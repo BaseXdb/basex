@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Arithmetic expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class Arith extends Arr {
@@ -40,9 +40,10 @@ public class Arith extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.NUMBER, cc);
-    if(allAreValues(false)) return cc.preEval(this);
+    if(values(false, cc)) return cc.preEval(this);
 
     // move values to second position
+    // 1 + position()  ->  position() + 1
     Expr expr1 = exprs[0], expr2 = exprs[1];
     if((calc == Calc.ADD || calc == Calc.MULTIPLY) && expr1 instanceof Value &&
         !(expr2 instanceof Value)) {
@@ -83,24 +84,28 @@ public class Arith extends Arr {
         final boolean inverse = acalc == calc.invert();
         final Expr arg1 = expr1.arg(0), arg2 = expr1.arg(1);
 
-        if(arg2 instanceof Value && expr2 instanceof Value && (acalc == calc || inverse)) {
+        if(arg2 instanceof ANum && expr2 instanceof ANum && (acalc == calc || inverse)) {
           // (E - 3) + 2  ->  E - (3 - 2)
           // (E * 3 div 2  ->  E * (3 div 2)
           final Calc ncalc = add ? calc : sub ? calc.invert() : null;
-          if(ncalc != null) {
-            expr = new Arith(info, arg1, new Arith(info, arg2, expr2, ncalc).optimize(cc),
-                acalc).optimize(cc);
-          }
+          if(ncalc != null) expr = new Arith(info, arg1,
+              new Arith(info, arg2, expr2, ncalc).optimize(cc), acalc).optimize(cc);
         } else if(inverse) {
           // E + NUMBER - NUMBER  ->  E
           // NUMBER * E div NUMBER  ->  E
           expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) && add ? arg2 : this;
-          if(expr != this) expr = new Cast(cc.sc(), info, expr, SeqType.NUMERIC_O).optimize(cc);
+          if(expr != this) expr = new Cast(info, expr, SeqType.NUMERIC_O).optimize(cc);
         }
+      } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof ANum &&
+          ((ANum) expr2).dbl() < 0) {
+        // E + -1  ->  E - 1
+        // E - -1  ->  E + 1
+        final Expr inv2 = new Unary(info, expr2, true).optimize(cc);
+        expr = new Arith(info, expr1, inv2, calc.invert()).optimize(cc);
       }
     }
 
-    if(expr == this && calcOpt == null && !(expr instanceof CmpSimpleG)) {
+    if(expr == this && calcOpt == null && !(expr instanceof ArithSimple)) {
       calcOpt = CalcOpt.get(st1, st2, calc);
       if(calcOpt != null && st1.zeroOrOne() && st2.zeroOrOne()) {
         expr = new ArithSimple(info, expr1, expr2, calc, calcOpt);
@@ -114,8 +119,8 @@ public class Arith extends Arr {
     final Item item1 = exprs[0].atomItem(qc, info);
     if(item1.isEmpty()) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);
-    return item2.isEmpty() ? Empty.VALUE : calcOpt != null ? calcOpt.eval(item1, item2, info) :
-      calc.eval(item1, item2, info);
+    if(item2.isEmpty()) return Empty.VALUE;
+    return calcOpt != null ? calcOpt.eval(item1, item2, info) : calc.eval(item1, item2, info);
   }
 
   @Override

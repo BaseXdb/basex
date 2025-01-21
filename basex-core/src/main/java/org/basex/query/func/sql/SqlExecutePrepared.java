@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Functions on relational databases.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Rositsa Shadura
  */
 public final class SqlExecutePrepared extends SqlExecute {
@@ -28,7 +28,7 @@ public final class SqlExecutePrepared extends SqlExecute {
   public Iter iter(final QueryContext qc) throws QueryException {
     final PreparedStatement ps = prepared(qc);
     final Item params = arg(1).item(qc, info);
-    final StatementOptions options = toOptions(arg(2), new StatementOptions(), true, qc);
+    final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
 
     final ANode prms = params.isEmpty() ? null : toElem(params, qc);
     if(prms != null && !prms.qname().eq(Q_PARAMETERS)) {

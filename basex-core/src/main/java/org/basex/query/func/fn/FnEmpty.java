@@ -15,13 +15,22 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FnEmpty extends StandardFunc {
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(empty(qc));
+  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    final Expr input = arg(0);
+    return input.seqType().zeroOrOne() ?
+      input.item(qc, info).isEmpty() :
+      input.iter(qc).next() == null;
   }
 
   @Override
@@ -61,7 +70,7 @@ public class FnEmpty extends StandardFunc {
       final Expr[] args = input.args();
       if(args.length == 2 && args[1].seqType().one() &&
           CmpG.compatible(args[0].seqType(), args[1].seqType(), true)) {
-        input = new CmpG(info, args[0], args[1], OpG.EQ, null, sc).optimize(cc);
+        input = new CmpG(info, args[0], args[1], OpG.EQ).optimize(cc);
       }
     } else if(STRING_TO_CODEPOINTS.is(input) || CHARACTERS.is(input)) {
       // exists(string-to-codepoints(E))  ->  boolean(string(E))
@@ -74,7 +83,7 @@ public class FnEmpty extends StandardFunc {
     final boolean map = _MAP_KEYS.is(input), array = _ARRAY_MEMBERS.is(input);
     if(map || array) {
       input = cc.function(map ? _MAP_SIZE : _ARRAY_SIZE, info, input.args());
-      return new CmpG(info, input, Int.ZERO, exists ? OpG.NE : OpG.EQ, null, sc).optimize(cc);
+      return new CmpG(info, input, Int.ZERO, exists ? OpG.NE : OpG.EQ).optimize(cc);
     }
 
     return embed(cc, true);
@@ -94,18 +103,5 @@ public class FnEmpty extends StandardFunc {
       return expr.mergeEbv(this, or, cc);
     }
     return null;
-  }
-
-  /**
-   * Evaluates the function.
-   * @param qc query context
-   * @return boolean result
-   * @throws QueryException query exception
-   */
-  final boolean empty(final QueryContext qc) throws QueryException {
-    final Expr input = arg(0);
-    return input.seqType().zeroOrOne() ?
-      input.item(qc, info).isEmpty() :
-      input.iter(qc).next() == null;
   }
 }

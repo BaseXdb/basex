@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -15,27 +16,22 @@ import org.basex.util.*;
 /**
  * Abstract update expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class Update extends Arr {
-  /** Static context. */
-  final StaticContext sc;
-
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param expr expressions
    */
-  Update(final StaticContext sc, final InputInfo info, final Expr... expr) {
+  Update(final InputInfo info, final Expr... expr) {
     super(info, SeqType.EMPTY_SEQUENCE_Z, expr);
-    this.sc = sc;
   }
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.UPD.in(flags) || Flag.NDT.in(flags) || super.has(flags);
+    return Flag.UPD.oneOf(flags) || Flag.NDT.oneOf(flags) || super.has(flags);
   }
 
   /**
@@ -59,13 +55,17 @@ abstract class Update extends Arr {
   }
 
   /**
-   * Returns a node list.
-   * @param builder node builder
-   * @param attr attributes or elements
-   * @return list
+   * Creates a node builder.
+   * @param expr node expression
+   * @param qc query context
+   * @return builder
+   * @throws QueryException query exception
    */
-  final ANodeList toList(final FBuilder builder, final boolean attr) {
-    final ANodeList list = attr ? builder.attributes : builder.children;
-    return list != null ? list : new ANodeList();
+  final FBuilder builder(final Expr expr, final QueryContext qc) throws QueryException {
+    final FBuilder builder = new FBuilder();
+    final Constr constr = new Constr(builder, info, qc).add(expr);
+    if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
+    if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
+    return builder;
   }
 }

@@ -14,14 +14,14 @@ import org.basex.util.options.Options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JsonSerialize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final JsonSerialOptions options = toOptions(arg(1), new JsonSerialOptions(), true, qc);
+    final JsonSerialOptions options = toOptions(arg(1), new JsonSerialOptions(), qc);
     return Str.get(serialize(input, options(options), INVALIDOPT_X, qc));
   }
 

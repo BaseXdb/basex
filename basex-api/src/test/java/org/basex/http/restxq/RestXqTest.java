@@ -15,7 +15,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class contains RESTXQ tests.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class RestXqTest extends HTTPTest {
@@ -38,41 +38,41 @@ public abstract class RestXqTest extends HTTPTest {
    * Executes the specified GET request and tests the result.
    * @param expected expected result
    * @param function function to test
-   * @param query request
+   * @param path path of request
    * @throws IOException I/O exception
    */
-  protected static void get(final String expected, final String function, final String query)
+  protected static void get(final String expected, final String function, final String path)
       throws IOException {
     register(function);
-    get(expected, query);
+    get(expected, path);
   }
 
   /**
    * Executes the specified GET request and tests for a status code.
    * @param status status code to check
    * @param function function to test
-   * @param query request
+   * @param path path of request
    * @throws IOException I/O exception
    */
-  protected static void get(final int status, final String function, final String query)
+  protected static void get(final int status, final String function, final String path)
       throws IOException {
     register(function);
-    get(status, query);
+    get(status, path);
   }
 
   /**
    * Executes the specified POST request and tests the result.
    * @param expected expected result
    * @param function function to test
-   * @param query request
+   * @param path path of request
    * @param payload payload
    * @param type media type
    * @throws IOException I/O exception
    */
-  protected static void post(final String expected, final String function, final String query,
+  protected static void post(final String expected, final String function, final String path,
       final String payload, final MediaType type) throws IOException {
     register(function);
-    assertEquals(expected, post(payload, type, query));
+    assertEquals(expected, post(payload, type, path));
   }
 
   /**

@@ -18,23 +18,22 @@ import org.basex.util.hash.*;
 /**
  * Delete expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
 public final class Delete extends Update {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param trg target expression
    */
-  public Delete(final StaticContext sc, final InputInfo info, final Expr trg) {
-    super(sc, info, trg);
+  public Delete(final InputInfo info, final Expr trg) {
+    super(info, trg);
   }
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = exprs[0].iter(qc);
+    final Iter iter = arg(0).iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof ANode)) throw UPTRGDELEMPT_X.get(info, item);
       final ANode node = (ANode) item;
@@ -49,7 +48,7 @@ public final class Delete extends Update {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Delete(sc, info, exprs[0].copy(cc, vm)));
+    return copyType(new Delete(info, arg(0).copy(cc, vm)));
   }
 
   @Override
@@ -59,6 +58,6 @@ public final class Delete extends Update {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(DELETE).token(NODES).token(exprs[0]);
+    qs.token(DELETE).token(NODES).token(arg(0));
   }
 }

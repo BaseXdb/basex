@@ -20,7 +20,7 @@ import org.basex.util.similarity.*;
  * This is a parser for command strings, creating {@link Command} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class StringParser extends CommandParser {
@@ -200,9 +200,9 @@ final class StringParser extends CommandParser {
       case REPO:
         switch(consume(CmdRepo.class, cmd)) {
           case INSTALL:
-            return new RepoInstall(string(cmd), new InputInfo(parser));
+            return new RepoInstall(string(cmd), parser.info());
           case DELETE:
-            return new RepoDelete(string(cmd), new InputInfo(parser));
+            return new RepoDelete(string(cmd), parser.info());
           case LIST:
             return new RepoList();
         }
@@ -219,21 +219,21 @@ final class StringParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String string(final Cmd cmd) throws QueryException {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     consumeWS();
     boolean more = true, quoted = false;
     while(more && parser.more()) {
-      final char ch = parser.curr();
+      final int cp = parser.current();
       if(quoted) {
-        if(ch == '"') more = false;
-      } else if(ch <= ' ' || eoc()) {
+        if(cp == '"') more = false;
+      } else if(cp <= ' ' || eoc()) {
         break;
-      } else if(ch == '"' && sb.length() == 0) {
+      } else if(cp == '"' && tb.isEmpty()) {
         quoted = true;
       }
-      sb.append(parser.consume());
+      tb.add(parser.consume());
     }
-    return finish(sb.toString().replaceAll("^\"|\"$", ""), cmd);
+    return finish(tb.toString().replaceAll("^\"|\"$", ""), cmd);
   }
 
   /**
@@ -245,9 +245,9 @@ final class StringParser extends CommandParser {
    */
   private String remaining(final Cmd cmd, final boolean quotes) throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    while(parser.more()) sb.append(parser.consume());
-    final String str = sb.toString();
+    final TokenBuilder tb = new TokenBuilder();
+    while(parser.more()) tb.add(parser.consume());
+    final String str = tb.toString();
     return finish(quotes ? str.replaceAll("^\"|\"$", "") : str, cmd);
   }
 
@@ -258,9 +258,9 @@ final class StringParser extends CommandParser {
    */
   private String command() throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    while(!eoc() && !ws(parser.curr())) sb.append(parser.consume());
-    return finish(sb, null);
+    final TokenBuilder tb = new TokenBuilder();
+    while(!eoc() && !ws(parser.current())) tb.add(parser.consume());
+    return finish(tb.toString(), null);
   }
 
   /**
@@ -305,16 +305,16 @@ final class StringParser extends CommandParser {
    */
   private String name(final Cmd cmd, final boolean glob) throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    char last = 0;
+    final TokenBuilder tb = new TokenBuilder();
+    int last = 0;
     while(true) {
-      final char ch = parser.curr();
-      if(!Databases.validChar(ch, sb.length() == 0) &&
-          (!glob || ch != '*' && ch != '?' && ch != ',')) {
-        return finish((eoc() || ws(ch)) && last != '.' ? sb : null, cmd);
+      final int cp = parser.current();
+      if(!Databases.validChar(cp, tb.isEmpty()) &&
+          (!glob || cp != '*' && cp != '?' && cp != ',')) {
+        return finish((eoc() || ws(cp)) && last != '.' ? tb.toString() : null, cmd);
       }
-      sb.append(parser.consume());
-      last = ch;
+      tb.add(parser.consume());
+      last = cp;
     }
   }
 
@@ -329,7 +329,7 @@ final class StringParser extends CommandParser {
     consumeWS();
     final int p = parser.pos;
     final boolean ok = (parser.consume(key) || parser.consume(
-        key.toLowerCase(Locale.ENGLISH))) && (parser.curr(0) || ws(parser.curr()));
+        key.toLowerCase(Locale.ENGLISH))) && (parser.current(0) || ws(parser.current()));
     if(!ok) {
       parser.pos = p;
       if(cmd != null) throw help(null, cmd);
@@ -357,19 +357,18 @@ final class StringParser extends CommandParser {
    */
   private String number() throws QueryException {
     consumeWS();
-    final StringBuilder sb = new StringBuilder();
-    if(parser.curr() == '-') sb.append(parser.consume());
-    while(digit(parser.curr())) sb.append(parser.consume());
-    return finish(eoc() || ws(parser.curr()) ? sb : null, null);
+    final TokenBuilder tb = new TokenBuilder();
+    if(parser.current() == '-') tb.add(parser.consume());
+    while(digit(parser.current())) tb.add(parser.consume());
+    return finish(eoc() || ws(parser.current()) ? tb.toString() : null, null);
   }
 
   /**
-   * Consumes all whitespace characters from the beginning of the remaining
-   * query.
+   * Consumes all whitespace characters from the beginning of the remaining query.
    */
   private void consumeWS() {
     final int pl = parser.length;
-    while(parser.pos < pl && parser.input.charAt(parser.pos) <= ' ') ++parser.pos;
+    while(parser.pos < pl && parser.input[parser.pos] <= ' ') ++parser.pos;
     parser.mark = parser.pos - 1;
   }
 
@@ -402,11 +401,13 @@ final class StringParser extends CommandParser {
       return null;
     }
 
-    // output error for similar commands
-    final byte[] name = uc(token(token));
-    final Object similar = Levenshtein.similar(name, startWith(complete, null),
-        o -> ((Enum<?>) o).name());
-    if(similar != null) throw error(alt, UNKNOWN_SIMILAR_X_X, name, similar);
+    // include similar command in error message
+    if(token.matches("^\\w+$")) {
+      final byte[] name = uc(token(token));
+      final Object similar = Levenshtein.similar(name, startWith(complete, null),
+          cmd -> ((Enum<?>) cmd).name());
+      if(similar != null) throw error(alt, UNKNOWN_SIMILAR_X_X, name, similar);
+    }
 
     // show unknown command error or available command extensions
     throw parent == null ? error(alt, UNKNOWN_TRY_X, token) : help(alt, parent);
@@ -448,7 +449,7 @@ final class StringParser extends CommandParser {
    * @return true if command has ended
    */
   private boolean eoc() {
-    return !parser.more() || parser.curr() == ';';
+    return !parser.more() || parser.current() == ';';
   }
 
   /**

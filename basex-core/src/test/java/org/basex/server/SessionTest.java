@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the client/server query API.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class SessionTest extends SandboxTest {
@@ -633,7 +633,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception */
   @Test public void queryJSON() throws IOException {
     final Query query = session.query(SerializerOptions.INDENT.arg("no") + "map { 'a': '&amp;' }");
-    assertEqual("map{\"a\":\"&amp;\"}", query.next());
+    assertEqual("{\"a\":\"&amp;\"}", query.next());
   }
 
   /**

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Sequence of items of type {@link Int xs:short}, containing at least two of them.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ShrSeq extends NativeSeq {
@@ -97,7 +97,7 @@ public final class ShrSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  static Value get(final int size, final Value... values) throws QueryException {
+  public static Value get(final long size, final Value... values) throws QueryException {
     final ShortList tmp = new ShortList(size);
     for(final Value value : values) {
       // speed up construction, depending on input

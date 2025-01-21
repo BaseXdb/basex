@@ -12,7 +12,7 @@ import org.basex.util.options.*;
  * This class contains options which are used in the GUI.
  * They are also stored in the project's home directory.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class GUIOptions extends Options {
@@ -100,6 +100,8 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SHOWTREE = new BooleanOption("SHOWTREE", false);
   /** Flag for activated project structure. */
   public static final BooleanOption SHOWPROJECT = new BooleanOption("SHOWPROJECT", true);
+  /** Indent result. */
+  public static final BooleanOption INDENTRESULT = new BooleanOption("INDENTRESULT", false);
 
   /** Preferences tab. */
   public static final NumberOption PREFTAB = new NumberOption("PREFTAB", 0);

@@ -16,28 +16,29 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class InspectStaticContext extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    Item func = arg(0).item(qc, info);
+    final Item func = arg(0).item(qc, info);
     final String name = toString(arg(1), qc);
     final StaticContext sctx;
     if(func.isEmpty()) {
-      sctx = sc;
+      sctx = sc();
+    } else if(func instanceof FuncItem) {
+      final FuncItem fi = (FuncItem) func;
+      sctx = fi.info().sc();
     } else {
-      func = toFunction(func, qc);
-      if(!(func instanceof FuncItem)) throw INVFUNCITEM_X_X.get(info, func.type, func);
-      sctx = ((FuncItem) func).sc;
+      throw INVFUNCITEM_X_X.get(info, func.type, func);
     }
 
     switch(name) {
       case BASE_URI:
         return sctx.baseURI();
       case NAMESPACES:
-        MapBuilder mb = new MapBuilder(info);
+        MapBuilder mb = new MapBuilder();
         Atts nsp = sctx.ns.list;
         int ns = nsp.size();
         for(int n = 0; n < ns; n++) {
@@ -71,9 +72,9 @@ public final class InspectStaticContext extends StandardFunc {
         return StrSeq.get(tl);
       case DECIMAL_FORMATS:
         // enforce creation of default formatter
-        sctx.decFormat(QNm.EMPTY);
+        sctx.decFormat(QNm.EMPTY, info);
         // loop through all formatters
-        mb = new MapBuilder(info);
+        mb = new MapBuilder();
         for(final byte[] format : sctx.decFormats) {
           mb.put(Str.get(format), sctx.decFormats.get(format).toMap());
         }

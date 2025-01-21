@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the functions of the XQuery Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class XQueryModuleTest extends SandboxTest {
@@ -26,11 +26,16 @@ public final class XQueryModuleTest extends SandboxTest {
     error(func.args("1+"), CALCEXPR);
     error("declare variable $a:=1;" + func.args("$a"), VARUNDEF_X);
     error("for $a in (1, 2) return" + func.args("$a"), VARUNDEF_X);
+
     // check updating expressions
     error(func.args("delete node ()"), XQUERY_UPDATE1);
     error(func.args("declare %updating function local:x() {()}; local:x()"), XQUERY_UPDATE1);
     query(func.args("declare %updating function local:x() {()}; 1"));
     query(func.args(DOC.args(PATH).trim()));
+
+    // GH-2332
+    query("try {" + func.args("declare function local:f() { local:f() }; local:f()") +
+        "} catch xquery:error { 'STOP' }", "STOP");
   }
 
   /** Test method. */
@@ -156,9 +161,9 @@ public final class XQueryModuleTest extends SandboxTest {
     error(func.args(" (" + updating + ", " + updating + ")[number(<_>1</_>)]"), FUNCUP_X);
     error(func.args(" (" + updating + ", " + updating + ")[" + wrap(1) + ']'), FUNCUP_X);
 
-    error(func.args(" count#1"), INVARITY_X_X_X);
+    error(func.args(" count#1"), INVARITY_X_X);
     error(func.args(" 123"), INVCONVERT_X_X_X);
-    error(func.args(" (count#1, count#1)"), INVARITY_X_X_X);
+    error(func.args(" (count#1, count#1)"), INVARITY_X_X);
     error(func.args(" (123, 123)"), INVCONVERT_X_X_X);
     error(func.args(" error#0"), FUNERR1);
     error(func.args(" replicate(error#0, 100)"), FUNERR1);

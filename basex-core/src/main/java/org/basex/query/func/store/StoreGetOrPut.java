@@ -1,13 +1,14 @@
 package org.basex.query.func.store;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class StoreGetOrPut extends StoreFn {
@@ -18,9 +19,14 @@ public final class StoreGetOrPut extends StoreFn {
 
     Value value = store(qc).get(key);
     if(value.isEmpty()) {
-      value = put.invoke(qc, info);
-      store(qc).put(key, value);
+      value = invoke(put, new HofArgs(), qc);
+      store(key, value, qc);
     }
     return value;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

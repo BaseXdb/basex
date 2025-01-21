@@ -11,7 +11,7 @@ import org.basex.util.options.*;
  * This class defines options which are used all around the project.
  * The initial keys and values are also stored in the project's home directory.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class StaticOptions extends Options {
@@ -32,6 +32,8 @@ public final class StaticOptions extends Options {
   public static final BooleanOption FAIRLOCK = new BooleanOption("FAIRLOCK", false);
   /** Timeout (seconds) for remembering result of asynchronous queries. */
   public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
+  /** Write store at shutdown. */
+  public static final BooleanOption WRITESTORE = new BooleanOption("WRITESTORE", true);
 
   /** Comment: written to the options file. */
   public static final Comment C_CLIENT = new Comment("Client/Server Architecture");
@@ -64,7 +66,11 @@ public final class StaticOptions extends Options {
   /** Defines the number of parallel readers. */
   public static final NumberOption PARALLEL = new NumberOption("PARALLEL", 8);
   /** Logging flag. */
-  public static final BooleanOption LOG = new BooleanOption("LOG", true);
+  public static final StringOption LOG = new StringOption("LOG", "data");
+  /** Log filter. */
+  public static final StringOption LOGEXCLUDE = new StringOption("LOGEXCLUDE", "");
+  /** Log remove pattern. */
+  public static final StringOption LOGCUT = new StringOption("LOGCUT", "");
   /** Log message cut-off. */
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
   /** Write trace output to the logs. */

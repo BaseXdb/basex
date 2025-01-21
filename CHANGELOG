@@ -1,3 +1,79 @@
+VERSION 11.6 (November 28, 2024) ---------------------------------------
+
+ - [ADD] New XQuery 4 features (sibling axes, civil-timezone, etc)
+ - [ADD] job:execute: Run XQuery scripts
+ - [ADD] Permissions: Access to request headers and query parameters
+ - [ADD] New options: LOGEXCLUDE, LOGCUT
+ - [ADD] JSON serialization: Improved double representation
+ - [ADD] JSON serialization: json-lines support
+ - [FIX] Tomcat: improved job handling
+
+VERSION 11.5 (October 29, 2024) ----------------------------------------
+
+ - [ADD] New XQuery 4 features (support for named record type, etc)
+ - [MOD] XQuery: tweaked rules for swapping comparison operands
+ - [FIX] Logging: Whitespace normalized
+ - [FIX] XQuery: transitive module imports
+
+VERSION 11.4 (October 2, 2024) -----------------------------------------
+
+ - [ADD] New XQuery 4 features (fn:element-number, others)
+ - [FIX] XQuery: Inlining of sequences
+ - [FIX] XQuery: better support for JSON payloads in HTTP requests
+ - [FIX] XQuery: improved processing of serialization parameters
+ - [FIX] Core: concurrent string caching
+
+VERSION 11.3 (September 19, 2024) --------------------------------------
+
+ - [ADD] New XQuery 4 features
+ - [ADD] Options: LOG, support for stdout/stderr/slf4j targets
+ - [ADD] XQuery: focus expression (A -> B; experimental)
+ - [MOD] XQuery, processing single chars: reduced memory consumption
+ - [MOD] XQuery, db:node-id, db:node-pre: faster retrieval
+ - [FIX] XQuery: self-recursiveness of functions and variables revised
+ - [FIX] XQuery: inspect:function has become more robust
+
+VERSION 11.2 (August 15, 2024) -----------------------------------------
+
+ - [ADD] New XQuery 4 features
+ - [ADD] XQuery: proc:system: new 'environment' option
+ - [MOD] GUI: Global Ctrl-ENTER shortcut
+ - [MOD] XQuery: faster evaluation of recursive functions
+ - [MOD] XQuery: faster invocation of HOF function parameters
+ - [MOD] XQuery: distinct-values: faster processing of numeric input
+ - [MOD] XQuery: fewer redundant type checks
+ - [FIX] XQuery: circularity/self-dependency checks revised
+ - [FIX] WebSockets (Jetty 11): Idle timeout increased to 1 hour
+
+VERSION 11.1 (July 10, 2024) -------------------------------------------
+
+ - [FIX] Duplicate libraries removed from distribution packages
+ - [FIX] XQuery, inspect:module and inspect:xqdoc
+ - [FIX] WebSocket, ws:broadcast, ws:emit: send maps and arrays
+ - [FIX] HTTP Payloads: handling multipart messages
+ - [ADD] XQuery: support for union node tests
+ - [MOD] XQuery: Better coercion for arrays and maps
+ - [MIN] Updated to Jetty 11.0.22 and Markup Blitz 1.4
+
+VERSION 11.0 (June 6, 2024) --------------------------------------------
+
+ STORAGE
+ - Key/value Store: Better compactification when storing values
+ - CSV/JSON/XML parsing: reduced memory consumption
+
+ XQUERY
+ - First release with new 4.0 features
+ - Numerous new built-in functions (standard, maps, arrays, math)
+ - Updates: Multiple targets in rename/replace/insert expressions
+ - New custom functions: archive:refresh, validate:xsd-init, xslt:init
+ - Full support for Invisible XML.
+
+ GENERAL
+ - GUI: Full Unicode character support
+ - Web Server: Upgrade to Jetty 11
+ - Command-Line: New options -C, -Q, -W
+ - Options: WRITESTORE, writes store to disk at shutdown time
+
 VERSION 10.7 (August 4, 2023) ------------------------------------------
 
  - GUI, Editor: Full support for Unicode characters

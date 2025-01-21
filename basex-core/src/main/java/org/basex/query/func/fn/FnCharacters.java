@@ -11,17 +11,16 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnCharacters extends StandardFunc {
+public final class FnCharacters extends StandardFunc {
   @Override
-  public final Iter iter(final QueryContext qc) throws QueryException {
+  public Iter iter(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
     final byte[] token = toToken(value);
     final int tl = token.length;
@@ -35,9 +34,7 @@ public class FnCharacters extends StandardFunc {
         }
         @Override
         public Value value(final QueryContext q, final Expr expr) throws QueryException {
-          final TokenList list = new TokenList(value.length(info));
-          for(final byte b : token) list.add(new byte[] { b });
-          return StrSeq.get(list);
+          return StrSeq.get(value.characters(info));
         }
       };
     }
@@ -48,30 +45,22 @@ public class FnCharacters extends StandardFunc {
       @Override
       public Str next() {
         if(t == tl) return null;
-        final int e = t + cl(token, t);
-        final byte[] string = Arrays.copyOfRange(token, t, e);
+        final int s = t, e = s + cl(token, s);
         t = e;
-        return Str.get(string);
+        return Str.get(Arrays.copyOfRange(token, s, e));
       }
     };
   }
 
   @Override
-  public final Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final AStr value = toZeroStr(arg(0), qc);
-    final byte[] token = toToken(value);
+    return StrSeq.get(value.characters(info));
+  }
 
-    final TokenList list = new TokenList(value.length(info));
-    if(value.ascii(info)) {
-      for(final byte b : token) list.add(new byte[] { b });
-    } else {
-      final int tl = token.length;
-      for(int t = 0; t < tl;) {
-        final int e = t + cl(token, t);
-        list.add(Arrays.copyOfRange(token, t, e));
-        t = e;
-      }
-    }
-    return StrSeq.get(list);
+  @Override
+  protected Expr opt(final CompileContext cc) {
+    final Expr value = arg(0);
+    return value.seqType().zero() ? value : this;
   }
 }

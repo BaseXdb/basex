@@ -14,7 +14,7 @@ import org.basex.util.hash.*;
 /**
  * Definitions of all built-in XQuery annotations.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum Annotation {
@@ -138,6 +138,8 @@ public enum Annotation {
   _REST_HEAD("HEAD()", params(), REST_URI),
   /** XQuery annotation. */
   _REST_OPTIONS("OPTIONS()", params(), REST_URI),
+  /** XQuery annotation. */
+  _REST_PATCH("PATCH([body])", params(STRING_O), REST_URI),
 
   /** XQuery annotation. */
   _UNIT_AFTER("after([function])", params(STRING_O), UNIT_URI),
@@ -183,7 +185,7 @@ public enum Annotation {
 
   static {
     for(final Annotation value : VALUES) {
-      MAP.put(new QNm(value.local(), value.uri).internal(), value);
+      MAP.put(new QNm(value.local(), value.uri).unique(), value);
     }
   }
 
@@ -218,7 +220,7 @@ public enum Annotation {
    * @return annotation or {@code null}
    */
   public static Annotation get(final QNm name) {
-    return MAP.get(name.internal());
+    return MAP.get(name.unique());
   }
 
   /**

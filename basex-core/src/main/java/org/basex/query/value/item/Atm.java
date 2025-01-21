@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Untyped atomic item ({@code xs:untypedAtomic}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Atm extends Item {
@@ -54,6 +54,11 @@ public final class Atm extends Item {
   }
 
   @Override
+  public int hashCode() {
+    return Token.hashCode(value);
+  }
+
+  @Override
   public boolean bool(final InputInfo ii) {
     return value.length != 0;
   }
@@ -64,10 +69,10 @@ public final class Atm extends Item {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return comparable(item) ? Token.eq(value, item.string(ii), coll) :
-      item.equal(this, coll, sc, ii);
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return comparable(item) ? Token.eq(value, item.string(ii), Collation.get(coll, ii)) :
+      item.equal(this, coll, ii);
   }
 
   @Override
@@ -78,15 +83,18 @@ public final class Atm extends Item {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return comparable(item) ? Token.compare(value, item.string(ii), coll) :
+    return comparable(item) ? Token.compare(value, item.string(ii), Collation.get(coll, ii)) :
       -item.compare(this, coll, transitive, ii);
   }
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[xs:untypedAtomic('x')]  ->  E[true()]
-    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ?
-      Bln.get(this != EMPTY) : this, mode);
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // E[xs:untypedAtomic('x')]  ->  E[true()]
+      expr = Bln.get(this != EMPTY);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

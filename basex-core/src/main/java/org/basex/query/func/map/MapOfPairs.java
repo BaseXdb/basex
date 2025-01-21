@@ -13,39 +13,45 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MapOfPairs extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter pairs = arg(0).iter(qc);
+    final Iter input = arg(0).iter(qc);
     final FItem combine = toFunctionOrNull(arg(1), 2, qc);
 
-    XQMap result = XQMap.empty();
-    for(Item item; (item = qc.next(pairs)) != null;) {
+    final HofArgs cargs = combine != null ? new HofArgs(2) : null;
+    final MapBuilder map = new MapBuilder(input.size());
+    for(Item item; (item = qc.next(input)) != null;) {
       // extract key/value record entries
-      final XQMap map = toRecord(item, Str.KEY, Str.VALUE);
-      final Item key = checkType(map.get(Str.KEY, info), AtomType.ANY_ATOMIC_TYPE);
-      Value value = map.get(Str.VALUE, info);
-      if(result.contains(key, info)) {
-        final Value old = result.get(key, info);
-        value = combine != null ? combine.invoke(qc, info, old, value) :
+      final XQMap pair = toRecord(item, RecordType.PAIR, qc);
+      final Item key = toAtomItem(pair.get(Str.KEY), qc);
+      Value value = pair.get(Str.VALUE);
+      final Value old = map.get(key);
+      if(old != null) {
+        value = combine != null ? invoke(combine, cargs.set(0, old).set(1, value), qc) :
           ValueBuilder.concat(old, value, qc);
       }
-      result = result.put(key, value, info);
+      map.put(key, value);
     }
-    return result;
+    return map.map();
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) {
-      final SeqType st = ft.declType;
-      final AtomType kt = st.type.atomic();
-      exprType.assign(MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE, st));
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) {
+      final SeqType vt = ((MapType) tp).valueType;
+      final AtomType kt = vt.type.atomic();
+      exprType.assign(MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE, vt));
     }
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

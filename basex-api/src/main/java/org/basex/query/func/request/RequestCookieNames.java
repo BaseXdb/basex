@@ -1,6 +1,6 @@
 package org.basex.query.func.request;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RequestCookieNames extends ApiFunc {

@@ -13,7 +13,7 @@ import org.basex.query.var.*;
  * A visitor for all sub-expressions in an {@link Expr}. All methods return a
  * {@code boolean} which signals if the tree walk should be continued.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public abstract class ASTVisitor {
@@ -64,16 +64,6 @@ public abstract class ASTVisitor {
    */
   @SuppressWarnings("unused")
   public boolean staticFuncCall(final StaticFuncCall call) {
-    return true;
-  }
-
-  /**
-   * Notifies the visitor of a dynamic function call.
-   * @param call function call
-   * @return if more expressions should be visited ({@code true} by default)
-   */
-  @SuppressWarnings("unused")
-  public boolean dynFuncCall(final DynFuncCall call) {
     return true;
   }
 

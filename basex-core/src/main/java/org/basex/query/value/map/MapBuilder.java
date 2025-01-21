@@ -1,6 +1,7 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -9,28 +10,26 @@ import org.basex.util.*;
 /**
  * A convenience class for building an {@link XQMap}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MapBuilder {
-  /** Input info (can be {@code null}). */
-  private final InputInfo info;
   /** Map. */
-  private XQMap map = XQMap.empty();
+  private final ItemObjectMap<Value> map;
 
   /**
    * Constructor.
    */
   public MapBuilder() {
-    this(null);
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor.
-   * @param info input info (can be {@code null})
+   * Constructor with initial capacity.
+   * @param capacity initial capacity (will be resized to a power of two)
    */
-  public MapBuilder(final InputInfo info) {
-    this.info = info;
+  public MapBuilder(final long capacity) {
+    map = new ItemObjectMap<>(capacity);
   }
 
   /**
@@ -41,7 +40,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final Item key, final Value value) throws QueryException {
-    map = map.put(key, value, info);
+    map.put(key, value);
     return this;
   }
 
@@ -112,23 +111,23 @@ public final class MapBuilder {
   }
 
   /**
-   * Checks if the given key exists.
+   * Returns the value for the specified key.
+   * @param key key to look for
+   * @return value, or {@code null} if nothing was found
+   * @throws QueryException query exception
+   */
+  public Value get(final Item key) throws QueryException {
+    return map.get(key);
+  }
+
+  /**
+   * Checks if the specified key exists in the map.
    * @param key key to look for
    * @return result of check
    * @throws QueryException query exception
    */
   public boolean contains(final Item key) throws QueryException {
-    return map.contains(key, info);
-  }
-
-  /**
-   * Returns the value of a map.
-   * @param key key to look for
-   * @return value or empty sequence
-   * @throws QueryException query exception
-   */
-  public Value get(final Item key) throws QueryException {
-    return map.get(key, info);
+    return map.contains(key);
   }
 
   /**
@@ -136,8 +135,11 @@ public final class MapBuilder {
    * @return map
    */
   public XQMap map() {
-    final XQMap m = map;
-    map = null;
-    return m;
+    return XQMap.map(map);
+  }
+
+  @Override
+  public String toString() {
+    return Util.className(this) + '[' + map + ']';
   }
 }

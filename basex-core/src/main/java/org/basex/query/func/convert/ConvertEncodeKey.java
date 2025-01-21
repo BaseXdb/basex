@@ -7,10 +7,10 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class ConvertEncodeKey extends ConvertIntegersToBase64 {
+public final class ConvertEncodeKey extends ConvertIntegersToBase64 {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] key = toToken(arg(0), qc);

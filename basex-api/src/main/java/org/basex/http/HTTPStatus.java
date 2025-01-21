@@ -1,13 +1,13 @@
 package org.basex.http;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 
 import org.basex.util.*;
 
 /**
  * Enumeration with HTTP codes and error messages.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum HTTPStatus {

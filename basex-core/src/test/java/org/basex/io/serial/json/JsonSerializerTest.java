@@ -16,7 +16,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for the {@link JsonSerializer} classes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JsonSerializerTest extends SandboxTest {
@@ -98,9 +98,9 @@ public final class JsonSerializerTest extends SandboxTest {
   }
 
   /**
-   * Tests for the 'map' serialization format.
+   * Tests for the 'xquery' serialization format.
    */
-  @Test public void map() {
+  @Test public void xquery() {
     final JsonFormat format = JsonFormat.XQUERY;
 
     // objects
@@ -133,17 +133,31 @@ public final class JsonSerializerTest extends SandboxTest {
     error("[ (1, 2) ]", format, SERJSONSEQ);
 
     // mixed
-    serialize("map { 'A': map {} }", "{'A':{}}", format);
+    serialize("map { 'A': map { } }", "{'A':{}}", format);
     serialize("map { 'A': map { 'B': 'C' } }", "{'A':{'B':'C'}}", format);
     serialize("map { 'A': array { 'B' } }", "{'A':['B']}", format);
     serialize("map { '0': () }", "{'0':null}", format);
     serialize("map { '-1': () }", "{'-1':null}", format);
 
-    // atomic values
+    // atomic items
     serialize("()", "null", format);
     serialize("'A'", "'A'", format);
     serialize("true()", "true", format);
     serialize("1", "1", format);
+
+    serialize("0.0e0", "0", format);
+    serialize("-0.0e0", "-0", format);
+    serialize("1e-6", "0.000001", format);
+    serialize("1e-7", "1e-7", format);
+    serialize("1e20", "100000000000000000000", format);
+    serialize("1e21", "1e21", format);
+    serialize("12345678.9e0", "12345678.9", format);
+    serialize("12345678901234e0", "12345678901234", format);
+    serialize("123456789012345e0", "123456789012345", format);
+    serialize("1234567890123456e0", "1234567890123456", format);
+    serialize("12345678901234567e0", "12345678901234568", format);
+    serialize("123456789012345678e0", "123456789012345680", format);
+    serialize("1234567890123456789e0", "1234567890123456770", format);
   }
 
   /**

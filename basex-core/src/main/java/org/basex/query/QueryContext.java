@@ -46,7 +46,7 @@ import org.basex.util.list.*;
  * This class organizes both static and dynamic properties that are specific to a
  * single query.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class QueryContext extends Job implements Closeable {
@@ -95,11 +95,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Available collations. */
   public TokenObjMap<Collation> collations;
-
-  /** Number of successive tail calls. */
-  public int tailCalls;
-  /** Maximum number of successive tail calls (will be set before compilation). */
-  public int maxCalls;
+  /** Perform tail-call optimizations. */
+  public boolean tco;
 
   /** Function for the next tail call. */
   private XQFunction tcFunc;
@@ -110,13 +107,17 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Parsed modules, containing the file path and module uri. */
   public final TokenMap modParsed = new TokenMap();
+  /** Parsed modules, containing the file path and library module. */
+  public final TokenObjMap<LibraryModule> libs = new TokenObjMap<>();
   /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
-  final TokenMap modDeclared = new TokenMap();
+  public final TokenMap modDeclared = new TokenMap();
   /** Stack of module files that are currently parsed. */
   final TokenList modStack = new TokenList();
 
   /** Main module (root expression). */
   public MainModule main;
+  /** Context value type. */
+  public SeqType contextType;
   /** Context scope. */
   public ContextScope contextValue;
   /** Indicates if context scope exists and is final. */
@@ -249,14 +250,14 @@ public final class QueryContext extends Job implements Closeable {
   public void assign(final StaticFunc func, final Expr... args) throws QueryException {
     for(final StaticFunc sf : functions.funcs()) {
       if(func.info.equals(sf.info)) {
-        // inline arguments of called function
+        // disable inlining of called function to ensure explicit locks are considered
         if(!sf.anns.contains(Annotation._BASEX_INLINE)) {
-          sf.anns = sf.anns.attach(new Ann(sf.info, Annotation._BASEX_INLINE, Empty.VALUE));
+          sf.anns = sf.anns.attach(new Ann(sf.info, Annotation._BASEX_INLINE, Int.ZERO));
         }
         // create and assign function call
-        final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.sc, sf.info);
+        final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.info, true);
         call.setFunc(sf);
-        main = new MainModule(call, new VarScope(sf.sc));
+        main = new MainModule(call, new VarScope(), sf.sc);
         updating = sf.updating();
         return;
       }
@@ -275,7 +276,7 @@ public final class QueryContext extends Job implements Closeable {
     run(info.compiling, () -> {
       // assign tail call option after compiling options
       options.compile();
-      maxCalls = context.options.get(MainOptions.TAILCALLS);
+      tco = context.options.get(MainOptions.TAILCALLS) >= 0;
 
       // bind external variables
       if(parent == null) {
@@ -284,7 +285,7 @@ public final class QueryContext extends Job implements Closeable {
           bind(entry.getKey(), Atm.get(entry.getValue()), null, main.sc);
         }
       }
-      vars.bindExternal(this, bindings);
+      vars.bindExternal(this, bindings, true);
 
       return compile(false);
     });
@@ -308,7 +309,7 @@ public final class QueryContext extends Job implements Closeable {
       }
       final Value value = bindings.get(QNm.EMPTY);
       if(value != null) {
-        contextValue = new ContextScope(value, sc.contextType, new VarScope(sc), null, null);
+        contextValue = new ContextScope(value, sc.contextType, new VarScope(), sc, null, null);
       }
       if(contextValue != null) finalContext = true;
 
@@ -322,7 +323,7 @@ public final class QueryContext extends Job implements Closeable {
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Void compile(final boolean dynamic) throws QueryException {
+  public Void compile(final boolean dynamic) throws QueryException {
     checkStop();
 
     info.runtime = false;
@@ -338,7 +339,7 @@ public final class QueryContext extends Job implements Closeable {
         }
       }
       if(main != null) {
-        new QueryCompiler().compile(cc);
+        QueryCompiler.compile(cc);
       } else {
         // required for XQueryParse
         functions.compileAll(cc);
@@ -483,7 +484,7 @@ public final class QueryContext extends Job implements Closeable {
     // only show root node if functions or variables exist
     final QueryPlan plan = new QueryPlan(compiled, closed, full);
     if(main != null) {
-      for(final StaticScope ss : QueryCompiler.usedDecls(main)) ss.toXml(plan);
+      for(final StaticDecl ss : main.references()) ss.toXml(plan);
       main.toXml(plan);
     } else {
       functions.toXml(plan);
@@ -546,11 +547,11 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Registers a tail-called function and its arguments to this query context.
    * @param fn function to call
-   * @param arg arguments to pass to {@code fn}
+   * @param args arguments to pass to {@code fn}
    */
-  public void registerTailCall(final XQFunction fn, final Value[] arg) {
+  public void registerTailCall(final XQFunction fn, final Value[] args) {
     tcFunc = fn;
-    tcArgs = arg;
+    tcArgs = args;
   }
 
   /**
@@ -568,9 +569,9 @@ public final class QueryContext extends Job implements Closeable {
    * @return argument values if a tail call was registered, {@code null} otherwise
    */
   public Value[] pollTailArgs() {
-    final Value[] as = tcArgs;
+    final Value[] args = tcArgs;
     tcArgs = null;
-    return as;
+    return args;
   }
 
   /**
@@ -585,7 +586,7 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public String toString() {
-    return main != null ? QueryInfo.usedDecls(main) : info.query;
+    return main != null ? main.toString() : info.query;
   }
 
   // CLASS METHODS ================================================================================
@@ -729,10 +730,10 @@ public final class QueryContext extends Job implements Closeable {
     if(object instanceof Value) {
       final Value val = (Value) object;
       // cast single item
-      if(val.isItem()) return tp.cast((Item) val, this, sc, null);
+      if(val.isItem()) return tp.cast((Item) val, this, null);
       // cast sequence
       final ValueBuilder vb = new ValueBuilder(this);
-      for(final Item item : val) vb.add(tp.cast(item, this, sc, null));
+      for(final Item item : val) vb.add(tp.cast(item, this, null));
       return vb.value(tp);
     }
 
@@ -778,5 +779,14 @@ public final class QueryContext extends Job implements Closeable {
    */
   private static QNm qname(final String name, final StaticContext sc) throws QueryException {
     return QNm.parse(token(Strings.startsWith(name, '$') ? name.substring(1) : name), sc);
+  }
+
+  /**
+   * Checks whether the given string contains a valid XQuery version number.
+   * @param version version string
+   * @return true, if string contains a valid XQuery version number.
+   */
+  public static boolean isSupported(final String version) {
+    return Strings.eq(version, "1.0", "1.1", "3.0", "3.1", "4.0");
   }
 }

@@ -1,24 +1,15 @@
 package org.basex.query.value.map;
 
-import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
-
-import java.util.*;
-import java.util.function.*;
-
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Leaf that contains a collision list of keys with the same hash code.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 final class TrieList extends TrieNode {
@@ -41,7 +32,6 @@ final class TrieList extends TrieNode {
     this.keys = keys;
     this.values = values;
     this.hash = hash;
-    assert verify();
   }
 
   /**
@@ -58,13 +48,39 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int hs, final Item key, final int level, final InputInfo info)
-      throws QueryException {
+  TrieNode put(final int hs, final int lv, final TrieUpdate update) throws QueryException {
+    // same hash
+    final boolean same = hs == hash;
+    if(same) {
+      for(int i = keys.length; i-- > 0;) {
+        final Item key = keys[i];
+        if(key.atomicEqual(update.key)) {
+          update.replace(key);
+          // same key: update key order if type differs
+          Item[] ks = keys;
+          if(key.type != update.key.type) {
+            ks = ks.clone();
+            ks[i] = update.key;
+          }
+          final Value[] vs = values.clone();
+          vs[i] = update.value;
+          return new TrieList(hs, ks, vs);
+        }
+      }
+    }
+    // different key: extend list of values or create branch
+    update.add(null);
+    return same ? new TrieList(hash, Array.add(keys, update.key), Array.add(values, update.value)) :
+      branch(hs, lv, hash, size, update);
+  }
 
+  @Override
+  TrieNode remove(final int hs, final int lv, final TrieUpdate update) throws QueryException {
     if(hs == hash) {
       for(int i = size; i-- > 0;) {
         // still collisions?
-        if(key.atomicEqual(keys[i], info)) {
+        if(keys[i].atomicEqual(update.key)) {
+          update.remove(keys[i]);
           // found entry
           if(size == 2) {
             // single leaf remains
@@ -87,252 +103,13 @@ final class TrieList extends TrieNode {
   }
 
   @Override
-  TrieNode put(final int hs, final Item key, final Value value, final int level,
-      final InputInfo info) throws QueryException {
-
-    // same hash, replace or merge
-    if(hs == hash) {
-      for(int i = keys.length; i-- > 0;) {
-        if(key.atomicEqual(keys[i], info)) {
-          // replace value
-          final Value[] vs = values.clone();
-          vs[i] = value;
-          return new TrieList(hs, keys, vs);
-        }
-      }
-      return new TrieList(hash, Array.add(keys, key), Array.add(values, value));
-    }
-
-    // different hash, branch
-    final TrieNode[] ch = new TrieNode[KIDS];
-    final int a = key(hs, level), b = key(hash, level);
-    final int used;
-    if(a == b) {
-      ch[a] = put(hs, key, value, level + 1, info);
-      used = 1 << a;
-    } else {
-      ch[a] = new TrieLeaf(hs, key, value);
-      ch[b] = this;
-      used = 1 << a | 1 << b;
-    }
-    // we definitely inserted one value
-    return new TrieBranch(ch, used, size + 1);
-  }
-
-  @Override
-  Value get(final int hs, final Item key, final int level, final InputInfo info)
-      throws QueryException {
+  Value get(final int hs, final Item ky, final int lv) throws QueryException {
     if(hs == hash) {
       for(int k = keys.length; k-- != 0;) {
-        if(key.atomicEqual(keys[k], info)) return values[k];
+        if(ky.atomicEqual(keys[k])) return values[k];
       }
     }
     return null;
-  }
-
-  @Override
-  boolean contains(final int hs, final Item key, final int level, final InputInfo info)
-      throws QueryException {
-    if(hs == hash) {
-      for(int k = keys.length; k-- != 0;)
-        if(key.atomicEqual(keys[k], info)) return true;
-    }
-    return false;
-  }
-
-  @Override
-  TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-    return node.add(this, level, merge, qc, info);
-  }
-
-  @Override
-  TrieNode add(final TrieLeaf leaf, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-
-    qc.checkStop();
-    if(hash == leaf.hash) {
-      for(int k = keys.length; k-- > 0;) {
-        if(leaf.key.atomicEqual(keys[k], info)) {
-          switch(merge) {
-            case USE_FIRST:
-            case USE_ANY:
-              final Value[] uf = values.clone();
-              uf[k] = leaf.value;
-              return new TrieList(hash, keys, uf);
-            case USE_LAST:
-              return this;
-            case COMBINE:
-              final Value[] cm = values.clone();
-              cm[k] = ValueBuilder.concat(leaf.value, cm[k], qc);
-              return new TrieList(hash, keys, cm);
-            default:
-              throw MERGE_DUPLICATE_X.get(info, leaf.key);
-          }
-        }
-      }
-      return new TrieList(hash, Array.add(keys, leaf.key), Array.add(values, leaf.value));
-    }
-
-    final TrieNode[] ch = new TrieNode[KIDS];
-    final int k = key(hash, level), ok = key(leaf.hash, level), nu;
-
-    // same key? add recursively
-    if(k == ok) {
-      ch[k] = add(leaf, level + 1, merge, qc, info);
-      nu = 1 << k;
-    } else {
-      ch[k] = this;
-      ch[ok] = leaf;
-      nu = 1 << k | 1 << ok;
-    }
-
-    return new TrieBranch(ch, nu, size + 1);
-  }
-
-  @Override
-  TrieNode add(final TrieList list, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-
-    qc.checkStop();
-    if(hash == list.hash) {
-      final Value[] vs0 = list.values;
-      Item[] ks = list.keys;
-      Value[] vs = vs0;
-      final BitSet unmatched = new BitSet(list.size);
-      unmatched.set(0, list.size);
-
-      OUTER:
-      for(int i = 0; i < size; i++) {
-        final Item ok = keys[i];
-        // check if the key is already in the list
-        for(int j = unmatched.nextSetBit(0); j >= 0; j = unmatched.nextSetBit(j + 1)) {
-          final Item k = list.keys[j];
-          if(k.atomicEqual(ok, info)) {
-            unmatched.clear(j);
-            switch(merge) {
-              case USE_FIRST:
-              case USE_ANY:
-                // no change, skip the entry
-                break;
-              case USE_LAST:
-                // left value is overwritten
-                if(vs == vs0) vs = vs0.clone();
-                vs[j] = values[i];
-                break;
-              case COMBINE:
-                // right value is appended
-                if(vs == vs0) vs = vs0.clone();
-                vs[j] = ValueBuilder.concat(vs[j], values[i], qc);
-                break;
-              default:
-                throw MERGE_DUPLICATE_X.get(info, k);
-            }
-            continue OUTER;
-          }
-        }
-        // key is not in this list, add it
-        ks = Array.add(ks, ok);
-        vs = Array.add(vs, values[i]);
-      }
-      return vs == vs0 ? list : new TrieList(hash, ks, vs);
-    }
-
-    final TrieNode[] ch = new TrieNode[KIDS];
-    final int k = key(hash, level), ok = key(list.hash, level), nu;
-
-    // same key? add recursively
-    if(k == ok) {
-      ch[k] = add(list, level + 1, merge, qc, info);
-      nu = 1 << k;
-    } else {
-      ch[k] = this;
-      ch[ok] = list;
-      nu = 1 << k | 1 << ok;
-    }
-    return new TrieBranch(ch, nu, size + list.size);
-  }
-
-  @Override
-  TrieNode add(final TrieBranch branch, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-
-    final int k = key(hash, level);
-    final TrieNode[] ch = branch.copyKids();
-    final TrieNode old = ch[k];
-    ch[k] = old == null ? this : old.addAll(this, level + 1, merge, qc, info);
-    return new TrieBranch(ch, branch.used | 1 << k,
-        branch.size + size - (old != null ? old.size : 0));
-  }
-
-  @Override
-  boolean verify() {
-    try {
-      for(int i = 1; i < size; i++) {
-        for(int j = i; j-- > 0;) {
-          if(keys[i].atomicEqual(keys[j], null)) return false;
-        }
-      }
-    } catch(final QueryException ex) {
-      Util.debug(ex);
-      return false;
-    }
-    return true;
-  }
-
-  @Override
-  void keys(final ItemList ks) {
-    for(final Item key : keys) ks.add(key);
-  }
-
-  @Override
-  void values(final ValueBuilder vs) {
-    for(final Value value : values) vs.add(value);
-  }
-
-  @Override
-  void cache(final boolean lazy, final InputInfo info) throws QueryException {
-    for(int i = 0; i < size; i++) {
-      keys[i].cache(lazy, info);
-      values[i].cache(lazy, info);
-    }
-  }
-
-  @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo info)
-      throws QueryException {
-    for(final Value value : values)  {
-      if(!value.materialized(test, info)) return false;
-    }
-    return true;
-  }
-
-  @Override
-  void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    for(int i = 0; i < size; i++) func.accept(keys[i], values[i]);
-  }
-
-  @Override
-  boolean instanceOf(final AtomType kt, final SeqType dt) {
-    if(kt != null) {
-      for(final Item key : keys) {
-        if(!key.type.instanceOf(kt)) return false;
-      }
-    }
-    if(dt != null) {
-      for(final Value value : values) {
-        if(!dt.instance(value)) return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  int hash(final InputInfo info) throws QueryException {
-    int h = hash;
-    // order isn't important, operation has to be commutative
-    for(int i = size; --i >= 0;) h ^= values[i].hash(info);
-    return h;
   }
 
   @Override
@@ -348,7 +125,7 @@ final class TrieList extends TrieNode {
       final Value value = values[i];
       for(int j = 0; j < size; j++) {
         if(deep != null) {
-          if(!key.atomicEqual(ol.keys[j], deep.info)) continue;
+          if(!key.atomicEqual(ol.keys[j])) continue;
           if(!deep.equal(value, ol.values[j])) return false;
         } else {
           if(!key.equals(ol.keys[j])) continue;
@@ -369,14 +146,6 @@ final class TrieList extends TrieNode {
     final int kl = keys.length;
     for(int k = 0; k < kl; k++) {
       tb.add(indent).add("      ").add(keys[k]).add(" => ").add(values[k]).add('\n');
-    }
-  }
-
-  @Override
-  void add(final TokenBuilder tb) {
-    final int kl = keys.length;
-    for(int k = 0; k < kl && tb.moreInfo(); k++) {
-      tb.add(keys[k]).add(MAPASG).add(values[k]).add(SEP);
     }
   }
 }

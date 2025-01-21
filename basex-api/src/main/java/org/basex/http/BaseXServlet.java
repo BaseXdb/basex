@@ -1,12 +1,12 @@
 package org.basex.http;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 
 import java.io.*;
 import java.util.*;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
@@ -21,7 +21,7 @@ import org.basex.util.http.*;
 /**
  * Base class for various servlets.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class BaseXServlet extends HttpServlet {
@@ -42,9 +42,8 @@ public abstract class BaseXServlet extends HttpServlet {
     }
 
     // parse servlet-specific user and authentication method
-    final Enumeration<String> en = config.getInitParameterNames();
-    while(en.hasMoreElements()) {
-      String name = en.nextElement();
+    for(final String n : Collections.list(config.getInitParameterNames())) {
+      String name = n;
       final String value = config.getInitParameter(name);
       if(name.startsWith(Prop.DBPREFIX)) {
         name = name.substring(Prop.DBPREFIX.length());
@@ -93,8 +92,7 @@ public abstract class BaseXServlet extends HttpServlet {
     } finally {
       if(Prop.debug) {
         Util.errln("Request: " + request.getMethod() + ' ' + request.getRequestURL());
-        for(final Enumeration<String> en = request.getHeaderNames(); en.hasMoreElements();) {
-          final String name = en.nextElement();
+        for(final String name : Collections.list(request.getHeaderNames())) {
           Util.errln("* " + name + ": " + request.getHeader(name));
         }
         Util.errln("Response: " + response.getStatus());

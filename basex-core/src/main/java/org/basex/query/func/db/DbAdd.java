@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DbAdd extends DbNew {
@@ -21,8 +21,7 @@ public final class DbAdd extends DbNew {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
     final String path = toStringOrNull(arg(2), qc);
-
-    final NewInput input = toNewInput(toNodeOrAtomItem(arg(1), qc),
+    final NewInput input = toNewInput(toNodeOrAtomItem(arg(1), false, qc),
         path != null ? toDbPath(path) : "");
     final HashMap<String, String> options = toOptions(arg(3), qc);
 

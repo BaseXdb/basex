@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MapPair extends StandardFunc {
@@ -22,13 +22,13 @@ public final class MapPair extends StandardFunc {
     final Item key = toAtomItem(arg(0), qc);
     final Value value = arg(1).value(qc);
 
-    return XQMap.singleton(Str.KEY, key, info).put(Str.VALUE, value, info);
+    return XQMap.pair(key, value);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final SeqType st = arg(0).seqType().union(arg(1).seqType());
-    exprType.assign(MapType.get(AtomType.STRING, st));
+    final SeqType vt = arg(0).seqType().union(arg(1).seqType());
+    exprType.assign(MapType.get(AtomType.STRING, vt));
     return this;
   }
 

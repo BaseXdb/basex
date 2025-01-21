@@ -2,14 +2,14 @@ package org.basex.http;
 
 import java.util.concurrent.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.util.list.*;
 
 /**
  * This class creates and destroys HTTP sessions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class SessionListener implements HttpSessionListener {

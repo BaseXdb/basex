@@ -10,19 +10,10 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Math Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MathModuleTest extends SandboxTest {
-  /** Test method. */
-  @Test public void crc32() {
-    final Function func = _MATH_CRC32;
-    query(func.args(" ()"), "");
-    query(func.args(" ()"), "");
-    query("string( " + func.args("") + ')', "00000000");
-    query("string( " + func.args("BaseX") + ')', "4C06FC7F");
-  }
-
   /** Test method. */
   @Test public void cosh() {
     final Function func = _MATH_COSH;

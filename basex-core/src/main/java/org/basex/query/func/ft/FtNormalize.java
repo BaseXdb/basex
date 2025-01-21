@@ -8,10 +8,10 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FtNormalize extends FtTokenize {
+public final class FtNormalize extends FtTokenize {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return item(qc, info);

@@ -5,13 +5,13 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.server.*;
 import org.basex.util.*;
+import org.basex.util.log.*;
 
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class AdminDeleteLogs extends AdminFn {

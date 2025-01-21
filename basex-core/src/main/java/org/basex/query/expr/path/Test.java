@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Abstract node test.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Test extends ExprInfo {
@@ -42,26 +42,19 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
-   * Creates a single test with the same node type.
+   * Creates a single test.
    * @param tests tests to be merged (can contain {@code null} references)
    * @return single test, union test, or {@code null} if test cannot be created.
    */
-  public static Test get(final Test... tests) {
-    final int tl = tests.length;
+  public static Test get(final List<Test> tests) {
+    final int tl = tests.size();
     if(tl == 0) return null;
-    if(tl == 1) return tests[0];
-
-    // find common node type
-    NodeType type = null;
-    for(final Test test : tests) {
-      if(test == null || type != null && type != test.type) return null;
-      type = test.type;
-    }
+    if(tl == 1) return tests.get(0);
 
     // merge name tests
     final List<Test> list = new ArrayList<>(tl);
     for(final Test test : tests) {
-      if(test instanceof KindTest) return test;
+      if(test == null) return null;
       if(test instanceof UnionTest) {
         for(final Test t : ((UnionTest) test).tests) {
           if(!list.contains(t)) list.add(t);
@@ -70,7 +63,7 @@ public abstract class Test extends ExprInfo {
         list.add(test);
       }
     }
-    return list.size() == 1 ? list.get(0) : new UnionTest(type, list.toArray(Test[]::new));
+    return list.size() == 1 ? list.get(0) : new UnionTest(list.toArray(Test[]::new));
   }
 
   /**

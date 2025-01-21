@@ -11,7 +11,7 @@ import org.basex.util.options.*;
 /**
  * This class contains database options which are used all around the project.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MainOptions extends Options {
@@ -188,6 +188,9 @@ public final class MainOptions extends Options {
   /** All parsing options. */
   public static final Option<?>[] PARSING = Stream.concat(Stream.of(XMLPARSING),
       Stream.of(EXTPARSING)).toArray(Option<?>[]::new);
+  /** All create options. */
+  public static final Option<?>[] CREATING = Stream.concat(Stream.of(INDEXING),
+      Stream.of(PARSING)).toArray(Option<?>[]::new);
 
   /** Parser. */
   public enum MainParser {
@@ -199,7 +202,7 @@ public final class MainOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 
@@ -213,7 +216,7 @@ public final class MainOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 

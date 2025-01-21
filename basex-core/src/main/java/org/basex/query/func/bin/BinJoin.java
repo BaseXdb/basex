@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class BinJoin extends StandardFunc {
@@ -23,7 +23,7 @@ public final class BinJoin extends StandardFunc {
 
     final ByteList bl;
     if(binaries instanceof SingletonSeq && ((SingletonSeq) binaries).singleItem()) {
-      final byte[] bytes = toB64(((Value) binaries).itemAt(0)).binary(info);
+      final byte[] bytes = toBin(((Value) binaries).itemAt(0)).binary(info);
       final long bs = binaries.size();
       bl = new ByteList(bs * bytes.length);
       for(int b = 0; b < bs; b++) bl.add(bytes);
@@ -31,7 +31,7 @@ public final class BinJoin extends StandardFunc {
       bl = new ByteList();
       final Iter iter = binaries.atomIter(qc, info);
       for(Item item; (item = qc.next(iter)) != null;) {
-        bl.add(toB64(item).binary(info));
+        bl.add(toBin(item).binary(info));
       }
     }
     return B64.get(bl.finish());

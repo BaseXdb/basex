@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Name test.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
@@ -128,11 +128,33 @@ public final class NameTest extends Test {
 
   @Override
   public boolean instanceOf(final Test test) {
-    if(test instanceof NameTest) {
-      final NameTest nt = (NameTest) test;
-      return type == nt.type && part == nt.part && qname.eq(nt.qname);
+    if(!(test instanceof NameTest)) return super.instanceOf(test);
+    final NameTest nt = (NameTest) test;
+    if(type != nt.type) return false;
+    switch(nt.part) {
+      case FULL:
+        switch(part) {
+          case FULL: return qname.eq(nt.qname);
+          case LOCAL:
+          case URI: return false;
+          default: throw Util.notExpected();
+        }
+      case LOCAL:
+        switch(part) {
+          case LOCAL:
+          case FULL: return Token.eq(qname.local(), nt.qname.local());
+          case URI: return false;
+          default: throw Util.notExpected();
+        }
+      case URI:
+        switch(part) {
+          case URI:
+          case FULL: return Token.eq(qname.uri(), nt.qname.uri());
+          case LOCAL: return false;
+          default: throw Util.notExpected();
+        }
+      default: throw Util.notExpected();
     }
-    return super.instanceOf(test);
   }
 
   @Override

@@ -14,7 +14,7 @@ import com.bradmcevoy.http.exceptions.*;
 /**
  * WebDAV resource representing a folder within a collection database.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
@@ -109,7 +109,7 @@ class WebDAVFolder extends WebDAVResource implements FolderResource, DeletableCo
       final LockResult lockResult = r.lock(timeout, lockInfo);
       if(lockResult.isSuccessful()) return lockResult.getLockToken();
     } catch(final Exception ex) {
-      Util.debug("Cannot lock and create requested resource", ex);
+      Util.debugln("Cannot lock and create requested resource", ex);
     }
     return null;
   }

@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnNumber extends ContextFn {
@@ -23,7 +23,7 @@ public final class FnNumber extends ContextFn {
     if(value.type == DOUBLE) return value;
     try {
       if(info != null) info.internal(true);
-      return DOUBLE.cast(value, qc, sc, info);
+      return DOUBLE.cast(value, qc, info);
     } catch(final QueryException ex) {
       Util.debug(ex);
       return Dbl.NAN;

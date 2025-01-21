@@ -14,16 +14,16 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class ArraySplit extends ArrayFn {
+public final class ArraySplit extends ArrayFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
 
     return new Iter() {
-      final Iterator<Value> members = array.members().iterator();
+      final Iterator<Value> members = array.iterable().iterator();
 
       @Override
       public XQArray next() {
@@ -35,7 +35,7 @@ public class ArraySplit extends ArrayFn {
       }
       @Override
       public long size() {
-        return array.arraySize();
+        return array.structSize();
       }
     };
   }
@@ -45,7 +45,7 @@ public class ArraySplit extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value member : array.members()) vb.add(XQArray.singleton(member));
+    for(final Value member : array.iterable()) vb.add(XQArray.singleton(member));
     return vb.value();
   }
 
@@ -54,7 +54,7 @@ public class ArraySplit extends ArrayFn {
     final Expr array = arg(0);
     if(array == XQArray.empty()) return Empty.VALUE;
 
-    final FuncType ft = array.funcType();
+    final Type ft = array.seqType().type;
     if(ft instanceof ArrayType) exprType.assign(ft.seqType(Occ.ZERO_OR_MORE));
     return this;
   }

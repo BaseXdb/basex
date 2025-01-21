@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * German language formatter. Can be instantiated via {@link Formatter#get}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class FormatterDE extends Formatter {
@@ -74,7 +74,7 @@ final class FormatterDE extends Formatter {
 
   @Override
   public byte[] word(final long n, final NumeralType numType, final byte[] modifier) {
-    byte[] suffix = modifier == null || modifier[0] == '%' ? null : delete(modifier, '-');
+    final byte[] suffix = modifier == null || modifier[0] == '%' ? null : delete(modifier, '-');
     final TokenBuilder tb = new TokenBuilder();
     word(tb, n, numType, suffix);
     if(!tb.isEmpty()) tb.set(0, (byte) uc(tb.get(0)));

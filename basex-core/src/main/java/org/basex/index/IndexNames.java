@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Names and namespace uris of elements/attribute to index.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IndexNames {
@@ -50,7 +50,7 @@ public final class IndexNames {
         uri = "";
         ln = entry;
       } else { // invalid
-        Util.debug("Included name is invalid: %", entry);
+        Util.debugln("Included name is invalid: %", entry);
         continue;
       }
       qnames.add(ln == null ? null : token(ln), uri == null ? null : token(uri));

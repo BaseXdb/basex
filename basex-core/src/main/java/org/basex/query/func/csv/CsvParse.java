@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class CsvParse extends StandardFunc {
@@ -40,9 +40,9 @@ public class CsvParse extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
-    final CsvParserOptions options = toOptions(arg(1), new CsvParserOptions(), true, qc);
+    final CsvParserOptions options = toOptions(arg(1), new CsvParserOptions(), qc);
     try {
-      return CsvConverter.get(options).convert(io);
+      return CsvConverter.get(options).convert(io, info);
     } catch(final IOException ex) {
       throw CSV_PARSE_X.get(info, ex);
     }

@@ -10,7 +10,7 @@ import javax.xml.xquery.*;
  *
  * Part 7: XQuery Type System.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  */
 public final class Part7 extends Main {
   /**
@@ -47,7 +47,7 @@ public final class Part7 extends Main {
           // Any other type
           default:
             String a = xqs.getAtomicValue();
-            System.out.println("Atomic Value: " + a);
+            System.out.println("Atomic Item: " + a);
             break;
         }
       } else {

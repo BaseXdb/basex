@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * Abstract array expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Arr extends ParseExpr {
@@ -94,16 +94,13 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Returns true if all arguments are values (possibly of small size).
-   * @param limit check if result size of any expression exceeds {@link CompileContext#MAX_PREEVAL}
+   * Returns true if all expressions are values (possibly of small size).
+   * @param limit check if result size of any expression is not too large
+   * @param cc compilation context
    * @return result of check
    */
-  protected boolean allAreValues(final boolean limit) {
-    for(final Expr expr : exprs) {
-      if(!(expr instanceof Value) || limit && expr.size() > CompileContext.MAX_PREEVAL)
-        return false;
-    }
-    return true;
+  protected boolean values(final boolean limit, final CompileContext cc) {
+    return cc.values(limit, exprs);
   }
 
   /**
@@ -190,7 +187,7 @@ public abstract class Arr extends ParseExpr {
       // pre-evaluate values
       if(expr instanceof Value && (!predicate || !expr.seqType().mayBeNumber())) {
         // skip evaluation: true() or $bool  ->  true()
-        if(expr.test(cc.qc, info, predicate) == or) return true;
+        if(expr.test(cc.qc, info, 0) == or) return true;
         // ignore result: true() and $bool  ->  $bool
         cc.info(QueryText.OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else if(!pos && list.contains(expr) && !expr.has(Flag.NDT)) {
@@ -313,7 +310,7 @@ public abstract class Arr extends ParseExpr {
         // A intersect (A union B)  ->  A
         // (A and B) or (A and B and C)  ->  A
         return left.seqType().type instanceof NodeType && !left.ddo() ?
-          cc.function(Function._UTIL_DDO, info, left) : left;
+          cc.function(Function.DISTINCT_ORDERED_NODES, info, left) : left;
       } else if(curr.size() == 1) {
         // single additional test: add this test
         // (A and B) or (A and C)  ->  A and (B or C)

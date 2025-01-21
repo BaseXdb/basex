@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Concurrency tests of BaseX REST API.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 public final class RESTConcurrencyTest extends SandboxTest {
@@ -174,7 +174,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   // REST API
 
   /** REST GET request. */
-  private static class Get implements Callable<HTTPResponse> {
+  private static final class Get implements Callable<HTTPResponse> {
     /** Request URI. */
     protected final URI uri;
     /** Stop signal. */
@@ -257,7 +257,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   }
 
   /** REST POST request. */
-  private static class Post extends Put {
+  private static final class Post extends Put {
     /**
      * Construct a new POST request.
      * @param request request string without the base URI
@@ -271,7 +271,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
   // Toolbox
 
   /** Simple HTTP response. */
-  private static class HTTPResponse {
+  private static final class HTTPResponse {
     /** Status code. */
     public final int status;
     /** Response data or {@code null} if no data was returned. */

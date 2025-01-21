@@ -7,10 +7,10 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for strings.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class StringList extends ObjectList<String, StringList> {
+public final class StringList extends ObjectList<String, StringList> {
   /**
    * Default constructor.
    */
@@ -48,7 +48,7 @@ public class StringList extends ObjectList<String, StringList> {
    * Sorts the elements in ascending order, using the standard options.
    * @return self reference
    */
-  public final StringList sort() {
+  public StringList sort() {
     return sort(true);
   }
 
@@ -57,7 +57,7 @@ public class StringList extends ObjectList<String, StringList> {
    * @param cs respect case sensitivity
    * @return self reference
    */
-  public final StringList sort(final boolean cs) {
+  public StringList sort(final boolean cs) {
     return sort(cs, true);
   }
 
@@ -67,14 +67,14 @@ public class StringList extends ObjectList<String, StringList> {
    * @param asc ascending/descending flag
    * @return self reference
    */
-  public final StringList sort(final boolean cs, final boolean asc) {
+  public StringList sort(final boolean cs, final boolean asc) {
     final Comparator<String> comp = cs ? null : String.CASE_INSENSITIVE_ORDER;
     Arrays.sort(list, 0, size, asc ? comp : Collections.reverseOrder(comp));
     return this;
   }
 
   @Override
-  protected final String[] newArray(final int s) {
+  protected String[] newArray(final int s) {
     return new String[s];
   }
 }

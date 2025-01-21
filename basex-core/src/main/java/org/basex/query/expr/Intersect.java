@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * Intersect expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Intersect extends Set {
@@ -55,7 +55,7 @@ public final class Intersect extends Set {
       if(expr == Empty.VALUE) {
         // empty operand: * intersect ()  ->  ()
         return Empty.VALUE;
-      } else if(!expr.has(Flag.CNS, Flag.NDT) && list.contains(expr)) {
+      } else if(list.contains(expr) && !expr.has(Flag.CNS, Flag.NDT)) {
         // remove duplicates: * intersect *  ->  *
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Checks query rewritings.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RewritingsTest extends SandboxTest {
@@ -358,8 +358,9 @@ public final class RewritingsTest extends SandboxTest {
     check("for $i in (1, 2) return 'a'[position() = $i]", "a", root(Str.class));
     check("for $i in (1, 2) return 'a'[position() = $i to $i]", "a", root(Str.class));
 
+    check("for $i in (1, 2)[. > 0] return 9[position() = $i to 1]", 9, root(DualMap.class));
+
     check("for $i in (1, 2)[. > 0] return 9[position() = $i to $i + 1]", 9, exists(_UTIL_RANGE));
-    check("for $i in (1, 2)[. > 0] return 9[position() = $i to 1]", 9, exists(_UTIL_RANGE));
     check("for $i in (1, 2)[. > 0] return 9[position() >= $i]", 9, exists(_UTIL_RANGE));
     check("for $i in (1, 2)[. > 0] return 9[position() > $i]", "", exists(_UTIL_RANGE));
     check("for $i in (1, 2)[. > 0] return 9[position() <= $i]", "9\n9", exists(_UTIL_RANGE));
@@ -398,9 +399,9 @@ public final class RewritingsTest extends SandboxTest {
 
     // check if positional predicates are merged and rewritten to utility functions
     check("for $i in" + seq + "return ('a', 'b')[position() >= $i and position() <= $i]", "a\nb",
-        exists(_UTIL_RANGE));
+        exists(ITEMS_AT));
     check("for $i in" + seq + "return ('a', 'b')[position() <= $i and position() >= $i]",
-        "a\nb", exists(_UTIL_RANGE));
+        "a\nb", exists(ITEMS_AT));
     check("for $i in" + seq + "return ('a', 'b')[position() > $i and position() < $i]",
         "", exists(_UTIL_RANGE));
     check("for $i in" + seq + "return ('a', 'b')[position() < $i and position() > $i]",
@@ -438,9 +439,9 @@ public final class RewritingsTest extends SandboxTest {
         "<b/>", empty(List.class), root(IterFilter.class));
 
     check("<a/>[position() >= last() - 1]",
-        "<a/>", exists(Range.class));
+        "<a/>", root(CElem.class));
     check("<a/>[position() > last() - 2]",
-        "<a/>", exists(Range.class));
+        "<a/>", root(CElem.class));
     check("<a/>[position() = 0 to 9223372036854775807]",
         "<a/>", root(CElem.class));
     check("<a/>[position() = -1 to 9223372036854775807]",
@@ -467,7 +468,7 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>[.][.]", "<a/>", exists(CElem.class), empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
     check("<a/>/self::*[.][.]", "<a/>", empty(ContextValue.class));
-    check("('a', 'b')[. ! position()]", "a", exists("*[contains(name(), 'Map')]"));
+    check("('a', 'b')[. ! position()]", "a", exists(Pipeline.class));
     check("(1, 0)[.]", 1, exists(ContextValue.class));
     error("true#0[.]", ARGTYPE_X_X_X);
     error("(true#0, false#0)[.]", ARGTYPE_X_X_X);
@@ -917,8 +918,8 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>[path() instance of xs:string]", "<a/>", root(CElem.class));
     check("<a/>[name() = 'a']", "<a/>", exists(CmpSimpleG.class));
 
-    check("node-name(" + VOID.args(" ()") + ")", "", root(VOID));
-    check("prefix-from-QName(" + VOID.args(" ()") + ")", "", root(VOID));
+    check("() => void(true()) => node-name()", "", root(VOID));
+    check("() => void(true()) => prefix-from-QName()", "", root(VOID));
   }
 
   /** Rewrite name tests to self steps. */
@@ -1005,10 +1006,12 @@ public final class RewritingsTest extends SandboxTest {
     check("<a>1</a> coerce to xs:string", 1, root(Str.class));
     check(wrap(1) + "coerce to xs:string", 1, root(TypeCheck.class));
     check("(1, 2) coerce to xs:double+", "1\n2",
-        empty(TypeCheck.class), root(ItemSeq.class), count(Dbl.class, 2));
+        empty(TypeCheck.class), root(SmallSeq.class), count(Dbl.class, 2));
+    check("(-128, 127) coerce to xs:byte+", "-128\n127",
+        empty(TypeCheck.class), root(SmallSeq.class), count(Int.class, 2));
 
     error("<a/> coerce to empty-sequence()", INVCONVERT_X_X_X);
-    error("(1, 2) coerce to xs:byte+", INVCONVERT_X_X_X);
+    error("(1, 128) coerce to xs:byte+", FUNCCAST_X_X_X);
   }
 
   /** Treat and coerce, error messages. */
@@ -1053,13 +1056,13 @@ public final class RewritingsTest extends SandboxTest {
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("<_>A</_> ! text() = 'A'", true, exists(IterPath.class));
     check("let $a := <_>A</_> return $a ! text() = $a ! text()", true,
-        root(ItemMap.class), empty(IterPath.class), empty(IterMap.class));
+        root(Pipeline.class), empty(IterPath.class), empty(IterMap.class));
 
     // EBV rewritings
     check("<a><b/></a>[b ! ..]", "<a><b/></a>", exists(CachedPath.class));
 
     // absolute paths
-    check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(DualIterMap.class));
+    check("text { 'a' } ! <x>{ . }</x>/text() = 'a'", true, exists(Pipeline.class));
     check("string(<a>a</a>) ! <x>{ . }</x>/text() = 'a'", true, empty(DualIterMap.class));
     check("<a>a</a>/string() ! <x>{ . }</x>/text() = 'a'", true, empty(DualIterMap.class));
   }
@@ -1083,10 +1086,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** If expression with empty branches. */
   @Test public void gh1809() {
-    check("if(" + wrap(1) + "[. = 1]) then () else ()",
-        "", empty());
-    check("if(" + VOID.args(1) + ") then () else ()", "",
-        root(VOID), count(VOID, 1));
+    check("if(" + wrap(1) + "[. = 1]) then () else ()", "", empty());
+    check("if(void(1, true())) then () else ()", "", root(VOID), count(VOID, 1));
   }
 
   /** Redundant predicates in paths. */
@@ -1150,8 +1151,8 @@ public final class RewritingsTest extends SandboxTest {
       "  default return x\n" +
       ")/z", "", empty());
 
-    check("(x," + VOID.args(" ()") + ")/z", "", empty());
-    check("(x |" + VOID.args(" ()") + ")/z", "", empty());
+    check("(x, void((), true()))/z", "", empty());
+    check("(x | void((), true()))/z", "", empty());
     check("(if(" + _RANDOM_DOUBLE.args() + ") then x)/z", "", empty());
   }
 
@@ -1166,7 +1167,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** List to union. */
   @Test public void gh1818() {
-    check("<a/>[b, text()]", "", exists(Union.class), count(SingleIterPath.class, 2));
+    check("<a/>[b, text()]", "", count(SingleIterPath.class, 1),
+        type(IterStep.class, "(element(b)|text())*"));
 
     // union expression will be further rewritten to single path
     check("<a/>[b, c]", "", empty(List.class), count(SingleIterPath.class, 1));
@@ -1177,17 +1179,17 @@ public final class RewritingsTest extends SandboxTest {
   /** FLWOR, no results, nondeterministic expressions. */
   @Test public void gh1819() {
     check("for $_ in () return <x/>", "", empty());
-    check("for $_ in" + VOID.args(1) + " return 1", "", root(VOID));
+    check("for $_ in void(1, true()) return 1", "", root(VOID));
     check("let $_ := 1 return <x/>", "<x/>", root(CElem.class));
-    check("let $_ :=" + VOID.args(1) + " return 1", 1, root(List.class), exists(VOID));
+    check("let $_ := void(1, true()) return 1", 1, root(List.class), exists(VOID));
     check("for $_ in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
     check("for $_ in 1 to 2 return ()", "", empty());
 
-    check("let $_ :=" + VOID.args(1) + " return 1", 1, root(List.class), exists(VOID));
+    check("let $_ := void(1, true()) return 1", 1, root(List.class), exists(VOID));
 
     // rewrite to simple map
     check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(REPLICATE));
-    check("for $_ in 1 to 2 return" + VOID.args(1), "", root(REPLICATE));
+    check("for $_ in 1 to 2 return void(1, true())", "", root(REPLICATE));
   }
 
   /** Merge and/or expressions. */
@@ -1325,7 +1327,7 @@ public final class RewritingsTest extends SandboxTest {
       "  map:entry(<e/> ! string(), '')" +
       "}; local:f()?*", "");
     query("declare function local:f() as map(xs:string, xs:string) {" +
-      "  map:put(map {}, <e/> ! string(), '')" +
+      "  map:put(map { }, <e/> ! string(), '')" +
       "}; local:f()?*", "");
   }
 
@@ -1438,7 +1440,8 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1841() {
     check("<_/>[position() = (1, 1)]", "<_/>", root(CElem.class));
     check("<_/>[position() = (1, 2, 1)]", "<_/>", root(CElem.class));
-    check("<_/>[position() = (1, 2, 2.1)]", "<_/>", count(Int.class, 2));
+    check("<_/>[position() = (1, 2, 2.1)]", "<_/>", root(CElem.class));
+    check("<_/>[position() = (3, 2, 2.1, 1)]", "<_/>", root(CElem.class));
   }
 
   /** Flatten expression lists. */
@@ -1491,7 +1494,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // move filters with positional tests and variable references into simple map
     check("for $c in 1 to 10 return $c[.]", 1, root(DualMap.class));
-    check("for $c in 1 to 10 return $c[position() = (0, 2)]", "", root(DualMap.class));
+    check("for $c in 1 to 10 return $c[position() = (0, 2)]", "", empty());
 
     // no rewriting: position checks are replaced by items-at
     check("for $c in 1 to 10 return $c[position() =" + wrap(2) + "]", "", root(DualMap.class));
@@ -1743,14 +1746,16 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Distinct document order. */
   @Test public void gh1888() {
-    check("let $a := <a/> return" + _UTIL_DDO.args(" ($a, $a)"), "<a/>", root(CElem.class));
-    check("let $a := <a/> return ($a, $a)/.", "<a/>", root(CElem.class));
+    check("let $a := <a/> return" + DISTINCT_ORDERED_NODES.args(" ($a, $a)"),
+        "<a/>", root(CElem.class));
+    check("let $a := <a/> return ($a, $a)/.",
+        "<a/>", root(CElem.class));
   }
 
   /** Simple map implementation for two operands. */
   @Test public void gh1889() {
     check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(REPLICATE));
-    check("(3 to 13) !" + VOID.args(" ."), "", root(DualMap.class));
+    check("(3 to 13) ! void(., true())", "", root(DualMap.class));
   }
 
   /** Rewrite FLWOR to simple map. */
@@ -1804,7 +1809,8 @@ public final class RewritingsTest extends SandboxTest {
     check("count#1 ! .('a')", 1, root(Int.class));
 
     // do not generate nested node constructors
-    check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()", "x", root(ItemMap.class));
+    check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()",
+        "x", root(Pipeline.class));
   }
 
   /** Rewritings of positional tests. */
@@ -1962,13 +1968,13 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1914() {
     check("<a/>/(self::*|self::a)", "<a/>", root(CElem.class));
 
-    check("<a/>/(* | a)", "", type(IterStep.class, "element()*"));
-    check("<a/>/(a | *)", "", type(IterStep.class, "element()*"));
-    check("<a/>/(a | * | b)", "", type(IterStep.class, "element()*"));
+    check("<a/>/(* | a)", "", type(IterStep.class, "(element()|element(a))*"));
+    check("<a/>/(a | *)", "", type(IterStep.class, "(element(a)|element())*"));
+    check("<a/>/(a | * | b)", "", type(IterStep.class, "(element(a)|element()|element(b))*"));
 
-    check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "element(a)|element(b)+"));
-    check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "element(a)|element(b)+"));
-    check("count((<a/> | <b/>, <b/> | <a/>))", 4, type(List.class, "element(a)|element(b)+"));
+    check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));
+    check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));
+    check("count((<a/> | <b/>, <b/> | <a/>))", 4, type(List.class, "(element(a)|element(b))+"));
   }
 
   /** Push type checks into expressions. */
@@ -1977,21 +1983,21 @@ public final class RewritingsTest extends SandboxTest {
         + "  case 'a' return <a/> "
         + "  case 'b' return <b/> "
         + "  default  return error()"
-        + ") treat as element(a)",
-        "<a/>", exists("SwitchGroup/Treat"));
+        + ") coerce to element(a)",
+        "<a/>", exists("SwitchGroup/TypeCheck"));
     check("for $e in (<a/>, <b/>) "
         + "return (typeswitch($e) "
         + "  case element(a) return <a/> "
         + "  case element(b) return <b/> "
         + "  default return error() "
-        + ") treat as element()",
+        + ") coerce to element()",
         "<a/>\n<b/>", empty(Treat.class));
   }
 
   /** Rewrite side-effecting let expressions. */
   @Test public void gh1917() {
     check("let $a := (# basex:nondeterministic #) { <a/> } return $a ! name()",
-        "a", root(ItemMap.class));
+        "a", root(Pipeline.class));
   }
 
   /** Rewrite list to replicate. */
@@ -2077,7 +2083,7 @@ public final class RewritingsTest extends SandboxTest {
     check("()?*", "", empty());
     check("map { 1: 2 }?*", 2, root(Int.class));
     check("[ 1 ]?*", 1, root(Int.class));
-    check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string)?1",
+    check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string?)?1",
         "A", root(Str.class));
 
     // do not pre-evaluate lookups with multiple input items
@@ -2102,7 +2108,7 @@ public final class RewritingsTest extends SandboxTest {
     check("for $a in 1 to 2 group by $b := data($a) return $b", "1\n2", root(RangeSeq.class));
 
     check("for $a in (1, 2) group by $a return $a", "1\n2", root(RangeSeq.class));
-    check("for $a in (1, 3) group by $a return $a", "1\n3", root(SmallSeq.class));
+    check("for $a in (1, 3) group by $a return $a", "1\n3", root(IntSeq.class));
     check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(SmallSeq.class));
 
     check("for $p in (1 to 2)[. >= 0] group by $q := string($p) return $q",
@@ -2113,13 +2119,17 @@ public final class RewritingsTest extends SandboxTest {
     check("for $a in (1 to 2)[. >= 0] group by $b := string($a) return $b || 'x'",
         "1x\n2x", count(DualMap.class, 2));
 
-    // do not rewrite group by clauses if value is not a single atomic value
+    // do not rewrite group by clauses if value is not a single atomic item
     check("for $a allowing empty in () group by $a return $a", "", root(GFLWOR.class));
     check("for $a in (1 to 6) group by $g := [ $a mod 1 ] return $g", 0, root(GFLWOR.class));
     check("for $a in (1 to 6) group by $g := [] return $g", "", root(GFLWOR.class));
+    check("for $a as xs:byte in (1 to 2)[. >= 0] group by $a return $a", "1\n2",
+        root(DISTINCT_VALUES), exists(GFLWOR.class));
+    check("for $a in (1 to 2)[. >= 0] group by $a as xs:byte := $a return $a", "1\n2",
+        root(GFLWOR.class));
 
-    error("for $a as xs:byte in (1 to 2)[. >= 0] group by $a return $a", INVTREAT_X_X_X);
-    error("for $a in (1 to 2)[. >= 0] group by $a as xs:byte := $a return $a", INVTREAT_X_X_X);
+    error("for $a as xs:byte in (127 to 128)[. >= 0] group by $a return $a", FUNCCAST_X_X_X);
+    error("for $a in (127 to 128)[. >= 0] group by $a as xs:byte := $a return $a", FUNCCAST_X_X_X);
   }
 
   /** Rewrite expression range to replicate. */
@@ -2572,7 +2582,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Rewrite let/where to for. */
   @Test public void gh2058() {
     check("let $a := <a/>[data()] where $a return $a", "", root(IterFilter.class));
-    check("let $a := <a/>[data()] where $a return string($a)", "", root(ItemMap.class));
+    check("let $a := <a/>[data()] where $a return string($a)", "", root(DualMap.class));
   }
 
   /** Rewrite fn:not, comparisons (related to GH-1775). */
@@ -2884,10 +2894,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** where false(). */
   @Test public void gh2080() {
-    check("let $_ :=" + VOID.args(1) + " where false() return ()",
-        "", root(VOID));
-    check("let $_ :=" + VOID.args(1) + " where false() return" + VOID.args(2),
-        "", root(VOID));
+    check("let $_ := void(1, true()) where false() return ()", "", root(VOID));
+    check("let $_ := void(1, true()) where false() return void(2, true())", "", root(VOID));
   }
 
   /** Rewrite value to general comparison. */
@@ -2956,8 +2964,8 @@ public final class RewritingsTest extends SandboxTest {
     check("subsequence((1 to 6) ! (. * 2), 2, 2)", "4\n6", root(DualMap.class));
 
     check(TRUNK.args(" (1 to 10)[. > 7] ! (. * .)"), "64\n81", root(DualMap.class));
-    check(ITEMS_AT.args(" (1 to 10)[. > 6] ! (. * .)", 2), 64, root(ItemMap.class));
-    check(FOOT.args(" (1 to 10)[. > 5] ! (. * .)"), 100, root(ItemMap.class));
+    check(ITEMS_AT.args(" (1 to 10)[. > 6] ! (. * .)", 2), 64, root(DualMap.class));
+    check(FOOT.args(" (1 to 10)[. > 5] ! (. * .)"), 100, root(DualMap.class));
   }
 
   /** Check existence of paths in predicates. */
@@ -3043,7 +3051,7 @@ public final class RewritingsTest extends SandboxTest {
         "a", root(SUBSTRING_BEFORE));
     check("for $b in <?_ a-1?> group by $c := substring-before($b, '-') " +
         "return ($c, string-length($c))",
-        "a\n1", root(DualIterMap.class));
+        "a\n1", root(Pipeline.class));
   }
 
   /** Inlined type check. */
@@ -3069,10 +3077,10 @@ public final class RewritingsTest extends SandboxTest {
 
     // GH-2182: EBV tests, rewriting to descendant::text()
     check("boolean(<a><b>x</b></a>/*[@nr = 0] ! string())", false, exists(CmpSimpleG.class));
-    check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(ItemMap.class));
+    check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(DualMap.class));
 
     // GH-2215: Unexpected exception of mapping double attributes
-    check("boolean((<a/> ! (a, b)))", false, exists(IterPath.class));
+    check("boolean((<a/> ! (a, b)))", false, exists(Pipeline.class));
     check("boolean(count(<T/>//*[@id = '1'] ! (@a, @b)))", false, exists(IterPath.class));
   }
 
@@ -3116,7 +3124,7 @@ public final class RewritingsTest extends SandboxTest {
     check("<a>A</a> ! (if(text()) then data() else ())",
         "A", root(DATA), empty(If.class));
     check("<a>A</a> ! (if(text()) then string() else ())",
-        "A", root(ItemMap.class), empty(If.class));
+        "A", root(DualMap.class), empty(If.class));
   }
 
   /** Compare untyped atomics with QNames. */
@@ -3225,18 +3233,22 @@ public final class RewritingsTest extends SandboxTest {
         count(IterStep.class, 1), "//@axis = 'descendant-or-self'");
 
     check("<A><B/></A>/descendant-or-self::node()/(* | text())", "<B/>",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
+        count(IterStep.class, 1), "//@axis = 'descendant'");
+    check("<A><B/>X</A>/descendant-or-self::node()/(* | text())", "<B/>\nX",
+        count(IterStep.class, 1), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(descendant::* | text())", "<B/>",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
+        count(IterStep.class, 1), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())", "<B/>",
-        count(IterStep.class, 2), "//@axis = 'descendant'");
+        count(IterStep.class, 1), "//@axis = 'descendant'");
 
     check("<A><B/></A>/descendant-or-self::node()/(* | text())[..]", "<B/>",
-        count(IterStep.class, 3), "//@axis = 'descendant'");
+        count(IterStep.class, 2), "//@axis = 'descendant'");
+    check("<A><B/>X</A>/descendant-or-self::node()/(* | text())[..]", "<B/>\nX",
+        count(IterStep.class, 2), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(descendant::* | text())[..]", "<B/>",
-        count(IterStep.class, 3), "//@axis = 'descendant'");
+        count(IterStep.class, 2), "//@axis = 'descendant'");
     check("<A><B/></A>/descendant-or-self::node()/(* | descendant::text())[..]", "<B/>",
-        count(IterStep.class, 3), "//@axis = 'descendant'");
+        count(IterStep.class, 2), "//@axis = 'descendant'");
   }
 
   /** Refine parameter types to arguments types of function call. */
@@ -3294,5 +3306,28 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh2272() {
     query("db:create('test')");
     query("db:put('test', <a/>, 'a.xml'), db:optimize('test', true(), map { 'updindex': true() })");
+  }
+
+  /** Faster EBV checks. */
+  @Test public void gh2326() {
+    query("let $b := <a><b/></a> return <a/>[* union $b/b]", "<a/>");
+    check("let $b := <a><b/></a> return <a/>[* union <b/>]", "<a/>", root(CElem.class));
+  }
+
+  /** for clause: coercion. */
+  @Test public void gh2334() {
+    query("for $a as xs:integer in [ 1, 2 ] return $a", "1\n2");
+  }
+
+  /** Typing: Filters, instance of. */
+  @Test public void gh2345() {
+    check("(1 to 10000000000000, 'x')[. instance of xs:integer] instance of xs:integer*",
+        true, root(Bln.class));
+    check("(1 to 10, 'x')[. instance of xs:byte] instance of xs:byte*",
+        true, root(Bln.class));
+    check("(1 to 10, 'x')[. instance of array(*)] instance of fn(*)*",
+        true, root(Bln.class));
+    check("(1 to 10000000000000, 'x')[. instance of xs:integer][. instance of xs:string]",
+        "", empty());
   }
 }

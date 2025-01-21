@@ -7,12 +7,12 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for native long values.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class LongList extends ElementList {
+public final class LongList extends ElementList {
   /** Element container. */
-  protected long[] list;
+  private long[] list;
 
   /**
    * Default constructor.
@@ -34,7 +34,7 @@ public class LongList extends ElementList {
    * @param element element to be added
    * @return self reference
    */
-  public final LongList add(final long element) {
+  public LongList add(final long element) {
     long[] lst = list;
     final int s = size;
     if(s == lst.length) {
@@ -51,7 +51,7 @@ public class LongList extends ElementList {
    * @param elements elements to be added
    * @return self reference
    */
-  public final LongList add(final long... elements) {
+  public LongList add(final long... elements) {
     long[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) {
@@ -68,7 +68,7 @@ public class LongList extends ElementList {
    * @param index index of the element to return
    * @return element
    */
-  public final long get(final int index) {
+  public long get(final int index) {
     return list[index];
   }
 
@@ -76,7 +76,7 @@ public class LongList extends ElementList {
    * Returns the uppermost element from the stack.
    * @return the uppermost element
    */
-  public final long peek() {
+  public long peek() {
     return list[size - 1];
   }
 
@@ -84,7 +84,7 @@ public class LongList extends ElementList {
    * Pops the uppermost element from the stack.
    * @return the popped element
    */
-  public final long pop() {
+  public long pop() {
     return list[--size];
   }
 
@@ -92,7 +92,7 @@ public class LongList extends ElementList {
    * Pushes an element onto the stack.
    * @param element element
    */
-  public final void push(final long element) {
+  public void push(final long element) {
     add(element);
   }
 
@@ -100,7 +100,7 @@ public class LongList extends ElementList {
    * Returns an array with all elements.
    * @return array
    */
-  public final long[] toArray() {
+  public long[] toArray() {
     return Arrays.copyOf(list, size);
   }
 

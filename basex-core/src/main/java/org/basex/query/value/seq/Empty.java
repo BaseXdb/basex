@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Empty sequence.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Empty extends Item {
@@ -81,7 +81,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate) {
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
     return false;
   }
 
@@ -96,8 +96,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) {
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii) {
     throw Util.notExpected();
   }
 
@@ -117,7 +116,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public int hash(final InputInfo ii) {
+  public int hashCode() {
     return 0;
   }
 

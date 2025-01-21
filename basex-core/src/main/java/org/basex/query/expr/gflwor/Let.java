@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code let} clause, binding an expression to a variable.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class Let extends ForLet {
@@ -65,15 +65,15 @@ public final class Let extends ForLet {
   public Let optimize(final CompileContext cc) throws QueryException {
     // skip redundant type check
     if(!scoring && expr instanceof TypeCheck) {
-      final TypeCheck tc = (TypeCheck) expr;
-      if(tc.isRedundant(var) || var.adoptCheck(tc.seqType(), tc.coerce)) {
+      if(var.declType != null && var.declType.instanceOf(expr.seqType()) ||
+          var.adoptCheck(expr.seqType())) {
         cc.info(OPTTYPE_X, this);
-        expr = tc.expr;
+        expr = ((TypeCheck) expr).expr;
       }
     }
     // coerce at compile time
     if(expr instanceof Value) {
-      expr = var.checkType((Value) expr, cc.qc, true);
+      expr = var.checkType((Value) expr, cc.qc, cc);
     }
 
     // assign type to clause and variable
@@ -122,7 +122,7 @@ public final class Let extends ForLet {
   }
 
   /** Evaluator for a block of {@code let} expressions. */
-  private static class LetEval extends Eval {
+  private static final class LetEval extends Eval {
     /** Let expressions of the current block, in declaration order. */
     private final ArrayList<Let> lets;
     /** Sub-evaluator. */

@@ -11,7 +11,7 @@ import com.ibm.icu.text.*;
 /**
  * This collation is based on the ICU collator.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class UCACollation extends Collation {
@@ -94,6 +94,11 @@ final class UCACollation extends Collation {
       iterS.setOffset(offS);
       iterC.setOffset(offC);
     }
+  }
+
+  @Override
+  public byte[] key(final byte[] string, final InputInfo info) {
+    return collator.getCollationKey(Token.string(string)).toByteArray();
   }
 
   /**

@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnError extends StandardFunc {
@@ -33,9 +33,9 @@ public final class FnError extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final QNm code = toQNmOrNull(arg(0), qc);
     final String description = toStringOrNull(arg(1), qc);
-    final Value object = defined(2) ? arg(2).value(qc) : null;
+    final Value value = defined(2) ? arg(2).value(qc) : null;
     throw new QueryException(info, code != null ? code : FUNERR1.qname(),
-      description != null ? description : FUNERR1.message).value(object);
+      description != null ? description : FUNERR1.message).value(value);
   }
 
   @Override
@@ -52,14 +52,12 @@ public final class FnError extends StandardFunc {
    * Creates an error function instance.
    * @param ex query exception
    * @param st type of the expression that caused the error message
-   * @param sc static context
    * @return function
    */
-  public static StandardFunc get(final QueryException ex, final SeqType st,
-      final StaticContext sc) {
+  public static StandardFunc get(final QueryException ex, final SeqType st) {
     Util.debug(ex);
     final Str desc = Str.get(ex.getLocalizedMessage());
-    final StandardFunc sf = ERROR.get(sc, ex.info(), ex.qname(), desc);
+    final StandardFunc sf = ERROR.get(ex.info(), ex.qname(), desc);
     sf.exprType.assign(st);
     return sf;
   }

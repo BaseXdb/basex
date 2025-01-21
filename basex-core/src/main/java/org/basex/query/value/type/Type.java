@@ -8,11 +8,13 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * XQuery types.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public interface Type {
@@ -20,6 +22,7 @@ public interface Type {
   enum ID {
     // function types
     /** function(*).              */ FUN(7),
+    /** record(*).                */ REC(29),
     /** map(*).                   */ MAP(30),
     /** array(*).                 */ ARRAY(31),
 
@@ -93,7 +96,12 @@ public interface Type {
     /** xs:NOTATION.              */ NOT(83),
     /** xs:numeric.               */ NUM(84),
     /** java().                   */ JAVA(86),
-    /** last dummy type.          */ LAST(87);
+    /** enum().                   */ ENM(87),
+
+    // item type
+    /** choice item type.         */ CIT(88),
+
+    /** last dummy type.          */ LAST(89);
 
     /** Type index. */
     private final byte index;
@@ -138,18 +146,17 @@ public interface Type {
   /**
    * Casts the specified item to this type.
    * @param item item to be converted
-   * @param qc query context
-   * @param sc static context (only required for {@link AtomType#QNAME} conversion)
+   * @param qc query context (can be {@code null} if the target type needs no reference)
    * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */
-  Value cast(Item item, QueryContext qc, StaticContext sc, InputInfo info) throws QueryException;
+  Value cast(Item item, QueryContext qc, InputInfo info) throws QueryException;
 
   /**
    * Casts the specified Java value to this type.
    * @param value Java value
-   * @param qc query context
+   * @param qc query context (can be {@code null} if the target type needs no reference
    * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
@@ -192,6 +199,14 @@ public interface Type {
       if(this == type) return true;
     }
     return false;
+  }
+
+  /**
+   * Returns the function type of this type, if any.
+   * @return function type, or {@code null} if type cannot represent a function
+   */
+  default FuncType funcType() {
+    return null;
   }
 
   // PUBLIC AND STATIC METHODS ====================================================================
@@ -290,10 +305,36 @@ public interface Type {
    */
   default Type refine(final Expr expr) {
     if(expr != null) {
-      final Type t = expr.seqType().type.intersect(this);
-      if(t != null) return t;
+      final Type tp = expr.seqType().type.intersect(this);
+      if(tp != null) return tp;
     }
     return this;
+  }
+
+  /**
+   * Returns an info message for a similar function.
+   * @param qname name of type
+   * @return info string
+   */
+  static byte[] similar(final QNm qname) {
+    final byte[] ln = Token.lc(qname.local());
+
+    final TokenList list = new TokenList();
+    list.add(QueryText.ITEM).add(QueryText.FUNCTION).add(QueryText.FN);
+    list.add(QueryText.MAP).add(QueryText.ARRAY);
+    for(final NodeType type : NodeType.values()) list.add(type.test());
+    final byte[][] values = list.finish();
+
+    Object similar = Levenshtein.similar(ln, values);
+    if(similar == null) {
+      for(final byte[] value : values) {
+        if(Token.startsWith(value, ln)) {
+          similar = value;
+          break;
+        }
+      }
+    }
+    return QueryError.similar(qname.prefixId(Token.XML), similar);
   }
 
   @Override

@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayRemove extends ArrayFn {
@@ -31,7 +31,7 @@ public final class ArrayRemove extends ArrayFn {
     // delete entries backwards
     for(int l = pos.size() - 1; l >= 0; l--) {
       final long p = pos.get(l);
-      if(p < array.arraySize()) array = array.remove(p, qc);
+      if(p < array.structSize()) array = array.remove(p, qc);
     }
     return array;
   }

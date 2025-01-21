@@ -2,7 +2,7 @@ package org.basex.query.func.session;
 
 import java.util.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * This module contains functions for processing global sessions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ASession {
@@ -57,8 +57,7 @@ public final class ASession {
    */
   public Value names() {
     final TokenList tl = new TokenList();
-    final Enumeration<String> en = session.getAttributeNames();
-    while(en.hasMoreElements()) tl.add(en.nextElement());
+    for(final String name : Collections.list(session.getAttributeNames())) tl.add(name);
     return StrSeq.get(tl);
   }
 

@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class DbText extends DbAccess {
@@ -50,6 +50,11 @@ public class DbText extends DbAccess {
       exprType.assign(seqType(), size);
     }
     return this;
+  }
+
+  @Override
+  public final boolean ddo() {
+    return true;
   }
 
   /**

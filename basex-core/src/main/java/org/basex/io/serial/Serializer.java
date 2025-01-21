@@ -26,7 +26,7 @@ import org.basex.util.list.*;
 /**
  * This is an interface for serializing XQuery values.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Serializer implements Closeable {
@@ -82,7 +82,7 @@ public abstract class Serializer implements Closeable {
       case HTML:  return new HTMLSerializer(os, so);
       case TEXT:  return new TextSerializer(os, so);
       case CSV:
-        final CsvSerialOptions copts = so.get(SerializerOptions.CSV);
+        final CsvOptions copts = so.get(SerializerOptions.CSV);
         return copts.get(CsvOptions.FORMAT) == CsvFormat.XQUERY
                ? new CsvXQuerySerializer(os, so)
                : new CsvDirectSerializer(os, so);
@@ -104,7 +104,7 @@ public abstract class Serializer implements Closeable {
   // PUBLIC METHODS ===============================================================================
 
   /**
-   * Serializes the specified item, which may be a node or an atomic value.
+   * Serializes the specified item, which may be a node or an atomic item.
    * @param item item to be serialized
    * @throws IOException I/O exception
    */
@@ -317,7 +317,7 @@ public abstract class Serializer implements Closeable {
   protected void pi(final byte[] name, final byte[] value) throws IOException { }
 
   /**
-   * Serializes an atomic value.
+   * Serializes an atomic item.
    * @param item item
    * @throws IOException I/O exception
    */

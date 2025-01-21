@@ -21,28 +21,33 @@ import org.basex.util.hash.*;
 /**
  * Id functions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class Ids extends ContextFn {
   /** Map for data references and id flags. */
   private final Map<Data, Boolean> indexed = Collections.synchronizedMap(new IdentityHashMap<>());
 
+  @Override
+  public final Value value(final QueryContext qc) throws QueryException {
+    return ids(qc);
+  }
+
   /**
    * Returns referenced nodes.
    * @param qc query context
-   * @param idref resolve id reference
    * @return referenced nodes
    * @throws QueryException query exception
    */
-  protected final Value ids(final QueryContext qc, final boolean idref) throws QueryException {
+  private Value ids(final QueryContext qc) throws QueryException {
     final TokenSet idSet = ids(arg(0).atomIter(qc, info), qc);
     final ANode node = toNodeOrNull(arg(1), qc);
 
     final ANode root = (node != null ? node : toNode(context(qc), qc)).root();
     if(root.type != NodeType.DOCUMENT_NODE) throw IDDOC.get(info);
 
-    final ANodeBuilder list = new ANodeBuilder();
+    final ANodeBuilder results = new ANodeBuilder();
+    final boolean idref = idref();
     if(index(root, idref)) {
       // create index iterator
       final Data data = root.data();
@@ -54,14 +59,16 @@ abstract class Ids extends ContextFn {
       for(Item item; (item = iter.next()) != null;) {
         // check attribute name; check root if database has more than one document
         final ANode attr = (ANode) item;
-        if(XMLToken.isId(attr.name(), idref) && (data.meta.ndocs == 1 || attr.root().is(root)))
-          list.add(idref ? attr : attr.parent());
+        if(XMLToken.isId(attr.name(), idref) && (idref || idSet.remove(attr.string()) != 0) &&
+            (data.meta.ndocs == 1 || attr.root().is(root))) {
+          results.add(idref ? attr : attr.parent());
+        }
       }
     } else {
       // otherwise, do sequential scan: parse node and its descendants
-      add(idSet, list, root, idref);
+      add(idSet, results, root);
     }
-    return list.value(this);
+    return results.value(this);
   }
 
   /**
@@ -84,24 +91,24 @@ abstract class Ids extends ContextFn {
    * @param idSet ids to be found
    * @param results node cache
    * @param node current node
-   * @param idref idref flag
    */
-  private static void add(final TokenSet idSet, final ANodeBuilder results, final ANode node,
-      final boolean idref) {
-
+  private void add(final TokenSet idSet, final ANodeBuilder results, final ANode node) {
+    final boolean idref = idref();
     for(final ANode attr : node.attributeIter()) {
       if(XMLToken.isId(attr.name(), idref)) {
         // id/idref found
-        for(final byte[] token : distinctTokens(attr.string())) {
-          // correct value: add to results
-          if(idSet.contains(token)) {
+        boolean found = false;
+        for(final byte[] id : distinctTokens(attr.string())) {
+          if((idref ? idSet.contains(id) : idSet.remove(id) != 0) && !found) {
             results.add(idref ? attr.finish() : node.finish());
-            break;
+            found = true;
           }
         }
       }
     }
-    for(final ANode child : node.childIter()) add(idSet, results, child, idref);
+    for(final ANode child : node.childIter()) {
+      add(idSet, results, child);
+    }
   }
 
   /**
@@ -119,6 +126,14 @@ abstract class Ids extends ContextFn {
       }
     }
     return ts;
+  }
+
+  /**
+   * Return idref flag.
+   * @return result of check
+   */
+  boolean idref() {
+    return false;
   }
 
   @Override

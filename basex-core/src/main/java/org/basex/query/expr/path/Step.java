@@ -23,7 +23,7 @@ import org.basex.util.hash.*;
 /**
  * Abstract axis step expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Step extends Preds {
@@ -89,13 +89,13 @@ public abstract class Step extends Preds {
       final Expr... preds) {
 
     // optimize single last() functions
-    if(preds.length == 1 && Function.LAST.is(preds[0]))
+    if(preds.length == 1 && preds[0] instanceof Pos && Function.LAST.is(((Pos) preds[0]).expr))
       return new IterLastStep(info, axis, test, preds);
 
     // check for simple positional predicates
     boolean pos = false;
     for(final Expr pred : preds) {
-      if(pred instanceof CmpPos || Pos.numeric(pred)) {
+      if(pred instanceof CmpPos) {
         // predicate is known to be a positional check; can be optimized
         pos = true;
       } else if(mayBePositional(pred)) {
@@ -106,7 +106,6 @@ public abstract class Step extends Preds {
     return pos ?
       new IterPosStep(info, axis, test, preds) :
       new IterStep(info, axis, test, preds);
-
   }
 
   /**
@@ -162,8 +161,8 @@ public abstract class Step extends Preds {
     }
     test = t;
 
-    // simplify predicates, choose best implementation
-    return simplify(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
+    // optimize predicates, choose best implementation
+    return optimize(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
   }
 
   @Override
@@ -206,7 +205,7 @@ public abstract class Step extends Preds {
   @Override
   public final Expr inline(final InlineContext ic) throws QueryException {
     // do not inline context value
-    return ic.var != null && ic.cc.ok(this, () -> ic.inline(exprs)) ? optimize(ic.cc) : null;
+    return ic.var != null && ic.cc.ok(this, true, () -> ic.inline(exprs)) ? optimize(ic.cc) : null;
   }
 
   @Override
@@ -309,9 +308,13 @@ public abstract class Step extends Preds {
       case CHILD:
       case DESCENDANT:
       case FOLLOWING:
+      case FOLLOWING_OR_SELF:
       case FOLLOWING_SIBLING:
+      case FOLLOWING_SIBLING_OR_SELF:
       case PRECEDING:
+      case PRECEDING_OR_SELF:
       case PRECEDING_SIBLING:
+      case PRECEDING_SIBLING_OR_SELF:
         return type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE_ELEMENT,
             NodeType.DOCUMENT_NODE, NodeType.NAMESPACE_NODE);
       default:
@@ -332,6 +335,10 @@ public abstract class Step extends Preds {
       switch(axis) {
         case SELF:
         case ANCESTOR_OR_SELF:
+        case FOLLOWING_OR_SELF:
+        case FOLLOWING_SIBLING_OR_SELF:
+        case PRECEDING_OR_SELF:
+        case PRECEDING_SIBLING_OR_SELF:
           return !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
         case CHILD:
         case DESCENDANT:

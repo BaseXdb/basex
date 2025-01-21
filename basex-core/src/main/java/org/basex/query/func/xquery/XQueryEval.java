@@ -21,7 +21,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class XQueryEval extends StandardFunc {
@@ -68,7 +68,7 @@ public class XQueryEval extends StandardFunc {
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     final XQueryOptions options = new XQueryOptions();
     options.put(XQueryOptions.PERMISSION, perm);
-    toOptions(arg(2), options, true, qc);
+    toOptions(arg(2), options, qc);
 
     final Perm evalPerm = Perm.get(options.get(XQueryOptions.PERMISSION).toString());
     if(!user.has(evalPerm)) throw XQUERY_PERMISSION2_X.get(info, evalPerm);
@@ -104,6 +104,7 @@ public class XQueryEval extends StandardFunc {
       }
 
       // evaluate query
+      final boolean pass = options.get(XQueryOptions.PASS);
       try {
         final StaticContext sctx = new StaticContext(qctx);
         sctx.baseURI(toBaseUri(query.url(), options, XQueryOptions.BASE_URI));
@@ -112,28 +113,43 @@ public class XQueryEval extends StandardFunc {
         }
         qctx.parseMain(string(query.read()), null, sctx);
 
-        if(!sc.mixUpdates && updating != qctx.updating) {
+        if(!sc().mixUpdates && updating != qctx.updating) {
           if(!updating) throw XQUERY_UPDATE1.get(info);
           if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATE2.get(info);
         }
 
+        final Value value;
         final Iter iter = qctx.iter();
-        // value-based iterator: return result unchanged
-        if(iter.valueIter()) return iter.value(qctx, this);
-        // collect resulting items
-        final ValueBuilder vb = new ValueBuilder(qc);
-        for(Item item; (item = qctx.next(iter)) != null;) vb.add(item);
-        return vb.value();
+        if(iter.valueIter()) {
+          // value-based iterator: return result unchanged
+          value = iter.value(qctx, this);
+        } else {
+          // collect resulting items
+          final ValueBuilder vb = new ValueBuilder(qc);
+          for(Item item; (item = qctx.next(iter)) != null;) vb.add(item);
+          value = vb.value();
+        }
+        // return cached result
+        value.cache(false, info);
+        return value;
       } catch(final JobException ex) {
-        if(qctx.state == JobState.TIMEOUT) throw XQUERY_TIMEOUT.get(info);
-        if(qctx.state == JobState.MEMORY)  throw XQUERY_MEMORY.get(info);
+        QueryError error = null;
+        if(qctx.state == JobState.TIMEOUT) error = XQUERY_TIMEOUT;
+        else if(qctx.state == JobState.MEMORY) error = XQUERY_MEMORY;
+        if(error != null) throw error.get(pass ? new InputInfo(query.path(), 1, 1) : info);
         throw ex;
       } catch(final QueryException ex) {
         Util.debug(ex);
+        final InputInfo ii = ex.info();
         final QueryError error = ex.error();
         final QueryException qe = error == BASEX_PERMISSION_X || error == BASEX_PERMISSION_X_X ?
           XQUERY_PERMISSION1_X.get(info, ex.getLocalizedMessage()) : ex;
-        throw qe.info(options.get(XQueryOptions.PASS) ? ex.info() : info);
+        // pass on error info: assign (possibly empty) path of module which caused the error
+        throw qe.info(pass ? ii.path().equals(info.path()) ?
+          new InputInfo(query.path(), ii.line(), ii.column()) : ii : info);
+      } catch(final StackOverflowError er) {
+        // pass on error info: assign (possibly empty) path of module which caused the error
+        throw XQUERY_UNEXPECTED_X.get(info, er);
       }
     } finally {
       if(to != null) to.cancel();
@@ -142,13 +158,13 @@ public class XQueryEval extends StandardFunc {
   }
 
   @Override
-  public boolean accept(final ASTVisitor visitor) {
+  public final boolean accept(final ASTVisitor visitor) {
     // locked resources cannot be detected statically
     return visitor.lock((String) null) && super.accept(visitor);
   }
 
   @Override
-  public boolean updating() {
-    return sc.mixUpdates || super.updating();
+  public final boolean hasUPD() {
+    return sc().mixUpdates || super.hasUPD();
   }
 }

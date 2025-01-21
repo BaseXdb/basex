@@ -13,10 +13,10 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DbGetBinary extends DbGetValue {
+public final class DbGetBinary extends DbGetValue {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return value(ResourceType.BINARY, qc);
@@ -28,7 +28,7 @@ public class DbGetBinary extends DbGetValue {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     if(defined(1)) {
       exprType.assign(SeqType.BASE64_BINARY_O);
     } else {

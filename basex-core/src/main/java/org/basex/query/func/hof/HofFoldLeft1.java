@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -13,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class HofFoldLeft1 extends StandardFunc {
@@ -22,13 +21,14 @@ public final class HofFoldLeft1 extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem action = toFunction(arg(1), 3, qc);
 
-    int p = 0;
-    Value value = input.next();
-    if(value == null) return Empty.VALUE;
+    final Value first = input.next();
+    if(first == null) return Empty.VALUE;
+
+    final HofArgs args = new HofArgs(3).set(0, first);
     for(Item item; (item = input.next()) != null;) {
-      value = action.invoke(qc, info, value, item, Int.get(++p));
+      args.set(0, invoke(action, args.set(1, item).inc(), qc));
     }
-    return value;
+    return args.get(0);
   }
 
   @Override
@@ -36,23 +36,13 @@ public final class HofFoldLeft1 extends StandardFunc {
     final Expr input = arg(0), action = arg(1);
     if(input.seqType().zero()) return input;
 
-    // unroll fold
-    final int arity = arity(action);
-    if(action instanceof Value && arity == 2) {
-      final ExprList unroll = cc.unroll(input, true);
-      if(unroll != null) {
-        final Expr func = coerce(1, cc, arity);
-        Expr expr = unroll.get(0);
-        final long is = unroll.size();
-        for(int i = 1; i < is; i++) {
-          expr = new DynFuncCall(info, sc, func, expr, unroll.get(i)).optimize(cc);
-        }
-        return expr;
-      }
-    }
-
-    final FuncType ft = arg(1).funcType();
+    final FuncType ft = action.funcType();
     if(ft != null) exprType.assign(ft.declType);
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

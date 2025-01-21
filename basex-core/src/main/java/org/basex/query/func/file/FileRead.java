@@ -11,7 +11,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class FileRead extends FileFn {
@@ -29,6 +29,6 @@ abstract class FileRead extends FileFn {
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
 
-    return new StrLazy(new IOFile(path.toFile()), encoding, FILE_IO_ERROR_X, !fallback);
+    return new StrLazy(new IOFile(path), encoding, FILE_IO_ERROR_X, !fallback);
   }
 }

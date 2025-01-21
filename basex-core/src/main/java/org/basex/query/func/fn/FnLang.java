@@ -12,12 +12,18 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnLang extends Ids {
+public final class FnLang extends ContextFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final byte[] lang = lc(toZeroToken(arg(0), qc));
     ANode node = toNodeOrNull(arg(1), qc);
     if(node == null) node = toNode(context(qc), qc);
@@ -27,11 +33,15 @@ public final class FnLang extends Ids {
       for(ANode at; (at = atts.next()) != null;) {
         if(eq(at.qname().string(), LANG)) {
           final byte[] ln = lc(normalize(at.string()));
-          return Bln.get(startsWith(ln, lang) &&
-              (lang.length == ln.length || ln[lang.length] == '-'));
+          return startsWith(ln, lang) && (lang.length == ln.length || ln[lang.length] == '-');
         }
       }
     }
-    return Bln.FALSE;
+    return false;
+  }
+
+  @Override
+  public int contextIndex() {
+    return 1;
   }
 }

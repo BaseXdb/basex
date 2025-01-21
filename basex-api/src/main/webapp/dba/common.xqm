@@ -1,7 +1,7 @@
 (:~
  : Common RESTXQ access points.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/common';
 
@@ -33,8 +33,8 @@ function dba:file(
   let $path := file:base-dir() || 'static/' || $file
   return (
     web:response-header(
-      map { 'media-type': web:content-type($path) },
-      map { 'Cache-Control': 'max-age=3600,public', 'Content-Length': file:size($path) }
+      { 'media-type': web:content-type($path) },
+      { 'Cache-Control': 'max-age=3600,public', 'Content-Length': file:size($path) }
     ),
     file:read-binary($path)
   )
@@ -52,15 +52,14 @@ declare
 function dba:unknown(
   $path  as xs:string
 ) as element(html) {
-  html:wrap(
-    <tr>
-      <td>
-        <h2>Page not found:</h2>
-        <ul>
-          <li>Page: dba/{ $path }</li>
-          <li>Method: { request:method() }</li>
-        </ul>
-      </td>
-    </tr>
-  )
+  <tr>
+    <td>
+      <h2>Page not found:</h2>
+      <ul>
+        <li>Page: dba/{ $path }</li>
+        <li>Method: { request:method() }</li>
+      </ul>
+    </td>
+  </tr>
+  => html:wrap()
 };

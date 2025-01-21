@@ -9,14 +9,14 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArraySlice extends FnSlice {
   @Override
   public XQArray value(final QueryContext qc) throws QueryException {
     XQArray array = toArray(arg(0), qc);
-    final Slice slice = slice(array.arraySize(), qc);
+    final Slice slice = slice(array.structSize(), qc);
 
     if(slice.length == 0) return XQArray.empty();
     if(slice.reverse) array = array.reverseArray(qc);

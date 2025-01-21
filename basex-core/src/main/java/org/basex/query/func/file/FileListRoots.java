@@ -10,12 +10,12 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FileListRoots extends FileFn {
+public final class FileListRoots extends FileFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value value(final QueryContext qc) {
     final TokenList tl = new TokenList();
     for(final Path path : FileSystems.getDefault().getRootDirectories()) {
       tl.add(get(path, true).string());

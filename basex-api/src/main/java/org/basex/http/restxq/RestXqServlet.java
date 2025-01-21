@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 
 import java.util.stream.*;
 
@@ -19,7 +19,7 @@ import org.basex.util.http.*;
  * <p>The implementation is based on Adam Retter's paper presented at XMLPrague 2012,
  * titled "RESTful XQuery - Standardised XQuery 3.0 Annotations for REST".</p>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RestXqServlet extends BaseXServlet {

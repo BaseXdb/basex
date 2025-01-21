@@ -15,10 +15,10 @@ import org.basex.util.list.*;
 /**
  * Resizable-array implementation for nodes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class ANodeList extends ObjectList<ANode, ANodeList> {
+public final class ANodeList extends ObjectList<ANode, ANodeList> {
   /**
    * Constructor.
    */

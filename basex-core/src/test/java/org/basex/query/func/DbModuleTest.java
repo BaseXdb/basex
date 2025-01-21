@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the functions of the Database Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DbModuleTest extends SandboxTest {
@@ -125,14 +125,14 @@ public final class DbModuleTest extends SandboxTest {
     query("exists(" + _DB_GET.args(NAME, "C3.xml") + ")", true);
 
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X_X);
+        " map { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X);
     error(func.args(NAME, CSV, "csv.xml",
         " map { 'parser': 'csv', 'csvparser': map { 'header': ('true', 'false') } }"),
-        INVALIDOPT_X);
+        INVALIDOPTION_X_X_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': 'csv', 'csvparser': map { 'headr': 'true' } }"), BASEX_OPTIONS2_X);
+        " map { 'parser': 'csv', 'csvparser': map { 'headr': 'true' } }"), BASEX_OPTIONS_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS2_X);
+        " map { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS_X);
 
     error(func.args(NAME, " <a/>"), RESINV_X);
     error(func.args(NAME, " <a/>", " ()"), RESINV_X);
@@ -375,13 +375,11 @@ public final class DbModuleTest extends SandboxTest {
 
     // specify unknown or invalid options
     error(func.args(NAME, " ()", " ()", " map { 'xyz': 'abc' }"),
-        BASEX_OPTIONS1_X);
-    error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
     error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
     error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
 
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
@@ -742,15 +740,14 @@ public final class DbModuleTest extends SandboxTest {
     assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
 
     // check invalid options
-    error(func.args(NAME, false, " map { 'xyz': 'abc' }"), BASEX_OPTIONS1_X);
+    error(func.args(NAME, false, " map { 'xyz': 'abc' }"),
+        BASEX_OPTIONS_X);
     error(func.args(NAME, false, " map { '" + lc(MainOptions.UPDINDEX) + "': 1 }"),
-        BASEX_OPTIONS1_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': -1 }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
     error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
     error(func.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
-        BASEX_OPTIONS_X_X);
+        BASEX_OPTIONS_X);
 
     // check if optimize call adopts original options
     query(func.args(NAME));
@@ -802,6 +799,17 @@ public final class DbModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void optionMap() {
+    final Function func = _DB_OPTION_MAP;
+    query(func.args() + "?addraw", false);
+    query(func.args() + "?ADDRAW", "");
+    query(func.args() + "?runs", 1);
+    query(func.args() + "?bindings", "");
+    query(func.args() + "?serializer?indent", "no");
+    query(func.args() + "?xyz", "");
+  }
+
+  /** Test method. */
   @Test public void path() {
     final Function func = _DB_PATH;
     query(func.args(_DB_GET.args(NAME)), XML.replaceAll(".*/", ""));
@@ -813,7 +821,16 @@ public final class DbModuleTest extends SandboxTest {
   @Test public void property() {
     final Function func = _DB_PROPERTY;
     query(func.args(NAME, "name"), NAME);
+    query(func.args(NAME, "NAME"), NAME);
     error(func.args(NAME, "xyz"), DB_PROPERTY_X);
+  }
+
+  /** Test method. */
+  @Test public void propertyMap() {
+    final Function func = _DB_PROPERTY_MAP;
+    query(func.args(NAME) + "?name", NAME);
+    query(func.args(NAME) + "?NAME", "");
+    query(func.args(NAME) + "?xyz", "");
   }
 
   /** Test method. */

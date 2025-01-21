@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Sequence, containing at least two nodes in distinct document order (DDO).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class DBNodeSeq extends NativeSeq {
@@ -46,12 +46,12 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Data data() {
+  public final Data data() {
     return data;
   }
 
   @Override
-  public boolean ddo() {
+  public final boolean ddo() {
     return true;
   }
 
@@ -61,7 +61,7 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) {
+  public final Value atomValue(final QueryContext qc, final InputInfo ii) {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(int i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
     return vb.value(AtomType.ANY_ATOMIC_TYPE);
@@ -71,7 +71,7 @@ public class DBNodeSeq extends NativeSeq {
    * Returns the internal pre value array.
    * @return pre values
    */
-  public int[] pres() {
+  public final int[] pres() {
     return pres;
   }
 
@@ -80,7 +80,7 @@ public class DBNodeSeq extends NativeSeq {
    * @param index index of pre value
    * @return pre value
    */
-  public int pre(final int index) {
+  public final int pre(final int index) {
     return pres[index];
   }
 
@@ -88,12 +88,12 @@ public class DBNodeSeq extends NativeSeq {
    * Indicates if pre values reference all documents of the database.
    * @return flag
    */
-  public boolean all() {
+  public final boolean all() {
     return all;
   }
 
   @Override
-  public Value reverse(final QueryContext qc) {
+  public final Value reverse(final QueryContext qc) {
     final int sz = (int) size;
     final int[] tmp = new int[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = pres[i];
@@ -121,8 +121,13 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii) {
+  public final boolean materialized(final Predicate<Data> test, final InputInfo ii) {
     return test.test(data);
+  }
+
+  @Override
+  public final void refineType() {
+    refineType(this);
   }
 
   @Override
@@ -134,7 +139,7 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public void toString(final QueryString qs) {
+  public final void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder().add('(');
     for(int p = 0; p < size; ++p) {
       if(p > 0) tb.add(SEP);

@@ -3,6 +3,7 @@ package org.basex.util.similarity;
 import static org.basex.util.FTToken.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
 import java.util.function.*;
 
 /**
@@ -10,17 +11,17 @@ import java.util.function.*;
  * "Binary codes capable of correcting spurious insertions and deletions of ones", and
  * Damerau (1964): "A technique for computer detection and correction of spelling errors.".</p>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Levenshtein {
-  /** Maximum token size. */
-  private static final int MAX = 50;
+  /** Size of matrix (and maximum supported length for comparing tokens). */
+  private static final int MAX_LENGTH = 128;
 
   /** Default number of allowed errors; dynamic calculation if value is 0. */
   private final int maxErrors;
   /** Matrix for calculating Levenshtein distance. */
-  private int[][] matrix;
+  private final byte[][] matrix;
 
   /**
    * Constructor.
@@ -35,6 +36,12 @@ public final class Levenshtein {
    */
   public Levenshtein(final int maxErrors) {
     this.maxErrors = maxErrors;
+    matrix = new byte[MAX_LENGTH + 2][MAX_LENGTH + 2];
+    final int ml = matrix.length;
+    for(int m = 0; m < ml; ++m) {
+      matrix[0][m] = (byte) m;
+      matrix[m][0] = (byte) m;
+    }
   }
 
   /**
@@ -102,81 +109,85 @@ public final class Levenshtein {
    * @return distance
    */
   private int distance(final byte[] token, final byte[] compare, final int max) {
-    final int sl = compare.length, tl = token.length;
-    int clen = 0, tlen = 0;
-    for(int c = 0; c < sl; c += cl(compare, c)) ++clen;
-    for(int t = 0; t < tl; t += cl(token, t)) ++tlen;
+    // create normalized copies of the tokens
+    final int[] tkn = normalize(token), cmp = normalize(compare);
+    final int tl = tkn.length, cl = cmp.length;
 
     // use exact search for too short and too long values
-    final int dlen = Math.abs(clen - tlen);
-    if(max == 0 && (tlen < 4 || clen < 4) || tlen > MAX || clen > MAX)
-      return dlen == 0 && same(token, compare) ? 0 : Integer.MAX_VALUE;
+    final int dlen = Math.abs(cl - tl);
+    if(max == 0 && (tl < 4 || cl < 4) || tl > MAX_LENGTH || cl > MAX_LENGTH) {
+      return dlen == 0 && Arrays.equals(tkn, cmp) ? 0 : Integer.MAX_VALUE;
+    }
 
     // skip different tokens with too different lengths
-    final int k = max == 0 ? Math.max(1, clen >> 2) : max;
+    final int k = max == 0 ? Math.max(1, cl >> 2) : max;
     if(dlen > k) return Integer.MAX_VALUE;
 
     // compute distance
-    int[][] mx = matrix;
-    if(mx == null) {
-      mx = new int[MAX + 2][MAX + 2];
-      final int ml = mx.length;
-      for(int m = 0; m < ml; ++m) {
-        mx[0][m] = m;
-        mx[m][0] = m;
-      }
-      matrix = mx;
-    }
-
-    int f = -1, g = -1;
-    for(int t = 0; t < tlen; t += cl(token, t)) {
-      final int tn = noDiacritics(lc(cp(token, t)));
+    final byte[][] m = matrix;
+    for(int f = -1, g = -1, t = 0; t < tl; t++) {
+      final int tn = tkn[t];
       int d = Integer.MAX_VALUE;
-      for(int c = 0; c < clen; c += cl(compare, c)) {
-        final int cn = noDiacritics(lc(cp(compare, c)));
-        int e = m(mx[t][c + 1] + 1, mx[t + 1][c] + 1, mx[t][c] + (tn == cn ? 0 : 1));
-        if(tn == g && cn == f) e = mx[t][c];
-        mx[t + 1][c + 1] = e;
-        d = Math.min(d, e);
+      for(int c = 0; c < cl; c++) {
+        final int cn = cmp[c];
+        int cost = min(m[t][c + 1] + 1, m[t + 1][c] + 1, m[t][c] + (tn == cn ? 0 : 1));
+        if(tn == g && cn == f) cost = m[t][c];
+        m[t + 1][c + 1] = (byte) cost;
+        d = Math.min(d, cost);
         g = cn;
       }
       if(d > k) return Integer.MAX_VALUE;
       f = tn;
     }
-    final int d = mx[tlen][clen];
+    final int d = m[tl][cl];
     return d <= k ? d : Integer.MAX_VALUE;
+  }
+
+  /**
+   * Normalizes a token and returns a codepoint array.
+   * @param token token
+   * @return normalized token
+   */
+  private static int[] normalize(final byte[] token) {
+    final int[] cps = cps(token);
+    final int cl = cps.length;
+    for(int c = 0; c < cl; c++) cps[c] = noDiacritics(lc(cps[c]));
+    return cps;
   }
 
   /**
    * <p>Computes the full Damerau-Levenshtein distance for two codepoint arrays and returns a
    * double value (0.0 - 1.0), which represents the distance. The value is computed as follows:</p>
    *
-   * <pre>  1.0 - distance / max(length of strings)</pre>
+   * <code>1.0 - distance / max(length of strings)</code>.
+   * 1.0 is returned if the strings are equal
+   * 0.0 is returned if the strings are different enough.
    *
-   * <p>1.0 is returned if the strings are equal; 0.0 is returned if all strings are
-   * completely different.</p>
-   *
-   * @param cps1 first codepoints array
-   * @param cps2 second codepoints array
+   * @param token first codepoints array
+   * @param compare second codepoints array
    * @return distance (0.0 - 1.0)
    */
-  public static double distance(final int[] cps1, final int[] cps2) {
-    final int l1 = cps1.length, l2 = cps2.length, lMax = Math.max(l1, l2);
-    if(lMax == 0) return 1;
+  public static double distance(final int[] token, final int[] compare) {
+    final int tl = token.length, cl = compare.length, max = Math.max(tl, cl);
+    if(max == 0) return 1;
+    if(Math.abs(tl - cl) >= max) return 0;
 
-    final int[][] m = new int[lMax + 1][lMax + 1];
-    for(int f2 = -1, f1 = -1, p1 = 0; p1 < lMax; p1++) {
-      final int c1 = p1 < l1 ? cps1[p1] : 0;
-      for(int p2 = 0; p2 < lMax; p2++) {
-        final int c2 = p2 < l2 ? cps2[p2] : 0;
-        int c = m(m[p1][p2 + 1] + 1, m[p1 + 1][p2] + 1, m[p1][p2] + (c1 == c2 ? 0 : 1));
-        if(c1 == f1 && c2 == f2) c = m[p1][p2];
-        m[p1 + 1][p2 + 1] = c;
-        f1 = c2;
+    final char[][] m = new char[tl + 1][cl + 1];
+    for(int t = 0; t <= tl; t++) m[t][0] = (char) t;
+    for(int c = 0; c <= cl; c++) m[0][c] = (char) c;
+
+    for(int f = -1, g = -1, t = 0; t < tl; t++) {
+      final int tn = token[t];
+      for(int c = 0; c < cl; c++) {
+        final int cn = compare[c];
+        int cost = min(m[t][c + 1] + 1, m[t + 1][c] + 1, m[t][c] + (tn == cn ? 0 : 1));
+        if(tn == g && cn == f) cost = m[t][c];
+        m[t + 1][c + 1] = (char) cost;
+        g = cn;
       }
-      f2 = c1;
+      f = tn;
     }
-    return (double) (lMax - m[lMax][lMax]) / lMax;
+    return (double) (max - m[tl][cl]) / max;
   }
 
   /**
@@ -186,21 +197,7 @@ public final class Levenshtein {
    * @param c 3rd value
    * @return minimum
    */
-  private static int m(final int a, final int b, final int c) {
+  private static int min(final int a, final int b, final int c) {
     return Math.min(Math.min(a, b), c);
-  }
-
-  /**
-   * Compares two character arrays for equality.
-   * @param token input token
-   * @param compare token to be compared
-   * @return true if the arrays are equal
-   */
-  private static boolean same(final byte[] token, final byte[] compare) {
-    final int tl = token.length, cl = compare.length;
-    for(int c = 0, t = 0; t < tl && c < cl; t += cl(token, t), c += cl(compare, c)) {
-      if(lc(noDiacritics(cp(token, t))) != lc(noDiacritics(cp(compare, t)))) return false;
-    }
-    return true;
   }
 }

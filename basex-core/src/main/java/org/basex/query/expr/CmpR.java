@@ -11,7 +11,6 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -29,7 +28,7 @@ import org.basex.util.hash.*;
 /**
  * Numeric range expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CmpR extends Single {
@@ -130,41 +129,45 @@ public final class CmpR extends Single {
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();
 
-    if(expr instanceof Value) return cc.preEval(this);
-
+    // position() = .1e0  ->  false()
     if(Function.POSITION.is(expr)) {
-      // E[let $p := position() return $p > .1e0]
-      final long mn = Math.max((long) Math.ceil(min), 1), size = (long) Math.floor(max) - mn + 1;
-      final Expr pos = RangeSeq.get(mn, size, true).optimizePos(OpV.EQ, cc);
-      return cc.replaceWith(this, pos instanceof Bln ? pos : IntPos.get(pos, OpV.EQ, info));
+      final long mn = Math.max((long) Math.ceil(min), 1), mx = (long) Math.floor(max);
+      return cc.replaceWith(this, IntPos.get(mn, mx, info));
     }
-    return this;
+
+    return expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);
-      return Bln.get(!item.isEmpty() && inRange(item));
+      return !item.isEmpty() && inRange(item);
     }
 
     // pre-evaluate ranges
     if(expr instanceof Range || expr instanceof RangeSeq) {
       final Value value = expr.value(qc);
       final long size = value.size();
-      if(size == 0) return Bln.FALSE;
-      if(size == 1) return Bln.get(inRange((Item) value));
+      if(size == 0) return false;
+      if(size == 1) return inRange((Item) value);
       final RangeSeq rs = (RangeSeq) value;
-      return Bln.get(rs.max() >= min && rs.min() <= max);
+      return rs.max() >= min && rs.min() <= max;
     }
 
     // iterative evaluation
     final Iter iter = expr.atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(inRange(item)) return Bln.TRUE;
+      if(inRange(item)) return true;
     }
-    return Bln.FALSE;
+    return false;
   }
 
   /**

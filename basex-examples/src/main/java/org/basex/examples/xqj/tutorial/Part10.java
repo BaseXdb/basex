@@ -18,7 +18,7 @@ import org.xml.sax.helpers.*;
  *
  * Part 10: XML Pipelines.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  */
 public final class Part10 extends Main {
   /**
@@ -98,7 +98,7 @@ public final class Part10 extends Main {
   /**
    * XQuery for Java filter.
    */
-  private static class XQJFilter extends XMLFilterImpl {
+  private static final class XQJFilter extends XMLFilterImpl {
     /** Prepared expression. */
     final XQPreparedExpression expression;
 

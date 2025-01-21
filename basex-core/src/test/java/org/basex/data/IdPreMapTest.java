@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 /**
  * ID -> PRE mapping test.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 public final class IdPreMapTest {
@@ -210,7 +210,7 @@ public final class IdPreMapTest {
    * Dummy implementation of ID -> PRE map: very slow, but simple and correct.
    * @author Dimitar Popov
    */
-  private static class DummyIdPreMap extends IdPreMap {
+  private static final class DummyIdPreMap extends IdPreMap {
     /** ID list. */
     private final ArrayList<Integer> ids;
 

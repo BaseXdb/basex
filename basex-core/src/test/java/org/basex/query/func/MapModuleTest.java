@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
-import org.basex.query.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -15,7 +14,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Map Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MapModuleTest extends SandboxTest {
@@ -27,13 +26,13 @@ public final class MapModuleTest extends SandboxTest {
   @Test public void build() {
     final Function func = _MAP_BUILD;
 
-    query(func.args(" ()", " boolean#1"), "map{}");
-    query(func.args(" 0", " boolean#1"), "map{false():0}");
-    query(func.args(" 1", " boolean#1"), "map{true():1}");
+    query(func.args(" ()", " boolean#1"), "{}");
+    query(func.args(" 0", " boolean#1"), "{false():0}");
+    query(func.args(" 1", " boolean#1"), "{true():1}");
     query(func.args(" (0, 1)", " boolean#1") + " => map:size()", 2);
-    query(func.args(" (0, 1)", " function($i) { boolean($i)[.] }"), "map{true():1}");
+    query(func.args(" (0, 1)", " function($i) { boolean($i)[.] }"), "{true():1}");
 
-    query(func.args(" (1 to 100)", " function($i) { }"), "map{}");
+    query(func.args(" (1 to 100)", " function($i) { }"), "{}");
     query(func.args(" (1 to 100)", " boolean#1") + " => map:size()", 1);
     query(func.args(" (1 to 100)", " string#1") + " => map:size()", 100);
     query(func.args(" (1 to 100)", " function($i) { $i mod 10 }") + " => map:size()", 10);
@@ -43,14 +42,26 @@ public final class MapModuleTest extends SandboxTest {
     query(func.args(" <xml>{ (1 to 9) ! <sub>{ . }</sub> }</xml>/*", " string-length#1")
         + " => map:keys()", 1);
     query("for $f in (true#0, false#0, concat#2, substring#2, contains#2, identity#1)"
-        + "[function-arity(.) = 1] return " + func.args(5, " $f"), "map{5:5}");
+        + "[function-arity(.) = 1] return " + func.args(5, " $f"), "{5:5}");
     query("for $f in (1, 2, 3, 4, string#1, 6)"
-        + "[. instance of function(*)] return " + func.args(8, " $f"), "map{\"8\":8}");
+        + "[. instance of function(*)] return " + func.args(8, " $f"), "{\"8\":8}");
 
     query("for $f in (1, 2, 3, 4, string#1, 6)"
-        + "[. instance of function(*)] return " + func.args(8, " $f"), "map{\"8\":8}");
+        + "[. instance of function(*)] return " + func.args(8, " $f"), "{\"8\":8}");
+    query("map:for-each(" + func.args(1, " fn { 'x' }", " fn { 'y' }") + ", concat#2)", "xy");
 
-    query("map:for-each(map:build(1, fn { 'x' }, fn { 'y' }), concat#2)", "xy");
+    inline(true);
+    try {
+      check(func.args("a", " fn($x) { if($x instance of xs:string) then 1 else 'x' }"),
+          "{1:\"a\"}", type(func, "map(xs:integer, xs:string+)"));
+    } finally {
+      inline(false);
+    }
+
+    // GH-2312
+    query("map:for-each(" + func.args("a", " ()", " fn($f) { 1[$f = 'x'] }") +
+        ", fn($_, $v) { $v })", "");
+    query(func.args(" <a>A</a>"), "{\"A\":<a>A</a>}");
   }
 
   /** Test method. */
@@ -71,13 +82,13 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void entries() {
     final Function func = _MAP_ENTRIES;
-    query(func.args(" map {}"), "");
+    query(func.args(" map { }"), "");
     query(func.args(" map { 1: 2 }") + " !" + _MAP_KEYS.args(" ."), 1);
-    query(func.args(" map { 1: 2 }") + " !" + _MAP_VALUES.args(" ."), 2);
+    query(func.args(" map { 1: 2 }") + " !" + _MAP_ITEMS.args(" ."), 2);
     query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_KEYS.args(" ."), 1);
-    query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_VALUES.args(" ."), "2\n3");
+    query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_ITEMS.args(" ."), "2\n3");
     query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_KEYS.args(" ."), "1\n3");
-    query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_VALUES.args(" ."), "2\n4");
+    query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_ITEMS.args(" ."), "2\n4");
   }
 
   /** Test method. */
@@ -87,7 +98,7 @@ public final class MapModuleTest extends SandboxTest {
     query("exists(" + func.args(1, 2) + ')', true);
     query("exists(" + _MAP_MERGE.args(func.args(1, 2)) + ')', true);
 
-    check(func.args(" <_>A</_>", 0), "map{\"A\":0}", empty(CElem.class), root(XQMap.class));
+    check(func.args(" <_>A</_>", 0), "{\"A\":0}", empty(CElem.class), root(XQTrieMap.class));
 
     error("exists(" + func.args(" ()", 2) + ')', EMPTYFOUND);
     error("exists(" + func.args(" (1, 2)", 2) + ')', SEQFOUND_X);
@@ -96,15 +107,15 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void filter() {
     final Function func = _MAP_FILTER;
-    query(func.args(" map { }", " function($k, $v) { true() } "), "map{}");
-    query(func.args(" map { }", " function($k, $v) { false() } "), "map{}");
+    query(func.args(" map { }", " function($k, $v) { true() } "), "{}");
+    query(func.args(" map { }", " function($k, $v) { false() } "), "{}");
 
-    query(func.args(" map { 1: 2 }", " function($k, $v) { true() } "), "map{1:2}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { false() } "), "map{}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { $k = 1 } "), "map{1:2}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { $k = 2 } "), "map{}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { $v = 1 } "), "map{}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { $v = 2 } "), "map{1:2}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { true() } "), "{1:2}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { false() } "), "{}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { $k = 1 } "), "{1:2}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { $k = 2 } "), "{}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { $v = 1 } "), "{}");
+    query(func.args(" map { 1: 2 }", " function($k, $v) { $v = 2 } "), "{1:2}");
 
     query(func.args(" map:merge((1 to 10) ! map:entry(., string()))",
         " function($k, $v) { $k < 2 } ") + " => map:keys()", 1);
@@ -118,7 +129,7 @@ public final class MapModuleTest extends SandboxTest {
         " => map:keys()", "aba");
 
     // function coercion: allow function with lower arity
-    query(func.args(" map { 1: 2 }", " true#0"), "map{1:2}");
+    query(func.args(" map { 1: 2 }", " true#0"), "{1:2}");
     // reject function with higher arity
     error(func.args(" map { 'abc': 'a', 'def': 'g' }", " substring#2"), INVCONVERT_X_X_X);
   }
@@ -155,6 +166,16 @@ public final class MapModuleTest extends SandboxTest {
     query(func.args(_MAP_ENTRY.args(1, 2), 3), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { }"), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { 4, 5 }"), "4\n5");
+  }
+
+  /** Test method. */
+  @Test public void items() {
+    final Function func = _MAP_ITEMS;
+
+    query(func.args(" map { }"), "");
+    query(func.args(" map { 1: 2 }"), 2);
+    query(func.args(" map { 1: (2, 3) }"), "2\n3");
+    query(func.args(" map { 1: 2, 3: 4 }"), "2\n4");
   }
 
   /** Test method. */
@@ -246,15 +267,13 @@ public final class MapModuleTest extends SandboxTest {
 
   /**
    * Regression tests for {@code map:merge(...)} in the presence of hash collisions.
-   *
-   * @throws QueryException exception
    */
-  @Test public void gh1779() throws QueryException {
+  @Test public void gh1779() {
     final Function func = _MAP_MERGE;
     final Str[] keys = { Str.get("DENW21AL100077Hs"), Str.get("DENW21AL100076i5"),
         Str.get("DENW21AL100076hT") };
-    assertEquals(keys[0].hash(null), keys[1].hash(null));
-    assertEquals(keys[1].hash(null), keys[2].hash(null));
+    assertEquals(keys[0].hashCode(), keys[1].hashCode());
+    assertEquals(keys[1].hashCode(), keys[2].hashCode());
 
     final String mapAB = Util.info("map { '%': %, '%': % }", keys[0], 1, keys[1], 1);
     final String mapABC = Util.info("map { '%': %, '%': %, '%': % }",
@@ -311,7 +330,7 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void pairs() {
     final Function func = _MAP_PAIRS;
-    query(func.args(" map {}"), "");
+    query(func.args(" map { }"), "");
     query(func.args(" map { 1: 2 }") + "?key", 1);
     query(func.args(" map { 1: 2 }") + "?value", 2);
     query(func.args(" map { 1: (2, 3) }") + "?key", 1);
@@ -331,8 +350,8 @@ public final class MapModuleTest extends SandboxTest {
 
     query(func.args(" map { xs:time('01:01:01'): 'b' }", "xs:time('01:01:02+01:00')", 1));
 
-    check(func.args(" map { <?_ 1?>: 2, 3: 4 }", " <_>5</_>", 6),
-        "map{3:4,\"1\":2,\"5\":6}", empty(CElem.class));
+    check(func.args(" map { <?_ 1?>: 2, 3: 4 }", " <_>5</_>", 6) + "?* => sort()",
+        "2\n4\n6", empty(CElem.class));
 
     query("deep-equal(" + func.args(" map { 0: 1 }", -1, 2) + ", map { 0: 1, -1: 2 })", true);
   }
@@ -347,16 +366,6 @@ public final class MapModuleTest extends SandboxTest {
   @Test public void size() {
     final Function func = _MAP_SIZE;
     query(func.args(" map { }"), 0);
-  }
-
-  /** Test method. */
-  @Test public void values() {
-    final Function func = _MAP_VALUES;
-
-    query(func.args(" map {}"), "");
-    query(func.args(" map { 1: 2 }"), 2);
-    query(func.args(" map { 1: (2, 3) }"), "2\n3");
-    query(func.args(" map { 1: 2, 3: 4 }"), "2\n4");
   }
 
   /**

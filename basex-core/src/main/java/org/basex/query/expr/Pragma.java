@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Abstract pragma expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public abstract class Pragma extends ExprInfo {
@@ -41,7 +41,7 @@ public abstract class Pragma extends ExprInfo {
   /**
    * Finalizes the pragma expression.
    * @param qc query context
-   * @param state state before pragmas was set
+   * @param state state before pragma was set
    */
   abstract void finish(QueryContext qc, Object state);
 

@@ -9,10 +9,10 @@ import org.basex.query.value.seq.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DbGet extends DbAccess {
+public final class DbGet extends DbAccess {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
@@ -27,6 +27,6 @@ public class DbGet extends DbAccess {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    return cc.dynamic && allAreValues(true) ? value(cc.qc) : compileData(cc);
+    return cc.dynamic && values(true, cc) ? value(cc.qc) : compileData(cc);
   }
 }

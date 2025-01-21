@@ -1,7 +1,7 @@
 (:~
  : Download file.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/files';
 
@@ -18,11 +18,11 @@ declare
 function dba:file-download(
   $name  as xs:string
 ) as item()+ {
-  let $path := config:directory() || $name
+  let $path := config:files-dir() || $name
   return (
     web:response-header(
-      map { 'media-type': 'application/octet-stream' },
-      map { 'Content-Length': file:size($path) }
+      { 'media-type': 'application/octet-stream' },
+      { 'Content-Length': file:size($path) }
     ),
     file:read-binary($path)
   )

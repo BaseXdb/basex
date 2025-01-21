@@ -1,6 +1,7 @@
 package org.basex.query.func.web;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
@@ -9,16 +10,17 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.Token.*;
 import org.basex.util.http.*;
 import org.basex.util.options.*;
 
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class WebFn extends StandardFunc {
+public abstract class WebFn extends StandardFunc {
   /** Response options. */
   public static class ResponseOptions extends Options {
     /** Status. */
@@ -39,17 +41,33 @@ abstract class WebFn extends StandardFunc {
     final byte[] anchor = toZeroToken(arg(2), qc);
 
     final XQMap map = params.isEmpty() ? XQMap.empty() : toMap(params);
-    final TokenBuilder tb = new TokenBuilder().add(href);
-    int c = 0;
-    for(final Item key : map.keys()) {
+    final TokenBuilder url = createUrl(href, map, '&', info);
+    if(anchor.length > 0) url.add('#').add(Token.encodeUri(anchor, UriEncoder.URI));
+    return url.toString();
+  }
+
+  /**
+   * Creates a URL from the function arguments.
+   * @param href host and path
+   * @param params query parameters
+   * @param info input info
+   * @param sep separator for query parameters
+   * @return supplied URL builder
+   * @throws QueryException query exception
+   */
+  public static final TokenBuilder createUrl(final byte[] href, final XQMap params,
+      final char sep, final InputInfo info) throws QueryException {
+
+    final TokenBuilder url = new TokenBuilder().add(href);
+    final AtomicInteger c = new AtomicInteger();
+    params.forEach((key, value) -> {
       final byte[] name = key.string(info);
-      for(final Item item : map.get(key, info)) {
-        tb.add(c++ == 0 ? '?' : '&').add(Token.encodeUri(name, false));
-        tb.add('=').add(Token.encodeUri(item.string(info), false));
+      for(final Item item : value) {
+        url.add(c.getAndIncrement() == 0 ? '?' : sep).add(Token.encodeUri(name, UriEncoder.URI));
+        url.add('=').add(Token.encodeUri(item.string(info), UriEncoder.URI));
       }
-    }
-    if(anchor.length > 0) tb.add('#').add(Token.encodeUri(anchor, false));
-    return tb.toString();
+    });
+    return url;
   }
 
   /**
@@ -85,7 +103,7 @@ abstract class WebFn extends StandardFunc {
       for(final String entry : output.keySet())
         if(sopts.option(entry) == null) throw QueryError.INVALIDOPTION_X.get(info, entry);
 
-      final FBuilder param = FElem.build(FuncOptions.Q_SERIALIZTION_PARAMETERS).declareNS();
+      final FBuilder param = FElem.build(SerializerOptions.Q_ROOT).declareNS();
       output.forEach((name, value) -> {
         if(!value.isEmpty()) {
           final QNm qnm = new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI);

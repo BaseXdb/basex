@@ -15,7 +15,7 @@ import org.basex.io.*;
 /**
  * Dialog window for defining variable and context bindings.
 
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DialogBindings extends BaseXDialog {
@@ -25,8 +25,8 @@ public final class DialogBindings extends BaseXDialog {
   private final BaseXTextField[] names = new BaseXTextField[MAX];
   /** Values. */
   private final BaseXTextField[] values = new BaseXTextField[MAX];
-  /** Context item. */
-  private final BaseXTextField ctxitem;
+  /** Context value. */
+  private final BaseXTextField ctxValue;
 
   /**
    * Default constructor.
@@ -36,7 +36,7 @@ public final class DialogBindings extends BaseXDialog {
     super(gui, EXTERNAL_VARIABLES);
     ((BorderLayout) panel.getLayout()).setHgap(4);
 
-    ctxitem = new BaseXTextField(this).hint(gui.editor.context());
+    ctxValue = new BaseXTextField(this).hint(gui.editor.context());
 
     final BaseXBack center = new BaseXBack(new RowLayout(4));
     for(int c = -1; c < MAX + 1; c++) {
@@ -50,9 +50,9 @@ public final class DialogBindings extends BaseXDialog {
         values[c] = new BaseXTextField(this);
         row.add(values[c]);
       } else {
-        row.add(new BaseXLabel("Context item" + COLS));
+        row.add(new BaseXLabel("Context value" + COLS));
         final BaseXBack ctx = new BaseXBack().layout(new BorderLayout(8, 0));
-        ctx.add(ctxitem, BorderLayout.CENTER);
+        ctx.add(ctxValue, BorderLayout.CENTER);
         final BaseXButton browse = new BaseXButton(this, BROWSE_D);
         browse.addActionListener(e -> choose());
         ctx.add(browse, BorderLayout.EAST);
@@ -80,7 +80,7 @@ public final class DialogBindings extends BaseXDialog {
     for(final Entry<String, String> entry : opts.toMap(MainOptions.BINDINGS).entrySet()) {
       final String name = entry.getKey(), value = entry.getValue();
       if(name.isEmpty()) {
-        ctxitem.setText(value);
+        ctxValue.setText(value);
       } else if(c < MAX) {
         names[c].setText('$' + name.replaceAll("^\\$", ""));
         values[c].setText(value);
@@ -114,7 +114,7 @@ public final class DialogBindings extends BaseXDialog {
       final String name = names[c].getText().replaceAll("^\\s*\\$|\\s+$", "");
       if(!name.isEmpty()) map.put(name, values[c].getText());
     }
-    final String value = ctxitem.getText();
+    final String value = ctxValue.getText();
     if(!value.isEmpty()) map.put("", value);
     assign(map, gui);
 

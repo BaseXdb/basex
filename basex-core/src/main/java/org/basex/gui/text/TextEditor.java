@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Provides methods for editing a text that is visualized by the {@link TextPanel}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class TextEditor {
@@ -457,7 +457,7 @@ public final class TextEditor {
    */
   boolean comment(final Syntax syntax) {
     final byte[] st = syntax.commentOpen(), en = syntax.commentEnd();
-    final byte[] ste = concat(st, SPACE), ene = concat(SPACE, en);
+    final byte[] ste = concat(st, cpToken(' ')), ene = concat(cpToken(' '), en);
     final int sl = st.length, el = en.length, sle = ste.length, ele = ene.length;
 
     if(!isSelected()) {
@@ -861,13 +861,13 @@ public final class TextEditor {
       } else if(ch == '-') {
         // closes XML comments
         if(prev == '-' && pprv == '!' && pos > 2 && text[pos - 3] == '<') {
-          sb.append("  -->\n");
+          sb.append("  -->");
           move = 2;
         }
       } else if(ch == '?') {
         // closes XML processing instructions
         if(prev == '<') {
-          sb.append(" ?>\n");
+          sb.append(" ?>");
           move = 1;
         }
       }

@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Writes the parsed JSON file to the given {@link TokenBuilder}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 final class JsonStringConverter extends JsonConverter {
@@ -91,16 +91,16 @@ final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  public void numberLit(final Item value) {
+  public void numberLit(final byte[] value) {
     tb.add(value);
   }
 
   @Override
   void stringLit(final byte[] value) {
     tb.add('"');
-    final int vl = value.length;
-    for(int v = 0; v < vl; v += Token.cl(value, v)) {
-      final int cp = Token.cp(value, v);
+    final TokenParser tp = new TokenParser(value);
+    while(tp.more()) {
+      final int cp = tp.next();
       switch(cp) {
         case '\\':
         case '"':

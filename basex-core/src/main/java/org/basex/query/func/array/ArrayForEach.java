@@ -2,6 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -11,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayForEach extends ArrayFn {
@@ -20,10 +21,10 @@ public final class ArrayForEach extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
     final FItem action = toFunction(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, action);
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final Value value : array.members()) {
-      ab.append(action.invoke(qc, info, value, Int.get(++p)));
+    for(final Value value : array.iterable()) {
+      ab.append(invoke(action, args.set(0, value).inc(), qc));
     }
     return ab.array(this);
   }
@@ -35,8 +36,7 @@ public final class ArrayForEach extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, ((ArrayType) type).declType,
-          SeqType.INTEGER_O));
+      arg(1, arg -> refineFunc(arg, cc, ((ArrayType) type).valueType, SeqType.INTEGER_O));
     }
 
     // assign type after coercion (expression might have changed)
@@ -44,5 +44,10 @@ public final class ArrayForEach extends ArrayFn {
     if(ft != null) exprType.assign(ArrayType.get(ft.declType));
 
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

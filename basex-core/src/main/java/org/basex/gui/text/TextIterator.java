@@ -11,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * Returns an iterator for the visualized text.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class TextIterator {
@@ -95,7 +95,7 @@ final class TextIterator {
    * @return string
    */
   String substring(final int s, final int e) {
-    return string(text, s, e - s);
+    return s < e ? string(text, s, e - s) : "";
   }
 
   /**

@@ -14,7 +14,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ProfTrack extends StandardFunc {
@@ -30,7 +30,7 @@ public final class ProfTrack extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final TrackOptions options = toOptions(arg(1), new TrackOptions(), true, qc);
+    final TrackOptions options = toOptions(arg(1), new TrackOptions(), qc);
 
     // include memory consumption
     long min = -1;

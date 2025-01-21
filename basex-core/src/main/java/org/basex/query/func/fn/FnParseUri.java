@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -16,10 +17,10 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnParseUri extends FnJsonDoc {
+public class FnParseUri extends StandardFunc {
   /** URI part. */
   static final String URI = "uri";
   /** URI part. */
@@ -46,6 +47,8 @@ public class FnParseUri extends FnJsonDoc {
   static final String QUERY_PARAMETERS = "query-parameters";
   /** URI part. */
   static final String FILEPATH = "filepath";
+  /** Absolute. */
+  static final String ABSOLUTE = "absolute";
 
   /** File scheme. */
   static final String FILE = "file";
@@ -57,116 +60,115 @@ public class FnParseUri extends FnJsonDoc {
       "http", "80", "https", "443", "ftp", "21", "ssh", "22");
 
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String value = toString(arg(0), qc);
-    final UriOptions options = toOptions(arg(1), new UriOptions(), false, qc);
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final String value = toStringOrNull(arg(0), qc);
+    final UriOptions options = toOptions(arg(1), new UriOptions(), qc);
+    if(value == null) return Empty.VALUE;
 
-    String string = value.replace('\\', '/');
-    String fragment = "", query = "", scheme = "", filepath = "", authority = "", userinfo = "";
-    String host = "", port = "", path;
+    String string = value.replace('\\', '/'), fragment = "", query = "", scheme = "";
+    String filepath = "", authority = "", userinfo = "", host = "", port = "", path;
 
     // strip off the fragment identifier and any query
-    Matcher m = Pattern.compile("^(.*?)#(.*)$").matcher(string);
-    if(m.matches()) {
-      string = m.group(1);
-      fragment = m.group(2);
+    final Regex r = new Regex();
+    if(r.has(string, "^(.*?)#(.*)$")) {
+      string = r.group(1);
+      fragment = XMLToken.decodeUri(r.group(2));
     }
-    m = Pattern.compile("^(.*?)\\?(.*)$").matcher(string);
-    if(m.matches()) {
-      string = m.group(1);
-      query = m.group(2);
+    if(r.has(string, "^(.*?)\\?(.*)$")) {
+      string = r.group(1);
+      query = r.group(2);
     }
 
     // attempt to identify the scheme
-    if(string.matches("^[a-zA-Z][:|].*$")) {
-      scheme = FILE;
-      string = string.replaceAll("^(.)\\|", "$1:");
-      filepath = string;
-      string = "/" + string;
-    } else {
-      m = Pattern.compile("^([a-zA-Z][-+.A-Za-z0-9]*):(.*)$").matcher(string);
-      if(m.matches()) {
-        scheme = m.group(1);
-        string = m.group(2);
+    if(r.has(string, "^([a-zA-Z][-+.A-Za-z0-9]+):(.*)$")) {
+      scheme = r.group(1);
+      string = r.group(2);
+    }
+    boolean absolute = !scheme.isEmpty() && fragment.isEmpty();
+
+    if(scheme.isEmpty() || scheme.equalsIgnoreCase(FILE)) {
+      if(r.has(string, "^/*([a-zA-Z][:|].*)$")) {
+        scheme = FILE;
+        string = '/' + r.group(1).replaceAll("^(.)\\|", "$1:");
+      } else if(options.get(UriOptions.UNC_PATH)) {
+        scheme = FILE;
       }
     }
 
     // determine if the URI is hierarchical
     final Item hierarchical = NON_HIERARCHICAL.contains(scheme) ? Bln.FALSE :
       string.isEmpty() ? Empty.VALUE : Bln.get(string.startsWith("/"));
+    if(hierarchical == Bln.FALSE) absolute = false;
 
-    // examine the remaining parts of the string
-    if(scheme.isEmpty() && options.get(UriOptions.UNC_PATH) && string.matches("^//[^/].*$")) {
-      scheme = FILE;
-      filepath = string;
-    } else {
-      m = Pattern.compile("^/*(/[a-zA-Z]:.*)$").matcher(string);
-      if((scheme.isEmpty() || scheme.equals(FILE)) && m.matches()) {
-        string = m.group(1);
+    // identify the remaining components
+    if(scheme.equalsIgnoreCase(FILE)) {
+      if(options.get(UriOptions.UNC_PATH) && r.has(string, "^/*(//[^/].*)$")) {
+        string = r.group(1);
+        filepath = string;
+      } else if(r.has(string, "^/+[A-Za-z]:/.*$")) {
+        string = string.replaceAll("^/+", "/");
+        filepath = string.replaceAll("^/", "");
       } else {
-        m = Pattern.compile("^///*([^/]+)?(/.*)?$").matcher(string);
-        if(m.matches()) {
-          authority = m.group(1);
-          string = m.group(2);
-        }
+        string = string.replaceAll("^/+", "/");
+        filepath = string;
+      }
+    } else if(hierarchical == Bln.TRUE) {
+      if(r.has(string, "^//([^/]+)$")) {
+        authority = r.group(1);
+        string = "";
+      } else if(r.has(string, "^//([^/]*)(/.*)$")) {
+        authority = r.group(1);
+        string = r.group(2);
       }
     }
-    if(string == null) string = "";
 
     // parse userinfo
-    m = Pattern.compile("^(([^@]*)@)(.*)(:([^:]*))?$").matcher(authority);
-    if(m.matches()) {
-      userinfo = m.group(2);
+    if(r.has(authority, "^(([^@]*)@)(.*)(:([^:]*))?$")) {
+      userinfo = r.group(2);
       if(!options.get(UriOptions.ALLOW_DEPRECATED_FEATURES) && userinfo.contains(":")) {
         userinfo = "";
       }
     }
     // parse host
-    m = Pattern.compile("^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$").matcher(authority);
-    if(m.matches()) {
-      host = m.group(3);
-    } else if(authority.matches("^(([^@]*)@)?\\[.*$")) {
+    if(r.has(authority, "^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$")) {
+      host = r.group(3);
+    } else if(r.has(authority, "^(([^@]*)@)?\\[.*$")) {
       throw PARSE_URI_X.get(info, value);
-    } else {
-      m = Pattern.compile("^(([^@]*)@)?([^:]+)(:([^:]*))?$").matcher(authority);
-      if(m.matches()) host = m.group(3);
+    } else if(r.has(authority, "^(([^@]*)@)?([^:]+)(:([^:]*))?$")) {
+      host = r.group(3);
     }
     if(host == null) host = "";
     // an IPv6/IPvFuture address may contain a colon
-    m = Pattern.compile("^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$").matcher(authority);
-    if(m.matches()) {
-      port = m.group(5);
-    } else {
-      m = Pattern.compile("^(([^@]*)@)?([^:]+)(:([^:]*))?$").matcher(authority);
-      if(m.matches()) port = m.group(5);
+    if(r.has(authority, "^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$")) {
+      port = r.group(5);
+    } else if(r.has(authority, "^(([^@]*)@)?([^:]+)(:([^:]*))?$")) {
+      port = r.group(5);
     }
     if(port == null) port = "";
     if(omitPort(port, scheme, options)) port = "";
 
     path = string;
-    if(filepath.isEmpty() && (scheme.isEmpty() || scheme.equals(FILE))) {
+    if(filepath.isEmpty() && (scheme.isEmpty() || scheme.equalsIgnoreCase(FILE))) {
       filepath = string;
     }
 
     final TokenList segments = new TokenList();
     if(!string.isEmpty()) {
-      final String separator = Pattern.quote(options.get(UriOptions.PATH_SEPARATOR));
-      for(final String s : string.split(separator)) segments.add(decode(s));
+      for(final String s : string.split("/", -1)) segments.add(XMLToken.decodeUri(s));
     }
 
     XQMap queries = XQMap.empty();
     if(!query.isEmpty()) {
-      final String separator = Pattern.quote(options.get(UriOptions.QUERY_SEPARATOR));
-      for(final String q : query.split(separator)) {
+      for(final String q : query.split("&")) {
         final int eq = q.indexOf('=');
-        final Str key = eq == -1 ? Str.EMPTY : Str.get(q.substring(0, eq));
-        final Str val = Str.get(q.substring(eq + 1));
-        queries = queries.put(key, ValueBuilder.concat(queries.get(key, info), val, qc), info);
+        final Str key = eq == -1 ? Str.EMPTY : Str.get(XMLToken.decodeUri(q.substring(0, eq)));
+        final Str val = Str.get(XMLToken.decodeUri(q.substring(eq + 1)));
+        queries = queries.put(key, ValueBuilder.concat(queries.get(key), val, qc));
       }
     }
-    filepath = decode(filepath);
+    filepath = XMLToken.decodeUri(filepath);
 
-    final MapBuilder mb = new MapBuilder(info);
+    final MapBuilder mb = new MapBuilder();
     add(mb, URI, value);
     add(mb, SCHEME, scheme);
     add(mb, HIERARCHICAL, hierarchical);
@@ -180,6 +182,7 @@ public class FnParseUri extends FnJsonDoc {
     add(mb, PATH_SEGMENTS, StrSeq.get(segments));
     add(mb, QUERY_PARAMETERS, queries);
     add(mb, FILEPATH, filepath);
+    if(absolute) add(mb, ABSOLUTE, Bln.TRUE);
     return mb.map();
   }
 
@@ -197,15 +200,6 @@ public class FnParseUri extends FnJsonDoc {
   }
 
   /**
-   * URI-decodes a string.
-   * @param string encoded string
-   * @return decoded string
-   */
-  static String decode(final String string) {
-    return Token.string(XMLToken.decodeUri(Token.token(string), true));
-  }
-
-  /**
    * Checks if the port can be omitted.
    * @param port port
    * @param scheme scheme
@@ -215,5 +209,31 @@ public class FnParseUri extends FnJsonDoc {
   static boolean omitPort(final String port, final String scheme, final UriOptions options) {
     return options.get(UriOptions.OMIT_DEFAULT_PORTS) &&
         Objects.equals(PORTS.get(scheme), port);
+  }
+
+  /** Helper class for regex matching. */
+  private static final class Regex {
+    /** Current matcher. */
+    private Matcher m;
+
+    /**
+     * Attempts to find the input in the pattern.
+     * @param pattern pattern
+     * @param input input
+     * @return result of check
+     */
+    boolean has(final String pattern, final String input) {
+      m = Pattern.compile(input).matcher(pattern);
+      return m.find();
+    }
+
+    /**
+     * Returns the specified group.
+     * @param i index
+     * @return string
+     */
+    String group(final int i) {
+      return m.group(i);
+    }
   }
 }

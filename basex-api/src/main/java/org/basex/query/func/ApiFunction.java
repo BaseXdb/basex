@@ -20,7 +20,7 @@ import org.basex.query.value.type.*;
  * New namespace mappings for function prefixes and URIs must be added to the static initializer of
  * the {@link NSGlobal} class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum ApiFunction implements AFunction {
@@ -34,6 +34,9 @@ public enum ApiFunction implements AFunction {
   _REQUEST_ATTRIBUTE(RequestAttribute::new, "attribute(name[,default])",
       params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
   /** XQuery function. */
+  _REQUEST_ATTRIBUTE_MAP(RequestAttributeMap::new, "attribute-map()",
+      params(), MAP_O, REQUEST_URI),
+  /** XQuery function. */
   _REQUEST_ATTRIBUTE_NAMES(RequestAttributeNames::new, "attribute-names()",
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
@@ -43,11 +46,17 @@ public enum ApiFunction implements AFunction {
   _REQUEST_COOKIE(RequestCookie::new, "cookie(name[,default])",
       params(STRING_O, STRING_O), STRING_ZO, REQUEST_URI),
   /** XQuery function. */
+  _REQUEST_COOKIE_MAP(RequestCookieMap::new, "cookie-map()",
+      params(), MAP_O, REQUEST_URI),
+  /** XQuery function. */
   _REQUEST_COOKIE_NAMES(RequestCookieNames::new, "cookie-names()",
       params(), STRING_ZM, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER(RequestHeader::new, "header(name[,default])",
       params(STRING_O, STRING_O), STRING_ZO, REQUEST_URI),
+  /** XQuery function. */
+  _REQUEST_HEADER_MAP(RequestHeaderMap::new, "header-map()",
+      params(), MAP_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_HEADER_NAMES(RequestHeaderNames::new, "header-names()",
       params(), STRING_ZM, REQUEST_URI),
@@ -60,6 +69,9 @@ public enum ApiFunction implements AFunction {
   /** XQuery function. */
   _REQUEST_PARAMETER(RequestParameter::new, "parameter(name[,default])",
       params(STRING_O, ITEM_ZM), ITEM_ZM, REQUEST_URI),
+  /** XQuery function. */
+  _REQUEST_PARAMETER_MAP(RequestParameterMap::new, "parameter-map()",
+      params(), MAP_O, REQUEST_URI),
   /** XQuery function. */
   _REQUEST_PARAMETER_NAMES(RequestParameterNames::new, "parameter-names()",
       params(), STRING_ZM, REQUEST_URI),
@@ -258,7 +270,8 @@ public enum ApiFunction implements AFunction {
   }
 
   /**
-   * Adds function signatures to the list. Called via reflection during initialization.
+   * Adds function signatures to the list. Called via reflection from {@link Functions}
+   * during initialization.
    * @param list list of function signatures
    */
   public static void init(final ArrayList<FuncDefinition> list) {

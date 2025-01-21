@@ -1,7 +1,7 @@
 (:~
- : Settings page.
+ : Settings.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/settings';
 
@@ -12,21 +12,18 @@ import module namespace html = 'dba/html' at '../lib/html.xqm';
 declare variable $dba:CAT := 'settings';
 
 (:~
- : Settings page.
- : @param  $error  error string
- : @param  $info   info string
+ : Settings.
+ : @param  $info  info string
  : @return page
  :)
 declare
   %rest:GET
   %rest:path('/dba/settings')
-  %rest:query-param('error', '{$error}')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
   %output:html-version('5')
 function dba:settings(
-  $error  as xs:string?,
-  $info   as xs:string?
+  $info  as xs:string?
 ) as element(html) {
   let $system := html:properties(db:system())
   let $table-row := fn($label, $items) {
@@ -47,21 +44,19 @@ function dba:settings(
   let $string := fn($key, $label) {
     $table-row($label, <input type='text' name='{ $key }' value='{ config:get($key) }'/>)
   }
-  return html:wrap(map { 'header': $dba:CAT, 'info': $info, 'error': $error },
+  return (
     <tr>
       <td width='33%'>
-        <form action='settings' method='post'>
-          <h2>Settings » { html:button('save', 'Save') }</h2>
+        <form method='post' autocomplete='off'>
+          <h2>Settings » { html:button('settings-save', 'Save') }</h2>
           <h3>Queries</h3>
-          <table>
-            {
-              $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
-              $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)'),
-              $number($config:MAXCHARS, 'Maximum output size'),
-              $option($config:PERMISSION, $config:PERMISSIONS, 'Permission'),
-              $option($config:INDENT, $config:INDENTS, 'Indent results')
-            }
-          </table>
+          <table>{
+            $number($config:TIMEOUT, 'Timeout, in seconds (0 = disabled)'),
+            $number($config:MEMORY, 'Memory limit, in MB (0 = disabled)'),
+            $number($config:MAXCHARS, 'Maximum output size'),
+            $option($config:PERMISSION, $config:PERMISSIONS, 'Permission'),
+            $option($config:INDENT, $config:INDENTS, 'Indent results')
+          }</table>
           <h3>Tables</h3>
           <table>{
             $number($config:MAXROWS,  'Displayed table rows')
@@ -74,8 +69,8 @@ function dba:settings(
       </td>
       <td class='vertical'/>
       <td width='33%'>
-        <form action='settings-gc' method='post'>
-          <h2>Global Options » { html:button('gc', 'GC') }</h2>
+        <form method='post' autocomplete='off'>
+          <h2>Global Options » { html:button('settings-gc', 'GC') }</h2>
           <table>{
             $system/tr[th][3]/preceding-sibling::tr[not(th)]
           }</table>
@@ -89,7 +84,7 @@ function dba:settings(
         }</table>
       </td>
     </tr>
-  )
+  ) => html:wrap({ 'header': $dba:CAT, 'info': $info })
 };
 
 (:~
@@ -98,9 +93,9 @@ function dba:settings(
  :)
 declare
   %rest:POST
-  %rest:path('/dba/settings')
+  %rest:path('/dba/settings-save')
 function dba:settings-save(
 ) as element(rest:response) {
   config:save(html:parameters()),
-  web:redirect($dba:CAT, map { 'info': 'Settings were saved.' })
+  web:redirect($dba:CAT, { 'info': 'Settings were saved.' })
 };

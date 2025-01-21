@@ -2,6 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -10,7 +11,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class ArrayFoldLeft extends FnFoldLeft {
@@ -19,13 +20,13 @@ public class ArrayFoldLeft extends FnFoldLeft {
     final XQArray array = toArray(arg(0), qc);
     final FItem action = action(qc);
 
-    int p = 0;
-    Value result = arg(1).value(qc);
-    for(final Value value : array.members()) {
-      if(skip(qc, result, value)) break;
-      result = action.invoke(qc, info, result, value, Int.get(++p));
+    final HofArgs args = new HofArgs(3, action).set(0, arg(1).value(qc));
+    for(final Value value : array.iterable()) {
+      args.set(1, value).inc();
+      if(skip(qc, args)) break;
+      args.set(0, invoke(action, args, qc));
     }
-    return result;
+    return args.get(0);
   }
 
   @Override

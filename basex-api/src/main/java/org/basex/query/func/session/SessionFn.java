@@ -2,7 +2,7 @@ package org.basex.query.func.session;
 
 import static org.basex.query.QueryError.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Session function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class SessionFn extends ApiFunc {

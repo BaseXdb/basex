@@ -1,20 +1,15 @@
 package org.basex.query.value.map;
 
-import java.util.function.*;
-
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
  * Inner node of a {@link XQMap}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 final class TrieBranch extends TrieNode {
@@ -33,49 +28,33 @@ final class TrieBranch extends TrieNode {
     super(size);
     this.kids = kids;
     this.used = used;
-    assert verify();
-  }
-
-  /**
-   * Copies the children array.
-   * This is faster than {@code kids.clone()} according to
-   * <a href="http://www.javaspecialists.eu/archive/Issue124.html">Heinz M. Kabutz</a>.
-   * @return copy of the child array
-   */
-  TrieNode[] copyKids() {
-    final TrieNode[] copy = new TrieNode[KIDS];
-    Array.copy(kids, KIDS, copy);
-    return copy;
   }
 
   @Override
-  TrieNode put(final int hs, final Item key, final Value value, final int level,
-      final InputInfo info) throws QueryException {
-    final int k = key(hs, level);
+  TrieNode put(final int hs, final int lv, final TrieUpdate update) throws QueryException {
+    final int k = hashKey(hs, lv), bs, rem;
     final TrieNode sub = kids[k], nsub;
-    final int bs, rem;
     if(sub != null) {
-      nsub = sub.put(hs, key, value, level + 1, info);
-      if(nsub == sub) return this;
+      nsub = sub.put(hs, lv + 1, update);
       bs = used;
       rem = sub.size;
     } else {
-      nsub = new TrieLeaf(hs, key, value);
+      update.add(null);
+      nsub = new TrieLeaf(hs, update.key, update.value);
       bs = used | 1 << k;
       rem = 0;
     }
-    final TrieNode[] ks = copyKids();
+    final TrieNode[] ks = kids.clone();
     ks[k] = nsub;
     return new TrieBranch(ks, bs, size - rem + nsub.size);
   }
 
   @Override
-  TrieNode delete(final int hash, final Item key, final int level, final InputInfo info)
-      throws QueryException {
-    final int k = key(hash, level);
+  TrieNode remove(final int hs, final int lv, final TrieUpdate update) throws QueryException {
+    final int k = hashKey(hs, lv);
     final TrieNode sub = kids[k];
     if(sub == null) return this;
-    final TrieNode nsub = sub.delete(hash, key, level + 1, info);
+    final TrieNode nsub = sub.remove(hs, lv + 1, update);
     if(nsub == sub) return this;
 
     final int nu;
@@ -89,166 +68,16 @@ final class TrieBranch extends TrieNode {
     } else {
       nu = used;
     }
-
-    final TrieNode[] ks = copyKids();
+    final TrieNode[] ks = kids.clone();
     ks[k] = nsub;
     return new TrieBranch(ks, nu, size - 1);
   }
 
   @Override
-  Value get(final int hash, final Item key, final int level, final InputInfo info)
-      throws QueryException {
-    final int k = key(hash, level);
+  Value get(final int hs, final Item ky, final int lv) throws QueryException {
+    final int k = hashKey(hs, lv);
     final TrieNode sub = kids[k];
-    return sub == null ? null : sub.get(hash, key, level + 1, info);
-  }
-
-  @Override
-  boolean contains(final int hash, final Item key, final int level, final InputInfo info)
-      throws QueryException {
-    final int k = key(hash, level);
-    final TrieNode sub = kids[k];
-    return sub != null && sub.contains(hash, key, level + 1, info);
-  }
-
-  /** End strings. */
-  private static final String[] ENDS = { "|-- ", "|   ", "`-- ", "    " };
-
-  @Override
-  TrieNode addAll(final TrieNode node, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-    return node.add(this, level, merge, qc, info);
-  }
-
-  @Override
-  TrieNode add(final TrieLeaf leaf, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-
-    qc.checkStop();
-    final int k = key(leaf.hash, level);
-    final TrieNode ch = kids[k], kid;
-    int n = 1;
-    if(ch != null) {
-      final TrieNode ins = ch.add(leaf, level + 1, merge, qc, info);
-      if(ins == ch) return this;
-      n = ins.size - ch.size;
-      kid = ins;
-    } else {
-      kid = leaf;
-    }
-
-    final TrieNode[] ks = copyKids();
-    ks[k] = kid;
-    return new TrieBranch(ks, used | 1 << k, size + n);
-  }
-
-  @Override
-  TrieNode add(final TrieList list, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-
-    qc.checkStop();
-    final int k = key(list.hash, level);
-    final TrieNode ch = kids[k], kid;
-    int n = list.size;
-    if(ch != null) {
-      final TrieNode ins = ch.add(list, level + 1, merge, qc, info);
-      if(ins == ch) return this;
-      n = ins.size - ch.size;
-      kid = ins;
-    } else {
-      kid = list;
-    }
-
-    final TrieNode[] ks = copyKids();
-    ks[k] = kid;
-    return new TrieBranch(ks, used | 1 << k, size + n);
-  }
-
-  @Override
-  TrieNode add(final TrieBranch branch, final int level, final MergeDuplicates merge,
-      final QueryContext qc, final InputInfo info) throws QueryException {
-
-    TrieNode[] ch = null;
-    int nu = used, ns = size;
-    final int kl = kids.length;
-    for(int k = 0; k < kl; k++) {
-      final TrieNode n = kids[k], ok = branch.kids[k];
-      if(ok != null) {
-        final TrieNode kid = n == null ? ok : ok.addAll(n, level + 1, merge, qc, info);
-        if(kid != n) {
-          if(ch == null) ch = copyKids();
-          ch[k] = kid;
-          nu |= 1 << k;
-          ns += kid.size - (n == null ? 0 : n.size);
-        }
-      }
-    }
-    return ch == null ? this : new TrieBranch(ch, nu, ns);
-  }
-
-  @Override
-  boolean verify() {
-    int c = 0;
-    for(int i = 0; i < KIDS; i++) {
-      final boolean bit = (used & 1 << i) != 0, act = kids[i] != null;
-      if(bit ^ act) return false;
-      if(act) c += kids[i].size;
-    }
-    return c == size;
-  }
-
-  @Override
-  void keys(final ItemList ks) {
-    for(final TrieNode nd : kids) {
-      if(nd != null) nd.keys(ks);
-    }
-  }
-
-  @Override
-  void values(final ValueBuilder vs) {
-    for(final TrieNode nd : kids) {
-      if(nd != null) nd.values(vs);
-    }
-  }
-
-  @Override
-  void cache(final boolean lazy, final InputInfo info) throws QueryException {
-    for(final TrieNode nd : kids) {
-      if(nd != null) nd.cache(lazy, info);
-    }
-  }
-
-  @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo info)
-      throws QueryException {
-    for(final TrieNode nd : kids) {
-      if(nd != null && !nd.materialized(test, info)) return false;
-    }
-    return true;
-  }
-
-  @Override
-  void apply(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    for(final TrieNode nd : kids) {
-      if(nd != null) nd.apply(func);
-    }
-  }
-
-  @Override
-  boolean instanceOf(final AtomType kt, final SeqType dt) {
-    for(final TrieNode nd : kids) {
-      if(nd != null && !nd.instanceOf(kt, dt)) return false;
-    }
-    return true;
-  }
-
-  @Override
-  int hash(final InputInfo info) throws QueryException {
-    int hash = 0;
-    for(final TrieNode nd : kids) {
-      if(nd != null) hash = (hash << 5) - hash + nd.hash(info);
-    }
-    return hash;
+    return sub == null ? null : sub.get(hs, ky, lv + 1);
   }
 
   @Override
@@ -267,6 +96,9 @@ final class TrieBranch extends TrieNode {
     return true;
   }
 
+  /** End strings. */
+  private static final String[] ENDS = { "|-- ", "|   ", "`-- ", "    " };
+
   @Override
   void add(final TokenBuilder tb, final String indent) {
     final int s = Integer.bitCount(used);
@@ -275,13 +107,6 @@ final class TrieBranch extends TrieNode {
       final int e = i == s - 1 ? 2 : 0;
       tb.add(indent).add(ENDS[e]).add(String.format("%x", j)).add('\n');
       kids[j].add(tb, indent + ENDS[e + 1]);
-    }
-  }
-
-  @Override
-  void add(final TokenBuilder tb) {
-    for(int k = 0; k < KIDS && tb.moreInfo(); k++) {
-      if(kids[k] != null) kids[k].add(tb);
     }
   }
 }

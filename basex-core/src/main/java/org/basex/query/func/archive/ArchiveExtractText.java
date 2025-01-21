@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArchiveExtractText extends ArchiveExtractBinary {
@@ -18,7 +18,9 @@ public final class ArchiveExtractText extends ArchiveExtractBinary {
   public Value value(final QueryContext qc) throws QueryException {
     final String encoding = toEncodingOrNull(arg(2), ARCHIVE_ENCODE1_X, qc);
     final TokenList tl = new TokenList();
-    for(final byte[] bytes : extract(qc)) tl.add(encode(bytes, encoding, qc));
+    for(final byte[] content : extract(qc)) {
+      tl.add(encode(content, encoding, true, qc));
+    }
     return StrSeq.get(tl);
   }
 }

@@ -16,25 +16,24 @@ import org.basex.util.hash.*;
 /**
  * Text constructor.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CTxt extends CNode {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param value value
    */
-  public CTxt(final StaticContext sc, final InputInfo info, final Expr value) {
-    super(sc, info, SeqType.TEXT_ZO, true, value);
+  public CTxt(final InputInfo info, final Expr value) {
+    super(info, SeqType.TEXT_ZO, true, value);
   }
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.STRING, cc);
 
-    if(allAreValues(true) && !(exprs[0] instanceof Str)) {
+    if(values(true, cc) && !(exprs[0] instanceof Str)) {
       final byte[] value = atomValue(cc.qc, false);
       exprs[0] = value != null ? Str.get(value) : Empty.VALUE;
     }
@@ -56,7 +55,7 @@ public final class CTxt extends CNode {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CTxt(sc, info, exprs[0].copy(cc, vm)));
+    return copyType(new CTxt(info, exprs[0].copy(cc, vm)));
   }
 
   @Override

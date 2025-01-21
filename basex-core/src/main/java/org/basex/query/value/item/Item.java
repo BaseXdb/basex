@@ -29,7 +29,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for all items.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
@@ -93,7 +93,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     return bool(ii);
   }
@@ -179,35 +179,33 @@ public abstract class Item extends Value {
    * Compares items for equality. Called by {@link OpV}.
    * @param item item to be compared
    * @param coll collation (can be {@code null})
-   * @param sc static context; required for comparing items of type xs:QName (can be {@code null})
    * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean equal(Item item, Collation coll, StaticContext sc, InputInfo ii)
-      throws QueryException;
+  public abstract boolean equal(Item item, Collation coll, InputInfo ii) throws QueryException;
 
   /**
    * Compares items for deep equality.
    * Called by {@link DeepEqual}.
    * @param item item to be compared
-   * @param deep comparator
+   * @param deep comparator ({@code null} if called by {@link FItem#equals(Object)})
    * @return result of check
    * @throws QueryException query exception
    */
+  @SuppressWarnings("unused")
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return atomicEqual(item, deep.info);
+    return atomicEqual(item);
   }
 
   /**
    * Compares items for atomic equality. Called by {@link FnAtomicEqual}.
    * @param item item to be compared
-   * @param ii input info (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
-    return comparable(item) && equal(item, null, null, ii);
+  public boolean atomicEqual(final Item item) throws QueryException {
+    return comparable(item) && equal(item, null, null);
   }
 
   /**
@@ -307,17 +305,15 @@ public abstract class Item extends Value {
     return true;
   }
 
+  @Override
+  public final void refineType() { }
+
   /**
    * Returns a score value. Overwritten by {@link FTNode}.
    * @return score value
    */
   public double score() {
     return 0;
-  }
-
-  @Override
-  public int hash(final InputInfo ii) throws QueryException {
-    return Token.hash(string(ii));
   }
 
   /**

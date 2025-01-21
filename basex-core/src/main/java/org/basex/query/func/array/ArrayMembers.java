@@ -15,7 +15,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayMembers extends StandardFunc {
@@ -24,19 +24,19 @@ public final class ArrayMembers extends StandardFunc {
     final XQArray array = toArray(arg(0), qc);
 
     return new Iter() {
-      final Iterator<Value> members = array.members().iterator();
+      final Iterator<Value> values = array.iterable().iterator();
 
       @Override
-      public XQMap next() throws QueryException {
-        return members.hasNext() ? record(members.next()) : null;
+      public XQMap next() {
+        return values.hasNext() ? record(values.next()) : null;
       }
       @Override
-      public Item get(final long i) throws QueryException {
+      public Item get(final long i) {
         return record(array.get(i));
       }
       @Override
       public long size() {
-        return array.arraySize();
+        return array.structSize();
       }
     };
   }
@@ -46,14 +46,16 @@ public final class ArrayMembers extends StandardFunc {
     final XQArray array = toArray(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value member : array.members()) vb.add(record(member));
+    for(final Value member : array.iterable()) vb.add(record(member));
     return vb.value(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof ArrayType) exprType.assign(MapType.get(AtomType.STRING, ft.declType));
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof ArrayType) {
+      exprType.assign(MapType.get(AtomType.STRING, ((ArrayType) tp).valueType));
+    }
     return this;
   }
 
@@ -61,9 +63,8 @@ public final class ArrayMembers extends StandardFunc {
    * Creates a value record.
    * @param value value of the record
    * @return map
-   * @throws QueryException query exception
    */
-  private XQMap record(final Value value) throws QueryException {
-    return XQMap.singleton(Str.VALUE, value, info);
+  private static XQMap record(final Value value) {
+    return XQMap.singleton(Str.VALUE, value);
   }
 }

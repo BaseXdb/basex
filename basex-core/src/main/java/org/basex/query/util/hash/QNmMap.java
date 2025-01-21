@@ -1,5 +1,7 @@
 package org.basex.query.util.hash;
 
+import java.util.function.*;
+
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -7,7 +9,7 @@ import org.basex.util.*;
  * This is an efficient and memory-saving hash map for storing QNames and objects.
  * {@link QNmSet hash set}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @param <E> generic value type
  */
@@ -25,13 +27,29 @@ public final class QNmMap<E> extends QNmSet {
   /**
    * Indexes the specified key and value.
    * If the key exists, the value is updated.
-   * @param qnm QName to look up
+   * @param key QName to look up
    * @param val value
    */
-  public void put(final QNm qnm, final E val) {
+  public void put(final QNm key, final E val) {
     // array bounds are checked before array is resized
-    final int i = put(qnm);
+    final int i = put(key);
     values[i] = val;
+  }
+
+  /**
+   * Returns the value for the specified key.
+   * Creates a new value if none exists.
+   * @param key key
+   * @param func function that create a new value
+   * @return value
+   */
+  public E computeIfAbsent(final QNm key, final Supplier<? extends E> func) {
+    E value = get(key);
+    if(value == null) {
+      value = func.get();
+      put(key, value);
+    }
+    return value;
   }
 
   /**

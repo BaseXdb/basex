@@ -11,25 +11,25 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayOfMembers extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter members = arg(0).iter(qc);
+    final Iter input = arg(0).iter(qc);
 
     final ArrayBuilder ab = new ArrayBuilder();
-    for(Item item; (item = qc.next(members)) != null;) {
-      ab.append(toRecord(item, Str.VALUE).get(Str.VALUE, info));
+    for(Item item; (item = qc.next(input)) != null;) {
+      ab.append(toRecord(item, RecordType.MEMBER, qc).get(Str.VALUE));
     }
     return ab.array(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) exprType.assign(ArrayType.get(ft.declType));
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) exprType.assign(ArrayType.get(((MapType) tp).valueType));
     return this;
   }
 }

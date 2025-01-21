@@ -9,7 +9,7 @@ import java.awt.event.*;
 /**
  * This class offers system-dependent key mappings.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  * @author Klavs Prieditis
@@ -106,7 +106,6 @@ public enum BaseXKeys {
 
   // General
 
-  /** Run query.             */ EXEC(META, VK_ENTER),
   /** Run test.              */ TESTS(META | SHIFT, VK_ENTER),
 
   /** Escape.                */ ESCAPE(NO_MOD, VK_ESCAPE),

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 /**
  * Arrow operator tests.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrowTest extends SandboxTest {
@@ -38,7 +38,7 @@ public final class ArrowTest extends SandboxTest {
 
   /** Test. */
   @Test public void error() {
-    error("1 => 1", ARROWSPEC);
+    error("1 => 1", ARROWSPEC_X);
     error("1 => (1)()", INVFUNCITEM_X_X);
   }
 }

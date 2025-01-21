@@ -55,7 +55,7 @@ import org.basex.util.list.*;
  *      merging.</li>
  * </ol>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
 public final class Updates {
@@ -136,7 +136,7 @@ public final class Updates {
 
     // determine highest ancestor node
     ANode tmp = target;
-    final BasicNodeIter iter = target.ancestorIter();
+    final BasicNodeIter iter = target.ancestorIter(false);
     for(ANode n; (n = iter.next()) != null;) {
       tmp = n;
     }

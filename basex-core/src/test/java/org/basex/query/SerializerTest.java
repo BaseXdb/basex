@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the serializers.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class SerializerTest extends SandboxTest {
@@ -206,5 +206,15 @@ public final class SerializerTest extends SandboxTest {
     query(option + "<a xml:space='preserve'>T<b/></a>", "<a xml:space=\"preserve\">T<b/></a>");
     query(option + "<a xml:space='default'>T<b/></a>", "<a xml:space=\"default\">T<b/></a>");
     query(option + "<a xml:space='x'>T<b/></a>", "<a xml:space=\"x\">T<b/></a>");
+  }
+
+  /** Test: method=json, json-lines=on. */
+  @Test public void jsonLines() {
+    final String option = METHOD.arg("json") + JSON_LINES.arg("on");
+    query(option + "()", "");
+    query(option + "1, 2", "1\n2");
+    query(option + "[1], {'2':3}", "[1]\n{\"2\":3}");
+
+    query(option + INDENT.arg("yes") + "[1], {'2':3}", "[ 1 ]\n{ \"2\": 3 }");
   }
 }

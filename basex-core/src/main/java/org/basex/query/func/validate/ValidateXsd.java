@@ -8,11 +8,11 @@ import java.util.Map.*;
 import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.w3c.dom.ls.*;
 import org.xml.sax.*;
@@ -20,7 +20,7 @@ import org.xml.sax.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class ValidateXsd extends ValidateFn {
@@ -59,34 +59,43 @@ public class ValidateXsd extends ValidateFn {
   }
 
   @Override
-  public ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
-    return process(new Validation() {
+  public final ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
+    return validate(new Validation() {
       @Override
-      void process(final ValidationHandler handler) throws IOException, SAXException,
-          QueryException {
-
-        final IO input = read(toNodeOrAtomItem(arg(0), qc), null);
-        final Item schema = defined(1) ? toNodeOrAtomItem(arg(1), qc) : Empty.VALUE;
+      void validate() throws IOException, SAXException, QueryException {
+        final IO input = read(toNodeOrAtomItem(arg(0), false, qc), null);
+        final Item schema = toNodeOrAtomItem(arg(1), true, qc);
         final HashMap<String, String> options = toOptions(arg(2), qc);
 
-        final String url = schema.isEmpty() ? "" : prepare(read(schema, null), handler).url();
+        final String url = schema == null ? "" : prepare(read(schema, null)).url();
         final String caching = options.remove("cache");
-        final boolean cache = caching != null && Strings.toBoolean(caching);
+        final boolean cache = Strings.isTrue(caching);
 
         Schema s = cache ? MAP.get(url) : null;
         if(s == null) {
           // create schema factory and set version
-          final SchemaFactory sf = JAVA ? SchemaFactory.newInstance(FACTORY) :
-            (SchemaFactory) Reflect.get(Reflect.find(IMPL[OFFSET]));
-          // Saxon: use version 1.1
-          if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
+          final SchemaFactory sf;
+          if(JAVA) {
+            sf = SchemaFactory.newInstance(FACTORY);
+          } else {
+            final Class<?> clz = Reflect.find(IMPL[OFFSET]);
+            // catch Saxon errors (e.g. NoClassDefFoundError: org/xmlresolver/Resolver)
+            try {
+              sf = (SchemaFactory) clz.getDeclaredConstructor().newInstance();
+            } catch(final Exception ex) {
+              throw new BaseXException(ex);
+            }
+            // Saxon: use version 1.1
+            if(SAXON) sf.setProperty(SAXON_VERSION_URI, IMPL[OFFSET + 2]);
+          }
+          sf.setErrorHandler(this);
 
           final LSResourceResolver ls = Resolver.resources(qc.context.options);
           if(ls != null) sf.setResourceResolver(ls);
 
           // assign parser features
           for(final Entry<String, String> entry : options.entrySet()) {
-            sf.setFeature(entry.getKey(), Strings.toBoolean(entry.getValue()));
+            sf.setFeature(entry.getKey(), Strings.isTrue(entry.getValue()));
           }
           // schema declaration is included in document, or specified as string
           s = url.isEmpty() ? sf.newSchema() : sf.newSchema(new URL(url));
@@ -94,7 +103,7 @@ public class ValidateXsd extends ValidateFn {
         }
 
         final Validator v = s.newValidator();
-        v.setErrorHandler(handler);
+        v.setErrorHandler(this);
         v.validate(input instanceof IOContent || input instanceof IOStream ?
             new StreamSource(input.inputStream()) : new StreamSource(input.url()));
       }

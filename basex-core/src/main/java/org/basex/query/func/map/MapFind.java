@@ -12,7 +12,7 @@ import org.basex.query.value.map.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MapFind extends StandardFunc {
@@ -48,11 +48,11 @@ public final class MapFind extends StandardFunc {
     for(Item item; (item = qc.next(iter)) != null;) {
       if(item instanceof XQMap) {
         final XQMap map = (XQMap) item;
-        final Value value = map.get(key, info);
+        final Value value = map.get(key);
         if(!value.isEmpty()) builder.append(value);
-        map.apply((k, val) -> find(val.iter(), key, builder, qc));
+        map.forEach((k, val) -> find(val.iter(), key, builder, qc));
       } else if(item instanceof XQArray) {
-        for(final Value value : ((XQArray) item).members()) {
+        for(final Value value : ((XQArray) item).iterable()) {
           find(value.iter(), key, builder, qc);
         }
       }

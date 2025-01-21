@@ -11,10 +11,10 @@ import org.basex.util.*;
 /**
  * <p>This class builds a main-memory index for attribute values and text contents.</p>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class MemValuesBuilder extends ValuesBuilder {
+public final class MemValuesBuilder extends ValuesBuilder {
   /**
    * Constructor.
    * @param data data reference
@@ -26,7 +26,7 @@ public class MemValuesBuilder extends ValuesBuilder {
 
   @Override
   public MemValues build() throws IOException {
-    Util.debug(detailedInfo());
+    Util.debugln(detailedInfo());
 
     final MemValues index = new MemValues(data, type);
     final boolean updindex = data.meta.updindex;

@@ -1,7 +1,7 @@
 (:~
  : Drop backups.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/databases';
 
@@ -13,29 +13,26 @@ declare variable $dba:CAT := 'databases';
 declare variable $dba:SUB := 'database';
 
 (:~
- : Drops database backups.
+ : Drops backups.
  : @param  $name     name of database
  : @param  $backups  timestamps of backups
  : @return redirection
  :)
 declare
   %updating
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/backup-drop')
-  %rest:query-param('name',   '{$name}', '')
-  %rest:query-param('backup', '{$backups}')
+  %rest:form-param('name',   '{$name}', '')
+  %rest:form-param('backup', '{$backups}')
 function dba:backup-drop(
   $name     as xs:string,
   $backups  as xs:string*
-) as empty-sequence() {
-  let $target := if($name) then $dba:SUB else $dba:CAT
+) {
+  let $target := if ($name) then $dba:SUB else $dba:CAT
   return try {
     $backups ! db:drop-backup($name || '-' || .),
-    utils:redirect(
-      $target,
-      map { 'name': $name, 'info': utils:info($backups, 'backup', 'dropped') }
-    )
+    utils:redirect($target, { 'name': $name, 'info': utils:info($backups, 'backup', 'dropped') })
   } catch * {
-    utils:redirect($target, map { 'name': $name, 'error': $err:description })
+    utils:redirect($target, { 'name': $name, 'error': $err:description })
   }
 };

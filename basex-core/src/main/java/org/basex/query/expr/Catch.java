@@ -20,18 +20,21 @@ import org.basex.util.hash.*;
 /**
  * Catch clause.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Catch extends Single {
   /** Error Strings. */
   public static final String[] NAMES = {
-    "code", "description", "value", "module", "line-number", "column-number", "additional", "map"
+    "code", "description", "value", "module",
+    "line-number", "column-number", "additional", "stack-trace",
+    "map"
   };
   /** Error types. */
   public static final SeqType[] TYPES = {
     SeqType.QNAME_O, SeqType.STRING_ZO, SeqType.ITEM_ZM, SeqType.STRING_ZO,
-    SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.ITEM_ZM, SeqType.MAP_O
+    SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.STRING_O, SeqType.STRING_O,
+    SeqType.MAP_O
   };
   /** Error QNames. */
   public static final QNm[] QNAMES = new QNm[NAMES.length];
@@ -96,7 +99,7 @@ public final class Catch extends Single {
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
     final int vl = QNAMES.length;
     final Var[] vrs = new Var[vl];
-    for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(QNAMES[v], TYPES[v], false, cc.qc, info);
+    for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(QNAMES[v], TYPES[v], cc.qc, info);
     final Catch ctch = new Catch(info, vrs, new ArrayList<>(tests));
     final int val = vars.length;
     for(int v = 0; v < val; v++) vm.put(vars[v].id, ctch.vars[v]);
@@ -141,6 +144,7 @@ public final class Catch extends Single {
    * @throws QueryException query exception
    */
   public static Value[] values(final QueryException qe) throws QueryException {
+    final Str stack = qe.stackTrace();
     final Value[] values = {
       qe.qname(),
       Str.get(qe.getLocalizedMessage()),
@@ -148,10 +152,12 @@ public final class Catch extends Single {
       qe.file() != null ? Str.get(qe.file()) : Empty.VALUE,
       qe.line() != 0 ? Int.get(qe.line()) : Empty.VALUE,
       qe.column() != 0 ? Int.get(qe.column()) : Empty.VALUE,
-      StrSeq.get(qe.stack()),
+      stack,
+      stack,
       null
     };
-    // assign map as last value
+
+    // add all values to map
     final MapBuilder mb = new MapBuilder();
     final int nl = NAMES.length - 1;
     for(int n = 0; n < nl; n++) {

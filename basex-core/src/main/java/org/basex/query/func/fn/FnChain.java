@@ -1,7 +1,6 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -11,7 +10,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnChain extends FnApply {
@@ -26,7 +25,7 @@ public final class FnChain extends FnApply {
       if(func.arity() == 1) {
         args.add(input);
       } else if(input instanceof XQArray) {
-        for(final Value arg : ((XQArray) input).members()) args.add(arg);
+        for(final Value arg : ((XQArray) input).iterable()) args.add(arg);
       } else {
         for(final Item it : input) args.add(it);
       }
@@ -36,7 +35,7 @@ public final class FnChain extends FnApply {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    return this;
+  public int hofIndex() {
+    return 1;
   }
 }

@@ -4,6 +4,7 @@ import static org.basex.query.util.DeepEqualOptions.*;
 import static org.basex.query.value.type.NodeType.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
@@ -28,7 +29,7 @@ import org.basex.util.*;
 /**
  * Abstract node type.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class ANode extends Item {
@@ -59,6 +60,12 @@ public abstract class ANode extends Item {
   }
 
   @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return true;
+  }
+
+  @Override
   public final boolean bool(final InputInfo ii) {
     return true;
   }
@@ -79,8 +86,10 @@ public abstract class ANode extends Item {
       throws QueryException {
     Expr expr = this;
     if(mode == Simplify.STRING) {
+      // boolean(<a>A</a>)  ->  boolean('A')
       expr = Str.get(string());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
+      // data(<a>A</a>)  ->  data(xs:untypedAtomic('A'))
       expr = Atm.get(string());
     }
     return cc.simplify(this, expr, mode);
@@ -92,17 +101,19 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return item.type.isStringOrUntyped() ? Token.eq(string(), item.string(ii), coll) :
-      item.equal(this, coll, sc, ii);
+  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return item.type.isStringOrUntyped()
+        ? Token.eq(string(), item.string(ii), Collation.get(coll, ii))
+        : item.equal(this, coll, ii);
   }
 
   @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return item.type.isStringOrUntyped() ? Token.compare(string(), item.string(ii), coll) :
-      -item.compare(this, coll, transitive, ii);
+    return item.type.isStringOrUntyped()
+        ? Token.compare(string(), item.string(ii), Collation.get(coll, ii))
+        : -item.compare(this, coll, transitive, ii);
   }
 
   @Override
@@ -143,7 +154,9 @@ public abstract class ANode extends Item {
           if(attr2 == null) return false;
           name2 = attr2.qname();
           if(name1.eq(name2)) {
-            if((!options.get(NAMESPACE_PREFIXES) || Token.eq(name1.prefix(), name2.prefix())) &&
+            final Bln eq = deep.itemsEqual(attr1, attr2);
+            if(eq == Bln.TRUE || eq == null &&
+                (!options.get(NAMESPACE_PREFIXES) || Token.eq(name1.prefix(), name2.prefix())) &&
                 Token.eq(attr1.string(), attr2.string(), deep)) break;
             return false;
           }
@@ -192,7 +205,7 @@ public abstract class ANode extends Item {
         if(deep.qc != null) deep.qc.checkStop();
         final ANode child1 = iter1.next();
         if(child1 == null) return true;
-        if(!child1.deepEqual(iter2.next(), deep)) return false;
+        if(!deep.equal(child1, iter2.next())) return false;
       }
     }
 
@@ -201,7 +214,7 @@ public abstract class ANode extends Item {
       boolean found = false;
       for(int l2 = list2.size() - 1; !found && l2 >= 0; l2--) {
         if(deep.qc != null) deep.qc.checkStop();
-        if(list1.get(l1).deepEqual(list2.get(l2), deep)) {
+        if(deep.equal(list1.get(l1), list2.get(l2))) {
           list2.remove(l2);
           found = true;
         }
@@ -209,6 +222,21 @@ public abstract class ANode extends Item {
       if(!found) return false;
     }
     return true;
+  }
+
+  /**
+   * Returns if whitespace needs to be preserved.
+   * @return node kind
+   */
+  private boolean preserve() {
+    final QNm xs = new QNm(DataText.XML_SPACE, QueryText.XML_URI);
+    for(ANode node = this; node != null; node = node.parent()) {
+      if(node.type == ELEMENT) {
+        final byte[] v = node.attribute(xs);
+        if(v != null) return Token.eq(v, DataText.PRESERVE);
+      }
+    }
+    return false;
   }
 
   @Override
@@ -299,28 +327,13 @@ public abstract class ANode extends Item {
       final Atts nsp = node.namespaces();
       if(nsp != null) {
         for(int a = nsp.size() - 1; a >= 0; a--) {
-          final byte[] key = nsp.name(a);
-          if(!ns.contains(key)) ns.add(key, nsp.value(a));
+          final byte[] name = nsp.name(a);
+          if(!ns.contains(name)) ns.add(name, nsp.value(a));
         }
       }
     }
     if(sc != null) sc.ns.inScope(ns);
     return ns;
-  }
-
-  /**
-   * Returns if whitespace needs to be preserved.
-   * @return node kind
-   */
-  public boolean preserve() {
-    final QNm xs = new QNm(DataText.XML_SPACE, QueryText.XML_URI);
-    for(ANode node = this; node != null; node = node.parent()) {
-      if(node.type == ELEMENT) {
-        final byte[] v = node.attribute(xs);
-        if(v != null) return Token.eq(v, DataText.PRESERVE);
-      }
-    }
-    return false;
   }
 
   /**
@@ -444,78 +457,77 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level ancestor axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * Overwritten by {@link DBNode#ancestorIter()}.
+   * Returns a light-weight ancestor-or-self axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
+   * @param self include self node
    * @return iterator
    */
-  public BasicNodeIter ancestorIter() {
+  public BasicNodeIter ancestorIter(final boolean self) {
     return new BasicNodeIter() {
       private ANode node = ANode.this;
+      private boolean slf = self;
 
       @Override
       public ANode next() {
-        node = node.parent();
+        if(slf) {
+          slf = false;
+        } else {
+          node = node.parent();
+        }
         return node;
       }
     };
   }
 
   /**
-   * Returns a light-weight ancestor-or-self axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * Overwritten by {@link DBNode#ancestorOrSelfIter()}.
-   * @return iterator
-   */
-  public BasicNodeIter ancestorOrSelfIter() {
-    return new BasicNodeIter() {
-      private ANode node = ANode.this;
-
-      @Override
-      public ANode next() {
-        if(node == null) return null;
-        final ANode n = node;
-        node = n.parent();
-        return n;
-      }
-    };
-  }
-
-  /**
-   * Returns a light-weight, low-level attribute axis iterator with {@link Iter#size()} and
+   * Returns a light-weight attribute axis iterator with {@link Iter#size()} and
    * {@link Iter#get(long)} implemented.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
   public abstract BasicNodeIter attributeIter();
 
   /**
-   * Returns a light-weight, low-level child axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight child axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
   public abstract BasicNodeIter childIter();
 
   /**
-   * Returns a light-weight, low-level descendant axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * @return iterator
+   * Returns an iterator for all descendant nodes.
+   * @param self include self node
+   * @return node iterator
    */
-  public abstract BasicNodeIter descendantIter();
+  public BasicNodeIter descendantIter(final boolean self) {
+    return new BasicNodeIter() {
+      private final Stack<BasicNodeIter> iters = new Stack<>();
+      private ANode last;
+
+      @Override
+      public ANode next() {
+        final BasicNodeIter ir = last != null ? last.childIter() : self ? selfIter() : childIter();
+        last = ir.next();
+        if(last == null) {
+          while(!iters.isEmpty()) {
+            last = iters.peek().next();
+            if(last != null) break;
+            iters.pop();
+          }
+        } else {
+          iters.add(ir);
+        }
+        return last;
+      }
+    };
+  }
 
   /**
-   * Returns a light-weight, low-level descendant-or-self axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * @return iterator
+   * Returns an iterator for all descendant nodes.
+   * @param self include self node
+   * @return node iterator
    */
-  public abstract BasicNodeIter descendantOrSelfIter();
-
-  /**
-   * Returns a light-weight, low-level following axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
-   * @return iterator
-   */
-  public BasicNodeIter followingIter() {
+  public BasicNodeIter followingIter(final boolean self) {
     return new BasicNodeIter() {
       private BasicNodeIter iter;
 
@@ -523,6 +535,7 @@ public abstract class ANode extends Item {
       public ANode next() {
         if(iter == null) {
           final ANodeList list = new ANodeList();
+          if(self) list.add(finish());
           ANode node = ANode.this, root = node.parent();
           while(root != null) {
             final BasicNodeIter ir = root.childIter();
@@ -533,7 +546,7 @@ public abstract class ANode extends Item {
             }
             for(final ANode nd : ir) {
               list.add(nd.finish());
-              addDesc(nd.childIter(), list);
+              addDescendants(nd.childIter(), list);
             }
             node = root;
             root = root.parent();
@@ -546,21 +559,26 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level following-sibling axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight following-sibling axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
+   * @param self include self node
    * @return iterator
    */
-  public BasicNodeIter followingSiblingIter() {
+  public BasicNodeIter followingSiblingIter(final boolean self) {
+    final ANode root = parent();
+    if(root == null || type == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
+
     return new BasicNodeIter() {
-      private BasicNodeIter iter;
+      private final BasicNodeIter iter = root.childIter();
+      private boolean found;
 
       @Override
       public ANode next() {
-        if(iter == null) {
-          final ANode root = parent();
-          if(root == null) return null;
-          iter = root.childIter();
-          for(ANode n; (n = iter.next()) != null && !n.is(ANode.this););
+        for(ANode n; !found && (n = iter.next()) != null;) {
+          if(n.is(ANode.this)) {
+            found = true;
+            if(self) return n;
+          }
         }
         return iter.next();
       }
@@ -568,8 +586,8 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level parent axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight parent axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
    * @return iterator
    */
   public final BasicNodeIter parentIter() {
@@ -586,11 +604,12 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level preceding axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight preceding axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
+   * @param self include self node
    * @return iterator
    */
-  public final BasicNodeIter precedingIter() {
+  public BasicNodeIter precedingIter(final boolean self) {
     return new BasicNodeIter() {
       private BasicNodeIter iter;
 
@@ -598,6 +617,7 @@ public abstract class ANode extends Item {
       public ANode next() {
         if(iter == null) {
           final ANodeList list = new ANodeList();
+          if(self) list.add(finish());
           ANode node = ANode.this, root = node.parent();
           while(root != null) {
             if(node.type != ATTRIBUTE) {
@@ -605,7 +625,7 @@ public abstract class ANode extends Item {
               for(final ANode c : root.childIter()) {
                 if(c.is(node)) break;
                 tmp.add(c.finish());
-                addDesc(c.childIter(), tmp);
+                addDescendants(c.childIter(), tmp);
               }
               for(int t = tmp.size() - 1; t >= 0; t--) list.add(tmp.get(t));
             }
@@ -620,31 +640,31 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a light-weight, low-level preceding-sibling axis iterator.
-   * Before nodes are added to the result, they must be finalized via {@link ANode#finish()}.
+   * Returns a light-weight preceding-sibling axis iterator.
+   * Before nodes are added to a result, they must be finalized via {@link ANode#finish()}.
+   * @param self include self node
    * @return iterator
    */
-  public final BasicNodeIter precedingSiblingIter() {
+  public final BasicNodeIter precedingSiblingIter(final boolean self) {
+    final ANode root = parent();
+    if(root == null || type == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
+
     return new BasicNodeIter() {
-      private BasicNodeIter iter;
-      private int i;
+      private ANodeList list;
+      private int l;
 
       @Override
       public ANode next() {
-        if(iter == null) {
-          if(type == ATTRIBUTE) return null;
-          final ANode root = parent();
-          if(root == null) return null;
-
-          final ANodeList list = new ANodeList();
+        if(list == null) {
+          list = new ANodeList();
           for(final ANode node : root.childIter()) {
-            if(node.is(ANode.this)) break;
-            list.add(node.finish());
+            final boolean last = node.is(ANode.this);
+            if(!last || self) list.add(node.finish());
+            if(last) break;
           }
-          i = list.size();
-          iter = list.iter();
+          l = list.size();
         }
-        return i > 0 ? iter.get(--i) : null;
+        return l > 0 ? list.get(--l) : null;
       }
     };
   }
@@ -667,14 +687,14 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Adds children of a sub node.
+   * Adds nodes of a child iterator and its descendants.
    * @param children child nodes
    * @param nodes node cache
    */
-  private static void addDesc(final BasicNodeIter children, final ANodeList nodes) {
+  private static void addDescendants(final BasicNodeIter children, final ANodeList nodes) {
     for(final ANode node : children) {
       nodes.add(node.finish());
-      addDesc(node.childIter(), nodes);
+      addDescendants(node.childIter(), nodes);
     }
   }
 

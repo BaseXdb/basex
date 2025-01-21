@@ -21,7 +21,7 @@ import org.basex.util.options.Options.*;
  * This is the starter class for the stand-alone console mode.
  * It executes all commands locally.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class BaseX extends CLI {
@@ -101,6 +101,10 @@ public class BaseX extends CLI {
             out = new PrintOutput(new IOFile(value));
             session().setOutputStream(out);
             break;
+          case 'O':
+            String[] kv = value.split("=", 2);
+            execute(new Set(kv[0], kv.length > 1 ? kv[1] : ""), false);
+            break;
           case 'q':
             console = false;
             execute(new XQuery(value), verbose);
@@ -118,7 +122,7 @@ public class BaseX extends CLI {
             break;
           case 's':
             if(sopts == null) sopts = new SerializerOptions();
-            final String[] kv = value.split("=", 2);
+            kv = value.split("=", 2);
             sopts.assign(kv[0], kv.length > 1 ? kv[1] : "");
             execute(new Set(MainOptions.SERIALIZER, sopts), false);
             break;
@@ -164,7 +168,7 @@ public class BaseX extends CLI {
    * Launches the console mode, which reads and executes user input.
    */
   private void console() {
-    Util.outln(header() + NL + TRY_MORE_X);
+    Util.println(header() + NL + TRY_MORE_X);
     verbose = true;
 
     // create console reader
@@ -181,7 +185,7 @@ public class BaseX extends CLI {
         try {
           if(!execute(CommandParser.get(in, context).pwReader(cr))) {
             // show goodbye message if method returns false
-            Util.outln(BYE[new Random().nextInt(4)]);
+            Util.println(BYE[new Random().nextInt(4)]);
             break;
           }
         } catch(final IOException ex) {
@@ -208,24 +212,22 @@ public class BaseX extends CLI {
 
     final MainParser arg = new MainParser(this);
     while(arg.more()) {
-      final char c;
+      final char ch;
       String v = null;
       if(arg.dash()) {
-        c = arg.next();
-        if(c == 'd') {
+        ch = arg.next();
+        if(ch == 'd') {
           // activate debug mode
           Prop.debug = true;
-        } else if(c == 'b' || c == 'c' || c == 'C' || c == 'i' || c == 'I' || c == 'o' ||
-            c == 'q' || c == 'Q' || c == 'r' || c == 's' || c == 't' && local()) {
+        } else if(Strings.contains("t", ch) && local() || Strings.contains("bcCiIoOqQrs", ch)) {
           // options followed by a string
           v = arg.string();
-        } else if(c == 'D' && local() || c == 'u' && local() || c == 'R' ||
-            c == 'v' || c == 'V' || c == 'w' || c == 'W' || c == 'x' || c == 'X' || c == 'z') {
-          // options to be toggled
+        } else if(Strings.contains("Du", ch) && local() || Strings.contains("RvVwWxXz", ch)) {
+          // toggle options
           v = "";
         } else if(!local()) {
           // client options: need to be set before other options
-          switch(c) {
+          switch(ch) {
             // set server name
             case 'n': context.soptions.set(StaticOptions.HOST, arg.string()); break;
             // set server port
@@ -241,10 +243,10 @@ public class BaseX extends CLI {
         }
       } else {
         v = arg.string().trim();
-        c = isFile(v) ? v.endsWith(IO.BXSSUFFIX) ? 'C' : 'Q' : 'q';
+        ch = isFile(v) ? v.endsWith(IO.BXSSUFFIX) ? 'C' : 'Q' : 'q';
       }
       if(v != null) {
-        ops.add(c);
+        ops.add(ch);
         vals.add(v);
       }
     }

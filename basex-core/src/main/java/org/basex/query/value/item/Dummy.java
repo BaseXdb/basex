@@ -1,8 +1,12 @@
 package org.basex.query.value.item;
 
+import java.util.function.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.util.collation.*;
+import org.basex.query.expr.*;
+import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -10,66 +14,39 @@ import org.basex.util.list.*;
 /**
  * Dummy item (only used at compile time).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Dummy extends Item {
-  /** Data reference (can be {@code null}). */
-  private final Data data;
-  /** Sequence type. */
-  private final SeqType seqType;
+public final class Dummy extends Value {
+  /** Input expression. */
+  private final Expr expr;
+  /** Focus single item. */
+  private final boolean item;
 
   /**
    * Constructor.
-   * @param seqType sequence type
-   * @param data data reference (can be {@code null})
+   * @param expr input expression
+   * @param item focus single item
    */
-  public Dummy(final SeqType seqType, final Data data) {
-    super(seqType.type);
-    this.seqType = seqType;
-    this.data = data;
+  public Dummy(final Expr expr, final boolean item) {
+    super(expr.seqType().type);
+    this.expr = expr;
+    this.item = item;
   }
 
   @Override
   public SeqType seqType() {
-    return seqType;
+    return item ? expr.seqType().with(Occ.EXACTLY_ONE) : expr.seqType();
+  }
+
+  @Override
+  public long size() {
+    return item ? 1 : expr.size();
   }
 
   @Override
   public Data data() {
-    return data;
-  }
-
-  @Override
-  public byte[] string(final InputInfo ii) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public boolean bool(final InputInfo ii) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public boolean atomicEqual(final Item item, final InputInfo ii) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo info) throws QueryException {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public boolean comparable(final Item item) {
-    throw Util.notExpected();
+    return expr.data();
   }
 
   @Override
@@ -88,9 +65,72 @@ public final class Dummy extends Item {
   }
 
   @Override
+  public BasicIter<Item> iter() {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+      throws QueryException {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
+      throws QueryException {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Value subsequence(final long start, final long length, final QueryContext qc) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public boolean sameType() {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Item itemAt(final long pos) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Value reverse(final QueryContext qc) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public void refineType(final Expr ex) {
+    throw Util.notExpected();
+  }
+
+  @Override
   public void toString(final QueryString qs) {
-    final TokenList list = new TokenList().add(seqType.toString());
-    if(data != null) list.add(data.meta.name);
+    final TokenList list = new TokenList().add(seqType().toString());
+    if(data() != null) list.add(data().meta.name);
     qs.token(getClass()).params(list.finish());
   }
 }

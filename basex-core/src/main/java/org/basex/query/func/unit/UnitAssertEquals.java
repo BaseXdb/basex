@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class UnitAssertEquals extends UnitFn {
@@ -30,7 +30,7 @@ public final class UnitAssertEquals extends UnitFn {
       if(empty1 || empty2 || !deep.equal(item1, item2)) break;
       c++;
     }
-    final Item item = defined(2) ? toNodeOrAtomItem(arg(2), qc) : null;
+    final Item item = toNodeOrAtomItem(arg(2), true, qc);
     throw new UnitException(info, UNIT_FAIL_X_X_X, item1, item2, c).value(item);
   }
 }

@@ -1,7 +1,11 @@
 package org.basex.query.scope;
 
+import java.util.*;
+import java.util.List;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -11,7 +15,7 @@ import org.basex.query.var.*;
 /**
  * An XQuery main module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public class MainModule extends AModule {
@@ -19,9 +23,10 @@ public class MainModule extends AModule {
    * Constructor.
    * @param expr root expression
    * @param vs variable scope
+   * @param sc static context
    */
-  public MainModule(final Expr expr, final VarScope vs) {
-    super(vs.sc);
+  public MainModule(final Expr expr, final VarScope vs, final StaticContext sc) {
+    super(sc);
     this.expr = expr;
     this.vs = vs;
   }
@@ -100,6 +105,49 @@ public class MainModule extends AModule {
 
   @Override
   public final void toString(final QueryString qs) {
+    for(final StaticDecl decl : references()) qs.token(decl).newline();
     qs.token(expr);
+  }
+
+  /**
+   * Gathers all function and variable declarations that are referenced by the main module.
+   * @return referenced declarations
+   */
+  public final List<StaticDecl> references() {
+    final List<StaticDecl> decls = new ArrayList<>();
+    final HashSet<Scope> visited = new HashSet<>();
+    visit(new ASTVisitor() {
+      @Override
+      public boolean staticVar(final StaticVar var) {
+        if(visited.add(var)) {
+          var.visit(this);
+          decls.add(var);
+        }
+        return true;
+      }
+
+      @Override
+      public boolean staticFuncCall(final StaticFuncCall call) {
+        final StaticFunc func = call.func();
+        if(func != null && visited.add(func)) {
+          func.visit(this);
+          decls.add(func);
+        }
+        return true;
+      }
+
+      @Override
+      public boolean inlineFunc(final Scope scope) {
+        if(visited.add(scope)) scope.visit(this);
+        return true;
+      }
+
+      @Override
+      public boolean funcItem(final FuncItem func) {
+        if(visited.add(func)) func.visit(this);
+        return true;
+      }
+    });
+    return decls;
   }
 }

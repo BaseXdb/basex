@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Wrapper for representing XQuery values.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class XdmValue implements Iterable<XdmItem> {
@@ -86,12 +86,15 @@ public abstract class XdmValue implements Iterable<XdmItem> {
   /**
    * Checks if the two values are deep-equal, according to XQuery.
    * @param value second value
+   * @param ordered ordered results
    * @return result of check
    * @throws XQueryException exception
    */
-  public boolean deepEqual(final XdmValue value) {
+  public boolean deepEqual(final XdmValue value, final boolean ordered) {
     try {
-      return new DeepEqual().equal(internal(), value.internal());
+      final DeepEqualOptions options = new DeepEqualOptions();
+      options.set(DeepEqualOptions.ORDERED, ordered);
+      return new DeepEqual(null, null, null, options).equal(internal(), value.internal());
     } catch(final QueryException ex) {
       throw new XQueryException(ex);
     }

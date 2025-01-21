@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -13,7 +14,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayForEachPair extends ArrayFn {
@@ -22,11 +23,11 @@ public final class ArrayForEachPair extends ArrayFn {
     final XQArray array1 = toArray(arg(0), qc), array2 = toArray(arg(1), qc);
     final FItem action = toFunction(arg(2), 3, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(3, action);
     final ArrayBuilder ab = new ArrayBuilder();
     final Iterator<Value> as = array1.iterator(0), bs = array2.iterator(0);
     while(as.hasNext() && bs.hasNext()) {
-      ab.append(action.invoke(qc, info, as.next(), bs.next(), Int.get(++p)));
+      ab.append(invoke(action, args.set(0, as.next()).set(1, bs.next()).inc(), qc));
     }
     return ab.array(this);
   }
@@ -39,8 +40,8 @@ public final class ArrayForEachPair extends ArrayFn {
 
     final Type type1 = array1.seqType().type, type2 = array2.seqType().type;
     if(type1 instanceof ArrayType && type2 instanceof ArrayType) {
-      arg(2, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM,
-          ((ArrayType) type1).declType, ((ArrayType) type2).declType, SeqType.INTEGER_O));
+      arg(2, arg -> refineFunc(arg, cc, ((ArrayType) type1).valueType,
+          ((ArrayType) type2).valueType, SeqType.INTEGER_O));
     }
 
     // assign type after coercion (expression might have changed)
@@ -48,5 +49,10 @@ public final class ArrayForEachPair extends ArrayFn {
     if(ft != null) exprType.assign(ArrayType.get(ft.declType));
 
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 2;
   }
 }

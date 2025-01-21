@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Array constructor.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CArray extends Arr {
@@ -37,25 +37,25 @@ public final class CArray extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final boolean values = allAreValues(true);
+    final boolean values = values(true, cc);
     if(exprs.length == 1 && (sequences || exprs[0].size() == 1)) {
       return cc.replaceWith(this, values
           ? XQArray.singleton(exprs[0].value(cc.qc))
           : cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
     }
 
-    SeqType dt = null;
+    SeqType mt = null;
     if(sequences) {
-      dt = SeqType.union(exprs, true);
+      mt = SeqType.union(exprs, true);
     } else {
       for(final Expr expr : exprs) {
         final SeqType st = expr.seqType().with(Occ.EXACTLY_ONE);
-        dt = dt == null ? st : dt.union(st);
+        mt = mt == null ? st : mt.union(st);
       }
     }
-    if(dt != null) exprType.assign(ArrayType.get(dt));
+    if(mt != null) exprType.assign(ArrayType.get(mt));
 
-    return allAreValues(true) ? cc.preEval(this) : this;
+    return values ? cc.preEval(this) : this;
   }
 
   @Override

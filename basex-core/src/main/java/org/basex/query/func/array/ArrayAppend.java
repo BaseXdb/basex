@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayAppend extends ArrayFn {
@@ -29,8 +29,8 @@ public final class ArrayAppend extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      final SeqType dt = ((ArrayType) type).declType.union(add.seqType());
-      exprType.assign(ArrayType.get(dt));
+      final SeqType mt = ((ArrayType) type).valueType.union(add.seqType());
+      exprType.assign(ArrayType.get(mt));
     }
     return this;
   }

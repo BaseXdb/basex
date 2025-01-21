@@ -22,7 +22,7 @@ import org.basex.util.list.*;
 /**
  * REST-based evaluation of POST operations.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class RESTPost {
@@ -119,9 +119,11 @@ final class RESTPost {
       final String text = value("*/*:text/text()", doc, ctx);
 
       // choose evaluation
-      if(cmd.equals(COMMAND)) return RESTCommands.get(session, text, true);
-      if(cmd.equals(RUN)) return RESTRun.get(session, text, bindings);
-      if(cmd.equals(QUERY)) return RESTQuery.get(session, text, bindings);
+      switch(cmd) {
+        case COMMAND: return RESTCommands.get(session, text, true);
+        case RUN:     return RESTRun.get(session, text, bindings);
+        case QUERY:   return RESTQuery.get(session, text, bindings);
+      }
       throw HTTPStatus.BAD_REQUEST_X.get("Invalid POST command: " + cmd);
 
     } catch(final QueryException ex) {

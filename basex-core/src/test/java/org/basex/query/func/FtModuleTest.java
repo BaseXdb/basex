@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the functions of the Fulltext Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FtModuleTest extends SandboxTest {
@@ -64,10 +64,23 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("databases and xml", "databases xml",
         " map { 'mode': 'all words', 'window': map { 'size': 3 } }"), true);
 
+    // GH-2296
+    query(func.args("serch", "serch", " { 'fuzzy': true() }"), true);
+    query(func.args("surch", "serch", " { 'fuzzy': true() }"), true);
+    query(func.args("serch", "surch", " { 'fuzzy': true() }"), true);
+    query(func.args("行イ音便", "行イ音便", " { 'fuzzy': true() }"), true);
+    query(func.args("行イ音音", "行イ音便", " { 'fuzzy': true() }"), true);
+    query(func.args("行イ音便", "行イ音音", " { 'fuzzy': true() }"), true);
+    query(func.args("イイ音便", "行イ音便", " { 'fuzzy': true() }"), true);
+    query(func.args("行イ音便", "イイ音便", " { 'fuzzy': true() }"), true);
+
+    query(func.args("行イ音便", "serch", " { 'fuzzy': true() }"), false);
+    query(func.args("serch", "行イ音便", " { 'fuzzy': true() }"), false);
+
     // check buggy options
-    error(func.args("x", "x", " map { 'x': 'y' }"), INVALIDOPT_X);
-    error(func.args("x", "x", " map { 'mode': '' }"), INVALIDOPT_X);
-    error(func.args("x", "x", " 1"), MAP_X_X);
+    error(func.args("x", "x", " map { 'x': 'y' }"), OPTION_X);
+    error(func.args("x", "x", " map { 'mode': '' }"), OPTION_X);
+    error(func.args("x", "x", " 1"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -188,9 +201,9 @@ public final class FtModuleTest extends SandboxTest {
         "Databases and XML");
 
     // check buggy options
-    error(func.args(NAME, "x", " map { 'x': 'y' }"), INVALIDOPT_X);
-    error(func.args(NAME, "x", " map { 'mode': '' }"), INVALIDOPT_X);
-    error(func.args(NAME, "x", " 1"), MAP_X_X);
+    error(func.args(NAME, "x", " map { 'x': 'y' }"), OPTION_X);
+    error(func.args(NAME, "x", " map { 'mode': '' }"), OPTION_X);
+    error(func.args(NAME, "x", " 1"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */

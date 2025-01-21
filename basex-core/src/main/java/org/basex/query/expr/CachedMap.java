@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Cached map expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CachedMap extends SimpleMap {
@@ -45,11 +45,10 @@ public final class CachedMap extends SimpleMap {
         }
         value = vb.value(expr);
       }
+      return value;
     } finally {
       qc.focus = focus;
     }
-
-    return value;
   }
 
   @Override

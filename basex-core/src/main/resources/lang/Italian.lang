@@ -12,7 +12,6 @@ admin_static         = L'utente amministratore non può essere modificato.
 algorithm            = Algoritmo
 all                  = Tutti
 alter_pw             = Modifica parola chiave
-and_others           = ed altri
 are_you_sure         = Sei sicuro?
 ascending_order      = Ordine crescente
 attribute            = Attributo

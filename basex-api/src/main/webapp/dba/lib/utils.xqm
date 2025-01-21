@@ -1,7 +1,7 @@
 (:~
  : Utility functions.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace utils = 'dba/utils';
 
@@ -13,6 +13,23 @@ declare variable $utils:BACKUP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(
 declare variable $utils:BACKUP-ZIP-REGEX := '^(.*)-(\d{4}-\d\d-\d\d)-(\d\d)-(\d\d)-(\d\d)\.zip$';
 
 (:~
+ : Parses a query.
+ : @param  $query  query string
+ : @param  $uri    base URI (optional)
+ : @return parse result
+ :)
+declare function utils:query-parse(
+  $query  as xs:string,
+  $uri    as xs:string?
+) as element() {
+  xquery:parse($query, {
+    'base-uri': $uri otherwise config:edited-file() otherwise config:editor-dir(),
+    'plan'    : false(),
+    'pass'    : true()
+  })
+};
+
+(:~
  : Evaluates a query and returns the result.
  : @param  $query    query string
  : @param  $context  initial context item (can be empty)
@@ -22,7 +39,7 @@ declare function utils:query(
   $query    as xs:string,
   $context  as item()?
 ) as xs:string {
-  let $bindings := $context ! map { '': . }
+  let $bindings := $context ! { '': . }
   let $result := xquery:eval($query, $bindings, utils:query-options())
   return utils:serialize($result)
 };
@@ -30,11 +47,10 @@ declare function utils:query(
 (:~
  : Runs an updating query.
  : @param  $query  query string
- : @return empty sequence
  :)
-declare %updating function utils:update-query(
+declare %updating function utils:update(
   $query  as xs:string
-) as empty-sequence() {
+) {
   xquery:eval-update($query, (), utils:query-options()),
   
   let $result := update:cache(true())
@@ -42,20 +58,20 @@ declare %updating function utils:update-query(
 };
 
 (:~
- : Finalizes the result of an evaluated query.
- : @param  $result  query result
- : @return empty sequence
+ : Serializes a value, considering the specified system limits.
+ : @param  $value  value
+ : @return string
  :)
 declare function utils:serialize(
-  $result  as item()*
+  $value  as item()*
 ) as xs:string {
   (: serialize more characters than requested, because limit represents number of bytes :)
   let $limit := config:get($config:MAXCHARS)
   let $indent := config:get($config:INDENT)
-  let $string := serialize($result, map {
+  let $string := serialize($value, {
     'limit': $limit * 2 + 1,
-    'method': 'basex',
-    'indent': $indent
+    'indent': $indent,
+    'method': 'basex'
   })
   return utils:chop($string, $limit)
 };
@@ -65,11 +81,12 @@ declare function utils:serialize(
  : @return options
  :)
 declare %private function utils:query-options() as map(*) {
-  map {
+  {
     'timeout'   : config:get($config:TIMEOUT),
     'memory'    : config:get($config:MEMORY),
     'permission': config:get($config:PERMISSION),
-    'base-uri'  : config:directory() || '/' || config:file()
+    'base-uri'  : config:edited-file() otherwise config:editor-dir(),
+    'pass'      : true()
   }
 };
 
@@ -83,11 +100,11 @@ declare function utils:start(
   $page  as xs:integer,
   $sort  as xs:string
 ) as xs:integer {
-  if($page and not($sort)) then (
+  if ($page and not($sort)) {
     ($page - 1) * config:get($config:MAXROWS) + 1
-  ) else (
+  } else {
     1
-  )
+  }
 };
 
 (:~
@@ -100,11 +117,11 @@ declare function utils:end(
   $page  as xs:integer,
   $sort  as xs:string
 ) as xs:integer {
-  if($page and not($sort)) then (
+  if ($page and not($sort)) {
     $page * config:get($config:MAXROWS)
-  ) else (
+  } else {
     999999999
-  )
+  }
 };
 
 (:~
@@ -117,11 +134,11 @@ declare function utils:chop(
   $string  as xs:string,
   $max     as xs:integer
 ) as xs:string {
-  if(string-length($string) > $max) then (
+  if (string-length($string) > $max) {
     substring($string, 1, $max) || '...'
-  ) else (
+  } else {
     $string
-  )
+  }
 };
 
 (:~
@@ -137,7 +154,7 @@ declare function utils:info(
   $action  as xs:string
 ) as xs:string {
   let $count := count($items)
-  return $count || ' ' || $name || (if($count != 1) then 's were ' else ' was ') || $action || '.'
+  return `{ $count } { $name || (if ($count != 1) then 's were ' else ' was ') || $action }.`
 };
 
 (:~
@@ -159,6 +176,6 @@ declare function utils:capitalize(
 declare %updating function utils:redirect(
   $url     as xs:string,
   $params  as map(*)
-) as empty-sequence() {
+) {
   update:output(web:redirect($url, $params))
 };

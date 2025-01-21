@@ -9,7 +9,7 @@ import org.basex.util.options.*;
 /**
  * Collation options.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class CollationOptions extends Options {
@@ -41,7 +41,7 @@ abstract class CollationOptions extends Options {
     for(final Entry<String, String> entry : args.entrySet()) {
       try {
         assign(entry.getKey(), entry.getValue());
-      } catch (BaseXException ex) {
+      } catch(final BaseXException ex) {
         if(!fallback) throw ex;
       }
     }

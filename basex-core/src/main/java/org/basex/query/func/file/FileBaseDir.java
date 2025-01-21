@@ -10,13 +10,13 @@ import org.basex.query.value.seq.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FileBaseDir extends FileFn {
   @Override
   public Item item(final QueryContext qc) {
-    final IO base = sc.baseIO();
+    final IO base = sc().baseIO();
     if(!(base instanceof IOFile)) return Empty.VALUE;
     return get(absolute(Paths.get(base.isDir() ? base.path() : base.dir())), true);
   }

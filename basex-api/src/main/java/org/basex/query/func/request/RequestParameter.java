@@ -8,35 +8,30 @@ import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RequestParameter extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String name = toString(arg(0), qc);
+    final AStr name = toStr(arg(0), qc);
 
     final RequestContext requestCtx = requestContext(qc);
     try {
-      final Value query = requestCtx.queryValues().get(name);
-      final Value form = requestCtx.formValues(qc.context.options).get(name);
-      if(query == null && form == null) {
-        return defined(1) ? arg(1).value(qc) : Empty.VALUE;
-      }
-
       final ValueBuilder vb = new ValueBuilder(qc);
-      if(query != null) vb.add(query);
-      if(form != null) vb.add(form);
-      return vb.value(this);
+      vb.add(requestCtx.queryValues().get(name));
+      vb.add(requestCtx.formValues(qc.context.options).get(name));
+      final Value value = vb.value();
+      return value.isEmpty() && defined(1) ? arg(1).value(qc) : value;
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw REQUEST_PARAMETER.get(info, requestCtx.queryString());
+      throw REQUEST_PARAMETER.get(info);
     }
   }
 }

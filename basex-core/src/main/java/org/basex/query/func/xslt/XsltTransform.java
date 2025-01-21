@@ -24,7 +24,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Liam Quin
  */
@@ -55,7 +55,7 @@ public class XsltTransform extends XsltFn {
   final Item transform(final QueryContext qc, final boolean simple) throws QueryException {
     final IO input = read(arg(0), qc), stylesheet = read(arg(1), qc);
     final HashMap<String, String> arguments = toOptions(arg(2), qc);
-    final XsltOptions options = toOptions(arg(3), new XsltOptions(), true, qc);
+    final XsltOptions options = toOptions(arg(3), new XsltOptions(), qc);
 
     final ArrayOutput result = new ArrayOutput();
     final PrintStream errPS = System.err;
@@ -134,7 +134,7 @@ public class XsltTransform extends XsltFn {
    * @throws QueryException query exception
    */
   private IO read(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = toNodeOrAtomItem(expr, qc);
+    final Item item = toNodeOrAtomItem(expr, false, qc);
     if(item instanceof ANode) {
       try {
         final IO io = new IOContent(item.serialize().finish());

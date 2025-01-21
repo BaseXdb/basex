@@ -6,16 +6,16 @@ import static org.basex.util.Token.*;
 /**
  * Abstract class for parsing various inputs, such as database commands or queries.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class InputParser {
   /** Parsing exception. */
   private static final String FOUND = ", found '%'";
 
-  /** Input to be parsed. */
-  public final String input;
-  /** Query length. */
+  /** Codepoints of normalized input string. */
+  public final int[] input;
+  /** Input length. */
   public final int length;
 
   /** File reference. */
@@ -30,8 +30,8 @@ public class InputParser {
    * @param input input
    */
   public InputParser(final String input) {
-    this.input = input;
-    length = input.length();
+    this.input = input.replaceAll("\r\n?", "\n").codePoints().toArray();
+    length = this.input.length;
   }
 
   /**
@@ -46,19 +46,19 @@ public class InputParser {
    * Returns the current character.
    * @return current character
    */
-  public final char curr() {
+  public final int current() {
     final int i = pos;
-    return i < length ? input.charAt(i) : 0;
+    return i < length ? input[i] : 0;
   }
 
   /**
    * Checks if the current character equals the specified one.
-   * @param ch character to be checked
+   * @param cp character to be checked
    * @return result of check
    */
-  public final boolean curr(final int ch) {
+  public final boolean current(final int cp) {
     final int i = pos;
-    return i < length && ch == input.charAt(i);
+    return i < length && cp == input[i];
   }
 
   /**
@@ -72,38 +72,38 @@ public class InputParser {
    * Returns the next character.
    * @return next character, or {@code 0} if string is exhausted
    */
-  protected final char next() {
+  protected final int next() {
     final int i = pos + 1;
-    return i < length ? input.charAt(i) : 0;
+    return i < length ? input[i] : 0;
   }
 
   /**
    * Consumes the next character.
    * @return next character, or {@code 0} if string is exhausted
    */
-  public final char consume() {
-    return pos < length ? input.charAt(pos++) : 0;
+  public final int consume() {
+    return pos < length ? input[pos++] : 0;
   }
 
   /**
    * Peeks forward and consumes the character if it equals the specified one.
-   * @param ch character to consume
+   * @param cp character to consume
    * @return true if character was found
    */
-  public final boolean consume(final int ch) {
+  public final boolean consume(final int cp) {
     final int i = pos;
-    if(i >= length || ch != input.charAt(i)) return false;
+    if(i >= length || cp != input[i]) return false;
     ++pos;
     return true;
   }
 
   /**
    * Checks if the specified character is a quote.
-   * @param ch character to be checked
+   * @param cp character to be checked
    * @return result
    */
-  protected static boolean quote(final int ch) {
-    return ch == '"' || ch == '\'';
+  protected static boolean quote(final int cp) {
+    return cp == '"' || cp == '\'';
   }
 
   /**
@@ -116,7 +116,7 @@ public class InputParser {
     final int l = string.length();
     if(i + l > length) return false;
     for(int s = 0; s < l; ++s) {
-      if(input.charAt(i++) != string.charAt(s)) return false;
+      if(input[i++] != string.charAt(s)) return false;
     }
     pos = i;
     return true;
@@ -127,7 +127,7 @@ public class InputParser {
    * @return completion
    */
   protected final byte[] found() {
-    return curr() == 0 ? EMPTY : Util.inf(FOUND, curr());
+    return current() == 0 ? EMPTY : Util.inf(FOUND, currentAsString());
   }
 
   /**
@@ -135,22 +135,45 @@ public class InputParser {
    * @return query substring
    */
   protected final String remaining() {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     final int pl = Math.min(length, pos + 15);
     int p = pos;
     for(; p < pl; p++) {
-      final char ch = input.charAt(p);
-      if(ch == '\n') break;
-      sb.append(ch);
+      final int cp = input[p];
+      if(cp == '\n') break;
+      tb.add(cp);
     }
-    return sb + (pl == length ? "" : DOTS);
+    return tb + (pl == length ? "" : DOTS);
+  }
+
+  /**
+   * Returns an input substring.
+   * @param s start index
+   * @param e end index
+   * @return substring
+   */
+  public final TokenBuilder substring(final int s, final int e) {
+    final TokenBuilder tb = new TokenBuilder();
+    for(int i = s; i < e; i++) tb.add(input[i]);
+    return tb;
+  }
+
+  /**
+   * Returns the current character as string.
+   * @return current character
+   */
+  protected final String currentAsString() {
+    final int cp = current();
+    return cp == 0 ? "END OF INPUT" : !XMLToken.valid(cp) || Character.isSpaceChar(cp) ?
+      Character.getName(cp) :
+      Character.toString(cp);
   }
 
   /**
    * Creates input information.
    * @return input info
    */
-  public final InputInfo info() {
+  public InputInfo info() {
     return new InputInfo(this);
   }
 }

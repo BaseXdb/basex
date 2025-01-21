@@ -5,7 +5,7 @@ import org.basex.util.options.*;
 /**
  * Full-text big units.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum FTBigUnit {
@@ -26,6 +26,6 @@ public enum FTBigUnit {
    */
   @Override
   public String toString() {
-    return EnumOption.string(name());
+    return EnumOption.string(this);
   }
 }

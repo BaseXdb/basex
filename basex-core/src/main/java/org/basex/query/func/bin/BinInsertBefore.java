@@ -8,15 +8,15 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class BinInsertBefore extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final B64 binary = toB64OrNull(arg(0), qc);
+    final Bin binary = toBinOrNull(arg(0), qc);
     final Item offset = arg(1).atomItem(qc, info);
-    final B64 extra = toB64OrNull(arg(2), qc);
+    final Bin extra = toBinOrNull(arg(2), qc);
     if(binary == null) return Empty.VALUE;
 
     final byte[] bytes = binary.binary(info);

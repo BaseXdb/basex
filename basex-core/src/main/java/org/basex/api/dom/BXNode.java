@@ -14,7 +14,7 @@ import org.w3c.dom.*;
 /**
  * DOM - Node implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class BXNode implements Node {
@@ -134,12 +134,12 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getNextSibling() {
-    return get(nd.followingSiblingIter().next());
+    return get(nd.followingSiblingIter(false).next());
   }
 
   @Override
   public BXNode getPreviousSibling() {
-    return get(nd.precedingSiblingIter().next());
+    return get(nd.precedingSiblingIter(false).next());
   }
 
   @Override
@@ -275,7 +275,7 @@ public abstract class BXNode implements Node {
   final BXNList getElements(final String name) {
     final ANodeList nb = new ANodeList();
     final byte[] nm = "*".equals(name) ? null : token(name);
-    for(final ANode n : nd.descendantIter()) {
+    for(final ANode n : nd.descendantIter(false)) {
       if(n.type == NodeType.ELEMENT && (nm == null || eq(nm, n.name()))) {
         nb.add(n.finish());
       }

@@ -10,7 +10,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -23,7 +22,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FnSort extends StandardFunc {
@@ -34,7 +33,7 @@ public class FnSort extends StandardFunc {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 
@@ -58,17 +57,30 @@ public class FnSort extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter iter(final Value input, final QueryContext qc) throws QueryException {
-    final ValueList list = new ValueList(input.size());
+    final long is = input.size();
+    final ItemList list = new ItemList(is);
     for(final Item item : input) list.add(item);
-    final Value[] values = list.finish();
-
+    final Item[] values = list.finish();
     final Integer[] index = index(values, qc);
-    return new BasicIter<>(values.length) {
+    return sorted(index) ? input.iter() : new BasicIter<>(is) {
       @Override
-      public Item get(final long i) {
-        return (Item) values[index[(int) i]];
+      public Item get(final long l) {
+        return values[index[(int) l]];
       }
     };
+  }
+
+  /**
+   * Checks if the index is sorted.
+   * @param index index
+   * @return result of check
+   */
+  protected final boolean sorted(final Integer[] index) {
+    final int il = index.length;
+    for(int i = 0; i < il; i++) {
+      if(index[i] != i) return false;
+    }
+    return true;
   }
 
   /**
@@ -99,9 +111,6 @@ public class FnSort extends StandardFunc {
         l > 0 && invert[l - 1];
     }
 
-    // single value: atomize to check type
-    if(size == 1) values[0].atomValue(qc, info);
-
     final Integer[] indexes = new Integer[size];
     for(int o = 0; o < size; o++) indexes[o] = o;
     try {
@@ -111,13 +120,13 @@ public class FnSort extends StandardFunc {
           for(int l = 0; l < levels; l++) {
             final int ll = l;
             final QueryFunction<Integer, Value> value = i -> {
-              Value v = cached[ll][i];
-              if(v == null) {
+              Value val = cached[ll][i];
+              if(val == null) {
                 final FItem k = key[ll];
-                v = (k == null ? values[i] : k.invoke(qc, info, values[i])).atomValue(qc, info);
-                cached[ll][i] = v;
+                val = (k == null ? values[i] : k.invoke(qc, info, values[i])).atomValue(qc, info);
+                cached[ll][i] = val;
               }
-              return v;
+              return val;
             };
             final int diff = compare(value.apply(i1), value.apply(i2), collation[l], info);
             if(diff != 0) return invert[l] ? -diff : diff;
@@ -137,26 +146,32 @@ public class FnSort extends StandardFunc {
    * Compares two values.
    * @param value1 first value
    * @param value2 second value
-   * @param coll collation
    * @param info input info (can be {@code null})
+   * @param collation collation (can be {@code null})
    * @return result of comparison (-1, 0, 1)
    * @throws QueryException query exception
    */
-  static int compare(final Value value1, final Value value2, final Collation coll,
+  static int compare(final Value value1, final Value value2, final Collation collation,
       final InputInfo info) throws QueryException {
     final long size1 = value1.size(), size2 = value2.size(), il = Math.min(size1, size2);
     for(int i = 0; i < il; i++) {
       final Item item1 = value1.itemAt(i), item2 = value2.itemAt(i);
       if(!item1.comparable(item2)) throw compareError(item1, item2, info);
-      final int diff = item1.compare(item2, coll, true, info);
+      final int diff = item1.compare(item2, collation, true, info);
       if(diff != 0) return diff;
     }
     return Long.signum(size1 - size2);
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return cc.simplify(this, mode == Simplify.COUNT ? arg(0) : this, mode);
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+    Expr expr = this;
+    if(mode == Simplify.COUNT) {
+      // count(sort(A))  -> count(A)
+      expr = arg(0);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   @Override
@@ -166,29 +181,31 @@ public class FnSort extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    if(defined(2) && arg(2).size() == 1) {
-      arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, st.with(Occ.EXACTLY_ONE)));
-    } else if(exprs.length == 1) {
-      if(st.zeroOrOne() && st.type.isSortable()) return input;
-      // enforce pre-evaluation as remaining arguments may not be values
-      if(input instanceof Value) {
+    if(defined(2)) {
+      if(arg(2).size() == 1) {
+        arg(2, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE)));
+      }
+    } else if(!defined(1)) {
+      if(st.zeroOrOne() && st.type.isSortable()) {
+        return input;
+      } else if(input instanceof Value) {
         final Value value = quickValue((Value) input);
         if(value != null) return value;
       } else if(REVERSE.is(input) || SORT.is(input)) {
+        // sort(reverse(EXPR))  ->  sort(EXPR)
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
         return cc.function(SORT, info, args);
       } else if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
+        // sort(replicate(10, 5))  ->  replicate(10, 5)
         final SeqType rst = input.arg(0).seqType();
         if(rst.zeroOrOne() && rst.type.isSortable()) return input;
+      } else if(_DB_NODE_PRE.is(input) && input.arg(0).ddo()) {
+        // sort(db:node-pre(db:text(...)))  ->  db:node-pre(db:text(...))
+        return input;
       }
     }
     return adoptType(input);
-  }
-
-  @Override
-  public final boolean has(final Flag... flags) {
-    return Flag.HOF.in(flags) && defined(2) || super.has(flags);
   }
 
   /**
@@ -197,6 +214,8 @@ public class FnSort extends StandardFunc {
    * @return sorted value or {@code null}
    */
   private Value quickValue(final Value input) {
+    // empty sequence
+    if(input.isEmpty()) return input;
     if(exprs.length == 1) {
       // range values
       if(input instanceof RangeSeq) {
@@ -210,5 +229,10 @@ public class FnSort extends StandardFunc {
     }
     // no quick evaluation possible
     return null;
+  }
+
+  @Override
+  public final int hofIndex() {
+    return 2;
   }
 }

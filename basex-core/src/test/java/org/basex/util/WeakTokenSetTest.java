@@ -11,10 +11,10 @@ import org.opentest4j.*;
 /**
  * WaekTokenSet test.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public class WeakTokenSetTest {
+public final class WeakTokenSetTest {
   /** The prefix for assertion messages, showing random seed for reproducing potential failures. */
   private static String msgPrefix;
   /** Random value generator. */
@@ -81,11 +81,11 @@ public class WeakTokenSetTest {
    * @return list of random strings
    */
   private List<String> randomStrings() {
-    final int maxLength = 1 + random.nextInt(16);
+    final int maxLength = 2 + random.nextInt(16);
     final int count = (int) Math.pow(2, 3 + random.nextInt(3)) - 2 + random.nextInt(4);
     final Set<String> strings = new LinkedHashSet<>();
     do {
-      final int length = 1 + random.nextInt(maxLength);
+      final int length = 2 + random.nextInt(maxLength);
       final String asciiString = random.ints(length, ' ', 127).
           collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).
           toString();

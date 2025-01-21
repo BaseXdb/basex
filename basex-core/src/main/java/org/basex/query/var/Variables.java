@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Container of global variables of a module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class Variables extends ExprInfo implements Iterable<StaticVar> {
@@ -54,24 +54,34 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    */
   public void check() throws QueryException {
     for(final VarEntry ve : vars.values()) {
-      if(ve.var == null) {
-        final StaticVarRef vr = ve.refs.get(0);
-        throw VARUNDEF_X.get(vr.info(), vr);
+      final StaticVar var = ve.var;
+      if(var == null) {
+        final StaticVarRef ref = ve.refs.get(0);
+        throw VARUNDEF_X.get(ref.info(), ref);
+      }
+      final QNm varMod = var.info.sc().module;
+      final byte[] varModUri = varMod == null ? Token.EMPTY : varMod.uri();
+      for(final StaticVarRef ref : ve.refs) {
+        if(!ref.hasImport) {
+          final QNm refMod = ref.info().sc().module;
+          final byte[] refModUri = refMod == null ? Token.EMPTY : refMod.uri();
+          if(!Token.eq(varModUri, refModUri))  throw INVISIBLEVAR_X.get(ref.info(), var.name);
+        }
       }
     }
   }
 
   /**
    * Returns a new reference to the (possibly not yet declared) variable with the given name.
-   * @param info input info (can be {@code null})
    * @param name variable name
-   * @param sc static context
+   * @param info input info (can be {@code null})
+   * @param hasImport indicates whether a module import for the variable name's URI was present
    * @return reference
    * @throws QueryException if the variable is not visible
    */
-  public StaticVarRef newRef(final QNm name, final StaticContext sc, final InputInfo info)
+  public StaticVarRef newRef(final QNm name, final InputInfo info, final boolean hasImport)
       throws QueryException {
-    final StaticVarRef ref = new StaticVarRef(info, name, sc);
+    final StaticVarRef ref = new StaticVarRef(info, name, hasImport);
     varEntry(name).addRef(ref);
     return ref;
   }
@@ -94,15 +104,16 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * Binds all external variables.
    * @param qc query context
    * @param bindings variable bindings
+   * @param cast cast flag, value will be coerced if false
    * @throws QueryException query exception
    */
-  public void bindExternal(final QueryContext qc, final QNmMap<Value> bindings)
+  public void bindExternal(final QueryContext qc, final QNmMap<Value> bindings, final boolean cast)
       throws QueryException {
 
     for(final QNm qnm : bindings) {
       if(qnm != QNm.EMPTY) {
         final VarEntry ve = vars.get(qnm);
-        if(ve != null) ve.var.bind(bindings.get(qnm), qc);
+        if(ve != null) ve.var.bind(bindings.get(qnm), qc, cast);
       }
     }
   }

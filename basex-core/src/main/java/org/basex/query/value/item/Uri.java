@@ -12,11 +12,12 @@ import org.basex.query.util.*;
 import org.basex.query.util.UriParser.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.Token.*;
 
 /**
  * URI item ({@code xs:anyURI}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Uri extends AStr {
@@ -68,7 +69,7 @@ public final class Uri extends AStr {
    * @return result of check
    */
   public boolean eq(final Uri uri) {
-    return Token.eq(string(), uri.string());
+    return Token.eq(value, uri.value);
   }
 
   /**
@@ -82,7 +83,12 @@ public final class Uri extends AStr {
   public Uri resolve(final Uri add, final InputInfo info) throws QueryException {
     if(add.value.length == 0) return this;
     try {
-      final URI base = new URI(Token.string(value)), res = new URI(Token.string(add.value));
+      final URI res = new URI(Token.string(add.value));
+      URI base = new URI(Token.string(value));
+      if("".equals(base.getPath()) && !"".equals(base.getHost())) {
+        // work around JDK-8272702, https://bugs.java.com/bugdatabase/view_bug?bug_id=8272702
+        base = new URI(Token.string(value) + "/");
+      }
       String uri = base.resolve(res).toString();
       if(uri.startsWith(IO.FILEPREF))
         uri = uri.replaceAll('^' + IO.FILEPREF + "([^/])", IO.FILEPREF + "//$1");
@@ -122,10 +128,18 @@ public final class Uri extends AStr {
   }
 
   @Override
+  public int hashCode() {
+    return Token.hashCode(value);
+  }
+
+  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[xs:anyURI('x')]  ->  E[true()]
-    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ?
-      Bln.get(value.length != 0) : this, mode);
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // E[xs:anyURI('x')]  ->  E[true()]
+      expr = Bln.get(value.length != 0);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   /**
@@ -133,7 +147,9 @@ public final class Uri extends AStr {
    * @return parsed URI
    */
   private ParsedUri parsed() {
-    if(parsed == null) parsed = UriParser.parse(Token.string(Token.encodeUri(value, true)));
+    if(parsed == null) {
+      parsed = UriParser.parse(Token.string(Token.encodeUri(value, UriEncoder.IRI)));
+    }
     return parsed;
   }
 

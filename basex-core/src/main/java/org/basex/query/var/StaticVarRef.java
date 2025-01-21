@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
 /**
  * Reference to a static variable.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 final class StaticVarRef extends ParseExpr {
@@ -23,19 +23,18 @@ final class StaticVarRef extends ParseExpr {
   private final QNm name;
   /** Referenced variable. */
   private StaticVar var;
-  /** URI of the enclosing module. */
-  private final StaticContext sc;
-
+  /** Indicates whether a module import for the variable name's URI was present. */
+  final boolean hasImport;
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param name variable name
-   * @param sc static context
+   * @param hasImport indicates whether a module import for the variable name's URI was present
    */
-  StaticVarRef(final InputInfo info, final QNm name, final StaticContext sc) {
+  StaticVarRef(final InputInfo info, final QNm name, final boolean hasImport) {
     super(info, SeqType.ITEM_ZM);
     this.name = name;
-    this.sc = sc;
+    this.hasImport = hasImport;
   }
 
   @Override
@@ -76,7 +75,7 @@ final class StaticVarRef extends ParseExpr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final StaticVarRef ref = new StaticVarRef(info, name, sc);
+    final StaticVarRef ref = new StaticVarRef(info, name, hasImport);
     ref.var = var;
     return copyType(ref);
   }
@@ -108,7 +107,7 @@ final class StaticVarRef extends ParseExpr {
    * @throws QueryException query exception
    */
   void init(final StaticVar vr) throws QueryException {
-    if(vr.anns.contains(Annotation.PRIVATE) && !sc.baseURI().eq(vr.sc.baseURI()))
+    if(vr.anns.contains(Annotation.PRIVATE) && !info.sc().baseURI().eq(vr.sc.baseURI()))
       throw VARPRIVATE_X.get(info, this);
     var = vr;
   }

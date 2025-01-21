@@ -7,7 +7,7 @@ import org.basex.util.*;
  * Atomic update operation that replaces the value of a single text, comment, pi or
  * attribute node.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
 final class UpdateValue extends BasicUpdate {
@@ -47,7 +47,7 @@ final class UpdateValue extends BasicUpdate {
 
   @Override
   DataClip getInsertionData() {
-    throw Util.notExpected("No insertion sequence needed for atomic value update operation.");
+    throw Util.notExpected("No insertion sequence needed for atomic item update operation.");
   }
 
   @Override

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests all function signatures.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class SignatureTest extends SandboxTest {
@@ -62,5 +62,11 @@ public final class SignatureTest extends SandboxTest {
     // all variable names must be distinct
     final Set<QNm> set = new HashSet<>(Arrays.asList(names));
     assertEquals(names.length, set.size(), "Duplicate argument names: " + fd);
+
+    /* higher-order functions must have HOF flag
+    final Checks<SeqType> hof = arg -> arg.type.instanceOf(SeqType.FUNCTION) &&
+        !arg.type.instanceOf(SeqType.MAP) && !arg.type.instanceOf(SeqType.ARRAY);
+    if(hof.any(fd.types) && !fd.has(Flag.HOF)) System.err.println(fd);
+    */
   }
 }

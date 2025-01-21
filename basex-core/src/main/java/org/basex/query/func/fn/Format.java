@@ -13,7 +13,7 @@ import org.basex.query.value.type.*;
 /**
  * Formatting functions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class Format extends StandardFunc {
@@ -36,7 +36,7 @@ abstract class Format extends StandardFunc {
 
     final ADate date = toDate(value, tp, qc);
     final Formatter form = Formatter.get(language);
-    return Str.get(form.formatDate(date, language, picture, calendar, place, sc, info));
+    return Str.get(form.formatDate(date, language, picture, calendar, place, info));
   }
 
   @Override

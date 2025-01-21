@@ -1,6 +1,5 @@
 package org.basex.query.value.seq;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.io.*;
@@ -22,7 +21,7 @@ import org.basex.util.*;
 /**
  * Range sequence, containing at least two integers.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RangeSeq extends Seq {
@@ -111,12 +110,9 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-
-    if(!predicate) throw testError(this, false, ii);
-    final long pos = qc.focus.pos;
-    return pos >= min() && pos <= max();
+    return pos != 0 ? pos >= min() && pos <= max() : super.test(qc, ii, pos);
   }
 
   @Override
@@ -215,6 +211,9 @@ public final class RangeSeq extends Seq {
     final RangeSeq rs = (RangeSeq) obj;
     return start == rs.start && size == rs.size && ascending == rs.ascending;
   }
+
+  @Override
+  public void refineType() { }
 
   @Override
   public String description() {

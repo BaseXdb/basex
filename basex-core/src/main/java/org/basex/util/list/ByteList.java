@@ -9,12 +9,12 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for native bytes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class ByteList extends ElementList {
+public final class ByteList extends ElementList {
   /** Element container. */
-  protected byte[] list;
+  private byte[] list;
 
   /**
    * Default constructor.
@@ -77,7 +77,7 @@ public class ByteList extends ElementList {
    * @param index index of the element to return
    * @return element
    */
-  public final byte get(final int index) {
+  public byte get(final int index) {
     return list[index];
   }
 
@@ -94,7 +94,7 @@ public class ByteList extends ElementList {
    * Returns an array with all elements and resets the array size.
    * @return array
    */
-  public final byte[] next() {
+  public byte[] next() {
     final int s = size;
     if(s == 0) return EMPTY;
     size = 0;

@@ -9,7 +9,7 @@ import org.basex.util.*;
  * This is the basic structure of an efficient and memory-saving hash set.
  * The first entry of the token set (offset 0) will always be kept empty.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class ASet {
@@ -83,7 +83,7 @@ public abstract class ASet {
 
     for(final int bucket : buckets) {
       for(int id = bucket; id != 0;) {
-        final int b = hash(id) & newSize - 1, nx = next[id];
+        final int b = hashCode(id) & newSize - 1, nx = next[id];
         relocateAction.accept(id, b);
         next[id] = bckts[b];
         bckts[b] = id;
@@ -105,11 +105,11 @@ public abstract class ASet {
   }
 
   /**
-   * Returns the hash value of the element with the specified id.
+   * Returns a hash code for the element with the specified id.
    * @param id id of the element
    * @return hash value
    */
-  protected abstract int hash(int id);
+  protected abstract int hashCode(int id);
 
   /**
    * Rehashes all entries.

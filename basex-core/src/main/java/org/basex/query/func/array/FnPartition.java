@@ -4,6 +4,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -14,7 +15,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnPartition extends ArrayFn {
@@ -24,18 +25,18 @@ public final class FnPartition extends ArrayFn {
     final FItem splitWhen = toFunction(arg(1), 3, qc);
     return new Iter() {
       Value value = Empty.VALUE;
-      int p;
+      final HofArgs args = new HofArgs(3, splitWhen);
 
       @Override
       public Item next() throws QueryException {
         while(value != null) {
           final Item item = input.next();
-          if(item == null || toBoolean(qc, splitWhen, value, item, Int.get(++p))) {
-            final Value v = value;
+          if(item == null || test(splitWhen, args.set(0, value).set(1, item).inc(), qc)) {
+            final Value val = value;
             value = item;
-            if(!v.isEmpty()) {
+            if(!val.isEmpty()) {
               final ArrayBuilder ab = new ArrayBuilder();
-              for(final Item it : v) ab.append(it);
+              for(final Item it : val) ab.append(it);
               return ab.array();
             }
           } else {
@@ -61,10 +62,14 @@ public final class FnPartition extends ArrayFn {
       return cc.function(_UTIL_ARRAY_MEMBER, info, input);
     }
 
-    final SeqType so = st.with(Occ.EXACTLY_ONE);
-    arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, st.with(Occ.ZERO_OR_MORE), so,
-        SeqType.INTEGER_O));
-    exprType.assign(ArrayType.get(so));
+    final SeqType mt = st.with(Occ.EXACTLY_ONE);
+    arg(1, arg -> refineFunc(arg, cc, st.with(Occ.ZERO_OR_MORE), mt, SeqType.INTEGER_O));
+    exprType.assign(ArrayType.get(mt));
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

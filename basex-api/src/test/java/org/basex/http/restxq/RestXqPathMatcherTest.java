@@ -13,7 +13,7 @@ import org.junit.jupiter.api.*;
 /**
  * Path matcher tests.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 public final class RestXqPathMatcherTest {
@@ -131,14 +131,14 @@ public final class RestXqPathMatcherTest {
    * @param template template
    * @param path path
    * @param var variable
-   * @param val value
+   * @param value value
    * @throws Exception arbitrary exception
    */
   private static void testValues(final String template, final String path, final String var,
-      final String val) throws Exception {
+      final String value) throws Exception {
 
     final QNmMap<String> actual = RestXqPathMatcher.parse(template, null).values(path);
-    assertEquals(val, actual.get(new QNm(var)), "values differ");
+    assertEquals(value, actual.get(new QNm(var)), "values differ");
   }
 
   /**

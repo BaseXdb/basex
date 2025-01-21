@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * HexBinary item ({@code xs:hexBinary}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Hex extends Bin {
@@ -50,8 +50,13 @@ public final class Hex extends Bin {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) throws QueryException {
-    return Token.hex(binary(ii), true);
+  public byte[] string(final InputInfo ii) {
+    return Token.hex(data, true);
+  }
+
+  @Override
+  public int hashCode() {
+    return Token.hashCode(data);
   }
 
   @Override

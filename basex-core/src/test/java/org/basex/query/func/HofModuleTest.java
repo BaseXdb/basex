@@ -1,18 +1,14 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
-import org.basex.query.expr.*;
-import org.basex.query.value.item.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the Higher-Order Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class HofModuleTest extends SandboxTest {
@@ -32,28 +28,6 @@ public final class HofModuleTest extends SandboxTest {
     check(func.args(" 1 to 6", " function($a, $b) { $a + $b }"),
         21,
         exists(func));
-
-    // should be unrolled and evaluated at compile time
-    unroll(true);
-    check(func.args(" 1 to 5", " function($a, $b) { $a + $b }"),
-        15,
-        empty(func),
-        exists(Int.class));
-    // should be unrolled but not evaluated at compile time
-    check(func.args(" 1 to 5", " function($a, $b) { 0 * " + _RANDOM_DOUBLE.args() + " + $b }"),
-        5,
-        exists(Int.class),
-        empty(func),
-        count(Util.className(Arith.class) + "[@op = '+']", 4));
-  }
-
-  /** Test method. */
-  @Test public void sortWith() {
-    final Function func = _HOF_SORT_WITH;
-    query(func.args(" ()", " function($a, $b) { $a < $b }"), "");
-    query(func.args(" 1 to 5", " function($a, $b) { $a > $b }"), "5\n4\n3\n2\n1");
-    error(func.args(" 1 to 5", " <x/>"), INVCONVERT_X_X_X);
-    error(func.args(" 1 to 5", wrap("")), INVCONVERT_X_X_X);
   }
 
   /** Test method. */

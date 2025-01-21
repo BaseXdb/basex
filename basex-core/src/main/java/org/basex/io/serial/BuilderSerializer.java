@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * A serializer that pipes the events directly through to a builder.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public class BuilderSerializer extends Serializer {
@@ -37,7 +37,7 @@ public class BuilderSerializer extends Serializer {
 
   @Override
   protected final void pi(final byte[] name, final byte[] value) throws IOException {
-    builder.pi(concat(name, SPACE, value));
+    builder.pi(concat(name, cpToken(' '), value));
   }
 
   @Override

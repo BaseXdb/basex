@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnFunctionLookup extends StandardFunc {
@@ -24,9 +24,9 @@ public final class FnFunctionLookup extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // make sure that all functions are compiled
-    cc.qc.functions.compileAll(cc);
+    if(!cc.dynamic) cc.qc.functions.compileAll(cc);
 
-    if(allAreValues(false)) {
+    if(values(false, cc)) {
       final Expr expr = item(cc.qc);
       if(expr != null) return expr;
     }
@@ -50,7 +50,7 @@ public final class FnFunctionLookup extends StandardFunc {
     final long arity = toLong(arg(1), qc);
     if(arity >= 0 && arity <= Integer.MAX_VALUE) {
       try {
-        return Functions.item(name, (int) arity, true, sc, info, qc);
+        return Functions.item(name, (int) arity, true, info, qc, true);
       } catch(final QueryException ex) {
         Util.debug(ex);
       }

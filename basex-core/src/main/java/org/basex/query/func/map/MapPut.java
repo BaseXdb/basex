@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class MapPut extends StandardFunc {
@@ -25,7 +25,7 @@ public final class MapPut extends StandardFunc {
     final Item key = toAtomItem(arg(1), qc);
     final Value value = arg(2).value(qc);
 
-    return map.put(key, value, info);
+    return map.put(key, value);
   }
 
   @Override
@@ -35,16 +35,16 @@ public final class MapPut extends StandardFunc {
 
     final Type type = map.seqType().type;
     if(type instanceof MapType) {
-      AtomType typeKey = key.seqType().type.atomic();
+      Type typeKey = key.seqType().type.atomic();
       if(typeKey != null) {
-        SeqType st = value.seqType();
+        SeqType vt = value.seqType();
         // merge types if input is expected to have at least one entry
         if(map != XQMap.empty()) {
           final MapType mt = (MapType) type;
-          typeKey = mt.keyType().union(typeKey);
-          st = mt.declType.union(value.seqType());
+          typeKey = mt.keyType.union(typeKey);
+          vt = mt.valueType.union(value.seqType());
         }
-        exprType.assign(MapType.get(typeKey, st));
+        exprType.assign(MapType.get(typeKey, vt));
       }
     }
     return this;

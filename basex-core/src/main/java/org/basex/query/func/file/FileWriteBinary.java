@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 import java.nio.file.*;
 
-import org.basex.io.in.*;
+import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.func.archive.*;
@@ -15,7 +15,7 @@ import org.basex.query.value.seq.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FileWriteBinary extends FileFn {
@@ -32,9 +32,7 @@ public class FileWriteBinary extends FileFn {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final synchronized void write(final boolean append, final QueryContext qc)
-      throws QueryException, IOException {
-
+  final void write(final boolean append, final QueryContext qc) throws QueryException, IOException {
     final Path path = toParent(toPath(arg(0), qc));
     if(defined(2)) {
       // write file chunk
@@ -49,15 +47,12 @@ public class FileWriteBinary extends FileFn {
       }
     } else {
       // write full file
-      try(BufferOutput out = new BufferOutput(new FileOutputStream(path.toFile(), append))) {
+      try(BufferOutput out = BufferOutput.get(new FileOutputStream(path.toFile(), append))) {
         if(arg(1).getClass() == ArchiveCreate.class) {
           // optimization: stream archive to disk (no support for ArchiveCreateFrom)
           ((ArchiveCreate) arg(1)).create(out, qc);
         } else {
-          final Bin value = toBin(arg(1), qc);
-          try(BufferInput bi = value.input(info)) {
-            for(int b; (b = bi.read()) != -1;) out.write(b);
-          }
+          IO.write(toBin(arg(1), qc).input(info), out);
         }
       }
     }

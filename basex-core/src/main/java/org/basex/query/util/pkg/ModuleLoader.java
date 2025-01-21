@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * Module loader.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ModuleLoader {
@@ -99,7 +99,7 @@ public final class ModuleLoader {
         }
       }
       // check XQuery modules
-      final String path = JavaCall.uri2path(uri);
+      final String path = Strings.uri2path(uri);
       for(final String suffix : IO.XQSUFFIXES) {
         final IOFile file = new IOFile(repoPath, path + suffix);
         if(file.exists()) {
@@ -108,12 +108,12 @@ public final class ModuleLoader {
         }
       }
       // convert to Java notation
-      className = JavaCall.uriToClasspath(path);
+      className = Strings.uriToClasspath(path);
     }
     className = JavaCall.classPath(className);
 
     // load Java module
-    final IOFile jar = new IOFile(repoPath, JavaCall.uri2path(className) + IO.JARSUFFIX);
+    final IOFile jar = new IOFile(repoPath, Strings.uri2path(className) + IO.JARSUFFIX);
     if(jar.exists()) addURL(jar);
 
     // create Java class instance
@@ -190,7 +190,7 @@ public final class ModuleLoader {
 
     // parse package descriptor
     final IO pkgDesc = new IOFile(pkgPath, PkgText.DESCRIPTOR);
-    if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, id);
+    if(!pkgDesc.exists()) Util.debugln(PkgText.MISSDESC, id);
 
     pkg = new PkgParser(info).parse(pkgDesc);
     // check if package contains a jar descriptor

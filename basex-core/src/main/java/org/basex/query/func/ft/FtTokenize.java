@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FtTokenize extends FtAccess {
@@ -30,7 +30,7 @@ public class FtTokenize extends FtAccess {
    */
   protected final TokenList tokens(final QueryContext qc, final boolean all) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    final FtTokenizeOptions options = toOptions(arg(1), new FtTokenizeOptions(), true, qc);
+    final FtTokenizeOptions options = toOptions(arg(1), new FtTokenizeOptions(), qc);
 
     final TokenList tl = new TokenList();
     if(!value.isEmpty()) {

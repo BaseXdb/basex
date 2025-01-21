@@ -22,7 +22,7 @@ import org.basex.util.similarity.*;
 /**
  * Container for user-defined functions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class StaticFuncs extends ExprInfo {
@@ -33,7 +33,7 @@ public final class StaticFuncs extends ExprInfo {
 
   /**
    * Declares a new user-defined function.
-   * @param qname function name
+   * @param name function name
    * @param params parameters with variables and optional default values
    * @param expr function body (can be {@code null})
    * @param anns annotations
@@ -43,17 +43,17 @@ public final class StaticFuncs extends ExprInfo {
    * @return static function reference
    * @throws QueryException query exception
    */
-  public StaticFunc declare(final QNm qname, final Params params, final Expr expr,
+  public StaticFunc declare(final QNm name, final Params params, final Expr expr,
       final AnnList anns, final String doc, final VarScope vs, final InputInfo info)
-          throws QueryException {
+      throws QueryException {
 
-    final byte[] uri = qname.uri();
-    if(uri.length == 0) throw FUNNONS_X.get(info, qname.string());
-    if(NSGlobal.reserved(uri) || Functions.builtIn(qname) != null)
-      throw FNRESERVED_X.get(info, qname.string());
+    final byte[] uri = name.uri();
+    if(uri.length == 0) throw FUNNONS_X.get(info, name.string());
+    if(NSGlobal.reserved(uri) || Functions.builtIn(name) != null)
+      throw FNRESERVED_X.get(info, name.string());
 
-    final StaticFunc sf = new StaticFunc(qname, params, expr, anns, vs, info, doc);
-    if(!cache(qname.prefixId()).register(sf)) throw DUPLFUNC_X.get(sf.info, qname.string());
+    final StaticFunc sf = new StaticFunc(name, params, expr, anns, vs, info, doc);
+    if(!cache(name.prefixId()).register(sf)) throw DUPLFUNC_X.get(sf.info, name.string());
     return sf;
   }
 
@@ -67,11 +67,11 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Registers a function literal.
-   * @param literal wrapped literal
+   * Registers a closure.
+   * @param closure wrapped literal
    */
-  public void register(final Closure literal) {
-    cache(literal.funcName().prefixId()).add(literal);
+  public void register(final Closure closure) {
+    cache(closure.funcName().prefixId()).add(closure);
   }
 
   /**
@@ -222,7 +222,7 @@ public final class StaticFuncs extends ExprInfo {
   /**
    * Function cache.
    *
-   * @author BaseX Team 2005-24, BSD License
+   * @author BaseX Team, BSD License
    * @author Christian Gruen
    */
   private static final class FuncCache {
@@ -230,11 +230,11 @@ public final class StaticFuncs extends ExprInfo {
     final ArrayList<StaticFunc> funcs = new ArrayList<>(1);
     /** Function calls. */
     final ArrayList<StaticFuncCall> calls = new ArrayList<>(0);
-    /** Function literals. */
-    final ArrayList<Closure> literals = new ArrayList<>(0);
+    /** Function closures. */
+    final ArrayList<Closure> closures = new ArrayList<>(0);
 
     /**
-     * Initializes the function calls and literals.
+     * Initializes the function calls and closures.
      * @param qc query context
      * @throws QueryException query exception
      */
@@ -248,24 +248,33 @@ public final class StaticFuncs extends ExprInfo {
             for(final StaticFunc func : funcs) arities.add(func.min).add(func.arity());
             final InputInfo info = call.info();
             throw arities.isEmpty() ? qc.functions.similarError(qname(), info) :
-              Functions.wrongArity(call.arity(), arities, qname().prefixString(), false, info);
+              Functions.wrongArity(call.arity(), arities, false, info, qname().prefixString());
           }
         } else {
           // check if all implementations exist for all functions, set updating flag
           final StaticFunc func = call.func;
           if(func != null) {
+            if(!call.hasImport) {
+              final QNm funcMod = func.sc.module;
+              final QNm callMod = call.info().sc().module;
+              final byte[] funcModUri = funcMod == null ? Token.EMPTY : funcMod.uri();
+              final byte[] callModUri = callMod == null ? Token.EMPTY : callMod.uri();
+              if(!Token.eq(funcModUri, callModUri)) {
+                throw INVISIBLEFUNC_X.get(call.info(), call.name);
+              }
+            }
             if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
             if(func.updating) qc.updating();
           } else if(((JavaCall) call.external).updating) qc.updating();
         }
       }
 
-      // assign function signatures to function literals
-      for(final Closure literal : literals) {
-        final int arity = literal.arity();
+      // assign function signatures to function closures
+      for(final Closure closure : closures) {
+        final int arity = closure.arity();
         for(final StaticFunc func : funcs) {
-          if(arity < func.min || arity > func.arity()) {
-            literal.setSignature(func.funcType());
+          if(arity >= func.min && arity <= func.arity()) {
+            closure.setSignature(func.funcType());
             break;
           }
         }
@@ -281,8 +290,9 @@ public final class StaticFuncs extends ExprInfo {
       /* Reject a function with a conflicting arity range. Examples:
        * f($a), f($b)
        * f($a), f($a, $b := ()) */
+      final int nargs = func.arity();
       for(final StaticFunc sf : funcs) {
-        if(func.arity() >= sf.min && func.min <= sf.arity()) return false;
+        if(nargs >= sf.min && func.min <= sf.arity()) return false;
       }
       funcs.add(func);
       return true;
@@ -323,18 +333,18 @@ public final class StaticFuncs extends ExprInfo {
      * @throws QueryException query exception
      */
     boolean setJava(final StaticFuncCall call, final QueryContext qc) throws QueryException {
-      final JavaCall java = literals.isEmpty() ?
-        JavaCall.get(call.name, call.exprs, qc, call.sc, call.info()) : null;
+      final JavaCall java = closures.isEmpty() ?
+        JavaCall.get(call.name, call.exprs, qc, call.info()) : null;
       call.setExternal(java);
       return java != null;
     }
 
     /**
-     * Adds a function literal.
-     * @param literal literal
+     * Adds a closure.
+     * @param closure closure
      */
-    void add(final Closure literal) {
-      literals.add(literal);
+    void add(final Closure closure) {
+      closures.add(closure);
     }
 
     /**

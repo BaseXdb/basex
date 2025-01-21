@@ -9,7 +9,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FnCollection extends Docs {
@@ -19,7 +19,7 @@ public class FnCollection extends Docs {
   }
 
   @Override
-  public boolean ddo() {
+  public final boolean ddo() {
     return true;
   }
 

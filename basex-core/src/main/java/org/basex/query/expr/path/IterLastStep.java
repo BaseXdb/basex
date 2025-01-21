@@ -11,10 +11,10 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression with a single last() predicate.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class IterLastStep extends Step {
+public final class IterLastStep extends Step {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -29,12 +29,12 @@ final class IterLastStep extends Step {
   @Override
   public NodeIter iter(final QueryContext qc) {
     return new NodeIter() {
-      boolean stop;
+      boolean skip;
 
       @Override
       public ANode next() throws QueryException {
-        if(stop) return null;
-        stop = true;
+        if(skip) return null;
+        skip = true;
 
         // return last item
         ANode last = null;

@@ -12,6 +12,7 @@ import javax.xml.transform.stream.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.util.*;
 import org.xml.sax.*;
 
@@ -20,7 +21,7 @@ import org.xml.sax.*;
  * be a local file ({@link IOFile}), a URL ({@link IOUrl}), a byte array
  * ({@link IOContent}), or a stream ({@link IOStream}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class IO {
@@ -67,7 +68,7 @@ public abstract class IO {
   public static final String[] XQSUFFIXES =
     { XQSUFFIX, XQMSUFFIX, ".xqy", ".xql", ".xqu", ".xquery", ".xpath" };
   /** Archive suffixes. */
-  public static final String[] ZIPSUFFIXES = {
+  public static final String[] ARCHIVESUFFIXES = {
     ZIPSUFFIX, GZSUFFIX, TGZSUFFIX, TARSUFFIX, XARSUFFIX,
     ".docx", ".pptx", ".xlsx", ".odt", ".odp", ".ods", ".epub", ".idml"
   };
@@ -139,20 +140,19 @@ public abstract class IO {
   }
 
   /**
-   * Returns the binary contents.
-   * @return binary contents
+   * Returns the binary content.
+   * @return binary content
    * @throws IOException I/O exception
    */
   public abstract byte[] read() throws IOException;
 
   /**
-   * Returns the contents as string. The input encoding will be guessed by analyzing the
-   * first bytes. UTF-8 will be used as fallback.
-   * @return string contents
+   * Returns the contents as string. The input encoding will be guessed by analyzing the input.
+   * @return string content
    * @throws IOException I/O exception
    */
   public final String string() throws IOException {
-    return new TextInput(this).cache().toString();
+    return new TextInput(read()).cache().toString();
   }
 
   /**
@@ -265,7 +265,7 @@ public abstract class IO {
    * @return result of check
    */
   public final boolean isArchive() {
-    return hasSuffix(ZIPSUFFIXES);
+    return hasSuffix(ARCHIVESUFFIXES);
   }
 
   /**
@@ -275,12 +275,12 @@ public abstract class IO {
    */
   public final String dbName() {
     final TokenBuilder tb = new TokenBuilder();
-    final byte[] n = token(name());
-    int i = lastIndexOf(n, '.');
-    if(i == -1) i = n.length;
-    for(int c = 0; c < i; c += cl(n, c)) {
-      final int ch = noDiacritics(cp(n, c));
-      if(Databases.validChar(ch, c == 0 || c + 1 == i)) tb.add(ch);
+    final byte[] token = token(name());
+    int nl = lastIndexOf(token, '.');
+    if(nl == -1) nl = token.length;
+    for(int n = 0; n < nl; n += cl(token, n)) {
+      final int ch = noDiacritics(cp(token, n));
+      if(Databases.validChar(ch, n == 0 || n + 1 == nl)) tb.add(ch);
     }
     // return hash code if string is empty (mainly required for CHECK command)
     return tb.isEmpty() ? Integer.toString(hashCode()) : tb.toString();
@@ -358,6 +358,18 @@ public abstract class IO {
       if(suf.equals(suffix)) return true;
     }
     return false;
+  }
+
+  /**
+   * Writes data from an input stream to an output stream.
+   * @param in input stream
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  public static final void write(final InputStream in, final OutputStream out) throws IOException {
+    try(BufferInput bi = BufferInput.get(in); BufferOutput bo = BufferOutput.get(out)) {
+      for(int c; (c = bi.read()) != -1;) bo.write(c);
+    }
   }
 
   /**

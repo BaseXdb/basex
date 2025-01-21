@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class MapKeysWhere extends StandardFunc {
@@ -20,20 +20,28 @@ public final class MapKeysWhere extends StandardFunc {
     final XQMap map = toMap(arg(0), qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
+    final HofArgs args = new HofArgs(2);
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((key, value) -> {
-      if(toBoolean(qc, predicate, key, value)) vb.add(key);
+    map.forEach((key, value) -> {
+      if(test(predicate, args.set(0, key).set(1, value), qc)) vb.add(key);
     });
     return vb.value(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) {
-      arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, ft.declType));
-      exprType.assign(((MapType) ft).keyType());
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) {
+      final MapType mt = (MapType) tp;
+      final Type kt = mt.keyType;
+      arg(1, arg -> refineFunc(arg, cc, kt.seqType()));
+      exprType.assign(kt);
     }
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

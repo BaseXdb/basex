@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArraySubarray extends ArrayFn {
@@ -21,7 +21,7 @@ public final class ArraySubarray extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
     final long start = toLong(arg(1), qc) - 1;
 
-    final long size = array.arraySize();
+    final long size = array.structSize();
     if(start < 0 || start > size) throw ARRAYBOUNDS_X_X.get(info, start + 1, size + 1);
 
     final Item length = arg(2).atomItem(qc, info);

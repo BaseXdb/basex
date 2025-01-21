@@ -18,7 +18,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -26,7 +25,7 @@ import org.basex.util.hash.*;
 /**
  * Compilation context.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CompileContext {
@@ -98,12 +97,14 @@ public final class CompileContext {
   }
 
   /** Limit for the size of sequences that are pre-evaluated. */
-  public static final int MAX_PREEVAL = 1 << 18;
+  private static final int MAX_PREEVAL = 1 << 18;
 
   /** Query context. */
   public final QueryContext qc;
   /** Dynamic compilation. */
   public final boolean dynamic;
+  /** Currently inlined function expressions. */
+  public final ArrayDeque<XQFunctionExpr> inlined = new ArrayDeque<>();
 
   /** Variable scope list. */
   private final ArrayDeque<VarScope> scopes = new ArrayDeque<>();
@@ -157,31 +158,35 @@ public final class CompileContext {
   /**
    * Pushes the current query focus onto the stack and, if possible, assigns a new dummy item.
    * @param expr focus expression (can be {@code null})
+   * @param item focus single item
    */
-  public void pushFocus(final Expr expr) {
+  public void pushFocus(final Expr expr, final boolean item) {
     focuses.add(qc.focus);
     final QueryFocus qf = new QueryFocus();
-    if(expr != null) qf.value = dummy(expr);
+    if(expr != null) qf.value = new Dummy(expr, item);
     qc.focus = qf;
   }
 
   /**
    * Assigns a new dummy item to the query focus.
    * @param expr focus expression
+   * @param item focus single item
    */
-  public void updateFocus(final Expr expr) {
-    qc.focus.value = dummy(expr);
+  public void updateFocus(final Expr expr, final boolean item) {
+    qc.focus.value = new Dummy(expr, item);
   }
 
   /**
    * Evaluates a function within the focus of the supplied expression.
    * @param expr focus expression (can be {@code null})
+   * @param item focus single item
    * @param func function to evaluate
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public Expr get(final Expr expr, final QuerySupplier<Expr> func) throws QueryException {
-    pushFocus(expr);
+  public Expr get(final Expr expr, final boolean item, final QuerySupplier<Expr> func)
+      throws QueryException {
+    pushFocus(expr, item);
     try {
       return func.get();
     } finally {
@@ -192,26 +197,19 @@ public final class CompileContext {
   /**
    * Evaluates a function within the focus of the supplied expression.
    * @param expr focus expression (can be {@code null})
+   * @param item focus single item
    * @param func function to evaluate
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean ok(final Expr expr, final QuerySupplier<Boolean> func) throws QueryException {
-    pushFocus(expr);
+  public boolean ok(final Expr expr, final boolean item, final QuerySupplier<Boolean> func)
+      throws QueryException {
+    pushFocus(expr, item);
     try {
       return func.get();
     } finally {
       removeFocus();
     }
-  }
-
-  /**
-   * Returns a dummy item, based on the type of the specified expression and the current context.
-   * @param expr expression
-   * @return dummy item
-   */
-  private Item dummy(final Expr expr) {
-    return new Dummy(expr.seqType().with(Occ.EXACTLY_ONE), expr.data());
   }
 
   /**
@@ -238,14 +236,6 @@ public final class CompileContext {
   }
 
   /**
-   * Returns the current static context.
-   * @return static context
-   */
-  public StaticContext sc() {
-    return vs().sc;
-  }
-
-  /**
    * Creates a new copy of the given variable in this scope.
    * @param var variable to copy (can be {@code null})
    * @param vm variable mapping (can be {@code null})
@@ -254,7 +244,7 @@ public final class CompileContext {
   public Var copy(final Var var, final IntObjMap<Var> vm) {
     if(var == null) return null;
     final VarScope vs = vs();
-    final Var vr = vs.add(new Var(var, qc, vs.sc));
+    final Var vr = vs.add(new Var(var, qc));
     if(vm != null) vm.put(var.id, vr);
     return vr;
   }
@@ -284,7 +274,7 @@ public final class CompileContext {
    * @param expr original expression
    * @param result resulting expression
    * @param mode mode of simplification
-   * @return optimized expression
+   * @return simplified or original expression
    * @throws QueryException query exception
    */
   public Expr simplify(final Expr expr, final Expr result, final Simplify mode)
@@ -337,7 +327,7 @@ public final class CompileContext {
    * @return function
    */
   public StandardFunc error(final QueryException qe, final Expr expr) {
-    return FnError.get(qe, expr.seqType(), sc());
+    return FnError.get(qe, expr.seqType());
   }
 
   /**
@@ -367,7 +357,7 @@ public final class CompileContext {
    */
   public Expr function(final AFunction function, final InputInfo info, final Expr... exprs)
       throws QueryException {
-    return function.get(sc(), info, exprs).optimize(this);
+    return function.get(info, exprs).optimize(this);
   }
 
   /**
@@ -381,8 +371,8 @@ public final class CompileContext {
   public Expr voidAndReturn(final Expr expr, final Expr result, final InputInfo info)
       throws QueryException {
     // a nondeterministic expression may get deterministic when optimizing the query
-    return expr.has(Flag.NDT) ?
-      List.get(this, info, function(Function.VOID, info, expr, Bln.TRUE), result) : result;
+    return expr.has(Flag.NDT) ? List.get(this, info, function(Function.VOID, info, expr), result) :
+      result;
   }
 
   /**
@@ -401,28 +391,54 @@ public final class CompileContext {
   }
 
   /**
-   * Returns an expression list for unrolling an expression.
+   * Returns an unrolled expression list.
    * @param expr expression to analyze
-   * @param items unroll lists only if all its expressions yield items the number of which
-   *   do not exceed limit
+   * @param single unroll expressions and medium-size lists that yield single items
    * @return expression list or {@code null}
    */
-  public ExprList unroll(final Expr expr, final boolean items) {
+  public ExprList unroll(final Expr expr, final boolean single) {
+    final Consumer<ExprList> add;
     final long size = expr.size(), limit = qc.context.options.get(MainOptions.UNROLLLIMIT);
-    final boolean value = expr instanceof Seq && size <= limit;
-    final boolean list = expr instanceof List && (
-        items ? size <= limit && ((Checks<Expr>) ex -> ex.seqType().one()).all(expr.args())
-              : expr.args().length <= limit
-    );
-    if(!(value || list)) return null;
+    if(single && size == 1) {
+      // expression yielding single item: <a/>
+      add = exprs -> exprs.add(expr);
+    } else if(expr instanceof Seq && size <= limit) {
+      // sequence: 'a', 'b', 'c'
+      add = exprs -> { for(final Item item : (Seq) expr) exprs.add(item); };
+    } else if(expr instanceof List && (single ?
+        size <= limit && ((Checks<Expr>) ex -> ex.seqType().one()).all(expr.args()) :
+        expr.args().length <= limit)) {
+      // list: <a/>, <b/>
+      add = exprs -> { for(final Expr ex : expr.args()) exprs.add(ex); };
+    } else {
+      return null;
+    }
 
     info(QueryText.OPTUNROLL_X, expr);
-    final ExprList exprs = new ExprList((int) size);
-    if(value) {
-      for(final Item item : (Value) expr) exprs.add(item);
-    } else {
-      for(final Expr arg : expr.args()) exprs.add(arg);
-    }
+    final ExprList exprs = new ExprList();
+    add.accept(exprs);
     return exprs;
+  }
+
+  /**
+   * Checks if all specified expressions are values (possibly of small size).
+   * @param limit check if result size of any expression exceeds {@link #MAX_PREEVAL}
+   * @param exprs expressions
+   * @return result of check
+   */
+  public boolean values(final boolean limit, final Expr... exprs) {
+    for(final Expr expr : exprs) {
+      if(!(expr instanceof Value) || limit && largeResult(expr)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if an expression yields a large result.
+   * @param expr expression
+   * @return result of check
+   */
+  public boolean largeResult(final Expr expr) {
+    return expr.size() > MAX_PREEVAL;
   }
 }

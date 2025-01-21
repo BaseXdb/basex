@@ -17,7 +17,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the correctness of the item types of the client API.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class XdmInfoTest extends SandboxTest {
@@ -80,7 +80,7 @@ public final class XdmInfoTest extends SandboxTest {
   /**
    * Extends the client session.
    */
-  private static class TestSession extends ClientSession {
+  private static final class TestSession extends ClientSession {
     /**
      * Constructor.
      * @param host host name
@@ -121,7 +121,7 @@ public final class XdmInfoTest extends SandboxTest {
   /**
    * Extends the client session.
    */
-  private static class TestQuery extends ClientQuery {
+  private static final class TestQuery extends ClientQuery {
     /**
      * Constructor.
      * @param q query string

@@ -8,7 +8,7 @@ import org.basex.query.value.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class WebResponseHeader extends WebFn {
@@ -16,7 +16,7 @@ public final class WebResponseHeader extends WebFn {
   public Value value(final QueryContext qc) throws QueryException {
     final HashMap<String, String> output = toOptions(arg(0), qc);
     final HashMap<String, String> headers = toOptions(arg(1), qc);
-    final ResponseOptions response = toOptions(arg(2), new ResponseOptions(), true, qc);
+    final ResponseOptions response = toOptions(arg(2), new ResponseOptions(), qc);
 
     return createResponse(response, headers, output);
   }

@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Static variable to which an expression can be assigned.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class StaticVar extends StaticDecl {
@@ -44,7 +44,6 @@ public final class StaticVar extends StaticDecl {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     if(expr == null) throw VAREMPTY_X.get(info, name());
-    if(dontEnter) throw CIRCVAR_X.get(info, name());
     if(!compiled) {
       compiled = dontEnter = true;
 
@@ -58,8 +57,8 @@ public final class StaticVar extends StaticDecl {
       } finally {
         cc.removeScope(this);
         cc.qc.focus = focus;
+        dontEnter = false;
       }
-      dontEnter = false;
 
       // dynamic compilation, eager evaluation: pre-evaluate expressions
       if(expr instanceof Value || cc.dynamic && !lazy) {
@@ -106,12 +105,13 @@ public final class StaticVar extends StaticDecl {
    * Binds an external value and casts it to the declared type (if specified).
    * @param val value to bind
    * @param qc query context
+   * @param cast cast flag, value will be coerced if false
    * @throws QueryException query exception
    */
-  void bind(final Value val, final QueryContext qc) throws QueryException {
+  void bind(final Value val, final QueryContext qc, final boolean cast) throws QueryException {
     if(external && !compiled) {
       value = declType == null || declType.instance(val) ? val :
-        declType.cast(val, true, qc, sc, info);
+        cast ? declType.cast(val, true, qc, info) : declType.coerce(val, name, qc, null, info);
       expr = value;
     }
   }
@@ -122,19 +122,11 @@ public final class StaticVar extends StaticDecl {
   }
 
   /**
-   * Returns a unique identifier for this variable.
-   * @return identifier
-   */
-  public byte[] id() {
-    return Token.concat(Token.DOLLAR, name.internal());
-  }
-
-  /**
    * Returns the name of the variable.
    * @return name
    */
-  private String name() {
-    return Strings.concat(Token.DOLLAR, name.string());
+  public String name() {
+    return Strings.concat(Token.cpToken('$'), name.string());
   }
 
   /**

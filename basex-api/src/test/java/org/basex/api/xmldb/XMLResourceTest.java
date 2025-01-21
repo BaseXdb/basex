@@ -18,7 +18,7 @@ import org.xmldb.api.modules.*;
 /**
  * This class tests the XMLDB/API XMLResource implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class XMLResourceTest extends XMLDBBaseTest {
@@ -97,7 +97,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
   @Test public void testGetContentAsDOM() throws Exception {
     final Node node = resource.getContentAsDOM();
     final String root = node.getChildNodes().item(0).getNodeName();
-    assertTrue(node instanceof Document, "Document instance expected.");
+    assertInstanceOf(Document.class, node, "Document instance expected.");
     assertEquals(root, "first", "Wrong root tag.");
   }
 
@@ -122,7 +122,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     assertEquals(2, collection.getResourceCount(), "Wrong number of documents.");
 
     // compare content type
-    assertTrue(xml.getContent() instanceof Document, "Document expected.");
+    assertInstanceOf(Document.class, xml.getContent(), "Document expected.");
   }
 
   /**

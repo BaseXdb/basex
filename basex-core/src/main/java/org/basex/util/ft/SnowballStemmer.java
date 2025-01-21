@@ -12,7 +12,7 @@ import org.basex.util.*;
  * The Snowball stemmers were written by Dr Martin Porter and Richard Boulton
  * and is based on the BSD License: {@code http://snowball.tartarus.org/}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 final class SnowballStemmer extends Stemmer {
@@ -35,7 +35,7 @@ final class SnowballStemmer extends Stemmer {
         final Method m2 = Reflect.method(clz, "stem");
         final Method m3 = Reflect.method(clz, "getCurrent");
         if(m1 == null || m2 == null || m3 == null) {
-          Util.debug("Could not initialize \"%\" Snowball stemmer.", l);
+          Util.debugln("Could not initialize \"%\" Snowball stemmer.", l);
         } else {
           CLASSES.put(l, new StemmerClass(clz, m1, m2, m3));
         }
@@ -96,7 +96,7 @@ final class SnowballStemmer extends Stemmer {
   }
 
   /** Structure, containing stemming methods. */
-  private static class StemmerClass {
+  private static final class StemmerClass {
     /** Class implementing the stemmer. */
     final Class<?> clz;
     /** Method {@code setCurrent}. */

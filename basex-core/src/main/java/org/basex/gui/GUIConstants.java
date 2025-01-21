@@ -46,7 +46,7 @@ import org.basex.util.list.*;
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class GUIConstants {
@@ -88,10 +88,10 @@ public final class GUIConstants {
   /** Toolbar entries, containing the button commands. */
   static final GUIMenuCmd[] TOOLBAR = {
     C_CREATE, C_OPEN_MANAGE, C_PROPERTIES, C_CLOSE, null,
-    C_SHOW_EDITOR, C_SHOW_RESULT, C_SHOW_INFO, null,
+    C_SHOW_EDITOR, C_SHOW_RESULT, C_INDENT_RESULT, C_SHOW_INFO, null,
     C_SHOW_MAP, C_SHOW_TREE, C_SHOW_FOLDER, C_SHOW_PLOT, C_SHOW_TABLE, C_SHOW_EXPLORE, null,
     C_GO_HOME, C_GO_BACK, C_GO_UP, C_GO_FORWARD, C_FILTER_NODES, null,
-    C_INDENT_RESULT, C_PREFERENCES
+    C_PREFERENCES
   };
 
   // MENUBARS =====================================================================================
@@ -111,10 +111,10 @@ public final class GUIConstants {
   }, {
     C_EDIT_NEW, C_EDIT_OPEN, C_EDIT_REOPEN, C_EDIT_SAVE, C_EDIT_SAVE_AS, C_EDIT_CLOSE,
     C_EDIT_CLOSE_ALL, SEPARATOR,
+    C_GO, C_INDENT_RESULT, C_EXTERNAL_VARIABLES, SEPARATOR,
     C_FORMAT, C_COMMENT, C_SORT, SEPARATOR,
     C_LOWER_CASE, C_UPPER_CASE, C_TITLE_CASE, SEPARATOR,
-    C_JUMP_TO_BRACKET, C_JUMP_TO_FILE, C_NEXT_ERROR, SEPARATOR,
-    C_INDENT_RESULT, C_EXTERNAL_VARIABLES
+    C_JUMP_TO_BRACKET, C_JUMP_TO_FILE, C_NEXT_ERROR, SEPARATOR
   }, {
     C_SHOW_EDITOR, C_SHOW_PROJECT, C_FIND_CONTENTS, SEPARATOR,
     C_SHOW_RESULT, C_SHOW_INFO, SEPARATOR,

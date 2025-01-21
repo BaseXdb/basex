@@ -17,15 +17,15 @@ import org.basex.util.hash.*;
 /**
  * A named function literal.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class FuncLit extends Single implements Scope {
+public final class FuncLit extends Single implements Scope, XQFunctionExpr {
   /** Variable scope. */
   private final VarScope vs;
   /** Function name. */
   private final QNm name;
-  /** Formal parameters. */
+  /** Parameters. */
   private final Var[] params;
   /** Annotations. */
   private final AnnList anns;
@@ -34,7 +34,7 @@ public final class FuncLit extends Single implements Scope {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body
-   * @param params formal parameters
+   * @param params parameters
    * @param anns annotations
    * @param seqType sequence type
    * @param name function name
@@ -48,6 +48,36 @@ public final class FuncLit extends Single implements Scope {
     this.params = params;
     this.anns = anns;
     this.vs = vs;
+  }
+
+  @Override
+  public int arity() {
+    return params.length;
+  }
+
+  @Override
+  public QNm funcName() {
+    return name;
+  }
+
+  @Override
+  public QNm paramName(final int pos) {
+    return params[pos].name;
+  }
+
+  @Override
+  public AnnList annotations() {
+    return anns;
+  }
+
+  @Override
+  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
+    return null;
+  }
+
+  @Override
+  public boolean vacuousBody() {
+    return false;
   }
 
   @Override
@@ -76,13 +106,13 @@ public final class FuncLit extends Single implements Scope {
 
   @Override
   public FuncItem item(final QueryContext qc, final InputInfo ii) {
-    return new FuncItem(info, expr, params, anns, funcType(), vs.sc, vs.stackSize(),
-        name, qc.focus.copy());
+    return new FuncItem(info, expr, params, anns, funcType(), vs.stackSize(), name,
+        qc.focus.copy());
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final VarScope vsc = new VarScope(vs.sc);
+    final VarScope vsc = new VarScope();
     cc.pushScope(vsc);
     try {
       final int pl = params.length;
@@ -95,7 +125,7 @@ public final class FuncLit extends Single implements Scope {
     }
   }
 
-    @Override
+  @Override
   public boolean visit(final ASTVisitor visitor) {
     for(final Var var : params) {
       if(!visitor.declared(var)) return false;
@@ -121,6 +151,6 @@ public final class FuncLit extends Single implements Scope {
   @Override
   public void toString(final QueryString qs) {
     qs.token(anns).concat("(: ", name.prefixId(), "#", params.length, " :)");
-    qs.token(FUNCTION).params(params).token(AS).token(funcType().declType).brace(expr);
+    qs.token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
   }
 }

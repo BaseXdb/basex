@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Sequence of items of type {@link Int xs:decimal}, containing at least two of them.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DecSeq extends NativeSeq {
@@ -98,8 +98,8 @@ public final class DecSeq extends NativeSeq {
    * @return value
    * @throws QueryException query exception
    */
-  static Value get(final int size, final Value... values) throws QueryException {
-    final BigDecimal[] tmp = new BigDecimal[size];
+  public static Value get(final long size, final Value... values) throws QueryException {
+    final BigDecimal[] tmp = new BigDecimal[Array.checkCapacity(size)];
     int t = 0;
     for(final Value value : values) {
       // speed up construction, depending on input

@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
 /**
  * Range expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Range extends Arr {
@@ -45,7 +45,7 @@ public final class Range extends Arr {
 
     Expr expr = emptyExpr();
     if(expr == this) {
-      if(allAreValues(false)) return cc.preEval(this);
+      if(values(false, cc)) return cc.preEval(this);
 
       final Expr min = exprs[0], max = exprs[1];
       final SeqType st1 = min.seqType(), st2 = max.seqType();
@@ -99,12 +99,14 @@ public final class Range extends Arr {
         if(mn > LAST || mx < 1) return Bln.FALSE;
         if(mn < 1) minMax[0] = Int.ONE;
         if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
+        if(mn < LAST && mx >= LAST) minMax[1] = Int.MAX;
         break;
       case NE:
         if(mn <= 1 && mx >= LAST) return Bln.FALSE;
         if(results && (mn > LAST || mx < 1)) return Bln.TRUE;
         if(mn < 1) minMax[0] = Int.ONE;
         if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
+        if(mn < LAST && mx >= LAST) minMax[1] = Int.MAX;
         break;
       case LE:
         if(mx < 1) return Bln.FALSE;

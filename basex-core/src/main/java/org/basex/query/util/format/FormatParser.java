@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Format parser for integers and dates.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class FormatParser extends FormatUtil {
@@ -30,7 +30,7 @@ abstract class FormatParser extends FormatUtil {
     CARDINAL,
     /** Numbering. */
     NUMBERING
-  };
+  }
   /** Type of numeral. */
   NumeralType numType = NumeralType.NUMBERING;
   /** Format modifier; {@code null} if not specified. */
@@ -66,20 +66,20 @@ abstract class FormatParser extends FormatUtil {
 
     // find primary format
     final TokenParser tp = new TokenParser(pic);
-    int ch = tp.next();
+    int cp = tp.next();
     // check single character
     if(tp.more()) {
       // Word output (title case)
-      if(ch == 'W' && tp.consume('w')) return pic;
+      if(cp == 'W' && tp.consume('w')) return pic;
       // Textual output (title case)
-      if(date && ch == 'N' && tp.consume('n')) return pic;
+      if(date && cp == 'N' && tp.consume('n')) return pic;
     } else if(
-      sequence(ch) != null || // Latin, Greek and other alphabets
-      ch == 'i' || ch == 'I' || // Roman sequences (lower/upper case)
-      ch == 'w' || ch == 'W' || // Word output (lower/upper case)
-      date && (ch == 'n' || ch == 'N') || // Textual output
-      ch == '\u2460' || ch == '\u2474' || ch == '\u2488' || // circled, parenthesized, full stop
-      ch == KANJI[1] // Japanese numbering
+      sequence(cp) != null || // Latin, Greek and other alphabets
+      cp == 'i' || cp == 'I' || // Roman sequences (lower/upper case)
+      cp == 'w' || cp == 'W' || // Word output (lower/upper case)
+      date && (cp == 'n' || cp == 'N') || // Textual output
+      cp == '\u2460' || cp == '\u2474' || cp == '\u2488' || // circled, parenthesized, full stop
+      cp == KANJI[1] // Japanese numbering
     ) {
       return pic;
     }
@@ -96,20 +96,20 @@ abstract class FormatParser extends FormatUtil {
     boolean mds = false;
     boolean ods = false;
     while(tp.more()) {
-      ch = tp.next();
-      final int d = zeroes(ch);
+      cp = tp.next();
+      final int d = zeroes(cp);
       if(d != -1) {
         // mandatory-digit-sign
         if(ods && frac) throw OPTBEFORE_X.get(info, pic);
         if(first != d) throw DIFFMAND_X.get(info, pic);
         mds = true;
         gss = false;
-      } else if(ch == '#') {
+      } else if(cp == '#') {
         // optional-digit-sign
         if(mds && !frac) throw OPTAFTER_X.get(info, pic);
         ods = true;
         gss = false;
-      } else if(!Character.isLetter(ch)) {
+      } else if(!Character.isLetter(cp)) {
         // grouping-separator-sign
         if(gss) throw INVGROUP_X.get(info, pic);
         gss = true;

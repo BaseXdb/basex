@@ -15,7 +15,7 @@ import org.basex.query.value.item.*;
 /**
  * Document and collection functions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Docs extends DynamicFn {
@@ -29,7 +29,7 @@ public abstract class Docs extends DynamicFn {
    */
   QueryInput queryInput(final byte[] uri) {
     return queryInput != null ? queryInput :
-      Uri.get(uri).isValid() ? new QueryInput(string(uri), sc) : null;
+      Uri.get(uri).isValid() ? new QueryInput(string(uri), sc()) : null;
   }
 
   @Override
@@ -50,7 +50,7 @@ public abstract class Docs extends DynamicFn {
   public final boolean accept(final ASTVisitor visitor) {
     return visitor.lock(() -> {
       final ArrayList<String> list = new ArrayList<>(1);
-      if(sc.withdb) {
+      if(sc().withdb) {
         // lock default collection (only collection functions can have 0 arguments)
         if(defined(0)) {
           // check if input argument is a static string

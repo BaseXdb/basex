@@ -5,7 +5,7 @@ import org.basex.util.options.*;
 /**
  * Full-text units.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum FTUnit {
@@ -19,6 +19,6 @@ public enum FTUnit {
    */
   @Override
   public String toString() {
-    return EnumOption.string(name());
+    return EnumOption.string(this);
   }
 }

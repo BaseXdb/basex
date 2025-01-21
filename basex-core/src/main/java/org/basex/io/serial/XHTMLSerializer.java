@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * This class serializes items as XHTML.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class XHTMLSerializer extends MarkupSerializer {
@@ -31,8 +31,9 @@ final class XHTMLSerializer extends MarkupSerializer {
       throws IOException {
 
     // escape URI attributes
-    final byte[] nm = concat(lc(elem.local()), COLON, lc(name));
-    final byte[] val = escuri && HTMLSerializer.URIS.contains(nm) ? escape(value) : value;
+    final byte[] nm = concat(lc(elem.local()), cpToken(':'), lc(name));
+    final byte[] val = escape && HTMLSerializer.URIS.contains(nm) ?
+      encodeUri(value, UriEncoder.ESCAPE) : value;
     super.attribute(name, val, standalone);
   }
 
@@ -92,8 +93,7 @@ final class XHTMLSerializer extends MarkupSerializer {
    * @return {@code true} if the element is contained in the token set
    */
   private boolean contains(final TokenSet elements, final QNm element) {
-    final byte[] uri = element.uri(), local = element.local();
-    return eq(uri, XHTML_URI) && elements.contains(local) ||
-        html5 && eq(uri, EMPTY) && elements.contains(lc(local));
+    return eq(element.uri(), html5 ? EMPTY : XHTML_URI) &&
+        elements.contains(html5 ? lc(element.local()) : element.local());
   }
 }

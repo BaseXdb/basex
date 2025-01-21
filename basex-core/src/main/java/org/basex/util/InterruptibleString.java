@@ -7,11 +7,11 @@ import org.basex.core.jobs.*;
  * Interruptible string implementation.
  * Inspired by https://stackoverflow.com/questions/910740/cancelling-a-long-running-regex-match
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author gojomo
  */
-public class InterruptibleString implements CharSequence {
+public final class InterruptibleString implements CharSequence {
   /** String. */
   private final String string;
 

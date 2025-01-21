@@ -21,7 +21,7 @@ import org.basex.index.resource.*;
  * Combination of a JTree and a text field. The tree visualizes the database contents.
  * The search field allows to quickly access specific resources.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
 final class DialogResources extends BaseXBack {
@@ -165,7 +165,7 @@ final class DialogResources extends BaseXBack {
    */
   private void filter() {
     final byte[] filterPath = ResourceNode.preparePath(token(filterText.getText()));
-    if(eq(filterPath, SLASH)) {
+    if(eq(filterPath, cpToken('/'))) {
       refreshFolder(root);
       return;
     }
@@ -229,7 +229,7 @@ final class DialogResources extends BaseXBack {
 
   /**
    * Custom tree cell renderer to distinguish between resource types.
-   * @author BaseX Team 2005-24, BSD License
+   * @author BaseX Team, BSD License
    * @author Lukas Kircher
    */
   private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {

@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -13,7 +14,7 @@ import org.basex.util.*;
  * Abstract super class for all numeric items.
  * Useful for removing exceptions and unifying hash values.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public abstract class ANum extends Item {
@@ -48,13 +49,13 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
+  public final boolean atomicEqual(final Item item) throws QueryException {
     if(item instanceof ANum) {
-      final double d1 = dbl(ii), d2 = item.dbl(ii);
+      final double d1 = dbl(), d2 = item.dbl(null);
       final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
       if(n1 || n2) return n1 == n2;
       if(Double.isInfinite(d1) || Double.isInfinite(d2)) return d1 == d2;
-      return dec(ii).compareTo(item.dec(ii)) == 0;
+      return dec(null).compareTo(item.dec(null)) == 0;
     }
     return false;
   }
@@ -103,11 +104,11 @@ public abstract class ANum extends Item {
 
   /**
    * Returns a rounded value.
-   * @param scale scale
-   * @param even half-to-even flag
+   * @param prec precision
+   * @param mode rounding mode
    * @return rounded value
    */
-  public abstract ANum round(int scale, boolean even);
+  public abstract ANum round(int prec, RoundMode mode);
 
   @Override
   public final boolean comparable(final Item item) {
@@ -115,19 +116,22 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    return predicate ? dbl() == qc.focus.pos : bool(ii);
+    return pos > 0 ? dbl() == pos : bool(ii);
   }
 
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    // predicate: E[0]  ->  E[false()]
-    // EBV: if(0)  ->  if(false())
+    Expr expr = this;
     final double d = dbl();
-    return cc.simplify(this, mode == Simplify.PREDICATE && (d != itr() || d < 1) ||
-        mode == Simplify.EBV && d == 0 ? Bln.FALSE : this, mode);
+    if(mode == Simplify.PREDICATE && (d != itr() || d < 1) || mode == Simplify.EBV && d == 0) {
+      // predicate: E[0]  ->  E[false()]
+      // EBV: if(0)  ->  if(false())
+      expr = Bln.FALSE;
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   @Override
@@ -148,18 +152,12 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final int hash(final InputInfo ii) {
-    // makes sure the hashing is good for very small and very big numbers
+  public int hashCode() {
+    // equal values for different numeric types must return identical hash values!
     final long l = itr();
-    final float f = flt(ii);
-
-    // extract fractional part from a finite float
-    final int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY ||
-        isNaN(f) ? 0 : floatToIntBits(f - l);
-
-    int h = frac ^ (int) (l ^ l >>> 32);
-
-    // this part ensures better distribution of bits (from java.util.HashMap)
+    final float f = flt();
+    // extract fractional part from a finite float; distribute bits to improve hashing
+    int h = floatToRawIntBits(f - l) ^ (int) (l ^ l >>> 32);
     h ^= h >>> 20 ^ h >>> 12;
     return h ^ h >>> 7 ^ h >>> 4;
   }

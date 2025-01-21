@@ -15,7 +15,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Job Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JobModuleTest extends SandboxTest {
@@ -188,6 +188,17 @@ public final class JobModuleTest extends SandboxTest {
     // find log entry
     final String date = DateTime.format(new Date(), DateTime.DATE);
     query(_ADMIN_LOGS.args(date) + " = '" + uuid + "'", true);
+  }
+
+  /** Executes a job. */
+  @Test public void execute() {
+    final Function func = _JOB_EXECUTE;
+
+    query(func.args("()"), "");
+    query(func.args("1 + 2"), 3);
+    query(func.args("(1 to 1000)[. = 0]"), "");
+    query(func.args("(1 to 1000)[. = 1]"), 1);
+    error(func.args("1 + ''"), NONUMBER_X_X);
   }
 
   /** Test method. */

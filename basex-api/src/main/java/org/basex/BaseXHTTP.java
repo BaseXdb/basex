@@ -11,19 +11,20 @@ import java.util.function.*;
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.io.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.log.*;
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.gzip.*;
 import org.eclipse.jetty.util.resource.*;
 import org.eclipse.jetty.webapp.*;
+import org.eclipse.jetty.websocket.server.config.*;
 import org.eclipse.jetty.xml.*;
 
 /**
  * This is the main class for the starting the database HTTP services.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Dirk Kirsten
  */
@@ -71,7 +72,7 @@ public final class BaseXHTTP extends CLI {
     // context must be initialized after parsing of arguments
     soptions = new StaticOptions(true);
 
-    if(!quiet) Util.outln(header());
+    if(!quiet) Util.println(header());
 
     hc = HTTPContext.get();
     hc.init(soptions);
@@ -93,6 +94,7 @@ public final class BaseXHTTP extends CLI {
     } else {
       jetty.setHandler(wac);
     }
+    JettyWebSocketServletContainerInitializer.configure(wac, null);
 
     ServerConnector sc = null;
     for(final Connector conn : jetty.getConnectors()) {
@@ -107,10 +109,10 @@ public final class BaseXHTTP extends CLI {
     final Function<Boolean, String> msg2 = start -> Util.info(HTTP + ' ' + msg1.apply(start), port);
     // output user info, keep message visible for a while
     final Consumer<Boolean> info = start -> {
-      Util.outln(msg2.apply(start));
+      Util.println(msg2.apply(start));
       if(!soptions.get(StaticOptions.HTTPLOCAL)) {
         final int serverPort = soptions.get(StaticOptions.SERVERPORT);
-        Util.outln(msg1.apply(start), serverPort);
+        Util.println(msg1.apply(start), serverPort);
       }
       Performance.sleep(1000);
     };
@@ -153,13 +155,13 @@ public final class BaseXHTTP extends CLI {
     // otherwise, it may only be called if the JVM process is already shut down
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       final String message = msg2.apply(false);
-      if(!quiet) Util.outln(message);
+      if(!quiet) Util.println(message);
       context.log.writeServer(LogType.OK, message);
       context.close();
     }));
 
     // show start message
-    if(!quiet) Util.outln(msg2.apply(true));
+    if(!quiet) Util.println(msg2.apply(true));
 
     // log server start at very end (logging flag could have been updated by web.xml)
     context.log.writeServer(LogType.OK, msg2.apply(true));
@@ -284,7 +286,7 @@ public final class BaseXHTTP extends CLI {
             Prop.put(StaticOptions.USER, arg.string());
             break;
           case 'z': // suppress logging
-            Prop.put(StaticOptions.LOG, Boolean.toString(false));
+            Prop.put(StaticOptions.LOG, "");
             break;
           default:
             throw arg.usage();
@@ -373,11 +375,11 @@ public final class BaseXHTTP extends CLI {
     public void run() {
       try {
         while(true) {
-          Util.outln(HTTP + " STOP " + SRV_STARTED_PORT_X, stopPort);
+          Util.println(HTTP + " STOP " + SRV_STARTED_PORT_X, stopPort);
           try(Socket s = socket.accept()) { /* no action */ }
           if(stopFile.exists()) {
             socket.close();
-            Util.outln(HTTP + " STOP " + SRV_STOPPED_PORT_X, stopPort);
+            Util.println(HTTP + " STOP " + SRV_STOPPED_PORT_X, stopPort);
             jetty.stop();
             hc.close();
             Prop.clear();

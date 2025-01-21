@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * Dynamic function call.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class DynFuncCall extends FuncCall {
@@ -30,34 +30,29 @@ public final class DynFuncCall extends FuncCall {
   private final boolean updating;
   /** Nondeterministic flag. */
   private boolean ndt;
-  /** Hash values of all function items that this call was copied from, possibly {@code null}. */
-  private int[] inlinedFrom;
 
   /**
    * Function constructor.
    * @param info input info (can be {@code null})
-   * @param sc static context
    * @param expr function expression
    * @param args arguments
    */
-  public DynFuncCall(final InputInfo info, final StaticContext sc, final Expr expr,
-      final Expr... args) {
-    this(info, sc, false, false, expr, args);
+  public DynFuncCall(final InputInfo info, final Expr expr, final Expr... args) {
+    this(info, false, false, expr, args);
   }
 
   /**
    * Function constructor.
    * @param info input info (can be {@code null})
-   * @param sc static context
    * @param updating updating flag
    * @param ndt nondeterministic flag
    * @param expr function expression
    * @param args arguments
    */
-  public DynFuncCall(final InputInfo info, final StaticContext sc, final boolean updating,
-      final boolean ndt, final Expr expr, final Expr... args) {
+  public DynFuncCall(final InputInfo info, final boolean updating, final boolean ndt,
+      final Expr expr, final Expr... args) {
 
-    super(info, sc, ExprList.concat(args, expr));
+    super(info, ExprList.concat(args, expr));
     this.updating = updating;
     this.ndt = ndt;
   }
@@ -79,27 +74,31 @@ public final class DynFuncCall extends FuncCall {
         final int arity = ft.argTypes.length;
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
       }
-      if(!sc.mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
+      if(!sc().mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
-      final SeqType dt = ft.declType;
-      exprType.assign(ft instanceof MapType ? dt.union(Occ.ZERO) : dt);
+      exprType.assign(ft.declType);
     }
 
-    if(func instanceof XQData) {
+    if(func instanceof XQStruct) {
       // lookup key must be atomic
       if(nargs == 1) arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
       // pre-evaluation is safe as maps and arrays contain values
-      if(allAreValues(false)) return cc.preEval(this);
+      if(values(false, cc)) return cc.preEval(this);
     }
 
+    // try to inline the function; avoid recursive inlining
     if(func instanceof XQFunctionExpr) {
-      // try to inline the function
-      if(!(func instanceof FuncItem && comesFrom((FuncItem) func))) {
-        final XQFunctionExpr fe = (XQFunctionExpr) func;
-        checkUp(fe, updating, sc);
-        final Expr inlined = fe.inline(Arrays.copyOf(exprs, nargs), cc);
-        if(inlined != null) return inlined;
+      final XQFunctionExpr fe = (XQFunctionExpr) func;
+      if(!cc.inlined.contains(fe)) {
+        checkUp(fe, updating);
+        cc.inlined.push(fe);
+        try {
+          final Expr inlined = fe.inline(Arrays.copyOf(exprs, nargs), cc);
+          if(inlined != null) return inlined;
+        } finally {
+          cc.inlined.pop();
+        }
       }
     } else if(func instanceof Value) {
       // raise error (values tested at this stage are no functions)
@@ -116,31 +115,6 @@ public final class DynFuncCall extends FuncCall {
   }
 
   /**
-   * Marks this call after it was inlined from the given function item.
-   * @param item the function item
-   */
-  public void markInlined(final FuncItem item) {
-    final int hash = item.hashCode();
-    inlinedFrom = inlinedFrom == null ? new int[] { hash } :
-      org.basex.util.Array.add(inlinedFrom, hash);
-  }
-
-  /**
-   * Checks if this call was inlined from the body of the given function item.
-   * @param item function item
-   * @return result of check
-   */
-  private boolean comesFrom(final FuncItem item) {
-    if(inlinedFrom != null) {
-      final int hash = item.hashCode();
-      for(final int h : inlinedFrom) {
-        if(hash == h) return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Returns the function body expression.
    * @return body
    */
@@ -153,14 +127,7 @@ public final class DynFuncCall extends FuncCall {
     final Expr[] copy = copyAll(cc, vm, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
-    final DynFuncCall call = new DynFuncCall(info, sc, updating, ndt, copy[last], args);
-    if(inlinedFrom != null) call.inlinedFrom = inlinedFrom.clone();
-    return copyType(call);
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return visitor.dynFuncCall(this) && visitAll(visitor, exprs);
+    return copyType(new DynFuncCall(info, updating, ndt, copy[last], args));
   }
 
   @Override
@@ -168,7 +135,7 @@ public final class DynFuncCall extends FuncCall {
     final Item item = body().item(qc, info);
     if(!(item instanceof FItem)) throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
 
-    final FItem func = checkUp((FItem) item, updating, sc);
+    final FItem func = checkUp((FItem) item, updating);
     final int nargs = exprs.length - 1, arity = func.arity();
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
     return func;
@@ -176,10 +143,9 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag... flags) {
-    final boolean upd = updating || sc.mixUpdates;
-    if(Flag.UPD.in(flags) && upd) return true;
-    if(Flag.NDT.in(flags) && (ndt || upd)) return true;
-    final Flag[] flgs = Flag.NDT.remove(Flag.UPD.remove(flags));
+    if(Flag.UPD.oneOf(flags) && (updating || sc().mixUpdates)) return true;
+    if(Flag.NDT.oneOf(flags) && (ndt || updating || sc().mixUpdates)) return true;
+    final Flag[] flgs = Flag.remove(flags, Flag.NDT, Flag.UPD);
     return flgs.length != 0 && super.has(flgs);
   }
 

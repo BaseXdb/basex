@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * Wrapper for evaluating XQuery expressions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class XQuery implements Iterable<XdmItem>, Closeable {
@@ -87,7 +87,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
    */
   public XQuery decimalFormat(final QName name, final DecFormatOptions format) {
     try {
-      qp.sc.decFormats.put(new QNm(name).internal(), new DecFormatter(format, null));
+      qp.sc.decFormats.put(new QNm(name).unique(), new DecFormatter(format, null));
       return this;
     } catch(final QueryException ex) {
       throw new XQueryException(ex);

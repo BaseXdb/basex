@@ -7,12 +7,12 @@
   <parent>
     <groupId>org.basex</groupId>
     <artifactId>basex-parent</artifactId>
-    <version>11.0-SNAPSHOT</version>
+    <version>11.7-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
 
   <properties>
-    <jettyVersion>9.4.53.v20231009</jettyVersion>
+    <jettyVersion>11.0.24</jettyVersion>
   </properties>
 
   <name>BaseX API</name>
@@ -49,15 +49,11 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-server</artifactId>
+      <artifactId>websocket-jetty-server</artifactId>
     </dependency>
     <dependency>
       <groupId>com.ettrema</groupId>
       <artifactId>milton-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-fileupload</groupId>
-      <artifactId>commons-fileupload</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -75,9 +71,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <useIncrementalCompilation>false</useIncrementalCompilation>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -108,7 +101,7 @@
         <artifactId>jetty-maven-plugin</artifactId>
         <version>${jettyVersion}</version>
         <configuration>
-          <jettyXml>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXml>
+          <jettyXmls>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXmls>
           <stopKey>keyToStopJetty</stopKey>
           <stopPort>8081</stopPort>
           <supportedPackagings>

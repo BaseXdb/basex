@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Project file cache.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class ProjectFiles {
@@ -75,7 +75,7 @@ final class ProjectFiles {
 
     final long id = ++filterId;
     final StringList results = new StringList();
-    final int[] search = new TokenParser(Token.lc(Token.token(contents))).toArray();
+    final int[] search = contents.toLowerCase(Locale.ENGLISH).codePoints().toArray();
 
     // glob pattern
     final ProjectCache pc = cache(root);

@@ -8,10 +8,12 @@ import org.basex.util.list.*;
 /**
  * Stores an integer array of pre values and their corresponding weights.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Joerg Hauser
  */
-final class MapList extends IntList {
+final class MapList {
+  /** Pre values. */
+  final IntList pres;
   /** Weights array. */
   double[] weight;
 
@@ -19,6 +21,7 @@ final class MapList extends IntList {
    * Constructor.
    */
   MapList() {
+    pres = new IntList();
   }
 
   /**
@@ -26,13 +29,39 @@ final class MapList extends IntList {
    * @param v initial list values
    */
   MapList(final int[] v) {
-    super(v);
+    pres = new IntList(v);
   }
 
-  @Override
-  public MapList sort() {
-    sort(weight, false);
-    return this;
+  /**
+   * Returns the number of elements.
+   * @return number of elements
+   */
+  public int size() {
+    return pres.size();
+  }
+
+  /**
+   * Returns the specified pre value.
+   * @param index index
+   * @return pre value
+   */
+  public int get(final int index) {
+    return pres.get(index);
+  }
+
+  /**
+   * Adds a pre value.
+   * @param pre pre value to be added
+   */
+  public void add(final int pre) {
+    pres.add(pre);
+  }
+
+  /**
+   * Sorts the pre values.
+   */
+  public void sort() {
+    pres.sort(weight, false);
   }
 
   /**
@@ -44,29 +73,30 @@ final class MapList extends IntList {
    * @param w weight
    */
   void initWeights(final int[] textLen, final int nchildren, final Data data, final int w) {
+    final int size = size();
     weight = new double[size];
 
     // only children
     if(w == 0) {
       for(int i = 0; i < size; ++i) {
-        weight[i] = (double) ViewData.size(data, list[i]) / nchildren;
+        weight[i] = (double) ViewData.size(data, pres.get(i)) / nchildren;
       }
       return;
     }
 
     // summarize sizes
     final double sizeP = w / 100.0d;
-    long sum = 0;
+    double sum = 0;
     for(int i = 0; i < size; ++i) sum += weight(textLen, data, i);
 
-    // use #children and size for weight
     if(sizeP < 1) {
+      // use #children and size for weight
       for(int i = 0; i < size; ++i) {
         weight[i] = sizeP * weight(textLen, data, i) / sum +
-          (1 - sizeP) * ViewData.size(data, list[i]) / nchildren;
+          (1 - sizeP) * ViewData.size(data, pres.get(i)) / nchildren;
       }
-    // only sizes
     } else {
+      // only sizes
       for(int i = 0; i < size; ++i) {
         weight[i] = weight(textLen, data, i) / sum;
       }
@@ -83,9 +113,9 @@ final class MapList extends IntList {
   private double weight(final int[] textLen, final Data data, final int i) {
     final double d;
     if(textLen != null) {
-      d = textLen[list[i]];
+      d = textLen[pres.get(i)];
     } else {
-      final byte[] val = data.attValue(ViewData.sizeID(data), list[i]);
+      final byte[] val = data.attValue(ViewData.sizeID(data), pres.get(i));
       d = val != null ? Token.toLong(val) : 0;
     }
     return d > 1 ? d : 1;
@@ -94,9 +124,10 @@ final class MapList extends IntList {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(Util.className(this) + '[');
-    for(int i = 0; i < size; ++i) {
-      sb.append(i == 0 ? "" : ", ").append(list[i]);
-      if(weight != null) sb.append('/').append(weight[i]);
+    final int ps = size();
+    for(int p = 0; p < ps; ++p) {
+      sb.append(p == 0 ? "" : ", ").append(pres.get(p));
+      if(weight != null) sb.append('/').append(weight[p]);
     }
     return sb.append(']').toString();
   }

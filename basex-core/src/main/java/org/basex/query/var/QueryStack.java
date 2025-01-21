@@ -7,12 +7,12 @@ import org.basex.util.*;
 /**
  * The query stack, containing local variable bindings of all active scopes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class QueryStack {
   /** Initial stack size. */
-  private static final int INIT = 1 << 3;
+  private static final int INIT = 1 << 5;
   /** The currently assigned values. */
   private Value[] stack = new Value[INIT];
   /** The currently assigned variables. */
@@ -50,19 +50,28 @@ public final class QueryStack {
 
   /**
    * Exits a stack frame and makes all bound variables eligible for garbage collection.
-   * @param frame frame pointer of the underlying stack frame
+   * @param fp frame pointer of the underlying stack frame
    */
-  public void exitFrame(final int frame) {
+  public void exitFrame(final int fp) {
     final int s = start;
     final Value[] stck = stack;
     for(int en = end; --en >= s;) stck[en] = null;
     end = s;
-    start = frame;
+    start = fp;
 
     final int sl = stck.length;
     int len = sl;
     while(len > INIT && sl <= len >> 2) len >>= 1;
     if(len != sl) resize(len);
+  }
+
+  /**
+   * Checks if tail calls should be eliminated.
+   * @param size new frame size
+   * @return result of check
+   */
+  public boolean tco(final int size) {
+    return end + (size << 1) > INIT;
   }
 
   /**
@@ -108,7 +117,7 @@ public final class QueryStack {
    */
   public void set(final Var var, final Value value, final QueryContext qc) throws QueryException {
     final int pos = start + var.slot;
-    stack[pos] = var.checkType(value, qc, false);
+    stack[pos] = var.checkType(value, qc, null);
     vars[pos] = var;
   }
 

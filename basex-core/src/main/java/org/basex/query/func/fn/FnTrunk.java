@@ -14,10 +14,10 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnTrunk extends StandardFunc {
+public final class FnTrunk extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // retrieve and decrement iterator size

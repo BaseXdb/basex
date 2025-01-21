@@ -16,7 +16,7 @@ import org.basex.query.value.seq.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnReverse extends StandardFunc {
@@ -89,14 +89,13 @@ public final class FnReverse extends StandardFunc {
       final int al = args.length;
       final ExprList list = new ExprList(al);
       for(int a = al - 1; a >= 0; a--) list.add(cc.function(REVERSE, info, args[a]));
-      return List.get(cc, input.info(), list.finish());
+      return List.get(cc, input.info(info), list.finish());
     }
     // reverse(E[test])  ->  reverse(E)[test]
     if(input instanceof IterFilter) {
       final IterFilter filter = (IterFilter) input;
-      if(filter.root.size() != -1) {
-        return Filter.get(cc, info, cc.function(REVERSE, filter.info(), filter.root), filter.exprs);
-      }
+      if(filter.root.size() != -1) return Filter.get(cc, info,
+          cc.function(REVERSE, filter.info(info), filter.root), filter.exprs);
     }
 
     adoptType(input);
@@ -105,6 +104,11 @@ public final class FnReverse extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return cc.simplify(this, mode.oneOf(Simplify.DISTINCT, Simplify.COUNT) ? arg(0) : this, mode);
+    Expr expr = this;
+    if(mode.oneOf(Simplify.DISTINCT, Simplify.COUNT)) {
+      // count(reverse(A))  -> count(A)
+      expr = arg(0);
+    }
+    return cc.simplify(this, expr, mode);
   }
 }

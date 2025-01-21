@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * in some cases (e.g. when bulk insertions of new documents are performed). A tree structure could
  * be introduced to offer better general performance.</p>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Lukas Kircher
  */
@@ -233,7 +233,7 @@ final class Docs {
     byte[] exact = EMPTY, prefix = normalize(token(pth));
     if(!(pth.isEmpty() || Strings.endsWith(pth, '/'))) {
       exact = prefix;
-      prefix = concat(exact, SLASH);
+      prefix = concat(exact, cpToken('/'));
     }
 
     // relevant paths: exact hits and prefixes
@@ -247,7 +247,7 @@ final class Docs {
       if(!add) {
         add = startsWith(pt, prefix);
         if(add && dir) {
-          final int i = indexOf(pt, SLASH, prefix.length + 1);
+          final int i = indexOf(pt, cpToken('/'), prefix.length + 1);
           if(i != -1) add = set.add(substring(pt, prefix.length, i));
         }
       }
@@ -284,7 +284,7 @@ final class Docs {
    * @return path to a directory or not
    */
   synchronized boolean isDir(final String path) {
-    final byte[] prefix = concat(path, SLASH);
+    final byte[] prefix = concat(path, cpToken('/'));
     for(final byte[] pth : paths()) {
       if(startsWith(pth, prefix)) return true;
     }
@@ -305,7 +305,7 @@ final class Docs {
 
     // normalize root path
     byte[] root = token(pth);
-    if(root.length != 0) root = concat(root, SLASH);
+    if(root.length != 0) root = concat(root, cpToken('/'));
 
     final IntList docs = docs();
     final int ds = docs.size();
@@ -313,7 +313,7 @@ final class Docs {
       byte[] np = data.text(docs.get(d), true);
       if(startsWith(np, root)) {
         np = substring(np, root.length, np.length);
-        final int i = indexOf(np, SLASH);
+        final int i = indexOf(np, cpToken('/'));
         // no more slashes means this must be a leaf
         if(!dir && i == -1) map.put(np, ResourceType.XML);
         else if(dir && i >= 0) map.put(substring(np, 0, i), ResourceType.XML);
@@ -328,7 +328,7 @@ final class Docs {
    * @return canonical path
    */
   private static byte[] normalize(final byte[] path) {
-    return concat(SLASH, Prop.CASE ? path : lc(path));
+    return concat(cpToken('/'), Prop.CASE ? path : lc(path));
   }
 
   @Override

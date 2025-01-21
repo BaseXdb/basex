@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -32,7 +32,7 @@ public final class ArrayFlatten extends ArrayFn {
           if(next == null) {
             stack.pop();
           } else if(next instanceof XQArray) {
-            final Iterator<Value> members = ((XQArray) next).members().iterator();
+            final Iterator<Value> values = ((XQArray) next).iterable().iterator();
             stack.push(new Iter() {
               private Iter iter = Empty.ITER;
 
@@ -41,8 +41,8 @@ public final class ArrayFlatten extends ArrayFn {
                 while(true) {
                   final Item item = iter.next();
                   if(item != null) return item;
-                  if(!members.hasNext()) return null;
-                  final Value value = members.next();
+                  if(!values.hasNext()) return null;
+                  final Value value = values.next();
                   if(value.isItem()) {
                     iter = Empty.ITER;
                     return (Item) value;
@@ -82,7 +82,7 @@ public final class ArrayFlatten extends ArrayFn {
    * @return result type
    */
   private static Type type(final Type type) {
-    return type instanceof ArrayType ? type(((ArrayType) type).declType.type) : type;
+    return type instanceof ArrayType ? type(((ArrayType) type).valueType.type) : type;
   }
 
   /**
@@ -97,7 +97,7 @@ public final class ArrayFlatten extends ArrayFn {
     final Iter iter = expr.iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(item instanceof XQArray) {
-        for(final Value value : ((XQArray) item).members()) add(vb, value, qc);
+        for(final Value value : ((XQArray) item).iterable()) add(vb, value, qc);
       } else {
         vb.add(item);
       }

@@ -17,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * This class contains common methods for full-text index builders.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FTBuilder extends IndexBuilder {
@@ -55,7 +55,7 @@ public final class FTBuilder extends IndexBuilder {
 
   @Override
   public FTIndex build() throws IOException {
-    Util.debug(detailedInfo());
+    Util.debugln(detailedInfo());
 
     try {
       for(pre = 0; pre < size; ++pre) {

@@ -5,7 +5,7 @@ import org.basex.util.hash.*;
 /**
  * <p>This class provides mapping tables for converting full-text tokens.</p>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FTToken {
@@ -39,14 +39,13 @@ public final class FTToken {
   public static byte[] noDiacritics(final byte[] token) {
     final int tl = token.length;
     final TokenBuilder tb = new TokenBuilder(tl);
-    for(int c = 0; c < tl; c += Token.cl(token, c)) {
-      int cp = Token.cp(token, c);
-      if(cp >= 0x80) {
-        if(isCombining(Character.getType(cp))) continue;
-        cp = noDiacritics(cp);
+    Token.forEachCp(token, cp -> {
+      if(cp < 0x80) {
+        tb.add(cp);
+      } else if(!isCombining(Character.getType(cp))) {
+        tb.add(noDiacritics(cp));
       }
-      tb.add(cp);
-    }
+    });
     return tb.finish();
   }
 

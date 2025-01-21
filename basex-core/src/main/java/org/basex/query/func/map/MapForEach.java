@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public class MapForEach extends StandardFunc {
@@ -22,9 +22,10 @@ public class MapForEach extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final FItem action = toFunction(arg(1), 2, MapForEach.this instanceof UpdateMapForEach, qc);
-    final BasicIter<Item> keys = map.keys().iter();
+    final BasicIter<Item> keys = map.keys();
 
     return new Iter() {
+      final HofArgs args = new HofArgs(2);
       Iter iter = Empty.ITER;
 
       @Override
@@ -34,7 +35,7 @@ public class MapForEach extends StandardFunc {
           if(item != null) return item;
           final Item key = keys.next();
           if(key == null) return null;
-          iter = action.invoke(qc, info, key, map.get(key, info)).iter();
+          iter = invoke(action, args.set(0, key).set(1, map.get(key)), qc).iter();
         }
       }
     };
@@ -45,8 +46,9 @@ public class MapForEach extends StandardFunc {
     final XQMap map = toMap(arg(0), qc);
     final FItem action = toFunction(arg(1), 2, this instanceof UpdateMapForEach, qc);
 
+    final HofArgs args = new HofArgs(2);
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((key, value) -> vb.add(action.invoke(qc, info, key, value)));
+    map.forEach((key, value) -> vb.add(invoke(action, args.set(0, key).set(1, value), qc)));
     return vb.value(this);
   }
 
@@ -58,13 +60,18 @@ public class MapForEach extends StandardFunc {
     final Type type = map.seqType().type;
     if(type instanceof MapType) {
       final MapType mtype = (MapType) type;
-      final SeqType declType = mtype.argTypes[0].with(Occ.EXACTLY_ONE);
-      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, declType, mtype.declType));
+      final SeqType declType = SeqType.get(mtype.keyType, Occ.EXACTLY_ONE);
+      arg(1, arg -> refineFunc(arg, cc, declType, mtype.valueType));
     }
 
     final FuncType ft = arg(1).funcType();
     if(ft != null) exprType.assign(ft.declType.type);
 
     return this;
+  }
+
+  @Override
+  public final int hofIndex() {
+    return 1;
   }
 }

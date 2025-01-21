@@ -15,7 +15,6 @@ import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -29,7 +28,7 @@ import org.basex.util.hash.*;
 /**
  * General comparison.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class CmpG extends Cmp {
@@ -167,12 +166,9 @@ public class CmpG extends Cmp {
    * @param expr1 first expression
    * @param expr2 second expression
    * @param op operator
-   * @param coll collation (can be {@code null})
-   * @param sc static context
    */
-  public CmpG(final InputInfo info, final Expr expr1, final Expr expr2, final OpG op,
-      final Collation coll, final StaticContext sc) {
-    super(info, expr1, expr2, coll, SeqType.BOOLEAN_O, sc);
+  public CmpG(final InputInfo info, final Expr expr1, final Expr expr2, final OpG op) {
+    super(info, expr1, expr2, SeqType.BOOLEAN_O);
     this.op = op;
   }
 
@@ -200,6 +196,7 @@ public class CmpG extends Cmp {
     // swap operands
     if(swap()) {
       cc.info(QueryText.OPTSWAP_X, this);
+      Collections.reverse(Arrays.asList(exprs));
       op = op.swap();
     }
 
@@ -210,8 +207,8 @@ public class CmpG extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(expr == this && expr1 instanceof If && !expr1.has(Flag.NDT)) {
       final If iff = (If) expr1;
-      final Expr thn = new CmpG(info, iff.arg(0), expr2, op, coll, sc);
-      final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjMap<>()), op, coll, sc);
+      final Expr thn = new CmpG(info, iff.arg(0), expr2, op);
+      final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjMap<>()), op);
       return new If(info, iff.cond, thn.optimize(cc), els.optimize(cc)).optimize(cc);
     }
 
@@ -224,25 +221,24 @@ public class CmpG extends Cmp {
       // determine types, choose best implementation
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
-      // skip type check if types are identical (and a child instance of any atomic type)
-      check = !(type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
-          (type1.isSortable() || !op.oneOf(OpG.EQ, OpG.NE)) || comparable(type1, type2, true));
+      // skip type check if types are identical, have a specific atomic type and are comparable
+      check = !(type1 == type2 && !type1.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.ITEM) &&
+          comparable(type1, type2, true));
 
       CmpHashG hash = null;
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) {
-          expr = new CmpSimpleG(expr1, expr2, op, coll, sc, info, check);
+          expr = new CmpSimpleG(expr1, expr2, op, info, check);
         }
-      } else if(op == OpG.EQ && coll == null && (type1.isNumber() && type2.isNumber() ||
+      } else if(op == OpG.EQ && sc().collation == null && (type1.isNumber() && type2.isNumber() ||
           type1.isStringOrUntyped() && type2.isStringOrUntyped()) && !st2.zeroOrOne()) {
         // hash-based comparisons
-        hash = this instanceof CmpHashG ? (CmpHashG) this :
-          new CmpHashG(expr1, expr2, op, sc, info);
+        hash = this instanceof CmpHashG ? (CmpHashG) this : new CmpHashG(expr1, expr2, op, info);
         expr = hash;
       }
       // pre-evaluate expression; discard hashed results
-      if(allAreValues(false)) {
+      if(values(false, cc)) {
         expr = cc.preEval(expr);
         if(hash != null) cc.qc.threads.get(hash, info).remove();
         return expr;
@@ -270,7 +266,7 @@ public class CmpG extends Cmp {
         final Calc calc1 = ((Arith) expr1).calc;
         if(calc1 == Calc.SUBTRACT && expr2 == Int.ZERO) {
           // E - NUMERIC = 0  ->  E = NUMERIC
-          ex = new CmpG(info, op11, op12, op, coll, sc);
+          ex = new CmpG(info, op11, op12, op);
         } else if((
           Function.POSITION.is(op11) ||
           !Double.isNaN(num12) &&
@@ -285,7 +281,7 @@ public class CmpG extends Cmp {
           // $a - 1 = $b + 1  ->  $a = $b + 2
           // $x * -1 = 1  ->  $x = 1 div -1  (no rewrite if RHS of */div (<,<=,>=,>) is negative)
           final Expr arg2 = new Arith(info, expr2, op12, calc1.invert()).optimize(cc);
-          ex = new CmpG(info, op11, arg2, op, coll, sc);
+          ex = new CmpG(info, op11, arg2, op);
         }
       }
     }
@@ -293,49 +289,55 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final Iter iter1 = exprs[0].atomIter(qc, info);
     final long size1 = iter1.size();
-    if(size1 == 0) return Bln.FALSE;
+    if(size1 == 0) return false;
     final Iter iter2 = exprs[1].atomIter(qc, info);
     final long size2 = iter2.size();
-    return size2 == 0 ? Bln.FALSE : compare(iter1, iter2, size1, size2, qc);
+    return size2 == 0 ? false : compare(iter1, iter2, size1, size2, qc);
   }
 
   /**
    * Compares all values of the first and second iterators.
-   * @param iter1 first iterator
-   * @param iter2 second iterator
+   * @param iter1 first atomic iterator
+   * @param iter2 second atomic iterator
    * @param size1 size of first iterator
    * @param size2 size of second iterator
    * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  Bln compare(final Iter iter1, final Iter iter2, final long size1, final long size2,
+  boolean compare(final Iter iter1, final Iter iter2, final long size1, final long size2,
       final QueryContext qc) throws QueryException {
 
     // evaluate single items
     Iter ir1 = iter1, ir2 = iter2;
     final boolean single1 = size1 == 1, single2 = size2 == 1;
-    if(single1 && single2) return Bln.get(eval(ir1.next(), ir2.next()));
+    if(single1 && single2) return eval(ir1.next(), ir2.next());
 
     if(single1) {
       // first iterator yields single result
       final Item item1 = ir1.next();
       for(Item item2; (item2 = qc.next(ir2)) != null;) {
-        if(eval(item1, item2)) return Bln.TRUE;
+        if(eval(item1, item2)) return true;
       }
-      return Bln.FALSE;
+      return false;
     }
 
     if(single2) {
       // second iterator yields single result
       final Item item2 = ir2.next();
       for(Item item1; (item1 = qc.next(ir1)) != null;) {
-        if(eval(item1, item2)) return Bln.TRUE;
+        if(eval(item1, item2)) return true;
       }
-      return Bln.FALSE;
+      return false;
     }
 
     // swap iterators if first iterator returns more results than second
@@ -350,11 +352,11 @@ public class CmpG extends Cmp {
     for(Item item1; (item1 = ir1.next()) != null;) {
       if(ir2 == null) ir2 = exprs[swap ? 0 : 1].atomIter(qc, info);
       for(Item item2; (item2 = qc.next(ir2)) != null;) {
-        if(swap ? eval(item2, item1) : eval(item1, item2)) return Bln.TRUE;
+        if(swap ? eval(item2, item1) : eval(item1, item2)) return true;
       }
       ir2 = null;
     }
-    return Bln.FALSE;
+    return false;
   }
 
   /**
@@ -369,7 +371,7 @@ public class CmpG extends Cmp {
       final Type type1 = item1.type, type2 = item2.type;
       if(!comparable(type1, type2, true)) throw compareError(item1, item2, info);
     }
-    return op.value().eval(item1, item2, coll, sc, info);
+    return op.value().eval(item1, item2, info);
   }
 
   /**
@@ -410,7 +412,7 @@ public class CmpG extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
-      new CmpG(info, expr1, expr2, op.invert(), coll, sc) : null;
+      new CmpG(info, expr1, expr2, op.invert()) : null;
   }
 
   @Override
@@ -444,13 +446,14 @@ public class CmpG extends Cmp {
     // compare first and second comparison
     final CmpG cmp2 = (CmpG) expr2;
     final OpG cmpOp = not2 ? cmp2.op.invert() : cmp2.op;
-    if(op != cmpOp || coll != cmp2.coll || !exprs[0].equals(cmp2.exprs[0])) return null;
+    if(op != cmpOp || sc().collation != cmp2.sc().collation || !exprs[0].equals(cmp2.exprs[0]))
+      return null;
 
     // function for creating new comparison
     final Expr exprL = exprs[0], exprR1 = exprs[1], exprR2 = cmp2.exprs[1];
     final QueryFunction<OpG, Expr> newList = newOp -> {
       final Expr exprR = List.get(cc, info, exprR1, exprR2);
-      return new CmpG(info, exprL, exprR, newOp, coll, sc).optimize(cc);
+      return new CmpG(info, exprL, exprR, newOp).optimize(cc);
     };
 
     // check if comparisons can be merged
@@ -484,10 +487,15 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[local-name() = 'a']  ->  E[self::*:a]
-    return cc.simplify(this, mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this,
-      mode);
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
+
+    Expr expr = this;
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      // E[local-name() = 'a']  ->  E[self::*:a]
+      expr = optPred(cc);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   /**
@@ -505,7 +513,7 @@ public class CmpG extends Cmp {
     final OpV opV = opV();
     if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof ContextFn &&
         expr2 instanceof Value && opV == OpV.EQ) {
-      // skip functions that do not refer to the current context item
+      // skip functions that do not refer to the current context value
       final ContextFn func = (ContextFn) expr1;
       final Value value = (Value) expr2;
       if(func.exprs.length > 0 && !(func.exprs[0] instanceof ContextValue)) return this;
@@ -524,7 +532,7 @@ public class CmpG extends Cmp {
           // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1}* | self::Q{URI2}*
           for(final Item item : value) {
             final byte[] uri = item.string(info);
-            if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.COLON, uri));
+            if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.cpToken(':'), uri));
           }
           if(qnames.size() == value.size()) part = NamePart.URI;
         } else if(NAME.is(func)) {
@@ -550,7 +558,7 @@ public class CmpG extends Cmp {
       if(part != null) {
         final ExprList paths = new ExprList(2);
         for(final QNm qname : qnames) {
-          final Test test = new NameTest(qname, part, (NodeType) type, cc.sc().elemNS);
+          final Test test = new NameTest(qname, part, (NodeType) type, sc().elemNS);
           final Expr step = Step.get(cc, null, info, test);
           if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
         }
@@ -564,7 +572,7 @@ public class CmpG extends Cmp {
   @Override
   public final boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // only equality expressions on default collation can be rewritten
-    if(op != OpG.EQ || coll != null) return false;
+    if(op != OpG.EQ || sc().collation != null) return false;
 
     Expr expr1 = exprs[0];
     IndexType type = null;
@@ -578,7 +586,7 @@ public class CmpG extends Cmp {
 
   @Override
   public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final CmpG cmp = new CmpG(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, coll, sc);
+    final CmpG cmp = new CmpG(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op);
     cmp.check = check;
     return copyType(cmp);
   }

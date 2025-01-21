@@ -25,7 +25,7 @@ import org.basex.util.options.Options.*;
 /**
  * This enumeration encapsulates all commands that are triggered by GUI operations.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum GUIMenuCmd implements GUICommand {
@@ -190,6 +190,19 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Runs the currently opened query. */
+  C_GO(RUN_QUERY, "% ENTER", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.editor.run();
+    }
+
+    @Override
+    public boolean enabled(final GUI gui) {
+      return gui.gopts.get(GUIOptions.SHOWEDITOR);
+    }
+  },
+
   /** Edits external variables. */
   C_EXTERNAL_VARIABLES(EXTERNAL_VARIABLES, "% shift E", false, false) {
     @Override
@@ -207,15 +220,15 @@ public enum GUIMenuCmd implements GUICommand {
   C_INDENT_RESULT(INDENT_RESULT, "% shift I", false, true) {
     @Override
     public void execute(final GUI gui) {
+      final boolean indent = gui.gopts.invert(GUIOptions.INDENTRESULT);
       final SerializerOptions sopts = gui.context.options.get(MainOptions.SERIALIZER);
-      sopts.put(SerializerOptions.INDENT, selected(gui) ? YesNo.NO : YesNo.YES);
+      sopts.put(SerializerOptions.INDENT, indent ? YesNo.YES : YesNo.NO);
       gui.layoutViews();
     }
 
     @Override
     public boolean selected(final GUI gui) {
-      final SerializerOptions sopts = gui.context.options.get(MainOptions.SERIALIZER);
-      return sopts.get(SerializerOptions.INDENT) == YesNo.YES;
+      return gui.gopts.get(GUIOptions.INDENTRESULT);
     }
   },
 
@@ -424,7 +437,7 @@ public enum GUIMenuCmd implements GUICommand {
       final StringList sl = insert.result;
       final NodeType type = ANode.type(insert.kind);
       final TokenBuilder item = new TokenBuilder();
-      item.add(type.qname().local()).add(" { ").add(quote(sl.get(0))).add(" }");
+      item.add(type.kind()).add(" { ").add(quote(sl.get(0))).add(" }");
 
       if(type.oneOf(NodeType.ATTRIBUTE, NodeType.PROCESSING_INSTRUCTION)) {
         item.add(" { ").add(quote(sl.get(1))).add(" }");
@@ -982,7 +995,7 @@ public enum GUIMenuCmd implements GUICommand {
    * @return result of check
    */
   private static boolean updatable(final DBNodes node, final int... kinds) {
-    if(node == null || (kinds.length == 0 ? node.size() < 1 : node.size() != 1)) return false;
+    if(node == null || (kinds.length == 0 ? node.isEmpty() : node.size() != 1)) return false;
     final int k = node.data().kind(node.pre(0));
     for(final int kind : kinds) {
       if(k == kind) return false;

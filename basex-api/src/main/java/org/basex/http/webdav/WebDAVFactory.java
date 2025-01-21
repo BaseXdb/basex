@@ -1,6 +1,6 @@
 package org.basex.http.webdav;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.util.*;
@@ -11,7 +11,7 @@ import com.bradmcevoy.http.*;
 /**
  * WebDAV resource factory. Main class for generating WebDAV resources.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

@@ -13,7 +13,7 @@ import org.basex.util.http.*;
 /**
  * RESTXQ permissions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RestXqPerm implements Comparable<RestXqPerm> {
@@ -39,11 +39,14 @@ public final class RestXqPerm implements Comparable<RestXqPerm> {
    * @return permission information
    * @throws QueryException query exception
    */
-  static XQMap map(final RestXqFunction func, final HTTPConnection conn) throws QueryException {
+  static XQMap map(final RestXqFunction func, final HTTPConnection conn)
+      throws QueryException {
     return new MapBuilder().
       put(ALLOW, StrSeq.get(func.allows.toArray())).
       put(PATH, conn.path()).
       put(METHOD, conn.method).
+      put(HEADERS, conn.requestCtx.headers()).
+      put(PARAMETERS, conn.requestCtx.queryValues()).
       put(AUTHORIZATION, conn.request.getHeader(HTTPText.AUTHORIZATION)).map();
   }
 

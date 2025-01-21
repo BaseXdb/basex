@@ -13,7 +13,7 @@ import javax.xml.xquery.*;
  *
  * Part 9: Creating XDM Instances.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  */
 public final class Part9 extends Main {
   /**
@@ -38,7 +38,7 @@ public final class Part9 extends Main {
       if(xqs.instanceOf(xqt)) {
         System.out.println("Node: " + xqs.getNode());
       } else {
-        System.out.println("Atomic Value: " + xqs.getAtomicValue());
+        System.out.println("Atomic Item: " + xqs.getAtomicValue());
       }
     }
 

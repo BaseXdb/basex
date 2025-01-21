@@ -12,7 +12,7 @@ import org.basex.util.list.*;
  * Text renderer, supporting syntax highlighting and highlighting of selected, erroneous
  * or linked text.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class TextRenderer extends BaseXBack {
@@ -322,6 +322,7 @@ final class TextRenderer extends BaseXBack {
     String s = iter.currString();
     int sw = 0;
 
+    if(s.isEmpty()) return false;
     final int cp = s.codePointAt(0);
     if(cp == TokenBuilder.BOLD) {
       setStyle(Font.BOLD);

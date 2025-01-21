@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for optimizations of the filter expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FilterTest extends SandboxTest {
@@ -365,7 +365,8 @@ public final class FilterTest extends SandboxTest {
     final String post = "] ! name(.) => string-join()";
 
     check(pre + " = last() - 1 to last() - 2" + post, "",       root(Str.class));
-    check(pre + " = last() - 2 to last() - 2" + post, "D",      empty(Pos.class));
+    check(pre + " = last() - 2 to last() - 2" + post, "D",      exists(ITEMS_AT));
+    check(pre + " = last() - 2 to last()"     + post, "DEF",    exists(SUBSEQUENCE));
     check(pre + " = last() - 3 to last() - 2" + post, "CD",     exists(Pos.class));
 
     check(pre + "!= last() - 3 to last() - 2" + post, "ABCDEF", exists(CmpG.class));
@@ -374,10 +375,10 @@ public final class FilterTest extends SandboxTest {
     check(pre + ">= last() - 3 to last() - 2" + post, "CDEF",   exists(CmpG.class));
     check(pre + ">  last() - 3 to last() - 2" + post, "DEF",    exists(CmpG.class));
 
-    check(pre + " + 1 = last()" + post, "E", empty(CmpSimpleG.class), empty(Pos.class));
-    check(pre + " - 1 = last()" + post, "", empty(CmpSimpleG.class), empty(Pos.class));
+    check(pre + " + 1 = last()" + post, "E", empty(CmpSimpleG.class), exists(ITEMS_AT));
+    check(pre + " - 1 = last()" + post, "", root(Str.class));
     check(pre + " + 1 < last()" + post, "ABCD", empty(CmpSimpleG.class), exists(Pos.class));
-    check(pre + " - 1 < last()" + post, "ABCDEF", empty(CmpSimpleG.class), empty(Pos.class));
+    check(pre + " - 1 < last()" + post, "ABCDEF", exists(DualMap.class), empty(Pos.class));
     check("for $i in -3 to 3 return " + pre + " + 1 = $i" + post,
         "\n\n\n\n\nA\nB", empty(CmpSimpleG.class));
 

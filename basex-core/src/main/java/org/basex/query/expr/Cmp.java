@@ -9,7 +9,6 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -21,15 +20,10 @@ import org.basex.util.*;
 /**
  * Abstract comparison.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Cmp extends Arr {
-  /** Collation (can be {@code null}). */
-  final Collation coll;
-  /** Static context. */
-  final StaticContext sc;
-
   /** Check: true. */
   private static final long[] COUNT_TRUE = { };
   /** Check: false. */
@@ -44,46 +38,38 @@ public abstract class Cmp extends Arr {
    * @param info input info (can be {@code null})
    * @param expr1 first expression
    * @param expr2 second expression
-   * @param coll collation (can be {@code null})
    * @param seqType sequence type
-   * @param sc static context
    */
-  Cmp(final InputInfo info, final Expr expr1, final Expr expr2, final Collation coll,
-      final SeqType seqType, final StaticContext sc) {
+  Cmp(final InputInfo info, final Expr expr1, final Expr expr2, final SeqType seqType) {
     super(info, seqType, expr1, expr2);
-    this.coll = coll;
-    this.sc = sc;
   }
 
   /**
-   * Swaps the operands of the expression if this might improve performance.
-   * The operator itself needs to be swapped by the calling expression.
-   * @return resulting expression
+   * Checks if the operands of the expression can be swapped to improve performance.
+   * @return {@code true} if operands were swapped
    */
   final boolean swap() {
-    // move value, or path without root, to second position
     final Expr expr1 = exprs[0], expr2 = exprs[1];
 
-    final boolean swap = POSITION.is(expr2) || !(expr2 instanceof Value) && (
-      // move static value to the right: $words = 'words'
-      expr1 instanceof Value ||
-      // hashed comparisons: move larger sequences to the right: $small = $large
-      expr1.size() > 1 && expr1.size() > expr2.size() &&
-      expr1.seqType().type.instanceOf(AtomType.ANY_ATOMIC_TYPE) ||
-      // hashed comparisons: . = $words
-      expr1 instanceof VarRef && expr1.seqType().occ.max > 1 &&
-        !(expr2 instanceof VarRef && expr2.seqType().occ.max > 1) ||
-      // context value: . = $item
-      expr1 instanceof VarRef && expr2 instanceof ContextValue ||
-      // index rewritings: move path to the left: word/text() = $word
-      !(expr1 instanceof Path && ((Path) expr1).root == null) &&
-        expr2 instanceof Path && ((Path) expr2).root == null
-    );
+    // keep dedicated function calls as left-hand operand
+    if(COUNT.is(expr1) || POSITION.is(expr1)) return false;
 
-    if(swap) {
-      exprs[0] = expr2;
-      exprs[1] = expr1;
-    }
+    // move position() and count() to the left: position() = 123
+    boolean swap = COUNT.is(expr2) || POSITION.is(expr2);
+    // keep right operand if it is a value
+    if(!swap && expr2 instanceof Value) return false;
+
+    // move static value to the right: $words = 'words'
+    if(!swap) swap = expr1 instanceof Value;
+    // move larger input to the right: $small = $large
+    if(!swap) swap = expr1.size() > 1 && expr1.size() > expr2.size();
+    // move context item to the left: . = $input
+    if(!swap) swap = expr2 instanceof ContextValue && expr2.size() == 1 &&
+        !(expr1 instanceof ContextValue);
+    // move path to the left: word/text() = $word
+    if(!swap) swap = !(expr1 instanceof Path && ((Path) expr1).root == null) &&
+      expr2 instanceof Path && ((Path) expr2).root == null;
+
     return swap;
   }
 
@@ -147,7 +133,7 @@ public abstract class Cmp extends Arr {
     final Type type1 = st1.type;
     if(expr1.equals(expr2) &&
       // keep: () = (), (1,2) != (1,2), (1,2) eq (1,2)
-      (op != OpV.EQ || this instanceof CmpV ? st1.one() : st1.oneOrMore()) &&
+      (op != OpV.EQ ? st1.one() : st1.oneOrMore()) &&
       // keep: xs:double('NaN') = xs:double('NaN')
       (type1.isStringOrUntyped() || type1.instanceOf(AtomType.DECIMAL) ||
           type1 == AtomType.BOOLEAN) &&
@@ -224,7 +210,7 @@ public abstract class Cmp extends Arr {
                 if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().one())) {
                   OpG opG = ((CmpG) last).op;
                   if(!success) opG = opG.invert();
-                  return new CmpG(info, map.remove(cc, al), op2, opG, coll, sc).optimize(cc);
+                  return new CmpG(info, map.remove(cc, al), op2, opG).optimize(cc);
                 }
               } else if(success && last instanceof CmpR) {
                 // (number ! (. >= 1e0) = true()  ->  number >= 1e0
@@ -237,8 +223,8 @@ public abstract class Cmp extends Arr {
               } else if(success && last instanceof CmpSR) {
                 // (string ! (. >= 'b') = true()  ->  string >= 'b'
                 final CmpSR cmp = (CmpSR) last;
-                return new CmpSR(map.remove(cc, al), cmp.min, cmp.mni, cmp.max, cmp.mxi,
-                    cmp.coll, info).optimize(cc);
+                return new CmpSR(map.remove(cc, al), cmp.min, cmp.mni, cmp.max, cmp.mxi, info).
+                    optimize(cc);
               }
             }
           }
@@ -393,8 +379,8 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   private Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
-    if(POSITION.is(exprs[0])) {
-      final Expr expr = Pos.get(exprs[1], op, info, cc, true);
+    if(POSITION.is(exprs[0]) && exprs[1].seqType().type.isNumberOrUntyped()) {
+      final Expr expr = Pos.get(exprs[1], op, info, cc, null);
       if(expr != null) return expr;
     }
     return this;

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.*;
 /**
  * Test index updates when using memory storage ({@link MemData}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 public class MemDataTest extends SandboxTest {
@@ -39,7 +39,7 @@ public class MemDataTest extends SandboxTest {
   /**
    * Replace value update test.
    */
-  @Test public void replaceValue() {
+  @Test public final void replaceValue() {
     query("replace value of node /a/b with 'test2'");
     final String o = query("/a/b[text() = 'test']");
     assertTrue(o.isEmpty(), "Old node found");
@@ -50,7 +50,7 @@ public class MemDataTest extends SandboxTest {
   /**
    * Replace node update test.
    */
-  @Test public void replaceNode() {
+  @Test public final void replaceNode() {
     query("replace node /a/b with <d f='test2'/>");
     final String o = query("/a/b");
     assertTrue(o.isEmpty(), "Old node found");
@@ -61,7 +61,7 @@ public class MemDataTest extends SandboxTest {
   /**
    * Insert node update test.
    */
-  @Test public void insertNode() {
+  @Test public final void insertNode() {
     query("insert node <d>test2</d> as first into /a");
     final String r = query("//d[text() = 'test2']");
     assertFalse(r.isEmpty(), "Node not found");
@@ -73,7 +73,7 @@ public class MemDataTest extends SandboxTest {
   /**
    * Insert node update test.
    */
-  @Test public void insertDuplicateNode() {
+  @Test public final void insertDuplicateNode() {
     query("insert node <d>test</d> as first into /a");
     final String r = query("//d[text() = 'test']");
     assertFalse(r.isEmpty(), "Node not found");
@@ -84,7 +84,7 @@ public class MemDataTest extends SandboxTest {
   /**
    * Delete node update test.
    */
-  @Test public void deleteNode() {
+  @Test public final void deleteNode() {
     query("delete node //b");
     final String r = query("//*[text() = 'test']");
     assertTrue(r.isEmpty(), "Node not deleted");
@@ -93,7 +93,7 @@ public class MemDataTest extends SandboxTest {
   /**
    * Try to find non-existing node.
    */
-  @Test public void findNonexistingNode() {
+  @Test public final void findNonexistingNode() {
     final String r = query("//*[text() = 'test0']");
     assertTrue(r.isEmpty(), "Found non-existing node");
   }

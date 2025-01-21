@@ -15,24 +15,30 @@ import org.basex.util.hash.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FnEvery extends StandardFunc {
   @Override
   public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunctionOrNull(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = predicate != null ? new HofArgs(2, predicate) : null;
     final boolean some = some();
     for(Item item; (item = input.next()) != null;) {
-      final boolean test = predicate == null ? toBoolean(item) :
-        toBoolean(qc, predicate, item, Int.get(++p));
-      if(test == some) return Bln.get(some);
+      final boolean test = (predicate == null ? item :
+        invoke(predicate, args.set(0, item).inc(), qc).item(qc, info)).test(qc, ii, 0);
+      if(test == some) return some;
     }
-    return Bln.get(!some);
+    return !some;
   }
 
   @Override
@@ -43,36 +49,39 @@ public class FnEvery extends StandardFunc {
     if(st.zero()) return cc.voidAndReturn(input, Bln.get(!some), info);
 
     Expr result = null;
-    if(defined(1)) {
-      final int arity = arity(predicate);
-      if(arity == 1 || arity == 2) {
-        final IntObjMap<Var> vm = new IntObjMap<>();
-        final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), vm);
-        final Expr item = new VarRef(info, i).optimize(cc);
-        final For fr;
-        Expr pos = null;
-        if(arity == 1) {
-          // some : (for $i in INPUT return PREDICATE($i)) = true()
-          // every:  not((for $i in INPUT return PREDICATE($i)) = false())
-          fr = new For(i, input).optimize(cc);
-        } else {
-          // some : (for $i at $p in INPUT return PREDICATE($i, $p)) = true()
-          // every:  not((for $i at $p in INPUT return PREDICATE($i, $p)) = false())
-          final Var p = cc.copy(new Var(new QNm("pos"), null, cc.qc, sc, info), vm);
-          fr = new For(i, p, null, input, false).optimize(cc);
-          pos = new VarRef(info, p).optimize(cc);
-        }
-        final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
-        final Expr rtrn = new DynFuncCall(info, sc, coerce(1, cc, arity), args).optimize(cc);
-        result = new GFLWOR(info, fr, rtrn).optimize(cc);
+
+    final boolean func = defined(1);
+    final int arity = func ? arity(predicate) : 1;
+    if(arity == 1 || arity == 2) {
+      final IntObjMap<Var> vm = new IntObjMap<>();
+      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
+      final Expr item = new VarRef(info, i).optimize(cc);
+      final For fr;
+      Expr pos = null;
+      if(arity == 1) {
+        // without predicate:
+        //   some : INPUT = true()
+        //   every: not(INPUT = false())
+        // with predicate:
+        //   some : (for $i in INPUT return PREDICATE($i)) = true()
+        //   every: not((for $i in INPUT return PREDICATE($i)) = false())
+        fr = new For(i, input).optimize(cc);
+      } else {
+        // some : (for $i at $p in INPUT return PREDICATE($i, $p)) = true()
+        // every: not((for $i at $p in INPUT return PREDICATE($i, $p)) = false())
+        final Var p = cc.copy(new Var(new QNm("pos"), null, cc.qc, info), vm);
+        fr = new For(i, p, null, input, false).optimize(cc);
+        pos = new VarRef(info, p).optimize(cc);
       }
-    } else {
-      // some : INPUT = true()
-      // every: not(INPUT = false())
-      result = input;
+
+      final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
+      final Expr rtrn =  func ? new DynFuncCall(info, coerceFunc(1, cc, arity), args).optimize(cc) :
+        cc.function(Function.BOOLEAN, info, args);
+      result = new GFLWOR(info, fr, rtrn).optimize(cc);
     }
+
     if(result != null) {
-      final Expr cmp = new CmpG(info, result, Bln.get(some), OpG.EQ, null, sc).optimize(cc);
+      final Expr cmp = new CmpG(info, result, Bln.get(some), OpG.EQ).optimize(cc);
       return some ? cmp : cc.function(Function.NOT, info, cmp);
     }
     return this;
@@ -84,5 +93,10 @@ public class FnEvery extends StandardFunc {
    */
   boolean some() {
     return false;
+  }
+
+  @Override
+  public final int hofIndex() {
+    return 1;
   }
 }

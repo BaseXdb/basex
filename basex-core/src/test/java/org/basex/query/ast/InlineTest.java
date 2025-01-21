@@ -14,7 +14,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for inlining.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class InlineTest extends SandboxTest {
@@ -51,7 +51,7 @@ public final class InlineTest extends SandboxTest {
         "return $type",
         "<type>a</type>",
         empty(Let.class),
-        root(ItemMap.class));
+        root(Pipeline.class));
   }
 
   /** Typing and Function items: XPTY0004. */
@@ -91,7 +91,7 @@ public final class InlineTest extends SandboxTest {
         exists(Util.className(Int.class) + "[. = '42']"));
   }
 
-  /** Checks that the simple map operator prohibits inlining a context item into its RHS. */
+  /** Checks that the simple map operator prohibits inlining a context value into its RHS. */
   @Test public void gh1055() {
     inline(true);
     check("(let $d := for-each(1 to 100, function($a) { $a }) "
@@ -141,7 +141,6 @@ public final class InlineTest extends SandboxTest {
     check("declare %basex:lock('x') function local:x($x) { $x }; local:x(123)",
         123,
         exists(StaticFunc.class));
-
   }
 
   /** Tests if all let clauses are removed. */
@@ -155,7 +154,7 @@ public final class InlineTest extends SandboxTest {
     check("let $a := function($d) { trace($d) }"
         + "let $b := nondeterministic $a('1st') let $c := nondeterministic $a('2nd') "
         + "return $b", "1st",
-        root(ItemMap.class),
+        root(Pipeline.class),
         "//FnTrace[. = '1st'] << //FnTrace[. = '2nd']");
   }
 
@@ -183,6 +182,6 @@ public final class InlineTest extends SandboxTest {
         exists(DynFuncCall.class),
         empty(StaticFunc.class),
         empty(Closure.class),
-        root(ItemMap.class));
+        root(Pipeline.class));
   }
 }

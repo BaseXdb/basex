@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ConvertBinaryToIntegers extends StandardFunc {
@@ -47,6 +47,6 @@ public final class ConvertBinaryToIntegers extends StandardFunc {
 
     final LongList list = new LongList(bl);
     for(final byte b : bytes) list.add(b & 0xFF);
-    return IntSeq.get(list);
+    return IntSeq.get(list.finish());
   }
 }

@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Step expression: iterative evaluation (no positional access).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IterStep extends Step {
@@ -28,20 +28,28 @@ public final class IterStep extends Step {
   }
 
   @Override
-  public NodeIter iter(final QueryContext qc) {
+  public NodeIter iter(final QueryContext qc) throws QueryException {
+    final BasicNodeIter iter = axis.iter(checkNode(qc));
     return new NodeIter() {
-      BasicNodeIter iter;
-
       @Override
       public ANode next() throws QueryException {
-        if(iter == null) iter = axis.iter(checkNode(qc));
-        for(ANode node; (node = iter.next()) != null;) {
+        for(final ANode node : iter) {
           qc.checkStop();
-          if(test.matches(node) && match(node, qc)) return node.finish();
+          if(test.matches(node) && test(node, qc)) return node.finish();
         }
         return null;
       }
     };
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    for(final ANode node : axis.iter(checkNode(qc))) {
+      qc.checkStop();
+      if(test.matches(node) && test(node, qc)) return true;
+    }
+    return false;
   }
 
   @Override

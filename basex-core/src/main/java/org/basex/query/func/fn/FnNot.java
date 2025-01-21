@@ -14,13 +14,19 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnNot extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(!arg(0).test(qc, info, false));
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return !arg(0).test(qc, info, 0);
   }
 
   @Override

@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Step expression, caching all results.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CachedStep extends Step {
@@ -47,7 +47,7 @@ public final class CachedStep extends Step {
           final ANode node = list.get(n);
           qf.value = node;
           qf.pos = n + 1;
-          if(expr.test(qc, info, true)) list.set(c++, node);
+          if(expr.test(qc, info, qf.pos)) list.set(c++, node);
         }
         list.size(c);
       }

@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.*;
  * Many of the Soundex and ColognePhonetic tests have been adopted from the
  * Apache Commons project (SoundexTest.java, ColognePhoneticTest.java).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class StringModuleTest extends SandboxTest {
@@ -111,12 +112,6 @@ public final class StringModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void cr() {
-    final Function func = _STRING_CR;
-    query("string-to-codepoints(" + func.args() + ')', 13);
-  }
-
-  /** Test method. */
   @Test public void format() {
     final Function func = _STRING_FORMAT;
     query(func.args("x", "x"), "x");
@@ -126,30 +121,58 @@ public final class StringModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void levenshtein() {
-    final Function func = _STRING_LEVENSHTEIN;
-    // queries
-    query(func.args("ab", "ab"), 1);
-    query(func.args("ab", "a"), 0.5);
-    query(func.args("ab", "a"), 0.5);
-    query(func.args("ab", ""), 0);
-
-    query(func.args("ac", "ab"), 0.5);
-    query(func.args("a", "ab"), 0.5);
-    query(func.args("", "ab"), 0);
-
-    query(func.args("ab", "ba"), 0.5);
-
-    query(func.args("", ""), 1);
-
-    query("let $x := string-join((1 to 1000) ! 'a') return " + func.args(" $x", " $x"), 1);
+  @Test public void jaroWinkler() {
+    final Function func = _STRING_JARO_WINKLER;
+    query(func.args("", ""), 0);
+    query(func.args("", "a"), 0);
+    query(func.args("aaapppp", ""), 0);
+    query(func.args("frog", "fog"), .93);
+    query(func.args("fly", "ant"), 0);
+    query(func.args("elephant", "hippo"), .44);
+    query(func.args("hippo", "elephant"), .44);
+    query(func.args("hippo", "zzzzzzzz"), 0);
+    query(func.args("hello", "hallo"), .88);
+    query(func.args("ABC Corporation", "ABC Corp"), .93);
+    query(func.args("D N H Enterprises Inc", "D &amp; H Enterprises, Inc."), .95);
+    query(func.args("My Gym Children's Fitness Center", "My Gym. Childrens Fitness"), .92);
+    query(func.args("PENNSYLVANIA", "PENNCISYLVNIA"), .88);
   }
 
   /** Test method. */
-  @Test public void nl() {
-    final Function func = _STRING_NL;
-    query(func.args(), "\n");
-    query("string-to-codepoints(" + func.args() + ')', 10);
+  @Test public void levenshtein() {
+    final Function func = _STRING_LEVENSHTEIN;
+    // queries
+    query(func.args("", ""), 1);
+    query(func.args("a", "a"), 1);
+    query(func.args("ab", "ab"), 1);
+    query(func.args("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"), 1);
+    query("string-join(replicate('x', 1000)) ! " + func.args(" .", " ."), 1);
+
+    query(func.args("a", "b"), 0);
+    query(func.args("b", "a"), 0);
+
+    query(func.args("ab", "a"), 0.5);
+    query(func.args("a", "ab"), 0.5);
+
+    query(func.args("ab", ""), 0);
+    query(func.args("", "ab"), 0);
+
+    query(func.args("ac", "ab"), 0.5);
+    query(func.args("ab", "ac"), 0.5);
+
+    query(func.args("ab", "ba"), 0.5);
+    query(func.args("ba", "ab"), 0.5);
+
+    query(func.args("ab", "axb"), 2e0 / 3);
+    query(func.args("ab", "axx"), 1e0 / 3);
+
+    query(func.args("xyb", "ab"), 1e0 / 3);
+    query(func.args("ab", "xyb"), 1e0 / 3);
+
+    query(func.args(" string-join(replicate('x', 10000))", "x"), "0.0001");
+    query(func.args("x", " string-join(replicate('x', 10000))"), "0.0001");
+
+    error(func.args(" string-join(replicate('x', 10001))", "x"), STRING_BOUNDS_X);
   }
 
   /** Tests, adopted from Apache Commons project (SoundexTest.java). */
@@ -264,12 +287,6 @@ public final class StringModuleTest extends SandboxTest {
     soundexVariations("E625",
       "Erickson", "Erickson", "Erikson", "Ericson", "Ericksen", "Ericsen"
     );
-  }
-  /** Test method. */
-  @Test public void tab() {
-    final Function func = _STRING_TAB;
-    query(func.args(), "\t");
-    query("string-to-codepoints(" + func.args() + ')', 9);
   }
 
   /**

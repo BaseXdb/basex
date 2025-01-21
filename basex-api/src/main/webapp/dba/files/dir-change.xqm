@@ -1,7 +1,7 @@
 (:~
  : Change directory.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/files';
 
@@ -17,26 +17,22 @@ declare variable $dba:CAT := 'files';
  :)
 declare
   %rest:path('/dba/dir-change')
-  %rest:query-param('dir', '{$dir}')
+  %rest:form-param('dir', '{$dir}')
 function dba:dir-change(
   $dir  as xs:string
 ) as element(rest:response) {
   try {
     let $sep := file:dir-separator()
-    let $path := file:path-to-native(if(contains($dir, $sep)) then (
-      $dir
-    ) else (
-      config:directory() || $dir || $sep)
+    let $path := file:path-to-native(
+      if (contains($dir, $sep)) then $dir else config:files-dir() || $dir || $sep
     )
     return (
       (: ensure that the directory can be accessed :)
       void(file:list($path)),
-  
-      config:directory($path),
-      config:file('')
+      config:set-files-dir($path)
     ),
     web:redirect($dba:CAT)
   } catch file:io-error {
-    web:redirect($dba:CAT, map { 'error': $err:description })
+    web:redirect($dba:CAT, { 'error': $err:description })
   }
 };

@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class UserFn extends StandardFunc {
@@ -147,6 +147,6 @@ abstract class UserFn extends StandardFunc {
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {
-    return (!updating() || visitor.lock(Locking.USER)) && super.accept(visitor);
+    return (!hasUPD() || visitor.lock(Locking.USER)) && super.accept(visitor);
   }
 }

@@ -3,10 +3,7 @@ package org.basex.api.xmldb;
 import static org.basex.api.xmldb.BXXMLDBText.*;
 import static org.basex.core.Text.*;
 
-import java.util.*;
-
 import org.basex.core.*;
-import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
 import org.basex.util.*;
 import org.xmldb.api.base.*;
@@ -15,7 +12,7 @@ import org.xmldb.api.base.Collection;
 /**
  * Implementation of the Database Interface for the XMLDB:API.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class BXDatabase implements Database {
@@ -49,7 +46,7 @@ public final class BXDatabase implements Database {
 
   @Override
   public String getProperty(final String name) {
-    final Object value = ShowOptions.get(name.toUpperCase(Locale.ENGLISH), ctx);
+    final Object value = ctx.option(name);
     return value == null ? null : value.toString();
   }
 

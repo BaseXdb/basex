@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Thesaurus structure.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Thesaurus {
@@ -90,7 +90,7 @@ public final class Thesaurus {
    */
   private static ANodeList elements(final ANode node, final byte[] name, final boolean desc) {
     final ANodeList list = new ANodeList();
-    for(final ANode element : desc ? node.descendantIter() : node.childIter()) {
+    for(final ANode element : desc ? node.descendantIter(false) : node.childIter()) {
       if(element.type == NodeType.ELEMENT && eq(element.qname().local(), name))
         list.add(element.finish());
     }

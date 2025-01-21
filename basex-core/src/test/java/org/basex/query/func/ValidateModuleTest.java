@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Validation Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ValidateModuleTest extends SandboxTest {
@@ -87,6 +87,7 @@ public final class ValidateModuleTest extends SandboxTest {
     query(func.args(FILE, DTD), "<report><status>valid</status></report>");
     // specify arguments as file paths
     query(func.args(FILE, DTD) + "//status/string()", "valid");
+    query(func.args(FILE, DTD) + "//message/@level/string()", "");
     // specify document as document nodes
     query(func.args(" doc(\"" + FILE + "\")", DTD) + "//status/string()", "valid");
     // specify arguments as file contents
@@ -226,6 +227,8 @@ public final class ValidateModuleTest extends SandboxTest {
 
     // returned error
     query(func.args(FILE) + "//status/string()", "invalid");
+    query(func.args(FILE) + "//message/@level/string()", "Error");
+
     query(
       "let $doc := <root/> " +
       "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +

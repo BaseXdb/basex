@@ -30,7 +30,7 @@ import org.basex.util.*;
  * This class provides static layout and paint helper methods which are used all over
  * the GUI.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class BaseXLayout {
@@ -204,7 +204,7 @@ public final class BaseXLayout {
     final int ll = label.length();
     for(int l = 0; l < ll; l++) {
       final char ch = Character.toLowerCase(label.charAt(l));
-      if(!letter(ch) || mnem.indexOf(Character.toString(ch)) != -1) continue;
+      if(!letter(ch) || mnem.indexOf(String.valueOf(ch)) != -1) continue;
       b.setMnemonic(ch);
       mnem.append(ch);
       break;
@@ -235,11 +235,11 @@ public final class BaseXLayout {
             for(final DataFlavor df : tr.getTransferDataFlavors()) {
               sb.append("- ").append(df).append('\n');
             }
-            Util.debug(sb);
+            Util.debugln(sb);
           }
           break;
         }
-        Util.debug("Clipboard has no contents.");
+        Util.debugln("Clipboard has no contents.");
         break;
       } catch(final Exception ex) {
         Util.stack(ex);
@@ -287,7 +287,7 @@ public final class BaseXLayout {
 
   /**
    * Drag and drop handler.
-   * @author BaseX Team 2005-24, BSD License
+   * @author BaseX Team, BSD License
    * @author Christian Gruen
    */
   public interface DropHandler {
@@ -483,16 +483,16 @@ public final class BaseXLayout {
     if(w < 10) return;
     int j = string.length;
     try {
-      for(int k = 0, l = 0, fw = 0; k < j; k += l) {
-        final int ww = width(g, cp(string, k));
+      for(int s = 0, l = 0, fw = 0; s < j; s += l) {
+        final int ww = width(g, cp(string, s));
         if(fw + ww >= w - 4) {
-          j = Math.max(1, k - l);
-          if(k > 1) fw -= width(g, cp(string, k - 1));
+          j = Math.max(1, s - l);
+          if(s > 1) fw -= width(g, cp(string, s - 1));
           g.drawString("..", x + fw, y + fs);
           break;
         }
         fw += ww;
-        l = cl(string, k);
+        l = cl(string, s);
       }
     } catch(final Exception ex) {
       Util.debug(ex);
@@ -511,8 +511,8 @@ public final class BaseXLayout {
     int fw = 0;
     try {
       // ignore faulty character sets
-      final int l = string.length;
-      for(int k = 0; k < l; k += cl(string, k)) fw += width(g, cp(string, k));
+      final int sl = string.length;
+      for(int s = 0; s < sl; s += cl(string, s)) fw += width(g, cp(string, s));
     } catch(final Exception ex) {
       Util.debug(ex);
     }

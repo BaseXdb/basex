@@ -7,9 +7,10 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 
+import org.basex.io.out.PrintOutput.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.XQArray;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -19,7 +20,7 @@ import org.basex.util.*;
 /**
  * This class serializes items in adaptive mode.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class AdaptiveSerializer extends OutputSerializer {
@@ -124,14 +125,12 @@ public class AdaptiveSerializer extends OutputSerializer {
     }
   }
 
+  /** Fallback function. */
+  private final Fallback fallback = this::printHex;
+
   @Override
   protected void printChar(final int cp) throws IOException {
-    try {
-      out.print(cp);
-    } catch(final QueryIOException ex) {
-      if(ex.getCause().error() == QueryError.SERENC_X_X) printHex(cp);
-      else throw ex;
-    }
+    out.print(cp, fallback);
   }
 
   /**
@@ -142,7 +141,7 @@ public class AdaptiveSerializer extends OutputSerializer {
   protected void array(final XQArray array) throws IOException {
     final TokenBuilder tb = new TokenBuilder().add('[');
     int c = 0;
-    for(final Value value : array.members()) {
+    for(final Value value : array.iterable()) {
       if(c++ > 0) {
         tb.add(',');
         if(indent) tb.add(' ');
@@ -169,21 +168,19 @@ public class AdaptiveSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   protected void map(final XQMap map) throws IOException {
-    final TokenBuilder tb = new TokenBuilder().add("map");
-    if(indent) tb.add(' ');
-    tb.add('{');
+    final TokenBuilder tb = new TokenBuilder().add('{');
     int c = 0;
     ++level;
-    for(final Item key : map.keys()) {
-      if(c++ > 0) tb.add(',');
-      printChars(tb.next());
-      indent();
-      more = false;
-      serialize(key);
-      tb.add(':');
-      if(indent) tb.add(' ');
-      try {
-        final Value value = map.get(key, null);
+    try {
+      for(final Item key : map.keys()) {
+        if(c++ > 0) tb.add(',');
+        printChars(tb.next());
+        indent();
+        more = false;
+        serialize(key);
+        tb.add(':');
+        if(indent) tb.add(' ');
+        final Value value = map.get(key);
         final boolean par = value.size() != 1;
         if(par) tb.add('(');
         int cc = 0;
@@ -197,9 +194,9 @@ public class AdaptiveSerializer extends OutputSerializer {
           serialize(item);
         }
         if(par) tb.add(')');
-      } catch(final QueryException ex) {
-        throw new QueryIOException(ex);
       }
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
     }
     printChars(tb.next());
     --level;

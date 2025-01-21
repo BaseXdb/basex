@@ -12,7 +12,7 @@ import org.basex.util.options.*;
 /**
  * Project-specific collation options.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class BaseXCollationOptions extends CollationOptions {
@@ -44,7 +44,7 @@ public final class BaseXCollationOptions extends CollationOptions {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 
@@ -67,7 +67,7 @@ public final class BaseXCollationOptions extends CollationOptions {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 

@@ -1,7 +1,7 @@
 (:~
  : Delete files.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/files';
 
@@ -17,9 +17,9 @@ declare variable $dba:CAT := 'files';
  : @return redirection
  :)
 declare
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/file-delete')
-  %rest:query-param('name', '{$names}')
+  %rest:form-param('name', '{$names}')
 function dba:file-delete(
   $names  as xs:string*
 ) as element(rest:response) {
@@ -27,9 +27,9 @@ function dba:file-delete(
     (: delete all files, ignore reference to parent directory :)
     for $name in $names
     where $name != '..'
-    return file:delete(config:directory() || $name),
-    web:redirect($dba:CAT, map { 'info': utils:info($names, 'file', 'deleted') })
+    return file:delete(config:files-dir() || $name),
+    web:redirect($dba:CAT, { 'info': utils:info($names, 'file', 'deleted') })
   } catch * {
-    web:redirect($dba:CAT, map { 'error': $err:description })
+    web:redirect($dba:CAT, { 'error': $err:description })
   }
 };

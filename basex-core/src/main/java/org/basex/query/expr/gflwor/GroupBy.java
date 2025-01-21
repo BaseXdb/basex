@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * The GFLWOR {@code group by} expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class GroupBy extends Clause {
@@ -136,7 +136,7 @@ public final class GroupBy extends Clause {
               // If the values are compared using a special collation, we let them collide
               // here and let the comparison do all the work later.
               // This enables other non-collation specs to avoid the collision.
-              hash = 31 * hash + (atom.isEmpty() || spec.coll != null ? 0 : atom.hash(info));
+              hash = 31 * hash + (atom.isEmpty() || spec.coll != null ? 0 : atom.hashCode());
             }
             qc.set(spec.var, atom);
           }

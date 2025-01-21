@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FnForEach extends StandardFunc {
@@ -26,10 +26,10 @@ public class FnForEach extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem action = toFunction(arg(1), 2, this instanceof UpdateForEach, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, action);
     final ValueBuilder vb = new ValueBuilder(qc);
     for(Item item; (item = input.next()) != null;) {
-      vb.add(action.invoke(qc, info, item, Int.get(++p)));
+      vb.add(invoke(action, args.set(0, item).inc(), qc));
     }
     return vb.value(this);
   }
@@ -45,17 +45,22 @@ public class FnForEach extends StandardFunc {
       // for $i in INPUT return ACTION($i)
       // for $i at $p in INPUT return ACTION($i, $p)
       final IntObjMap<Var> vm = new IntObjMap<>();
-      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, sc, info), vm);
-      final Var p = arity != 1 ? cc.copy(new Var(new QNm("pos"), null, cc.qc, sc, info), vm) : null;
+      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
+      final Var p = arity != 1 ? cc.copy(new Var(new QNm("pos"), null, cc.qc, info), vm) : null;
       final For fr = new For(i, p, null, input, false).optimize(cc);
 
-      final Expr act = coerce(1, cc, arity);
+      final Expr act = coerceFunc(1, cc, arity);
       final boolean updating = this instanceof UpdateForEach, ndt = act.has(Flag.NDT);
       final ExprList args = new ExprList(new VarRef(info, i).optimize(cc));
       if(arity == 2) args.add(new VarRef(info, p).optimize(cc));
-      final Expr rtrn = new DynFuncCall(info, sc, updating, ndt, act, args.finish()).optimize(cc);
+      final Expr rtrn = new DynFuncCall(info, updating, ndt, act, args.finish()).optimize(cc);
       return new GFLWOR(info, fr, rtrn).optimize(cc);
     }
     return this;
+  }
+
+  @Override
+  public final int hofIndex() {
+    return 1;
   }
 }

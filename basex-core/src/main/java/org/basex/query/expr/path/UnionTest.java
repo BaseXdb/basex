@@ -8,23 +8,33 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Union test for nodes of common type.
+ * Union test for nodes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class UnionTest extends Test {
   /** Tests. */
-  final Test[] tests;
+  public final Test[] tests;
 
   /**
    * Constructor.
-   * @param type common node type
-   * @param tests tests ({@link NameTest}, {@link DocTest} and {@link InvDocTest} instances)
+   * @param tests tests
    */
-  UnionTest(final NodeType type, final Test[] tests) {
-    super(type);
+  public UnionTest(final Test[] tests) {
+    super(unionType(tests));
     this.tests = tests;
+  }
+
+  /**
+   * Calculate union type of tests.
+   * @param tests tests
+   * @return union type
+   */
+  private static NodeType unionType(final Test[] tests) {
+    Type unionType = tests[0].type;
+    for (int i = 1; i < tests.length; ++i) unionType = unionType.union(tests[i].type);
+    return (NodeType) unionType;
   }
 
   @Override
@@ -34,7 +44,7 @@ public final class UnionTest extends Test {
       final Test t = test.optimize(data);
       if(t != null) list.add(t);
     }
-    return tests.length != list.size() ? get(list.toArray(Test[]::new)) : this;
+    return tests.length != list.size() ? get(list) : this;
   }
 
   @Override
@@ -88,7 +98,7 @@ public final class UnionTest extends Test {
       final Test t2 = t.intersect(test);
       if(t2 != null) list.add(t2);
     }
-    return get(list.toArray(Test[]::new));
+    return get(list);
   }
 
   @Override
@@ -99,10 +109,11 @@ public final class UnionTest extends Test {
   @Override
   public String toString(final boolean full) {
     final TokenBuilder tb = new TokenBuilder();
+    char ch = '(';
     for(final Test test : tests) {
-      if(!tb.isEmpty()) tb.add('|');
-      tb.add(test.toString(full));
+      tb.add(ch).add(test.toString(full));
+      ch = '|';
     }
-    return tb.toString();
+    return tb.add(')').toString();
   }
 }

@@ -10,7 +10,7 @@ import org.basex.util.list.*;
 /**
  * Provides central access to all databases and backups.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Jens Erat
  */
 public final class Databases {
@@ -162,7 +162,7 @@ public final class Databases {
    * @return date string
    */
   public static String date(final String backup) {
-    return backup.replaceAll("^.+-(" + DATE + ")$", "$1");
+    return backup.replaceAll("^.*-(" + DATE + ")$", "$1");
   }
 
   /**

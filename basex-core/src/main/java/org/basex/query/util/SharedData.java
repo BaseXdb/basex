@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * Shared data references.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class SharedData {
@@ -59,7 +59,7 @@ public final class SharedData {
    */
   public QNm qName(final byte[] name, final byte[] uri) {
     return qnames.computeIfAbsent(
-      uri != null ? Token.concat(name, Token.SPACE, uri) : name,
+      uri != null ? Token.concat(name, Token.cpToken(' '), uri) : name,
       () -> new QNm(name, uri)
     );
   }

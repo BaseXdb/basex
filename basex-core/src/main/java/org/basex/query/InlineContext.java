@@ -11,13 +11,13 @@ import org.basex.util.hash.*;
 /**
  * Context for inlining expressions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class InlineContext {
   /** Compilation context. */
   public final CompileContext cc;
-  /** Variable reference, or {@code null} for context reference. */
+  /** Variable reference, or {@code null} for context reference, to be replaced. */
   public final Var var;
   /** Expression to inline. */
   public final Expr expr;
@@ -40,7 +40,7 @@ public final class InlineContext {
   /**
    * Checks if inlining into the specified expressions is possible.
    * See {@link Expr#inlineable} for further details.
-   * @param targets target expressions
+   * @param targets expressions to be modified
    * @return result of check
    */
   public boolean inlineable(final Expr... targets) {

@@ -1,6 +1,6 @@
 (:~
  : This XQuery module is evaluated by some JUnit tests.
- : @author BaseX Team 2005-24, BSD License
+ : @author BaseX Team, BSD License
  : @version 1.0
  : @unknown tag
  :)
@@ -33,6 +33,11 @@ declare %public function hello:world() as xs:string {
   hello:internal()
 };
 
+(:~ Function with default parameter value. :)
+declare function hello:hello($who := "world") as xs:string {
+  "hello " || $who
+};
+
 (:~ Private function returning a simple string. :)
 declare %private %Q{ns}ignored function hello:internal() as xs:string {
   "hello world"
@@ -42,3 +47,9 @@ declare %private %Q{ns}ignored function hello:internal() as xs:string {
 declare function hello:closure() {
   count#1(1)
 };
+
+(:~ Private type. :)
+declare %private type hello:private-int as xs:integer;
+
+(:~ Public type. :)
+declare type hello:int as hello:private-int;

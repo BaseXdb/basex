@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class HtmlParse extends StandardFunc {
@@ -51,7 +51,7 @@ public class HtmlParse extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
-    final HtmlOptions options = toOptions(arg(1), new HtmlOptions(), INVHTMLOPT_X, qc);
+    final HtmlOptions options = toOptions(arg(1), new HtmlOptions(), qc);
     if(options.contains(HEURISTICS)) {
       switch (options.get(HEURISTICS)) {
       case ALL:

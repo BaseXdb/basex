@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Parser for formatting integers.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IntFormat extends FormatParser {
@@ -48,7 +48,7 @@ public final class IntFormat extends FormatParser {
 
     final byte[] pres = substring(picture, rc + 1, sc == -1 ? picture.length : sc);
     if(pres.length == 0) throw PICEMPTY.get(info, picture);
-    finish(presentation(pres, ONE, false, false));
+    finish(presentation(pres, cpToken('1'), false, false));
     if(sc == -1) return;
 
     // parses the format modifier

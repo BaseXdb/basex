@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * This class contains functions for generating a plain XQuery documentation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class PlainDoc extends Inspect {
@@ -46,8 +46,8 @@ final class PlainDoc extends Inspect {
   }
 
   @Override
-  public FNode parse(final IOContent content) throws QueryException {
-    final AModule module = parseModule(content);
+  public FNode parse(final IOContent source) throws QueryException {
+    final AModule module = parseModule(source);
     final FBuilder root = element("module");
     if(module instanceof LibraryModule) {
       final QNm name = module.sc.module;
@@ -138,7 +138,7 @@ final class PlainDoc extends Inspect {
     type(ft.declType, rtrn);
     final TokenList returns = doc != null ? doc.get(DOC_RETURN) : null;
     if(returns != null) {
-      for(final byte[] val : returns) add(val, rtrn);
+      for(final byte[] value : returns) add(value, rtrn);
     }
     return function.add(rtrn).finish();
   }

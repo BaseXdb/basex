@@ -4,11 +4,10 @@ import static java.lang.Long.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -19,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Integer position range check.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IntPos extends Simple implements CmpPos {
@@ -53,51 +52,27 @@ public final class IntPos extends Simple implements CmpPos {
       new IntPos(Math.max(1, min), Math.max(1, max), info);
   }
 
-  /**
-   * Tries to rewrite {@code fn:position() CMP number(s)} to this expression.
-   * Returns an instance of this class, an optimized expression, or {@code null}
-   * @param pos positions to be matched
-   * @param op comparison operator
-   * @param info input info (can be {@code null})
-   * @return optimized expression or {@code null}
-   */
-  static Expr get(final Expr pos, final OpV op, final InputInfo info) {
-    if(pos == Empty.VALUE) return Bln.FALSE;
-    if(pos instanceof RangeSeq && op == OpV.EQ) {
-      final RangeSeq rs = (RangeSeq) pos;
-      return get(rs.min(), rs.max(), info);
-    }
-    if(pos instanceof ANum) {
-      final ANum num = (ANum) pos;
-      final long p = num.itr();
-      final boolean exact = p == num.dbl();
-      switch(op) {
-        case EQ: return exact ? get(p, p, info) : Bln.FALSE;
-        case GE: return get(exact ? p : p + 1, MAX_VALUE, info);
-        case GT: return get(p + 1, MAX_VALUE, info);
-        case LE: return get(1, p, info);
-        case LT: return get(1, exact ? p - 1 : p, info);
-        case NE: return exact ? p < 2 ? get(p + 1, MAX_VALUE, info) : null : Bln.TRUE;
-        default:
-      }
-    }
-    return null;
+  @Override
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
   }
 
   @Override
-  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     ctxValue(qc);
-    return Bln.get(test(qc.focus.pos, qc) != 0);
+    final long p = qc.focus.pos;
+    return p >= min && p <= max;
+  }
+
+  @Override
+  public Value positions(final QueryContext qc) {
+    return RangeSeq.get(min, max - min + 1, true);
   }
 
   @Override
   public boolean exact() {
     return min == max;
-  }
-
-  @Override
-  public int test(final long pos, final QueryContext qc) {
-    return pos == max ? 2 : pos >= min && pos <= max ? 1 : 0;
   }
 
   @Override
@@ -114,7 +89,7 @@ public final class IntPos extends Simple implements CmpPos {
   public Expr invert(final CompileContext cc) throws QueryException {
     if(exact()) {
       final Expr pos = cc.function(Function.POSITION, info);
-      return new CmpG(info, pos, Int.get(min), OpG.NE, null, cc.sc()).optimize(cc);
+      return new CmpG(info, pos, Int.get(min), OpG.NE).optimize(cc);
     }
     return min == 1 ? get(max + 1, MAX_VALUE, info) :
       max == MAX_VALUE ? get(1, min - 1, info) : null;
@@ -122,31 +97,25 @@ public final class IntPos extends Simple implements CmpPos {
 
   @Override
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
-    if(!(ex instanceof IntPos)) return null;
-
-    // find range with smaller minimum
-    IntPos pos1 = this, pos2 = (IntPos) ex;
-    if(pos2.min < pos1.min) {
-      pos1 = pos2;
-      pos2 = this;
+    if(ex instanceof IntPos) {
+      // find range with smaller minimum
+      IntPos pos1 = this, pos2 = (IntPos) ex;
+      if(pos2.min < pos1.min) {
+        pos1 = pos2;
+        pos2 = this;
+      }
+      // create intersection: pos: 1, 2 and pos: 2, 3  ->  pos: 2
+      if(!or) return get(pos2.min, Math.min(pos1.max, pos2.max), info);
+      // create union: pos: 1, 2 or pos: 2, 3  ->  pos: 1, 3
+      if(pos1.max + 1 >= pos2.min) return get(pos1.min, Math.max(pos1.max, pos2.max), info);
+      // disjoint ranges, no rewrite: pos: 1 or pos: 3
     }
-    // create intersection: position() = 1 to 2 and position() = 2 to 3  ->  position() = 2
-    return !or ? get(pos2.min, Math.min(pos1.max, pos2.max), info) :
-      // create union: position() = 1 to 2 or position() = 2 to 3  ->  position() = 1 to 3
-      pos1.max + 1 >= pos2.min ? get(pos1.min, Math.max(pos1.max, pos2.max), info) :
-      // disjoint ranges: position() = 1 or position() = 3   ->  no rewrite
-      null;
+    return null;
   }
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags) || Flag.CTX.in(flags) || super.has(flags);
-  }
-
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[position() = 3]  ->  E[3]
-    return cc.simplify(this, mode == Simplify.PREDICATE && exact() ? Int.get(min) : this, mode);
+    return Flag.POS.oneOf(flags) || Flag.CTX.oneOf(flags) || super.has(flags);
   }
 
   @Override

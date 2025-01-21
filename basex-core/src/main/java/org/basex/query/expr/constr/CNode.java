@@ -14,27 +14,23 @@ import org.basex.util.*;
 /**
  * Node constructor.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class CNode extends Arr {
-  /** Static context. */
-  final StaticContext sc;
   /** Computed constructor. */
   final boolean computed;
 
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param computed computed constructor
    * @param seqType sequence type
    * @param exprs expressions
    */
-  CNode(final StaticContext sc, final InputInfo info, final SeqType seqType, final boolean computed,
+  CNode(final InputInfo info, final SeqType seqType, final boolean computed,
       final Expr... exprs) {
     super(info, seqType, exprs);
-    this.sc = sc;
     this.computed = computed;
   }
 
@@ -48,7 +44,7 @@ public abstract class CNode extends Arr {
    */
   final void optValue(final CompileContext cc) throws QueryException {
     exprs = simplifyAll(Simplify.STRING, cc);
-    if(allAreValues(true) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
+    if(values(true, cc) && (exprs.length != 1 || !(exprs[0] instanceof Str))) {
       exprs = new Expr[] { Str.get(atomValue(cc.qc, true)) };
     }
   }
@@ -63,13 +59,13 @@ public abstract class CNode extends Arr {
   final byte[] atomValue(final QueryContext qc, final boolean empty) throws QueryException {
     TokenBuilder tb = null;
     for(final Expr expr : exprs) {
-      boolean space = false;
+      boolean more = false;
       final Iter iter = expr.atomIter(qc, info);
       for(Item item; (item = qc.next(iter)) != null;) {
         if(tb == null) tb = new TokenBuilder();
-        else if(space) tb.add(' ');
+        else if(more) tb.add(' ');
         tb.add(item.string(info));
-        space = true;
+        more = true;
       }
     }
     return tb != null ? tb.finish() : empty ? Token.EMPTY : null;
@@ -89,17 +85,17 @@ public abstract class CNode extends Arr {
         }
       }
     }
-    return cc.simplify(this, st != null ? new Cast(cc.sc(), info, exprs[0], st).optimize(cc) : this,
-      mode);
+    return cc.simplify(this, st != null ? new Cast(info, exprs[0], st).optimize(cc) : this, mode);
   }
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.CNS.in(flags) || super.has(flags);
+    return Flag.CNS.oneOf(flags) || super.has(flags);
   }
 
   @Override
   public boolean inlineable(final InlineContext ic) {
+    // do not change context of constructed nodes:  <x/> ! <y xmlns='y'>{ <x/> }</y>
     return !ic.expr.has(Flag.CNS) && super.inlineable(ic);
   }
 
@@ -110,7 +106,7 @@ public abstract class CNode extends Arr {
 
   @Override
   public final String description() {
-    return Strings.concat(((NodeType) seqType().type).qname().local(), " constructor");
+    return Strings.concat(((NodeType) seqType().type).kind(), " constructor");
   }
 
   /**

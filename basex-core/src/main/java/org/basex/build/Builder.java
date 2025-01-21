@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * are to be added or closed. The builder implementation decides whether
  * the nodes are stored on disk or kept in memory.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Builder extends Job {
@@ -76,7 +76,7 @@ public abstract class Builder extends Job {
    */
   final void parse() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
-    Util.debug(shortInfo() + DOTS);
+    Util.debugln(shortInfo() + DOTS);
     try {
       // add document node and parse document
       parser.parse(this);

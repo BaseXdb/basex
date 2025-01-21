@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * This class serializes items as HTML.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class HTMLSerializer extends MarkupSerializer {
@@ -99,7 +99,7 @@ final class HTMLSerializer extends MarkupSerializer {
       final byte[] nm = concat(lc(elem.string()), ATT, lc(name));
       if(BOOLEAN.contains(nm) && eq(name, val)) return;
       // escape URI attributes
-      if(escuri && URIS.contains(nm)) val = escape(val);
+      if(escape && URIS.contains(nm)) val = encodeUri(val, UriEncoder.ESCAPE);
     }
 
     out.print(ATT1);

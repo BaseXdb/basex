@@ -4,12 +4,16 @@ import java.io.*;
 
 import org.basex.build.csv.*;
 import org.basex.io.in.*;
+import org.basex.query.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * A CSV parser generating parse events similar to a SAX XML parser.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CsvParser {
@@ -23,34 +27,63 @@ public final class CsvParser {
   private final boolean backslashes;
   /** Column separator (see {@link CsvOptions#SEPARATOR}). */
   private final int separator;
+  /** Row delimiter (see {@link CsvOptions#ROW_DELIMITER}). */
+  private final int rowDelimiter;
+  /** Quote character (see {@link CsvOptions#QUOTE_CHARACTER}). */
+  private final int quoteCharacter;
   /** Parse quotes.  */
   private final boolean quotes;
+  /** Trim whitespace (see {@link CsvOptions#TRIM_WHITESPACE}). */
+  private final boolean trimWhitespace;
+  /** Trim rows (see {@link CsvOptions#TRIM_ROWS}). */
+  private final boolean trimRows;
+  /** Disallow field content outside of quotes. */
+  private final boolean strictQuoting;
+  /** Select columns. */
+  private final int[] selectColumns;
 
   /** First entry of a line. */
   private boolean first = true;
+  /** Number of fields in first row. */
+  private int rowSize = -1;
   /** Data mode. */
   private boolean data;
+  /** Fields of the current row. */
+  private final TokenList fields = new TokenList();
 
   /**
    * Constructor.
    * @param input input
    * @param opts options
    * @param conv converter
+   * @throws QueryException query exception
    */
-  public CsvParser(final TextInput input, final CsvParserOptions opts, final CsvConverter conv) {
+  public CsvParser(final TextInput input, final CsvParserOptions opts, final CsvConverter conv)
+      throws QueryException {
     this.input = input;
     this.conv = conv;
     header = opts.get(CsvOptions.HEADER);
     separator = opts.separator();
-    quotes = opts.get(CsvOptions.QUOTES);
+    rowDelimiter = opts.rowDelimiter();
+    quoteCharacter = opts.quoteCharacter();
+    strictQuoting = opts.get(CsvOptions.STRICT_QUOTING);
+    quotes = strictQuoting || opts.get(CsvOptions.QUOTES);
     backslashes = opts.get(CsvOptions.BACKSLASHES);
+    trimWhitespace = opts.get(CsvOptions.TRIM_WHITESPACE);
+    trimRows = opts.get(CsvOptions.TRIM_ROWS);
+    selectColumns = opts.get(CsvOptions.SELECT_COLUMNS);
+    for(final int sc : selectColumns) {
+      if(sc < 1) throw QueryError.typeError(Int.get(sc), SeqType.POSITIVE_INTEGER_O, null);
+    }
   }
 
   /**
    * Parses a CSV expression.
+   * @param ii input info (can be @null)
+   * @throws QueryException query exception
    * @throws IOException query I/O exception
    */
-  public void parse() throws IOException {
+  public void parse(final InputInfo ii) throws QueryException, IOException {
     final TokenBuilder entry = new TokenBuilder();
     boolean quoted = false;
     data = !header;
@@ -59,33 +92,38 @@ public final class CsvParser {
     while(ch != -1) {
       if(quoted) {
         // quoted state
-        if(ch == '"') {
+        if(ch == quoteCharacter) {
           ch = input.read();
-          if(ch != '"') {
+          if(ch != quoteCharacter) {
             quoted = false;
+            if(strictQuoting && ch != separator && ch != rowDelimiter && ch != -1)
+              throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(
+                  quoteCharacter).add(entry).add(quoteCharacter).add(ch));
             continue;
           }
-          if(backslashes) add(entry, '"');
+          if(backslashes) add(entry, quoteCharacter);
         } else if(ch == '\\' && backslashes) {
           ch = bs();
         }
         add(entry, ch);
-      } else if(ch == '"') {
+      } else if(ch == quoteCharacter) {
         if(quotes && entry.isEmpty()) {
           // parse quote
           quoted = true;
+        } else if (strictQuoting) {
+          throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(entry).add(quoteCharacter));
         } else {
           ch = input.read();
-          if(ch != '"' || backslashes) add(entry, '"');
+          if(ch != quoteCharacter || backslashes) add(entry, quoteCharacter);
           continue;
         }
       } else if(ch == separator) {
         // parse separator
-        record(entry, true);
+        record(entry, false, false);
         first = false;
-      } else if(ch == '\n') {
+      } else if(ch == rowDelimiter) {
         // parse newline
-        record(entry, !entry.isEmpty());
+        record(entry, false, true);
         first = true;
         data = true;
       } else {
@@ -94,7 +132,9 @@ public final class CsvParser {
       }
       ch = input.read();
     }
-    record(entry, !entry.isEmpty());
+    if(quoted && strictQuoting)
+      throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(quoteCharacter).add(entry));
+    record(entry, true, true);
   }
 
   /**
@@ -122,17 +162,30 @@ public final class CsvParser {
   /**
    * Adds a new record and entry.
    * @param entry entry to be added
-   * @param record add new record
+   * @param lastRow whether this is the last row
+   * @param lastField whether this is the last field of the row
    * @throws IOException I/O exception
    */
-  private void record(final TokenBuilder entry, final boolean record) throws IOException {
-    if(record && first && data) conv.record();
-    if(record || !first) {
-      if(data) {
-        conv.entry(entry.next());
-      } else {
-        conv.header(entry.next());
+  private void record(final TokenBuilder entry, final boolean lastRow, final boolean lastField)
+      throws IOException {
+    final byte[] next = entry.next();
+    final byte[] field = trimWhitespace ? Token.trim(next) : next;
+    if(field.length > 0 || !(first && lastField)) fields.add(field);
+    if(lastField && !(lastRow && fields.isEmpty())) {
+      if(data) conv.record();
+      if(rowSize == -1) rowSize = fields.size();
+      final int n = selectColumns.length != 0 ? selectColumns.length
+                                              : trimRows ? rowSize : fields.size();
+      for(int i = 0; i < n; ++i) {
+        final int index = selectColumns.length != 0 ? selectColumns[i] - 1 : i;
+        final byte[] f = index < fields.size() ? fields.get(index) : Token.EMPTY;
+        if(data) {
+          conv.entry(f);
+        } else {
+          conv.header(f);
+        }
       }
+      fields.reset();
     }
   }
 }

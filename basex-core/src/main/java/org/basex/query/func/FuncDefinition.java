@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.users.*;
-import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -15,9 +14,9 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Definition of built-in function.
+ * Definition of a built-in function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FuncDefinition {
@@ -108,12 +107,10 @@ public final class FuncDefinition {
         break;
       } else if(ch == ')') {
         break;
-      } else {
-        if(optional) {
-          if(max == min) max++;
-        } else {
-          if(min == 0) min = 1;
-        }
+      } else if(optional) {
+        if(max == min) max++;
+      } else if(min == 0) {
+        min = 1;
       }
     }
     if(max == -1) max = min;
@@ -237,14 +234,13 @@ public final class FuncDefinition {
 
   /**
    * Creates a new function instance.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param args function arguments
    * @return function
    */
-  public StandardFunc get(final StaticContext sc, final InputInfo info, final Expr... args) {
+  public StandardFunc get(final InputInfo info, final Expr... args) {
     final StandardFunc sf = supplier.get();
-    sf.init(sc, info, this, args);
+    sf.init(info, this, args);
     return sf;
   }
 

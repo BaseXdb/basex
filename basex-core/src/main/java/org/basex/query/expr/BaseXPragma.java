@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Pragma for database options.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class BaseXPragma extends Pragma {
@@ -40,7 +40,7 @@ public final class BaseXPragma extends Pragma {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.NDT.in(flags) && ndt;
+    return Flag.NDT.oneOf(flags) && ndt;
   }
 
   @Override

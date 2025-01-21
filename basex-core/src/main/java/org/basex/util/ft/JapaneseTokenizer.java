@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Japanese lexer using igo (http://igo.sourceforge.jp/).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Toshio HIRAI
  */
 final class JapaneseTokenizer extends Tokenizer {
@@ -103,18 +103,18 @@ final class JapaneseTokenizer extends Tokenizer {
     if(available) {
       Class<?> clz = Reflect.find(PATTERN);
       if(clz == null) {
-        Util.debug("Could not initialize Igo Japanese lexer.");
+        Util.debugln("Could not initialize Igo Japanese lexer.");
       } else {
         /* Igo constructor. */
         final Constructor<?> tgr = Reflect.find(clz, String.class);
         tagger = Reflect.get(tgr, dic.path());
         if(tagger == null) {
           available = false;
-          Util.debug("Could not initialize Igo Japanese lexer.");
+          Util.debugln("Could not initialize Igo Japanese lexer.");
         } else {
           parse = Reflect.method(clz, "parse", CharSequence.class);
           if(parse == null) {
-            Util.debug("Could not initialize Igo lexer method.");
+            Util.debugln("Could not initialize Igo lexer method.");
           }
           clz = Reflect.find("net.reduls.igo.Morpheme");
           surface = Reflect.field(clz, "surface");
@@ -306,8 +306,8 @@ final class JapaneseTokenizer extends Tokenizer {
       if(!currToken.isMark() && !currToken.isAttachedWord()) return true;
     }
     return false;
-
   }
+
   @Override
   public boolean hasNext() {
     return wc ? moreWC() : more();

@@ -11,13 +11,14 @@ import org.basex.build.json.JsonParserOptions.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
  * This class provides a parse method to convert JSON data to XML nodes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class JsonXmlConverter extends JsonConverter {
@@ -103,8 +104,13 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  void numberLit(final Item value) throws QueryException {
-    addValue(NUMBER, value.string(null));
+  void numberLit(final byte[] value) throws QueryException {
+    byte[] string = value;
+    if(numberParser != null) {
+      final Item item = numberParser.apply(value);
+      string = item.isEmpty() ? Token.EMPTY : item.string(null);
+    }
+    addValue(NUMBER, string);
   }
 
   @Override

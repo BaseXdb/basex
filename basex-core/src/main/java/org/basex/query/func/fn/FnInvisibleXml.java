@@ -24,7 +24,7 @@ import de.bottlecaps.markup.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class FnInvisibleXml extends StandardFunc {
@@ -60,7 +60,7 @@ public final class FnInvisibleXml extends StandardFunc {
       final String grammar = value.isEmpty()
           ? Blitz.ixmlGrammar()
           : FnInvisibleXml.this.toString(value);
-      final IxmlOptions opts = toOptions(arg(1), new IxmlOptions(), true, qc);
+      final IxmlOptions opts = toOptions(arg(1), new IxmlOptions(), qc);
       final de.bottlecaps.markup.blitz.Parser parser;
       try {
         parser = opts.get(IxmlOptions.FAIL_ON_ERROR)
@@ -71,11 +71,12 @@ public final class FnInvisibleXml extends StandardFunc {
       } catch(final BlitzException ex) {
         throw IXML_GEN_X.get(info, ex);
       }
-      final Var[] params = { new VarScope(sc).addNew(new QNm("input"), STRING_O, true, qc, info)};
-      final Expr arg = new VarRef(info, params[0]);
+      final Var var = new VarScope().addNew(new QNm("input"), STRING_O, qc, info);
+      final Var[] params = { var };
+      final Expr arg = new VarRef(info, var);
       final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);
       final FuncType ft = FuncType.get(parseFunction.seqType(), STRING_O);
-      return new FuncItem(info, parseFunction, params, AnnList.EMPTY, ft, sc, params.length, null);
+      return new FuncItem(info, parseFunction, params, AnnList.EMPTY, ft, params.length, null);
     }
   }
 
@@ -102,11 +103,10 @@ public final class FnInvisibleXml extends StandardFunc {
     public DBNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
       final String input = toString(arg(0), qc);
       try {
-        final String output = parser.parse(input);
-        return new DBNode(IO.get(output));
+        return new DBNode(IO.get(parser.parse(input)));
       } catch(final BlitzParseException ex) {
         throw IXML_INP_X_X_X.get(ii, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
-      } catch(BlitzException | IOException ex) {
+      } catch(final BlitzException | IOException ex) {
         throw IXML_RESULT_X.get(info, ex);
       }
     }

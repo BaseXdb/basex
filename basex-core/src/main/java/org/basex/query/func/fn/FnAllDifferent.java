@@ -17,20 +17,26 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnAllDifferent extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
 
-    final ItemSet set = CollationItemSet.get(collation, info);
+    final ItemSet set = ItemSet.get(collation, info);
     for(Item item; (item = qc.next(values)) != null;) {
-      if(!set.add(item)) return Bln.FALSE;
+      if(!set.add(item)) return false;
     }
-    return Bln.TRUE;
+    return true;
   }
 
   @Override

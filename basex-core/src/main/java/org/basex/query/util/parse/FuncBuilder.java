@@ -5,89 +5,111 @@ import org.basex.query.expr.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Container for parsed function data.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FuncBuilder {
-  /** Static context. */
-  public final StaticContext sc;
   /** Input Info. */
   public final InputInfo info;
-
-  /** Variable scope (literals). */
-  public VarScope vs;
-  /** Parameters (literals). */
-  public Var[] params;
-  /** Annotations (literals). */
-  public AnnList anns = AnnList.EMPTY;
-  /** Runtime flag (literals). */
-  public boolean runtime;
-  /** Fixed argument list (literals). */
-  private Expr[] fixedArgs;
-  /** Argument counter (literals). */
-  private int c;
-
   /** Keyword-based arguments (initialized if required). */
   public QNmMap<Expr> keywords;
+  /** Number of placeholders. */
+  public int placeholders;
+  /** Arity. */
+  public int arity;
+
+  /** Annotations (literals). */
+  public AnnList anns = AnnList.EMPTY;
+  /** Parameters (literals). */
+  public Var[] params;
+  /** Variable scope (literals). */
+  public VarScope vs;
+  /** Runtime flag (literals). */
+  public boolean runtime;
+
   /** Arguments. */
-  private ExprList args;
-  /** Placeholders (initialized if required). */
-  private IntList holes;
+  private final ExprList args;
 
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info
    */
-  public FuncBuilder(final StaticContext sc, final InputInfo info) {
-    this.sc = sc;
-    this.info = info;
+  public FuncBuilder(final InputInfo info) {
+    this(info, new ExprList(4));
   }
 
   /**
-   * Initializes the builder.
-   * @param arguments initial arguments
-   * @param kw initial keywords (can be {@code null})
-   * @return self reference
+   * Constructor.
+   * @param info input info
+   * @param args initial arguments
    */
-  public FuncBuilder init(final Expr[] arguments, final QNmMap<Expr> kw) {
-    args = arguments != null ? new ExprList(arguments) : new ExprList(4);
+  public FuncBuilder(final InputInfo info, final ExprList args) {
+    this.info = info;
+    this.args = args;
+  }
+
+  /**
+   * Constructor.
+   * @param info input info
+   * @param args initial arguments
+   * @param kw initial keywords (can be {@code null})
+   */
+  public FuncBuilder(final InputInfo info, final Expr[] args, final QNmMap<Expr> kw) {
+    this(info, new ExprList(args));
     keywords = kw;
-    return this;
+  }
+
+  /**
+   * Constructor for function literals.
+   * @param info input info
+   * @param a arity
+   * @param rt {@code true} if the function is created at runtime
+   */
+  public FuncBuilder(final InputInfo info, final int a, final boolean rt) {
+    this(info, new ExprList(a));
+    params = new Var[a];
+    vs = new VarScope();
+    runtime = rt;
   }
 
   /**
    * Adds an argument.
-   * @param arg argument ({@code null} for placeholder)
+   * @param arg argument ({@link Empty#UNDEFINED} for placeholder)
+   * @param name name of parameter (can be {@code null})
+   * @return {@code true} if a key has been supplied more than once
    */
-  public void add(final Expr arg) {
-    if(arg != null) {
-      args.add(arg);
+  public boolean add(final Expr arg, final QNm name) {
+    boolean duplicate = false;
+    if(name != null) {
+      if(keywords == null) keywords = new QNmMap<>();
+      else duplicate = keywords.contains(name);
+      keywords.put(name, arg);
     } else {
-      if(holes == null) holes = new IntList(4);
-      holes.add(holes.size() + args.size());
+      args.add(arg);
     }
+    if(arg == Empty.UNDEFINED) placeholders++;
+    arity++;
+    return duplicate;
   }
 
   /**
-   * Adds a keyword expression.
-   * @param qnm name of keyword
-   * @param arg argument ({@code null} for placeholder)
-   * @return {@code true} if the entry already exists
+   * Adds a parameter and argument for a function literal.
+   * @param name parameter name
+   * @param st parameter type
+   * @param qc query context
    */
-  public boolean add(final QNm qnm, final Expr arg) {
-    if(keywords == null) keywords = new QNmMap<>();
-    final boolean contains = keywords.contains(qnm);
-    keywords.put(qnm, arg);
-    return contains;
+  public void add(final QNm name, final SeqType st, final QueryContext qc) {
+    final Var var = vs.addNew(name, st, qc, info);
+    params[arity] = var;
+    add(new VarRef(info, var), null);
   }
 
   /**
@@ -95,58 +117,7 @@ public final class FuncBuilder {
    * @return arguments
    */
   public Expr[] args() {
-    return fixedArgs != null ? fixedArgs : args.toArray();
-  }
-
-  /**
-   * Returns placeholder positions.
-   * @return placeholders (can be {@code null})
-   */
-  public int[] holes() {
-    return holes.finish();
-  }
-
-  /**
-   * Indicates if this is a partial function application.
-   * @return placeholders (can be {@code null})
-   */
-  public boolean partial() {
-    return holes != null;
-  }
-
-  /**
-   * Returns the function arity.
-   * @return arity
-   */
-  public int arity() {
-    return fixedArgs != null ? fixedArgs.length : args.size() + holes.size();
-  }
-
-  // LITERALS =====================================================================================
-
-  /**
-   * Initializes the builder for function literals.
-   * @param a arity
-   * @param rt {@code true} if the function is created at runtime
-   * @return self reference
-   */
-  public FuncBuilder initLiteral(final int a, final boolean rt) {
-    fixedArgs = new Expr[a];
-    params = new Var[a];
-    vs = new VarScope(sc);
-    runtime = rt;
-    return this;
-  }
-
-  /**
-   * Adds a parameter and argument.
-   * @param name parameter name
-   * @param st parameter type
-   * @param qc query context
-   */
-  public void add(final QNm name, final SeqType st, final QueryContext qc) {
-    final Var var = vs.addNew(name, st, true, qc, info);
-    params[c] = var;
-    fixedArgs[c++] = new VarRef(info, var);
+    // function literals: return array with full capacity
+    return params != null ? args.list : args.toArray();
   }
 }

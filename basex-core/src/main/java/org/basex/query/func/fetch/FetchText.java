@@ -10,16 +10,16 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FetchText extends FetchDoc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final IO io = toIO(arg(0), qc);
+    final IO source = toIO(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), FETCH_ENCODING_X, qc);
     final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
-    return new StrLazy(io, encoding, FETCH_OPEN_X, !fallback);
+    return new StrLazy(source, encoding, FETCH_OPEN_X, !fallback);
   }
 }

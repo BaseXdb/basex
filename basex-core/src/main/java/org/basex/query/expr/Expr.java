@@ -6,12 +6,10 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
-import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
@@ -29,7 +27,7 @@ import org.basex.util.hash.*;
  * Abstract class for representing XQuery expressions.
  * Expression are divided into {@link ParseExpr} and {@link Value} classes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Expr extends ExprInfo {
@@ -83,8 +81,8 @@ public abstract class Expr extends ExprInfo {
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
    * If this method is not implemented, {@link #value(QueryContext)} must be implemented instead.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
-   *   which have no input info)
+   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   *   that have no input info)
    * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
@@ -93,8 +91,8 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns an iterator on the resulting, atomized items.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
-   *   which have no input info)
+   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   *   that have no input info)
    * @return iterator
    * @throws QueryException query exception
    */
@@ -111,8 +109,8 @@ public abstract class Expr extends ExprInfo {
    * Evaluates the expression and returns the resulting, atomized item,
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
-   *   which have no input info)
+   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   *   that have no input info)
    * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
@@ -123,8 +121,8 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns the atomized items.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
-   *   which have no input info)
+   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   *   that have no input info)
    * @return atomized item
    * @throws QueryException query exception
    */
@@ -133,14 +131,13 @@ public abstract class Expr extends ExprInfo {
   /**
    * Computes the effective boolean value for this expression.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for {@link Seq} instances,
-   *   which have no input info)
-   * @param predicate predicate test
+   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   *   that have no input info)
+   * @param pos position of context item (if {@code 0}, perform EBV test)
    * @return item
    * @throws QueryException query exception
    */
-  public abstract boolean test(QueryContext qc, InputInfo ii, boolean predicate)
-      throws QueryException;
+  public abstract boolean test(QueryContext qc, InputInfo ii, long pos) throws QueryException;
 
   /**
    * Tests if this is a vacuous expression (empty sequence or error function).
@@ -193,15 +190,14 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if inlining is possible.
-   * This function is called by {@link InlineContext#inlineable} and:
-   * {@link CNode#inlineable} returns false if the new expression construct new nodes.
+   * This function is called by {@link InlineContext#inlineable}.
    *
-   * The following tests might reject inlining if the expression is a context reference:
+   * The following tests might reject inlining if the expression depends on the context value:
    * <ul>
    *   <li>{@link Preds#inlineable}</li>
    *   <li>{@link Path#inlineable}</li>
    *   <li>{@link SimpleMap#inlineable}</li>
-   *   <li>{@link StaticJavaCall#inlineable}</li>
+   *   <li>{@link Pipeline#inlineable}</li>
    *   <li>{@link TransformWith#inlineable}</li>
    * </ul>
    *
@@ -213,7 +209,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks how often a variable or context reference is used in this expression.
    *
-   * This function is called by:
+   * This function is, among others, called by:
    * <ul>
    *   <li> {@link Closure#optimize}</li>
    *   <li> {@link GFLWOR#inlineForLet}</li>
@@ -311,8 +307,7 @@ public abstract class Expr extends ExprInfo {
    * @return function type, or {@code null} if expression yields no functions
    */
   public FuncType funcType() {
-    final Type type = seqType().type;
-    return type instanceof FuncType ? (FuncType) type : null;
+    return seqType().type.funcType();
   }
 
   /**
@@ -352,7 +347,7 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
-    return this;
+    return simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.DISTINCT, cc);
   }
 
   /**
@@ -382,7 +377,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if there are variables which are used but not declared in this expression,
    *         {@code false} otherwise
    */
-  protected boolean hasFreeVars() {
+  public boolean hasFreeVars() {
     final BitSet declared = new BitSet();
     return !accept(new ASTVisitor() {
       @Override
@@ -467,6 +462,16 @@ public abstract class Expr extends ExprInfo {
   @SuppressWarnings("unused")
   protected Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
     return null;
+  }
+
+  /**
+   * Returns the input info of this expression, or the supplied reference as fallback.
+   * @param info fallback reference
+   * @return info or {@code null}
+   */
+  public final InputInfo info(final InputInfo info) {
+    final InputInfo ii = info();
+    return ii != null ? ii : info;
   }
 
   /**

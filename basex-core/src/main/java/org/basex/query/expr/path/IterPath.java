@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative expression for paths that return nodes in distinct document order.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IterPath extends AxisPath {
@@ -33,7 +33,7 @@ public final class IterPath extends AxisPath {
 
     return new Iter() {
       final int sz = steps.length + (rt ? 0 : -1);
-      final Expr[] exprs = rt ? new ExprList(sz + 1).add(root).add(steps).finish() : steps;
+      final Expr[] exprs = rt ? ExprList.concat(root, steps) : steps;
       final Iter[] iter = new Iter[sz + 1];
       int pos;
 
@@ -66,6 +66,12 @@ public final class IterPath extends AxisPath {
   @Override
   protected Value nodes(final QueryContext qc) throws QueryException {
     return iterator(qc).value(qc, this);
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return iterator(qc).next() != null;
   }
 
   @Override

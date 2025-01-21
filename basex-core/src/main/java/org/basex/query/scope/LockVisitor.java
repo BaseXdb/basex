@@ -12,7 +12,7 @@ import org.basex.query.var.*;
 /**
  * Lock visitor.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class LockVisitor extends ASTVisitor {
@@ -37,7 +37,7 @@ public final class LockVisitor extends ASTVisitor {
   public boolean lock(final String lock) {
     final boolean local = lock != null;
     if(local) {
-      // if context item is found on top level, it will refer to currently opened database
+      // if context value is found on top level, it will refer to currently opened database
       if(lock != Locking.CONTEXT || level == 0) ll.add(lock);
     }
     return local;

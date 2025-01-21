@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Cached items.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CmpCache {
@@ -64,6 +64,6 @@ public final class CmpCache {
    * Initializes the hash item set.
    */
   private void init() {
-    set = new HashItemSet(true, info);
+    set = new HashItemSet(ItemSet.Mode.EQUAL, info);
   }
 }

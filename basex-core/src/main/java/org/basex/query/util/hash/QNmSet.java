@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
  * This is an efficient and memory-saving hash set for storing QNames.
  * It is derived from the {@link TokenSet} class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class QNmSet extends ASet implements Iterable<QNm> {
@@ -62,21 +62,11 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * @return id, or {@code 0} if key does not exist
    */
   public final int id(final QNm key) {
-    final int b = key.hash(null) & capacity() - 1;
+    final int b = key.hashCode() & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(key.eq(keys[id])) return id;
     }
     return 0;
-  }
-
-  /**
-   * Returns the key with the specified id.
-   * All ids start with {@code 1} instead of {@code 0}.
-   * @param id id of the key to return
-   * @return key
-   */
-  public final QNm key(final int id) {
-    return keys[id];
   }
 
   /**
@@ -86,7 +76,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * @return id, or negative id if key has already been stored
    */
   private int index(final QNm key) {
-    final int h = key.hash(null);
+    final int h = key.hashCode();
     int b = h & capacity() - 1;
     for(int id = buckets[b]; id != 0; id = next[id]) {
       if(keys[id].eq(key)) return -id;
@@ -101,7 +91,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
   }
 
   @Override
-  protected final int hash(final int id) {
+  protected final int hashCode(final int id) {
     return hash[id];
   }
 

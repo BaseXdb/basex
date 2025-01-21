@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * This class converts CSV data to XML, using direct or attributes conversion.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class CsvDirectConverter extends CsvConverter {
@@ -69,6 +69,6 @@ final class CsvDirectConverter extends CsvConverter {
    * Finishes a record.
    */
   private void finishRecord() {
-    if(record != null && !record.isEmpty()) root.add(record);
+    if(record != null) root.add(record);
   }
 }

@@ -14,14 +14,13 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.server.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.log.*;
 
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class AdminLogs extends AdminFn {
@@ -97,8 +96,8 @@ public final class AdminLogs extends AdminFn {
                   entry.type = type;
                   entry.user = next.user;
                   entry.ms = entry.ms.add(next.ms);
-                  final String msg1 = entry.message, msg2 = next.message;
-                  if(!msg2.isEmpty()) entry.message = msg1.isEmpty() ? msg2 : msg1 + "; " + msg2;
+                  final String msg1 = entry.info, msg2 = next.info;
+                  if(!msg2.isEmpty()) entry.info = msg1.isEmpty() ? msg2 : msg1 + "; " + msg2;
                   iter.remove();
                   break;
                 }
@@ -106,7 +105,7 @@ public final class AdminLogs extends AdminFn {
             }
           }
           // add new element
-          final FBuilder elem = FElem.build(Q_ENTRY).add(entry.message);
+          final FBuilder elem = FElem.build(Q_ENTRY).add(entry.info);
           if(entry.address != null) {
             elem.add(Q_TIME, entry.time).add(Q_ADDRESS, entry.address);
             elem.add(Q_USER, entry.user).add(Q_TYPE, entry.type);
@@ -141,7 +140,7 @@ public final class AdminLogs extends AdminFn {
           entry.address = cols[1];
           entry.user = cols[2];
           entry.type = cols.length > 3 ? cols[3] : "";
-          entry.message = cols.length > 4 ? cols[4] : "";
+          entry.info = cols.length > 4 ? cols[4] : "";
           entry.ms = BigDecimal.ZERO;
           if(cols.length > 5) {
             // skip errors caused by erroneous input
@@ -150,7 +149,7 @@ public final class AdminLogs extends AdminFn {
           }
         } else {
           // legacy format
-          entry.message = line;
+          entry.info = line;
         }
         logs.add(entry);
       }

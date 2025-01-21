@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JobBindings extends StandardFunc {
@@ -28,7 +28,7 @@ public final class JobBindings extends StandardFunc {
     final QueryJobTask jt = jobs.tasks.get(id);
     if(job == null && jt != null) job = jt.job;
 
-    final MapBuilder mb = new MapBuilder(info);
+    final MapBuilder mb = new MapBuilder();
     if(job instanceof QueryJob) {
       for(final Entry<String, Value> entry : ((QueryJob) job).bindings().entrySet()) {
         mb.put(entry.getKey(), entry.getValue());

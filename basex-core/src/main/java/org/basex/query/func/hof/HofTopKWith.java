@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -13,10 +14,10 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class HofTopKWith extends HofFn {
+public final class HofTopKWith extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
@@ -44,5 +45,25 @@ public final class HofTopKWith extends HofFn {
     // even single items must be sorted, as the input might be invalid
     final Expr input = arg(0);
     return input.seqType().zero() ? input : adoptType(input);
+  }
+
+  /**
+   * Gets a comparator from a less-than predicate as function item.
+   * The {@link Comparator#compare(Object, Object)} method throws a
+   * {@link QueryRTException} if the comparison throws a {@link QueryException}.
+   * @param qc query context
+   * @return comparator
+   * @throws QueryException exception
+   */
+  private Comparator<Item> comparator(final QueryContext qc) throws QueryException {
+    final FItem comparator = toFunction(arg(1), 2, qc);
+    final HofArgs args = new HofArgs(2);
+    return (item1, item2) -> {
+      try {
+        return test(comparator, args.set(0, item1).set(1, item2), qc) ? -1 : 1;
+      } catch(final QueryException qe) {
+        throw new QueryRTException(qe);
+      }
+    };
   }
 }

@@ -1,6 +1,6 @@
 package org.basex.http;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
@@ -8,8 +8,8 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
@@ -18,16 +18,16 @@ import org.basex.core.users.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.server.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.Base64;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
+import org.basex.util.log.*;
 
 /**
  * Single HTTP connection.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class HTTPConnection implements ClientInfo {
@@ -267,16 +267,21 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientName() {
-    // check for request id
-    Object value = request.getAttribute(HTTPText.CLIENT_ID);
-
-    // check for session id (DBA, global)
-    if(value == null) {
-      final HttpSession session = request.getSession(false);
-      if(session != null) {
-        final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
-        value = session.getAttribute(dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID);
+    Object value = null;
+    try {
+      // check for request id
+      value = request.getAttribute(HTTPText.CLIENT_ID);
+      // check for session id (DBA, global)
+      if(value == null) {
+        final HttpSession session = request.getSession(false);
+        if(session != null) {
+          final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
+          value = session.getAttribute(dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID);
+        }
       }
+    } catch(final IllegalStateException ex) {
+      // Tomcat: https://github.com/spring-projects/spring-boot/issues/36763
+      Util.debug(ex);
     }
     return clientName(value, context);
   }
@@ -391,14 +396,23 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Returns the content type of a request, or an empty string.
+   * Returns the address of the client that sent a request, or an empty string.
+   * Evaluates the HTTP headers to find the original IP address.
    * @param request servlet request
-   * @return content type
+   * @return remote address
    */
   public static String remoteAddress(final HttpServletRequest request) {
     for(final String header : FORWARDING_HEADERS) {
-      final String addr = request.getHeader(header);
-      if(addr != null && !addr.isEmpty() && !"unknown".equalsIgnoreCase(addr)) return addr;
+      final String value = request.getHeader(header);
+      // header found: test last (most reliable) part first
+      if(value != null && !value.isEmpty()) {
+        String ip = null;
+        final String[] entries = value.split("\\s*,\\s*");
+        for(int e = entries.length; --e >= 0 && entries[e].matches("^\\[?[:.\\d]+\\]?$");) {
+          ip = entries[e];
+        }
+        if(ip != null) return ip;
+      }
     }
     return request.getRemoteAddr();
   }

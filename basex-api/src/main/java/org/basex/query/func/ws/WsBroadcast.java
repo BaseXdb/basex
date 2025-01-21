@@ -9,13 +9,13 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class WsBroadcast extends WsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    WsPool.broadcast(arg(0).atomItem(qc, info), ws(qc).id);
+    WsPool.broadcast(arg(0).item(qc, info), ws(qc).id);
     return Empty.VALUE;
   }
 }

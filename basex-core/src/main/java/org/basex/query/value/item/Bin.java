@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Abstract class for binary items.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Bin extends Item {
@@ -43,14 +43,15 @@ public abstract class Bin extends Item {
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return item instanceof Bin && Token.eq(binary(ii), ((Bin) item).binary(ii));
+  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
+    return Token.eq(binary(ii), bin);
   }
 
   @Override
-  public final boolean atomicEqual(final Item item, final InputInfo ii) throws QueryException {
-    return type == item.type && Token.eq(binary(ii), ((Bin) item).binary(ii));
+  public final boolean atomicEqual(final Item item) throws QueryException {
+    return type == item.type && Token.eq(binary(null), ((Bin) item).binary(null));
   }
 
   @Override

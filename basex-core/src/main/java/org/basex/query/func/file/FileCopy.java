@@ -12,7 +12,7 @@ import org.basex.query.value.seq.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FileCopy extends FileFn {
@@ -29,7 +29,7 @@ public class FileCopy extends FileFn {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final synchronized void relocate(final boolean copy, final QueryContext qc)
+  final void relocate(final boolean copy, final QueryContext qc)
       throws QueryException, IOException {
 
     final Path source = toPath(arg(0), qc);
@@ -62,8 +62,8 @@ public class FileCopy extends FileFn {
    * @param qc query context
    * @throws IOException I/O exception
    */
-  private synchronized void relocate(final Path src, final Path trg, final boolean copy,
-      final QueryContext qc) throws IOException {
+  private void relocate(final Path src, final Path trg, final boolean copy, final QueryContext qc)
+      throws IOException {
 
     if(Files.isDirectory(src)) {
       if(!Files.exists(trg)) Files.createDirectory(trg);

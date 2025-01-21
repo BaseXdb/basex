@@ -13,7 +13,7 @@ import org.basex.util.Base64;
 /**
  * Base64 item ({@code xs:base64Binary}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class B64 extends Bin {
@@ -92,6 +92,16 @@ public class B64 extends Bin {
   @Override
   public final byte[] string(final InputInfo ii) throws QueryException {
     return Base64.encode(binary(ii));
+  }
+
+  @Override
+  public int hashCode() {
+    try {
+      return Token.hashCode(binary(null));
+    } catch(final QueryException ex) {
+      Util.stack(ex);
+      return Integer.MAX_VALUE;
+    }
   }
 
   @Override

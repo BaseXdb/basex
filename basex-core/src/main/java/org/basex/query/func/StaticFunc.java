@@ -27,11 +27,11 @@ import org.basex.util.hash.*;
 /**
  * A static user-defined function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class StaticFunc extends StaticDecl implements XQFunction {
-  /** Formal parameters. */
+  /** Parameters. */
   public final Var[] params;
   /** Default expressions (entries can be {@code null} references). */
   final Expr[] defaults;
@@ -42,6 +42,8 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   /** Map with requested function properties. */
   private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
+  /** Indicates if the query focus is accessed or modified. */
+  private boolean simple;
 
   /**
    * Function constructor.
@@ -73,6 +75,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public Expr compile(final CompileContext cc) {
     if(!compiled && expr != null) {
       compiled = true;
+      simple = !expr.has(Flag.CTX);
 
       // dynamic compilation: refine parameter types to arguments types of function call
       final SeqType[] callTypes = cc.dynamic ? cc.qc.functions.seqTypes(this) : null;
@@ -92,11 +95,11 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
       // compile function body, handle return type
       dontEnter = true;
-      cc.pushFocus(null);
+      cc.pushFocus(null, false);
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
-        if(declType != null) expr = new TypeCheck(info, sc, expr, declType, true).optimize(cc);
+        if(declType != null) expr = new TypeCheck(info, expr, declType).optimize(cc);
       } catch(final QueryException qe) {
         expr = cc.error(qe, expr);
       } finally {
@@ -138,6 +141,14 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   /**
+   * Returns the minimum arity.
+   * @return the minimum arity.
+   */
+  public int minArity() {
+    return min;
+  }
+
+  /**
    * Returns the maximum arity.
    */
   @Override
@@ -174,13 +185,17 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
 
+    final int arity = arity();
+    for(int a = 0; a < arity; a++) qc.set(params[a], args[a]);
+
+    // use shortcut if focus is not accessed
+    if(simple) return expr.value(qc);
+
     // reset context and evaluate function
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
     qf.value = null;
     try {
-      final int pl = params.length;
-      for(int p = 0; p < pl; p++) qc.set(params[p], args[p]);
       return expr.value(qc);
     } finally {
       qf.value = qv;
@@ -192,16 +207,19 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @throws QueryException query exception
    */
   void checkUp() throws QueryException {
+    // skip already compiled functions
+    if(compiled) return;
+
     final boolean exprUpdating = expr.has(Flag.UPD);
     if(exprUpdating) expr.checkUp();
-    final InputInfo ii = expr.info() != null ? expr.info() : info;
+    final InputInfo ii = expr.info(info);
     if(updating) {
       // updating function
       if(!(exprUpdating || expr.vacuous())) throw UPEXPECTF.get(ii);
       if(declType != null && !declType.zero()) throw UUPFUNCTYPE.get(ii);
-    } else {
+    } else if(exprUpdating) {
       // uses updates, but is not declared as such
-      if(exprUpdating) throw UPNOT_X.get(ii, description());
+      throw UPNOT_X.get(ii, description());
     }
   }
 
@@ -218,7 +236,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   boolean has(final Flag... flags) {
     // function itself does not perform any updates
-    final Flag[] flgs = Flag.UPD.remove(flags);
+    final Flag[] flgs = Flag.remove(flags, Flag.UPD);
     return flgs.length != 0 && check(flgs);
   }
 
@@ -229,7 +247,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    */
   public boolean updating() {
     // MIXUPDATES: recursive check; otherwise, rely on flag (GH-1281)
-    return sc.mixUpdates ? check(Flag.UPD) : updating;
+    return sc != null && sc.mixUpdates ? check(Flag.UPD) : updating;
   }
 
   /**
@@ -301,12 +319,12 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
    * @return result of check
    */
   public static boolean inline(final CompileContext cc, final AnnList anns, final Expr expr) {
-    final Ann inline = anns != null ? anns.get(Annotation._BASEX_INLINE) : null;
+    final Ann inline = anns.get(Annotation._BASEX_INLINE);
     final long limit;
     if(inline != null) {
       final Value value = inline.value();
       limit = value.isEmpty() ? Long.MAX_VALUE : ((ANum) value.itemAt(0)).itr();
-    } else if(anns != null && anns.get(Annotation._BASEX_LOCK) != null) {
+    } else if(anns.contains(Annotation._BASEX_LOCK)) {
       limit = 0;
     } else {
       limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);

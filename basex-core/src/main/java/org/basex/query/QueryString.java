@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Query string builder.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class QueryString {
@@ -136,15 +136,6 @@ public final class QueryString {
   }
 
   /**
-   * Adds a token wrapped with square brackets.
-   * @param token token to be added
-   * @return self reference
-   */
-  public QueryString bracket(final Object token) {
-    return braced("[", token, "]");
-  }
-
-  /**
    * Serializes a chopped version of the specified value.
    * @param value value
    * @return string
@@ -171,11 +162,20 @@ public final class QueryString {
    * @param close closing brace
    * @return self reference
    */
-  private QueryString braced(final String open, final Object token, final String close) {
+  public QueryString braced(final String open, final Object token, final String close) {
     tb.add(open);
     token(token);
     final byte[] t = Token.token(close);
     tb.add(last() == ' ' && Token.startsWith(t, ' ') ? Token.substring(t, 1) : t);
+    return this;
+  }
+
+  /**
+   * Adds a newline.
+   * @return self reference
+   */
+  public QueryString newline() {
+    tb.add(Prop.NL);
     return this;
   }
 

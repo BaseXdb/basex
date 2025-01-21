@@ -1,12 +1,12 @@
 (:~
- : Download resources.
+ : Download backups.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/databases';
 
 (:~
- : Downloads a database backup.
+ : Downloads a backup.
  : @param  $backup  name of backup file (ignored by the server)
  : @return binary data
  :)
@@ -19,8 +19,8 @@ function dba:backup-download(
   let $path := db:option('dbpath') || '/' || $backup
   return (
     web:response-header(
-      map { 'media-type': 'application/octet-stream' },
-      map { 'Content-Length': file:size($path) }
+      { 'media-type': 'application/octet-stream' },
+      { 'Content-Length': file:size($path) }
     ),
     file:read-binary($path)
   )

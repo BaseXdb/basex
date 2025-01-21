@@ -10,7 +10,7 @@ import java.util._
  *
  * Documentation: https://docs.basex.org/wiki/Clients
  *
- * (C) BaseX Team 2005-24, BSD License
+ * (C) BaseX Team, BSD License
  */
 
 /**
@@ -243,7 +243,7 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
     }
 
     /**
-     * Binds the context item.
+     * Binds the context value.
      * @param value value
      * @throws IOException I/O exception
      */
@@ -252,7 +252,7 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
     }
 
     /**
-     * Binds the context item with a specific data type.
+     * Binds the context value with a specific data type.
      * @param value value
      * @param type data type
      * @throws IOException I/O exception

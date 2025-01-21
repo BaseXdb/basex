@@ -2,6 +2,8 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -12,22 +14,20 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
-import java.util.Arrays;
-
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FnApply extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final FItem function = checkUp(toFunction(arg(0), qc), this instanceof UpdateApply, sc);
+    final FItem function = checkUp(toFunction(arg(0), qc), this instanceof UpdateApply);
     final XQArray arguments = toArray(arg(1), qc);
 
-    final ValueList args = new ValueList(arguments.arraySize());
-    for(final Value arg : arguments.members()) args.add(arg);
+    final ValueList args = new ValueList(arguments.structSize());
+    for(final Value arg : arguments.iterable()) args.add(arg);
     return apply(function, args, qc);
   }
 
@@ -35,24 +35,24 @@ public class FnApply extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr func = arg(0), args = arg(1);
     FuncType ft = func.funcType();
-    final FuncType ftArgs = args.funcType();
+    final Type tpArgs = args.seqType().type;
 
     // try to pass on types of array argument to function item
-    if(ftArgs instanceof ArrayType) {
+    if(tpArgs instanceof ArrayType) {
       if(args instanceof XQArray) {
         // argument is a value: final types are known
         final XQArray array = (XQArray) args;
-        final int as = Math.max(0, (int) array.arraySize());
+        final int as = Math.max(0, (int) array.structSize());
         final SeqType[] ast = new SeqType[as];
         for(int a = 0; a < as; a++) ast[a] = array.get(a).seqType();
-        arg(0, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, ast));
+        arg(0, arg -> refineFunc(arg, cc, ast));
       } else if(ft != null) {
         // argument will be of type array: assign generic array return type to all arguments
         final SeqType[] at = ft.argTypes;
         if(at != null) {
           final SeqType[] ast = new SeqType[at.length];
-          Arrays.fill(ast, ftArgs.declType);
-          arg(0, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, ast));
+          Arrays.fill(ast, ((ArrayType) tpArgs).valueType);
+          arg(0, arg -> refineFunc(arg, cc, ast));
         }
       }
     }
@@ -75,5 +75,10 @@ public class FnApply extends StandardFunc {
     final long ar = func.arity(), as = args.size();
     if(ar != as) throw APPLY_X_X.get(info, arguments(as), func, args);
     return func.invoke(qc, info, args.finish());
+  }
+
+  @Override
+  public int hofIndex() {
+    return 0;
   }
 }

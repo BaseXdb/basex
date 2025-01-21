@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Boolean item ({@code xs:boolean}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Bln extends Item {
@@ -72,6 +72,11 @@ public final class Bln extends Item {
   }
 
   @Override
+  public int hashCode() {
+    return Boolean.hashCode(value);
+  }
+
+  @Override
   public boolean bool(final InputInfo ii) {
     return value;
   }
@@ -97,15 +102,15 @@ public final class Bln extends Item {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    return value == (item.type == type ? item.bool(ii) : parse(item, ii));
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return value == (item.type == AtomType.BOOLEAN ? item.bool(ii) : parse(item, ii));
   }
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    final boolean b = item.type == type ? item.bool(ii) : parse(item, ii);
+    final boolean b = item.type == AtomType.BOOLEAN ? item.bool(ii) : parse(item, ii);
     return value == b ? 0 : b ? -1 : 1;
   }
 
@@ -151,8 +156,8 @@ public final class Bln extends Item {
    */
   public static Boolean parse(final byte[] value) {
     final byte[] v = Token.trim(value);
-    if(Token.eq(v, Token.TRUE) || Token.eq(v, Token.ONE)) return Boolean.TRUE;
-    if(Token.eq(v, Token.FALSE) || Token.eq(v, Token.ZERO)) return Boolean.FALSE;
+    if(Token.eq(v, Token.TRUE) || Token.eq(v, Token.cpToken('1'))) return Boolean.TRUE;
+    if(Token.eq(v, Token.FALSE) || Token.eq(v, Token.cpToken('0'))) return Boolean.FALSE;
     return null;
   }
 }

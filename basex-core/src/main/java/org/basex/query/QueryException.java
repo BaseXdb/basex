@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Thrown to indicate an exception during the parsing or evaluation of a query.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class QueryException extends Exception {
@@ -190,7 +190,7 @@ public class QueryException extends Exception {
     if(info != null) return;
     // check if line/column information has already been added
     parser.pos = Math.min(parser.mark, parser.length);
-    info = new InputInfo(parser);
+    info = parser.info();
   }
 
   /**
@@ -218,12 +218,12 @@ public class QueryException extends Exception {
   }
 
   @Override
-  public String getLocalizedMessage() {
+  public final String getLocalizedMessage() {
     return super.getMessage();
   }
 
   @Override
-  public String getMessage() {
+  public final String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
     if(info != null) tb.add(STOPPED_AT).add(info).add(COL).add(NL);
     final byte[] code = name.local();
@@ -237,21 +237,21 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Returns a stack trace.
-   * @return stack trace
+   * Returns a stack trace expression.
+   * @return expression
    */
-  public byte[][] stack() {
-    final TokenList list = new TokenList();
-    if(info != null) list.add(info.toString());
-    for(final InputInfo ii : stack) list.add(ii.toString());
-    return list.finish();
+  public final Str stackTrace() {
+    final TokenBuilder tb = new TokenBuilder();
+    if(info != null) tb.add(info).add('\n');
+    for(final InputInfo stck : stack) tb.add(stck).add('\n');
+    return Str.get(tb.finish());
   }
 
   /**
    * Checks if this exception can be caught by a {@code try/catch} expression.
    * @return result of check
    */
-  public boolean isCatchable() {
+  public final boolean isCatchable() {
     return catchable;
   }
 

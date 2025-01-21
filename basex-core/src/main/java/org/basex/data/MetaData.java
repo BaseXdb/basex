@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 /**
  * This class provides meta information on a database.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MetaData {
@@ -404,25 +404,25 @@ public final class MetaData {
         case DBLASTID:   lastid = toInt(v); break;
         case DBTIME:     time = toLong(v); break;
         case DBFSIZE:    inputsize = toLong(v); break;
-        case DBFTDC:     diacritics = toBoolean(v); break;
-        case DBUPDIDX:   updindex = toBoolean(v); break;
-        case DBAUTOOPT:  autooptimize = toBoolean(v); break;
-        case DBTXTIDX:   textindex = toBoolean(v); break;
-        case DBATVIDX:   attrindex = toBoolean(v); break;
-        case DBTOKIDX:   tokenindex = toBoolean(v); break;
-        case DBFTXIDX:   ftindex = toBoolean(v); break;
+        case DBFTDC:     diacritics = isTrue(v); break;
+        case DBUPDIDX:   updindex = isTrue(v); break;
+        case DBAUTOOPT:  autooptimize = isTrue(v); break;
+        case DBTXTIDX:   textindex = isTrue(v); break;
+        case DBATVIDX:   attrindex = isTrue(v); break;
+        case DBTOKIDX:   tokenindex = isTrue(v); break;
+        case DBFTXIDX:   ftindex = isTrue(v); break;
         case DBTXTINC:   textinclude = v; break;
         case DBATVINC:   attrinclude = v; break;
         case DBTOKINC:   tokeninclude = v; break;
         case DBFTXINC:   ftinclude = v; break;
         case DBSPLITS:   splitsize = toInt(v); break;
-        case DBCRTTXT:   createtext = toBoolean(v); break;
-        case DBCRTATV:   createattr = toBoolean(v); break;
-        case DBCRTTOK:   createtoken = toBoolean(v); break;
-        case DBCRTFTX:   createft = toBoolean(v); break;
-        case DBFTST:     stemming = toBoolean(v); break;
-        case DBFTCS:     casesens = toBoolean(v); break;
-        case DBUPTODATE: uptodate = toBoolean(v); break;
+        case DBCRTTXT:   createtext = isTrue(v); break;
+        case DBCRTATV:   createattr = isTrue(v); break;
+        case DBCRTTOK:   createtoken = isTrue(v); break;
+        case DBCRTFTX:   createft = isTrue(v); break;
+        case DBFTST:     stemming = isTrue(v); break;
+        case DBFTCS:     casesens = isTrue(v); break;
+        case DBUPTODATE: uptodate = isTrue(v); break;
       }
     }
 

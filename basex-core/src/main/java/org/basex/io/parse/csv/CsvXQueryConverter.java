@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 /**
  * This class converts CSV data to an XQuery representation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CsvXQueryConverter extends CsvConverter {
@@ -59,7 +59,7 @@ public final class CsvXQueryConverter extends CsvConverter {
   @Override
   protected XQMap finish() throws QueryException {
     if(row != null) rows.add(row.array(STRING_ARRAY));
-    final MapBuilder mb = new MapBuilder();
+    final MapBuilder mb = new MapBuilder(headers.size());
     if(!headers.isEmpty()) {
       final ArrayBuilder names = new ArrayBuilder();
       for(final byte[] header : headers) names.append(Str.get(header));

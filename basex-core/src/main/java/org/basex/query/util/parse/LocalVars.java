@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Organizes local variables.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class LocalVars {
@@ -72,7 +72,7 @@ public final class LocalVars {
     final int ls = vars.size();
     while(++l < ls) {
       final VarContext vctx = vars.get(l);
-      final Var local = new Var(var.name, var.seqType(), parser.qc, parser.sc, info);
+      final Var local = new Var(var.name, var.seqType(), parser.qc, info);
       vctx.add(local);
       vctx.bindings.put(local, new VarRef(info, var));
       var = local;
@@ -102,8 +102,9 @@ public final class LocalVars {
     // - if a variable uses the module or an imported URI, or
     // - if it is specified in the main module
     final QNm module = parser.sc.module;
-    if(module == null || eq(module.uri(), uri) || parser.moduleURIs.contains(uri))
-      return parser.qc.vars.newRef(name, parser.sc, info);
+    final boolean hasImport = parser.moduleURIs.contains(uri);
+    if(module == null || eq(module.uri(), uri) || hasImport)
+      return parser.qc.vars.newRef(name, info, hasImport);
 
     throw parser.error(VARUNDEF_X, info, '$' + string(name.string()));
   }
@@ -115,7 +116,7 @@ public final class LocalVars {
    */
   public HashMap<Var, Expr> pushContext(final boolean global) {
     final HashMap<Var, Expr> map = global ? new HashMap<>() : null;
-    vars.add(new VarContext(map, parser.sc));
+    vars.add(new VarContext(map));
     return map;
   }
 

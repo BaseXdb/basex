@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * DayTime Duration item ({@code xs:dayTimeDuration}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DTDur extends Dur {
@@ -123,7 +123,7 @@ public final class DTDur extends Dur {
    */
   public DTDur(final ADate date, final ADate sub, final InputInfo info) throws QueryException {
     super(AtomType.DAY_TIME_DURATION);
-    seconds = date.seconds().subtract(sub.seconds());
+    seconds = date.toSeconds().subtract(sub.toSeconds());
     final double d = seconds.doubleValue();
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(info, d);
   }

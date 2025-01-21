@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Archive reader.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class ArchiveIn implements Closeable {
@@ -68,6 +68,7 @@ abstract class ArchiveIn implements Closeable {
    * @throws IOException I/O exception
    */
   final void write(final OutputStream out) throws IOException {
+    // keep streams open
     final byte[] data = new byte[IO.BLOCKSIZE];
     for(int c; (c = read(data)) != -1;) out.write(data, 0, c);
   }

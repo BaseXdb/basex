@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Project specific File Chooser implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class BaseXFileChooser {
@@ -177,7 +177,7 @@ public final class BaseXFileChooser {
   /**
    * Defines a file filter for a list of extensions.
    */
-  private static class Filter extends FileFilter {
+  private static final class Filter extends FileFilter {
     /** Suffixes. */
     final String[] suffixes;
     /** Description. */

@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class HofTopKBy extends StandardFunc {
@@ -28,7 +28,7 @@ public final class HofTopKBy extends StandardFunc {
     final MinHeap<Item, Item> heap = new MinHeap<>((item1, item2) -> {
       try {
         if(!item1.comparable(item2)) throw compareError(item1, item2, info);
-        return item1.compare(item2, sc.collation, true, info);
+        return item1.compare(item2, null, true, info);
       } catch(final QueryException qe) {
         throw new QueryRTException(qe);
       }
@@ -51,5 +51,10 @@ public final class HofTopKBy extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Expr input = arg(0);
     return input.seqType().zero() ? input : adoptType(input);
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

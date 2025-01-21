@@ -2,25 +2,29 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Stores a sequence type definition.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class SeqType {
@@ -67,6 +71,8 @@ public final class SeqType {
   public static final SeqType INTEGER_ZO = INTEGER.seqType(ZERO_OR_ONE);
   /** Zero or more integers. */
   public static final SeqType INTEGER_ZM = INTEGER.seqType(ZERO_OR_MORE);
+  /** Positive integer. */
+  public static final SeqType POSITIVE_INTEGER_O = POSITIVE_INTEGER.seqType();
   /** Zero or more bytes. */
   public static final SeqType BYTE_ZM = BYTE.seqType(ZERO_OR_MORE);
 
@@ -76,12 +82,18 @@ public final class SeqType {
   public static final SeqType STRING_ZO = STRING.seqType(ZERO_OR_ONE);
   /** Zero or more strings. */
   public static final SeqType STRING_ZM = STRING.seqType(ZERO_OR_MORE);
+  /** One or more strings. */
+  public static final SeqType STRING_OM = STRING.seqType(ONE_OR_MORE);
   /** Zero or one NCName. */
   public static final SeqType NCNAME_ZO = NCNAME.seqType(ZERO_OR_ONE);
   /** Single language. */
   public static final SeqType LANGUAGE_O = LANGUAGE.seqType();
-  /** Single string. */
+  /** Single untyped atomic. */
+  public static final SeqType UNTYPED_ATOMIC_O = UNTYPED_ATOMIC.seqType();
+  /** Zero or one untyped atomic. */
   public static final SeqType UNTYPED_ATOMIC_ZO = UNTYPED_ATOMIC.seqType(ZERO_OR_ONE);
+  /** Zero or more untyped atomics. */
+  public static final SeqType UNTYPED_ATOMIC_ZM = UNTYPED_ATOMIC.seqType(ZERO_OR_MORE);
 
   /** Single URI. */
   public static final SeqType ANY_URI_O = ANY_URI.seqType();
@@ -123,8 +135,6 @@ public final class SeqType {
   public static final SeqType BINARY_O = BINARY.seqType();
   /** One xs:hexBinary. */
   public static final SeqType HEX_BINARY_O = HEX_BINARY.seqType();
-  /** Zero or one xs:hexBinary. */
-  public static final SeqType HEX_BINARY_ZO = HEX_BINARY.seqType(ZERO_OR_ONE);
   /** Single xs:base64Binary. */
   public static final SeqType BASE64_BINARY_O = BASE64_BINARY.seqType();
   /** Zero or one xs:base64Binary. */
@@ -167,12 +177,23 @@ public final class SeqType {
   /** Zero or more text nodes. */
   public static final SeqType TEXT_ZM = TEXT.seqType(ZERO_OR_MORE);
 
+  /** Single NMTOKENS. */
+  public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
+
+  /** Gregorian type. */
+  public static final SeqType GREGORIAN_ZO = new ChoiceItemType(Arrays.asList(
+      DATE_TIME.seqType(), DATE.seqType(), TIME.seqType(), G_YEAR.seqType(),
+      G_YEAR_MONTH.seqType(), G_MONTH.seqType(), G_MONTH_DAY.seqType(), G_DAY.seqType())).
+      seqType(ZERO_OR_ONE);
+
   // function types must be placed here due to circular dependencies
 
   /** Any function type. */
   public static final FuncType FUNCTION = new FuncType(null, (SeqType[]) null);
   /** Java function type. */
   public static final FuncType JAVA = new FuncType(null);
+  /** The general record type. */
+  public static final RecordType RECORD = new RecordType(true, new TokenObjMap<>(), null);
   /** The general map type. */
   public static final MapType MAP = ITEM_ZM.mapType(ANY_ATOMIC_TYPE);
   /** The general array type. */
@@ -185,11 +206,11 @@ public final class SeqType {
   /** Zero of more functions. */
   public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
   /** Predicate function. */
-  public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O, INTEGER_O).seqType();
+  public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, INTEGER_O).seqType();
   /** Predicate function. */
-  public static final SeqType PREDICATE_ZM = FuncType.get(BOOLEAN_O, ITEM_ZM, INTEGER_O).seqType();
+  public static final SeqType PREDICATE_ZM = FuncType.get(BOOLEAN_ZO, ITEM_ZM, INTEGER_O).seqType();
   /** Predicate function. */
-  public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_O, ITEM_O, ITEM_O).seqType();
+  public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, ITEM_O).seqType();
   /** Action function. */
   public static final SeqType ACTION_O = FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType();
   /** Single map. */
@@ -200,8 +221,18 @@ public final class SeqType {
   public static final SeqType MAP_ZM = MAP.seqType(ZERO_OR_MORE);
   /** Single array. */
   public static final SeqType ARRAY_O = ARRAY.seqType();
+  /** Zero or one array. */
+  public static final SeqType ARRAY_ZO = ARRAY.seqType(ZERO_OR_ONE);
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
+  /** Single record. */
+  public static final SeqType RECORD_O = RECORD.seqType();
+  /** Single pair. */
+  public static final SeqType PAIR_O = RecordType.PAIR.seqType();
+  /** Zero or more pairs. */
+  public static final SeqType PAIR_ZM = RecordType.PAIR.seqType(ZERO_OR_MORE);
+  /** Zero or more members. */
+  public static final SeqType MEMBER_ZM = RecordType.MEMBER.seqType(ZERO_OR_MORE);
 
   /** Item type. */
   public final Type type;
@@ -212,7 +243,7 @@ public final class SeqType {
   /** Array type (lazy instantiation). */
   private ArrayType arrayType;
   /** Map types (lazy instantiation). */
-  private EnumMap<AtomType, MapType> mapTypes;
+  private Map<Type, MapType> mapTypes;
 
   /**
    * Constructor.
@@ -249,12 +280,12 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrence indicator
-   * @param test kind test (can be {@code null}; ignored if this is no node type)
+   * @param test kind test (can be {@code null}; {@link KindTest} is redundant and ignored)
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ, final Test test) {
-    return occ == ZERO || test == null || !(type instanceof NodeType) ?
-      get(type, occ) : new SeqType(type, occ, test);
+    return occ == ZERO || test == null || test instanceof KindTest ? get(type, occ) :
+      new SeqType(type, occ, test);
   }
 
   /**
@@ -271,9 +302,9 @@ public final class SeqType {
    * @param keyType key type
    * @return map type
    */
-  public MapType mapType(final AtomType keyType) {
-    if(mapTypes == null) mapTypes = new EnumMap<>(AtomType.class);
-    return mapTypes.computeIfAbsent(keyType, o -> new MapType(keyType, this));
+  public MapType mapType(final Type keyType) {
+    if(mapTypes == null) mapTypes = new ConcurrentHashMap<>();
+    return mapTypes.computeIfAbsent(keyType, k -> new MapType(k, this));
   }
 
   /**
@@ -325,6 +356,12 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Item item) {
+    if(type instanceof ChoiceItemType) {
+      for(final SeqType tp : ((ChoiceItemType) type).types) {
+        if(tp.instance(item)) return true;
+      }
+      return false;
+    }
     return item.instanceOf(type) && (test == null || test.matches(item));
   }
 
@@ -333,41 +370,50 @@ public final class SeqType {
    * @param value value to cast
    * @param error raise error (return {@code null} otherwise)
    * @param qc query context
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @return cast value
    * @throws QueryException query exception
    */
   public Value cast(final Value value, final boolean error, final QueryContext qc,
-      final StaticContext sc, final InputInfo info) throws QueryException {
+      final InputInfo info) throws QueryException {
 
     // check cardinality
     final long size = value.size();
     if(!occ.check(size)) {
-      if(error) throw INVCONVERT_X_X_X.get(info, value.seqType(), this, value);
+      if(error) throw typeError(value, this, info);
       return null;
     }
     if(size == 0) return Empty.VALUE;
 
+    // cast single items
+    if(size == 1) return cast((Item) value, error, qc, info);
+    // cast sequences
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Item item : value) {
+      qc.checkStop();
+      vb.add(cast(item, error, qc, info));
+    }
+    return vb.value(type);
+  }
+
+  /**
+   * Casts an item to this type.
+   * @param item item to cast
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return cast value
+   * @throws QueryException query exception
+   */
+  private Value cast(final Item item, final boolean error, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+
+    if(item.type.eq(type)) return item;
+
+    // enable light-weight error handling
+    if(!error && info != null) info.internal(true);
     try {
-      // enable light-weight error handling
-      if(!error && info != null) info.internal(true);
-      // cast single items
-      if(size == 1) {
-        final Item item = (Item) value;
-        return item.type.eq(type) ? item : type.cast(item, qc, sc, info);
-      }
-      // cast sequences
-      final ValueBuilder vb = new ValueBuilder(qc);
-      for(final Item item : value) {
-        if(item.type.eq(type)) {
-          vb.add(item);
-        } else {
-          qc.checkStop();
-          vb.add(type.cast(item, qc, sc, info));
-        }
-      }
-      return vb.value(type);
+      return type.cast(item, qc, info);
     } catch(final QueryException ex) {
       if(error) throw ex;
       return null;
@@ -379,77 +425,118 @@ public final class SeqType {
   /**
    * Converts the specified value to this type.
    * @param value value to promote
-   * @param name variable name (can be {@code null})
+   * @param name variable name (used for error message, can be {@code null})
    * @param qc query context
-   * @param sc static context
+   * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
-   * @param opt if the result should be optimized
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
   public Value coerce(final Value value, final QNm name, final QueryContext qc,
-      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
+      final CompileContext cc, final InputInfo info) throws QueryException {
 
-    final long size = value.size();
-    ItemList items = null;
-    for(long i = 0; i < size; i++) {
-      qc.checkStop();
-      final Item item = value.itemAt(i);
-      if(instance(item)) {
-        if(items != null) items.add(item);
-      } else {
-        if(items == null) {
-          items = new ItemList(Seq.initialCapacity(size));
-          for(int j = 0; j < i; j++) items.add(value.itemAt(j));
+    // check if function arguments must be coerced
+    final boolean toFunc = type instanceof FuncType;
+    final SeqType[] argTypes = toFunc ? ((FuncType) type).argTypes : null;
+    boolean coerce = argTypes != null && ((Checks<SeqType>) at -> !at.eq(ITEM_ZM)).any(argTypes);
+
+    // check if value must be coerced
+    if(!coerce) {
+      if(instance(value) && (!toFunc || value instanceof FuncItem)) return value;
+      for(final Item item : value) {
+        qc.checkStop();
+        if(!instance(item) || toFunc && !(item instanceof FuncItem)) {
+          coerce = true;
+          break;
         }
-        coerce(item, name, items, qc, sc, info, opt);
       }
     }
-    final long is = items != null ? items.size() : value.size();
-    if(!occ.check(is)) throw typeError(value, this, name, info, true);
-    return items != null ? items.value(type) : value;
+
+    // coerce items if required
+    Value val = value;
+    if(coerce) {
+      final ValueBuilder vb = new ValueBuilder(qc);
+      for(final Item item : value) {
+        qc.checkStop();
+        coerce(item, name, vb, qc, cc, info);
+      }
+      val = vb.value(type);
+    }
+
+    if(!occ.check(val.size())) throw typeError(value, this, name, info);
+    return val;
   }
 
   /**
    * Converts the specified item to this type.
    * @param item item to promote
-   * @param name variable name (can be {@code null})
-   * @param items item cache
+   * @param name variable name (used for error message, can be {@code null})
+   * @param vb value builder
    * @param qc query context
-   * @param sc static context
+   * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
-   * @param opt if the result should be optimized
    * @throws QueryException query exception
    */
-  public void coerce(final Item item, final QNm name, final ItemList items, final QueryContext qc,
-      final StaticContext sc, final InputInfo info, final boolean opt) throws QueryException {
+  public void coerce(final Item item, final QNm name, final ValueBuilder vb, final QueryContext qc,
+      final CompileContext cc, final InputInfo info) throws QueryException {
 
-    if(type instanceof AtomType) {
-      final Iter iter = item.atomValue(qc, info).iter();
-      for(Item item1; (item1 = qc.next(iter)) != null;) {
-        final Type tp = item1.type;
-        if(tp.instanceOf(type)) {
-          items.add(item1);
-        } else if(tp == UNTYPED_ATOMIC) {
-          if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
-          final Iter iter2 = type.cast(item1, qc, sc, info).iter();
-          for(Item item2; (item2 = qc.next(iter2)) != null;) {
-            items.add(item2);
-          }
-        } else if(type == DOUBLE && (tp == FLOAT || tp.instanceOf(DECIMAL))) {
-          items.add(Dbl.get(item1.dbl(info)));
-        } else if(type == FLOAT && tp.instanceOf(DECIMAL)) {
-          items.add(Flt.get(item1.flt(info)));
-        } else if(type == STRING && item1 instanceof Uri) {
-          items.add(Str.get(item1.string(info)));
-        } else {
-          throw typeError(item, with(EXACTLY_ONE), name, info, true);
+    final QuerySupplier<QueryException> error = () ->
+      typeError(item, with(EXACTLY_ONE), name, info);
+    if(type instanceof ChoiceItemType) {
+      for(final SeqType st : ((ChoiceItemType) type).types) {
+        try {
+          final ValueBuilder tmp = new ValueBuilder(qc);
+          st.coerce(item, name, tmp, qc, cc, info);
+          vb.add(tmp.value(type));
+          return;
+        } catch(final QueryException ex) {
+          Util.debug(ex);
         }
       }
+      throw error.get();
+    }
+    if(type instanceof AtomType || type instanceof EnumType) {
+      final Iter iter = item.atomValue(qc, info).iter();
+      for(Item it; (it = qc.next(iter)) != null;) {
+        Item relabel = null;
+        final Type itemType = it.type;
+        if(!itemType.instanceOf(type)) {
+          if(itemType == UNTYPED_ATOMIC) {
+            if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
+            // item will be cast
+          } else if(
+            type == DECIMAL && (itemType == DOUBLE || itemType == FLOAT) ||
+            type == DOUBLE && (itemType == FLOAT || itemType.instanceOf(DECIMAL)) ||
+            type == FLOAT && (itemType == DOUBLE || itemType.instanceOf(DECIMAL)) ||
+            type == STRING && itemType == ANY_URI ||
+            type == ANY_URI && itemType.instanceOf(STRING) ||
+            type == HEX_BINARY && itemType == BASE64_BINARY ||
+            type == BASE64_BINARY && itemType == HEX_BINARY
+          ) {
+            // item will be cast
+          } else if(!type.union(itemType).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
+            // item will be relabeled: remember old type for future comparison
+            relabel = it;
+          } else {
+            throw error.get();
+          }
+          it = (Item) cast(it, true, qc, info);
+          if(relabel != null && !it.equal(relabel, null, info)) throw error.get();
+        }
+        vb.add(it);
+      }
+    } else if(item instanceof XQArray && type instanceof ArrayType) {
+      vb.add(((XQArray) item).coerceTo((ArrayType) type, qc, cc, info));
+    } else if(item instanceof XQMap && type instanceof RecordType) {
+      final RecordType rt = (RecordType) type;
+      vb.add(((XQMap) item).coerceTo(rt, qc, cc, info));
+    } else if(item instanceof XQMap && type instanceof MapType) {
+      vb.add(((XQMap) item).coerceTo((MapType) type, qc, cc, info));
     } else if(item instanceof FItem && type instanceof FuncType) {
-      items.add(((FItem) item).coerceTo((FuncType) type, qc, info, opt));
+      final FuncType ft = type == FUNCTION ? item.funcType() : (FuncType) type;
+      vb.add(((FItem) item).coerceTo(ft, qc, cc, info));
     } else {
-      throw typeError(item, with(EXACTLY_ONE), name, info, true);
+      throw error.get();
     }
   }
 
@@ -462,13 +549,13 @@ public final class SeqType {
     if(intersect(st) != null) return true;
     if(occ.intersect(st.occ) == null) return false;
     final Type tp = st.type;
-    if(tp instanceof AtomType) {
+    if(tp instanceof AtomType || tp instanceof ChoiceItemType) {
       if(type.isUntyped()) return !tp.nsSensitive();
       return tp == DOUBLE && (type.intersect(FLOAT) != null || type.intersect(DECIMAL) != null) ||
              tp == FLOAT && type.intersect(DECIMAL) != null ||
              tp == STRING && type.intersect(ANY_URI) != null;
     }
-    return st.type instanceof FuncType && type instanceof FuncType;
+    return st.type instanceof FType && type instanceof FType;
   }
 
   /**
@@ -481,7 +568,7 @@ public final class SeqType {
     // ignore general type of empty sequence
     final Type tp = st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ oc = occ.union(st.occ);
-    final Test ts = st.zero() ? test : zero() ? st.test : Test.get(test, st.test);
+    final Test ts = st.zero() ? test : zero() ? st.test : Test.get(Arrays.asList(test, st.test));
     return get(tp, oc, ts);
   }
 
@@ -571,7 +658,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeFunction() {
-    return !zero() && (type instanceof FuncType || ANY_ATOMIC_TYPE.instanceOf(type));
+    return !zero() && (type instanceof FType || ANY_ATOMIC_TYPE.instanceOf(type));
   }
 
   /**
@@ -580,9 +667,17 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instanceOf(final SeqType st) {
+    if(this == st) return true;
     // empty sequence: only check cardinality
-    return this == st || (zero() ? !st.oneOrMore() :
-      type.instanceOf(st.type) && occ.instanceOf(st.occ) && kindInstanceOf(st));
+    if(zero()) return !st.oneOrMore();
+    if(!occ.instanceOf(st.occ)) return false;
+    if(type instanceof ChoiceItemType) {
+      return ((ChoiceItemType) type).instanceOf(st.with(EXACTLY_ONE));
+    }
+    if(st.type instanceof ChoiceItemType) {
+      return ((ChoiceItemType) st.type).hasInstance(this.with(EXACTLY_ONE));
+    }
+    return type.instanceOf(st.type) && kindInstanceOf(st);
   }
 
   /**
@@ -618,18 +713,31 @@ public final class SeqType {
   }
 
   /**
+   * This implementation of {@link #hashCode} is used on the alternatives of a
+   * {@link ChoiceItemType}, while {@link #mapTypes} is being maintained as a {@link HashMap}.
+   * Since {@link MapType#keyType} is guaranteed to be an atomic type, we expect it to be called
+   * only on {@link #SeqType} instances based on some {@link AtomType}, where suitable hash codes
+   * are available for {@link #type}, and {@link #occ}.
+   */
+  @Override
+  public int hashCode() {
+    if(test != null) throw Util.notExpected();
+    return (type == null ? 0 : type.hashCode()) + (occ == null ? 0 : occ.hashCode());
+  }
+
+  /**
    * Returns a string representation of the type.
    * @return string
    */
   public String typeString() {
-    return zero() ? QueryText.EMPTY_SEQUENCE + "()" :
-      test != null ? test.toString() : type.toString();
+    return zero() ? QueryText.EMPTY_SEQUENCE + "()" : test != null ? test.toString() :
+      type.toString();
   }
 
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(!one() && type instanceof FuncType) {
+    if(!one() && type instanceof FType) {
       tb.add('(').add(typeString()).add(')');
     } else {
       tb.add(typeString());

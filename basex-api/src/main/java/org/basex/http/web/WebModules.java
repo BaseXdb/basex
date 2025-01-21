@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
@@ -23,7 +23,7 @@ import org.basex.util.http.*;
 /**
  * This class caches RESTXQ modules found in the HTTP root directory.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class WebModules {

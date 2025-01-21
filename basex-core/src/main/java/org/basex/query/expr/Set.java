@@ -20,7 +20,7 @@ import org.basex.util.*;
 /**
  * Set expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class Set extends Arr {
@@ -42,7 +42,7 @@ abstract class Set extends Arr {
     if(expr == null) {
       final int el = exprs.length;
       if(el == 0) return Empty.VALUE;
-      if(el == 1) return cc.function(Function._UTIL_DDO, info, exprs[0]);
+      if(el == 1) return cc.function(Function.DISTINCT_ORDERED_NODES, info, exprs[0]);
       // try to merge operands
       expr = mergePaths(cc);
       if(expr == null) expr = mergeFilters(cc);
@@ -146,7 +146,7 @@ abstract class Set extends Arr {
         tests.add(step.test);
       }
       // all steps were parsed. try to merge tests
-      if(s == sl) test = Test.get(tests.toArray(Test[]::new));
+      if(s == sl) test = Test.get(tests);
     }
 
     // try to merge first predicates of all steps
@@ -163,8 +163,8 @@ abstract class Set extends Arr {
         }
         list.add(newPredicate(step.exprs, cc));
       }
-      final Expr merged = cc.get(root, () -> mergePredicates(list.finish(), cc).optimize(cc));
-      preds = s == sl ? new Expr[] { merged } : null;
+      preds = s < sl ? null : new Expr[] { cc.get(root, true,
+          () -> mergePredicates(list.finish(), cc).optimize(cc)) };
     }
     if(test == null || preds == null) return null;
 

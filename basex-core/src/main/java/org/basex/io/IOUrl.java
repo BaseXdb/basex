@@ -21,7 +21,7 @@ import org.xml.sax.*;
 /**
  * {@link IO} reference, representing a URL.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {
@@ -198,8 +198,8 @@ public final class IOUrl extends IO {
     int u = url.indexOf(':');
     if(u < 2 || u + 1 == ul || !isJarURL(url) && url.charAt(u + 1) != '/') return false;
     while(--u >= 0) {
-      final char c = url.charAt(u);
-      if(!(c >= 'a' && c <= 'z' || c == '+' || c == '-' || c == '.' || c == '_')) return false;
+      final char ch = url.charAt(u);
+      if(!(ch >= 'a' && ch <= 'z' || Strings.contains("+-._", ch))) return false;
     }
     return true;
   }
@@ -241,7 +241,7 @@ public final class IOUrl extends IO {
           public void checkServerTrusted(final X509Certificate[] x509, final String type) { }
         }
       }, new SecureRandom());
-    } catch(NoSuchAlgorithmException | KeyManagementException ex) {
+    } catch(final NoSuchAlgorithmException | KeyManagementException ex) {
       Util.stack(ex);
     }
   }

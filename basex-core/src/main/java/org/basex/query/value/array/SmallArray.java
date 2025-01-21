@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * A small array that is stored in a single Java array.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 final class SmallArray extends XQArray {
@@ -72,7 +72,7 @@ final class SmallArray extends XQArray {
   }
 
   @Override
-  public long arraySize() {
+  public long structSize() {
     return members.length;
   }
 

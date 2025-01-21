@@ -8,7 +8,9 @@ import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -17,17 +19,29 @@ import org.basex.util.hash.*;
 /**
  * Simple position range check.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class SimplePos extends Arr implements CmpPos {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param range (min/max) expressions
+   * @param exprs single or min/max expressions
    */
-  SimplePos(final InputInfo info, final Expr... range) {
-    super(info, SeqType.BOOLEAN_O, range);
+  SimplePos(final InputInfo info, final Expr... exprs) {
+    super(info, SeqType.BOOLEAN_O, exprs);
+  }
+
+  /**
+   * Returns a position expression for the specified range, or an optimized boolean item.
+   * @param min minimum position
+   * @param max maximum position (inclusive, can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return expression
+   */
+  public static Expr get(final Expr min, final Expr max, final InputInfo info) {
+    return max == null || min.equals(max) ? new SimplePos(info, min) :
+      new SimplePos(info, min, max);
   }
 
   @Override
@@ -43,42 +57,81 @@ final class SimplePos extends Arr implements CmpPos {
       return expr;
     };
     exprs[0] = simplify.apply(exprs[0]);
-    exprs[1] = simplify.apply(exprs[1]);
 
-    Expr min = exprs[0], max = exprs[1], ex = null;
+    Expr ex = null;
     if(exact()) {
-      min = max = min.optimizePos(OpV.EQ, cc);
-      if(min instanceof Bln) ex = min;
+      ex = exprs[0].optimizePos(OpV.EQ, cc);
+      if(!(ex instanceof Bln)) ex = null;
+    } else {
+      exprs[1] = simplify.apply(exprs[1]);
     }
-    if(ex == null && min instanceof Int && max instanceof Int) {
-      ex = IntPos.get(((Int) min).itr(), ((Int) max).itr(), info);
+    if(ex == null && exprs[0] instanceof Int) {
+      final long mn = ((Int) exprs[0]).itr();
+      if(exact()) {
+        ex = IntPos.get(mn, mn, info);
+      } else if(exprs[1] instanceof Int) {
+        ex = IntPos.get(mn, ((Int) exprs[1]).itr(), info);
+      }
     }
     return ex != null ? cc.replaceWith(this, ex) : this;
   }
 
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     ctxValue(qc);
-    return Bln.get(test(qc.focus.pos, qc) != 0);
+
+    final Item min = exprs[0].atomItem(qc, info);
+    if(min.isEmpty()) return false;
+
+    final long p = qc.focus.pos;
+    if(exact()) return p == toDouble(min);
+
+    final Item max = exprs[1].atomItem(qc, info);
+    if(max.isEmpty()) return false;
+
+    return p >= toDouble(min) && p <= toDouble(max);
+  }
+
+  @Override
+  public Value positions(final QueryContext qc) throws QueryException {
+    final Item min = exprs[0].atomItem(qc, info);
+    if(min.isEmpty()) return Empty.VALUE;
+
+    final Item max = exact() ? min : exprs[1].atomItem(qc, info);
+    if(max.isEmpty()) return Empty.VALUE;
+
+    final long mn = (long) Math.ceil(toDouble(min)), mx = (long) Math.floor(toDouble(max));
+    return RangeSeq.get(mn, mx - mn + 1, true);
   }
 
   @Override
   public SimplePos copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final Expr min = exprs[0].copy(cc, vm), max = exact() ? min : exprs[1].copy(cc, vm);
-    return copyType(new SimplePos(info, min, max));
+    return copyType(new SimplePos(info, copyAll(cc, vm, exprs)));
   }
 
   @Override
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
-    if(or || !(ex instanceof SimplePos)) return null;
-    final SimplePos simplePos = (SimplePos) ex;
-    final Expr[] posExpr = simplePos.exprs;
-    if(!exact() && !simplePos.exact()) {
-      final Expr expr1 = exprs[0], expr2 = exprs[1];
-      final Expr min = expr1 == Int.ONE ? posExpr[0] : posExpr[0] == Int.ONE ? expr1 : null;
-      final Expr max = expr2 == Int.MAX ? posExpr[1] : posExpr[1] == Int.MAX ? expr2 : null;
-      if(min != null && max != null) return new SimplePos(info, min, max).optimize(cc);
+
+    if(!or && ex instanceof SimplePos) {
+      final SimplePos pos = (SimplePos) ex;
+      final Expr expr1 = exprs[0], expr2 = exact() ? expr1 : exprs[1];
+      final Expr pexpr1 = pos.exprs[0], pexpr2 = pos.exact() ? pexpr1 : pos.exprs[1];
+
+      // create intersection: pos: 1, 8 and pos: 6, INF  ->  pos: 6, 8
+      final Expr min = expr1 == Int.ONE ? pexpr1 : pexpr1 == Int.ONE ? expr1 : null;
+      final Expr max = expr2 == Int.MAX ? pexpr2 : pexpr2 == Int.MAX ? expr2 : null;
+      if(min != null && max != null) return SimplePos.get(min, max, info).optimize(cc);
+      // create intersection: pos: 5 and pos: 5, 10  ->  pos: 5
+      // create intersection: pos: 4, 6 and pos: 6  ->  pos: 6
+      if(exact() && (expr1.equals(pexpr1) || expr1.equals(pexpr2))) return this;
+      if(pos.exact() && (pexpr1.equals(expr1) || pexpr2.equals(expr2))) return pos;
     }
     return null;
   }
@@ -87,48 +140,21 @@ final class SimplePos extends Arr implements CmpPos {
   public Expr invert(final CompileContext cc) throws QueryException {
     if(exprs[0].seqType().one()) {
       final QuerySupplier<Expr> pos = () -> cc.function(Function.POSITION, info);
-      final Expr expr1 = exprs[0], expr2 = exprs[1];
-      if(exact()) {
-        return new CmpG(info, pos.get(), expr1, OpG.NE, null, cc.sc()).optimize(cc);
-      } else if(expr1 == Int.ONE) {
-        return new CmpG(info, pos.get(), expr2, OpG.GT, null, cc.sc()).optimize(cc);
-      } else if(expr2 == Int.MAX) {
-        return new CmpG(info, pos.get(), expr1, OpG.LT, null, cc.sc()).optimize(cc);
-      }
+      if(exact()) return new CmpG(info, pos.get(), exprs[0], OpG.NE).optimize(cc);
+      if(exprs[0] == Int.ONE) return new CmpG(info, pos.get(), exprs[1], OpG.GT).optimize(cc);
+      if(exprs[1] == Int.MAX) return new CmpG(info, pos.get(), exprs[0], OpG.LT).optimize(cc);
     }
     return null;
   }
 
   @Override
   public boolean exact() {
-    return exprs[0] == exprs[1];
-  }
-
-  @Override
-  public int test(final long pos, final QueryContext qc) throws QueryException {
-    final Item min = exprs[0].atomItem(qc, info);
-    if(min.isEmpty()) return 0;
-    final double mn = toDouble(min), mx;
-    if(exact()) {
-      mx = mn;
-    } else {
-      final Item max = exprs[1].atomItem(qc, info);
-      if(max.isEmpty()) return 0;
-      mx = toDouble(max);
-    }
-    return pos == mx ? 2 : pos >= mn && pos <= mx ? 1 : 0;
+    return exprs.length == 1;
   }
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.POS.in(flags) || Flag.CTX.in(flags) || super.has(flags);
-  }
-
-  @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[position() = NUMBER]  ->  E[NUMBER]
-    return cc.simplify(this, mode == Simplify.PREDICATE && exact() &&
-        exprs[0].seqType().instanceOf(SeqType.NUMERIC_O) ? exprs[0] : this, mode);
+    return Flag.POS.oneOf(flags) || Flag.CTX.oneOf(flags) || super.has(flags);
   }
 
   @Override
@@ -139,6 +165,11 @@ final class SimplePos extends Arr implements CmpPos {
   @Override
   public String description() {
     return "positional access";
+  }
+
+  @Override
+  public void toXml(final QueryPlan plan) {
+    plan.add(plan.create(this), exact() ? exprs[0] : exprs);
   }
 
   @Override

@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * A builder for creating an {@link XQArray} by prepending and appending members.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class ArrayBuilder {
@@ -110,7 +110,7 @@ public final class ArrayBuilder {
    */
   public ArrayBuilder append(final XQArray array) {
     if(!(array instanceof BigArray)) {
-      for(final Value value : array.members()) append(value);
+      for(final Value value : array.iterable()) append(value);
     } else {
       final BigArray big = (BigArray) array;
       final Value[] ls = big.left, rs = big.right;

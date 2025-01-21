@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the JSON Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JsonModuleTest extends SandboxTest {
@@ -37,7 +37,7 @@ public final class JsonModuleTest extends SandboxTest {
         "<json type=\"object\"><_0009 type=\"number\">0</_0009></json>");
     parse("{ \"a\" :0 }", "", "<json type=\"object\"><a type=\"number\">0</a></json>");
     parse("{ \"\" : 0 }", "", "<json type=\"object\"><_ type=\"number\">0</_></json>");
-    parse("{ \"\" : 0.0e0 }", "", "...<_ type=\"number\">0</_>");
+    parse("{ \"\" : 0.0e0 }", "", "...<_ type=\"number\">0.0e0</_>");
     parse("{ \"\" : null }", "", "...<_ type=\"null\"/>");
     parse("{ \"\" : true }", "", "...<_ type=\"boolean\">true</_>");
     parse("{ \"\" : {} }", "", "... type=\"object\"><_ type=\"object\"/>");
@@ -47,7 +47,7 @@ public final class JsonModuleTest extends SandboxTest {
     parse("{ \"O\" : [ 1 ] }", "", "...<O type=\"array\"><_ type=\"number\">1</_></O>");
     parse("{ \"A\" : [ 0, 1 ] }", "",
         "...<A type=\"array\"><_ type=\"number\">0</_><_ type=\"number\">1</_>");
-    parse("{ \"\" : 0.0 }", "", "...>0<");
+    parse("{ \"\" : 0.0 }", "", "...>0.0<");
 
     // merging data types
     parse("[]", "'merge': true()", "<json arrays=\"json\"/>");
@@ -59,7 +59,7 @@ public final class JsonModuleTest extends SandboxTest {
         "<json objects=\"json\" numbers=\"a\"><a>0</a></json>");
     parse("{ \"\" : 0 }", "'merge': true()",
         "<json objects=\"json\" numbers=\"_\"><_>0</_></json>");
-    parse("{ \"\" : 0.0e0 }", "'merge': true()", "...<_>0</_>");
+    parse("{ \"\" : 0.0e0 }", "'merge': true()", "...<_>0.0e0</_>");
     parse("{ \"\" : null }", "'merge': true()", "...<_/>");
     parse("{ \"\" : true }", "'merge': true()", "...<_>true</_>");
     parse("{ \"\" : {} }", "'merge': true()", "... objects=\"json _\"><_/>");
@@ -101,9 +101,9 @@ public final class JsonModuleTest extends SandboxTest {
     final Function func = _JSON_PARSE;
     // queries
     String options = " map { 'format': 'xquery' }";
-    query(func.args("{}", options), "map{}");
-    query(func.args("{\"A\":1}", options), "map{\"A\":1.0e0}");
-    query(func.args("{\"\":null}", options), "map{\"\":()}");
+    query(func.args("{}", options), "{}");
+    query(func.args("{\"A\":1}", options), "{\"A\":1.0e0}");
+    query(func.args("{\"\":null}", options), "{\"\":()}");
 
     query(func.args("[]", options), "[]");
     query(func.args("[\"A\"]", options), "[\"A\"]");
@@ -154,7 +154,7 @@ public final class JsonModuleTest extends SandboxTest {
         " map { 'format': 'xquery', 'escape': false(), 'liberal': true() }") + ')',
         "9\n10");
 
-    error(func.args("42", " map { 'spec': 'garbage' }"), INVALIDOPT_X);
+    error(func.args("42", " map { 'spec': 'garbage' }"), OPTION_X);
   }
 
   /** Test method. */

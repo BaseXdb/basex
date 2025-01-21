@@ -14,7 +14,7 @@ import org.basex.query.var.*;
 /**
  * Context-based function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class ContextFn extends StandardFunc {
@@ -46,8 +46,8 @@ public abstract class ContextFn extends StandardFunc {
   }
 
   @Override
-  public final boolean has(final Flag... flags) {
-    return Flag.CTX.in(flags) && contextAccess() || super.has(flags);
+  public boolean hasCTX() {
+    return contextAccess();
   }
 
   @Override
@@ -78,8 +78,7 @@ public abstract class ContextFn extends StandardFunc {
     // create new expression with inlined context value
     if(ic.var == null && !(ic.expr instanceof ContextValue) && contextAccess()) {
       // $v ! string()  ->  string($v)
-      final Expr[] newArgs = new ExprList(args.length + 1).add(args).add(ic.copy()).finish();
-      expr = definition.get(ic.cc.sc(), info, newArgs);
+      expr = definition.get(info, ExprList.concat(args, ic.copy()));
     }
     return expr != null ? expr.optimize(ic.cc) : null;
   }

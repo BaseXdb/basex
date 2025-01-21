@@ -1,5 +1,6 @@
 package org.basex.util;
 
+import java.net.*;
 import java.nio.charset.*;
 import java.security.*;
 import java.util.*;
@@ -10,7 +11,7 @@ import org.basex.util.list.*;
 /**
  * <p>This class provides convenience operations for strings.</p>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Strings {
@@ -40,9 +41,8 @@ public final class Strings {
 
   /**
    * Converts the specified string into a long value.
-   * {@link Long#MIN_VALUE} is returned if the input is invalid.
    * @param string string to be converted
-   * @return resulting long value
+   * @return resulting long value, or {@link Long#MIN_VALUE} if the input is invalid.
    */
   public static long toLong(final String string) {
     return Token.toLong(Token.token(string));
@@ -50,21 +50,38 @@ public final class Strings {
 
   /**
    * Converts the specified string into an integer value.
-   * {@link Integer#MIN_VALUE} is returned if the input is invalid.
    * @param string string to be converted
-   * @return resulting integer value
+   * @return resulting integer value, or {@link Integer#MIN_VALUE} if the input is invalid
    */
   public static int toInt(final String string) {
     return Token.toInt(Token.token(string));
   }
 
   /**
-   * Checks if the specified string is "yes", "true", "on" or "1".
+   * Converts the specified string to a boolean value.
    * @param string string to be checked
+   * @return result of check, or {@code null} if the input is invalid
+   */
+  public static Boolean toBoolean(final String string) {
+    return isTrue(string) ? Boolean.TRUE : isFalse(string) ? Boolean.FALSE : null;
+  }
+
+  /**
+   * Checks if the specified string is "yes", "true", "on" or "1".
+   * @param string string to be checked (can be {@code null})
    * @return result of check
    */
-  public static boolean toBoolean(final String string) {
+  public static boolean isTrue(final String string) {
     return eqic(string, "1", Text.TRUE, Text.YES, Text.ON);
+  }
+
+  /**
+   * Checks if the specified string is "no", "false", "off" or "0".
+   * @param string string to be checked (can be {@code null})
+   * @return result of check
+   */
+  public static boolean isFalse(final String string) {
+    return eqic(string, Text.FALSE, Text.NO, Text.OFF, "0");
   }
 
   /**
@@ -80,7 +97,7 @@ public final class Strings {
   /**
    * Compares several strings for equality.
    * @param string first string (can be {@code null})
-   * @param strings strings to be compared (can be {@code null})
+   * @param strings strings to be compared (can contain {@code null} references)
    * @return {@code true} if one test is successful
    */
   public static boolean eq(final String string, final String... strings) {
@@ -92,8 +109,8 @@ public final class Strings {
 
   /**
    * Compares several strings for equality, ignoring the case.
-   * @param string first string
-   * @param strings strings to be compared
+   * @param string first string (can be {@code null})
+   * @param strings strings to be compared (can contain {@code null} references)
    * @return {@code true} if test is successful
    */
   public static boolean eqic(final String string, final String... strings) {
@@ -249,15 +266,6 @@ public final class Strings {
   }
 
   /**
-   * Checks if the specified string is "no", "false", "off" or "0".
-   * @param string string to be checked
-   * @return result of check
-   */
-  public static boolean no(final String string) {
-    return eqic(string, Text.FALSE, Text.NO, Text.OFF, "0");
-  }
-
-  /**
    * Checks if a string starts with the specified character.
    * @param string string
    * @param ch character to be found
@@ -294,5 +302,78 @@ public final class Strings {
   public static String[] encodings() {
     if(encodings == null) encodings = Charset.availableCharsets().keySet().toArray(String[]::new);
     return encodings;
+  }
+
+  /**
+   * Converts a string to camel case.
+   * @param string string to convert
+   * @return resulting string
+   */
+  public static String camelCase(final String string) {
+    final StringBuilder sb = new StringBuilder();
+    boolean upper = false;
+    final int sl = string.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = string.charAt(s);
+      if(ch == '-') {
+        upper = true;
+      } else if(upper) {
+        sb.append(Character.toUpperCase(ch));
+        upper = false;
+      } else {
+        sb.append(ch);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Converts the given string to a Java class name. Slashes will be replaced with dots, and
+   * the last package segment will be capitalized and camel-cased.
+   * @param string string to convert
+   * @return class name
+   */
+  public static String uriToClasspath(final String string) {
+    final String s = string.replace('/', '.');
+    final int c = s.lastIndexOf('.') + 1;
+    return s.substring(0, c) + capitalize(camelCase(s.substring(c)));
+  }
+
+  /**
+   * Converts a URI to a directory path.
+   * See https://docs.basex.org/wiki/Repository#URI_Rewriting for details.
+   * @param uri namespace uri
+   * @return converted path
+   */
+  public static String uri2path(final String uri) {
+    String path = uri;
+    try {
+      final URI u = new URI(uri);
+      final TokenBuilder tb = new TokenBuilder();
+      if(u.isOpaque()) {
+        tb.add(u.getScheme()).add('/').add(u.getSchemeSpecificPart().replace(':', '/'));
+      } else {
+        final String auth = u.getAuthority();
+        if(auth != null) {
+          // reverse authority, replace dots by slashes. example: basex.org  ->  org/basex
+          final String[] comp = split(auth, '.');
+          for(int c = comp.length - 1; c >= 0; c--) tb.add('/').add(comp[c]);
+        }
+        // add remaining path
+        final String p = u.getPath();
+        tb.add(p == null || p.isEmpty() ? "/" : p.replace('.', '/'));
+      }
+      path = tb.toString();
+    } catch(final URISyntaxException ex) {
+      Util.debug(ex);
+    }
+
+    // replace special characters with dashes; remove multiple slashes
+    path = path.replaceAll("[^\\w.-/]+", "-").replaceAll("//+", "/");
+    // add "index" string
+    if(endsWith(path, '/')) path += "index";
+    // remove heading slash
+    if(startsWith(path, '/')) path = path.substring(1);
+    return path;
   }
 }

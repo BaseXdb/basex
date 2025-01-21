@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Variable expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -26,19 +26,13 @@ public final class Var extends ExprInfo {
   /** Input info (can be {@code null}). */
   public final InputInfo info;
 
-  /** Declared type, {@code null} if not specified. */
+  /** Declared type ({@code null} if no type or {@code item()*} was specified). */
   public SeqType declType;
-  /** Flag for function coercion. */
-  public boolean coerce;
   /** Stack slot ({@code -1} if unused). */
-  public int slot;
+  int slot;
 
   /** Actual type (by type inference). */
   private final ExprType exprType;
-  /** Static context. */
-  private final StaticContext sc;
-  /** Flag for function parameters. */
-  private final boolean param;
   /** Input expression, from which the data reference and DDO flag will be requested. */
   private Expr ex;
 
@@ -47,22 +41,17 @@ public final class Var extends ExprInfo {
    * @param name variable name
    * @param declType declared type, {@code null} for no check
    * @param qc query context, used for generating a variable ID
-   * @param sc static context
    * @param info input info (can be {@code null})
-   * @param param function parameter flag
    * @param slot stack slot ({@code -1} if unused)
    * @param exprType expression type (can be {@code null})
    */
-  public Var(final QNm name, final SeqType declType, final QueryContext qc, final StaticContext sc,
-      final InputInfo info, final boolean param, final int slot, final ExprType exprType) {
+  public Var(final QNm name, final SeqType declType, final QueryContext qc, final InputInfo info,
+      final int slot, final ExprType exprType) {
     this.name = name;
-    this.param = param;
-    this.sc = sc;
     this.info = info;
     this.slot = slot;
     this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
     this.exprType = exprType != null ? exprType : new ExprType(SeqType.ITEM_ZM);
-    coerce = param;
     id = qc.varIDs++;
   }
 
@@ -71,37 +60,19 @@ public final class Var extends ExprInfo {
    * @param name variable name
    * @param declType declared sequence type, {@code null} for no check
    * @param qc query context, used for generating a variable ID
-   * @param sc static context
    * @param info input info (can be {@code null})
    */
-  public Var(final QNm name, final SeqType declType, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) {
-    this(name, declType, qc, sc, info, false);
-  }
-
-  /**
-   * Constructor.
-   * @param name variable name
-   * @param declType declared sequence type, {@code null} for no check
-   * @param qc query context, used for generating a variable ID
-   * @param sc static context
-   * @param info input info (can be {@code null})
-   * @param param function parameter flag
-   */
-  public Var(final QNm name, final SeqType declType, final QueryContext qc, final StaticContext sc,
-      final InputInfo info, final boolean param) {
-    this(name, declType, qc, sc, info, param, -1, null);
+  public Var(final QNm name, final SeqType declType, final QueryContext qc, final InputInfo info) {
+    this(name, declType, qc, info, -1, null);
   }
 
   /**
    * Copy constructor.
    * @param var variable to copy
    * @param qc query context
-   * @param sc static context
    */
-  public Var(final Var var, final QueryContext qc, final StaticContext sc) {
-    this(var.name, var.declType, qc, sc, var.info, var.param, -1, new ExprType(var.exprType));
-    coerce = var.coerce;
+  public Var(final Var var, final QueryContext qc) {
+    this(var.name, var.declType, qc, var.info, -1, new ExprType(var.exprType));
   }
 
   /**
@@ -178,7 +149,7 @@ public final class Var extends ExprInfo {
 
     if(declType != null) {
       if(declType.occ.intersect(st.occ) == null)
-        throw INVTREAT_X_X_X.get(info, st, declType, Token.concat('$', name.string()));
+        throw INVCONVERT_X_X_X.get(info, st, declType, Token.concat('$', name.string()));
       if(st.instanceOf(declType)) {
         if(cc != null) cc.info(OPTTYPE_X, this);
         declType = null;
@@ -203,23 +174,20 @@ public final class Var extends ExprInfo {
    * @throws QueryException query exception
    */
   public Expr checked(final Expr expr, final CompileContext cc) throws QueryException {
-    return declType != null ? new TypeCheck(info, sc, expr, declType, coerce).optimize(cc) : expr;
+    return declType != null ? new TypeCheck(info, expr, declType).optimize(cc) : expr;
   }
 
   /**
    * Checks the type of this value and casts/promotes it when necessary.
    * @param value value to be checked
    * @param qc query context
-   * @param opt if the result should be optimized
+   * @param cc compilation context (can be {@code null})
    * @return checked and possibly cast value
    * @throws QueryException if the check failed
    */
-  public Value checkType(final Value value, final QueryContext qc, final boolean opt)
+  public Value checkType(final Value value, final QueryContext qc, final CompileContext cc)
       throws QueryException {
-
-    if(declType == null || declType.instance(value)) return value;
-    if(coerce) return declType.coerce(value, name, qc, sc, info, opt);
-    throw typeError(value, declType, name, info, false);
+    return declType != null ? declType.coerce(value, name, qc, cc, info) : value;
   }
 
   /**
@@ -242,25 +210,19 @@ public final class Var extends ExprInfo {
     if(declType == null || vt.type.instanceOf(et.type) ||
         et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
 
-    if(!coerce || !(et.type instanceof NodeType) && !et.promotable(vt)) {
-      throw vt.type.nsSensitive() ? NSSENS_X_X.get(info, et, vt) :
-        typeError(expr, vt, name, info, coerce);
+    if(!(et.type instanceof NodeType) && !et.promotable(vt)) {
+      throw vt.type.nsSensitive() ? NSSENS_X_X.get(info, et, vt) : typeError(expr, vt, name, info);
     }
   }
 
   /**
    * Tries to adopt the given type check.
    * @param st type to check
-   * @param crc if function coercion should be applied
    * @return {@code true} if the check could be adopted, {@code false} otherwise
    */
-  public boolean adoptCheck(final SeqType st, final boolean crc) {
-    if(declType == null || st.instanceOf(declType)) {
-      declType = st;
-    } else if(!declType.instanceOf(st)) {
-      return false;
-    }
-    coerce |= crc;
+  public boolean adoptCheck(final SeqType st) {
+    if(declType != null && !st.instanceOf(declType)) return declType.instanceOf(st);
+    declType = st;
     return true;
   }
 

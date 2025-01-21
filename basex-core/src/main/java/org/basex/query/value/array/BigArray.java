@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * An array containing more members than fit into a {@link SingletonArray} or {@link SmallArray}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 final class BigArray extends XQArray {
@@ -50,7 +50,7 @@ final class BigArray extends XQArray {
   }
 
   @Override
-  public long arraySize() {
+  public long structSize() {
     // O(1) because the middle tree caches its size
     return left.length + middle.size() + right.length;
   }

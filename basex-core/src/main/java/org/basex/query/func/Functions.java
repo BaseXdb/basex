@@ -27,7 +27,7 @@ import org.basex.util.similarity.*;
 /**
  * This class provides access to built-in and user-defined functions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Functions {
@@ -56,7 +56,9 @@ public final class Functions {
     for(final FuncDefinition fd : DEFINITIONS) {
       URIS.add(fd.uri);
       final QNm qnm = new QNm(fd.local(), fd.uri());
-      CACHE.put(qnm.internal(), qnm);
+      final byte[] id = qnm.unique();
+      if(CACHE.contains(id)) throw Util.notExpected("Function % is defined twice.", id);
+      CACHE.put(id, qnm);
     }
   }
 
@@ -77,14 +79,15 @@ public final class Functions {
    * @param name function name
    * @param fb function arguments
    * @param qc query context
+   * @param hasImport indicates whether a module import for the function name's URI was present
    * @return function call
    * @throws QueryException query exception
    */
-  public static Expr get(final QNm name, final FuncBuilder fb, final QueryContext qc)
-      throws QueryException {
+  public static Expr get(final QNm name, final FuncBuilder fb, final QueryContext qc,
+      final boolean hasImport) throws QueryException {
 
     // partial function call?
-    if(fb.partial()) return dynamic(item(name, fb.arity(), false, fb.sc, fb.info, qc), fb);
+    if(fb.placeholders > 0) return dynamic(item(name, fb.arity, false, fb.info, qc, hasImport), fb);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) return constructorCall(name, fb);
@@ -94,13 +97,13 @@ public final class Functions {
     if(fd != null) {
       final int min = fd.minMax[0], max = fd.minMax[1];
       final Expr[] prepared = prepareArgs(fb, fd.names, min, max, fd);
-      final StandardFunc sf = fd.get(fb.sc, fb.info, prepared);
-      if(sf.updating()) qc.updating();
+      final StandardFunc sf = fd.get(fb.info, prepared);
+      if(sf.hasUPD()) qc.updating();
       return sf;
     }
 
     // user-defined function
-    return staticCall(name, fb, qc);
+    return staticCall(name, fb, qc, hasImport);
   }
 
   /**
@@ -108,12 +111,30 @@ public final class Functions {
    * @param expr function expression
    * @param fb function arguments
    * @return function call
+   * @throws QueryException query exception
    */
-  public static Expr dynamic(final Expr expr, final FuncBuilder fb) {
-    final Expr[] args = fb.args();
-    return fb.partial() ? args.length == 0 ? expr :
-      new PartFunc(fb.info, fb.sc, ExprList.concat(args, expr), fb.holes()) :
-      new DynFuncCall(fb.info, fb.sc, expr, args);
+  public static Expr dynamic(final Expr expr, final FuncBuilder fb) throws QueryException {
+    final int ph = fb.placeholders;
+    final Expr[] args;
+    int[] phPerm = null;
+
+    if(fb.keywords == null) {
+      args = fb.args();
+    } else {
+      final XQFunctionExpr fe = (XQFunctionExpr) expr;
+      final int arity = fe.arity();
+      final QNm[] names = new QNm[arity];
+      for(int a = 0; a < arity; ++a) names[a] = fe.paramName(a);
+      args = prepareArgs(fb, names, expr);
+      if(ph > 0) phPerm = preparePlaceholders(fb, names, args);
+    }
+
+    // no placeholders: create dynamic function call
+    // all arguments are placeholders in the original order: return original function expression
+    // otherwise, create partially applied function with optional placeholder permutation
+    return ph == 0 ? new DynFuncCall(fb.info, expr, args) :
+           ph == args.length && phPerm == null ? expr :
+           new PartFunc(fb.info, ExprList.concat(args, expr), ph, phPerm);
   }
 
   /**
@@ -121,16 +142,16 @@ public final class Functions {
    * @param name function name
    * @param arity number of arguments
    * @param runtime {@code true} if this method is called at runtime
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param qc query context
+   * @param hasImport indicates whether a module import for the function name's URI was present
    * @return literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
   public static Expr item(final QNm name, final int arity, final boolean runtime,
-      final StaticContext sc, final InputInfo info, final QueryContext qc) throws QueryException {
+      final InputInfo info, final QueryContext qc, final boolean hasImport) throws QueryException {
 
-    final FuncBuilder fb = new FuncBuilder(sc, info).initLiteral(arity, runtime);
+    final FuncBuilder fb = new FuncBuilder(info, arity, runtime);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) {
@@ -143,13 +164,14 @@ public final class Functions {
     // built-in function
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
-      checkArity(arity, fd.minMax[0], fd.minMax[1], fd, true, info);
+      final IntList arts = checkArity(arity, fd.minMax[0], fd.minMax[1]);
+      if(arts != null) throw wrongArity(arity, arts, true, info, fd);
 
       final FuncType ft = fd.type(arity, fb.anns);
       final QNm[] names = fd.paramNames(arity);
       for(int a = 0; a < arity; a++) fb.add(names[a], ft.argTypes[a], qc);
-      final StandardFunc sf = fd.get(sc, info, fb.args());
-      final boolean updating = sf.updating();
+      final StandardFunc sf = fd.get(info, fb.args());
+      final boolean updating = sf.hasUPD();
       if(updating) {
         fb.anns = fb.anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
         qc.updating();
@@ -160,7 +182,7 @@ public final class Functions {
     // user-defined function
     final StaticFunc sf = qc.functions.get(name, arity);
     if(sf != null) {
-      final Expr func = item(sf, fb, qc);
+      final Expr func = item(sf, fb, qc, hasImport);
       if(sf.updating) qc.updating();
       return func;
     }
@@ -168,7 +190,7 @@ public final class Functions {
     for(int a = 0; a < arity; a++) fb.add(new QNm(ARG + (a + 1), ""), null, qc);
 
     // Java function
-    final JavaCall java = JavaCall.get(name, fb.args(), qc, sc, info);
+    final JavaCall java = JavaCall.get(name, fb.args(), qc, info);
     if(java != null) {
       final SeqType[] sts = new SeqType[arity];
       Arrays.fill(sts, SeqType.ITEM_ZM);
@@ -178,7 +200,7 @@ public final class Functions {
     if(runtime) return null;
 
     // closure
-    final StaticFuncCall call = staticCall(name, fb, qc);
+    final StaticFuncCall call = staticCall(name, fb, qc, hasImport);
     // safe cast (no context dependency, no runtime evaluation)
     final Closure closure = (Closure) item(call, fb, null, name, false, false);
     qc.functions.register(closure);
@@ -186,56 +208,19 @@ public final class Functions {
   }
 
   /**
-   * Creates a function item for a user-defined function.
-   * @param sf static function
-   * @param sc static context
-   * @param info input info (can be {@code null})
-   * @param qc query context
-   * @return function item
-   * @throws QueryException query exception
-   */
-  public static FuncItem item(final StaticFunc sf, final StaticContext sc,
-      final InputInfo info, final QueryContext qc) throws QueryException {
-    // safe cast (no context dependency, runtime evaluation)
-    final FuncBuilder fb = new FuncBuilder(sc, info).initLiteral(sf.arity(), true);
-    return (FuncItem) item(sf, fb, qc);
-  }
-
-  /**
    * Raises an error for the wrong number of function arguments.
    * @param nargs number of supplied arguments
-   * @param arities available arities (if first arity is negative, function is variadic)
-   * @param function function
+   * @param arities available arities (if single arity is negative, function is variadic)
    * @param literal literal flag
    * @param info input info (can be {@code null})
+   * @param function function (for error messages)
    * @return error
    */
   public static QueryException wrongArity(final int nargs, final IntList arities,
-      final Object function, final boolean literal, final InputInfo info) {
+      final boolean literal, final InputInfo info, final Object function) {
 
-    final String supplied = literal ? "Arity " + nargs : arguments(nargs), expected;
-    if(!arities.isEmpty() && arities.peek() < 0) {
-      expected = "at least " + -arities.peek();
-    } else {
-      final int as = arities.ddo().size();
-      int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-      for(int a = 0; a < as; a++) {
-        final int m = arities.get(a);
-        if(m < min) min = m;
-        if(m > max) max = m;
-      }
-      final TokenBuilder tb = new TokenBuilder();
-      if(as > 2 && max - min + 1 == as) {
-        tb.addInt(min).add('-').addInt(max);
-      } else {
-        for(int a = 0; a < as; a++) {
-          if(a != 0) tb.add(a + 1 < as ? ", " : " or ");
-          tb.addInt(arities.get(a));
-        }
-      }
-      expected = tb.toString();
-    }
-    return INVNARGS_X_X_X.get(info, function, supplied, expected);
+    final String arity = arity(literal ? "Arity " + nargs : arguments(nargs), arities);
+    return INVNARGS_X_X.get(info, function, arity);
   }
 
   /**
@@ -244,7 +229,7 @@ public final class Functions {
    * @return function definition if found, {@code null} otherwise
    */
   static FuncDefinition builtIn(final QNm name) {
-    final int id = CACHE.id(name.internal());
+    final int id = CACHE.id(name.unique());
     return id != 0 ? DEFINITIONS.get(id - 1) : null;
   }
 
@@ -278,7 +263,7 @@ public final class Functions {
    * Incorporates keywords in the argument list.
    * @param fb function arguments
    * @param names parameter names
-   * @param function function
+   * @param function function (for error messages)
    * @return arguments
    * @throws QueryException query exception
    */
@@ -312,7 +297,7 @@ public final class Functions {
       throw ABSTRACTFUNC_X.get(fb.info, name.prefixId());
 
     final Expr[] prepared = prepareArgs(fb, CAST_PARAM, 0, 1, name.string());
-    return new Cast(fb.sc, fb.info, prepared.length != 0 ? prepared[0] :
+    return new Cast(fb.info, prepared.length != 0 ? prepared[0] :
       new ContextValue(fb.info), SeqType.get(type, Occ.ZERO_OR_ONE));
   }
 
@@ -321,15 +306,17 @@ public final class Functions {
    * @param name function name
    * @param fb function arguments
    * @param qc query context
+   * @param hasImport indicates whether a module import for the function name's URI was present
    * @return function call
    * @throws QueryException query exception
    */
   private static StaticFuncCall staticCall(final QNm name, final FuncBuilder fb,
-      final QueryContext qc) throws QueryException {
+      final QueryContext qc, final boolean hasImport) throws QueryException {
 
     if(NSGlobal.reserved(name.uri())) throw qc.functions.similarError(name, fb.info);
 
-    final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.sc, fb.info);
+    final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.info,
+        hasImport);
     qc.functions.register(call);
     return call;
   }
@@ -339,44 +326,41 @@ public final class Functions {
    * @param sf static function
    * @param fb function arguments
    * @param qc query context
+   * @param hasImport indicates whether a module import for the function name's URI was present
    * @return function item
    * @throws QueryException query exception
    */
-  private static Expr item(final StaticFunc sf, final FuncBuilder fb, final QueryContext qc)
-      throws QueryException {
+  public static Expr item(final StaticFunc sf, final FuncBuilder fb, final QueryContext qc,
+      final boolean hasImport) throws QueryException {
 
     final FuncType sft = sf.funcType();
     final int arity = fb.params.length;
     for(int a = 0; a < arity; a++) fb.add(sf.paramName(a), sft.argTypes[a], qc);
     final FuncType ft = FuncType.get(fb.anns, sft.declType, Arrays.copyOf(sft.argTypes, arity));
 
-    final StaticFuncCall call = staticCall(sf.name, fb, qc);
+    final StaticFuncCall call = staticCall(sf.name, fb, qc, hasImport);
     if(call.func != null) fb.anns = call.func.anns;
     return item(call, fb, ft, sf.name, sf.updating, false);
   }
 
   /**
-   * Raises an error for the wrong number of function arguments.
+   * Checks if the specified number of arguments matches the allowed min/max range.
+   * If not, returns an array with the allowed numbers of parameters.
    * @param nargs number of supplied arguments
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
-   * @param function function
-   * @param literal literal
-   * @param info input info (can be {@code null})
-   * @throws QueryException query exception
+   * @return arities or {@code null}
    */
-  private static void checkArity(final int nargs, final int min, final int max,
-      final Object function, final boolean literal, final InputInfo info) throws QueryException {
+  public static IntList checkArity(final long nargs, final int min, final int max) {
+    if(nargs >= min && nargs <= max) return null;
 
-    if(nargs < min || nargs > max) {
-      final IntList arities = new IntList();
-      if(max != Integer.MAX_VALUE) {
-        for(int m = min; m <= max; m++) arities.add(m);
-      } else {
-        arities.add(-min);
-      }
-      throw wrongArity(nargs, arities, function, literal, info);
+    final IntList arities = new IntList();
+    if(max != Integer.MAX_VALUE) {
+      for(int m = min; m <= max; m++) arities.add(m);
+    } else {
+      arities.add(-min);
     }
+    return arities;
   }
 
   /**
@@ -405,7 +389,7 @@ public final class Functions {
     }
     // runtime: create function item
     if(fb.runtime) {
-      return new FuncItem(fb.info, expr, params, anns, ft, vs.sc, vs.stackSize(), name);
+      return new FuncItem(fb.info, expr, params, anns, ft, vs.stackSize(), name);
     }
     // otherwise: create closure
     final SeqType declType = updating ? SeqType.EMPTY_SEQUENCE_Z : ft != null ? ft.declType : null;
@@ -418,22 +402,60 @@ public final class Functions {
    * @param names parameter names
    * @param min minimum number of allowed arguments
    * @param max maximum number of allowed arguments
-   * @param function function
+   * @param function function (for error messages)
    * @return arguments
    * @throws QueryException query exception
    */
   private static Expr[] prepareArgs(final FuncBuilder fb, final QNm[] names, final int min,
       final int max, final Object function) throws QueryException {
 
-    final Expr[] tmp = fb.keywords != null ? prepareArgs(fb, names, function) : fb.args();
-    final int arity = tmp.length;
+    final Expr[] args = fb.keywords != null ? prepareArgs(fb, names, function) : fb.args();
+    final int arity = args.length;
     for(int a = arity - 1; a >= 0; a--) {
-      if(tmp[a] == null) {
+      if(args[a] == null) {
         if(a < min) throw ARGMISSING_X_X.get(fb.info, function, names[a].prefixString());
-        tmp[a] = Empty.UNDEFINED;
+        args[a] = Empty.UNDEFINED;
       }
     }
-    checkArity(arity, min, max, function, false, fb.info);
-    return tmp;
+    final IntList arities = checkArity(arity, min, max);
+    if(arities != null) throw wrongArity(arity, arities, false, fb.info, function);
+    return args;
+  }
+
+  /**
+   * Calculates the permutation of argument placeholder ordinals, that will map from the order of
+   * placeholders in the target function's argument list to the parameter positions in the parameter
+   * list of a partially evaluated function.
+   * @param fb function arguments
+   * @param names parameter names
+   * @param args arguments with optional placeholders
+   * @return an integer array, where the value at index i indicates the index in the parameter list
+   *         of the partially evaluated function of the i-th placeholder in the (positional) target
+   *         function argument list.
+   */
+  private static int[] preparePlaceholders(final FuncBuilder fb, final QNm[] names,
+      final Expr[] args) {
+    final int[] phPerm = new int[fb.placeholders];
+    final int posArgs = fb.arity - fb.keywords.size();
+    int p = 0;
+    for(int a = 0; a < posArgs; ++a) {
+      if(PartFunc.placeholder(args[a])) {
+        phPerm[p] = p;
+        ++p;
+      }
+    }
+    final int nonKwPh = p;
+    for(int a = posArgs; a < fb.arity; ++a) {
+      if(PartFunc.placeholder(args[a])) {
+        final QNm name = names[a];
+        int i = nonKwPh;
+        for(final QNm qnm : fb.keywords) {
+          if(qnm.eq(name)) break;
+          if(PartFunc.placeholder(fb.keywords.get(qnm))) ++i;
+        }
+        phPerm[p++] = i;
+      }
+    }
+    return phPerm;
   }
 }

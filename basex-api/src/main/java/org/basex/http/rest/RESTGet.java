@@ -8,6 +8,7 @@ import java.util.AbstractMap.*;
 import java.util.Map.*;
 
 import org.basex.http.*;
+import org.basex.query.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -15,7 +16,7 @@ import org.basex.util.options.*;
 /**
  * This class processes GET requests sent to the REST server.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class RESTGet {
@@ -26,9 +27,10 @@ final class RESTGet {
    * Creates and returns a REST command.
    * @param session REST session
    * @return code
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public static RESTCmd get(final RESTSession session) throws IOException {
+  public static RESTCmd get(final RESTSession session) throws QueryException, IOException {
     final Map<String, Entry<Object, String>> bindings = new HashMap<>();
 
     // parse query string

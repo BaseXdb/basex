@@ -8,7 +8,6 @@ import java.util.zip.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -16,13 +15,13 @@ import org.basex.query.value.node.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ArchiveEntries extends StandardFunc {
+public final class ArchiveEntries extends ArchiveFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final B64 archive = toB64(arg(0), qc);
+    final Bin archive = toArchive(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {

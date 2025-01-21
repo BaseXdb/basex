@@ -5,6 +5,7 @@ import java.math.*;
 
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -12,7 +13,7 @@ import org.basex.util.*;
 /**
  * Integer item ({@code xs:int}, {@code xs:integer}, {@code xs:short}, etc.).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Int extends ANum {
@@ -82,7 +83,7 @@ public final class Int extends ANum {
 
   @Override
   public byte[] string() {
-    return value == 0 ? Token.ZERO : Token.token(value);
+    return value == 0 ? Token.cpToken('0') : Token.token(value);
   }
 
   @Override
@@ -106,8 +107,8 @@ public final class Int extends ANum {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate) {
-    return predicate ? value == qc.focus.pos : bool(ii);
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
+    return pos > 0 ? value == pos : bool(ii);
   }
 
   @Override
@@ -131,37 +132,17 @@ public final class Int extends ANum {
   }
 
   @Override
-  public Int round(final int scale, final boolean even) {
-    final long v = rnd(scale, even);
+  public Int round(final int prec, final RoundMode mode) {
+    if(value == 0 || prec >= 0) return this;
+    final long v = Dec.round(BigDecimal.valueOf(value), prec, mode).longValue();
     return v == value ? this : get(v);
   }
 
-  /**
-   * Returns a rounded value.
-   * @param s scale
-   * @param e half-to-even flag
-   * @return result
-   */
-  private long rnd(final int s, final boolean e) {
-    long v = value;
-    if(s >= 0 || v == 0) return v;
-    if(s < -15) return Dec.get(new BigDecimal(v)).round(s, e).itr();
-
-    long f = 1;
-    final int c = -s;
-    for(long i = 0; i < c; i++) f = (f << 3) + (f << 1);
-    final boolean n = v < 0;
-    final long a = n ? -v : v, m = a % f, d = m << 1;
-    v = a - m;
-    if(e ? d > f || d == f && v % (f << 1) != 0 : n ? d > f : d >= f) v += f;
-    return n ? -v : v;
-  }
-
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
     return item instanceof Int ? value == ((Int) item).value :
-           item instanceof Dec ? item.equal(this, coll, sc, ii) :
+           item instanceof Dec ? item.equal(this, coll, ii) :
            value == item.dbl(ii);
   }
 
@@ -188,6 +169,13 @@ public final class Int extends ANum {
       default:
         return value;
     }
+  }
+
+  @Override
+  public int hashCode() {
+    final long v = value;
+    final int i = (int) v;
+    return v == i ? i : super.hashCode();
   }
 
   @Override

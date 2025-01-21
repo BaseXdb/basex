@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class MapEntries extends StandardFunc {
@@ -20,21 +20,21 @@ public class MapEntries extends StandardFunc {
   public final Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
       final XQMap map = toMap(arg(0), qc);
-      final BasicIter<Item> keys = map.keys().iter();
+      final BasicIter<Item> keys = map.keys();
 
       @Override
       public XQMap next() throws QueryException {
         final Item key = keys.next();
-        return key != null ? entry(key, map.get(key, info)) : null;
+        return key != null ? entry(key, map.get(key)) : null;
       }
       @Override
       public Item get(final long i) throws QueryException {
         final Item key = keys.get(i);
-        return entry(key, map.get(key, info));
+        return entry(key, map.get(key));
       }
       @Override
       public long size() {
-        return map.mapSize();
+        return map.structSize();
       }
     };
   }
@@ -44,25 +44,26 @@ public class MapEntries extends StandardFunc {
     final XQMap map = toMap(arg(0), qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    map.apply((key, value) -> vb.add(entry(key, value)));
+    map.forEach((key, value) -> vb.add(entry(key, value)));
     return vb.value(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final FuncType ft = arg(0).funcType();
-    if(ft instanceof MapType) exprType.assign(ft);
+    final Type tp = arg(0).seqType().type;
+    if(tp instanceof MapType) exprType.assign(tp);
     return this;
   }
 
   /**
-   * Creates a map pair.
+   * Returns a single map entry as a new map.
    * @param key key
    * @param value value
    * @return created map entry
    * @throws QueryException query exception
    */
+  @SuppressWarnings("unused")
   XQMap entry(final Item key, final Value value) throws QueryException {
-    return XQMap.singleton(key, value, info);
+    return XQMap.singleton(key, value);
   }
 }

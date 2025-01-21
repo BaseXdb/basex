@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * Panel for importing new database resources. Embedded by both the database creation and
  * properties dialog.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class DialogImport extends BaseXBack {
@@ -194,7 +194,7 @@ final class DialogImport extends BaseXBack {
   private void choose() {
     String path = input.getText();
     final BaseXFileChooser fc = new BaseXFileChooser(dialog, FILE_OR_DIR, path);
-    fc.textFilters().filter(ZIP_ARCHIVES, false, IO.ZIPSUFFIXES);
+    fc.textFilters().filter(ZIP_ARCHIVES, false, IO.ARCHIVESUFFIXES);
     final IOFile file = fc.select(Mode.FDOPEN);
     if(file == null) return;
 

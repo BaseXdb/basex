@@ -6,10 +6,10 @@ import org.basex.query.value.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class ValidateXsdInfo extends ValidateXsd {
+public final class ValidateXsdInfo extends ValidateXsd {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return info(qc);

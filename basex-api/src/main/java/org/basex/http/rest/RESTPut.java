@@ -9,12 +9,13 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.*;
 import org.basex.core.cmd.*;
 import org.basex.http.*;
+import org.basex.query.*;
 import org.basex.util.http.*;
 
 /**
  * REST-based evaluation of PUT operations.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class RESTPut {
@@ -25,9 +26,10 @@ final class RESTPut {
    * Creates and returns a REST command.
    * @param session REST session
    * @return code
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public static RESTExec get(final RESTSession session) throws IOException {
+  public static RESTExec get(final RESTSession session) throws QueryException, IOException {
     // create new database or update resource
     final HTTPConnection conn = session.conn;
     final String db = conn.db();

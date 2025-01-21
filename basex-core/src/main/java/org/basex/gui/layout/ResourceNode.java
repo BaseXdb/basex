@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * JTree node for representing database resources.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
 public abstract class ResourceNode extends DefaultMutableTreeNode
@@ -58,7 +58,7 @@ public abstract class ResourceNode extends DefaultMutableTreeNode
   public static byte[] preparePath(final byte[] path) {
     String p = MetaData.normPath(string(path));
     if(Strings.endsWith(p, '/')) p = p.substring(0, p.length() - 1);
-    return concat(SLASH, token(p));
+    return concat(cpToken('/'), token(p));
   }
 
   /**
@@ -66,7 +66,7 @@ public abstract class ResourceNode extends DefaultMutableTreeNode
    * @return path string
    */
   public final String path() {
-    return string(preparePath(concat(path, SLASH, name)));
+    return string(preparePath(concat(path, cpToken('/'), name)));
   }
 
   /**

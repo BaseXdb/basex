@@ -1,4 +1,4 @@
-/* Copyright (c) 2005-24, Alexander Holupirek <alex@holupirek.de>, BSD license */
+/* Copyright (c), Alexander Holupirek <alex@holupirek.de>, BSD license */
 #ifdef __cplusplus
 extern "C" {
 #endif

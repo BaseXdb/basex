@@ -16,7 +16,7 @@ import org.xmldb.api.modules.*;
 /**
  * This class tests the XMLDB/API Collection implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CollectionTest extends XMLDBBaseTest {
@@ -198,7 +198,7 @@ public final class CollectionTest extends XMLDBBaseTest {
 
     // test xml resource and ID creation
     Resource resource = collection.createResource(null, XMLResource.RESOURCE_TYPE);
-    assertTrue(resource instanceof XMLResource, "XMLResource expected.");
+    assertInstanceOf(XMLResource.class, resource, "XMLResource expected.");
     assertNotNull(resource.getId(), "No ID was created.");
 
     // test adoption of specified id

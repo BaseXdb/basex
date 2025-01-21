@@ -1,7 +1,7 @@
 (:~
  : Delete resources.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/databases';
 
@@ -12,26 +12,24 @@ declare variable $dba:SUB := 'database';
 
 (:~
  : Deletes resources.
- : @param  $names     database
+ : @param  $name      database
  : @param  $resource  resources
  : @return redirection
  :)
 declare
   %updating
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/db-delete')
-  %rest:query-param('name',     '{$name}')
-  %rest:query-param('resource', '{$resources}')
+  %rest:form-param('name',     '{$name}')
+  %rest:form-param('resource', '{$resources}')
 function dba:db-delete(
   $name       as xs:string,
   $resources  as xs:string*
-) as empty-sequence() {
+) {
   try {
     $resources ! db:delete($name, .),
-    utils:redirect($dba:SUB,
-      map { 'name': $name, 'info': utils:info($resources, 'resource', 'deleted') }
-    )
+    utils:redirect($dba:SUB, { 'name': $name, 'info': utils:info($resources, 'resource', 'deleted') })
   } catch * {
-    utils:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
+    utils:redirect($dba:SUB, { 'name': $name, 'error': $err:description })
   }
 };

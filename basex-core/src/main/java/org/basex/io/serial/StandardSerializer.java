@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
 /**
  * This class serializes items to an output stream.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class StandardSerializer extends OutputSerializer {
@@ -47,7 +47,6 @@ public abstract class StandardSerializer extends OutputSerializer {
 
     super(os, sopts);
 
-    // normalization form
     final String norm = sopts.get(NORMALIZATION_FORM);
     if(norm.equals(NORMALIZATION_FORM.value())) {
       form = null;
@@ -59,16 +58,15 @@ public abstract class StandardSerializer extends OutputSerializer {
         throw SERNORM_X.getIO(norm);
       }
     }
-
-    final String maps = sopts.get(USE_CHARACTER_MAPS);
-    if(maps.isEmpty()) {
+    if(sopts.get(USE_CHARACTER_MAPS).isEmpty()) {
       map = null;
     } else {
       map = new IntObjMap<>();
       for(final Map.Entry<String, String> entry : sopts.toMap(USE_CHARACTER_MAPS).entrySet()) {
         final String key = entry.getKey();
-        if(key.length() != 1) throw SERMAP_X.getIO(key);
-        map.put(key.charAt(0), token(entry.getValue()));
+        if(key.codePoints().count() != 1) throw SERPARAM_X.getIO(
+            Util.info("Key in character map is not a single character: %.", key));
+        map.put(key.codePointAt(0), token(entry.getValue()));
       }
     }
   }
@@ -97,7 +95,7 @@ public abstract class StandardSerializer extends OutputSerializer {
   @Override
   protected void function(final FItem item) throws IOException {
     if(!(item instanceof XQArray)) throw SERFUNC_X.getIO(item.seqType());
-    for(final Value value : ((XQArray) item).members()) {
+    for(final Value value : ((XQArray) item).iterable()) {
       for(final Item it : value) serialize(it);
     }
   }
@@ -122,7 +120,9 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   @Override
   protected final void printChar(final int cp) throws IOException {
-    if(!characterMap(cp)) print(cp);
+    final byte[] value = map != null ? map.get(cp) : null;
+    if(value != null) out.print(value);
+    else print(cp);
   }
 
   /**
@@ -135,30 +135,13 @@ public abstract class StandardSerializer extends OutputSerializer {
   }
 
   /**
-   * Replaces a character with an entry from the character map.
-   * @param cp codepoint
-   * @return {@code true} if replacement was found
-   * @throws IOException I/O exception
-   */
-  protected final boolean characterMap(final int cp) throws IOException {
-    if(map != null) {
-      final byte[] value = map.get(cp);
-      if(value != null) {
-        out.print(value);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Flattens an array.
    * @param array array
    * @return contained items
    */
   static ItemList flatten(final XQArray array) {
     final ItemList list = new ItemList();
-    for(final Value value : array.members()) {
+    for(final Value value : array.iterable()) {
       for(final Item item : value) {
         if(item instanceof XQArray) {
           list.add(flatten((XQArray) item));

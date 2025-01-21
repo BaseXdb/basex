@@ -1,7 +1,6 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
-import static org.basex.util.Token.*;
 
 import java.util.regex.*;
 
@@ -17,12 +16,12 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnTokenize extends RegEx {
   /** Default pattern. */
-  private static final byte[] DEFAULT = { ' ' };
+  private static final byte[] DEFAULT = Token.cpToken(' ');
   /** Placeholder for default search. */
   private static final byte[] WHITESPACE = Token.token("\\s+");
 
@@ -44,14 +43,14 @@ public final class FnTokenize extends RegEx {
           @Override
           public Item next() {
             if(start == -1) return null;
-            final int e = indexOf(value, ch, start);
+            final int e = Token.indexOf(value, ch, start);
             return e != -1 ? next(e, e + sl) : next(vl, -1);
           }
 
           private Str next(final int end, final int next) {
             final int b = start;
             start = next;
-            return Str.get(substring(value, b, end));
+            return Str.get(Token.substring(value, b, end));
           }
         };
       }
@@ -59,7 +58,7 @@ public final class FnTokenize extends RegEx {
 
     final Pattern p = pattern(pattern, flags, true);
     return vl == 0 ? Empty.ITER : new Iter() {
-      final String string = string(value);
+      final String string = Token.string(value);
       final Matcher matcher = p.matcher(string);
       int start;
 
@@ -72,7 +71,7 @@ public final class FnTokenize extends RegEx {
       private Str next(final int end, final int next) {
         final int b = start;
         start = next;
-        return Str.get(token(string.substring(b, end)));
+        return Str.get(Token.token(string.substring(b, end)));
       }
     };
   }
@@ -87,14 +86,14 @@ public final class FnTokenize extends RegEx {
 
     if(simple) {
       final int ch = patternChar(pattern);
-      if(ch != -1) return vl == 0 ? Empty.VALUE : StrSeq.get(split(value, ch, true));
+      if(ch != -1) return vl == 0 ? Empty.VALUE : StrSeq.get(Token.split(value, ch, true));
     }
 
     final Pattern p = pattern(pattern, flags, true);
     if(vl == 0) return Empty.VALUE;
 
     final TokenList tl = new TokenList();
-    final String string = string(value);
+    final String string = Token.string(value);
     int start = 0;
     for(final Matcher matcher = p.matcher(string); matcher.find();) {
       tl.add(string.substring(start, matcher.start()));
@@ -123,7 +122,7 @@ public final class FnTokenize extends RegEx {
    */
   private byte[] input(final byte[] pattern, final QueryContext qc) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
-    return pattern == DEFAULT ? normalize(value) : value;
+    return pattern == DEFAULT ? Token.normalize(value) : value;
   }
 
   @Override
@@ -131,7 +130,8 @@ public final class FnTokenize extends RegEx {
     final Expr value = arg(0), pattern = arg(1);
 
     // tokenize(normalize-space(A), ' ')  ->  tokenize(A)
-    if(NORMALIZE_SPACE.is(value) && pattern instanceof Str && eq(((Str) pattern).string(), SPACE)) {
+    if(NORMALIZE_SPACE.is(value) && pattern instanceof Str &&
+        Token.eq(((Str) pattern).string(), Token.cpToken(' '))) {
       final Expr arg = value.args().length == 1 ? value.arg(0) : ContextValue.get(cc, info);
       return cc.function(TOKENIZE, info, arg);
     }
@@ -145,6 +145,6 @@ public final class FnTokenize extends RegEx {
   public boolean whitespace() {
     final Expr pattern = arg(1);
     return pattern == Empty.VALUE || pattern == Empty.UNDEFINED ||
-        pattern instanceof Str && eq(((Str) pattern).string(), WHITESPACE);
+        pattern instanceof Str && Token.eq(((Str) pattern).string(), WHITESPACE);
   }
 }

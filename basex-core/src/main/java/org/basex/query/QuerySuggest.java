@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * This class analyzes the current path and gives suggestions for code completions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class QuerySuggest extends QueryParser {
@@ -57,7 +57,7 @@ final class QuerySuggest extends QueryParser {
       }
       list.sort();
     }
-    return list.add(input.substring(0, index));
+    return list.add(substring(0, index).toString());
   }
 
   @Override

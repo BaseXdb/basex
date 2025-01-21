@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.math.*;
 
 import org.basex.query.*;
+import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -12,19 +13,19 @@ import org.basex.util.*;
 /**
  * Unsigned long ({@code xs:unsignedLong}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Uln extends ANum {
   /** Maximum unsigned long values. */
   public static final BigDecimal MAXULN = BigDecimal.valueOf(Long.MAX_VALUE).
       multiply(Dec.BD_2).add(BigDecimal.ONE);
-  /** Decimal value. */
+  /** Integer value. */
   private final BigInteger value;
 
   /**
    * Constructor.
-   * @param value decimal value
+   * @param value integer value
    */
   public Uln(final BigInteger value) {
     super(AtomType.UNSIGNED_LONG);
@@ -78,16 +79,17 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public ANum round(final int scale, final boolean even) {
-    return scale >= 0 ? this :
-      Int.get(Dec.get(new BigDecimal(value)).round(scale, even).dec(null).longValue());
+  public ANum round(final int prec, final RoundMode mode) {
+    if(value.equals(BigInteger.ZERO) || prec >= 0) return this;
+    final BigInteger v = Dec.round(new BigDecimal(value), prec, mode).toBigInteger();
+    return v.equals(value) ? this : new Uln(v);
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
     return item.type == AtomType.UNSIGNED_LONG ? value.equals(((Uln) item).value) :
-      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT ? item.equal(this, coll, sc, ii) :
+      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT ? item.equal(this, coll, ii) :
       value.compareTo(BigInteger.valueOf(item.itr(ii))) == 0;
   }
 
@@ -103,6 +105,11 @@ public final class Uln extends ANum {
   @Override
   public Object toJava() {
     return new BigInteger(value.toString());
+  }
+
+  @Override
+  public int hashCode() {
+    return value.bitLength() < 32 ? value.intValue() : super.hashCode();
   }
 
   @Override

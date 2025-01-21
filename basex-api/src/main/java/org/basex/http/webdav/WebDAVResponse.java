@@ -3,7 +3,7 @@ package org.basex.http.webdav;
 import java.io.*;
 import java.util.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.http.*;
 
@@ -17,7 +17,7 @@ import com.bradmcevoy.http.Cookie;
  * the source was integrated into BaseX.
  *
  * @author Milton Development Team
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
@@ -111,7 +111,7 @@ final class WebDAVResponse extends AbstractResponse {
       return cookie;
     }
 
-    final javax.servlet.http.Cookie c = new javax.servlet.http.Cookie(
+    final jakarta.servlet.http.Cookie c = new jakarta.servlet.http.Cookie(
         cookie.getName(), cookie.getValue());
     c.setDomain(cookie.getDomain());
     c.setMaxAge(cookie.getExpiry());
@@ -125,7 +125,7 @@ final class WebDAVResponse extends AbstractResponse {
 
   @Override
   public Cookie setCookie(final String name, final String value) {
-    final javax.servlet.http.Cookie c = new javax.servlet.http.Cookie(name, value);
+    final jakarta.servlet.http.Cookie c = new jakarta.servlet.http.Cookie(name, value);
     response.addCookie(c);
     return new WebDAVCookie(c);
   }

@@ -15,7 +15,7 @@ import org.eclipse.jetty.websocket.api.*;
 /**
  * This class defines a pool for WebSockets. It manages all connected WebSockets.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Johannes Finckh
  */
 public final class WsPool {
@@ -128,9 +128,9 @@ public final class WsPool {
       final RemoteEndpoint remote = ws.getSession().getRemote();
       for(final Object value : values) {
         if(value instanceof ByteBuffer) {
-          remote.sendBytesByFuture((ByteBuffer) value);
+          remote.sendBytes((ByteBuffer) value, WriteCallback.NOOP);
         } else {
-          remote.sendStringByFuture((String) value);
+          remote.sendString((String) value, WriteCallback.NOOP);
         }
       }
     }

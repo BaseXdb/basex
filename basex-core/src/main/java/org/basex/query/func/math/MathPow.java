@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MathPow extends MathFn {
@@ -33,7 +33,7 @@ public final class MathPow extends MathFn {
     if(exp instanceof ANum) {
       final double e = ((ANum) exp).dbl();
       if(e == 0) return Dbl.ONE;
-      if(e == 1) return new Cast(sc, info, base, SeqType.DOUBLE_O).optimize(cc);
+      if(e == 1) return new Cast(info, base, SeqType.DOUBLE_O).optimize(cc);
       if(e == -1) return new Arith(info, Dbl.ONE, base, Calc.DIVIDE).optimize(cc);
     }
     // merge nested function calls

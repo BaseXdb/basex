@@ -12,7 +12,7 @@ import org.basex.query.value.seq.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnTransitiveClosure extends StandardFunc {
@@ -43,5 +43,10 @@ public final class FnTransitiveClosure extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Expr node = arg(0);
     return node.seqType().zero() ? node : this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  * This class serializes items as JSON. The input must conform to the rules
  * defined in the {@link JsonDirectConverter} and {@link JsonAttsConverter} class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JsonBasicSerializer extends JsonSerializer {
@@ -86,7 +86,8 @@ public final class JsonBasicSerializer extends JsonSerializer {
         key = escape(key, escapedKey, true);
         out.print('"');
         out.print(normalize(key, form));
-        out.print("\":");
+        out.print('"');
+        out.print(':');
       }
 
       if(eq(local, NULL)) {
@@ -109,10 +110,13 @@ public final class JsonBasicSerializer extends JsonSerializer {
       } else if(eq(local, NUMBER)) {
         final byte[] value = value(iter, local);
         if(value == null) throw error("Element '%' has no value.", local);
-        final double d = toDouble(value);
-        if(Double.isNaN(d) || Double.isInfinite(d))
-          throw error("Element '%' has invalid value: '%'.", local, value);
-        out.print(token(d));
+        final String string = Token.string(value).trim().
+            replaceAll("^\\+", "").
+            replaceAll("^(-?)0+([\\d])", "$1$2").
+            replaceAll("^(\\.)", "0$1").
+            replaceAll("(\\.)([\\D]|$)", "$10$2");
+        if(!isNumber(string)) throw error("Element '%' has invalid value: '%'.", local, value);
+        out.print(token(string));
       } else if(eq(local, ARRAY)) {
         out.print('[');
         children(iter, false);
@@ -125,6 +129,39 @@ public final class JsonBasicSerializer extends JsonSerializer {
         throw error("Invalid element: '%'", name);
       }
     }
+  }
+
+  /**
+   * Checks if a string is a valid JSON number.
+   * @param number number string
+   * @return result of check
+   */
+  public static boolean isNumber(final String number) {
+    final InputParser ip = new InputParser(number);
+    int cp = ip.consume();
+    if(cp == '-') cp = ip.consume();
+    if(cp < '0' || cp > '9') return false;
+
+    final boolean zero = cp == '0';
+    cp = ip.consume();
+    if(zero && cp >= '0' && cp <= '9') return false;
+
+    while(cp != '.' && cp != 'e' && cp != 'E') {
+      if(cp < '0' || cp > '9') return cp == 0;
+      cp = ip.consume();
+    }
+    if(cp == '.') {
+      cp = ip.consume();
+      if(cp < '0' || cp > '9') return false;
+      do cp = ip.consume(); while(cp >= '0' && cp <= '9');
+      if(cp != 'e' && cp != 'E') return cp == 0;
+    }
+    cp = ip.consume();
+    if(cp == '-' || cp == '+') cp = ip.consume();
+
+    if(cp < '0' || cp > '9') return false;
+    do cp = ip.consume(); while(cp >= '0' && cp <= '9');
+    return cp == 0;
   }
 
   @Override
@@ -159,7 +196,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
   @Override
   protected void atomic(final Item value) throws IOException {
-    throw JSON_SERIALIZE_X.getIO("Atomic values cannot be serialized");
+    throw JSON_SERIALIZE_X.getIO("Atomic items cannot be serialized");
   }
 
   /**
@@ -247,7 +284,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
           case '\t':
             tb.add('t'); break;
           default:
-            tb.add('u').add('0').add('0').add(HEX_TABLE[cp >> 4]).add(HEX_TABLE[cp & 0xF]); break;
+            tb.add('u').add(hex(cp, 4));
         }
       } else {
         if((cp == '\\' || cp == '"' || cp == '/' && escapeSolidus) &&

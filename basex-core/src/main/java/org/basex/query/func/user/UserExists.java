@@ -7,12 +7,18 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class UserExists extends UserFn {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(qc.context.users.get(toName(arg(0), qc)) != null);
+  public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    return qc.context.users.get(toName(arg(0), qc)) != null;
   }
 }

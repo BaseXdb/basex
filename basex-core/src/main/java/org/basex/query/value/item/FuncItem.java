@@ -24,16 +24,14 @@ import org.basex.util.list.*;
 /**
  * Function item.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItem extends FItem implements Scope {
-  /** Static context. */
-  public final StaticContext sc;
   /** Function expression. */
   public final Expr expr;
 
-  /** Formal parameters. */
+  /** Parameters. */
   private final Var[] params;
   /** Annotations. */
   private final AnnList anns;
@@ -52,40 +50,35 @@ public final class FuncItem extends FItem implements Scope {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body
-   * @param params formal parameters
+   * @param params parameters
    * @param anns function annotations
    * @param type function type
-   * @param sc static context
    * @param stackSize stack-frame size
    * @param name function name (can be {@code null})
    */
   public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
-      final FuncType type, final StaticContext sc, final int stackSize, final QNm name) {
-    this(info, expr, params, anns, type, sc, stackSize, name, null);
+      final FuncType type, final int stackSize, final QNm name) {
+    this(info, expr, params, anns, type, stackSize, name, null);
   }
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body
-   * @param params formal parameters
+   * @param params parameters
    * @param anns function annotations
    * @param type function type
-   * @param sc static context
    * @param stackSize stack-frame size
    * @param name function name (can be {@code null})
    * @param focus query focus (can be {@code null})
    */
   public FuncItem(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
-      final FuncType type, final StaticContext sc, final int stackSize, final QNm name,
-      final QueryFocus focus) {
-
+      final FuncType type, final int stackSize, final QNm name, final QueryFocus focus) {
     super(type);
     this.info = info;
     this.expr = expr;
     this.params = params;
     this.anns = anns;
-    this.sc = sc;
     this.stackSize = stackSize;
     this.name = name;
     this.focus = focus;
@@ -113,6 +106,12 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
+  public void refineType(final Expr exp) {
+    final Type tp = funcType().intersect(exp.seqType().type);
+    if(tp != null) type = tp;
+  }
+
+  @Override
   public Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
 
@@ -122,6 +121,7 @@ public final class FuncItem extends FItem implements Scope {
     // use shortcut if focus is not accessed
     if(simple) return expr.value(qc);
 
+    // reset context and evaluate function
     final QueryFocus qf = qc.focus;
     qc.focus = focus != null ? focus : new QueryFocus();
     try {
@@ -137,45 +137,8 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public FuncItem coerceTo(final FuncType ft, final QueryContext qc, final InputInfo ii,
-      final boolean optimize) throws QueryException {
-
-    final int arity = arity(), nargs = ft.argTypes.length;
-    if(nargs < arity) throw arityError(this, arity, nargs, false, info);
-
-    // optimize: continue with coercion if current type is only an instance of new type
-    FuncType tp = funcType();
-    if(optimize ? tp.eq(ft) : tp.instanceOf(ft)) return this;
-
-    // create new compilation context and variable scope
-    final CompileContext cc = new CompileContext(qc, false);
-    final VarScope vs = new VarScope(sc);
-    final Var[] vars = new Var[arity];
-    final Expr[] args = new Expr[arity];
-    for(int a = 0; a < arity; a++) {
-      vars[a] = vs.addNew(params[a].name, ft.argTypes[a], true, qc, info);
-      args[a] = new VarRef(info, vars[a]).optimize(cc);
-    }
-    cc.pushScope(vs);
-
-    // create new function call (will immediately be inlined/simplified when being optimized)
-    final boolean updating = anns != null && anns.contains(Annotation.UPDATING) ||
-        expr.has(Flag.UPD);
-    Expr body = new DynFuncCall(info, sc, updating, false, this, args);
-    if(optimize) body = body.optimize(cc);
-
-    // add type check if return types differ
-    final SeqType dt = ft.declType;
-    if(!tp.declType.instanceOf(dt)) {
-      body = new TypeCheck(info, sc, body, dt, true);
-      if(optimize) body = body.optimize(cc);
-    }
-
-    // adopt type of optimized body if it is more specific than passed on type
-    final SeqType bt = body.seqType();
-    tp = optimize && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, ft.argTypes) : ft;
-    body.markTailCalls(null);
-    return new FuncItem(info, body, vars, anns, tp, sc, vs.stackSize(), name);
+  boolean updating() {
+    return anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
   }
 
   @Override
@@ -216,7 +179,6 @@ public final class FuncItem extends FItem implements Scope {
 
     // create the return clause
     final Expr rtrn = expr.copy(cc, vm).optimize(cc);
-    rtrn.accept(new InlineVisitor());
     return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 
@@ -236,7 +198,7 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
+  public boolean deepEqual(final Item item, final DeepEqual deep) {
     if(this == item) return true;
     if(item instanceof FuncItem) {
       final FuncItem func = (FuncItem) item;
@@ -249,37 +211,6 @@ public final class FuncItem extends FItem implements Scope {
   public boolean vacuousBody() {
     final SeqType st = expr.seqType();
     return st != null && st.zero() && !expr.has(Flag.UPD);
-  }
-
-  @Override
-  public String description() {
-    return FUNCTION + ' ' + ITEM;
-  }
-
-  @Override
-  public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, NAME, name == null ? null : name.prefixId()), params, expr);
-  }
-
-  @Override
-  public String toErrorString() {
-    final QueryString qs = new QueryString();
-    if(name != null) {
-      qs.concat(name.prefixId(), "#", arity());
-    } else {
-      final StringList list = new StringList(arity());
-      for(final Var param : params) list.add(param.toErrorString());
-      qs.token(anns).token(FUNCTION).params(list.finish());
-      qs.token(AS).token(funcType().declType).brace(expr);
-    }
-    return qs.toString();
-  }
-
-  @Override
-  public void toString(final QueryString qs) {
-    qs.token(anns);
-    if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-    qs.token(FUNCTION).params(params).token(AS).token(funcType().declType).brace(expr);
   }
 
   /**
@@ -319,8 +250,8 @@ public final class FuncItem extends FItem implements Scope {
             cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
           }
           if(action != null) return new FuncItem[] {
-            new FuncItem(info, cnd, params, anns, funcType(), sc, stackSize, null, focus),
-            new FuncItem(info, action, params, anns, funcType(), sc, stackSize, null, focus)
+            new FuncItem(info, cnd, params, anns, funcType(), stackSize, null, focus),
+            new FuncItem(info, action, params, anns, funcType(), stackSize, null, focus)
           };
         }
       }
@@ -329,21 +260,72 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   /**
-   * A visitor for checking inlined expressions.
-   *
-   * @author BaseX Team 2005-24, BSD License
-   * @author Leo Woerteler
+   * Creates a new function item with refined types.
+   * @param argTypes argument types
+   * @param cc compilation context
+   * @return original or refined function item
+   * @throws QueryException query context
    */
-  private final class InlineVisitor extends ASTVisitor {
-    @Override
-    public boolean inlineFunc(final Scope scope) {
-      return scope.visit(this);
-    }
+  public FuncItem refine(final SeqType[] argTypes, final CompileContext cc) throws QueryException {
+    // skip refinement if function has too many parameters
+    final int nargs = argTypes.length, arity = arity();
+    if(nargs >= arity) {
+      // select more specific types arguments and return types
+      final FuncType oldType = funcType();
+      final SeqType[] oldArgTypes = oldType.argTypes, newArgTypes = new SeqType[arity];
+      for(int a = 0; a < arity; a++) {
+        final SeqType at = argTypes[a], oat = oldArgTypes[a];
+        newArgTypes[a] = at.instanceOf(oat) ? at : oat;
+      }
+      final FuncType newType = FuncType.get(oldType.declType, newArgTypes);
+      // coerce to refined function type
+      final FuncItem fitem = newType.eq(oldType) ? this :
+        (FuncItem) coerceTo(newType, cc.qc, cc, info);
 
-    @Override
-    public boolean dynFuncCall(final DynFuncCall call) {
-      call.markInlined(FuncItem.this);
-      return true;
+      // drop redundant types
+      final Var[] vars = fitem.params;
+      for(int a = 0; a < arity; a++) {
+        final SeqType vt = vars[a].declType;
+        if(vt != null && argTypes[a].instanceOf(vt)) vars[a].declType = null;
+      }
+      return fitem;
     }
+    return this;
+  }
+
+  @Override
+  public InputInfo info() {
+    return info;
+  }
+
+  @Override
+  public String description() {
+    return FUNCTION + ' ' + ITEM;
+  }
+
+  @Override
+  public void toXml(final QueryPlan plan) {
+    plan.add(plan.create(this, NAME, name == null ? null : name.prefixId()), params, expr);
+  }
+
+  @Override
+  public String toErrorString() {
+    final QueryString qs = new QueryString();
+    if(name != null) {
+      qs.concat(name.prefixId(), "#", arity());
+    } else {
+      final StringList list = new StringList(arity());
+      for(final Var param : params) list.add(param.toErrorString());
+      qs.token(anns).token(FN).params(list.finish());
+      qs.token(AS).token(funcType().declType).brace(expr);
+    }
+    return qs.toString();
+  }
+
+  @Override
+  public void toString(final QueryString qs) {
+    qs.token(anns);
+    if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
+    qs.token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
   }
 }

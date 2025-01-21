@@ -7,10 +7,10 @@ import org.basex.query.util.list.*;
 /**
  * Container for parsed data from "part" element.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Rositsa Shadura
  */
-public class Part {
+public final class Part {
   /** Part headers. */
   public final Map<String, String> headers = new HashMap<>();
   /** Attributes of part body. */

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for compiling function items.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class FuncItemTest extends SandboxTest {
@@ -197,6 +197,16 @@ public final class FuncItemTest extends SandboxTest {
   @Test public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
         "return $f(function() { 1, 2 })", INVCONVERT_X_X_X);
+    error("let $x as fn (xs:byte) as item() := fn($x as item()) {$x} return $x(384)",
+        FUNCCAST_X_X_X);
+    error("let $x as fn(xs:anyAtomicType) as xs:string? := { 1:'A', 'x':'B' } return $x?*",
+        LOOKUP_X);
+    error("let $x as fn(xs:integer) as xs:integer := [1, 2] return $x?*", LOOKUP_X);
+    error("let $x as fn(*) := { 1:'A', 'x':'B' } return $x?*", LOOKUP_X);
+    error("let $x as fn(*) := [1, 2] return $x?*", LOOKUP_X);
+
+    query("let $f as fn() as xs:anyAtomicType := fn() { <a/> } " +
+      "return $f() ! (. = ('1', '2'))", "false");
   }
 
   /** Checks if nested closures are inlined. */
@@ -236,6 +246,27 @@ public final class FuncItemTest extends SandboxTest {
         exists(DynFuncCall.class),
         exists(FuncItem.class)
     );
+  }
+
+  /** Tests if recursive function items are inlined only once. */
+  @Test public void gh2033() {
+    check("let $p := function($c, $q) { $c/* ! $q(?, $q)(.) } return $p((), $p)",
+        "",
+        empty()
+    );
+    // GH-2324
+    query("declare variable $f := map {"
+        + "  'A': function($r, $f) { $r/x ! $f?B(., $f) },"
+        + "  'B': function($r, $f) { $r/x ! $f?A(., $f) }"
+        + "};"
+        + "$f?A(<a/>, $f)", "");
+    query("let $even := fn($n, $self, $odd) {"
+        + "  $n = 0 and $odd($n - 1, $odd, $self)"
+        + "}"
+        + "let $odd := fn($n, $self, $even) {"
+        + "  $n != 0 or $even($n - 1, $even, $self)"
+        + "}"
+        + "return $even(1, $even, $odd)", false);
   }
 
   /** Tests if not-yet-known function references are parsed correctly. */
@@ -319,5 +350,22 @@ public final class FuncItemTest extends SandboxTest {
     // bug fix
     query("array:fold-right(" + array + ", 1, fn($a, $b) { if($b > 10000000) then $b else $a+$b })",
         10094951);
+  }
+
+  /** Checks order of keyword placeholder parameters of partially evaluated function. */
+  @Test public void placeholderOrder() {
+    query("declare function local:f($s as xs:string, $i as xs:integer) {$s, $i}; "
+        + "let $result := local:f(i := ?, s := ?)(4.0, xs:anyURI('XQuery'))"
+        + "return ($result[1] instance of xs:string, $result[2] instance of xs:integer)",
+        "true\ntrue");
+  }
+
+  /** Variable declarations with function-lookup. */
+  @Test public void gh2324() {
+    query("declare variable $a := function-lookup(xs:QName('local:f'), 0);"
+        + "declare variable $b := $a;"
+        + "declare function local:f() { $b };"
+        + "local:f() => function-name()",
+        "local:f");
   }
 }

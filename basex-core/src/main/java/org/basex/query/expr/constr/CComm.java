@@ -15,20 +15,18 @@ import org.basex.util.hash.*;
 /**
  * Comment constructor.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CComm extends CNode {
   /**
    * Constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param computed computed constructor
    * @param comment comment
    */
-  public CComm(final StaticContext sc, final InputInfo info, final boolean computed,
-      final Expr comment) {
-    super(sc, info, SeqType.COMMENT_O, computed, comment);
+  public CComm(final InputInfo info, final boolean computed, final Expr comment) {
+    super(info, SeqType.COMMENT_O, computed, comment);
   }
 
   @Override
@@ -45,7 +43,7 @@ public final class CComm extends CNode {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new CComm(sc, info, computed, exprs[0].copy(cc, vm)));
+    return copyType(new CComm(info, computed, exprs[0].copy(cc, vm)));
   }
 
   @Override

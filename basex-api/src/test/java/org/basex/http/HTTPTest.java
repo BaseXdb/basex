@@ -20,7 +20,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class contains common methods for the HTTP services.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class HTTPTest extends SandboxTest {
@@ -44,7 +44,7 @@ public abstract class HTTPTest extends SandboxTest {
   /**
    * Initializes the test.
    * @param url root path
-   * @param local local flag
+   * @param local local flag (without database server instance
    * @param auth enforce authentication
    * @throws Exception exception
    */
@@ -75,64 +75,64 @@ public abstract class HTTPTest extends SandboxTest {
   /**
    * Executes the specified GET request and returns the result.
    * @param expected expected result
-   * @param request request
-   * @param params query parameters
+   * @param path path of request
+   * @param params query parameters (keys and values)
    * @throws IOException I/O exception
    */
-  protected static void get(final String expected, final String request, final Object... params)
+  protected static void get(final String expected, final String path, final Object... params)
       throws IOException {
-    assertEquals(expected, get(200, request, params));
+    assertEquals(expected, get(200, path, params));
   }
 
   /**
    * Executes the specified GET request and returns the result.
    * @param status status code to check
-   * @param request request
-   * @param params query parameters
+   * @param path path of request
+   * @param params query parameters (keys and values)
    * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
-  protected static String get(final int status, final String request, final Object... params)
+  protected static String get(final int status, final String path, final Object... params)
       throws IOException {
-    return send(status, GET.name(), null, null, request, params).replaceAll("\\r", "");
+    return send(status, GET.name(), null, null, path, params).replaceAll("\\r", "");
   }
 
   /**
    * Executes the specified DELETE request.
    * @param status status code to check
-   * @param request request
-   * @param params query parameters
+   * @param path path of request
+   * @param params query parameters (keys and values)
    * @return response code
    * @throws IOException I/O exception
    */
-  protected static String delete(final int status, final String request, final Object... params)
+  protected static String delete(final int status, final String path, final Object... params)
       throws IOException {
-    return send(status, DELETE.name(), null, null, request, params);
+    return send(status, DELETE.name(), null, null, path, params);
   }
 
   /**
    * Executes the specified HEAD request and returns the result.
    * @param status status code to check
-   * @param request request
-   * @param params query parameters
+   * @param path path of request
+   * @param params query parameters (keys and values)
    * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
-  protected static String head(final int status, final String request, final Object... params)
+  protected static String head(final int status, final String path, final Object... params)
       throws IOException {
-    return send(status, HEAD.name(), null, null, request, params);
+    return send(status, HEAD.name(), null, null, path, params);
   }
 
   /**
    * Executes the specified OPTIONS request and returns the result.
-   * @param request request
-   * @param params query parameters
+   * @param path path of request
+   * @param params query parameters (keys and values)
    * @return string result, or {@code null} for a failure
    * @throws IOException I/O exception
    */
-  protected static String options(final String request, final Object... params)
+  protected static String options(final String path, final Object... params)
       throws IOException {
-    return send(200, OPTIONS.name(), null, null, request, params);
+    return send(200, OPTIONS.name(), null, null, path, params);
   }
 
   /**
@@ -154,7 +154,7 @@ public abstract class HTTPTest extends SandboxTest {
    * @param payload payload
    * @param type media type
    * @param request path
-   * @param params query parameters
+   * @param params query parameters (keys and values)
    * @return string result
    * @throws IOException I/O exception
    */
@@ -177,13 +177,13 @@ public abstract class HTTPTest extends SandboxTest {
    * Executes the specified PUT request.
    * @param status status code to check
    * @param is input stream (can be {@code null})
-   * @param request query
-   * @param params query parameters
+   * @param path path of request
+   * @param params query parameters (keys and values)
    * @throws IOException I/O exception
    */
-  protected static void put(final int status, final InputStream is, final String request,
+  protected static void put(final int status, final InputStream is, final String path,
       final Object... params) throws IOException {
-    send(status, Method.PUT.name(), is, null, request, params);
+    send(status, Method.PUT.name(), is, null, path, params);
   }
 
   /**
@@ -192,18 +192,18 @@ public abstract class HTTPTest extends SandboxTest {
    * @param method HTTP method
    * @param is input stream (can be {@code null})
    * @param type media type (optional, may be {@code null})
-   * @param request query
-   * @param params parameters
+   * @param path path of request
+   * @param params query parameters (keys and values)
    * @return string result
    * @throws IOException I/O exception
    */
   protected static String send(final int status, final String method, final InputStream is,
-      final MediaType type, final String request, final Object... params) throws IOException {
+      final MediaType type, final String path, final Object... params) throws IOException {
 
     final BodyPublisher pub = is != null ? HttpRequest.BodyPublishers.ofInputStream(() -> is) :
       HttpRequest.BodyPublishers.noBody();
 
-    final StringBuilder sb = new StringBuilder(rootUrl + request);
+    final StringBuilder sb = new StringBuilder(rootUrl + path);
     final int pl = params.length;
     for(int p = 0; p < pl; p += 2) {
       sb.append(p == 0 ? '?' : '&').append(params[p]).append('=').
@@ -218,7 +218,7 @@ public abstract class HTTPTest extends SandboxTest {
       final HttpResponse<String> response = client.send(builder.build(),
           HttpResponse.BodyHandlers.ofString());
       final String body = response.body();
-      assertEquals(status, response.statusCode(), method + ' ' + request + "\nResponse: " + body);
+      assertEquals(status, response.statusCode(), method + ' ' + path + "\nResponse: " + body);
       return body;
     } catch(final InterruptedException ex) {
       throw new IOException(ex);

@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.regex.*;
 
 import org.basex.build.csv.*;
 import org.basex.io.serial.*;
@@ -15,12 +14,12 @@ import org.basex.util.list.*;
 /**
  * This class serializes items as CSV.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class CsvSerializer extends StandardSerializer {
   /** CSV options. */
-  final CsvSerialOptions copts;
+  final CsvOptions copts;
   /** Separator. */
   final int separator;
   /** Generate quotes. */
@@ -28,8 +27,6 @@ abstract class CsvSerializer extends StandardSerializer {
   /** Generate backslashes. */
   final boolean backslashes;
 
-  /** Data pattern. */
-  Pattern allow;
   /** Header flag. */
   boolean header;
 
@@ -45,15 +42,6 @@ abstract class CsvSerializer extends StandardSerializer {
     quotes = copts.get(CsvOptions.QUOTES);
     backslashes = copts.get(CsvOptions.BACKSLASHES);
     header = copts.get(CsvOptions.HEADER);
-    final String allw = copts.get(CsvSerialOptions.ALLOW);
-    if(!allw.isEmpty()) {
-      try {
-        allow = Pattern.compile(allw);
-      } catch(final PatternSyntaxException ex) {
-        Util.debug(ex);
-        throw CSV_SERIALIZE_X_X.getIO("Invalid pattern", allw);
-      }
-    }
     separator = copts.separator();
   }
 
@@ -69,12 +57,7 @@ abstract class CsvSerializer extends StandardSerializer {
       final byte[] v = entries.get(i);
       if(i != 0) out.print(separator);
 
-      byte[] txt = EMPTY;
-      if(v != null) {
-        txt = v;
-        if(allow != null && !allow.matcher(string(v)).matches())
-          throw CSV_SERIALIZE_X_X.getIO("Value is not allowed", v);
-      }
+      byte[] txt = v != null ? v : EMPTY;
       final boolean delim = contains(txt, separator) || contains(txt, '\n');
       final boolean special = contains(txt, '\r') || contains(txt, '\t') || contains(txt, '"');
       if(delim || special || backslashes && contains(txt, '\\')) {
@@ -83,9 +66,9 @@ abstract class CsvSerializer extends StandardSerializer {
           throw CSV_SERIALIZE_X_X.getIO("Output must be put into quotes", txt);
 
         if(quotes && (delim || special)) tb.add('"');
-        final int len = txt.length;
-        for(int c = 0; c < len; c += cl(txt, c)) {
-          final int cp = cp(txt, c);
+        final TokenParser tp = new TokenParser(txt);
+        while(tp.more()) {
+          final int cp = tp.next();
           if(backslashes) {
             if(cp == '\n') tb.add("\\n");
             else if(cp == '\r') tb.add("\\r");
@@ -110,6 +93,6 @@ abstract class CsvSerializer extends StandardSerializer {
 
   @Override
   protected void atomic(final Item value) throws IOException {
-    throw CSV_SERIALIZE_X.getIO("Atomic values cannot be serialized");
+    throw CSV_SERIALIZE_X.getIO("Atomic items cannot be serialized");
   }
 }

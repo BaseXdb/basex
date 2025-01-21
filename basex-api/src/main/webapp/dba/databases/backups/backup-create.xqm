@@ -1,7 +1,7 @@
 (:~
  : Create backup.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/databases';
 
@@ -14,35 +14,45 @@ declare variable $dba:CAT := 'databases';
 declare variable $dba:SUB := 'database';
 
 (:~
- : Form for creating a backup.
- : @param  $name  database (empty string for general data)
- : @return page
+ : Create backup.
+ : @param  $name      database (empty string for general data)
+ : @param  $comment   comment
+ : @param  $compress  compress files
+ : @param  $do        perform update
+ : @return form or redirection
  :)
 declare
-  %rest:GET
+  %updating
+  %rest:POST
   %rest:path('/dba/backup-create')
-  %rest:query-param('name', '{$name}', '')
+  %rest:form-param('name',     '{$name}', '')
+  %rest:form-param('comment',  '{$comment}')
+  %rest:form-param('compress', '{$compress}')
+  %rest:form-param('do',       '{$do}')
   %output:method('html')
   %output:html-version('5')
 function dba:backup-create(
-  $name  as xs:string
-) as element(html) {
-  html:wrap(map { 'header': ($dba:CAT, $name) },
+  $name      as xs:string,
+  $comment   as xs:string?,
+  $compress  as xs:string?,
+  $do        as xs:string?
+) {
+  html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
     <tr>
       <td>
-        <form action='backup-create' method='post' autocomplete='off'>
+        <form method='post' autocomplete='off'>
+          <input type='hidden' name='do' value='do'/>
           <input type='hidden' name='name' value='{ $name }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
-            (html:link($name, $dba:SUB, map { 'name': $name }), ' » ')[$name],
+            (html:link($name, $dba:SUB, { 'name': $name }), ' » ')[$name],
             html:button('backup-create', 'Create Backup')
           }</h2>
           <table>
             <tr>
               <td>Comment:</td>
               <td>
-                <input type='text' name='comment' id='comment' size='64' placeholder='optional'/>
-                { html:focus('comment') }
+                <input type='text' name='comment' size='64' placeholder='optional' autofocus=''/>
               </td>
             </tr>
             <tr>
@@ -55,34 +65,10 @@ function dba:backup-create(
         </form>
       </td>
     </tr>
-  )
-};
-
-(:~
- : Creates a backup.
- : @param  $name      database (empty string for general data)
- : @param  $comment   comment
- : @param  $compress  compress files
- : @return redirection
- :)
-declare
-  %updating
-  %rest:POST
-  %rest:path('/dba/backup-create')
-  %rest:query-param('name',     '{$name}', '')
-  %rest:query-param('comment',  '{$comment}')
-  %rest:query-param('compress', '{$compress}')
-function dba:db-rename(
-  $name      as xs:string,
-  $comment   as xs:string,
-  $compress  as xs:string?
-) as empty-sequence() {
-  try {
-    db:create-backup($name, map { 'comment': $comment, 'compress': boolean($compress) }),
-    utils:redirect($dba:SUB, map { 'name': $name, 'info': 'Backup was created.' })
-  } catch * {
-    utils:redirect($dba:SUB, map { 'name': $name, 'error': $err:description })
-  }
+  }, fn() {
+    db:create-backup($name, { 'comment': $comment, 'compress': boolean($compress) }),
+    utils:redirect($dba:SUB, { 'name': $name, 'info': 'Backup was created.' })
+  })
 };
 
 (:~
@@ -92,16 +78,16 @@ function dba:db-rename(
  :)
 declare
   %updating
-  %rest:GET
-  %rest:path('/dba/backup-create-all')
-  %rest:query-param('name', '{$names}')
-function dba:db-optimize-all(
+  %rest:POST
+  %rest:path('/dba/backups-create')
+  %rest:form-param('name', '{$names}')
+function dba:backups-create(
   $names  as xs:string*
-) as empty-sequence() {
+) {
   try {
     $names ! db:create-backup(.),
-    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'database', 'backed up') })
+    utils:redirect($dba:CAT, { 'info': utils:info($names, 'database', 'backed up') })
   } catch * {
-    utils:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, { 'error': $err:description })
   }
 };

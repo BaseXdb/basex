@@ -5,19 +5,22 @@ import java.text.*;
 import org.basex.query.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
-import org.basex.util.*;
+import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
  * Options for comparing values.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DeepEqualOptions extends Options {
   /** Option: base-uri. */
   public static final BooleanOption BASE_URI =
       new BooleanOption("base-uri", false);
+  /** Option: collation. */
+  public static final StringOption COLLATION =
+      new StringOption("collation");
   /** Option: comments. */
   public static final BooleanOption COMMENTS =
       new BooleanOption("comments", false);
@@ -36,6 +39,9 @@ public final class DeepEqualOptions extends Options {
   /** Option: in-scope-namespaces. */
   public static final BooleanOption IN_SCOPE_NAMESPACES =
       new BooleanOption("in-scope-namespaces", false);
+  /** Option: items-equal. */
+  public static final ValueOption ITEMS_EQUAL =
+      new ValueOption("items-equal", SeqType.FUNCTION_O);
   /** Option: namespace-prefixes. */
   public static final BooleanOption NAMESPACE_PREFIXES =
       new BooleanOption("namespace-prefixes", false);
@@ -81,30 +87,21 @@ public final class DeepEqualOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(name());
+      return EnumOption.string(this);
     }
   }
 
   /** QNames. */
-  private final QNmSet qnames = new QNmSet();
-
-  /**
-   * Resolves QNames.
-   * @param sc static context
-   * @throws QueryException query exception
-   */
-  public void finish(final StaticContext sc) throws QueryException {
-    for(final byte[] name : Token.split(Token.token(get(UNORDERED_ELEMENTS)), ' ')) {
-      qnames.add(QNm.parse(name, sc));
-    }
-  }
+  private QNmSet unordered;
 
   /**
    * Checks if the specified QName is among the unordered element names.
    * @param qname QName
    * @return element names
+   * @throws QueryException query exception
    */
-  public boolean unordered(final QNm qname) {
-    return qnames.contains(qname);
+  public boolean unordered(final QNm qname) throws QueryException {
+    if(unordered == null) unordered = QNm.set(get(UNORDERED_ELEMENTS), null);
+    return unordered.contains(qname);
   }
 }

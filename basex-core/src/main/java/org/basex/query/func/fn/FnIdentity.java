@@ -8,10 +8,10 @@ import org.basex.query.value.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public class FnIdentity extends StandardFunc {
+public final class FnIdentity extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // implementation for dynamic function lookup calls
@@ -19,7 +19,7 @@ public class FnIdentity extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) {
     return arg(0);
   }
 }

@@ -18,7 +18,7 @@ import org.basex.util.options.*;
 /**
  * Functions on relational databases.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Rositsa Shadura
  */
 public class SqlExecute extends SqlFn {
@@ -43,7 +43,7 @@ public class SqlExecute extends SqlFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Connection conn = connection(qc);
     final String query = toString(arg(1), qc);
-    final StatementOptions options = toOptions(arg(2), new StatementOptions(), true, qc);
+    final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
 
     try {
       final Statement stmt = conn.createStatement();
@@ -126,7 +126,6 @@ public class SqlExecute extends SqlFn {
           }
         }
       };
-
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }

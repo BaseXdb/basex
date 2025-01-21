@@ -1,7 +1,7 @@
 (:~
  : Rename database.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/databases';
 
@@ -14,41 +14,42 @@ declare variable $dba:CAT := 'databases';
 declare variable $dba:SUB := 'database';
 
 (:~
- : Form for renaming a database.
+ : Rename database.
  : @param  $name     name of database
  : @param  $newname  new name
- : @param  $error    error string
- : @return page
+ : @param  $do       perform update
+ : @return form or redirection
  :)
 declare
-  %rest:GET
+  %updating
+  %rest:POST
   %rest:path('/dba/db-alter')
-  %rest:query-param('name',    '{$name}')
-  %rest:query-param('newname', '{$newname}')
-  %rest:query-param('error',   '{$error}')
+  %rest:form-param('name',    '{$name}')
+  %rest:form-param('newname', '{$newname}')
+  %rest:form-param('do',      '{$do}')
   %output:method('html')
   %output:html-version('5')
 function dba:db-alter(
   $name     as xs:string,
   $newname  as xs:string?,
-  $error    as xs:string?
-) as element(html) {
-  html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
+  $do       as xs:string?
+) {
+  html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
     <tr>
       <td>
-        <form action='db-alter' method='post' autocomplete='off'>
+        <form method='post' autocomplete='off'>
+          <input type='hidden' name='do' value='do'/>
           <input type='hidden' name='name' value='{ $name }'/>
           <h2>{
             html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
-            html:button('alter', 'Rename')
+            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
+            html:button('db-alter', 'Rename')
           }</h2>
           <table>
             <tr>
               <td>Name:</td>
               <td>
-                <input type='text' name='newname' value='{ head(($newname, $name)) }' id='newname'/>
-                { html:focus('newname') }
+                <input type='text' name='newname' value='{ $newname otherwise $name }' autofocus=''/>
                 <div class='small'/>
               </td>
             </tr>
@@ -56,33 +57,14 @@ function dba:db-alter(
         </form>
       </td>
     </tr>
-  )
-};
-
-(:~
- : Renames a database.
- : @param  $name     name of database
- : @param  $newname  new name
- : @return redirection
- :)
-declare
-  %updating
-  %rest:POST
-  %rest:path('/dba/db-alter')
-  %rest:query-param('name',    '{$name}')
-  %rest:query-param('newname', '{$newname}')
-function dba:db-alter(
-  $name     as xs:string,
-  $newname  as xs:string
-) {
-  try {
-    if(db:exists($newname)) then (
-      error((), 'Database already exists.')
-    ) else (
-      db:alter($name, $newname)
-    ),
-    utils:redirect($dba:SUB, map { 'name': $newname, 'info': 'Database was renamed.' })
-  } catch * {
-    utils:redirect('db-alter', map { 'name': $name, 'newname': $newname, 'error': $err:description })
-  }
+  }, fn() {
+    if ($name != $newname) {
+      if (db:exists($newname)) {
+        error((), 'Database already exists.')
+      } else {
+        db:alter($name, $newname)
+      },
+      utils:redirect($dba:SUB, { 'name': $newname, 'info': 'Database was renamed.' })
+    }
+  })
 };

@@ -18,18 +18,18 @@ import org.basex.util.list.*;
  * Function implementation.
  *
  * @author Christian Gruen
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  */
 public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final Item text = unparsedText(qc, false, true);
+    final Item text = unparsedText(qc, false, true, arg(1));
     return text.isEmpty() ? Empty.ITER : new LinesIter(text.string(info));
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item text = unparsedText(qc, false, true);
+    final Item text = unparsedText(qc, false, true, arg(1));
     if(text.isEmpty()) return Empty.VALUE;
 
     try(NewlineInput ni = new NewlineInput(text.string(info))) {
@@ -54,7 +54,7 @@ public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   /**
    * Line iterator.
    * @author Christian Gruen
-   * @author BaseX Team 2005-24, BSD License
+   * @author BaseX Team, BSD License
    */
   private static final class LinesIter extends Iter {
     /** Token builder. */

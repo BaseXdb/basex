@@ -7,7 +7,7 @@ import org.basex.query.*;
 /**
  * Simple XQuery tests.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class SimpleTest extends QueryTest {
@@ -60,6 +60,11 @@ public final class SimpleTest extends QueryTest {
       { "Compare 17", booleans(false), "xs:double(1.13) lt xs:float (1.13)" },
       { "Compare 18", booleans(true),  "xs:double(1.13) gt xs:float (1.13)" },
 
+      { "Compare 50", booleans(true),  "xs:hexBinary('41') = xs:untypedAtomic('41')" },
+      { "Compare 51", booleans(true),  "xs:untypedAtomic('41') = xs:hexBinary('41')" },
+      { "Compare 52", booleans(true),  "xs:untypedAtomic('41') <= xs:hexBinary('41')" },
+      { "Compare 53", booleans(true),  "xs:hexBinary('41') <= xs:untypedAtomic('41')" },
+
       { "FLWOR 1", integers(3), "(for $i in 1 to 5 return $i)[3]" },
       { "FLWOR 2", integers(4),
         "(for $a in 1 to 5 for $b in 1 to 5 return $a * $b)[7]" },
@@ -89,6 +94,7 @@ public final class SimpleTest extends QueryTest {
 
       { "ExtVar 1", integers(1), "declare variable $a external; 1" },
       { "ExtVar 2", "declare variable $a external; $a" },
+      { "ExtVar 3", strings("a"), "declare variable $x as enum('a', 'b') := 'a'; $x" },
 
       { "If  1", booleans(true), "if(true()) then true() else false()" },
       { "If  2", booleans(false), "if(false()) then true() else false()" },
@@ -231,8 +237,6 @@ public final class SimpleTest extends QueryTest {
         "local:foo()')" },
       { "FuncTest 3", "local:a(), local:a(1)" },
       { "FuncTest 4", emptySequence(), "()/x[function($x as item()){1}(.)]" },
-
-      { "StaticVar 1", "declare variable $CONFIG := $CONFIG; delete node <a/>" },
 
       { "Limits 1", integers(9223372036854775806L), "2 * 4611686018427387903" },
       { "Limits 2", "2 * 4611686018427387904" }, // overflow

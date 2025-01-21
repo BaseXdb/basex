@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArraySort extends FnSort {
@@ -24,12 +24,17 @@ public final class ArraySort extends FnSort {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    final ValueList list = new ValueList(array.arraySize());
-    for(final Value member : array.members()) list.add(member);
+    final long as = array.structSize();
+    if(as == 0) return array;
+
+    final ValueList list = new ValueList(as);
+    for(final Value member : array.iterable()) list.add(member);
     final Value[] values = list.finish();
+    final Integer[] index = index(values, qc);
+    if(sorted(index)) return array;
 
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final int i : index(values, qc)) ab.append(values[i]);
+    for(final int i : index) ab.append(values[i]);
     return ab.array(this);
   }
 
@@ -42,7 +47,7 @@ public final class ArraySort extends FnSort {
     final Type type = st.type;
     if(type instanceof ArrayType) {
       if(defined(2) && arg(2).size() == 1) {
-        arg(2, arg -> refineFunc(arg, cc, SeqType.ANY_ATOMIC_TYPE_ZM, ((ArrayType) type).declType));
+        arg(2, arg -> refineFunc(arg, cc, ((ArrayType) type).valueType));
       }
       exprType.assign(type);
     }

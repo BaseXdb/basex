@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * GZIP output.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class GZIPOut extends ArchiveOut {
@@ -44,7 +44,7 @@ final class GZIPOut extends ArchiveOut {
   @Override
   public void write(final ZipEntry entry, final Bin bin, final InputInfo info)
       throws IOException, QueryException {
-    write(bin, zos, info);
+    writeBin(bin, zos, info);
   }
 
   @Override

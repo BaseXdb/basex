@@ -5,10 +5,10 @@ import java.lang.reflect.*;
 /**
  * Candidate with function/constructor arguments.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class JavaCandidate {
+public final class JavaCandidate {
   /** Arguments. */
   final Object[] arguments;
 

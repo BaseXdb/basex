@@ -7,14 +7,13 @@ import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
 import org.basex.build.json.JsonParserOptions.JsonDuplicates;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
  * A JSON parser generating parse events similar to a SAX XML parser.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class JsonParser extends InputParser {
@@ -29,7 +28,7 @@ public final class JsonParser extends InputParser {
 
   /** Converter. */
   private final JsonConverter conv;
-  /** Spec. */
+  /** Liberal flag. */
   private final boolean liberal;
   /** Escape flag. */
   private final boolean escape;
@@ -77,7 +76,7 @@ public final class JsonParser extends InputParser {
    */
   private void value() throws QueryException {
     if(pos >= length) throw eof(", expected JSON value");
-    switch(curr()) {
+    switch(current()) {
       case '[':
         array();
         break;
@@ -100,8 +99,7 @@ public final class JsonParser extends InputParser {
       case '8':
       case '9':
         // number
-        conv.numberLit(conv.numberParser != null ? conv.numberParser.apply(number()) :
-          Dbl.get(number(), null));
+        conv.numberLit(number());
         break;
       default:
         // boolean, null or constructor
@@ -123,7 +121,7 @@ public final class JsonParser extends InputParser {
     if(!consumeWs('}', false)) {
       final TokenSet set = new TokenSet();
       do {
-        final byte[] key = !liberal || curr() == '"' ? string() : unquoted();
+        final byte[] key = !liberal || current() == '"' ? string() : unquoted();
         final boolean dupl = set.contains(key);
         if(dupl && duplicates == JsonDuplicates.REJECT)
           throw error(JSON_DUPL_X_X_X, "Key \"%\" occurs more than once", key);
@@ -134,7 +132,7 @@ public final class JsonParser extends InputParser {
         value();
         conv.closePair(add);
         set.put(key);
-      } while(consumeWs(',', false) && !(liberal && curr() == '}'));
+      } while(consumeWs(',', false) && !(liberal && current() == '}'));
       consumeWs('}', true);
     }
     conv.closeObject();
@@ -152,7 +150,7 @@ public final class JsonParser extends InputParser {
         conv.openItem();
         value();
         conv.closeItem();
-      } while(consumeWs(',', false) && !(liberal && curr() == ']'));
+      } while(consumeWs(',', false) && !(liberal && current() == ']'));
       consumeWs(']', true);
     }
     conv.closeArray();
@@ -164,14 +162,12 @@ public final class JsonParser extends InputParser {
    * @throws QueryException query exception
    */
   private byte[] unquoted() throws QueryException {
-    int cp = more() ? input.codePointAt(pos) : -1;
-    if(cp < 0 || !Character.isJavaIdentifierStart(cp))
+    if(!Character.isJavaIdentifierStart(current()))
       throw error("Expected unquoted string, found %", remaining());
     tb.reset();
     do {
-      tb.add(cp);
-      cp = input.codePointAt(pos += cp < 0x10000 ? 1 : 2);
-    } while(Character.isJavaIdentifierPart(cp));
+      tb.add(consume());
+    } while(Character.isJavaIdentifierPart(current()));
     skipWs();
     return tb.toArray();
   }
@@ -185,21 +181,21 @@ public final class JsonParser extends InputParser {
     tb.reset();
 
     // integral part
-    int ch = consume();
-    tb.add(ch);
-    if(ch == '-') {
-      ch = consume();
-      if(ch < '0' || ch > '9') throw error("Number expected after '-'");
-      tb.add(ch);
+    int cp = consume();
+    tb.add(cp);
+    if(cp == '-') {
+      cp = consume();
+      if(cp < '0' || cp > '9') throw error("Number expected after '-'");
+      tb.add(cp);
     }
 
-    final boolean zero = ch == '0';
-    ch = curr();
-    if(zero && ch >= '0' && ch <= '9') throw error("No digit allowed after '0'");
+    final boolean zero = cp == '0';
+    cp = current();
+    if(zero && cp >= '0' && cp <= '9') throw error("No digit allowed after '0'");
 
     LOOP:
     while(true) {
-      switch(ch) {
+      switch(cp) {
         case '0':
         case '1':
         case '2':
@@ -210,9 +206,9 @@ public final class JsonParser extends InputParser {
         case '7':
         case '8':
         case '9':
-          tb.add(ch);
+          tb.add(cp);
           pos++;
-          ch = curr();
+          cp = current();
           break;
         case '.':
         case 'e':
@@ -226,14 +222,14 @@ public final class JsonParser extends InputParser {
 
     if(consume('.')) {
       tb.add('.');
-      ch = curr();
-      if(ch < '0' || ch > '9') throw error("Number expected after '.'");
+      cp = current();
+      if(cp < '0' || cp > '9') throw error("Number expected after '.'");
       do {
-        tb.add(ch);
+        tb.add(cp);
         pos++;
-        ch = curr();
-      } while(ch >= '0' && ch <= '9');
-      if(ch != 'e' && ch != 'E') {
+        cp = current();
+      } while(cp >= '0' && cp <= '9');
+      if(cp != 'e' && cp != 'E') {
         skipWs();
         return tb.toArray();
       }
@@ -241,15 +237,15 @@ public final class JsonParser extends InputParser {
 
     // 'e' or 'E'
     tb.add(consume());
-    ch = curr();
-    if(ch == '-' || ch == '+') {
+    cp = current();
+    if(cp == '-' || cp == '+') {
       tb.add(consume());
-      ch = curr();
+      cp = current();
     }
 
-    if(ch < '0' || ch > '9') throw error("Exponent expected");
+    if(cp < '0' || cp > '9') throw error("Exponent expected");
     do tb.add(consume());
-    while((ch = curr()) >= '0' && ch <= '9');
+    while((cp = current()) >= '0' && cp <= '9');
     skipWs();
     return tb.toArray();
   }
@@ -260,15 +256,15 @@ public final class JsonParser extends InputParser {
    * @throws QueryException query exception
    */
   private byte[] string() throws QueryException {
-    if(!consume('"')) throw error("Expected string, found '%'", curr());
+    if(!consume('"')) throw error("Expected: string, found: %", currentAsString());
     tb.reset();
-    char high = 0; // cached high surrogate
+    int high = 0; // cached high surrogate
     while(pos < length) {
       final int p = pos;
-      int ch = consume();
+      int cp = consume();
 
       // string is closed..
-      if(ch == '"') {
+      if(cp == '"') {
         // unpaired surrogate?
         if(high != 0) add(high, pos - 7, p);
         skipWs();
@@ -276,51 +272,51 @@ public final class JsonParser extends InputParser {
       }
 
       // escape sequence
-      if(ch == '\\') {
-        ch = consume();
-        switch(ch) {
+      if(cp == '\\') {
+        cp = consume();
+        switch(cp) {
           case '\\':
           case '/':
           case '"':
             break;
           case 'b':
-            ch = '\b';
+            cp = '\b';
             break;
           case 'f':
-            ch = '\f';
+            cp = '\f';
             break;
           case 'n':
-            ch = '\n';
+            cp = '\n';
             break;
           case 'r':
-            ch = '\r';
+            cp = '\r';
             break;
           case 't':
-            ch = '\t';
+            cp = '\t';
             break;
           case 'u':
             if(pos + 4 >= length) throw eof(", expected four-digit hex value");
-            ch = 0;
+            cp = 0;
             for(int i = 0; i < 4; i++) {
-              final char x = consume();
-              if(x >= '0' && x <= '9')      ch = 16 * ch + x      - '0';
-              else if(x >= 'a' && x <= 'f') ch = 16 * ch + x + 10 - 'a';
-              else if(x >= 'A' && x <= 'F') ch = 16 * ch + x + 10 - 'A';
-              else throw error("Illegal hexadecimal digit: '%'", x);
+              final int cp2 = consume();
+              if(cp2 >= '0' && cp2 <= '9')      cp = 16 * cp + cp2      - '0';
+              else if(cp2 >= 'a' && cp2 <= 'f') cp = 16 * cp + cp2 + 10 - 'a';
+              else if(cp2 >= 'A' && cp2 <= 'F') cp = 16 * cp + cp2 + 10 - 'A';
+              else throw error("Illegal hexadecimal digit: %", currentAsString());
             }
             break;
 
           default:
-            throw error("Unknown character escape: '\\%'", ch);
+            throw error("Unknown character escape: %", currentAsString());
         }
-      } else if(!liberal && ch <= 0x1F) {
-        throw error("Non-escaped control character: '\\%'", CTRL[ch]);
+      } else if(!liberal && cp <= 0x1F) {
+        throw error("Non-escaped control character: %", CTRL[cp]);
       }
 
       if(high != 0) {
-        if(ch >= 0xDC00 && ch <= 0xDFFF) {
+        if(cp >= 0xDC00 && cp <= 0xDFFF) {
           // compute resulting codepoint
-          ch = (high - 0xD800 << 10) + ch - 0xDC00 + 0x10000;
+          cp = (high - 0xD800 << 10) + cp - 0xDC00 + 0x10000;
         } else {
           // add invalid high surrogate, treat expected low surrogate as new character
           add(high, p, pos);
@@ -328,11 +324,11 @@ public final class JsonParser extends InputParser {
         high = 0;
       }
 
-      if(ch >= 0xD800 && ch <= 0xDBFF) {
+      if(cp >= 0xD800 && cp <= 0xDBFF) {
         // remember high surrogate
-        high = (char) ch;
+        high = cp;
       } else {
-        add(ch, p, pos);
+        add(cp, p, pos);
       }
     }
     throw eof(" in string literal");
@@ -340,50 +336,49 @@ public final class JsonParser extends InputParser {
 
   /**
    * Adds the specified character.
-   * @param ch character
+   * @param cp character
    * @param s start position of invalid unicode sequence
    * @param e end position
    * @throws QueryException query exception
    */
-  private void add(final int ch, final int s, final int e) throws QueryException {
+  private void add(final int cp, final int s, final int e) throws QueryException {
     if(escape) {
-      if(ch == '\\') {
+      if(cp == '\\') {
         tb.add("\\\\");
-      } else if(ch == '\b') {
+      } else if(cp == '\b') {
         tb.add("\\b");
-      } else if(ch == '\f') {
+      } else if(cp == '\f') {
         tb.add("\\f");
-      } else if(ch == '\n') {
+      } else if(cp == '\n') {
         tb.add("\\n");
-      } else if(ch == '\r') {
+      } else if(cp == '\r') {
         tb.add("\\r");
-      } else if(ch == '\t') {
+      } else if(cp == '\t') {
         tb.add("\\t");
-      } else if(XMLToken.valid(ch)) {
-        tb.add(ch);
+      } else if(XMLToken.valid(cp)) {
+        tb.add(cp);
       } else {
-        tb.add('\\').add('u').add(HEX_TABLE[ch >> 12 & 0xF]).add(HEX_TABLE[ch >> 8 & 0xF]);
-        tb.add(HEX_TABLE[ch >> 4 & 0xF]).add(HEX_TABLE[ch & 0xF]);
+        tb.add("\\u").add(hex(cp, 4));
       }
-    } else if(XMLToken.valid(ch)) {
-      tb.add(ch);
+    } else if(XMLToken.valid(cp)) {
+      tb.add(cp);
     } else if(conv.fallback == null) {
       tb.add(REPLACEMENT);
     } else {
-      tb.add(conv.fallback.apply(token(input.substring(s, e))));
+      tb.add(conv.fallback.apply(substring(s, e).finish()));
     }
   }
 
   /** Consumes all whitespace characters from the remaining query. */
   private void skipWs() {
-    while(pos < length) {
-      switch(input.charAt(pos)) {
+    while(more()) {
+      switch(current()) {
         case ' ':
         case '\t':
         case '\r':
         case '\n':
         case '\u00A0': // non-breaking space
-          pos++;
+          consume();
           break;
         default:
           return;
@@ -404,7 +399,7 @@ public final class JsonParser extends InputParser {
       skipWs();
       return true;
     }
-    if(err) throw error("Expected '%', found '%'", ch, curr());
+    if(err) throw error("Expected: '%', found: %", ch, currentAsString());
     return false;
   }
 
@@ -436,7 +431,7 @@ public final class JsonParser extends InputParser {
    * @return query exception
    */
   private QueryException error(final QueryError err, final String msg, final Object... ext) {
-    final InputInfo ii = new InputInfo(this);
+    final InputInfo ii = info();
     return err.get(ii, ii.line(), ii.column(), Util.inf(msg, ext));
   }
 }

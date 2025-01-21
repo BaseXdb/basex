@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Lazy string item ({@code xs:string}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class StrLazy extends AStr implements Lazy {
@@ -73,6 +73,16 @@ public final class StrLazy extends AStr implements Lazy {
       if(!isCached()) value = get(ii).content();
     } catch(final IOException ex) {
       throw error.get(ii, ex);
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    try {
+      return Token.hashCode(string(null));
+    } catch(final QueryException ex) {
+      Util.stack(ex);
+      return Integer.MAX_VALUE;
     }
   }
 

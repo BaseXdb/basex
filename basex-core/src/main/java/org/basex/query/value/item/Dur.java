@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Duration item ({@code xs:duration}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class Dur extends ADateDur {
@@ -162,7 +162,7 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public final BigDecimal sec() {
+  public final BigDecimal seconds() {
     return seconds.remainder(BD_60);
   }
 
@@ -227,15 +227,15 @@ public class Dur extends ADateDur {
     if(h != 0) { tb.addLong(Math.abs(h)); tb.add('H'); }
     final long m = minute();
     if(m != 0) { tb.addLong(Math.abs(m)); tb.add('M'); }
-    final BigDecimal sc = sec();
+    final BigDecimal sc = seconds();
     if(sc.signum() == 0) return;
     tb.add(Token.chopNumber(Token.token(sc.abs().toPlainString()))).add('S');
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final StaticContext sc,
-      final InputInfo ii) throws QueryException {
-    final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, null, ii));
+  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, ii));
     return months == dur.months && seconds.compareTo(dur.seconds) == 0;
   }
 
@@ -251,7 +251,7 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public final int hash(final InputInfo ii) {
+  public final int hashCode() {
     return (int) (31 * months + (seconds == null ? 0 : seconds.doubleValue()));
   }
 

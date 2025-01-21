@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests the database commands.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dominik Abend
  * @author Christian Gruen
  */
-public class CatalogTest extends SandboxTest {
+public final class CatalogTest extends SandboxTest {
   /** Test folder. */
   private static final String DIR = "src/test/resources/catalog/";
   /** Catalog file. */

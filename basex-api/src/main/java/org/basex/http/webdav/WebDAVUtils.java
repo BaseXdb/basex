@@ -1,8 +1,6 @@
 package org.basex.http.webdav;
 
 import java.io.*;
-import java.net.*;
-import java.nio.charset.StandardCharsets;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -11,7 +9,7 @@ import org.basex.util.*;
 /**
  * WebDAV utility methods.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 final class WebDAVUtils {
@@ -51,20 +49,12 @@ final class WebDAVUtils {
   }
 
   /**
-   * Decodes a URL. Character set must be guessed, because it cannot be derived from the request.
+   * Decodes a URL.
    * @param url url to be decoded
    * @return decoded url
    */
   static String decode(final String url) {
-    if(url.indexOf('%') != -1) {
-      try {
-        final String ud = URLDecoder.decode(url, StandardCharsets.UTF_8);
-        return ud.contains("\uFFFD") ? URLDecoder.decode(url, StandardCharsets.ISO_8859_1) : ud;
-      } catch(final Exception ex) {
-        Util.stack(ex);
-      }
-    }
-    return url;
+    return url.indexOf('%') != -1 ? XMLToken.decodeUri(url) : url;
   }
 
   /**

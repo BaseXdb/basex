@@ -12,23 +12,30 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FnContainsSubsequence extends StandardFunc {
   @Override
-  public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final Value input = arg(0).value(qc);
     final Value subsequence = arg(1).value(qc);
     final FItem compare = toFunctionOrNull(arg(2), 2, qc);
 
     final QueryBiFunction<Item, Item, Boolean> cmp;
     if(compare != null) {
-      cmp = (item1, item2) -> toBoolean(qc, compare, item1, item2);
+      final HofArgs args = new HofArgs(2);
+      cmp = (item1, item2) -> test(compare, args.set(0, item1).set(1, item2), qc);
     } else {
-      cmp = new DeepEqual(info, sc.collation, qc)::equal;
+      cmp = new DeepEqual(info, null, qc)::equal;
     }
-    return Bln.get(compare(input, subsequence, cmp));
+    return test(input, subsequence, cmp);
   }
 
   /**
@@ -39,7 +46,7 @@ public class FnContainsSubsequence extends StandardFunc {
    * @return result of comparison
    * @throws QueryException query exception
    */
-  boolean compare(final Value input, final Value subsequence,
+  boolean test(final Value input, final Value subsequence,
       final QueryBiFunction<Item, Item, Boolean> cmp) throws QueryException {
 
     final long is = input.size(), ss = subsequence.size(), ps = is - ss;
@@ -61,9 +68,13 @@ public class FnContainsSubsequence extends StandardFunc {
     if(sst.zero()) return Bln.TRUE;
 
     if(defined(2)) {
-      arg(2, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, ist.with(Occ.EXACTLY_ONE),
-          sst.with(Occ.EXACTLY_ONE)));
+      arg(2, arg -> refineFunc(arg, cc, ist.with(Occ.EXACTLY_ONE), sst.with(Occ.EXACTLY_ONE)));
     }
     return this;
+  }
+
+  @Override
+  public final int hofIndex() {
+    return 2;
   }
 }

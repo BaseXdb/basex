@@ -3,14 +3,14 @@ package org.basex.http.web;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import org.basex.io.serial.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 
 /**
  * This class assembles texts which are used in the Web classes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public interface WebText {
@@ -25,6 +25,10 @@ public interface WebText {
   String PATH = "path";
   /** Permission token. */
   String METHOD = "method";
+  /** Parameters. */
+  String PARAMETERS = "parameters";
+  /** Headers. */
+  String HEADERS = "headers";
   /** Permission token. */
   String AUTHORIZATION = "authorization";
 
@@ -42,7 +46,7 @@ public interface WebText {
   /** Error message. */
   String ANN_CONFLICT_X = "Conflicting annotations: %.";
   /** Error message. */
-  String ANN_BODYVAR = "More than one body request variable specified.";
+  String ANN_BODY_TWICE = "More than one body variable specified.";
   /** Error message. */
   String ANN_TWICE_X_X = "Annotation %% is specified twice.";
   /** Error message. */
@@ -74,7 +78,7 @@ public interface WebText {
   /** Error message. */
   String HEAD_METHOD = "HEAD method must return a single 'restxq:response' element.";
   /** Error message. */
-  String METHOD_VALUE_X = "Method % does not allow values.";
+  String METHOD_BODY_X = "Method % cannot have a body.";
   /** Error message. */
   String BODY_TYPE_X_X = "Body cannot be parsed as %: %.";
   /** Error message. */
@@ -108,7 +112,7 @@ public interface WebText {
   QNm Q_MEDIA_TYPE = new QNm("mediaType");
 
   /** Serializer node test. */
-  NameTest T_OUTPUT_SERIAL = new NameTest(FuncOptions.Q_SERIALIZTION_PARAMETERS);
+  NameTest T_OUTPUT_SERIAL = SerializerOptions.T_ROOT;
   /** HTTP Response test. */
   NameTest T_HTTP_RESPONSE = new NameTest(new QNm("response", HTTP_URI));
   /** RESTXQ Response test. */

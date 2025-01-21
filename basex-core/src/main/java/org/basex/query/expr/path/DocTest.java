@@ -7,7 +7,7 @@ import org.basex.query.value.type.*;
 /**
  * Document with child test.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DocTest extends Test {
@@ -33,7 +33,7 @@ public final class DocTest extends Test {
     if(node.type != NodeType.DOCUMENT_NODE) return false;
     final BasicNodeIter iter = node.childIter();
     boolean found = false;
-    for(ANode n; (n = iter.next()) != null;) {
+    for(final ANode n : iter) {
       if(n.type.oneOf(NodeType.COMMENT, NodeType.PROCESSING_INSTRUCTION)) continue;
       if(found || !child.matches(n)) return false;
       found = true;

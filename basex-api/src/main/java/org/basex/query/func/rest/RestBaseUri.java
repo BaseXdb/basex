@@ -1,6 +1,6 @@
 package org.basex.query.func.rest;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RestBaseUri extends ApiFunc {

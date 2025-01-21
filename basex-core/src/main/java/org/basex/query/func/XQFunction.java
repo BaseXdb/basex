@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Interface for XQuery functions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public interface XQFunction extends XQFunctionExpr {
@@ -24,17 +24,17 @@ public interface XQFunction extends XQFunctionExpr {
   default Value invoke(final QueryContext qc, final InputInfo info, final Value... args)
       throws QueryException {
 
-    XQFunction fn = this;
-    Value[] values = args;
-    final int fp = qc.stack.enterFrame(fn.stackFrameSize());
+    final int fp = qc.stack.enterFrame(stackFrameSize());
     try {
+      XQFunction fn = this;
+      Value[] values = args;
       while(true) {
         qc.checkStop();
         final Value value = fn.invokeInternal(qc, info, values);
         fn = qc.pollTailCall();
         if(fn == null) return value;
-        qc.stack.reuseFrame(fn.stackFrameSize());
         values = qc.pollTailArgs();
+        qc.stack.reuseFrame(fn.stackFrameSize());
       }
     } catch(final QueryException ex) {
       throw ex.add(info);
@@ -52,25 +52,23 @@ public interface XQFunction extends XQFunctionExpr {
    * @return result of the function call
    * @throws QueryException query exception
    */
-  default Value invokeTail(final QueryContext qc, final InputInfo info, final Value... args)
+  default Value invokeTail(final QueryContext qc, final InputInfo info, final Value[] args)
       throws QueryException {
 
     qc.checkStop();
-    final int calls = qc.tailCalls, max = qc.maxCalls;
-    if(max >= 0 && calls >= max) {
+    final int size = stackFrameSize();
+    if(qc.tco && qc.stack.tco(size)) {
       // too many tail calls on the stack, eliminate them
       qc.registerTailCall(this, args);
       return Empty.VALUE;
     }
 
-    qc.tailCalls++;
-    final int fp = qc.stack.enterFrame(stackFrameSize());
+    final int fp = qc.stack.enterFrame(size);
     try {
       return invokeInternal(qc, info, args);
     } catch(final QueryException ex) {
       throw ex.add(info);
     } finally {
-      qc.tailCalls = calls;
       qc.stack.exitFrame(fp);
     }
   }

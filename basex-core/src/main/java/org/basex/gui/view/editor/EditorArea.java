@@ -20,7 +20,7 @@ import org.basex.util.*;
 /**
  * This class extends the text panel by editor features.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class EditorArea extends TextPanel {
@@ -130,9 +130,7 @@ public final class EditorArea extends TextPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    if(EXEC.is(e)) {
-      if(gui.editor.go.isEnabled()) release(Action.EXECUTE);
-    } else if(TESTS.is(e)) {
+    if(TESTS.is(e)) {
       if(gui.editor.test.isEnabled()) release(Action.TEST);
     } else if(HISTORY.is(e)) {
       gui.editor.historyPopup(0);

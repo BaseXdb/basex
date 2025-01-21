@@ -8,7 +8,6 @@ import static org.basex.query.expr.CalcOpt.*;
 import java.math.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -16,7 +15,7 @@ import org.basex.util.*;
 /**
  * Calculation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum Calc {
@@ -62,7 +61,7 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
-        return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+        return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // merge arithmetical expressions
       if(expr1.equals(expr2)) {
@@ -142,7 +141,7 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
-        return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+        return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // replace with neutral number; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
@@ -225,7 +224,7 @@ public enum Calc {
       if(expr2 instanceof ANum) {
         final double dbl2 = ((ANum) expr2).dbl();
         // check for neutral number
-        if(dbl2 == 1) return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+        if(dbl2 == 1) return new Cast(info, expr1, type.seqType()).optimize(cc);
         // check for absorbing number
         if(dbl2 == 0) return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Int.ZERO : null;
       }
@@ -235,17 +234,16 @@ public enum Calc {
           return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
         }
         if(_MATH_POW.is(expr1)) {
-          final StandardFunc func = (StandardFunc) expr1;
-          if(func.exprs[0].equals(expr2) && func.exprs[1] instanceof ANum) {
-            final double factor = ((ANum) func.exprs[1]).dbl();
-            return cc.function(_MATH_POW, info, func.exprs[0], Dbl.get(factor + 1));
+          if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof ANum) {
+            final double factor = ((ANum) expr1.arg(1)).dbl();
+            return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(factor + 1));
           }
         }
       }
       if(expr2 instanceof Arith) {
         final Arith arith = (Arith) expr2;
         if(arith.calc == DIVIDE && arith.exprs[0] instanceof Int && arith.exprs[1].equals(expr1)) {
-          return new Cast(cc.sc(), info, arith.exprs[0], type.seqType()).optimize(cc);
+          return new Cast(info, arith.exprs[0], type.seqType()).optimize(cc);
         }
       }
       return null;
@@ -309,17 +307,16 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
-        return new Cast(cc.sc(), info, expr1, type.seqType()).optimize(cc);
+        return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
         return type == DECIMAL ? Dec.ONE : type == INTEGER ? Int.ONE : null;
       }
       if(_MATH_POW.is(expr1)) {
-        final StandardFunc func = (StandardFunc) expr1;
-        if(func.exprs[0].equals(expr2) && func.exprs[1] instanceof ANum) {
-          final double factor = ((ANum) func.exprs[1]).dbl();
-          return cc.function(_MATH_POW, info, func.exprs[0], Dbl.get(factor - 1));
+        if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof ANum) {
+          final double factor = ((ANum) expr1.arg(1)).dbl();
+          return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(factor - 1));
         }
       }
       return null;
@@ -366,7 +363,7 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
-        return new Cast(cc.sc(), info, expr1, SeqType.INTEGER_O).optimize(cc);
+        return new Cast(info, expr1, SeqType.INTEGER_O).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {

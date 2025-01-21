@@ -11,13 +11,13 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class BinToOctets extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final B64 binary = toB64(arg(0), qc);
+    final Bin binary = toBin(arg(0), qc);
     final byte[] bytes = binary.binary(info);
 
     return new BasicIter<Int>(bytes.length) {
@@ -34,6 +34,6 @@ public final class BinToOctets extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return ConvertBinaryToIntegers.toValue(toB64(arg(0), qc).binary(info));
+    return ConvertBinaryToIntegers.toValue(toBin(arg(0), qc).binary(info));
   }
 }

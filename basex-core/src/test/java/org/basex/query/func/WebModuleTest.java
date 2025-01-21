@@ -10,7 +10,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Web Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class WebModuleTest extends SandboxTest {
@@ -25,7 +25,7 @@ public final class WebModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void createUrl() {
     final Function func = _WEB_CREATE_URL;
-    query(func.args("http://x.com", " map {}"), "http://x.com");
+    query(func.args("http://x.com", " map { }"), "http://x.com");
     query(func.args("url", " map { 'a': 'b' }"), "url?a=b");
     query(func.args("url", " map { 'a': ('b', 'c') }"), "url?a=b&a=c");
     query(func.args("url", " map { 12: true() }"), "url?12=true");
@@ -44,9 +44,9 @@ public final class WebModuleTest extends SandboxTest {
     query("let $s := codepoints-to-string((9, 10, 13, 32 to 55295, 57344 to 65533, 65536)) " +
         "return $s = web:decode-url(web:encode-url($s))", true);
 
-    error(func.args("%1"), WEB_INVALID2_X);
-    error(func.args("%1F"), WEB_INVALID1_X);
-    error(func.args("%D8%00"), WEB_INVALID1_X);
+    query(func.args("%1"), "\uFFFD");
+    query(func.args("%01"), "\uFFFD");
+    query(func.args("%D8%00"), "\uFFFD\uFFFD");
   }
 
   /** Test method. */
@@ -102,14 +102,14 @@ public final class WebModuleTest extends SandboxTest {
         "/output:serialization-parameters/*)", 0);
 
     // overwrite header
-    query(func.args(" map {}", " map { 'Cache-Control': 'X' }") +
+    query(func.args(" map { }", " map { 'Cache-Control': 'X' }") +
         "/http:response/http:header[@name = 'Cache-Control']/@value/string()", "X");
     // header is not generated if value is empty
-    query("count(" + func.args(" map {}", " map { 'Cache-Control': '' }") +
+    query("count(" + func.args(" map { }", " map { 'Cache-Control': '' }") +
         "/http:response/*)", 0);
 
     // status/message arguments
-    query(func.args(" map {}", " map {}", " map { 'status': 200, 'message': 'OK' }") +
+    query(func.args(" map { }", " map { }", " map { 'status': 200, 'message': 'OK' }") +
         "/http:response ! (@status, @message) ! string()", "200\nOK");
 
     // GH-1585

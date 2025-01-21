@@ -15,7 +15,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnCodepointsToString extends StandardFunc {
@@ -24,20 +24,33 @@ public final class FnCodepointsToString extends StandardFunc {
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Expr values = arg(0);
+
     // input is single integer
-    if(singleInt) return toStr(arg(0).item(qc, info).itr(info), info);
+    if(singleInt) return Str.get(toCodepoint(values.item(qc, info).itr(info), info));
 
     // current input is single item
-    final Iter values = arg(0).atomIter(qc, info);
-    final long size = values.size();
-    if(size == 1) return toStr(toLong(values.next()), info);
+    final Iter iter = values.atomIter(qc, info);
+    final long size = iter.size();
+    if(size == 1) return Str.get(toCodepoint(toLong(iter.next()), info));
 
     // handle arbitrary input
     final TokenBuilder tb = new TokenBuilder(Seq.initialCapacity(size));
-    for(Item item; (item = qc.next(values)) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       tb.add(toCodepoint(toLong(item), info));
     }
     return Str.get(tb.finish());
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    if(!singleInt) {
+      final Item item = arg(0).atomIter(qc, info).next();
+      if(item == null) return false;
+      toLong(item);
+    }
+    return true;
   }
 
   @Override
@@ -47,19 +60,13 @@ public final class FnCodepointsToString extends StandardFunc {
     // codepoints-to-string(string-to-codepoints(A))  ->  string(A)
     if(STRING_TO_CODEPOINTS.is(values)) return cc.function(STRING, info, values.args());
 
-    singleInt = arg(0).seqType().instanceOf(SeqType.INTEGER_O);
+    singleInt = values.seqType().instanceOf(SeqType.INTEGER_O);
     return this;
   }
 
-  /**
-   * Converts a single codepoint to a string.
-   * @param value value
-   * @param info input info (can be {@code null})
-   * @return codepoint as string
-   * @throws QueryException query exception
-   */
-  private static Str toStr(final long value, final InputInfo info) throws QueryException {
-    return Str.get(Token.cpToken(toCodepoint(value, info)));
+  @Override
+  protected boolean values(final boolean limit, final CompileContext cc) {
+    return super.values(true, cc);
   }
 
   /**

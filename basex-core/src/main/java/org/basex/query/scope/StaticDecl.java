@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Common superclass for static functions and variables.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public abstract class StaticDecl extends StaticScope {
@@ -30,7 +30,7 @@ public abstract class StaticDecl extends StaticScope {
    */
   protected StaticDecl(final QNm name, final SeqType declType, final AnnList anns,
       final VarScope vs, final InputInfo info, final String doc) {
-    super(vs.sc);
+    super(info.sc());
     this.name = name;
     this.declType = declType;
     this.anns = anns;

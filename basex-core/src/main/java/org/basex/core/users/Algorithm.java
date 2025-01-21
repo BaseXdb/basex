@@ -5,7 +5,7 @@ import org.basex.util.options.*;
 /**
  * Algorithms.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum Algorithm {
@@ -27,6 +27,6 @@ public enum Algorithm {
 
   @Override
   public String toString() {
-    return EnumOption.string(name());
+    return EnumOption.string(this);
   }
 }

@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 /**
  * Project files cache.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class ProjectCache implements Iterable<String> {
@@ -75,7 +75,7 @@ final class ProjectCache implements Iterable<String> {
       try(DirectoryStream<Path> paths = Files.newDirectoryStream(root)) {
         for(final Path path : paths) {
           // skip hidden files, cancel parsing if directory contains .ignore file
-          final IOFile io = new IOFile(path.toFile());
+          final IOFile io = new IOFile(path);
           if(io.ignore()) return;
           if(showHidden || !io.isHidden()) {
             if(Files.isDirectory(path)) {
@@ -101,7 +101,6 @@ final class ProjectCache implements Iterable<String> {
     } catch(final IOException ex) {
       Util.debug(ex);
     }
-
   }
 
   @Override

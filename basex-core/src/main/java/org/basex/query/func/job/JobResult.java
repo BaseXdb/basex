@@ -14,7 +14,7 @@ import org.basex.util.options.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JobResult extends StandardFunc {
@@ -27,18 +27,13 @@ public final class JobResult extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String id = toString(arg(0), qc);
-    final ResultOptions options = toOptions(arg(1), new ResultOptions(), true, qc);
+    final ResultOptions options = toOptions(arg(1), new ResultOptions(), qc);
 
     final Map<String, QueryJobResult> results = qc.context.jobs.results;
     final QueryJobResult result = results.get(id);
     if(result == null) return Empty.VALUE;
     if(result.value == null && result.exception == null) throw JOBS_RUNNING_X.get(info, id);
-
-    try {
-      if(result.exception != null) throw result.exception;
-      return result.value;
-    } finally {
-      if(!options.get(ResultOptions.KEEP)) results.remove(id);
-    }
+    if(!options.get(ResultOptions.KEEP)) results.remove(id);
+    return result.get();
   }
 }

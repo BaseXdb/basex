@@ -2,8 +2,6 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 
-import java.nio.charset.*;
-
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 import org.basex.util.similarity.*;
@@ -12,14 +10,12 @@ import org.basex.util.similarity.*;
  * This class provides convenience operations for XML-specific character
  * operations.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class XMLToken {
   /** Index for all HTML entities (lazy initialization). */
   private static TokenMap entities;
-  /** The underscore. */
-  private static final byte[] UNDERSCORE = { '_' };
 
   /** Hidden constructor. */
   private XMLToken() { }
@@ -86,8 +82,8 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isNCName(final byte[] value) {
-    final int l = value.length;
-    return l != 0 && ncName(value, 0) == l;
+    final int vl = value.length;
+    return vl != 0 && ncName(value, 0) == vl;
   }
 
   /**
@@ -96,12 +92,12 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isName(final byte[] value) {
-    final int l = value.length;
-    for(int i = 0; i < l; i += cl(value, i)) {
-      final int cp = cp(value, i);
-      if(i == 0 ? !isStartChar(cp) : !isChar(cp)) return false;
+    final int vl = value.length;
+    for(int v = 0; v < vl; v += cl(value, v)) {
+      final int cp = cp(value, v);
+      if(v == 0 ? !isStartChar(cp) : !isChar(cp)) return false;
     }
-    return l != 0;
+    return vl != 0;
   }
 
   /**
@@ -110,11 +106,11 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isNMToken(final byte[] value) {
-    final int l = value.length;
-    for(int i = 0; i < l; i += cl(value, i)) {
-      if(!isChar(cp(value, i))) return false;
+    final int vl = value.length;
+    for(int v = 0; v < vl; v += cl(value, v)) {
+      if(!isChar(cp(value, v))) return false;
     }
-    return l != 0;
+    return vl != 0;
   }
 
   /**
@@ -123,13 +119,13 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isQName(final byte[] value) {
-    final int l = value.length;
-    if(l == 0) return false;
+    final int vl = value.length;
+    if(vl == 0) return false;
     final int i = ncName(value, 0);
-    if(i == l) return true;
+    if(i == vl) return true;
     if(i == 0 || value[i] != ':') return false;
     final int j = ncName(value, i + 1);
-    return j == l && j != i + 1;
+    return j == vl && j != i + 1;
   }
 
   /**
@@ -139,25 +135,25 @@ public final class XMLToken {
    * @return end position
    */
   private static int ncName(final byte[] value, final int start) {
-    final int l = value.length;
-    for(int i = start; i < l; i += cl(value, i)) {
-      final int c = cp(value, i);
-      if(i == start ? !isNCStartChar(c) : !isNCChar(c)) return i;
+    final int vl = value.length;
+    for(int v = start; v < vl; v += cl(value, v)) {
+      final int cp = cp(value, v);
+      if(v == start ? !isNCStartChar(cp) : !isNCChar(cp)) return v;
     }
-    return l;
+    return vl;
   }
 
   /**
    * Checks if the specified name is an id/idref attribute ({@code idref}: local name must contain
-   * 'idref'; {@code id}: local name must contain 'if', but not 'idref').
+   * 'idref'; {@code id}: local name must contain 'id', but not 'idref').
    * The correct approach would be to gather all id/idref attributes and store them as metadata.
    * @param name name
    * @param idref id/idref flag
    * @return result of check
    */
   public static boolean isId(final byte[] name, final boolean idref) {
-    final byte[] n = lc(local(name));
-    return idref ? contains(n, REF) : contains(n, ID) && !contains(n, REF);
+    final byte[] id = lc(local(name));
+    return idref ? contains(id, REF) : contains(id, ID) && !contains(id, REF);
   }
 
   /**
@@ -170,7 +166,7 @@ public final class XMLToken {
     // lax encoding: trim whitespace
     final byte[] nm = lax ? trim(name) : name;
     final int nl = nm.length;
-    if(nl == 0) return UNDERSCORE;
+    if(nl == 0) return cpToken('_');
 
     for(int n = 0; n < nl; n += cl(nm, n)) {
       int cp = cp(nm, n);
@@ -207,7 +203,7 @@ public final class XMLToken {
    * @param cp char
    */
   private static void addEsc(final TokenBuilder tb, final int cp) {
-    tb.addByte(UNDERSCORE[0]);
+    tb.addByte((byte) '_');
     final int a = cp >>> 12;
     tb.addByte((byte) (a + (a > 9 ? 87 : '0')));
     final int b = cp >>> 8 & 0x0F;
@@ -284,31 +280,16 @@ public final class XMLToken {
   }
 
   /**
-   * Checks if the specified token contains invalid XML 1.0 characters.
-   * @param token the token to be checked
-   * @return invalid character or {@code -1}
-   */
-  public static int invalid(final byte[] token) {
-    final TokenParser tp = new TokenParser(token);
-    while(tp.more()) {
-      final int cp = tp.next();
-      if(!XMLToken.valid(cp)) return cp;
-    }
-    return -1;
-  }
-
-  /**
    * Returns a URI-decoded token.
    * @param token encoded token
-   * @param plus decode '+' character
    * @return decoded token
    */
-  public static byte[] decodeUri(final byte[] token, final boolean plus) {
+  public static byte[] decodeUri(final byte[] token) {
     final int tl = token.length;
     final TokenBuilder tb = new TokenBuilder(tl);
     for(int t = 0; t < tl; t++) {
       int b = token[t];
-      if(plus && b == '+') {
+      if(b == '+') {
         b = ' ';
       } else if(b == '%') {
         final int b1 = ++t < tl ? dec(token[t]) : -1, b2 = ++t < tl ? dec(token[t]) : -1;
@@ -318,14 +299,19 @@ public final class XMLToken {
       else tb.addByte((byte) b);
     }
 
-    final byte[] decoded = Token.token(new String(tb.toArray(), StandardCharsets.UTF_8));
-    tb.reset();
-    final int dl = decoded.length;
-    for(int d = 0; d < dl; d += cl(decoded, d)) {
-      final int cp = cp(decoded, d);
+    Token.string(tb.next()).codePoints().forEach(cp -> {
       tb.add(XMLToken.valid(cp) ? cp : Token.REPLACEMENT);
-    }
+    });
     return tb.finish();
+  }
+
+  /**
+   * URI-decodes a string.
+   * @param string encoded string
+   * @return decoded string
+   */
+  public static String decodeUri(final String string) {
+    return Token.string(decodeUri(Token.token(string)));
   }
 
   /**

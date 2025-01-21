@@ -14,7 +14,7 @@ import org.basex.util.ft.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FtSearch extends FtAccess {
@@ -22,7 +22,7 @@ public final class FtSearch extends FtAccess {
   public NodeIter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     final Value query = arg(1).value(qc);
-    final FtIndexOptions options = toOptions(arg(2), new FtIndexOptions(), true, qc);
+    final FtIndexOptions options = toOptions(arg(2), new FtIndexOptions(), qc);
 
     final IndexDb db = new IndexStaticDb(data, info);
     final FTMode mode = options.get(FtIndexOptions.MODE);
@@ -45,6 +45,11 @@ public final class FtSearch extends FtAccess {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     return compileData(cc);
+  }
+
+  @Override
+  public boolean ddo() {
+    return true;
   }
 
   @Override

@@ -97,6 +97,7 @@ textarea {
   border-radius: 3px;
   outline: none;
   width: 100%;
+  height: 200px;
   resize: vertical;
 }
 
@@ -112,6 +113,10 @@ input[type=submit], button {
   border: 1px solid #AAA;
   border-radius: 3px;
   outline: none;
+}
+
+.codemirror {
+  border: 1px solid #AAA;
 }
 
 input[type=text], input[type=password], input[type=number], select {

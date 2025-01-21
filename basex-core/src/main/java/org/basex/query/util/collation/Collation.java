@@ -11,12 +11,13 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 import org.basex.util.options.Options.*;
 
 /**
  * This class organizes collations.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Collation {
@@ -24,10 +25,10 @@ public abstract class Collation {
   private static final byte[] NOCASE =
       token("http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive");
 
-  /** UCA collations. */
-  private static final byte[] UCA = token("http://www.w3.org/2013/collation/UCA");
-  /** Implementation-defined collation URI. */
-  private static final byte[] URL = token(BASEX_URL + "/collation");
+  /** ICU (UCA) collation URL. */
+  public static final byte[] ICU = token("http://www.w3.org/2013/collation/UCA");
+  /** BaseX collation URI. */
+  public static final byte[] BASEX = token(BASEX_URL + "/collation");
   /** Collation URI. */
   private byte[] uri = EMPTY;
 
@@ -43,22 +44,21 @@ public abstract class Collation {
    * Returns a collation instance for the specified uri.
    * @param uri collation uri (can be {@code null})
    * @param qc query context
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param err error code for unknown collation uris
-   * @return collator instance or {@code null} for unicode point collation
+   * @return collation instance or {@code null} for unicode point collation
    * @throws QueryException query exception
    */
-  public static Collation get(final byte[] uri, final QueryContext qc, final StaticContext sc,
-      final InputInfo info, final QueryError err) throws QueryException {
+  public static Collation get(final byte[] uri, final QueryContext qc, final InputInfo info,
+      final QueryError err) throws QueryException {
 
     // return default collation
-    if(uri == null) return sc.collation;
+    if(uri == null) return info.sc().collation;
 
     final Uri u = Uri.get(uri);
     if(!u.isValid()) throw INVURI_X.get(info, uri);
-    final byte[] url = u.isAbsolute() ? uri :
-      Token.startsWith(uri, '?') ? concat(URL, uri) : sc.baseURI().resolve(u, info).string();
+    final byte[] url = u.isAbsolute() ? uri : Token.startsWith(uri, '?') ? concat(BASEX, uri) :
+      info.sc().baseURI().resolve(u, info).string();
 
     // return unicode point collation
     if(eq(COLLATION_URI, url)) return null;
@@ -85,7 +85,7 @@ public abstract class Collation {
       throws QueryException {
 
     // case-insensitive collation
-    if(eq(NOCASE, uri)) return new NoCaseCollation();
+    if(eq(NOCASE, uri)) return NoCaseCollation.INSTANCE;
 
     final int q = Token.indexOf(uri, '?');
     final byte[] base = q == -1 ? uri : substring(uri, 0, q);
@@ -93,15 +93,11 @@ public abstract class Collation {
         q == -1 ? "" : string(replace(substring(uri, q + 1), '&', ';')));
 
     CollationOptions opts = null;
-    if(eq(URL, base)) {
+    if(eq(BASEX, base)) {
       opts = new BaseXCollationOptions(false);
-    } else if(eq(UCA, base)) {
+    } else if(eq(ICU, base)) {
       final boolean fallback = !YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()));
-      if(UCAOptions.ACTIVE) {
-        opts = new UCAOptions(fallback);
-      } else if(fallback) {
-        opts = new BaseXCollationOptions(true);
-      }
+      opts = Prop.ICU ? new UCAOptions(fallback) : new BaseXCollationOptions(fallback);
     }
     if(opts == null) throw err.get(info, Util.inf("Unknown collation '%'", uri));
 
@@ -112,6 +108,16 @@ public abstract class Collation {
     } catch(final IllegalArgumentException | BaseXException ex) {
       throw err.get(info, ex.getMessage());
     }
+  }
+
+  /**
+   * Returns a collation for the specified collation and input info.
+   * @param coll collation
+   * @param info input info (can be {@code null})
+   * @return collation instance, or {@code null} for unicode point collation
+   */
+  public static Collation get(final Collation coll, final InputInfo info) {
+    return coll != null ? coll : info != null ? info.sc().collation : null;
   }
 
   /**
@@ -216,6 +222,15 @@ public abstract class Collation {
   public abstract int compare(byte[] string, byte[] compare);
 
   /**
+   * Returns a collation key.
+   * @param string string
+   * @param info input info (can be {@code null})
+   * @return key
+   * @throws QueryException query exception
+   */
+  public abstract byte[] key(byte[] string, InputInfo info) throws QueryException;
+
+  /**
    * Returns the start or end position of the specified substring.
    * @param string string
    * @param sub substring to be found
@@ -226,4 +241,15 @@ public abstract class Collation {
    */
   protected abstract int indexOf(String string, String sub, Mode mode, InputInfo info)
       throws QueryException;
+
+  /**
+   * Returns a standard collation key.
+   * @param string string
+   * @return key
+   */
+  public static byte[] key(final byte[] string) {
+    final ByteList bl = new ByteList(string.length * 3L);
+    Token.forEachCp(string, cp -> bl.add(cp >>> 16).add(cp >>> 8).add(cp));
+    return bl.finish();
+  }
 }

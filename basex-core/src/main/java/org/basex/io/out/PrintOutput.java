@@ -9,7 +9,7 @@ import org.basex.io.*;
 /**
  * This class is a stream-wrapper for textual data encoded in UTF8.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {
@@ -70,7 +70,18 @@ public class PrintOutput extends OutputStream {
    * @param cp codepoint to be printed
    * @throws IOException I/O exception
    */
-  public void print(final int cp) throws IOException {
+  public final void print(final int cp) throws IOException {
+    print(cp, null);
+  }
+
+  /**
+   * Prints a single character, and keeps track of the current line length.
+   * @param cp codepoint of character to be printed
+   * @param fallback fallback function (can be {@code null})
+   * @throws IOException I/O exception
+   */
+  public void print(final int cp, @SuppressWarnings("unused") final Fallback fallback)
+      throws IOException {
     if(cp <= 0x7F) {
       write(cp);
       lineLength = cp == '\n' ? 0 : lineLength + 1;
@@ -163,5 +174,16 @@ public class PrintOutput extends OutputStream {
    */
   public boolean finished() {
     return size == max;
+  }
+
+  /** Fallback function for encoding problems. */
+  @FunctionalInterface
+  public interface Fallback {
+    /**
+     * Prints fallback characters if an encoding problem occurs.
+     * @param cp codepoint
+     * @throws IOException I/O exception
+     */
+    void print(int cp) throws IOException;
   }
 }

@@ -11,10 +11,10 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnSubsequenceWhere extends StandardFunc {
+public final class FnSubsequenceWhere extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
@@ -23,17 +23,16 @@ public class FnSubsequenceWhere extends StandardFunc {
 
     // create standard iterator
     return new Iter() {
-      boolean more = true;
-      boolean found;
-      int c;
+      final HofArgs args = new HofArgs(2, from, to);
+      boolean more = true, found;
 
       @Override
       public Item next() throws QueryException {
         for(Item item; more && (item = qc.next(input)) != null;) {
-          final Int pos = Int.get(++c);
-          if(!found && (from == null || toBoolean(qc, from, item, pos))) found = true;
+          args.set(0, item).inc();
+          if(!found && (from == null || test(from, args, qc))) found = true;
           if(found) {
-            if(to != null && toBoolean(qc, to, item, pos)) more = false;
+            if(to != null && test(to, args, qc)) more = false;
             return item;
           }
         }
@@ -48,17 +47,23 @@ public class FnSubsequenceWhere extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final boolean from = defined(1), to = defined(2);
     final SeqType ist = input.seqType();
     if(!(from || to) || ist.zero()) return input;
 
     final SeqType[] types = { ist.with(Occ.EXACTLY_ONE), SeqType.INTEGER_O };
-    if(from) arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, types));
-    if(to) arg(2, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, types));
+    if(from) arg(1, arg -> refineFunc(arg, cc, types));
+    if(to) arg(2, arg -> refineFunc(arg, cc, types));
 
     exprType.assign(ist);
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    final boolean from = defined(1), to = defined(2);
+    return from && to ? super.hofIndex() : from ? 1 : 2;
   }
 }

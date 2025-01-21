@@ -1,20 +1,20 @@
 package org.basex.http.restxq;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 
+import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -24,7 +24,7 @@ import org.basex.util.http.*;
 /**
  * This class creates a new HTTP response.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class RestXqResponse extends WebResponse {
@@ -56,8 +56,9 @@ final class RestXqResponse extends WebResponse {
     ctx.setExternal(conn.requestCtx);
 
     func = new RestXqFunction(function.function, function.module, qc);
-    func.parseAnnotations(ctx);
-    return func.bind(data, conn, qc);
+    final MainOptions mopts = new MainOptions(ctx.options);
+    func.parseAnnotations(mopts);
+    return func.bind(data, conn, qc, mopts);
   }
 
   @Override
@@ -164,7 +165,7 @@ final class RestXqResponse extends WebResponse {
     if(attr != null) throw func.error(UNEXP_NODE_X, attr);
 
     // parse response and serialization parameters
-    SerializerOptions sp = func.sopts;
+    final SerializerOptions sopts = func.sopts;
     String cType = null;
     for(final ANode node : response.childIter()) {
       // process http:response element
@@ -202,7 +203,7 @@ final class RestXqResponse extends WebResponse {
         }
       } else if(T_OUTPUT_SERIAL.matches(node)) {
         // parse output:serialization-parameters
-        sp = FuncOptions.serializer(node, func.sopts, func.function.info);
+        sopts.assign(node, func.function.info);
       } else {
         throw func.error(UNEXP_NODE_X, node);
       }
@@ -210,7 +211,7 @@ final class RestXqResponse extends WebResponse {
     if(status == null) status = SC_OK;
 
     // set content type and serialize data
-    if(cType != null) sp.set(SerializerOptions.MEDIA_TYPE, cType);
-    return sp;
+    if(cType != null) sopts.set(SerializerOptions.MEDIA_TYPE, cType);
+    return sopts;
   }
 }

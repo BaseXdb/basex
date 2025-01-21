@@ -15,23 +15,29 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnContainsToken extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Bln.get(test(qc, ii, 0));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
     final byte[] token = trim(toToken(arg(1), qc));
     final Collation collation = toCollation(arg(2), qc);
     if(token.length != 0) {
       final Iter value = arg(0).iter(qc);
       for(Item item; (item = qc.next(value)) != null;) {
         for(final byte[] distinct : distinctTokens(toToken(item))) {
-          if(eq(token, distinct, collation)) return Bln.TRUE;
+          if(eq(token, distinct, collation)) return true;
         }
       }
     }
-    return Bln.FALSE;
+    return false;
   }
 
   @Override

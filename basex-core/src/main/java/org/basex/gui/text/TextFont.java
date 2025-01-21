@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 /**
  * Current font with different fallbacks and styles.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class TextFont {

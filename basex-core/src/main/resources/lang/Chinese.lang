@@ -12,7 +12,6 @@ admin_static         = Admin用户不能被修改
 algorithm            = 算法
 all                  = 全部
 alter_pw             = 修改密码
-and_others           = 其他
 are_you_sure         = 确定吗？
 ascending_order      = 增序
 attribute            = 属性

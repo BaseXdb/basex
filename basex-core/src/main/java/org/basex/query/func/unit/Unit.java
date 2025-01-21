@@ -20,11 +20,12 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * XQUnit tests: Testing single modules.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class Unit {
@@ -125,7 +126,7 @@ final class Unit {
         if(vs == 2 && eq(Q_EXPECTED.string(), value.itemAt(0).string(null))) {
           code = QNm.parse(value.itemAt(1).string(null), QueryText.ERROR_URI, sf.sc, sf.info);
         } else if(vs != 0) {
-          throw BASEX_ANN2_X_X.get(ann.info, ann, arguments(vs));
+          throw BASEX_ANN2_X_X.get(ann.info, ann, arity(arguments(vs), new IntList().add(0)));
         }
 
         final FBuilder testcase = FElem.build(Q_TESTCASE).add(Q_NAME, sf.name.local());

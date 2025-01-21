@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  * </li>
  * </ul>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DiskValuesBuilder extends ValuesBuilder {
@@ -47,7 +47,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
 
   @Override
   public DiskValues build() throws IOException {
-    Util.debug(detailedInfo());
+    Util.debugln(detailedInfo());
 
     try {
       final boolean updindex = data.meta.updindex;

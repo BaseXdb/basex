@@ -7,12 +7,12 @@ import org.basex.util.*;
 /**
  * Resizable-array implementation for native int values.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class IntList extends ElementList {
+public final class IntList extends ElementList {
   /** Element container. */
-  protected int[] list;
+  private int[] list;
 
   /**
    * Default constructor.
@@ -53,7 +53,7 @@ public class IntList extends ElementList {
    * @param element element to be added
    * @return self reference
    */
-  public final IntList add(final int element) {
+  public IntList add(final int element) {
     int[] lst = list;
     final int s = size;
     if(s == lst.length) {
@@ -70,7 +70,7 @@ public class IntList extends ElementList {
    * @param elements elements to be added
    * @return self reference
    */
-  public final IntList add(final int... elements) {
+  public IntList add(final int... elements) {
     int[] lst = list;
     final int l = elements.length, s = size, ns = s + l;
     if(ns > lst.length) {
@@ -87,7 +87,7 @@ public class IntList extends ElementList {
    * @param index index of the element to return
    * @return element
    */
-  public final int get(final int index) {
+  public int get(final int index) {
     return list[index];
   }
 
@@ -96,7 +96,7 @@ public class IntList extends ElementList {
    * @param index index of the element to replace
    * @param element element to be stored
    */
-  public final void set(final int index, final int element) {
+  public void set(final int index, final int element) {
     if(index >= list.length) list = Arrays.copyOf(list, newCapacity(index + 1));
     list[index] = element;
     size = Math.max(size, index + 1);
@@ -107,7 +107,7 @@ public class IntList extends ElementList {
    * @param element element to be found
    * @return result of check
    */
-  public final boolean contains(final int element) {
+  public boolean contains(final int element) {
     final int s = size;
     final int[] lst = list;
     for(int i = 0; i < s; ++i) {
@@ -117,11 +117,21 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Adds an element to the array if it is not contained yet.
+   * @param element element to be added
+   * @return result of check
+   */
+  public IntList addUnique(final int element) {
+    if(!contains(element)) add(element);
+    return this;
+  }
+
+  /**
    * Inserts elements at the specified index position.
    * @param index inserting position
    * @param elements elements to be inserted
    */
-  public final void insert(final int index, final int... elements) {
+  public void insert(final int index, final int... elements) {
     final int l = elements.length;
     if(l == 0) return;
     if(size + l > list.length) list = Arrays.copyOf(list, newCapacity(size + l));
@@ -133,7 +143,7 @@ public class IntList extends ElementList {
    * Removes all occurrences of the specified element from the list.
    * @param element element to be removed
    */
-  public final void removeAll(final int element) {
+  public void removeAll(final int element) {
     final int[] lst = list;
     final int s = size;
     int ns = 0;
@@ -148,7 +158,7 @@ public class IntList extends ElementList {
    * @param index index of the element to remove
    * @return removed element
    */
-  public final int remove(final int index) {
+  public int remove(final int index) {
     final int[] lst = list;
     final int e = lst[index];
     Array.remove(lst, index, 1, size);
@@ -161,7 +171,7 @@ public class IntList extends ElementList {
    * @param diff difference
    * @param index index of the first element
    */
-  public final void incFrom(final int diff, final int index) {
+  public void incFrom(final int diff, final int index) {
     final int[] lst = list;
     final int s = size;
     for(int l = index; l < s; l++) lst[l] += diff;
@@ -171,7 +181,7 @@ public class IntList extends ElementList {
    * Returns the uppermost element from the stack.
    * @return the uppermost element
    */
-  public final int peek() {
+  public int peek() {
     return list[size - 1];
   }
 
@@ -179,7 +189,7 @@ public class IntList extends ElementList {
    * Pops the uppermost element from the stack.
    * @return the popped element
    */
-  public final int pop() {
+  public int pop() {
     return list[--size];
   }
 
@@ -187,7 +197,7 @@ public class IntList extends ElementList {
    * Pushes an element onto the stack.
    * @param element element
    */
-  public final void push(final int element) {
+  public void push(final int element) {
     add(element);
   }
 
@@ -197,7 +207,7 @@ public class IntList extends ElementList {
    * @param element element to be found
    * @return index of the search key, or the negative insertion point - 1
    */
-  public final int sortedIndexOf(final int element) {
+  public int sortedIndexOf(final int element) {
     return Arrays.binarySearch(list, 0, size, element);
   }
 
@@ -205,7 +215,7 @@ public class IntList extends ElementList {
    * Returns an array with all elements.
    * @return array
    */
-  public final int[] toArray() {
+  public int[] toArray() {
     return Arrays.copyOf(list, size);
   }
 
@@ -214,7 +224,7 @@ public class IntList extends ElementList {
    * Warning: the function must only be called if the list is discarded afterwards.
    * @return array (internal representation!)
    */
-  public final int[] finish() {
+  public int[] finish() {
     final int[] lst = list;
     list = null;
     final int s = size;
@@ -225,7 +235,7 @@ public class IntList extends ElementList {
    * Sorts the data and removes distinct values.
    * @return self reference
    */
-  public final IntList ddo() {
+  public IntList ddo() {
     if(!isEmpty()) {
       sort();
       int i = 1;
@@ -239,26 +249,12 @@ public class IntList extends ElementList {
   }
 
   /**
-   * Reverses the order of the elements.
-   * @return self reference
-   */
-  public IntList reverse() {
-    final int[] lst = list;
-    for(int l = 0, r = size - 1; l < r; l++, r--) {
-      final int tmp = lst[l];
-      lst[l] = lst[r];
-      lst[r] = tmp;
-    }
-    return this;
-  }
-
-  /**
    * Sorts the data and returns an array with offsets to the sorted array.
    * See {@link Array#createOrder(int[], boolean)}
    * @param asc ascending order
    * @return array with new order
    */
-  public final int[] createOrder(final boolean asc) {
+  public int[] createOrder(final boolean asc) {
     final IntList il = Array.number(size);
     il.sort(list, asc);
     return il.finish();
@@ -282,7 +278,7 @@ public class IntList extends ElementList {
    * @param asc ascending order
    * @param num numeric sort
    */
-  public final void sort(final byte[][] values, final boolean asc, final boolean num) {
+  public void sort(final byte[][] values, final boolean asc, final boolean num) {
     sort(values, asc, 0, size, num);
   }
 
@@ -293,7 +289,7 @@ public class IntList extends ElementList {
    * @param values values to sort by
    * @param asc ascending order
    */
-  public final void sort(final double[] values, final boolean asc) {
+  public void sort(final double[] values, final boolean asc) {
     sort(values, asc, 0, size);
   }
 
@@ -304,7 +300,7 @@ public class IntList extends ElementList {
    * @param values values to sort by
    * @param asc ascending order
    */
-  public final void sort(final int[] values, final boolean asc) {
+  public void sort(final int[] values, final boolean asc) {
     sort(values, asc, 0, size);
   }
 
@@ -315,7 +311,7 @@ public class IntList extends ElementList {
    * @param values values to sort by
    * @param asc ascending order
    */
-  public final void sort(final long[] values, final boolean asc) {
+  public void sort(final long[] values, final boolean asc) {
     sort(values, asc, 0, size);
   }
 

@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Node comparison.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CmpN extends Cmp {
@@ -31,7 +31,7 @@ public final class CmpN extends Cmp {
     },
 
     /** Node comparison: before. */
-    ET("<<") {
+    ET("<<", "\uFF1C\uFF1C") {
       @Override
       public boolean eval(final ANode node1, final ANode node2) {
         return node1.compare(node2) < 0;
@@ -39,7 +39,7 @@ public final class CmpN extends Cmp {
     },
 
     /** Node comparison: after. */
-    GT(">>") {
+    GT(">>", "\uFF1E\uFF1E") {
       @Override
       public boolean eval(final ANode node1, final ANode node2) {
         return node1.compare(node2) > 0;
@@ -48,15 +48,15 @@ public final class CmpN extends Cmp {
 
     /** Cached enums (faster). */
     public static final OpN[] VALUES = values();
-    /** String representation. */
-    public final String name;
+    /** String representations. */
+    public final String[] names;
 
     /**
      * Constructor.
-     * @param name string representation
+     * @param names string representations
      */
-    OpN(final String name) {
-      this.name = name;
+    OpN(final String... names) {
+      this.names = names;
     }
 
     /**
@@ -69,7 +69,7 @@ public final class CmpN extends Cmp {
 
     @Override
     public String toString() {
-      return name;
+      return names[0];
     }
   }
 
@@ -84,7 +84,7 @@ public final class CmpN extends Cmp {
    * @param op comparator
    */
   public CmpN(final InputInfo info, final Expr expr1, final Expr expr2, final OpN op) {
-    super(info, expr1, expr2, null, SeqType.BOOLEAN_ZO, null);
+    super(info, expr1, expr2, SeqType.BOOLEAN_ZO);
     this.op = op;
   }
 
@@ -95,7 +95,7 @@ public final class CmpN extends Cmp {
     if(st1.oneOrMore() && st2.oneOrMore()) exprType.assign(Occ.EXACTLY_ONE);
 
     final Expr expr = emptyExpr();
-    return expr == this && allAreValues(false) ? cc.preEval(this) : cc.replaceWith(this, expr);
+    return expr == this && values(false, cc) ? cc.preEval(this) : cc.replaceWith(this, expr);
   }
 
   @Override
@@ -105,6 +105,16 @@ public final class CmpN extends Cmp {
     final ANode n2 = toNodeOrNull(exprs[1], qc);
     if(n2 == null) return Empty.VALUE;
     return Bln.get(op.eval(n1, n2));
+  }
+
+  @Override
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
+      throws QueryException {
+    final ANode n1 = toNodeOrNull(exprs[0], qc);
+    if(n1 == null) return false;
+    final ANode n2 = toNodeOrNull(exprs[1], qc);
+    if(n2 == null) return false;
+    return op.eval(n1, n2);
   }
 
   @Override
@@ -139,7 +149,7 @@ public final class CmpN extends Cmp {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, OP, op.name), exprs);
+    plan.add(plan.create(this, OP, op.names[0]), exprs);
   }
 
   @Override

@@ -7,7 +7,7 @@ import java.util.*;
  * This class assembles some reflection methods. Most exceptions are caught and replaced
  * by a {@code null} value.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Reflect {
@@ -172,14 +172,14 @@ public final class Reflect {
 
   /**
    * Returns a class instance or {@code null}.
-   * @param clazz class
+   * @param constructor constructor
    * @param args arguments
    * @param <O> class type
    * @return instance or {@code null}
    */
-  public static <O> O get(final Constructor<O> clazz, final Object... args) {
+  public static <O> O get(final Constructor<O> constructor, final Object... args) {
     try {
-      return clazz != null ? clazz.newInstance(args) : null;
+      return constructor != null ? constructor.newInstance(args) : null;
     } catch(final Throwable ex) {
       Util.debug(ex);
       return null;

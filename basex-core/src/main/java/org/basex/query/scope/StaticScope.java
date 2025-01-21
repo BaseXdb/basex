@@ -1,7 +1,5 @@
 package org.basex.query.scope;
 
-import static org.basex.query.QueryError.*;
-
 import java.io.*;
 
 import org.basex.io.in.*;
@@ -19,7 +17,7 @@ import org.basex.util.list.*;
 /**
  * Superclass for static functions, variables and the main expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public abstract class StaticScope extends ExprInfo implements Scope {
@@ -33,7 +31,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
 
   /** Input info (can be {@code null}). */
   public InputInfo info;
-  /** Name of the declaration (can be {@code null}). */
+  /** Name of the scope (can be {@code null}). */
   public QNm name;
 
   /** Variable scope. */
@@ -79,10 +77,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
       final int fp = vs.enter(qc);
       try {
         final Value val = expr.value(qc);
-        if(declType != null && !declType.instance(val)) {
-          throw typeError(val, declType, name, info, false);
-        }
-        value = val;
+        value = declType != null ? declType.coerce(val, name, qc, null, info) : val;
       } finally {
         vs.exit(fp, qc);
       }
@@ -91,7 +86,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
   }
 
   /**
-   * Returns a map with all documentation tags found for this scope or {@code null} if
+   * Returns a map with all documentation tags found for this scope, or {@code null} if
    * no documentation exists. The main description is flagged with the "description" key.
    * The supported tags are defined in {@link Inspect#DOC_TAGS} (other tags will be
    * included in the map, too).

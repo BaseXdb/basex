@@ -46,18 +46,15 @@ function page:start(
 
       <h3><a href='dba'>DBA: Database Administration</a></h3>
 
-      <p>The Database Administration interface is completely
-        written in RESTXQ.<br/>
-        The source code helps to understand how complex
-        web applications can be built with XQuery.
+      <p>The Database Administration interface is completely written in RESTXQ.<br/>
+        You can view the source code to learn how to build complex web applications with XQuery.
       </p>
 
       <h3><a href='chat'>WebSocket Chat</a></h3>
 
       <p>The chat application demonstrates how bidirectional communication
         is realized with BaseX.<br/>
-        For a better experience when testing the chat,
-        consider the following steps:
+        For a better experience when testing the chat, consider the following steps:
       </p>
         
       <ol>

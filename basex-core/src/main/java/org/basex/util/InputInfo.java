@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.value.type.*;
 
@@ -7,7 +9,7 @@ import org.basex.query.value.type.*;
  * This class contains information on the original query, which will be evaluated for
  * error feedback and debugging purposes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class InputInfo {
@@ -18,12 +20,14 @@ public final class InputInfo {
   private boolean internal;
   /** Input path. */
   private final String path;
-  /** Input string (can be {@code null}). */
-  private String input;
+  /** Static context (can be {@code null}). */
+  private StaticContext sc;
+  /** Input (can be {@code null}). */
+  private int[] input;
   /** Line number ({@code 0} if not initialized). */
   private int line;
-  /** Column number of (if not initialized) string position. */
-  private int col;
+  /** Column number or (if not initialized) string position. */
+  private int column;
 
   /**
    * Constructor.
@@ -32,7 +36,17 @@ public final class InputInfo {
   public InputInfo(final InputParser parser) {
     input = parser.input;
     path = parser.file;
-    col = parser.pos;
+    column = parser.pos;
+  }
+
+  /**
+   * Constructor.
+   * @param parser input parser, containing information on the current parsing state
+   * @param sc static context
+   */
+  public InputInfo(final InputParser parser, final StaticContext sc) {
+    this(parser);
+    this.sc = sc;
   }
 
   /**
@@ -44,7 +58,7 @@ public final class InputInfo {
   public InputInfo(final String path, final int line, final int col) {
     this.path = path;
     this.line = line;
-    this.col = col;
+    this.column = col;
   }
 
   /**
@@ -70,7 +84,15 @@ public final class InputInfo {
    */
   public int column() {
     init();
-    return col;
+    return column;
+  }
+
+  /**
+   * Returns the static context.
+   * @return static context (can be {@code null})
+   */
+  public StaticContext sc() {
+    return sc;
   }
 
   /**
@@ -80,16 +102,14 @@ public final class InputInfo {
     // positions have already been calculated
     if(line != 0) return;
 
-    final int cl = Math.min(col, input.length());
-    final String q = input;
+    final int cl = Math.min(column, input.length);
     int l = 1, c = 1;
-    for(int i = 0, ch; i < cl; i += Character.charCount(ch)) {
-      ch = q.codePointAt(i);
-      if(ch == '\n') { l++; c = 1; }
-      else if(ch != '\r') { c++; }
+    for(int i = 0; i < cl; i++) {
+      final int cp = input[i];
+      if(cp == '\n') { l++; c = 1; } else { c++; }
     }
     line = l;
-    col = c;
+    column = c;
   }
 
   /**
@@ -102,7 +122,7 @@ public final class InputInfo {
 
   /**
    * Activates light-weight error handling (invoked e.g. by {@link SeqType#cast(
-   * org.basex.query.value.Value, boolean, QueryContext, StaticContext, InputInfo)}).
+   * org.basex.query.value.Value, boolean, QueryContext, InputInfo)}).
    * @param value value to set
    */
   public void internal(final boolean value) {
@@ -113,13 +133,13 @@ public final class InputInfo {
   public boolean equals(final Object object) {
     if(!(object instanceof InputInfo)) return false;
     final InputInfo ii = (InputInfo) object;
-    return (path != null ? path.equals(ii.path) : input.equals(ii.input)) &&
+    return (path != null ? path.equals(ii.path) : Arrays.equals(input, ii.input)) &&
         column() == ii.column() && line() == ii.line();
   }
 
   @Override
   public int hashCode() {
-    return (path != null ? path.hashCode() : input.hashCode()) + column() + (line() << 16);
+    return (path != null ? path.hashCode() : Arrays.hashCode(input)) + column() + (line() << 16);
   }
 
   @Override

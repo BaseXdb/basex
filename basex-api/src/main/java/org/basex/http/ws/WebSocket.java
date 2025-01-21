@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
@@ -15,16 +15,17 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
+import org.basex.util.log.*;
 import org.eclipse.jetty.websocket.api.*;
+import org.eclipse.jetty.websocket.api.exceptions.*;
 
 /**
  * This class defines an abstract WebSocket. It inherits the Jetty WebSocket adapter.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Johannes Finckh
  */
 public final class WebSocket extends WebSocketAdapter implements ClientInfo {
@@ -103,9 +104,10 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   }
 
   @Override
-  public void onWebSocketError(final Throwable cause) {
-    run("[WS-ERROR] " + request.getRequestURL() + ": " + cause.getMessage(), null,
-        () -> findAndProcess(Annotation._WS_ERROR, cause.getMessage()));
+  public void onWebSocketError(final Throwable th) {
+    final String m1 = th.getMessage(), m2 = Util.message(th), msg = m1 != null ? m1 : m2;
+    run("[WS-ERROR] " + request.getRequestURL() + ": " + msg, null,
+        () -> findAndProcess(Annotation._WS_ERROR, msg));
   }
 
   @Override
@@ -188,7 +190,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   /**
    * Runs a function and creates log output.
    * @param info log string
-   * @param status close status
+   * @param status close status (can be {@code null})
    * @param func function to be run
    */
   private void run(final String info, final Integer status, final Runnable func) {
@@ -196,7 +198,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
     final Performance perf = new Performance();
     try {
       func.run();
-    } catch (final Exception ex) {
+    } catch(final Exception ex) {
       context.log.write(LogType.ERROR, "", perf, context);
       throw ex;
     }

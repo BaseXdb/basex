@@ -27,13 +27,13 @@ import org.basex.util.hash.*;
 /**
  * Inline function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Function name, {@code null} if not specified. */
   private final QNm name;
-  /** Formal parameters. */
+  /** Parameters. */
   private final Var[] params;
   /** Value type, {@code null} if not specified. */
   private SeqType declType;
@@ -70,7 +70,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * Package-private constructor allowing a name.
    * @param info input info (can be {@code null})
    * @param expr function expression
-   * @param params formal parameters
+   * @param params parameters
    * @param anns annotations
    * @param vs variable scope
    * @param global bindings for non-local variables (can be {@code null})
@@ -164,7 +164,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         Expr inline = null;
         if(ex instanceof Value) {
           // values are always inlined into the closure
-          inline = var.checkType((Value) ex, cc.qc, true);
+          inline = var.checkType((Value) ex, cc.qc, cc);
         } else if(ex instanceof Closure) {
           // nested closures are inlined if their size and number of closed-over variables is small
           final Closure cl = (Closure) ex;
@@ -199,9 +199,15 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     // only evaluate if:
     // - the closure is empty, so we don't lose variables
-    // - the result size does not exceed a specific limit
-    return global.isEmpty() && expr.size() <= CompileContext.MAX_PREEVAL ?
-      cc.preEval(this) : this;
+    // - the result size is not too large
+    if(global.isEmpty() && !cc.largeResult(expr)) {
+      try {
+        return cc.preEval(this);
+      } catch(final QueryException qe) {
+        expr = cc.error(qe, expr);
+      }
+    }
+    return this;
   }
 
   @Override
@@ -232,12 +238,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final VarScope innerScope = new VarScope(vs.sc);
+    final VarScope vsc = new VarScope();
 
     final HashMap<Var, Expr> outer = new HashMap<>();
     global.forEach((key, value) -> outer.put(key, value.copy(cc, vm)));
 
-    cc.pushScope(innerScope);
+    cc.pushScope(vsc);
     try {
       final IntObjMap<Var> innerVars = new IntObjMap<>();
       vs.copy(cc, innerVars);
@@ -276,8 +282,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     // create the return clause
     final Expr body = expr.copy(cc, vm).optimize(cc);
-    final Expr rtrn = declType == null ? body :
-      new TypeCheck(info, vs.sc, body, declType, true).optimize(cc);
+    final Expr rtrn = declType == null ? body : new TypeCheck(info, body, declType).optimize(cc);
     return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
   }
 
@@ -303,25 +308,24 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     } else if(body instanceof Value) {
       // we can type check immediately
       final Value value = (Value) body;
-      checked = declType.instance(value) ? value :
-        declType.coerce(value, name, qc, vs.sc, info, false);
+      checked = declType.coerce(value, name, qc, null, info);
     } else {
       // check at each call: reject impossible arities
       if(argType.type.instanceOf(declType.type) && argType.occ.intersect(declType.occ) == null &&
-        !body.has(Flag.NDT)) {
-        throw typeError(body, declType, name, info, true);
+          !body.has(Flag.NDT)) {
+        throw typeError(body, declType, name, info);
       }
-      checked = new TypeCheck(info, vs.sc, body, declType, true);
+      checked = new TypeCheck(info, body, declType);
     }
 
     final FuncType ft = (FuncType) seqType().type;
-    return new FuncItem(info, checked, params, anns, ft, vs.sc, vs.stackSize(), name);
+    return new FuncItem(info, checked, params, anns, ft, vs.stackSize(), name);
   }
 
   @Override
   public boolean has(final Flag... flags) {
     // closure does not perform any updates
-    if(Flag.UPD.in(flags)) return false;
+    if(Flag.UPD.oneOf(flags)) return false;
 
     // handle recursive calls: check which flags are already or currently assigned
     final ArrayList<Flag> flgs = new ArrayList<>();
@@ -358,8 +362,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     for(final Entry<Var, Expr> entry : global.entrySet()) {
       if(!(entry.getValue().accept(visitor) && visitor.declared(entry.getKey()))) return false;
     }
-    for(final Var var : params) {
-      if(!visitor.declared(var)) return false;
+    for(final Var param : params) {
+      if(!visitor.declared(param)) return false;
     }
     return expr.accept(visitor);
   }
@@ -430,9 +434,9 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   private void checkUpdating() throws QueryException {
     // derive updating flag from function body
     updating = expr.has(Flag.UPD);
-    final boolean annUpdating = anns.contains(Annotation.UPDATING);
-    if(updating != annUpdating) {
-      if(!annUpdating) anns = anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
+    final boolean upd = anns.contains(Annotation.UPDATING);
+    if(updating != upd) {
+      if(!upd) anns = anns.attach(new Ann(info, Annotation.UPDATING, Empty.VALUE));
       else if(!expr.vacuous()) throw UPEXPECTF.get(info);
     }
   }
@@ -451,8 +455,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     });
 
     final FBuilder elem = plan.create(this);
-    final int pl = params.length;
-    for(int p = 0; p < pl; p++) plan.addAttribute(elem, ARG + p, params[p].name.string());
+    final int arity = arity();
+    for(int a = 0; a < arity; a++) plan.addAttribute(elem, ARG + a, params[a].name.string());
     plan.add(elem, list.toArray());
   }
 
@@ -464,7 +468,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       global.forEach((k, v) -> qs.token(LET).token(k).token(":=").token(v));
       qs.token(RETURN);
     }
-    qs.token(FUNCTION).params(params);
+    qs.token(FN).params(params);
     qs.token(AS).token(declType != null ? declType : SeqType.ITEM_ZM).brace(expr);
     if(inlined) qs.token(')');
   }

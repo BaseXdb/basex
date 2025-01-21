@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 /**
  * A window {@code start} of {@code end} condition.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class Condition extends Single {
@@ -142,7 +142,7 @@ public final class Condition extends Single {
     // bind variables
     bind(qc, it, ps, pr, nx);
     // evaluate as effective boolean value
-    return expr.test(qc, info, false);
+    return expr.test(qc, info, 0);
   }
 
   /**

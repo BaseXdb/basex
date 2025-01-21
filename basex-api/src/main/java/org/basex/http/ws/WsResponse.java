@@ -20,7 +20,7 @@ import org.eclipse.jetty.websocket.api.*;
 /**
  * Creates WebSocket responses.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Johannes Finckh
  */
 public final class WsResponse extends WebResponse {
@@ -49,7 +49,7 @@ public final class WsResponse extends WebResponse {
     ctx.setExternal(new RequestContext(ws.request));
 
     func = new WsFunction(function.function, function.module, qc);
-    func.parseAnnotations(ctx);
+    func.parseAnnotations(null);
     return func.bind(data, ws.headers, qc);
   }
 
@@ -92,7 +92,7 @@ public final class WsResponse extends WebResponse {
     final SerialMethod method = sopts.get(SerializerOptions.METHOD);
     for(Item item; (item = iter.next()) != null;) {
       // serialize maps and arrays as JSON
-      final boolean json = method == SerialMethod.BASEX && item instanceof XQData;
+      final boolean json = method == SerialMethod.BASEX && item instanceof XQStruct;
       sopts.set(SerializerOptions.METHOD, json ? SerialMethod.JSON : method);
       // interpret result as binary or string
       final ArrayOutput ao = item.serialize(sopts);

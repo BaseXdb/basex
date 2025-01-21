@@ -17,7 +17,7 @@ import org.junit.jupiter.api.*;
 /**
  * Test cases for FLWOR expressions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class GFLWORTest extends SandboxTest {
@@ -46,7 +46,7 @@ public final class GFLWORTest extends SandboxTest {
         "a\na",
         empty(Let.class),
         empty(For.class),
-        root(DualIterMap.class),
+        root(Pipeline.class),
         exists(REPLICATE)
     );
   }
@@ -72,8 +72,8 @@ public final class GFLWORTest extends SandboxTest {
         "let $b as xs:string := $seq[$j] " +
         "return concat($i, $j, $b, $b)",
         "12bb\n13cc\n23cc",
-        Util.info("every $f in //% satisfies $f << //%[starts-with(@name, '$b')]",
-            For.class, Let.class)
+        "every $f in //For satisfies $f << //" + Util.className(Pipeline.class),
+        empty(Let.class)
     );
   }
 
@@ -98,7 +98,7 @@ public final class GFLWORTest extends SandboxTest {
         "<x/>\n<x/>",
         empty(Let.class),
         empty(For.class),
-        root(DualIterMap.class),
+        root(Pipeline.class),
         exists(REPLICATE)
     );
 
@@ -109,7 +109,7 @@ public final class GFLWORTest extends SandboxTest {
         "<x/>\n<x/>",
         empty(Let.class),
         empty(For.class),
-        root(DualIterMap.class),
+        root(Pipeline.class),
         exists(REPLICATE)
     );
   }
@@ -256,7 +256,7 @@ public final class GFLWORTest extends SandboxTest {
     check("for $i in 1 to 10 let $rnd := " + _RANDOM_DOUBLE.args() + " return $i * $rnd",
         null,
         empty(Let.class),
-        exists(ItemMap.class)
+        exists(Pipeline.class)
     );
   }
 
@@ -362,7 +362,7 @@ public final class GFLWORTest extends SandboxTest {
     check("let $rnd := " + _RANDOM_DOUBLE.args() + " return (1 to 10) ! $rnd",
         null,
         empty(Let.class),
-        root(DualIterMap.class),
+        root(Pipeline.class),
         exists(REPLICATE)
     );
   }
@@ -408,7 +408,9 @@ public final class GFLWORTest extends SandboxTest {
   @Test public void inlineLetTest() {
     check("let $x := 1 let $b := $x + 2 return $b + 3", 6, empty(Let.class));
     check("let $x := <x>0</x> let $b := $x/text() return $b + 1", 1, empty(Let.class));
-    error("let $x := <x>false</x> let $b as xs:boolean := $x/text() return $b", INVTREAT_X_X_X);
+    check("let $x := <x>false</x> let $b as xs:boolean := $x/text() return $b", false,
+        empty(Let.class));
+    error("let $x := <x>42</x> let $b as xs:boolean := $x/text() return $b", FUNCCAST_X_X_X);
   }
 
   /** Tests flattening. */
@@ -432,7 +434,7 @@ public final class GFLWORTest extends SandboxTest {
   /** Allowing empty. */
   @Test public void allowingEmpty() {
     check("for $x allowing empty in () return $x", "", empty());
-    check("for $x allowing empty in" + VOID.args(1) + " return $x", "", exists(GFLWOR.class));
+    check("for $x allowing empty in" + VOID.args(1, true) + " return $x", "", exists(GFLWOR.class));
   }
 
   /** Merge for/let clauses. */
@@ -452,12 +454,62 @@ public final class GFLWORTest extends SandboxTest {
   /** Remove clauses that will never be executed. */
   @Test public void gh1999() {
     check("for $a in () return delete node a", "", empty());
-    check("for $a in" + VOID.args(1) + " return delete node a", "", root(VOID));
+    check("for $a in" + VOID.args(1, true) + " return delete node a", "", root(VOID));
   }
 
   /** Sliding windows. */
   @Test public void gh2252() {
     query("for sliding window $w in 1 to 3 start at $p when true()"
         + "only end when $p = 2 return <w>{ $w }</w>", "<w>2</w>");
+  }
+
+  /** Merge where clauses. */
+  @Test public void mergeWhere() {
+    check("for $i at $p in (1 to 4) where $i <= 3 return $p",
+        "1\n2\n3", count(Where.class, 1));
+    check("for $i at $p in (1 to 4) where $i <= 3 where $i >= 2 return $p",
+        "2\n3", count(Where.class, 1));
+    check("for $i at $p in (1 to 4) where $i <= 3 where $i >= 2 where $p < 5 return $p",
+        "2\n3", count(Where.class, 1));
+
+    check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
+        + "for $j at $q in ($i to 2) return $q",
+        "1\n2\n1", count(Where.class, 1));
+    check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
+        + "for $j at $q in ($i to 2) where $q < 5 return $q",
+        "1\n2\n1", count(Where.class, 2));
+    check("for $i at $p in (1 to 4) where $i <= 3 where $p < 5 "
+        + "for $j at $q in ($i to 2) where $j > 1 where $p < 5 return $q",
+        "2\n1", count(Where.class, 2));
+  }
+
+  /** Merge where clauses. */
+  @Test public void mergeWhile() {
+    check("for $i at $p in (1 to 4) while $i <= 3 return $p",
+        "1\n2\n3", count(While.class, 1));
+    check("for $i at $p in (1 to 4) while $i <= 3 while $i >= 0 return $p",
+        "1\n2\n3", count(While.class, 1));
+    check("for $i at $p in (1 to 4) while $i <= 3 while $i >= 0 while $p < 5 return $p",
+        "1\n2\n3", count(While.class, 1));
+
+    check("for $i at $p in (1 to 4) while $i <= 3 while $p < 5 "
+        + "for $j at $q in ($i to 2) return $q",
+        "1\n2\n1", count(While.class, 1));
+    check("for $i at $p in (1 to 4) while $i <= 3 while $p < 5 "
+        + "for $j at $q in ($i to 2) while $q < 5 return $q",
+        "1\n2\n1", count(While.class, 2));
+    check("for $i at $p in (1 to 4) while $i <= 3 while $p < 5 "
+        + "for $j at $q in ($i to 2) while $j >= 1 while $p < 5 return $q",
+        "1\n2\n1", count(While.class, 2));
+  }
+
+  /** While clause optimizations. */
+  @Test public void whilee() {
+    check("for $i in 1 to 6 while true() return $i", "1\n2\n3\n4\n5\n6", root(RangeSeq.class));
+    check("for $i in 1 to 6 while false() return $i", "", empty());
+
+    check("for $i in 1 to 6 let $j := text { $i } while $i < 2 return ($j, $j + 1)",
+        "1\n2", exists(Pipeline.class));
+    check("let $a := <a/>[text()] while $a return $a", "", root(IterFilter.class));
   }
 }

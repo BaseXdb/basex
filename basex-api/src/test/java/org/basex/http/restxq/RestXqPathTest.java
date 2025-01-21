@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 /**
  * This test contains RESTXQ paths.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RestXqPathTest extends RestXqTest {
@@ -14,13 +14,9 @@ public final class RestXqPathTest extends RestXqTest {
    * @throws Exception exception
    */
   @Test public void get() throws Exception {
-    // ignore duplicate slashes
+    // root access
     get("root", "declare %R:path('') function m:f() { 'root' };", "");
-    get("root", "declare %R:path('') function m:f() { 'root' };", "/");
-    get("root", "declare %R:path('') function m:f() { 'root' };", "//");
-    get("root", "declare %R:path('') function m:f() { 'root' };", "/////");
     get("root", "declare %R:path('/') function m:f() { 'root' };", "");
-    get("root", "declare %R:path('/') function m:f() { 'root' };", "/");
     // explicit GET method
     get("root", "declare %R:GET %R:path('') function m:f() { 'root' };", "");
     // duplicate GET method
@@ -95,7 +91,7 @@ public final class RestXqPathTest extends RestXqTest {
     get("1", "declare %R:path('%7b') function m:f() {1};", "%7B");
     get("1", "declare %R:path('%7B') function m:f() {1};", "%7b");
     get("1", "declare %R:path('%7C') function m:f() {1};", "%7C");
-    get("1", "declare %R:path('+') function m:f() {1};", "+");
+    get("1", "declare %R:path('+') function m:f() {1};", "%20");
     get("1", "declare %R:path(' ') function m:f() {1};", "%20");
     get("1", "declare %R:path('%2b') function m:f() {1};", "+");
     get("1", "declare %R:path('%20') function m:f() {1};", "%20");

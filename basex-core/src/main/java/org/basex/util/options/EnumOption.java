@@ -7,7 +7,7 @@ import org.basex.util.list.*;
 /**
  * Option containing an enumeration value.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @param <V> enumeration value
  */
@@ -78,10 +78,10 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
 
   /**
    * Helper function for converting enumeration names to strings.
-   * @param name name
+   * @param en enumeration
    * @return lower-case string with '-' replaced by '-';
    */
-  public static String string(final String name) {
-    return name.toLowerCase(Locale.ENGLISH).replace('_', '-');
+  public static String string(final Enum<?> en) {
+    return en.name().toLowerCase(Locale.ENGLISH).replace('_', '-');
   }
 }

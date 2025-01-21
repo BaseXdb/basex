@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * The empty array.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 final class EmptyArray extends XQArray {
@@ -48,7 +48,7 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public long arraySize() {
+  public long structSize() {
     return 0;
   }
 

@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class MapRemove extends StandardFunc {
@@ -22,7 +22,7 @@ public final class MapRemove extends StandardFunc {
     final Iter keys = arg(1).iter(qc);
 
     for(Item item; (item = qc.next(keys)) != null;) {
-      map = map.delete(toAtomItem(item, qc), info);
+      map = map.remove(toAtomItem(item, qc));
     }
     return map;
   }

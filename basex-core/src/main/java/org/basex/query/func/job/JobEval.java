@@ -17,25 +17,27 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class JobEval extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return eval(toContent(arg(0), qc), qc);
+    return eval(toContent(arg(0), qc), toOptions(arg(2), new JobOptions(), qc), qc);
   }
 
   /**
    * Evaluates a query as job.
    * @param query query
+   * @param options job options
    * @param qc query context
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Str eval(final IOContent query, final QueryContext qc) throws QueryException {
+  final Str eval(final IOContent query, final JobOptions options, final QueryContext qc)
+      throws QueryException {
+
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
-    final JobOptions options = toOptions(arg(2), new JobOptions(), true, qc);
     options.set(JobOptions.BASE_URI, toBaseUri(query.url(), options, JobOptions.BASE_URI));
 
     final boolean service = Boolean.TRUE.equals(options.get(JobOptions.SERVICE));

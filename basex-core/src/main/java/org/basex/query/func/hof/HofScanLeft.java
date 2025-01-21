@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class HofScanLeft extends StandardFunc {
@@ -22,19 +22,19 @@ public final class HofScanLeft extends StandardFunc {
     final FItem action = toFunction(arg(2), 2, qc);
 
     return new Iter() {
-      private Value acc = arg(1).value(qc);
-      private Iter inner = acc.iter();
+      final HofArgs args = new HofArgs(2).set(0, arg(1).value(qc));
+      Iter inner = args.get(0).iter();
 
       @Override
       public Item next() throws QueryException {
         while(true) {
           final Item in = inner.next();
           if(in != null) return in;
-          final Item out = input.next();
-          if(out == null) return null;
+          final Item item = input.next();
+          if(item == null) return null;
 
-          acc = action.invoke(qc, info, acc, out);
-          inner = acc.iter();
+          args.set(0, invoke(action, args.set(1, item), qc));
+          inner = args.get(0).iter();
         }
       }
     };
@@ -52,5 +52,10 @@ public final class HofScanLeft extends StandardFunc {
 
     exprType.assign(input.seqType().union(Occ.ZERO)).data(input);
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 2;
   }
 }

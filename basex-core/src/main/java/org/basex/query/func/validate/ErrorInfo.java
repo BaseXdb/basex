@@ -2,19 +2,32 @@ package org.basex.query.func.validate;
 
 import org.basex.io.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 import org.xml.sax.*;
 
 /**
  * Error info.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class ErrorInfo {
+  /** Error level. */
+  enum Level {
+    /** Fatal. */ FATAL,
+    /** Error. */ ERROR,
+    /** Warning. */ WARNING;
+
+    @Override
+    public String toString() {
+      return Strings.capitalize(EnumOption.string(this));
+    }
+  }
+
   /** Message. */
   final String message;
   /** Level. */
-  final String level;
+  final Level level;
   /** URL. */
   String url;
   /** Line number. */
@@ -28,7 +41,7 @@ final class ErrorInfo {
    * @param level type
    * @param schema schema url
    */
-  ErrorInfo(final SAXException ex, final String level, final IO schema) {
+  ErrorInfo(final SAXException ex, final Level level, final IO schema) {
     this.level = level;
 
     String m = ex.getMessage();

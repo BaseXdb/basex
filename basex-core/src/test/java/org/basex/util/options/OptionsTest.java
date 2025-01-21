@@ -19,7 +19,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests on options.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class OptionsTest extends SandboxTest {
@@ -29,7 +29,6 @@ public final class OptionsTest extends SandboxTest {
     new UCAOptions(false);
     new CsvOptions();
     new CsvParserOptions();
-    new CsvSerialOptions();
     new HtmlOptions();
     new JsonOptions();
     new JsonParserOptions();

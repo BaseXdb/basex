@@ -21,10 +21,10 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnItemsAt extends StandardFunc {
+public final class FnItemsAt extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return seqType().zeroOrOne() ? evalItem(qc).iter() : evalIter(qc);
@@ -47,20 +47,24 @@ public class FnItemsAt extends StandardFunc {
       // retrieve (possibly invalid) position
       final double d = toDouble(at) - 1;
       long l = (long) d;
-      if(d != l || l < 0) return Empty.VALUE;
+      if(l >= 0 && d == l) {
+        // retrieve single item
+        final Expr input = arg(0);
+        if(input.seqType().zeroOrOne()) {
+          return l == 0 ? input.item(qc, info) : Empty.VALUE;
+        }
 
-      // retrieve single item
-      final Expr input = arg(0);
-      if(input.seqType().zeroOrOne()) return l == 0 ? input.item(qc, info) : Empty.VALUE;
+        // fast route if the result size is known
+        final Iter iter = input.iter(qc);
+        final long size = iter.size();
+        if(size >= 0) {
+          return l < size ? iter.get(l) : Empty.VALUE;
+        }
 
-      // fast route if the result size is known
-      final Iter iter = input.iter(qc);
-      final long size = iter.size();
-      if(size >= 0) return l < size ? iter.get(l) : Empty.VALUE;
-
-      // iterate until specified item is found
-      for(Item item; (item = qc.next(iter)) != null;) {
-        if(l-- == 0) return item;
+        // iterate until specified item is found
+        for(Item item; (item = qc.next(iter)) != null;) {
+          if(l-- == 0) return item;
+        }
       }
     }
     return Empty.VALUE;
@@ -75,14 +79,22 @@ public class FnItemsAt extends StandardFunc {
   private Iter evalIter(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
     final Iter at = arg(1).iter(qc);
-    final long size = input.size();
+    // hidden option, indicates whether the positions are sorted
+    final boolean sorted = toBooleanOrFalse(arg(2), qc);
+
     return new Iter() {
+      final long size = input.size();
+
       @Override
       public Item next() throws QueryException {
         for(Item item; (item = qc.next(at)) != null;) {
           final double d = toDouble(item) - 1;
-          long l = (long) d;
-          if(d == l && l >= 0 && l < size) return input.itemAt(l);
+          final long l = (long) d;
+          if(l < size) {
+            if(l >= 0 && d == l) return input.itemAt(l);
+          } else if(sorted) {
+            break;
+          }
         }
         return null;
       }
@@ -183,7 +195,7 @@ public class FnItemsAt extends StandardFunc {
     exprType.assign(ist.with(occ)).data(input);
 
     // ignore standard limitation for large values to speed up evaluation of result
-    return allAreValues(false) ? value(cc.qc) : embed(cc, false);
+    return values(false, cc) ? value(cc.qc) : embed(cc, false);
   }
 
   /**

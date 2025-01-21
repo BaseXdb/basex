@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -13,7 +12,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative step expression with one or more simple numeric predicates.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IterPosStep extends Step {
@@ -30,10 +29,15 @@ public final class IterPosStep extends Step {
 
   @Override
   public NodeIter iter(final QueryContext qc) {
+    final int el = exprs.length;
     return new NodeIter() {
-      final CmpPos[] posExpr = new CmpPos[exprs.length];
-      final long[] cPos = new long[exprs.length];
+      /** Current context positions. */
+      final long[] currPos = new long[el];
+      /** Cached search positions. */
+      final Value[] cachedPos = new Value[el];
+      /** Iterator. */
       BasicNodeIter iter;
+      /** Skip remaining tests. */
       boolean skip;
 
       @Override
@@ -41,14 +45,10 @@ public final class IterPosStep extends Step {
         if(skip) return null;
         if(iter == null) {
           iter = axis.iter(checkNode(qc));
-          final int el = exprs.length;
           for(int e = 0; e < el; e++) {
-            final Expr expr = Pos.get(exprs[e], info, qc);
-            if(expr == Bln.FALSE) return null;
-            if(expr instanceof CmpPos) posExpr[e] = (CmpPos) expr;
+            if(exprs[e] instanceof CmpPos) cachedPos[e] = ((CmpPos) exprs[e]).positions(qc);
           }
         }
-
         for(final ANode node : iter) {
           qc.checkStop();
           if(test.matches(node) && preds(node)) return node.finish();
@@ -61,17 +61,15 @@ public final class IterPosStep extends Step {
         final Value qv = qf.value;
         qf.value = node;
         try {
-          final int pl = exprs.length;
-          for(int p = 0; p < pl; p++) {
-            final Expr pred = exprs[p];
-            final CmpPos pos = posExpr[p];
-            if(pos == null) {
-              if(!pred.test(qc, info, true)) return false;
-            } else {
-              final long ps = ++cPos[p];
-              final int t = pos.test(ps, qc);
-              if(t == 0) return false;
-              if(t == 2) skip = true;
+          for(int e = 0; e < el; e++) {
+            final Value pos = cachedPos[e];
+            if(pos != null) {
+              final long p = ++currPos[e];
+              if(!pos.test(qc, info, p)) return false;
+              // last position reached: early exit
+              if(p == pos.itemAt(pos.size() - 1).itr(info)) skip = true;
+            } else if(!exprs[e].test(qc, info, 0)) {
+              return false;
             }
           }
         } finally {

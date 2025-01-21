@@ -1,7 +1,7 @@
 (:~
  : Drop databases.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/databases';
 
@@ -17,16 +17,16 @@ declare variable $dba:CAT := 'databases';
  :)
 declare
   %updating
-  %rest:GET
-  %rest:path('/dba/db-drop')
-  %rest:query-param('name', '{$names}')
-function dba:db-drop(
+  %rest:POST
+  %rest:path('/dba/dbs-drop')
+  %rest:form-param('name', '{$names}')
+function dba:dbs-drop(
   $names  as xs:string*
-) as empty-sequence() {
+) {
   try {
     $names ! db:drop(.),
-    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'database', 'dropped') })
+    utils:redirect($dba:CAT, { 'info': utils:info($names, 'database', 'dropped') })
   } catch * {
-    utils:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, { 'error': $err:description })
   }
 };

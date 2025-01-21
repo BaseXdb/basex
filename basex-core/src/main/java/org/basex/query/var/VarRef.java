@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
 /**
  * Local Variable Reference expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Leo Woerteler
  */
@@ -67,7 +67,7 @@ public final class VarRef extends ParseExpr {
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
     // replace variable reference with expression
-    return var == ic.var  ? ic.copy() : null;
+    return var == ic.var ? ic.copy() : null;
   }
 
   @Override
@@ -106,7 +106,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof VarRef && var.slot == (((VarRef) obj).var).slot;
+    return this == obj || obj instanceof VarRef && var.slot == ((VarRef) obj).var.slot;
   }
 
   @Override

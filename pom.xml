@@ -5,7 +5,7 @@
   <!-- Artifact information -->
   <groupId>org.basex</groupId>
   <artifactId>basex-parent</artifactId>
-  <version>11.0-SNAPSHOT</version>
+  <version>11.7-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <distributionManagement>
@@ -29,7 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>9.4.53.v20231009</jettyVersion>
+    <jettyVersion>11.0.24</jettyVersion>
     <junit.version>5.10.0</junit.version>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
@@ -46,7 +46,7 @@
       <dependency>
         <groupId>org.junit.platform</groupId>
         <artifactId>junit-platform-commons</artifactId>
-        <version>1.10.1</version>
+        <version>1.10.3</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -93,7 +93,7 @@
       <dependency>
         <groupId>net.xqj</groupId>
         <artifactId>basex-xqj</artifactId>
-        <version>10.0</version>
+        <version>11.0</version>
       </dependency>
       <dependency>
         <groupId>org.xmldb</groupId>
@@ -126,7 +126,7 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.websocket</groupId>
-        <artifactId>websocket-server</artifactId>
+        <artifactId>websocket-jetty-server</artifactId>
         <version>${jettyVersion}</version>
         <scope>provided</scope>
       </dependency>
@@ -158,26 +158,21 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <version>1.5</version>
-      </dependency>
-      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>2.0.11</version>
+        <version>2.0.16</version>
       </dependency>
       <dependency>
         <groupId>de.bottlecaps</groupId>
         <artifactId>markup-blitz</artifactId>
-        <version>1.2</version>
+        <version>1.5</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>com.ibm.icu</groupId>
         <artifactId>icu4j</artifactId>
-        <version>74.2</version>
+        <version>75.1</version>
         <scope>provided</scope>
         <optional>true</optional>
       </dependency>
@@ -307,7 +302,7 @@
         <plugins>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.6.0</version>
+            <version>3.7.1</version>
             <inherited>true</inherited>
             <executions>
               <execution>
@@ -329,7 +324,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.1.0</version>
+            <version>3.2.4</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -350,7 +345,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.6.3</version>
+            <version>3.8.0</version>
             <inherited>true</inherited>
             <configuration>
               <doclint>none</doclint>
@@ -376,7 +371,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>javacc-maven-plugin</artifactId>
-          <version>3.0.1</version>
+          <version>3.1.0</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -395,13 +390,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.12.1</version>
+          <version>3.13.0</version>
           <inherited>true</inherited>
           <configuration>
             <source>${compileSource}</source>
             <target>${compileSource}</target>
-            <!-- https://jira.codehaus.org/browse/MCOMPILER-205 -->
-            <useIncrementalCompilation>false</useIncrementalCompilation>
           </configuration>
         </plugin>
 
@@ -427,7 +420,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.4.2</version>
           <inherited>true</inherited>
           <configuration>
             <archive>
@@ -444,14 +437,14 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.2.5</version>
+          <version>3.3.1</version>
           <inherited>true</inherited>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.3.1</version>
           <inherited>true</inherited>
           <configuration>
             <outputDirectory>target</outputDirectory>
@@ -470,7 +463,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>3.0.1</version>
+          <version>3.1.1</version>
           <configuration>
             <tagNameFormat>@{project.version}</tagNameFormat>
             <releaseProfiles>ossrh</releaseProfiles>
@@ -481,7 +474,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.6.1</version>
+          <version>3.7.1</version>
           <inherited>true</inherited>
           <configuration>
             <outputDirectory>${project.lib.directory}</outputDirectory>
@@ -501,7 +494,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>exec-maven-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.4.0</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -515,14 +508,14 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.1.2</version>
           <inherited>true</inherited>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.3.1</version>
+          <version>3.4.0</version>
           <inherited>true</inherited>
           <executions>
             <execution>
@@ -545,7 +538,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.13</version>
+          <version>1.7.0</version>
           <extensions>true</extensions>
           <configuration>
             <serverId>ossrh</serverId>

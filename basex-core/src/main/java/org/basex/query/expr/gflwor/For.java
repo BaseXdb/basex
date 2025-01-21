@@ -1,6 +1,7 @@
 package org.basex.query.expr.gflwor;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import java.util.*;
 import java.util.List;
@@ -19,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * FLWOR {@code for} clause, iterating over a sequence.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class For extends ForLet {
@@ -119,7 +120,13 @@ public final class For extends ForLet {
 
   @Override
   public For optimize(final CompileContext cc) throws QueryException {
-    // assign type to clause and variable; remove empty flag if expression always yields items
+    // for $a as xs:integer in $array  ->  for $a as xs:integer in data($array)
+    final SeqType dt = var.declType;
+    if(dt != null && dt.instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM) && expr.seqType().mayBeArray()) {
+      expr = cc.function(DATA, info, expr);
+    }
+
+    // remove empty flag if expression is never empty; assign type to clause and variable
     final SeqType st = expr.seqType();
     if(st.oneOrMore()) empty = false;
     exprType.assign(st.with(empty ? st.zero() ? Occ.ZERO : Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE));

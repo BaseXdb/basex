@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Mixed XQuery tests.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class MixedTest extends SandboxTest {
@@ -56,6 +56,18 @@ public final class MixedTest extends SandboxTest {
     contains("import module namespace a='world' at '" + XQMFILE + "'; $a:lazy", "hello:foo");
     contains("import module namespace a='world' at '" + XQMFILE + "'; $a:func()", "hello:foo");
     contains("import module namespace a='world' at '" + XQMFILE + "'; a:inlined()", "hello:foo");
+  }
+
+  /** Checks imported module's types. */
+  @Test public void typesInModules() {
+    query("import module namespace a='world' at '" + XQMFILE + "'; '42' cast as a:int", 42);
+    query("import module namespace a='world' at '" + XQMFILE + "';" +
+      "declare type a:private-int as a:int; '42' cast as a:private-int", 42);
+
+    error("import module namespace a='world' at '" + XQMFILE + "';" +
+      "declare type Q{world}int as xs:double; '42' cast as a:int", DUPLTYPE_X);
+    error("import module namespace a='world' at '" + XQMFILE + "'; '42' cast as a:private-int",
+      WHICHCAST_X);
   }
 
   /**
@@ -115,7 +127,7 @@ public final class MixedTest extends SandboxTest {
     query("(<a><b><c/></b></a> update {})/b/c ! name(..)", "b");
     query("(<a><b><c/></b></a> update {})/b/c/.. ! name(..)", "a");
 
-    query("<a><b/></a>  ! <x>{ . }</x>/a/b/ancestor::node() ! name()", "x\na");
+    query("<a><b/></a> ! <x>{ . }</x>/a/b/ancestor::node() ! name()", "x\na");
     query("(<a><b/></a> update {}) ! <x>{ . }</x>/a/b/ancestor::node() ! name()", "x\na");
 
     query("<A>{ <a><b/><c/></a>/* }</A>/b/following-sibling::c", "<c/>");

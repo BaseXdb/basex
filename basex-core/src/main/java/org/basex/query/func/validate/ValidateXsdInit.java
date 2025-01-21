@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ValidateXsdInit extends ValidateFn {
@@ -21,7 +21,7 @@ public final class ValidateXsdInit extends ValidateFn {
   }
 
   @Override
-  public ArrayList<ErrorInfo> errors(final QueryContext qc) throws QueryException {
+  public ArrayList<ErrorInfo> errors(final QueryContext qc) {
     throw Util.notExpected();
   }
 }

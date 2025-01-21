@@ -16,14 +16,14 @@ import org.basex.util.options.*;
 /**
  * This class contains constants and system properties which are used all around the project.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Current version (major and minor number, optionally followed by development tag). */
-  private static final String CURRENT_VERSION = "11.0-SNAPSHOT";
+  private static final String CURRENT_VERSION = "11.7 beta";
 
   /** Name of project in lower case. */
   public static final String PROJECT = NAME.toLowerCase(Locale.ENGLISH);
@@ -54,6 +54,9 @@ public final class Prop {
   public static final String TEMPDIR = dir(System.getProperty("java.io.tmpdir"));
   /** Project home directory. */
   public static final String HOMEDIR;
+
+  /** Availability of ICU. */
+  public static final boolean ICU = Reflect.available("com.ibm.icu.text.BreakIterator");
 
   /** Global options, assigned by the starter classes and the web.xml context parameters. */
   private static final Map<String, String> OPTIONS = new ConcurrentHashMap<>();

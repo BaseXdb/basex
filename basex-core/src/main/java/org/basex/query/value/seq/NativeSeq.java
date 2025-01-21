@@ -9,7 +9,7 @@ import org.basex.util.*;
 /**
  * Sequence of items, which are stored in their primitive/native representation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class NativeSeq extends Seq {
@@ -54,4 +54,7 @@ abstract class NativeSeq extends Seq {
   public final Value remove(final long pos, final QueryContext qc) {
     return copyRemove(pos, qc);
   }
+
+  @Override
+  public void refineType() { }
 }

@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DbPutValue extends DbAccess {
@@ -25,7 +25,7 @@ public final class DbPutValue extends DbAccess {
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw RESINV_X.get(info, path);
 
-    qc.updates().add(new DBPut(data, input, path, info), qc);
+    qc.updates().add(new DBPut(data, input.compactify(), path, info), qc);
     return Empty.VALUE;
   }
 }

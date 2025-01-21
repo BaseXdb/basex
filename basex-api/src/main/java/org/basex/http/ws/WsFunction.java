@@ -19,7 +19,7 @@ import org.basex.util.*;
 /**
  * This class represents a single WebSocket function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Johannes Finckh
  */
 public final class WsFunction extends WebFunction {
@@ -39,7 +39,7 @@ public final class WsFunction extends WebFunction {
   }
 
   @Override
-  public boolean parseAnnotations(final Context ctx) throws QueryException {
+  public boolean parseAnnotations(final MainOptions mopts) throws QueryException {
     final boolean[] declared = new boolean[function.arity()];
     // counter for annotations that should occur only once
     boolean found = false;

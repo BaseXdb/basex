@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnPosition extends StandardFunc {
@@ -30,8 +30,12 @@ public final class FnPosition extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[position()]  ->  E[true()]
-    return cc.simplify(this, mode == Simplify.PREDICATE ? Bln.TRUE : this, mode);
+    Expr expr = this;
+    if(mode == Simplify.PREDICATE) {
+      // E[position()]  ->  E[true()]
+      expr = Bln.TRUE;
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   @Override

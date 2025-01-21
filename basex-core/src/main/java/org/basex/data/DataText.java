@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 /**
  * This class assembles texts which are used in the data classes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public interface DataText {
@@ -183,9 +183,9 @@ public interface DataText {
   byte[] PI_C = token("?>");
 
   /** Element output. */
-  byte[] ELEM_O = { '<' };
+  byte[] ELEM_O = cpToken('<');
   /** Element output. */
-  byte[] ELEM_C = { '>' };
+  byte[] ELEM_C = cpToken('>');
   /** Element output. */
   byte[] ELEM_OS = token("</");
   /** Element output. */
@@ -205,10 +205,10 @@ public interface DataText {
   /** Processing instruction output. */
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
-  byte[] ATT = { '@' };
-  /** CDATA output. */
+  byte[] ATT = cpToken('@');
+  /** Opening CDATA. */
   byte[] CDATA_O = token("<![CDATA[");
-  /** CDATA output. */
+  /** Closing CDATA. */
   byte[] CDATA_C = token("]]>");
 
   /** XML spaces: attribute name. */

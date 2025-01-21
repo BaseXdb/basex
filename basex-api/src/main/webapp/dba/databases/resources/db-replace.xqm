@@ -1,7 +1,7 @@
 (:~
  : Replace resource.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/databases';
 
@@ -14,58 +14,12 @@ declare variable $dba:CAT := 'databases';
 declare variable $dba:SUB := 'database';
 
 (:~
- : Form for putting replacing a resource.
- : @param  $name      database
- : @param  $resource  resource
- : @param  $error     error string
- : @return page
- :)
-declare
-  %rest:GET
-  %rest:path('/dba/db-replace')
-  %rest:query-param('name',     '{$name}')
-  %rest:query-param('resource', '{$resource}')
-  %rest:query-param('error',    '{$error}')
-  %output:method('html')
-  %output:html-version('5')
-function dba:db-replace(
-  $name      as xs:string,
-  $resource  as xs:string,
-  $error     as xs:string?
-) as element(html) {
-  html:wrap(map { 'header': ($dba:CAT, $name), 'error': $error },
-    <tr>
-      <td>
-        <form action='db-replace' method='post' enctype='multipart/form-data'>
-          <input type='hidden' name='name' value='{ $name }'/>
-          <input type='hidden' name='resource' value='{ $resource }'/>
-          <h2>{
-            html:link('Databases', $dba:CAT), ' » ',
-            html:link($name, $dba:SUB, map { 'name': $name }), ' » ',
-            html:link($resource, $dba:SUB, map { 'name': $name, 'resource': $resource }), ' » ',
-            html:button('db-replace', 'Replace')
-          }</h2>
-          <table>
-            <tr>
-              <td>
-                <input type='file' name='file'/>
-                { html:focus('file') }
-                <div class='small'/>
-              </td>
-            </tr>
-          </table>
-        </form>
-      </td>
-    </tr>
-  )
-};
-
-(:~
- : Replaces a resource in the database.
+ : Replace resource.
  : @param  $name      database
  : @param  $resource  resource
  : @param  $file      file input
- : @return redirection
+ : @param  $do        perform update
+ : @return form or redirection
  :)
 declare
   %updating
@@ -74,29 +28,53 @@ declare
   %rest:form-param('name',     '{$name}')
   %rest:form-param('resource', '{$resource}')
   %rest:form-param('file',     '{$file}')
-function dba:db-replace-post(
+  %rest:form-param('do',       '{$do}')
+  %output:method('html')
+  %output:html-version('5')
+function dba:db-replace(
   $name      as xs:string,
-  $resource  as xs:string,
-  $file      as map(*)?
-) as empty-sequence() {
-  try {
-    let $key := map:keys($file)
-    return if($key = '') then (
+  $resource  as xs:string?,
+  $file      as item()?,
+  $do        as xs:string?
+) {
+  html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
+    <tr>
+      <td>
+        <form method='post' enctype='multipart/form-data' autocomplete='off'>
+          <input type='hidden' name='do' value='do'/>
+          <input type='hidden' name='name' value='{ $name }'/>
+          <input type='hidden' name='resource' value='{ $resource }'/>
+          <h2>{
+            html:link('Databases', $dba:CAT), ' » ',
+            html:link($name, $dba:SUB, { 'name': $name }), ' » ',
+            html:link($resource, $dba:SUB, { 'name': $name, 'resource': $resource }), ' » ',
+            html:button('db-replace', 'Replace')
+          }</h2>
+          <table>
+            <tr>
+              <td>
+                <input type='file' name='file' autofocus=''/>
+                <div class='small'/>
+              </td>
+            </tr>
+          </table>
+        </form>
+      </td>
+    </tr>
+  }, fn() {
+    let $key := $file[. instance of map(*)] ! map:keys(.)
+    return if (not($key)) {
       error((), 'No input specified.')
-    ) else (
-      let $input := if(db:type($name, $resource) = 'xml') then (
+    } else {
+      let $input := if (db:type($name, $resource) = 'xml') {
         fetch:binary-doc($file($key))
-      ) else (
+      } else {
         $file($key)
-      )
+      }
       return db:put($name, $input, $resource),
-      utils:redirect($dba:SUB, map {
+      utils:redirect($dba:SUB, {
         'name': $name, 'resource': $resource, 'info': 'Resource was replaced.'
       })
-    )
-  } catch * {
-    utils:redirect('db-replace', map {
-      'name': $name, 'resource': $resource, 'error': $err:description
-    })
-  }
+    }
+  })
 };

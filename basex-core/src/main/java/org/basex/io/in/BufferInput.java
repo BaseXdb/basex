@@ -8,7 +8,7 @@ import org.basex.util.list.*;
 /**
  * This class uses an internal buffer to speed up input stream processing.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class BufferInput extends InputStream {
@@ -65,7 +65,7 @@ public class BufferInput extends InputStream {
    * Constructor.
    * @param is input stream
    */
-  public BufferInput(final InputStream is) {
+  protected BufferInput(final InputStream is) {
     this(is, is instanceof BufferInput ? ((BufferInput) is).length : -1);
   }
 

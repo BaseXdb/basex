@@ -15,20 +15,18 @@ import org.basex.util.hash.*;
 /**
  * Cast expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Cast extends Convert {
   /**
    * Function constructor.
-   * @param sc static context
    * @param info input info (can be {@code null})
    * @param expr expression
    * @param seqType sequence type to cast to (zero or one item)
    */
-  public Cast(final StaticContext sc, final InputInfo info, final Expr expr,
-      final SeqType seqType) {
-    super(sc, info, expr, seqType, SeqType.ITEM_ZM);
+  public Cast(final InputInfo info, final Expr expr, final SeqType seqType) {
+    super(info, expr, seqType, SeqType.ITEM_ZM);
   }
 
   @Override
@@ -37,31 +35,22 @@ public final class Cast extends Convert {
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
         seqType.occ.instanceOf(expr.seqType().occ)) expr = expr.arg(0);
 
-    final SeqType castType = castType();
-    exprType.assign(castType);
+    final SeqType st = castType();
+    exprType.assign(st);
 
-    final Boolean castable = cast(castType);
-    if(castable == Boolean.FALSE) throw error(expr);
-    if(castable == Boolean.TRUE) return cc.replaceWith(this, expr);
+    final Boolean test = castable(st);
+    if(test == Boolean.FALSE) throw typeError(expr, seqType, info);
+    if(test == Boolean.TRUE) return cc.replaceWith(this, expr);
 
-    final Expr arg = simplify(castType, cc);
-    if(arg != null) return new Cast(sc, info, arg, seqType).optimize(cc);
+    final Expr arg = simplify(st, cc);
+    if(arg != null) return new Cast(info, arg, seqType).optimize(cc);
 
     return expr instanceof Value ? cc.preEval(this) : this;
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return seqType.cast(expr.atomValue(qc, info), true, qc, sc, info);
-  }
-
-  /**
-   * Throws a type error.
-   * @param ex expression that triggers the error
-   * @return query exception
-   */
-  private QueryException error(final Expr ex) {
-    return INVCONVERT_X_X_X.get(info, ex.seqType(), seqType, ex);
+    return seqType.cast(expr.atomValue(qc, info), true, qc, info);
   }
 
   @Override
@@ -71,7 +60,7 @@ public final class Cast extends Convert {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    return copyType(new Cast(sc, info, expr.copy(cc, vm), seqType));
+    return copyType(new Cast(info, expr.copy(cc, vm), seqType));
   }
 
   @Override

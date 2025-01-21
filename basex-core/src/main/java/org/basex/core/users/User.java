@@ -18,7 +18,7 @@ import org.basex.util.*;
 /**
  * This class contains information on a single user.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class User {
@@ -80,7 +80,7 @@ public final class User {
         passwords.put(algorithm, ec);
 
         for(final ANode code : children(child)) {
-          final Code cd = value(name, code.qname().internal(), algorithm.codes);
+          final Code cd = value(name, code.qname().unique(), algorithm.codes);
           if(ec.containsKey(cd)) throw new BaseXException(
               "%, %: Code % supplied more than once.", name, algorithm, code);
           ec.put(cd, string(code.string()));

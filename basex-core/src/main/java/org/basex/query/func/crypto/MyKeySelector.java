@@ -11,17 +11,17 @@ import javax.xml.crypto.dsig.keyinfo.*;
 /**
  * Extracts a key from a given {@link KeyInfo} object.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
 final class MyKeySelector extends KeySelector {
   /**
    * Wrapper for KeySelector results.
    *
-   * @author BaseX Team 2005-24, BSD License
+   * @author BaseX Team, BSD License
    * @author Lukas Kircher
    */
-  private static class MyKeySelectorResult implements KeySelectorResult {
+  private static final class MyKeySelectorResult implements KeySelectorResult {
     /** Key. */
     private final Key pk;
 

@@ -12,10 +12,10 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class UpdateOutput extends StandardFunc {
+public final class UpdateOutput extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(qc.updates().mod instanceof TransformModifier) throw BASEX_UPDATE.get(info);

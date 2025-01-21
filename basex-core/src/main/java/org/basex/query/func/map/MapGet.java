@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class MapGet extends StandardFunc {
@@ -22,9 +22,8 @@ public final class MapGet extends StandardFunc {
     final Item key = toAtomItem(arg(1), qc);
     final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
-    final Value value = map.get(key, info);
-    return !value.isEmpty() || fallback == null || map.contains(key, info) ? value :
-      fallback.invoke(qc, info, key);
+    final Value value = map.get(key, fallback == null);
+    return value != null ? value : fallback.invoke(qc, info, key);
   }
 
   @Override
@@ -33,15 +32,15 @@ public final class MapGet extends StandardFunc {
     final boolean fallback = defined(2);
     if(fallback) {
       final Type type = arg(1).seqType().type.atomic();
-      if(type != null) arg(2, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, type.seqType()));
-    } else {
-      if(map == XQMap.empty()) return Empty.VALUE;
+      arg(2, arg -> refineFunc(arg, cc, type != null ? type.seqType() : SeqType.ANY_ATOMIC_TYPE_O));
+    } else if(map == XQMap.empty()) {
+      return Empty.VALUE;
     }
 
     // combine result type with return type of fallback function, or with empty sequence
     final Type type = map.seqType().type;
     if(type instanceof MapType) {
-      SeqType st = ((MapType) type).declType;
+      SeqType st = ((MapType) type).valueType;
       if(fallback) {
         final FuncType ft = arg(2).funcType();
         if(ft != null) st = st.union(ft.declType);
@@ -51,5 +50,10 @@ public final class MapGet extends StandardFunc {
       exprType.assign(st);
     }
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 2;
   }
 }

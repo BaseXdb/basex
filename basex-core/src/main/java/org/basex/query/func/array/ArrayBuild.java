@@ -12,18 +12,19 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayBuild extends StandardFunc {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final FItem action = toFunctionOrNull(arg(1), 1, qc);
+    final FItem action = toFunctionOrNull(arg(1), 2, qc);
 
     final ArrayBuilder ab = new ArrayBuilder();
+    final HofArgs args = action != null ? new HofArgs(2, action) : null;
     for(Item item; (item = qc.next(input)) != null;) {
-      ab.append(action != null ? action.invoke(qc, info, item) : item);
+      ab.append(action != null ? invoke(action, args.set(0, item).inc(), qc) : item);
     }
     return ab.array();
   }
@@ -35,10 +36,15 @@ public final class ArrayBuild extends StandardFunc {
     if(st.zero()) return cc.voidAndReturn(input, XQArray.empty(), info);
 
     if(defined(1)) {
-      arg(1, arg -> refineFunc(arg, cc, SeqType.ITEM_ZM, st.with(Occ.EXACTLY_ONE)));
+      arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), SeqType.INTEGER_O));
       final FuncType ft = arg(1).funcType();
       if(ft != null) exprType.assign(ArrayType.get(ft.declType));
     }
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * If expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class If extends Arr {
@@ -68,7 +68,7 @@ public final class If extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(EMPTY.is(cond)) {
       // if(empty(A)) then B else C  ->  if(exists(A)) then C else B
-      cond = cc.function(EXISTS, cond.info(), cond.arg(0));
+      cond = cc.function(EXISTS, cond.info(info), cond.arg(0));
       swap();
       cc.info(QueryText.OPTSWAP_X, this);
     } else if(NOT.is(cond)) {
@@ -77,7 +77,7 @@ public final class If extends Arr {
       swap();
       cc.info(QueryText.OPTSWAP_X, this);
     }
-    // if(exists(nodes))  ->  if(nodes)
+    // if(exists($nodes))  ->  if($nodes)
     cond = cond.simplifyFor(Simplify.EBV, cc);
 
     return cc.replaceWith(this, opt(cc));
@@ -132,9 +132,9 @@ public final class If extends Arr {
         new And(info, cond, br1).optimize(cc);
 
       if(contradict(br1, br2, false)) return new CmpG(
-          info, cc.function(BOOLEAN, info, cond), br1, OpG.EQ, null, cc.sc()).optimize(cc);
+          info, cc.function(BOOLEAN, info, cond), br1, OpG.EQ).optimize(cc);
       if(contradict(br2, br1, false)) return new CmpG(
-          info, cc.function(BOOLEAN, info, cond), br2, OpG.NE, null, cc.sc()).optimize(cc);
+          info, cc.function(BOOLEAN, info, cond), br2, OpG.NE).optimize(cc);
     }
     return this;
   }
@@ -170,7 +170,7 @@ public final class If extends Arr {
    * @throws QueryException query exception
    */
   private Expr expr(final QueryContext qc) throws QueryException {
-    return exprs[cond.test(qc, info, false) ? 0 : 1];
+    return exprs[cond.test(qc, info, 0) ? 0 : 1];
   }
 
   @Override

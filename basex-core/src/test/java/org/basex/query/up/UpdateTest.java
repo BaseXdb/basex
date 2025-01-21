@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 /**
  * General test of the XQuery Update Facility implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
 public final class UpdateTest extends SandboxTest {
@@ -89,7 +89,7 @@ public final class UpdateTest extends SandboxTest {
   @Test public void transform2() {
     set(MainOptions.MAINMEM, true);
     try {
-      execute(new CreateDB("DBtransform", "<instance><data><vocable hits='1'/></data></instance>"));
+      execute(new CreateDB("DBTransform", "<instance><data><vocable hits='1'/></data></instance>"));
       query("for $voc in 1 to 2 "
           + "let $xml :=" + _DB_GET.args("DBTransform")
           + "return $xml update {"
@@ -1157,8 +1157,8 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh1576() {
     query(_UPDATE_OUTPUT.args(" [ ]"), "[]");
     query(_UPDATE_OUTPUT.args(" [ 1, (2, [ 3, 4 ]) ]"), "[1,(2,[3,4])]");
-    query(_UPDATE_OUTPUT.args(" map { }"), "map{}");
-    query(_UPDATE_OUTPUT.args(" map { 1: map { 2: 3 }}"), "map{1:map{2:3}}");
+    query(_UPDATE_OUTPUT.args(" map { }"), "{}");
+    query(_UPDATE_OUTPUT.args(" map { 1: map { 2: 3 }}"), "{1:{2:3}}");
 
     error(_UPDATE_OUTPUT.args(" true#0"), BASEX_STORE_X);
     error(_UPDATE_OUTPUT.args(" [ true#0 ]"), BASEX_STORE_X);

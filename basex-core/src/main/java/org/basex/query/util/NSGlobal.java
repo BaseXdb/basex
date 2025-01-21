@@ -9,7 +9,7 @@ import org.basex.util.hash.*;
 /**
  * Global namespaces.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class NSGlobal {
@@ -62,7 +62,6 @@ public final class NSGlobal {
     NS.add(DB_PREFIX, DB_URI);
     NS.add(FETCH_PREFIX, FETCH_URI);
     NS.add(FT_PREFIX, FT_URI);
-    NS.add(HASH_PREFIX, HASH_URI);
     NS.add(HOF_PREFIX, HOF_URI);
     NS.add(HTML_PREFIX, HTML_URI);
     NS.add(INDEX_PREFIX, INDEX_URI);

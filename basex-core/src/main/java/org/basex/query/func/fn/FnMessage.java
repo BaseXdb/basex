@@ -8,10 +8,10 @@ import org.basex.query.value.seq.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnMessage extends FnTrace {
+public final class FnMessage extends FnTrace {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     super.value(qc);

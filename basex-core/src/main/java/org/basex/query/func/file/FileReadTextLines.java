@@ -20,7 +20,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FileReadTextLines extends FileRead {
@@ -84,7 +84,7 @@ public final class FileReadTextLines extends FileRead {
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
 
-    final NewlineInput ni = new NewlineInput(new IOFile(path.toFile()));
+    final NewlineInput ni = new NewlineInput(new IOFile(path));
     ni.encoding(encoding).validate(!fallback);
     return ni;
   }

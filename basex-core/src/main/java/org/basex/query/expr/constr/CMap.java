@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Map constructor.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class CMap extends Arr {
@@ -54,24 +54,24 @@ public final class CMap extends Arr {
     if(kt == null) kt = AtomType.ANY_ATOMIC_TYPE;
 
     // determine static value type
-    SeqType dt = null;
+    SeqType vt = null;
     for(int e = 1; e < el; e += 2) {
       final SeqType dst = exprs[e].seqType();
-      dt = dt == null ? dst : dt.union(dst);
+      vt = vt == null ? dst : vt.union(dst);
     }
-    exprType.assign(MapType.get(kt, dt != null ? dt : SeqType.ITEM_ZM));
+    exprType.assign(MapType.get(kt, vt != null ? vt : SeqType.ITEM_ZM));
 
-    return allAreValues(true) ? cc.preEval(this) : this;
+    return values(true, cc) ? cc.preEval(this) : this;
   }
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final MapBuilder mb = new MapBuilder(info);
     final int el = exprs.length;
+    final MapBuilder mb = new MapBuilder(el >>> 1);
     for(int e = 0; e < el; e += 2) {
       final Item key = toAtomItem(exprs[e], qc);
       final Value value = exprs[e + 1].value(qc);
-      if(mb.contains(key)) throw MAPDUPLKEY_X_X_X.get(info, key, mb.get(key), value);
+      if(mb.contains(key)) throw MAPDUPLKEY_X.get(info);
       mb.put(key, value);
     }
     return mb.map();
@@ -94,7 +94,7 @@ public final class CMap extends Arr {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(MAP).token(" { ");
+    qs.token("{ ");
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       if(e != 0) qs.token(',');

@@ -9,7 +9,7 @@ import java.awt.event.*;
 /**
  * DoubleSlider implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class BaseXDSlider extends BaseXPanel {
@@ -288,7 +288,7 @@ public final class BaseXDSlider extends BaseXPanel {
   }
 
   /** Range class. */
-  private static class Range {
+  private static final class Range {
     /** Range distance. */
     final double dist;
     /** Start position. */

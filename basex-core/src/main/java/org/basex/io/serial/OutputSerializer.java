@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * This class serializes items to an output stream.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class OutputSerializer extends Serializer {
@@ -122,8 +122,8 @@ public abstract class OutputSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   protected final void printChars(final byte[] text) throws IOException {
-    final int al = text.length;
-    for(int a = 0; a < al; a += cl(text, a)) printChar(cp(text, a));
+    final int tl = text.length;
+    for(int t = 0; t < tl; t += cl(text, t)) printChar(cp(text, t));
   }
 
   /**
@@ -139,7 +139,9 @@ public abstract class OutputSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   protected final void printHex(final int cp) throws IOException {
-    out.print("&#x");
+    out.print('&');
+    out.print('#');
+    out.print('x');
     boolean o = false;
     for(int i = 3; i >= 0; i--) {
       final int b = cp >> (i << 3) & 0xFF;

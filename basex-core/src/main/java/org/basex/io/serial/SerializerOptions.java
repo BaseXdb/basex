@@ -5,14 +5,15 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
+import java.util.function.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
+import org.basex.query.expr.path.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -23,7 +24,7 @@ import org.basex.util.options.*;
 /**
  * This class defines all available serialization parameters.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class SerializerOptions extends Options {
@@ -96,10 +97,13 @@ public final class SerializerOptions extends Options {
   /** Serialization parameter: xml/xhtml/html/text. */
   public static final EnumOption<SerialMethod> JSON_NODE_OUTPUT_METHOD =
       new EnumOption<>("json-node-output-method", SerialMethod.XML);
+  /** Serialization parameter: yes/no. */
+  public static final EnumOption<YesNo> JSON_LINES =
+      new EnumOption<>("json-lines", YesNo.NO);
 
   /** Specific serialization parameter. */
-  public static final OptionsOption<CsvSerialOptions> CSV =
-      new OptionsOption<>("csv", new CsvSerialOptions());
+  public static final OptionsOption<CsvOptions> CSV =
+      new OptionsOption<>("csv", new CsvOptions());
   /** Specific serialization parameter. */
   public static final OptionsOption<JsonSerialOptions> JSON =
       new OptionsOption<>("json", new JsonSerialOptions());
@@ -122,6 +126,14 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter: attribute indentation. */
   public static final EnumOption<YesNo> INDENT_ATTRIBUTES =
       new EnumOption<>("indent-attributes", YesNo.NO);
+
+  /** QName. */
+  public static final QNm Q_ROOT =
+      new QNm(OUTPUT_PREFIX, "serialization-parameters", OUTPUT_URI);
+  /** Name test. */
+  public static final NameTest T_ROOT = new NameTest(Q_ROOT);
+  /** Value. */
+  private static final QNm VALUE = new QNm("value");
 
   /** Newlines. */
   public enum Newline {
@@ -182,50 +194,57 @@ public final class SerializerOptions extends Options {
   }
 
   /**
-   * Parses options.
-   * @param name name of option
-   * @param value value
-   * @param sc static context
+   * Converts the specified output parameter item to serializer options.
+   * @param item node with serialization parameters
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public void parse(final String name, final byte[] value, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-
+  public void assign(final Item item, final InputInfo info) throws QueryException {
+    if(!T_ROOT.matches(item)) throw ELMMAP_X_X_X.get(info, Q_ROOT.prefixId(XML), item.type, item);
     try {
-      assign(name, string(value));
+      assign(toString((ANode) item, new QNmSet(), info));
     } catch(final BaseXException ex) {
-      for(final Option<?> o : this) {
-        if(o.name().equals(name)) throw SER_X.get(info, ex);
-      }
-      throw OUTINVALID_X.get(info, ex);
+      throw SERDOC_X.get(info, ex);
     }
+  }
 
-    // parse parameters and character map
-    if(name.equals(PARAMETER_DOCUMENT.name())) {
+  /**
+   * Parses options.
+   * @param name name of option
+   * @param value value
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public void parse(final String name, final String value, final InputInfo info)
+      throws QueryException {
+
+    final Option<?> option = option(name);
+    if(option == PARAMETER_DOCUMENT) {
+      // parse parameters and character map
       Uri uri = Uri.get(value);
       if(!uri.isValid()) throw INVURI_X.get(info, value);
-      if(!uri.isAbsolute()) uri = sc.baseURI().resolve(uri, info);
+      if(!uri.isAbsolute()) uri = info.sc().baseURI().resolve(uri, info);
       final IO io = IO.get(string(uri.string()));
       final ANode root;
       try {
         root = new DBNode(io).childIter().next();
       } catch(final IOException ex) {
-        throw OUTDOC_X.get(info, ex);
+        throw PARAMDOC_X.get(info, ex);
       }
-
-      if(root != null) FuncOptions.serializer(root, this, info);
-
-      final HashMap<String, String> free = free();
-      if(!free.isEmpty()) throw SEROPTION_X.get(info, free.keySet().iterator().next());
+      if(root != null) assign(root, info);
 
       for(final ANode child : root.childIter()) {
         if(child.type != NodeType.ELEMENT) continue;
-        if(string(child.qname().local()).equals(USE_CHARACTER_MAPS.name())) {
-          final String map = characterMap(child);
-          if(map == null) throw SEROPTION_X.get(info, USE_CHARACTER_MAPS.name());
-          set(USE_CHARACTER_MAPS, map);
+        if(option(string(child.qname().local())) == USE_CHARACTER_MAPS) {
+          set(USE_CHARACTER_MAPS, characterMap(child, info));
         }
+      }
+    } else {
+      // parse remaining parameters
+      try {
+        assign(name, value);
+      } catch(final BaseXException ex) {
+        throw (option != null ? SERPARAM_X : OUTPUT_X).get(info, ex);
       }
     }
   }
@@ -233,12 +252,15 @@ public final class SerializerOptions extends Options {
   /**
    * Extracts a character map.
    * @param elem child node
+   * @param info input info
    * @return character map or {@code null} if map is invalid
+   * @throws QueryException query exception
    */
-  public static String characterMap(final ANode elem) {
-    if(elem.attributeIter().next() != null) return null;
+  public static String characterMap(final ANode elem, final InputInfo info) throws QueryException {
+    final Supplier<QueryException> error = () -> SERDOC_X.get(info,
+        Util.info("Serialization parameter '%' is invalid.", USE_CHARACTER_MAPS.name()));
+    if(elem.attributeIter().next() != null) throw error.get();
 
-    // parse characters
     final TokenMap map = new TokenMap();
     for(final ANode child : elem.childIter()) {
       if(child.type != NodeType.ELEMENT) continue;
@@ -249,12 +271,15 @@ public final class SerializerOptions extends Options {
           final byte[] att = attr.name();
           if(eq(att, CHARACTER)) key = attr.string();
           else if(eq(att, MAP_STRING)) val = attr.string();
-          else return null;
+          else throw error.get();
         }
-        if(key == null || val == null || map.get(key) != null) return null;
+        if(key == null || val == null) throw error.get();
+        if(map.get(key) != null) throw SERCHARDUP_X.get(info, key);
+        if(length(key) != 1) throw SERDOC_X.get(info,
+            Util.info("Key in character map is not a single character: %.", key));
         map.put(key, val);
       } else {
-        return null;
+        throw error.get();
       }
     }
 
@@ -265,5 +290,90 @@ public final class SerializerOptions extends Options {
       tb.add(key).add('=').add(string(map.get(key)).replace(",", ",,"));
     }
     return tb.toString();
+  }
+
+  /**
+   * Builds a string representation of the specified node.
+   * @param node node
+   * @param cache name cache
+   * @param info input info
+   * @return string
+   * @throws QueryException query exception
+   */
+  private String toString(final ANode node, final QNmSet cache, final InputInfo info)
+      throws QueryException {
+
+    final ANode att = node.attributeIter().next();
+    if(att != null) throw SERDOC_X.get(info, Util.info("Invalid attribute: '%'", att.name()));
+
+    final StringBuilder sb = new StringBuilder();
+    // interpret options
+    for(final ANode child : node.childIter()) {
+      if(child.type != NodeType.ELEMENT) continue;
+
+      // ignore elements in other namespace
+      final QNm qname = child.qname();
+      if(!cache.add(qname)) throw SERDUP_X.get(info, qname);
+
+      if(!eq(qname.uri(), Q_ROOT.uri())) {
+        if(qname.uri().length != 0) continue;
+        throw SERDOC_X.get(info, Util.info("Element has no namespace: '%'", qname));
+      }
+      // retrieve key from element name and value from "value" attribute or text node
+      final String name = string(qname.local());
+      final Option<?> option = option(name);
+      String value = null;
+      if(option == USE_CHARACTER_MAPS) {
+        value = characterMap(child, info);
+      } else if(hasElements(child)) {
+        value = toString(child, cache, info);
+      } else {
+        for(final ANode attr : child.attributeIter()) {
+          if(attr.qname().eq(VALUE)) {
+            value = string(attr.string());
+            if(option == CDATA_SECTION_ELEMENTS) value = cdataSectionElements(child, value);
+          } else {
+            throw SERDOC_X.get(info, Util.info("Invalid attribute: '%'", attr.name()));
+          }
+        }
+        if(value == null) throw SERDOC_X.get(info, "Missing 'value' attribute.");
+      }
+      sb.append(name).append('=').append(value.trim().replace(",", ",,")).append(',');
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Converts QNames with prefixes to the EQName notation.
+   * @param elem root element
+   * @param value value
+   * @return name with resolved QNames
+   */
+  private static String cdataSectionElements(final ANode elem, final String value) {
+    if(!Strings.contains(value, ':')) return value;
+
+    final TokenBuilder tb = new TokenBuilder();
+    for(final byte[] name : distinctTokens(token(value))) {
+      byte[] qname = name;
+      final int i = indexOf(name, ':');
+      if(i != -1) {
+        final byte[] uri = elem.nsScope(null).value(substring(name, 0, i));
+        if(uri != null) qname = QNm.eqName(uri, substring(name, i + 1));
+      }
+      tb.add(qname).add(' ');
+    }
+    return tb.toString();
+  }
+
+  /**
+   * Checks if the specified node has elements as children.
+   * @param node node
+   * @return result of check
+   */
+  private static boolean hasElements(final ANode node) {
+    for(final ANode nd : node.childIter()) {
+      if(nd.type == NodeType.ELEMENT) return true;
+    }
+    return false;
   }
 }

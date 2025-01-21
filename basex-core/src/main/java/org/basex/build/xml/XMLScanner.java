@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
 /**
  * This class scans an XML document and creates atomic tokens.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class XMLScanner extends Job {
@@ -29,10 +29,6 @@ final class XMLScanner extends Job {
     { "amp", "&", "apos", "'", "quot", "\"", "lt", "<", "gt", ">" };
   /** PublicID characters. */
   private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
-  /** Question mark. */
-  private static final byte[] QUESTION = { '?' };
-  /** Ampersand entity. */
-  private static final byte[] AMPER = { '&' };
 
   /** Scanning states. */
   private enum Scan {
@@ -427,11 +423,11 @@ final class XMLScanner extends Job {
 
   /**
    * Checks input for the specified token.
-   * @param tok token to be found
+   * @param t token to be found
    * @throws IOException I/O exception
    */
-  private void check(final byte[] tok) throws IOException {
-    if(!consume(tok)) throw error(WRONGCHAR, tok, (char) consume());
+  private void check(final byte[] t) throws IOException {
+    if(!consume(t)) throw error(WRONGCHAR, t, (char) consume());
   }
 
   /**
@@ -484,7 +480,7 @@ final class XMLScanner extends Job {
         final boolean h = b == 0x10 && (ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F');
         if(!m && !h) {
           completeRef(ent);
-          return QUESTION;
+          return cpToken('?');
         }
         n *= b;
         n += ch & 0x0F;
@@ -492,7 +488,7 @@ final class XMLScanner extends Job {
         ent.add(ch = nextChar());
       } while(ch != ';');
 
-      if(!valid(n)) return QUESTION;
+      if(!valid(n)) return cpToken('?');
       ent.reset();
       ent.add(n);
       return ent.finish();
@@ -500,13 +496,13 @@ final class XMLScanner extends Job {
 
     // scans predefined entities [68]
     final byte[] name = name(false);
-    if(!consume(';')) return QUESTION;
+    if(!consume(';')) return cpToken('?');
 
-    if(!e) return concat(AMPER, name, SEMI);
+    if(!e) return concat(cpToken('&'), name, SEMI);
 
     byte[] en = ents.get(name);
     if(en == null) en = getEntity(name);
-    return en == null ? QUESTION : en;
+    return en == null ? cpToken('?') : en;
   }
 
   /**
@@ -838,11 +834,11 @@ final class XMLScanner extends Job {
             !consume(ENTS) && !consume(ENT1) && !consume(NMTS) &&
             !consume(NMT)) { // [56]
           if(consume(NOT)) { // [57,58]
-            checkS(); check('('); s(); name(true); s();
-            while(consume('|')) { s(); name(true); s(); }
+            checkS(); check('(');
+            do { s(); name(true); s(); } while(consume('|'));
           } else { // [59]
-            check('('); s(); nmtoken(); s();
-            while(consume('|')) { s(); nmtoken(); s(); }
+            check('(');
+            do { s(); nmtoken(); s(); } while(consume('|'));
           }
           check(')');
         }

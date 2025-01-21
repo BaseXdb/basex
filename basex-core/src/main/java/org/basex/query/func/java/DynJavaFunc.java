@@ -19,7 +19,7 @@ import org.basex.util.list.*;
 /**
  * Dynamic invocation of a Java field or method.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class DynJavaFunc extends DynJavaCall {
@@ -36,12 +36,11 @@ final class DynJavaFunc extends DynJavaCall {
    * @param name name of Java field/method
    * @param types types provided in the parsed expression string (can be {@code null})
    * @param args arguments
-   * @param sc static context
    * @param info input info (can be {@code null})
    */
-  DynJavaFunc(final Class<?> clazz, final String name, final String[] types,
-      final Expr[] args, final StaticContext sc, final InputInfo info) {
-    super(clazz, types, args, sc, info);
+  DynJavaFunc(final Class<?> clazz, final String name, final String[] types, final Expr[] args,
+      final InputInfo info) {
+    super(clazz, types, args, info);
     this.name = name;
   }
 
@@ -79,7 +78,7 @@ final class DynJavaFunc extends DynJavaCall {
     final TokenList names = new TokenList();
     for(final String mthd : allMethods.keySet()) names.add(mthd);
     for(final Field fld : clazz.getFields()) names.add(fld.getName());
-    throw noMember(name, types, arity, name(), arities, names.finish(), info);
+    throw noMember(name, types, arity, arities, names.finish(), info, name());
   }
 
   @Override
@@ -133,7 +132,7 @@ final class DynJavaFunc extends DynJavaCall {
     final Object instance = instance(values, isStatic(method));
     if(instance instanceof QueryModule) {
       final QueryModule qm = (QueryModule) instance;
-      qm.staticContext = sc;
+      qm.staticContext = sc();
       qm.queryContext = qc;
     }
 
@@ -149,7 +148,7 @@ final class DynJavaFunc extends DynJavaCall {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-    final DynJavaFunc f = new DynJavaFunc(clazz, name, types, copyAll(cc, vm, exprs), sc, info);
+    final DynJavaFunc f = new DynJavaFunc(clazz, name, types, copyAll(cc, vm, exprs), info);
     f.field = field;
     f.methods = methods;
     return copyType(f);

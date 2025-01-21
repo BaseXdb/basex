@@ -270,7 +270,7 @@ An empty string can be specified as data type."""
         self.__exc(chr(3), self.__id + chr(0) + name + chr(0) + value + chr(0) + datatype)
 
     def context(self, value, datatype=''):
-        """Bind the context item"""
+        """Bind the context value"""
         self.__exc(chr(14), self.__id + chr(0) + value + chr(0) + datatype)
 
     def iter(self):

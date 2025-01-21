@@ -31,7 +31,7 @@ import org.basex.util.*;
  *     <code>{'foo':42, 'bar':()}</code>)
  * </dl>
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class JsonXQueryConverter extends JsonConverter {
@@ -40,7 +40,7 @@ public final class JsonXQueryConverter extends JsonConverter {
   /** Stack for intermediate arrays. */
   private final Stack<ValueList> arrays = new Stack<>();
   /** Stack for intermediate maps. */
-  private final Stack<XQMap> maps = new Stack<>();
+  private final Stack<MapBuilder> maps = new Stack<>();
 
   /**
    * Constructor.
@@ -67,7 +67,7 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   @Override
   void openObject() {
-    maps.push(XQMap.empty());
+    maps.push(new MapBuilder());
   }
 
   @Override
@@ -79,12 +79,12 @@ public final class JsonXQueryConverter extends JsonConverter {
   void closePair(final boolean add) throws QueryException {
     final Value value = stack.pop();
     final Item key = (Item) stack.pop();
-    if(add) maps.push(maps.pop().put(key, value, null));
+    if(add) maps.peek().put(key, value);
   }
 
   @Override
   void closeObject() {
-    stack.push(maps.pop());
+    stack.push(maps.pop().map());
   }
 
   @Override
@@ -109,8 +109,8 @@ public final class JsonXQueryConverter extends JsonConverter {
   }
 
   @Override
-  public void numberLit(final Item value) throws QueryException {
-    stack.push(value);
+  public void numberLit(final byte[] value) throws QueryException {
+    stack.push(numberParser != null ? numberParser.apply(value) : Dbl.get(Dbl.parse(value, null)));
   }
 
   @Override
@@ -120,7 +120,7 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   @Override
   public void nullLit() {
-    stack.push(Empty.VALUE);
+    stack.push(nullValue);
   }
 
   @Override

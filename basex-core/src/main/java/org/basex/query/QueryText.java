@@ -8,7 +8,7 @@ import org.basex.util.*;
  * This class assembles text string and tokens required by the XQuery processor
  * implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public interface QueryText {
@@ -52,6 +52,7 @@ public interface QueryText {
   /** Parser token. */ String DISTANCE = "distance";
   /** Parser token. */ String DIV = "div";
   /** Parser token. */ String DOCUMENT = "document";
+  /** Parser token. */ String DOCUMENT_NODE = "document-node";
   /** Parser token. */ String ELEMENT = "element";
   /** Parser token. */ String ELSE = "else";
   /** Parser token. */ String EMPTY_SEQUENCE = "empty-sequence";
@@ -59,6 +60,7 @@ public interface QueryText {
   /** Parser token. */ String ENCODING = "encoding";
   /** Parser token. */ String END = "end";
   /** Parser token. */ String ENTIRE = "entire";
+  /** Parser token. */ String ENUM = "enum";
   /** Parser token. */ String ERRORS = "errors";
   /** Parser token. */ String EVERY = "every";
   /** Parser token. */ String EXACTLY = "exactly";
@@ -104,6 +106,7 @@ public interface QueryText {
   /** Parser token. */ String MODULE = "module";
   /** Parser token. */ String MOST = "most";
   /** Parser token. */ String NAMESPACE = "namespace";
+  /** Parser token. */ String NAMESPACE_NODE = "namespace-node";
   /** Parser token. */ String NEXT = "next";
   /** Parser token. */ String NO_INHERIT = "no-inherit";
   /** Parser token. */ String NO_PRESERVE = "no-preserve";
@@ -127,6 +130,7 @@ public interface QueryText {
   /** Parser token. */ String PROCESSING_INSTRUCTION = "processing-instruction";
   /** Parser token. */ String PRESERVE = "preserve";
   /** Parser token. */ String PREVIOUS = "previous";
+  /** Parser token. */ String RECORD = "record";
   /** Parser token. */ String RELATIONSHIP = "relationship";
   /** Parser token. */ String RENAME = "rename";
   /** Parser token. */ String REPLACE = "replace";
@@ -134,6 +138,7 @@ public interface QueryText {
   /** Parser token. */ String REVALIDATION = "revalidation";
   /** Parser token. */ String SAME = "same";
   /** Parser token. */ String SATISFIES = "satisfies";
+  /** Parser token. */ String SCHEMA_ATTRIBUTE = "schema-attribute";
   /** Parser token. */ String SCHEMA_ELEMENT = "schema-element";
   /** Parser token. */ String SCHEMA = "schema";
   /** Parser token. */ String SCORE = "score";
@@ -176,6 +181,7 @@ public interface QueryText {
   /** Parser token. */ String WEIGHT = "weight";
   /** Parser token. */ String WHEN = "when";
   /** Parser token. */ String WHERE = "where";
+  /** Parser token. */ String WHILE = "while";
   /** Parser token. */ String WILDCARDS = "wildcards";
   /** Parser token. */ String WINDOW = "window";
   /** Parser token. */ String WITH = "with";
@@ -216,7 +222,6 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] FN_PREFIX = token("fn");
   /** XQuery prefix. */ byte[] FT_PREFIX = token("ft");
   /** XQuery prefix. */ byte[] GEO_PREFIX = token("geo");
-  /** XQuery prefix. */ byte[] HASH_PREFIX = token("hash");
   /** XQuery prefix. */ byte[] HOF_PREFIX = token("hof");
   /** XQuery prefix. */ byte[] HTML_PREFIX = token("html");
   /** XQuery prefix. */ byte[] HTTP_PREFIX = token("http");
@@ -301,7 +306,6 @@ public interface QueryText {
   /** BaseX URI. */ byte[] DB_URI = token(BXMODULES_URL + "db");
   /** BaseX URI. */ byte[] FETCH_URI = token(BXMODULES_URL + "fetch");
   /** BaseX URI. */ byte[] FT_URI = token(BXMODULES_URL + "ft");
-  /** BaseX URI. */ byte[] HASH_URI = token(BXMODULES_URL + "hash");
   /** BaseX URI. */ byte[] HOF_URI = token(BXMODULES_URL + "hof");
   /** BaseX URI. */ byte[] HTML_URI = token(BXMODULES_URL + "html");
   /** BaseX URI. */ byte[] INDEX_URI = token(BXMODULES_URL + "index");

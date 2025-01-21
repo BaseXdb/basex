@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 /**
  * JTree node which represents a folder.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
 public class ResourceFolder extends ResourceNode {
@@ -101,7 +101,7 @@ public class ResourceFolder extends ResourceNode {
    * @return sub folder path
    */
   byte[] subfolder() {
-    return concat(path.length > 1 ? concat(path, SLASH) : path, name);
+    return concat(path.length > 1 ? concat(path, cpToken('/')) : path, name);
   }
 
   /**
@@ -123,7 +123,7 @@ public class ResourceFolder extends ResourceNode {
   public static byte[] path(final byte[] path) {
     if(path.length == 0) return path;
     final byte[] r = substring(path, 0, lastIndexOf(path, '/'));
-    return r.length == 0 ? SLASH : r;
+    return r.length == 0 ? cpToken('/') : r;
   }
 
   /**

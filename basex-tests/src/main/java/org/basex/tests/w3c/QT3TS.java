@@ -32,7 +32,7 @@ import org.basex.util.options.Options.*;
  * {@code http://dev.w3.org/2011/QT3-test-suite/}. The driver needs to be
  * executed from the test suite directory.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class QT3TS extends Main {
@@ -125,9 +125,9 @@ public final class QT3TS extends Main {
 
     final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);
-    Util.outln(NL + "QT Test Suite " + version);
-    Util.outln("Test directory: " + file(false, "."));
-    Util.out("Parsing queries");
+    Util.println(NL + "QT Test Suite " + version);
+    Util.println("Test directory: " + file(false, "."));
+    Util.print("Parsing queries");
 
     for(final XdmItem ienv : new XQuery("*:catalog/*:environment", ctx).context(doc))
       genvs.add(new QT3Env(ctx, ienv));
@@ -143,7 +143,7 @@ public final class QT3TS extends Main {
     result.append(" Ignored : ").append(ignored).append(NL);
 
     // save log data
-    Util.outln(NL + "Writing log file...");
+    Util.println(NL + "Writing log file...");
     try(PrintOutput po = new PrintOutput(new IOFile("tests.log"))) {
       po.println("QT3TS RESULTS __________________________" + NL);
       po.println(result.toString());
@@ -164,16 +164,16 @@ public final class QT3TS extends Main {
       sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.YES);
       final String file = "ReportingResults/results_" + NAME + '_' + VERSION + IO.XMLSUFFIX;
       new IOFile(file).write(report.create(ctx));
-      Util.outln("Creating report '" + file + "'...");
+      Util.println("Creating report '" + file + "'...");
     }
 
-    Util.out(NL + result);
-    Util.outln(" Time    : " + perf);
+    Util.print(NL + result);
+    Util.println(" Time    : " + perf);
 
     if(slow != null && !slow.isEmpty()) {
-      Util.outln(NL + "Slow queries:");
+      Util.println(NL + "Slow queries:");
       for(final Entry<Long, String> l : slow.entrySet()) {
-        Util.outln("- " + -(l.getKey() / 1000000) + " ms: " + l.getValue());
+        Util.println("- " + -(l.getKey() / 1000000) + " ms: " + l.getValue());
       }
     }
 
@@ -219,7 +219,7 @@ public final class QT3TS extends Main {
    * @throws Exception exception
    */
   private void testCase(final XdmItem test, final ArrayList<QT3Env> envs) throws Exception {
-    if(total++ % 500 == 0) Util.out(".");
+    if(total++ % 500 == 0) Util.print(".");
 
     if(!supported(test)) {
       if(ignoring) ignore.add(asString("@name", test)).add(NL);
@@ -273,7 +273,7 @@ public final class QT3TS extends Main {
       string = string(new IOFile(baseDir, qfile).read());
     }
 
-    if(verbose) Util.outln(name);
+    if(verbose) Util.println(name);
 
     // bind variables
     if(env != null) {
@@ -296,7 +296,7 @@ public final class QT3TS extends Main {
     if(base) query.baseURI(baseURI);
 
     // add modules
-    final String qm = "for $m in *:module return ($m/@uri, $m/@file)";
+    final String qm = "for $m in *:module where $m/@uri return ($m/@uri, $m/@file)";
     final XQuery qmod = new XQuery(qm, ctx).context(test);
     while(true) {
       final XdmItem uri = qmod.next();
@@ -304,6 +304,32 @@ public final class QT3TS extends Main {
       final XdmItem file = qmod.next();
       if(file == null) break;
       query.addModule(uri.getString(), new IOFile(baseDir, file.getString()).path());
+    }
+
+    // collect module locations (test cases modules-30, -31, -32, -33, -40, -41, -42, d1e78807j)
+    final Map<String, IO> locations = new HashMap<>();
+    final String ql = "for $m in *:module where $m/@location return ($m/@location, $m/@file)";
+    final XQuery qloc = new XQuery(ql, ctx).context(test);
+    while(true) {
+      final XdmItem location = qloc.next();
+      if(location == null) break;
+      final XdmItem file = qloc.next();
+      if(file == null) break;
+      locations.put(location.getString(), new IOFile(baseDir, file.getString()));
+    }
+
+    if(!locations.isEmpty()) {
+      final QueryProcessor qp = query.qp();
+      qp.uriResolver(new UriResolver() {
+        @Override
+        public IO resolve(final String path, final String uri, final Uri bas) {
+          qp.uriResolver(null);
+          final IO io = qp.sc.resolve(path, uri);
+          qp.uriResolver(this);
+          final IO file = locations.get(io.path());
+          return file == null ? io : file;
+        }
+      });
     }
 
     final QT3Result returned = new QT3Result();
@@ -432,7 +458,7 @@ public final class QT3TS extends Main {
   /** Flags for dependencies that are not supported. */
   private static final String NOSUPPORT =
     "('schema-location-hint', 'schemaImport', 'schemaValidation', " +
-    "'staticTyping', 'typedData', 'XQUpdate')";
+    "'staticTyping', 'typedData', 'XQUpdate', 'fn-transform-XSLT')";
 
   /**
    * Checks if the current test case is supported.
@@ -441,13 +467,11 @@ public final class QT3TS extends Main {
    */
   private boolean supported(final XdmValue test) {
     // the following query generates a result if the specified test is not supported
-    return all || new XQuery(
-      "*:environment/*:collation |" + // skip collation tests
-      "*:dependency[" +
-      // skip schema imports, schema validation, namespace axis, static typing
-      "@type = 'feature' and (" +
-      " @value = " + NOSUPPORT + " and (@satisfied = 'true' or empty(@satisfied)) or" +
-      " @value != " + NOSUPPORT + "and @satisfied = 'false') or " +
+    final String query = all ? "*:test[@update = 'true']" : "*:dependency[" +
+      // skip various features
+      "@type = 'feature' and @value = " + NOSUPPORT + " and string(@satisfied) = ('', 'true') or " +
+      // skip supported features when test asks for non-support
+      "@type = 'feature' and not(@value = " + NOSUPPORT + ") and string(@satisfied) = 'false' or " +
       // skip fully-normalized unicode tests
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
       // skip xml/xsd 1.1 tests
@@ -456,7 +480,8 @@ public final class QT3TS extends Main {
       "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)'))" +
-        ']', ctx).context(test).value().size() == 0;
+    "]";
+    return new XQuery(query, ctx).context(test).value().size() == 0;
   }
 
   /**
@@ -539,8 +564,7 @@ public final class QT3TS extends Main {
       }
       return msg;
     } catch(final Exception ex) {
-      Util.stack(ex);
-      return "Exception: " + ex.getMessage();
+      return "Flawed test case: " + Util.message(ex);
     }
   }
 
@@ -623,8 +647,8 @@ public final class QT3TS extends Main {
     final String exp = expected.getString();
     try {
       final String query = "declare variable $result external; " + exp;
-      return environment(new XQuery(query, ctx), result.env).variable("$result", result.value).
-          value().getBoolean() ? null : exp;
+      return environment(new XQuery(query, ctx), result.env).context(result.value).variable(
+          "$result", result.value).value().getBoolean() ? null : exp;
     } catch(final XQueryException ex) {
       // should not occur
       return ex.getException().getMessage();
@@ -670,7 +694,7 @@ public final class QT3TS extends Main {
    */
   private String assertDeepEq(final QT3Result result, final XdmValue expected) {
     final XdmValue exp = environment(new XQuery(expected.getString(), ctx), result.env).value();
-    return exp.deepEqual(result.value) ? null : exp.toString();
+    return exp.deepEqual(result.value, true) ? null : exp.toString();
   }
 
   /**
@@ -680,25 +704,8 @@ public final class QT3TS extends Main {
    * @return optional expected test suite result
    */
   private String assertPermutation(final QT3Result result, final XdmValue expected) {
-    // cache expected results
-    final HashSet<String> exp = new HashSet<>();
-    for(final XdmItem item : environment(new XQuery(expected.getString(), ctx), result.env))
-      exp.add(item.getString());
-    // cache actual results
-    final HashSet<String> res = new HashSet<>();
-    for(final XdmItem item : result.value) res.add(item.getString());
-
-    if(exp.size() != res.size())
-      return Util.info("% results (found: %)", exp.size(), res.size());
-
-    for(final String s : exp.toArray(String[]::new)) {
-      if(!res.contains(s)) return Util.info("% (missing)", s);
-    }
-    for(final String s : res.toArray(String[]::new)) {
-      if(!exp.contains(s))
-        return Util.info("% (missing in expected result)", s);
-    }
-    return null;
+    final XdmValue exp = environment(new XQuery(expected.getString(), ctx), result.env).value();
+    return exp.deepEqual(result.value, false) ? null : exp.toString();
   }
 
   /**
@@ -712,31 +719,31 @@ public final class QT3TS extends Main {
     final boolean normalizeSpace = asBoolean("@normalize-space=('true','1')", expected);
     final boolean ignorePrefixes = asBoolean("@ignore-prefixes=('true','1')", expected);
 
-    String exp = expected.getString();
+    String expctd = expected.getString();
     try {
-      if(!file.isEmpty()) exp = string(new IOFile(baseDir, file).read());
-      exp = normNL(exp);
-      if(normalizeSpace) exp = string(normalize(token(exp)));
+      if(!file.isEmpty()) expctd = string(new IOFile(baseDir, file).read());
+      expctd = normNL(expctd);
+      if(normalizeSpace) expctd = string(normalize(token(expctd)));
 
       final XdmValue returned = result.value;
-      final String res = normNL(
-          asString("serialize(., map{ 'indent':'no','method':'xml' })", returned));
-      if(exp.equals(res)) return null;
-      final String r = normNL(asString(
-          "serialize(., map{ 'indent':'no','method':'xml','omit-xml-declaration':'no' })",
+      final String rslt = normNL(
+          asString("serialize(., { 'method': 'xml' })", returned));
+      if(expctd.equals(rslt)) return null;
+      final String rtrnd = normNL(
+          asString("serialize(., { 'method': 'xml', 'omit-xml-declaration': 'no' })",
           returned));
-      if(exp.equals(r)) return null;
+      if(expctd.equals(rtrnd)) return null;
 
       // include check for comments, processing instructions and namespaces
       final StringList options = new StringList();
       options.add("'" + DeepEqualOptions.NAMESPACE_PREFIXES.name() + "':" + !ignorePrefixes + "()");
       options.add("'" + DeepEqualOptions.COMMENTS.name() + "':true()");
       options.add("'" + DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "':true()");
-      final String query = Function.DEEP_EQUAL.args(" <X>" + exp + "</X>",
-          " <X>" + res + "</X>", " ()", " map { " + String.join(", ", options) + " }");
-      return asBoolean(query, expected) ? null : exp;
+      final String query = Function.DEEP_EQUAL.args(" <X>" + expctd + "</X>",
+          " <X>" + rslt + "</X>", " { " + String.join(", ", options) + " }");
+      return asBoolean(query, expected) ? null : expctd;
     } catch(final IOException ex) {
-      return Util.info("% (found: %)", exp, ex);
+      return Util.info("% (found: %)", expctd, ex);
     }
   }
 

@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 /**
  * Arithmetic expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class ArithSimple extends Arith {
@@ -33,7 +33,8 @@ public class ArithSimple extends Arith {
     final Item item1 = exprs[0].item(qc, info);
     if(item1.isEmpty()) return Empty.VALUE;
     final Item item2 = exprs[1].item(qc, info);
-    return item2.isEmpty() ? Empty.VALUE : calcOpt.eval(item1, item2, info);
+    if(item2.isEmpty()) return Empty.VALUE;
+    return calcOpt.eval(item1, item2, info);
   }
 
   @Override

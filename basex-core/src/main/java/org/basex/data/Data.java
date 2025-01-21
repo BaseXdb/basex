@@ -64,7 +64,7 @@ import org.basex.util.list.*;
  * NOTE: the class is not thread-safe. It is imperative that all read/write accesses
  * are synchronized over a single context's read/write lock.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Data {
@@ -347,7 +347,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns a size value (number of descendant table entries).
+   * Returns the size value (number of descendant table entries).
    * @param pre pre value
    * @param kind node kind
    * @return size value
@@ -357,7 +357,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns a number of attributes.
+   * Returns the number of attributes plus 1.
    * @param pre pre value
    * @param kind node kind
    * @return number of attributes
@@ -365,7 +365,9 @@ public abstract class Data {
   public final int attSize(final int pre, final int kind) {
     int s = kind == ELEM ? table.read1(pre, 0) >> 3 & IO.MAXATTS : 1;
     // skip additional attributes if value is larger than maximum range
-    if(s == IO.MAXATTS) while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
+    if(s == IO.MAXATTS) {
+      while(s < meta.size - pre && kind(pre + s) == ATTR) s++;
+    }
     return s;
   }
 
@@ -514,7 +516,7 @@ public abstract class Data {
     meta.update();
 
     if(kind == PI) {
-      updateText(pre, trim(concat(name, SPACE, atom(pre))), PI);
+      updateText(pre, trim(concat(name, cpToken(' '), atom(pre))), PI);
     } else {
       // check if namespace has changed
       final byte[] prefix = prefix(name);
@@ -567,7 +569,7 @@ public abstract class Data {
    * @param value value to be updated (text, comment, pi, attribute, document name)
    */
   public final void update(final int pre, final int kind, final byte[] value) {
-    final byte[] val = kind == PI ? trim(concat(name(pre, kind), SPACE, value)) : value;
+    final byte[] val = kind == PI ? trim(concat(name(pre, kind), cpToken(' '), value)) : value;
     if(eq(val, text(pre, kind != ATTR))) return;
 
     meta.update();

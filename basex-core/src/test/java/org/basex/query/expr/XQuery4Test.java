@@ -5,13 +5,14 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
  * XQuery 4.0 tests.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class XQuery4Test extends SandboxTest {
@@ -32,7 +33,7 @@ public final class XQuery4Test extends SandboxTest {
     query("declare context value as item()* := (1, 2); .", "1\n2");
     query("declare context value as xs:integer* := (1, 2); .", "1\n2");
 
-    error("declare context value as xs:integer := (1, 2); .", INVTREAT_X_X_X);
+    error("declare context value as xs:integer := (1, 2); .", INVCONVERT_X_X_X);
     error("declare context value := 1; declare context value := 2; .", DUPLVALUE);
     error("declare context value := 1; declare context item := 2; .", DUPLVALUE);
     error("declare context item := 1; declare context item := 2; .", DUPLVALUE);
@@ -67,10 +68,10 @@ public final class XQuery4Test extends SandboxTest {
     query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 0]", "");
 
     check("1 otherwise void(2)", 1, root(Int.class));
-    check("void(1) otherwise 2", 2, root(Otherwise.class));
-    check("void(1) otherwise void(2)", "", root(Otherwise.class));
+    check("void(1, true()) otherwise 2", 2, root(Otherwise.class));
+    check("void(1, true()) otherwise void(2, true())", "", root(Otherwise.class));
 
-    check("count(void(1) otherwise void(2))", 0, root(COUNT));
+    check("count(void(1, true()) otherwise void(2, true()))", 0, root(COUNT));
     query("count((1 to 10)[. = 0] otherwise (1 to 10)[. = 2])", 1);
     query("count((1 to 10)[. = 1] otherwise (1 to 10)[. = 2])", 1);
 
@@ -111,8 +112,8 @@ public final class XQuery4Test extends SandboxTest {
     check("(3, <_>4</_>)[. = 3] otherwise ()", 3, root(IterFilter.class));
     check("(4, <_>5</_>)[. = 4] otherwise <z/>", 4, root(Otherwise.class));
 
-    check(VOID.args(1) + " otherwise 2", 2, root(Otherwise.class));
-    check(VOID.args(2) + " otherwise " + VOID.args(3), "", root(Otherwise.class));
+    check("void(1, true()) otherwise 2", 2, root(Otherwise.class));
+    check("void(2, true()) otherwise void(3, true())", "", root(Otherwise.class));
 
     check("<_>6</_>[. = 6] otherwise 7", "<_>6</_>", root(Otherwise.class));
   }
@@ -157,8 +158,8 @@ public final class XQuery4Test extends SandboxTest {
     query("for member $m at $p in [ 3, 4 ] return $p", "1\n2");
     query("for member $m at $p in [ (3, 2), 1, () ] return count($p)", "1\n1\n1");
 
-    check("for member $m in [ (3, 2), 1, () ] return sum($m)", "5\n1\n0", empty(_ARRAY_VALUES));
-    check("for member $m in [ (3, 2), 1, () ] return count($m)", "2\n1\n0", exists(_ARRAY_VALUES));
+    check("for member $m in [ (3, 2), 1, () ] return sum($m)", "5\n1\n0", empty(_ARRAY_ITEMS));
+    check("for member $m in [ (3, 2), 1, () ] return count($m)", "2\n1\n0", exists(_ARRAY_ITEMS));
 
     error("for member $m allowing empty in 1 return $m", WRONGCHAR_X_X);
   }
@@ -416,7 +417,7 @@ public final class XQuery4Test extends SandboxTest {
     query("try { 1 + <_/> } catch * { $err:map?line-number }", 1);
     query("try { 1 + <_/> } catch * { boolean($err:map?additional) }", true);
     query("try { 1 + <_/> } catch * { $err:map?value }", "");
-    query("try { 1 + <_/> } catch * { map:size($err:map) }", 6);
+    query("try { 1 + <_/> } catch * { map:size($err:map) }", 7);
 
     query("try { error((), (), 1) } catch * { $err:map?value }", 1);
     query("try { error(xs:QName('a')) } catch * { $err:map?code }", "a");
@@ -501,5 +502,128 @@ public final class XQuery4Test extends SandboxTest {
     query("for sliding window $w in 1 to 4 "
         + "only end $e when $e = 3 "
         + "return sum($w)", "6\n5\n3");
+  }
+
+  /** Record tests. */
+  @Test public void recordTest() {
+    query("{} instance of record(*)", true);
+    query("{} instance of record(x?, *)", true);
+    query("{} instance of record(x?, y?, *)", true);
+    query("{ 'x': 1 } instance of record(x, y?, *)", true);
+    query("{ 'y': 1 } instance of record(x?, y, *)", true);
+    query("{ 'x': 1 } instance of record(x as xs:integer)", true);
+    query("{ 'x': 1 } instance of record(x as xs:integer, *)", true);
+
+    query("{} instance of record(x, *)", false);
+    query("{ 'x': 1 } instance of record(x?, y, *)", false);
+    query("{ 'y': 1 } instance of record(x, y?, *)", false);
+    query("{ 'x': 1 } instance of record(x as xs:string)", false);
+    query("{ 'x': 1 } instance of record(x as xs:string, *)", false);
+    query("{ 'x': 1 } instance of record(x? as xs:string)", false);
+    query("{ 'x': 1 } instance of record(x? as xs:string, *)", false);
+
+    error("{} instance of record(*, x)", WRONGCHAR_X_X);
+  }
+
+  /** While clause. */
+  @Test public void whilee() {
+    query("for $i in 1 to 4 while $i > 2 return $i", "");
+    query("for $i in 1 to 4 while $i < 3 return $i", "1\n2");
+    query("for $i in 1 to 4 while $i return $i", "1\n2\n3\n4");
+    query("for $i in 1 to 4 order by $i descending while $i > 2 return $i", "4\n3");
+    query("for $i allowing empty in () while count($i) = 0 return 1", 1);
+    query("for $i allowing empty in () while count($i) != 0 return 1", "");
+  }
+
+  /** Structure filter. */
+  @Test public void structFilter() {
+    query("[]?[true()]", "[]");
+    query("[]?[false()]", "[]");
+
+    query("[ 1 ]?[true()]", "[1]");
+    query("[ 1 ]?[false()]", "[]");
+
+    query("[ 1, 2 ]?[true()]", "[1,2]");
+    query("[ 1, 2 ]?[false()]", "[]");
+
+    query("[ 1, 2 ]?[1]", "[1]");
+    query("[ 1, 2 ]?[3]", "[]");
+    query("[ 1, 2 ]?['a']", "[1,2]");
+    query("[ 1, 2 ]?['']", "[]");
+
+    query("[ 1, 2 ]?['a']?['a']?['a']", "[1,2]");
+    query("[ 1, 2 ]?[1]?[1]?[1]", "[1]");
+
+    query("{}?[true()]", "{}");
+    query("{}?[false()]", "{}");
+
+    query("{ 1: 2 }?[true()]", "{1:2}");
+    query("{ 1: 2 }?[false()]", "{}");
+
+    query("{ 1: 2, 3: 4}?[true()]", "{1:2,3:4}");
+    query("{ 1: 2, 3: 4}?[false()]", "{}");
+
+    query("{ 1: 2, 3: 4}?[?key = 1]", "{1:2}");
+    query("{ 1: 2, 3: 4}?[?key = 8]", "{}");
+    query("{ 1: 2, 3: 4}?[?value = 2]", "{1:2}");
+    query("{ 1: 2, 3: 4}?[?value = 9]", "{}");
+    query("{ 1: 2, 3: 4}?['a']", "{1:2,3:4}");
+    query("{ 1: 2, 3: 4}?['']", "{}");
+
+    query("{ 1: 2, 3: 4}?['a']?['a']?['a']", "{1:2,3:4}");
+    query("{ 1: 2, 3: 4}?[?key = 1]?[?key = 1]?[?key = 1]", "{1:2}");
+    query("{ 1: 2, 3: 4}?[?value = 2]?[?value = 2]?[?value = 2]", "{1:2}");
+  }
+
+  /** Lookup arrow. */
+  @Test public void lookupArrow() {
+    query("{ 'size': map:size#1 } =?> size()", 1);
+    query("{ 'size': map:size#1, 'map': identity#1 } =?> map() =?> size()", 2);
+    query("<a/>[. = 'x'] =?> f()", "");
+
+    query("let $data := { 'size': map:size#1 } return $data =?> size()", 1);
+    query("for $i in 1 let $map := { 'n': fn { $i } } return $map =?> n()", 1);
+    query("for $i in 1 to 2 let $map := { 'n': fn { $i } } return $map =?> n()", "1\n2");
+    query("for $i in 1 to 6 let $map := { 'n': fn { $i } } return $map =?> n()",
+        "1\n2\n3\n4\n5\n6");
+
+    check("() =?> f()", "", empty());
+    check("(<a/>[. = 'x'] =?> f(), 1)", 1, exists(List.class));
+    check("(<a/>[. = 'x'] =?> f(), <a/>[. = 'x'] =?> f())", "", exists(REPLICATE));
+    check("let $f := fn($m) { $m =?> f() } return $f({ 'f': count#1 })", 1,
+        root(DynFuncCall.class));
+    inline(true);
+    check("let $f := fn($m) { $m =?> f() } return $f({ 'f': count#1 })", 1,
+        root(LookupArrow.class));
+
+    error("'f' =?> f()", INVCONVERT_X_X_X);
+    error("{} =?> f()", INVCONVERT_X_X_X);
+    error("{ 'f': 1 } =?> f()", INVCONVERT_X_X_X);
+    error("{ 'f': true#0 } =?> f()", INVARITY_X_X);
+  }
+
+  /** Array coercion. */
+  @Test public void arrayCoercion() {
+    query("fn($a as array(xs:integer)) { $a }([ 1.0 ])", "[1]");
+    query("fn($a as array(xs:double)) { $a }([ 1, 2 ])", "[1.0e0,2.0e0]");
+    query("fn($a as array(xs:byte)) { $a }([ 1, 2 ])", "[1,2]");
+
+    query("fn($a as array(xs:double)) { $a }([ 1, 2 ]) instance of array(xs:double)", true);
+    query("fn($a as array(xs:byte)) { $a }([ 1, 2 ]) instance of array(xs:byte)", true);
+    query("fn($a as array(xs:double)) { $a }([ 1, 2 ]) instance of array(xs:integer)", false);
+
+    error("fn($a as array(xs:integer)) { $a }([ 1.2 ])", INVCONVERT_X_X_X);
+  }
+
+  /** Map coercion. */
+  @Test public void mapCoercion() {
+    query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 })", "{1.2e0:0}");
+
+    query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 }) instance of map(xs:double, item())",
+        true);
+    query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 }) instance of map(xs:integer, item())",
+        false);
+
+    error("fn($a as map(xs:float, item())) { $a }({ 1.2: 0, 1.2000000001: 0 })", INVCONVERT_X_X_X);
   }
 }

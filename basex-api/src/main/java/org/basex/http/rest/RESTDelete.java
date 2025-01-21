@@ -4,11 +4,12 @@ import java.io.*;
 
 import org.basex.core.cmd.*;
 import org.basex.http.*;
+import org.basex.query.*;
 
 /**
  * REST-based evaluation of DELETE operations.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class RESTDelete {
@@ -19,9 +20,10 @@ final class RESTDelete {
    * Creates and returns a REST command.
    * @param session REST session
    * @return command
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  static RESTExec get(final RESTSession session) throws IOException {
+  static RESTExec get(final RESTSession session) throws QueryException, IOException {
     RESTCmd.assignOptions(session);
 
     final HTTPConnection conn = session.conn;

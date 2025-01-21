@@ -11,13 +11,13 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.server.Log.*;
 import org.basex.util.*;
+import org.basex.util.log.*;
 
 /**
  * Scheduled XQuery job.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class QueryJob extends Job implements Runnable {
@@ -34,7 +34,7 @@ public final class QueryJob extends Job implements Runnable {
   private boolean remove;
 
   /**
-   * Constructor.
+   * Constructor, which creates and registers the specified job.
    * @param job job info
    * @param context database context
    * @param info input info (can be {@code null})

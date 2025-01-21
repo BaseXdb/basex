@@ -13,10 +13,13 @@ import org.basex.util.*;
 /**
  * DateTime item ({@code xs:dateTime}).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Dtm extends ADate {
+  /** UNIX time. */
+  public static final Dtm ZERO = get(0);
+
   /**
    * Constructor.
    * @param date date
@@ -52,30 +55,30 @@ public final class Dtm extends ADate {
 
   /**
    * Constructor.
-   * @param date date
+   * @param dateTime date time
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public Dtm(final byte[] date, final InputInfo info) throws QueryException {
+  public Dtm(final byte[] dateTime, final InputInfo info) throws QueryException {
     super(AtomType.DATE_TIME);
-    final int i = Token.indexOf(date, 'T');
-    if(i == -1) throw dateError(date, XDTM, info);
-    date(Token.substring(date, 0, i), XDTM, info);
-    time(Token.substring(date, i + 1), XDTM, info);
+    final int i = Token.indexOf(dateTime, 'T');
+    if(i == -1) throw dateError(dateTime, XDTM, info);
+    date(Token.substring(dateTime, 0, i), XDTM, info);
+    time(Token.substring(dateTime, i + 1), XDTM, info);
   }
 
   /**
    * Constructor.
-   * @param date date
+   * @param dateTime date
    * @param dur duration
    * @param plus plus/minus flag
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public Dtm(final Dtm date, final Dur dur, final boolean plus, final InputInfo info)
+  public Dtm(final Dtm dateTime, final Dur dur, final boolean plus, final InputInfo info)
       throws QueryException {
 
-    this(date);
+    this(dateTime);
     if(dur instanceof DTDur) {
       calc((DTDur) dur, plus);
       if(year <= MIN_YEAR || year > MAX_YEAR) throw YEARRANGE_X.get(info, year);

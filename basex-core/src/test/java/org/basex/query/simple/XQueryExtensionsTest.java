@@ -1,12 +1,16 @@
 package org.basex.query.simple;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.*;
+import org.basex.query.expr.*;
+import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
  * XQuery extensions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class XQueryExtensionsTest extends SandboxTest {
@@ -24,6 +28,48 @@ public final class XQueryExtensionsTest extends SandboxTest {
   @Test public void errAdditional() {
     query("try { error() } catch * { count($err:additional) }", 1);
     query("let $f := function () { error() } " +
-        "return try { $f() } catch * { count($err:additional) }", 2);
+        "return try { $f() } catch * { count($err:additional) }", 1);
+    query("let $f := function () { error() } " +
+        "return try { $f() } catch * { count($err:stack-trace) }", 1);
+  }
+
+  /** Pipeline operator. */
+  @Test public void pipeline() {
+    query(wrap(1) + " -> (., . to 6)", "1\n1\n2\n3\n4\n5\n6");
+    query("count(" + wrap(1) + " -> (., . to 6))", 7);
+
+    query("<x/>/parent::* -> (self::y or count(*) eq 1)", false);
+
+    check("2 -> .", 2, root(Int.class));
+    check("2 -> .", 2, root(Int.class));
+
+    check("void((), true()) -> void((), true()) -> 2", 2, root(Pipeline.class), count(VOID, 2));
+    check("void((), true()) -> 2", 2, root(Pipeline.class));
+    check("void((), true()) -> . -> 2", 2, root(Pipeline.class), empty(ContextValue.class));
+    check("(void((), true()) -> void((), true())) -> 2", 2, count(Pipeline.class, 1));
+
+    check("(1, 2) -> (head(.) + tail(.))", 3, root(Int.class));
+    check("(<a/>, <b/>) -> (foot(.), head(.))", "<b/>\n<a/>", root(Pipeline.class));
+
+    check("2 -> (. * .)", 4, root(Int.class));
+    check("<a>2</a> -> (. * .)", 4, root(Dbl.class));
+    check("<?_ 2?> -> xs:integer() -> (. * .)", 4, root(Pipeline.class));
+
+    check("<?_ 2?> ! xs:integer() ! (. * .) ! (. * .)", 16,
+        count(Pipeline.class, 1), root(Pipeline.class));
+    check("<?_ 2?> ! xs:integer() ! (. * .) -> (. * .)", 16,
+        count(Pipeline.class, 1), root(Pipeline.class));
+    check("<?_ 2?> ! xs:integer() -> (. * .) ! (. * .)", 16,
+        count(Pipeline.class, 1), root(Pipeline.class));
+    check("<?_ 2?> -> xs:integer() ! (. * .) ! (. * .)", 16,
+        count(Pipeline.class, 1), root(Pipeline.class));
+    check("<?_ 2?> ! xs:integer() -> (. * .) -> (. * .)", 16,
+        count(Pipeline.class, 1), root(Pipeline.class));
+    check("<?_ 2?> -> xs:integer() ! (. * .) -> (. * .)", 16,
+        count(Pipeline.class, 1), root(Pipeline.class));
+    check("<?_ 2?> -> xs:integer() -> (. * .) ! (. * .)", 16,
+        count(Pipeline.class, 1), root(Pipeline.class));
+    check("<?_ 2?> -> xs:integer() -> (. * .) -> (. * .)", 16,
+        count(Pipeline.class, 1), root(Pipeline.class));
   }
 }

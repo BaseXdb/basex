@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * Functions on relational databases.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Rositsa Shadura
  */
 public final class SqlConnect extends SqlFn {
@@ -41,7 +41,7 @@ public final class SqlConnect extends SqlFn {
     final Connection conn;
     try {
       conn = DriverManager.getConnection(url, props);
-      if(auto != null) conn.setAutoCommit(Strings.toBoolean(auto.toString()));
+      if(auto != null) conn.setAutoCommit(Strings.isTrue(auto.toString()));
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }

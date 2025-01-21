@@ -7,14 +7,16 @@ import org.basex.build.json.JsonOptions.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FnJsonDoc extends Parse {
@@ -22,7 +24,7 @@ public class FnJsonDoc extends Parse {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item;
     try {
-      item = unparsedText(qc, false, false);
+      item = unparsedText(qc, false, false, null);
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw ex.error() == INVCHARS_X ? PARSE_JSON_X.get(info, ex.getLocalizedMessage()) : ex;
@@ -70,24 +72,33 @@ public class FnJsonDoc extends Parse {
   protected final JsonConverter converter(final QueryContext qc, final JsonFormat format)
       throws QueryException {
 
-    final boolean dflt = format != null;
-    final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), !dflt, qc);
-    if(dflt) options.set(JsonOptions.FORMAT, format);
+    final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), qc);
+    if(format != null) options.set(JsonOptions.FORMAT, format);
 
     final JsonConverter jc = JsonConverter.get(options);
-    final FuncItem fb = options.get(JsonParserOptions.FALLBACK);
-    if(fb != null) {
-      toFunction(fb, 1, qc);
-      jc.fallback(s -> fb.invoke(qc, info, Str.get(s)).item(qc, info).string(info));
+    final JsonFormat jf = options.get(JsonOptions.FORMAT);
+    if(options.get(JsonParserOptions.VALIDATE) != null && jf != JsonFormat.BASIC) {
+      throw OPTION_X.get(info, Options.unknown(JsonParserOptions.VALIDATE));
+    }
+
+    final Value fallback = options.get(JsonParserOptions.FALLBACK);
+    if(!fallback.isEmpty()) {
+      final FItem fb = toFunction(fallback, 1, qc);
+      jc.fallback(s -> toAtomItem(fb.invoke(qc, info, Str.get(s)), qc).string(info));
       if(options.get(JsonParserOptions.ESCAPE)) {
         throw OPTION_JSON_X.get(info, "Escape cannot be combined with fallback function.");
       }
     }
-    final FuncItem np = options.get(JsonParserOptions.NUMBER_PARSER);
-    if(np != null) {
-      toFunction(np, 1, qc);
+    final Value numberParser = options.get(JsonParserOptions.NUMBER_PARSER);
+    if(!numberParser.isEmpty()) {
+      final FItem np = toFunction(numberParser, 1, qc);
       jc.numberParser(s -> np.invoke(qc, info, Atm.get(s)).item(qc, info));
     }
+    final Value nll = options.get(JsonParserOptions.NULL);
+    if(nll != Empty.VALUE && jf != JsonFormat.XQUERY) {
+      throw OPTION_X.get(info, Options.unknown(JsonParserOptions.NULL));
+    }
+    jc.nullValue(nll);
     return jc;
   }
 }

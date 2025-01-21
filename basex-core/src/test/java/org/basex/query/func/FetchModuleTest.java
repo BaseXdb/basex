@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Fetch Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FetchModuleTest extends SandboxTest {
@@ -65,7 +65,7 @@ public final class FetchModuleTest extends SandboxTest {
     query(COUNT.args(func.args(CSV,
         " map { 'parser': 'csv', 'csvparser': map { 'header': 'true' } }") + "//City"), 3);
 
-    error(func.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X_X);
+    error(func.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X);
     error(func.args(XML + 'x'), WHICHRES_X);
     error(func.args("httttp://x"), FETCH_OPEN_X);
   }

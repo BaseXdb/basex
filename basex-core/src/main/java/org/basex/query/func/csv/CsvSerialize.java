@@ -13,14 +13,14 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CsvSerialize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final CsvSerialOptions options = toOptions(arg(1), new CsvSerialOptions(), true, qc);
+    final CsvOptions options = toOptions(arg(1), new CsvOptions(), qc);
 
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.CSV);

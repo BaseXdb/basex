@@ -1,7 +1,7 @@
 (:~
  : Download log file.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/logs';
 
@@ -14,22 +14,22 @@ declare variable $dba:CAT := 'logs';
  : @return single or zipped file
  :)
 declare
-  %rest:GET
-  %rest:path('/dba/log-download')
-  %rest:query-param('name', '{$names}')
-function dba:log-download(
+  %rest:POST
+  %rest:path('/dba/logs-download')
+  %rest:form-param('name', '{$names}')
+function dba:logs-download(
   $names  as xs:string*
 ) as item()+ {
-  if(count($names) = 1) then (
+  if (count($names) = 1) {
     web:response-header(
-      map { 'media-type': 'text/plain' },
-      map { 'Content-Disposition': 'attachment; filename=' || $names || '.log' }
+      { 'media-type': 'text/plain' },
+      { 'Content-Disposition': 'attachment; filename=' || $names || '.log' }
     ),
     file:read-binary(db:option('dbpath') || '/.logs/' || $names || '.log')
-  ) else (
+  } else {
     web:response-header(
-      map { 'media-type': 'application/zip' },
-      map { 'Content-Disposition': 'attachment; filename=' ||
+      { 'media-type': 'application/zip' },
+      { 'Content-Disposition': 'attachment; filename=' ||
         string-join(sort($names)[position() = (1, last())], '_') || '.zip' }
     ),
     let $logs := $names ! (. || '.log')
@@ -37,5 +37,5 @@ function dba:log-download(
       $logs,
       $logs ! file:read-binary(db:option('dbpath') || '/.logs/' || .)
     )
-  )
+  }
 };

@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Abstract super class for dates and durations.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class ADateDur extends Item {
@@ -57,7 +57,7 @@ public abstract class ADateDur extends Item {
    * Returns the seconds (0-59), including the fractional part.
    * @return day
    */
-  public abstract BigDecimal sec();
+  public abstract BigDecimal seconds();
 
   /**
    * Throws a date format exception.

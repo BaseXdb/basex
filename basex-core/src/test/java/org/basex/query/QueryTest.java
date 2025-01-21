@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests query evaluation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class QueryTest extends SandboxTest {
@@ -172,7 +172,7 @@ public abstract class QueryTest extends SandboxTest {
    * @return iterator
    */
   protected static Item decimal(final int integer) {
-    return Dec.get(new BigDecimal(integer));
+    return Dec.get(BigDecimal.valueOf(integer));
   }
 
   /**

@@ -30,7 +30,7 @@ import org.basex.util.hash.*;
 /**
  * Renders and provides edit capabilities for text.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class TextPanel extends BaseXPanel {
@@ -1010,23 +1010,22 @@ public class TextPanel extends BaseXPanel {
    */
   private void gotoLine() {
     final byte[] last = editor.text();
-    final int ll = last.length;
-    final int cr = getCaret();
-    int l = 1;
-    for(int e = 0; e < ll && e < cr; e += cl(last, e)) {
-      if(last[e] == '\n') ++l;
+    final int ll = last.length, cr = getCaret();
+    int line = 1;
+    for(int l = 0; l < ll && l < cr; l += cl(last, l)) {
+      if(last[l] == '\n') ++line;
     }
-    final DialogLine dl = new DialogLine(gui, l);
+    final DialogLine dl = new DialogLine(gui, line);
     if(!dl.ok()) return;
     final int el = dl.line();
-    l = 1;
-    int p = 0;
-    for(int e = 0; e < ll && l < el; e += cl(last, e)) {
-      if(last[e] != '\n') continue;
-      p = e + 1;
-      ++l;
+    line = 1;
+    int pos = 0;
+    for(int l = 0; l < ll && line < el; l += cl(last, l)) {
+      if(last[l] != '\n') continue;
+      pos = l + 1;
+      ++line;
     }
-    setCaret(p);
+    setCaret(pos);
     gui.editor.posCode.invokeLater();
   }
 

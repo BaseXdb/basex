@@ -2,6 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -11,7 +12,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayFilter extends ArrayFn {
@@ -20,10 +21,10 @@ public final class ArrayFilter extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
-    int p = 0;
+    final HofArgs args = new HofArgs(2, predicate).set(0, arg(0).value(qc));
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final Value value : array.members()) {
-      if(toBoolean(qc, predicate, value, Int.get(++p))) ab.append(value);
+    for(final Value value : array.iterable()) {
+      if(test(predicate, args.set(0, value).inc(), qc)) ab.append(value);
     }
     return ab.array(this);
   }
@@ -35,10 +36,14 @@ public final class ArrayFilter extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      arg(1, arg -> refineFunc(arg, cc, SeqType.BOOLEAN_O, ((ArrayType) type).declType,
-          SeqType.INTEGER_O));
+      arg(1, arg -> refineFunc(arg, cc, ((ArrayType) type).valueType, SeqType.INTEGER_O));
       exprType.assign(type);
     }
     return this;
+  }
+
+  @Override
+  public int hofIndex() {
+    return 1;
   }
 }

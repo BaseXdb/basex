@@ -1,7 +1,7 @@
 (:~
  : Delete log files.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/logs';
 
@@ -16,16 +16,16 @@ declare variable $dba:CAT := 'logs';
  : @return redirection
  :)
 declare
-  %rest:GET
-  %rest:path('/dba/log-delete')
-  %rest:query-param('name', '{$names}')
-function dba:log-delete(
+  %rest:POST
+  %rest:path('/dba/logs-delete')
+  %rest:form-param('name', '{$names}')
+function dba:logs-delete(
   $names  as xs:string*
 ) as element(rest:response) {
   try {
     $names ! admin:delete-logs(.),
-    web:redirect($dba:CAT, map { 'info': utils:info($names, 'log', 'deleted') })
+    web:redirect($dba:CAT, { 'info': utils:info($names, 'log', 'deleted') })
   } catch * {
-    web:redirect($dba:CAT, map { 'error': $err:description })
+    web:redirect($dba:CAT, { 'error': $err:description })
   }
 };

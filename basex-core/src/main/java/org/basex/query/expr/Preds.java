@@ -7,6 +7,7 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
@@ -20,7 +21,7 @@ import org.basex.util.*;
 /**
  * Abstract predicate expression, implemented by {@link Filter} and {@link Step}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Preds extends Arr {
@@ -39,7 +40,8 @@ public abstract class Preds extends Arr {
     // called at an early stage as it affects the optimization of predicates
     final Expr root = type(cc.qc.focus.value);
     final int el = exprs.length;
-    if(el != 0) cc.get(this, () -> {
+    final boolean value = this instanceof StructFilter;
+    if(el != 0) cc.get(value ? null : this, !value, () -> {
       if(root != null) {
         final long size = root.size();
         if(size != -1) cc.qc.focus.size = size;
@@ -61,54 +63,20 @@ public abstract class Preds extends Arr {
   protected abstract Expr type(Expr expr);
 
   /**
-   * Assigns the sequence type and result size.
-   * @param root root expression
-   * @return whether the evaluation can be skipped
-   */
-  private boolean exprType(final Expr root) {
-    long max = root.size();
-    boolean exact = max != -1;
-    if(!exact) max = Long.MAX_VALUE;
-
-    // check for positional predicates
-    for(final Expr expr : exprs) {
-      if(expr instanceof Int || Function.LAST.is(expr)) {
-        // use minimum of old value and 1
-        max = Math.min(max, 1);
-      } else if(expr instanceof IntPos) {
-        final IntPos pos = (IntPos) expr;
-        // subtract start position. example: ...[1 to 2][2]  ->  2  ->  1
-        if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
-        // use minimum of old value and range. example: ...[1 to 5]  ->  5
-        max = Math.min(max, pos.max - pos.min + 1);
-      } else {
-        // resulting size will be unknown for any other filter
-        exact = false;
-      }
-    }
-
-    final boolean empty = max == 0;
-    SeqType st = root.seqType();
-    st = max == 1 ? st.with(Occ.ZERO_OR_ONE) : st.union(Occ.ZERO);
-    exprType.assign(st, exact || empty ? max : -1);
-    return empty;
-  }
-
-  /**
    * Checks if the specified item matches the predicates.
    * @param item item to be checked
    * @param qc query context
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean match(final Item item, final QueryContext qc) throws QueryException {
+  protected final boolean test(final Item item, final QueryContext qc) throws QueryException {
     // set context value and position
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
     qf.value = item;
     try {
       for(final Expr expr : exprs) {
-        if(!expr.test(qc, info, true)) return false;
+        if(!expr.test(qc, info, qf.pos)) return false;
       }
       return true;
     } finally {
@@ -117,34 +85,34 @@ public abstract class Preds extends Arr {
   }
 
   /**
-   * Simplifies all predicates.
+   * Optimizes all predicates.
    * @param cc compilation context
    * @param root root expression
-   * @return {@code true} if evaluation can be skipped
+   * @return whether the evaluation can be skipped
    * @throws QueryException query exception
    */
-  protected final boolean simplify(final CompileContext cc, final Expr root) throws QueryException {
-    return cc.ok(root, () -> {
+  protected final boolean optimize(final CompileContext cc, final Expr root) throws QueryException {
+    return cc.ok(root, true, () -> {
       final ExprList list = new ExprList(exprs.length);
-      for(final Expr expr : exprs) simplify(expr, list, root, cc);
+      for(final Expr expr : exprs) optimize(expr, list, root, cc);
       exprs = list.finish();
       return optimizeEbv(false, true, cc);
-    }) || exprType(root);
+    }) || optimizeType(root);
   }
 
   /**
-   * Simplifies a predicate.
+   * Optimizes a predicate.
    * @param pred predicate
    * @param list resulting predicates
    * @param root root expression
    * @param cc compilation context
    * @throws QueryException query exception
    */
-  private void simplify(final Expr pred, final ExprList list, final Expr root,
+  private void optimize(final Expr pred, final ExprList list, final Expr root,
       final CompileContext cc) throws QueryException {
 
-    // E[exists(nodes)]  ->  E[nodes]
-    // E[count(nodes)]  will not be rewritten
+    // E[exists($nodes)]  ->  E[$nodes]
+    // E[count($nodes)]  will not be rewritten
     Expr expr = pred.simplifyFor(Simplify.PREDICATE, cc);
 
     // map operator: E[. ! ...]  ->  E[...], E[E ! ...]  ->  E[...]
@@ -159,7 +127,7 @@ public abstract class Preds extends Arr {
     if(expr instanceof Path && rst.type instanceof NodeType) {
       final Path path = (Path) expr;
       if(first.test(path.root) && !path.steps[0].has(Flag.POS)) {
-        expr = Path.get(cc, expr.info(), null, path.steps);
+        expr = Path.get(cc, expr.info(info), null, path.steps);
       }
     }
 
@@ -191,32 +159,76 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // positional tests:
-    //   <a/>/.[position() = 1]  ->  <a/>/.[true()]
-    //   $child/..[position() > 1]  ->  $child/..[false()]
+    // positional tests: x[1]  ->  x[pos: 1]
+    if(expr.seqType().type.instanceOf(AtomType.NUMERIC)) {
+      final Expr ex = Pos.get(expr, OpV.EQ, info, cc, null);
+      if(ex != null) expr = ex;
+    }
+
+    // <a/>/.[pos: 1]  ->  <a/>/.[true()]
+    // $child/..[pos: 2, 5]  ->  $child/..[false()]
     if(root instanceof Step) {
       final Axis axis = ((Step) root).axis;
-      if(axis == Axis.SELF || axis == Axis.PARENT) {
-        if(expr instanceof Int) {
-          expr = Bln.get(((Int) expr).itr() == 1);
-        } else if(expr instanceof IntPos) {
-          expr = Bln.get(((IntPos) expr).min == 1);
-        }
+      if((axis == Axis.SELF || axis == Axis.PARENT) && expr instanceof IntPos) {
+        expr = Bln.get(((IntPos) expr).min == 1);
       }
     }
 
     // recursive optimization of AND expressions: E[A and [B and C]]  ->  E[A][B][C]
     if(expr instanceof And && !expr.has(Flag.POS)) {
       cc.info(OPTPRED_X, expr);
-      for(final Expr ex : expr.args()) {
-        final boolean numeric = ex.seqType().mayBeNumber();
-        simplify(numeric ? cc.function(Function.BOOLEAN, info, ex) : ex, list, root, cc);
+      for(final Expr arg : expr.args()) {
+        final boolean numeric = arg.seqType().mayBeNumber();
+        optimize(numeric ? cc.function(Function.BOOLEAN, info, arg) : arg, list, root, cc);
       }
       expr = Bln.TRUE;
     }
 
     // add predicate to list
     if(expr != Bln.TRUE) list.add(cc.simplify(pred, expr, Simplify.PREDICATE));
+  }
+
+  /**
+   * Assigns the sequence type and result size.
+   * @param root root expression
+   * @return whether the evaluation can be skipped
+   */
+  private boolean optimizeType(final Expr root) {
+    long max = root.size();
+    boolean exact = max != -1;
+    if(!exact) max = Long.MAX_VALUE;
+
+    // positional predicates
+    for(final Expr expr : exprs) {
+      if(expr instanceof Pos && Function.LAST.is(((Pos) expr).expr) || expr instanceof SimplePos &&
+          ((SimplePos) expr).exact() && Function.LAST.is(expr.arg(0))) {
+        // use minimum of old value and 1
+        max = Math.min(max, 1);
+      } else if(expr instanceof IntPos) {
+        final IntPos pos = (IntPos) expr;
+        // subtract start position. example: ...[pos: 1, 2][2]  ->  2  ->  1
+        if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
+        // use minimum of old value and range. example: ...[pos: 1, 5]  ->  5
+        max = Math.min(max, pos.max - pos.min + 1);
+      } else {
+        // resulting size will be unknown for any other filter
+        exact = false;
+      }
+      // no results will be returned
+      if(max == 0) return true;
+    }
+
+    // (1, 'x')[. instance of xs:integer]  ->  xs:integer*
+    SeqType st = root.seqType();
+    for(final Expr expr : exprs) {
+      if(expr instanceof Instance && expr.arg(0) instanceof ContextValue) {
+        st = st.intersect(((Instance) expr).seqType.with(st.occ));
+        // E[. instance of xs:integer][. instance of xs:string]  ->  ()
+        if(st == null) return true;
+      }
+    }
+    exprType.assign(max == 1 ? st.with(Occ.ZERO_OR_ONE) : st.union(Occ.ZERO), exact ? max : -1);
+    return false;
   }
 
   /**
@@ -269,9 +281,7 @@ public abstract class Preds extends Arr {
         type1 == type2 || type1.isStringOrUntyped() && type2.isStringOrUntyped()
       )) && !op2.has(Flag.CTX)) {
         final Expr expr = createExpr.apply(op1, true);
-        if(expr != this) {
-          return new CmpG(cmp.info, expr, op2, cmp.opG(), cmp.coll, cmp.sc).optimize(cc);
-        }
+        if(expr != this) return new CmpG(cmp.info, expr, op2, cmp.opG()).optimize(cc);
       }
     }
 
@@ -306,7 +316,8 @@ public abstract class Preds extends Arr {
 
   @Override
   public boolean inlineable(final InlineContext ic) {
-    if(ic.expr instanceof ContextValue && ic.var != null) {
+    // do not replace $v with .:  EXPR[. = $v]
+    if(ic.var != null && ic.expr.has(Flag.CTX)) {
       for(final Expr expr : exprs) {
         if(expr.uses(ic.var)) return false;
       }
@@ -315,7 +326,14 @@ public abstract class Preds extends Arr {
   }
 
   @Override
+  public int exprSize() {
+    int size = 1;
+    for(final Expr expr : exprs) size += expr.exprSize();
+    return size;
+  }
+
+  @Override
   public void toString(final QueryString qs) {
-    for(final Expr expr : exprs) qs.bracket(expr);
+    for(final Expr expr : exprs) qs.braced("[", expr, "]");
   }
 }

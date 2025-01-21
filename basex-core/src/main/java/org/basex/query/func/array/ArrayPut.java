@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayPut extends ArrayFn {
@@ -26,8 +26,8 @@ public final class ArrayPut extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Type type = arg(0).seqType().type;
     if(type instanceof ArrayType) {
-      final SeqType dt = ((ArrayType) type).declType.union(arg(2).seqType());
-      exprType.assign(ArrayType.get(dt));
+      final SeqType mt = ((ArrayType) type).valueType.union(arg(2).seqType());
+      exprType.assign(ArrayType.get(mt));
     }
     return this;
   }

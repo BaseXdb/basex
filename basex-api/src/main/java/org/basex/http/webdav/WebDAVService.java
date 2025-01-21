@@ -21,7 +21,7 @@ import org.basex.util.http.*;
 /**
  * Service handling the various WebDAV operations.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 final class WebDAVService {
@@ -305,7 +305,7 @@ final class WebDAVService {
    */
   List<WebDAVResource> listDbs() throws IOException {
     final WebDAVQuery query = new WebDAVQuery(STRING_JOIN.args(
-        _DB_LIST_DETAILS.args() + " ! (string(), @modified-date)", _STRING_TAB.args()));
+        _DB_LIST_DETAILS.args() + " ! (string(), @modified-date)", CHAR.args(9)));
 
     final String[] result = Strings.split(query.execute(session()), '\t');
     final List<WebDAVResource> dbs = new ArrayList<>();
@@ -474,7 +474,7 @@ final class WebDAVService {
       throws IOException {
 
     // use 4MB as buffer input
-    try(BufferInput bi = new BufferInput(in)) {
+    try(BufferInput bi = BufferInput.get(in)) {
       // guess the content type from the first character
       if(peek(bi) == '<') {
         try {

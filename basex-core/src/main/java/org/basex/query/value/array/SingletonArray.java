@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * A singleton array.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class SingletonArray extends XQArray {
@@ -47,7 +47,7 @@ final class SingletonArray extends XQArray {
   }
 
   @Override
-  public long arraySize() {
+  public long structSize() {
     return 1;
   }
 

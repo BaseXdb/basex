@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.*;
 
-import javax.servlet.http.*;
-
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
@@ -35,10 +33,12 @@ import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
 
+import jakarta.servlet.http.*;
+
 /**
  * This class represents a single RESTXQ function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class RestXqFunction extends WebFunction {
@@ -88,11 +88,10 @@ public final class RestXqFunction extends WebFunction {
   }
 
   @Override
-  public boolean parseAnnotations(final Context ctx) throws QueryException, IOException {
+  public boolean parseAnnotations(final MainOptions mopts) throws QueryException, IOException {
     // parse all annotations
     final boolean[] declared = new boolean[function.arity()];
     boolean found = false;
-    final MainOptions options = ctx.options;
 
     AnnList starts = AnnList.EMPTY;
     for(final Ann ann : function.anns) {
@@ -139,15 +138,6 @@ public final class RestXqFunction extends WebFunction {
       } else if(eq(def.uri, QueryText.REST_URI)) {
         final Item body = value.isEmpty() ? null : value.itemAt(0);
         addMethod(string(def.local()), body, declared, ann.info);
-      } else if(def == _INPUT_CSV) {
-        final CsvParserOptions opts = new CsvParserOptions(options.get(MainOptions.CSVPARSER));
-        options.set(MainOptions.CSVPARSER, parse(opts, ann));
-      } else if(def == _INPUT_JSON) {
-        final JsonParserOptions opts = new JsonParserOptions(options.get(MainOptions.JSONPARSER));
-        options.set(MainOptions.JSONPARSER, parse(opts, ann));
-      } else if(def == _INPUT_HTML) {
-        final HtmlOptions opts = new HtmlOptions(options.get(MainOptions.HTMLPARSER));
-        options.set(MainOptions.HTMLPARSER, parse(opts, ann));
       } else if(eq(def.uri, QueryText.OUTPUT_URI)) {
         // serialization parameters
         final String name = string(def.local()), val = toString(value.itemAt(0));
@@ -163,6 +153,17 @@ public final class RestXqFunction extends WebFunction {
         final QNm v = value.size() > 1 ? checkVariable(toString(value.itemAt(1)), declared) : null;
         permission = new RestXqPerm(p, v);
         starts = starts.attach(ann);
+      } else if(mopts != null) {
+        if(def == _INPUT_CSV) {
+          final CsvParserOptions opts = new CsvParserOptions(mopts.get(MainOptions.CSVPARSER));
+          mopts.set(MainOptions.CSVPARSER, parse(opts, ann));
+        } else if(def == _INPUT_JSON) {
+          final JsonParserOptions opts = new JsonParserOptions(mopts.get(MainOptions.JSONPARSER));
+          mopts.set(MainOptions.JSONPARSER, parse(opts, ann));
+        } else if(def == _INPUT_HTML) {
+          final HtmlOptions opts = new HtmlOptions(mopts.get(MainOptions.HTMLPARSER));
+          mopts.set(MainOptions.HTMLPARSER, parse(opts, ann));
+        }
       }
     }
 
@@ -183,12 +184,13 @@ public final class RestXqFunction extends WebFunction {
    * @param ext extended processing information (can be {@code null})
    * @param conn HTTP connection
    * @param qc query context
+   * @param mopts main options
    * @return arguments
    * @throws QueryException exception
    * @throws IOException I/O exception
    */
-  Expr[] bind(final Object ext, final HTTPConnection conn, final QueryContext qc)
-      throws QueryException, IOException {
+  Expr[] bind(final Object ext, final HTTPConnection conn, final QueryContext qc,
+      final MainOptions mopts) throws QueryException, IOException {
 
     // bind variables from segments
     final Expr[] args = new Expr[function.arity()];
@@ -202,7 +204,6 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind request body in the correct format
-    final MainOptions mopts = conn.context.options;
     if(requestBody != null) {
       final MediaType type = conn.mediaType();
       final byte[] body = conn.requestCtx.body().read();
@@ -217,28 +218,27 @@ public final class RestXqFunction extends WebFunction {
 
     // bind query and form parameters
     for(final WebParam rxp : queryParams) {
-      bind(rxp, args, conn.requestCtx.queryValues().get(rxp.name), qc);
+      bind(rxp, args, conn.requestCtx.queryValues().get(Str.get(rxp.name)), qc);
     }
     for(final WebParam rxp : formParams) {
-      bind(rxp, args, conn.requestCtx.formValues(mopts).get(rxp.name), qc);
+      bind(rxp, args, conn.requestCtx.formValues(mopts).get(Str.get(rxp.name)), qc);
     }
 
     // bind header parameters
     for(final WebParam rxp : headerParams) {
       final TokenList tl = new TokenList();
-      final Enumeration<?> en = conn.request.getHeaders(rxp.name);
-      while(en.hasMoreElements()) {
-        for(final String s : en.nextElement().toString().split(", *")) tl.add(s);
+      for(final String header : Collections.list(conn.request.getHeaders(rxp.name))) {
+        for(final String s : header.split(", *")) tl.add(s);
       }
       bind(rxp, args, StrSeq.get(tl), qc);
     }
 
     // bind cookie parameters
-    final Cookie[] ck = conn.request.getCookies();
+    final Cookie[] cookies = conn.request.getCookies();
     for(final WebParam rxp : cookieParams) {
       Value value = Empty.VALUE;
-      if(ck != null) {
-        for(final Cookie c : ck) {
+      if(cookies != null) {
+        for(final Cookie c : cookies) {
           if(rxp.name.equals(c.getName())) value = Str.get(c.getValue());
         }
       }
@@ -329,16 +329,16 @@ public final class RestXqFunction extends WebFunction {
   /**
    * Assigns annotation values as options.
    * @param <O> option type
-   * @param opts options instance
+   * @param options options instance
    * @param ann annotation
    * @return options instance
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private static <O extends Options> O parse(final O opts, final Ann ann)
+  private static <O extends Options> O parse(final O options, final Ann ann)
       throws QueryException, IOException {
-    for(final Item arg : ann.value()) opts.assign(string(arg.string(ann.info)));
-    return opts;
+    for(final Item arg : ann.value()) options.assign(string(arg.string(ann.info)));
+    return options;
   }
 
   /**
@@ -354,8 +354,8 @@ public final class RestXqFunction extends WebFunction {
 
     if(body != null) {
       final Method m = Method.get(method);
-      if(m != null && !m.body) throw error(info, METHOD_VALUE_X, m);
-      if(requestBody != null) throw error(info, ANN_BODYVAR);
+      if(m != null && !m.body) throw error(info, METHOD_BODY_X, m);
+      if(requestBody != null) throw error(info, ANN_BODY_TWICE);
       requestBody = checkVariable(toString(body), declared);
     }
     if(methods.contains(method)) throw error(info, ANN_TWICE_X_X, "%", method);
@@ -462,14 +462,14 @@ public final class RestXqFunction extends WebFunction {
       } else if(err.endsWith(":*")) {
         final byte[] prefix = token(err.substring(0, err.length() - 2));
         if(!XMLToken.isNCName(prefix)) throw error(INV_CODE_X, err);
-        name = new QNm(concat(prefix, COLON), function.sc);
+        name = new QNm(concat(prefix, cpToken(':')), function.sc);
         part = NamePart.URI;
       } else {
         final Matcher m = EQNAME.matcher(err);
         if(m.matches()) {
           final byte[] uri = token(m.group(1)), local = token(m.group(2));
           if(local.length == 1 && local[0] == '*') {
-            name = new QNm(COLON, uri);
+            name = new QNm(cpToken(':'), uri);
             part = NamePart.URI;
           } else {
             if(!XMLToken.isNCName(local) || !Uri.get(uri).isValid()) throw error(INV_CODE_X, err);

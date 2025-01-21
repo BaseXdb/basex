@@ -13,7 +13,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnRemove extends StandardFunc {
@@ -60,21 +60,21 @@ public final class FnRemove extends StandardFunc {
    * @return resulting value
    */
   private static Value value(final Value value, final LongList list, final QueryContext qc) {
-    Value v = value;
-    for(int l = list.size() - 1; l >= 0 && !v.isEmpty(); l--) {
-      final long pos = list.get(l), size = v.size();
+    Value val = value;
+    for(int l = list.size() - 1; l >= 0 && !val.isEmpty(); l--) {
+      final long pos = list.get(l), size = val.size();
       if(pos == 0) {
         // remove first item
-        v = v.subsequence(1, size - 1, qc);
+        val = val.subsequence(1, size - 1, qc);
       } else if(pos == size - 1) {
         // remove last item
-        v = v.subsequence(0, size - 1, qc);
+        val = val.subsequence(0, size - 1, qc);
       } else if(pos > 0 && pos < size) {
         // remove item at supplied position
-        v = ((Seq) v).remove(pos, qc);
+        val = ((Seq) val).remove(pos, qc);
       }
     }
-    return v;
+    return val;
   }
 
   /**
@@ -93,7 +93,7 @@ public final class FnRemove extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // ignore standard limitation for large values to speed up evaluation of result
-    if(allAreValues(false)) return value(cc.qc);
+    if(values(false, cc)) return value(cc.qc);
 
     final Expr input = arg(0), pos = arg(1);
     final SeqType st = input.seqType();

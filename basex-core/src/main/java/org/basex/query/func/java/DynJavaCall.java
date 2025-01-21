@@ -18,7 +18,7 @@ import org.basex.util.Array;
 /**
  * Dynamic invocation of a Java constructor, field or method.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class DynJavaCall extends JavaCall {
@@ -32,12 +32,10 @@ abstract class DynJavaCall extends JavaCall {
    * @param clazz Java class
    * @param types types provided in the parsed expression string (can be {@code null})
    * @param args arguments
-   * @param sc static context
    * @param info input info (can be {@code null})
    */
-  DynJavaCall(final Class<?> clazz, final String[] types, final Expr[] args, final StaticContext sc,
-      final InputInfo info) {
-    super(args, Perm.ADMIN, false, sc, info);
+  DynJavaCall(final Class<?> clazz, final String[] types, final Expr[] args, final InputInfo info) {
+    super(args, Perm.ADMIN, false, info);
     this.clazz = clazz;
     this.types = types;
   }
@@ -91,12 +89,12 @@ abstract class DynJavaCall extends JavaCall {
    */
   final QueryException instanceExpected(final Exception ex) {
     if(ex != null) Util.debug(ex);
-    return JAVANOINSTANCE_X_X.get(info, JavaCall.className(clazz), JavaCall.argType(arg(0)));
+    return JAVANOINSTANCE_X_X.get(info, className(clazz), JavaCall.argType(arg(0)));
   }
 
   @Override
   public final boolean has(final Flag... flags) {
-    return Flag.NDT.in(flags) || super.has(flags);
+    return Flag.NDT.oneOf(flags) || super.has(flags);
   }
 
   /**

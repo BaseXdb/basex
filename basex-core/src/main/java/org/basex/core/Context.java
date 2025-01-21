@@ -11,6 +11,8 @@ import org.basex.query.util.pkg.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
 import org.basex.util.list.*;
+import org.basex.util.log.*;
+import org.basex.util.options.*;
 
 /**
  * This class serves as a central database context.
@@ -18,7 +20,7 @@ import org.basex.util.list.*;
  * Next, the instance of this class will be passed on to all operations, as it organizes concurrent
  * data access, ensuring that no job will concurrently write to the same data instances.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Context {
@@ -70,7 +72,7 @@ public final class Context {
   public int focused = -1;
 
   /**
-   * Default constructor, which is usually called once in the lifetime of a project.
+   * Default constructor, to be called once in the lifetime of a project.
    */
   public Context() {
     this(true);
@@ -321,5 +323,38 @@ public final class Context {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns all options visible to the current user.
+   * @return options (with names in lower-case)
+   */
+  public HashMap<String, Object> options() {
+    final HashMap<String, Object> map = new HashMap<>();
+    if(user().has(Perm.ADMIN)) {
+      for(final Option<?> o : soptions) {
+        map.put(o.name().toLowerCase(Locale.ENGLISH), soptions.get(o));
+      }
+    }
+    for(final Option<?> o : options) {
+      map.put(o.name().toLowerCase(Locale.ENGLISH), options.get(o));
+    }
+    return map;
+  }
+
+  /**
+   * Returns the value of an option visible to the current user.
+   * @param name name of option (case insensitive)
+   * @return value or {@code null}
+   */
+  public Object option(final String name) {
+    final String uc = name.toUpperCase(Locale.ENGLISH);
+    Options opts = options;
+    Option<?> opt = opts.option(uc);
+    if(opt == null && user().has(Perm.ADMIN)) {
+      opts = soptions;
+      opt = opts.option(uc);
+    }
+    return opt != null ? opts.get(opt) : null;
   }
 }

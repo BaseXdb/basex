@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class FnOutermost extends StandardFunc {
@@ -36,7 +36,7 @@ public class FnOutermost extends StandardFunc {
    * @return outermost/innermost nodes
    * @throws QueryException exception
    */
-  Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
+  final Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
     final Iter nodes = arg(0).iter(qc);
 
     final ANodeBuilder list = new ANodeBuilder();
@@ -84,7 +84,7 @@ public class FnOutermost extends StandardFunc {
       // multiple documents and/or constructed fragments
       OUTER: for(int l = 0; l < len; l++) {
         final ANode nd = list.get(l);
-        final BasicNodeIter ax = outer ? nd.ancestorIter() : nd.descendantIter();
+        final BasicNodeIter ax = outer ? nd.ancestorIter(false) : nd.descendantIter(false);
         for(ANode a; (a = ax.next()) != null;) {
           qc.checkStop();
           if(list.contains(a)) continue OUTER;

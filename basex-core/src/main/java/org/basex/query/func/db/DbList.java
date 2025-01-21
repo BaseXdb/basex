@@ -22,11 +22,10 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class DbList extends StandardFunc {
-
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return defined(0) ? resources(qc) : list(qc).iter();

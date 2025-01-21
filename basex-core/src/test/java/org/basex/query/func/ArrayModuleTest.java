@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Array Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayModuleTest extends SandboxTest {
@@ -226,6 +226,19 @@ public final class ArrayModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void items() {
+    final Function func = _ARRAY_ITEMS;
+
+    query(func.args(" []"), "");
+    query(func.args(" [ () ]"), "");
+    query(func.args(" [ 1 ]"), "1");
+    query(func.args(" [ 1, 2 ]"), "1\n2");
+    query(func.args(" [ (1, 2) ]"), "1\n2");
+    query(func.args(" [ (1, 2), 3 ]"), "1\n2\n3");
+    query(func.args(" array { <_>1</_> to 100000 }") + " =>" + FOOT.args(), "100000");
+  }
+
+  /** Test method. */
   @Test public void join() {
     final Function func = _ARRAY_JOIN;
     query(func.args(" [ ]"), "[]");
@@ -247,12 +260,12 @@ public final class ArrayModuleTest extends SandboxTest {
     final Function func = _ARRAY_MEMBERS;
 
     query(func.args(" []"), "");
-    query(func.args(" [ () ]"), "map{\"value\":()}");
-    query(func.args(" [ 1 ]"), "map{\"value\":1}");
-    query(func.args(" [ 1, 2 ]"), "map{\"value\":1}\nmap{\"value\":2}");
-    query(func.args(" [ (1, 2) ]"), "map{\"value\":(1,2)}");
-    query(func.args(" [ (1, 2), 3 ]"), "map{\"value\":(1,2)}\nmap{\"value\":3}");
-    query(func.args(" array { <_>1</_> to 100000 }") + " => foot()", "map{\"value\":100000}");
+    query(func.args(" [ () ]"), "{\"value\":()}");
+    query(func.args(" [ 1 ]"), "{\"value\":1}");
+    query(func.args(" [ 1, 2 ]"), "{\"value\":1}\n{\"value\":2}");
+    query(func.args(" [ (1, 2) ]"), "{\"value\":(1,2)}");
+    query(func.args(" [ (1, 2), 3 ]"), "{\"value\":(1,2)}\n{\"value\":3}");
+    query(func.args(" array { <_>1</_> to 100000 }") + " => foot()", "{\"value\":100000}");
   }
 
   /** Test method. */
@@ -462,18 +475,4 @@ public final class ArrayModuleTest extends SandboxTest {
 
     error(func.args(" [ ]"), ARRAYEMPTY);
   }
-
-  /** Test method. */
-  @Test public void values() {
-    final Function func = _ARRAY_VALUES;
-
-    query(func.args(" []"), "");
-    query(func.args(" [ () ]"), "");
-    query(func.args(" [ 1 ]"), "1");
-    query(func.args(" [ 1, 2 ]"), "1\n2");
-    query(func.args(" [ (1, 2) ]"), "1\n2");
-    query(func.args(" [ (1, 2), 3 ]"), "1\n2\n3");
-    query(func.args(" array { <_>1</_> to 100000 }") + " =>" + FOOT.args(), "100000");
-  }
-
 }

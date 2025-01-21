@@ -17,7 +17,7 @@ import org.basex.util.*;
  * This class contains internationalized text strings, which are used throughout the project.
  * If this class is called first, the Strings are initialized by the {@link Lang} class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public interface Text {
@@ -46,14 +46,13 @@ public interface Text {
   /** Main author. */
   String AUTHOR = "Christian Grün";
   /** Co-authors (1). */
-  String AUTHORS1 = "Michael Seiferle, Alexander Holupirek";
-  /** Co-authors (2). */
-  String AUTHORS2 = "Marc H. Scholl, Sabine Teubner, Dominik Abend";
+  String AUTHORS = "Michael Seiferle, Alexander Holupirek, Gunther Rademacher, Sabine Teubner, "
+      + "Dominik Abend, Marc H. Scholl";
 
   /** Entity. */
   String ORGANIZATION = Prop.NAME + " Team";
   /** Copyright info. */
-  String COPYRIGHT = "\u00A9 2005-24 " + ORGANIZATION;
+  String COPYRIGHT = "\u00A9 " + ORGANIZATION;
 
   /** New line. */
   String NL = Prop.NL;
@@ -87,63 +86,65 @@ public interface Text {
   String S_STANDALONE = "Standalone";
   /** Start information. */
   String  S_LOCALINFO =
-    " [-bcCdiIoqQrRstuvVwWxz] [input]" + NL +
-    "  [input]    XQuery or command file, or query string" + NL +
-    "  -b<args>   Bind external query variables" + NL +
-    "  -c<input>  Execute commands from file or string" + NL +
-    "  -C<file>   Execute command script file" + NL +
-    "  -d         Toggle debugging output" + NL +
-    "  -i<input>  Bind file or database to context" + NL +
-    "  -I<input>  Bind input string to context" + NL +
-    "  -o<path>   Write output to local file" + NL +
-    "  -q<expr>   Execute XQuery expression" + NL +
-    "  -Q<file>   Execute XQuery file" + NL +
-    "  -r<num>    Run query multiple times" + NL +
-    "  -R         Toggle query execution" + NL +
-    "  -s<args>   Set serialization parameters" + NL +
-    "  -t[path]   Run tests in file or directory" + NL +
-    "  -u         Toggle updates in original files" + NL +
-    "  -v         Toggle output of progress info" + NL +
-    "  -V         Toggle detailed query output" + NL +
-    "  -w         Toggle whitespace stripping" + NL +
-    "  -W         Enable indentation with whitespace" + NL +
-    "  -x         Toggle output of query plan" + NL +
-    "  -z         Toggle output of query result";
+    " [options...] [input]" + NL +
+    "  [input]     XQuery or command file, or query string" + NL +
+    "  -b<var>     Bind query variable (name=value)" + NL +
+    "  -c<input>   Execute commands from file or string" + NL +
+    "  -C<file>    Execute command script file" + NL +
+    "  -d          Toggle debugging output" + NL +
+    "  -i<input>   Bind file or database to context" + NL +
+    "  -I<input>   Bind input string to context" + NL +
+    "  -o<path>    Write output to local file" + NL +
+    "  -O<option>  Set option (name=value)" + NL +
+    "  -q<expr>    Execute XQuery expression" + NL +
+    "  -Q<file>    Execute XQuery file" + NL +
+    "  -r<num>     Run query multiple times" + NL +
+    "  -R          Toggle query execution" + NL +
+    "  -s<param>   Set serialization parameter (name=value)" + NL +
+    "  -t[path]    Run tests in file or directory" + NL +
+    "  -u          Toggle updates in original files" + NL +
+    "  -v          Toggle output of progress info" + NL +
+    "  -V          Toggle detailed query output" + NL +
+    "  -w          Toggle whitespace stripping" + NL +
+    "  -W          Enable indentation with whitespace" + NL +
+    "  -x          Toggle output of query plan" + NL +
+    "  -z          Toggle output of query result";
 
   /** Client mode. */
   String S_CLIENT = "Client";
   /** Client start information. */
   String S_CLIENTINFO =
-    " [-bcCdiInopPqQrRsUvVwWxz] [input]" + NL +
-    "  [input]    XQuery or command file, or query string" + NL +
-    "  -b<args>   Bind external query variables" + NL +
-    "  -c<input>  Execute commands from file or string" + NL +
-    "  -C<file>   Execute command script file" + NL +
-    "  -d         Toggle debugging output" + NL +
-    "  -i<input>  Bind file or database to context" + NL +
-    "  -I<input>  Bind input string to context" + NL +
-    "  -n<name>   Set server (host) name" + NL +
-    "  -o<path>   Write output to local file" + NL +
-    "  -p<port>   Set server port" + NL +
-    "  -P<pass>   Specify user password" + NL +
-    "  -q<expr>   Execute XQuery expression" + NL +
-    "  -Q<file>   Execute XQuery file" + NL +
-    "  -r<num>    Run query multiple times" + NL +
-    "  -R         Toggle query execution" + NL +
-    "  -s<args>   Set serialization parameters" + NL +
-    "  -U<name>   Specify username" + NL +
-    "  -v         Toggle output of progress info" + NL +
-    "  -V         Toggle detailed query output" + NL +
-    "  -w         Toggle whitespace stripping" + NL +
-    "  -W         Enable indentation with whitespace" + NL +
-    "  -x         Toggle output of query plan" + NL +
-    "  -z         Toggle output of query result";
+    " [options...] [input]" + NL +
+    "  [input]     XQuery or command file, or query string" + NL +
+    "  -b<var>     Bind query variable (name=value)" + NL +
+    "  -c<input>   Execute commands from file or string" + NL +
+    "  -C<file>    Execute command script file" + NL +
+    "  -d          Toggle debugging output" + NL +
+    "  -i<input>   Bind file or database to context" + NL +
+    "  -I<input>   Bind input string to context" + NL +
+    "  -n<name>    Set server (host) name" + NL +
+    "  -o<path>    Write output to local file" + NL +
+    "  -O<option>  Set option (name=value)" + NL +
+    "  -p<port>    Set server port" + NL +
+    "  -P<pass>    Specify user password" + NL +
+    "  -q<expr>    Execute XQuery expression" + NL +
+    "  -Q<file>    Execute XQuery file" + NL +
+    "  -r<num>     Run query multiple times" + NL +
+    "  -R          Toggle query execution" + NL +
+    "  -s<param>   Set serialization parameter (name=value)" + NL +
+    "  -U<name>    Specify username" + NL +
+    "  -v          Toggle output of progress info" + NL +
+    "  -V          Toggle detailed query output" + NL +
+    "  -w          Toggle whitespace stripping" + NL +
+    "  -W          Enable indentation with whitespace" + NL +
+    "  -x          Toggle output of query plan" + NL +
+    "  -z          Toggle output of query result";
 
   /** Server mode. */
   String S_SERVER = "Server";
   /** Server start information. */
   String S_SERVERINFO =
-    " [-cCdnpSz] [stop]" + NL +
+    " [options...] [stop]" + NL +
     "  stop       Stop running server" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
     "  -C<file>   Execute command script file" + NL +
@@ -157,7 +158,7 @@ public interface Text {
   String S_GUI = "GUI";
   /** GUI start information. */
   String S_GUIINFO =
-    " [-d] [files]" + NL +
+    " [options...] [files...]" + NL +
     "  [files]  Open specified files" + NL +
     "  -d  Enable debugging";
 
@@ -165,7 +166,7 @@ public interface Text {
   String S_HTTP_SERVER = "HTTP Server";
   /** HTTP information. */
   String S_HTTPINFO =
-    " [-cCdghlnpsSUz] [stop]" + NL +
+    " [options...] [stop]" + NL +
     "  stop       Stop running server" + NL +
     "  -c<input>  Execute commands from file or string" + NL +
     "  -C<file>   Execute command script file" + NL +
@@ -233,19 +234,11 @@ public interface Text {
   /** Options error. */
   String OPT_OFFSET_X = "List counter for '%' is invalid.";
   /** Options error. */
-  String OPT_INVALID_X_X = "Invalid '%' value '%'; must be ";
+  String OPT_BOOLEAN_X_X = "Invalid '%' value '%'; expected: 'yes', 'no', or boolean.";
   /** Options error. */
-  String OPT_BOOLEAN_X_X = OPT_INVALID_X_X + "'yes', 'no', or a boolean.";
+  String OPT_NUMBER_X_X = "Invalid '%' value '%'; expected: number.";
   /** Options error. */
-  String OPT_NUMBER_X_X = OPT_INVALID_X_X + "a number.";
-  /** Options error. */
-  String OPT_MAP_X_X = OPT_INVALID_X_X + "a map.";
-  /** Options error. */
-  String OPT_FUNC_X_X = OPT_INVALID_X_X + "a function.";
-  /** Options error. */
-  String OPT_ONEOF_X_X_X = OPT_INVALID_X_X + "one of: %.";
-  /** Options error. */
-  String OPT_EXPECT_X_X_X = "% expected, % found: %.";
+  String OPT_ONEOF_X_X_X = "Invalid '%' value '%'; expected: one of %.";
 
   /** "log". */
   String PLOTLOG = "log";
@@ -1377,8 +1370,6 @@ public interface Text {
   String CHIEF_ARCHITECT = lang("chief_architect");
   /** Contributors info. */
   String TEAM = lang("team");
-  /** Developer names. */
-  String AND_OTHERS = lang("and_others");
   /** Translation. */
   String TRANSLATION = lang("translation");
 

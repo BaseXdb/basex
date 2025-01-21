@@ -3,7 +3,7 @@ package org.basex.server;
 /**
  * This class defines the available command-line commands.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum ServerCmd {
@@ -38,7 +38,7 @@ public enum ServerCmd {
   /** Code for executing a query and returning all information relevant for XQJ: {id}0. */
   FULL(31),
   /** Code for running a database command: {path}0{input}0. */
-  COMMAND(-1);
+  EXECUTE(-1);
 
   /** Control code (soon obsolete). */
   public final int code;
@@ -61,6 +61,6 @@ public enum ServerCmd {
       if(value.code == code) return value;
     }
     // current default for unknown codes: database command.
-    return COMMAND;
+    return EXECUTE;
   }
 }

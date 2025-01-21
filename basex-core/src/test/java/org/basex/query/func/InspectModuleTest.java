@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Inspection Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class InspectModuleTest extends SandboxTest {
@@ -73,12 +73,18 @@ public final class InspectModuleTest extends SandboxTest {
     final String url = "src/test/resources/hello.xqm";
     query("declare function local:x() { 1 }; " + COUNT.args(func.args()), 1);
     query("declare function local:x() { 2 }; " + func.args() + "()", 2);
+    query("declare function local:x($a := (), $b := (), $c := ()) {}; " + COUNT.args(func.args()),
+        4);
     query("import module namespace hello='world' at '" + url + "';" +
         func.args() + "[last()] instance of function(*)", true);
 
     query("for $f in " + func.args(url)
         + "where local-name-from-QName(function-name($f)) = 'world' "
         + "return $f()", "hello world");
+    query("for $f in " + func.args(url)
+        + "where local-name-from-QName(function-name($f)) = 'hello' "
+        + "return if(function-arity($f) eq 0) then $f() else $f('BaseX')",
+        "hello world\nhello BaseX");
 
     // ensure that closures will be compiled (GH-1194)
     query(func.args(url)
@@ -173,14 +179,16 @@ public final class InspectModuleTest extends SandboxTest {
 
     query(func.args(" 1 to 2", " map { 'item': true() }"), "xs:integer");
     query(func.args(" (<a/>, <b/>)[name() = 'a']", " map { 'mode': 'expression' }"),
-        "element(a)|element(b)*");
+        "(element(a)|element(b))*");
+    query(func.args(" ('z' cast as enum('x', 'a', 'z'), 'a' cast as (enum('a')|enum('b')))"),
+        "enum(\"z\", \"a\")+");
 
     String expr = " (<a/>, <b/>)[name() = 'a']";
     String result = "element()";
     query(func.args(expr), result);
     query(func.args(expr, " map { 'mode': 'computed' }"), result);
     query(func.args(expr, " map { 'mode': 'value' }"), result);
-    query(func.args(expr, " map { 'mode': 'expression' }"), "element(a)|element(b)*");
+    query(func.args(expr, " map { 'mode': 'expression' }"), "(element(a)|element(b))*");
 
     expr = " map:put(map { 1: text { 2 } }, 2, text { 2 })";
     result = "map(xs:integer, text())";

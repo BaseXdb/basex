@@ -18,26 +18,25 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnReplicate extends StandardFunc {
+public final class FnReplicate extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Expr input = arg(0);
-    final Item count = arg(1).atomItem(qc, info);
+    final long count = toLong(arg(1).atomItem(qc, info), 0);
 
-    final long cnt = toLong(count, 0);
-    if(cnt == 0) return Empty.VALUE;
-    if(cnt == 1) return input.value(qc);
+    if(count == 0) return Empty.VALUE;
+    if(count == 1) return input.value(qc);
 
     // check if expression must be evaluated only once
     final boolean once = input instanceof Value || !defined(2) || !toBooleanOrFalse(arg(2), qc);
-    if(once) return SingletonSeq.get(input.value(qc), cnt);
+    if(once) return SingletonSeq.get(input.value(qc), count);
 
     // repeated evaluations
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(long c = 0; c < cnt; c++) vb.add(input.value(qc));
+    for(long c = 0; c < count; c++) vb.add(input.value(qc));
     return vb.value(this);
   }
 
@@ -153,8 +152,8 @@ public class FnReplicate extends StandardFunc {
   }
 
   @Override
-  protected boolean allAreValues(final boolean limit) {
-    return super.allAreValues(limit) && arg(1) instanceof Int &&
+  protected boolean values(final boolean limit, final CompileContext cc) {
+    return super.values(false, cc) && arg(1) instanceof Int &&
         Util.inBounds(arg(0).size(), ((Int) arg(1)).itr());
   }
 

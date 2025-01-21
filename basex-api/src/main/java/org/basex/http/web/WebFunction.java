@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 /**
  * This abstract class defines common methods of Web functions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Johannes Finckh
  */
 public abstract class WebFunction implements Comparable<WebFunction> {
@@ -54,12 +54,12 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   /**
    * Checks a function for REST and permission annotations. This function is called both
    * when a module is parsed, and when the function is prepared for evaluation.
-   * @param ctx database context
+   * @param mopts main options (for evaluating the input options; {@code null} otherwise)
    * @return {@code true} if function contains relevant annotations
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public abstract boolean parseAnnotations(Context ctx) throws QueryException, IOException;
+  public abstract boolean parseAnnotations(MainOptions mopts) throws QueryException, IOException;
 
   /**
    * Creates an exception with the specified message.
@@ -159,8 +159,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
       if(var.name.eq(name)) {
         // casts and binds the value
         final SeqType st = var.declaredType();
-        args[p] = value.seqType().instanceOf(st) ? value :
-          st.cast(value, false, qc, function.sc, null);
+        args[p] = value.seqType().instanceOf(st) ? value : st.cast(value, false, qc, null);
         if(args[p] == null) throw error(ARG_TYPE_X_X_X, info, st, value);
         break;
       }

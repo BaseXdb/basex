@@ -16,13 +16,10 @@ import com.ibm.icu.util.*;
 /**
  * Language formatter using ICU4J. Can be instantiated via {@link IcuFormatter#get}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class IcuFormatter extends Formatter {
-  /** Whether ICU is available on the class path. */
-  private static final boolean AVAILABLE =
-      Reflect.available("com.ibm.icu.text.RuleBasedNumberFormat");
   /** Prefix of RuleSet names that are supported by ICU's SPELLOUT format. */
   private static final String ICU_SPELLOUT_PREFIX = "%spellout-";
   /** Name or prefix of ICU spell out ordinal rule set. */
@@ -35,14 +32,12 @@ public final class IcuFormatter extends Formatter {
   private static final String ICU_SPELLOUT_CARDINAL_NEUTER = ICU_SPELLOUT_CARDINAL + "-neuter";
 
   /** IcuFormatter instances. */
-  private static final ThreadLocal<TokenObjMap<IcuFormatter>> MAP = new ThreadLocal<>() {
-    protected TokenObjMap<IcuFormatter> initialValue() {
-      final TokenObjMap<IcuFormatter> map = new TokenObjMap<>();
-      // initialize hash map with English formatter as default
-      map.put(EN, forLanguage(EN));
-      return map;
-    }
-  };
+  private static final ThreadLocal<TokenObjMap<IcuFormatter>> MAP = ThreadLocal.withInitial(() -> {
+    // initialize hash map with English formatter as default
+    final TokenObjMap<IcuFormatter> map = new TokenObjMap<>();
+    map.put(EN, forLanguage(EN));
+    return map;
+  });
 
   /** ICU rule based spell out format. */
   private final RuleBasedNumberFormat spelloutFormat;
@@ -136,14 +131,6 @@ public final class IcuFormatter extends Formatter {
     get(languageTag);
     // check map using get rather than contains, as map contains null values
     return MAP.get().get(languageTag) != null;
-  }
-
-  /**
-   * Checks if the ICU4J library is available.
-   * @return result of check
-   */
-  public static boolean available() {
-    return AVAILABLE;
   }
 
   @Override

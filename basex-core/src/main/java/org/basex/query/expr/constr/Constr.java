@@ -7,6 +7,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -19,7 +20,7 @@ import org.basex.util.*;
 /**
  * Node constructor.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Constr {
@@ -36,8 +37,6 @@ public final class Constr {
   private final FBuilder builder;
   /** Query context. */
   private final QueryContext qc;
-  /** Static context. */
-  private final StaticContext sc;
   /** Input information. */
   private final InputInfo info;
   /** Text cache. */
@@ -49,14 +48,11 @@ public final class Constr {
    * Creates the children of the constructor.
    * @param builder node builder
    * @param info input info (can be {@code null})
-   * @param sc static context
    * @param qc query context
    */
-  public Constr(final FBuilder builder, final InputInfo info, final StaticContext sc,
-      final QueryContext qc) {
+  public Constr(final FBuilder builder, final InputInfo info, final QueryContext qc) {
     this.builder = builder;
     this.info = info;
-    this.sc = sc;
     this.qc = qc;
   }
 
@@ -67,7 +63,8 @@ public final class Constr {
    * @throws QueryException query exception
    */
   public Constr add(final Expr... exprs) throws QueryException {
-    final int size = sc.ns.size();
+    final NSContext ns = info.sc().ns;
+    final int size = ns.size();
     try {
       final QNmSet qnames = new QNmSet();
       for(final Expr expr : exprs) {
@@ -78,7 +75,7 @@ public final class Constr {
       builder.add(qc.shared.token(text.toArray()));
       return this;
     } finally {
-      sc.ns.size(size);
+      ns.size(size);
     }
   }
 
@@ -91,7 +88,7 @@ public final class Constr {
    */
   private boolean add(final Item item, final QNmSet qnames) throws QueryException {
     if(item instanceof XQArray) {
-      for(final Value value : ((XQArray) item).members()) {
+      for(final Value value : ((XQArray) item).iterable()) {
         for(final Item it : value) {
           if(!add(it, qnames)) return false;
         }
@@ -127,7 +124,7 @@ public final class Constr {
         // add attribute
         builder.add(name, qc.shared.token(node.string()));
         // add new namespace
-        if(name.hasURI()) sc.ns.add(name.prefix(), name.uri());
+        if(name.hasURI()) info.sc().ns.add(name.prefix(), name.uri());
 
       } else if(type == NodeType.NAMESPACE_NODE) {
         // type: namespace node
@@ -165,7 +162,7 @@ public final class Constr {
       }
       more = false;
     } else {
-      // type: atomic value
+      // type: atomic item
       if(more) text.add(' ');
       text.add(item.string(info));
       more = true;
@@ -197,7 +194,7 @@ public final class Constr {
       if(defaultNS != -1) {
         if(nm.uri().length == 0) throw EMPTYNSCONS.get(info);
         final int scope = inscopeNS.get(EMPTY);
-        final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope) : sc.ns.uri(EMPTY);
+        final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope) : info.sc().ns.uri(EMPTY);
         final byte[] uri = dynamicNs.value(defaultNS);
         if(scopeUri != null && scopeUri.length != 0 && !eq(scopeUri, uri)) {
           throw DUPLNSCONS_X.get(info, uri);
@@ -224,7 +221,7 @@ public final class Constr {
 
         final byte[] auri = qnm.uri(), npref = addNS(inscopeNS, prefix, auri);
         if(npref != null) {
-          final QNm aname = qc.shared.qName(concat(npref, COLON, qnm.local()), auri);
+          final QNm aname = qc.shared.qName(concat(npref, cpToken(':'), qnm.local()), auri);
           attributes.set(a, new FAttr(aname, qc.shared.token(attr.string())));
         }
       }

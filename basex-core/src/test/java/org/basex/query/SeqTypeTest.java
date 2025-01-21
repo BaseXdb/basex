@@ -1,19 +1,25 @@
 package org.basex.query;
 
-import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.SeqType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
 import java.util.function.*;
 
+import org.basex.query.util.hash.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.query.value.type.RecordType.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.junit.jupiter.api.*;
 
 /**
  * Tests for the {@link SeqType} class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class SeqTypeTest {
@@ -101,8 +107,45 @@ public final class SeqTypeTest {
     }
   }
 
-  /** Tests for {@link SeqType#instanceOf(SeqType)}. */
-  @Test public void instanceOf() {
+  /**
+   * Tests for {@link SeqType#eq(SeqType)}.
+   * @throws QueryException query exception
+   */
+  @Test public void eq() throws QueryException {
+    final TokenObjMap<Field> fld1 = new TokenObjMap<>(),
+        fld2 = new TokenObjMap<>();
+    final QNm r1Name = new QNm(Token.token("r1")),
+      r2Name = new QNm(Token.token("r2"));
+    final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
+    final SeqType
+      // r1 record(next? as r1, x)
+      r1 = SeqType.get(new RecordType(r1Name, ii), EXACTLY_ONE),
+      // r2 record(next? as r2, x)
+      r2 = SeqType.get(new RecordType(r2Name, ii), EXACTLY_ONE);
+
+    fld1.put(Token.token("next"), new Field(true, r1));
+    fld1.put(Token.token("x"), new Field(false, ITEM_ZM));
+
+    fld2.put(Token.token("next"), new Field(true, r2));
+    fld2.put(Token.token("x"), new Field(false, ITEM_ZM));
+
+    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
+    final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
+    recordTypeRefs.put(r1Name, (RecordType) r1.type);
+    recordTypeRefs.put(r2Name, (RecordType) r2.type);
+    declaredRecordTypes.put(r1Name, new RecordType(false, fld1, null));
+    declaredRecordTypes.put(r2Name, new RecordType(false, fld2, null));
+    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
+
+    assertTrue(r1.eq(r2));
+    assertTrue(r2.eq(r1));
+  }
+
+  /**
+   * Tests for {@link SeqType#instanceOf(SeqType)}.
+   * @throws QueryException query exception
+   */
+  @Test public void instanceOf() throws QueryException {
     // atomic items
     assertTrue(BOOLEAN_O.instanceOf(ANY_ATOMIC_TYPE_ZM));
     assertFalse(ANY_ATOMIC_TYPE_ZM.instanceOf(BOOLEAN_O));
@@ -154,10 +197,136 @@ public final class SeqTypeTest {
     assertFalse(NODE_O.instanceOf(ELEMENT_O));
     assertFalse(ITEM_O.instanceOf(ELEMENT_O));
     assertTrue(ELEMENT_O.instanceOf(ITEM_O));
+
+    // enums
+    final SeqType
+      // enum('a')
+      e1 = SeqType.get(new EnumType(new TokenSet("a")), EXACTLY_ONE),
+      // enum('b')
+      e2 = SeqType.get(new EnumType(new TokenSet("b")), EXACTLY_ONE),
+      // enum('a', 'b')
+      e3 = SeqType.get(new EnumType(new TokenSet("a", "b")), EXACTLY_ONE);
+    assertTrue(e1.instanceOf(e3));
+    assertFalse(e1.instanceOf(e2));
+    assertFalse(e3.instanceOf(e1));
+    assertTrue(e3.instanceOf(e3));
+    assertTrue(e1.instanceOf(STRING_O));
+    assertFalse(STRING_O.instanceOf(e3));
+    assertFalse(e1.instanceOf(LANGUAGE_O));
+    assertFalse(LANGUAGE_O.instanceOf(e3));
+
+    final SeqType
+      // (xs:date | xs:string)
+      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      // (element() | xs:string)
+      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      // (xs:NMTOKENS | xs:string)
+      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      // (array(*) | xs:string)
+      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      // (map(*) | xs:string)
+      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      // (function(*) | xs:string)
+      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+
+    assertTrue(c1.instanceOf(c1));
+    assertFalse(c1.instanceOf(c2));
+    assertFalse(c1.instanceOf(c3));
+    assertFalse(c1.instanceOf(c4));
+    assertFalse(c1.instanceOf(c5));
+    assertFalse(c1.instanceOf(c6));
+    assertFalse(c1.instanceOf(DATE_O));
+    assertTrue(DATE_O.instanceOf(c1));
+    assertFalse(c1.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c1));
+    assertFalse(c2.instanceOf(c1));
+    assertTrue(c2.instanceOf(c2));
+    assertFalse(c2.instanceOf(c3));
+    assertFalse(c2.instanceOf(c4));
+    assertFalse(c2.instanceOf(c5));
+    assertFalse(c2.instanceOf(c6));
+    assertFalse(c2.instanceOf(ELEMENT_O));
+    assertTrue(ELEMENT_O.instanceOf(c2));
+    assertFalse(c2.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c2));
+    assertFalse(c3.instanceOf(c1));
+    assertFalse(c3.instanceOf(c2));
+    assertTrue(c3.instanceOf(c3));
+    assertFalse(c3.instanceOf(c4));
+    assertFalse(c3.instanceOf(c5));
+    assertFalse(c3.instanceOf(c6));
+    assertFalse(c3.instanceOf(NMTOKENS_O));
+    assertTrue(NMTOKENS_O.instanceOf(c3));
+    assertFalse(c3.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c3));
+    assertFalse(c4.instanceOf(c1));
+    assertFalse(c4.instanceOf(c2));
+    assertFalse(c4.instanceOf(c3));
+    assertTrue(c4.instanceOf(c4));
+    assertFalse(c4.instanceOf(c5));
+    assertTrue(c4.instanceOf(c6));
+    assertFalse(c4.instanceOf(ARRAY_O));
+    assertTrue(ARRAY_O.instanceOf(c4));
+    assertFalse(c4.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c4));
+    assertFalse(c5.instanceOf(c1));
+    assertFalse(c5.instanceOf(c2));
+    assertFalse(c5.instanceOf(c3));
+    assertFalse(c5.instanceOf(c4));
+    assertTrue(c5.instanceOf(c5));
+    assertTrue(c5.instanceOf(c6));
+    assertFalse(c5.instanceOf(MAP_O));
+    assertTrue(MAP_O.instanceOf(c5));
+    assertFalse(c5.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c5));
+    assertFalse(c6.instanceOf(c1));
+    assertFalse(c6.instanceOf(c2));
+    assertFalse(c6.instanceOf(c3));
+    assertFalse(c6.instanceOf(c4));
+    assertFalse(c6.instanceOf(c5));
+    assertTrue(c6.instanceOf(c6));
+    assertFalse(c6.instanceOf(FUNCTION_O));
+    assertTrue(FUNCTION_O.instanceOf(c6));
+    assertFalse(c6.instanceOf(STRING_O));
+    assertTrue(STRING_O.instanceOf(c6));
+
+    final TokenObjMap<Field> fld1 = new TokenObjMap<>(),
+        fld2 = new TokenObjMap<>();
+    final QNm r1Name = new QNm(Token.token("r1")),
+      r2Name = new QNm(Token.token("r2"));
+    final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
+    final SeqType
+      // r1 record(next? as r1, x)
+      r1 = SeqType.get(new RecordType(r1Name, ii), EXACTLY_ONE),
+      // r2 record(next? as r2, x)
+      r2 = SeqType.get(new RecordType(r2Name, ii), EXACTLY_ONE);
+
+    fld1.put(Token.token("next"), new Field(true, r1));
+    fld1.put(Token.token("x"), new Field(false, ITEM_ZM));
+
+    fld2.put(Token.token("next"), new Field(true, r2));
+    fld2.put(Token.token("x"), new Field(false, ITEM_ZM));
+
+    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
+    final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
+    recordTypeRefs.put(r1Name, (RecordType) r1.type);
+    recordTypeRefs.put(r2Name, (RecordType) r2.type);
+    declaredRecordTypes.put(r1Name, new RecordType(false, fld1, null));
+    declaredRecordTypes.put(r2Name, new RecordType(false, fld2, null));
+    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
+
+    assertTrue(RECORD_O.instanceOf(FUNCTION_O));
+    assertTrue(MAP_O.instanceOf(RECORD_O));
+    assertTrue(RECORD_O.instanceOf(MAP_O));
+    assertTrue(r1.instanceOf(r2));
+    assertTrue(r2.instanceOf(r1));
   }
 
-  /** Tests for {@link SeqType#union(SeqType)}. */
-  @Test public void union() {
+  /**
+   * Tests for {@link SeqType#union(SeqType)}.
+   * @throws QueryException query exception
+   */
+  @Test public void union() throws QueryException {
     final BiFunction<SeqType, SeqType, SeqType> op = SeqType::union;
 
     combine(EMPTY_SEQUENCE_Z, op);
@@ -196,7 +365,9 @@ public final class SeqTypeTest {
       // function(xs:integer) as xs:nonNegativeInteger
       f4 = FuncType.get(NON_NEGATIVE_INTEGER.seqType(), INTEGER_O).seqType(),
       // function(xs:boolean) as xs:integer
-      f5 = FuncType.get(INTEGER_O, BOOLEAN_O).seqType();
+      f5 = FuncType.get(INTEGER_O, BOOLEAN_O).seqType(),
+      // function(xs:boolean) as xs:integer?
+      f6 = FuncType.get(INTEGER_ZO, BOOLEAN_O).seqType();
 
     combine(f1, op);
     combine(f2, op);
@@ -235,7 +406,7 @@ public final class SeqTypeTest {
     combine(MAP_O, m1, MAP_O, op);
     combine(m1, INTEGER_O, ITEM_O, op);
     combine(m1, f1, f1, op);
-    combine(m1, f2, f5, op);
+    combine(m1, f2, f6, op);
     combine(m1, m2, m1, op);
     combine(m1, m3, m1, op);
     combine(m2, m4, m1, op);
@@ -262,10 +433,141 @@ public final class SeqTypeTest {
     combine(a1, f1, FUNCTION_O, op);
     combine(a1, f2, FUNCTION_O, op);
     combine(a2, a4, a2, op);
+
+    // enums
+    final SeqType
+      // enum('a')
+      e1 = SeqType.get(new EnumType(new TokenSet("a")), EXACTLY_ONE),
+      // enum('b')
+      e2 = SeqType.get(new EnumType(new TokenSet("b")), EXACTLY_ONE),
+      // enum('a', 'b')
+      e3 = SeqType.get(new EnumType(new TokenSet("a", "b")), EXACTLY_ONE);
+
+    combine(e1, e2, e3, op);
+    combine(e1, e3, e3, op);
+    combine(e3, op);
+    combine(e1, STRING_O, STRING_O, op);
+    combine(e1, LANGUAGE_O, STRING_O, op);
+    combine(e1, INTEGER_O, ANY_ATOMIC_TYPE_O, op);
+
+    final SeqType
+      // (xs:date | xs:string)
+      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      // (element() | xs:string)
+      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      // (xs:NMTOKENS | xs:string)
+      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      // (array(*) | xs:string)
+      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      // (map(*) | xs:string)
+      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      // (function(*) | xs:string)
+      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+
+    combine(c1, op);
+    combine(c1, DATE_O, ANY_ATOMIC_TYPE_O, op);
+    combine(c1, STRING_O, ANY_ATOMIC_TYPE_O, op);
+    combine(c2, op);
+    combine(c2, ELEMENT_O, ITEM_O, op);
+    combine(c2, STRING_O, ITEM_O, op);
+    combine(c3, op);
+    combine(c3, NMTOKENS_O, ITEM_O, op);
+    combine(c3, STRING_O, ITEM_O, op);
+    combine(c4, op);
+    combine(c4, ARRAY_O, ITEM_O, op);
+    combine(c4, STRING_O, ITEM_O, op);
+    combine(c5, op);
+    combine(c5, MAP_O, ITEM_O, op);
+    combine(c5, STRING_O, ITEM_O, op);
+    combine(c6, op);
+    combine(c6, FUNCTION_O, ITEM_O, op);
+    combine(c6, STRING_O, ITEM_O, op);
+
+    final TokenObjMap<Field> fld1 = new TokenObjMap<>(),
+        fld2 = new TokenObjMap<>(),
+        fld3 = new TokenObjMap<>(),
+        fld4 = new TokenObjMap<>(),
+        fld5 = new TokenObjMap<>(),
+        fld6 = new TokenObjMap<>(),
+        fld7 = new TokenObjMap<>(),
+        fld8 = new TokenObjMap<>(),
+        fld9 = new TokenObjMap<>(),
+        fld10 = new TokenObjMap<>();
+    fld1.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld2.put(Token.token("a"), new Field(false, STRING_O));
+    fld3.put(Token.token("a"), new Field(false, ANY_ATOMIC_TYPE_O));
+    fld4.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld5.put(Token.token("a"), new Field(true, INTEGER_O));
+    fld6.put(Token.token("b"), new Field(true, INTEGER_O));
+    fld7.put(Token.token("a"), new Field(true, INTEGER_O));
+    fld7.put(Token.token("b"), new Field(true, INTEGER_O));
+    fld10.put(Token.token("next"), new Field(true, RECORD_O));
+    fld10.put(Token.token("x"), new Field(false, ITEM_ZM));
+    fld10.put(Token.token("y"), new Field(true, ITEM_ZM));
+    fld10.put(Token.token("z"), new Field(true, ITEM_ZM));
+    final QNm r8Name = new QNm(Token.token("r8")),
+      r9Name = new QNm(Token.token("r9"));
+    final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
+    final SeqType
+      // record(a as xs:integer)
+      r1 = SeqType.get(new RecordType(false, fld1, null), EXACTLY_ONE),
+      // record(a as xs:string)
+      r2 = SeqType.get(new RecordType(false, fld2, null), EXACTLY_ONE),
+      // record(a as xs:anyAtomicType)
+      r3 = SeqType.get(new RecordType(false, fld3, null), EXACTLY_ONE),
+      // record(a as xs:integer, *)
+      r4 = SeqType.get(new RecordType(true, fld4, null), EXACTLY_ONE),
+      // record(a as xs:integer?, *)
+      r5 = SeqType.get(new RecordType(true, fld5, null), EXACTLY_ONE),
+      // record(b as xs:integer?, *)
+      r6 = SeqType.get(new RecordType(true, fld6, null), EXACTLY_ONE),
+      // record(b as xs:integer?, *)
+      r7 = SeqType.get(new RecordType(true, fld7, null), EXACTLY_ONE),
+      // r8 record(next? as r8, x, y)
+      r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
+      // r9 record(next? as r8, x, z)
+      r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE),
+      // r10 record(next? as record(*), x, y, z)
+      r10 = SeqType.get(new RecordType(false, fld10, null), EXACTLY_ONE);
+
+    fld8.put(Token.token("next"), new Field(true, r8));
+    fld8.put(Token.token("x"), new Field(false, ITEM_ZM));
+    fld8.put(Token.token("y"), new Field(false, ITEM_ZM));
+
+    fld9.put(Token.token("next"), new Field(true, r9));
+    fld9.put(Token.token("x"), new Field(false, ITEM_ZM));
+    fld9.put(Token.token("z"), new Field(false, ITEM_ZM));
+
+    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
+    final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
+    recordTypeRefs.put(r8Name, (RecordType) r8.type);
+    recordTypeRefs.put(r9Name, (RecordType) r9.type);
+    declaredRecordTypes.put(r8Name, new RecordType(false, fld8, null));
+    declaredRecordTypes.put(r9Name, new RecordType(false, fld9, null));
+    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
+
+    combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
+    combine(RECORD_O, MAP_O, MAP_O, op);
+    combine(RECORD_O, r1, RECORD_O, op);
+    combine(FUNCTION_O, r1, FUNCTION_O, op);
+    combine(MAP_O, r1, MAP_O, op);
+    combine(r1, r2, r3, op);
+    combine(r1, r3, r3, op);
+    combine(r4, r1, r4, op);
+    combine(r5, r1, r5, op);
+    combine(r5, r4, r5, op);
+    combine(r1, r6, r6, op);
+    combine(r2, r6, r6, op);
+    combine(r4, r6, r7, op);
+    combine(r5, r6, r7, op);
+    combine(r8, r9, r10, op);
   }
 
-  /** Tests for {@link SeqType#intersect(SeqType)}. */
-  @Test public void intersect() {
+  /**
+   * Tests for {@link SeqType#intersect(SeqType)}.
+   * @throws QueryException query exception
+   */
+  @Test public void intersect() throws QueryException {
     final BiFunction<SeqType, SeqType, SeqType> op = SeqType::intersect;
 
     combine(EMPTY_SEQUENCE_Z, op);
@@ -300,7 +602,9 @@ public final class SeqTypeTest {
       // function(xs:boolean) as xs:integer
       f5 = FuncType.get(INTEGER_O, BOOLEAN_O).seqType(),
       // function(xs:boolean) as xs:boolean
-      f6 = FuncType.get(BOOLEAN_O, BOOLEAN_O).seqType();
+      f6 = FuncType.get(BOOLEAN_O, BOOLEAN_O).seqType(),
+      // function(xs:boolean) as xs:integer?
+      f7 = FuncType.get(INTEGER_ZO, BOOLEAN_O).seqType();
 
     combine(f1, op);
     combine(f2, op);
@@ -345,7 +649,7 @@ public final class SeqTypeTest {
     combine(m1, m3,
         MapType.get(BOOLEAN, NON_NEGATIVE_INTEGER.seqType()).seqType(), op);
     combine(m2, m4, null, op);
-    combine(m4, f5, m4, op);
+    combine(m4, f7, m4, op);
 
     final SeqType
       // array(xs:integer)
@@ -374,6 +678,133 @@ public final class SeqTypeTest {
     combine(a1, FuncType.get(ITEM_O).seqType(), null, op);
     combine(a1, f1, null, op);
     combine(a4, f5, null, op);
+
+    // enums
+    final SeqType
+      // enum('a')
+      e1 = SeqType.get(new EnumType(new TokenSet("a")), EXACTLY_ONE),
+      // enum('b')
+      e2 = SeqType.get(new EnumType(new TokenSet("b")), EXACTLY_ONE),
+      // enum('a', 'b')
+      e3 = SeqType.get(new EnumType(new TokenSet("a", "b")), EXACTLY_ONE);
+
+    combine(e1, e2, null, op);
+    combine(e1, e3, e1, op);
+    combine(e3, op);
+    combine(e1, STRING_O, e1, op);
+    combine(e1, LANGUAGE_O, null, op);
+    combine(e1, INTEGER_O, null, op);
+
+    final SeqType
+      // (xs:date | xs:string)
+      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      // (element() | xs:string)
+      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      // (xs:NMTOKENS | xs:string)
+      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      // (array(*) | xs:string)
+      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      // (map(*) | xs:string)
+      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      // (function(*) | xs:string)
+      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+
+    combine(c1, op);
+    combine(c1, DATE_O, DATE_O, op);
+    combine(c1, STRING_O, STRING_O, op);
+    combine(c1, INTEGER_O, null, op);
+    combine(c2, op);
+    combine(c2, ELEMENT_O, ELEMENT_O, op);
+    combine(c2, STRING_O, STRING_O, op);
+    combine(c2, INTEGER_O, null, op);
+    combine(c3, op);
+    combine(c3, NMTOKENS_O, NMTOKENS_O, op);
+    combine(c3, STRING_O, STRING_O, op);
+    combine(c3, INTEGER_O, null, op);
+    combine(c4, op);
+    combine(c4, ARRAY_O, ARRAY_O, op);
+    combine(c4, STRING_O, STRING_O, op);
+    combine(c4, INTEGER_O, null, op);
+    combine(c5, op);
+    combine(c5, MAP_O, MAP_O, op);
+    combine(c5, STRING_O, STRING_O, op);
+    combine(c5, INTEGER_O, null, op);
+    combine(c6, op);
+    combine(c6, FUNCTION_O, FUNCTION_O, op);
+    combine(c6, STRING_O, STRING_O, op);
+    combine(c6, INTEGER_O, null, op);
+
+    final TokenObjMap<Field> fld1 = new TokenObjMap<>(),
+        fld2 = new TokenObjMap<>(),
+        fld3 = new TokenObjMap<>(),
+        fld4 = new TokenObjMap<>(),
+        fld5 = new TokenObjMap<>(),
+        fld6 = new TokenObjMap<>(),
+        fld7 = new TokenObjMap<>(),
+        fld8 = new TokenObjMap<>(),
+        fld9 = new TokenObjMap<>();
+    fld1.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld2.put(Token.token("a"), new Field(false, STRING_O));
+    fld3.put(Token.token("a"), new Field(false, ANY_ATOMIC_TYPE_O));
+    fld4.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld5.put(Token.token("a"), new Field(true, INTEGER_O));
+    fld6.put(Token.token("b"), new Field(true, INTEGER_O));
+    fld7.put(Token.token("a"), new Field(false, INTEGER_O));
+    fld7.put(Token.token("b"), new Field(false, INTEGER_O));
+    final QNm r8Name = new QNm(Token.token("r8")),
+      r9Name = new QNm(Token.token("r9"));
+    final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
+    final SeqType
+      // record(a as xs:integer)
+      r1 = SeqType.get(new RecordType(false, fld1, null), EXACTLY_ONE),
+      // record(a as xs:string)
+      r2 = SeqType.get(new RecordType(false, fld2, null), EXACTLY_ONE),
+      // record(a as xs:anyAtomicType)
+      r3 = SeqType.get(new RecordType(false, fld3, null), EXACTLY_ONE),
+      // record(a as xs:integer, *)
+      r4 = SeqType.get(new RecordType(true, fld4, null), EXACTLY_ONE),
+      // record(a as xs:integer?, *)
+      r5 = SeqType.get(new RecordType(true, fld5, null), EXACTLY_ONE),
+      // record(b as xs:integer?, *)
+      r6 = SeqType.get(new RecordType(true, fld6, null), EXACTLY_ONE),
+      // record(b as xs:integer?, *)
+      r7 = SeqType.get(new RecordType(true, fld7, null), EXACTLY_ONE),
+      // r8 record(next? as r8, x, y)
+      r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
+      // r9 record(next? as r8, x, z)
+      r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE);
+
+    fld8.put(Token.token("next"), new Field(true, r8));
+    fld8.put(Token.token("x"), new Field(false, ITEM_ZM));
+    fld8.put(Token.token("y"), new Field(false, ITEM_ZM));
+
+    fld9.put(Token.token("next"), new Field(true, r9));
+    fld9.put(Token.token("x"), new Field(false, ITEM_ZM));
+    fld9.put(Token.token("z"), new Field(false, ITEM_ZM));
+
+    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
+    final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
+    recordTypeRefs.put(r8Name, (RecordType) r8.type);
+    recordTypeRefs.put(r9Name, (RecordType) r9.type);
+    declaredRecordTypes.put(r8Name, new RecordType(false, fld8, null));
+    declaredRecordTypes.put(r9Name, new RecordType(false, fld9, null));
+    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
+
+    combine(RECORD_O, FUNCTION_O, RECORD_O, op);
+    combine(RECORD_O, MAP_O, RECORD_O, op);
+    combine(RECORD_O, r1, r1, op);
+    combine(FUNCTION_O, r1, r1, op);
+    combine(MAP_O, r1, r1, op);
+    combine(r1, r2, null, op);
+    combine(r1, r3, r1, op);
+    combine(r4, r1, r1, op);
+    combine(r5, r1, r1, op);
+    combine(r5, r4, r4, op);
+    combine(r1, r6, r1, op);
+    combine(r2, r6, r2, op);
+    combine(r4, r6, r7, op);
+    combine(r5, r6, r7, op);
+    combine(r8, r9, null, op);
   }
 
   /**

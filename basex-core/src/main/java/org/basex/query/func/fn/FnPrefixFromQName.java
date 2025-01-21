@@ -11,7 +11,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnPrefixFromQName extends StandardFunc {
@@ -19,7 +19,7 @@ public final class FnPrefixFromQName extends StandardFunc {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final QNm value = toQNmOrNull(arg(0), qc);
     return value == null || !value.hasPrefix() ? Empty.VALUE :
-      AtomType.NCNAME.cast(Str.get(value.prefix()), qc, sc, info);
+      AtomType.NCNAME.cast(Str.get(value.prefix()), qc, info);
   }
 
   @Override

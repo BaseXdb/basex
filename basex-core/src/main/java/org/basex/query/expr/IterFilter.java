@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Iterative filter expression without numeric predicates.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IterFilter extends Filter {
@@ -36,7 +36,7 @@ public final class IterFilter extends Filter {
         if(iter == null) iter = root.iter(qc);
         // filter sequence
         for(Item item; (item = qc.next(iter)) != null;) {
-          if(match(item, qc)) return item;
+          if(test(item, qc)) return item;
         }
         return null;
       }
@@ -48,7 +48,7 @@ public final class IterFilter extends Filter {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter iter = root.iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(match(item, qc)) vb.add(item);
+      if(test(item, qc)) vb.add(item);
     }
     return vb.value(this);
   }

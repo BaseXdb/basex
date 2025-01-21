@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * XQuery list types.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum ListType implements Type {
@@ -75,21 +75,21 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final Value cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+  public final Value cast(final Item item, final QueryContext qc, final InputInfo info)
+      throws QueryException {
 
     final byte[][] values = split(normalize(item.string(info)), ' ');
     if(values.length == 0) throw FUNCCAST_X_X_X.get(info, item.type, this, item);
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final byte[] value : values) vb.add(type.cast(Str.get(value), qc, sc, info));
+    for(final byte[] value : values) vb.add(type.cast(Str.get(value), qc, info));
     return vb.value(type);
   }
 
   @Override
   public final Value cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    return cast(Str.get(value, qc, info), qc, null, info);
+    return cast(Str.get(value, qc, info), qc, info);
   }
 
   @Override
@@ -99,7 +99,7 @@ public enum ListType implements Type {
 
   @Override
   public SeqType seqType(final Occ occ) {
-    // cannot statically be instantiated due to circular dependencies
+    // cannot be instantiated statically due to circular dependencies
     if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
     return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
   }
@@ -111,17 +111,19 @@ public enum ListType implements Type {
 
   @Override
   public final boolean instanceOf(final Type tp) {
-    return this == tp;
+    return this == tp || (tp instanceof ChoiceItemType ? ((ChoiceItemType) tp).hasInstance(this) :
+      tp == AtomType.ITEM);
   }
 
   @Override
   public final Type union(final Type tp) {
-    return this == tp ? tp : AtomType.ITEM;
+    return this == tp ? tp : tp instanceof ChoiceItemType ? tp.union(this) : AtomType.ITEM;
   }
 
   @Override
   public final Type intersect(final Type tp) {
-    return this == tp ? this : tp.instanceOf(this) ? tp : null;
+    return tp instanceof ChoiceItemType ? tp.intersect(this) : instanceOf(tp) ? this :
+      tp.instanceOf(this) ? tp : null;
   }
 
   @Override

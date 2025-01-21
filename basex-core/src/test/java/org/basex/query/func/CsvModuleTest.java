@@ -9,7 +9,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the CSV Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class CsvModuleTest extends SandboxTest {
@@ -47,7 +47,23 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X,Y\n1,", header, "<csv><record><X>1</X><Y/></record></csv>");
     parse("X,Y\n1,", skipEmpty + ", " + header, "<csv><record><X>1</X></record></csv>");
     parse("X,Y\n,1", skipEmpty + ", " + header, "<csv><record><Y>1</Y></record></csv>");
-    parse("X,Y\n,", skipEmpty + ", " + header, "<csv/>");
+                                       // was: "<csv/>");
+    parse("X,Y\n,", skipEmpty + ", " + header, "<csv><record/></csv>");
+
+            // was: "<csv/>");
+    parse("\n", "", "<csv><record/></csv>");
+              // was: "<csv/>");
+    parse("\n\n", "", "<csv><record/><record/></csv>");
+               // was: "<csv><record><entry>X</entry></record></csv>");
+    parse("\n\nX", "", "<csv><record/><record/><record><entry>X</entry></record></csv>");
+               // was:  "...<entry>X</entry></record><record><entry>Y</entry>");
+    parse("X\n\nY", "", "...<entry>X</entry></record><record/><record><entry>Y</entry>");
+    parse("X\n", "", "<csv><record><entry>X</entry></record></csv>");
+               // was: "<csv><record><entry>X</entry></record></csv>");
+    parse("X\n\n", "", "<csv><record><entry>X</entry></record><record/></csv>");
+
+    parse(" ' \" X\"'", "'quotes': true()", "<csv><record><entry> \" X\"</entry></record></csv>");
+    parse(" '\"X \" '", "'quotes': true()", "<csv><record><entry>X  </entry></record></csv>");
 
     parseError("", "'x': 'y'");
     parseError("", "'format': 'abc'");
@@ -60,6 +76,24 @@ public final class CsvModuleTest extends SandboxTest {
     parse("X\nY", "'header': false(), 'format': 'xquery'", "...[\"X\"],[\"Y\"]");
     parse("X\nY", "'header': false(), 'format': 'xquery'", "...\"records\":([\"X\"],[\"Y\"])");
     parse("X\nY", "'header': true(), 'format': 'xquery'", "...\"names\":[\"X\"]");
+
+    parse("", "'format': 'xquery'", "{\"records\":()}");
+                              // was: "{\"records\":()}");
+    parse("\n", "'format': 'xquery'", "{\"records\":[]}");
+                                // was: "{\"records\":()}");
+    parse("\n\n", "'format': 'xquery'", "{\"records\":([],[])}");
+                                 // was: "{\"records\":[\"X\"]}");
+    parse("\n\nX", "'format': 'xquery'", "{\"records\":([],[],[\"X\"])}");
+                                  // was: "{\"records\":([\"X\"],[\"Y\"])}");
+    parse("X\n\nY", "'format': 'xquery'", "{\"records\":([\"X\"],[],[\"Y\"])}");
+    parse("X\n", "'format': 'xquery'", "{\"records\":[\"X\"]}");
+                                 // was: "{\"records\":[\"X\"]}");
+    parse("X\n\n", "'format': 'xquery'", "{\"records\":([\"X\"],[])}");
+
+    parse(" ' \"\"'", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\" \"\"\"]}");
+    parse(" ' \" X\"'", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\" \"\" X\"\"\"]}");
+    parse(" '\"\" '", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\" \"]}");
+    parse(" '\"X \" '", "'quotes': true(), 'format': 'xquery'", "{\"records\":[\"X  \"]}");
   }
 
   /** Test method. */
@@ -122,21 +156,6 @@ public final class CsvModuleTest extends SandboxTest {
         "'header': true(), 'format': 'xquery'", "A,B\n");
     serial(" map { 'names': [ 'A' ], 'records': [ '1' ] }",
         "'header': true(), 'format': 'xquery'", "A\n1\n");
-  }
-
-  /** Test method. */
-  @Test public void serializeAllow() {
-    query(_CSV_SERIALIZE.args(" <csv><record><A>1</A></record></csv>",
-        " map { 'allow': '1' }"), "1\n");
-
-    // value not allowed
-    error(_CSV_SERIALIZE.args(" <csv><record><A>123</A></record></csv>",
-        " map { 'allow': '1' }"), CSV_SERIALIZE_X_X);
-    error(_CSV_SERIALIZE.args(" <csv><record><A>1</A></record></csv>",
-        " map { 'allow': '2' }"), CSV_SERIALIZE_X_X);
-    // invalid pattern
-    error(_CSV_SERIALIZE.args(" <csv><record><A>+</A></record></csv>",
-        " map { 'allow': '+' }"), CSV_SERIALIZE_X_X);
   }
 
   /**
@@ -205,6 +224,6 @@ public final class CsvModuleTest extends SandboxTest {
   private static void error(final String input, final String options, final Function function) {
     final String query = options.isEmpty() ? function.args(input) :
       function.args(input, " map { " + options + " }");
-    error(query, INVALIDOPT_X);
+    error(query, OPTION_X);
   }
 }

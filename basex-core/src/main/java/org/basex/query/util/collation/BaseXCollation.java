@@ -12,7 +12,7 @@ import org.basex.util.*;
 /**
  * This collation is based on a standard Java collator.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class BaseXCollation extends Collation {
@@ -63,6 +63,12 @@ final class BaseXCollation extends Collation {
       iterS.setOffset(offS);
       iterC.setOffset(offC);
     }
+  }
+
+  @Override
+  public byte[] key(final byte[] string, final InputInfo info) throws QueryException {
+    if(!(collator instanceof RuleBasedCollator)) throw CHARCOLL.get(info);
+    return ((RuleBasedCollator) collator).getCollationKey(Token.string(string)).toByteArray();
   }
 
   /**

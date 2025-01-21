@@ -9,7 +9,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class ArrayHead extends ArrayFn {
@@ -23,7 +23,7 @@ public final class ArrayHead extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type type = arg(0).seqType().type;
-    if(type instanceof ArrayType) exprType.assign(((ArrayType) type).declType);
+    if(type instanceof ArrayType) exprType.assign(((ArrayType) type).valueType);
     return this;
   }
 }

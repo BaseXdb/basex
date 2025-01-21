@@ -8,7 +8,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class StorePut extends StoreFn {
@@ -17,7 +17,7 @@ public final class StorePut extends StoreFn {
     final byte[] key = toKey(qc);
     final Value value = arg(1).value(qc);
 
-    store(qc).put(key, value.materialize(n -> false, info, qc));
+    store(key, value, qc);
     return Empty.VALUE;
   }
 }

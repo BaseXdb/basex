@@ -16,7 +16,7 @@ import org.w3c.dom.*;
  *
  * Part 8: Binding External Variables.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  */
 public final class Part8 extends Main {
   /**
@@ -54,7 +54,7 @@ public final class Part8 extends Main {
     xqp.bindObject(new QName("v2"), 174, xsinteger);
     print("Bind integers to external variables", xqp);
 
-    // Bind atomic values
+    // Bind atomic items
     xqp = xqc.prepareExpression(
         "declare variable $v1 external; " +
         "declare variable $v2 external; " +

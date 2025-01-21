@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class DbGetValue extends DbAccess {
@@ -46,7 +46,7 @@ public class DbGetValue extends DbAccess {
         return resource(bin, qc);
       }
 
-      final MapBuilder mb = new MapBuilder(info);
+      final MapBuilder mb = new MapBuilder();
       final IOFile bin = data.meta.dir(type);
       for(final String path : data.resources.paths("", type)) {
         mb.put(path, resource(type.filePath(bin, path), qc));

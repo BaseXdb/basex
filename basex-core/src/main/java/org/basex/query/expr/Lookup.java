@@ -9,9 +9,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -20,12 +18,12 @@ import org.basex.util.hash.*;
 /**
  * Lookup expression.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Lookup extends Arr {
   /** Wildcard string. */
-  public static final Str WILDCARD = Str.get(new byte[] { '*' });
+  public static final Str WILDCARD = Str.get('*');
 
   /**
    * Constructor.
@@ -45,8 +43,8 @@ public final class Lookup extends Arr {
     if(is == 0) return cc.replaceWith(this, inputs);
 
     // skip optimizations if input may yield other items than maps or arrays
-    final FuncType ft = inputs.funcType();
-    final boolean map = ft instanceof MapType, array = ft instanceof ArrayType;
+    final Type tp = inputs.seqType().type;
+    final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
     final Expr expr = opt(cc);
@@ -54,7 +52,8 @@ public final class Lookup extends Arr {
 
     // derive type from input expression
     final Expr keys = exprs[1];
-    final SeqType st = ft.declType, kt = keys.seqType();
+    final SeqType kt = keys.seqType();
+    final SeqType st = map ? ((MapType) tp).valueType : ((ArrayType) tp).valueType;
     Occ occ = st.occ;
     if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeArray()) {
       // key is wildcard, or expressions yield no single item
@@ -81,20 +80,20 @@ public final class Lookup extends Arr {
 
     final long is = input.size();
     final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) ->
-      keys == WILDCARD ? cc.function(input.funcType() instanceof MapType ?
-      Function._MAP_VALUES : Function._ARRAY_VALUES, info, in) :
-      new DynFuncCall(info, cc.sc(), in, arg).optimize(cc);
+      keys == WILDCARD ? cc.function(input.seqType().type instanceof MapType ?
+      Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
+      new DynFuncCall(info, in, arg).optimize(cc);
 
     // single keys
     if(ks == 1) {
       // single input:
       //   INPUT?(KEY)  ->  INPUT(KEY)
-      //   ARRAY?*      ->  util:array-values(MAP)
-      //   MAP?*        ->  util:map-values(MAP)
+      //   ARRAY?*      ->  array:values(MAP)
+      //   MAP?*        ->  map:values(MAP)
       if(is == 1) return rewrite.apply(input, keys);
       // multiple inputs:
       //   INPUTS?(KEY)  ->  INPUTS ! .(KEY)
-      final Expr ex = cc.get(input, () -> rewrite.apply(ContextValue.get(cc, info), keys));
+      final Expr ex = cc.get(input, true, () -> rewrite.apply(ContextValue.get(cc, info), keys));
       return SimpleMap.get(cc, info, input, ex);
     }
 
@@ -103,14 +102,14 @@ public final class Lookup extends Arr {
       if(is == 1) {
         // single input:
         //  INPUT?(KEYS)  ->  KEYS ! INPUT(.)
-        final Expr ex = cc.get(keys, () -> rewrite.apply(input, ContextValue.get(cc, info)));
+        final Expr ex = cc.get(keys, true, () -> rewrite.apply(input, ContextValue.get(cc, info)));
         return SimpleMap.get(cc, info, keys, ex);
       }
       // multiple inputs:
-      //  INPUTS?(KEYS)  ->  for $_ in INPUTS return KEYS ! $_(.)
-      final Var var = cc.vs().addNew(new QNm("_"), null, false, cc.qc, info);
+      //  INPUTS?(KEYS)  ->  for $item in INPUTS return KEYS ! $item(.)
+      final Var var = cc.vs().addNew(new QNm("item"), null, cc.qc, info);
       final For fr = new For(var, input).optimize(cc);
-      final Expr ex = cc.get(keys, () ->
+      final Expr ex = cc.get(keys, true, () ->
         rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info)));
       return new GFLWOR(info, fr, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
     }
@@ -132,7 +131,7 @@ public final class Lookup extends Arr {
           }
           final Item item = qc.next(iter);
           if(item == null) return null;
-          ir = add(item, new ValueBuilder(qc), qc).value(Lookup.this).iter();
+          ir = valueFor(item, qc).iter();
         }
       }
     };
@@ -143,40 +142,32 @@ public final class Lookup extends Arr {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      add(item, vb, qc);
+      vb.add(valueFor(item, qc));
     }
     return vb.value(this);
   }
 
   /**
-   * Adds values to the specified value builder.
+   * Returns the looked up values for the specified input.
    * @param item input item
-   * @param vb value builder
    * @param qc query context
    * @return supplied value builder
    * @throws QueryException query exception
    */
-  private ValueBuilder add(final Item item, final ValueBuilder vb, final QueryContext qc)
-      throws QueryException {
-
-    if(!(item instanceof XQData)) throw LOOKUP_X.get(info, item);
-
+  private Value valueFor(final Item item, final QueryContext qc) throws QueryException {
+    if(!(item instanceof XQStruct)) throw LOOKUP_X.get(info, item);
+    final XQStruct struct = (XQStruct) item;
     final Expr keys = exprs[1];
-    if(keys == WILDCARD) {
-      // wildcard: add all values
-      if(item instanceof XQMap) {
-        ((XQMap) item).values(vb);
-      } else {
-        for(final Value member : ((XQArray) item).members()) vb.add(member);
-      }
-    } else {
-      final FItem fitem = (FItem) item;
-      final Iter ir = keys.atomIter(qc, info);
-      for(Item key; (key = ir.next()) != null;) {
-        vb.add(fitem.invoke(qc, info, key));
-      }
+
+    // wildcard: add all values
+    if(keys == WILDCARD) return struct.values(qc);
+
+    final ValueBuilder vb = new ValueBuilder(qc);
+    final Iter ir = keys.atomIter(qc, info);
+    for(Item key; (key = ir.next()) != null;) {
+      vb.add(struct.invoke(qc, info, key));
     }
-    return vb;
+    return vb.value(this);
   }
 
   @Override

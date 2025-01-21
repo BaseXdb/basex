@@ -13,7 +13,7 @@ import org.basex.util.*;
 /**
  * General preferences.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class DialogGeneralPrefs extends BaseXBack {
@@ -98,13 +98,13 @@ final class DialogGeneralPrefs extends BaseXBack {
 
   /**
    * Returns the translation credits for the specified language.
-   * @param lng language
+   * @param language language
    * @return credits
    */
-  static String creds(final String lng) {
+  static String credits(final String language) {
     final int ll = LANGS[0].length;
     for(int l = 0; l < ll; l++) {
-      if(LANGS[0][l].equals(lng)) return LANGS[1][l];
+      if(LANGS[0][l].equals(language)) return LANGS[1][l];
     }
     return "";
   }
@@ -131,7 +131,7 @@ final class DialogGeneralPrefs extends BaseXBack {
     opts.set(StaticOptions.LANG, lang.getSelectedItem());
     xmlSuffixes.assign();
 
-    creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem()));
+    creds.setText(TRANSLATION + COLS + credits(lang.getSelectedItem()));
     return true;
   }
 }

@@ -25,7 +25,7 @@ import org.basex.util.list.*;
 /**
  * Sequence, containing at least two items.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class Seq extends Value {
@@ -82,18 +82,16 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final boolean predicate)
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
 
-    if(itemAt(0) instanceof ANode) return true;
-    if(!predicate) throw testError(this, false, ii);
+    final Item first = itemAt(0);
+    if(first instanceof ANode) return true;
+    if(pos == 0 || !(first instanceof ANum)) throw testError(this, false, ii);
 
-    boolean num = false;
     for(final Item item : this) {
-      if(item instanceof ANode) return true;
-      if(!(item instanceof ANum)) throw testError(this, num, ii);
-      if(item.dbl(ii) == qc.focus.pos) return true;
-      num = true;
+      if(!(item instanceof ANum)) throw testError(this, true, ii);
+      if(item.test(qc, ii, pos)) return true;
     }
     return false;
   }
@@ -205,19 +203,8 @@ public abstract class Seq extends Value {
 
   @Override
   public final void refineType(final Expr expr) {
-    final Type t = expr.seqType().type.intersect(type);
-    if(t != null) type = t;
-  }
-
-  @Override
-  public final int hash(final InputInfo ii) throws QueryException {
-    // final hash function because equivalent sequences *must* produce the
-    // same hash value, otherwise they get lost in hash maps.
-    // example: hash(RangeSeq(1 to 3)) == hash(ItrSeq(1, 2, 3))
-    //                                 == hash(ItemSeq(Itr(1), Itr(2), Itr(3)))
-    int h = 1;
-    for(long v = Math.min(size, 5); --v >= 0;) h = 31 * h + itemAt(v).hash(ii);
-    return h;
+    final Type tp = expr.seqType().type.intersect(type);
+    if(tp != null) type = tp;
   }
 
   @Override
@@ -352,42 +339,6 @@ public abstract class Seq extends Value {
   }
 
   /**
-   * Tries to create a typed sequence with the items of the specified values.
-   * @param size size of resulting sequence
-   * @param values values
-   * @param type type
-   * @return value, or {@code null} if sequence could not be created
-   * @throws QueryException query exception
-   */
-  public static Value get(final int size, final Type type, final Value... values)
-      throws QueryException {
-
-    if(type instanceof AtomType) {
-      switch((AtomType) type) {
-        case BOOLEAN:
-          return BlnSeq.get(size, values);
-        case STRING:
-          return StrSeq.get(size, values);
-        case BYTE:
-          return BytSeq.get(size, values);
-        case SHORT:
-          return ShrSeq.get(size, values);
-        case FLOAT:
-          return FltSeq.get(size, values);
-        case DOUBLE:
-          return DblSeq.get(size, values);
-        case DECIMAL:
-          return DecSeq.get(size, values);
-        case UNSIGNED_LONG:
-          return null;
-        default:
-          if(type.instanceOf(AtomType.INTEGER)) return IntSeq.get(type, size, values);
-      }
-    }
-    return null;
-  }
-
-  /**
    * Returns an initial array capacity for the expected result size.
    * Throws an exception if the requested size will take too much memory.
    * @param size expected result size
@@ -395,7 +346,7 @@ public abstract class Seq extends Value {
    * @throws QueryException query exception
    */
   public static int initialCapacity(final long size) throws QueryException {
-    if(size > Array.MAX_SIZE) throw ARRAY_X_X.get(null, Array.MAX_SIZE, size);
+    if(size > Array.MAX_SIZE) throw MAX_SIZE_X_X.get(null, Array.MAX_SIZE, size);
     return Array.initialCapacity(size);
   }
 }

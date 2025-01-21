@@ -5,7 +5,7 @@ import org.basex.util.options.*;
 /**
  * Properties for formatting decimal numbers.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
 public final class DecFormatOptions extends Options {
@@ -31,4 +31,6 @@ public final class DecFormatOptions extends Options {
   public static final StringOption DIGIT = new StringOption("digit");
   /** Decimal format property: pattern-separator. */
   public static final StringOption PATTERN_SEPARATOR = new StringOption("pattern-separator");
+  /** Decimal format property: format-name. */
+  public static final StringOption FORMAT_NAME = new StringOption("format-name");
 }

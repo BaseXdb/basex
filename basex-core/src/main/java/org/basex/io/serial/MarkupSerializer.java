@@ -8,6 +8,7 @@ import static org.basex.util.Token.normalize;
 
 import java.io.*;
 
+import org.basex.io.out.PrintOutput.*;
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.util.hash.*;
@@ -23,7 +24,7 @@ import org.basex.util.options.*;
 /**
  * This class serializes items to in a markup language.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 abstract class MarkupSerializer extends StandardSerializer {
@@ -43,7 +44,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   /** HTML5 flag. */
   final boolean html5;
   /** URI escape flag. */
-  final boolean escuri;
+  final boolean escape;
   /** Standalone 'omit' flag. */
   final boolean saomit;
   /** Include content type flag. */
@@ -83,7 +84,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     docsys  = sopts.get(DOCTYPE_SYSTEM);
     docpub  = sopts.get(DOCTYPE_PUBLIC);
     media   = sopts.get(MEDIA_TYPE);
-    escuri  = sopts.yes(ESCAPE_URI_ATTRIBUTES);
+    escape  = sopts.yes(ESCAPE_URI_ATTRIBUTES);
     content = sopts.yes(INCLUDE_CONTENT_TYPE);
     undecl  = sopts.yes(UNDECLARE_PREFIXES);
     indAttr = sopts.yes(INDENT_ATTRIBUTES);
@@ -110,7 +111,7 @@ abstract class MarkupSerializer extends StandardSerializer {
           }
           out.print(ATT2);
           out.print(PI_C);
-          out.print('\n');
+          if(indent) out.print('\n');
         }
       }
     }
@@ -142,8 +143,8 @@ abstract class MarkupSerializer extends StandardSerializer {
     out.print(ATT1);
     final byte[] val = normalize(value, form);
     final int vl = val.length;
-    for(int k = 0; k < vl; k += cl(val, k)) {
-      final int cp = cp(val, k);
+    for(int v = 0; v < vl; v += cl(val, v)) {
+      final int cp = cp(val, v);
       if(cp == '"') {
         out.print(E_QUOT);
       } else if(cp == 0x9 || cp == 0xA) {
@@ -169,6 +170,13 @@ abstract class MarkupSerializer extends StandardSerializer {
     out.print(' ');
   }
 
+  /** Fallback function. */
+  private final Fallback fallbackCDATA = cp -> {
+    out.print(CDATA_C);
+    printHex(cp);
+    out.print(CDATA_O);
+  };
+
   @Override
   protected void text(final byte[] value, final FTPos ftp) throws IOException {
     if(opened.isEmpty()) checkRoot(null);
@@ -177,14 +185,14 @@ abstract class MarkupSerializer extends StandardSerializer {
       final QNmSet qnames = cdata();
       final int vl = val.length;
       if(qnames.isEmpty() || opened.isEmpty() || !qnames.contains(opened.peek())) {
-        for(int k = 0; k < vl; k += cl(val, k)) {
-          printChar(cp(val, k));
+        for(int v = 0; v < vl; v += cl(val, v)) {
+          printChar(cp(val, v));
         }
       } else {
         out.print(CDATA_O);
         int c = 0;
-        for(int k = 0; k < vl; k += cl(val, k)) {
-          final int cp = cp(val, k);
+        for(int v = 0; v < vl; v += cl(val, v)) {
+          final int cp = cp(val, v);
           if(cp == ']') {
             ++c;
           } else {
@@ -194,7 +202,7 @@ abstract class MarkupSerializer extends StandardSerializer {
             }
             c = 0;
           }
-          out.print(cp);
+          out.print(cp, fallbackCDATA);
         }
         out.print(CDATA_C);
       }
@@ -285,6 +293,9 @@ abstract class MarkupSerializer extends StandardSerializer {
     super.atomic(item);
   }
 
+  /** Fallback function. */
+  private final Fallback fallback = this::printHex;
+
   @Override
   protected void print(final int cp) throws IOException {
     if(cp < ' ' && cp != '\n' && cp != '\t' || cp >= 0x7F && cp < 0xA0) {
@@ -298,12 +309,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     } else if(cp == 0x2028) {
       out.print(E_2028);
     } else {
-      try {
-        super.print(cp);
-      } catch(final QueryIOException ex) {
-        if(ex.getCause().error() == SERENC_X_X) printHex(cp);
-        else throw ex;
-      }
+      out.print(cp, fallback);
     }
   }
 
@@ -408,21 +414,15 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @throws QueryIOException query I/O exception
    */
   private QNmSet cdata() throws QueryIOException {
-    QNmSet list = cdata;
-    if(list == null) {
-      list = new QNmSet();
+    if(cdata == null) {
+      cdata = new QNmSet();
       final boolean html = this instanceof HTMLSerializer;
-      final String cdse = sopts.get(CDATA_SECTION_ELEMENTS);
-      for(final byte[] name : split(normalize(token(cdse)), ' ')) {
-        if(name.length == 0) continue;
-        final QNm qnm = resolve(name);
-        if(!html || contains(name, ':') && (!html5 || !string(name).contains("html:"))) {
-          list.add(qnm);
-        }
+      for(final QNm name : qnames(CDATA_SECTION_ELEMENTS)) {
+        final byte[] uri = name.uri();
+        if(!html || uri.length != 0 && (!html5 || !eq(uri, XHTML_URI))) cdata.add(name);
       }
-      cdata = list;
     }
-    return list;
+    return cdata;
   }
 
   /**
@@ -441,24 +441,19 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @throws QueryIOException query I/O exception
    */
   boolean suppressIndentation(final QNm qname) throws QueryIOException {
-    if(suppress == null) {
-      suppress = new QNmSet();
-      for(final byte[] name : split(normalize(token(sopts.get(SUPPRESS_INDENTATION))), ' ')) {
-        if(name.length != 0) suppress.add(resolve(name));
-      }
-    }
+    if(suppress == null) suppress = qnames(SUPPRESS_INDENTATION);
     return suppress.contains(qname);
   }
 
   /**
-   * Resolves a QName.
-   * @param name name to be resolved
-   * @return list
+   * Returns the values of an option as QNames.
+   * @param option option to be found
+   * @return set of QNames
    * @throws QueryIOException query I/O exception
    */
-  private QNm resolve(final byte[] name) throws QueryIOException {
+  private QNmSet qnames(final StringOption option) throws QueryIOException {
     try {
-      return QNm.parse(name, sc == null ? null : sc.elemNS, sc, null);
+      return QNm.set(sopts.get(option), sc);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

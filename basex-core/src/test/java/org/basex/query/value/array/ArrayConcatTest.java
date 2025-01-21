@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 /**
  * Tests for {@link XQArray#concat(XQArray)}.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class ArrayConcatTest extends ArrayTest {
@@ -40,7 +40,7 @@ public final class ArrayConcatTest extends ArrayTest {
         array1 = array1.concat(array2);
         array1.checkInvariants();
         list1.addAll(list2);
-        assertEquals(n, array1.arraySize());
+        assertEquals(n, array1.structSize());
         assertEquals(n, list1.size());
 
         final Iterator<Value> iter1 = array1.iterator(0);
@@ -67,10 +67,10 @@ public final class ArrayConcatTest extends ArrayTest {
       array2 = array2.append(value);
     }
 
-    assertEquals(n, array1.arraySize());
-    assertEquals(n, array2.arraySize());
+    assertEquals(n, array1.structSize());
+    assertEquals(n, array2.structSize());
     final XQArray array = array1.concat(array2);
-    assertEquals(2 * n, array.arraySize());
+    assertEquals(2 * n, array.structSize());
 
     for(int i = 0; i < 2 * n; i++) {
       final int diff = i - n, j = diff < 0 ? -(diff + 1) : diff;

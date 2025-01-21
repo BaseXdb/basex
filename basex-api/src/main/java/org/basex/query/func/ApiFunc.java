@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
@@ -10,7 +10,7 @@ import org.basex.query.*;
 /**
  * Request function.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public abstract class ApiFunc extends StandardFunc {

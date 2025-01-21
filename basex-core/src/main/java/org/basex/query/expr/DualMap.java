@@ -11,7 +11,7 @@ import org.basex.util.hash.*;
 /**
  * Simple map expression: iterative evaluation with two operands (the last one yielding items).
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DualMap extends SimpleMap {
@@ -41,12 +41,12 @@ public final class DualMap extends SimpleMap {
           Item item;
           do {
             // left operand
-            qf.value = qv;
             item = iter1.next();
             if(item == null) break;
             // right operand
             qf.value = item;
             item = expr2.item(qc, info);
+            qf.value = qv;
           } while(item.isEmpty());
           return item;
         } finally {

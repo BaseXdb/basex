@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dirk Kirsten
  */
 public final class RandomSeededInteger extends StandardFunc {
@@ -41,7 +41,7 @@ public final class RandomSeededInteger extends StandardFunc {
     final int vl = Seq.initialCapacity(args[1]), max = (int) args[2];
     final LongList list = new LongList(vl);
     for(long v = 0; v < vl; v++) list.add(max == 0 ? r.nextInt() : r.nextInt(max));
-    return IntSeq.get(list);
+    return IntSeq.get(list.finish());
   }
 
   /**

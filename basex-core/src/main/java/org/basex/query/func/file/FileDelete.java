@@ -10,7 +10,7 @@ import org.basex.query.value.seq.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FileDelete extends FileFn {
@@ -33,7 +33,7 @@ public final class FileDelete extends FileFn {
    * @param qc query context
    * @throws IOException I/O exception
    */
-  private synchronized void delete(final Path path, final QueryContext qc) throws IOException {
+  private void delete(final Path path, final QueryContext qc) throws IOException {
     if(Files.isDirectory(path)) {
       try(DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
         qc.checkStop();

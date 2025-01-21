@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FileReadBinary extends FileFn {
@@ -30,11 +30,11 @@ public final class FileReadBinary extends FileFn {
 
     // read full file
     if(off == 0 && len == Long.MAX_VALUE) {
-      return new B64Lazy(new IOFile(path.toFile()), FILE_IO_ERROR_X);
+      return new B64Lazy(new IOFile(path), FILE_IO_ERROR_X);
     }
 
     // read chunk
-    try(DataAccess da = new DataAccess(new IOFile(path.toFile()))) {
+    try(DataAccess da = new DataAccess(new IOFile(path))) {
       final long dlen = da.length();
       if(len == Long.MAX_VALUE) len = dlen - off;
       if(off < 0 || off > dlen || len < 0 || off + len > dlen) {

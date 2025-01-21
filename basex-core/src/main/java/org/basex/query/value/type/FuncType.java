@@ -1,9 +1,7 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.io.in.DataInput;
@@ -13,30 +11,20 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
-import org.basex.util.similarity.*;
 
 /**
  * XQuery 3.0 function types.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public class FuncType implements Type {
-  /** Name. */
-  public static final byte[] FUNCTION = Token.token(QueryText.FUNCTION);
-  /** Any function placeholder string. */
-  static final String[] WILDCARD = { "*" };
-
+public final class FuncType extends FType {
   /** Annotations. */
   public final AnnList anns;
   /** Return type of the function. */
   public final SeqType declType;
-  /** Argument types (can be {@code null}, indicated that no types were specified). */
+  /** Argument types (can be {@code null}, indicates that no types were specified). */
   public final SeqType[] argTypes;
-
-  /** Sequence types (lazy instantiation). */
-  private EnumMap<Occ, SeqType> seqTypes;
 
   /**
    * Constructor.
@@ -60,62 +48,28 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final boolean isNumber() {
-    return false;
+  public FuncType funcType() {
+    return this;
   }
 
   @Override
-  public final boolean isUntyped() {
-    return false;
-  }
-
-  @Override
-  public final boolean isNumberOrUntyped() {
-    return false;
-  }
-
-  @Override
-  public final boolean isStringOrUntyped() {
-    return false;
-  }
-
-  @Override
-  public final boolean isSortable() {
-    return false;
-  }
-
-  @Override
-  public SeqType seqType(final Occ occ) {
-    // cannot statically be instantiated due to circular dependencies
-    if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
-    return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
-  }
-
-  @Override
-  public FItem cast(final Item item, final QueryContext qc, final StaticContext sc,
-      final InputInfo info) throws QueryException {
-
+  public FItem cast(final Item item, final QueryContext qc, final InputInfo info)
+      throws QueryException {
     if(!(item instanceof FItem)) throw typeError(item, this, info);
     final FItem func = (FItem) item;
-    return this == SeqType.FUNCTION ? func : func.coerceTo(this, qc, info, false);
+    return this == SeqType.FUNCTION ? func : func.coerceTo(this, qc, null, info);
   }
 
   @Override
-  public Item cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-    throw FUNCCAST_X_X.get(info, this, value);
-  }
-
-  @Override
-  public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+  public Item read(final DataInput in, final QueryContext qc) {
     throw Util.notExpected();
   }
 
   @Override
   public boolean eq(final Type type) {
     if(this == type) return true;
-    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof FuncType) ||
-        type instanceof MapType || type instanceof ArrayType) return false;
+    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof FuncType))
+      return false;
 
     final FuncType ft = (FuncType) type;
     final int arity = argTypes.length, nargs = ft.argTypes.length;
@@ -129,8 +83,8 @@ public class FuncType implements Type {
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.FUNCTION, AtomType.ITEM)) return true;
-    if(this == SeqType.FUNCTION || !(type instanceof FuncType) || type instanceof MapType ||
-        type instanceof ArrayType) return false;
+    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
+    if(this == SeqType.FUNCTION || !(type instanceof FuncType)) return false;
 
     final FuncType ft = (FuncType) type;
     final int arity = argTypes.length, nargs = ft.argTypes.length;
@@ -146,12 +100,13 @@ public class FuncType implements Type {
 
   @Override
   public Type union(final Type type) {
+    if(type instanceof ChoiceItemType) return type.union(this);
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
-    if(!(type instanceof FuncType)) return AtomType.ITEM;
+    final FuncType ft = type.funcType();
+    if(ft == null) return AtomType.ITEM;
 
-    final FuncType ft = (FuncType) type;
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return SeqType.FUNCTION;
 
@@ -160,21 +115,19 @@ public class FuncType implements Type {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
       if(arg[a] == null) return SeqType.FUNCTION;
     }
-
-    final AnnList an = anns.union(ft.anns);
-    final SeqType dt = declType.union(ft.declType);
-    return get(an, dt, arg);
+    return get(anns.union(ft.anns), declType.union(ft.declType), arg);
   }
 
   @Override
-  public FuncType intersect(final Type type) {
+  public Type intersect(final Type type) {
+    if(type instanceof ChoiceItemType) return type.intersect(this);
     if(instanceOf(type)) return this;
-    if(type.instanceOf(this)) return (FuncType) type;
+    if(type.instanceOf(this)) return type;
 
-    if(!(type instanceof FuncType)) return null;
+    if(type instanceof MapType || type instanceof ArrayType) return type.intersect(this);
 
-    final FuncType ft = (FuncType) type;
-    if(ft instanceof MapType || ft instanceof ArrayType) return ft.intersect(this);
+    final FuncType ft = type.funcType();
+    if(ft == null) return null;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return null;
@@ -226,45 +179,22 @@ public class FuncType implements Type {
    */
   public static Type find(final QNm name) {
     if(name.uri().length == 0) {
-      final byte[] ln = name.local();
-      if(Token.eq(ln, FuncType.FUNCTION)) return SeqType.FUNCTION;
-      if(Token.eq(ln, MapType.MAP)) return SeqType.MAP;
-      if(Token.eq(ln, ArrayType.ARRAY)) return SeqType.ARRAY;
-    }
-    return null;
-  }
-
-  /**
-   * Returns an info message for a similar function.
-   * @param qname name of type
-   * @return info string
-   */
-  public static byte[] similar(final QNm qname) {
-    final byte[] ln = lc(qname.local());
-
-    final TokenList list = new TokenList();
-    list.add(AtomType.ITEM.qname().local()).add(FuncType.FUNCTION);
-    list.add(MapType.MAP).add(ArrayType.ARRAY);
-    for(final NodeType type : NodeType.values()) list.add(type.qname().local());
-    final byte[][] values = list.finish();
-
-    Object similar = Levenshtein.similar(ln, values);
-    if(similar == null) {
-      for(final byte[] value : values) {
-        if(startsWith(value, ln)) {
-          similar = value;
-          break;
-        }
+      switch(Token.string(name.local())) {
+        case QueryText.FUNCTION:
+        case QueryText.FN:       return SeqType.FUNCTION;
+        case QueryText.MAP:      return SeqType.MAP;
+        case QueryText.RECORD:   return SeqType.RECORD;
+        case QueryText.ARRAY:    return SeqType.ARRAY;
       }
     }
-    return QueryError.similar(qname.prefixId(XML), similar);
+    return null;
   }
 
   /**
    * Getter for a function's type.
    * @param anns annotations
    * @param declType declared return type (can be {@code null})
-   * @param params formal parameters
+   * @param params parameters
    * @return function type
    */
   public static FuncType get(final AnnList anns, final SeqType declType, final Var[] params) {
@@ -287,13 +217,8 @@ public class FuncType implements Type {
   }
 
   @Override
-  public boolean nsSensitive() {
-    return false;
-  }
-
-  @Override
   public String toString() {
-    final QueryString qs = new QueryString().token(anns).token(FUNCTION);
+    final QueryString qs = new QueryString().token(anns).token(QueryText.FUNCTION);
     if(this == SeqType.FUNCTION) qs.params(WILDCARD);
     else qs.params(argTypes).token(QueryText.AS).token(declType);
     return qs.toString();

@@ -1,8 +1,8 @@
 package org.basex.http.webdav;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 
-import javax.servlet.*;
+import jakarta.servlet.*;
 
 import org.basex.http.*;
 
@@ -11,7 +11,7 @@ import com.bradmcevoy.http.*;
 /**
  * WebDAV servlet.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
 public final class WebDAVServlet extends BaseXServlet {

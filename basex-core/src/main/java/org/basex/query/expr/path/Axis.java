@@ -7,7 +7,7 @@ import org.basex.util.*;
 /**
  * XPath axes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum Axis {
@@ -18,7 +18,7 @@ public enum Axis {
   ANCESTOR_OR_SELF("ancestor-or-self", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.ancestorOrSelfIter();
+      return n.ancestorIter(true);
     }
   },
 
@@ -26,7 +26,7 @@ public enum Axis {
   ANCESTOR("ancestor", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.ancestorIter();
+      return n.ancestorIter(false);
     }
   },
 
@@ -50,7 +50,7 @@ public enum Axis {
   DESCENDANT_OR_SELF("descendant-or-self", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.descendantOrSelfIter();
+      return n.descendantIter(true);
     }
   },
 
@@ -58,7 +58,15 @@ public enum Axis {
   DESCENDANT("descendant", true) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.descendantIter();
+      return n.descendantIter(false);
+    }
+  },
+
+  /** Following-sibling-or-self axis. */
+  FOLLOWING_SIBLING_OR_SELF("following-sibling-or-self", false) {
+    @Override
+    BasicNodeIter iter(final ANode n) {
+      return n.followingSiblingIter(true);
     }
   },
 
@@ -66,7 +74,15 @@ public enum Axis {
   FOLLOWING_SIBLING("following-sibling", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.followingSiblingIter();
+      return n.followingSiblingIter(false);
+    }
+  },
+
+  /** Following axis. */
+  FOLLOWING_OR_SELF("following-or-self", false) {
+    @Override
+    BasicNodeIter iter(final ANode n) {
+      return n.followingIter(true);
     }
   },
 
@@ -74,7 +90,7 @@ public enum Axis {
   FOLLOWING("following", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.followingIter();
+      return n.followingIter(false);
     }
   },
 
@@ -87,10 +103,26 @@ public enum Axis {
   },
 
   /** Preceding-sibling axis. */
+  PRECEDING_SIBLING_OR_SELF("preceding-sibling-or-self", false) {
+    @Override
+    BasicNodeIter iter(final ANode n) {
+      return n.precedingSiblingIter(true);
+    }
+  },
+
+  /** Preceding-sibling axis. */
   PRECEDING_SIBLING("preceding-sibling", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.precedingSiblingIter();
+      return n.precedingSiblingIter(false);
+    }
+  },
+
+  /** Preceding axis. */
+  PRECEDING_OR_SELF("preceding-or-self", false) {
+    @Override
+    BasicNodeIter iter(final ANode n) {
+      return n.precedingIter(true);
     }
   },
 
@@ -98,7 +130,7 @@ public enum Axis {
   PRECEDING("preceding", false) {
     @Override
     BasicNodeIter iter(final ANode n) {
-      return n.precedingIter();
+      return n.precedingIter(false);
     }
   },
 
@@ -145,19 +177,23 @@ public enum Axis {
    */
   public final Axis invert() {
     switch(this) {
-      case ANCESTOR:           return DESCENDANT;
-      case ANCESTOR_OR_SELF:   return DESCENDANT_OR_SELF;
+      case ANCESTOR:                   return DESCENDANT;
+      case ANCESTOR_OR_SELF:           return DESCENDANT_OR_SELF;
       case ATTRIBUTE:
-      case CHILD:              return PARENT;
-      case DESCENDANT:         return ANCESTOR;
-      case DESCENDANT_OR_SELF: return ANCESTOR_OR_SELF;
-      case FOLLOWING_SIBLING:  return PRECEDING_SIBLING;
-      case FOLLOWING:          return PRECEDING;
-      case PARENT:             return CHILD;
-      case PRECEDING_SIBLING:  return FOLLOWING_SIBLING;
-      case PRECEDING:          return FOLLOWING;
-      case SELF:               return SELF;
-      default:                 throw Util.notExpected();
+      case CHILD:                      return PARENT;
+      case DESCENDANT:                 return ANCESTOR;
+      case DESCENDANT_OR_SELF:         return ANCESTOR_OR_SELF;
+      case FOLLOWING_SIBLING:          return PRECEDING_SIBLING;
+      case FOLLOWING_SIBLING_OR_SELF:  return PRECEDING_SIBLING_OR_SELF;
+      case FOLLOWING:                  return PRECEDING;
+      case FOLLOWING_OR_SELF:          return PRECEDING_OR_SELF;
+      case PARENT:                     return CHILD;
+      case PRECEDING_SIBLING:          return FOLLOWING_SIBLING;
+      case PRECEDING_SIBLING_OR_SELF:  return FOLLOWING_SIBLING_OR_SELF;
+      case PRECEDING:                  return FOLLOWING;
+      case PRECEDING_OR_SELF:          return FOLLOWING_OR_SELF;
+      case SELF:                       return SELF;
+      default:                         throw Util.notExpected();
     }
   }
 }

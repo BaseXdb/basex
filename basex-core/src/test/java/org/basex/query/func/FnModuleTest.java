@@ -4,12 +4,15 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
+
 import org.basex.*;
+import org.basex.core.cmd.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -19,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This class tests standard functions.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnModuleTest extends SandboxTest {
@@ -148,6 +151,16 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void analyzeString() {
     final Function func = ANALYZE_STRING;
     query(func.args("a", "", "j") + "//fn:non-match/text()", "a");
+
+    for(final String opt : Arrays.asList(" ()", "j")) {
+      query(func.args("banana", "(b)(x?)", opt), "<analyze-string-result xmlns="
+          + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b</group>"
+          + "<group nr=\"2\"/></match><non-match>anana</non-match></analyze-string-result>");
+      query(func.args("banana", "(b(x?))", opt), "<analyze-string-result xmlns="
+          + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b<group nr=\"2\"/>"
+          + "</group></match><non-match>anana</non-match></analyze-string-result>");
+    }
+
     error(func.args("a", ""), REGEMPTY_X);
   }
 
@@ -263,6 +276,14 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("AMP"), "&");
     query(func.args("amp"), "&");
     query(func.args("Tab"), "\t");
+
+    error(func.args(1), CHARINV_X);
+    error(func.args(11111111111111L), CHARINV_X);
+    error(func.args("\\x"), CHARINV_X);
+    error(func.args(""), CHARINV_X);
+    error(func.args("x"), CHARINV_X);
+    error(func.args("xy"), CHARINV_X);
+    error(func.args("xyz"), CHARINV_X);
   }
 
   /** Test method. */
@@ -290,6 +311,8 @@ public final class FnModuleTest extends SandboxTest {
     query("subsequence(" + func.args(wrap("aeiou")) + ", 3)", "i\no\nu");
     query("subsequence(" + func.args(wrap("äeiöü")) + ", 3)", "i\nö\nü");
 
+    query("sort(" + func.args("cba") + ")", "a\nb\nc");
+
     check("count(" + func.args(" string-join(" +
         REPLICATE.args(wrap("A"), 100000) + ')') + ')', 100000, exists(STRING_LENGTH));
     check("string-to-codepoints(" + wrap("AB") + ") ! codepoints-to-string(.)",
@@ -300,6 +323,49 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void codepointsToString() {
     final Function func = CODEPOINTS_TO_STRING;
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ')'), "ABC", root(STRING));
+
+    query(func.args(" ()"), "");
+    query(func.args(" (1 to 1000)[. > 1000]"), "");
+    query(func.args(" 0x41"), "A");
+    query(func.args(" (0x41, 0x42)"), "AB");
+    query(func.args(" (0x41 to 0x5A)"), "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    query(func.args(" (1 to 1000)[. = 0x41]"), "A");
+
+    // GH-2326
+    query(func.args(" ()") + " => boolean()", false);
+    query(func.args(" (1 to 1000)[. > 1000]") + " => boolean()", false);
+    query(func.args(" 0x41") + " => boolean()", true);
+    query(func.args(" (0x41, 0x42)") + " => boolean()", true);
+    query(func.args(" (0x1000 to 0xA000)") + " => boolean()", true);
+    query(func.args(" (1 to 1000) ! (0x1000 to 0xA000)") + " => boolean()", true);
+    query(func.args(" (1 to 1000)[. > 999]") + " => boolean()", true);
+  }
+
+  /** Test method. */
+  @Test public void concat() {
+    final Function func = CONCAT;
+
+    query(func.args(""), "");
+    query(func.args("", ""), "");
+    query(func.args(" ('', '')"), "");
+    query(func.args(" <?_?>"), "");
+    query(func.args(" <?_?>", " <?_?>"), "");
+    query(func.args(" (<?_?>, <?_?>)"), "");
+
+    // GH-2326
+    query(func.args("") + " => boolean()", false);
+    query(func.args("", "") + " => boolean()", false);
+    query(func.args(" ('', '')") + " => boolean()", false);
+    query(func.args(" <?_?>") + " => boolean()", false);
+    query(func.args(" <?_?>", " <?_?>") + " => boolean()", false);
+    query(func.args(" (<?_?>, <?_?>)") + " => boolean()", false);
+
+    query(func.args("", " 1") + " => boolean()", true);
+    query(func.args(" ('', '1')") + " => boolean()", true);
+    query(func.args(" 1") + " => boolean()", true);
+    query(func.args("", " 1 to 10000000000") + " => boolean()", true);
+    query(func.args(" (1, 1 to 10000000000)") + " => boolean()", true);
+    query(func.args(" 1", " 1 to 10000000000", "") + " => boolean()", true);
   }
 
   /** Test method. */
@@ -326,6 +392,164 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" count([ <a/>, <b/> ]) "), 1);
 
     query(func.args(" data( [ (1 to 6) ! <_>{ 1 }</_> ][. > 0 ] )"), 6);
+  }
+
+  /** Test method. */
+  @Test public void csvToArrays() {
+    final Function func = CSV_TO_ARRAYS;
+
+    // Handling trivial input:
+    query(func.args(" ()"), "");
+    query(func.args(""), "");
+    query(func.args(" char('\\n')"), "[]");
+    query(func.args(" ' '", " { 'trim-whitespace': true() }"), "");
+    query(func.args(" ' '", " { 'trim-whitespace': false() }"), "[\" \"]");
+    query(func.args(" ` {char('\\n')}`", " { 'trim-whitespace': true() }"), "[]");
+    query(func.args(" ` {char('\\n')}`", " { 'trim-whitespace': false() }"), "[\" \"]");
+    query(func.args(" `{char('\\n')} `", " { 'trim-whitespace': true() }"), "[]");
+    query(func.args(" `{char('\\n')} `", " { 'trim-whitespace': false() }"), "[]\n[\" \"]");
+    // Using newline separators:
+    query(func.args(
+        " `name,city{ char('\\n') }` ||\n"
+      + " `Bob,Berlin{ char('\\n') }` ||\n"
+      + " `Alice,Aachen{ char('\\n') }`"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    query(
+        " let $CRLF := `{ char('\\r') }{ char('\\n') }`\n"
+      + "return " + func.args(
+        "  `name,city{ $CRLF }` ||\n"
+      + "  `Bob,Berlin{ $CRLF }` ||\n"
+      + "  `Alice,Aachen{ $CRLF }`\n"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    // Quote handling:
+    query(func.args(
+        " string-join(\n"
+      + "    (`\"name\",\"city\"`, `\"Bob\",\"Berlin\"`, `\"Alice\",\"Aachen\"`),\n"
+      + "    char('\\n')\n"
+      + "  )"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    query(func.args(
+        "  `\"name\",\"city\"{ char('\\n') }` ||\n"
+      + "  `\"Bob \"\"The Exemplar\"\" Mustermann\",\"Berlin\"{ char('\\n') }`"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob \"\"The Exemplar\"\" Mustermann\",\"Berlin\"]");
+    // Non-default record- and field-delimiters:
+    query(func.args("name;city\u00A7Bob;Berlin\u00A7Alice;Aachen",
+      " { \"row-delimiter\": \"\u00A7\", \"field-delimiter\": \";\" }"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+    // Non-default quote character:
+    query(func.args(
+        " string-join(\n"
+      + "    (\"|name|,|city|\", \"|Bob|,|Berlin|\"),\n"
+      + "    char('\\n')\n"
+      + "  )", " { \"quote-character\": \"|\" }"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]");
+    // Trimming whitespace in fields:
+    query(func.args(
+        " string-join(\n"
+      + "    (\"name  ,city    \", \"Bob   ,Berlin  \", \"Alice ,Aachen  \"),\n"
+      + "    char('\\n')\n"
+      + "  )", " { \"trim-whitespace\": true() }"),
+        "[\"name\",\"city\"]\n"
+      + "[\"Bob\",\"Berlin\"]\n"
+      + "[\"Alice\",\"Aachen\"]");
+  }
+
+  /** Test method. */
+  @Test public void csvToXml() {
+    final Function func = CSV_TO_XML;
+    final String queryPrefix =
+        "let $crlf := char('\\r') || char('\\n')\n"
+      + "let $csv-string := `name,city{ $crlf }Bob,Berlin{ $crlf }Alice,Aachen{ $crlf }`\n"
+      + "let $csv-uneven-cols := concat(\n"
+      + "  `date,name,city,amount,currency,original amount,note{ $crlf }`,\n"
+      + "  `2023-07-19,Bob,Berlin,10.00,USD,13.99{ $crlf }`,\n"
+      + "  `2023-07-20,Alice,Aachen,15.00{ $crlf }`,\n"
+      + "  `2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie{ $crlf }`\n"
+      + ")\n"
+      + "return ";
+    final String resultTag = "<csv xmlns=\"http://www.w3.org/2005/xpath-functions\">";
+
+    // An empty CSV with default column extraction (false):
+    query(func.args(" ()"), "");
+    query(func.args(""), resultTag + "<rows/></csv>");
+    query(func.args(" char('\\n')"), resultTag + "<rows><row/></rows></csv>");
+    // An empty CSV with header extraction:
+    query(func.args("", " { 'header': true() }"), resultTag + "<rows/></csv>");
+    // An empty CSV with explicit column names:
+    query(func.args("", " { \"header\": (\"name\", \"\", \"city\") }"), resultTag + "<columns>"
+      + "<column>name</column><column/><column>city</column></columns><rows/></csv>");
+    // With defaults for delimiters and quotes, recognizing headers:
+    query(queryPrefix + func.args(" $csv-string", " { 'header': true() }"),
+      resultTag + "<columns><column>name</column><column>city</column></columns><rows><row><field "
+      + "column=\"name\">Bob</field><field column=\"city\">Berlin</field></row><row><field column="
+      + "\"name\">Alice</field><field column=\"city\">Aachen</field></row></rows></csv>");
+    // Filtering columns
+    query(queryPrefix + func.args(" $csv-uneven-cols",
+        " { \"header\": true(), \n"
+      + "  \"select-columns\": (2, 1, 4)\n"
+      + " }"),
+      resultTag + "<columns><column>name</column><column>date</column><column>amount</column>"
+      + "</columns><rows><row><field column=\"name\">Bob</field><field column=\"date\">2023-07-19"
+      + "</field><field column=\"amount\">10.00</field></row><row><field column=\"name\">Alice"
+      + "</field><field column=\"date\">2023-07-20</field><field column=\"amount\">15.00</field>"
+      + "</row><row><field column=\"name\">Charlie</field><field column=\"date\">2023-07-20</field>"
+      + "<field column=\"amount\">15.00</field></row></rows></csv>");
+    // Ragged rows
+    query(queryPrefix + func.args(" $csv-uneven-cols", " { \"header\": true() }"),
+      resultTag + "<columns><column>date</column><column>name</column><column>city</column><column>"
+      + "amount</column><column>currency</column><column>original amount</column><column>note"
+      + "</column></columns><rows><row><field column=\"date\">2023-07-19</field><field column="
+      + "\"name\">Bob</field><field column=\"city\">Berlin</field><field column=\"amount\">10.00"
+      + "</field><field column=\"currency\">USD</field><field column=\"original amount\">13.99"
+      + "</field></row><row><field column=\"date\">2023-07-20</field><field column=\"name\">Alice"
+      + "</field><field column=\"city\">Aachen</field><field column=\"amount\">15.00</field></row>"
+      + "<row><field column=\"date\">2023-07-20</field><field column=\"name\">Charlie</field><field"
+      + " column=\"city\">Celle</field><field column=\"amount\">15.00</field><field column="
+      + "\"currency\">GBP</field><field column=\"original amount\">11.99</field><field column="
+      + "\"note\">cake</field><field>not a lie</field></row></rows></csv>");
+    // Trimming rows to constant width
+    query(queryPrefix + func.args(" $csv-uneven-cols",
+        " { \"header\": true(),\n"
+      + "   \"trim-rows\": true()\n"
+      + " }"),
+      resultTag + "<columns><column>date</column><column>name</column><column>city</column><column>"
+      + "amount</column><column>currency</column><column>original amount</column><column>note"
+      + "</column></columns><rows><row><field column=\"date\">2023-07-19</field><field column="
+      + "\"name\">Bob</field><field column=\"city\">Berlin</field><field column=\"amount\">10.00"
+      + "</field><field column=\"currency\">USD</field><field column=\"original amount\">13.99"
+      + "</field><field column=\"note\"/></row><row><field column=\"date\">2023-07-20</field><field"
+      + " column=\"name\">Alice</field><field column=\"city\">Aachen</field><field column="
+      + "\"amount\">15.00</field><field column=\"currency\"/><field column=\"original amount\"/>"
+      + "<field column=\"note\"/></row><row><field column=\"date\">2023-07-20</field><field column="
+      + "\"name\">Charlie</field><field column=\"city\">Celle</field><field column=\"amount\">15.00"
+      + "</field><field column=\"currency\">GBP</field><field column=\"original amount\">11.99"
+      + "</field><field column=\"note\">cake</field></row></rows></csv>");
+    // Specifying a fixed number of columns
+    query(queryPrefix + func.args(" $csv-uneven-cols",
+        " { \"header\": true(),\n"
+      + "   \"select-columns\": 1 to 6\n"
+      + " }"),
+      resultTag + "<columns><column>date</column><column>name</column><column>city</column><column>"
+      + "amount</column><column>currency</column><column>original amount</column></columns><rows>"
+      + "<row><field column=\"date\">2023-07-19</field><field column=\"name\">Bob</field><field "
+      + "column=\"city\">Berlin</field><field column=\"amount\">10.00</field><field column="
+      + "\"currency\">USD</field><field column=\"original amount\">13.99</field></row><row><field "
+      + "column=\"date\">2023-07-20</field><field column=\"name\">Alice</field><field column="
+      + "\"city\">Aachen</field><field column=\"amount\">15.00</field><field column=\"currency\"/>"
+      + "<field column=\"original amount\"/></row><row><field column=\"date\">2023-07-20</field>"
+      + "<field column=\"name\">Charlie</field><field column=\"city\">Celle</field><field column="
+      + "\"amount\">15.00</field><field column=\"currency\">GBP</field><field column="
+      + "\"original amount\">11.99</field></row></rows></csv>");
   }
 
   /** Test method. */
@@ -377,12 +601,33 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void distinctOrderedNodes() {
+    final Function func = DISTINCT_ORDERED_NODES;
+    query(func.args(" <a/>"), "<a/>");
+    query(func.args(" (<a/>, <b/>)"), "<a/>\n<b/>");
+
+    check(func.args(REPLICATE.args(" (<a/>, <b/>)", 10)), "<a/>\n<b/>",
+        empty(REPLICATE));
+    check(func.args(REPLICATE.args(" <a/>", 2, true)), "<a/>\n<a/>",
+        exists(REPLICATE));
+
+    check("(<a><b/></a> ! (., *)) => reverse() => " + func.args(),
+        "<a><b/></a>\n<b/>", empty(REVERSE));
+    check("(<a><b/></a> ! (., *)) => sort() => " + func.args(),
+        "<a><b/></a>\n<b/>", empty(SORT));
+    check("(<a><b/></a> ! (., *)) => sort() => reverse() => sort() => " + func.args(),
+        "<a><b/></a>\n<b/>", empty(SORT), empty(REVERSE));
+
+    error(func.args(1), INVCONVERT_X_X_X);
+  }
+
+  /** Test method. */
   @Test public void distinctValues() {
     final Function func = DISTINCT_VALUES;
 
     query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
-    check(func.args(VOID.args(1)), "", root(VOID));
+    check(func.args(VOID.args(1, true)), "", root(VOID));
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
 
     // remove duplicate expressions
@@ -406,6 +651,25 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(wrap("A")), "A", root(DATA));
     check("(<a/>, <b/>) ! " + func.args(" ."), "\n", root(DATA));
     check("(1 to 2) ! " + func.args(" ."), "1\n2", root(RangeSeq.class));
+
+    // integer runtime optimizations
+    query("sum(" + func.args(" (3, 1 to 1000000)") + ")", 500000500000L);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000)") + "))", 500000500000L);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + ")", 500000500000L);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + "))", 500000500000L);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + ")", 500000499999L);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + "))", 500000499999L);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + ")", 500000499999L);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + "))", 500000499999L);
+
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + ")", 55);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + "))", 55);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(3))") + ")", 55);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(3))") + "))", 55);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + ")", 54);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + "))", 54);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + ")", 54);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + "))", 54);
   }
 
   /** Test method. */
@@ -531,6 +795,25 @@ public final class FnModuleTest extends SandboxTest {
     check(seq + "count(distinct-values($seq)) >= count($seq)", false, root(EMPTY), exists(func));
     check(seq + "count(distinct-values($seq)) >  count($seq)", false, root(Bln.class));
     check(seq + "count(distinct-values($seq)) != count($seq)", true,  root(EXISTS), exists(func));
+
+    // integer runtime optimizations
+    query("sum(" + func.args(" (3, 1 to 1000000)") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000)") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(3))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + ")", 2);
+    query("sum(sort(" + func.args(" (3, 1 to 1000000, xs:byte(-1), -1)") + "))", 2);
+
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(3))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(3))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + ")", 3);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1))") + "))", 3);
+    query("sum(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + ")", 2);
+    query("sum(sort(" + func.args(" (3, 1 to xs:integer(<?_ 10?>), xs:byte(-1), -1)") + "))", 2);
   }
 
   /** Test method. */
@@ -599,6 +882,16 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" ('a', <a/>)", " function($s as xs:string) as xs:boolean? { $s = 'a' }"), "a",
         exists(IterFilter.class));
 
+    check(func.args(9, " { 9: true() }"), 9);
+    check(func.args(9, " { 9: false() }"), null);
+    check(func.args(9, " { 9: ()} "), "");
+    check(func.args(8, " { 9: true() }"), "");
+
+    check(func.args(1, " [ true() ]"), 1);
+    check(func.args(1, " [ false() ]"), null);
+    check(func.args(1, " [ () ]"), "");
+    error(func.args(2, " [ true() ]"), ARRAYBOUNDS_X_X);
+
     inline(true);
     check(func.args(" (<a/>, <b/>)", " boolean#1"), "<a/>\n<b/>", root(List.class));
     check(func.args(" <a/>", " boolean#1"), "<a/>", root(CElem.class));
@@ -623,7 +916,7 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
-    check(func.args(" <a>1</a>", " xs:byte(1)", " function($n, $_) {" +
+    check(func.args(" 1 to 10", " xs:byte(1)", " function($n, $_) {" +
         " if($n instance of xs:byte ) then xs:short  (1) else" +
         " if($n instance of xs:short) then xs:int    (1) else" +
         " if($n instance of xs:int  ) then xs:long   (1) else" +
@@ -699,7 +992,7 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(VOID.args(" ()")), "", empty(func));
     check(func.args(" <a/>"), "<a/>", empty(func));
-    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(HEAD, "element(b)|element(a)?"));
+    check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(HEAD, "(element(b)|element(a))?"));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
 
     check(func.args(" tokenize(<_/>)"), "", exists(FOOT));
@@ -822,7 +1115,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" xs:date('2024-01-12Z')", "[Y0001]-[M01]-[D01][Z]", " ()", " ()",
         "America/New_York"), "2024-01-11-05:00");
 
-    if(IcuFormatter.available()) {
+    if(Prop.ICU) {
       query(func.args(" xs:date('2023-12-11')", "[FNn], [MNn] [D], [Y]", "cy"),
           "Dydd Llun, Rhagfyr 11, 2023");
       query(func.args(" xs:date('2023-09-01')", "[MNn]", "es"), "septiembre");
@@ -851,7 +1144,7 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(1, "Ww", "de"), "Eins");
     query(func.args(1, "Ww;o", "de"), "Erste");
-    if(IcuFormatter.available()) {
+    if(Prop.ICU) {
       query(func.args(1, "Ww;c", "de"), "Ein");
       query(func.args(1, "Ww;o(%spellout-cardinal-feminine-financial)", "bs"), "Jedinica");
       query(func.args(1, "Ww;c(%spellout-ordinal-neuter)", "es"), "Primera");
@@ -870,20 +1163,25 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = FORMAT_NUMBER;
 
     query(func.args(" 12345.67", "#.##0,00", "de"), "12.345,67");
-    query(func.args(" 12345.67", "#.##0,00", " ()", " map { 'decimal-separator': ',', "
+    query(func.args(" 12345.67", "#.##0,00", " { 'decimal-separator': ',', "
         + "'grouping-separator': '.' }"), "12.345,67");
     query(func.args(" 12345.67", "#\u2019##0.00", "de-CH"), "12\u2019345.67");
+    query(func.args(" 12345.67", "#.##0,00", " { "
+        + "'decimal-separator': ',', 'grouping-separator': '.' }"), "12.345,67");
+    query(func.args(" 12345.67", "#.##0,00", " { 'format-name': 'de' }"), "12.345,67");
+    query(func.args(" 12345.67", "#.##0,00", " { 'format-name': 'de', "
+        + "'decimal-separator': ',', 'grouping-separator': '.' }"), "12.345,67");
+    query(func.args(" 12345.67", "#.##0,00", " { 'format-name': 'en', "
+        + "'decimal-separator': ',', 'grouping-separator': '.' }"), "12.345,67");
 
-    error(func.args(" 12345.67", "#.##0,00", "de", " map { 'decimal-separator': ',', "
-        + "'grouping-separator': '.' }"), FORMDUP_X);
-    error(func.args(" 12345.67", "#.##0,00", "de-XX"), FORMNUM_X);
+    error(func.args(" 12345.67", "#.##0,00", "de-XX"), FORMATWHICH_X);
   }
 
   /** Test method. */
   @Test public void functionAnnotations() {
     final Function func = FUNCTION_ANNOTATIONS;
     // queries
-    query(func.args(" true#0"), "map{}");
+    query(func.args(" true#0"), "{}");
     query(func.args(" %local:x function() { }") +
         "=> " + _MAP_CONTAINS.args(" xs:QName('local:x')"), true);
     query(func.args(" %Q{uri}name('a', 'b') function() {}") +
@@ -914,6 +1212,18 @@ public final class FnModuleTest extends SandboxTest {
     // GH-1633: ensure that database nodes return identical id
     query("count(distinct-values((document { <x/> } update {}) ! (*, *) ! " +
         func.args(" .") + "))", 1);
+  }
+
+  /** Test method. */
+  @Test public void hash() {
+    final Function func = HASH;
+    query(func.args(" ()", "crc-32"), "");
+    query("string( " + func.args("", "CRC-32") + ')', "00000000");
+    query("string( " + func.args("BaseX", "CRC-32") + ')', "4C06FC7F");
+    query("string( " + func.args("BaseX", "CRC-32", " {}") + ')', "4C06FC7F");
+
+    query("string( " + func.args("X", "BLAKE3") + ')',
+        "F7B966D4B544408E21361E62D4D554FEDB411BD8E108D70B4B654620A4B06CD2");
   }
 
   /** Test method. */
@@ -992,11 +1302,45 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 6, empty(REVERSE));
 
+    query(func.args(" (98 to 102)", " key := string#1"), 99);
+    query(func.args(" (98 to 102)", " ()", " string#1"), 99);
+
     error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
     error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOMIZE_X);
+  }
+
+  /** Test method. */
+  @Test public void id() {
+    final Function func = ID;
+    final String doc = "<foo xml:id=\"a1\" x=\"x\"><bar xml:id=\"a1\" y=\"y\"/></foo>";
+    String input = " document { " + doc + " }";
+    query(func.args("a1", input), doc);
+    query(func.args("a2", input), "");
+    query(func.args("a1", input + "/*"), doc);
+    query(func.args("a2", input + "/*"), "");
+    query(input + " ! " + func.args("a1"), doc);
+    query(input + " ! " + func.args("a2"), "");
+    query(input + "/* ! " + func.args("a1"), doc);
+    query(input + "/* ! " + func.args("a2"), "");
+
+    input = " doc('db')";
+    execute(new CreateDB("db", doc));
+    query(func.args("a1", input), doc);
+    query(func.args("a2", input), "");
+    query(func.args("a1", input + "/*"), doc);
+    query(func.args("a2", input + "/*"), "");
+    query(input + " ! " + func.args("a1"), doc);
+    query(input + " ! " + func.args("a2"), "");
+    query(input + "/* ! " + func.args("a1"), doc);
+    query(input + "/* ! " + func.args("a2"), "");
+
+    query(input + "/* ! boolean(" + func.args("a1") + ")", true);
+    query(input + "/* ! boolean(" + func.args("a2") + ")", false);
+
+    error(func.args("a2", " <a/>"), IDDOC);
   }
 
   /** Test method. */
@@ -1019,6 +1363,8 @@ public final class FnModuleTest extends SandboxTest {
     query("count(" + func.args(" reverse(1 to 1000000)", 1000000) + ")", 1);
 
     query("count(" + func.args(" (1 to 1000000) ! 'x'", "x") + ")", 1000000);
+
+    check(func.args(" replicate(1, 6)", 1), "1\n2\n3\n4\n5\n6", exists(RangeSeq.class));
   }
 
   /** Test method. */
@@ -1090,26 +1436,6 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void intersperse() {
-    final Function func = INTERSPERSE;
-
-    query(func.args(" ()", " ()"), "");
-    query(func.args(" ()", 1), "");
-    query(func.args(1, " ()"), 1);
-    query(func.args(" (1, 2)", " ()"), "1\n2");
-
-    query(func.args(1, "a"), 1);
-    query(func.args(1, " ('a', 'b')"), 1);
-    query(func.args(" (1, 2)", "a"), "1\na\n2");
-    query(func.args(" (1, 2)", " ('a', 'b')"), "1\na\nb\n2");
-
-    check(func.args(1, "a") + " => count()", 1, root(Int.class));
-    check(func.args(" 1[. = <_>1</_>]", "a"), 1, root(If.class));
-    check(func.args(" (1, 2)[. = <_>3</_>]", " 'a'"), "", root(func));
-    check(func.args(" (1, 2)", " 'a'[. = <_/>]"), "1\n2", root(func));
-  }
-
-  /** Test method. */
   @Test public void invisibleXml() {
     final Function func = INVISIBLE_XML;
     // unambiguous grammar
@@ -1129,11 +1455,16 @@ public final class FnModuleTest extends SandboxTest {
         + "   \"(\", e, \")\".") + "('2*3+4')",
           "<e xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"ambiguous\">"
         + "<e><e><f>2</f></e>*<e><f>3</f></e></e>+<e><f>4</f></e></e>");
-    // input with cr+lf
+    // input with cr+lf, ixml 1.0
+    query("string-to-codepoints("
+        + func.args("ixml version '1.0'. s: ~[]*.")
+        + "(codepoints-to-string((9,13,10,9,10,13,9,10,9,13,9))))",
+        "9\n13\n10\n9\n10\n13\n9\n10\n9\n13\n9");
+    // input with cr+lf, ixml 1.1+
     query("string-to-codepoints("
         + func.args("s: ~[]*.")
         + "(codepoints-to-string((9,13,10,9,10,13,9,10,9,13,9))))",
-        "9\n13\n10\n9\n10\n13\n9\n10\n9\n13\n9");
+        "9\n10\n9\n10\n10\n9\n10\n9\n10\n9");
     // invalid input
     query("let $parser := " + func.args("s: ~[\"x\"]*.") + "\n"
         + "return $parser('x')",
@@ -1266,7 +1597,7 @@ public final class FnModuleTest extends SandboxTest {
     check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) + 1"),
         "", empty());
     check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) - 1"),
-        9, root(GFLWOR.class));
+        9, root(Pipeline.class));
 
     check(func.args(VOID.args(" ()"), 0), "", empty(func));
     check(func.args(TRUNK.args(" (1, 2, 3, <_/>)"), 2), 2, empty(TRUNK));
@@ -1284,6 +1615,32 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = JSON_TO_XML;
     contains(func.args("null"), "xmlns");
     contains(func.args("null") + " update { }", "xmlns");
+  }
+
+  /** Test method. */
+  @Test public void loadXQueryModule() {
+    final Function func = LOAD_XQUERY_MODULE;
+    final String module = "src/test/resources/hello.xqm";
+    query(_REPO_INSTALL.args(module));
+
+    query(func.args("world", " {'variables': {QName('world', 'ext'): 42}}")
+        + "?variables(QName('world', 'ext'))", 42);
+    query("let $expr := '2 + 2'\n"
+        + "let $module := `xquery version '4.0'; \n"
+        + "                module namespace dyn='http://example.com/dyn';\n"
+        + "                declare %public variable $dyn:value := {$expr};`\n"
+        + "let $exec := load-xquery-module('http://example.com/dyn', \n"
+        + "                                {'content':$module})\n"
+        + "let $variables := $exec?variables\n"
+        + "return $variables(QName('http://example.com/dyn', 'value'))", 4);
+
+    error(func.args(""), MODULE_URI_EMPTY);
+    error(func.args("x"), MODULE_NOT_FOUND_X);
+    error(func.args("x", " {'content': '%@?$'}"), MODULE_STATIC_ERROR_X_X);
+    error(func.args("x", " {'content': 'module namespace y = \"y\";'}"), MODULE_FOUND_OTHER_X);
+    error(func.args("x.xq", " { 'content': 'declare function local:f() {}; ()' }"),
+        MODULE_FOUND_MAIN_X);
+    error(func.args("world"), VAREMPTY_X);
   }
 
   /** Test method. */
@@ -1313,6 +1670,9 @@ public final class FnModuleTest extends SandboxTest {
         " function($a) { string($a/@*) }"), "<_ _=\"10\"/>");
     check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 4, empty(REVERSE));
+
+    query(func.args(" (98 to 102)", " key := string#1"), 100);
+    query(func.args(" (98 to 102)", " ()", " string#1"), 100);
 
     error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
     error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
@@ -1371,7 +1731,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(1.1), 1.1);
     query(func.args(" 1e1"), 10);
     query(func.args(" (1, 1e1)"), 1);
-    query(func.args(" (1, 1.1, 1e1)") + " instance of xs:double", true);
+    query(func.args(" (1, 1.1, 1e1)") + " instance of xs:integer", true);
     query(func.args(wrap(1)) + " instance of xs:double", true);
     query(func.args(" [1]"), 1);
     query(func.args(" (7, 6, 6, 6.0, 5.0, 5.0, xs:float('5'), xs:float('4'), xs:float('4'), " +
@@ -1383,7 +1743,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (xs:anyURI('c'), xs:anyURI('b'), 'a')") +
         " ! (. = 'a' and . instance of xs:string)", true);
     query(func.args(" ('b', xs:anyURI('a'))") +
-        " ! (. = 'a' and . instance of xs:string)", true);
+        " ! (. = 'a' and . instance of xs:anyURI)", true);
     query(func.args(" (2, 3, 1)"), 1);
     query(func.args(" (xs:date('2002-01-01'), xs:date('2003-01-01'), xs:date('2001-01-01'))"),
         "2001-01-01");
@@ -1414,6 +1774,30 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void namespaceUriForPrefix() {
     final Function func = NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
+  }
+
+  /** Test method. */
+  @Test public void normalizeSpace() {
+    final Function func = NORMALIZE_SPACE;
+
+    query(func.args(""), "");
+    query(func.args("x"), "x");
+    query(func.args(" ' x '"), "x");
+    query(func.args(" <?_ x?>"), "x");
+    query(func.args(" <?_  x ?>"), "x");
+    query("string-length(" + func.args(" string-join((1 to 100000) ! ' ')") + ')', 0);
+    query("string-length(" + func.args(" string-join((1 to 100000) ! 'x')") + ')', 100000);
+
+    // GH-2326
+    query("boolean(" + func.args("") + ')', false);
+    query("boolean(" + func.args(" <?_?>") + ')', false);
+    query("boolean(" + func.args(" string-join((1 to 100000) ! ' ')") + ')', false);
+
+    query("boolean(" + func.args("x") + ')', true);
+    query("boolean(" + func.args(" ' x '") + ')', true);
+    query("boolean(" + func.args(" <?_ x?>") + ')', true);
+    query("boolean(" + func.args(" <?_  x ?>") + ')', true);
+    query("boolean(" + func.args(" string-join((1 to 100000) ! 'x')") + ')', true);
   }
 
   /** Test method. */
@@ -1529,14 +1913,173 @@ public final class FnModuleTest extends SandboxTest {
         + "<body>\u20AC</body>", "ISO-8859-7"), " map {'heuristics': 'NONE'}"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"ISO-8859-7\"/></head>"
         + "<body>\u20AC</body></html>");
+    query(func.args("42", " map {'heuristics': 'ICU'}"),
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
 
     error(func.args(42), STRBIN_X_X);
-    error(func.args("42", 42), MAP_X_X);
-    error(func.args("42", " map {'1234': ''}"), INVHTMLOPT_X);
-    error(func.args("42", " map {'heuristics': '5678'}"), INVHTMLOPT_X);
+    error(func.args("42", 42), INVCONVERT_X_X_X);
+    error(func.args("42", " map {'1234': ''}"), OPTION_X);
+    error(func.args("42", " map {'heuristics': '5678'}"), OPTION_X);
     error(func.args("42", " map {'heuristics': 'CHARDET'}"), BASEX_CLASSPATH_X_X);
-    error(func.args("42", " map {'heuristics': 'ICU'}"), BASEX_CLASSPATH_X_X);
     error(func.args("42", " map {'heuristics': 'ALL'}"), BASEX_CLASSPATH_X_X);
+  }
+
+  /** Test method. */
+  @Test public void parseCsv() {
+    final Function func = PARSE_CSV;
+    final String display =
+        "let $display := fn($result) {\n"
+      + "   (: tidy up the result for display (function items cannot be properly displayed) :) \n"
+      + "   map:put($result, \"get\", \"(: function :)\")\n"
+      + "}\n";
+
+    // Default delimiters, no column headers:
+    query(display
+      + "let $input := string-join(\n"
+      + "  (\"name,city\", \"Bob,Berlin\", \"Alice,Aachen\"),\n"
+      + "  char('\\n')\n"
+      + ")\n"
+      + "let $result := " + func.args(" $input") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(1, 2),\n"
+      + "  $result?get(2, 2)\n"
+      + ")",
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"name\",\"city\"],[\"Bob\",\"Berlin\"],"
+      + "[\"Alice\",\"Aachen\"]),\"get\":\"(: function :)\"}\n"
+      + "city\n"
+      + "Berlin");
+    // Default delimiters, column headers:
+    query(display
+      + "let $input := string-join(\n"
+      + "  (\"name,city\", \"Bob,Berlin\", \"Alice,Aachen\"),\n"
+      + "  char('\\n')\n"
+      + ")\n"
+      + "let $result := " + func.args(" $input", " { \"header\": true() }") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(1, \"name\"),\n"
+      + "  $result?get(2, \"city\")\n"
+      + ")",
+        "{\"columns\":(\"name\",\"city\"),\"column-index\":{\"name\":1,\"city\":2},\"rows\":("
+      + "[\"Bob\",\"Berlin\"],[\"Alice\",\"Aachen\"]),\"get\":\"(: function :)\"}\n"
+      + "Bob\n"
+      + "Aachen");
+    // Custom delimiters, no column headers:
+    query(display
+      + "let $options := {\n"
+      + "  \"row-delimiter\": \"\u00A7\", \n"
+      + "  \"field-delimiter\": \";\", \n"
+      + "  \"quote-character\": \"|\"\n"
+      + "}\n"
+      + "let $input := \"|name|;|city|\u00A7|Bob|;|Berlin|\u00A7|Alice|;|Aachen|\"\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(3, 1)\n"
+      + ")",
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"name\",\"city\"],[\"Bob\",\"Berlin\"],"
+      + "[\"Alice\",\"Aachen\"]),\"get\":\"(: function :)\"}\n"
+        + "Alice");
+    // Supplied column names:
+    query(display
+      + "let $headers := (\"Person\", \"Location\")\n"
+      + "let $options := { \"header\": $headers, \"row-delimiter\": \";\" }\n"
+      + "let $input := \"Alice,Aachen;Bob,Berlin;\"\n"
+      + "let $parsed-csv := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $parsed-csv => $display(),\n"
+      + "  $parsed-csv?get(2, \"Location\")\n"
+      + ")",
+        "{\"columns\":(\"Person\",\"Location\"),\"column-index\":{\"Person\":1,\"Location\":2},"
+      + "\"rows\":([\"Alice\",\"Aachen\"],[\"Bob\",\"Berlin\"]),\"get\":\"(: function :)\"}\n"
+      + "Berlin");
+    // Filtering columns, with ragged input and header: true()
+    query(display
+      + "let $input := string-join((\n"
+      + "   \"date,name,city,amount,currency,original amount,note\",\n"
+      + "   \"2023-07-19,Bob,Berlin,10.00,USD,13.99\",\n"
+      + "   \"2023-07-20,Alice,Aachen,15.00\",\n"
+      + "   \"2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie\"\n"
+      + "), char('\\n'))\n"
+      + "let $options := {\n"
+      + "  \"header\": true(),\n"
+      + "  \"select-columns\": (2, 1, 4)\n"
+      + "}\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(2, \"amount\")\n"
+      + ")",
+        "{\"columns\":(\"name\",\"date\",\"amount\"),\"column-index\":{\"name\":1,\"date\":2,"
+      + "\"amount\":3},\"rows\":([\"Bob\",\"2023-07-19\",\"10.00\"],[\"Alice\",\"2023-07-20\","
+      + "\"15.00\"],[\"Charlie\",\"2023-07-20\",\"15.00\"]),\"get\":\"(: function :)\"}\n"
+      + "15.00");
+    // Filtering columns, with supplied column map
+    query(display
+      + "let $input := string-join((\n"
+      + "  \"2023-07-20,Alice,Aachen,15.00\",\n"
+      + "  \"2023-07-19,Bob,Berlin,10.00,USD,13.99\",\n"
+      + "  \"2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie\"\n"
+      + "), char('\\n'))\n"
+      + "let $options := { \n"
+      + "  \"header\": ( \"Person\", \"\", \"Amount\" ),\n"
+      + "  \"select-columns\": (2, 1, 4)\n"
+      + "}\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(2, \"Person\"),\n"
+      + "  $result?get(2, \"Amount\")\n"
+      + ")",
+        "{\"columns\":(\"Person\",\"\",\"Amount\"),\"column-index\":{\"Person\":1,\"Amount\":3},"
+      + "\"rows\":([\"Alice\",\"2023-07-20\",\"15.00\"],[\"Bob\",\"2023-07-19\",\"10.00\"],"
+      + "[\"Charlie\",\"2023-07-20\",\"15.00\"]),\"get\":\"(: function :)\"}\n"
+      + "Bob\n"
+      + "10.00");
+    // Specifying the number of columns explicitly, with header: false()
+    query(display
+      + "let $input := string-join((\n"
+      + "  \"date,      name,     amount,    currency,   original amount\",\n"
+      + "  \"2023-07-19,Bob,      10.00,     USD,        13.99\",\n"
+      + "  \"2023-07-20,Alice,    15.00\",\n"
+      + "  \"2023-07-20,Charlie,  15.00,     GBP,        11.99,             extra data\"\n"
+      + "), char('\\n'))\n"
+      + "let $options := {\n"
+      + "  \"header\": false(), \n"
+      + "  \"select-columns\": 1 to 5, \n"
+      + "  \"trim-whitespace\" :true()\n"
+      + "}\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(4, 3)\n"
+      + ")",
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"date\",\"name\",\"amount\",\"currency\","
+      + "\"original amount\"],[\"2023-07-19\",\"Bob\",\"10.00\",\"USD\",\"13.99\"],[\"2023-07-20\","
+      + "\"Alice\",\"15.00\",\"\",\"\"],[\"2023-07-20\",\"Charlie\",\"15.00\",\"GBP\",\"11.99\"]),"
+      + "\"get\":\"(: function :)\"}\n"
+      + "15.00");
+    // Specifying the number of columns with a number and header: true()
+    query(display
+      + "let $input := string-join((\n"
+      + "  \"date,name,city,amount,currency,original amount,note\",\n"
+      + "  \"2023-07-19,Bob,Berlin,10.00,USD,13.99\",\n"
+      + "  \"2023-07-20,Alice,Aachen,15.00\",\n"
+      + "  \"2023-07-20,Charlie,Celle,15.00,GBP,11.99,cake,not a lie\"\n"
+      + "), char('\\n'))\n"
+      + "let $options := { \"header\": true(), \"select-columns\": 1 to 6 }\n"
+      + "let $result := " + func.args(" $input", " $options") + "\n"
+      + "return (\n"
+      + "  $result => $display(),\n"
+      + "  $result?get(3, \"original amount\")\n"
+      + ")",
+        "{\"columns\":(\"date\",\"name\",\"city\",\"amount\",\"currency\",\"original amount\"),"
+      + "\"column-index\":{\"date\":1,\"name\":2,\"city\":3,\"amount\":4,\"currency\":5,"
+      + "\"original amount\":6},\"rows\":([\"2023-07-19\",\"Bob\",\"Berlin\",\"10.00\",\"USD\","
+      + "\"13.99\"],[\"2023-07-20\",\"Alice\",\"Aachen\",\"15.00\",\"\",\"\"],[\"2023-07-20\","
+      + "\"Charlie\",\"Celle\",\"15.00\",\"GBP\",\"11.99\"]),\"get\":\"(: function :)\"}\n"
+      + "11.99");
   }
 
   /** Test method. */
@@ -1814,6 +2357,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("bab", "a", " action := function($_, $__) { }"), "bb");
     query(func.args("bab", "(a)", " action := function($_, $__) { }"), "bb");
     query(func.args("bab", "(a)", " action := function($_, $__) { '' }"), "bb");
+    query(func.args("abcde", "b(.)d", "$1"), "ace");
+    query(func.args("abcde", "b(.)d", "$1", "j"), "ace");
 
     error(func.args("W", ".*", " ()", " ()", " function($k, $g) { }"), REGEMPTY_X);
   }
@@ -1905,10 +2450,30 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void sequenceJoin() {
+    final Function func = SEQUENCE_JOIN;
+
+    query(func.args(" ()", " ()"), "");
+    query(func.args(" ()", 1), "");
+    query(func.args(1, " ()"), 1);
+    query(func.args(" (1, 2)", " ()"), "1\n2");
+
+    query(func.args(1, "a"), 1);
+    query(func.args(1, " ('a', 'b')"), 1);
+    query(func.args(" (1, 2)", "a"), "1\na\n2");
+    query(func.args(" (1, 2)", " ('a', 'b')"), "1\na\nb\n2");
+
+    check(func.args(1, "a") + " => count()", 1, root(Int.class));
+    check(func.args(" 1[. = <_>1</_>]", "a"), 1, root(If.class));
+    check(func.args(" (1, 2)[. = <_>3</_>]", " 'a'"), "", root(func));
+    check(func.args(" (1, 2)", " 'a'[. = <_/>]"), "1\n2", root(func));
+  }
+
+  /** Test method. */
   @Test public void serialize() {
     final Function func = SERIALIZE;
     contains(func.args(" <x/>"), "<x/>");
-    contains(func.args(" <x/>", " map {}"), "<x/>");
+    contains(func.args(" <x/>", " map { }"), "<x/>");
     contains(func.args(" <x>a</x>", " map { 'method': 'text' }"), "a");
 
     // character maps
@@ -1920,7 +2485,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("1", " map { 'indent': false() }"), 1);
     query(func.args("1", " map { 'indent': true() }"), 1);
     query(func.args("1", " map { 'indent': 1 }"), 1);
-    error(func.args("1", " map { 'indent': 2 }"), SEROPT_X);
+    error(func.args("1", " map { 'indent': 2 }"), OPTION_X);
 
     query(func.args("<html/>", " map { 'html-version': 5 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " map { 'html-version': 5.0 }"), "&lt;html/&gt;");
@@ -2019,17 +2584,17 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" (" + wrap("1") + " + 1, 3)", 1, 2), "2\n3", root(List.class));
     check(func.args(" replicate(" + wrap("1") + " + 1, 3)", 2), "2\n2", root(REPLICATE));
 
-    check(func.args(" doc('" + DOC + "')//*", 1) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 1) + " => " + VOID.args(true),
         "", empty(func));
-    check(func.args(" doc('" + DOC + "')//*", 2) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 2) + " => " + VOID.args(true),
         "", empty(func), exists(TAIL));
-    check(func.args(" doc('" + DOC + "')//*", 9) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 9) + " => " + VOID.args(true),
         "", empty(func), exists(_UTIL_RANGE));
-    check(func.args(" doc('" + DOC + "')//*", 10) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 10) + " => " + VOID.args(true),
         "", empty(func), exists(FOOT));
-    check(func.args(" doc('" + DOC + "')//*", 11) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 11) + " => " + VOID.args(true),
         "", empty(func), exists(FOOT));
-    check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => " + VOID.args(),
+    check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => " + VOID.args(true),
         "", empty(func), exists(_UTIL_RANGE));
   }
 
@@ -2099,7 +2664,7 @@ public final class FnModuleTest extends SandboxTest {
     check("(" + _RANDOM_DOUBLE.args() + " => " + REPLICATE.args(10, true) + " => " +
         func.args() + ")[. > 1]", "", exists(func));
 
-    error(func.args(" true#0"), FIATOMIZE_X);
+    query(func.args(" true#0"), "fn:true#0");
     error(func.args(" (1 to 2) ! true#0"), FIATOMIZE_X);
   }
 
@@ -2136,6 +2701,35 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(CHARACTERS.args(wrap("ABC"))), "ABC", root(STRING));
     check(func.args(" string-to-codepoints(" + wrap("ABC") + ") ! codepoints-to-string(.)"),
         "ABC", root(STRING));
+
+    query(func.args(" ()", ""), "");
+    query(func.args(" ()", "x"), "");
+    query(func.args("", "x"), "");
+    query(func.args(" (1 to 100000000) ! ''"), "");
+
+    query(func.args("x", ""), "x");
+    query(func.args("x", "x"), "x");
+    query(func.args(" ('', '')", "x"), "x");
+    query(func.args(" ('x', '')", ""), "x");
+    query(func.args(" ('', 'x')", ""), "x");
+    query(func.args(" ('', 'x')", "x"), "xx");
+    query(func.args(" 1 to 6"), "123456");
+    query(func.args(" (1 to 6) ! 'x'"), "xxxxxx");
+
+    // GH-2326
+    query(func.args(" ()", "") + " => boolean()", false);
+    query(func.args(" ()", "x") + " => boolean()", false);
+    query(func.args("", "x") + " => boolean()", false);
+    query(func.args(" (1 to 100000000) ! ''") + " => boolean()", false);
+
+    query(func.args("x", "") + " => boolean()", true);
+    query(func.args("x", "x") + " => boolean()", true);
+    query(func.args(" ('', '')", "x") + " => boolean()", true);
+    query(func.args(" ('x', '')", "") + " => boolean()", true);
+    query(func.args(" ('', 'x')", "") + " => boolean()", true);
+    query(func.args(" ('', 'x')", "x") + " => boolean()", true);
+    query(func.args(" 1 to 100000000") + " => boolean()", true);
+    query(func.args(" (1 to 100000000) ! 'x'") + " => boolean()", true);
   }
 
   /** Test method. */
@@ -2286,6 +2880,9 @@ public final class FnModuleTest extends SandboxTest {
     query("<x/> ! subsequence((., *), 1, 1)", "<x/>");
     query("<x/> ! subsequence((., *), 1, 2)", "<x/>");
     query("<x/> ! subsequence((., *), 1, 3)", "<x/>");
+
+    // GH-2315
+    check("(1 to 6) ! " + func.args(" <a/>/*", " .", 1), "", root(_UTIL_RANGE));
   }
 
   /** Test method. */
@@ -2449,6 +3046,13 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void takeWhile() {
+    final Function func = TAKE_WHILE;
+
+    query(func.args(" <x><a/><a/><c/></x>/*", " fn($n) { boolean($n/self::a) }"), "<a/>\n<a/>");
+  }
+
+  /** Test method. */
   @Test public void tokenize() {
     final Function func = TOKENIZE;
     query(func.args("a", "", "j"), "\na\n");
@@ -2567,6 +3171,14 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void unixDateTime() {
+    final Function func = UNIX_DATETIME;
+    query(func.args(), "1970-01-01T00:00:00Z");
+    query(func.args(0), "1970-01-01T00:00:00Z");
+    query(func.args(86400000), "1970-01-02T00:00:00Z");
+  }
+
+  /** Test method. */
   @Test public void unparsedText() {
     final Function func = UNPARSED_TEXT;
     contains(func.args(TEXT), "<html");
@@ -2588,9 +3200,10 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("1, 2"), "");
     query(func.args("1, 2", true), "");
 
-    check(func.args("(1 to 10000000000000) ! string()", true), "", empty());
-    error(func.args(" 1 + <a/>", false), FUNCCAST_X_X);
-    query(func.args(" 1 + <a/>", true), "");
+    check(func.args(" (1 to 10000000000000) ! string()"), "", empty());
+    query(func.args(" 1 + <a/>"), "");
+    query(func.args(" 2 + <a/>", false), "");
+    error(func.args(" 3 + <a/>", true), FUNCCAST_X_X);
 
     // GH-2139: Simplify inlined nondeterministic code
     check("let $doc := doc('" + TEXT + "') let $a := 1 return $a", 1, root(Int.class));

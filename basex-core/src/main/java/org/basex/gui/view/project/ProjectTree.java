@@ -17,7 +17,7 @@ import org.basex.util.*;
 /**
  * Tree of project view.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 final class ProjectTree extends BaseXTree implements TreeWillExpandListener, ProjectCommands {
@@ -113,9 +113,8 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
 
             final String fn = name;
             new Thread(() -> {
-              final Enumeration<?> children = dir.children();
-              while(children.hasMoreElements()) {
-                final ProjectNode child = (ProjectNode) children.nextElement();
+              for(final TreeNode tn : Collections.list(dir.children())) {
+                final ProjectNode child = (ProjectNode) tn;
                 if(child.file != null && child.file.name().equals(fn)) {
                   final TreePath tp = child.path();
                   setSelectionPath(tp);

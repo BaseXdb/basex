@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -14,7 +14,7 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class FnReplace extends RegEx {
@@ -37,13 +37,14 @@ public final class FnReplace extends RegEx {
     final Matcher matcher = regExpr.pattern.matcher(string(value));
 
     if(action != null) {
+      final HofArgs args = new HofArgs(2);
       final StringBuilder sb = new StringBuilder();
       while(matcher.find()) {
-        final Atm group = Atm.get(matcher.group());
         final ValueBuilder groups = new ValueBuilder(qc);
         final int gc = matcher.groupCount();
         for(int g = 0; g < gc; g++) groups.add(Atm.get(matcher.group(g + 1)));
-        final Item item = action.invoke(qc, info, group, groups.value()).atomItem(qc, info);
+        args.set(0, Atm.get(matcher.group())).set(1, groups.value());
+        final Item item = invoke(action, args, qc).atomItem(qc, info);
         matcher.appendReplacement(sb, item.isEmpty() ? "" :
           string(item.string(info)).replace("\\", "\\\\").replace("$", "\\$"));
       }
@@ -81,7 +82,7 @@ public final class FnReplace extends RegEx {
             s = ++i;
             if(i < sl && Character.isDigit(string.charAt(i))) i++;
             final int n = Integer.parseInt(string.substring(s, i));
-            if(n <= regExpr.groups) sb.append('$').append(n);
+            if(n <= matcher.groupCount()) sb.append('$').append(n);
             s = i;
           } else {
             sb.append(string, s, i + 1);
@@ -95,7 +96,7 @@ public final class FnReplace extends RegEx {
   }
 
   @Override
-  public boolean has(final Flag... flags) {
-    return Flag.HOF.in(flags) && defined(4) || super.has(flags);
+  public int hofIndex() {
+    return 4;
   }
 }

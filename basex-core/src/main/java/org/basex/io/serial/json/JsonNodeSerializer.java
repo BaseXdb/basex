@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * This class serializes items as JSON. The input must conform to the rules
  * defined in the {@link JsonDirectConverter} and {@link JsonAttsConverter} class.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class JsonNodeSerializer extends JsonSerializer {
@@ -132,7 +132,8 @@ public final class JsonNodeSerializer extends JsonSerializer {
         final byte[] name = atts ? key : XMLToken.decode(key, lax);
         if(name == null) throw error("Name of element <%> is invalid", key);
         out.print(normalize(name, form));
-        out.print("\":");
+        out.print('"');
+        out.print(':');
       } else if(eq(ptype, ARRAY)) {
         if(atts) {
           if(!eq(elem.string(), ITEM)) throw error("<%> found, <%> expected", elem, ITEM);
@@ -189,7 +190,8 @@ public final class JsonNodeSerializer extends JsonSerializer {
     finishOpen();
     final byte[] type = types.get(level);
     if(eq(type, STRING)) {
-      out.print("\"\"");
+      out.print('"');
+      out.print('"');
     } else if(eq(type, NULL)) {
       out.print(NULL);
     } else if(!eq(type, OBJECT, ARRAY)) {

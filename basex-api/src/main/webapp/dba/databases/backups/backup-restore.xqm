@@ -1,7 +1,7 @@
 (:~
  : Restore backup.
  :
- : @author Christian Grün, BaseX Team 2005-24, BSD License
+ : @author Christian Grün, BaseX Team, BSD License
  :)
 module namespace dba = 'dba/databases';
 
@@ -20,23 +20,20 @@ declare variable $dba:SUB := 'database';
  :)
 declare
   %updating
-  %rest:GET
+  %rest:POST
   %rest:path('/dba/backup-restore')
-  %rest:query-param('name',   '{$name}', '')
-  %rest:query-param('backup', '{$backups}')
+  %rest:form-param('name',   '{$name}', '')
+  %rest:form-param('backup', '{$backups}')
 function dba:backup-restore(
   $name     as xs:string,
   $backups  as xs:string+
-) as empty-sequence() {
-  let $target := if($name) then $dba:SUB else $dba:CAT
+) {
+  let $target := if ($name) then $dba:SUB else $dba:CAT
   return try {
     db:restore($name || '-' || head($backups)),
-    utils:redirect(
-      $target,
-      map { 'name': $name, 'info': utils:info($backups, 'backup', 'restored') }
-    )
+    utils:redirect($target, { 'name': $name, 'info': utils:info($backups, 'backup', 'restored') })
   } catch * {
-    utils:redirect($target, map { 'name': $name, 'error': $err:description })
+    utils:redirect($target, { 'name': $name, 'error': $err:description })
   }
 };
 
@@ -47,16 +44,16 @@ function dba:backup-restore(
  :)
 declare
   %updating
-  %rest:GET
-  %rest:path('/dba/backup-restore-all')
-  %rest:query-param('name', '{$names}')
-function dba:db-optimize-all(
+  %rest:POST
+  %rest:path('/dba/backups-restore')
+  %rest:form-param('name', '{$names}')
+function dba:backups-restore(
   $names  as xs:string*
-) as empty-sequence() {
+) {
   try {
     $names ! db:restore(.),
-    utils:redirect($dba:CAT, map { 'info': utils:info($names, 'backup', 'restored') })
+    utils:redirect($dba:CAT, { 'info': utils:info($names, 'backup', 'restored') })
   } catch * {
-    utils:redirect($dba:CAT, map { 'error': $err:description })
+    utils:redirect($dba:CAT, { 'error': $err:description })
   }
 };

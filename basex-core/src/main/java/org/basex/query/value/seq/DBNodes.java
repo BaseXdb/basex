@@ -13,7 +13,7 @@ import org.basex.util.list.*;
  * Instances of this class are processed in the GUI to reference currently opened, marked,
  * and copied database nodes.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DBNodes extends DBNodeSeq {
@@ -57,6 +57,11 @@ public final class DBNodes extends DBNodeSeq {
    */
   public FTPosData ftpos() {
     return ftpos;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return size() == 0;
   }
 
   /**

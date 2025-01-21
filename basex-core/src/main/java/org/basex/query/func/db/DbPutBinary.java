@@ -12,14 +12,14 @@ import org.basex.util.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class DbPutBinary extends DbAccess {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final Item input = toNodeOrAtomItem(arg(1), qc);
+    final Item input = toNodeOrAtomItem(arg(1), false, qc);
     final String path = toDbPath(arg(2), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw RESINV_X.get(info, path);

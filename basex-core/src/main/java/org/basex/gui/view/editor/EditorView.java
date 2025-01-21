@@ -43,7 +43,7 @@ import org.xml.sax.*;
 /**
  * This view allows the input and evaluation of queries and documents.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class EditorView extends View {
@@ -56,8 +56,6 @@ public final class EditorView extends View {
 
   /** Project files. */
   final ProjectView project;
-  /** Go button. */
-  final AbstractButton go;
   /** Test button. */
   final AbstractButton test;
 
@@ -120,11 +118,10 @@ public final class EditorView extends View {
     final AbstractButton saveB = BaseXButton.get("c_save", SAVE, false, gui);
     final AbstractButton find = search.button(FIND_REPLACE);
     final AbstractButton vars = BaseXButton.command(GUIMenuCmd.C_EXTERNAL_VARIABLES, gui);
+    final AbstractButton go = BaseXButton.command(GUIMenuCmd.C_GO, gui);
 
     history = BaseXButton.get("c_history", BaseXLayout.addShortcut(RECENTLY_OPENED,
         BaseXKeys.HISTORY.toString()), false, gui);
-    go = BaseXButton.get("c_go", BaseXLayout.addShortcut(RUN_QUERY,
-        BaseXKeys.EXEC.toString()), false, gui);
     stop = BaseXButton.get("c_stop", STOP, false, gui);
     stop.setEnabled(false);
     test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
@@ -202,7 +199,6 @@ public final class EditorView extends View {
       stop.setEnabled(false);
       gui.stop();
     });
-    go.addActionListener(e -> run(getEditor(), Action.EXECUTE));
     test.addActionListener(e -> run(getEditor(), Action.TEST));
     tabs.addChangeListener(e -> {
       final EditorArea ea = getEditor();
@@ -314,7 +310,7 @@ public final class EditorView extends View {
       // close database
       if(Close.close(gui.context)) gui.notify.init();
       doc = new DBNode(file);
-      // remove context item binding
+      // remove context value binding
       final Map<String, String> map = gui.context.options.toMap(MainOptions.BINDINGS);
       map.remove("");
       DialogBindings.assign(map, gui);
@@ -544,8 +540,15 @@ public final class EditorView extends View {
 
   /**
    * Parses or evaluates the current file.
+   */
+  public void run() {
+    run(getEditor(), Action.EXECUTE);
+  }
+
+  /**
+   * Parses or evaluates the query in the specified editor.
+   * @param editor editor
    * @param action action
-   * @param editor current editor
    */
   void run(final EditorArea editor, final Action action) {
     refreshControls(editor, false);
@@ -887,19 +890,19 @@ public final class EditorView extends View {
    * @return position
    */
   private static int pos(final byte[] text, final int line, final int col) {
-    final int ll = text.length;
-    int ep = ll;
-    for(int p = 0, l = 1, c = 1; p < ll; ++c, p += cl(text, p)) {
+    final int tl = text.length;
+    int ep = tl;
+    for(int t = 0, l = 1, c = 1; t < tl; ++c, t += cl(text, t)) {
       if(l > line || l == line && c == col) {
-        ep = p;
+        ep = t;
         break;
       }
-      if(text[p] == '\n') {
+      if(text[t] == '\n') {
         ++l;
         c = 0;
       }
     }
-    if(ep < ll && Character.isLetterOrDigit(cp(text, ep))) {
+    if(ep < tl && Character.isLetterOrDigit(cp(text, ep))) {
       while(ep > 0 && Character.isLetterOrDigit(cp(text, ep - 1))) ep--;
     }
     return ep;
@@ -1017,7 +1020,7 @@ public final class EditorView extends View {
     for(final EditorArea edit : editors()) {
       if(edit.opened()) continue;
       final String n = edit.file().name().substring(FILE.length());
-      bl.set(n.isEmpty() ? 1 : Integer.parseInt(n), true);
+      bl.set(n.isEmpty() ? 1 : Strings.toInt(n), true);
     }
     // find first free file number
     int b = 0;

@@ -13,13 +13,13 @@ import org.basex.util.list.*;
 /**
  * Function implementation.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnInScopePrefixes extends StandardFunc {
+public final class FnInScopePrefixes extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Atts atts = toElem(arg(0), qc).nsScope(sc).add(XML, XML_URI);
+    final Atts atts = toElem(arg(0), qc).nsScope(sc()).add(XML, XML_URI);
 
     final int as = atts.size();
     final TokenList tl = new TokenList();

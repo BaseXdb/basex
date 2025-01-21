@@ -8,7 +8,7 @@ import org.junit.jupiter.api.*;
 /**
  * This class tests the functions of the Lazy Module.
  *
- * @author BaseX Team 2005-24, BSD License
+ * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class LazyModuleTest extends SandboxTest {
@@ -28,14 +28,10 @@ public final class LazyModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void isCached() {
     final Function func = _LAZY_IS_CACHED;
-    query(func.args(_FILE_READ_BINARY.args(FILE)), "false");
-    query(func.args(_LAZY_CACHE.args(_FILE_READ_BINARY.args(FILE))), "true");
-    query(func.args(_FILE_READ_TEXT.args(FILE)), "false");
-    query(func.args(_LAZY_CACHE.args(_FILE_READ_TEXT.args(FILE))), "true");
-
-    query("let $bin := " + _FILE_READ_BINARY.args(FILE) + " return (" +
-        func.args(" $bin") + ',' + VOID.args(" $bin") + ',' + func.args(" $bin") + ')',
-        "false\ntrue");
+    query(func.args(_FILE_READ_BINARY.args(FILE)), false);
+    query(func.args(_LAZY_CACHE.args(_FILE_READ_BINARY.args(FILE))), true);
+    query(func.args(_FILE_READ_TEXT.args(FILE)), false);
+    query(func.args(_LAZY_CACHE.args(_FILE_READ_TEXT.args(FILE))), true);
   }
 
   /** Test method. */
