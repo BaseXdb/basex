@@ -6,8 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.build.csv.*;
-import org.basex.build.csv.CsvOptions.*;
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
 import org.basex.data.*;
@@ -81,11 +79,7 @@ public abstract class Serializer implements Closeable {
       case XHTML: return new XHTMLSerializer(os, so);
       case HTML:  return new HTMLSerializer(os, so);
       case TEXT:  return new TextSerializer(os, so);
-      case CSV:
-        final CsvOptions copts = so.get(SerializerOptions.CSV);
-        return copts.get(CsvOptions.FORMAT) == CsvFormat.XQUERY
-               ? new CsvXQuerySerializer(os, so)
-               : new CsvDirectSerializer(os, so);
+      case CSV:   return new CsvSerializer.Delegator(os, so);
       case JSON:
         final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
         final JsonFormat jformat = jopts.get(JsonOptions.FORMAT);

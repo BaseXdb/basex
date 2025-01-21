@@ -14,17 +14,19 @@ import org.basex.util.*;
  */
 public final class CsvXmlConverter extends CsvConverter {
   /** QName. */
-  protected static final QNm Q_FN_CSV = new QNm("csv", QueryText.FN_URI);
+  public static final QNm Q_FN_CSV = new QNm("csv", QueryText.FN_URI);
   /** QName. */
   protected static final QNm Q_FN_ROWS = new QNm("rows", QueryText.FN_URI);
   /** QName. */
-  protected static final QNm Q_FN_ROW = new QNm("row", QueryText.FN_URI);
+  public static final QNm Q_FN_ROW = new QNm("row", QueryText.FN_URI);
   /** QName. */
   protected static final QNm Q_FN_FIELD = new QNm("field", QueryText.FN_URI);
   /** QName. */
   protected static final QNm Q_FN_COLUMNS = new QNm("columns", QueryText.FN_URI);
   /** QName. */
-  protected static final QNm Q_FN_COLUMN = new QNm("column", QueryText.FN_URI);
+  public static final QNm Q_FN_COLUMN = new QNm("column", QueryText.FN_URI);
+  /** QName. */
+  public static final QNm Q_COLUMN = new QNm("column");
 
   /** Document node. */
   private FBuilder doc;
@@ -71,7 +73,7 @@ public final class CsvXmlConverter extends CsvConverter {
 
     final FBuilder elem = FElem.build(Q_FN_FIELD);
     final byte[] name = headers.get(column);
-    if(name != null && name.length > 0) elem.add(Q_FN_COLUMN, name);
+    if(name != null && name.length > 0) elem.add(Q_COLUMN, name);
     record.add(elem.add(shared.token(value)));
   }
 

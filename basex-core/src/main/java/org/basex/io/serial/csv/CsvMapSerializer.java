@@ -5,9 +5,9 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 
 import org.basex.build.csv.*;
-import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -15,12 +15,13 @@ import org.basex.query.value.map.*;
 import org.basex.util.list.*;
 
 /**
- * This class serializes map data as CSV. The input must conform to the XQuery CSV representation.
+ * This class serializes a map as CSV. The input must conform to the result format of
+ * fn:parse-csvs.
  *
  * @author BaseX Team, BSD License
- * @author Christian Gruen
+ * @author Gunther Rademacher
  */
-public final class CsvXQuerySerializer extends CsvSerializer {
+public final class CsvMapSerializer extends CsvSerializer {
   /**
    * Constructor.
    * @param os output stream
@@ -28,7 +29,7 @@ public final class CsvXQuerySerializer extends CsvSerializer {
    * @param copts csv options
    * @throws IOException I/O exception
    */
-  public CsvXQuerySerializer(final OutputStream os, final SerializerOptions sopts,
+  public CsvMapSerializer(final OutputStream os, final SerializerOptions sopts,
       final CsvOptions copts) throws IOException {
     super(os, sopts, copts);
   }
@@ -45,16 +46,12 @@ public final class CsvXQuerySerializer extends CsvSerializer {
     try {
       // print header
       if(header) {
-        if(!m.contains(CsvXQueryConverter.NAMES))
-          throw CSV_SERIALIZE_X.getIO("Map has no 'names' key");
-        record(m.get(CsvXQueryConverter.NAMES), tl);
+        if(!m.contains(FnParseCsv.COLUMNS)) throw CSV_SERIALIZE_X.getIO("Map has no 'columns' key");
+        row(m.get(FnParseCsv.COLUMNS), tl);
       }
-      // print records
-      if(!m.contains(CsvXQueryConverter.RECORDS))
-        throw CSV_SERIALIZE_X.getIO("Map has no 'records' key");
-      for(final Item record : m.get(CsvXQueryConverter.RECORDS)) {
-        record(record, tl);
-      }
+      // print rows
+      if(!m.contains(FnParseCsv.ROWS)) throw CSV_SERIALIZE_X.getIO("Map has no 'rows' key");
+      for(final Item record : m.get(FnParseCsv.ROWS)) row(((XQArray) record).iterable(), tl);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
@@ -68,10 +65,9 @@ public final class CsvXQuerySerializer extends CsvSerializer {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void record(final Value line, final TokenList tl) throws QueryException, IOException {
-    if(!(line instanceof XQArray))
-      throw CSV_SERIALIZE_X_X.getIO("Array expected, found " + line.seqType(), line);
-    for(final Value value : ((XQArray) line).iterable()) {
+  private void row(final Iterable<? extends Value> line, final TokenList tl)
+      throws QueryException, IOException {
+    for(final Value value : line) {
       if(!value.isItem()) throw CSV_SERIALIZE_X_X.getIO(
           "Item expected, found " + value.seqType(), value);
       tl.add(((Item) value).string(null));
