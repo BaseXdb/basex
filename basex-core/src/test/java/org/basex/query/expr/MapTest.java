@@ -223,14 +223,14 @@ public final class MapTest extends SandboxTest {
 
   /** Replacements with equal keys of different type. */
   @Test public void orderedEqualKey() {
-    query("{ 1: 'A' } => map:put(1e0, 'B')", "{1.0e0:\"B\"}");
+    query("{ 1: 'A' } => map:put(1e0, 'B')", "{1:\"B\"}");
     query("{ 1: 'A' } => map:put(1e0, 'B') => map:put(1.0,'C')", "{1:\"C\"}");
 
-    query("{ 1: 'A', 2: 'B' } => map:put(2e0, 'C')", "{1:\"A\",2.0e0:\"C\"}");
+    query("{ 1: 'A', 2: 'B' } => map:put(2e0, 'C')", "{1:\"A\",2:\"C\"}");
     query("{ 1: 'A', 2: 'B' } => map:put(2e0, 'C') => map:put(2.0,'D')", "{1:\"A\",2:\"D\"}");
 
     // equal key: append new entries
-    query("{ 1: 'A', 2: 'B' } => map:put(1e0, 'C')", "{2:\"B\",1.0e0:\"C\"}");
+    query("{ 1: 'A', 2: 'B' } => map:put(1e0, 'C')", "{2:\"B\",1:\"C\"}");
 
     query("{ 1: 1, 2: 2 } => map:remove(1e0)", "{2:2}");
     query("{ 1: 1, 2: 2 } => map:remove(1.0)", "{2:2}");

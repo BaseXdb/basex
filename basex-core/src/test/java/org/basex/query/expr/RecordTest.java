@@ -95,15 +95,15 @@ public final class RecordTest extends SandboxTest {
     query("declare namespace cx = 'CX';\n"
         + "declare record cx:complex(r as xs:double, i as xs:double := 0);\n"
         + "cx:complex(3, 2), cx:complex(3)",
-        "{\"r\":3.0e0,\"i\":2.0e0}\n{\"r\":3.0e0,\"i\":0.0e0}");
+        "{\"r\":3,\"i\":2}\n{\"r\":3,\"i\":0}");
     query("declare namespace cx = 'CX';\n"
         + "declare record cx:complex(r as xs:double, i? as xs:double);\n"
         + "cx:complex(3, 2), cx:complex(3)",
-        "{\"r\":3.0e0,\"i\":2.0e0}\n{\"r\":3.0e0}");
+        "{\"r\":3,\"i\":2}\n{\"r\":3}");
     query("declare namespace cx = 'CX';\n"
         + "declare record cx:complex(r as xs:double, i? as xs:double := ());\n"
         + "cx:complex(3, 2), cx:complex(3)",
-        "{\"r\":3.0e0,\"i\":2.0e0}\n{\"r\":3.0e0,\"i\":()}");
+        "{\"r\":3,\"i\":2}\n{\"r\":3,\"i\":()}");
     query("declare namespace p = 'P'\n;"
         + "declare record p:person(first as xs:string, last as xs:string, *);\n"
         + "p:person('John', 'Smith', {'last': 'Miller', 'middle': 'A.'})",

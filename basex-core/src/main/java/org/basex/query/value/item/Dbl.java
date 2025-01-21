@@ -167,4 +167,17 @@ public final class Dbl extends ANum {
 
     throw AtomType.DOUBLE.castError(value, info);
   }
+
+  /**
+   * Returns a JSON string representation of a double value.
+   * @param d double value
+   * @return string
+   */
+  public static String serialize(final double d) {
+    final BigDecimal bd = BigDecimal.valueOf(d).stripTrailingZeros();
+    final double abs = Math.abs(d);
+    return d == 0 && Double.doubleToRawLongBits(d) < 0 ? "-0" :
+      abs >= 1e-6 && abs < 1e21 ? bd.toPlainString() :
+      bd.toString().replace('E', 'e').replace("e+", "e");
+  }
 }

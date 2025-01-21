@@ -45,7 +45,7 @@ public final class BaseXSerializerTest extends SandboxTest {
     serialize("map { 'x': true#0 }", "{'x':fn:true#0}");
     serialize("map { 'x': (true#0, false#0) }", "{'x':(fn:true#0,fn:false#0)}");
     serialize("map { xs:date('2001-01-01'): 'd', '2001-01-01': 'd' }",
-        "{xs:date('2001-01-01'):'d','2001-01-01':'d'}");
+        "{'2001-01-01':'d','2001-01-01':'d'}");
 
     // arrays
     serialize("[ true#0 ]", "[fn:true#0]");

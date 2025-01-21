@@ -76,6 +76,8 @@ public final class Token {
   public static final DecimalFormat SF = new DecimalFormat("0.0######E0", LOC);
   /** Decimal float output. */
   public static final DecimalFormat DF = new DecimalFormat("#####0.0######", LOC);
+  /** Adaptive output. */
+  public static final DecimalFormat AD = new DecimalFormat("0.0##########################E0", LOC);
 
   /** BigInteger representing 2 * ({@link Long#MAX_VALUE} + 1). */
   public static final BigInteger MAX_ULONG = BigInteger.ONE.shiftLeft(64);

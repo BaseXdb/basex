@@ -102,12 +102,12 @@ public final class JsonModuleTest extends SandboxTest {
     // queries
     String options = " map { 'format': 'xquery' }";
     query(func.args("{}", options), "{}");
-    query(func.args("{\"A\":1}", options), "{\"A\":1.0e0}");
+    query(func.args("{\"A\":1}", options), "{\"A\":1}");
     query(func.args("{\"\":null}", options), "{\"\":()}");
 
     query(func.args("[]", options), "[]");
     query(func.args("[\"A\"]", options), "[\"A\"]");
-    query(func.args("[1,true]", options), "[1.0e0,true()]");
+    query(func.args("[1,true]", options), "[1,true()]");
 
     query(func.args("1", options), 1);
     query(func.args("\"f\"", options), "f");
@@ -128,7 +128,7 @@ public final class JsonModuleTest extends SandboxTest {
     query(func.args("123.4e-123", options), "1.234E-121");
     query(func.args("123.456E0001", options), "1234.56");
     query(func.args("-123.456E0001", options), "-1234.56");
-    query(func.args("[ -123.456E0001, 0 ]", options), "[-1.23456e3,0.0e0]");
+    query(func.args("[ -123.456E0001, 0 ]", options), "[-1234.56,0]");
 
     options = " map { 'format': 'xquery', 'number-parser': xs:decimal#1 }";
     String input = "1234567890123456789012345678901234567890";

@@ -4,7 +4,6 @@ import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import java.io.*;
-import java.text.*;
 import java.util.*;
 
 import org.basex.io.out.PrintOutput.*;
@@ -24,8 +23,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class AdaptiveSerializer extends OutputSerializer {
-  /** Format for double values. */
-  private static final String DOUBLES = "0.0##########################E0";
   /** Original output stream. */
   private final OutputStream os;
   /** XML serializer (lazy instantiation). */
@@ -87,25 +84,33 @@ public class AdaptiveSerializer extends OutputSerializer {
   protected void atomic(final Item item) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
     final Type type = item.type;
-    if(type.instanceOf(STRING) || type.instanceOf(DECIMAL) ||
-       type.oneOf(BOOLEAN, UNTYPED_ATOMIC, ANY_URI)) {
-      tb.add(item);
-    } else if(type == QNAME) {
-      tb.add(((QNm) item).eqName());
-    } else if(type == DOUBLE) {
-      final Dbl dbl = (Dbl) item;
-      final double d = dbl.dbl();
-      if(Double.isInfinite(d) || Double.isNaN(d)) tb.add(dbl.string());
-      else tb.add(new DecimalFormat(DOUBLES, Token.LOC).format(d).toLowerCase(Locale.ENGLISH));
-    } else if(type.instanceOf(DURATION)) {
-      final Dur dur = new Dur((Dur) item);
-      tb.add(dur.type).add("(\"").add(dur.string(null)).add("\")");
-    } else {
-      try {
-        tb.add(type).add('(').add(value(item.string(null), '"', false)).add(')');
-      } catch(final QueryException ex) {
-        throw new QueryIOException(ex);
+    final boolean plain = this instanceof BaseXSerializer;
+    try {
+      if(type == DOUBLE) {
+        final double d = item.dbl(null);
+        if(Double.isNaN(d) || Double.isInfinite(d)) {
+          tb.add(item.string(null));
+        } else if(plain) {
+          tb.add(Dbl.serialize(d));
+        } else {
+          synchronized(Token.AD) {
+            tb.add(Token.AD.format(d).toLowerCase(Locale.ENGLISH));
+          }
+        }
+      } else if(type == QNAME) {
+        tb.add(plain ? item.string(null) : ((QNm) item).eqName());
+      } else {
+        final boolean simple = type == BOOLEAN || type.instanceOf(DECIMAL);
+        final byte[] value = simple ? Token.token(item) : value(item.string(null), '"', false);
+        if(plain || simple || type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI)) {
+          tb.add(value);
+        } else {
+          tb.add(Token.token(type.instanceOf(DURATION) ? DURATION : type));
+          tb.add('(').add(value).add(')');
+        }
       }
+    } catch(final QueryException ex) {
+      throw new QueryIOException(ex);
     }
     printChars(tb.finish());
   }

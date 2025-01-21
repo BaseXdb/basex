@@ -217,4 +217,87 @@ public final class SerializerTest extends SandboxTest {
 
     query(option + INDENT.arg("yes") + "[1], {'2':3}", "[ 1 ]\n{ \"2\": 3 }");
   }
+
+  /** Test: method=adaptive. */
+  @Test public void adaptive() {
+    final String option = METHOD.arg("adaptive");
+    query(option + "()", "");
+    query(option + "1", 1);
+    query(option + "1.0", 1);
+    query(option + "1e0", "1.0e0");
+    query(option + "xs:double('NaN')", "NaN");
+    query(option + "xs:double('INF')", "INF");
+    query(option + "xs:byte(1)", 1);
+    query(option + "false()", "false()");
+    query(option + "'A'", "\"A\"");
+    query(option + "xs:anyURI('A')", "\"A\"");
+    query(option + "xs:untypedAtomic('A')", "\"A\"");
+    query(option + "xs:QName('xml:a')", "Q{http://www.w3.org/XML/1998/namespace}a");
+    query(option + "xs:dayTimeDuration('P1D')", "xs:duration(\"P1D\")");
+    query(option + "<xml><a>B</a></xml>", "<xml><a>B</a></xml>");
+    query(option + "true#0", "fn:true#0");
+    query(option + "fn() {}", "(anonymous-function)#0");
+    query(option + "xs:float(1)", "xs:float(\"1\")");
+
+    query(option + "[]", "[]");
+    query(option + "[ 1 ]", "[1]");
+    query(option + "[ 1.0 ]", "[1]");
+    query(option + "[ 1e0 ]", "[1.0e0]");
+    query(option + "[ xs:double('NaN') ]", "[NaN]");
+    query(option + "[ xs:double('INF') ]", "[INF]");
+    query(option + "[ xs:byte(1) ]", "[1]");
+    query(option + "[ false() ]", "[false()]");
+    query(option + "[ 'A' ]", "[\"A\"]");
+    query(option + "[ xs:anyURI('A') ]", "[\"A\"]");
+    query(option + "[ xs:untypedAtomic('A') ]", "[\"A\"]");
+    query(option + "[ xs:QName('xml:a') ]", "[Q{http://www.w3.org/XML/1998/namespace}a]");
+    query(option + "[ xs:dayTimeDuration('P1D') ]", "[xs:duration(\"P1D\")]");
+    query(option + "[ <xml><a>B</a></xml> ]", "[<xml><a>B</a></xml>]");
+    query(option + "[ true#0 ]", "[fn:true#0]");
+    query(option + "[ fn() {} ]", "[(anonymous-function)#0]");
+    query(option + "[ xs:float(1) ]", "[xs:float(\"1\")]");
+
+    query(option + "{ 1: (), 2: 3, 4: (5, 6) }", "{1:(),2:3,4:(5,6)}");
+  }
+
+  /** Test: method=basex. */
+  @Test public void basex() {
+    query("()", "");
+    query("1", 1);
+    query("1.0", 1);
+    query("1e0", 1);
+    query("xs:double('NaN')", "NaN");
+    query("xs:double('INF')", "INF");
+    query("xs:byte(1)", 1);
+    query("false()", "false");
+    query("'A'", "A");
+    query("xs:anyURI('A')", "A");
+    query("xs:untypedAtomic('A')", "A");
+    query("xs:QName('xml:a')", "xml:a");
+    query("xs:dayTimeDuration('P1D')", "P1D");
+    query("<xml><a>B</a></xml>", "<xml><a>B</a></xml>");
+    query("true#0", "fn:true#0");
+    query("fn() {}", "(anonymous-function)#0");
+    query("xs:float(1)", 1);
+
+    query("[]", "[]");
+    query("[ 1 ]", "[1]");
+    query("[ 1.0 ]", "[1]");
+    query("[ 1e0 ]", "[1]");
+    query("[ xs:double('NaN') ]", "[NaN]");
+    query("[ xs:double('INF') ]", "[INF]");
+    query("[ xs:byte(1) ]", "[1]");
+    query("[ false() ]", "[false()]");
+    query("[ 'A' ]", "[\"A\"]");
+    query("[ xs:anyURI('A') ]", "[\"A\"]");
+    query("[ xs:untypedAtomic('A') ]", "[\"A\"]");
+    query("[ xs:QName('xml:a') ]", "[xml:a]");
+    query("[ xs:dayTimeDuration('P1D') ]", "[\"P1D\"]");
+    query("[ <xml><a>B</a></xml> ]", "[<xml><a>B</a></xml>]");
+    query("[ true#0 ]", "[fn:true#0]");
+    query("[ fn() {} ]", "[(anonymous-function)#0]");
+    query("[ xs:float(1) ]", "[\"1\"]"); // should be revised for 'adaptive' method
+
+    query("{ 1: (), 2: 3, 4: (5, 6) }", "{1:(),2:3,4:(5,6)}");
+  }
 }

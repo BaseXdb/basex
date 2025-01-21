@@ -605,7 +605,7 @@ public final class XQuery4Test extends SandboxTest {
   /** Array coercion. */
   @Test public void arrayCoercion() {
     query("fn($a as array(xs:integer)) { $a }([ 1.0 ])", "[1]");
-    query("fn($a as array(xs:double)) { $a }([ 1, 2 ])", "[1.0e0,2.0e0]");
+    query("fn($a as array(xs:double)) { $a }([ 1, 2 ])", "[1,2]");
     query("fn($a as array(xs:byte)) { $a }([ 1, 2 ])", "[1,2]");
 
     query("fn($a as array(xs:double)) { $a }([ 1, 2 ]) instance of array(xs:double)", true);
@@ -617,7 +617,7 @@ public final class XQuery4Test extends SandboxTest {
 
   /** Map coercion. */
   @Test public void mapCoercion() {
-    query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 })", "{1.2e0:0}");
+    query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 })", "{1.2:0}");
 
     query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 }) instance of map(xs:double, item())",
         true);
