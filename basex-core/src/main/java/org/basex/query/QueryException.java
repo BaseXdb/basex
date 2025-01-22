@@ -203,7 +203,7 @@ public class QueryException extends Exception {
 
   /**
    * Returns the error.
-   * @return error
+   * @return error (can be {@code null})
    */
   public final QueryError error() {
     return error;

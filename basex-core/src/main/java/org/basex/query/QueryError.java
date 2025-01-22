@@ -596,7 +596,7 @@ public enum QueryError {
   /** Error code. */
   CSV_QUOTING_X(FOCV, 1, "CSV field quoting error: %."),
   /** Error code. */
-  CSV_SINGLECHAR_X_X(FOCV, 2, "The value of % is not a single character: %."),
+  CSV_SINGLECHAR_X_X(FOCV, 2, "The value of '%' is not a single character: '%."),
   /** Error code. */
   CSV_DELIMITER_X(FOCV, 3, "Duplicate CSV delimiter error: %."),
   /** Error code. */
@@ -1170,8 +1170,6 @@ public enum QueryError {
   /** Error code. */
   STRUCT_FILTER_X(XPTY, 4, "Input of filter must be map or array: %."),
   /** Error code. */
-  INVALIDOPT_X(XPTY, 4, "%"),
-  /** Error code. */
   EXP_FOUND_X_X(XPTY, 4, "% expected, % found."),
   /** Error code. */
   EXP_FOUND_X_X_X(XPTY, 4, "% expected, % found: %."),
@@ -1188,8 +1186,6 @@ public enum QueryError {
   /** Error code. */
   ELM_X_X_X(XPTY, 4, "element(%) expected, % found: %."),
   /** Error code. */
-  INVALIDOPTION_X(XPTY, 4, "Unknown option '%'."),
-  /** Error code. */
   FUNCUP_X(XPTY, 4, "Function is updating: %."),
   /** Error code. */
   FUNCNOTUP_X(XPTY, 4, "Function is not updating: %."),
@@ -1200,7 +1196,9 @@ public enum QueryError {
   /** Error code. */
   INVALIDOPTION_X_X_X(XPTY, 4, "Option: % expected, % found: %."),
   /** Error code. */
-  OPTION_X(XPTY, 4, "%"),
+  INVALIDOPTION_X(XPTY, 4, "%"),
+  /** Error code. */
+  UNKNOWNOPTION_X(XPTY, 4, "Unknown option '%'."),
 
   /** Error code. */
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),

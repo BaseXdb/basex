@@ -32,6 +32,6 @@ public final class FnXmlToJson extends FnParseJson {
     if(indent == null) options.set(JsonSerialOptions.INDENT,
         qc.parameters().get(SerializerOptions.INDENT) == YesNo.YES);
 
-    return Str.get(serialize(node.iter(), JsonSerialize.options(options), INVALIDOPT_X, qc));
+    return Str.get(serialize(node.iter(), JsonSerialize.options(options), INVALIDOPTION_X, qc));
   }
 }

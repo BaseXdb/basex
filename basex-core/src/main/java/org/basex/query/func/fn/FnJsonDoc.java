@@ -77,7 +77,7 @@ public class FnJsonDoc extends Parse {
     final JsonConverter jc = JsonConverter.get(options);
     final JsonFormat jf = options.get(JsonOptions.FORMAT);
     if(options.get(JsonParserOptions.VALIDATE) != null && jf != JsonFormat.BASIC) {
-      throw OPTION_X.get(info, Options.unknown(JsonParserOptions.VALIDATE));
+      throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.VALIDATE));
     }
 
     final Value fallback = options.get(JsonParserOptions.FALLBACK);
@@ -95,7 +95,7 @@ public class FnJsonDoc extends Parse {
     }
     final Value nll = options.get(JsonParserOptions.NULL);
     if(nll != Empty.VALUE && jf != JsonFormat.XQUERY) {
-      throw OPTION_X.get(info, Options.unknown(JsonParserOptions.NULL));
+      throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.NULL));
     }
     jc.nullValue(nll);
     return jc;

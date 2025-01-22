@@ -107,14 +107,14 @@ public class CsvOptions extends Options {
    * @throws QueryException query exception
    */
   private void validate(final InputInfo info) throws QueryException {
+    final StringOption separator = get(FIELD_DELIMITER) != null ? FIELD_DELIMITER : SEPARATOR;
     final int f = fieldDelimiter(), r = rowDelimiter(), q = quoteCharacter();
-    if(f == -1) throw OPTION_X.get(info, "Invalid separator: '%'", get(SEPARATOR));
-    if(r == -1) throw CSV_SINGLECHAR_X_X.get(info, ROW_DELIMITER.name(), get(ROW_DELIMITER));
-    if(q == -1) throw CSV_SINGLECHAR_X_X.get(info, QUOTE_CHARACTER.name(), get(QUOTE_CHARACTER));
+    final StringOption option = f == -1 ? separator : r == -1 ? ROW_DELIMITER : q == -1 ?
+      QUOTE_CHARACTER : null;
+    if(option != null) throw CSV_SINGLECHAR_X_X.get(info, option.name(), get(option));
     if(f == q || r == f || q == r) throw CSV_DELIMITER_X.get(info,
-        get(f == q || r == f ? SEPARATOR : QUOTE_CHARACTER));
+        get(f == q || r == f ? separator : QUOTE_CHARACTER));
   }
-
 
   /**
    * Returns the separator character or {@code -1} if character is invalid.

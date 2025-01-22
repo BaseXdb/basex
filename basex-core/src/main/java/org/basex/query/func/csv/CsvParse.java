@@ -40,9 +40,12 @@ public class CsvParse extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
-    final CsvParserOptions copts = toOptions(arg(1), new CsvParserOptions(), qc);
     try {
-      return CsvConverter.get(copts).convert(io, info);
+      return CsvConverter.get(toOptions(arg(1), new CsvParserOptions(), qc)).convert(io, info);
+    } catch(final QueryException ex) {
+      if(!ex.error().toString().startsWith(ErrType.FOCV.name())) throw ex;
+      Util.debug(ex);
+      throw CSV_PARSE_X.get(info, ex.getLocalizedMessage());
     } catch(final IOException ex) {
       throw CSV_PARSE_X.get(info, ex);
     }

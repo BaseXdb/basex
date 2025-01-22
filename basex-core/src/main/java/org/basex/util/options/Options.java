@@ -815,7 +815,7 @@ public class Options implements Iterable<Option<?>> {
     final Option<?> option = definitions.get(name);
     if(option == null) {
       if(getClass() == Options.class || name.startsWith("Q{")) return;
-      throw OPTION_X.get(info, similar(name));
+      throw INVALIDOPTION_X.get(info, similar(name));
     }
 
     final Item item = value.isItem() ? (Item) value : null;
@@ -849,7 +849,7 @@ public class Options implements Iterable<Option<?>> {
       final String string = normalize(serialize(value, info));
       final EnumOption<?> eo = (EnumOption<?>) option;
       result = eo.get(string);
-      if(result == null) throw OPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
+      if(result == null) throw INVALIDOPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
     } else if(option instanceof OptionsOption) {
       if(!(item instanceof XQMap)) throw expected.apply(SeqType.MAP);
       result = ((OptionsOption<?>) option).newInstance();

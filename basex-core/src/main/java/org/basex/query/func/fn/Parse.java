@@ -77,7 +77,7 @@ public abstract class Parse extends StandardFunc {
       }
       final Boolean normalize = po.get(ParseOptions.NORMALIZE_NEWLINES);
       if(normalize != null && lines) {
-        throw OPTION_X.get(info, Options.unknown(ParseOptions.NORMALIZE_NEWLINES));
+        throw INVALIDOPTION_X.get(info, Options.unknown(ParseOptions.NORMALIZE_NEWLINES));
       }
 
       String encoding = toEncodingOrNull(po.get(ParseOptions.ENCODING), ENCODING_X);

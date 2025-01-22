@@ -81,7 +81,7 @@ public final class FnElementsToMaps extends StandardFunc {
         free().entrySet()) {
       final QNm name = QNm.parse(Token.token(entry.getKey()), sc());
       final Layout layout = Layout.get(entry.getValue());
-      if(layout == null) throw INVALIDOPT_X.get(info, "Unknown layout: " + entry.getValue() + '.');
+      if(layout == null) throw INVALIDOPTION_X.get(info, "Unknown layout: " + entry.getValue() + '.');
       layouts.put(name, layout);
     }
 
