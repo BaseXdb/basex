@@ -41,6 +41,22 @@ public abstract class JsonSerializer extends StandardSerializer {
   final boolean nodups;
 
   /**
+   * Returns a CSV serializer for the given serialization options.
+   * @param os output stream reference
+   * @param so serialization options
+   * @return serializer
+   * @throws IOException I/O exception
+   */
+  public static Serializer get(final OutputStream os, final SerializerOptions so)
+      throws IOException {
+    switch(so.get(SerializerOptions.JSON).get(JsonOptions.FORMAT)) {
+      case JSONML: return new JsonMLSerializer(os, so);
+      case BASIC:  return new JsonBasicSerializer(os, so);
+      default:     return new JsonNodeSerializer(os, so);
+    }
+  }
+
+  /**
    * Constructor.
    * @param os output stream
    * @param sopts serialization parameters

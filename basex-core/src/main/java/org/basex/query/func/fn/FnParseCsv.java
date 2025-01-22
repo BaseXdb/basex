@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.build.csv.*;
+import org.basex.build.csv.CsvOptions.*;
 import org.basex.io.*;
 import org.basex.io.parse.csv.*;
 import org.basex.query.*;
@@ -20,7 +21,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -37,18 +37,15 @@ public class FnParseCsv extends Parse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
-    final ParseCsvOptions options = toOptions(arg(1), new ParseCsvOptions(), qc);
-    options.validate(ii);
+    final CsvParserOptions options = toOptions(arg(1), new CsvW3Options(), qc).finish(info,
+        CsvFormat.W3);
 
-    final CsvParserOptions copts = options.toCsvParserOptions();
     try {
-      final XQMap map = (XQMap) CsvConverter.get(copts).convert(new IOContent(value), ii);
-      final Value columns;
-      if(options.columnNames != null) {
-        columns = options.columnNames;
-      } else {
+      final XQMap map = (XQMap) CsvConverter.get(options).convert(new IOContent(value), ii);
+      Value columns = options.get(CsvOptions.HEADER);
+      if(columns.type.instanceOf(AtomType.BOOLEAN)) {
         final Value names = map.get(CsvXQueryConverter.NAMES).atomValue(qc, ii);
-        if(copts.get(CsvOptions.TRIM_WHITESPACE)) {
+        if(options.get(CsvOptions.TRIM_WHITESPACE)) {
           columns = names;
         } else {
           final ValueBuilder vb = new ValueBuilder(qc);
@@ -151,41 +148,6 @@ public class FnParseCsv extends Parse {
       final Var[] params = { row, col };
       final FuncType funcType = FuncType.get(STRING_O, rowType, colType);
       return new FuncItem(ii, get, params, AnnList.EMPTY, funcType, params.length, null);
-    }
-  }
-
-  /**
-   * Options for fn:parse-csv.
-   */
-  public static final class ParseCsvOptions extends FnCsvToArrays.CsvToArraysOptions {
-    /** parse-csv option header. */
-    public static final ValueOption HEADER = new ValueOption("header", ITEM_ZM, Bln.FALSE);
-    /** parse-csv option select-columns. */
-    public static final NumbersOption SELECT_COLUMNS = new NumbersOption("select-columns");
-    /** parse-csv option trim-rows. */
-    public static final BooleanOption TRIM_ROWS = new BooleanOption("trim-rows", false);
-
-    /** Explicit column names. */
-    public Value columnNames;
-    /** Whether to extract the header from the first input row. */
-    private boolean extractHeader;
-
-    @Override
-    public void validate(final InputInfo ii) throws QueryException {
-      super.validate(ii);
-      final Value header = get(HEADER);
-      if(BOOLEAN_O.instance(header)) extractHeader = toBoolean((Item) header, ii);
-      else if(STRING_ZM.instance(header)) columnNames = header;
-      else throw typeError(header, STRING_OM, ii);
-    }
-
-    @Override
-    public CsvParserOptions toCsvParserOptions() {
-      final CsvParserOptions copts = super.toCsvParserOptions();
-      copts.set(CsvOptions.TRIM_ROWS, get(TRIM_ROWS));
-      copts.set(CsvOptions.SELECT_COLUMNS, get(SELECT_COLUMNS));
-      copts.set(CsvOptions.HEADER, extractHeader);
-      return copts;
     }
   }
 }

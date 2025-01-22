@@ -6,8 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.build.json.*;
-import org.basex.build.json.JsonOptions.*;
 import org.basex.data.*;
 import org.basex.io.serial.csv.*;
 import org.basex.io.serial.json.*;
@@ -76,22 +74,14 @@ public abstract class Serializer implements Closeable {
     // choose serializer
     final SerializerOptions so = sopts == null ? SerializerMode.DEFAULT.get() : sopts;
     switch(so.get(SerializerOptions.METHOD)) {
-      case XHTML: return new XHTMLSerializer(os, so);
-      case HTML:  return new HTMLSerializer(os, so);
-      case TEXT:  return new TextSerializer(os, so);
-      case CSV:   return CsvSerializer.get(os, so);
-      case JSON:
-        final JsonSerialOptions jopts = so.get(SerializerOptions.JSON);
-        final JsonFormat jformat = jopts.get(JsonOptions.FORMAT);
-        return jformat == JsonFormat.JSONML ? new JsonMLSerializer(os, so) :
-               jformat == JsonFormat.BASIC  ? new JsonBasicSerializer(os, so) :
-               new JsonNodeSerializer(os, so);
-      case XML:
-        return new XMLSerializer(os, so);
-      case ADAPTIVE:
-        return new AdaptiveSerializer(os, so);
-      default:
-        return new BaseXSerializer(os, so);
+      case XHTML:    return new XHTMLSerializer(os, so);
+      case HTML:     return new HTMLSerializer(os, so);
+      case TEXT:     return new TextSerializer(os, so);
+      case CSV:      return CsvSerializer.get(os, so);
+      case JSON:     return JsonSerializer.get(os, so);
+      case XML:      return new XMLSerializer(os, so);
+      case ADAPTIVE: return new AdaptiveSerializer(os, so);
+      default:       return new BaseXSerializer(os, so);
     }
   }
 

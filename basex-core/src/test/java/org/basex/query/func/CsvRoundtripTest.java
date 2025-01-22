@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.build.csv.CsvOptions.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -424,24 +425,35 @@ public final class CsvRoundtripTest extends SandboxTest {
   }
 
   /**
-   * Parses csv with the given function and verifies that the result is as expected. Then
+   * Parses CSV with the given function and verifies that the result is as expected. Then
    * serializes the result, parses the serialization, and verifies that this also returns
    * the expected result.
    * @param function function
-   * @param input csv input
+   * @param input CSV input
    * @param options options
    * @param expected expected result
    */
   private void roundtrip(final Function function, final String input, final String options,
       final String expected) {
+
+    // parsing
     final String parseQuery = function.args(input, " { " + options + " }");
     final String result = query(parseQuery);
     compare(parseQuery, result, expected, null);
+
+    // serialization: add target format to options
+    final StringBuilder format = new StringBuilder();
+    if(!options.contains("'format'")) {
+      if(!options.isEmpty()) format.append(", ");
+      format.append("'format': '" + (function == _CSV_PARSE ? CsvFormat.DIRECT :
+        function == CSV_TO_ARRAYS ? CsvFormat.W3_ARRAYS :
+        function == CSV_TO_XML ? CsvFormat.W3_XML : CsvFormat.W3)).append("'");
+    }
     final String serializeQuery = _CSV_SERIALIZE.args(
       result.startsWith("<") ? ' ' + result :
       result.startsWith("[") ? " (" + result.replace('\n', ',') + ")" :
       result.startsWith("{") ? " " + result.replaceAll(",\"get\":\\(anonymous-function\\)#2", "") :
-      result.isEmpty() ? " ()" : " " + result, " { " + options + " }");
+      result.isEmpty() ? " ()" : " " + result, " { " + options + format + " }");
     final String serialization = query(serializeQuery);
     final String roundtripQuery = function.args(" \"" + serialization.replace("\"", "\"\"") + "\"",
         " { " + options + " }");

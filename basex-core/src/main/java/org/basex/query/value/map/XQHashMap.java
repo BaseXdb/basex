@@ -66,7 +66,7 @@ public final class XQHashMap extends XQMap {
   }
 
   @Override
-  public BasicIter<Item> keys() throws QueryException {
+  public BasicIter<Item> keys() {
     return new BasicIter<>(map.size()) {
       @Override
       public Item get(final long i) {

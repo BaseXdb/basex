@@ -285,9 +285,8 @@ public abstract class XQMap extends XQStruct {
   /**
    * Returns a key iterator.
    * @return iterator
-   * @throws QueryException query exception
    */
-  public abstract BasicIter<Item> keys() throws QueryException;
+  public abstract BasicIter<Item> keys();
 
   @Override
   public final Value values(final QueryContext qc) throws QueryException {

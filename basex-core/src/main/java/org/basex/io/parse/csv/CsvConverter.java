@@ -56,7 +56,7 @@ public abstract class CsvConverter extends Job {
     this.copts = copts;
     lax = copts.get(CsvOptions.LAX);
     attributes = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
-    skipEmpty = copts.get(CsvParserOptions.SKIP_EMPTY) && copts.get(CsvOptions.HEADER);
+    skipEmpty = copts.get(CsvParserOptions.SKIP_EMPTY) && copts.get(CsvOptions.HEADER) != Bln.FALSE;
   }
 
   /**
@@ -93,8 +93,13 @@ public abstract class CsvConverter extends Job {
    * @return CSV converter
    */
   public static CsvConverter get(final CsvParserOptions copts) {
-    return copts.get(CsvOptions.FORMAT) == CsvFormat.XQUERY ?
-      new CsvXQueryConverter(copts) : new CsvDirectConverter(copts);
+    switch(copts.get(CsvOptions.FORMAT)) {
+      case W3:
+      case XQUERY:
+      case W3_ARRAYS: return new CsvXQueryConverter(copts);
+      case W3_XML:    return new CsvXmlConverter(copts);
+      default:        return new CsvDirectConverter(copts);
+    }
   }
 
   /**

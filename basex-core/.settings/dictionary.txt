@@ -378,3 +378,6 @@ cyan
 variadic
 compactified
 tarjan
+gunther
+rademacher
+delegator

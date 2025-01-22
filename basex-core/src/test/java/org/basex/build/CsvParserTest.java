@@ -9,6 +9,7 @@ import org.basex.core.*;
 import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -70,7 +71,7 @@ public final class CsvParserTest extends SandboxTest {
    * Adds the sample CSV file.
    */
   @Test public void one() {
-    copts.set(CsvOptions.HEADER, true);
+    copts.set(CsvOptions.HEADER, Bln.TRUE);
     execute(new CreateDB(NAME, FILE));
     assertEquals("3", query("count(//Name)"));
     assertEquals("2", query("count(//Email)"));
@@ -84,7 +85,7 @@ public final class CsvParserTest extends SandboxTest {
    * Adds the sample CSV file, using different separators.
    */
   @Test public void separator() {
-    copts.set(CsvOptions.HEADER, true);
+    copts.set(CsvOptions.HEADER, Bln.TRUE);
 
     copts.set(CsvOptions.SEPARATOR, "tab");
     execute(new CreateDB(NAME, FILE));
@@ -99,7 +100,7 @@ public final class CsvParserTest extends SandboxTest {
    * Checks the quotes flag.
    */
   @Test public void quotes() {
-    copts.set(CsvOptions.HEADER, true);
+    copts.set(CsvOptions.HEADER, Bln.TRUE);
 
     copts.set(CsvOptions.QUOTES, false);
     execute(new CreateDB(NAME, FILE));
@@ -114,7 +115,7 @@ public final class CsvParserTest extends SandboxTest {
    * Checks the backslash flag.
    */
   @Test public void backslash() {
-    copts.set(CsvOptions.HEADER, true);
+    copts.set(CsvOptions.HEADER, Bln.TRUE);
 
     // "H \n""U\",a@b.c....
     copts.set(CsvOptions.BACKSLASHES, false);
@@ -132,7 +133,7 @@ public final class CsvParserTest extends SandboxTest {
    * Adds the sample CSV file, using different separators.
    */
   @Test public void atts() {
-    copts.set(CsvOptions.HEADER, true);
+    copts.set(CsvOptions.HEADER, Bln.TRUE);
     copts.set(CsvOptions.FORMAT, CsvFormat.ATTRIBUTES);
     execute(new CreateDB(NAME, FILE));
     assertEquals("true", query("exists(//entry[@name = 'Name'])"));

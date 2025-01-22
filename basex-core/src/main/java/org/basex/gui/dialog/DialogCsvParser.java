@@ -40,9 +40,7 @@ final class DialogCsvParser extends DialogParser {
   /** Format. */
   private final BaseXCombo format;
   /** Separator. */
-  private final BaseXCombo seps;
-  /** Separator (numeric). */
-  private final BaseXTextField sepchar;
+  private final BaseXCombo separator;
   /** Lax name conversion. */
   private final BaseXCheckBox lax;
   /** Skip empty fields. */
@@ -67,38 +65,27 @@ final class DialogCsvParser extends DialogParser {
     encoding = encoding(dialog, copts.get(CsvParserOptions.ENCODING));
     p.add(encoding);
 
-    final BaseXBack sep = new BaseXBack().layout(new ColumnLayout(6));
     final StringList csv = new StringList();
     for(final CsvSep cs : CsvSep.values()) csv.add(cs.toString());
-    final String[] sa = csv.toArray();
-    seps = new BaseXCombo(dialog, csv.add("").finish());
-    sep.add(seps);
-
-    final String s = copts.get(CsvOptions.SEPARATOR);
-    if(Strings.eq(s, sa)) {
-      seps.setSelectedItem(s);
-    } else {
-      seps.setSelectedIndex(sa.length);
+    separator = new BaseXCombo(dialog, csv.finish());
+    final String sep = copts.get(CsvOptions.SEPARATOR);
+    for(final CsvSep cs : CsvSep.values()) {
+      if(String.valueOf(cs.sep).equals(sep)) separator.setSelectedItem(cs.toString());
     }
-    sepchar = new BaseXTextField(dialog, s);
-    sepchar.setColumns(2);
-    sep.add(sepchar);
-
     p.add(new BaseXLabel(SEPARATOR, true, true));
-    p.add(sep);
+    p.add(separator);
+    pp.add(p);
 
     p.add(new BaseXLabel(FORMAT + COL, true, true));
     final CsvFormat[] formats = CsvFormat.values();
-    final int fl = formats.length - 1;
-    final StringList frmts = new StringList(fl);
-    for(int f = 0; f < fl; f++) frmts.add(formats[f].toString());
+    final StringList frmts = new StringList();
+    for(int f = 0; f < 3; f++) frmts.add(formats[f].toString());
     format = new BaseXCombo(dialog, frmts.finish());
     format.setSelectedItem(copts.get(CsvOptions.FORMAT));
     p.add(format);
-    pp.add(p);
 
     p = new BaseXBack(new RowLayout());
-    header = new BaseXCheckBox(dialog, FIRST_LINE_HEADER, CsvOptions.HEADER, copts);
+    header = new BaseXCheckBox(dialog, FIRST_LINE_HEADER, copts.get(CsvOptions.HEADER) == Bln.TRUE);
     p.add(header);
     quotes = new BaseXCheckBox(dialog, PARSE_QUOTES, CsvOptions.QUOTES, copts);
     p.add(quotes);
@@ -108,7 +95,6 @@ final class DialogCsvParser extends DialogParser {
     p.add(lax);
     skipEmpty = new BaseXCheckBox(dialog, SKIP_EMPTY, CsvParserOptions.SKIP_EMPTY, copts);
     p.add(skipEmpty);
-
     pp.add(p);
 
     add(pp, BorderLayout.WEST);
@@ -132,33 +118,24 @@ final class DialogCsvParser extends DialogParser {
     } catch(final QueryException | IOException ex) {
       example.setText(error(ex));
     }
-
-    final boolean fixedsep = seps.getSelectedIndex() < CsvSep.values().length;
-    sepchar.setEnabled(!fixedsep);
-    if(fixedsep) sepchar.setText(new String(Character.toChars(copts.separator())));
-    return fixedsep || sepchar.getText().length() == 1;
+    return true;
   }
 
   @Override
   void update() {
     final String enc = encoding.getSelectedItem();
     copts.set(CsvParserOptions.ENCODING, enc.equals(Strings.UTF8) ? null : enc);
-    copts.set(CsvOptions.HEADER, header.isSelected());
+    copts.set(CsvOptions.HEADER, Bln.get(header.isSelected()));
     copts.set(CsvOptions.FORMAT, format.getSelectedItem());
     copts.set(CsvOptions.LAX, lax.isSelected());
     copts.set(CsvOptions.QUOTES, quotes.isSelected());
     copts.set(CsvOptions.BACKSLASHES, backslashes.isSelected());
     copts.set(CsvParserOptions.SKIP_EMPTY, skipEmpty.isSelected());
-    String sep;
-    if(seps.getSelectedIndex() < CsvSep.values().length) {
-      sep = seps.getSelectedItem();
-    } else {
-      sep = sepchar.getText();
-      for(final CsvSep cs : CsvSep.values()) {
-        if(String.valueOf(cs.sep).equals(sep)) sep = cs.toString();
-      }
+
+    final String sep = separator.getText();
+    for(final CsvSep cs : CsvSep.values()) {
+      if(cs.toString().equals(sep)) copts.set(CsvOptions.SEPARATOR, String.valueOf(cs.sep));
     }
-    copts.set(CsvOptions.SEPARATOR, sep);
   }
 
   @Override

@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import org.basex.build.csv.*;
 import org.basex.io.parse.csv.*;
 import org.basex.io.serial.*;
 import org.basex.query.util.ft.*;
@@ -29,13 +28,10 @@ public final class CsvXmlSerializer extends CsvSerializer {
    * Constructor.
    * @param os output stream
    * @param sopts serialization parameters
-   * @param copts csv options
    * @throws IOException I/O exception
    */
-  public CsvXmlSerializer(final OutputStream os, final SerializerOptions sopts,
-      final CsvOptions copts) throws IOException {
-
-    super(os, sopts, copts);
+  public CsvXmlSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
+    super(os, sopts);
     headers = header ? new TokenList() : null;
   }
 

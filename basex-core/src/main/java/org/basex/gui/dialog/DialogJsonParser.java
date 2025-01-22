@@ -63,9 +63,8 @@ final class DialogJsonParser extends DialogParser {
     encoding = encoding(dialog, jopts.get(JsonParserOptions.ENCODING));
 
     final JsonFormat[] formats = JsonFormat.values();
-    final int fl = formats.length - 1;
-    final StringList frmts = new StringList(fl);
-    for(int f = 0; f < fl; f++) frmts.add(formats[f].toString());
+    final StringList frmts = new StringList();
+    for(int f = 0; f < 4; f++) frmts.add(formats[f].toString());
     format = new BaseXCombo(dialog, frmts.finish());
     format.setSelectedItem(jopts.get(JsonOptions.FORMAT));
 
