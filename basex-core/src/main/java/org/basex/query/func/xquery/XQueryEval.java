@@ -140,11 +140,12 @@ public class XQueryEval extends StandardFunc {
         throw ex;
       } catch(final QueryException ex) {
         Util.debug(ex);
-        final InputInfo ii = ex.info();
         final QueryError error = ex.error();
         final QueryException qe = error == BASEX_PERMISSION_X || error == BASEX_PERMISSION_X_X ?
           XQUERY_PERMISSION1_X.get(info, ex.getLocalizedMessage()) : ex;
         // pass on error info: assign (possibly empty) path of module which caused the error
+        InputInfo ii = ex.info();
+        if(pass && ii == null) ii = new InputInfo(query.path(), 1, 1);
         throw qe.info(pass ? ii.path().equals(info.path()) ?
           new InputInfo(query.path(), ii.line(), ii.column()) : ii : info);
       } catch(final StackOverflowError er) {
