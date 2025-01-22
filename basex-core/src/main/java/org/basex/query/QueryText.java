@@ -205,7 +205,6 @@ public interface QueryText {
   // PREFIXES =====================================================================================
 
   /** XQuery prefix. */ byte[] ADMIN_PREFIX = token("admin");
-  /** XQuery prefix. */ byte[] ANN_PREFIX = token("ann");
   /** XQuery prefix. */ byte[] ARCHIVE_PREFIX = token("archive");
   /** XQuery prefix. */ byte[] ARRAY_PREFIX = token("array");
   /** XQuery prefix. */ byte[] BASEX_PREFIX = token("basex");
@@ -259,6 +258,7 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] VALIDATE_PREFIX = token("validate");
   /** XQuery prefix. */ byte[] WEB_PREFIX = token("web");
   /** XQuery prefix. */ byte[] WS_PREFIX = token("ws");
+  /** XQuery prefix. */ byte[] XQ_PREFIX = token("xq");
   /** XQuery prefix. */ byte[] XQUERY_PREFIX = token("xquery");
   /** XQuery prefix. */ byte[] XS_PREFIX = token("xs");
   /** XQuery prefix. */ byte[] XSI_PREFIX = token("xsi");

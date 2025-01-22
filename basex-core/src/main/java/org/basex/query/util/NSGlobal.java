@@ -31,7 +31,7 @@ public final class NSGlobal {
     NS.add(MATH_PREFIX, MATH_URI);
     NS.add(MAP_PREFIX, MAP_URI);
     NS.add(ARRAY_PREFIX, ARRAY_URI);
-    NS.add(ANN_PREFIX, XQ_URI);
+    NS.add(XQ_PREFIX, XQ_URI);
     for(int s = NS.size() - 1; s >= 0; s--) RESERVED.add(NS.value(s));
 
     // additional XQuery namespaces
