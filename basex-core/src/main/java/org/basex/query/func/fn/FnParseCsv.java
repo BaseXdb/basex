@@ -31,8 +31,12 @@ import org.basex.util.hash.*;
 public class FnParseCsv extends Parse {
   /** Columns. */
   public static final Str COLUMNS = Str.get("columns");
+  /** Column-index. */
+  public static final Str COLUMN_INDEX = Str.get("column-index");
   /** Rows. */
   public static final Str ROWS = Str.get("rows");
+  /** Get. */
+  public static final Str GET = Str.get("get");
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -43,24 +47,24 @@ public class FnParseCsv extends Parse {
     try {
       final XQMap map = (XQMap) CsvConverter.get(options).convert(new IOContent(value), ii);
       Value columns = options.get(CsvOptions.HEADER);
-      if(columns.type.instanceOf(AtomType.BOOLEAN)) {
+      if(SeqType.BOOLEAN_O.instance(columns)) {
         final Value names = map.get(CsvXQueryConverter.NAMES).atomValue(qc, ii);
         if(options.get(CsvOptions.TRIM_WHITESPACE)) {
           columns = names;
         } else {
           final ValueBuilder vb = new ValueBuilder(qc);
-          for(final Item col : names) {
-            vb.add(Str.get(Token.trim(toZeroToken(col, qc))));
+          for(final Item name : names) {
+            vb.add(Str.get(Token.trim(toZeroToken(name, qc))));
           }
           columns = vb.value();
         }
       }
       final MapBuilder columnIndexBuilder = new MapBuilder();
       int i = 0;
-      for(final Item col : columns) {
+      for(final Item column : columns) {
         ++i;
-        if(toToken(col).length > 0 && !columnIndexBuilder.contains(col)) {
-          columnIndexBuilder.put(col, Int.get(i));
+        if(toToken(column).length > 0 && !columnIndexBuilder.contains(column)) {
+          columnIndexBuilder.put(column, Int.get(i));
         }
       }
       final XQMap columnIndex = columnIndexBuilder.map();
@@ -68,9 +72,9 @@ public class FnParseCsv extends Parse {
 
       final MapBuilder result = new MapBuilder();
       result.put(COLUMNS, columns);
-      result.put("column-index", columnIndex);
+      result.put(COLUMN_INDEX, columnIndex);
       result.put(ROWS, rows);
-      result.put("get", Get.funcItem(rows, columnIndex, qc, ii));
+      result.put(GET, Get.funcItem(rows, columnIndex, qc, ii));
       return result.map();
     } catch(final IOException ex) {
       throw CSV_ERROR_X.get(ii, ex);

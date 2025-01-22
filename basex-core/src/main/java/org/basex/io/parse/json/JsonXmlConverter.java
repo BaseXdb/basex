@@ -58,7 +58,7 @@ abstract class JsonXmlConverter extends JsonConverter {
 
   /**
    * Constructor.
-   * @param opts json options
+   * @param opts JSON options
    * @throws QueryException query exception
    */
   JsonXmlConverter(final JsonParserOptions opts) throws QueryException {

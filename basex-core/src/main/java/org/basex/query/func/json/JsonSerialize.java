@@ -27,7 +27,7 @@ public final class JsonSerialize extends StandardFunc {
 
   /**
    * Creates parameters for options.
-   * @param jopts json options
+   * @param jopts JSON options
    * @return options
    */
   public static SerializerOptions options(final JsonSerialOptions jopts) {

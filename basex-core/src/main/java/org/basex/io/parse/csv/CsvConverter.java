@@ -91,11 +91,12 @@ public abstract class CsvConverter extends Job {
    * Returns a CSV converter for the given configuration.
    * @param copts options
    * @return CSV converter
+   * @throws QueryException query exception
    */
-  public static CsvConverter get(final CsvParserOptions copts) {
+  public static CsvConverter get(final CsvParserOptions copts) throws QueryException {
     switch(copts.get(CsvOptions.FORMAT)) {
-      case W3:
       case XQUERY:
+      case W3:
       case W3_ARRAYS: return new CsvXQueryConverter(copts);
       case W3_XML:    return new CsvXmlConverter(copts);
       default:        return new CsvDirectConverter(copts);

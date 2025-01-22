@@ -15,7 +15,7 @@ import org.basex.util.list.*;
 
 /**
  * This class serializes a map as CSV. The input must conform to the result format of
- * fn:parse-csvs.
+ * fn:parse-csv.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher

@@ -41,7 +41,7 @@ public abstract class JsonSerializer extends StandardSerializer {
   final boolean nodups;
 
   /**
-   * Returns a CSV serializer for the given serialization options.
+   * Returns a JSON serializer for the given serialization options.
    * @param os output stream reference
    * @param so serialization options
    * @return serializer

@@ -44,7 +44,7 @@ public final class JsonXQueryConverter extends JsonConverter {
 
   /**
    * Constructor.
-   * @param opts json options
+   * @param opts JSON options
    * @throws QueryException query exception
    */
   JsonXQueryConverter(final JsonParserOptions opts) throws QueryException {

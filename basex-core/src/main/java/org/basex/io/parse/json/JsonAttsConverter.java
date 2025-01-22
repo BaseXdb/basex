@@ -17,7 +17,7 @@ import org.basex.query.value.node.*;
 public final class JsonAttsConverter extends JsonXmlConverter {
   /**
    * Constructor.
-   * @param opts json options
+   * @param opts JSON options
    * @throws QueryException query exception
    */
   JsonAttsConverter(final JsonParserOptions opts) throws QueryException {

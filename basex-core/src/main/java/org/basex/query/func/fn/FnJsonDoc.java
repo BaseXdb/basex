@@ -29,7 +29,7 @@ public class FnJsonDoc extends Parse {
       Util.debug(ex);
       throw ex.error() == INVCHARS_X ? PARSE_JSON_X.get(info, ex.getLocalizedMessage()) : ex;
     }
-    return item.isEmpty() ? Empty.VALUE : parse(item.string(info), false, qc);
+    return item.isEmpty() ? Empty.VALUE : parse(item.string(info), JsonFormat.XQUERY, qc);
   }
 
   @Override
@@ -40,16 +40,15 @@ public class FnJsonDoc extends Parse {
   /**
    * Parses the specified JSON string.
    * @param json JSON string
-   * @param xml convert to xml
+   * @param format format
    * @param qc query context
    * @return resulting item
    * @throws QueryException query exception
    */
-  final Item parse(final byte[] json, final boolean xml, final QueryContext qc)
+  final Item parse(final byte[] json, final JsonFormat format, final QueryContext qc)
       throws QueryException {
 
     try {
-      final JsonFormat format = xml ? JsonFormat.BASIC : JsonFormat.XQUERY;
       return converter(qc, format).convert(Token.string(json), "");
     } catch(final QueryException ex) {
       Util.debug(ex);
