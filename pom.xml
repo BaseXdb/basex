@@ -64,6 +64,13 @@
         <optional>true</optional>
       </dependency>
       <dependency>
+        <groupId>org.ccil.cowan.tagsoup</groupId>
+        <artifactId>tagsoup</artifactId>
+        <version>1.2.1</version>
+        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
         <groupId>nu.validator</groupId>
         <artifactId>htmlparser</artifactId>
         <version>1.4.16</version>

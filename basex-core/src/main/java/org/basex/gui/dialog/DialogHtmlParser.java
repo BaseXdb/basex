@@ -6,10 +6,12 @@ import java.awt.*;
 import java.io.*;
 
 import org.basex.build.html.*;
+import org.basex.build.html.HtmlParser.*;
 import org.basex.core.*;
 import org.basex.gui.*;
-import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.GUIConstants.*;
 import org.basex.gui.layout.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -33,10 +35,10 @@ final class DialogHtmlParser extends DialogParser {
    */
   DialogHtmlParser(final BaseXDialog dialog, final MainOptions opts) {
     hopts = new HtmlOptions(opts.get(MainOptions.HTMLPARSER));
-
-    final boolean avl = HtmlParser.available();
+    final Parser parser = Parser.of(hopts);
+    final boolean avl = parser.available(hopts);
     final BaseXBack pp  = new BaseXBack(new RowLayout(8));
-    pp.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER));
+    pp.add(new BaseXLabel(avl ? Util.info(H_HTML_PARSER_X, parser) : H_NO_HTML_PARSER));
 
     options = new BaseXTextField(dialog, hopts.toString());
     options.setToolTipText(tooltip(hopts));

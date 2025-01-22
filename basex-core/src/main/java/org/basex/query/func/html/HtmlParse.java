@@ -1,11 +1,11 @@
 package org.basex.query.func.html;
 
-import static org.basex.build.html.HtmlOptions.*;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
 import org.basex.build.html.*;
+import org.basex.build.html.HtmlParser.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -23,19 +23,23 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class HtmlParse extends StandardFunc {
-  /** Class needed for option heuristics=ICU. */
-  private static final String ICU_CLASS_NAME = "com.ibm.icu.text.CharsetDetector";
-  /** Class needed for option heuristics=CHARDET. */
-  private static final String CHARDET_CLASS_NAME =
-      "org.mozilla.intl.chardet.nsICharsetDetectionObserver";
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return parse(htmlInput(qc), Parser.DEFAULT, qc);
+  }
+
+  /**
+   * Converts the HTML input in the first argument to an IOContent instance from a binary or string
+   * item.
+   * @param qc query context
+   * @return input as an IOContent instance ({@code null}, if empty)
+   * @throws QueryException query exception
+   */
+  protected IOContent htmlInput(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    if (value.isEmpty()) return Empty.VALUE;
-    final IO io = value instanceof Bin ? new IOContent(toBytes(value))
-                                       : new IOContent(toBytes(value), "", Strings.UTF8);
-    return parse(io, qc);
+    if(value.isEmpty()) return null;
+    return value instanceof Bin ? new IOContent(toBytes(value))
+                                : new IOContent(toBytes(value), "", Strings.UTF8);
   }
 
   @Override
@@ -46,41 +50,22 @@ public class HtmlParse extends StandardFunc {
   /**
    * Parses the input and creates an XML document.
    * @param io input data
+   * @param defaultParser default HTML parser to be used in absence of the METHOD option
    * @param qc query context
    * @return node
    * @throws QueryException query exception
    */
-  protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
+  protected final Item parse(final IO io, final Parser defaultParser, final QueryContext qc)
+      throws QueryException {
+    if(io == null) return Empty.VALUE;
     final HtmlOptions options = toOptions(arg(1), new HtmlOptions(), qc);
-    if(options.contains(HEURISTICS)) {
-      switch (options.get(HEURISTICS)) {
-      case ALL:
-        ensureAvailable(ICU_CLASS_NAME);
-        ensureAvailable(CHARDET_CLASS_NAME);
-        break;
-      case ICU:
-        ensureAvailable(ICU_CLASS_NAME);
-        break;
-      case CHARDET:
-        ensureAvailable(CHARDET_CLASS_NAME);
-        break;
-      default:
-      }
-    }
+    final Parser parser = Parser.of(options, defaultParser);
+    if(!parser.fallbackToXml()) parser.ensureAvailable(options, definition.local(), info);
     try {
-      return new DBNode(new org.basex.build.html.HtmlParser(io, new MainOptions(), options));
+      return new DBNode(
+          new org.basex.build.html.HtmlParser(io, parser, new MainOptions(), options));
     } catch(final IOException ex) {
       throw INVHTML_X.get(info, ex);
     }
-  }
-
-  /**
-   * Ensure that a required class is available on the class path.
-   * @param className the class name
-   * @throws QueryException query exception,
-   */
-  private void ensureAvailable(final String className) throws QueryException {
-    if(!Reflect.available(className))
-      throw BASEX_CLASSPATH_X_X.get(info, definition.local(), className);
   }
 }

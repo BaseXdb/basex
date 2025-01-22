@@ -1,7 +1,5 @@
 package org.basex.query.func.html;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.build.html.HtmlParser;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -17,8 +15,6 @@ public class FnParseHtml extends HtmlParse {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    String className = HtmlParser.firstUnavailableClass();
-    if (className != null) throw BASEX_CLASSPATH_X_X.get(info, definition.local(), className);
-    return super.item(qc, ii);
+    return parse(htmlInput(qc), HtmlParser.Parser.NU, qc);
   }
 }
