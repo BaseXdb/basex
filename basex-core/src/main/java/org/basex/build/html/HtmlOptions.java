@@ -3,7 +3,7 @@ package org.basex.build.html;
 import org.basex.util.options.*;
 
 /**
- * Options for parsing and serializing HTML documents with Validator.nu.
+ * Options for parsing and serializing HTML documents with TagSoup and Validator.nu.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

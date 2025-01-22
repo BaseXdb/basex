@@ -20,9 +20,12 @@ import nu.validator.htmlparser.common.XmlViolationPolicy;
 import nu.validator.htmlparser.sax.*;
 
 /**
- * This class uses the Validator.nu HTML parser to convert HTML input to well-formed XML.
- * If the Validator.nu HTML parser is not found in the classpath, the original document is
- * passed on.
+ * This class uses the TagSoup or Validator.nu HTML parser to convert HTML input to well-formed
+ * XML. If TagSoup should be used, and it is not found in the classpath, the original document
+ * is passed on.
+ *
+ * TagSoup was written by John Cowan and is based on the Apache 2.0 License:
+ * {@code http://home.ccil.org/~cowan/XML/tagsoup/}.
  *
  * The Validator.nu HTML parser was written by Henri Sivonen and is based on the MIT License:
  * {@code https://about.validator.nu/htmlparser/}.
@@ -80,7 +83,7 @@ public final class HtmlParser extends XMLParser {
           : hopts.contains(ENCODING)
             ? hopts.get(HtmlOptions.ENCODING)
             : null;
-      if (enc != null) {
+      if(enc != null) {
         if(!Strings.supported(enc)) throw INVALIDOPT_X.getIO("Unsupported encoding: " + enc + '.');
         is.setEncoding(Strings.normEncoding(enc));
       }

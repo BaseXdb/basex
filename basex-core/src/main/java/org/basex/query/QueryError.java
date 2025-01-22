@@ -619,8 +619,6 @@ public enum QueryError {
   RESINV_X(FODC, 7, "Resource path '%' is invalid."),
   /** Error code. */
   INVHTML_X(FODC, 11, "HTML parsing failed: %"),
-  /** Error code. */
-  INVHTMLOPT_X(FODC, 12, "HTML option processing failed: %"),
 
   /** Error code. */
   FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),
