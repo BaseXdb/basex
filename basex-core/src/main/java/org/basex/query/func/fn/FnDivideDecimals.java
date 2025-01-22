@@ -25,8 +25,8 @@ public final class FnDivideDecimals extends StandardFunc {
     final Item precision = arg(2).atomItem(qc, info);
     if(divisor.signum() == 0) throw DIVZERO_X.get(info, value);
 
-    final int scale = precision.isEmpty() ? 0 : (int) Math.max(Integer.MIN_VALUE,
-        Math.min(Integer.MAX_VALUE, toLong(precision)));
+    final int scale = precision.isEmpty() ? 0 : (int) Math.max(-1 << 20,
+        Math.min(1 << 20, toLong(precision)));
     final BigDecimal quotient = value.divide(divisor, scale, RoundingMode.DOWN);
     final BigDecimal remainder = value.subtract(quotient.multiply(divisor));
 

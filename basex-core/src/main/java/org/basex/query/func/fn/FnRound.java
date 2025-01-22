@@ -49,8 +49,8 @@ public class FnRound extends NumericFn {
     final ANum value = toNumberOrNull(arg(0), qc);
     final Item precision = arg(1).atomItem(qc, info);
 
-    final long prec = precision.isEmpty() ? 0 : Math.max(Integer.MIN_VALUE, toLong(precision));
-    return value == null ? Empty.VALUE : prec > Integer.MAX_VALUE ? value :
-      value.round((int) prec, mode);
+    final int scale = precision.isEmpty() ? 0 : (int) Math.max(-1 << 20,
+        Math.min(1 << 20, toLong(precision)));
+    return value == null ? Empty.VALUE : value.round(scale, mode);
   }
 }
