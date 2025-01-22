@@ -233,7 +233,7 @@ public abstract class CsvSerializer extends StandardSerializer {
         }
 
         if(!(item instanceof XQMap)) {
-          throw CSV_SERIALIZE_X_X.getIO("Cannot serialize items of type " + item.type);
+          throw CSV_SERIALIZE_X_X.getIO("Cannot serialize items of type " + item.type, item);
         }
 
         if(((XQMap) item).contains(FnParseCsv.ROWS)) {
