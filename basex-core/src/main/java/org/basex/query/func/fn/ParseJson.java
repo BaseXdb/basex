@@ -49,9 +49,7 @@ public abstract class ParseJson extends Parse {
     try {
       item = unparsedText(qc, false, false, null);
     } catch(final QueryException ex) {
-      if(ex.error() != INVCHARS_X) throw ex;
-      Util.debug(ex);
-      throw PARSE_JSON_X.get(info, ex.getLocalizedMessage());
+      throw error(ex, ex.error() == INVCHARS_X ? PARSE_JSON_X : null);
     }
     return item.isEmpty() ? Empty.VALUE : parse(qc, format, item.string(info));
   }

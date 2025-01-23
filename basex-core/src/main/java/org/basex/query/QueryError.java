@@ -1465,14 +1465,14 @@ public enum QueryError {
   /** Cached enums (faster). */
   private static final QueryError[] VALUES = values();
 
-  /** Error code. */
-  private final String code;
   /** Error URI. */
   private final byte[] uri;
   /** Error prefix. */
   private final String prefix;
+  /** Error code. */
+  private final String code;
   /** Error message. */
-  public final String message;
+  private final String message;
 
   /**
    * Constructor.
@@ -1648,6 +1648,14 @@ public enum QueryError {
    */
   public final QNm qname() {
     return new QNm(Token.token(prefix), code, uri);
+  }
+
+  /**
+   * Returns the error message.
+   * @return message
+   */
+  public final String message() {
+    return message;
   }
 
   /**

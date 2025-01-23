@@ -811,6 +811,18 @@ public abstract class StandardFunc extends Arr {
     });
   }
 
+  /**
+   * Returns the original exception, or a new exception for the specified error.
+   * @param ex original exception
+   * @param error error adapted error (ignored if {@code null})
+   * @return new exception
+   */
+  protected final QueryException error(final QueryException ex, final QueryError error) {
+    if(error == null) return ex;
+    Util.debug(ex);
+    return error.get(info, ex.getLocalizedMessage());
+  }
+
   @Override
   public final boolean equals(final Object obj) {
     return this == obj || obj instanceof StandardFunc &&

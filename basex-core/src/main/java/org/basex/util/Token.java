@@ -179,7 +179,7 @@ public final class Token {
    *   <li> byte arrays are returned as-is.</li>
    *   <li> {@code null} references are replaced by the string "{@code null}".</li>
    *   <li> objects of type {@link Throwable} are converted to a string representation via
-   *        {@link Util#message}.</li>
+   *        {@link Util#message(Throwable)}.</li>
    *   <li> objects of type {@link Class} are converted via {@link Util#className(Class)}.</li>
    *   <li> for all other typer, {@link Object#toString} is called.</li>
    * </ul>

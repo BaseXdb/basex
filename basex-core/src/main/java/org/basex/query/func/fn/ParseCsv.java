@@ -45,9 +45,7 @@ public abstract class ParseCsv extends Parse {
     try {
       item = unparsedText(qc, false, false, null);
     } catch(final QueryException ex) {
-      if(ex.error() != INVCHARS_X) throw ex;
-      Util.debug(ex);
-      throw CSV_ERROR_X.get(info, ex.getLocalizedMessage());
+      throw error(ex, ex.error() == INVCHARS_X ? CSV_ERROR_X : null);
     }
     return item.isEmpty() ? Empty.VALUE : parse(qc, format, item.string(info));
   }

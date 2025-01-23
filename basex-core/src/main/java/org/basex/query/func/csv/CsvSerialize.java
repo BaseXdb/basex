@@ -24,9 +24,7 @@ public final class CsvSerialize extends StandardFunc {
       final CsvOptions options = toOptions(arg(1), new CsvOptions(), qc);
       return Str.get(serialize(input, options(options), INVALIDOPTION_X, qc));
     } catch(final QueryException ex) {
-      if(!ex.error().toString().startsWith(ErrType.FOCV.name())) throw ex;
-      Util.debug(ex);
-      throw CSV_SERIALIZE_X.get(info, ex.getLocalizedMessage());
+      throw error(ex, ex.matches(ErrType.FOCV) ? CSV_SERIALIZE_X : null);
     }
   }
 

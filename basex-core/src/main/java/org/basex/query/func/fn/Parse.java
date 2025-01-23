@@ -103,20 +103,8 @@ public abstract class Parse extends StandardFunc {
       }
 
     } catch(final QueryException ex) {
-      if(check && !ex.error().toString().startsWith(ErrType.XPTY.name())) return Bln.FALSE;
+      if(check && !ex.matches(ErrType.XPTY)) return Bln.FALSE;
       throw ex;
     }
-  }
-
-  /**
-   * Returns the original or an adapted exception.
-   * @param ex exception to be adapted
-   * @param error error adapted error
-   * @return new exception
-   */
-  protected final QueryException error(final QueryException ex, final QueryError error) {
-    if(error == null) return ex;
-    Util.debug(ex);
-    return error.get(info, ex.getLocalizedMessage());
   }
 }
