@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -29,8 +28,6 @@ public class CsvDoc extends ParseCsv {
    * @return new exception
    */
   final QueryException error(final QueryException ex) {
-    if(!ex.error().toString().startsWith(ErrType.FOCV.name())) return ex;
-    Util.debug(ex);
-    return CSV_PARSE_X.get(info, ex.getLocalizedMessage());
+    return error(ex, ex.error().toString().startsWith(ErrType.FOCV.name()) ? CSV_PARSE_X : null);
   }
 }

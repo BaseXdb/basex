@@ -420,7 +420,7 @@ public final class JsonParser extends InputParser {
    * @return query exception
    */
   private QueryException error(final String msg, final Object... ext) {
-    return error(PARSE_JSON_X, msg, ext);
+    return error(PARSE_JSON_X_X_X, msg, ext);
   }
 
   /**
@@ -432,7 +432,6 @@ public final class JsonParser extends InputParser {
    */
   private QueryException error(final QueryError err, final String msg, final Object... ext) {
     final InputInfo ii = info();
-    System.out.println(msg);
     return err.get(ii, ii.line(), ii.column(), Util.inf(msg, ext));
   }
 }

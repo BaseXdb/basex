@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.query.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
-import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -29,14 +28,8 @@ public class JsonDoc extends ParseJson {
    * @return new exception
    */
   final QueryException error(final QueryException ex) {
-    Util.debug(ex);
     final QueryError error = ex.error();
-    QueryError err = null;
-    if(error == PARSE_JSON_X) err = JSON_PARSE_X_X_X;
-    else if(error == DUPLICATE_JSON_X) err = JSON_DUPL_X_X_X;
-    else if(error == OPTION_JSON_X) err = JSON_OPTIONS_X;
-    if(err == null) return ex;
-    Util.debug(ex);
-    return err.get(info, ex.getLocalizedMessage());
+    return error(ex, error == PARSE_JSON_X || error == DUPLICATE_JSON_X ? JSON_PARSE_X :
+      error == OPTION_JSON_X ? JSON_OPTIONS_X : null);
   }
 }

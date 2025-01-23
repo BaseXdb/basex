@@ -107,4 +107,16 @@ public abstract class Parse extends StandardFunc {
       throw ex;
     }
   }
+
+  /**
+   * Returns the original or an adapted exception.
+   * @param ex exception to be adapted
+   * @param error error adapted error
+   * @return new exception
+   */
+  protected final QueryException error(final QueryException ex, final QueryError error) {
+    if(error == null) return ex;
+    Util.debug(ex);
+    return error.get(info, ex.getLocalizedMessage());
+  }
 }
