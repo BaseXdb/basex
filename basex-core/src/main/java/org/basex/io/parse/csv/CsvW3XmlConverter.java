@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public class CsvXmlConverter extends CsvConverter {
+public class CsvW3XmlConverter extends CsvConverter {
   /** QName. */
   public static final QNm Q_FN_CSV = new QNm("csv", QueryText.FN_URI);
   /** QName. */
@@ -43,7 +43,7 @@ public class CsvXmlConverter extends CsvConverter {
    * @param copts CSV options
    * @throws QueryException query exception
    */
-  public CsvXmlConverter(final CsvParserOptions copts) throws QueryException {
+  public CsvW3XmlConverter(final CsvParserOptions copts) throws QueryException {
     super(copts);
     final TokenSet names = new TokenSet();
     final Value columns = copts.get(CsvOptions.HEADER);
@@ -94,10 +94,10 @@ public class CsvXmlConverter extends CsvConverter {
   }
 
   @Override
-  protected final FNode finish() {
+  protected final FNode finish(final InputInfo ii, final QueryContext qc) {
     finishRecord();
     final FBuilder root = FElem.build(Q_FN_CSV);
-    if(headers.size() > 0) {
+    if(!headers.isEmpty()) {
       final FBuilder columns = FElem.build(Q_FN_COLUMNS);
       for(final byte[] h : headers) columns.add(FElem.build(Q_FN_COLUMN).add(h));
       root.add(columns);

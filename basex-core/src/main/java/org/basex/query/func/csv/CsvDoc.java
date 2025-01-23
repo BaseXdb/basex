@@ -1,8 +1,10 @@
 package org.basex.query.func.csv;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.func.fn.*;
+import org.basex.query.value.*;
 import org.basex.util.*;
 
 /**
@@ -11,10 +13,24 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class CsvDoc extends CsvParse {
+public class CsvDoc extends ParseCsv {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String source = toStringOrNull(arg(0), qc);
-    return source != null ? parse(toIO(source), qc) : Empty.VALUE;
+  public Value value(final QueryContext qc) throws QueryException {
+    try {
+      return doc(qc, null);
+    } catch(final QueryException ex) {
+      throw error(ex);
+    }
+  }
+
+  /**
+   * Adapts the error code.
+   * @param ex exception to be adapted
+   * @return new exception
+   */
+  final QueryException error(final QueryException ex) {
+    if(!ex.error().toString().startsWith(ErrType.FOCV.name())) return ex;
+    Util.debug(ex);
+    return CSV_PARSE_X.get(info, ex.getLocalizedMessage());
   }
 }

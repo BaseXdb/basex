@@ -2,9 +2,7 @@ package org.basex.query.func.fn;
 
 import org.basex.build.json.JsonOptions.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
-import org.basex.util.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -12,10 +10,9 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnJsonToXml extends FnParseJson {
+public final class FnJsonToXml extends ParseJson {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
-    return value.isEmpty() ? Empty.VALUE : parse(toToken(value), JsonFormat.BASIC, qc);
+  public Value value(final QueryContext qc) throws QueryException {
+    return parse(qc, JsonFormat.BASIC);
   }
 }

@@ -9,6 +9,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -20,6 +21,15 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class CsvConverter extends Job {
+  /** Columns. */
+  public static final Str COLUMNS = Str.get("columns");
+  /** Column-index. */
+  public static final Str COLUMN_INDEX = Str.get("column-index");
+  /** Rows. */
+  public static final Str ROWS = Str.get("rows");
+  /** Get. */
+  public static final Str GET = Str.get("get");
+
   /** QName. */
   protected static final QNm Q_CSV = new QNm("csv");
   /** QName. */
@@ -29,6 +39,8 @@ public abstract class CsvConverter extends Job {
   /** QName. */
   protected static final QNm Q_NAME = new QNm("name");
 
+  /** CSV options. */
+  protected final CsvParserOptions copts;
   /** Shared data references. */
   protected final SharedData shared = new SharedData();
   /** Headers. */
@@ -45,8 +57,21 @@ public abstract class CsvConverter extends Job {
   /** Current column. */
   protected int column = -1;
 
-  /** CSV options. */
-  private final CsvParserOptions copts;
+  /**
+   * Returns a CSV converter for the given configuration.
+   * @param copts options
+   * @return CSV converter
+   * @throws QueryException query exception
+   */
+  public static CsvConverter get(final CsvParserOptions copts) throws QueryException {
+    switch(copts.get(CsvOptions.FORMAT)) {
+      case XQUERY:    return new CsvXQueryConverter(copts);
+      case W3_MAP:    return new CsvW3MapConverter(copts);
+      case W3_ARRAYS: return new CsvW3ArraysConverter(copts);
+      case W3_XML:    return new CsvW3XmlConverter(copts);
+      default:        return new CsvDirectConverter(copts);
+    }
+  }
 
   /**
    * Constructor.
@@ -66,41 +91,27 @@ public abstract class CsvConverter extends Job {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public final Item convert(final IO input) throws QueryException, IOException {
-    return convert(input, null);
+  public final Value convert(final IO input) throws QueryException, IOException {
+    return convert(input, null, null);
   }
 
   /**
    * Converts the specified input to an XQuery value.
    * @param input input
    * @param ii input info (can be {@code null})
+   * @param qc query context (if {@code null}, result may lack XQuery-specific contents)
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public final Item convert(final IO input, final InputInfo ii) throws QueryException, IOException {
+  public final Value convert(final IO input, final InputInfo ii, final QueryContext qc)
+      throws QueryException, IOException {
     init(input.url());
     try(NewlineInput in = new NewlineInput(input)) {
       nli = in.encoding(copts.get(CsvParserOptions.ENCODING));
       new CsvParser(in, copts, this).parse(ii);
     }
-    return finish();
-  }
-
-  /**
-   * Returns a CSV converter for the given configuration.
-   * @param copts options
-   * @return CSV converter
-   * @throws QueryException query exception
-   */
-  public static CsvConverter get(final CsvParserOptions copts) throws QueryException {
-    switch(copts.get(CsvOptions.FORMAT)) {
-      case XQUERY:
-      case W3:
-      case W3_ARRAYS: return new CsvXQueryConverter(copts);
-      case W3_XML:    return new CsvXmlConverter(copts);
-      default:        return new CsvDirectConverter(copts);
-    }
+    return finish(ii, qc);
   }
 
   /**
@@ -130,9 +141,12 @@ public abstract class CsvConverter extends Job {
 
   /**
    * Returns the resulting XQuery value.
+   * @param ii input info (can be {@code null})
+   * @param qc query context (if {@code null}, result may lack XQuery-specific contents)
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  protected abstract Item finish() throws QueryException, IOException;
+  protected abstract Value finish(InputInfo ii, QueryContext qc)
+      throws QueryException, IOException;
 }

@@ -1,6 +1,6 @@
 package org.basex.query.func.fn;
 
-import org.basex.build.json.JsonOptions.*;
+import org.basex.build.csv.CsvOptions.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 
@@ -10,9 +10,9 @@ import org.basex.query.value.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnParseJson extends ParseJson {
+public class FnCsvDoc extends ParseCsv {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return parse(qc, JsonFormat.XQUERY);
+    return doc(qc, CsvFormat.W3_MAP);
   }
 }

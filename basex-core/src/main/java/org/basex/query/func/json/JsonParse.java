@@ -1,10 +1,7 @@
 package org.basex.query.func.json;
 
-import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
-import org.basex.util.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -14,8 +11,11 @@ import org.basex.util.*;
  */
 public final class JsonParse extends JsonDoc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toTokenOrNull(arg(0), qc);
-    return value != null ? parse(new IOContent(value), qc) : Empty.VALUE;
+  public Value value(final QueryContext qc) throws QueryException {
+    try {
+      return parse(qc, null);
+    } catch(final QueryException ex) {
+      throw error(ex);
+    }
   }
 }

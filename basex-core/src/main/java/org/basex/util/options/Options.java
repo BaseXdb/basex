@@ -849,7 +849,9 @@ public class Options implements Iterable<Option<?>> {
       final String string = normalize(serialize(value, info));
       final EnumOption<?> eo = (EnumOption<?>) option;
       result = eo.get(string);
-      if(result == null) throw INVALIDOPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
+      if(result == null) {
+        throw INVALIDOPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
+      }
     } else if(option instanceof OptionsOption) {
       if(!(item instanceof XQMap)) throw expected.apply(SeqType.MAP);
       result = ((OptionsOption<?>) option).newInstance();

@@ -31,10 +31,26 @@ public abstract class JsonConverter {
   protected Value nullValue = Empty.VALUE;
 
   /**
+   * Returns a JSON converter for the given configuration.
+   * @param jopts options
+   * @return JSON converter
+   * @throws QueryException query exception
+   */
+  public static JsonConverter get(final JsonParserOptions jopts) throws QueryException {
+    switch(jopts.get(JsonOptions.FORMAT)) {
+      case JSONML:     return new JsonMLConverter(jopts);
+      case ATTRIBUTES: return new JsonAttsConverter(jopts);
+      case XQUERY:     return new JsonXQueryConverter(jopts);
+      case BASIC:      return new JsonBasicConverter(jopts);
+      default:         return new JsonDirectConverter(jopts);
+    }
+  }
+
+  /**
    * Constructor.
    * @param jopts JSON options
    */
-  JsonConverter(final JsonParserOptions jopts) {
+  protected JsonConverter(final JsonParserOptions jopts) {
     this.jopts = jopts;
   }
 
@@ -88,22 +104,6 @@ public abstract class JsonConverter {
     final JsonParser parser = new JsonParser(input, jopts, this);
     parser.parse();
     return finish();
-  }
-
-  /**
-   * Returns a JSON converter for the given configuration.
-   * @param jopts options
-   * @return JSON converter
-   * @throws QueryException query exception
-   */
-  public static JsonConverter get(final JsonParserOptions jopts) throws QueryException {
-    switch(jopts.get(JsonOptions.FORMAT)) {
-      case JSONML:     return new JsonMLConverter(jopts);
-      case ATTRIBUTES: return new JsonAttsConverter(jopts);
-      case XQUERY:     return new JsonXQueryConverter(jopts);
-      case BASIC:      return new JsonBasicConverter(jopts);
-      default:         return new JsonDirectConverter(jopts);
-    }
   }
 
   /**

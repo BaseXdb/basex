@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.io.parse.csv.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -76,7 +77,7 @@ final class CsvBuilder extends CsvConverter {
   }
 
   @Override
-  protected Str finish() throws IOException {
+  protected Str finish(final InputInfo ii, final QueryContext qc) throws IOException {
     finishRecord();
     builder.closeElem();
     return null;

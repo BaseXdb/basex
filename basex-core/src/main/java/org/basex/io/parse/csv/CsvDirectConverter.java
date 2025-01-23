@@ -1,6 +1,7 @@
 package org.basex.io.parse.csv;
 
 import org.basex.build.csv.*;
+import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -60,7 +61,7 @@ final class CsvDirectConverter extends CsvConverter {
   }
 
   @Override
-  protected FNode finish() {
+  protected FNode finish(final InputInfo ii, final QueryContext qc) {
     finishRecord();
     return doc.add(root).finish();
   }

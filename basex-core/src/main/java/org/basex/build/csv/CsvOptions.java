@@ -50,7 +50,7 @@ public class CsvOptions extends Options {
     /** Attributes. */ ATTRIBUTES,
     /** W3: XML.    */ W3_XML,
     /** W3: Arrays. */ W3_ARRAYS,
-    /** W3.         */ W3,
+    /** W3: Map.    */ W3_MAP,
     /** XQuery.     */ XQUERY;
 
     @Override

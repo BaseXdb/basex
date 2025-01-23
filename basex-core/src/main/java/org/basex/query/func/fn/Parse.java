@@ -17,7 +17,7 @@ import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
- * Parse functions.
+ * Parse helper functions.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -26,11 +26,9 @@ public abstract class Parse extends StandardFunc {
   /** Parse Options. */
   public static final class ParseOptions extends Options {
     /** Normalize-newlines option. */
-    public static final BooleanOption NORMALIZE_NEWLINES =
-        new BooleanOption("normalize-newlines");
+    public static final BooleanOption NORMALIZE_NEWLINES = new BooleanOption("normalize-newlines");
     /** Encoding option. */
-    public static final StringOption ENCODING =
-        new StringOption("encoding");
+    public static final StringOption ENCODING = new StringOption("encoding");
   }
 
   /** Input reference. */
@@ -41,7 +39,7 @@ public abstract class Parse extends StandardFunc {
    * @param uri URI
    * @return io reference, or {@code null} if the URI is invalid
    */
-  protected IO input(final byte[] uri) {
+  protected final IO input(final byte[] uri) {
     return input != null ? input : Uri.get(uri).isValid() ? info.sc().resolve(string(uri)) : null;
   }
 

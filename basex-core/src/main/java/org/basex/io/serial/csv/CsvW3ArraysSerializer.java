@@ -18,14 +18,14 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public final class CsvArraysSerializer extends CsvSerializer {
+public final class CsvW3ArraysSerializer extends CsvSerializer {
   /**
    * Constructor.
    * @param os output stream
    * @param sopts serialization parameters
    * @throws IOException I/O exception
    */
-  public CsvArraysSerializer(final OutputStream os, final SerializerOptions sopts)
+  public CsvW3ArraysSerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
     super(os, sopts);
   }

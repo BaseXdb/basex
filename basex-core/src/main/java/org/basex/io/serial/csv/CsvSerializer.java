@@ -50,9 +50,9 @@ public abstract class CsvSerializer extends StandardSerializer {
       throws IOException {
     switch(so.get(SerializerOptions.CSV).get(CsvOptions.FORMAT)) {
       case XQUERY:    return new CsvXQuerySerializer(os, so);
-      case W3:        return new CsvMapSerializer(os, so);
-      case W3_ARRAYS: return new CsvArraysSerializer(os, so);
-      case W3_XML:    return new CsvXmlSerializer(os, so);
+      case W3_MAP:    return new CsvW3MapSerializer(os, so);
+      case W3_ARRAYS: return new CsvW3ArraysSerializer(os, so);
+      case W3_XML:    return new CsvW3XmlSerializer(os, so);
       default:        return new CsvDirectSerializer(os, so);
     }
   }

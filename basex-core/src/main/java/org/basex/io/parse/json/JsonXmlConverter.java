@@ -69,7 +69,7 @@ abstract class JsonXmlConverter extends JsonConverter {
 
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
     if(dupl == JsonDuplicates.USE_LAST) {
-      throw JSON_OPTIONS_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl);
+      throw OPTION_JSON_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl);
     }
   }
 
