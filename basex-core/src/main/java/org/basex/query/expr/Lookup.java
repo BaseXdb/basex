@@ -88,8 +88,8 @@ public final class Lookup extends Arr {
     if(ks == 1) {
       // single input:
       //   INPUT?(KEY)  ->  INPUT(KEY)
-      //   ARRAY?*      ->  array:values(MAP)
-      //   MAP?*        ->  map:values(MAP)
+      //   ARRAY?*      ->  array:items(MAP)
+      //   MAP?*        ->  map:items(MAP)
       if(is == 1) return rewrite.apply(input, keys);
       // multiple inputs:
       //   INPUTS?(KEY)  ->  INPUTS ! .(KEY)

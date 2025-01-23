@@ -117,7 +117,7 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   public final Value get(final Item key) throws QueryException {
-    return get(key, true);
+    return getInternal(key, true);
   }
 
   /**
@@ -127,7 +127,7 @@ public abstract class XQMap extends XQStruct {
    * @return value or {@code null}
    * @throws QueryException query exception
    */
-  public final Value get(final Item key, final boolean empty) throws QueryException {
+  public final Value getInternal(final Item key, final boolean empty) throws QueryException {
     final Value value = getInternal(key);
     return value != null ? value : empty ? Empty.VALUE : null;
   }

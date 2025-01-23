@@ -24,8 +24,8 @@ abstract class ArrayFn extends StandardFunc {
   final long toPos(final XQArray array, final long pos, final boolean incl)
       throws QueryException {
 
-    final long as = array.structSize() + (incl ? 1 : 0);
-    if(pos < 1 || pos > as) throw (as == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(info, pos, as);
-    return pos - 1;
+    final long size = array.structSize() + (incl ? 1 : 0);
+    if(pos > 0 && pos <= size) return pos - 1;
+    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(info, pos, size);
   }
 }
