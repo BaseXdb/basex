@@ -156,6 +156,9 @@ public enum Function implements AFunction {
   COUNT(FnCount::new, "count(input)",
       params(ITEM_ZM), INTEGER_O),
   /** XQuery function. */
+  CSV_DOC(FnCsvDoc::new, "csv-doc(source[,options])",
+      params(STRING_ZO, MAP_ZO), MAP_O, flag(HOF), FN_URI, Perm.CREATE),
+  /** XQuery function. */
   CSV_TO_ARRAYS(FnCsvToArrays::new, "csv-to-arrays(value[,options])",
       params(STRING_ZO, MAP_ZO), STRING_O.arrayType().seqType(Occ.ZERO_OR_MORE)),
   /** XQuery function. */
