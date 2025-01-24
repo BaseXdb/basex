@@ -1426,7 +1426,7 @@ public interface Text {
   String H_VERSION_NEW_X_X = lang("h_version_new_%_%");
 
   /** HTML Parser. */
-  String H_HTML_PARSER = lang("h_html_parser");
+  String H_HTML_PARSER_X = lang("h_html_parser_%");
   /** No HTML Parser. */
   String H_NO_HTML_PARSER = lang("h_no_html_parser");
 

@@ -36,6 +36,12 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>nu.validator</groupId>
+      <artifactId>htmlparser</artifactId>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>jline</groupId>
       <artifactId>jline</artifactId>
       <scope>compile</scope>

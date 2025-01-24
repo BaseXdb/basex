@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 
 import org.basex.build.html.*;
+import org.basex.build.html.HtmlParser.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -24,8 +25,21 @@ import org.basex.util.*;
 public class HtmlParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return parse(htmlInput(qc), Parser.DEFAULT, qc);
+  }
+
+  /**
+   * Converts the HTML input in the first argument to an IOContent instance from a binary or string
+   * item.
+   * @param qc query context
+   * @return input as an IOContent instance ({@code null}, if empty)
+   * @throws QueryException query exception
+   */
+  protected IOContent htmlInput(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    return value.isEmpty() ? Empty.VALUE : parse(new IOContent(toBytes(value)), qc);
+    if(value.isEmpty()) return null;
+    return value instanceof Bin ? new IOContent(toBytes(value))
+                                : new IOContent(toBytes(value), "", Strings.UTF8);
   }
 
   @Override
@@ -36,16 +50,22 @@ public class HtmlParse extends StandardFunc {
   /**
    * Parses the input and creates an XML document.
    * @param io input data
+   * @param defaultParser default HTML parser to be used in absence of the METHOD option
    * @param qc query context
    * @return node
    * @throws QueryException query exception
    */
-  protected final Item parse(final IO io, final QueryContext qc) throws QueryException {
+  protected final Item parse(final IO io, final Parser defaultParser, final QueryContext qc)
+      throws QueryException {
+    if(io == null) return Empty.VALUE;
     final HtmlOptions options = toOptions(arg(1), new HtmlOptions(), qc);
+    final Parser parser = Parser.of(options, defaultParser);
+    if(!parser.fallbackToXml()) parser.ensureAvailable(options, definition.local(), info);
     try {
-      return new DBNode(new org.basex.build.html.HtmlParser(io, new MainOptions(), options));
+      return new DBNode(
+          new org.basex.build.html.HtmlParser(io, parser, new MainOptions(), options));
     } catch(final IOException ex) {
-      throw HTML_PARSE_X.get(info, ex);
+      throw INVHTML_X.get(info, ex);
     }
   }
 }
