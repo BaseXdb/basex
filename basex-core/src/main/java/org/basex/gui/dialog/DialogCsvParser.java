@@ -60,12 +60,7 @@ final class DialogCsvParser extends DialogParser {
   DialogCsvParser(final BaseXDialog dialog, final MainOptions opts) {
     copts = new CsvParserOptions(opts.get(MainOptions.CSVPARSER));
 
-    final BaseXBack pp = new BaseXBack(new RowLayout(8));
-    BaseXBack p = new BaseXBack(new TableLayout(4, 2, 8, 4));
-
-    p.add(new BaseXLabel(ENCODING + COL, true, true));
     encoding = encoding(dialog, copts.get(CsvParserOptions.ENCODING));
-    p.add(encoding);
 
     final StringList csv = new StringList();
     for(final CsvSep cs : CsvSep.values()) csv.add(cs.toString());
@@ -74,35 +69,37 @@ final class DialogCsvParser extends DialogParser {
     for(final CsvSep cs : CsvSep.values()) {
       if(String.valueOf(cs.sep).equals(sep)) separator.setSelectedItem(cs.toString());
     }
-    p.add(new BaseXLabel(SEPARATOR, true, true));
-    p.add(separator);
-    pp.add(p);
 
-    p.add(new BaseXLabel(FORMAT + COL, true, true));
     final String[] formats = Arrays.stream(new CsvFormat[] {
-      CsvFormat.DIRECT, CsvFormat.ATTRIBUTES, CsvFormat.W3_XML
-    }).map(CsvFormat::toString).toArray(String[]::new);
-    format = new BaseXCombo(dialog, formats);
-    format.setSelectedItem(copts.get(CsvOptions.FORMAT));
-    p.add(format);
+        CsvFormat.DIRECT, CsvFormat.ATTRIBUTES, CsvFormat.W3_XML
+      }).map(CsvFormat::toString).toArray(String[]::new);
+      format = new BaseXCombo(dialog, formats);
+      format.setSelectedItem(copts.get(CsvOptions.FORMAT));
 
-    p = new BaseXBack(new RowLayout());
     header = new BaseXCheckBox(dialog, FIRST_LINE_HEADER, copts.get(CsvOptions.HEADER) == Bln.TRUE);
-    p.add(header);
     quotes = new BaseXCheckBox(dialog, PARSE_QUOTES, CsvOptions.QUOTES, copts);
-    p.add(quotes);
     backslashes = new BaseXCheckBox(dialog, BACKSLASHES, CsvOptions.BACKSLASHES, copts);
-    p.add(backslashes);
     lax = new BaseXCheckBox(dialog, LAX_NAME_CONVERSION, CsvOptions.LAX, copts);
-    p.add(lax);
     skipEmpty = new BaseXCheckBox(dialog, SKIP_EMPTY, CsvParserOptions.SKIP_EMPTY, copts);
-    p.add(skipEmpty);
-    pp.add(p);
-
-    add(pp, BorderLayout.WEST);
-
     example = new TextPanel(dialog, false);
 
+    final BaseXBack pp = new BaseXBack(new RowLayout(8));
+    BaseXBack p = new BaseXBack(new TableLayout(3, 2, 8, 4));
+    p.add(new BaseXLabel(ENCODING + COL, true, true));
+    p.add(encoding);
+    p.add(new BaseXLabel(SEPARATOR, true, true));
+    p.add(separator);
+    p.add(new BaseXLabel(FORMAT + COL, true, true));
+    p.add(format);
+    pp.add(p);
+    p = new BaseXBack(new RowLayout());
+    p.add(header);
+    p.add(quotes);
+    p.add(backslashes);
+    p.add(lax);
+    p.add(skipEmpty);
+    pp.add(p);
+    add(pp, BorderLayout.WEST);
     add(example, BorderLayout.CENTER);
     action(true);
   }
@@ -110,11 +107,6 @@ final class DialogCsvParser extends DialogParser {
   @Override
   boolean action(final boolean active) {
     try {
-      final boolean head = header.isSelected();
-      format.setEnabled(head);
-      lax.setEnabled(head && copts.get(CsvOptions.FORMAT) == CsvFormat.DIRECT);
-      skipEmpty.setEnabled(head);
-
       final Value value = CsvConverter.get(copts).convert(new IOContent(EXAMPLE));
       example.setText(example(MainParser.CSV.name(), EXAMPLE, value));
     } catch(final QueryException | IOException ex) {

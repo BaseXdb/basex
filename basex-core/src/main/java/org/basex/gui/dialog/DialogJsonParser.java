@@ -16,7 +16,7 @@ import org.basex.gui.text.*;
 import org.basex.io.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.util.*;
 
 /**
@@ -73,6 +73,7 @@ final class DialogJsonParser extends DialogParser {
     merge = new BaseXCheckBox(dialog, MERGE_TYPES, JsonOptions.MERGE, jopts);
     strings = new BaseXCheckBox(dialog, INCLUDE_STRINGS, JsonOptions.STRINGS, jopts);
     lax = new BaseXCheckBox(dialog, LAX_NAME_CONVERSION, JsonOptions.LAX, jopts);
+    example = new TextPanel(dialog, false);
 
     final BaseXBack pp = new BaseXBack(new RowLayout(8));
     BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 4));
@@ -81,7 +82,6 @@ final class DialogJsonParser extends DialogParser {
     p.add(new BaseXLabel(FORMAT + COL, true, true));
     p.add(format);
     pp.add(p);
-
     p = new BaseXBack(new RowLayout());
     p.add(liberal);
     p.add(escape);
@@ -90,8 +90,6 @@ final class DialogJsonParser extends DialogParser {
     p.add(lax);
     pp.add(p);
     add(pp, BorderLayout.WEST);
-
-    example = new TextPanel(dialog, false);
     add(example, BorderLayout.CENTER);
 
     action(true);
@@ -102,10 +100,6 @@ final class DialogJsonParser extends DialogParser {
     try {
       final boolean jl = jopts.get(JsonParserOptions.LIBERAL);
       final JsonFormat jf = jopts.get(JsonOptions.FORMAT);
-      lax.setEnabled(jf == JsonFormat.DIRECT);
-      merge.setEnabled(jf != JsonFormat.JSONML);
-      strings.setEnabled(jf != JsonFormat.JSONML);
-
       if(active) {
         final String json;
         if(jf == JsonFormat.JSONML) {
@@ -115,8 +109,8 @@ final class DialogJsonParser extends DialogParser {
         } else {
           json = EXAMPLE;
         }
-        final Item item = JsonConverter.get(jopts).convert(new IOContent(json));
-        example.setText(example(MainParser.JSON.name(), json, item));
+        final Value value = JsonConverter.get(jopts).convert(new IOContent(json));
+        example.setText(example(MainParser.JSON.name(), json, value));
       }
     } catch(final QueryException | IOException ex) {
       example.setText(error(ex));
