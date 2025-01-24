@@ -16,11 +16,11 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class CsvOptions extends Options {
-  /** Option: column separator. */
+  /** Option: separator. */
   public static final StringOption SEPARATOR = new StringOption("separator", ",");
   /** Option: format. */
   public static final EnumOption<CsvFormat> FORMAT = new EnumOption<>("format", CsvFormat.DIRECT);
-  /** Option: header line. */
+  /** Option: header. */
   public static final BooleanOption HEADER = new BooleanOption("header", false);
   /** Option: backslash flag . */
   public static final BooleanOption BACKSLASHES = new BooleanOption("backslashes", false);
@@ -94,7 +94,7 @@ public class CsvOptions extends Options {
       throws QueryException {
     super.assign(name, value, info);
     final int s = separator(), r = rowDelimiter(), q = quoteCharacter();
-    if(s == -1) throw OPTION_X.get(info, "Invalid separator: '%'", get(SEPARATOR));
+    if(s == -1) throw INVALIDOPTION_X.get(info, "Invalid separator: '%'", get(SEPARATOR));
     if(r == -1) throw CSV_SINGLECHAR_X_X.get(info, ROW_DELIMITER.name(), get(ROW_DELIMITER));
     if(q == -1) throw CSV_SINGLECHAR_X_X.get(info, QUOTE_CHARACTER.name(), get(QUOTE_CHARACTER));
     if(s == q || r == s || q == r) throw CSV_DELIMITER_X.get(info,

@@ -41,7 +41,6 @@ public final class CsvDirectSerializer extends CsvSerializer {
    */
   public CsvDirectSerializer(final OutputStream os, final SerializerOptions sopts)
       throws IOException {
-
     super(os, sopts);
     headers = header ? new TokenList() : null;
     atts = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;

@@ -78,8 +78,8 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("serch", "行イ音便", " { 'fuzzy': true() }"), false);
 
     // check buggy options
-    error(func.args("x", "x", " map { 'x': 'y' }"), OPTION_X);
-    error(func.args("x", "x", " map { 'mode': '' }"), OPTION_X);
+    error(func.args("x", "x", " map { 'x': 'y' }"), INVALIDOPTION_X);
+    error(func.args("x", "x", " map { 'mode': '' }"), INVALIDOPTION_X);
     error(func.args("x", "x", " 1"), INVCONVERT_X_X_X);
   }
 
@@ -201,8 +201,8 @@ public final class FtModuleTest extends SandboxTest {
         "Databases and XML");
 
     // check buggy options
-    error(func.args(NAME, "x", " map { 'x': 'y' }"), OPTION_X);
-    error(func.args(NAME, "x", " map { 'mode': '' }"), OPTION_X);
+    error(func.args(NAME, "x", " map { 'x': 'y' }"), INVALIDOPTION_X);
+    error(func.args(NAME, "x", " map { 'mode': '' }"), INVALIDOPTION_X);
     error(func.args(NAME, "x", " 1"), INVCONVERT_X_X_X);
   }
 

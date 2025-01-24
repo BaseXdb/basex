@@ -154,7 +154,7 @@ public final class JsonModuleTest extends SandboxTest {
         " map { 'format': 'xquery', 'escape': false(), 'liberal': true() }") + ')',
         "9\n10");
 
-    error(func.args("42", " map { 'spec': 'garbage' }"), OPTION_X);
+    error(func.args("42", " map { 'spec': 'garbage' }"), INVALIDOPTION_X);
   }
 
   /** Test method. */
@@ -246,8 +246,7 @@ public final class JsonModuleTest extends SandboxTest {
    * @param function function
    */
   private static void error(final String input, final String options, final Function function) {
-    final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " map { " + options + " }");
-    error(query, INVALIDOPT_X, JSON_PARSE_X, JSON_PARSE_X_X_X, JSON_SERIALIZE_X);
+    final String query = function.args(input, " { " + options + " }");
+    error(query, INVALIDOPTION_X, JSON_PARSE_X, JSON_PARSE_X_X_X, JSON_SERIALIZE_X);
   }
 }

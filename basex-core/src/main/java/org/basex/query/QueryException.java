@@ -66,7 +66,7 @@ public class QueryException extends Exception {
    * @param ext error extension
    */
   public QueryException(final InputInfo info, final QueryError error, final Object... ext) {
-    this(info, error.qname(), error.message, ext);
+    this(info, error.qname(), error.message(), ext);
     this.error = error;
   }
 
@@ -203,7 +203,7 @@ public class QueryException extends Exception {
 
   /**
    * Returns the error.
-   * @return error
+   * @return error (can be {@code null})
    */
   public final QueryError error() {
     return error;
@@ -215,6 +215,15 @@ public class QueryException extends Exception {
    */
   public final Value value() {
     return value;
+  }
+
+  /**
+   * Checks if the exception matches the specified type.
+   * @param type error type
+   * @return result of check
+   */
+  public final boolean matches(final ErrType type) {
+    return error != null && error.toString().startsWith(type.name());
   }
 
   @Override

@@ -19,7 +19,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
 
   /**
    * Constructor.
-   * @param opts json options
+   * @param opts JSON options
    * @throws QueryException query exception
    */
   JsonBasicConverter(final JsonParserOptions opts) throws QueryException {

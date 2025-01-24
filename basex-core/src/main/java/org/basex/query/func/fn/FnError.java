@@ -35,7 +35,7 @@ public final class FnError extends StandardFunc {
     final String description = toStringOrNull(arg(1), qc);
     final Value value = defined(2) ? arg(2).value(qc) : null;
     throw new QueryException(info, code != null ? code : FUNERR1.qname(),
-      description != null ? description : FUNERR1.message).value(value);
+      description != null ? description : FUNERR1.message()).value(value);
   }
 
   @Override

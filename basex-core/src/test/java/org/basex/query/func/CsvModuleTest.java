@@ -222,8 +222,7 @@ public final class CsvModuleTest extends SandboxTest {
    * @param function function
    */
   private static void error(final String input, final String options, final Function function) {
-    final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " map { " + options + " }");
-    error(query, OPTION_X);
+    final String query = function.args(input, " { " + options + " }");
+    error(query, INVALIDOPTION_X);
   }
 }

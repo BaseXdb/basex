@@ -32,7 +32,7 @@ public final class SqlExecutePrepared extends SqlExecute {
 
     final ANode prms = params.isEmpty() ? null : toElem(params, qc);
     if(prms != null && !prms.qname().eq(Q_PARAMETERS)) {
-      throw INVALIDOPTION_X.get(info, prms.qname().local());
+      throw UNKNOWNOPTION_X.get(info, prms.qname().local());
     }
 
     try {
@@ -62,7 +62,7 @@ public final class SqlExecutePrepared extends SqlExecute {
     int i = 1;
     for(ANode next; (next = params.next()) != null; i++) {
       // Check name
-      if(!next.qname().eq(Q_PARAMETER)) throw INVALIDOPTION_X.get(info, next.qname().local());
+      if(!next.qname().eq(Q_PARAMETER)) throw UNKNOWNOPTION_X.get(info, next.qname().local());
       final BasicNodeIter attrs = next.attributeIter();
       String type = null;
       boolean isNull = false;

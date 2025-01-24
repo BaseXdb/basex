@@ -54,7 +54,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
 
   /**
    * Constructor.
-   * @param opts json options
+   * @param opts JSON options
    * @throws QueryException query exception
    */
   JsonDirectConverter(final JsonParserOptions opts) throws QueryException {

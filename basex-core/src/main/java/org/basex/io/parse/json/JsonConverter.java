@@ -32,7 +32,7 @@ public abstract class JsonConverter {
 
   /**
    * Constructor.
-   * @param jopts json options
+   * @param jopts JSON options
    */
   JsonConverter(final JsonParserOptions jopts) {
     this.jopts = jopts;

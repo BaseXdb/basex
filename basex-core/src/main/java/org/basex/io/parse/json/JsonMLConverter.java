@@ -24,7 +24,7 @@ final class JsonMLConverter extends JsonXmlConverter {
 
   /**
    * Constructor.
-   * @param opts json options
+   * @param opts JSON options
    * @throws QueryException query exception
    */
   JsonMLConverter(final JsonParserOptions opts) throws QueryException {

@@ -567,19 +567,19 @@ public class Options implements Iterable<Option<?>> {
     final StringBuilder sb = new StringBuilder();
     values.forEach((name, value) -> {
       if(value != null) {
-        final StringList sl = new StringList();
+        final StringList list = new StringList();
         final Object value2 = definitions.get(name).value();
         if(value instanceof String[]) {
-          for(final String s : (String[]) value) sl.add(s);
+          for(final String s : (String[]) value) list.add(s);
         } else if(value instanceof int[]) {
-          for(final int s : (int[]) value) sl.add(Integer.toString(s));
+          for(final int s : (int[]) value) list.add(Integer.toString(s));
         } else if(value instanceof Options) {
           final String s = value.toString();
-          if(value2 == null || !s.equals(value2.toString())) sl.add(s);
+          if(value2 == null || !s.equals(value2.toString())) list.add(s);
         } else if(!value.equals(value2)) {
-          sl.add(value.toString());
+          list.add(value.toString());
         }
-        for(final String s : sl) {
+        for(final String s : list) {
           if(sb.length() != 0) sb.append(',');
           sb.append(name).append('=').append(s.replace(",", ",,"));
         }
@@ -662,7 +662,7 @@ public class Options implements Iterable<Option<?>> {
         ss[index - 1] = value;
       }
     } else {
-      throw Util.notExpected("Unsupported option: " + option);
+      throw Util.notExpected("Unsupported option (%): %", Util.className(option), option);
     }
     return null;
   }
@@ -796,7 +796,7 @@ public class Options implements Iterable<Option<?>> {
     final Option<?> option = definitions.get(name);
     if(option == null) {
       if(getClass() == Options.class || name.startsWith("Q{")) return;
-      throw OPTION_X.get(info, similar(name));
+      throw INVALIDOPTION_X.get(info, similar(name));
     }
 
     final Item item = value.isItem() ? (Item) value : null;
@@ -830,7 +830,9 @@ public class Options implements Iterable<Option<?>> {
       final String string = normalize(serialize(value, info));
       final EnumOption<?> eo = (EnumOption<?>) option;
       result = eo.get(string);
-      if(result == null) throw OPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
+      if(result == null) {
+        throw INVALIDOPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
+      }
     } else if(option instanceof OptionsOption) {
       if(!(item instanceof XQMap)) throw expected.apply(SeqType.MAP);
       result = ((OptionsOption<?>) option).newInstance();
