@@ -360,10 +360,6 @@ public enum QueryError {
   /** Error code. */
   JSON_PARSE_X(JSON, "parse", "%"),
   /** Error code. */
-  JSON_DUPL_X_X_X(JSON, "parse", "(%:%): %."),
-  /** Error code. */
-  JSON_PARSE_X_X_X(JSON, "parse", "(%:%): %."),
-  /** Error code. */
   JSON_SERIALIZE_X(JSON, "serialize", "%."),
   /** Error code. */
   JSON_OPTIONS_X(JSON, "options", "'%':'%' is not supported by the target format."),
@@ -684,6 +680,8 @@ public enum QueryError {
 
   /** Error code. */
   PARSE_JSON_X(FOJS, 1, "%"),
+  /** Error code. */
+  PARSE_JSON_X_X_X(FOJS, 1, "(%:%): %."),
   /** Error code. */
   DUPLICATE_JSON_X(FOJS, 3, "%"),
   /** Error code. */

@@ -1,9 +1,8 @@
 package org.basex.query.func.fn;
 
+import org.basex.build.json.JsonOptions.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
-import org.basex.util.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -11,10 +10,9 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnParseJson extends FnJsonDoc {
+public final class FnParseJson extends ParseJson {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] value = toTokenOrNull(arg(0), qc);
-    return value == null ? Empty.VALUE : parse(value, false, qc);
+  public Value value(final QueryContext qc) throws QueryException {
+    return parse(qc, JsonFormat.XQUERY);
   }
 }

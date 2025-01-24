@@ -124,7 +124,7 @@ public final class JsonParser extends InputParser {
         final byte[] key = !liberal || current() == '"' ? string() : unquoted();
         final boolean dupl = set.contains(key);
         if(dupl && duplicates == JsonDuplicates.REJECT)
-          throw error(JSON_DUPL_X_X_X, "Key \"%\" occurs more than once", key);
+          throw error(DUPLICATE_JSON_X, "Key \"%\" occurs more than once", key);
 
         final boolean add = !(dupl && duplicates == JsonDuplicates.USE_FIRST);
         conv.openPair(key, add);
@@ -420,7 +420,7 @@ public final class JsonParser extends InputParser {
    * @return query exception
    */
   private QueryException error(final String msg, final Object... ext) {
-    return error(JSON_PARSE_X_X_X, msg, ext);
+    return error(PARSE_JSON_X_X_X, msg, ext);
   }
 
   /**

@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.awt.*;
 import java.io.*;
+import java.util.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
@@ -17,7 +18,6 @@ import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * JSON parser panel.
@@ -62,11 +62,10 @@ final class DialogJsonParser extends DialogParser {
 
     encoding = encoding(dialog, jopts.get(JsonParserOptions.ENCODING));
 
-    final JsonFormat[] formats = JsonFormat.values();
-    final int fl = formats.length - 1;
-    final StringList frmts = new StringList(fl);
-    for(int f = 0; f < fl; f++) frmts.add(formats[f].toString());
-    format = new BaseXCombo(dialog, frmts.finish());
+    final String[] formats = Arrays.stream(new JsonFormat[] {
+      JsonFormat.DIRECT, JsonFormat.ATTRIBUTES, JsonFormat.JSONML, JsonFormat.BASIC
+    }).map(JsonFormat::toString).toArray(String[]::new);
+    format = new BaseXCombo(dialog, formats);
     format.setSelectedItem(jopts.get(JsonOptions.FORMAT));
 
     liberal = new BaseXCheckBox(dialog, LIBERAL_PARSING, JsonParserOptions.LIBERAL, jopts);
