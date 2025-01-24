@@ -25,8 +25,8 @@ public final class CsvParser {
   private final boolean header;
   /** Backslash flag. */
   private final boolean backslashes;
-  /** Column separator (see {@link CsvOptions#SEPARATOR}). */
-  private final int separator;
+  /** Field delimiter (see {@link CsvOptions#FIELD_DELIMITER}). */
+  private final int fieldDelimiter;
   /** Row delimiter (see {@link CsvOptions#ROW_DELIMITER}). */
   private final int rowDelimiter;
   /** Quote character (see {@link CsvOptions#QUOTE_CHARACTER}). */
@@ -62,8 +62,8 @@ public final class CsvParser {
       throws QueryException {
     this.input = input;
     this.conv = conv;
-    header = opts.get(CsvOptions.HEADER);
-    separator = opts.separator();
+    header = opts.get(CsvOptions.HEADER) == Bln.TRUE;
+    fieldDelimiter = opts.fieldDelimiter();
     rowDelimiter = opts.rowDelimiter();
     quoteCharacter = opts.quoteCharacter();
     strictQuoting = opts.get(CsvOptions.STRICT_QUOTING);
@@ -96,7 +96,7 @@ public final class CsvParser {
           ch = input.read();
           if(ch != quoteCharacter) {
             quoted = false;
-            if(strictQuoting && ch != separator && ch != rowDelimiter && ch != -1)
+            if(strictQuoting && ch != fieldDelimiter && ch != rowDelimiter && ch != -1)
               throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(
                   quoteCharacter).add(entry).add(quoteCharacter).add(ch));
             continue;
@@ -117,7 +117,7 @@ public final class CsvParser {
           if(ch != quoteCharacter || backslashes) add(entry, quoteCharacter);
           continue;
         }
-      } else if(ch == separator) {
+      } else if(ch == fieldDelimiter) {
         // parse separator
         record(entry, false, false);
         first = false;

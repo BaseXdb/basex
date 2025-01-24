@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.io.parse.csv.*;
+import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -41,7 +42,7 @@ final class CsvBuilder extends CsvConverter {
   public void record() throws IOException {
     finishRecord();
     builder.openElem(Q_RECORD.string(), atts, nsp);
-    column = -1;
+    col = -1;
     line++;
   }
 
@@ -52,10 +53,10 @@ final class CsvBuilder extends CsvConverter {
 
   @Override
   public void entry(final byte[] value) throws IOException {
-    ++column;
+    ++col;
     if(skipEmpty && value.length == 0) return;
 
-    final byte[] elem = Q_ENTRY.string(), name = headers.get(column);
+    final byte[] elem = Q_ENTRY.string(), name = headers.get(col);
     if(attributes) {
       if(name == null) {
         builder.openElem(elem, atts, nsp);
@@ -76,7 +77,7 @@ final class CsvBuilder extends CsvConverter {
   }
 
   @Override
-  protected Str finish() throws IOException {
+  protected Str finish(final InputInfo ii, final QueryContext qc) throws IOException {
     finishRecord();
     builder.closeElem();
     return null;
@@ -97,6 +98,6 @@ final class CsvBuilder extends CsvConverter {
    * @throws IOException I/O exception
    */
   private void finishRecord() throws IOException {
-    if(column >= 0) builder.closeElem();
+    if(col >= 0) builder.closeElem();
   }
 }

@@ -1,6 +1,7 @@
 package org.basex.io.parse.csv;
 
 import org.basex.build.csv.*;
+import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -30,7 +31,7 @@ final class CsvDirectConverter extends CsvConverter {
   protected void record() {
     finishRecord();
     record = FElem.build(Q_RECORD);
-    column = -1;
+    col = -1;
   }
 
   @Override
@@ -40,10 +41,10 @@ final class CsvDirectConverter extends CsvConverter {
 
   @Override
   protected void entry(final byte[] value) {
-    ++column;
+    ++col;
     if(skipEmpty && value.length == 0) return;
 
-    final byte[] name = headers.get(column);
+    final byte[] name = headers.get(col);
     final FBuilder elem;
     if(attributes) {
       elem = FElem.build(Q_ENTRY).add(Q_NAME, name);
@@ -60,7 +61,7 @@ final class CsvDirectConverter extends CsvConverter {
   }
 
   @Override
-  protected FNode finish() {
+  protected FNode finish(final InputInfo ii, final QueryContext qc) {
     finishRecord();
     return doc.add(root).finish();
   }

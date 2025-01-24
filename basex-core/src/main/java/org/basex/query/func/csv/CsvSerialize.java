@@ -20,11 +20,23 @@ public final class CsvSerialize extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
-    final CsvOptions options = toOptions(arg(1), new CsvOptions(), qc);
+    try {
+      final CsvOptions options = toOptions(arg(1), new CsvOptions(), qc);
+      return Str.get(serialize(input, options(options), INVALIDOPTION_X, qc));
+    } catch(final QueryException ex) {
+      throw error(ex, ex.matches(ErrType.FOCV) ? CSV_SERIALIZE_X : null);
+    }
+  }
 
+  /**
+   * Creates parameters for options.
+   * @param copts CSV options
+   * @return options
+   */
+  public static SerializerOptions options(final CsvOptions copts) {
     final SerializerOptions sopts = new SerializerOptions();
     sopts.set(SerializerOptions.METHOD, SerialMethod.CSV);
-    sopts.set(SerializerOptions.CSV, options);
-    return Str.get(serialize(input, sopts, INVALIDOPTION_X, qc));
+    sopts.set(SerializerOptions.CSV, copts);
+    return sopts;
   }
 }

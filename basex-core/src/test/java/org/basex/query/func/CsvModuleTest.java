@@ -223,6 +223,6 @@ public final class CsvModuleTest extends SandboxTest {
    */
   private static void error(final String input, final String options, final Function function) {
     final String query = function.args(input, " { " + options + " }");
-    error(query, INVALIDOPTION_X);
+    error(query, INVALIDOPTION_X, CSV_PARSE_X, CSV_SERIALIZE_X);
   }
 }

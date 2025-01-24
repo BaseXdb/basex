@@ -10,7 +10,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.util.*;
 
 /**
@@ -49,15 +49,15 @@ abstract class DialogParser extends BaseXBack {
    * Builds a parsing example string.
    * @param format format
    * @param input input string
-   * @param item example item
+   * @param value example value
    * @return example string
    * @throws QueryIOException query I/O exception
    */
-  static String example(final String format, final String input, final Item item)
+  static String example(final String format, final String input, final Value value)
       throws QueryIOException {
     final TokenBuilder text = new TokenBuilder();
     text.bold().add(format).add(COL).norm().nline().add(input).nline().nline();
-    final String string = item.serialize(SerializerMode.INDENT.get()).toString();
+    final String string = value.serialize(SerializerMode.INDENT.get()).toString();
     return text.bold().add("XML").add(COL).norm().nline().add(string).toString();
   }
 

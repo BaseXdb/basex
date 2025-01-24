@@ -361,6 +361,15 @@ public class Options implements Iterable<Option<?>> {
   }
 
   /**
+   * Sets the value of an option.
+   * @param option option to be set
+   * @param value value to be set
+   */
+  public final synchronized void set(final ValueOption option, final Value value) {
+    put(option, value);
+  }
+
+  /**
    * Assigns a value after casting it to the correct type. If the option is unknown,
    * it will be added as free option.
    * @param name name of option
@@ -577,7 +586,14 @@ public class Options implements Iterable<Option<?>> {
           final String s = value.toString();
           if(value2 == null || !s.equals(value2.toString())) list.add(s);
         } else if(!value.equals(value2)) {
-          list.add(value.toString());
+          if(value instanceof Value) {
+            // quick and dirty: rewrite "A" to A, true() to true, ...
+            for(final Item item : (Value) value) {
+              list.add(item.toString().replaceAll("[\"()]", ""));
+            }
+          } else {
+            list.add(value.toString());
+          }
         }
         for(final String s : list) {
           if(sb.length() != 0) sb.append(',');
@@ -620,6 +636,9 @@ public class Options implements Iterable<Option<?>> {
       assign.accept(v);
     } else if(option instanceof StringOption) {
       assign.accept(value);
+    } else if(option instanceof ValueOption) {
+      final Boolean b = Strings.toBoolean(value);
+      assign.accept(b != null ? Bln.get(b) : Str.get(value));
     } else if(option instanceof EnumOption) {
       final EnumOption<?> eo = (EnumOption<?>) option;
       final Object v = eo.get(option instanceof EnumOption ? normalize(value) : value);

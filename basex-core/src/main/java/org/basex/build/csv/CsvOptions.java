@@ -1,6 +1,7 @@
 package org.basex.build.csv;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.value.type.SeqType.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
@@ -16,12 +17,14 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class CsvOptions extends Options {
-  /** Option: separator. */
+  /** Option: separator. Ignored if {@code FIELD_DELIMITER} is assigned. */
   public static final StringOption SEPARATOR = new StringOption("separator", ",");
+  /** Option: field delimiter. */
+  public static final StringOption FIELD_DELIMITER = new StringOption("field-delimiter");
   /** Option: format. */
   public static final EnumOption<CsvFormat> FORMAT = new EnumOption<>("format", CsvFormat.DIRECT);
   /** Option: header. */
-  public static final BooleanOption HEADER = new BooleanOption("header", false);
+  public static final ValueOption HEADER = new ValueOption("header", ITEM_ZM, Bln.FALSE);
   /** Option: backslash flag . */
   public static final BooleanOption BACKSLASHES = new BooleanOption("backslashes", false);
   /** Option: lax conversion of strings to QNames. */
@@ -43,9 +46,12 @@ public class CsvOptions extends Options {
 
   /** CSV formats. */
   public enum CsvFormat {
-    /** Default.    */ DIRECT,
-    /** Attributes. */ ATTRIBUTES,
-    /** XQuery.     */ XQUERY;
+    /** Default.       */ DIRECT,
+    /** Attributes.    */ ATTRIBUTES,
+    /** XQuery.        */ XQUERY,
+    /** parse-csv.     */ W3,
+    /** csv-to-arrays. */ W3_ARRAYS,
+    /** csv-to-xml.    */ W3_XML;
 
     @Override
     public String toString() {
@@ -81,36 +87,48 @@ public class CsvOptions extends Options {
   @Override
   public synchronized void assign(final String name, final String value) throws BaseXException {
     super.assign(name, value);
-    final int s = separator(), r = rowDelimiter(), q = quoteCharacter();
-    if(s == -1) throw new BaseXException("Invalid separator: '%'", get(SEPARATOR));
-    if(r == -1) throw new BaseXException("Invalid row delimiter: '%'", get(ROW_DELIMITER));
-    if(q == -1) throw new BaseXException("Invalid quote character: '%'", get(QUOTE_CHARACTER));
-    if(s == q || r == s || q == r) throw new BaseXException("Duplicate CSV delimiter error: '%'",
-        get(s == q || r == s ? SEPARATOR : QUOTE_CHARACTER));
+    try {
+      validate(null);
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex.getLocalizedMessage());
+    }
   }
 
   @Override
   public synchronized void assign(final Item name, final Value value, final InputInfo info)
       throws QueryException {
     super.assign(name, value, info);
-    final int s = separator(), r = rowDelimiter(), q = quoteCharacter();
-    if(s == -1) throw INVALIDOPTION_X.get(info, "Invalid separator: '%'", get(SEPARATOR));
-    if(r == -1) throw CSV_SINGLECHAR_X_X.get(info, ROW_DELIMITER.name(), get(ROW_DELIMITER));
-    if(q == -1) throw CSV_SINGLECHAR_X_X.get(info, QUOTE_CHARACTER.name(), get(QUOTE_CHARACTER));
-    if(s == q || r == s || q == r) throw CSV_DELIMITER_X.get(info,
-        get(s == q || r == s ? SEPARATOR : QUOTE_CHARACTER));
+    validate(info);
+  }
+
+  /**
+   * Validates options.
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  private void validate(final InputInfo info) throws QueryException {
+    final StringOption separator = get(FIELD_DELIMITER) != null ? FIELD_DELIMITER : SEPARATOR;
+    final int f = fieldDelimiter(), r = rowDelimiter(), q = quoteCharacter();
+    final StringOption option = f == -1 ? separator : r == -1 ? ROW_DELIMITER : q == -1 ?
+      QUOTE_CHARACTER : null;
+    if(option != null) throw CSV_SINGLECHAR_X_X.get(info, option.name(), get(option));
+    if(f == q || r == f || q == r) throw CSV_DELIMITER_X.get(info,
+        get(f == q || r == f ? separator : QUOTE_CHARACTER));
   }
 
   /**
    * Returns the separator character or {@code -1} if character is invalid.
    * @return separator
    */
-  public int separator() {
-    final String sep = get(SEPARATOR);
-    for(final CsvSep s : CsvSep.values()) {
-      if(sep.equals(s.toString())) return s.sep;
+  public int fieldDelimiter() {
+    String sep = get(FIELD_DELIMITER);
+    if(sep == null) {
+      sep = get(SEPARATOR);
+      for(final CsvSep s : CsvSep.values()) {
+        if(sep.equals(s.toString())) return s.sep;
+      }
     }
-    return validate(sep);
+    return checkCodepoint(sep);
   }
 
   /**
@@ -118,7 +136,7 @@ public class CsvOptions extends Options {
    * @return separator
    */
   public int rowDelimiter() {
-    return validate(get(ROW_DELIMITER));
+    return checkCodepoint(get(ROW_DELIMITER));
   }
 
   /**
@@ -126,7 +144,7 @@ public class CsvOptions extends Options {
    * @return separator
    */
   public int quoteCharacter() {
-    return validate(get(QUOTE_CHARACTER));
+    return checkCodepoint(get(QUOTE_CHARACTER));
   }
 
   /**
@@ -134,7 +152,7 @@ public class CsvOptions extends Options {
    * @param single single character string
    * @return code point or {@code -1}
    */
-  private int validate(final String single) {
+  private int checkCodepoint(final String single) {
     if(single.codePointCount(0, single.length()) == 1) {
       final int cp = single.codePointAt(0);
       if(XMLToken.valid(cp)) return cp;
@@ -152,7 +170,7 @@ public class CsvOptions extends Options {
    * Constructor with options to be copied.
    * @param opts options
    */
-  CsvOptions(final CsvOptions opts) {
+  public CsvOptions(final CsvOptions opts) {
     super(opts);
   }
 }

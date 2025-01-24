@@ -8,11 +8,11 @@ import org.basex.query.value.*;
  * Function implementation.
  *
  * @author BaseX Team, BSD License
- * @author Gunther Rademacher
+ * @author Christian Gruen
  */
-public class FnParseCsv extends ParseCsv {
+public class FnCsvDoc extends ParseCsv {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return parse(qc, CsvFormat.W3);
+    return doc(qc, CsvFormat.W3);
   }
 }
