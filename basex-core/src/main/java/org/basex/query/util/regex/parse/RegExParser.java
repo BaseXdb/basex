@@ -24,9 +24,9 @@ public class RegExParser implements RegExParserConstants {
   /** Group counter. */
   private int groups;
   /** Closed groups. */
-  private final Map<Integer, Group> closed = new HashMap<>();
+  private final Map<Integer, Group> closed = new HashMap<Integer, Group>();
   /** Path of current atom: sequence numbers of branches and atoms currently being processed. */
-  private final Stack<Integer> atomPath = new Stack<>();
+  private Stack<Integer> atomPath = new Stack<Integer>();
   /** If the wildcard {@code .} matches any character. */
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
@@ -71,9 +71,9 @@ public class RegExParser implements RegExParserConstants {
 brs.add(br);
     label_1:
     while (true) {
-      switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case OR:{
-        
+        ;
         break;
         }
       default:
@@ -102,7 +102,7 @@ atomPath.pop();
     atomPath.push(0);
     label_2:
     while (true) {
-      switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case NPAR_OPEN:
       case PAR_OPEN:
       case CHAR:
@@ -115,7 +115,7 @@ atomPath.pop();
       case MULTI_ESC:
       case CAT_ESC:
       case BR_OPEN:{
-        
+        ;
         break;
         }
       default:
@@ -123,7 +123,7 @@ atomPath.pop();
         break label_2;
       }
       atom = atom();
-      switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case Q_MARK:
       case STAR:
       case PLUS:
@@ -152,7 +152,7 @@ atomPath.pop();
   final public   Quantifier quantifier() throws ParseException {int min = 0, max = 0;
     boolean lazy = false;
     int[] qu = null;
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case Q_MARK:{
       jj_consume_token(Q_MARK);
 max = 1;
@@ -180,7 +180,7 @@ min = qu[0]; max = qu[1];
       jj_consume_token(-1);
       throw new ParseException();
     }
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case Q_MARK:{
       jj_consume_token(Q_MARK);
 lazy = true;
@@ -209,11 +209,11 @@ try {
       } catch(final NumberFormatException ex) {
         {if (true) throw new ParseException("Number in quantifier is too large");}
       }
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case COMMA:{
       jj_consume_token(COMMA);
 qty[1] = -1;
-      switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case NUMBER:{
         jj_consume_token(NUMBER);
 try {
@@ -245,7 +245,7 @@ try {
    * @throws ParseException parsing exception
    */
   final public   RegExp atom() throws ParseException {RegExp nd = null;
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case CHAR:
     case DIGIT:{
       nd = Char();
@@ -297,7 +297,7 @@ final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()
    * @throws ParseException parsing exception
    */
   final public   Literal Char() throws ParseException {
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case CHAR:{
       jj_consume_token(CHAR);
       break;
@@ -325,8 +325,8 @@ final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()
 backref = token.image.charAt(1) - '0';
     label_3:
     while (true) {
-      if (jj_2_1(1) && 10 * backref + token.next.image.charAt(0) - '0' <= groups) {
-        
+      if (jj_2_1(1) && (10 * backref + token.next.image.charAt(0) - '0' <= groups)) {
+        ;
       } else {
         break label_3;
       }
@@ -355,7 +355,7 @@ final Group g = closed.get(backref);
    * @throws ParseException parsing exception
    */
   final public   RegExp charClass() throws ParseException {RegExp nd = null;
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case SINGLE_ESC:
     case MULTI_ESC:
     case CAT_ESC:{
@@ -396,7 +396,7 @@ nd = LineBorder.get(false, multiLine);
    * @throws ParseException parsing exception
    */
   final public   RegExp charClassEsc() throws ParseException {
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case SINGLE_ESC:{
       jj_consume_token(SINGLE_ESC);
       break;
@@ -429,7 +429,7 @@ final RegExp esc = Escape.get(token.image);
   final public   CharClass charClassExpr() throws ParseException {CharGroup group = null;
     CharClass sub = null;
     jj_consume_token(BR_OPEN);
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case NEG:{
       jj_consume_token(NEG);
       group = posCharGroup();
@@ -445,7 +445,7 @@ group.negative = true;
         throw new ParseException();
       }
     }
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case TO:{
       jj_consume_token(TO);
       sub = charClassExpr();
@@ -473,11 +473,11 @@ group.negative = true;
         sub = charRange(cg.isEmpty());
 cg.add(sub);
       } else {
-        switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case SINGLE_ESC:
         case MULTI_ESC:
         case CAT_ESC:{
-          switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case SINGLE_ESC:{
             jj_consume_token(SINGLE_ESC);
             break;
@@ -505,7 +505,7 @@ for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
         }
       }
       if (jj_2_4(1)) {
-        
+        ;
       } else {
         break label_4;
       }
@@ -519,7 +519,7 @@ for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
    * @return expression
    * @throws ParseException parsing exception
    */
-  final public   RegExp charRange(final boolean isBegin) throws ParseException {int a = -1, b = -1;
+  final public   RegExp charRange(boolean isBegin) throws ParseException {int a = -1, b = -1;
     if (getToken(2).kind == CHAR && "-".equals(getToken(2).image)
             && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF) {
       a = charOrEsc();
@@ -528,7 +528,7 @@ for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
 if(a > b) {if (true) throw new ParseException("Illegal range: " +
             Literal.escape(a) + " > " + Literal.escape(b));}
     } else {
-      switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case CHAR:
       case DIGIT:{
         a = XmlChar();
@@ -552,7 +552,7 @@ if(a == '-' && !isBegin && getToken(1).kind != BR_CLOSE && getToken(1).kind != E
    * @throws ParseException parsing exception
    */
   final public   int charOrEsc() throws ParseException {int cp = -1;
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case CHAR:
     case DIGIT:{
       cp = XmlChar();
@@ -578,7 +578,7 @@ cp = Escape.getCp(token.image);
    * @throws ParseException parsing exception
    */
   final public   int XmlChar() throws ParseException {
-    switch (jj_ntk==-1?jj_ntk_f():jj_ntk) {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case CHAR:{
       jj_consume_token(CHAR);
       break;
@@ -596,35 +596,35 @@ cp = Escape.getCp(token.image);
     throw new Error("Missing return statement in function");
 }
 
-  private boolean jj_2_1(final int xla)
+  private boolean jj_2_1(int xla)
  {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_1(); }
-    catch(final LookaheadSuccess ls) { return true; }
+    try { return (!jj_3_1()); }
+    catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(0, xla); }
   }
 
-  private boolean jj_2_2(final int xla)
+  private boolean jj_2_2(int xla)
  {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_2(); }
-    catch(final LookaheadSuccess ls) { return true; }
+    try { return (!jj_3_2()); }
+    catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(1, xla); }
   }
 
-  private boolean jj_2_3(final int xla)
+  private boolean jj_2_3(int xla)
  {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_3(); }
-    catch(final LookaheadSuccess ls) { return true; }
+    try { return (!jj_3_3()); }
+    catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(2, xla); }
   }
 
-  private boolean jj_2_4(final int xla)
+  private boolean jj_2_4(int xla)
  {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
-    try { return !jj_3_4(); }
-    catch(final LookaheadSuccess ls) { return true; }
+    try { return (!jj_3_4()); }
+    catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(3, xla); }
   }
 
@@ -712,7 +712,7 @@ cp = Escape.getCp(token.image);
     Token xsp;
     xsp = jj_scanpos;
     jj_lookingAhead = true;
-    boolean jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image)
+    jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image)
         && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF;
     jj_lookingAhead = false;
     if (!jj_semLA || jj_3R_charRange_330_7_8()) {
@@ -756,6 +756,7 @@ cp = Escape.getCp(token.image);
   private int jj_la;
   /** Whether we are looking ahead. */
   private boolean jj_lookingAhead = false;
+  private boolean jj_semLA;
   private int jj_gen;
   final private int[] jj_la1 = new int[18];
   static private int[] jj_la1_0;
@@ -771,7 +772,7 @@ cp = Escape.getCp(token.image);
 
 
   /** Constructor with user supplied Token Manager. */
-  public RegExParser(final TokenManager tm) {
+  public RegExParser(TokenManager tm) {
 	 token_source = tm;
 	 token = new Token();
 	 jj_ntk = -1;
@@ -781,7 +782,7 @@ cp = Escape.getCp(token.image);
   }
 
   /** Reinitialise. */
-  public void ReInit(final TokenManager tm) {
+  public void ReInit(TokenManager tm) {
 	 token_source = tm;
 	 token = new Token();
 	 jj_ntk = -1;
@@ -790,7 +791,7 @@ cp = Escape.getCp(token.image);
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
-  private Token jj_consume_token(final int kind) throws ParseException {
+  private Token jj_consume_token(int kind) throws ParseException {
 	 Token oldToken;
 	 if ((oldToken = token).next != null) token = token.next;
 	 else token = token.next = token_source.getNextToken();
@@ -799,8 +800,8 @@ cp = Escape.getCp(token.image);
 	   jj_gen++;
 	   if (++jj_gc > 100) {
 		 jj_gc = 0;
-		 for(final JJCalls jj_2_rtn : jj_2_rtns) {
-		   JJCalls c = jj_2_rtn;
+		 for (int i = 0; i < jj_2_rtns.length; i++) {
+		   JJCalls c = jj_2_rtns[i];
 		   while (c != null) {
 			 if (c.gen < jj_gen) c.first = null;
 			 c = c.next;
@@ -822,7 +823,7 @@ cp = Escape.getCp(token.image);
     }
   }
   static private final LookaheadSuccess jj_ls = new LookaheadSuccess();
-  private boolean jj_scan_token(final int kind) {
+  private boolean jj_scan_token(int kind) {
 	 if (jj_scanpos == jj_lastpos) {
 	   jj_la--;
 	   if (jj_scanpos.next == null) {
@@ -854,7 +855,7 @@ cp = Escape.getCp(token.image);
   }
 
 /** Get the specific Token. */
-  final public Token getToken(final int index) {
+  final public Token getToken(int index) {
 	 Token t = jj_lookingAhead ? jj_scanpos : token;
 	 for (int i = 0; i < index; i++) {
 	   if (t.next != null) t = t.next;
@@ -865,18 +866,18 @@ cp = Escape.getCp(token.image);
 
   private int jj_ntk_f() {
 	 if ((jj_nt=token.next) == null)
-	   return jj_ntk = (token.next=token_source.getNextToken()).kind;
+	   return (jj_ntk = (token.next=token_source.getNextToken()).kind);
 	 else
-	   return jj_ntk = jj_nt.kind;
+	   return (jj_ntk = jj_nt.kind);
   }
 
-  private final java.util.List<int[]> jj_expentries = new java.util.ArrayList<>();
+  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
   private int[] jj_expentry;
   private int jj_kind = -1;
-  private final int[] jj_lasttokens = new int[100];
+  private int[] jj_lasttokens = new int[100];
   private int jj_endpos;
 
-  private void jj_add_error_token(final int kind, final int pos) {
+  private void jj_add_error_token(int kind, int pos) {
 	 if (pos >= 100) {
 		return;
 	 }
@@ -890,7 +891,7 @@ cp = Escape.getCp(token.image);
 		 jj_expentry[i] = jj_lasttokens[i];
 	   }
 
-	   for (final int[] oldentry : jj_expentries) {
+	   for (int[] oldentry : jj_expentries) {
 		 if (oldentry.length == jj_expentry.length) {
 		   boolean isMatched = true;
 
@@ -917,7 +918,7 @@ cp = Escape.getCp(token.image);
   /** Generate ParseException. */
   public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 final boolean[] la1tokens = new boolean[25];
+	 boolean[] la1tokens = new boolean[25];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
@@ -925,7 +926,7 @@ cp = Escape.getCp(token.image);
 	 for (int i = 0; i < 18; i++) {
 	   if (jj_la1[i] == jj_gen) {
 		 for (int j = 0; j < 32; j++) {
-		   if ((jj_la1_0[i] & 1<<j) != 0) {
+		   if ((jj_la1_0[i] & (1<<j)) != 0) {
 			 la1tokens[j] = true;
 		   }
 		 }
@@ -941,7 +942,7 @@ cp = Escape.getCp(token.image);
 	 jj_endpos = 0;
 	 jj_rescan_token();
 	 jj_add_error_token(0, 0);
-	 final int[][] exptokseq = new int[jj_expentries.size()][];
+	 int[][] exptokseq = new int[jj_expentries.size()][];
 	 for (int i = 0; i < jj_expentries.size(); i++) {
 	   exptokseq[i] = jj_expentries.get(i);
 	 }
@@ -982,19 +983,19 @@ cp = Escape.getCp(token.image);
 		   p = p.next;
 		 } while (p != null);
 
-		 } catch(final LookaheadSuccess ls) { }
+		 } catch(LookaheadSuccess ls) { }
 	 }
 	 jj_rescan = false;
   }
 
-  private void jj_save(final int index, final int xla) {
+  private void jj_save(int index, int xla) {
 	 JJCalls p = jj_2_rtns[index];
 	 while (p.gen > jj_gen) {
 	   if (p.next == null) { p = p.next = new JJCalls(); break; }
 	   p = p.next;
 	 }
 
-	 p.gen = jj_gen + xla - jj_la;
+	 p.gen = jj_gen + xla - jj_la; 
 	 p.first = token;
 	 p.arg = xla;
   }
