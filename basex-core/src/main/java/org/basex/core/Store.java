@@ -36,8 +36,8 @@ public final class Store implements Closeable {
 
   /** Name of current store. */
   private String name = "";
-  /** Dirty flag. */
-  private boolean dirty = true;
+  /** Timestamp of current store (set to {@code -1} if store is dirty). */
+  private long timestamp = -1;
   /** Initialization flag. */
   private boolean initialized;
 
@@ -77,10 +77,13 @@ public final class Store implements Closeable {
    * @param value value
    */
   public synchronized void put(final byte[] key, final Value value) {
-    init();
-    dirty = true;
-    if(value.isEmpty()) map.remove(key);
-    else map.put(key, value);
+    if(value.isEmpty()) {
+      remove(key);
+    } else {
+      init();
+      map.put(key, value);
+      timestamp = -1;
+    }
   }
 
   /**
@@ -89,8 +92,8 @@ public final class Store implements Closeable {
    */
   public synchronized void remove(final byte[] key) {
     init();
-    dirty = true;
     map.remove(key);
+    timestamp = -1;
   }
 
   /**
@@ -98,8 +101,8 @@ public final class Store implements Closeable {
    */
   public synchronized void clear() {
     initialized = true;
-    dirty = true;
     map.clear();
+    timestamp = -1;
   }
 
   /**
@@ -126,13 +129,16 @@ public final class Store implements Closeable {
   public synchronized boolean read(final String store, final QueryContext qc)
       throws IOException, QueryException {
 
+    // return false if a requested non-standard store does not exist
     final IOFile file = file(store);
-    final boolean exists = file.exists();
-    if(!exists && !standard(store)) return false;
+    final boolean standard = standard(store), exists = file.exists();
+    if(!(standard || exists)) return false;
 
-    name = store;
+    // skip read if store in memory is up to date
     initialized = true;
-    dirty = false;
+    if(exists && name.equals(file.name()) && timestamp == file.timeStamp()) return true;
+
+    // regenerate store in memory
     map.clear();
     if(exists) {
       try(DataInput in = new DataInput(file)) {
@@ -140,7 +146,11 @@ public final class Store implements Closeable {
           map.put(in.readToken(), read(in, qc));
         }
       }
+      timestamp = file.timeStamp();
+    } else {
+      timestamp = -1;
     }
+    name = file.name();
     return true;
   }
 
@@ -151,14 +161,14 @@ public final class Store implements Closeable {
    * @throws QueryException query exception
    */
   public synchronized void write(final String store) throws IOException, QueryException {
-    init();
-    name = store;
-    dirty = false;
+    if(!initialized) return;
 
+    init();
     final IOFile file = file(store);
     if(standard(store) && map.isEmpty()) {
       // delete standard store if it is empty
       file.delete();
+      timestamp = -1;
     } else {
       // write store to disk
       file.parent().md();
@@ -171,7 +181,9 @@ public final class Store implements Closeable {
           write(out, map.get(key));
         }
       }
+      timestamp = file.timeStamp();
     }
+    name = file.name();
   }
 
   /**
@@ -186,7 +198,8 @@ public final class Store implements Closeable {
 
   @Override
   public synchronized void close() {
-    if(context.soptions.get(StaticOptions.WRITESTORE) && initialized && name.isEmpty() && dirty) {
+    final boolean writestore = context.soptions.get(StaticOptions.WRITESTORE);
+    if(writestore && initialized && name.isEmpty() && timestamp == -1) {
       try {
         write("");
       } catch(final IOException | QueryException ex) {

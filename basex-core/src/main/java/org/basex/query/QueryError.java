@@ -438,7 +438,7 @@ public enum QueryError {
   /** Error code. */
   STORE_NAME_X(STORE, "name", "Invalid name: %."),
   /** Error code. */
-  STORE_NOTFOUND_X(STORE, "not-found", "Cache '%' not found."),
+  STORE_NOTFOUND_X(STORE, "not-found", "Store '%' not found."),
 
   // String Module
 

@@ -4,10 +4,13 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.Map.*;
 
 import org.basex.*;
+import org.basex.io.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -27,7 +30,7 @@ public final class StoreModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void storeClear() {
+  @Test public void clear() {
     final Function func = _STORE_CLEAR;
     query(_STORE_PUT.args("key", "CLEAR"));
     query(_STORE_KEYS.args(), "key");
@@ -36,7 +39,7 @@ public final class StoreModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void storeDelete() {
+  @Test public void delete() {
     final Function func = _STORE_DELETE;
     query(_STORE_PUT.args("key", "CLEAR"));
     query(_STORE_WRITE.args("DELETE"));
@@ -52,13 +55,13 @@ public final class StoreModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void storeGet() {
+  @Test public void get() {
     final Function func = _STORE_GET;
     query(func.args("key"), "");
   }
 
   /** Test method. */
-  @Test public void storeGetOrPut() {
+  @Test public void getOrPut() {
     final Function func = _STORE_GET_OR_PUT;
     query(_STORE_GET.args("key"), "");
     query(func.args("key", " function() { 'GET-OR-PUT' }"), "GET-OR-PUT");
@@ -70,7 +73,7 @@ public final class StoreModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void storeKeys() {
+  @Test public void keys() {
     final Function func = _STORE_KEYS;
     for(int i = 0; i < 3; i++) query(_STORE_PUT.args(Integer.toString(i), i));
     query(func.args() + " => sort()", "0\n1\n2");
@@ -79,18 +82,18 @@ public final class StoreModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void storeList() {
+  @Test public void list() {
     final Function func = _STORE_LIST;
     query(_STORE_WRITE.args());
-    query(_STORE_WRITE.args("LIST1"));
-    query(_STORE_WRITE.args("LIST2"));
-    query(func.args() + " => sort()", "LIST1\nLIST2");
+    query(_STORE_WRITE.args("a"));
+    query(_STORE_WRITE.args("b"));
+    query(func.args() + " => sort()", "a\nb");
     query(func.args() + " ! " + _STORE_DELETE.args(" ."));
     query(func.args(), "");
   }
 
   /** Test method. */
-  @Test public void storePut() {
+  @Test public void put() {
     final Function func = _STORE_PUT;
     query(func.args("key", "PUT"), "");
     query(_STORE_GET.args("key"), "PUT");
@@ -109,7 +112,7 @@ public final class StoreModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void storeRead() {
+  @Test public void read() {
     final Function func = _STORE_READ;
     query(func.args());
     query(_STORE_PUT.args("key", "READ"));
@@ -133,7 +136,7 @@ public final class StoreModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void storeRemove() {
+  @Test public void remove() {
     final Function func = _STORE_REMOVE;
     query(_STORE_PUT.args("key", "REMOVE"));
     query(_STORE_KEYS.args(), "key");
@@ -142,7 +145,7 @@ public final class StoreModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void storeWrite() {
+  @Test public void write() {
     final Function func = _STORE_WRITE;
     query(_STORE_PUT.args("key", "WRITE"));
     query(func.args());
@@ -257,5 +260,88 @@ public final class StoreModuleTest extends SandboxTest {
     for(final Entry<String, String> entry : values.entrySet()) {
       assertEquals(entry.getValue(), query(_STORE_GET.args(entry.getKey())));
     }
+  }
+
+  /**
+   * Verify if the store is correctly read and written.
+   * @throws IOException I/O exception
+   */
+  @Test public void readWrite() throws IOException {
+    final IOFile store = context.soptions.dbPath("store" + IO.BASEXSUFFIX);
+    final IOFile storeA = context.soptions.dbPath("store-a" + IO.BASEXSUFFIX);
+
+    query(_STORE_KEYS.args(), "");
+    query(_STORE_READ.args());
+    query(_STORE_KEYS.args(), "");
+
+    query(_STORE_PUT.args("X", "Y"));
+    query(_STORE_KEYS.args(), "X");
+    query(_STORE_READ.args());
+    query(_STORE_KEYS.args(), "");
+
+    query(_STORE_PUT.args("X", "Y"));
+    query(_STORE_WRITE.args());
+    final byte[] bytes = store.read();
+    query(_STORE_KEYS.args(), "X");
+    query(_STORE_READ.args());
+    query(_STORE_KEYS.args(), "X");
+
+    query(_STORE_CLEAR.args());
+    query(_STORE_KEYS.args(), "");
+    query(_STORE_READ.args());
+    query(_STORE_KEYS.args(), "X");
+
+    query(_STORE_CLEAR.args());
+    query(_STORE_KEYS.args(), "");
+    query(_STORE_WRITE.args());
+    query(_STORE_READ.args());
+    query(_STORE_KEYS.args(), "");
+
+    store.delete();
+    query(_STORE_PUT.args("X", "Y"));
+    query(_STORE_READ.args());
+    query(_STORE_KEYS.args(), "");
+    store.write(bytes);
+    query(_STORE_READ.args());
+    query(_STORE_KEYS.args(), "X");
+    store.delete();
+    query(_STORE_READ.args());
+    query(_STORE_KEYS.args(), "");
+
+    write(storeA, bytes);
+    query(_STORE_READ.args("a"));
+    query(_STORE_KEYS.args(), "X");
+    query(_STORE_READ.args());
+    query(_STORE_KEYS.args(), "");
+    query(_STORE_READ.args("a"));
+    query(_STORE_KEYS.args(), "X");
+
+    write(storeA, bytes);
+    query(_STORE_READ.args("a"));
+    query(_STORE_KEYS.args(), "X");
+    write(storeA, bytes);
+    query(_STORE_CLEAR.args());
+    query(_STORE_READ.args("a"));
+    query(_STORE_KEYS.args(), "X");
+    write(storeA, new byte[0]);
+    query(_STORE_READ.args("a"));
+    query(_STORE_KEYS.args(), "");
+    write(storeA, bytes);
+    query(_STORE_READ.args("a"));
+    query(_STORE_KEYS.args(), "X");
+
+    storeA.delete();
+    error(_STORE_READ.args("a"), STORE_NOTFOUND_X);
+  }
+
+  /**
+   * Reads bytes to a store file. A delay is used to ensure that the timestamp of the file changes.
+   * @param file file
+   * @param bytes contents
+   * @throws IOException I/O exception
+   */
+  private static void write(final IOFile file, final byte[] bytes) throws IOException {
+    Performance.sleep(10);
+    file.write(bytes);
   }
 }
