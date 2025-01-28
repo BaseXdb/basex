@@ -1,0 +1,52 @@
+name: Build and Test BaseX
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Java
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
+      # Cache Maven dependencies
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Build the project using Maven
+      - name: Build with Maven
+        run: mvn clean install
+
+      # Run tests
+      - name: Run tests
+        run: mvn test
+        working-directory: ./basex-tests
+
+      # Archive test reports (optional)
+      - name: Upload test results
+        if: always() # Ensure this runs even if previous steps fail
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: '**/target/surefire-reports/**/*.xml'
