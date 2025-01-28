@@ -337,7 +337,7 @@ public final class HtmlParser extends XMLParser {
      * @param info input info (can be {@code null})
      * @throws QueryException query exception,
      */
-    private static void ensureAvailable(final String className, final byte[] func,
+    static void ensureAvailable(final String className, final byte[] func,
         final InputInfo info) throws QueryException {
       if(!Reflect.available(className)) throw BASEX_CLASSPATH_X_X.get(info, func, className);
     }
