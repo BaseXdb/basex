@@ -12,6 +12,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       # Checkout the repository
@@ -24,6 +25,15 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
+
+      # Cache Maven dependencies
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-${{ runner.os }}-
 
       # Build the project using Maven
       - name: Build with Maven
