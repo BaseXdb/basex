@@ -1915,6 +1915,7 @@ public final class FnModuleTest extends SandboxTest {
         + "<body>\u20AC</body></html>");
     query(func.args("42", " map {'heuristics': 'ICU'}"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
+    query(func.args("42", " {'method': 'tagsoup'}"), "<html><body>42</body></html>");
 
     error(func.args(42), STRBIN_X_X);
     error(func.args("42", 42), INVCONVERT_X_X_X);
