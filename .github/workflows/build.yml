@@ -25,28 +25,17 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      # Cache Maven dependencies
-      - name: Cache Maven dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       # Build the project using Maven
       - name: Build with Maven
         run: mvn clean install
 
-      # Run tests
-      - name: Run tests
-        run: mvn test
-        working-directory: ./basex-tests
-
-      # Archive test reports (optional)
+      # Archive test reports and possible dumps in case of failure
       - name: Upload test results
-        if: always() # Ensure this runs even if previous steps fail
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: '**/target/surefire-reports/**/*.xml'
+          path: |
+            '**/target/surefire-reports/**/*.xml'
+            '**/*.dump'
+            '**/*.dumpstream'
