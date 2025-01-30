@@ -9,8 +9,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class HtmlOptions extends Options {
-  /** TagSoup option: html. */
-  public static final BooleanOption HTML = new BooleanOption("html", false);
   /** TagSoup option: omit-xml-declaration. */
   public static final BooleanOption OMIT_XML_DECLARATION =
       new BooleanOption("omit-xml-declaration", false);

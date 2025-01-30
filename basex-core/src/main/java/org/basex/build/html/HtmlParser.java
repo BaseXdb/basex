@@ -101,10 +101,8 @@ public final class HtmlParser extends XMLParser {
 
   /** Method option values. */
   public enum Method {
-    /** TagSoup parser with method 'xml'. */
-    xml(Parser.TAGSOUP),
-    /** TagSoup parser with method 'html'. */
-    html(Parser.TAGSOUP),
+    /** TagSoup parser. */
+    tagsoup(Parser.TAGSOUP),
     /** Validator.nu parser. */
     nu(Parser.NU);
 
@@ -141,11 +139,6 @@ public final class HtmlParser extends XMLParser {
         reader.setContentHandler(writer);
 
         // set TagSoup options
-        if(hopts.get(HTML)) {
-          reader.setFeature("http://xml.org/sax/features/namespaces", false);
-          writer.setOutputProperty(METHOD.name(), "html");
-          writer.setOutputProperty(OMIT_XML_DECLARATION.name(), "yes");
-        }
         if(hopts.get(NONS))
           reader.setFeature("http://xml.org/sax/features/namespaces", false);
         if(hopts.get(NOBOGONS))
@@ -170,8 +163,6 @@ public final class HtmlParser extends XMLParser {
           reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
         if(hopts.get(OMIT_XML_DECLARATION))
           writer.setOutputProperty(OMIT_XML_DECLARATION.name(), "yes");
-        if(hopts.contains(METHOD))
-          writer.setOutputProperty(METHOD.name(), hopts.get(METHOD).name());
         if(hopts.contains(DOCTYPE_SYSTEM))
           writer.setOutputProperty(DOCTYPE_SYSTEM.name(), hopts.get(DOCTYPE_SYSTEM));
         if(hopts.contains(DOCTYPE_PUBLIC))
@@ -337,7 +328,7 @@ public final class HtmlParser extends XMLParser {
      * @param info input info (can be {@code null})
      * @throws QueryException query exception,
      */
-    private static void ensureAvailable(final String className, final byte[] func,
+    static void ensureAvailable(final String className, final byte[] func,
         final InputInfo info) throws QueryException {
       if(!Reflect.available(className)) throw BASEX_CLASSPATH_X_X.get(info, func, className);
     }
