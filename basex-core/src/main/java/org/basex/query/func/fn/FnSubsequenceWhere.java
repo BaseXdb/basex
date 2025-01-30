@@ -64,6 +64,6 @@ public final class FnSubsequenceWhere extends StandardFunc {
   @Override
   public int hofIndex() {
     final boolean from = defined(1), to = defined(2);
-    return from && to ? super.hofIndex() : from ? 1 : 2;
+    return from && to ? Integer.MAX_VALUE : from ? 1 : to ? 2 : -1;
   }
 }

@@ -182,14 +182,14 @@ public abstract class StandardFunc extends Arr {
     if(hof >= 0 && hof < Integer.MAX_VALUE && !defined(hof)) hof = -1;
     for(final Flag flag : flags) {
       switch(flag) {
+        case HOF:
+          if(hof >= 0) return true;
+          continue;
         case UPD:
           if(hasUPD()) return true;
           break;
         case CTX:
           if(hasCTX()) return true;
-          break;
-        case HOF:
-          if(hof >= 0) return true;
           break;
         case NDT:
           // check whether function argument may contain non-deterministic functions
@@ -229,6 +229,7 @@ public abstract class StandardFunc extends Arr {
 
   /**
    * Returns the index of a single higher-order function parameter.
+   * Used to assess further properties of a function item, e.g. if its body is nondeterministic.
    * @return index, {@code -1} if no HOF parameter exists, or {@code Integer#MAX_VALUE} if the
    *   number cannot be returned or if multiple HOF parameters exist
    */

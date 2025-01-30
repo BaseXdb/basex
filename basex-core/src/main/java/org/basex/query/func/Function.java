@@ -725,10 +725,10 @@ public enum Function implements AFunction {
   // Map Module
 
   /** XQuery function. */
-  _MAP_BUILD(MapBuild::new, "build(input[,keys,value,combine])",
+  _MAP_BUILD(MapBuild::new, "build(input[,keys,value,options])",
       params(ITEM_ZM, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE),
       FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE),
-      FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
+      MAP_ZO),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_CONTAINS(MapContains::new, "contains(map,key)",
@@ -767,11 +767,10 @@ public enum Function implements AFunction {
       ANY_ATOMIC_TYPE_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
-      params(MAP_ZM, MAP_ZO), MAP_O, MAP_URI),
+      params(MAP_ZM, MAP_ZO), MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
-  _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(input[,combine])",
-      params(MAP_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType(Occ.ZERO_OR_ONE)),
-      PAIR_ZM, flag(HOF), MAP_URI),
+  _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(input[,options])",
+      params(MAP_ZM, MAP_ZO), MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_PAIR(MapPair::new, "pair(key,value)",
       params(ANY_ATOMIC_TYPE_O, ITEM_ZM), PAIR_O, MAP_URI),

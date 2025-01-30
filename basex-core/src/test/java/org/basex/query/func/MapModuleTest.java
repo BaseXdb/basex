@@ -62,6 +62,38 @@ public final class MapModuleTest extends SandboxTest {
     query("map:for-each(" + func.args("a", " ()", " fn($f) { 1[$f = 'x'] }") +
         ", fn($_, $v) { $v })", "");
     query(func.args(" <a>A</a>"), "{\"A\":<a>A</a>}");
+
+    final String input = " (1, 1)", empty = " ()", pos = " fn($i, $p) { $p }";
+    query(func.args(input), "{1:(1,1)}");
+    query(func.args(input, empty, pos), "{1:(1,2)}");
+    query(func.args(input, pos), "{1:1,2:1}");
+    query(func.args(input, pos, pos), "{1:1,2:2}");
+    query(func.args(input, empty, empty, " { 'combine': op('*') }"), "{1:1}");
+    query(func.args(input, empty, pos, " { 'combine': op('*') }"), "{1:2}");
+    query(func.args(input, pos, empty, " { 'combine': op('*') }"), "{1:1,2:1}");
+    query(func.args(input, pos, pos, " { 'combine': op('*') }"), "{1:1,2:2}");
+
+    check(func.args(input, empty, pos),
+        "{1:(1,2)}", type(func, "map(xs:integer, item()*)"));
+    check(func.args(input, empty, pos, " { 'duplicates': 'use-first' }"),
+        "{1:1}", type(func, "map(xs:integer, item()*)"));
+    check(func.args(input, empty, pos, " { 'duplicates': 'use-any' }"),
+        "{1:2}", type(func, "map(xs:integer, item()*)"));
+    check(func.args(input, empty, pos, " { 'duplicates': 'use-last' }"),
+        "{1:2}", type(func, "map(xs:integer, item()*)"));
+    check(func.args(input, empty, pos, " { 'duplicates': 'combine' }"),
+        "{1:(1,2)}", type(func, "map(xs:integer, item()*)"));
+    check(func.args(input, empty, pos, " { 'combine': op('+') }"),
+        "{1:3}", type(func, "map(xs:integer, item()*)"));
+    check(func.args(input, empty, pos, " { " + wrap("combine") + ": op('+') }"),
+        "{1:3}", type(func, "map(xs:integer, item()*)"));
+    error(func.args(input, empty, pos, " { 'duplicates': 'reject' }"),
+        MERGE_DUPLICATE_X);
+    error(func.args(input, empty, pos, " { 'duplicates': 'reject', 'combine': sum#2 }"),
+        OPTIONS_X_X);
+
+    check(func.args(empty) + " => map:keys()", "", empty());
+    check(func.args(1) + " => map:keys()", 1, root(Int.class));
   }
 
   /** Test method. */
@@ -261,8 +293,39 @@ public final class MapModuleTest extends SandboxTest {
     // GH-1954
     query(func.args(" if (<a/>/text()) then map { } else ()") + " ! map:keys(.)", "");
 
-    //
+    // map:merge -> map:put
     check(func.args(" (map:entry(1, <a/>), map { 1: <b/> })") + "?*", "<a/>", empty(func));
+
+    query(func.args(" ({ 1: <x/> })"), "{1:<x/>}");
+    query(func.args(" ({ 1: <x/> }, { 1: <y/> })"), "{1:<x/>}");
+    query(func.args(" ({ 1: <x/> }, { 1: <y/> })[name(?*) = 'x']"), "{1:<x/>}");
+    query(func.args(" ({ 1: <x/> }, { 1: <y/> })[name(?*) = 'z']"), "{}");
+
+    final String input = " ({ 1: 2 }, { 1: " + wrap(3) + " cast as xs:integer })";
+    query(func.args(input), "{1:2}");
+    query(func.args(input, " { 'combine': op('*') }"), "{1:6}");
+
+    check(func.args(input),
+        "{1:2}", type(func, "map(xs:integer, xs:integer)"));
+    check(func.args(input, " { 'duplicates': 'use-first' }"),
+        "{1:2}", type(func, "map(xs:integer, xs:integer)"));
+    check(func.args(input, " { 'duplicates': 'use-any' }"),
+        "{1:3}", type(func, "map(xs:integer, xs:integer)"));
+    check(func.args(input, " { 'duplicates': 'use-last' }"),
+        "{1:3}", type(func, "map(xs:integer, xs:integer)"));
+    check(func.args(input, " { 'duplicates': 'combine' }"),
+        "{1:(2,3)}", type(func, "map(xs:integer, xs:integer+)"));
+    check(func.args(input, " { 'combine': op('+') }"),
+        "{1:5}", type(func, "map(xs:integer, xs:anyAtomicType?)"));
+    check(func.args(input, " { " + wrap("combine") + ": op('+') }"),
+        "{1:5}", type(func, "map(xs:integer, item()*)"));
+    error(func.args(input, " { 'duplicates': 'reject' }"),
+        MERGE_DUPLICATE_X);
+    error(func.args(input, " { 'duplicates': 'reject', 'combine': sum#2 }"),
+        OPTIONS_X_X);
+
+    check(func.args(" {}") + " => map:keys()", "", empty());
+    check(func.args(" { 1: 2 }") + " => map:keys()", 1, root(Int.class));
   }
 
   /**
@@ -325,6 +388,38 @@ public final class MapModuleTest extends SandboxTest {
         ),
         true
     );
+  }
+
+  /** Test method. */
+  @Test public void ofPairs() {
+    final Function func = _MAP_OF_PAIRS;
+
+    final String input = " ({ 'key': 1, 'value': 2 }, "
+        + "{ 'key': 1, 'value': " + wrap(3) + " cast as xs:integer })";
+    query(func.args(input), "{1:(2,3)}");
+    query(func.args(input, " { 'combine': op('*') }"), "{1:6}");
+
+    check(func.args(input),
+        "{1:(2,3)}", type(func, "map(xs:integer, xs:integer+)"));
+    check(func.args(input, " { 'duplicates': 'use-first' }"),
+        "{1:2}", type(func, "map(xs:integer, xs:integer)"));
+    check(func.args(input, " { 'duplicates': 'use-any' }"),
+        "{1:3}", type(func, "map(xs:integer, xs:integer)"));
+    check(func.args(input, " { 'duplicates': 'use-last' }"),
+        "{1:3}", type(func, "map(xs:integer, xs:integer)"));
+    check(func.args(input, " { 'duplicates': 'combine' }"),
+        "{1:(2,3)}", type(func, "map(xs:integer, xs:integer+)"));
+    check(func.args(input, " { 'combine': op('+') }"),
+        "{1:5}", type(func, "map(xs:integer, xs:anyAtomicType?)"));
+    check(func.args(input, " { " + wrap("combine") + ": op('+') }"),
+        "{1:5}", type(func, "map(xs:integer, item()*)"));
+    error(func.args(input, " { 'duplicates': 'reject' }"),
+        MERGE_DUPLICATE_X);
+    error(func.args(input, " { 'duplicates': 'reject', 'combine': sum#2 }"),
+        OPTIONS_X_X);
+
+    check(func.args(" ()") + " => map:keys()", "", empty());
+    check(func.args(" { 'key': 1, 'value': 2 }") + " => map:keys()", 1, root(Int.class));
   }
 
   /** Test method. */

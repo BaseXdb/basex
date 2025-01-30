@@ -728,33 +728,30 @@ public enum QueryError {
   URIARG_X(FORG, 2, "Invalid URI: %."),
   /** Error code. */
   BASEURIARG_X(FORG, 2, "Invalid base URI: %."),
-
   /** Error code. */
   ZEROORONE(FORG, 3, "Zero or one item expected."),
   /** Error code. */
   ONEORMORE(FORG, 4, "One or more item expected."),
   /** Error code. */
   EXACTLYONE(FORG, 5, "Exactly one item expected."),
-
   /** Error code. */
   ARGTYPE_X_X_X(FORG, 6, "% expected, % found: %."),
   /** Error code. */
   COMPARE_X_X(FORG, 6, "Items of type % cannot be compared: %."),
   /** Error code. */
   NUMDUR_X_X(FORG, 6, "Number or duration expected, % found: %."),
-
   /** Error code. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
-
   /** Error code. */
   IETF_PARSE_X_X_X(FORG, 10, "Invalid input (% expected, '%' found): '%'."),
   /** Error code. */
   IETF_INV_X(FORG, 10, "Invalid input: '%'."),
-
   /** Error code. */
   INTRADIX_X(FORG, 11, "Radix out of range (2-36): %."),
   /** Error code. */
   INTINVALID_X_X(FORG, 12, "Cannot parse input with radix %: %."),
+  /** Error code. */
+  OPTIONS_X_X(FORG, 13, "Conflicting options: % vs %."),
 
   /** Error code. */
   REGFLAG_X(FORX, 1, "Invalid regular flag: '%'."),

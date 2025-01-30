@@ -21,7 +21,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class MapMerge extends StandardFunc {
+public class MapMerge extends StandardFunc {
   /** Duplicate handling. */
   public enum Duplicates {
     /** Reject.    */ REJECT,
@@ -29,23 +29,31 @@ public final class MapMerge extends StandardFunc {
     /** Use last.  */ USE_LAST,
     /** Use any.   */ USE_ANY,
     /** Combine.   */ COMBINE;
+
     @Override
     public String toString() {
       return EnumOption.string(this);
     }
   }
+
   /** Merge options. */
   public static final class MergeOptions extends Options {
     /** Handle duplicates. */
     public static final EnumOption<Duplicates> DUPLICATES =
-        new EnumOption<>("duplicates", Duplicates.USE_FIRST);
+        new EnumOption<>("duplicates", Duplicates.class);
+    /** Combine function. */
+    public static final ValueOption COMBINE =
+        new ValueOption("combine", SeqType.FUNCTION_ZO);
   }
+
+  /** Cached value merger instance. */
+  ValueMerger vm;
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter maps = arg(0).iter(qc);
     final MergeOptions options = toOptions(arg(1), new MergeOptions(), qc);
-    final Duplicates merge = options.get(MergeOptions.DUPLICATES);
+    final ValueMerger merger = merger(options, qc, Duplicates.USE_FIRST);
 
     // empty input: return empty map
     final Item first = qc.next(maps);
@@ -56,7 +64,7 @@ public final class MapMerge extends StandardFunc {
     Item current = qc.next(maps);
     if(current == null) return mp;
 
-    // update first map if exactly 2 maps are supplied. otherwise, use map builder
+    // update first map if 2 maps are supplied, use map builder otherwise
     Item next = qc.next(maps);
     final MapBuilder mb = next == null ? null : new MapBuilder(arg(0).size());
     if(mb != null) mp.forEach((k, v) -> mb.put(k,  v));
@@ -65,21 +73,11 @@ public final class MapMerge extends StandardFunc {
       final XQMap map = toMap(current);
       for(final Item key : map.keys()) {
         final Value old = mb != null ? mb.get(key) : mp.getInternal(key, false);
-        Value value = map.get(key);
-        switch(merge) {
-          case REJECT:
-            if(old != null) throw MERGE_DUPLICATE_X.get(info, key);
-            break;
-          case COMBINE:
-            if(old != null) value = ValueBuilder.concat(old, value, qc);
-            break;
-          case USE_FIRST:
-            if(old != null) continue;
-            break;
-          default:
+        final Value val = merger.merge(key, old, map.get(key));
+        if(val != null) {
+          if(mb != null) mb.put(key, val);
+          else mp = mp.put(key, val);
         }
-        if(mb != null) mb.put(key, value);
-        else mp = mp.put(key, value);
       }
       current = next;
       next = current != null ? qc.next(maps) : null;
@@ -89,6 +87,8 @@ public final class MapMerge extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    prepareMerge(1, Duplicates.USE_FIRST, cc);
+
     if(arg(0).seqType().type instanceof MapType) {
       // remove empty entries
       if(arg(0) instanceof List &&
@@ -111,19 +111,64 @@ public final class MapMerge extends StandardFunc {
         }
       }
 
-      // check if duplicates will be combined (if yes, adjust occurrence of return type)
-      MapType mt = (MapType) st.type;
-      final SeqType vt = mt.valueType;
-      // broaden type if values may be combined
+      // consider duplicate handling for value type
       //   map:merge((1 to 2) ! map { 1: 1 }, map { 'duplicates': 'combine' })
-      if(!vt.zero() && defined(1)) {
-        if(!(arg(1) instanceof Value) || toOptions(arg(1), new MergeOptions(), cc.qc).
-            get(MergeOptions.DUPLICATES) == Duplicates.COMBINE) {
-          mt = MapType.get(mt.keyType, vt.union(Occ.ONE_OR_MORE));
-        }
-      }
-      exprType.assign(mt);
+      final MapType mt = (MapType) st.type;
+      final Type kt = mt.keyType;
+      final SeqType vt = mt.valueType;
+      exprType.assign(MapType.get(kt, vm != null ? vm.type(vt) : SeqType.ITEM_ZM));
     }
     return this;
+  }
+
+  /**
+   * Optimizes merge operations.
+   * @param arg options argument
+   * @param dflt default duplicate operation
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  final void prepareMerge(final int arg, final Duplicates dflt, final CompileContext cc)
+      throws QueryException {
+    if(arg(arg) instanceof Value) {
+      MergeOptions options = new MergeOptions();
+      if(defined(arg)) options = toOptions(arg(arg), options, cc.qc);
+      vm = merger(options, cc.qc, dflt);
+    }
+  }
+
+  /**
+   * Creates a value merger.
+   * @param options merge options
+   * @param qc query context
+   * @param dflt default duplicate operation
+   * @return merger
+   * @throws QueryException query exception
+   */
+  final ValueMerger merger(final MergeOptions options, final QueryContext qc, final Duplicates dflt)
+      throws QueryException {
+
+    if(vm != null) return vm;
+
+    Duplicates duplicates = options.get(MergeOptions.DUPLICATES);
+    final Value combine = options.get(MergeOptions.COMBINE);
+    if(!combine.isEmpty()) {
+      if(duplicates != null) throw OPTIONS_X_X.get(info, MergeOptions.DUPLICATES.name(),
+          MergeOptions.COMBINE.name());
+      return new Invoke(toFunction(combine, 2, qc), info, qc);
+    }
+
+    if(duplicates == null) duplicates = dflt;
+    switch(duplicates) {
+      case REJECT:    return new Reject(info);
+      case COMBINE:   return new Combine(qc);
+      case USE_FIRST: return new UseFirst();
+      default:        return new UseLast();
+    }
+  }
+
+  @Override
+  public int hofIndex() {
+    return defined(1) ? Integer.MAX_VALUE : -1;
   }
 }
