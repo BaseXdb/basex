@@ -55,16 +55,9 @@ final class TrieList extends TrieNode {
       for(int i = keys.length; i-- > 0;) {
         final Item key = keys[i];
         if(key.atomicEqual(update.key)) {
-          update.replace(key);
-          // same key: update key order if type differs
-          Item[] ks = keys;
-          if(key.type != update.key.type) {
-            ks = ks.clone();
-            ks[i] = update.key;
-          }
           final Value[] vs = values.clone();
           vs[i] = update.value;
-          return new TrieList(hs, ks, vs);
+          return new TrieList(hs, keys, vs);
         }
       }
     }

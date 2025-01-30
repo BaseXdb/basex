@@ -15,9 +15,9 @@ final class TrieUpdate {
   /** Value (can be {@code null}). */
   final Value value;
   /** Order of old map ({@code null} for empty and singleton maps). */
-  final TrieOrder oldOrder;
+  private final TrieOrder oldOrder;
   /** Order of new map (initially {@code null}). */
-  TrieOrder newOrder;
+  private TrieOrder newOrder;
 
   /**
    * Constructor.
@@ -44,18 +44,6 @@ final class TrieUpdate {
   }
 
   /**
-   * Replaces an entry.
-   * @param old key of entry to be replaced
-   */
-  void replace(final Item old) {
-    if(oldOrder() && key.type != old.type) {
-      // remove and add key if old and new keys are of different type
-      newOrder.remove(old);
-      newOrder.add(key);
-    }
-  }
-
-  /**
    * Removes an entry.
    * @param old key of entry to be removed
    */
@@ -63,6 +51,14 @@ final class TrieUpdate {
     if(oldOrder()) {
       newOrder.remove(old);
     }
+  }
+
+  /**
+   * Returns the current map order.
+   * @return order
+   */
+  TrieOrder order() {
+    return newOrder != null ? newOrder : oldOrder;
   }
 
   /**

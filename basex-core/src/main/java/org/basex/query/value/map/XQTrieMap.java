@@ -38,14 +38,14 @@ public final class XQTrieMap extends XQMap {
   XQMap putInternal(final Item key, final Value value) throws QueryException {
     final TrieUpdate update = new TrieUpdate(key, value, order);
     final TrieNode node = root.put(key.hashCode(), 0, update);
-    return new XQTrieMap(node, update.newOrder);
+    return new XQTrieMap(node, update.order());
   }
 
   @Override
   public XQMap removeInternal(final Item key) throws QueryException {
     final TrieUpdate update = new TrieUpdate(key, null, order);
     final TrieNode node = root.remove(key.hashCode(), 0, update);
-    return node == root ? this : node != null ? new XQTrieMap(node, update.newOrder) : null;
+    return node == root ? this : node != null ? new XQTrieMap(node, update.order()) : null;
   }
 
   @Override

@@ -103,11 +103,11 @@ public final class MapTest extends SandboxTest {
     query("let $m := { 48e0: 1 }"
         + "return some(map:keys($m), fn { . instance of xs:double })", true);
     query("let $m := { 48: 1 } => map:put(48e0, 2)"
-        + "return some(map:keys($m), fn { . instance of xs:double })", true);
+        + "return every(map:keys($m), fn { . instance of xs:integer })", true);
     query("let $m := { '0': 1 } => map:put(48, 2) => map:put(48e0, 3)"
-        + "return some(map:keys($m), fn { . instance of xs:double })", true);
+        + "return every(map:keys($m), fn { not(. instance of xs:double) })", true);
     query("let $m := { '0': 1 } => map:put(48, 2) => map:put(48.0, 3) => map:put(48e0, 4)"
-        + "return some(map:keys($m), fn { . instance of xs:double })", true);
+        + "return every(map:keys($m), fn { not(. instance of xs:double) })", true);
   }
 
   /** Atomize key. */
@@ -200,7 +200,7 @@ public final class MapTest extends SandboxTest {
 
     query("map:build(1 to 99) "
         + "! map:put(., 50e0, '') "
-        + "! some(map:keys(.), fn { . instance of xs:double })",
+        + "! every(map:keys(.), fn { . instance of xs:integer })",
         true);
     query("map:build(1 to 99) "
         + "! map:put(., 50e0, '') "
@@ -209,7 +209,7 @@ public final class MapTest extends SandboxTest {
         false);
     query("map:build(1 to 99) "
         + "! fold-left(map:keys(.), ., fn($m, $i) { map:put($m, xs:double($i), ()) })"
-        + "! every(map:keys(.), fn { . instance of xs:double })",
+        + "! every(map:keys(.), fn { . instance of xs:integer })",
         true);
     query("map:build(1 to 99) "
         + "! fold-left(map:keys(.), ., fn($m, $i) { map:put($m, xs:double($i), ()) })"
@@ -230,7 +230,7 @@ public final class MapTest extends SandboxTest {
     query("{ 1: 'A', 2: 'B' } => map:put(2e0, 'C') => map:put(2.0,'D')", "{1:\"A\",2:\"D\"}");
 
     // equal key: append new entries
-    query("{ 1: 'A', 2: 'B' } => map:put(1e0, 'C')", "{2:\"B\",1:\"C\"}");
+    query("{ 1: 'A', 2: 'B' } => map:put(1e0, 'C')", "{1:\"C\",2:\"B\"}");
 
     query("{ 1: 1, 2: 2 } => map:remove(1e0)", "{2:2}");
     query("{ 1: 1, 2: 2 } => map:remove(1.0)", "{2:2}");
