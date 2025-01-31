@@ -1,3 +1,16 @@
+VERSION 11.7 (January 31, 2025) ----------------------------------------
+
+ - [ADD] XQuery: Ordered maps, preserving the insertion order
+ - [ADD] New Pipeline operator "->"
+ - [ADD] XQuery 3.1 function (finally) fn:load-xquery-module
+ - [ADD] New functions: fn:siblings, fn:type-of, fn:elements-to-maps
+ - [ADD] New parse functions: fn:parse-csv, fn:parse-html
+ - [ADD] HTML parsing: Support for both TagSoup and Validate.nu
+ - [MOD] Better readable serialization of doubles, maps and arrays
+ - [MOD] Store functions: only read if contents have changed
+ - [MOD] RESTXQERRORS option: if disabled, write error to logs
+ - [FIX] RESTXQ: Correct handling of query and form parameters
+
 VERSION 11.6 (November 28, 2024) ---------------------------------------
 
  - [ADD] New XQuery 4 features (sibling axes, civil-timezone, etc)
