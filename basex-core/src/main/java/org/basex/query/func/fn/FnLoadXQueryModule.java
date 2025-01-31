@@ -141,8 +141,8 @@ public final class FnLoadXQueryModule extends ParseFn {
     for(final QNm qnm : funcs) {
       final MapBuilder arities = new MapBuilder();
       final Map<Integer, Expr> funcItems = funcs.get(qnm);
-      for(final Integer arity : funcItems.keySet()) {
-        arities.put(Int.get(arity), funcItems.get(arity).value(mqc));
+      for(final Map.Entry<Integer, Expr> entry : funcItems.entrySet()) {
+        arities.put(Int.get(entry.getKey()), entry.getValue().value(mqc));
       }
       functions.put(qnm, arities.map());
     }

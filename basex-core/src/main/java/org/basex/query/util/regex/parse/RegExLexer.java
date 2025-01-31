@@ -98,7 +98,7 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
    * @return token kind
    */
   private int normal() {
-    int curr = next(skipCmt);
+    final int curr = next(skipCmt);
     if(curr == -1) return 0;
     switch(curr) {
       case '^':  return LINE_START;

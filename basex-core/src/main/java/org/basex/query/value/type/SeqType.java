@@ -186,19 +186,10 @@ public final class SeqType {
       G_YEAR_MONTH.seqType(), G_MONTH.seqType(), G_MONTH_DAY.seqType(), G_DAY.seqType())).
       seqType(ZERO_OR_ONE);
 
-  // function types must be placed here due to circular dependencies
+  // types that instantiate sequence types must be placed last to avoid circular dependencies
 
-  /** Any function type. */
+  /** The general function type. */
   public static final FuncType FUNCTION = new FuncType(null, (SeqType[]) null);
-  /** Java function type. */
-  public static final FuncType JAVA = new FuncType(null);
-  /** The general record type. */
-  public static final RecordType RECORD = new RecordType(true, new TokenObjMap<>(), null);
-  /** The general map type. */
-  public static final MapType MAP = ITEM_ZM.mapType(ANY_ATOMIC_TYPE);
-  /** The general array type. */
-  public static final ArrayType ARRAY = ITEM_ZM.arrayType();
-
   /** Single function. */
   public static final SeqType FUNCTION_O = FUNCTION.seqType();
   /** Zero of single function. */
@@ -213,18 +204,29 @@ public final class SeqType {
   public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, ITEM_O).seqType();
   /** Action function. */
   public static final SeqType ACTION_O = FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType();
+  /** Java function type. */
+  public static final FuncType JAVA = new FuncType(null);
+
+  /** The general map type. */
+  public static final MapType MAP = ITEM_ZM.mapType(ANY_ATOMIC_TYPE);
   /** Single map. */
   public static final SeqType MAP_O = MAP.seqType();
   /** Zero or one map. */
   public static final SeqType MAP_ZO = MAP.seqType(ZERO_OR_ONE);
   /** Zero or more maps. */
   public static final SeqType MAP_ZM = MAP.seqType(ZERO_OR_MORE);
+
+  /** The general array type. */
+  public static final ArrayType ARRAY = ITEM_ZM.arrayType();
   /** Single array. */
   public static final SeqType ARRAY_O = ARRAY.seqType();
   /** Zero or one array. */
   public static final SeqType ARRAY_ZO = ARRAY.seqType(ZERO_OR_ONE);
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
+
+  /** The general record type. */
+  public static final RecordType RECORD = new RecordType(true, new TokenObjMap<>(), null);
   /** Single record. */
   public static final SeqType RECORD_O = RECORD.seqType();
   /** Single pair. */

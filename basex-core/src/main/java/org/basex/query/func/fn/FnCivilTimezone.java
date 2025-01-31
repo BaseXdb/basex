@@ -30,6 +30,6 @@ public final class FnCivilTimezone extends DateTimeFn {
       throw PLACE_X.get(info, place);
     }
 
-    return DTDur.get(ZonedDateTime.ofInstant(instant, id).getOffset().getTotalSeconds() * 1000);
+    return DTDur.get(ZonedDateTime.ofInstant(instant, id).getOffset().getTotalSeconds() * 1000L);
   }
 }

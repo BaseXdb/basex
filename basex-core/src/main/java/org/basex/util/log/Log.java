@@ -162,7 +162,7 @@ public final class Log implements QueryTracer {
     if(targets == null) {
       final String log = sopts.get(StaticOptions.LOG);
       final Set<LogTarget> set = EnumSet.noneOf(LogTarget.class);
-      for(final String target : log.trim().toUpperCase().split("\\s*,\\s*")) {
+      for(final String target : log.trim().toUpperCase(Locale.ENGLISH).split("\\s*,\\s*")) {
         final Boolean enable = Strings.toBoolean(target);
         if(enable == null) {
           for(final LogTarget lt : LogTarget.values()) {

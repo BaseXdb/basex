@@ -47,7 +47,7 @@ public final class Users {
   /**
    * Reads user permissions.
    */
-  private void read() {
+  private synchronized void read() {
     if(!file.exists()) return;
     try {
       final MainOptions options = new MainOptions(false);

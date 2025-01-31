@@ -133,7 +133,7 @@ public final class HtmlParser extends XMLParser {
 
       @Override
       XMLReader reader(final HtmlOptions hopts, final StringWriter sw) throws SAXException {
-        XMLReader reader = new org.ccil.cowan.tagsoup.Parser();
+        final XMLReader reader = new org.ccil.cowan.tagsoup.Parser();
         final XMLWriter writer = new XMLWriter(sw);
         writer.setOutputProperty(ENCODING.name(), Strings.UTF8);
         reader.setContentHandler(writer);

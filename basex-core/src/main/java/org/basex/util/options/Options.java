@@ -831,7 +831,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof BooleanOption) {
       final Boolean b = item != null ? Strings.toBoolean(string(item.string(info))) : null;
       if(b == null) throw expected.apply(AtomType.BOOLEAN);
-      result = b.booleanValue();
+      result = b;
     } else if(option instanceof NumberOption) {
       if(item == null) throw expected.apply(AtomType.INTEGER);
       result = (int) item.itr(info);
