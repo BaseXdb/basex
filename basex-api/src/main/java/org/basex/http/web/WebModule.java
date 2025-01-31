@@ -10,6 +10,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
+import org.basex.util.log.*;
 
 /**
  * This class caches information on a single XQuery module with relevant annotations.
@@ -69,6 +70,7 @@ public final class WebModule {
     } catch(final QueryException ex) {
       if(ctx.soptions.get(StaticOptions.RESTXQERRORS)) throw ex;
       // ignore modules that cannot be parsed
+      ctx.log.writeServer(LogType.ERROR, Util.message(ex));
       Util.debug(ex);
     }
   }
