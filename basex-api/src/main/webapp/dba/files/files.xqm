@@ -39,7 +39,7 @@ function dba:files(
     <tr>
       <td>
         <h2>Directory</h2>
-        <form action='dir-change' method='post' autocomplete='off'>
+        <form action='dir-change' method='get' autocomplete='off'>
           <select name='dir' style='width: 350px;' onchange='this.form.submit();'>{
             let $dir-path := fn($path) {
               try {

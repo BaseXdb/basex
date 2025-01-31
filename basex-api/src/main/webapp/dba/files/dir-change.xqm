@@ -17,7 +17,7 @@ declare variable $dba:CAT := 'files';
  :)
 declare
   %rest:path('/dba/dir-change')
-  %rest:form-param('dir', '{$dir}')
+  %rest:query-param('dir', '{$dir}')
 function dba:dir-change(
   $dir  as xs:string
 ) as element(rest:response) {
