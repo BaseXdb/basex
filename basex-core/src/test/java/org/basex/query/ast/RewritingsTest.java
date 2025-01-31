@@ -3330,4 +3330,15 @@ public final class RewritingsTest extends SandboxTest {
     check("(1 to 10000000000000, 'x')[. instance of xs:integer][. instance of xs:string]",
         "", empty());
   }
+
+  /** Include data reference in equality check. */
+  @Test public void gh2373() {
+    execute(new CreateDB(NAME + 1));
+    execute(new Add("1.xml", "<a/>"));
+    execute(new Add("2.xml", "<b/>"));
+    execute(new CreateDB(NAME + 2));
+    execute(new Add("3.xml", "<c/>"));
+    execute(new Add("4.xml", "<d/>"));
+    query("db:get('" + NAME + "1'), db:get('" + NAME + "2')", "<a/>\n<b/>\n<c/>\n<d/>");
+  }
 }

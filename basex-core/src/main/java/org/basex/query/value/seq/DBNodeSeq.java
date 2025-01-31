@@ -135,7 +135,7 @@ public class DBNodeSeq extends NativeSeq {
     if(this == obj) return true;
     if(!(obj instanceof DBNodeSeq)) return super.equals(obj);
     final DBNodeSeq ds = (DBNodeSeq) obj;
-    return size == ds.size && Arrays.equals(pres, ds.pres);
+    return data == ds.data && size == ds.size && Arrays.equals(pres, ds.pres);
   }
 
   @Override
