@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class RegEx extends StandardFunc {
+abstract class RegExFn extends StandardFunc {
   /** Regex characters. */
   static final byte[] REGEX_CHARS = Token.token("\\^$.|?*+()[]{}");
 

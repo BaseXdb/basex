@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class DbNew extends DbAccess {
+abstract class DbNew extends DbAccessFn {
   /**
    * Creates a container for the specified input.
    * @param input input item (node or string)

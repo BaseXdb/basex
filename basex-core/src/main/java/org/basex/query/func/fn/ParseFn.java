@@ -22,7 +22,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public abstract class Parse extends StandardFunc {
+public abstract class ParseFn extends StandardFunc {
   /** Parse Options. */
   public static final class ParseOptions extends Options {
     /** Normalize-newlines option. */

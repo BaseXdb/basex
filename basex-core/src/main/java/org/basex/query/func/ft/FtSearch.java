@@ -17,7 +17,7 @@ import org.basex.util.ft.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FtSearch extends FtAccess {
+public final class FtSearch extends FtAccessFn {
   @Override
   public NodeIter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);

@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FtCount extends FtAccess {
+public final class FtCount extends FtAccessFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FTPosData tmp = qc.ftPosData;

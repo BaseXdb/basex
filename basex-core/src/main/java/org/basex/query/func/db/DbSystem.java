@@ -15,6 +15,6 @@ import org.basex.util.*;
 public final class DbSystem extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return DbInfo.toNode(DbAccess.Q_SYSTEM, Info.info(qc.context), qc);
+    return DbInfo.toNode(DbAccessFn.Q_SYSTEM, Info.info(qc.context), qc);
   }
 }

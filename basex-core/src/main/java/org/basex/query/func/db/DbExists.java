@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class DbExists extends DbAccess {
+public final class DbExists extends DbAccessFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Bln.get(test(qc, ii, 0));

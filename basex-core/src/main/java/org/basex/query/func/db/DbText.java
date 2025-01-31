@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DbText extends DbAccess {
+public class DbText extends DbAccessFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);

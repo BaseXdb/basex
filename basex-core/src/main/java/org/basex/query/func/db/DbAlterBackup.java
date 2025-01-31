@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class DbAlterBackup extends DbAccess {
+public final class DbAlterBackup extends DbAccessFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toName(arg(0), false, qc), newname = toName(arg(1), false, qc);

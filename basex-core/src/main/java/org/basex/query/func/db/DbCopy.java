@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DbCopy extends DbAccess {
+public class DbCopy extends DbAccessFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     copy(qc, true);

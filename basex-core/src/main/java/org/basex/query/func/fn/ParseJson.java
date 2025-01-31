@@ -19,7 +19,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public abstract class ParseJson extends Parse {
+public abstract class ParseJson extends ParseFn {
   @Override
   protected final Expr opt(final CompileContext cc) {
     return optFirst();

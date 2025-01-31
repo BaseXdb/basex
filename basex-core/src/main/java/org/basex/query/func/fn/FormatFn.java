@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class Format extends StandardFunc {
+abstract class FormatFn extends StandardFunc {
   /**
    * Returns a formatted number.
    * @param qc query context

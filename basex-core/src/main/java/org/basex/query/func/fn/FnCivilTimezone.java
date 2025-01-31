@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnCivilTimezone extends DateTime {
+public final class FnCivilTimezone extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Dtm value = (Dtm) checkType(arg(0), AtomType.DATE_TIME, qc);

@@ -13,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FtThesaurus extends FtAccess {
+public final class FtThesaurus extends FtAccessFn {
   /** Most recently used thesaurus. */
   private Thesaurus thesaurus;
   /** Most recently supplied root node. */

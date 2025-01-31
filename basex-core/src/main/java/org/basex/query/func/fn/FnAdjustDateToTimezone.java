@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnAdjustDateToTimezone extends DateTime {
+public final class FnAdjustDateToTimezone extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return adjust(AtomType.DATE, qc);

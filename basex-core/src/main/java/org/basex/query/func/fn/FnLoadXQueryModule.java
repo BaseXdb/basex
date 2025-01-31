@@ -31,7 +31,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public final class FnLoadXQueryModule extends Parse {
+public final class FnLoadXQueryModule extends ParseFn {
   /** The type of the value of the 'variables' and 'vendor-options' option. */
   public static final MapType QNAME_MAP_TYPE = MapType.get(AtomType.QNAME, SeqType.ITEM_ZM);
 

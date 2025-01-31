@@ -133,7 +133,7 @@ public final class SerializerOptions extends Options {
   /** Name test. */
   public static final NameTest T_ROOT = new NameTest(Q_ROOT);
   /** Value. */
-  private static final QNm VALUE = new QNm("value");
+  private static final QNm Q_VALUE = new QNm("value");
 
   /** Newlines. */
   public enum Newline {
@@ -329,7 +329,7 @@ public final class SerializerOptions extends Options {
         value = toString(child, cache, info);
       } else {
         for(final ANode attr : child.attributeIter()) {
-          if(attr.qname().eq(VALUE)) {
+          if(attr.qname().eq(Q_VALUE)) {
             value = string(attr.string());
             if(option == CDATA_SECTION_ELEMENTS) value = cdataSectionElements(child, value);
           } else {

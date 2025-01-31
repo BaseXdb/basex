@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class DateTime extends StandardFunc {
+abstract class DateTimeFn extends StandardFunc {
   /**
    * Checks if the specified item is a Duration item. If it is untyped, a duration is returned.
    * @param item item to be checked

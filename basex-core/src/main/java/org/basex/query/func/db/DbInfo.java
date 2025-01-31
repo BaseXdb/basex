@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class DbInfo extends DbAccess {
+public final class DbInfo extends DbAccessFn {
   @Override
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);

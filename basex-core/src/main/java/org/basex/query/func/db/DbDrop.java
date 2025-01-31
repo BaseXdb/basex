@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class DbDrop extends DbAccess {
+public final class DbDrop extends DbAccessFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toName(arg(0), false, qc);

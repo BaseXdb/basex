@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FtTokenize extends FtAccess {
+public class FtTokenize extends FtAccessFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return StrSeq.get(tokens(qc, false));

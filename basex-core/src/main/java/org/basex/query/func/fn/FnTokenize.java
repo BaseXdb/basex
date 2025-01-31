@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnTokenize extends RegEx {
+public final class FnTokenize extends RegExFn {
   /** Default pattern. */
   private static final byte[] DEFAULT = Token.cpToken(' ');
   /** Placeholder for default search. */

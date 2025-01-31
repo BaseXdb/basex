@@ -21,7 +21,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public abstract class ParseCsv extends Parse {
+public abstract class ParseCsv extends ParseFn {
   /**
    * Returns an XDM value for the parsed data.
    * @param qc query context

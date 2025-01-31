@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnAnalyzeString extends RegEx {
+public final class FnAnalyzeString extends RegExFn {
   /** QName. */
   private static final QNm Q_ANALYZE_STRING_RESULT = new QNm("analyze-string-result", FN_URI);
   /** QName. */

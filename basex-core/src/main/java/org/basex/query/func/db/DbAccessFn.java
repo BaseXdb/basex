@@ -21,7 +21,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class DbAccess extends StandardFunc {
+abstract class DbAccessFn extends StandardFunc {
   /** QName. */
   static final QNm Q_BACKUP = new QNm("backup");
   /** QName. */

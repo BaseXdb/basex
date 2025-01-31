@@ -16,7 +16,7 @@ import org.basex.util.ft.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class FtAccess extends StandardFunc {
+abstract class FtAccessFn extends StandardFunc {
   /**
    * Parses and returns full-text options.
    * @param opts options specified in the query

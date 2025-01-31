@@ -1,6 +1,6 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.func.db.DbAccess.*;
+import static org.basex.query.func.db.DbAccessFn.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;

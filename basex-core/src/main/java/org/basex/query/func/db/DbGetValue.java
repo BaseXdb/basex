@@ -21,7 +21,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DbGetValue extends DbAccess {
+public class DbGetValue extends DbAccessFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return value(ResourceType.VALUE, qc);

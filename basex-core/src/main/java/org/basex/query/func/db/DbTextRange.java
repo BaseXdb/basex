@@ -15,7 +15,7 @@ import org.basex.query.value.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DbTextRange extends DbAccess {
+public class DbTextRange extends DbAccessFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);

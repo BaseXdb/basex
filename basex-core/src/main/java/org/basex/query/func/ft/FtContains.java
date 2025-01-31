@@ -16,7 +16,7 @@ import org.basex.util.ft.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FtContains extends FtAccess {
+public final class FtContains extends FtAccessFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value input = arg(0).value(qc), terms = arg(1).value(qc);

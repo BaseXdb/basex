@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class DbFlush extends DbAccess {
+public final class DbFlush extends DbAccessFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     qc.updates().add(new DBFlush(toData(qc), qc, info), qc);
