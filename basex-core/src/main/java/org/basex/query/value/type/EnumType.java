@@ -33,6 +33,15 @@ public final class EnumType implements Type {
     this.values = values;
   }
 
+  /**
+   * Constructor.
+   * @param values enumeration values (at least one)
+   */
+  public EnumType(final Enum<?>[] values) {
+    this.values = new TokenSet(values.length);
+    for(final Enum<?> v : values) this.values.add(v.toString());
+  }
+
   @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {

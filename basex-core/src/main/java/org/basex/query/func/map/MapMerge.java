@@ -1,10 +1,10 @@
 package org.basex.query.func.map;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -19,7 +19,7 @@ import org.basex.util.options.*;
  * Function implementation.
  *
  * @author BaseX Team, BSD License
- * @author Leo Woerteler
+ * @author Christian Gruen
  */
 public class MapMerge extends StandardFunc {
   /** Duplicate handling. */
@@ -38,12 +38,8 @@ public class MapMerge extends StandardFunc {
 
   /** Merge options. */
   public static final class MergeOptions extends Options {
-    /** Handle duplicates. */
-    public static final EnumOption<Duplicates> DUPLICATES =
-        new EnumOption<>("duplicates", Duplicates.class);
-    /** Combine function. */
-    public static final ValueOption COMBINE =
-        new ValueOption("combine", SeqType.FUNCTION_ZO);
+    /** Duplicates handling. */
+    public static final ValueOption DUPLICATES = new ValueOption("duplicates", SeqType.ITEM_ZM);
   }
 
   /** Cached value merger instance. */
@@ -148,23 +144,24 @@ public class MapMerge extends StandardFunc {
   final ValueMerger merger(final MergeOptions options, final QueryContext qc, final Duplicates dflt)
       throws QueryException {
 
+    // return static options instance
     if(vm != null) return vm;
-
-    Duplicates duplicates = options.get(MergeOptions.DUPLICATES);
-    final Value combine = options.get(MergeOptions.COMBINE);
-    if(!combine.isEmpty()) {
-      if(duplicates != null) throw OPTIONS_X_X.get(info, MergeOptions.DUPLICATES.name(),
-          MergeOptions.COMBINE.name());
-      return new Invoke(toFunction(combine, 2, qc), info, qc);
+    // function
+    final Value duplicates = options.get(MergeOptions.DUPLICATES);
+    if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc), info, qc);
+    // fixed option
+    final String string = duplicates.isEmpty() ? dflt.toString() : toString(duplicates, qc);
+    for(final Duplicates value : Duplicates.values()) {
+      if(value.toString().equals(string)) {
+        switch(value) {
+          case REJECT:    return new Reject(info);
+          case COMBINE:   return new Combine(qc);
+          case USE_FIRST: return new UseFirst();
+          default:        return new UseLast();
+        }
+      }
     }
-
-    if(duplicates == null) duplicates = dflt;
-    switch(duplicates) {
-      case REJECT:    return new Reject(info);
-      case COMBINE:   return new Combine(qc);
-      case USE_FIRST: return new UseFirst();
-      default:        return new UseLast();
-    }
+    throw QueryError.typeError(duplicates, new EnumType(Duplicates.values()), info);
   }
 
   @Override
