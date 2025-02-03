@@ -13,7 +13,7 @@ import org.basex.query.value.node.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class JsonBasicConverter extends JsonXmlConverter {
+public final class JsonW3XmlConverter extends JsonXmlConverter {
   /** Escape characters. */
   private final boolean escape;
 
@@ -22,7 +22,7 @@ public final class JsonBasicConverter extends JsonXmlConverter {
    * @param opts JSON options
    * @throws QueryException query exception
    */
-  JsonBasicConverter(final JsonParserOptions opts) throws QueryException {
+  JsonW3XmlConverter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     escape = jopts.get(JsonParserOptions.ESCAPE);
   }

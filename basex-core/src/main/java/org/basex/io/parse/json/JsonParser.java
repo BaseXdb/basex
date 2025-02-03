@@ -48,7 +48,8 @@ public final class JsonParser extends InputParser {
     liberal = opts.get(JsonParserOptions.LIBERAL);
     escape = opts.get(JsonParserOptions.ESCAPE);
     final JsonDuplicates dupl = opts.get(JsonParserOptions.DUPLICATES);
-    duplicates = dupl != null ? dupl : opts.get(JsonOptions.FORMAT) == JsonFormat.BASIC ?
+    final JsonFormat jf = opts.get(JsonOptions.FORMAT);
+    duplicates = dupl != null ? dupl : jf == JsonFormat.W3_XML || jf == JsonFormat.BASIC ?
       JsonDuplicates.RETAIN : JsonDuplicates.USE_FIRST;
     this.conv = conv;
   }

@@ -72,7 +72,8 @@ public abstract class ParseJson extends ParseFn {
 
     final JsonConverter converter = JsonConverter.get(options);
     final JsonFormat jf = options.get(JsonOptions.FORMAT);
-    if(options.get(JsonParserOptions.VALIDATE) != null && jf != JsonFormat.BASIC) {
+    if(options.get(JsonParserOptions.VALIDATE) != null && jf != JsonFormat.W3_XML &&
+      jf != JsonFormat.BASIC) {
       throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.VALIDATE));
     }
 
@@ -90,7 +91,7 @@ public abstract class ParseJson extends ParseFn {
       converter.numberParser(s -> np.invoke(qc, info, Atm.get(s)).item(qc, info));
     }
     final Value nll = options.get(JsonParserOptions.NULL);
-    if(nll != Empty.VALUE && jf != JsonFormat.XQUERY) {
+    if(nll != Empty.VALUE && jf != JsonFormat.W3 && jf != JsonFormat.XQUERY) {
       throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.NULL));
     }
     converter.nullValue(nll);

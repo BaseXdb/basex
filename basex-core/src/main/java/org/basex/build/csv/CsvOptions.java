@@ -46,12 +46,12 @@ public class CsvOptions extends Options {
 
   /** CSV formats. */
   public enum CsvFormat {
-    /** Default.       */ DIRECT,
-    /** Attributes.    */ ATTRIBUTES,
-    /** XQuery.        */ XQUERY,
-    /** parse-csv.     */ W3,
-    /** csv-to-arrays. */ W3_ARRAYS,
-    /** csv-to-xml.    */ W3_XML;
+    /** Default. */ DIRECT,
+    /** Attributes. */ ATTRIBUTES,
+    /** fn:parse-csv. */ W3,
+    /** fn:csv-to-arrays. */ W3_ARRAYS,
+    /** fn:csv-to-xml. */ W3_XML,
+    /** XQuery (deprecated; use {@link #W3}). */ XQUERY;
 
     @Override
     public String toString() {

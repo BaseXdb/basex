@@ -34,7 +34,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class JsonXQueryConverter extends JsonConverter {
+public final class JsonW3Converter extends JsonConverter {
   /** Stack for intermediate values. */
   private final Stack<Value> stack = new Stack<>();
   /** Stack for intermediate arrays. */
@@ -47,7 +47,7 @@ public final class JsonXQueryConverter extends JsonConverter {
    * @param opts JSON options
    * @throws QueryException query exception
    */
-  JsonXQueryConverter(final JsonParserOptions opts) throws QueryException {
+  JsonW3Converter(final JsonParserOptions opts) throws QueryException {
     super(opts);
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
     if(dupl == JsonDuplicates.RETAIN) {

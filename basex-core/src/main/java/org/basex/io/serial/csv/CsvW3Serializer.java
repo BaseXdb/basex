@@ -49,8 +49,11 @@ public final class CsvW3Serializer extends CsvSerializer {
         row(m.get(CsvConverter.COLUMNS), tl);
       }
       // print rows
-      if(!m.contains(CsvConverter.ROWS)) throw CSV_SERIALIZE_X.getIO("Map has no 'rows' key");
-      for(final Item record : m.get(CsvConverter.ROWS)) row(((XQArray) record).iterable(), tl);
+      if(!m.contains(CsvConverter.ROWS))
+        throw CSV_SERIALIZE_X.getIO("Map has no 'rows' key");
+      for(final Item record : m.get(CsvConverter.ROWS)) {
+        row(((XQArray) record).iterable(), tl);
+      }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

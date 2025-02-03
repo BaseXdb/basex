@@ -14,7 +14,7 @@ import org.basex.query.value.map.*;
 import org.basex.util.list.*;
 
 /**
- * This class serializes map data as CSV. The input must conform to the XQuery CSV representation.
+ * This class serializes a map as CSV. The input must conform to the XQuery CSV representation.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

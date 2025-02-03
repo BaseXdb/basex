@@ -98,10 +98,10 @@ public final class JsonSerializerTest extends SandboxTest {
   }
 
   /**
-   * Tests for the 'xquery' serialization format.
+   * Tests for the 'w3' serialization format.
    */
-  @Test public void xquery() {
-    final JsonFormat format = JsonFormat.XQUERY;
+  @Test public void w3() {
+    final JsonFormat format = JsonFormat.W3;
 
     // objects
     serialize("map { }", "{}", format);

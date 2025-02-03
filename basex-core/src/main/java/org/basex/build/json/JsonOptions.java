@@ -20,11 +20,13 @@ public class JsonOptions extends Options {
 
   /** JSON formats. */
   public enum JsonFormat {
-    /** Direct.     */ DIRECT,
+    /** Direct. */ DIRECT,
     /** Attributes. */ ATTRIBUTES,
-    /** JsonML.     */ JSONML,
-    /** Basic.      */ BASIC,
-    /** XQuery.     */ XQUERY;
+    /** JsonML. */ JSONML,
+    /** fn:parse-json. */ W3,
+    /** fn:json-to-xml. */ W3_XML,
+    /** XQuery (deprecated; use {@link #W3}). */ XQUERY,
+    /** Basic (deprecated; use {@link #W3_XML}). */ BASIC;
 
     @Override
     public String toString() {

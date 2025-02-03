@@ -27,7 +27,7 @@ public final class FnXmlToJson extends StandardFunc {
     final JsonSerialOptions options = toOptions(arg(1), new JsonSerialOptions(), qc);
     if(node == null) return Empty.VALUE;
 
-    options.set(JsonOptions.FORMAT, JsonFormat.BASIC);
+    options.set(JsonOptions.FORMAT, JsonFormat.W3_XML);
     final Boolean indent = options.get(JsonSerialOptions.INDENT);
     // no indentation specified: adopt module indentation
     if(indent == null) options.set(JsonSerialOptions.INDENT,

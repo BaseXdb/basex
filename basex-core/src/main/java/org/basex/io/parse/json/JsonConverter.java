@@ -40,8 +40,10 @@ public abstract class JsonConverter {
     switch(jopts.get(JsonOptions.FORMAT)) {
       case JSONML:     return new JsonMLConverter(jopts);
       case ATTRIBUTES: return new JsonAttsConverter(jopts);
-      case XQUERY:     return new JsonXQueryConverter(jopts);
-      case BASIC:      return new JsonBasicConverter(jopts);
+      case XQUERY: //deprecated
+      case W3:         return new JsonW3Converter(jopts);
+      case BASIC: //deprecated
+      case W3_XML:     return new JsonW3XmlConverter(jopts);
       default:         return new JsonDirectConverter(jopts);
     }
   }

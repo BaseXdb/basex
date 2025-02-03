@@ -65,7 +65,7 @@ public abstract class CsvConverter extends Job {
    */
   public static CsvConverter get(final CsvParserOptions copts) throws QueryException {
     switch(copts.get(CsvOptions.FORMAT)) {
-      case XQUERY:    return new CsvXQueryConverter(copts);
+      case XQUERY:    return new CsvXQueryConverter(copts); // deprecated
       case W3:        return new CsvW3Converter(copts);
       case W3_ARRAYS: return new CsvW3ArraysConverter(copts);
       case W3_XML:    return new CsvW3XmlConverter(copts);

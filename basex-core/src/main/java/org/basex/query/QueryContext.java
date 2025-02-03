@@ -421,7 +421,7 @@ public final class QueryContext extends Job implements Closeable {
    * The specified type is interpreted as follows:
    * <ul>
    *   <li> If {@code "json"} is specified, the value is converted according to the rules
-   *        specified in {@link JsonXQueryConverter}.</li>
+   *        specified in {@link JsonW3Converter}.</li>
    *   <li> Otherwise, the type is cast to the specified XDM type.</li>
    * </ul>
    * @param name name of variable; context value if empty string or {@code null}
@@ -716,7 +716,7 @@ public final class QueryContext extends Job implements Closeable {
     // convert JSON input
     if(type.equalsIgnoreCase(MainParser.JSON.name())) {
       final JsonParserOptions jp = new JsonParserOptions();
-      jp.set(JsonOptions.FORMAT, JsonFormat.XQUERY);
+      jp.set(JsonOptions.FORMAT, JsonFormat.W3);
       return JsonConverter.get(jp).convert(object.toString(), "");
     }
 

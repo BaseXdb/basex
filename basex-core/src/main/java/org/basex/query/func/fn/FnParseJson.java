@@ -13,6 +13,6 @@ import org.basex.query.value.*;
 public final class FnParseJson extends ParseJson {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return parse(qc, JsonFormat.XQUERY);
+    return parse(qc, JsonFormat.W3);
   }
 }
