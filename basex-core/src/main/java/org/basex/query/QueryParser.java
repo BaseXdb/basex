@@ -1939,19 +1939,14 @@ public class QueryParser extends InputParser {
           final boolean mapping = wsConsume("=!>") || wsConsume("=!\uFF1E");
           if(!mapping && !consume("=>") && !consume("=\uFF1E")) break;
 
-          QNm name = null;
-          Expr ex;
           skipWs();
-          if(current('$')) {
-            ex = varRef();
-          } else if(current('(')) {
-            ex = parenthesized();
-          } else {
-            ex = functionItem();
-            if(ex == null) {
-              name = eQName(sc.funcNS, ARROWSPEC_X);
-              if(reserved(name)) throw error(RESERVED_X, name.local());
-            }
+          final int p = pos;
+          QNm name = eQName(sc.funcNS, null);
+          Expr ex = null;
+          if(name == null || reserved(name)) {
+            pos = p;
+            ex = primary();
+            if(ex == null) throw error(ARROWSPEC_X, found());
           }
           final InputInfo ii = info();
           final Expr arg;

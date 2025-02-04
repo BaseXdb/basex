@@ -118,7 +118,7 @@ public final class XQuery4Test extends SandboxTest {
     check("<_>6</_>[. = 6] otherwise 7", "<_>6</_>", root(Otherwise.class));
   }
 
-  /** Function item, arrow. */
+  /** Function items (fn syntax). */
   @Test public void fn() {
     query("fn() { }()", "");
     query("fn($a) { $a }(())", "");
@@ -193,6 +193,15 @@ public final class XQuery4Test extends SandboxTest {
     error("function { . + $i }", VARUNDEF_X);
   }
 
+  /** Generalized arrow operator. */
+  @Test public void arrow() {
+    query("'x' => {}()", "");
+    query("'x' => { 'x': 8 }()", 8);
+    query("1 => [ 8 ]()", 8);
+    query("8 => fn { . }()", 8);
+    query("8 => fn($n) { $n }()", 8);
+  }
+
   /** Mapping arrow operator. */
   @Test public void mappingArrow() {
     query("'abc' =!> upper-case() =!> tokenize('\\s+')", "ABC");
@@ -245,7 +254,7 @@ public final class XQuery4Test extends SandboxTest {
       "Happy Families Are All Alike; Every Unhappy Family Is Unhappy In Its Own Way.");
 
     error("2 ! 256 =!> xs:byte()", FUNCCAST_X_X_X);
-    error("1 =!> if()", RESERVED_X);
+    error("1 =!> if()", ARROWSPEC_X);
     error("0 =!> unknown()", WHICHFUNC_X);
     error("0 =!> unknown(?)", WHICHFUNC_X);
     error("0 =!> local:unknown()", WHICHFUNC_X);
