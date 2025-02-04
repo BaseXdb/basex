@@ -349,6 +349,9 @@ public enum Function implements AFunction {
   HOURS_FROM_TIME(FnHoursFromTime::new, "hours-from-time(value)",
       params(TIME_ZO), INTEGER_ZO),
   /** XQuery function. */
+  HTML_DOC(FnHtmlDoc::new, "html-doc(source[,options])",
+      params(STRING_ZO, MAP_O), DOCUMENT_NODE_ZO, flag(NDT)),
+  /** XQuery function. */
   ID(FnId::new, "id(values[,node])",
       params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
   /** XQuery function. */
