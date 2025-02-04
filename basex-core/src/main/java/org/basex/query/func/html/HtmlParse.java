@@ -50,7 +50,8 @@ public class HtmlParse extends StandardFunc {
   /**
    * Parses the input and creates an XML document.
    * @param io input data
-   * @param defaultParser default HTML parser to be used in absence of the METHOD option
+   * @param defaultParser default HTML parser to be used in absence of the METHOD option (can be
+   *          {@code null})
    * @param qc query context
    * @return node
    * @throws QueryException query exception
@@ -60,7 +61,7 @@ public class HtmlParse extends StandardFunc {
     if(io == null) return Empty.VALUE;
     final HtmlOptions options = toOptions(arg(1), new HtmlOptions(), qc);
     final Parser parser = Parser.of(options, defaultParser);
-    if(!parser.fallbackToXml()) parser.ensureAvailable(options, definition.local(), info);
+    if(parser != null) parser.ensureAvailable(options, definition.local(), info);
     try {
       return new DBNode(
           new org.basex.build.html.HtmlParser(io, parser, new MainOptions(), options));
