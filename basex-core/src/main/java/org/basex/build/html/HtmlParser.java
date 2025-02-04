@@ -25,7 +25,7 @@ import nu.validator.htmlparser.sax.*;
  * is passed on.
  *
  * TagSoup was written by John Cowan and is based on the Apache 2.0 License:
- * {@code http://home.ccil.org/~cowan/XML/tagsoup/}.
+ * {@code http://vrici.lojban.org/~cowan/tagsoup/}
  *
  * The Validator.nu HTML parser was written by Henri Sivonen and is based on the MIT License:
  * {@code https://about.validator.nu/htmlparser/}.
@@ -49,7 +49,7 @@ public final class HtmlParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
-   * @param parser parser to be used
+   * @param parser parser to be used (can be {@code null})
    * @param options main options
    * @param hopts html options
    * @throws IOException I/O exception
@@ -62,15 +62,15 @@ public final class HtmlParser extends XMLParser {
   /**
    * Converts an HTML document to XML.
    * @param io io reference
-   * @param parser parser to be used
+   * @param parser parser to be used (can be {@code null})
    * @param hopts html options
    * @return parser
    * @throws IOException I/O exception
    */
   private static IO toXml(final IO io, final Parser parser, final HtmlOptions hopts)
       throws IOException {
-    // reader could not be initialized; fall back to XML
-    if(!parser.available(hopts)) return io;
+    // parser unavailable: fall back to XML
+    if(parser == null) return io;
     try {
       // define output
       final StringWriter sw = new StringWriter();
@@ -81,7 +81,7 @@ public final class HtmlParser extends XMLParser {
       final String enc = io.encoding() != null
           ? io.encoding()
           : hopts.contains(ENCODING)
-            ? hopts.get(HtmlOptions.ENCODING)
+            ? hopts.get(ENCODING)
             : null;
       if(enc != null) {
         if(!Strings.supported(enc)) {
@@ -125,11 +125,6 @@ public final class HtmlParser extends XMLParser {
 
       /** TagSoup URL. */
       private static final String FEATURES = "http://www.ccil.org/~cowan/tagsoup/features/";
-
-      @Override
-      public boolean fallbackToXml() {
-        return true;
-      }
 
       @Override
       XMLReader reader(final HtmlOptions hopts, final StringWriter sw) throws SAXException {
@@ -182,11 +177,6 @@ public final class HtmlParser extends XMLParser {
       /** Class needed for option heuristics=CHARDET. */
       private static final String CHARDET_CLASS_NAME =
           "org.mozilla.intl.chardet.nsICharsetDetectionObserver";
-
-      @Override
-      public boolean fallbackToXml() {
-        return false;
-      }
 
       @Override
       XMLReader reader(final HtmlOptions hopts, final StringWriter sw) throws SAXException {
@@ -266,19 +256,17 @@ public final class HtmlParser extends XMLParser {
       }
     };
 
-    /** Default parser. */
-    public static final Parser DEFAULT = TAGSOUP;
+    /** The default parser: TAGSOUP if available, NU if available, {@code null} otherwise. */
+    public static final Parser DEFAULT;
+    static {
+      final HtmlOptions opts = new HtmlOptions();
+      DEFAULT = TAGSOUP.available(opts) ? TAGSOUP : NU.available(opts) ? NU : null;
+    }
 
     /** String representation. */
     private final String string;
     /** Required classes. */
     private final String[] classes;
-
-    /**
-     * Whether to fall back to XML if this parser is not available.
-     * @return result of check
-     */
-    public abstract boolean fallbackToXml();
 
     /**
      * Return a reader instance for this parser.
@@ -343,10 +331,11 @@ public final class HtmlParser extends XMLParser {
     }
 
     /**
-     * Returns the parser associated with the specified HTML options.
+     * Returns the parser associated with the specified HTML options, if any, or the specified
+     * default parser.
      * @param options HTML options.
-     * @param defaultParser default parser
-     * @return parser
+     * @param defaultParser default parser (can be {@code null})
+     * @return parser (can be {@code null})
      */
     public static Parser of(final HtmlOptions options, final Parser defaultParser) {
       return options.contains(METHOD) ? options.get(METHOD).parser : defaultParser;
