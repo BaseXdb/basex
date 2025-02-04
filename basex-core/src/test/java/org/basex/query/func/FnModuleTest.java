@@ -1313,6 +1313,20 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void htmlDoc() {
+    final Function func = HTML_DOC;
+    query(func.args(" ()"), "");
+    query(func.args(" []"), "");
+    query(func.args(" <_/>/text()"), "");
+
+    final String path = "src/test/resources/input.html";
+    query(func.args(path) + "//Q{http://www.w3.org/1999/xhtml}body ! name()", "body");
+    query(func.args(path, " {'method': 'tagsoup', 'nons': false()}")
+        + "//Q{http://www.w3.org/1999/xhtml}body ! name()", "body");
+    query(func.args(path, " {'method': 'tagsoup'}") + "//body ! name()", "body");
+  }
+
+  /** Test method. */
   @Test public void id() {
     final Function func = ID;
     final String doc = "<foo xml:id=\"a1\" x=\"x\"><bar xml:id=\"a1\" y=\"y\"/></foo>";
