@@ -1,5 +1,7 @@
 package org.basex.io.parse.csv;
 
+import static org.basex.query.value.type.SeqType.*;
+
 import java.io.*;
 
 import org.basex.build.csv.*;
@@ -12,6 +14,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -61,9 +64,8 @@ public abstract class CsvConverter extends Job {
    * Returns a CSV converter for the given configuration.
    * @param copts options
    * @return CSV converter
-   * @throws QueryException query exception
    */
-  public static CsvConverter get(final CsvParserOptions copts) throws QueryException {
+  public static CsvConverter get(final CsvParserOptions copts) {
     switch(copts.get(CsvOptions.FORMAT)) {
       case XQUERY:    return new CsvXQueryConverter(copts); // deprecated
       case W3:        return new CsvW3Converter(copts);
@@ -81,7 +83,19 @@ public abstract class CsvConverter extends Job {
     this.copts = copts;
     lax = copts.get(CsvOptions.LAX);
     attributes = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
-    skipEmpty = copts.get(CsvParserOptions.SKIP_EMPTY) && copts.get(CsvOptions.HEADER) != Bln.FALSE;
+    final Value header = copts.get(CsvOptions.HEADER);
+    skipEmpty = copts.get(CsvParserOptions.SKIP_EMPTY) && header != Bln.FALSE;
+    if(STRING_ZM.instance(header)) {
+      final TokenSet names = new TokenSet();
+      try {
+        for(final Item columnName : header) {
+          final byte[] token = columnName.string(null);
+          header(names.add(token) ? token : Token.EMPTY);
+        }
+      } catch(final QueryException ex) {
+        throw Util.notExpected(ex);
+      }
+    }
   }
 
   /**

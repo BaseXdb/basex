@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -71,10 +72,17 @@ public abstract class ParseCsv extends ParseFn {
     toOptions(arg(1), copts, qc);
 
     // transfer to common CSV options instance
-    final CsvParserOptions cpopts = format == CsvFormat.W3 || format == CsvFormat.W3_XML ?
-      ((CsvW3Options) copts).finish(info, format) : format == CsvFormat.W3_ARRAYS ?
-      ((CsvW3ArraysOptions) copts).finish(info, format) :
-      (CsvParserOptions) copts;
+    final CsvParserOptions cpopts;
+    if(format == CsvFormat.W3 || format == CsvFormat.W3_XML || format == CsvFormat.W3_ARRAYS) {
+      cpopts = ((CsvW3ArraysOptions) copts).finish(info, format);
+    } else {
+      cpopts = (CsvParserOptions) copts;
+      final Value hdr = copts.get(CsvOptions.HEADER);
+      if(hdr instanceof Str) {
+        final Boolean b = Strings.toBoolean(string(((Str) hdr).string()));
+        if(b != null) copts.put(CsvOptions.HEADER, Bln.get(b));
+      }
+    }
     if(format != null) cpopts.set(CsvOptions.FORMAT, format);
 
     // convert data

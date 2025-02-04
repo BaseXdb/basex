@@ -38,16 +38,7 @@ public final class CsvW3Converter extends CsvXQueryConverter {
     final XQMap map = (XQMap) super.finish(ii, qc);
     Value columns = copts.get(CsvOptions.HEADER);
     if(SeqType.BOOLEAN_O.instance(columns)) {
-      final Value names = map.get(CsvXQueryConverter.NAMES).atomValue(qc, ii);
-      if(copts.get(CsvOptions.TRIM_WHITESPACE)) {
-        columns = names;
-      } else {
-        final ValueBuilder vb = new ValueBuilder(qc);
-        for(final Item name : names) {
-          vb.add(Str.get(Token.trim(name.string(ii))));
-        }
-        columns = vb.value();
-      }
+      columns = map.get(CsvXQueryConverter.NAMES).atomValue(qc, ii);
     }
     final MapBuilder columnIndexBuilder = new MapBuilder();
     int i = 0;
