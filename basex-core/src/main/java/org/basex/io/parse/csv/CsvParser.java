@@ -169,7 +169,7 @@ public final class CsvParser {
   private void record(final TokenBuilder entry, final boolean lastRow, final boolean lastField)
       throws IOException {
     final byte[] next = entry.next();
-    final byte[] field = trimWhitespace ? Token.trim(next) : next;
+    final byte[] field = trimWhitespace || !data ? Token.trim(next) : next;
     if(field.length > 0 || !(first && lastField)) fields.add(field);
     if(lastField && !(lastRow && fields.isEmpty())) {
       if(data) conv.record();

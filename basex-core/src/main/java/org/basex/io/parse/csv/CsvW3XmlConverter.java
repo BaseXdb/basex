@@ -2,12 +2,9 @@ package org.basex.io.parse.csv;
 
 import org.basex.build.csv.*;
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * This class converts CSV data to XML according to the rules of fn:csv-to-xml.
@@ -41,18 +38,9 @@ public class CsvW3XmlConverter extends CsvConverter {
   /**
    * Constructor.
    * @param copts CSV options
-   * @throws QueryException query exception
    */
-  public CsvW3XmlConverter(final CsvParserOptions copts) throws QueryException {
+  public CsvW3XmlConverter(final CsvParserOptions copts) {
     super(copts);
-    final TokenSet names = new TokenSet();
-    final Value columns = copts.get(CsvOptions.HEADER);
-    if(!SeqType.BOOLEAN_O.instance(columns)) {
-      for(final Item columnName : columns) {
-        final byte[] token = columnName.string(null);
-        header(names.add(token) ? token : Token.EMPTY, false);
-      }
-    }
   }
 
   @Override
@@ -64,16 +52,7 @@ public class CsvW3XmlConverter extends CsvConverter {
 
   @Override
   public final void header(final byte[] value) {
-    header(value, true);
-  }
-
-  /**
-   * Adds a new header.
-   * @param value header value
-   * @param trim whether to trim the header value
-   */
-  public final void header(final byte[] value, final boolean trim) {
-    headers.add(shared.token(trim ? Token.trim(value) : value));
+    headers.add(shared.token(value));
   }
 
   @Override
