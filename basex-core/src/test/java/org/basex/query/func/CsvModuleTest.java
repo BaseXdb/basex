@@ -65,6 +65,28 @@ public final class CsvModuleTest extends SandboxTest {
     parse(" ' \" X\"'", "'quotes': true()", "<csv><record><entry> \" X\"</entry></record></csv>");
     parse(" '\"X \" '", "'quotes': true()", "<csv><record><entry>X  </entry></record></csv>");
 
+    parse("X\nY", "'header': false(), 'format': 'direct'", "...<record><entry>X</entry></record>");
+    parse("X\nY", "'header': 'no', 'format': 'direct'", "...<record><entry>X</entry></record>");
+    parse("X\nY", "'header': '0', 'format': 'direct'", "...<record><entry>X</entry></record>");
+    parse("X\nY", "'header': true(), 'format': 'direct'", "<csv><record><X>Y</X></record></csv>");
+    parse("X\nY", "'header': 'yes', 'format': 'direct'", "<csv><record><X>Y</X></record></csv>");
+    parse("X\nY", "'header': '1', 'format': 'direct'", "<csv><record><X>Y</X></record></csv>");
+    parse("X\nY", "'header': '01', 'format': 'direct'", "...<record><_01>X</_01></record>");
+    parse("X\nY", "'header': '1.0', 'format': 'direct'", "...<record><_1.0>X</_1.0></record>");
+    parse("X\nY", "'header': ('yes', 'no'), 'format': 'direct'", "...<yes>X</yes>");
+    parse("X\nY", "'header': ' h ', 'format': 'direct'", "...<h>X</h>");
+
+    parse("X\nY", "'header': false(), 'format': 'attributes'", "...<entry>X</entry>");
+    parse("X\nY", "'header': 'no', 'format': 'attributes'", "...<record><entry>X</entry></record>");
+    parse("X\nY", "'header': '0', 'format': 'attributes'", "...<record><entry>X</entry></record>");
+    parse("X\nY", "'header': true(), 'format': 'attributes'", "...<entry name=\"X\">Y</entry>");
+    parse("X\nY", "'header': 'yes', 'format': 'attributes'", "...<entry name=\"X\">Y</entry>");
+    parse("X\nY", "'header': '1', 'format': 'attributes'", "...<entry name=\"X\">Y</entry>");
+    parse("X\nY", "'header': '01', 'format': 'attributes'", "...<entry name=\"01\">Y</entry>");
+    parse("X\nY", "'header': '1.0', 'format': 'attributes'", "...<entry name=\"1.0\">Y</entry>");
+    parse("X\nY", "'header': ('yes', 'no'), 'format': 'attributes'", "...name=\"yes\">Y<");
+    parse("X\nY", "'header': ' h ', 'format': 'attributes'", "...<entry name=\" h \">Y</entry>");
+
     parseError("", "'x': 'y'");
     parseError("", "'format': 'abc'");
     parseError("", "'separator': ''");
@@ -73,9 +95,20 @@ public final class CsvModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void parseXQuery() {
-    parse("X\nY", "'header': false(), 'format': 'xquery'", "...[\"X\"],[\"Y\"]");
-    parse("X\nY", "'header': false(), 'format': 'xquery'", "...\"records\":([\"X\"],[\"Y\"])");
+    parse("X\nY", "'header': false(), 'format': 'xquery'", "{\"records\":([\"X\"],[\"Y\"])}");
+    parse("X\nY", "'header': 'no', 'format': 'xquery'", "{\"records\":([\"X\"],[\"Y\"])}");
+    parse("X\nY", "'header': '0', 'format': 'xquery'", "{\"records\":([\"X\"],[\"Y\"])}");
     parse("X\nY", "'header': true(), 'format': 'xquery'", "...\"names\":[\"X\"]");
+    parse("X\nY", "'header': 'yes', 'format': 'xquery'", "...\"names\":[\"X\"]");
+    parse("X\nY", "'header': '1', 'format': 'xquery'", "...\"names\":[\"X\"]");
+    parse("X\nY", "'header': '01', 'format': 'xquery'", "{\"names\":[\"01\"],"
+        + "\"records\":([\"X\"],[\"Y\"])}");
+    parse("X\nY", "'header': '1.0', 'format': 'xquery'", "{\"names\":[\"1.0\"],"
+        + "\"records\":([\"X\"],[\"Y\"])}");
+    parse("X\nY", "'header': ('yes', 'no'), 'format': 'xquery'", "{\"names\":[\"yes\",\"no\"],"
+        + "\"records\":([\"X\"],[\"Y\"])}");
+    parse("X\nY", "'header': ' h ' , 'format': 'xquery'", "{\"names\":[\" h \"],"
+        + "\"records\":([\"X\"],[\"Y\"])}");
 
     parse("", "'format': 'xquery'", "{\"records\":()}");
                               // was: "{\"records\":()}");
@@ -98,6 +131,23 @@ public final class CsvModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void serializeXml() {
+    final String xml = "<csv><record><entry name='X'>Y</entry></record></csv>";
+    serial(xml, "'header': false()", "Y\n");
+    serial(xml, "'header': 'no'", "Y\n");
+    serial(xml, "'header': '0'", "Y\n");
+    serial(xml, "'header': true()", "entry\nY\n");
+    serial(xml, "'header': 'yes'", "entry\nY\n");
+    serial(xml, "'header': '1'", "entry\nY\n");
+    serial(xml, "'header': 'x'", "Y\n");
+
+    serial(xml, "'format': 'attributes', 'header': false()", "Y\n");
+    serial(xml, "'format': 'attributes', 'header': 'no'", "Y\n");
+    serial(xml, "'format': 'attributes', 'header': '0'", "Y\n");
+    serial(xml, "'format': 'attributes', 'header': true()", "X\nY\n");
+    serial(xml, "'format': 'attributes', 'header': 'yes'", "X\nY\n");
+    serial(xml, "'format': 'attributes', 'header': '1'", "X\nY\n");
+    serial(xml, "'format': 'attributes', 'header': 'x'", "Y\n");
+
     serial("<csv><record><A__>1</A__></record></csv>", "'header': true(), 'lax': false()",
         "A_\n1\n");
     serial("<csv><record><_>1</_></record></csv>", "'header': true(), 'lax': false()", "\n1\n");
@@ -156,6 +206,15 @@ public final class CsvModuleTest extends SandboxTest {
         "'header': true(), 'format': 'xquery'", "A,B\n");
     serial(" map { 'names': [ 'A' ], 'records': [ '1' ] }",
         "'header': true(), 'format': 'xquery'", "A\n1\n");
+
+    final String map = "{'names': ['A', 'B'], 'records': (['X'], ['Y'])}";
+    serial(map, "'format': 'xquery', 'header': false()", "X\nY\n");
+    serial(map, "'format': 'xquery', 'header': 'no'", "X\nY\n");
+    serial(map, "'format': 'xquery', 'header': '0'", "X\nY\n");
+    serial(map, "'format': 'xquery', 'header': true()", "A,B\nX\nY\n");
+    serial(map, "'format': 'xquery', 'header': 'yes'", "A,B\nX\nY\n");
+    serial(map, "'format': 'xquery', 'header': '1'", "A,B\nX\nY\n");
+    serial(map, "'format': 'xquery', 'header': ('C', 'D')", "X\nY\n");
   }
 
   /**
