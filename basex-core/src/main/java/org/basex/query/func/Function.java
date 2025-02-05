@@ -350,7 +350,7 @@ public enum Function implements AFunction {
       params(TIME_ZO), INTEGER_ZO),
   /** XQuery function. */
   HTML_DOC(FnHtmlDoc::new, "html-doc(source[,options])",
-      params(STRING_ZO, MAP_O), DOCUMENT_NODE_ZO, flag(NDT)),
+      params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   ID(FnId::new, "id(values[,node])",
       params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
