@@ -191,7 +191,7 @@ public class DBNode extends ANode {
       final String base = Token.string(data.text(pre, true));
       if(data.inMemory()) {
         final String path = data.meta.original;
-        return Token.token(path.isEmpty() ? base : IO.get(path).merge(base).url());
+        return Token.token(path.isEmpty() ? base : IO.get(path).url());
       }
       return Token.concat('/', data.meta.name, '/', base);
     }
