@@ -74,13 +74,13 @@ public abstract class ContextFn extends StandardFunc {
   public final Expr inline(final InlineContext ic) throws QueryException {
     // try to inline arguments
     final Expr[] args = args();
-    Expr expr = ic.inline(args) ? this : null;
+    Expr inlined = ic.inline(args) ? this : null;
     // create new expression with inlined context value
     if(ic.var == null && !(ic.expr instanceof ContextValue) && contextAccess()) {
       // $v ! string()  ->  string($v)
-      expr = definition.get(info, ExprList.concat(args, ic.copy()));
+      inlined = definition.get(info, ExprList.concat(args, ic.copy()));
     }
-    return expr != null ? expr.optimize(ic.cc) : null;
+    return inlined != null ? inlined.optimize(ic.cc) : null;
   }
 
   /**

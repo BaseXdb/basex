@@ -103,10 +103,10 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public FTExpr inline(final InlineContext ic) throws QueryException {
-    final boolean anyInlined = ic.inline(exprs);
+    final boolean changed = ic.inline(exprs);
     final Expr inlined = win.inline(ic);
     if(inlined != null) win = inlined;
-    return anyInlined || inlined != null ? optimize(ic.cc) : null;
+    return changed || inlined != null ? optimize(ic.cc) : null;
   }
 
   @Override

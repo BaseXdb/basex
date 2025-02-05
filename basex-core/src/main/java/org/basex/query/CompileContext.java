@@ -322,12 +322,12 @@ public final class CompileContext {
 
   /**
    * Creates an error function instance.
-   * @param qe exception to be raised
+   * @param ex exception to be raised
    * @param expr expression that caused the error message
    * @return function
    */
-  public StandardFunc error(final QueryException qe, final Expr expr) {
-    return FnError.get(qe, expr.seqType());
+  public StandardFunc error(final QueryException ex, final Expr expr) {
+    return FnError.get(ex, expr.seqType());
   }
 
   /**

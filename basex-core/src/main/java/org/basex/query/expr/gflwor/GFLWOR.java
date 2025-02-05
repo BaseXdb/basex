@@ -98,14 +98,14 @@ public final class GFLWOR extends ParseExpr {
     final ListIterator<Clause> iter = clauses.listIterator();
     try {
       while(iter.hasNext()) iter.next().compile(cc);
-    } catch(final QueryException qe) {
+    } catch(final QueryException ex) {
       iter.remove();
-      clauseError(qe, iter, cc);
+      clauseError(ex, iter, cc);
     }
     try {
       rtrn = rtrn.compile(cc);
-    } catch(final QueryException qe) {
-      clauseError(qe, iter, cc);
+    } catch(final QueryException ex) {
+      clauseError(ex, iter, cc);
     }
     return optimize(cc);
   }
@@ -1014,9 +1014,9 @@ public final class GFLWOR extends ParseExpr {
           iter.set((Clause) inlined);
           changed = true;
         }
-      } catch(final QueryException qe) {
+      } catch(final QueryException ex) {
         iter.remove();
-        return clauseError(qe, iter, ic.cc);
+        return clauseError(ex, iter, ic.cc);
       }
     }
 
@@ -1026,8 +1026,8 @@ public final class GFLWOR extends ParseExpr {
         rtrn = inlined;
         changed = true;
       }
-    } catch(final QueryException qe) {
-      return clauseError(qe, iter, ic.cc);
+    } catch(final QueryException ex) {
+      return clauseError(ex, iter, ic.cc);
     }
 
     return changed;
@@ -1035,13 +1035,13 @@ public final class GFLWOR extends ParseExpr {
 
   /**
    * Tries to recover from a compile-time exception inside a FLWOR clause.
-   * @param qe thrown exception
+   * @param ex thrown exception
    * @param iter iterator positioned where the failing clause was before
    * @param cc compilation context
    * @return {@code true} if the GFLWOR expression has to stay
    * @throws QueryException query exception if the whole expression fails
    */
-  private boolean clauseError(final QueryException qe, final ListIterator<Clause> iter,
+  private boolean clauseError(final QueryException ex, final ListIterator<Clause> iter,
       final CompileContext cc) throws QueryException {
 
     // check if an outer clause can prevent the error
@@ -1053,13 +1053,13 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        rtrn = cc.error(qe, rtrn);
+        rtrn = cc.error(ex, rtrn);
         return true;
       }
     }
 
     // error will always be thrown
-    throw qe;
+    throw ex;
   }
 
   @Override

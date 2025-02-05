@@ -34,8 +34,8 @@ public final class FnSortWith extends StandardFunc {
           if(diff != 0) return diff < 0 ? -1 : 1;
         }
         return 0;
-      } catch(final QueryException qe) {
-        throw new QueryRTException(qe);
+      } catch(final QueryException ex) {
+        throw new QueryRTException(ex);
       }
     };
 

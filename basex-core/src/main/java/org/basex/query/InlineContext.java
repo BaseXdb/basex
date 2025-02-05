@@ -118,9 +118,9 @@ public final class InlineContext {
       Expr inlined;
       try {
         inlined = exprs[e].inline(this);
-      } catch(final QueryException qe) {
-        if(!error) throw qe;
-        inlined = cc.error(qe, exprs[e]);
+      } catch(final QueryException ex) {
+        if(!error) throw ex;
+        inlined = cc.error(ex, exprs[e]);
       }
       if(inlined != null) {
         exprs[e] = inlined;

@@ -73,8 +73,8 @@ public final class Catch extends Single {
   public Catch compile(final CompileContext cc) {
     try {
       expr = expr.compile(cc);
-    } catch(final QueryException qe) {
-      expr = cc.error(qe, expr);
+    } catch(final QueryException ex) {
+      expr = cc.error(ex, expr);
     }
     return optimize(cc);
   }
@@ -87,13 +87,13 @@ public final class Catch extends Single {
   /**
    * Returns the value of the caught expression.
    * @param qc query context
-   * @param qe thrown exception
+   * @param ex caught exception
    * @return resulting item
    * @throws QueryException query exception
    */
-  Value value(final QueryContext qc, final QueryException qe) throws QueryException {
+  Value value(final QueryContext qc, final QueryException ex) throws QueryException {
     int i = 0;
-    for(final Value value : values(qe)) qc.set(vars[i++], value);
+    for(final Value value : values(ex)) qc.set(vars[i++], value);
     return expr.value(qc);
   }
 
@@ -113,28 +113,28 @@ public final class Catch extends Single {
       final Expr inlined = expr.inline(ic);
       if(inlined == null) return null;
       expr = inlined;
-    } catch(final QueryException qe) {
-      expr = ic.cc.error(qe, expr);
+    } catch(final QueryException ex) {
+      expr = ic.cc.error(ex, expr);
     }
     return this;
   }
 
   /**
    * Returns the catch expression with inlined exception values.
-   * @param qe caught exception
+   * @param ex caught exception
    * @param cc compilation context
    * @return expression
    * @throws QueryException query exception
    */
-  Expr inline(final QueryException qe, final CompileContext cc) throws QueryException {
+  Expr inline(final QueryException ex, final CompileContext cc) throws QueryException {
     if(expr instanceof Value) return expr;
 
-    Expr ex = expr;
+    Expr inlined = expr;
     int v = 0;
-    for(final Value value : values(qe)) {
-      ex = new InlineContext(vars[v++], value, cc).inline(ex);
+    for(final Value value : values(ex)) {
+      inlined = new InlineContext(vars[v++], value, cc).inline(inlined);
     }
-    return ex;
+    return inlined;
   }
 
   /**
@@ -154,19 +154,19 @@ public final class Catch extends Single {
 
   /**
    * Returns all error values.
-   * @param qe exception
+   * @param ex caught exception
    * @return values
    * @throws QueryException query exception
    */
-  private static Value[] values(final QueryException qe) throws QueryException {
-    final Str stack = qe.stackTrace();
+  private static Value[] values(final QueryException ex) throws QueryException {
+    final Str stack = ex.stackTrace();
     final Value[] values = {
-      qe.qname(),
-      Str.get(qe.getLocalizedMessage()),
-      qe.value() != null ? qe.value() : Empty.VALUE,
-      qe.file() != null ? Str.get(qe.file()) : Empty.VALUE,
-      qe.line() != 0 ? Int.get(qe.line()) : Empty.VALUE,
-      qe.column() != 0 ? Int.get(qe.column()) : Empty.VALUE,
+      ex.qname(),
+      Str.get(ex.getLocalizedMessage()),
+      ex.value() != null ? ex.value() : Empty.VALUE,
+      ex.file() != null ? Str.get(ex.file()) : Empty.VALUE,
+      ex.line() != 0 ? Int.get(ex.line()) : Empty.VALUE,
+      ex.column() != 0 ? Int.get(ex.column()) : Empty.VALUE,
       stack,
       stack,
       null
@@ -184,12 +184,12 @@ public final class Catch extends Single {
 
   /**
    * Returns a map with all catch values.
-   * @param qe exception
+   * @param ex caught exception
    * @return values
    * @throws QueryException query exception
    */
-  public static XQMap map(final QueryException qe) throws QueryException {
-    final Value[] values = values(qe);
+  public static XQMap map(final QueryException ex) throws QueryException {
+    final Value[] values = values(ex);
     final int vl = values.length;
     final MapBuilder map = new MapBuilder(vl);
     for(int v = 0; v < vl; v++) map.put(STRINGS[v], values[v]);
@@ -240,11 +240,11 @@ public final class Catch extends Single {
 
   /**
    * Checks if one of the specified errors match the thrown error.
-   * @param qe thrown error
+   * @param ex caught exception
    * @return result of check
    */
-  boolean matches(final QueryException qe) {
-    final QNm name = qe.qname();
+  boolean matches(final QueryException ex) {
+    final QNm name = ex.qname();
     for(final Test test : tests) {
       if(test instanceof KindTest || ((NameTest) test).matches(name)) return true;
     }

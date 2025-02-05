@@ -69,15 +69,15 @@ public final class SwitchGroup extends Arr {
 
   @Override
   public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
-    Expr ex = rtrn();
+    Expr rtrn = rtrn();
     try {
-      ex = tc.check(ex, cc);
-    } catch(final QueryException qe) {
-      ex = cc.error(qe, ex);
+      rtrn = tc.check(rtrn, cc);
+    } catch(final QueryException ex) {
+      rtrn = cc.error(ex, rtrn);
     }
     // returned expression will be handled Switch#typeCheck
-    if(ex == null) return null;
-    exprs[0] = ex;
+    if(rtrn == null) return null;
+    exprs[0] = rtrn;
     return optimize(cc);
   }
 

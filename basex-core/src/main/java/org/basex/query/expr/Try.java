@@ -120,16 +120,16 @@ public final class Try extends Single {
         expr = inlined;
         changed = true;
       }
-    } catch(final QueryException qe) {
-      if(!qe.isCatchable()) throw qe;
+    } catch(final QueryException ex) {
+      if(!ex.isCatchable()) throw ex;
       for(final Catch ctch : catches) {
-        if(ctch.matches(qe)) {
+        if(ctch.matches(ex)) {
           // found a matching clause, inline variable and error message
           final Catch ct = ctch.inline(ic);
-          return cc.replaceWith(this, (ct == null ? ctch : ct).inline(qe, cc));
+          return cc.replaceWith(this, (ct == null ? ctch : ct).inline(ex, cc));
         }
       }
-      throw qe;
+      throw ex;
     }
 
     for(final Catch ctch : catches) {

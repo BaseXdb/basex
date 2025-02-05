@@ -29,8 +29,8 @@ public final class HofTopKBy extends StandardFunc {
       try {
         if(!item1.comparable(item2)) throw compareError(item1, item2, info);
         return item1.compare(item2, null, true, info);
-      } catch(final QueryException qe) {
-        throw new QueryRTException(qe);
+      } catch(final QueryException ex) {
+        throw new QueryRTException(ex);
       }
     });
 
