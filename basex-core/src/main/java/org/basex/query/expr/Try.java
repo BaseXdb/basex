@@ -94,7 +94,10 @@ public final class Try extends Single {
     } catch(final QueryException ex) {
       if(ex.isCatchable()) {
         for(final Catch ctch : catches) {
-          if(ctch.matches(ex)) return ctch.value(qc, ex);
+          if(ctch.matches(ex)) {
+            Util.debug(ex);
+            return ctch.value(qc, ex);
+          }
         }
       }
       throw ex;
