@@ -249,7 +249,7 @@ public final class QT3TS extends Main {
     boolean base = true;
     if(env == null) {
       final String e = asString("*:environment[1]/@ref", test);
-      if(!e.isEmpty()) {
+      if(!e.isEmpty() && !e.equals("empty")) {
         // check if environment is defined in test-set
         env = envs(envs, e);
         // check if environment is defined in catalog
@@ -739,8 +739,9 @@ public final class QT3TS extends Main {
       options.add("'" + DeepEqualOptions.NAMESPACE_PREFIXES.name() + "':" + !ignorePrefixes + "()");
       options.add("'" + DeepEqualOptions.COMMENTS.name() + "':true()");
       options.add("'" + DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "':true()");
-      final String query = Function.DEEP_EQUAL.args(" <X>" + expctd + "</X>",
-          " <X>" + rslt + "</X>", " { " + String.join(", ", options) + " }");
+      final String query = "declare boundary-space preserve;\n"
+          + Function.DEEP_EQUAL.args(" <X>" + expctd.trim() + "</X>", " <X>" + rslt.trim() + "</X>",
+          " { " + String.join(", ", options) + " }");
       return asBoolean(query, expected) ? null : expctd;
     } catch(final IOException ex) {
       return Util.info("% (found: %)", expctd, ex);
