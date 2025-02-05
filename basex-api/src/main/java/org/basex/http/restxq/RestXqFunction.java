@@ -247,8 +247,11 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind errors
-    final XQMap errors = Catch.map((QueryException) ext);
-    for(final WebParam rxp : errorParams) bind(rxp, args, errors.get(Str.get(rxp.name)), qc);
+    final XQMap errors = ext instanceof QueryException ? Catch.map((QueryException) ext) :
+      XQMap.empty();
+    for(final WebParam rxp : errorParams) {
+      bind(rxp, args, errors.get(Str.get(rxp.name)), qc);
+    }
 
     // bind permission information
     if(ext instanceof RestXqFunction && permission.var != null) {
@@ -394,15 +397,14 @@ public final class RestXqFunction extends WebFunction {
    * Binds the specified parameter to a variable.
    * @param param parameter
    * @param args argument array
-   * @param value values to be bound; the parameter's default value is assigned
-   *        if the argument is {@code null} or empty
+   * @param value values to be bound; the default value is assigned if the argument is empty
    * @param qc query context
    * @throws QueryException query exception
    */
   private void bind(final WebParam param, final Expr[] args, final Value value,
       final QueryContext qc) throws QueryException {
-    bind(param.var, args, value == null || value.isEmpty() ? param.value : value, qc,
-      "Value of \"" + param.name + '"');
+    bind(param.var, args, value.isEmpty() ? param.value : value, qc,
+      "Value of '" + param.name + "'");
   }
 
   /**

@@ -192,7 +192,7 @@ public final class Catch extends Single {
     final Value[] values = values(qe);
     final int vl = values.length;
     final MapBuilder map = new MapBuilder(vl);
-    for(int v = 0; v < vl; v++) map.put(QNAMES[v], values[v]);
+    for(int v = 0; v < vl; v++) map.put(STRINGS[v], values[v]);
     return map.map();
   }
 
