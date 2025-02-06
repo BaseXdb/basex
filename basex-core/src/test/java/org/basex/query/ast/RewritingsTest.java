@@ -3341,4 +3341,16 @@ public final class RewritingsTest extends SandboxTest {
     execute(new Add("4.xml", "<d/>"));
     query("db:get('" + NAME + "1'), db:get('" + NAME + "2')", "<a/>\n<b/>\n<c/>\n<d/>");
   }
+
+  /** Recursive function items: Typing. */
+  @Test public void gh2314() {
+    query("declare function local:f($p) as xs:integer {"
+        + " if($p < 100000) then local:f($p + 1) else $p"
+        + "};"
+        + "local:f(1)", 100000);
+     query("let $f := fn($p, $self) as xs:integer {"
+        + " if($p < 100000) then $self($p + 1, $self) else $p"
+        + "}"
+        + "return $f(1, $f)", 100000);
+  }
 }
