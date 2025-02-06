@@ -499,7 +499,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
   PARSE_HTML(FnParseHtml::new, "parse-html(html[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_O), DOCUMENT_NODE_ZO),
+      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO),
   /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
       params(STRING_ZO, INTEGER_ZO), INTEGER_ZO),
@@ -1179,7 +1179,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _CSV_DOC(CsvDoc::new, "doc(source[,options])",
-      params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), CSV_URI),
+      params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), CSV_URI, Perm.CREATE),
   /** XQuery function. */
   _CSV_PARSE(CsvParse::new, "parse(value[,options])",
       params(STRING_ZO, MAP_ZO), ITEM_ZO, CSV_URI),
@@ -1326,19 +1326,19 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _FETCH_BINARY(FetchBinary::new, "binary(source)",
-      params(STRING_O), BASE64_BINARY_O, flag(NDT), FETCH_URI),
+      params(STRING_O), BASE64_BINARY_O, flag(NDT), FETCH_URI, Perm.CREATE),
   /** XQuery function. */
   _FETCH_BINARY_DOC(FetchBinaryDoc::new, "binary-doc(value[,options])",
       params(BINARY_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
   _FETCH_CONTENT_TYPE(FetchContentType::new, "content-type(source)",
-      params(STRING_O), STRING_O, flag(NDT), FETCH_URI),
+      params(STRING_O), STRING_O, flag(NDT), FETCH_URI, Perm.CREATE),
   /** XQuery function. */
   _FETCH_DOC(FetchDoc::new, "doc(source[,options])",
-      params(STRING_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI),
+      params(STRING_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI, Perm.CREATE),
   /** XQuery function. */
   _FETCH_TEXT(FetchText::new, "text(source[,encoding,fallback])",
-      params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FETCH_URI),
+      params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FETCH_URI, Perm.CREATE),
 
   // File Module
 
@@ -1515,7 +1515,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _HTML_DOC(HtmlDoc::new, "doc(source[,options])",
-      params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), HTML_URI),
+      params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), HTML_URI, Perm.CREATE),
   /** XQuery function. */
   _HTML_PARSE(HtmlParse::new, "parse(value[,options])",
       params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, HTML_URI),
@@ -1614,7 +1614,7 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _JSON_DOC(JsonDoc::new, "doc(source[,options])",
-      params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), JSON_URI),
+      params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), JSON_URI, Perm.CREATE),
   /** XQuery function. */
   _JSON_PARSE(JsonParse::new, "parse(value[,options])",
       params(STRING_ZO, MAP_ZO), ITEM_ZO, JSON_URI),
