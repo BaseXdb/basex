@@ -196,7 +196,6 @@ public final class User {
       final Entry<String, Perm> entry = find(db);
       if(entry != null) return entry.getValue();
     }
-    Util.stack(8);
     return perm;
   }
 
