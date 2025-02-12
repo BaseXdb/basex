@@ -2175,6 +2175,12 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("<a/>") + "/*[1][self::a]", "<a/>");
     query(func.args("<a/>") + "/*[1][not(child::node())]", "<a/>");
     query(func.args("<a/>") + "/*[1][self::a][not(child::node())]", "<a/>");
+    query(func.args("<x> <y> </y> </x>"), "<x> <y> </y> </x>");
+    query(func.args("<x> <y> </y> </x>", " {'strip-space': false()}"), "<x> <y> </y> </x>");
+    query(func.args("<x> <y> </y> </x>", " {'strip-space': true()}"), "<x><y/></x>");
+    query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': false()}"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': true()}"), "<doc/>");
   }
 
   /** Test method. */
