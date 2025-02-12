@@ -105,7 +105,7 @@ public final class QueryStack {
    * @return bound value
    */
   public Value get(final Var var) {
-    return stack[start + var.slot];
+    return var.slot == -1 ? null : stack[start + var.slot];
   }
 
   /**
@@ -119,21 +119,6 @@ public final class QueryStack {
     final int pos = start + var.slot;
     stack[pos] = var.checkType(value, qc, null);
     vars[pos] = var;
-  }
-
-  /**
-   * Creates a dump of the current variable stack.
-   * @return string dump
-   */
-  public String dump() {
-    final TokenBuilder tb = new TokenBuilder().add(QueryText.DEBUG_LOCAL).add(':');
-    for(int i = end; --i >= 0;) {
-      if(vars[i] != null) {
-        tb.add(Prop.NL).add("  $").add(vars[i].name).add(" := ").add(stack[i]);
-        if(i == start && i > 0) tb.add(Prop.NL).add(QueryText.DEBUG_GLOBAL).add(':');
-      }
-    }
-    return tb.toString();
   }
 
   @Override
