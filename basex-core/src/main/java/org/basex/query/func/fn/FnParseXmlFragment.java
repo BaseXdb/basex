@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.build.Parser;
 import org.basex.build.xml.*;
@@ -52,10 +53,21 @@ public class FnParseXmlFragment extends StandardFunc {
     final String baseURI = options.contains(ParseXmlFragmentOptions.BASE_URI)
         ? options.get(ParseXmlFragmentOptions.BASE_URI) : string(info.sc().baseURI().string());
     final IO io = new IOContent(value, baseURI);
-    final MainOptions mainOpts = new MainOptions();
-    mainOpts.set(MainOptions.STRIPWS, options.get(ParseXmlFragmentOptions.STRIP_SPACE));
+
+    final MainOptions mainOpts = new MainOptions(qc.context.options, true);
+    Map.of(ParseXmlFragmentOptions.STRIP_SPACE, MainOptions.STRIPWS,
+        ParseXmlFragmentOptions.INTPARSE, MainOptions.INTPARSE,
+        ParseXmlFragmentOptions.STRIPNS, MainOptions.STRIPNS,
+        ParseXmlFragmentOptions.DTD, MainOptions.DTD,
+        ParseXmlFragmentOptions.XINCLUDE, MainOptions.XINCLUDE).forEach((opt, mainOpt) -> {
+        if(options.contains(opt)) mainOpts.set(mainOpt, options.get(opt));
+    });
+    if(options.contains(ParseXmlFragmentOptions.CATALOG))
+      mainOpts.set(MainOptions.CATALOG, options.get(ParseXmlFragmentOptions.CATALOG));
+
     try {
-      return new DBNode(frag ? new XMLParser(io, mainOpts, true) : Parser.xmlParser(io, mainOpts));
+      return new DBNode(frag || mainOpts.get(MainOptions.INTPARSE) ?
+          new XMLParser(io, mainOpts, true) : Parser.xmlParser(io, mainOpts));
     } catch(final IOException ex) {
       final QueryException qe = SAXERR_X.get(info, ex);
       final Throwable th = ex.getCause();
@@ -72,5 +84,16 @@ public class FnParseXmlFragment extends StandardFunc {
     public static final StringOption BASE_URI = new StringOption("base-uri");
     /** Remove whitespace-only text nodes. */
     public static final BooleanOption STRIP_SPACE = new BooleanOption("strip-space", false);
+
+    /** Use internal XML parser (default: {@code qc.context.options.get(MainOptions.INTPARSE)}). */
+    public static final BooleanOption INTPARSE = new BooleanOption("int-parse");
+    /** Strip namespaces (default: {@code qc.context.options.get(MainOptions.STRIPNS)}). */
+    public static final BooleanOption STRIPNS = new BooleanOption("strip-ns");
+    /** Flag for parsing DTDs (default: {@code qc.context.options.get(MainOptions.DTD)}). */
+    public static final BooleanOption DTD = new BooleanOption("dtd");
+    /** Flag for using XInclude (default: {@code qc.context.options.get(MainOptions.XINCLUDE)}). */
+    public static final BooleanOption XINCLUDE = new BooleanOption("xinclude");
+    /** Path to XML Catalog file (default: {@code qc.context.options.get(MainOptions.CATALOG)}). */
+    public static final StringOption CATALOG = new StringOption("catalog");
   }
 }
