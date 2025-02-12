@@ -21,7 +21,7 @@ import org.basex.util.hash.*;
  */
 public final class VarScope {
   /** Local variables in this scope. */
-  private final ArrayList<Var> vars = new ArrayList<>();
+  public final ArrayList<Var> vars = new ArrayList<>();
 
   /**
    * Adds a variable to this scope.

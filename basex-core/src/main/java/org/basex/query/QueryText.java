@@ -404,7 +404,6 @@ public interface QueryText {
   /** Serialization. */ byte[] MAP_STRING = token("map-string");
 
   /** Debugging info. */ String DEBUG_LOCAL = "Local Variables";
-  /** Debugging info. */ String DEBUG_GLOBAL = "Global Variables";
 
   /** Java prefix. */ String JAVA_PREFIX_COLON = "java:";
   /** Java keyword: new. */ String NEW = "new";
