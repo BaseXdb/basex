@@ -111,14 +111,14 @@ public abstract class Logical extends Arr {
           exprs[e] = inlined;
           changed = true;
         }
-      } catch(final QueryException qe) {
+      } catch(final QueryException ex) {
         // first expression is evaluated eagerly
-        if(e == 0) throw qe;
+        if(e == 0) throw ex;
 
         // everything behind the error is dead anyway
         final Expr[] nw = new Expr[e + 1];
         Array.copy(exprs, e, nw);
-        nw[e] = ic.cc.error(qe, exprs[e]);
+        nw[e] = ic.cc.error(ex, exprs[e]);
         exprs = nw;
         changed = true;
         break;

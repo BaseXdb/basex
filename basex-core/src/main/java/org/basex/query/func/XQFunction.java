@@ -31,9 +31,12 @@ public interface XQFunction extends XQFunctionExpr {
       while(true) {
         qc.checkStop();
         final Value value = fn.invokeInternal(qc, info, values);
-        fn = qc.pollTailCall();
-        if(fn == null) return value;
-        values = qc.pollTailArgs();
+        if(qc.tcFunc == null) return value;
+        // call registered tail call function
+        fn = qc.tcFunc;
+        qc.tcFunc = null;
+        values = qc.tcArgs;
+        qc.tcArgs = null;
         qc.stack.reuseFrame(fn.stackFrameSize());
       }
     } catch(final QueryException ex) {
@@ -58,8 +61,9 @@ public interface XQFunction extends XQFunctionExpr {
     qc.checkStop();
     final int size = stackFrameSize();
     if(qc.tco && qc.stack.tco(size)) {
-      // too many tail calls on the stack, eliminate them
-      qc.registerTailCall(this, args);
+      // stack is full: register tail call function
+      qc.tcFunc = this;
+      qc.tcArgs = args;
       return Empty.VALUE;
     }
 

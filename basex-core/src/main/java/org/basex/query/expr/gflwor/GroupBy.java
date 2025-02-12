@@ -247,8 +247,8 @@ public final class GroupBy extends Clause {
   @Override
   public Clause inline(final InlineContext ic) throws QueryException {
     // inline both grouping specs and non-grouping variable expressions
-    final boolean a = ic.inline(specs), b = ic.inline(preExpr);
-    return a || b ? optimize(ic.cc) : null;
+    final boolean changed1 = ic.inline(specs), changed2 = ic.inline(preExpr);
+    return changed1 || changed2 ? optimize(ic.cc) : null;
   }
 
   @Override

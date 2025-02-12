@@ -1376,7 +1376,7 @@ public class QueryParser extends InputParser {
   private Condition windowCond(final boolean start) throws QueryException {
     skipWs();
     final InputInfo ii = info();
-    final Var var = current('$')             ? localVars.add(newVar(SeqType.ITEM_O))    : null;
+    final Var var = current('$')          ? localVars.add(newVar(SeqType.ITEM_O))    : null;
     final Var at  = wsConsumeWs(AT)       ? localVars.add(newVar(SeqType.INTEGER_O)) : null;
     final Var prv = wsConsumeWs(PREVIOUS) ? localVars.add(newVar(SeqType.ITEM_ZO))   : null;
     final Var nxt = wsConsumeWs(NEXT)     ? localVars.add(newVar(SeqType.ITEM_ZO))   : null;
@@ -3615,14 +3615,10 @@ public class QueryParser extends InputParser {
       if(tests == null) throw error(NOCATCH);
 
       final int s = localVars.openScope();
-      final int cl = Catch.QNAMES.length;
-      final Var[] vs = new Var[cl];
       final InputInfo ii = info();
-      for(int c = 0; c < cl; c++) {
-        vs[c] = localVars.add(new Var(Catch.QNAMES[c], Catch.TYPES[c], qc, ii));
-      }
-      final Catch c = new Catch(ii, vs, tests);
-      c.expr = enclosedExpr();
+      final Var[] vs = Catch.vars(qc, ii);
+      for(final Var var : vs) localVars.add(var);
+      final Catch c = new Catch(ii, enclosedExpr(), vs, tests);
       localVars.closeScope(s);
 
       catches = Array.add(catches, c);

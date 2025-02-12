@@ -136,8 +136,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     cc.pushScope(vs);
     try {
       expr = expr.compile(cc);
-    } catch(final QueryException qe) {
-      expr = cc.error(qe, expr);
+    } catch(final QueryException ex) {
+      expr = cc.error(ex, expr);
     } finally {
       cc.removeScope(this);
     }
@@ -187,8 +187,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       }
       // add all newly added bindings
       if(add != null) global.putAll(add);
-    } catch(final QueryException qe) {
-      expr = cc.error(qe, expr);
+    } catch(final QueryException ex) {
+      expr = cc.error(ex, expr);
     } finally {
       cc.removeScope(this);
     }
@@ -203,8 +203,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     if(global.isEmpty() && !cc.largeResult(expr)) {
       try {
         return cc.preEval(this);
-      } catch(final QueryException qe) {
-        expr = cc.error(qe, expr);
+      } catch(final QueryException ex) {
+        expr = cc.error(ex, expr);
       }
     }
     return this;

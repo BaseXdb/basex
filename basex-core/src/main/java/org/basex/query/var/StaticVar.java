@@ -51,9 +51,9 @@ public final class StaticVar extends StaticDecl {
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
-      } catch(final QueryException qe) {
-        if(!lazy) throw qe.notCatchable();
-        expr = cc.error(qe, expr);
+      } catch(final QueryException ex) {
+        if(!lazy) throw ex.notCatchable();
+        expr = cc.error(ex, expr);
       } finally {
         cc.removeScope(this);
         cc.qc.focus = focus;
@@ -82,9 +82,9 @@ public final class StaticVar extends StaticDecl {
       final QueryFocus focus = pushFocus(qc);
       try {
         super.value(qc);
-      } catch(final QueryException qe) {
-        if(lazy) qe.notCatchable();
-        throw qe;
+      } catch(final QueryException ex) {
+        if(lazy) ex.notCatchable();
+        throw ex;
       } finally {
         qc.focus = focus;
         dontEnter = false;

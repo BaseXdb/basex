@@ -246,8 +246,8 @@ public final class If extends Arr {
       Expr expr = exprs[e];
       try {
         expr = tc.check(expr, cc);
-      } catch(final QueryException qe) {
-        expr = cc.error(qe, expr);
+      } catch(final QueryException ex) {
+        expr = cc.error(ex, expr);
       }
       if(expr != null) {
         changed = true;

@@ -61,8 +61,8 @@ public final class HofTopKWith extends StandardFunc {
     return (item1, item2) -> {
       try {
         return test(comparator, args.set(0, item1).set(1, item2), qc) ? -1 : 1;
-      } catch(final QueryException qe) {
-        throw new QueryRTException(qe);
+      } catch(final QueryException ex) {
+        throw new QueryRTException(ex);
       }
     };
   }

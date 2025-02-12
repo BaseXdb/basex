@@ -226,9 +226,9 @@ public abstract class SimpleMap extends Mapping {
       if(inline) {
         try {
           return new InlineContext(null, expr, cc).inline(next);
-        } catch(final QueryException qe) {
+        } catch(final QueryException ex) {
           // replace original expression with error
-          return cc.error(qe, next);
+          return cc.error(ex, next);
         }
       }
     }

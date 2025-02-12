@@ -196,8 +196,8 @@ public class ArchiveCreate extends ArchiveFn {
       final byte[] value  = ((ANode) header).attribute(Q_LAST_MODIFIED);
       try {
         if(value != null) return toMs(new Dtm(value, info), qc);
-      } catch(final QueryException qe) {
-        Util.debug(qe);
+      } catch(final QueryException ex) {
+        Util.debug(ex);
         throw ARCHIVE_TIMESTAMP_X.get(info, value);
       }
     }

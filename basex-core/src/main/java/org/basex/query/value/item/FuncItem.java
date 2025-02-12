@@ -9,6 +9,7 @@ import java.util.function.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
@@ -241,13 +242,24 @@ public final class FuncItem extends FItem implements Scope {
           Expr cnd = cond, action = null;
           if(result.test(thn)) {
             // if(COND) then $result else ACTION
-            // -> if COND($result): break; else $result = ACTION($result, $value)
+            // -> if COND: return $result; else $result = ACTION
             action = els;
           } else if(result.test(els)) {
             // if(COND) then ACTION else $result
-            // -> if not(COND(result)): break; else $result = ACTION($result, $value)
-            action = thn;
+            // -> if not(COND): return $result; else $result = ACTION
             cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
+            action = thn;
+          } else if(cond instanceof CmpG) {
+            // if($result = ITEM) then ITEM else ACTION
+            // -> if COND: return $result; else $result = ACTION
+            final CmpG cmp = (CmpG) cond;
+            final Expr op1 = cmp.arg(0), op2 = cmp.arg(1);
+            final SeqType st1 = op1.seqType(), st2 = op2.seqType();
+            if(result.test(op1) && op2 instanceof Item && op2.equals(thn) &&
+              cmp.opG() == OpG.EQ && st1.eq(st2) && (
+              st1.instanceOf(SeqType.DECIMAL_O) || st1.instanceOf(SeqType.STRING_O))) {
+              action = els;
+            }
           }
           if(action != null) return new FuncItem[] {
             new FuncItem(info, cnd, params, anns, funcType(), stackSize, null, focus),

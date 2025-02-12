@@ -120,9 +120,9 @@ public abstract class Mapping extends Arr {
       Expr inlined;
       try {
         inlined = exprs[e].inline(ic);
-      } catch(final QueryException qe) {
+      } catch(final QueryException ex) {
         // replace original expression with error
-        inlined = cc.error(qe, exprs[e]);
+        inlined = cc.error(ex, exprs[e]);
       }
       if(inlined != null) {
         exprs[e] = inlined;
@@ -224,14 +224,14 @@ public abstract class Mapping extends Arr {
     if(!next.has(Flag.POS, Flag.HOF)) {
       final InlineContext ic = new InlineContext(null, expr, cc);
       if(ic.inlineable(next)) {
-        Expr ex;
+        Expr inlined;
         try {
-          ex = ic.inline(next);
-        } catch(final QueryException qe) {
+          inlined = ic.inline(next);
+        } catch(final QueryException ex) {
           // replace original expression with error
-          ex = cc.error(qe, next);
+          inlined = cc.error(ex, next);
         }
-        return ex;
+        return inlined;
       }
     }
     return null;

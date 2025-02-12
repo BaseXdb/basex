@@ -116,8 +116,8 @@ public final class Transform extends Copy {
 
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
-    final boolean a = ic.inline(copies), b = ic.inline(args());
-    return a || b ? optimize(ic.cc) : null;
+    final boolean changed1 = ic.inline(copies), changed2 = ic.inline(args());
+    return changed1 || changed2 ? optimize(ic.cc) : null;
   }
 
   @Override

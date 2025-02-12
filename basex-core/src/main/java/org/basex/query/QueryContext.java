@@ -99,9 +99,9 @@ public final class QueryContext extends Job implements Closeable {
   public boolean tco;
 
   /** Function for the next tail call. */
-  private XQFunction tcFunc;
+  public XQFunction tcFunc;
   /** Arguments for the next tail call. */
-  private Value[] tcArgs;
+  public Value[] tcArgs;
   /** Counter for variable IDs. */
   public int varIDs;
 
@@ -542,36 +542,6 @@ public final class QueryContext extends Job implements Closeable {
    */
   public void set(final Var var, final Value value) throws QueryException {
     stack.set(var, value, this);
-  }
-
-  /**
-   * Registers a tail-called function and its arguments to this query context.
-   * @param fn function to call
-   * @param args arguments to pass to {@code fn}
-   */
-  public void registerTailCall(final XQFunction fn, final Value[] args) {
-    tcFunc = fn;
-    tcArgs = args;
-  }
-
-  /**
-   * Returns and clears the currently registered tail-call function.
-   * @return function to call if present, {@code null} otherwise
-   */
-  public XQFunction pollTailCall() {
-    final XQFunction fn = tcFunc;
-    tcFunc = null;
-    return fn;
-  }
-
-  /**
-   * Returns and clears registered arguments of a tail-called function.
-   * @return argument values if a tail call was registered, {@code null} otherwise
-   */
-  public Value[] pollTailArgs() {
-    final Value[] args = tcArgs;
-    tcArgs = null;
-    return args;
   }
 
   /**

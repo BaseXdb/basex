@@ -320,22 +320,36 @@ public final class FuncItemTest extends SandboxTest {
     final String seq = "1 to 1000000000000000000";
 
     // return unchanged result
-    check("fold-left(" + seq + ", 456, fn($r, $i) { $r })", 456, root(Int.class));
+    check("fold-left (" + seq + ", 456, fn($r, $i) { $r })", 456, root(Int.class));
     check("fold-right(" + seq + ", 456, fn($i, $r) { $r })", 456, root(Int.class));
 
     // return constant value
-    check("fold-left(" + seq + ", 1, fn($r, $i) { 123 })", 123, root(Int.class));
+    check("fold-left (" + seq + ", 1, fn($r, $i) { 123 })", 123, root(Int.class));
     check("fold-right(" + seq + ", 1, fn($i, $r) { 123 })", 123, root(Int.class));
 
-    // exit if result will not change anymore
-    query("fold-left(" + seq + ", 1, fn($r, $i) { if($r < 100) then $r + $i else $r })",
+    // exit early if result will not change anymore
+    query("fold-left (" + seq + ", 1, fn($r, $i) { if($r < 100) then $r + $i else $r })",
         106);
-    query("fold-left(" + seq + ", 1, fn($r, $i) { if($r > 100) then $r + $i else $r })",
+    query("fold-left (" + seq + ", 1, fn($r, $i) { if($r > 100) then $r + $i else $r })",
         1);
     query("fold-right(" + seq + ", 1, fn($i, $r) { if($r < 10) then $r + $i else $r })",
         1000000000000000001L);
     query("fold-right(" + seq + ", 1, fn($i, $r) { if($r > 10) then $r else $r + $i })",
         1000000000000000001L);
+
+    query("fold-left (" + seq + ", 0, fn($r, $i) { if($r eq 10) then 10 else $r + $i })",
+        10);
+    query("fold-right(reverse(" + seq + "), 0, fn($i, $r) { if($r eq 10) then 10 else $r + $i })",
+        10);
+    query("fold-left (" + seq + ", 0, fn($r, $i) { if($r = 10) then 10 else $r + $i })",
+        10);
+    query("fold-right(reverse(" + seq + "), 0, fn($i, $r) { if($r = 10) then 10 else $r + $i })",
+        10);
+    query("fold-left (" + seq + ", '0', fn($r, $i) { if($r = '9') then '9' else string($i) })",
+        9);
+    query("fold-right(reverse(" + seq + "), '0', "
+        + "fn($i, $r) { if($r = '9') then '9' else string($i) })",
+        9);
 
     // bug fix
     query("fold-right(1 to 100000, 1, fn($a, $b) { if($b > 10000000) then $b else $a + $b })",

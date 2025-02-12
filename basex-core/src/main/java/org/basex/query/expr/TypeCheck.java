@@ -114,7 +114,8 @@ public final class TypeCheck extends Single {
       if(!st.occ.check(value.size())) throw typeError(value, st, info);
       return value;
     }
-    return st.coerce(value, null, qc, null, info);
+    // ignore type of result returned by tail call function
+    return qc.tcFunc != null ? value : st.coerce(value, null, qc, null, info);
   }
 
   @Override

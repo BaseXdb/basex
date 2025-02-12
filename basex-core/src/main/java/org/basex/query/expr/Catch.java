@@ -25,27 +25,27 @@ import org.basex.util.hash.*;
  */
 public final class Catch extends Single {
   /** Error Strings. */
-  public static final String[] NAMES = {
+  private static final String[] NAMES = {
     "code", "description", "value", "module",
     "line-number", "column-number", "additional", "stack-trace",
     "map"
   };
   /** Error types. */
-  public static final SeqType[] TYPES = {
+  private static final SeqType[] TYPES = {
     SeqType.QNAME_O, SeqType.STRING_ZO, SeqType.ITEM_ZM, SeqType.STRING_ZO,
     SeqType.INTEGER_ZO, SeqType.INTEGER_ZO, SeqType.STRING_O, SeqType.STRING_O,
     SeqType.MAP_O
   };
   /** Error QNames. */
-  public static final QNm[] QNAMES = new QNm[NAMES.length];
+  private static final QNm[] QNAMES = new QNm[NAMES.length];
   /** Error string items. */
-  public static final Str[] STRS = new Str[NAMES.length];
+  private static final Str[] STRINGS = new Str[NAMES.length];
 
   static {
     for(int n = NAMES.length - 1; n >= 0; n--) {
       final String name = NAMES[n];
       QNAMES[n] = qname(name);
-      STRS[n] = Str.get(name);
+      STRINGS[n] = Str.get(name);
     }
   }
 
@@ -57,21 +57,24 @@ public final class Catch extends Single {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
+   * @param expr expression
    * @param vars variables to be bound
    * @param tests error tests
    */
-  public Catch(final InputInfo info, final Var[] vars, final ArrayList<Test> tests) {
-    super(info, null, SeqType.ITEM_ZM);
+  public Catch(final InputInfo info, final Expr expr, final Var[] vars,
+      final ArrayList<Test> tests) {
+    super(info, expr, SeqType.ITEM_ZM);
     this.tests = tests;
     this.vars = vars;
+    this.expr = expr;
   }
 
   @Override
   public Catch compile(final CompileContext cc) {
     try {
       expr = expr.compile(cc);
-    } catch(final QueryException qe) {
-      expr = cc.error(qe, expr);
+    } catch(final QueryException ex) {
+      expr = cc.error(ex, expr);
     }
     return optimize(cc);
   }
@@ -84,14 +87,13 @@ public final class Catch extends Single {
   /**
    * Returns the value of the caught expression.
    * @param qc query context
-   * @param qe thrown exception
+   * @param ex caught exception
    * @return resulting item
    * @throws QueryException query exception
    */
-  Value value(final QueryContext qc, final QueryException qe) throws QueryException {
-    Util.debug(qe);
+  Value value(final QueryContext qc, final QueryException ex) throws QueryException {
     int i = 0;
-    for(final Value value : values(qe)) qc.set(vars[i++], value);
+    for(final Value value : values(ex)) qc.set(vars[i++], value);
     return expr.value(qc);
   }
 
@@ -100,11 +102,9 @@ public final class Catch extends Single {
     final int vl = QNAMES.length;
     final Var[] vrs = new Var[vl];
     for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(QNAMES[v], TYPES[v], cc.qc, info);
-    final Catch ctch = new Catch(info, vrs, new ArrayList<>(tests));
     final int val = vars.length;
-    for(int v = 0; v < val; v++) vm.put(vars[v].id, ctch.vars[v]);
-    ctch.expr = expr.copy(cc, vm);
-    return copyType(ctch);
+    for(int v = 0; v < val; v++) vm.put(vars[v].id, vrs[v]);
+    return copyType(new Catch(info, expr.copy(cc, vm), vrs, new ArrayList<>(tests)));
   }
 
   @Override
@@ -113,45 +113,60 @@ public final class Catch extends Single {
       final Expr inlined = expr.inline(ic);
       if(inlined == null) return null;
       expr = inlined;
-    } catch(final QueryException qe) {
-      expr = ic.cc.error(qe, expr);
+    } catch(final QueryException ex) {
+      expr = ic.cc.error(ex, expr);
     }
     return this;
   }
 
   /**
    * Returns the catch expression with inlined exception values.
-   * @param qe caught exception
+   * @param ex caught exception
    * @param cc compilation context
    * @return expression
    * @throws QueryException query exception
    */
-  Expr inline(final QueryException qe, final CompileContext cc) throws QueryException {
+  Expr inline(final QueryException ex, final CompileContext cc) throws QueryException {
     if(expr instanceof Value) return expr;
 
-    Expr ex = expr;
+    Expr inlined = expr;
     int v = 0;
-    for(final Value value : values(qe)) {
-      ex = new InlineContext(vars[v++], value, cc).inline(ex);
+    for(final Value value : values(ex)) {
+      inlined = new InlineContext(vars[v++], value, cc).inline(inlined);
     }
-    return ex;
+    return inlined;
+  }
+
+  /**
+   * Returns variables for a new catch expression.
+   * @param qc query context
+   * @param info input info
+   * @return variables
+   */
+  public static Var[] vars(final QueryContext qc, final InputInfo info) {
+    final int vl = QNAMES.length;
+    final Var[] vs = new Var[vl];
+    for(int v = 0; v < vl; v++) {
+      vs[v] = new Var(QNAMES[v], TYPES[v], qc, info);
+    }
+    return vs;
   }
 
   /**
    * Returns all error values.
-   * @param qe exception
+   * @param ex caught exception
    * @return values
    * @throws QueryException query exception
    */
-  public static Value[] values(final QueryException qe) throws QueryException {
-    final Str stack = qe.stackTrace();
+  private static Value[] values(final QueryException ex) throws QueryException {
+    final Str stack = ex.stackTrace();
     final Value[] values = {
-      qe.qname(),
-      Str.get(qe.getLocalizedMessage()),
-      qe.value() != null ? qe.value() : Empty.VALUE,
-      qe.file() != null ? Str.get(qe.file()) : Empty.VALUE,
-      qe.line() != 0 ? Int.get(qe.line()) : Empty.VALUE,
-      qe.column() != 0 ? Int.get(qe.column()) : Empty.VALUE,
+      ex.qname(),
+      Str.get(ex.getLocalizedMessage()),
+      ex.value() != null ? ex.value() : Empty.VALUE,
+      ex.file() != null ? Str.get(ex.file()) : Empty.VALUE,
+      ex.line() != 0 ? Int.get(ex.line()) : Empty.VALUE,
+      ex.column() != 0 ? Int.get(ex.column()) : Empty.VALUE,
       stack,
       stack,
       null
@@ -161,10 +176,24 @@ public final class Catch extends Single {
     final MapBuilder mb = new MapBuilder();
     final int nl = NAMES.length - 1;
     for(int n = 0; n < nl; n++) {
-      if(!values[n].isEmpty()) mb.put(STRS[n], values[n]);
+      if(!values[n].isEmpty()) mb.put(STRINGS[n], values[n]);
     }
     values[nl] = mb.map();
     return values;
+  }
+
+  /**
+   * Returns a map with all catch values.
+   * @param ex caught exception
+   * @return values
+   * @throws QueryException query exception
+   */
+  public static XQMap map(final QueryException ex) throws QueryException {
+    final Value[] values = values(ex);
+    final int vl = values.length;
+    final MapBuilder map = new MapBuilder(vl);
+    for(int v = 0; v < vl; v++) map.put(STRINGS[v], values[v]);
+    return map.map();
   }
 
   /**
@@ -211,11 +240,11 @@ public final class Catch extends Single {
 
   /**
    * Checks if one of the specified errors match the thrown error.
-   * @param qe thrown error
+   * @param ex caught exception
    * @return result of check
    */
-  boolean matches(final QueryException qe) {
-    final QNm name = qe.qname();
+  boolean matches(final QueryException ex) {
+    final QNm name = ex.qname();
     for(final Test test : tests) {
       if(test instanceof KindTest || ((NameTest) test).matches(name)) return true;
     }
