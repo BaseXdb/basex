@@ -514,10 +514,10 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), MAP_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value[,options])",
-      params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
+      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value[,options])",
-      params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
+      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARTITION(FnPartition::new, "partition(input,split-when)",
       params(ITEM_ZM, FuncType.get(BOOLEAN_ZO, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
