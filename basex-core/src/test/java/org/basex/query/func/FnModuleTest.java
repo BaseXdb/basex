@@ -2202,7 +2202,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'no'}"), "<a/>");
     query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'yes'}"), "<a>" + entity + "</a>");
     query(func.args(dtd + "<b>&amp;e;</b>", " {'dtd': 'yes'}"), "<b>" + entity + "</b>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes'}"), "<a>" + entity + "</a>");
+    query(func.args(dtd + "<a><b/></a>", " {'dtd-validation': 'yes'}"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'no'}"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes'}"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes', 'dtd': 'yes'}"),
+        "<a>" + entity + "</a>");
 
     query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
         + "'/></a>", " {'xinclude': 'no'}"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
