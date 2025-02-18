@@ -47,12 +47,13 @@ public class FnParseXmlFragment extends StandardFunc {
    */
   final Item parseXml(final QueryContext qc, final boolean frag,
       final ParseXmlFragmentOptions options) throws QueryException {
-    final byte[] value = toTokenOrNull(arg(0), qc);
-    if(value == null) return Empty.VALUE;
+    final Item value = arg(0).atomItem(qc, info);
+    if(value.isEmpty()) return Empty.VALUE;
 
     final String baseURI = options.contains(ParseXmlFragmentOptions.BASE_URI)
         ? options.get(ParseXmlFragmentOptions.BASE_URI) : string(info.sc().baseURI().string());
-    final IO io = new IOContent(value, baseURI);
+    final IO io = value instanceof Bin ? new IOContent(toBytes(value), baseURI)
+                                       : new IOContent(toBytes(value), baseURI, Strings.UTF8);
 
     final MainOptions mainOpts = new MainOptions(qc.context.options, true);
     Map.of(ParseXmlFragmentOptions.STRIP_SPACE, MainOptions.STRIPWS,
