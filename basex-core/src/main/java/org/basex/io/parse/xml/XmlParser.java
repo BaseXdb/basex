@@ -49,17 +49,16 @@ public final class XmlParser {
 
   /**
    * Returns an XML reader.
-   * @param dtdParsing parse DTDs
+   * @param dtd parse external DTDs
    * @param dtdValidation DTD validation (implies DTD parsing)
    * @param xinclude enable XInclude
    * @throws SAXException SAX exception
    * @throws ParserConfigurationException parser configuration exception
    * @return reader
    */
-  public static XMLReader reader(final boolean dtdParsing, final boolean dtdValidation,
+  public static XMLReader reader(final boolean dtd, final boolean dtdValidation,
       final boolean xinclude) throws SAXException, ParserConfigurationException {
 
-    final boolean dtd = dtdParsing || dtdValidation;
     final SAXParserFactory f = SAXParserFactory.newInstance();
     f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
     f.setFeature("http://xml.org/sax/features/external-general-entities", dtd);
