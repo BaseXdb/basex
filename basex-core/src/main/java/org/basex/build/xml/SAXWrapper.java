@@ -7,6 +7,7 @@ import java.io.*;
 import javax.xml.transform.sax.*;
 
 import org.basex.build.*;
+import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.io.*;
@@ -51,7 +52,8 @@ public final class SAXWrapper extends SingleParser {
     try {
       XMLReader reader = saxs.getXMLReader();
       if(reader == null) {
-        reader = XmlParser.reader(options.get(MainOptions.DTD), options.get(MainOptions.XINCLUDE));
+        reader = XmlParser.reader(options.get(MainOptions.DTD),
+            options.get(MainOptions.DTDVALIDATION), options.get(MainOptions.XINCLUDE));
       }
       final EntityResolver er = Resolver.entities(options);
       if(er != null) reader.setEntityResolver(er);
@@ -64,9 +66,11 @@ public final class SAXWrapper extends SingleParser {
       reader.setErrorHandler(saxh);
 
       reader.parse(is);
-    } catch(final SAXParseException ex) {
-      final String msg = Util.info(SCANPOS_X_X, source.path(), ex.getLineNumber(),
-          ex.getColumnNumber()) + COLS + Util.message(ex);
+    } catch(final SAXParseException | ValidationException ex) {
+      final SAXParseException spex =
+          (SAXParseException) (ex instanceof ValidationException ? ex.getCause() : ex);
+      final String msg = Util.info(SCANPOS_X_X, source.path(), spex.getLineNumber(),
+          spex.getColumnNumber()) + COLS + Util.message(spex);
       throw new IOException(msg, ex);
     } catch(final JobException ex) {
       throw ex;

@@ -189,6 +189,11 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   /* public void warning(SAXParseException ex) { } */
   /* public void fatalError(SAXParseException ex) { } */
 
+  @Override
+  public void error(final SAXParseException e) throws SAXException {
+    throw new ValidationException(e);
+  }
+
   // LexicalHandler
   @Override
   public void startDTD(final String name, final String pid, final String sid) {
@@ -211,4 +216,17 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   @Override
   public void startEntity(final String entity) { /* ignored. */ }
+
+  /** Validation exception: wrap a SAXParseException such that it can be recognized as a validation
+   * exception.
+   */
+  public static class ValidationException extends SAXException {
+    /**
+     * Constructor.
+     * @param cause exception to be wrapped
+     */
+    public ValidationException(final SAXParseException cause) {
+      super(cause);
+    }
+  }
 }

@@ -23,7 +23,7 @@ public final class XmlParser {
    * @throws ParserConfigurationException parser configuration exception
    */
   public XmlParser() throws SAXException, ParserConfigurationException {
-    reader = reader(false, false);
+    reader = reader(false, false, false);
   }
 
   /**
@@ -49,22 +49,25 @@ public final class XmlParser {
 
   /**
    * Returns an XML reader.
-   * @param dtd parse DTDs
+   * @param dtdParsing parse DTDs
+   * @param dtdValidation DTD validation (implies DTD parsing)
    * @param xinclude enable XInclude
    * @throws SAXException SAX exception
    * @throws ParserConfigurationException parser configuration exception
    * @return reader
    */
-  public static XMLReader reader(final boolean dtd, final boolean xinclude)
-      throws SAXException, ParserConfigurationException {
+  public static XMLReader reader(final boolean dtdParsing, final boolean dtdValidation,
+      final boolean xinclude) throws SAXException, ParserConfigurationException {
 
+    final boolean dtd = dtdParsing || dtdValidation;
     final SAXParserFactory f = SAXParserFactory.newInstance();
     f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
     f.setFeature("http://xml.org/sax/features/external-general-entities", dtd);
     f.setFeature("http://xml.org/sax/features/external-parameter-entities", dtd);
+    f.setFeature("http://xml.org/sax/features/validation", dtdValidation);
     f.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
     f.setNamespaceAware(true);
-    f.setValidating(false);
+    f.setValidating(dtdValidation);
     f.setXIncludeAware(xinclude);
     return f.newSAXParser().getXMLReader();
   }

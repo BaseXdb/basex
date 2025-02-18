@@ -57,6 +57,8 @@ public final class MainOptions extends Options {
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);
   /** Flag for parsing DTDs. */
   public static final BooleanOption DTD = new BooleanOption("DTD", false);
+  /** Flag for DTD validation. */
+  public static final BooleanOption DTDVALIDATION = new BooleanOption("DTDVALIDATION", false);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", true);
   /** Path to XML Catalog file. */
@@ -180,8 +182,8 @@ public final class MainOptions extends Options {
     STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
 
   /** XML Parsing options. */
-  private static final Option<?>[] XMLPARSING = { INTPARSE, STRIPWS, STRIPNS, DTD, XINCLUDE,
-      CATALOG };
+  private static final Option<?>[] XMLPARSING = { INTPARSE, STRIPWS, STRIPNS, DTD, DTDVALIDATION,
+      XINCLUDE, CATALOG};
   /** Extended parsing options. */
   public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
       SKIPCORRUPT, ADDRAW, ADDCACHE, CSVPARSER, JSONPARSER, HTMLPARSER, PARSER };

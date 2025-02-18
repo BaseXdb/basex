@@ -612,6 +612,8 @@ public enum QueryError {
   /** Error code. */
   SAXERR_X(FODC, 6, "SAX: %"),
   /** Error code. */
+  SAXVALIDATIONERR_X(FODC, 7, "Validation: %"),
+  /** Error code. */
   RESINV_X(FODC, 7, "Resource path '%' is invalid."),
   /** Error code. */
   INVHTML_X(FODC, 11, "HTML parsing failed: %"),
