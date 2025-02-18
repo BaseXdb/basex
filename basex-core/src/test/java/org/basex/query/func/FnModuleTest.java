@@ -4,6 +4,9 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
+import java.nio.file.*;
+import java.nio.file.Path;
 import java.util.*;
 
 import org.basex.*;
@@ -2165,8 +2168,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("\"x\\u0000\""), "x\uFFFD");
   }
 
-  /** Test method. */
-  @Test public void parseXml() {
+  /**
+   * Test method.
+   * @throws IOException I/O exception
+   */
+  @Test public void parseXml() throws IOException {
     final Function func = PARSE_XML;
     contains(func.args("<x>a</x>") + "//text()", "a");
     query(func.args("<a/>") + "/a[node()]", "");
@@ -2185,6 +2191,20 @@ public final class FnModuleTest extends SandboxTest {
         + "'?><x>42</x>", Strings.UTF16LE)), "<x>42</x>");
     query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
         + "\u20AC</x>", "ISO-8859-7")), "<x>\u20AC</x>");
+
+    final String path = "src/test/resources/parse-xml.entity";
+    final String dtd = "<!DOCTYPE a ["
+        + "<!ELEMENT a (#PCDATA | b)*>"
+        + "<!ELEMENT b EMPTY>"
+        + "<!ENTITY e SYSTEM '" + path + "'>]>";
+    final String entity = Files.readString(Path.of(path));
+    query(func.args(dtd + "<a>&amp;e;</a>"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'no'}"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'yes'}"), "<a>" + entity + "</a>");
+    query(func.args(dtd + "<b>&amp;e;</b>", " {'dtd': 'yes'}"), "<b>" + entity + "</b>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes'}"), "<a>" + entity + "</a>");
+
+    error(func.args(dtd + "<b>&amp;e;</b>", " {'dtd-validation': 'yes'}"), SAXVALIDATIONERR_X);
   }
 
   /** Test method. */

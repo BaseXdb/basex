@@ -25,5 +25,14 @@ public final class FnParseXml extends FnParseXmlFragment {
     public static final BooleanOption DTD_VALIDATION = new BooleanOption("dtd-validation");
     /** XSD validation. */
     public static final StringOption XSD_VALIDATION = new StringOption("xsd-validation", "skip");
+
+    /** Use internal XML parser (default: {@code qc.context.options.get(MainOptions.INTPARSE)}). */
+    public static final BooleanOption INTPARSE = new BooleanOption("int-parse");
+    /** Flag for parsing DTDs (default: {@code qc.context.options.get(MainOptions.DTD)}). */
+    public static final BooleanOption DTD = new BooleanOption("dtd");
+    /** Flag for using XInclude (default: {@code qc.context.options.get(MainOptions.XINCLUDE)}). */
+    public static final BooleanOption XINCLUDE = new BooleanOption("xinclude");
+    /** Path to XML Catalog file (default: {@code qc.context.options.get(MainOptions.CATALOG)}). */
+    public static final StringOption CATALOG = new StringOption("catalog");
   }
 }
