@@ -52,8 +52,7 @@ public final class SAXWrapper extends SingleParser {
     try {
       XMLReader reader = saxs.getXMLReader();
       if(reader == null) {
-        reader = XmlParser.reader(options.get(MainOptions.DTD),
-            options.get(MainOptions.DTDVALIDATION), options.get(MainOptions.XINCLUDE));
+        reader = XmlParser.reader(options);
       }
       final EntityResolver er = Resolver.entities(options);
       if(er != null) reader.setEntityResolver(er);

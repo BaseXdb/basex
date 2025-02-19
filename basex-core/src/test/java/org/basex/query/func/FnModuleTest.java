@@ -2207,6 +2207,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes'}"), "<a/>");
     query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes', 'dtd': 'yes'}"),
         "<a>" + entity + "</a>");
+    query(func.args("<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
+        + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
+        " {'xsd-validation': 'strict'}"),
+        "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+        + "xsi:noNamespaceSchemaLocation=\"src/test/resources/validate.xsd\"/>");
 
     query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
         + "'/></a>", " {'xinclude': 'no'}"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
@@ -2215,7 +2220,10 @@ public final class FnModuleTest extends SandboxTest {
         + "'/></a>"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
         + "<b xml:base=\"src/test/resources/parse-xml.entity\"/></a>");
 
-    error(func.args(dtd + "<b>&amp;e;</b>", " {'dtd-validation': 'yes'}"), SAXVALIDATIONERR_X);
+    error(func.args(dtd + "<b>&amp;e;</b>", " {'dtd-validation': 'yes'}"), DTDVALIDATIONERR_X);
+    error(func.args("<a xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
+        + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
+        " {'xsd-validation': 'strict'}"), XSDVALIDATIONERR_X);
   }
 
   /** Test method. */
