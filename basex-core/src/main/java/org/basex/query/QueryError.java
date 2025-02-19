@@ -616,7 +616,11 @@ public enum QueryError {
   /** Error code. */
   RESINV_X(FODC, 7, "Resource path '%' is invalid."),
   /** Error code. */
+  NOXSDVALIDATION(FODC, 9, "XSD validation is not supported."),
+  /** Error code. */
   INVHTML_X(FODC, 11, "HTML parsing failed: %"),
+  /** Error code. */
+  NODTDVALIDATION(FODC, 13, "The internal parser does not support DTD validation."),
 
   /** Error code. */
   FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),
