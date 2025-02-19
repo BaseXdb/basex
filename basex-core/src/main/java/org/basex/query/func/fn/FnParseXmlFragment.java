@@ -82,8 +82,15 @@ public class FnParseXmlFragment extends StandardFunc {
     if(options.contains(ParseXmlOptions.CATALOG))
       mainOpts.set(MainOptions.CATALOG, options.get(ParseXmlOptions.CATALOG));
 
+    final boolean intParse;
+    if(frag) {
+      intParse = true;
+    } else {
+      intParse = mainOpts.get(MainOptions.INTPARSE);
+      if(intParse && mainOpts.get(MainOptions.DTDVALIDATION)) throw NODTDVALIDATION.get(info);
+    }
+
     try {
-      final boolean intParse = frag || mainOpts.get(MainOptions.INTPARSE);
       return new DBNode(intParse
           ? new XMLParser(io, mainOpts, true) : Parser.xmlParser(io, mainOpts));
     } catch(final IOException ex) {
