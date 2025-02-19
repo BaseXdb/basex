@@ -66,6 +66,31 @@ public class QueryParser extends InputParser {
   private static final TokenSet KEYWORDS = new TokenSet(
       ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE_NODE, NODE, SCHEMA_ATTRIBUTE,
       SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, FN, FUNCTION, IF, SWITCH, TYPESWITCH);
+  /** Literal terminals taking the form of an NCName. */
+  private static final TokenSet LITERAL_TERMINAL_NAMES = new TokenSet(new String[] { ALLOWING,
+      Axis.ANCESTOR.toString(), Axis.ANCESTOR_OR_SELF.toString(), AND, ARRAY, AS, ASCENDING, AT,
+      ATTRIBUTE, BASE_URI, BOUNDARY_SPACE, BY, CASE, CAST, CASTABLE, CATCH, Axis.CHILD.toString(),
+      COLLATION, COMMENT, CONSTRUCTION, CONTEXT, COPY_NAMESPACES, COUNT, DECIMAL_FORMAT,
+      DecFormatOptions.DECIMAL_SEPARATOR.name(), DECLARE, DEFAULT, Axis.DESCENDANT.toString(),
+      Axis.DESCENDANT_OR_SELF.toString(), DESCENDING, DecFormatOptions.DIGIT.name(), DIV, DOCUMENT,
+      DOCUMENT_NODE, ELEMENT, ELSE, EMPTYY, EMPTY_SEQUENCE, ENCODING, END, ENUM, OpV.EQ.toString(),
+      EVERY, EXCEPT, DecFormatOptions.EXPONENT_SEPARATOR.name(), EXTERNAL, FALSE, FIXED, FN,
+      Axis.FOLLOWING.toString(), Axis.FOLLOWING_OR_SELF.toString(),
+      Axis.FOLLOWING_SIBLING.toString(), Axis.FOLLOWING_SIBLING_OR_SELF.toString(), FOR, FUNCTION,
+      OpV.GE.toString(), GREATEST, GROUP, DecFormatOptions.GROUPING_SEPARATOR.name(),
+      OpV.GT.toString(), IDIV, IF, IMPORT, IN, DecFormatOptions.INFINITY.name(), INHERIT, INSTANCE,
+      INTERSECT, OpN.EQ.toString(), ITEM, ITEMS, KEY, KEYS, LAX, OpV.LE.toString(), LEAST, LET,
+      OpV.LT.toString(), MAP, MEMBER, DecFormatOptions.MINUS_SIGN.name(), MOD, MODULE, NAMESPACE,
+      NAMESPACE_NODE, string(NAN), OpV.NE.toString(), NEXT, NO_INHERIT, NO_PRESERVE, NODE, OF, ONLY,
+      OPTION, OR, ORDER, ORDERED, ORDERING, OTHERWISE, PAIRS, Axis.PARENT.toString(),
+      DecFormatOptions.PATTERN_SEPARATOR.name(), DecFormatOptions.PER_MILLE.name(),
+      DecFormatOptions.PERCENT.name(), Axis.PRECEDING.toString(), Axis.PRECEDING_OR_SELF.toString(),
+      Axis.PRECEDING_SIBLING.toString(), Axis.PRECEDING_SIBLING_OR_SELF.toString(), PRESERVE,
+      PREVIOUS, PROCESSING_INSTRUCTION, RECORD, RETURN, SATISFIES, SCHEMA, SCHEMA_ATTRIBUTE,
+      SCHEMA_ELEMENT, Axis.SELF.toString(), SLIDING, SOME, STABLE, START, STRICT, STRIP, SWITCH,
+      TEXT, THEN, TO, TREAT, TRUE, TRY, TUMBLING, TYPE, TYPESWITCH, UNION, UNORDERED, VALIDATE,
+      VALUEE, VALUESS, VARIABLE, VERSION, WHEN, WHERE, WHILE, WINDOW, XQUERY,
+      DecFormatOptions.ZERO_DIGIT.name(), "\uFF1C", "\uFF1C\uFF1C", "\uFF1E", "\uFF1E\uFF1E"});
 
   /** URIs of modules loaded by the current file. */
   public final TokenSet moduleURIs = new TokenSet();
@@ -3240,9 +3265,32 @@ public class QueryParser extends InputParser {
     // parse name enclosed in quotes
     if(quote(current())) return Str.get(stringLiteral());
     // parse literal name
-    if(qname) return eQName(SKIPCHECK, null);
+    if(qname) {
+      final QNm name = eQName(SKIPCHECK, null);
+      if(name == null || reservedName(name)) return null;
+      return name;
+    }
     final byte[] string = ncName(null);
+    if(reservedName(string)) return null;
     return string.length != 0 ? Str.get(string) : null;
+  }
+
+  /**
+   * Checks if the specified name is reserved per constraint "unreserved-name".
+   * @param name name
+   * @return result of check
+   */
+  private static boolean reservedName(final QNm name) {
+    return !name.hasURI() && !name.hasPrefix() && LITERAL_TERMINAL_NAMES.contains(name.local());
+  }
+
+  /**
+   * Checks if the specified name is reserved per constraint "unreserved-name".
+   * @param name name
+   * @return result of check
+   */
+  private static boolean reservedName(final byte[] name) {
+    return LITERAL_TERMINAL_NAMES.contains(name);
   }
 
   /**
