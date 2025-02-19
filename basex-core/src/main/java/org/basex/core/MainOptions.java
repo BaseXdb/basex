@@ -59,6 +59,12 @@ public final class MainOptions extends Options {
   public static final BooleanOption DTD = new BooleanOption("DTD", false);
   /** Flag for DTD validation. */
   public static final BooleanOption DTDVALIDATION = new BooleanOption("DTDVALIDATION", false);
+  /** XSD validation option value. */
+  public static final String SKIP = "skip";
+  /** XSD validation option value. */
+  public static final String STRICT = "strict";
+  /** XSD validation. */
+  public static final StringOption XSDVALIDATION = new StringOption("XSDVALIDATION", SKIP);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", true);
   /** Path to XML Catalog file. */

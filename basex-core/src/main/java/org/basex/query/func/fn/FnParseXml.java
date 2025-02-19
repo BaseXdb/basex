@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -17,8 +15,6 @@ public final class FnParseXml extends FnParseXmlFragment {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ParseXmlOptions options = toOptions(arg(1), new ParseXmlOptions(), qc);
-    if(!options.get(ParseXmlOptions.XSD_VALIDATION).equals(ParseXmlOptions.SKIP))
-      throw NOXSDVALIDATION.get(info);
     return parseXml(qc, false, options);
   }
 
@@ -26,13 +22,10 @@ public final class FnParseXml extends FnParseXmlFragment {
    * Options for fn:parse-xml.
    */
   public static final class ParseXmlOptions extends ParseXmlFragmentOptions {
-    /** XSD validation value. */
-    private static final String SKIP = "skip";
-
     /** DTD validation. */
     public static final BooleanOption DTD_VALIDATION = new BooleanOption("dtd-validation");
     /** XSD validation. */
-    public static final StringOption XSD_VALIDATION = new StringOption("xsd-validation", SKIP);
+    public static final StringOption XSD_VALIDATION = new StringOption("xsd-validation");
 
     /** Use internal XML parser (default: {@code qc.context.options.get(MainOptions.INTPARSE)}). */
     public static final BooleanOption INTPARSE = new BooleanOption("int-parse");

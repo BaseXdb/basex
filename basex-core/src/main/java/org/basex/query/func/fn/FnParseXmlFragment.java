@@ -66,8 +66,8 @@ public class FnParseXmlFragment extends StandardFunc {
       for(BooleanOption opt : Arrays.asList(MainOptions.INTPARSE, MainOptions.DTD,
           MainOptions.DTDVALIDATION, MainOptions.XINCLUDE))
         if(contextOpts.contains(opt)) mainOpts.set(opt, contextOpts.get(opt));
-      if(contextOpts.contains(MainOptions.CATALOG))
-        mainOpts.set(MainOptions.CATALOG, contextOpts.get(MainOptions.CATALOG));
+      for(StringOption opt : Arrays.asList(MainOptions.XSDVALIDATION, MainOptions.CATALOG))
+        if(contextOpts.contains(opt)) mainOpts.set(opt, contextOpts.get(opt));
     }
 
     // override with explicit options
@@ -79,15 +79,25 @@ public class FnParseXmlFragment extends StandardFunc {
         ParseXmlOptions.XINCLUDE, MainOptions.XINCLUDE).forEach((opt, mainOpt) -> {
         if(options.contains(opt)) mainOpts.set(mainOpt, options.get(opt));
     });
-    if(options.contains(ParseXmlOptions.CATALOG))
-      mainOpts.set(MainOptions.CATALOG, options.get(ParseXmlOptions.CATALOG));
+    Map.of(ParseXmlOptions.XSD_VALIDATION, MainOptions.XSDVALIDATION,
+        ParseXmlOptions.CATALOG, MainOptions.CATALOG).forEach((opt, mainOpt) -> {
+        if(options.contains(opt)) mainOpts.set(mainOpt, options.get(opt));
+    });
 
     final boolean intParse;
+    final Boolean dtdVal = mainOpts.get(MainOptions.DTDVALIDATION);
     if(frag) {
       intParse = true;
     } else {
       intParse = mainOpts.get(MainOptions.INTPARSE);
-      if(intParse && mainOpts.get(MainOptions.DTDVALIDATION)) throw NODTDVALIDATION.get(info);
+      final String xsdVal = mainOpts.get(MainOptions.XSDVALIDATION);
+      if(intParse) {
+        if(dtdVal) throw NODTDVALIDATION.get(info);
+        if(!MainOptions.SKIP.equals(xsdVal)) throw NOXSDVALIDATION_X.get(info, xsdVal);
+      } else if(!MainOptions.SKIP.equals(xsdVal)) {
+        if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
+        if(!MainOptions.STRICT.equals(xsdVal)) throw INVALIDXSDOPT_X.get(info, xsdVal);
+      }
     }
 
     try {
@@ -95,8 +105,8 @@ public class FnParseXmlFragment extends StandardFunc {
           ? new XMLParser(io, mainOpts, true) : Parser.xmlParser(io, mainOpts));
     } catch(final IOException ex) {
       final Throwable th = ex.getCause();
-      final QueryException qe = th instanceof ValidationException ? SAXVALIDATIONERR_X.get(info, ex)
-                                                                  : SAXERR_X.get(info, ex);
+      final QueryException qe = !(th instanceof ValidationException) ? SAXERR_X.get(info, ex) :
+        dtdVal ? DTDVALIDATIONERR_X.get(info, ex) : XSDVALIDATIONERR_X.get(info, ex);
       if(th instanceof SAXException) qe.value(Str.get(th.toString()));
       throw qe;
     }
