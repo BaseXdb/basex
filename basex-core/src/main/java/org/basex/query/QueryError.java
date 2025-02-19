@@ -612,9 +612,21 @@ public enum QueryError {
   /** Error code. */
   SAXERR_X(FODC, 6, "SAX: %"),
   /** Error code. */
+  DTDVALIDATIONERR_X(FODC, 7, "DTD Validation error: %"),
+  /** Error code. */
   RESINV_X(FODC, 7, "Resource path '%' is invalid."),
   /** Error code. */
+  INVALIDXSDOPT_X(FODC, 8, "Unsupported value of option 'xsd-validation': '%'."),
+  /** Error code. */
+  NOXSDVALIDATION_X(FODC, 9, "The internal parser does not support 'xsd-validation': '%'."),
+  /** Error code. */
+  NOXSDANDDTD_X(FODC, 9, "DTD validation must not be enabled when 'xsd-validation' is '%'."),
+  /** Error code. */
   INVHTML_X(FODC, 11, "HTML parsing failed: %"),
+  /** Error code. */
+  NODTDVALIDATION(FODC, 13, "The internal parser does not support DTD validation."),
+  /** Error code. */
+  XSDVALIDATIONERR_X(FODC, 14, "XSD Validation error: %"),
 
   /** Error code. */
   FORMATWHICH_X(FODF, 1280, "Unknown decimal format: %."),

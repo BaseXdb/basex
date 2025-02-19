@@ -116,7 +116,17 @@ public class Parser extends Job {
    * @return xml parser
    */
   public static SAXWrapper xmlParser(final IO source) {
-    return new SAXWrapper(source, new MainOptions());
+    return xmlParser(source, new MainOptions());
+  }
+
+  /**
+   * Returns an XML parser instance, using the Java default parser.
+   * @param source input source
+   * @param options main options
+   * @return xml parser
+   */
+  public static SAXWrapper xmlParser(final IO source, final MainOptions options) {
+    return new SAXWrapper(source, options);
   }
 
   /**

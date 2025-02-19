@@ -1,22 +1,9 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
-
-import java.io.*;
-
-import org.basex.build.Parser;
-import org.basex.build.xml.*;
-import org.basex.core.*;
-import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.xml.sax.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -24,36 +11,29 @@ import org.xml.sax.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FnParseXml extends StandardFunc {
+public final class FnParseXml extends FnParseXmlFragment {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return parseXml(qc, false);
-  }
-
-  @Override
-  protected final Expr opt(final CompileContext cc) {
-    return optFirst();
+    final ParseXmlOptions options = toOptions(arg(1), new ParseXmlOptions(), qc);
+    return parseXml(qc, false, options);
   }
 
   /**
-   * Returns a document node for the parsed XML input.
-   * @param qc query context
-   * @param frag parse fragments
-   * @return result or {@link Empty#VALUE}
-   * @throws QueryException query exception
+   * Options for fn:parse-xml.
    */
-  final Item parseXml(final QueryContext qc, final boolean frag) throws QueryException {
-    final byte[] value = toTokenOrNull(arg(0), qc);
-    if(value == null) return Empty.VALUE;
+  public static final class ParseXmlOptions extends ParseXmlFragmentOptions {
+    /** DTD validation. */
+    public static final BooleanOption DTD_VALIDATION = new BooleanOption("dtd-validation");
+    /** XSD validation. */
+    public static final StringOption XSD_VALIDATION = new StringOption("xsd-validation");
 
-    final IO io = new IOContent(value, string(info.sc().baseURI().string()));
-    try {
-      return new DBNode(frag ? new XMLParser(io, new MainOptions(), true) : Parser.xmlParser(io));
-    } catch(final IOException ex) {
-      final QueryException qe = SAXERR_X.get(info, ex);
-      final Throwable th = ex.getCause();
-      if(th instanceof SAXException) qe.value(Str.get(th.toString()));
-      throw qe;
-    }
+    /** Use internal XML parser (default: {@code qc.context.options.get(MainOptions.INTPARSE)}). */
+    public static final BooleanOption INTPARSE = new BooleanOption("int-parse");
+    /** Flag for parsing DTDs (default: {@code qc.context.options.get(MainOptions.DTD)}). */
+    public static final BooleanOption DTD = new BooleanOption("dtd");
+    /** Flag for using XInclude (default: {@code qc.context.options.get(MainOptions.XINCLUDE)}). */
+    public static final BooleanOption XINCLUDE = new BooleanOption("xinclude");
+    /** Path to XML Catalog file (default: {@code qc.context.options.get(MainOptions.CATALOG)}). */
+    public static final StringOption CATALOG = new StringOption("catalog");
   }
 }

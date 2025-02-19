@@ -122,6 +122,7 @@ public final class QT3TS extends Main {
     sopts.set(SerializerOptions.METHOD, SerialMethod.XML);
     sopts.set(SerializerOptions.OMIT_XML_DECLARATION, YesNo.NO);
     ctx.options.set(MainOptions.SERIALIZER, sopts);
+    ctx.options.set(MainOptions.DTD, true);
 
     final XdmValue doc = new XQuery("doc('" + file(false, CATALOG) + "')", ctx).value();
     final String version = asString("*:catalog/@version", doc);
@@ -249,7 +250,7 @@ public final class QT3TS extends Main {
     boolean base = true;
     if(env == null) {
       final String e = asString("*:environment[1]/@ref", test);
-      if(!e.isEmpty()) {
+      if(!e.isEmpty() && !e.equals("empty")) {
         // check if environment is defined in test-set
         env = envs(envs, e);
         // check if environment is defined in catalog
@@ -739,8 +740,9 @@ public final class QT3TS extends Main {
       options.add("'" + DeepEqualOptions.NAMESPACE_PREFIXES.name() + "':" + !ignorePrefixes + "()");
       options.add("'" + DeepEqualOptions.COMMENTS.name() + "':true()");
       options.add("'" + DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "':true()");
-      final String query = Function.DEEP_EQUAL.args(" <X>" + expctd + "</X>",
-          " <X>" + rslt + "</X>", " { " + String.join(", ", options) + " }");
+      final String query = "declare boundary-space preserve;\n"
+          + Function.DEEP_EQUAL.args(" <X>" + expctd.trim() + "</X>", " <X>" + rslt.trim() + "</X>",
+          " { " + String.join(", ", options) + " }");
       return asBoolean(query, expected) ? null : expctd;
     } catch(final IOException ex) {
       return Util.info("% (found: %)", expctd, ex);

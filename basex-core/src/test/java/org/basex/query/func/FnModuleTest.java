@@ -4,6 +4,9 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
+import java.nio.file.*;
+import java.nio.file.Path;
 import java.util.*;
 
 import org.basex.*;
@@ -2165,8 +2168,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("\"x\\u0000\""), "x\uFFFD");
   }
 
-  /** Test method. */
-  @Test public void parseXml() {
+  /**
+   * Test method.
+   * @throws IOException I/O exception
+   */
+  @Test public void parseXml() throws IOException {
     final Function func = PARSE_XML;
     contains(func.args("<x>a</x>") + "//text()", "a");
     query(func.args("<a/>") + "/a[node()]", "");
@@ -2175,6 +2181,64 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("<a/>") + "/*[1][self::a]", "<a/>");
     query(func.args("<a/>") + "/*[1][not(child::node())]", "<a/>");
     query(func.args("<a/>") + "/*[1][self::a][not(child::node())]", "<a/>");
+    query(func.args("<x> <y> </y> </x>"), "<x> <y> </y> </x>");
+    query(func.args("<x> <y> </y> </x>", " {'strip-space': false()}"), "<x> <y> </y> </x>");
+    query(func.args("<x> <y> </y> </x>", " {'strip-space': true()}"), "<x><y/></x>");
+    query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': false()}"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': true()}"), "<doc/>");
+    query(func.args(_CONVERT_STRING_TO_HEX.args("<?xml version='1.0' encoding='" + Strings.UTF16LE
+        + "'?><x>42</x>", Strings.UTF16LE)), "<x>42</x>");
+    query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
+        + "\u20AC</x>", "ISO-8859-7")), "<x>\u20AC</x>");
+
+    final String path = "src/test/resources/parse-xml.entity";
+    final String dtd = "<!DOCTYPE a ["
+        + "<!ELEMENT a (#PCDATA | b)*>"
+        + "<!ELEMENT b EMPTY>"
+        + "<!ENTITY e SYSTEM '" + path + "'>]>";
+    final String entity = Files.readString(Path.of(path));
+    query(func.args(dtd + "<a>&amp;e;</a>"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'no'}"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'yes'}"), "<a>" + entity + "</a>");
+    query(func.args(dtd + "<b>&amp;e;</b>", " {'dtd': 'yes'}"), "<b>" + entity + "</b>");
+    query(func.args(dtd + "<a><b/></a>", " {'dtd-validation': 'yes'}"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'no'}"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes'}"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes', 'dtd': 'yes'}"),
+        "<a>" + entity + "</a>");
+    query(func.args("<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
+        + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
+        " {'xsd-validation': 'strict'}"),
+        "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+        + "xsi:noNamespaceSchemaLocation=\"src/test/resources/validate.xsd\"/>");
+
+    query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
+        + "'/></a>", " {'xinclude': 'no'}"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
+        + "<xi:include href=\"" + path + "\"/></a>");
+    query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
+        + "'/></a>"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
+        + "<b xml:base=\"src/test/resources/parse-xml.entity\"/></a>");
+
+    error(func.args(dtd + "<b>&amp;e;</b>", " {'dtd-validation': 'yes'}"), DTDVALIDATIONERR_X);
+    error(func.args("<a xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
+        + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
+        " {'xsd-validation': 'strict'}"), XSDVALIDATIONERR_X);
+  }
+
+  /** Test method. */
+  @Test public void parseXmlFragment() {
+    final Function func = PARSE_XML_FRAGMENT;
+    query(func.args("<x> <y> </y> </x> <z/>"), "<x> <y> </y> </x> <z/>");
+    query(func.args("<x> <y> </y> </x> <z/>", " {'strip-space': 'no'}"), "<x> <y> </y> </x> <z/>");
+    query(func.args("<x> <y> </y> </x> <z/>", " {'strip-space': 'yes'}"), "<x><y/></x><z/>");
+    query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': false()}"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': true()}"), "<doc/>");
+    query(func.args(_CONVERT_STRING_TO_HEX.args("<?xml version='1.0' encoding='" + Strings.UTF16LE
+        + "'?><x/><y/>", Strings.UTF16LE)), "<x/><y/>");
+    query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
+        + "\u20AC</x><y>\u20AF</y>", "ISO-8859-7")), "<x>\u20AC</x><y>\u20AF</y>");
   }
 
   /** Test method. */
