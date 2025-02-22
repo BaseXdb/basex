@@ -139,42 +139,49 @@ final class SyntaxXQuery extends Syntax {
 
   @Override
   public byte[] format(final byte[] text, final byte[] spaces) {
-    int ind = 0;
     final TokenBuilder tb = new TokenBuilder();
     final int tl = text.length;
+    int quoted = 0, comments = 0, indents = 0;
     for(int t = 0; t < tl; t++) {
-      final byte ch = text[t];
-      final int open = OPENING.indexOf(ch);
-      final int close = CLOSING.indexOf(ch);
-      final int next = t + 1 < tl ? text[t + 1] : 0;
-      final int prev = t > 0 ? text[t - 1] : 0;
-      if(open != -1 && (next != ':' || ch != '(')) {
-        ind++;
-        tb.addByte(ch);
-        if(next != '\n' && !matches(CLOSING.charAt(open), t, text, 3)) {
-          tb.add('\n');
-          for(int i = 0; i < ind; i++) tb.add(spaces);
-        }
-      } else {
-        if(close != -1 && (prev != ':' || ch != ')')) {
-          ind--;
-          if(!spaces(tb) && !matches(OPENING.charAt(close), t, text, -3)) {
+      final byte curr = text[t];
+      final int open = OPENING.indexOf(curr), close = CLOSING.indexOf(curr);
+      int next = t + 1 < tl ? text[t + 1] : 0, prev = t > 0 ? text[t - 1] : 0;
+      if(quoted != 0) {
+        if(curr == quoted) quoted = 0;
+      } else if("\"'`".indexOf(curr) != -1) {
+        quoted = curr;
+      } else if(curr == '(' && next == ':') {
+        comments++;
+      } else if(prev == ':' && curr == ')') {
+        comments--;
+      } else if(comments == 0) {
+        if(open != -1) {
+          indents++;
+          tb.addByte(curr);
+          if(next != '\n' && !matches(CLOSING.charAt(open), t, text, true)) {
             tb.add('\n');
-            for(int i = 0; i < ind; i++) tb.add(spaces);
+            for(int i = 0; i < indents; i++) tb.add(spaces);
+          }
+          continue;
+        } else if(close != -1) {
+          indents--;
+          if(!endingWithWs(tb) && !matches(OPENING.charAt(close), t, text, false)) {
+            tb.add('\n');
+            for(int i = 0; i < indents; i++) tb.add(spaces);
           }
         }
-        tb.addByte(ch);
       }
+      tb.addByte(curr);
     }
     return tb.finish();
   }
 
   /**
-   * Checks if the last line contains only spaces.
+   * Checks if the previous line contains only spaces.
    * @param text text
    * @return result of check
    */
-  private static boolean spaces(final TokenBuilder text) {
+  private static boolean endingWithWs(final TokenBuilder text) {
     for(int t = text.size() - 1; t >= 0; t--) {
       final byte c = text.get(t);
       if(c == '\n') break;
@@ -184,18 +191,19 @@ final class SyntaxXQuery extends Syntax {
   }
 
   /**
-   * Checks if the specified character.
+   * Checks if the specified character is found near the current position.
    * @param ch character to be found
    * @param pos current position
    * @param text text
-   * @param dist maximum allowed distance
+   * @param after search after or before the current position
    * @return result of check
    */
-  private static boolean matches(final char ch, final int pos, final byte[] text, final int dist) {
-    for(int d = 0; dist > 0 ? d < dist : d > dist; d += dist > 0 ? 1 : -1) {
+  private static boolean matches(final char ch, final int pos, final byte[] text,
+      final boolean after) {
+    final int dist = after ? 3 : -3;
+    for(int d = 0; after ? d < dist : d > dist; d += after ? 1 : -1) {
       final int p = pos + d;
-      if(p < 0 || p >= text.length) break;
-      if(text[p] == ch) return true;
+      if(p >= 0 && p < text.length && text[p] == ch) return true;
     }
     return false;
   }
