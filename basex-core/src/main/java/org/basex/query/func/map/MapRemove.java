@@ -33,7 +33,10 @@ public final class MapRemove extends StandardFunc {
     if(map == XQMap.empty()) return map;
 
     final Type type = map.seqType().type;
-    if(type instanceof MapType) exprType.assign(type);
+    if(type instanceof MapType) {
+      final MapType mt = (MapType) type;
+      exprType.assign(MapType.get(mt.keyType, mt.valueType));
+    }
     return this;
   }
 }

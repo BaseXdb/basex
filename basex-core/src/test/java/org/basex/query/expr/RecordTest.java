@@ -28,6 +28,11 @@ public final class RecordTest extends SandboxTest {
     query("{ 'x': (), 'y': () } instance of record(x)", false);
     query("{ 'x': (), 0: () } instance of record(x, *)", true);
     query("{ 'x': (), 0: () } instance of record(x)", false);
+
+    query("declare record local:coord(x, y); "
+        + "let $coord := local:coord(1, 2) "
+        + "let $new := map:remove($coord, 'x') "
+        + "return $new instance of local:coord", false);
   }
 
   /** Recursive records. */
