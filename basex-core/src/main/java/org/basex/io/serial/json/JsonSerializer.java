@@ -178,6 +178,11 @@ public abstract class JsonSerializer extends StandardSerializer {
     else if(indent) out.print(' ');
   }
 
+  @Override
+  protected boolean separate() {
+    return false;
+  }
+
   /**
    * Serializes a JSON string.
    * @param string string
