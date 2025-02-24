@@ -49,7 +49,7 @@ final class XMLScanner extends Job {
   private final TokenMap pents = new TokenMap();
   /** DTD flag. */
   private final boolean dtd;
-  /** Allow document fragment as input. */
+  /** Parse fragment. */
   private final boolean fragment;
 
   /** Current scanner state. */
@@ -69,7 +69,7 @@ final class XMLScanner extends Job {
    * Initializes the scanner.
    * @param file input file
    * @param opts database options
-   * @param fragment allow parsing of document fragment
+   * @param fragment parse fragment
    * @throws IOException I/O exception
    */
   XMLScanner(final IO file, final MainOptions opts, final boolean fragment) throws IOException {

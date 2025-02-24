@@ -15,6 +15,6 @@ import org.basex.util.*;
 public class FnParseHtml extends HtmlParse {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return parse(htmlInput(qc), HtmlParser.Parser.NU, qc);
+    return parse(input(qc), HtmlParser.Parser.NU, qc);
   }
 }

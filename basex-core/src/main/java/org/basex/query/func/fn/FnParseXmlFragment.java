@@ -29,6 +29,17 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public class FnParseXmlFragment extends StandardFunc {
+  /** Function options. */
+  public static class ParseXmlFragmentOptions extends Options {
+    /** Document node's base URI. */
+    public static final StringOption BASE_URI = new StringOption("base-uri");
+    /** Remove whitespace-only text nodes. */
+    public static final BooleanOption STRIP_SPACE = new BooleanOption("strip-space", false);
+
+    /** Strip namespaces (default: {@link MainOptions#STRIPNS}). */
+    public static final BooleanOption STRIPNS = new BooleanOption("stripns");
+  }
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return parseXml(qc, true, toOptions(arg(1), new ParseXmlFragmentOptions(), qc));
@@ -42,67 +53,51 @@ public class FnParseXmlFragment extends StandardFunc {
   /**
    * Returns a document node for the parsed XML input.
    * @param qc query context
-   * @param frag parse fragments
+   * @param fragment parse fragment
    * @param options options
    * @return result or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  final Item parseXml(final QueryContext qc, final boolean frag,
+  final Item parseXml(final QueryContext qc, final boolean fragment,
       final ParseXmlFragmentOptions options) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     if(value.isEmpty()) return Empty.VALUE;
 
     final String baseURI = options.contains(ParseXmlFragmentOptions.BASE_URI)
         ? options.get(ParseXmlFragmentOptions.BASE_URI) : string(info.sc().baseURI().string());
-    final IO io = value instanceof Bin ? new IOContent(toBytes(value), baseURI)
-                                       : new IOContent(toBytes(value), baseURI, Strings.UTF8);
+    final IO io = new IOContent(toBytes(value), baseURI, value instanceof Bin ? null :
+      Strings.UTF8);
 
-    // get option default values from context options
-    final MainOptions contextOpts = qc.context.options;
-    final MainOptions mainOpts = new MainOptions();
-    for(BooleanOption opt : Arrays.asList(MainOptions.STRIPWS, MainOptions.STRIPNS))
-      if(contextOpts.contains(opt)) mainOpts.set(opt, contextOpts.get(opt));
-    if(!frag) {
-      for(BooleanOption opt : Arrays.asList(MainOptions.INTPARSE, MainOptions.DTD,
-          MainOptions.DTDVALIDATION, MainOptions.XINCLUDE))
-        if(contextOpts.contains(opt)) mainOpts.set(opt, contextOpts.get(opt));
-      for(StringOption opt : Arrays.asList(MainOptions.XSDVALIDATION, MainOptions.CATALOG))
-        if(contextOpts.contains(opt)) mainOpts.set(opt, contextOpts.get(opt));
-    }
-
-    // override with explicit options
+    // assign options
+    final MainOptions mopts = new MainOptions();
     Map.of(ParseXmlFragmentOptions.STRIP_SPACE, MainOptions.STRIPWS,
         ParseXmlFragmentOptions.STRIPNS, MainOptions.STRIPNS,
         ParseXmlOptions.INTPARSE, MainOptions.INTPARSE,
         ParseXmlOptions.DTD, MainOptions.DTD,
         ParseXmlOptions.DTD_VALIDATION, MainOptions.DTDVALIDATION,
-        ParseXmlOptions.XINCLUDE, MainOptions.XINCLUDE).forEach((opt, mainOpt) -> {
-        if(options.contains(opt)) mainOpts.set(mainOpt, options.get(opt));
+        ParseXmlOptions.XINCLUDE, MainOptions.XINCLUDE).forEach((opt, mopt) -> {
+      if(options.contains(opt)) mopts.set(mopt, options.get(opt));
     });
     Map.of(ParseXmlOptions.XSD_VALIDATION, MainOptions.XSDVALIDATION,
-        ParseXmlOptions.CATALOG, MainOptions.CATALOG).forEach((opt, mainOpt) -> {
-        if(options.contains(opt)) mainOpts.set(mainOpt, options.get(opt));
+        ParseXmlOptions.CATALOG, MainOptions.CATALOG).forEach((opt, mopt) -> {
+      if(options.contains(opt)) mopts.set(mopt, options.get(opt));
     });
 
-    final boolean intParse;
-    final Boolean dtdVal = mainOpts.get(MainOptions.DTDVALIDATION);
-    if(frag) {
-      intParse = true;
-    } else {
-      intParse = mainOpts.get(MainOptions.INTPARSE);
-      final String xsdVal = mainOpts.get(MainOptions.XSDVALIDATION);
-      if(intParse) {
-        if(dtdVal) throw NODTDVALIDATION.get(info);
-        if(!MainOptions.SKIP.equals(xsdVal)) throw NOXSDVALIDATION_X.get(info, xsdVal);
-      } else if(!MainOptions.SKIP.equals(xsdVal)) {
-        if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
-        if(!MainOptions.STRICT.equals(xsdVal)) throw INVALIDXSDOPT_X.get(info, xsdVal);
-      }
+    final boolean dtdVal = mopts.get(MainOptions.DTDVALIDATION);
+    final String xsdVal = mopts.get(MainOptions.XSDVALIDATION);
+    final boolean skip = MainOptions.SKIP.equals(xsdVal);
+    final boolean strict = MainOptions.STRICT.equals(xsdVal);
+    final boolean intparse = fragment || mopts.get(MainOptions.INTPARSE);
+    if(intparse) {
+      if(dtdVal) throw NODTDVALIDATION.get(info);
+      if(!skip) throw NOXSDVALIDATION_X.get(info, xsdVal);
+    } else if(!skip) {
+      if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
+      if(!strict) throw INVALIDXSDOPT_X.get(info, xsdVal);
     }
 
     try {
-      return new DBNode(intParse
-          ? new XMLParser(io, mainOpts, true) : Parser.xmlParser(io, mainOpts));
+      return new DBNode(intparse ? new XMLParser(io, mopts, true) : Parser.xmlParser(io, mopts));
     } catch(final IOException ex) {
       final Throwable th = ex.getCause();
       final QueryException qe = !(th instanceof ValidationException) ? SAXERR_X.get(info, ex) :
@@ -110,18 +105,5 @@ public class FnParseXmlFragment extends StandardFunc {
       if(th instanceof SAXException) qe.value(Str.get(th.toString()));
       throw qe;
     }
-  }
-
-  /**
-   * Options for fn:parse-xml-fragment.
-   */
-  public static class ParseXmlFragmentOptions extends Options {
-    /** Document node's base URI. */
-    public static final StringOption BASE_URI = new StringOption("base-uri");
-    /** Remove whitespace-only text nodes. */
-    public static final BooleanOption STRIP_SPACE = new BooleanOption("strip-space", false);
-
-    /** Strip namespaces (default: {@code qc.context.options.get(MainOptions.STRIPNS)}). */
-    public static final BooleanOption STRIPNS = new BooleanOption("strip-ns");
   }
 }

@@ -2185,8 +2185,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("<x> <y> </y> </x>", " {'strip-space': false()}"), "<x> <y> </y> </x>");
     query(func.args("<x> <y> </y> </x>", " {'strip-space': true()}"), "<x><y/></x>");
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
-    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': false()}"), "<x:doc xmlns:x=\"X\"/>");
-    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': true()}"), "<doc/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'stripns': false()}"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'stripns': true()}"), "<doc/>");
     query(func.args(_CONVERT_STRING_TO_HEX.args("<?xml version='1.0' encoding='" + Strings.UTF16LE
         + "'?><x>42</x>", Strings.UTF16LE)), "<x>42</x>");
     query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
@@ -2233,8 +2233,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("<x> <y> </y> </x> <z/>", " {'strip-space': 'no'}"), "<x> <y> </y> </x> <z/>");
     query(func.args("<x> <y> </y> </x> <z/>", " {'strip-space': 'yes'}"), "<x><y/></x><z/>");
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
-    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': false()}"), "<x:doc xmlns:x=\"X\"/>");
-    query(func.args("<x:doc xmlns:x='X'/>", " {'strip-ns': true()}"), "<doc/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'stripns': false()}"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " {'stripns': true()}"), "<doc/>");
     query(func.args(_CONVERT_STRING_TO_HEX.args("<?xml version='1.0' encoding='" + Strings.UTF16LE
         + "'?><x/><y/>", Strings.UTF16LE)), "<x/><y/>");
     query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"

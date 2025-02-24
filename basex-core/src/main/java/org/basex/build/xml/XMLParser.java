@@ -31,7 +31,7 @@ public class XMLParser extends SingleParser {
   private final XMLScanner scanner;
   /** Names of opened elements. */
   private final TokenList elms = new TokenList();
-  /** Allow document fragment as input. */
+  /** Parse fragment. */
   private final boolean fragment;
   /** Closed root element. */
   private boolean closed;
@@ -50,17 +50,17 @@ public class XMLParser extends SingleParser {
    * Constructor.
    * @param source document source
    * @param options main options
-   * @param frag allow parsing of document fragment
+   * @param fragment parse fragment
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final MainOptions options, final boolean frag)
+  public XMLParser(final IO source, final MainOptions options, final boolean fragment)
       throws IOException {
     super(source, options);
-    scanner = new XMLScanner(source, options, frag);
+    scanner = new XMLScanner(source, options, fragment);
     stripNS = options.get(MainOptions.STRIPNS);
     stripWS = options.get(MainOptions.STRIPWS);
     strips.push(stripWS);
-    fragment = frag;
+    this.fragment = fragment;
   }
 
   @Override

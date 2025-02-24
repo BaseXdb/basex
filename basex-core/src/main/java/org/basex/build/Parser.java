@@ -113,7 +113,7 @@ public class Parser extends Job {
   /**
    * Returns an XML parser instance, using the Java default parser.
    * @param source input source
-   * @return xml parser
+   * @return XML parser
    */
   public static SAXWrapper xmlParser(final IO source) {
     return xmlParser(source, new MainOptions());
@@ -123,7 +123,7 @@ public class Parser extends Job {
    * Returns an XML parser instance, using the Java default parser.
    * @param source input source
    * @param options main options
-   * @return xml parser
+   * @return XML parser
    */
   public static SAXWrapper xmlParser(final IO source, final MainOptions options) {
     return new SAXWrapper(source, options);

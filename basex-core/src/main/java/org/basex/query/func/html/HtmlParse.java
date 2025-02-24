@@ -25,7 +25,7 @@ import org.basex.util.*;
 public class HtmlParse extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return parse(htmlInput(qc), Parser.DEFAULT, qc);
+    return parse(input(qc), Parser.DEFAULT, qc);
   }
 
   /**
@@ -35,11 +35,10 @@ public class HtmlParse extends StandardFunc {
    * @return input as an IOContent instance ({@code null}, if empty)
    * @throws QueryException query exception
    */
-  protected IOContent htmlInput(final QueryContext qc) throws QueryException {
+  protected IOContent input(final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    if(value.isEmpty()) return null;
-    return value instanceof Bin ? new IOContent(toBytes(value))
-                                : new IOContent(toBytes(value), "", Strings.UTF8);
+    return value.isEmpty() ? null :
+      new IOContent(toBytes(value), "", value instanceof Bin ? null : Strings.UTF8);
   }
 
   @Override
