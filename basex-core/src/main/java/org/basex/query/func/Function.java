@@ -1689,8 +1689,8 @@ public enum Function implements AFunction {
   _PROF_TYPE(ProfType::new, "type(value)",
       params(ITEM_ZM), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_VARIABLES(ProfVariables::new, "variables()",
-      params(), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
+  _PROF_VARIABLES(ProfVariables::new, "variables([map,label])",
+      params(MAP_ZO, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
 
   // Random Module
 

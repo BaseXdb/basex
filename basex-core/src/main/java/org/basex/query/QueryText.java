@@ -403,7 +403,7 @@ public interface QueryText {
   /** Serialization. */ byte[] CHARACTER_MAP = token("character-map");
   /** Serialization. */ byte[] MAP_STRING = token("map-string");
 
-  /** Debugging info. */ String DEBUG_LOCAL = "Local Variables";
+  /** Debugging info. */ byte[] DEBUG_ASSIGNMENTS = token("Assignments:");
 
   /** Java prefix. */ String JAVA_PREFIX_COLON = "java:";
   /** Java keyword: new. */ String NEW = "new";

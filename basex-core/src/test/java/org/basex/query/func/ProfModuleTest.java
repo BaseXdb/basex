@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.query.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -72,7 +73,20 @@ public final class ProfModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void variables() {
     final Function func = _PROF_VARIABLES;
+    final String name = func.args().replace("()", "");
+
+    // ensure that profiling leads to no unexpected errors (the debug output is not tested)
     query("for $x in 1 to 2 return " + func.args(), "");
     query(func.args() + ", let $x := " + _RANDOM_DOUBLE.args() + " return floor($x * $x)", 0);
+    query(func.args() + ", let $x := " + wrap(1) + " return $x, " + func.args(), 1);
+    query("fn { " + func.args() + "}(1)", "");
+
+    query("function-lookup(xs:QName('" + name + "'), 0)()", "");
+    query("function-lookup(xs:QName(" + wrap(name) + "), 0)()", "");
+
+    query(func.args(" {}"), "");
+    query("function-lookup(xs:QName('" + name + "'), 1)({})", "");
+    query("function-lookup(xs:QName(" + wrap(name) + "), 1)({})", "");
+    error(func.args(1), QueryError.INVCONVERT_X_X_X);
   }
 }

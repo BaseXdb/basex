@@ -1,7 +1,9 @@
 package org.basex.query.var;
 
 import org.basex.query.*;
+import org.basex.query.func.prof.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -13,13 +15,13 @@ import org.basex.util.*;
 public final class QueryStack {
   /** Initial stack size. */
   private static final int INIT = 1 << 5;
-  /** The currently assigned values. */
-  private Value[] stack = new Value[INIT];
-  /** The currently assigned variables. */
+  /** Assigned values. */
+  private Value[] values = new Value[INIT];
+  /** Declared variables. */
   private Var[] vars = new Var[INIT];
-  /** The frame pointer, marking the start of the current stack frame. */
+  /** Frame pointer, marking the start of the current stack frame. */
   private int start;
-  /** The stack limit, marking the end of the current stack frame. */
+  /** Stack limit, marking the end of the current stack frame. */
   private int end;
 
   /**
@@ -43,8 +45,8 @@ public final class QueryStack {
   public void reuseFrame(final int size) {
     final int s = start;
     ensureCapacity(s + size);
-    final Value[] stck = stack;
-    for(int e = end; --e >= s;) stck[e] = null;
+    final Value[] vls = values;
+    for(int e = end; --e >= s;) vls[e] = null;
     end = s + size;
   }
 
@@ -54,15 +56,15 @@ public final class QueryStack {
    */
   public void exitFrame(final int fp) {
     final int s = start;
-    final Value[] stck = stack;
-    for(int en = end; --en >= s;) stck[en] = null;
+    final Value[] vls = values;
+    for(int en = end; --en >= s;) vls[en] = null;
     end = s;
     start = fp;
 
-    final int sl = stck.length;
-    int len = sl;
-    while(len > INIT && sl <= len >> 2) len >>= 1;
-    if(len != sl) resize(len);
+    final int vl = vls.length;
+    int ns = vl;
+    while(ns > INIT && vl <= ns >> 2) ns >>= 1;
+    if(ns != vl) resize(ns);
   }
 
   /**
@@ -79,10 +81,10 @@ public final class QueryStack {
    * @param size required stack size
    */
   private void ensureCapacity(final int size) {
-    final int sl = stack.length;
-    int len = sl;
-    while(size > len) len <<= 1;
-    if(len != sl) resize(len);
+    final int vl = values.length;
+    int ns = vl;
+    while(size > ns) ns <<= 1;
+    if(ns != vl) resize(ns);
   }
 
   /**
@@ -91,21 +93,23 @@ public final class QueryStack {
    */
   private void resize(final int size) {
     final int os = end;
-    final Value[] nst = new Value[size];
-    Array.copy(stack, os, nst);
-    stack = nst;
-    final Var[] nvr = new Var[size];
-    Array.copy(vars, os, nvr);
-    vars = nvr;
+    final Value[] vls = new Value[size];
+    Array.copy(values, os, vls);
+    values = vls;
+    final Var[] vrs = new Var[size];
+    Array.copy(vars, os, vrs);
+    vars = vrs;
   }
 
   /**
    * Gets the value bound to the given variable in the current stack frame.
    * @param var variable
-   * @return bound value
+   * @return bound value, or {@link Empty#UNDEFINED} reference (required for {@link ProfVariables})
    */
   public Value get(final Var var) {
-    return var.slot == -1 ? null : stack[start + var.slot];
+    final int vs = var.slot;
+    final Value value = vs == -1 ? null : values[start + vs];
+    return value != null ? value : Empty.UNDEFINED;
   }
 
   /**
@@ -117,12 +121,12 @@ public final class QueryStack {
    */
   public void set(final Var var, final Value value, final QueryContext qc) throws QueryException {
     final int pos = start + var.slot;
-    stack[pos] = var.checkType(value, qc, null);
     vars[pos] = var;
+    values[pos] = var.checkType(value, qc, null);
   }
 
   @Override
   public String toString() {
-    return new TokenBuilder().add(getClass()).add('[').addAll(stack, ", ").add(']').toString();
+    return new TokenBuilder().add(getClass()).add('[').addAll(values, ", ").add(']').toString();
   }
 }

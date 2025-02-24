@@ -1,22 +1,20 @@
 package org.basex.query.func.prof;
 
-import static org.basex.util.Token.*;
+import static org.basex.query.func.Function.*;
 
 import java.util.List;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
-import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
-import org.basex.query.value.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -26,67 +24,39 @@ import org.basex.util.hash.*;
  */
 public final class ProfVariables extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) {
-    throw Util.notExpected();
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Item map = arg(0).item(qc, info);
+    final byte[] label = toZeroToken(arg(1), qc);
+
+    if(!map.isEmpty()) {
+      final TokenBuilder tb = new TokenBuilder();
+      toMap(map).forEach((key, value) -> {
+        if(value != Empty.UNDEFINED) {
+          tb.add(Prop.NL).add("  ").add(key.toJava()).add(" := ").add(value);
+        }
+      });
+      FnTrace.trace(tb.finish(), label.length != 0 ? label : QueryText.DEBUG_ASSIGNMENTS, qc);
+    }
+    return Empty.VALUE;
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    if(!arg(0).seqType().zero()) return this;
+
+    // create map constructor with context value and variable names/references
+    final ExprList list = new ExprList();
+    if(cc.qc.focus.value != null) {
+      list.add(new ContextValue(info)).add(Str.get("."));
+    }
     final List<Var> vars = cc.vs().vars;
     final QNmSet names = new QNmSet();
-    final Expr[] varRefs = new Expr[vars.size()];
-    for(int i = 0; i < vars.size(); ++i) {
-      final Var var = vars.get(i);
-      names.add(var.name);
-      varRefs[i] = new VarRef(info, var);
-    }
-    return new VarHandler(info, names, varRefs);
-  }
-
-  /**
-   * Function implementation for logging defined variables.
-   */
-  private static class VarHandler extends Arr {
-    /** Names of variables. */
-    final QNmSet names;
-
-    /**
-     * Constructor.
-     * @param info input info
-     * @param names variable names
-     * @param varRefs variable references
-     */
-    protected VarHandler(final InputInfo info, final QNmSet names, final Expr... varRefs) {
-      super(info, SeqType.EMPTY_SEQUENCE_Z, varRefs);
-      this.names = names;
-    }
-
-    @Override
-    public Value value(final QueryContext qc) throws QueryException {
-      final TokenBuilder tb = new TokenBuilder().add(QueryText.DEBUG_LOCAL).add(':');
-      int i = 0;
-      for(final QNm name : names) {
-        final Value value = exprs[i++].value(qc);
-        if(value != null) tb.add(Prop.NL).add("  $").add(name).add(" := ").add(value);
+    for(int v = vars.size() - 1; v >= 0; --v) {
+      final Var var = vars.get(v);
+      if(names.add(var.name)) {
+        list.add(new VarRef(info, var)).add(Str.get(Strings.concat('$', var.name.prefixId())));
       }
-      FnTrace.trace(token(tb.toString()), EMPTY, qc);
-      return Empty.VALUE;
     }
-
-    @Override
-    public boolean has(final Flag... flags) {
-      for(final Flag flag : flags) if(flag == Flag.NDT) return true;
-      return super.has(flags);
-    }
-
-    @Override
-    public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-      return copyType(new VarHandler(info, names, copyAll(cc, vm, args())));
-    }
-
-    @Override
-    public void toString(final QueryString qs) {
-      qs.token("prof:variables").params(exprs);
-    }
+    return cc.function(_PROF_VARIABLES, info, new CMap(info, list.reverse().finish()));
   }
 }
