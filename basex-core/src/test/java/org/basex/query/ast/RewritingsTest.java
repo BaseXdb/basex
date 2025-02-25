@@ -3353,4 +3353,16 @@ public final class RewritingsTest extends SandboxTest {
         + "}"
         + "return $f(1, $f)", 100000);
   }
+
+  /** Filter expression, node order. */
+  @Test public void gh2386() {
+    query("let $f := fn { true() } "
+        + "let $a := sort((<x>2</x>, <x>1</x>)) "
+        + "let $b := $a[$f(.)] "
+        + "return ($a, $b)",
+        "<x>1</x>\n<x>2</x>\n<x>1</x>\n<x>2</x>");
+    query("let $f := fn { true() } "
+        + "return sort((<x>2</x>, <x>1</x>)) -> (., .[$f(.)])",
+        "<x>1</x>\n<x>2</x>\n<x>1</x>\n<x>2</x>");
+  }
 }

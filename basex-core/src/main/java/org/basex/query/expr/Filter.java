@@ -67,7 +67,7 @@ public abstract class Filter extends AFilter {
     // no positional access..
     if(!mayBePositional()) {
       // convert to axis path: .[text()]  ->  self::node()[text()]
-      if(root instanceof ContextValue && root.seqType().type instanceof NodeType) {
+      if(root instanceof ContextValue && root.ddo()) {
         return Path.get(cc, info, null, Step.get(cc, root, info, exprs));
       }
       // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
