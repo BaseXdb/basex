@@ -2771,7 +2771,7 @@ public final class FnModuleTest extends SandboxTest {
     check("for $s in ('a', 'b') return $s[" + func.args() + ']', "a\nb", empty(func));
     check("for $s in ('a', 'b') return $s[" + func.args() + " = 'a']", "a", empty(func));
     check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "",
-        empty(func), exists(SingleIterPath.class));
+        empty(func), exists(SingleIterPath.class), root(IterFilter.class));
 
     error(func.args(), NOCTX_X);
     error(func.args(" true#0"), FISTRING_X);

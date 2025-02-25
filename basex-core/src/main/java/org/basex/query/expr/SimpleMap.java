@@ -235,12 +235,15 @@ public abstract class SimpleMap extends Mapping {
 
     // merge filter with context value as root
     // A ! .[B]  ->  A[B]
+    Preds preds = null;
     if(next instanceof Filter) {
       final Filter filter = (Filter) next;
-      if(filter.root instanceof ContextValue && !filter.mayBePositional()) {
-        return Filter.get(cc, info, expr, filter.exprs);
-      }
+      if(filter.root instanceof ContextValue) preds = filter;
+    } else if(next instanceof SingleIterPath) {
+      final Step step = ((AxisPath) next).step(0);
+      if(step.axis == Axis.SELF && step.test == KindTest.NODE) preds = step;
     }
+    if(preds != null && !preds.mayBePositional()) return Filter.get(cc, info, expr, preds.exprs);
 
     // A ! (if(B) then C else ()  ->  A[B] ! C
     if(next instanceof If) {
