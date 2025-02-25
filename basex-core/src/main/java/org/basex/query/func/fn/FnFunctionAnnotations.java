@@ -3,9 +3,11 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.func.*;
+import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.util.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -15,13 +17,15 @@ import org.basex.util.*;
  */
 public final class FnFunctionAnnotations extends StandardFunc {
   @Override
-  public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Value value(final QueryContext qc) throws QueryException {
     final FItem function = toFunction(arg(0), qc);
 
-    final MapBuilder mb = new MapBuilder();
-    for(final Ann ann : function.annotations()) {
-      mb.put(ann.name(), ann.value());
+    final AnnList anns = function.annotations();
+    if(anns.isEmpty()) return Empty.VALUE;
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Ann ann : anns) {
+      vb.add(XQMap.singleton(ann.name(), ann.value()));
     }
-    return mb.map();
+    return vb.value();
   }
 }
