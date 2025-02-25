@@ -4,7 +4,9 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 
 /**
@@ -16,15 +18,18 @@ import org.basex.util.*;
 public final class ProfRuntime extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toString(arg(0), qc);
-
+    final byte[] name = toTokenOrNull(arg(0), qc);
     final Runtime rt = Runtime.getRuntime();
-    switch(name) {
-      case "max":        return Int.get(rt.maxMemory());
-      case "total":      return Int.get(rt.totalMemory());
-      case "used":       return Int.get(rt.totalMemory() - rt.freeMemory());
-      case "processors": return Int.get(rt.availableProcessors());
-    }
+
+    final MapBuilder map = new MapBuilder();
+    map.put("used", Int.get(rt.totalMemory() - rt.freeMemory()));
+    map.put("total", Int.get(rt.totalMemory()));
+    map.put("max", Int.get(rt.maxMemory()));
+    map.put("processors", Int.get(rt.availableProcessors()));
+    if(name == null) return map.map();
+
+    final Value value = map.get(Str.get(name));
+    if(value != null) return (Item) value;
     throw PROF_OPTION_X.get(info, name);
   }
 }

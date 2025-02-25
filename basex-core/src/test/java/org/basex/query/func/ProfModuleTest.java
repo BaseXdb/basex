@@ -32,6 +32,17 @@ public final class ProfModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void runtime() {
+    final Function func = _PROF_RUNTIME;
+    query(func.args() + " instance of map(*)", true);
+    query(func.args("used") + " instance of xs:integer", true);
+    query(func.args("total") + " instance of xs:integer", true);
+    query(func.args("max") + " instance of xs:integer", true);
+    query(func.args("processors") + " instance of xs:integer", true);
+    error(func.args("x"), QueryError.PROF_OPTION_X);
+  }
+
+  /** Test method. */
   @Test public void sleep() {
     final Function func = _PROF_SLEEP;
     query(func.args(" 10"));

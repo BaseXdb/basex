@@ -1677,7 +1677,7 @@ public enum Function implements AFunction {
   _PROF_SLEEP(ProfSleep::new, "sleep(ms)",
       params(INTEGER_O), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_RUNTIME(ProfRuntime::new, "runtime(name)",
+  _PROF_RUNTIME(ProfRuntime::new, "runtime([option])",
       params(STRING_O), ITEM_O, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TIME(ProfTime::new, "time(value[,label])",
