@@ -41,9 +41,9 @@ public abstract class Step extends Preds {
    * @return step
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final Expr root, final InputInfo info,
+  public static Expr self(final CompileContext cc, final Expr root, final InputInfo info,
       final Expr... preds) throws QueryException {
-    return get(cc, root, info, KindTest.NODE, preds);
+    return self(cc, root, info, KindTest.NODE, preds);
   }
 
   /**
@@ -56,7 +56,7 @@ public abstract class Step extends Preds {
    * @return step
    * @throws QueryException query exception
    */
-  public static Expr get(final CompileContext cc, final Expr root, final InputInfo info,
+  public static Expr self(final CompileContext cc, final Expr root, final InputInfo info,
       final Test test, final Expr... preds) throws QueryException {
     return get(cc, root, info, SELF, test, preds);
   }

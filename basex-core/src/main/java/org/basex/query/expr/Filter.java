@@ -68,7 +68,7 @@ public abstract class Filter extends AFilter {
     if(!mayBePositional()) {
       // convert to axis path: .[text()]  ->  self::node()[text()]
       if(root instanceof ContextValue && root.ddo()) {
-        return Path.get(cc, info, null, Step.get(cc, root, info, exprs));
+        return Path.get(cc, info, null, Step.self(cc, root, info, exprs));
       }
       // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
       if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(cc, exprs);
@@ -76,7 +76,7 @@ public abstract class Filter extends AFilter {
       // rewrite filter with document nodes to path to possibly enable index rewritings
       // example: db:get('db')[.//text() = 'x']  ->  db:get('db')/.[.//text() = 'x']
       if(root.seqType().type == NodeType.DOCUMENT_NODE && root.ddo()) {
-        final Expr step = Step.get(cc, root, info, exprs);
+        final Expr step = Step.self(cc, root, info, exprs);
         return cc.replaceWith(this, Path.get(cc, info, root, step));
       }
 

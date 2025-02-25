@@ -559,7 +559,7 @@ public class CmpG extends Cmp {
         final ExprList paths = new ExprList(2);
         for(final QNm qname : qnames) {
           final Test test = new NameTest(qname, part, (NodeType) type, sc().elemNS);
-          final Expr step = Step.get(cc, null, info, test);
+          final Expr step = Step.self(cc, null, info, test);
           if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
         }
         return paths.isEmpty() ? Bln.FALSE : paths.size() == 1 ? paths.get(0) :

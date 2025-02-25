@@ -856,7 +856,7 @@ public abstract class Path extends ParseExpr {
     if(!lastPreds.isEmpty()) {
       indexSteps.add(indexStep instanceof Step
           ? ((Step) indexSteps.pop()).addPredicates(lastPreds.finish())
-          : Step.get(cc, indexRoot, info, lastPreds.finish()));
+          : Step.self(cc, indexRoot, info, lastPreds.finish()));
     }
 
     // add remaining steps

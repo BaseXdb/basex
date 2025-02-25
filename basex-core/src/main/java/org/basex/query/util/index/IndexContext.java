@@ -51,7 +51,7 @@ class IndexContext extends IndexPred {
     if(info.text || !(st.test instanceof NameTest || st.test instanceof UnionTest)) return root;
 
     // attribute index request: add attribute step
-    final Expr step = Step.get(info.cc, root, st.info(), st.test);
+    final Expr step = Step.self(info.cc, root, st.info(), st.test);
     return Path.get(root.info(), root, step);
   }
 }

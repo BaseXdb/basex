@@ -76,7 +76,7 @@ class IndexPath extends IndexPred {
 
     // attribute index request: start inverted path with attribute step
     if(!info.text && (last.test instanceof NameTest || last.test instanceof UnionTest)) {
-      steps.add(Step.get(cc, rt, last.info(), last.test));
+      steps.add(Step.self(cc, rt, last.info(), last.test));
     }
     // add inverted steps in reverse order
     while(--s >= 0) {
