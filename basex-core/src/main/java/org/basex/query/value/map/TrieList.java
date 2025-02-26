@@ -49,22 +49,26 @@ final class TrieList extends TrieNode {
 
   @Override
   TrieNode put(final int hs, final int lv, final TrieUpdate update) throws QueryException {
-    // same hash
-    final boolean same = hs == hash;
-    if(same) {
-      for(int i = keys.length; i-- > 0;) {
-        final Item key = keys[i];
-        if(key.atomicEqual(update.key)) {
-          final Value[] vs = values.clone();
-          vs[i] = update.value;
-          return new TrieList(hs, keys, vs);
+    // different hash: proceed recursively
+    if(hs != hash) return branch(hs, lv, hash, size, update);
+    // same hash...
+    for(int i = keys.length; i-- > 0;) {
+      final Item key = keys[i];
+      if(key.atomicEqual(update.key)) {
+        // same key...
+        if(values[i] == update.value) {
+          // same value: return existing instance
+          return this;
         }
+        // different value: replace value
+        final Value[] vs = values.clone();
+        vs[i] = update.value;
+        return new TrieList(hs, keys, vs);
       }
     }
-    // different key: extend list of values or create branch
-    update.add(null);
-    return same ? new TrieList(hash, Array.add(keys, update.key), Array.add(values, update.value)) :
-      branch(hs, lv, hash, size, update);
+    // different key: add key and value
+    update.add();
+    return new TrieList(hash, Array.add(keys, update.key), Array.add(values, update.value));
   }
 
   @Override

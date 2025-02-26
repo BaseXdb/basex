@@ -242,6 +242,9 @@ public final class MapTest extends SandboxTest {
     query("{ 48: 'I', '0': 'S' } => map:get(48.0)", "I");
     query("{ 48: 'I', '0': 'S' } => map:put(9, 9) => map:get(48e0)", "I");
     query("{ 48: 'I', '0': 'S' } => map:put(9, 9) => map:get(48.0)", "I");
+
+    query("{ 48: 'I', '0': 'S' } => map:put('0', 'S') => map:get('0')", "S");
+    query("{ 48: 'I', '0': 'S' } => map:put('0', 'T') => map:get('0')", "T");
   }
 
   /** Multiple puts/removes in the same map. */

@@ -24,15 +24,16 @@ final class TrieKeys implements Iterable<Item> {
 
   /**
    * Empty constructor.
+   * @param keys keys
    */
-  TrieKeys() {
-    this(new Item[2], 0);
+  TrieKeys(final Item... keys) {
+    this(keys, keys.length);
   }
 
   /**
    * Constructor.
-   * @param size number of keys
    * @param keys keys
+   * @param size number of keys
    */
   TrieKeys(final Item[] keys, final int size) {
     this.keys = keys;

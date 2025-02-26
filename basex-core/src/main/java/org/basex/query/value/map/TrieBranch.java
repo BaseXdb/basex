@@ -35,11 +35,14 @@ final class TrieBranch extends TrieNode {
     final int k = hashKey(hs, lv), bs, rem;
     final TrieNode sub = kids[k], nsub;
     if(sub != null) {
-      nsub = sub.put(hs, lv + 1, update);
+      final TrieNode sb = sub.put(hs, lv + 1, update);
+      // nothing has change: return existing instance
+      if(sb == sub) return this;
+      nsub = sb;
       bs = used;
       rem = sub.size;
     } else {
-      update.add(null);
+      update.add();
       nsub = new TrieLeaf(hs, update.key, update.value);
       bs = used | 1 << k;
       rem = 0;

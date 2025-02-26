@@ -36,7 +36,7 @@ abstract class TrieNode {
    * @param hs hash code used as key
    * @param lv level
    * @param update update information
-   * @return updated map
+   * @return updated map, {@code this} otherwise
    * @throws QueryException query exception
    */
   abstract TrieNode put(int hs, int lv, TrieUpdate update) throws QueryException;
@@ -60,6 +60,7 @@ abstract class TrieNode {
       ch[a] = put(hs, lv + 1, update);
       used = 1 << a;
     } else {
+      update.add();
       ch[a] = new TrieLeaf(hs, update.key, update.value);
       ch[b] = this;
       used = 1 << a | 1 << b;

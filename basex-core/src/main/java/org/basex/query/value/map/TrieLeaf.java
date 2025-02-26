@@ -35,14 +35,21 @@ final class TrieLeaf extends TrieNode {
 
   @Override
   TrieNode put(final int hs, final int lv, final TrieUpdate update) throws QueryException {
-    // same hash
-    final boolean same = hs == hash;
-    // same key: create new leaf
-    if(same && key.atomicEqual(update.key)) return new TrieLeaf(hs, key, update.value);
-    // different key: create list of values or branch
-    update.add(key);
-    return same ? new TrieList(hs, key, value, update.key, update.value) :
-      branch(hs, lv, hash, 1, update);
+    // different hash: proceed recursively
+    if(hs != hash) return branch(hs, lv, hash, 1, update);
+    // same hash...
+    if(key.atomicEqual(update.key)) {
+      // same key...
+      if(value == update.value) {
+        // same value: return existing instance
+        return this;
+      }
+      // different value: replace value
+      return new TrieLeaf(hs, key, update.value);
+    }
+    // same hash, different key: add key and value
+    update.add();
+    return new TrieList(hs, key, value, update.key, update.value);
   }
 
   @Override

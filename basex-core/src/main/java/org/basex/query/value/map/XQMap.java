@@ -208,7 +208,7 @@ public abstract class XQMap extends XQStruct {
   /**
    * Tests all entries.
    * @param func predicate function
-   * @return result of check
+   * @return {@code true} if all the check is successful for all entries
    * @throws QueryException query exception
    */
   public abstract boolean test(QueryBiPredicate<Item, Value> func) throws QueryException;
@@ -368,26 +368,39 @@ public abstract class XQMap extends XQStruct {
     if(!(item instanceof XQMap)) return false;
     final XQMap map = (XQMap) item;
     if(structSize() != map.structSize()) return false;
-
-    // return identical map representations (faster)
+    // compare identical map representations first (faster)
     return getClass() == map.getClass() ? deepEqual(map, deep) : deepEq(map, deep);
   }
 
   /**
-   * Compares two maps for equality (fallback, quadratic complexity).
+   * Compares two maps for equality (fallback).
    * @param map map to be compared
-   * @param deep comparator
+   * @param deep comparator (can be {@code null})
    * @return result of check
    * @throws QueryException query exception
    */
   final boolean deepEq(final XQMap map, final DeepEqual deep) throws QueryException {
+    // compare sorted entries
+    final BasicIter<Item> keys = keys(), keys2 = map.keys();
+    while(true) {
+      final Item key = keys.next(), key2 = keys2.next();
+      if(key == null) return true;
+      final Value value = getInternal(key), value2 = map.getInternal(key2);
+      if(deep != null) {
+        if(!(key.atomicEqual(key2) && deep.equal(value, value2))) break;
+      } else {
+        if(!(key.equals(key2) && value.equals(value2))) break;
+      }
+    }
+    // compare unsorted entries (worst case)
     return test((key, value) -> {
       if(deep != null && deep.qc != null) deep.qc.checkStop();
-      for(final Item k : map.keys()) {
+      for(final Item key2 : map.keys()) {
+        final Value value2 = map.getInternal(key2);
         if(deep != null) {
-          if(key.atomicEqual(k)) return deep.equal(value, map.get(k));
+          if(key.atomicEqual(key2)) return deep.equal(value, value2);
         } else {
-          if(key.equals(k)) return value.equals(map.get(k));
+          if(key.equals(key2)) return value.equals(value2);
         }
       }
       return false;

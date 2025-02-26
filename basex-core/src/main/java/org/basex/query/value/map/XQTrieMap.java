@@ -38,14 +38,20 @@ public final class XQTrieMap extends XQMap {
   XQMap putInternal(final Item key, final Value value) throws QueryException {
     final TrieUpdate update = new TrieUpdate(key, value, order);
     final TrieNode node = root.put(key.hashCode(), 0, update);
-    return new XQTrieMap(node, update.order());
+    if(node == root) return this;
+    // create initial map order if an entry is added to a singleton map
+    return new XQTrieMap(node, node.size == 1 ? null :
+      root.size == 1 ? new TrieOrder(((TrieLeaf) root).key, key) : update.order());
   }
 
   @Override
   public XQMap removeInternal(final Item key) throws QueryException {
     final TrieUpdate update = new TrieUpdate(key, null, order);
     final TrieNode node = root.remove(key.hashCode(), 0, update);
-    return node == root ? this : node != null ? new XQTrieMap(node, update.order()) : null;
+    if(node == root) return this;
+    if(node == null) return null;
+    // drop map order if map has single entry
+    return new XQTrieMap(node, node.size == 1 ? null : update.order());
   }
 
   @Override

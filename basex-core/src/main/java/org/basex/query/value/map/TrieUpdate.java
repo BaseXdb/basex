@@ -33,14 +33,9 @@ final class TrieUpdate {
 
   /**
    * Adds an entry.
-   * @param old key of entry to be replaced (only considered for additions to singleton maps)
    */
-  void add(final Item old) {
-    if(!oldOrder()) {
-      newOrder = new TrieOrder();
-      newOrder.add(old);
-    }
-    newOrder.add(key);
+  void add() {
+    if(oldOrder != null) newOrder = oldOrder.add(key);
   }
 
   /**
@@ -48,27 +43,15 @@ final class TrieUpdate {
    * @param old key of entry to be removed
    */
   void remove(final Item old) {
-    if(oldOrder()) {
-      newOrder.remove(old);
-    }
+    if(oldOrder != null) newOrder = oldOrder.remove(old);
   }
 
   /**
    * Returns the current map order.
-   * @return order
+   * @return order (can be {@code null})
    */
   TrieOrder order() {
     return newOrder != null ? newOrder : oldOrder;
-  }
-
-  /**
-   * Indicates if an old order existed and could be prepared for updates.
-   * @return result of check
-   */
-  private boolean oldOrder() {
-    if(oldOrder == null) return false;
-    newOrder = oldOrder.copy();
-    return true;
   }
 
   @Override

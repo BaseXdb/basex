@@ -12,54 +12,56 @@ import org.basex.util.*;
  */
 final class TrieOrder {
   /** Added keys. */
-  private TrieKeys added = new TrieKeys();
+  private TrieKeys added;
   /** Removed keys (lazy instantiation). */
   private TrieKeys removed;
+
+  /**
+   * Constructor.
+   * @param keys added keys
+   */
+  TrieOrder(final Item... keys) {
+    this(new TrieKeys(keys), null);
+  }
+
+  /**
+   * Constructor.
+   * @param added added keys
+   * @param removed removed keys
+   */
+  private TrieOrder(final TrieKeys added, final TrieKeys removed) {
+    this.added = added;
+    this.removed = removed;
+  }
 
   /**
    * Returns a key iterator.
    * @return iterator
    */
   BasicIter<Item> keys() {
-    cleanUp();
+    if(removed != null) {
+      added = added.remove(removed);
+      removed = null;
+    }
     return added.keys();
   }
 
   /**
    * Adds a key.
    * @param key key to be added
+   * @return new order
    */
-  void add(final Item key) {
-    added = added.add(key);
+  TrieOrder add(final Item key) {
+    return new TrieOrder(added.add(key), removed);
   }
 
   /**
    * Removes a key.
    * @param key key to be removed
+   * @return new order
    */
-  void remove(final Item key) {
-    removed = (removed != null ? removed : new TrieKeys()).add(key);
-  }
-
-  /**
-   * Creates a copy of this data structure.
-   * @return copy
-   */
-  protected TrieOrder copy() {
-    final TrieOrder order = new TrieOrder();
-    order.added = added;
-    order.removed = removed;
-    return order;
-  }
-
-  /**
-   * Cleans up.
-   */
-  private void cleanUp() {
-    if(removed != null) {
-      added = added.remove(removed);
-      removed = null;
-    }
+  TrieOrder remove(final Item key) {
+    return new TrieOrder(added, removed != null ? removed.add(key) : new TrieKeys(key));
   }
 
   @Override
