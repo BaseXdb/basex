@@ -199,6 +199,64 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void atomicTypeAnnotation() {
+    final Function func = ATOMIC_TYPE_ANNOTATION;
+
+    query("atomic-type-annotation(23) ? name", "integer");
+    query("let $x := 23, $y := 93.7 return " + func.args(" $x") + "? matches($y)", false);
+    query("atomic-type-annotation(xs:numeric('23.2')) ? name", "double");
+
+    final String q1 = func.args(" <a>42</a>");
+    query(q1, "{\"name\":untypedAtomic,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
+        + "\"primitive-type\":(anonymous-function)#0,\"variety\":\"atomic\",\"matches\":"
+        + "(anonymous-function)#1,\"constructor\":xs:untypedAtomic#1}");
+    query(q1 + "?name eq xs:QName('xs:untypedAtomic')", true);
+    query(q1 + "?is-simple", true);
+    query(q1 + "?variety", "atomic");
+    query(q1 + "?base-type()?name eq xs:QName('xs:anyAtomicType')", true);
+    query(q1 + "?base-type()?is-simple", true);
+    query(q1 + "?base-type()?variety", "atomic");
+    query(q1 + "?base-type()?base-type()?name eq xs:QName('xs:anySimpleType')", true);
+    query(q1 + "?base-type()?base-type()?is-simple", true);
+    query(q1 + "?base-type()?base-type()=> map:contains('variety')", false);
+    query(q1 + "?base-type()?base-type()?base-type()?name eq xs:QName('xs:anyType')", true);
+    query(q1 + "?base-type()?base-type()?base-type()?is-simple", false);
+    query(q1 + "?base-type()?base-type()?base-type()?variety", "mixed");
+    query(q1 + "?base-type()?base-type()?base-type()?base-type()", "");
+    query(q1 + "?primitive-type()?name eq xs:QName('xs:untypedAtomic')", true);
+    query(q1 + "=> map:contains('members')", false);
+    query(q1 + "=> map:contains('simple-content-type')", false);
+    query(q1 + "?matches(<a>abc</a>)", true);
+    query(q1 + "?constructor(<a>abc</a>)", "abc");
+
+    final String q2 = "let $q2 := " + func.args(" xs:unsignedByte(255)") + "\n return $q2";
+    query(q2, "{\"name\":unsignedByte,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
+        + "\"primitive-type\":(anonymous-function)#0,\"variety\":\"atomic\",\"matches\":"
+        + "(anonymous-function)#1,\"constructor\":xs:unsignedByte#1}");
+    query(q2 + "?name eq xs:QName('xs:unsignedByte')", true);
+    query(q2 + "?is-simple", true);
+    query(q2 + "?base-type()?name eq xs:QName('xs:unsignedShort')", true);
+    query(q2 + "?base-type()?is-simple", true);
+    query(q2 + "?base-type()?matches($q2?base-type()?constructor(255))", true);
+    query(q2 + "?primitive-type()?name eq xs:QName('xs:decimal')", true);
+    query(q2 + "?primitive-type()?base-type()?name eq xs:QName('xs:anyAtomicType')", true);
+    query(q2 + "?primitive-type() => deep-equal($q2?base-type()?primitive-type())", true);
+    query(q2 + "?variety", "atomic");
+    query(q2 + "=> map:contains('members')", false);
+    query(q2 + "=> map:contains('simple-content-type')", false);
+    query(q2 + "?matches($q2?constructor(255))", true);
+    query(q2 + "?matches($q2?base-type()?constructor(255))", false);
+    query(q2 + "?constructor(255) => ($q2?matches)()", true);
+
+    error(q2 + "?constructor(256)", FUNCCAST_X_X_X);
+
+    error(func.args(" ()"), EMPTYFOUND);
+    error(func.args(" []"), EMPTYFOUND);
+    error(func.args(" {}"), FIATOMIZE_X);
+    error(func.args(" [1, 2]"), SEQFOUND_X);
+  }
+
+  /** Test method. */
   @Test public void avg() {
     final Function func = AVG;
 

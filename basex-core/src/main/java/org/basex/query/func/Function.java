@@ -90,6 +90,9 @@ public enum Function implements AFunction {
   ATOMIC_EQUAL(FnAtomicEqual::new, "atomic-equal(value1,value2)",
       params(ANY_ATOMIC_TYPE_O, ANY_ATOMIC_TYPE_O), BOOLEAN_O),
   /** XQuery function. */
+  ATOMIC_TYPE_ANNOTATION(FnAtomicTypeAnnotation::new, "atomic-type-annotation(value)",
+      params(ANY_ATOMIC_TYPE_O), MAP_O),
+  /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables::new,
       "available-environment-variables()",
       params(), STRING_ZM),
