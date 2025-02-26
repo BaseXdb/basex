@@ -94,7 +94,8 @@ public abstract class StandardFunc extends Arr {
       final int p = Math.min(a, definition.types.length - 1);
       final Type type = definition.types[p].type;
       if(type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
-        final Simplify mode = type.instanceOf(AtomType.NUMERIC) ? Simplify.NUMBER : Simplify.STRING;
+        final Simplify mode = type.instanceOf(AtomType.NUMERIC) ? Simplify.NUMBER :
+            type.instanceOf(AtomType.STRING) ? Simplify.STRING : Simplify.DATA;
         arg(a, arg -> arg.simplifyFor(mode, cc));
       }
     }
