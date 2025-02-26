@@ -914,7 +914,7 @@ public enum AtomType implements Type {
   /** Name. */
   private final byte[] name;
   /** Parent type. */
-  private final AtomType parent;
+  public final AtomType parent;
   /** URI. */
   private final byte[] uri;
 
