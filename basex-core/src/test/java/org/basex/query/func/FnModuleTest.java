@@ -202,9 +202,9 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void atomicTypeAnnotation() {
     final Function func = ATOMIC_TYPE_ANNOTATION;
 
-    query("atomic-type-annotation(23) ? name", "integer");
+    query(func.args(23) + " ? name", "integer");
     query("let $x := 23, $y := 93.7 return " + func.args(" $x") + "? matches($y)", false);
-    query("atomic-type-annotation(xs:numeric('23.2')) ? name", "double");
+    query(func.args(" xs:numeric('23.2')") + " ? name", "double");
 
     final String q1 = func.args(" <a>42</a>");
     query(q1, "{\"name\":untypedAtomic,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
@@ -1852,6 +1852,57 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void namespaceUriForPrefix() {
     final Function func = NAMESPACE_URI_FOR_PREFIX;
     query("sort(<e xmlns:p='u'>{" + func.args("p", " <e/>") + "}</e>/text()/tokenize(.))", "u");
+  }
+
+  /** Test method. */
+  @Test public void nodeTypeAnnotation() {
+    final Function func = NODE_TYPE_ANNOTATION;
+
+    query("let $e := parse-xml(\"<e/>\")/* return " + func.args(" $e") + " ? name", "untyped");
+    query("let $a := parse-xml(\"<e a='3'/>\")//@a return " + func.args(" $a") + " ? name",
+        "untypedAtomic");
+
+    final String q1 = func.args(" <a>42</a>");
+    query(q1, "{\"name\":untyped,\"is-simple\":false(),\"base-type\":(anonymous-function)#0,"
+        + "\"variety\":\"mixed\"}");
+    query(q1 + "?name eq xs:QName('xs:untyped')", true);
+    query(q1 + "?is-simple", false);
+    query(q1 + "?variety", "mixed");
+    query(q1 + "?base-type()?name eq xs:QName('xs:anyType')", true);
+    query(q1 + "?base-type()?is-simple", false);
+    query(q1 + "?base-type()?variety", "mixed");
+    query(q1 + "=> map:contains('primitive-type')", false);
+    query(q1 + "=> map:contains('members')", false);
+    query(q1 + "=> map:contains('simple-content-type')", false);
+
+    final String q2 = func.args(" attribute a {42}");
+    query(q2, "{\"name\":untypedAtomic,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
+        + "\"primitive-type\":(anonymous-function)#0,\"variety\":\"atomic\",\"matches\":"
+        + "(anonymous-function)#1,\"constructor\":xs:untypedAtomic#1}");
+    query(q2 + "?name eq xs:QName('xs:untypedAtomic')", true);
+    query(q2 + "?is-simple", true);
+    query(q2 + "?variety", "atomic");
+    query(q2 + "?base-type()?name eq xs:QName('xs:anyAtomicType')", true);
+    query(q2 + "?base-type()?is-simple", true);
+    query(q2 + "?base-type()?variety", "atomic");
+    query(q2 + "?base-type()?base-type()?name eq xs:QName('xs:anySimpleType')", true);
+    query(q2 + "?base-type()?base-type()?is-simple", true);
+    query(q2 + "?base-type()?base-type()=> map:contains('variety')", false);
+    query(q2 + "?base-type()?base-type()?base-type()?name eq xs:QName('xs:anyType')", true);
+    query(q2 + "?base-type()?base-type()?base-type()?is-simple", false);
+    query(q2 + "?base-type()?base-type()?base-type()?variety", "mixed");
+    query(q2 + "?base-type()?base-type()?base-type()?base-type()", "");
+    query(q2 + "?primitive-type()?name eq xs:QName('xs:untypedAtomic')", true);
+    query(q2 + "=> map:contains('members')", false);
+    query(q2 + "=> map:contains('simple-content-type')", false);
+    query(q2 + "?matches(<a>abc</a>)", true);
+    query(q2 + "?constructor(attribute a {42})", "42");
+
+    error(func.args(" ()"), INVCONVERT_X_X_X);
+    error(func.args(" []"), INVCONVERT_X_X_X);
+    error(func.args(" {}"), INVCONVERT_X_X_X);
+    error(func.args(" [<x/>, <y/>]"), INVCONVERT_X_X_X);
+    error(func.args(" text{'a'}"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
