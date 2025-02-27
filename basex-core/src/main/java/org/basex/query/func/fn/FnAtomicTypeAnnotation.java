@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public final class FnAtomicTypeAnnotation extends StandardFunc {
+public class FnAtomicTypeAnnotation extends StandardFunc {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -51,6 +51,10 @@ public final class FnAtomicTypeAnnotation extends StandardFunc {
         baseType = null;
         variety = Variety.mixed;
         break;
+      case UNTYPED:
+        baseType = ANY_TYPE;
+        variety = Variety.mixed;
+        break;
       case ANY_SIMPLE_TYPE:
         baseType = ANY_TYPE;
         variety = null;
@@ -71,11 +75,11 @@ public final class FnAtomicTypeAnnotation extends StandardFunc {
 
     final MapBuilder mb = new MapBuilder();
     mb.put("name", type.qname());
-    mb.put("is-simple", Bln.get(type != ANY_TYPE));
+    mb.put("is-simple", Bln.get(!type.oneOf(ANY_TYPE, UNTYPED)));
     mb.put("base-type", TypeAnnotation.funcItem(baseType, ii));
     if(primType != null) mb.put("primitive-type", TypeAnnotation.funcItem(primType, ii));
     if(variety != null) mb.put("variety", variety.name());
-    mb.put("matches", Matches.funcItem(type, qc, ii));
+    if(type.atomic() != null) mb.put("matches", Matches.funcItem(type, qc, ii));
     if(constructor != null) mb.put("constructor", constructor);
     return mb.map();
   }

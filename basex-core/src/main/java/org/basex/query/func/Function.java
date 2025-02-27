@@ -474,6 +474,9 @@ public enum Function implements AFunction {
   NODE_NAME(FnNodeName::new, "node-name([node])",
       params(NODE_ZO), QNAME_ZO),
   /** XQuery function. */
+  NODE_TYPE_ANNOTATION(FnNodeTypeAnnotation::new, "node-type-annotation(node)",
+      params(NODE_O), MAP_O),
+  /** XQuery function. */
   NORMALIZE_SPACE(FnNormalizeSpace::new, "normalize-space([value])",
       params(STRING_ZO), STRING_O),
   /** XQuery function. */
