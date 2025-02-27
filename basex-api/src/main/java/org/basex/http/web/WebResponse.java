@@ -60,7 +60,7 @@ public abstract class WebResponse {
       if(ex.file() == null) ex.info(sf.info);
       throw ex;
     } finally {
-      if(qc != null) qc.close();
+      finish();
     }
   }
 
@@ -85,4 +85,11 @@ public abstract class WebResponse {
    */
   protected abstract Response serialize(boolean body) throws QueryException, IOException,
       ServletException;
+
+  /**
+   * Finalizes a response.
+   * @throws IOException I/O exception
+   * @throws ServletException servlet exception
+   */
+  protected abstract void finish() throws IOException, ServletException;
 }

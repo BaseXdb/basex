@@ -31,12 +31,16 @@ final class RestXqResponse extends WebResponse {
   /** HTTP connection. */
   private final HTTPConnection conn;
 
+  /** Singleton. */
+  private RestXqSingleton singleton;
   /** Function. */
   private RestXqFunction func;
   /** Status message. */
   private String message;
   /** Status code. */
   private Integer status;
+  /** Forwarding. */
+  String forward;
 
   /**
    * Constructor.
@@ -58,6 +62,10 @@ final class RestXqResponse extends WebResponse {
     func = new RestXqFunction(function.function, function.module, qc);
     final MainOptions mopts = new MainOptions(ctx.options);
     func.parseAnnotations(mopts);
+
+    if(func.singleton != null) {
+      singleton = new RestXqSingleton(conn, func.singleton, qc);
+    }
     return func.bind(data, conn, qc, mopts);
   }
 
@@ -65,10 +73,7 @@ final class RestXqResponse extends WebResponse {
   public Response serialize(final boolean body) throws QueryException, IOException,
       ServletException {
 
-    final String id = func.singleton;
-    final RestXqSingleton singleton = id != null ? new RestXqSingleton(conn, id, qc) : null;
-    final ArrayOutput cache = id != null ? new ArrayOutput() : null;
-    String forward = null;
+    final ArrayOutput cache = singleton != null ? new ArrayOutput() : null;
     boolean response;
 
     qc.register(ctx);
@@ -126,20 +131,8 @@ final class RestXqResponse extends WebResponse {
           for(; item != null; item = qc.next(iter)) ser.serialize(item);
         }
       }
-
     } finally {
-      qc.close();
       if(cache != null) conn.timing(qc.info);
-
-      qc.unregister(ctx);
-      if(singleton != null) singleton.unregister();
-
-      if(forward != null) {
-        conn.log(SC_NO_CONTENT, "");
-        conn.forward(forward);
-      } else {
-        qc.checkStop();
-      }
     }
 
     // write cached result
@@ -150,6 +143,19 @@ final class RestXqResponse extends WebResponse {
 
     return status != null || forward != null ? Response.CUSTOM :
       response ? Response.STANDARD : Response.NONE;
+  }
+
+  @Override
+  public void finish() throws IOException, ServletException {
+    if(qc != null) {
+      qc.close();
+      qc.unregister(ctx);
+    }
+    if(singleton != null) singleton.unregister();
+    if(forward != null) {
+      conn.log(SC_NO_CONTENT, "");
+      conn.forward(forward);
+    }
   }
 
   /**

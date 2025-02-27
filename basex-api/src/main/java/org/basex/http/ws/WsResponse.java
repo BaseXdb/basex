@@ -56,25 +56,28 @@ public final class WsResponse extends WebResponse {
   @Override
   public Response serialize(final boolean body) throws QueryException, IOException {
     qc.register(ctx);
-    try {
-      final ArrayList<Object> values = serialize(qc.iter(), func.sopts);
-      // don't send anything if the WebSocket connection has been closed
-      if(!func.matches(Annotation._WS_CLOSE, null) &&
-         !func.matches(Annotation._WS_ERROR, null)) {
-        for(final Object value : values) {
-          final RemoteEndpoint remote = ws.getSession().getRemote();
-          if(value instanceof ByteBuffer) {
-            remote.sendBytes((ByteBuffer) value);
-          } else {
-            remote.sendString((String) value);
-          }
+    final ArrayList<Object> values = serialize(qc.iter(), func.sopts);
+    // don't send anything if the WebSocket connection has been closed
+    if(!func.matches(Annotation._WS_CLOSE, null) &&
+       !func.matches(Annotation._WS_ERROR, null)) {
+      for(final Object value : values) {
+        final RemoteEndpoint remote = ws.getSession().getRemote();
+        if(value instanceof ByteBuffer) {
+          remote.sendBytes((ByteBuffer) value);
+        } else {
+          remote.sendString((String) value);
         }
       }
-    } finally {
+    }
+    return Response.STANDARD;
+  }
+
+  @Override
+  protected void finish() {
+    if(qc != null) {
       qc.close();
       qc.unregister(ctx);
     }
-    return Response.STANDARD;
   }
 
   /**
