@@ -255,16 +255,6 @@ public final class Context {
   }
 
   /**
-   * Checks if the current user has the specified permission.
-   * @param perm requested permission
-   * @param db database pattern (can be {@code null})
-   * @return result of check
-   */
-  public boolean perm(final Perm perm, final String db) {
-    return user.has(perm, db);
-  }
-
-  /**
    * Returns the host and port of a client.
    * @return address (or {@code null})
    */
@@ -296,7 +286,7 @@ public final class Context {
   public StringList listDBs(final String pattern) {
     final StringList dbs = databases.listDBs(pattern), sl = new StringList(dbs.size());
     for(final String db : dbs) {
-      if(perm(Perm.READ, db)) sl.add(db);
+      if(user.has(Perm.READ, db)) sl.add(db);
     }
     return sl;
   }

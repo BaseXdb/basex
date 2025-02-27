@@ -63,7 +63,7 @@ public abstract class UserPermUpdate extends UserUpdate {
   protected final void grant() {
     final int ps = perms.size(), ts = patterns.size();
     for(int p = 0; p < ps; p++) {
-      user.perm(perms.get(p), p < ts ? patterns.get(p) : "");
+      user.permission(perms.get(p), p < ts ? patterns.get(p) : "");
     }
   }
 }

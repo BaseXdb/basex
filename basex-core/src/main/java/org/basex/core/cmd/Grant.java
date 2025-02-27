@@ -63,7 +63,7 @@ public final class Grant extends AUser {
 
     final Users users = context.users;
     final User user = users.get(name);
-    user.perm(prm, db);
+    user.permission(prm, db);
     return info(db.isEmpty() ? GRANTED_X_X : GRANTED_ON_X_X_X, args[0], name, db);
   }
 

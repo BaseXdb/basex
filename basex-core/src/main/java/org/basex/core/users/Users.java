@@ -41,7 +41,7 @@ public final class Users {
     file = sopts.dbPath(string(Q_USERS.string()) + IO.XMLSUFFIX);
     read();
     // ensure that default admin user exists
-    if(get(ADMIN) == null) add(new User(ADMIN).perm(Perm.ADMIN));
+    if(get(ADMIN) == null) add(new User(ADMIN).permission(Perm.ADMIN));
   }
 
   /**

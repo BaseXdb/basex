@@ -69,7 +69,7 @@ public class XQueryEval extends StandardFunc {
 
     final Perm perm = Perm.get(options.get(XQueryOptions.PERMISSION).toString());
     if(!user.has(perm)) throw XQUERY_PERMISSION2_X.get(info, perm);
-    qc.context.user(user.copy().perm(perm));
+    qc.context.user(new User(user).permission(perm));
 
     Timer to = null;
     try(QueryContext qctx = new QueryContext(qc)) {

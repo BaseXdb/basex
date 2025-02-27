@@ -186,7 +186,7 @@ public final class QueryResources {
     }
 
     // open and register database
-    if(!ctx.perm(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(info, Perm.READ, name);
+    if(!ctx.user().has(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(info, Perm.READ, name);
     try {
       return addData(Open.open(name, ctx, ctx.options, true, false));
     } catch(final IOException ex) {
@@ -400,7 +400,7 @@ public final class QueryResources {
 
     final Context ctx = qc.context;
     final boolean withdb = ctx.options.get(MainOptions.WITHDB);
-    final String dbName = qi.dbName;
+    final String name = qi.dbName;
 
     // check opened databases
     for(final Data data : datas) {
@@ -414,17 +414,19 @@ public final class QueryResources {
           return data;
         }
         // compare database name; favor existing database instances
-        if(IO.equals(data.meta.name, dbName) && (!mem || !ctx.soptions.dbExists(dbName))) {
+        if(IO.equals(data.meta.name, name) && (!mem || !ctx.soptions.dbExists(name))) {
           return data;
         }
       }
     }
 
     // try to open existing database
-    if(withdb && dbName != null) {
-      if(!ctx.perm(Perm.READ, dbName)) throw BASEX_PERMISSION_X_X.get(info, Perm.READ, dbName);
+    if(withdb && name != null) {
+      if(!ctx.user().has(Perm.READ, name)) {
+        throw BASEX_PERMISSION_X_X.get(info, Perm.READ, name);
+      }
       try {
-        final Data data = Open.open(dbName, ctx, ctx.options, false, false);
+        final Data data = Open.open(name, ctx, ctx.options, false, false);
         if(data != null) return addData(data);
       } catch(final IOException ex) {
         throw IOERR_X.get(info, ex);

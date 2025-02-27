@@ -23,12 +23,12 @@ import org.basex.util.*;
  */
 public final class User {
   /** Stored password codes. */
-  private final EnumMap<Algorithm, EnumMap<Code, String>> passwords =
+  private EnumMap<Algorithm, EnumMap<Code, String>> passwords =
       new EnumMap<>(Algorithm.class);
   /** Database patterns for local permissions. */
-  private final LinkedHashMap<String, Perm> patterns = new LinkedHashMap<>();
+  private LinkedHashMap<String, Perm> patterns = new LinkedHashMap<>();
   /** Permission. */
-  private Perm perm = Perm.NONE;
+  private Perm permission = Perm.NONE;
   /** Name. */
   private String name;
   /** Info node (can be {@code null}). */
@@ -53,6 +53,19 @@ public final class User {
   }
 
   /**
+   * Copy constructor.
+   * @param user parent user
+   */
+  public User(final User user) {
+    passwords = user.passwords;
+    patterns = user.patterns;
+    permission = user.permission;
+    name = user.name;
+    info = user.info;
+  }
+
+
+  /**
    * Indicates if passwords are stored for a user.
    * @return result of check
    */
@@ -68,7 +81,7 @@ public final class User {
    */
   User(final ANode user, final IOFile file) throws BaseXException {
     name = string(attribute(user, Q_NAME, "Root"));
-    perm = attribute(name, user, Q_PERMISSION, Perm.values());
+    permission = attribute(name, user, Q_PERMISSION, Perm.values());
 
     for(final ANode child : children(user)) {
       final QNm qname = child.qname();
@@ -92,8 +105,8 @@ public final class User {
       } else if(qname.eq(Q_DATABASE)) {
         // parse local permissions
         final String nm = string(attribute(child, Q_PATTERN, name));
-        final Perm prm = attribute(name, child, Q_PERMISSION, Perm.values());
-        patterns.put(nm, prm);
+        final Perm perm = attribute(name, child, Q_PERMISSION, Perm.values());
+        patterns.put(nm, perm);
       } else if(qname.eq(Q_INFO)) {
         if(info != null) throw new BaseXException("%: <%/> occurs more than once.", file, qname);
         info = child.finish();
@@ -111,7 +124,7 @@ public final class User {
    * @throws QueryException query exception
    */
   public synchronized FNode toXml(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FBuilder user = FElem.build(Q_USER).add(Q_NAME, name).add(Q_PERMISSION, perm);
+    final FBuilder user = FElem.build(Q_USER).add(Q_NAME, name).add(Q_PERMISSION, permission);
     passwords.forEach((key, value) -> {
       final FBuilder pw = FElem.build(Q_PASSWORD).add(Q_ALGORITHM, key);
       value.forEach((k, v) -> {
@@ -196,7 +209,7 @@ public final class User {
       final Entry<String, Perm> entry = find(db);
       if(entry != null) return entry.getValue();
     }
-    return perm;
+    return permission;
   }
 
   /**
@@ -213,46 +226,46 @@ public final class User {
 
   /**
    * Sets a global permission.
-   * @param prm permission
+   * @param perm permission
    * @return self reference
    */
-  public synchronized User perm(final Perm prm) {
-    perm = prm;
+  public synchronized User permission(final Perm perm) {
+    permission = perm;
     return this;
   }
 
   /**
    * Sets a permission for a specific pattern.
-   * @param prm permission
+   * @param perm permission
    * @param pattern database pattern (if empty, a global permission is set)
    * @return self reference
    */
-  public synchronized User perm(final Perm prm, final String pattern) {
+  public synchronized User permission(final Perm perm, final String pattern) {
     if(pattern.isEmpty()) {
-      perm(prm);
+      permission(perm);
     } else {
-      patterns.put(pattern, prm);
+      patterns.put(pattern, perm);
     }
     return this;
   }
 
   /**
    * Tests if the user has the specified permission.
-   * @param prm permission to be checked
+   * @param perm permission to be checked
    * @return result of check
    */
-  public synchronized boolean has(final Perm prm) {
-    return has(prm, null);
+  public synchronized boolean has(final Perm perm) {
+    return has(perm, null);
   }
 
   /**
    * Tests if the user has the specified permission.
-   * @param prm permission to be checked
+   * @param perm permission to be checked
    * @param db database pattern (can be {@code null})
    * @return result of check
    */
-  public synchronized boolean has(final Perm prm, final String db) {
-    return perm(db).ordinal() >= prm.ordinal();
+  public synchronized boolean has(final Perm perm, final String db) {
+    return perm(db).ordinal() >= perm.ordinal();
   }
 
   /**
@@ -283,17 +296,6 @@ public final class User {
   }
 
   /**
-   * Creates a lightweight copy.
-   * @return copy
-   */
-  public synchronized User copy() {
-    final User user = new User(name);
-    user.perm = perm;
-    user.info = info;
-    return user;
-  }
-
-  /**
    * Returns the digest hash value.
    * @param name username
    * @param password password
@@ -305,6 +307,6 @@ public final class User {
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + name + '/' + perm + ']';
+    return Util.className(this) + '[' + name + '/' + permission + ']';
   }
 }

@@ -59,7 +59,7 @@ public final class DbListDetails extends DbList {
           database.add(Q_RESOURCES, meta.ndocs + binaries + values);
           database.add(Q_MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
           database.add(Q_SIZE, meta.dbSize());
-          if(ctx.perm(Perm.CREATE, name)) database.add(Q_PATH, meta.original);
+          if(ctx.user().has(Perm.CREATE, name)) database.add(Q_PATH, meta.original);
         } catch(final IOException ex) {
           // invalid database will be ignored
           Util.debug(ex);

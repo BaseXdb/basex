@@ -85,8 +85,9 @@ public final class Open extends Command {
       final boolean exists, final boolean perm) throws IOException {
 
     // check permissions
-    if(perm && !context.perm(Perm.READ, name)) throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
-
+    if(perm && !context.user().has(Perm.READ, name)) {
+      throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
+    }
     synchronized(context.datas) {
       Data data = context.datas.pin(name);
       if(data == null) {

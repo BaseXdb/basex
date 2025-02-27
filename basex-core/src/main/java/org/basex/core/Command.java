@@ -223,7 +223,7 @@ public abstract class Command extends Job {
     if(data == null && openDB) return error(NO_DB_OPENED);
 
     // check permissions
-    if(!ctx.perm(perm, data != null && !data.inMemory() ? data.meta.name : null))
+    if(!ctx.user().has(perm, data != null && !data.inMemory() ? data.meta.name : null))
       return error(PERM_REQUIRED_X, perm);
 
     init(ctx, os);

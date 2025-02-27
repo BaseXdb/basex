@@ -25,10 +25,10 @@ final class DatabaseModifier extends ContextModifier {
   synchronized void add(final Update update, final QueryContext qc) throws QueryException {
     // check permissions
     if(update instanceof NameUpdate) {
-      if(!qc.context.perm(Perm.CREATE, ((NameUpdate) update).name()))
+      if(!qc.context.user().has(Perm.CREATE, ((NameUpdate) update).name()))
         throw BASEX_PERMISSION_X.get(update.info(), Perm.CREATE);
     } else if(update instanceof DataUpdate) {
-      if(!qc.context.perm(Perm.WRITE, ((DataUpdate) update).data().meta.name))
+      if(!qc.context.user().has(Perm.WRITE, ((DataUpdate) update).data().meta.name))
         throw BASEX_PERMISSION_X.get(update.info(), Perm.WRITE);
     }
     super.add(update, qc);
