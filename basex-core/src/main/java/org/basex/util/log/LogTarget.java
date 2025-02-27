@@ -49,7 +49,7 @@ enum LogTarget {
   static {
     final Class<?> cLoggerFactory = Reflect.find("org.slf4j.LoggerFactory");
     final Class<?> cLogger = Reflect.find("org.slf4j.Logger");
-    final Method mLogger = Reflect.method(cLoggerFactory, "getLogger", Class.class);
+    final Method mLogger = Reflect.method(cLoggerFactory, "getLogger", String.class);
     final Object logger = Reflect.invoke(mLogger, null, Prop.NAME);
     slf4j = (type, text) -> {
       final String level = Strings.eqic(type, "trace", "debug", "warn", "error") ?
