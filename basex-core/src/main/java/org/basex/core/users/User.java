@@ -212,7 +212,7 @@ public final class User {
   }
 
   /**
-   * Sets the global permission.
+   * Sets a global permission.
    * @param prm permission
    * @return self reference
    */
@@ -222,9 +222,9 @@ public final class User {
   }
 
   /**
-   * Sets the permission.
+   * Sets a permission for a specific pattern.
    * @param prm permission
-   * @param pattern database pattern (can be empty)
+   * @param pattern database pattern (if empty, a global permission is set)
    * @return self reference
    */
   public synchronized User perm(final Perm prm, final String pattern) {
@@ -280,6 +280,17 @@ public final class User {
    */
   public synchronized void info(final ANode elem) {
     info = elem.hasChildren() || elem.hasAttributes() ? elem : null;
+  }
+
+  /**
+   * Creates a lightweight copy.
+   * @return copy
+   */
+  public synchronized User copy() {
+    final User user = new User(name);
+    user.perm = perm;
+    user.info = info;
+    return user;
   }
 
   /**

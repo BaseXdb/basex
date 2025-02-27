@@ -60,20 +60,18 @@ public class XQueryEval extends StandardFunc {
     for(int c = 5; qcAnc != null && c > 0; c--) qcAnc = qcAnc.parent;
     if(qcAnc != null) throw XQUERY_NESTED.get(info);
 
-    final User user = qc.context.user();
-    final Perm perm = user.perm("");
-    Timer to = null;
-
     // bind variables and context value, parse options
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     final XQueryOptions options = new XQueryOptions();
-    options.put(XQueryOptions.PERMISSION, perm);
+    final User user = qc.context.user();
+    options.put(XQueryOptions.PERMISSION, user.perm(""));
     toOptions(arg(2), options, qc);
 
-    final Perm evalPerm = Perm.get(options.get(XQueryOptions.PERMISSION).toString());
-    if(!user.has(evalPerm)) throw XQUERY_PERMISSION2_X.get(info, evalPerm);
-    user.perm(evalPerm);
+    final Perm perm = Perm.get(options.get(XQueryOptions.PERMISSION).toString());
+    if(!user.has(perm)) throw XQUERY_PERMISSION2_X.get(info, perm);
+    qc.context.user(user.copy().perm(perm));
 
+    Timer to = null;
     try(QueryContext qctx = new QueryContext(qc)) {
       // limit memory consumption: enforce garbage collection and calculate usage
       final long mb = options.get(XQueryOptions.MEMORY);
@@ -154,7 +152,7 @@ public class XQueryEval extends StandardFunc {
       }
     } finally {
       if(to != null) to.cancel();
-      user.perm(perm);
+      qc.context.user(user);
     }
   }
 
