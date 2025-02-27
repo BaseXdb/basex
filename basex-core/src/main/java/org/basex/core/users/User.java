@@ -291,4 +291,9 @@ public final class User {
   private static String digest(final String name, final String password) {
     return md5(name + ':' + Prop.NAME + ':' + password);
   }
+
+  @Override
+  public String toString() {
+    return Util.className(this) + '[' + name + '/' + perm + ']';
+  }
 }

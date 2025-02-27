@@ -106,7 +106,7 @@ public abstract class Job {
   /**
    * Stops a job because a memory limit was exceeded.
    */
-  public final void memory() {
+  public final void outOfMemory() {
     state(JobState.MEMORY);
   }
 

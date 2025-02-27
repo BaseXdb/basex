@@ -87,7 +87,7 @@ public class XQueryEval extends StandardFunc {
           public void run() {
             if(!qctx.stopped() && Performance.memory() > limit) {
               Performance.gc(1);
-              if(Performance.memory() > limit) qctx.memory();
+              if(Performance.memory() > limit) qctx.outOfMemory();
             }
           }
         }, 250, 250);
@@ -154,7 +154,7 @@ public class XQueryEval extends StandardFunc {
       }
     } finally {
       if(to != null) to.cancel();
-      user.perm(perm, "");
+      user.perm(perm);
     }
   }
 
