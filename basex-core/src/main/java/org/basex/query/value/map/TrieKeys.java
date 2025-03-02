@@ -46,18 +46,18 @@ final class TrieKeys implements Iterable<Item> {
    * @return new list
    */
   TrieKeys add(final Item key) {
-    if(size == keys.length) {
-      keys = Array.copy(keys, new Item[Array.newCapacity(size)]);
-    }
-    final Item[] newKeys;
-    if(copy) {
-      newKeys = keys.clone();
+    final int sz = size;
+    final Item[] ks;
+    if(sz == keys.length) {
+      ks = Array.copy(keys, new Item[Array.newCapacity(sz)]);
+    } else if(copy) {
+      ks = keys.clone();
     } else {
-      newKeys = keys;
+      ks = keys;
       copy = true;
     }
-    newKeys[size] = key;
-    return new TrieKeys(newKeys, size + 1);
+    ks[sz] = key;
+    return new TrieKeys(ks, sz + 1);
   }
 
   /**
@@ -81,7 +81,7 @@ final class TrieKeys implements Iterable<Item> {
     final ItemList tmp = new ItemList(sz);
     for(final Item key : this) {
       if(!map.isEmpty() && map.containsKey(key)) {
-        final Integer occ = map.get(key);
+        final int occ = map.get(key);
         if(occ == 1) map.remove(key);
         else map.put(key, occ - 1);
       } else {
