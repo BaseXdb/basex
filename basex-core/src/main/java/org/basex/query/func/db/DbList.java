@@ -43,7 +43,7 @@ public class DbList extends StandardFunc {
    */
   private static Value list(final QueryContext qc) {
     final Context ctx = qc.context;
-    final StringList dbs = ctx.listDBs();
+    final StringList dbs = ctx.databases.list(ctx.user(), null);
     final TokenList list = new TokenList(dbs.size());
     for(final String name : dbs) list.add(name);
     return StrSeq.get(list);
@@ -59,9 +59,10 @@ public class DbList extends StandardFunc {
     final Data data = toData(qc);
     final String path = defined(1) ? toString(arg(1), qc) : "";
 
-    final IntList docs = data.resources.docs(path);
-    final StringList binaries = data.resources.paths(path, ResourceType.BINARY);
-    final StringList values = data.resources.paths(path, ResourceType.VALUE);
+    final Resources resources = data.resources;
+    final IntList docs = resources.docs(path);
+    final StringList binaries = resources.paths(path, ResourceType.BINARY);
+    final StringList values = resources.paths(path, ResourceType.VALUE);
     final int ds = docs.size(), bs = ds + binaries.size(), size = bs + values.size();
 
     return new BasicIter<Str>(size) {

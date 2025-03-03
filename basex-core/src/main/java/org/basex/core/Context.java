@@ -10,7 +10,6 @@ import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
-import org.basex.util.list.*;
 import org.basex.util.log.*;
 import org.basex.util.options.*;
 
@@ -268,27 +267,6 @@ public final class Context {
    */
   public String clientName() {
     return client != null ? client.clientName() : user != null ? user.name() : null;
-  }
-
-  /**
-   * Returns all databases for which the current user has read access.
-   * @return resulting list
-   */
-  public StringList listDBs() {
-    return listDBs(null);
-  }
-
-  /**
-   * Returns all databases for which the current user has read access.
-   * @param pattern database pattern (can be {@code null})
-   * @return resulting list
-   */
-  public StringList listDBs(final String pattern) {
-    final StringList dbs = databases.listDBs(pattern), sl = new StringList(dbs.size());
-    for(final String db : dbs) {
-      if(user.has(Perm.READ, db)) sl.add(db);
-    }
-    return sl;
   }
 
   /**

@@ -65,11 +65,12 @@ public final class List extends Command {
     final Table table = new Table();
     table.description = DATABASES_X;
 
-    final boolean create = context.user().has(Perm.CREATE);
+    final User user = context.user();
+    final boolean create = user.has(Perm.CREATE);
     table.header.add(NAME).add(RESOURCES).add(SIZE);
     if(create) table.header.add(INPUT_PATH);
 
-    for(final String name : context.listDBs()) {
+    for(final String name : context.databases.list(user, null)) {
       String file;
       long dbsize = 0;
       int count = 0;

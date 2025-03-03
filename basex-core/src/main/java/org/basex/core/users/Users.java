@@ -168,7 +168,7 @@ public final class Users {
 
     for(final String user : S_USERINFO) table.header.add(user);
     for(final User user : users(db, ctx)) {
-      table.contents.add(new TokenList().add(user.name()).add(user.perm(db).toString()));
+      table.contents.add(new TokenList().add(user.name()).add(user.permission(db).toString()));
     }
     return table.sort().toTop(token(ADMIN));
   }

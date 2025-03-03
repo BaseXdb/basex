@@ -3,6 +3,7 @@ package org.basex.core;
 import java.util.*;
 import java.util.regex.*;
 
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -45,71 +46,58 @@ public final class Databases {
   }
 
   /**
-   * Lists all available databases and backups.
-   * @return database and backup list
+   * Returns the sorted names of all databases and backups.
+   * @return databases and backups
+   */
+  public StringList all() {
+    return list(null, null, true);
+  }
+
+  /**
+   * Returns the sorted names of all databases.
+   * @return databases and backups
    */
   public StringList list() {
-    return list(true, null);
+    return list(null, null, false);
   }
 
   /**
-   * Lists all available databases matching the given name. Supports glob patterns.
+   * Returns the sorted names of all databases.
+   * @param user accessing user
    * @param pattern database pattern (can be {@code null})
-   * @return database list
+   * @return databases
    */
-  StringList listDBs(final String pattern) {
-    return list(false, pattern);
+  public StringList list(final User user, final String pattern) {
+    return list(user, pattern, false);
   }
 
   /**
-   * Returns the sorted names of all available databases and, optionally, backups.
-   * Filters for {@code name} if not {@code null} with glob support.
-   * @param backup return backups?
+   * Returns the sorted names of all databases and, optionally, backups.
+   * @param user accessing user (can be {@code null})
    * @param pattern database pattern (can be {@code null})
-   * @return database and backups list
+   * @param all include names of backed up databases
+   * @return databases and, optionally, backups
    */
-  private StringList list(final boolean backup, final String pattern) {
+  private StringList list(final User user, final String pattern, final boolean all) {
     final Pattern pt = pattern == null ? null : regex(pattern);
-    final IOFile[] files = soptions.dbPath().children();
-    final StringList list = new StringList(files.length);
-    final HashSet<String> map = new HashSet<>(files.length);
-    for(final IOFile file : files) {
+    final StringList list = new StringList();
+    final HashSet<String> map = new HashSet<>();
+    for(final IOFile file : soptions.dbPath().children()) {
       final String name = file.name();
-      String add = null;
-      if(backup && name.endsWith(IO.ZIPSUFFIX)) {
+      String entry = null;
+      if(all && name.endsWith(IO.ZIPSUFFIX)) {
         final String[] split = ZIPPATTERN.split(name);
-        if(split.length > 0 && !split[0].equals(name)) add = split[0];
+        if(split.length > 0 && !split[0].equals(name)) entry = split[0];
       } else if(file.isDir() && !Strings.startsWith(name, '.')) {
-        add = name;
+        entry = name;
       }
-      // add entry if it matches the pattern, and has not already been added
-      if(add != null && (pt == null || pt.matcher(add).matches()) && map.add(add)) {
-        list.add(add);
+      // add entry if it has not already been added, matches the pattern, and is accessible
+      if(entry != null && map.add(entry) && (pt == null || pt.matcher(entry).matches()) &&
+          (user == null || user.has(Perm.READ, entry))) {
+        list.add(entry);
       }
     }
     return list.sort(false);
-  }
-
-  /**
-   * Returns a regular expression for the specified name pattern.
-   * @param pattern pattern
-   * @return regular expression
-   */
-  public static Pattern regex(final String pattern) {
-    return regex(pattern, "");
-  }
-
-  /**
-   * Returns a regular expression for the specified name pattern.
-   * @param pattern pattern (can be {@code null})
-   * @param suffix regular expression suffix
-   * @return regular expression or {@code null}
-   */
-  private static Pattern regex(final String pattern, final String suffix) {
-    if(pattern == null) return null;
-    final String nm = REGEX.matcher(pattern).matches() ? IOFile.regex(pattern) :
-      pattern.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") + suffix;
-    return Pattern.compile(nm, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
   }
 
   /**
@@ -144,6 +132,15 @@ public final class Databases {
       }
     }
     return backups.sort(Prop.CASE, false);
+  }
+
+  /**
+   * Returns a regular expression for the specified name pattern.
+   * @param pattern pattern
+   * @return regular expression
+   */
+  public static Pattern regex(final String pattern) {
+    return regex(pattern, "");
   }
 
   /**
@@ -191,6 +188,19 @@ public final class Databases {
    */
   public static boolean validPattern(final String pattern) {
     return valid(pattern, true);
+  }
+
+  /**
+   * Returns a regular expression for the specified name pattern.
+   * @param pattern pattern (can be {@code null})
+   * @param suffix regular expression suffix
+   * @return regular expression or {@code null}
+   */
+  private static Pattern regex(final String pattern, final String suffix) {
+    if(pattern == null) return null;
+    final String nm = REGEX.matcher(pattern).matches() ? IOFile.regex(pattern) :
+      pattern.replaceAll("([" + REGEXCHARS + "])", "\\\\$1") + suffix;
+    return Pattern.compile(nm, Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
   }
 
   /**

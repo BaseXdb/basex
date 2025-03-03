@@ -64,7 +64,7 @@ public final class DialogManage extends BaseXDialog {
     panel.setLayout(new BorderLayout(4, 0));
 
     // create database chooser
-    final String[] dbs = gui.context.databases.list().finish();
+    final String[] dbs = gui.context.databases.all().finish();
     choice = new BaseXList(this, false, dbs);
     choice.setSize(240, 600);
     final Data data = gui.context.data();
@@ -139,7 +139,7 @@ public final class DialogManage extends BaseXDialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      choice.setData(ctx.databases.list().finish());
+      choice.setData(ctx.databases.all().finish());
       choice.requestFocusInWindow();
       refresh = false;
     }

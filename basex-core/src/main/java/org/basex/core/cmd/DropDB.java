@@ -30,7 +30,7 @@ public final class DropDB extends ACreate {
     if(!Databases.validPattern(pattern)) return error(NAME_INVALID_X, pattern);
 
     // retrieve all databases; return true if no database is found (no error)
-    final StringList dbs = context.listDBs(pattern);
+    final StringList dbs = context.databases.list(context.user(), pattern);
     if(dbs.isEmpty()) return info(NO_DB_DROPPED);
 
     // loop through all databases

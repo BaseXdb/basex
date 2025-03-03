@@ -204,7 +204,7 @@ public final class User {
    * @param db database pattern (can be {@code null})
    * @return permission
    */
-  public synchronized Perm perm(final String db) {
+  public synchronized Perm permission(final String db) {
     if(db != null) {
       final Entry<String, Perm> entry = find(db);
       if(entry != null) return entry.getValue();
@@ -265,7 +265,7 @@ public final class User {
    * @return result of check
    */
   public synchronized boolean has(final Perm perm, final String db) {
-    return perm(db).ordinal() >= perm.ordinal();
+    return permission(db).ordinal() >= perm.ordinal();
   }
 
   /**

@@ -44,7 +44,7 @@ public final class DbListDetails extends DbList {
    */
   private static Iter list(final QueryContext qc) {
     final Context ctx = qc.context;
-    final StringList dbs = ctx.listDBs();
+    final StringList dbs = ctx.databases.list(ctx.user(), null);
     return new BasicIter<FNode>(dbs.size()) {
       @Override
       public FNode get(final long i) {
