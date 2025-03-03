@@ -254,7 +254,7 @@ public final class XQuery4Test extends SandboxTest {
       "Happy Families Are All Alike; Every Unhappy Family Is Unhappy In Its Own Way.");
 
     error("2 ! 256 =!> xs:byte()", FUNCCAST_X_X_X);
-    error("1 =!> if()", ARROWSPEC_X);
+    error("1 =!> if()", RESERVED_X);
     error("0 =!> unknown()", WHICHFUNC_X);
     error("0 =!> unknown(?)", WHICHFUNC_X);
     error("0 =!> local:unknown()", WHICHFUNC_X);

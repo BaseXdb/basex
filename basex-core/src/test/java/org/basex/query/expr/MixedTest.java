@@ -332,7 +332,7 @@ public final class MixedTest extends SandboxTest {
     query("('ab' => (substring(?, ?))(?))(2)", "b");
     query("let $a := count#1 return 1 => $a()", 1);
 
-    error("1 => 1", WRONGCHAR_X_X);
+    error("1 => 1", ARROWSPEC_X);
     error("1 => (1)()", INVFUNCITEM_X_X);
   }
 }

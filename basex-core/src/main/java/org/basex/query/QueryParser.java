@@ -1939,14 +1939,21 @@ public class QueryParser extends InputParser {
           final boolean mapping = wsConsume("=!>") || wsConsume("=!\uFF1E");
           if(!mapping && !consume("=>") && !consume("=\uFF1E")) break;
 
+          QNm name = null;
+          Expr ex;
           skipWs();
-          final int p = pos;
-          QNm name = eQName(sc.funcNS, null);
-          Expr ex = null;
-          if(name == null || reserved(name)) {
-            pos = p;
-            ex = primary();
-            if(ex == null) throw error(ARROWSPEC_X, found());
+          if(current('$')) {
+            ex = varRef();
+          } else if(current('(')) {
+            ex = parenthesized();
+          } else {
+            ex = mapConstructor();
+            if(ex == null) ex = arrayConstructor();
+            if(ex == null) ex = functionItem();
+            if(ex == null) {
+              name = eQName(sc.funcNS, ARROWSPEC_X);
+              if(reserved(name)) throw error(RESERVED_X, name.local());
+            }
           }
           final InputInfo ii = info();
           final Expr arg;
@@ -2423,17 +2430,11 @@ public class QueryParser extends InputParser {
     expr = compConstructor();
     if(expr != null) return expr;
     // map constructor
-    if(current('{') || wsConsumeWs(MAP, MAPCONSTR, "{")) return mapConstructor();
+    expr = mapConstructor();
+    if(expr != null) return expr;
     // square array constructor
     expr = arrayConstructor();
     if(expr != null) return expr;
-    // curly array constructor
-    if(wsConsumeWs(ARRAY, ARRAYCONSTR, "{")) {
-      wsCheck("{");
-      final Expr exp = expr();
-      wsCheck("}");
-      return exp == null ? new CArray(info(), false) : new CArray(info(), false, exp);
-    }
     // ordered expression
     if(wsConsumeWs(ORDERED, null, "{") || wsConsumeWs(UNORDERED, null, "{")) return enclosedExpr();
     // unary lookup
@@ -2482,21 +2483,24 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private CMap mapConstructor() throws QueryException {
-    if(!wsConsume("{")) return null;
-    final InputInfo info = info();
-    final ExprList el = new ExprList();
-    if(!wsConsume("}")) {
-      final ItemSet set = new HashItemSet(ItemSet.Mode.ATOMIC, info);
-      do {
-        final Expr key = single();
-        add(el, check(key, INVMAPKEY));
-        if(key instanceof Item && !set.add((Item) key)) throw error(MAPDUPLKEY_X, key);
-        if(!wsConsume(":")) throw error(WRONGCHAR_X_X, ":", found());
-        add(el, check(single(), INVMAPVAL));
-      } while(wsConsume(","));
-      wsCheck("}");
+    if(wsConsumeWs(MAP, MAPCONSTR, "{") || current('{')) {
+      check('{');
+      final InputInfo info = info();
+      final ExprList el = new ExprList();
+      if(!wsConsume("}")) {
+        final ItemSet set = new HashItemSet(ItemSet.Mode.ATOMIC, info);
+        do {
+          final Expr key = single();
+          add(el, check(key, INVMAPKEY));
+          if(key instanceof Item && !set.add((Item) key)) throw error(MAPDUPLKEY_X, key);
+          if(!wsConsume(":")) throw error(WRONGCHAR_X_X, ":", found());
+          add(el, check(single(), INVMAPVAL));
+        } while(wsConsume(","));
+        wsCheck("}");
+      }
+      return new CMap(info, el.finish());
     }
-    return new CMap(info, el.finish());
+    return null;
   }
 
   /**
@@ -2505,16 +2509,24 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private CArray arrayConstructor() throws QueryException {
-    if(!wsConsume("[")) return null;
-    final InputInfo info = info();
-    final ExprList el = new ExprList();
-    if(!wsConsume("]")) {
-      do {
-        add(el, check(single(), INVMAPVAL));
-      } while(wsConsume(","));
-      wsCheck("]");
+    if(wsConsumeWs(ARRAY, ARRAYCONSTR, "{")) {
+      check('{');
+      final Expr exp = expr();
+      wsCheck("}");
+      return exp == null ? new CArray(info(), false) : new CArray(info(), false, exp);
     }
-    return new CArray(info, true, el.finish());
+    if(consume('[')) {
+      final InputInfo info = info();
+      final ExprList el = new ExprList();
+      if(!wsConsume("]")) {
+        do {
+          add(el, check(single(), INVMAPVAL));
+        } while(wsConsume(","));
+        wsCheck("]");
+      }
+      return new CArray(info, true, el.finish());
+    }
+    return null;
   }
 
   /**
@@ -4367,7 +4379,7 @@ public class QueryParser extends InputParser {
    * found, the cursor is placed after the first token.
    * @param string string to consume (words must not be followed by letters)
    * @param expr alternative error message (can be {@code null})
-   * @param strings second string
+   * @param strings subsequent strings
    * @return result of check
    * @throws QueryException query exception
    */
