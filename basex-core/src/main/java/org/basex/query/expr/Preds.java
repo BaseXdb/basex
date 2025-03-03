@@ -120,7 +120,7 @@ public abstract class Preds extends Arr {
     final Predicate<Expr> first = f -> f instanceof ContextValue ||
         root.equals(f) && root.isSimple() && rst.one();
     if(expr instanceof SimpleMap && first.test(expr.arg(0)) && !expr.arg(1).has(Flag.POS)) {
-      expr = ((SimpleMap) expr).remove(cc, 1);
+      expr = ((SimpleMap) expr).remove(cc, 0);
     }
 
     // paths: E[./...]  ->  E[...], E[E/...]  ->  E[...]

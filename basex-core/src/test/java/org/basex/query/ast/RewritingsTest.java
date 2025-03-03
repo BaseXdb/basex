@@ -3365,4 +3365,9 @@ public final class RewritingsTest extends SandboxTest {
         + "return sort((<x>2</x>, <x>1</x>)) -> (., .[$f(.)])",
         "<x>1</x>\n<x>2</x>\n<x>1</x>\n<x>2</x>");
   }
+
+  /** Nested predicates, axis checks. */
+  @Test public void gh2390() {
+    query("<p><b/></p>/*[.[self::a union self::b/@x]]", "");
+  }
 }
