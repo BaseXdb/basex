@@ -13,6 +13,6 @@ import org.basex.util.*;
 public final class UserCurrent extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return Str.get(qc.context.user().name());
+    return Str.get(qc.user.name());
   }
 }

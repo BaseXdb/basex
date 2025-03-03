@@ -44,6 +44,6 @@ public class FnDocAvailable extends Docs {
       qi = queryInput(toToken(source));
       if(qi == null) throw INVDOC_X.get(info, source);
     }
-    return qc.resources.doc(qi, info);
+    return qc.resources.doc(qi, qc.user, info);
   }
 }

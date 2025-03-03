@@ -16,6 +16,7 @@ import org.basex.core.MainOptions.MainParser;
 import org.basex.core.cmd.*;
 import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
@@ -81,6 +82,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Update container; will be created if the first update is evaluated. */
   public Updates updates;
+  /** User. */
+  public User user;
 
   /** Full-text position data (needed for highlighting full-text results). */
   public FTPosData ftPosData = Prop.gui ? new FTPosData() : null;
@@ -112,7 +115,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
   public final TokenMap modDeclared = new TokenMap();
   /** Stack of module files that are currently parsed. */
-  final TokenList modStack = new TokenList();
+  public final TokenList modStack = new TokenList();
 
   /** Main module (root expression). */
   public MainModule main;
@@ -169,6 +172,7 @@ public final class QueryContext extends Job implements Closeable {
     this.parent = parent;
     this.info = info != null ? info : new QueryInfo(context);
     this.resources = resources != null ? resources : new QueryResources(this);
+    this.user = context.user();
   }
 
   /**

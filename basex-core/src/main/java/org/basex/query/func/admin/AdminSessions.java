@@ -23,7 +23,7 @@ public final class AdminSessions extends AdminFn {
       final Context ctx = cl.context();
       final Data data = ctx.data();
       final FBuilder elem = FElem.build(Q_SESSION);
-      elem.add(Q_USER, ctx.user().name()).add(Q_ADDRESS, cl.clientAddress());
+      elem.add(Q_USER, qc.user.name()).add(Q_ADDRESS, cl.clientAddress());
       if(data != null) elem.add(Q_DATABASE, data.meta.name);
       vb.add(elem.finish());
     }

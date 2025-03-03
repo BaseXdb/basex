@@ -28,8 +28,8 @@ public final class XQueryModuleTest extends SandboxTest {
     error("for $a in (1, 2) return" + func.args("$a"), VARUNDEF_X);
 
     // check updating expressions
-    error(func.args("delete node ()"), XQUERY_UPDATE1);
-    error(func.args("declare %updating function local:x() {()}; local:x()"), XQUERY_UPDATE1);
+    error(func.args("delete node ()"), XQUERY_NOUPDATES);
+    error(func.args("declare %updating function local:x() {()}; local:x()"), XQUERY_NOUPDATES);
     query(func.args("declare %updating function local:x() {()}; 1"));
     query(func.args(DOC.args(PATH).trim()));
 
@@ -52,11 +52,11 @@ public final class XQueryModuleTest extends SandboxTest {
     // queries
     query(_DB_CREATE.args(NAME));
     error(func.args(DOC.args(NAME).trim(), " map { }",
-      " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
+      " map { 'permission': 'none' }"), XQUERY_PERM_X);
     error(func.args(_DB_GET.args(NAME).trim(), " map { }",
-      " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
+      " map { 'permission': 'none' }"), XQUERY_PERM_X);
     error(func.args(_FILE_EXISTS.args("x").trim(), " map { }",
-      " map { 'permission': 'none' }"), XQUERY_PERMISSION1_X);
+      " map { 'permission': 'none' }"), XQUERY_PERM_X);
   }
 
   /** Test method. */
@@ -105,14 +105,14 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args("delete node <a/>"));
     query(func.args("update:output(1)"), 1);
     query(func.args("()"));
-    error(func.args("1"), XQUERY_UPDATE2);
+    error(func.args("1"), XQUERY_UPDATEEXPECTED);
   }
 
   /** Test method. */
   @Test public void evalUpdateUri() {
     final Function func = _XQUERY_EVAL_UPDATE;
     // queries
-    error(func.args(" xs:anyURI('src/test/resources/input.xq')"), XQUERY_UPDATE2);
+    error(func.args(" xs:anyURI('src/test/resources/input.xq')"), XQUERY_UPDATEEXPECTED);
     error(func.args(" xs:anyURI('src/test/resources/xxx.xq')"), WHICHRES_X);
   }
 

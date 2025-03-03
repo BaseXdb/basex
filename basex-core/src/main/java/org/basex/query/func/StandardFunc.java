@@ -647,7 +647,8 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Data toData(final QueryContext qc) throws QueryException {
     final Data data = exprType.data();
-    return data != null ? data : qc.resources.database(toName(arg(0), false, DB_NAME_X, qc), info);
+    return data != null ? data : qc.resources.database(
+        toName(arg(0), false, DB_NAME_X, qc), qc.user, info);
   }
 
   /**
@@ -657,8 +658,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected void checkPerm(final QueryContext qc, final Perm perm) throws QueryException {
-    if(perm != Perm.NONE && !qc.context.user().has(perm))
-      throw BASEX_PERMISSION_X_X.get(info, perm, this);
+    if(perm != Perm.NONE && !qc.user.has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
   }
 
   /**

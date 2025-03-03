@@ -71,8 +71,8 @@ abstract class UserFn extends StandardFunc {
    */
   protected final User toUser(final Expr expr, final QueryContext qc) throws QueryException {
     final String name = toName(expr, qc);
+    if(!qc.user.name().equals(name)) checkPerm(qc, Perm.ADMIN);
     final User user = qc.context.users.get(name);
-    if(user != qc.context.user()) checkPerm(qc, Perm.ADMIN);
     if(user == null) throw USER_UNKNOWN_X.get(info, name);
     return user;
   }

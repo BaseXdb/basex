@@ -70,7 +70,7 @@ public abstract class JavaCall extends Arr {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     // check permission
-    if(!qc.context.user().has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
+    if(!qc.user.has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
 
     final Value value = eval(qc, qc.context.options.get(MainOptions.WRAPJAVA));
     if(!updating) return value;

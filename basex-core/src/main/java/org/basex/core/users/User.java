@@ -23,10 +23,9 @@ import org.basex.util.*;
  */
 public final class User {
   /** Stored password codes. */
-  private EnumMap<Algorithm, EnumMap<Code, String>> passwords =
-      new EnumMap<>(Algorithm.class);
+  private final EnumMap<Algorithm, EnumMap<Code, String>> passwords;
   /** Database patterns for local permissions. */
-  private LinkedHashMap<String, Perm> patterns = new LinkedHashMap<>();
+  private final LinkedHashMap<String, Perm> patterns;
   /** Permission. */
   private Perm permission = Perm.NONE;
   /** Name. */
@@ -40,6 +39,9 @@ public final class User {
    */
   public User(final String name) {
     this.name = name;
+    passwords = new EnumMap<>(Algorithm.class);
+    patterns = new LinkedHashMap<>();
+    permission = Perm.NONE;
   }
 
   /**
@@ -57,10 +59,10 @@ public final class User {
    * @param user parent user
    */
   public User(final User user) {
+    name = user.name;
     passwords = user.passwords;
     patterns = user.patterns;
     permission = user.permission;
-    name = user.name;
     info = user.info;
   }
 
@@ -81,6 +83,8 @@ public final class User {
    */
   User(final ANode user, final IOFile file) throws BaseXException {
     name = string(attribute(user, Q_NAME, "Root"));
+    passwords = new EnumMap<>(Algorithm.class);
+    patterns = new LinkedHashMap<>();
     permission = attribute(name, user, Q_PERMISSION, Perm.values());
 
     for(final ANode child : children(user)) {

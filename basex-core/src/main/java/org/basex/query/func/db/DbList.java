@@ -4,7 +4,6 @@ import static org.basex.query.func.db.DbAccessFn.*;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
@@ -42,8 +41,7 @@ public class DbList extends StandardFunc {
    * @return databases
    */
   private static Value list(final QueryContext qc) {
-    final Context ctx = qc.context;
-    final StringList dbs = ctx.databases.list(ctx.user(), null);
+    final StringList dbs = qc.context.databases.list(qc.user, null);
     final TokenList list = new TokenList(dbs.size());
     for(final String name : dbs) list.add(name);
     return StrSeq.get(list);

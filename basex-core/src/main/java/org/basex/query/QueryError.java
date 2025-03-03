@@ -513,13 +513,13 @@ public enum QueryError {
   // XQuery Module
 
   /** Error code. */
-  XQUERY_UPDATE1(ErrType.XQUERY, "update", "No updating expression allowed."),
+  XQUERY_NOUPDATES(ErrType.XQUERY, "update", "No updating expression allowed."),
   /** Error code. */
-  XQUERY_UPDATE2(ErrType.XQUERY, "update", "Updating expression expected."),
+  XQUERY_UPDATEEXPECTED(ErrType.XQUERY, "update", "Updating expression expected."),
   /** Error code. */
-  XQUERY_PERMISSION1_X(ErrType.XQUERY, "permission", "%"),
+  XQUERY_PERM_X(ErrType.XQUERY, "permission", "%"),
   /** Error code. */
-  XQUERY_PERMISSION2_X(ErrType.XQUERY, "permission", "% permission required."),
+  XQUERY_PERMREQUIRED_X(ErrType.XQUERY, "permission", "% permission required."),
   /** Error code. */
   XQUERY_TIMEOUT(ErrType.XQUERY, "timeout", "The timeout was exceeded."),
   /** Error code. */

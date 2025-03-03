@@ -68,11 +68,12 @@ public class XQueryEval extends StandardFunc {
     toOptions(arg(2), options, qc);
 
     final Perm perm = Perm.get(options.get(XQueryOptions.PERMISSION).toString());
-    if(!user.has(perm)) throw XQUERY_PERMISSION2_X.get(info, perm);
-    qc.context.user(new User(user).permission(perm));
+    if(!user.has(perm)) throw XQUERY_PERMREQUIRED_X.get(info, perm);
 
     Timer to = null;
     try(QueryContext qctx = new QueryContext(qc)) {
+      qctx.user = new User(user).permission(perm);
+
       // limit memory consumption: enforce garbage collection and calculate usage
       final long mb = options.get(XQueryOptions.MEMORY);
       if(mb != 0) {
@@ -112,8 +113,8 @@ public class XQueryEval extends StandardFunc {
         qctx.parseMain(string(query.read()), null, sctx);
 
         if(!sc().mixUpdates && updating != qctx.updating) {
-          if(!updating) throw XQUERY_UPDATE1.get(info);
-          if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATE2.get(info);
+          if(!updating) throw XQUERY_NOUPDATES.get(info);
+          if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATEEXPECTED.get(info);
         }
 
         final Value value;
@@ -140,7 +141,7 @@ public class XQueryEval extends StandardFunc {
         Util.debug(ex);
         final QueryError error = ex.error();
         final QueryException qe = error(ex, error == BASEX_PERMISSION_X ||
-            error == BASEX_PERMISSION_X_X ? XQUERY_PERMISSION1_X : null);
+            error == BASEX_PERMISSION_X_X ? XQUERY_PERM_X : null);
         // pass on error info: assign (possibly empty) path of module which caused the error
         InputInfo ii = ex.info();
         if(pass && ii == null) ii = new InputInfo(query.path(), 1, 1);
@@ -152,7 +153,6 @@ public class XQueryEval extends StandardFunc {
       }
     } finally {
       if(to != null) to.cancel();
-      qc.context.user(user);
     }
   }
 
