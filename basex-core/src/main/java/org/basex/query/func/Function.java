@@ -95,7 +95,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables::new,
       "available-environment-variables()",
-      params(), STRING_ZM),
+      params(), STRING_ZM, flag(), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   AVG(FnAvg::new, "avg(values)",
       params(ANY_ATOMIC_TYPE_ZM), ANY_ATOMIC_TYPE_ZO),
@@ -249,7 +249,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM, BIPREDICATE_O.with(Occ.ZERO_OR_ONE)), BOOLEAN_O, flag(HOF)),
   /** XQuery function. */
   ENVIRONMENT_VARIABLE(FnEnvironmentVariable::new, "environment-variable(name)",
-      params(STRING_O), STRING_ZO),
+      params(STRING_O), STRING_ZO, flag(), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   ERROR(FnError::new, "error([code,description,value])",
       params(QNAME_ZO, STRING_ZO, ITEM_ZM), ITEM_ZM, flag(NDT)),
@@ -411,7 +411,7 @@ public enum Function implements AFunction {
       params(), INTEGER_O, flag(POS, CTX)),
   /** XQuery function. */
   LOAD_XQUERY_MODULE(FnLoadXQueryModule::new, "load-xquery-module(module-uri[,options])",
-      params(STRING_O, MAP_ZO), MAP_O),
+      params(STRING_O, MAP_ZO), MAP_O, flag(NDT, HOF), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   LOCAL_NAME(FnLocalName::new, "local-name([node])",
       params(NODE_ZO), STRING_O),
@@ -520,7 +520,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), MAP_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS), FN_URI, Perm.CREATE),
+      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value[,options])",
       params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),

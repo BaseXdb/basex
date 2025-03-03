@@ -10,6 +10,7 @@ import org.basex.build.Parser;
 import org.basex.build.xml.*;
 import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -82,6 +83,7 @@ public class FnParseXmlFragment extends StandardFunc {
         ParseXmlOptions.CATALOG, MainOptions.CATALOG).forEach((opt, mopt) -> {
       if(options.contains(opt)) mopts.set(mopt, options.get(opt));
     });
+    if(mopts.get(MainOptions.DTD) || mopts.get(MainOptions.XINCLUDE)) checkPerm(qc, Perm.CREATE);
 
     final boolean dtdVal = mopts.get(MainOptions.DTDVALIDATION);
     final String xsdVal = mopts.get(MainOptions.XSDVALIDATION);
