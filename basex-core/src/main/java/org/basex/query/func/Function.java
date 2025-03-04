@@ -388,7 +388,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   INVISIBLE_XML(FnInvisibleXml::new, "invisible-xml(grammar[,options])",
-      params(STRING_ZO, MAP_ZO), FuncType.get(DOCUMENT_NODE_O, STRING_O).seqType(), flag(HOF)),
+      params(ITEM_ZO, MAP_ZO), FuncType.get(DOCUMENT_NODE_O, STRING_O).seqType(), flag(HOF)),
   /** XQuery function. */
   IRI_TO_URI(FnIriToUri::new, "iri-to-uri(value)",
       params(STRING_ZO), STRING_O),
