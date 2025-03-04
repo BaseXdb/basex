@@ -1,7 +1,6 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -81,22 +80,6 @@ final class TrieBranch extends TrieNode {
     final int k = hashKey(hs, lv);
     final TrieNode sub = kids[k];
     return sub == null ? null : sub.get(hs, ky, lv + 1);
-  }
-
-  @Override
-  boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
-    if(!(node instanceof TrieBranch)) return false;
-
-    // check bit usage first
-    final TrieBranch ob = (TrieBranch) node;
-    if(used != ob.used) return false;
-    // recursively compare children
-    if(deep != null && deep.qc != null) deep.qc.checkStop();
-    for(int k = 0; k < KIDS; k++) {
-      if(kids[k] != null && !kids[k].equal(ob.kids[k], deep)) return false;
-    }
-    // everything OK
-    return true;
   }
 
   /** End strings. */

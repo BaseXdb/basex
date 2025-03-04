@@ -1,6 +1,5 @@
 package org.basex.query.value.map;
 
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -35,11 +34,6 @@ final class TrieEmpty extends TrieNode {
   @Override
   Value get(final int hs, final Item ky, final int lv) {
     return null;
-  }
-
-  @Override
-  boolean equal(final TrieNode node, final DeepEqual deep) {
-    return this == node;
   }
 
   @Override

@@ -3,7 +3,6 @@ package org.basex.query.value.map;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -77,23 +76,6 @@ public final class XQHashMap extends XQMap {
         return ItemSeq.get(map.keys(), (int) size, ((MapType) type).keyType);
       }
     };
-  }
-
-  @Override
-  public boolean deepEqual(final XQMap compare, final DeepEqual deep) throws QueryException {
-    final ItemObjectMap<Value> map2 = ((XQHashMap) compare).map;
-    final int is = map.size();
-    for(int i = 1; i <= is; i++) {
-      final Item key = map.key(i), key2 = map2.key(i);
-      final Value value = map.value(i), value2 = map2.value(i);
-      if(deep != null) {
-        // different order: call fallback
-        if(!(key.atomicEqual(key2) && deep.equal(value, value2))) return deepEq(compare, deep);
-      } else {
-        if(!(key.equals(key2) && value.equals(value2))) return false;
-      }
-    }
-    return true;
   }
 
   /**

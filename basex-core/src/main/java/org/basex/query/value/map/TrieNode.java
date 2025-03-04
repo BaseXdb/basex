@@ -1,7 +1,6 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -97,15 +96,6 @@ abstract class TrieNode {
   static int hashKey(final int hash, final int level) {
     return hash >>> level * BITS & MASK;
   }
-
-  /**
-   * Checks if this node is indistinguishable from the given node.
-   * @param node other node
-   * @param deep comparator
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  abstract boolean equal(TrieNode node, DeepEqual deep) throws QueryException;
 
   /**
    * Recursive {@link #toString()} helper.

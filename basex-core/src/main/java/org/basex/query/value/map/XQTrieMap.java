@@ -2,7 +2,6 @@ package org.basex.query.value.map;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -78,10 +77,5 @@ public final class XQTrieMap extends XQMap {
   public BasicIter<Item> keys() {
     final long size = structSize();
     return size == 0 ? Empty.ITER : size == 1 ? ((TrieLeaf) root).key.iter() : order.keys();
-  }
-
-  @Override
-  public boolean deepEqual(final XQMap map, final DeepEqual deep) throws QueryException {
-    return root.equal(((XQTrieMap) map).root, deep);
   }
 }

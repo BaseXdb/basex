@@ -42,6 +42,9 @@ public final class DeepEqualOptions extends Options {
   /** Option: items-equal. */
   public static final ValueOption ITEMS_EQUAL =
       new ValueOption("items-equal", SeqType.FUNCTION_O);
+  /** Option: map-order. */
+  public static final BooleanOption MAP_ORDER =
+      new BooleanOption("map-order", false);
   /** Option: namespace-prefixes. */
   public static final BooleanOption NAMESPACE_PREFIXES =
       new BooleanOption("namespace-prefixes", false);

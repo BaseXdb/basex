@@ -1,7 +1,6 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -15,7 +14,6 @@ import org.basex.util.*;
 final class TrieList extends TrieNode {
   /** Common hash value of all contained values. */
   final int hash;
-
   /** List of keys of this collision list. */
   final Item[] keys;
   /** List of values of this collision list. */
@@ -107,34 +105,6 @@ final class TrieList extends TrieNode {
       }
     }
     return null;
-  }
-
-  @Override
-  boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
-    if(!(node instanceof TrieList) || size != node.size) return false;
-
-    // do the evil nested-loop thing
-    final TrieList ol = (TrieList) node;
-    OUTER:
-    for(int i = 0; i < size; i++) {
-      if(deep != null && deep.qc != null) deep.qc.checkStop();
-      final Item key = keys[i];
-      final Value value = values[i];
-      for(int j = 0; j < size; j++) {
-        if(deep != null) {
-          if(!key.atomicEqual(ol.keys[j])) continue;
-          if(!deep.equal(value, ol.values[j])) return false;
-        } else {
-          if(!key.equals(ol.keys[j])) continue;
-          if(!value.equals(ol.values[j])) return false;
-        }
-        continue OUTER;
-      }
-      // all keys of the other list were checked, none matched
-      return false;
-    }
-    // all entries were found
-    return true;
   }
 
   @Override

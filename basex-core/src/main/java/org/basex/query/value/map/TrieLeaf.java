@@ -1,7 +1,6 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -64,16 +63,6 @@ final class TrieLeaf extends TrieNode {
   @Override
   Value get(final int hs, final Item ky, final int lv) throws QueryException {
     return hs == hash && key.atomicEqual(ky) ? value : null;
-  }
-
-  @Override
-  boolean equal(final TrieNode node, final DeepEqual deep) throws QueryException {
-    if(node instanceof TrieLeaf) {
-      final TrieLeaf leaf = (TrieLeaf) node;
-      return deep != null ? key.atomicEqual(leaf.key) && deep.equal(value, leaf.value) :
-        key.equals(leaf.key) && value.equals(leaf.value);
-    }
-    return false;
   }
 
   @Override
