@@ -740,9 +740,8 @@ public final class QT3TS extends Main {
       options.add("'" + DeepEqualOptions.NAMESPACE_PREFIXES.name() + "':" + !ignorePrefixes + "()");
       options.add("'" + DeepEqualOptions.COMMENTS.name() + "':true()");
       options.add("'" + DeepEqualOptions.PROCESSING_INSTRUCTIONS.name() + "':true()");
-      final String query = "declare boundary-space preserve;\n"
-          + Function.DEEP_EQUAL.args(" <X>" + expctd.trim() + "</X>", " <X>" + rslt.trim() + "</X>",
-          " { " + String.join(", ", options) + " }");
+      final String query = Function.DEEP_EQUAL.args(" <X>" + expctd + "</X>",
+          " <X>" + rslt + "</X>", " { " + String.join(", ", options) + " }");
       return asBoolean(query, expected) ? null : expctd;
     } catch(final IOException ex) {
       return Util.info("% (found: %)", expctd, ex);
