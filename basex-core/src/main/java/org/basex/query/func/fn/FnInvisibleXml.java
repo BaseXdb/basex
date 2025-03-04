@@ -9,8 +9,10 @@ import java.util.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -28,6 +30,10 @@ import de.bottlecaps.markup.*;
  * @author Gunther Rademacher
  */
 public final class FnInvisibleXml extends StandardFunc {
+  /** The function's argument type. */
+  private static final SeqType ARG_TYPE = new ChoiceItemType(
+      Arrays.asList(STRING_O, SeqType.get(NodeType.ELEMENT, Occ.EXACTLY_ONE,
+          Test.get(NodeType.ELEMENT, new QNm("ixml"), null)))).seqType(Occ.ZERO_OR_ONE);
   /** The invisible XML parser generator. */
   private Generator generator;
 
@@ -56,16 +62,29 @@ public final class FnInvisibleXml extends StandardFunc {
      * @throws QueryException query exception
      */
     public FuncItem generate(final QueryContext qc) throws QueryException {
-      final Item value = arg(0).atomItem(qc, info);
-      final String grammar = value.isEmpty()
-          ? Blitz.ixmlGrammar()
-          : FnInvisibleXml.this.toString(value);
+      final Value value = arg(0).value(qc);
+      ARG_TYPE.coerce(value, null, qc, null, info);
+      final String grammar;
+      try {
+        grammar = value.isEmpty()
+            ? Blitz.ixmlGrammar()
+            : value instanceof ANode ? value.serialize().toString()
+                                     : Token.string(((Str) value).string(info));
+      } catch(QueryIOException ex) {
+        throw ex.getCause();
+      }
       final IxmlOptions opts = toOptions(arg(1), new IxmlOptions(), qc);
       final de.bottlecaps.markup.blitz.Parser parser;
       try {
-        parser = opts.get(IxmlOptions.FAIL_ON_ERROR)
-            ? Blitz.generate(grammar, Blitz.Option.FAIL_ON_ERROR)
-            : Blitz.generate(grammar);
+        if(value instanceof ANode) {
+          parser = opts.get(IxmlOptions.FAIL_ON_ERROR)
+              ? Blitz.generateFromXml(grammar, Blitz.Option.FAIL_ON_ERROR)
+              : Blitz.generateFromXml(grammar);
+        } else {
+          parser = opts.get(IxmlOptions.FAIL_ON_ERROR)
+              ? Blitz.generate(grammar, Blitz.Option.FAIL_ON_ERROR)
+              : Blitz.generate(grammar);
+        }
       } catch(final BlitzParseException ex) {
         throw IXML_GRM_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
       } catch(final BlitzException ex) {
