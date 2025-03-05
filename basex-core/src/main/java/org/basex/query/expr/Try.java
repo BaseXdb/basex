@@ -155,10 +155,7 @@ public final class Try extends Single {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Catch ctch : catches) {
-      if(ctch.has(flags)) return true;
-    }
-    return super.has(flags);
+    return ((Checks<Catch>) ctch -> ctch.has(flags)).any(catches) || super.has(flags);
   }
 
   @Override

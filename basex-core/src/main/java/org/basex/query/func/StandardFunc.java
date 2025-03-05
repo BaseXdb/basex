@@ -207,8 +207,7 @@ public abstract class StandardFunc extends Arr {
       if(definition.has(flag)) return true;
     }
     // check arguments (without function invocation; it only applies to function itself)
-    final Flag[] flgs = Flag.remove(flags, Flag.HOF);
-    return flgs.length != 0 && super.has(flgs);
+    return super.has(Flag.remove(flags, Flag.HOF));
   }
 
   /**

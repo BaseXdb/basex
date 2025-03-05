@@ -92,13 +92,10 @@ public final class Transform extends Copy {
 
   @Override
   public boolean has(final Flag... flags) {
-    for(final Let copy : copies) {
-      if(copy.has(flags)) return true;
-    }
-    if(Flag.CNS.oneOf(flags) ||
-        Flag.UPD.oneOf(flags) && arg(target()).has(Flag.UPD)) return true;
-    final Flag[] flgs = Flag.remove(flags, Flag.UPD);
-    return flgs.length != 0 && super.has(flgs);
+    return ((Checks<Let>) copy -> copy.has(flags)).any(copies) ||
+           Flag.CNS.oneOf(flags) ||
+           Flag.UPD.oneOf(flags) && arg(target()).has(Flag.UPD) ||
+           super.has(Flag.remove(flags, Flag.UPD));
   }
 
   @Override

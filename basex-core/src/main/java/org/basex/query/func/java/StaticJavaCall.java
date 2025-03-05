@@ -93,10 +93,10 @@ public final class StaticJavaCall extends JavaCall {
   @Override
   public boolean has(final Flag... flags) {
     return Flag.UPD.oneOf(flags) && method.getAnnotation(Updating.class) != null ||
-      Flag.NDT.oneOf(flags) && method.getAnnotation(Deterministic.class) == null ||
-      (Flag.CTX.oneOf(flags) || Flag.POS.oneOf(flags)) &&
-      method.getAnnotation(FocusDependent.class) != null ||
-      super.has(flags);
+           Flag.NDT.oneOf(flags) && method.getAnnotation(Deterministic.class) == null ||
+           (Flag.CTX.oneOf(flags) || Flag.POS.oneOf(flags)) &&
+             method.getAnnotation(FocusDependent.class) != null ||
+           super.has(flags);
   }
 
   @Override

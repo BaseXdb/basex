@@ -41,11 +41,6 @@ abstract class Copy extends Arr {
     if(!modify.vacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
   }
 
-  @Override
-  public boolean has(final Flag... flags) {
-    return flags.length != 0 && super.has(flags);
-  }
-
   /**
    * Returns the position of the updating expression.
    * @return result expression
