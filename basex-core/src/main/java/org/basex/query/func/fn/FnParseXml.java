@@ -16,18 +16,19 @@ public final class FnParseXml extends FnParseXmlFragment {
   /** Function options. */
   public static final class ParseXmlOptions extends ParseXmlFragmentOptions {
     /** DTD validation. */
-    public static final BooleanOption DTD_VALIDATION = new BooleanOption("dtd-validation");
+    public static final BooleanOption DTD_VALIDATION = new BooleanOption("dtd-validation", false);
     /** XSD validation. */
-    public static final StringOption XSD_VALIDATION = new StringOption("xsd-validation");
+    public static final StringOption XSD_VALIDATION = new StringOption("xsd-validation",
+        MainOptions.SKIP);
 
-    /** Use internal XML parser (default: {@link MainOptions#INTPARSE}). */
-    public static final BooleanOption INTPARSE = new BooleanOption("intparse");
-    /** Flag for parsing DTDs (default: {@link MainOptions#DTD}). */
-    public static final BooleanOption DTD = new BooleanOption("dtd");
-    /** Flag for using XInclude (default: {@link MainOptions#XINCLUDE}). */
-    public static final BooleanOption XINCLUDE = new BooleanOption("xinclude");
-    /** Path to XML Catalog file (default: {@link MainOptions#CATALOG}). */
-    public static final StringOption CATALOG = new StringOption("catalog");
+    /** Custom option (see {@link MainOptions#INTPARSE}). */
+    public static final BooleanOption INTPARSE = new BooleanOption("intparse", false);
+    /** Custom option (see {@link MainOptions#DTD}). */
+    public static final BooleanOption DTD = new BooleanOption("dtd", false);
+    /** Custom option (see {@link MainOptions#XINCLUDE}). */
+    public static final BooleanOption XINCLUDE = new BooleanOption("xinclude", false);
+    /** Custom option (see {@link MainOptions#CATALOG}). */
+    public static final StringOption CATALOG = new StringOption("catalog", "");
   }
 
   @Override

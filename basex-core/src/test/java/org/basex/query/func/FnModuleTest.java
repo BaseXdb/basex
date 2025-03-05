@@ -2326,7 +2326,7 @@ public final class FnModuleTest extends SandboxTest {
         + "'/></a>", " {'xinclude': 'no'}"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
         + "<xi:include href=\"" + path + "\"/></a>");
     query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
-        + "'/></a>"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
+        + "'/></a>", " {'xinclude': 'yes'}"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
         + "<b xml:base=\"src/test/resources/parse-xml.entity\"/></a>");
 
     error(func.args(dtd + "<b>&amp;e;</b>", " {'dtd-validation': 'yes'}"), DTDVALIDATIONERR_X);

@@ -37,8 +37,8 @@ public class FnParseXmlFragment extends StandardFunc {
     /** Remove whitespace-only text nodes. */
     public static final BooleanOption STRIP_SPACE = new BooleanOption("strip-space", false);
 
-    /** Strip namespaces (default: {@link MainOptions#STRIPNS}). */
-    public static final BooleanOption STRIPNS = new BooleanOption("stripns");
+    /** Custom option (see {@link MainOptions#STRIPNS}). */
+    public static final BooleanOption STRIPNS = new BooleanOption("stripns", false);
   }
 
   @Override
@@ -83,7 +83,8 @@ public class FnParseXmlFragment extends StandardFunc {
         ParseXmlOptions.CATALOG, MainOptions.CATALOG).forEach((opt, mopt) -> {
       if(options.contains(opt)) mopts.set(mopt, options.get(opt));
     });
-    if(mopts.get(MainOptions.DTD) || mopts.get(MainOptions.XINCLUDE)) checkPerm(qc, Perm.CREATE);
+    if(mopts.get(MainOptions.DTD) || mopts.get(MainOptions.XINCLUDE) ||
+        !mopts.get(MainOptions.CATALOG).isEmpty()) checkPerm(qc, Perm.CREATE);
 
     final boolean dtdVal = mopts.get(MainOptions.DTDVALIDATION);
     final String xsdVal = mopts.get(MainOptions.XSDVALIDATION);
