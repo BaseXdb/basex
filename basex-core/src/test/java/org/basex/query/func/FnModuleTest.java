@@ -195,6 +195,7 @@ public final class FnModuleTest extends SandboxTest {
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
     query(func.args(" true#0", " [1]"), true);
+    error(func.args(" concat#2", " ['x']"), APPLY_X_X);
     error(func.args(" put#2", " [<_/>, '']"), FUNCUP_X);
   }
 
