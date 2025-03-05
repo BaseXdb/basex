@@ -3370,4 +3370,10 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh2390() {
     query("<p><b/></p>/*[.[self::a union self::b/@x]]", "");
   }
+
+  /** Repeated evaluation of nondeterministic code. */
+  @Test public void gh2395() {
+    query("count(distinct-values((1 to 5) ! prof:track((1 to 1000000)[. = 0])?time)) > 1",
+        true);
+  }
 }
