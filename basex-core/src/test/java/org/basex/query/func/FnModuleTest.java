@@ -180,7 +180,7 @@ public final class FnModuleTest extends SandboxTest {
     query("for $a in 2 to 3 "
         + "let $f := function-lookup(xs:QName('fn:concat'), $a) "
         + "return " + func.args(" $f", " array { 1 to $a }"), "12\n123");
-    error(func.args(" false#0", " ['x']"), APPLY_X_X);
+    query(func.args(" false#0", " ['x']"), false);
     error(func.args(" string-length#1", " [ ('a', 'b') ]"), INVCONVERT_X_X_X);
 
     // no pre-evaluation (higher-order arguments), but type adjustment
@@ -194,7 +194,7 @@ public final class FnModuleTest extends SandboxTest {
 
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
-    error(func.args(" true#0", " [1]"), APPLY_X_X);
+    query(func.args(" true#0", " [1]"), true);
     error(func.args(" put#2", " [<_/>, '']"), FUNCUP_X);
   }
 
@@ -2348,6 +2348,15 @@ public final class FnModuleTest extends SandboxTest {
         + "'?><x/><y/>", Strings.UTF16LE)), "<x/><y/>");
     query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
         + "\u20AC</x><y>\u20AF</y>", "ISO-8859-7")), "<x>\u20AC</x><y>\u20AF</y>");
+  }
+
+  /** Test method. */
+  @Test public void partialApply() {
+    final Function func = PARTIAL_APPLY;
+
+    query("let $f := " + func.args(" dateTime#2", " {2: xs:time('00:00:00')}") + " return $f("
+        + "xs:date('2025-03-01'))", "2025-03-01T00:00:00");
+    error(func.args(" string-length#1", " {1: 42}"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
