@@ -525,6 +525,9 @@ public enum Function implements AFunction {
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value[,options])",
       params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
+  PARTIAL_APPLY(FnPartialApply::new, "partial-apply(function,arguments)",
+      params(FUNCTION_O, MAP_O), FUNCTION_O, flag(HOF)),
+  /** XQuery function. */
   PARTITION(FnPartition::new, "partition(input,split-when)",
       params(ITEM_ZM, FuncType.get(BOOLEAN_ZO, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ARRAY_ZM, flag(HOF)),
