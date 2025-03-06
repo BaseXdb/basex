@@ -106,6 +106,7 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new ShowSessions(), false, NONE);
     ckDBs(new ShowUsers(), false, NONE);
     ckDBs(new ShowUsers(NAME), false, NONE);
+    ckDBs(new org.basex.core.cmd.Test(NAME), true, null);
   }
 
   /** Tests locked databases in XQuery queries. */

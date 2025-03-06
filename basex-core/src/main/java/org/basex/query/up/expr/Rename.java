@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
@@ -79,8 +80,9 @@ public final class Rename extends Update {
       }
 
       final Updates updates = qc.updates();
-      final DBNode dbn = updates.determineDataRef(target, qc);
-      updates.add(new RenameNode(dbn.pre(), dbn.data(), info, newName), qc);
+      final DBNode dbnode = updates.determineDataRef(target, qc);
+      checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
+      updates.add(new RenameNode(dbnode.pre(), dbnode.data(), info, newName), qc);
     }
     return Empty.VALUE;
   }

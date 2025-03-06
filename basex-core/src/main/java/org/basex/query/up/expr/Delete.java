@@ -3,6 +3,7 @@ package org.basex.query.up.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -40,8 +41,9 @@ public final class Delete extends Update {
       // nodes without parents are ignored
       if(node.parent() == null) continue;
       final Updates updates = qc.updates();
-      final DBNode dbn = updates.determineDataRef(node, qc);
-      updates.add(new DeleteNode(dbn.pre(), dbn.data(), info), qc);
+      final DBNode dbnode = updates.determineDataRef(node, qc);
+      checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
+      updates.add(new DeleteNode(dbnode.pre(), dbnode.data(), info), qc);
     }
     return Empty.VALUE;
   }

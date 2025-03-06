@@ -2,6 +2,7 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.name.*;
@@ -23,6 +24,7 @@ public final class DbAlterBackup extends DbAccessFn {
     final String name = toName(arg(0), false, qc), newname = toName(arg(1), false, qc);
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 
+    checkPerm(qc, Perm.CREATE, name);
     final StringList backups = qc.context.databases.backups(name);
     if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);
 

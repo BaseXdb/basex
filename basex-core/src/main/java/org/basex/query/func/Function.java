@@ -542,7 +542,7 @@ public enum Function implements AFunction {
       params(QNAME_ZO), NCNAME_ZO),
   /** XQuery function. */
   PUT(FnPut::new, "put(node,source[,options])",
-      params(NODE_O, STRING_ZO, ITEM_ZO), EMPTY_SEQUENCE_Z, flag(UPD), FN_URI, Perm.CREATE),
+      params(NODE_O, STRING_ZO, ITEM_ZO), EMPTY_SEQUENCE_Z, flag(UPD), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   QNAME(FnQName::new, "QName(uri,qname)",
       params(STRING_ZO, STRING_O), QNAME_O),
@@ -1245,7 +1245,7 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_O), BOOLEAN_O, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_EXPORT(DbExport::new, "export(database,path[,param])",
-      params(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), DB_URI, Perm.CREATE),
+      params(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(NDT), DB_URI, Perm.ADMIN),
   /** XQuery function. */
   _DB_FLUSH(DbFlush::new, "flush(database)",
       params(ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),

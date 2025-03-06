@@ -3,6 +3,7 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 
 import org.basex.core.*;
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.item.*;
@@ -23,6 +24,7 @@ public final class DbRestore extends BackupFn {
     final String name = toName(arg(0), true, qc);
 
     // find backup with or without date suffix
+    checkPerm(qc, Perm.CREATE, Databases.name(name));
     final StringList backups = qc.context.databases.backups(name);
     if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);
 

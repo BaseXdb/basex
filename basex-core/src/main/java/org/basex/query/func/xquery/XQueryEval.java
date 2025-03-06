@@ -140,8 +140,7 @@ public class XQueryEval extends StandardFunc {
       } catch(final QueryException ex) {
         Util.debug(ex);
         final QueryError error = ex.error();
-        final QueryException qe = error(ex, error == BASEX_PERMISSION_X ||
-            error == BASEX_PERMISSION_X_X ? XQUERY_PERM_X : null);
+        final QueryException qe = error(ex, error == BASEX_PERMISSION_X_X ? XQUERY_PERM_X : null);
         // pass on error info: assign (possibly empty) path of module which caused the error
         InputInfo ii = ex.info();
         if(pass && ii == null) ii = new InputInfo(query.path(), 1, 1);

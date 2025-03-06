@@ -3,6 +3,7 @@ package org.basex.query.up.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -51,7 +52,8 @@ public final class Replace extends Update {
 
       final ANode targ = (ANode) item;
       final Updates updates = qc.updates();
-      final DBNode dbn = updates.determineDataRef(targ, qc);
+      final DBNode dbnode = updates.determineDataRef(targ, qc);
+      checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
 
       // replace node
       if(builder == null) builder = builder(arg(1), qc);
@@ -65,7 +67,7 @@ public final class Replace extends Update {
         if(type == NodeType.COMMENT) FComm.parse(text, info);
         if(type == NodeType.PROCESSING_INSTRUCTION) FPI.parse(text, info);
 
-        updates.add(new ReplaceValue(dbn.pre(), dbn.data(), info, text), qc);
+        updates.add(new ReplaceValue(dbnode.pre(), dbnode.data(), info, text), qc);
       } else {
         final ANode parent = targ.parent();
         if(parent == null) throw UPNOPAR_X.get(info, targ);
@@ -81,7 +83,7 @@ public final class Replace extends Update {
           list = builder.children != null ? builder.children : new ANodeList();
         }
         // conforms to specification: insertion sequence may be empty
-        updates.add(new ReplaceNode(dbn.pre(), dbn.data(), info, list), qc);
+        updates.add(new ReplaceNode(dbnode.pre(), dbnode.data(), info, list), qc);
       }
     }
     return Empty.VALUE;

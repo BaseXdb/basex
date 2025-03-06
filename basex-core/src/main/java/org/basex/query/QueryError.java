@@ -57,8 +57,6 @@ public enum QueryError {
   /** Error code. */
   BASEX_OVERFLOW(BASEX, "overflow", "Stack Overflow: Try tail recursion?"),
   /** Error code. */
-  BASEX_PERMISSION_X(BASEX, "permission", "No % permission."),
-  /** Error code. */
   BASEX_PERMISSION_X_X(BASEX, "permission", "No % permission: %."),
   /** Error code. */
   BASEX_RESTXQ_X(BASEX, "restxq", "%"),

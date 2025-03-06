@@ -2,6 +2,7 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.value.item.*;
@@ -19,6 +20,8 @@ public final class DbCreateBackup extends BackupFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toName(arg(0), true, qc);
     final CreateBackupOptions options = toOptions(arg(1), new CreateBackupOptions(), qc);
+
+    checkPerm(qc, Perm.CREATE, name);
     if(!name.isEmpty() && !qc.context.soptions.dbExists(name)) throw DB_OPEN1_X.get(info, name);
 
     final String comment = options.get(CreateBackupOptions.COMMENT);

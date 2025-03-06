@@ -171,12 +171,13 @@ public final class QueryResources {
    * Opens a new database or returns a reference to an already opened database.
    * @param name name of database
    * @param user current user
+   * @param updating updating access
    * @param info input info (can be {@code null})
    * @return database instance
    * @throws QueryException query exception
    */
-  public synchronized Data database(final String name, final User user, final InputInfo info)
-      throws QueryException {
+  public synchronized Data database(final String name, final User user, final boolean updating,
+      final InputInfo info) throws QueryException {
 
     final boolean mainmem = context.options.get(MainOptions.MAINMEM);
 
@@ -188,7 +189,8 @@ public final class QueryResources {
     }
 
     // open and register database
-    if(!user.has(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(info, Perm.READ, name);
+    final Perm perm = updating ? Perm.WRITE : Perm.READ;
+    if(!user.has(perm, name)) throw BASEX_PERMISSION_X_X.get(info, perm, name);
     try {
       return addData(Open.open(name, context, context.options, true, false));
     } catch(final IOException ex) {

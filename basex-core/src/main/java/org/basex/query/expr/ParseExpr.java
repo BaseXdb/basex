@@ -6,6 +6,7 @@ import static org.basex.query.value.type.NodeType.*;
 
 import java.util.*;
 
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -212,6 +213,29 @@ public abstract class ParseExpr extends Expr {
       if(updating ? state == -1 : state == 1) throw UPALL.get(info);
       state = updating ? 1 : -1;
     }
+  }
+
+  /**
+   * Checks if the current user has the given permissions. If negative, an exception is thrown.
+   * @param qc query context
+   * @param perm permission
+   * @throws QueryException query exception
+   */
+  protected void checkPerm(final QueryContext qc, final Perm perm) throws QueryException {
+    if(!qc.user.has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, this);
+  }
+
+  /**
+   * Checks if the current user has the given permissions for the specified database.
+   * If negative, an exception is thrown.
+   * @param qc query context
+   * @param perm permission
+   * @param name name of resource
+   * @throws QueryException query exception
+   */
+  protected void checkPerm(final QueryContext qc, final Perm perm, final String name)
+      throws QueryException {
+    if(!qc.user.has(perm, name)) throw BASEX_PERMISSION_X_X.get(info(), perm, this);
   }
 
   /**
