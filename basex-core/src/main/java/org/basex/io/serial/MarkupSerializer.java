@@ -368,7 +368,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   /**
    * Prints the content type declaration.
    * @param empty empty flag
-   * @param html method
+   * @param html HTML/XHTML flag
    * @return {@code true} if declaration was printed
    * @throws IOException I/O exception
    */

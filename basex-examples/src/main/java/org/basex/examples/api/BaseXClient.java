@@ -103,7 +103,7 @@ public final class BaseXClient implements Closeable {
   /**
    * Creates a database.
    * @param name name of database
-   * @param input xml input
+   * @param input XML input
    * @throws IOException I/O exception
    */
   public void create(final String name, final InputStream input) throws IOException {
@@ -113,7 +113,7 @@ public final class BaseXClient implements Closeable {
   /**
    * Adds a document to a database.
    * @param path path to resource
-   * @param input xml input
+   * @param input XML input
    * @throws IOException I/O exception
    */
   public void add(final String path, final InputStream input) throws IOException {
@@ -123,7 +123,7 @@ public final class BaseXClient implements Closeable {
   /**
    * Puts (adds or replaces) a document in the opened database.
    * @param path path to resource
-   * @param input xml input
+   * @param input XML input
    * @throws IOException I/O exception
    */
   public void put(final String path, final InputStream input) throws IOException {
@@ -133,7 +133,7 @@ public final class BaseXClient implements Closeable {
   /**
    * Puts (adds or replaces) a binary resource in the opened database.
    * @param path path to resource
-   * @param input xml input
+   * @param input XML input
    * @throws IOException I/O exception
    */
   public void putBinary(final String path, final InputStream input) throws IOException {
@@ -207,7 +207,7 @@ public final class BaseXClient implements Closeable {
    * Sends a command, argument, and input.
    * @param code command code
    * @param path name, or path to resource
-   * @param input xml input
+   * @param input XML input
    * @throws IOException I/O exception
    */
   private void send(final int code, final String path, final InputStream input) throws IOException {
@@ -218,7 +218,7 @@ public final class BaseXClient implements Closeable {
 
   /**
    * Sends an input stream to the server.
-   * @param input xml input
+   * @param input XML input
    * @throws IOException I/O exception
    */
   private void send(final InputStream input) throws IOException {

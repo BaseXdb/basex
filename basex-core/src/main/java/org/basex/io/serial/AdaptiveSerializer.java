@@ -43,7 +43,7 @@ public class AdaptiveSerializer extends OutputSerializer {
    * Constructor, specifying serialization options.
    * @param os output stream
    * @param sopts serialization parameters
-   * @param omit omit xml declaration
+   * @param omit omit XML declaration
    * @throws IOException I/O exception
    */
   protected AdaptiveSerializer(final OutputStream os, final SerializerOptions sopts,

@@ -38,7 +38,7 @@ public final class HtmlParser extends XMLParser {
    * Constructor.
    * @param source document source
    * @param options main options
-   * @param hopts html options
+   * @param hopts HTML options
    * @throws IOException I/O exception
    */
   public HtmlParser(final IO source, final MainOptions options, final HtmlOptions hopts)
@@ -51,7 +51,7 @@ public final class HtmlParser extends XMLParser {
    * @param source document source
    * @param parser parser to be used (can be {@code null})
    * @param options main options
-   * @param hopts html options
+   * @param hopts HTML options
    * @throws IOException I/O exception
    */
   public HtmlParser(final IO source, final Parser parser, final MainOptions options,
@@ -63,7 +63,7 @@ public final class HtmlParser extends XMLParser {
    * Converts an HTML document to XML.
    * @param io io reference
    * @param parser parser to be used (can be {@code null})
-   * @param hopts html options
+   * @param hopts HTML options
    * @return parser
    * @throws IOException I/O exception
    */

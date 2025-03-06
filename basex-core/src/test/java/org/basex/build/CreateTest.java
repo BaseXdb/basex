@@ -30,7 +30,7 @@ public final class CreateTest extends SandboxTest {
   /** First document in test folder. */
   private static final String FOLDERFILE;
 
-  // finds the first document in the xml folder
+  // finds the first document in the XML folder
   static {
     String file = "";
     for(final IOFile c : new IOFile(FOLDER).children()) {

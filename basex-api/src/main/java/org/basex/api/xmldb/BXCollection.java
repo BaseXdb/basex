@@ -288,7 +288,7 @@ public final class BXCollection implements Collection {
    * Returns the specified resource as a project specific XML resource.
    * If that's not possible, throws an exception
    * @param resource input resource
-   * @return xml resource
+   * @return XML resource
    * @throws XMLDBException exception
    */
   private static BXXMLResource checkXML(final Resource resource) throws XMLDBException {

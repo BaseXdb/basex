@@ -61,7 +61,7 @@ public abstract class Session implements Closeable {
   /**
    * Creates a database.
    * @param name name of database
-   * @param input xml input
+   * @param input XML input
    * @throws IOException I/O exception
    */
   public abstract void create(String name, InputStream input) throws IOException;
@@ -69,7 +69,7 @@ public abstract class Session implements Closeable {
   /**
    * Adds a document to the opened database.
    * @param path target path
-   * @param input xml input
+   * @param input XML input
    * @throws IOException I/O exception
    */
   public abstract void add(String path, InputStream input) throws IOException;

@@ -208,7 +208,7 @@ final class XMLParser extends CommandParser {
   /**
    * Returns the serialized XML value.
    * @param context context node
-   * @return xml value
+   * @return XML string
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
