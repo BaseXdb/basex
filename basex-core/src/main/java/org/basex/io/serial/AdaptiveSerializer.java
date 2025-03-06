@@ -147,10 +147,8 @@ public class AdaptiveSerializer extends OutputSerializer {
     final TokenBuilder tb = new TokenBuilder().add('[');
     int c = 0;
     for(final Value value : array.iterable()) {
-      if(c++ > 0) {
-        tb.add(',');
-        if(indent) tb.add(' ');
-      }
+      if(c++ > 0) tb.add(',');
+      if(indent) tb.add(' ');
       final long vs = value.size();
       if(vs != 1) tb.add('(');
       for(int i = 0, cc = 0; i < vs; i++, cc++) {
@@ -164,6 +162,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       }
       if(vs != 1) tb.add(')');
     }
+    if(c > 0 && indent) tb.add(' ');
     printChars(tb.add(']').finish());
   }
 
@@ -205,7 +204,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     }
     printChars(tb.next());
     --level;
-    indent();
+    if(c > 0) indent();
     printChars(tb.add('}').finish());
   }
 
