@@ -42,7 +42,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.RecordType.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -976,7 +975,7 @@ public class QueryParser extends InputParser {
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck("(");
-    final TokenObjMap<Field> fields = new TokenObjMap<>();
+    final TokenObjMap<RecordField> fields = new TokenObjMap<>();
     final RecordType rt;
     if(wsConsume(")")) {
       rt = new RecordType(false, fields, qn);
@@ -1001,7 +1000,7 @@ public class QueryParser extends InputParser {
           localVars.popContext();
           exprRequired = true;
         }
-        fields.put(name, new Field(optional, seqType, expr));
+        fields.put(name, new RecordField(optional, seqType, expr));
       } while(wsConsume(","));
       wsCheck(")");
       rt = new RecordType(extensible, fields, qn);
@@ -1018,15 +1017,15 @@ public class QueryParser extends InputParser {
       final Params params = new Params();
       boolean defaults = false;
       for(final byte[] key : rt) {
-        final Field field = rt.getField(key);
-        final boolean optional = field.isOptional();
-        final Expr initExpr = field.getInitExpr();
+        final RecordField rf = rt.field(key);
+        final boolean optional = rf.isOptional();
+        final Expr initExpr = rf.expr();
         if(optional || initExpr != null) {
           defaults = true;
         } else if(defaults) {
           throw error(PARAMOPTIONAL_X, key);
         }
-        final SeqType fst = field.seqType();
+        final SeqType fst = rf.seqType();
         final SeqType pst = optional ? fst.union(Occ.ZERO) : fst;
         final Expr init = initExpr == null && optional ? Empty.VALUE : initExpr;
         params.add(new QNm(key), pst, init, null);
@@ -1047,7 +1046,7 @@ public class QueryParser extends InputParser {
       for(int i = 0; i < pv.length; ++i) {
         args[i] = new VarRef(null, pv[i]);
       }
-      final Expr expr = new RecordConstructor(ii, rt, args);
+      final Expr expr = new CRecord(ii, rt, args);
       final String doc = docBuilder.toString();
       final VarScope vs = localVars.popContext();
       final StaticFunc func = qc.functions.declare(qn, params, expr, anns, doc, vs, info());
@@ -3419,7 +3418,7 @@ public class QueryParser extends InputParser {
 
     // record
     if(type instanceof RecordType) {
-      final TokenObjMap<Field> fields = new TokenObjMap<>();
+      final TokenObjMap<RecordField> fields = new TokenObjMap<>();
       if(consume(')')) return new RecordType(false, fields, null);
       boolean extensible = false;
       do {
@@ -3431,7 +3430,7 @@ public class QueryParser extends InputParser {
         final boolean optional = wsConsume("?");
         final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
         if(fields.contains(name)) throw error(DUPFIELD_X, name);
-        fields.put(name, new Field(optional, seqType));
+        fields.put(name, new RecordField(optional, seqType));
       } while(wsConsume(","));
       wsCheck(")");
       return fields.isEmpty() ? SeqType.RECORD : new RecordType(extensible, fields, null);

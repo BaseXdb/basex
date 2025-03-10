@@ -3,7 +3,6 @@ package org.basex.query.func.map;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -34,20 +33,24 @@ public final class MapPut extends StandardFunc {
     if(map == XQMap.empty()) return cc.function(_MAP_ENTRY, info, key, value);
 
     final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      final MapType mt = (MapType) type;
-      Type kt = key.seqType().type.atomic();
-      if(kt != null) {
-        kt = mt.keyType.union(kt);
-        SeqType vt = mt.valueType.union(value.seqType());
-        exprType.assign(MapType.get(kt, vt));
+    Type tp = null;
+    if(type instanceof RecordType) {
+      // propagate record type
+      final RecordType rt = (RecordType) type;
+      if(key instanceof Item) {
+        final RecordField rf = key.seqType().type.isStringOrUntyped() ?
+          rt.field(toToken(key, cc.qc)) : null;
+        if(rf != null ? value.seqType().instanceOf(rf.seqType()) : rt.isExtensible()) tp = rt;
       }
     }
-    return this;
-  }
+    if(tp == null && type instanceof MapType) {
+      // create new map type (to drop potential record type assignment)
+      final MapType mt = (MapType) type;
+      final Type kt = key.seqType().type.atomic();
+      if(kt != null) tp = MapType.get(mt.keyType.union(kt), mt.valueType.union(value.seqType()));
+    }
+    if(tp != null) exprType.assign(tp);
 
-  @Override
-  protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(1, arg -> arg.simplifyFor(Simplify.DATA, cc));
+    return this;
   }
 }

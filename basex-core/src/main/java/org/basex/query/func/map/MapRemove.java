@@ -28,15 +28,28 @@ public final class MapRemove extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final Expr map = arg(0);
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr map = arg(0), key = arg(1);
     if(map == XQMap.empty()) return map;
 
     final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      final MapType mt = (MapType) type;
-      exprType.assign(MapType.get(mt.keyType, mt.valueType));
+    Type tp = null;
+    if(type instanceof RecordType) {
+      // propagate record type
+      final RecordType rt = (RecordType) type;
+      if(key instanceof Item && key.seqType().type.isStringOrUntyped()) {
+        final RecordField rf = rt.field(toToken(key, cc.qc));
+        if(rf == null && !rt.isExtensible()) return map;
+        if(rf == null || rf.isOptional()) tp = rt;
+      }
     }
+    if(tp == null && type instanceof MapType) {
+      // create new map type (to drop potential record type assignment)
+      final MapType mt = (MapType) type;
+      tp = MapType.get(mt.keyType, mt.valueType);
+    }
+    if(tp != null) exprType.assign(tp);
+
     return this;
   }
 }

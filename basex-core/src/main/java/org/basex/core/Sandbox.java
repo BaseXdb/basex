@@ -353,7 +353,7 @@ public abstract class Sandbox {
    * @return test string
    */
   protected static String root(final String expr) {
-    return "name(QueryPlan/*) = '" + expr + "'";
+    return "QueryPlan/* ! name() = '" + expr + "'";
   }
 
   /**

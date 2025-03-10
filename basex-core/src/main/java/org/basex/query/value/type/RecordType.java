@@ -8,12 +8,9 @@ import java.util.*;
 import java.util.Set;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.util.hash.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -30,21 +27,21 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
   public static final RecordType MEMBER;
 
   static {
-    TokenObjMap<Field> map = new TokenObjMap<>();
-    map.put(Str.KEY.string(), new Field(false, SeqType.ANY_ATOMIC_TYPE_O));
-    map.put(Str.VALUE.string(), new Field(false, SeqType.ITEM_ZM));
+    TokenObjMap<RecordField> map = new TokenObjMap<>();
+    map.put(Str.KEY.string(), new RecordField(false, SeqType.ANY_ATOMIC_TYPE_O));
+    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
     PAIR = new RecordType(false, map, null);
     map = new TokenObjMap<>();
-    map.put(Str.VALUE.string(), new Field(false, SeqType.ITEM_ZM));
+    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
     MEMBER = new RecordType(false, map, null);
   }
 
   /** Extensible flag. */
   private boolean extensible;
-  /** Field declarations. */
-  private TokenObjMap<Field> fields;
+  /** Record fields. */
+  private TokenObjMap<RecordField> fields;
   /** Record type name (can be {@code null}). */
-  public final QNm name;
+  private final QNm name;
   /** Input info ({@code null}, if this is not an unresolved reference). */
   private InputInfo info;
 
@@ -54,7 +51,8 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
    * @param fields field declarations
    * @param name record type name (can be {@code null})
    */
-  public RecordType(final boolean extensible, final TokenObjMap<Field> fields, final QNm name) {
+  public RecordType(final boolean extensible, final TokenObjMap<RecordField> fields,
+      final QNm name) {
     super(extensible ? AtomType.ANY_ATOMIC_TYPE : AtomType.STRING,
         extensible ? SeqType.ITEM_ZM : unionType(fields));
     this.extensible = extensible;
@@ -78,14 +76,14 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
 
   /**
    * Calculate union type of field sequence types.
-   * @param fields field declarations
+   * @param recordFields field declarations
    * @return union type
    */
-  private static SeqType unionType(final TokenObjMap<Field> fields) {
-    if(fields.isEmpty()) return SeqType.ITEM_ZM;
+  private static SeqType unionType(final TokenObjMap<RecordField> recordFields) {
+    if(recordFields.isEmpty()) return SeqType.ITEM_ZM;
     SeqType unionType = null;
-    for(final Field field : fields.values()) {
-      final SeqType st = field.seqType();
+    for(final RecordField recordField : recordFields.values()) {
+      final SeqType st = recordField.seqType();
       unionType = unionType == null ? st : unionType.union(st);
     }
     return unionType;
@@ -109,8 +107,16 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
    * @param key key to be looked up
    * @return field, or {@code null} if nothing was found
    */
-  public Field getField(final byte[] key) {
+  public RecordField field(final byte[] key) {
     return fields.get(key);
+  }
+
+  /**
+   * Returns the name of the record.
+   * @return name (can be {@code null})
+   */
+  public QNm name() {
+    return name;
   }
 
   /**
@@ -121,7 +127,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
   public boolean instance(final XQMap map) {
     try {
       for(final byte[] field : fields) {
-        final Field f = fields.get(field);
+        final RecordField f = fields.get(field);
         final Item key = Str.get(field);
         if(map.contains(key)) {
           if(f.seqType != null && !f.seqType.instance(map.get(key))) return false;
@@ -211,9 +217,9 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
         }
       }
       for(final byte[] field : rt.fields) {
-        final Field rtf = rt.fields.get(field);
+        final RecordField rtf = rt.fields.get(field);
         if(fields.contains(field)) {
-          final Field f = fields.get(field);
+          final RecordField f = fields.get(field);
           if(!rtf.optional && f.optional) return false;
           final SeqType fst = f.seqType(), rtfst = rtf.seqType();
           if(fst != rtfst) {
@@ -273,12 +279,12 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
 
     if(type instanceof RecordType) {
       final RecordType rt = (RecordType) type;
-      final TokenObjMap<Field> map = new TokenObjMap<>();
+      final TokenObjMap<RecordField> map = new TokenObjMap<>();
       for(final byte[] field : fields) {
-        final Field f = fields.get(field);
+        final RecordField f = fields.get(field);
         if(rt.fields.contains(field)) {
           // common field
-          final Field rtf = rt.fields.get(field);
+          final RecordField rtf = rt.fields.get(field);
           final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
           final Type ft = fst.type, rtft = rtfst.type;
           final SeqType union;
@@ -291,16 +297,16 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
           } else {
             union = fst.union(rtfst);
           }
-          map.put(field, new Field(f.optional || rtf.optional, union));
+          map.put(field, new RecordField(f.optional || rtf.optional, union));
         } else {
           // field missing in type
-          map.put(field, new Field(true, f.seqType));
+          map.put(field, new RecordField(true, f.seqType));
         }
       }
       for(final byte[] field : rt.fields) {
         if(!fields.contains(field)) {
           // field missing in this RecordType
-          map.put(field, new Field(true, rt.fields.get(field).seqType));
+          map.put(field, new RecordField(true, rt.fields.get(field).seqType));
         }
       }
       return new RecordType(extensible || rt.extensible, map, null);
@@ -334,12 +340,12 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
 
     if(!(type instanceof RecordType)) return null;
     final RecordType rt = (RecordType) type;
-    final TokenObjMap<Field> map = new TokenObjMap<>();
+    final TokenObjMap<RecordField> map = new TokenObjMap<>();
     for(final byte[] field : fields) {
-      final Field f = fields.get(field);
+      final RecordField f = fields.get(field);
       if(rt.fields.contains(field)) {
         // common field
-        final Field rtf = rt.fields.get(field);
+        final RecordField rtf = rt.fields.get(field);
         final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
         final Type ft = fst.type, rtft = rtfst.type;
         final SeqType is;
@@ -353,18 +359,18 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
           is = fst.intersect(rtfst);
         }
         if(is == null) return null;
-        map.put(field, new Field(f.optional && rtf.optional, is));
+        map.put(field, new RecordField(f.optional && rtf.optional, is));
       } else {
         // field missing in type
         if(!rt.extensible) return null;
-        map.put(field, new Field(false, f.seqType));
+        map.put(field, new RecordField(false, f.seqType));
       }
     }
     for(final byte[] field : rt.fields) {
       if(!fields.contains(field)) {
         // field missing in this RecordType
         if(!extensible) return null;
-        map.put(field, new Field(false, rt.fields.get(field).seqType));
+        map.put(field, new RecordField(false, rt.fields.get(field).seqType));
       }
     }
     return new RecordType(extensible && rt.extensible, map, null);
@@ -386,7 +392,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
       for(final byte[] field : fields) {
         if(i++ != 0) qs.token(',').token(' ');
         if(XMLToken.isNCName(field)) qs.token(field); else qs.quoted(field);
-        final Field f = fields.get(field);
+        final RecordField f = fields.get(field);
         if(f.optional) qs.token('?');
         if(f.seqType != null) qs.token(AS).token(f.seqType);
       }
@@ -432,132 +438,6 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
   }
 
   /**
-   * Named record type constructor function.
-   */
-  public static class RecordConstructor extends Arr {
-    /** Record type. */
-    private final RecordType recordType;
-
-    /**
-     * Constructor.
-     * @param recordType record type
-     * @param info input info (can be {@code null})
-     * @param args function arguments
-     */
-    public RecordConstructor(final InputInfo info, final RecordType recordType, final Expr[] args) {
-      super(info, recordType.seqType(), args);
-      this.recordType = recordType;
-    }
-
-    @Override
-    public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-      final MapBuilder mb = new MapBuilder();
-      final Expr[] args = args();
-      int i = 0;
-      for(final byte[] key : recordType.fields) {
-        final Value value = args[i++].value(qc);
-        final boolean omit;
-        if(value.isEmpty()) {
-          final Field field = recordType.getField(key);
-          omit = field.isOptional() && field.initExpr == null;
-        } else {
-          omit = false;
-        }
-        if(!omit) mb.put(key, value);
-      }
-      if(recordType.isExtensible()) {
-        toMap(arg(i), qc).forEach((k, v) -> {
-          if(!mb.contains(k)) mb.put(k, v);
-        });
-      }
-      return mb.map();
-    }
-
-    @Override
-    public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
-      return copyType(new RecordConstructor(info, recordType, copyAll(cc, vm, args())));
-    }
-
-    @Override
-    public void toString(final QueryString qs) {
-      qs.token(recordType.name).params(exprs);
-    }
-  }
-
-  /**
-   * Field declaration.
-   */
-  public static class Field {
-    /** Optional flag. */
-    private final boolean optional;
-    /** Field type (can be {@code null}). */
-    private final SeqType seqType;
-    /** Initializing expression (can be {@code null}). */
-    private final Expr initExpr;
-
-    /**
-     * Constructor.
-     * @param optional optional flag
-     * @param seqType field type (can be {@code null})
-     * @param initExpr initializing expression (can be {@code null})
-     */
-    public Field(final boolean optional, final SeqType seqType, final Expr initExpr) {
-      this.optional = optional;
-      this.seqType = seqType;
-      this.initExpr = initExpr;
-    }
-
-    /**
-     * Constructor.
-     * @param optional optional flag
-     * @param seqType field type (can be {@code null})
-     */
-    public Field(final boolean optional, final SeqType seqType) {
-      this(optional, seqType, null);
-    }
-
-    /**
-     * Indicates if this field is optional.
-     * @return result of check
-     */
-    public boolean isOptional() {
-      return optional;
-    }
-
-    /**
-     * Returns the initializing expression.
-     * @return initializing expression (can be {@code null})
-     */
-    public Expr getInitExpr() {
-      return initExpr;
-    }
-
-    /**
-     * Get effective sequence type of this field.
-     * @return sequence type
-     */
-    public SeqType seqType() {
-      return seqType == null ? SeqType.ITEM_ZM : seqType;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-      if(this == obj) return true;
-      if(!(obj instanceof Field)) return false;
-      final Field other = (Field) obj;
-      return optional == other.optional && seqType().equals(other.seqType());
-    }
-
-    @Override
-    public String toString() {
-      final QueryString qs = new QueryString();
-      if(optional) qs.token('?');
-      qs.token(AS).token(seqType());
-      return qs.toString();
-    }
-  }
-
-  /**
    * An ordered pair of objects.
    */
   private static final class Pair {
@@ -579,7 +459,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     @Override
     public boolean equals(final Object o) {
       if(this == o) return true;
-      if(o == null || getClass() != o.getClass()) return false;
+      if(!(o instanceof Pair)) return false;
       final Pair p = (Pair) o;
       return o1 == p.o1 && o2 == p.o2;
     }

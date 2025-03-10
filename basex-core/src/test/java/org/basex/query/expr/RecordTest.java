@@ -1,8 +1,10 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.query.func.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -131,5 +133,84 @@ public final class RecordTest extends SandboxTest {
         + "let $box := geom:rectangle(3, 2)\n"
         + "return $box?area($box)",
         6);
+  }
+
+  /** Static typing. */
+  @Test public void typing() {
+    check("declare record local:x(x); local:x(1)", "{\"x\":1}",
+        type(StaticFuncCall.class, "local:x"));
+    check("declare record local:x(x, y); local:x(1, 2)", "{\"x\":1,\"y\":2}",
+        type(StaticFuncCall.class, "local:x"));
+  }
+
+  /** Type propagation when removing entries. */
+  @Test public void typeRemove() {
+    check("declare record local:x(x); local:x(1) => map:remove('x')", "{}",
+        type(_MAP_REMOVE, "map(xs:string, item()*)"));
+    check("declare record local:x(x); local:x(1) => map:remove(<_>x</_>)", "{}",
+        type(_MAP_REMOVE, "map(xs:string, item()*)"));
+    check("declare record local:x(x); local:x(1) => map:remove('y')", "{\"x\":1}",
+        empty(_MAP_REMOVE));
+    check("declare record local:x(x); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
+        empty(_MAP_REMOVE));
+
+    check("declare record local:x(x, *); local:x(1) => map:remove('x')", "{}",
+        type(_MAP_REMOVE, "map(*)"));
+    check("declare record local:x(x, *); local:x(1) => map:remove(<_>x</_>)", "{}",
+        type(_MAP_REMOVE, "map(*)"));
+    check("declare record local:x(x, *); local:x(1) => map:remove('y')", "{\"x\":1}",
+        type(_MAP_REMOVE, "local:x"));
+    check("declare record local:x(x, *); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
+        type(_MAP_REMOVE, "local:x"));
+
+    check("declare record local:x(x, y?); local:x(1) => map:remove('x')", "{}",
+        type(_MAP_REMOVE, "map(xs:string, item()*)"));
+    check("declare record local:x(x, y?); local:x(1) => map:remove(<_>x</_>)", "{}",
+        type(_MAP_REMOVE, "map(xs:string, item()*)"));
+    check("declare record local:x(x, y?); local:x(1) => map:remove('y')", "{\"x\":1}",
+        type(_MAP_REMOVE, "local:x"));
+    check("declare record local:x(x, y?); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
+        type(_MAP_REMOVE, "local:x"));
+    check("declare record local:x(x, y?); local:x(1) => map:remove('z')", "{\"x\":1}",
+        empty(_MAP_REMOVE), type(StaticFuncCall.class, "local:x"));
+  }
+
+  /** Type propagation when inserting entries. */
+  @Test public void typePut() {
+    check("declare record local:x(x); local:x(1) => map:put('x', 2)", "{\"x\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
+        type(_MAP_PUT, "map(xs:string, item()*)"));
+    check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
+        type(_MAP_PUT, "map(*)"));
+    check("declare record local:x(x); local:x(1) => map:put(0, 0)", "{\"x\":1,0:0}",
+        type(_MAP_PUT, "map(*)"));
+
+    check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)", "{\"x\":<x/>}",
+        type(_MAP_PUT, "map(xs:string, item())"));
+
+    check("declare record local:x(x, *); local:x(1) => map:put('x', 2)", "{\"x\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x, *); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x, *); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x, *); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x, *); local:x(1) => map:put(0, 0)", "{\"x\":1,0:0}",
+        type(_MAP_PUT, "local:x"));
+
+    check("declare record local:x(x, y?); local:x(1) => map:put('x', 2)", "{\"x\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x, y?); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x, y?); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x, y?); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
+        type(_MAP_PUT, "local:x"));
+    check("declare record local:x(x, y?); local:x(1) => map:put(0, 0)", "{\"x\":1,0:0}",
+        type(_MAP_PUT, "map(*)"));
   }
 }

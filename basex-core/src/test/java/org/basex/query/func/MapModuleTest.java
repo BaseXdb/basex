@@ -455,6 +455,8 @@ public final class MapModuleTest extends SandboxTest {
   @Test public void remove() {
     final Function func = _MAP_REMOVE;
     checkSize(func.args(_MAP_ENTRY.args(1, 2), 1), 0);
+
+    check("map:remove({}, 'x')", "{}", root(XQTrieMap.class));
   }
 
   /** Test method. */

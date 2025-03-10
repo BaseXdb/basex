@@ -21,7 +21,6 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.RecordType.*;
 import org.basex.util.*;
 
 /**
@@ -331,17 +330,17 @@ public abstract class XQMap extends XQStruct {
       final InputInfo ii) throws QueryException {
 
     for(final byte[] key : rt) {
-      if(!rt.getField(key).isOptional() && !contains(Str.get(key))) {
+      if(!rt.field(key).isOptional() && !contains(Str.get(key))) {
         throw typeError(this, rt.seqType(), ii);
       }
     }
     final MapBuilder mb = new MapBuilder(structSize());
     forEach((key, value) -> {
       qc.checkStop();
-      final Field field = key.instanceOf(AtomType.STRING) ? rt.getField(key.string(null)) : null;
+      final RecordField rf = key.instanceOf(AtomType.STRING) ? rt.field(key.string(null)) : null;
       final Value v;
-      if(field != null) {
-        v = field.seqType().coerce(value, null, qc, cc, ii);
+      if(rf != null) {
+        v = rf.seqType().coerce(value, null, qc, cc, ii);
       } else if(rt.isExtensible()) {
         v = value;
       } else {
