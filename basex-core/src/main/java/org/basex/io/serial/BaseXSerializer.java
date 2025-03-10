@@ -41,7 +41,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
             for(int b; (b = bi.read()) != -1;) out.write(b);
           }
         } else if(item.type == AtomType.DOUBLE) {
-          printChars(Dbl.serialize(item.dbl(null)));
+          printChars(Dbl.string(item.dbl(null)));
         } else {
           printChars(item.string(null));
         }

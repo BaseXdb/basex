@@ -83,7 +83,7 @@ public final class Int extends ANum {
 
   @Override
   public byte[] string() {
-    return value == 0 ? Token.cpToken('0') : Token.token(value);
+    return Token.token(value);
   }
 
   @Override

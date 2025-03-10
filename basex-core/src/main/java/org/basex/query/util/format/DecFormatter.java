@@ -37,7 +37,7 @@ public final class DecFormatter extends FormatUtil {
   private final int zero;
 
   /** Infinity. */
-  private byte[] inf = Token.INFINITY;
+  private byte[] inf = Token.POSITIVE_INFINITY;
   /** NaN. */
   private byte[] nan = Token.NAN;
   /** Pattern-separator character. */

@@ -89,7 +89,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       if(type == DOUBLE) {
         final double d = item.dbl(null);
         if(plain) {
-          tb.add(Dbl.serialize(d));
+          tb.add(Dbl.string(d));
         } else if(Double.isNaN(d) || Double.isInfinite(d)) {
           tb.add(item.string(null));
         } else {

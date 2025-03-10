@@ -162,24 +162,23 @@ public final class Dbl extends ANum {
 
     final byte[] v = Token.trim(value);
     if(Token.eq(v, Token.NAN)) return Double.NaN;
-    if(Token.eq(v, Token.INF)) return Double.POSITIVE_INFINITY;
-    if(Token.eq(v, Token.NEGATVE_INF)) return Double.NEGATIVE_INFINITY;
-
+    if(Token.eq(v, Token.POSITIVE_INF)) return Double.POSITIVE_INFINITY;
+    if(Token.eq(v, Token.NEGATIVE_INF)) return Double.NEGATIVE_INFINITY;
     throw AtomType.DOUBLE.castError(value, info);
   }
 
   /**
-   * Returns a JSON string representation of a double value.
-   * @param d double value
+   * Returns a JSON-compliant string representation of a double value.
+   * @param value double value
    * @return string
    */
-  public static byte[] serialize(final double d) {
-    final byte[] token = Token.fastToken(d);
+  public static byte[] string(final double value) {
+    final byte[] token = Token.fastToken(value);
     if(token != null) return token;
 
-    final BigDecimal bd = BigDecimal.valueOf(d).stripTrailingZeros();
-    final double abs = Math.abs(d);
-    return d == 0 && Double.doubleToRawLongBits(d) < 0 ? Token.NEGATIVE_ZERO :
+    final BigDecimal bd = BigDecimal.valueOf(value).stripTrailingZeros();
+    final double abs = Math.abs(value);
+    return value == 0 && Double.doubleToRawLongBits(value) < 0 ? Token.NEGATIVE_ZERO :
       abs >= 1e-6 && abs < 1e21 ? Token.token(bd.toPlainString()) :
         Token.token(bd.toString().replace('E', 'e').replace("e+", "e"));
   }

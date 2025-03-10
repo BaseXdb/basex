@@ -45,11 +45,11 @@ public final class Token {
   /** Token 'NaN'. */
   public static final byte[] NAN = token("NaN");
   /** Token 'INF'. */
-  public static final byte[] INF = token("INF");
+  public static final byte[] POSITIVE_INF = token("INF");
   /** Token '-INF'. */
-  public static final byte[] NEGATVE_INF = token("-INF");
+  public static final byte[] NEGATIVE_INF = token("-INF");
   /** Token 'Infinity'. */
-  public static final byte[] INFINITY = token("Infinity");
+  public static final byte[] POSITIVE_INFINITY = token("Infinity");
   /** Token '-Infinity'. */
   public static final byte[] NEGATIVE_INFINITY = token("-Infinity");
   /** Minimum long value. */
@@ -355,7 +355,7 @@ public final class Token {
    * @return integer value in byte array
    */
   public static byte[] token(final int integer) {
-    if(integer == 0) return cpToken('0');
+    if(integer >= 0 && integer <= 9) return cpToken('0' + integer);
     if(integer == Integer.MIN_VALUE) return MIN_INT;
 
     int n = integer;
@@ -439,7 +439,8 @@ public final class Token {
    * @return byte array
    */
   public static byte[] token(final long integer) {
-    return integer >= Integer.MIN_VALUE && integer <= Integer.MAX_VALUE ?
+    return integer >= 0 && integer <= 9 ? cpToken('0' + (int) integer) :
+           integer >= Integer.MIN_VALUE && integer <= Integer.MAX_VALUE ?
         token((int) integer) : token(Long.toString(integer));
   }
 
@@ -494,8 +495,8 @@ public final class Token {
    * @return byte array or {@code null}
    */
   public static byte[] fastToken(final double value) {
-    if(value == Double.POSITIVE_INFINITY) return INF;
-    if(value == Double.NEGATIVE_INFINITY) return NEGATVE_INF;
+    if(value == Double.POSITIVE_INFINITY) return POSITIVE_INF;
+    if(value == Double.NEGATIVE_INFINITY) return NEGATIVE_INF;
     if(value == 0) return 1 / value > 0 ? cpToken('0') : NEGATIVE_ZERO;
     if(Double.isNaN(value)) return NAN;
     final double a = Math.abs(value);

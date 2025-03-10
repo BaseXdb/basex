@@ -161,7 +161,7 @@ public abstract class JsonSerializer extends StandardSerializer {
       if(type.oneOf(AtomType.DOUBLE, AtomType.FLOAT)) {
         final double d = item.dbl(null);
         if(Double.isNaN(d) || Double.isInfinite(d)) throw SERNUMBER_X.getIO(d);
-        out.print(Dbl.serialize(d));
+        out.print(Dbl.string(d));
       } else if(type == AtomType.BOOLEAN || type.isNumber()) {
         out.print(item.string(null));
       } else {

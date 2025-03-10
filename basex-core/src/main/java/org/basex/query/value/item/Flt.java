@@ -158,16 +158,16 @@ public final class Flt extends ANum {
    */
   public static float parse(final byte[] value, final InputInfo info) throws QueryException {
     final byte[] v = Token.trim(value);
-    if(!Token.eq(v, Token.INFINITY, Token.NEGATIVE_INFINITY)) {
+    if(Token.eq(v, Token.NAN)) return Float.NaN;
+    if(Token.eq(v, Token.POSITIVE_INF)) return Float.POSITIVE_INFINITY;
+    if(Token.eq(v, Token.NEGATIVE_INF)) return Float.NEGATIVE_INFINITY;
+    if(!Token.eq(v, Token.POSITIVE_INFINITY, Token.NEGATIVE_INFINITY)) {
       try {
         return Float.parseFloat(Token.string(v));
       } catch(final NumberFormatException ex) {
         Util.debug(ex);
       }
     }
-
-    if(Token.eq(v, Token.INF)) return Float.POSITIVE_INFINITY;
-    if(Token.eq(v, Token.NEGATVE_INF)) return Float.NEGATIVE_INFINITY;
     throw AtomType.FLOAT.castError(value, info);
   }
 }
