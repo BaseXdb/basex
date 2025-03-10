@@ -377,18 +377,21 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
 
   @Override
   public String toString() {
-    if(name != null) return name.toString();
-    final QueryString qs = new QueryString().token(RECORD).token("(");
-    if(this == SeqType.RECORD) return qs.token('*').token(')').toString();
-    int i = 0;
-    for(final byte[] field : fields) {
-      if(i++ != 0) qs.token(',').token(' ');
-      if(XMLToken.isNCName(field)) qs.token(field); else qs.quoted(field);
-      final Field f = fields.get(field);
-      if(f.optional) qs.token('?');
-      if(f.seqType != null) qs.token(AS).token(f.seqType);
+    if(name != null) return Token.string(name.prefixString());
+    final QueryString qs = new QueryString().token(RECORD).token('(');
+    if(this == SeqType.RECORD) {
+      qs.token('*');
+    } else {
+      int i = 0;
+      for(final byte[] field : fields) {
+        if(i++ != 0) qs.token(',').token(' ');
+        if(XMLToken.isNCName(field)) qs.token(field); else qs.quoted(field);
+        final Field f = fields.get(field);
+        if(f.optional) qs.token('?');
+        if(f.seqType != null) qs.token(AS).token(f.seqType);
+      }
+      if(extensible) qs.token(',').token(' ').token('*');
     }
-    if(extensible) qs.token(',').token(' ').token('*');
     return qs.token(')').toString();
   }
 
