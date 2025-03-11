@@ -24,18 +24,15 @@ public final class FnDuplicateValues extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
-
-    final ItemSet set1 = ItemSet.get(collation, info);
-    final ItemSet set2 = ItemSet.get(collation, info);
-    final IntSet ints1 = new IntSet(), ints2 = new IntSet();
-
     return new Iter() {
-      boolean intseq = seqType().eq(SeqType.INTEGER_ZM);
+      final IntSet ints1 = new IntSet(), ints2 = new IntSet();
+      ItemSet set1, set2;
 
       @Override
       public Item next() throws QueryException {
-        for(Item item; (item = qc.next(values)) != null;) {
-          if(intseq) {
+        if(set1 == null) {
+          // try to parse input as 32-bit integer sequence
+          for(Item item; (item = qc.next(values)) != null;) {
             if(item.type == AtomType.INTEGER) {
               final long l = item.itr(info);
               final int i = (int) l;
@@ -44,11 +41,16 @@ public final class FnDuplicateValues extends StandardFunc {
                 continue;
               }
             }
-            // fallback (input is no 32bit integer)
-            intseq = false;
+            set1 = ItemSet.get(collation, info);
+            set2 = ItemSet.get(collation, info);
             for(final int i : ints1.toArray()) set1.add(Int.get(i));
             for(final int i : ints2.toArray()) set2.add(Int.get(i));
+            if(!set1.add(item) && set2.add(item)) return item;
+            break;
           }
+        }
+        // generic fallback
+        for(Item item; (item = qc.next(values)) != null;) {
           if(!set1.add(item) && set2.add(item)) return item;
         }
         return null;
@@ -61,33 +63,29 @@ public final class FnDuplicateValues extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
 
-    final ItemSet set1 = ItemSet.get(collation, info);
-    final ItemSet set2 = ItemSet.get(collation, info);
-    final IntSet ints1 = new IntSet(), ints2 = new IntSet();
-
-    final ValueBuilder vb = new ValueBuilder(qc);
+    // try to parse input as 32-bit integer sequence
     final LongList list = new LongList();
-
-    boolean intseq = seqType().eq(SeqType.INTEGER_ZM);
-    for(Item item; (item = qc.next(values)) != null;) {
-      if(intseq) {
-        if(item.type == AtomType.INTEGER) {
-          final long l = item.itr(info);
-          final int i = (int) l;
-          if(i == l) {
-            if(!ints1.add(i) && ints2.add(i)) list.add(i);
-            continue;
-          }
-        }
-        // fallback (input is no 32bit integer)
-        intseq = false;
-        for(final int i : ints1.toArray()) set1.add(Int.get(i));
-        for(final int i : ints2.toArray()) set2.add(Int.get(i));
-        for(final long l : list.finish()) vb.add(Int.get(l));
-      }
-      if(!set1.add(item) && set2.add(item)) vb.add(item);
+    final IntSet ints1 = new IntSet(), ints2 = new IntSet();
+    Item item = null;
+    while((item = qc.next(values)) != null) {
+      if(item.type != AtomType.INTEGER) break;
+      final long l = item.itr(info);
+      final int i = (int) l;
+      if(i != l) break;
+      if(!ints1.add(i) && ints2.add(i)) list.add(i);
     }
-    return intseq ? IntSeq.get(list.finish()) : vb.value(this);
+    final Value intseq = IntSeq.get(list.finish());
+    if(item == null) return intseq;
+
+    // generic fallback
+    final ValueBuilder vb = new ValueBuilder(qc).add(intseq);
+    final ItemSet set1 = ItemSet.get(collation, info), set2 = ItemSet.get(collation, info);
+    for(final int i : ints1.toArray()) set1.add(Int.get(i));
+    for(final int i : ints2.toArray()) set2.add(Int.get(i));
+    do {
+      if(!set1.add(item) && set2.add(item)) vb.add(item);
+    } while((item = qc.next(values)) != null);
+    return vb.value(this);
   }
 
   @Override
