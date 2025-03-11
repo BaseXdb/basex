@@ -85,8 +85,8 @@ public final class QueryContext extends Job implements Closeable {
   /** User. */
   public User user;
 
-  /** Full-text position data (needed for highlighting full-text results). */
-  public FTPosData ftPosData = Prop.gui ? new FTPosData() : null;
+  /** Cached full-text position data. */
+  public FTPosData ftPosData;
   /** Current full-text lexer. */
   public FTLexer ftLexer;
   /** Current full-text options. */
@@ -146,7 +146,7 @@ public final class QueryContext extends Job implements Closeable {
    * @param parent parent context
    */
   public QueryContext(final QueryContext parent) {
-    this(parent.context, parent, parent.resources, parent.info);
+    this(parent.context, parent, parent.info);
     parent.pushJob(this);
     updates = parent.updates;
   }
@@ -156,7 +156,7 @@ public final class QueryContext extends Job implements Closeable {
    * @param context database context
    */
   public QueryContext(final Context context) {
-    this(context, null, null, null);
+    this(context, null, null);
   }
 
   /**
@@ -164,14 +164,13 @@ public final class QueryContext extends Job implements Closeable {
    * @param context database context
    * @param parent parent context (can be {@code null})
    * @param info query info (can be {@code null})
-   * @param resources resources (can be {@code null})
    */
-  public QueryContext(final Context context, final QueryContext parent,
-      final QueryResources resources, final QueryInfo info) {
+  public QueryContext(final Context context, final QueryContext parent, final QueryInfo info) {
     this.context = context;
     this.parent = parent;
     this.info = info != null ? info : new QueryInfo(context);
-    this.resources = resources != null ? resources : new QueryResources(this);
+    this.resources = parent != null ? parent.resources : new QueryResources(this);
+    this.ftPosData = parent != null ? parent.ftPosData : FTPosData.get(context);
     this.user = context.user();
   }
 

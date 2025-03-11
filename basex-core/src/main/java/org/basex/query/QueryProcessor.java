@@ -47,7 +47,7 @@ public final class QueryProcessor extends Job implements Closeable {
   public QueryProcessor(final String query, final String uri, final Context ctx,
       final QueryInfo info) {
     this.query = query;
-    qc = pushJob(new QueryContext(ctx, null, null, info));
+    qc = pushJob(new QueryContext(ctx, null, info));
     sc = new StaticContext(qc);
     sc.baseURI(uri != null && uri.isEmpty() ? "./" : uri);
   }
