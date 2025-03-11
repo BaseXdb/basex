@@ -114,21 +114,18 @@ public final class ValueBuilder {
    * @return reference to this builder for convenience
    */
   public ValueBuilder add(final Value value) {
-    if(value.isEmpty()) {
-      qc.checkStop();
-      return this;
-    }
-
-    final TreeSeqBuilder tree = builder;
-    if(tree != null) {
-      tree.add(value, qc);
-    } else {
-      final Value first = firstValue;
-      if(first != null) {
-        builder = new TreeSeqBuilder().add(first, qc).add(value, qc);
-        firstValue = null;
+    if(!value.isEmpty()) {
+      final TreeSeqBuilder tree = builder;
+      if(tree != null) {
+        tree.add(value, qc);
       } else {
-        firstValue = value;
+        final Value first = firstValue;
+        if(first != null) {
+          builder = new TreeSeqBuilder().add(first, qc).add(value, qc);
+          firstValue = null;
+        } else {
+          firstValue = value;
+        }
       }
     }
     return this;

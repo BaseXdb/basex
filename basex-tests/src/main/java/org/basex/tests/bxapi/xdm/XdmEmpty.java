@@ -28,6 +28,11 @@ public final class XdmEmpty extends XdmValue {
   }
 
   @Override
+  public boolean getBoolean() {
+    return false;
+  }
+
+  @Override
   public int size() {
     return 0;
   }
