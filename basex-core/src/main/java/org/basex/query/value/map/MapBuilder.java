@@ -1,10 +1,10 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -14,8 +14,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class MapBuilder {
-  /** New map instance. */
-  private final XQHashMap instance;
+  /** Initial capacity. */
+  private final long capacity;
+  /** Current map implementation. */
+  private XQHashMap map;
 
   /**
    * Constructor.
@@ -26,10 +28,10 @@ public final class MapBuilder {
 
   /**
    * Constructor with initial capacity.
-   * @param capacity initial capacity (will be resized to a power of two)
+   * @param capacity initial capacity
    */
   public MapBuilder(final long capacity) {
-    instance = new XQHashMap(new ItemObjectMap<>(capacity));
+    this.capacity = capacity;
   }
 
   /**
@@ -40,7 +42,16 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final Item key, final Value value) throws QueryException {
-    instance.map.put(key, value);
+    XQHashMap m = map;
+    if(m == null) {
+      final Type k = key.type;
+      final SeqType v = value.seqType();
+      final long c = capacity;
+      m = k == AtomType.INTEGER ? v.eq(SeqType.INTEGER_O) ? new XQIntMap(c) : new XQIntObjMap(c) :
+          k == AtomType.STRING ? v.eq(SeqType.STRING_O) ? new XQTokenMap(c) : new XQTokenObjMap(c) :
+          new XQItemObjMap(capacity);
+    }
+    map = m.build(key, value);
     return this;
   }
 
@@ -117,7 +128,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public Value get(final Item key) throws QueryException {
-    return instance.map.get(key);
+    return map != null ? map.getInternal(key) : null;
   }
 
   /**
@@ -127,7 +138,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public boolean contains(final Item key) throws QueryException {
-    return instance.map.contains(key);
+    return map != null && map.contains(key);
   }
 
   /**
@@ -135,13 +146,12 @@ public final class MapBuilder {
    * @return map
    */
   public XQMap map() {
-    final int size = instance.map.size();
-    return size == 0 ? XQMap.empty() : size == 1 ?
-      XQMap.singleton(instance.map.key(1), instance.map.value(1)) : instance;
+    return map == null ? XQMap.empty() : map.structSize() == 1 ?
+      XQMap.singleton(map.keyInternal(1), map.valueInternal(1)) : map;
   }
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + instance + ']';
+    return Util.className(this) + '[' + map + ']';
   }
 }

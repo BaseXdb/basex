@@ -18,7 +18,7 @@ final class TrieKeys implements Iterable<Item> {
   /** Key array must be copied before being updated, as it is referenced multiple times. */
   private boolean copy;
   /** Keys. */
-  private Item[] keys;
+  private final Item[] keys;
   /** Number of keys. */
   private final int size;
 

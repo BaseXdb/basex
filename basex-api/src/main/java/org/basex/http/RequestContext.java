@@ -142,7 +142,7 @@ public final class RequestContext {
    */
   private static XQMap toMap(final String params) throws QueryException {
     // collect values in item lists (faster)
-    final ItemObjectMap<ItemList> map = new ItemObjectMap<>();
+    final ItemObjMap<ItemList> map = new ItemObjMap<>();
     for(final String param : Strings.split(params, '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {

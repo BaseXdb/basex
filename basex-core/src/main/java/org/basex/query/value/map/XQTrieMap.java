@@ -34,7 +34,7 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
-  XQMap putInternal(final Item key, final Value value) throws QueryException {
+  XQTrieMap putInternal(final Item key, final Value value) throws QueryException {
     final TrieUpdate update = new TrieUpdate(key, value, order);
     final TrieNode node = root.put(key.hashCode(), 0, update);
     if(node == root) return this;

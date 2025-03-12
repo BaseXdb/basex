@@ -26,7 +26,7 @@ public final class TokenMap extends TokenSet {
    * Constructor with initial capacity.
    * @param capacity array capacity (will be resized to a power of two)
    */
-  public TokenMap(final int capacity) {
+  public TokenMap(final long capacity) {
     super(capacity);
     values = new byte[capacity()][];
   }
@@ -66,6 +66,16 @@ public final class TokenMap extends TokenSet {
     final int i = super.remove(key);
     values[i] = null;
     return i;
+  }
+
+  /**
+   * Returns the value with the specified id.
+   * All ids start with {@code 1} instead of {@code 0}.
+   * @param id id of the value
+   * @return value
+   */
+  public byte[] value(final int id) {
+    return values[id];
   }
 
   /**

@@ -58,6 +58,16 @@ public final class IntMap extends IntSet {
     return values[id(key)];
   }
 
+  /**
+   * Returns the value with the specified id.
+   * All ids start with {@code 1} instead of {@code 0}.
+   * @param id id of the value
+   * @return value
+   */
+  public int value(final int id) {
+    return values[id];
+  }
+
   @Override
   protected void rehash(final int newSize) {
     super.rehash(newSize);

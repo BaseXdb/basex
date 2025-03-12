@@ -21,6 +21,15 @@ public final class IntObjMap<E> extends IntSet {
    * Default constructor.
    */
   public IntObjMap() {
+    this(Array.INITIAL_CAPACITY);
+  }
+
+  /**
+   * Constructor with initial capacity.
+   * @param capacity array capacity (will be resized to a power of two)
+   */
+  public IntObjMap(final long capacity) {
+    super(capacity);
     values = new Object[capacity()];
   }
 
@@ -64,6 +73,17 @@ public final class IntObjMap<E> extends IntSet {
   @SuppressWarnings("unchecked")
   public E get(final int key) {
     return (E) values[id(key)];
+  }
+
+  /**
+   * Returns the value with the specified id.
+   * All ids start with {@code 1} instead of {@code 0}.
+   * @param id id of the value
+   * @return value
+   */
+  @SuppressWarnings("unchecked")
+  public E value(final int id) {
+    return (E) values[id];
   }
 
   /**

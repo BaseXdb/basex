@@ -21,6 +21,15 @@ public final class TokenObjMap<E> extends TokenSet {
    * Default constructor.
    */
   public TokenObjMap() {
+    this(Array.INITIAL_CAPACITY);
+  }
+
+  /**
+   * Constructor with initial capacity.
+   * @param capacity array capacity (will be resized to a power of two)
+   */
+  public TokenObjMap(final long capacity) {
+    super(capacity);
     values = new Object[capacity()];
   }
 
@@ -60,6 +69,17 @@ public final class TokenObjMap<E> extends TokenSet {
   @SuppressWarnings("unchecked")
   public E get(final byte[] key) {
     return key != null ? (E) values[id(key)] : null;
+  }
+
+  /**
+   * Returns the value with the specified id.
+   * All ids start with {@code 1} instead of {@code 0}.
+   * @param id id of the value
+   * @return value
+   */
+  @SuppressWarnings("unchecked")
+  public E value(final int id) {
+    return (E) values[id];
   }
 
   /**

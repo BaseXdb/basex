@@ -14,7 +14,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -70,15 +69,6 @@ public abstract class XQMap extends XQStruct {
    */
   public static XQMap pair(final Item key, final Value value) throws QueryException {
     return singleton(Str.KEY, key).put(Str.VALUE, value);
-  }
-
-  /**
-   * Returns a map.
-   * @param map unmodified mutable hash map instance
-   * @return map
-   */
-  public static XQMap map(final ItemObjectMap<Value> map) {
-    return map.isEmpty() ? XQMap.EMPTY : new XQHashMap(map);
   }
 
   @Override

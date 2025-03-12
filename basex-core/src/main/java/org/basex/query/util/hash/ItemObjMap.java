@@ -13,14 +13,14 @@ import org.basex.util.*;
  * @author Christian Gruen
  * @param <E> generic value type
  */
-public final class ItemObjectMap<E> extends HashItemSet {
+public final class ItemObjMap<E> extends HashItemSet {
   /** Map values. */
   private Object[] values;
 
   /**
    * Constructor.
    */
-  public ItemObjectMap() {
+  public ItemObjMap() {
     this(Array.INITIAL_CAPACITY);
   }
 
@@ -28,7 +28,7 @@ public final class ItemObjectMap<E> extends HashItemSet {
    * Constructor with initial capacity.
    * @param capacity initial capacity (will be resized to a power of two)
    */
-  public ItemObjectMap(final long capacity) {
+  public ItemObjMap(final long capacity) {
     super(Mode.ATOMIC, null, capacity);
     values = new Object[capacity()];
   }
