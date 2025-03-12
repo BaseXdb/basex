@@ -79,8 +79,8 @@ public enum BaseXKeys {
 
   /** Go back.               */ GOBACK(MAC ? META : ALT, VK_LEFT),
   /** Go forward.            */ GOFORWARD(MAC ? META : ALT, VK_RIGHT),
-  /** Go up.                 */ GOUP(MAC ? META : ALT, VK_UP),
-  /** Go down.               */ FILTER(MAC ? META : ALT, VK_DOWN),
+  /** Go up.                 */ GOUP(MAC ? META : ALT, VK_PAGE_UP),
+  /** Go down.               */ FILTER(MAC ? META : ALT, VK_PAGE_DOWN),
   /** Go home.               */ GOHOME(MAC ? META : ALT, VK_HOME),
 
   /** Go to line.            */ GOTOLINE(META, VK_L),
