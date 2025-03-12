@@ -324,7 +324,7 @@ public final class HtmlParser extends XMLParser {
     /**
      * Returns the parser associated with the specified HTML options.
      * @param options HTML options.
-     * @return parser
+     * @return parser (can be {@code null})
      */
     public static Parser of(final HtmlOptions options) {
       return of(options, Parser.DEFAULT);

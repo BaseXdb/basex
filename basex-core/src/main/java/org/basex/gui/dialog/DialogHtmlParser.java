@@ -37,15 +37,15 @@ final class DialogHtmlParser extends DialogParser {
     hopts = new HtmlOptions(opts.get(MainOptions.HTMLPARSER));
 
     final Parser parser = Parser.of(hopts);
-    final boolean avl = parser.available(hopts);
+    final boolean available = parser != null && parser.available(hopts);
 
     options = new BaseXTextField(dialog, hopts.toString());
     options.setToolTipText(tooltip(hopts));
     info = new BaseXLabel(" ").border(12, 0, 6, 0);
 
     final BaseXBack pp  = new BaseXBack(new RowLayout(8));
-    pp.add(new BaseXLabel(avl ? Util.info(H_HTML_PARSER_X, parser) : H_NO_HTML_PARSER));
-    if(avl) {
+    pp.add(new BaseXLabel(available ? Util.info(H_HTML_PARSER_X, parser) : H_NO_HTML_PARSER));
+    if(available) {
       final BaseXBack p = new BaseXBack(new ColumnLayout(8));
       p.add(new BaseXLabel(PARAMETERS + COL, true, true));
       p.add(options);
