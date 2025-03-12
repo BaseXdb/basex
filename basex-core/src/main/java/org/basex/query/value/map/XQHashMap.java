@@ -17,7 +17,7 @@ import org.basex.query.value.type.*;
  */
 public final class XQHashMap extends XQMap {
   /** Hash map. */
-  private final ItemObjectMap<Value> map;
+  final ItemObjectMap<Value> map;
   /** Cached immutable variant, for updates. */
   private XQMap trie;
 
@@ -27,6 +27,11 @@ public final class XQHashMap extends XQMap {
    */
   XQHashMap(final ItemObjectMap<Value> map) {
     this.map = map;
+  }
+
+  @Override
+  public long structSize() {
+    return map.size();
   }
 
   @Override
@@ -45,37 +50,58 @@ public final class XQHashMap extends XQMap {
   }
 
   @Override
-  public long structSize() {
-    return map.size();
-  }
-
-  @Override
   public void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    final int is = map.size();
-    for(int i = 1; i <= is; i++) func.accept(map.key(i), map.value(i));
+    final long is = structSize();
+    for(int i = 1; i <= is; i++) func.accept(keyInternal(i), valueInternal(i));
   }
 
   @Override
   public boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    final int is = map.size();
+    final long is = structSize();
     for(int i = 1; i <= is; i++) {
-      if(!func.test(map.key(i), map.value(i))) return false;
+      if(!func.test(keyInternal(i), valueInternal(i))) return false;
     }
     return true;
   }
 
   @Override
   public BasicIter<Item> keys() {
-    return new BasicIter<>(map.size()) {
+    return new BasicIter<>(structSize()) {
       @Override
       public Item get(final long i) {
-        return map.key((int) i + 1);
+        return keyInternal((int) i + 1);
       }
       @Override
       public Value value(final QueryContext qc, final Expr expr) {
-        return ItemSeq.get(map.keys(), (int) size, ((MapType) type).keyType);
+        return ItemSeq.get(keysInternal(), (int) size, ((MapType) type).keyType);
       }
     };
+  }
+
+  /**
+   * Returns all keys.
+   * @return key
+   */
+  private Item[] keysInternal() {
+    return map.keys();
+  }
+
+  /**
+   * Returns the key at the specified position.
+   * @param pos position (starting with {@code 1})
+   * @return key
+   */
+  private Item keyInternal(final int pos) {
+    return map.key(pos);
+  }
+
+  /**
+   * Returns the value at the specified position.
+   * @param pos position (starting with {@code 1})
+   * @return key
+   */
+  private Value valueInternal(final int pos) {
+    return map.value(pos);
   }
 
   /**
@@ -86,9 +112,9 @@ public final class XQHashMap extends XQMap {
   private XQMap trie() throws QueryException {
     if(trie == null) {
       XQMap mp = XQMap.empty();
-      final int is = map.size();
+      final long is = structSize();
       for(int i = 1; i <= is; i++) {
-        mp = mp.put(map.key(i), map.value(i));
+        mp = mp.put(keyInternal(i), valueInternal(i));
       }
       trie = mp;
     }

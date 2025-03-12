@@ -14,8 +14,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class MapBuilder {
-  /** Map. */
-  private final ItemObjectMap<Value> map;
+  /** New map instance. */
+  private final XQHashMap instance;
 
   /**
    * Constructor.
@@ -29,7 +29,7 @@ public final class MapBuilder {
    * @param capacity initial capacity (will be resized to a power of two)
    */
   public MapBuilder(final long capacity) {
-    map = new ItemObjectMap<>(capacity);
+    instance = new XQHashMap(new ItemObjectMap<>(capacity));
   }
 
   /**
@@ -40,7 +40,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final Item key, final Value value) throws QueryException {
-    map.put(key, value);
+    instance.map.put(key, value);
     return this;
   }
 
@@ -117,7 +117,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public Value get(final Item key) throws QueryException {
-    return map.get(key);
+    return instance.map.get(key);
   }
 
   /**
@@ -127,7 +127,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public boolean contains(final Item key) throws QueryException {
-    return map.contains(key);
+    return instance.map.contains(key);
   }
 
   /**
@@ -135,11 +135,13 @@ public final class MapBuilder {
    * @return map
    */
   public XQMap map() {
-    return XQMap.map(map);
+    final int size = instance.map.size();
+    return size == 0 ? XQMap.empty() : size == 1 ?
+      XQMap.singleton(instance.map.key(1), instance.map.value(1)) : instance;
   }
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + map + ']';
+    return Util.className(this) + '[' + instance + ']';
   }
 }
