@@ -170,7 +170,7 @@ public final class QueryContext extends Job implements Closeable {
     this.parent = parent;
     this.info = info != null ? info : new QueryInfo(context);
     this.resources = parent != null ? parent.resources : new QueryResources(this);
-    this.ftPosData = parent != null ? parent.ftPosData : FTPosData.get(context);
+    this.ftPosData = parent != null ? parent.ftPosData : null;
     this.user = context.user();
   }
 
@@ -565,32 +565,30 @@ public final class QueryContext extends Job implements Closeable {
   // CLASS METHODS ================================================================================
 
   /**
-   * This function is called by the GUI.
-   * Caches the result of the specified query. If all nodes are of the same database
-   * instance, the returned value will be of type {@link DBNodes}.
+   * Caches the result of the specified query.
+   * This function is called by the GUI and must only be called after optimizing the query.
    * @param cmd query command
-   * @param max maximum number of items to cache (negative: return full result)
+   * @param max maximum number of items to cache
    */
   void cache(final AQuery cmd, final int max) {
     final ItemList items = new ItemList();
     final IntList pres = new IntList();
     final Data data = resources.globalData();
+    if(data != null) ftPosData = new FTPosData(data);
     try {
-      optimize();
       run(info.evaluating, () -> {
         // evaluates the query
-        final int mx = max >= 0 ? max : Integer.MAX_VALUE;
-        final Iter iter = iter();
+        final Iter iter = updating ? update().iter() : main.iter(this);
         Item item;
 
         do {
           // collect pre values if a database is opened globally
           if(defaultOutput && data != null) {
-            while((item = next(iter)) != null && item.data() == data && pres.size() < mx) {
+            while((item = next(iter)) != null && item.data() == data && pres.size() < max) {
               pres.add(((DBNode) item).pre());
             }
             // skip if all results have been collected
-            if(item == null || pres.size() == mx) break;
+            if(item == null || pres.size() >= max) break;
 
             // otherwise, add nodes to standard iterator
             for(final int pre : pres.finish()) items.add(new DBNode(data, pre));
@@ -598,7 +596,7 @@ public final class QueryContext extends Job implements Closeable {
           }
 
           // use standard iterator
-          while((item = next(iter)) != null && items.size() < mx) {
+          while((item = next(iter)) != null && items.size() < max) {
             item.cache(false, null);
             items.add(item);
           }

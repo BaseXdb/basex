@@ -2,7 +2,6 @@ package org.basex.query.util.ft;
 
 import java.util.*;
 
-import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -25,16 +24,17 @@ public final class FTPosData {
   private int size;
 
   /**
-   * Creates a new instance of this class.
-   * @param context database context
-   * @return new instance or {@code null}
+   * Constructor.
    */
-  public static FTPosData get(final Context context) {
-    final Data data = context.data();
-    if(data == null) return null;
-    final FTPosData ftp = new FTPosData();
-    ftp.dt = data;
-    return ftp;
+  public FTPosData() {
+  }
+
+  /**
+   * Creates a new instance of this class.
+   * @param data data reference
+   */
+  public FTPosData(final Data data) {
+    dt = data;
   }
 
   /**
