@@ -35,6 +35,8 @@ public final class RequestContext {
   private XQMap headers;
   /** Content body. */
   private IOContent body;
+  /** Query string. */
+  private final String query;
 
   /**
    * Returns an immutable map with all query parameters.
@@ -42,6 +44,7 @@ public final class RequestContext {
    */
   public RequestContext(final HttpServletRequest request) {
     this.request = request;
+    this.query = request.getQueryString();
   }
 
   /**
@@ -84,8 +87,13 @@ public final class RequestContext {
    */
   public XQMap queryValues() throws QueryException {
     if(values == null) {
+      // combine query parameters of previous and current request
+      final MapBuilder mb = new MapBuilder();
+      final RequestContext forward = (RequestContext) request.getAttribute(HTTPText.FORWARD);
+      if(forward != null && forward.query != null) addParams(forward.query, mb);
       final String string = request.getQueryString();
-      values = string != null ? toMap(string) : XQMap.empty();
+      if(string != null) addParams(string, mb);
+      values = mb.map();
     }
     return values;
   }
@@ -107,7 +115,9 @@ public final class RequestContext {
         }
       } else if(mt.is(MediaType.APPLICATION_X_WWW_FORM_URLENCODED)) {
         // convert URL-encoded parameters
-        form = toMap(body().toString());
+        final MapBuilder mb = new MapBuilder();
+        addParams(body().toString(), mb);
+        form = mb.map();
       } else {
         form = XQMap.empty();
       }
@@ -135,13 +145,12 @@ public final class RequestContext {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Returns a map with URL-decoded parameters.
-   * @param params query parameters
-   * @return map
+   * Adds URL-decoded parameters to the specified map.
+   * @param params parameters
+   * @param mb map builder
    * @throws QueryException query exception
    */
-  private static XQMap toMap(final String params) throws QueryException {
-    // collect values in item lists (faster)
+  private static void addParams(final String params, final MapBuilder mb) throws QueryException {
     final ItemObjMap<ItemList> map = new ItemObjMap<>();
     for(final String param : Strings.split(params, '&')) {
       final String[] parts = Strings.split(param, '=', 2);
@@ -151,8 +160,6 @@ public final class RequestContext {
       }
     }
     // create final map
-    final MapBuilder mb = new MapBuilder();
     for(final Item key : map) mb.put(key, map.get(key).value());
-    return mb.map();
   }
 }
