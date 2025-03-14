@@ -62,7 +62,7 @@ final class DialogResources extends BaseXBack {
     final GUI gui = dialog.gui();
     final Data data = gui.context.data();
     final String label = data.meta.name + " (/)";
-    root = new ResourceRootFolder(token(label), token("/"), tree, data);
+    root = new ResourceRootFolder(token(label), cpToken('/'), tree, data);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
 
     filter = new BaseXButton(dialog, FILTER);

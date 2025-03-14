@@ -273,7 +273,7 @@ final class XMLScanner extends Job {
         // verify...
         final byte[] r = ref(true);
         if(r.length == 1) token.add(r);
-        else if(!input.add(r, false)) throw error(RECENT);
+        else if(!input.add(r, false)) throw error(ENTITY);
       } else {
         token.add(c);
       }
@@ -301,7 +301,7 @@ final class XMLScanner extends Job {
         // scan entity
         final byte[] r = ref(true);
         if(r.length == 1) token.add(r);
-        else if(!input.add(r, false)) throw error(RECENT);
+        else if(!input.add(r, false)) throw error(ENTITY);
       } else {
         if(c == ']') {
           // ']]>' not allowed in content
@@ -565,7 +565,7 @@ final class XMLScanner extends Job {
         final byte[] val = pents.get(key);
         if(val == null) throw error(UNKNOWNPE, key);
         check(';');
-        input.add(val, true);
+        if(!input.add(val, true)) throw error(ENTITY);
       } else {
         return ch;
       }

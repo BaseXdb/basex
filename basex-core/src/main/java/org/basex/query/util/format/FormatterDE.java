@@ -63,7 +63,7 @@ final class FormatterDE extends Formatter {
   /** Token: eine. */
   private static final byte[] EINE = token("eine");
   /** Token: e. */
-  private static final byte[] E = token("e");
+  private static final byte[] E = cpToken('e');
   /** Token: hundert. */
   private static final byte[] HUNDERT = token("hundert");
   /** Token: tausend. */

@@ -19,6 +19,8 @@ public class XMLInput extends InputStream {
   private int ip;
   /** Current line. */
   private int line = 1;
+  /** Entity expansion counter. */
+  private int exp;
 
   /** Buffer with most recent characters. */
   private final int[] last = new int[16];
@@ -80,10 +82,10 @@ public class XMLInput extends InputStream {
    * @throws IOException I/O exception
    */
   public boolean add(final byte[] value, final boolean spaces) throws IOException {
-    if(spaces) add(new NewlineInput(Token.token(" ")));
+    if(spaces) add(new NewlineInput(Token.cpToken(' ')));
     add(new NewlineInput(value));
-    if(spaces) add(new NewlineInput(Token.token(" ")));
-    return ip < 32;
+    if(spaces) add(new NewlineInput(Token.cpToken(' ')));
+    return ++exp < 32000 && ip < 32;
   }
 
   /**

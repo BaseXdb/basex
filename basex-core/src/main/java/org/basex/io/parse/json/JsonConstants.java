@@ -42,7 +42,7 @@ public interface JsonConstants {
   /** Token: name. */
   byte[] NAME = token("name");
   /** Token: array value. */
-  byte[] VALUE = token("_");
+  byte[] VALUE = cpToken('_');
 
   /** Supported data types. */
   byte[][] TYPES = { OBJECT, ARRAY, STRING, NUMBER, BOOLEAN, NULL };

@@ -88,7 +88,7 @@ public interface BuildText {
   /** Scanner error. */
   String INVPE = "Parameter reference not allowed here.";
   /** Scanner error. */
-  String RECENT = "Recursive entity definition.";
+  String ENTITY = "Entities: expansion limit exceeded or recursive definitions found.";
 
   /** DTD whitespace error. */
   String WSERROR = "Missing Whitespace.";
@@ -96,7 +96,7 @@ public interface BuildText {
   String ERRDT = "Error in DTD.";
 
   /** Semicolon. */
-  byte[] SEMI = token(";");
+  byte[] SEMI = cpToken(';');
   /** CDATA token. */
   byte[] CDATA = token("CDATA[");
   /** XML document version. */

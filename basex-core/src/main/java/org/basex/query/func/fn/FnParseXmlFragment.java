@@ -100,7 +100,8 @@ public class FnParseXmlFragment extends StandardFunc {
     }
 
     try {
-      return new DBNode(intparse ? new XMLParser(io, mopts, true) : Parser.xmlParser(io, mopts));
+      return new DBNode(intparse ? new XMLParser(io, mopts, fragment) :
+        Parser.xmlParser(io, mopts));
     } catch(final IOException ex) {
       final Throwable th = ex.getCause();
       final QueryException qe = !(th instanceof ValidationException) ? SAXERR_X.get(info, ex) :
