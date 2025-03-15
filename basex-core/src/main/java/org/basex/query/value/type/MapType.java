@@ -138,7 +138,7 @@ public class MapType extends FType {
 
   @Override
   public final FuncType funcType() {
-    return FuncType.get(valueType.union(Occ.ZERO), SeqType.ANY_ATOMIC_TYPE_O);
+    return FuncType.get(valueType.union(Occ.ZERO), keyType.seqType());
   }
 
   @Override

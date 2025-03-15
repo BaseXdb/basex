@@ -33,14 +33,35 @@ public final class InspectModuleTest extends SandboxTest {
     query(query + "/return/@type/data()", "xs:boolean");
     query(query + "/return/@occurrence/data()", "");
 
-    query = query(func.args(" map { }"));
+    query = query(func.args(" []"));
+    query(query + "/@name/data()", "");
+    query(query + "/@uri/data()", "");
+    query(query + "/argument/@type/data()", "xs:integer");
+    query(query + "/return/@type/data()", "item()");
+    query(query + "/return/@occurrence/data()", "*");
+
+    query = query(func.args(" [ 'x' ]"));
+    query(query + "/@name/data()", "");
+    query(query + "/@uri/data()", "");
+    query(query + "/argument/@type/data()", "xs:integer");
+    query(query + "/return/@type/data()", "xs:string");
+    query(query + "/return/@occurrence/data()", "");
+
+    query = query(func.args(" {}"));
     query(query + "/@name/data()", "");
     query(query + "/@uri/data()", "");
     query(query + "/argument/@type/data()", "xs:anyAtomicType");
     query(query + "/return/@type/data()", "item()");
     query(query + "/return/@occurrence/data()", "*");
 
-    query = query(func.args(" function($a as xs:int) as xs:integer { $a + 1 }"));
+    query = query(func.args(" { 1: 'x' }"));
+    query(query + "/@name/data()", "");
+    query(query + "/@uri/data()", "");
+    query(query + "/argument/@type/data()", "xs:integer");
+    query(query + "/return/@type/data()", "xs:string");
+    query(query + "/return/@occurrence/data()", "?");
+
+    query = query(func.args(" fn($a as xs:int) as xs:integer { $a + 1 }"));
     query(query + "/@name/data()", "");
     query(query + "/@uri/data()", "");
     query(query + "/argument/@name/data()", "");
