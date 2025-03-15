@@ -52,7 +52,7 @@ public final class ArrayItems extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    return array.values(qc);
+    return array.items(qc);
   }
 
   @Override

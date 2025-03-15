@@ -41,7 +41,7 @@ public final class MapItems extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-    return map.values(qc);
+    return map.items(qc);
   }
 
   @Override

@@ -263,6 +263,11 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     return union(type, emptySet());
   }
 
+  @Override
+  public MapType union(final Type kt, final SeqType vt) {
+    return get(keyType.union(kt), valueType.union(vt));
+  }
+
   /**
    * Computes the union between this type and the given one, i.e. the least common ancestor of both
    * types in the type hierarchy. This implementation uses the <code>pairs</code> argument to keep
@@ -311,11 +316,8 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
       }
       return new RecordType(extensible || rt.extensible, map, null);
     }
-    if(type instanceof MapType) {
-      final MapType mt = (MapType) type;
-      return get(keyType.union(mt.keyType), valueType.union(mt.valueType));
-    }
-    return type instanceof ArrayType ? SeqType.FUNCTION :
+    return type instanceof MapType ? ((MapType) type).union(keyType, valueType) :
+           type instanceof ArrayType ? SeqType.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 

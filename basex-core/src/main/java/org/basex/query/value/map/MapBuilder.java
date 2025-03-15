@@ -31,7 +31,8 @@ public final class MapBuilder {
    * @param capacity initial capacity
    */
   public MapBuilder(final long capacity) {
-    this.capacity = capacity;
+    // increase by 2 (capacity of map must be larger than actual entries)
+    this.capacity = capacity + 2;
   }
 
   /**

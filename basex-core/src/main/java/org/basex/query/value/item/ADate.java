@@ -401,7 +401,8 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final boolean atomicEqual(final Item item) throws QueryException {
-    return type == item.type && compare(item, null) == 0 && hasTz() == ((ADate) item).hasTz();
+    return this == item || type == item.type && compare(item, null) == 0 &&
+        hasTz() == ((ADate) item).hasTz();
   }
 
   @Override

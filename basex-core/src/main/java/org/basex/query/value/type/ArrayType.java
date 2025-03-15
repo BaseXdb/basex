@@ -82,9 +82,18 @@ public final class ArrayType extends FType {
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
-    if(type instanceof ArrayType) return get(valueType.union(((ArrayType) type).valueType));
-    return type instanceof MapType ? SeqType.FUNCTION :
+    return type instanceof ArrayType ? union(((ArrayType) type).valueType) :
+           type instanceof MapType ? SeqType.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
+  }
+
+  /**
+   * Creates a union of two array types.
+   * @param vt value type
+   * @return array type
+   */
+  public ArrayType union(final SeqType vt) {
+    return valueType.eq(vt) ? this : get(valueType.union(vt));
   }
 
   @Override

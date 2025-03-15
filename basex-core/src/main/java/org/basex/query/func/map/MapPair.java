@@ -27,8 +27,7 @@ public final class MapPair extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final SeqType vt = arg(0).seqType().union(arg(1).seqType());
-    exprType.assign(MapType.get(AtomType.STRING, vt));
+    exprType.assign(MapType.get(AtomType.STRING, arg(0).seqType().union(arg(1).seqType())));
     return this;
   }
 

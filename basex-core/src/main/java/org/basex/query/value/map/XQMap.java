@@ -30,13 +30,14 @@ import org.basex.util.*;
  */
 public abstract class XQMap extends XQStruct {
   /** The empty map. */
-  private static final XQMap EMPTY = new XQTrieMap(TrieEmpty.VALUE, null);
+  private static final XQMap EMPTY = new XQTrieMap(TrieEmpty.VALUE, null, SeqType.MAP);
 
   /**
    * Constructor.
+   * @param type map type
    */
-  XQMap() {
-    super(SeqType.MAP);
+  XQMap(final Type type) {
+    super(type);
   }
 
   /**
@@ -55,9 +56,7 @@ public abstract class XQMap extends XQStruct {
    * @return map
    */
   public static XQMap singleton(final Item key, final Value value) {
-    final XQMap map = new XQTrieMap(new TrieLeaf(key.hashCode(), key, value), null);
-    map.type = MapType.get(key.type, value.seqType());
-    return map;
+    return new XQSingletonMap(key, value);
   }
 
   /**
@@ -68,7 +67,7 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   public static XQMap pair(final Item key, final Value value) throws QueryException {
-    return singleton(Str.KEY, key).put(Str.VALUE, value);
+    return new MapBuilder(2).put(Str.KEY, key).put(Str.VALUE, value).map();
   }
 
   @Override
@@ -137,11 +136,11 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   public final XQMap put(final Item key, final Value value) throws QueryException {
-    if(structSize() == 0) return singleton(key, value);
-
-    final XQMap map = putInternal(key, value);
-    if(map != this) map.type = union(key.type, value.seqType());
-    return map;
+    if(structSize() == 0) {
+      return new XQTrieMap(new TrieLeaf(key.hashCode(), key, value), null,
+          MapType.get(key.type, value.seqType()));
+    }
+    return putInternal(key, value);
   }
 
   /**
@@ -152,19 +151,6 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   abstract XQMap putInternal(Item key, Value value) throws QueryException;
-
-  /**
-   * Creates a union of two map types.
-   * @param kt key type
-   * @param vt value type
-   * @return union type
-   */
-  private Type union(final Type kt, final SeqType vt) {
-    final MapType mt = (MapType) type;
-    final Type mkt = mt.keyType;
-    final SeqType mvt = mt.valueType;
-    return mkt == kt && mvt.eq(vt) ? type : MapType.get(mkt.union(kt), mvt.union(vt));
-  }
 
   /**
    * Removed a key from this map.
@@ -278,7 +264,7 @@ public abstract class XQMap extends XQStruct {
   public abstract BasicIter<Item> keys();
 
   @Override
-  public final Value values(final QueryContext qc) throws QueryException {
+  public final Value items(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     forEach((key, value) -> vb.add(value));
     return vb.value(((MapType) type).valueType.type);

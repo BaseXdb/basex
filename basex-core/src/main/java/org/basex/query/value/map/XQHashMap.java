@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * Unmodifiable hash map implementation.
@@ -15,6 +16,18 @@ import org.basex.query.value.item.*;
 abstract class XQHashMap extends XQMap {
   /** Cached immutable variant, for updates. */
   private XQMap trie;
+  /** Initial capacity. */
+  final long capacity;
+
+  /**
+   * Constructor.
+   * @param capacity initial capacity
+   * @param type map type
+   */
+  XQHashMap(final long capacity, final Type type) {
+    super(type);
+    this.capacity = capacity;
+  }
 
   @Override
   public abstract long structSize();

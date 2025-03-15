@@ -8,7 +8,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * A singleton array.
+ * Array with a single member.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

@@ -99,10 +99,20 @@ public class MapType extends FType {
 
     if(type instanceof MapType) {
       final MapType mt = (MapType) type;
-      return get(keyType.union(mt.keyType), valueType.union(mt.valueType));
+      return union(mt.keyType, mt.valueType);
     }
     return type instanceof ArrayType ? SeqType.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
+  }
+
+  /**
+   * Creates a union of two map types.
+   * @param kt key type
+   * @param vt value type
+   * @return map type
+   */
+  public MapType union(final Type kt, final SeqType vt) {
+    return keyType.eq(kt) && valueType.eq(vt) ? this : get(keyType.union(kt), valueType.union(vt));
   }
 
   @Override

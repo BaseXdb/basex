@@ -205,7 +205,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean atomicEqual(final Item item) throws QueryException {
-    return comparable(item) && equal(item, null, null);
+    return this == item || comparable(item) && equal(item, null, null);
   }
 
   /**

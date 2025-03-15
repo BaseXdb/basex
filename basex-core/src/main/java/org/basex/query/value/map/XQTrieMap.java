@@ -5,6 +5,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Hash array mapped trie implementation.
@@ -22,8 +23,10 @@ public final class XQTrieMap extends XQMap {
    * Constructor.
    * @param root root node
    * @param order map order (can be ({@code null})
+   * @param type map type
    */
-  XQTrieMap(final TrieNode root, final TrieOrder order) {
+  XQTrieMap(final TrieNode root, final TrieOrder order, final Type type) {
+    super(type);
     this.root = root;
     this.order = order;
   }
@@ -38,9 +41,19 @@ public final class XQTrieMap extends XQMap {
     final TrieUpdate update = new TrieUpdate(key, value, order);
     final TrieNode node = root.put(key.hashCode(), 0, update);
     if(node == root) return this;
-    // create initial map order if an entry is added to a singleton map
-    return new XQTrieMap(node, node.size == 1 ? null :
-      root.size == 1 ? new TrieOrder(((TrieLeaf) root).key, key) : update.order());
+
+    final TrieOrder to;
+    final Type mt;
+    if(node.size == 1) {
+      // single entry: no map order, initialize type
+      to = null;
+      mt = MapType.get((((TrieLeaf) root).key).type, value.seqType());
+    } else {
+      // initialize map order if a second entry was added
+      to = root.size == 1 ? new TrieOrder(((TrieLeaf) root).key, key) : update.order();
+      mt = ((MapType) type).union(key.type, value.seqType());
+    }
+    return new XQTrieMap(node, to, mt);
   }
 
   @Override
@@ -49,8 +62,8 @@ public final class XQTrieMap extends XQMap {
     final TrieNode node = root.remove(key.hashCode(), 0, update);
     if(node == root) return this;
     if(node == null) return null;
-    // drop map order if map has single entry
-    return new XQTrieMap(node, node.size == 1 ? null : update.order());
+    // drop map order if a single entry is left
+    return new XQTrieMap(node, node.size == 1 ? null : update.order(), type);
   }
 
   @Override

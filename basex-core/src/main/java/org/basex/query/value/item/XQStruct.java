@@ -66,12 +66,12 @@ public abstract class XQStruct extends FItem {
   public abstract long structSize();
 
   /**
-   * Returns all values of this structure.
+   * Returns all items (sequence-concatenated values) of this structure.
    * @param qc query context
    * @return values
    * @throws QueryException query exception
    */
-  public abstract Value values(QueryContext qc) throws QueryException;
+  public abstract Value items(QueryContext qc) throws QueryException;
 
   /**
    * Returns the key for accessing a function value.

@@ -130,7 +130,7 @@ public final class MapModuleTest extends SandboxTest {
     query("exists(" + func.args(1, 2) + ')', true);
     query("exists(" + _MAP_MERGE.args(func.args(1, 2)) + ')', true);
 
-    check(func.args(" <_>A</_>", 0), "{\"A\":0}", empty(CElem.class), root(XQTrieMap.class));
+    check(func.args(" <_>A</_>", 0), "{\"A\":0}", empty(CElem.class), root(XQSingletonMap.class));
 
     error("exists(" + func.args(" ()", 2) + ')', EMPTYFOUND);
     error("exists(" + func.args(" (1, 2)", 2) + ')', SEQFOUND_X);

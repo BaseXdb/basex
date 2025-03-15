@@ -14,8 +14,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class XQTokenMap extends XQHashMap {
-  /** Initial capacity. */
-  private final long capacity;
+  /** Map type. */
+  private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.STRING_O);
   /** Hash map. */
   private final TokenMap map;
 
@@ -24,7 +24,7 @@ public final class XQTokenMap extends XQHashMap {
    * @param capacity initial capacity
    */
   XQTokenMap(final long capacity) {
-    this.capacity = capacity;
+    super(capacity, TYPE);
     map = new TokenMap(capacity);
   }
 

@@ -56,7 +56,7 @@ public abstract class XQArray extends XQStruct {
   }
 
   /**
-   * Creates an array with a single value.
+   * Creates an array with a single member.
    * @param value single value
    * @return array
    */
@@ -204,7 +204,7 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  public final Value values(final QueryContext qc) throws QueryException {
+  public final Value items(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Value value : iterable()) vb.add(value);
     return vb.value(((ArrayType) type).valueType.type);
@@ -256,8 +256,7 @@ public abstract class XQArray extends XQStruct {
    * @return union type
    */
   final Type union(final Value value) {
-    final SeqType mt = ((ArrayType) type).valueType, st = value.seqType();
-    return mt.eq(st) ? type : ArrayType.get(mt.union(st));
+    return ((ArrayType) type).union(value.seqType());
   }
 
   /**

@@ -56,7 +56,7 @@ public final class ProfTrack extends StandardFunc {
       }
     }
 
-    final MapBuilder mb = new MapBuilder();
+    final MapBuilder mb = new MapBuilder(3);
     // execution time (called before garbage collection)
     if(perf != null) {
       final BigDecimal ms = BigDecimal.valueOf(perf.ns()).divide(Dec.BD_1000000,

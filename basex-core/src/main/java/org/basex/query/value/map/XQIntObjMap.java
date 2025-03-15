@@ -15,8 +15,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class XQIntObjMap extends XQHashMap {
-  /** Initial capacity. */
-  private final long capacity;
+  /** Map type. */
+  private static final MapType TYPE = MapType.get(AtomType.INTEGER, SeqType.ITEM_ZM);
   /** Hash map. */
   private final IntObjMap<Value> map;
 
@@ -25,7 +25,7 @@ public final class XQIntObjMap extends XQHashMap {
    * @param capacity initial capacity
    */
   XQIntObjMap(final long capacity) {
-    this.capacity = capacity;
+    super(capacity, TYPE);
     map = new IntObjMap<>(capacity);
   }
 
