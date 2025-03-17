@@ -326,7 +326,7 @@ public abstract class XQMap extends XQStruct {
     });
     // assign record type to speed up future type checks
     final XQMap map = mb.map();
-    map.type = rt;
+    if(map != EMPTY) map.type = rt;
     return map;
   }
 
