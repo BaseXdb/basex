@@ -135,22 +135,7 @@ public abstract class XQMap extends XQStruct {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public final XQMap put(final Item key, final Value value) throws QueryException {
-    if(structSize() == 0) {
-      return new XQTrieMap(new TrieLeaf(key.hashCode(), key, value), null,
-          MapType.get(key.type, value.seqType()));
-    }
-    return putInternal(key, value);
-  }
-
-  /**
-   * Puts the given value into this map and replaces existing keys.
-   * @param key key to insert
-   * @param value value to insert
-   * @return updated map
-   * @throws QueryException query exception
-   */
-  abstract XQMap putInternal(Item key, Value value) throws QueryException;
+  public abstract XQMap put(Item key, Value value) throws QueryException;
 
   /**
    * Removed a key from this map.
@@ -158,20 +143,7 @@ public abstract class XQMap extends XQStruct {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public final XQMap remove(final Item key) throws QueryException {
-    final XQMap map = removeInternal(key);
-    if(map == null) return EMPTY;
-    if(map != this) map.type = type;
-    return map;
-  }
-
-  /**
-   * Removes a key from this map.
-   * @param key key to remove
-   * @return updated map
-   * @throws QueryException query exception
-   */
-  abstract XQMap removeInternal(Item key) throws QueryException;
+  public abstract XQMap remove(Item key) throws QueryException;
 
   /**
    * Applies a function on all entries.

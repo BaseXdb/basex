@@ -37,7 +37,11 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
-  XQTrieMap putInternal(final Item key, final Value value) throws QueryException {
+  public XQTrieMap put(final Item key, final Value value) throws QueryException {
+    final long oldSize = structSize();
+    if(oldSize == 0) return new XQTrieMap(new TrieLeaf(key.hashCode(), key, value), null,
+          MapType.get(key.type, value.seqType()));
+
     final TrieUpdate update = new TrieUpdate(key, value, order);
     final TrieNode node = root.put(key.hashCode(), 0, update);
     if(node == root) return this;
@@ -50,20 +54,22 @@ public final class XQTrieMap extends XQMap {
       mt = MapType.get((((TrieLeaf) root).key).type, value.seqType());
     } else {
       // initialize map order if a second entry was added
-      to = root.size == 1 ? new TrieOrder(((TrieLeaf) root).key, key) : update.order();
+      to = oldSize == 1 ? new TrieOrder(((TrieLeaf) root).key, key) : update.order();
       mt = ((MapType) type).union(key.type, value.seqType());
     }
     return new XQTrieMap(node, to, mt);
   }
 
   @Override
-  public XQMap removeInternal(final Item key) throws QueryException {
+  public XQMap remove(final Item key) throws QueryException {
     final TrieUpdate update = new TrieUpdate(key, null, order);
     final TrieNode node = root.remove(key.hashCode(), 0, update);
     if(node == root) return this;
-    if(node == null) return null;
+    if(node == null) return empty();
+
     // drop map order if a single entry is left
-    return new XQTrieMap(node, node.size == 1 ? null : update.order(), type);
+    final TrieOrder to = node.size == 1 ? null : update.order();
+    return new XQTrieMap(node, to, type);
   }
 
   @Override

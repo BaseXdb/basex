@@ -14,9 +14,9 @@ import org.basex.query.value.type.*;
  */
 public final class XQSingletonMap extends XQMap {
   /** Key. */
-  private Item k;
+  private final Item k;
   /** Value. */
-  private Value v;
+  private final Value v;
 
   /**
    * Constructor.
@@ -40,12 +40,12 @@ public final class XQSingletonMap extends XQMap {
   }
 
   @Override
-  XQMap putInternal(final Item key, final Value value) throws QueryException {
+  public XQMap put(final Item key, final Value value) throws QueryException {
     return empty().put(k, v).put(key, value);
   }
 
   @Override
-  public XQMap removeInternal(final Item key) throws QueryException {
+  public XQMap remove(final Item key) throws QueryException {
     return key.atomicEqual(k) ? empty() : this;
   }
 
