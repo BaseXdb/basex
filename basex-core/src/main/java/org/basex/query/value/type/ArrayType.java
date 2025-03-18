@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 public final class ArrayType extends FType {
   /** Type of the array values. */
-  public final SeqType valueType;
+  private final SeqType valueType;
 
   /**
    * Constructor.
@@ -36,6 +36,14 @@ public final class ArrayType extends FType {
    */
   public static ArrayType get(final SeqType valueType) {
     return valueType.arrayType();
+  }
+
+  /**
+   * Getter for the value type.
+   * @return value type
+   */
+  public SeqType valueType() {
+    return valueType;
   }
 
   @Override

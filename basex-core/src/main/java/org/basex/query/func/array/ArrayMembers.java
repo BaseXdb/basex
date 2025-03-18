@@ -54,7 +54,7 @@ public final class ArrayMembers extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Type tp = arg(0).seqType().type;
     if(tp instanceof ArrayType) {
-      exprType.assign(MapType.get(AtomType.STRING, ((ArrayType) tp).valueType));
+      exprType.assign(MapType.get(AtomType.STRING, ((ArrayType) tp).valueType()));
     }
     return this;
   }

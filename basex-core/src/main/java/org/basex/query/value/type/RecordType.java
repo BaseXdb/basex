@@ -67,7 +67,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
    * @param info input info
    */
   public RecordType(final QNm name, final InputInfo info) {
-    super(AtomType.ANY_ATOMIC_TYPE, SeqType.ITEM_ZM);
+    super(AtomType.ANY_ATOMIC_TYPE, SeqType.ITEM_ZM, false);
     this.extensible = true;
     this.fields = new TokenObjMap<>();
     this.name = name;
@@ -244,9 +244,9 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     }
     if(!extensible && type instanceof MapType) {
       final MapType mt = (MapType) type;
-      if(!mt.keyType.oneOf(AtomType.STRING, AtomType.ANY_ATOMIC_TYPE)) return false;
+      if(!mt.keyType().oneOf(AtomType.STRING, AtomType.ANY_ATOMIC_TYPE)) return false;
       for(final byte[] field : fields) {
-        if(!fields.get(field).seqType().instanceOf(mt.valueType)) return false;
+        if(!fields.get(field).seqType().instanceOf(mt.valueType())) return false;
       }
       return true;
     }
@@ -265,7 +265,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
 
   @Override
   public MapType union(final Type kt, final SeqType vt) {
-    return get(keyType.union(kt), valueType.union(vt));
+    return get(keyType().union(kt), valueType().union(vt));
   }
 
   /**
@@ -316,7 +316,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
       }
       return new RecordType(extensible || rt.extensible, map, null);
     }
-    return type instanceof MapType ? ((MapType) type).union(keyType, valueType) :
+    return type instanceof MapType ? ((MapType) type).union(keyType(), valueType()) :
            type instanceof ArrayType ? SeqType.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
@@ -418,8 +418,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
       ref.extensible = dec.extensible;
       ref.fields = dec.fields;
       ref.info = null;
-      ref.keyType = dec.keyType;
-      ref.valueType = dec.valueType;
+      ref.finalizeTypes(dec.keyType(), dec.valueType());
     }
   }
 

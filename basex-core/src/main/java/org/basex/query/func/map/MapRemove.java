@@ -46,7 +46,7 @@ public final class MapRemove extends StandardFunc {
     if(tp == null && type instanceof MapType) {
       // create new map type (to drop potential record type assignment)
       final MapType mt = (MapType) type;
-      tp = MapType.get(mt.keyType, mt.valueType);
+      tp = MapType.get(mt.keyType(), mt.valueType());
     }
     if(tp != null) exprType.assign(tp);
 

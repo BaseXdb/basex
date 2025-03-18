@@ -19,9 +19,11 @@ import org.basex.util.*;
  */
 public class MapType extends FType {
   /** Key type of the map. */
-  public Type keyType;
+  private Type keyType;
   /** Value types (can be {@code null}, indicating that no type was specified). */
-  public SeqType valueType;
+  private SeqType valueType;
+  /** Flag indicating that keyType and valueType are final. */
+  private boolean isFinal;
 
   /**
    * Constructor.
@@ -29,8 +31,19 @@ public class MapType extends FType {
    * @param valueType value type
    */
   MapType(final Type keyType, final SeqType valueType) {
+    this(keyType, valueType, true);
+  }
+
+  /**
+   * Constructor.
+   * @param keyType key type
+   * @param valueType value type
+   * @param isFinal whether keyType and valueType are final
+   */
+  MapType(final Type keyType, final SeqType valueType, final boolean isFinal) {
     this.keyType = keyType;
     this.valueType = valueType;
+    this.isFinal = isFinal;
   }
 
   /**
@@ -40,7 +53,37 @@ public class MapType extends FType {
    * @return map type
    */
   public static MapType get(final Type keyType, final SeqType valueType) {
-    return valueType.mapType(keyType);
+    final MapType mt = valueType.mapType(keyType);
+    if(!mt.isFinal) throw Util.notExpected();
+    return mt;
+  }
+
+  /**
+   * Supply final value of key type and value type.
+   * @param kt key type
+   * @param vt value type
+   */
+  public void finalizeTypes(final Type kt, final SeqType vt) {
+    if(isFinal) throw Util.notExpected();
+    this.keyType = kt;
+    this.valueType = vt;
+    this.isFinal = true;
+  }
+
+  /**
+   * Getter for the key type.
+   * @return key type
+   */
+  public Type keyType() {
+    return keyType;
+  }
+
+  /**
+   * Getter for the value type.
+   * @return value type
+   */
+  public SeqType valueType() {
+    return valueType;
   }
 
   @Override

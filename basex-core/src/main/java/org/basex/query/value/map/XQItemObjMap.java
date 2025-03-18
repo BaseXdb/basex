@@ -38,7 +38,7 @@ public final class XQItemObjMap extends XQHashMap {
 
   @Override
   Value keysInternal() {
-    return ItemSeq.get(map.keys(), (int) structSize(), ((MapType) type).keyType);
+    return ItemSeq.get(map.keys(), (int) structSize(), ((MapType) type).keyType());
   }
 
   @Override
