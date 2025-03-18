@@ -24,7 +24,7 @@ public final class MapOfPairs extends MapMerge {
 
     final MapBuilder builder = new MapBuilder(input.size());
     for(Item item; (item = qc.next(input)) != null;) {
-      final XQMap pair = toRecord(item, RecordType.PAIR, qc);
+      final XQMap pair = toRecord(item, SeqType.PAIR, qc);
       final Item key = toAtomItem(pair.get(Str.KEY), qc);
       final Value old = builder.get(key);
       final Value val = merger.merge(key, old, pair.get(Str.VALUE));

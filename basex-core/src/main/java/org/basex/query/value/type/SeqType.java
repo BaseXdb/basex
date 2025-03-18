@@ -227,14 +227,29 @@ public final class SeqType {
 
   /** The general record type. */
   public static final RecordType RECORD = new RecordType(true, new TokenObjMap<>(), null);
+  /** Pair record. */
+  public static final RecordType PAIR;
+  /** Member record. */
+  public static final RecordType MEMBER;
+
+  static {
+    TokenObjMap<RecordField> map = new TokenObjMap<>();
+    map.put(Str.KEY.string(), new RecordField(false, SeqType.ANY_ATOMIC_TYPE_O));
+    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
+    PAIR = new RecordType(false, map, null);
+    map = new TokenObjMap<>();
+    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
+    MEMBER = new RecordType(false, map, null);
+  }
+
   /** Single record. */
   public static final SeqType RECORD_O = RECORD.seqType();
   /** Single pair. */
-  public static final SeqType PAIR_O = RecordType.PAIR.seqType();
+  public static final SeqType PAIR_O = PAIR.seqType();
   /** Zero or more pairs. */
-  public static final SeqType PAIR_ZM = RecordType.PAIR.seqType(ZERO_OR_MORE);
+  public static final SeqType PAIR_ZM = PAIR.seqType(ZERO_OR_MORE);
   /** Zero or more members. */
-  public static final SeqType MEMBER_ZM = RecordType.MEMBER.seqType(ZERO_OR_MORE);
+  public static final SeqType MEMBER_ZM = MEMBER.seqType(ZERO_OR_MORE);
 
   /** Item type. */
   public final Type type;

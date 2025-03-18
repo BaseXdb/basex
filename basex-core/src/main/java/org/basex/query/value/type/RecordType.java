@@ -21,21 +21,6 @@ import org.basex.util.hash.*;
  * @author Gunther Rademacher
  */
 public final class RecordType extends MapType implements Iterable<byte[]> {
-  /** Pair. */
-  public static final RecordType PAIR;
-  /** Member. */
-  public static final RecordType MEMBER;
-
-  static {
-    TokenObjMap<RecordField> map = new TokenObjMap<>();
-    map.put(Str.KEY.string(), new RecordField(false, SeqType.ANY_ATOMIC_TYPE_O));
-    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
-    PAIR = new RecordType(false, map, null);
-    map = new TokenObjMap<>();
-    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
-    MEMBER = new RecordType(false, map, null);
-  }
-
   /** Extensible flag. */
   private boolean extensible;
   /** Record fields. */
