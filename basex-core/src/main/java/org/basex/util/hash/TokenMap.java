@@ -6,7 +6,6 @@ import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash map for storing tokens.
- * It extends the {@link TokenSet} class.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -36,20 +35,24 @@ public final class TokenMap extends TokenSet {
    * If the key exists, the value is updated.
    * @param key key
    * @param value value
+   * @return old value
    */
-  public void put(final byte[] key, final byte[] value) {
+  public byte[] put(final byte[] key, final byte[] value) {
     // array bounds are checked before array is resized
     final int i = put(key);
+    final byte[] v = values[i];
     values[i] = value;
+    return v;
   }
 
   /**
    * Convenience function for adding strings, which will be converted to tokens.
    * @param key key
    * @param value value
+   * @return old value
    */
-  public void put(final String key, final String value) {
-    put(Token.token(key), Token.token(value));
+  public byte[] put(final String key, final String value) {
+    return put(Token.token(key), Token.token(value));
   }
 
   /**

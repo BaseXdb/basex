@@ -6,8 +6,7 @@ import java.util.function.*;
 import org.basex.util.*;
 
 /**
- * This is an efficient and memory-saving hash map for storing primitive integers
- * and objects. It extends the {@link IntSet} class.
+ * This is an efficient and memory-saving hash map for storing primitive integers and objects.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -34,8 +33,8 @@ public final class IntObjMap<E> extends IntSet {
   }
 
   /**
-   * Indexes the specified key and stores the associated value.
-   * If the key already exists, the value is updated.
+   * Stores the specified key and value.
+   * If the key exists, the value is updated.
    * @param key key
    * @param value value
    * @return old value
@@ -44,9 +43,9 @@ public final class IntObjMap<E> extends IntSet {
   public E put(final int key, final E value) {
     // array bounds are checked before array is resized
     final int i = put(key);
-    final Object v = values[i];
+    final E v = (E) values[i];
     values[i] = value;
-    return (E) v;
+    return v;
   }
 
   /**
@@ -68,7 +67,7 @@ public final class IntObjMap<E> extends IntSet {
   /**
    * Returns the value for the specified key.
    * @param key key to be looked up
-   * @return value or {@code null} if the key was not found
+   * @return value or {@code null} if the key does not exist
    */
   @SuppressWarnings("unchecked")
   public E get(final int key) {

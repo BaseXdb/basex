@@ -50,11 +50,15 @@ public final class ItemObjMap<E> extends HashItemSet {
    * @param key key
    * @param value value
    * @throws QueryException query exception
+   * @return old value
    */
-  public void put(final Item key, final E value) throws QueryException {
+  @SuppressWarnings("unchecked")
+  public E put(final Item key, final E value) throws QueryException {
     // array bounds are checked before array is resized
     final int i = put(key);
+    final E v = (E) values[i];
     values[i] = value;
+    return v;
   }
 
   /**

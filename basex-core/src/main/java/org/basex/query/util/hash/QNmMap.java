@@ -25,15 +25,19 @@ public final class QNmMap<E> extends QNmSet {
   }
 
   /**
-   * Indexes the specified key and value.
+   * Stores the specified key and value.
    * If the key exists, the value is updated.
    * @param key QName to look up
    * @param val value
+   * @return old value
    */
-  public void put(final QNm key, final E val) {
+  @SuppressWarnings("unchecked")
+  public E put(final QNm key, final E val) {
     // array bounds are checked before array is resized
     final int i = put(key);
+    final E v = (E) values[i];
     values[i] = val;
+    return v;
   }
 
   /**

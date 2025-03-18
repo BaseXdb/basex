@@ -50,7 +50,7 @@ public final class MapBuilder {
       final long c = capacity;
       m = k == AtomType.INTEGER ? v.eq(SeqType.INTEGER_O) ? new XQIntMap(c) : new XQIntObjMap(c) :
           k == AtomType.STRING ? v.eq(SeqType.STRING_O) ? new XQTokenMap(c) : new XQTokenObjMap(c) :
-          new XQItemObjMap(capacity);
+          new XQItemObjMap(c);
     }
     map = m.build(key, value);
     return this;

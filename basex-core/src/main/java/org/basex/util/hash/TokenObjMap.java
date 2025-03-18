@@ -7,7 +7,6 @@ import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash map for storing tokens and objects.
- * {@link TokenSet hash set}.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -34,15 +33,19 @@ public final class TokenObjMap<E> extends TokenSet {
   }
 
   /**
-   * Indexes the specified key and value.
+   * Stores the specified key and value.
    * If the key exists, the value is updated.
    * @param key key
-   * @param val value
+   * @param value value
+   * @return old value
    */
-  public void put(final byte[] key, final E val) {
+  @SuppressWarnings("unchecked")
+  public E put(final byte[] key, final E value) {
     // array bounds are checked before array is resized
     final int i = put(key);
-    values[i] = val;
+    final E v = (E) values[i];
+    values[i] = value;
+    return v;
   }
 
   /**
@@ -64,7 +67,7 @@ public final class TokenObjMap<E> extends TokenSet {
   /**
    * Returns the value for the specified key.
    * @param key key to be looked up
-   * @return value, or {@code null} if nothing was found
+   * @return value, or {@code null} if the key does not exist
    */
   @SuppressWarnings("unchecked")
   public E get(final byte[] key) {
@@ -98,15 +101,15 @@ public final class TokenObjMap<E> extends TokenSet {
   }
 
   @Override
-  public void clear() {
-    Arrays.fill(values, null);
-    super.clear();
-  }
-
-  @Override
   protected void rehash(final int newSize) {
     super.rehash(newSize);
     values = Array.copy(values, new Object[newSize]);
+  }
+
+  @Override
+  public void clear() {
+    super.clear();
+    Arrays.fill(values, null);
   }
 
   @Override

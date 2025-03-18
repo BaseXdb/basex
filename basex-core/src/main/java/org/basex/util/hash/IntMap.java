@@ -6,8 +6,7 @@ import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash map for storing primitive integers.
- * It extends the {@link IntSet} class. All values except for {@link Integer#MIN_VALUE}
- * can be stored as values.
+ * {@link Integer#MIN_VALUE} is returned for an entry that does not exist.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -34,9 +33,9 @@ public final class IntMap extends IntSet {
   }
 
   /**
-   * Indexes the specified key and stores the associated value.
-   * If the key already exists, the value is updated.
-   * Please note that the value {@link Integer#MIN_VALUE} cannot be stored.
+   * Stores the specified key and value.
+   * If the key exists, the value is updated.
+   * Note that {@link Integer#MIN_VALUE} is used to indicate that a key does not exist.
    * @param key key
    * @param value value
    * @return old value
@@ -52,7 +51,7 @@ public final class IntMap extends IntSet {
   /**
    * Returns the value for the specified key.
    * @param key key to be looked up
-   * @return value or {@link Integer#MIN_VALUE} if the key was not found
+   * @return value, or {@link Integer#MIN_VALUE} if the key does not exist
    */
   public int get(final int key) {
     return values[id(key)];

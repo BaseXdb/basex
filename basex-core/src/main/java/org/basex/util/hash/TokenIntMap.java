@@ -5,9 +5,11 @@ import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
+import org.basex.util.*;
 
 /**
  * This is an efficient and memory-saving hash map for storing tokens and integers.
+ * {@link Integer#MIN_VALUE} is returned for an entry that does not exist.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -17,14 +19,24 @@ public final class TokenIntMap extends TokenSet {
   private int[] values;
 
   /**
-   * Constructor.
+   * Default constructor.
    */
   public TokenIntMap() {
-    values = new int[capacity()];
+    this(Array.INITIAL_CAPACITY);
   }
 
   /**
-   * Constructor.
+   * Constructor with initial capacity.
+   * @param capacity array capacity (will be resized to a power of two)
+   */
+  public TokenIntMap(final long capacity) {
+    super(capacity);
+    values = new int[capacity()];
+    values[0] = Integer.MIN_VALUE;
+  }
+
+  /**
+   * Input constructor.
    * @param in input stream
    * @throws IOException I/O exception
    */
@@ -45,31 +57,34 @@ public final class TokenIntMap extends TokenSet {
   }
 
   /**
-   * Indexes the specified key and stores the associated value.
-   * If the key already exists, the value is updated.
+   * Stores the specified key and value.
+   * If the key exists, the value is updated.
+   * Note that {@link Integer#MIN_VALUE} is used to indicate that a key does not exist.
    * @param key key
    * @param value value
+   * @return old value
    */
-  public void put(final byte[] key, final int value) {
+  public int put(final byte[] key, final int value) {
     // array bounds are checked before array is resized
     final int i = put(key);
+    final int v = values[i];
     values[i] = value;
+    return v;
   }
 
   /**
    * Returns the value for the specified key.
    * @param key key to be looked up
-   * @return value, or {@code -1} if the key was not found
+   * @return value, or {@link Integer#MIN_VALUE} if the key does not exist
    */
   public int get(final byte[] key) {
-    final int i = id(key);
-    return i == 0 ? -1 : values[i];
+    return values[id(key)];
   }
 
   @Override
   public int remove(final byte[] key) {
     final int i = super.remove(key);
-    values[i] = -1;
+    values[i] = Integer.MIN_VALUE;
     return i;
   }
 

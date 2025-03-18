@@ -109,7 +109,7 @@ public class HashItemSet extends ASet implements ItemSet {
    * Stores the specified key and returns its index, or returns the negative index if a key
    * already existed.
    * @param key key to be indexed
-   * @return id, or negative id if the key already existed
+   * @return id, or negative id if the key already exists
    * @throws QueryException query exception
    */
   private int index(final Item key) throws QueryException {
