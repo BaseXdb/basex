@@ -210,8 +210,8 @@ public abstract class XQMap extends XQStruct {
     final SeqType vt;
     if(tp instanceof MapType) {
       final MapType mt = (MapType) tp;
-      kt = mt.keyType == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType;
-      vt = mt.valueType.eq(SeqType.ITEM_ZM) ? null : mt.valueType;
+      kt = mt.keyType() == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType();
+      vt = mt.valueType().eq(SeqType.ITEM_ZM) ? null : mt.valueType();
     } else if(tp instanceof FuncType) {
       final FuncType ft = (FuncType) tp;
       if(ft.declType.occ.min != 0 || ft.argTypes.length != 1 ||
@@ -239,7 +239,7 @@ public abstract class XQMap extends XQStruct {
   public final Value items(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     forEach((key, value) -> vb.add(value));
-    return vb.value(((MapType) type).valueType.type);
+    return vb.value(((MapType) type).valueType().type);
   }
 
   /**
@@ -254,7 +254,7 @@ public abstract class XQMap extends XQStruct {
   public final XQMap coerceTo(final MapType mt, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
-    final SeqType kt = mt.keyType.seqType(), vt = mt.valueType;
+    final SeqType kt = mt.keyType().seqType(), vt = mt.valueType();
     final MapBuilder mb = new MapBuilder(structSize());
     forEach((key, value) -> {
       qc.checkStop();

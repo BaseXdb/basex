@@ -47,7 +47,7 @@ public final class ArraySort extends FnSort {
     final Type type = st.type;
     if(type instanceof ArrayType) {
       if(defined(2) && arg(2).size() == 1) {
-        arg(2, arg -> refineFunc(arg, cc, ((ArrayType) type).valueType));
+        arg(2, arg -> refineFunc(arg, cc, ((ArrayType) type).valueType()));
       }
       exprType.assign(type);
     }

@@ -47,7 +47,7 @@ public final class MapItems extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type tp = arg(0).seqType().type;
-    if(tp instanceof MapType) exprType.assign(((MapType) tp).valueType.with(Occ.ZERO_OR_MORE));
+    if(tp instanceof MapType) exprType.assign(((MapType) tp).valueType().with(Occ.ZERO_OR_MORE));
     return this;
   }
 }

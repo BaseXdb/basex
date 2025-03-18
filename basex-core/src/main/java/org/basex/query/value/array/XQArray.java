@@ -207,7 +207,7 @@ public abstract class XQArray extends XQStruct {
   public final Value items(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Value value : iterable()) vb.add(value);
-    return vb.value(((ArrayType) type).valueType.type);
+    return vb.value(((ArrayType) type).valueType().type);
   }
 
   /**
@@ -364,7 +364,7 @@ public abstract class XQArray extends XQStruct {
 
     final SeqType mt;
     if(tp instanceof ArrayType) {
-      mt = ((ArrayType) tp).valueType;
+      mt = ((ArrayType) tp).valueType();
     } else if(tp instanceof FuncType) {
       final FuncType ft = (FuncType) tp;
       if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.INTEGER_O)) return false;
@@ -397,7 +397,7 @@ public abstract class XQArray extends XQStruct {
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : iterable()) {
       qc.checkStop();
-      ab.append(at.valueType.coerce(value, null, qc, cc, ii));
+      ab.append(at.valueType().coerce(value, null, qc, cc, ii));
     }
     return ab.array();
   }

@@ -110,8 +110,8 @@ public class MapMerge extends StandardFunc {
       // consider duplicate handling for value type
       //   map:merge((1 to 2) ! map { 1: 1 }, map { 'duplicates': 'combine' })
       final MapType mt = (MapType) st.type;
-      final Type kt = mt.keyType;
-      final SeqType vt = mt.valueType;
+      final Type kt = mt.keyType();
+      final SeqType vt = mt.valueType();
       exprType.assign(MapType.get(kt, vm != null ? vm.type(vt) : SeqType.ITEM_ZM));
     }
     return this;
