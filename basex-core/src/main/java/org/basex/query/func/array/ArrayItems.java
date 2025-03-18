@@ -58,7 +58,8 @@ public final class ArrayItems extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type tp = arg(0).seqType().type;
-    if(tp instanceof ArrayType) exprType.assign(((ArrayType) tp).valueType().with(Occ.ZERO_OR_MORE));
+    if(tp instanceof ArrayType)
+      exprType.assign(((ArrayType) tp).valueType().with(Occ.ZERO_OR_MORE));
     return this;
   }
 
