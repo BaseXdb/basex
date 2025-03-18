@@ -9,24 +9,24 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Unmodifiable hash map implementation for integers.
+ * Unmodifiable hash map implementation for integers and values.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQIntMap extends XQHashMap {
+public final class XQIntTokenMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.INTEGER, SeqType.INTEGER_O);
+  private static final MapType TYPE = MapType.get(AtomType.INTEGER, SeqType.STRING_O);
   /** Hash map. */
-  private final IntMap map;
+  private final IntObjMap<byte[]> map;
 
   /**
    * Constructor.
    * @param capacity initial capacity
    */
-  XQIntMap(final long capacity) {
+  XQIntTokenMap(final long capacity) {
     super(capacity, TYPE);
-    map = new IntMap(capacity);
+    map = new IntObjMap<>(capacity);
   }
 
   @Override
@@ -35,7 +35,7 @@ public final class XQIntMap extends XQHashMap {
   }
 
   @Override
-  Int getInternal(final Item key) throws QueryException {
+  Value getInternal(final Item key) throws QueryException {
     if(key instanceof ANum) {
       final double d = key.dbl(null);
       final int i = (int) d;
@@ -56,20 +56,21 @@ public final class XQIntMap extends XQHashMap {
   }
 
   @Override
-  Int keyInternal(final int pos) {
+  Item keyInternal(final int pos) {
     return Int.get(map.key(pos));
   }
 
   @Override
-  Int valueInternal(final int pos) {
-    return Int.get(map.value(pos));
+  Value valueInternal(final int pos) {
+    return Str.get(map.value(pos));
   }
 
   @Override
   XQHashMap build(final Item key, final Value value) throws QueryException {
-    final int k = toInt(key), v = toInt(value);
+    final int k = toInt(key);
+    final byte[] v = toString(value);
     if(k != Integer.MIN_VALUE) {
-      if(v != Integer.MIN_VALUE) {
+      if(v != null) {
         map.put(k, v);
         return this;
       }

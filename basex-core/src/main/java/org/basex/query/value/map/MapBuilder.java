@@ -48,8 +48,10 @@ public final class MapBuilder {
       final Type k = key.type;
       final SeqType v = value.seqType();
       final long c = capacity;
-      m = k == AtomType.INTEGER ? v.eq(SeqType.INTEGER_O) ? new XQIntMap(c) : new XQIntObjMap(c) :
-          k == AtomType.STRING ? v.eq(SeqType.STRING_O) ? new XQTokenMap(c) : new XQTokenObjMap(c) :
+      final boolean ki = k == AtomType.INTEGER, ks = k == AtomType.STRING;
+      final boolean vi = v.eq(SeqType.INTEGER_O), vs = v.eq(SeqType.STRING_O);
+      m = ki ? vi ? new XQIntMap(c)   : vs ? new XQIntTokenMap(c) : new XQIntObjMap(c)   :
+          ks ? vs ? new XQTokenMap(c) : vi ? new XQTokenIntMap(c) : new XQTokenObjMap(c) :
           new XQItemObjMap(c);
     }
     map = m.build(key, value);

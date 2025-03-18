@@ -8,7 +8,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 
 /**
- * Unmodifiable hash map implementation for tokens.
+ * Unmodifiable hash map implementation for strings.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -59,9 +59,10 @@ public final class XQTokenMap extends XQHashMap {
 
   @Override
   XQHashMap build(final Item key, final Value value) throws QueryException {
-    if(key.type == AtomType.STRING) {
-      if(value.seqType().eq(SeqType.STRING_O)) {
-        map.put(key.string(null), ((Item) value).string(null));
+    final byte[] k = toString(key), v = toString(value);
+    if(k != null) {
+      if(v != null) {
+        map.put(k, v);
         return this;
       }
       return new XQTokenObjMap(capacity).build(this).build(key, value);

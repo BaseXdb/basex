@@ -463,6 +463,11 @@ public final class MapTest extends SandboxTest {
         "{\"1\":\"1\",2:2,3:3}", root(XQItemObjMap.class));
     check("map:merge(({ '1': '1' }, { 2: 2 }, { '3': '3' }))",
         "{\"1\":\"1\",2:2,\"3\":\"3\"}", root(XQItemObjMap.class));
+
+    check("map:merge(({ 1: '1' }, { 2: '2' }, { 3: '3' }))",
+        "{1:\"1\",2:\"2\",3:\"3\"}", root(XQIntTokenMap.class));
+    check("map:merge(({ 1: '1' }, { 2: '2' }, { 3: 3 }))",
+        "{1:\"1\",2:\"2\",3:3}", root(XQIntObjMap.class));
   }
 
   /** Tests string maps. */
@@ -514,5 +519,10 @@ public final class MapTest extends SandboxTest {
         "{\"1\":\"1\",2:2,3:3}", root(XQItemObjMap.class));
     check("map:merge(({ '1': '1' }, { 2: 2 }, { '3': '3' }))",
         "{\"1\":\"1\",2:2,\"3\":\"3\"}", root(XQItemObjMap.class));
+
+    check("map:merge(({ '1': 1 }, { '2': 2 }, { '3': 3 }))",
+        "{\"1\":1,\"2\":2,\"3\":3}", root(XQTokenIntMap.class));
+    check("map:merge(({ '1': 1 }, { '2': 2 }, { '3': '3' }))",
+        "{\"1\":1,\"2\":2,\"3\":\"3\"}", root(XQTokenObjMap.class));
   }
 }

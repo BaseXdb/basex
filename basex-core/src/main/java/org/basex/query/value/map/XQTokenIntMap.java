@@ -8,24 +8,24 @@ import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 
 /**
- * Unmodifiable hash map implementation for strings and values.
+ * Unmodifiable hash map implementation for strings and integers.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQTokenObjMap extends XQHashMap {
+public final class XQTokenIntMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.ITEM_ZM);
+  private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.INTEGER_O);
   /** Hash map. */
-  private final TokenObjMap<Value> map;
+  private final TokenIntMap map;
 
   /**
    * Constructor.
    * @param capacity initial capacity
    */
-  XQTokenObjMap(final long capacity) {
+  XQTokenIntMap(final long capacity) {
     super(capacity, TYPE);
-    map = new TokenObjMap<>(capacity);
+    map = new TokenIntMap(capacity);
   }
 
   @Override
@@ -53,16 +53,20 @@ public final class XQTokenObjMap extends XQHashMap {
   }
 
   @Override
-  Value valueInternal(final int pos) {
-    return map.value(pos);
+  Int valueInternal(final int pos) {
+    return Int.get(map.value(pos));
   }
 
   @Override
   XQHashMap build(final Item key, final Value value) throws QueryException {
     final byte[] k = toString(key);
+    final int v = toInt(value);
     if(k != null) {
-      map.put(k, value);
-      return this;
+      if(v != Integer.MIN_VALUE) {
+        map.put(k, v);
+        return this;
+      }
+      return new XQTokenObjMap(capacity).build(this).build(key, value);
     }
     return new XQItemObjMap(capacity).build(this).build(key, value);
   }

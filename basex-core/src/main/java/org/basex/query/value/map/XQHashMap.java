@@ -130,4 +130,31 @@ abstract class XQHashMap extends XQMap {
     }
     return trie;
   }
+
+  /**
+   * Tries to convert the value to a string.
+   * @param value value
+   * @return token or {@code null}
+   * @throws QueryException query exception
+   */
+  final byte[] toString(final Value value) throws QueryException {
+    if(value.seqType().eq(SeqType.STRING_O)) {
+      return ((AStr) value).string(null);
+    }
+    return null;
+  }
+
+  /**
+   * Tries to convert the value to an integer (excluding {@link Integer#MIN_VALUE}).
+   * @param value value
+   * @return integer or {@link Integer#MIN_VALUE}
+   */
+  final int toInt(final Value value) {
+    if(value.seqType().eq(SeqType.INTEGER_O)) {
+      final long vl = ((ANum) value).itr();
+      final int vi = (int) vl;
+      if(vi == vl) return vi;
+    }
+    return Integer.MIN_VALUE;
+  }
 }

@@ -9,7 +9,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Unmodifiable hash map implementation for integers.
+ * Unmodifiable hash map implementation for integers and values.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -67,13 +67,10 @@ public final class XQIntObjMap extends XQHashMap {
 
   @Override
   XQHashMap build(final Item key, final Value value) throws QueryException {
-    if(key.type == AtomType.INTEGER) {
-      final long kl = key.itr(null);
-      final int ki = (int) kl;
-      if(ki == kl) {
-        map.put(ki, value);
-        return this;
-      }
+    final int k = toInt(key);
+    if(k != Integer.MIN_VALUE) {
+      map.put(k, value);
+      return this;
     }
     return new XQItemObjMap(capacity).build(this).build(key, value);
   }
