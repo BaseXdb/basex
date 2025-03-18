@@ -38,7 +38,7 @@ public class ArithSimple extends Arith {
   }
 
   @Override
-  public ArithSimple copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public ArithSimple copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new ArithSimple(info, exprs[0].copy(cc, vm),
         exprs[1].copy(cc, vm), calc, calcOpt));
   }

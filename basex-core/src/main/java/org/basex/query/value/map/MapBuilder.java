@@ -50,9 +50,9 @@ public final class MapBuilder {
       final long c = capacity;
       final boolean ki = k == AtomType.INTEGER, ks = k == AtomType.STRING;
       final boolean vi = v.eq(SeqType.INTEGER_O), vs = v.eq(SeqType.STRING_O);
-      m = ki ? vi ? new XQIntMap(c)   : vs ? new XQIntTokenMap(c) : new XQIntObjMap(c)   :
-          ks ? vs ? new XQTokenMap(c) : vi ? new XQTokenIntMap(c) : new XQTokenObjMap(c) :
-          new XQItemObjMap(c);
+      m = ki ? vi ? new XQIntMap(c) : vs ? new XQIntStrMap(c) : new XQIntValueMap(c)   :
+          ks ? vs ? new XQStrMap(c) : vi ? new XQStrIntMap(c) : new XQStrValueMap(c) :
+          new XQItemValueMap(c);
     }
     map = m.build(key, value);
     return this;

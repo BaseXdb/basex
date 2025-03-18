@@ -95,7 +95,7 @@ public abstract class Inspect {
    * @param parent parent element
    * @throws QueryException query exception
    */
-  final void comment(final TokenObjMap<TokenList> tags, final FBuilder parent)
+  final void comment(final TokenObjectMap<TokenList> tags, final FBuilder parent)
       throws QueryException {
     for(final byte[] tag : tags) {
       for(final byte[] value : tags.get(tag)) {
@@ -175,7 +175,7 @@ public abstract class Inspect {
    * @param name parameter name
    * @return documentation of specified variable or {@code null}
    */
-  public static byte[] doc(final TokenObjMap<TokenList> doc, final byte[] name) {
+  public static byte[] doc(final TokenObjectMap<TokenList> doc, final byte[] name) {
     final TokenList params = doc != null ? doc.get(DOC_PARAM) : null;
     if(params != null) {
       for(final byte[] param : params) {

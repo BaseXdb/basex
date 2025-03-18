@@ -63,7 +63,7 @@ public final class Extension extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Extension(info, pragma.copy(), expr.copy(cc, vm)));
   }
 

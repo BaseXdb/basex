@@ -16,9 +16,9 @@ public final class NSGlobal {
   /** Namespaces: prefixes and namespace URIs. */
   public static final Atts NS = new Atts();
   /** Mapping: prefix to URI. */
-  private static final TokenMap URIS = new TokenMap();
+  private static final TokenObjectMap<byte[]> URIS = new TokenObjectMap<>();
   /** Mapping: URI to prefix. */
-  private static final TokenMap PREFIXES = new TokenMap();
+  private static final TokenObjectMap<byte[]> PREFIXES = new TokenObjectMap<>();
   /** URIs of reserved namespaces. */
   private static final TokenSet RESERVED = new TokenSet();
 

@@ -75,7 +75,7 @@ public class ResourceFolder extends ResourceNode {
    * @return number of remaining nodes that can be added
    */
   public final int addLeaves(final byte[] filter, final int cmax, final ResourceFolder target) {
-    final TokenObjMap<ResourceType> map = data.resources.children(string(subfolder()), false);
+    final TokenObjectMap<ResourceType> map = data.resources.children(string(subfolder()), false);
     final List<byte[]> keys = new ArrayList<>(map.size());
 
     // get desired leaves, depending on the given filter

@@ -25,7 +25,7 @@ abstract class RegExFn extends StandardFunc {
   static final byte[] REGEX_CHARS = Token.token("\\^$.|?*+()[]{}");
 
   /** Pattern cache. */
-  private final TokenObjMap<RegExpr> patterns = new TokenObjMap<>();
+  private final TokenObjectMap<RegExpr> patterns = new TokenObjectMap<>();
 
   /**
    * Regular expression pattern.

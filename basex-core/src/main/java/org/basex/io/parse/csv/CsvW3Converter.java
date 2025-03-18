@@ -101,7 +101,7 @@ public final class CsvW3Converter extends CsvXQueryConverter {
     }
 
     @Override
-    public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
       return copyType(new Get(info, rows, columnIndex, copyAll(cc, vm, args())));
     }
 

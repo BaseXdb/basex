@@ -49,7 +49,7 @@ public final class Delete extends Update {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Delete(info, arg(0).copy(cc, vm)));
   }
 

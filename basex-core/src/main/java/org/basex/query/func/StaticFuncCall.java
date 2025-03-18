@@ -89,7 +89,7 @@ public final class StaticFuncCall extends FuncCall {
   }
 
   @Override
-  public StaticFuncCall copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public StaticFuncCall copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new StaticFuncCall(name, Arr.copyAll(cc, vm, exprs), func, info, hasImport));
   }
 

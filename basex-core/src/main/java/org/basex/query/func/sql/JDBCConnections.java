@@ -19,7 +19,7 @@ public final class JDBCConnections implements QueryResource {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open connections and prepared statements with unique ids. */
-  private final TokenObjMap<AutoCloseable> conns = new TokenObjMap<>();
+  private final TokenObjectMap<AutoCloseable> conns = new TokenObjectMap<>();
 
   /**
    * Adds a connection.

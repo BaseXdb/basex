@@ -48,7 +48,7 @@ public final class FnFilter extends StandardFunc {
       return Filter.get(cc, info, input, pred);
     } else if(arity == 2) {
       // for $i at $p in INPUT where PREDICATE($i, $p) return $i
-      final IntObjMap<Var> vm = new IntObjMap<>();
+      final IntObjectMap<Var> vm = new IntObjectMap<>();
       final LinkedList<Clause> clauses = new LinkedList<>();
 
       final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);

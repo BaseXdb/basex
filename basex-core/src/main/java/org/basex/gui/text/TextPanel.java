@@ -1125,7 +1125,7 @@ public class TextPanel extends BaseXPanel {
   /* Reads in the property file. */
   static {
     for(int l = 0; l < 5; l++) LISTS.add(new ArrayList<>());
-    final TokenMap map = Util.properties("completions.properties");
+    final TokenObjectMap<byte[]> map = Util.properties("completions.properties");
     for(final byte[] key : map) {
       LISTS.get(0).add(new SimpleEntry<>(Token.string(key), Token.string(map.get(key))));
     }

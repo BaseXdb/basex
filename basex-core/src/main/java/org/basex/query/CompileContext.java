@@ -241,7 +241,7 @@ public final class CompileContext {
    * @param vm variable mapping (can be {@code null})
    * @return new variable, or {@code null} if the supplied variable is {@code null}
    */
-  public Var copy(final Var var, final IntObjMap<Var> vm) {
+  public Var copy(final Var var, final IntObjectMap<Var> vm) {
     if(var == null) return null;
     final VarScope vs = vs();
     final Var vr = vs.add(new Var(var, qc));

@@ -320,7 +320,7 @@ final class NSNode {
    * @param map namespace map
    * @param ns namespace reference
    */
-  void info(final TokenObjMap<TokenList> map, final Namespaces ns) {
+  void info(final TokenObjectMap<TokenList> map, final Namespaces ns) {
     final int vl = values.length;
     for(int v = 0; v < vl; v += 2) {
       final byte[] prefix = ns.prefix(values[v]), uri = ns.uri(values[v + 1]);

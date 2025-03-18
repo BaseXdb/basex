@@ -27,7 +27,7 @@ final class TextFont {
   /** Default monospaced fonts. */
   private static final StringList MONO = new StringList();
   /** Names of fallback fonts for already visited codepoints. */
-  private static final IntObjMap<String> FALLBACK = new IntObjMap<>();
+  private static final IntObjectMap<String> FALLBACK = new IntObjectMap<>();
   /** Fonts sorted in descending order by number of glyphs. */
   private static List<Font> cachedFonts;
 

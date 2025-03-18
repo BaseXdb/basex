@@ -410,7 +410,7 @@ public final class Namespaces {
    * @return info string
    */
   public byte[] info() {
-    final TokenObjMap<TokenList> map = new TokenObjMap<>();
+    final TokenObjectMap<TokenList> map = new TokenObjectMap<>();
     root.info(map, this);
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] key : map) {

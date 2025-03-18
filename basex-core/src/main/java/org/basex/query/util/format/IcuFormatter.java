@@ -32,9 +32,10 @@ public final class IcuFormatter extends Formatter {
   private static final String ICU_SPELLOUT_CARDINAL_NEUTER = ICU_SPELLOUT_CARDINAL + "-neuter";
 
   /** IcuFormatter instances. */
-  private static final ThreadLocal<TokenObjMap<IcuFormatter>> MAP = ThreadLocal.withInitial(() -> {
+  private static final ThreadLocal<TokenObjectMap<IcuFormatter>> MAP = ThreadLocal.withInitial(
+      () -> {
     // initialize hash map with English formatter as default
-    final TokenObjMap<IcuFormatter> map = new TokenObjMap<>();
+    final TokenObjectMap<IcuFormatter> map = new TokenObjectMap<>();
     map.put(EN, forLanguage(EN));
     return map;
   });
@@ -47,8 +48,8 @@ public final class IcuFormatter extends Formatter {
   private final Set<String> ruleSetNames;
   /** Rule set cache: rule set name by format modifier for each NumeralType. */
   @SuppressWarnings("rawtypes")
-  private final TokenObjMap[] ruleSetByModifierForNumType = {
-    new TokenObjMap<>(), new TokenObjMap<>(), new TokenObjMap<>()
+  private final TokenObjectMap[] ruleSetByModifierForNumType = {
+    new TokenObjectMap<>(), new TokenObjectMap<>(), new TokenObjectMap<>()
   };
   /** Month names. */
   private final byte[][] months;
@@ -88,7 +89,7 @@ public final class IcuFormatter extends Formatter {
    * @return formatter instance
    */
   public static IcuFormatter get(final byte[] languageTag) {
-    final TokenObjMap<IcuFormatter> map = MAP.get();
+    final TokenObjectMap<IcuFormatter> map = MAP.get();
     final IcuFormatter form;
     if(map.contains(languageTag)) {
       form = map.get(languageTag);
@@ -201,7 +202,7 @@ public final class IcuFormatter extends Formatter {
    */
   private String ruleSet(final NumeralType numType, final byte[] modifier) {
     @SuppressWarnings("unchecked")
-    final TokenObjMap<String> map = ruleSetByModifierForNumType[numType.ordinal()];
+    final TokenObjectMap<String> map = ruleSetByModifierForNumType[numType.ordinal()];
     final byte[] key = modifier == null ? EMPTY : modifier;
     String ruleSet = map.get(key);
     if(ruleSet == null) {

@@ -8,24 +8,24 @@ import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 
 /**
- * Unmodifiable hash map implementation for strings.
+ * Unmodifiable hash map implementation for strings and values.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQTokenMap extends XQHashMap {
+public final class XQStrValueMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.STRING_O);
+  private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.ITEM_ZM);
   /** Hash map. */
-  private final TokenMap map;
+  private final TokenObjectMap<Value> map;
 
   /**
    * Constructor.
    * @param capacity initial capacity
    */
-  XQTokenMap(final long capacity) {
+  XQStrValueMap(final long capacity) {
     super(capacity, TYPE);
-    map = new TokenMap(capacity);
+    map = new TokenObjectMap<>(capacity);
   }
 
   @Override
@@ -34,7 +34,7 @@ public final class XQTokenMap extends XQHashMap {
   }
 
   @Override
-  Str getInternal(final Item key) throws QueryException {
+  Value getInternal(final Item key) throws QueryException {
     if(key.type.isStringOrUntyped()) {
       final int id = map.id(key.string(null));
       if(id != 0) return valueInternal(id);
@@ -53,20 +53,17 @@ public final class XQTokenMap extends XQHashMap {
   }
 
   @Override
-  Str valueInternal(final int pos) {
-    return Str.get(map.value(pos));
+  Value valueInternal(final int pos) {
+    return map.value(pos);
   }
 
   @Override
   XQHashMap build(final Item key, final Value value) throws QueryException {
-    final byte[] k = toString(key), v = toString(value);
+    final byte[] k = toString(key);
     if(k != null) {
-      if(v != null) {
-        map.put(k, v);
-        return this;
-      }
-      return new XQTokenObjMap(capacity).build(this).build(key, value);
+      map.put(k, value);
+      return this;
     }
-    return new XQItemObjMap(capacity).build(this).build(key, value);
+    return new XQItemValueMap(capacity).build(this).build(key, value);
   }
 }

@@ -111,8 +111,8 @@ public final class SeqTypeTest {
    * @throws QueryException query exception
    */
   @Test public void eq() throws QueryException {
-    final TokenObjMap<RecordField> fld1 = new TokenObjMap<>(),
-        fld2 = new TokenObjMap<>();
+    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
+        fld2 = new TokenObjectMap<>();
     final QNm r1Name = new QNm(Token.token("r1")),
       r2Name = new QNm(Token.token("r2"));
     final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
@@ -289,8 +289,8 @@ public final class SeqTypeTest {
     assertFalse(c6.instanceOf(STRING_O));
     assertTrue(STRING_O.instanceOf(c6));
 
-    final TokenObjMap<RecordField> fld1 = new TokenObjMap<>(),
-        fld2 = new TokenObjMap<>();
+    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
+        fld2 = new TokenObjectMap<>();
     final QNm r1Name = new QNm(Token.token("r1")),
       r2Name = new QNm(Token.token("r2"));
     final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
@@ -482,16 +482,16 @@ public final class SeqTypeTest {
     combine(c6, FUNCTION_O, ITEM_O, op);
     combine(c6, STRING_O, ITEM_O, op);
 
-    final TokenObjMap<RecordField> fld1 = new TokenObjMap<>(),
-        fld2 = new TokenObjMap<>(),
-        fld3 = new TokenObjMap<>(),
-        fld4 = new TokenObjMap<>(),
-        fld5 = new TokenObjMap<>(),
-        fld6 = new TokenObjMap<>(),
-        fld7 = new TokenObjMap<>(),
-        fld8 = new TokenObjMap<>(),
-        fld9 = new TokenObjMap<>(),
-        fld10 = new TokenObjMap<>();
+    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
+        fld2 = new TokenObjectMap<>(),
+        fld3 = new TokenObjectMap<>(),
+        fld4 = new TokenObjectMap<>(),
+        fld5 = new TokenObjectMap<>(),
+        fld6 = new TokenObjectMap<>(),
+        fld7 = new TokenObjectMap<>(),
+        fld8 = new TokenObjectMap<>(),
+        fld9 = new TokenObjectMap<>(),
+        fld10 = new TokenObjectMap<>();
     fld1.put(Token.token("a"), new RecordField(false, INTEGER_O));
     fld2.put(Token.token("a"), new RecordField(false, STRING_O));
     fld3.put(Token.token("a"), new RecordField(false, ANY_ATOMIC_TYPE_O));
@@ -733,15 +733,15 @@ public final class SeqTypeTest {
     combine(c6, STRING_O, STRING_O, op);
     combine(c6, INTEGER_O, null, op);
 
-    final TokenObjMap<RecordField> fld1 = new TokenObjMap<>(),
-        fld2 = new TokenObjMap<>(),
-        fld3 = new TokenObjMap<>(),
-        fld4 = new TokenObjMap<>(),
-        fld5 = new TokenObjMap<>(),
-        fld6 = new TokenObjMap<>(),
-        fld7 = new TokenObjMap<>(),
-        fld8 = new TokenObjMap<>(),
-        fld9 = new TokenObjMap<>();
+    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
+        fld2 = new TokenObjectMap<>(),
+        fld3 = new TokenObjectMap<>(),
+        fld4 = new TokenObjectMap<>(),
+        fld5 = new TokenObjectMap<>(),
+        fld6 = new TokenObjectMap<>(),
+        fld7 = new TokenObjectMap<>(),
+        fld8 = new TokenObjectMap<>(),
+        fld9 = new TokenObjectMap<>();
     fld1.put(Token.token("a"), new RecordField(false, INTEGER_O));
     fld2.put(Token.token("a"), new RecordField(false, STRING_O));
     fld3.put(Token.token("a"), new RecordField(false, ANY_ATOMIC_TYPE_O));

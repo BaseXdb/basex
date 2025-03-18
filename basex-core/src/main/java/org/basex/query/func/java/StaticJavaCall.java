@@ -85,7 +85,7 @@ public final class StaticJavaCall extends JavaCall {
   }
 
   @Override
-  public StaticJavaCall copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public StaticJavaCall copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new StaticJavaCall(module, method, copyAll(cc, vm, exprs), perm, updating,
         info));
   }

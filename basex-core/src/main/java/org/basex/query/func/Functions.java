@@ -35,7 +35,7 @@ public final class Functions {
   public static final ArrayList<FuncDefinition> DEFINITIONS = new ArrayList<>();
 
   /** Cached functions. */
-  private static final TokenObjMap<QNm> CACHE = new TokenObjMap<>();
+  private static final TokenObjectMap<QNm> CACHE = new TokenObjectMap<>();
   /** URIs of built-in functions. */
   private static final TokenSet URIS = new TokenSet();
   /** Cast parameter. */

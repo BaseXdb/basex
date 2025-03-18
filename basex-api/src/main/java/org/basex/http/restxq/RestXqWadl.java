@@ -75,7 +75,7 @@ public final class RestXqWadl {
       for(final RestXqFunction func : module.functions()) {
         if(func.path == null) continue;
 
-        final TokenObjMap<TokenList> xqdoc = func.function.doc();
+        final TokenObjectMap<TokenList> xqdoc = func.function.doc();
         final String path = func.path.toString();
         final String methods = func.methods.toString().replaceAll("[^A-Z ]", "");
 
@@ -129,7 +129,7 @@ public final class RestXqWadl {
    * @throws QueryException query exception
    */
   private static void addParam(final String name, final String style, final FBuilder root,
-      final TokenObjMap<TokenList> xqdoc, final RestXqFunction func) throws QueryException {
+      final TokenObjectMap<TokenList> xqdoc, final RestXqFunction func) throws QueryException {
 
     final FBuilder param = FElem.build(Q_PARAM).add(Q_NAME, name).add(Q_STYLE, style);
     final QNm qnm = new QNm(name);

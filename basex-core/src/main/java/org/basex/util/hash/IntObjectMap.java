@@ -12,14 +12,14 @@ import org.basex.util.*;
  * @author Christian Gruen
  * @param <E> generic value type
  */
-public final class IntObjMap<E> extends IntSet {
+public final class IntObjectMap<E> extends IntSet {
   /** Values. */
   private Object[] values;
 
   /**
    * Default constructor.
    */
-  public IntObjMap() {
+  public IntObjectMap() {
     this(Array.INITIAL_CAPACITY);
   }
 
@@ -27,7 +27,7 @@ public final class IntObjMap<E> extends IntSet {
    * Constructor with initial capacity.
    * @param capacity array capacity (will be resized to a power of two)
    */
-  public IntObjMap(final long capacity) {
+  public IntObjectMap(final long capacity) {
     super(capacity);
     values = new Object[capacity()];
   }

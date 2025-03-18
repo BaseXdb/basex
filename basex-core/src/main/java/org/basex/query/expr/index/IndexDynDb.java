@@ -78,7 +78,7 @@ public final class IndexDynDb extends IndexDb {
   }
 
   @Override
-  public IndexDynDb copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public IndexDynDb copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new IndexDynDb(expr.copy(cc, vm), info));
   }
 

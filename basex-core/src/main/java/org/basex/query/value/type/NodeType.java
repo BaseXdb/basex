@@ -56,9 +56,11 @@ public enum NodeType implements Type {
   ELEMENT("element", NODE, ID.ELM) {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-      if(value instanceof BXElem)  return ((BXNode) value).getNode();
-      if(value instanceof Element) return FElem.build((Element) value, new TokenMap()).finish();
+        throws QueryException {
+      if(value instanceof BXElem)
+        return ((BXNode) value).getNode();
+      if(value instanceof Element)
+        return FElem.build((Element) value, new TokenObjectMap<>()).finish();
       try {
         return new DBNode(new IOContent(Token.token(value))).childIter().next();
       } catch(final IOException ex) {

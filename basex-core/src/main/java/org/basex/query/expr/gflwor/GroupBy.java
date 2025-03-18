@@ -119,7 +119,7 @@ public final class GroupBy extends Clause {
        */
       private Group[] init(final QueryContext qc) throws QueryException {
         final ArrayList<Group> grps = new ArrayList<>();
-        final IntObjMap<Group> map = new IntObjMap<>();
+        final IntObjectMap<Group> map = new IntObjectMap<>();
         final DeepEqual[] deeps = new DeepEqual[nonOcc];
         int c = 0;
         for(final GroupSpec spec : specs) {
@@ -252,7 +252,7 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  public GroupBy copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public GroupBy copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     // copy the pre-grouping expressions
     final Expr[] pEx = Arr.copyAll(cc, vm, preExpr);
 
@@ -278,7 +278,7 @@ public final class GroupBy extends Clause {
   }
 
   @Override
-  boolean clean(final IntObjMap<Var> decl, final BitArray used) {
+  boolean clean(final IntObjectMap<Var> decl, final BitArray used) {
     final int len = preExpr.length;
     for(int p = 0; p < post.length; p++) {
       if(!used.get(post[p].id)) {

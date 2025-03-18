@@ -102,7 +102,7 @@ public final class StructFilter extends AFilter {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new StructFilter(info, root, exprs));
   }
 

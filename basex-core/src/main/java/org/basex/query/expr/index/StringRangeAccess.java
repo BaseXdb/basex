@@ -108,7 +108,7 @@ public final class StringRangeAccess extends IndexAccess {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new StringRangeAccess(info, index, db.copy(cc, vm)));
   }
 

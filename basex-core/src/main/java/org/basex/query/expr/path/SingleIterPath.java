@@ -43,7 +43,7 @@ public final class SingleIterPath extends AxisPath {
   }
 
   @Override
-  public SingleIterPath copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public SingleIterPath copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new SingleIterPath(info, steps[0].copy(cc, vm)));
   }
 }

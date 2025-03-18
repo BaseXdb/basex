@@ -44,7 +44,7 @@ public class FnForEach extends StandardFunc {
     if(arity == 1 || arity == 2) {
       // for $i in INPUT return ACTION($i)
       // for $i at $p in INPUT return ACTION($i, $p)
-      final IntObjMap<Var> vm = new IntObjMap<>();
+      final IntObjectMap<Var> vm = new IntObjectMap<>();
       final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
       final Var p = arity != 1 ? cc.copy(new Var(new QNm("pos"), null, cc.qc, info), vm) : null;
       final For fr = new For(i, p, null, input, false).optimize(cc);

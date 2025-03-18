@@ -130,7 +130,7 @@ public final class VarScope {
    * @param cc compilation context
    * @param vm variable mapping
    */
-  public void copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public void copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     for(final Var var : vars) cc.copy(var, vm);
   }
 }

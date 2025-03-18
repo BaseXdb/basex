@@ -53,7 +53,7 @@ public class FnEvery extends StandardFunc {
     final boolean func = defined(1);
     final int arity = func ? arity(predicate) : 1;
     if(arity == 1 || arity == 2) {
-      final IntObjMap<Var> vm = new IntObjMap<>();
+      final IntObjectMap<Var> vm = new IntObjectMap<>();
       final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
       final Expr item = new VarRef(info, i).optimize(cc);
       final For fr;

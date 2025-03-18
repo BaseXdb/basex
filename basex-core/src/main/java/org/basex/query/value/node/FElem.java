@@ -57,7 +57,7 @@ public final class FElem extends FNode {
    * @param nsMap namespaces in scope
    * @return element builder
    */
-  public static FBuilder build(final Element elem, final TokenMap nsMap) {
+  public static FBuilder build(final Element elem, final TokenObjectMap<byte[]> nsMap) {
     final String nsUri = elem.getNamespaceURI();
     final QNm name = new QNm(elem.getNodeName(), nsUri == null ? Token.EMPTY : token(nsUri));
 
@@ -85,9 +85,9 @@ public final class FElem extends FNode {
     for(int n = 0; n < ns; n++) nsMap.put(nspaces.name(n), nspaces.value(n));
 
     // no parent, so we have to add all namespaces in scope
-    TokenMap namespaces = nsMap;
+    TokenObjectMap<byte[]> namespaces = nsMap;
     if(namespaces == null) {
-      namespaces = new TokenMap();
+      namespaces = new TokenObjectMap<>();
       nsScope(elem.getParentNode(), namespaces);
       for(final byte[] prefix : namespaces) {
         if(!nspaces.contains(prefix)) nspaces.add(prefix, namespaces.get(prefix));
@@ -99,7 +99,7 @@ public final class FElem extends FNode {
       nsMap.put(prefix, uri);
     }
     if(!nspaces.isEmpty()) builder.namespaces = nspaces;
-    children(elem, builder, new TokenMap());
+    children(elem, builder, new TokenObjectMap<>());
     return builder;
   }
 
@@ -122,7 +122,7 @@ public final class FElem extends FNode {
    * @param elem DOM element
    * @param nsMap map
    */
-  private static void nsScope(final Node elem, final TokenMap nsMap) {
+  private static void nsScope(final Node elem, final TokenObjectMap<byte[]> nsMap) {
     Node n = elem;
     // only elements can declare namespaces
     while(n instanceof Element) {

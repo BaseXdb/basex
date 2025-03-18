@@ -547,7 +547,7 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    */
   private boolean cleanDeadVars() {
-    final IntObjMap<Var> decl = new IntObjMap<>();
+    final IntObjectMap<Var> decl = new IntObjectMap<>();
     for(final Clause clause : clauses) {
       for(final Var var : clause.vars()) decl.put(var.id, var);
     }
@@ -1063,7 +1063,7 @@ public final class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final LinkedList<Clause> cls = new LinkedList<>();
     for(final Clause clause : clauses) cls.add(clause.copy(cc, vm));
     return copyType(new GFLWOR(info, cls, rtrn.copy(cc, vm)));

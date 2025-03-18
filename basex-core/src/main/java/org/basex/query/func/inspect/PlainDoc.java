@@ -54,7 +54,7 @@ final class PlainDoc extends Inspect {
       root.add(Q_PREFIX, name.string()).add(Q_URI, name.uri());
     }
 
-    final TokenObjMap<TokenList> doc = module.doc();
+    final TokenObjectMap<TokenList> doc = module.doc();
     if(doc != null) comment(doc, root);
     for(final StaticVar sv : module.vars) root.add(variable(sv));
     for(final StaticFunc sf : module.funcs) root.add(function(sf.name, sf, sf.funcType(), sf.anns));
@@ -99,7 +99,7 @@ final class PlainDoc extends Inspect {
     }
     function.add(Q_EXTERNAL, sf != null && sf.expr == null);
 
-    final TokenObjMap<TokenList> doc = sf != null ? sf.doc() : null;
+    final TokenObjectMap<TokenList> doc = sf != null ? sf.doc() : null;
     final int al = ft.argTypes.length;
     QNm[] names = null;
     if(sf != null) {
@@ -155,7 +155,7 @@ final class PlainDoc extends Inspect {
    * @throws QueryException query exception
    */
   private void comment(final StaticScope scope, final FBuilder parent) throws QueryException {
-    final TokenObjMap<TokenList> tags = scope.doc();
+    final TokenObjectMap<TokenList> tags = scope.doc();
     if(tags != null) comment(tags, parent);
   }
 

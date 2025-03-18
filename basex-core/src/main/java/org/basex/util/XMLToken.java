@@ -15,7 +15,7 @@ import org.basex.util.similarity.*;
  */
 public final class XMLToken {
   /** Index for all HTML entities (lazy initialization). */
-  private static TokenMap entities;
+  private static TokenObjectMap<byte[]> entities;
 
   /** Hidden constructor. */
   private XMLToken() { }
@@ -329,7 +329,7 @@ public final class XMLToken {
    * @return most similar entity or {@code null}
    */
   public static Object similarEntity(final byte[] key) {
-    final TokenMap map = entities();
+    final TokenObjectMap<byte[]> map = entities();
     final TokenList list = new TokenList(map.size());
     for(final byte[] entity : map) list.add(entity);
     return Levenshtein.similar(key, list.finish());
@@ -339,7 +339,7 @@ public final class XMLToken {
    * Returns the initialized entity map.
    * @return entity map
    */
-  private static TokenMap entities() {
+  private static TokenObjectMap<byte[]> entities() {
     if(entities == null) entities = Util.properties("entities.properties");
     return entities;
   }

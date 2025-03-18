@@ -147,7 +147,7 @@ final class DynJavaFunc extends DynJavaCall {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final DynJavaFunc f = new DynJavaFunc(clazz, name, types, copyAll(cc, vm, exprs), info);
     f.field = field;
     f.methods = methods;

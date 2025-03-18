@@ -99,7 +99,7 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
-  public abstract FTExpr copy(CompileContext cc, IntObjMap<Var> vm);
+  public abstract FTExpr copy(CompileContext cc, IntObjectMap<Var> vm);
 
   /**
    * Checks if sub expressions of a mild not operator violate the grammar.

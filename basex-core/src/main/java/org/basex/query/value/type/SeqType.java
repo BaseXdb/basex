@@ -226,18 +226,18 @@ public final class SeqType {
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
 
   /** The general record type. */
-  public static final RecordType RECORD = new RecordType(true, new TokenObjMap<>(), null);
+  public static final RecordType RECORD = new RecordType(true, new TokenObjectMap<>(), null);
   /** Pair record. */
   public static final RecordType PAIR;
   /** Member record. */
   public static final RecordType MEMBER;
 
   static {
-    TokenObjMap<RecordField> map = new TokenObjMap<>();
+    TokenObjectMap<RecordField> map = new TokenObjectMap<>();
     map.put(Str.KEY.string(), new RecordField(false, SeqType.ANY_ATOMIC_TYPE_O));
     map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
     PAIR = new RecordType(false, map, null);
-    map = new TokenObjMap<>();
+    map = new TokenObjectMap<>();
     map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
     MEMBER = new RecordType(false, map, null);
   }

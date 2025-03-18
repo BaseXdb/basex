@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  */
 public final class SharedData {
   /** Cached QNames. */
-  private final TokenObjMap<QNm> qnames = new TokenObjMap<>();
+  private final TokenObjectMap<QNm> qnames = new TokenObjectMap<>();
   /** Cached tokens. */
   private final WeakTokenSet tokens = new WeakTokenSet();
 

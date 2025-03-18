@@ -13,17 +13,17 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQItemObjMap extends XQHashMap {
+public final class XQItemValueMap extends XQHashMap {
   /** Hash map. */
-  private final ItemObjMap<Value> map;
+  private final ItemObjectMap<Value> map;
 
   /**
    * Constructor.
    * @param capacity initial capacity
    */
-  XQItemObjMap(final long capacity) {
+  XQItemValueMap(final long capacity) {
     super(capacity, SeqType.MAP);
-    map = new ItemObjMap<>(capacity);
+    map = new ItemObjectMap<>(capacity);
   }
 
   @Override

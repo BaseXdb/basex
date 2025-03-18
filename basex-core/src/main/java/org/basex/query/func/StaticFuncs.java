@@ -27,7 +27,7 @@ import org.basex.util.similarity.*;
  */
 public final class StaticFuncs extends ExprInfo {
   /** Function caches. */
-  private final TokenObjMap<FuncCache> caches = new TokenObjMap<>();
+  private final TokenObjectMap<FuncCache> caches = new TokenObjectMap<>();
   /** Function calls. */
   private Map<StaticFunc, ArrayList<StaticFuncCall>> callsMap;
 

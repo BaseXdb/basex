@@ -331,11 +331,11 @@ public final class Util {
    * @param name name of the property resource
    * @return property map
    */
-  public static TokenMap properties(final String name) {
+  public static TokenObjectMap<byte[]> properties(final String name) {
     final InputStream is = Util.class.getResourceAsStream('/' + name);
     if(is == null) throw notExpected("%: Property resource missing.", name);
 
-    final TokenMap map = new TokenMap();
+    final TokenObjectMap<byte[]> map = new TokenObjectMap<>();
     try(NewlineInput nli = new NewlineInput(is)) {
       for(String line; (line = nli.readLine()) != null;) {
         final int s = line.indexOf('=');

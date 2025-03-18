@@ -25,7 +25,7 @@ public abstract class AModule extends StaticScope {
   /** URIs of modules. */
   public TokenSet modules;
   /** Namespaces. */
-  public TokenMap namespaces;
+  public TokenObjectMap<byte[]> namespaces;
 
   /**
    * Constructor.
@@ -42,15 +42,16 @@ public abstract class AModule extends StaticScope {
    * @param tp public types
    * @param md URIs of modules
    * @param ns namespaces
-   * @param d documentation string
+   * @param dc documentation string
    */
   public void set(final ArrayList<StaticFunc> fn, final ArrayList<StaticVar> vr,
-      final QNmMap<SeqType> tp, final TokenSet md, final TokenMap ns, final String d) {
+      final QNmMap<SeqType> tp, final TokenSet md, final TokenObjectMap<byte[]> ns,
+      final String dc) {
     funcs = fn;
     vars = vr;
     types = tp;
     modules = md;
     namespaces = ns;
-    doc(d);
+    doc(dc);
   }
 }

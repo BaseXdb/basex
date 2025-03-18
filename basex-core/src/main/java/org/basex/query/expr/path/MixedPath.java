@@ -99,7 +99,7 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new MixedPath(info, root == null ? null : root.copy(cc, vm),
         Arr.copyAll(cc, vm, steps)));
   }

@@ -88,7 +88,7 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public Let copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Let copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Let(cc.copy(var, vm), expr.copy(cc, vm), scoring));
   }
 

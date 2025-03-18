@@ -261,7 +261,7 @@ public final class SerializerOptions extends Options {
         Util.info("Serialization parameter '%' is invalid.", USE_CHARACTER_MAPS.name()));
     if(elem.attributeIter().next() != null) throw error.get();
 
-    final TokenMap map = new TokenMap();
+    final TokenObjectMap<byte[]> map = new TokenObjectMap<>();
     for(final ANode child : elem.childIter()) {
       if(child.type != NodeType.ELEMENT) continue;
       final byte[] name = child.qname().local();

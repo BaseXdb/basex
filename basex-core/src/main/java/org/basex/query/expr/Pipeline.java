@@ -113,7 +113,7 @@ public final class Pipeline extends Mapping {
   }
 
   @Override
-  public Pipeline copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Pipeline copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Pipeline(info, Arr.copyAll(cc, vm, exprs)));
   }
 

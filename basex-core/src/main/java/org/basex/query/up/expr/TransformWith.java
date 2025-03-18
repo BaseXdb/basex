@@ -123,7 +123,7 @@ public final class TransformWith extends Copy {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new TransformWith(info,
         arg(target()).copy(cc, vm), arg(update()).copy(cc, vm)));
   }

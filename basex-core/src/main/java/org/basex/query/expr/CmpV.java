@@ -282,7 +282,7 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new CmpV(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), opV));
   }
 

@@ -123,7 +123,7 @@ public final class DynFuncCall extends FuncCall {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Expr[] copy = copyAll(cc, vm, exprs);
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);

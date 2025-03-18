@@ -39,7 +39,7 @@ public final class Lang {
     TEXTS.clear();
     CHECK.clear();
     final String path = SUFFIX + '/' + lang + '.' + SUFFIX;
-    final TokenMap map = Util.properties(path);
+    final TokenObjectMap<byte[]> map = Util.properties(path);
     for(final byte[] key : map) {
       final String name = Token.string(key), val = Token.string(map.get(key));
       if(TEXTS.put(name, val.replace("\n", Prop.NL)) != null) {

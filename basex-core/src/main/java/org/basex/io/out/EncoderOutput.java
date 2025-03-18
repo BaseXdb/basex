@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  */
 public final class EncoderOutput extends PrintOutput {
   /** Cache with encoded characters. */
-  private final IntObjMap<byte[]> cache = new IntObjMap<>();
+  private final IntObjectMap<byte[]> cache = new IntObjectMap<>();
   /** Charset encoder. */
   private final CharsetEncoder encoder;
   /** Character set. */

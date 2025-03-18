@@ -136,7 +136,7 @@ public class Arith extends Arr {
   }
 
   @Override
-  public Arith copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Arith copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Arith arith = new Arith(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), calc);
     arith.calcOpt = calcOpt;
     return copyType(arith);

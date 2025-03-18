@@ -36,7 +36,7 @@ public abstract class Clause extends ParseExpr {
    * @return {@code true} if something changed, {@code false} otherwise
    */
   @SuppressWarnings("unused")
-  boolean clean(final IntObjMap<Var> decl, final BitArray used) {
+  boolean clean(final IntObjectMap<Var> decl, final BitArray used) {
     return false;
   }
 
@@ -57,7 +57,7 @@ public abstract class Clause extends ParseExpr {
   public abstract Clause inline(InlineContext ic) throws QueryException;
 
   @Override
-  public abstract Clause copy(CompileContext cc, IntObjMap<Var> vm);
+  public abstract Clause copy(CompileContext cc, IntObjectMap<Var> vm);
 
   /**
    * Checks if the given clause (currently: let or where) can be slid over this clause.

@@ -49,7 +49,7 @@ public abstract class IndexDb extends ParseExpr {
   public abstract IndexDb inline(InlineContext ic) throws QueryException;
 
   @Override
-  public abstract IndexDb copy(CompileContext cc, IntObjMap<Var> vm);
+  public abstract IndexDb copy(CompileContext cc, IntObjectMap<Var> vm);
 
   @Override
   public boolean equals(final Object obj) {

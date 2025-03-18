@@ -93,7 +93,8 @@ public abstract class FNode extends ANode {
    * @param builder parent node
    * @param nsMap namespace map
    */
-  static void children(final Node node, final FBuilder builder, final TokenMap nsMap) {
+  static void children(final Node node, final FBuilder builder,
+      final TokenObjectMap<byte[]> nsMap) {
     final NodeList ch = node.getChildNodes();
     final int cl = ch.getLength();
     for(int c = 0; c < cl; ++c) {

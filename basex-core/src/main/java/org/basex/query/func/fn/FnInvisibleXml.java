@@ -131,7 +131,7 @@ public final class FnInvisibleXml extends StandardFunc {
     }
 
     @Override
-    public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
       return copyType(new ParseInvisibleXml(info, parser, copyAll(cc, vm, args())));
     }
 

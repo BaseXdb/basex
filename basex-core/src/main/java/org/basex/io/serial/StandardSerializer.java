@@ -29,7 +29,7 @@ public abstract class StandardSerializer extends OutputSerializer {
   /** Normalization form. */
   protected final Form form;
   /** Character map. */
-  protected final IntObjMap<byte[]> map;
+  protected final IntObjectMap<byte[]> map;
 
   /** Include separator. */
   protected boolean sep;
@@ -61,7 +61,7 @@ public abstract class StandardSerializer extends OutputSerializer {
     if(sopts.get(USE_CHARACTER_MAPS).isEmpty()) {
       map = null;
     } else {
-      map = new IntObjMap<>();
+      map = new IntObjectMap<>();
       for(final Map.Entry<String, String> entry : sopts.toMap(USE_CHARACTER_MAPS).entrySet()) {
         final String key = entry.getKey();
         if(key.codePoints().count() != 1) throw SERPARAM_X.getIO(

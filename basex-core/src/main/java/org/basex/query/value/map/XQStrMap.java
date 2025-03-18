@@ -8,24 +8,24 @@ import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
 
 /**
- * Unmodifiable hash map implementation for strings and values.
+ * Unmodifiable hash map implementation for strings.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQTokenObjMap extends XQHashMap {
+public final class XQStrMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.ITEM_ZM);
+  private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.STRING_O);
   /** Hash map. */
-  private final TokenObjMap<Value> map;
+  private final TokenObjectMap<byte[]> map;
 
   /**
    * Constructor.
    * @param capacity initial capacity
    */
-  XQTokenObjMap(final long capacity) {
+  XQStrMap(final long capacity) {
     super(capacity, TYPE);
-    map = new TokenObjMap<>(capacity);
+    map = new TokenObjectMap<>(capacity);
   }
 
   @Override
@@ -34,7 +34,7 @@ public final class XQTokenObjMap extends XQHashMap {
   }
 
   @Override
-  Value getInternal(final Item key) throws QueryException {
+  Str getInternal(final Item key) throws QueryException {
     if(key.type.isStringOrUntyped()) {
       final int id = map.id(key.string(null));
       if(id != 0) return valueInternal(id);
@@ -53,17 +53,20 @@ public final class XQTokenObjMap extends XQHashMap {
   }
 
   @Override
-  Value valueInternal(final int pos) {
-    return map.value(pos);
+  Str valueInternal(final int pos) {
+    return Str.get(map.value(pos));
   }
 
   @Override
   XQHashMap build(final Item key, final Value value) throws QueryException {
-    final byte[] k = toString(key);
+    final byte[] k = toString(key), v = toString(value);
     if(k != null) {
-      map.put(k, value);
-      return this;
+      if(v != null) {
+        map.put(k, v);
+        return this;
+      }
+      return new XQStrValueMap(capacity).build(this).build(key, value);
     }
-    return new XQItemObjMap(capacity).build(this).build(key, value);
+    return new XQItemValueMap(capacity).build(this).build(key, value);
   }
 }

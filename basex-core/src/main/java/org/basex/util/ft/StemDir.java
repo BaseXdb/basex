@@ -1,5 +1,7 @@
 package org.basex.util.ft;
 
+import static org.basex.util.Token.*;
+
 import java.io.*;
 
 import org.basex.io.*;
@@ -14,7 +16,7 @@ import org.basex.util.hash.*;
  */
 public final class StemDir {
   /** Map. */
-  private final TokenMap map = new TokenMap();
+  private final TokenObjectMap<byte[]> map = new TokenObjectMap<>();
 
   /**
    * Reads a stop words file.
@@ -26,7 +28,7 @@ public final class StemDir {
       for(final String line : fl.string().split("\\n")) {
         final String[] terms = line.split("\\s+");
         final int tl = terms.length;
-        for(int t = 1; t < tl; t++) map.put(terms[t], terms[0]);
+        for(int t = 1; t < tl; t++) map.put(token(terms[t]), token(terms[0]));
       }
       return true;
     } catch(final IOException ex) {

@@ -298,7 +298,7 @@ final class Docs {
    * @param map map with resource types
    */
   synchronized void children(final String path, final boolean dir,
-      final TokenObjMap<ResourceType> map) {
+      final TokenObjectMap<ResourceType> map) {
 
     final String pth = MetaData.normPath(path);
     if(pth == null) return;

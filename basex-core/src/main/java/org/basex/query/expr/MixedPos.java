@@ -70,7 +70,7 @@ final class MixedPos extends Single implements CmpPos {
   }
 
   @Override
-  public MixedPos copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public MixedPos copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new MixedPos(info, expr.copy(cc, vm)));
   }
 

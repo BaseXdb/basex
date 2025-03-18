@@ -111,7 +111,7 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final VarScope vsc = new VarScope();
     cc.pushScope(vsc);
     try {

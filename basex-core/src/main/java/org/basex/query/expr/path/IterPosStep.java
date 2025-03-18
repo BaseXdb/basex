@@ -81,7 +81,7 @@ public final class IterPosStep extends Step {
   }
 
   @Override
-  public Step copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Step copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new IterPosStep(info, axis, test.copy(), Arr.copyAll(cc, vm, exprs)));
   }
 }

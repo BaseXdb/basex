@@ -140,7 +140,7 @@ public final class Union extends Set {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Union un = new Union(info, copyAll(cc, vm, exprs));
     un.iterative = iterative;
     return copyType(un);

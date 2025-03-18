@@ -127,7 +127,7 @@ public class FnAtomicTypeAnnotation extends StandardFunc {
     }
 
     @Override
-    public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
       return new TypeAnnotation(info, type);
     }
 
@@ -178,7 +178,7 @@ public class FnAtomicTypeAnnotation extends StandardFunc {
     }
 
     @Override
-    public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+    public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
       return new Matches(info, type, copyAll(cc, vm, args()));
     }
 

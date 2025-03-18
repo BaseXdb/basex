@@ -29,7 +29,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
   private final boolean lax;
 
   /** Contents of current row. */
-  private TokenMap data;
+  private TokenObjectMap<byte[]> data;
   /** Current attribute value. */
   private byte[] attv;
 
@@ -49,7 +49,7 @@ public final class CsvDirectSerializer extends CsvSerializer {
 
   @Override
   protected void startOpen(final QNm name) {
-    if(level == 1) data = new TokenMap();
+    if(level == 1) data = new TokenObjectMap<>();
     attv = null;
   }
 

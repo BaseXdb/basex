@@ -24,7 +24,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
   /** Extensible flag. */
   private boolean extensible;
   /** Record fields. */
-  private TokenObjMap<RecordField> fields;
+  private TokenObjectMap<RecordField> fields;
   /** Record type name (can be {@code null}). */
   private final QNm name;
   /** Input info ({@code null}, if this is not an unresolved reference). */
@@ -36,7 +36,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
    * @param fields field declarations
    * @param name record type name (can be {@code null})
    */
-  public RecordType(final boolean extensible, final TokenObjMap<RecordField> fields,
+  public RecordType(final boolean extensible, final TokenObjectMap<RecordField> fields,
       final QNm name) {
     super(extensible ? AtomType.ANY_ATOMIC_TYPE : AtomType.STRING,
         extensible ? SeqType.ITEM_ZM : unionType(fields));
@@ -54,7 +54,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
   public RecordType(final QNm name, final InputInfo info) {
     super(AtomType.ANY_ATOMIC_TYPE, SeqType.ITEM_ZM, false);
     this.extensible = true;
-    this.fields = new TokenObjMap<>();
+    this.fields = new TokenObjectMap<>();
     this.name = name;
     this.info = info;
   }
@@ -64,7 +64,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
    * @param recordFields field declarations
    * @return union type
    */
-  private static SeqType unionType(final TokenObjMap<RecordField> recordFields) {
+  private static SeqType unionType(final TokenObjectMap<RecordField> recordFields) {
     if(recordFields.isEmpty()) return SeqType.ITEM_ZM;
     SeqType unionType = null;
     for(final RecordField recordField : recordFields.values()) {
@@ -269,7 +269,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
 
     if(type instanceof RecordType) {
       final RecordType rt = (RecordType) type;
-      final TokenObjMap<RecordField> map = new TokenObjMap<>();
+      final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
       for(final byte[] field : fields) {
         final RecordField f = fields.get(field);
         if(rt.fields.contains(field)) {
@@ -327,7 +327,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
 
     if(!(type instanceof RecordType)) return null;
     final RecordType rt = (RecordType) type;
-    final TokenObjMap<RecordField> map = new TokenObjMap<>();
+    final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
     for(final byte[] field : fields) {
       final RecordField f = fields.get(field);
       if(rt.fields.contains(field)) {

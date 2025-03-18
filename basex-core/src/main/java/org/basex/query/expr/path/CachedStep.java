@@ -58,7 +58,7 @@ public final class CachedStep extends Step {
   }
 
   @Override
-  public Step copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Step copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new CachedStep(info, axis, test.copy(), copyAll(cc, vm, exprs)));
   }
 }

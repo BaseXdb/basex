@@ -79,7 +79,7 @@ public final class DualIterMap extends SimpleMap {
   }
 
   @Override
-  public DualIterMap copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public DualIterMap copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new DualIterMap(info, Arr.copyAll(cc, vm, exprs)));
   }
 

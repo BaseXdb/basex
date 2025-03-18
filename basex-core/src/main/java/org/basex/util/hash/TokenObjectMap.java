@@ -12,14 +12,14 @@ import org.basex.util.*;
  * @author Christian Gruen
  * @param <E> generic value type
  */
-public final class TokenObjMap<E> extends TokenSet {
+public final class TokenObjectMap<E> extends TokenSet {
   /** Values. */
   private Object[] values;
 
   /**
    * Default constructor.
    */
-  public TokenObjMap() {
+  public TokenObjectMap() {
     this(Array.INITIAL_CAPACITY);
   }
 
@@ -27,7 +27,7 @@ public final class TokenObjMap<E> extends TokenSet {
    * Constructor with initial capacity.
    * @param capacity array capacity (will be resized to a power of two)
    */
-  public TokenObjMap(final long capacity) {
+  public TokenObjectMap(final long capacity) {
     super(capacity);
     values = new Object[capacity()];
   }

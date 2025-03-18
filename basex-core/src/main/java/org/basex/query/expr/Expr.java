@@ -257,7 +257,7 @@ public abstract class Expr extends ExprInfo {
    *           Required by {@link Closure#copy} and {@link VarRef#copy}
    * @return copied expression
    */
-  public abstract Expr copy(CompileContext cc, IntObjMap<Var> vm);
+  public abstract Expr copy(CompileContext cc, IntObjectMap<Var> vm);
 
   /**
    * Simplifies the expression. Overwritten by many expressions;

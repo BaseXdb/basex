@@ -13,7 +13,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQTokenIntMap extends XQHashMap {
+public final class XQStrIntMap extends XQHashMap {
   /** Map type. */
   private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.INTEGER_O);
   /** Hash map. */
@@ -23,7 +23,7 @@ public final class XQTokenIntMap extends XQHashMap {
    * Constructor.
    * @param capacity initial capacity
    */
-  XQTokenIntMap(final long capacity) {
+  XQStrIntMap(final long capacity) {
     super(capacity, TYPE);
     map = new TokenIntMap(capacity);
   }
@@ -66,8 +66,8 @@ public final class XQTokenIntMap extends XQHashMap {
         map.put(k, v);
         return this;
       }
-      return new XQTokenObjMap(capacity).build(this).build(key, value);
+      return new XQStrValueMap(capacity).build(this).build(key, value);
     }
-    return new XQItemObjMap(capacity).build(this).build(key, value);
+    return new XQItemValueMap(capacity).build(this).build(key, value);
   }
 }

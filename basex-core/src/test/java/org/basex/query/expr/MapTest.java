@@ -434,13 +434,13 @@ public final class MapTest extends SandboxTest {
     check("map:merge(({ 1: 1 }, { 2: 2 }, { 3: 3 }))",
         "{1:1,2:2,3:3}", root(XQIntMap.class));
     check("map:merge(({ 1: 1 }, { 2: '2' }, { 3: '3' }))",
-        "{1:1,2:\"2\",3:\"3\"}", root(XQIntObjMap.class));
+        "{1:1,2:\"2\",3:\"3\"}", root(XQIntValueMap.class));
     check("map:merge(({ 1: 1 }, { 2: '2' }, { '3': '3' }))",
-        "{1:1,2:\"2\",\"3\":\"3\"}", root(XQItemObjMap.class));
+        "{1:1,2:\"2\",\"3\":\"3\"}", root(XQItemValueMap.class));
     check("map:merge(({ 1: 1 }, { '2': '2' }, { '3': '3' }))",
-        "{1:1,\"2\":\"2\",\"3\":\"3\"}", root(XQItemObjMap.class));
+        "{1:1,\"2\":\"2\",\"3\":\"3\"}", root(XQItemValueMap.class));
     check("map:merge(({ 1: 1 }, { '2': '2' }, { 3: 3 }))",
-        "{1:1,\"2\":\"2\",3:3}", root(XQItemObjMap.class));
+        "{1:1,\"2\":\"2\",3:3}", root(XQItemValueMap.class));
 
     query("map:build('1')", "{\"1\":\"1\"}");
     query("map:build('1') => map:keys()", 1);
@@ -454,20 +454,20 @@ public final class MapTest extends SandboxTest {
     query("map:build(xs:token('1')) -> map:keys(.) -> (. instance of xs:token)", true);
 
     check("map:merge(({ '1': '1' }, { '2': '2' }, { '3': '3' }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\"}", root(XQTokenMap.class));
+        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\"}", root(XQStrMap.class));
     check("map:merge(({ '1': '1' }, { '2': '2' }, { '3': 3 }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":3}", root(XQTokenObjMap.class));
+        "{\"1\":\"1\",\"2\":\"2\",\"3\":3}", root(XQStrValueMap.class));
     check("map:merge(({ '1': '1' }, { '2': '2' }, { 3: '3' }))",
-        "{\"1\":\"1\",\"2\":\"2\",3:\"3\"}", root(XQItemObjMap.class));
+        "{\"1\":\"1\",\"2\":\"2\",3:\"3\"}", root(XQItemValueMap.class));
     check("map:merge(({ '1': '1' }, { 2: 2 }, { 3: 3 }))",
-        "{\"1\":\"1\",2:2,3:3}", root(XQItemObjMap.class));
+        "{\"1\":\"1\",2:2,3:3}", root(XQItemValueMap.class));
     check("map:merge(({ '1': '1' }, { 2: 2 }, { '3': '3' }))",
-        "{\"1\":\"1\",2:2,\"3\":\"3\"}", root(XQItemObjMap.class));
+        "{\"1\":\"1\",2:2,\"3\":\"3\"}", root(XQItemValueMap.class));
 
     check("map:merge(({ 1: '1' }, { 2: '2' }, { 3: '3' }))",
-        "{1:\"1\",2:\"2\",3:\"3\"}", root(XQIntTokenMap.class));
+        "{1:\"1\",2:\"2\",3:\"3\"}", root(XQIntStrMap.class));
     check("map:merge(({ 1: '1' }, { 2: '2' }, { 3: 3 }))",
-        "{1:\"1\",2:\"2\",3:3}", root(XQIntObjMap.class));
+        "{1:\"1\",2:\"2\",3:3}", root(XQIntValueMap.class));
   }
 
   /** Tests string maps. */
@@ -490,13 +490,13 @@ public final class MapTest extends SandboxTest {
     check("map:merge(({ 1: 1 }, { 2: 2 }, { 3: 3 }))",
         "{1:1,2:2,3:3}", root(XQIntMap.class));
     check("map:merge(({ 1: 1 }, { 2: '2' }, { 3: '3' }))",
-        "{1:1,2:\"2\",3:\"3\"}", root(XQIntObjMap.class));
+        "{1:1,2:\"2\",3:\"3\"}", root(XQIntValueMap.class));
     check("map:merge(({ 1: 1 }, { 2: '2' }, { '3': '3' }))",
-        "{1:1,2:\"2\",\"3\":\"3\"}", root(XQItemObjMap.class));
+        "{1:1,2:\"2\",\"3\":\"3\"}", root(XQItemValueMap.class));
     check("map:merge(({ 1: 1 }, { '2': '2' }, { '3': '3' }))",
-        "{1:1,\"2\":\"2\",\"3\":\"3\"}", root(XQItemObjMap.class));
+        "{1:1,\"2\":\"2\",\"3\":\"3\"}", root(XQItemValueMap.class));
     check("map:merge(({ 1: 1 }, { '2': '2' }, { 3: 3 }))",
-        "{1:1,\"2\":\"2\",3:3}", root(XQItemObjMap.class));
+        "{1:1,\"2\":\"2\",3:3}", root(XQItemValueMap.class));
 
     query("map:build('1')", "{\"1\":\"1\"}");
     query("map:build('1') => map:keys()", 1);
@@ -510,19 +510,19 @@ public final class MapTest extends SandboxTest {
     query("map:build(xs:token('1')) -> map:keys(.) -> (. instance of xs:token)", true);
 
     check("map:merge(({ '1': '1' }, { '2': '2' }, { '3': '3' }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\"}", root(XQTokenMap.class));
+        "{\"1\":\"1\",\"2\":\"2\",\"3\":\"3\"}", root(XQStrMap.class));
     check("map:merge(({ '1': '1' }, { '2': '2' }, { '3': 3 }))",
-        "{\"1\":\"1\",\"2\":\"2\",\"3\":3}", root(XQTokenObjMap.class));
+        "{\"1\":\"1\",\"2\":\"2\",\"3\":3}", root(XQStrValueMap.class));
     check("map:merge(({ '1': '1' }, { '2': '2' }, { 3: '3' }))",
-        "{\"1\":\"1\",\"2\":\"2\",3:\"3\"}", root(XQItemObjMap.class));
+        "{\"1\":\"1\",\"2\":\"2\",3:\"3\"}", root(XQItemValueMap.class));
     check("map:merge(({ '1': '1' }, { 2: 2 }, { 3: 3 }))",
-        "{\"1\":\"1\",2:2,3:3}", root(XQItemObjMap.class));
+        "{\"1\":\"1\",2:2,3:3}", root(XQItemValueMap.class));
     check("map:merge(({ '1': '1' }, { 2: 2 }, { '3': '3' }))",
-        "{\"1\":\"1\",2:2,\"3\":\"3\"}", root(XQItemObjMap.class));
+        "{\"1\":\"1\",2:2,\"3\":\"3\"}", root(XQItemValueMap.class));
 
     check("map:merge(({ '1': 1 }, { '2': 2 }, { '3': 3 }))",
-        "{\"1\":1,\"2\":2,\"3\":3}", root(XQTokenIntMap.class));
+        "{\"1\":1,\"2\":2,\"3\":3}", root(XQStrIntMap.class));
     check("map:merge(({ '1': 1 }, { '2': 2 }, { '3': '3' }))",
-        "{\"1\":1,\"2\":2,\"3\":\"3\"}", root(XQTokenObjMap.class));
+        "{\"1\":1,\"2\":2,\"3\":\"3\"}", root(XQStrValueMap.class));
   }
 }

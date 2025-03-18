@@ -190,7 +190,7 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  public OrderBy copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public OrderBy copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new OrderBy(Arr.copyAll(cc, vm, refs), Arr.copyAll(cc, vm, keys), info));
   }
 
@@ -200,7 +200,7 @@ public final class OrderBy extends Clause {
   }
 
   @Override
-  boolean clean(final IntObjMap<Var> decl, final BitArray used) {
+  boolean clean(final IntObjectMap<Var> decl, final BitArray used) {
     // delete unused variables
     final int len = refs.length;
     for(int r = refs.length; --r >= 0;) {

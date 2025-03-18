@@ -53,7 +53,7 @@ public final class LookupArrow extends Arr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new LookupArrow(info, name, copyAll(cc, vm, exprs)));
   }
 

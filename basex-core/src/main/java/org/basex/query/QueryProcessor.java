@@ -1,5 +1,7 @@
 package org.basex.query;
 
+import static org.basex.util.Token.*;
+
 import java.io.*;
 
 import org.basex.core.*;
@@ -215,7 +217,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * @param file file name
    */
   public void module(final String uri, final String file) {
-    qc.modDeclared.put(uri, file);
+    qc.modDeclared.put(token(uri), token(file));
   }
 
   @Override

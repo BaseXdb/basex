@@ -71,7 +71,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Var nw = vm.get(var.id);
     return new VarRef(info, nw != null ? nw : var).assignType();
   }

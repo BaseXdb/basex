@@ -83,7 +83,7 @@ public final class While extends Clause {
   }
 
   @Override
-  public While copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public While copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new While(expr.copy(cc, vm), info));
   }
 

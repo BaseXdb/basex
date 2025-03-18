@@ -97,7 +97,7 @@ public final class QueryContext extends Job implements Closeable {
   public boolean scoring;
 
   /** Available collations. */
-  public TokenObjMap<Collation> collations;
+  public TokenObjectMap<Collation> collations;
   /** Perform tail-call optimizations. */
   public boolean tco;
 
@@ -109,11 +109,11 @@ public final class QueryContext extends Job implements Closeable {
   public int varIDs;
 
   /** Parsed modules, containing the file path and module uri. */
-  public final TokenMap modParsed = new TokenMap();
+  public final TokenObjectMap<byte[]> modParsed = new TokenObjectMap<>();
   /** Parsed modules, containing the file path and library module. */
-  public final TokenObjMap<LibraryModule> libs = new TokenObjMap<>();
+  public final TokenObjectMap<LibraryModule> libs = new TokenObjectMap<>();
   /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
-  public final TokenMap modDeclared = new TokenMap();
+  public final TokenObjectMap<byte[]> modDeclared = new TokenObjectMap<>();
   /** Stack of module files that are currently parsed. */
   public final TokenList modStack = new TokenList();
 

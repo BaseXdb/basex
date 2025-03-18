@@ -136,7 +136,7 @@ public final class TypeCheck extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final TypeCheck ex = copyType(new TypeCheck(info, expr.copy(cc, vm), seqType()));
     ex.check = check;
     return ex;

@@ -43,7 +43,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   final BoolList addValues = new BoolList();
 
   /** Map from element name to a pair of all its nodes and the collective node type. */
-  private final TokenObjMap<TypeCache> names = new TokenObjMap<>();
+  private final TokenObjectMap<TypeCache> names = new TokenObjectMap<>();
   /** Store types in root. */
   private final boolean merge;
   /** Include string type. */

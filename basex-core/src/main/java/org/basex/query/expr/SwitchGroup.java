@@ -58,7 +58,7 @@ public final class SwitchGroup extends Arr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new SwitchGroup(info, copyAll(cc, vm, exprs)));
   }
 

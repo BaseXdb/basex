@@ -44,7 +44,7 @@ public final class FnIndexWhere extends StandardFunc {
     final int arity = arity(predicate);
     if(arity >= 1) {
       // for $i at $p in INPUT where PREDICATE($i, $p) return $p
-      final IntObjMap<Var> vm = new IntObjMap<>();
+      final IntObjectMap<Var> vm = new IntObjectMap<>();
       final LinkedList<Clause> clauses = new LinkedList<>();
 
       final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);

@@ -120,7 +120,7 @@ final class ProjectFiles {
       if(id != parseId) throw new InterruptedException();
       if(parsed.contains(path)) continue;
 
-      final TokenMap modules = parse(path, ctx, errs);
+      final TokenObjectMap<byte[]> modules = parse(path, ctx, errs);
       if(modules != null) {
         for(final byte[] mod : modules) parsed.add(Token.string(mod));
       }
@@ -135,7 +135,7 @@ final class ProjectFiles {
    * @param errors files with errors
    * @return parsed modules or {@code null}
    */
-  static TokenMap parse(final String path, final Context ctx,
+  static TokenObjectMap<byte[]> parse(final String path, final Context ctx,
       final TreeMap<String, InputInfo> errors) {
 
     try(TextInput ti = new TextInput(new IOFile(path))) {

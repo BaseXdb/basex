@@ -151,7 +151,7 @@ public final class RequestContext {
    * @throws QueryException query exception
    */
   private static void addParams(final String params, final MapBuilder mb) throws QueryException {
-    final ItemObjMap<ItemList> map = new ItemObjMap<>();
+    final ItemObjectMap<ItemList> map = new ItemObjectMap<>();
     for(final String param : Strings.split(params, '&')) {
       final String[] parts = Strings.split(param, '=', 2);
       if(parts.length == 2) {

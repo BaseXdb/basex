@@ -25,7 +25,7 @@ import org.xml.sax.*;
  */
 public final class StaticContext {
   /** Decimal formats. */
-  public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<>();
+  public final TokenObjectMap<DecFormatter> decFormats = new TokenObjectMap<>();
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
   /** Mix updates flag. */

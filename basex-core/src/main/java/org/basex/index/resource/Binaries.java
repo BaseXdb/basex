@@ -56,7 +56,7 @@ final class Binaries {
    * @param map paths and resource types
    */
   synchronized void children(final String path, final boolean dir,
-      final TokenObjMap<ResourceType> map) {
+      final TokenObjectMap<ResourceType> map) {
 
     for(final ResourceType type : Resources.BINARIES) {
       final IOFile bin = data.meta.file(path, type);

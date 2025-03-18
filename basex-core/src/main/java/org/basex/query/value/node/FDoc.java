@@ -63,7 +63,7 @@ public final class FDoc extends FNode {
    */
   public static FBuilder build(final String uri, final DocumentFragment doc) {
     final FBuilder builder = build(Token.token(uri));
-    children(doc, builder, new TokenMap());
+    children(doc, builder, new TokenObjectMap<>());
     return builder;
   }
 

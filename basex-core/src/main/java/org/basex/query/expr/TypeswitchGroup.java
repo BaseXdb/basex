@@ -85,7 +85,7 @@ public final class TypeswitchGroup extends Single {
   Expr rewrite(final Expr cond, final CompileContext cc) throws QueryException {
     if(var == null) return cc.voidAndReturn(cond, expr, info);
 
-    final IntObjMap<Var> vm = new IntObjMap<>();
+    final IntObjectMap<Var> vm = new IntObjectMap<>();
     final Let let = new Let(cc.copy(var, vm), cond).optimize(cc);
     final Expr rtrn = expr.copy(cc, vm).optimize(cc);
     return new GFLWOR(info, let, rtrn).optimize(cc);
@@ -157,7 +157,7 @@ public final class TypeswitchGroup extends Single {
   }
 
   @Override
-  public TypeswitchGroup copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public TypeswitchGroup copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new TypeswitchGroup(info, cc.copy(var, vm), seqTypes.clone(),
         expr.copy(cc, vm)));
   }

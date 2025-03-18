@@ -89,7 +89,7 @@ final class DynJavaConstr extends DynJavaCall {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final DynJavaConstr c = new DynJavaConstr(clazz, types, copyAll(cc, vm, exprs), info);
     c.constrs = constrs;
     return copyType(c);

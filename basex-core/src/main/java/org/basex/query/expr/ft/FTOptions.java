@@ -57,7 +57,7 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public FTExpr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new FTOptions(info, exprs[0].copy(cc, vm), new FTOpt().assign(opt)));
   }
 

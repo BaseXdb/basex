@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
  */
 public final class DBPut extends DBUpdate {
   /** Values to be stored. */
-  private final TokenObjMap<Value> paths = new TokenObjMap<>();
+  private final TokenObjectMap<Value> paths = new TokenObjectMap<>();
 
   /**
    * Constructor.
@@ -59,7 +59,7 @@ public final class DBPut extends DBUpdate {
 
   @Override
   public void merge(final Update update) throws QueryException {
-    final TokenObjMap<Value> put = ((DBPut) update).paths;
+    final TokenObjectMap<Value> put = ((DBPut) update).paths;
     for(final byte[] path : put) {
       if(paths.contains(path)) throw DB_CONFLICT5_X.get(info, path);
       paths.put(path, put.get(path));

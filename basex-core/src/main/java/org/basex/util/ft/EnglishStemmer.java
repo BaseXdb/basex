@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  */
 final class EnglishStemmer extends InternalStemmer {
   /** Dictionary with most frequent terms. */
-  private static final TokenMap DICTIONARY = Util.properties("stemmer-en.properties");
+  private static final TokenObjectMap<byte[]> DICTIONARY = Util.properties("stemmer-en.properties");
 
   /** Stemming character. */
   private static final byte[] AT = token("at");

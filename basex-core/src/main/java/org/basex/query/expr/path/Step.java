@@ -214,7 +214,7 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public abstract Step copy(CompileContext cc, IntObjMap<Var> vm);
+  public abstract Step copy(CompileContext cc, IntObjectMap<Var> vm);
 
   /**
    * Returns the path nodes that are the result of this step.

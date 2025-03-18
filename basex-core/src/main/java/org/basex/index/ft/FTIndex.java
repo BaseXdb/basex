@@ -56,7 +56,7 @@ public final class FTIndex extends ValueIndex {
   private static final int ENTRY = 9;
 
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  private final IntObjMap<byte[]> ctext = new IntObjMap<>();
+  private final IntObjectMap<byte[]> ctext = new IntObjectMap<>();
   /** Levenshtein reference. */
   private final Levenshtein ls = new Levenshtein();
 

@@ -44,7 +44,7 @@ public final class OrderKey extends Single {
   }
 
   @Override
-  public OrderKey copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public OrderKey copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new OrderKey(info, expr.copy(cc, vm), desc, least, coll));
   }
 

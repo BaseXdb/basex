@@ -365,7 +365,7 @@ public final class FnElementsToMaps extends StandardFunc {
         if(!empty(children(NodeType.TEXT, node))) return MIXED.apply(node, parent, format);
 
         final MapBuilder map = attributes(node, format);
-        final TokenObjMap<ANodeList> cache = new TokenObjMap<>();
+        final TokenObjectMap<ANodeList> cache = new TokenObjectMap<>();
         for(final ANode child : children(NodeType.ELEMENT, node)) {
           cache.computeIfAbsent(nodeName(child, node, format), ANodeList::new).add(child);
         }

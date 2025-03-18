@@ -18,7 +18,7 @@ public final class ClientSessions implements QueryResource {
   /** Last inserted id. */
   private int lastId = -1;
   /** Map with all open sessions and their ids. */
-  private final TokenObjMap<ClientSession> conns = new TokenObjMap<>();
+  private final TokenObjectMap<ClientSession> conns = new TokenObjectMap<>();
 
   /**
    * Adds a session.

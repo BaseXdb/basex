@@ -26,20 +26,20 @@ public final class Thesaurus {
   private static final byte[] TERM = token("term");
 
   /** Map with thesaurus entries. */
-  private final TokenObjMap<ThesEntry> entries = new TokenObjMap<>();
+  private final TokenObjectMap<ThesEntry> entries = new TokenObjectMap<>();
   /** Relationships. */
-  private static final TokenMap RSHIPS = new TokenMap();
+  private static final TokenObjectMap<byte[]> RSHIPS = new TokenObjectMap<>();
 
   static {
-    RSHIPS.put("NT", "BT");
-    RSHIPS.put("BT", "BT");
-    RSHIPS.put("BTG", "NTG");
-    RSHIPS.put("NTG", "BTG");
-    RSHIPS.put("BTP", "NTP");
-    RSHIPS.put("NTP", "BTP");
-    RSHIPS.put("USE", "UF");
-    RSHIPS.put("UF", "USE");
-    RSHIPS.put("RT", "RT");
+    RSHIPS.put(token("NT"), token("BT"));
+    RSHIPS.put(token("BT"), token("BT"));
+    RSHIPS.put(token("BTG"), token("NTG"));
+    RSHIPS.put(token("NTG"), token("BTG"));
+    RSHIPS.put(token("BTP"), token("NTP"));
+    RSHIPS.put(token("NTP"), token("BTP"));
+    RSHIPS.put(token("USE"), token("UF"));
+    RSHIPS.put(token("UF"), token("USE"));
+    RSHIPS.put(token("RT"), token("RT"));
   }
 
   /**

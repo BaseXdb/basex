@@ -63,7 +63,7 @@ public final class CRecord extends Arr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new CRecord(info, recordType, copyAll(cc, vm, args())));
   }
 

@@ -180,7 +180,7 @@ public final class Pos extends Single {
   }
 
   @Override
-  public Pos copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Pos copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Pos(info, expr.copy(cc, vm)));
   }
 

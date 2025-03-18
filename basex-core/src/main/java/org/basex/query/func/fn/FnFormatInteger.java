@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  */
 public final class FnFormatInteger extends StandardFunc {
   /** Pattern cache. */
-  private final TokenObjMap<IntFormat> formats = new TokenObjMap<>();
+  private final TokenObjectMap<IntFormat> formats = new TokenObjectMap<>();
 
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {

@@ -208,7 +208,7 @@ public class CmpG extends Cmp {
     if(expr == this && expr1 instanceof If && !expr1.has(Flag.NDT)) {
       final If iff = (If) expr1;
       final Expr thn = new CmpG(info, iff.arg(0), expr2, op);
-      final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjMap<>()), op);
+      final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjectMap<>()), op);
       return new If(info, iff.cond, thn.optimize(cc), els.optimize(cc)).optimize(cc);
     }
 
@@ -585,7 +585,7 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public CmpG copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public CmpG copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final CmpG cmp = new CmpG(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op);
     cmp.check = check;
     return copyType(cmp);

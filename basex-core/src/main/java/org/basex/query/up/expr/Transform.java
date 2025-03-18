@@ -118,7 +118,7 @@ public final class Transform extends Copy {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Transform(info, copyAll(cc, vm, copies), arg(update()).copy(cc, vm),
         arg(target()).copy(cc, vm)));
   }

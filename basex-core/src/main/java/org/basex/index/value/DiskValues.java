@@ -33,7 +33,7 @@ public class DiskValues extends ValueIndex {
   /** Cached index entries: mapping between keys and index entries. */
   final IndexCache cache = new IndexCache();
   /** Cached texts: mapping between key positions in the reference file, and the indexed texts. */
-  final IntObjMap<byte[]> ctext = new IntObjMap<>();
+  final IntObjectMap<byte[]> ctext = new IntObjectMap<>();
   /** Number of current index entries. */
   final AtomicInteger size = new AtomicInteger();
 

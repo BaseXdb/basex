@@ -130,7 +130,7 @@ public final class Intersect extends Set {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Intersect is = new Intersect(info, copyAll(cc, vm, exprs));
     is.iterative = iterative;
     return copyType(is);

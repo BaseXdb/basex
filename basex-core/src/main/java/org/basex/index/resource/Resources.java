@@ -143,8 +143,8 @@ public final class Resources implements Index {
    * @param dir returns directories
    * @return paths with resource types
    */
-  public synchronized TokenObjMap<ResourceType> children(final String path, final boolean dir) {
-    final TokenObjMap<ResourceType> map = new TokenObjMap<>();
+  public synchronized TokenObjectMap<ResourceType> children(final String path, final boolean dir) {
+    final TokenObjectMap<ResourceType> map = new TokenObjectMap<>();
     docs.children(path, dir, map);
     bins.children(path, dir, map);
     return map;

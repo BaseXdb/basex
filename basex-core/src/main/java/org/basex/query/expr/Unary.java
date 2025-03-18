@@ -82,7 +82,7 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Unary(info, expr.copy(cc, vm), minus));
   }
 

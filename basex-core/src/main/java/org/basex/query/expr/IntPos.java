@@ -81,7 +81,7 @@ public final class IntPos extends Simple implements CmpPos {
   }
 
   @Override
-  public IntPos copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public IntPos copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new IntPos(min, max, info));
   }
 

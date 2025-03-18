@@ -59,7 +59,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
 
     super(os, sopts);
     final int tl = typeCache.length;
-    for(int t = 0; t < tl; t++) typeCache[t] = new TokenMap();
+    for(int t = 0; t < tl; t++) typeCache[t] = new TokenSet();
     atts = jopts.get(JsonOptions.FORMAT) == JsonFormat.ATTRIBUTES;
     lax = jopts.get(JsonOptions.LAX) || atts;
   }

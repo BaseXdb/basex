@@ -59,7 +59,7 @@ public final class Cast extends Convert {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Cast(info, expr.copy(cc, vm), seqType));
   }
 

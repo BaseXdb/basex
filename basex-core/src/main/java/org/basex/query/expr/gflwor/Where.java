@@ -86,7 +86,7 @@ public final class Where extends Clause {
   }
 
   @Override
-  public Where copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Where copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Where(expr.copy(cc, vm), info));
   }
 

@@ -64,7 +64,7 @@ public abstract class Collation {
     if(eq(COLLATION_URI, url)) return null;
 
     // create new collation or return cached instance
-    if(qc.collations == null) qc.collations = new TokenObjMap<>();
+    if(qc.collations == null) qc.collations = new TokenObjectMap<>();
     Collation coll = qc.collations.get(url);
     if(coll == null) {
       coll = get(url, info, err);

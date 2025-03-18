@@ -34,11 +34,11 @@ import org.xml.sax.*;
  */
 final class DigitalSignature {
   /** Canonicalization algorithms. */
-  private static final TokenMap CANONICALS = new TokenMap();
+  private static final TokenObjectMap<byte[]> CANONICALS = new TokenObjectMap<>();
   /** Signature digest algorithms. */
-  private static final TokenMap DIGESTS = new TokenMap();
+  private static final TokenObjectMap<byte[]> DIGESTS = new TokenObjectMap<>();
   /** Signature algorithms. */
-  private static final TokenMap SIGNATURES = new TokenMap();
+  private static final TokenObjectMap<byte[]> SIGNATURES = new TokenObjectMap<>();
   /** Signature types. */
   private static final TokenSet TYPES = new TokenSet();
   /** Default canonicalization algorithm. */
@@ -54,17 +54,19 @@ final class DigitalSignature {
 
   // initializations
   static {
-    CANONICALS.put("inclusive-with-comments", CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS);
-    CANONICALS.put("exclusive-with-comments", CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS);
-    CANONICALS.put("inclusive", CanonicalizationMethod.INCLUSIVE);
-    CANONICALS.put("exclusive", CanonicalizationMethod.EXCLUSIVE);
+    CANONICALS.put(token("inclusive-with-comments"),
+        token(CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS));
+    CANONICALS.put(token("exclusive-with-comments"),
+        token(CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS));
+    CANONICALS.put(token("inclusive"), token(CanonicalizationMethod.INCLUSIVE));
+    CANONICALS.put(token("exclusive"), token(CanonicalizationMethod.EXCLUSIVE));
 
-    DIGESTS.put("sha1", DigestMethod.SHA1);
-    DIGESTS.put("sha256", DigestMethod.SHA256);
-    DIGESTS.put("sha512", DigestMethod.SHA512);
+    DIGESTS.put(token("sha1"), token(DigestMethod.SHA1));
+    DIGESTS.put(token("sha256"), token(DigestMethod.SHA256));
+    DIGESTS.put(token("sha512"), token(DigestMethod.SHA512));
 
-    SIGNATURES.put("rsa_sha1", SignatureMethod.RSA_SHA1);
-    SIGNATURES.put("dsa_sha1", SignatureMethod.DSA_SHA1);
+    SIGNATURES.put(token("rsa_sha1"), token(SignatureMethod.RSA_SHA1));
+    SIGNATURES.put(token("dsa_sha1"), token(SignatureMethod.DSA_SHA1));
 
     TYPES.add(DEFT);
     TYPES.add(ENVT);

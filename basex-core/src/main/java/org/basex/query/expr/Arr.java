@@ -86,7 +86,7 @@ public abstract class Arr extends ParseExpr {
    * @return deep copy of the array
    */
   @SuppressWarnings("unchecked")
-  public static <T extends Expr> T[] copyAll(final CompileContext cc, final IntObjMap<Var> vm,
+  public static <T extends Expr> T[] copyAll(final CompileContext cc, final IntObjectMap<Var> vm,
       final T[] arr) {
 
     final T[] copy = arr.clone();

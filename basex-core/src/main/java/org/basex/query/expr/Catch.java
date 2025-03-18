@@ -98,7 +98,7 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final int vl = QNAMES.length;
     final Var[] vrs = new Var[vl];
     for(int v = 0; v < vl; v++) vrs[v] = cc.vs().addNew(QNAMES[v], TYPES[v], cc.qc, info);

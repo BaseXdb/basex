@@ -68,7 +68,7 @@ public final class Updates {
 
   /** Mapping between fragment IDs and the temporary data instances
    * to apply updates on the corresponding fragments. */
-  private final IntObjMap<MemData> fragmentIDs = new IntObjMap<>();
+  private final IntObjectMap<MemData> fragmentIDs = new IntObjectMap<>();
 
   /**
    * Constructor.

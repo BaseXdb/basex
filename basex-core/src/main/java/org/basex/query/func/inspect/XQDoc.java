@@ -68,7 +68,7 @@ final class XQDoc extends Inspect {
 
     // namespaces
     final FBuilder namespaces = element("namespaces");
-    final TokenMap nsCache = new TokenMap();
+    final TokenObjectMap<byte[]> nsCache = new TokenObjectMap<>();
     for(final byte[] prefix : module.namespaces) {
       nsCache.put(prefix, module.namespaces.get(prefix));
     }
@@ -158,7 +158,7 @@ final class XQDoc extends Inspect {
    * @throws QueryException query exception
    */
   private void comment(final StaticScope scope, final FBuilder parent) throws QueryException {
-    final TokenObjMap<TokenList> map = scope.doc();
+    final TokenObjectMap<TokenList> map = scope.doc();
     if(map != null) {
       final FBuilder comment = element("comment");
       comment(map, comment);

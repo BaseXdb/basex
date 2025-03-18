@@ -90,7 +90,7 @@ public final class Replace extends Update {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Replace(info, arg(0).copy(cc, vm), arg(1).copy(cc, vm), value));
   }
 

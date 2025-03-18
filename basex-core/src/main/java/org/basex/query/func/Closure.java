@@ -237,7 +237,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final VarScope vsc = new VarScope();
 
     final HashMap<Var, Expr> outer = new HashMap<>();
@@ -245,7 +245,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     cc.pushScope(vsc);
     try {
-      final IntObjMap<Var> innerVars = new IntObjMap<>();
+      final IntObjectMap<Var> innerVars = new IntObjectMap<>();
       vs.copy(cc, innerVars);
 
       final HashMap<Var, Expr> bindings = new HashMap<>();
@@ -271,7 +271,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     // create let bindings for all variables
     final LinkedList<Clause> clauses = new LinkedList<>();
-    final IntObjMap<Var> vm = new IntObjMap<>();
+    final IntObjectMap<Var> vm = new IntObjectMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
       clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));

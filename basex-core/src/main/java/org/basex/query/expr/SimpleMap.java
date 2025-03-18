@@ -206,7 +206,7 @@ public abstract class SimpleMap extends Mapping {
       if(unroll != null) {
         final ExprList results = new ExprList(unroll.size());
         for(final Expr ex : unroll) {
-          final Expr nxt = results.size() == size - 1 ? next : next.copy(cc, new IntObjMap<>());
+          final Expr nxt = results.size() == size - 1 ? next : next.copy(cc, new IntObjectMap<>());
           results.add(get(cc, info, ex, nxt));
         }
         return List.get(cc, info, results.finish());

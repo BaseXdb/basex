@@ -66,7 +66,7 @@ public final class ContextValue extends Simple {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new ContextValue(info));
   }
 

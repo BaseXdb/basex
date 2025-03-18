@@ -76,7 +76,7 @@ public class QueryParser extends InputParser {
   /** List of modules to be parsed. */
   private final ArrayList<ModInfo> modules = new ArrayList<>();
   /** Namespaces. */
-  private final TokenMap namespaces = new TokenMap();
+  private final TokenObjectMap<byte[]> namespaces = new TokenObjectMap<>();
 
   /** Parsed variables. */
   private final ArrayList<StaticVar> vars = new ArrayList<>();
@@ -975,7 +975,7 @@ public class QueryParser extends InputParser {
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck("(");
-    final TokenObjMap<RecordField> fields = new TokenObjMap<>();
+    final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
     final RecordType rt;
     if(wsConsume(")")) {
       rt = new RecordType(false, fields, qn);
@@ -1151,7 +1151,7 @@ public class QueryParser extends InputParser {
     final LinkedList<Clause> clauses = initialClause(null);
     if(clauses == null) return null;
 
-    final TokenObjMap<Var> curr = new TokenObjMap<>();
+    final TokenObjectMap<Var> curr = new TokenObjectMap<>();
     for(final Clause fl : clauses)
       for(final Var var : fl.vars()) curr.put(var.name.unique(), var);
 
@@ -3418,7 +3418,7 @@ public class QueryParser extends InputParser {
 
     // record
     if(type instanceof RecordType) {
-      final TokenObjMap<RecordField> fields = new TokenObjMap<>();
+      final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
       if(consume(')')) return new RecordType(false, fields, null);
       boolean extensible = false;
       do {

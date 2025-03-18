@@ -18,7 +18,7 @@ public final class MediaType implements Comparable<MediaType> {
   /* Reads in the media-types. */
   static {
     final HashMap<String, MediaType> cache = new HashMap<>();
-    final TokenMap map = Util.properties("media-types.properties");
+    final TokenObjectMap<byte[]> map = Util.properties("media-types.properties");
     for(final byte[] key : map) {
       final String suffix = Token.string(key), type = Token.string(map.get(key));
       MEDIATYPES.put(suffix, cache.computeIfAbsent(type, MediaType::new));

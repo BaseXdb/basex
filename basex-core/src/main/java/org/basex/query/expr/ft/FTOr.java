@@ -114,7 +114,7 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTExpr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public FTExpr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new FTOr(info, Arr.copyAll(cc, vm, exprs)));
   }
 

@@ -171,7 +171,7 @@ public final class Lookup extends Arr {
   }
 
   @Override
-  public Lookup copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Lookup copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Lookup(info, copyAll(cc, vm, exprs)));
   }
 

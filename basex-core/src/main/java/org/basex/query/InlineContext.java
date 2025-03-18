@@ -136,6 +136,6 @@ public final class InlineContext {
    * @throws QueryException query exception
    */
   public Expr copy() throws QueryException {
-    return expr instanceof Value ? expr : expr.copy(cc, new IntObjMap<>()).optimize(cc);
+    return expr instanceof Value ? expr : expr.copy(cc, new IntObjectMap<>()).optimize(cc);
   }
 }

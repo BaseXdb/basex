@@ -300,7 +300,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
     // create let bindings for all variables
     final LinkedList<Clause> clauses = new LinkedList<>();
-    final IntObjMap<Var> vm = new IntObjMap<>();
+    final IntObjectMap<Var> vm = new IntObjectMap<>();
     final int pl = params.length;
     for(int p = 0; p < pl; p++) {
       clauses.add(new Let(cc.copy(params[p], vm), exprs[p]).optimize(cc));

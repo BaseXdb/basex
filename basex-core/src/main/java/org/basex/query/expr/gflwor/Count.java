@@ -84,7 +84,7 @@ public final class Count extends Clause {
   }
 
   @Override
-  public Count copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Count copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Count(cc.copy(var, vm)));
   }
 

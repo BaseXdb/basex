@@ -30,7 +30,7 @@ public final class Store implements Closeable {
   private static final Pattern PATTERN = Pattern.compile(NAME + "-(.*)\\" + IO.BASEXSUFFIX);
 
   /** Store entries. */
-  private final TokenObjMap<Value> map = new TokenObjMap<>();
+  private final TokenObjectMap<Value> map = new TokenObjectMap<>();
   /** Database context. */
   private final Context context;
 

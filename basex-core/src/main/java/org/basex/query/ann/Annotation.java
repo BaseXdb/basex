@@ -181,7 +181,7 @@ public enum Annotation {
   public static final Annotation[] VALUES = values();
 
   /** Maps with QName and signature pairs. */
-  private static final TokenObjMap<Annotation> MAP = new TokenObjMap<>();
+  private static final TokenObjectMap<Annotation> MAP = new TokenObjectMap<>();
 
   static {
     for(final Annotation value : VALUES) {

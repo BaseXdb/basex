@@ -74,7 +74,7 @@ public final class Range extends Arr {
   }
 
   @Override
-  public Range copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Range copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final Range r = copyType(new Range(info, copyAll(cc, vm, exprs)));
     r.ints = ints;
     return r;

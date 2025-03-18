@@ -73,8 +73,8 @@ public final class XQIntMap extends XQHashMap {
         map.put(k, v);
         return this;
       }
-      return new XQIntObjMap(capacity).build(this).build(key, value);
+      return new XQIntValueMap(capacity).build(this).build(key, value);
     }
-    return new XQItemObjMap(capacity).build(this).build(key, value);
+    return new XQItemValueMap(capacity).build(this).build(key, value);
   }
 }

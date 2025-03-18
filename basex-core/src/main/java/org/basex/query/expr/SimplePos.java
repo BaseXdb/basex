@@ -111,7 +111,7 @@ final class SimplePos extends Arr implements CmpPos {
   }
 
   @Override
-  public SimplePos copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public SimplePos copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new SimplePos(info, copyAll(cc, vm, exprs)));
   }
 

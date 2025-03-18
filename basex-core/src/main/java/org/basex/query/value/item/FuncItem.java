@@ -172,7 +172,7 @@ public final class FuncItem extends FItem implements Scope {
 
     // create let bindings for all variables
     final LinkedList<Clause> clauses = new LinkedList<>();
-    final IntObjMap<Var> vm = new IntObjMap<>();
+    final IntObjectMap<Var> vm = new IntObjectMap<>();
     final int arity = arity();
     for(int a = 0; a < arity; a++) {
       clauses.add(new Let(cc.copy(params[a], vm), exprs[a]).optimize(cc));

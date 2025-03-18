@@ -25,8 +25,8 @@ import org.basex.util.hash.*;
  */
 final class XMLScanner extends Job {
   /** Entities. */
-  private static final String[] ENTITIES =
-    { "amp", "&", "apos", "'", "quot", "\"", "lt", "<", "gt", ">" };
+  private static final byte[][] ENTITIES = tokens(
+    "amp", "&", "apos", "'", "quot", "\"", "lt", "<", "gt", ">");
   /** PublicID characters. */
   private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
 
@@ -44,9 +44,9 @@ final class XMLScanner extends Job {
   Type type;
 
   /** Index for all entity names. */
-  private final TokenMap ents = new TokenMap();
+  private final TokenObjectMap<byte[]> ents = new TokenObjectMap<>();
   /** Index for all PEReferences. */
-  private final TokenMap pents = new TokenMap();
+  private final TokenObjectMap<byte[]> pents = new TokenObjectMap<>();
   /** DTD flag. */
   private final boolean dtd;
   /** Parse fragment. */

@@ -88,7 +88,7 @@ public final class Concat extends Arr {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new Concat(info, copyAll(cc, vm, exprs)));
   }
 

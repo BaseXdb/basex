@@ -42,7 +42,7 @@ public final class CComm extends CNode {
   }
 
   @Override
-  public Expr copy(final CompileContext cc, final IntObjMap<Var> vm) {
+  public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new CComm(info, computed, exprs[0].copy(cc, vm)));
   }
 

@@ -28,7 +28,7 @@ public final class Str extends AStr {
   public static final Str VALUE = Str.get("value");
 
   /** Unicode character cache. */
-  private static final IntObjMap<Str> CACHE = new IntObjMap<>();
+  private static final IntObjectMap<Str> CACHE = new IntObjectMap<>();
   /** Single ASCII characters. */
   private static final Str[] CHAR;
 
