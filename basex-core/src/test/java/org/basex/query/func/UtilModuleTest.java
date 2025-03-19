@@ -7,6 +7,7 @@ import org.basex.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -244,5 +245,46 @@ public final class UtilModuleTest extends SandboxTest {
 
     error(func.args(" <_ xmlns:l='L' l:a='' a=''/>"), BASEX_STRIP_X);
     error(func.args(" <_ xmlns:l='L' a='' l:a=''/>"), BASEX_STRIP_X);
+  }
+
+  /** Test method. */
+  @Test public void valuesExcept() {
+    final Function func = _UTIL_VALUES_EXCEPT;
+    query(func.args(" ()", " ()"), "");
+    query(func.args(1, " ()"), 1);
+    query(func.args(1, 1), "");
+    query(func.args("a", ""), "a");
+    query(func.args("a", "a"), "");
+
+    query(func.args(" (1, 2)", " ()"), "1\n2");
+    query(func.args(" (1, 2)", " (1)"), 2);
+    query(func.args(" (1, 2)", " (1, 2)"), "");
+    query(func.args(" (1, 2)", " (1e0)"), 2);
+    query(func.args(" (1, 2)", " (1.0)"), 2);
+    query(func.args(" (1, 2)", " (1.1)"), "1\n2");
+    query(func.args(" (1, 2)", " (3)"), "1\n2");
+    query(func.args(" (1, 2)", " (3.1)"), "1\n2");
+
+    query(func.args(" (1)", " (1 to 5)"), "");
+    query(func.args(" (1e0)", " (1 to 5)"), "");
+    query(func.args(" (1.0)", " (1 to 5)"), "");
+    query(func.args(" (1.1)", " (1 to 5)"), "1.1");
+
+    query(func.args(" (1 to 1000000)", " (1 to 1000000)"), "");
+    query(func.args(" (1 to 1000000)", " (1 to 999999)"), 1000000);
+    query(func.args(" (1 to 1000000)", " (2 to 1000000)"), 1);
+
+    query(func.args(" (1 to 6) ! string()", " (1 to 6)"), "1\n2\n3\n4\n5\n6");
+    query(func.args(" (5,4, 3, 2, 1, true#0)[not(. instance of fn(*))]", 1), "5\n4\n3\n2");
+
+    check(func.args(" (1 to 6)", " ()"), "1\n2\n3\n4\n5\n6", empty(func), root(RangeSeq.class));
+    check(func.args(" (1 to 6) ! string()", " ()"), "1\n2\n3\n4\n5\n6", empty(func));
+    check(func.args(" (1 to 6) ! data(attribute _ { . })", " ()"), "1\n2\n3\n4\n5\n6",
+        empty(func), exists(DATA));
+
+    final String c = "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive";
+    query(func.args("a", "A"), "a");
+    query(func.args("a", "A", c), "");
+    query(func.args("A", "a", c), "");
   }
 }

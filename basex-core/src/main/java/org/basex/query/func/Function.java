@@ -1899,6 +1899,9 @@ public enum Function implements AFunction {
   _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(input,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
   /** XQuery function. */
+  _UTIL_VALUES_EXCEPT(UtilValuesExcept::new, "values-except(values,except[,collation])",
+      params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM, UTIL_URI),
+  /** XQuery function. */
   _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
       params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
