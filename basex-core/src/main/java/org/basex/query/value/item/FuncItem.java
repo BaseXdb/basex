@@ -86,6 +86,19 @@ public final class FuncItem extends FItem implements Scope {
     this.simple = !expr.has(Flag.CTX);
   }
 
+  /**
+   * Construct a new function item from an existing one, with replaced annotations and focus.
+   * @param funcItem the existing function item
+   * @param anns the new annotations
+   * @param focus the new focus
+   */
+  public FuncItem(final FuncItem funcItem, final AnnList anns, final QueryFocus focus) {
+    this(
+        funcItem.info, funcItem.expr, funcItem.params, anns, FuncType.get(anns,
+            ((FuncType) funcItem.type).declType, ((FuncType) funcItem.type).argTypes),
+        funcItem.stackSize, funcItem.name, focus);
+  }
+
   @Override
   public int arity() {
     return params.length;

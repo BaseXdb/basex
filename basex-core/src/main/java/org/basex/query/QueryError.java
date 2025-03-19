@@ -1248,6 +1248,8 @@ public enum QueryError {
   /** Error code. */
   DUPLNSCONS_X(XQDY, 102, "Duplicate declaration of namespace '%'."),
   /** Error code. */
+  NOMETHOD(XPST, 107, "The annotation %method is not allowed here."),
+  /** Error code. */
   MAPDUPLKEY_X(XQDY, 137, "Map contains duplicate key: %."),
 
   /** Error code. */
@@ -1360,6 +1362,8 @@ public enum QueryError {
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** Error code. */
   DUPLFUNVIS(XQST, 106, "More than one visibility annotation declared."),
+  /** Error code. */
+  DUPLMETHOD(XQST, 106, "More than one %method annotation declared."),
   /** Error code. */
   OUTPUTLIB_X(XQST, 108, "Declaration not allowed in library module: output:%."),
   /** Error code. */

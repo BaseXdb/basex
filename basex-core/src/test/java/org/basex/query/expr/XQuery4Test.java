@@ -52,6 +52,24 @@ public final class XQuery4Test extends SandboxTest {
     query("declare variable $_ := 1; [ 9 ]?$_", 9);
   }
 
+  /** Method annotation. */
+  @Test public void method() {
+    final String rect = "{ 'height': 3, 'width': 4, 'area': %method fn() { ?height × ?width } }";
+    query(rect + "?area()", 12);
+    query(rect + "?area instance of %method fn() as item()*", false);
+    query(rect + "('area') instance of %method fn() as item()*", true);
+
+    query("declare record local:rect(height, width, area := %method fn() { ?height × ?width }); "
+        + "let $r := local:rect(3, 4) return local:rect(5, 6, $r?area)?area()", 12);
+    query("{'self': %method fn() { . } }?*() => map:keys()", "self");
+    query("let $f := %method fn() {?i}, $h := ({'i': 7, 'f': $f}, {'i': 11, 'g': $f})?('f', 'g') "
+        + "return $h[1]() * $h[2]()", 77);
+
+    error("(" + rect + "=> map:get('area'))()", NOCTX_X);
+    error(rect + "('area')()", NOCTX_X);
+    error("%method fn { . }", NOMETHOD);
+  }
+
   /** Otherwise expression. */
   @Test public void otherwise() {
     query("() otherwise ()", "");
