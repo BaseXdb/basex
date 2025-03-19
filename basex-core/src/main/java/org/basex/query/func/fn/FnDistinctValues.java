@@ -28,36 +28,30 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnDistinctValues extends StandardFunc {
+public final class FnDistinctValues extends FnDuplicateValues {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
     return new Iter() {
-      final IntSet ints = new IntSet();
+      IntSet ints = new IntSet();
       ItemSet set;
 
       @Override
       public Item next() throws QueryException {
-        if(set == null) {
-          // try to parse input as 32-bit integer sequence
-          for(Item item; (item = qc.next(values)) != null;) {
-            if(item.type == AtomType.INTEGER) {
-              final long l = item.itr(info);
-              final int i = (int) l;
-              if(i == l) {
-                if(ints.add(i)) return item;
-                continue;
-              }
+        for(Item item; (item = qc.next(values)) != null;) {
+          if(ints != null) {
+            // try to treat items as 32-bit integers
+            final int v = toInt(item);
+            if(v != Integer.MIN_VALUE) {
+              if(ints.add(v)) return item;
+              continue;
             }
             set = ItemSet.get(collation, info);
             for(final int i : ints.toArray()) set.add(Int.get(i));
-            if(set.add(item)) return item;
-            break;
+            ints = null;
           }
-        }
-        // generic fallback
-        for(Item item; (item = qc.next(values)) != null;) {
+          // fallback
           if(set.add(item)) return item;
         }
         return null;
@@ -70,24 +64,23 @@ public final class FnDistinctValues extends StandardFunc {
     final Iter values = arg(0).atomIter(qc, info);
     final Collation collation = toCollation(arg(1), qc);
 
-    // try to parse input as 32-bit integer sequence
+    // try to treat items as 32-bit integers
     final LongList list = new LongList();
-    final IntSet ints = new IntSet();
+    IntSet ints = new IntSet();
     Item item = null;
     while((item = qc.next(values)) != null) {
-      if(item.type != AtomType.INTEGER) break;
-      final long l = item.itr(info);
-      final int i = (int) l;
-      if(i != l) break;
-      if(ints.add(i)) list.add(i);
+      final int v = toInt(item);
+      if(v == Integer.MIN_VALUE) break;
+      if(ints.add(v)) list.add(v);
     }
     final Value intseq = IntSeq.get(list.finish());
     if(item == null) return intseq;
 
-    // generic fallback
+    // fallback
     final ValueBuilder vb = new ValueBuilder(qc).add(intseq);
     final ItemSet set = ItemSet.get(collation, info);
     for(final int i : ints.toArray()) set.add(Int.get(i));
+    ints = null;
     do {
       if(set.add(item)) vb.add(item);
     } while((item = qc.next(values)) != null);

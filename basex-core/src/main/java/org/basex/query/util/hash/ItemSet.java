@@ -28,6 +28,14 @@ public interface ItemSet extends Iterable<Item> {
   boolean add(Item key) throws QueryException;
 
   /**
+   * Checks if the set contains the specified key.
+   * @param key key to be looked up
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  boolean contains(Item key) throws QueryException;
+
+  /**
    * Returns a hash item set.
    * @param coll collation (can be {@code null})
    * @param info input info (can be {@code null})

@@ -31,13 +31,19 @@ public final class CollationItemSet implements ItemSet {
   }
 
   @Override
-  public boolean add(final Item item) throws QueryException {
+  public boolean add(final Item key) throws QueryException {
+    if(contains(key)) return false;
+    items.add(key);
+    return true;
+  }
+
+  @Override
+  public boolean contains(final Item key) throws QueryException {
     final int is = items.size();
     for(int id = 0; id < is; id++) {
-      if(deep.equal(items.get(id), item)) return false;
+      if(deep.equal(items.get(id), key)) return true;
     }
-    items.add(item);
-    return true;
+    return false;
   }
 
   @Override

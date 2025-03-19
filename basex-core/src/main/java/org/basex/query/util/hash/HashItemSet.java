@@ -85,12 +85,7 @@ public class HashItemSet extends ASet implements ItemSet {
     return Math.abs(id);
   }
 
-  /**
-   * Checks if the set contains the specified key.
-   * @param key key to be looked up
-   * @return result of check
-   * @throws QueryException query exception
-   */
+  @Override
   public final boolean contains(final Item key) throws QueryException {
     return id(key) > 0;
   }

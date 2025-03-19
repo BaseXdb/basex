@@ -137,7 +137,7 @@ abstract class XQHashMap extends XQMap {
    * @return token or {@code null}
    * @throws QueryException query exception
    */
-  final byte[] toString(final Value value) throws QueryException {
+  static final byte[] toString(final Value value) throws QueryException {
     if(value.seqType().eq(SeqType.STRING_O)) {
       return ((AStr) value).string(null);
     }
@@ -149,11 +149,11 @@ abstract class XQHashMap extends XQMap {
    * @param value value
    * @return integer or {@link Integer#MIN_VALUE}
    */
-  final int toInt(final Value value) {
+  static final int toInt(final Value value) {
     if(value.seqType().eq(SeqType.INTEGER_O)) {
-      final long vl = ((ANum) value).itr();
-      final int vi = (int) vl;
-      if(vi == vl) return vi;
+      final long l = ((Int) value).itr();
+      final int i = (int) l;
+      if(i == l) return i;
     }
     return Integer.MIN_VALUE;
   }
