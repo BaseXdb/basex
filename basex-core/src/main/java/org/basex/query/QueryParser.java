@@ -389,17 +389,17 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(VARIABLE)) {
           // variables cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGVAR);
-          varDecl(anns.check(true, true));
+          varDecl(anns.check(true, true, false));
         } else if(wsConsumeWs(FUNCTION)) {
-          functionDecl(anns.check(false, true));
+          functionDecl(anns.check(false, true, false));
         } else if(wsConsumeWs(TYPE)) {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
-          typeDecl(anns.check(false, true));
+          typeDecl(anns.check(false, true, false));
         } else if(wsConsumeWs(RECORD)) {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
-          namedRecordTypeDecl(anns.check(false, true));
+          namedRecordTypeDecl(anns.check(false, true, false));
         } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
@@ -2541,7 +2541,7 @@ public class QueryParser extends InputParser {
 
     // inline function
     final int p = pos;
-    final AnnList anns = annotations(false).check(false, true);
+    final AnnList anns = annotations(false).check(false, true, true);
     if(wsConsume(FUNCTION) || wsConsume(FN)) {
       final boolean args = wsConsume("("), focus = !args && current('{');
       if(args || focus) {
@@ -2553,6 +2553,8 @@ public class QueryParser extends InputParser {
           expr = enclosedExpr();
         } else {
           // focus function
+          Ann method = anns.get(Annotation.METHOD);
+          if(method != null) throw NOMETHOD.get(method.info);
           final InputInfo ii = info();
           final QNm name = new QNm("arg");
           params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, localVars);
@@ -3353,7 +3355,7 @@ public class QueryParser extends InputParser {
     if(wsConsume("(")) return choiceItemType();
 
     // parse annotations and type name
-    final AnnList anns = annotations(false).check(false, false);
+    final AnnList anns = annotations(false).check(false, false, true);
     skipWs();
     SeqType st = null;
     Type type;

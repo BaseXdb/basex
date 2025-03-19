@@ -19,6 +19,8 @@ import org.basex.util.hash.*;
  */
 public enum Annotation {
   /** XQuery annotation. */
+  METHOD("method()", params(), XQ_URI, false),
+  /** XQuery annotation. */
   PUBLIC("public()", params(), XQ_URI, false),
   /** XQuery annotation. */
   PRIVATE("private()", params(), XQ_URI, false),
