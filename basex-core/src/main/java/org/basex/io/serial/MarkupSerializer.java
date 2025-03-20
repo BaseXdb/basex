@@ -246,7 +246,7 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void startOpen(final QNm name) throws IOException {
-    if(opened.isEmpty()) checkRoot(name.string());
+    if(opened.isEmpty()) checkRoot(name);
     if(sep) indent();
     out.print(ELEM_O);
     out.print(name.string());
@@ -259,7 +259,7 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @param name name of doctype (if {@code null}, no doctype declaration will be output)
    * @throws IOException I/O exception
    */
-  final void checkRoot(final byte[] name) throws IOException {
+  final void checkRoot(final QNm name) throws IOException {
     if(root) {
       if(!saomit) throw SERSA.getIO();
       if(docsys != null) throw SERDT.getIO();
@@ -315,10 +315,10 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   /**
    * Prints the document type declaration.
-   * @param type document type
+   * @param name name of element
    * @throws IOException I/O exception
    */
-  protected abstract void doctype(byte[] type) throws IOException;
+  protected abstract void doctype(QNm name) throws IOException;
 
   @Override
   protected boolean skipElement(final ANode node) {
@@ -331,18 +331,18 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   /**
    * Prints the document type declaration.
-   * @param type document type
+   * @param name name of element
    * @param pub doctype-public parameter
    * @param sys doctype-system parameter
    * @throws IOException I/O exception
    */
-  protected final void printDoctype(final byte[] type, final String pub, final String sys)
+  protected final void printDoctype(final byte[] name, final String pub, final String sys)
       throws IOException {
 
     if(level != 0 || root) return;
     if(sep) indent();
     out.print(DOCTYPE);
-    out.print(type);
+    out.print(name);
     if(sys != null || pub != null) {
       if(pub != null) out.print(' ' + PUBLIC + " \"" + pub + '"');
       else out.print(' ' + SYSTEM);

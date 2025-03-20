@@ -82,7 +82,7 @@ public final class SerializerOptions extends Options {
   /** Serialization parameter. */
   public static final StringOption ITEM_SEPARATOR =
       new StringOption("item-separator");
-  /** Serialization parameter: 1.0/1.1. */
+  /** Serialization parameter (supported values depend on method). */
   public static final StringOption VERSION =
       new StringOption("version", "");
   /** Serialization parameter: 4.0/4.01/5.0. */

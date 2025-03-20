@@ -4,6 +4,8 @@ import static org.basex.data.DataText.*;
 
 import java.io.*;
 
+import org.basex.query.value.item.*;
+
 /**
  * This class serializes items as XML.
  *
@@ -22,7 +24,7 @@ public class XMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void doctype(final byte[] type) throws IOException {
-    if(docsys != null) printDoctype(type, docpub, docsys);
+  protected void doctype(final QNm name) throws IOException {
+    if(docsys != null) printDoctype(name.local(), docpub, docsys);
   }
 }
