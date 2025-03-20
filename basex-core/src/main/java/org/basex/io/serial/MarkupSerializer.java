@@ -72,10 +72,12 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     super(os, sopts);
 
-    final String version = supported(VERSION, sopts.get(VERSION), versions);
-    String hv = sopts.get(HTML_VERSION);
+    String version = sopts.get(VERSION), hv = sopts.get(HTML_VERSION);
     if(hv.matches("\\d+(\\.\\d+)?")) hv = Double.toString(Double.parseDouble(hv));
-    html5 = version.equals(V50) || supported(HTML_VERSION, hv, V40, V401, V50).equals(V50);
+    html5 = hv.equals(V50) || versions[0].equals(V50) &&
+        (version.isEmpty() ? hv.isEmpty() : version.equals(V50));
+    version = checkVersion(VERSION, version, versions);
+    hv = checkVersion(VERSION, hv, V50, V401, V40);
 
     final boolean omitDecl = sopts.yes(OMIT_XML_DECLARATION);
     final YesNoOmit sa = sopts.get(STANDALONE);
@@ -246,7 +248,7 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void startOpen(final QNm name) throws IOException {
-    if(opened.isEmpty()) checkRoot(name.string());
+    if(opened.isEmpty()) checkRoot(name);
     if(sep) indent();
     out.print(ELEM_O);
     out.print(name.string());
@@ -259,7 +261,7 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @param name name of doctype (if {@code null}, no doctype declaration will be output)
    * @throws IOException I/O exception
    */
-  final void checkRoot(final byte[] name) throws IOException {
+  final void checkRoot(final QNm name) throws IOException {
     if(root) {
       if(!saomit) throw SERSA.getIO();
       if(docsys != null) throw SERDT.getIO();
@@ -315,10 +317,10 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   /**
    * Prints the document type declaration.
-   * @param type document type
+   * @param name name of element
    * @throws IOException I/O exception
    */
-  protected abstract void doctype(byte[] type) throws IOException;
+  protected abstract void doctype(QNm name) throws IOException;
 
   @Override
   protected boolean skipElement(final ANode node) {
@@ -331,18 +333,18 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   /**
    * Prints the document type declaration.
-   * @param type document type
+   * @param name name of element
    * @param pub doctype-public parameter
    * @param sys doctype-system parameter
    * @throws IOException I/O exception
    */
-  protected final void printDoctype(final byte[] type, final String pub, final String sys)
+  protected final void printDoctype(final byte[] name, final String pub, final String sys)
       throws IOException {
 
     if(level != 0 || root) return;
     if(sep) indent();
     out.print(DOCTYPE);
-    out.print(type);
+    out.print(name);
     if(sys != null || pub != null) {
       if(pub != null) out.print(' ' + PUBLIC + " \"" + pub + '"');
       else out.print(' ' + SYSTEM);
@@ -390,14 +392,14 @@ abstract class MarkupSerializer extends StandardSerializer {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Retrieves a value from the specified option and checks for supported values.
+   * Checks if the specified version is valid and returns a normalized value.
    * @param option option
    * @param string value
    * @param allowed allowed values
    * @return value
    * @throws QueryIOException query I/O exception
    */
-  private static String supported(final StringOption option, final String string,
+  static String checkVersion(final StringOption option, final String string,
       final String... allowed) throws QueryIOException {
 
     if(string.isEmpty()) return allowed.length > 0 ? allowed[0] : string;

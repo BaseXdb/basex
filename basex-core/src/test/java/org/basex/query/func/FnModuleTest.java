@@ -4,9 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.*;
-import java.nio.file.*;
-import java.nio.file.Path;
 import java.util.*;
 
 import org.basex.*;
@@ -2278,11 +2275,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("\"x\\u0000\""), "x\uFFFD");
   }
 
-  /**
-   * Test method.
-   * @throws IOException I/O exception
-   */
-  @Test public void parseXml() throws IOException {
+  /** Test method. */
+  @Test public void parseXml() {
     final Function func = PARSE_XML;
     contains(func.args("<x>a</x>") + "//text()", "a");
     query(func.args("<a/>") + "/a[node()]", "");
@@ -2307,16 +2301,15 @@ public final class FnModuleTest extends SandboxTest {
         + "<!ELEMENT a (#PCDATA | b)*>"
         + "<!ELEMENT b EMPTY>"
         + "<!ENTITY e SYSTEM '" + path + "'>]>";
-    final String entity = Files.readString(Path.of(path));
-    query(func.args(dtd + "<a>&amp;e;</a>"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>"), "<a><b/></a>");
     query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'no'}"), "<a/>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'yes'}"), "<a>" + entity + "</a>");
-    query(func.args(dtd + "<b>&amp;e;</b>", " {'dtd': 'yes'}"), "<b>" + entity + "</b>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'yes'}"), "<a><b/></a>");
+    query(func.args(dtd + "<b>&amp;e;</b>", " {'dtd': 'yes'}"), "<b><b/></b>");
     query(func.args(dtd + "<a><b/></a>", " {'dtd-validation': 'yes'}"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'no'}"), "<a/>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes'}"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'no'}"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes'}"), "<a><b/></a>");
     query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes', 'dtd': 'yes'}"),
-        "<a>" + entity + "</a>");
+        "<a><b/></a>");
     query(func.args("<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
         " {'xsd-validation': 'strict'}"),

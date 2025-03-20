@@ -94,17 +94,21 @@ public final class SerializerTest extends SandboxTest {
   /** Test: method=html. */
   @Test public void html() {
     final String option = METHOD.arg("html");
-    query(option + "<html/>", "<html></html>");
+    query(option + "<html/>", "<!DOCTYPE HTML><html></html>");
     final String[] empties = { "area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "basefont", "frame", "isindex", "param" };
-    for(final String e : empties) query(option + '<' + e + "/>", '<' + e + '>');
+    for(final String e : empties) {
+      query(option + '<' + e + "/>", '<' + e + '>');
+    }
 
     query(option + "<html><script>&lt;</script></html>",
-        "<html><script><</script></html>");
+        "<!DOCTYPE HTML><html><script><</script></html>");
     query(option + "<html><style>{ serialize(<a/>) }</style></html>",
-        "<html><style><a/></style></html>");
+        "<!DOCTYPE HTML><html><style><a/></style></html>");
     query(option + "<a b='&lt;'/>", "<a b=\"<\"></a>");
-    error(option + "<a>&#x90;</a>", SERILL_X);
+
+    query(option + "<a>&#x90;</a>", "<a>&#x90;</a>");
+    error(option + HTML_VERSION.arg("4.01") + "<a>&#x90;</a>", SERILL_X);
 
     query(option + "<option selected='selected'/>", "<option selected></option>");
 
@@ -113,14 +117,15 @@ public final class SerializerTest extends SandboxTest {
 
     query(option + INDENT.arg("yes")
         + "<html><body><PRE><u>test</u></PRE></body></html>",
-        "<html>\n"
+        "<!DOCTYPE HTML>\n"
+        + "<html>\n"
         + "  <body>\n"
         + "    <PRE><u>test</u></PRE>\n"
         + "  </body>\n"
         + "</html>");
     query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
         + "<html><body><PRE><u>test</u></PRE></body></html>",
-        "<!DOCTYPE html>\n"
+        "<!DOCTYPE HTML>\n"
         + "<html>\n"
         + "  <body>\n"
         + "    <PRE><u>test</u></PRE>\n"
@@ -128,7 +133,7 @@ public final class SerializerTest extends SandboxTest {
         + "</html>");
     query(option + INDENT.arg("yes") + HTML_VERSION.arg("5.0")
         + "<html><body><p><b>x</b><ul><li>1</li><li>2</li></ul></p><br/></body></html>",
-        "<!DOCTYPE html>\n"
+        "<!DOCTYPE HTML>\n"
         + "<html>\n"
         + "  <body>\n"
         + "    <p><b>x</b><ul>\n"
@@ -137,23 +142,27 @@ public final class SerializerTest extends SandboxTest {
         + "      </ul>\n"
         + "    </p><br></body>\n"
         + "</html>");
-    query(option + INDENT_ATTRIBUTES.arg("yes")
+    query(option + INDENT_ATTRIBUTES.arg("yes") + INDENT.arg("yes")
         + "<html><body onload='alert(\"loaded\")' style='background: black'/></html>",
-        "<html><body onload=\"alert(&quot;loaded&quot;)\"\n"
-        + "            style=\"background: black\"></body></html>");
+        "<!DOCTYPE HTML>\n"
+        + "<html>\n"
+        + "  <body onload=\"alert(&quot;loaded&quot;)\"\n"
+        + "        style=\"background: black\">\n"
+        + "  </body>\n"
+        + "</html>");
   }
 
   /** Test: method=html, version=5.0. */
   @Test public void version50() {
     final String option = METHOD.arg("html") + VERSION.arg("5.0");
-    query(option + "<html/>", "<!DOCTYPE html><html></html>");
+    query(option + "<html/>", "<!DOCTYPE HTML><html></html>");
     final String[] empties = { "area", "base", "br", "col", "command", "embed", "hr",
         "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr" };
     for(final String e : empties) {
-      query(option + '<' + e + "/>", "<!DOCTYPE html><" + e + '>');
+      query(option + '<' + e + "/>", "<" + e + '>');
     }
-    query(option + "<a>&#x90;</a>", "<!DOCTYPE html><a>&#x90;</a>");
-    query(option + "<html/>", "<!DOCTYPE html><html></html>");
+    query(option + "<a>&#x90;</a>", "<a>&#x90;</a>");
+    query(option + "<html/>", "<!DOCTYPE HTML><html></html>");
   }
 
   /** Test: method=text. */

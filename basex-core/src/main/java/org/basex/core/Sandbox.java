@@ -121,7 +121,11 @@ public abstract class Sandbox {
       Util.errln(query.strip());
       Util.errln(res.replace('\n', ','));
     }
-    assertEquals(exp, res, "\n" + query + "\n" + (plan == null ? "" : serialize(plan)));
+    //assertEquals(exp, res, "\n" + query + "\n" + (plan == null ? "" : serialize(plan)));
+    if(!exp.equals(res)) {
+      fail("\n" + query + "\n[EXPECT] " + exp + "\n[RESULT] " + res +
+          (plan == null ? "" : "\n" + serialize(plan)));
+    }
   }
 
   /**

@@ -23,7 +23,7 @@ final class XHTMLSerializer extends MarkupSerializer {
    * @throws IOException I/O exception
    */
   XHTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
-    super(os, sopts, V10, V11);
+    super(os, sopts, V11, V10);
   }
 
   @Override
@@ -66,11 +66,11 @@ final class XHTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void doctype(final byte[] type) throws IOException {
+  protected void doctype(final QNm name) throws IOException {
     if(html5 && docsys == null) {
-      printDoctype(type, null, null);
+      printDoctype(name.local(), null, null);
     } else if(docsys != null) {
-      printDoctype(type, docpub, docsys);
+      printDoctype(name.local(), docpub, docsys);
     }
   }
 

@@ -83,7 +83,7 @@ final class HTMLSerializer extends MarkupSerializer {
    * @throws IOException I/O exception
    */
   HTMLSerializer(final OutputStream os, final SerializerOptions sopts) throws IOException {
-    super(os, sopts, V40, V401, V50);
+    super(os, sopts, V50, V401, V40);
   }
 
   @Override
@@ -148,7 +148,7 @@ final class HTMLSerializer extends MarkupSerializer {
 
   @Override
   protected void startOpen(final QNm name) throws IOException {
-    if(opened.isEmpty()) checkRoot(HTML);
+    if(opened.isEmpty()) checkRoot(name);
     if(sep) indent();
     out.print(ELEM_O);
     out.print(name.string());
@@ -166,17 +166,21 @@ final class HTMLSerializer extends MarkupSerializer {
 
   @Override
   protected void finishEmpty() throws IOException {
-    if(printCT(true, true)) return;
-    out.print(ELEM_C);
-    final byte[] lc = lc(elem.local());
-    if(html5) {
-      if(EMPTIES5.contains(lc)) return;
-    } else if(EMPTIES.contains(lc)) {
-      final byte[] uri = nsUri(EMPTY);
-      if(uri == null || uri.length == 0) return;
+    byte[] uri = elem.uri();
+    if(uri.length > 0 && !eq(uri, XHTML_URI)) {
+      super.finishEmpty();
+    } else {
+      if(printCT(true, true)) return;
+      out.print(ELEM_C);
+      final byte[] lc = lc(elem.local());
+      if(EMPTIES.contains(lc)) {
+        uri = nsUri(EMPTY);
+        if(uri == null || uri.length == 0) return;
+      }
+      if(html5 && EMPTIES5.contains(lc)) return;
+      sep = false;
+      finishClose();
     }
-    sep = false;
-    finishClose();
   }
 
   @Override
@@ -186,12 +190,11 @@ final class HTMLSerializer extends MarkupSerializer {
   }
 
   @Override
-  protected void doctype(final byte[] type) throws IOException {
-    final boolean doc = docpub != null || docsys != null;
-    if(doc) {
-      printDoctype(type, docpub, docsys);
-    } else if(html5) {
-      printDoctype(type, null, null);
+  protected void doctype(final QNm name) throws IOException {
+    if(docpub != null || docsys != null) {
+      printDoctype(name.local(), docpub, docsys);
+    } else if(html5 && eq(lc(name.local()), HTML)) {
+      printDoctype(uc(HTML), null, null);
     }
   }
 
