@@ -675,7 +675,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeFunction() {
-    return !zero() && (type instanceof FType || ANY_ATOMIC_TYPE.instanceOf(type));
+    return !zero() && (type instanceof FType || type == AtomType.ITEM);
   }
 
   /**

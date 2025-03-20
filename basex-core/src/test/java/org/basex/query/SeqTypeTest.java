@@ -807,6 +807,54 @@ public final class SeqTypeTest {
   }
 
   /**
+   * May-be tests.
+   */
+  @Test public void mayBe() {
+    assertTrue(SeqType.ITEM_O.mayBeNumber());
+    assertFalse(SeqType.FUNCTION_O.mayBeNumber());
+    assertFalse(SeqType.MAP_O.mayBeNumber());
+    assertFalse(SeqType.ARRAY_O.mayBeNumber());
+    assertFalse(SeqType.RECORD_O.mayBeNumber());
+    assertTrue(SeqType.ANY_ATOMIC_TYPE_O.mayBeNumber());
+    assertTrue(SeqType.NUMERIC_O.mayBeNumber());
+    assertTrue(SeqType.INTEGER_O.mayBeNumber());
+    assertTrue(AtomType.BYTE.seqType().mayBeNumber());
+    assertFalse(SeqType.STRING_O.mayBeNumber());
+    assertFalse(SeqType.NODE_O.mayBeNumber());
+    assertFalse(SeqType.ELEMENT_O.mayBeNumber());
+    assertFalse(SeqType.NMTOKENS_O.mayBeNumber());
+
+    assertTrue(SeqType.ITEM_O.mayBeArray());
+    assertTrue(SeqType.FUNCTION_O.mayBeArray());
+    assertFalse(SeqType.MAP_O.mayBeArray());
+    assertTrue(SeqType.ARRAY_O.mayBeArray());
+    assertFalse(SeqType.RECORD_O.mayBeArray());
+    assertFalse(SeqType.ANY_ATOMIC_TYPE_O.mayBeArray());
+    assertFalse(SeqType.NUMERIC_O.mayBeArray());
+    assertFalse(SeqType.INTEGER_O.mayBeArray());
+    assertFalse(AtomType.BYTE.seqType().mayBeArray());
+    assertFalse(SeqType.STRING_O.mayBeArray());
+    assertFalse(SeqType.NODE_O.mayBeArray());
+    assertFalse(SeqType.ELEMENT_O.mayBeArray());
+    assertFalse(SeqType.NMTOKENS_O.mayBeArray());
+
+    assertTrue(SeqType.ITEM_O.mayBeFunction());
+    assertTrue(SeqType.FUNCTION_O.mayBeFunction());
+    assertTrue(SeqType.MAP_O.mayBeFunction());
+    assertTrue(SeqType.ARRAY_O.mayBeFunction());
+    assertTrue(SeqType.RECORD_O.mayBeFunction());
+    assertFalse(SeqType.ANY_ATOMIC_TYPE_O.mayBeFunction());
+    assertFalse(SeqType.NUMERIC_O.mayBeFunction());
+    assertFalse(SeqType.INTEGER_O.mayBeFunction());
+    assertFalse(AtomType.BYTE.seqType().mayBeFunction());
+    assertFalse(SeqType.STRING_O.mayBeFunction());
+    assertFalse(SeqType.NODE_O.mayBeFunction());
+    assertFalse(SeqType.ELEMENT_O.mayBeFunction());
+    assertFalse(SeqType.NMTOKENS_O.mayBeFunction());
+
+  }
+
+  /**
    * Combines two sequences types.
    * @param st1 first type
    * @param st2 second type
