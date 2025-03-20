@@ -147,8 +147,7 @@ public final class SerializerTest extends SandboxTest {
         "<!DOCTYPE HTML>\n"
         + "<html>\n"
         + "  <body onload=\"alert(&quot;loaded&quot;)\"\n"
-        + "        style=\"background: black\">\n"
-        + "  </body>\n"
+        + "        style=\"background: black\"></body>\n"
         + "</html>");
   }
 
