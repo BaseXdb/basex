@@ -1929,49 +1929,42 @@ public class QueryParser extends InputParser {
     Expr expr = unary();
     if(expr != null) {
       while(true) {
-        if(wsConsume("=?>") || wsConsume("=?\uFF1E")) {
-          skipWs();
-          final Str name = Str.get(ncName(ARROWSPEC_X));
-          final FuncBuilder fb = argumentList(false, null);
-          expr = new LookupArrow(info(), name, ExprList.concat(expr, fb.args()));
-        } else {
-          final boolean mapping = wsConsume("=!>") || wsConsume("=!\uFF1E");
-          if(!mapping && !consume("=>") && !consume("=\uFF1E")) break;
+        final boolean mapping = wsConsume("=!>") || wsConsume("=!\uFF1E");
+        if(!mapping && !consume("=>") && !consume("=\uFF1E")) break;
 
-          QNm name = null;
-          Expr ex;
-          skipWs();
-          if(current('$')) {
-            ex = varRef();
-          } else if(current('(')) {
-            ex = parenthesized();
-          } else {
-            ex = mapConstructor();
-            if(ex == null) ex = arrayConstructor();
-            if(ex == null) ex = functionItem();
-            if(ex == null) {
-              name = eQName(sc.funcNS, ARROWSPEC_X);
-              if(reserved(name)) throw error(RESERVED_X, name.local());
-            }
+        QNm name = null;
+        Expr ex;
+        skipWs();
+        if(current('$')) {
+          ex = varRef();
+        } else if(current('(')) {
+          ex = parenthesized();
+        } else {
+          ex = mapConstructor();
+          if(ex == null) ex = arrayConstructor();
+          if(ex == null) ex = functionItem();
+          if(ex == null) {
+            name = eQName(sc.funcNS, ARROWSPEC_X);
+            if(reserved(name)) throw error(RESERVED_X, name.local());
           }
-          final InputInfo ii = info();
-          final Expr arg;
-          For fr = null;
-          int s = 0;
-          if(mapping) {
-            s = localVars.openScope();
-            fr = new For(localVars.add(new Var(new QNm("item"), null, qc, ii)), expr);
-            arg = new VarRef(ii, fr.var);
-          } else {
-            arg = expr;
-          }
-          final FuncBuilder fb = argumentList(ex == null, arg);
-          expr = ex != null ? Functions.dynamic(ex, fb) :
-            Functions.get(name, fb, qc, moduleURIs.contains(name.uri()));
-          if(mapping) {
-            expr = new GFLWOR(ii, fr, expr);
-            localVars.closeScope(s);
-          }
+        }
+        final InputInfo ii = info();
+        final Expr arg;
+        For fr = null;
+        int s = 0;
+        if(mapping) {
+          s = localVars.openScope();
+          fr = new For(localVars.add(new Var(new QNm("item"), null, qc, ii)), expr);
+          arg = new VarRef(ii, fr.var);
+        } else {
+          arg = expr;
+        }
+        final FuncBuilder fb = argumentList(ex == null, arg);
+        expr = ex != null ? Functions.dynamic(ex, fb) :
+          Functions.get(name, fb, qc, moduleURIs.contains(name.uri()));
+        if(mapping) {
+          expr = new GFLWOR(ii, fr, expr);
+          localVars.closeScope(s);
         }
       }
     }
