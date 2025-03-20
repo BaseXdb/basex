@@ -50,12 +50,11 @@ public final class Lookup extends Arr {
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
-    final Expr expr = opt(cc);
-
     // replace if different, unless there is a chance of a %method that needs to be processed
     final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
-    if(expr != this && (array || !st.mayBeFunction())) {
-      return cc.replaceWith(this, expr);
+    if(array || !st.mayBeFunction()) {
+      final Expr expr = opt(cc);
+      if(expr != this) return cc.replaceWith(this, expr);
     }
 
     // derive type from input expression
@@ -185,14 +184,19 @@ public final class Lookup extends Arr {
    * @return value, or new function item with focus bound to map
    */
   private Value bindFocusIfNeeded(final XQStruct struct, final Value value) {
-    if(!(struct instanceof XQMap) || !(value instanceof FuncItem)) return value;
-    final FuncItem fi = (FuncItem) value;
-    if(!fi.annotations().contains(Annotation.METHOD)) return value;
-    final AnnList anns = AnnList.EMPTY;
-    for(final Ann a : fi.annotations()) if(a.definition != Annotation.METHOD) anns.attach(a);
-    final QueryFocus qf = new QueryFocus();
-    qf.value = struct;
-    return new FuncItem(fi, anns, qf);
+    if(struct instanceof XQMap && value instanceof FuncItem) {
+      final FuncItem fi = (FuncItem) value;
+      if(fi.annotations().contains(Annotation.METHOD)) {
+        AnnList anns = AnnList.EMPTY;
+        for(final Ann a : fi.annotations()) {
+          if(a.definition != Annotation.METHOD) anns = anns.attach(a);
+        }
+        final QueryFocus qf = new QueryFocus();
+        qf.value = struct;
+        return new FuncItem(fi, anns, qf);
+      }
+    }
+    return value;
   }
 
   @Override
