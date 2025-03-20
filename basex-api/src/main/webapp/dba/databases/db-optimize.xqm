@@ -42,7 +42,7 @@ function dba:db-optimize(
 ) {
   html:update($do, { 'header': ($dba:CAT, $name) }, fn() {
     let $opts := if ($do) then $opts else db:info($name)//*[text() = 'true']/name()
-    let $lang := if ($do) then $lang else db:property('input', 'language')
+    let $lang := if ($do) then $lang else db:property($name, 'language')
     return <tr>
       <td>
         <form method='post' autocomplete='off'>
