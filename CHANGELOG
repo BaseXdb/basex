@@ -1,3 +1,15 @@
+VERSION 11.8 (March 20, 2025) ------------------------------------------
+
+ - [MOD] Lightning fast construction of ordered maps of all types
+ - [MOD] fn:distinct-values, fn:duplicate-values: faster comparisons
+ - [MOD] Faster map comparison (ordered and unordered)
+ - [ADD] New function util:values-except
+ - [ADD] XQuery 4.0 functionality (functions, %method annotation)
+ - [MOD] XQuery fold functions: more early exits
+ - [MOD] XQuery, fn:parse-xml: options added
+ - [MOD] prof:variables: Better capture of in-scope variables
+ - [FIX] Stricter permission checks when calling built-in functions
+
 VERSION 11.7 (January 31, 2025) ----------------------------------------
 
  - [ADD] XQuery: Ordered maps, preserving the insertion order
