@@ -45,14 +45,15 @@ public final class Lookup extends Arr {
     final long is = inputs.size();
     if(is == 0) return cc.replaceWith(this, inputs);
 
-    // skip optimizations if input may yield other items than maps or arrays
+    // skip optimizations if input may yield items other than maps or arrays
     final Type tp = inputs.seqType().type;
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
     // replace if different, unless there is a chance of a %method that needs to be processed
     final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
-    if(array || !st.mayBeFunction()) {
+    if(array || !st.mayBeFunction() || st.instanceOf(SeqType.ARRAY_ZM) ||
+        st.instanceOf(SeqType.MAP_ZM)) {
       final Expr expr = opt(cc);
       if(expr != this) return cc.replaceWith(this, expr);
     }
