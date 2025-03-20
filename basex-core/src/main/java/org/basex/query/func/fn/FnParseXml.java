@@ -24,7 +24,7 @@ public final class FnParseXml extends FnParseXmlFragment {
     /** Custom option (see {@link MainOptions#INTPARSE}). */
     public static final BooleanOption INTPARSE = new BooleanOption("intparse", false);
     /** Custom option (see {@link MainOptions#DTD}). */
-    public static final BooleanOption DTD = new BooleanOption("dtd", false);
+    public static final BooleanOption DTD = new BooleanOption("dtd", true);
     /** Custom option (see {@link MainOptions#XINCLUDE}). */
     public static final BooleanOption XINCLUDE = new BooleanOption("xinclude", false);
     /** Custom option (see {@link MainOptions#CATALOG}). */
