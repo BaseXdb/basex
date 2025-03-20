@@ -50,7 +50,7 @@ public final class Lookup extends Arr {
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
-    Expr expr = opt(cc);
+    final Expr expr = opt(cc);
 
     // replace if different, unless there is a chance of a %method that needs to be processed
     final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
@@ -172,8 +172,7 @@ public final class Lookup extends Arr {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter ir = keys.atomIter(qc, info);
     for(Item key; (key = ir.next()) != null;) {
-      Value value = struct.invoke(qc, info, key);
-      vb.add(bindFocusIfNeeded(struct, value));
+      vb.add(bindFocusIfNeeded(struct, struct.invoke(qc, info, key)));
     }
     return vb.value(this);
   }
@@ -190,7 +189,7 @@ public final class Lookup extends Arr {
     final FuncItem fi = (FuncItem) value;
     if(!fi.annotations().contains(Annotation.METHOD)) return value;
     final AnnList anns = AnnList.EMPTY;
-    for(Ann a : fi.annotations()) if(a.definition != Annotation.METHOD) anns.attach(a);
+    for(final Ann a : fi.annotations()) if(a.definition != Annotation.METHOD) anns.attach(a);
     final QueryFocus qf = new QueryFocus();
     qf.value = struct;
     return new FuncItem(fi, anns, qf);

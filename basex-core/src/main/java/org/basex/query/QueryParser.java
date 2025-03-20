@@ -2553,7 +2553,7 @@ public class QueryParser extends InputParser {
           expr = enclosedExpr();
         } else {
           // focus function
-          Ann method = anns.get(Annotation.METHOD);
+          final Ann method = anns.get(Annotation.METHOD);
           if(method != null) throw NOMETHOD.get(method.info);
           final InputInfo ii = info();
           final QNm name = new QNm("arg");
