@@ -32,7 +32,8 @@ public final class ArchiveRefresh extends ArchiveCreate {
     try {
       if(!localZip(io)) throw ARCHIVE_ZIP_X.get(info, io);
 
-      try(FileSystem fs = FileSystems.newFileSystem(Paths.get(io.path()), (ClassLoader /* needed for JDK 13 and up */) null)) {
+      try(FileSystem fs = FileSystems.newFileSystem(Paths.get(io.path()),
+          (ClassLoader /* needed for JDK 13 and up */) null)) {
         for(final Entry<String, Entry<Item, Item>> file : files.entrySet()) {
           final Path path = fs.getPath(file.getKey());
           final Entry<Item, Item> entry = file.getValue();
