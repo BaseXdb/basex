@@ -173,7 +173,7 @@ public final class PathIndex implements Index {
    * @return descendant nodes
    */
   public ArrayList<PathNode> desc(final byte[] name) {
-    final int id = data.elemNames.id(name);
+    final int id = data.elemNames.index(name);
     final ArrayList<PathNode> list = new ArrayList<>();
     for(final PathNode child : root.children) child.addDesc(list, id);
     return list;
@@ -208,7 +208,7 @@ public final class PathIndex implements Index {
     for(final byte[] name : names) {
       final boolean attr = startsWith(name, '@');
       final byte kind = attr ? Data.ATTR : Data.ELEM;
-      final int id = attr ? data.attrNames.id(substring(name, 1)) : data.elemNames.id(name);
+      final int id = attr ? data.attrNames.index(substring(name, 1)) : data.elemNames.index(name);
 
       final ArrayList<PathNode> list = new ArrayList<>();
       for(final PathNode node : nodes) {

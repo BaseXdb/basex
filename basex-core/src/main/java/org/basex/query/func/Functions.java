@@ -229,7 +229,7 @@ public final class Functions {
    * @return function definition if found, {@code null} otherwise
    */
   static FuncDefinition builtIn(final QNm name) {
-    final int id = CACHE.id(name.unique());
+    final int id = CACHE.index(name.unique());
     return id != 0 ? DEFINITIONS.get(id - 1) : null;
   }
 

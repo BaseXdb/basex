@@ -308,7 +308,7 @@ public final class Store implements Closeable {
    * Reads a store from disk.
    * @param in input stream
    * @param qc query context
-   * @return value or {@code null} if data could not be read
+   * @return value, or {@code null} if data could not be read
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */

@@ -25,8 +25,7 @@ public final class QNmMap<E> extends QNmSet {
   }
 
   /**
-   * Stores the specified key and value.
-   * If the key exists, the value is updated.
+   * Stores the specified key and value. If the key exists, the value is updated.
    * @param key QName to look up
    * @param val value
    * @return old value
@@ -41,8 +40,7 @@ public final class QNmMap<E> extends QNmSet {
   }
 
   /**
-   * Returns the value for the specified key.
-   * Creates a new value if none exists.
+   * Returns the value for the specified key. Creates a new value if none exists.
    * @param key key
    * @param func function that create a new value
    * @return value
@@ -63,7 +61,7 @@ public final class QNmMap<E> extends QNmSet {
    */
   @SuppressWarnings("unchecked")
   public E get(final QNm qnm) {
-    return (E) values[id(qnm)];
+    return (E) values[index(qnm)];
   }
 
   /**

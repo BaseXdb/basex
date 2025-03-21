@@ -38,10 +38,10 @@ public final class XQIntValueMap extends XQHashMap {
   Value getInternal(final Item key) throws QueryException {
     if(key instanceof ANum) {
       final double d = key.dbl(null);
-      final int i = (int) d;
-      if(d == i) {
-        final int id = map.id(i);
-        if(id != 0) return valueInternal(id);
+      final int v = (int) d;
+      if(d == v) {
+        final int i = map.index(v);
+        if(i != 0) return valueInternal(i);
       }
     }
     return null;

@@ -52,13 +52,12 @@ public class HashItemSet extends ASet implements ItemSet {
   }
 
   /**
-   * Returns the key with the specified id.
-   * All ids start with {@code 1} instead of {@code 0}.
-   * @param id id of the key
+   * Returns the key with the specified index.
+   * @param index index of the key (starts with {@code 1})
    * @return key
    */
-  public final Item key(final int id) {
-    return keys[id];
+  public final Item key(final int index) {
+    return keys[index];
   }
 
   /**
@@ -71,49 +70,49 @@ public class HashItemSet extends ASet implements ItemSet {
 
   @Override
   public final boolean add(final Item key) throws QueryException {
-    return index(key) >= 0;
+    return store(key) >= 0;
   }
 
   /**
-   * Stores the specified key and returns its id.
+   * Stores the specified key and returns its index.
    * @param key key to be added
-   * @return unique id of stored key (larger than zero)
+   * @return index of stored key (larger than {@code 0})
    * @throws QueryException query exception
    */
   public final int put(final Item key) throws QueryException {
-    final int id = index(key);
-    return Math.abs(id);
+    final int i = store(key);
+    return Math.abs(i);
   }
 
   @Override
   public final boolean contains(final Item key) throws QueryException {
-    return id(key) > 0;
+    return index(key) > 0;
   }
 
   /**
-   * Returns the id of the specified key, or {@code 0} if the key does not exist.
+   * Returns the index of the specified key.
    * @param key key to be looked up
-   * @return id, or {@code 0} if key does not exist
+   * @return index, or {@code 0} if key does not exist
    * @throws QueryException query exception
    */
-  public final int id(final Item key) throws QueryException {
-    return id(key, key.hashCode() & capacity() - 1);
+  public final int index(final Item key) throws QueryException {
+    return index(key, key.hashCode() & capacity() - 1);
   }
 
   /**
    * Stores the specified key and returns its index, or returns the negative index if a key
    * already existed.
    * @param key key to be indexed
-   * @return id, or negative id if the key already exists
+   * @return index, or negative index if the key already exists
    * @throws QueryException query exception
    */
-  private int index(final Item key) throws QueryException {
+  private int store(final Item key) throws QueryException {
     final int h = key.hashCode();
     int b = h & capacity() - 1;
-    final int id = id(key, b);
-    if(id > 0) {
-      keys[id] = key;
-      return -id;
+    final int i = index(key, b);
+    if(i > 0) {
+      keys[i] = key;
+      return -i;
     }
 
     final int s = size++;
@@ -125,22 +124,22 @@ public class HashItemSet extends ASet implements ItemSet {
   }
 
   /**
-   * Returns the id for the specified key and bucket, or {@code 0} if the key does not exist.
+   * Returns the index for the specified key and bucket.
    * @param key key to be looked up
    * @param b bucket index
-   * @return id, or {@code 0} if key does not exist
+   * @return index, or {@code 0} if key does not exist
    * @throws QueryException query exception
    */
-  private int id(final Item key, final int b) throws QueryException {
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(equal.test(keys[id], key)) return id;
+  private int index(final Item key, final int b) throws QueryException {
+    for(int i = buckets[b]; i != 0; i = next[i]) {
+      if(equal.test(keys[i], key)) return i;
     }
     return 0;
   }
 
   @Override
-  protected final int hashCode(final int id) {
-    return keys[id].hashCode();
+  protected final int hashCode(final int index) {
+    return keys[index].hashCode();
   }
 
   @Override

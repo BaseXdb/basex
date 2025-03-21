@@ -49,7 +49,7 @@ public final class MemValues extends ValueIndex {
 
   @Override
   public IndexIterator iter(final IndexSearch search) {
-    final int id = values.id(search.token());
+    final int id = values.index(search.token());
     if(id == 0) return IndexIterator.EMPTY;
 
     final int len = lenList.get(id);
@@ -75,7 +75,7 @@ public final class MemValues extends ValueIndex {
 
   @Override
   public IndexCosts costs(final IndexSearch search) {
-    return IndexCosts.get(lenList.get(values.id(search.token())));
+    return IndexCosts.get(lenList.get(values.index(search.token())));
   }
 
   @Override
@@ -166,7 +166,7 @@ public final class MemValues extends ValueIndex {
    */
   void add(final byte[] key, final int... vals) {
     // token index: add values. otherwise, reference existing values
-    final int id = type == IndexType.TOKEN ? values.put(key) : values.id(key), vl = vals.length;
+    final int id = type == IndexType.TOKEN ? values.put(key) : values.index(key), vl = vals.length;
     // updatable index: if required, resize existing arrays
     while(idsList.size() < id + 1) idsList.add(null);
     if(lenList.size() < id + 1) lenList.set(id, 0);
@@ -204,7 +204,7 @@ public final class MemValues extends ValueIndex {
    * @param vals sorted values
    */
   void delete(final byte[] key, final int... vals) {
-    final int id = values.id(key), vl = vals.length, l = lenList.get(id), s = l - vl;
+    final int id = values.index(key), vl = vals.length, l = lenList.get(id), s = l - vl;
     final int[] ids = idsList.get(id);
     for(int i = 0, n = 0, v = 0; i < l; i++) {
       if(v == vl || ids[i] != vals[v]) ids[n++] = ids[i];

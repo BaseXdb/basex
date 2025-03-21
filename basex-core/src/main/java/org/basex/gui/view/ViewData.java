@@ -121,7 +121,7 @@ public final class ViewData {
    */
   public static int labelID(final Data data, final String labels) {
     for(final byte[] key : Token.split(Token.token(labels), ',')) {
-      final int id = data.attrNames.id(key);
+      final int id = data.attrNames.index(key);
       if(id > 0) return id;
     }
     return 0;
@@ -133,7 +133,7 @@ public final class ViewData {
    * @return size id, or {@code 0} if key does not exist
    */
   public static int sizeID(final Data data) {
-    return data.attrNames.id(T_SIZE);
+    return data.attrNames.index(T_SIZE);
   }
 
   /**

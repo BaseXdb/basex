@@ -45,63 +45,63 @@ public final class Names extends TokenSet implements Index {
     super(in);
     this.meta = meta;
     stats = new Stats[keys.length];
-    for(int id = 1; id < size; id++) stats[id] = new Stats(in);
+    for(int i = 1; i < size; i++) stats[i] = new Stats(in);
   }
 
   /**
    * Initializes the index.
    */
   public void init() {
-    for(int id = 1; id < size; id++) stats[id] = new Stats();
+    for(int i = 1; i < size; i++) stats[i] = new Stats();
   }
 
   /**
-   * Indexes a name, updates the statistics, and returns the name id.
+   * Stores a name, updates the statistics, and returns the index of the name.
    * @param name name to be added
-   * @return name id
+   * @return index
    */
-  public int index(final byte[] name) {
-    return index(name, null);
+  public int store(final byte[] name) {
+    return store(name, null);
   }
 
   /**
-   * Indexes a name, updates the statistics, and returns the name id.
+   * Stores a name, updates the statistics, and returns the index of the name.
    * @param name name to be added
    * @param value value, added to statistics (can be {@code null})
-   * @return name id
+   * @return index
    */
-  public int index(final byte[] name, final byte[] value) {
-    final int id = put(name);
-    Stats s = stats[id];
+  public int store(final byte[] name, final byte[] value) {
+    final int i = put(name);
+    Stats s = stats[i];
     if(s == null) {
       s = new Stats();
-      stats[id] = s;
+      stats[i] = s;
     }
     if(value != null) s.add(value, meta);
     s.count++;
-    return id;
+    return i;
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     super.write(out);
-    for(int id = 1; id < size; id++) {
-      Stats s = stats[id];
+    for(int i = 1; i < size; i++) {
+      Stats s = stats[i];
       if(s == null) {
         s = new Stats();
-        stats[id] = s;
+        stats[i] = s;
       }
       s.write(out);
     }
   }
 
   /**
-   * Returns the statistics for the specified key id.
-   * @param id name id
+   * Returns the statistics for the key with the specified index.
+   * @param index index of name
    * @return statistics (can be {@code null})
    */
-  public Stats stats(final int id) {
-    return stats[id];
+  public Stats stats(final int index) {
+    return stats[index];
   }
 
   @Override
@@ -109,27 +109,27 @@ public final class Names extends TokenSet implements Index {
     final int[] tl = new int[size];
     tl[0] = 0;
     int len = 0;
-    for(int id = 1; id < size; id++) {
-      if(len < keys[id].length) len = keys[id].length;
-      if(stats[id] == null) continue;
-      tl[id] = stats[id].count;
+    for(int i = 1; i < size; i++) {
+      if(len < keys[i].length) len = keys[i].length;
+      if(stats[i] == null) continue;
+      tl[i] = stats[i].count;
     }
     len += 2;
 
     // print all entries in descending number of occurrences
-    final int[] ids = Array.createOrder(tl, false);
+    final int[] ordered = Array.createOrder(tl, false);
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(Text.LI_STRUCTURE).add(Text.HASH).add(Text.NL);
     tb.add(Text.LI_ENTRIES).addInt(size - 1).add(Text.NL);
     for(int i = 0; i < size - 1; i++) {
-      final int id = ids[i];
-      if(stats[id] == null) continue;
-      final byte[] key = keys[id];
+      final int o = ordered[i];
+      if(stats[o] == null) continue;
+      final byte[] key = keys[o];
       tb.add("  ").add(key);
       final int kl = len - key.length;
       for(int k = 0; k < kl; ++k) tb.add(' ');
-      tb.add(stats[id] + Text.NL);
+      tb.add(stats[o] + Text.NL);
     }
     return tb.finish();
   }

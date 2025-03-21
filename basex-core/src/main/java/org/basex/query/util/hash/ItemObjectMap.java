@@ -34,19 +34,17 @@ public final class ItemObjectMap<E> extends HashItemSet {
   }
 
   /**
-   * Returns the value with the specified id.
-   * All ids start with {@code 1} instead of {@code 0}.
-   * @param id id of the value
+   * Returns the value with the specified index.
+   * @param index index of the value (starts with {@code 1})
    * @return value
    */
   @SuppressWarnings("unchecked")
-  public E value(final int id) {
-    return (E) values[id];
+  public E value(final int index) {
+    return (E) values[index];
   }
 
   /**
-   * Stores the specified key and value.
-   * If the key exists, the value is updated.
+   * Stores the specified key and value. If the key exists, the value is updated.
    * @param key key
    * @param value value
    * @throws QueryException query exception
@@ -62,8 +60,7 @@ public final class ItemObjectMap<E> extends HashItemSet {
   }
 
   /**
-   * Returns the value for the specified key.
-   * Creates a new value if none exists.
+   * Returns the value for the specified key. Creates a new value if none exists.
    * @param key key
    * @param func function that create a new value
    * @return value
@@ -86,7 +83,7 @@ public final class ItemObjectMap<E> extends HashItemSet {
    */
   @SuppressWarnings("unchecked")
   public E get(final Item key) throws QueryException {
-    return (E) values[id(key)];
+    return (E) values[index(key)];
   }
 
   @Override

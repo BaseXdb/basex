@@ -34,17 +34,17 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * @return {@code true} if the key did not exist yet and was stored
    */
   public final boolean add(final QNm key) {
-    return index(key) > 0;
+    return store(key) > 0;
   }
 
   /**
-   * Stores the specified key and returns its id.
+   * Stores the specified key and returns its index.
    * @param key key to be added
-   * @return unique id of stored key (larger than zero)
+   * @return index of stored key (larger than {@code 0})
    */
   public final int put(final QNm key) {
-    final int id = index(key);
-    return Math.abs(id);
+    final int i = store(key);
+    return Math.abs(i);
   }
 
   /**
@@ -53,33 +53,33 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * @return result of check
    */
   public final boolean contains(final QNm key) {
-    return id(key) > 0;
+    return index(key) > 0;
   }
 
   /**
-   * Returns the id of the specified key, or {@code 0} if the key does not exist.
+   * Returns the index of the specified key.
    * @param key key to be looked up
-   * @return id, or {@code 0} if key does not exist
+   * @return index, or {@code 0} if key does not exist
    */
-  public final int id(final QNm key) {
+  public final int index(final QNm key) {
     final int b = key.hashCode() & capacity() - 1;
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(key.eq(keys[id])) return id;
+    for(int i = buckets[b]; i != 0; i = next[i]) {
+      if(key.eq(keys[i])) return i;
     }
     return 0;
   }
 
   /**
-   * Stores the specified key and returns its id, or returns the negative id if the key has already
-   * been stored. The public method {@link #add} can be used to check if an added value exists.
+   * Stores the specified key and returns its index,
+   * or returns the negative index if the key has already been stored.
    * @param key key to be indexed
-   * @return id, or negative id if key has already been stored
+   * @return index, or negative index if the key already exists
    */
-  private int index(final QNm key) {
+  private int store(final QNm key) {
     final int h = key.hashCode();
     int b = h & capacity() - 1;
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(keys[id].eq(key)) return -id;
+    for(int i = buckets[b]; i != 0; i = next[i]) {
+      if(keys[i].eq(key)) return -i;
     }
     final int s = size++;
     if(checkCapacity()) b = h & capacity() - 1;
@@ -91,8 +91,8 @@ public class QNmSet extends ASet implements Iterable<QNm> {
   }
 
   @Override
-  protected final int hashCode(final int id) {
-    return hash[id];
+  protected final int hashCode(final int index) {
+    return hash[index];
   }
 
   @Override

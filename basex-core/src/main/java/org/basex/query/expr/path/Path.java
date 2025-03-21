@@ -594,7 +594,7 @@ public abstract class Path extends ParseExpr {
       final NameTest test = (NameTest) curr.test;
       if(test.part() != NamePart.LOCAL) return null;
 
-      final int name = data.elemNames.id(test.qname.local());
+      final int name = data.elemNames.index(test.qname.local());
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {

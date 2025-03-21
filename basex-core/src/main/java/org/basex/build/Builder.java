@@ -287,7 +287,7 @@ public abstract class Builder extends Job {
    */
   private void addElem(final byte[] name, final Atts atts, final Atts nsp) throws IOException {
     // get reference of element name
-    int nameId = elemNames.index(name);
+    int nameId = elemNames.store(name);
     path.index(nameId, Data.ELEM, level);
 
     // cache pre value
@@ -311,7 +311,7 @@ public abstract class Builder extends Job {
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
       final byte[] an = atts.name(a), av = atts.value(a), ap = prefix(an);
-      nameId = attrNames.index(an, av);
+      nameId = attrNames.store(an, av);
       uriId = nspaces.uriIdForPrefix(ap, false);
       if(uriId == 0 && ap.length != 0 && !eq(ap, XML))
         throw new BuildException(WHICHNS, parser.detailedInfo(), an);

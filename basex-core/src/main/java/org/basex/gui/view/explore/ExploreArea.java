@@ -173,7 +173,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
           final boolean att = Strings.startsWith(item, '@');
           final Names names = att ? data.attrNames : data.elemNames;
           final byte[] key = Token.token(att ? item.substring(1) : item);
-          final Stats stats = names.stats(names.id(key));
+          final Stats stats = names.stats(names.index(key));
           if(StatsType.isInteger(stats.type)) {
             addSlider(stats.min, stats.max, cp + 1, true);
           } else if(StatsType.isDouble(stats.type)) {

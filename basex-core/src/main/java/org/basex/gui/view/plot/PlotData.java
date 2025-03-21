@@ -63,7 +63,7 @@ final class PlotData {
     final StringList sl = new StringList();
     for(final byte[] nm : data.paths.desc(name, true, false)) {
       final Names names = startsWith(nm, '@') ? data.attrNames : data.elemNames;
-      if(names.stats(names.id(delete(nm, '@'))).type != StatsType.NONE) sl.add(nm);
+      if(names.stats(names.index(delete(nm, '@'))).type != StatsType.NONE) sl.add(nm);
     }
     return sl.finish();
   }
@@ -92,7 +92,7 @@ final class PlotData {
   void refreshItems(final DBNodes nodes, final boolean sub) {
     final Data data = context.data();
     final IntList il = new IntList();
-    final int itmID = data.elemNames.id(item);
+    final int itmID = data.elemNames.index(item);
 
     if(!sub) {
       pres = nodes.pres();

@@ -243,7 +243,7 @@ public abstract class Step extends Preds {
       if(t instanceof NameTest) {
         final NameTest nt = (NameTest) t;
         if(nt.part() != NamePart.LOCAL) return false;
-        name = names.id(nt.local);
+        name = names.index(nt.local);
       }
       for(final PathNode pn : nodes) {
         if(axis == SELF || axis == DESCENDANT_OR_SELF) {

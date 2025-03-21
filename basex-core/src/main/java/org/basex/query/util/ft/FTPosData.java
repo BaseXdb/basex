@@ -97,7 +97,7 @@ public final class FTPosData {
   /**
    * Returns the index of the specified pre value.
    * @param pre int pre value
-   * @return index, or negative index - 1 if pre value is not found
+   * @return index, or negative index -1 if pre value is not found
    */
   private int find(final int pre) {
     // binary search

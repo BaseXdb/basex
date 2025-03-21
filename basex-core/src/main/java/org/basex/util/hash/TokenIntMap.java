@@ -57,8 +57,7 @@ public final class TokenIntMap extends TokenSet {
   }
 
   /**
-   * Stores the specified key and value.
-   * If the key exists, the value is updated.
+   * Stores the specified key and value. If the key exists, the value is updated.
    * Note that {@link Integer#MIN_VALUE} is used to indicate that a key does not exist.
    * @param key key
    * @param value value
@@ -78,17 +77,16 @@ public final class TokenIntMap extends TokenSet {
    * @return value, or {@link Integer#MIN_VALUE} if the key does not exist
    */
   public int get(final byte[] key) {
-    return values[id(key)];
+    return values[index(key)];
   }
 
   /**
-   * Returns the value with the specified id.
-   * All ids start with {@code 1} instead of {@code 0}.
-   * @param id id of the value
+   * Returns the value with the specified index.
+   * @param index index of the value (starts with {@code 1})
    * @return value
    */
-  public int value(final int id) {
-    return values[id];
+  public int value(final int index) {
+    return values[index];
   }
 
   @Override

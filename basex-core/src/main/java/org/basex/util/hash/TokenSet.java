@@ -90,7 +90,7 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return {@code true} if the key did not exist yet and was stored
    */
   public final boolean add(final byte[] key) {
-    return index(key) > 0;
+    return store(key) > 0;
   }
 
   /**
@@ -103,13 +103,13 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   }
 
   /**
-   * Stores the specified key and returns its id.
+   * Stores the specified key and returns its index.
    * @param key key to be added
-   * @return unique id of stored key (larger than zero)
+   * @return index of stored key (larger than {@code 0})
    */
   public final int put(final byte[] key) {
-    final int id = index(key);
-    return Math.abs(id);
+    final int index = store(key);
+    return Math.abs(index);
   }
 
   /**
@@ -118,30 +118,29 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * @return result of check
    */
   public final boolean contains(final byte[] key) {
-    return id(key) > 0;
+    return index(key) > 0;
   }
 
   /**
-   * Returns the id of the specified key, or {@code 0} if the key does not exist.
+   * Returns the index of the specified key, or {@code 0} if the key does not exist.
    * @param key key to be looked up
-   * @return id, or {@code 0} if key does not exist
+   * @return index, or {@code 0} if key does not exist
    */
-  public final int id(final byte[] key) {
+  public final int index(final byte[] key) {
     final int b = Token.hashCode(key) & capacity() - 1;
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(Token.eq(key, keys[id])) return id;
+    for(int i = buckets[b]; i != 0; i = next[i]) {
+      if(Token.eq(key, keys[i])) return i;
     }
     return 0;
   }
 
   /**
-   * Returns the key with the specified id.
-   * All ids start with {@code 1} instead of {@code 0}.
-   * @param id id of the key to return
+   * Returns the key with the specified index.
+   * @param index index of the key (starts with {@code 1})
    * @return key
    */
-  public final byte[] key(final int id) {
-    return keys[id];
+  public final byte[] key(final int index) {
+    return keys[index];
   }
 
   /**
@@ -149,31 +148,31 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
    * The deletion of keys will lead to empty entries. If {@link #size} is called after
    * deletions, the original number of entries will be returned.
    * @param key key
-   * @return id of the deleted key, or {@code 0} if the key did not exist
+   * @return index of the deleted key, or {@code 0} if the key did not exist
    */
   public int remove(final byte[] key) {
     final int b = Token.hashCode(key) & capacity() - 1;
-    for(int p = 0, id = buckets[b]; id != 0; p = id, id = next[id]) {
-      if(!Token.eq(key, keys[id])) continue;
-      if(p == 0) buckets[b] = next[id];
+    for(int p = 0, i = buckets[b]; i != 0; p = i, i = next[i]) {
+      if(!Token.eq(key, keys[i])) continue;
+      if(p == 0) buckets[b] = next[i];
       else next[p] = next[next[p]];
-      keys[id] = null;
-      return id;
+      keys[i] = null;
+      return i;
     }
     return 0;
   }
 
   /**
-   * Stores the specified key and returns its id, or returns the negative id if the key has already
-   * been stored. The public method {@link #add} can be used to check if an added value exists.
+   * Stores the specified key and returns its index,
+   * or returns the negative index if the key has already been stored.
    * @param key key to be indexed
-   * @return id, or negative id if key has already been stored
+   * @return index, or negative index if the key already exists
    */
-  private int index(final byte[] key) {
+  private int store(final byte[] key) {
     final int h = Token.hashCode(key);
     int b = h & capacity() - 1;
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(Token.eq(key, keys[id])) return -id;
+    for(int i = buckets[b]; i != 0; i = next[i]) {
+      if(Token.eq(key, keys[i])) return -i;
     }
     final int s = size++;
     if(checkCapacity()) b = h & capacity() - 1;
@@ -184,8 +183,8 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   }
 
   @Override
-  protected final int hashCode(final int id) {
-    return Token.hashCode(keys[id]);
+  protected final int hashCode(final int index) {
+    return Token.hashCode(keys[index]);
   }
 
   @Override

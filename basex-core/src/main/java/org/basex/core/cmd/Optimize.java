@@ -129,14 +129,14 @@ public final class Optimize extends ACreate {
           ++n;
         } else if(kind == Data.ELEM) {
           final int id = data.nameId(pre);
-          data.elemNames.index(data.elemNames.key(id));
+          data.elemNames.store(data.elemNames.key(id));
           data.paths.index(id, Data.ELEM, level);
           pars.push(pre);
           elemStack.push(id);
         } else if(kind == Data.ATTR) {
           final int id = data.nameId(pre);
           final byte[] value = data.text(pre, false);
-          data.attrNames.index(data.attrNames.key(id), value);
+          data.attrNames.store(data.attrNames.key(id), value);
           data.paths.index(id, Data.ATTR, level, value, meta);
         } else {
           final byte[] value = data.text(pre, true);

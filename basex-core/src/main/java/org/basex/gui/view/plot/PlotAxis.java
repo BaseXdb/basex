@@ -91,7 +91,7 @@ final class PlotAxis {
     elem = !contains(b, '@');
     b = delete(b, '@');
     final Data data = plotData.context.data();
-    attrID = (elem ? data.elemNames : data.attrNames).id(b);
+    attrID = (elem ? data.elemNames : data.attrNames).index(b);
     refreshAxis();
     return true;
   }

@@ -67,12 +67,12 @@ public abstract class ASet {
    * @return {@code true} if the hash table was resized
    */
   protected final boolean checkCapacity() {
-    return checkCapacity((id, bucket) -> { });
+    return checkCapacity((index, bucket) -> { });
   }
 
   /**
    * Checks the capacity of the hash table and resizes it if necessary.
-   * @param relocateAction action to be executed while relocating id to new bucket
+   * @param relocateAction action to be executed while relocating index to new bucket
    * @return {@code true} if the hash table was resized
    */
   protected final boolean checkCapacity(final BiConsumer<Integer, Integer> relocateAction) {
@@ -82,12 +82,12 @@ public abstract class ASet {
     final int[] bckts = new int[newSize];
 
     for(final int bucket : buckets) {
-      for(int id = bucket; id != 0;) {
-        final int b = hashCode(id) & newSize - 1, nx = next[id];
-        relocateAction.accept(id, b);
-        next[id] = bckts[b];
-        bckts[b] = id;
-        id = nx;
+      for(int i = bucket; i != 0;) {
+        final int b = hashCode(i) & newSize - 1, nx = next[i];
+        relocateAction.accept(i, b);
+        next[i] = bckts[b];
+        bckts[b] = i;
+        i = nx;
       }
     }
     buckets = bckts;
@@ -105,11 +105,11 @@ public abstract class ASet {
   }
 
   /**
-   * Returns a hash code for the element with the specified id.
-   * @param id id of the element
+   * Returns a hash code for the entry at the specified index.
+   * @param index index of the entry
    * @return hash value
    */
-  protected abstract int hashCode(int id);
+  protected abstract int hashCode(int index);
 
   /**
    * Rehashes all entries.

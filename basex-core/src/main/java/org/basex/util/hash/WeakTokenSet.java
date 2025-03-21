@@ -39,8 +39,8 @@ public final class WeakTokenSet extends ASet {
   public byte[] put(final byte[] key) {
     final int h = Token.hashCode(key), c = capacity();
     int b = h & c - 1;
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      final byte[] stored = keys[id].get();
+    for(int i = buckets[b]; i != 0; i = next[i]) {
+      final byte[] stored = keys[i].get();
       if(Token.eq(key, stored)) return stored;
     }
 
@@ -50,7 +50,7 @@ public final class WeakTokenSet extends ASet {
       s = free;
       free = next[s];
     } else {
-      if(checkCapacity((id, bucket) -> keys[id].bucket = bucket)) b = h & capacity() - 1;
+      if(checkCapacity((i, bucket) -> keys[i].bucket = bucket)) b = h & capacity() - 1;
       s = size++;
     }
     next[s] = buckets[b];
@@ -66,26 +66,26 @@ public final class WeakTokenSet extends ASet {
   private void cleanUp() {
     for(WeakTokenRef key; (key = (WeakTokenRef) gcedKeys.poll()) != null;) {
       final int b = key.bucket;
-      for(int p = 0, id = buckets[b];; p = id, id = next[id]) {
-        if(id == 0) throw Util.notExpected();
-        if(key != keys[id]) continue;
+      for(int p = 0, i = buckets[b];; p = i, i = next[i]) {
+        if(i == 0) throw Util.notExpected();
+        if(key != keys[i]) continue;
         if(p == 0) {
-          buckets[b] = next[id];
+          buckets[b] = next[i];
         } else {
-          next[p] = next[id];
+          next[p] = next[i];
         }
-        keys[id] = null;
-        next[id] = free;
-        free = id;
+        keys[i] = null;
+        next[i] = free;
+        free = i;
         break;
       }
     }
   }
 
   @Override
-  protected int hashCode(final int id) {
-    final byte[] token = keys[id].get();
-    return token == null ? keys[id].bucket : Token.hashCode(token);
+  protected int hashCode(final int index) {
+    final byte[] token = keys[index].get();
+    return token == null ? keys[index].bucket : Token.hashCode(token);
   }
 
   @Override

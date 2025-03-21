@@ -37,17 +37,17 @@ public class IntSet extends ASet {
    * @return {@code true} if the key did not exist yet and was stored
    */
   public final boolean add(final int key) {
-    return index(key) > 0;
+    return store(key) > 0;
   }
 
   /**
-   * Stores the specified key and returns its id.
+   * Stores the specified key and returns its index.
    * @param key key to be added
-   * @return unique id of stored key (larger than zero)
+   * @return index of stored key (larger than {@code 0})
    */
   public final int put(final int key) {
-    final int id = index(key);
-    return Math.abs(id);
+    final int i = store(key);
+    return Math.abs(i);
   }
 
   /**
@@ -56,42 +56,41 @@ public class IntSet extends ASet {
    * @return result of check
    */
   public final boolean contains(final int key) {
-    return id(key) > 0;
+    return index(key) > 0;
   }
 
   /**
-   * Returns the id of the specified key, or {@code 0} if the key does not exist.
+   * Returns the index of the specified key.
    * @param key key to be looked up
-   * @return id, or {@code 0} if key does not exist
+   * @return index, or {@code 0} if key does not exist
    */
-  public final int id(final int key) {
+  public final int index(final int key) {
     final int b = key & capacity() - 1;
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(key == keys[id]) return id;
+    for(int i = buckets[b]; i != 0; i = next[i]) {
+      if(key == keys[i]) return i;
     }
     return 0;
   }
 
   /**
-   * Returns the key with the specified id.
-   * All ids start with {@code 1} instead of {@code 0}.
-   * @param id id of the key to return
+   * Returns the key with the specified index.
+   * @param index index of the key (starts with {@code 1})
    * @return key
    */
-  public final int key(final int id) {
-    return keys[id];
+  public final int key(final int index) {
+    return keys[index];
   }
 
   /**
-   * Stores the specified key and returns its id, or returns the negative id if the key has already
-   * been stored. The public method {@link #add} can be used to check if an added value exists.
+   * Stores the specified key and returns its index,
+   * or returns the negative index if the key has already been stored.
    * @param key key to be indexed
-   * @return id, or negative id if key has already been stored
+   * @return index, or negative index if the key already exists
    */
-  private int index(final int key) {
+  private int store(final int key) {
     int b = key & capacity() - 1;
-    for(int id = buckets[b]; id != 0; id = next[id]) {
-      if(key == keys[id]) return -id;
+    for(int i = buckets[b]; i != 0; i = next[i]) {
+      if(key == keys[i]) return -i;
     }
     final int s = size++;
     if(checkCapacity()) b = key & capacity() - 1;
@@ -102,8 +101,8 @@ public class IntSet extends ASet {
   }
 
   @Override
-  protected final int hashCode(final int id) {
-    return keys[id];
+  protected final int hashCode(final int index) {
+    return keys[index];
   }
 
   @Override

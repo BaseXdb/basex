@@ -112,7 +112,7 @@ public final class Namespaces {
    * @return id, or {@code 0} if no entry is found
    */
   public int uriId(final byte[] uri) {
-    return uris.id(uri);
+    return uris.index(uri);
   }
 
   /**
@@ -177,7 +177,7 @@ public final class Namespaces {
    * @return id of the namespace uri, or {@code 0} if namespace is not found
    */
   private int uriId(final byte[] prefix, final NSNode node) {
-    final int prefId = prefixes.id(prefix);
+    final int prefId = prefixes.index(prefix);
     if(prefId == 0) return 0;
 
     NSNode nd = node;
@@ -363,7 +363,7 @@ public final class Namespaces {
    * @param uri namespace URI reference
    */
   public void delete(final byte[] uri) {
-    final int id = uris.id(uri);
+    final int id = uris.index(uri);
     if(id != 0) current.delete(id);
   }
 

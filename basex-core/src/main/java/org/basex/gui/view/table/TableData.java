@@ -92,7 +92,7 @@ final class TableData {
       int c = 0;
       for(final byte[] kk : data.paths.desc(k, true, false)) {
         final Names names = startsWith(kk, '@') ? data.attrNames : data.elemNames;
-        if(names.stats(names.id(delete(kk, '@'))).isLeaf()) ++c;
+        if(names.stats(names.index(delete(kk, '@'))).isLeaf()) ++c;
       }
       // add keys with a minimum of three columns
       if(c > 2) roots.add(k);
@@ -113,12 +113,12 @@ final class TableData {
     rowH = 1;
 
     if(rt == -1 && roots.isEmpty()) return;
-    if(root == -1) root = dt.elemNames.id(roots.get(0));
+    if(root == -1) root = dt.elemNames.index(roots.get(0));
     for(final byte[] k : dt.paths.desc(dt.elemNames.key(root), true, true)) {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
       final Names names = elem ? dt.elemNames : dt.attrNames;
-      if(names.stats(names.id(key)).isLeaf()) addCol(key, elem);
+      if(names.stats(names.index(key)).isLeaf()) addCol(key, elem);
     }
 
     context(true);
@@ -149,7 +149,7 @@ final class TableData {
    */
   private void addCol(final byte[] name, final boolean elem) {
     final Data data = ctx.data();
-    final int id = (elem ? data.elemNames : data.attrNames).id(name);
+    final int id = (elem ? data.elemNames : data.attrNames).index(name);
     if(id == 0) return;
     final TableCol col = new TableCol();
     col.id = id;

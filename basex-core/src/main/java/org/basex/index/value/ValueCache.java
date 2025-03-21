@@ -130,7 +130,7 @@ public final class ValueCache implements Iterable<byte[]> {
    * @return id list
    */
   IntList ids(final byte[] key) {
-    return ids.get(keys.id(key) - 1);
+    return ids.get(keys.index(key) - 1);
   }
 
   /**
@@ -139,6 +139,6 @@ public final class ValueCache implements Iterable<byte[]> {
    * @return id list or {@code null}
    */
   IntList pos(final byte[] key) {
-    return pos != null ? pos.get(keys.id(key) - 1) : null;
+    return pos != null ? pos.get(keys.index(key) - 1) : null;
   }
 }
