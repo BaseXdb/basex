@@ -41,7 +41,7 @@ public final class XQSingletonMap extends XQMap {
 
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
-    return empty().put(k, v).put(key, value);
+    return key.atomicEqual(k) ? new XQSingletonMap(k, value) : empty().put(k, v).put(key, value);
   }
 
   @Override

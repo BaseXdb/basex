@@ -81,7 +81,7 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final void refineType(final Expr expr) {
-    if(structSize() != 0) super.refineType(expr);
+    if(this != EMPTY) super.refineType(expr);
   }
 
   @Override
