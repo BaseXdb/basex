@@ -17,13 +17,13 @@ import org.basex.util.list.*;
  *
  * <p>The data is stored on disk in the following format:</p>
  * <ul>
- * <li> {@code DATATXT/ATV + 'l'}: contains the index values, which are dense id
+ * <li> {@code DATATXT/ATV + 'l'}: contains the index values, which are dense ID
  *   lists to all text nodes/attribute values, stored in the {@link Num} format:
  *   [size0, id1, id2, ...]. The number of index keys is stored in the first 4
  *   bytes of the file.</li>
- * <li> {@code DATATXT/ATV + 'r'}: contains 5-byte references to the id lists
+ * <li> {@code DATATXT/ATV + 'r'}: contains 5-byte references to the ID lists
  *   for all keys. To save space, the keys itself are not stored in the index
- *   structure. Instead, they can be found by following the id references to
+ *   structure. Instead, they can be found by following the ID references to
  *   the main table.
  * </li>
  * </ul>
@@ -135,7 +135,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
           ml.add(i);
         }
 
-        // parse through all values, cache and sort id values
+        // parse through all values, cache and sort ID values
         final int ms = ml.size();
         for(int m = 0; m < ms; ++m) {
           final DiskValuesMerger t = vm[ml.get(m)];
@@ -168,7 +168,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
    * @throws IOException I/O exception
    */
   private void writeIndex(final boolean partial) throws IOException {
-    // write id arrays and references
+    // write ID arrays and references
     final String name = DiskValues.fileSuffix(type) + (partial ? splits : "");
     try(DataOutput outL = new DataOutput(data.meta.dbFile(name + 'l'));
         DataOutput outR = new DataOutput(data.meta.dbFile(name + 'r'))) {
@@ -214,7 +214,7 @@ public final class DiskValuesBuilder extends ValuesBuilder {
    * Writes the final value structure to disk.
    * @param outL index values
    * @param outR references
-   * @param id ids
+   * @param id ID
    * @param pos positions (can be {@code null})
    * @throws IOException I/O exception
    */

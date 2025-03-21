@@ -79,7 +79,7 @@ public final class Rename extends ACreate {
   /**
    * Generates a target path for the specified document.
    * @param data data reference
-   * @param pre pre value of the document
+   * @param pre PRE value of the document
    * @param src source path
    * @param trg target path
    * @return new name

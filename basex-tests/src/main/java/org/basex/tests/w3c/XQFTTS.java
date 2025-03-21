@@ -101,7 +101,7 @@ public final class XQFTTS extends W3CTS {
   }
 
   /**
-   * Returns the resulting auxiliary uri in multiple strings.
+   * Returns the resulting auxiliary URI in multiple strings.
    * @param role role
    * @param root root node
    * @return attribute value

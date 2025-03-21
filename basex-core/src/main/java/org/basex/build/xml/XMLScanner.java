@@ -656,7 +656,7 @@ final class XMLScanner extends Job {
    * Scans an external ID.
    * @param full full flag
    * @param root root flag
-   * @return id or {@code null}
+   * @return ID or {@code null}
    * @throws IOException I/O exception
    */
   private byte[] externalID(final boolean full, final boolean root) throws IOException {

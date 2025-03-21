@@ -11,14 +11,14 @@ public final class IndexEntry {
   public final byte[] key;
   /** Number of index results. */
   public int size;
-  /** File offset to the id list. */
+  /** File offset to the ID list. */
   public long offset;
 
   /**
    * Constructor.
    * @param key key
    * @param size number of index results
-   * @param offset file offset to the id list
+   * @param offset file offset to the ID list
    */
   public IndexEntry(final byte[] key, final int size, final long offset) {
     this.key = key;

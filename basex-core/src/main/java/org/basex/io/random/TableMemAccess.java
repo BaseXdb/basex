@@ -175,7 +175,7 @@ public final class TableMemAccess extends TableAccess {
 
   /**
    * Returns the current block and assigns the {@link #current} block index.
-   * @param pre pre value
+   * @param pre PRE value
    * @return block
    */
   private TableMemBlock block(final int pre) {
@@ -214,9 +214,9 @@ public final class TableMemAccess extends TableAccess {
   }
 
   /**
-   * Returns the first pre value of the specified block.
+   * Returns the first PRE value of the specified block.
    * @param index block index
-   * @return first pre value
+   * @return first PRE value
    */
   private int firstPre(final int index) {
     return index < blocks.size() ? blocks.get(index).firstPre : meta.size;

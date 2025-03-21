@@ -30,7 +30,7 @@ public final class UserInfo {
 
   /**
    * Constructor.
-   * @param uri uri
+   * @param uri URI
    */
   public UserInfo(final URI uri) {
     this(uri, null);
@@ -38,7 +38,7 @@ public final class UserInfo {
 
   /**
    * Constructor.
-   * @param uri uri
+   * @param uri URI
    * @param request info (can be {@code null})
    */
   public UserInfo(final URI uri, final Request request) {

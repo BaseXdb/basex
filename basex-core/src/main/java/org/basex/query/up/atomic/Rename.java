@@ -22,7 +22,7 @@ final class Rename extends BasicUpdate {
    * @param location PRE value of target node location
    * @param kind target node kind
    * @param name new name for the target node
-   * @param uri new name uri for the target node
+   * @param uri new name URI for the target node
    * @param parent parent node PRE
    */
   private Rename(final int location, final int kind, final byte[] name, final byte[] uri,
@@ -39,7 +39,7 @@ final class Rename extends BasicUpdate {
    * @param data data reference
    * @param pre target node PRE
    * @param name new name
-   * @param uri new uri
+   * @param uri new URI
    * @return instance
    */
   static Rename getInstance(final Data data, final int pre, final byte[] name, final byte[] uri) {

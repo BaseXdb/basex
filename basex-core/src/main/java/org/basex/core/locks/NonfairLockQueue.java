@@ -28,7 +28,7 @@ final class NonfairLockQueue extends LockQueue {
 
     // only wait if job is locking
     if(jobs >= parallel && (read || write)) {
-      // add job id to queue and wait
+      // add job ID to queue and wait
       final Queue<Long> queue = write ? writers : readers;
       queue.add(id);
 

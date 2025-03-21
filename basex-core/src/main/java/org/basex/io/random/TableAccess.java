@@ -49,7 +49,7 @@ public abstract class TableAccess {
 
   /**
    * Reads a byte value and returns it as an integer value.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @return integer value
    */
@@ -57,7 +57,7 @@ public abstract class TableAccess {
 
   /**
    * Reads a short value and returns it as an integer value.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @return integer value
    */
@@ -65,7 +65,7 @@ public abstract class TableAccess {
 
   /**
    * Reads an integer value.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @return integer value
    */
@@ -73,7 +73,7 @@ public abstract class TableAccess {
 
   /**
    * Reads a 5-byte value and returns it as a long value.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @return integer value
    */
@@ -81,7 +81,7 @@ public abstract class TableAccess {
 
   /**
    * Writes a byte value to the specified position.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @param value value to be written
    */
@@ -89,7 +89,7 @@ public abstract class TableAccess {
 
   /**
    * Writes a short value to the specified position.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @param value value to be written
    */
@@ -97,7 +97,7 @@ public abstract class TableAccess {
 
   /**
    * Writes an integer value to the specified position.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @param value value to be written
    */
@@ -105,7 +105,7 @@ public abstract class TableAccess {
 
   /**
    * Writes a 5-byte value to the specified position.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @param value value to be written
    */
@@ -137,21 +137,21 @@ public abstract class TableAccess {
   /**
    * Copies the specified values into the database.
    * @param entries entries to copy
-   * @param first first target pre value
-   * @param last last pre value
+   * @param first first target PRE value
+   * @param last last PRE value
    */
   protected abstract void copy(byte[] entries, int first, int last);
 
   /**
    * Deletes the specified number of entries from the database.
-   * @param pre pre value of the first node to delete
+   * @param pre PRE value of the first node to delete
    * @param count number of entries to be deleted
    */
   public abstract void delete(int pre, int count);
 
   /**
    * Inserts the specified entries into the database.
-   * @param pre pre value
+   * @param pre PRE value
    * @param entries array of bytes containing the entries to insert
    */
   public abstract void insert(int pre, byte[] entries);

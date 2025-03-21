@@ -27,12 +27,12 @@ public interface ClientInfo {
 
   /**
    * Returns the name of a client, taken from the specified object or from the logged-in user.
-   * @param id object with user id (can be {@code null})
+   * @param id object with user ID (can be {@code null})
    * @param ctx database context
    * @return name of client or {@code null}
    */
   default String clientName(final Object id, final Context ctx) {
-    // try to get string representation of supplied user id
+    // try to get string representation of supplied user ID
     try {
       if(id instanceof Item) return Token.string(((Item) id).string(null));
     } catch(final QueryException ex) {

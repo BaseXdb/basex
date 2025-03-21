@@ -52,10 +52,10 @@ public class DbGetId extends DbAccessFn {
   }
 
   /**
-   * Returns the pre value for the specified id.
-   * @param id id
+   * Returns the PRE value for the specified ID.
+   * @param id ID
    * @param data data reference
-   * @return pre value
+   * @return PRE value
    */
   protected int pre(final int id, final Data data) {
     return data.pre(id);

@@ -195,7 +195,7 @@ public enum Annotation {
    * Constructor.
    * @param desc descriptive function string, containing the function name and its arguments
    * @param params parameter types
-   * @param uri uri
+   * @param uri URI
    */
   Annotation(final String desc, final SeqType[] params, final byte[] uri) {
     this(desc, params, uri, true);
@@ -205,7 +205,7 @@ public enum Annotation {
    * Constructor.
    * @param desc descriptive function string, containing the function name and its arguments
    * @param params parameter types
-   * @param uri uri
+   * @param uri URI
    * @param single annotation must only occur once
    */
   Annotation(final String desc, final SeqType[] params, final byte[] uri, final boolean single) {

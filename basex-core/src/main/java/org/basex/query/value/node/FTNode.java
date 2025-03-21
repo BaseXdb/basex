@@ -36,7 +36,7 @@ public final class FTNode extends DBNode {
    * Constructor, called by the index variant.
    * @param matches full-text matches
    * @param data data reference (can be {@code null})
-   * @param pre pre value
+   * @param pre PRE value
    * @param tl token length
    * @param is number of indexed results
    */

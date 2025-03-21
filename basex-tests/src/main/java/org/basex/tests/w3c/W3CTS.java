@@ -53,7 +53,7 @@ public abstract class W3CTS extends Main {
   private final String pathlog;
   /** Test suite input. */
   private final String input;
-  /** Test suite id. */
+  /** Test suite ID. */
   private final String testid;
 
   /** Query path. */

@@ -46,7 +46,7 @@ public final class DialogEdit extends BaseXDialog {
   /**
    * Default constructor.
    * @param gui reference to the main frame
-   * @param pre pre value
+   * @param pre PRE value
    */
   public DialogEdit(final GUI gui, final int pre) {
     super(gui, EDIT_DATA);

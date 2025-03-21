@@ -6,15 +6,15 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class indexes full-text tokens in a balanced binary tree, including their pre and pos
- * values. An iterator returns all compressed pre and pos values in a sorted manner.
+ * This class indexes full-text tokens in a balanced binary tree, including their PRE and POS
+ * values. An iterator returns all compressed PRE and POS values in a sorted manner.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */
 final class FTIndexTree extends IndexTree {
-  /** Compressed pre values. */
+  /** Compressed PRE values. */
   private TokenList poss = new TokenList(FACTOR);
   /** Tree structure [left, right, parent]. */
   private IntList numpre = new IntList(FACTOR);
@@ -31,12 +31,12 @@ final class FTIndexTree extends IndexTree {
   }
 
   /**
-   * Checks if the specified token was already indexed. If yes, its pre value is added to the
+   * Checks if the specified token was already indexed. If yes, its PRE value is added to the
    * existing values. Otherwise, a new index entry is created.
    * @param token token to be indexed
-   * @param id id value of the token
+   * @param id ID value of the token
    * @param pos pos value of the token
-   * @param index current file id
+   * @param index current file ID
    */
   void add(final byte[] token, final int id, final int pos, final int index) {
     final int os = keys.size();
@@ -88,15 +88,15 @@ final class FTIndexTree extends IndexTree {
   }
 
   /**
-   * Returns the next pre values.
-   * @return byte[] compressed pre values
+   * Returns the next PRE values.
+   * @return byte[] compressed PRE values
    */
   byte[] nextPres() {
     return ids.get(pft);
   }
 
   /**
-   * Returns the next pos values.
+   * Returns the next POS values.
    * @return byte[] compressed pos values
    */
   byte[] nextPoss() {
@@ -104,8 +104,8 @@ final class FTIndexTree extends IndexTree {
   }
 
   /**
-   * Returns the next number of pre values.
-   * @return number of pre values
+   * Returns the next number of PRE values.
+   * @return number of PRE values
    */
   int nextNumPre() {
     return numpre.get(pft);

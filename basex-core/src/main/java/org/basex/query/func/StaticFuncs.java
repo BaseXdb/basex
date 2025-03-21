@@ -211,8 +211,8 @@ public final class StaticFuncs extends ExprInfo {
   }
 
   /**
-   * Returns a function cache for the specified function id.
-   * @param id function id
+   * Returns a function cache for the specified function ID.
+   * @param id function ID
    * @return function cache
    */
   private FuncCache cache(final byte[] id) {

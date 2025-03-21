@@ -29,7 +29,7 @@ public interface Index {
   /**
    * Returns an iterator for the index results.
    * @param search index search definition
-   * @return sorted pre values for the token
+   * @return sorted PRE values for the token
    */
   IndexIterator iter(IndexSearch search);
 

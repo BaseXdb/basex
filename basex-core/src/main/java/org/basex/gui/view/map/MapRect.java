@@ -38,12 +38,12 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
 
   /**
    * Default rectangle constructor, specifying additional rectangle
-   * attributes such as id, level and orientation.
+   * attributes such as ID, level and orientation.
    * @param xx x position
    * @param yy y position
    * @param ww width
    * @param hh height
-   * @param p rectangle pre value
+   * @param p rectangle PRE value
    * @param l level
    */
   MapRect(final int xx, final int yy, final int ww, final int hh, final int p, final int l) {
@@ -55,7 +55,7 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
   /**
    * Constructor taking MapRect for position initialization.
    * @param r pos and dimension rectangle
-   * @param p rectangle pre value
+   * @param p rectangle PRE value
    */
   MapRect(final ViewRect r, final int p) {
     this(r.x, r.y, r.w, r.h, p, r.level);

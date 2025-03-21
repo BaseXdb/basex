@@ -108,11 +108,11 @@ public final class QueryContext extends Job implements Closeable {
   /** Counter for variable IDs. */
   public int varIDs;
 
-  /** Parsed modules, containing the file path and module uri. */
+  /** Parsed modules, containing the file path and module URI. */
   public final TokenObjectMap<byte[]> modParsed = new TokenObjectMap<>();
   /** Parsed modules, containing the file path and library module. */
   public final TokenObjectMap<LibraryModule> libs = new TokenObjectMap<>();
-  /** Pre-declared modules, containing module uri and their file paths (required for test APIs). */
+  /** Pre-declared modules, containing module URI and their file paths (required for test APIs). */
   public final TokenObjectMap<byte[]> modDeclared = new TokenObjectMap<>();
   /** Stack of module files that are currently parsed. */
   public final TokenList modStack = new TokenList();
@@ -582,7 +582,7 @@ public final class QueryContext extends Job implements Closeable {
         Item item;
 
         do {
-          // collect pre values if a database is opened globally
+          // collect PRE values if a database is opened globally
           if(defaultOutput && data != null) {
             while((item = next(iter)) != null && item.data() == data && pres.size() < max) {
               pres.add(((DBNode) item).pre());

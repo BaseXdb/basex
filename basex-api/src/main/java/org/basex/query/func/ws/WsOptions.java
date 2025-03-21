@@ -11,6 +11,6 @@ import org.basex.util.options.*;
 public final class WsOptions extends Options {
   /** Query base-uri. */
   public static final StringOption BASE_URI = new StringOption("base-uri");
-  /** Custom id string. */
+  /** Custom ID string. */
   public static final StringOption ID = new StringOption("id");
 }

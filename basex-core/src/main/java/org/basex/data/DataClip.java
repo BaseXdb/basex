@@ -8,7 +8,7 @@ import org.basex.core.cmd.*;
  * sequence caching (only one {@link Data} instance).
  *
  * Arbitrary trees can be stored in this clip. To distinguish between two insertion
- * sequences, the root node of each sequence points to the virtual parent pre value -1.
+ * sequences, the root node of each sequence points to the virtual parent PRE value -1.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

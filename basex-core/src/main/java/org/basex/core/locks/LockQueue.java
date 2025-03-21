@@ -22,7 +22,7 @@ abstract class LockQueue {
 
   /**
    * Queues the job until it can be started.
-   * @param id job id
+   * @param id job ID
    * @param read read flag
    * @param write write flag
    * @throws InterruptedException interrupted exception

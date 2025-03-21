@@ -23,9 +23,9 @@ import org.basex.util.list.*;
 final class ProjectFiles {
   /** Maximum number of filtered hits (speeds up search). */
   private static final int MAXHITS = 256;
-  /** Parse id. */
+  /** Parse ID. */
   private static long parseId;
-  /** Filter id. */
+  /** Filter ID. */
   private static long filterId;
 
   /** Project view. */
@@ -160,7 +160,7 @@ final class ProjectFiles {
   /**
    * Returns the current file cache.
    * @param root root directory
-   * @return id, or {@code null} if newer file cache exists
+   * @return ID, or {@code null} if newer file cache exists
    * @throws InterruptedException interruption
    */
   private ProjectCache cache(final IOFile root) throws InterruptedException {
@@ -185,7 +185,7 @@ final class ProjectFiles {
    * Chooses tokens from the file cache that match the specified pattern.
    * @param files files filter
    * @param search codepoints of search string
-   * @param id search id
+   * @param id search ID
    * @param results search result
    * @param cache file cache
    * @throws InterruptedException interruption

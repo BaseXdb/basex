@@ -64,10 +64,10 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
 
   /**
    * Declares a namespace.
-   * A namespace is undeclared if the {@code uri} is an empty string.
-   * The default element namespaces is set if the {@code prefix} is empty.
+   * A namespace is undeclared if the specified URI is an empty string.
+   * The default element namespaces is set if the specified prefix is empty.
    * @param prefix namespace prefix
-   * @param uri namespace uri
+   * @param uri namespace URI
    * @return self reference
    */
   public XQuery namespace(final String prefix, final String uri) {
@@ -165,7 +165,7 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
 
   /**
    * Adds a module.
-   * @param uri module uri
+   * @param uri module URI
    * @param file file reference
    * @throws XQueryException exception
    */

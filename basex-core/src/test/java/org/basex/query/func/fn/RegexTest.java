@@ -21,7 +21,7 @@ public final class RegexTest extends SandboxTest {
   /**
    * Test.
    * @param regex regular expression
-   * @param parentGroups expected parent group id's
+   * @param parentGroups expected parent group IDs
    */
   @ParameterizedTest
   @MethodSource

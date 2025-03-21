@@ -16,7 +16,7 @@ public final class Pkg {
   /** Package components. */
   final ArrayList<PkgComponent> comps = new ArrayList<>();
 
-  /** Package uri. */
+  /** Package URI. */
   final String name;
 
   /** Path to package. */
@@ -51,8 +51,8 @@ public final class Pkg {
   }
 
   /**
-   * Returns the package id, consisting of the package name/URI and, optionally, its version.
-   * @return id
+   * Returns the package ID, consisting of the package name/URI and, optionally, its version.
+   * @return ID
    */
   public String id() {
     return type == PkgType.EXPATH ? name + '-' + version : name;

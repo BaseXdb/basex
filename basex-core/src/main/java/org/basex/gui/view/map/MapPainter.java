@@ -47,7 +47,7 @@ final class MapPainter {
         // mark ancestor of invisible node
         final int r = rects.find(pre);
         if(m < marked.size()) {
-          // find pre value of next rectangle
+          // find PRE value of next rectangle
           final int e;
           if(r + 1 < rects.size) {
             e = rects.sorted[r + 1].pre;
@@ -56,7 +56,7 @@ final class MapPainter {
             final int spre = rects.sorted[r].pre;
             e = data.size(spre, data.kind(spre));
           }
-          // mark rectangle if pre value is its descendant
+          // mark rectangle if PRE value is its descendant
           return marked.sorted(m) < e ? GUIConstants.colormark2 : null;
         }
         return null;

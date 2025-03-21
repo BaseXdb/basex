@@ -48,7 +48,7 @@ public final class ClientListener extends Thread implements ClientInfo {
   private PrintOutput out;
   /** Current command. */
   private Command command;
-  /** Query id counter. */
+  /** Query ID counter. */
   private int id;
   /** Indicates if the server thread is running. */
   private volatile boolean authenticated;

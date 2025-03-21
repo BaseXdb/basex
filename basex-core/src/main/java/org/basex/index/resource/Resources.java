@@ -73,7 +73,7 @@ public final class Resources implements Index {
 
   /**
    * Deletes the specified entry and updates subsequent nodes.
-   * @param pre pre value
+   * @param pre PRE value
    * @param size number of deleted nodes
    */
   public void delete(final int pre, final int size) {
@@ -82,7 +82,7 @@ public final class Resources implements Index {
 
   /**
    * Updates the index after a document has been renamed.
-   * @param pre pre value of updated document
+   * @param pre PRE value of updated document
    * @param value new name
    */
   public void rename(final int pre, final byte[] value) {
@@ -90,28 +90,28 @@ public final class Resources implements Index {
   }
 
   /**
-   * Returns the pre values of all document nodes that start with the specified path.
+   * Returns the PRE values of all document nodes that start with the specified path.
    * @param path input path
-   * @return pre values (internal representation!)
+   * @return PRE values (internal representation!)
    */
   public synchronized IntList docs(final String path) {
     return docs(path, false);
   }
 
   /**
-   * Returns the pre values of all document nodes that start with the specified path.
+   * Returns the PRE values of all document nodes that start with the specified path.
    * @param path input path
    * @param dir directory view
-   * @return pre values (internal representation!)
+   * @return PRE values (internal representation!)
    */
   public synchronized IntList docs(final String path, final boolean dir) {
     return docs.docs(path, dir);
   }
 
   /**
-   * Returns the pre value of the document node that matches the specified path.
+   * Returns the PRE value of the document node that matches the specified path.
    * @param path input path
-   * @return pre value or {@code -1}
+   * @return PRE value or {@code -1}
    */
   public int doc(final String path) {
     return docs.doc(path);

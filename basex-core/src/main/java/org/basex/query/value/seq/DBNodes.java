@@ -19,23 +19,23 @@ import org.basex.util.list.*;
 public final class DBNodes extends DBNodeSeq {
   /** Full-text position data (can be {@code null}). */
   private FTPosData ftpos;
-  /** Sorted pre values (can be {@code null}). */
+  /** Sorted PRE values (can be {@code null}). */
   private int[] sorted;
 
   /**
-   * Constructor, specifying a database and pre values.
+   * Constructor, specifying a database and PRE values.
    * @param data data reference
-   * @param pres pre values
+   * @param pres PRE values
    */
   public DBNodes(final Data data, final int... pres) {
     this(data, false, pres);
   }
 
   /**
-   * Constructor, specifying a database, pre values and full-text positions.
-   * @param all pre values reference all documents of the database
+   * Constructor, specifying a database, PRE values and full-text positions.
+   * @param all PRE values reference all documents of the database
    * @param data data reference
-   * @param pres pre values
+   * @param pres PRE values
    */
   public DBNodes(final Data data, final boolean all, final int... pres) {
     super(pres, data, all ? NodeType.DOCUMENT_NODE : NodeType.NODE, all);
@@ -65,7 +65,7 @@ public final class DBNodes extends DBNodeSeq {
   }
 
   /**
-   * Returns {@code null} if the pre values reference all documents of the database.
+   * Returns {@code null} if the PRE values reference all documents of the database.
    * @return self reference or {@code null}
    */
   public DBNodes discardDocs() {
@@ -83,7 +83,7 @@ public final class DBNodes extends DBNodeSeq {
 
   /**
    * Checks if the specified node is contained in the array.
-   * @param pre pre value
+   * @param pre PRE value
    * @return true if the node was found
    */
   public boolean contains(final int pre) {
@@ -93,7 +93,7 @@ public final class DBNodes extends DBNodeSeq {
   /**
    * Returns the position of the specified node or the negative value - 1 of
    * the position where it should have been found.
-   * @param pre pre value
+   * @param pre PRE value
    * @return position, or {@code -1}
    */
   public int find(final int pre) {
@@ -102,8 +102,8 @@ public final class DBNodes extends DBNodeSeq {
   }
 
   /**
-   * Adds or removes the specified pre node.
-   * @param pre pre value
+   * Adds or removes the specified PRE node.
+   * @param pre PRE value
    */
   public void toggle(final int pre) {
     final int[] n = { pre };
@@ -113,8 +113,8 @@ public final class DBNodes extends DBNodeSeq {
   }
 
   /**
-   * Merges the specified array with the existing pre nodes.
-   * @param pre pre value
+   * Merges the specified array with the existing PRE nodes.
+   * @param pre PRE value
    */
   public void union(final int[] pre) {
     pres = union(pres, pre);
@@ -183,9 +183,9 @@ public final class DBNodes extends DBNodeSeq {
   }
 
   /**
-   * Returns a sorted pre value.
-   * @param index index of pre value
-   * @return pre value
+   * Returns a sorted PRE value.
+   * @param index index of PRE value
+   * @return PRE value
    */
   public int sorted(final int index) {
     return sorted[index];

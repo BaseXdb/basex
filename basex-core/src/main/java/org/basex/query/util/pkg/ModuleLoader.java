@@ -65,7 +65,7 @@ public final class ModuleLoader {
 
   /**
    * Adds a package from the repository or a Java class.
-   * @param uri module uri
+   * @param uri module URI
    * @param qp query parser
    * @param info input info (can be {@code null})
    * @return {@code true} if the package has been found
@@ -170,7 +170,7 @@ public final class ModuleLoader {
 
   /**
    * Adds a package from the package repository.
-   * @param id package id
+   * @param id package ID
    * @param toLoad list with packages to be loaded
    * @param loaded already loaded packages
    * @param qp query parser

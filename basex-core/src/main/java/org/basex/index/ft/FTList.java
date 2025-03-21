@@ -19,7 +19,7 @@ final class FTList {
   /** Empty integer array. */
   private static final int[] NOINTS = {};
 
-  /** Storing pre and pos values for each token. */
+  /** Storing PRE and POS values for each token. */
   private final DataAccess dat;
   /** Structure file. */
   private final IOFile files;
@@ -46,7 +46,7 @@ final class FTList {
   int size;
   /** Next token. */
   byte[] token;
-  /** Next pre values. */
+  /** Next PRE values. */
   int[] prv;
   /** Next pos values. */
   int[] pov;

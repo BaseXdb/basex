@@ -33,7 +33,7 @@ import org.xmldb.api.modules.*;
 public final class BXXMLResource implements XMLResource {
   /** Collection reference. */
   private final BXCollection coll;
-  /** String id. */
+  /** String ID. */
   private String id;
   /** Query result. */
   private Item item;
@@ -67,8 +67,8 @@ public final class BXXMLResource implements XMLResource {
   /**
    * Standard constructor.
    * @param data data reference
-   * @param pre pre value
-   * @param id id
+   * @param pre PRE value
+   * @param id ID
    * @param coll collection
    */
   BXXMLResource(final Data data, final int pre, final String id, final BXCollection coll) {
@@ -141,9 +141,9 @@ public final class BXXMLResource implements XMLResource {
     // specs, but many query results are not related to a document anymore
     if(item != null) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_DOC);
 
-    // resource does not result from a query - return normal id
+    // resource does not result from a query - return normal ID
     if(id != null) return id;
-    // get document root id
+    // get document root ID
     int p = pre;
     while(p >= 0) {
       final int k = data.kind(p);

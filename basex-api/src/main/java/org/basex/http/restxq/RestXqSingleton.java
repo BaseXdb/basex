@@ -26,7 +26,7 @@ final class RestXqSingleton {
   /**
    * Constructor for singleton functions.
    * @param conn HTTP connection
-   * @param id id of singleton function
+   * @param id ID of singleton function
    * @param qc query context
    */
   RestXqSingleton(final HTTPConnection conn, final String id, final QueryContext qc) {

@@ -57,7 +57,7 @@ public final class FDoc extends FNode {
   /**
    * Creates a document builder for DOM nodes.
    * Originally provided by Erdal Karaca.
-   * @param uri base uri
+   * @param uri base URI
    * @param doc DOM node
    * @return document builder
    */

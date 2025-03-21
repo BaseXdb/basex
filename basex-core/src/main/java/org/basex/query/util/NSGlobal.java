@@ -106,17 +106,17 @@ public final class NSGlobal {
   private NSGlobal() { }
 
   /**
-   * Finds the specified namespace uri.
+   * Finds the specified namespace URI.
    * @param prefix prefix of the namespace
-   * @return uri or {@code null}
+   * @return URI or {@code null}
    */
   public static byte[] uri(final byte[] prefix) {
     return URIS.get(prefix);
   }
 
   /**
-   * Finds the prefix for the specified uri.
-   * @param uri namespace uri
+   * Finds the prefix for the specified URI.
+   * @param uri namespace URI
    * @return prefix, or empty string
    */
   public static byte[] prefix(final byte[] uri) {
@@ -125,8 +125,8 @@ public final class NSGlobal {
   }
 
   /**
-   * Checks if the specified uri is a reserved namespace.
-   * @param uri uri to be checked
+   * Checks if the specified URI is a reserved namespace.
+   * @param uri URI to be checked
    * @return result of check
    */
   public static boolean reserved(final byte[] uri) {

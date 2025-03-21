@@ -24,7 +24,7 @@ public final class RenameNode extends NodeUpdate {
 
   /**
    * Constructor.
-   * @param pre target node pre value
+   * @param pre target node PRE value
    * @param data target data reference
    * @param info input info (can be {@code null})
    * @param name new QName

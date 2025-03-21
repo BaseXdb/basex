@@ -176,7 +176,7 @@ public final class UriParser {
 
   /**
    * Parses an RFC 3986 URI.
-   * @param uri the uri to parse
+   * @param uri the URI to parse
    * @return parsed URI
    */
   public static ParsedUri parse(final String uri) {

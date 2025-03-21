@@ -51,7 +51,7 @@ public final class DataPrinter {
   }
 
   /**
-   * Adds an entry for the specified pre value.
+   * Adds an entry for the specified PRE value.
    * @param pre node to be added
    */
   private void add(final int pre) {

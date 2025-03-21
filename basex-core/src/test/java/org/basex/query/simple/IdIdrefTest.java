@@ -15,7 +15,7 @@ import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
 /**
- * Tests for {@code id} and {@code idref}.
+ * Tests for {@code ID} and {@code IDREF}.
  *
  * @author BaseX Team, BSD License
  * @author Jens Erat

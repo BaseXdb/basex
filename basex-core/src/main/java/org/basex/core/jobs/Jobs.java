@@ -113,8 +113,8 @@ public final class Jobs {
   }
 
   /**
-   * Removes all jobs with the specified id from the list.
-   * @param id job id
+   * Removes all jobs with the specified ID from the list.
+   * @param id job ID
    */
   public void remove(final String id) {
     list.removeIf(job -> id.equals(job.options.get(JobOptions.ID)));

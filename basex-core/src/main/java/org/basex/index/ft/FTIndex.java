@@ -41,9 +41,9 @@ import org.basex.util.similarity.*;
  * Structure: {@code [t0, t1, ... tl, z, s]}
  * {@code t0, t1, ... tl-1} is the token [byte[l]]
  * {@code z} is the pointer on the data entries of the token [long]
- * {@code s} is the number of pre values, saved in data [int]
+ * {@code s} is the number of PRE values, saved in data [int]
  * </li>
- * <li>File <b>z</b> contains the {@code id/pos} references.
+ * <li>File <b>z</b> contains the {@code ID/POS} references.
  *   The values are ordered, but not distinct:
  *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
  * </ul>
@@ -65,7 +65,7 @@ public final class FTIndex extends ValueIndex {
   private final DataAccess dataX;
   /** Index storing each token, its data size and pointer on the data. */
   private final DataAccess dataY;
-  /** Storing pre and pos values for each token. */
+  /** Storing PRE and POS values for each token. */
   private final DataAccess dataZ;
 
   /** Cache for number of hits and data reference per token. */
@@ -404,7 +404,7 @@ public final class FTIndex extends ValueIndex {
   /**
    * Returns an iterator for an index entry.
    * @param off offset on entries
-   * @param size number of id/pos entries
+   * @param size number of ID/POS entries
    * @param da data source
    * @param token index token
    * @return iterator
@@ -422,7 +422,7 @@ public final class FTIndex extends ValueIndex {
 
   /**
    * Returns an iterator for an index entry.
-   * @param ftc id cache
+   * @param ftc ID cache
    * @param token index token
    * @return iterator
    */
@@ -488,7 +488,7 @@ public final class FTIndex extends ValueIndex {
 
     /**
      * Constructor.
-     * @param pr pre values
+     * @param pr PRE values
      * @param ps positions
      */
     private FTCache(final IntList pr, final IntList ps) {

@@ -41,7 +41,7 @@ public abstract class ANode extends Item {
   };
   /** Static node counter. */
   private static final AtomicInteger ID = new AtomicInteger();
-  /** Unique node id. ID can get negative, as subtraction of ids is used for all comparisons. */
+  /** Unique node ID. ID can get negative, as subtraction of IDs is used for all comparisons. */
   public final int id = ID.incrementAndGet();
 
   /**
@@ -337,9 +337,9 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Recursively finds the uri for the specified prefix.
+   * Recursively finds the URI for the specified prefix.
    * @param prefix prefix
-   * @return uri or {@code null}
+   * @return URI or {@code null}
    */
   public final byte[] uri(final byte[] prefix) {
     final Atts ns = namespaces();

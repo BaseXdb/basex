@@ -59,7 +59,7 @@ import org.basex.util.list.*;
  *
  * As all methods of this class are optimized for performance, no checks are
  * performed on the arguments (e.g.: if the string value of a text node is
- * requested, the specified pre value must point to a text node).
+ * requested, the specified PRE value must point to a text node).
  *
  * NOTE: the class is not thread-safe. It is imperative that all read/write accesses
  * are synchronized over a single context's read/write lock.
@@ -83,7 +83,7 @@ public abstract class Data {
 
   /** Static node counter. */
   private static final AtomicInteger ID = new AtomicInteger();
-  /** Unique id. Negative ID values are ok (IDs are subtracted when being compared). */
+  /** Unique ID. Negative ID values are ok (IDs are subtracted when being compared). */
   public final int dbid = ID.incrementAndGet();
 
   /** Resource index. */
@@ -226,7 +226,7 @@ public abstract class Data {
   /**
    * Returns an atomized content for any node kind.
    * The atomized value can be an attribute value or XML content.
-   * @param pre pre value
+   * @param pre PRE value
    * @return atomized value
    */
   public final byte[] atom(final int pre) {
@@ -273,14 +273,14 @@ public abstract class Data {
   // RETRIEVING VALUES ============================================================================
 
   /**
-   * Returns a pre value for the specified id.
-   * @param id unique node id
-   * @return pre value or {@code -1} if id was not found
+   * Returns a PRE value for the specified ID.
+   * @param id unique node ID
+   * @return PRE value or {@code -1} if ID was not found
    */
   public final int pre(final int id) {
     if(meta.updindex) return idmap.pre(id);
 
-    // find pre value in the table; start with specified id
+    // find PRE value in the table; start with specified ID
     final int size = meta.size;
     for(int p = Math.max(0, id); p < meta.size; ++p) {
       if(id == id(p)) return p;
@@ -289,14 +289,14 @@ public abstract class Data {
     for(int p = 0; p < ps; ++p) {
       if(id == id(p)) return p;
     }
-    // id not found
+    // ID not found
     return -1;
   }
 
   /**
-   * Returns a unique node id.
-   * @param pre pre value
-   * @return node id
+   * Returns a unique node ID.
+   * @param pre PRE value
+   * @return node ID
    */
   public final int id(final int pre) {
     return table.read4(pre, 12);
@@ -305,7 +305,7 @@ public abstract class Data {
   /**
    * Returns the node kind ({@link #DOC}, {@link #ELEM}, {@link #TEXT}, {@link #ATTR},
    * {@link #COMM}, {@link #PI}).
-   * @param pre pre value
+   * @param pre PRE value
    * @return node kind
    */
   public final int kind(final int pre) {
@@ -313,10 +313,10 @@ public abstract class Data {
   }
 
   /**
-   * Returns a pre value of the parent node.
-   * @param pre pre value
+   * Returns a PRE value of the parent node.
+   * @param pre PRE value
    * @param kind node kind
-   * @return pre value of the parent node
+   * @return PRE value of the parent node
    */
   public final int parent(final int pre, final int kind) {
     return pre - dist(pre, kind);
@@ -324,7 +324,7 @@ public abstract class Data {
 
   /**
    * Returns the distance of the specified node.
-   * @param pre pre value
+   * @param pre PRE value
    * @param kind node kind
    * @return distance
    */
@@ -348,7 +348,7 @@ public abstract class Data {
 
   /**
    * Returns the size value (number of descendant table entries).
-   * @param pre pre value
+   * @param pre PRE value
    * @param kind node kind
    * @return size value
    */
@@ -358,7 +358,7 @@ public abstract class Data {
 
   /**
    * Returns the number of attributes plus 1.
-   * @param pre pre value
+   * @param pre PRE value
    * @param kind node kind
    * @return number of attributes
    */
@@ -373,8 +373,8 @@ public abstract class Data {
 
   /**
    * Finds the specified attribute and returns its value.
-   * @param att the attribute id of the attribute to be found
-   * @param pre pre value
+   * @param att the attribute ID of the attribute to be found
+   * @param pre PRE value
    * @return attribute value or {@code null}
    */
   public final byte[] attValue(final int att, final int pre) {
@@ -387,9 +387,9 @@ public abstract class Data {
   }
 
   /**
-   * Returns the id of the name of an element, attribute or processing instruction.
-   * @param pre pre value
-   * @return name id
+   * Returns the ID of the name of an element, attribute or processing instruction.
+   * @param pre PRE value
+   * @return name ID
    */
   public final int nameId(final int pre) {
     return table.read2(pre, 1) & 0x7FFF;
@@ -397,7 +397,7 @@ public abstract class Data {
 
   /**
    * Returns the name of an element, attribute or processing instruction.
-   * @param pre pre value
+   * @param pre PRE value
    * @param kind node kind
    * @return name
    */
@@ -411,20 +411,20 @@ public abstract class Data {
   }
 
   /**
-   * Returns the id of the namespace uri of the addressed element or attribute.
-   * @param pre pre value
+   * Returns the ID of the namespace URI of the addressed element or attribute.
+   * @param pre PRE value
    * @param kind node kind
-   * @return id of the namespace uri, or {@code 0} if node has no namespace
+   * @return ID of the namespace URI, or {@code 0} if node has no namespace
    */
   public final int uriId(final int pre, final int kind) {
     return kind == ELEM || kind == ATTR ? table.read1(pre, kind == ELEM ? 3 : 11) & 0xFF : 0;
   }
 
   /**
-   * Returns the name and namespace uri of the addressed element or attribute.
-   * @param pre pre value
+   * Returns the name and namespace URI of the addressed element or attribute.
+   * @param pre PRE value
    * @param kind node kind
-   * @return array with name and namespace uri
+   * @return array with name and namespace URI
    */
   public final byte[][] qname(final int pre, final int kind) {
     final byte[] name = name(pre, kind);
@@ -443,7 +443,7 @@ public abstract class Data {
 
   /**
    * Returns the namespace flag of the addressed element.
-   * @param pre pre value
+   * @param pre PRE value
    * @return namespace flag
    */
   public final boolean nsFlag(final int pre) {
@@ -451,10 +451,10 @@ public abstract class Data {
   }
 
   /**
-   * Returns all namespace prefixes and uris that are defined for the specified pre value.
+   * Returns all namespace prefixes and URIs that are defined for the specified PRE value.
    * Should only be called for element nodes.
-   * @param pre pre value
-   * @return key and value ids
+   * @param pre PRE value
+   * @return key and value IDs
    */
   public final Atts namespaces(final int pre) {
     return nsFlag(pre) ? nspaces.values(pre, this) : new Atts();
@@ -462,7 +462,7 @@ public abstract class Data {
 
   /**
    * Returns the reference to a text (text, comment, pi, pi, document) or attribute value.
-   * @param pre pre value
+   * @param pre PRE value
    * @return disk offset
    */
   public final long textRef(final int pre) {
@@ -471,7 +471,7 @@ public abstract class Data {
 
   /**
    * Returns a text (text, comment, pi, document) or attribute value.
-   * @param pre pre value
+   * @param pre PRE value
    * @param text text/attribute flag
    * @return atomized value
    */
@@ -480,7 +480,7 @@ public abstract class Data {
   /**
    * Returns a text (text, comment, pi, document) or attribute value as integer value.
    * {@link Long#MIN_VALUE} is returned if the input is no valid integer.
-   * @param pre pre value
+   * @param pre PRE value
    * @param text text/attribute flag
    * @return numeric value
    */
@@ -489,7 +489,7 @@ public abstract class Data {
   /**
    * Returns a text (text, comment, pi, document) or attribute value as double value.
    * {@link Double#NaN} is returned if the input is no valid double.
-   * @param pre pre value
+   * @param pre PRE value
    * @param text text/attribute flag
    * @return numeric value
    */
@@ -497,7 +497,7 @@ public abstract class Data {
 
   /**
    * Returns the byte length of a (possibly compressed) text (text, comment, pi, document).
-   * @param pre pre value
+   * @param pre PRE value
    * @param text text/attribute flag
    * @return length
    */
@@ -507,10 +507,10 @@ public abstract class Data {
 
   /**
    * Updates (renames) the name of an element, attribute or processing instruction.
-   * @param pre pre value of the node to be updated
+   * @param pre PRE value of the node to be updated
    * @param kind node kind of the updated node
    * @param name name of the new element, attribute or processing instruction
-   * @param uri namespace uri
+   * @param uri namespace URI
    */
   public final void update(final int pre, final int kind, final byte[] name, final byte[] uri) {
     meta.update();
@@ -527,7 +527,7 @@ public abstract class Data {
         oldUriId != 0 && eq(nspaces.uri(oldUriId), uri) ? oldUriId : 0;
       final int size = size(pre, kind);
 
-      // write ids of namespace uri and name, and namespace flag
+      // write IDs of namespace URI and name, and namespace flag
       if(kind == ATTR) {
         // delete old values from attribute indexes
         if(meta.updindex) {
@@ -564,7 +564,7 @@ public abstract class Data {
 
   /**
    * Updates (replaces) the value of a single text, comment, pi, attribute or document node.
-   * @param pre pre value of the node to be updated
+   * @param pre PRE value of the node to be updated
    * @param kind node kind
    * @param value value to be updated (text, comment, pi, attribute, document name)
    */
@@ -579,7 +579,7 @@ public abstract class Data {
 
   /**
    * Rapid Replace implementation. Replaces parts of the database with the specified data instance.
-   * @param pre pre value of the node to be replaced
+   * @param pre PRE value of the node to be replaced
    * @param source clip with source data
    * @return success flag
    */
@@ -607,7 +607,7 @@ public abstract class Data {
       if(sPre == sTopPre) {
         // handle top level entry: calculate distance based on target database
         cDist = cPre - tPar;
-        // calculate pre value of next top level entry
+        // calculate PRE value of next top level entry
         sTopPre += sSize;
       } else {
         cDist = sPre - sPar;
@@ -672,7 +672,7 @@ public abstract class Data {
 
   /**
    * Deletes a node and its descendants.
-   * @param pre pre value of the node to be deleted
+   * @param pre PRE value of the node to be deleted
    */
   public final void delete(final int pre) {
     meta.update();
@@ -697,7 +697,7 @@ public abstract class Data {
       kind = kind(par);
     }
 
-    // delete namespace nodes and propagate pre value shifts (before node sizes are touched!)
+    // delete namespace nodes and propagate PRE value shifts (before node sizes are touched!)
     nspaces.delete(pre, size, this);
 
     // reduce size of ancestors
@@ -718,8 +718,8 @@ public abstract class Data {
 
   /**
    * Inserts standalone attributes (without root element).
-   * @param pre target pre value (insertion position)
-   * @param par target parent pre value of node
+   * @param pre target PRE value (insertion position)
+   * @param par target parent PRE value of node
    * @param source clip with source data
    */
   public final void insertAttr(final int pre, final int par, final DataClip source) {
@@ -732,13 +732,13 @@ public abstract class Data {
   }
 
   /**
-   * Inserts a data instance at the specified pre value. Notes:
+   * Inserts a data instance at the specified PRE value. Notes:
    * <ul>
    *   <li> The data instance in the specified data clip must differ from this instance.</li>
    *   <li> Attributes must be inserted via {@link #insertAttr}.</li>
    * </ul>
-   * @param pre target pre value (insertion position)
-   * @param par target parent pre value of node ({@code -1} if document is added)
+   * @param pre target PRE value (insertion position)
+   * @param par target parent PRE value of node ({@code -1} if document is added)
    * @param source clip with source data
    */
   public final void insert(final int pre, final int par, final DataClip source) {
@@ -766,12 +766,12 @@ public abstract class Data {
       final int sSize = sdata.size(sPre, sKind);
       final int sPar = sdata.parent(sPre, sKind);
 
-      // pre and dist value of new node
+      // PRE and DIST value of new node
       final int nPre = pre + c, nDist;
       if(sPre == sTopPre) {
         // handle top level entry: calculate distance based on target database
         nDist = nPre - par;
-        // calculate pre value of next top level entry
+        // calculate PRE value of next top level entry
         sTopPre += sSize;
       } else {
         // handle descendant node: calculate distance based on source database
@@ -842,7 +842,7 @@ public abstract class Data {
   }
 
   /**
-   * This method updates the distance values of the specified pre value
+   * This method updates the distance values of the specified PRE value
    * and the following siblings of all ancestor-or-self nodes.
    * @param pre root node
    * @param size size to be added/removed
@@ -860,8 +860,8 @@ public abstract class Data {
   }
 
   /**
-   * Sets the node id.
-   * @param pre pre value
+   * Sets the node ID.
+   * @param pre PRE value
    * @param value value to be stored
    */
   public final void id(final int pre, final int value) {
@@ -870,7 +870,7 @@ public abstract class Data {
 
   /**
    * Sets the size value.
-   * @param pre pre value
+   * @param pre PRE value
    * @param kind node kind
    * @param value value to be stored
    */
@@ -880,7 +880,7 @@ public abstract class Data {
 
   /**
    * Sets the reference to a text/attribute value.
-   * @param pre pre value
+   * @param pre PRE value
    * @param off offset
    */
   protected final void textRef(final int pre, final long off) {
@@ -889,7 +889,7 @@ public abstract class Data {
 
   /**
    * Updates the specified text or attribute value.
-   * @param pre pre value
+   * @param pre PRE value
    * @param value content
    * @param kind node kind
    */
@@ -897,7 +897,7 @@ public abstract class Data {
 
   /**
    * Sets the distance.
-   * @param pre pre value
+   * @param pre PRE value
    * @param kind node kind
    * @param value value
    */
@@ -908,7 +908,7 @@ public abstract class Data {
 
   /**
    * Sets the attribute size.
-   * @param pre pre value
+   * @param pre PRE value
    * @param kind node kind
    * @param value value
    */
@@ -920,7 +920,7 @@ public abstract class Data {
   /**
    * Sets the namespace flag.
    * Should be only called for element nodes.
-   * @param pre pre value
+   * @param pre PRE value
    * @param nsFlag namespace flag
    */
   public final void nsFlag(final int pre, final boolean nsFlag) {
@@ -937,7 +937,7 @@ public abstract class Data {
 
   /**
    * Deletes the specified text entry.
-   * @param pre pre value
+   * @param pre PRE value
    * @param text text (text, comment or pi) or attribute flag
    */
   protected abstract void delete(int pre, boolean text);
@@ -978,10 +978,10 @@ public abstract class Data {
   /**
    * Adds an element to the internal update buffer.
    * @param dist parent distance
-   * @param nameId id of element name
+   * @param nameId ID of element name
    * @param asize number of attributes
    * @param size node size
-   * @param uriId id of namespace uri
+   * @param uriId ID of namespace URI
    * @param nsFlag namespace flag
    */
   public final void elem(final int dist, final int nameId, final int asize, final int size,
@@ -1016,9 +1016,9 @@ public abstract class Data {
   /**
    * Adds an attribute to the internal update buffer.
    * @param dist parent distance
-   * @param nameId id of attribute name
+   * @param nameId ID of attribute name
    * @param value attribute value
-   * @param uriId id of namespace uri
+   * @param uriId ID of namespace URI
    */
   public final void attr(final int dist, final int nameId, final byte[] value, final int uriId) {
     // add attribute to text storage
@@ -1040,8 +1040,8 @@ public abstract class Data {
   }
 
   /**
-   * Generates a new id.
-   * @return id
+   * Generates a new ID.
+   * @return ID
    */
   private int newID() {
     return ++meta.lastid;
@@ -1075,8 +1075,8 @@ public abstract class Data {
 
   /**
    * Deletes entries from the index structures.
-   * @param pre first pre value of the nodes to delete
-   * @param id id (a simple value update is indicated by the value {@code -1})
+   * @param pre first PRE value of the nodes to delete
+   * @param id ID (a simple value update is indicated by the value {@code -1})
    * @param size number of descendants
    */
   protected final void indexDelete(final int pre, final int id, final int size) {
@@ -1091,8 +1091,8 @@ public abstract class Data {
 
   /**
    * Inserts new entries in the index structure.
-   * @param pre first pre value of the nodes to insert
-   * @param id id (a simple value update is indicated by the value {@code -1})
+   * @param pre first PRE value of the nodes to insert
+   * @param id ID (a simple value update is indicated by the value {@code -1})
    * @param size number of descendants
    * @param clip data clip to be inserted
    */

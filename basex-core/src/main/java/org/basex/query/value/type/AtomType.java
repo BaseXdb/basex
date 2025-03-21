@@ -938,7 +938,7 @@ public enum AtomType implements Type {
    * Constructor.
    * @param name string representation
    * @param parent parent type
-   * @param uri uri
+   * @param uri URI
    * @param numeric numeric flag
    * @param untyped untyped flag
    * @param string string flag

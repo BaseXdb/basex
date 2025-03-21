@@ -152,8 +152,8 @@ public final class TableView extends View {
   }
 
   /**
-   * Sets scrollbar position for the specified pre value.
-   * @param pre pre value
+   * Sets scrollbar position for the specified PRE value.
+   * @param pre PRE value
    */
   private void setPos(final int pre) {
     final int o = getOff(pre);
@@ -165,8 +165,8 @@ public final class TableView extends View {
   }
 
   /**
-   * Returns list offset for specified pre value.
-   * @param pre pre value
+   * Returns list offset for specified PRE value.
+   * @param pre PRE value
    * @return offset
    */
   private int getOff(final int pre) {

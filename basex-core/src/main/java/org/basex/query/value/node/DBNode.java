@@ -47,7 +47,7 @@ public class DBNode extends ANode {
   /**
    * Constructor, creating a node from the specified data reference.
    * @param data data reference
-   * @param pre pre value
+   * @param pre PRE value
    */
   public DBNode(final Data data, final int pre) {
     this(data, pre, data.kind(pre));
@@ -56,7 +56,7 @@ public class DBNode extends ANode {
   /**
    * Constructor, specifying full node information.
    * @param data data reference
-   * @param pre pre value
+   * @param pre PRE value
    * @param kind node kind
    */
   public DBNode(final Data data, final int pre, final int kind) {
@@ -66,7 +66,7 @@ public class DBNode extends ANode {
   /**
    * Constructor, specifying full node information.
    * @param data data reference (can be {@code null} if invoked by {@link FTNode})
-   * @param pre pre value
+   * @param pre PRE value
    * @param rt root reference (can be {@code null})
    * @param type node type
    */
@@ -97,7 +97,7 @@ public class DBNode extends ANode {
 
   /**
    * Sets the node type.
-   * @param p pre value
+   * @param p PRE value
    * @param k node kind
    * @return self reference
    */
@@ -113,16 +113,16 @@ public class DBNode extends ANode {
   }
 
   /**
-   * Assigns a pre value.
-   * @param p pre value
+   * Assigns a PRE value.
+   * @param p PRE value
    */
   public final void pre(final int p) {
     pre = p;
   }
 
   /**
-   * Returns the pre value.
-   * @return pre value
+   * Returns the PRE value.
+   * @return PRE value
    */
   public final int pre() {
     return pre;
@@ -209,7 +209,7 @@ public class DBNode extends ANode {
     if(this == node) return 0;
     final Data ndata = node.data();
     return ndata != null ?
-      // comparison of database nodes: compare pre values or database ids
+      // comparison of database nodes: compare PRE values or database IDs
       data == ndata ? Integer.signum(pre - ((DBNode) node).pre) :
         Integer.signum(data.dbid - ndata.dbid) :
       // comparison of database and fragment: find LCA

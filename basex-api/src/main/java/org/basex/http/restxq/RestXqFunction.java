@@ -67,7 +67,7 @@ public final class RestXqFunction extends WebFunction {
 
   /** Path (can be {@code null}). */
   public RestXqPath path;
-  /** Singleton id (can be {@code null}). */
+  /** Singleton ID (can be {@code null}). */
   String singleton;
 
   /** Post/Put variable (can be {@code null}). */

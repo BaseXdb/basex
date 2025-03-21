@@ -25,7 +25,7 @@ public final class ViewData {
    * Checks if the specified node is a text node.
    * @param opts gui options
    * @param data data reference
-   * @param pre pre value
+   * @param pre PRE value
    * @return result of check
    */
   public static boolean leaf(final GUIOptions opts, final Data data, final int pre) {
@@ -39,9 +39,9 @@ public final class ViewData {
   }
 
   /**
-   * Returns path for the specified pre value.
+   * Returns path for the specified PRE value.
    * @param data data reference
-   * @param pre pre value
+   * @param pre PRE value
    * @return current path
    */
   public static byte[] path(final Data data, final int pre) {
@@ -77,7 +77,7 @@ public final class ViewData {
   /**
    * Returns textual contents for the specified node.
    * @param data data reference
-   * @param pre pre value
+   * @param pre PRE value
    * @return text
    */
   public static byte[] text(final Data data, final int pre) {
@@ -96,7 +96,7 @@ public final class ViewData {
    * Returns a label for the specified node.
    * @param opts gui options
    * @param data data reference
-   * @param pre pre value
+   * @param pre PRE value
    * @return name
    */
   public static byte[] label(final GUIOptions opts, final Data data, final int pre) {
@@ -114,10 +114,10 @@ public final class ViewData {
   }
 
   /**
-   * Returns the name id of the specified node.
+   * Returns the name ID of the specified node.
    * @param data data reference
    * @param labels labels
-   * @return name id, or {@code 0} if key does not exist
+   * @return name ID, or {@code 0} if key does not exist
    */
   public static int labelID(final Data data, final String labels) {
     for(final byte[] key : Token.split(Token.token(labels), ',')) {
@@ -128,9 +128,9 @@ public final class ViewData {
   }
 
   /**
-   * Returns the size id of the specified node.
+   * Returns the size ID of the specified node.
    * @param data data reference
-   * @return size id, or {@code 0} if key does not exist
+   * @return size ID, or {@code 0} if key does not exist
    */
   public static int sizeID(final Data data) {
     return data.attrNames.index(T_SIZE);

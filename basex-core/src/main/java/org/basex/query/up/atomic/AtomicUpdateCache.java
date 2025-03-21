@@ -54,7 +54,7 @@ public final class AtomicUpdateCache {
    * inconsistencies on-the-fly eliminating the need to traverse all updates. */
   private BasicUpdate recent;
   /** Most recently added structural atomic update - if there is any. Used to calculate accumulated
-   * pre value shifts on-the-fly, as {@link BasicUpdate} do not carry this information. */
+   * PRE value shifts on-the-fly, as {@link BasicUpdate} do not carry this information. */
   private BasicUpdate recentStruct;
   /** Target data reference. */
   public final Data data;
@@ -99,7 +99,7 @@ public final class AtomicUpdateCache {
    * Adds a RENAME atomic to the list.
    * @param pre PRE value of the target node/update location
    * @param name new name for the target node
-   * @param uri new uri for the target node
+   * @param uri new URI for the target node
    */
   public void addRename(final int pre, final byte[] name, final byte[] uri) {
     considerAtomic(Rename.getInstance(data, pre, name, uri), false);
@@ -450,7 +450,7 @@ public final class AtomicUpdateCache {
 
     // keep track of the visited locations to avoid superfluous checks
     int smallestVisited = Integer.MAX_VALUE;
-    // Text nodes have to be merged from the highest to the lowest pre value
+    // Text nodes have to be merged from the highest to the lowest PRE value
     for(int i = structUpdates.size() - 1; i >= 0; i--) {
       final StructuralUpdate u = structUpdates.get(i);
       final DataClip insseq = u.getInsertionData();

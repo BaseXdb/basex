@@ -90,7 +90,7 @@ public final class ViewNotifier {
 
   /**
    * Notifies all views of a focus change.
-   * @param pre focused pre value
+   * @param pre focused PRE value
    * @param vw the calling view
    */
   public void focus(final int pre, final View vw) {

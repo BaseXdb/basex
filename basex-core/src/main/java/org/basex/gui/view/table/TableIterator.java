@@ -14,14 +14,14 @@ final class TableIterator {
   private final TableData tdata;
   /** Data reference. */
   private final Data data;
-  /** Current pre value. */
+  /** Current PRE value. */
   private int last;
   /** Current element. */
   private int elem;
   /** Root element. */
   private int rootElem;
 
-  /** Current pre value. */
+  /** Current PRE value. */
   int pre;
   /** Current column. */
   int col;
@@ -40,7 +40,7 @@ final class TableIterator {
 
   /**
    * Initializes the iterator.
-   * @param p pre value to start from (must be an element node)
+   * @param p PRE value to start from (must be an element node)
    */
   void init(final int p) {
     last = p + data.size(p, data.kind(p));

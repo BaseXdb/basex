@@ -735,7 +735,7 @@ public final class EditorView extends View {
 
   /**
    * Starts a thread, which shows a waiting info after a short timeout.
-   * @param id thread id
+   * @param id thread ID
    */
   public void pleaseWait(final int id) {
     new Timer(true).schedule(new TimerTask() {

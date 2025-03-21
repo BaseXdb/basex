@@ -62,7 +62,7 @@ public final class QT3TS extends Main {
   /** Number of ignored queries. */
   private int ignored;
 
-  /** Current base uri. */
+  /** Current base URI. */
   private String baseURI;
   /** Current base directory. */
   private String baseDir;
@@ -367,7 +367,7 @@ public final class QT3TS extends Main {
         if(env.context != null) {
           query.context(env.context);
         }
-        // set base uri
+        // set base URI
         if(env.baseURI != null) query.baseURI(env.baseURI);
         // bind decimal formats
         for(final Entry<QName, DecFormatOptions> df : env.decFormats.entrySet()) {

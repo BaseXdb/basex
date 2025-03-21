@@ -37,8 +37,8 @@ public abstract class IdPreMapBulkTestBase {
 
   /**
    * Insert a &lt;pre, id&gt; pair in {@link #basemap} and {@link #testedmap}.
-   * @param pre pre value
-   * @param id id value
+   * @param pre PRE value
+   * @param id ID value
    * @param c number of inserted records
    */
   final void insert(final int pre, final int id, final int c) {
@@ -49,7 +49,7 @@ public abstract class IdPreMapBulkTestBase {
 
   /**
    * Delete a &lt;pre, id&gt; pair from {@link #basemap} and {@link #testedmap}.
-   * @param pre pre value
+   * @param pre PRE value
    * @param c number of deleted records (negative)
    */
   final void delete(final int pre, final int c) {
@@ -95,7 +95,7 @@ public abstract class IdPreMapBulkTestBase {
 
     /**
      * Constructor.
-     * @param list initial list of ids
+     * @param list initial list of IDs
      */
     public DummyIdPreMap(final int[] list) {
       super(list.length - 1);

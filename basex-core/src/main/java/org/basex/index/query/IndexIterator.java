@@ -24,8 +24,8 @@ public interface IndexIterator {
   boolean more();
 
   /**
-   * Returns the next pre value.
-   * @return pre value
+   * Returns the next PRE value.
+   * @return PRE value
    */
   int pre();
 

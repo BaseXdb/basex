@@ -63,7 +63,7 @@ public final class Inspect extends Command {
           if(parKind != Data.DOC && parKind != Data.ELEM ||
               par + data.size(par, parKind) < pre) parChild.add(pre);
         }
-        // check if id/pre mapping is correct
+        // check if ID/PRE mapping is correct
         if(idPre != null && data.pre(data.id(pre)) != pre) idPre.add(pre);
       }
       info.addExt("Checking main table (% nodes):", md.size).add(Prop.NL);
@@ -91,7 +91,7 @@ public final class Inspect extends Command {
 
     /**
      * Adds an entry.
-     * @param pre pre value
+     * @param pre PRE value
      */
     private void add(final int pre) {
       invalid++;

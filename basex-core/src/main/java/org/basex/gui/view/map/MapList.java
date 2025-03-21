@@ -6,7 +6,7 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Stores an integer array of pre values and their corresponding weights.
+ * Stores an integer array of PRE values and their corresponding weights.
  *
  * @author BaseX Team, BSD License
  * @author Joerg Hauser
@@ -41,24 +41,24 @@ final class MapList {
   }
 
   /**
-   * Returns the specified pre value.
+   * Returns the specified PRE value.
    * @param index index
-   * @return pre value
+   * @return PRE value
    */
   public int get(final int index) {
     return pres.get(index);
   }
 
   /**
-   * Adds a pre value.
-   * @param pre pre value to be added
+   * Adds a PRE value.
+   * @param pre PRE value to be added
    */
   public void add(final int pre) {
     pres.add(pre);
   }
 
   /**
-   * Sorts the pre values.
+   * Sorts the PRE values.
    */
   public void sort() {
     pres.sort(weight, false);
@@ -67,7 +67,7 @@ final class MapList {
   /**
    * Initializes the weights of each list entry, using the text length of
    * nodes or (if the array reference is null) the size attributes.
-   * @param textLen array holding pre values to text lengths
+   * @param textLen array holding PRE values to text lengths
    * @param nchildren reference number of nodes
    * @param data reference
    * @param w weight
@@ -105,7 +105,7 @@ final class MapList {
 
   /**
    * Returns the numeric weight for the specified input, or 1 as minimum.
-   * @param textLen array holding pre values to text lengths
+   * @param textLen array holding PRE values to text lengths
    * @param data data reference
    * @param i array index
    * @return calculated weight

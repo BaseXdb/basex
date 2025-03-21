@@ -16,7 +16,7 @@ public final class FTPosNode extends DBNode {
   /**
    * Constructor, called by the sequential variant.
    * @param data data reference
-   * @param pre pre value
+   * @param pre PRE value
    * @param ftpos full-text positions
    */
   public FTPosNode(final Data data, final int pre, final FTPosData ftpos) {

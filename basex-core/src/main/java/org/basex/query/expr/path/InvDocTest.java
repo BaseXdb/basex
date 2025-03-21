@@ -20,12 +20,12 @@ import org.basex.util.list.*;
 final class InvDocTest extends Test {
   /** Data reference. */
   private final Data data;
-  /** Sorted pre values. */
+  /** Sorted PRE values. */
   private final IntList pres;
 
   /**
    * Constructor.
-   * @param pres sorted pre values
+   * @param pres sorted PRE values
    * @param data data reference
    */
   private InvDocTest(final IntList pres, final Data data) {
@@ -50,14 +50,14 @@ final class InvDocTest extends Test {
     final Data data = root.data();
     if(data == null || data.meta.ndocs == 1) return KindTest.DOCUMENT_NODE;
 
-    // include pre values of root nodes in document test
+    // include PRE values of root nodes in document test
     final IntList pres;
     if(root instanceof DBNodeSeq) {
       final DBNodeSeq seq = (DBNodeSeq) root;
       if(seq.all()) return KindTest.DOCUMENT_NODE;
       pres = new IntList(seq.pres());
     } else {
-      // loop through all documents and add pre values of documents
+      // loop through all documents and add PRE values of documents
       pres = new IntList(Seq.initialCapacity(root.size()));
       for(final Item item : root) pres.add(((DBNode) item).pre());
     }
@@ -73,7 +73,7 @@ final class InvDocTest extends Test {
   public boolean matches(final ANode node) {
     // no database node
     if(!(node instanceof DBNode)) return false;
-    // ensure that the pre value is contained in the target documents
+    // ensure that the PRE value is contained in the target documents
     final DBNode db = (DBNode) node;
     return data == db.data() && pres.sortedIndexOf(db.pre()) >= 0;
   }

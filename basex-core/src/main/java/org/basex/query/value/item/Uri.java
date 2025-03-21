@@ -35,28 +35,28 @@ public final class Uri extends AStr {
   }
 
   /**
-   * Creates a new uri instance.
+   * Creates a new URI instance.
    * @param value value
-   * @return uri instance
+   * @return URI instance
    */
   public static Uri get(final byte[] value) {
     return get(value, true);
   }
 
   /**
-   * Creates a new uri instance.
+   * Creates a new URI instance.
    * @param value string value
-   * @return uri instance
+   * @return URI instance
    */
   public static Uri get(final String value) {
     return get(Token.token(value), true);
   }
 
   /**
-   * Creates a new uri instance.
+   * Creates a new URI instance.
    * @param value value
    * @param normalize remove leading and trailing whitespace
-   * @return uri instance
+   * @return URI instance
    */
   public static Uri get(final byte[] value, final boolean normalize) {
     final byte[] uri = normalize ? Token.normalize(value) : value;
@@ -74,10 +74,10 @@ public final class Uri extends AStr {
 
   /**
    * Appends the specified address. If one of the URIs is invalid,
-   * the original uri is returned.
+   * the original URI is returned.
    * @param add address to be appended
    * @param info input info (can be {@code null})
-   * @return new uri
+   * @return new URI
    * @throws QueryException query exception
    */
   public Uri resolve(final Uri add, final InputInfo info) throws QueryException {

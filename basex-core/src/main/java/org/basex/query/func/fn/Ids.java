@@ -25,7 +25,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 abstract class Ids extends ContextFn {
-  /** Map for data references and id flags. */
+  /** Map for data references and ID flags. */
   private final Map<Data, Boolean> indexed = Collections.synchronizedMap(new IdentityHashMap<>());
 
   @Override
@@ -54,7 +54,7 @@ abstract class Ids extends ContextFn {
       final ValueAccess va = new ValueAccess(info, idSet, idref ? IndexType.TOKEN :
         IndexType.ATTRIBUTE, null, new IndexStaticDb(data, info));
 
-      // collect and return index results, filtered by id/idref attributes
+      // collect and return index results, filtered by ID/IDREF attributes
       final Iter iter = va.iter(qc);
       for(Item item; (item = iter.next()) != null;) {
         // check attribute name; check root if database has more than one document
@@ -72,23 +72,23 @@ abstract class Ids extends ContextFn {
   }
 
   /**
-   * Checks if the ids can to be found in the index.
+   * Checks if the IDs can to be found in the index.
    * @param root root node
-   * @param idref follow idref
+   * @param idref follow IDREF
    * @return result of check
    */
   private boolean index(final ANode root, final boolean idref) {
     // check if index exists
     final Data data = root.data();
     if(data == null || (idref ? !data.meta.tokenindex : !data.meta.attrindex)) return false;
-    // check if index names contain id attributes
+    // check if index names contain ID attributes
     return indexed.computeIfAbsent(data, d -> new IndexNames(IndexType.ATTRIBUTE, d).
         containsIds(idref));
   }
 
   /**
-   * Adds nodes with the specified id.
-   * @param idSet ids to be found
+   * Adds nodes with the specified ID.
+   * @param idSet IDs to be found
    * @param results node cache
    * @param node current node
    */
@@ -96,7 +96,7 @@ abstract class Ids extends ContextFn {
     final boolean idref = idref();
     for(final ANode attr : node.attributeIter()) {
       if(XMLToken.isId(attr.name(), idref)) {
-        // id/idref found
+        // ID/IDREF found
         boolean found = false;
         for(final byte[] id : distinctTokens(attr.string())) {
           if((idref ? idSet.contains(id) : idSet.remove(id) != 0) && !found) {
@@ -112,10 +112,10 @@ abstract class Ids extends ContextFn {
   }
 
   /**
-   * Extracts and returns all unique ids from the iterated strings.
+   * Extracts and returns all unique IDs from the iterated strings.
    * @param iter iterator
    * @param qc query context
-   * @return id set
+   * @return ID set
    * @throws QueryException query exception
    */
   private TokenSet ids(final Iter iter, final QueryContext qc) throws QueryException {
@@ -129,7 +129,7 @@ abstract class Ids extends ContextFn {
   }
 
   /**
-   * Return idref flag.
+   * Return IDREF flag.
    * @return result of check
    */
   boolean idref() {

@@ -49,7 +49,7 @@ public final class IndexCache {
    * it will be updated.
    * @param key key
    * @param count number of index hits
-   * @param offset offset to id list
+   * @param offset offset to ID list
    * @return cache entry
    */
   public IndexEntry add(final byte[] key, final int count, final long offset) {

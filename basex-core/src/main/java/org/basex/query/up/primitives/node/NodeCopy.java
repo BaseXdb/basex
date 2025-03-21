@@ -26,7 +26,7 @@ abstract class NodeCopy extends NodeUpdate {
   /**
    * Constructor.
    * @param type type
-   * @param pre target node pre value
+   * @param pre target node PRE value
    * @param data data
    * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence

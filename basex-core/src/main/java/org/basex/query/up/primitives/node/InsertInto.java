@@ -17,7 +17,7 @@ import org.basex.util.*;
 public class InsertInto extends NodeCopy {
   /**
    * Constructor for an insertInto.
-   * @param pre target pre value
+   * @param pre target PRE value
    * @param data target data instance
    * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence

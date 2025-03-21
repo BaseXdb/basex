@@ -32,7 +32,7 @@ import org.basex.util.options.*;
 public abstract class Sandbox {
   /** Flag for writing queries and results to STDERR; helpful for exporting test cases. */
   private static final boolean OUTPUT = false;
-  /** Base uri. */
+  /** Base URI. */
   private static final String BASEURI = new File(".").getAbsolutePath();
 
   /** Database port. */

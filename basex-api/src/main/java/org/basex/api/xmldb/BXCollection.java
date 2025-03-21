@@ -125,7 +125,7 @@ public final class BXCollection implements Collection {
     check();
 
     if(type.equals(XMLResource.RESOURCE_TYPE)) {
-      // create new id if necessary
+      // create new ID if necessary
       final String uid = id == null || id.isEmpty() ? createId() : id;
       return new BXXMLResource(null, 0, uid, this);
     }
@@ -166,7 +166,7 @@ public final class BXCollection implements Collection {
     if(resource.getContent() == null)
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ERR_EMPTY);
 
-    // disallow storage of resources without id
+    // disallow storage of resources without ID
     final String id = resource.getId();
     if(id == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ERR_ID);
 
@@ -264,9 +264,9 @@ public final class BXCollection implements Collection {
   }
 
   /**
-   * Checks if the specified id exists in the specified id list.
-   * @param ids id list
-   * @param id id to be found
+   * Checks if the specified ID exists in the specified ID list.
+   * @param ids ID list
+   * @param id ID to be found
    * @return result of check
    */
   private static boolean contains(final String[] ids, final String id) {

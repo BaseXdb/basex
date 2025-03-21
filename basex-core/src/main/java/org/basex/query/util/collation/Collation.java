@@ -41,11 +41,11 @@ public abstract class Collation {
   }
 
   /**
-   * Returns a collation instance for the specified uri.
-   * @param uri collation uri (can be {@code null})
+   * Returns a collation instance for the specified URI.
+   * @param uri collation URI (can be {@code null})
    * @param qc query context
    * @param info input info (can be {@code null})
-   * @param err error code for unknown collation uris
+   * @param err error code for unknown collation URIs
    * @return collation instance or {@code null} for unicode point collation
    * @throws QueryException query exception
    */
@@ -78,7 +78,7 @@ public abstract class Collation {
    * @param uri collation URI
    * @param info input info (can be {@code null})
    * @param err error code for unknown collation URIs
-   * @return collation instance or {@code null} if uri is invalid
+   * @return collation instance or {@code null} if URI is invalid
    * @throws QueryException query exception
    */
   private static Collation get(final byte[] uri, final InputInfo info, final QueryError err)
@@ -207,7 +207,7 @@ public abstract class Collation {
 
   /**
    * Returns the collation URI.
-   * @return uri
+   * @return URI
    */
   public final byte[] uri() {
     return uri;

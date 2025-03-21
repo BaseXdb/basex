@@ -235,8 +235,8 @@ final class PlotAxis {
   }
 
   /**
-   * Returns the value for the specified pre value.
-   * @param pre pre value
+   * Returns the value for the specified PRE value.
+   * @param pre PRE value
    * @return item value
    */
   byte[] getValue(final int pre) {

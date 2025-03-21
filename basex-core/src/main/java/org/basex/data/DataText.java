@@ -68,7 +68,7 @@ public interface DataText {
   String DBSPLITS = "SPLITS";
   /** Up-to-date flag. */
   String DBUPTODATE = "UPTODATE";
-  /** Last (highest) id. */
+  /** Last (highest) ID. */
   String DBLASTID = "LASTID";
   /** Documents. */
   String DBDOCS = "DOCS";

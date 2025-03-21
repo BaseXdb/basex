@@ -80,7 +80,7 @@ final class Docs {
 
   /**
    * Returns a list with the {@code pre} values of all document nodes.
-   * @return pre values
+   * @return PRE values
    */
   synchronized IntList docs() {
     if(docList == null) {
@@ -166,9 +166,9 @@ final class Docs {
       paths.insert(i, tmp);
     }
 
-    // insert pre values
+    // insert PRE values
     docs.insert(i, pres);
-    // adjust pre values of following document nodes
+    // adjust PRE values of following document nodes
     docs.incFrom(clip.size(), i + ps);
 
     update();
@@ -176,7 +176,7 @@ final class Docs {
 
   /**
    * Deletes the specified entry and updates subsequent nodes.
-   * @param pre pre value
+   * @param pre PRE value
    * @param size number of deleted nodes
    */
   void delete(final int pre, final int size) {
@@ -184,20 +184,20 @@ final class Docs {
     final IntList docs = docs();
     final int doc = docs.sortedIndexOf(pre);
 
-    // pre value points to a document node...
+    // PRE value points to a document node...
     if(doc >= 0) {
       if(pathIndex) paths().remove(doc);
       docs.remove(doc);
     }
 
-    // adjust pre values of following document nodes
+    // adjust PRE values of following document nodes
     docs.incFrom(-size, doc < 0 ? -doc - 1 : doc);
     update();
   }
 
   /**
    * Updates the index after a document has been renamed.
-   * @param pre pre value of updated document
+   * @param pre PRE value of updated document
    * @param value new name
    */
   void rename(final int pre, final byte[] value) {
@@ -215,10 +215,10 @@ final class Docs {
   }
 
   /**
-   * Returns the pre values of all document nodes matching the specified path.
+   * Returns the PRE values of all document nodes matching the specified path.
    * @param path input path
    * @param dir directory view
-   * @return pre values (can be internal representation!)
+   * @return PRE values (can be internal representation!)
    */
   synchronized IntList docs(final String path, final boolean dir) {
     // invalid path, or no documents: return empty list
@@ -257,9 +257,9 @@ final class Docs {
   }
 
   /**
-   * Returns the pre value of a document node that matches the specified path.
+   * Returns the PRE value of a document node that matches the specified path.
    * @param path input path
-   * @return pre value, or {@code -1} if the document does not exist or if the path is invalid
+   * @return PRE value, or {@code -1} if the document does not exist or if the path is invalid
    */
   synchronized int doc(final String path) {
     final String pth = MetaData.normPath(path);

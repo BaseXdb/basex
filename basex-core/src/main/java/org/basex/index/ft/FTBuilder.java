@@ -200,9 +200,9 @@ public final class FTBuilder extends IndexBuilder {
         for(int i = 0; i < j; ++i) outY.write1(key[i]);
         // write pointer on full-text data
         outY.write5(dr);
-        // write full-text data size (number of pre values)
+        // write full-text data size (number of PRE values)
         outY.write4(t.nextNumPre());
-        // write compressed pre and pos arrays
+        // write compressed PRE and POS arrays
         writeFTData(outZ, t.nextPres(), t.nextPoss());
 
         dr = outZ.size();
@@ -238,7 +238,7 @@ public final class FTBuilder extends IndexBuilder {
       s += list[m].size;
       list[m].next();
     }
-    // write compressed pre and pos arrays
+    // write compressed PRE and POS arrays
     final byte[] pr = tbp.finish();
     Num.size(pr, pr.length);
     final byte[] po = tbo.finish();
@@ -253,7 +253,7 @@ public final class FTBuilder extends IndexBuilder {
    * Writes full-text data for a single token to disk.
    * Format: {@code score? pre1 pos1 pre2 pos2 ... (0 score)? pre...}
    * @param out DataOutput for disk access
-   * @param vpre compressed pre values
+   * @param vpre compressed PRE values
    * @param vpos compressed pos values
    * @throws IOException IOException
    */
@@ -271,7 +271,7 @@ public final class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Checks if any unprocessed pre values are remaining.
+   * Checks if any unprocessed PRE values are remaining.
    * @param lists lists
    * @return boolean
    */

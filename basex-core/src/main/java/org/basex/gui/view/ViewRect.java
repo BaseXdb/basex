@@ -17,7 +17,7 @@ public class ViewRect {
   public int w;
   /** Height. */
   public int h;
-  /** Rectangle pre value. */
+  /** Rectangle PRE value. */
   public int pre;
   /** Level. */
   public int level;

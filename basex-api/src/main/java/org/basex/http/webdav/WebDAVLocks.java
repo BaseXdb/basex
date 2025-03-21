@@ -34,7 +34,7 @@ public final class WebDAVLocks {
 
   /**
    * Releases the lock for the given token.
-   * @param id token id
+   * @param id token ID
    */
   synchronized void unlock(final String id) {
     locks.remove(id);
@@ -42,7 +42,7 @@ public final class WebDAVLocks {
 
   /**
    * Refreshes a lock.
-   * @param id token id
+   * @param id token ID
    * @return refreshed lock (can be {@code null})
    */
   synchronized WebDAVLock refreshLock(final String id) {

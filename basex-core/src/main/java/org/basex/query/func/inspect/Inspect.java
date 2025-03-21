@@ -110,7 +110,7 @@ public abstract class Inspect {
    * Creates annotation child elements.
    * @param anns annotations
    * @param parent parent element
-   * @param uri include uri
+   * @param uri include URI
    * @throws QueryException query exception
    */
   final void annotation(final AnnList anns, final FBuilder parent, final boolean uri)

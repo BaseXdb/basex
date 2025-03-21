@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Optimize extends ACreate {
-  /** Current pre value. */
+  /** Current PRE value. */
   private int pre;
   /** Data size. */
   private int size;
@@ -180,7 +180,7 @@ public final class Optimize extends ACreate {
   }
 
   /**
-   * Creates new node ids and recreates updatable index structures.
+   * Creates new node IDs and recreates updatable index structures.
    * @param data data
    * @throws IOException I/O Exception during index rebuild
    */

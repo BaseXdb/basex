@@ -33,7 +33,7 @@ class IndexContext extends IndexPred {
   }
 
   /**
-   * Returns the local name and namespace uri of the last name test. Examples:
+   * Returns the local name and namespace URI of the last name test. Examples:
    * <ul>
    *   <li> //x[. = 'TEXT']  -> x </li>
    *   <li> //@x[. = 'TEXT'] -> x </lI>

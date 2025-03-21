@@ -269,9 +269,9 @@ public final class HTTPConnection implements ClientInfo {
   public String clientName() {
     Object value = null;
     try {
-      // check for request id
+      // check for request ID
       value = request.getAttribute(HTTPText.CLIENT_ID);
-      // check for session id (DBA, global)
+      // check for session ID (DBA, global)
       if(value == null) {
         final HttpSession session = request.getSession(false);
         if(session != null) {

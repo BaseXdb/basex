@@ -51,7 +51,7 @@ public final class NSContext {
    * Finds the namespace URI for the specified prefix if it is found
    * in statically declared namespaces.
    * @param prefix prefix of the namespace
-   * @return uri or {@code null}
+   * @return URI or {@code null}
    */
   public byte[] staticURI(final byte[] prefix) {
     for(int s = list.size() - 1; s >= 0; s--) {

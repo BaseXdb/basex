@@ -141,7 +141,7 @@ public final class Constr {
         if(knownUri == null) {
           builder.addNS(name, uri);
         } else if(!Token.eq(uri, knownUri)) {
-          // duplicate namespace (ignore duplicates with same uri)
+          // duplicate namespace (ignore duplicates with same URI)
           duplNS = name;
           return false;
         }
@@ -234,7 +234,7 @@ public final class Constr {
    * If the prefix is already used for another URI, a new name is generated.
    * @param inscopeNS in-scope namespaces
    * @param prefix prefix
-   * @param uri uri
+   * @param uri URI
    * @return resulting prefix or {@code null}
    */
   private byte[] addNS(final Atts inscopeNS, final byte[] prefix, final byte[] uri) {
@@ -267,7 +267,7 @@ public final class Constr {
    * Adds namespaces to the namespace array.
    * @param inscopeNS in-scope namespaces
    * @param prefix prefix
-   * @param uri uri
+   * @param uri URI
    */
   private void add(final Atts inscopeNS, final byte[] prefix, final byte[] uri) {
     inscopeNS.add(qc.shared.token(prefix), qc.shared.token(uri));

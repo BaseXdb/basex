@@ -33,7 +33,7 @@ abstract class RegExFn extends StandardFunc {
   static class RegExpr {
     /** Pattern. */
     final Pattern pattern;
-    /** Parent group id's of capturing groups. */
+    /** Parent group IDs of capturing groups. */
     private int[] parentGroups;
 
     /**
@@ -46,8 +46,8 @@ abstract class RegExFn extends StandardFunc {
     }
 
     /**
-     * Returns the parent group id's of capturing groups.
-     * @return parent group id's.
+     * Returns the parent group IDs of capturing groups.
+     * @return parent group IDs.
      */
     int[] getParentGroups() {
       if(parentGroups == null) parentGroups = GroupScanner.parentGroups(pattern.pattern());
@@ -178,8 +178,8 @@ abstract class RegExFn extends StandardFunc {
     /**
      * Find the parent groups of capturing groups in a Java regular expression.
      * @param pattern the regular expression.
-     * @return an array indicating the parent group id for each capturing group, where element i
-     * contains the parent group id of capturing group i+1.
+     * @return an array indicating the parent group ID for each capturing group, where element i
+     * contains the parent group ID of capturing group i+1.
      */
     public static int[] parentGroups(final String pattern) {
       final GroupScanner gnd = new GroupScanner(pattern);

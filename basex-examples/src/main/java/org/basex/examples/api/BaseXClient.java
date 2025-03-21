@@ -261,7 +261,7 @@ public final class BaseXClient implements Closeable {
    * Inner class for iterative query execution.
    */
   public class Query implements Closeable {
-    /** Query id. */
+    /** Query ID. */
     private final String id;
     /** Cached results. */
     private ArrayList<byte[]> cache;

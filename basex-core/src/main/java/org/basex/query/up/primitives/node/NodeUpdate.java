@@ -21,7 +21,7 @@ public abstract class NodeUpdate extends DataUpdate {
   /**
    * Constructor.
    * @param type update type
-   * @param pre target node pre value
+   * @param pre target node PRE value
    * @param data target data reference
    * @param info input info (can be {@code null})
    */

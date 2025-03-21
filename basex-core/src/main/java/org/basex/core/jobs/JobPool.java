@@ -85,7 +85,7 @@ public final class JobPool {
 
   /**
    * Returns all registered IDs.
-   * @return sorted id list
+   * @return sorted ID list
    */
   public TokenList ids() {
     final Set<String> set = new HashSet<>(results.keySet());
@@ -94,7 +94,7 @@ public final class JobPool {
     final TokenList ids = new TokenList(set.size());
     for(final String id : set) ids.add(id);
 
-    // compare default job counter, or compare custom ids as strings
+    // compare default job counter, or compare custom IDs as strings
     final byte[] prefix = token(JobContext.PREFIX);
     final int pl = prefix.length;
     return ids.sort((id1, id2) -> startsWith(id1, prefix) && startsWith(id2, prefix) ?
@@ -103,7 +103,7 @@ public final class JobPool {
 
   /**
    * Removes a job.
-   * @param id id
+   * @param id ID
    * @return return success flag
    */
   public boolean remove(final String id) {

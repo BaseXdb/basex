@@ -56,7 +56,7 @@ final class QueryCompiler {
 
   /**
    * Algorithm of Tarjan for computing the strongly connected components of a graph.
-   * @param id id of current node
+   * @param id ID of current node
    * @param result scopes
    */
   private void tarjan(final int id, final ArrayList<ArrayList<Scope>> result) {

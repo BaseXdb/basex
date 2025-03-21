@@ -15,15 +15,15 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class ClientSessions implements QueryResource {
-  /** Last inserted id. */
+  /** Last inserted ID. */
   private int lastId = -1;
-  /** Map with all open sessions and their ids. */
+  /** Map with all open sessions and their IDs. */
   private final TokenObjectMap<ClientSession> conns = new TokenObjectMap<>();
 
   /**
    * Adds a session.
    * @param cs client session
-   * @return session id
+   * @return session ID
    */
   synchronized Uri add(final ClientSession cs) {
     final byte[] uri = Token.token(cs + "/" + ++lastId);
@@ -33,7 +33,7 @@ public final class ClientSessions implements QueryResource {
 
   /**
    * Returns a session.
-   * @param id session id
+   * @param id session ID
    * @return session
    */
   synchronized ClientSession get(final Uri id) {
@@ -42,7 +42,7 @@ public final class ClientSessions implements QueryResource {
 
   /**
    * Removes a session.
-   * @param id session id
+   * @param id session ID
    */
   synchronized void remove(final Uri id) {
     conns.remove(id.string());

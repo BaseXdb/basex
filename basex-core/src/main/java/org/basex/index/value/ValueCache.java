@@ -10,7 +10,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Caches values and ids for update operations.
+ * Caches values and IDs for update operations.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -18,14 +18,14 @@ import org.basex.util.list.*;
 public final class ValueCache implements Iterable<byte[]> {
   /** Keys. */
   private final TokenSet keys = new TokenSet();
-  /** Ids. */
+  /** IDs. */
   private final ArrayList<IntList> ids = new ArrayList<>();
   /** Positions. */
   private final ArrayList<IntList> pos;
 
   /**
-   * Caches the text and id for a node with specified pre value.
-   * @param pre pre value
+   * Caches the text and ID for a node with specified PRE value.
+   * @param pre PRE value
    * @param type index type
    * @param data data reference
    */
@@ -34,8 +34,8 @@ public final class ValueCache implements Iterable<byte[]> {
   }
 
   /**
-   * Caches all texts and ids in the specified database range.
-   * @param pre pre value
+   * Caches all texts and IDs in the specified database range.
+   * @param pre PRE value
    * @param size size value
    * @param type index type
    * @param data data reference
@@ -45,8 +45,8 @@ public final class ValueCache implements Iterable<byte[]> {
   }
 
   /**
-   * Caches texts of the specified pre values.
-   * @param pres pre values
+   * Caches texts of the specified PRE values.
+   * @param pres PRE values
    * @param type index type
    * @param data data reference
    */
@@ -72,10 +72,10 @@ public final class ValueCache implements Iterable<byte[]> {
   }
 
   /**
-   * Caches all texts and ids in the specified database range.
-   * @param pre pre value
+   * Caches all texts and IDs in the specified database range.
+   * @param pre PRE value
    * @param size size value
-   * @return list of pre values
+   * @return list of PRE values
    */
   private static IntList pres(final int pre, final int size) {
     final IntList pres = new IntList(size);
@@ -85,9 +85,9 @@ public final class ValueCache implements Iterable<byte[]> {
   }
 
   /**
-   * Adds a single node id and position.
+   * Adds a single node ID and position.
    * @param text text
-   * @param pre pre value
+   * @param pre PRE value
    * @param ps position
    * @param data data reference
    */
@@ -125,9 +125,9 @@ public final class ValueCache implements Iterable<byte[]> {
   }
 
   /**
-   * Returns the id list for the specified key.
+   * Returns the ID list for the specified key.
    * @param key key
-   * @return id list
+   * @return ID list
    */
   IntList ids(final byte[] key) {
     return ids.get(keys.index(key) - 1);
@@ -136,7 +136,7 @@ public final class ValueCache implements Iterable<byte[]> {
   /**
    * Returns the position list for the specified key.
    * @param key key
-   * @return id list or {@code null}
+   * @return ID list or {@code null}
    */
   IntList pos(final byte[] key) {
     return pos != null ? pos.get(keys.index(key) - 1) : null;

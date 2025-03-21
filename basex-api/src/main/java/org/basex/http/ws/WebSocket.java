@@ -41,7 +41,7 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
   /** Servlet request. */
   final HttpServletRequest request;
 
-  /** Client WebSocket id. */
+  /** Client WebSocket ID. */
   public String id;
   /** HTTP Session. */
   public HttpSession session;

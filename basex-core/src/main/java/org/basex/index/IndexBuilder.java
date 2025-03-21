@@ -35,10 +35,10 @@ public abstract class IndexBuilder extends Job {
   /** Maximum memory to consume. */
   private final long maxMem = (long) (Runtime.getRuntime().maxMemory() * 0.8);
 
-  /** Names and namespace uri of element or attributes to include. */
+  /** Names and namespace URI of element or attributes to include. */
   private final IndexNames includeNames;
 
-  /** Current pre value. */
+  /** Current PRE value. */
   protected int pre;
   /** Total number of index operations (may get pretty large). */
   protected long count;

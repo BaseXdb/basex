@@ -279,14 +279,14 @@ public interface Type {
   AtomType atomic();
 
   /**
-   * Returns the type id.
-   * @return id
+   * Returns the type ID.
+   * @return ID
    */
   ID id();
 
   /**
    * Returns the type index.
-   * @return id
+   * @return index
    */
   default byte index() {
     return id().asByte();

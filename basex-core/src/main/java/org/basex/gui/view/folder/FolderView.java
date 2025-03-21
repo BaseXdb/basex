@@ -199,7 +199,7 @@ public final class FolderView extends View {
   /**
    * Draws a string and checks mouse position.
    * @param g graphics reference
-   * @param pre pre value
+   * @param pre PRE value
    * @param x horizontal coordinate
    * @param y vertical coordinate
    */
@@ -247,10 +247,10 @@ public final class FolderView extends View {
   }
 
   /**
-   * Focuses the current pre value.
+   * Focuses the current PRE value.
    * @param x x mouse position
    * @param y y mouse position
-   * @return currently focused id
+   * @return currently focused ID
    */
   private boolean focus(final int x, final int y) {
     if(opened == null) return false;
@@ -277,8 +277,8 @@ public final class FolderView extends View {
   }
 
   /**
-   * Jumps to the specified pre value.
-   * @param pre pre value to be found
+   * Jumps to the specified PRE value.
+   * @param pre PRE value to be found
    * @param open opened folder
    */
   private void jumpTo(final int pre, final boolean open) {
@@ -293,7 +293,7 @@ public final class FolderView extends View {
       refreshHeight();
     }
 
-    // find specified pre value
+    // find specified PRE value
     final FolderIterator iter = new FolderIterator(this);
     while(iter.more() && pre != iter.pre);
 

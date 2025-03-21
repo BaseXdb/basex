@@ -25,7 +25,7 @@ final class Delete extends StructuralUpdate {
   /**
    * Factory.
    * @param data data reference
-   * @param pre location pre value
+   * @param pre location PRE value
    * @return atomic delete
    */
   static Delete getInstance(final Data data, final int pre) {

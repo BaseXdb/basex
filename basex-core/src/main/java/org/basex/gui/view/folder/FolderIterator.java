@@ -18,7 +18,7 @@ final class FolderIterator {
   int y;
   /** Current level. */
   int level;
-  /** Current pre value. */
+  /** Current PRE value. */
   int pre;
 
   /** Stack for parent nodes. */

@@ -766,7 +766,7 @@ public class QueryParser extends InputParser {
   private void importModule(final ModInfo mi) throws QueryException {
     final byte[] uri = mi.uri;
     if(mi.paths.isEmpty()) {
-      // no paths specified: skip statically available modules; try to resolve module uri
+      // no paths specified: skip statically available modules; try to resolve module URI
       if(Functions.staticURI(uri) || qc.resources.modules().addImport(string(uri), this, mi.info))
         return;
       // module not found
@@ -811,7 +811,7 @@ public class QueryParser extends InputParser {
       final QueryParser qp = new QueryParser(query, io.path(), qc, null);
       qp.sc.resolver = sc.resolver;
 
-      // check if import and declaration uri match
+      // check if import and declaration URI match
       final LibraryModule lib = qp.parseLibrary(false);
       qc.libs.put(tPath, lib);
       final byte[] muri = lib.sc.module.uri();

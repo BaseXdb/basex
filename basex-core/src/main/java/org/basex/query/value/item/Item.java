@@ -326,7 +326,7 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns a type id.
+   * Returns a type ID.
    * Overwritten by {@link DBNode} and {@link FDoc}.
    * @return type string
    */

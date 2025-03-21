@@ -96,7 +96,7 @@ public final class MetaData {
 
   /** Number of nodes. */
   public int size;
-  /** Last (highest) id assigned to a node. Can be {@code -1} if database is empty. */
+  /** Last (highest) ID assigned to a node. Can be {@code -1} if database is empty. */
   public int lastid = -1;
 
   /** Database directory. Set to {@code null} if database is in main memory. */

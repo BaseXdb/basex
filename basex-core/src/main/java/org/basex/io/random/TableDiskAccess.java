@@ -30,7 +30,7 @@ public final class TableDiskAccess extends TableAccess {
   /** File lock. */
   private FileLock lock;
 
-  /** First pre values (ascending order); will be initialized with the first update. */
+  /** First PRE values (ascending order); will be initialized with the first update. */
   private int[] fPreIndex;
   /** Page index; will be initialized with the first update. */
   private int[] pageIndex;
@@ -43,7 +43,7 @@ public final class TableDiskAccess extends TableAccess {
   private int page = -1;
   /** Pre value of the first entry in the current page. */
   private int firstPre = -1;
-  /** First pre value of the next page. */
+  /** First PRE value of the next page. */
   private int nextPre = -1;
 
   /**
@@ -65,7 +65,7 @@ public final class TableDiskAccess extends TableAccess {
         // no mapping: total and used number of pages is identical
         used = pages;
       } else if(used != 0) {
-        // read page index and first pre values from disk
+        // read page index and first PRE values from disk
         fPreIndex = in.readNums();
         pageIndex = in.readNums();
         // read block bitmap
@@ -251,7 +251,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // check if all entries are in current page
     if(last <= nextPre) {
-      // move entries in current page and decreases pointers to pre values
+      // move entries in current page and decreases pointers to PRE values
       if(last < nextPre) delete(buffers.current(), from, from + count, nextPre - last);
       decreasePre(count);
 
@@ -377,7 +377,7 @@ public final class TableDiskAccess extends TableAccess {
           Array.copyFromStart(buffer.data, o, buffer.data, remain);
           Array.copyToStart(all, all.length - remain, remain, buffer.data);
           buffer.dirty = true;
-          // reduce the pre value, since it will be later incremented with nr
+          // reduce the PRE value, since it will be later incremented with nr
           fPreIndex[page] -= remain >>> IO.NODEPOWER;
           // go back to the previous page
           readPage(page - 1);
@@ -456,9 +456,9 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Searches for the page containing the entry for the specified pre value.
+   * Searches for the page containing the entry for the specified PRE value.
    * Reads the page and returns its offset inside the page.
-   * @param pre pre of the entry to search for
+   * @param pre PRE of the entry to search for
    * @return offset of the entry in the page
    */
   private int cursor(final int pre) {
@@ -476,9 +476,9 @@ public final class TableDiskAccess extends TableAccess {
       }
       if(l > h) throw Util.notExpected(
           "Data Access out of bounds:" +
-          "\n- pre value: " + pre +
+          "\n- PRE value: " + pre +
           "\n- table size: " + meta.size +
-          "\n- first/next pre value: " + fp + '/' + np +
+          "\n- first/next PRE value: " + fp + '/' + np +
           "\n- #total/used pages: " + pages + '/' + used +
           "\n- accessed page: " + m + " (" + l + " > " + h + ']');
       readPage(m);
@@ -506,9 +506,9 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Return the specified pre value.
+   * Return the specified PRE value.
    * @param pre index of the page to fetch
-   * @return pre value
+   * @return PRE value
    */
   private int fpre(final int pre) {
     return fPreIndex == null ? pre * IO.ENTRIES : fPreIndex[pre];
@@ -560,7 +560,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Decreases pointers to pre value.
+   * Decreases pointers to PRE value.
    * @param count number of entries to move
    */
   private void decreasePre(final int count) {

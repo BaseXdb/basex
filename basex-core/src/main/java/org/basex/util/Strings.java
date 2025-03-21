@@ -342,7 +342,7 @@ public final class Strings {
   /**
    * Converts a URI to a directory path.
    * See https://docs.basex.org/wiki/Repository#URI_Rewriting for details.
-   * @param uri namespace uri
+   * @param uri namespace URI
    * @return converted path
    */
   public static String uri2path(final String uri) {

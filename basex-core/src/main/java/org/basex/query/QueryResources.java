@@ -356,7 +356,7 @@ public final class QueryResources {
 
   /**
    * Adds a resource with the specified path. Only called from the test APIs.
-   * @param uri resource uri
+   * @param uri resource URI
    * @param strings resource strings (path, encoding)
    */
   public void addText(final String uri, final String... strings) {

@@ -78,7 +78,7 @@ public final class QueryJob extends Job implements Runnable {
       throw JOBS_OVERFLOW.get(info);
 
     synchronized(jobs.tasks) {
-      // custom job id: check if it is invalid or has already been assigned
+      // custom job ID: check if it is invalid or has already been assigned
       String id = opts.get(JobOptions.ID);
       if(id != null) {
         if(id.startsWith(JobContext.PREFIX)) throw JOBS_ID_INVALID_X.get(info, id);

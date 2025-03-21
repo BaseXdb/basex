@@ -16,7 +16,7 @@ import org.basex.util.list.*;
 final class TableMemBlock {
   /** Table data, with two values for one XML node. */
   private long[] data;
-  /** First pre value. */
+  /** First PRE value. */
   int firstPre;
 
   /**
@@ -41,9 +41,9 @@ final class TableMemBlock {
   }
 
   /**
-   * Creates new blocks with computed pre values.
+   * Creates new blocks with computed PRE values.
    * @param count number of entries to add
-   * @param pre pre value of first block (will be incremented for subsequent blocks)
+   * @param pre PRE value of first block (will be incremented for subsequent blocks)
    * @return new blocks
    */
   static ArrayList<TableMemBlock> get(final int count, final int pre) {
@@ -58,7 +58,7 @@ final class TableMemBlock {
 
   /**
    * Returns the number of remaining entries in this block.
-   * @param nextPre pre value of next block
+   * @param nextPre PRE value of next block
    * @return remaining entries
    */
   int remaining(final int nextPre) {
@@ -67,7 +67,7 @@ final class TableMemBlock {
 
   /**
    * Returns the value at the specified position.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @return value
    */
@@ -77,7 +77,7 @@ final class TableMemBlock {
 
   /**
    * Assigns a value at the specified position.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset offset
    * @param value value
    */
@@ -89,9 +89,9 @@ final class TableMemBlock {
 
   /**
    * Deletes the specified number of entries.
-   * @param pre pre value of first entry to delete
+   * @param pre PRE value of first entry to delete
    * @param count number of entries to delete
-   * @param nextPre pre value of next block
+   * @param nextPre PRE value of next block
    * @return number of deleted entries
    */
   int delete(final int pre, final int count, final int nextPre) {
@@ -103,9 +103,9 @@ final class TableMemBlock {
 
   /**
    * Inserts the specified number of entries.
-   * @param pre pre value of first entry to insert (may point to the end of the block)
+   * @param pre PRE value of first entry to insert (may point to the end of the block)
    * @param count number of entries to insert
-   * @param nextPre pre value of next block
+   * @param nextPre PRE value of next block
    * @return new blocks or {@code null}
    */
   ArrayList<TableMemBlock> insert(final int pre, final int count, final int nextPre) {
@@ -184,7 +184,7 @@ final class TableMemBlock {
 
   /**
    * Returns the index to the current table segment.
-   * @param pre pre value
+   * @param pre PRE value
    * @param offset byte offset (0-16)
    * @return table index
    */

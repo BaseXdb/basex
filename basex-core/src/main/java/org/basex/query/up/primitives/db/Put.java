@@ -26,7 +26,7 @@ public final class Put extends DBUpdate {
   private final StringList paths = new StringList(1);
   /** Serializer options. */
   private final ArrayList<SerializerOptions> options = new ArrayList<>();
-  /** Node id of the target node. Target nodes are identified via their ID, as structural
+  /** Node ID of the target node. Target nodes are identified via their ID, as structural
    *  changes (delete/insert) during the snapshot lead to PRE value shifts on disk.
    *  In addition, deleted/replaced nodes will not be serialized by fn:put as the
    *  identity of these nodes is gone - which is easier to track operating on IDs. */
@@ -34,7 +34,7 @@ public final class Put extends DBUpdate {
 
   /**
    * Constructor.
-   * @param id target node id
+   * @param id target node ID
    * @param data target data reference
    * @param path target path
    * @param sopts serializer options

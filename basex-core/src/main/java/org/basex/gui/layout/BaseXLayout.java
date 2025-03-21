@@ -398,7 +398,7 @@ public final class BaseXLayout {
   }
 
   /**
-   * Returns the value of the specified pre value and attribute.
+   * Returns the value of the specified PRE value and attribute.
    * @param val value to be evaluated
    * @return value as string
    */

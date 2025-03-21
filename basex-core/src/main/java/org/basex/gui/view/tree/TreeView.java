@@ -27,7 +27,7 @@ import org.basex.util.list.*;
  * @author Wolfgang Miller
  */
 public final class TreeView extends View {
-  /** TreeBorders Object, contains cached pre values and borders. */
+  /** TreeBorders Object, contains cached PRE values and borders. */
   private TreeSubtree sub;
   /** TreeRects Object, contains cached rectangles. */
   private TreeRects tr;
@@ -913,7 +913,7 @@ public final class TreeView extends View {
           flv = lv;
           final int pre;
 
-          // if multiple pre values, then approximate pre value
+          // if multiple PRE values, then approximate PRE value
           pre = tr.bigRect(sub, rn, lv) ? tr.prePerXPos(sub, rn, lv, mx) :
             sub.prePerIndex(rn, lv, l);
           fpre = pre;

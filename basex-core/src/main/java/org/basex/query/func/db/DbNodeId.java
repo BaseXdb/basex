@@ -89,7 +89,7 @@ public class DbNodeId extends StandardFunc {
   /**
    * Returns the node value.
    * @param node database node
-   * @return node id
+   * @return node ID
    */
   protected int id(final DBNode node) {
     return node.data().id(node.pre());

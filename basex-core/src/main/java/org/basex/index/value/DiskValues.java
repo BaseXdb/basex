@@ -172,9 +172,9 @@ public class DiskValues extends ValueIndex {
   }
 
   /**
-   * Returns the {@code pre} value for the specified id.
-   * @param id id value
-   * @return pre value
+   * Returns the PRE value for the specified ID.
+   * @param id ID value
+   * @return PRE value
    */
   protected int pre(final int id) {
     return id;
@@ -338,7 +338,7 @@ public class DiskValues extends ValueIndex {
    * <p><em>Important:</em> This method is thread-safe.</p>
    * @param sz number of values
    * @param offset offset
-   * @return sorted pre values
+   * @return sorted PRE values
    */
   protected IntList pres(final int sz, final long offset) {
     final IntList pres = new IntList(sz);
@@ -372,7 +372,7 @@ public class DiskValues extends ValueIndex {
         // skip traversal if value is too large
         final int diff = compare(key(id), tok.max);
         if(diff > 0 || !tok.mxi && diff == 0) break;
-        // add pre values
+        // add PRE values
         for(int c = 0; c < count; c++) {
           pres.add(pre(id));
           id += idxl.readNum();
@@ -423,7 +423,7 @@ public class DiskValues extends ValueIndex {
 
   /**
    * Returns the specified key, considering tokenization.
-   * @param id id of key
+   * @param id ID of key
    * @return key token
    */
   private byte[] key(final int id) {

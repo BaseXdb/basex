@@ -26,7 +26,7 @@ public final class ReplaceDoc extends NodeUpdate {
 
   /**
    * Constructor.
-   * @param pre target node pre value
+   * @param pre target node PRE value
    * @param data target data instance
    * @param input new document
    * @param qopts query options

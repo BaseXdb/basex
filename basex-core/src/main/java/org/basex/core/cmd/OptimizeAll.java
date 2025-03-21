@@ -165,7 +165,7 @@ public final class OptimizeAll extends ACreate {
     private final DiskData data;
     /** Data size. */
     private final int size;
-    /** Current pre value. */
+    /** Current PRE value. */
     private int pre;
 
     /**

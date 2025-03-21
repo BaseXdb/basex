@@ -17,7 +17,7 @@ public final class FTPos {
 
   /**
    * Constructor.
-   * @param pre pre value
+   * @param pre PRE value
    * @param list sorted positions
    */
   FTPos(final int pre, final IntList list) {

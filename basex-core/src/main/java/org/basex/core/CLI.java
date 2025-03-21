@@ -56,7 +56,7 @@ public abstract class CLI extends Main {
 
   /**
    * Parses and executes the input string.
-   * @param command base uri (name) and command string (value)
+   * @param command base URI (name) and command string (value)
    * @return {@code false} if the exit command was sent
    * @throws IOException database exception
    */

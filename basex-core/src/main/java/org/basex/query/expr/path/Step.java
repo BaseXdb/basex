@@ -271,7 +271,7 @@ public abstract class Step extends Preds {
    * Adds path nodes to the list if they comply with the given test conditions.
    * @param node root node
    * @param nodes output nodes
-   * @param name name id, or {@code 0} as wildcard
+   * @param name name ID, or {@code 0} as wildcard
    * @param kind node kind, or {@code -1} for all types
    */
   private void add(final PathNode node, final ArrayList<PathNode> nodes, final int name,

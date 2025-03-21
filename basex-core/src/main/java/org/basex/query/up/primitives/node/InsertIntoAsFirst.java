@@ -17,7 +17,7 @@ import org.basex.util.*;
 public final class InsertIntoAsFirst extends NodeCopy {
   /**
    * Constructor.
-   * @param pre target node pre value
+   * @param pre target node PRE value
    * @param data target data reference
    * @param info input info (can be {@code null})
    * @param nodes insertion sequence node list

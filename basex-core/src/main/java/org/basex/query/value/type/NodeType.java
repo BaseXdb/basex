@@ -150,7 +150,7 @@ public enum NodeType implements Type {
   private final byte[] kind;
   /** Parent type. */
   private final Type parent;
-  /** Type id . */
+  /** Type ID . */
   private final ID id;
 
   /** Sequence types (lazy instantiation). */
@@ -160,7 +160,7 @@ public enum NodeType implements Type {
    * Constructor.
    * @param name name
    * @param parent parent type
-   * @param id type id
+   * @param id type ID
    */
   NodeType(final String name, final Type parent, final ID id) {
     this.test = Token.token(name);

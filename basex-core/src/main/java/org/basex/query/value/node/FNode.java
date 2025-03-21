@@ -37,7 +37,7 @@ public abstract class FNode extends ANode {
 
   @Override
   public final int compare(final ANode node) {
-    // fragments: compare node ids. otherwise, find LCA
+    // fragments: compare node IDs. otherwise, find LCA
     return this == node ? 0 : node instanceof FNode ? Integer.signum(id - node.id) :
       compare(this, node);
   }

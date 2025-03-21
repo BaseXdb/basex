@@ -70,7 +70,7 @@ public class ModuleDemo extends QueryModule {
   }
 
   /**
-   * Returns all id values of the specified database nodes.
+   * Returns all ID values of the specified database nodes.
    * @param value value
    * @return resulting value
    */

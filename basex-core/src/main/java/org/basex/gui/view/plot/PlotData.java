@@ -24,7 +24,7 @@ final class PlotData {
   final PlotAxis xAxis;
   /** The y-axis of the plot. */
   final PlotAxis yAxis;
-  /** Items pre values. */
+  /** Items PRE values. */
   int[] pres;
   /** Item token selected by user. */
   byte[] item = EMPTY;
@@ -119,9 +119,9 @@ final class PlotData {
   }
 
   /**
-   * Returns the array position of a given pre value by performing a binary
-   * search on the sorted pre values array currently displayed in the plot.
-   * @param pre pre value to be looked up
+   * Returns the array position of a given PRE value by performing a binary
+   * search on the sorted PRE values array currently displayed in the plot.
+   * @param pre PRE value to be looked up
    * @return array index if found, {@code -1} if not
    */
   int findPre(final int pre) {

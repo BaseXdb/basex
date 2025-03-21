@@ -45,7 +45,7 @@ public final class PathNode {
 
   /**
    * Default constructor.
-   * @param name id of node name
+   * @param name ID of node name
    * @param kind node kind
    * @param parent parent node
    */
@@ -77,7 +77,7 @@ public final class PathNode {
 
   /**
    * Indexes the specified name and its kind.
-   * @param id name id
+   * @param id name ID
    * @param knd node kind
    * @param value value (can be {@code null})
    * @param meta meta data
@@ -166,7 +166,7 @@ public final class PathNode {
   /**
    * Recursively adds the node and its descendants to the specified list with the specified name.
    * @param nodes node list
-   * @param nm name id
+   * @param nm name ID
    */
   void addDesc(final ArrayList<PathNode> nodes, final int nm) {
     if(kind == Data.ELEM && nm == name) nodes.add(this);

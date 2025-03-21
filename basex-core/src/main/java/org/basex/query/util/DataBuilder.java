@@ -96,7 +96,7 @@ public final class DataBuilder {
    * @param node node to be added
    * @param pre node position
    * @param par node parent
-   * @return pre value of next node
+   * @return PRE value of next node
    */
   private int addNode(final ANode node, final int pre, final int par) {
     if(qc != null) qc.checkStop();
@@ -114,8 +114,8 @@ public final class DataBuilder {
   /**
    * Adds a document node.
    * @param node node to be added
-   * @param pre pre reference
-   * @return pre value of next node
+   * @param pre PRE value
+   * @return PRE value of next node
    */
   private int addDoc(final ANode node, final int pre) {
     final int size = size(node, false);
@@ -131,9 +131,9 @@ public final class DataBuilder {
   /**
    * Adds an attribute.
    * @param node node to be added
-   * @param pre pre reference
+   * @param pre PRE value
    * @param par parent reference
-   * @return pre value of next node
+   * @return PRE value of next node
    */
   private int addAttr(final ANode node, final int pre, final int par) {
     final int last = data.meta.size;
@@ -152,9 +152,9 @@ public final class DataBuilder {
   /**
    * Adds a text node.
    * @param node node to be added
-   * @param pre pre reference
+   * @param pre PRE value
    * @param par parent reference
-   * @return pre value of next node
+   * @return PRE value of next node
    */
   private int addText(final ANode node, final int pre, final int par) {
     // check full-text mode
@@ -194,9 +194,9 @@ public final class DataBuilder {
   /**
    * Adds a processing instruction.
    * @param node node to be added
-   * @param pre pre reference
+   * @param pre PRE value
    * @param par parent reference
-   * @return pre value of next node
+   * @return PRE value of next node
    */
   private int addPI(final ANode node, final int pre, final int par) {
     final byte[] value = trim(concat(node.name(), cpToken(' '), node.string()));
@@ -208,9 +208,9 @@ public final class DataBuilder {
   /**
    * Adds a comment.
    * @param node node to be added
-   * @param pre pre reference
+   * @param pre PRE value
    * @param par parent reference
-   * @return pre value of next node
+   * @return PRE value of next node
    */
   private int addComm(final ANode node, final int pre, final int par) {
     data.text(pre - par, node.string(), Data.COMM);
@@ -221,9 +221,9 @@ public final class DataBuilder {
   /**
    * Adds an element node.
    * @param node node to be added
-   * @param pre pre reference
+   * @param pre PRE value
    * @param par parent reference
-   * @return pre value of next node
+   * @return PRE value of next node
    */
   private int addElem(final ANode node, final int pre, final int par) {
     final int last = data.meta.size;

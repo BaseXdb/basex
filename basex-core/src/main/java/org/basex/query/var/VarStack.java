@@ -21,7 +21,7 @@ public final class VarStack extends ObjectList<Var, VarStack> {
 
   /**
    * Returns a variable with the specified name; should only be
-   * used while parsing, because it ignores the ids of variables.
+   * used while parsing, because it ignores the IDs of variables.
    * @param name variable name
    * @return variable or {@code null}
    */

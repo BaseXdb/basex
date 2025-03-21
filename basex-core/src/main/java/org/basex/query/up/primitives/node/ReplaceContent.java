@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class ReplaceContent extends InsertInto {
   /**
    * Constructor.
-   * @param pre target pre value
+   * @param pre target PRE value
    * @param data target data instance
    * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence

@@ -25,9 +25,9 @@ final class FTIndexTrees {
   /**
    * Indexes a token with full-text data.
    * @param token token to be indexed
-   * @param pre pre value for the token
+   * @param pre PRE value for the token
    * @param pos pos value of the token
-   * @param index current file id
+   * @param index current file ID
    */
   void index(final byte[] token, final int pre, final int pos, final int index) {
     final int tl = token.length;

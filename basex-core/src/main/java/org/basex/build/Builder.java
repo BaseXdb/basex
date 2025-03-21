@@ -240,9 +240,9 @@ public abstract class Builder extends Job {
    * size value; if this node has further descendants, {@link #setSize} must
    * be called to set the final size value.
    * @param dist distance to parent
-   * @param nameId id of element name
+   * @param nameId ID of element name
    * @param asize number of attributes
-   * @param uriId id of namespace uri
+   * @param uriId ID of namespace URI
    * @param ne namespace flag (indicates if this element introduces new namespaces)
    * @throws IOException I/O exception
    */
@@ -251,10 +251,10 @@ public abstract class Builder extends Job {
 
   /**
    * Adds an attribute to the database.
-   * @param nameId id of attribute name
+   * @param nameId ID of attribute name
    * @param value attribute value
    * @param dist distance to parent
-   * @param uriId id of namespace uri
+   * @param uriId ID of namespace URI
    * @throws IOException I/O exception
    */
   protected abstract void addAttr(int nameId, byte[] value, int dist, int uriId) throws IOException;
@@ -270,7 +270,7 @@ public abstract class Builder extends Job {
 
   /**
    * Stores a size value to the specified table position.
-   * @param pre pre reference
+   * @param pre PRE value
    * @param size value to be stored
    * @throws IOException I/O exception
    */
@@ -290,9 +290,9 @@ public abstract class Builder extends Job {
     int nameId = elemNames.store(name);
     path.index(nameId, Data.ELEM, level);
 
-    // cache pre value
+    // cache PRE value
     final int pre = meta.size;
-    // remember id of element name and parent reference
+    // remember ID of element name and parent reference
     elemStack.set(level, nameId);
     parStack.set(level, pre);
 

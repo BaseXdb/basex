@@ -175,12 +175,12 @@ final class TreeRects {
   }
 
   /**
-   * Returns pre value for given x position of a big rectangle.
+   * Returns PRE value for given x position of a big rectangle.
    * @param sub subtree
    * @param rn root
    * @param lv level
    * @param x x position
-   * @return pre value
+   * @return PRE value
    */
   int prePerXPos(final TreeSubtree sub, final int rn, final int lv, final int x) {
     final TreeRect r = treeRectsPerLevel(rn, lv)[0];
@@ -190,12 +190,12 @@ final class TreeRects {
   }
 
   /**
-   * Uses binary search to find the rectangle with given pre value.
+   * Uses binary search to find the rectangle with given PRE value.
    * @param sub subtree
    * @param rn root number
    * @param lv level
-   * @param pre the pre value to be found
-   * @return the rectangle containing the given pre value, {@code null} else
+   * @param pre the PRE value to be found
+   * @return the rectangle containing the given PRE value, {@code null} else
    */
   TreeRect searchRect(final TreeSubtree sub, final int rn, final int lv, final int pre) {
     final int i = sub.searchPreArrayPos(rn, lv, pre);

@@ -36,7 +36,7 @@ public final class MixedTest extends SandboxTest {
       DUPLMODULE_X);
   }
 
-  /** Catches duplicate module import with different module uri. */
+  /** Catches duplicate module import with different module URI. */
   @Test public void duplImportDiffUri() {
     error("import module namespace a='world' at '" + XQMFILE + "';" +
       "import module namespace a='galaxy' at '" + XQMFILE + "'; 1",
@@ -184,7 +184,7 @@ public final class MixedTest extends SandboxTest {
     query(query + "[..[@id = $id]/parent::document-node()]", "<b id=\"1\"/>");
   }
 
-  /** Node ids. */
+  /** Node IDs. */
   @Test public void gh1566() {
     query("((<_><a/><b/></_> update {})/* ! element _ { . })/*", "<a/>\n<b/>");
     query("((<_><a>A</a><b>B</b></_> update {})/* ! element _ { . })/*/node()", "A\nB");
@@ -275,7 +275,7 @@ public final class MixedTest extends SandboxTest {
     query("(xs:anyURI('b'), 'a', 'a')[. = 'c'] instance of xs:string*", true);
   }
 
-  /** JSON documents, node ids. */
+  /** JSON documents, node IDs. */
   @Test public void gh1983() {
     query("tail(" + _JSON_PARSE.args("{}") +  "/*/ancestor-or-self::node()) instance of element()",
         true);

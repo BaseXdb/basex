@@ -80,7 +80,7 @@ public final class SelectiveIndexTest extends SandboxTest {
     }
   }
 
-  /** Tests the id functions. */
+  /** Tests the ID functions. */
   @Test public void id() {
     set(MainOptions.TOKENINDEX, true);
     try {
@@ -90,7 +90,7 @@ public final class SelectiveIndexTest extends SandboxTest {
         "", "*", "Q{}*", "Q{id}",
         "Q{}id", "id", "*:id", "Q{}idref", "idref", "*:idref",
         "Q{}x", "Q{}x", "x", "*:x", "Q{}x",
-        // does not work, as it would currently indicate that idref is included in the index
+        // does not work, as it would currently indicate that IDREF is included in the index
         "Q{}ref", "ref", "*:ref",
       };
       for(final String include : includes) {

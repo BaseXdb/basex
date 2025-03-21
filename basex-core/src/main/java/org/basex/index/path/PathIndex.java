@@ -93,7 +93,7 @@ public final class PathIndex implements Index {
 
   /**
    * Adds an element or document node.
-   * @param name name id ({@code 0} for nodes other than elements and attributes)
+   * @param name name ID ({@code 0} for nodes other than elements and attributes)
    * @param kind node kind
    * @param level current level
    */
@@ -103,7 +103,7 @@ public final class PathIndex implements Index {
 
   /**
    * Adds an entry, including its value.
-   * @param name name id ({@code 0} for nodes other than elements and attributes)
+   * @param name name ID ({@code 0} for nodes other than elements and attributes)
    * @param kind node kind
    * @param level current level
    * @param value value ({@code null} for element or document nodes)

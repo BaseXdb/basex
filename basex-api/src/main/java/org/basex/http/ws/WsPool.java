@@ -19,19 +19,19 @@ import org.eclipse.jetty.websocket.api.*;
  * @author Johannes Finckh
  */
 public final class WsPool {
-  /** Clients of the pool. id -> adapter. */
+  /** Clients of the pool. ID -> adapter. */
   private static final ConcurrentHashMap<String, WebSocket> CLIENTS = new ConcurrentHashMap<>();
   /** WebSocket prefix. */
   private static final String PREFIX = "websocket";
-  /** Incrementing id. */
+  /** Incrementing ID. */
   private static long websocketId = -1;
 
   /** Private constructor. */
   private WsPool() { }
 
   /**
-   * Returns the ids of all connected clients.
-   * @return client ids
+   * Returns the IDs of all connected clients.
+   * @return client IDs
    */
   public static TokenList ids() {
     final TokenList ids = new TokenList(CLIENTS.size());
@@ -42,7 +42,7 @@ public final class WsPool {
   /**
    * Adds a WebSocket to the clients list.
    * @param socket WebSocket
-   * @return client id
+   * @return client ID
    */
   static String add(final WebSocket socket) {
     final String id = createId();
@@ -52,7 +52,7 @@ public final class WsPool {
 
   /**
    * Removes a WebSocket from the clients list.
-   * @param id client id
+   * @param id client ID
    */
   static void remove(final String id) {
     CLIENTS.remove(id);
@@ -68,9 +68,9 @@ public final class WsPool {
   }
 
   /**
-   * Sends a message to all connected clients except to the one with the given id.
+   * Sends a message to all connected clients except to the one with the given ID.
    * @param message message
-   * @param client client id
+   * @param client client ID
    * @throws QueryException query exception
    */
   public static void broadcast(final Item message, final String client) throws QueryException {
@@ -84,7 +84,7 @@ public final class WsPool {
   /**
    * Sends a message to a specific clients.
    * @param message message
-   * @param ids client ids
+   * @param ids client IDs
    * @throws QueryException query exception
    */
   public static void send(final Value message, final String... ids) throws QueryException {
@@ -97,8 +97,8 @@ public final class WsPool {
   }
 
   /**
-   * Returns the client with the specified id.
-   * @param id client id
+   * Returns the client with the specified ID.
+   * @param id client ID
    * @return client
    */
   public static WebSocket get(final String id) {
@@ -137,8 +137,8 @@ public final class WsPool {
   }
 
   /**
-   * Creates a new, unused WebSocket id.
-   * @return new id
+   * Creates a new, unused WebSocket ID.
+   * @return new ID
    */
   private static synchronized String createId() {
     websocketId = Math.max(0, websocketId + 1);

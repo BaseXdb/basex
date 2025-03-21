@@ -89,8 +89,8 @@ public final class Namespaces {
   }
 
   /**
-   * Returns a prefix for the name with the specified id.
-   * @param id id of prefix
+   * Returns a prefix for the name with the specified ID.
+   * @param id ID of prefix
    * @return prefix
    */
   byte[] prefix(final int id) {
@@ -98,8 +98,8 @@ public final class Namespaces {
   }
 
   /**
-   * Returns a namespace URI for the name with the specified id.
-   * @param id id of namespace URI ({@code 0}: no namespace)
+   * Returns a namespace URI for the name with the specified ID.
+   * @param id ID of namespace URI ({@code 0}: no namespace)
    * @return namespace URI or {@code null}
    */
   public byte[] uri(final int id) {
@@ -107,9 +107,9 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the id of the specified namespace uri.
+   * Returns the ID of the specified namespace URI.
    * @param uri namespace URI
-   * @return id, or {@code 0} if no entry is found
+   * @return ID, or {@code 0} if no entry is found
    */
   public int uriId(final byte[] uri) {
     return uris.index(uri);
@@ -149,10 +149,10 @@ public final class Namespaces {
   // Requesting Namespaces Based on Context =======================================================
 
   /**
-   * Returns the id of a namespace URI for the specified prefix.
+   * Returns the ID of a namespace URI for the specified prefix.
    * @param prefix prefix
    * @param element indicates if the prefix belongs to an element or attribute name
-   * @return id of namespace uri, or {@code 0} if no entry is found
+   * @return ID of namespace URI, or {@code 0} if no entry is found
    */
   public int uriIdForPrefix(final byte[] prefix, final boolean element) {
     if(isEmpty()) return 0;
@@ -160,21 +160,21 @@ public final class Namespaces {
   }
 
   /**
-   * Returns the id of a namespace URI for the specified prefix and pre value.
+   * Returns the ID of a namespace URI for the specified prefix and PRE value.
    * @param prefix prefix
-   * @param pre pre value
+   * @param pre PRE value
    * @param data data reference
-   * @return id of namespace uri, or {@code 0} if no entry is found
+   * @return ID of namespace URI, or {@code 0} if no entry is found
    */
   public int uriIdForPrefix(final byte[] prefix, final int pre, final Data data) {
     return uriId(prefix, current.find(pre, data));
   }
 
   /**
-   * Returns the id of a namespace URI for the specified prefix and node.
+   * Returns the ID of a namespace URI for the specified prefix and node.
    * @param prefix prefix
    * @param node node to start with
-   * @return id of the namespace uri, or {@code 0} if namespace is not found
+   * @return ID of the namespace URI, or {@code 0} if namespace is not found
    */
   private int uriId(final byte[] prefix, final NSNode node) {
     final int prefId = prefixes.index(prefix);
@@ -190,11 +190,11 @@ public final class Namespaces {
   }
 
   /**
-   * Returns all namespace prefixes and uris that are declared for the specified pre value.
+   * Returns all namespace prefixes and URIs that are declared for the specified PRE value.
    * Should only be called for element nodes.
-   * @param pre pre value
+   * @param pre PRE value
    * @param data data reference
-   * @return key and value ids
+   * @return key and value IDs
    */
   Atts values(final int pre, final Data data) {
     final int[] values = current.find(pre, data).values();
@@ -206,9 +206,9 @@ public final class Namespaces {
 
   /**
    * Finds the nearest namespace node on the ancestor axis of the insert location and sets it as new
-   * root. Possible candidates for this node are collected and the match with the highest pre value
+   * root. Possible candidates for this node are collected and the match with the highest PRE value
    * between ancestors and candidates is determined.
-   * @param pre pre value
+   * @param pre PRE value
    * @param data data reference
    */
   void root(final int pre, final Data data) {
@@ -224,14 +224,14 @@ public final class Namespaces {
 
     nd = root;
     if(cand.size() > 1) {
-      // compare candidates to ancestors of pre value
+      // compare candidates to ancestors of PRE value
       int ancPre = pre;
       // take first candidate from stack
       NSNode curr = cand.remove(0);
       while(ancPre > -1 && nd == root) {
-        // if the current candidate's pre value is lower than the current ancestor of par or par
+        // if the current candidate's PRE value is lower than the current ancestor of par or par
         // itself, we have to look for a potential match for this candidate. therefore we iterate
-        // through ancestors until we find one with a lower than or the same pre value as the
+        // through ancestors until we find one with a lower than or the same PRE value as the
         // current candidate.
         while(ancPre > curr.pre()) ancPre = data.parent(ancPre, data.kind(ancPre));
         // this is the new root
@@ -244,14 +244,14 @@ public final class Namespaces {
 
     final int uriId = uriIdForPrefix(Token.EMPTY, pre, data);
     defaults.set(level, uriId);
-    // remember uri before insert of first node n to connect siblings of n to according namespace
+    // remember URI before insert of first node n to connect siblings of n to according namespace
     defaults.set(level - 1, uriId);
     current = nd;
   }
 
   /**
-   * Caches and returns all namespace nodes in the namespace structure with a minimum pre value.
-   * @param pre minimum pre value of a namespace node
+   * Caches and returns all namespace nodes in the namespace structure with a minimum PRE value.
+   * @param pre minimum PRE value of a namespace node
    * @return list of namespace nodes
    */
   ArrayList<NSNode> cache(final int pre) {
@@ -264,7 +264,7 @@ public final class Namespaces {
    * Recursively adds namespace nodes to a list, starting with the children of a node.
    * @param node current namespace node
    * @param list list with namespace nodes
-   * @param pre pre value
+   * @param pre PRE value
    */
   private static void addNodes(final NSNode node, final List<NSNode> list, final int pre) {
     final int size = node.children();
@@ -305,7 +305,7 @@ public final class Namespaces {
 
   /**
    * Adds namespaces to a new namespace child node and sets this node as new cursor.
-   * @param pre pre value
+   * @param pre PRE value
    * @param atts namespaces
    */
   public void open(final int pre, final Atts atts) {
@@ -326,12 +326,12 @@ public final class Namespaces {
   }
 
   /**
-   * Adds a single namespace for the specified pre value.
-   * @param pre pre value
+   * Adds a single namespace for the specified PRE value.
+   * @param pre PRE value
    * @param prefix prefix
-   * @param uri namespace uri
+   * @param uri namespace URI
    * @param data data reference
-   * @return id of namespace uri
+   * @return ID of namespace URI
    */
   public int add(final int pre, final byte[] prefix, final byte[] uri, final Data data) {
     final int prefId = prefixes.put(prefix), uriId = uris.put(uri);
@@ -347,7 +347,7 @@ public final class Namespaces {
 
   /**
    * Closes a namespace node.
-   * @param pre current pre value
+   * @param pre current PRE value
    */
   public void close(final int pre) {
     while(current.pre() >= pre) {
@@ -369,7 +369,7 @@ public final class Namespaces {
 
   /**
    * Deletes the specified number of entries from the namespace structure.
-   * @param pre pre value of the first node to delete
+   * @param pre PRE value of the first node to delete
    * @param data data reference
    * @param size number of entries to be deleted
    */
@@ -387,8 +387,8 @@ public final class Namespaces {
 
   /**
    * Returns a tabular representation of the namespace entries.
-   * @param start first pre value
-   * @param end last pre value
+   * @param start first PRE value
+   * @param end last PRE value
    * @return namespaces
    */
   byte[] table(final int start, final int end) {
@@ -433,8 +433,8 @@ public final class Namespaces {
 
   /**
    * Returns a string representation of the namespaces.
-   * @param start start pre value
-   * @param end end pre value
+   * @param start start PRE value
+   * @param end end PRE value
    * @return string
    */
   String toString(final int start, final int end) {

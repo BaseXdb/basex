@@ -22,7 +22,7 @@ public final class JobContext {
 
   /** Job prefix. */
   static final String PREFIX = "job";
-  /** Query id. */
+  /** Query ID. */
   private static final AtomicLong JOBID = new AtomicLong(-1);
 
   /** Registered locks. */
@@ -37,7 +37,7 @@ public final class JobContext {
 
   /** Root job. */
   private final Job job;
-  /** Job id. Will be set while job is registered. */
+  /** Job ID. Will be set while job is registered. */
   private String id;
   /** Job name (optional). */
   private String tp;
@@ -53,16 +53,16 @@ public final class JobContext {
   }
 
   /**
-   * Sets a custom id.
-   * @param string custom id string
+   * Sets a custom ID.
+   * @param string custom ID string
    */
   public void id(final String string) {
     id = string;
   }
 
   /**
-   * Returns the id of the root job.
-   * @return id
+   * Returns the ID of the root job.
+   * @return ID
    */
   public String id() {
     if(id == null) id = PREFIX + JOBID.updateAndGet(i -> Math.max(0, i + 1));

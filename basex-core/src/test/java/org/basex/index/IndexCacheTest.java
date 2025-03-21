@@ -91,7 +91,7 @@ public final class IndexCacheTest {
    * Assert a cache entry is found in the cache.
    * @param key key
    * @param size number of index hits
-   * @param pointer pointer to id list
+   * @param pointer pointer to ID list
    */
   private void assertCacheEntry(final byte[] key, final int size, final long pointer) {
     final IndexEntry entry = cache.get(key);

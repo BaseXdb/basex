@@ -201,7 +201,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     assertInstanceOf(XMLResource.class, resource, "XMLResource expected.");
     assertNotNull(resource.getId(), "No ID was created.");
 
-    // test adoption of specified id
+    // test adoption of specified ID
     final String id = DOC2;
     resource = collection.createResource(id, XMLResource.RESOURCE_TYPE);
     assertEquals(id, resource.getId(), "Resource has wrong ID.");
@@ -272,7 +272,7 @@ public final class CollectionTest extends XMLDBBaseTest {
     // check number of documents
     assertEquals(4, collection.getResourceCount(), "Wrong number of documents.");
 
-    // update document with known id
+    // update document with known ID
     resource = collection.createResource("Correct", XMLResource.RESOURCE_TYPE);
     resource.setContent("<XML/>");
     collection.storeResource(resource);
@@ -333,7 +333,7 @@ public final class CollectionTest extends XMLDBBaseTest {
       Object run() throws XMLDBException { return collection.createId(); }
     };
 
-    // check some ids for their uniqueness
+    // check some IDs for their uniqueness
     for(int i = 0; i < 10; ++i) {
       if(collection.getResource(code.run().toString()) != null) {
         fail("Returned ID not unique.");

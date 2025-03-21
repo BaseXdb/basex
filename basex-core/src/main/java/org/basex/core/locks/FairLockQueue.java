@@ -24,7 +24,7 @@ final class FairLockQueue extends LockQueue {
   synchronized void acquire(final Long id, final boolean read, final boolean write)
       throws InterruptedException {
 
-    // add job id to queue and wait
+    // add job ID to queue and wait
     if(jobs >= parallel) {
       queue.add(id);
 

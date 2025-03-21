@@ -2042,7 +2042,7 @@ public enum Function implements AFunction {
    * @param desc descriptive function string
    * @param params parameter types
    * @param type return type
-   * @param uri uri
+   * @param uri URI
    */
   Function(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType type, final byte[] uri) {
@@ -2072,7 +2072,7 @@ public enum Function implements AFunction {
    * @param params parameter types
    * @param seqType return type
    * @param flags static function properties
-   * @param uri uri
+   * @param uri URI
    */
   Function(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri) {
@@ -2088,7 +2088,7 @@ public enum Function implements AFunction {
    * @param params parameter types
    * @param seqType return type
    * @param flags static function properties
-   * @param uri uri
+   * @param uri URI
    * @param perm minimum permission
    */
   Function(final Supplier<? extends StandardFunc> supplier, final String desc,

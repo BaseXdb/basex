@@ -30,7 +30,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
   }
 
   /**
-   * Returns the base uri of a node.
+   * Returns the base URI of a node.
    * @return node name
    */
   public String getBaseURI() {

@@ -330,7 +330,7 @@ public final class JobModuleTest extends SandboxTest {
 
   /**
    * Waits until a very slow query has been started.
-   * @return query id
+   * @return query ID
    */
   private static String verySlowQuery() {
     final String id = query(_JOB_EVAL.args(VERY_SLOW_QUERY));

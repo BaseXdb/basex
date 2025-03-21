@@ -5,7 +5,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * This class indexes keys in a balanced binary tree, including their id values.
+ * This class indexes keys in a balanced binary tree, including their ID values.
  * Iterator methods are available to traverse through the tree.
  *
  * @author BaseX Team, BSD License
@@ -18,7 +18,7 @@ public class IndexTree {
 
   /** Keys saved in the tree. */
   public final TokenList keys = new TokenList(FACTOR);
-  /** Compressed id values. */
+  /** Compressed ID values. */
   public TokenList ids = new TokenList(FACTOR);
 
   /** Mapping for using existing tree. */
@@ -44,9 +44,9 @@ public class IndexTree {
   }
 
   /**
-   * Indexes the specified key and id.
+   * Indexes the specified key and ID.
    * @param key key to be indexed
-   * @param id id to be indexed
+   * @param id ID to be indexed
    * @param pos token position (only relevant for token index)
    */
   public final void add(final byte[] key, final int id, final int pos) {
@@ -54,11 +54,11 @@ public class IndexTree {
   }
 
   /**
-   * Indexes the specified key and id. If the key has already been
-   * indexed, its id is appended to the existing array.
+   * Indexes the specified key and ID. If the key has already been
+   * indexed, its ID is appended to the existing array.
    * Otherwise, a new index entry is created.
    * @param key key to be indexed
-   * @param id id to be indexed
+   * @param id ID to be indexed
    * @param pos token position (only relevant for token index)
    * @param exist flag for using existing index
    * @return int node
@@ -152,8 +152,8 @@ public class IndexTree {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Creates a new id list and adds an id.
-   * @param id id value
+   * Creates a new ID list and adds an ID.
+   * @param id ID value
    * @param pos token position (only relevant for token index)
    */
   private void addNewIds(final int id, final int pos) {
@@ -163,10 +163,10 @@ public class IndexTree {
   }
 
   /**
-   * Appends an id to id list n.
-   * @param id id value
+   * Appends an ID to the ID list specified by n.
+   * @param id ID value
    * @param pos token position (only relevant for token index)
-   * @param n id list to append to
+   * @param n ID list to append to
    */
   private void addIds(final int id, final int pos, final int n) {
     byte[] vs = ids.get(n);
@@ -178,7 +178,7 @@ public class IndexTree {
   /**
    * Creates a new node.
    * @param key node key
-   * @param id id value
+   * @param id ID value
    * @param pos token position (only relevant for token index)
    * @param par pointer to parent node
    * @param exist flag for reusing existing tree

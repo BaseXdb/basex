@@ -51,7 +51,7 @@ public final class FuncDefinition {
    * @param types parameter types
    * @param seqType return type
    * @param flags static function properties
-   * @param uri uri
+   * @param uri URI
    * @param perm minimum permission
    */
   FuncDefinition(final Supplier<? extends StandardFunc> supplier, final String desc,

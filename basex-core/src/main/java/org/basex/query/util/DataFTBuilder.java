@@ -23,14 +23,14 @@ final class DataFTBuilder {
   private final FTPosData pos;
   /** Length of full-text extract. */
   private final int len;
-  /** Id of marker element name. */
+  /** ID of marker element name. */
   private final int name;
 
   /**
    * Constructor.
    * @param pos full-text position data
    * @param len length of extract
-   * @param name id of marker element name
+   * @param name ID of marker element name
    */
   DataFTBuilder(final FTPosData pos, final int len, final int name) {
     this.pos = pos;
@@ -39,8 +39,8 @@ final class DataFTBuilder {
   }
 
   /**
-   * Returns the id of the marker element name.
-   * @return id
+   * Returns the ID of the marker element name.
+   * @return ID
    */
   int name() {
     return name;

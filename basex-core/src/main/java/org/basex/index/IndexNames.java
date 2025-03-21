@@ -11,13 +11,13 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Names and namespace uris of elements/attribute to index.
+ * Names and namespace URIs of elements/attribute to index.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class IndexNames {
-  /** Local names and namespace uris. All names are accepted if the list is empty. */
+  /** Local names and namespace URIs. All names are accepted if the list is empty. */
   private final Atts qnames = new Atts();
   /** Data reference. */
   private final Data data;
@@ -67,7 +67,7 @@ public final class IndexNames {
 
   /**
    * Checks if the name of the addressed database entry is to be indexed.
-   * @param pre pre value
+   * @param pre PRE value
    * @param text text flag
    * @return result of check
    */
@@ -80,7 +80,7 @@ public final class IndexNames {
 
   /**
    * Checks if the specified name is an index candidate.
-   * @param qname local name and namespace uri (reference or array entries can be {@code null})
+   * @param qname local name and namespace URI (reference or array entries can be {@code null})
    * @return result of check
    */
   public boolean contains(final byte[][] qname) {
@@ -129,8 +129,8 @@ public final class IndexNames {
   }
 
   /**
-   * Checks if the index names contain all relevant id or idref attributes.
-   * @param idref idref flag
+   * Checks if the index names contain all relevant ID or IDREF attributes.
+   * @param idref IDREF flag
    * @return result of check
    */
   public boolean containsIds(final boolean idref) {
@@ -138,14 +138,14 @@ public final class IndexNames {
     if(isEmpty()) return true;
     // currently no support for documents with namespaces (cannot be resolved from name index)
     if(data.nspaces.isEmpty()) return false;
-    // find id candidates
+    // find ID candidates
     final TokenSet names = new TokenSet();
     final int ns = qnames.size();
     for(int n = 0; n < ns; n++) {
       final byte[] name = qnames.name(n);
       if(name != null && XMLToken.isId(name, idref)) names.add(name);
     }
-    // check if database name index consists of other ids
+    // check if database name index consists of other IDs
     for(final byte[] name : data.attrNames) {
       if(XMLToken.isId(name, idref && !names.contains(name))) return false;
     }

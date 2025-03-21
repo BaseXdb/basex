@@ -39,7 +39,7 @@ final class TreeSubtree {
   }
 
   /**
-   * Returns pre by given index.
+   * Returns PRE value by given index.
    * @param rn root
    * @param lv level
    * @param ix index
@@ -50,7 +50,7 @@ final class TreeSubtree {
   }
 
   /**
-   * Returns pre by given index.
+   * Returns PRE value by given index.
    * @param bo border
    * @param ix index
    * @return pre
@@ -125,10 +125,10 @@ final class TreeSubtree {
   }
 
   /**
-   * Determines the index position of given pre value.
+   * Determines the index position of given PRE value.
    * @param rn root
    * @param lv level
-   * @param pre pre value
+   * @param pre PRE value
    * @return the determined index position
    */
   int searchPreArrayPos(final int rn, final int lv, final int pre) {
@@ -136,9 +136,9 @@ final class TreeSubtree {
   }
 
   /**
-   * Determines the index position of given pre value.
+   * Determines the index position of given PRE value.
    * @param bo border
-   * @param pre pre value
+   * @param pre PRE value
    * @return the determined index position
    */
   private int searchPreArrayPos(final TreeBorder bo, final int pre) {

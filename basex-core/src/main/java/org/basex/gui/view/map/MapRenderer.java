@@ -83,7 +83,7 @@ final class MapRenderer {
     int yy = rect.y + fh;
     final int ww = rect.w;
 
-    // get index on first pre value
+    // get index on first PRE value
     int ll = 0;
     final FTLexer lexer = new FTLexer().original().init(text);
     while(lexer.hasNext()) {

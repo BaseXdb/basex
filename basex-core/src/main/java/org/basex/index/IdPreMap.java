@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  * @author Dimitar Popov
  */
 public class IdPreMap {
-  /** Invalid id-value. */
+  /** Invalid ID value. */
   private static final int INV = -1;
   /** Base ID value. */
   private int baseid;
@@ -83,7 +83,7 @@ public class IdPreMap {
 
   /**
    * Finishes database creation.
-   * @param base last id
+   * @param base last ID
    */
   public final void finish(final int base) {
     baseid = base;
@@ -95,16 +95,16 @@ public class IdPreMap {
    * @return PRE or -1 if the ID is already deleted
    */
   public int pre(final int id) {
-    // no updates or id is not affected by updates
+    // no updates or ID is not affected by updates
     if(rows == 0 || id < pres[0]) return id;
 
     if(id > baseid) {
-      // id was inserted by update
+      // ID was inserted by update
       for(int i = 0; i < rows; ++i) {
         if(fids[i] <= id && id <= nids[i]) return pres[i] + id - fids[i];
       }
     } else {
-      // id is affected by updates
+      // ID is affected by updates
       final int i = sortedLastIndexOf(oids, id);
       return id + incs[i < 0 ? -i - 2 : i];
     }
@@ -133,13 +133,13 @@ public class IdPreMap {
       if(pos < 0) {
         pos = -pos - 1;
         if(pos != 0) {
-          // check if inserting into an existing id interval
+          // check if inserting into an existing ID interval
           final int prev = pos - 1;
           final int prevcnt = nids[prev] - fids[prev] + 1;
           final int prevpre = pres[prev];
 
           if(pre < prevpre + prevcnt) {
-            // split the id interval
+            // split the ID interval
             final int split = pre - prevpre;
             final int fid = fids[prev] + split;
 
@@ -285,9 +285,9 @@ public class IdPreMap {
   }
 
   /**
-   * Searches for a given pre value.
-   * @param pre pre value
-   * @return index of the record where the pre is found, or the insertion point if not found
+   * Searches for a given PRE value.
+   * @param pre PRE value
+   * @return index of the record where the PRE is found, or the insertion point if not found
    */
   private int findPre(final int pre) {
     int low = 0;
@@ -321,7 +321,7 @@ public class IdPreMap {
   /**
    * Adds a record to the table and the ID index.
    * @param i index in the table where the record should be inserted
-   * @param pre pre value
+   * @param pre PRE value
    * @param fid first ID value
    * @param nid last ID value
    * @param inc increment value

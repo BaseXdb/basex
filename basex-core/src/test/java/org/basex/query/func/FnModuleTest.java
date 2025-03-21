@@ -1268,7 +1268,7 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void generateId() {
     final Function func = GENERATE_ID;
 
-    // GH-1633: ensure that database nodes return identical id
+    // GH-1633: ensure that database nodes return identical ID
     query("count(distinct-values((document { <x/> } update {}) ! (*, *) ! " +
         func.args(" .") + "))", 1);
   }

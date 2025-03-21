@@ -86,7 +86,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testGetDocumentID() throws Exception {
-    // id and document id should be identical
+    // ID and document ID should be identical
     assertEquals(resource.getId(), resource.getDocumentId(), "ID and DocumentID differ.");
   }
 

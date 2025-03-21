@@ -27,9 +27,9 @@ public interface HTTPText {
   /** Unexpected error. */
   String UNEXPECTED_X = "Unexpected error: %";
 
-  /** DBA client id. */
+  /** DBA client ID. */
   String DBA_CLIENT_ID = "dba";
-  /** Client id. */
+  /** Client ID. */
   String CLIENT_ID = "id";
   /** Forwarded request context. */
   String FORWARD = "forward";

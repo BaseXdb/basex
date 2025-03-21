@@ -538,7 +538,7 @@ public final class UpdateTest extends SandboxTest {
 
   /**
    * Text merging for a simple insert into statement in combination with an
-   * insert before statement. Checks if pre value shifts are taken into account.
+   * insert before statement. Checks if PRE value shifts are taken into account.
    */
   @Test public void textMerging02() {
     createDB(null);
@@ -548,7 +548,7 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * Text merging test. Test 'insert into as first' and whether pre value
+   * Text merging test. Test 'insert into as first' and whether PRE value
    * shifts are taken into account correctly.
    */
   @Test public void textMerging03() {
@@ -562,7 +562,7 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * Text merging for a simple insert into statement. Checks if pre value shifts
+   * Text merging for a simple insert into statement. Checks if PRE value shifts
    * are taken into account.
    */
   @Test public void textMerging04() {
@@ -572,7 +572,7 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * Text merging for a simple insert into statement. Checks if pre value shifts
+   * Text merging for a simple insert into statement. Checks if PRE value shifts
    * are taken into account.
    */
   @Test public void textMerging05() {
@@ -873,7 +873,7 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * Tests if pre cache is clear / free of ambiguous entries.
+   * Tests if PRE cache is clear / free of ambiguous entries.
    */
   @Test public void delayedDistanceAdjustment17() {
     createDB("<A><B/><C/><D/></A>");
@@ -882,7 +882,7 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * Tests if pre cache is clear / free of ambiguous entries.
+   * Tests if PRE cache is clear / free of ambiguous entries.
    */
   @Test public void delayedDistanceAdjustment18() {
     createDB("<A><B/><C/><D/></A>");
@@ -891,7 +891,7 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * Tests if pre cache is clear / free of ambiguous entries.
+   * Tests if PRE cache is clear / free of ambiguous entries.
    */
   @Test public void delayedDistanceAdjustment19() {
     createDB("<A><B/><C/><D/></A>");
@@ -965,7 +965,7 @@ public final class UpdateTest extends SandboxTest {
   }
 
   /**
-   * Tests if pre value shifts are accumulated correctly for a mixture of structural and
+   * Tests if PRE value shifts are accumulated correctly for a mixture of structural and
    * non-structural updates.
    */
   @Test public void delayedDistanceAdjustment26() {

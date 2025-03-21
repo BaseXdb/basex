@@ -128,7 +128,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
   /**
    * Refreshes a lock.
-   * @param id token id
+   * @param id token ID
    * @return result containing the token if successful, otherwise a failure reason code
    */
   @Override
@@ -139,7 +139,7 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
 
   /**
    * Unlocks a resource.
-   * @param id token id
+   * @param id token ID
    */
   @Override
   public void unlock(final String id) {

@@ -20,28 +20,28 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class QT3Env {
-  /** Namespaces: prefix, uri. */
+  /** Namespaces: prefix, URI. */
   final ArrayList<HashMap<String, String>> namespaces;
-  /** Sources: role, file, validation, uri, xml:id. */
+  /** Sources: role, file, validation, URI, xml:id. */
   final ArrayList<HashMap<String, String>> sources;
   /** Resources. */
   final ArrayList<HashMap<String, String>> resources;
   /** Parameters: name, as, select, declared. */
   final ArrayList<HashMap<String, String>> params;
-  /** Schemas: uri, file, xml:id. */
+  /** Schemas: URI, file, xml:id. */
   final HashMap<String, String> schemas;
-  /** Collations: uri, default. */
+  /** Collations: URI, default. */
   final HashMap<String, String> collations;
   /** Decimal Formats: decimal-separator, grouping-separator,
       digit, pattern-separator, infinity, NaN, per-mille,
       minus-sign, name, percent, zero-digit. */
   final HashMap<QName, DecFormatOptions> decFormats;
-  /** Static Base URI: uri. */
+  /** Static Base URI. */
   final String baseURI;
   /** Name. */
   final String name;
 
-  /** Collection uri. */
+  /** Collection URI. */
   final String collURI;
   /** Initial context item. */
   final XdmValue context;

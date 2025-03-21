@@ -16,7 +16,7 @@ abstract class WsFn extends StandardFunc {
   /**
    * Returns the current WebSocket.
    * @param qc query context
-   * @return client id
+   * @return client ID
    * @throws QueryException QueryException
    */
   final WebSocket ws(final QueryContext qc) throws QueryException {

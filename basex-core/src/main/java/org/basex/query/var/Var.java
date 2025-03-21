@@ -233,7 +233,7 @@ public final class Var extends ExprInfo {
 
   /**
    * Returns a unique representation of the variable.
-   * @return variable id
+   * @return variable ID
    */
   public byte[] id() {
     return Token.concat("$", name.string(), "_", id);

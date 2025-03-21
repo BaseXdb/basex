@@ -24,7 +24,7 @@ import org.basex.util.*;
 public class ClientQuery extends Query {
   /** Client session. */
   final ClientSession cs;
-  /** Query id. */
+  /** Query ID. */
   final String id;
 
   /**

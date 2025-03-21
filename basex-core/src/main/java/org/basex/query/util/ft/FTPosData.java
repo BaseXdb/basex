@@ -40,7 +40,7 @@ public final class FTPosData {
   /**
    * Adds position data.
    * @param data data reference
-   * @param pre pre value
+   * @param pre PRE value
    * @param all full-text matches
    */
   public void add(final Data data, final int pre, final FTMatches all) {
@@ -72,11 +72,11 @@ public final class FTPosData {
 
   /**
    * Gets full-text data from the container.
-   * If no data is stored for a pre value, {@code null} is returned.
+   * If no data is stored for a PRE value, {@code null} is returned.
    * int[0] : [pos0, ..., posn]
    * int[1] : [poi0, ..., poin]
    * @param data data reference
-   * @param pre int pre value
+   * @param pre int PRE value
    * @return int[2][n] full-text data or {@code null}
    */
   public FTPos get(final Data data, final int pre) {
@@ -95,9 +95,9 @@ public final class FTPosData {
   }
 
   /**
-   * Returns the index of the specified pre value.
-   * @param pre int pre value
-   * @return index, or negative index -1 if pre value is not found
+   * Returns the index of the specified PRE value.
+   * @param pre int PRE value
+   * @return index, or negative index -1 if PRE value is not found
    */
   private int find(final int pre) {
     // binary search

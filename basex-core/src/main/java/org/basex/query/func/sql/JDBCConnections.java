@@ -16,16 +16,16 @@ import org.basex.util.hash.*;
  * @author Rositsa Shadura
  */
 public final class JDBCConnections implements QueryResource {
-  /** Last inserted id. */
+  /** Last inserted ID. */
   private int lastId = -1;
-  /** Map with all open connections and prepared statements with unique ids. */
+  /** Map with all open connections and prepared statements with unique IDs. */
   private final TokenObjectMap<AutoCloseable> conns = new TokenObjectMap<>();
 
   /**
    * Adds a connection.
    * @param conn connection
-   * @param url url
-   * @return generated id
+   * @param url URL
+   * @return generated ID
    */
   synchronized Uri add(final Connection conn, final String url) {
     final byte[] uri = token(url + "/connection-" + ++lastId);
@@ -36,7 +36,7 @@ public final class JDBCConnections implements QueryResource {
   /**
    * Adds a prepared statement.
    * @param stmt prepared statement
-   * @return generated id
+   * @return generated ID
    * @throws SQLException SQL connection
    */
   synchronized Uri add(final PreparedStatement stmt) throws SQLException {
@@ -47,8 +47,8 @@ public final class JDBCConnections implements QueryResource {
   }
 
   /**
-   * Returns connection or prepared statement with the given id.
-   * @param id id
+   * Returns connection or prepared statement with the given ID.
+   * @param id ID
    * @return connection, prepared statement or {@code null}
    */
   synchronized AutoCloseable get(final Uri id) {
@@ -57,7 +57,7 @@ public final class JDBCConnections implements QueryResource {
 
   /**
    * Removes either a connection or a prepared statement.
-   * @param id connection/prepared statement id
+   * @param id connection/prepared statement ID
    */
   synchronized void remove(final Uri id) {
     conns.remove(id.string());
@@ -66,7 +66,7 @@ public final class JDBCConnections implements QueryResource {
   /**
    * Returns the key for the specified connection or prepared statement.
    * @param ac connection or prepared statement
-   * @return id or {@code null}
+   * @return ID or {@code null}
    */
   private byte[] get(final AutoCloseable ac) {
     for(final byte[] id : conns) {

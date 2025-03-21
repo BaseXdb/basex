@@ -29,7 +29,7 @@ public final class ASession {
 
   /**
    * Returns the session ID.
-   * @return session id
+   * @return session ID
    */
   public Str id() {
     return Str.get(session.getId());

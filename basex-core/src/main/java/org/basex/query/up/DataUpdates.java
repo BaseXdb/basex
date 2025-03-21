@@ -37,7 +37,7 @@ final class DataUpdates {
   /** Write databases back to disk. */
   private final boolean writeback;
 
-  /** Mapping between pre values of the target nodes and all node updates
+  /** Mapping between PRE values of the target nodes and all node updates
    * which operate on this target. */
   private final IntObjectMap<NodeUpdates> nodeUpdates = new IntObjectMap<>();
   /** Database updates. */
@@ -263,7 +263,7 @@ final class DataUpdates {
 
   /**
    * Checks nodes for namespace conflicts and duplicate attributes.
-   * @param pres pre values of nodes to check (in descending order)
+   * @param pres PRE values of nodes to check (in descending order)
    * @throws QueryException query exception
    */
   private void checkNames(final int... pres) throws QueryException {
@@ -280,13 +280,13 @@ final class DataUpdates {
     final byte[][] ns = names.nsOK();
     if(ns != null) throw UPNSCONFL2_X_X.get(null, ns[0], ns[1]);
 
-    // check pre values of attributes that have already been added to the name pool
+    // check PRE values of attributes that have already been added to the name pool
     final IntSet set = new IntSet();
     final IntConsumer addAttribute = p -> {
       final byte[][] qname = data.qname(p, Data.ATTR);
       names.add(new QNm(qname[0], qname[1]), NodeType.ATTRIBUTE);
     };
-    // pre values consist exclusively of element and attribute nodes
+    // PRE values consist exclusively of element and attribute nodes
     for(final int pre : pres) {
       if(data.kind(pre) == Data.ATTR) {
         addAttribute.accept(pre);

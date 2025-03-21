@@ -266,10 +266,10 @@ final class TableData {
   }
 
   /**
-   * Returns pre value of possible root element.
+   * Returns PRE value of possible root element.
    * @param data data reference
-   * @param pre pre value to start with
-   * @return pre value of root element
+   * @param pre PRE value to start with
+   * @return PRE value of root element
    */
   int getRoot(final Data data, final int pre) {
     if(pre == -1) return -1;

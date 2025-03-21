@@ -33,10 +33,10 @@ public class DBNodeSeq extends NativeSeq {
 
   /**
    * Constructor.
-   * @param pres pre values
+   * @param pres PRE values
    * @param data data reference
    * @param type node type
-   * @param all pre values reference all documents of the database
+   * @param all PRE values reference all documents of the database
    */
   protected DBNodeSeq(final int[] pres, final Data data, final Type type, final boolean all) {
     super(pres.length, type);
@@ -68,24 +68,24 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   /**
-   * Returns the internal pre value array.
-   * @return pre values
+   * Returns the internal PRE value array.
+   * @return PRE values
    */
   public final int[] pres() {
     return pres;
   }
 
   /**
-   * Returns the specified pre value.
-   * @param index index of pre value
-   * @return pre value
+   * Returns the specified PRE value.
+   * @param index index of PRE value
+   * @return PRE value
    */
   public final int pre(final int index) {
     return pres[index];
   }
 
   /**
-   * Indicates if pre values reference all documents of the database.
+   * Indicates if PRE values reference all documents of the database.
    * @return flag
    */
   public final boolean all() {
@@ -156,10 +156,10 @@ public class DBNodeSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the specified values.
-   * @param pres pre values
+   * @param pres PRE values
    * @param data data reference
    * @param type node type (can be {@code null})
-   * @param all pre values reference all documents of the database
+   * @param all PRE values reference all documents of the database
    * @return value
    */
   public static Value get(final int[] pres, final Data data, final Type type, final boolean all) {
@@ -169,7 +169,7 @@ public class DBNodeSeq extends NativeSeq {
 
   /**
    * Creates a sequence with the specified values.
-   * @param pres pre values
+   * @param pres PRE values
    * @param data data reference
    * @param expr expression (can be {@code null})
    * @return value
@@ -179,11 +179,11 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   /**
-   * Creates a node sequence with the given data reference and pre values.
-   * @param pres pre values
+   * Creates a node sequence with the given data reference and PRE values.
+   * @param pres PRE values
    * @param data data reference
    * @param docs all values reference document nodes
-   * @param all pre values reference all documents of the database
+   * @param all PRE values reference all documents of the database
    * @return value
    */
   public static Value get(final IntList pres, final Data data, final boolean docs,

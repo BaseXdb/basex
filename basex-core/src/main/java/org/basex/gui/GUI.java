@@ -524,8 +524,8 @@ public final class GUI extends JFrame implements BaseXWindow {
   }
 
   /**
-   * Checks if a command with the specified id is still running.
-   * @param id command id
+   * Checks if a command with the specified ID is still running.
+   * @param id command ID
    * @return result of check
    */
   public boolean running(final int id) {

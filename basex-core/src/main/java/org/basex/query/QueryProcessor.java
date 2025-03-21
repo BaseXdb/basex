@@ -42,7 +42,7 @@ public final class QueryProcessor extends Job implements Closeable {
   /**
    * Default constructor.
    * @param query query string
-   * @param uri base uri (can be {@code null})
+   * @param uri base URI (can be {@code null})
    * @param ctx database context
    * @param info query info (can be {@code null})
    */
@@ -172,10 +172,10 @@ public final class QueryProcessor extends Job implements Closeable {
 
   /**
    * Declares a namespace.
-   * A namespace is undeclared if the {@code uri} is an empty string.
-   * The default element namespaces is set if the {@code prefix} is empty.
+   * A namespace is undeclared if the specified URI is an empty string.
+   * The default element namespaces is set if the specified prefix is empty.
    * @param prefix namespace prefix
-   * @param uri namespace uri
+   * @param uri namespace URI
    * @return self reference
    * @throws QueryException query exception
    */
@@ -213,7 +213,7 @@ public final class QueryProcessor extends Job implements Closeable {
 
   /**
    * Adds a module reference. Only called from the test APIs.
-   * @param uri module uri
+   * @param uri module URI
    * @param file file name
    */
   public void module(final String uri, final String file) {

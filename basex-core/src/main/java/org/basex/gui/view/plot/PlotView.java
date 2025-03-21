@@ -894,7 +894,7 @@ public final class PlotView extends View {
   /**
    * Determines all nodes lying under the mouse cursor (or the currently
    * focused node).
-   * @param pre position of pre value in the sorted array of plotted nodes
+   * @param pre position of PRE value in the sorted array of plotted nodes
    * @return nodes
    */
   private int[] overlappingNodes(final int pre) {
@@ -923,7 +923,7 @@ public final class PlotView extends View {
   /**
    * Formats an axis caption.
    * @param drawX x/y axis flag
-   * @param focused pre value of the focused node
+   * @param focused PRE value of the focused node
    * @return formatted string
    */
   private String formatString(final boolean drawX, final int focused) {

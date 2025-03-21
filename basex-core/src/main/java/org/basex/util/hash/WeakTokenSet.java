@@ -20,7 +20,7 @@ public final class WeakTokenSet extends ASet {
   private WeakTokenRef[] keys;
   /** Garbage collected keys. */
   private ReferenceQueue<byte[]> gcedKeys = new ReferenceQueue<>();
-  /** Head of free id list. */
+  /** Head of free ID list. */
   private int free;
 
   /**

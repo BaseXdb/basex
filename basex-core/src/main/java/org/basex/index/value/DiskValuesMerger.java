@@ -33,11 +33,11 @@ final class DiskValuesMerger {
    * Constructor.
    * @param data data reference
    * @param type index type
-   * @param i merge id
+   * @param id merge ID
    * @throws IOException I/O exception
    */
-  DiskValuesMerger(final Data data, final IndexType type, final int i) throws IOException {
-    prefix = DiskValues.fileSuffix(type) + i;
+  DiskValuesMerger(final Data data, final IndexType type, final int id) throws IOException {
+    prefix = DiskValues.fileSuffix(type) + id;
     dk = new DataInput(data.meta.dbFile(prefix + 't'));
     dv = new DiskValues(data, type, prefix);
     this.data = data;

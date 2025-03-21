@@ -68,7 +68,7 @@ final class TreeNodeCache {
   /**
    * Generates subtree borders.
    * @param d data reference
-   * @param pre pre value
+   * @param pre PRE value
    * @return borders array
    */
   TreeBorder[] subtree(final Data d, final int pre) {
@@ -102,8 +102,8 @@ final class TreeNodeCache {
   }
 
   /**
-   * Finds pre value in cached nodes and returns level and index position.
-   * @param pre pre value
+   * Finds PRE value in cached nodes and returns level and index position.
+   * @param pre PRE value
    * @return level and position pair, or {@code null} if it is not available
    */
   private int[] findPre(final int pre) {
@@ -117,11 +117,11 @@ final class TreeNodeCache {
   }
 
   /**
-   * Determines the index position of given pre value.
+   * Determines the index position of given PRE value.
    * @param lv level to be searched
    * @param l left array border
    * @param r right array border
-   * @param pre pre value
+   * @param pre PRE value
    * @return the determined index position
    */
   int searchPreArrayPos(final int lv, final int l, final int r, final int pre) {
@@ -129,7 +129,7 @@ final class TreeNodeCache {
   }
 
   /**
-   * Searches for pre value or pre range.
+   * Searches for PRE value or PRE range.
    * @param lv level
    * @param lb left TreeBorder
    * @param rb right TreeBorder
@@ -157,10 +157,10 @@ final class TreeNodeCache {
   }
 
   /**
-   * Returns pre value at given level and index.
+   * Returns PRE value at given level and index.
    * @param lv level
    * @param i index
-   * @return pre value
+   * @return PRE value
    */
   int getPrePerLevelAndIndex(final int lv, final int i) {
     return nodes[lv].get(i);

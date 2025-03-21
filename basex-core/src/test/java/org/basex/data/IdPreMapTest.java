@@ -131,7 +131,7 @@ public final class IdPreMapTest {
    * @param m tested map
    */
   private static void insertPerformance(final IdPreMap m) {
-    // prepare <pre, id> pairs:
+    // prepare <PRE/ID> pairs:
     final int[][] d = new int[ITERATIONS][2];
     for(int i = 0, id = BASEID + 1; i < ITERATIONS; id++, i++) {
       d[i][0] = RANDOM.nextInt(id);
@@ -147,7 +147,7 @@ public final class IdPreMapTest {
    * @param b base map
    */
   private static void deletePerformance(final IdPreMap m, final DummyIdPreMap b) {
-    // prepare <pre, id> pairs:
+    // prepare <PRE/ID> pairs:
     final int dl = BASEID + 1;
     final int[][] d = new int[dl][2];
     for(int i = 0, id = BASEID + 1; i < dl; id--, i++) {
@@ -171,26 +171,22 @@ public final class IdPreMapTest {
 
   /**
    * Insert a &lt;pre, id&gt; pair in {@link #basemap} and {@link #testedmap}.
-   * @param pre pre value
-   * @param id id value
+   * @param pre PRE value
+   * @param id ID value
    */
   private void insert(final int pre, final int id) {
     insertedpres.add(pre);
-    //if(VERBOSE) Util.errln("insert(" + pre + ", " + id + ")");
     testedmap.insert(pre, id, 1);
-    //if(VERBOSE) Util.errln(testedmap);
     basemap.insert(pre, id, 1);
   }
 
   /**
    * Delete a &lt;pre, id&gt; pair from {@link #basemap} and {@link #testedmap}.
-   * @param pre pre value
+   * @param pre PRE value
    */
   private void delete(final int pre) {
     deletedpres.add(pre);
-    //if(VERBOSE) Util.errln("delete(" + pre + ", " + basemap.id(pre) + ")");
     testedmap.delete(pre, basemap.id(pre), -1);
-    //if(VERBOSE) Util.errln(testedmap);
     basemap.delete(pre, basemap.id(pre), -1);
   }
 
@@ -216,7 +212,7 @@ public final class IdPreMapTest {
 
     /**
      * Constructor.
-     * @param i initial list of ids
+     * @param i initial list of IDs
      */
     DummyIdPreMap(final int[] i) {
       super(i.length - 1);

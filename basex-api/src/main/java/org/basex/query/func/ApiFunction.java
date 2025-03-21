@@ -221,7 +221,7 @@ public enum ApiFunction implements AFunction {
    * @param desc descriptive function string
    * @param params parameter types
    * @param seqType return type
-   * @param uri uri
+   * @param uri URI
    */
   ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType seqType, final byte[] uri) {
@@ -237,7 +237,7 @@ public enum ApiFunction implements AFunction {
    * @param params parameter types
    * @param seqType return type
    * @param perm minimum permission
-   * @param uri uri
+   * @param uri URI
    */
   ApiFunction(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType seqType, final byte[] uri, final Perm perm) {

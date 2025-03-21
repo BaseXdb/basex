@@ -189,7 +189,7 @@ public final class XdmInfoTest extends SandboxTest {
   /**
    * <p>Examples for available data types.</p>
    * <ul>
-   * <li>Array position: type id</li>
+   * <li>Array position: type ID</li>
    * <li>Entry 1: node type</li>
    * <li>Entry 2: query</li>
    * <li>Entry 3: textual result</li>

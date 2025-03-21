@@ -119,10 +119,10 @@ public final class Updates {
   }
 
   /**
-   * Determines the data reference and pre value for an update primitive
+   * Determines the data reference and PRE value for an update primitive
    * which has a fragment as a target node. If an ancestor of the given target
    * node has already been added to the pending update list, the corresponding
-   * data reference and the pre value of the given target node within this
+   * data reference and the PRE value of the given target node within this
    * database table are calculated. Otherwise, a new data instance is created.
    * This function is called during query evaluation.
    *
@@ -143,7 +143,7 @@ public final class Updates {
     final ANode root = tmp;
 
     // see if this ancestor has already been added to the pending update list
-    // if data instance does not exist, create mapping between fragment id and data reference
+    // if data instance does not exist, create mapping between fragment ID and data reference
     MemData data;
     synchronized(fragmentIDs) {
       data = fragmentIDs.get(root.id);
@@ -153,7 +153,7 @@ public final class Updates {
       }
     }
 
-    // determine the pre value of the target node within its database
+    // determine the PRE value of the target node within its database
     final int pre = preSteps(root, target.id);
     return new DBNode(data, pre);
   }
@@ -198,11 +198,11 @@ public final class Updates {
   }
 
   /**
-   * Recursively determines the pre value for a given fragment node within the
+   * Recursively determines the PRE value for a given fragment node within the
    * corresponding data reference.
    * @param node current
-   * @param trgID ID of fragment for which we calculate the pre value
-   * @return pre value
+   * @param trgID ID of fragment for which we calculate the PRE value
+   * @return PRE value
    */
   private static int preSteps(final ANode node, final int trgID) {
     if(node.id == trgID) return 0;

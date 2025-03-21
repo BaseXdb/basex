@@ -105,7 +105,7 @@ public final class QNm extends Item {
 
   /**
    * Constructor, binding a statically known namespace.
-   * If no namespace is found, the namespace uri is set to {@code null}.
+   * If no namespace is found, the namespace URI is set to {@code null}.
    * @param name name (possibly prefixed)
    * @param sc static context
    */
@@ -132,7 +132,7 @@ public final class QNm extends Item {
 
   /**
    * Sets the URI of this QName.
-   * @param u the uri to be set (can be {@code null}, or an empty or non-empty string)
+   * @param u the URI to be set (can be {@code null}, or an empty or non-empty string)
    */
   public void uri(final byte[] u) {
     uri = u == null ? null : normalize(u);
@@ -140,7 +140,7 @@ public final class QNm extends Item {
 
   /**
    * Returns the URI of this QName.
-   * @return uri
+   * @return URI
    */
   public byte[] uri() {
     return uri == null ? Token.EMPTY : uri;
@@ -269,7 +269,7 @@ public final class QNm extends Item {
    *   <li> Returns a prefixed name if the namespace URI is statically known.</li>
    *   <li> Otherwise, {@link #unique()} is called.</li>
    * </ul>
-   * @param ns default uri (can be {@code null})
+   * @param ns default URI (can be {@code null})
    * @return QName as token
    */
   public byte[] prefixId(final byte[] ns) {
@@ -399,11 +399,11 @@ public final class QNm extends Item {
    * Constructs an internal string representation for the components of a QName.
    * @param prefix prefix
    * @param local name (can be {@code null})
-   * @param uri uri (can be {@code null})
+   * @param uri URI (can be {@code null})
    * @return EQName representation
    */
   private static byte[] internal(final byte[] prefix, final byte[] local, final byte[] uri) {
-    // return local name if no prefix and uri exist
+    // return local name if no prefix and URI exist
     final int ul = uri == null ? 0 : uri.length, pl = prefix == null ? 0 : prefix.length;
     if(ul == 0 && pl == 0) return local;
 

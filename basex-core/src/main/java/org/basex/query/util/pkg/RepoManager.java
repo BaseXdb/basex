@@ -98,7 +98,7 @@ public final class RepoManager {
   }
 
   /**
-   * Returns a list of all package ids.
+   * Returns a list of all package IDs.
    * @return packages
    */
   public StringList ids() {
@@ -109,7 +109,7 @@ public final class RepoManager {
 
   /**
    * Removes a package from the repository.
-   * @param name name or id of the package
+   * @param name name or ID of the package
    * @throws QueryException query exception
    */
   public void delete(final String name) throws QueryException {
@@ -204,7 +204,7 @@ public final class RepoManager {
   private boolean installXQ(final byte[] content, final String path)
       throws QueryException, IOException {
 
-    // parse module to find namespace uri
+    // parse module to find namespace URI
     try(QueryContext qc = new QueryContext(context)) {
       final byte[] uri = qc.parseLibrary(string(content), path).sc.module.uri();
       // copy file to rewritten URI file path

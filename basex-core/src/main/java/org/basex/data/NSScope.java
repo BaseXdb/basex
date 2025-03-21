@@ -16,7 +16,7 @@ final class NSScope {
   private final Data data;
   /** Namespaces. */
   private final Namespaces nspaces;
-  /** Stack with pre values. */
+  /** Stack with PRE values. */
   private final IntList preStack = new IntList();
   /** Root namespace. */
   private final NSNode root;
@@ -25,7 +25,7 @@ final class NSScope {
 
   /**
    * Default constructor.
-   * @param pre pre value
+   * @param pre PRE value
    * @param data data reference
    */
   NSScope(final int pre, final Data data) {
@@ -37,7 +37,7 @@ final class NSScope {
 
   /**
    * Refreshes the namespace structure.
-   * @param nsPre pre value with namespaces
+   * @param nsPre PRE value with namespaces
    * @param c insertion counter
    */
   void loop(final int nsPre, final int c) {
@@ -47,7 +47,7 @@ final class NSScope {
 
   /**
    * Opens a new level.
-   * @param pre pre value
+   * @param pre PRE value
    */
   void open(final int pre) {
     nspaces.open();
@@ -56,7 +56,7 @@ final class NSScope {
 
   /**
    * Parses the specified namespaces and returns all namespaces that are not declared yet.
-   * @param pre pre value
+   * @param pre PRE value
    * @param nsp source namespaces
    * @return {@code true} if new namespaces were added
    */

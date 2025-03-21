@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class ReplaceNode extends NodeCopy {
   /**
    * Constructor.
-   * @param pre target node pre value
+   * @param pre target node PRE value
    * @param data target data instance
    * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence

@@ -144,11 +144,11 @@ public final class XMLToken {
   }
 
   /**
-   * Checks if the specified name is an id/idref attribute ({@code idref}: local name must contain
-   * 'idref'; {@code id}: local name must contain 'id', but not 'idref').
-   * The correct approach would be to gather all id/idref attributes and store them as metadata.
+   * Checks if the specified name is an ID/IDREF attribute (IDREF: local name must contain 'idref';
+   * ID: local name must contain 'id', but not 'idref').
+   * The correct approach would be to gather all ID/IDREF attributes and store them as metadata.
    * @param name name
-   * @param idref id/idref flag
+   * @param idref ID/IDREF flag
    * @return result of check
    */
   public static boolean isId(final byte[] name, final boolean idref) {

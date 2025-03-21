@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class XQDoc extends Inspect {
-  /** Namespace uri. */
+  /** Namespace URI. */
   private static final byte[] XQDOC_URI = token("http://www.xqdoc.org/1.0");
   /** Token: xqdoc. */
   private static final byte[] XQDOC_PREFIX = token("xqdoc");

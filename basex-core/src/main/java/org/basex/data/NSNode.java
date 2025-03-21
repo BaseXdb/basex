@@ -24,14 +24,14 @@ final class NSNode {
   private int size;
   /** Parent node. */
   private NSNode parent;
-  /** Dense array with ids of prefix/namespace uri pairs. */
+  /** Dense array with IDs of prefix/namespace URI pairs. */
   private int[] values;
   /** Pre value. */
   private int pre;
 
   /**
    * Default constructor.
-   * @param pre pre value or {@code -1}
+   * @param pre PRE value or {@code -1}
    */
   NSNode(final int pre) {
     this.pre = pre;
@@ -84,8 +84,8 @@ final class NSNode {
   }
 
   /**
-   * Returns the pre value.
-   * @return pre value
+   * Returns the PRE value.
+   * @return PRE value
    */
   int pre() {
     return pre;
@@ -100,8 +100,8 @@ final class NSNode {
   }
 
   /**
-   * Returns the ids of prefix/namespace uri pairs.
-   * @return prefix/namespace uri pairs
+   * Returns the IDs of prefix/namespace URI pairs.
+   * @return prefix/namespace URI pairs
    */
   int[] values() {
     return values;
@@ -110,13 +110,13 @@ final class NSNode {
   // Requesting Namespaces ========================================================================
 
   /**
-   * Finds the namespace node that is located closest to the specified pre value.
-   * @param p pre value
+   * Finds the namespace node that is located closest to the specified PRE value.
+   * @param p PRE value
    * @param data data reference
    * @return node
    */
   NSNode find(final int p, final Data data) {
-    // return this node if the pre values of all children are greater than the searched value
+    // return this node if the PRE values of all children are greater than the searched value
     final int s = find(p);
     if(s == -1) return this;
 
@@ -131,13 +131,13 @@ final class NSNode {
   }
 
   /**
-   * Locates a child node with the specified pre value.
+   * Locates a child node with the specified PRE value.
    * <ul>
    *   <li> If the value is found, the position of the child node is returned.</li>
-   *   <li> Otherwise, the position of the last child with a smaller pre value is returned.</li>
-   *   <li> -1 is returned if all children have greater pre values.</li>
+   *   <li> Otherwise, the position of the last child with a smaller PRE value is returned.</li>
+   *   <li> -1 is returned if all children have greater PRE values.</li>
    * </ul>
-   * @param p pre value
+   * @param p PRE value
    * @return position of the child node
    */
   int find(final int p) {
@@ -152,9 +152,9 @@ final class NSNode {
   }
 
   /**
-   * Returns the id of the namespace uri for the specified prefix.
+   * Returns the ID of the namespace URI for the specified prefix.
    * @param prefix prefix reference
-   * @return if of the namespace uri, or {@code 0} if none is found
+   * @return id of the namespace URI, or {@code 0} if none is found
    */
   int uri(final int prefix) {
     final int[] vls = values;
@@ -168,8 +168,8 @@ final class NSNode {
   // Updating Namespaces ==========================================================================
 
   /**
-   * Deletes nodes in the specified range (p .. p + s - 1) and updates the following pre values.
-   * @param p pre value
+   * Deletes nodes in the specified range (p .. p + s - 1) and updates the following PRE values.
+   * @param p PRE value
    * @param s number of nodes to be deleted, or actually the size of the pre
    * value which is to be deleted
    */
@@ -180,7 +180,7 @@ final class NSNode {
     // if the node is not directly contained as a child, either start at array index 0 or
     // proceed with the next node in the child array to search for descendants of pre
     if(i == -1 || nodes[i].pre != p) ++i;
-    // first pre value which is not deleted
+    // first PRE value which is not deleted
     final int upper = p + s;
     // number of nodes to be deleted
     int num = 0;
@@ -200,7 +200,7 @@ final class NSNode {
   }
 
   /**
-   * Adds the specified node into the child array, which is sorted by pre values.
+   * Adds the specified node into the child array, which is sorted by PRE values.
    * @param node child node
    */
   void add(final NSNode node) {
@@ -218,7 +218,7 @@ final class NSNode {
   /**
    * Adds the specified prefix and URI reference.
    * @param prefix prefix reference
-   * @param uri uri reference
+   * @param uri URI reference
    */
   void add(final int prefix, final int uri) {
     final int v = values.length;
@@ -246,9 +246,9 @@ final class NSNode {
   }
 
   /**
-   * Recursive shifting of pre values after delete operations.
+   * Recursive shifting of PRE values after delete operations.
    * @param start update location
-   * @param diff value to subtract from pre value
+   * @param diff value to subtract from PRE value
    */
   void decrementPre(final int start, final int diff) {
     if(pre >= start + diff) pre -= diff;
@@ -256,8 +256,8 @@ final class NSNode {
   }
 
   /**
-   * Increments the pre value by the specified size.
-   * @param diff value to add to pre value
+   * Increments the PRE value by the specified size.
+   * @param diff value to add to PRE value
    */
   void incrementPre(final int diff) {
     pre += diff;
@@ -270,8 +270,8 @@ final class NSNode {
    * @param tb token builder
    * @param level level
    * @param ns namespace reference
-   * @param start start pre value
-   * @param end end pre value
+   * @param start start PRE value
+   * @param end end PRE value
    */
   private void print(final TokenBuilder tb, final int level, final Namespaces ns, final int start,
       final int end) {
@@ -296,8 +296,8 @@ final class NSNode {
   /**
    * Adds the namespace structure of a node to the specified table.
    * @param table table
-   * @param start first pre value
-   * @param end last pre value
+   * @param start first PRE value
+   * @param end last PRE value
    * @param ns namespace reference
    */
   void table(final Table table, final int start, final int end, final Namespaces ns) {
@@ -333,8 +333,8 @@ final class NSNode {
   /**
    * Prints the node structure.
    * @param ns namespace reference
-   * @param start start pre value
-   * @param end end pre value
+   * @param start start PRE value
+   * @param end end PRE value
    * @return string
    */
   String toString(final Namespaces ns, final int start, final int end) {
