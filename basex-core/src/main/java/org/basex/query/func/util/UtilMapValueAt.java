@@ -26,7 +26,7 @@ public final class UtilMapValueAt extends StandardFunc {
     final Expr map = arg(0);
     final Type type = map.seqType().type;
     if(type instanceof MapType) {
-      exprType.assign(((MapType) type).valueType());
+      exprType.assign(((MapType) type).valueType().union(Occ.ZERO));
     }
     return this;
   }
