@@ -2,7 +2,6 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -13,9 +12,9 @@ import org.basex.util.*;
  * Function implementation.
  *
  * @author BaseX Team, BSD License
- * @author Leo Woerteler
+ * @author Christian Gruen
  */
-public final class MapRemove extends StandardFunc {
+public final class MapRemove extends MapFn {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     XQMap map = toMap(arg(0), qc);
@@ -32,24 +31,20 @@ public final class MapRemove extends StandardFunc {
     final Expr map = arg(0), key = arg(1);
     if(map == XQMap.empty()) return map;
 
-    final Type type = map.seqType().type;
-    Type tp = null;
-    if(type instanceof RecordType) {
-      // propagate record type
-      final RecordType rt = (RecordType) type;
-      if(key instanceof Item && key.seqType().type.isStringOrUntyped()) {
-        final RecordField rf = rt.field(toToken(key, cc.qc));
-        if(rf == null && !rt.isExtensible()) return map;
-        if(rf == null || rf.isOptional()) tp = rt;
-      }
+    Type type = null;
+    final MapInfo mi = mapInfo(map, key);
+    if(mi.key != null) {
+      // try to propagate record type
+      final boolean ext = mi.record.isExtensible();
+      if(mi.field == null && !ext) return map;
+      if(mi.key == EXTENDED && ext || mi.field == null || mi.field.isOptional()) type = mi.record;
     }
-    if(tp == null && type instanceof MapType) {
-      // create new map type (to drop potential record type assignment)
-      final MapType mt = (MapType) type;
-      tp = MapType.get(mt.keyType(), mt.valueType());
-    }
-    if(tp != null) exprType.assign(tp);
 
+    if(type == null && mi.mapType != null) {
+      // create new map type (potentially assigned record type must not be propagated)
+      type = MapType.get(mi.mapType.keyType(), mi.mapType.valueType());
+    }
+    if(type != null) exprType.assign(type);
     return this;
   }
 }

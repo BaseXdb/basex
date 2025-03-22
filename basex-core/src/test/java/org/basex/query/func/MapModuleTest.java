@@ -99,28 +99,44 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void contains() {
     final Function func = _MAP_CONTAINS;
-    query(func.args(" map { }", 1), false);
+    query(func.args(" {}", 1), false);
     query(func.args(_MAP_ENTRY.args(1, 2), 1), true);
+
+    check(func.args(" {}", "true#0"), false, root(Bln.class));
+    check(func.args(_MAP_ENTRY.args(1, wrap(0)), 1), true, root(func));
+    check(func.args(_MAP_ENTRY.args(wrap("a"), wrap(0)), "a"), true, root(func));
+
+    String record = "declare record local:x(x as xs:integer);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), true, root(Bln.class));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(Bln.class));
+
+    record = "declare record local:x(x? as xs:integer);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), true, root(func));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(Bln.class));
+
+    record = "declare record local:x(x as xs:integer, *);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), true, root(Bln.class));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(func));
   }
 
   /** Test method. */
   @Test public void emptyy() {
     final Function func = _MAP_EMPTY;
 
-    query(func.args(" map { }"), true);
-    query(func.args(" map { 1: () }"), false);
+    query(func.args(" {}"), true);
+    query(func.args(" { 1: () }"), false);
   }
 
   /** Test method. */
   @Test public void entries() {
     final Function func = _MAP_ENTRIES;
-    query(func.args(" map { }"), "");
-    query(func.args(" map { 1: 2 }") + " !" + _MAP_KEYS.args(" ."), 1);
-    query(func.args(" map { 1: 2 }") + " !" + _MAP_ITEMS.args(" ."), 2);
-    query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_KEYS.args(" ."), 1);
-    query(func.args(" map { 1: (2, 3) }") + " !" + _MAP_ITEMS.args(" ."), "2\n3");
-    query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_KEYS.args(" ."), "1\n3");
-    query(func.args(" map { 1: 2, 3: 4 }") + " !" + _MAP_ITEMS.args(" ."), "2\n4");
+    query(func.args(" {}"), "");
+    query(func.args(" { 1: 2 }") + " !" + _MAP_KEYS.args(" ."), 1);
+    query(func.args(" { 1: 2 }") + " !" + _MAP_ITEMS.args(" ."), 2);
+    query(func.args(" { 1: (2, 3) }") + " !" + _MAP_KEYS.args(" ."), 1);
+    query(func.args(" { 1: (2, 3) }") + " !" + _MAP_ITEMS.args(" ."), "2\n3");
+    query(func.args(" { 1: 2, 3: 4 }") + " !" + _MAP_KEYS.args(" ."), "1\n3");
+    query(func.args(" { 1: 2, 3: 4 }") + " !" + _MAP_ITEMS.args(" ."), "2\n4");
   }
 
   /** Test method. */
@@ -139,45 +155,45 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void filter() {
     final Function func = _MAP_FILTER;
-    query(func.args(" map { }", " function($k, $v) { true() } "), "{}");
-    query(func.args(" map { }", " function($k, $v) { false() } "), "{}");
+    query(func.args(" {}", " function($k, $v) { true() } "), "{}");
+    query(func.args(" {}", " function($k, $v) { false() } "), "{}");
 
-    query(func.args(" map { 1: 2 }", " function($k, $v) { true() } "), "{1:2}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { false() } "), "{}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { $k = 1 } "), "{1:2}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { $k = 2 } "), "{}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { $v = 1 } "), "{}");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { $v = 2 } "), "{1:2}");
+    query(func.args(" { 1: 2 }", " function($k, $v) { true() } "), "{1:2}");
+    query(func.args(" { 1: 2 }", " function($k, $v) { false() } "), "{}");
+    query(func.args(" { 1: 2 }", " function($k, $v) { $k = 1 } "), "{1:2}");
+    query(func.args(" { 1: 2 }", " function($k, $v) { $k = 2 } "), "{}");
+    query(func.args(" { 1: 2 }", " function($k, $v) { $v = 1 } "), "{}");
+    query(func.args(" { 1: 2 }", " function($k, $v) { $v = 2 } "), "{1:2}");
 
     query(func.args(" map:merge((1 to 10) ! map:entry(., string()))",
         " function($k, $v) { $k < 2 } ") + " => map:keys()", 1);
     query(func.args(" map:merge((1 to 10) ! map:entry(., string()))",
         " function($k, $v) { $v < '2' } ") + "?* => sort()", "1\n10");
-    query(func.args(" map { 'abc': 'a', 'def': 'g' }", " contains#2") + "?*", "a");
-    query("map { 'aba': 'a', 'abc': 'a', 'cba': 'a' }" +
+    query(func.args(" { 'abc': 'a', 'def': 'g' }", " contains#2") + "?*", "a");
+    query("{ 'aba': 'a', 'abc': 'a', 'cba': 'a' }" +
         " =>" + func.args(" contains#2") +
         " =>" + func.args(" starts-with#2") +
         " =>" + func.args(" ends-with#2") +
         " => map:keys()", "aba");
 
     // function coercion: allow function with lower arity
-    query(func.args(" map { 1: 2 }", " true#0"), "{1:2}");
+    query(func.args(" { 1: 2 }", " true#0"), "{1:2}");
     // reject function with higher arity
-    error(func.args(" map { 'abc': 'a', 'def': 'g' }", " substring#2"), INVCONVERT_X_X_X);
+    error(func.args(" { 'abc': 'a', 'def': 'g' }", " substring#2"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
   @Test public void forEach() {
     final Function func = _MAP_FOR_EACH;
 
-    query("(1, map { 1: 2 })[. instance of map(*)] ! " +
+    query("(1, { 1: 2 })[. instance of map(*)] ! " +
         func.args(" .", " function($k, $v) { $v }"), 2);
     query("(1, matches#2)[. instance of function(*)] ! " +
-        func.args(" map { 'aa': 'a' }", " ."), true);
+        func.args(" { 'aa': 'a' }", " ."), true);
 
-    query(func.args(" map { }", " function($k, $v) { 1 }"), "");
-    query(func.args(" map { 1: 2 }", " function($k, $v) { $k+$v }"), 3);
-    query(func.args(" map { 'a': 1, 'b': 2 }", " function($k, $v) { $v }"), "1\n2");
+    query(func.args(" {}", " function($k, $v) { 1 }"), "");
+    query(func.args(" { 1: 2 }", " function($k, $v) { $k+$v }"), 3);
+    query(func.args(" { 'a': 1, 'b': 2 }", " function($k, $v) { $v }"), "1\n2");
 
     query("count(" + func.args(" map:merge((1 to 10) ! map:entry(., ()))",
         " function($k, $v) { $v }") + ')', 0);
@@ -186,28 +202,44 @@ public final class MapModuleTest extends SandboxTest {
     query("count(" + func.args(" map:merge((1 to 10) ! map:entry(., (., .)))",
         " function($k, $v) { $v }") + ')', 20);
 
-    check(func.args(" map { 'aa': 'a' }", " matches#2"), true, type(func, "xs:boolean*"));
+    check(func.args(" { 'aa': 'a' }", " matches#2"), true, type(func, "xs:boolean*"));
   }
 
   /** Test method. */
   @Test public void get() {
     final Function func = _MAP_GET;
-    query(func.args(" map { }", 1), "");
+    query(func.args(" {}", 1), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 1), 2);
 
     query(func.args(_MAP_ENTRY.args(1, 2), 3), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { }"), "");
     query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { 4, 5 }"), "4\n5");
+
+    check(func.args(" {}", "true#0"), "", empty());
+    check(func.args(_MAP_ENTRY.args(1, wrap(0)), 1), 0, root(func));
+    check(func.args(_MAP_ENTRY.args(wrap("a"), wrap(0)), "a"), 0, root(func));
+
+    String record = "declare record local:x(x as xs:integer);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0, type(func, "xs:integer"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
+
+    record = "declare record local:x(x? as xs:integer);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0, type(func, "xs:integer?"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
+
+    record = "declare record local:x(x as xs:integer, *);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0, type(func, "xs:integer"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", root(func));
   }
 
   /** Test method. */
   @Test public void items() {
     final Function func = _MAP_ITEMS;
 
-    query(func.args(" map { }"), "");
-    query(func.args(" map { 1: 2 }"), 2);
-    query(func.args(" map { 1: (2, 3) }"), "2\n3");
-    query(func.args(" map { 1: 2, 3: 4 }"), "2\n4");
+    query(func.args(" {}"), "");
+    query(func.args(" { 1: 2 }"), 2);
+    query(func.args(" { 1: (2, 3) }"), "2\n3");
+    query(func.args(" { 1: 2, 3: 4 }"), "2\n4");
   }
 
   /** Test method. */
@@ -241,60 +273,60 @@ public final class MapModuleTest extends SandboxTest {
     checkSize(_MAP_ENTRY.args(1, 2), 1);
     checkSize(func.args(" ()"), 0);
     // single entry
-    query("exists(" + func.args(" map { 'a': 'b' }") + ')', true);
-    checkSize(func.args(" map { 'a': 'b' }"), 1);
+    query("exists(" + func.args(" { 'a': 'b' }") + ')', true);
+    checkSize(func.args(" { 'a': 'b' }"), 1);
     // single entry
-    query("exists(" + func.args(" map { 'a': 'b', 'b': 'c' }") + ')', true);
-    checkSize(func.args(" map { 'a': 'b', 'b': 'c' }"), 2);
+    query("exists(" + func.args(" { 'a': 'b', 'b': 'c' }") + ')', true);
+    checkSize(func.args(" { 'a': 'b', 'b': 'c' }"), 2);
 
-    query(func.args(" (map { xs:time('01:01:01'): '' }, map { xs:time('01:01:01+01:00'): '' })"));
+    query(func.args(" ({ xs:time('01:01:01'): '' }, { xs:time('01:01:01+01:00'): '' })"));
 
     // duplicates option
-    query(func.args(" (map { 1: 2 }, map { 1: 3 })") + "(1)", 2);
-    query(func.args(" (map { 1: 2 }, map { 1: 3 })",
-        " map { 'duplicates': 'use-first' }") + "(1)", 2);
-    query(func.args(" (map { 1: 2 }, map { 1: 3 })",
-        " map { 'duplicates': 'use-last' }") + "(1)", 3);
-    query(func.args(" (map { 1: 2 }, map { 1: 3 })",
-        " map { 'duplicates': 'combine' }") + "(1)", "2\n3");
-    error(func.args(" (map { 1: 2 }, map { 1: 3 })",
-        " map { 'duplicates': 'reject' }") + "(1)",
+    query(func.args(" ({ 1: 2 }, { 1: 3 })") + "(1)", 2);
+    query(func.args(" ({ 1: 2 }, { 1: 3 })",
+        " { 'duplicates': 'use-first' }") + "(1)", 2);
+    query(func.args(" ({ 1: 2 }, { 1: 3 })",
+        " { 'duplicates': 'use-last' }") + "(1)", 3);
+    query(func.args(" ({ 1: 2 }, { 1: 3 })",
+        " { 'duplicates': 'combine' }") + "(1)", "2\n3");
+    error(func.args(" ({ 1: 2 }, { 1: 3 })",
+        " { 'duplicates': 'reject' }") + "(1)",
         MERGE_DUPLICATE_X);
 
     // GH-1543
-    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'a': () })") +
+    query("map:for-each(" + func.args(" ({ 'a': () }, { 'a': () })") +
         ", function($k, $v) { () })", "");
-    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'a': () })",
-        " map { 'duplicates': 'combine' }") + ", function($k, $v) { () })", "");
-    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'a': () })",
-        " map { 'duplicates': 'use-first' }") + ", function($k, $v) { () })", "");
-    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'b': () })") +
+    query("map:for-each(" + func.args(" ({ 'a': () }, { 'a': () })",
+        " { 'duplicates': 'combine' }") + ", function($k, $v) { () })", "");
+    query("map:for-each(" + func.args(" ({ 'a': () }, { 'a': () })",
+        " { 'duplicates': 'use-first' }") + ", function($k, $v) { () })", "");
+    query("map:for-each(" + func.args(" ({ 'a': () }, { 'b': () })") +
         ", function($k, $v) { $v })", "");
-    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'b': () })",
-        " map { 'duplicates': 'combine' }") + ", function($k, $v) { $v })", "");
-    query("map:for-each(" + func.args(" (map { 'a': () }, map { 'b': () })",
-        " map { 'duplicates': 'use-first' }") + ", function($k, $v) { $v })", "");
+    query("map:for-each(" + func.args(" ({ 'a': () }, { 'b': () })",
+        " { 'duplicates': 'combine' }") + ", function($k, $v) { $v })", "");
+    query("map:for-each(" + func.args(" ({ 'a': () }, { 'b': () })",
+        " { 'duplicates': 'use-first' }") + ", function($k, $v) { $v })", "");
 
     // GH-1561
-    final String arg1 = " (map { 'A': 'a' }, map { 'A': 'a', 'B': 'b' })";
+    final String arg1 = " ({ 'A': 'a' }, { 'A': 'a', 'B': 'b' })";
     query("map:size(" + func.args(arg1) + ")", 2);
-    query("map:size(" + func.args(arg1, " map { 'duplicates': 'use-first' }") + ")", 2);
-    query("map:size(" + func.args(arg1, " map { 'duplicates': 'use-last' }") + ")", 2);
-    query("map:size(" + func.args(arg1, " map { 'duplicates': 'combine' }") + ")", 2);
+    query("map:size(" + func.args(arg1, " { 'duplicates': 'use-first' }") + ")", 2);
+    query("map:size(" + func.args(arg1, " { 'duplicates': 'use-last' }") + ")", 2);
+    query("map:size(" + func.args(arg1, " { 'duplicates': 'combine' }") + ")", 2);
 
     // GH-1602
-    query("let $_ := 'duplicates' return " + func.args(" map { 0:1 }",
-        " map { 'duplicates': $_ }") + "?0", 1);
+    query("let $_ := 'duplicates' return " + func.args(" { 0:1 }",
+        " { 'duplicates': $_ }") + "?0", 1);
 
-    check(func.args(" map { 1: <a/> }") + "?1", "<a/>", empty(func));
-    check(func.args(" (map { 1: <a/> }, map { })") + "?1", "<a/>", empty(func));
-    check(func.args(" (map { 1: <a/> }, map { })") + "?*", "<a/>", empty(func));
+    check(func.args(" { 1: <a/> }") + "?1", "<a/>", empty(func));
+    check(func.args(" ({ 1: <a/> }, {})") + "?1", "<a/>", empty(func));
+    check(func.args(" ({ 1: <a/> }, {})") + "?*", "<a/>", empty(func));
 
     // GH-1954
-    query(func.args(" if (<a/>/text()) then map { } else ()") + " ! map:keys(.)", "");
+    query(func.args(" if (<a/>/text()) then {} else ()") + " ! map:keys(.)", "");
 
     // map:merge -> map:put
-    check(func.args(" (map:entry(1, <a/>), map { 1: <b/> })") + "?*", "<a/>", empty(func));
+    check(func.args(" (map:entry(1, <a/>), { 1: <b/> })") + "?*", "<a/>", empty(func));
 
     query(func.args(" ({ 1: <x/> })"), "{1:<x/>}");
     query(func.args(" ({ 1: <x/> }, { 1: <y/> })"), "{1:<x/>}");
@@ -338,52 +370,52 @@ public final class MapModuleTest extends SandboxTest {
     assertEquals(keys[0].hashCode(), keys[1].hashCode());
     assertEquals(keys[1].hashCode(), keys[2].hashCode());
 
-    final String mapAB = Util.info("map { '%': %, '%': % }", keys[0], 1, keys[1], 1);
-    final String mapABC = Util.info("map { '%': %, '%': %, '%': % }",
+    final String mapAB = Util.info("{ '%': %, '%': % }", keys[0], 1, keys[1], 1);
+    final String mapABC = Util.info("{ '%': %, '%': %, '%': % }",
         keys[0], 2, keys[2], 2, keys[1], 2);
     // use-first
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapAB + "," + mapABC + ")", " map { 'duplicates': 'use-first' }"),
-            Util.info(" map { '%': %, '%': %, '%': % }", keys[0], 1, keys[1], 1, keys[2], 2)
+            func.args(" (" + mapAB + "," + mapABC + ")", " { 'duplicates': 'use-first' }"),
+            Util.info(" { '%': %, '%': %, '%': % }", keys[0], 1, keys[1], 1, keys[2], 2)
         ),
         true
     );
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapABC + "," + mapAB + ")", " map { 'duplicates': 'use-first' }"),
-            Util.info(" map { '%': %, '%': %, '%': % }", keys[0], 2, keys[1], 2, keys[2], 2)
+            func.args(" (" + mapABC + "," + mapAB + ")", " { 'duplicates': 'use-first' }"),
+            Util.info(" { '%': %, '%': %, '%': % }", keys[0], 2, keys[1], 2, keys[2], 2)
         ),
         true
     );
     // use-last
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapAB + "," + mapABC + ")", " map { 'duplicates': 'use-last' }"),
-            Util.info(" map { '%': %, '%': %, '%': % }", keys[0], 2, keys[1], 2, keys[2], 2)
+            func.args(" (" + mapAB + "," + mapABC + ")", " { 'duplicates': 'use-last' }"),
+            Util.info(" { '%': %, '%': %, '%': % }", keys[0], 2, keys[1], 2, keys[2], 2)
         ),
         true
     );
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapABC + "," + mapAB + ")", " map { 'duplicates': 'use-last' }"),
-            Util.info(" map { '%': %, '%': %, '%': % }", keys[0], 1, keys[1], 1, keys[2], 2)
+            func.args(" (" + mapABC + "," + mapAB + ")", " { 'duplicates': 'use-last' }"),
+            Util.info(" { '%': %, '%': %, '%': % }", keys[0], 1, keys[1], 1, keys[2], 2)
         ),
         true
     );
     // merge
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapAB + "," + mapABC + ")", " map { 'duplicates': 'combine' }"),
-            Util.info(" map { '%': (%, %), '%': (%, %), '%': % }",
+            func.args(" (" + mapAB + "," + mapABC + ")", " { 'duplicates': 'combine' }"),
+            Util.info(" { '%': (%, %), '%': (%, %), '%': % }",
                 keys[0], 1, 2, keys[1], 1, 2, keys[2], 2)
         ),
         true
     );
     query(
         DEEP_EQUAL.args(
-            func.args(" (" + mapABC + "," + mapAB + ")", " map { 'duplicates': 'combine' }"),
-            Util.info(" map { '%': (%, %), '%': (%, %), '%': % }",
+            func.args(" (" + mapABC + "," + mapAB + ")", " { 'duplicates': 'combine' }"),
+            Util.info(" { '%': (%, %), '%': (%, %), '%': % }",
                 keys[0], 2, 1, keys[1], 2, 1, keys[2], 2)
         ),
         true
@@ -425,30 +457,59 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void pairs() {
     final Function func = _MAP_PAIRS;
-    query(func.args(" map { }"), "");
-    query(func.args(" map { 1: 2 }") + "?key", 1);
-    query(func.args(" map { 1: 2 }") + "?value", 2);
-    query(func.args(" map { 1: (2, 3) }") + "?key", 1);
-    query(func.args(" map { 1: (2, 3) }") + "?value", "2\n3");
-    query(func.args(" map { 1: 2, 3: 4 }") + "?key", "1\n3");
-    query(func.args(" map { 1: 2, 3: 4 }") + "?value", "2\n4");
+    query(func.args(" {}"), "");
+    query(func.args(" { 1: 2 }") + "?key", 1);
+    query(func.args(" { 1: 2 }") + "?value", 2);
+    query(func.args(" { 1: (2, 3) }") + "?key", 1);
+    query(func.args(" { 1: (2, 3) }") + "?value", "2\n3");
+    query(func.args(" { 1: 2, 3: 4 }") + "?key", "1\n3");
+    query(func.args(" { 1: 2, 3: 4 }") + "?value", "2\n4");
   }
 
   /** Test method. */
   @Test public void put() {
     // no entry
     final Function func = _MAP_PUT;
-    checkSize(func.args(" map { }", 1, 2), 1);
-    checkSize(func.args(" map { }", "a", "b"), 1);
-    checkSize(func.args(" map { 'a': 'b' }", "c", "d"), 2);
-    checkSize(func.args(" map { 'a': 'b' }", "c", "d"), 2);
+    checkSize(func.args(" {}", 1, 2), 1);
+    checkSize(func.args(" {}", "a", "b"), 1);
+    checkSize(func.args(" { 'a': 'b' }", "c", "d"), 2);
+    checkSize(func.args(" { 'a': 'b' }", "c", "d"), 2);
 
-    query(func.args(" map { xs:time('01:01:01'): 'b' }", "xs:time('01:01:02+01:00')", 1));
+    query(func.args(" { xs:time('01:01:01'): 'b' }", "xs:time('01:01:02+01:00')", 1));
 
-    check(func.args(" map { <?_ 1?>: 2, 3: 4 }", " <_>5</_>", 6) + "?* => sort()",
+    check(func.args(" { <?_ 1?>: 2, 3: 4 }", " <_>5</_>", 6) + "?* => sort()",
         "2\n4\n6", empty(CElem.class));
 
-    query("deep-equal(" + func.args(" map { 0: 1 }", -1, 2) + ", map { 0: 1, -1: 2 })", true);
+    query("deep-equal(" + func.args(" { 0: 1 }", -1, 2) + ", { 0: 1, -1: 2 })", true);
+
+    check(func.args(_MAP_ENTRY.args(1, wrap(0)), 1, " true#0"), "{1:fn:true#0}",
+        type(func, "map(xs:integer, item())"));
+    check(func.args(_MAP_ENTRY.args(1, wrap(0)), "a", 0), "{1:\"0\",\"a\":0}",
+        type(func, "map(xs:anyAtomicType, xs:anyAtomicType)"));
+
+    String record = "declare record local:x(x as xs:integer);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
+        type(func, "local:x"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
+        type(func, "map(xs:string, xs:anyAtomicType)"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
+        type(func, "map(xs:string, xs:integer)"));
+
+    record = "declare record local:x(x? as xs:integer);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
+        type(func, "local:x"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
+        type(func, "map(xs:string, xs:anyAtomicType)"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
+        type(func, "map(xs:string, xs:integer)"));
+
+    record = "declare record local:x(x as xs:integer, *);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
+        type(func, "local:x"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
+        type(func, "map(*)"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
+        type(func, "local:x"));
   }
 
   /** Test method. */
@@ -457,12 +518,35 @@ public final class MapModuleTest extends SandboxTest {
     checkSize(func.args(_MAP_ENTRY.args(1, 2), 1), 0);
 
     check("map:remove({}, 'x')", "{}", root(XQTrieMap.class));
+
+    check(func.args(_MAP_ENTRY.args(1, wrap(0)), 1), "{}",
+        type(func, "map(xs:integer, xs:untypedAtomic)"));
+    check(func.args(_MAP_ENTRY.args(1, wrap(0)), "a"), "{1:\"0\"}",
+        type(func, "map(xs:integer, xs:untypedAtomic)"));
+
+    String record = "declare record local:x(x as xs:integer);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
+        type(func, "map(xs:string, xs:integer)"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
+        empty(func));
+
+    record = "declare record local:x(x? as xs:integer);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
+        type(func, "local:x"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
+        empty(func));
+
+    record = "declare record local:x(x as xs:integer, *);";
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
+        type(func, "map(*)"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
+        type(func, "local:x"));
   }
 
   /** Test method. */
   @Test public void size() {
     final Function func = _MAP_SIZE;
-    query(func.args(" map { }"), 0);
+    query(func.args(" { }"), 0);
   }
 
   /**
