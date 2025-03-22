@@ -81,20 +81,6 @@ abstract class XQHashMap extends XQMap {
   abstract Value keysInternal();
 
   /**
-   * Returns the key at the specified position.
-   * @param pos position (starting with {@code 1})
-   * @return key
-   */
-  abstract Item keyInternal(int pos);
-
-  /**
-   * Returns the value at the specified position.
-   * @param pos position (starting with {@code 1})
-   * @return key
-   */
-  abstract Value valueInternal(int pos);
-
-  /**
    * Builds the map by adding a new key and value.
    * @param key key to insert
    * @param value value to insert

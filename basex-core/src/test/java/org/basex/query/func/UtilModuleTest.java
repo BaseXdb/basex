@@ -188,6 +188,42 @@ public final class UtilModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void mapKeyAt() {
+    final Function func = _UTIL_MAP_KEY_AT;
+    query(func.args(" {}", 0), "");
+    query(func.args(" {}", 1), "");
+
+    final String map = " { 1: 'uno', 10: 'dieci', 100: 'cento' }";
+    query(func.args(map, 0), "");
+    query(func.args(map, 1), 1);
+    query(func.args(map, 2), 10);
+    query(func.args(map, 3), 100);
+    query(func.args(map, 4), "");
+    query(func.args(map, 2147483647L), "");
+    query(func.args(map, 2147483648L), "");
+    query(func.args(map, 4294967295L), "");
+    query(func.args(map, 4294967296L), "");
+  }
+
+  /** Test method. */
+  @Test public void mapValueAt() {
+    final Function func = _UTIL_MAP_VALUE_AT;
+    query(func.args(" {}", 0), "");
+    query(func.args(" {}", 1), "");
+
+    final String map = " { 1: 'uno', 10: 'dieci', 100: 'cento' }";
+    query(func.args(map, 0), "");
+    query(func.args(map, 1), "uno");
+    query(func.args(map, 2), "dieci");
+    query(func.args(map, 3), "cento");
+    query(func.args(map, 4), "");
+    query(func.args(map, 2147483647L), "");
+    query(func.args(map, 2147483648L), "");
+    query(func.args(map, 4294967295L), "");
+    query(func.args(map, 4294967296L), "");
+  }
+
+  /** Test method. */
   @Test public void range() {
     final Function func = _UTIL_RANGE;
     query(func.args(" ()", 1, 2), "");

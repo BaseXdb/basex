@@ -129,6 +129,38 @@ public abstract class XQMap extends XQStruct {
   abstract Value getInternal(Item key) throws QueryException;
 
   /**
+   * Gets a map key at the specified position.
+   * @param index map index
+   * @return value or {@code Empty#VALUE}
+   */
+  public final Item keyAt(final long index) {
+    return index > 0 && index <= structSize() ? keyInternal((int) index) : Empty.VALUE;
+  }
+
+  /**
+   * Gets a map value at the specified position.
+   * @param index map index
+   * @return value or {@code Empty#VALUE}
+   */
+  public final Value valueAt(final long index) {
+    return index > 0 && index <= structSize() ? valueInternal((int) index) : Empty.VALUE;
+  }
+
+  /**
+   * Gets a map key at the specified position.
+   * @param index map index (must be valid)
+   * @return key
+   */
+  abstract Item keyInternal(int index);
+
+  /**
+   * Gets a map value at the specified position.
+   * @param index map index (must be valid)
+   * @return value
+   */
+  abstract Value valueInternal(int index);
+
+  /**
    * Puts the given value into this map and replaces existing keys.
    * @param key key to insert
    * @param value value to insert
