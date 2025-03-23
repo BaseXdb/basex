@@ -473,6 +473,7 @@ public final class QueryResources {
     final Data data;
     try {
       data = CreateDB.create(io.dbName(), parser, context, opts, mem);
+      data.meta.single = single;
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }

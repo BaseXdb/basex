@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.*;
@@ -291,6 +292,21 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(" true#0"), FIATOMIZE_X);
     error(func.args(REPLICATE.args(" true#0", 2)), FIATOMIZE_X);
     error(func.args(" (1 to 999999) ! true#0"), FIATOMIZE_X);
+  }
+
+  /**
+   * Test method.
+   * @throws IOException IO exception
+   */
+  @Test public void baseUri() throws IOException {
+    final Function func = BASE_URI;
+    final String cd = new File(".").getCanonicalFile().toURI().toString().replaceFirst(
+        "^file:/(?!/)", "file:///");
+    query(func.args(" parse-xml('<x/>')"), cd);
+    query(func.args(" document{<x/>}"), cd);
+    query(func.args(" doc('src/test/resources/test.xml')"), cd + "src/test/resources/test.xml");
+    query("collection('src/test/resources/catalog')!" + func.args(" .")
+        + "[ends-with(., '/doc.xml')]", cd + "src/test/resources/catalog/doc.xml");
   }
 
   /** Test method. */
@@ -738,6 +754,21 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(TEXT), true);
     query(func.args("/"), false);
     query(func.args("/a/b/c/d/e"), false);
+  }
+
+  /**
+   * Test method.
+   * @throws IOException IO exception
+   */
+  @Test public void documentUri() throws IOException {
+    final Function func = DOCUMENT_URI;
+    final String cd = new File(".").getCanonicalFile().toURI().toString().replaceFirst(
+        "^file:/(?!/)", "file:///");
+    query(func.args(" parse-xml('<x/>')"), "");
+    query(func.args(" document{<x/>}"), "");
+    query(func.args(" doc('src/test/resources/test.xml')"), cd + "src/test/resources/test.xml");
+    query("collection('src/test/resources/catalog')!" + func.args(" .")
+        + "[ends-with(., '/doc.xml')]", cd + "src/test/resources/catalog/doc.xml");
   }
 
   /** Test method. */

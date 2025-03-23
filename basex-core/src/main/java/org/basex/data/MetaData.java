@@ -30,6 +30,8 @@ public final class MetaData {
 
   /** Path to initially imported resources. */
   public String original = "";
+  /** Whether this instance is for a single document. */
+  public boolean single = true;
   /** Size of initially imported resources. */
   public long inputsize;
   /** Database timestamp. */
