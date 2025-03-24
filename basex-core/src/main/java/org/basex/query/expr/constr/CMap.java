@@ -33,33 +33,39 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // map { <_>A</_>: 1 }  ->  map { 'A': 1 }
+    // { <_>A</_>: 1 }  ->  { 'A': 1 }
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) exprs[e] = exprs[e].simplifyFor(Simplify.DATA, cc);
 
-    // map { $a: $b }  ->  map:entry($a, $b)
+    // { $a: $b }  ->  map:entry($a, $b)
     if(el == 2) return cc.function(_MAP_ENTRY, info, exprs);
 
-    // determine static key type (all keys must be single items)
-    AtomType kt = null;
-    for(int e = 0; e < el; e += 2) {
-      final SeqType st = exprs[e].seqType();
-      final AtomType type = st.type.atomic();
-      if(type == null || !st.one() || st.mayBeArray()) {
-        kt = null;
-        break;
+    // check if record type can be defined for constructed map
+    final MapType mt;
+    boolean record = true;
+    for(int e = 0; e < el && record; e += 2) {
+      if(!(exprs[e] instanceof AStr)) record = false;
+    }
+    if(record) {
+      final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
+      for(int e = 0; e < el; e += 2) {
+        fields.put(((Item) exprs[e]).string(info), new RecordField(false, exprs[e + 1].seqType()));
       }
-      kt = kt == null ? type : kt.union(type);
+      mt = cc.qc.newRecord(false, fields);
+    } else {
+      // determine static types
+      AtomType kt = AtomType.ANY_ATOMIC_TYPE;
+      SeqType vt = SeqType.ITEM_ZM;
+      for(int e = 0; e < el; e += 2) {
+        final SeqType kst = exprs[e].seqType(), dst = exprs[e + 1].seqType();
+        final AtomType akt = kst.type.atomic();
+        kt = akt == null || !kst.one() || kst.mayBeArray() ? AtomType.ANY_ATOMIC_TYPE :
+          e == 0 ? akt : kt.union(akt);
+        vt = e == 0 ? dst : vt.union(dst);
+      }
+      mt = MapType.get(kt, vt);
     }
-    if(kt == null) kt = AtomType.ANY_ATOMIC_TYPE;
-
-    // determine static value type
-    SeqType vt = null;
-    for(int e = 1; e < el; e += 2) {
-      final SeqType dst = exprs[e].seqType();
-      vt = vt == null ? dst : vt.union(dst);
-    }
-    exprType.assign(MapType.get(kt, vt != null ? vt : SeqType.ITEM_ZM));
+    exprType.assign(mt);
 
     return values(true, cc) ? cc.preEval(this) : this;
   }
@@ -74,7 +80,7 @@ public final class CMap extends Arr {
       if(mb.contains(key)) throw MAPDUPLKEY_X.get(info);
       mb.put(key, value);
     }
-    return mb.map();
+    return mb.map(this);
   }
 
   @Override

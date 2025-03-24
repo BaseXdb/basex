@@ -1,6 +1,7 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -145,12 +146,23 @@ public final class MapBuilder {
   }
 
   /**
-   * Returns the resulting map and invalidates the internal reference.
+   * Returns the built map.
    * @return map
    */
   public XQMap map() {
     return map == null ? XQMap.empty() : map.structSize() == 1 ?
       XQMap.singleton(map.keyInternal(1), map.valueInternal(1)) : map;
+  }
+
+  /**
+   * Returns the built map and assigns the type of the .
+   * @param expr building expression
+   * @return map
+   */
+  public XQMap map(final Expr expr) {
+    final XQMap mp = map();
+    mp.refineType(expr);
+    return mp;
   }
 
   @Override
