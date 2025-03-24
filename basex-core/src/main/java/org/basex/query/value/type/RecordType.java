@@ -377,11 +377,26 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     } else {
       int i = 0;
       for(final byte[] field : fields) {
-        if(i++ != 0) qs.token(',').token(' ');
-        if(XMLToken.isNCName(field)) qs.token(field); else qs.quoted(field);
+        if(i++ != 0) {
+          qs.token(',').token(' ');
+          if(i > 3) {
+            qs.token("...");
+            break;
+          }
+        }
+        if(XMLToken.isNCName(field)) {
+          qs.token(field);
+        } else {
+          qs.quoted(field);
+        }
         final RecordField f = fields.get(field);
         if(f.optional) qs.token('?');
-        if(f.seqType != null) qs.token(AS).token(f.seqType);
+        if(f.seqType != null) {
+          Type type = f.seqType.type;
+          if(f.seqType.instanceOf(SeqType.ARRAY_ZM)) type = SeqType.ARRAY;
+          else if(f.seqType.instanceOf(SeqType.MAP_ZM)) type = SeqType.MAP;
+          qs.token(AS).token(type.seqType(f.seqType.occ));
+        }
       }
       if(extensible) qs.token(',').token(' ').token('*');
     }

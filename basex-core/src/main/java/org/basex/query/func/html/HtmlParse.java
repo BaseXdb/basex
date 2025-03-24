@@ -48,7 +48,7 @@ public class HtmlParse extends StandardFunc {
 
   /**
    * Parses the input and creates an XML document.
-   * @param io input data
+   * @param io input data (can be {@code null})
    * @param defaultParser default HTML parser to be used in absence of the METHOD option (can be
    *          {@code null})
    * @param qc query context
