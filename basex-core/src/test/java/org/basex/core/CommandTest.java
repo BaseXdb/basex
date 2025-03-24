@@ -326,6 +326,7 @@ public class CommandTest extends SandboxTest {
     ok(new Export(sandbox().toString()));
     ok(exported.exists());
     ok(new Export(sandbox().toString()));
+    ok(exported.delete());
   }
 
   /** Command test. */
