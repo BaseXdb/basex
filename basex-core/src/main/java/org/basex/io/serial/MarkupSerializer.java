@@ -74,8 +74,8 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     String version = sopts.get(VERSION), hv = sopts.get(HTML_VERSION);
     if(hv.matches("\\d+(\\.\\d+)?")) hv = Double.toString(Double.parseDouble(hv));
-    html5 = hv.equals(V50) || versions[0].equals(V50) &&
-        (version.isEmpty() ? hv.isEmpty() : version.equals(V50));
+    html5 = hv.equals(V50) || versions[0].equals(V50) && hv.isEmpty() &&
+        (version.isEmpty() || version.equals(V50));
     version = checkVersion(VERSION, version, versions);
     hv = checkVersion(VERSION, hv, V50, V401, V40);
 
