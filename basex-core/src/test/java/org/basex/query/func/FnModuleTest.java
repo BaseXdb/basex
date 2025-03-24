@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.*;
@@ -26,8 +27,6 @@ import org.junit.jupiter.api.Test;
  * @author Christian Gruen
  */
 public final class FnModuleTest extends SandboxTest {
-  /** Text file. */
-  private static final String TEXT = "src/test/resources/input.xml";
   /** Document. */
   private static final String DOC = "src/test/resources/input.xml";
   /** Months. */
@@ -291,6 +290,21 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(" true#0"), FIATOMIZE_X);
     error(func.args(REPLICATE.args(" true#0", 2)), FIATOMIZE_X);
     error(func.args(" (1 to 999999) ! true#0"), FIATOMIZE_X);
+  }
+
+  /**
+   * Test method.
+   * @throws IOException IO exception
+   */
+  @Test public void baseUri() throws IOException {
+    final Function func = BASE_URI;
+    final String cd = new File(".").getCanonicalFile().toURI().toString().replaceFirst(
+        "^file:/(?!/)", "file:///");
+    query(func.args(" parse-xml('<x/>')"), cd);
+    query(func.args(" document{<x/>}"), cd);
+    query(func.args(" doc('src/test/resources/test.xml')"), cd + "src/test/resources/test.xml");
+    query("collection('src/test/resources/catalog')!" + func.args(" .")
+        + "[ends-with(., '/doc.xml')]", cd + "src/test/resources/catalog/doc.xml");
   }
 
   /** Test method. */
@@ -735,9 +749,24 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void docAvailable() {
     final Function func = DOC_AVAILABLE;
 
-    query(func.args(TEXT), true);
+    query(func.args(DOC), true);
     query(func.args("/"), false);
     query(func.args("/a/b/c/d/e"), false);
+  }
+
+  /**
+   * Test method.
+   * @throws IOException IO exception
+   */
+  @Test public void documentUri() throws IOException {
+    final Function func = DOCUMENT_URI;
+    final String cd = new File(".").getCanonicalFile().toURI().toString().replaceFirst(
+        "^file:/(?!/)", "file:///");
+    query(func.args(" parse-xml('<x/>')"), "");
+    query(func.args(" document{<x/>}"), "");
+    query(func.args(" doc('src/test/resources/test.xml')"), cd + "src/test/resources/test.xml");
+    query("collection('src/test/resources/catalog')!" + func.args(" .")
+        + "[ends-with(., '/doc.xml')]", cd + "src/test/resources/catalog/doc.xml");
   }
 
   /** Test method. */
@@ -3375,9 +3404,9 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void unparsedText() {
     final Function func = UNPARSED_TEXT;
-    contains(func.args(TEXT), "<html");
-    contains(func.args(TEXT, "US-ASCII"), "<html");
-    error(func.args(TEXT, "xyz"), ENCODING_X);
+    contains(func.args(DOC), "<html");
+    contains(func.args(DOC, "US-ASCII"), "<html");
+    error(func.args(DOC, "xyz"), ENCODING_X);
   }
 
   /** Test method. */
@@ -3400,7 +3429,7 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(" 3 + <a/>", true), FUNCCAST_X_X);
 
     // GH-2139: Simplify inlined nondeterministic code
-    check("let $doc := doc('" + TEXT + "') let $a := 1 return $a", 1, root(Int.class));
+    check("let $doc := doc('" + DOC + "') let $a := 1 return $a", 1, root(Int.class));
   }
 
   /** Test method. */

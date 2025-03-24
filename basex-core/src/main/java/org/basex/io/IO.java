@@ -105,11 +105,11 @@ public abstract class IO {
   /**
    * Protected constructor.
    * @param path path
+   * @param single assign empty string as filename if path points to a directory
    */
-  IO(final String path) {
+  IO(final String path, final boolean single) {
     pth = path;
-    final String p = Strings.endsWith(path, '/') ? path.substring(0, path.length() - 1) : path;
-    nm = p.substring(p.lastIndexOf('/') + 1);
+    nm = single && path.endsWith("/") ? "" : path.replaceAll("^(?:.*/)?([^/]+)/?$", "$1");
   }
 
   /**

@@ -59,7 +59,7 @@ public final class IOContent extends IO {
    * @param encoding encoding (can be {@code null})
    */
   public IOContent(final byte[] content, final String path, final String encoding) {
-    super(path);
+    super(path, true);
     this.content = content;
     this.encoding = encoding;
     len = content.length;

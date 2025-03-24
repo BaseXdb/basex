@@ -33,22 +33,21 @@ public final class FnBaseUri extends ContextFn {
   /**
    * Returns the static base URI of a node.
    * @param node node (can be {@code null})
-   * @param staticBase static base URI (can be {@code null})
+   * @param staticBase static base URI
    * @param info input info (can be {@code null})
-   * @return base URI or {@code null}
+   * @return base URI, or {@code null} if a node has no such URI
    * @throws QueryException query exception
    */
   public static Uri uri(final ANode node, final Uri staticBase, final InputInfo info)
       throws QueryException {
 
-    if(node == null) return null;
-    final Type type = node.type;
-    if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE) && node.parent() == null) return null;
+    if(node == null || !node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE) &&
+        node.parent() == null) return null;
 
     Uri base = Uri.EMPTY;
     ANode nd = node;
     do {
-      if(nd == null) return staticBase != null ? staticBase.resolve(base, info) : Uri.EMPTY;
+      if(nd == null) return staticBase.resolve(base, info);
       final Uri bu = Uri.get(nd.baseURI(), false);
       if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
       base = bu.resolve(base, info);

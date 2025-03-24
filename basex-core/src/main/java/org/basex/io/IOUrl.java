@@ -103,7 +103,7 @@ public final class IOUrl extends IO {
    * @param url url
    */
   public IOUrl(final String url) {
-    super(normalize(url));
+    super(normalize(url), false);
   }
 
   @Override

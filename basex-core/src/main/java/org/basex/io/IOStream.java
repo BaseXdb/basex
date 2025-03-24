@@ -32,7 +32,7 @@ public final class IOStream extends IO {
    * @param path path
    */
   public IOStream(final InputStream is, final String path) {
-    super(path);
+    super(path, true);
     input = BufferInput.get(is);
   }
 

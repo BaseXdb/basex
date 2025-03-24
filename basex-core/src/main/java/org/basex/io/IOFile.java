@@ -80,7 +80,7 @@ public final class IOFile extends IO {
    */
   public IOFile(final File file, final String last) {
     super(normalize(file.getAbsolutePath(), Strings.endsWith(last, '/') ||
-        Strings.endsWith(last, '\\')));
+        Strings.endsWith(last, '\\')), false);
     boolean abs = file.isAbsolute();
     this.file = abs ? file : new File(pth);
     // Windows: checks if the original file path starts with a slash
