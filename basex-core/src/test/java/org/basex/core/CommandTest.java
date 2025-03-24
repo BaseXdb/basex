@@ -320,13 +320,12 @@ public class CommandTest extends SandboxTest {
 
   /** Command test. */
   @Test public final void export() {
-    final IOFile io = new IOFile(FN);
-    no(new Export(io.path()));
+    final IOFile exported = new IOFile(sandbox(), FN);
+    no(new Export(exported.path()));
     ok(new CreateDB(NAME, FILE));
-    ok(new Export("."));
-    ok(new Export("."));
-    ok(io.exists());
-    ok(io.delete());
+    ok(new Export(sandbox().toString()));
+    ok(exported.exists());
+    ok(new Export(sandbox().toString()));
   }
 
   /** Command test. */
