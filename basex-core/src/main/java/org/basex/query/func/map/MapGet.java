@@ -41,7 +41,7 @@ public final class MapGet extends MapFn {
     final MapInfo mi = mapInfo(map, key);
     if(mi.key != null) {
       if(mi.field == null) {
-        if(!mi.record.isExtensible()) return Empty.VALUE;
+        if(!mi.record.isExtensible() && !fallback) return Empty.VALUE;
       } else if(!mi.field.isOptional()) {
         st = mi.field.seqType();
       }
