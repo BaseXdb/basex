@@ -3414,7 +3414,7 @@ public class QueryParser extends InputParser {
     // record
     if(type instanceof RecordType) {
       final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
-      if(consume(')')) return new RecordType(false, fields, null);
+      if(consume(')')) return qc.newRecord(false, fields);
       boolean extensible = false;
       do {
         if(wsConsume("*")) {
@@ -3428,7 +3428,7 @@ public class QueryParser extends InputParser {
         fields.put(name, new RecordField(optional, seqType));
       } while(wsConsume(","));
       wsCheck(")");
-      return fields.isEmpty() ? SeqType.RECORD : new RecordType(extensible, fields, null);
+      return fields.isEmpty() ? SeqType.RECORD : qc.newRecord(extensible, fields);
     }
     // map
     if(type instanceof MapType) {

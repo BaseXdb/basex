@@ -128,6 +128,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** External variables and context to be bound at compile time. */
   private final QNmMap<Value> bindings = new QNmMap<>();
+  /** Cached record types. */
+  private final ArrayList<RecordType> recordTypes = new ArrayList<>();
 
   /** Serialization options. */
   private SerializerOptions sopts;
@@ -476,6 +478,21 @@ public final class QueryContext extends Job implements Closeable {
    */
   public void ftOpt(final FTOpt opt) {
     ftOpt = opt;
+  }
+
+  /**
+   * Creates a new record or returns an existing instance.
+   * @param extensible extensible flag
+   * @param fields field declarations
+   * @return new or already registered record type
+   */
+  public RecordType newRecord(final boolean extensible, final TokenObjectMap<RecordField> fields) {
+    final RecordType rt = new RecordType(extensible, fields, null);
+    for(final RecordType recordType : recordTypes) {
+      if(recordType.eq(rt)) return recordType;
+    }
+    recordTypes.add(rt);
+    return rt;
   }
 
   /**
