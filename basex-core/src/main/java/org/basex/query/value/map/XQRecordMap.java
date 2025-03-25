@@ -6,7 +6,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Compact map implementation for records with fixed entries.
@@ -36,15 +35,20 @@ public final class XQRecordMap extends XQHashMap {
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
     if(key.type.isStringOrUntyped()) {
-      final TokenObjectMap<RecordField> fields = ((RecordType) type).fields();
-      final int i = fields.index(key.string(null));
-      if(i != 0 && value.seqType().instanceOf(fields.value(i).seqType())) {
-        final Value[] copy = values.clone();
-        copy[i - 1] = value;
-        return new XQRecordMap(copy, type);
-      }
+      final int i = ((RecordType) type).fields().index(key.string(null));
+      if(i != 0) return putAt(i - 1, value);
     }
     return super.put(key, value);
+  }
+
+  @Override
+  public XQMap putAt(final int index, final Value value) throws QueryException {
+    if(value.seqType().instanceOf(((RecordType) type).fields().value(index + 1).seqType())) {
+      final Value[] copy = values.clone();
+      copy[index] = value;
+      return new XQRecordMap(copy, type);
+    }
+    return super.putAt(index, value);
   }
 
   @Override

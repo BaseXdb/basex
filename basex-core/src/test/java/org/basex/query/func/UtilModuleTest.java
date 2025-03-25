@@ -206,6 +206,30 @@ public final class UtilModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void mapPutAt() {
+    final Function func = _UTIL_MAP_PUT_AT;
+    query(func.args(" { 9: 8 }", 1, 0), "{9:0}");
+    query(func.args(" { 9: 8, 7: 6 }", 0, 0), "{9:8,7:6}");
+    query(func.args(" { 9: 8, 7: 6 }", 1, 0), "{9:0,7:6}");
+    query(func.args(" { 9: 8, 7: 6 }", 2, 0), "{9:8,7:0}");
+    query(func.args(" { 9: 8, 7: 6 }", 3, 0), "{9:8,7:6}");
+
+    query(func.args(" { '9': 8, '7': 6 }", 0, 0), "{\"9\":8,\"7\":6}");
+    query(func.args(" { '9': 8, '7': 6 }", 1, 0), "{\"9\":0,\"7\":6}");
+    query(func.args(" { '9': 8, '7': 6 }", 2, 0), "{\"9\":8,\"7\":0}");
+    query(func.args(" { '9': 8, '7': 6 }", 3, 0), "{\"9\":8,\"7\":6}");
+
+    query(func.args(" { '9': 8, '7': 6 }", 0, "a"), "{\"9\":8,\"7\":6}");
+    query(func.args(" { '9': 8, '7': 6 }", 1, "a"), "{\"9\":\"a\",\"7\":6}");
+    query(func.args(" { '9': 8, '7': 6 }", 2, "a"), "{\"9\":8,\"7\":\"a\"}");
+    query(func.args(" { '9': 8, '7': 6 }", 3, "a"), "{\"9\":8,\"7\":6}");
+
+    query("map:build(1 to 100) => " + func.args(1, 0) + " => map:get(1)", 0);
+    query("map:build((1 to 100) ! string()) => " + func.args(1, 0) + " => map:get('1')", 0);
+    query("map:build((1 to 100) ! string()) => " + func.args(1, "0") + " => map:get('1')", 0);
+  }
+
+  /** Test method. */
   @Test public void mapValueAt() {
     final Function func = _UTIL_MAP_VALUE_AT;
     query(func.args(" {}", 0), "");

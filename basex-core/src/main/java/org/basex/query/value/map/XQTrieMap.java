@@ -76,6 +76,11 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
+  public XQTrieMap putAt(final int index, final Value value) throws QueryException {
+    return put(keyAt(index), value);
+  }
+
+  @Override
   public XQMap remove(final Item key) throws QueryException {
     final TrieUpdate update = new TrieUpdate(key, null, order);
     final TrieNode node = root.remove(key.hashCode(), 0, update);

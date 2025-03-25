@@ -41,6 +41,11 @@ abstract class XQHashMap extends XQMap {
   }
 
   @Override
+  public XQMap putAt(final int index, final Value value) throws QueryException {
+    return trie().putAt(index, value);
+  }
+
+  @Override
   public final XQMap remove(final Item key) throws QueryException {
     return getInternal(key) == null ? this : trie().remove(key);
   }
