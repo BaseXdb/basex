@@ -44,7 +44,7 @@ public final class XQStrMap extends XQHashMap {
 
   @Override
   Value keysInternal() {
-    return StrSeq.get(map.toArray());
+    return StrSeq.get(map.keys());
   }
 
   @Override

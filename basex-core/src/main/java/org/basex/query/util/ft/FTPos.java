@@ -34,7 +34,7 @@ public final class FTPos {
     final IntSet set = new IntSet(ps + ls);
     for(int p = 0; p < ps; p++) set.add(list.get(p));
     for(int l = 0; l < ls; l++) set.add(pos.get(l));
-    list = new IntList(set.toArray()).sort();
+    list = new IntList(set.keys()).sort();
   }
 
   /**

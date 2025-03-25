@@ -39,10 +39,10 @@ public class FnDuplicateValues extends StandardFunc {
               continue;
             }
             set1 = ItemSet.get(collation, info);
-            for(final int i : ints1.toArray()) set1.add(Int.get(i));
+            for(final int i : ints1.keys()) set1.add(Int.get(i));
             ints1 = null;
             set2 = ItemSet.get(collation, info);
-            for(final int i : ints2.toArray()) set2.add(Int.get(i));
+            for(final int i : ints2.keys()) set2.add(Int.get(i));
             ints2 = null;
           }
           // fallback
@@ -73,8 +73,8 @@ public class FnDuplicateValues extends StandardFunc {
     // fallback
     final ValueBuilder vb = new ValueBuilder(qc).add(intseq);
     final ItemSet set1 = ItemSet.get(collation, info), set2 = ItemSet.get(collation, info);
-    for(final int i : ints1.toArray()) set1.add(Int.get(i));
-    for(final int i : ints2.toArray()) set2.add(Int.get(i));
+    for(final int i : ints1.keys()) set1.add(Int.get(i));
+    for(final int i : ints2.keys()) set2.add(Int.get(i));
     ints1 = null;
     ints2 = null;
     do {

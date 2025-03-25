@@ -204,10 +204,10 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   }
 
   /**
-   * Returns an array with all elements.
+   * Returns an array with all keys.
    * @return array
    */
-  public final byte[][] toArray() {
+  public final byte[][] keys() {
     return Arrays.copyOfRange(keys, 1, size);
   }
 

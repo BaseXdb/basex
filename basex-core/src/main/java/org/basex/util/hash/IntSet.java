@@ -111,10 +111,10 @@ public class IntSet extends ASet {
   }
 
   /**
-   * Returns an array with all elements.
+   * Returns an array with all keys.
    * @return array
    */
-  public final int[] toArray() {
+  public final int[] keys() {
     return Arrays.copyOfRange(keys, 1, size);
   }
 

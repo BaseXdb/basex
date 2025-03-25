@@ -56,7 +56,7 @@ public final class FTPosData {
     }
 
     // sort and store all positions
-    final IntList il = new IntList(set.toArray()).sort();
+    final IntList il = new IntList(set.keys()).sort();
     int c = find(pre);
     if(c < 0) {
       c = -c - 1;
