@@ -130,7 +130,7 @@ public abstract class XQMap extends XQStruct {
 
   /**
    * Gets a map key at the specified position.
-   * @param index map index
+   * @param index map index (starts with 1)
    * @return value or {@code Empty#VALUE}
    */
   public final Item keyAt(final long index) {
@@ -139,7 +139,7 @@ public abstract class XQMap extends XQStruct {
 
   /**
    * Gets a map value at the specified position.
-   * @param index map index
+   * @param index map index (starts with 1)
    * @return value or {@code Empty#VALUE}
    */
   public final Value valueAt(final long index) {
@@ -148,14 +148,14 @@ public abstract class XQMap extends XQStruct {
 
   /**
    * Gets a map key at the specified position.
-   * @param index map index (must be valid)
+   * @param index map index (starts with 1, must be valid)
    * @return key
    */
   abstract Item keyInternal(int index);
 
   /**
    * Gets a map value at the specified position.
-   * @param index map index (must be valid)
+   * @param index map index (starts with 1, must be valid)
    * @return value
    */
   abstract Value valueInternal(int index);
@@ -309,7 +309,7 @@ public abstract class XQMap extends XQStruct {
   public final XQMap coerceTo(final RecordType rt, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
-    for(final byte[] key : rt) {
+    for(final byte[] key : rt.fields()) {
       if(!rt.field(key).isOptional() && !contains(Str.get(key))) {
         throw typeError(this, rt.seqType(), ii);
       }

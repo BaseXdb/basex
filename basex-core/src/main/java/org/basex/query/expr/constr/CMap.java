@@ -39,6 +39,7 @@ public final class CMap extends Arr {
     for(int e = 0; e < el; e += 2) exprs[e] = exprs[e].simplifyFor(Simplify.DATA, cc);
 
     // { $a: $b }  ->  map:entry($a, $b)
+    if(el == 0) return XQMap.empty();
     if(el == 2) return cc.function(_MAP_ENTRY, info, exprs);
 
     // use record constructor (not too large, only strings as keys)?

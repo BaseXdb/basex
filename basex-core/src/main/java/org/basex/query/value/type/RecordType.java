@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public final class RecordType extends MapType implements Iterable<byte[]> {
+public final class RecordType extends MapType {
   /** Extensible flag. */
   private boolean extensible;
   /** Record fields. */
@@ -74,9 +74,12 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     return ust;
   }
 
-  @Override
-  public Iterator<byte[]> iterator() {
-    return fields.iterator();
+  /**
+   * Returns all record fields.
+   * @return record fields
+   */
+  public TokenObjectMap<RecordField> fields() {
+    return fields;
   }
 
   /**
@@ -378,11 +381,6 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
       }
     }
     return new RecordType(extensible && rt.extensible, map, null);
-  }
-
-  @Override
-  public ID id() {
-    return ID.REC;
   }
 
   @Override

@@ -22,7 +22,6 @@ public interface Type {
   enum ID {
     // function types
     /** function(*).              */ FUN(7),
-    /** record(*).                */ REC(29),
     /** map(*).                   */ MAP(30),
     /** array(*).                 */ ARRAY(31),
 

@@ -1016,7 +1016,7 @@ public class QueryParser extends InputParser {
       localVars.pushContext(false);
       final Params params = new Params();
       boolean defaults = false;
-      for(final byte[] key : rt) {
+      for(final byte[] key : rt.fields()) {
         final RecordField rf = rt.field(key);
         final boolean optional = rf.isOptional();
         final Expr initExpr = rf.expr();
