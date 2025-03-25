@@ -41,7 +41,7 @@ public final class XQIntValueMap extends XQHashMap {
       final int v = (int) d;
       if(d == v) {
         final int i = map.index(v);
-        if(i != 0) return valueInternal(i);
+        if(i != 0) return valueAt(i - 1);
       }
     }
     return null;
@@ -56,13 +56,13 @@ public final class XQIntValueMap extends XQHashMap {
   }
 
   @Override
-  Item keyInternal(final int pos) {
-    return Int.get(map.key(pos));
+  public Item keyAt(final int pos) {
+    return Int.get(map.key(pos + 1));
   }
 
   @Override
-  Value valueInternal(final int pos) {
-    return map.value(pos);
+  public Value valueAt(final int pos) {
+    return map.value(pos + 1);
   }
 
   @Override

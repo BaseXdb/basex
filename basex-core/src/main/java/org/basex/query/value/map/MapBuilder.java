@@ -151,7 +151,7 @@ public final class MapBuilder {
    */
   public XQMap map() {
     return map == null ? XQMap.empty() : map.structSize() == 1 ?
-      XQMap.singleton(map.keyInternal(1), map.valueInternal(1)) : map;
+      XQMap.singleton(map.keyAt(0), map.valueAt(0)) : map;
   }
 
   /**

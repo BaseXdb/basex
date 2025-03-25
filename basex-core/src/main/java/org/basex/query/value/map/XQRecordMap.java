@@ -51,7 +51,7 @@ public final class XQRecordMap extends XQHashMap {
   Value getInternal(final Item key) throws QueryException {
     if(key.type.isStringOrUntyped()) {
       final int i = ((RecordType) type).fields().index(key.string(null));
-      if(i != 0) return valueInternal(i);
+      if(i != 0) return valueAt(i - 1);
     }
     return null;
   }
@@ -62,13 +62,13 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   @Override
-  Item keyInternal(final int pos) {
-    return Str.get(((RecordType) type).fields().key(pos));
+  public Item keyAt(final int pos) {
+    return Str.get(((RecordType) type).fields().key(pos + 1));
   }
 
   @Override
-  Value valueInternal(final int pos) {
-    return values[pos - 1];
+  public Value valueAt(final int pos) {
+    return values[pos];
   }
 
   @Override

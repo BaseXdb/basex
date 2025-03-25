@@ -42,13 +42,13 @@ public final class XQItemValueMap extends XQHashMap {
   }
 
   @Override
-  Item keyInternal(final int pos) {
-    return map.key(pos);
+  public Item keyAt(final int pos) {
+    return map.key(pos + 1);
   }
 
   @Override
-  Value valueInternal(final int pos) {
-    return map.value(pos);
+  public Value valueAt(final int pos) {
+    return map.value(pos + 1);
   }
 
   @Override

@@ -37,7 +37,7 @@ public final class XQStrMap extends XQHashMap {
   Str getInternal(final Item key) throws QueryException {
     if(key.type.isStringOrUntyped()) {
       final int i = map.index(key.string(null));
-      if(i != 0) return valueInternal(i);
+      if(i != 0) return valueAt(i - 1);
     }
     return null;
   }
@@ -48,13 +48,13 @@ public final class XQStrMap extends XQHashMap {
   }
 
   @Override
-  Str keyInternal(final int pos) {
-    return Str.get(map.key(pos));
+  public Str keyAt(final int pos) {
+    return Str.get(map.key(pos + 1));
   }
 
   @Override
-  Str valueInternal(final int pos) {
-    return Str.get(map.value(pos));
+  public Str valueAt(final int pos) {
+    return Str.get(map.value(pos + 1));
   }
 
   @Override

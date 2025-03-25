@@ -48,14 +48,14 @@ abstract class XQHashMap extends XQMap {
   @Override
   public final void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
     final long is = structSize();
-    for(int i = 1; i <= is; i++) func.accept(keyInternal(i), valueInternal(i));
+    for(int i = 0; i < is; i++) func.accept(keyAt(i), valueAt(i));
   }
 
   @Override
   public final boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
     final long is = structSize();
-    for(int i = 1; i <= is; i++) {
-      if(!func.test(keyInternal(i), valueInternal(i))) return false;
+    for(int i = 0; i < is; i++) {
+      if(!func.test(keyAt(i), valueAt(i))) return false;
     }
     return true;
   }
@@ -65,7 +65,7 @@ abstract class XQHashMap extends XQMap {
     return new BasicIter<>(structSize()) {
       @Override
       public Item get(final long i) {
-        return keyInternal((int) i + 1);
+        return keyAt((int) i);
       }
       @Override
       public Value value(final QueryContext qc, final Expr expr) {
@@ -109,9 +109,7 @@ abstract class XQHashMap extends XQMap {
     if(trie == null) {
       XQMap mp = empty();
       final long is = structSize();
-      for(int i = 1; i <= is; i++) {
-        mp = mp.put(keyInternal(i), valueInternal(i));
-      }
+      for(int i = 0; i < is; i++) mp = mp.put(keyAt(i), valueAt(i));
       trie = mp;
     }
     return trie;

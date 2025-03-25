@@ -105,7 +105,7 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   public final Value get(final Item key) throws QueryException {
-    return getInternal(key, true);
+    return get(key, true);
   }
 
   /**
@@ -115,7 +115,7 @@ public abstract class XQMap extends XQStruct {
    * @return value or {@code null}
    * @throws QueryException query exception
    */
-  public final Value getInternal(final Item key, final boolean empty) throws QueryException {
+  public final Value get(final Item key, final boolean empty) throws QueryException {
     final Value value = getInternal(key);
     return value != null ? value : empty ? Empty.VALUE : null;
   }
@@ -130,38 +130,20 @@ public abstract class XQMap extends XQStruct {
 
   /**
    * Gets a map key at the specified position.
-   * @param index map index (starts with 1)
-   * @return value or {@code Empty#VALUE}
-   */
-  public final Item keyAt(final long index) {
-    return index > 0 && index <= structSize() ? keyInternal((int) index) : Empty.VALUE;
-  }
-
-  /**
-   * Gets a map value at the specified position.
-   * @param index map index (starts with 1)
-   * @return value or {@code Empty#VALUE}
-   */
-  public final Value valueAt(final long index) {
-    return index > 0 && index <= structSize() ? valueInternal((int) index) : Empty.VALUE;
-  }
-
-  /**
-   * Gets a map key at the specified position.
-   * @param index map index (starts with 1, must be valid)
+   * @param index map index (starting with 0, must be valid)
    * @return key
    */
-  abstract Item keyInternal(int index);
+  public abstract Item keyAt(int index);
 
   /**
    * Gets a map value at the specified position.
-   * @param index map index (starts with 1, must be valid)
+   * @param index map index (starting with 0, must be valid)
    * @return value
    */
-  abstract Value valueInternal(int index);
+  public abstract Value valueAt(int index);
 
   /**
-   * Puts the given value into this map and replaces existing keys.
+   * Puts a value with the specified key into this map.
    * @param key key to insert
    * @param value value to insert
    * @return updated map if changed, {@code this} otherwise

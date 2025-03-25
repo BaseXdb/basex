@@ -38,14 +38,14 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
-  Item keyInternal(final int index) {
+  public Item keyAt(final int index) {
     return keys().get(index);
   }
 
   @Override
-  Value valueInternal(final int index) {
+  public Value valueAt(final int index) {
     try {
-      return getInternal(keyInternal(index));
+      return getInternal(keyAt(index));
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }

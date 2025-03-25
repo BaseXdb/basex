@@ -21,7 +21,7 @@ public final class MapGet extends MapFn {
     final Item key = toAtomItem(arg(1), qc);
     final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
-    final Value value = map.getInternal(key, fallback == null);
+    final Value value = map.get(key, fallback == null);
     return value != null ? value : fallback.invoke(qc, info, key);
   }
 

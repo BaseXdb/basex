@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -18,7 +19,9 @@ public final class UtilMapKeyAt extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final long index = toLong(arg(1), qc);
-    return map.keyAt(index);
+
+    final long size = map.structSize();
+    return index > 0 && index <= size ? map.keyAt((int) index - 1) : Empty.VALUE;
   }
 
   @Override
