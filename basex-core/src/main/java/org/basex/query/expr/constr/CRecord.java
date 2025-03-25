@@ -1,10 +1,13 @@
 package org.basex.query.expr.constr;
 
+import static org.basex.query.QueryText.*;
+
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -40,22 +43,21 @@ public final class CRecord extends Arr {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final MapBuilder mb = new MapBuilder();
-    final Expr[] args = args();
-    int i = 0;
+    int e = 0;
     for(final Iterator<byte[]> iter = recordType.iterator(); iter.hasNext();) {
       final byte[] key = iter.next();
-      final Value value = args[i++].value(qc);
-      final boolean omit;
+      final Value value = exprs[e++].value(qc);
+      final boolean add;
       if(value.isEmpty()) {
         final RecordField rf = recordType.field(key);
-        omit = rf.isOptional() && rf.expr() == null;
+        add = !rf.isOptional() || rf.expr() != null;
       } else {
-        omit = false;
+        add = true;
       }
-      if(!omit) mb.put(key, value);
+      if(add) mb.put(key, value);
     }
     if(recordType.isExtensible()) {
-      toMap(arg(i), qc).forEach((k, v) -> {
+      toMap(arg(e), qc).forEach((k, v) -> {
         if(!mb.contains(k)) mb.put(k, v);
       });
     }
@@ -68,7 +70,23 @@ public final class CRecord extends Arr {
   }
 
   @Override
+  public String description() {
+    return RECORD + " constructor";
+  }
+
+  @Override
   public void toString(final QueryString qs) {
-    qs.token(recordType.name()).params(exprs);
+    final QNm name = recordType.name();
+    if(name != null) {
+      qs.token(name).params(exprs);
+    } else {
+      qs.token("{ ");
+      int e = -1;
+      for(final byte[] key : recordType) {
+        if(++e != 0) qs.token(',');
+        qs.quoted(key).token(':').token(exprs[e]);
+      }
+      qs.token(" }");
+    }
   }
 }

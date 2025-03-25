@@ -95,7 +95,7 @@ public final class CArray extends Arr {
 
   @Override
   public String description() {
-    return ARRAY;
+    return ARRAY + " constructor";
   }
 
   @Override

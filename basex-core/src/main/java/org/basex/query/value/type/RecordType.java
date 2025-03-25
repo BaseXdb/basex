@@ -5,7 +5,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.Set;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.util.hash.*;
@@ -61,17 +61,17 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
 
   /**
    * Calculate union type of field sequence types.
-   * @param recordFields field declarations
+   * @param rfs field declarations
    * @return union type
    */
-  private static SeqType unionType(final TokenObjectMap<RecordField> recordFields) {
-    if(recordFields.isEmpty()) return SeqType.ITEM_ZM;
-    SeqType unionType = null;
-    for(final RecordField recordField : recordFields.values()) {
-      final SeqType st = recordField.seqType();
-      unionType = unionType == null ? st : unionType.union(st);
+  private static SeqType unionType(final TokenObjectMap<RecordField> rfs) {
+    if(rfs.isEmpty()) return SeqType.ITEM_ZM;
+    SeqType ust = null;
+    for(final RecordField rf : rfs.values()) {
+      final SeqType st = rf.seqType();
+      ust = ust == null ? st : ust.union(st);
     }
-    return unionType;
+    return ust;
   }
 
   @Override
@@ -111,12 +111,12 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
    */
   public boolean instance(final XQMap map) {
     try {
-      for(final byte[] field : fields) {
-        final RecordField f = fields.get(field);
-        final Item key = Str.get(field);
-        if(map.contains(key)) {
-          if(f.seqType != null && !f.seqType.instance(map.get(key))) return false;
-        } else if(!f.optional) {
+      for(final byte[] key : fields) {
+        final RecordField rf = fields.get(key);
+        final Str string = Str.get(key);
+        if(map.contains(string)) {
+          if(rf.seqType != null && !rf.seqType.instance(map.get(string))) return false;
+        } else if(!rf.optional) {
           return false;
         }
       }
@@ -131,10 +131,14 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     }
   }
 
-
   @Override
   public boolean eq(final Type type) {
-    return eq(type, emptySet());
+    return eq(type, emptySet(), false);
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    return this == o || o instanceof RecordType && eq((RecordType) o, emptySet(), true);
   }
 
   /**
@@ -143,28 +147,41 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
    * recursion.
    * @param type other type
    * @param pairs pairs of RecordTypes that are currently being checked, or have been checked before
-   * @return {@code true} if both types are equal, {@code false} otherwise
+   * @param strict strict comparison (consider order and name of record)
+   * @return result of check
    */
-  private boolean eq(final Type type, final Set<Pair> pairs) {
+  private boolean eq(final Type type, final Set<Pair> pairs, final boolean strict) {
     if(this == type) return true;
     if(!(type instanceof RecordType)) return false;
     final RecordType rt = (RecordType) type;
     if(extensible != rt.extensible || fields.size() != rt.fields.size()) return false;
 
-    for(final byte[] field : fields) {
-      if(!rt.fields.contains(field)) return false;
-      final var f = fields.get(field);
-      final var rtf = rt.fields.get(field);
-      if(f.optional != rtf.optional) return false;
-      final SeqType fst = f.seqType();
-      final SeqType rtfst = rtf.seqType();
-      if(fst.occ != rtfst.occ) return false;
-      final Type ft = fst.type, rtft = rtfst.type;
-      if(ft instanceof RecordType && rtft instanceof RecordType) {
-        final Pair pair = new Pair(ft, rtft);
-        if(!pairs.contains(pair) && !((RecordType) ft).eq(rtft, pair.addTo(pairs))) return false;
-      } else if(!ft.eq(rtft)) {
+    final Predicate<byte[]> compareFields = key -> {
+      final RecordField rf1 = fields.get(key), rf2 = rt.fields.get(key);
+      if(rf1 == null || rf2 == null || rf1.optional != rf2.optional) return false;
+      final SeqType st1 = rf1.seqType(), st2 = rf2.seqType();
+      if(st1.occ != st2.occ) return false;
+      final Type tp1 = st1.type, tp2 = st2.type;
+      if(tp1 instanceof RecordType && tp2 instanceof RecordType) {
+        final Pair pair = new Pair(tp1, tp2);
+        if(!pairs.contains(pair) && !((RecordType) tp1).eq(tp2, pair.addTo(pairs), strict)) {
+          return false;
+        }
+      } else if(!tp1.eq(tp2)) {
         return false;
+      }
+      return true;
+    };
+
+    if(strict) {
+      if(!Objects.equals(name, rt.name)) return false;
+      final Iterator<byte[]> iter = fields.iterator(), iter2 = rt.fields.iterator();
+      for(byte[] key; (key = iter.next()) != null;) {
+        if(!Token.eq(key, iter2.next()) || !compareFields.test(key)) return false;
+      }
+    } else {
+      for(final byte[] key : fields) {
+        if(!compareFields.test(key)) return false;
       }
     }
     return true;
@@ -197,14 +214,14 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
       final RecordType rt = (RecordType) type;
       if(!rt.extensible) {
         if(extensible) return false;
-        for(final byte[] field : fields) {
-          if(!rt.fields.contains(field)) return false;
+        for(final byte[] key : fields) {
+          if(!rt.fields.contains(key)) return false;
         }
       }
-      for(final byte[] field : rt.fields) {
-        final RecordField rtf = rt.fields.get(field);
-        if(fields.contains(field)) {
-          final RecordField f = fields.get(field);
+      for(final byte[] key : rt.fields) {
+        final RecordField rtf = rt.fields.get(key);
+        if(fields.contains(key)) {
+          final RecordField f = fields.get(key);
           if(!rtf.optional && f.optional) return false;
           final SeqType fst = f.seqType(), rtfst = rtf.seqType();
           if(fst != rtfst) {
@@ -230,8 +247,8 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     if(!extensible && type instanceof MapType) {
       final MapType mt = (MapType) type;
       if(!mt.keyType().oneOf(AtomType.STRING, AtomType.ANY_ATOMIC_TYPE)) return false;
-      for(final byte[] field : fields) {
-        if(!fields.get(field).seqType().instanceOf(mt.valueType())) return false;
+      for(final byte[] key : fields) {
+        if(!fields.get(key).seqType().instanceOf(mt.valueType())) return false;
       }
       return true;
     }
@@ -270,11 +287,11 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     if(type instanceof RecordType) {
       final RecordType rt = (RecordType) type;
       final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
-      for(final byte[] field : fields) {
-        final RecordField f = fields.get(field);
-        if(rt.fields.contains(field)) {
+      for(final byte[] key : fields) {
+        final RecordField f = fields.get(key);
+        if(rt.fields.contains(key)) {
           // common field
-          final RecordField rtf = rt.fields.get(field);
+          final RecordField rtf = rt.fields.get(key);
           final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
           final Type ft = fst.type, rtft = rtfst.type;
           final SeqType union;
@@ -287,16 +304,16 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
           } else {
             union = fst.union(rtfst);
           }
-          map.put(field, new RecordField(f.optional || rtf.optional, union));
+          map.put(key, new RecordField(f.optional || rtf.optional, union));
         } else {
           // field missing in type
-          map.put(field, new RecordField(true, f.seqType));
+          map.put(key, new RecordField(true, f.seqType));
         }
       }
-      for(final byte[] field : rt.fields) {
-        if(!fields.contains(field)) {
+      for(final byte[] key : rt.fields) {
+        if(!fields.contains(key)) {
           // field missing in this RecordType
-          map.put(field, new RecordField(true, rt.fields.get(field).seqType));
+          map.put(key, new RecordField(true, rt.fields.get(key).seqType));
         }
       }
       return new RecordType(extensible || rt.extensible, map, null);
@@ -328,11 +345,11 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
     if(!(type instanceof RecordType)) return null;
     final RecordType rt = (RecordType) type;
     final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
-    for(final byte[] field : fields) {
-      final RecordField f = fields.get(field);
-      if(rt.fields.contains(field)) {
+    for(final byte[] key : fields) {
+      final RecordField f = fields.get(key);
+      if(rt.fields.contains(key)) {
         // common field
-        final RecordField rtf = rt.fields.get(field);
+        final RecordField rtf = rt.fields.get(key);
         final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
         final Type ft = fst.type, rtft = rtfst.type;
         final SeqType is;
@@ -346,18 +363,18 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
           is = fst.intersect(rtfst);
         }
         if(is == null) return null;
-        map.put(field, new RecordField(f.optional && rtf.optional, is));
+        map.put(key, new RecordField(f.optional && rtf.optional, is));
       } else {
         // field missing in type
         if(!rt.extensible) return null;
-        map.put(field, new RecordField(false, f.seqType));
+        map.put(key, new RecordField(false, f.seqType));
       }
     }
-    for(final byte[] field : rt.fields) {
-      if(!fields.contains(field)) {
+    for(final byte[] key : rt.fields) {
+      if(!fields.contains(key)) {
         // field missing in this RecordType
         if(!extensible) return null;
-        map.put(field, new RecordField(false, rt.fields.get(field).seqType));
+        map.put(key, new RecordField(false, rt.fields.get(key).seqType));
       }
     }
     return new RecordType(extensible && rt.extensible, map, null);
@@ -376,7 +393,7 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
       qs.token('*');
     } else {
       int i = 0;
-      for(final byte[] field : fields) {
+      for(final byte[] key : fields) {
         if(i++ != 0) {
           qs.token(',').token(' ');
           if(i > 3) {
@@ -384,12 +401,12 @@ public final class RecordType extends MapType implements Iterable<byte[]> {
             break;
           }
         }
-        if(XMLToken.isNCName(field)) {
-          qs.token(field);
+        if(XMLToken.isNCName(key)) {
+          qs.token(key);
         } else {
-          qs.quoted(field);
+          qs.quoted(key);
         }
-        final RecordField f = fields.get(field);
+        final RecordField f = fields.get(key);
         if(f.optional) qs.token('?');
         if(f.seqType != null) {
           Type type = f.seqType.type;

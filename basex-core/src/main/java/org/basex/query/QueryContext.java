@@ -489,7 +489,7 @@ public final class QueryContext extends Job implements Closeable {
   public RecordType newRecord(final boolean extensible, final TokenObjectMap<RecordField> fields) {
     final RecordType rt = new RecordType(extensible, fields, null);
     for(final RecordType recordType : recordTypes) {
-      if(recordType.eq(rt)) return recordType;
+      if(recordType.equals(rt)) return recordType;
     }
     recordTypes.add(rt);
     return rt;

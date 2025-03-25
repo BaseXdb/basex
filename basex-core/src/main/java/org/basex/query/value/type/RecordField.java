@@ -2,6 +2,8 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 
@@ -68,8 +70,9 @@ public final class RecordField {
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     if(!(obj instanceof RecordField)) return false;
-    final RecordField other = (RecordField) obj;
-    return optional == other.optional && seqType().equals(other.seqType());
+    final RecordField rf = (RecordField) obj;
+    return optional == rf.optional && Objects.equals(seqType, rf.seqType) &&
+        Objects.equals(expr, rf.expr);
   }
 
   @Override

@@ -7,6 +7,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -40,32 +41,33 @@ public final class CMap extends Arr {
     // { $a: $b }  ->  map:entry($a, $b)
     if(el == 2) return cc.function(_MAP_ENTRY, info, exprs);
 
-    // check if record type can be defined for constructed map
-    final MapType mt;
-    boolean record = true;
+    // use record constructor (not too large, only strings as keys)?
+    boolean record = el < 32;
     for(int e = 0; e < el && record; e += 2) {
-      if(!(exprs[e] instanceof AStr)) record = false;
+      if(!exprs[e].seqType().eq(SeqType.STRING_O)) record = false;
     }
     if(record) {
       final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
+      final ExprList args = new ExprList(el / 2);
       for(int e = 0; e < el; e += 2) {
-        fields.put(((Item) exprs[e]).string(info), new RecordField(false, exprs[e + 1].seqType()));
+        final Expr key = exprs[e], value = exprs[e + 1];
+        fields.put(((Item) key).string(info), new RecordField(false, value.seqType()));
+        args.add(value);
       }
-      mt = cc.qc.newRecord(false, fields);
-    } else {
-      // determine static types
-      AtomType kt = AtomType.ANY_ATOMIC_TYPE;
-      SeqType vt = SeqType.ITEM_ZM;
-      for(int e = 0; e < el; e += 2) {
-        final SeqType kst = exprs[e].seqType(), dst = exprs[e + 1].seqType();
-        final AtomType akt = kst.type.atomic();
-        kt = akt == null || !kst.one() || kst.mayBeArray() ? AtomType.ANY_ATOMIC_TYPE :
-          e == 0 ? akt : kt.union(akt);
-        vt = e == 0 ? dst : vt.union(dst);
-      }
-      mt = MapType.get(kt, vt);
+      return new CRecord(info, cc.qc.newRecord(false, fields), args.finish()).optimize(cc);
     }
-    exprType.assign(mt);
+
+    // determine static types
+    AtomType kt = AtomType.ANY_ATOMIC_TYPE;
+    SeqType vt = SeqType.ITEM_ZM;
+    for(int e = 0; e < el; e += 2) {
+      final SeqType kst = exprs[e].seqType(), dst = exprs[e + 1].seqType();
+      final AtomType akt = kst.type.atomic();
+      kt = akt == null || !kst.one() || kst.mayBeArray() ? AtomType.ANY_ATOMIC_TYPE :
+        e == 0 ? akt : kt.union(akt);
+      vt = e == 0 ? dst : vt.union(dst);
+    }
+    exprType.assign(MapType.get(kt, vt));
 
     return values(true, cc) ? cc.preEval(this) : this;
   }
@@ -77,7 +79,7 @@ public final class CMap extends Arr {
     for(int e = 0; e < el; e += 2) {
       final Item key = toAtomItem(exprs[e], qc);
       final Value value = exprs[e + 1].value(qc);
-      if(mb.contains(key)) throw MAPDUPLKEY_X.get(info);
+      if(mb.contains(key)) throw MAPDUPLKEY_X.get(info, key);
       mb.put(key, value);
     }
     return mb.map(this);
@@ -95,7 +97,7 @@ public final class CMap extends Arr {
 
   @Override
   public String description() {
-    return MAP;
+    return MAP + " constructor";
   }
 
   @Override
