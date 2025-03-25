@@ -452,6 +452,8 @@ public final class MapModuleTest extends SandboxTest {
 
     check(func.args(" ()") + " => map:keys()", "", empty());
     check(func.args(" { 'key': 1, 'value': 2 }") + " => map:keys()", 1, root(Int.class));
+
+    query(func.args(" { 'key': 1, 'value': 2, 'more': 3 }"), "{1:2}");
   }
 
   /** Test method. */

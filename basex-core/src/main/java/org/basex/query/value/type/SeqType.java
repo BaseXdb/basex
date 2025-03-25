@@ -236,7 +236,7 @@ public final class SeqType {
     TokenObjectMap<RecordField> map = new TokenObjectMap<>();
     map.put(Str.KEY.string(), new RecordField(false, SeqType.ANY_ATOMIC_TYPE_O));
     map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
-    PAIR = new RecordType(false, map, null);
+    PAIR = new RecordType(true, map, null);
     map = new TokenObjectMap<>();
     map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
     MEMBER = new RecordType(false, map, null);
