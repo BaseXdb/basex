@@ -5,6 +5,9 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.func.*;
+import org.basex.query.func.map.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -220,5 +223,36 @@ public final class RecordTest extends SandboxTest {
         type(func, "local:x"));
     check("declare record local:x(x, y?); local:x(1) => map:put(0, 0)", "{\"x\":1,0:0}",
         type(func, "map(*)"));
+  }
+
+  /** Tests for the compact record map implementation. */
+  @Test public void recordMap() {
+    String map = "{ 'a': 1, 'b': 2 }";
+    check(map + " => map:get('a')", 1, root(Int.class));
+    check(map + " => map:get('c')", "", empty());
+    check(map + " => map:get(1)", "", empty());
+    check(map + " => map:get(<?_ 1?> cast as xs:integer)", "", empty());
+    check(map + " => map:put('b', 3)", "{\"a\":1,\"b\":3}", root(XQRecordMap.class));
+    check(map + " => map:put('b', xs:byte(3))", "{\"a\":1,\"b\":3}", root(XQRecordMap.class));
+    check(map + " => map:put('b', '3')", "{\"a\":1,\"b\":\"3\"}", root(XQTrieMap.class));
+    check(map + " => map:put('c', 3)", "{\"a\":1,\"b\":2,\"c\":3}", root(XQTrieMap.class));
+    check(map + " => map:put(3, 3)", "{\"a\":1,\"b\":2,3:3}", root(XQTrieMap.class));
+    check(map + " => map:remove('b')", "{\"a\":1}", root(XQTrieMap.class));
+    check(map + " => map:remove('c')", "{\"a\":1,\"b\":2}", root(XQRecordMap.class));
+    check(map + " => map:remove(1)", "{\"a\":1,\"b\":2}", root(XQRecordMap.class));
+    check(map + " => map:remove(<?_ 1?> cast as xs:integer)", "{\"a\":1,\"b\":2}",
+        root(XQRecordMap.class));
+
+    map = "{ 'a': 1, 'b': <?_ 2?> cast as xs:integer }";
+    check(map + " => map:get('a')", 1, type(MapGet.class, "xs:integer"));
+    check(map + " => map:get('c')", "", empty());
+    check(map + " => map:get(1)", "", empty());
+    check(map + " => map:get(<?_ 1?> cast as xs:integer)", "", empty());
+    check(map + " => map:get(<?_ a?>)", 1, type(MapGet.class, "xs:integer?"));
+    check(map + " => map:get(<?_ c?>)", "", type(MapGet.class, "xs:integer?"));
+
+    map = "for $b in 1 to 6 return { 'a': 1, 'b': $b }";
+    check(map + " => map:get('b')", "1\n2\n3\n4\n5\n6", type(DualMap.class, "xs:integer+"));
+
   }
 }

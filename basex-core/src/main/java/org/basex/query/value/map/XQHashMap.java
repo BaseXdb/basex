@@ -36,13 +36,13 @@ abstract class XQHashMap extends XQMap {
   abstract Value getInternal(Item key) throws QueryException;
 
   @Override
-  public final XQMap put(final Item key, final Value value) throws QueryException {
+  public XQMap put(final Item key, final Value value) throws QueryException {
     return trie().put(key, value);
   }
 
   @Override
   public final XQMap remove(final Item key) throws QueryException {
-    return trie().remove(key);
+    return getInternal(key) == null ? this : trie().remove(key);
   }
 
   @Override
