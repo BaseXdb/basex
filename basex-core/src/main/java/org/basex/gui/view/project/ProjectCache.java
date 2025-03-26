@@ -97,7 +97,6 @@ final class ProjectCache implements Iterable<String> {
         if(cache.size() == MAX) return;
         cache.add(file.path());
       }
-
     } catch(final IOException ex) {
       Util.debug(ex);
     }

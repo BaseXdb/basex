@@ -201,5 +201,4 @@ public final class HtmlOptions extends Options {
        */
       ICU
   }
-
 }

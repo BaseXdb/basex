@@ -119,7 +119,6 @@ public final class CreateDB extends ACreate {
 
       if(options.get(MainOptions.CREATEONLY)) Close.close(context);
       return true;
-
     } catch(final JobException ex) {
       throw ex;
     } catch(final IOException ex) {

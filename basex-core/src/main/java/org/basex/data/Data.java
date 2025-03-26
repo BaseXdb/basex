@@ -542,7 +542,6 @@ public abstract class Data {
           if(meta.attrindex) attrIndex.add(new ValueCache(pre, IndexType.ATTRIBUTE, this));
           if(meta.tokenindex) tokenIndex.add(new ValueCache(pre, IndexType.TOKEN, this));
         }
-
       } else {
         // update element name
         final IntList pres = new IntList();

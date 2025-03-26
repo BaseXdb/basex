@@ -851,7 +851,6 @@ public final class SeqTypeTest {
     assertFalse(SeqType.NODE_O.mayBeFunction());
     assertFalse(SeqType.ELEMENT_O.mayBeFunction());
     assertFalse(SeqType.NMTOKENS_O.mayBeFunction());
-
   }
 
   /**

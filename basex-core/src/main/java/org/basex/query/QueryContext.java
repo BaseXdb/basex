@@ -657,7 +657,6 @@ public final class QueryContext extends Job implements Closeable {
       updates.apply(this);
 
       return vb.value(value);
-
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw BASEX_OVERFLOW.get(null);

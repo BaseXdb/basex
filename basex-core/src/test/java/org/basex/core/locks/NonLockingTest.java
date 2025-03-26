@@ -39,7 +39,6 @@ public final class NonLockingTest extends SandboxTest {
       // stop sleeping process, wait for its completion
       query(_JOB_REMOVE.args(id));
       query(_JOB_WAIT.args(id));
-
     } finally {
       execute(new DropDB(NAME));
     }
@@ -69,7 +68,6 @@ public final class NonLockingTest extends SandboxTest {
 
       // stop sleeping jobs
       query(LIST_JOBS + '!' + _JOB_REMOVE.args(" ."));
-
     } finally {
       execute(new DropDB(NAME));
     }

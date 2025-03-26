@@ -151,7 +151,6 @@ public final class AtomicUpdateCache {
       final BasicUpdate m = recent.merge(data, candidate);
       if(m != null) add(m, true);
       else add(candidate, false);
-
     }
   }
 

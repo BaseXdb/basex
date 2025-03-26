@@ -128,7 +128,6 @@ public final class RecordType extends MapType {
             return false;
         }
       }
-
     }
     return true;
   }

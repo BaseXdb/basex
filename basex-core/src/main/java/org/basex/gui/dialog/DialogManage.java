@@ -150,52 +150,43 @@ public final class DialogManage extends BaseXDialog {
 
     if(cmp == open) {
       close();
-
     } else if(cmp == drop) {
       for(final String s : dbs) {
         if(ctx.soptions.dbExists(s)) cmds.add(new DropDB(s));
       }
       if(!BaseXDialog.confirm(gui, Util.info(DROPPING_DB_X, cmds.size()))) return;
       refresh = true;
-
     } else if(cmp == rename) {
       final DialogInput input = new DialogInput(db, this, Action.ALTER_DATABASE);
       if(!input.ok() || input.input().equals(db)) return;
       cmds.add(new AlterDB(db, input.input()));
       refresh = true;
-
     } else if(cmp == copy) {
       final DialogInput input = new DialogInput(db, this, Action.COPY_DATABASE);
       if(!input.ok() || input.input().equals(db)) return;
       cmds.add(new Copy(db, input.input()));
       refresh = true;
-
     } else if(cmp == backup) {
       final DialogInput input = new DialogInput("", this, Action.CREATE_BACKUP);
       if(!input.ok()) return;
       for(final String name : dbs) cmds.add(new CreateBackup(name, input.input()));
-
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
       if(!gui.context.soptions.dbExists(db) || BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION))
         cmds.add(new Restore(backups.getValue()));
-
     } else if(cmp == backups) {
       // don't reset the combo box after selecting an item
       comment.setText(ShowBackups.comment(backups.getValue(), ctx));
-
     } else if(cmp == delete) {
       if(!BaseXDialog.confirm(gui, Util.info(DROP_BACKUPS_X, 1))) return;
       cmds.add(new DropBackup(backups.getValue()));
       refresh = backups.getList().length == 1;
       backups.requestFocusInWindow();
-
     } else if(cmp == deleteAll) {
       final String[] back = backups.getList();
       if(!BaseXDialog.confirm(gui, Util.info(DROP_BACKUPS_X, back.length))) return;
       for(final String b : back) cmds.add(new DropBackup(b));
       refresh = true;
-
     } else {
       final String title = dbs.size() == 1 ? db : dbs.size() + " " + DATABASES;
       doc1.setChoppedText(title, 600);

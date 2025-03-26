@@ -57,7 +57,6 @@ final class MyKeySelector extends KeySelector {
         } catch(final KeyException ke) {
           throw new KeySelectorException(ke);
         }
-
       } else if(s instanceof X509Data) {
         for(final Object d : ((X509Data) s).getContent()) {
           if(d instanceof X509Certificate) {

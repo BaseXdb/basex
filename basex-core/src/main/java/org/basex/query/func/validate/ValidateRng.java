@@ -88,7 +88,6 @@ public class ValidateRng extends ValidateFn {
           // load schema, validate document
           final Object loaded = vdLoadSchema.invoke(vd, schm.inputSource());
           if(loaded.equals(Boolean.TRUE)) vdValidate.invoke(vd, input.inputSource());
-
         } catch(final ClassNotFoundException ex) {
           Util.debug(ex);
           throw VALIDATE_NOTFOUND_X.get(info);

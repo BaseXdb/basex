@@ -169,5 +169,4 @@ public final class Uri extends AStr {
     final Uri u = (Uri) obj;
     return type == u.type && Token.eq(value, u.value);
   }
-
 }

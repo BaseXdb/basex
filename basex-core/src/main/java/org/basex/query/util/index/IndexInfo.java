@@ -177,7 +177,6 @@ public final class IndexInfo {
       // create expression for index access
       va = new ValueAccess(info, tokens, type, test, db);
       va.exprType.assign(va.seqType(), size);
-
     } else {
       /* index access is not possible if returned type is not a string or untyped; if
        * expression depends on context; or if it is nondeterministic. examples:

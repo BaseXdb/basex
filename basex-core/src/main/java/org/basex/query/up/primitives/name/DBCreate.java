@@ -71,7 +71,6 @@ public final class DBCreate extends NameUpdate {
         }
       }
       Close.close(data, qc.context);
-
     } catch(final IOException ex) {
       throw UPDBERROR_X.get(info, ex);
     } finally {

@@ -176,5 +176,4 @@ public final class Str extends AStr {
   public String toJava() {
     return Token.string(value);
   }
-
 }

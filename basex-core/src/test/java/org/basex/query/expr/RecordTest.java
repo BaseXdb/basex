@@ -253,6 +253,5 @@ public final class RecordTest extends SandboxTest {
 
     map = "for $b in 1 to 6 return { 'a': 1, 'b': $b }";
     check(map + " => map:get('b')", "1\n2\n3\n4\n5\n6", type(DualMap.class, "xs:integer+"));
-
   }
 }

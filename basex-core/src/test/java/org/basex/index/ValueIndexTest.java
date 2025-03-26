@@ -153,5 +153,4 @@ public final class ValueIndexTest extends SandboxTest {
       assertEquals((int) value, count, "Wrong number of nodes returned: \"" + key + "\": ");
     });
   }
-
 }

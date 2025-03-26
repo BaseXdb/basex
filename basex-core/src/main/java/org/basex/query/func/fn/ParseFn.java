@@ -101,7 +101,6 @@ public abstract class ParseFn extends StandardFunc {
         if(ex instanceof InputException) throw INVCHARS_X.get(info, ex);
         throw RESNF_X.get(info, io);
       }
-
     } catch(final QueryException ex) {
       if(check && !ex.matches(ErrType.XPTY)) return Bln.FALSE;
       throw ex;

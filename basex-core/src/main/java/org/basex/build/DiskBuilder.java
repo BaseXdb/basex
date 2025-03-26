@@ -96,7 +96,6 @@ public final class DiskBuilder extends Builder {
       // return database instance. build will be finalized when this instance is closed
       meta.dirty = true;
       return new DiskData(meta, elemNames, attrNames, path, nspaces);
-
     } catch(final Throwable th) {
       DropDB.drop(meta.name, sopts);
       throw th;

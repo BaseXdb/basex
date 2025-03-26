@@ -116,7 +116,6 @@ public final class DialogPackages extends BaseXDialog {
       if(!dialog.ok()) return;
       refresh = true;
       cmds.add(new RepoInstall(dialog.url(), null));
-
     } else if(cmp == install) {
       final BaseXFileChooser fc = new BaseXFileChooser(this, FILE_OR_DIR,
           gui.gopts.get(GUIOptions.WORKPATH));
@@ -128,12 +127,10 @@ public final class DialogPackages extends BaseXDialog {
       gui.gopts.setFile(GUIOptions.WORKPATH, file);
       refresh = true;
       cmds.add(new RepoInstall(file.path(), null));
-
     } else if(cmp == delete) {
       if(!BaseXDialog.confirm(gui, Util.info(DELETE_PACKAGES_X, pkgs.size()))) return;
       refresh = true;
       for(final String pkg : pkgs) cmds.add(new RepoDelete(pkg, null));
-
     } else {
       final String key = packages.getValue();
       for(final Pkg pkg : new RepoManager(ctx).packages()) {

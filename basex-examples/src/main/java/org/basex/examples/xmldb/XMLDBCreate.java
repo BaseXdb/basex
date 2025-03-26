@@ -45,7 +45,6 @@ public final class XMLDBCreate {
 
       // Close the connection
       coll.close();
-
     } catch(final XMLDBException ex) {
       // Handle exceptions
       System.err.println("XML:DB Exception occurred " + ex.errorCode);

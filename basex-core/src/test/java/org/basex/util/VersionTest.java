@@ -165,5 +165,4 @@ public final class VersionTest {
     assertFalse(test6.compareTo(semVerMin1) > 0
         && test6.compareTo(semVerMax1) < 0);
   }
-
 }

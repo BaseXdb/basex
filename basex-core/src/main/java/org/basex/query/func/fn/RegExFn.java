@@ -146,7 +146,6 @@ abstract class RegExFn extends StandardFunc {
       }
 
       return new RegExpr(pattern);
-
     } catch(final PatternSyntaxException | ParseException | TokenMgrError ex) {
       Util.debug(ex);
       throw REGINVALID_X.get(info, regex);

@@ -311,7 +311,6 @@ public abstract class W3CTS extends Main {
           try(Serializer ser = Serializer.get(ao, sopts)) {
             for(final Item item : value) ser.serialize(item);
           }
-
         } catch(final Exception ex) {
           Util.debug(ex);
           if(!(ex instanceof QueryException || ex instanceof IOException)) {

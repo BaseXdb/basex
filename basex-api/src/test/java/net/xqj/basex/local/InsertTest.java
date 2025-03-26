@@ -129,5 +129,4 @@ public final class InsertTest extends XQJBaseTest {
     return rs.getInt();
   }
   // --------------------------------------------------------------------------
-
 }

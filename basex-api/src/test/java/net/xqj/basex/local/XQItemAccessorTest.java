@@ -512,5 +512,4 @@ public final class XQItemAccessorTest extends XQJBaseTest {
   }
 
   // --------------------------------------------------------------------------
-
 }

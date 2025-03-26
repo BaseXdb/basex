@@ -148,7 +148,6 @@ public final class CElem extends CName {
 
       // return optimized node
       return elem.finish();
-
     } finally {
       info.sc().ns.size(s);
     }

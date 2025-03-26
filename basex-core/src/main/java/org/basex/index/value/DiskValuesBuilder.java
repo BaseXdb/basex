@@ -77,7 +77,6 @@ public final class DiskValuesBuilder extends ValuesBuilder {
 
       finishIndex();
       return updindex ? new UpdatableDiskValues(data, type) : new DiskValues(data, type);
-
     } catch(final Throwable th) {
       // drop index files
       data.meta.drop(DiskValues.fileSuffix(type) + ".+");

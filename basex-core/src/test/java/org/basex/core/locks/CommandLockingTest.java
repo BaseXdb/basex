@@ -397,5 +397,4 @@ public final class CommandLockingTest extends SandboxTest {
     }
     return true;
   }
-
 }

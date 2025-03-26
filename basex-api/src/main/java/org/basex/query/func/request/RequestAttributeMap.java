@@ -27,5 +27,4 @@ public final class RequestAttributeMap extends ApiFunc {
     }
     return map.map();
   }
-
 }

@@ -90,13 +90,11 @@ public final class TreeSeqBuilder implements Iterable<Item> {
       // just insert the item
       items[(mid + inRight) % CAP] = item;
       inRight++;
-
     } else if(tree.isEmpty() && inLeft < TreeSeq.MAX_DIGIT) {
       // move the middle to the right
       mid = (mid + 1) % CAP;
       items[(mid + inRight + CAP - 1) % CAP] = item;
       inLeft++;
-
     } else {
       // push leaf node into the tree
       tree.append(new LeafNode(items(mid, NODE_SIZE)));

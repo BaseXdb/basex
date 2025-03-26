@@ -468,7 +468,6 @@ public final class HTTPConnection implements ClientInfo {
           final String[] creds = Strings.split(Base64.decode(details), ':', 2);
           user = user(creds[0]);
           if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException(user.name());
-
         } else {
           final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header);
           user = user(auth.get(RequestAttribute.USERNAME));
@@ -502,7 +501,6 @@ public final class HTTPConnection implements ClientInfo {
       // accept and return user
       context.blocker.remove(token(getRemoteAddr()));
       return user;
-
     } catch(final LoginException ex) {
       // delay users with wrong passwords
       context.blocker.delay(token(getRemoteAddr()));

@@ -80,5 +80,4 @@ public final class OptionsTest extends SandboxTest {
     query("delete node doc('" + file + "')/a");
     assertEquals(input, Token.string(file.read()));
   }
-
 }

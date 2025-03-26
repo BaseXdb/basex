@@ -501,7 +501,6 @@ public final class GUI extends JFrame implements BaseXWindow {
         // only cache output if data has not been updated (in which case notifyUpdate was called)
         if(!updated) text.cache(output, cmd, value);
       }
-
     } catch(final Exception ex) {
       // unexpected error
       updating = false;

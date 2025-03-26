@@ -148,5 +148,4 @@ public final class FnInvisibleXml extends StandardFunc {
     /** Invisible XML option fail-on-error. */
     public static final BooleanOption FAIL_ON_ERROR = new BooleanOption("fail-on-error", false);
   }
-
 }

@@ -125,7 +125,6 @@ final class RESTPost {
         case QUERY:   return RESTQuery.get(session, text, bindings);
       }
       throw HTTPStatus.BAD_REQUEST_X.get("Invalid POST command: " + cmd);
-
     } catch(final QueryException ex) {
       throw HTTPStatus.BAD_REQUEST_X.get(ex);
     }

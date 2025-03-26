@@ -619,7 +619,6 @@ public final class BaseXLayout {
 
       final Taskbar taskbar = Taskbar.getTaskbar();
       taskbar.setIconImage(BaseXImages.get("logo_large"));
-
     } catch(final Exception ex) {
       Util.errln("Failed to initialize native Mac OS X interface:");
       Util.stack(ex);

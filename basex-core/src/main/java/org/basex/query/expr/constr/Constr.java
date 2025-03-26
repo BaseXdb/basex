@@ -106,7 +106,6 @@ public final class Constr {
       if(type == NodeType.TEXT) {
         // type: text node
         text.add(node.string());
-
       } else if(type == NodeType.ATTRIBUTE) {
         // type: attribute node
 
@@ -125,7 +124,6 @@ public final class Constr {
         builder.add(name, qc.shared.token(node.string()));
         // add new namespace
         if(name.hasURI()) info.sc().ns.add(name.prefix(), name.uri());
-
       } else if(type == NodeType.NAMESPACE_NODE) {
         // type: namespace node
 
@@ -145,13 +143,11 @@ public final class Constr {
           duplNS = name;
           return false;
         }
-
       } else if(type == NodeType.DOCUMENT_NODE) {
         // type: document node
 
         final BasicNodeIter iter = node.childIter();
         for(Item it; (it = qc.next(iter)) != null && add(it, qnames););
-
       } else {
         // type: element/comment/processing instruction node
 
@@ -166,7 +162,6 @@ public final class Constr {
       if(more) text.add(' ');
       text.add(item.string(info));
       more = true;
-
     }
     return true;
   }

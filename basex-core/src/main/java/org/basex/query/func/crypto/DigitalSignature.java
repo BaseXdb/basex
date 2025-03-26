@@ -206,7 +206,6 @@ final class DigitalSignature {
         tfList = new ArrayList<>(2);
         tfList.add(fac.newTransform(Transform.XPATH, new XPathFilterParameterSpec(string(path))));
         tfList.add(fac.newTransform(Transform.ENVELOPED, (TransformParameterSpec) null));
-
       } else {
         tfList = Collections.singletonList(fac.newTransform(
             Transform.ENVELOPED, (TransformParameterSpec) null));
@@ -244,7 +243,6 @@ final class DigitalSignature {
       // actually sign the document
       xmlSig.sign(signContext);
       signedNode = NodeType.DOCUMENT_NODE.cast(inputNode, qc, info);
-
     } catch(final XPathExpressionException ex) {
       throw CX_XPINV.get(info, ex);
     } catch(final SAXException | IOException | ParserConfigurationException ex) {
@@ -278,7 +276,6 @@ final class DigitalSignature {
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
       return Bln.get(signature.validate(valContext));
-
     } catch(final XMLSignatureException | SAXException | ParserConfigurationException |
         IOException ex) {
       throw CX_IOEXC.get(info, ex);

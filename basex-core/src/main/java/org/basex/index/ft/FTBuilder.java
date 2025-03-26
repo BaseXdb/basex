@@ -87,7 +87,6 @@ public final class FTBuilder extends IndexBuilder {
 
       finishIndex();
       return new FTIndex(data);
-
     } catch(final Throwable th) {
       // drop index files
       data.meta.drop(DATAFTX + ".*");

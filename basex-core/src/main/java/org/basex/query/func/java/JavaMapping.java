@@ -134,5 +134,4 @@ final class JavaMapping {
     }
     return null;
   }
-
 }

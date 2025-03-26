@@ -208,7 +208,6 @@ public final class QueryJob extends Job implements Runnable {
 
       // retrieve result; copy persistent database nodes
       result.value = qp.value().materialize(d -> d == null || d.inMemory(), null, qp.qc);
-
     } catch(final JobException ex) {
       // query was interrupted: remove cached result
       Util.debug(ex);

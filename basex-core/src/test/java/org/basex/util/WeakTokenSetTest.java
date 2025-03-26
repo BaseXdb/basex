@@ -68,7 +68,6 @@ public final class WeakTokenSetTest {
           assertTrue(capacity - 1 >= wts.size(), msgPrefix + "unexpected size" + wts.size());
         }
       }
-
     } catch(final AssertionFailedError e) {
       throw e;
     } catch(final Throwable t) {

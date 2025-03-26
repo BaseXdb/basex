@@ -128,7 +128,6 @@ public abstract class JsonSerializer extends StandardSerializer {
         level--;
         indent();
         out.print('}');
-
       } else if(item instanceof XQArray) {
         level++;
         out.print('[');
@@ -144,7 +143,6 @@ public abstract class JsonSerializer extends StandardSerializer {
         level--;
         indent();
         out.print(']');
-
       } else {
         throw SERJSONFUNC_X.getIO(item.type);
       }

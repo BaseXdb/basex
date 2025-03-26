@@ -26,5 +26,4 @@ public final class RequestCookieMap extends ApiFunc {
     }
     return map.map();
   }
-
 }

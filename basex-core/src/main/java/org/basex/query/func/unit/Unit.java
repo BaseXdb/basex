@@ -170,7 +170,6 @@ final class Unit {
 
       // run finalizing tests
       for(final StaticFunc sf : afterModule) eval(sf);
-
     } catch(final QueryException ex) {
       if(current == null) {
         // handle errors caused by parsing or compilation
