@@ -79,7 +79,7 @@ final class Unit {
     final Performance perf = new Performance();
 
     try(QueryContext qc = new QueryContext(ctx)) {
-      input = file.string();
+      input = file.readString();
       qc.parse(input, file.path());
 
       // loop through all functions
@@ -225,7 +225,7 @@ final class Unit {
         error = FElem.build(Q_ERROR);
       }
       error.add(Q_LINE, ex.line()).add(Q_COLUMN, ex.column());
-      final String url = IO.get(ex.file()).url();
+      final String url = IO.get(ex.path()).url();
       if(!file.url().equals(url)) error.add(Q_URI, url);
 
       if(ex instanceof UnitException) {

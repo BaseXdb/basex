@@ -40,7 +40,7 @@ public final class ModuleTest extends SandboxTest {
   @Test public void module2() throws Exception {
     final IOFile file = new IOFile("src/test/resources/recmod/a.xqm");
     try(QueryContext qc = new QueryContext(context)) {
-      qc.parse(file.string(), file.path());
+      qc.parse(file.readString(), file.path());
     }
   }
 

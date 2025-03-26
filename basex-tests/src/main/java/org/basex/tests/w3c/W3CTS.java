@@ -268,7 +268,7 @@ public abstract class W3CTS extends Main {
       final Item state = states.itemAt(s);
       final String inname = text("*:query/@name", state);
       final IOFile query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
-      final String in = query.string();
+      final String in = query.readString();
       String er = null;
       Value value = null;
 
@@ -331,7 +331,7 @@ public abstract class W3CTS extends Main {
         for(final Item item : expOut) {
           final String resFile = string(item.string(null));
           final IOFile exp = new IOFile(expected + pth + resFile);
-          result.add(exp.string().replaceAll("\r\n|\r|\n", Prop.NL));
+          result.add(exp.readString().replaceAll("\r\n|\r|\n", Prop.NL));
         }
 
         final Value cmpFiles = nodes("*:output-file/@compare", state);
@@ -591,7 +591,7 @@ public abstract class W3CTS extends Main {
     for(int n = 0; n < ns; ++n) {
       final String file = pth + string(nodes.itemAt(n).string(null)) + IO.XQSUFFIX;
       final IO io = new IOFile(queries, file);
-      try(QueryProcessor xq = new QueryProcessor(io.string(), io.path(), context, null)) {
+      try(QueryProcessor xq = new QueryProcessor(io.readString(), io.path(), context, null)) {
         qp.variable(string(vars.itemAt(n).string(null)), xq.value());
       }
     }
@@ -625,7 +625,7 @@ public abstract class W3CTS extends Main {
   private String error(final String nm, final String error) throws IOException {
     final String error2 = expected + nm + ".log";
     final IO file = new IOFile(error2);
-    return file.exists() ? error + '/' + file.string() : error;
+    return file.exists() ? error + '/' + file.readString() : error;
   }
 
   /**

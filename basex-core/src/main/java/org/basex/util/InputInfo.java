@@ -22,7 +22,7 @@ public final class InputInfo {
   private final String path;
   /** Static context (can be {@code null}). */
   private StaticContext sc;
-  /** Input (can be {@code null}). */
+  /** Input string as codepoints (can be {@code null}). */
   private int[] input;
   /** Line number ({@code 0} if not initialized). */
   private int line;
@@ -35,7 +35,7 @@ public final class InputInfo {
    */
   public InputInfo(final InputParser parser) {
     input = parser.input;
-    path = parser.file;
+    path = parser.path;
     column = parser.pos;
   }
 

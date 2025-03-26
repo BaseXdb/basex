@@ -58,7 +58,7 @@ final class RESTRun extends RESTQuery {
       throw HTTPStatus.NOT_FOUND_X.get(Util.info(RES_NOT_FOUND_X, path));
 
     // retrieve file contents
-    final String input = file.string();
+    final String input = file.readString();
     // interpret as commands if input ends with command script suffix
     if(file.hasSuffix(IO.BXSSUFFIX)) {
       try {

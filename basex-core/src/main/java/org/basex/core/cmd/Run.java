@@ -42,9 +42,9 @@ public final class Run extends Execute {
       } else {
         try {
           // interpret as commands if input ends with command script suffix
-          if(file.hasSuffix(IO.BXSSUFFIX)) return init(file.string(), file.path(), ctx);
+          if(file.hasSuffix(IO.BXSSUFFIX)) return init(file.readString(), file.path(), ctx);
           // otherwise, interpret input as xquery
-          commands.add(new XQuery(file.string()).baseURI(file.path()));
+          commands.add(new XQuery(file.readString()).baseURI(file.path()));
         } catch(final IOException ex) {
           error = Util.message(ex);
         }

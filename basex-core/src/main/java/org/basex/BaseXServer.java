@@ -129,8 +129,8 @@ public final class BaseXServer extends CLI implements Runnable {
     Runtime.getRuntime().addShutdownHook(new Thread(this::close));
 
     // execute initial command-line arguments
-    for(final Entry<String, String> cmd : commands) {
-      if(!execute(cmd)) return;
+    for(final Entry<String, String> command : commands) {
+      if(!execute(command)) return;
     }
   }
 

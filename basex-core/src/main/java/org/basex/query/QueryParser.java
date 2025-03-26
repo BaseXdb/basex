@@ -193,9 +193,9 @@ public class QueryParser extends InputParser {
 
       // get absolute path
       final IO baseO = sc.baseIO();
-      final byte[] path = token(baseO == null ? "" : baseO.path());
-      qc.modParsed.put(path, uri);
-      qc.modStack.push(path);
+      final byte[] pth = token(baseO == null ? "" : baseO.path());
+      qc.modParsed.put(pth, uri);
+      qc.modStack.push(pth);
 
       prolog1();
       importModules();
@@ -234,7 +234,7 @@ public class QueryParser extends InputParser {
    */
   private void init() throws QueryException {
     final IO baseIO = sc.baseIO();
-    file = baseIO == null ? null : baseIO.path();
+    path = baseIO == null ? null : baseIO.path();
     if(!more()) throw error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters
@@ -723,8 +723,8 @@ public class QueryParser extends InputParser {
     final ModInfo mi = new ModInfo();
     if(!addLocations(mi.paths)) {
       // check module files that have been pre-declared by a test API
-      final byte[] path = qc.modDeclared.get(uri);
-      if(path != null) mi.paths.add(path);
+      final byte[] pth = qc.modDeclared.get(uri);
+      if(pth != null) mi.paths.add(pth);
     }
     mi.uri = uri;
     mi.info = info();
@@ -773,21 +773,21 @@ public class QueryParser extends InputParser {
       throw error(WHICHMOD_X, mi.info, uri);
     }
     // parse supplied paths
-    for(final byte[] path : mi.paths) module(string(path), string(uri), mi.info);
+    for(final byte[] pth : mi.paths) module(string(pth), string(uri), mi.info);
   }
 
   /**
    * Parses the specified module, checking function and variable references at the end.
-   * @param path file path
+   * @param pth input path
    * @param uri base URI of module
    * @param info input info
    * @throws QueryException query exception
    */
-  public final void module(final String path, final String uri, final InputInfo info)
+  public final void module(final String pth, final String uri, final InputInfo info)
       throws QueryException {
 
     // get absolute path
-    final IO io = sc.resolve(path, uri);
+    final IO io = sc.resolve(pth, uri);
     final byte[] tPath = token(io.path());
 
     // check if module has already been parsed
@@ -801,7 +801,7 @@ public class QueryParser extends InputParser {
       // read module
       final String query;
       try {
-        query = io.string();
+        query = io.readString();
       } catch(final IOException expr) {
         Util.debug(expr);
         throw error(WHICHMODFILE_X, info, io);

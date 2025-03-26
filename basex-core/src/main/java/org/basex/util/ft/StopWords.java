@@ -65,7 +65,7 @@ public final class StopWords {
    * @throws IOException I/O exception
    */
   public void read(final IO file, final boolean exclude) throws IOException {
-    for(final String term : file.string().trim().split("\\s+")) {
+    for(final String term : file.readString().trim().split("\\s+")) {
       final byte[] token = Token.token(term);
       if(exclude) set.remove(token);
       else set.add(token);

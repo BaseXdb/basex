@@ -495,7 +495,7 @@ public abstract class StandardFunc extends Arr {
     checkPerm(qc, Perm.ADMIN);
     final IO io = toIO(source);
     try {
-      return new IOContent(io.string(), io.url());
+      return new IOContent(io.readString(), io.url());
     } catch(final IOException ex) {
       throw IOERR_X.get(info, ex);
     }

@@ -112,7 +112,7 @@ public class BaseX extends CLI {
           case 'Q':
             console = false;
             final IO io = IO.get(value);
-            execute(new XQuery(io.string()).baseURI(io.path()), verbose);
+            execute(new XQuery(io.readString()).baseURI(io.path()), verbose);
             break;
           case 'r':
             execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);

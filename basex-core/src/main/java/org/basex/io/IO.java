@@ -151,7 +151,7 @@ public abstract class IO {
    * @return string content
    * @throws IOException I/O exception
    */
-  public final String string() throws IOException {
+  public final String readString() throws IOException {
     return new TextInput(read()).cache().toString();
   }
 
@@ -304,7 +304,7 @@ public abstract class IO {
   }
 
   /**
-   * Returns the full path.
+   * Returns the full path to the resource.
    * The path uses forward slashes, no matter which OS is used.
    * @return path
    */

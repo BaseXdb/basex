@@ -25,8 +25,8 @@ public abstract class CommandParser {
   PasswordReader pwReader;
   /** Possible completions. */
   Enum<?>[] completions;
-  /** Base URI. */
-  String uri = "";
+  /** Input path. */
+  String path = "";
   /** Parse single command. */
   boolean single;
   /** XQuery suggestions. */
@@ -64,12 +64,12 @@ public abstract class CommandParser {
   }
 
   /**
-   * Attaches a base URI.
-   * @param base base URI
+   * Attaches an input path.
+   * @param pth input path
    * @return self reference
    */
-  public final CommandParser baseURI(final String base) {
-    uri = base;
+  public final CommandParser path(final String  pth) {
+    path = pth;
     return this;
   }
 

@@ -62,7 +62,7 @@ public abstract class CLI extends Main {
    */
   protected final boolean execute(final Entry<String, String> command) throws IOException {
     final CommandParser cp = CommandParser.get(command.getValue(), context);
-    return execute(cp.baseURI(command.getKey()).pwReader(PWREADER));
+    return execute(cp.path(command.getKey()).pwReader(PWREADER));
   }
 
   /**
@@ -149,12 +149,12 @@ public abstract class CLI extends Main {
   /**
    * Returns the base URI and the contents for the specified command script.
    * @param input input
-   * @return return base URI and query string
+   * @return return input path and content
    * @throws IOException I/O exception
    */
   protected static Entry<String, String> script(final String input) throws IOException {
     final IO io = IO.get(input);
-    return new SimpleEntry<>(io.path(), io.string());
+    return new SimpleEntry<>(io.path(), io.readString());
   }
 
   /**

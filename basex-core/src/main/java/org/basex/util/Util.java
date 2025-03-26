@@ -312,7 +312,7 @@ public final class Util {
     for(int c = 0; c < to; c++) {
       try {
         final int exit = process.exitValue();
-        if(exit == 1) return new IOStream(process.getErrorStream()).string();
+        if(exit == 1) return new IOStream(process.getErrorStream()).readString();
         break;
       } catch(final IllegalThreadStateException ex) {
         debug(ex);

@@ -167,8 +167,8 @@ public final class BaseXHTTP extends CLI {
     context.log.writeServer(LogType.OK, msg2.apply(true));
 
     // execute initial command-line arguments
-    for(final Entry<String, String> cmd : commands) {
-      if(!execute(cmd)) return;
+    for(final Entry<String, String> command : commands) {
+      if(!execute(command)) return;
     }
   }
 

@@ -13,13 +13,13 @@ public class InputParser {
   /** Parsing exception. */
   private static final String FOUND = ", found '%'";
 
-  /** Codepoints of normalized input string. */
+  /** Input string as codepoints. */
   public final int[] input;
   /** Input length. */
   public final int length;
 
-  /** File reference. */
-  public String file;
+  /** Input path. */
+  public String path;
   /** Current input position. */
   public int pos;
   /** Marked input position. */

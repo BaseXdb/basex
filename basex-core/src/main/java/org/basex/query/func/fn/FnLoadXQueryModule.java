@@ -83,8 +83,8 @@ public final class FnLoadXQueryModule extends ParseFn {
     for(final IO src : srcs) {
       mqc.finalContext = false;
       try {
-        final String path = src.path();
-        mqc.parse(src.string(), path.isEmpty() ? Token.string(info.sc().baseURI().string()) : path);
+        final String path = src.path(), content = src.readString();
+        mqc.parse(content, path.isEmpty() ? Token.string(info.sc().baseURI().string()) : path);
       } catch(final IOException ex) {
         Util.debug(ex);
         throw WHICHMODFILE_X.get(info, src);

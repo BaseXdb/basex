@@ -43,10 +43,10 @@ final class StringParser extends CommandParser {
       final String line = sc.next().trim();
       if(line.isEmpty() || Strings.startsWith(line, '#')) continue;
       parser = new InputParser(line);
-      parser.file = uri;
+      parser.path = path;
       while(parser.more()) {
         final Cmd cmd = consume(Cmd.class, null);
-        if(cmd != null) cmds.add(parse(cmd).baseURI(uri));
+        if(cmd != null) cmds.add(parse(cmd).baseURI(path));
         if(parser.more() && !parser.consume(';')) throw help(null, cmd);
       }
     }

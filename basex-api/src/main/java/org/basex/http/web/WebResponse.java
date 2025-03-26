@@ -57,7 +57,7 @@ public abstract class WebResponse {
       qc.compile();
       return serialize(body);
     } catch(final QueryException ex) {
-      if(ex.file() == null) ex.info(sf.info);
+      if(ex.path() == null) ex.info(sf.info);
       throw ex;
     } finally {
       finish();

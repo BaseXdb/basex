@@ -99,14 +99,14 @@ public class Execute extends Command {
   /**
    * Initializes the specified input.
    * @param input command input
-   * @param base base URI
+   * @param path input path
    * @param ctx database context
    * @return success flag
    */
-  final boolean init(final String input, final String base, final Context ctx) {
+  final boolean init(final String input, final String path, final Context ctx) {
     if(commands.isEmpty() && error == null) {
       try {
-        Collections.addAll(commands, CommandParser.get(input, ctx).baseURI(base).parse());
+        Collections.addAll(commands, CommandParser.get(input, ctx).path(path).parse());
       } catch(final QueryException ex) {
         error = Util.message(ex);
         return false;

@@ -50,7 +50,7 @@ public final class WebModule {
     if(time == ts) return;
 
     time = ts;
-    content = file.string();
+    content = file.readString();
 
     functions.clear();
     wsFunctions.clear();

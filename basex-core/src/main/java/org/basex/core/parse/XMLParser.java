@@ -46,7 +46,7 @@ final class XMLParser extends CommandParser {
         }
       }
       try(QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
-        for(final Item ia : qp.value()) cmds.add(command(ia).baseURI(uri));
+        for(final Item ia : qp.value()) cmds.add(command(ia).baseURI(path));
       }
     } catch(final IOException ex) {
       throw error(Text.STOPPED_AT + '%', ex);

@@ -92,34 +92,34 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Returns the error column.
-   * @return error column
+   * Returns the column number of the error.
+   * @return column number, or {@code 0} if unknown
    */
   public final int column() {
     return info == null ? 0 : info.column();
   }
 
   /**
-   * Returns the marked error column.
-   * @return marked error column
+   * Returns the column number of a marked error.
+   * @return column number
    */
   public final int markedColumn() {
     return markedCol;
   }
 
   /**
-   * Returns the error line.
-   * @return error line
+   * Returns the line number of the error.
+   * @return line number, or {@code 0} if unknown
    */
   public final int line() {
     return info == null ? 0 : info.line();
   }
 
   /**
-   * Returns the file.
-   * @return error line
+   * Returns the input path.
+   * @return input path, or {@code null} if unknown
    */
-  public final String file() {
+  public final String path() {
     return info == null ? null : info.path();
   }
 
@@ -182,7 +182,7 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Finds line and column for the specified query parser.
+   * Adopts input information from the specified parser.
    * @param parser parser
    */
   final void pos(final InputParser parser) {

@@ -164,7 +164,7 @@ public final class Catch extends Single {
       ex.qname(),
       Str.get(ex.getLocalizedMessage()),
       ex.value() != null ? ex.value() : Empty.VALUE,
-      ex.file() != null ? Str.get(ex.file()) : Empty.VALUE,
+      ex.path() != null ? Str.get(ex.path()) : Empty.VALUE,
       ex.line() != 0 ? Int.get(ex.line()) : Empty.VALUE,
       ex.column() != 0 ? Int.get(ex.column()) : Empty.VALUE,
       stack,

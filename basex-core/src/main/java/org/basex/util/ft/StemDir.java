@@ -25,7 +25,7 @@ public final class StemDir {
    */
   public boolean read(final IO fl) {
     try {
-      for(final String line : fl.string().split("\\n")) {
+      for(final String line : fl.readString().split("\\n")) {
         final String[] terms = line.split("\\s+");
         final int tl = terms.length;
         for(int t = 1; t < tl; t++) map.put(token(terms[t]), token(terms[0]));
