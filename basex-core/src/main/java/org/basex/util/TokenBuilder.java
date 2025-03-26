@@ -64,6 +64,14 @@ public final class TokenBuilder {
   }
 
   /**
+   * Constructor with initial token.
+   * @param object initial object
+   */
+  public TokenBuilder(final Object object) {
+    this(token(object));
+  }
+
+  /**
    * Returns the number of bytes.
    * @return number of bytes
    */
@@ -226,7 +234,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a single byte to the token.
+   * Adds a single byte.
    * @param value the byte to be added
    * @return self reference
    */
@@ -241,7 +249,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds an integer value to the token.
+   * Adds an integer value.
    * @param value value to be added
    * @return self reference
    */
@@ -250,7 +258,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a number to the token.
+   * Adds a number.
    * @param value value to be added
    * @return self reference
    */
@@ -259,7 +267,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a token to the token.
+   * Adds a token.
    * @param token the token to be added
    * @return self reference
    */
@@ -288,7 +296,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a string to the token.
+   * Adds a string.
    * @param string the string to be added
    * @return self reference
    */
@@ -297,7 +305,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds multiple strings to the token, separated by the specified string.
+   * Adds multiple strings, separated by the specified string.
    * @param objects the object to be added
    * @param separator separator string
    * @return self reference
@@ -312,7 +320,7 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds an object to the token.
+   * Adds an object.
    * @param object the object to be added
    * @return self reference
    */

@@ -67,6 +67,11 @@ public final class XQJava extends FItem {
   }
 
   @Override
+  public String funcIdentity() {
+    return new TokenBuilder(funcName().prefixId()).add('-').addInt(hashCode()).toString();
+  }
+
+  @Override
   public QNm paramName(final int pos) {
     return null;
   }

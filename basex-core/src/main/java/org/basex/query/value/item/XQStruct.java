@@ -45,6 +45,12 @@ public abstract class XQStruct extends FItem {
   }
 
   @Override
+  public final String funcIdentity() {
+    final long size = structSize();
+    return description() + size + (size > 0 ? "-" + hashCode() : "");
+  }
+
+  @Override
   public final Expr inline(final Expr[] exprs, final CompileContext cc) {
     return null;
   }

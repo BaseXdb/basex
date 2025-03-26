@@ -46,6 +46,12 @@ public abstract class FItem extends Item implements XQFunction {
     return type.funcType();
   }
 
+  /**
+   * Identity of this function.
+   * @return identity string
+   */
+  public abstract String funcIdentity();
+
   @Override
   public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
