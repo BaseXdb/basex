@@ -34,8 +34,8 @@ public final class Store implements Closeable {
   /** Database context. */
   private final Context context;
 
-  /** Name of current store. */
-  private String name = "";
+  /** File name of current store. */
+  private String filename = "";
   /** Timestamp of current store (set to {@code -1} if store is dirty). */
   private long timestamp = -1;
   /** Initialization flag. */
@@ -77,13 +77,13 @@ public final class Store implements Closeable {
    * @param value value
    */
   public synchronized void put(final byte[] key, final Value value) {
+    init();
     if(value.isEmpty()) {
-      remove(key);
+      map.remove(key);
     } else {
-      init();
       map.put(key, value);
-      timestamp = -1;
     }
+    timestamp = -1;
   }
 
   /**
@@ -136,7 +136,7 @@ public final class Store implements Closeable {
 
     // skip read if store in memory is up to date
     initialized = true;
-    if(exists && name.equals(file.name()) && timestamp == file.timeStamp()) return true;
+    if(exists && filename.equals(file.name()) && timestamp == file.timeStamp()) return true;
 
     // regenerate store in memory
     map.clear();
@@ -150,7 +150,7 @@ public final class Store implements Closeable {
     } else {
       timestamp = -1;
     }
-    name = file.name();
+    filename = file.name();
     return true;
   }
 
@@ -183,7 +183,7 @@ public final class Store implements Closeable {
       }
       timestamp = file.timeStamp();
     }
-    name = file.name();
+    filename = file.name();
   }
 
   /**
@@ -199,7 +199,7 @@ public final class Store implements Closeable {
   @Override
   public synchronized void close() {
     final boolean writestore = context.soptions.get(StaticOptions.WRITESTORE);
-    if(writestore && initialized && name.isEmpty() && timestamp == -1) {
+    if(writestore && initialized && !filename.contains("-") && timestamp == -1) {
       try {
         write("");
       } catch(final IOException | QueryException ex) {
