@@ -455,9 +455,9 @@ public final class SeqType {
     // check if function arguments must be coerced
     final boolean toFunc = type instanceof FuncType;
     final SeqType[] argTypes = toFunc ? ((FuncType) type).argTypes : null;
-    boolean coerce = argTypes != null && ((Checks<SeqType>) at -> !at.eq(ITEM_ZM)).any(argTypes);
 
     // check if value must be coerced
+    boolean coerce = argTypes != null && ((Checks<SeqType>) at -> !at.eq(ITEM_ZM)).any(argTypes);
     if(!coerce) {
       if(instance(value) && (!toFunc || value instanceof FuncItem)) return value;
       for(final Item item : value) {

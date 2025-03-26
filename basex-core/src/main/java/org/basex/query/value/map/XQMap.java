@@ -226,25 +226,25 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final boolean instanceOf(final Type tp) {
-    if(tp instanceof RecordType) return ((RecordType) tp).instance(this);
-    if(type.instanceOf(tp)) return true;
-
-    final Type kt;
-    final SeqType vt;
-    if(tp instanceof MapType) {
-      final MapType mt = (MapType) tp;
-      kt = mt.keyType() == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType();
-      vt = mt.valueType().eq(SeqType.ITEM_ZM) ? null : mt.valueType();
-    } else if(tp instanceof FuncType) {
-      final FuncType ft = (FuncType) tp;
-      if(ft.declType.occ.min != 0 || ft.argTypes.length != 1 ||
-          !ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O)) return false;
-      kt = null;
-      vt = ft.declType.eq(SeqType.ITEM_ZM) ? null : ft.declType;
-    } else {
-      return false;
-    }
     try {
+      if(tp instanceof RecordType) return ((RecordType) tp).instance(this);
+      if(type.instanceOf(tp)) return true;
+
+      final Type kt;
+      final SeqType vt;
+      if(tp instanceof MapType) {
+        final MapType mt = (MapType) tp;
+        kt = mt.keyType() == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType();
+        vt = mt.valueType().eq(SeqType.ITEM_ZM) ? null : mt.valueType();
+      } else if(tp instanceof FuncType) {
+        final FuncType ft = (FuncType) tp;
+        if(ft.declType.occ.min != 0 || ft.argTypes.length != 1 ||
+            !ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O)) return false;
+        kt = null;
+        vt = ft.declType.eq(SeqType.ITEM_ZM) ? null : ft.declType;
+      } else {
+        return false;
+      }
       return kt == null && vt == null || test((key, value) ->
         (kt == null || key.type.instanceOf(kt)) && (vt == null || vt.instance(value)));
     } catch(final QueryException ex) {
