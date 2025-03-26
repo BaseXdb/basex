@@ -38,7 +38,7 @@ abstract class Copy extends Arr {
   public void checkUp() throws QueryException {
     final Expr modify = arg(update());
     modify.checkUp();
-    if(!modify.vacuous() && !modify.has(Flag.UPD)) throw UPMODIFY.get(info);
+    if(!modify.has(Flag.UPD) && !modify.vacuous()) throw UPMODIFY.get(info);
   }
 
   /**

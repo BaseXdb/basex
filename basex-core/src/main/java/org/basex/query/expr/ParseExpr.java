@@ -204,14 +204,14 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final void checkAllUp(final Expr... exprs) throws QueryException {
-    // updating state: 0 = initial state, 1 = updating, -1 = non-updating
-    int state = 0;
+    Boolean updating = null;
     for(final Expr expr : exprs) {
       expr.checkUp();
-      if(expr.vacuous()) continue;
-      final boolean updating = expr.has(Flag.UPD);
-      if(updating ? state == -1 : state == 1) throw UPALL.get(info);
-      state = updating ? 1 : -1;
+      final boolean upd = expr.has(Flag.UPD), vacuous = expr.vacuous();
+      if(upd ? updating == Boolean.FALSE : !vacuous && updating == Boolean.TRUE) {
+        throw UPALL.get(info);
+      }
+      if(!vacuous) updating = upd;
     }
   }
 
