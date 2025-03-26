@@ -132,7 +132,7 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public Value get(final Item key) throws QueryException {
-    return map != null ? map.getInternal(key) : null;
+    return map != null ? map.getOrNull(key) : null;
   }
 
   /**

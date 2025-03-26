@@ -35,7 +35,7 @@ public final class XQIntStrMap extends XQHashMap {
   }
 
   @Override
-  Value getInternal(final Item key) throws QueryException {
+  public Value getOrNull(final Item key) throws QueryException {
     if(key instanceof ANum) {
       final double d = key.dbl(null);
       final int v = (int) d;

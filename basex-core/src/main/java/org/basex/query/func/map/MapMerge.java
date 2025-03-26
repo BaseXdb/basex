@@ -68,7 +68,7 @@ public class MapMerge extends StandardFunc {
     while(current != null) {
       final XQMap map = toMap(current);
       for(final Item key : map.keys()) {
-        final Value old = mb != null ? mb.get(key) : mp.get(key, false);
+        final Value old = mb != null ? mb.get(key) : mp.getOrNull(key);
         final Value val = merger.merge(key, old, map.get(key));
         if(val != null) {
           if(mb != null) mb.put(key, val);

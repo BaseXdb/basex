@@ -21,8 +21,11 @@ public final class ArrayGet extends StandardFunc {
     final Item position = toAtomItem(arg(1), qc);
     final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
-    final Value value = array.getInternal(position, qc, info, fallback == null);
-    return value != null ? value : invoke(fallback, new HofArgs(position), qc);
+    if(fallback != null) {
+      final Value value = array.getOrNull(position, qc, info);
+      return value != null ? value : invoke(fallback, new HofArgs(position), qc);
+    }
+    return array.get(position, qc, info);
   }
 
   @Override

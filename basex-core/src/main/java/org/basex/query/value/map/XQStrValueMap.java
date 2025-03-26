@@ -34,7 +34,7 @@ public final class XQStrValueMap extends XQHashMap {
   }
 
   @Override
-  Value getInternal(final Item key) throws QueryException {
+  public Value getOrNull(final Item key) throws QueryException {
     if(key.type.isStringOrUntyped()) {
       final int i = map.index(key.string(null));
       if(i != 0) return valueAt(i - 1);

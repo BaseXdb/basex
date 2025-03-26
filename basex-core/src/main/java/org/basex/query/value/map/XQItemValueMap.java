@@ -32,7 +32,7 @@ public final class XQItemValueMap extends XQHashMap {
   }
 
   @Override
-  Value getInternal(final Item key) throws QueryException {
+  public Value getOrNull(final Item key) throws QueryException {
     return map.get(key);
   }
 

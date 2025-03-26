@@ -118,7 +118,7 @@ public final class RecordType extends MapType {
     if(this != map.type) {
       for(final byte[] key : fields) {
         final RecordField rf = fields.get(key);
-        final Value value = map.get(Str.get(key), false);
+        final Value value = map.getOrNull(Str.get(key));
         if(value != null ? rf.seqType != null && !rf.seqType.instance(value) : !rf.optional)
           return false;
       }

@@ -35,7 +35,7 @@ public final class XQSingletonMap extends XQMap {
   }
 
   @Override
-  Value getInternal(final Item key) throws QueryException {
+  public Value getOrNull(final Item key) throws QueryException {
     return key.atomicEqual(k) ? v : null;
   }
 

@@ -268,27 +268,49 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    return getInternal(key(args[0], qc, ii), qc, ii, true);
+    return get(key(args[0], qc, ii), qc, ii);
   }
 
   /**
-   * Gets the internal map value.
+   * Gets a value from this array.
    * @param key key to look for
    * @param qc query context
    * @param ii input info (can be {@code null})
-   * @param error if {@code true}, raise error if index is out of bounds
    * @return value or {@code null}
    * @throws QueryException query exception
    */
-  public Value getInternal(final Item key, final QueryContext qc, final InputInfo ii,
-      final boolean error) throws QueryException {
-    final Item ki = (Item) SeqType.INTEGER_O.coerce(key, null, qc, null, ii);
+  public final Value get(final Item key, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    final long i = index(key, qc, ii), size = structSize();
+    if(i > 0 && i <= size) return get(i - 1);
+    throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, i, size);
+  }
 
-    final long pos = ki.itr(ii), size = structSize();
-    if(pos > 0 && pos <= size) return get(pos - 1);
+  /**
+   * Gets a value from this array.
+   * @param key key to look for
+   * @param qc query context
+   * @param ii input info (can be {@code null})
+   * @return value or {@code null}
+   * @throws QueryException query exception
+   */
+  public final Value getOrNull(final Item key, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    final long i = index(key, qc, ii);
+    return i > 0 && i <= structSize() ? get(i - 1) : null;
+  }
 
-    if(error) throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, pos, size);
-    return null;
+  /**
+   * Returns the array index.
+   * @param key key to look for
+   * @param qc query context
+   * @param ii input info (can be {@code null})
+   * @return index
+   * @throws QueryException query exception
+   */
+  private static long index(final Item key, final QueryContext qc, final InputInfo ii)
+      throws QueryException {
+    return ((Int) SeqType.INTEGER_O.coerce(key, null, qc, null, ii)).itr();
   }
 
   @Override

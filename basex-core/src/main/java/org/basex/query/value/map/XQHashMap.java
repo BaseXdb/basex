@@ -33,7 +33,7 @@ abstract class XQHashMap extends XQMap {
   public abstract long structSize();
 
   @Override
-  abstract Value getInternal(Item key) throws QueryException;
+  public abstract Value getOrNull(Item key) throws QueryException;
 
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
@@ -47,7 +47,7 @@ abstract class XQHashMap extends XQMap {
 
   @Override
   public final XQMap remove(final Item key) throws QueryException {
-    return getInternal(key) == null ? this : trie().remove(key);
+    return getOrNull(key) == null ? this : trie().remove(key);
   }
 
   @Override

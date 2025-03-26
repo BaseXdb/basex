@@ -101,32 +101,21 @@ public abstract class XQMap extends XQStruct {
   /**
    * Gets a value from this map.
    * @param key key to look for
-   * @return bound value if found, empty sequence otherwise
+   * @return value if found, empty sequence otherwise
    * @throws QueryException query exception
    */
   public final Value get(final Item key) throws QueryException {
-    return get(key, true);
+    final Value value = getOrNull(key);
+    return value != null ? value : Empty.VALUE;
   }
 
   /**
-   * Gets the internal map value.
+   * Gets a value from this map.
    * @param key key to look for
-   * @param empty if {@code true}, return empty sequence if key is not found
-   * @return value or {@code null}
+   * @return value if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public final Value get(final Item key, final boolean empty) throws QueryException {
-    final Value value = getInternal(key);
-    return value != null ? value : empty ? Empty.VALUE : null;
-  }
-
-  /**
-   * Gets the internal map value.
-   * @param key key to look for
-   * @return value or {@code null}
-   * @throws QueryException query exception
-   */
-  abstract Value getInternal(Item key) throws QueryException;
+  public abstract Value getOrNull(Item key) throws QueryException;
 
   /**
    * Gets a map key at the specified position.
@@ -190,7 +179,7 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   public final boolean contains(final Item key) throws QueryException {
-    return getInternal(key) != null;
+    return getOrNull(key) != null;
   }
 
   @Override
@@ -355,7 +344,7 @@ public abstract class XQMap extends XQStruct {
     final BasicIter<Item> keys2 = map.keys();
     for(final Item key : keys()) {
       final Item k = keys2.next();
-      if(!(key.equals(k) && getInternal(key).equals(map.getInternal(k)))) return false;
+      if(!(key.equals(k) && getOrNull(key).equals(map.getOrNull(k)))) return false;
     }
     return true;
   }
@@ -371,7 +360,7 @@ public abstract class XQMap extends XQStruct {
     final BasicIter<Item> keys2 = map.keys();
     for(final Item key : keys()) {
       final Item k = keys2.next();
-      if(!(key.atomicEqual(k) && deep.equal(getInternal(key), map.getInternal(k)))) return false;
+      if(!(key.atomicEqual(k) && deep.equal(getOrNull(key), map.getOrNull(k)))) return false;
     }
     return true;
   }
@@ -385,8 +374,8 @@ public abstract class XQMap extends XQStruct {
    */
   private boolean deepEqualUnordered(final XQMap map, final DeepEqual deep) throws QueryException {
     for(final Item key : keys()) {
-      final Value v = map.getInternal(key);
-      if(v == null || !deep.equal(getInternal(key), v)) return false;
+      final Value v = map.getOrNull(key);
+      if(v == null || !deep.equal(getOrNull(key), v)) return false;
     }
     return true;
   }

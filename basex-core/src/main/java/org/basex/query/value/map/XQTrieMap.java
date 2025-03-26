@@ -33,7 +33,7 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
-  Value getInternal(final Item key) throws QueryException {
+  public Value getOrNull(final Item key) throws QueryException {
     return root.get(key.hashCode(), key, 0);
   }
 
@@ -45,7 +45,7 @@ public final class XQTrieMap extends XQMap {
   @Override
   public Value valueAt(final int index) {
     try {
-      return getInternal(keyAt(index));
+      return getOrNull(keyAt(index));
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }

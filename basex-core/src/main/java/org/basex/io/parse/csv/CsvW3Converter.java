@@ -93,8 +93,8 @@ public final class CsvW3Converter extends CsvXQueryConverter {
             if(it.isEmpty()) throw CSV_COLUMNNAME_X.get(info, colIndex);
             colIndex = it;
           }
-          final Value val = row.getInternal(colIndex, qc, info, false);
-          if(val != null) return val;
+          final Value value = row.getOrNull(colIndex, qc, info);
+          if(value != null) return value;
         }
       }
       return Str.EMPTY;
