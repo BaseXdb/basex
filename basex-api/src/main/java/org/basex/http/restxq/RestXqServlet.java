@@ -61,15 +61,13 @@ public final class RestXqServlet extends BaseXServlet {
       if(func == null) throw HTTPStatus.SERVICE_NOT_FOUND.get();
     }
 
-    // create response
-    final RestXqResponse response = new RestXqResponse(conn);
     try {
       // run checks; stop further processing if a function produces a response
       for(final RestXqFunction check : modules.checks(conn)) {
-        if(response.create(check, func, body) != Response.NONE) return;
+        if(new RestXqResponse(conn).create(check, func, body) != Response.NONE) return;
       }
       // run addressed function
-      if(response.create(func, null, body) != Response.CUSTOM) {
+      if(new RestXqResponse(conn).create(func, null, body) != Response.CUSTOM) {
         conn.log(SC_OK, "");
       }
     } catch(final QueryException ex) {
@@ -77,7 +75,7 @@ public final class RestXqServlet extends BaseXServlet {
       func = modules.restxq(conn, ex.qname());
       if(func == null) throw ex;
 
-      response.create(func, ex, body);
+      new RestXqResponse(conn).create(func, ex, body);
     }
   }
 }
