@@ -92,22 +92,16 @@ public final class HofArgs {
   }
 
   /**
-   * Assigns the position.
-   * @param p p position
-   * @return self reference
-   */
-  public HofArgs pos(final long p) {
-    final int pp = posParam;
-    if(pp != -1) set(pp, Int.get(p));
-    pos = p;
-    return this;
-  }
-
-  /**
    * Increases the position.
    * @return self reference
    */
   public HofArgs inc() {
-    return pos(pos + 1);
+    final int pp = posParam;
+    if(pp != -1) {
+      final long p = pos + 1;
+      set(pp, Int.get(p));
+      pos = p;
+    }
+    return this;
   }
 }

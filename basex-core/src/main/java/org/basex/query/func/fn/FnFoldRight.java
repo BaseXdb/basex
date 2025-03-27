@@ -26,7 +26,7 @@ public final class FnFoldRight extends FnFoldLeft {
     long p = input.size();
     if(p != -1) {
       for(; p > 0; p--) {
-        args.set(1, invoke(action, args.set(0, input.get(p - 1)).pos(p), qc));
+        args.set(1, invoke(action, args.set(0, input.get(p - 1)).inc(), qc));
         if(skip(qc, args)) break;
       }
     } else {
@@ -35,12 +35,12 @@ public final class FnFoldRight extends FnFoldLeft {
       if(value instanceof TreeSeq) {
         final TreeSeq seq = (TreeSeq) value;
         for(final ListIterator<Item> iter = seq.iterator(p); iter.hasPrevious();) {
-          args.set(1, invoke(action, args.set(0, iter.previous()).pos(p--), qc));
+          args.set(1, invoke(action, args.set(0, iter.previous()).inc(), qc));
           if(skip(qc, args)) break;
         }
       } else {
         for(; p > 0; p--) {
-          args.set(1, invoke(action, args.set(0, value.itemAt(p - 1)).pos(p), qc));
+          args.set(1, invoke(action, args.set(0, value.itemAt(p - 1)).inc(), qc));
           if(skip(qc, args)) break;
         }
       }

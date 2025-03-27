@@ -1043,8 +1043,8 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void foldRight() {
     final Function func = FOLD_RIGHT;
-    query(func.args(" 1 to 6", "ok", " fn($i, $r, $p) { $r[$i = $p] }"), "ok");
-    query(func.args(" 2 to 7", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
+    query(func.args(" 1 to 6", "ok", " fn($i, $r, $p) { $r[$i = 7 - $p] }"), "ok");
+    query(func.args(" 1 to 6", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
 
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
