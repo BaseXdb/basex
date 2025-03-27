@@ -69,13 +69,13 @@ public class FnFoldLeft extends StandardFunc {
    * @throws QueryException query exception
    */
   public final Expr unroll(final CompileContext cc, final boolean left) throws QueryException {
-    final Expr input = arg(0), zero = arg(1), action = arg(2);
+    final Expr input = arg(0), init = arg(1), action = arg(2);
     final int arity = arity(action);
     if(arity == 2) {
       final ExprList unroll = cc.unroll(input, true);
       if(unroll != null) {
         final Expr func = coerceFunc(2, cc, arity);
-        Expr expr = zero;
+        Expr expr = init;
         if(left) {
           for(final Expr ex : unroll) {
             expr = new DynFuncCall(info, func, expr, ex).optimize(cc);
@@ -102,20 +102,20 @@ public class FnFoldLeft extends StandardFunc {
   public final Expr optType(final CompileContext cc, final boolean array, final boolean left)
       throws QueryException {
 
-    final Expr input = arg(0), zero = arg(1), action = arg(2);
+    final Expr input = arg(0), init = arg(1), action = arg(2);
     final SeqType ist = input.seqType();
-    // fold-left((), ZERO, $f)  ->  ZERO
-    if(array ? input == XQArray.empty() : ist.zero()) return zero;
+    // fold-left((), INIT, $f)  ->  INIT
+    if(array ? input == XQArray.empty() : ist.zero()) return init;
 
     if(action instanceof FuncItem) {
       if(iff == null) {
         final Object fold = ((FuncItem) action).fold(input, array, left, cc);
         if(fold instanceof Expr) return (Expr) fold;
-        if(fold instanceof String) return zero;
+        if(fold instanceof String) return init;
         if(fold instanceof FuncItem[]) iff = (FuncItem[]) fold;
       }
 
-      final SeqType zst = zero.seqType(), i1t = array ? ist.type instanceof ArrayType ?
+      final SeqType zst = init.seqType(), i1t = array ? ist.type instanceof ArrayType ?
         ((ArrayType) ist.type).valueType() : SeqType.ITEM_O : ist.with(Occ.EXACTLY_ONE);
       SeqType st = zst, ost;
       do {

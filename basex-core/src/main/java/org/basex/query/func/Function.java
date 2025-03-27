@@ -278,11 +278,11 @@ public enum Function implements AFunction {
   FLOOR(FnFloor::new, "floor(value)",
       params(NUMERIC_ZO), NUMERIC_ZO),
   /** XQuery function. */
-  FOLD_LEFT(FnFoldLeft::new, "fold-left(input,zero,action)",
+  FOLD_LEFT(FnFoldLeft::new, "fold-left(input,init,action)",
       params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
-  FOLD_RIGHT(FnFoldRight::new, "fold-right(input,zero,action)",
+  FOLD_RIGHT(FnFoldRight::new, "fold-right(input,init,action)",
       params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
@@ -824,11 +824,11 @@ public enum Function implements AFunction {
   _ARRAY_FLATTEN(ArrayFlatten::new, "flatten(input)",
       params(ITEM_ZM), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_FOLD_LEFT(ArrayFoldLeft::new, "fold-left(array,zero,action)",
+  _ARRAY_FOLD_LEFT(ArrayFoldLeft::new, "fold-left(array,init,action)",
       params(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_FOLD_RIGHT(ArrayFoldRight::new, "fold-right(array,zero,action)",
+  _ARRAY_FOLD_RIGHT(ArrayFoldRight::new, "fold-right(array,init,action)",
       params(ARRAY_O, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF), ARRAY_URI),
   /** XQuery function. */
@@ -1511,7 +1511,7 @@ public enum Function implements AFunction {
       params(ITEM_OM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */
-  _HOF_SCAN_LEFT(HofScanLeft::new, "scan-left(input,zero,action)",
+  _HOF_SCAN_LEFT(HofScanLeft::new, "scan-left(input,init,action)",
       params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O).seqType()),
       ITEM_ZM, flag(HOF), HOF_URI),
   /** XQuery function. */

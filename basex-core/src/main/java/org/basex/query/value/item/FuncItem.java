@@ -250,9 +250,9 @@ public final class FuncItem extends FItem implements Scope {
       final Predicate<Expr> result = ex -> ex instanceof VarRef &&
           ((VarRef) ex).var.equals(resultVar);
 
-      // fold-left(SEQ, ZERO, f($result, $value) { VALUE })  ->  VALUE
+      // fold-left(SEQ, INIT, f($result, $value) { VALUE })  ->  VALUE
       if(!array && input.seqType().oneOrMore() && expr instanceof Value) return expr;
-      // fold-left(SEQ, ZERO, f($result, $value) { $result })  ->  $result
+      // fold-left(SEQ, INIT, f($result, $value) { $result })  ->  $result
       if(result.test(expr)) return "";
 
       if(expr instanceof If) {
