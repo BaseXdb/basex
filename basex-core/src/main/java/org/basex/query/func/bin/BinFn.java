@@ -3,6 +3,7 @@ package org.basex.query.func.bin;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.math.*;
 import java.nio.*;
 import java.util.*;
 
@@ -60,23 +61,24 @@ abstract class BinFn extends StandardFunc {
     final ByteOrder order = order(arg(3), qc);
 
     final byte[] bytes = binary.binary(info);
-    final int bl = bytes.length;
-    final int[] bounds = bounds(offset, size, bl);
-    final int o = bounds[0], l = Math.min(8, bounds[1]);
+    final int[] bounds = bounds(offset, size, bytes.length);
+    final int o = bounds[0], l = bounds[1];
     if(l == 0) return Int.ZERO;
 
-    // place input data in long byte array, consider sign
-    final byte[] tmp = new byte[8];
-    final boolean neg = signed && (bytes[0] & 0x80) != 0;
-    if(order == ByteOrder.BIG_ENDIAN) {
-      final int s = 8 - l;
-      if(neg) for(int i = 0; i < s; i++) tmp[i] = (byte) 0xFF;
-      Array.copy(bytes, o, l, tmp, s);
-    } else {
-      Array.copyToStart(bytes, o, l, tmp);
-      if(neg) for(int i = l; i < 8; i++) tmp[i] = (byte) 0xFF;
+    final byte[] result = new byte[l];
+    ByteBuffer.wrap(bytes, o, l).order(order).get(result);
+
+    if(order == ByteOrder.LITTLE_ENDIAN) {
+      for(int i = 0, j = l - 1; i < j; i++, j--) {
+        final byte tmp = result[i];
+        result[i] = result[j];
+        result[j] = tmp;
+      }
     }
-    return Int.get(ByteBuffer.wrap(tmp).order(order).getLong());
+    final BigInteger bi = signed ? new BigInteger(result) : new BigInteger(1, result);
+    final long v = bi.longValue();
+    if(BigInteger.valueOf(v).equals(bi)) return Int.get(v);
+    throw RANGE_X.get(info, bi);
   }
 
   /**

@@ -29,7 +29,6 @@ public abstract class ConvertFn extends StandardFunc {
   final byte[] stringToBinary(final QueryContext qc) throws QueryException {
     final byte[] value = toToken(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), CONVERT_ENCODING_X, qc);
-    if(encoding == null || encoding == Strings.UTF8) return value;
     try {
       return toBinary(value, encoding);
     } catch(final CharacterCodingException ex) {
@@ -41,16 +40,16 @@ public abstract class ConvertFn extends StandardFunc {
   /**
    * Converts the first argument from a string to a byte array.
    * @param in input string
-   * @param enc encoding
+   * @param encoding encoding (can be {@code null})
    * @return resulting value
    * @throws CharacterCodingException character coding exception
    */
-  public static byte[] toBinary(final byte[] in, final String enc) throws CharacterCodingException {
-    if(enc == Strings.UTF8) return in;
-    final ByteBuffer bb = Charset.forName(enc).newEncoder().encode(CharBuffer.wrap(string(in)));
-    final int il = bb.limit();
-    final byte[] tmp = bb.array();
-    return tmp.length == il  ? tmp : Arrays.copyOf(tmp, il);
+  public static byte[] toBinary(final byte[] in, final String encoding)
+      throws CharacterCodingException {
+    if(encoding == null || encoding == Strings.UTF8) return in;
+    final Charset cs = Charset.forName(encoding == Strings.UTF16 ? Strings.UTF16BE : encoding);
+    final ByteBuffer bb = cs.newEncoder().encode(CharBuffer.wrap(string(in)));
+    return Arrays.copyOfRange(bb.array(), bb.position(), bb.limit());
   }
 
   /**
