@@ -97,11 +97,9 @@ public final class HofArgs {
    */
   public HofArgs inc() {
     final int pp = posParam;
-    if(pp != -1) {
-      final long p = pos + 1;
-      set(pp, Int.get(p));
-      pos = p;
-    }
+    final long p = pos + 1;
+    if(pp != -1) set(pp, Int.get(p));
+    pos = p;
     return this;
   }
 }
