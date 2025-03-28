@@ -929,6 +929,8 @@ public enum AtomType implements Type {
   /** Sortable flag. */
   private final boolean sortable;
 
+  /** Pre/post values representing the hierarchy. */
+  private int[] prePost = new int[2];
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
   /** QName (lazy instantiation). */
@@ -955,6 +957,26 @@ public enum AtomType implements Type {
     this.string = string;
     this.sortable = sortable;
     this.id = id;
+  }
+
+  // map hierarchy to pre/post values
+  static {
+    final HashMap<AtomType, List<AtomType>> types = new HashMap<>(VALUES.length);
+    for(final AtomType type : VALUES) {
+      if(type.parent != null) types.computeIfAbsent(type.parent, k -> new ArrayList<>()).add(type);
+    }
+    ITEM.assign(types, new int[2]);
+  }
+
+  /**
+   * Assign pre/post values to types.
+   * @param types child types
+   * @param pp pre/post array
+   */
+  private void assign(final HashMap<AtomType, List<AtomType>> types, final int[] pp) {
+    prePost[0] = pp[0]++;
+    for(final AtomType type : types.getOrDefault(this, List.of())) type.assign(types, pp);
+    prePost[1] = pp[1]++;
   }
 
   @Override
@@ -998,9 +1020,12 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return this == type || type == AtomType.ITEM ||
-        (type instanceof ChoiceItemType ? ((ChoiceItemType) type).hasInstance(this) :
-          type instanceof AtomType && parent != null && parent.instanceOf(type));
+    if(type == this || type == AtomType.ITEM) return true;
+    if(type instanceof AtomType) {
+      final AtomType at = (AtomType) type;
+      return prePost[0] >= at.prePost[0] && prePost[1] <= at.prePost[1];
+    }
+    return type instanceof ChoiceItemType && ((ChoiceItemType) type).hasInstance(this);
   }
 
   @Override
