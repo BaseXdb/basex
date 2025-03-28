@@ -174,7 +174,7 @@ public class FnAtomicTypeAnnotation extends StandardFunc {
     @Override
     public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
       final Item value = toAtomItem(arg(0), qc);
-      return Bln.get(value.instanceOf(type));
+      return Bln.get(value.type.instanceOf(type));
     }
 
     @Override

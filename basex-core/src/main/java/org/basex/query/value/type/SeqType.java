@@ -348,21 +348,31 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Value value) {
+    return instance(value, false);
+  }
+
+  /**
+   * Checks if the specified value is an instance of this type.
+   * @param value value to check
+   * @param coerce item coercion
+   * @return result of check
+   */
+  private boolean instance(final Value value, final boolean coerce) {
     // check cardinality
     final long size = value.size();
     if(!occ.check(size)) return false;
-
-    // single item, empty sequence
-    if(size == 1) return instance((Item) value);
     if(size == 0) return true;
 
-    // sequence: try shortcut, based on value type
-    final SeqType st = value.seqType();
-    if(st.type.instanceOf(type) && st.kindInstanceOf(this)) return true;
-
-    // if type is too general, check type of each item
+    // try shortcut (type of value may be specific enough)
+    if(!(coerce || type instanceof ChoiceItemType)) {
+      final SeqType st = value.seqType();
+      if(st.type.instanceOf(type) && st.kindInstanceOf(this)) return true;
+    }
+    // check single item
+    if(size == 1) return instance((Item) value, coerce);
+    // check each item
     for(final Item item : value) {
-      if(!instance(item)) return false;
+      if(!instance(item, coerce)) return false;
     }
     return true;
   }
@@ -370,16 +380,17 @@ public final class SeqType {
   /**
    * Checks if the specified item is an instance of this sequence type.
    * @param item item to check
+   * @param coerce item coercion
    * @return result of check
    */
-  public boolean instance(final Item item) {
+  public boolean instance(final Item item, final boolean coerce) {
     if(type instanceof ChoiceItemType) {
       for(final SeqType tp : ((ChoiceItemType) type).types) {
-        if(tp.instance(item)) return true;
+        if(tp.instance(item, coerce)) return true;
       }
       return false;
     }
-    return item.instanceOf(type) && (test == null || test.matches(item));
+    return item.instanceOf(type, coerce) && (test == null || test.matches(item));
   }
 
   /**
@@ -452,33 +463,19 @@ public final class SeqType {
   public Value coerce(final Value value, final QNm name, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
-    // check if function arguments must be coerced
-    final boolean toFunc = type instanceof FuncType;
-    final SeqType[] argTypes = toFunc ? ((FuncType) type).argTypes : null;
-
-    // check if value must be coerced
-    boolean coerce = argTypes != null && ((Checks<SeqType>) at -> !at.eq(ITEM_ZM)).any(argTypes);
-    if(!coerce) {
-      if(instance(value) && (!toFunc || value instanceof FuncItem)) return value;
-      for(final Item item : value) {
-        qc.checkStop();
-        if(!instance(item) || toFunc && !(item instanceof FuncItem)) {
-          coerce = true;
-          break;
-        }
-      }
-    }
+    // instance check
+    final SeqType[] at = type instanceof FuncType ? ((FuncType) type).argTypes : null;
+    if((at == null || ((Checks<SeqType>) st -> st.eq(ITEM_ZM)).all(at)) && instance(value, true))
+      return value;
 
     // coerce items if required
     Value val = value;
-    if(coerce) {
-      final ValueBuilder vb = new ValueBuilder(qc);
-      for(final Item item : value) {
-        qc.checkStop();
-        coerce(item, name, vb, qc, cc, info);
-      }
-      val = vb.value(type);
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Item item : value) {
+      qc.checkStop();
+      coerce(item, name, vb, qc, cc, info);
     }
+    val = vb.value(type);
 
     if(!occ.check(val.size())) throw typeError(value, this, name, info);
     return val;

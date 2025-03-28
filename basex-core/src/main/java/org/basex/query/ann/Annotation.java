@@ -1,7 +1,8 @@
 package org.basex.query.ann;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.value.type.SeqType.*;
+import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.AtomType.ITEM;
 import static org.basex.util.Token.*;
 
 import org.basex.query.func.*;
@@ -30,110 +31,110 @@ public enum Annotation {
   /** XQuery annotation. */
   _BASEX_LAZY("lazy()", params(), BASEX_URI),
   /** XQuery annotation. */
-  _BASEX_INLINE("inline([limit])", params(INTEGER_O), BASEX_URI),
+  _BASEX_INLINE("inline([limit])", params(INTEGER), BASEX_URI),
   /** XQuery annotation. */
-  _BASEX_LOCK("lock(key)", params(STRING_O), BASEX_URI),
+  _BASEX_LOCK("lock(key)", params(STRING), BASEX_URI),
 
   /** XQuery annotation. */
-  _INPUT_CSV("csv(options...)", params(STRING_O), INPUT_URI),
+  _INPUT_CSV("csv(options...)", params(STRING), INPUT_URI),
   /** XQuery annotation. */
-  _INPUT_HTML("html(options...)", params(STRING_O), INPUT_URI),
+  _INPUT_HTML("html(options...)", params(STRING), INPUT_URI),
   /** XQuery annotation. */
-  _INPUT_JSON("json(options...)", params(STRING_O), INPUT_URI),
+  _INPUT_JSON("json(options...)", params(STRING), INPUT_URI),
 
   /** XQuery annotation. */
-  _OUTPUT_ALLOW_DUPLICATE_NAMES("allow-duplicate-names(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_ALLOW_DUPLICATE_NAMES("allow-duplicate-names(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_BYTE_ORDER_MARK("byte-order-mark(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_BYTE_ORDER_MARK("byte-order-mark(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_CDATA_SECTION_ELEMENTS("cdata-section-elements(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_CDATA_SECTION_ELEMENTS("cdata-section-elements(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_CSV("csv(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_CSV("csv(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_DOCTYPE_PUBLIC("doctype-public(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_DOCTYPE_PUBLIC("doctype-public(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_DOCTYPE_SYSTEM("doctype-system(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_DOCTYPE_SYSTEM("doctype-system(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_ENCODING("encoding(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_ENCODING("encoding(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_ESCAPE_URI_ATTRIBUTES("escape-uri-attributes(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_ESCAPE_URI_ATTRIBUTES("escape-uri-attributes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_HTML_VERSION("html-version(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_HTML_VERSION("html-version(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_INCLUDE_CONTENT_TYPE("include-content-type(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_INCLUDE_CONTENT_TYPE("include-content-type(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_INDENT("indent(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_INDENT("indent(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_INDENTS("indents(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_INDENTS("indents(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_ITEM_SEPARATOR("item-separator(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_ITEM_SEPARATOR("item-separator(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_JSON("json(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_JSON("json(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_JSON_NODE_OUTPUT_METHOD("json-node-output-method(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_JSON_NODE_OUTPUT_METHOD("json-node-output-method(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_MEDIA_TYPE("media-type(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_MEDIA_TYPE("media-type(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_METHOD("method(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_METHOD("method(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_NEWLINE("newline(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_NEWLINE("newline(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_NORMALIZATION_FORM("normalization-form(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_NORMALIZATION_FORM("normalization-form(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_OMIT_XML_DECLARATION("omit-xml-declaration(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_OMIT_XML_DECLARATION("omit-xml-declaration(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_PARAMETER_DOCUMENT("parameter-document(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_PARAMETER_DOCUMENT("parameter-document(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_STANDALONE("standalone(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_STANDALONE("standalone(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_SUPPRESS_INDENTATION("suppress-indentation(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_SUPPRESS_INDENTATION("suppress-indentation(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_TABULATOR("tabulator(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_TABULATOR("tabulator(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_UNDECLARE_PREFIXES("undeclare-prefixes(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_UNDECLARE_PREFIXES("undeclare-prefixes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_USE_CHARACTER_MAPS("use-character-maps(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_USE_CHARACTER_MAPS("use-character-maps(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
-  _OUTPUT_VERSION("version(value)", params(STRING_O), OUTPUT_URI),
+  _OUTPUT_VERSION("version(value)", params(STRING), OUTPUT_URI),
 
   /** XQuery annotation. */
-  _PERM_CHECK("check([path,map])", params(STRING_O, STRING_O), PERM_URI),
+  _PERM_CHECK("check([path,map])", params(STRING, STRING), PERM_URI),
   /** XQuery annotation. */
-  _PERM_ALLOW("allow(names...)", params(STRING_O), PERM_URI, false),
+  _PERM_ALLOW("allow(names...)", params(STRING), PERM_URI, false),
 
   /** XQuery annotation. */
-  _REST_PATH("path(path)", params(STRING_O), REST_URI),
+  _REST_PATH("path(path)", params(STRING), REST_URI),
   /** XQuery annotation. */
-  _REST_ERROR("error(codes...)", params(STRING_O), REST_URI, false),
+  _REST_ERROR("error(codes...)", params(STRING), REST_URI, false),
   /** XQuery annotation. */
-  _REST_CONSUMES("consumes(types...)", params(STRING_O), REST_URI, false),
+  _REST_CONSUMES("consumes(types...)", params(STRING), REST_URI, false),
   /** XQuery annotation. */
-  _REST_PRODUCES("produces(types...)", params(STRING_O), REST_URI, false),
+  _REST_PRODUCES("produces(types...)", params(STRING), REST_URI, false),
   /** XQuery annotation. */
   _REST_QUERY_PARAM("query-param(name,variable[,defaults...])",
-      params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
+      params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
   _REST_FORM_PARAM("form-param(name,variable[,defaults...])",
-      params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
+      params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
   _REST_HEADER_PARAM("header-param(name,variable[,defaults...])",
-      params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
+      params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
   _REST_COOKIE_PARAM("cookie-param(name,variable[,defaults...])",
-      params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
+      params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
   _REST_ERROR_PARAM("error-param(name,variable[,defaults...])",
-      params(STRING_O, STRING_O, ITEM_O), REST_URI, false),
+      params(STRING, STRING, ITEM), REST_URI, false),
   /** XQuery annotation. */
-  _REST_METHOD("method(name[,body])", params(STRING_O, STRING_O), REST_URI, false),
+  _REST_METHOD("method(name[,body])", params(STRING, STRING), REST_URI, false),
   /** XQuery annotation. */
-  _REST_SINGLE("single([key])", params(STRING_O), REST_URI),
+  _REST_SINGLE("single([key])", params(STRING), REST_URI),
   /** XQuery annotation. */
   _REST_GET("GET()", params(), REST_URI),
   /** XQuery annotation. */
-  _REST_POST("POST([body])", params(STRING_O), REST_URI),
+  _REST_POST("POST([body])", params(STRING), REST_URI),
   /** XQuery annotation. */
-  _REST_PUT("PUT([body])", params(STRING_O), REST_URI),
+  _REST_PUT("PUT([body])", params(STRING), REST_URI),
   /** XQuery annotation. */
   _REST_DELETE("DELETE()", params(), REST_URI),
   /** XQuery annotation. */
@@ -141,35 +142,35 @@ public enum Annotation {
   /** XQuery annotation. */
   _REST_OPTIONS("OPTIONS()", params(), REST_URI),
   /** XQuery annotation. */
-  _REST_PATCH("PATCH([body])", params(STRING_O), REST_URI),
+  _REST_PATCH("PATCH([body])", params(STRING), REST_URI),
 
   /** XQuery annotation. */
-  _UNIT_AFTER("after([function])", params(STRING_O), UNIT_URI),
+  _UNIT_AFTER("after([function])", params(STRING), UNIT_URI),
   /** XQuery annotation. */
   _UNIT_AFTER_MODULE("after-module()", params(), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_BEFORE("before([function])", params(STRING_O), UNIT_URI),
+  _UNIT_BEFORE("before([function])", params(STRING), UNIT_URI),
   /** XQuery annotation. */
   _UNIT_BEFORE_MODULE("before-module()", params(), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_IGNORE("ignore([message])", params(STRING_O), UNIT_URI),
+  _UNIT_IGNORE("ignore([message])", params(STRING), UNIT_URI),
   /** XQuery annotation. */
-  _UNIT_TEST("test(['expected',error])", params(STRING_O, STRING_O), UNIT_URI),
+  _UNIT_TEST("test(['expected',error])", params(STRING, STRING), UNIT_URI),
 
   /** XQuery annotation. */
-  _WS_CONNECT("connect(path)", params(STRING_O), WS_URI),
+  _WS_CONNECT("connect(path)", params(STRING), WS_URI),
   /** XQuery annotation. */
-  _WS_MESSAGE("message(path,message)", params(STRING_O, STRING_O), WS_URI),
+  _WS_MESSAGE("message(path,message)", params(STRING, STRING), WS_URI),
   /** XQuery annotation. */
-  _WS_CLOSE("close(path)", params(STRING_O), WS_URI),
+  _WS_CLOSE("close(path)", params(STRING), WS_URI),
   /** XQuery annotation. */
   _WS_HEADER_PARAM("header-param(name,variable[,defaults...])",
-      params(STRING_O, STRING_O, ITEM_O), WS_URI, false),
+      params(STRING, STRING, ITEM), WS_URI, false),
   /** XQuery annotation. */
-  _WS_ERROR("error(path,message)", params(STRING_O, STRING_O), WS_URI);
+  _WS_ERROR("error(path,message)", params(STRING, STRING), WS_URI);
 
   /** Parameter types. */
-  public final SeqType[] params;
+  public final AtomType[] params;
   /** URI. */
   public final byte[] uri;
   /** Minimum and maximum number of arguments. */
@@ -197,7 +198,7 @@ public enum Annotation {
    * @param params parameter types
    * @param uri URI
    */
-  Annotation(final String desc, final SeqType[] params, final byte[] uri) {
+  Annotation(final String desc, final AtomType[] params, final byte[] uri) {
     this(desc, params, uri, true);
   }
 
@@ -208,7 +209,7 @@ public enum Annotation {
    * @param uri URI
    * @param single annotation must only occur once
    */
-  Annotation(final String desc, final SeqType[] params, final byte[] uri, final boolean single) {
+  Annotation(final String desc, final AtomType[] params, final byte[] uri, final boolean single) {
     this.desc = desc;
     this.params = params;
     this.uri = uri;
@@ -230,7 +231,7 @@ public enum Annotation {
    * @param params parameter types
    * @return array
    */
-  private static SeqType[] params(final SeqType... params) {
+  private static AtomType[] params(final AtomType... params) {
     return params;
   }
 

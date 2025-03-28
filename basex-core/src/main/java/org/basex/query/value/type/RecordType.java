@@ -124,7 +124,7 @@ public final class RecordType extends MapType {
       }
       if(!extensible) {
         for(final Item key : map.keys()) {
-          if(!key.instanceOf(AtomType.STRING) || !fields.contains(key.string(null)))
+          if(!key.type.instanceOf(AtomType.STRING) || !fields.contains(key.string(null)))
             return false;
         }
       }

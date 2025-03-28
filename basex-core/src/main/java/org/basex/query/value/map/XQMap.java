@@ -214,7 +214,8 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  public final boolean instanceOf(final Type tp) {
+  public final boolean instanceOf(final Type tp, final boolean coerce) {
+    if(coerce && tp instanceof FuncType) return this == tp;
     try {
       if(tp instanceof RecordType) return ((RecordType) tp).instance(this);
       if(type.instanceOf(tp)) return true;
@@ -297,7 +298,8 @@ public abstract class XQMap extends XQStruct {
     final MapBuilder mb = new MapBuilder(structSize());
     forEach((key, value) -> {
       qc.checkStop();
-      final RecordField rf = key.instanceOf(AtomType.STRING) ? rt.field(key.string(null)) : null;
+      final RecordField rf = key.type.instanceOf(AtomType.STRING) ? rt.field(key.string(null)) :
+        null;
       final Value v;
       if(rf != null) {
         v = rf.seqType().coerce(value, null, qc, cc, ii);

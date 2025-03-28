@@ -480,9 +480,11 @@ public class QueryParser extends InputParser {
 
           final int al = def.params.length;
           for(int i = 0; i < is; i++) {
-            final SeqType st = def.params[Math.min(al - 1, i)];
+            final AtomType type = def.params[Math.min(al - 1, i)];
             final Item item = items.get(i);
-            if(!st.instance(item)) throw error(BASEX_ANN_X_X_X, ii, def, st, item.seqType());
+            if(!item.type.instanceOf(type)) {
+              throw error(BASEX_ANN_X_X_X, ii, def, type, item.seqType());
+            }
           }
           ann = new Ann(ii, def, items.value());
         }

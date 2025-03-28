@@ -51,8 +51,8 @@ public final class ArrayType extends FType {
       throws QueryException {
 
     if(item instanceof XQArray) {
-      final XQArray a = (XQArray) item;
-      if(a.instanceOf(this)) return a;
+      final XQArray array = (XQArray) item;
+      if(array.instanceOf(this, false)) return array;
     }
     throw typeError(item, this, info);
   }

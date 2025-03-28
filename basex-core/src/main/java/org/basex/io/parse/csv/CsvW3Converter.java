@@ -88,7 +88,7 @@ public final class CsvW3Converter extends CsvXQueryConverter {
         final XQArray row = (XQArray) rows.itemAt(rowIndex - 1);
         if(row != null) {
           Item colIndex = toAtomItem(arg(1), qc);
-          if(STRING_O.instance(colIndex)) {
+          if(colIndex.type.instanceOf(AtomType.STRING)) {
             final Item it = (Item) columnIndex.get(colIndex);
             if(it.isEmpty()) throw CSV_COLUMNNAME_X.get(info, colIndex);
             colIndex = it;

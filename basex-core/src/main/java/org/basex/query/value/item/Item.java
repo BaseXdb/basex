@@ -160,9 +160,11 @@ public abstract class Item extends Value {
    * Checks if this item is instance of the specified type.
    * Overwritten by {@link XQMap} and {@link XQArray}.
    * @param tp type
+   * @param coerce item coercion
    * @return result of check
    */
-  public boolean instanceOf(final Type tp) {
+  @SuppressWarnings("unused")
+  public boolean instanceOf(final Type tp, final boolean coerce) {
     return type.instanceOf(tp);
   }
 

@@ -90,8 +90,8 @@ public class MapType extends FType {
   public final XQMap cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     if(item instanceof XQMap) {
-      final XQMap m = (XQMap) item;
-      if(m.instanceOf(this)) return m;
+      final XQMap map = (XQMap) item;
+      if(map.instanceOf(this, false)) return map;
     }
     throw typeError(item, this, info);
   }
