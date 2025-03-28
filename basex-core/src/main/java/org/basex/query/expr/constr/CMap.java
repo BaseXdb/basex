@@ -65,7 +65,7 @@ public final class CMap extends Arr {
       final SeqType kst = exprs[e].seqType(), dst = exprs[e + 1].seqType();
       final AtomType akt = kst.type.atomic();
       kt = akt == null || !kst.one() || kst.mayBeArray() ? AtomType.ANY_ATOMIC_TYPE :
-        e == 0 ? akt : kt.union(akt);
+        e == 0 ? akt : (AtomType) kt.union(akt);
       vt = e == 0 ? dst : vt.union(dst);
     }
     exprType.assign(MapType.get(kt, vt));

@@ -913,8 +913,8 @@ public enum AtomType implements Type {
 
   /** Name. */
   private final byte[] name;
-  /** Parent type. */
-  public final AtomType parent;
+  /** Parent type (can be {@code null}). */
+  private final AtomType parent;
   /** URI. */
   private final byte[] uri;
 
@@ -930,7 +930,7 @@ public enum AtomType implements Type {
   private final boolean sortable;
 
   /** Pre/post values representing the hierarchy. */
-  private int[] prePost = new int[2];
+  private byte[] prePost = new byte[2];
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
   /** QName (lazy instantiation). */
@@ -939,7 +939,7 @@ public enum AtomType implements Type {
   /**
    * Constructor.
    * @param name string representation
-   * @param parent parent type
+   * @param parent parent type (can be {@code null})
    * @param uri URI
    * @param numeric numeric flag
    * @param untyped untyped flag
@@ -965,7 +965,7 @@ public enum AtomType implements Type {
     for(final AtomType type : VALUES) {
       if(type.parent != null) types.computeIfAbsent(type.parent, k -> new ArrayList<>()).add(type);
     }
-    ITEM.assign(types, new int[2]);
+    ITEM.assign(types, new byte[2]);
   }
 
   /**
@@ -973,7 +973,7 @@ public enum AtomType implements Type {
    * @param types child types
    * @param pp pre/post array
    */
-  private void assign(final HashMap<AtomType, List<AtomType>> types, final int[] pp) {
+  private void assign(final HashMap<AtomType, List<AtomType>> types, final byte[] pp) {
     prePost[0] = pp[0]++;
     for(final AtomType type : types.getOrDefault(this, List.of())) type.assign(types, pp);
     prePost[1] = pp[1]++;
@@ -1013,6 +1013,14 @@ public enum AtomType implements Type {
     return qnm;
   }
 
+  /**
+   * Returns the parent type.
+   * @return parent (can be {@code null})
+   */
+  public final AtomType parent() {
+    return parent;
+  }
+
   @Override
   public final boolean eq(final Type type) {
     return this == type;
@@ -1029,19 +1037,16 @@ public enum AtomType implements Type {
   }
 
   @Override
-  public final AtomType union(final Type type) {
-    if(type instanceof ChoiceItemType || type instanceof EnumType) {
-      return (AtomType) type.union(this);
-    }
+  public final Type union(final Type type) {
+    if(type instanceof ChoiceItemType || type instanceof EnumType) return type.union(this);
     if(type.instanceOf(this)) return this;
-
+    if(instanceOf(type)) return type;
     if(type instanceof AtomType) {
-      AtomType at = (AtomType) type;
-      if(instanceOf(at)) return at;
-      final List<AtomType> arr = new ArrayList<>();
-      while((at = at.parent) != null) arr.add(at);
-      for(AtomType p = this; (p = p.parent) != null;)
-        if(arr.contains(p)) return p;
+      final List<AtomType> ancestors = new ArrayList<>();
+      for(AtomType p = (AtomType) type; p != null; p = p.parent) ancestors.add(p);
+      for(AtomType p = this; p != null; p = p.parent) {
+        if(ancestors.contains(p)) return p;
+      }
     }
     return ITEM;
   }

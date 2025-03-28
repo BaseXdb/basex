@@ -64,11 +64,11 @@ public class FnAtomicTypeAnnotation extends StandardFunc {
         variety = Variety.atomic;
         break;
       default:
-        final AtomType parent = type.parent;
+        final AtomType parent = type.parent();
         baseType = parent == NUMERIC ? ANY_ATOMIC_TYPE : parent;
         variety = Variety.atomic;
-        for(primType = type; !primType.parent.oneOf(ANY_ATOMIC_TYPE, NUMERIC, null);)
-          primType = primType.parent;
+        for(primType = type; !primType.parent().oneOf(ANY_ATOMIC_TYPE, NUMERIC, null);)
+          primType = primType.parent();
         if(!type.oneOf(QNAME, NOTATION))
           constructor = (FuncItem) Functions.item(type.qname(), 1, true, ii, qc, true);
     }
