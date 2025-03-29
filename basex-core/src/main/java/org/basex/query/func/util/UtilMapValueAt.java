@@ -3,6 +3,7 @@ package org.basex.query.func.util;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.func.map.*;
 import org.basex.query.value.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -26,11 +27,22 @@ public final class UtilMapValueAt extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr map = arg(0);
-    final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      exprType.assign(((MapType) type).valueType().union(Occ.ZERO));
+    final Expr map = arg(0), index = arg(1);
+    if(map == XQMap.empty()) return Empty.VALUE;
+
+    SeqType st = null;
+    final MapCompilation mc = MapCompilation.get(map).index(index);
+    if(mc.field == null) {
+      // util:map-value-at({ 'a': 1 }, 2)  ->  ()
+      if(mc.index != null) return Empty.VALUE;
+    } else if(!mc.record.hasOptional()) {
+      st = mc.field.seqType();
     }
+
+    if(st == null && mc.mapType != null) {
+      st = mc.mapType.valueType().union(Occ.ZERO);
+    }
+    if(st != null) exprType.assign(st);
     return this;
   }
 }

@@ -220,15 +220,18 @@ public final class MapModuleTest extends SandboxTest {
     check(func.args(_MAP_ENTRY.args(wrap("a"), wrap(0)), "a"), 0, root(func));
 
     String record = "declare record local:x(x as xs:integer);";
-    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0, type(func, "xs:integer"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0,
+        type(_UTIL_MAP_VALUE_AT, "xs:integer"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
 
     record = "declare record local:x(x? as xs:integer);";
-    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0, type(func, "xs:integer?"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0,
+        type(func, "xs:integer?"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
 
     record = "declare record local:x(x as xs:integer, *);";
-    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0, type(func, "xs:integer"));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0,
+        type(_UTIL_MAP_VALUE_AT, "xs:integer"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", root(func));
   }
 
@@ -491,9 +494,9 @@ public final class MapModuleTest extends SandboxTest {
 
     String record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(func, "local:x"));
+        type(_UTIL_MAP_PUT_AT, "local:x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(func, "map(xs:string, xs:anyAtomicType)"));
+        type(_UTIL_MAP_PUT_AT, "map(xs:string, xs:anyAtomicType)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
         type(func, "map(xs:string, xs:integer)"));
 
@@ -507,9 +510,9 @@ public final class MapModuleTest extends SandboxTest {
 
     record = "declare record local:x(x as xs:integer, *);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
-        type(func, "local:x"));
+        type(_UTIL_MAP_PUT_AT, "local:x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(func, "map(*)"));
+        type(_UTIL_MAP_PUT_AT, "map(*)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
         type(func, "local:x"));
   }

@@ -1,7 +1,10 @@
 package org.basex.query.func.map;
 
+import static org.basex.query.func.Function.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -14,7 +17,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapGet extends MapFn {
+public final class MapGet extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
@@ -36,27 +39,27 @@ public final class MapGet extends MapFn {
       arg(2, arg -> refineFunc(arg, cc, type != null ? type.seqType() : SeqType.ANY_ATOMIC_TYPE_O));
     }
 
-    // combine result type with return type of fallback function, or with empty sequence
-    SeqType st = null;
-    final MapInfo mi = mapInfo(map, key);
-    if(mi.key != null) {
-      if(mi.field == null) {
-        if(!mi.record.isExtensible() && !fallback) return Empty.VALUE;
-      } else if(!mi.field.isOptional()) {
-        st = mi.field.seqType();
+    final MapCompilation mc = MapCompilation.get(map).key(key);
+    if(mc.key != null) {
+      if(mc.field == null) {
+        // map:get({ 'a': 1, 'a': 2 }, 'c')  ->  ()
+        if(!mc.record.isExtensible() && !fallback) return Empty.VALUE;
+      } else if(!mc.record.hasOptional()) {
+        // map:get({ 'a': 1, 'b': 2 }, 'b')  ->  util:map-value-at({ 'a': 1, 'b': 2 }, 2)
+        return cc.function(_UTIL_MAP_VALUE_AT, info, map, Int.get(mc.index));
       }
     }
 
-    if(st == null && mi.mapType != null) {
-      st = mi.mapType.valueType();
+    if(mc.mapType != null) {
+      SeqType st = mc.mapType.valueType();
       if(fallback) {
         final FuncType ft = func.funcType();
         if(ft != null) st = st.union(ft.declType);
       } else {
         st = st.union(Occ.ZERO);
       }
+      exprType.assign(st);
     }
-    if(st != null) exprType.assign(st);
     return this;
   }
 

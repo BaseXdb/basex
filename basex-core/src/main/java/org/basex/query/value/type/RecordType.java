@@ -90,12 +90,32 @@ public final class RecordType extends MapType {
   }
 
   /**
+   * Indicates if this record has optional fields.
+   * @return result of check
+   */
+  public boolean hasOptional() {
+    for(final byte[] key : fields) {
+      if(fields.get(key).isOptional()) return true;
+    }
+    return false;
+  }
+
+  /**
    * Returns the field with the specified key.
    * @param key key to be looked up
    * @return field, or {@code null} if nothing was found
    */
   public RecordField field(final byte[] key) {
     return fields.get(key);
+  }
+
+  /**
+   * Returns the index of the field with the specified key.
+   * @param key key to be looked up
+   * @return index, or {@code 0} if nothing was found
+   */
+  public int index(final byte[] key) {
+    return fields.index(key);
   }
 
   /**

@@ -2,6 +2,7 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -14,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapRemove extends MapFn {
+public final class MapRemove extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     XQMap map = toMap(arg(0), qc);
@@ -32,17 +33,19 @@ public final class MapRemove extends MapFn {
     if(map == XQMap.empty()) return map;
 
     Type type = null;
-    final MapInfo mi = mapInfo(map, key);
-    if(mi.key != null) {
+    final MapCompilation mc = MapCompilation.get(map).key(key);
+    if(mc.key != null) {
       // try to propagate record type
-      final boolean ext = mi.record.isExtensible();
-      if(mi.field == null && !ext) return map;
-      if(mi.key == EXTENDED && ext || mi.field == null || mi.field.isOptional()) type = mi.record;
+      final boolean ext = mc.record.isExtensible();
+      if(mc.field == null && !ext) return map;
+      if(mc.key == MapCompilation.EXTENDED && ext || mc.field == null || mc.field.isOptional()) {
+        type = mc.record;
+      }
     }
 
-    if(type == null && mi.mapType != null) {
+    if(type == null && mc.mapType != null) {
       // create new map type (potentially assigned record type must not be propagated)
-      type = MapType.get(mi.mapType.keyType(), mi.mapType.valueType());
+      type = MapType.get(mc.mapType.keyType(), mc.mapType.valueType());
     }
     if(type != null) exprType.assign(type);
     return this;
