@@ -74,6 +74,19 @@ public final class AnnList implements Iterable<Ann> {
   }
 
   /**
+   * Removes an annotation.
+   * @param ann annotation to be added
+   * @return a new instance
+   */
+  public AnnList remove(final Annotation ann) {
+    AnnList tmp = AnnList.EMPTY;
+    for(final Ann a : anns) {
+      if(a.definition != ann) tmp = tmp.attach(a);
+    }
+    return tmp;
+  }
+
+  /**
    * Tests whether the container has no elements.
    * @return result of check
    */

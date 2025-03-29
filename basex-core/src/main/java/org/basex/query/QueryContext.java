@@ -487,6 +487,8 @@ public final class QueryContext extends Job implements Closeable {
    * @return new or already registered record type
    */
   public RecordType newRecord(final boolean extensible, final TokenObjectMap<RecordField> fields) {
+    if(fields.isEmpty() && extensible) return SeqType.RECORD;
+
     final RecordType rt = new RecordType(extensible, fields, null);
     for(final RecordType recordType : recordTypes) {
       if(recordType.equals(rt)) return recordType;

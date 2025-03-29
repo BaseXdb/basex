@@ -186,17 +186,14 @@ public final class Lookup extends Arr {
    * @param value lookup result
    * @return value, or new function item with focus bound to map
    */
-  private Value bindFocusIfNeeded(final XQStruct struct, final Value value) {
+  private static Value bindFocusIfNeeded(final XQStruct struct, final Value value) {
     if(struct instanceof XQMap && value instanceof FuncItem) {
       final FuncItem fi = (FuncItem) value;
-      if(fi.annotations().contains(Annotation.METHOD)) {
-        AnnList anns = AnnList.EMPTY;
-        for(final Ann a : fi.annotations()) {
-          if(a.definition != Annotation.METHOD) anns = anns.attach(a);
-        }
+      final AnnList anns = fi.annotations();
+      if(anns.contains(Annotation.METHOD)) {
         final QueryFocus qf = new QueryFocus();
         qf.value = struct;
-        return new FuncItem(fi, anns, qf);
+        return new FuncItem(fi, anns.remove(Annotation.METHOD), qf);
       }
     }
     return value;

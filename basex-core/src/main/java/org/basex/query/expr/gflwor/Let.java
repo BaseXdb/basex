@@ -134,7 +134,7 @@ public final class Let extends ForLet {
      * @param sub sub-evaluator
      */
     LetEval(final Let let, final Eval sub) {
-      lets = new ArrayList<>();
+      lets = new ArrayList<>(4);
       lets.add(let);
       this.sub = sub;
     }

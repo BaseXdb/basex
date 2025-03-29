@@ -1042,7 +1042,7 @@ public enum AtomType implements Type {
     if(type.instanceOf(this)) return this;
     if(instanceOf(type)) return type;
     if(type instanceof AtomType) {
-      final List<AtomType> ancestors = new ArrayList<>();
+      final List<AtomType> ancestors = new ArrayList<>(8);
       for(AtomType p = (AtomType) type; p != null; p = p.parent) ancestors.add(p);
       for(AtomType p = this; p != null; p = p.parent) {
         if(ancestors.contains(p)) return p;

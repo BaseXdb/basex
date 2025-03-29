@@ -216,21 +216,35 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
-    if(this == tp) return true;
-    if(coerce && (tp instanceof FuncType || tp instanceof RecordType)) return false;
+    if(type == tp) return true;
+    if(coerce && tp instanceof FuncType) return false;
+
     try {
       if(tp instanceof RecordType) {
         final RecordType rt = (RecordType) tp;
         final TokenObjectMap<RecordField> fields = rt.fields();
         final int fs = fields.size();
+        final BasicIter<Item> keys = keys();
+        if(coerce) {
+          for(int f = 1; f <= fs; f++) {
+            final byte[] rk = fields.key(f);
+            final RecordField rf = fields.value(f);
+            final Item k = keys.next();
+            if(rf.isOptional() || k == null || k.type != AtomType.STRING ||
+                !Token.eq(rk, k.string(null))) return false;
+            if(!rf.seqType().instance(getOrNull(k))) return false;
+          }
+          return keys.next() == null || rt.isExtensible();
+        }
+
         for(int f = 1; f <= fs; f++) {
-          final byte[] key = fields.key(f);
+          final byte[] rk = fields.key(f);
           final RecordField rf = fields.value(f);
-          final Value value = getOrNull(Str.get(key));
+          final Value value = getOrNull(Str.get(rk));
           if(value != null ? !rf.seqType().instance(value) : !rf.isOptional()) return false;
         }
         if(!rt.isExtensible()) {
-          for(final Item key : keys()) {
+          for(final Item key : keys) {
             if(!key.type.instanceOf(AtomType.STRING) || !fields.contains(key.string(null)))
               return false;
           }

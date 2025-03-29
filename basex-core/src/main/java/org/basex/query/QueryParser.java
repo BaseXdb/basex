@@ -3414,21 +3414,20 @@ public class QueryParser extends InputParser {
     // record
     if(type instanceof RecordType) {
       final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
-      if(consume(')')) return qc.newRecord(false, fields);
-      boolean extensible = false;
-      do {
-        if(wsConsume("*")) {
-          extensible = true;
-          break;
-        }
-        final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X);
-        final boolean optional = wsConsume("?");
-        final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
-        if(fields.contains(name)) throw error(DUPFIELD_X, name);
-        fields.put(name, new RecordField(optional, seqType));
-      } while(wsConsume(","));
-      wsCheck(")");
-      return fields.isEmpty() ? SeqType.RECORD : qc.newRecord(extensible, fields);
+      boolean extensible = !consume(')');
+      if(extensible) {
+        do {
+          extensible = wsConsume("*");
+          if(extensible) break;
+          final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X);
+          final boolean optional = wsConsume("?");
+          final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
+          if(fields.contains(name)) throw error(DUPFIELD_X, name);
+          fields.put(name, new RecordField(optional, seqType));
+        } while(wsConsume(","));
+        wsCheck(")");
+      }
+      return qc.newRecord(extensible, fields);
     }
     // map
     if(type instanceof MapType) {
