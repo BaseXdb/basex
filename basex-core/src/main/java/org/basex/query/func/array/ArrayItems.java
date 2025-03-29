@@ -1,7 +1,5 @@
 package org.basex.query.func.array;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -9,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -22,37 +19,12 @@ public final class ArrayItems extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-
-    return new Iter() {
-      final Iterator<Value> values = array.iterator(0);
-      Iter ir;
-
-      @Override
-      public Item next() throws QueryException {
-        while(true) {
-          if(ir != null) {
-            final Item item = qc.next(ir);
-            if(item != null) return item;
-          }
-          if(!values.hasNext()) return null;
-          ir = values.next().iter();
-        }
-      }
-      @Override
-      public Item get(final long i) throws QueryException {
-        return array.get(i).item(qc, info);
-      }
-      @Override
-      public long size() {
-        return array.funcType().declType.one() ? array.structSize() : -1;
-      }
-    };
+    return array.items();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final XQArray array = toArray(arg(0), qc);
-    return array.items(qc);
+    return iter(qc).value(qc, this);
   }
 
   @Override

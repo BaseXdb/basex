@@ -279,13 +279,80 @@ public abstract class XQMap extends XQStruct {
    * Returns a key iterator.
    * @return iterator
    */
-  public abstract BasicIter<Item> keys();
+  public BasicIter<Item> keys() {
+    final long size = structSize();
+    if(size == 0) return Empty.ITER;
+    if(size == 1) return keyAt(0).iter();
+
+    return new BasicIter<>(size) {
+      @Override
+      public Item get(final long i) {
+        return keyAt((int) i);
+      }
+      @Override
+      public Value value(final QueryContext qc, final Expr expr) throws QueryException {
+        final Value items = keysInternal();
+        return items != null ? items : super.value(qc, expr);
+      }
+    };
+  }
 
   @Override
-  public final Value items(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    forEach((key, value) -> vb.add(value));
-    return vb.value(((MapType) type).valueType().type);
+  public final Iter items() {
+    final long size = structSize();
+    if(size == 0) return Empty.ITER;
+    if(size == 1) return valueAt(0).iter();
+
+    // single-item values?
+    if(((MapType) type).valueType().one()) {
+      return new BasicIter<>(size) {
+        @Override
+        public Item get(final long i) {
+          return (Item) XQMap.this.valueAt((int) i);
+        }
+        @Override
+        public Value value(final QueryContext qc, final Expr expr) throws QueryException {
+          final Value items = itemsInternal();
+          return items != null ? items : super.value(qc, expr);
+        }
+      };
+    }
+
+    final BasicIter<Item> keys = keys();
+    return new Iter() {
+      Iter iter = Empty.ITER;
+
+      @Override
+      public Item next() throws QueryException {
+        while(true) {
+          final Item item = iter.next();
+          if(item != null) return item;
+          final Item key = keys.next();
+          if(key == null) return null;
+          iter = XQMap.this.get(key).iter();
+        }
+      }
+      @Override
+      public Value value(final QueryContext qc, final Expr expr) throws QueryException {
+        final Value items = itemsInternal();
+        return items != null ? items : super.value(qc, expr);
+      }
+    };
+  }
+
+  /**
+   * Returns keys.
+   * @return items ({@code null} if not implemented)
+   */
+  Value keysInternal() {
+    return null;
+  }
+  /**
+   * Returns sequence-concatenated values.
+   * @return items ({@code null} if not implemented)
+   */
+  Value itemsInternal() {
+    return null;
   }
 
   /**

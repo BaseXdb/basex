@@ -1,8 +1,6 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -64,26 +62,6 @@ abstract class XQHashMap extends XQMap {
     }
     return true;
   }
-
-  @Override
-  public final BasicIter<Item> keys() {
-    return new BasicIter<>(structSize()) {
-      @Override
-      public Item get(final long i) {
-        return keyAt((int) i);
-      }
-      @Override
-      public Value value(final QueryContext qc, final Expr expr) {
-        return keysInternal();
-      }
-    };
-  }
-
-  /**
-   * Returns all keys.
-   * @return key
-   */
-  abstract Value keysInternal();
 
   /**
    * Builds the map by adding a new key and value.

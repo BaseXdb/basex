@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -73,11 +74,10 @@ public abstract class XQStruct extends FItem {
 
   /**
    * Returns all items (sequence-concatenated values) of this structure.
-   * @param qc query context
    * @return values
    * @throws QueryException query exception
    */
-  public abstract Value items(QueryContext qc) throws QueryException;
+  public abstract Iter items() throws QueryException;
 
   /**
    * Returns the key for accessing a function value.

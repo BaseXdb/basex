@@ -1,7 +1,6 @@
 package org.basex.query.value.map;
 
 import org.basex.query.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -72,10 +71,5 @@ public final class XQSingletonMap extends XQMap {
   @Override
   public boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
     return func.test(k, v);
-  }
-
-  @Override
-  public BasicIter<Item> keys() {
-    return k.iter();
   }
 }

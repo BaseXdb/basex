@@ -6,6 +6,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Unmodifiable hash map implementation for strings.
@@ -45,6 +46,13 @@ public final class XQStrMap extends XQHashMap {
   @Override
   Value keysInternal() {
     return StrSeq.get(map.keys());
+  }
+
+  @Override
+  Value itemsInternal() {
+    final TokenList list = new TokenList(structSize());
+    for(final byte[] value : map.values()) list.add(value);
+    return StrSeq.get(list.finish());
   }
 
   @Override

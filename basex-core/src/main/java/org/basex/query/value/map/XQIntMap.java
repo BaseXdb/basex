@@ -56,6 +56,14 @@ public final class XQIntMap extends XQHashMap {
   }
 
   @Override
+  Value itemsInternal() {
+    final long is = structSize();
+    final LongList list = new LongList(is);
+    for(int i = 1; i <= is; i++) list.add(map.value(i));
+    return IntSeq.get(list.finish());
+  }
+
+  @Override
   public Int keyAt(final int pos) {
     return Int.get(map.key(pos + 1));
   }

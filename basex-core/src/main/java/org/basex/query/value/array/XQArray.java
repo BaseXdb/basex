@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -204,10 +205,23 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  public final Value items(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value value : iterable()) vb.add(value);
-    return vb.value(((ArrayType) type).valueType().type);
+  public final Iter items() throws QueryException {
+    return new Iter() {
+      final Iterator<Value> values = iterator(0);
+      Iter ir;
+
+      @Override
+      public Item next() throws QueryException {
+        while(true) {
+          if(ir != null) {
+            final Item item = ir.next();
+            if(item != null) return item;
+          }
+          if(!values.hasNext()) return null;
+          ir = values.next().iter();
+        }
+      }
+    };
   }
 
   /**
