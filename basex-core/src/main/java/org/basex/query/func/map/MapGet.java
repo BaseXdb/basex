@@ -22,10 +22,17 @@ public final class MapGet extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final Item key = toAtomItem(arg(1), qc);
-    final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
-    final Value value = map.getOrNull(key);
-    return value != null ? value : fallback != null ? fallback.invoke(qc, info, key) : Empty.VALUE;
+    Value value = map.getOrNull(key);
+    if(value == null) {
+      final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
+      if(fallback != null) value = fallback.invoke(qc, info, key);
+      if(value == null) return Empty.VALUE;
+    }
+    if(value instanceof FuncItem && toBoolean(arg(3), qc)) {
+      value = ((FuncItem) value).toMethod(map);
+    }
+    return value;
   }
 
   @Override
@@ -33,7 +40,7 @@ public final class MapGet extends StandardFunc {
     final Expr map = arg(0), key = arg(1), func = arg(2);
     if(map == XQMap.empty()) return Empty.VALUE;
 
-    final boolean fallback = defined(2);
+    final boolean fallback = defined(2), methods = defined(3);
     if(fallback) {
       final Type type = arg(1).seqType().type.atomic();
       arg(2, arg -> refineFunc(arg, cc, type != null ? type.seqType() : SeqType.ANY_ATOMIC_TYPE_O));
@@ -44,7 +51,7 @@ public final class MapGet extends StandardFunc {
       if(mc.field == null) {
         // map:get({ 'a': 1, 'a': 2 }, 'c')  ->  ()
         if(!mc.record.isExtensible() && !fallback) return Empty.VALUE;
-      } else if(!mc.record.hasOptional()) {
+      } else if(!mc.record.hasOptional() && !methods) {
         // map:get({ 'a': 1, 'b': 2 }, 'b')  ->  util:map-value-at({ 'a': 1, 'b': 2 }, 2)
         return cc.function(_UTIL_MAP_VALUE_AT, info, map, Int.get(mc.index));
       }

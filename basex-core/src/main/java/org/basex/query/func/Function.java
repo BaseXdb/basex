@@ -777,9 +777,9 @@ public enum Function implements AFunction {
       params(MAP_O, FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
       ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
-  _MAP_GET(MapGet::new, "get(map,key[,fallback])",
+  _MAP_GET(MapGet::new, "get(map,key[,fallback,methods])",
       params(MAP_O, ANY_ATOMIC_TYPE_O,
-      FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O).seqType(Occ.ZERO_OR_ONE)),
+      FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O).seqType(Occ.ZERO_OR_ONE), BOOLEAN_ZO),
       ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map)",

@@ -60,7 +60,7 @@ public final class XQuery4Test extends SandboxTest {
 
     query("declare record local:rect(height, width, area := %method fn() { ?height × ?width }); "
         + "let $r := local:rect(3, 4) return local:rect(5, 6, $r?area)?area()", 12);
-    query("{'self': %method fn() { . } }?*() => map:keys()", "self");
+    query("{'self': %method fn() { . } }?self() => map:keys()", "self");
     query("let $f := %method fn() {?i}, $h := ({'i': 7, 'f': $f}, {'i': 11, 'g': $f})?('f', 'g') "
         + "return $h[1]() * $h[2]()", 77);
 

@@ -4,15 +4,14 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -50,17 +49,13 @@ public final class Lookup extends Arr {
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
-    // replace if different, unless there is a chance of a %method that needs to be processed
-    final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
-    if(array || !st.mayBeFunction() || st.instanceOf(SeqType.ARRAY_ZM) ||
-        st.instanceOf(SeqType.MAP_ZM)) {
-      final Expr expr = opt(cc);
-      if(expr != this) return cc.replaceWith(this, expr);
-    }
+    final Expr expr = opt(cc);
+    if(expr != this) return cc.replaceWith(this, expr);
 
     // derive type from input expression
     final Expr keys = exprs[1];
     final SeqType kt = keys.seqType();
+    final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
     Occ occ = st.occ;
     if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeArray()) {
       // key is wildcard, or expressions yield no single item
@@ -96,7 +91,8 @@ public final class Lookup extends Arr {
        *  ARRAY?(KEY)  ->  array:get(INPUT, KEY) */
       final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == WILDCARD ?
         cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
-        cc.function(map ? Function._MAP_GET   : Function._ARRAY_GET  , info, in, arg);
+        array ? cc.function(Function._ARRAY_GET, info, in, arg) :
+        cc.function(Function._MAP_GET, info, in, arg, Empty.UNDEFINED, Bln.TRUE);
 
       // single key
       if(ks == 1) {
@@ -169,34 +165,16 @@ public final class Lookup extends Arr {
     final Expr keys = exprs[1];
 
     // wildcard: add all values
-    if(keys == WILDCARD) return bindFocusIfNeeded(struct, struct.items(qc));
+    if(keys == WILDCARD) return struct.items(qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter ir = keys.atomIter(qc, info);
     for(Item key; (key = ir.next()) != null;) {
-      vb.add(bindFocusIfNeeded(struct, struct.invoke(qc, info, key)));
+      final Value value = struct.invoke(qc, info, key);
+      vb.add(value instanceof FuncItem && struct instanceof XQMap ?
+        ((FuncItem) value).toMethod(struct) : value);
     }
     return vb.value(this);
-  }
-
-  /**
-   * Bind the focus of a %method function item, in case it is a singleton map value, to the map upon
-   * lookup.
-   * @param struct structure
-   * @param value lookup result
-   * @return value, or new function item with focus bound to map
-   */
-  private static Value bindFocusIfNeeded(final XQStruct struct, final Value value) {
-    if(struct instanceof XQMap && value instanceof FuncItem) {
-      final FuncItem fi = (FuncItem) value;
-      final AnnList anns = fi.annotations();
-      if(anns.contains(Annotation.METHOD)) {
-        final QueryFocus qf = new QueryFocus();
-        qf.value = struct;
-        return new FuncItem(fi, anns.remove(Annotation.METHOD), qf);
-      }
-    }
-    return value;
   }
 
   @Override
