@@ -44,18 +44,19 @@ public final class MapCompilation {
 
   /**
    * Attaches map information for the specified key.
-   * @param keyExpr key expression
+   * @param expr key expression
    * @return map information
    * @throws QueryException query exception
    */
-  public MapCompilation key(final Expr keyExpr) throws QueryException {
+  public MapCompilation key(final Expr expr) throws QueryException {
     if(record != null) {
-      final Type kt = keyExpr.seqType().type;
+      final Type kt = expr.seqType().type;
       if(kt.isStringOrUntyped()) {
-        if(keyExpr instanceof Item) {
-          final byte[] k = ((Item) keyExpr).string(null);
-          index = record.index(k);
-          field = record.field(k);
+        if(expr instanceof Item) {
+          final TokenObjectMap<RecordField> fields = record.fields();
+          final byte[] k = ((Item) expr).string(null);
+          index = fields.index(k);
+          field = fields.get(k);
           key = field != null ? k : EXTENDED;
         }
       } else if(kt.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
@@ -67,12 +68,12 @@ public final class MapCompilation {
 
   /**
    * Attaches map information for the specified index.
-   * @param indexExpr index expression
+   * @param expr index expression
    * @return map information
    */
-  public MapCompilation index(final Expr indexExpr) {
-    if(record != null && indexExpr instanceof Int) {
-      index = (int) ((Int) indexExpr).itr();
+  public MapCompilation index(final Expr expr) {
+    if(record != null && expr instanceof Int) {
+      index = (int) ((Int) expr).itr();
       final TokenObjectMap<RecordField> fields = record.fields();
       if(index > 0 && index <= fields.size()) {
         field = fields.value(index);

@@ -36,9 +36,10 @@ public final class MapRemove extends StandardFunc {
     final MapCompilation mc = MapCompilation.get(map).key(key);
     if(mc.key != null) {
       // try to propagate record type
-      final boolean ext = mc.record.isExtensible();
-      if(mc.field == null && !ext) return map;
-      if(mc.key == MapCompilation.EXTENDED && ext || mc.field == null || mc.field.isOptional()) {
+      final boolean extensible = mc.record.isExtensible();
+      if(mc.field == null && !extensible) return map;
+      if(mc.key == MapCompilation.EXTENDED && extensible || mc.field == null ||
+          mc.field.isOptional()) {
         type = mc.record;
       }
     }

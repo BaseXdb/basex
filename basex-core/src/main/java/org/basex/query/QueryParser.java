@@ -978,11 +978,9 @@ public class QueryParser extends InputParser {
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck("(");
     final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
-    final RecordType rt;
-    if(wsConsume(")")) {
-      rt = new RecordType(false, fields, qn);
-    } else {
-      boolean extensible = false, exprRequired = false;
+    boolean extensible = false;
+    if(!wsConsume(")")) {
+      boolean exprRequired = false;
       do {
         skipWs();
         if(!fields.isEmpty() && consume("*")) {
@@ -1005,8 +1003,8 @@ public class QueryParser extends InputParser {
         fields.put(name, new RecordField(optional, seqType, expr));
       } while(wsConsume(","));
       wsCheck(")");
-      rt = new RecordType(extensible, fields, qn);
     }
+    final RecordType rt = new RecordType(extensible, fields, qn);
     declaredTypes.put(qn, rt.seqType());
     namedRecordTypes.put(qn, rt);
     if(!anns.contains(Annotation.PRIVATE)) {
@@ -1018,8 +1016,8 @@ public class QueryParser extends InputParser {
       localVars.pushContext(false);
       final Params params = new Params();
       boolean defaults = false;
-      for(final byte[] key : rt.fields()) {
-        final RecordField rf = rt.field(key);
+      for(final byte[] key : fields) {
+        final RecordField rf = fields.get(key);
         final boolean optional = rf.isOptional();
         final Expr initExpr = rf.expr();
         if(optional || initExpr != null) {

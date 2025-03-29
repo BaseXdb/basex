@@ -21,6 +21,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * The map item.
@@ -220,15 +221,17 @@ public abstract class XQMap extends XQStruct {
     try {
       if(tp instanceof RecordType) {
         final RecordType rt = (RecordType) tp;
-        for(final byte[] key : rt.fields()) {
-          final RecordField rf = rt.field(key);
+        final TokenObjectMap<RecordField> fields = rt.fields();
+        final int fs = fields.size();
+        for(int f = 1; f <= fs; f++) {
+          final byte[] key = fields.key(f);
+          final RecordField rf = fields.value(f);
           final Value value = getOrNull(Str.get(key));
-          if(value != null ? !rf.seqType().instance(value) : !rf.isOptional())
-            return false;
+          if(value != null ? !rf.seqType().instance(value) : !rf.isOptional()) return false;
         }
         if(!rt.isExtensible()) {
           for(final Item key : keys()) {
-            if(!key.type.instanceOf(AtomType.STRING) || rt.field(key.string(null)) == null)
+            if(!key.type.instanceOf(AtomType.STRING) || !fields.contains(key.string(null)))
               return false;
           }
         }
@@ -306,11 +309,14 @@ public abstract class XQMap extends XQStruct {
   public final XQMap coerceTo(final RecordType rt, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
-    final long size = structSize();
-    final MapBuilder mb = new MapBuilder(size);
+    final long ms = structSize();
+    final MapBuilder mb = new MapBuilder(ms);
     // add defined values
-    for(final byte[] key : rt.fields()) {
-      final RecordField rf = rt.field(key);
+    final TokenObjectMap<RecordField> fields = rt.fields();
+    final int fs = fields.size();
+    for(int f = 1; f <= fs; f++) {
+      final byte[] key = fields.key(f);
+      final RecordField rf = fields.value(f);
       final Value value = getOrNull(Str.get(key));
       if(value != null) {
         mb.put(key, rf.seqType().coerce(value, null, qc, cc, ii));
@@ -319,7 +325,7 @@ public abstract class XQMap extends XQStruct {
       }
     }
     // add remaining values
-    if(mb.size() < size) {
+    if(mb.size() < ms) {
       forEach((key, value) -> {
         if(!mb.contains(key)) {
           qc.checkStop();

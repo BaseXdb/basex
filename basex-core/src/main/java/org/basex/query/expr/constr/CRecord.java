@@ -24,7 +24,7 @@ public final class CRecord extends Arr {
    * Constructor.
    * @param type record type
    * @param info input info (can be {@code null})
-   * @param args function arguments
+   * @param args record values
    */
   public CRecord(final InputInfo info, final Type type, final Expr[] args) {
     super(info, type.seqType(), args);
@@ -38,21 +38,22 @@ public final class CRecord extends Arr {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final RecordType rt = (RecordType) seqType().type;
-    final boolean ext = rt.isExtensible();
-    if(ext || ((Checks<byte[]>) rf -> rt.field(rf).isOptional()).any(rt.fields())) {
-      final MapBuilder mb = new MapBuilder();
-      int e = 0;
-      for(final byte[] key : rt.fields()) {
-        final Value value = exprs[e++].value(qc);
+    final TokenObjectMap<RecordField> fields = rt.fields();
+    final int fs = fields.size();
+    final boolean extensible = rt.isExtensible();
+    if(extensible || rt.hasOptional()) {
+      final MapBuilder mb = new MapBuilder(exprs.length);
+      for(int f = 1; f <= fs; f++) {
         boolean add = true;
+        final Value value = exprs[f - 1].value(qc);
         if(value.isEmpty()) {
-          final RecordField rf = rt.field(key);
+          final RecordField rf = fields.value(f);
           if(rf.isOptional() && rf.expr() == null) add = false;
         }
-        if(add) mb.put(key, value);
+        if(add) mb.put(fields.key(f), value);
       }
-      if(ext) {
-        toMap(arg(e), qc).forEach((k, v) -> {
+      if(extensible) {
+        toMap(arg(fs), qc).forEach((k, v) -> {
           if(!mb.contains(k)) mb.put(k, v);
         });
       }
@@ -60,7 +61,7 @@ public final class CRecord extends Arr {
     }
 
     // create compact record map
-    final ValueList values = new ValueList(rt.fields().size());
+    final ValueList values = new ValueList(fs);
     for(final Expr expr : exprs) values.add(expr.value(qc));
     return new XQRecordMap(values.finish(), rt);
   }

@@ -94,28 +94,10 @@ public final class RecordType extends MapType {
    * @return result of check
    */
   public boolean hasOptional() {
-    for(final byte[] key : fields) {
-      if(fields.get(key).isOptional()) return true;
+    for(final RecordField field : fields.values()) {
+      if(field.isOptional()) return true;
     }
     return false;
-  }
-
-  /**
-   * Returns the field with the specified key.
-   * @param key key to be looked up
-   * @return field, or {@code null} if nothing was found
-   */
-  public RecordField field(final byte[] key) {
-    return fields.get(key);
-  }
-
-  /**
-   * Returns the index of the field with the specified key.
-   * @param key key to be looked up
-   * @return index, or {@code 0} if nothing was found
-   */
-  public int index(final byte[] key) {
-    return fields.index(key);
   }
 
   /**
@@ -242,8 +224,8 @@ public final class RecordType extends MapType {
     if(!extensible && type instanceof MapType) {
       final MapType mt = (MapType) type;
       if(!mt.keyType().oneOf(AtomType.STRING, AtomType.ANY_ATOMIC_TYPE)) return false;
-      for(final byte[] key : fields) {
-        if(!fields.get(key).seqType().instanceOf(mt.valueType())) return false;
+      for(final RecordField field : fields.values()) {
+        if(!field.seqType().instanceOf(mt.valueType())) return false;
       }
       return true;
     }
