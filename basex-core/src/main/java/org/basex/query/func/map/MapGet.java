@@ -29,7 +29,7 @@ public final class MapGet extends StandardFunc {
       if(fallback != null) value = fallback.invoke(qc, info, key);
       if(value == null) return Empty.VALUE;
     }
-    if(value instanceof FuncItem && toBoolean(arg(3), qc)) {
+    if(value instanceof FuncItem && toBooleanOrFalse(arg(3), qc)) {
       value = ((FuncItem) value).toMethod(map);
     }
     return value;
@@ -40,7 +40,7 @@ public final class MapGet extends StandardFunc {
     final Expr map = arg(0), key = arg(1), func = arg(2);
     if(map == XQMap.empty()) return Empty.VALUE;
 
-    final boolean fallback = defined(2), methods = defined(3);
+    final boolean fallback = defined(2);
     if(fallback) {
       final Type type = arg(1).seqType().type.atomic();
       arg(2, arg -> refineFunc(arg, cc, type != null ? type.seqType() : SeqType.ANY_ATOMIC_TYPE_O));
@@ -51,12 +51,11 @@ public final class MapGet extends StandardFunc {
       if(mc.field == null) {
         // map:get({ 'a': 1, 'a': 2 }, 'c')  ->  ()
         if(!mc.record.isExtensible() && !fallback) return Empty.VALUE;
-      } else if(!mc.record.hasOptional() && !methods) {
+      } else if(!mc.record.hasOptional()) {
         // map:get({ 'a': 1, 'b': 2 }, 'b')  ->  util:map-value-at({ 'a': 1, 'b': 2 }, 2)
-        return cc.function(_UTIL_MAP_VALUE_AT, info, map, Int.get(mc.index));
+        return cc.function(_UTIL_MAP_VALUE_AT, info, map, Int.get(mc.index), arg(3));
       }
     }
-
     if(mc.mapType != null) {
       SeqType st = mc.mapType.valueType();
       if(fallback) {
@@ -65,7 +64,8 @@ public final class MapGet extends StandardFunc {
       } else {
         st = st.union(Occ.ZERO);
       }
-      exprType.assign(st);
+      // invalidate function type (%method annotation would need to be removed from type)
+      if(!(st.mayBeFunction() && defined(3))) exprType.assign(st);
     }
     return this;
   }

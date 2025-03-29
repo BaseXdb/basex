@@ -55,7 +55,7 @@ public final class Lookup extends Arr {
     // derive type from input expression
     final Expr keys = exprs[1];
     final SeqType kt = keys.seqType();
-    final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
+    SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
     Occ occ = st.occ;
     if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeArray()) {
       // key is wildcard, or expressions yield no single item
@@ -64,8 +64,8 @@ public final class Lookup extends Arr {
       // map lookup may result in empty sequence
       occ = occ.union(Occ.ZERO);
     }
-    exprType.assign(st.type, occ);
-
+    // invalidate function type (%method annotation would need to be removed from type)
+    exprType.assign(st.mayBeFunction() ? AtomType.ITEM : st.type, occ);
     return this;
   }
 
@@ -85,14 +85,14 @@ public final class Lookup extends Arr {
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
     if(map || array) {
       /* REWRITE LOOKUP:
-       *  MAP?*        ->  map:items(MAP)
-       *  ARRAY?*      ->  array:items(MAP)
-       *  MAP?(KEY)    ->  map:get(INPUT, KEY)
-       *  ARRAY?(KEY)  ->  array:get(INPUT, KEY) */
+       *  MAP?*      ->  map:items(MAP)
+       *  ARRAY?*    ->  array:items(MAP)
+       *  MAP?KEY    ->  map:get(INPUT, KEY, (), true())
+       *  ARRAY?KEY  ->  array:get(INPUT, KEY) */
       final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == WILDCARD ?
         cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
-        array ? cc.function(Function._ARRAY_GET, info, in, arg) :
-        cc.function(Function._MAP_GET, info, in, arg, Empty.UNDEFINED, Bln.TRUE);
+        map ? cc.function(Function._MAP_GET, info, in, arg, Empty.UNDEFINED, Bln.TRUE) :
+        cc.function(Function._ARRAY_GET, info, in, arg);
 
       // single key
       if(ks == 1) {

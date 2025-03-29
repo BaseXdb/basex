@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.map.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -22,7 +23,11 @@ public final class UtilMapValueAt extends StandardFunc {
     final long index = toLong(arg(1), qc);
 
     final long size = map.structSize();
-    return index > 0 && index <= size ? map.valueAt((int) index - 1) : Empty.VALUE;
+    if(index < 1 || index > size) return Empty.VALUE;
+
+    final Value value = map.valueAt((int) index - 1);
+    return value instanceof FuncItem && toBooleanOrFalse(arg(2), qc) ?
+      ((FuncItem) value).toMethod(map) : value;
   }
 
   @Override
@@ -38,11 +43,10 @@ public final class UtilMapValueAt extends StandardFunc {
     } else if(!mc.record.hasOptional()) {
       st = mc.field.seqType();
     }
+    if(st == null && mc.mapType != null) st = mc.mapType.valueType().union(Occ.ZERO);
 
-    if(st == null && mc.mapType != null) {
-      st = mc.mapType.valueType().union(Occ.ZERO);
-    }
-    if(st != null) exprType.assign(st);
+    // invalidate function type (%method annotation would need to be removed from type)
+    if(st != null && !(st.mayBeFunction() && defined(2))) exprType.assign(st);
     return this;
   }
 }
