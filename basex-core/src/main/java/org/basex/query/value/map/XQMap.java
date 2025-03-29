@@ -215,9 +215,25 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final boolean instanceOf(final Type tp, final boolean coerce) {
-    if(coerce && tp instanceof FuncType) return this == tp;
+    if(this == tp) return true;
+    if(coerce && (tp instanceof FuncType || tp instanceof RecordType)) return false;
     try {
-      if(tp instanceof RecordType) return ((RecordType) tp).instance(this);
+      if(tp instanceof RecordType) {
+        final RecordType rt = (RecordType) tp;
+        for(final byte[] key : rt.fields()) {
+          final RecordField rf = rt.field(key);
+          final Value value = getOrNull(Str.get(key));
+          if(value != null ? !rf.seqType().instance(value) : !rf.isOptional())
+            return false;
+        }
+        if(!rt.isExtensible()) {
+          for(final Item key : keys()) {
+            if(!key.type.instanceOf(AtomType.STRING) || rt.field(key.string(null)) == null)
+              return false;
+          }
+        }
+        return true;
+      }
       if(type.instanceOf(tp)) return true;
 
       final Type kt;
@@ -290,26 +306,28 @@ public abstract class XQMap extends XQStruct {
   public final XQMap coerceTo(final RecordType rt, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
+    final long size = structSize();
+    final MapBuilder mb = new MapBuilder(size);
+    // add defined values
     for(final byte[] key : rt.fields()) {
-      if(!rt.field(key).isOptional() && !contains(Str.get(key))) {
+      final RecordField rf = rt.field(key);
+      final Value value = getOrNull(Str.get(key));
+      if(value != null) {
+        mb.put(key, rf.seqType().coerce(value, null, qc, cc, ii));
+      } else if(!rf.isOptional()) {
         throw typeError(this, rt.seqType(), ii);
       }
     }
-    final MapBuilder mb = new MapBuilder(structSize());
-    forEach((key, value) -> {
-      qc.checkStop();
-      final RecordField rf = key.type.instanceOf(AtomType.STRING) ? rt.field(key.string(null)) :
-        null;
-      final Value v;
-      if(rf != null) {
-        v = rf.seqType().coerce(value, null, qc, cc, ii);
-      } else if(rt.isExtensible()) {
-        v = value;
-      } else {
-        throw typeError(this, rt.seqType(), ii);
-      }
-      mb.put(key, v);
-    });
+    // add remaining values
+    if(mb.size() < size) {
+      forEach((key, value) -> {
+        if(!mb.contains(key)) {
+          qc.checkStop();
+          mb.put(key, value);
+        }
+      });
+    }
+
     // assign record type to speed up future type checks
     final XQMap map = mb.map();
     if(map != EMPTY) map.type = rt;

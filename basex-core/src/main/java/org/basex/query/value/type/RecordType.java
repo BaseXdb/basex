@@ -9,9 +9,7 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.util.hash.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -106,30 +104,6 @@ public final class RecordType extends MapType {
    */
   public QNm name() {
     return name;
-  }
-
-  /**
-   * Checks if the specified map is an instance of this record type.
-   * @param map map to check
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public boolean instance(final XQMap map) throws QueryException {
-    if(this != map.type) {
-      for(final byte[] key : fields) {
-        final RecordField rf = fields.get(key);
-        final Value value = map.getOrNull(Str.get(key));
-        if(value != null ? rf.seqType != null && !rf.seqType.instance(value) : !rf.optional)
-          return false;
-      }
-      if(!extensible) {
-        for(final Item key : map.keys()) {
-          if(!key.type.instanceOf(AtomType.STRING) || !fields.contains(key.string(null)))
-            return false;
-        }
-      }
-    }
-    return true;
   }
 
   @Override
