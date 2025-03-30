@@ -14,17 +14,13 @@ import org.basex.query.value.type.*;
 abstract class XQHashMap extends XQMap {
   /** Cached immutable variant, for updates. */
   private XQMap trie;
-  /** Initial capacity. */
-  final long capacity;
 
   /**
    * Constructor.
-   * @param capacity initial capacity
    * @param type map type
    */
-  XQHashMap(final long capacity, final Type type) {
+  XQHashMap(final Type type) {
     super(type);
-    this.capacity = capacity;
   }
 
   @Override

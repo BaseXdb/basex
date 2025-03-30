@@ -19,14 +19,17 @@ public final class XQStrMap extends XQHashMap {
   private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.STRING_O);
   /** Hash map. */
   private final TokenObjectMap<byte[]> map;
+  /** Initial capacity. */
+  private final int capacity;
 
   /**
    * Constructor.
    * @param capacity initial capacity
    */
-  XQStrMap(final long capacity) {
-    super(capacity, TYPE);
+  XQStrMap(final int capacity) {
+    super(TYPE);
     map = new TokenObjectMap<>(capacity);
+    this.capacity = capacity;
   }
 
   @Override

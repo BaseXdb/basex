@@ -18,14 +18,17 @@ public final class XQStrValueMap extends XQHashMap {
   private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.ITEM_ZM);
   /** Hash map. */
   private final TokenObjectMap<Value> map;
+  /** Initial capacity. */
+  private final int capacity;
 
   /**
    * Constructor.
    * @param capacity initial capacity
    */
-  XQStrValueMap(final long capacity) {
-    super(capacity, TYPE);
+  XQStrValueMap(final int capacity) {
+    super(TYPE);
     map = new TokenObjectMap<>(capacity);
+    this.capacity = capacity;
   }
 
   @Override

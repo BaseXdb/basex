@@ -32,7 +32,7 @@ public abstract class ASet {
   protected ASet(final long capacity) {
     long c = 1;
     while(c < capacity) c <<= 1;
-    final int s = Array.checkCapacity(c);
+    final int s = Integer.highestOneBit(Array.checkCapacity(c));
     buckets = new int[s];
     next = new int[s];
   }

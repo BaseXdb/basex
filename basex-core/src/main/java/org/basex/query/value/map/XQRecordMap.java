@@ -23,13 +23,13 @@ public final class XQRecordMap extends XQHashMap {
    * @param type record type
    */
   public XQRecordMap(final Value[] values, final Type type) {
-    super(values.length, type);
+    super(type);
     this.values = values;
   }
 
   @Override
   public long structSize() {
-    return capacity;
+    return values.length;
   }
 
   @Override

@@ -90,9 +90,10 @@ public final class Lookup extends Arr {
        *  MAP?KEY    ->  map:get(INPUT, KEY, (), true())
        *  ARRAY?KEY  ->  array:get(INPUT, KEY) */
       final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == WILDCARD ?
-        cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
+        map ? cc.function(Function._MAP_ITEMS, info, in) :
+          cc.function(Function._ARRAY_ITEMS, info, in) :
         map ? cc.function(Function._MAP_GET, info, in, arg, Empty.UNDEFINED, Bln.TRUE) :
-        cc.function(Function._ARRAY_GET, info, in, arg);
+          cc.function(Function._ARRAY_GET, info, in, arg);
 
       // single key
       if(ks == 1) {

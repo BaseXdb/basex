@@ -19,14 +19,17 @@ public final class XQIntStrMap extends XQHashMap {
   private static final MapType TYPE = MapType.get(AtomType.INTEGER, SeqType.STRING_O);
   /** Hash map. */
   private final IntObjectMap<byte[]> map;
+  /** Initial capacity. */
+  private final int capacity;
 
   /**
    * Constructor.
    * @param capacity initial capacity
    */
-  XQIntStrMap(final long capacity) {
-    super(capacity, TYPE);
+  XQIntStrMap(final int capacity) {
+    super(TYPE);
     map = new IntObjectMap<>(capacity);
+    this.capacity = capacity;
   }
 
   @Override

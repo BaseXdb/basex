@@ -44,18 +44,17 @@ public final class MapBuilder {
    * @throws QueryException query exception
    */
   public MapBuilder put(final Item key, final Value value) throws QueryException {
-    XQHashMap m = map;
-    if(m == null) {
+    if(map == null) {
       final Type k = key.type;
       final SeqType v = value.seqType();
-      final long c = capacity;
+      final int c = Array.checkCapacity(capacity);
       final boolean ki = k == AtomType.INTEGER, ks = k == AtomType.STRING;
       final boolean vi = v.eq(SeqType.INTEGER_O), vs = v.eq(SeqType.STRING_O);
-      m = ki ? vi ? new XQIntMap(c) : vs ? new XQIntStrMap(c) : new XQIntValueMap(c)   :
-          ks ? vs ? new XQStrMap(c) : vi ? new XQStrIntMap(c) : new XQStrValueMap(c) :
-          new XQItemValueMap(c);
+      map = ki ? vi ? new XQIntMap(c) : vs ? new XQIntStrMap(c) : new XQIntValueMap(c) :
+            ks ? vs ? new XQStrMap(c) : vi ? new XQStrIntMap(c) : new XQStrValueMap(c) :
+            new XQItemValueMap(c);
     }
-    map = m.build(key, value);
+    map = map.build(key, value);
     return this;
   }
 
