@@ -929,8 +929,8 @@ public enum AtomType implements Type {
   /** Sortable flag. */
   private final boolean sortable;
 
-  /** Pre/post values representing the hierarchy. */
-  private byte[] prePost = new byte[2];
+  /** Pre/post values (pre, post << 8). */
+  private short prePost;
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
   /** QName (lazy instantiation). */
@@ -974,9 +974,9 @@ public enum AtomType implements Type {
    * @param pp pre/post array
    */
   private void assign(final HashMap<AtomType, List<AtomType>> types, final byte[] pp) {
-    prePost[0] = pp[0]++;
+    prePost = pp[0]++;
     for(final AtomType type : types.getOrDefault(this, List.of())) type.assign(types, pp);
-    prePost[1] = pp[1]++;
+    prePost |= pp[1]++ << 8;
   }
 
   @Override
@@ -1031,7 +1031,7 @@ public enum AtomType implements Type {
     if(type == this || type == AtomType.ITEM) return true;
     if(type instanceof AtomType) {
       final AtomType at = (AtomType) type;
-      return prePost[0] >= at.prePost[0] && prePost[1] <= at.prePost[1];
+      return (prePost & 0xFF) >= (at.prePost & 0xFF) && (prePost & 0xFF00) <= (at.prePost & 0xFF00);
     }
     return type instanceof ChoiceItemType && ((ChoiceItemType) type).hasInstance(this);
   }
