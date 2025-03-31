@@ -3,14 +3,13 @@ package org.basex.query.ann;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.value.type.AtomType.*;
 import static org.basex.query.value.type.AtomType.ITEM;
-import static org.basex.util.Token.*;
 
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Definitions of all built-in XQuery annotations.
@@ -171,24 +170,24 @@ public enum Annotation {
 
   /** Parameter types. */
   public final AtomType[] params;
-  /** URI. */
-  public final byte[] uri;
+  /** Name of function. */
+  public final QNm name;
   /** Minimum and maximum number of arguments. */
   public final int[] minMax;
   /** Annotation must only occur once. */
   public final boolean single;
-  /** Descriptions. */
-  private final String desc;
+  /** Descriptive parameter string. */
+  private final String paramString;
 
   /** Cached enums (faster). */
   public static final Annotation[] VALUES = values();
 
   /** Maps with QName and signature pairs. */
-  private static final TokenObjectMap<Annotation> MAP = new TokenObjectMap<>();
+  private static final QNmMap<Annotation> MAP = new QNmMap<>();
 
   static {
     for(final Annotation value : VALUES) {
-      MAP.put(new QNm(value.local(), value.uri).unique(), value);
+      MAP.put(value.name, value);
     }
   }
 
@@ -204,17 +203,19 @@ public enum Annotation {
 
   /**
    * Constructor.
-   * @param desc descriptive function string, containing the function name and its arguments
+   * @param string descriptive function string, containing the function name and its arguments
    * @param params parameter types
    * @param uri URI
    * @param single annotation must only occur once
    */
-  Annotation(final String desc, final AtomType[] params, final byte[] uri, final boolean single) {
-    this.desc = desc;
+  Annotation(final String string, final AtomType[] params, final byte[] uri, final boolean single) {
     this.params = params;
-    this.uri = uri;
     this.single = single;
-    minMax = FuncDefinition.minMax(desc);
+
+    final int s = string.indexOf('(');
+    name = new QNm(NSGlobal.prefix(uri), Token.token(string.substring(0, s)), uri);
+    paramString = string.substring(s + 1).replace(")", "");
+    minMax = FuncDefinition.minMax(paramString);
   }
 
   /**
@@ -223,7 +224,7 @@ public enum Annotation {
    * @return annotation or {@code null}
    */
   public static Annotation get(final QNm name) {
-    return MAP.get(name.unique());
+    return MAP.get(name);
   }
 
   /**
@@ -235,37 +236,9 @@ public enum Annotation {
     return params;
   }
 
-  /**
-   * Returns the local name of the annotation.
-   * @return name
-   */
-  public byte[] local() {
-    return token(desc.substring(0, desc.indexOf('(')));
-  }
-
-  /**
-   * Returns the QName of the annotation.
-   * @return QName
-   */
-  public QNm qname() {
-    return new QNm(id(), uri);
-  }
-
-  /**
-   * Returns the prefixed name of the annotation.
-   * @return name
-   */
-  public byte[] id() {
-    final TokenBuilder tb = new TokenBuilder();
-    if(!eq(uri, XQ_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
-    return tb.add(local()).finish();
-  }
-
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add('%');
-    if(!eq(uri, XQ_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
     // chop parentheses if annotation has no parameters
-    return tb.add(desc.replace("()", "")).toString();
+    return Strings.concat(name.string(), paramString.isEmpty() ? "" : ('(' + paramString + ')'));
   }
 }

@@ -106,6 +106,14 @@ public class QNmSet extends ASet implements Iterable<QNm> {
     return new ArrayIterator<>(keys, 1, size);
   }
 
+  /**
+   * Returns an array with all keys.
+   * @return array
+   */
+  public final QNm[] keys() {
+    return Arrays.copyOfRange(keys, 1, size);
+  }
+
   @Override
   public String toString() {
     return toString(keys);

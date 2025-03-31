@@ -60,7 +60,7 @@ public class HtmlParse extends StandardFunc {
     if(io == null) return Empty.VALUE;
     final HtmlOptions options = toOptions(arg(1), new HtmlOptions(), qc);
     final Parser parser = Parser.of(options, defaultParser);
-    if(parser != null) parser.ensureAvailable(options, definition.local(), info);
+    if(parser != null) parser.ensureAvailable(options, definition.name, info);
     try {
       return new DBNode(
           new org.basex.build.html.HtmlParser(io, parser, new MainOptions(), options));

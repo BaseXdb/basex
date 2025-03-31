@@ -47,7 +47,7 @@ public final class BaseXPragma extends Pragma {
   public void accept(final ASTVisitor visitor) {
     visitor.lock(() -> {
       final ArrayList<String> list = new ArrayList<>(1);
-      if(Token.eq(name.local(), Annotation._BASEX_LOCK.local())) {
+      if(name.eq(Annotation._BASEX_LOCK.name)) {
         Collections.addAll(list, Locking.queryLocks(value));
       }
       return list;

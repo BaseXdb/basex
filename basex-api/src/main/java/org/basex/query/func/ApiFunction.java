@@ -270,8 +270,7 @@ public enum ApiFunction implements AFunction {
   }
 
   /**
-   * Adds function signatures to the list. Called via reflection from {@link Functions}
-   * during initialization.
+   * Adds function signatures. Called via reflection from {@link Functions} at initialization time.
    * @param list list of function signatures
    */
   public static void init(final ArrayList<FuncDefinition> list) {

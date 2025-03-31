@@ -43,7 +43,7 @@ public final class FnInvisibleXml extends StandardFunc {
       for(final String className : Arrays.asList("de.bottlecaps.markup.Blitz",
           "de.bottlecaps.markup.BlitzException", "de.bottlecaps.markup.BlitzParseException")) {
         if(!Reflect.available(className)) {
-          throw BASEX_CLASSPATH_X_X.get(info, definition.local(), className);
+          throw BASEX_CLASSPATH_X_X.get(info, definition.name, className);
         }
       }
       generator = new Generator();

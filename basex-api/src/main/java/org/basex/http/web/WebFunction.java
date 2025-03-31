@@ -1,6 +1,7 @@
 package org.basex.http.web;
 
 import static org.basex.http.web.WebText.*;
+import static org.basex.query.QueryText.*;
 
 import java.io.*;
 import java.util.*;
@@ -102,7 +103,9 @@ public abstract class WebFunction implements Comparable<WebFunction> {
       if(as == 0) throw error(ANN_MISSING);
       if(as > 1) {
         final StringList names = new StringList(anns.size());
-        for(final Ann ann : anns) names.add('%' + Token.string(ann.definition.id()));
+        for(final Ann ann : anns) {
+          names.add('%' + Token.string(ann.definition.name.prefixId(XQ_URI)));
+        }
         throw error(ANN_CONFLICT_X, String.join(", ", names.finish()));
       }
 

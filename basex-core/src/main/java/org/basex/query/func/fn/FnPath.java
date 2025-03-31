@@ -54,9 +54,7 @@ public final class FnPath extends ContextFn {
       final NodeType type = (NodeType) node.type;
       if(parent == null) {
         if(type != NodeType.DOCUMENT_NODE) {
-          final QNm root = new QNm(Function.ROOT.definition().toString().
-              replaceAll("\\(.*", ""), QueryText.FN_URI);
-          tb.add(name(root, false, lexical, namespaces, qc)).add("()");
+          tb.add(name(Function.ROOT.definition().name, false, lexical, namespaces, qc)).add("()");
         }
         break;
       }

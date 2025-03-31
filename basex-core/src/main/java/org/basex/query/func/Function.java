@@ -2143,7 +2143,7 @@ public enum Function implements AFunction {
   }
 
   /**
-   * Adds function signatures to the list. Required for initialization.
+   * Adds function signatures to the list. Called at initialization time.
    * @param list list of function signatures
    */
   public static void init(final ArrayList<FuncDefinition> list) {

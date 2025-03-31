@@ -1,6 +1,7 @@
 package org.basex.query.func.inspect;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -11,6 +12,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.scope.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -119,7 +121,8 @@ public abstract class Inspect {
     for(final Ann ann : anns) {
       final FBuilder annotation = element("annotation");
       final QNm name = ann.name();
-      annotation.add(Q_NAME, name.string());
+      annotation.add(Q_NAME, NSGlobal.prefix(name.uri()).length == 0 ? name.string() :
+        name.prefixId(XQ_URI));
       if(uri) annotation.add(Q_URI, name.uri());
 
       for(final Item arg : ann.value()) {

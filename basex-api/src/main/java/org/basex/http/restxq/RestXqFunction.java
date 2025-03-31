@@ -99,7 +99,7 @@ public final class RestXqFunction extends WebFunction {
       final Annotation def = ann.definition;
       if(def == null) continue;
 
-      found |= eq(def.uri, QueryText.REST_URI, QueryText.PERM_URI);
+      found |= eq(def.name.uri(), QueryText.REST_URI, QueryText.PERM_URI);
       final Value value = ann.value();
       if(def == _REST_PATH) {
         try {
@@ -136,12 +136,12 @@ public final class RestXqFunction extends WebFunction {
       } else if(def == _REST_SINGLE) {
         singleton = '\u0001' + (!value.isEmpty() ? toString(value.itemAt(0)) :
           function.info.path() + ':' + function.info.line());
-      } else if(eq(def.uri, QueryText.REST_URI)) {
+      } else if(eq(def.name.uri(), QueryText.REST_URI)) {
         final Item body = value.isEmpty() ? null : value.itemAt(0);
-        addMethod(string(def.local()), body, declared, ann.info);
-      } else if(eq(def.uri, QueryText.OUTPUT_URI)) {
+        addMethod(string(def.name.local()), body, declared, ann.info);
+      } else if(eq(def.name.uri(), QueryText.OUTPUT_URI)) {
         // serialization parameters
-        final String name = string(def.local()), val = toString(value.itemAt(0));
+        final String name = string(def.name.local()), val = toString(value.itemAt(0));
         try {
           sopts.assign(name, val);
         } catch(final BaseXException ex) {

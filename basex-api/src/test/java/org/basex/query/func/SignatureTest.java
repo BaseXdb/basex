@@ -19,7 +19,7 @@ public final class SignatureTest extends SandboxTest {
    * Tests the validity of all function signatures.
    */
   @Test public void signatures() {
-    for(final FuncDefinition fd : Functions.DEFINITIONS) check(fd);
+    for(final FuncDefinition fd : Functions.BUILT_IN.values()) check(fd);
   }
 
   /**
@@ -30,14 +30,14 @@ public final class SignatureTest extends SandboxTest {
    */
   private static void check(final FuncDefinition fd) {
     // check the general syntax of the description syntax
-    final String desc = fd.toString();
-    assertTrue(desc.matches("^.+\\(.*\\)$"), "Invalid syntax: " + desc);
+    final String string = fd.toString();
+    assertTrue(string.matches("^.+\\(.*\\)$"), "Invalid syntax: " + string);
 
-    final String name = desc.replaceAll("\\(.*", "");
-    String params = desc.replaceAll("^.*\\(|\\)$", "");
-    assertTrue(name.matches("^[a-z]+:[-a-zA-Z\\d]+$"), "Invalid function name: " + desc);
+    final String name = string.replaceAll("\\(.*", "");
+    String params = string.replaceAll("^.*\\(|\\)$", "");
+    assertTrue(name.matches("^[a-z]+:[-a-zA-Z\\d]+$"), "Invalid function name: " + string);
     if(params.contains("[")) {
-      assertTrue(params.matches("^.*\\[[^\\]]+\\]$"), "Invalid optional parameters: " + desc);
+      assertTrue(params.matches("^.*\\[[^\\]]+\\]$"), "Invalid optional parameters: " + string);
       params = params.replaceAll("\\[|\\]", "");
     }
     final String[] list = params.split(",");
@@ -45,16 +45,16 @@ public final class SignatureTest extends SandboxTest {
     boolean dots = false;
     if(!list[0].isEmpty()) {
       for(final String param : list) {
-        assertFalse(dots, "Variadic parameter must be last one: " + desc);
+        assertFalse(dots, "Variadic parameter must be last one: " + string);
         assertTrue(param.matches("^[a-z\\d][-a-z\\d]*(\\.\\.\\.)?$"),
-            "Invalid parameter name: " + desc);
+            "Invalid parameter name: " + string);
         dots = param.endsWith("...");
       }
     }
-    assertEquals(variadic, dots, "Variadic function? " + desc);
+    assertEquals(variadic, dots, "Variadic function? " + string);
 
     // check that there are enough argument names
-    final QNm[] names = fd.names;
+    final QNm[] names = fd.params;
     final int min = fd.minMax[0], max = fd.minMax[1];
     assertEquals(names.length, variadic ? min + 1 : max,
       "Wrong number of argument names: " + fd + Arrays.toString(names));

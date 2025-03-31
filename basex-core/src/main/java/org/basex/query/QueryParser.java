@@ -473,7 +473,7 @@ public class QueryParser extends InputParser {
           }
           ann = new Ann(ii, name, items.value());
         } else {
-          if(def.single && anns.contains(def)) throw error(BASEX_ANN3_X_X, ii, "%", def.id());
+          if(def.single && anns.contains(def)) throw error(BASEX_ANN3_X_X, ii, "%", def.name());
           final int is = items.size();
           final IntList arities = Functions.checkArity(is, def.minMax[0], def.minMax[1]);
           if(arities != null) throw error(BASEX_ANN2_X_X, ii, def, arity(arguments(is), arities));

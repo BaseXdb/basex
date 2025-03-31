@@ -827,9 +827,10 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final void toXml(final QueryPlan plan) {
+    final byte[] name = definition.name.prefixId(FN_URI);
     final int undefined = undefined();
     if(undefined == 0) {
-      plan.add(plan.create(this, NAME, definition.id()), args());
+      plan.add(plan.create(this, NAME, name), args());
     } else {
       final int al = args().length;
       final QNm[] names = definition.paramNames(al);
@@ -841,16 +842,16 @@ public abstract class StandardFunc extends Arr {
           nms.add(names[a].toString());
         }
       }
-      plan.add(plan.create(this, NAME, definition.id(), ARG, String.join(", ", nms.finish())),
-          args.finish());
+      plan.add(plan.create(this, NAME, name, ARG, String.join(", ", nms.finish())), args.finish());
     }
   }
 
   @Override
   public final void toString(final QueryString qs) {
+    final byte[] name = definition.name.prefixId(FN_URI);
     final int undefined = undefined();
     if(undefined == 0) {
-      qs.token(definition.id()).params(args());
+      qs.token(name).params(args());
     } else {
       final int al = args().length;
       final QNm[] names = definition.paramNames(al);
@@ -863,7 +864,7 @@ public abstract class StandardFunc extends Arr {
           gap = true;
         }
       }
-      qs.token(definition.id()).params(args);
+      qs.token(name).params(args);
     }
   }
 

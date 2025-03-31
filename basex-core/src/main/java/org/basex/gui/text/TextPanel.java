@@ -1130,13 +1130,12 @@ public class TextPanel extends BaseXPanel {
       LISTS.get(0).add(new SimpleEntry<>(Token.string(key), Token.string(map.get(key))));
     }
     // add functions (default functions first)
-    for(final FuncDefinition fd : Functions.DEFINITIONS) {
-      final String func = fd.toString();
-      final String name = func.replaceAll("^fn:|\\(.*", "");
-      final String value = name + (func.contains("()") ? "()" : "(_)");
+    for(final FuncDefinition fd : Functions.BUILT_IN.values()) {
+      final String name = string(fd.name.prefixId(QueryText.FN_URI));
+      final String value = name + (fd.params.length > 0 ? "(_)" : "()");
       final BiConsumer<Integer, String> add = (i, string) ->
         LISTS.get(i).add(new SimpleEntry<>(string.toLowerCase(Locale.ENGLISH), value));
-      if(fd.uri() == QueryText.FN_URI) {
+      if(fd.name.uri() == QueryText.FN_URI) {
         add.accept(1, name.replaceAll("(.)[^-A-Z]*-?", "$1"));
         add.accept(2, name);
       } else {

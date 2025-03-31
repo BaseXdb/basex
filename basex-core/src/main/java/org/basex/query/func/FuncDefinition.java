@@ -1,7 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
-
 import java.util.*;
 import java.util.function.*;
 
@@ -22,57 +20,56 @@ import org.basex.util.*;
 public final class FuncDefinition {
   /** Result type. */
   public final SeqType seqType;
+  /** Name of function. */
+  public final QNm name;
+  /** Parameter names. */
+  public final QNm[] params;
+  /** Parameter types. */
+  public final SeqType[] types;
 
   /** Function constructor. */
   final Supplier<? extends StandardFunc> supplier;
   /** Minimum and maximum number of arguments. */
   final int[] minMax;
-  /** Parameter types. */
-  final SeqType[] types;
-  /** Parameter names. */
-  final QNm[] names;
-  /** URI. */
-  final byte[] uri;
   /** Minimum permission. */
   final Perm perm;
 
-  /** Description. */
-  private final String desc;
+  /** Descriptive parameter string. */
+  private final String paramString;
   /** Compiler flags. */
   private final EnumSet<Flag> flags;
 
   /**
    * Constructs a function signature.
    * @param supplier function implementation constructor
-   * @param desc descriptive function string, containing the function name and its
-   *             arguments in parentheses. Optional arguments are represented in nested
-   *             square brackets; three dots indicate that the number of arguments of a
-   *             function is not limited
+   * @param string descriptive function string, containing the function name and its arguments
+   *   in parentheses. Optional arguments are represented in nested square brackets; three dots
+   *   indicate that the number of arguments of a function is not limited
    * @param types parameter types
    * @param seqType return type
    * @param flags static function properties
    * @param uri URI
    * @param perm minimum permission
    */
-  FuncDefinition(final Supplier<? extends StandardFunc> supplier, final String desc,
+  FuncDefinition(final Supplier<? extends StandardFunc> supplier, final String string,
       final SeqType[] types, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri,
       final Perm perm) {
 
     this.supplier = supplier;
-    this.desc = desc;
     this.seqType = seqType;
     this.types = types;
     this.flags = flags;
-    this.uri = uri;
     this.perm = perm;
-    minMax = minMax(desc);
 
-    // extract parameter names from function descriptions
-    final int p = desc.indexOf('(');
-    final String[] tmp = Strings.split(desc.substring(p + 1).replaceAll("[\\.\\[\\])]", ""), ',');
-    final int tl = tmp.length == 1 && tmp[0].isEmpty() ? 0 : tmp.length;
-    names = new QNm[tl];
-    for(int n = 0; n < tl; n++) names[n] = new QNm(tmp[n]);
+    final int s = string.indexOf('(');
+    name = new QNm(NSGlobal.prefix(uri), Token.token(string.substring(0, s)), uri);
+    paramString = string.substring(s + 1).replace(")", "");
+    minMax = minMax(paramString);
+
+    final String[] prms = Strings.split(paramString.replaceAll("[.\\[\\]]", ""), ',');
+    final int pl = prms.length == 1 && prms[0].isEmpty() ? 0 : prms.length;
+    params = new QNm[pl];
+    for(int p = 0; p < pl; p++) params[p] = new QNm(prms[p]);
 
     // treat updating expressions as nondeterministic
     if(flags.contains(Flag.UPD)) flags.add(Flag.NDT);
@@ -80,17 +77,14 @@ public final class FuncDefinition {
 
   /**
    * Computes the minimum and maximum number of parameters by analyzing the description string.
-   * @param desc description
+   * @param paramString parameter string
    * @return min/max values
    */
-  public static int[] minMax(final String desc) {
+  public static int[] minMax(final String paramString) {
     boolean optional = false;
     int min = 0, max = -1;
-    for(int d = desc.indexOf('(') + 1;; d++) {
-      if(d == desc.length()) {
-        throw Util.notExpected(desc);
-      }
-      final char ch = desc.charAt(d);
+    for(int d = 0; d < paramString.length(); d++) {
+      final char ch = paramString.charAt(d);
       if(ch == ',') {
         if(optional) {
           max++;
@@ -105,8 +99,6 @@ public final class FuncDefinition {
         if(!optional) min -= 1;
         max = Integer.MAX_VALUE;
         break;
-      } else if(ch == ')') {
-        break;
       } else if(optional) {
         if(max == min) max++;
       } else if(min == 0) {
@@ -115,14 +107,6 @@ public final class FuncDefinition {
     }
     if(max == -1) max = min;
     return new int[] { min, max };
-  }
-
-  /**
-   * Returns the namespace URI of this function.
-   * @return function
-   */
-  public byte[] uri() {
-    return uri;
   }
 
   /**
@@ -161,36 +145,18 @@ public final class FuncDefinition {
    */
   QNm[] paramNames(final int arity) {
     final QNm[] qnames = new QNm[arity];
-    final int params = names.length;
-    for(int n = Math.min(arity, params); --n >= 0;) {
-      qnames[n] = names[n];
+    final int nl = params.length;
+    for(int n = Math.min(arity, nl); --n >= 0;) {
+      qnames[n] = params[n];
     }
-    if(arity > params) {
-      final String name = Token.string(names[params - 1].local());
+    if(arity > nl) {
+      final String nm = Token.string(params[nl - 1].local());
       final int start = 1;
-      for(int n = params; n < arity; n++) {
-        qnames[n] = new QNm(name + (start + n - params), "");
+      for(int n = nl; n < arity; n++) {
+        qnames[n] = new QNm(nm + (start + n - nl), "");
       }
     }
     return qnames;
-  }
-
-  /**
-   * Returns the local name of the function.
-   * @return name
-   */
-  public byte[] local() {
-    return Token.token(desc.substring(0, desc.indexOf('(')));
-  }
-
-  /**
-   * Returns the prefixed name of the annotation.
-   * @return name
-   */
-  byte[] id() {
-    final TokenBuilder tb = new TokenBuilder();
-    if(!Token.eq(uri, FN_URI)) tb.add(NSGlobal.prefix(uri)).add(':');
-    return tb.add(local()).finish();
   }
 
   /**
@@ -199,37 +165,6 @@ public final class FuncDefinition {
    */
   public boolean variadic() {
     return minMax[1] == Integer.MAX_VALUE;
-  }
-
-  /**
-   * Returns a string representation of the function with the specified
-   * arguments. All objects are wrapped with quotes, except for the following ones:
-   * <ul>
-   * <li>numbers (integer, long, float, double)</li>
-   * <li>booleans (which will be suffixed with parentheses)</li>
-   * <li>strings starting with a space (which will be chopped)</li>
-   * </ul>
-   * @param args arguments
-   * @return string representation with leading space (simplifies nesting of returned string)
-   */
-  String args(final Object... args) {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final Object arg : args) {
-      if(!tb.isEmpty()) tb.add(", ");
-      if(arg instanceof Expr || arg instanceof Number) {
-        tb.add(arg);
-      } else if(arg instanceof Boolean) {
-        tb.add(arg + "()");
-      } else {
-        final String str = arg.toString();
-        if(Strings.startsWith(str, ' ')) {
-          tb.add(str.substring(1));
-        } else {
-          tb.add('"' + str.replace("\"", "\"\"") + '"');
-        }
-      }
-    }
-    return ' ' + toString().replaceAll("\\(.*", "(") + tb + ')';
   }
 
   /**
@@ -244,8 +179,40 @@ public final class FuncDefinition {
     return sf;
   }
 
+  /**
+   * Returns a string representation of the function with the specified
+   * arguments. All objects are wrapped with quotes, except for the following ones:
+   * <ul>
+   * <li>numbers (integer, long, float, double)</li>
+   * <li>booleans (which will be suffixed with parentheses)</li>
+   * <li>strings starting with a space (which will be chopped)</li>
+   * </ul>
+   * @param args arguments
+   * @return string representation with leading space (simplifies nesting of returned string)
+   */
+  String args(final Object... args) {
+    final TokenBuilder tb = new TokenBuilder().add(' ').add(name.string()).add('(');
+    int c = 0;
+    for(final Object arg : args) {
+      if(c++ > 0) tb.add(", ");
+      if(arg instanceof Expr || arg instanceof Number) {
+        tb.add(arg);
+      } else if(arg instanceof Boolean) {
+        tb.add(arg + "()");
+      } else {
+        final String str = arg.toString();
+        if(Strings.startsWith(str, ' ')) {
+          tb.add(str.substring(1));
+        } else {
+          tb.add('"' + str.replace("\"", "\"\"") + '"');
+        }
+      }
+    }
+    return tb.add(')').toString();
+  }
+
   @Override
   public String toString() {
-    return Strings.concat(NSGlobal.prefix(uri), ":", desc);
+    return Strings.concat(name.string(), '(', paramString, ')');
   }
 }

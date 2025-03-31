@@ -11,6 +11,7 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.ccil.cowan.tagsoup.*;
 import org.xml.sax.*;
@@ -214,20 +215,20 @@ public final class HtmlParser extends XMLParser {
       }
 
       @Override
-      public void ensureAvailable(final HtmlOptions options, final byte[] func,
-          final InputInfo info) throws QueryException {
-        super.ensureAvailable(options, func, info);
+      public void ensureAvailable(final HtmlOptions options, final QNm name, final InputInfo info)
+          throws QueryException {
+        super.ensureAvailable(options, name, info);
         if(options.contains(HEURISTICS)) {
           switch(options.get(HEURISTICS)) {
           case ALL:
-            ensureAvailable(ICU_CLASS_NAME, func, info);
-            ensureAvailable(CHARDET_CLASS_NAME, func, info);
+            ensureAvailable(ICU_CLASS_NAME, name, info);
+            ensureAvailable(CHARDET_CLASS_NAME, name, info);
             break;
           case ICU:
-            ensureAvailable(ICU_CLASS_NAME, func, info);
+            ensureAvailable(ICU_CLASS_NAME, name, info);
             break;
           case CHARDET:
-            ensureAvailable(CHARDET_CLASS_NAME, func, info);
+            ensureAvailable(CHARDET_CLASS_NAME, name, info);
             break;
           default:
           }
@@ -299,25 +300,25 @@ public final class HtmlParser extends XMLParser {
     /**
      * Throws an exception if any of the classes required for this parser are unavailable.
      * @param options HTML options
-     * @param func name of function that is asking for this parser
+     * @param name name of function that is asking for this parser
      * @param info input info (can be {@code null})
      * @throws QueryException query exception
      */
     public void ensureAvailable(@SuppressWarnings("unused") final HtmlOptions options,
-        final byte[] func, final InputInfo info) throws QueryException {
-      for(final String cl : classes) ensureAvailable(cl, func, info);
+        final QNm name, final InputInfo info) throws QueryException {
+      for(final String cl : classes) ensureAvailable(cl, name, info);
     }
 
     /**
      * Throws an exception if a class required for this parser is unavailable.
      * @param className the class name
-     * @param func name of function that is asking for this parser
+     * @param name name of function that is asking for this parser
      * @param info input info (can be {@code null})
      * @throws QueryException query exception,
      */
-    static void ensureAvailable(final String className, final byte[] func,
+    static void ensureAvailable(final String className, final QNm name,
         final InputInfo info) throws QueryException {
-      if(!Reflect.available(className)) throw BASEX_CLASSPATH_X_X.get(info, func, className);
+      if(!Reflect.available(className)) throw BASEX_CLASSPATH_X_X.get(info, name, className);
     }
 
     /**

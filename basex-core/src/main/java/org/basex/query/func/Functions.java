@@ -12,6 +12,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.java.*;
 import org.basex.query.util.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
@@ -31,11 +32,9 @@ import org.basex.util.similarity.*;
  * @author Christian Gruen
  */
 public final class Functions {
-  /** Signatures of built-in functions. */
-  public static final ArrayList<FuncDefinition> DEFINITIONS = new ArrayList<>();
+  /** Definitions of built-in functions. */
+  public static final QNmMap<FuncDefinition> BUILT_IN = new QNmMap<>();
 
-  /** Cached functions. */
-  private static final TokenObjectMap<QNm> CACHE = new TokenObjectMap<>();
   /** URIs of built-in functions. */
   private static final TokenSet URIS = new TokenSet();
   /** Cast parameter. */
@@ -46,19 +45,18 @@ public final class Functions {
 
   // initializes built-in XQuery functions
   static {
-    // add built-in core functions
-    Function.init(DEFINITIONS);
+    // add built-in functions
+    final ArrayList<FuncDefinition> list = new ArrayList<>();
+    Function.init(list);
     // add built-in API functions if available
     final Class<?> clz = Reflect.find("org.basex.query.func.ApiFunction");
     final Method mth = Reflect.method(clz, "init", ArrayList.class);
-    if(mth != null) Reflect.invoke(mth, null, DEFINITIONS);
+    if(mth != null) Reflect.invoke(mth, null, list);
 
-    for(final FuncDefinition fd : DEFINITIONS) {
-      URIS.add(fd.uri);
-      final QNm qnm = new QNm(fd.local(), fd.uri());
-      final byte[] id = qnm.unique();
-      if(CACHE.contains(id)) throw Util.notExpected("Function % is defined twice.", id);
-      CACHE.put(id, qnm);
+    for(final FuncDefinition fd : list) {
+      final QNm name = fd.name;
+      if(BUILT_IN.put(name, fd) != null) throw Util.notExpected("Function % defined twice.", name);
+      URIS.add(name.uri());
     }
   }
 
@@ -96,7 +94,7 @@ public final class Functions {
     final FuncDefinition fd = builtIn(name);
     if(fd != null) {
       final int min = fd.minMax[0], max = fd.minMax[1];
-      final Expr[] prepared = prepareArgs(fb, fd.names, min, max, fd);
+      final Expr[] prepared = prepareArgs(fb, fd.params, min, max, fd);
       final StandardFunc sf = fd.get(fb.info, prepared);
       if(sf.hasUPD()) qc.updating();
       return sf;
@@ -229,8 +227,7 @@ public final class Functions {
    * @return function definition if found, {@code null} otherwise
    */
   static FuncDefinition builtIn(final QNm name) {
-    final int id = CACHE.index(name.unique());
-    return id != 0 ? DEFINITIONS.get(id - 1) : null;
+    return BUILT_IN.get(name);
   }
 
   /**
@@ -240,19 +237,17 @@ public final class Functions {
    */
   static byte[] similar(final QNm qname) {
     // find similar function in several attempts
-    final ArrayList<QNm> qnames = new ArrayList<>(CACHE.size());
-    for(final QNm qnm : CACHE.values()) qnames.add(qnm);
     final byte[] local = lc(qname.local()), uri = qname.uri();
 
     // find functions with identical URIs and similar local names
-    Object similar = Levenshtein.similar(qname.local(), qnames.toArray(),
+    Object similar = Levenshtein.similar(qname.local(), BUILT_IN.keys(),
         o -> eq(uri, ((QNm) o).uri()) ? ((QNm) o).local() : null);
     // find functions with identical local names
-    for(final QNm qnm : qnames) {
+    for(final QNm qnm : BUILT_IN) {
       if(similar == null && eq(lc(qnm.local()), local)) similar = qnm;
     }
     // find functions with identical URIs and local names that start with the specified name
-    for(final QNm qnm : qnames) {
+    for(final QNm qnm : BUILT_IN) {
       if(similar == null && eq(uri, qnm.uri()) && startsWith(lc(qnm.local()), local)) similar = qnm;
     }
     return QueryError.similar(qname.prefixString(),

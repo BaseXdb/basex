@@ -88,7 +88,8 @@ final class Unit {
         final AnnList anns = sf.anns;
         boolean unit = false;
         for(final Ann ann : anns) {
-          unit = unit || ann.definition != null && eq(ann.definition.uri, QueryText.UNIT_URI);
+          final Annotation ad = ann.definition;
+          unit = unit || ad != null && eq(ad.name.uri(), QueryText.UNIT_URI);
         }
         if(!unit) continue;
 

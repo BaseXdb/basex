@@ -21,7 +21,7 @@ public final class FunctionArgsTest extends SandboxTest {
    */
   @Test public void signatures() throws Exception {
     context.openDB(MemBuilder.build(new IOContent("<a/>")));
-    for(final FuncDefinition fd : Functions.DEFINITIONS) run(fd);
+    for(final FuncDefinition fd : Functions.BUILT_IN.values()) run(fd);
   }
 
   /**

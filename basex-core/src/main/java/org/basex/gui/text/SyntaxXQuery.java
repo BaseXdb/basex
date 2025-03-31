@@ -14,6 +14,7 @@ import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -47,8 +48,8 @@ final class SyntaxXQuery extends Syntax {
         if("IGNORE".equals(f.getName())) break;
         Collections.addAll(KEYWORDS, ((String) f.get(null)).split("-"));
       }
-      for(final FuncDefinition fd : Functions.DEFINITIONS) {
-        Collections.addAll(KEYWORDS, string(fd.local()).split("-"));
+      for(final QNm name : Functions.BUILT_IN) {
+        Collections.addAll(KEYWORDS, string(name.local()).split("-"));
       }
       for(final Axis a : Axis.VALUES) Collections.addAll(KEYWORDS, a.name);
       for(final OpV o : OpV.VALUES) Collections.addAll(KEYWORDS, o.name);

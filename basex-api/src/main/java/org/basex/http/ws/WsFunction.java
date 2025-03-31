@@ -47,7 +47,7 @@ public final class WsFunction extends WebFunction {
 
     for(final Ann ann : function.anns) {
       final Annotation def = ann.definition;
-      if(def == null || !eq(def.uri, QueryText.WS_URI)) continue;
+      if(def == null || !eq(def.name.uri(), QueryText.WS_URI)) continue;
 
       found = true;
       final Value value = ann.value();
