@@ -67,8 +67,7 @@ public final class ArrayType extends FType {
 
   @Override
   public boolean eq(final Type type) {
-    return this == type ||
-        type instanceof ArrayType && valueType.eq(((ArrayType) type).valueType);
+    return this == type || type instanceof ArrayType && valueType.eq(((ArrayType) type).valueType);
   }
 
   @Override
@@ -80,19 +79,17 @@ public final class ArrayType extends FType {
       return valueType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
           ft.argTypes[0].instanceOf(SeqType.INTEGER_O);
     }
-    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
-    return false;
+    return type instanceof ChoiceItemType && ((ChoiceItemType) type).hasInstance(this);
   }
 
   @Override
   public Type union(final Type type) {
-    if(type instanceof ChoiceItemType) return type.union(this);
-    if(instanceOf(type)) return type;
-    if(type.instanceOf(this)) return this;
-
-    return type instanceof ArrayType ? union(((ArrayType) type).valueType) :
-           type instanceof MapType ? SeqType.FUNCTION :
-           type instanceof FuncType ? type.union(this) : AtomType.ITEM;
+    return type instanceof ChoiceItemType ? type.union(this) :
+      instanceOf(type) ? type :
+      type.instanceOf(this) ? this :
+      type instanceof ArrayType ? union(((ArrayType) type).valueType) :
+      type instanceof MapType ? SeqType.FUNCTION :
+      type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
   /**

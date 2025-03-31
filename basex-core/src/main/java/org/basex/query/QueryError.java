@@ -727,6 +727,9 @@ public enum QueryError {
   MODULE_XQUERY_VERSION_X(FOQM, 6, "XQuery version '%' not supported."),
 
   /** Error code. */
+  PATH_X(FOPA, 1, "Node is not contained in path: %."),
+
+  /** Error code. */
   INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
   /** Error code. */
   FUNCCAST_X_X(FORG, 1, "Cannot convert to %: %."),
@@ -1599,6 +1602,7 @@ public enum QueryError {
     /** Error type. */ FOIX,
     /** Error type. */ FOJS,
     /** Error type. */ FONS,
+    /** Error type. */ FOPA,
     /** Error type. */ FORG,
     /** Error type. */ FOQM,
     /** Error type. */ FORX,

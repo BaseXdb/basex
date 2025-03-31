@@ -1,7 +1,10 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -22,7 +25,11 @@ public final class FnPath extends ContextFn {
   /** Path options. */
   public static class PathOptions extends Options {
     /** Option. */
-    public static final ValueOption NAMESPACES = new ValueOption("namespaces", SeqType.MAP_O, null);
+    public static final ValueOption ORIGIN = new ValueOption("origin", SeqType.NODE_ZO);
+    /** Option. */
+    public static final BooleanOption LEXICAL = new BooleanOption("lexical", false);
+    /** Option. */
+    public static final ValueOption NAMESPACES = new ValueOption("namespaces", SeqType.MAP_O);
     /** Option. */
     public static final BooleanOption INDEXES = new BooleanOption("indexes", true);
   }
@@ -37,23 +44,27 @@ public final class FnPath extends ContextFn {
     final TokenList steps = new TokenList();
     final boolean indexes = options.get(PathOptions.INDEXES);
     final Value ns = options.get(PathOptions.NAMESPACES);
-    final XQMap namespaces = ns == null ? XQMap.empty() : toMap(ns, qc);
+    final XQMap namespaces = ns == Empty.VALUE ? XQMap.empty() : toMap(ns, qc);
+    final boolean lexical = options.get(PathOptions.LEXICAL);
+    final Value origin = options.get(PathOptions.ORIGIN);
 
+    boolean relative = false;
     while(true) {
-      // root node: finalize traversal
       final ANode parent = node.parent();
       final NodeType type = (NodeType) node.type;
       if(parent == null) {
-        if(type != NodeType.DOCUMENT_NODE)
-          tb.add(name(new QNm("root", QueryText.FN_URI), false, namespaces, qc)).add("()");
+        if(type != NodeType.DOCUMENT_NODE) {
+          final QNm root = new QNm(Function.PATH.definition().local(), QueryText.FN_URI);
+          tb.add(name(root, false, lexical, namespaces, qc)).add("()");
+        }
         break;
       }
       // step: name/type
       final QNm qname = node.qname();
       if(type == NodeType.ATTRIBUTE) {
-        tb.add('@').add(name(qname, true, namespaces, qc));
+        tb.add('@').add(name(qname, true, lexical, namespaces, qc));
       } else if(type == NodeType.ELEMENT) {
-        tb.add(name(qname, false, namespaces, qc));
+        tb.add(name(qname, false, lexical, namespaces, qc));
       } else if(type == NodeType.PROCESSING_INSTRUCTION) {
         tb.add(type.toString(Token.string(qname.local())));
       } else if(type.oneOf(NodeType.COMMENT, NodeType.TEXT)) {
@@ -71,10 +82,20 @@ public final class FnPath extends ContextFn {
       }
       steps.add(tb.next());
       node = parent;
+
+      // root node: finalize traversal
+      if(origin instanceof ANode && node.is((ANode) origin)) {
+        relative = true;
+        break;
+      }
     }
+    if(origin instanceof ANode && !relative) throw PATH_X.get(info, origin);
 
     // add all steps in reverse order; cache element paths
-    for(int s = steps.size() - 1; s >= 0; --s) tb.add('/').add(steps.get(s));
+    for(int s = steps.size() - 1; s >= 0; --s) {
+      if(!(tb.isEmpty() && origin instanceof ANode)) tb.add('/');
+      tb.add(steps.get(s));
+    }
     return Str.get(tb.isEmpty() ? Token.cpToken('/') : tb.finish());
   }
 
@@ -83,15 +104,19 @@ public final class FnPath extends ContextFn {
    * @param qnm QName
    * @param attr attribute flag
    * @param namespaces namespaces
+   * @param lexical lexical flag
    * @param qc query context
    * @return name
    * @throws QueryException query exception
    */
-  private byte[] name(final QNm qnm, final boolean attr, final XQMap namespaces,
-      final QueryContext qc) throws QueryException {
+  private byte[] name(final QNm qnm, final boolean attr, final boolean lexical,
+      final XQMap namespaces, final QueryContext qc) throws QueryException {
+
+    if(lexical) return qnm.string();
     for(final Item prefix : namespaces.keys()) {
-      if(Token.eq(qnm.uri(), toToken(namespaces.get(prefix), qc)))
+      if(Token.eq(qnm.uri(), toToken(namespaces.get(prefix), qc))) {
         return new QNm(toToken(prefix), qnm.local(), qnm.uri()).string();
+      }
     }
     return attr ? qnm.unique() : qnm.eqName();
   }

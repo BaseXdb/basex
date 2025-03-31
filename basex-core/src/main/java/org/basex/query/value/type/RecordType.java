@@ -239,7 +239,7 @@ public final class RecordType extends MapType {
 
   @Override
   public Type union(final Type type) {
-    return union(type, emptySet());
+    return type == this ? this : union(type, emptySet());
   }
 
   @Override
@@ -302,7 +302,7 @@ public final class RecordType extends MapType {
 
   @Override
   public Type intersect(final Type type) {
-    return intersect(type, emptySet());
+    return type == this ? this : intersect(type, emptySet());
   }
 
   /**

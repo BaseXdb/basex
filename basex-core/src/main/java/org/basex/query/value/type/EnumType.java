@@ -88,6 +88,7 @@ public final class EnumType implements Type {
 
   @Override
   public Type union(final Type type) {
+    if(type == this) return this;
     if(type instanceof ChoiceItemType) return type.union(this);
     if(type instanceof EnumType) {
       final EnumType et = (EnumType) type;

@@ -242,14 +242,14 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return this == type || type == AtomType.ITEM ||
+    return type == this || type == AtomType.ITEM ||
         (type instanceof ChoiceItemType ? ((ChoiceItemType) type).hasInstance(this) :
-          type instanceof NodeType && parent.instanceOf(type));
+          type instanceof NodeType && type == parent);
   }
 
   @Override
   public final Type union(final Type type) {
-    return this == type ? this : type instanceof NodeType ? NODE :
+    return type == this ? this : type instanceof NodeType ? NODE :
       type instanceof ChoiceItemType ? type.union(this) : AtomType.ITEM;
   }
 

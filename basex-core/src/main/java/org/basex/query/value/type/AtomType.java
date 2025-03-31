@@ -1039,8 +1039,8 @@ public enum AtomType implements Type {
   @Override
   public final Type union(final Type type) {
     if(type instanceof ChoiceItemType || type instanceof EnumType) return type.union(this);
-    if(type.instanceOf(this)) return this;
     if(instanceOf(type)) return type;
+    if(type.instanceOf(this)) return this;
     if(type instanceof AtomType) {
       final List<AtomType> ancestors = new ArrayList<>(8);
       for(AtomType p = (AtomType) type; p != null; p = p.parent) ancestors.add(p);
