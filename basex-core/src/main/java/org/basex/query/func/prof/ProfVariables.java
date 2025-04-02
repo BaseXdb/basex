@@ -8,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -26,16 +25,16 @@ public final class ProfVariables extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item map = arg(0).item(qc, info);
-    final byte[] label = toZeroToken(arg(1), qc);
+    final String label = toStringOrNull(arg(1), qc);
 
     if(!map.isEmpty()) {
-      final TokenBuilder tb = new TokenBuilder();
+      final StringBuilder sb = new StringBuilder();
       toMap(map).forEach((key, value) -> {
         if(value != Empty.UNDEFINED) {
-          tb.add(Prop.NL).add("  ").add(key.toJava()).add(" := ").add(value);
+          sb.append(Prop.NL).append("  ").append(key.toJava()).append(" := ").append(value);
         }
       });
-      FnTrace.trace(tb.finish(), label.length != 0 ? label : QueryText.DEBUG_ASSIGNMENTS, qc);
+      qc.trace(sb.toString(), label.isEmpty() ? QueryText.DEBUG_ASSIGNMENTS : label);
     }
     return Empty.VALUE;
   }

@@ -452,6 +452,17 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Sends the specified message to the tracer.
+   * @param message traced value
+   * @param label label (can be {@code null})
+   */
+  public void trace(final String message, final String label) {
+    final String lbl = label != null ? label : "";
+    final String msg = lbl + message;
+    if(jc().tracer().print(msg)) evalInfo(msg);
+  }
+
+  /**
    * Returns query-specific or default serialization parameters.
    * @return serialization parameters
    */

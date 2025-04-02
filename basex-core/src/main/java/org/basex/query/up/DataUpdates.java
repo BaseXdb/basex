@@ -11,7 +11,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.up.atomic.*;
 import org.basex.query.up.primitives.*;
 import org.basex.query.up.primitives.db.*;
@@ -192,7 +191,7 @@ final class DataUpdates {
           throw UPDBERROR_X.get(null, ex);
         }
       } else {
-        FnTrace.trace(Token.token(original + ": Updates are not written back."), Token.EMPTY, qc);
+        qc.trace(original + ": Updates are not written back.", "");
       }
     }
   }

@@ -250,8 +250,8 @@ public final class Log implements QueryTracer {
   }
 
   @Override
-  public boolean print(final String info) {
-    writeServer(LogType.TRACE, info);
+  public boolean print(final String message) {
+    writeServer(LogType.TRACE, message);
     return false;
   }
 }

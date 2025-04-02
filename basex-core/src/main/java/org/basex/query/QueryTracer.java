@@ -9,8 +9,8 @@ package org.basex.query;
 public interface QueryTracer {
   /**
    * Processes tracing output.
-   * @param info string to be output
+   * @param message string to be output
    * @return {@code true} if string shall be further processed by the calling function
    */
-  boolean print(String info);
+  boolean print(String message);
 }

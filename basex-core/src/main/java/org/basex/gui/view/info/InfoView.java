@@ -397,8 +397,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   }
 
   @Override
-  public boolean print(final String info) {
-    if(clear || all.length < 50000) setInfo(info, null, true, false);
+  public boolean print(final String message) {
+    if(clear || all.length < 50000) setInfo(message, null, true, false);
     return true;
   }
 

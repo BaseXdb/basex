@@ -1,13 +1,10 @@
 package org.basex.query.func.prof;
 
-import static org.basex.util.Token.*;
-
 import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
 
@@ -22,7 +19,7 @@ public class ProfTime extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     // create timer
     final Performance p = new Performance();
-    return value(qc, () -> token(p.formatRuntime()));
+    return evaluate(qc, () -> p.formatRuntime());
   }
 
   @Override
@@ -36,16 +33,16 @@ public class ProfTime extends StandardFunc {
   }
 
   /**
-   * Profiles the argument.
+   * Evaluates the result.
    * @param qc query context
    * @param func profiling function
    * @return value
    * @throws QueryException query exception
    */
-  final Value value(final QueryContext qc, final Supplier<byte[]> func) throws QueryException {
+  final Value evaluate(final QueryContext qc, final Supplier<String> func) throws QueryException {
     final Value value = arg(0).value(qc);
-    final byte[] label = toZeroToken(arg(1), qc);
-    FnTrace.trace(func.get(), label, qc);
+    final String label = toStringOrNull(arg(1), qc);
+    qc.trace(func.get(), label);
     return value;
   }
 }

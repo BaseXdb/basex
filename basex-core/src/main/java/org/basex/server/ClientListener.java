@@ -68,7 +68,7 @@ public final class ClientListener extends Thread implements ClientInfo {
     last = System.currentTimeMillis();
     setDaemon(true);
     // register the info view for trace output
-    context.setExternal((QueryTracer) info -> true);
+    context.setExternal((QueryTracer) message -> true);
   }
 
   @Override

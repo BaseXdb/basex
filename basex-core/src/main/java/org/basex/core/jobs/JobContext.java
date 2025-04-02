@@ -15,8 +15,8 @@ import org.basex.util.*;
  */
 public final class JobContext {
   /** Prints trace output to standard error. */
-  private static final QueryTracer TRACER = info -> {
-    Util.errln(info);
+  private static final QueryTracer TRACER = message -> {
+    Util.errln(message);
     return false;
   };
 

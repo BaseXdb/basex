@@ -1,7 +1,5 @@
 package org.basex.query.func.prof;
 
-import static org.basex.util.Token.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.util.*;
@@ -18,9 +16,9 @@ public final class ProfMemory extends ProfTime {
     // measure initial memory consumption
     Performance.gc(4);
     final long min = Performance.memory();
-    return value(qc, () -> {
+    return evaluate(qc, () -> {
       Performance.gc(2);
-      return token(Performance.formatHuman(Math.max(0, Performance.memory() - min)));
+      return Performance.formatHuman(Math.max(0, Performance.memory() - min));
     });
   }
 }
