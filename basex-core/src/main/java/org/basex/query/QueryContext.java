@@ -457,8 +457,8 @@ public final class QueryContext extends Job implements Closeable {
    * @param label label (can be {@code null})
    */
   public void trace(final String message, final String label) {
-    final String lbl = label != null ? label : "";
-    final String msg = lbl + message;
+    final String lbl = label != null ? label.replaceAll("\\s+", " ") : "";
+    final String msg = (lbl.isEmpty() || lbl.matches("^.*\\p{P} ?$") ? lbl : lbl + ": ") + message;
     if(jc().tracer().print(msg)) evalInfo(msg);
   }
 
