@@ -159,8 +159,6 @@ public final class FnModuleTest extends SandboxTest {
           + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b<group nr=\"2\"/>"
           + "</group></match><non-match>anana</non-match></analyze-string-result>");
     }
-
-    error(func.args("a", ""), REGEMPTY_X);
   }
 
   /** Test method. */

@@ -1091,7 +1091,7 @@ re = LookAround.get(behind, positive, re);
 	   p = p.next;
 	 }
 
-	 p.gen = jj_gen + xla - jj_la; 
+	 p.gen = jj_gen + xla - jj_la;
 	 p.first = token;
 	 p.arg = xla;
   }
