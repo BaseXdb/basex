@@ -16,9 +16,9 @@ public final class ProfMemory extends ProfTime {
     // measure initial memory consumption
     Performance.gc(4);
     final long min = Performance.memory();
-    return evaluate(qc, () -> {
+    return evaluate(qc, false, () -> {
       Performance.gc(2);
-      return Performance.formatHuman(Math.max(0, Performance.memory() - min));
+      return Math.max(0, Performance.memory() - min);
     });
   }
 }

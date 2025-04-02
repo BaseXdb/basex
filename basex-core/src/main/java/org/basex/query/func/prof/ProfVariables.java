@@ -34,7 +34,8 @@ public final class ProfVariables extends StandardFunc {
           sb.append(Prop.NL).append("  ").append(key.toJava()).append(" := ").append(value);
         }
       });
-      qc.trace(sb.toString(), label.isEmpty() ? QueryText.DEBUG_ASSIGNMENTS : label);
+      final String lbl = label == null || label.isEmpty() ? QueryText.DEBUG_ASSIGNMENTS : label;
+      qc.trace(sb.toString(), lbl);
     }
     return Empty.VALUE;
   }

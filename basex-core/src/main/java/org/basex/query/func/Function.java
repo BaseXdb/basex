@@ -1691,8 +1691,8 @@ public enum Function implements AFunction {
   _PROF_HUMAN(ProfHuman::new, "human(value)",
       params(INTEGER_O), STRING_O, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_MEMORY(ProfMemory::new, "memory(value[,label])",
-      params(ITEM_ZM, STRING_O), ITEM_ZM, flag(NDT), PROF_URI),
+  _PROF_MEMORY(ProfMemory::new, "memory(value[,label,aggregate])",
+      params(ITEM_ZM, STRING_O, BOOLEAN_O), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_SLEEP(ProfSleep::new, "sleep(ms)",
       params(INTEGER_O), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
@@ -1700,8 +1700,8 @@ public enum Function implements AFunction {
   _PROF_RUNTIME(ProfRuntime::new, "runtime([option])",
       params(STRING_O), ITEM_O, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_TIME(ProfTime::new, "time(value[,label])",
-      params(ITEM_ZM, STRING_O), ITEM_ZM, flag(NDT), PROF_URI),
+  _PROF_TIME(ProfTime::new, "time(value[,label,aggregate])",
+      params(ITEM_ZM, STRING_O, BOOLEAN_O), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
   _PROF_TRACK(ProfTrack::new, "track(value[,options])",
       params(ITEM_ZM, MAP_ZO), MAP_O, flag(NDT), PROF_URI),

@@ -98,6 +98,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Available collations. */
   public TokenObjectMap<Collation> collations;
+  /** Profiling results. */
+  public QueryProfiler profiler = new QueryProfiler(this);
   /** Perform tail-call optimizations. */
   public boolean tco;
 
@@ -538,6 +540,7 @@ public final class QueryContext extends Job implements Closeable {
     if(closed) return;
 
     closed = true;
+    profiler.finish();
     if(parent == null) {
       // topmost query: close resources (opened by compile step)
       resources.close();

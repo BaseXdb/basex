@@ -29,6 +29,7 @@ public final class ProfModuleTest extends SandboxTest {
     query(func.args(" ()"));
     query("count(" + func.args(" 1 to 100 ") + ")", 100);
     query("count(" + func.args(" 1 to 100 ", "label") + ")", 100);
+    query("(1 to 2) !" + func.args(" .", "", true), "1\n2");
   }
 
   /** Test method. */
@@ -57,6 +58,7 @@ public final class ProfModuleTest extends SandboxTest {
     query(func.args(" ()"));
     query("count(" + func.args(" 1 to 100 ") + ")", 100);
     query("count(" + func.args(" 1 to 100 ", "label") + ")", 100);
+    query("(1 to 2) !" + func.args(" .", "", true), "1\n2");
   }
 
   /** Test method. */
