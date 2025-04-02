@@ -48,7 +48,7 @@ public final class InfoDB extends AInfo {
     final String header = (bold ? new TokenBuilder().bold().add('%').norm().toString() : "%") + NL;
     tb.addExt(header, DB_PROPS);
     info(tb, MetaProp.NAME, meta);
-    info(tb, MetaProp.SIZE.name(), Performance.format(meta.dbSize()));
+    info(tb, MetaProp.SIZE.name(), Performance.formatHuman(meta.dbSize()));
     info(tb, MetaProp.NODES, meta);
     info(tb, MetaProp.DOCUMENTS, meta);
     info(tb, MetaProp.BINARIES, meta);
@@ -59,7 +59,7 @@ public final class InfoDB extends AInfo {
 
     tb.add(NL).addExt(header, RES_PROPS);
     info(tb, MetaProp.INPUTPATH, meta);
-    info(tb, MetaProp.INPUTSIZE.name(), Performance.format(meta.inputsize));
+    info(tb, MetaProp.INPUTSIZE.name(), Performance.formatHuman(meta.inputsize));
     info(tb, MetaProp.INPUTDATE, meta);
 
     if(index) {

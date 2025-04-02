@@ -22,7 +22,7 @@ public class ProfTime extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     // create timer
     final Performance p = new Performance();
-    return value(qc, () -> token(p.getTime()));
+    return value(qc, () -> token(p.formatRuntime()));
   }
 
   @Override

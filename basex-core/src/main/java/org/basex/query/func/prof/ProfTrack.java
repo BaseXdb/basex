@@ -59,7 +59,7 @@ public final class ProfTrack extends StandardFunc {
     final MapBuilder mb = new MapBuilder(3);
     // execution time (called before garbage collection)
     if(perf != null) {
-      final BigDecimal ms = BigDecimal.valueOf(perf.ns()).divide(Dec.BD_1000000,
+      final BigDecimal ms = BigDecimal.valueOf(perf.nanoRuntime()).divide(Dec.BD_1000000,
           MathContext.DECIMAL64);
       mb.put(TrackOptions.TIME.name(), Dec.get(ms));
     }

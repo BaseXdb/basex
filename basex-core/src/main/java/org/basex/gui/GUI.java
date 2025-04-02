@@ -492,7 +492,7 @@ public final class GUI extends JFrame implements BaseXWindow {
         // refresh editor info
         editor.refreshContextLabel();
         // refresh info view and status bar
-        final String total = info.setInfo(inf, cmd, perf.getTime(), ok, true);
+        final String total = info.setInfo(inf, cmd, perf.formatRuntime(), ok, true);
         if(ok) status.setText(TIME_REQUIRED + COLS + total, true);
         // show number of hits
         results.setText(BaseXLayout.results(value != null ? value.size() : -1, -1, this));

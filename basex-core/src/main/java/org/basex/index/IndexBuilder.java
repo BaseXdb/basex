@@ -132,7 +132,7 @@ public abstract class IndexBuilder extends Job {
 
     final StringBuilder sb = new StringBuilder();
     sb.append(' ').append(count / 10000 / 100d).append(" M operations, ");
-    sb.append(perf).append(" (").append(Performance.getMemory()).append(").");
+    sb.append(perf).append(" (").append(Performance.formatMemory()).append(").");
     if(splits > 1 && splitSize <= 0) {
       sb.append(" Recommended ").append(MainOptions.SPLITSIZE.name()).append(": ");
       sb.append((int) Math.ceil((double) count / splits / splitFactor())).append('.');

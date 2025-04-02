@@ -236,7 +236,7 @@ public final class FTIndex extends ValueIndex {
     final TokenBuilder tb = new TokenBuilder();
     final long l = dataX.length() + dataY.length() + dataZ.length();
     tb.add(LI_NAMES).add(data.meta.ftinclude).add(NL);
-    tb.add(LI_SIZE).add(Performance.format(l)).add(NL);
+    tb.add(LI_SIZE).add(Performance.formatHuman(l)).add(NL);
 
     final IndexStats stats = new IndexStats(options.get(MainOptions.MAXSTAT));
     addOccs(stats);

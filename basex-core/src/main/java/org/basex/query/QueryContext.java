@@ -539,7 +539,7 @@ public final class QueryContext extends Job implements Closeable {
     options.close();
 
     final Performance perf = jc().performance;
-    if(perf != null) info.serializing.addAndGet(perf.ns());
+    if(perf != null) info.serializing.addAndGet(perf.nanoRuntime());
   }
 
   @Override
@@ -750,12 +750,12 @@ public final class QueryContext extends Job implements Closeable {
     if(perf == null) {
       perf = new Performance();
     } else {
-      perf.ns();
+      perf.nanoRuntime();
     }
     try {
       return code.get();
     } finally {
-      runtime.addAndGet(perf.ns());
+      runtime.addAndGet(perf.nanoRuntime());
     }
   }
 

@@ -85,7 +85,7 @@ public abstract class Builder extends Job {
     }
     meta.lastid = meta.size - 1;
 
-    if(Prop.debug) Util.errln(" " + perf + " (" + Performance.getMemory() + ')');
+    if(Prop.debug) Util.errln(" " + perf + " (" + Performance.formatMemory() + ')');
   }
 
   /**

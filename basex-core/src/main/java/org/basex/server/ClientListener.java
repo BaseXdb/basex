@@ -89,7 +89,7 @@ public final class ClientListener extends Thread implements ClientInfo {
           }
 
           last = System.currentTimeMillis();
-          perf.ns();
+          perf.nanoRuntime();
           sc = ServerCmd.get(b);
           cmd = null;
           if(sc == ServerCmd.CREATE) {

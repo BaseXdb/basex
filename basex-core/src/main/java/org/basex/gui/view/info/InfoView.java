@@ -208,7 +208,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
         final int tm = (int) (Double.parseDouble(line.substring(d + 1, t)) * 100);
         tms.add(tm);
         final String key = line.substring(0, d).trim();
-        final String val = Performance.getTime(tm * 10000L * runs, runs);
+        final String val = Performance.formatNano(tm * 10000L * runs, runs);
         strings.add(LI + key + COLS + val);
       } else if(line.startsWith(NUMBER_CC) || line.startsWith(UPDATED_CC) ||
           line.startsWith(PRINTED_CC) || line.startsWith(READ_LOCKING_CC) ||
@@ -300,7 +300,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     // show total time required for running a command
     String total = time;
     if(!tms.isEmpty()) {
-      total = Performance.getTime(tms.get(tms.size() - 1) * 10000L * runs, runs);
+      total = Performance.formatNano(tms.get(tms.size() - 1) * 10000L * runs, runs);
     }
     if(total != null) setTime(TOTAL_TIME_CC + total);
     all = tb.finish();

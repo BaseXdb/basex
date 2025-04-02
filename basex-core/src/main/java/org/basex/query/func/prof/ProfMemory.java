@@ -20,7 +20,7 @@ public final class ProfMemory extends ProfTime {
     final long min = Performance.memory();
     return value(qc, () -> {
       Performance.gc(2);
-      return token(Performance.format(Math.max(0, Performance.memory() - min)));
+      return token(Performance.formatHuman(Math.max(0, Performance.memory() - min)));
     });
   }
 }

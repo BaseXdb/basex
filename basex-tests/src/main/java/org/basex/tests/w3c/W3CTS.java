@@ -195,7 +195,7 @@ public abstract class W3CTS extends Main {
     Util.println("");
     total = ok + ok2 + err + err2;
 
-    final String time = perf.getTime();
+    final String time = perf.formatRuntime();
     Util.println("Writing log file..." + NL);
     try(PrintOutput po = new PrintOutput(new IOFile(path + pathlog))) {
       po.println("TEST RESULTS ________________________________________________");
@@ -465,13 +465,13 @@ public abstract class W3CTS extends Main {
     }
 
     // print verbose/timing information
-    final long nano = perf.ns();
+    final long nano = perf.nanoRuntime();
     final boolean slow = nano / 1000000 > timer;
     if(verbose) {
-      if(slow) Util.print(": " + Performance.getTime(nano, 1));
+      if(slow) Util.print(": " + Performance.formatNano(nano));
       Util.println("");
     } else if(slow) {
-      Util.print(NL + "- " + outname + ": " + Performance.getTime(nano, 1));
+      Util.print(NL + "- " + outname + ": " + Performance.formatNano(nano));
     }
 
     return single == null || !outname.equals(single);

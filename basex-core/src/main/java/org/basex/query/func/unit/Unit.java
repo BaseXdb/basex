@@ -299,6 +299,6 @@ final class Unit {
    * @return time
    */
   static byte[] time(final Performance p) {
-    return DTDur.get(p.ns() / 1000000).string(null);
+    return DTDur.get(p.nanoRuntime() / 1000000).string(null);
   }
 }

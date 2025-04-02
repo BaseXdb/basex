@@ -43,7 +43,7 @@ public final class JobListDetails extends StandardFunc {
 
       final JobContext jc = job.jc();
       final long ms = jc.performance != null
-          ? jc.performance.ns(false) / 1000000 : jr != null
+          ? jc.performance.nanoRuntime(false) / 1000000 : jr != null
           ? jr.time / 1000000 : -1;
 
       final FBuilder elem = FElem.build(Q_JOB);

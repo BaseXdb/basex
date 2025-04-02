@@ -19,7 +19,7 @@ public final class ProfSleep extends StandardFunc {
 
     // allow interruption of long sleeps; abort loop if maximum sleep time has been reached
     final Performance perf = new Performance();
-    for(int m = 0; m < ms && perf.ns(false) / 1000000 < ms; m++) {
+    for(int m = 0; m < ms && perf.nanoRuntime(false) / 1000000 < ms; m++) {
       Performance.sleep(1);
       qc.checkStop();
     }

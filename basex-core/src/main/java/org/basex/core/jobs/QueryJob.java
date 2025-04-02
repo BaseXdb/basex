@@ -197,13 +197,13 @@ public final class QueryJob extends Job implements Runnable {
       }
       qp.parse();
       updating = qp.updating;
-      result.time = perf.ns();
+      result.time = perf.nanoRuntime();
 
       // register job
       pushJob(qp);
       register(ctx);
       // reset timer
-      perf.ns();
+      perf.nanoRuntime();
       if(remove) ctx.jobs.tasks.remove(id);
 
       // retrieve result; copy persistent database nodes
@@ -230,7 +230,7 @@ public final class QueryJob extends Job implements Runnable {
         unregister(ctx);
         popJob();
         qp = null;
-        result.time += jc.performance.ns();
+        result.time += jc.performance.nanoRuntime();
       }
 
       // write concluding log entry, invalidate performance measurements

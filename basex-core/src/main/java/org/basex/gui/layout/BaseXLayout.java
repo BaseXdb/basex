@@ -572,7 +572,7 @@ public final class BaseXLayout {
     final StringBuilder sb = new StringBuilder();
     if(file != null) {
       sb.append(full ? file.path() : file.name());
-      if(file.exists()) sb.append(" (").append(Performance.format(file.length())).append(')');
+      if(file.exists()) sb.append(" (").append(Performance.formatHuman(file.length())).append(')');
     }
     return sb.toString();
   }
@@ -594,7 +594,7 @@ public final class BaseXLayout {
       sb.append(Util.info(count == 1 ? Text.RESULT_X : Text.RESULTS_X, text));
       if(bytes >= 0) {
         final int maxtext = gopts.get(GUIOptions.MAXTEXT);
-        sb.append(", ").append(more.apply(bytes, maxtext)).append(Performance.format(bytes));
+        sb.append(", ").append(more.apply(bytes, maxtext)).append(Performance.formatHuman(bytes));
       }
     }
     return sb.length() > 0 ? sb.toString() : " ";

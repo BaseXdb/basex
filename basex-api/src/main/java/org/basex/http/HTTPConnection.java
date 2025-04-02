@@ -357,7 +357,7 @@ public final class HTTPConnection implements ClientInfo {
   public void timing(final QueryInfo qi) {
     final StringList list = new StringList(4);
     final BiConsumer<String, Long> add = (name, nano) ->
-      list.add(name + ";dur=" + Performance.getTime(nano, 1));
+      list.add(name + ";dur=" + Performance.formatNano(nano));
     add.accept("parse", qi.parsing.get());
     add.accept("compile", qi.compiling.get());
     add.accept("optimize", qi.optimizing.get());

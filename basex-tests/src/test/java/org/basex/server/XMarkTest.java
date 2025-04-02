@@ -181,7 +181,7 @@ public final class XMarkTest extends SandboxTest {
             while(total.compareTo(max) < 0) {
               final Performance p = new Performance();
               cq.execute();
-              final double t = Double.parseDouble(p.getTime().replaceAll(" .*", ""));
+              final double t = Double.parseDouble(p.formatRuntime().replaceAll(" .*", ""));
               total = total.add(BigDecimal.valueOf(t));
               min = Math.min(min, t);
               r++;

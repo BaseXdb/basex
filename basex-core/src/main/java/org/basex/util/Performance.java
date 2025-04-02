@@ -7,75 +7,93 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public final class Performance {
-  /** Performance timer, using nano seconds. */
+  /** Performance timer, using nanoseconds. */
   private long time = System.nanoTime();
 
   /**
-   * Returns the measured execution time in nanoseconds and resets the timer.
-   * @return execution time
+   * Returns the measured runtime in nanoseconds and resets the timer.
+   * @return runtime
    */
-  public long ns() {
-    return ns(true);
+  public long nanoRuntime() {
+    return nanoRuntime(true);
   }
 
   /**
-   * Returns the measured execution time in nanoseconds.
+   * Returns the measured runtime in nanoseconds.
    * @param reset reset timer
-   * @return execution time
+   * @return runtime
    */
-  public long ns(final boolean reset) {
+  public long nanoRuntime(final boolean reset) {
     final long time2 = System.nanoTime(), diff = time2 - time;
     if(reset) time = time2;
     return diff;
   }
 
   /**
-   * Returns the measured execution time in milliseconds and resets the timer.
-   * @return execution time
+   * Returns the measured runtime in milliseconds and resets the timer.
+   * @return runtime
    */
-  public String getTime() {
-    return getTime(1);
+  public String formatRuntime() {
+    return formatRuntime(1);
   }
 
   /**
-   * Returns the measured execution time in milliseconds, divided by the number of runs,
+   * Returns the measured runtime in milliseconds, divided by the number of runs,
    * and resets the timer.
    * @param runs number of runs
-   * @return execution time
+   * @return runtime
    */
-  public String getTime(final int runs) {
+  public String formatRuntime(final int runs) {
     final long time2 = System.nanoTime();
-    final String t = getTime(time2 - time, runs);
+    final String t = formatNano(time2 - time, runs);
     time = time2;
     return t;
   }
 
   /**
-   * Returns the measured execution time in nanoseconds and resets the timer.
-   * @param nano execution time in nanoseconds
-   * @param runs number of runs
-   * @return execution time
+   * Returns a string with the specified time in milliseconds.
+   * @param nano time in nanoseconds
+   * @return time in milliseconds with 2 decimal places
    */
-  public static double ms(final long nano, final int runs) {
+  public static double nanoToMilli(final long nano) {
+    return nanoToMilli(nano, 1);
+  }
+
+  /**
+   * Returns a string with the specified time in milliseconds.
+   * @param nano time in nanoseconds
+   * @param runs number of runs
+   * @return time in milliseconds with 2 decimal places
+   */
+  public static double nanoToMilli(final long nano, final int runs) {
     return Math.round(nano / 10000.0d / runs) / 100.0d;
   }
 
   /**
-   * Returns a string with the measured execution time in milliseconds.
+   * Returns a string with the specified time in milliseconds.
+   * @param nano time in nanoseconds
+   * @return time
+   */
+  public static String formatNano(final long nano) {
+    return formatNano(nano, 1);
+  }
+
+  /**
+   * Returns a string with the specified time in milliseconds.
    * @param nano measured time in nanoseconds
    * @param runs number of runs
-   * @return execution time
+   * @return formatted time in milliseconds with 2 decimal places
    */
-  public static String getTime(final long nano, final int runs) {
-    return ms(nano, runs) + " ms" + (runs > 1 ? " (avg)" : "");
+  public static String formatNano(final long nano, final int runs) {
+    return nanoToMilli(nano, runs) + " ms" + (runs > 1 ? " (avg)" : "");
   }
 
   /**
    * Returns a formatted representation of the current memory consumption.
-   * @return memory consumption
+   * @return formatted memory consumption
    */
-  public static String getMemory() {
-    return format(memory());
+  public static String formatMemory() {
+    return formatHuman(memory());
   }
 
   /**
@@ -83,15 +101,15 @@ public final class Performance {
    * @param size value to be formatted
    * @return formatted size value
    */
-  public static String format(final long size) {
-    final String num = Long.toString(size);
-    final int nl = num.length();
-    if(nl > 16) return units(size, 1L << 40) + " PB";
-    if(nl > 13) return units(size, 1L << 40) + " TB";
-    if(nl > 10) return units(size, 1L << 30) + " GB";
-    if(nl >  7) return units(size, 1L << 20) + " MB";
-    if(nl >  4) return units(size, 1L << 10) + " kB";
-    return num + " b";
+  public static String formatHuman(final long size) {
+    final String value = Long.toString(size);
+    final int vl = value.length();
+    return vl > 16 ? units(size, 1L << 40) + " PB" :
+           vl > 13 ? units(size, 1L << 40) + " TB" :
+           vl > 10 ? units(size, 1L << 30) + " GB" :
+           vl >  7 ? units(size, 1L << 20) + " MB" :
+           vl >  4 ? units(size, 1L << 10) + " kB" :
+           value + " b";
   }
 
   /**
@@ -109,7 +127,7 @@ public final class Performance {
   /**
    * Performs some garbage collection.
    * GC behavior in Java is a pretty complex task. Still, garbage collection
-   * can be forced by calling it several times.
+   * gets more probable when being called several times.
    * @param count number of times to execute garbage collection
    */
   public static void gc(final int count) {
@@ -137,6 +155,6 @@ public final class Performance {
 
   @Override
   public String toString() {
-    return getTime();
+    return formatRuntime();
   }
 }

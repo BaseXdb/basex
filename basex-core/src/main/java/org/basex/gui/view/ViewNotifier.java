@@ -68,7 +68,7 @@ public final class ViewNotifier {
       boolean open = false;
       for(final View view : views) open |= view.visible() && view.db();
       if(open && size > LARGEDB && BaseXDialog.confirm(gui,
-          Util.info(H_LARGE_DB, Performance.format(size)))) {
+          Util.info(H_LARGE_DB, Performance.formatHuman(size)))) {
         for(final View view : views) {
           if(view.visible() && view.db()) view.visible(false);
         }

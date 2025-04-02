@@ -121,7 +121,7 @@ public final class QueryInfo {
       final Locks locks, final boolean success) {
 
     final TokenBuilder tb = new TokenBuilder();
-    final String total = Performance.getTime(parsing.get() + compiling.get() + optimizing.get() +
+    final String total = Performance.formatNano(parsing.get() + compiling.get() + optimizing.get() +
         evaluating.get() + serializing.get(), runs);
     if(queryinfo) {
       tb.add(NL);
@@ -144,16 +144,16 @@ public final class QueryInfo {
         tb.add(EVALUATING).add(COL).add(NL);
         tb.add(evaluate).add(NL);
       }
-      tb.add(PARSING_CC).add(Performance.getTime(parsing.get(), runs)).add(NL);
-      tb.add(COMPILING_CC).add(Performance.getTime(compiling.get(), runs)).add(NL);
-      tb.add(OPTIMIZING_CC).add(Performance.getTime(optimizing.get(), runs)).add(NL);
-      tb.add(EVALUATING_CC).add(Performance.getTime(evaluating.get(), runs)).add(NL);
-      tb.add(PRINTING_CC).add(Performance.getTime(serializing.get(), runs)).add(NL);
+      tb.add(PARSING_CC).add(Performance.formatNano(parsing.get(), runs)).add(NL);
+      tb.add(COMPILING_CC).add(Performance.formatNano(compiling.get(), runs)).add(NL);
+      tb.add(OPTIMIZING_CC).add(Performance.formatNano(optimizing.get(), runs)).add(NL);
+      tb.add(EVALUATING_CC).add(Performance.formatNano(evaluating.get(), runs)).add(NL);
+      tb.add(PRINTING_CC).add(Performance.formatNano(serializing.get(), runs)).add(NL);
       tb.add(TOTAL_TIME_CC).add(total).add(NL).add(NL);
       tb.add(NUMBER_CC + hits).add(' ').add(hits == 1 ? ITEM : ITEMS).add(NL);
       final int up = qp.updates();
       tb.add(UPDATED_CC + up).add(' ').add(up == 1 ? ITEM : ITEMS).add(NL);
-      tb.add(PRINTED_CC).add(Performance.format(printed)).add(NL);
+      tb.add(PRINTED_CC).add(Performance.formatHuman(printed)).add(NL);
       if(locks != null) {
         tb.add(READ_LOCKING_CC).add(locks.reads).add(NL);
         tb.add(WRITE_LOCKING_CC).add(locks.writes).add(NL);

@@ -45,7 +45,7 @@ public final class Info extends AInfo {
     info(tb, VERSINFO, Prop.VERSION);
 
     final User user = context.user();
-    info(tb, USED_MEM, Performance.getMemory());
+    info(tb, USED_MEM, Performance.formatMemory());
 
     if(user.has(Perm.ADMIN)) {
       final StaticOptions sopts = context.soptions;

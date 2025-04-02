@@ -89,7 +89,7 @@ final class DialogResultPrefs extends BaseXBack {
     gopts.set(GUIOptions.MAXRESULTS, mr);
 
     resultsLabel.setText(mr == Integer.MAX_VALUE ? ALL : new DecimalFormat("#,###,###").format(mr));
-    textLabel.setText(mt == Integer.MAX_VALUE ? ALL : Performance.format(mt));
+    textLabel.setText(mt == Integer.MAX_VALUE ? ALL : Performance.formatHuman(mt));
     return true;
   }
 
