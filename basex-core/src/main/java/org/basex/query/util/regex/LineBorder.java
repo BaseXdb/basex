@@ -36,8 +36,17 @@ public final class LineBorder extends RegExp {
     return INSTANCES[pos];
   }
 
+  /**
+   * Return the end-of-string pattern to be used, depending on multi-line mode.
+   * @param multi multi-line flag
+   * @return end-of-line pattern
+   */
+  public static String eos(final boolean multi) {
+    return multi ? "$" : "(?:$(?!\\s))";
+  }
+
   @Override
   void toRegEx(final StringBuilder sb) {
-    sb.append(start ? "^" : multi ? "$" : "(?:$(?!\\s))");
+    sb.append(start ? "^" : eos(multi));
   }
 }

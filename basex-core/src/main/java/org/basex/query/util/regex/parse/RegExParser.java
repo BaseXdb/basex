@@ -53,7 +53,7 @@ public class RegExParser implements RegExParserConstants {
    * @throws ParseException parsing exception
    */
   final public   RegExp parse() throws ParseException {RegExp regex;
-    regex = regExp();
+    regex = regExp(false);
     jj_consume_token(0);
 {if ("" != null) return regex;}
     throw new Error("Missing return statement in function");
@@ -61,13 +61,14 @@ public class RegExParser implements RegExParserConstants {
 
 /**
    * Parses the "regExp" rule.
+   * @param lookbehind flag indicating lookbehind expression
    * @return expression
    * @throws ParseException parsing exception
    */
-  final public   RegExp regExp() throws ParseException {final RegExpList brs = new RegExpList();
+  final public   RegExp regExp(final boolean lookbehind) throws ParseException {final RegExpList brs = new RegExpList();
     RegExp br;
     atomPath.push(0);
-    br = branch();
+    br = branch(lookbehind);
 brs.add(br);
     label_1:
     while (true) {
@@ -82,7 +83,7 @@ brs.add(br);
       }
       jj_consume_token(OR);
 atomPath.push(atomPath.pop() + 1);
-      br = branch();
+      br = branch(lookbehind);
 brs.add(br);
     }
 atomPath.pop();
@@ -93,10 +94,11 @@ atomPath.pop();
 /**
    * Parses the "branch" rule.
    * Parses the "piece" rule.
+   * @param lookbehind flag indicating lookbehind expression
    * @return expression
    * @throws ParseException parsing exception
    */
-  final public   RegExp branch() throws ParseException {RegExp atom;
+  final public   RegExp branch(final boolean lookbehind) throws ParseException {RegExp atom;
     final RegExpList pieces = new RegExpList();
     Quantifier qu = null;
     atomPath.push(0);
@@ -109,12 +111,17 @@ atomPath.pop();
       case DIGIT:
       case BACK_REF:
       case WILDCARD:
-      case LINE_START:
-      case LINE_END:
       case SINGLE_ESC:
       case MULTI_ESC:
       case CAT_ESC:
-      case BR_OPEN:{
+      case BR_OPEN:
+      case LINE_START:
+      case LINE_END:
+      case WORD_BOUNDARY:
+      case POS_LOOKAHEAD:
+      case NEG_LOOKAHEAD:
+      case POS_LOOKBEHIND:
+      case NEG_LOOKBEHIND:{
         ;
         break;
         }
@@ -122,22 +129,53 @@ atomPath.pop();
         jj_la1[1] = jj_gen;
         break label_2;
       }
-      atom = atom();
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case Q_MARK:
-      case STAR:
-      case PLUS:
-      case QUANT_OPEN:{
-        qu = quantifier();
+      case NPAR_OPEN:
+      case PAR_OPEN:
+      case CHAR:
+      case DIGIT:
+      case BACK_REF:
+      case WILDCARD:
+      case SINGLE_ESC:
+      case MULTI_ESC:
+      case CAT_ESC:
+      case BR_OPEN:{
+        atom = atom(lookbehind);
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case Q_MARK:
+        case STAR:
+        case PLUS:
+        case QUANT_OPEN:{
+          qu = quantifier();
+if(lookbehind) {if (true) throw new ParseException("Lookbehind assertions must not contain quantifiers.");}
+          break;
+          }
+        default:
+          jj_la1[2] = jj_gen;
+          ;
+        }
+pieces.add(qu == null ? atom : new Piece(atom, qu));
+            qu = null;
+        break;
+        }
+      case LINE_START:
+      case LINE_END:
+      case WORD_BOUNDARY:
+      case POS_LOOKAHEAD:
+      case NEG_LOOKAHEAD:
+      case POS_LOOKBEHIND:
+      case NEG_LOOKBEHIND:{
+        atom = assertion();
+if(lookbehind) {if (true) throw new ParseException("Lookbehind assertions must not contain nested assertions.");}
+            pieces.add(atom);
         break;
         }
       default:
-        jj_la1[2] = jj_gen;
-        ;
+        jj_la1[3] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
       }
-pieces.add(qu == null ? atom : new Piece(atom, qu));
-        qu = null;
-        atomPath.push(atomPath.pop() + 1);
+atomPath.push(atomPath.pop() + 1);
     }
 atomPath.pop();
       {if ("" != null) return pieces.size() == 1 ? pieces.get(0) : new Branch(pieces.finish());}
@@ -176,7 +214,7 @@ min = qu[0]; max = qu[1];
       break;
       }
     default:
-      jj_la1[3] = jj_gen;
+      jj_la1[4] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -187,7 +225,7 @@ lazy = true;
       break;
       }
     default:
-      jj_la1[4] = jj_gen;
+      jj_la1[5] = jj_gen;
       ;
     }
 {if ("" != null) return new Quantifier(min, max, lazy);}
@@ -226,13 +264,13 @@ try {
         break;
         }
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[6] = jj_gen;
         ;
       }
       break;
       }
     default:
-      jj_la1[6] = jj_gen;
+      jj_la1[7] = jj_gen;
       ;
     }
 {if ("" != null) return qty;}
@@ -241,10 +279,11 @@ try {
 
 /**
    * Parses the "atom" rule.
+   * @param lookbehind flag indicating lookbehind expression
    * @return expression
    * @throws ParseException parsing exception
    */
-  final public   RegExp atom() throws ParseException {RegExp nd = null;
+  final public   RegExp atom(final boolean lookbehind) throws ParseException {RegExp nd = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case CHAR:
     case DIGIT:{
@@ -252,8 +291,6 @@ try {
       break;
       }
     case WILDCARD:
-    case LINE_START:
-    case LINE_END:
     case SINGLE_ESC:
     case MULTI_ESC:
     case CAT_ESC:
@@ -263,27 +300,30 @@ try {
       }
     case NPAR_OPEN:{
       jj_consume_token(NPAR_OPEN);
-      nd = regExp();
+      nd = regExp(false);
       jj_consume_token(PAR_CLOSE);
-nd = new Group(nd, false, atomPath.toArray(new Integer[atomPath.size()]));
+if(lookbehind) {if (true) throw new ParseException("Lookbehind assertions must not contain parenthesized expressions.");}
+        nd = new Group(nd, false, atomPath.toArray(new Integer[atomPath.size()]));
       break;
       }
     case PAR_OPEN:{
       jj_consume_token(PAR_OPEN);
 final int grp = ++groups;
-      nd = regExp();
+      nd = regExp(false);
       jj_consume_token(PAR_CLOSE);
-final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()]));
+if(lookbehind) {if (true) throw new ParseException("Lookbehind assertions must not contain parenthesized expressions.");}
+        final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()]));
         closed.put(grp, g);
         nd = g;
       break;
       }
     case BACK_REF:{
       nd = backReference();
+if(lookbehind) {if (true) throw new ParseException("Lookbehind assertions must not contain backward references.");}
       break;
       }
     default:
-      jj_la1[7] = jj_gen;
+      jj_la1[8] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -307,7 +347,7 @@ final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()
       break;
       }
     default:
-      jj_la1[8] = jj_gen;
+      jj_la1[9] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -371,18 +411,8 @@ final Group g = closed.get(backref);
 nd = Wildcard.get(dotAll);
       break;
       }
-    case LINE_START:{
-      jj_consume_token(LINE_START);
-nd = LineBorder.get(true, multiLine);
-      break;
-      }
-    case LINE_END:{
-      jj_consume_token(LINE_END);
-nd = LineBorder.get(false, multiLine);
-      break;
-      }
     default:
-      jj_la1[9] = jj_gen;
+      jj_la1[10] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -410,7 +440,7 @@ nd = LineBorder.get(false, multiLine);
       break;
       }
     default:
-      jj_la1[10] = jj_gen;
+      jj_la1[11] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -437,7 +467,7 @@ group.negative = true;
       break;
       }
     default:
-      jj_la1[11] = jj_gen;
+      jj_la1[12] = jj_gen;
       if (jj_2_2(1)) {
         group = posCharGroup();
       } else {
@@ -452,7 +482,7 @@ group.negative = true;
       break;
       }
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[13] = jj_gen;
       ;
     }
     jj_consume_token(BR_CLOSE);
@@ -491,7 +521,7 @@ cg.add(sub);
             break;
             }
           default:
-            jj_la1[13] = jj_gen;
+            jj_la1[14] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -499,7 +529,7 @@ for(final RegExp re : Escape.inGroup(token.image)) cg.add(re);
           break;
           }
         default:
-          jj_la1[14] = jj_gen;
+          jj_la1[15] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -537,7 +567,7 @@ if(a == '-' && !isBegin && getToken(1).kind != BR_CLOSE && getToken(1).kind != E
         break;
         }
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[16] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -564,7 +594,7 @@ cp = Escape.getCp(token.image);
       break;
       }
     default:
-      jj_la1[16] = jj_gen;
+      jj_la1[17] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -588,11 +618,77 @@ cp = Escape.getCp(token.image);
       break;
       }
     default:
-      jj_la1[17] = jj_gen;
+      jj_la1[18] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
 {if ("" != null) return token.image.codePointAt(0);}
+    throw new Error("Missing return statement in function");
+}
+
+/**
+   * Parsers the "assertion" rule.
+   * @return expression
+   */
+  final public   RegExp assertion() throws ParseException {RegExp re;
+    boolean behind, positive;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case LINE_START:{
+      jj_consume_token(LINE_START);
+re = LineBorder.get(true, multiLine);
+      break;
+      }
+    case LINE_END:{
+      jj_consume_token(LINE_END);
+re = LineBorder.get(false, multiLine);
+      break;
+      }
+    case WORD_BOUNDARY:{
+      jj_consume_token(WORD_BOUNDARY);
+re = WordBoundary.get(token.image, multiLine);
+      break;
+      }
+    case POS_LOOKAHEAD:
+    case NEG_LOOKAHEAD:
+    case POS_LOOKBEHIND:
+    case NEG_LOOKBEHIND:{
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case POS_LOOKAHEAD:{
+        jj_consume_token(POS_LOOKAHEAD);
+behind = false; positive = true;
+        break;
+        }
+      case NEG_LOOKAHEAD:{
+        jj_consume_token(NEG_LOOKAHEAD);
+behind = false; positive = false;
+        break;
+        }
+      case POS_LOOKBEHIND:{
+        jj_consume_token(POS_LOOKBEHIND);
+behind = true;  positive = true;
+        break;
+        }
+      case NEG_LOOKBEHIND:{
+        jj_consume_token(NEG_LOOKBEHIND);
+behind = true;  positive = false;
+        break;
+        }
+      default:
+        jj_la1[19] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      re = regExp(behind);
+      jj_consume_token(PAR_CLOSE);
+re = LookAround.get(behind, positive, re);
+      break;
+      }
+    default:
+      jj_la1[20] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+{if ("" != null) return re;}
     throw new Error("Missing return statement in function");
 }
 
@@ -628,29 +724,52 @@ cp = Escape.getCp(token.image);
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3R_posCharGroup_314_7_7()
+  private boolean jj_3_2()
+ {
+    if (jj_3R_posCharGroup_327_5_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_scan_token(DIGIT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_XmlChar_380_5_11()
  {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_scan_token(18)) {
+    if (jj_scan_token(12)) {
     jj_scanpos = xsp;
-    if (jj_scan_token(19)) {
+    if (jj_scan_token(13)) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_posCharGroup_328_7_7()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(16)) {
     jj_scanpos = xsp;
-    if (jj_scan_token(20)) return true;
+    if (jj_scan_token(17)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(18)) return true;
     }
     }
     return false;
   }
 
-  private boolean jj_3R_charRange_336_7_9()
+  private boolean jj_3R_charRange_350_7_9()
  {
-    if (jj_3R_XmlChar_366_5_11()) return true;
+    if (jj_3R_XmlChar_380_5_11()) return true;
     return false;
   }
 
   private boolean jj_3_3()
  {
-    if (jj_3R_charRange_330_5_6()) return true;
+    if (jj_3R_charRange_344_5_6()) return true;
     return false;
   }
 
@@ -660,12 +779,12 @@ cp = Escape.getCp(token.image);
     xsp = jj_scanpos;
     if (jj_3_3()) {
     jj_scanpos = xsp;
-    if (jj_3R_posCharGroup_314_7_7()) return true;
+    if (jj_3R_posCharGroup_328_7_7()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_313_5_5()
+  private boolean jj_3R_posCharGroup_327_5_5()
  {
     Token xsp;
     if (jj_3_4()) return true;
@@ -676,38 +795,38 @@ cp = Escape.getCp(token.image);
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_354_7_13()
+  private boolean jj_3R_charOrEsc_368_7_13()
  {
     if (jj_scan_token(SINGLE_ESC)) return true;
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_353_7_12()
+  private boolean jj_3R_charOrEsc_367_7_12()
  {
-    if (jj_3R_XmlChar_366_5_11()) return true;
+    if (jj_3R_XmlChar_380_5_11()) return true;
     return false;
   }
 
-  private boolean jj_3R_charRange_330_7_8()
+  private boolean jj_3R_charRange_344_7_8()
  {
-    if (jj_3R_charOrEsc_353_5_10()) return true;
+    if (jj_3R_charOrEsc_367_5_10()) return true;
     if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_charOrEsc_353_5_10()) return true;
+    if (jj_3R_charOrEsc_367_5_10()) return true;
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_353_5_10()
+  private boolean jj_3R_charOrEsc_367_5_10()
  {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_charOrEsc_353_7_12()) {
+    if (jj_3R_charOrEsc_367_7_12()) {
     jj_scanpos = xsp;
-    if (jj_3R_charOrEsc_354_7_13()) return true;
+    if (jj_3R_charOrEsc_368_7_13()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_charRange_330_5_6()
+  private boolean jj_3R_charRange_344_5_6()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -715,32 +834,9 @@ cp = Escape.getCp(token.image);
     jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image)
         && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF;
     jj_lookingAhead = false;
-    if (!jj_semLA || jj_3R_charRange_330_7_8()) {
+    if (!jj_semLA || jj_3R_charRange_344_7_8()) {
     jj_scanpos = xsp;
-    if (jj_3R_charRange_336_7_9()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_posCharGroup_313_5_5()) return true;
-    return false;
-  }
-
-  private boolean jj_3_1()
- {
-    if (jj_scan_token(DIGIT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_XmlChar_366_5_11()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_scan_token(12)) {
-    jj_scanpos = xsp;
-    if (jj_scan_token(13)) return true;
+    if (jj_3R_charRange_350_7_9()) return true;
     }
     return false;
   }
@@ -758,13 +854,13 @@ cp = Escape.getCp(token.image);
   private boolean jj_lookingAhead = false;
   private boolean jj_semLA;
   private int jj_gen;
-  final private int[] jj_la1 = new int[18];
+  final private int[] jj_la1 = new int[21];
   static private int[] jj_la1_0;
   static {
 	   jj_la1_init_0();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x2,0x3ffa00,0x3c,0x3c,0x4,0x80,0x100,0x3ffa00,0x3000,0x3f8000,0x1c0000,0x400000,0x800000,0x1c0000,0x1c0000,0x3000,0x43000,0x3000,};
+	   jj_la1_0 = new int[] {0x2,0x3f8ffa00,0x3c,0x3f8ffa00,0x3c,0x4,0x80,0x100,0xffa00,0x3000,0xf8000,0x70000,0x100000,0x200000,0x70000,0x70000,0x3000,0x13000,0x3000,0x3c000000,0x3f800000,};
 	}
   final private JJCalls[] jj_2_rtns = new JJCalls[4];
   private boolean jj_rescan = false;
@@ -777,7 +873,7 @@ cp = Escape.getCp(token.image);
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 18; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 21; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -787,7 +883,7 @@ cp = Escape.getCp(token.image);
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 18; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 21; i++) jj_la1[i] = -1;
 	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -918,12 +1014,12 @@ cp = Escape.getCp(token.image);
   /** Generate ParseException. */
   public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[25];
+	 boolean[] la1tokens = new boolean[30];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
 	 }
-	 for (int i = 0; i < 18; i++) {
+	 for (int i = 0; i < 21; i++) {
 	   if (jj_la1[i] == jj_gen) {
 		 for (int j = 0; j < 32; j++) {
 		   if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -932,7 +1028,7 @@ cp = Escape.getCp(token.image);
 		 }
 	   }
 	 }
-	 for (int i = 0; i < 25; i++) {
+	 for (int i = 0; i < 30; i++) {
 	   if (la1tokens[i]) {
 		 jj_expentry = new int[1];
 		 jj_expentry[0] = i;
