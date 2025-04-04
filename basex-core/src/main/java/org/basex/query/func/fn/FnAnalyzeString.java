@@ -26,7 +26,13 @@ public final class FnAnalyzeString extends RegExFn {
   /** QName. */
   private static final QNm Q_MGROUP = new QNm("group", FN_URI);
   /** QName. */
+  private static final QNm Q_LGROUP = new QNm("lookahead-group", FN_URI);
+  /** QName. */
   private static final QNm Q_NR = new QNm("nr");
+  /** QName. */
+  private static final QNm Q_VALUE = new QNm("value");
+  /** QName. */
+  private static final QNm Q_POSITION = new QNm("position");
 
   @Override
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -34,7 +40,7 @@ public final class FnAnalyzeString extends RegExFn {
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);
 
-    final RegExpr regExpr = regExpr(pattern, flags, true);
+    final RegExpr regExpr = regExpr(pattern, flags);
     final Matcher matcher = regExpr.pattern.matcher(value);
     final FBuilder root = FElem.build(Q_ANALYZE_STRING_RESULT).declareNS();
     int start = 0;
@@ -67,7 +73,7 @@ public final class FnAnalyzeString extends RegExFn {
     while(pos[0] <= gc && matcher.end(pos[0]) <= end
         && (matcher.start(pos[0]) < end || regExpr.getParentGroups()[pos[0] - 1] == group)) {
       final int st = matcher.start(pos[0]);
-      if(st >= 0) { // group matched
+      if(st >= 0 && !regExpr.getAssertionFlags()[pos[0] - 1]) { // group matched
         if(pos[1] < st) node.add(string.substring(pos[1], st));
         pos = match(matcher, string, node, pos[0], regExpr);
       } else pos[0]++; // skip it
@@ -75,6 +81,18 @@ public final class FnAnalyzeString extends RegExFn {
     if(pos[1] < end) {
       node.add(string.substring(pos[1], end));
       pos[1] = end;
+    }
+    if(group == 0) {
+      final boolean[] assertionFlags = regExpr.getAssertionFlags();
+      for(int g = 1; g <= assertionFlags.length; ++g) {
+        if(assertionFlags[g - 1] && matcher.start(g) >= 0) {
+          final FBuilder lg = FElem.build(Q_LGROUP);
+          lg.add(Q_NR, g);
+          lg.add(Q_VALUE, string.substring(matcher.start(g), matcher.end(g)));
+          lg.add(Q_POSITION, matcher.start(g) + 1);
+          node.add(lg);
+        }
+      }
     }
     parent.add(node);
     return pos;

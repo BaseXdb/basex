@@ -26,7 +26,7 @@ public final class RegexTest extends SandboxTest {
   @ParameterizedTest
   @MethodSource
   public void testParentGroups(final String regex, final int[] parentGroups) {
-    final int[] actualGroups = RegExFn.GroupScanner.parentGroups(regex);
+    final int[] actualGroups = RegExFn.GroupScanner.groupInfo(regex).parentGroups;
     assertArrayEquals(parentGroups, actualGroups,
         () -> "Unexpected result: " + Arrays.toString(actualGroups));
     assertEquals(Pattern.compile(regex).matcher("").groupCount(), parentGroups.length);

@@ -66,26 +66,27 @@ PARSER_END(RegExParser)
   RegExp parse() : {
     RegExp regex;
   } {
-    regex = regExp() <EOF> {
+    regex = regExp(false) <EOF> {
       return regex;
     }
   }
 
   /**
    * Parses the "regExp" rule.
+   * @param lookbehind flag indicating lookbehind expression
    * @return expression
    * @throws ParseException parsing exception
    */
-  RegExp regExp() : {
+  RegExp regExp(final boolean lookbehind) : {
     final RegExpList brs = new RegExpList();
     RegExp br;
     atomPath.push(0);
   } {
     (
-      br = branch() { brs.add(br); }
+      br = branch(lookbehind) { brs.add(br); }
       (
         <OR> { atomPath.push(atomPath.pop() + 1); }
-        br = branch() { brs.add(br); }
+        br = branch(lookbehind) { brs.add(br); }
       )*
     ) {
       atomPath.pop();
@@ -96,21 +97,31 @@ PARSER_END(RegExParser)
   /**
    * Parses the "branch" rule.
    * Parses the "piece" rule.
+   * @param lookbehind flag indicating lookbehind expression
    * @return expression
    * @throws ParseException parsing exception
    */
-  RegExp branch() : {
+  RegExp branch(final boolean lookbehind) : {
     RegExp atom;
     final RegExpList pieces = new RegExpList();
     Quantifier qu = null;
     atomPath.push(0);
   } {
     (
-      ( atom = atom() [ qu = quantifier() ] ) {
-        pieces.add(qu == null ? atom : new Piece(atom, qu));
-        qu = null;
-        atomPath.push(atomPath.pop() + 1);
-      }
+      (
+        ( atom = atom(lookbehind) [ qu = quantifier() {
+            if(lookbehind) throw new ParseException("Lookbehind assertions must not contain quantifiers.");
+          } ] ) {
+            pieces.add(qu == null ? atom : new Piece(atom, qu));
+            qu = null;
+          }
+        | atom = assertion() {
+            if(lookbehind) throw new ParseException("Lookbehind assertions must not contain nested assertions.");
+            pieces.add(atom);
+          }
+        ) {
+          atomPath.push(atomPath.pop() + 1);
+        }
     )* {
       atomPath.pop();
       return pieces.size() == 1 ? pieces.get(0) : new Branch(pieces.finish());
@@ -175,25 +186,30 @@ PARSER_END(RegExParser)
 
   /**
    * Parses the "atom" rule.
+   * @param lookbehind flag indicating lookbehind expression
    * @return expression
    * @throws ParseException parsing exception
    */
-  RegExp atom() : {
+  RegExp atom(final boolean lookbehind) : {
     RegExp nd = null;
   } {
     ( nd = Char()
     | nd = charClass()
-    | (<NPAR_OPEN> nd = regExp() <PAR_CLOSE>) {
+    | (<NPAR_OPEN> nd = regExp(false) <PAR_CLOSE>) {
+        if(lookbehind) throw new ParseException("Lookbehind assertions must not contain parenthesized expressions.");
         nd = new Group(nd, false, atomPath.toArray(new Integer[atomPath.size()]));
       }
     | (<PAR_OPEN> { final int grp = ++groups; }
-        nd = regExp()
+        nd = regExp(false)
       <PAR_CLOSE>) {
+        if(lookbehind) throw new ParseException("Lookbehind assertions must not contain parenthesized expressions.");
         final Group g = new Group(nd, true, atomPath.toArray(new Integer[atomPath.size()]));
         closed.put(grp, g);
         nd = g;
       }
-    | nd = backReference()
+    | nd = backReference() {
+        if(lookbehind) throw new ParseException("Lookbehind assertions must not contain backward references.");
+      }
     ) {
       return nd;
     }
@@ -256,8 +272,6 @@ PARSER_END(RegExParser)
     ( nd = charClassEsc()
     | nd = charClassExpr()
     | <WILDCARD>   { nd = Wildcard.get(dotAll); }
-    | <LINE_START> { nd = LineBorder.get(true, multiLine); }
-    | <LINE_END>   { nd = LineBorder.get(false, multiLine); }
     ) {
       return nd;
     }
@@ -370,3 +384,23 @@ PARSER_END(RegExParser)
     }
   }
 
+  /**
+   * Parsers the "assertion" rule.
+   * @return expression
+   */
+  RegExp assertion(): {
+    RegExp re;
+    boolean behind, positive;
+  } {
+    ( <LINE_START>                      { re = LineBorder.get(true, multiLine); }
+    | <LINE_END>                        { re = LineBorder.get(false, multiLine); }
+    | <WORD_BOUNDARY>                   { re = WordBoundary.get(token.image, multiLine); }
+    | ( <POS_LOOKAHEAD>                 { behind = false; positive = true; }
+      | <NEG_LOOKAHEAD>                 { behind = false; positive = false; }
+      | <POS_LOOKBEHIND>                { behind = true;  positive = true; }
+      | <NEG_LOOKBEHIND>                { behind = true;  positive = false; }
+      ) re = regExp(behind) <PAR_CLOSE> { re = LookAround.get(behind, positive, re); }
+    ) {
+      return re;
+    }
+  }

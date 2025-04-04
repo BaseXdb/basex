@@ -41,23 +41,33 @@ public interface RegExParserConstants {
   /** RegularExpression Id. */
   int WILDCARD = 15;
   /** RegularExpression Id. */
-  int LINE_START = 16;
+  int SINGLE_ESC = 16;
   /** RegularExpression Id. */
-  int LINE_END = 17;
+  int MULTI_ESC = 17;
   /** RegularExpression Id. */
-  int SINGLE_ESC = 18;
+  int CAT_ESC = 18;
   /** RegularExpression Id. */
-  int MULTI_ESC = 19;
+  int BR_OPEN = 19;
   /** RegularExpression Id. */
-  int CAT_ESC = 20;
+  int NEG = 20;
   /** RegularExpression Id. */
-  int BR_OPEN = 21;
+  int TO = 21;
   /** RegularExpression Id. */
-  int NEG = 22;
+  int BR_CLOSE = 22;
   /** RegularExpression Id. */
-  int TO = 23;
+  int LINE_START = 23;
   /** RegularExpression Id. */
-  int BR_CLOSE = 24;
+  int LINE_END = 24;
+  /** RegularExpression Id. */
+  int WORD_BOUNDARY = 25;
+  /** RegularExpression Id. */
+  int POS_LOOKAHEAD = 26;
+  /** RegularExpression Id. */
+  int NEG_LOOKAHEAD = 27;
+  /** RegularExpression Id. */
+  int POS_LOOKBEHIND = 28;
+  /** RegularExpression Id. */
+  int NEG_LOOKBEHIND = 29;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -77,8 +87,6 @@ public interface RegExParserConstants {
     "<DIGIT>",
     "<BACK_REF>",
     "<WILDCARD>",
-    "<LINE_START>",
-    "<LINE_END>",
     "<SINGLE_ESC>",
     "<MULTI_ESC>",
     "<CAT_ESC>",
@@ -86,6 +94,13 @@ public interface RegExParserConstants {
     "<NEG>",
     "<TO>",
     "<BR_CLOSE>",
+    "<LINE_START>",
+    "<LINE_END>",
+    "<WORD_BOUNDARY>",
+    "<POS_LOOKAHEAD>",
+    "<NEG_LOOKAHEAD>",
+    "<POS_LOOKBEHIND>",
+    "<NEG_LOOKBEHIND>",
   };
 
 }

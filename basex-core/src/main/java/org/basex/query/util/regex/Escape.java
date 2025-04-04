@@ -23,9 +23,9 @@ public final class Escape extends RegExp {
   /** Everything except name characters. */
   private static final String NOT_CHAR;
   /** Word characters. */
-  private static final String WORD;
+  public static final String WORD;
   /** Everything except word characters. */
-  private static final String NOT_WORD;
+  public static final String NOT_WORD;
   /** Digits. */
   private static final String DIGIT = "\\p{Nd}";
   /** Everything except digits. */

@@ -33,8 +33,8 @@ abstract class RegExFn extends StandardFunc {
   static class RegExpr {
     /** Pattern. */
     final Pattern pattern;
-    /** Parent group IDs of capturing groups. */
-    private int[] parentGroups;
+    /** Group info. */
+    private GroupInfo groupInfo;
 
     /**
      * Constructor.
@@ -42,7 +42,7 @@ abstract class RegExFn extends StandardFunc {
      */
     RegExpr(final Pattern pattern) {
       this.pattern = pattern;
-      parentGroups = null;
+      groupInfo = null;
     }
 
     /**
@@ -50,8 +50,17 @@ abstract class RegExFn extends StandardFunc {
      * @return parent group IDs.
      */
     int[] getParentGroups() {
-      if(parentGroups == null) parentGroups = GroupScanner.parentGroups(pattern.pattern());
-      return parentGroups;
+      if(groupInfo == null) groupInfo = GroupScanner.groupInfo(pattern.pattern());
+      return groupInfo.parentGroups;
+    }
+
+    /**
+     * Returns the assertion flags of capturing groups.
+     * @return assertion flags.
+     */
+    boolean[] getAssertionFlags() {
+      if(groupInfo == null) groupInfo = GroupScanner.groupInfo(pattern.pattern());
+      return groupInfo.assertionFlags;
     }
   }
 
@@ -59,31 +68,29 @@ abstract class RegExFn extends StandardFunc {
    * Returns a regular expression pattern.
    * @param pattern pattern
    * @param flags flags (can be {@code null})
-   * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  final Pattern pattern(final byte[] pattern, final byte[] flags, final boolean check)
+  final Pattern pattern(final byte[] pattern, final byte[] flags)
       throws QueryException {
-    return regExpr(pattern, flags, check).pattern;
+    return regExpr(pattern, flags).pattern;
   }
 
   /**
    * Returns a regular expression pattern.
    * @param pattern pattern
    * @param flags flags
-   * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  final RegExpr regExpr(final byte[] pattern, final byte[] flags, final boolean check)
+  final RegExpr regExpr(final byte[] pattern, final byte[] flags)
       throws QueryException {
 
     final byte[] key = Token.concat(pattern, '\b', flags);
     synchronized(patterns) {
       RegExpr regExpr = patterns.get(key);
       if(regExpr == null) {
-        regExpr = parse(pattern, flags, check);
+        regExpr = parse(pattern, flags);
         patterns.put(key, regExpr);
       }
       return regExpr;
@@ -104,11 +111,10 @@ abstract class RegExFn extends StandardFunc {
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
    * @param modifiers modifiers
-   * @param check check result for empty strings
    * @return the pattern
    * @throws QueryException query exception
    */
-  private RegExpr parse(final byte[] regex, final byte[] modifiers, final boolean check)
+  private RegExpr parse(final byte[] regex, final byte[] modifiers)
       throws QueryException {
 
     // process modifiers
@@ -136,19 +142,32 @@ abstract class RegExFn extends StandardFunc {
         final String string = parser.parse().toString();
 
         pattern = Pattern.compile(string, flags);
-        if(check) {
-          // Circumvent Java RegEx behavior ("If MULTILINE mode is activated"...):
-          // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt
-          final Pattern p = (pattern.flags() & Pattern.MULTILINE) == 0 ? pattern :
-            Pattern.compile(pattern.pattern());
-          if(p.matcher("").matches()) throw REGEMPTY_X.get(info, string);
-        }
       }
 
       return new RegExpr(pattern);
     } catch(final PatternSyntaxException | ParseException | TokenMgrError ex) {
       Util.debug(ex);
       throw REGINVALID_X.get(info, regex);
+    }
+  }
+
+  /**
+   * Information about capturing groups.
+   */
+  public static class GroupInfo {
+    /** Parent group: element i contains the parent group ID of capturing group i+1. */
+    public final int[] parentGroups;
+    /** Assertion status: element i tells whether capturing group i+1 occurs in an assertion. */
+    public final boolean[] assertionFlags;
+
+    /**
+     * Constructor.
+     * @param parentGroup parent group IDs
+     * @param assertionFlags inside of assertion indicators
+     */
+    GroupInfo(final int[] parentGroup, final boolean[] assertionFlags) {
+      this.parentGroups = parentGroup;
+      this.assertionFlags = assertionFlags;
     }
   }
 
@@ -180,17 +199,19 @@ abstract class RegExFn extends StandardFunc {
      * @return an array indicating the parent group ID for each capturing group, where element i
      * contains the parent group ID of capturing group i+1.
      */
-    public static int[] parentGroups(final String pattern) {
+    public static GroupInfo groupInfo(final String pattern) {
       final GroupScanner gnd = new GroupScanner(pattern);
       final Stack<Integer> open = new Stack<>();
       open.push(0);
       int[] parentGroups = { };
+      boolean[] inAssertion = { };
       boolean quoted = false;
       int classLevel = 0;
+      int assrtMark = 0;
       for(;;) {
         switch(gnd.nxtToken()) {
           case EOP:
-            return parentGroups;
+            return new GroupInfo(parentGroups, inAssertion);
           case LBRACKET:
             if(!quoted) ++classLevel;
             break;
@@ -207,14 +228,25 @@ abstract class RegExFn extends StandardFunc {
             if(!quoted && classLevel == 0) {
               parentGroups = Arrays.copyOf(parentGroups, parentGroups.length + 1);
               parentGroups[parentGroups.length - 1] = open.peek();
+              inAssertion = Arrays.copyOf(inAssertion, inAssertion.length + 1);
+              inAssertion[inAssertion.length - 1] = assrtMark != 0;
               open.push(parentGroups.length);
+            }
+            break;
+          case ASSRT_LPAREN:
+            if(!quoted && classLevel == 0) {
+              open.push(open.peek());
+              if(assrtMark == 0) assrtMark = open.size();
             }
             break;
           case LPAREN:
             if(!quoted && classLevel == 0) open.push(open.peek());
             break;
           case RPAREN:
-            if(!quoted && classLevel == 0) open.pop();
+            if(!quoted && classLevel == 0) {
+              if (open.size() == assrtMark) assrtMark = 0;
+              open.pop();
+            }
             break;
           default:
         }
@@ -242,7 +274,18 @@ abstract class RegExFn extends StandardFunc {
           switch(nxtCp()) {
             case '?':
               switch(nxtCp()) {
-                case '<': return Token.CAPT_LPAREN;
+                case '=':
+                case '!':
+                  return Token.ASSRT_LPAREN;
+                case '<':
+                  switch(nxtCp()) {
+                    case '=':
+                    case '!':
+                      return Token.ASSRT_LPAREN;
+                    default:
+                      reset();
+                      return Token.CAPT_LPAREN;
+                  }
                 default:
                   reset();
                   return Token.LPAREN;
@@ -285,6 +328,7 @@ abstract class RegExFn extends StandardFunc {
       /** End of pattern.                         */ EOP,
       /** Capturing group's left parenthesis.     */ CAPT_LPAREN,
       /** Non-capturing group's left parenthesis. */ LPAREN,
+      /** Assertion's left parenthesis.           */ ASSRT_LPAREN,
       /** Right parenthesis.                      */ RPAREN,
       /** Left square bracket.                    */ LBRACKET,
       /** Right square bracket.                   */ RBRACKET,
