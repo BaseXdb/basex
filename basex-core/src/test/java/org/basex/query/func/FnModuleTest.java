@@ -2524,7 +2524,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("a", ".", "b"), "b");
 
     query(func.args("a", "", "x", "j"), "xax");
-    error(func.args("a", "", "x"), REGEMPTY_X);
+    query(func.args("a", "", "x"), "xax");
 
     // GH-573
     query(func.args("aaaaa bbbbbbbb ddd ", "(.{6,15}) ", "$1@"), "aaaaa bbbbbbbb@ddd ");
@@ -2581,7 +2581,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("abcde", "b(.)d", "$1"), "ace");
     query(func.args("abcde", "b(.)d", "$1", "j"), "ace");
 
-    error(func.args("W", ".*", " ()", " ()", " function($k, $g) { }"), REGEMPTY_X);
+    query(func.args("W", ".*", " ()", " ()", " function($k, $g) { '~' }"), "~~");
   }
 
   /** Test method. */
