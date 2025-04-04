@@ -2,13 +2,18 @@ package org.basex.query;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryError.*;
+import static org.basex.query.QueryText.*;
 
 import java.util.*;
 
 import org.basex.query.expr.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
+import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -24,6 +29,29 @@ public class QueryException extends Exception {
     @Override
     public synchronized Throwable fillInStackTrace() { return this; }
   };
+
+  /** Error Strings. */
+  private static final String[] NAMES = {
+    "code", "description", "value", "module", "line-number",
+    "column-number", "additional", "stack-trace", "map"
+  };
+  /** Error types. */
+  private static final SeqType[] TYPES = {
+    SeqType.QNAME_O, SeqType.STRING_ZO, SeqType.ITEM_ZM, SeqType.STRING_ZO, SeqType.INTEGER_ZO,
+    SeqType.INTEGER_ZO, SeqType.STRING_O, SeqType.STRING_O, SeqType.MAP_O
+  };
+  /** Error QNames. */
+  private static final QNm[] QNAMES = new QNm[NAMES.length];
+  /** Error string items. */
+  private static final Str[] STRINGS = new Str[NAMES.length];
+
+  static {
+    for(int n = NAMES.length - 1; n >= 0; n--) {
+      final String name = NAMES[n];
+      QNAMES[n] = new QNm(ERR_PREFIX, name, ERROR_URI);
+      STRINGS[n] = Str.get(name);
+    }
+  }
 
   /** Stack. */
   private final ArrayList<InputInfo> stack = new ArrayList<>();
@@ -246,17 +274,6 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Returns a stack trace expression.
-   * @return expression
-   */
-  public final Str stackTrace() {
-    final TokenBuilder tb = new TokenBuilder();
-    if(info != null) tb.add(info).add('\n');
-    for(final InputInfo stck : stack) tb.add(stck).add('\n');
-    return Str.get(tb.finish());
-  }
-
-  /**
    * Checks if this exception can be caught by a {@code try/catch} expression.
    * @return result of check
    */
@@ -271,6 +288,70 @@ public class QueryException extends Exception {
   public final QueryException notCatchable() {
     catchable = false;
     return this;
+  }
+
+  /**
+   * Returns variables for a new catch expression.
+   * @param qc query context
+   * @param info input info
+   * @return variables
+   */
+  public static Var[] variables(final QueryContext qc, final InputInfo info) {
+    final int vl = QNAMES.length;
+    final Var[] vars = new Var[vl];
+    for(int v = 0; v < vl; v++) {
+      vars[v] = new Var(QNAMES[v], TYPES[v], qc, info);
+    }
+    return vars;
+  }
+
+  /**
+   * Returns an array with values for this exception.
+   * @return values
+   * @throws QueryException query exception
+   */
+  public ValueList values() throws QueryException {
+    final TokenBuilder tb = new TokenBuilder();
+    if(info != null) tb.add(info).add('\n');
+    for(final InputInfo stck : stack) tb.add(stck).add('\n');
+    final Str trace = Str.get(tb.finish());
+
+    final ValueList list = new ValueList();
+    list.add(qname());
+    list.add(Str.get(getLocalizedMessage()));
+    list.add(value() != null ? value() : Empty.VALUE);
+    list.add(path() != null ? Str.get(path()) : Empty.VALUE);
+    list.add(line() != 0 ? Int.get(line()) : Empty.VALUE);
+    list.add(column() != 0 ? Int.get(column()) : Empty.VALUE);
+    list.add(trace);
+    list.add(trace);
+    list.add(map(list));
+    return list;
+  }
+
+  /**
+   * Returns a map with values for this exception.
+   * @return values
+   * @throws QueryException query exception
+   */
+  public XQMap map() throws QueryException {
+    return map(values());
+  }
+
+  /**
+   * Returns a map with all catch values.
+   * @param values error values
+   * @return map
+   * @throws QueryException query exception
+   */
+  private static XQMap map(final ValueList values) throws QueryException {
+    final MapBuilder mb = new MapBuilder();
+    int v = 0;
+    for(final Value value : values) {
+      if(!value.isEmpty()) mb.put(STRINGS[v], value);
+      v++;
+    }
+    return mb.map();
   }
 
   /**

@@ -3621,9 +3621,9 @@ public class QueryParser extends InputParser {
 
       final int s = localVars.openScope();
       final InputInfo ii = info();
-      final Var[] vs = Catch.vars(qc, ii);
-      for(final Var var : vs) localVars.add(var);
-      final Catch c = new Catch(ii, enclosedExpr(), vs, tests);
+      final Var[] vrs = QueryException.variables(qc, ii);
+      for(final Var var : vrs) localVars.add(var);
+      final Catch c = new Catch(ii, enclosedExpr(), vrs, tests);
       localVars.closeScope(s);
 
       catches = Array.add(catches, c);

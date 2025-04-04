@@ -247,7 +247,7 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind errors
-    final XQMap errors = ext instanceof QueryException ? Catch.map((QueryException) ext) :
+    final XQMap errors = ext instanceof QueryException ? ((QueryException) ext).map() :
       XQMap.empty();
     for(final WebParam rxp : errorParams) {
       bind(rxp, args, errors.get(Str.get(rxp.name)), qc);
