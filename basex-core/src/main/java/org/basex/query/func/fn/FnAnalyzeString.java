@@ -83,7 +83,7 @@ public final class FnAnalyzeString extends RegExFn {
       pos[1] = end;
     }
     if(group == 0) {
-      boolean[] assertionFlags = regExpr.getAssertionFlags();
+      final boolean[] assertionFlags = regExpr.getAssertionFlags();
       for(int g = 1; g <= assertionFlags.length; ++g) {
         if(assertionFlags[g - 1] && matcher.start(g) >= 0) {
           final FBuilder lg = FElem.build(Q_LGROUP);

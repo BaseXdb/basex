@@ -96,17 +96,14 @@ public final class FnTokenize extends RegExFn {
     final String string = Token.string(value);
     final int len = string.length();
     int start = 0;
-    boolean emptyEnd = false;
     for(final Matcher matcher = p.matcher(string); matcher.find();) {
       final int ms = matcher.start(), me = matcher.end();
-      emptyEnd = ms == len;
-      if(me != 0) {
+      if(ms != len && me != 0) {
         tl.add(string.substring(start, ms));
         start = me;
       }
     }
-    if(!emptyEnd) tl.add(string.substring(start));
-    return StrSeq.get(tl);
+    return StrSeq.get(tl.add(string.substring(start)));
   }
 
   /**

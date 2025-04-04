@@ -159,6 +159,9 @@ public final class FnModuleTest extends SandboxTest {
           + "\"http://www.w3.org/2005/xpath-functions\"><match><group nr=\"1\">b<group nr=\"2\"/>"
           + "</group></match><non-match>anana</non-match></analyze-string-result>");
     }
+
+    query(func.args("a", ""), "<analyze-string-result xmlns=\"http://www.w3.org/2005/xpath-"
+        + "functions\"><match/><non-match>a</non-match><match/></analyze-string-result>");
   }
 
   /** Test method. */
@@ -3294,7 +3297,6 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(wrap("a!!b!!c!!d"), "!!"), "a\nb\nc\nd");
     query(func.args(wrap("")), "");
     query(func.args(wrap(""), "!!"), "");
-    query(func.args("a", ""), "a");
 
     check(func.args(" normalize-space(" + wrap("A") + ")", " ' '"), "A", empty(NORMALIZE_SPACE));
     check("(<_>A</_>, <_>B</_>) ! " + func.args(" normalize-space()", " ' '"), "A\nB",
@@ -3303,6 +3305,8 @@ public final class FnModuleTest extends SandboxTest {
         exists(NORMALIZE_SPACE));
     check(func.args(" normalize-space(" + wrap("A") + ")", ";"), "A",
         exists(NORMALIZE_SPACE));
+
+    query(func.args("a", ""), "a");
   }
 
   /** Test method. */

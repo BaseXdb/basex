@@ -20,15 +20,15 @@ public final class WordBoundary extends RegExp {
    * @param multi multi-line flag
    */
   private WordBoundary(final boolean positive, final boolean multi) {
-    final String eol = LineBorder.eos(multi);
+    final String eos = LineBorder.eos(multi);
     if(positive) {
-      img = "(?:(?<=["      + Escape.WORD     + "])(?:(?=[" + Escape.NOT_WORD + "])|" + eol + ")"
+      img = "(?:(?<=["      + Escape.WORD     + "])(?:(?=[" + Escape.NOT_WORD + "])|" + eos + ")"
           +   "|(?<=(?:^|[" + Escape.NOT_WORD + "]))(?=["   + Escape.WORD     + "])"
           + ")";
     } else {
       img = "(?:(?<=["      + Escape.WORD     + "])(?=["     + Escape.WORD     + "])"
-          +   "|(?<=(?:^|[" + Escape.NOT_WORD + "]))(?:(?=[" + Escape.NOT_WORD + "])|" + eol + ")"
-          +   "|^" + eol
+          +   "|(?<=(?:^|[" + Escape.NOT_WORD + "]))(?:(?=[" + Escape.NOT_WORD + "])|" + eos + ")"
+          +   "|^" + eos
           + ")";
     }
   }
