@@ -3276,10 +3276,10 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void tokenize() {
     final Function func = TOKENIZE;
-    query(func.args("a", "", "j"), "\na\n");
-    query(func.args(wrap("a"), "", "j"), "\na\n");
-    query(func.args("a", wrap(""), "j"), "\na\n");
-    query(func.args(wrap("a"), wrap(""), "j"), "\na\n");
+    query(func.args("a", "", "j"), "a");
+    query(func.args(wrap("a"), "", "j"), "a");
+    query(func.args("a", wrap(""), "j"), "a");
+    query(func.args(wrap("a"), wrap(""), "j"), "a");
 
     query("subsequence(" + func.args(wrap("a b c d")) + ", 3)", "c\nd");
     query("subsequence(" + func.args(wrap("a,b,c,d"), ",") + ", 3)", "c\nd");
@@ -3294,6 +3294,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(wrap("a!!b!!c!!d"), "!!"), "a\nb\nc\nd");
     query(func.args(wrap("")), "");
     query(func.args(wrap(""), "!!"), "");
+    query(func.args("a", ""), "a");
 
     check(func.args(" normalize-space(" + wrap("A") + ")", " ' '"), "A", empty(NORMALIZE_SPACE));
     check("(<_>A</_>, <_>B</_>) ! " + func.args(" normalize-space()", " ' '"), "A\nB",
@@ -3302,8 +3303,6 @@ public final class FnModuleTest extends SandboxTest {
         exists(NORMALIZE_SPACE));
     check(func.args(" normalize-space(" + wrap("A") + ")", ";"), "A",
         exists(NORMALIZE_SPACE));
-
-    error(func.args("a", ""), REGEMPTY_X);
   }
 
   /** Test method. */
