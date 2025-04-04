@@ -40,7 +40,7 @@ public final class FnAnalyzeString extends RegExFn {
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);
 
-    final RegExpr regExpr = regExpr(pattern, flags, false);
+    final RegExpr regExpr = regExpr(pattern, flags);
     final Matcher matcher = regExpr.pattern.matcher(value);
     final FBuilder root = FElem.build(Q_ANALYZE_STRING_RESULT).declareNS();
     int start = 0;

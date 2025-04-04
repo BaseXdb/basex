@@ -68,31 +68,29 @@ abstract class RegExFn extends StandardFunc {
    * Returns a regular expression pattern.
    * @param pattern pattern
    * @param flags flags (can be {@code null})
-   * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  final Pattern pattern(final byte[] pattern, final byte[] flags, final boolean check)
+  final Pattern pattern(final byte[] pattern, final byte[] flags)
       throws QueryException {
-    return regExpr(pattern, flags, check).pattern;
+    return regExpr(pattern, flags).pattern;
   }
 
   /**
    * Returns a regular expression pattern.
    * @param pattern pattern
    * @param flags flags
-   * @param check check result for empty strings
    * @return pattern modifier
    * @throws QueryException query exception
    */
-  final RegExpr regExpr(final byte[] pattern, final byte[] flags, final boolean check)
+  final RegExpr regExpr(final byte[] pattern, final byte[] flags)
       throws QueryException {
 
     final byte[] key = Token.concat(pattern, '\b', flags);
     synchronized(patterns) {
       RegExpr regExpr = patterns.get(key);
       if(regExpr == null) {
-        regExpr = parse(pattern, flags, check);
+        regExpr = parse(pattern, flags);
         patterns.put(key, regExpr);
       }
       return regExpr;
@@ -113,11 +111,10 @@ abstract class RegExFn extends StandardFunc {
    * Compiles this regular expression to a {@link Pattern}.
    * @param regex regular expression to parse
    * @param modifiers modifiers
-   * @param check check result for empty strings
    * @return the pattern
    * @throws QueryException query exception
    */
-  private RegExpr parse(final byte[] regex, final byte[] modifiers, final boolean check)
+  private RegExpr parse(final byte[] regex, final byte[] modifiers)
       throws QueryException {
 
     // process modifiers
@@ -145,13 +142,6 @@ abstract class RegExFn extends StandardFunc {
         final String string = parser.parse().toString();
 
         pattern = Pattern.compile(string, flags);
-        if(check) {
-          // Circumvent Java RegEx behavior ("If MULTILINE mode is activated"...):
-          // http://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#lt
-          final Pattern p = (pattern.flags() & Pattern.MULTILINE) == 0 ? pattern :
-            Pattern.compile(pattern.pattern());
-          if(p.matcher("").matches()) throw REGEMPTY_X.get(info, string);
-        }
       }
 
       return new RegExpr(pattern);

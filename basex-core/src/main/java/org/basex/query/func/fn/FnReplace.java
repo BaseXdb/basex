@@ -33,7 +33,7 @@ public final class FnReplace extends RegExFn {
       final int sp = patternChar(pattern), rp = replace != null ? patternChar(replace) : -1;
       if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
     }
-    final RegExpr regExpr = regExpr(pattern, flags, false);
+    final RegExpr regExpr = regExpr(pattern, flags);
     final Matcher matcher = regExpr.pattern.matcher(string(value));
 
     if(action != null) {

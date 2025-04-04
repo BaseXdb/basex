@@ -32,7 +32,7 @@ public final class FnMatches extends RegExFn {
       final int ch = patternChar(pattern);
       if(ch != -1) return contains(value, ch);
     }
-    return pattern(pattern, flags, false).matcher(string(value)).find();
+    return pattern(pattern, flags).matcher(string(value)).find();
   }
 
   @Override
