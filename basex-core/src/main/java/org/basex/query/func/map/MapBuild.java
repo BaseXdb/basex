@@ -54,7 +54,6 @@ public final class MapBuild extends MapMerge {
       kt = arg(1).funcType().declType.type;
     }
     kt = kt.atomic();
-    if(kt == null) kt = AtomType.ANY_ATOMIC_TYPE;
 
     final boolean fiValue = arg(2) instanceof FuncItem;
     SeqType vt = arg(2).size() == 0 || fiValue ? s1t : SeqType.ITEM_ZM;
@@ -62,7 +61,7 @@ public final class MapBuild extends MapMerge {
       arg(2, arg -> refineFunc(arg, cc, s1t));
       vt = arg(2).funcType().declType;
     }
-    exprType.assign(MapType.get(kt, vm != null ? vm.type(vt) : SeqType.ITEM_ZM));
+    assignType(kt, vt);
     return this;
   }
 

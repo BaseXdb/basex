@@ -9,6 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -26,9 +27,20 @@ public final class MapEntry extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
-    final AtomType type = arg(0).seqType().type.atomic();
-    if(type != null) exprType.assign(MapType.get(type, arg(1).seqType()));
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr key = arg(0), value = arg(1);
+
+    Type type = null;
+    final SeqType vt = value.seqType();
+    if(key instanceof AStr) {
+      final TokenObjectMap<RecordField> fields = new TokenObjectMap<>(2);
+      fields.put(((Item) key).string(info), new RecordField(false, vt));
+      type = cc.qc.shared.record(false, fields);
+    } else {
+      final AtomType kt = key.seqType().type.atomic();
+      type = MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE, vt);
+    }
+    exprType.assign(type);
     return this;
   }
 

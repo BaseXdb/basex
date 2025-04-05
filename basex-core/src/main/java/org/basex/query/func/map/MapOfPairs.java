@@ -40,9 +40,7 @@ public final class MapOfPairs extends MapMerge {
     final Type tp = arg(0).seqType().type;
     if(tp instanceof MapType) {
       final SeqType vt = ((MapType) tp).valueType();
-      final AtomType kt = vt.type.atomic();
-      exprType.assign(MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE,
-        vm != null ? vm.type(vt) : SeqType.ITEM_ZM));
+      assignType(vt.type.atomic(), vt);
     }
     return this;
   }

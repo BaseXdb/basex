@@ -106,13 +106,8 @@ public class MapMerge extends StandardFunc {
           return cc.function(_MAP_PUT, info, args[1], args[0].arg(0), args[0].arg(1));
         }
       }
-
-      // consider duplicate handling for value type
-      //   map:merge((1 to 2) ! map { 1: 1 }, map { 'duplicates': 'combine' })
       final MapType mt = (MapType) st.type;
-      final Type kt = mt.keyType();
-      final SeqType vt = mt.valueType();
-      exprType.assign(MapType.get(kt, vm != null ? vm.type(vt) : SeqType.ITEM_ZM));
+      assignType(mt.keyType(), mt.valueType());
     }
     return this;
   }
@@ -162,6 +157,16 @@ public class MapMerge extends StandardFunc {
       }
     }
     throw QueryError.typeError(duplicates, new EnumType(Duplicates.values()), info);
+  }
+
+  /**
+   * Assigns a map type for this expression.
+   * @param kt key type
+   * @param vt value type
+   */
+  final void assignType(final Type kt, final SeqType vt) {
+    exprType.assign(MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE,
+      vm != null ? vm.type(vt) : SeqType.ITEM_ZM));
   }
 
   @Override

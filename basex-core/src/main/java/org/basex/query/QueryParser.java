@@ -3427,7 +3427,7 @@ public class QueryParser extends InputParser {
         } while(wsConsume(","));
         wsCheck(")");
       }
-      return qc.newRecord(extensible, fields);
+      return qc.shared.record(extensible, fields);
     }
     // map
     if(type instanceof MapType) {

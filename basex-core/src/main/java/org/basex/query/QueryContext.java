@@ -72,7 +72,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Query threads. */
   public final QueryThreads threads = new QueryThreads();
   /** Shared data references. */
-  public final SharedData shared = new SharedData();
+  public final SharedData shared;
   /** User-defined locks. */
   public final LockList locks = new LockList();
   /** Current query focus. */
@@ -99,7 +99,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Available collations. */
   public TokenObjectMap<Collation> collations;
   /** Profiling results. */
-  public QueryProfiler profiler = new QueryProfiler(this);
+  public final QueryProfiler profiler = new QueryProfiler(this);
   /** Perform tail-call optimizations. */
   public boolean tco;
 
@@ -130,8 +130,6 @@ public final class QueryContext extends Job implements Closeable {
 
   /** External variables and context to be bound at compile time. */
   private final QNmMap<Value> bindings = new QNmMap<>();
-  /** Cached record types. */
-  private final ArrayList<RecordType> recordTypes = new ArrayList<>();
 
   /** Serialization options. */
   private SerializerOptions sopts;
@@ -175,6 +173,7 @@ public final class QueryContext extends Job implements Closeable {
     this.info = info != null ? info : new QueryInfo(context);
     this.resources = parent != null ? parent.resources : new QueryResources(this);
     this.ftPosData = parent != null ? parent.ftPosData : null;
+    this.shared = parent != null ? parent.shared : new SharedData();
     this.user = context.user();
   }
 
@@ -491,23 +490,6 @@ public final class QueryContext extends Job implements Closeable {
    */
   public void ftOpt(final FTOpt opt) {
     ftOpt = opt;
-  }
-
-  /**
-   * Creates a new record or returns an existing instance.
-   * @param extensible extensible flag
-   * @param fields field declarations
-   * @return new or already registered record type
-   */
-  public RecordType newRecord(final boolean extensible, final TokenObjectMap<RecordField> fields) {
-    if(fields.isEmpty() && extensible) return SeqType.RECORD;
-
-    final RecordType rt = new RecordType(extensible, fields, null);
-    for(final RecordType recordType : recordTypes) {
-      if(recordType.equals(rt)) return recordType;
-    }
-    recordTypes.add(rt);
-    return rt;
   }
 
   /**

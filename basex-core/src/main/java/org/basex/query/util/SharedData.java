@@ -1,9 +1,11 @@
 package org.basex.query.util;
 
+import java.util.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -18,6 +20,17 @@ public final class SharedData {
   private final TokenObjectMap<QNm> qnames = new TokenObjectMap<>();
   /** Cached tokens. */
   private final WeakTokenSet tokens = new WeakTokenSet();
+  /** Cached record types. */
+  private final IntObjectMap<ArrayList<RecordType>> recordTypes = new IntObjectMap<>();
+
+  /**
+   * Constructor.
+   */
+  public SharedData() {
+    record(SeqType.RECORD);
+    record(SeqType.PAIR);
+    record(SeqType.MEMBER);
+  }
 
   /**
    * Parses and returns a shared QName.
@@ -71,5 +84,30 @@ public final class SharedData {
    */
   public byte[] token(final byte[] token) {
     return token.length == 0 ? Token.EMPTY : tokens.put(token);
+  }
+
+  /**
+   * Creates a new record or returns an existing instance.
+   * @param extensible extensible flag
+   * @param fields field declarations
+   * @return new or already registered record type
+   */
+  public RecordType record(final boolean extensible, final TokenObjectMap<RecordField> fields) {
+    return record(new RecordType(extensible, fields, null));
+  }
+
+  /**
+   * Creates a new record or returns an existing instance.
+   * @param rt record type
+   * @return new or already registered record type
+   */
+  public RecordType record(final RecordType rt) {
+    final ArrayList<RecordType> types = recordTypes.computeIfAbsent(rt.fields().size(),
+        () -> new ArrayList<>());
+    for(final RecordType type : types) {
+      if(type.equals(rt)) return type;
+    }
+    types.add(rt);
+    return rt;
   }
 }
