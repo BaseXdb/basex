@@ -148,7 +148,7 @@ public abstract class JavaCall extends Arr {
     if(type != null && arg.type.instanceOf(type)) return arg.toJava();
 
     // convert empty array to target type
-    if(arg instanceof XQArray && ((XQArray) arg).structSize() == 0 && param.isArray()) {
+    if(arg instanceof XQArray && arg.structSize() == 0 && param.isArray()) {
       final Class<?> atype = param.getComponentType();
       if(atype == boolean.class) return new boolean[0];
       if(atype == byte.class) return new byte[0];

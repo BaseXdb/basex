@@ -28,8 +28,12 @@ public final class MapKeys extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type type = arg(0).seqType().type;
-    if(type instanceof MapType) exprType.assign(((MapType) type).keyType());
+    final Expr map = arg(0);
+    final Type type = map.seqType().type;
+    if(type instanceof MapType) {
+      final Type kt = ((MapType) type).keyType();
+      exprType.assign(kt.seqType(Occ.ZERO_OR_MORE), map.structSize());
+    }
     return this;
   }
 }

@@ -1,8 +1,11 @@
 package org.basex.query.func.array;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.util.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -20,7 +23,16 @@ public final class ArrayEmpty extends ArrayFn {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    final XQArray array = toArray(arg(0), qc);
-    return array == XQArray.empty();
+    return toArray(arg(0), qc) == XQArray.empty();
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr array = arg(0);
+    if(array.seqType().type instanceof ArrayType) {
+      final long size = array.structSize();
+      if(size >= 0 && !array.has(Flag.NDT)) return Bln.get(size == 0);
+    }
+    return this;
   }
 }

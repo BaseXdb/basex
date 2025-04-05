@@ -158,10 +158,18 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the result size, or {@code -1} if the size is unknown.
-   * @return result of check
+   * Returns the result size.
+   * @return size, or {@code -1} if it is unknown
    */
   public abstract long size();
+
+  /**
+   * Returns the size of a structure resulting from this expression.
+   * @return size, or {@code -1} if it is unknown or if the result is not a structure.
+   */
+  public long structSize() {
+    return -1;
+  }
 
   /**
    * Indicates if an expression has one of the specified compiler properties. This method must only

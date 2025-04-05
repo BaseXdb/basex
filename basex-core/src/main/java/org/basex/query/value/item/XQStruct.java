@@ -66,10 +66,7 @@ public abstract class XQStruct extends FItem {
     return false;
   }
 
-  /**
-   * Returns the number of entries of this structure.
-   * @return number of entries
-   */
+  @Override
   public abstract long structSize();
 
   /**

@@ -48,4 +48,9 @@ public final class MapEntry extends StandardFunc {
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
     arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
   }
+
+  @Override
+  public long structSize() {
+    return 1;
+  }
 }

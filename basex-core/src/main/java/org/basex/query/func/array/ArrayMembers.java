@@ -52,9 +52,11 @@ public final class ArrayMembers extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Type tp = arg(0).seqType().type;
-    if(tp instanceof ArrayType) {
-      exprType.assign(MapType.get(AtomType.STRING, ((ArrayType) tp).valueType()));
+    final Expr array = arg(0);
+    final Type type = array.seqType().type;
+    if(type instanceof ArrayType) {
+      final MapType mt = MapType.get(AtomType.STRING, ((ArrayType) type).valueType());
+      exprType.assign(mt.seqType(Occ.ZERO_OR_MORE), array.structSize());
     }
     return this;
   }

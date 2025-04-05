@@ -57,6 +57,8 @@ public final class MapGet extends StandardFunc {
       }
     }
     if(mc.mapType != null) {
+      if(map.structSize() == 0) return Empty.VALUE;
+
       SeqType st = mc.mapType.valueType();
       if(fallback) {
         final FuncType ft = func.funcType();

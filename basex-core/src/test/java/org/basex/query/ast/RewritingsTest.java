@@ -1279,9 +1279,13 @@ public final class RewritingsTest extends SandboxTest {
         false, empty(CHARACTERS), empty(EMPTY), exists(NOT), exists(STRING));
 
     check("exists(map:keys(map:entry(1, <_/>)))",
-        true, empty(_MAP_KEYS), empty(EXISTS), exists(_MAP_SIZE), exists(CmpSimpleG.class));
+        true, root(Bln.class));
+    check("exists(map:items(map:entry(1, <_/>)))",
+        true, root(Bln.class));
     check("empty(map:keys(map:entry(1, <_/>)))",
-        false, empty(_MAP_KEYS), empty(EMPTY), exists(_MAP_SIZE), exists(CmpSimpleG.class));
+        false, root(Bln.class));
+    check("empty(map:items(map:entry(1, <_/>)))",
+        false, root(Bln.class));
 
     // no rewritings
     check("exists(<a/>/a) and exists(<b/>/b)", false, exists(And.class), empty(EXISTS));

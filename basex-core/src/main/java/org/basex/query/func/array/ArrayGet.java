@@ -6,6 +6,7 @@ import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -35,6 +36,8 @@ public final class ArrayGet extends StandardFunc {
     // combine result type with return type of fallback function
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
+      if(array.structSize() == 0) return Empty.VALUE;
+
       SeqType st = ((ArrayType) type).valueType();
       if(defined(2)) {
         final FuncType ft = arg(2).funcType();

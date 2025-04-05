@@ -56,7 +56,7 @@ public final class StructFilter extends AFilter {
     qc.focus = qf;
     try {
       for(final Expr expr : exprs) {
-        qf.size = ((XQStruct) item).structSize();
+        qf.size = item.structSize();
         final AtomicInteger a = new AtomicInteger();
 
         // arrays

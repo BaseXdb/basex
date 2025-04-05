@@ -87,6 +87,11 @@ public final class CMap extends Arr {
   }
 
   @Override
+  public long structSize() {
+    return exprs.length >> 1;
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new CMap(info, copyAll(cc, vm, exprs)));
   }

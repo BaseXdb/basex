@@ -7,6 +7,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -43,26 +44,35 @@ public final class MapBuild extends MapMerge {
   protected Expr opt(final CompileContext cc) throws QueryException {
     prepareMerge(3, Duplicates.COMBINE, cc);
 
-    final Expr input = arg(0);
+    final Expr input = arg(0), keys = arg(1), value = arg(2);
     final SeqType st = input.seqType(), s1t = st.with(Occ.EXACTLY_ONE);
     if(st.zero()) return cc.voidAndReturn(input, XQMap.empty(), info);
 
-    final boolean fiKey = arg(1) instanceof FuncItem;
-    Type kt = arg(1).size() == 0 || fiKey ? s1t.type : AtomType.ITEM;
+    final boolean noKey = keys == Empty.UNDEFINED || keys == Empty.VALUE;
+    final boolean fiKey = keys instanceof FuncItem;
+    Type kt = noKey || fiKey ? s1t.type : AtomType.ITEM;
     if(fiKey) {
       arg(1, arg -> refineFunc(arg, cc, s1t));
       kt = arg(1).funcType().declType.type;
     }
     kt = kt.atomic();
 
-    final boolean fiValue = arg(2) instanceof FuncItem;
-    SeqType vt = arg(2).size() == 0 || fiValue ? s1t : SeqType.ITEM_ZM;
+    final boolean noValue = value == Empty.UNDEFINED || value == Empty.UNDEFINED;
+    final boolean fiValue = value instanceof FuncItem;
+    SeqType vt = noValue || fiValue ? s1t : SeqType.ITEM_ZM;
     if(fiValue) {
       arg(2, arg -> refineFunc(arg, cc, s1t));
       vt = arg(2).funcType().declType;
     }
     assignType(kt, vt);
     return this;
+  }
+
+  @Override
+  public long structSize() {
+    final Expr input = arg(0), keys = arg(1);
+    return input instanceof RangeSeq && (keys == Empty.UNDEFINED || keys == Empty.VALUE) ?
+      input.size() : -1;
   }
 
   @Override

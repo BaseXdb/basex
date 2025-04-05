@@ -37,9 +37,9 @@ public final class MapOfPairs extends MapMerge {
   protected Expr opt(final CompileContext cc) throws QueryException {
     prepareMerge(1, Duplicates.COMBINE, cc);
 
-    final Type tp = arg(0).seqType().type;
-    if(tp instanceof MapType) {
-      final SeqType vt = ((MapType) tp).valueType();
+    final Type type = arg(0).seqType().type;
+    if(type instanceof MapType) {
+      final SeqType vt = ((MapType) type).valueType();
       assignType(vt.type.atomic(), vt);
     }
     return this;
