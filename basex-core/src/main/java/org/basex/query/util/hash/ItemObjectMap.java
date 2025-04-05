@@ -21,7 +21,7 @@ public final class ItemObjectMap<E> extends HashItemSet {
    * Constructor.
    */
   public ItemObjectMap() {
-    this(Array.INITIAL_CAPACITY);
+    this(INITIAL_CAPACITY);
   }
 
   /**

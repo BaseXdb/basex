@@ -7,6 +7,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * A convenience class for building an {@link XQMap}.
@@ -24,7 +25,7 @@ public final class MapBuilder {
    * Constructor.
    */
   public MapBuilder() {
-    this(Array.INITIAL_CAPACITY);
+    this(ASet.INITIAL_CAPACITY);
   }
 
   /**

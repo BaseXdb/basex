@@ -21,7 +21,9 @@ public final class FnTypeOf extends ContextFn {
     final TokenSet types = new TokenSet();
     for(final Value item : value) {
       String type = item.type.toString();
-      if(item.type instanceof FType) type = type.replaceAll("\\(.*", "(*)");
+      if(item.type instanceof FType) {
+        type = type.replaceAll("\\(.*", "(*)").replace("record", "map");
+      }
       types.add(type);
     }
     final int ts = types.size();

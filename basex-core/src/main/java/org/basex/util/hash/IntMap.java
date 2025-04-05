@@ -2,8 +2,6 @@ package org.basex.util.hash;
 
 import java.util.*;
 
-import org.basex.util.*;
-
 /**
  * This is an efficient and memory-saving hash map for storing primitive integers.
  * {@link Integer#MIN_VALUE} is returned for an entry that does not exist.
@@ -19,7 +17,7 @@ public final class IntMap extends IntSet {
    * Default constructor.
    */
   public IntMap() {
-    this(Array.INITIAL_CAPACITY);
+    this(INITIAL_CAPACITY);
   }
 
   /**

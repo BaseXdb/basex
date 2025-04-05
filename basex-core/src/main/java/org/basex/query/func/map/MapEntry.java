@@ -32,7 +32,7 @@ public final class MapEntry extends StandardFunc {
 
     Type type = null;
     final SeqType vt = value.seqType();
-    if(key instanceof AStr) {
+    if(key instanceof AStr && key.seqType().eq(SeqType.STRING_O)) {
       final TokenObjectMap<RecordField> fields = new TokenObjectMap<>(2);
       fields.put(((Item) key).string(info), new RecordField(false, vt));
       type = cc.qc.shared.record(false, fields);

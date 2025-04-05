@@ -45,14 +45,14 @@ public final class CMap extends Arr {
     // use record constructor (not too large, only strings as keys)?
     boolean record = el < 32;
     for(int e = 0; e < el && record; e += 2) {
-      if(!(exprs[e] instanceof AStr)) record = false;
+      if(!(exprs[e] instanceof AStr && exprs[e].seqType().eq(SeqType.STRING_O))) record = false;
     }
     if(record) {
       final TokenObjectMap<RecordField> fields = new TokenObjectMap<>(el / 2);
       final ExprList args = new ExprList(el / 2);
       for(int e = 0; e < el; e += 2) {
         final Expr key = exprs[e], value = exprs[e + 1];
-        fields.put(((Item) key).string(info), new RecordField(false, value.seqType()));
+        fields.put(((AStr) key).string(info), new RecordField(false, value.seqType()));
         args.add(value);
       }
       return new CRecord(info, cc.qc.shared.record(false, fields), args.finish()).optimize(cc);

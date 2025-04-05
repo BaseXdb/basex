@@ -27,7 +27,7 @@ public final class WeakTokenSet extends ASet {
    * Default constructor.
    */
   public WeakTokenSet() {
-    super(Array.INITIAL_CAPACITY);
+    super(INITIAL_CAPACITY);
     keys = new WeakTokenRef[capacity()];
   }
 

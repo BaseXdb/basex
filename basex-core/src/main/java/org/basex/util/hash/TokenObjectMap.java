@@ -20,7 +20,7 @@ public final class TokenObjectMap<E> extends TokenSet {
    * Default constructor.
    */
   public TokenObjectMap() {
-    this(Array.INITIAL_CAPACITY);
+    this(INITIAL_CAPACITY);
   }
 
   /**

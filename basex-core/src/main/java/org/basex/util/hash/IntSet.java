@@ -2,8 +2,6 @@ package org.basex.util.hash;
 
 import java.util.*;
 
-import org.basex.util.*;
-
 /**
  * This is an efficient and memory-saving hash set for storing primitive integers.
  * It is derived from the {@link TokenSet} class.
@@ -19,7 +17,7 @@ public class IntSet extends ASet {
    * Default constructor.
    */
   public IntSet() {
-    this(Array.INITIAL_CAPACITY);
+    this(INITIAL_CAPACITY);
   }
 
   /**

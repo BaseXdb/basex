@@ -26,7 +26,7 @@ public class HashItemSet extends ASet implements ItemSet {
    * @param info input info (can be {@code null})
    */
   public HashItemSet(final Mode mode, final InputInfo info) {
-    this(mode, info, Array.INITIAL_CAPACITY);
+    this(mode, info, INITIAL_CAPACITY);
   }
 
   /**

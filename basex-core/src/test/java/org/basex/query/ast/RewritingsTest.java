@@ -764,9 +764,12 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Static typing of computed maps. */
   @Test public void gh1766() {
-    check("let $map := map { 'c': 'x' } return $map?(1 to 6)", "",
+    check("let $map := map { 'c': 'x' } return $map?(1 to 6)", "", empty());
+    check("let $map := map { 'c': 'x' } return count($map?(1 to 6))", 0, root(Int.class));
+
+    check("let $map := map { 1: 'x' } return $map?(1 to 6)", "x",
         type(DualMap.class, "xs:string*"));
-    check("let $map := map { 'c': 'x' } return count($map?(1 to 6))", 0,
+    check("let $map := map { 1: 'x' } return count($map?(1 to 6))", 1,
         type(DualMap.class, "xs:string*"));
   }
 

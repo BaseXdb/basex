@@ -13,6 +13,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ASet {
+  /** Initial default size for new sets. */
+  public static final int INITIAL_CAPACITY = 6;
   /** Hash table buckets. */
   protected int[] buckets;
   /** Pointers to the next entry. */
@@ -30,6 +32,7 @@ public abstract class ASet {
    * @param capacity array capacity (will be resized to a power of two)
    */
   protected ASet(final long capacity) {
+    // do not exceed maximum capacity, add 2 more slots (empty first slot, trailing placeholder)
     final int s = Array.checkCapacity(Long.highestOneBit(capacity + 1) << 1);
     buckets = new int[s];
     next = new int[s];

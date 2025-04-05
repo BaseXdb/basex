@@ -23,7 +23,7 @@ public class QNmSet extends ASet implements Iterable<QNm> {
    * Default constructor.
    */
   public QNmSet() {
-    super(Array.INITIAL_CAPACITY);
+    super(INITIAL_CAPACITY);
     keys = new QNm[capacity()];
     hash = new int[capacity()];
   }

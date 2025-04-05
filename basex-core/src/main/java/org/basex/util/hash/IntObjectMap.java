@@ -20,7 +20,7 @@ public final class IntObjectMap<E> extends IntSet {
    * Default constructor.
    */
   public IntObjectMap() {
-    this(Array.INITIAL_CAPACITY);
+    this(INITIAL_CAPACITY);
   }
 
   /**
