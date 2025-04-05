@@ -30,9 +30,7 @@ public abstract class ASet {
    * @param capacity array capacity (will be resized to a power of two)
    */
   protected ASet(final long capacity) {
-    long c = 1;
-    while(c < capacity) c <<= 1;
-    final int s = Integer.highestOneBit(Array.checkCapacity(c));
+    final int s = Array.checkCapacity(Long.highestOneBit(capacity + 1) << 1);
     buckets = new int[s];
     next = new int[s];
   }
