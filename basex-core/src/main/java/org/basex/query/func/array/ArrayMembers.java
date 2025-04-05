@@ -55,8 +55,7 @@ public final class ArrayMembers extends StandardFunc {
     final Expr array = arg(0);
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      final MapType mt = MapType.get(AtomType.STRING, ((ArrayType) type).valueType());
-      exprType.assign(mt.seqType(Occ.ZERO_OR_MORE), array.structSize());
+      exprType.assign(cc.qc.shared.record(Str.VALUE, ((ArrayType) type).valueType()));
     }
     return this;
   }

@@ -24,9 +24,9 @@ public final class MapPairs extends MapEntries {
     final Expr map = arg(0);
     final Type type = map.seqType().type;
     if(type instanceof MapType) {
-      MapType mt = (MapType) type;
-      mt = MapType.get(AtomType.STRING, mt.keyType().seqType().union(mt.valueType()));
-      exprType.assign(mt.seqType(Occ.ZERO_OR_MORE), map.structSize());
+      final MapType mt = (MapType) type;
+      exprType.assign(cc.qc.shared.record(Str.KEY, mt.keyType().seqType(),
+          Str.VALUE, mt.valueType()).seqType(Occ.ZERO_OR_MORE), map.structSize());
     }
     return this;
   }

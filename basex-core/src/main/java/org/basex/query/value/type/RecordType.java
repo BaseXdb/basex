@@ -33,6 +33,15 @@ public final class RecordType extends MapType {
    * Constructor for RecordType declarations and literal RecordType instances.
    * @param extensible extensible flag
    * @param fields field declarations
+   */
+  public RecordType(final boolean extensible, final TokenObjectMap<RecordField> fields) {
+    this(extensible, fields, null);
+  }
+
+  /**
+   * Constructor for RecordType declarations and literal RecordType instances.
+   * @param extensible extensible flag
+   * @param fields field declarations
    * @param name record type name (can be {@code null})
    */
   public RecordType(final boolean extensible, final TokenObjectMap<RecordField> fields,
@@ -292,7 +301,7 @@ public final class RecordType extends MapType {
           map.put(key, new RecordField(true, rt.fields.get(key).seqType));
         }
       }
-      return new RecordType(extensible || rt.extensible, map, null);
+      return new RecordType(extensible || rt.extensible, map);
     }
     return type instanceof MapType ? ((MapType) type).union(keyType(), valueType()) :
            type instanceof ArrayType ? SeqType.FUNCTION :
@@ -353,7 +362,7 @@ public final class RecordType extends MapType {
         map.put(key, new RecordField(false, rt.fields.get(key).seqType));
       }
     }
-    return new RecordType(extensible && rt.extensible, map, null);
+    return new RecordType(extensible && rt.extensible, map);
   }
 
   @Override

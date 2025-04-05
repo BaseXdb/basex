@@ -38,8 +38,6 @@ public final class MapGet extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = arg(0), key = arg(1), func = arg(2);
-    if(map == XQMap.empty()) return Empty.VALUE;
-
     final boolean fallback = defined(2);
     if(fallback) {
       final Type type = arg(1).seqType().type.atomic();
@@ -57,8 +55,6 @@ public final class MapGet extends StandardFunc {
       }
     }
     if(mc.mapType != null) {
-      if(map.structSize() == 0) return Empty.VALUE;
-
       SeqType st = mc.mapType.valueType();
       if(fallback) {
         final FuncType ft = func.funcType();

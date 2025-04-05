@@ -9,7 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -31,14 +30,11 @@ public final class MapEntry extends StandardFunc {
     final Expr key = arg(0), value = arg(1);
 
     Type type = null;
-    final SeqType vt = value.seqType();
-    if(key instanceof AStr && key.seqType().eq(SeqType.STRING_O)) {
-      final TokenObjectMap<RecordField> fields = new TokenObjectMap<>(2);
-      fields.put(((Item) key).string(info), new RecordField(false, vt));
-      type = cc.qc.shared.record(false, fields);
+    if(key instanceof Str && key.seqType().eq(SeqType.STRING_O)) {
+      type = cc.qc.shared.record((Str) key, value.seqType());
     } else {
       final AtomType kt = key.seqType().type.atomic();
-      type = MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE, vt);
+      type = MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE, value.seqType());
     }
     exprType.assign(type);
     return this;
