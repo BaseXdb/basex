@@ -151,7 +151,6 @@ public final class RecordType extends MapType {
     };
 
     if(strict) {
-      if(!Objects.equals(name, rt.name)) return false;
       final Iterator<byte[]> iter = fields.iterator(), iter2 = rt.fields.iterator();
       for(byte[] key; (key = iter.next()) != null;) {
         if(!Token.eq(key, iter2.next()) || !compareFields.test(key)) return false;
