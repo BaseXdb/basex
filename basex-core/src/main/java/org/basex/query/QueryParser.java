@@ -3612,10 +3612,9 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(TRY)) return null;
 
     final Expr expr = enclosedExpr();
-    wsCheck(CATCH);
 
     Catch[] catches = { };
-    do {
+    while(wsConsume(CATCH)) {
       final ArrayList<Test> tests = nameTestUnion(NodeType.ELEMENT);
       if(tests == null) throw error(NOCATCH);
 
@@ -3627,9 +3626,12 @@ public class QueryParser extends InputParser {
       localVars.closeScope(s);
 
       catches = Array.add(catches, c);
-    } while(wsConsumeWs(CATCH));
+    }
+    Expr fnlly = null;
+    if(wsConsume(FINALLY)) fnlly = enclosedExpr();
 
-    return new Try(info(), expr, catches);
+    if(catches.length == 0 && fnlly == null) throw error(NOCATCH);
+    return new Try(info(), expr, fnlly != null ? fnlly : Empty.VALUE, catches);
   }
 
   /**

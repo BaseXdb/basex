@@ -327,6 +327,7 @@ public final class CompileContext {
    * @return function
    */
   public StandardFunc error(final QueryException ex, final Expr expr) {
+    Util.debug(ex);
     return FnError.get(ex, expr.seqType());
   }
 

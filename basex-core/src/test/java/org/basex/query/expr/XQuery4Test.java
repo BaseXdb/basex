@@ -439,6 +439,7 @@ public final class XQuery4Test extends SandboxTest {
 
   /** Try/catch expression. */
   @Test public void tryy() {
+    // $err:map
     query("try { 1 + <_/> } catch * { $err:map?code }", "err:FORG0001");
     query("try { 1 + <_/> } catch * { $err:map?line-number }", 1);
     query("try { 1 + <_/> } catch * { boolean($err:map?additional) }", true);
@@ -447,6 +448,54 @@ public final class XQuery4Test extends SandboxTest {
 
     query("try { error((), (), 1) } catch * { $err:map?value }", 1);
     query("try { error(xs:QName('a')) } catch * { $err:map?code }", "a");
+
+    query("declare function local:f($a) {"
+        + "  try { 1 div 0 } catch * { if($a > 0) then local:f($a - 1) else $a } "
+        + "}; local:f(10000)", 0);
+    query("declare function local:f($a) {"
+        + "  try { if($a > 0) then local:f($a - 1) else $a } catch * { 1 } "
+        + "}; local:f(10000)", 0);
+    query("declare function local:f($a) {"
+        + "  try { 0 } catch * { 1 } "
+        + "}; local:f(10000)", 0);
+    query("declare function local:f($a) {"
+        + "  try { } catch * { if($a > 0) { local:f($a - 1) } } "
+        + "}; local:f(10000)", "");
+
+    // finally
+    check("try { 1 } finally { }", 1, root(Int.class));
+    check("try { 1 } catch * { 2 } finally { }", 1, root(Int.class));
+    check("try { 1 div 0 } catch * { 2 } finally { }", 2, root(Int.class));
+
+    check("try { 1 } finally { (1 to 1000)[. = 0] }", 1, root(Try.class));
+    check("try { 1 } catch * { 2 } finally { (1 to 1000)[. = 0] }", 1, root(Try.class));
+    check("try { 1 div 0 } catch * { 2 } finally { (1 to 1000)[. = 0] }", 2, root(Try.class));
+
+    check("try { 1 } catch * { error() } finally { message('done') }", 1, empty(ERROR));
+    check("try { 1 } catch err:FOER0 { 2 } finally { }", 1, root(Int.class), count(Int.class, 1));
+    check("try { 1 } catch err:FOER0 { 2 } catch err:FOER1 { 3 } finally { }", 1,
+        root(Int.class), count(Int.class, 1));
+
+    check("let $a := 1 return try { $a } finally { $a[. = 0] }", 1, root(Int.class));
+    check("let $a := 1 return try { $a } catch * { $a } finally { $a[. = 0] }", 1, root(Int.class));
+
+    error("try { 1 } catch * { 2 } finally { 2 div 0 }", DIVZERO_X);
+    error("try { error() } catch * { 2 } finally { 2 div 0 }", DIVZERO_X);
+    error("try { 1 } catch * { error() } finally { 2 div 0 }", DIVZERO_X);
+    error("try { 1 div 0 } catch err:FOER0 { 2 } finally { }", DIVZERO_X);
+    error("try { 1 div 0 } catch err:FOER0 { 2 } catch err:FOER1 { 2 } finally { }", DIVZERO_X);
+
+    error("try { 1 } finally { 1 }", FINALLY_X);
+    error("try { error() } finally { 1 }", FINALLY_X);
+    error("try { 1 } catch * { 2 } finally { 1 }", FINALLY_X);
+    error("try { 1 } catch * { 2 } finally { 1 }", FINALLY_X);
+    error("try { error() } catch * { 2 } finally { 1 }", FINALLY_X);
+    error("try { error() } catch * { error() } finally { 1 }", FINALLY_X);
+    error("try { 1 } finally { (1 to 1000)[. > 0] }", FINALLY_X);
+    error("try { 1 } catch * { 2 } finally { (1 to 1000)[. > 0] }", FINALLY_X);
+    error("try { 1 div 0 } catch * { 2 } finally { (1 to 1000)[. > 0] }", FINALLY_X);
+    error("let $a := 1 return try { $a } finally { $a[. = 1] }", FINALLY_X);
+    error("let $a := 1 return try { $a } catch * { $a } finally { $a[. = 1] }", FINALLY_X);
   }
 
   /** Window expression. */

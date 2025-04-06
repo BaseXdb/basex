@@ -67,6 +67,7 @@ public interface QueryText {
   /** Parser token. */ String EXCEPT = "except";
   /** Parser token. */ String EXTERNAL = "external";
   /** Parser token. */ String FALSE = "false";
+  /** Parser token. */ String FINALLY = "finally";
   /** Parser token. */ String FIRST = "first";
   /** Parser token. */ String FN = "fn";
   /** Parser token. */ String FOR = "for";
