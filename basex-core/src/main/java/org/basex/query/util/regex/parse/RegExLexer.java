@@ -110,7 +110,32 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
       case '|':  return OR;
       case '(':
         final int p = pos, ts = tb.size();
-        if(next(skipCmt) == '?' && next(skipCmt) == ':') return NPAR_OPEN;
+        switch(next(skipCmt)) {
+          case '?':
+            switch(next(skipCmt)) {
+              case ':': return NPAR_OPEN;
+              case '=': return POS_LOOKAHEAD;
+              case '!': return NEG_LOOKAHEAD;
+              case '<':
+                switch(next(skipCmt)) {
+                  case '=': return POS_LOOKBEHIND;
+                  case '!': return NEG_LOOKBEHIND;
+                }
+            }
+            break;
+          case '*':
+            Boolean neg = null;
+            switch(next(skipCmt)) {
+              case 'p': if(matches("ositive_look")) neg = false; break;
+              case 'n': if(matches("egative_look")) neg = true; break;
+            }
+            if(neg != null) {
+              switch(next(skipCmt)) {
+                case 'a': if(matches("head:")) return neg ? NEG_LOOKAHEAD : POS_LOOKAHEAD; break;
+                case 'b': if(matches("ehind:")) return neg ? NEG_LOOKBEHIND : POS_LOOKBEHIND; break;
+              }
+            }
+        }
         pos = p;
         tb.size(ts);
         return PAR_OPEN;
@@ -132,12 +157,25 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
   }
 
   /**
+   * Match a string against the input.
+   * @param string the string to be matched
+   * @return true if the input matches the string
+   */
+  private boolean matches(final String string) {
+    for(char c : string.toCharArray()) if(c != next(skipCmt)) return false;
+    return true;
+  }
+
+  /**
    * Escape sequence.
    * @return token kind
    */
   private int escape() {
     final int curr = next(false);
     switch(curr) {
+      case 'b':
+      case 'B':
+        return WORD_BOUNDARY;
       case 'n':
       case 'r':
       case 't':

@@ -160,7 +160,8 @@ public final class FnModuleTest extends SandboxTest {
           + "</group></match><non-match>anana</non-match></analyze-string-result>");
     }
 
-    error(func.args("a", ""), REGEMPTY_X);
+    query(func.args("a", ""), "<analyze-string-result xmlns=\"http://www.w3.org/2005/xpath-"
+        + "functions\"><match/><non-match>a</non-match><match/></analyze-string-result>");
   }
 
   /** Test method. */
@@ -2526,7 +2527,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("a", ".", "b"), "b");
 
     query(func.args("a", "", "x", "j"), "xax");
-    error(func.args("a", "", "x"), REGEMPTY_X);
+    query(func.args("a", "", "x"), "xax");
 
     // GH-573
     query(func.args("aaaaa bbbbbbbb ddd ", "(.{6,15}) ", "$1@"), "aaaaa bbbbbbbb@ddd ");
@@ -2583,7 +2584,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("abcde", "b(.)d", "$1"), "ace");
     query(func.args("abcde", "b(.)d", "$1", "j"), "ace");
 
-    error(func.args("W", ".*", " ()", " ()", " function($k, $g) { }"), REGEMPTY_X);
+    query(func.args("W", ".*", " ()", " ()", " function($k, $g) { '~' }"), "~~");
   }
 
   /** Test method. */
@@ -3278,10 +3279,10 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void tokenize() {
     final Function func = TOKENIZE;
-    query(func.args("a", "", "j"), "\na\n");
-    query(func.args(wrap("a"), "", "j"), "\na\n");
-    query(func.args("a", wrap(""), "j"), "\na\n");
-    query(func.args(wrap("a"), wrap(""), "j"), "\na\n");
+    query(func.args("a", "", "j"), "a");
+    query(func.args(wrap("a"), "", "j"), "a");
+    query(func.args("a", wrap(""), "j"), "a");
+    query(func.args(wrap("a"), wrap(""), "j"), "a");
 
     query("subsequence(" + func.args(wrap("a b c d")) + ", 3)", "c\nd");
     query("subsequence(" + func.args(wrap("a,b,c,d"), ",") + ", 3)", "c\nd");
@@ -3305,7 +3306,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" normalize-space(" + wrap("A") + ")", ";"), "A",
         exists(NORMALIZE_SPACE));
 
-    error(func.args("a", ""), REGEMPTY_X);
+    query(func.args("a", ""), "a");
   }
 
   /** Test method. */

@@ -56,7 +56,7 @@ public final class FnTokenize extends RegExFn {
       }
     }
 
-    final Pattern p = pattern(pattern, flags, true);
+    final Pattern p = pattern(pattern, flags);
     return vl == 0 ? Empty.ITER : new Iter() {
       final String string = Token.string(value);
       final Matcher matcher = p.matcher(string);
@@ -89,15 +89,19 @@ public final class FnTokenize extends RegExFn {
       if(ch != -1) return vl == 0 ? Empty.VALUE : StrSeq.get(Token.split(value, ch, true));
     }
 
-    final Pattern p = pattern(pattern, flags, true);
+    final Pattern p = pattern(pattern, flags);
     if(vl == 0) return Empty.VALUE;
 
     final TokenList tl = new TokenList();
     final String string = Token.string(value);
+    final int len = string.length();
     int start = 0;
     for(final Matcher matcher = p.matcher(string); matcher.find();) {
-      tl.add(string.substring(start, matcher.start()));
-      start = matcher.end();
+      final int ms = matcher.start(), me = matcher.end();
+      if(ms != len && me != 0) {
+        tl.add(string.substring(start, ms));
+        start = me;
+      }
     }
     return StrSeq.get(tl.add(string.substring(start)));
   }
