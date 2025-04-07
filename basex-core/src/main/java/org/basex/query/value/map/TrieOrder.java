@@ -1,6 +1,6 @@
 package org.basex.query.value.map;
 
-import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -35,10 +35,10 @@ final class TrieOrder {
   }
 
   /**
-   * Returns a key iterator.
-   * @return iterator
+   * Returns all key.
+   * @return keys
    */
-  BasicIter<Item> keys() {
+  Value keys() {
     if(removed != null) {
       added = added.remove(removed);
       removed = null;

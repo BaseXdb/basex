@@ -75,8 +75,9 @@ public final class RecordType extends MapType {
   private static SeqType unionType(final TokenObjectMap<RecordField> rfs) {
     if(rfs.isEmpty()) return SeqType.ITEM_ZM;
     SeqType ust = null;
-    for(final RecordField rf : rfs.values()) {
-      final SeqType st = rf.seqType();
+    final int fs = rfs.size();
+    for(int f = 1; f <= fs; f++) {
+      final SeqType st = rfs.value(f).seqType();
       ust = ust == null ? st : ust.union(st);
     }
     return ust;
@@ -103,8 +104,9 @@ public final class RecordType extends MapType {
    * @return result of check
    */
   public boolean hasOptional() {
-    for(final RecordField field : fields.values()) {
-      if(field.isOptional()) return true;
+    final int fs = fields.size();
+    for(int f = 1; f <= fs; f++) {
+      if(fields.value(f).isOptional()) return true;
     }
     return false;
   }
@@ -232,8 +234,9 @@ public final class RecordType extends MapType {
     if(!extensible && type instanceof MapType) {
       final MapType mt = (MapType) type;
       if(!mt.keyType().oneOf(AtomType.STRING, AtomType.ANY_ATOMIC_TYPE)) return false;
-      for(final RecordField field : fields.values()) {
-        if(!field.seqType().instanceOf(mt.valueType())) return false;
+      final int fs = fields.size();
+      for(int f = 1; f <= fs; f++) {
+        if(!fields.value(f).seqType().instanceOf(mt.valueType())) return false;
       }
       return true;
     }

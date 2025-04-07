@@ -23,11 +23,11 @@ public final class ArraySplit extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
 
     return new Iter() {
-      final Iterator<Value> members = array.iterable().iterator();
+      final Iterator<Value> values = array.iterable().iterator();
 
       @Override
       public XQArray next() {
-        return members.hasNext() ? XQArray.singleton(members.next()) : null;
+        return values.hasNext() ? XQArray.singleton(values.next()) : null;
       }
       @Override
       public Item get(final long i) {

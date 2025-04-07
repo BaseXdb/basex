@@ -224,27 +224,26 @@ public abstract class XQMap extends XQStruct {
         final RecordType rt = (RecordType) tp;
         final TokenObjectMap<RecordField> fields = rt.fields();
         final int fs = fields.size();
-        final BasicIter<Item> keys = keys();
         if(coerce) {
+          final BasicIter<Item> keys = keys();
           for(int f = 1; f <= fs; f++) {
-            final byte[] rk = fields.key(f);
             final RecordField rf = fields.value(f);
-            final Item k = keys.next();
-            if(rf.isOptional() || k == null || k.type != AtomType.STRING ||
-                !Token.eq(rk, k.string(null))) return false;
-            if(!rf.seqType().instance(getOrNull(k))) return false;
+            final Item key = keys.next();
+            final SeqType st = rf.seqType();
+            if(rf.isOptional() || key == null || key.type != AtomType.STRING ||
+              !Token.eq(fields.key(f), key.string(null)) ||
+              st != SeqType.ITEM_ZM && !st.instance(getOrNull(key))) return false;
           }
           return keys.next() == null || rt.isExtensible();
         }
 
         for(int f = 1; f <= fs; f++) {
-          final byte[] rk = fields.key(f);
           final RecordField rf = fields.value(f);
-          final Value value = getOrNull(Str.get(rk));
+          final Value value = getOrNull(Str.get(fields.key(f)));
           if(value != null ? !rf.seqType().instance(value) : !rf.isOptional()) return false;
         }
         if(!rt.isExtensible()) {
-          for(final Item key : keys) {
+          for(final Item key : keys()) {
             if(!key.type.instanceOf(AtomType.STRING) || !fields.contains(key.string(null)))
               return false;
           }
@@ -277,6 +276,7 @@ public abstract class XQMap extends XQStruct {
 
   /**
    * Returns a key iterator.
+   * Overwritten by {@link XQTrieMap#keys}
    * @return iterator
    */
   public BasicIter<Item> keys() {
@@ -308,7 +308,7 @@ public abstract class XQMap extends XQStruct {
       return new BasicIter<>(size) {
         @Override
         public Item get(final long i) {
-          return (Item) XQMap.this.valueAt((int) i);
+          return (Item) valueAt((int) i);
         }
         @Override
         public Value value(final QueryContext qc, final Expr expr) throws QueryException {
@@ -341,14 +341,15 @@ public abstract class XQMap extends XQStruct {
   }
 
   /**
-   * Returns keys.
+   * Returns keys. Invoked by {@link #keys}.
    * @return items ({@code null} if not implemented)
    */
   Value keysInternal() {
     return null;
   }
+
   /**
-   * Returns sequence-concatenated values.
+   * Returns sequence-concatenated values. Invoked by {@link #items}.
    * @return items ({@code null} if not implemented)
    */
   Value itemsInternal() {

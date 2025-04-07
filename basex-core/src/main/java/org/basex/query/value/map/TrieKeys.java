@@ -2,8 +2,8 @@ package org.basex.query.value.map;
 
 import java.util.*;
 
-import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -61,11 +61,11 @@ final class TrieKeys implements Iterable<Item> {
   }
 
   /**
-   * Returns a key iterator.
-   * @return iterator
+   * Returns all keys.
+   * @return keys
    */
-  BasicIter<Item> keys() {
-    return ItemSeq.get(keys, size, null).iter();
+  Value keys() {
+    return ItemSeq.get(keys, size, null);
   }
 
   /**

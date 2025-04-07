@@ -115,6 +115,6 @@ public final class XQTrieMap extends XQMap {
   @Override
   public BasicIter<Item> keys() {
     final long size = structSize();
-    return size == 0 ? Empty.ITER : size == 1 ? ((TrieLeaf) root).key.iter() : order.keys();
+    return size == 0 ? Empty.ITER : size == 1 ? ((TrieLeaf) root).key.iter() : order.keys().iter();
   }
 }

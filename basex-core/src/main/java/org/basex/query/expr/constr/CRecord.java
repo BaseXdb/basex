@@ -38,11 +38,11 @@ public final class CRecord extends Arr {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final RecordType rt = (RecordType) seqType().type;
-    final TokenObjectMap<RecordField> fields = rt.fields();
-    final int fs = fields.size();
     final boolean extensible = rt.isExtensible();
     if(extensible || rt.hasOptional()) {
       final MapBuilder mb = new MapBuilder(exprs.length);
+      final TokenObjectMap<RecordField> fields = rt.fields();
+      final int fs = fields.size();
       for(int f = 1; f <= fs; f++) {
         boolean add = true;
         final Value value = exprs[f - 1].value(qc);
@@ -61,7 +61,7 @@ public final class CRecord extends Arr {
     }
 
     // create compact record map
-    final ValueList values = new ValueList(fs);
+    final ValueList values = new ValueList(exprs.length);
     for(final Expr expr : exprs) values.add(expr.value(qc));
     return new XQRecordMap(values.finish(), rt);
   }

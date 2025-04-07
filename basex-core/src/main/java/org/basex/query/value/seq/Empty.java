@@ -26,10 +26,6 @@ public final class Empty extends Item {
   /** Empty iterator. */
   public static final BasicIter<Item> ITER = new BasicIter<>(0) {
     @Override
-    public Item next() {
-      return null;
-    }
-    @Override
     public Item get(final long i) {
       return null;
     }

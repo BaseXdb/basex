@@ -107,6 +107,7 @@ public class FnFoldLeft extends StandardFunc {
     // fold-left((), INIT, $f)  ->  INIT
     if(array ? input == XQArray.empty() : ist.zero()) return init;
 
+    final SeqType zst = init.seqType();
     if(action instanceof FuncItem) {
       if(iff == null) {
         final Object fold = ((FuncItem) action).fold(input, array, left, cc);
@@ -115,7 +116,7 @@ public class FnFoldLeft extends StandardFunc {
         if(fold instanceof FuncItem[]) iff = (FuncItem[]) fold;
       }
 
-      final SeqType zst = init.seqType(), i1t = array ? ist.type instanceof ArrayType ?
+      final SeqType i1t = array ? ist.type instanceof ArrayType ?
         ((ArrayType) ist.type).valueType() : SeqType.ITEM_O : ist.with(Occ.EXACTLY_ONE);
       SeqType st = zst, ost;
       do {
@@ -124,8 +125,10 @@ public class FnFoldLeft extends StandardFunc {
         ost = st;
         st = st.union(arg(2).funcType().declType);
       } while(!st.eq(ost));
-
       exprType.assign(st);
+    } else {
+      final FuncType ft = action.funcType();
+      if(ft != null) exprType.assign(ist.oneOrMore() ? ft.declType : zst.union(ft.declType));
     }
     return this;
   }

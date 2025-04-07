@@ -60,8 +60,9 @@ public final class XQIntStrMap extends XQHashMap {
 
   @Override
   Value itemsInternal() {
-    final TokenList list = new TokenList(structSize());
-    for(final byte[] value : map.values()) list.add(value);
+    final long is = structSize();
+    final TokenList list = new TokenList(is);
+    for(int i = 1; i <= is; i++) list.add(map.value(i));
     return StrSeq.get(list.finish());
   }
 

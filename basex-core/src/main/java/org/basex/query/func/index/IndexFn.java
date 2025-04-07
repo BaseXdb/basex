@@ -67,17 +67,16 @@ public abstract class IndexFn extends StandardFunc {
    */
   static Iter entries(final Index index, final IndexEntries entries) {
     final EntryIterator ei = index.entries(entries);
-
     return new BasicIter<FNode>(ei.size()) {
       @Override
       public FNode next() {
         final byte[] token = ei.next();
-        return token == null ? null : get(token);
+        return token == null ? null : entry(token);
       }
 
       @Override
       public FNode get(final long i) {
-        return get(ei.get((int) i));
+        return entry(ei.get((int) i));
       }
 
       /**
@@ -85,7 +84,7 @@ public abstract class IndexFn extends StandardFunc {
        * @param token token
        * @return element
        */
-      private FNode get(final byte[] token) {
+      private FNode entry(final byte[] token) {
         return FElem.build(Q_ENTRY).add(Q_COUNT, ei.count()).add(token).finish();
       }
     };
