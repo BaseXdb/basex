@@ -12,7 +12,7 @@
   </parent>
 
   <properties>
-    <jettyVersion>11.0.25</jettyVersion>
+    <jettyVersion>12.0.18</jettyVersion>
   </properties>
 
   <name>BaseX API</name>
@@ -36,20 +36,33 @@
       <artifactId>jetty-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
+      <groupId>org.eclipse.jetty.ee9</groupId>
+      <artifactId>jetty-ee9-servlet</artifactId>
+      <version>${jettyVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlets</artifactId>
+      <groupId>org.eclipse.jetty.ee9</groupId>
+      <artifactId>jetty-ee9-servlets</artifactId>
+      <version>${jettyVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-webapp</artifactId>
+      <groupId>org.eclipse.jetty.ee9</groupId>
+      <artifactId>jetty-ee9-webapp</artifactId>
+      <version>${jettyVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.ee9.websocket</groupId>
+      <artifactId>jetty-ee9-websocket-jetty-server</artifactId>
+      <version>${jettyVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
-      <artifactId>websocket-jetty-server</artifactId>
+      <artifactId>jetty-websocket-jetty-api</artifactId>
+      <version>${jettyVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -93,8 +106,8 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
+        <groupId>org.eclipse.jetty.ee9</groupId>
+        <artifactId>jetty-ee9-maven-plugin</artifactId>
         <version>${jettyVersion}</version>
         <configuration>
           <jettyXmls>${basedir}/src/main/webapp/WEB-INF/jetty.xml</jettyXmls>
