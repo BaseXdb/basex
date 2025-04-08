@@ -16,7 +16,6 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.eclipse.jetty.ee9.websocket.api.*;
-import org.eclipse.jetty.websocket.api.*;
 /**
  * Creates WebSocket responses.
  *

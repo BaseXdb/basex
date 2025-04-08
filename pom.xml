@@ -138,6 +138,12 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
+        <groupId>org.eclipse.jetty.websocket</groupId>
+        <artifactId>jetty-websocket-jetty-api</artifactId>
+        <version>${jettyVersion}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
         <groupId>com.ettrema</groupId>
         <artifactId>milton-api</artifactId>
         <version>1.8.1.4</version>
