@@ -556,10 +556,8 @@ public enum Function implements AFunction {
   REMOVE(FnRemove::new, "remove(input,positions)",
       params(ITEM_ZM, INTEGER_ZM), ITEM_ZM),
   /** XQuery function. */
-  REPLACE(FnReplace::new, "replace(value,pattern[,replacement,flags,action])",
-      params(STRING_ZO, STRING_O, STRING_ZO, STRING_ZO,
-      FuncType.get(ITEM_ZO, UNTYPED_ATOMIC_O, UNTYPED_ATOMIC_ZM).seqType(Occ.ZERO_OR_ONE)),
-      STRING_O),
+  REPLACE(FnReplace::new, "replace(value,pattern[,replacement,flags])",
+      params(STRING_ZO, STRING_O, ITEM_ZO, STRING_ZO), STRING_O),
   /** XQuery function. */
   REPLICATE(FnReplicate::new, "replicate(input,count[,multiple])",
       params(ITEM_ZM, INTEGER_O, BOOLEAN_ZO), ITEM_ZM),

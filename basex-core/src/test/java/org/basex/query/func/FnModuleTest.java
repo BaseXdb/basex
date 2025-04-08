@@ -2542,49 +2542,49 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args("a", "a", " ()"), "");
 
-    query(func.args("b", "b", " ()", " ()", " function($k, $g) { }"), "");
-    query(func.args("c", "c", " ()", " ()", " function($k, $g) { upper-case($k) }"), "C");
-    query(func.args("de", ".", " ()", " ()", " function($k, $g) { $k || $k }"), "ddee");
+    query(func.args("b", "b", " fn($k, $g) { }"), "");
+    query(func.args("c", "c", " fn($k, $g) { upper-case($k) }"), "C");
+    query(func.args("de", ".", " fn($k, $g) { $k || $k }"), "ddee");
 
-    query(func.args("Chapter 9", "[0-9]+", " ()", " ()",
-        " function($k, $g) { string(number($k) + 1) }"), "Chapter 10");
+    query(func.args("Chapter 9", "[0-9]+", " fn($k, $g) { string(number($k) + 1) }"),
+        "Chapter 10");
     query("let $map := map { 'LAX': 'Los Angeles', 'LHR': 'London' } return"
-        + func.args("LHR to LAX", "[A-Z]{3}", " ()", " ()",
-        " function($s, $g) { $map($s) }"), "London to Los Angeles");
-    query(func.args("57°43′30″", "([0-9]+)°([0-9]+)′([0-9]+)″", " ()", " ()", " function($s, $g) "
+        + func.args("LHR to LAX", "[A-Z]{3}", " fn($s, $g) { $map($s) }"),
+        "London to Los Angeles");
+    query(func.args("57°43′30″", "([0-9]+)°([0-9]+)′([0-9]+)″", " fn($s, $g) "
         + "{ string(number($g[1]) + number($g[2]) div 60 + number($g[3]) div 3600) || '°' }"),
         "57.725°");
-    query(func.args("A1 B234", "([A-Z]+)([0-9]+)", " ()", " ()",
-        " function($s, $g) { string-join(characters($g[2]) ! ($g[1] || .)) }"),
+    query(func.args("A1 B234", "([A-Z]+)([0-9]+)",
+        " fn($s, $g) { string-join(characters($g[2]) ! ($g[1] || .)) }"),
         "A1 B2B3B4");
-    query(func.args("A(0)B(1)C(0)D(9)", "(.)\\((\\d)\\)", " ()", " ()",
-        " function($s, $g) { $g[1][$g[2] != '0'] }"),
+    query(func.args("A(0)B(1)C(0)D(9)", "(.)\\((\\d)\\)",
+        " fn($s, $g) { $g[1][$g[2] != '0'] }"),
         "BD");
-    query(func.args("chop first character ", "(.).*? ", " ()", " ()", " substring-after#2"),
+    query(func.args("chop first character ", "(.).*? ", " substring-after#2"),
         "hop irst haracter ");
-    query(func.args("12345678", ".(.)", " ()", " ()", " replace(?, ?, '')"),
+    query(func.args("12345678", ".(.)", " replace(?, ?, '')"),
         1357);
     query("for $function in (head#1, tail#1) return" +
-        func.args("1234", "(.)(.)", " ()", " ()", " function($s, $g) { $function($g) }"),
+        func.args("1234", "(.)(.)", " fn($s, $g) { $function($g) }"),
         "13\n24");
     query("for $function in (substring-before#2, substring-after#2) return" +
-        func.args("1234", ".(..)", " ()", " ()", " $function"),
+        func.args("1234", ".(..)", " $function"),
         "14\n4");
     query("for $before in (true(), false()) "
         + "let $name := 'fn:substring-' || (if($before) then 'before' else 'after') "
         + "let $function := function-lookup(xs:QName($name), 2) "
-        + "return" + func.args("1234", ".(..)", " ()", " ()", " $function"),
+        + "return" + func.args("1234", ".(..)", " $function"),
         "14\n4");
-    query(func.args("X", ".", " ()", " ()", " contains#2"), true);
-    query(func.args("1", "(.)", " action := function($n, $_) { $n + 1 }"), 2);
+    query(func.args("X", ".", " contains#2"), true);
+    query(func.args("1", "(.)", " fn($n, $_) { $n + 1 }"), 2);
 
-    query(func.args("bab", "a", " action := function($_, $__) { }"), "bb");
-    query(func.args("bab", "(a)", " action := function($_, $__) { }"), "bb");
-    query(func.args("bab", "(a)", " action := function($_, $__) { '' }"), "bb");
+    query(func.args("bab", "a", " fn($_, $__) { }"), "bb");
+    query(func.args("bab", "(a)", " fn($_, $__) { }"), "bb");
+    query(func.args("bab", "(a)", " fn($_, $__) { '' }"), "bb");
     query(func.args("abcde", "b(.)d", "$1"), "ace");
     query(func.args("abcde", "b(.)d", "$1", "j"), "ace");
 
-    query(func.args("W", ".*", " ()", " ()", " function($k, $g) { '~' }"), "~~");
+    query(func.args("W", ".*", " fn($k, $g) { '~' }"), "~~");
   }
 
   /** Test method. */

@@ -22,21 +22,22 @@ public final class FnReplace extends RegExFn {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
-    final Item replacement = arg(2).atomItem(qc, info);
+    final Item replacement = arg(2).item(qc, info);
     final byte[] flags = toZeroToken(arg(3), qc);
-    final FItem action = toFunctionOrNull(arg(4), 2, qc);
-    if(!replacement.isEmpty() && action != null) throw REGACTION_X.get(info, this);
+
+    final boolean func = replacement instanceof FuncItem;
+    final FItem action = func ? toFunction(replacement, 2, qc) : null;
+    final byte[] replace = func ? null : replacement.isEmpty() ? Token.EMPTY : toToken(replacement);
 
     // shortcut for simple character replacements
-    final byte[] replace = replacement.isEmpty() ? EMPTY : toToken(replacement);
     if(flags.length == 0) {
-      final int sp = patternChar(pattern), rp = replace != null ? patternChar(replace) : -1;
+      final int sp = patternChar(pattern), rp = func ? -1 : patternChar(replace);
       if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
     }
     final RegExpr regExpr = regExpr(pattern, flags);
     final Matcher matcher = regExpr.pattern.matcher(string(value));
 
-    if(action != null) {
+    if(func) {
       final HofArgs args = new HofArgs(2);
       final StringBuilder sb = new StringBuilder();
       while(matcher.find()) {
