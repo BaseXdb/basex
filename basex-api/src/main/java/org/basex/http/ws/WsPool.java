@@ -11,7 +11,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.list.*;
 import org.eclipse.jetty.ee9.websocket.api.*;
-import org.eclipse.jetty.websocket.api.*;
 
 /**
  * This class defines a pool for WebSockets. It manages all connected WebSockets.

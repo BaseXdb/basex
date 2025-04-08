@@ -82,10 +82,10 @@ public final class BaseXHTTP extends CLI {
     final String webapp = soptions.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     locate(WEBCONF, webapp);
-    final IOFile jettyConf = locate(JETTYCONF, webapp);
-    final Path p = Paths.get(jettyConf.toString());
+    final Path p = Paths.get(locate(JETTYCONF, webapp).toString());
     final URI uri = p.toUri();
-    this.jetty = (Server) new XmlConfiguration(new PathResourceFactory().newResource(uri)).configure();
+    final Resource resource = new PathResourceFactory().newResource(uri);
+    this.jetty = (Server) new XmlConfiguration(resource).configure();
 
     // enable GZIP support
     if(soptions.get(StaticOptions.GZIP)) {

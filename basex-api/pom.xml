@@ -38,31 +38,22 @@
     <dependency>
       <groupId>org.eclipse.jetty.ee9</groupId>
       <artifactId>jetty-ee9-servlet</artifactId>
-      <version>${jettyVersion}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.ee9</groupId>
       <artifactId>jetty-ee9-servlets</artifactId>
-      <version>${jettyVersion}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.ee9</groupId>
       <artifactId>jetty-ee9-webapp</artifactId>
-      <version>${jettyVersion}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.ee9.websocket</groupId>
       <artifactId>jetty-ee9-websocket-jetty-server</artifactId>
-      <version>${jettyVersion}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
       <artifactId>jetty-websocket-jetty-api</artifactId>
-      <version>${jettyVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
