@@ -704,6 +704,8 @@ public enum QueryError {
   INVALID_JSON_X(FOJS, 6, "%"),
   /** Error code. */
   ESCAPE_JSON_X(FOJS, 7, "Invalid escape sequence: %."),
+  /** Error code. */
+  PLAN_X_X(FOJS, 8, "Layout '%' cannot be applied: %."),
 
   /** Error code. */
   NSDECL_X(FONS, 4, "Namespace prefix not declared: %."),
@@ -1123,8 +1125,6 @@ public enum QueryError {
   /** Error code. */
   JAVAEXEC_X_X_X(XPTY, 4, "%. Caused by: %%."),
   /** Error code. */
-  JAVANULL(XPTY, 17, "Java array contains null values."),
-  /** Error code. */
   JAVAMULTIPLE_X_X(XPTY, 4, "Multiple % candidates. Parameters: %."),
   /** Error code. */
   JAVANONE_X_X_X(XPTY, 4, "% cannot be called with %. Expected: %."),
@@ -1204,6 +1204,8 @@ public enum QueryError {
   /** Error code. */
   UNKNOWNOPTION_X(XPTY, 4, "Unknown option '%'."),
 
+  /** Error code. */
+  JAVANULL(XPTY, 17, "Java array contains null values."),
   /** Error code. */
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),
   /** Error code. */
