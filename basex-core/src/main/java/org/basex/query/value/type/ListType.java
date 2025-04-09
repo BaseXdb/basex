@@ -49,6 +49,14 @@ public enum ListType implements Type {
     this.type = type;
   }
 
+  /**
+   * Returns the name of this type.
+   * @return name
+   */
+  public final QNm qname() {
+    return name;
+  }
+
   @Override
   public final boolean isNumber() {
     return false;
