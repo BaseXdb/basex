@@ -588,6 +588,9 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM, INTEGER_O).seqType()),
       ARRAY_ZM, flag(HOF)),
   /** XQuery function. */
+  SCHEMA_TYPE(FnSchemaType::new, "schema-type(name)",
+      params(QNAME_O), MAP_ZO),
+  /** XQuery function. */
   SECONDS(FnSeconds::new, "seconds(value)",
       params(DECIMAL_ZO), DAY_TIME_DURATION_ZO),
   /** XQuery function. */

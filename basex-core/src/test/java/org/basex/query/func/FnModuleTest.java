@@ -220,7 +220,7 @@ public final class FnModuleTest extends SandboxTest {
     query(q1 + "?base-type()?base-type()?base-type()?name eq xs:QName('xs:anyType')", true);
     query(q1 + "?base-type()?base-type()?base-type()?is-simple", false);
     query(q1 + "?base-type()?base-type()?base-type()?variety", "mixed");
-    query(q1 + "?base-type()?base-type()?base-type()?base-type()", "");
+    query(q1 + "?base-type()?base-type()?base-type()?base-type() => exists()", false);
     query(q1 + "?primitive-type()?name eq xs:QName('xs:untypedAtomic')", true);
     query(q1 + "=> map:contains('members')", false);
     query(q1 + "=> map:contains('simple-content-type')", false);
@@ -1919,7 +1919,7 @@ public final class FnModuleTest extends SandboxTest {
     query(q2 + "?base-type()?base-type()?base-type()?name eq xs:QName('xs:anyType')", true);
     query(q2 + "?base-type()?base-type()?base-type()?is-simple", false);
     query(q2 + "?base-type()?base-type()?base-type()?variety", "mixed");
-    query(q2 + "?base-type()?base-type()?base-type()?base-type()", "");
+    query(q2 + "?base-type()?base-type()?base-type()?base-type() => exists()", false);
     query(q2 + "?primitive-type()?name eq xs:QName('xs:untypedAtomic')", true);
     query(q2 + "=> map:contains('members')", false);
     query(q2 + "=> map:contains('simple-content-type')", false);
@@ -2671,6 +2671,19 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(" (1 to 6, (7 to " + wrap(13) + ")[. > 12], (14 to " + wrap(20) + ")[. > 18])"),
         "20\n19\n13\n6\n5\n4\n3\n2\n1", count(REVERSE, 2));
+  }
+
+  /** Test method. */
+  @Test public void schemaType() {
+    final Function func = SCHEMA_TYPE;
+
+    query(func.args(" xs:QName('xs:integer')") + " ? name", "integer");
+    query(func.args(" xs:QName('xs:long')") + " ? primitive-type() ? name", "decimal");
+    query(func.args(" xs:QName('xs:positiveInteger')") + " ? base-type() ? name",
+        "nonNegativeInteger");
+    query(func.args(" xs:QName('xs:integer')") + " ? matches(23)", true);
+    query(func.args(" xs:QName('xs:numeric')") + " ? variety", "union");
+    query(func.args(" xs:QName('xs:numeric')") + " ? members() ? name", "double\nfloat\ndecimal");
   }
 
   /** Test method. */
