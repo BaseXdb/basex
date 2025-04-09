@@ -3383,4 +3383,10 @@ public final class RewritingsTest extends SandboxTest {
     query("count(distinct-values((1 to 5) ! prof:track((1 to 1000000)[. = 0])?time)) > 1",
         true);
   }
+
+  /** Erroneous rewrite to pipeline operator. */
+  @Test public void gh2415() {
+    query("let $a := 'x' let $b := if($a) then (<a/>, <b/>) else error() return $b/name()",
+        "a\nb");
+  }
 }

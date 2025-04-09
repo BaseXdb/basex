@@ -71,11 +71,11 @@ public abstract class Path extends ParseExpr {
    * Returns a new path instance.
    * A path implementation is chosen that works fastest for the given steps.
    * @param info input info (can be {@code null})
-   * @param root root expression (can be temporary {@link Dummy} node or {@code null})
+   * @param input input expression (can be temporary {@link Dummy} node or {@code null})
    * @param steps steps
    * @return path instance
    */
-  public static Expr get(final InputInfo info, final Expr root, final Expr... steps) {
+  public static Expr get(final InputInfo info, final Expr input, final Expr... steps) {
     // add steps of input array
     boolean axes = true;
     final ExprList tmp = new ExprList(steps.length);
@@ -92,20 +92,21 @@ public abstract class Path extends ParseExpr {
       tmp.add(expr);
       axes = axes && expr instanceof Step;
     }
-    final Expr rt = root instanceof ContextValue || root instanceof Dummy ? null : root;
+    final Expr root = input instanceof ContextValue && input.size() == 1 ||
+        input instanceof Dummy ? null : input;
     final Expr[] stps = tmp.finish();
-    final Expr step = rt == null && stps.length == 1 ? stps[0] : null;
+    final Expr step = root == null && stps.length == 1 ? stps[0] : null;
 
     // choose best implementation
     if(axes) {
-      if(iterative(root, stps)) {
+      if(iterative(input, stps)) {
         // example: a
         if(step != null && !step.has(Flag.POS)) return new SingleIterPath(info, step);
         // example: a/b
-        return new IterPath(info, rt, stps);
+        return new IterPath(info, root, stps);
       }
       // example: a/b/..
-      return new CachedPath(info, rt, stps);
+      return new CachedPath(info, root, stps);
     }
 
     // examples: 'text', (a union b)
@@ -113,7 +114,7 @@ public abstract class Path extends ParseExpr {
       return stps[0];
     }
     // example: (1 to 10)/<xml/>
-    return new MixedPath(info, rt, stps);
+    return new MixedPath(info, root, stps);
   }
 
   @Override
