@@ -75,6 +75,9 @@ public final class StaticOptions extends Options {
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
   /** Write trace output to the logs. */
   public static final BooleanOption LOGTRACE = new BooleanOption("LOGTRACE", true);
+  /** Logging of personal data. */
+  public static final EnumOption<LogEncode> LOGENCODE =
+      new EnumOption<>("LOGENCODE", LogEncode.NONE);
 
   /** Comment: written to the options file. */
   public static final Comment C_HTTP = new Comment("HTTP Services");
@@ -110,6 +113,18 @@ public final class StaticOptions extends Options {
     public String toString() {
       final String name = name();
       return name.charAt(0) + name.substring(1).toLowerCase(Locale.ENGLISH);
+    }
+  }
+
+  /** Logging of personal data. */
+  public enum LogEncode {
+    /** Pseudonymize. */ PSEUDONYMIZE,
+    /** Anonymize. */ ANONYMIZE,
+    /** None. */ NONE;
+
+    @Override
+    public String toString() {
+      return EnumOption.string(this);
     }
   }
 

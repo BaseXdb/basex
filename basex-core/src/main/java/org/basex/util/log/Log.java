@@ -1,11 +1,13 @@
 package org.basex.util.log;
 
 import java.io.*;
+import java.security.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.regex.*;
 
 import org.basex.core.*;
+import org.basex.core.StaticOptions.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -27,11 +29,18 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class Log implements QueryTracer {
+  /** Characters for hash strings. */
+  private static final byte[] HASHCHARS = Token.token(
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
   /** Server string. */
   private static final String SERVER = "SERVER";
+  /** Encoder for personal log strings. */
+  private static MessageDigest encoder;
 
   /** Static options. */
   private final StaticOptions sopts;
+  /** Encode personal data. */
+  private final LogEncode encode;
   /** Logs messages to exclude. */
   private final Pattern exclude;
   /** Log messages to cut. */
@@ -63,9 +72,16 @@ public final class Log implements QueryTracer {
       }
       return null;
     };
+
     exclude = pattern.apply(StaticOptions.LOGEXCLUDE);
     cut = pattern.apply(StaticOptions.LOGCUT);
     maxLen = sopts.get(StaticOptions.LOGMSGMAXLEN);
+    encode = sopts.get(StaticOptions.LOGENCODE);
+    try {
+      if(encode != LogEncode.NONE) encoder = MessageDigest.getInstance("SHA-256");
+    } catch(final Exception ex) {
+      Util.errln("Personal data cannot be encoded: %", ex);
+    }
   }
 
   /**
@@ -137,8 +153,8 @@ public final class Log implements QueryTracer {
     final LogEntry entry = new LogEntry();
     entry.date = new Date();
     entry.time = DateTime.format(entry.date, DateTime.TIME);
-    entry.address = address != null ? address.replaceFirst("^/", "") : SERVER;
-    entry.user = user != null ? user : UserText.ADMIN;
+    entry.address = encode(address != null ? address.replaceFirst("^/", "") : SERVER, SERVER);
+    entry.user = encode(user != null ? user : UserText.ADMIN, UserText.ADMIN);
     entry.type = type.toString();
     entry.info = inf;
     if(perf != null) entry.runtime = perf.toString();
@@ -247,6 +263,24 @@ public final class Log implements QueryTracer {
    */
   private IOFile dir() {
     return sopts.dbPath(".").resolve(sopts.get(StaticOptions.LOGPATH));
+  }
+
+  /**
+   * Encode log string.
+   * @param input input string
+   * @param dflt default string, which must not be encoded
+   * @return encoded string
+   */
+  private String encode(final String input, final String dflt) {
+    if(encoder == null || input.equals(dflt)) return input;
+
+    final byte[] hash = encoder.digest(encode == LogEncode.ANONYMIZE ?
+      Token.token(input.intern().hashCode()) : Token.token(input));
+    final TokenBuilder tb = new TokenBuilder();
+    for(int r = 0; r < 8; r++) {
+      tb.add(HASHCHARS[(hash[r % hash.length] & 0xFF) % HASHCHARS.length]);
+    }
+    return tb.toString();
   }
 
   @Override
