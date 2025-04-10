@@ -5,6 +5,7 @@ import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
 import java.util.Map.*;
 import java.util.function.*;
 
@@ -13,12 +14,12 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.log.*;
+import org.eclipse.jetty.ee9.webapp.*;
+import org.eclipse.jetty.ee9.websocket.server.config.*;
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.gzip.*;
 import org.eclipse.jetty.util.resource.*;
-import org.eclipse.jetty.webapp.*;
-import org.eclipse.jetty.websocket.server.config.*;
 import org.eclipse.jetty.xml.*;
 
 /**
@@ -81,8 +82,10 @@ public final class BaseXHTTP extends CLI {
     final String webapp = soptions.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
     locate(WEBCONF, webapp);
-    final IOFile url = locate(JETTYCONF, webapp);
-    jetty = (Server) new XmlConfiguration(new PathResource(url.file())).configure();
+    final IOFile jettyConf = locate(JETTYCONF, webapp);
+    final Path p = Paths.get(jettyConf.toString());
+    final URI uri = p.toUri();
+    this.jetty = (Server) new XmlConfiguration(new PathResourceFactory().newResource(uri)).configure();
 
     // enable GZIP support
     if(soptions.get(StaticOptions.GZIP)) {
