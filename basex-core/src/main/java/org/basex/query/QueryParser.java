@@ -3492,13 +3492,17 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test documentTest() throws QueryException {
-    final boolean elem = consume(ELEMENT);
-    if(!elem && !consume(SCHEMA_ELEMENT)) return null;
-
-    wsCheck("(");
-    skipWs();
-    final Test test = elem ? elemAttrTest(NodeType.ELEMENT) : schemaTest();
-    wsCheck(")");
+    Test test = null;
+    final boolean element = consume(ELEMENT), schema = !element && consume(SCHEMA_ELEMENT);
+    if(element || schema) {
+      wsCheck("(");
+      skipWs();
+      test = element ? elemAttrTest(NodeType.ELEMENT) : schemaTest();
+      wsCheck(")");
+    } else {
+      test = Test.get(nameTestUnion(NodeType.ELEMENT));
+      if(test == null) return null;
+    }
     return new DocTest(test != null ? test : KindTest.ELEMENT);
   }
 
@@ -3520,9 +3524,8 @@ public class QueryParser extends InputParser {
    */
   private Test elemAttrTest(final NodeType type) throws QueryException {
     final ArrayList<Test> tests = nameTestUnion(type);
-    if(tests == null) return null;
+    if(tests.isEmpty()) return null;
 
-    final Test test = Test.get(tests);
     if(wsConsumeWs(",")) {
       final QNm name = eQName(sc.elemNS, QNAME_X);
       Type ann = ListType.find(name);
@@ -3535,7 +3538,7 @@ public class QueryParser extends InputParser {
         throw error(STATIC_X, ann);
       }
     }
-    return test;
+    return Test.get(tests);
   }
 
   /**
@@ -3616,7 +3619,7 @@ public class QueryParser extends InputParser {
     Catch[] catches = { };
     while(wsConsume(CATCH)) {
       final ArrayList<Test> tests = nameTestUnion(NodeType.ELEMENT);
-      if(tests == null) throw error(NOCATCH);
+      if(tests.isEmpty()) throw error(NOCATCH);
 
       final int s = localVars.openScope();
       final InputInfo ii = info();
@@ -3641,14 +3644,16 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private ArrayList<Test> nameTestUnion(final NodeType type) throws QueryException {
-    ArrayList<Test> tests = null;
+    final ArrayList<Test> tests = new ArrayList<>();
+    Test test = null;
+    int p = pos;
     do {
       skipWs();
-      final Test test = simpleNodeTest(type, false);
-      if(test == null) return null;
-      if(tests == null) tests = new ArrayList<>(1);
+      test = simpleNodeTest(type, false);
+      if(test == null) break;
       tests.add(test);
     } while(wsConsume("|"));
+    if(test == null) pos = p;
     return tests;
   }
 
