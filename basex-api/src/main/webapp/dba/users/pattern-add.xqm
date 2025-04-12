@@ -55,7 +55,7 @@ function dba:pattern-add(
               <td>
                 <input type='text' name='pattern' value='{ $pattern }' autofocus=''/>  
                 <span class='note'>…support for <a target='_blank'
-                  href='https://docs.basex.org/wiki/Commands#Glob_Syntax'>glob syntax</a>.</span>
+                  href='https://docs.basex.org/main/Commands#Glob_Syntax'>glob syntax</a>.</span>
                 <div class='small'/>
               </td>
             </tr>

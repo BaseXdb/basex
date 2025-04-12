@@ -28,17 +28,17 @@ function page:start(
       <div>Welcome to the BaseX HTTP Services. They allow you to:</div>
       <ul>
         <li>create web applications and services with
-          <a href='https://docs.basex.org/wiki/RESTXQ'>RESTXQ</a>,</li>
+          <a href='https://docs.basex.org/main/RESTXQ'>RESTXQ</a>,</li>
         <li>use full-duplex communication with
-          <a href='https://docs.basex.org/wiki/WebSockets'>WebSockets</a>,</li>
-        <li>query and modify databases via <a href='https://docs.basex.org/wiki/REST'>REST</a>
+          <a href='https://docs.basex.org/main/WebSockets'>WebSockets</a>,</li>
+        <li>query and modify databases via <a href='https://docs.basex.org/main/REST'>REST</a>
           (try <a href='rest'>here</a>), and</li>
         <li>browse and update resources via
-          <a href='https://docs.basex.org/wiki/WebDAV'>WebDAV</a>.</li>
+          <a href='https://docs.basex.org/main/WebDAV'>WebDAV</a>.</li>
       </ul>
 
       <p>Find more information on the
-        <a href='https://docs.basex.org/wiki/Web_Application'>Web Application</a>
+        <a href='https://docs.basex.org/main/Web_Application'>Web Application</a>
         page in our documentation.</p>
 
       <p>The following sample applications give you a glimpse of how applications
