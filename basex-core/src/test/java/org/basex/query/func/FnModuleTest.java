@@ -1571,12 +1571,15 @@ public final class FnModuleTest extends SandboxTest {
     // invalid input
     query("let $parser := " + func.args("s: ~[\"x\"]*.") + "\n"
         + "return $parser('x')",
-        "<ixml xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"failed\">"
-        + "Failed to parse input:\n"
-        + "lexical analysis failed\n"
-        + "while expecting [$, #0...]\n"
-        + "at line 1, column 1:\n"
-        + "...x...</ixml>");
+        "<ixml xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"failed\">Failed to parse "
+        + "input:\nlexical analysis failed, found 'x'\nwhile expecting one of [end-of-input, ' ', "
+        + "'!', '\"', '#', '$', '%', '&amp;', \"'\", '(', ')', '*', '+', ',', '-', '.', ...]\nat "
+        + "line 1, column 1:\n...x...</ixml>");
+    query(func.args("s: [L].") + "('')",
+        "<ixml xmlns:ixml=\"http://invisiblexml.org/NS\" ixml:state=\"failed\">Failed to parse "
+        + "input:\nsyntax error, found end-of-input\nwhile expecting one of ['A'-'Z', 'a'-'z', #aa,"
+        + " #b5, #ba, #c0-#d6, #d8-#f6, #f8-#2c1, #2c6-#2d1, #2e0-#2e4, #2ec, #2ee, #370-#374, #376"
+        + ", #377, #37a-#37d, ...]\nat line 1, column 1</ixml>");
     // result processing error
     query("let $parser := " + func.args("-s: 'x'.") + "\n"
         + "return $parser('x')",
