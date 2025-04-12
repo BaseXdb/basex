@@ -75,6 +75,8 @@ public final class StaticOptions extends Options {
   public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
   /** Write trace output to the logs. */
   public static final BooleanOption LOGTRACE = new BooleanOption("LOGTRACE", true);
+  /** Mask IP address in the logs. */
+  public static final BooleanOption LOGMASKIP = new BooleanOption("LOGMASKIP", false);
 
   /** Comment: written to the options file. */
   public static final Comment C_HTTP = new Comment("HTTP Services");

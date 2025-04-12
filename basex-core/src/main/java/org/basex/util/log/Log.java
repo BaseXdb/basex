@@ -38,6 +38,8 @@ public final class Log implements QueryTracer {
   private final Pattern cut;
   /** Cached filtered entries. */
   private final HashMap<String, Long> cache = new HashMap<>();
+  /** Mask IP address. */
+  private final boolean maskip;
   /** Maximum length of log messages. */
   private final int maxLen;
 
@@ -66,6 +68,7 @@ public final class Log implements QueryTracer {
     exclude = pattern.apply(StaticOptions.LOGEXCLUDE);
     cut = pattern.apply(StaticOptions.LOGCUT);
     maxLen = sopts.get(StaticOptions.LOGMSGMAXLEN);
+    maskip = sopts.get(StaticOptions.LOGMASKIP);
   }
 
   /**
@@ -134,10 +137,18 @@ public final class Log implements QueryTracer {
     final int len = inf.codePointCount(0, inf.length());
     if(len > maxLen) inf = inf.substring(0, inf.offsetByCodePoints(0, maxLen)) + "...";
 
+    String addr = address != null ? address.replaceFirst("^/", "") : SERVER;
+    if(maskip) {
+      // examples for input strings:
+      // IPv4: 192.128.0.1:54321
+      // IPv6: [2001:db8:abcd:0012:0000:0000:1234:5678]:54321
+      addr = addr.replaceAll("\\.\\d+:", ".0:").replaceAll("(\\w*:\\w*:\\w*)(:\\w*){5}", "$1::");
+    }
+
     final LogEntry entry = new LogEntry();
     entry.date = new Date();
     entry.time = DateTime.format(entry.date, DateTime.TIME);
-    entry.address = address != null ? address.replaceFirst("^/", "") : SERVER;
+    entry.address = addr;
     entry.user = user != null ? user : UserText.ADMIN;
     entry.type = type.toString();
     entry.info = inf;
