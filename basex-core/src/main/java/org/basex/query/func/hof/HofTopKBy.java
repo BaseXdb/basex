@@ -43,8 +43,8 @@ public final class HofTopKBy extends StandardFunc {
     } catch(final QueryRTException ex) { throw ex.getCause(); }
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    while(!heap.isEmpty()) vb.addFront(heap.removeMin());
-    return vb.value(this);
+    while(!heap.isEmpty()) vb.add(heap.removeMin());
+    return vb.value(this).reverse(qc);
   }
 
   @Override

@@ -51,13 +51,8 @@ public final class FnReverse extends StandardFunc {
         return size;
       }
     };
-
-    // standard iterator
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(Item item; (item = qc.next(input)) != null;) {
-      vb.addFront(item);
-    }
-    return vb.value(this).iter();
+    // standard implementation
+    return input.value(qc, this).reverse(qc).iter();
   }
 
   @Override

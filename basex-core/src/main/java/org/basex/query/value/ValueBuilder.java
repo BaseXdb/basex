@@ -65,28 +65,6 @@ public final class ValueBuilder {
   }
 
   /**
-   * Adds an item to the front of the built value.
-   * @param item item to add
-   * @return reference to this builder for convenience
-   */
-  public ValueBuilder addFront(final Item item) {
-    qc.checkStop();
-    final TreeSeqBuilder tree = builder;
-    if(tree != null) {
-      tree.addFront(item);
-    } else {
-      final Value first = firstValue;
-      if(first != null) {
-        builder = new TreeSeqBuilder().add(first, qc).addFront(item);
-        firstValue = null;
-      } else {
-        firstValue = item;
-      }
-    }
-    return this;
-  }
-
-  /**
    * Appends an item to the built value.
    * @param item item to append
    * @return reference to this builder for convenience
@@ -150,7 +128,7 @@ public final class ValueBuilder {
     if(first != null) return first;
     final TreeSeqBuilder tree = builder;
     builder = null;
-    return tree != null ? tree.sequence(type) : Empty.VALUE;
+    return tree != null ? tree.value(type) : Empty.VALUE;
   }
 
   /**

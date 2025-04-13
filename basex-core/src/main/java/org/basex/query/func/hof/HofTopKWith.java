@@ -36,8 +36,8 @@ public final class HofTopKWith extends StandardFunc {
     }
 
     final ValueBuilder vb = new ValueBuilder(qc);
-    while(!heap.isEmpty()) vb.addFront(heap.removeMin());
-    return vb.value(this);
+    while(!heap.isEmpty()) vb.add(heap.removeMin());
+    return vb.value(this).reverse(qc);
   }
 
   @Override

@@ -201,7 +201,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
    * @param type type of all items in this sequence
    * @return resulting sequence
    */
-  public Seq sequence(final Type type) {
+  public Seq value(final Type type) {
     // small int sequence, fill directly
     final int n = inLeft + inRight, start = (mid - inLeft + CAP) % CAP;
     if(n <= TreeSeq.MAX_SMALL) return new SmallSeq(items(start, n), type);

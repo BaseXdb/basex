@@ -171,7 +171,7 @@ public abstract class Seq extends Value {
    */
   protected Value copyInsert(final long pos, final Value value, final QueryContext qc) {
     final Type tp = type.union(value.type);
-    if(pos == size) return new TreeSeqBuilder().add(this, qc).add(value, qc).sequence(tp);
+    if(pos == size) return new TreeSeqBuilder().add(this, qc).add(value, qc).value(tp);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
