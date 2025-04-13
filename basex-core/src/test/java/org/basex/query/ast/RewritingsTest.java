@@ -2163,7 +2163,7 @@ public final class RewritingsTest extends SandboxTest {
     check("(1, 3, 5, 7)[position() = last() idiv 2]", 3, root(Int.class));
     check("(1, 3, 5, 7)[position() = last() div 2]", 3, root(Int.class));
 
-    check("(1, 3, 5)[not(position() = 2)]", "1\n5", root(IntSeq.class));
+    check("(1, 3, 5)[not(position() = 2)]", "1\n5", root(SmallSeq.class));
     check("(1, 3, 5)[not(position() > 2)]", "1\n3", root(SubSeq.class));
     check("(1, 3, 5)[not(position() < 2)]", "3\n5", root(SubSeq.class));
     check("(1, <_/>[data()])[not(position() = 2)]", 1, root(REMOVE));
