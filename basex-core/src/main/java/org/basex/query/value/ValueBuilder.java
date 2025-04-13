@@ -32,7 +32,7 @@ public final class ValueBuilder {
    * @param qc query context (required for interrupting running queries)
    */
   public ValueBuilder(final QueryContext qc) {
-    this(qc, Array.INITIAL_CAPACITY);
+    this(qc, -1);
   }
 
   /**
@@ -86,12 +86,13 @@ public final class ValueBuilder {
       final Value sngl = single;
       if(sngl != null) {
         single = null;
-        sequence =
-          isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
-          isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
-          isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
-          isBln(sngl) && isBln(value) ? new BlnSeqBuilder() :
-          new TreeSeqBuilder();
+        if(capacity != -1) {
+          sequence = isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
+                     isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
+                     isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
+                     isBln(sngl) && isBln(value) ? new BlnSeqBuilder() : null;
+        }
+        if(sequence == null) sequence = new TreeSeqBuilder();
         add(sngl);
       }
       if(sequence != null) {
