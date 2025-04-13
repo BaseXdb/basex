@@ -338,14 +338,38 @@ public final class MixedTest extends SandboxTest {
 
   /** Recursive query. */
   @Test public void recursive() {
-    // runtime will degrade if no tree sequence builder is used
+    // runtime degrades if no tree sequence builder is used
     query("declare function local:f($x) {"
-        + "  if(count($x) < 100000) then ("
-        + "    local:f(($x, 2, 1))"
-        + "  ) else ("
-        + "    $x"
-        + "  )"
+        + "  if(count($x) < 100000) then local:f((1, $x)) else $x"
         + "};"
         + "count(local:f(()))", 100000);
+    query("declare function local:f($x) {"
+        + "  if(count($x) < 100000) then local:f(($x, 1)) else $x"
+        + "};"
+        + "count(local:f(()))", 100000);
+    query("declare function local:f($x) {"
+        + "  if(count($x) < 100000) then local:f(($x, 2, 1)) else $x"
+        + "};"
+        + "count(local:f(()))", 100000);
+    query("declare function local:f($x) {"
+        + "  if(count($x) < 100000) then local:f(insert-before($x, 3, 1)) else $x"
+        + "};"
+        + "count(local:f(1 to 5))", 100000);
+    query("declare function local:f($x) {"
+        + "  if(count($x) > 1) then local:f(remove($x, 2)) else $x"
+        + "};"
+        + "count(local:f(1 to 100000))", 1);
+    query("declare function local:f($x) {"
+        + "  if(exists($x)) then local:f(remove($x, 1)) else $x"
+        + "};"
+        + "count(local:f(1 to 100000))", 0);
+    query("declare function local:f($x) {"
+        + "  if(count($x) > 0) then local:f(tail($x)) else $x"
+        + "};"
+        + "count(local:f(1 to 100000))", 0);
+    query("declare function local:f($x) {"
+        + "  if(count($x) > 0) then local:f(trunk($x)) else $x"
+        + "};"
+        + "count(local:f(1 to 100000))", 0);
   }
 }
