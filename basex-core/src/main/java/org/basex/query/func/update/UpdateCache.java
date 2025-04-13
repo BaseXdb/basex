@@ -14,6 +14,6 @@ public final class UpdateCache extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final boolean reset = toBooleanOrFalse(arg(0), qc);
-    return qc.updates().output(reset);
+    return qc.updates().output(reset, qc);
   }
 }
