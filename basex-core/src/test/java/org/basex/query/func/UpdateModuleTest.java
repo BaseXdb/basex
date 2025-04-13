@@ -31,7 +31,10 @@ public final class UpdateModuleTest extends SandboxTest {
   @Test public void cache() {
     final Function func = _UPDATE_CACHE;
     query(func.args(), "");
+    query(_UPDATE_OUTPUT.args(func.args()), "");
     query(_UPDATE_OUTPUT.args("x") + ',' + _UPDATE_OUTPUT.args(func.args()), "x\nx");
+    query(_UPDATE_OUTPUT.args("x") + ',' + _UPDATE_OUTPUT.args("x") + ',' +
+        _UPDATE_OUTPUT.args(func.args()), "x\nx\nx\nx");
   }
 
   /** Test method. */

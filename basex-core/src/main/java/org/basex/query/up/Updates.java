@@ -115,6 +115,7 @@ public final class Updates {
    */
   public synchronized Value output(final boolean reset, final QueryContext qc) {
     final Value value = output != null ? output.value() : Empty.VALUE;
+    output = null;
     if(!reset) addOutput(value, qc);
     return value;
   }
