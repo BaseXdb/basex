@@ -62,7 +62,7 @@ public class DBNodeSeq extends NativeSeq {
 
   @Override
   public final Value atomValue(final QueryContext qc, final InputInfo ii) {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size);
     for(int i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
     return vb.value(AtomType.ANY_ATOMIC_TYPE);
   }

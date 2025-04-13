@@ -47,7 +47,7 @@ public class MapForEach extends StandardFunc {
     final FItem action = toFunction(arg(1), 2, this instanceof UpdateMapForEach, qc);
 
     final HofArgs args = new HofArgs(2);
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, map.structSize());
     map.forEach((key, value) -> vb.add(invoke(action, args.set(0, key).set(1, value), qc)));
     return vb.value(this);
   }

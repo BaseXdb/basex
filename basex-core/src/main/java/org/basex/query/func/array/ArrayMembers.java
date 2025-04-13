@@ -45,7 +45,7 @@ public final class ArrayMembers extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, structSize());
     for(final Value member : array.iterable()) vb.add(record(member));
     return vb.value(this);
   }

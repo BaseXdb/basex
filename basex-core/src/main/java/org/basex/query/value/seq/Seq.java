@@ -173,7 +173,7 @@ public abstract class Seq extends Value {
     final Type tp = type.union(value.type);
     if(pos == size) return new TreeSeqBuilder().add(this, qc).add(value, qc).value(tp);
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size + value.size());
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     vb.add(value);
     for(long i = pos; i < size; i++) vb.add(itemAt(i));
@@ -195,7 +195,7 @@ public abstract class Seq extends Value {
    * @return resulting sequence
    */
   final Value copyRemove(final long pos, final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size - 1);
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     for(long i = pos + 1; i < size; i++) vb.add(itemAt(i));
     return vb.value(type);
@@ -222,7 +222,7 @@ public abstract class Seq extends Value {
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size);
     for(final Item item : this) vb.add(item.atomValue(qc, ii));
     return vb.value(AtomType.ANY_ATOMIC_TYPE);
   }
@@ -255,7 +255,7 @@ public abstract class Seq extends Value {
 
     if(materialized(test, ii)) return this;
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size);
     for(final Item item : this) vb.add(item.materialize(test, ii, qc));
     return vb.value(this);
   }

@@ -88,7 +88,7 @@ public final class List extends Arr {
       // size will be small enough to be cast to an integer
       Value value = Value.get((int) size, type, values);
       if(value == null) {
-        final ValueBuilder vb = new ValueBuilder(cc.qc);
+        final ValueBuilder vb = new ValueBuilder(cc.qc, size);
         for(int v = 0; v < vl; v++) vb.add(values[v]);
         value = vb.value(this);
       }
@@ -231,7 +231,7 @@ public final class List extends Arr {
     if(exprs.length == 2) return ValueBuilder.concat(exprs[0].value(qc), exprs[1].value(qc), qc);
 
     // general case: concatenate all sequences
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size());
     for(final Expr expr : exprs) vb.add(expr.value(qc));
     return vb.value(this);
   }

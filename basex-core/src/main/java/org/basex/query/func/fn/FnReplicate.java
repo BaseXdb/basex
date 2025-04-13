@@ -35,7 +35,7 @@ public final class FnReplicate extends StandardFunc {
     if(once) return SingletonSeq.get(input.value(qc), count);
 
     // repeated evaluations
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size());
     for(long c = 0; c < count; c++) vb.add(input.value(qc));
     return vb.value(this);
   }

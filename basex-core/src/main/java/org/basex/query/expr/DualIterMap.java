@@ -65,7 +65,7 @@ public final class DualIterMap extends SimpleMap {
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
     try {
-      final ValueBuilder vb = new ValueBuilder(qc);
+      final ValueBuilder vb = new ValueBuilder(qc, size());
       final Iter iter1 = exprs[0].iter(qc);
       for(Item item1; (item1 = qc.next(iter1)) != null;) {
         qf.value = item1;

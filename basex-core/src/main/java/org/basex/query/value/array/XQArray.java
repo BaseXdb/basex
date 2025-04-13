@@ -330,7 +330,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(structSize() == 1) return get(0).atomValue(qc, ii);
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, structSize());
     for(final Value value : iterable()) vb.add(value.atomValue(qc, ii));
     return vb.value(AtomType.ANY_ATOMIC_TYPE);
   }

@@ -48,7 +48,7 @@ public final class SubSeq extends Seq {
 
   @Override
   public Value reverse(final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size);
     for(long i = size - 1; i >= 0; i--) vb.add(itemAt(i));
     return vb.value(this);
   }
@@ -65,7 +65,7 @@ public final class SubSeq extends Seq {
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size);
     for(long i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
     return vb.value(AtomType.ANY_ATOMIC_TYPE);
   }

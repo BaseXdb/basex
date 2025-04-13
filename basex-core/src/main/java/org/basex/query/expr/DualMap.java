@@ -78,7 +78,7 @@ public final class DualMap extends SimpleMap {
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
     try {
-      final ValueBuilder vb = new ValueBuilder(qc);
+      final ValueBuilder vb = new ValueBuilder(qc, size());
       final Iter iter = exprs[0].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         qf.value = item;

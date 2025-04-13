@@ -74,7 +74,7 @@ public abstract class Iter {
     if(item == null) return ValueBuilder.concat(item1, item2);
 
     // more items: build sequence
-    final ValueBuilder vb = new ValueBuilder(qc).add(item1).add(item2);
+    final ValueBuilder vb = new ValueBuilder(qc, size()).add(item1).add(item2);
     do {
       vb.add(item);
     } while((item = qc.next(this)) != null);

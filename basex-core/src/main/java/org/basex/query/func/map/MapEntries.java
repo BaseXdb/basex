@@ -43,7 +43,7 @@ public class MapEntries extends StandardFunc {
   public final Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, structSize());
     map.forEach((key, value) -> vb.add(entry(key, value)));
     return vb.value(this);
   }

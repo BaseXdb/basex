@@ -88,7 +88,7 @@ public final class GFLWOR extends ParseExpr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Eval eval = newEval();
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size());
     while(eval.next(qc)) vb.add(rtrn.value(qc));
     return vb.value(this);
   }

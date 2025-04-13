@@ -22,6 +22,8 @@ public final class ValueBuilder {
 
   /** Sequence builder, only instantiated if there are at least two items. */
   private SeqBuilder sequence;
+  /** Capacity. */
+  private long capacity;
   /** The first added value is cached. */
   private Value single;
 
@@ -30,7 +32,17 @@ public final class ValueBuilder {
    * @param qc query context (required for interrupting running queries)
    */
   public ValueBuilder(final QueryContext qc) {
+    this(qc, Array.INITIAL_CAPACITY);
+  }
+
+  /**
+   * Constructor.
+   * @param qc query context (required for interrupting running queries)
+   * @param capacity initial capacity
+   */
+  public ValueBuilder(final QueryContext qc, final long capacity) {
     this.qc = qc;
+    this.capacity = capacity;
   }
 
   /**
@@ -169,7 +181,7 @@ public final class ValueBuilder {
   /** String sequence builder. */
   final class StrSeqBuilder implements SeqBuilder {
     /** Values. */
-    private final TokenList values = new TokenList();
+    private final TokenList values = new TokenList(capacity);
 
     @Override
     public SeqBuilder add(final Item item) {
@@ -189,7 +201,7 @@ public final class ValueBuilder {
   /** Integer sequence builder. */
   final class IntSeqBuilder implements SeqBuilder {
     /** Values. */
-    private final LongList values = new LongList();
+    private final LongList values = new LongList(capacity);
 
     @Override
     public SeqBuilder add(final Item item) {
@@ -209,7 +221,7 @@ public final class ValueBuilder {
   /** Double sequence builder. */
   final class DblSeqBuilder implements SeqBuilder {
     /** Values. */
-    private final DoubleList values = new DoubleList();
+    private final DoubleList values = new DoubleList(capacity);
 
     @Override
     public SeqBuilder add(final Item item) {
@@ -229,7 +241,7 @@ public final class ValueBuilder {
   /** Boolean sequence builder. */
   final class BlnSeqBuilder implements SeqBuilder {
     /** Values. */
-    private final BoolList values = new BoolList();
+    private final BoolList values = new BoolList(capacity);
 
     @Override
     public SeqBuilder add(final Item item) {

@@ -322,7 +322,7 @@ public final class Store implements Closeable {
     if(size == 1) return type.read(in, qc);
     final int classId = in.readNum();
     if(classId == SEQUENCE) {
-      final ValueBuilder vb = new ValueBuilder(qc);
+      final ValueBuilder vb = new ValueBuilder(qc, size);
       final boolean same = in.readBool();
       for(long s = 0; s < size; s++) {
         final Type tp = same ? type : Types.type(in.readNum());

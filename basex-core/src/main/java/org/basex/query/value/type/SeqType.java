@@ -470,7 +470,7 @@ public final class SeqType {
 
     // coerce items if required
     Value val = value;
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, value.size());
     for(final Item item : value) {
       qc.checkStop();
       coerce(item, name, vb, qc, cc, info);

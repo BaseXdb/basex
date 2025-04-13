@@ -58,7 +58,7 @@ public class FnForEachPair extends StandardFunc {
     final FItem action = toFunction(arg(2), 3, this instanceof UpdateForEachPair, qc);
 
     final HofArgs args = new HofArgs(3, action);
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size());
     for(Item item1, item2; (item1 = input1.next()) != null && (item2 = input2.next()) != null;) {
       vb.add(invoke(action, args.set(0, item1).set(1, item2).inc(), qc));
     }
