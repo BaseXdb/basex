@@ -1,7 +1,5 @@
 package org.basex.query.value;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
@@ -9,6 +7,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * A builder for efficiently creating a {@link Value} by prepending and appending
@@ -21,10 +20,10 @@ public final class ValueBuilder {
   /** QueryContext. */
   private final QueryContext qc;
 
+  /** Sequence builder, only instantiated if there are at least two items. */
+  private SeqBuilder sequence;
   /** The first added value is cached. */
-  private Value firstValue;
-  /** Underlying sequence builder, only instantiated if there are at least two items. */
-  private TreeSeqBuilder builder;
+  private Value single;
 
   /**
    * Constructor.
@@ -65,45 +64,28 @@ public final class ValueBuilder {
   }
 
   /**
-   * Appends an item to the built value.
-   * @param item item to append
-   * @return reference to this builder for convenience
-   */
-  public ValueBuilder add(final Item item) {
-    qc.checkStop();
-    final TreeSeqBuilder tree = builder;
-    if(tree != null) {
-      tree.add(item);
-    } else {
-      final Value first = firstValue;
-      if(first != null) {
-        builder = new TreeSeqBuilder().add(first, qc).add(item);
-        firstValue = null;
-      } else {
-        firstValue = item;
-      }
-    }
-    return this;
-  }
-
-  /**
-   * Appends a value to the built value.
+   * Appends a value to the sequence.
    * @param value value to append
    * @return reference to this builder for convenience
    */
   public ValueBuilder add(final Value value) {
     if(!value.isEmpty()) {
-      final TreeSeqBuilder tree = builder;
-      if(tree != null) {
-        tree.add(value, qc);
+      qc.checkStop();
+      final Value sngl = single;
+      if(sngl != null) {
+        single = null;
+        sequence =
+          isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
+          isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
+          isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
+          isBln(sngl) && isBln(value) ? new BlnSeqBuilder() :
+          new TreeSeqBuilder();
+        add(sngl);
+      }
+      if(sequence != null) {
+        sequence = sequence.add(value, qc);
       } else {
-        final Value first = firstValue;
-        if(first != null) {
-          builder = new TreeSeqBuilder().add(first, qc).add(value, qc);
-          firstValue = null;
-        } else {
-          firstValue = value;
-        }
+        single = value;
       }
     }
     return this;
@@ -120,15 +102,16 @@ public final class ValueBuilder {
   /**
    * Returns a {@link Value} representation of the items currently stored in this builder
    * annotated with the given item type.
-   * @param type type (only considered if new sequence is created)
+   * @param type type (only considered if new result value is created)
    * @return value
    */
   public Value value(final Type type) {
-    final Value first = firstValue;
-    if(first != null) return first;
-    final TreeSeqBuilder tree = builder;
-    builder = null;
-    return tree != null ? tree.value(type) : Empty.VALUE;
+    try {
+      return sequence != null ? sequence.value(type) : single != null ? single : Empty.VALUE;
+    } finally {
+      sequence = null;
+      single = null;
+    }
   }
 
   /**
@@ -141,15 +124,125 @@ public final class ValueBuilder {
     return expr != null ? value(expr.seqType().type) : value();
   }
 
+  /**
+   * Checks if the specified value is a string.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isStr(final Value value) {
+    return value instanceof Str && value.type == AtomType.STRING;
+  }
+
+  /**
+   * Checks if the specified value is an integer value.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isInt(final Value value) {
+    return value.type == AtomType.INTEGER;
+  }
+
+  /**
+   * Checks if the specified value is a double value.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isDbl(final Value value) {
+    return value.type == AtomType.DOUBLE;
+  }
+
+  /**
+   * Checks if the specified value is a boolean value.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isBln(final Value value) {
+    return value.type == AtomType.BOOLEAN;
+  }
+
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
-    final Iterator<Item> iter = firstValue != null ? firstValue.iterator() :
-      builder != null ? builder.iterator() : Collections.emptyIterator();
-    if(iter.hasNext()) {
-      sb.append(iter.next());
-      while(iter.hasNext()) sb.append(", ").append(iter.next());
+    return Util.className(this) + '[' + (sequence != null ? sequence : single != null ? single :
+      "empty") + ']';
+  }
+
+  /** String sequence builder. */
+  final class StrSeqBuilder implements SeqBuilder {
+    /** Values. */
+    private final TokenList values = new TokenList();
+
+    @Override
+    public SeqBuilder add(final Item item) {
+      if(isStr(item)) {
+        values.add(((Str) item).string());
+        return this;
+      }
+      return tree(item, qc);
     }
-    return sb.append(']').toString();
+
+    @Override
+    public Value value(final Type type) {
+      return StrSeq.get(values);
+    }
+  }
+
+  /** Integer sequence builder. */
+  final class IntSeqBuilder implements SeqBuilder {
+    /** Values. */
+    private final LongList values = new LongList();
+
+    @Override
+    public SeqBuilder add(final Item item) {
+      if(isInt(item)) {
+        values.add(((Int) item).itr());
+        return this;
+      }
+      return tree(item, qc);
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return IntSeq.get(values.finish());
+    }
+  }
+
+  /** Double sequence builder. */
+  final class DblSeqBuilder implements SeqBuilder {
+    /** Values. */
+    private final DoubleList values = new DoubleList();
+
+    @Override
+    public SeqBuilder add(final Item item) {
+      if(isDbl(item)) {
+        values.add(((Dbl) item).dbl());
+        return this;
+      }
+      return tree(item, qc);
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return DblSeq.get(values.finish());
+    }
+  }
+
+  /** Boolean sequence builder. */
+  final class BlnSeqBuilder implements SeqBuilder {
+    /** Values. */
+    private final BoolList values = new BoolList();
+
+    @Override
+    public SeqBuilder add(final Item item) {
+      if(isBln(item)) {
+        values.add(((Bln) item).bool(null));
+        return this;
+      }
+      return tree(item, qc);
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return BlnSeq.get(values.finish());
+    }
   }
 }

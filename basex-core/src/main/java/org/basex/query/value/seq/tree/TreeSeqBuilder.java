@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class TreeSeqBuilder implements Iterable<Item> {
+public final class TreeSeqBuilder implements SeqBuilder, Iterable<Item> {
   /** Capacity of the root. */
   private static final int CAP = 2 * TreeSeq.MAX_DIGIT;
   /** Size of inner nodes. */
@@ -80,11 +80,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
     return this;
   }
 
-  /**
-   * Adds an item to the end of the sequence.
-   * @param item item to add
-   * @return reference to this builder for convenience
-   */
+  @Override
   public TreeSeqBuilder add(final Item item) {
     if(inRight < TreeSeq.MAX_DIGIT) {
       // just insert the item
@@ -111,12 +107,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
     return this;
   }
 
-  /**
-   * Appends the items of the given value to this builder.
-   * @param value value to append
-   * @param qc query context
-   * @return this builder for convenience
-   */
+  @Override
   public TreeSeqBuilder add(final Value value, final QueryContext qc) {
     // shortcut for adding single items
     if(value.isItem()) return add((Item) value);
@@ -196,11 +187,7 @@ public final class TreeSeqBuilder implements Iterable<Item> {
     return this;
   }
 
-  /**
-   * Creates a sequence containing the items of this builder.
-   * @param type type of all items in this sequence
-   * @return resulting sequence
-   */
+  @Override
   public Seq value(final Type type) {
     // small int sequence, fill directly
     final int n = inLeft + inRight, start = (mid - inLeft + CAP) % CAP;
