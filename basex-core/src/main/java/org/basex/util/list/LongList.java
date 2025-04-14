@@ -18,7 +18,7 @@ public final class LongList extends ElementList {
    * Default constructor.
    */
   public LongList() {
-    this(Array.INITIAL_CAPACITY);
+    this(-1);
   }
 
   /**
@@ -26,7 +26,7 @@ public final class LongList extends ElementList {
    * @param capacity array capacity
    */
   public LongList(final long capacity) {
-    list = new long[Array.checkCapacity(capacity)];
+    list = new long[Array.initialCapacity(capacity)];
   }
 
   /**

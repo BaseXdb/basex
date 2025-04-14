@@ -23,7 +23,7 @@ public final class ExprList extends ObjectList<Expr, ExprList> {
    * @param capacity array capacity
    */
   public ExprList(final long capacity) {
-    super(new Expr[Array.checkCapacity(capacity)]);
+    super(new Expr[Array.initialCapacity(capacity)]);
   }
 
   /**

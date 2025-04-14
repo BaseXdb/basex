@@ -15,7 +15,7 @@ public final class StringList extends ObjectList<String, StringList> {
    * Default constructor.
    */
   public StringList() {
-    this(Array.INITIAL_CAPACITY);
+    this(-1);
   }
 
   /**
@@ -23,7 +23,7 @@ public final class StringList extends ObjectList<String, StringList> {
    * @param capacity array capacity
    */
   public StringList(final long capacity) {
-    super(new String[Array.checkCapacity(capacity)]);
+    super(new String[Array.initialCapacity(capacity)]);
   }
 
   /**

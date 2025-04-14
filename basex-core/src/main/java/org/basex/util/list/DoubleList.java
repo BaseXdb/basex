@@ -18,7 +18,7 @@ public final class DoubleList extends ElementList {
    * Default constructor.
    */
   public DoubleList() {
-    this(Array.INITIAL_CAPACITY);
+    this(-1);
   }
 
   /**
@@ -26,7 +26,7 @@ public final class DoubleList extends ElementList {
    * @param capacity array capacity
    */
   public DoubleList(final long capacity) {
-    list = new double[Array.checkCapacity(capacity)];
+    list = new double[Array.initialCapacity(capacity)];
   }
 
   /**

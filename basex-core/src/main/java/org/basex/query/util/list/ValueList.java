@@ -23,7 +23,7 @@ public final class ValueList extends ObjectList<Value, ValueList> {
    * @param capacity array capacity
    */
   public ValueList(final long capacity) {
-    super(new Value[Array.checkCapacity(capacity)]);
+    super(new Value[Array.initialCapacity(capacity)]);
   }
 
   @Override

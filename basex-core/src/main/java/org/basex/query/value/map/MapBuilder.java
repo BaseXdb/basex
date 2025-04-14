@@ -47,7 +47,7 @@ public final class MapBuilder {
     if(map == null) {
       final Type k = key.type;
       final SeqType v = value.seqType();
-      final int c = Array.checkCapacity(capacity);
+      final int c = Array.initialCapacity(capacity);
       final boolean ki = k == AtomType.INTEGER, ks = k == AtomType.STRING;
       final boolean vi = v.eq(SeqType.INTEGER_O), vs = v.eq(SeqType.STRING_O);
       map = ki ? vi ? new XQIntMap(c) : vs ? new XQIntStrMap(c) : new XQIntValueMap(c) :

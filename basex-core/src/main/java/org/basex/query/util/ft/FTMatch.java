@@ -24,7 +24,7 @@ public final class FTMatch extends ObjectList<FTStringMatch, FTMatch> {
    * @param capacity array capacity
    */
   public FTMatch(final long capacity) {
-    super(new FTStringMatch[Array.checkCapacity(capacity)]);
+    super(new FTStringMatch[Array.initialCapacity(capacity)]);
   }
 
   /**

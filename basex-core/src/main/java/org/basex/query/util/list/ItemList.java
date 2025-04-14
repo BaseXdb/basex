@@ -27,7 +27,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
    * @param capacity array capacity
    */
   public ItemList(final long capacity) {
-    super(new Item[Array.checkCapacity(capacity)]);
+    super(new Item[Array.initialCapacity(capacity)]);
   }
 
   /**

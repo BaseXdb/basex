@@ -25,7 +25,7 @@ public final class Atts extends ElementList {
    * @param capacity array capacity
    */
   public Atts(final long capacity) {
-    list = new byte[Array.checkCapacity(capacity << 1)][];
+    list = new byte[Array.initialCapacity(capacity << 1)][];
   }
 
   /**

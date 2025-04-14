@@ -247,8 +247,8 @@ public final class Array {
 
   /**
    * Returns an initial array capacity, which will not exceed {@link #MAX_CAPACITY}.
-   * @param size size expected result size (ignored if negative)
-   * @return capacity
+   * @param size size expected result size
+   * @return capacity ({@link #INITIAL_CAPACITY} is returned if the supplied size value is negative)
    */
   public static int initialCapacity(final long size) {
     return size < 0 ? INITIAL_CAPACITY : (int) Math.min(MAX_CAPACITY, size);
@@ -279,11 +279,13 @@ public final class Array {
 
   /**
    * Raises an exception if the specified size exceeds the maximum array size.
+   * Should be called whenever an array with a fixed size is created.
    * @param size array capacity
    * @return argument as integer, or {@code 0} if the argument is negative
    */
   public static int checkCapacity(final long size) {
-    if(size > MAX_SIZE) throw new ArrayIndexOutOfBoundsException("Maximum array size reached.");
+    if(size > MAX_SIZE) throw new ArrayIndexOutOfBoundsException(
+        "Maximum array size exceeded (" + size + " > " + MAX_SIZE + ").");
     return Math.max(0, (int) size);
   }
 

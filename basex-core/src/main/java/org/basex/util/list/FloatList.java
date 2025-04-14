@@ -18,7 +18,7 @@ public final class FloatList extends ElementList {
    * Default constructor.
    */
   public FloatList() {
-    this(Array.INITIAL_CAPACITY);
+    this(-1);
   }
 
   /**
@@ -26,7 +26,7 @@ public final class FloatList extends ElementList {
    * @param capacity array capacity
    */
   public FloatList(final long capacity) {
-    list = new float[Array.checkCapacity(capacity)];
+    list = new float[Array.initialCapacity(capacity)];
   }
 
   /**

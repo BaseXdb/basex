@@ -42,7 +42,7 @@ public final class TokenBuilder {
    * Empty constructor.
    */
   public TokenBuilder() {
-    this(Array.INITIAL_CAPACITY);
+    this(-1);
   }
 
   /**
@@ -50,7 +50,7 @@ public final class TokenBuilder {
    * @param capacity array capacity
    */
   public TokenBuilder(final long capacity) {
-    chars = new byte[Array.checkCapacity(capacity)];
+    chars = new byte[Array.initialCapacity(capacity)];
   }
 
   /**

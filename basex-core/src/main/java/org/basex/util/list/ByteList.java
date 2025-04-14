@@ -20,7 +20,7 @@ public final class ByteList extends ElementList {
    * Default constructor.
    */
   public ByteList() {
-    this(Array.INITIAL_CAPACITY);
+    this(-1);
   }
 
   /**
@@ -28,7 +28,7 @@ public final class ByteList extends ElementList {
    * @param capacity array capacity
 3   */
   public ByteList(final long capacity) {
-    list = new byte[Array.checkCapacity(capacity)];
+    list = new byte[Array.initialCapacity(capacity)];
   }
 
   /**

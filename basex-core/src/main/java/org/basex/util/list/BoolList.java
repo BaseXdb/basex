@@ -18,7 +18,7 @@ public final class BoolList extends ElementList {
    * Default constructor.
    */
   public BoolList() {
-    this(Array.INITIAL_CAPACITY);
+    this(-1);
   }
 
   /**
@@ -26,7 +26,7 @@ public final class BoolList extends ElementList {
    * @param capacity array capacity
    */
   public BoolList(final long capacity) {
-    list = new boolean[Array.checkCapacity(capacity)];
+    list = new boolean[Array.initialCapacity(capacity)];
   }
 
   /**

@@ -18,7 +18,7 @@ public final class ShortList extends ElementList {
    * Default constructor.
    */
   public ShortList() {
-    this(Array.INITIAL_CAPACITY);
+    this(-1);
   }
 
   /**
@@ -26,7 +26,7 @@ public final class ShortList extends ElementList {
    * @param capacity array capacity
 3   */
   public ShortList(final long capacity) {
-    list = new short[Array.checkCapacity(capacity)];
+    list = new short[Array.initialCapacity(capacity)];
   }
 
   /**

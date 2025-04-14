@@ -31,7 +31,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
    * @param capacity array capacity
    */
   public ANodeList(final long capacity) {
-    super(new ANode[Array.checkCapacity(capacity)]);
+    super(new ANode[Array.initialCapacity(capacity)]);
   }
 
   /**
