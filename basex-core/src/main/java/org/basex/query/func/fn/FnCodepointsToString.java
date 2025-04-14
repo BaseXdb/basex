@@ -81,6 +81,6 @@ public final class FnCodepointsToString extends StandardFunc {
       final int cp = (int) value;
       if(XMLToken.valid(cp)) return cp;
     }
-    throw INVCODE_X.get(info, Long.toHexString(value));
+    throw INVCODE_X.get(info, "&#x" + Long.toHexString(value) + ';');
   }
 }

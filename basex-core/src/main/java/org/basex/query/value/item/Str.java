@@ -113,23 +113,9 @@ public final class Str extends AStr {
    */
   public static Str get(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-
-    if(value == null) return Str.EMPTY;
-
-    // invalid Unicode characters: raise error or add replacement character
-    final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
-    final TokenBuilder tb = new TokenBuilder();
-    final TokenParser tp = new TokenParser(Token.token(value));
-    while(tp.more()) {
-      final int cp = tp.next();
-      if(XMLToken.valid(cp)) {
-        tb.add(cp);
-      } else {
-        if(validate) throw INVCODE_X.get(info, Integer.toHexString(cp));
-        tb.add(Token.REPLACEMENT);
-      }
-    }
-    return get(tb.finish());
+    final byte[] token = XMLToken.token(value, qc.context.options.get(MainOptions.CHECKSTRINGS));
+    if(token == null) throw INVCODE_X.get(info, value);
+    return Str.get(token);
   }
 
   @Override

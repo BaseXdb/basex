@@ -129,6 +129,29 @@ public final class XMLToken {
   }
 
   /**
+   * Returns a valid string representation of the specified value.
+   * @param value object (can be {@code null}, will be converted to token otherwise)
+   * @param validate validate input
+   * @return token, or {@code null} if validation is enabled and if invalid characters are found
+   */
+  public static byte[] token(final Object value, final boolean validate) {
+    if(value == null) return Token.EMPTY;
+
+    final TokenBuilder tb = new TokenBuilder();
+    final TokenParser tp = new TokenParser(Token.token(value));
+    while(tp.more()) {
+      final int cp = tp.next();
+      if(valid(cp)) {
+        tb.add(cp);
+      } else {
+        if(validate) return null;
+        tb.add(Token.REPLACEMENT);
+      }
+    }
+    return tb.finish();
+  }
+
+  /**
    * Checks the specified token as an NCName.
    * @param value value to be checked
    * @param start start position

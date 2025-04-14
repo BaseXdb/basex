@@ -570,7 +570,7 @@ public enum QueryError {
   DATECALC_X_X(FOCA, 5, "Invalid % calculation: %."),
 
   /** Error code. */
-  INVCODE_X(FOCH, 1, "Invalid XML character '&#x%;'."),
+  INVCODE_X(FOCH, 1, "Invalid XML character: %."),
   /** Error code. */
   WHICHCOLL_X(FOCH, 2, "%."),
   /** Error code. */

@@ -2,12 +2,15 @@ package org.basex.query.func.session;
 
 import java.util.*;
 
-import jakarta.servlet.http.*;
-
+import org.basex.query.*;
+import org.basex.query.func.java.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
+
+import jakarta.servlet.http.*;
 
 /**
  * This module contains functions for processing global sessions.
@@ -57,17 +60,25 @@ public final class ASession {
    */
   public Value names() {
     final TokenList tl = new TokenList();
-    for(final String name : Collections.list(session.getAttributeNames())) tl.add(name);
+    for(final String name : Collections.list(session.getAttributeNames())) {
+      final byte[] token = XMLToken.token(name, true);
+      if(token != null) tl.add(token);
+    }
     return StrSeq.get(tl);
   }
 
   /**
-   * Returns a session attribute.
+   * Returns the value of a session attribute.
    * @param key key to be requested
-   * @return session attribute or {@code null}
+   * @param qc query context
+   * @param info input info
+   * @return value, or {@code null} if attribute does not exist
+   * @throws QueryException query exception
    */
-  public Object get(final String key) {
-    return session.getAttribute(key);
+  public Value get(final String key, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    final Object value = session.getAttribute(key);
+    return value != null ? JavaCall.toValue(value, qc, info) : null;
   }
 
   /**
