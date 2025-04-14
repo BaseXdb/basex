@@ -101,7 +101,7 @@ public final class IterMap extends SimpleMap {
       final int el = exprs.length;
       for(int e = 1; e < el; e++) {
         final Expr expr = exprs[e];
-        final ValueBuilder vb = new ValueBuilder(qc);
+        final ValueBuilder vb = new ValueBuilder(qc, e < el - 1 ? -1 : size());
         final Iter iter = value.iter();
         for(Item item; (item = qc.next(iter)) != null;) {
           qf.value = item;

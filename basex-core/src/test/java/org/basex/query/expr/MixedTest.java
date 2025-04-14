@@ -348,6 +348,10 @@ public final class MixedTest extends SandboxTest {
         + "};"
         + "count(local:f(()))", 100000);
     query("declare function local:f($x) {"
+        + "  if(count($x) < 100000) then local:f((1, 2, $x)) else $x"
+        + "};"
+        + "count(local:f(()))", 100000);
+    query("declare function local:f($x) {"
         + "  if(count($x) < 100000) then local:f(($x, 2, 1)) else $x"
         + "};"
         + "count(local:f(()))", 100000);

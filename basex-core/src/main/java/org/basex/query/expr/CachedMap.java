@@ -36,7 +36,7 @@ public final class CachedMap extends SimpleMap {
         final Expr expr = exprs[e];
         qf.size = value.size();
         qf.pos = 0;
-        final ValueBuilder vb = new ValueBuilder(qc);
+        final ValueBuilder vb = new ValueBuilder(qc, e < el - 1 ? -1 : size());
         final Iter iter = value.iter();
         for(Item item; (item = qc.next(iter)) != null;) {
           qf.value = item;

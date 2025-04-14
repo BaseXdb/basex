@@ -294,8 +294,9 @@ public abstract class JavaCall extends Arr {
           return StrSeq.get(list);
         }
         // any other array (including nested ones)
-        final ValueBuilder vb = new ValueBuilder(qc);
-        for(final Object value : (Object[]) object) vb.add(toValue(value, qc, info, wrap));
+        final Object[] array = (Object[]) object;
+        final ValueBuilder vb = new ValueBuilder(qc, array.length);
+        for(final Object value : array) vb.add(toValue(value, qc, info, wrap));
         return vb.value();
       }
 

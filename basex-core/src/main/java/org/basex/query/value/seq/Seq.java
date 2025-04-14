@@ -173,7 +173,8 @@ public abstract class Seq extends Value {
     final Type tp = type.union(value.type);
     if(pos == size) return new TreeSeqBuilder().add(this, qc).add(value, qc).value(tp);
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    // avoid compact data structures (tree sequence builder is much faster for repeated updates)
+    final ValueBuilder vb = new ValueBuilder(qc, Integer.MIN_VALUE);
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     vb.add(value);
     for(long i = pos; i < size; i++) vb.add(itemAt(i));
@@ -195,7 +196,8 @@ public abstract class Seq extends Value {
    * @return resulting sequence
    */
   final Value copyRemove(final long pos, final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    // avoid compact data structures (tree sequence builder is much faster for repeated updates)
+    final ValueBuilder vb = new ValueBuilder(qc, Integer.MIN_VALUE);
     for(long i = 0; i < pos; i++) vb.add(itemAt(i));
     for(long i = pos + 1; i < size; i++) vb.add(itemAt(i));
     return vb.value(type);

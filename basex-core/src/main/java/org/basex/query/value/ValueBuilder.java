@@ -22,7 +22,7 @@ public final class ValueBuilder {
 
   /** Sequence builder, only instantiated if there are at least two items. */
   private SeqBuilder sequence;
-  /** Capacity. */
+  /** Capacity ({@link Integer#MIN_VALUE}: create no compact data structures). */
   private long capacity;
   /** The first added value is cached. */
   private Value single;
@@ -38,16 +38,7 @@ public final class ValueBuilder {
   /**
    * Constructor.
    * @param qc query context (required for interrupting running queries)
-   * @param compact try to create compact representation
-   */
-  public ValueBuilder(final QueryContext qc, final boolean compact) {
-    this(qc, compact ? Array.INITIAL_CAPACITY : -1);
-  }
-
-  /**
-   * Constructor.
-   * @param qc query context (required for interrupting running queries)
-   * @param capacity initial capacity
+   * @param capacity initial capacity ({@link Integer#MIN_VALUE}: create no compact data structures)
    */
   public ValueBuilder(final QueryContext qc, final long capacity) {
     this.qc = qc;
@@ -95,7 +86,7 @@ public final class ValueBuilder {
       final Value sngl = single;
       if(sngl != null) {
         single = null;
-        if(capacity != -1) {
+        if(capacity != Integer.MIN_VALUE) {
           sequence = isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
                      isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
                      isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :

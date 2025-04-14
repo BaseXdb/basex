@@ -682,7 +682,7 @@ public final class QueryContext extends Job implements Closeable {
 
       // subtypes overriding the global value (value \2 type)
       if(string.indexOf('\2') != -1) {
-        final ValueBuilder vb = new ValueBuilder(this);
+        final ValueBuilder vb = new ValueBuilder(this, strings.size());
         for(final String str : strings) {
           final int i = str.indexOf('\2');
           final String val = i == -1 ? str : str.substring(0, i);
@@ -717,15 +717,16 @@ public final class QueryContext extends Job implements Closeable {
       // cast single item
       if(val.isItem()) return tp.cast((Item) val, this, null);
       // cast sequence
-      final ValueBuilder vb = new ValueBuilder(this);
+      final ValueBuilder vb = new ValueBuilder(this, val.size());
       for(final Item item : val) vb.add(tp.cast(item, this, null));
       return vb.value(tp);
     }
 
     // cast sequences
     if(object instanceof Object[]) {
-      final ValueBuilder vb = new ValueBuilder(this);
-      for(final Object obj : (Object[]) object) vb.add(tp.cast(obj, this, null));
+      final Object[] array = (Object[]) object;
+      final ValueBuilder vb = new ValueBuilder(this, array.length);
+      for(final Object val : array) vb.add(tp.cast(val, this, null));
       return vb.value(tp);
     }
 

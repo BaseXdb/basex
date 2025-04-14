@@ -230,8 +230,8 @@ public final class List extends Arr {
     // special case: concatenate two sequences
     if(exprs.length == 2) return ValueBuilder.concat(exprs[0].value(qc), exprs[1].value(qc), qc);
 
-    // general case: concatenate all sequences
-    final ValueBuilder vb = new ValueBuilder(qc, size());
+    // general case: concatenate all sequences (unknown size: do not create compact data structures)
+    final ValueBuilder vb = new ValueBuilder(qc, size() != -1 ? size() : Integer.MIN_VALUE);
     for(final Expr expr : exprs) vb.add(expr.value(qc));
     return vb.value(this);
   }
