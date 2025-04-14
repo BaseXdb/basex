@@ -30,8 +30,8 @@ function chat:chat() as element() {
 declare
   %rest:POST
   %rest:path('/chat/login-check')
-  %rest:query-param('name', '{$name}')
-  %rest:query-param('pass', '{$pass}')
+  %rest:form-param('name', '{$name}')
+  %rest:form-param('pass', '{$pass}')
 function chat:login-check(
   $name  as xs:string,
   $pass  as xs:string

@@ -19,6 +19,10 @@ import org.basex.util.*;
 import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.log.*;
+import org.eclipse.jetty.ee9.websocket.api.*;
+import org.eclipse.jetty.ee9.websocket.api.Session;
+import org.eclipse.jetty.ee9.websocket.api.StatusCode;
+import org.eclipse.jetty.ee9.websocket.api.UpgradeRequest;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.exceptions.*;
 
