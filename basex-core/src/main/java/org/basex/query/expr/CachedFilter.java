@@ -31,7 +31,7 @@ public class CachedFilter extends Filter {
     qc.focus = qf;
     try {
       for(final Expr expr : exprs) {
-        final ValueBuilder vb = new ValueBuilder(qc, false);
+        final ValueBuilder vb = new ValueBuilder(qc, true);
         final long vs = value.size();
         qf.size = vs;
         for(int v = 0; v < vs; ++v) {
