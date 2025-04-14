@@ -38,6 +38,15 @@ public final class ValueBuilder {
   /**
    * Constructor.
    * @param qc query context (required for interrupting running queries)
+   * @param compact try to create compact representation
+   */
+  public ValueBuilder(final QueryContext qc, final boolean compact) {
+    this(qc, compact ? Array.INITIAL_CAPACITY : -1);
+  }
+
+  /**
+   * Constructor.
+   * @param qc query context (required for interrupting running queries)
    * @param capacity initial capacity
    */
   public ValueBuilder(final QueryContext qc, final long capacity) {
@@ -175,8 +184,8 @@ public final class ValueBuilder {
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + (sequence != null ? sequence : single != null ? single :
-      "empty") + ']';
+    return Util.className(this) + '[' + Util.className(sequence != null ? sequence :
+      single != null ? single : Empty.VALUE) + ']';
   }
 
   /** String sequence builder. */

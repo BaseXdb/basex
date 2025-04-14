@@ -45,7 +45,7 @@ public final class IterFilter extends Filter {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, true);
     final Iter iter = root.iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(test(item, qc)) vb.add(item);
