@@ -212,8 +212,8 @@ public final class MapModuleTest extends SandboxTest {
     query(func.args(_MAP_ENTRY.args(1, 2), 1), 2);
 
     query(func.args(_MAP_ENTRY.args(1, 2), 3), "");
-    query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { }"), "");
-    query(func.args(_MAP_ENTRY.args(1, 2), 3, " function($k) { 4, 5 }"), "4\n5");
+    query(func.args(_MAP_ENTRY.args(1, 2), 3, " ()"), "");
+    query(func.args(_MAP_ENTRY.args(1, 2), 3, " (4, 5)"), "4\n5");
 
     check(func.args(" {}", "true#0"), "", empty());
     check(func.args(_MAP_ENTRY.args(1, wrap(0)), 1), 0, root(func));

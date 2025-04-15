@@ -19,13 +19,15 @@ public final class ArrayGet extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     final Item position = toAtomItem(arg(1), qc);
-    final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
 
-    if(fallback != null) {
-      final Value value = array.getOrNull(position, qc, info);
-      return value != null ? value : invoke(fallback, new HofArgs(position), qc);
+    Value value;
+    if(defined(2)) {
+      value = array.getOrNull(position, qc, info);
+      if(value == null) value = arg(2).value(qc);
+    } else {
+      value = array.get(position, qc, info);
     }
-    return array.get(position, qc, info);
+    return value;
   }
 
   @Override
@@ -35,12 +37,8 @@ public final class ArrayGet extends StandardFunc {
     // combine result type with return type of fallback function
     final Type type = array.seqType().type;
     if(type instanceof ArrayType) {
-      SeqType st = ((ArrayType) type).valueType();
-      if(defined(2)) {
-        final FuncType ft = arg(2).funcType();
-        if(ft != null) st = st.union(ft.declType);
-      }
-      exprType.assign(st);
+      final SeqType st = ((ArrayType) type).valueType();
+      exprType.assign(defined(2) ? st.union(arg(2).seqType()) : st);
     }
     return this;
   }

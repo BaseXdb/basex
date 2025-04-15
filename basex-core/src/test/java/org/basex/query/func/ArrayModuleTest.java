@@ -182,8 +182,8 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" [ 1, 2 ]", 1), 1);
 
     error(func.args(" [ 1, 2 ]", 3), ARRAYBOUNDS_X_X);
-    query(func.args(" [ 1, 2 ]", 3, " function($k) { }"), "");
-    query(func.args(" [ 1, 2 ]", 3, " function($k) { 4, 5 }"), "4\n5");
+    query(func.args(" [ 1, 2 ]", 3, " ()"), "");
+    query(func.args(" [ 1, 2 ]", 3, " (4, 5)"), "4\n5");
   }
 
  /** Test method. */

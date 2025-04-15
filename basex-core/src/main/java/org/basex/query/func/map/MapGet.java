@@ -23,11 +23,12 @@ public final class MapGet extends StandardFunc {
     final XQMap map = toMap(arg(0), qc);
     final Item key = toAtomItem(arg(1), qc);
 
-    Value value = map.getOrNull(key);
-    if(value == null) {
-      final FItem fallback = toFunctionOrNull(arg(2), 1, qc);
-      if(fallback != null) value = fallback.invoke(qc, info, key);
-      if(value == null) return Empty.VALUE;
+    Value value;
+    if(defined(2)) {
+      value = map.getOrNull(key);
+      if(value == null) value = arg(2).value(qc);
+    } else {
+      value = map.get(key);
     }
     if(value instanceof FuncItem && toBooleanOrFalse(arg(3), qc)) {
       value = ((FuncItem) value).toMethod(map);
@@ -37,18 +38,14 @@ public final class MapGet extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr map = arg(0), key = arg(1), func = arg(2);
-    final boolean fallback = defined(2);
-    if(fallback) {
-      final Type type = arg(1).seqType().type.atomic();
-      arg(2, arg -> refineFunc(arg, cc, type != null ? type.seqType() : SeqType.ANY_ATOMIC_TYPE_O));
-    }
+    final Expr map = arg(0), key = arg(1);
+    final boolean dflt = defined(2);
 
     final MapCompilation mc = MapCompilation.get(map).key(key);
     if(mc.key != null) {
       if(mc.field == null) {
         // map:get({ 'a': 1, 'a': 2 }, 'c')  ->  ()
-        if(!mc.record.isExtensible() && !fallback) return Empty.VALUE;
+        if(!mc.record.isExtensible() && !dflt) return Empty.VALUE;
       } else if(!mc.record.hasOptional()) {
         // map:get({ 'a': 1, 'b': 2 }, 'b')  ->  util:map-value-at({ 'a': 1, 'b': 2 }, 2)
         return cc.function(_UTIL_MAP_VALUE_AT, info, map, Int.get(mc.index), arg(3));
@@ -56,12 +53,7 @@ public final class MapGet extends StandardFunc {
     }
     if(mc.mapType != null) {
       SeqType st = mc.mapType.valueType();
-      if(fallback) {
-        final FuncType ft = func.funcType();
-        if(ft != null) st = st.union(ft.declType);
-      } else {
-        st = st.union(Occ.ZERO);
-      }
+      st = dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO);
       // invalidate function type (%method annotation would need to be removed from type)
       if(!(st.mayBeFunction() && defined(3))) exprType.assign(st);
     }
