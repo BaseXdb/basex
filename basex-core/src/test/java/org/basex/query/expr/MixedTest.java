@@ -381,21 +381,39 @@ public final class MixedTest extends SandboxTest {
 
   /** Sequence tests. */
   @Test public void sequences() {
+    // list optimizations
     check("('A', 'B')",
         "A\nB", root(StrSeq.class), type(StrSeq.class, "xs:string+"));
     check("('A', 'B', 'A', 'B', 'A', 'B')",
         "A\nB\nA\nB\nA\nB", root(StrSeq.class), type(StrSeq.class, "xs:string+"));
-
     check("(1, 3)",
         "1\n3", root(IntSeq.class), type(IntSeq.class, "xs:integer+"));
     check("(1, 3, 1, 3, 1, 3)",
         "1\n3\n1\n3\n1\n3", root(IntSeq.class), type(IntSeq.class, "xs:integer+"));
-
     check("data((<a>A</a>))",
         "A", root(Atm.class));
     check("data((<a>A</a>, <a>B</a>))",
         "A\nB", root(StrSeq.class), type(StrSeq.class, "xs:untypedAtomic+"));
     check("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
         "A\nB\nA\nB\nA\nB", root(StrSeq.class), type(StrSeq.class, "xs:untypedAtomic+"));
+
+    // inspection
+    final String inspect = " =>" + _INSPECT_TYPE.args(" { 'internal': true() }");
+    check("('A', 'B', 'A', 'B', 'A', 'B')" + inspect, "xs:string+, StrSeq");
+    check("(1, 3, 1, 3, 1, 3)" + inspect, "xs:integer+, IntSeq");
+    check("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))" + inspect,
+        "xs:untypedAtomic+, StrSeq");
+
+    // filters
+    check("('A', 'B', 'A', 'B', 'A', 'B')[not(. = 'C')]" + inspect, "xs:string+, StrSeq");
+    check("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))[not(. = 'C')]" +
+        inspect, "xs:untypedAtomic+, StrSeq");
+    check("(1, 3, 1, 3, 1, 3)[not(. = 2)]" + inspect, "xs:integer+, IntSeq");
+
+    // map operator
+    check("(1 to 6) ! string()" + inspect, "xs:string+, StrSeq");
+    check("(1 to 6) ! xs:untypedAtomic()" + inspect, "xs:untypedAtomic+, StrSeq");
+    check("(1 to 6) ! ('0' || .) ! xs:integer()" + inspect, "xs:integer+, RangeSeq");
+    check("(1, 3, 1, 3, 1, 3) ! ('0' || .) ! xs:integer()" + inspect, "xs:integer+, IntSeq");
   }
 }

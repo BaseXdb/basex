@@ -32,7 +32,7 @@ public final class FnGraphemes extends StandardFunc {
         list.add(value.substring(s, e));
       }
     }
-    return StrSeq.get(list.finish());
+    return StrSeq.get(list);
   }
 
   @Override

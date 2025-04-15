@@ -63,7 +63,7 @@ public final class XQIntStrMap extends XQHashMap {
     final long is = structSize();
     final TokenList list = new TokenList(is);
     for(int i = 1; i <= is; i++) list.add(map.value(i));
-    return StrSeq.get(list.finish());
+    return StrSeq.get(list);
   }
 
   @Override

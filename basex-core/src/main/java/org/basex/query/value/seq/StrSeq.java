@@ -65,7 +65,7 @@ public final class StrSeq extends NativeSeq {
     final int sz = (int) size;
     final byte[][] array = new byte[sz][];
     for(int i = 0; i < sz; i++) array[sz - i - 1] = values[i];
-    return get(array);
+    return get(array, type);
   }
 
   @Override
