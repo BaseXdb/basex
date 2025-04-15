@@ -21,8 +21,8 @@ public final class InspectType extends StandardFunc {
     public static final EnumOption<Mode> MODE = new EnumOption<>("mode", Mode.COMPUTED);
     /** Item. */
     public static final BooleanOption ITEM = new BooleanOption("item", false);
-    /** Add internal information. */
-    public static final BooleanOption INTERNAL = new BooleanOption("internal", true);
+    /** Internal information. */
+    public static final BooleanOption INTERNAL = new BooleanOption("internal", false);
   }
 
   /** Inspection mode. */
