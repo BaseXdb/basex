@@ -21,14 +21,15 @@ public final class InspectType extends StandardFunc {
     public static final EnumOption<Mode> MODE = new EnumOption<>("mode", Mode.COMPUTED);
     /** Item. */
     public static final BooleanOption ITEM = new BooleanOption("item", false);
+    /** Add internal information. */
+    public static final BooleanOption INTERNAL = new BooleanOption("internal", true);
   }
 
   /** Inspection mode. */
   public enum Mode {
     /** Combined.   */ COMPUTED,
     /** Value.      */ VALUE,
-    /** Expression. */ EXPRESSION,
-    /** Interna.    */ INTERNAL;
+    /** Expression. */ EXPRESSION;
 
     @Override
     public String toString() {
@@ -45,21 +46,22 @@ public final class InspectType extends StandardFunc {
 
     final SeqType et = arg(0).seqType();
     SeqType st = value.seqType();
-    String internal = null;
     switch(mode) {
-      case INTERNAL:
-        internal = Util.className(value);
-        break;
       case EXPRESSION:
         st = et;
         break;
       case VALUE:
+        st = value.seqType();
         break;
       default:
         // compare refined with original type, which may be more specific (e.g. for node types)
         value.refineType();
         if(et.instanceOf(st)) st = et;
     }
-    return Str.get((internal != null ? internal : item ? st.with(Occ.EXACTLY_ONE) : st).toString());
+    final StringBuilder sb = new StringBuilder().append(item ? st.with(Occ.EXACTLY_ONE) : st);
+    if(options.get(InspectOptions.INTERNAL)) {
+      sb.append(", ").append(Util.className(mode == Mode.EXPRESSION ? arg(0) : value));
+    }
+    return Str.get(sb.toString());
   }
 }
