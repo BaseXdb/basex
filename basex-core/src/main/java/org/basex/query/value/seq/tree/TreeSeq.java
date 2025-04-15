@@ -48,7 +48,7 @@ public abstract class TreeSeq extends Seq {
     final TreeSeqBuilder tsb = new TreeSeqBuilder();
     if(pos < MAX_SMALL) {
       tsb.add(value, qc);
-      for(long i = pos; --i >= 0;) tsb.addFront(itemAt(i));
+      for(long i = pos; --i >= 0;) tsb.prepend(itemAt(i));
     } else {
       tsb.add(subsequence(0, pos, qc), qc);
       tsb.add(value, qc);

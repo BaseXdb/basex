@@ -1,7 +1,5 @@
 package org.basex.query.value.seq.tree;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
@@ -18,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class TreeSeqBuilder implements SeqBuilder, Iterable<Item> {
+public final class TreeSeqBuilder implements SeqBuilder {
   /** Capacity of the root. */
   private static final int CAP = 2 * TreeSeq.MAX_DIGIT;
   /** Size of inner nodes. */
@@ -51,7 +49,7 @@ public final class TreeSeqBuilder implements SeqBuilder, Iterable<Item> {
    * @param item item to add
    * @return reference to this builder for convenience
    */
-  public TreeSeqBuilder addFront(final Item item) {
+  public TreeSeqBuilder prepend(final Item item) {
     if(inLeft < TreeSeq.MAX_DIGIT) {
       // just insert the item
       items[(mid - inLeft + CAP - 1) % CAP] = item;
@@ -152,11 +150,11 @@ public final class TreeSeqBuilder implements SeqBuilder, Iterable<Item> {
       tree.append(midTree);
       for(int i = ls.length; --i >= 0;) {
         qc.checkStop();
-        addFront(ls[i]);
+        prepend(ls[i]);
       }
       for(int i = k; --i >= 0;) {
         qc.checkStop();
-        addFront(temp[i]);
+        prepend(temp[i]);
       }
       for(final Item r : rs) {
         qc.checkStop();
@@ -218,58 +216,21 @@ public final class TreeSeqBuilder implements SeqBuilder, Iterable<Item> {
   }
 
   @Override
-  public Iterator<Item> iterator() {
-    return new Iterator<>() {
-      private int pos = -inLeft;
-      private Iterator<Item> sub;
-
-      @Override
-      public boolean hasNext() {
-        return pos <= inRight;
-      }
-
-      @Override
-      public Item next() {
-        if(pos < 0) {
-          final int p = pos++;
-          return items[(mid + p + CAP) % CAP];
-        }
-
-        if(pos == 0) {
-          if(sub == null) sub = tree.iterator();
-          if(sub.hasNext()) return sub.next();
-          sub = null;
-          pos++;
-        }
-
-        // pos > 0
-        final int p = pos++;
-        return items[(mid + p - 1) % CAP];
-      }
-
-      @Override
-      public void remove() {
-        throw Util.notExpected();
-      }
-    };
-  }
-
-  @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(getClass()).add('[');
+    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
     if(tree.isEmpty()) {
       final int n = inLeft + inRight, first = (mid - inLeft + CAP) % CAP;
       if(n > 0) {
-        tb.add(items[first]);
-        for(int i = 1; i < n; i++) tb.add(", ").add(items[(first + i) % CAP]);
+        sb.append(items[first]);
+        for(int i = 1; i < n; i++) sb.append(", ").append(items[(first + i) % CAP]);
       }
     } else {
       final int first = (mid - inLeft + CAP) % CAP;
-      tb.add(items[first]);
-      for(int i = 1; i < inLeft; i++) tb.add(", ").add(items[(first + i) % CAP]);
-      for(final Item item : tree) tb.add(", ").add(item);
-      for(int i = 0; i < inRight; i++) tb.add(", ").add(items[(mid + i) % CAP]);
+      sb.append(items[first]);
+      for(int i = 1; i < inLeft; i++) sb.append(", ").append(items[(first + i) % CAP]);
+      for(final Item item : tree) sb.append(", ").append(item);
+      for(int i = 0; i < inRight; i++) sb.append(", ").append(items[(mid + i) % CAP]);
     }
-    return tb.add(']').toString();
+    return sb.append(']').toString();
   }
 }
