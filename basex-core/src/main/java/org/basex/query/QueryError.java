@@ -110,6 +110,8 @@ public enum QueryError {
   /** Error code. */
   BIN_IOOR_X_X(BIN, "index-out-of-range", "Index '%' is out of range (0-%)."),
   /** Error code. */
+  BIN_ITL_X_X(BIN, "integer-too-large", "Index '%' is too large: %."),
+  /** Error code. */
   BIN_NS_X(BIN, "negative-size", "Size '%' is negative."),
   /** Error code. */
   BIN_OOR_X(BIN, "octet-out-of-range", "Octet '%' is out of range."),

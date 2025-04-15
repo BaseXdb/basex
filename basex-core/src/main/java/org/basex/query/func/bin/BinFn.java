@@ -78,7 +78,7 @@ abstract class BinFn extends StandardFunc {
     final BigInteger bi = signed ? new BigInteger(result) : new BigInteger(1, result);
     final long v = bi.longValue();
     if(BigInteger.valueOf(v).equals(bi)) return Int.get(v);
-    throw RANGE_X.get(info, bi);
+    throw BIN_ITL_X_X.get(info, bi);
   }
 
   /**
