@@ -27,7 +27,8 @@ public final class InspectType extends StandardFunc {
   public enum Mode {
     /** Combined.   */ COMPUTED,
     /** Value.      */ VALUE,
-    /** Expression. */ EXPRESSION;
+    /** Expression. */ EXPRESSION,
+    /** Interna.    */ INTERNAL;
 
     @Override
     public String toString() {
@@ -44,7 +45,11 @@ public final class InspectType extends StandardFunc {
 
     final SeqType et = arg(0).seqType();
     SeqType st = value.seqType();
+    String internal = null;
     switch(mode) {
+      case INTERNAL:
+        internal = Util.className(value);
+        break;
       case EXPRESSION:
         st = et;
         break;
@@ -55,6 +60,6 @@ public final class InspectType extends StandardFunc {
         value.refineType();
         if(et.instanceOf(st)) st = et;
     }
-    return Str.get((item ? st.with(Occ.EXACTLY_ONE) : st).toString());
+    return Str.get((internal != null ? internal : item ? st.with(Occ.EXACTLY_ONE) : st).toString());
   }
 }
