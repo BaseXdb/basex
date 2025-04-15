@@ -192,14 +192,14 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(1), "xs:integer");
     query(func.args(" 1 to 2"), "xs:integer+");
     query(func.args(" <_/>"), "element(_)");
-    query(func.args(" map { 'a': (1, 2)[. = 1] }"), "map(xs:string, xs:integer)");
-    query(func.args(" map { 'a': 'b' }"), "record(a as xs:string)");
+    query(func.args(" { 'a': (1, 2)[. = 1] }"), "map(xs:string, xs:integer)");
+    query(func.args(" { 'a': 'b' }"), "record(a as xs:string)");
     query(func.args(" array { 1, <a/> }"), "array(item())");
     query(func.args(" array { 1, 2 }"), "array(xs:integer)");
     query(func.args(" function() { 1 }"), "function() as xs:integer");
 
-    query(func.args(" 1 to 2", " map { 'item': true() }"), "xs:integer");
-    query(func.args(" (<a/>, <b/>)[name() = 'a']", " map { 'mode': 'expression' }"),
+    query(func.args(" 1 to 2", " { 'item': true() }"), "xs:integer");
+    query(func.args(" (<a/>, <b/>)[name() = 'a']", " { 'mode': 'expression' }"),
         "(element(a)|element(b))*");
     query(func.args(" ('z' cast as enum('x', 'a', 'z'), 'a' cast as (enum('a')|enum('b')))"),
         "enum(\"z\", \"a\")+");
@@ -207,16 +207,27 @@ public final class InspectModuleTest extends SandboxTest {
     String expr = " (<a/>, <b/>)[name() = 'a']";
     String result = "element()";
     query(func.args(expr), result);
-    query(func.args(expr, " map { 'mode': 'computed' }"), result);
-    query(func.args(expr, " map { 'mode': 'value' }"), result);
-    query(func.args(expr, " map { 'mode': 'expression' }"), "(element(a)|element(b))*");
+    query(func.args(expr, " { 'mode': 'computed' }"), result);
+    query(func.args(expr, " { 'mode': 'value' }"), result);
+    query(func.args(expr, " { 'mode': 'expression' }"), "(element(a)|element(b))*");
 
-    expr = " map:put(map { 1: text { 2 } }, 2, text { 2 })";
+    expr = " map:put({ 1: text { 2 } }, 2, text { 2 })";
     result = "map(xs:integer, text())";
     query(func.args(expr), result);
-    query(func.args(expr, " map { 'mode': 'computed' }"), result);
-    query(func.args(expr, " map { 'mode': 'value' }"), result);
-    query(func.args(expr, " map { 'mode': 'expression' }"), result);
+    query(func.args(expr, " { 'mode': 'computed' }"), result);
+    query(func.args(expr, " { 'mode': 'value' }"), result);
+    query(func.args(expr, " { 'mode': 'expression' }"), result);
+
+    query(func.args(" ()", " { 'internal': true() }"), "empty-sequence(), Empty");
+    query(func.args(1, " { 'internal': true() }"), "xs:integer, Int");
+    query(func.args(" 1 to 6", " { 'internal': true() }"), "xs:integer+, RangeSeq");
+
+    query(func.args(" ()", " { 'internal': true(), 'mode': 'expression' }"),
+        "empty-sequence(), Empty");
+    query(func.args(1, " { 'internal': true(), 'mode': 'expression' }"),
+        "xs:integer, Int");
+    query(func.args(" 1 to 6", " { 'internal': true(), 'mode': 'expression' }"),
+        "xs:integer+, RangeSeq");
   }
 
   /** Test method. */
