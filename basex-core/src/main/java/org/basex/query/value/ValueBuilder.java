@@ -88,6 +88,7 @@ public final class ValueBuilder {
         single = null;
         if(capacity != Integer.MIN_VALUE) {
           sequence = isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
+                     isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder() :
                      isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
                      isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
                      isBln(sngl) && isBln(value) ? new BlnSeqBuilder() : null;
@@ -147,6 +148,15 @@ public final class ValueBuilder {
   }
 
   /**
+   * Checks if the specified value is a string.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isAtm(final Value value) {
+    return value.type == AtomType.UNTYPED_ATOMIC;
+  }
+
+  /**
    * Checks if the specified value is an integer value.
    * @param value value
    * @return result of check
@@ -196,6 +206,26 @@ public final class ValueBuilder {
     @Override
     public Value value(final Type type) {
       return StrSeq.get(values);
+    }
+  }
+
+  /** Untyped atomic sequence builder. */
+  final class AtmSeqBuilder implements SeqBuilder {
+    /** Values. */
+    private final TokenList values = new TokenList(capacity);
+
+    @Override
+    public SeqBuilder add(final Item item) {
+      if(isAtm(item)) {
+        values.add(((Atm) item).string(null));
+        return this;
+      }
+      return tree(item, qc);
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return StrSeq.get(values, AtomType.UNTYPED_ATOMIC);
     }
   }
 

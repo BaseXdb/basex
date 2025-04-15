@@ -8,6 +8,8 @@ import java.io.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -375,5 +377,25 @@ public final class MixedTest extends SandboxTest {
         + "  if(count($x) > 0) then local:f(trunk($x)) else $x"
         + "};"
         + "count(local:f(1 to 100000))", 0);
+  }
+
+  /** Sequence tests. */
+  @Test public void sequences() {
+    check("('A', 'B')",
+        "A\nB", root(StrSeq.class), type(StrSeq.class, "xs:string+"));
+    check("('A', 'B', 'A', 'B', 'A', 'B')",
+        "A\nB\nA\nB\nA\nB", root(StrSeq.class), type(StrSeq.class, "xs:string+"));
+
+    check("(1, 3)",
+        "1\n3", root(IntSeq.class), type(IntSeq.class, "xs:integer+"));
+    check("(1, 3, 1, 3, 1, 3)",
+        "1\n3\n1\n3\n1\n3", root(IntSeq.class), type(IntSeq.class, "xs:integer+"));
+
+    check("data((<a>A</a>))",
+        "A", root(Atm.class));
+    check("data((<a>A</a>, <a>B</a>))",
+        "A\nB", root(StrSeq.class), type(StrSeq.class, "xs:untypedAtomic+"));
+    check("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
+        "A\nB\nA\nB\nA\nB", root(StrSeq.class), type(StrSeq.class, "xs:untypedAtomic+"));
   }
 }

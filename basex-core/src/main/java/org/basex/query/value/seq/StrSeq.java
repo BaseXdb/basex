@@ -13,7 +13,8 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * Sequence of items of type {@link Str xs:string}, containing at least two of them.
+ * Sequence of items of type {@link Str xs:anyURI}, {@link Str xs:untypedAtomic} or
+ * instance of {@link Str xs:string}, containing at least two of them.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -25,9 +26,10 @@ public final class StrSeq extends NativeSeq {
   /**
    * Constructor.
    * @param values values
+   * @param type type
    */
-  private StrSeq(final byte[][] values) {
-    super(values.length, AtomType.STRING);
+  private StrSeq(final byte[][] values, final Type type) {
+    super(values.length, type);
     this.values = values;
   }
 
@@ -44,7 +46,7 @@ public final class StrSeq extends NativeSeq {
     final int size = in.readNum();
     final byte[][] values = new byte[size][];
     for(int s = 0; s < size; s++) values[s] = in.readToken();
-    return get(values);
+    return get(values, type);
   }
 
   @Override
@@ -54,8 +56,8 @@ public final class StrSeq extends NativeSeq {
   }
 
   @Override
-  public Str itemAt(final long pos) {
-    return Str.get(values[(int) pos]);
+  public Item itemAt(final long pos) {
+    return get(values[(int) pos], type);
   }
 
   @Override
@@ -87,8 +89,18 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final TokenList values) {
-    return values.isEmpty() ? Empty.VALUE : values.size() == 1 ? Str.get(values.get(0)) :
-      new StrSeq(values.finish());
+    return get(values, AtomType.STRING);
+  }
+
+  /**
+   * Creates a sequence with the specified values.
+   * @param values values
+   * @param type type; must be xs:anyURI, xs:untypedAtomic or an instance of xs:string
+   * @return value
+   */
+  public static Value get(final TokenList values, final Type type) {
+    return values.isEmpty() ? Empty.VALUE : values.size() == 1 ? get(values.get(0), type) :
+      new StrSeq(values.finish(), type);
   }
 
   /**
@@ -97,18 +109,30 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final byte[][] values) {
+    return get(values, AtomType.STRING);
+  }
+
+  /**
+   * Creates a sequence with the specified values.
+   * @param values values
+   * @param type type; must be xs:anyURI, xs:untypedAtomic or an instance of xs:string
+   * @return value
+   */
+  public static Value get(final byte[][] values, final Type type) {
     final int vl = values.length;
-    return vl == 0 ? Empty.VALUE : vl == 1 ? Str.get(values[0]) : new StrSeq(values);
+    return vl == 0 ? Empty.VALUE : vl == 1 ? get(values[0], type) : new StrSeq(values, type);
   }
 
   /**
    * Creates a typed sequence with the items of the specified values.
+   * @param type type; must be xs:anyURI, xs:untypedAtomic or an instance of xs:string
    * @param size size of resulting sequence
    * @param values values
    * @return value
    * @throws QueryException query exception
    */
-  public static Value get(final long size, final Value... values) throws QueryException {
+  public static Value get(final Type type, final long size, final Value... values)
+      throws QueryException {
     final TokenList tmp = new TokenList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
@@ -118,6 +142,17 @@ public final class StrSeq extends NativeSeq {
         for(final Item item : value) tmp.add(item.string(null));
       }
     }
-    return get(tmp);
+    return get(tmp, type);
+  }
+
+  /**
+   * Creates an item for the specified token.
+   * @param string string
+   * @param type type; must be xs:anyURI, xs:untypedAtomic or an instance of xs:string
+   * @return value
+   */
+  private static Item get(final byte[] string, final Type type) {
+    return type == AtomType.UNTYPED_ATOMIC ? Atm.get(string) :
+      type == AtomType.ANY_URI ? Uri.get(string) : Str.get(string, type);
   }
 }

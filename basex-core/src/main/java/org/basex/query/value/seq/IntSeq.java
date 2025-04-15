@@ -154,7 +154,7 @@ public final class IntSeq extends NativeSeq {
   /**
    * Creates a sequence with the specified values.
    * @param values values
-   * @param type item type; must be instance of xs:integer
+   * @param type type; must be instance of xs:integer
    * @return value
    */
   public static Value get(final long[] values, final Type type) {
@@ -182,7 +182,7 @@ public final class IntSeq extends NativeSeq {
   /**
    * Creates a typed sequence with the items of the specified values.
    * @param size size of resulting sequence
-   * @param type item type; must be instance of xs:integer
+   * @param type type; must be instance of xs:integer
    * @param values values
    * @return value
    * @throws QueryException query exception

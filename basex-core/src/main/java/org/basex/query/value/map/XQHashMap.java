@@ -100,9 +100,21 @@ abstract class XQHashMap extends XQMap {
    * @return token or {@code null}
    * @throws QueryException query exception
    */
-  static final byte[] toString(final Value value) throws QueryException {
+  static final byte[] toStr(final Value value) throws QueryException {
     if(value.seqType().eq(SeqType.STRING_O)) {
       return ((AStr) value).string(null);
+    }
+    return null;
+  }
+
+  /**
+   * Tries to convert the value to an untyped atomic.
+   * @param value value
+   * @return token or {@code null}
+   */
+  static final byte[] toAtm(final Value value) {
+    if(value.seqType().eq(SeqType.UNTYPED_ATOMIC_O)) {
+      return ((Atm) value).string(null);
     }
     return null;
   }

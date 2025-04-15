@@ -277,14 +277,17 @@ public abstract class Value extends Expr implements Iterable<Item> {
         type instanceof AtomType) {
       switch((AtomType) type) {
         case BOOLEAN: return BlnSeq.get(size, values);
-        case STRING: return StrSeq.get(size, values);
         case BYTE: return BytSeq.get(size, values);
         case SHORT: return ShrSeq.get(size, values);
         case FLOAT: return FltSeq.get(size, values);
         case DOUBLE: return DblSeq.get(size, values);
         case DECIMAL: return DecSeq.get(size, values);
         case UNSIGNED_LONG: return null;
-        default: if(type.instanceOf(AtomType.INTEGER)) return IntSeq.get(type, size, values);
+        case STRING: return StrSeq.get(type, size, values);
+        default:
+          if(type.instanceOf(AtomType.STRING) || type.oneOf(AtomType.UNTYPED_ATOMIC,
+              AtomType.UNTYPED_ATOMIC)) return StrSeq.get(type, size, values);
+          if(type.instanceOf(AtomType.INTEGER)) return IntSeq.get(type, size, values);
       }
     }
     return null;

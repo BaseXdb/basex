@@ -71,7 +71,7 @@ public final class XQStrMap extends XQHashMap {
 
   @Override
   XQHashMap build(final Item key, final Value value) throws QueryException {
-    final byte[] k = toString(key), v = toString(value);
+    final byte[] k = toStr(key), v = toStr(value);
     if(k != null) {
       if(v != null) {
         map.put(k, v);

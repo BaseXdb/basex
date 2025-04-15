@@ -9,14 +9,14 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Unmodifiable hash map implementation for strings and integers.
+ * Unmodifiable hash map implementation for untyped atomics and integers.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class XQStrIntMap extends XQHashMap {
+public final class XQAtmIntMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.INTEGER_O);
+  private static final MapType TYPE = MapType.get(AtomType.UNTYPED_ATOMIC, SeqType.INTEGER_O);
   /** Hash map. */
   private final TokenIntMap map;
   /** Initial capacity. */
@@ -26,7 +26,7 @@ public final class XQStrIntMap extends XQHashMap {
    * Constructor.
    * @param capacity initial capacity
    */
-  XQStrIntMap(final int capacity) {
+  XQAtmIntMap(final int capacity) {
     super(TYPE);
     map = new TokenIntMap(capacity);
     this.capacity = capacity;
@@ -48,7 +48,7 @@ public final class XQStrIntMap extends XQHashMap {
 
   @Override
   Value keysInternal() {
-    return StrSeq.get(map.keys());
+    return StrSeq.get(map.keys(), AtomType.UNTYPED_ATOMIC);
   }
 
   @Override
@@ -60,8 +60,8 @@ public final class XQStrIntMap extends XQHashMap {
   }
 
   @Override
-  public Str keyAt(final int pos) {
-    return Str.get(map.key(pos + 1));
+  public Atm keyAt(final int pos) {
+    return Atm.get(map.key(pos + 1));
   }
 
   @Override
@@ -71,14 +71,14 @@ public final class XQStrIntMap extends XQHashMap {
 
   @Override
   XQHashMap build(final Item key, final Value value) throws QueryException {
-    final byte[] k = toStr(key);
+    final byte[] k = toAtm(key);
     final int v = toInt(value);
     if(k != null) {
       if(v != Integer.MIN_VALUE) {
         map.put(k, v);
         return this;
       }
-      return new XQStrValueMap(capacity).build(this).build(key, value);
+      return new XQAtmValueMap(capacity).build(this).build(key, value);
     }
     return new XQItemValueMap(capacity).build(this).build(key, value);
   }
