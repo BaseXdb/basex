@@ -1,7 +1,5 @@
 package org.basex.query.value.array;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -13,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-final class SmallArray extends XQArray {
+final class SmallArray extends TreeArray {
   /** The members. */
   final Value[] members;
 
@@ -23,7 +21,7 @@ final class SmallArray extends XQArray {
    * @param type type
    */
   SmallArray(final Value[] members, final Type type) {
-    super(type);
+    super(members.length, type);
     this.members = members;
     assert members.length >= 2 && members.length <= MAX_SMALL;
   }
@@ -60,7 +58,7 @@ final class SmallArray extends XQArray {
   }
 
   @Override
-  public Value get(final long index) {
+  public Value memberAt(final long index) {
     return members[(int) index];
   }
 
@@ -72,44 +70,7 @@ final class SmallArray extends XQArray {
   }
 
   @Override
-  public long structSize() {
-    return members.length;
-  }
-
-  @Override
-  public XQArray concat(final XQArray other) {
-    return other == empty() ? this : other.prepend(this);
-  }
-
-  @Override
-  public Value head() {
-    return members[0];
-  }
-
-  @Override
-  public Value foot() {
-    return members[members.length - 1];
-  }
-
-  @Override
-  public XQArray trunk() {
-    final int ml = members.length;
-    return ml == 1 ? empty() :
-           ml == 2 ? new SingletonArray(members[0]) :
-           new SmallArray(slice(members, 0, ml - 1), type);
-  }
-
-  @Override
-  public XQArray tail() {
-    final int ml = members.length;
-    return ml == 1 ? empty() :
-           ml == 2 ? new SingletonArray(members[1]) :
-           new SmallArray(slice(members, 1, ml), type);
-  }
-
-  @Override
   public XQArray reverseArray(final QueryContext qc) {
-    qc.checkStop();
     final int ml = members.length;
     final Value[] tmp = new Value[ml];
     for(int m = 0; m < ml; m++) tmp[m] = members[ml - 1 - m];
@@ -134,7 +95,7 @@ final class SmallArray extends XQArray {
   public XQArray remove(final long pos, final QueryContext qc) {
     qc.checkStop();
     final int ml = members.length, p = (int) pos;
-    if(ml == 2) return new SingletonArray(members[p == 0 ? 1 : 0]);
+    if(ml == 2) return singleton(members[p == 0 ? 1 : 0]);
 
     final Value[] out = new Value[ml - 1];
     Array.copy(members, p, out);
@@ -143,88 +104,9 @@ final class SmallArray extends XQArray {
   }
 
   @Override
-  public XQArray subArray(final long pos, final long length, final QueryContext qc) {
+  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
     qc.checkStop();
-    final int p = (int) pos, n = (int) length;
-    return n == 0 ? empty() :
-           n == 1 ? new SingletonArray(members[p]) :
-           new SmallArray(slice(members, p, p + n), type);
-  }
-
-  @Override
-  public ListIterator<Value> iterator(final long start) {
-    return new ListIterator<>() {
-      private int index = (int) start;
-
-      @Override
-      public int nextIndex() {
-        return index;
-      }
-
-      @Override
-      public boolean hasNext() {
-        return index < members.length;
-      }
-
-      @Override
-      public Value next() {
-        return members[index++];
-      }
-
-      @Override
-      public int previousIndex() {
-        return index - 1;
-      }
-
-      @Override
-      public boolean hasPrevious() {
-        return index > 0;
-      }
-
-      @Override
-      public Value previous() {
-        return members[--index];
-      }
-
-      @Override
-      public void set(final Value e) {
-        throw Util.notExpected();
-      }
-
-      @Override
-      public void add(final Value e) {
-        throw Util.notExpected();
-      }
-
-      @Override
-      public void remove() {
-        throw Util.notExpected();
-      }
-    };
-  }
-
-  @Override
-  void checkInvariants() {
-    final int ml = members.length;
-    if(ml == 0) throw new AssertionError("Empty array in " + Util.className(this));
-    if(ml > MAX_SMALL) throw new AssertionError("Array too big: " + ml);
-  }
-
-  @Override
-  XQArray prepend(final SmallArray array) {
-    final Type tp = type.union(array.type);
-    final Value[] tmp = array.members;
-    final int tl = tmp.length, ml = members.length, n = tl + ml;
-
-    // both arrays can be used as digits
-    if(Math.min(tl, ml) >= MIN_DIGIT) return new BigArray(tmp, members, tp);
-
-    final Value[] out = new Value[n];
-    Array.copy(tmp, tl, out);
-    Array.copyFromStart(members, ml, out, tl);
-    if(n <= MAX_SMALL) return new SmallArray(out, tp);
-
-    final int mid = n / 2;
-    return new BigArray(slice(out, 0, mid), slice(out, mid, n), tp);
+    final int p = (int) pos, l = (int) length;
+    return new SmallArray(slice(members, p, p + l), type);
   }
 }

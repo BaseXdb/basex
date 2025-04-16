@@ -346,19 +346,6 @@ final class InnerNode<N, E> implements Node<Node<N, E>, E> {
   }
 
   @Override
-  public long checkInvariants() {
-    final int a = children.length;
-    if(a < 2 || a > FingerTree.MAX_ARITY) throw new AssertionError("Wrong arity: " + a);
-    long b = 0;
-    for(int i = 0; i < a; i++) {
-      final Node<N, E> ch = children[i];
-      b += ch.checkInvariants();
-      if(b != bounds[i]) throw new AssertionError("Wrong boundary: " + b);
-    }
-    return b;
-  }
-
-  @Override
   public int append(final NodeLike<Node<N, E>, E>[] nodes, final int pos) {
     if(pos == 0 || nodes[pos - 1] instanceof InnerNode) {
       nodes[pos] = this;

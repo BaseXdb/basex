@@ -256,4 +256,43 @@ public final class ArrayTest extends SandboxTest {
     query("array:fold-left(array:tail([ 1, 2, 3 ]), (), function($res, $fn) { ($res, $fn) })",
         "2\n3");
   }
+
+  /** Range array. */
+  @Test public void rangeArray() {
+    check("[ 1 to 6 ]", "[(1,2,3,4,5,6)]", root(SingletonArray.class));
+    check("array { 1 to 6 }", "[1,2,3,4,5,6]", root(RangeArray.class));
+    check("[ 1 to 6 ] => array:reverse()", "[(1,2,3,4,5,6)]", root(SingletonArray.class));
+    check("array { 1 to 6 } => array:reverse()", "[6,5,4,3,2,1]", root(RangeArray.class));
+    check("[ reverse(1 to 6) ]", "[(6,5,4,3,2,1)]", root(SingletonArray.class));
+    check("array { reverse(1 to 6) }", "[6,5,4,3,2,1]", root(RangeArray.class));
+
+    query("[ 1 to 2000000000 ] => array:size()", 1);
+    query("[ 1 to 2000000000 ] => array:items() => count()", 2000000000);
+    query("array { 1 to 2000000000 } => array:size()", 2000000000);
+    query("array { 1 to 2000000000 } => array:items() => count()", 2000000000);
+
+    query("[ 1 to 2000000000 ] => array:reverse() => array:size()", 1);
+    query("[ 1 to 2000000000 ] => array:reverse() => array:items() => count()", 2000000000);
+    query("array { 1 to 2000000000 } => array:reverse() => array:size()", 2000000000);
+    query("array { 1 to 2000000000 } => array:reverse() => array:items() => count()", 2000000000);
+
+    query("[ reverse(1 to 2000000000) ] => array:size()", 1);
+    query("[ reverse(1 to 2000000000) ] => array:items() => count()", 2000000000);
+    query("array { reverse(1 to 2000000000) } => array:size()", 2000000000);
+    query("array { reverse(1 to 2000000000) } => array:items() => count()", 2000000000);
+  }
+
+  /** Subarray. */
+  @Test public void subArray() {
+    check("[ 'a', 'b', 'c', 'd' ] => array:tail()", "[\"b\",\"c\",\"d\"]",
+        root(SubArray.class));
+    check("[ 'a', 'b', 'c', 'd' ] => array:tail() => array:tail()", "[\"c\",\"d\"]",
+        root(SubArray.class));
+    check("[ 'a', 'b', 'c', 'd' ] => array:trunk()", "[\"a\",\"b\",\"c\"]",
+        root(SubArray.class));
+    check("[ 'a', 'b', 'c', 'd' ] => array:trunk() => array:trunk()", "[\"a\",\"b\"]",
+        root(SubArray.class));
+    check("[ 'a', 'b', 'c', 'd' ] => array:subarray(2, 2)", "[\"b\",\"c\"]",
+        root(SubArray.class));
+  }
 }

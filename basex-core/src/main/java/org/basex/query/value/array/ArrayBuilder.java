@@ -1,200 +1,89 @@
 package org.basex.query.value.array;
 
 import org.basex.query.expr.*;
-import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
- * A builder for creating an {@link XQArray} by prepending and appending members.
+ * A builder for efficiently creating an {@link XQArray}.
  *
  * @author BaseX Team, BSD License
- * @author Leo Woerteler
+ * @author Christian Gruen
  */
 public final class ArrayBuilder {
-  /** Capacity of the root. */
-  private static final int CAP = 2 * XQArray.MAX_DIGIT;
-  /** Size of inner nodes. */
-  private static final int NODE_SIZE = (XQArray.MIN_LEAF + XQArray.MAX_LEAF + 1) / 2;
-
-  /** Ring buffer containing the root-level members. */
-  private Value[] members = new Value[CAP];
-  /** Builder for the middle tree. */
-  private FingerTreeBuilder<Value> tree = new FingerTreeBuilder<>();
-
-  /** Number of members in left digit. */
-  private int inLeft;
-  /** Middle between left and right digit in the buffer. */
-  private int mid = CAP / 2;
-  /** Number of members in right digit. */
-  private int inRight;
+  /** Sequence builder, only instantiated if there are at least two members. */
+  private ArrBuilder array;
+  /** Capacity ({@link Integer#MIN_VALUE}: create no compact data structures). */
+  private long capacity;
+  /** The first added value is cached. */
+  private Value single;
 
   /**
-   * Adds a member to the start of the array.
-   * @param member member to add
-   * @return self reference
+   * Constructor.
    */
-  public ArrayBuilder prepend(final Value member) {
-    if(inLeft < XQArray.MAX_DIGIT) {
-      // just insert the member
-      members[(mid - inLeft + CAP - 1) % CAP] = member;
-      inLeft++;
-    } else if(tree.isEmpty() && inRight < XQArray.MAX_DIGIT) {
-      // move the middle to the left
-      mid = (mid + CAP - 1) % CAP;
-      members[(mid - inLeft + CAP) % CAP] = member;
-      inRight++;
-    } else {
-      // push leaf node into the tree
-      final Value[] leaf = new Value[NODE_SIZE];
-      final int start = (mid - NODE_SIZE + CAP) % CAP;
-      for(int i = 0; i < NODE_SIZE; i++) leaf[i] = members[(start + i) % CAP];
-      tree.prepend(new LeafNode(leaf));
+  public ArrayBuilder() {
+    this(-1);
+  }
 
-      // move rest of the nodes to the right
-      final int rest = inLeft - NODE_SIZE;
-      final int p0 = (mid - inLeft + CAP) % CAP;
-      for(int i = 0; i < rest; i++) {
-        final int from = (p0 + i) % CAP, to = (from + NODE_SIZE) % CAP;
-        members[to] = members[from];
+  /**
+   * Constructor.
+   * @param capacity initial capacity ({@link Integer#MIN_VALUE}: create no compact data structures)
+   */
+  public ArrayBuilder(final long capacity) {
+    this.capacity = capacity;
+  }
+
+  /**
+   * Appends a member to the array.
+   * @param value value to append
+   * @return reference to this builder for convenience
+   */
+  public ArrayBuilder add(final Value value) {
+    final Value sngl = single;
+    if(sngl != null) {
+      single = null;
+      if(capacity != Integer.MIN_VALUE) {
+        array = isStr(sngl) && isStr(value) ? new StrArrBuilder() :
+                isAtm(sngl) && isAtm(value) ? new AtmArrBuilder() :
+                isInt(sngl) && isInt(value) ? new IntArrBuilder() :
+                isDbl(sngl) && isDbl(value) ? new DblArrBuilder() :
+                isBln(sngl) && isBln(value) ? new BlnArrBuilder() : null;
       }
-
-      // insert the member
-      members[(mid - rest + CAP - 1) % CAP] = member;
-      inLeft = rest + 1;
+      if(array == null) array = new TreeArrayBuilder();
+      add(sngl);
+    }
+    if(array != null) {
+      array = array.add(value);
+    } else {
+      single = value;
     }
     return this;
   }
 
   /**
-   * Adds a member to the end of the array.
-   * @param member member to add
-   * @return self reference
-   */
-  public ArrayBuilder append(final Value member) {
-    if(inRight < XQArray.MAX_DIGIT) {
-      // just insert the member
-      members[(mid + inRight) % CAP] = member;
-      inRight++;
-    } else if(tree.isEmpty() && inLeft < XQArray.MAX_DIGIT) {
-      // move the middle to the right
-      mid = (mid + 1) % CAP;
-      members[(mid + inRight + CAP - 1) % CAP] = member;
-      inLeft++;
-    } else {
-      // push leaf node into the tree
-      final Value[] leaf = new Value[NODE_SIZE];
-      final int start = mid;
-      for(int i = 0; i < NODE_SIZE; i++) leaf[i] = members[(start + i) % CAP];
-      tree.append(new LeafNode(leaf));
-
-      // move rest of the nodes to the right
-      final int rest = inRight - NODE_SIZE;
-      for(int i = 0; i < rest; i++) {
-        final int to = (mid + i) % CAP, from = (to + NODE_SIZE) % CAP;
-        members[to] = members[from];
-      }
-
-      // insert the member
-      members[(mid + rest) % CAP] = member;
-      inRight = rest + 1;
-    }
-    return this;
-  }
-
-  /**
-   * Appends the given array to this builder.
-   * @param array array to append
-   * @return self reference
-   */
-  public ArrayBuilder append(final XQArray array) {
-    if(!(array instanceof BigArray)) {
-      for(final Value value : array.iterable()) append(value);
-    } else {
-      final BigArray big = (BigArray) array;
-      final Value[] ls = big.left, rs = big.right;
-      final FingerTree<Value, Value> midTree = big.middle;
-      if(midTree.isEmpty()) {
-        for(final Value l : big.left) append(l);
-        for(final Value r : big.right) append(r);
-      } else if(tree.isEmpty()) {
-        // merge middle digits
-        final int k = inLeft + inRight;
-        final Value[] temp = new Value[k];
-        final int l = (mid - inLeft + CAP) % CAP, m = CAP - l;
-        if(k <= m) {
-          Array.copyToStart(members, l, k, temp);
-        } else {
-          Array.copyToStart(members, l, m, temp);
-          Array.copyFromStart(members, k - m, temp, m);
-        }
-
-        inLeft = inRight = 0;
-        tree.append(midTree);
-        for(int i = ls.length; --i >= 0;) prepend(ls[i]);
-        for(int i = k; --i >= 0;) prepend(temp[i]);
-        for(final Value r : rs) append(r);
-      } else {
-        final int inMiddle = inRight + big.left.length,
-            leaves = (inMiddle + XQArray.MAX_LEAF - 1) / XQArray.MAX_LEAF,
-            leafSize = (inMiddle + leaves - 1) / leaves;
-        for(int i = 0, l = 0; l < leaves; l++) {
-          final int inLeaf = Math.min(leafSize, inMiddle - i);
-          final Value[] leaf = new Value[inLeaf];
-          for(int p = 0; p < inLeaf; p++) {
-            leaf[p] = i < inRight ? members[(mid + i) % CAP] : big.left[i - inRight];
-            i++;
-          }
-          tree.append(new LeafNode(leaf));
-        }
-
-        tree.append(big.middle);
-        inRight = 0;
-        for(final Value r : big.right) append(r);
-      }
-    }
-    return this;
-  }
-
-  /**
-   * Creates an {@link XQArray} containing the members of this builder.
-   * @return resulting array
+   * Returns a {@link Value} representation of the items currently stored in this builder.
+   * @return value
    */
   public XQArray array() {
     return array(SeqType.ARRAY);
   }
 
   /**
-   * Creates an {@link XQArray} containing the members of this builder.
-   * @param type array type
-   * @return resulting array
+   * Returns a {@link Value} representation of the items currently stored in this builder
+   * annotated with the given item type.
+   * @param type type (only considered if new result value is created)
+   * @return value
    */
   public XQArray array(final ArrayType type) {
-    // invalidate data structures
-    final FingerTreeBuilder<Value> builder = tree;
-    final Value[] values = members;
-    members = null;
-    tree = null;
-
-    final int n = inLeft + inRight;
-    if(n == 0) return XQArray.empty();
-    final int start = (mid - inLeft + CAP) % CAP;
-    if(n == 1) return new SingletonArray(values[start]);
-
-    if(n <= XQArray.MAX_SMALL) {
-      // small int array, fill directly
-      final Value[] small = new Value[n];
-      for(int i = 0; i < n; i++) small[i] = values[(start + i) % CAP];
-      return new SmallArray(small, type);
+    try {
+      return array != null ? array.array(type) : single != null ? XQArray.singleton(single) :
+        XQArray.empty();
+    } finally {
+      array = null;
+      single = null;
     }
-
-    // deep array
-    final int a = builder.isEmpty() ? n / 2 : inLeft, b = n - a;
-    final Value[] ls = new Value[a], rs = new Value[b];
-    for(int i = 0; i < a; i++) ls[i] = values[(start + i) % CAP];
-    for(int i = a; i < n; i++) rs[i - a] = values[(start + i) % CAP];
-    return new BigArray(ls, builder.freeze(), rs, type);
   }
 
   /**
@@ -206,22 +95,155 @@ public final class ArrayBuilder {
     return expr != null ? array((ArrayType) expr.seqType().type) : array();
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(Util.className(this)).append('[');
-    if(tree.isEmpty()) {
-      final int n = inLeft + inRight, first = (mid - inLeft + CAP) % CAP;
-      if(n > 0) {
-        sb.append(members[first]);
-        for(int i = 1; i < n; i++) sb.append(", ").append(members[(first + i) % CAP]);
+  /**
+   * Checks if the specified value is a string.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isStr(final Value value) {
+    return value instanceof Str && value.type == AtomType.STRING;
+  }
+
+  /**
+   * Checks if the specified value is a string.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isAtm(final Value value) {
+    return value.seqType().eq(SeqType.UNTYPED_ATOMIC_O);
+  }
+
+  /**
+   * Checks if the specified value is an integer value.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isInt(final Value value) {
+    return value.seqType().eq(SeqType.INTEGER_O);
+  }
+
+  /**
+   * Checks if the specified value is a double value.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isDbl(final Value value) {
+    return value.seqType().eq(SeqType.DOUBLE_O);
+  }
+
+  /**
+   * Checks if the specified value is a boolean value.
+   * @param value value
+   * @return result of check
+   */
+  static boolean isBln(final Value value) {
+    return value.seqType().eq(SeqType.BOOLEAN_O);
+  }
+
+  /** String array builder. */
+  final class StrArrBuilder implements ArrBuilder {
+    /** Values. */
+    private final TokenList values = new TokenList(capacity);
+
+    @Override
+    public ArrBuilder add(final Value value) {
+      if(isStr(value)) {
+        values.add(((Str) value).string());
+        return this;
       }
-    } else {
-      final int first = (mid - inLeft + CAP) % CAP;
-      sb.append(members[first]);
-      for(int i = 1; i < inLeft; i++) sb.append(", ").append(members[(first + i) % CAP]);
-      for(final Value value : tree) sb.append(", ").append(value);
-      for(int i = 0; i < inRight; i++) sb.append(", ").append(members[(mid + i) % CAP]);
+      return tree(value);
     }
-    return sb.append(']').toString();
+
+    @Override
+    public XQArray array(final ArrayType type) {
+      return new StrArray(values.finish());
+    }
+  }
+
+  /** Untyped atomic array  builder. */
+  final class AtmArrBuilder implements ArrBuilder {
+    /** Values. */
+    private final TokenList values = new TokenList(capacity);
+
+    @Override
+    public ArrBuilder add(final Value value) {
+      if(isAtm(value)) {
+        values.add(((Atm) value).string(null));
+        return this;
+      }
+      return tree(value);
+    }
+
+    @Override
+    public XQArray array(final ArrayType type) {
+      return new AtmArray(values.finish());
+    }
+  }
+
+  /** Integer array builder. */
+  final class IntArrBuilder implements ArrBuilder {
+    /** Values. */
+    private final LongList values = new LongList(capacity);
+
+    @Override
+    public ArrBuilder add(final Value value) {
+      if(isInt(value)) {
+        values.add(((Int) value).itr());
+        return this;
+      }
+      return tree(value);
+    }
+
+    @Override
+    public XQArray array(final ArrayType type) {
+      final int vs = values.size();
+      final long first = values.get(0);
+      boolean range = true;
+      int v = 0;
+      while(range && ++v < vs) {
+        range &= values.get(v) == first + v;
+      }
+      return v == vs ? new RangeArray(first, vs, true) : new IntArray(values.finish());
+    }
+  }
+
+  /** Double array builder. */
+  final class DblArrBuilder implements ArrBuilder {
+    /** Values. */
+    private final DoubleList values = new DoubleList(capacity);
+
+    @Override
+    public ArrBuilder add(final Value value) {
+      if(isDbl(value)) {
+        values.add(((Dbl) value).dbl());
+        return this;
+      }
+      return tree(value);
+    }
+
+    @Override
+    public XQArray array(final ArrayType type) {
+      return new DblArray(values.finish());
+    }
+  }
+
+  /** Boolean array builder. */
+  final class BlnArrBuilder implements ArrBuilder {
+    /** Values. */
+    private final BoolList values = new BoolList(capacity);
+
+    @Override
+    public ArrBuilder add(final Value value) {
+      if(isBln(value)) {
+        values.add(((Bln) value).bool(null));
+        return this;
+      }
+      return tree(value);
+    }
+
+    @Override
+    public XQArray array(final ArrayType type) {
+      return new BlnArray(values.finish());
+    }
   }
 }

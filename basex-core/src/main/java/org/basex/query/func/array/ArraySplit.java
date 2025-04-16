@@ -31,7 +31,7 @@ public final class ArraySplit extends ArrayFn {
       }
       @Override
       public Item get(final long i) {
-        return XQArray.singleton(array.get(i));
+        return XQArray.singleton(array.memberAt(i));
       }
       @Override
       public long size() {

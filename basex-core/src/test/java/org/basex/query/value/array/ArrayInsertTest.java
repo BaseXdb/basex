@@ -32,9 +32,8 @@ public final class ArrayInsertTest extends ArrayTest {
       assertEquals(size, list.size());
 
       if(i % 1000 == 999) {
-        array.checkInvariants();
         for(int j = 0; j < size; j++) {
-          assertEquals(list.get(j).intValue(), ((Int) array.get(j)).itr());
+          assertEquals(list.get(j).intValue(), ((Int) array.memberAt(j)).itr());
         }
       }
     }
@@ -53,10 +52,10 @@ public final class ArrayInsertTest extends ArrayTest {
     final Int val = Int.get(n);
     for(int i = 0; i <= n; i++) {
       final XQArray array2 = array.insertBefore(i, val, qc);
-      assertEquals(n, ((Int) array2.get(i)).itr());
+      assertEquals(n, ((Int) array2.memberAt(i)).itr());
       assertEquals(n + 1L, array2.structSize());
       for(int j = 0; j < n; j++) {
-        assertEquals(j, ((Int) array2.get(j < i ? j : j + 1)).itr());
+        assertEquals(j, ((Int) array2.memberAt(j < i ? j : j + 1)).itr());
       }
     }
   }

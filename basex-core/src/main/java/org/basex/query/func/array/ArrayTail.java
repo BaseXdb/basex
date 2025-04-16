@@ -19,7 +19,7 @@ public final class ArrayTail extends ArrayFn {
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     if(array == XQArray.empty()) throw ARRAYEMPTY.get(info);
-    return array.tail();
+    return array.subArray(1, array.structSize() - 1, qc);
   }
 
   @Override

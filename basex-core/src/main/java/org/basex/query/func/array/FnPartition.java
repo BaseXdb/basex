@@ -36,7 +36,7 @@ public final class FnPartition extends ArrayFn {
             value = item;
             if(!val.isEmpty()) {
               final ArrayBuilder ab = new ArrayBuilder();
-              for(final Item it : val) ab.append(it);
+              for(final Item it : val) ab.add(it);
               return ab.array();
             }
           } else {

@@ -60,8 +60,9 @@ public final class ArrayType extends FType {
   @Override
   public XQArray read(final DataInput in, final QueryContext qc)
       throws IOException, QueryException {
-    final ArrayBuilder ab = new ArrayBuilder();
-    for(int s = in.readNum() - 1; s >= 0; s--) ab.append(Store.read(in, qc));
+    int size = in.readNum();
+    final ArrayBuilder ab = new ArrayBuilder(size);
+    while(--size >= 0) ab.add(Store.read(in, qc));
     return ab.array();
   }
 

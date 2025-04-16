@@ -51,7 +51,7 @@ public class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected final void entry(final byte[] value) {
-    row.append(Str.get(shared.token(value)));
+    row.add(Str.get(shared.token(value)));
   }
 
   @Override
@@ -64,7 +64,7 @@ public class CsvXQueryConverter extends CsvConverter {
     final MapBuilder mb = new MapBuilder(headers.size());
     if(!headers.isEmpty()) {
       final ArrayBuilder names = new ArrayBuilder();
-      for(final byte[] header : headers) names.append(Str.get(header));
+      for(final byte[] header : headers) names.add(Str.get(header));
       mb.put(NAMES, names.array(STRING_ARRAY));
     }
     return mb.put(RECORDS, rows.value(STRING_ARRAY)).map();

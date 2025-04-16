@@ -136,9 +136,4 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
     toString(elem, sb, indent + 1);
     sb.append('\n').append("  ".repeat(indent)).append(']');
   }
-
-  @Override
-  public long checkInvariants() {
-    return elem.checkInvariants();
-  }
 }

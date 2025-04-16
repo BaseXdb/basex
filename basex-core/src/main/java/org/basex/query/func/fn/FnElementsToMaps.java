@@ -278,7 +278,7 @@ public final class FnElementsToMaps extends StandardFunc {
 
     final ArrayBuilder ab = new ArrayBuilder();
     for(final ANode attr : children(NodeType.ATTRIBUTE, node)) {
-      ab.append(new MapBuilder().put(nodeName(attr, node, format), attr.string()).map());
+      ab.add(new MapBuilder().put(nodeName(attr, node, format), attr.string()).map());
     }
     for(final ANode child : node.childIter()) {
       Item item = null;
@@ -300,7 +300,7 @@ public final class FnElementsToMaps extends StandardFunc {
           break;
         default:
       }
-      if(item != null) ab.append(item);
+      if(item != null) ab.add(item);
     }
     return ab.array();
   }
@@ -340,7 +340,7 @@ public final class FnElementsToMaps extends StandardFunc {
         }
         final ArrayBuilder ab = new ArrayBuilder();
         for(final ANode child : children) {
-          ab.append(layout(child, format).apply(child, null, format));
+          ab.add(layout(child, format).apply(child, null, format));
         }
         return ab.array();
       }
@@ -372,10 +372,10 @@ public final class FnElementsToMaps extends StandardFunc {
         for(final byte[] name : cache) {
           final ArrayBuilder ab = new ArrayBuilder();
           for(final ANode child : cache.get(name)) {
-            ab.append(layout(child, format).apply(child, node, format));
+            ab.add(layout(child, format).apply(child, node, format));
           }
           final XQArray array = ab.array();
-          map.put(name, array.structSize() == 1 ? array.get(0) : array);
+          map.put(name, array.structSize() == 1 ? array.memberAt(0) : array);
         }
         return map.map();
      }

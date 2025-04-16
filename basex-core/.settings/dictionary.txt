@@ -338,6 +338,7 @@ testcase
 testsuites
 testsuite
 testinit
+subarray
 subarrays
 jav
 quaternary

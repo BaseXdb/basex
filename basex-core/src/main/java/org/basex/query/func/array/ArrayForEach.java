@@ -24,7 +24,7 @@ public final class ArrayForEach extends ArrayFn {
     final HofArgs args = new HofArgs(2, action);
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : array.iterable()) {
-      ab.append(invoke(action, args.set(0, value).inc(), qc));
+      ab.add(invoke(action, args.set(0, value).inc(), qc));
     }
     return ab.array(this);
   }

@@ -835,23 +835,6 @@ final class DeepTree<N, E> extends FingerTree<N, E> {
     sb.append("  ".repeat(indent + 1)).append("]\n").append("  ".repeat(indent)).append(']');
   }
 
-  @Override
-  public long checkInvariants() {
-    if(left.length < 1 || left.length > MAX_DIGIT) throw new AssertionError(
-        "Wrong left digit length: " + left.length);
-    long sz = 0;
-    for(final Node<N, E> nd : left)
-      sz += nd.checkInvariants();
-    if(sz != leftSize) throw new AssertionError("Wrong leftSize: " + leftSize + " vs. " + sz);
-    sz += middle.checkInvariants();
-    if(right.length < 1 || right.length > MAX_DIGIT) throw new AssertionError(
-        "Wrong right digit length: " + right.length);
-    for(final Node<N, E> nd : right)
-      sz += nd.checkInvariants();
-    if(sz != size) throw new AssertionError("Wrong size: " + size + " vs. " + sz);
-    return sz;
-  }
-
   /**
    * Calculates the size of a digit.
    * @param <N> node type

@@ -85,11 +85,4 @@ public interface Node<N, E> extends NodeLike<N, E> {
    * @return the subtree, possibly under-full
    */
   NodeLike<N, E> slice(long off, long len);
-
-  /**
-   * Checks that this node does not violate any invariants.
-   * @return this node's size
-   * @throws AssertionError if an invariant was violated
-   */
-  long checkInvariants();
 }

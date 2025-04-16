@@ -32,7 +32,7 @@ public final class ArrayMembers extends StandardFunc {
       }
       @Override
       public Item get(final long i) {
-        return record(array.get(i));
+        return record(array.memberAt(i));
       }
       @Override
       public long size() {

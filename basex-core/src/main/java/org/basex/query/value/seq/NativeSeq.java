@@ -2,7 +2,6 @@ package org.basex.query.value.seq;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -33,26 +32,6 @@ abstract class NativeSeq extends Seq {
   @Override
   public final boolean sameType() {
     return true;
-  }
-
-  /**
-   * {@inheritDoc}
-   * Because this function will mostly be invoked recursively, the standard implementation
-   * will be called, because its runtime outweighs the possibly higher memory consumption.
-   */
-  @Override
-  public final Value insertBefore(final long pos, final Item item, final QueryContext qc) {
-    return copyInsert(pos, item, qc);
-  }
-
-  /**
-   * {@inheritDoc}
-   * Because this function will mostly be invoked recursively, the standard implementation
-   * will be called, because its runtime outweighs the possibly higher memory consumption.
-   */
-  @Override
-  public final Value remove(final long pos, final QueryContext qc) {
-    return copyRemove(pos, qc);
   }
 
   @Override

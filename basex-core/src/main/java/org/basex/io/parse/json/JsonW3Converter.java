@@ -104,7 +104,7 @@ public final class JsonW3Converter extends JsonConverter {
   @Override
   void closeArray() {
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final Value value : arrays.pop()) ab.append(value);
+    for(final Value value : arrays.pop()) ab.add(value);
     stack.push(ab.array());
   }
 

@@ -38,7 +38,7 @@ public final class ArrayRemoveTest extends ArrayTest {
       }
       array1 = array1.append(Int.get(k));
       assertEquals(k + 1, array1.structSize());
-      assertEquals(k, ((Int) array1.foot()).itr());
+      assertEquals(k, ((Int) array1.memberAt(k)).itr());
     }
   }
 
@@ -46,17 +46,17 @@ public final class ArrayRemoveTest extends ArrayTest {
   @Test public void collapseMiddleTest() {
     final XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
-    XQArray array2 = array.tail();
+    XQArray array2 = array.subArray(1, array.structSize() - 1, qc);
     array2 = array2.remove(4, qc);
     array2 = array2.remove(2, qc);
     assertContains(array2, 1, 2, 4, 6, 7, 8);
 
-    array2 = array.prepend(Int.get(-1)).append(Int.get(9));
+    array2 = array.insertBefore(0, Int.get(-1), qc).append(Int.get(9));
     array2 = array2.remove(5, qc);
     array2 = array2.remove(5, qc);
     assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8, 9);
 
-    array2 = array.prepend(Int.get(-1));
+    array2 = array.insertBefore(0, Int.get(-1), qc);
     array2 = array2.remove(5, qc);
     array2 = array2.remove(5, qc);
     assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8);
@@ -81,7 +81,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     array = array.remove(5, qc);
     assertContains(array, 0, 1, 2, 3, 4);
 
-    array = from(1, 2, 3, 4, 5, 6, 7, 8, 9).prepend(Int.ZERO);
+    array = from(1, 2, 3, 4, 5, 6, 7, 8, 9).insertBefore(0, Int.ZERO, qc);
     for(int i = 9; i >= 4; i--) {
       array = array.remove(i, qc);
     }
@@ -167,7 +167,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     array = from(
         5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
-    for(int i = 4; i >= 0; i--) array = array.prepend(Int.get(i));
+    for(int i = 4; i >= 0; i--) array = array.insertBefore(0, Int.get(i), qc);
     for(int i = 31; i <= 35; i++) array = array.append(Int.get(i));
     for(int i = 22; i >= 16; i--) array = array.remove(i, qc);
     assertContains(array, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
@@ -196,7 +196,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     for(int i = 0; i < n; i++) list.add(Int.get(i));
 
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final Value value : list) ab.append(value);
+    for(final Value value : list) ab.add(value);
     XQArray array = ab.array();
 
     final Random rng = new Random(42);
@@ -209,9 +209,8 @@ public final class ArrayRemoveTest extends ArrayTest {
       assertEquals(size, list.size());
 
       if(i % 1000 == 999) {
-        array.checkInvariants();
         for(int j = 0; j < size; j++) {
-          assertEquals(((Int) list.get(j)).itr(), ((Int) array.get(j)).itr());
+          assertEquals(((Int) list.get(j)).itr(), ((Int) array.memberAt(j)).itr());
         }
       }
     }
@@ -248,7 +247,7 @@ public final class ArrayRemoveTest extends ArrayTest {
    */
   private static XQArray from(final int... values) {
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final int value : values) ab.append(Int.get(value));
+    for(final int value : values) ab.add(Int.get(value));
     return ab.array();
   }
 

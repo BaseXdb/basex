@@ -300,13 +300,6 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
   abstract void toString(StringBuilder sb, int indent);
 
   /**
-   * Checks that this tree does not violate any invariants.
-   * @return number of elements in this tree
-   * @throws AssertionError if any invariant was violated
-   */
-  public abstract long checkInvariants();
-
-  /**
    * Creates a {@link ListIterator} over the elements in this tree.
    * @param start starting position
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})

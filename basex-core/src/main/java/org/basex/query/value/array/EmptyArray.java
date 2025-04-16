@@ -20,7 +20,7 @@ final class EmptyArray extends XQArray {
 
   /** Hidden constructor. */
   private EmptyArray() {
-    super(SeqType.ARRAY);
+    super(0, SeqType.ARRAY);
   }
 
   @Override
@@ -29,16 +29,16 @@ final class EmptyArray extends XQArray {
 
   @Override
   public XQArray prepend(final Value head) {
-    return new SingletonArray(head);
+    return singleton(head);
   }
 
   @Override
   public XQArray append(final Value last) {
-    return new SingletonArray(last);
+    return singleton(last);
   }
 
   @Override
-  public Value get(final long index) {
+  public Value memberAt(final long index) {
     throw Util.notExpected();
   }
 
@@ -48,67 +48,17 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public long structSize() {
-    return 0;
-  }
-
-  @Override
-  public XQArray concat(final XQArray other) {
-    return other;
-  }
-
-  @Override
-  public Value head() {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public Value foot() {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public XQArray trunk() {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public XQArray tail() {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public XQArray subArray(final long pos, final long length, final QueryContext qc) {
-    return this;
-  }
-
-  @Override
   public XQArray reverseArray(final QueryContext qc) {
     return this;
   }
 
   @Override
   public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
-    return new SingletonArray(value);
+    return singleton(value);
   }
 
   @Override
-  public XQArray remove(final long pos, final QueryContext qc) {
-    throw Util.notExpected();
-  }
-
-  @Override
-  public ListIterator<Value> iterator(final long size) {
+  public ListIterator<Value> iterator(final long start) {
     return Collections.emptyListIterator();
-  }
-
-  @Override
-  void checkInvariants() {
-    // nothing can go wrong
-  }
-
-  @Override
-  XQArray prepend(final SmallArray array) {
-    return array;
   }
 }

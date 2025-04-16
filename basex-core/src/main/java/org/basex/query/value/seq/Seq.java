@@ -17,7 +17,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -40,35 +39,6 @@ public abstract class Seq extends Value {
   protected Seq(final long size, final Type type) {
     super(type);
     this.size = size;
-  }
-
-  @Override
-  public Object toJava() throws QueryException {
-    // determine type (static or exact)
-    Type tp = type;
-    if(tp == AtomType.ITEM) {
-      tp = null;
-      for(final Item item : this) {
-        final Type st = item.type;
-        tp = tp == null ? st : tp.union(st);
-      }
-    }
-
-    // shortcut for strings (avoid intermediate token representation)
-    final int sz = (int) size;
-    if(tp == AtomType.STRING) {
-      final StringList list = new StringList(sz);
-      for(final Item item : this) list.add(item.string(null));
-      return list.finish();
-    }
-    // try to create custom Java representation
-    final Value value = get(sz, tp, this);
-    if(value != null) return value.toJava();
-
-    int a = 0;
-    final Object[] array = new Object[sz];
-    for(final Item item : this) array[a++] = item.toJava();
-    return array;
   }
 
   @Override
@@ -141,66 +111,45 @@ public abstract class Seq extends Value {
 
   /**
    * Inserts a value at the given position into this sequence and returns the resulting sequence.
+   * By default, the sequence will be converted to the tree representation,
+   * because its runtime outweighs the possibly higher memory consumption.
    * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
    * @param value value to insert
    * @param qc query context
    * @return resulting value
    */
-  public final Value insert(final long pos, final Value value, final QueryContext qc) {
-    final long n = value.size();
-    return n == 0 ? this : n == 1 ? insertBefore(pos, (Item) value, qc) :
-      copyInsert(pos, value, qc);
-  }
-
-  /**
-   * Inserts an item at the given position into this sequence and returns the resulting sequence.
-   * @param pos position at which the item should be inserted, must be between 0 and {@link #size}
-   * @param item item to insert
-   * @param qc query context
-   * @return resulting value
-   */
-  public abstract Value insertBefore(long pos, Item item, QueryContext qc);
-
-  /**
-   * Helper for {@link #insert(long, Value, QueryContext)} that copies all items into a
-   * {@link TreeSeq}.
-   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
-   * @param value value to insert
-   * @param qc query context
-   * @return resulting value
-   */
-  protected Value copyInsert(final long pos, final Value value, final QueryContext qc) {
-    final Type tp = type.union(value.type);
-    if(pos == size) return new TreeSeqBuilder().add(this, qc).add(value, qc).value(tp);
-
-    // avoid compact data structures (tree sequence builder is much faster for repeated updates)
-    final ValueBuilder vb = new ValueBuilder(qc, Integer.MIN_VALUE);
-    for(long i = 0; i < pos; i++) vb.add(itemAt(i));
-    vb.add(value);
-    for(long i = pos; i < size; i++) vb.add(itemAt(i));
-    return vb.value(tp);
+  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
+    return toTree(qc).insertBefore(pos, value, qc);
   }
 
   /**
    * Removes the item at the given position in this sequence and returns the resulting sequence.
+   * By default, the sequence will be converted to the tree representation,
+   * because its runtime outweighs the possibly higher memory consumption.
    * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
    * @param qc query context
    * @return resulting sequence
    */
-  public abstract Value remove(long pos, QueryContext qc);
+  public Value remove(final long pos, final QueryContext qc) {
+    return toTree(qc).remove(pos, qc);
+  }
 
   /**
-   * Helper for {@link #remove(long, QueryContext)} that copies all items into a {@link TreeSeq}.
-   * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
+   * Creates a tree representation of this array.
    * @param qc query context
-   * @return resulting sequence
+   * @return array
    */
-  final Value copyRemove(final long pos, final QueryContext qc) {
-    // avoid compact data structures (tree sequence builder is much faster for repeated updates)
+  private Seq toTree(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc, Integer.MIN_VALUE);
-    for(long i = 0; i < pos; i++) vb.add(itemAt(i));
-    for(long i = pos + 1; i < size; i++) vb.add(itemAt(i));
-    return vb.value(type);
+    for(final Item item : this) vb.add(item);
+    return (Seq) vb.value(type);
+  }
+
+  @Override
+  public Value reverse(final QueryContext qc) {
+    final ValueBuilder vb = new ValueBuilder(qc, size);
+    for(long i = size - 1; i >= 0; i--) vb.add(itemAt(i));
+    return vb.value(this);
   }
 
   @Override
@@ -271,6 +220,35 @@ public abstract class Seq extends Value {
       }
     }
     return true;
+  }
+
+  @Override
+  public Object toJava() throws QueryException {
+    // determine type (static or exact)
+    Type tp = type;
+    if(tp == AtomType.ITEM) {
+      tp = null;
+      for(final Item item : this) {
+        final Type st = item.type;
+        tp = tp == null ? st : tp.union(st);
+      }
+    }
+
+    // shortcut for strings (avoid intermediate token representation)
+    final int sz = (int) size;
+    if(tp == AtomType.STRING) {
+      final StringList list = new StringList(sz);
+      for(final Item item : this) list.add(item.string(null));
+      return list.finish();
+    }
+    // try to create custom Java representation
+    final Value value = get(sz, tp, this);
+    if(value != null) return value.toJava();
+
+    int a = 0;
+    final Object[] array = new Object[sz];
+    for(final Item item : this) array[a++] = item.toJava();
+    return array;
   }
 
   @Override

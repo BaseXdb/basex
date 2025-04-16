@@ -25,7 +25,6 @@ public final class ArraySliceTest extends ArrayTest {
         for(int k = 0; k <= len - pos; k++) {
           final XQArray sub = array.subArray(pos, k, qc);
           assertEquals(k, sub.structSize());
-          sub.checkInvariants();
           final Iterator<Value> iter = sub.iterator(0);
           for(int i = 0; i < k; i++) {
             final long result = ((Int) iter.next()).itr();

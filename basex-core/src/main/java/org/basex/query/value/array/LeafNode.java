@@ -22,7 +22,7 @@ final class LeafNode implements Node<Value, Value> {
    */
   LeafNode(final Value[] values) {
     this.values = values;
-    assert values.length >= XQArray.MIN_LEAF && values.length <= XQArray.MAX_LEAF;
+    assert values.length >= TreeArray.MIN_LEAF && values.length <= TreeArray.MAX_LEAF;
   }
 
   @Override
@@ -53,17 +53,17 @@ final class LeafNode implements Node<Value, Value> {
     vals[p] = value;
     Array.copy(values, p, n - p, vals, p + 1);
 
-    if(n < XQArray.MAX_LEAF) {
+    if(n < TreeArray.MAX_LEAF) {
       // there is capacity
       siblings[1] = new LeafNode(vals);
       return false;
     }
 
     final LeafNode left = (LeafNode) siblings[0];
-    if(left != null && left.values.length < XQArray.MAX_LEAF) {
+    if(left != null && left.values.length < TreeArray.MAX_LEAF) {
       // push elements to the left sibling
       final Value[] lvals = left.values;
-      final int l = lvals.length, diff = XQArray.MAX_LEAF - l, move = (diff + 1) / 2;
+      final int l = lvals.length, diff = TreeArray.MAX_LEAF - l, move = (diff + 1) / 2;
       final Value[] newLeft = new Value[l + move], newRight = new Value[n + 1 - move];
       Array.copy(lvals, l, newLeft);
       Array.copyFromStart(vals, move, newLeft, l);
@@ -74,10 +74,10 @@ final class LeafNode implements Node<Value, Value> {
     }
 
     final LeafNode right = (LeafNode) siblings[2];
-    if(right != null && right.values.length < XQArray.MAX_LEAF) {
+    if(right != null && right.values.length < TreeArray.MAX_LEAF) {
       // push elements to the right sibling
       final Value[] rvals = right.values;
-      final int r = rvals.length, diff = XQArray.MAX_LEAF - r, move = (diff + 1) / 2,
+      final int r = rvals.length, diff = TreeArray.MAX_LEAF - r, move = (diff + 1) / 2,
           l = n + 1 - move;
       final Value[] newLeft = new Value[l], newRight = new Value[r + move];
       Array.copy(vals, l, newLeft);
@@ -105,7 +105,7 @@ final class LeafNode implements Node<Value, Value> {
     final int p = (int) pos, n = values.length;
     @SuppressWarnings("unchecked")
     final NodeLike<Value, Value>[] out = new NodeLike[] { left, null, right };
-    if(n > XQArray.MIN_LEAF) {
+    if(n > TreeArray.MIN_LEAF) {
       // we do not have to split
       final Value[] vals = new Value[n - 1];
       Array.copy(values, p, vals);
@@ -115,10 +115,10 @@ final class LeafNode implements Node<Value, Value> {
     }
 
     final LeafNode leftLeaf = (LeafNode) left;
-    if(leftLeaf != null && leftLeaf.arity() > XQArray.MIN_LEAF) {
+    if(leftLeaf != null && leftLeaf.arity() > TreeArray.MIN_LEAF) {
       // steal from the left neighbor
       final Value[] lvals = leftLeaf.values;
-      final int l = lvals.length, diff = l - XQArray.MIN_LEAF, move = (diff + 1) / 2;
+      final int l = lvals.length, diff = l - TreeArray.MIN_LEAF, move = (diff + 1) / 2;
       final int ll = l - move, rl = n - 1 + move;
       final Value[] newLeft = new Value[ll], newRight = new Value[rl];
 
@@ -132,10 +132,10 @@ final class LeafNode implements Node<Value, Value> {
     }
 
     final LeafNode rightLeaf = (LeafNode) right;
-    if(rightLeaf != null && rightLeaf.arity() > XQArray.MIN_LEAF) {
+    if(rightLeaf != null && rightLeaf.arity() > TreeArray.MIN_LEAF) {
       // steal from the right neighbor
       final Value[] rvals = rightLeaf.values;
-      final int r = rvals.length, diff = r - XQArray.MIN_LEAF, move = (diff + 1) / 2;
+      final int r = rvals.length, diff = r - TreeArray.MIN_LEAF, move = (diff + 1) / 2;
       final int ll = n - 1 + move, rl = r - move;
       final Value[] newLeft = new Value[ll], newRight = new Value[rl];
 
@@ -195,7 +195,7 @@ final class LeafNode implements Node<Value, Value> {
 
     final Value[] ls = ((PartialLeafNode) left).elems, rs = values;
     final int l = ls.length, r = rs.length, n = l + r;
-    if(n <= XQArray.MAX_LEAF) {
+    if(n <= TreeArray.MAX_LEAF) {
       // merge into one node
       final Value[] vals = new Value[n];
       Array.copy(ls, l, vals);
@@ -220,14 +220,7 @@ final class LeafNode implements Node<Value, Value> {
     final int p = (int) off, n = (int) size;
     final Value[] out = new Value[n];
     Array.copyToStart(values, p, n, out);
-    return n < XQArray.MIN_LEAF ? new PartialLeafNode(out) : new LeafNode(out);
-  }
-
-  @Override
-  public long checkInvariants() {
-    if(values.length < XQArray.MIN_LEAF || values.length > XQArray.MAX_LEAF)
-      throw new AssertionError("Wrong " + Util.className(this) + " size: " + values.length);
-    return values.length;
+    return n < TreeArray.MIN_LEAF ? new PartialLeafNode(out) : new LeafNode(out);
   }
 
   @Override

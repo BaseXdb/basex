@@ -66,7 +66,7 @@ public final class StructFilter extends AFilter {
             qc.checkStop();
             qf.value = value;
             qf.pos = a.incrementAndGet();
-            if(expr.test(qc, info, a.get())) ab.append(value);
+            if(expr.test(qc, info, a.get())) ab.add(value);
           }
           item = ab.array();
         } else {

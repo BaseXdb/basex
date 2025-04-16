@@ -224,13 +224,6 @@ final class LeafNode implements Node<Item, Item> {
   }
 
   @Override
-  public long checkInvariants() {
-    if(values.length < TreeSeq.MIN_LEAF || values.length > TreeSeq.MAX_LEAF)
-      throw new AssertionError("Wrong " + Util.className(this) + " size: " + values.length);
-    return values.length;
-  }
-
-  @Override
   public int arity() {
     return values.length;
   }

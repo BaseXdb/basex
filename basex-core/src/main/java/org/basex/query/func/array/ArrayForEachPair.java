@@ -27,7 +27,7 @@ public final class ArrayForEachPair extends ArrayFn {
     final ArrayBuilder ab = new ArrayBuilder();
     final Iterator<Value> as = array1.iterator(0), bs = array2.iterator(0);
     while(as.hasNext() && bs.hasNext()) {
-      ab.append(invoke(action, args.set(0, as.next()).set(1, bs.next()).inc(), qc));
+      ab.add(invoke(action, args.set(0, as.next()).set(1, bs.next()).inc(), qc));
     }
     return ab.array(this);
   }

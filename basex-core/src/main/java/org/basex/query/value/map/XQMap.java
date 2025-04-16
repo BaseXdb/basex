@@ -43,7 +43,6 @@ public abstract class XQMap extends XQStruct {
 
   /**
    * The empty map.
-   * Running time: <i>O(1)</i> and no allocation
    * @return (unique) instance of an empty map
    */
   public static XQMap empty() {

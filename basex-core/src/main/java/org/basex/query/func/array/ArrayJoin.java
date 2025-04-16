@@ -36,10 +36,11 @@ public final class ArrayJoin extends ArrayFn {
       for(final Value value : toArray(separator).iterable()) sep.add(value);
     }
 
-    final ArrayBuilder ab = new ArrayBuilder().append(toArray(item));
+    final ArrayBuilder ab = new ArrayBuilder();
+    for(final Value value : toArray(item).iterable()) ab.add(value);
     while((item = qc.next(iter)) != null) {
-      for(final Value value : sep) ab.append(value);
-      ab.append(toArray(item));
+      for(final Value value : sep) ab.add(value);
+      for(final Value value : toArray(item).iterable()) ab.add(value);
     }
     return ab.array(this);
   }

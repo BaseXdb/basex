@@ -10,11 +10,10 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * A builder for efficiently creating a {@link Value} by prepending and appending
- * {@link Item}s and {@link Value}s.
+ * A builder for efficiently creating a {@link Value}.
  *
  * @author BaseX Team, BSD License
- * @author Leo Woerteler
+ * @author Christian Gruen
  */
 public final class ValueBuilder {
   /** QueryContext. */
@@ -59,8 +58,8 @@ public final class ValueBuilder {
     final long size2 = value2.size();
     if(size2 == 0) return value1;
     // prepend or append values
-    if(size1 > 1) return ((Seq) value1).insert(size1, value2, qc);
-    if(size2 > 1) return ((Seq) value2).insertBefore(0, (Item) value1, qc);
+    if(size1 > 1) return ((Seq) value1).insertBefore(size1, value2, qc);
+    if(size2 > 1) return ((Seq) value2).insertBefore(0, value1, qc);
     // concatenate single items
     return concat((Item) value1, (Item) value2);
   }

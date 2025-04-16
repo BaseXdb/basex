@@ -28,28 +28,21 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public abstract class XQArray extends XQStruct {
-  /** Minimum size of a leaf. */
-  static final int MIN_LEAF = 8;
-  /** Maximum size of a leaf. */
-  static final int MAX_LEAF = 2 * MIN_LEAF - 1;
-  /** Minimum number of elements in a digit. */
-  static final int MIN_DIGIT = MIN_LEAF / 2;
-  /** Maximum number of elements in a digit. */
-  static final int MAX_DIGIT = MAX_LEAF + MIN_DIGIT;
-  /** Maximum size of a small array. */
-  static final int MAX_SMALL = 2 * MIN_DIGIT - 1;
+  /** Length. */
+  protected long size;
 
   /**
    * Default constructor.
+   * @param size size
    * @param type function type
    */
-  XQArray(final Type type) {
+  XQArray(final long size, final Type type) {
     super(type);
+    this.size = size;
   }
 
   /**
    * The empty array.
-   * Running time: <i>O(1)</i> and no allocation
    * @return (unique) instance of an empty array
    */
   public static XQArray empty() {
@@ -65,29 +58,35 @@ public abstract class XQArray extends XQStruct {
     return new SingletonArray(value);
   }
 
-  /**
-   * Prepends a value to the front of this array.
-   * Running time: <i>O(1)*</i>
-   * @param head value to prepend
-   * @return resulting array
-   */
-  public abstract XQArray prepend(Value head);
-
-  /**
-   * Appends a value to the end of this array.
-   * Running time: <i>O(1)*</i>
-   * @param last value to append
-   * @return resulting array
-   */
-  public abstract XQArray append(Value last);
+  @Override
+  public final long structSize() {
+    return size;
+  }
 
   /**
    * Gets the value at the given position in this array.
-   * Running time: <i>O(log n)</i>
    * @param index index of the value to get
    * @return the corresponding value
    */
-  public abstract Value get(long index);
+  public abstract Value memberAt(long index);
+
+  /**
+   * Prepends a value to the front of this array.
+   * @param head value to prepend
+   * @return resulting array
+   */
+  public XQArray prepend(final Value head) {
+    return toTree().prepend(head);
+  }
+
+  /**
+   * Appends a value to the end of this array.
+   * @param last value to append
+   * @return resulting array
+   */
+  public XQArray append(final Value last) {
+    return toTree().append(last);
+  }
 
   /**
    * Returns a copy of this array where the value at the given position is
@@ -96,91 +95,81 @@ public abstract class XQArray extends XQStruct {
    * @param value value to put into this array
    * @return resulting array
    */
-  public abstract XQArray put(long pos, Value value);
+  public XQArray put(final long pos, final Value value) {
+    return toTree().put(pos, value);
+  }
 
   /**
-   * Concatenates this array with another one.
-   * Running time: <i>O(log (min { this.arraySize(), other.arraySize() }))</i>
-   * @param other array to append to the end of this array
-   * @return resulting array
+   * Returns a subsequence of this array with the given start and length.
+   * @param start starting position
+   * @param length number of items
+   * @param qc query context
+   * @return sub sequence
    */
-  public abstract XQArray concat(XQArray other);
+  public final XQArray subArray(final long start, final long length, final QueryContext qc) {
+    return length == 0 ? empty() :
+           length == 1 ? singleton(memberAt(start)) :
+           length == structSize() ? this :
+           subArr(start, length, qc);
+  }
 
   /**
-   * Returns the first value of this array.
-   * Running time: <i>O(1)</i>
-   * @return first value
-   */
-  public abstract Value head();
-
-  /**
-   * Returns the last value of this array.
-   * Running time: <i>O(1)</i>
-   * @return last value
-   */
-  public abstract Value foot();
-
-  /**
-   * Returns the array without the last value.
-   * Running time: <i>O(1)*</i>
-   * @return new array
-   */
-  public abstract XQArray trunk();
-
-  /**
-   * Returns the array without the first value.
-   * same order), except for the first one.
-   * Running time: <i>O(1)*</i>
-   * @return new array
-   */
-  public abstract XQArray tail();
-
-  /**
-   * Extracts a contiguous part of this array.
-   * @param pos position of first value
-   * @param length number of values
+   * Returns a subsequence of this array with the given start and length.
+   * @param pos position of first member
+   * @param length number of members
    * @param qc query context
    * @return the sub-array
    */
-  public abstract XQArray subArray(long pos, long length, QueryContext qc);
-
-  /**
-   * Returns an array with the same values as this one, but their order reversed.
-   * Running time: <i>O(n)</i>
-   * @param qc query context
-   * @return reversed version of this array
-   */
-  public abstract XQArray reverseArray(QueryContext qc);
+  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
+    qc.checkStop();
+    return new SubArray(this, pos, length);
+  }
 
   /**
    * Inserts the given value at the given position into this array.
-   * Running time: <i>O(log n)</i>
+   * By default, the array will be converted to the tree representation,
+   * because its runtime outweighs the possibly higher memory consumption.
    * @param pos insertion position, must be between {@code 0} and {@code arraySize()}
    * @param value value to insert
    * @param qc query context
    * @return resulting array
    */
-  public abstract XQArray insertBefore(long pos, Value value, QueryContext qc);
+  public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
+    return toTree().insertBefore(pos, value, qc);
+  }
 
   /**
    * Removes the value at the given position in this array.
-   * Running time: <i>O(log n)</i>
+   * By default, the array will be converted to the tree representation,
+   * because its runtime outweighs the possibly higher memory consumption.
    * @param pos deletion position, must be between {@code 0} and {@code arraySize() - 1}
    * @param qc query context
    * @return resulting array
    */
-  public abstract XQArray remove(long pos, QueryContext qc);
+  public XQArray remove(final long pos, final QueryContext qc) {
+    return toTree().remove(pos, qc);
+  }
+
+  /**
+   * Returns an array with the same values as this one, but their order reversed.
+   * @param qc query context
+   * @return reversed version of this array
+   */
+  public XQArray reverseArray(final QueryContext qc) {
+    qc.checkStop();
+    final ArrayBuilder ab = new ArrayBuilder(size);
+    for(long i = size - 1; i >= 0; i--) ab.add(memberAt(i));
+    return ab.array(this);
+  }
 
   @Override
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(structSize());
-    for(final Value value : iterable()) {
-      Store.write(out, value);
-    }
+    for(final Value value : iterable()) Store.write(out, value);
   }
 
   @Override
-  public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+  public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
     for(final Value value : iterable()) value.cache(lazy, ii);
   }
 
@@ -190,7 +179,56 @@ public abstract class XQArray extends XQStruct {
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return array over the array values
    */
-  public abstract ListIterator<Value> iterator(long start);
+  public ListIterator<Value> iterator(final long start) {
+    return new ListIterator<>() {
+      private int index = (int) start;
+
+      @Override
+      public int nextIndex() {
+        return index;
+      }
+
+      @Override
+      public boolean hasNext() {
+        return index < structSize();
+      }
+
+      @Override
+      public Value next() {
+        return memberAt(index++);
+      }
+
+      @Override
+      public int previousIndex() {
+        return index - 1;
+      }
+
+      @Override
+      public boolean hasPrevious() {
+        return index > 0;
+      }
+
+      @Override
+      public Value previous() {
+        return memberAt(--index);
+      }
+
+      @Override
+      public void set(final Value e) {
+        throw Util.notExpected();
+      }
+
+      @Override
+      public void add(final Value e) {
+        throw Util.notExpected();
+      }
+
+      @Override
+      public void remove() {
+        throw Util.notExpected();
+      }
+    };
+  }
 
   /** Iterable over the values of this array. */
   private Iterable<Value> iterable;
@@ -205,7 +243,7 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  public final Iter items() throws QueryException {
+  public Iter items() throws QueryException {
     return new Iter() {
       final Iterator<Value> values = iterator(0);
       Iter ir;
@@ -225,59 +263,13 @@ public abstract class XQArray extends XQStruct {
   }
 
   /**
-   * Prepends the given array to this array.
-   * @param array small array
-   * @return resulting array
-   */
-  abstract XQArray prepend(SmallArray array);
-
-  /**
-   * Returns an array containing the values at the indices {@code from} to {@code to - 1} in
-   * the given array. Its length is always {@code to - from}. If {@code from} is smaller than zero,
-   * the first {@code -from} entries in the resulting array are {@code null}.
-   * If {@code to > arr.length} then the last {@code to - arr.length} entries are {@code null}.
-   * If {@code from == 0 && to == arr.length}, the original array is returned.
-   * @param values input values
-   * @param from first index, inclusive (can be negative)
-   * @param to last index, exclusive (can be greater than {@code arr.length})
-   * @return resulting array
-   */
-  static Value[] slice(final Value[] values, final int from, final int to) {
-    final Value[] out = new Value[to - from];
-    final int in0 = Math.max(0, from), in1 = Math.min(to, values.length);
-    final int out0 = Math.max(-from, 0);
-    Array.copy(values, in0, in1 - in0, out, out0);
-    return out;
-  }
-
-  /**
-   * Concatenates the two int arrays.
-   * @param values1 first values
-   * @param values2 second values
-   * @return resulting array
-   */
-  static Value[] concat(final Value[] values1, final Value[] values2) {
-    final int l = values1.length, r = values2.length, n = l + r;
-    final Value[] out = new Value[n];
-    Array.copy(values1, l, out);
-    Array.copyFromStart(values2, r, out, l);
-    return out;
-  }
-
-  /**
    * Creates a new array type.
    * @param value value to be added
    * @return union type
    */
-  final Type union(final Value value) {
+  final ArrayType union(final Value value) {
     return ((ArrayType) type).union(value.seqType());
   }
-
-  /**
-   * Checks that this array implementation does not violate any invariants.
-   * @throws AssertionError if an invariant was violated
-   */
-  abstract void checkInvariants();
 
   @Override
   public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
@@ -295,8 +287,8 @@ public abstract class XQArray extends XQStruct {
    */
   public final Value get(final Item key, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    final long i = index(key, qc, ii), size = structSize();
-    if(i > 0 && i <= size) return get(i - 1);
+    final long i = index(key, qc, ii);
+    if(i > 0 && i <= size) return memberAt(i - 1);
     throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, i, size);
   }
 
@@ -311,7 +303,7 @@ public abstract class XQArray extends XQStruct {
   public final Value getOrNull(final Item key, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     final long i = index(key, qc, ii);
-    return i > 0 && i <= structSize() ? get(i - 1) : null;
+    return i > 0 && i <= structSize() ? memberAt(i - 1) : null;
   }
 
   /**
@@ -328,8 +320,7 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  public final Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    if(structSize() == 1) return get(0).atomValue(qc, ii);
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc, structSize());
     for(final Value value : iterable()) vb.add(value.atomValue(qc, ii));
     return vb.value(AtomType.ANY_ATOMIC_TYPE);
@@ -378,7 +369,7 @@ public abstract class XQArray extends XQStruct {
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : iterable()) {
       qc.checkStop();
-      ab.append(value.materialize(test, ii, qc));
+      ab.add(value.materialize(test, ii, qc));
     }
     return ab.array(this);
   }
@@ -427,13 +418,13 @@ public abstract class XQArray extends XQStruct {
    * @return coerced array
    * @throws QueryException query exception
    */
-  public XQArray coerceTo(final ArrayType at, final QueryContext qc, final CompileContext cc,
+  public final XQArray coerceTo(final ArrayType at, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Value value : iterable()) {
       qc.checkStop();
-      ab.append(at.valueType().coerce(value, null, qc, cc, ii));
+      ab.add(at.valueType().coerce(value, null, qc, cc, ii));
     }
     return ab.array();
   }
@@ -521,22 +512,31 @@ public abstract class XQArray extends XQStruct {
     return list.toArray();
   }
 
+  /**
+   * Creates a tree representation of this array.
+   * @return array
+   */
+  private XQArray toTree() {
+    final ArrayBuilder ab = new ArrayBuilder(Integer.MIN_VALUE);
+    for(final Value member : iterable()) ab.add(member);
+    return ab.array((ArrayType) type);
+  }
+
   @Override
-  public final String description() {
+  public String description() {
     return ARRAY;
   }
 
   @Override
-  public final void toXml(final QueryPlan plan) {
+  public void toXml(final QueryPlan plan) {
     final ExprList list = new ExprList();
-    final long size = structSize();
     final int max = (int) Math.min(size, 5);
-    for(int i = 0; i < max; i++) list.add(get(i));
+    for(int i = 0; i < max; i++) list.add(memberAt(i));
     plan.add(plan.create(this, ENTRIES, size), list.finish());
   }
 
   @Override
-  public final void toString(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
     for(final Value value : iterable()) {
       if(!tb.moreInfo()) break;

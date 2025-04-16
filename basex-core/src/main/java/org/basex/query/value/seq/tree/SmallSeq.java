@@ -33,6 +33,24 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
+  TreeSeq prepend(final SmallSeq seq) {
+    final Type tp = type.union(seq.type);
+    final Item[] tmp = seq.items;
+    final int tl = tmp.length, il = items.length, n = tl + il;
+
+    // both arrays can be used as digits
+    if(Math.min(tl, il) >= MIN_DIGIT) return new BigSeq(tmp, items, tp);
+
+    final Item[] out = new Item[n];
+    Array.copy(tmp, tl, out);
+    Array.copyFromStart(items, il, out, tl);
+    if(n <= MAX_SMALL) return new SmallSeq(out, tp);
+
+    final int mid = n / 2;
+    return new BigSeq(slice(out, 0, mid), slice(out, mid, n), tp);
+  }
+
+  @Override
   public Item itemAt(final long index) {
     return items[(int) index];
   }
@@ -46,8 +64,11 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq insertBefore(final long pos, final Item item, final QueryContext qc) {
+  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
     qc.checkStop();
+    if(value.size() > 1) return copyInsert(pos, value, qc);
+
+    final Item item = (Item) value;
     final Type tp = type.union(item.type);
     final int p = (int) pos, il = items.length;
     final Item[] out = new Item[il + 1];
@@ -74,8 +95,8 @@ public final class SmallSeq extends TreeSeq {
   @Override
   protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
     qc.checkStop();
-    final int p = (int) pos, n = (int) length;
-    return new SmallSeq(slice(items, p, p + n), type);
+    final int p = (int) pos, l = (int) length;
+    return new SmallSeq(slice(items, p, p + l), type);
   }
 
   @Override
@@ -151,24 +172,6 @@ public final class SmallSeq extends TreeSeq {
         return SmallSeq.this;
       }
     };
-  }
-
-  @Override
-  TreeSeq prepend(final SmallSeq seq) {
-    final Type tp = type.union(seq.type);
-    final Item[] tmp = seq.items;
-    final int tl = tmp.length, il = items.length, n = tl + il;
-
-    // both arrays can be used as digits
-    if(Math.min(tl, il) >= MIN_DIGIT) return new BigSeq(tmp, items, tp);
-
-    final Item[] out = new Item[n];
-    Array.copy(tmp, tl, out);
-    Array.copyFromStart(items, il, out, tl);
-    if(n <= MAX_SMALL) return new SmallSeq(out, tp);
-
-    final int mid = n / 2;
-    return new BigSeq(slice(out, 0, mid), slice(out, mid, n), tp);
   }
 
   @Override

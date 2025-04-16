@@ -24,7 +24,7 @@ public final class ArrayBuild extends StandardFunc {
     final ArrayBuilder ab = new ArrayBuilder();
     final HofArgs args = action != null ? new HofArgs(2, action) : null;
     for(Item item; (item = qc.next(input)) != null;) {
-      ab.append(action != null ? invoke(action, args.set(0, item).inc(), qc) : item);
+      ab.add(action != null ? invoke(action, args.set(0, item).inc(), qc) : item);
     }
     return ab.array();
   }

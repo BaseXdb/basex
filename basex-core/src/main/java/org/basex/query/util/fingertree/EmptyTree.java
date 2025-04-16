@@ -113,11 +113,6 @@ final class EmptyTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public long checkInvariants() {
-    return 0;
-  }
-
-  @Override
   FingerTree<N, E> addAll(final Node<N, E>[] nodes, final long size, final boolean left) {
     return buildTree(nodes, nodes.length, size);
   }

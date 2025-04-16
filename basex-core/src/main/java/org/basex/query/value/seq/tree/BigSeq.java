@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -76,8 +77,11 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq insertBefore(final long pos, final Item item, final QueryContext qc) {
+  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
     qc.checkStop();
+    if(value.size() > 1) return copyInsert(pos, value, qc);
+
+    final Item item = (Item) value;
     final Type tp = type.union(item.type);
     final int ll = left.length;
     if(pos <= ll) {

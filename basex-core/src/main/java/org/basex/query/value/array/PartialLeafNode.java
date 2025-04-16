@@ -38,13 +38,13 @@ final class PartialLeafNode implements NodeLike<Value, Value> {
       final Value[] vals = new Value[n];
       Array.copy(ls, l, vals);
       Array.copyFromStart(rs, r, vals, l);
-      nodes[pos - 1] = n < XQArray.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
+      nodes[pos - 1] = n < TreeArray.MIN_LEAF ? new PartialLeafNode(vals) : new LeafNode(vals);
       return pos;
     }
 
     final Value[] ls = ((LeafNode) left).values, rs = elems;
     final int l = ls.length, r = rs.length, n = l + r;
-    if(n <= XQArray.MAX_LEAF) {
+    if(n <= TreeArray.MAX_LEAF) {
       final Value[] vals = new Value[n];
       Array.copy(ls, l, vals);
       Array.copyFromStart(rs, r, vals, l);

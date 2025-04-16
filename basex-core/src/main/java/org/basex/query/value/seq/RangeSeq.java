@@ -105,7 +105,7 @@ public final class RangeSeq extends Seq {
    * @param pos position
    * @return minimum value
    */
-  private long get(final long pos) {
+  public long get(final long pos) {
     return start + (ascending ? pos : -pos);
   }
 
@@ -133,14 +133,14 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Value insertBefore(final long pos, final Item item, final QueryContext qc) {
-    return copyInsert(pos, item, qc);
+  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
+    return super.insertBefore(pos, value, qc);
   }
 
   @Override
   public Value remove(final long pos, final QueryContext qc) {
     return pos == 0 || pos == size - 1 ? subSeq(pos == 0 ? 0 : 1, size - 1, qc) :
-      copyRemove(pos, qc);
+      super.remove(pos, qc);
   }
 
   @Override

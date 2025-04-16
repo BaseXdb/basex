@@ -17,7 +17,7 @@ public final class ArrayFoot extends ArrayFn {
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     if(array == XQArray.empty()) throw QueryError.ARRAYEMPTY.get(info);
-    return array.foot();
+    return array.memberAt(array.structSize() - 1);
   }
 
   @Override

@@ -75,13 +75,13 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Value insertBefore(final long pos, final Item item, final QueryContext qc) {
-    return item.equals(value) ? get(value, size + 1) : copyInsert(pos, item, qc);
+  public Value insertBefore(final long pos, final Value val, final QueryContext qc) {
+    return val.equals(value) ? get(value, size + 1) : super.insertBefore(pos, val, qc);
   }
 
   @Override
   public Value remove(final long pos, final QueryContext qc) {
-    return singleItem() ? get(value, size - 1) : copyRemove(pos, qc);
+    return singleItem() ? get(value, size - 1) : super.remove(pos, qc);
   }
 
   @Override

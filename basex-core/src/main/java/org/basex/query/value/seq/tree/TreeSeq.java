@@ -37,7 +37,14 @@ public abstract class TreeSeq extends Seq {
     super(size, type);
   }
 
-  @Override
+  /**
+   * Helper for {@link #insertBefore(long, Value, QueryContext)} that copies all items into a
+   * {@link TreeSeq}.
+   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
+   * @param value value to insert
+   * @param qc query context
+   * @return resulting value
+   */
   protected final Value copyInsert(final long pos, final Value value, final QueryContext qc) {
     final long right = size - pos;
     if(value instanceof TreeSeq && (pos == 0 || right == 0)) {
@@ -65,7 +72,6 @@ public abstract class TreeSeq extends Seq {
 
   /**
    * Concatenates this sequence with another one.
-   * Running time: <i>O(log (min { this.size(), other.size() }))</i>
    * @param other array to append to the end of this array
    * @return resulting array
    */

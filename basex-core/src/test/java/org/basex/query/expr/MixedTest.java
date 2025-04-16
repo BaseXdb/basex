@@ -366,7 +366,7 @@ public final class MixedTest extends SandboxTest {
         + "};"
         + "count(local:f(1 to 100000))", 1);
     query("declare function local:f($x) {"
-        + "  if(exists($x)) then local:f(remove($x, 1)) else $x"
+        + "  if(count($x) > 0) then local:f(remove($x, 1)) else $x"
         + "};"
         + "count(local:f(1 to 100000))", 0);
     query("declare function local:f($x) {"
@@ -377,6 +377,39 @@ public final class MixedTest extends SandboxTest {
         + "  if(count($x) > 0) then local:f(trunk($x)) else $x"
         + "};"
         + "count(local:f(1 to 100000))", 0);
+  }
+
+  /** Recursive array query. */
+  @Test public void recursiveArray() {
+    // runtime degrades if no tree sequence builder is used
+    query("declare function local:f($x) {"
+        + "  if(array:size($x) < 100000) then local:f(array:insert-before($x, 1, 1)) else $x"
+        + "};"
+        + "array:size(local:f(array {}))", 100000);
+    query("declare function local:f($x) {"
+        + "  if(array:size($x) < 100000) then local:f(array:append($x, 1)) else $x"
+        + "};"
+        + "array:size(local:f(array {}))", 100000);
+    query("declare function local:f($x) {"
+        + "  if(array:size($x) < 100000) then local:f(array:insert-before($x, 3, 1)) else $x"
+        + "};"
+        + "array:size(local:f(array { 1 to 5 }))", 100000);
+    query("declare function local:f($x) {"
+        + "  if(array:size($x) > 1) then local:f(array:remove($x, 2)) else $x"
+        + "};"
+        + "array:size(local:f(array { 1 to 100000 }))", 1);
+    query("declare function local:f($x) {"
+        + "  if(array:size($x) > 0) then local:f(array:remove($x, 1)) else $x"
+        + "};"
+        + "array:size(local:f(array { 1 to 100000 }))", 0);
+    query("declare function local:f($x) {"
+        + "  if(array:size($x) > 0) then local:f(array:tail($x)) else $x"
+        + "};"
+        + "array:size(local:f(array { 1 to 100000 }))", 0);
+    query("declare function local:f($x) {"
+        + "  if(array:size($x) > 0) then local:f(array:trunk($x)) else $x"
+        + "};"
+        + "array:size(local:f(array { 1 to 100000 }))", 0);
   }
 
   /** Sequence tests. */

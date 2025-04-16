@@ -93,7 +93,7 @@ final class XsltReport {
       for(final Object message : messages) {
         final ArrayBuilder ab = new ArrayBuilder();
         for(final Item item : convert(new IOContent(MW_GW.invoke(message).toString()), false)) {
-          ab.append(item);
+          ab.add(item);
         }
         vb.add(ab.array());
       }

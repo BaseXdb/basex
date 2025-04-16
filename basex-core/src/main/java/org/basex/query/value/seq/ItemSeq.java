@@ -46,16 +46,6 @@ public final class ItemSeq extends Seq {
       super.equals(obj));
   }
 
-  @Override
-  public Value insertBefore(final long pos, final Item item, final QueryContext qc) {
-    return copyInsert(pos, item, qc);
-  }
-
-  @Override
-  public Value remove(final long pos, final QueryContext qc) {
-    return copyRemove(pos, qc);
-  }
-
   // STATIC METHODS ===============================================================================
 
   /**

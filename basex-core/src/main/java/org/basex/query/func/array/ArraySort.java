@@ -34,7 +34,7 @@ public final class ArraySort extends FnSort {
     if(sorted(index)) return array;
 
     final ArrayBuilder ab = new ArrayBuilder();
-    for(final int i : index) ab.append(values[i]);
+    for(final int i : index) ab.add(values[i]);
     return ab.array(this);
   }
 

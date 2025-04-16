@@ -1,8 +1,7 @@
 package org.basex.query.value.array;
 
-import java.util.*;
-
 import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -13,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class SingletonArray extends XQArray {
+public final class SingletonArray extends XQArray {
   /** Single member. */
   final Value member;
 
@@ -22,8 +21,13 @@ final class SingletonArray extends XQArray {
    * @param member member
    */
   SingletonArray(final Value member) {
-    super(ArrayType.get(member.seqType()));
+    super(1, ArrayType.get(member.seqType()));
     this.member = member;
+  }
+
+  @Override
+  public Value memberAt(final long index) {
+    return member;
   }
 
   @Override
@@ -37,43 +41,13 @@ final class SingletonArray extends XQArray {
   }
 
   @Override
-  public Value get(final long index) {
-    return member;
-  }
-
-  @Override
   public XQArray put(final long pos, final Value value) {
-    return new SingletonArray(value);
+    return singleton(value);
   }
 
   @Override
-  public long structSize() {
-    return 1;
-  }
-
-  @Override
-  public XQArray concat(final XQArray other) {
-    return other == empty() ? this : other.prepend(member);
-  }
-
-  @Override
-  public Value head() {
-    return member;
-  }
-
-  @Override
-  public Value foot() {
-    return member;
-  }
-
-  @Override
-  public XQArray trunk() {
-    return empty();
-  }
-
-  @Override
-  public XQArray tail() {
-    return empty();
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return member.atomValue(qc, ii);
   }
 
   @Override
@@ -92,70 +66,7 @@ final class SingletonArray extends XQArray {
   }
 
   @Override
-  public XQArray subArray(final long pos, final long length, final QueryContext qc) {
-    return length == 0 ? empty() : this;
-  }
-
-  @Override
-  public ListIterator<Value> iterator(final long start) {
-    return new ListIterator<>() {
-      private int index = (int) start;
-
-      @Override
-      public int nextIndex() {
-        return index;
-      }
-
-      @Override
-      public boolean hasNext() {
-        return index < 1;
-      }
-
-      @Override
-      public Value next() {
-        ++index;
-        return member;
-      }
-
-      @Override
-      public int previousIndex() {
-        return index - 1;
-      }
-
-      @Override
-      public boolean hasPrevious() {
-        return index > 0;
-      }
-
-      @Override
-      public Value previous() {
-        --index;
-        return member;
-      }
-
-      @Override
-      public void set(final Value e) {
-        throw Util.notExpected();
-      }
-
-      @Override
-      public void add(final Value e) {
-        throw Util.notExpected();
-      }
-
-      @Override
-      public void remove() {
-        throw Util.notExpected();
-      }
-    };
-  }
-
-  @Override
-  void checkInvariants() {
-  }
-
-  @Override
-  XQArray prepend(final SmallArray array) {
-    return array.append(member);
+  public Iter items() throws QueryException {
+    return member.iter();
   }
 }

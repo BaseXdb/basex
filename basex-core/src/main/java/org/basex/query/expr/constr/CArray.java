@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -38,10 +39,16 @@ public final class CArray extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final boolean values = values(true, cc);
-    if(exprs.length == 1 && (sequences || exprs[0].size() == 1)) {
-      return cc.replaceWith(this, values
-          ? XQArray.singleton(exprs[0].value(cc.qc))
-          : cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
+    if(exprs.length == 1) {
+      if(sequences || exprs[0].size() == 1) {
+        return cc.replaceWith(this, values
+            ? XQArray.singleton(exprs[0].value(cc.qc))
+            : cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
+      }
+      if(!sequences && exprs[0] instanceof RangeSeq) {
+        final RangeSeq rs = (RangeSeq) exprs[0];
+        return cc.replaceWith(this, new RangeArray(rs.get(0), rs.size(), rs.ascending()));
+      }
     }
 
     SeqType mt = null;
@@ -63,11 +70,11 @@ public final class CArray extends Arr {
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Expr expr : exprs) {
       if(sequences) {
-        ab.append(expr.value(qc));
+        ab.add(expr.value(qc));
       } else {
         final Iter iter = expr.iter(qc);
         for(Item item; (item = qc.next(iter)) != null;) {
-          ab.append(item);
+          ab.add(item);
         }
       }
     }
