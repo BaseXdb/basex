@@ -69,6 +69,7 @@ public interface QueryText {
   /** Parser token. */ String FALSE = "false";
   /** Parser token. */ String FINALLY = "finally";
   /** Parser token. */ String FIRST = "first";
+  /** Parser token. */ String FIXED = "fixed";
   /** Parser token. */ String FN = "fn";
   /** Parser token. */ String FOR = "for";
   /** Parser token. */ String FROM = "from";
@@ -92,7 +93,9 @@ public interface QueryText {
   /** Parser token. */ String INTO = "into";
   /** Parser token. */ String INVOKE = "invoke";
   /** Parser token. */ String ITEM = "item";
+  /** Parser token. */ String ITEMS = "items";
   /** Parser token. */ String KEY = "key";
+  /** Parser token. */ String KEYS = "keys";
   /** Parser token. */ String LANGUAGE = "language";
   /** Parser token. */ String LAST = "last";
   /** Parser token. */ String LAX = "lax";
@@ -125,6 +128,7 @@ public interface QueryText {
   /** Parser token. */ String ORDERED = "ordered";
   /** Parser token. */ String ORDERING = "ordering";
   /** Parser token. */ String OTHERWISE = "otherwise";
+  /** Parser token. */ String PAIRS = "pairs";
   /** Parser token. */ String PARAGRAPH = "paragraph";
   /** Parser token. */ String PARAGRAPHS = "paragraphs";
   /** Parser token. */ String PHRASE = "phrase";
@@ -177,6 +181,7 @@ public interface QueryText {
   /** Parser token. */ String USING = "using";
   /** Parser token. */ String VALIDATE = "validate";
   /** Parser token. */ String VALUEE = "value";
+  /** Parser token. */ String VALUESS = "values";
   /** Parser token. */ String VARIABLE = "variable";
   /** Parser token. */ String VERSION = "version";
   /** Parser token. */ String WEIGHT = "weight";
