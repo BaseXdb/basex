@@ -82,37 +82,37 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   @Override
   protected void atomic(final Item item) throws IOException {
-    final TokenBuilder tb = new TokenBuilder();
     final Type type = item.type;
     final boolean plain = this instanceof BaseXSerializer;
     try {
       if(type == DOUBLE) {
         final double d = item.dbl(null);
         if(plain) {
-          tb.add(Dbl.string(d));
+          printChars(Dbl.string(d));
         } else if(Double.isNaN(d) || Double.isInfinite(d)) {
-          tb.add(item.string(null));
+          printChars(item.string(null));
         } else {
           synchronized(Token.AD) {
-            tb.add(Token.AD.format(d).toLowerCase(Locale.ENGLISH));
+            printChars(Token.token(Token.AD.format(d).toLowerCase(Locale.ENGLISH)));
           }
         }
       } else if(type == QNAME) {
-        tb.add(plain ? item.string(null) : ((QNm) item).eqName());
+        printChars(plain ? item.string(null) : ((QNm) item).eqName());
       } else {
         final boolean simple = type == BOOLEAN || type.instanceOf(DECIMAL);
         final byte[] value = simple ? Token.token(item) : value(item.string(null), '"', false);
         if(plain || simple || type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI)) {
-          tb.add(value);
+          printChars(value);
         } else {
-          tb.add(Token.token(type.instanceOf(DURATION) ? DURATION : type));
-          tb.add('(').add(value).add(')');
+          printChars(Token.token(type.instanceOf(DURATION) ? DURATION : type));
+          printChar('(');
+          printChars(value);
+          printChar(')');
         }
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
-    printChars(tb.finish());
   }
 
   @Override
@@ -122,11 +122,11 @@ public class AdaptiveSerializer extends OutputSerializer {
     } else if(item instanceof XQMap) {
       map((XQMap) item);
     } else {
-      final TokenBuilder tb = new TokenBuilder();
       final QNm fn = item.funcName();
-      if(fn == null) tb.add("(anonymous-function)");
-      else tb.add(fn.prefixId());
-      printChars(tb.add('#').addInt(item.arity()).finish());
+      if(fn == null) printChars(Token.token("(anonymous-function)"));
+      else printChars(fn.prefixId());
+      printChar('#');
+      printChars(Token.token(item.arity()));
     }
   }
 
@@ -144,26 +144,25 @@ public class AdaptiveSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   protected void array(final XQArray array) throws IOException {
-    final TokenBuilder tb = new TokenBuilder().add('[');
+    printChar('[');
     int c = 0;
     for(final Value value : array.iterable()) {
-      if(c++ > 0) tb.add(',');
-      if(indent) tb.add(' ');
+      if(c++ > 0) printChar(',');
+      if(indent) printChar(' ');
       final long vs = value.size();
-      if(vs != 1) tb.add('(');
+      if(vs != 1) printChar('(');
       for(int i = 0, cc = 0; i < vs; i++, cc++) {
         if(cc > 0) {
-          tb.add(',');
-          if(indent) tb.add(' ');
+          printChar(',');
+          if(indent) printChar(' ');
         }
-        printChars(tb.next());
         more = false;
         serialize(value.itemAt(i));
       }
-      if(vs != 1) tb.add(')');
+      if(vs != 1) printChar(')');
     }
-    if(c > 0 && indent) tb.add(' ');
-    printChars(tb.add(']').finish());
+    if(c > 0 && indent) printChar(' ');
+    printChar(']');
   }
 
   /**
@@ -172,40 +171,37 @@ public class AdaptiveSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   protected void map(final XQMap map) throws IOException {
-    final TokenBuilder tb = new TokenBuilder().add('{');
+    printChar('{');
     int c = 0;
     ++level;
     try {
       for(final Item key : map.keys()) {
-        if(c++ > 0) tb.add(',');
-        printChars(tb.next());
+        if(c++ > 0) printChar(',');
         indent();
         more = false;
         serialize(key);
-        tb.add(':');
-        if(indent) tb.add(' ');
+        printChar(':');
+        if(indent) printChar(' ');
         final Value value = map.get(key);
         final boolean par = value.size() != 1;
-        if(par) tb.add('(');
+        if(par) printChar('(');
         int cc = 0;
         for(final Item item : value) {
           if(cc++ > 0) {
-            tb.add(',');
-            if(indent) tb.add(' ');
+            printChar(',');
+            if(indent) printChar(' ');
           }
-          printChars(tb.next());
           more = false;
           serialize(item);
         }
-        if(par) tb.add(')');
+        if(par) printChar(')');
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
-    printChars(tb.next());
     --level;
     if(c > 0) indent();
-    printChars(tb.add('}').finish());
+    printChar('}');
   }
 
   /**
