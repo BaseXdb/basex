@@ -2,14 +2,17 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -430,23 +433,57 @@ public final class MixedTest extends SandboxTest {
     check("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
         "A\nB\nA\nB\nA\nB", root(StrSeq.class), type(StrSeq.class, "xs:untypedAtomic+"));
 
-    // inspection
-    final String inspect = " =>" + _INSPECT_TYPE.args(" { 'internal': true() }");
-    check("('A', 'B', 'A', 'B', 'A', 'B')" + inspect, "xs:string+, StrSeq");
-    check("(1, 3, 1, 3, 1, 3)" + inspect, "xs:integer+, IntSeq");
-    check("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))" + inspect,
-        "xs:untypedAtomic+, StrSeq");
+    try {
+      final ArrayOutput ao = new ArrayOutput();
+      System.setErr(new PrintStream(ao));
+      // inspection
+      checkType(ao, "('A', 'B', 'A', 'B', 'A', 'B')",
+          "Type: xs:string+, size: 6, class: StrSeq");
+      checkType(ao, "(1, 3, 1, 3, 1, 3)",
+          "Type: xs:integer+, size: 6, class: IntSeq");
+      checkType(ao, "data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
+          "Type: xs:untypedAtomic+, size: 6, class: StrSeq");
 
-    // filters
-    check("('A', 'B', 'A', 'B', 'A', 'B')[not(. = 'C')]" + inspect, "xs:string+, StrSeq");
-    check("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))[not(. = 'C')]" +
-        inspect, "xs:untypedAtomic+, StrSeq");
-    check("(1, 3, 1, 3, 1, 3)[not(. = 2)]" + inspect, "xs:integer+, IntSeq");
+      // filters
+      checkType(ao, "('A', 'B', 'A', 'B', 'A', 'B')[not(. = 'C')]",
+          "Type: xs:string*, size: -1, class: IterFilter -> "
+          + "Type: xs:string+, size: 6, class: StrSeq");
+      checkType(ao, "data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))"
+          + "[not(. = 'C')]",
+          "Type: xs:untypedAtomic*, size: -1, class: IterFilter -> "
+          + "Type: xs:untypedAtomic+, size: 6, class: StrSeq");
+      checkType(ao, "(1, 3, 1, 3, 1, 3)[not(. = 2)]",
+          "Type: xs:integer*, size: -1, class: IterFilter -> "
+          + "Type: xs:integer+, size: 6, class: IntSeq");
 
-    // map operator
-    check("(1 to 6) ! string()" + inspect, "xs:string+, StrSeq");
-    check("(1 to 6) ! xs:untypedAtomic()" + inspect, "xs:untypedAtomic+, StrSeq");
-    check("(1 to 6) ! ('0' || .) ! xs:integer()" + inspect, "xs:integer+, RangeSeq");
-    check("(1, 3, 1, 3, 1, 3) ! ('0' || .) ! xs:integer()" + inspect, "xs:integer+, IntSeq");
+      // map operator
+      checkType(ao, "(1 to 6) ! string()",
+          "Type: xs:string+, size: 6, class: DualMap -> "
+          + "Type: xs:string+, size: 6, class: StrSeq");
+      checkType(ao, "(1 to 6) ! xs:untypedAtomic()",
+          "Type: xs:untypedAtomic+, size: 6, class: DualMap -> "
+          + "Type: xs:untypedAtomic+, size: 6, class: StrSeq");
+      checkType(ao, "(1 to 6) ! ('0' || .) ! xs:integer()",
+          "Type: xs:integer+, size: 6, class: DualMap -> "
+          + "Type: xs:integer+, size: 6, class: RangeSeq");
+      checkType(ao, "(1, 3, 1, 3, 1, 3) ! ('0' || .) ! xs:integer()",
+          "Type: xs:integer+, size: 6, class: DualMap -> "
+          + "Type: xs:integer+, size: 6, class: IntSeq");
+
+    } finally {
+      System.setErr(ERR);
+    }
+  }
+
+  /**
+   * Checks the STDERR output.
+   * @param ao STDERR output
+   * @param query query to run
+   * @param expected expected output
+   */
+  protected static void checkType(final ArrayOutput ao, final String query, final String expected) {
+    query(query + " =>" + _PROF_TYPE.args());
+    final String returned = Token.string(ao.next()).trim();
+    assertEquals(expected, returned, "\nExpected: " + expected + "\nReturned: " + returned);
   }
 }
