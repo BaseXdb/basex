@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -41,8 +40,7 @@ public final class CArray extends Arr {
     // [ $m ]  ->  util:array-member($m)
     final int el = exprs.length;
     if(el == 0) return XQArray.empty();
-    final Expr single = el == 1 ? exprs[0] : null;
-    if(single != null && (single.size() == 1 || sequences)) {
+    if(el == 1 && (sequences || exprs[0].size() == 1)) {
       return cc.replaceWith(this, cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
     }
 
@@ -57,15 +55,19 @@ public final class CArray extends Arr {
     }
     if(mt != null) exprType.assign(ArrayType.get(mt));
 
-    return single instanceof Value || values(false, cc) ? cc.preEval(this) : this;
+    return values(false, cc) ? cc.preEval(this) : this;
   }
 
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // single value: shortcut
-    if(exprs.length == 1 && exprs[0] instanceof Value) {
-      final Value value = (Value) exprs[0];
-      return sequences ? XQArray.singleton(value) : value.toArray();
+    // single value: shortcut (at this stage, sequences is always false)
+    if(exprs.length == 1) {
+      final Iter iter = exprs[0].iter(qc);
+      if(iter.valueIter()) return iter.value(qc, this).toArray();
+
+      final ArrayBuilder ab = new ArrayBuilder(iter.size());
+      for(Item item; (item = qc.next(iter)) != null;) ab.add(item);
+      return ab.array(this);
     }
 
     final ArrayBuilder ab = new ArrayBuilder();
@@ -74,9 +76,7 @@ public final class CArray extends Arr {
         ab.add(expr.value(qc));
       } else {
         final Iter iter = expr.iter(qc);
-        for(Item item; (item = qc.next(iter)) != null;) {
-          ab.add(item);
-        }
+        for(Item item; (item = qc.next(iter)) != null;) ab.add(item);
       }
     }
     return ab.array(this);
