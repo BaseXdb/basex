@@ -14,6 +14,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.Function;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -113,6 +114,11 @@ public final class RangeSeq extends Seq {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     return pos != 0 ? pos >= min() && pos <= max() : super.test(qc, ii, pos);
+  }
+
+  @Override
+  public XQArray toArray() {
+    return new RangeArray(get(0), size(), ascending());
   }
 
   @Override

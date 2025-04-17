@@ -7,6 +7,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -64,6 +65,11 @@ public final class Empty extends Item {
   @Override
   public boolean isItem() {
     return false;
+  }
+
+  @Override
+  public XQArray toArray() {
+    return XQArray.empty();
   }
 
   @Override

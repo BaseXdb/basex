@@ -7,9 +7,9 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -38,17 +38,12 @@ public final class CArray extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final boolean values = values(true, cc);
-    if(exprs.length == 1) {
-      if(sequences || exprs[0].size() == 1) {
-        return cc.replaceWith(this, values
-            ? XQArray.singleton(exprs[0].value(cc.qc))
-            : cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
-      }
-      if(!sequences && exprs[0] instanceof RangeSeq) {
-        final RangeSeq rs = (RangeSeq) exprs[0];
-        return cc.replaceWith(this, new RangeArray(rs.get(0), rs.size(), rs.ascending()));
-      }
+    // [ $m ]  ->  util:array-member($m)
+    final int el = exprs.length;
+    if(el == 0) return XQArray.empty();
+    final Expr single = el == 1 ? exprs[0] : null;
+    if(single != null && (single.size() == 1 || sequences)) {
+      return cc.replaceWith(this, cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
     }
 
     SeqType mt = null;
@@ -62,11 +57,17 @@ public final class CArray extends Arr {
     }
     if(mt != null) exprType.assign(ArrayType.get(mt));
 
-    return values ? cc.preEval(this) : this;
+    return single instanceof Value || values(false, cc) ? cc.preEval(this) : this;
   }
 
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    // single value: shortcut
+    if(exprs.length == 1 && exprs[0] instanceof Value) {
+      final Value value = (Value) exprs[0];
+      return sequences ? XQArray.singleton(value) : value.toArray();
+    }
+
     final ArrayBuilder ab = new ArrayBuilder();
     for(final Expr expr : exprs) {
       if(sequences) {

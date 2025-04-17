@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class StrArray extends NativeArray {
+public final class StrArray extends NativeArray {
   /** Members. */
   final byte[][] members;
 
@@ -20,7 +20,7 @@ final class StrArray extends NativeArray {
    * Constructor.
    * @param members members
    */
-  StrArray(final byte[][] members) {
+  public StrArray(final byte[][] members) {
     super(members.length, AtomType.STRING);
     this.members = members;
   }

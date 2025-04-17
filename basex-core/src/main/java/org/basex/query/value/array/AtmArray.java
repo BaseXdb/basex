@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class AtmArray extends NativeArray {
+public final class AtmArray extends NativeArray {
   /** Members. */
   final byte[][] members;
 
@@ -20,7 +20,7 @@ final class AtmArray extends NativeArray {
    * Constructor.
    * @param members members
    */
-  AtmArray(final byte[][] members) {
+  public AtmArray(final byte[][] members) {
     super(members.length, AtomType.UNTYPED_ATOMIC);
     this.members = members;
   }

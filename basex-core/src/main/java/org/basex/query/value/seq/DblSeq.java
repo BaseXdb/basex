@@ -8,6 +8,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -72,6 +73,11 @@ public final class DblSeq extends NativeSeq {
   public boolean equals(final Object obj) {
     return this == obj || (obj instanceof DblSeq ? Arrays.equals(values, ((DblSeq) obj).values) :
       super.equals(obj));
+  }
+
+  @Override
+  public XQArray toArray() {
+    return new DblArray(values);
   }
 
   @Override

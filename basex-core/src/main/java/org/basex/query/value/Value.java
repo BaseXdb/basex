@@ -14,6 +14,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
@@ -147,6 +148,16 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @throws QueryException query exception
    */
   public abstract void cache(boolean lazy, InputInfo ii) throws QueryException;
+
+  /**
+   * Converts a sequence to an array.
+   * @return array or {@code null}
+   */
+  public XQArray toArray() {
+    final ArrayBuilder ab = new ArrayBuilder(size());
+    for(final Item item : this) ab.add(item);
+    return ab.array(ArrayType.get(seqType()));
+  }
 
   /**
    * Returns a Java representation of the value.

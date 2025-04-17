@@ -310,6 +310,11 @@ public abstract class Item extends Value {
   @Override
   public final void refineType() { }
 
+  @Override
+  public XQArray toArray() {
+    return XQArray.singleton(this);
+  }
+
   /**
    * Returns a score value. Overwritten by {@link FTNode}.
    * @return score value

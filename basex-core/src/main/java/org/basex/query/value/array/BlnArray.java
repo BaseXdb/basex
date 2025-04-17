@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class BlnArray extends NativeArray {
+public final class BlnArray extends NativeArray {
   /** Members. */
   final boolean[] members;
 
@@ -20,7 +20,7 @@ final class BlnArray extends NativeArray {
    * Constructor.
    * @param members members
    */
-  BlnArray(final boolean[] members) {
+  public BlnArray(final boolean[] members) {
     super(members.length, AtomType.BOOLEAN);
     this.members = members;
   }

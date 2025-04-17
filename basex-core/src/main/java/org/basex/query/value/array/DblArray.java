@@ -12,7 +12,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class DblArray extends NativeArray {
+public final class DblArray extends NativeArray {
   /** Members. */
   final double[] members;
 
@@ -20,7 +20,7 @@ final class DblArray extends NativeArray {
    * Constructor.
    * @param members members
    */
-  DblArray(final double[] members) {
+  public DblArray(final double[] members) {
     super(members.length, AtomType.DOUBLE);
     this.members = members;
   }
