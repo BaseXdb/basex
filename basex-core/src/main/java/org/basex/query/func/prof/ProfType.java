@@ -15,27 +15,23 @@ import org.basex.util.*;
 public final class ProfType extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    // implementation for dynamic function lookup
-    type(qc);
-    return arg(0).value(qc);
-  }
+    final Expr expr = arg(0);
+    final String label = toStringOrNull(arg(1), qc);
 
-  @Override
-  protected Expr opt(final CompileContext cc) {
-    if(cc.dynamic) {
-      type(cc.qc);
-      return arg(0);
-    }
-    return this;
+    final StringBuilder sb = new StringBuilder().append(info(expr));
+    final Value value = expr.value(qc);
+    if(expr != value) sb.append(" -> ").append(info(value));
+    qc.trace(sb.toString(), label);
+    return value;
   }
 
   /**
-   * Dumps the specified info to standard error or the info view of the GUI.
-   * @param qc query context
+   * Returns an info string for the specified expression.
+   * @param expr expression
+   * @return info string
    */
-  private void type(final QueryContext qc) {
-    final Expr expr = arg(0);
-    qc.trace(Util.info("%, size: %, exprSize: %", expr.seqType(), expr.size(), expr.exprSize()),
-        expr + ": ");
+  private static String info(final Expr expr) {
+    return "Type: " + expr.seqType() + ", size: " + expr.size() + ", class: " +
+        Util.className(expr);
   }
 }
