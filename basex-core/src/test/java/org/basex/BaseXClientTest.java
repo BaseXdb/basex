@@ -81,8 +81,8 @@ public final class BaseXClientTest extends BaseXTest {
       new BaseXClient(sl.add(args).finish());
       return ao.toString();
     } finally {
-      stopServer(server);
       System.setOut(OUT);
+      stopServer(server);
     }
   }
 }

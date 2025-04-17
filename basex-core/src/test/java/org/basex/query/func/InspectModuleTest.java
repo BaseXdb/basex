@@ -3,7 +3,10 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
+import java.io.*;
+
 import org.basex.*;
+import org.basex.io.out.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -218,16 +221,15 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(expr, " { 'mode': 'value' }"), result);
     query(func.args(expr, " { 'mode': 'expression' }"), result);
 
-    query(func.args(" ()", " { 'internal': true() }"), "empty-sequence(), Empty");
-    query(func.args(1, " { 'internal': true() }"), "xs:integer, Int");
-    query(func.args(" 1 to 6", " { 'internal': true() }"), "xs:integer+, RangeSeq");
-
-    query(func.args(" ()", " { 'internal': true(), 'mode': 'expression' }"),
-        "empty-sequence(), Empty");
-    query(func.args(1, " { 'internal': true(), 'mode': 'expression' }"),
-        "xs:integer, Int");
-    query(func.args(" 1 to 6", " { 'internal': true(), 'mode': 'expression' }"),
-        "xs:integer+, RangeSeq");
+    try {
+      final ArrayOutput ao = new ArrayOutput();
+      System.setErr(new PrintStream(ao));
+      checkType(ao, "()", "Type: empty-sequence(), size: 0, class: Empty");
+      checkType(ao, "1", "Type: xs:integer, size: 1, class: Int");
+      checkType(ao, "1 to 6", "Type: xs:integer+, size: 6, class: RangeSeq");
+    } finally {
+      System.setErr(ERR);
+    }
   }
 
   /** Test method. */

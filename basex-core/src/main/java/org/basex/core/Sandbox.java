@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
@@ -287,6 +288,18 @@ public abstract class Sandbox {
       Util.stack(ex);
       fail(ex);
     }
+  }
+
+  /**
+   * Checks the STDERR output.
+   * @param ao STDERR output
+   * @param query query to run
+   * @param expected expected output
+   */
+  protected static void checkType(final ArrayOutput ao, final String query, final String expected) {
+    query(_PROF_TYPE.args(" " + query));
+    final String returned = Token.string(ao.next()).trim();
+    assertEquals(expected, returned, "\nExpected: " + expected + "\nReturned: " + returned);
   }
 
   /**

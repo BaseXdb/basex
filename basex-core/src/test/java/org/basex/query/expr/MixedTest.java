@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
@@ -12,7 +11,6 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -469,21 +467,8 @@ public final class MixedTest extends SandboxTest {
       checkType(ao, "(1, 3, 1, 3, 1, 3) ! ('0' || .) ! xs:integer()",
           "Type: xs:integer+, size: 6, class: DualMap -> "
           + "Type: xs:integer+, size: 6, class: IntSeq");
-
     } finally {
       System.setErr(ERR);
     }
-  }
-
-  /**
-   * Checks the STDERR output.
-   * @param ao STDERR output
-   * @param query query to run
-   * @param expected expected output
-   */
-  protected static void checkType(final ArrayOutput ao, final String query, final String expected) {
-    query(query + " =>" + _PROF_TYPE.args());
-    final String returned = Token.string(ao.next()).trim();
-    assertEquals(expected, returned, "\nExpected: " + expected + "\nReturned: " + returned);
   }
 }
