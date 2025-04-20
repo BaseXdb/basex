@@ -82,7 +82,17 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public Value subsequence(final long start, final long length, final QueryContext qc) {
+  public Item insertValue(final long pos, final Value value, final QueryContext qc) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Item removeItem(final long pos, final QueryContext qc) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Value subSeq(final long start, final long length, final QueryContext qc) {
     throw Util.notExpected();
   }
 

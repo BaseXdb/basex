@@ -85,7 +85,7 @@ final class Combine extends ValueMerger {
 
   @Override
   Value get(final Item key, final Value old, final Value value) throws QueryException {
-    return ValueBuilder.concat(old, value, qc);
+    return old.append(value, qc);
   }
 
   @Override

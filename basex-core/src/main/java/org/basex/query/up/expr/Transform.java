@@ -70,7 +70,7 @@ public final class Transform extends Copy {
           error = item;
         } else {
           final Item item2 = iter.next();
-          if(item2 != null) error = ValueBuilder.concat(item, item2);
+          if(item2 != null) error = item.append(item2, qc);
         }
         if(error != null) throw UPSINGLE_X_X.get(copy.info(), copy.var.name, error);
 

@@ -51,21 +51,21 @@ public abstract class XQArray extends XQStruct {
 
   /**
    * Creates an array with a single member.
-   * @param value single value
+   * @param member single value
    * @return array
    */
-  public static XQArray singleton(final Value value) {
-    return new SingletonArray(value);
+  public static XQArray get(final Value member) {
+    return new SingletonArray(member);
   }
 
   /**
    * Creates an array with single-item members.
-   * @param value single value
+   * @param members members
    * @return array
    */
-  public static XQArray items(final Value value) {
-    final long size = value.size();
-    return size == 0 ? empty() : size == 1 ? singleton(value) : new ItemArray(value);
+  public static XQArray items(final Value members) {
+    final long size = members.size();
+    return size == 0 ? empty() : size == 1 ? get(members) : new ItemArray(members);
   }
 
   @Override
@@ -80,19 +80,32 @@ public abstract class XQArray extends XQStruct {
    */
   public abstract Value memberAt(long index);
 
-  /**
-   * Prepends a value to the front of this array.
-   * @param head value to prepend
-   * @return resulting array
-   */
-  public abstract XQArray prepend(Value head);
+  @Override
+  public Iter items() throws QueryException {
+    return new Iter() {
+      final Iterator<Value> values = iterator(0);
+      Iter ir;
 
-  /**
-   * Appends a value to the end of this array.
-   * @param last value to append
-   * @return resulting array
-   */
-  public abstract XQArray append(Value last);
+      @Override
+      public Item next() throws QueryException {
+        while(true) {
+          if(ir != null) {
+            final Item item = ir.next();
+            if(item != null) return item;
+          }
+          if(!values.hasNext()) return null;
+          ir = values.next().iter();
+        }
+      }
+    };
+  }
+
+  @Override
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc, structSize());
+    for(final Value value : iterable()) vb.add(value.atomValue(qc, ii));
+    return vb.value(AtomType.ANY_ATOMIC_TYPE);
+  }
 
   /**
    * Returns a copy of this array where the value at the given position is
@@ -104,17 +117,38 @@ public abstract class XQArray extends XQStruct {
   public abstract XQArray put(long pos, Value value);
 
   /**
+   * Appends a member.
+   * @param member member to append
+   * @param qc query context
+   * @return resulting value
+   */
+  public final XQArray appendMember(final Value member, final QueryContext qc) {
+    return insertMember(structSize(), member, qc);
+  }
+
+  /**
+   * Inserts the given value at the given position into this array.
+   * By default, the array will be converted to the tree representation,
+   * because its runtime outweighs the possibly higher memory consumption.
+   * @param pos insertion position, must be between {@code 0} and {@code arraySize()}
+   * @param value value to insert
+   * @param qc query context
+   * @return resulting array
+   */
+  public abstract XQArray insertMember(long pos, Value value, QueryContext qc);
+
+  /**
    * Returns a subsequence of this array with the given start and length.
-   * @param start starting position
+   * @param pos starting position
    * @param length number of items
    * @param qc query context
    * @return sub sequence
    */
-  public final XQArray subArray(final long start, final long length, final QueryContext qc) {
+  public final XQArray subArray(final long pos, final long length, final QueryContext qc) {
     return length == 0 ? empty() :
-           length == 1 ? singleton(memberAt(start)) :
+           length == 1 ? get(memberAt(pos)) :
            length == structSize() ? this :
-           subArr(start, length, qc);
+           subArr(pos, length, qc);
   }
 
   /**
@@ -127,25 +161,14 @@ public abstract class XQArray extends XQStruct {
   protected abstract XQArray subArr(long pos, long length, QueryContext qc);
 
   /**
-   * Inserts the given value at the given position into this array.
-   * By default, the array will be converted to the tree representation,
-   * because its runtime outweighs the possibly higher memory consumption.
-   * @param pos insertion position, must be between {@code 0} and {@code arraySize()}
-   * @param value value to insert
-   * @param qc query context
-   * @return resulting array
-   */
-  public abstract XQArray insertBefore(long pos, Value value, QueryContext qc);
-
-  /**
-   * Removes the value at the given position in this array.
+   * Removes the member at the given position in this array.
    * By default, the array will be converted to the tree representation,
    * because its runtime outweighs the possibly higher memory consumption.
    * @param pos deletion position, must be between {@code 0} and {@code arraySize() - 1}
    * @param qc query context
    * @return resulting array
    */
-  public abstract XQArray remove(long pos, QueryContext qc);
+  public abstract XQArray removeMember(long pos, QueryContext qc);
 
   /**
    * Returns an array with the same values as this one, but their order reversed.
@@ -239,26 +262,6 @@ public abstract class XQArray extends XQStruct {
     return iterable;
   }
 
-  @Override
-  public Iter items() throws QueryException {
-    return new Iter() {
-      final Iterator<Value> values = iterator(0);
-      Iter ir;
-
-      @Override
-      public Item next() throws QueryException {
-        while(true) {
-          if(ir != null) {
-            final Item item = ir.next();
-            if(item != null) return item;
-          }
-          if(!values.hasNext()) return null;
-          ir = values.next().iter();
-        }
-      }
-    };
-  }
-
   /**
    * Creates a new array type.
    * @param value value to be added
@@ -314,13 +317,6 @@ public abstract class XQArray extends XQStruct {
   private static long index(final Item key, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     return ((Int) SeqType.INTEGER_O.coerce(key, null, qc, null, ii)).itr();
-  }
-
-  @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc, structSize());
-    for(final Value value : iterable()) vb.add(value.atomValue(qc, ii));
-    return vb.value(AtomType.ANY_ATOMIC_TYPE);
   }
 
   @Override

@@ -27,37 +27,6 @@ final class SmallArray extends TreeArray {
   }
 
   @Override
-  public XQArray prepend(final Value head) {
-    final Type tp = union(head);
-    final int ml = members.length;
-    if(ml < MAX_SMALL) {
-      final Value[] newMembers = slice(members, -1, ml);
-      newMembers[0] = head;
-      return new SmallArray(newMembers, tp);
-    }
-
-    final int mid = MIN_DIGIT - 1;
-    final Value[] left = slice(members, -1, mid), right = slice(members, mid, ml);
-    left[0] = head;
-    return new BigArray(left, right, tp);
-  }
-
-  @Override
-  public XQArray append(final Value last) {
-    final Type tp = union(last);
-    final int ml = members.length;
-    if(ml < MAX_SMALL) {
-      final Value[] newMembers = slice(members, 0, ml + 1);
-      newMembers[newMembers.length - 1] = last;
-      return new SmallArray(newMembers, tp);
-    }
-
-    final Value[] left = slice(members, 0, MIN_DIGIT), right = slice(members, MIN_DIGIT, ml + 1);
-    right[right.length - 1] = last;
-    return new BigArray(left, right, tp);
-  }
-
-  @Override
   public Value memberAt(final long index) {
     return members[(int) index];
   }
@@ -70,15 +39,7 @@ final class SmallArray extends TreeArray {
   }
 
   @Override
-  public XQArray reverseArray(final QueryContext qc) {
-    final int ml = members.length;
-    final Value[] tmp = new Value[ml];
-    for(int m = 0; m < ml; m++) tmp[m] = members[ml - 1 - m];
-    return new SmallArray(tmp, type);
-  }
-
-  @Override
-  public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
+  public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
     qc.checkStop();
     final Type tp = union(value);
     final int ml = members.length, p = (int) pos;
@@ -92,11 +53,12 @@ final class SmallArray extends TreeArray {
   }
 
   @Override
-  public XQArray remove(final long pos, final QueryContext qc) {
+  public XQArray removeMember(final long pos, final QueryContext qc) {
     qc.checkStop();
-    final int ml = members.length, p = (int) pos;
-    if(ml == 2) return singleton(members[p == 0 ? 1 : 0]);
+    final int ml = members.length;
+    if(ml == 2) return get(members[pos == 0 ? 1 : 0]);
 
+    final int p = (int) pos;
     final Value[] out = new Value[ml - 1];
     Array.copy(members, p, out);
     Array.copy(members, p + 1, ml - 1 - p, out, p);
@@ -108,5 +70,13 @@ final class SmallArray extends TreeArray {
     qc.checkStop();
     final int p = (int) pos, l = (int) length;
     return new SmallArray(slice(members, p, p + l), type);
+  }
+
+  @Override
+  public XQArray reverseArray(final QueryContext qc) {
+    final int ml = members.length;
+    final Value[] tmp = new Value[ml];
+    for(int m = 0; m < ml; m++) tmp[m] = members[ml - 1 - m];
+    return new SmallArray(tmp, type);
   }
 }

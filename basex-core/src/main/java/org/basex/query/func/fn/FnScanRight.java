@@ -28,9 +28,9 @@ public final class FnScanRight extends FnScanLeft {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Value value = input.value(qc, arg(0));
     for(long p = value.size(); p > 0; p--) {
-      vb.add(XQArray.singleton(args.get(1)));
+      vb.add(XQArray.get(args.get(1)));
       args.set(1, invoke(action, args.set(0, value.itemAt(p - 1)).inc(), qc));
     }
-    return vb.add(XQArray.singleton(args.get(1))).value().reverse(qc);
+    return vb.add(XQArray.get(args.get(1))).value().reverse(qc);
   }
 }

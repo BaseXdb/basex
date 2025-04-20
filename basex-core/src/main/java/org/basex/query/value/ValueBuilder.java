@@ -45,36 +45,6 @@ public final class ValueBuilder {
   }
 
   /**
-   * Concatenates two values.
-   * @param value1 first value to concatenate
-   * @param value2 second value to concatenate
-   * @param qc query context
-   * @return concatenated values
-   */
-  public static Value concat(final Value value1, final Value value2, final QueryContext qc) {
-    // return existing values
-    final long size1 = value1.size();
-    if(size1 == 0) return value2;
-    final long size2 = value2.size();
-    if(size2 == 0) return value1;
-    // prepend or append values
-    if(size1 > 1) return ((Seq) value1).insertBefore(size1, value2, qc);
-    if(size2 > 1) return ((Seq) value2).insertBefore(0, value1, qc);
-    // concatenate single items
-    return concat((Item) value1, (Item) value2);
-  }
-
-  /**
-   * Concatenates two items.
-   * @param item1 first item to concatenate
-   * @param item2 second item to concatenate
-   * @return concatenated values
-   */
-  public static Value concat(final Item item1, final Item item2) {
-    return TreeSeqBuilder.concat(item1, item2);
-  }
-
-  /**
    * Appends a value to the sequence.
    * @param value value to append
    * @return reference to this builder for convenience

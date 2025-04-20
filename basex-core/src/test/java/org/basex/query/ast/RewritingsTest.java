@@ -369,11 +369,11 @@ public final class RewritingsTest extends SandboxTest {
     // check if positional predicates are rewritten to utility functions
     String seq = " (0, 1, 2, 3, 3, 4, 5) ";
     check("for $i in" + seq + "return ('a', 'b')[$i]",
-        "a\nb", exists(SmallSeq.class));
+        "a\nb", exists(StrSeq.class));
     check("for $i in" + seq + "return ('a', 'b')[position() = $i]",
-        "a\nb", exists(SmallSeq.class));
+        "a\nb", exists(StrSeq.class));
     check("for $i in" + seq + "return ('a', 'b')[position() = $i and position() = $i]", "a\nb",
-        exists(SmallSeq.class));
+        exists(StrSeq.class));
     check("for $i in (3, 5, 7, 8, 11, 13) return ('a', 'b')[position() = $i and position() = $i]",
         "", empty());
 

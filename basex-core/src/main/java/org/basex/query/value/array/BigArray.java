@@ -50,40 +50,6 @@ final class BigArray extends TreeArray {
   }
 
   @Override
-  public XQArray prepend(final Value head) {
-    final Type tp = union(head);
-    final int ll = left.length;
-    if(ll < MAX_DIGIT) {
-      final Value[] newLeft = slice(left, -1, ll);
-      newLeft[0] = head;
-      return new BigArray(newLeft, middle, right, tp);
-    }
-
-    final int mid = MAX_DIGIT / 2;
-    final Value[] newLeft = slice(left, -1, mid);
-    newLeft[0] = head;
-    final Node<Value, Value> sub = new LeafNode(slice(left, mid, ll));
-    return new BigArray(newLeft, middle.prepend(sub), right, tp);
-  }
-
-  @Override
-  public XQArray append(final Value last) {
-    final Type tp = union(last);
-    final int rl = right.length;
-    if(rl < MAX_DIGIT) {
-      final Value[] newRight = slice(right, 0, rl + 1);
-      newRight[rl] = last;
-      return new BigArray(left, middle, newRight, tp);
-    }
-
-    final int mid = (MAX_DIGIT + 1) / 2;
-    final Value[] newRight = slice(right, mid, rl + 1);
-    newRight[rl - mid] = last;
-    final Node<Value, Value> sub = new LeafNode(slice(right, 0, mid));
-    return new BigArray(left, middle.append(sub), newRight, tp);
-  }
-
-  @Override
   public Value memberAt(final long index) {
     // index in one of the digits?
     final int ll = left.length;
@@ -120,17 +86,7 @@ final class BigArray extends TreeArray {
   }
 
   @Override
-  public XQArray reverseArray(final QueryContext qc) {
-    qc.checkStop();
-    final int ll = left.length, rl = right.length;
-    final Value[] newLeft = new Value[rl], newRight = new Value[ll];
-    for(int i = 0; i < rl; i++) newLeft[i] = right[rl - 1 - i];
-    for(int i = 0; i < ll; i++) newRight[i] = left[ll - 1 - i];
-    return new BigArray(newLeft, middle.reverse(qc), newRight, type);
-  }
-
-  @Override
-  public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
+  public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
     qc.checkStop();
     final Type tp = union(value);
     final int ll = left.length;
@@ -161,7 +117,7 @@ final class BigArray extends TreeArray {
   }
 
   @Override
-  public XQArray remove(final long pos, final QueryContext qc) {
+  public XQArray removeMember(final long pos, final QueryContext qc) {
     qc.checkStop();
     final int ll = left.length, rl = right.length;
     if(pos < ll) {
@@ -423,6 +379,16 @@ final class BigArray extends TreeArray {
     if(ml <= MAX_SMALL) return new SmallArray(merged, type);
     final int mid = ml / 2;
     return new BigArray(slice(merged, 0, mid), slice(merged, mid, ml), type);
+  }
+
+  @Override
+  public XQArray reverseArray(final QueryContext qc) {
+    qc.checkStop();
+    final int ll = left.length, rl = right.length;
+    final Value[] newLeft = new Value[rl], newRight = new Value[ll];
+    for(int i = 0; i < rl; i++) newLeft[i] = right[rl - 1 - i];
+    for(int i = 0; i < ll; i++) newRight[i] = left[ll - 1 - i];
+    return new BigArray(newLeft, middle.reverse(qc), newRight, type);
   }
 
   @Override

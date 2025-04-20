@@ -23,7 +23,7 @@ public final class ArrayMembersTest extends ArrayTest {
       final ArrayList<Integer> list = new ArrayList<>(n);
       for(int i = 0; i < n; i++) {
         final int insPos = rng.nextInt(i + 1);
-        array = array.insertBefore(insPos, Int.get(i), qc);
+        array = array.insertMember(insPos, Int.get(i), qc);
         list.add(insPos, i);
       }
 

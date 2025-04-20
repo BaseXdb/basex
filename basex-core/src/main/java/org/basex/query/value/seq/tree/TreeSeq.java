@@ -38,7 +38,7 @@ public abstract class TreeSeq extends Seq {
   }
 
   /**
-   * Helper for {@link #insertBefore(long, Value, QueryContext)} that copies all items into a
+   * Helper for {@link #insert(long, Value, QueryContext)} that copies all items into a
    * {@link TreeSeq}.
    * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
    * @param value value to insert
@@ -71,13 +71,6 @@ public abstract class TreeSeq extends Seq {
   }
 
   /**
-   * Concatenates this sequence with another one.
-   * @param other array to append to the end of this array
-   * @return resulting array
-   */
-  public abstract TreeSeq concat(TreeSeq other);
-
-  /**
    * Iterator over the members of this sequence.
    * @param start starting position
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
@@ -94,7 +87,14 @@ public abstract class TreeSeq extends Seq {
   public abstract BasicIter<Item> iter();
 
   /**
-   * Prepends the given elements to this sequence.
+   * Concatenates this sequence with another one.
+   * @param other array to append to the end of this array
+   * @return resulting array
+   */
+  abstract TreeSeq concat(TreeSeq other);
+
+  /**
+   * Prepends the given sequence to this sequence.
    * @param seq small sequence
    * @return resulting sequence
    */

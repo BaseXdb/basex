@@ -127,16 +127,72 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * Returns a subsequence of this value with the given start and length.
    * The following properties must hold:
    * <ul>
-   *   <li>{@code start >= 0},
+   *   <li>{@code pos >= 0},
    *   <li>{@code length >= 0},
-   *   <li>{@code length <= size() - start}
+   *   <li>{@code length <= size() - pos}
    * </ul>
-   * @param start starting position
+   * @param pos starting position
    * @param length number of items
    * @param qc query context
    * @return sub sequence
    */
-  public abstract Value subsequence(long start, long length, QueryContext qc);
+  public final Value subsequence(final long pos, final long length, final QueryContext qc) {
+    return length == 0 ? Empty.VALUE :
+           length == 1 ? itemAt(pos) :
+           length == size() ? this :
+           subSeq(pos, length, qc);
+  }
+
+  /**
+   * Inserts a value at the given position.
+   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
+   * @param value value to insert
+   * @param qc query context
+   * @return resulting value
+   */
+  public final Value insert(final long pos, final Value value, final QueryContext qc) {
+    final long size = size(), vsize = value.size();
+    return size == 0 ? value :
+           vsize == 0 ? this :
+           pos == size && size < vsize ? value.insertValue(0, this, qc) :
+           insertValue(pos, value, qc);
+  }
+
+  /**
+   * Returns a subsequence of this value with the given start and length.
+   * @param pos position of first item (>= 0)
+   * @param length number of items (1 < length < size())
+   * @param qc query context
+   * @return sub sequence
+   */
+  protected abstract Value subSeq(long pos, long length, QueryContext qc);
+
+  /**
+   * Removes an item at the given position.
+   * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
+   * @param qc query context
+   * @return resulting sequence
+   */
+  public abstract Value removeItem(long pos, QueryContext qc);
+
+  /**
+   * Appends a value.
+   * @param value value to append
+   * @param qc query context
+   * @return resulting value
+   */
+  public final Value append(final Value value, final QueryContext qc) {
+    return insert(size(), value, qc);
+  }
+
+  /**
+   * Inserts a value at the given position into this sequence and returns the resulting sequence.
+   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
+   * @param value value to insert
+   * @param qc query context
+   * @return resulting value
+   */
+  public abstract Value insertValue(long pos, Value value, QueryContext qc);
 
   /**
    * Caches data of lazy items (i.e., those implementing the {@link Lazy} interface).

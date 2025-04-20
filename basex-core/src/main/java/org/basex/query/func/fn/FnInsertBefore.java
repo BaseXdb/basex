@@ -52,13 +52,8 @@ public final class FnInsertBefore extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc), insert = arg(2).value(qc);
-    final long size = input.size(), pos = Math.min(pos(qc), size);
-
-    // prepend, append or insert new value
-    return insert.isEmpty() ? input :
-           pos == 0 ? ValueBuilder.concat(insert, input, qc) :
-           pos == size ? ValueBuilder.concat(input, insert, qc) :
-           ((Seq) input).insertBefore(pos, insert, qc);
+    final long pos = Math.min(pos(qc), input.size());
+    return input.insert(pos, insert, qc);
   }
 
   /**

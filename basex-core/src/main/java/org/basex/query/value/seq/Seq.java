@@ -90,48 +90,19 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Value subsequence(final long start, final long length, final QueryContext qc) {
-    return length == 0 ? Empty.VALUE :
-           length == 1 ? itemAt(start) :
-           length == size() ? this :
-           subSeq(start, length, qc);
-  }
-
-  /**
-   * Returns a subsequence of this value with the given start and length.
-   * @param pos position of first item (ge 0)
-   * @param length number of items (1 lt length lt size())
-   * @param qc query context
-   * @return sub sequence
-   */
-  protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
+  protected Value subSeq(final long pos, final long length, final QueryContext qc) {
     qc.checkStop();
     return new SubSeq(this, pos, length);
   }
 
-  /**
-   * Inserts a value at the given position into this sequence and returns the resulting sequence.
-   * By default, the sequence will be converted to the tree representation,
-   * because its runtime outweighs the possibly higher memory consumption.
-   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
-   * @param value value to insert
-   * @param qc query context
-   * @return resulting value
-   */
-  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
-    return toTree(qc).insertBefore(pos, value, qc);
+  @Override
+  public Value insertValue(final long pos, final Value value, final QueryContext qc) {
+    return toTree(qc).insertValue(pos, value, qc);
   }
 
-  /**
-   * Removes the item at the given position in this sequence and returns the resulting sequence.
-   * By default, the sequence will be converted to the tree representation,
-   * because its runtime outweighs the possibly higher memory consumption.
-   * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
-   * @param qc query context
-   * @return resulting sequence
-   */
-  public Value remove(final long pos, final QueryContext qc) {
-    return toTree(qc).remove(pos, qc);
+  @Override
+  public Value removeItem(final long pos, final QueryContext qc) {
+    return toTree(qc).removeItem(pos, qc);
   }
 
   /**
@@ -139,17 +110,17 @@ public abstract class Seq extends Value {
    * @param qc query context
    * @return array
    */
-  private Seq toTree(final QueryContext qc) {
+  private Value toTree(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc, Integer.MIN_VALUE);
     for(final Item item : this) vb.add(item);
-    return (Seq) vb.value(type);
+    return vb.value(type);
   }
 
   @Override
   public Value reverse(final QueryContext qc) {
     final ValueBuilder vb = new ValueBuilder(qc, size);
     for(long i = size - 1; i >= 0; i--) vb.add(itemAt(i));
-    return vb.value(this);
+    return vb.value(type);
   }
 
   @Override
@@ -208,7 +179,7 @@ public abstract class Seq extends Value {
 
     final ValueBuilder vb = new ValueBuilder(qc, size);
     for(final Item item : this) vb.add(item.materialize(test, ii, qc));
-    return vb.value(this);
+    return vb.value(type);
   }
 
   @Override

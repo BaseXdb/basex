@@ -34,23 +34,8 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
-  public XQArray prepend(final Value head) {
-    return toTree().prepend(head);
-  }
-
-  @Override
-  public XQArray append(final Value last) {
-    return toTree().append(last);
-  }
-
-  @Override
-  public XQArray put(final long pos, final Value value) {
-    return toTree().put(pos, value);
-  }
-
-  @Override
-  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
-    return new ItemArray(members.subsequence(pos, length, qc));
+  public Iter items() throws QueryException {
+    return members.iter();
   }
 
   @Override
@@ -59,23 +44,29 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
+  public XQArray put(final long pos, final Value value) {
+    return toTree().put(pos, value);
+  }
+
+  @Override
+  public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
+    return toTree().insertMember(pos, value, qc);
+  }
+
+  @Override
+  public XQArray removeMember(final long pos, final QueryContext qc) {
+    return size == 2 ? get(members.itemAt(pos == 0 ? 1 : 0)) :
+      new ItemArray(members.removeItem(pos, qc));
+  }
+
+  @Override
+  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
+    return new ItemArray(members.subsequence(pos, length, qc));
+  }
+
+  @Override
   public XQArray reverseArray(final QueryContext qc) {
     return new ItemArray(members.reverse(qc));
-  }
-
-  @Override
-  public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
-    return toTree().insertBefore(pos, value, qc);
-  }
-
-  @Override
-  public XQArray remove(final long pos, final QueryContext qc) {
-    return toTree().remove(pos, qc);
-  }
-
-  @Override
-  public Iter items() throws QueryException {
-    return members.iter();
   }
 
   /**

@@ -26,7 +26,7 @@ public final class SmallSeq extends TreeSeq {
    * @param items items
    * @param type item type
    */
-  SmallSeq(final Item[] items, final Type type) {
+  public SmallSeq(final Item[] items, final Type type) {
     super(items.length, type);
     this.items = items;
     assert items.length >= 2 && items.length <= MAX_SMALL;
@@ -64,7 +64,7 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
+  public Value insertValue(final long pos, final Value value, final QueryContext qc) {
     qc.checkStop();
     if(value.size() > 1) return copyInsert(pos, value, qc);
 
@@ -81,7 +81,7 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public Value remove(final long pos, final QueryContext qc) {
+  public Value removeItem(final long pos, final QueryContext qc) {
     qc.checkStop();
     final int il = items.length, p = (int) pos;
     if(il == 2) return items[p == 0 ? 1 : 0];
@@ -100,7 +100,7 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq concat(final TreeSeq other) {
+  TreeSeq concat(final TreeSeq other) {
     return other.prepend(this);
   }
 

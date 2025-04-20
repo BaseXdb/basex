@@ -21,17 +21,24 @@ public final class ArrayRemove extends ArrayFn {
     XQArray array = toArray(arg(0), qc);
 
     // collect and sort positions and remove duplicates
-    final LongList pos = new LongList();
-    final Iter iter = arg(1).iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      pos.add(toPos(array, toLong(item), false));
+    final LongList list = new LongList();
+    final Iter positions = arg(1).iter(qc);
+    for(Item item; (item = qc.next(positions)) != null;) {
+      list.add(toPos(array, toLong(item), false));
     }
-    pos.ddo();
+    list.ddo();
 
     // delete entries backwards
-    for(int l = pos.size() - 1; l >= 0; l--) {
-      final long p = pos.get(l);
-      if(p < array.structSize()) array = array.remove(p, qc);
+    for(int l = list.size() - 1; l >= 0; l--) {
+      final long pos = list.get(l), size = array.structSize();
+      final boolean first = pos == 0, last = pos == size - 1;
+      if(first || last) {
+        // remove first or last member
+        array = array.subArray(first ? 1 : 0, size - 1, qc);
+      } else {
+        // remove member at supplied position
+        array = array.removeMember(pos, qc);
+      }
     }
     return array;
   }

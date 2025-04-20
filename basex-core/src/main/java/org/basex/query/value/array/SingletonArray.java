@@ -31,18 +31,8 @@ public final class SingletonArray extends XQArray {
   }
 
   @Override
-  public XQArray prepend(final Value head) {
-    return new SmallArray(new Value[] { head, member }, union(head));
-  }
-
-  @Override
-  public XQArray append(final Value last) {
-    return new SmallArray(new Value[] { member, last }, union(last));
-  }
-
-  @Override
   public XQArray put(final long pos, final Value value) {
-    return singleton(value);
+    return get(value);
   }
 
   @Override
@@ -54,18 +44,21 @@ public final class SingletonArray extends XQArray {
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return member.atomValue(qc, ii);
   }
+
   @Override
   public XQArray reverseArray(final QueryContext qc) {
     return this;
   }
 
   @Override
-  public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
-    return pos == 0 ? prepend(value) : append(value);
+  public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
+    final Value first = pos == 0 ? value : member, second = pos == 0 ? member : value;
+    final ArrayType at = (ArrayType) type.union(ArrayType.get(value.seqType()));
+    return new ArrayBuilder(qc, 2).add(first).add(second).array(at);
   }
 
   @Override
-  public XQArray remove(final long pos, final QueryContext qc) {
+  public XQArray removeMember(final long pos, final QueryContext qc) {
     return empty();
   }
 

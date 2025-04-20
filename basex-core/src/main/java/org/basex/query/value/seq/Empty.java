@@ -97,11 +97,6 @@ public final class Empty extends Item {
   }
 
   @Override
-  public Empty subsequence(final long start, final long length, final QueryContext qc) {
-    return this;
-  }
-
-  @Override
   public SeqType seqType() {
     return SeqType.EMPTY_SEQUENCE_Z;
   }

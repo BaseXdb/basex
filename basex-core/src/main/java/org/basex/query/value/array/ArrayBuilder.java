@@ -84,7 +84,7 @@ public final class ArrayBuilder {
    */
   public XQArray array(final ArrayType type) {
     try {
-      return array != null ? array.array(type) : single != null ? XQArray.singleton(single) :
+      return array != null ? array.array(type) : single != null ? XQArray.get(single) :
         XQArray.empty();
     } finally {
       array = null;

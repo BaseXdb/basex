@@ -69,15 +69,11 @@ public abstract class Iter {
     final Item item2 = next();
     if(item2 == null) return item1;
 
-    // two items?
-    Item item = next();
-    if(item == null) return ValueBuilder.concat(item1, item2);
-
-    // more items: build sequence
+    // build sequence
     final ValueBuilder vb = new ValueBuilder(qc, size()).add(item1).add(item2);
-    do {
+    for(Item item; (item = next()) != null;) {
       vb.add(item);
-    } while((item = qc.next(this)) != null);
+    }
     return vb.value(expr);
   }
 }

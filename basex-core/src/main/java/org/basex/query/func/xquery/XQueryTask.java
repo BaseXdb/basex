@@ -60,7 +60,7 @@ final class XQueryTask extends RecursiveTask<Value> {
       task2.fork();
       final XQueryTask task1 = new XQueryTask(tc, start, middle);
       final Value value1 = task1.invoke(), value2 = task2.join();
-      if(tc.results) return ValueBuilder.concat(value1, value2, tc.qc);
+      if(tc.results) return value1.append(value2, tc.qc);
     }
     return Empty.VALUE;
   }

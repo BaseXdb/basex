@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
@@ -48,30 +47,28 @@ public final class FnRemove extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
-    final LongList pos = positions(qc);
-    return value(input, pos, qc);
+    final LongList positions = positions(qc);
+    return value(input, positions, qc);
   }
 
   /**
    * Returns the result value.
    * @param value original value
-   * @param list positions of the items to remove (sorted, duplicate-free)
+   * @param positions positions of the items to remove (sorted, duplicate-free)
    * @param qc query context
    * @return resulting value
    */
-  private static Value value(final Value value, final LongList list, final QueryContext qc) {
+  private static Value value(final Value value, final LongList positions, final QueryContext qc) {
     Value val = value;
-    for(int l = list.size() - 1; l >= 0 && !val.isEmpty(); l--) {
-      final long pos = list.get(l), size = val.size();
-      if(pos == 0) {
-        // remove first item
-        val = val.subsequence(1, size - 1, qc);
-      } else if(pos == size - 1) {
-        // remove last item
-        val = val.subsequence(0, size - 1, qc);
+    for(int l = positions.size() - 1; l >= 0 && !val.isEmpty(); l--) {
+      final long pos = positions.get(l), size = val.size();
+      final boolean first = pos == 0, last = pos == size - 1;
+      if(first || last) {
+        // remove first or last item
+        val = val.subsequence(first ? 1 : 0, size - 1, qc);
       } else if(pos > 0 && pos < size) {
         // remove item at supplied position
-        val = ((Seq) val).remove(pos, qc);
+        val = val.removeItem(pos, qc);
       }
     }
     return val;

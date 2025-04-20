@@ -28,16 +28,6 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public XQArray prepend(final Value head) {
-    return singleton(head);
-  }
-
-  @Override
-  public XQArray append(final Value last) {
-    return singleton(last);
-  }
-
-  @Override
   public Value memberAt(final long index) {
     throw Util.notExpected();
   }
@@ -53,8 +43,8 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
-    return singleton(value);
+  public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
+    return get(value);
   }
 
   @Override
@@ -63,7 +53,7 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public XQArray remove(final long pos, final QueryContext qc) {
+  public XQArray removeMember(final long pos, final QueryContext qc) {
     throw Util.notExpected();
   }
 

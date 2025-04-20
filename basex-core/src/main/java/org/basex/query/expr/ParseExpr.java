@@ -84,12 +84,11 @@ public abstract class ParseExpr extends Expr {
     if(next == null) return first.test(qc, info, pos);
 
     // positional sequence?
-    if(pos == 0 || !(first instanceof ANum))
-      throw testError(ValueBuilder.concat(first, next), false, ii);
+    if(pos == 0 || !(first instanceof ANum)) throw testError(first.append(next, qc), false, ii);
 
     if(first.test(qc, info, pos)) return true;
     do {
-      if(!(next instanceof ANum)) throw testError(ValueBuilder.concat(first, next), true, info);
+      if(!(next instanceof ANum)) throw testError(first.append(next, qc), true, info);
       if(next.test(qc, info, pos)) return true;
     } while((next = iter.next()) != null);
     return false;

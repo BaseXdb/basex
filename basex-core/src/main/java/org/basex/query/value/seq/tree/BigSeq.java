@@ -77,7 +77,7 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
+  public Value insertValue(final long pos, final Value value, final QueryContext qc) {
     qc.checkStop();
     if(value.size() > 1) return copyInsert(pos, value, qc);
 
@@ -111,7 +111,7 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq remove(final long pos, final QueryContext qc) {
+  public TreeSeq removeItem(final long pos, final QueryContext qc) {
     qc.checkStop();
     final int ll = left.length, rl = right.length;
     if(pos < ll) {
@@ -378,7 +378,7 @@ final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq concat(final TreeSeq seq) {
+  TreeSeq concat(final TreeSeq seq) {
     final Type tp = type.union(seq.type);
     if(seq instanceof SmallSeq) {
       // merge with right digit

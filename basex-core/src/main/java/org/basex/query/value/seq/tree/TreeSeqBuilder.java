@@ -35,16 +35,6 @@ public final class TreeSeqBuilder implements SeqBuilder {
   private final FingerTreeBuilder<Item> tree = new FingerTreeBuilder<>();
 
   /**
-   * Concatenates two items.
-   * @param item1 first item
-   * @param item2 second item
-   * @return the value
-   */
-  public static Seq concat(final Item item1, final Item item2) {
-    return new SmallSeq(new Item[] { item1, item2 }, item1.type.union(item2.type));
-  }
-
-  /**
    * Adds an item to the start of the sequence.
    * @param item item to add
    * @return reference to this builder for convenience

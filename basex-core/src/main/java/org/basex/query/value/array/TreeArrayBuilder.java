@@ -118,7 +118,7 @@ final class TreeArrayBuilder implements ArrBuilder {
     final int n = inLeft + inRight;
     if(n == 0) return XQArray.empty();
     final int start = (mid - inLeft + CAP) % CAP;
-    if(n == 1) return XQArray.singleton(values[start]);
+    if(n == 1) return XQArray.get(values[start]);
 
     if(n <= TreeArray.MAX_SMALL) {
       // small int array, fill directly

@@ -55,7 +55,7 @@ public abstract class XQMap extends XQStruct {
    * @param value value
    * @return map
    */
-  public static XQMap singleton(final Item key, final Value value) {
+  public static XQMap get(final Item key, final Value value) {
     return new XQSingletonMap(key, value);
   }
 

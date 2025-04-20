@@ -70,18 +70,18 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
-    return singleItem() ? new SingletonSeq(length, value) : super.subSeq(pos, length, qc);
+  protected Value subSeq(final long pos, final long length, final QueryContext qc) {
+    return singleItem() ? get(value, length) : super.subSeq(pos, length, qc);
   }
 
   @Override
-  public Value insertBefore(final long pos, final Value val, final QueryContext qc) {
-    return val.equals(value) ? get(value, size + 1) : super.insertBefore(pos, val, qc);
+  public Value insertValue(final long pos, final Value val, final QueryContext qc) {
+    return val.equals(value) ? get(value, size + 1) : super.insertValue(pos, val, qc);
   }
 
   @Override
-  public Value remove(final long pos, final QueryContext qc) {
-    return singleItem() ? get(value, size - 1) : super.remove(pos, qc);
+  public Value removeItem(final long pos, final QueryContext qc) {
+    return singleItem() ? get(value, size - 1) : super.removeItem(pos, qc);
   }
 
   @Override
@@ -109,8 +109,7 @@ public final class SingletonSeq extends Seq {
   @Override
   public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
-    return materialized(test, ii) ? this :
-      new SingletonSeq(size, value.materialize(test, ii, qc));
+    return materialized(test, ii) ? this : get(value.materialize(test, ii, qc), size);
   }
 
   @Override

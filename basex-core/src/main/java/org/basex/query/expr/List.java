@@ -228,7 +228,7 @@ public final class List extends Arr {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     // special case: concatenate two sequences
-    if(exprs.length == 2) return ValueBuilder.concat(exprs[0].value(qc), exprs[1].value(qc), qc);
+    if(exprs.length == 2) return exprs[0].value(qc).append(exprs[1].value(qc), qc);
 
     // general case: concatenate all sequences (unknown size: do not create compact data structures)
     final ValueBuilder vb = new ValueBuilder(qc, size() != -1 ? size() : Integer.MIN_VALUE);

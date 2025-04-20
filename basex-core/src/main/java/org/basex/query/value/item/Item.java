@@ -21,7 +21,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type.*;
 import org.basex.util.*;
@@ -247,8 +246,21 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Value subsequence(final long start, final long length, final QueryContext qc) {
-    return length == 1 ? this : Empty.VALUE;
+  public final Item subSeq(final long start, final long length, final QueryContext qc) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public Value insertValue(final long pos, final Value value, final QueryContext qc) {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    vb.add(pos == 0 ? value : this);
+    vb.add(pos == 0 ? this : value);
+    return vb.value(type.union(value.type));
+  }
+
+  @Override
+  public final Item removeItem(final long pos, final QueryContext qc) {
+    throw Util.notExpected();
   }
 
   /**

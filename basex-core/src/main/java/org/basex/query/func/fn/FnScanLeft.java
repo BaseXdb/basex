@@ -22,7 +22,7 @@ public class FnScanLeft extends StandardFunc {
 
     return new Iter() {
       final HofArgs args = new HofArgs(3).set(0, arg(1).value(qc));
-      XQArray init = XQArray.singleton(args.get(0));
+      XQArray init = XQArray.get(args.get(0));
 
       @Override
       public Item next() throws QueryException {
@@ -34,7 +34,7 @@ public class FnScanLeft extends StandardFunc {
             item = input.next();
             if(item != null) {
               args.set(0, invoke(action, args.set(1, item).inc(), qc));
-              item = XQArray.singleton(args.get(0));
+              item = XQArray.get(args.get(0));
             }
           }
           return item;

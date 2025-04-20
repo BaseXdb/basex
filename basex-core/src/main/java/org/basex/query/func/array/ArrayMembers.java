@@ -66,6 +66,6 @@ public final class ArrayMembers extends StandardFunc {
    * @return map
    */
   private static XQMap record(final Value value) {
-    return XQMap.singleton(Str.VALUE, value);
+    return XQMap.get(Str.VALUE, value);
   }
 }

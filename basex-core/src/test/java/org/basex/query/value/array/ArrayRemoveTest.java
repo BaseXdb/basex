@@ -10,7 +10,7 @@ import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Tests the {@link XQArray#remove(long, QueryContext)} method.
+ * Tests the {@link XQArray#removeMember(long, QueryContext)} method.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
@@ -18,8 +18,8 @@ import org.junit.jupiter.api.*;
 public final class ArrayRemoveTest extends ArrayTest {
   /** Remove one element from singleton array. */
   @Test public void singletonTest() {
-    final XQArray array = XQArray.singleton(Int.get(42));
-    assertSame(XQArray.empty(), array.remove(0, qc));
+    final XQArray array = XQArray.get(Int.get(42));
+    assertSame(XQArray.empty(), array.removeMember(0, qc));
   }
 
   /** Delete each element once from arrays of varying length. */
@@ -28,7 +28,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     XQArray array1 = XQArray.empty();
     for(int k = 0; k < n; k++) {
       for(int i = 0; i < k; i++) {
-        final XQArray array2 = array1.remove(i, qc);
+        final XQArray array2 = array1.removeMember(i, qc);
         final Iterator<Value> iter2 = array2.iterator(0);
         for(int j = 0; j < k - 1; j++) {
           assertTrue(iter2.hasNext());
@@ -36,7 +36,7 @@ public final class ArrayRemoveTest extends ArrayTest {
         }
         assertFalse(iter2.hasNext());
       }
-      array1 = array1.append(Int.get(k));
+      array1 = array1.appendMember(Int.get(k), qc);
       assertEquals(k + 1, array1.structSize());
       assertEquals(k, ((Int) array1.memberAt(k)).itr());
     }
@@ -47,43 +47,43 @@ public final class ArrayRemoveTest extends ArrayTest {
     final XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
     XQArray array2 = array.subArray(1, array.structSize() - 1, qc);
-    array2 = array2.remove(4, qc);
-    array2 = array2.remove(2, qc);
+    array2 = array2.removeMember(4, qc);
+    array2 = array2.removeMember(2, qc);
     assertContains(array2, 1, 2, 4, 6, 7, 8);
 
-    array2 = array.insertBefore(0, Int.get(-1), qc).append(Int.get(9));
-    array2 = array2.remove(5, qc);
-    array2 = array2.remove(5, qc);
+    array2 = array.insertMember(0, Int.get(-1), qc).appendMember(Int.get(9), qc);
+    array2 = array2.removeMember(5, qc);
+    array2 = array2.removeMember(5, qc);
     assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8, 9);
 
-    array2 = array.insertBefore(0, Int.get(-1), qc);
-    array2 = array2.remove(5, qc);
-    array2 = array2.remove(5, qc);
+    array2 = array.insertMember(0, Int.get(-1), qc);
+    array2 = array2.removeMember(5, qc);
+    array2 = array2.removeMember(5, qc);
     assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8);
   }
 
   /** Delete elements so that the left digit is emptied. */
   @Test public void emptyLeftDigitTest() {
     XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
-    array = array.remove(0, qc);
-    array = array.remove(0, qc);
-    array = array.remove(0, qc);
-    array = array.remove(0, qc);
+    array = array.removeMember(0, qc);
+    array = array.removeMember(0, qc);
+    array = array.removeMember(0, qc);
+    array = array.removeMember(0, qc);
     assertContains(array, 4, 5, 6, 7, 8);
   }
 
   /** Delete elements so that the right digit is emptied. */
   @Test public void emptyRightDigitTest() {
     XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8);
-    array = array.remove(8, qc);
-    array = array.remove(7, qc);
-    array = array.remove(6, qc);
-    array = array.remove(5, qc);
+    array = array.removeMember(8, qc);
+    array = array.removeMember(7, qc);
+    array = array.removeMember(6, qc);
+    array = array.removeMember(5, qc);
     assertContains(array, 0, 1, 2, 3, 4);
 
-    array = from(1, 2, 3, 4, 5, 6, 7, 8, 9).insertBefore(0, Int.ZERO, qc);
+    array = from(1, 2, 3, 4, 5, 6, 7, 8, 9).insertMember(0, Int.ZERO, qc);
     for(int i = 9; i >= 4; i--) {
-      array = array.remove(i, qc);
+      array = array.removeMember(i, qc);
     }
     assertContains(array, 0, 1, 2, 3);
   }
@@ -91,21 +91,21 @@ public final class ArrayRemoveTest extends ArrayTest {
   /** Delete in the left digit of a deep node. */
   @Test public void deepLeftTest() {
     XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-    array = array.remove(3, qc);
+    array = array.removeMember(3, qc);
     assertContains(array, 0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 
     array = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-    array = array.remove(6, qc);
+    array = array.removeMember(6, qc);
     assertContains(array, 0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 
     array = from(
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
-    array = array.remove(9, qc);
-    array = array.remove(6, qc);
-    array = array.remove(5, qc);
-    array = array.remove(4, qc);
-    array = array.remove(3, qc);
-    array = array.remove(3, qc);
+    array = array.removeMember(9, qc);
+    array = array.removeMember(6, qc);
+    array = array.removeMember(5, qc);
+    array = array.removeMember(4, qc);
+    array = array.removeMember(3, qc);
+    array = array.removeMember(3, qc);
     assertContains(array,
         0, 1, 2, 8, 10, 11, 12, 13, 14,
         15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
@@ -114,11 +114,11 @@ public final class ArrayRemoveTest extends ArrayTest {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24);
-    array = array.remove(6, qc);
-    array = array.remove(5, qc);
-    array = array.remove(4, qc);
-    array = array.remove(3, qc);
-    array = array.remove(3, qc);
+    array = array.removeMember(6, qc);
+    array = array.removeMember(5, qc);
+    array = array.removeMember(4, qc);
+    array = array.removeMember(3, qc);
+    array = array.removeMember(3, qc);
     assertContains(array,
         0, 1, 2, 8, 9, 10, 11, 12, 13, 14,
         15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
@@ -127,14 +127,14 @@ public final class ArrayRemoveTest extends ArrayTest {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
         10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24);
-    array = array.remove(17, qc);
-    array = array.remove(16, qc);
-    array = array.remove(15, qc);
-    array = array.remove(6, qc);
-    array = array.remove(5, qc);
-    array = array.remove(4, qc);
-    array = array.remove(3, qc);
-    array = array.remove(3, qc);
+    array = array.removeMember(17, qc);
+    array = array.removeMember(16, qc);
+    array = array.removeMember(15, qc);
+    array = array.removeMember(6, qc);
+    array = array.removeMember(5, qc);
+    array = array.removeMember(4, qc);
+    array = array.removeMember(3, qc);
+    array = array.removeMember(3, qc);
     assertContains(array, 0, 1, 2, 8, 9, 10, 11, 12, 13, 14, 18, 19, 20, 21, 22, 23, 24);
 
     array = from(
@@ -143,7 +143,7 @@ public final class ArrayRemoveTest extends ArrayTest {
         21
     );
     for(int i = 12; i >= 4; i--) {
-      array = array.remove(i, qc);
+      array = array.removeMember(i, qc);
     }
     assertContains(array, 0, 1, 2, 3, 13, 14, 15, 16, 17, 18, 19, 20, 21);
   }
@@ -156,10 +156,10 @@ public final class ArrayRemoveTest extends ArrayTest {
         20, 21, 22, 23, 24, 25, 26);
 
     for(int i = 8; i >= 6; i--) {
-      array = array.remove(i, qc);
+      array = array.removeMember(i, qc);
     }
     for(int i = 15; i >= 9; i--) {
-      array = array.remove(i - 3, qc);
+      array = array.removeMember(i - 3, qc);
     }
 
     assertContains(array, 0, 1, 2, 3, 4, 5, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26);
@@ -167,9 +167,9 @@ public final class ArrayRemoveTest extends ArrayTest {
     array = from(
         5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
-    for(int i = 4; i >= 0; i--) array = array.insertBefore(0, Int.get(i), qc);
-    for(int i = 31; i <= 35; i++) array = array.append(Int.get(i));
-    for(int i = 22; i >= 16; i--) array = array.remove(i, qc);
+    for(int i = 4; i >= 0; i--) array = array.insertMember(0, Int.get(i), qc);
+    for(int i = 31; i <= 35; i++) array = array.appendMember(Int.get(i), qc);
+    for(int i = 22; i >= 16; i--) array = array.removeMember(i, qc);
     assertContains(array, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
             14, 15, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
   }
@@ -177,13 +177,13 @@ public final class ArrayRemoveTest extends ArrayTest {
   /** Delete in the right digit of a deep node. */
   @Test public void deepRightTest() {
     XQArray array = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
-    for(int i = 12; i >= 8; i--) array = array.remove(i, qc);
-    array = array.remove(8, qc);
+    for(int i = 12; i >= 8; i--) array = array.removeMember(i, qc);
+    array = array.removeMember(8, qc);
     assertContains(array, 0, 1, 2, 3, 4, 5, 6, 7, 14, 15, 16, 17);
 
     array = from(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
-    for(int i = 12; i >= 9; i--) array = array.remove(i, qc);
-    array = array.remove(9, qc);
+    for(int i = 12; i >= 9; i--) array = array.removeMember(i, qc);
+    array = array.removeMember(9, qc);
     assertContains(array, 0, 1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17);
   }
 
@@ -203,7 +203,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     for(int i = 0; i < n; i++) {
       final int delPos = rng.nextInt(n - i);
       list.remove(delPos);
-      array = array.remove(delPos, qc);
+      array = array.removeMember(delPos, qc);
       final int size = n - i - 1;
       assertEquals(size, array.structSize());
       assertEquals(size, list.size());
@@ -226,7 +226,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     for(int k = 0; k < n; k++) {
       assertEquals(k, array1.structSize());
       for(int i = 0; i < k; i++) {
-        final XQArray array2 = array1.remove(i, qc);
+        final XQArray array2 = array1.removeMember(i, qc);
         assertEquals(k - 1, array2.structSize());
 
         final Iterator<Value> iter2 = array2.iterator(0);
@@ -236,7 +236,7 @@ public final class ArrayRemoveTest extends ArrayTest {
         }
         assertFalse(iter2.hasNext());
       }
-      array1 = array1.append(Int.get(k));
+      array1 = array1.appendMember(Int.get(k), qc);
     }
   }
 

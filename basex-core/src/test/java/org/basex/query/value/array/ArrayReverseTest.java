@@ -21,7 +21,7 @@ public final class ArrayReverseTest extends ArrayTest {
     final Random rng = new Random(42);
     for(int n = 0; n < 1_000; n++) {
       XQArray array = XQArray.empty();
-      for(int i = 0; i < n; i++) array = array.insertBefore(rng.nextInt(i + 1), Int.get(i), qc);
+      for(int i = 0; i < n; i++) array = array.insertMember(rng.nextInt(i + 1), Int.get(i), qc);
       assertEquals(n, array.structSize());
       final XQArray rev = array.reverseArray(qc);
       final ListIterator<Value> af = array.iterator(0), ab = array.iterator(n);

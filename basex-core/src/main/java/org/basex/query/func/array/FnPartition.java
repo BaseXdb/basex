@@ -40,7 +40,7 @@ public final class FnPartition extends ArrayFn {
               return ab.array();
             }
           } else {
-            value = ValueBuilder.concat(value, item, qc);
+            value = value.append(item, qc);
           }
         }
         return null;

@@ -67,6 +67,6 @@ public class MapEntries extends StandardFunc {
    */
   @SuppressWarnings("unused")
   XQMap entry(final Item key, final Value value) throws QueryException {
-    return XQMap.singleton(key, value);
+    return XQMap.get(key, value);
   }
 }

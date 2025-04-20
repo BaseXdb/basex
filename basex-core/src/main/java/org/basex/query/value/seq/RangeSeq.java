@@ -133,11 +133,6 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Value insertBefore(final long pos, final Value value, final QueryContext qc) {
-    return super.insertBefore(pos, value, qc);
-  }
-
-  @Override
   public Value reverse(final QueryContext qc) {
     return get(get(size - 1), size(), !ascending);
   }

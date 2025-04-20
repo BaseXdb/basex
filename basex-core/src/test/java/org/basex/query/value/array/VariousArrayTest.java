@@ -16,14 +16,14 @@ import org.junit.jupiter.api.*;
  */
 public final class VariousArrayTest extends ArrayTest {
   /**
-   * Test for {@link XQArray#prepend(Value)} and {@link XQArray#append(Value)}.
+   * Test for {@link XQArray#insertMember(long, Value, org.basex.query.QueryContext)}.
    */
   @Test public void consSnocTest() {
     final int n = 200_000;
     XQArray array = XQArray.empty();
     for(int i = 0; i < n; i++) {
       final Int val = Int.get(i);
-      array = array.insertBefore(0, val, qc).append(val);
+      array = array.insertMember(0, val, qc).appendMember(val, qc);
     }
 
     assertEquals(2 * n, array.structSize());
@@ -39,13 +39,13 @@ public final class VariousArrayTest extends ArrayTest {
   @Test public void queueTest() {
     final int n = 2_000_000, k = n / 100;
     XQArray array = XQArray.empty();
-    for(int i = 0; i < k; i++) array = array.insertBefore(0, Int.get(i), qc);
+    for(int i = 0; i < k; i++) array = array.insertMember(0, Int.get(i), qc);
 
     for(int i = k; i < n; i++) {
       assertEquals(k, array.structSize());
       assertEquals(i - k, ((Int) array.memberAt(array.structSize() - 1)).itr());
       array = array.subArray(0, array.structSize() - 1, qc);
-      array = array.insertBefore(0, Int.get(i), qc);
+      array = array.insertMember(0, Int.get(i), qc);
     }
 
     assertEquals(k, array.structSize());
@@ -68,7 +68,7 @@ public final class VariousArrayTest extends ArrayTest {
     for(int i = 0; i < n; i++) {
       assertEquals(i, array.structSize());
       final Int val = Int.get(i);
-      array = array.insertBefore(0, val, qc).insertBefore(0, val, qc);
+      array = array.insertMember(0, val, qc).insertMember(0, val, qc);
       assertEquals(i, ((Int) array.memberAt(0)).itr());
       array = array.subArray(1, array.structSize() - 1, qc);
     }
@@ -94,7 +94,7 @@ public final class VariousArrayTest extends ArrayTest {
 
     for(int i = 0; i < n; i++) {
       final Int val = Int.get(i);
-      array = array.insertBefore(0, val, qc).append(val);
+      array = array.insertMember(0, val, qc).appendMember(val, qc);
       final int k = 2 * (i + 1);
       final Iterator<Value> iter = array.iterator(0);
       for(int j = 0; j < k; j++) {

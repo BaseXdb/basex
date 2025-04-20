@@ -18,7 +18,7 @@ public final class ArrayInsertBefore extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
     final long position = toPos(array, toLong(arg(1), qc), true);
     final Value member = arg(2).value(qc);
-    return array.insertBefore(position, member, qc);
+    return array.insertMember(position, member, qc);
   }
 
   @Override
