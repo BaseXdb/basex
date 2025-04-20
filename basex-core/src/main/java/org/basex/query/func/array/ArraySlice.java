@@ -22,7 +22,7 @@ public final class ArraySlice extends FnSlice {
     if(slice.reverse) array = array.reverseArray(qc);
     if(slice.step == 1) return array.subArray(slice.start - 1, slice.length, qc);
 
-    final ArrayBuilder ab = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder(qc);
     for(long i = slice.start; i <= slice.end; i += slice.step) {
       ab.add(array.memberAt(i - 1));
     }

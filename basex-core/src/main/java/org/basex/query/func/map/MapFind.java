@@ -21,7 +21,7 @@ public final class MapFind extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final Item key = toAtomItem(arg(1), qc);
 
-    final ArrayBuilder ab = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder(qc);
     find(input, key, ab, qc);
     return ab.array(this);
   }

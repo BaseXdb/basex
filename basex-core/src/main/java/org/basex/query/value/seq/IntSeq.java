@@ -10,7 +10,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -105,11 +104,6 @@ public final class IntSeq extends NativeSeq {
       else if(tl != size) expr = get(tmp, type);
     }
     return cc.simplify(this, expr, mode);
-  }
-
-  @Override
-  public XQArray toArray() {
-    return type != AtomType.INTEGER ? super.toArray() : new IntArray(values);
   }
 
   @Override

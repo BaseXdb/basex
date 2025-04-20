@@ -7,7 +7,6 @@ import java.util.*;
 import org.basex.build.json.*;
 import org.basex.build.json.JsonParserOptions.*;
 import org.basex.query.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -38,7 +37,7 @@ public final class JsonW3Converter extends JsonConverter {
   /** Stack for intermediate values. */
   private final Stack<Value> stack = new Stack<>();
   /** Stack for intermediate arrays. */
-  private final Stack<ValueList> arrays = new Stack<>();
+  private final Stack<ArrayBuilder> arrays = new Stack<>();
   /** Stack for intermediate maps. */
   private final Stack<MapBuilder> maps = new Stack<>();
 
@@ -89,7 +88,7 @@ public final class JsonW3Converter extends JsonConverter {
 
   @Override
   void openArray() {
-    arrays.push(new ValueList());
+    arrays.push(new ArrayBuilder());
   }
 
   @Override
@@ -103,9 +102,7 @@ public final class JsonW3Converter extends JsonConverter {
 
   @Override
   void closeArray() {
-    final ArrayBuilder ab = new ArrayBuilder();
-    for(final Value value : arrays.pop()) ab.add(value);
-    stack.push(ab.array());
+    stack.push(arrays.pop().array());
   }
 
   @Override

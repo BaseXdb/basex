@@ -7,7 +7,6 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -67,12 +66,6 @@ public final class StrSeq extends NativeSeq {
     final byte[][] array = new byte[sz][];
     for(int i = 0; i < sz; i++) array[sz - i - 1] = values[i];
     return get(array, type);
-  }
-
-  @Override
-  public XQArray toArray() {
-    final boolean str = type == AtomType.STRING, atm = type == AtomType.UNTYPED_ATOMIC;
-    return (!str && !atm) ? super.toArray() : str ? new StrArray(values) : new AtmArray(values);
   }
 
   @Override

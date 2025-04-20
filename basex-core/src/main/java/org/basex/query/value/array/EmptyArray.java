@@ -58,6 +58,16 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
+  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public XQArray remove(final long pos, final QueryContext qc) {
+    throw Util.notExpected();
+  }
+
+  @Override
   public ListIterator<Value> iterator(final long start) {
     return Collections.emptyListIterator();
   }

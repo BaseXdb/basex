@@ -22,7 +22,7 @@ public final class ArrayForEach extends ArrayFn {
     final FItem action = toFunction(arg(1), 2, qc);
 
     final HofArgs args = new HofArgs(2, action);
-    final ArrayBuilder ab = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder(qc);
     for(final Value value : array.iterable()) {
       ab.add(invoke(action, args.set(0, value).inc(), qc));
     }

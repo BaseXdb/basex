@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import org.basex.*;
 import org.basex.query.value.array.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -260,11 +261,11 @@ public final class ArrayTest extends SandboxTest {
   /** Range array. */
   @Test public void rangeArray() {
     check("[ 1 to 6 ]", "[(1,2,3,4,5,6)]", root(SingletonArray.class));
-    check("array { 1 to 6 }", "[1,2,3,4,5,6]", root(RangeArray.class));
+    check("array { 1 to 6 }", "[1,2,3,4,5,6]", exists(RangeSeq.class));
     check("[ 1 to 6 ] => array:reverse()", "[(1,2,3,4,5,6)]", root(SingletonArray.class));
-    check("array { 1 to 6 } => array:reverse()", "[6,5,4,3,2,1]", root(RangeArray.class));
+    check("array { 1 to 6 } => array:reverse()", "[6,5,4,3,2,1]", exists(RangeSeq.class));
     check("[ reverse(1 to 6) ]", "[(6,5,4,3,2,1)]", root(SingletonArray.class));
-    check("array { reverse(1 to 6) }", "[6,5,4,3,2,1]", root(RangeArray.class));
+    check("array { reverse(1 to 6) }", "[6,5,4,3,2,1]", exists(RangeSeq.class));
 
     query("[ 1 to 2000000000 ] => array:size()", 1);
     query("[ 1 to 2000000000 ] => array:items() => count()", 2000000000);
@@ -285,14 +286,14 @@ public final class ArrayTest extends SandboxTest {
   /** Subarray. */
   @Test public void subArray() {
     check("[ 'a', 'b', 'c', 'd' ] => array:tail()", "[\"b\",\"c\",\"d\"]",
-        root(SubArray.class));
+        exists(SubSeq.class));
     check("[ 'a', 'b', 'c', 'd' ] => array:tail() => array:tail()", "[\"c\",\"d\"]",
-        root(SubArray.class));
+        exists(SubSeq.class));
     check("[ 'a', 'b', 'c', 'd' ] => array:trunk()", "[\"a\",\"b\",\"c\"]",
-        root(SubArray.class));
+        exists(SubSeq.class));
     check("[ 'a', 'b', 'c', 'd' ] => array:trunk() => array:trunk()", "[\"a\",\"b\"]",
-        root(SubArray.class));
+        exists(SubSeq.class));
     check("[ 'a', 'b', 'c', 'd' ] => array:subarray(2, 2)", "[\"b\",\"c\"]",
-        root(SubArray.class));
+        exists(SubSeq.class));
   }
 }

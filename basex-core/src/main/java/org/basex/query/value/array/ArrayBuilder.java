@@ -1,10 +1,9 @@
 package org.basex.query.value.array;
 
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.list.*;
 
 /**
  * A builder for efficiently creating an {@link XQArray}.
@@ -13,6 +12,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ArrayBuilder {
+  /** QueryContext (can be {@code null}). */
+  private final QueryContext qc;
+
   /** Sequence builder, only instantiated if there are at least two members. */
   private ArrBuilder array;
   /** Capacity ({@link Integer#MIN_VALUE}: create no compact data structures). */
@@ -24,15 +26,25 @@ public final class ArrayBuilder {
    * Constructor.
    */
   public ArrayBuilder() {
-    this(-1);
+    this(null);
   }
 
   /**
    * Constructor.
+   * @param qc query context (can be {@code null}, required for interrupting running queries)
+   */
+  public ArrayBuilder(final QueryContext qc) {
+    this(qc, -1);
+  }
+
+  /**
+   * Constructor.
+   * @param qc query context (can be {@code null}, required for interrupting running queries)
    * @param capacity initial capacity ({@link Integer#MIN_VALUE}: create no compact data structures)
    */
-  public ArrayBuilder(final long capacity) {
-    this.capacity = capacity;
+  public ArrayBuilder(final QueryContext qc, final long capacity) {
+    this.qc = qc;
+    this.capacity = qc != null ? capacity : Integer.MIN_VALUE;
   }
 
   /**
@@ -44,14 +56,8 @@ public final class ArrayBuilder {
     final Value sngl = single;
     if(sngl != null) {
       single = null;
-      if(capacity != Integer.MIN_VALUE) {
-        array = isStr(sngl) && isStr(value) ? new StrArrBuilder() :
-                isAtm(sngl) && isAtm(value) ? new AtmArrBuilder() :
-                isInt(sngl) && isInt(value) ? new IntArrBuilder() :
-                isDbl(sngl) && isDbl(value) ? new DblArrBuilder() :
-                isBln(sngl) && isBln(value) ? new BlnArrBuilder() : null;
-      }
-      if(array == null) array = new TreeArrayBuilder();
+      array = capacity != Integer.MIN_VALUE && sngl.isItem() && value.isItem() ?
+        new ItemArrayBuilder(qc, capacity) : new TreeArrayBuilder();
       add(sngl);
     }
     if(array != null) {
@@ -93,157 +99,5 @@ public final class ArrayBuilder {
    */
   public XQArray array(final Expr expr) {
     return expr != null ? array((ArrayType) expr.seqType().type) : array();
-  }
-
-  /**
-   * Checks if the specified value is a string.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isStr(final Value value) {
-    return value instanceof Str && value.type == AtomType.STRING;
-  }
-
-  /**
-   * Checks if the specified value is a string.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isAtm(final Value value) {
-    return value.seqType().eq(SeqType.UNTYPED_ATOMIC_O);
-  }
-
-  /**
-   * Checks if the specified value is an integer value.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isInt(final Value value) {
-    return value.seqType().eq(SeqType.INTEGER_O);
-  }
-
-  /**
-   * Checks if the specified value is a double value.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isDbl(final Value value) {
-    return value.seqType().eq(SeqType.DOUBLE_O);
-  }
-
-  /**
-   * Checks if the specified value is a boolean value.
-   * @param value value
-   * @return result of check
-   */
-  static boolean isBln(final Value value) {
-    return value.seqType().eq(SeqType.BOOLEAN_O);
-  }
-
-  /** String array builder. */
-  final class StrArrBuilder implements ArrBuilder {
-    /** Values. */
-    private final TokenList values = new TokenList(capacity);
-
-    @Override
-    public ArrBuilder add(final Value value) {
-      if(isStr(value)) {
-        values.add(((Str) value).string());
-        return this;
-      }
-      return tree(value);
-    }
-
-    @Override
-    public XQArray array(final ArrayType type) {
-      return new StrArray(values.finish());
-    }
-  }
-
-  /** Untyped atomic array  builder. */
-  final class AtmArrBuilder implements ArrBuilder {
-    /** Values. */
-    private final TokenList values = new TokenList(capacity);
-
-    @Override
-    public ArrBuilder add(final Value value) {
-      if(isAtm(value)) {
-        values.add(((Atm) value).string(null));
-        return this;
-      }
-      return tree(value);
-    }
-
-    @Override
-    public XQArray array(final ArrayType type) {
-      return new AtmArray(values.finish());
-    }
-  }
-
-  /** Integer array builder. */
-  final class IntArrBuilder implements ArrBuilder {
-    /** Values. */
-    private final LongList values = new LongList(capacity);
-
-    @Override
-    public ArrBuilder add(final Value value) {
-      if(isInt(value)) {
-        values.add(((Int) value).itr());
-        return this;
-      }
-      return tree(value);
-    }
-
-    @Override
-    public XQArray array(final ArrayType type) {
-      final int vs = values.size();
-      final long first = values.get(0);
-      boolean range = true;
-      int v = 0;
-      while(range && ++v < vs) {
-        range &= values.get(v) == first + v;
-      }
-      return v == vs ? new RangeArray(first, vs, true) : new IntArray(values.finish());
-    }
-  }
-
-  /** Double array builder. */
-  final class DblArrBuilder implements ArrBuilder {
-    /** Values. */
-    private final DoubleList values = new DoubleList(capacity);
-
-    @Override
-    public ArrBuilder add(final Value value) {
-      if(isDbl(value)) {
-        values.add(((Dbl) value).dbl());
-        return this;
-      }
-      return tree(value);
-    }
-
-    @Override
-    public XQArray array(final ArrayType type) {
-      return new DblArray(values.finish());
-    }
-  }
-
-  /** Boolean array builder. */
-  final class BlnArrBuilder implements ArrBuilder {
-    /** Values. */
-    private final BoolList values = new BoolList(capacity);
-
-    @Override
-    public ArrBuilder add(final Value value) {
-      if(isBln(value)) {
-        values.add(((Bln) value).bool(null));
-        return this;
-      }
-      return tree(value);
-    }
-
-    @Override
-    public XQArray array(final ArrayType type) {
-      return new BlnArray(values.finish());
-    }
   }
 }

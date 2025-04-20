@@ -7,8 +7,10 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class converts CSV data to an XQuery representation.
@@ -28,7 +30,7 @@ public class CsvXQueryConverter extends CsvConverter {
   /** Rows. */
   private final ItemList rows = new ItemList();
   /** Current row. */
-  private ArrayBuilder row;
+  private TokenList row;
 
   /**
    * Constructor.
@@ -45,13 +47,13 @@ public class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected final void record() {
-    if(row != null) rows.add(row.array(STRING_ARRAY));
-    row = new ArrayBuilder();
+    if(row != null) rows.add(XQArray.items(StrSeq.get(row.next())));
+    else row = new TokenList();
   }
 
   @Override
   protected final void entry(final byte[] value) {
-    row.add(Str.get(shared.token(value)));
+    row.add(shared.token(value));
   }
 
   @Override
@@ -60,13 +62,9 @@ public class CsvXQueryConverter extends CsvConverter {
 
   @Override
   protected Value finish(final InputInfo ii, final QueryContext qc) throws QueryException {
-    if(row != null) rows.add(row.array(STRING_ARRAY));
-    final MapBuilder mb = new MapBuilder(headers.size());
-    if(!headers.isEmpty()) {
-      final ArrayBuilder names = new ArrayBuilder();
-      for(final byte[] header : headers) names.add(Str.get(header));
-      mb.put(NAMES, names.array(STRING_ARRAY));
-    }
+    if(row != null) rows.add(XQArray.items(StrSeq.get(row.next())));
+    final MapBuilder mb = new MapBuilder();
+    if(!headers.isEmpty()) mb.put(NAMES, XQArray.items(StrSeq.get(headers)));
     return mb.put(RECORDS, rows.value(STRING_ARRAY)).map();
   }
 }

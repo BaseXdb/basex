@@ -17,7 +17,7 @@ public final class ArrayPutTest extends ArrayTest {
    */
   @Test public void setAllTest() {
     final int n = 5000;
-    final ArrayBuilder ab = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder(qc);
     for(int i = 0; i < n; i++) {
       ab.add(Int.get(i));
     }

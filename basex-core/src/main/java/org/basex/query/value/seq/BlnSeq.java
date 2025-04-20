@@ -10,7 +10,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.list.*;
@@ -85,11 +84,6 @@ public final class BlnSeq extends NativeSeq {
       expr = f ^ t ? Bln.get(t) : DISTINCT;
     }
     return cc.simplify(this, expr, mode);
-  }
-
-  @Override
-  public XQArray toArray() {
-    return new BlnArray(values);
   }
 
   @Override

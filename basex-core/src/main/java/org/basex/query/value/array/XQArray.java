@@ -58,6 +58,16 @@ public abstract class XQArray extends XQStruct {
     return new SingletonArray(value);
   }
 
+  /**
+   * Creates an array with single-item members.
+   * @param value single value
+   * @return array
+   */
+  public static XQArray items(final Value value) {
+    final long size = value.size();
+    return size == 0 ? empty() : size == 1 ? singleton(value) : new ItemArray(value);
+  }
+
   @Override
   public final long structSize() {
     return size;
@@ -75,18 +85,14 @@ public abstract class XQArray extends XQStruct {
    * @param head value to prepend
    * @return resulting array
    */
-  public XQArray prepend(final Value head) {
-    return toTree().prepend(head);
-  }
+  public abstract XQArray prepend(Value head);
 
   /**
    * Appends a value to the end of this array.
    * @param last value to append
    * @return resulting array
    */
-  public XQArray append(final Value last) {
-    return toTree().append(last);
-  }
+  public abstract XQArray append(Value last);
 
   /**
    * Returns a copy of this array where the value at the given position is
@@ -95,9 +101,7 @@ public abstract class XQArray extends XQStruct {
    * @param value value to put into this array
    * @return resulting array
    */
-  public XQArray put(final long pos, final Value value) {
-    return toTree().put(pos, value);
-  }
+  public abstract XQArray put(long pos, Value value);
 
   /**
    * Returns a subsequence of this array with the given start and length.
@@ -120,10 +124,7 @@ public abstract class XQArray extends XQStruct {
    * @param qc query context
    * @return the sub-array
    */
-  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
-    qc.checkStop();
-    return new SubArray(this, pos, length);
-  }
+  protected abstract XQArray subArr(long pos, long length, QueryContext qc);
 
   /**
    * Inserts the given value at the given position into this array.
@@ -134,9 +135,7 @@ public abstract class XQArray extends XQStruct {
    * @param qc query context
    * @return resulting array
    */
-  public XQArray insertBefore(final long pos, final Value value, final QueryContext qc) {
-    return toTree().insertBefore(pos, value, qc);
-  }
+  public abstract XQArray insertBefore(long pos, Value value, QueryContext qc);
 
   /**
    * Removes the value at the given position in this array.
@@ -146,9 +145,7 @@ public abstract class XQArray extends XQStruct {
    * @param qc query context
    * @return resulting array
    */
-  public XQArray remove(final long pos, final QueryContext qc) {
-    return toTree().remove(pos, qc);
-  }
+  public abstract XQArray remove(long pos, QueryContext qc);
 
   /**
    * Returns an array with the same values as this one, but their order reversed.
@@ -157,7 +154,7 @@ public abstract class XQArray extends XQStruct {
    */
   public XQArray reverseArray(final QueryContext qc) {
     qc.checkStop();
-    final ArrayBuilder ab = new ArrayBuilder(size);
+    final ArrayBuilder ab = new ArrayBuilder(qc, size);
     for(long i = size - 1; i >= 0; i--) ab.add(memberAt(i));
     return ab.array(this);
   }
@@ -366,7 +363,7 @@ public abstract class XQArray extends XQStruct {
 
     if(materialized(test, ii)) return this;
 
-    final ArrayBuilder ab = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder(qc);
     for(final Value value : iterable()) {
       qc.checkStop();
       ab.add(value.materialize(test, ii, qc));
@@ -421,7 +418,7 @@ public abstract class XQArray extends XQStruct {
   public final XQArray coerceTo(final ArrayType at, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
-    final ArrayBuilder ab = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder(qc);
     for(final Value value : iterable()) {
       qc.checkStop();
       ab.add(at.valueType().coerce(value, null, qc, cc, ii));
@@ -510,16 +507,6 @@ public abstract class XQArray extends XQStruct {
     final ArrayList<Object> list = new ArrayList<>(sz);
     for(final Value value : iterable()) list.add(value.toJava());
     return list.toArray();
-  }
-
-  /**
-   * Creates a tree representation of this array.
-   * @return array
-   */
-  private XQArray toTree() {
-    final ArrayBuilder ab = new ArrayBuilder(Integer.MIN_VALUE);
-    for(final Value member : iterable()) ab.add(member);
-    return ab.array((ArrayType) type);
   }
 
   @Override

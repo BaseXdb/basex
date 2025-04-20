@@ -46,10 +46,14 @@ public final class SingletonArray extends XQArray {
   }
 
   @Override
+  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
+    throw Util.notExpected();
+  }
+
+  @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return member.atomValue(qc, ii);
   }
-
   @Override
   public XQArray reverseArray(final QueryContext qc) {
     return this;

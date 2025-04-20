@@ -195,7 +195,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     final ArrayList<Value> list = new ArrayList<>(n);
     for(int i = 0; i < n; i++) list.add(Int.get(i));
 
-    final ArrayBuilder ab = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder(qc);
     for(final Value value : list) ab.add(value);
     XQArray array = ab.array();
 
@@ -246,7 +246,7 @@ public final class ArrayRemoveTest extends ArrayTest {
    * @return the array
    */
   private static XQArray from(final int... values) {
-    final ArrayBuilder ab = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder(qc);
     for(final int value : values) ab.add(Int.get(value));
     return ab.array();
   }
