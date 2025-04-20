@@ -95,6 +95,6 @@ public abstract class ParseJson extends ParseFn {
       throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.NULL));
     }
     converter.nullValue(nll);
-    return converter.convert(Token.string(data), "");
+    return converter.convert(Token.string(data), "", qc);
   }
 }

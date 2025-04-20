@@ -43,7 +43,7 @@ final class JsonStringConverter extends JsonConverter {
     jopts.set(JsonParserOptions.LIBERAL, liberal);
     jopts.set(JsonParserOptions.ESCAPE, escape);
     final JsonStringConverter jsc = new JsonStringConverter(jopts, new TokenBuilder());
-    return (String) jsc.convert(json, "").toJava();
+    return (String) jsc.convert(json, "", null).toJava();
   }
 
   @Override

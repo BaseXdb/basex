@@ -294,8 +294,8 @@ public final class Payload {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static Value value(final byte[] body, final MediaType type,
-      final MainOptions options) throws IOException, QueryException {
+  public static Value value(final byte[] body, final MediaType type, final MainOptions options)
+      throws IOException, QueryException {
 
     final IOContent io = prepare(body, type);
     if(io.length() == 0) {

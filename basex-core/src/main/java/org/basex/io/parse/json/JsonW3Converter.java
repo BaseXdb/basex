@@ -88,7 +88,7 @@ public final class JsonW3Converter extends JsonConverter {
 
   @Override
   void openArray() {
-    arrays.push(new ArrayBuilder());
+    arrays.push(new ArrayBuilder(qctx));
   }
 
   @Override

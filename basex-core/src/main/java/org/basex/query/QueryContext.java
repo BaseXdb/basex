@@ -702,7 +702,7 @@ public final class QueryContext extends Job implements Closeable {
     if(type.equalsIgnoreCase(MainParser.JSON.name())) {
       final JsonParserOptions jp = new JsonParserOptions();
       jp.set(JsonOptions.FORMAT, JsonFormat.W3);
-      return JsonConverter.get(jp).convert(object.toString(), "");
+      return JsonConverter.get(jp).convert(object.toString(), "", this);
     }
 
     // parse target type

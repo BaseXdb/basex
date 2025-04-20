@@ -29,6 +29,8 @@ public abstract class JsonConverter {
   protected QueryFunction<byte[], Item> numberParser;
   /** Null value. */
   protected Value nullValue = Empty.VALUE;
+  /** Query context (can be {@code null}). */
+  protected QueryContext qctx;
 
   /**
    * Returns a JSON converter for the given configuration.
@@ -90,7 +92,7 @@ public abstract class JsonConverter {
   public final Value convert(final IO input) throws QueryException, IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
     try(NewlineInput ni = new NewlineInput(input)) {
-      return convert(ni.encoding(encoding).cache().toString(), input.url());
+      return convert(ni.encoding(encoding).cache().toString(), input.url(), null);
     }
   }
 
@@ -98,10 +100,13 @@ public abstract class JsonConverter {
    * Converts the specified input to an XQuery value.
    * @param input input
    * @param path input path (can be empty string)
+   * @param qc query context (if {@code null}, result may lack XQuery-specific contents)
    * @throws QueryException query exception
    * @return result
    */
-  public final Value convert(final String input, final String path) throws QueryException {
+  public final Value convert(final String input, final String path, final QueryContext qc)
+      throws QueryException {
+    qctx = qc;
     init(path.isEmpty() ? "" : IO.get(path).url());
     final JsonParser parser = new JsonParser(input, jopts, this);
     parser.parse();
