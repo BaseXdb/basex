@@ -138,12 +138,6 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Value remove(final long pos, final QueryContext qc) {
-    return pos == 0 || pos == size - 1 ? subSeq(pos == 0 ? 0 : 1, size - 1, qc) :
-      super.remove(pos, qc);
-  }
-
-  @Override
   public Value reverse(final QueryContext qc) {
     return get(get(size - 1), size(), !ascending);
   }
