@@ -166,7 +166,7 @@ public final class Lookup extends Arr {
     final Expr keys = exprs[1];
 
     // wildcard: add all values
-    if(keys == WILDCARD) return struct.items().value(qc, this);
+    if(keys == WILDCARD) return struct.items(qc);
 
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter ir = keys.atomIter(qc, info);

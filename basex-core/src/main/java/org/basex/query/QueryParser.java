@@ -2504,9 +2504,9 @@ public class QueryParser extends InputParser {
   private Expr arrayConstructor() throws QueryException {
     if(wsConsumeWs(ARRAY, ARRAYCONSTR, "{")) {
       check('{');
-      final Expr exp = expr();
+      final Expr expr = expr();
       wsCheck("}");
-      return exp == null ? XQArray.empty() : new CItemArray(info(), exp);
+      return expr == null ? XQArray.empty() : new CItemArray(info(), expr);
     }
     if(consume('[')) {
       final InputInfo info = info();
@@ -2517,7 +2517,7 @@ public class QueryParser extends InputParser {
         } while(wsConsume(","));
         wsCheck("]");
       }
-      return new CArray(info, el.finish());
+      return el.isEmpty() ? XQArray.empty() : new CArray(info, el.finish());
     }
     return null;
   }

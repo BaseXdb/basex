@@ -71,10 +71,19 @@ public abstract class XQStruct extends FItem {
 
   /**
    * Returns all items (sequence-concatenated values) of this structure.
-   * @return values
+   * @param qc query context
+   * @return items
    * @throws QueryException query exception
    */
-  public abstract Iter items() throws QueryException;
+  public Value items(final QueryContext qc) throws QueryException {
+    return itemsIter().value(qc, null);
+  }
+
+  /**
+   * Returns an iterator for all items (sequence-concatenated values) of this structure.
+   * @return iterator
+   */
+  public abstract Iter itemsIter();
 
   /**
    * Returns the key for accessing a function value.

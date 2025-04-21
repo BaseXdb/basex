@@ -224,7 +224,7 @@ public abstract class XQMap extends XQStruct {
         final TokenObjectMap<RecordField> fields = rt.fields();
         final int fs = fields.size();
         if(coerce) {
-          final BasicIter<Item> keys = keys();
+          final BasicIter<Item> keys = keys().iter();
           for(int f = 1; f <= fs; f++) {
             final RecordField rf = fields.value(f);
             final Item key = keys.next();
@@ -274,30 +274,13 @@ public abstract class XQMap extends XQStruct {
   }
 
   /**
-   * Returns a key iterator.
-   * Overwritten by {@link XQTrieMap#keys}
-   * @return iterator
+   * Returns all keys of this map.
+   * @return keys
    */
-  public BasicIter<Item> keys() {
-    final long size = structSize();
-    if(size == 0) return Empty.ITER;
-    if(size == 1) return keyAt(0).iter();
-
-    return new BasicIter<>(size) {
-      @Override
-      public Item get(final long i) {
-        return keyAt((int) i);
-      }
-      @Override
-      public Value value(final QueryContext qc, final Expr expr) throws QueryException {
-        final Value items = keysInternal();
-        return items != null ? items : super.value(qc, expr);
-      }
-    };
-  }
+  public abstract Value keys();
 
   @Override
-  public final Iter items() {
+  public final Iter itemsIter() {
     final long size = structSize();
     if(size == 0) return Empty.ITER;
     if(size == 1) return valueAt(0).iter();
@@ -309,15 +292,10 @@ public abstract class XQMap extends XQStruct {
         public Item get(final long i) {
           return (Item) valueAt((int) i);
         }
-        @Override
-        public Value value(final QueryContext qc, final Expr expr) throws QueryException {
-          final Value items = itemsInternal();
-          return items != null ? items : super.value(qc, expr);
-        }
       };
     }
 
-    final BasicIter<Item> keys = keys();
+    final BasicIter<Item> keys = keys().iter();
     return new Iter() {
       Iter iter = Empty.ITER;
 
@@ -331,28 +309,7 @@ public abstract class XQMap extends XQStruct {
           iter = XQMap.this.get(key).iter();
         }
       }
-      @Override
-      public Value value(final QueryContext qc, final Expr expr) throws QueryException {
-        final Value items = itemsInternal();
-        return items != null ? items : super.value(qc, expr);
-      }
     };
-  }
-
-  /**
-   * Returns keys. Invoked by {@link #keys}.
-   * @return items ({@code null} if not implemented)
-   */
-  Value keysInternal() {
-    return null;
-  }
-
-  /**
-   * Returns sequence-concatenated values. Invoked by {@link #items}.
-   * @return items ({@code null} if not implemented)
-   */
-  Value itemsInternal() {
-    return null;
   }
 
   /**
@@ -448,7 +405,7 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   private boolean deepEqualOrdered(final XQMap map) throws QueryException {
-    final BasicIter<Item> keys2 = map.keys();
+    final BasicIter<Item> keys2 = map.keys().iter();
     for(final Item key : keys()) {
       final Item k = keys2.next();
       if(!(key.equals(k) && getOrNull(key).equals(map.getOrNull(k)))) return false;
@@ -464,7 +421,7 @@ public abstract class XQMap extends XQStruct {
    * @throws QueryException query exception
    */
   private boolean deepEqualOrdered(final XQMap map, final DeepEqual deep)throws QueryException {
-    final BasicIter<Item> keys2 = map.keys();
+    final BasicIter<Item> keys2 = map.keys().iter();
     for(final Item key : keys()) {
       final Item k = keys2.next();
       if(!(key.atomicEqual(k) && deep.equal(getOrNull(key), map.getOrNull(k)))) return false;
@@ -535,7 +492,7 @@ public abstract class XQMap extends XQStruct {
   public final void toXml(final QueryPlan plan) {
     try {
       final long size = structSize();
-      final Value keys = keys().value(null, null);
+      final Value keys = keys();
       final ExprList list = new ExprList();
       final long max = Math.min(size, 5);
       for(long i = 0; i < max; i++) {

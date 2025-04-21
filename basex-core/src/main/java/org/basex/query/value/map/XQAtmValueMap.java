@@ -46,7 +46,7 @@ public final class XQAtmValueMap extends XQHashMap {
   }
 
   @Override
-  Value keysInternal() {
+  public Value keys() {
     return StrSeq.get(map.keys(), AtomType.UNTYPED_ATOMIC);
   }
 

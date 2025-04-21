@@ -39,6 +39,11 @@ public final class XQSingletonMap extends XQMap {
   }
 
   @Override
+  public Value keys() {
+    return k;
+  }
+
+  @Override
   public Item keyAt(final int index) {
     return k;
   }

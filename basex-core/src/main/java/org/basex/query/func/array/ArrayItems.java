@@ -6,7 +6,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -18,13 +17,12 @@ import org.basex.query.value.type.*;
 public final class ArrayItems extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final XQArray array = toArray(arg(0), qc);
-    return array.items();
+    return toArray(arg(0), qc).itemsIter();
   }
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    return toArray(arg(0), qc).items(qc);
   }
 
   @Override

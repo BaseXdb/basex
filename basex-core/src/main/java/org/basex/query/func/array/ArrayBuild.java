@@ -19,13 +19,14 @@ import org.basex.util.*;
 public final class ArrayBuild extends StandardFunc {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter input = arg(0).iter(qc);
     final FItem action = toFunctionOrNull(arg(1), 2, qc);
+    if(action == null) return XQArray.items(arg(0).value(qc));
 
+    final Iter input = arg(0).iter(qc);
     final ArrayBuilder ab = new ArrayBuilder(qc);
-    final HofArgs args = action != null ? new HofArgs(2, action) : null;
+    final HofArgs args = new HofArgs(2, action);
     for(Item item; (item = qc.next(input)) != null;) {
-      ab.add(action != null ? invoke(action, args.set(0, item).inc(), qc) : item);
+      ab.add(invoke(action, args.set(0, item).inc(), qc));
     }
     return ab.array();
   }

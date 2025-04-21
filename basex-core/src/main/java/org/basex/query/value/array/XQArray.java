@@ -83,7 +83,7 @@ public abstract class XQArray extends XQStruct {
   public abstract Value memberAt(long index);
 
   @Override
-  public Iter items() throws QueryException {
+  public Iter itemsIter() {
     return new Iter() {
       final Iterator<Value> values = iterator(0);
       Iter ir;
@@ -112,7 +112,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr ex = this;
-    if(mode.oneOf(Simplify.NUMBER, Simplify.DATA)) ex = items().value(cc.qc, null);
+    if(mode.oneOf(Simplify.NUMBER, Simplify.DATA)) ex = items(cc.qc);
     return cc.simplify(this, ex, mode);
   }
 

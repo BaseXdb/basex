@@ -34,8 +34,13 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
-  public Iter items() throws QueryException {
+  public Iter itemsIter() {
     return members.iter();
+  }
+
+  @Override
+  public Value items(final QueryContext qc) throws QueryException {
+    return members;
   }
 
   @Override

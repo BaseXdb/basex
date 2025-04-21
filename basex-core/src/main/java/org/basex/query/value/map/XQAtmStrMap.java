@@ -47,12 +47,12 @@ public final class XQAtmStrMap extends XQHashMap {
   }
 
   @Override
-  Value keysInternal() {
+  public Value keys() {
     return StrSeq.get(map.keys(), AtomType.UNTYPED_ATOMIC);
   }
 
   @Override
-  Value itemsInternal() {
+  public Value items(final QueryContext qc) {
     final long is = structSize();
     final TokenList list = new TokenList(is);
     for(int i = 1; i <= is; i++) list.add(map.value(i));

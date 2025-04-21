@@ -31,6 +31,16 @@ public final class SingletonArray extends XQArray {
   }
 
   @Override
+  public Value items(final QueryContext qc) {
+    return member;
+  }
+
+  @Override
+  public Iter itemsIter() {
+    return member.iter();
+  }
+
+  @Override
   public XQArray put(final long pos, final Value value) {
     return get(value);
   }
@@ -60,10 +70,5 @@ public final class SingletonArray extends XQArray {
   @Override
   public XQArray removeMember(final long pos, final QueryContext qc) {
     return empty();
-  }
-
-  @Override
-  public Iter items() throws QueryException {
-    return member.iter();
   }
 }

@@ -70,7 +70,7 @@ public final class CItemArray extends Single {
 
   @Override
   public String description() {
-    return "curly" + ' ' + ARRAY + " constructor";
+    return "curly " + ARRAY + " constructor";
   }
 
   @Override

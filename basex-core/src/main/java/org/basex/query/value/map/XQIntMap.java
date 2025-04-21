@@ -51,7 +51,7 @@ public final class XQIntMap extends XQHashMap {
   }
 
   @Override
-  Value keysInternal() {
+  public Value keys() {
     final long is = structSize();
     final LongList list = new LongList(is);
     for(int i = 1; i <= is; i++) list.add(map.key(i));
@@ -59,7 +59,7 @@ public final class XQIntMap extends XQHashMap {
   }
 
   @Override
-  Value itemsInternal() {
+  public Value items(final QueryContext qc) {
     final long is = structSize();
     final LongList list = new LongList(is);
     for(int i = 1; i <= is; i++) list.add(map.value(i));

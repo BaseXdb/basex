@@ -20,7 +20,7 @@ public class MapEntries extends StandardFunc {
   public final Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
       final XQMap map = toMap(arg(0), qc);
-      final BasicIter<Item> keys = map.keys();
+      final BasicIter<Item> keys = map.keys().iter();
 
       @Override
       public XQMap next() throws QueryException {

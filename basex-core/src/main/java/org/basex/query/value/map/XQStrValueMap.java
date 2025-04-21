@@ -46,7 +46,7 @@ public final class XQStrValueMap extends XQHashMap {
   }
 
   @Override
-  Value keysInternal() {
+  public Value keys() {
     return StrSeq.get(map.keys());
   }
 

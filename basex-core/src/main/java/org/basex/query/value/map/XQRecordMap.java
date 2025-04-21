@@ -61,7 +61,7 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   @Override
-  Value keysInternal() {
+  public Value keys() {
     return StrSeq.get(((RecordType) type).fields().keys());
   }
 
