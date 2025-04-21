@@ -30,17 +30,12 @@ import org.basex.util.list.*;
  * @author Leo Woerteler
  */
 public abstract class XQArray extends XQStruct {
-  /** Length. */
-  protected long size;
-
   /**
    * Default constructor.
-   * @param size size
    * @param type function type
    */
-  XQArray(final long size, final Type type) {
+  XQArray(final Type type) {
     super(type);
-    this.size = size;
   }
 
   /**
@@ -68,11 +63,6 @@ public abstract class XQArray extends XQStruct {
   public static XQArray items(final Value members) {
     final long size = members.size();
     return size == 0 ? empty() : size == 1 ? get(members) : new ItemArray(members);
-  }
-
-  @Override
-  public final long structSize() {
-    return size;
   }
 
   /**
@@ -186,6 +176,7 @@ public abstract class XQArray extends XQStruct {
    */
   public XQArray reverseArray(final QueryContext qc) {
     qc.checkStop();
+    final long size = structSize();
     final ArrayBuilder ab = new ArrayBuilder(qc, size);
     for(long i = size - 1; i >= 0; i--) ab.add(memberAt(i));
     return ab.array(this);
@@ -296,7 +287,7 @@ public abstract class XQArray extends XQStruct {
    */
   public final Value get(final Item key, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    final long i = index(key, qc, ii);
+    final long i = index(key, qc, ii), size = structSize();
     if(i > 0 && i <= size) return memberAt(i - 1);
     throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, i, size);
   }
@@ -522,8 +513,8 @@ public abstract class XQArray extends XQStruct {
   @Override
   public void toXml(final QueryPlan plan) {
     final ExprList list = new ExprList();
-    final int max = (int) Math.min(size, 5);
-    for(int i = 0; i < max; i++) list.add(memberAt(i));
+    final long size = structSize(), max = Math.min(size, 5);
+    for(int m = 0; m < max; m++) list.add(memberAt(m));
     plan.add(plan.create(this, ENTRIES, size), list.finish());
   }
 

@@ -14,14 +14,14 @@ import org.basex.util.*;
  */
 public final class SingletonArray extends XQArray {
   /** Single member. */
-  final Value member;
+  private final Value member;
 
   /**
    * Constructor.
    * @param member member
    */
   SingletonArray(final Value member) {
-    super(1, ArrayType.get(member.seqType()));
+    super(ArrayType.get(member.seqType()));
     this.member = member;
   }
 
@@ -38,6 +38,11 @@ public final class SingletonArray extends XQArray {
   @Override
   public Iter itemsIter() {
     return member.iter();
+  }
+
+  @Override
+  public long structSize() {
+    return 1;
   }
 
   @Override

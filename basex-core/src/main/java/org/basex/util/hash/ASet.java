@@ -14,7 +14,7 @@ import org.basex.util.*;
  */
 public abstract class ASet {
   /** Initial default size for new sets. */
-  public static final int INITIAL_CAPACITY = 6;
+  public static final int INITIAL_CAPACITY = 2;
   /** Hash table buckets. */
   protected int[] buckets;
   /** Pointers to the next entry. */
@@ -101,7 +101,7 @@ public abstract class ASet {
    * Returns the current array capacity.
    * @return array capacity
    */
-  protected final int capacity() {
+  public final int capacity() {
     return next.length;
   }
 

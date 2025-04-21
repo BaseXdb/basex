@@ -21,7 +21,7 @@ final class SmallArray extends TreeArray {
    * @param type type
    */
   SmallArray(final Value[] members, final Type type) {
-    super(members.length, type);
+    super(type);
     this.members = members;
     assert members.length >= 2 && members.length <= MAX_SMALL;
   }
@@ -29,6 +29,11 @@ final class SmallArray extends TreeArray {
   @Override
   public Value memberAt(final long index) {
     return members[(int) index];
+  }
+
+  @Override
+  public long structSize() {
+    return members.length;
   }
 
   @Override

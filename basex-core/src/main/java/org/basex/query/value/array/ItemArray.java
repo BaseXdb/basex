@@ -24,7 +24,7 @@ public final class ItemArray extends XQArray {
    * @param members members
    */
   ItemArray(final Value members) {
-    super(members.size(), ArrayType.get(members.type.seqType()));
+    super(ArrayType.get(members.type.seqType()));
     this.members = members;
   }
 
@@ -49,6 +49,11 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
+  public long structSize() {
+    return members.size();
+  }
+
+  @Override
   public XQArray put(final long pos, final Value value) {
     return toTree().put(pos, value);
   }
@@ -60,7 +65,7 @@ public final class ItemArray extends XQArray {
 
   @Override
   public XQArray removeMember(final long pos, final QueryContext qc) {
-    return size == 2 ? get(members.itemAt(pos == 0 ? 1 : 0)) :
+    return structSize() == 2 ? get(members.itemAt(pos == 0 ? 1 : 0)) :
       new ItemArray(members.removeItem(pos, qc));
   }
 
@@ -86,7 +91,7 @@ public final class ItemArray extends XQArray {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, ENTRIES, size), members);
+    plan.add(plan.create(this, ENTRIES, structSize()), members);
   }
 
   @Override

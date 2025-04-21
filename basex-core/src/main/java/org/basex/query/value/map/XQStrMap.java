@@ -19,8 +19,6 @@ public final class XQStrMap extends XQHashMap {
   private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.STRING_O);
   /** Hash map. */
   private final TokenObjectMap<byte[]> map;
-  /** Initial capacity. */
-  private final int capacity;
 
   /**
    * Constructor.
@@ -29,7 +27,6 @@ public final class XQStrMap extends XQHashMap {
   XQStrMap(final int capacity) {
     super(TYPE);
     map = new TokenObjectMap<>(capacity);
-    this.capacity = capacity;
   }
 
   @Override
@@ -77,8 +74,8 @@ public final class XQStrMap extends XQHashMap {
         map.put(k, v);
         return this;
       }
-      return new XQStrValueMap(capacity).build(this).build(key, value);
+      return new XQStrValueMap(map.capacity() - 2).build(this).build(key, value);
     }
-    return new XQItemValueMap(capacity).build(this).build(key, value);
+    return new XQItemValueMap(map.capacity() - 2).build(this).build(key, value);
   }
 }

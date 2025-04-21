@@ -20,7 +20,7 @@ final class EmptyArray extends XQArray {
 
   /** Hidden constructor. */
   private EmptyArray() {
-    super(0, SeqType.ARRAY);
+    super(SeqType.ARRAY);
   }
 
   @Override
@@ -30,6 +30,11 @@ final class EmptyArray extends XQArray {
   @Override
   public Value memberAt(final long index) {
     throw Util.notExpected();
+  }
+
+  @Override
+  public long structSize() {
+    return 0;
   }
 
   @Override

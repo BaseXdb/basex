@@ -12,11 +12,10 @@ import org.basex.util.*;
 abstract class NativeArray extends XQArray {
   /**
    * Constructor.
-   * @param size size
    * @param type type
    */
-  NativeArray(final long size, final Type type) {
-    super(size, ArrayType.get(type.seqType()));
+  NativeArray(final Type type) {
+    super(ArrayType.get(type.seqType()));
   }
 
   @Override

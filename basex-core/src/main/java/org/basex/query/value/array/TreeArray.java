@@ -24,11 +24,10 @@ abstract class TreeArray extends XQArray {
 
   /**
    * Default constructor.
-   * @param size size
    * @param type function type
    */
-  TreeArray(final long size, final Type type) {
-    super(size, type);
+  TreeArray(final Type type) {
+    super(type);
   }
 
   /**

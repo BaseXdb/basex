@@ -31,7 +31,7 @@ final class BigArray extends TreeArray {
    */
   BigArray(final Value[] left, final FingerTree<Value, Value> middle, final Value[] right,
       final Type type) {
-    super(left.length + middle.size() + right.length, type);
+    super(type);
     this.left = left;
     this.middle = middle;
     this.right = right;
@@ -60,6 +60,11 @@ final class BigArray extends TreeArray {
 
     // the member is in the middle tree
     return middle.get(index - ll);
+  }
+
+  @Override
+  public long structSize() {
+    return left.length + middle.size() + right.length;
   }
 
   @Override

@@ -18,8 +18,6 @@ public final class XQAtmValueMap extends XQHashMap {
   private static final MapType TYPE = MapType.get(AtomType.UNTYPED_ATOMIC, SeqType.ITEM_ZM);
   /** Hash map. */
   private final TokenObjectMap<Value> map;
-  /** Initial capacity. */
-  private final int capacity;
 
   /**
    * Constructor.
@@ -28,7 +26,6 @@ public final class XQAtmValueMap extends XQHashMap {
   XQAtmValueMap(final int capacity) {
     super(TYPE);
     map = new TokenObjectMap<>(capacity);
-    this.capacity = capacity;
   }
 
   @Override
@@ -67,6 +64,6 @@ public final class XQAtmValueMap extends XQHashMap {
       map.put(k, value);
       return this;
     }
-    return new XQItemValueMap(capacity).build(this).build(key, value);
+    return new XQItemValueMap(map.capacity() - 2).build(this).build(key, value);
   }
 }
