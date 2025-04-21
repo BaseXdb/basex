@@ -3,7 +3,6 @@ package org.basex.query.func.ft;
 import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -36,11 +35,5 @@ public final class FtContains extends FtAccessFn {
 
     final FTWords ftw = new FTWords(info, terms, mode, null).ftOpt(opt).optimize(qc);
     return new FTContains(input, ftExpr(ftw, options), info).item(qc, info);
-  }
-
-  @Override
-  protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.STRING, cc));
-    arg(1, arg -> arg.simplifyFor(Simplify.STRING, cc));
   }
 }

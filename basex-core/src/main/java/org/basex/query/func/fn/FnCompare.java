@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.collation.*;
@@ -31,12 +30,6 @@ public final class FnCompare extends StandardFunc {
 
     final long diff = value1.compare(value2, collation, true, info);
     return Int.get(diff < 0 ? -1 : diff > 0 ? 1 : 0);
-  }
-
-  @Override
-  protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
-    arg(1, arg -> arg.simplifyFor(Simplify.DATA, cc));
   }
 
   @Override

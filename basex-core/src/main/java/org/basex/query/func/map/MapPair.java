@@ -1,7 +1,6 @@
 package org.basex.query.func.map;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -32,10 +31,5 @@ public final class MapPair extends StandardFunc {
     if(kt == null) kt = AtomType.ANY_ATOMIC_TYPE;
     exprType.assign(cc.qc.shared.record(Str.KEY, kt.seqType(), Str.VALUE, value.seqType()));
     return this;
-  }
-
-  @Override
-  protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
   }
 }

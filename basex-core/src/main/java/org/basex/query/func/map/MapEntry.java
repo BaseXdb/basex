@@ -1,7 +1,6 @@
 package org.basex.query.func.map;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -38,11 +37,6 @@ public final class MapEntry extends StandardFunc {
     }
     exprType.assign(type);
     return this;
-  }
-
-  @Override
-  protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc));
   }
 
   @Override

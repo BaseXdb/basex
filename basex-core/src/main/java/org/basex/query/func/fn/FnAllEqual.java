@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
-import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -40,11 +39,6 @@ public final class FnAllEqual extends StandardFunc {
       }
     }
     return true;
-  }
-
-  @Override
-  protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.DATA, cc).simplifyFor(Simplify.DISTINCT, cc));
   }
 
   @Override
