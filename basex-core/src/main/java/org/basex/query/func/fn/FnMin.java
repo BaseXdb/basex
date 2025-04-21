@@ -78,10 +78,10 @@ public class FnMin extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    final Type type = arg(0).seqType().type;
-    if(type.isNumberOrUntyped()) arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
-
-    if(defined(1)) arg(1, arg -> arg.simplifyFor(Simplify.STRING, cc));
+    super.simplifyArgs(cc);
+    if(arg(0).seqType().type.isNumberOrUntyped()) {
+      arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
+    }
   }
 
   @Override

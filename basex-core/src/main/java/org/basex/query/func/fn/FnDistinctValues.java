@@ -89,10 +89,8 @@ public final class FnDistinctValues extends FnDuplicateValues {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> {
-      final Expr expr = arg.simplifyFor(Simplify.DATA, cc);
-      return defined(1) ? expr : expr.simplifyFor(Simplify.DISTINCT, cc);
-    });
+    super.simplifyArgs(cc);
+    if(!defined(1)) arg(0, arg -> arg.simplifyFor(Simplify.DISTINCT, cc));
   }
 
   @Override

@@ -58,12 +58,12 @@ public final class UtilValuesExcept extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    final QueryFunction<Expr, Expr> rewrite = arg -> {
-      final Expr expr = arg.simplifyFor(Simplify.DATA, cc);
-      return defined(2) ? expr : expr.simplifyFor(Simplify.DISTINCT, cc);
-    };
-    arg(0, rewrite);
-    arg(1, rewrite);
+    super.simplifyArgs(cc);
+    if(!defined(2)) {
+      final QueryFunction<Expr, Expr> rewrite = arg -> arg.simplifyFor(Simplify.DISTINCT, cc);
+      arg(0, rewrite);
+      arg(1, rewrite);
+    }
   }
 
   @Override

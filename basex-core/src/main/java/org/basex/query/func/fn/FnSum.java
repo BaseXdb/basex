@@ -100,8 +100,10 @@ public class FnSum extends NumericFn {
 
   @Override
   protected final void simplifyArgs(final CompileContext cc) throws QueryException {
-    final Type type = arg(0).seqType().type;
-    if(type.isNumberOrUntyped()) arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
+    super.simplifyArgs(cc);
+    if(arg(0).seqType().type.isNumberOrUntyped()) {
+      arg(0, arg -> arg.simplifyFor(Simplify.NUMBER, cc));
+    }
   }
 
   /**
