@@ -11,6 +11,8 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -105,6 +107,13 @@ public abstract class XQArray extends XQStruct {
     final ValueBuilder vb = new ValueBuilder(qc, structSize());
     for(final Value value : iterable()) vb.add(value.atomValue(qc, ii));
     return vb.value(AtomType.ANY_ATOMIC_TYPE);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr ex = this;
+    if(mode.oneOf(Simplify.NUMBER, Simplify.DATA)) ex = items().value(cc.qc, null);
+    return cc.simplify(this, ex, mode);
   }
 
   /**

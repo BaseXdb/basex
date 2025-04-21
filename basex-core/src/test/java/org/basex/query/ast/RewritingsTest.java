@@ -2127,8 +2127,8 @@ public final class RewritingsTest extends SandboxTest {
         "1x\n2x", count(DualMap.class, 2));
 
     // do not rewrite group by clauses if value is not a single atomic item
+    check("for $a in (1 to 6) group by $g := [ $a mod 1 ] return $g", 0, root(Int.class));
     check("for $a allowing empty in () group by $a return $a", "", root(GFLWOR.class));
-    check("for $a in (1 to 6) group by $g := [ $a mod 1 ] return $g", 0, root(GFLWOR.class));
     check("for $a in (1 to 6) group by $g := [] return $g", "", root(GFLWOR.class));
     check("for $a as xs:byte in (1 to 2)[. >= 0] group by $a return $a", "1\n2",
         root(DISTINCT_VALUES), exists(GFLWOR.class));

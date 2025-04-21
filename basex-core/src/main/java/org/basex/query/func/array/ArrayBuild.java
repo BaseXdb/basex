@@ -2,6 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.constr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
@@ -33,13 +34,14 @@ public final class ArrayBuild extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
+    // array:build(())  ->  {}
     if(st.zero()) return cc.voidAndReturn(input, XQArray.empty(), info);
+    // array:build(1 to 3)  ->  array { 1 to 3 }
+    if(!defined(1)) return new CItemArray(info, input);
 
-    if(defined(1)) {
-      arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), SeqType.INTEGER_O));
-      final FuncType ft = arg(1).funcType();
-      if(ft != null) exprType.assign(ArrayType.get(ft.declType));
-    }
+    arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), SeqType.INTEGER_O));
+    final FuncType ft = arg(1).funcType();
+    if(ft != null) exprType.assign(ArrayType.get(ft.declType));
     return this;
   }
 

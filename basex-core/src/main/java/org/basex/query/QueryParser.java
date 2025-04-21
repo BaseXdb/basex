@@ -38,6 +38,7 @@ import org.basex.query.util.format.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -2500,12 +2501,12 @@ public class QueryParser extends InputParser {
    * @return array constructor or {@code null}
    * @throws QueryException query exception
    */
-  private CArray arrayConstructor() throws QueryException {
+  private Expr arrayConstructor() throws QueryException {
     if(wsConsumeWs(ARRAY, ARRAYCONSTR, "{")) {
       check('{');
       final Expr exp = expr();
       wsCheck("}");
-      return exp == null ? new CArray(info(), false) : new CArray(info(), false, exp);
+      return exp == null ? XQArray.empty() : new CItemArray(info(), exp);
     }
     if(consume('[')) {
       final InputInfo info = info();
@@ -2516,7 +2517,7 @@ public class QueryParser extends InputParser {
         } while(wsConsume(","));
         wsCheck("]");
       }
-      return new CArray(info, true, el.finish());
+      return new CArray(info, el.finish());
     }
     return null;
   }
