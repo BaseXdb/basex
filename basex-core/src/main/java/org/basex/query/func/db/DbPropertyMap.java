@@ -21,7 +21,7 @@ public class DbPropertyMap extends DbAccessFn {
     final Data data = toData(qc);
 
     final MapBuilder map = new MapBuilder();
-    for(final MetaProp prop : MetaProp.ENUMS) {
+    for(final MetaProp prop : MetaProp.values()) {
       map.put(prop.name().toLowerCase(Locale.ENGLISH), item(prop.value(data.meta)));
     }
     return map.map();

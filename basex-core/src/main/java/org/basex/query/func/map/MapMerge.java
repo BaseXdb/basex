@@ -146,17 +146,16 @@ public class MapMerge extends StandardFunc {
     if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc), info, qc);
     // fixed option
     final String string = duplicates.isEmpty() ? dflt.toString() : toString(duplicates, qc);
-    for(final Duplicates value : Duplicates.values()) {
-      if(value.toString().equals(string)) {
-        switch(value) {
-          case REJECT:    return new Reject(info);
-          case COMBINE:   return new Combine(qc);
-          case USE_FIRST: return new UseFirst();
-          default:        return new UseLast();
-        }
-      }
+    final Duplicates value = EnumOption.get(Duplicates.class, string);
+    if(value == null) throw QueryError.typeError(duplicates,
+        new EnumType(Duplicates.values()), info);
+
+    switch(value) {
+      case REJECT:    return new Reject(info);
+      case COMBINE:   return new Combine(qc);
+      case USE_FIRST: return new UseFirst();
+      default:        return new UseLast();
     }
-    throw QueryError.typeError(duplicates, new EnumType(Duplicates.values()), info);
   }
 
   /**

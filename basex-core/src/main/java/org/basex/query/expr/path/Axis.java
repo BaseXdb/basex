@@ -142,8 +142,6 @@ public enum Axis {
     }
   };
 
-  /** Cached enums (faster). */
-  public static final Axis[] VALUES = values();
   /** Name of axis. */
   public final String name;
   /** Downward axis. */

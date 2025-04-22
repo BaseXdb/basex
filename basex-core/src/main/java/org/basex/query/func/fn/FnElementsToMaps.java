@@ -80,7 +80,7 @@ public final class FnElementsToMaps extends StandardFunc {
     for(final Map.Entry<String, String> entry : options.get(ElementsOptions.LAYOUTS).
         free().entrySet()) {
       final QNm name = QNm.parse(Token.token(entry.getKey()), sc());
-      final Layout layout = Layout.get(entry.getValue());
+      final Layout layout = EnumOption.get(Layout.class, entry.getValue());
       if(layout == null) {
         throw INVALIDOPTION_X.get(info, "Unknown layout: " + entry.getValue() + '.');
       }
@@ -413,21 +413,6 @@ public final class FnElementsToMaps extends StandardFunc {
      * @throws QueryException query exception
      */
     abstract Value apply(ANode node, ANode parent, Format format) throws QueryException;
-
-    /** Cached enums (faster). */
-    public static final Layout[] VALUES = values();
-
-    /**
-     * Returns a layout matching the specified string.
-     * @param layout layout string
-     * @return layout, or {@code null} if no match is found
-     */
-    public static Layout get(final String layout) {
-      for(final Layout l : VALUES) {
-        if(l.toString().equals(layout)) return l;
-      }
-      return null;
-    }
 
     @Override
     public String toString() {

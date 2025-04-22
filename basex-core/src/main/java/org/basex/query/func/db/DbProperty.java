@@ -19,7 +19,7 @@ public final class DbProperty extends DbPropertyMap {
     final Data data = toData(qc);
     final String name = toString(arg(1), qc);
 
-    for(final MetaProp prop : MetaProp.ENUMS) {
+    for(final MetaProp prop : MetaProp.values()) {
       if(prop.name().equalsIgnoreCase(name)) return item(prop.value(data.meta));
     }
     throw DB_PROPERTY_X.get(info, name);

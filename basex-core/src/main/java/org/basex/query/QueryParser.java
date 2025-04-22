@@ -1658,15 +1658,15 @@ public class QueryParser extends InputParser {
   private Expr comparison() throws QueryException {
     final Expr expr = ftContains();
     if(expr != null) {
-      for(final OpV c : OpV.VALUES) {
+      for(final OpV c : OpV.values()) {
         if(wsConsumeWs(c.name)) return new CmpV(info(), expr, check(ftContains(), CMPEXPR), c);
       }
-      for(final OpN c : OpN.VALUES) {
+      for(final OpN c : OpN.values()) {
         for(final String name : c.names) {
           if(wsConsumeWs(name)) return new CmpN(info(), expr, check(ftContains(), CMPEXPR), c);
         }
       }
-      for(final OpG c : OpG.VALUES) {
+      for(final OpG c : OpG.values()) {
         if(wsConsumeWs(c.name)) return new CmpG(info(), expr, check(ftContains(), CMPEXPR), c);
       }
     }
@@ -2230,7 +2230,7 @@ public class QueryParser extends InputParser {
         throw error(NOATTNAME);
       }
     } else {
-      for(final Axis ax : Axis.VALUES) {
+      for(final Axis ax : Axis.values()) {
         final int p = pos;
         if(wsConsume(ax.name)) {
           if(wsConsumeWs("::")) {

@@ -21,6 +21,7 @@ import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Abstract parse expression. All non-value expressions are derived from this class.
@@ -694,11 +695,9 @@ public abstract class ParseExpr extends Expr {
    */
   protected final <T extends Enum<T>> T toEnum(final Item item, final Class<T> keys)
       throws QueryException {
-    final String value = toString(item);
-    for(final T key : keys.getEnumConstants()) {
-      if(value.equals(key.toString())) return key;
-    }
-    throw EXP_FOUND_X_X.get(info, Arrays.toString(keys.getEnumConstants()), value);
+    final T key = EnumOption.get(keys, toString(item));
+    if(key != null) return key;
+    throw EXP_FOUND_X_X.get(info, Arrays.toString(keys.getEnumConstants()), item);
   }
 
   /**

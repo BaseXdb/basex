@@ -67,7 +67,7 @@ public final class InfoDB extends AInfo {
       if(meta.oldindex()) {
         tb.add(' ' + H_INDEX_FORMAT + NL);
       } else {
-        for(final MetaProp prop : MetaProp.ENUMS) {
+        for(final MetaProp prop : MetaProp.values()) {
           if(prop.index) info(tb, prop, meta);
         }
       }

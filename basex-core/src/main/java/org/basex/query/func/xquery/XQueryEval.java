@@ -67,7 +67,7 @@ public class XQueryEval extends StandardFunc {
     options.put(XQueryOptions.PERMISSION, user.permission(""));
     toOptions(arg(2), options, qc);
 
-    final Perm perm = Perm.get(options.get(XQueryOptions.PERMISSION).toString());
+    final Perm perm = EnumOption.get(Perm.class, options.get(XQueryOptions.PERMISSION).toString());
     if(!user.has(perm)) throw XQUERY_PERMREQUIRED_X.get(info, perm);
 
     Timer to = null;

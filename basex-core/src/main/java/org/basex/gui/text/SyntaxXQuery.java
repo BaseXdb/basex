@@ -51,9 +51,9 @@ final class SyntaxXQuery extends Syntax {
       for(final QNm name : Functions.BUILT_IN) {
         Collections.addAll(KEYWORDS, string(name.local()).split("-"));
       }
-      for(final Axis a : Axis.VALUES) Collections.addAll(KEYWORDS, a.name);
-      for(final OpV o : OpV.VALUES) Collections.addAll(KEYWORDS, o.name);
-      for(final OpN o : OpN.VALUES) Collections.addAll(KEYWORDS, o.names[0]);
+      for(final Axis a : Axis.values()) Collections.addAll(KEYWORDS, a.name);
+      for(final OpV o : OpV.values()) Collections.addAll(KEYWORDS, o.name);
+      for(final OpN o : OpN.values()) Collections.addAll(KEYWORDS, o.names[0]);
       final Atts ns = NSGlobal.NS;
       for(int n = 0; n < ns.size(); n++) KEYWORDS.add(string(ns.name(n)));
     } catch(final Exception ex) {

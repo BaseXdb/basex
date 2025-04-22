@@ -214,7 +214,7 @@ public final class Client {
           final String[] kv = Strings.split(header, '=', 2);
           final String key = kv[0].trim();
           if(!key.isEmpty() && kv.length == 2) {
-            final RequestAttribute r = RequestAttribute.get(key);
+            final RequestAttribute r = EnumOption.get(RequestAttribute.class, key);
             if(r != null) values.put(r, Strings.delete(kv[1], '"').trim());
           }
         }

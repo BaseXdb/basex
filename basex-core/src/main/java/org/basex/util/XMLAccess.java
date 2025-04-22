@@ -92,7 +92,7 @@ public final class XMLAccess {
 
     final String n = string(name);
     for(final E nm : names) {
-      if(n.equals(nm.toString())) return nm;
+      if(nm.toString().equals(n)) return nm;
     }
     throw new BaseXException("%: Unexpected element: \"%\".", prefix, name);
   }

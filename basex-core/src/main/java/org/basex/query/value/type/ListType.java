@@ -28,9 +28,6 @@ public enum ListType implements Type {
   /** IDREFS type. */
   IDREFS("IDREFS", AtomType.IDREF);
 
-  /** Cached enums (faster). */
-  private static final ListType[] VALUES = values();
-
   /** Atom Type. */
   private final AtomType type;
   /** Name. */
@@ -160,7 +157,7 @@ public enum ListType implements Type {
    * @return type or {@code null}
    */
   public static ListType find(final QNm qname) {
-    for(final ListType lt : VALUES) {
+    for(final ListType lt : values()) {
       if(lt.name.eq(qname)) return lt;
     }
     return null;

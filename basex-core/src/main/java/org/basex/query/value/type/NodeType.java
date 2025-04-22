@@ -137,8 +137,6 @@ public enum NodeType implements Type {
   /** Schema-attribute. */
   SCHEMA_ATTRIBUTE("schema-attribute", NODE, ID.SCA);
 
-  /** Cached enums (faster). */
-  private static final NodeType[] VALUES = values();
   /** Leaf node types. */
   public static final NodeType[] LEAF_TYPES = {
     ATTRIBUTE, COMMENT, NAMESPACE_NODE, PROCESSING_INSTRUCTION, TEXT
@@ -312,7 +310,7 @@ public enum NodeType implements Type {
   public static NodeType find(final QNm name) {
     if(name.uri().length == 0) {
       final byte[] ln = name.local();
-      for(final NodeType type : VALUES) {
+      for(final NodeType type : values()) {
         if(Token.eq(ln, type.test)) return type;
       }
     }

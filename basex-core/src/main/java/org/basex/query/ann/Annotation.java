@@ -179,14 +179,11 @@ public enum Annotation {
   /** Descriptive parameter string. */
   private final String paramString;
 
-  /** Cached enums (faster). */
-  public static final Annotation[] VALUES = values();
-
   /** Maps with QName and signature pairs. */
   private static final QNmMap<Annotation> MAP = new QNmMap<>();
 
   static {
-    for(final Annotation value : VALUES) {
+    for(final Annotation value : values()) {
       MAP.put(value.name, value);
     }
   }

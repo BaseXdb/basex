@@ -117,8 +117,6 @@ public final class CmpV extends Cmp {
       public OpG general() { return OpG.NE; }
     };
 
-    /** Cached enums (faster). */
-    public static final OpV[] VALUES = values();
     /** String representation. */
     public final String name;
 

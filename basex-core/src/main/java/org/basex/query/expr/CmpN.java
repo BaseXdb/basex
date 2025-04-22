@@ -46,8 +46,6 @@ public final class CmpN extends Cmp {
       }
     };
 
-    /** Cached enums (faster). */
-    public static final OpN[] VALUES = values();
     /** String representations. */
     public final String[] names;
 

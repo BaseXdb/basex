@@ -908,9 +908,6 @@ public enum AtomType implements Type {
   /** Language pattern. */
   private static final Pattern LANGPATTERN = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z\\d]{1,8})*");
 
-  /** Cached enums (faster). */
-  private static final AtomType[] VALUES = values();
-
   /** Name. */
   private final byte[] name;
   /** Parent type (can be {@code null}). */
@@ -961,8 +958,8 @@ public enum AtomType implements Type {
 
   // map hierarchy to pre/post values
   static {
-    final HashMap<AtomType, List<AtomType>> types = new HashMap<>(VALUES.length);
-    for(final AtomType type : VALUES) {
+    final HashMap<AtomType, List<AtomType>> types = new HashMap<>();
+    for(final AtomType type : values()) {
       if(type.parent != null) types.computeIfAbsent(type.parent, k -> new ArrayList<>()).add(type);
     }
     ITEM.assign(types, new byte[2]);
@@ -1215,7 +1212,7 @@ public enum AtomType implements Type {
    */
   public static AtomType find(final QNm qname, final boolean all) {
     if(!Token.eq(qname.uri(), BASEX_URI)) {
-      for(final AtomType value : VALUES) {
+      for(final AtomType value : values()) {
         if(qname.eq(value.qname()) && (all || value.parent != null)) return value;
       }
     }
@@ -1234,9 +1231,9 @@ public enum AtomType implements Type {
       final QNm qnm = tp.qname();
       return Token.eq(qnm.uri(), XS_URI) && tp.parent != null ? qnm.local() : null;
     };
-    Object similar = Levenshtein.similar(ln, VALUES, value -> local.apply((AtomType) value));
+    Object similar = Levenshtein.similar(ln, values(), value -> local.apply((AtomType) value));
     if(similar == null) {
-      for(final AtomType value : VALUES) {
+      for(final AtomType value : values()) {
         final byte[] lc = local.apply(value);
         if(lc != null && startsWith(lc, ln)) {
           similar = value;

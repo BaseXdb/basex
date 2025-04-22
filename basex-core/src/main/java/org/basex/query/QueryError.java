@@ -9,6 +9,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * This class contains all query error messages.
@@ -1471,9 +1472,6 @@ public enum QueryError {
   /** Error code. */
   UPATTELM2_X(XUTY, 22, "Attribute cannot be added to %.");
 
-  /** Cached enums (faster). */
-  private static final QueryError[] VALUES = values();
-
   /** Error URI. */
   private final byte[] uri;
   /** Error prefix. */
@@ -1676,10 +1674,8 @@ public enum QueryError {
    * @return exception or {@code null}
    */
   public static QueryException get(final String name, final String msg, final InputInfo info) {
-    for(final QueryError err : VALUES) {
-      if(err.toString().equals(name)) return new QueryException(info, err.qname(), msg).error(err);
-    }
-    return null;
+    final QueryError err = EnumOption.get(QueryError.class, name);
+    return err != null ? new QueryException(info, err.qname(), msg).error(err) : null;
   }
 
   /**

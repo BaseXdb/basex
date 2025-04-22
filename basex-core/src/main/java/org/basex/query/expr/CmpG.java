@@ -94,8 +94,6 @@ public class CmpG extends Cmp {
       public OpV value() { return OpV.NE; }
     };
 
-    /** Cached enums (faster). */
-    public static final OpG[] VALUES = values();
     /** String representation. */
     public final String name;
 
@@ -148,7 +146,7 @@ public class CmpG extends Cmp {
      * @return comparator or {@code null}
      */
     static OpG get(final OpV opV) {
-      for(final OpG value : VALUES) {
+      for(final OpG value : values()) {
         if(value.value() == opV) return value;
       }
       return null;

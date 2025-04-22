@@ -32,21 +32,6 @@ public enum RequestAttribute {
   /** Send-authorization. */ SEND_AUTHORIZATION,
   /** Override-media-type. */ OVERRIDE_MEDIA_TYPE;
 
-  /** Cached enums (faster). */
-  public static final RequestAttribute[] VALUES = values();
-
-  /**
-   * Returns an enum for the specified string.
-   * @param key key
-   * @return enum or {@code null}
-   */
-  public static RequestAttribute get(final String key) {
-    for(final RequestAttribute r : VALUES) {
-      if(key.equals(r.toString())) return r;
-    }
-    return null;
-  }
-
   @Override
   public String toString() {
     return EnumOption.string(this);

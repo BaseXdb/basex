@@ -124,9 +124,8 @@ public class CsvOptions extends Options {
     String sep = get(FIELD_DELIMITER);
     if(sep == null) {
       sep = get(SEPARATOR);
-      for(final CsvSep s : CsvSep.values()) {
-        if(sep.equals(s.toString())) return s.sep;
-      }
+      final CsvSep s = EnumOption.get(CsvSep.class, sep);
+      if(s != null) return s.sep;
     }
     return checkCodepoint(sep);
   }

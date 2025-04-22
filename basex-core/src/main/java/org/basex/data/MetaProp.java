@@ -177,9 +177,6 @@ public enum MetaProp {
     this.index = index;
   }
 
-  /** Cached enums (faster). */
-  public static final MetaProp[] ENUMS = values();
-
   /**
    * Returns the value of a property.
    * @param meta meta data
