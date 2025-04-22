@@ -1255,8 +1255,6 @@ public enum QueryError {
   NOMETHOD(XPST, 107, "The annotation %method is not allowed here."),
   /** Error code. */
   MAPDUPLKEY_X(XQDY, 137, "Map contains duplicate key: %."),
-  /** Error code. */
-  FINALLY_X(XQDY, 153, "Finally must not return a result: %."),
 
   /** Error code. */
   IMPLSCHEMA(XQST, 9, "No XML Schema support."),
@@ -1403,6 +1401,8 @@ public enum QueryError {
   NONSALL_X(XQTY, 24, "Namespaces does not follow root element: %."),
   /** Error code. */
   CONSFUNC_X(XQTY, 105, "Invalid content: %."),
+  /** Error code. */
+  FINALLY_X(XQTY, 153, "Finally must not return a result: %."),
 
   /** Error code. */
   UPNOPAR_X(XUDY, 9, "Target has no parent: %."),
