@@ -1104,6 +1104,8 @@ public enum QueryError {
   /** Error code. */
   FUNCNOIMPL_X(XPST, 17, "External function not implemented: %."),
   /** Error code. */
+  NO_OPTIONS_WITH_DB(XPST, 17, "The 'options' argument must not be used with a database URI."),
+  /** Error code. */
   JAVAINIT_X_X(XPST, 17, "%: %."),
   /** Error code. */
   JAVACLASS_X(XPST, 17, "Unknown class: %."),

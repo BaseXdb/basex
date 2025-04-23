@@ -74,6 +74,7 @@ public class FnParseXmlFragment extends StandardFunc {
     Map.of(ParseXmlFragmentOptions.STRIP_SPACE, MainOptions.STRIPWS,
         ParseXmlFragmentOptions.STRIPNS, MainOptions.STRIPNS,
         ParseXmlOptions.INTPARSE, MainOptions.INTPARSE,
+        ParseXmlOptions.ALLOW_EXTERNAL_ENTITIES, MainOptions.ALLOWEXTERNALENTITIES,
         ParseXmlOptions.DTD, MainOptions.DTD,
         ParseXmlOptions.DTD_VALIDATION, MainOptions.DTDVALIDATION,
         ParseXmlOptions.XINCLUDE, MainOptions.XINCLUDE).forEach((opt, mopt) -> {
@@ -83,8 +84,15 @@ public class FnParseXmlFragment extends StandardFunc {
         ParseXmlOptions.CATALOG, MainOptions.CATALOG).forEach((opt, mopt) -> {
       if(options.contains(opt)) mopts.set(mopt, options.get(opt));
     });
-    if(mopts.get(MainOptions.DTD) || mopts.get(MainOptions.XINCLUDE) ||
-        !mopts.get(MainOptions.CATALOG).isEmpty()) checkPerm(qc, Perm.CREATE);
+    if(options.contains(ParseXmlOptions.ENTITY_EXPANSION_LIMIT)) {
+      mopts.set(MainOptions.ENTITYEXPANSIONLIMIT,
+          options.get(ParseXmlOptions.ENTITY_EXPANSION_LIMIT));
+    }
+    if(mopts.get(MainOptions.DTD) || mopts.get(MainOptions.XINCLUDE)
+        || mopts.get(MainOptions.ALLOWEXTERNALENTITIES)
+        || !mopts.get(MainOptions.CATALOG).isEmpty()) {
+      checkPerm(qc, Perm.CREATE);
+    }
 
     final boolean dtdVal = mopts.get(MainOptions.DTDVALIDATION);
     final String xsdVal = mopts.get(MainOptions.XSDVALIDATION);
@@ -95,8 +103,8 @@ public class FnParseXmlFragment extends StandardFunc {
       if(dtdVal) throw NODTDVALIDATION.get(info);
       if(!skip) throw NOXSDVALIDATION_X.get(info, xsdVal);
     } else if(!skip) {
-      if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
       if(!strict) throw INVALIDXSDOPT_X.get(info, xsdVal);
+      if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
     }
 
     try {

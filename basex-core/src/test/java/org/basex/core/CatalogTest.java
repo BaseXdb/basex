@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
@@ -103,8 +104,10 @@ public final class CatalogTest extends SandboxTest {
   @Test public void doc() {
     final Function func = DOC;
 
-    set(MainOptions.DTD, true);
     set(MainOptions.CATALOG, CATALOG);
-    query(func.args("http://doc.xml"), "<doc>X</doc>");
+    query(func.args("http://doc.xml", " {'dtd': true()}"), "<doc>X</doc>");
+    query(func.args("http://doc.xml", " {'dtd': false()}"), "<doc/>");
+    query(func.args("http://doc.xml", " {'allow-external-entities': true()}"), "<doc>X</doc>");
+    error(func.args("http://doc.xml", " {'allow-external-entities': false()}"), IOERR_X);
   }
 }

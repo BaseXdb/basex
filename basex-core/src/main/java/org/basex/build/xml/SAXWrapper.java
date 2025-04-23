@@ -54,8 +54,10 @@ public final class SAXWrapper extends SingleParser {
       if(reader == null) {
         reader = XmlParser.reader(options);
       }
-      final EntityResolver er = Resolver.entities(options);
-      if(er != null) reader.setEntityResolver(er);
+      if(reader.getEntityResolver() == null) {
+        final EntityResolver er = Resolver.entities(options);
+        if(er != null) reader.setEntityResolver(er);
+      }
 
       saxh = new SAXHandler(builder, options.get(MainOptions.STRIPWS),
           options.get(MainOptions.STRIPNS));

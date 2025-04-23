@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.build.*;
+import org.basex.build.xml.SAXHandler.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.users.*;
@@ -202,25 +203,29 @@ public final class QueryResources {
    * Evaluates {@code fn:doc()}: opens an existing database document, or creates a new
    * database and node.
    * @param qi query input
+   * @param docOpts options used by fn:doc or fn:collection (can be {@code null})
    * @param user current user
    * @param info input info (can be {@code null})
    * @return document
    * @throws QueryException query exception
    */
-  public synchronized DBNode doc(final QueryInput qi, final User user, final InputInfo info)
-      throws QueryException {
+  public synchronized DBNode doc(final QueryInput qi, final DocOptions docOpts, final User user,
+      final InputInfo info) throws QueryException {
     final MainOptions options = context.options;
     // favor default database
     if(options.get(MainOptions.WITHDB) && options.get(MainOptions.DEFAULTDB)) {
       final Data data = globalData();
       if(data != null) {
         final int pre = data.resources.doc(qi.original);
-        if(pre != -1) return new DBNode(data, pre, Data.DOC);
+        if(pre != -1) {
+          if(docOpts != null) throw NO_OPTIONS_WITH_DB.get(info);
+          return new DBNode(data, pre, Data.DOC);
+        }
       }
     }
 
     // access open database or create new one
-    final Data data = data(true, qi, user, info);
+    final Data data = data(true, qi, docOpts, user, info);
     // ensure that database contains a single document
     final IntList docs = data.resources.docs(qi.dbPath);
     if(docs.size() == 1) return new DBNode(data, docs.get(0), Data.DOC);
@@ -267,7 +272,7 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    final Data data = data(false, qi, user, info);
+    final Data data = data(false, qi, null, user, info);
     final IntList docs = data.resources.docs(qi.dbPath);
     return DBNodeSeq.get(docs, data, true, qi.dbPath.isEmpty());
   }
@@ -350,7 +355,7 @@ public final class QueryResources {
   public void addDoc(final String name, final String path, final StaticContext sc)
       throws QueryException {
     final QueryInput qi = new QueryInput(path, sc);
-    final Data data = create(qi, context.user(), null, true);
+    final Data data = create(qi, null, context.user(), null, true);
     if(name != null) data.meta.original = name;
   }
 
@@ -377,7 +382,7 @@ public final class QueryResources {
     final ItemList items = new ItemList(paths.length);
     for(final String path : paths) {
       final QueryInput qi = new QueryInput(path, sc);
-      items.add(new DBNode(create(qi, context.user(), null, false), 0, Data.DOC));
+      items.add(new DBNode(create(qi, null, context.user(), null, false), 0, Data.DOC));
     }
     addCollection(items.value(NodeType.DOCUMENT_NODE), name);
   }
@@ -398,13 +403,14 @@ public final class QueryResources {
    * Returns an already open database for the specified input or creates a new one.
    * @param single single document
    * @param qi query input
+   * @param docOpts options used by fn:doc or fn:collection (can be {@code null})
    * @param user current user
    * @param info input info (can be {@code null})
    * @return document
    * @throws QueryException query exception
    */
-  private Data data(final boolean single, final QueryInput qi, final User user,
-      final InputInfo info) throws QueryException {
+  private Data data(final boolean single, final QueryInput qi, final DocOptions docOpts,
+      final User user, final InputInfo info) throws QueryException {
 
     final boolean withdb = context.options.get(MainOptions.WITHDB);
     final String name = qi.dbName;
@@ -415,13 +421,15 @@ public final class QueryResources {
       if(withdb || mem) {
         // compare input path
         final String original = data.meta.original;
-        if(!original.isEmpty() && IO.get(original).eq(qi.io)) {
+        if(!original.isEmpty() && IO.get(original).eq(qi.io) && (docOpts != null ? docOpts :
+          DocOptions.DEFAULT_DOC_OPTIONS).equals(data.meta.docOpts)) {
           // reset database path: indicates that database includes all files of the original path
           qi.dbPath = "";
           return data;
         }
         // compare database name; favor existing database instances
         if(IO.equals(data.meta.name, name) && (!mem || !context.soptions.dbExists(name))) {
+          if(docOpts != null) throw NO_OPTIONS_WITH_DB.get(info);
           return data;
         }
       }
@@ -432,14 +440,17 @@ public final class QueryResources {
       if(!user.has(Perm.READ, name)) throw BASEX_PERMISSION_X_X.get(info, Perm.READ, name);
       try {
         final Data data = Open.open(name, context, context.options, false, false);
-        if(data != null) return addData(data);
+        if(data != null) {
+          if(docOpts != null) throw NO_OPTIONS_WITH_DB.get(info);
+          return addData(data);
+        }
       } catch(final IOException ex) {
         throw IOERR_X.get(info, ex);
       }
     }
 
     // otherwise, create new instance
-    final Data data = create(qi, user, info, single);
+    final Data data = create(qi, docOpts, user, info, single);
     // reset database path: indicates that all documents were parsed
     qi.dbPath = "";
     return data;
@@ -448,14 +459,15 @@ public final class QueryResources {
   /**
    * Creates a new database instance.
    * @param input query input
+   * @param docOpts options used by fn:doc or fn:collection
    * @param user current user
    * @param info input info (can be {@code null})
    * @param single expect single document
    * @return data reference
    * @throws QueryException query exception
    */
-  private Data create(final QueryInput input, final User user, final InputInfo info,
-      final boolean single) throws QueryException {
+  private Data create(final QueryInput input, final DocOptions docOpts, final User user,
+      final InputInfo info, final boolean single) throws QueryException {
 
     // check user permissions
     if(!user.has(Perm.READ)) throw XQUERY_PERMREQUIRED_X.get(info, Perm.READ);
@@ -467,15 +479,34 @@ public final class QueryResources {
 
     // overwrite parsing options with default values
     final boolean mem = !context.options.get(MainOptions.FORCECREATE);
-    final MainOptions opts = new MainOptions(context.options, single);
-    final Parser parser = new DirParser(io, opts);
 
+    final DocOptions effectiveDocOpts;
+    final MainOptions options;
+    final boolean stable;
+    if(mem) {
+      effectiveDocOpts = docOpts != null ? docOpts : DocOptions.DEFAULT_DOC_OPTIONS;
+      options = effectiveDocOpts.toMainOptions(context.options);
+      stable = effectiveDocOpts.get(DocOptions.STABLE);
+    } else {
+      if(docOpts != null) throw NO_OPTIONS_WITH_DB.get(info);
+      effectiveDocOpts = null;
+      options = context.options;
+      stable = true;
+    }
+    final DirParser parser = new DirParser(io, options);
     final Data data;
     try {
-      data = CreateDB.create(io.dbName(), parser, context, opts, mem);
+      data = CreateDB.create(io.dbName(), parser, context, options, mem);
     } catch(final IOException ex) {
-      throw IOERR_X.get(info, ex);
+      final Throwable th = ex.getCause();
+      final QueryException qe;
+        qe = !(th instanceof ValidationException) ? IOERR_X.get(info, ex) :
+          options.get(MainOptions.DTDVALIDATION) ? DTDVALIDATIONERR_X.get(info, ex) :
+            XSDVALIDATIONERR_X.get(info, ex);
+      throw qe;
     }
+    if(!stable) return data;
+    data.meta.docOpts = effectiveDocOpts;
     return addData(data);
   }
 

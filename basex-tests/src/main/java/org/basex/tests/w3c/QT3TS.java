@@ -194,7 +194,11 @@ public final class QT3TS extends Main {
     baseURI = base.path();
     baseDir = base.dir();
 
-    if(supported(set)) {
+    if(!supported(set)) {
+      long n = new XQuery("count(*:test-case)", ctx).context(set).value().getInteger();
+      total += n;
+      ignored += n;
+    } else {
       // parse environment of test-set
       final ArrayList<QT3Env> envs = new ArrayList<>();
       for(final XdmItem ienv : new XQuery("*:environment", ctx).context(set))
@@ -319,20 +323,6 @@ public final class QT3TS extends Main {
       locations.put(location.getString(), new IOFile(baseDir, file.getString()));
     }
 
-    if(!locations.isEmpty()) {
-      final QueryProcessor qp = query.qp();
-      qp.uriResolver(new UriResolver() {
-        @Override
-        public IO resolve(final String path, final String uri, final Uri bas) {
-          qp.uriResolver(null);
-          final IO io = qp.sc.resolve(path, uri);
-          qp.uriResolver(this);
-          final IO file = locations.get(io.path());
-          return file == null ? io : file;
-        }
-      });
-    }
-
     final QT3Result returned = new QT3Result();
     returned.env = env;
 
@@ -345,6 +335,7 @@ public final class QT3TS extends Main {
           if(file ==  null) continue;
 
           final String path = file(base, file);
+          locations.put(src.get(URI), new IOFile(baseDir, file));
           query.addDocument(src.get(URI), path);
           if(role == null) continue;
 
@@ -373,6 +364,20 @@ public final class QT3TS extends Main {
         for(final Entry<QName, DecFormatOptions> df : env.decFormats.entrySet()) {
           query.decimalFormat(df.getKey(), df.getValue());
         }
+      }
+
+      if(!locations.isEmpty()) {
+        final QueryProcessor qp = query.qp();
+        qp.uriResolver(new UriResolver() {
+          @Override
+          public IO resolve(final String path, final String uri, final Uri bas) {
+            qp.uriResolver(null);
+            final IO io = qp.sc.resolve(path, uri);
+            qp.uriResolver(this);
+            final IO file = locations.get(io.path());
+            return file == null ? io : file;
+          }
+        });
       }
 
       // run query

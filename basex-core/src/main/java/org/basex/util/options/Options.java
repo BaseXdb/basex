@@ -933,4 +933,9 @@ public class Options implements Iterable<Option<?>> {
     if(!left) add.run();
     return map;
   }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj != null && getClass() == obj.getClass() && values.equals(((Options) obj).values);
+  }
 }
