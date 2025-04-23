@@ -232,7 +232,7 @@ public enum Function implements AFunction {
   ELEMENT_TO_MAP(FnElementToMap::new, "element-to-map(element[,options])",
       params(ELEMENT_ZO, MAP_ZO), MAP_ZO),
   /** XQuery function. */
-  ELEMENT_TO_MAP_PLAN(FnElementToMapPlan::new, "element-to-map-plan(element[,options])",
+  ELEMENT_TO_MAP_PLAN(FnElementToMapPlan::new, "element-to-map-plan(element)",
       params(NODE_ZM), MAP_O),
   /** XQuery function. */
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
