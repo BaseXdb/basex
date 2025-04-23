@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
+import org.basex.io.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
@@ -304,8 +306,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" parse-xml('<x/>')"), cd);
     query(func.args(" document{<x/>}"), cd);
     query(func.args(" doc('src/test/resources/test.xml')"), cd + "src/test/resources/test.xml");
-    query("collection('src/test/resources/catalog')!" + func.args(" .")
-        + "[ends-with(., '/doc.xml')]", cd + "src/test/resources/catalog/doc.xml");
+    query("collection('src/test/resources/dir')!" + func.args(" .")
+        + "[ends-with(., '/test.xml')]", cd + "src/test/resources/dir/test.xml");
   }
 
   /** Test method. */
@@ -747,12 +749,50 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void doc() {
+    final Function func = Function.DOC;
+
+    final IOFile sandbox = sandbox();
+    final BiFunction<String, String, String> write = (name, content) -> {
+      final IOFile file = new IOFile(sandbox, name);
+      write(file, content);
+      return file.path();
+    };
+
+    write.apply("schema.xsd", "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'><xs:element n"
+        + "ame='root'/></xs:schema>");
+    final String doc1 = write.apply("doc1.xml", "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema"
+        + "-instance\" xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
+    final String doc2 = write.apply("doc2.xml", "<root2 xmlns:xsi=\"http://www.w3.org/2001/XMLSchem"
+        + "a-instance\" xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
+    final String doc3 = write.apply("doc3.xml", "<!DOCTYPE root [<!ENTITY e1 \"EntityOne\"><!ENTITY"
+        + " e2 \"EntityTwo\"><!ENTITY e3 \"EntityThree\"><!ENTITY e4 \"EntityFour\">]><root><value>"
+        + "&e1;</value><value>&e2;</value><value>&e3;</value><value>&e4;</value></root>");
+
+    query(func.args(doc1, " {'xsd-validation': 'strict', 'xsi-schema-location': true()}"),
+        "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocatio"
+        + "n=\"schema.xsd\"/>");
+    query(func.args(doc3, " {'entity-expansion-limit': -1}"), "<root><value>EntityOne</value"
+        + "><value>EntityTwo</value><value>EntityThree</value><value>EntityFour</value></root>");
+    query(func.args(doc3, " {'entity-expansion-limit': 4}"), "<root><value>EntityOne</value>"
+        + "<value>EntityTwo</value><value>EntityThree</value><value>EntityFour</value></root>");
+
+    error(func.args(doc1, " {'xsd-validation': 'strict', 'xsi-schema-location': false()}"),
+        IOERR_X);
+    error(func.args(doc2, " {'xsd-validation': 'strict', 'xsi-schema-location': true()}"),
+        XSDVALIDATIONERR_X);
+    error(func.args(doc3, " {'entity-expansion-limit': 3}"), IOERR_X);
+    error(func.args(doc3, " {'entity-expansion-limit': 0}"), IOERR_X);
+  }
+
+  /** Test method. */
   @Test public void docAvailable() {
     final Function func = DOC_AVAILABLE;
 
     query(func.args(DOC), true);
     query(func.args("/"), false);
     query(func.args("/a/b/c/d/e"), false);
+    query(func.args(DOC, " {}"), true);
   }
 
   /**
@@ -766,8 +806,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" parse-xml('<x/>')"), "");
     query(func.args(" document{<x/>}"), "");
     query(func.args(" doc('src/test/resources/test.xml')"), cd + "src/test/resources/test.xml");
-    query("collection('src/test/resources/catalog')!" + func.args(" .")
-        + "[ends-with(., '/doc.xml')]", cd + "src/test/resources/catalog/doc.xml");
+    query("collection('src/test/resources/dir')!" + func.args(" .")
+        + "[ends-with(., '/test.xml')]", cd + "src/test/resources/dir/test.xml");
   }
 
   /** Test method. */

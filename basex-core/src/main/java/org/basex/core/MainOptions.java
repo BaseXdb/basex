@@ -6,6 +6,8 @@ import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.io.serial.*;
+import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
@@ -55,6 +57,9 @@ public final class MainOptions extends Options {
   public static final BooleanOption STRIPWS = new BooleanOption("STRIPWS", false);
   /** Strip namespaces. */
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);
+  /** Whether external entities are permitted or rejected. */
+  public static final BooleanOption ALLOWEXTERNALENTITIES = new BooleanOption(
+      "ALLOWEXTERNALENTITIES", true);
   /** Flag for parsing DTDs. */
   public static final BooleanOption DTD = new BooleanOption("DTD", false);
   /** Flag for DTD validation. */
@@ -65,6 +70,12 @@ public final class MainOptions extends Options {
   public static final String STRICT = "strict";
   /** XSD validation. */
   public static final StringOption XSDVALIDATION = new StringOption("XSDVALIDATION", SKIP);
+  /** Flag for handling xsi:schemaLocation and xsi:noNamespaceSchemaLocation attributes. */
+  public static final BooleanOption XSISCHEMALOCATION = new BooleanOption("XSISCHEMALOCATION",
+      true);
+  /** Limit on the maximum number of entity references that may be expanded. */
+  public static final ValueOption ENTITYEXPANSIONLIMIT = new ValueOption("ENTITYEXPANSIONLIMIT",
+      SeqType.INTEGER_ZO, Empty.VALUE);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", true);
   /** Path to XML Catalog file. */
@@ -189,7 +200,7 @@ public final class MainOptions extends Options {
 
   /** XML Parsing options. */
   private static final Option<?>[] XMLPARSING = { INTPARSE, STRIPWS, STRIPNS, DTD, DTDVALIDATION,
-      XINCLUDE, CATALOG};
+      XINCLUDE, CATALOG, ENTITYEXPANSIONLIMIT, XSDVALIDATION, XSISCHEMALOCATION };
   /** Extended parsing options. */
   public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
       SKIPCORRUPT, ADDRAW, ADDCACHE, CSVPARSER, JSONPARSER, HTMLPARSER, PARSER };

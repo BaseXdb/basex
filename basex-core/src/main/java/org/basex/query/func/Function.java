@@ -213,11 +213,11 @@ public enum Function implements AFunction {
   DIVIDE_DECIMALS(FnDivideDecimals::new, "divide-decimals(value,divisor[,precision])",
       params(DECIMAL_O, DECIMAL_O, INTEGER_ZO), MAP_O),
   /** XQuery function. */
-  DOC(FnDoc::new, "doc(source)",
-      params(STRING_ZO), DOCUMENT_NODE_ZO, flag(NDT)),
+  DOC(FnDoc::new, "doc(source[,options])",
+      params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(NDT)),
   /** XQuery function. */
-  DOC_AVAILABLE(FnDocAvailable::new, "doc-available(source)",
-      params(STRING_ZO), BOOLEAN_O, flag(NDT)),
+  DOC_AVAILABLE(FnDocAvailable::new, "doc-available(source[,options])",
+      params(STRING_ZO, MAP_ZO), BOOLEAN_O, flag(NDT)),
   /** XQuery function. */
   DOCUMENT_URI(FnDocumentUri::new, "document-uri([node])",
       params(NODE_ZO), ANY_URI_ZO),
