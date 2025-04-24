@@ -25,7 +25,6 @@
   </modules>
 
   <properties>
-    <compileSource>11</compileSource>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
@@ -399,10 +398,6 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.13.0</version>
           <inherited>true</inherited>
-          <configuration>
-            <source>${compileSource}</source>
-            <target>${compileSource}</target>
-          </configuration>
         </plugin>
 
         <plugin>
