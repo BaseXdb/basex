@@ -4,8 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
-import org.basex.core.*;
-import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -40,22 +38,7 @@ public class FnDocAvailable extends Docs {
    */
   final Item doc(final QueryContext qc) throws QueryException {
     final DocOptions options = toOptions(arg(1), new DocOptions(), qc);
-    if(options.get(DocOptions.DTD) || options.get(DocOptions.XINCLUDE) ||
-        options.get(DocOptions.ALLOW_EXTERNAL_ENTITIES)) {
-      checkPerm(qc, Perm.CREATE);
-    }
-    final boolean dtdVal = options.get(DocOptions.DTD_VALIDATION);
-    final String xsdVal = options.get(DocOptions.XSD_VALIDATION);
-    final boolean skip = MainOptions.SKIP.equals(xsdVal);
-    final boolean strict = MainOptions.STRICT.equals(xsdVal);
-    final boolean intparse = options.get(DocOptions.INTPARSE);
-    if(intparse) {
-      if(dtdVal) throw NODTDVALIDATION.get(info);
-      if(!skip) throw NOXSDVALIDATION_X.get(info, xsdVal);
-    } else if(!skip) {
-      if(!strict) throw INVALIDXSDOPT_X.get(info, xsdVal);
-      if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
-    }
+    check(options, false, qc);
 
     QueryInput qi = queryInput;
     if(qi == null) {

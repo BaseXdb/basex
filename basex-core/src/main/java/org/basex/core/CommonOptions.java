@@ -11,6 +11,11 @@ import org.basex.util.options.*;
 public interface CommonOptions {
   // XML parsing options
 
+  /** XSD validation option value. */
+  String SKIP = "skip";
+  /** XSD validation option value. */
+  String STRICT = "strict";
+
   /** Internal option: {@link MainOptions#EXTERNALENT}. */
   BooleanOption ALLOW_EXTERNAL_ENTITIES = new BooleanOption("allow-external-entities", true);
   /** Internal option: {@link MainOptions#DTDVALIDATION}. */
@@ -22,7 +27,7 @@ public interface CommonOptions {
   /** Internal option: {@link MainOptions#XINCLUDE}. */
   BooleanOption XINCLUDE = new BooleanOption("xinclude", false);
   /** Internal option: {@link MainOptions#XSDVALIDATION}. */
-  StringOption XSD_VALIDATION = new StringOption("xsd-validation", MainOptions.SKIP);
+  StringOption XSD_VALIDATION = new StringOption("xsd-validation", SKIP);
   /** Internal option: {@link MainOptions#XSILOCATION}. */
   BooleanOption XSI_SCHEMA_LOCATION = new BooleanOption("xsi-schema-location", false);
 
@@ -34,4 +39,7 @@ public interface CommonOptions {
   BooleanOption DTD = new BooleanOption("dtd", true);
   /** Internal option: {@link MainOptions#CATALOG}. */
   StringOption CATALOG = new StringOption("catalog", "");
+
+  /** Base URI. */
+  StringOption BASE_URI = new StringOption("base-uri");
 }

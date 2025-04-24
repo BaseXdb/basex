@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -40,7 +41,7 @@ public final class XQueryParse extends StandardFunc {
     /** Pass on error info. */
     public static final BooleanOption PASS = new BooleanOption("pass", false);
     /** Query base-uri. */
-    public static final StringOption BASE_URI = new StringOption("base-uri");
+    public static final StringOption BASE_URI = CommonOptions.BASE_URI;
   }
 
   @Override

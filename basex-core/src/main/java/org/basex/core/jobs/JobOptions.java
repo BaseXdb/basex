@@ -1,5 +1,6 @@
 package org.basex.core.jobs;
 
+import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -10,7 +11,7 @@ import org.basex.util.options.*;
  */
 public final class JobOptions extends Options {
   /** Query base-uri. */
-  public static final StringOption BASE_URI = new StringOption("base-uri");
+  public static final StringOption BASE_URI = CommonOptions.BASE_URI;
   /** Cache result. */
   public static final BooleanOption CACHE = new BooleanOption("cache");
   /** Start date/time/duration. */

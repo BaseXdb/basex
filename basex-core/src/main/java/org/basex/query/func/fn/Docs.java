@@ -1,16 +1,21 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
+import java.util.function.*;
 
+import org.basex.core.*;
 import org.basex.core.locks.*;
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.util.options.*;
 
 /**
  * Document and collection functions.
@@ -47,7 +52,7 @@ public abstract class Docs extends DynamicFn {
   }
 
   @Override
-  public final boolean accept(final ASTVisitor visitor) {
+  public boolean accept(final ASTVisitor visitor) {
     return visitor.lock(() -> {
       final ArrayList<String> list = new ArrayList<>(1);
       if(sc().withdb) {
@@ -71,5 +76,40 @@ public abstract class Docs extends DynamicFn {
       }
       return list;
     }) && super.accept(visitor);
+  }
+
+  /**
+   * Checks the validity of the chosen parsing options.
+   * Handles both common and main options.
+   * @param options options
+   * @param fragment parse fragment
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  void check(final Options options, final boolean fragment, final QueryContext qc)
+      throws QueryException {
+
+    final Predicate<BooleanOption> bool = o -> options.get(o) == Boolean.TRUE;
+    final boolean dtd = bool.test(CommonOptions.DTD) || bool.test(MainOptions.DTD);
+    final boolean xinclude = bool.test(CommonOptions.XINCLUDE) || bool.test(MainOptions.XINCLUDE);
+    final boolean externalent = bool.test(CommonOptions.ALLOW_EXTERNAL_ENTITIES) ||
+        bool.test(MainOptions.EXTERNALENT);
+    if(dtd || xinclude || externalent) checkPerm(qc, Perm.CREATE);
+
+    final boolean intparse = fragment || bool.test(CommonOptions.INTPARSE) ||
+        bool.test(MainOptions.INTPARSE);
+    final boolean dtdVal = bool.test(CommonOptions.DTD_VALIDATION) ||
+        bool.test(MainOptions.DTDVALIDATION);
+    String xsdVal = fragment ? CommonOptions.SKIP : options.get(MainOptions.XSDVALIDATION);
+    if(xsdVal == null) xsdVal = options.get(CommonOptions.XSD_VALIDATION);
+    final boolean skip = CommonOptions.SKIP.equals(xsdVal);
+    final boolean strict = CommonOptions.STRICT.equals(xsdVal);
+    if(intparse) {
+      if(dtdVal) throw NODTDVALIDATION.get(info);
+      if(!skip) throw NOXSDVALIDATION_X.get(info, xsdVal);
+    } else if(!skip) {
+      if(!strict) throw INVALIDXSDOPT_X.get(info, xsdVal);
+      if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
+    }
   }
 }

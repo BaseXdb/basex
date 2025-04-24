@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 import java.util.Map.*;
 
+import org.basex.core.*;
 import org.basex.core.jobs.*;
 import org.basex.core.users.*;
 import org.basex.io.*;
@@ -34,7 +35,7 @@ public class XQueryEval extends StandardFunc {
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
     /** Query base-uri. */
-    public static final StringOption BASE_URI = new StringOption("base-uri");
+    public static final StringOption BASE_URI = CommonOptions.BASE_URI;
     /** Pass on error info. */
     public static final BooleanOption PASS = new BooleanOption("pass", false);
   }

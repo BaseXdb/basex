@@ -66,7 +66,8 @@ public final class XmlParser {
     final boolean dtd = options.get(MainOptions.DTD);
     final boolean dtdValidation = options.get(MainOptions.DTDVALIDATION);
     final boolean xinclude = options.get(MainOptions.XINCLUDE);
-    final boolean xsdValidation = MainOptions.STRICT.equals(options.get(MainOptions.XSDVALIDATION));
+    final boolean xsdValidation = CommonOptions.STRICT.equals(
+        options.get(MainOptions.XSDVALIDATION));
     final boolean xsiLocation = options.get(MainOptions.XSILOCATION);
     final SAXParserFactory f = SAXParserFactory.newInstance();
     if(extEntities) {

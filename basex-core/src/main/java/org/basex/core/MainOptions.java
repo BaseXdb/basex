@@ -50,11 +50,6 @@ public final class MainOptions extends Options {
 
   // XML Parsing
 
-  /** XSD validation option value. */
-  public static final String SKIP = "skip";
-  /** XSD validation option value. */
-  public static final String STRICT = "strict";
-
   /** Use internal XML parser. */
   public static final BooleanOption INTPARSE = new BooleanOption("INTPARSE", false);
   /** Strip whitespace. */
@@ -70,7 +65,8 @@ public final class MainOptions extends Options {
   /** Flag for DTD validation. */
   public static final BooleanOption DTDVALIDATION = new BooleanOption("DTDVALIDATION", false);
   /** XSD validation. */
-  public static final StringOption XSDVALIDATION = new StringOption("XSDVALIDATION", SKIP);
+  public static final StringOption XSDVALIDATION = new StringOption("XSDVALIDATION",
+      CommonOptions.SKIP);
   /** Flag for handling xsi:schemaLocation and xsi:noNamespaceSchemaLocation attributes. */
   public static final BooleanOption XSILOCATION = new BooleanOption("XSILOCATION", true);
   /** Flag for using XInclude. */
