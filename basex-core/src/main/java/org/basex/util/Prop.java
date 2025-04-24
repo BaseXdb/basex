@@ -23,7 +23,7 @@ public final class Prop {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Current version (major and minor number, optionally followed by development tag). */
-  private static final String CURRENT_VERSION = "11.9 beta";
+  private static final String CURRENT_VERSION = "12.0 beta";
 
   /** Name of project in lower case. */
   public static final String PROJECT = NAME.toLowerCase(Locale.ENGLISH);
