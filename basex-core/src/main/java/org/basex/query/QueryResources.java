@@ -12,6 +12,7 @@ import org.basex.core.cmd.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.value.*;
@@ -29,6 +30,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QueryResources {
+  /** Default options. */
+  public static final DocOptions DOC_OPTIONS = new DocOptions();
+  /** Default options for creating new documents. */
+  private static final MainOptions MAIN_OPTIONS = new MainOptions(DOC_OPTIONS);
+
   /** Database context. */
   private final Context context;
 
@@ -203,7 +209,7 @@ public final class QueryResources {
    * Evaluates {@code fn:doc()}: opens an existing database document, or creates a new
    * database and node.
    * @param qi query input
-   * @param docOpts options used by fn:doc or fn:collection (can be {@code null})
+   * @param docOpts options used by fn:doc or fn:collection
    * @param user current user
    * @param info input info (can be {@code null})
    * @return document
@@ -218,7 +224,7 @@ public final class QueryResources {
       if(data != null) {
         final int pre = data.resources.doc(qi.original);
         if(pre != -1) {
-          if(docOpts != null) throw NO_OPTIONS_WITH_DB.get(info);
+          docOpts.checkDbAccess(info);
           return new DBNode(data, pre, Data.DOC);
         }
       }
@@ -272,7 +278,7 @@ public final class QueryResources {
     }
 
     // access open database or create new one
-    final Data data = data(false, qi, null, user, info);
+    final Data data = data(false, qi, DOC_OPTIONS, user, info);
     final IntList docs = data.resources.docs(qi.dbPath);
     return DBNodeSeq.get(docs, data, true, qi.dbPath.isEmpty());
   }
@@ -355,7 +361,7 @@ public final class QueryResources {
   public void addDoc(final String name, final String path, final StaticContext sc)
       throws QueryException {
     final QueryInput qi = new QueryInput(path, sc);
-    final Data data = create(qi, null, context.user(), null, true);
+    final Data data = create(qi, DOC_OPTIONS, context.user(), null, true);
     if(name != null) data.meta.original = name;
   }
 
@@ -382,7 +388,7 @@ public final class QueryResources {
     final ItemList items = new ItemList(paths.length);
     for(final String path : paths) {
       final QueryInput qi = new QueryInput(path, sc);
-      items.add(new DBNode(create(qi, null, context.user(), null, false), 0, Data.DOC));
+      items.add(new DBNode(create(qi, DOC_OPTIONS, context.user(), null, false), 0, Data.DOC));
     }
     addCollection(items.value(NodeType.DOCUMENT_NODE), name);
   }
@@ -403,7 +409,7 @@ public final class QueryResources {
    * Returns an already open database for the specified input or creates a new one.
    * @param single single document
    * @param qi query input
-   * @param docOpts options used by fn:doc or fn:collection (can be {@code null})
+   * @param docOpts options used by fn:doc or fn:collection
    * @param user current user
    * @param info input info (can be {@code null})
    * @return document
@@ -417,19 +423,19 @@ public final class QueryResources {
 
     // check opened databases
     for(final Data data : datas) {
-      final boolean mem = data.inMemory();
-      if(withdb || mem) {
+      final boolean mainmem = data.inMemory();
+      if(withdb || mainmem) {
         // compare input path
         final String original = data.meta.original;
-        if(!original.isEmpty() && IO.get(original).eq(qi.io) && (docOpts != null ? docOpts :
-          DocOptions.DEFAULT_DOC_OPTIONS).equals(data.meta.docOpts)) {
+        if(!original.isEmpty() && IO.get(original).eq(qi.io) &&
+            docOpts.toString().equals(data.meta.docOpts)) {
           // reset database path: indicates that database includes all files of the original path
           qi.dbPath = "";
           return data;
         }
         // compare database name; favor existing database instances
-        if(IO.equals(data.meta.name, name) && (!mem || !context.soptions.dbExists(name))) {
-          if(docOpts != null) throw NO_OPTIONS_WITH_DB.get(info);
+        if(IO.equals(data.meta.name, name) && (!mainmem || !context.soptions.dbExists(name))) {
+          docOpts.checkDbAccess(info);
           return data;
         }
       }
@@ -441,7 +447,7 @@ public final class QueryResources {
       try {
         final Data data = Open.open(name, context, context.options, false, false);
         if(data != null) {
-          if(docOpts != null) throw NO_OPTIONS_WITH_DB.get(info);
+          docOpts.checkDbAccess(info);
           return addData(data);
         }
       } catch(final IOException ex) {
@@ -477,37 +483,34 @@ public final class QueryResources {
     if(!io.exists()) throw WHICHRES_X.get(info, io.path());
     if(single && io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io.path());
 
-    // overwrite parsing options with default values
-    final boolean mem = !context.options.get(MainOptions.FORCECREATE);
-
-    final DocOptions effectiveDocOpts;
+    // create parsing options with custom values
+    final boolean mainmem = !context.options.get(MainOptions.FORCECREATE);
     final MainOptions options;
-    final boolean stable;
-    if(mem) {
-      effectiveDocOpts = docOpts != null ? docOpts : DocOptions.DEFAULT_DOC_OPTIONS;
-      options = effectiveDocOpts.toMainOptions(context.options);
-      stable = effectiveDocOpts.get(DocOptions.STABLE);
+    if(mainmem) {
+      final String catalog = context.options.get(MainOptions.CATALOG);
+      if(docOpts == DOC_OPTIONS && catalog.isEmpty()) {
+        options = MAIN_OPTIONS;
+      } else {
+        options = new MainOptions(docOpts);
+        options.set(MainOptions.CATALOG, catalog);
+      }
     } else {
-      if(docOpts != null) throw NO_OPTIONS_WITH_DB.get(info);
-      effectiveDocOpts = null;
+      docOpts.checkDbAccess(info);
       options = context.options;
-      stable = true;
     }
-    final DirParser parser = new DirParser(io, options);
-    final Data data;
+
     try {
-      data = CreateDB.create(io.dbName(), parser, context, options, mem);
+      final DirParser parser = new DirParser(io, options);
+      final Data data = CreateDB.create(io.dbName(), parser, context, options, mainmem);
+      data.meta.docOpts = docOpts.toString();
+      if(!docOpts.get(DocOptions.STABLE)) return data;
+      return addData(data);
     } catch(final IOException ex) {
       final Throwable th = ex.getCause();
-      final QueryException qe;
-        qe = !(th instanceof ValidationException) ? IOERR_X.get(info, ex) :
-          options.get(MainOptions.DTDVALIDATION) ? DTDVALIDATIONERR_X.get(info, ex) :
-            XSDVALIDATIONERR_X.get(info, ex);
-      throw qe;
+      throw !(th instanceof ValidationException) ? IOERR_X.get(info, ex) :
+        options.get(MainOptions.DTDVALIDATION) ? DTDVALIDATIONERR_X.get(info, ex) :
+          XSDVALIDATIONERR_X.get(info, ex);
     }
-    if(!stable) return data;
-    data.meta.docOpts = effectiveDocOpts;
-    return addData(data);
   }
 
   /**

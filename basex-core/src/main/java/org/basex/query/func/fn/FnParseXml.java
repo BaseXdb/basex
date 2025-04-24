@@ -3,8 +3,6 @@ package org.basex.query.func.fn;
 import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -18,25 +16,23 @@ public final class FnParseXml extends FnParseXmlFragment {
   /** Function options. */
   public static final class ParseXmlOptions extends ParseXmlFragmentOptions {
     /** DTD validation. */
-    public static final BooleanOption DTD_VALIDATION = new BooleanOption("dtd-validation", false);
+    public static final BooleanOption DTD_VALIDATION = CommonOptions.DTD_VALIDATION;
     /** Whether external entities are permitted. */
-    public static final BooleanOption ALLOW_EXTERNAL_ENTITIES = new BooleanOption(
-        "allow-external-entities", true);
+    public static final BooleanOption ALLOW_EXTERNAL_ENTITIES =
+        CommonOptions.ALLOW_EXTERNAL_ENTITIES;
     /** Limit on the maximum number of entity references that may be expanded. */
-    public static final ValueOption ENTITY_EXPANSION_LIMIT = new ValueOption(
-        "entity-expansion-limit", SeqType.INTEGER_ZO, Empty.VALUE);
+    public static final NumberOption ENTITY_EXPANSION_LIMIT = CommonOptions.ENTITY_EXPANSION_LIMIT;
     /** Whether any xi:include elements in the input are to be processed. */
-    public static final BooleanOption XINCLUDE = new BooleanOption("xinclude", false);
+    public static final BooleanOption XINCLUDE = CommonOptions.XINCLUDE;
     /** XSD validation. */
-    public static final StringOption XSD_VALIDATION = new StringOption("xsd-validation",
-        MainOptions.SKIP);
+    public static final StringOption XSD_VALIDATION = CommonOptions.XSD_VALIDATION;
 
     /** Custom option (see {@link MainOptions#INTPARSE}). */
-    public static final BooleanOption INTPARSE = new BooleanOption("intparse", false);
+    public static final BooleanOption INTPARSE = CommonOptions.INTPARSE;
     /** Custom option (see {@link MainOptions#DTD}). */
-    public static final BooleanOption DTD = new BooleanOption("dtd", true);
+    public static final BooleanOption DTD = CommonOptions.DTD;
     /** Custom option (see {@link MainOptions#CATALOG}). */
-    public static final StringOption CATALOG = new StringOption("catalog", "");
+    public static final StringOption CATALOG = CommonOptions.CATALOG;
   }
 
   @Override

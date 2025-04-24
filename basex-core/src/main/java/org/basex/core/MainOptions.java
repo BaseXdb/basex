@@ -1,13 +1,12 @@
 package org.basex.core;
 
+import java.util.*;
 import java.util.stream.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.io.serial.*;
-import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
@@ -51,6 +50,11 @@ public final class MainOptions extends Options {
 
   // XML Parsing
 
+  /** XSD validation option value. */
+  public static final String SKIP = "skip";
+  /** XSD validation option value. */
+  public static final String STRICT = "strict";
+
   /** Use internal XML parser. */
   public static final BooleanOption INTPARSE = new BooleanOption("INTPARSE", false);
   /** Strip whitespace. */
@@ -58,24 +62,17 @@ public final class MainOptions extends Options {
   /** Strip namespaces. */
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);
   /** Whether external entities are permitted or rejected. */
-  public static final BooleanOption ALLOWEXTERNALENTITIES = new BooleanOption(
-      "ALLOWEXTERNALENTITIES", true);
+  public static final BooleanOption EXTERNALENT = new BooleanOption("EXTENTITIES", true);
+  /** Limit on the maximum number of entity references that may be expanded. */
+  public static final NumberOption ENTEXPANSION = new NumberOption("ENTEXPANSION", 64000);
   /** Flag for parsing DTDs. */
   public static final BooleanOption DTD = new BooleanOption("DTD", false);
   /** Flag for DTD validation. */
   public static final BooleanOption DTDVALIDATION = new BooleanOption("DTDVALIDATION", false);
-  /** XSD validation option value. */
-  public static final String SKIP = "skip";
-  /** XSD validation option value. */
-  public static final String STRICT = "strict";
   /** XSD validation. */
   public static final StringOption XSDVALIDATION = new StringOption("XSDVALIDATION", SKIP);
   /** Flag for handling xsi:schemaLocation and xsi:noNamespaceSchemaLocation attributes. */
-  public static final BooleanOption XSISCHEMALOCATION = new BooleanOption("XSISCHEMALOCATION",
-      true);
-  /** Limit on the maximum number of entity references that may be expanded. */
-  public static final ValueOption ENTITYEXPANSIONLIMIT = new ValueOption("ENTITYEXPANSIONLIMIT",
-      SeqType.INTEGER_ZO, Empty.VALUE);
+  public static final BooleanOption XSILOCATION = new BooleanOption("XSILOCATION", true);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", true);
   /** Path to XML Catalog file. */
@@ -198,9 +195,24 @@ public final class MainOptions extends Options {
     TEXTINDEX, ATTRINDEX, TOKENINDEX, FTINDEX, TEXTINCLUDE, ATTRINCLUDE, TOKENINCLUDE, FTINCLUDE,
     STEMMING, CASESENS, DIACRITICS, UPDINDEX, AUTOOPTIMIZE };
 
-  /** XML Parsing options. */
-  private static final Option<?>[] XMLPARSING = { INTPARSE, STRIPWS, STRIPNS, DTD, DTDVALIDATION,
-      XINCLUDE, CATALOG, ENTITYEXPANSIONLIMIT, XSDVALIDATION, XSISCHEMALOCATION };
+  /** Mapping of XML parsing options. */
+  private static final Map<Option<?>, Option<?>> XMLPARSINGMAP = new HashMap<>();
+  static {
+    XMLPARSINGMAP.put(CommonOptions.INTPARSE, INTPARSE);
+    XMLPARSINGMAP.put(CommonOptions.STRIP_SPACE, STRIPWS);
+    XMLPARSINGMAP.put(CommonOptions.STRIPNS, STRIPNS);
+    XMLPARSINGMAP.put(CommonOptions.ALLOW_EXTERNAL_ENTITIES, EXTERNALENT);
+    XMLPARSINGMAP.put(CommonOptions.ENTITY_EXPANSION_LIMIT, ENTEXPANSION);
+    XMLPARSINGMAP.put(CommonOptions.DTD, DTD);
+    XMLPARSINGMAP.put(CommonOptions.DTD_VALIDATION, DTDVALIDATION);
+    XMLPARSINGMAP.put(CommonOptions.XSD_VALIDATION, XSDVALIDATION);
+    XMLPARSINGMAP.put(CommonOptions.XSI_SCHEMA_LOCATION, XSILOCATION);
+    XMLPARSINGMAP.put(CommonOptions.XINCLUDE, XINCLUDE);
+    XMLPARSINGMAP.put(CommonOptions.CATALOG, CATALOG);
+  }
+
+  /** XML parsing options. */
+  private static final Option<?>[] XMLPARSING = XMLPARSINGMAP.values().toArray(Option[]::new);
   /** Extended parsing options. */
   public static final Option<?>[] EXTPARSING = { CREATEFILTER, ADDARCHIVES, ARCHIVENAME,
       SKIPCORRUPT, ADDRAW, ADDCACHE, CSVPARSER, JSONPARSER, HTMLPARSER, PARSER };
@@ -270,5 +282,17 @@ public final class MainOptions extends Options {
   public MainOptions(final MainOptions options, final boolean xml) {
     this(false);
     for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
+  }
+
+  /**
+   * Constructor, adopting parsing options from the specified instance.
+   * @param options options
+   */
+  public MainOptions(final Options options) {
+    this(false);
+    XMLPARSINGMAP.forEach((source, target) -> {
+      final Object value = options.get(source);
+      if(value != null) put(target, value);
+    });
   }
 }

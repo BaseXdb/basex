@@ -759,30 +759,35 @@ public final class FnModuleTest extends SandboxTest {
       return file.path();
     };
 
-    write.apply("schema.xsd", "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'><xs:element n"
-        + "ame='root'/></xs:schema>");
-    final String doc1 = write.apply("doc1.xml", "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema"
-        + "-instance\" xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
-    final String doc2 = write.apply("doc2.xml", "<root2 xmlns:xsi=\"http://www.w3.org/2001/XMLSchem"
-        + "a-instance\" xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
-    final String doc3 = write.apply("doc3.xml", "<!DOCTYPE root [<!ENTITY e1 \"EntityOne\"><!ENTITY"
-        + " e2 \"EntityTwo\"><!ENTITY e3 \"EntityThree\"><!ENTITY e4 \"EntityFour\">]><root><value>"
-        + "&e1;</value><value>&e2;</value><value>&e3;</value><value>&e4;</value></root>");
+    write.apply("schema.xsd", "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>"
+        + "<xs:element name='root'/></xs:schema>");
+    final String doc1 = write.apply("doc1.xml",
+        "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+        + "xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
+    final String doc2 = write.apply("doc2.xml",
+        "<root2 xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+        + "xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
+    final String doc3 = write.apply("doc3.xml",
+        "<!DOCTYPE root [<!ENTITY e1 \"EntityOne\">"
+        + "<!ENTITY e2 \"EntityTwo\"><!ENTITY e3 \"EntityThree\">"
+        + "<!ENTITY e4 \"EntityFour\">]>"
+        + "<root><value>&e1;</value><value>&e2;</value>"
+        + "<value>&e3;</value><value>&e4;</value></root>");
 
-    query(func.args(doc1, " {'xsd-validation': 'strict', 'xsi-schema-location': true()}"),
-        "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocatio"
-        + "n=\"schema.xsd\"/>");
-    query(func.args(doc3, " {'entity-expansion-limit': -1}"), "<root><value>EntityOne</value"
-        + "><value>EntityTwo</value><value>EntityThree</value><value>EntityFour</value></root>");
-    query(func.args(doc3, " {'entity-expansion-limit': 4}"), "<root><value>EntityOne</value>"
+    query(func.args(doc1, " { 'xsd-validation': 'strict', 'xsi-schema-location': true() }"),
+        "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+        + "xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
+    query(func.args(doc3, " { 'entity-expansion-limit': 10 }"),
+        "<root><value>EntityOne</value><value>EntityTwo</value><value>EntityThree</value>"
+        + "<value>EntityFour</value></root>");
+    query(func.args(doc3, " { 'entity-expansion-limit': 4 }"), "<root><value>EntityOne</value>"
         + "<value>EntityTwo</value><value>EntityThree</value><value>EntityFour</value></root>");
 
-    error(func.args(doc1, " {'xsd-validation': 'strict', 'xsi-schema-location': false()}"),
+    error(func.args(doc1, " { 'xsd-validation': 'strict', 'xsi-schema-location': false() }"),
         IOERR_X);
-    error(func.args(doc2, " {'xsd-validation': 'strict', 'xsi-schema-location': true()}"),
+    error(func.args(doc2, " { 'xsd-validation': 'strict', 'xsi-schema-location': true() }"),
         XSDVALIDATIONERR_X);
-    error(func.args(doc3, " {'entity-expansion-limit': 3}"), IOERR_X);
-    error(func.args(doc3, " {'entity-expansion-limit': 0}"), IOERR_X);
+    error(func.args(doc3, " { 'entity-expansion-limit': 3 }"), IOERR_X);
   }
 
   /** Test method. */

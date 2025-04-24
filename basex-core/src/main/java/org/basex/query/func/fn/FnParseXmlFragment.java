@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.build.Parser;
 import org.basex.build.xml.*;
@@ -15,7 +14,6 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.func.fn.FnParseXml.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -35,10 +33,10 @@ public class FnParseXmlFragment extends StandardFunc {
     /** Document node's base URI. */
     public static final StringOption BASE_URI = new StringOption("base-uri");
     /** Remove whitespace-only text nodes. */
-    public static final BooleanOption STRIP_SPACE = new BooleanOption("strip-space", false);
+    public static final BooleanOption STRIP_SPACE = CommonOptions.STRIP_SPACE;
 
     /** Custom option (see {@link MainOptions#STRIPNS}). */
-    public static final BooleanOption STRIPNS = new BooleanOption("stripns", false);
+    public static final BooleanOption STRIPNS = CommonOptions.STRIPNS;
   }
 
   @Override
@@ -70,27 +68,9 @@ public class FnParseXmlFragment extends StandardFunc {
       Strings.UTF8);
 
     // assign options
-    final MainOptions mopts = new MainOptions();
-    Map.of(ParseXmlFragmentOptions.STRIP_SPACE, MainOptions.STRIPWS,
-        ParseXmlFragmentOptions.STRIPNS, MainOptions.STRIPNS,
-        ParseXmlOptions.INTPARSE, MainOptions.INTPARSE,
-        ParseXmlOptions.ALLOW_EXTERNAL_ENTITIES, MainOptions.ALLOWEXTERNALENTITIES,
-        ParseXmlOptions.DTD, MainOptions.DTD,
-        ParseXmlOptions.DTD_VALIDATION, MainOptions.DTDVALIDATION,
-        ParseXmlOptions.XINCLUDE, MainOptions.XINCLUDE).forEach((opt, mopt) -> {
-      if(options.contains(opt)) mopts.set(mopt, options.get(opt));
-    });
-    Map.of(ParseXmlOptions.XSD_VALIDATION, MainOptions.XSDVALIDATION,
-        ParseXmlOptions.CATALOG, MainOptions.CATALOG).forEach((opt, mopt) -> {
-      if(options.contains(opt)) mopts.set(mopt, options.get(opt));
-    });
-    if(options.contains(ParseXmlOptions.ENTITY_EXPANSION_LIMIT)) {
-      mopts.set(MainOptions.ENTITYEXPANSIONLIMIT,
-          options.get(ParseXmlOptions.ENTITY_EXPANSION_LIMIT));
-    }
-    if(mopts.get(MainOptions.DTD) || mopts.get(MainOptions.XINCLUDE)
-        || mopts.get(MainOptions.ALLOWEXTERNALENTITIES)
-        || !mopts.get(MainOptions.CATALOG).isEmpty()) {
+    final MainOptions mopts = new MainOptions(options);
+    if(mopts.get(MainOptions.DTD) || mopts.get(MainOptions.XINCLUDE) ||
+        mopts.get(MainOptions.EXTERNALENT) || !mopts.get(MainOptions.CATALOG).isEmpty()) {
       checkPerm(qc, Perm.CREATE);
     }
 

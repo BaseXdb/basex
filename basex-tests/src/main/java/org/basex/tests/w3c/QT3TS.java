@@ -195,7 +195,7 @@ public final class QT3TS extends Main {
     baseDir = base.dir();
 
     if(!supported(set)) {
-      long n = new XQuery("count(*:test-case)", ctx).context(set).value().getInteger();
+      final long n = new XQuery("count(*:test-case)", ctx).context(set).value().getInteger();
       total += n;
       ignored += n;
     } else {

@@ -158,19 +158,19 @@ public final class CreateDB extends ACreate {
    * @param parser input parser
    * @param ctx database context
    * @param options main options
-   * @param mem create main-memory instance
+   * @param mainmem create main-memory instance
    * @return new database instance
    * @throws IOException I/O exception
    */
   public static synchronized Data create(final String name, final Parser parser, final Context ctx,
-      final MainOptions options, final boolean mem) throws IOException {
+      final MainOptions options, final boolean mainmem) throws IOException {
 
     // check permissions
     if(!ctx.user().has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
 
     // create main-memory or disk-based database instance
     final Data data;
-    if(mem) {
+    if(mainmem) {
       data = MemBuilder.build(name, parser);
     } else {
       // database is currently locked by another job

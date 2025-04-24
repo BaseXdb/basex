@@ -14,7 +14,6 @@ import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.query.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
@@ -104,8 +103,8 @@ public final class MetaData {
   private final IOFile dir;
   /** Flag for out-of-date indexes. */
   private boolean oldindex;
-  /** The options that where used by fn:doc or fn:catalog (only set for external documents). */
-  public DocOptions docOpts;
+  /** Serialized XML parsing options (main-memory instances). */
+  public String docOpts;
 
   /**
    * Constructor for a main-memory database instance.

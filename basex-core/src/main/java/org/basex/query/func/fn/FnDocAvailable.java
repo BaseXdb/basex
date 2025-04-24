@@ -39,28 +39,22 @@ public class FnDocAvailable extends Docs {
    * @throws QueryException query exception
    */
   final Item doc(final QueryContext qc) throws QueryException {
-    final Item options = arg(1).item(qc, info);
-    final DocOptions docOpts;
-    if(options.isEmpty()) {
-      docOpts = null;
-    } else {
-      docOpts = toOptions(options, new DocOptions(), qc);
-      if(docOpts.get(DocOptions.DTD) || docOpts.get(DocOptions.XINCLUDE)
-          || docOpts.get(DocOptions.ALLOW_EXTERNAL_ENTITIES)) {
-        checkPerm(qc, Perm.CREATE);
-      }
-      final boolean dtdVal = docOpts.get(DocOptions.DTD_VALIDATION);
-      final String xsdVal = docOpts.get(DocOptions.XSD_VALIDATION);
-      final boolean skip = MainOptions.SKIP.equals(xsdVal);
-      final boolean strict = MainOptions.STRICT.equals(xsdVal);
-      final boolean intparse = docOpts.get(DocOptions.INTPARSE);
-      if(intparse) {
-        if(dtdVal) throw NODTDVALIDATION.get(info);
-        if(!skip) throw NOXSDVALIDATION_X.get(info, xsdVal);
-      } else if(!skip) {
-        if(!strict) throw INVALIDXSDOPT_X.get(info, xsdVal);
-        if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
-      }
+    final DocOptions options = toOptions(arg(1), new DocOptions(), qc);
+    if(options.get(DocOptions.DTD) || options.get(DocOptions.XINCLUDE) ||
+        options.get(DocOptions.ALLOW_EXTERNAL_ENTITIES)) {
+      checkPerm(qc, Perm.CREATE);
+    }
+    final boolean dtdVal = options.get(DocOptions.DTD_VALIDATION);
+    final String xsdVal = options.get(DocOptions.XSD_VALIDATION);
+    final boolean skip = MainOptions.SKIP.equals(xsdVal);
+    final boolean strict = MainOptions.STRICT.equals(xsdVal);
+    final boolean intparse = options.get(DocOptions.INTPARSE);
+    if(intparse) {
+      if(dtdVal) throw NODTDVALIDATION.get(info);
+      if(!skip) throw NOXSDVALIDATION_X.get(info, xsdVal);
+    } else if(!skip) {
+      if(!strict) throw INVALIDXSDOPT_X.get(info, xsdVal);
+      if(dtdVal) throw NOXSDANDDTD_X.get(info, xsdVal);
     }
 
     QueryInput qi = queryInput;
@@ -70,6 +64,6 @@ public class FnDocAvailable extends Docs {
       qi = queryInput(toToken(source));
       if(qi == null) throw INVDOC_X.get(info, source);
     }
-    return qc.resources.doc(qi, docOpts, qc.user, info);
+    return qc.resources.doc(qi, options, qc.user, info);
   }
 }
