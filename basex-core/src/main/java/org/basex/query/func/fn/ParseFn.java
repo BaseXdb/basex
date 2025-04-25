@@ -10,6 +10,7 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -44,66 +45,67 @@ public abstract class ParseFn extends StandardFunc {
   }
 
   /**
-   * Performs the unparsed-text function.
-   * @param qc query context
-   * @param check only check if text is available
-   * @param options options argument or {@code null}
+   * Reads the specified source and invokes {@link #parse(TextInput, Object, QueryContext)}.
+   * @param source input source
    * @param lines parse lines
+   * @param options options (custom format; can be {@code null})
+   * @param error custom error code for invalid input
+   * @param qc query context
    * @return content string, {@link Empty#VALUE} if no URL is supplied, or boolean success flag
    *   if availability is checked
    * @throws QueryException query exception
    */
-  final Item unparsedText(final QueryContext qc, final boolean check, final boolean lines,
-      final Expr options) throws QueryException {
-    try {
-      IO io = input;
-      if(io == null) {
-        final Item source = arg(0).atomItem(qc, info);
-        if(source.isEmpty()) return check ? Bln.FALSE : Empty.VALUE;
-        io = input(toToken(source));
-        if(io == null) throw INVURL_X.get(info, source);
-      }
-      if(Strings.contains(io.path(), '#')) throw FRAGID_X.get(info, io);
+  final Value parse(final Item source, final boolean lines, final Object options,
+      final QueryError error, final QueryContext qc) throws QueryException {
 
-      final ParseOptions po = new ParseOptions();
-      if(options != null) {
-        if(arg(1) instanceof XQMap) {
-          toOptions(options, po, qc);
-        } else {
-          po.set(ParseOptions.ENCODING, toStringOrNull(options, qc));
-        }
-      }
-      final Boolean normalize = po.get(ParseOptions.NORMALIZE_NEWLINES);
-      if(normalize != null && lines) {
-        throw INVALIDOPTION_X.get(info, Options.unknown(ParseOptions.NORMALIZE_NEWLINES));
-      }
+    IO io = input;
+    if(input == null) {
+      io = input(toToken(source));
+      if(io == null) throw INVURL_X.get(info, source);
+    }
+    if(Strings.contains(io.path(), '#')) throw FRAGID_X.get(info, io);
 
-      String encoding = toEncodingOrNull(po.get(ParseOptions.ENCODING), ENCODING_X);
-
-      // only required for test APIs
-      final String[] pathEnc = qc.resources.text(io);
-      if(pathEnc != null) {
-        io = IO.get(pathEnc[0]);
-        encoding = pathEnc[1];
+    final ParseOptions po = new ParseOptions();
+    if(options instanceof Expr) {
+      if(options instanceof XQMap) {
+        toOptions((XQMap) options, po, qc);
+      } else {
+        po.set(ParseOptions.ENCODING, toStringOrNull((Expr) options, qc));
       }
+    }
+    final Boolean normalize = po.get(ParseOptions.NORMALIZE_NEWLINES);
+    if(normalize != null && lines) {
+      throw INVALIDOPTION_X.get(info, Options.unknown(ParseOptions.NORMALIZE_NEWLINES));
+    }
+    String encoding = toEncodingOrNull(po.get(ParseOptions.ENCODING), ENCODING_X);
 
-      // parse text
-      try(InputStream is = io.inputStream(); TextInput ti = normalize == Boolean.TRUE ||
-          this instanceof FnUnparsedTextLines ? new NewlineInput(io) : new TextInput(io)) {
-        ti.encoding(encoding).validate(true);
-        if(!check) return Str.get(ti.content());
+    // only required for test APIs
+    final String[] pathEnc = qc.resources.text(io);
+    if(pathEnc != null) {
+      io = IO.get(pathEnc[0]);
+      encoding = pathEnc[1];
+    }
 
-        while(ti.read() != -1);
-        return Bln.TRUE;
-      } catch(final IOException ex) {
-        if(check) return Bln.FALSE;
-        if(ex instanceof DecodingException) throw WHICHCHARS_X.get(info, ex);
-        if(ex instanceof InputException) throw INVCHARS_X.get(info, ex);
-        throw RESNF_X.get(info, io);
-      }
-    } catch(final QueryException ex) {
-      if(check && !ex.matches(ErrType.XPTY)) return Bln.FALSE;
-      throw ex;
+    // parse text
+    try(InputStream is = io.inputStream(); TextInput ti = normalize == Boolean.TRUE ||
+        this instanceof FnUnparsedTextLines ? new NewlineInput(io) : new TextInput(io)) {
+      return parse(ti.encoding(encoding).validate(true), options, qc);
+    } catch(final IOException ex) {
+      if(ex instanceof DecodingException) throw WHICHCHARS_X.get(info, ex);
+      if(ex instanceof InputException) throw error.get(info, ex);
+      throw RESNF_X.get(info, io);
     }
   }
+
+  /**
+   * Parses the input and returns a custom result.
+   * @param ti text input
+   * @param options options (custom format; can be {@code null})
+   * @param qc query context
+   * @return result
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  abstract Value parse(TextInput ti, Object options, QueryContext qc)
+      throws QueryException, IOException;
 }

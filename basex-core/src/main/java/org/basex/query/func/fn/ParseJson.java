@@ -2,8 +2,11 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
 
+import java.io.*;
+
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
+import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -34,7 +37,13 @@ public abstract class ParseJson extends ParseFn {
    */
   protected final Value parse(final QueryContext qc, final JsonFormat format)
       throws QueryException {
-    return parse(qc, format, toTokenOrNull(arg(0), qc));
+    final byte[] source = toTokenOrNull(arg(0), qc);
+    if(source == null) return Empty.VALUE;
+    try(TextInput ti = new TextInput(source)) {
+      return parse(qc, format, ti);
+    } catch(final IOException ex) {
+      throw PARSE_JSON_X.get(info, ex);
+    }
   }
 
   /**
@@ -45,27 +54,27 @@ public abstract class ParseJson extends ParseFn {
    * @throws QueryException query exception
    */
   protected final Value doc(final QueryContext qc, final JsonFormat format) throws QueryException {
-    final Item item;
-    try {
-      item = unparsedText(qc, false, false, null);
-    } catch(final QueryException ex) {
-      throw error(ex, ex.error() == INVCHARS_X ? PARSE_JSON_X : null);
-    }
-    return item.isEmpty() ? Empty.VALUE : parse(qc, format, item.string(info));
+    final Item source = arg(0).atomItem(qc, info);
+    return source.isEmpty() ? Empty.VALUE : parse(source, false, format, PARSE_JSON_X, qc);
+  }
+
+  @Override
+  final Value parse(final TextInput ti, final Object options, final QueryContext qc)
+      throws QueryException, IOException {
+    return parse(qc, (JsonFormat) options, ti);
   }
 
   /**
    * Parses the specified string.
-   * @param data data to parse (can be {@code null})
    * @param format format
    * @param qc query context
+   * @param ti text input
    * @return resulting item
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private Value parse(final QueryContext qc, final JsonFormat format, final byte[] data)
-      throws QueryException {
-
-    if(data == null) return Empty.VALUE;
+  private Value parse(final QueryContext qc, final JsonFormat format, final TextInput ti)
+      throws QueryException, IOException {
 
     final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), qc);
     if(format != null) options.set(JsonOptions.FORMAT, format);
@@ -95,6 +104,6 @@ public abstract class ParseJson extends ParseFn {
       throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.NULL));
     }
     converter.nullValue(nll);
-    return converter.convert(Token.string(data), "", qc);
+    return converter.convert(Token.string(ti.content()), "", qc);
   }
 }

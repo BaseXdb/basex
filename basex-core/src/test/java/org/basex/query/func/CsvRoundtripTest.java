@@ -90,8 +90,6 @@ public final class CsvRoundtripTest extends SandboxTest {
   /** Test method. */
   @Test public void parseCsv() {
     final Function func = PARSE_CSV;
-    roundtrip(func, " ()", "", "{\"columns\":(),\"column-index\":{},\"rows\":(),\"get\":(anonymous-"
-        + "function)#2}");
     roundtrip(func, "", "", "{\"columns\":(),\"column-index\":{},\"rows\":(),\"get\":(anonymous-fun"
         + "ction)#2}");
     roundtrip(func, "one", "", "{\"columns\":(),\"column-index\":{},\"rows\":[\"one\"],\"get\":(ano"

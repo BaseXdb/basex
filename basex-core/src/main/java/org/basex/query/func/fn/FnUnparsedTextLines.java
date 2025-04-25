@@ -1,13 +1,10 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryError.*;
-
 import java.io.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -22,27 +19,14 @@ import org.basex.util.list.*;
  */
 public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    final Item text = unparsedText(qc, false, true, arg(1));
-    return text.isEmpty() ? Empty.ITER : new LinesIter(text.string(info));
+  public Value value(final QueryContext qc) throws QueryException {
+    final Item source = arg(0).atomItem(qc, info);
+    return source.isEmpty() ? Empty.VALUE : parse(source, true, arg(1), QueryError.INVCHARS_X, qc);
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Item text = unparsedText(qc, false, true, arg(1));
-    if(text.isEmpty()) return Empty.VALUE;
-
-    try(NewlineInput ni = new NewlineInput(text.string(info))) {
-      final TokenList tl = new TokenList();
-      final TokenBuilder tb = new TokenBuilder();
-      while(ni.readLine(tb)) {
-        qc.checkStop();
-        tl.add(tb.toArray());
-      }
-      return StrSeq.get(tl);
-    } catch(final IOException ex) {
-      throw FILE_IO_ERROR_X.get(info, ex);
-    }
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return value(qc).item(qc, ii);
   }
 
   @Override
@@ -51,38 +35,15 @@ public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
     return href.seqType().zero() ? href : super.opt(cc);
   }
 
-  /**
-   * Line iterator.
-   * @author Christian Gruen
-   * @author BaseX Team, BSD License
-   */
-  private static final class LinesIter extends Iter {
-    /** Token builder. */
-    private final TokenBuilder tb = new TokenBuilder();
-    /** Input stream. */
-    private final NewlineInput nli;
-
-    /**
-     * Constructor.
-     * @param contents file contents
-     */
-    private LinesIter(final byte[] contents) {
-      try {
-        nli = new NewlineInput(contents);
-      } catch(final IOException ex) {
-        // input has already been converted to the correct encoding
-        throw Util.notExpected(ex);
-      }
+  @Override
+  Value parse(final TextInput ti, final Object options, final QueryContext qc) throws IOException {
+    final NewlineInput ni = (NewlineInput) ti;
+    final TokenList tl = new TokenList();
+    final TokenBuilder tb = new TokenBuilder();
+    while(ni.readLine(tb)) {
+      qc.checkStop();
+      tl.add(tb.next());
     }
-
-    @Override
-    public Str next() {
-      try {
-        return nli.readLine(tb) ? Str.get(tb.toArray()) : null;
-      } catch(final IOException ex) {
-        // input has already been converted to the correct encoding
-        throw Util.notExpected(ex);
-      }
-    }
+    return StrSeq.get(tl);
   }
 }

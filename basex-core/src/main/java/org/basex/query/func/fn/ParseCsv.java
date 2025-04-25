@@ -8,6 +8,7 @@ import java.io.*;
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.parse.csv.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
@@ -31,7 +32,13 @@ public abstract class ParseCsv extends ParseFn {
    * @throws QueryException query exception
    */
   protected final Value parse(final QueryContext qc, final CsvFormat format) throws QueryException {
-    return parse(qc, format, toTokenOrNull(arg(0), qc));
+    final byte[] source = toTokenOrNull(arg(0), qc);
+    if(source == null) return Empty.VALUE;
+    try(TextInput ti = new TextInput(source)) {
+      return parse(qc, format, ti);
+    } catch(final IOException ex) {
+      throw CSV_ERROR_X.get(info, ex);
+    }
   }
 
   /**
@@ -42,28 +49,27 @@ public abstract class ParseCsv extends ParseFn {
    * @throws QueryException query exception
    */
   protected final Value doc(final QueryContext qc, final CsvFormat format) throws QueryException {
-    final Item item;
-    try {
-      item = unparsedText(qc, false, false, null);
-    } catch(final QueryException ex) {
-      throw error(ex, ex.error() == INVCHARS_X ? CSV_ERROR_X : null);
-    }
-    return item.isEmpty() ? Empty.VALUE : parse(qc, format, item.string(info));
+    final Item source = arg(0).atomItem(qc, info);
+    return source.isEmpty() ? Empty.VALUE : parse(source, false, format, CSV_ERROR_X, qc);
+  }
+
+  @Override
+  final Value parse(final TextInput ti, final Object options, final QueryContext qc)
+      throws QueryException, IOException {
+    return parse(qc, (CsvFormat) options, ti);
   }
 
   /**
    * Parses the specified string.
-   * @param data data to parse (can be {@code null})
    * @param qc query context
    * @param format format
+   * @param ti text input
    * @return resulting item
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  private Value parse(final QueryContext qc, final CsvFormat format, final byte[] data)
-      throws QueryException {
-
-    // (hopefully temporary) special case
-    if(data == null && format != CsvFormat.W3) return Empty.VALUE;
+  private Value parse(final QueryContext qc, final CsvFormat format, final TextInput ti)
+      throws QueryException, IOException {
 
     // parse options
     final Options copts = format == CsvFormat.W3 || format == CsvFormat.W3_XML ?
@@ -87,10 +93,6 @@ public abstract class ParseCsv extends ParseFn {
 
     // convert data
     final CsvConverter converter = CsvConverter.get(cpopts);
-    try {
-      return converter.convert(new IOContent(data != null ? data : Token.EMPTY), info, qc);
-    } catch(final IOException ex) {
-      throw CSV_ERROR_X.get(info, ex);
-    }
+    return converter.convert(new IOContent(ti.content()), info, qc);
   }
 }
