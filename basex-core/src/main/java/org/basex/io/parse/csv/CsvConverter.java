@@ -55,8 +55,8 @@ public abstract class CsvConverter extends Job {
   /** Skip empty fields. */
   protected final boolean skipEmpty;
 
-  /** Current input. */
-  protected NewlineInput nli;
+  /** Input stream. */
+  protected TextInput ti;
   /** Current column. */
   protected int col = -1;
 
@@ -101,30 +101,31 @@ public abstract class CsvConverter extends Job {
   /**
    * Converts the specified input to an XQuery value.
    * @param input input
-   * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
+   * @return result
    */
   public final Value convert(final IO input) throws QueryException, IOException {
-    return convert(input, null, null);
+    try(NewlineInput in = new NewlineInput(input)) {
+      return convert(in, input.url(), null, null);
+    }
   }
 
   /**
    * Converts the specified input to an XQuery value.
    * @param input input
+   * @param uri uri (can be empty)
    * @param ii input info (can be {@code null})
    * @param qc query context (if {@code null}, result may lack XQuery-specific contents)
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public final Value convert(final IO input, final InputInfo ii, final QueryContext qc)
-      throws QueryException, IOException {
-    init(input.url());
-    try(NewlineInput in = new NewlineInput(input)) {
-      nli = in.encoding(copts.get(CsvParserOptions.ENCODING));
-      new CsvParser(in, copts, this).parse(ii);
-    }
+  public final Value convert(final TextInput input, final String uri, final InputInfo ii,
+      final QueryContext qc) throws QueryException, IOException {
+    init(uri);
+    ti = input;
+    new CsvParser(input, copts, this).parse(ii);
     return finish(ii, qc);
   }
 

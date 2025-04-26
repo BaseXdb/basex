@@ -32,34 +32,34 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  FNode finish() {
+  protected FNode finish() {
     return doc.add(stack.pop()).finish();
   }
 
   @Override
-  void openObject() throws QueryException {
+  protected void openObject() throws QueryException {
     if(curr == null || name != null || stack.peek() != null)
       throw error("No object allowed at this stage");
   }
 
   @Override
-  void closeObject() {
+  protected void closeObject() {
     stack.pop();
     stack.push(curr);
     reset();
   }
 
   @Override
-  void openPair(final byte[] key, final boolean add) throws QueryException {
+  protected void openPair(final byte[] key, final boolean add) throws QueryException {
     name = shared.token(check(key));
     if(!atts.add(name)) throw error("Duplicate attribute found");
   }
 
   @Override
-  void closePair(final boolean add) { }
+  protected void closePair(final boolean add) { }
 
   @Override
-  void openArray() throws QueryException {
+  protected void openArray() throws QueryException {
     if(!stack.isEmpty()) {
       if(name == null && curr != null && stack.peek() == null) {
         stack.pop();
@@ -73,7 +73,7 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  void closeArray() throws QueryException {
+  protected void closeArray() throws QueryException {
     FBuilder value = stack.pop();
     if(value == null) {
       value = curr;
@@ -86,10 +86,10 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openItem() { }
+  protected void openItem() { }
 
   @Override
-  void closeItem() { }
+  protected void closeItem() { }
 
   @Override
   void addValue(final byte[] type, final byte[] value) throws QueryException {
@@ -113,22 +113,22 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  void stringLit(final byte[] value) throws QueryException {
+  protected void stringLit(final byte[] value) throws QueryException {
     addValue(STRING, value);
   }
 
   @Override
-  void numberLit(final byte[] value) throws QueryException {
+  protected void numberLit(final byte[] value) throws QueryException {
     throw error("No numbers allowed");
   }
 
   @Override
-  void nullLit() throws QueryException {
+  protected void nullLit() throws QueryException {
     throw error("No 'null' allowed");
   }
 
   @Override
-  void booleanLit(final byte[] value) throws QueryException {
+  protected void booleanLit(final byte[] value) throws QueryException {
     throw error("No booleans allowed");
   }
 

@@ -133,7 +133,7 @@ public class CmpG extends Cmp {
      * @param candidates candidates
      * @return result of check
      */
-    public boolean oneOf(final OpG...candidates) {
+    public boolean oneOf(final OpG... candidates) {
       return Enums.oneOf(this, candidates);
     }
 

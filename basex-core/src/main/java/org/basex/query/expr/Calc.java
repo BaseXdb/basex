@@ -473,7 +473,7 @@ public enum Calc {
    * @param candidates candidates
    * @return result of check
    */
-  public boolean oneOf(final Calc...candidates) {
+  public boolean oneOf(final Calc... candidates) {
     return Enums.oneOf(this, candidates);
   }
 

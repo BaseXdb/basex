@@ -711,7 +711,7 @@ public final class QueryContext extends Job implements Closeable {
     if(st.eq(SeqType.EMPTY_SEQUENCE_Z)) return Empty.VALUE;
     final Type tp = st.type;
 
-    // cast XDM values
+    // cast XQuery values
     if(object instanceof Value) {
       final Value val = (Value) object;
       // cast single item

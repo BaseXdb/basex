@@ -86,7 +86,7 @@ public abstract class JsonConverter {
    * Converts the specified input to an XQuery value.
    * @param input input
    * @throws QueryException query exception
-   * @throws IOException exception
+   * @throws IOException I/O exception
    * @return result
    */
   public final Value convert(final IO input) throws QueryException, IOException {
@@ -99,17 +99,16 @@ public abstract class JsonConverter {
   /**
    * Converts the specified input to an XQuery value.
    * @param input input
-   * @param path input path (can be empty string)
+   * @param uri uri (can be empty)
    * @param qc query context (if {@code null}, result may lack XQuery-specific contents)
-   * @throws QueryException query exception
    * @return result
+   * @throws QueryException query exception
    */
-  public final Value convert(final String input, final String path, final QueryContext qc)
-      throws QueryException {
+  public final Value convert(final String input, final String uri,
+      final QueryContext qc) throws QueryException {
     qctx = qc;
-    init(path.isEmpty() ? "" : IO.get(path).url());
-    final JsonParser parser = new JsonParser(input, jopts, this);
-    parser.parse();
+    init(uri);
+    new JsonParser(input, jopts, this).parse();
     return finish();
   }
 
@@ -117,24 +116,24 @@ public abstract class JsonConverter {
    * Initializes the conversion.
    * @param uri base URI
    */
-  abstract void init(String uri);
+  protected abstract void init(String uri);
 
   /**
    * Returns the resulting XQuery value.
    * @return result
    */
-  abstract Item finish();
+  protected abstract Item finish();
 
   /**
    * Called when a JSON object is opened.
    * @throws QueryException query exception
    */
-  abstract void openObject() throws QueryException;
+  protected abstract void openObject() throws QueryException;
 
   /**
    * Called when a JSON object is closed.
    */
-  abstract void closeObject();
+  protected abstract void closeObject();
 
   /**
    * Called when a pair of a JSON object is opened.
@@ -142,61 +141,61 @@ public abstract class JsonConverter {
    * @param add add pair
    * @throws QueryException query exception
    */
-  abstract void openPair(byte[] key, boolean add) throws QueryException;
+  protected abstract void openPair(byte[] key, boolean add) throws QueryException;
 
   /**
    * Called when a pair of a JSON object is closed.
    * @param add add pair
    * @throws QueryException query exception
    */
-  abstract void closePair(boolean add) throws QueryException;
+  protected abstract void closePair(boolean add) throws QueryException;
 
   /**
    * Called when a JSON array is opened.
    * @throws QueryException query exception
    */
-  abstract void openArray() throws QueryException;
+  protected abstract void openArray() throws QueryException;
 
   /**
    * Called when a JSON array is closed.
    * @throws QueryException query exception
    */
-  abstract void closeArray() throws QueryException;
+  protected abstract void closeArray() throws QueryException;
 
   /**
    * Called when an item of a JSON array is opened.
    */
-  abstract void openItem();
+  protected abstract void openItem();
 
   /**
    * Called when an item of a JSON array is closed.
    */
-  abstract void closeItem();
+  protected abstract void closeItem();
 
   /**
    * Called when a number literal is encountered.
    * @param value string representation
    * @throws QueryException query exception
    */
-  abstract void numberLit(byte[] value) throws QueryException;
+  protected abstract void numberLit(byte[] value) throws QueryException;
 
   /**
    * Called when a string literal is encountered.
    * @param value string representation
    * @throws QueryException query exception
    */
-  abstract void stringLit(byte[] value) throws QueryException;
+  protected abstract void stringLit(byte[] value) throws QueryException;
 
   /**
    * Called when a {@code null} literal is encountered.
    * @throws QueryException query exception
    */
-  abstract void nullLit() throws QueryException;
+  protected abstract void nullLit() throws QueryException;
 
   /**
    * Called when a boolean literal is encountered.
    * @param value string representation
    * @throws QueryException query exception
    */
-  abstract void booleanLit(byte[] value) throws QueryException;
+  protected abstract void booleanLit(byte[] value) throws QueryException;
 }

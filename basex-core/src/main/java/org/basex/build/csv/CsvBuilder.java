@@ -90,7 +90,7 @@ final class CsvBuilder extends CsvConverter {
 
   @Override
   public double progressInfo() {
-    return (double) nli.size() / nli.length();
+    return (double) ti.size() / ti.length();
   }
 
   /**

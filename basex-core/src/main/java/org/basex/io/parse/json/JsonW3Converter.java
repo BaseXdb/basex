@@ -55,7 +55,7 @@ public final class JsonW3Converter extends JsonConverter {
   }
 
   @Override
-  void init(final String uri) {
+  protected void init(final String uri) {
   }
 
   @Override
@@ -65,43 +65,43 @@ public final class JsonW3Converter extends JsonConverter {
   }
 
   @Override
-  void openObject() {
+  protected void openObject() {
     maps.push(new MapBuilder());
   }
 
   @Override
-  void openPair(final byte[] key, final boolean add) {
+  protected void openPair(final byte[] key, final boolean add) {
     stack.push(Str.get(shared.token(key)));
   }
 
   @Override
-  void closePair(final boolean add) throws QueryException {
+  protected void closePair(final boolean add) throws QueryException {
     final Value value = stack.pop();
     final Item key = (Item) stack.pop();
     if(add) maps.peek().put(key, value);
   }
 
   @Override
-  void closeObject() {
+  protected void closeObject() {
     stack.push(maps.pop().map());
   }
 
   @Override
-  void openArray() {
+  protected void openArray() {
     arrays.push(new ArrayBuilder(qctx));
   }
 
   @Override
-  void openItem() {
+  protected void openItem() {
   }
 
   @Override
-  void closeItem() {
+  protected void closeItem() {
     arrays.peek().add(stack.pop());
   }
 
   @Override
-  void closeArray() {
+  protected void closeArray() {
     stack.push(arrays.pop().array());
   }
 

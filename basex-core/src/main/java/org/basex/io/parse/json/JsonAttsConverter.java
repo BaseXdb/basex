@@ -25,17 +25,17 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openObject() {
+  protected void openObject() {
     openOuter(OBJECT);
   }
 
   @Override
-  void closeObject() {
+  protected void closeObject() {
     closeOuter();
   }
 
   @Override
-  void openPair(final byte[] key, final boolean add) {
+  protected void openPair(final byte[] key, final boolean add) {
     addValues.add(add);
     if(add) {
       openInner(Q_PAIR);
@@ -45,7 +45,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  void closePair(final boolean add) {
+  protected void closePair(final boolean add) {
     if(add) {
       closeInner();
       name = null;
@@ -54,22 +54,22 @@ public final class JsonAttsConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openArray() {
+  protected void openArray() {
     openOuter(ARRAY);
   }
 
   @Override
-  void closeArray() {
+  protected void closeArray() {
     closeOuter();
   }
 
   @Override
-  void openItem() {
+  protected void openItem() {
     openInner(Q_ITEM);
   }
 
   @Override
-  void closeItem() {
+  protected void closeItem() {
     closeInner();
   }
 

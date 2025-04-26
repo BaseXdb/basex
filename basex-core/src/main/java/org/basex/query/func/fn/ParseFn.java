@@ -13,7 +13,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -47,15 +46,14 @@ public abstract class ParseFn extends StandardFunc {
   /**
    * Reads the specified source and invokes {@link #parse(TextInput, Object, QueryContext)}.
    * @param source input source
-   * @param lines parse lines
+   * @param nl normalize newlines
    * @param options options (custom format; can be {@code null})
    * @param error custom error code for invalid input
    * @param qc query context
-   * @return content string, {@link Empty#VALUE} if no URL is supplied, or boolean success flag
-   *   if availability is checked
+   * @return parsed result
    * @throws QueryException query exception
    */
-  final Value parse(final Item source, final boolean lines, final Object options,
+  final Value parse(final Item source, final boolean nl, final Object options,
       final QueryError error, final QueryContext qc) throws QueryException {
 
     IO io = input;
@@ -73,9 +71,11 @@ public abstract class ParseFn extends StandardFunc {
         po.set(ParseOptions.ENCODING, toStringOrNull((Expr) options, qc));
       }
     }
-    final Boolean normalize = po.get(ParseOptions.NORMALIZE_NEWLINES);
-    if(normalize != null && lines) {
-      throw INVALIDOPTION_X.get(info, Options.unknown(ParseOptions.NORMALIZE_NEWLINES));
+    Boolean normalize = po.get(ParseOptions.NORMALIZE_NEWLINES);
+    if(normalize != null) {
+      if(nl) throw INVALIDOPTION_X.get(info, Options.unknown(ParseOptions.NORMALIZE_NEWLINES));
+    } else {
+      normalize = nl;
     }
     String encoding = toEncodingOrNull(po.get(ParseOptions.ENCODING), ENCODING_X);
 
@@ -87,8 +87,8 @@ public abstract class ParseFn extends StandardFunc {
     }
 
     // parse text
-    try(InputStream is = io.inputStream(); TextInput ti = normalize == Boolean.TRUE ||
-        this instanceof FnUnparsedTextLines ? new NewlineInput(io) : new TextInput(io)) {
+    try(InputStream is = io.inputStream(); TextInput ti = normalize ? new NewlineInput(io) :
+      new TextInput(io)) {
       return parse(ti.encoding(encoding).validate(true), options, qc);
     } catch(final IOException ex) {
       if(ex instanceof DecodingException) throw WHICHCHARS_X.get(info, ex);

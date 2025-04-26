@@ -64,43 +64,43 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   }
 
   @Override
-  void openObject() {
+  protected void openObject() {
     openOuter(OBJECT);
   }
 
   @Override
-  void closeObject() {
+  protected void closeObject() {
     closeOuter();
   }
 
   @Override
-  void openPair(final byte[] key, final boolean add) {
+  protected void openPair(final byte[] key, final boolean add) {
     addValues.add(add);
     if(add) name = shared.token(XMLToken.encode(key, lax));
   }
 
   @Override
-  void closePair(final boolean add) {
+  protected void closePair(final boolean add) {
     addValues.pop();
   }
 
   @Override
-  void openArray() {
+  protected void openArray() {
     openOuter(ARRAY);
   }
 
   @Override
-  void closeArray() {
+  protected void closeArray() {
     closeOuter();
   }
 
   @Override
-  void openItem() {
+  protected void openItem() {
     name = VALUE;
   }
 
   @Override
-  void closeItem() { }
+  protected void closeItem() { }
 
   @Override
   void addValue(final byte[] type, final byte[] value) {

@@ -7,7 +7,6 @@ import java.io.*;
 
 import org.basex.build.csv.*;
 import org.basex.build.csv.CsvOptions.*;
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.parse.csv.*;
 import org.basex.query.*;
@@ -25,7 +24,7 @@ import org.basex.util.options.*;
  */
 public abstract class ParseCsv extends ParseFn {
   /**
-   * Returns an XDM value for the parsed data.
+   * Returns an XQuery value for the parsed data.
    * @param qc query context
    * @param format format (can be {@code null})
    * @return resulting item
@@ -34,8 +33,8 @@ public abstract class ParseCsv extends ParseFn {
   protected final Value parse(final QueryContext qc, final CsvFormat format) throws QueryException {
     final byte[] source = toTokenOrNull(arg(0), qc);
     if(source == null) return Empty.VALUE;
-    try(TextInput ti = new TextInput(source)) {
-      return parse(qc, format, ti);
+    try(NewlineInput nli = new NewlineInput(source)) {
+      return parse(qc, format, nli);
     } catch(final IOException ex) {
       throw CSV_ERROR_X.get(info, ex);
     }
@@ -50,7 +49,7 @@ public abstract class ParseCsv extends ParseFn {
    */
   protected final Value doc(final QueryContext qc, final CsvFormat format) throws QueryException {
     final Item source = arg(0).atomItem(qc, info);
-    return source.isEmpty() ? Empty.VALUE : parse(source, false, format, CSV_ERROR_X, qc);
+    return source.isEmpty() ? Empty.VALUE : parse(source, true, format, CSV_ERROR_X, qc);
   }
 
   @Override
@@ -93,6 +92,6 @@ public abstract class ParseCsv extends ParseFn {
 
     // convert data
     final CsvConverter converter = CsvConverter.get(cpopts);
-    return converter.convert(new IOContent(ti.content()), info, qc);
+    return converter.convert(ti, "", info, qc);
   }
 }

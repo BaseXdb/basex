@@ -29,7 +29,7 @@ public class JsonDoc extends ParseJson {
    */
   final QueryException error(final QueryException ex) {
     final QueryError error = ex.error();
-    return error(ex, error == PARSE_JSON_X || error == DUPLICATE_JSON_X ? JSON_PARSE_X :
-      error == OPTION_JSON_X ? JSON_OPTIONS_X : null);
+    return error(ex, error == OPTION_JSON_X ? JSON_OPTIONS_X :
+        ex.matches(ErrType.FOJS) ? JSON_PARSE_X : null);
   }
 }

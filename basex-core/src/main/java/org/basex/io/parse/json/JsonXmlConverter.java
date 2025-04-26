@@ -74,12 +74,12 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  final void init(final String uri) {
+  protected final void init(final String uri) {
     doc = FDoc.build(token(uri));
   }
 
   @Override
-  FNode finish() {
+  protected FNode finish() {
     if(merge) {
       final ByteList[] types = new ByteList[ATTRS.length];
       for(final TypeCache arr : names.values()) {
@@ -104,7 +104,7 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  void numberLit(final byte[] value) throws QueryException {
+  protected void numberLit(final byte[] value) throws QueryException {
     byte[] string = value;
     if(numberParser != null) {
       final Item item = numberParser.apply(value);
@@ -114,17 +114,17 @@ abstract class JsonXmlConverter extends JsonConverter {
   }
 
   @Override
-  void stringLit(final byte[] value) throws QueryException {
+  protected void stringLit(final byte[] value) throws QueryException {
     addValue(STRING, value);
   }
 
   @Override
-  void nullLit() throws QueryException {
+  protected void nullLit() throws QueryException {
     addValue(NULL, null);
   }
 
   @Override
-  void booleanLit(final byte[] value) throws QueryException {
+  protected void booleanLit(final byte[] value) throws QueryException {
     addValue(BOOLEAN, value);
   }
 

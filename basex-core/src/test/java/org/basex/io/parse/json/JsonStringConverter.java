@@ -96,7 +96,7 @@ final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  void stringLit(final byte[] value) {
+  protected void stringLit(final byte[] value) {
     tb.add('"');
     final TokenParser tp = new TokenParser(value);
     while(tp.more()) {
@@ -147,11 +147,11 @@ final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  void init(final String uri) {
+  protected void init(final String uri) {
   }
 
   @Override
-  Item finish() {
+  protected Item finish() {
     return Str.get(tb.toArray());
   }
 }

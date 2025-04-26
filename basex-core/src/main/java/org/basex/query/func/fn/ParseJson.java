@@ -29,7 +29,7 @@ public abstract class ParseJson extends ParseFn {
   }
 
   /**
-   * Returns an XDM value for the parsed data.
+   * Returns an XQuery value for the parsed data.
    * @param qc query context
    * @param format format (can be {@code null})
    * @return resulting item
