@@ -31,7 +31,7 @@ public final class InspectType extends StandardFunc {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

@@ -1,6 +1,6 @@
 package org.basex.core.users;
 
-import org.basex.util.options.*;
+import org.basex.util.*;
 
 /**
  * User permissions.
@@ -22,6 +22,6 @@ public enum Perm {
 
   @Override
   public String toString() {
-    return EnumOption.string(this);
+    return Enums.string(this);
   }
 }

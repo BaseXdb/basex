@@ -469,15 +469,12 @@ public enum Calc {
   public abstract Calc invert();
 
   /**
-   * Checks if this is one of the specified types.
-   * @param calcs types
+   * Checks if this is one of the specified candidates.
+   * @param candidates candidates
    * @return result of check
    */
-  public final boolean oneOf(final Calc... calcs) {
-    for(final Calc calc : calcs) {
-      if(this == calc) return true;
-    }
-    return false;
+  public boolean oneOf(final Calc...candidates) {
+    return Enums.oneOf(this, candidates);
   }
 
   /**

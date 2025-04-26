@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -90,7 +91,7 @@ public final class DeepEqualOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

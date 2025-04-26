@@ -9,7 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * This class contains all query error messages.
@@ -1678,7 +1677,7 @@ public enum QueryError {
    * @return exception or {@code null}
    */
   public static QueryException get(final String name, final String msg, final InputInfo info) {
-    final QueryError err = EnumOption.get(QueryError.class, name);
+    final QueryError err = Enums.get(QueryError.class, name);
     return err != null ? new QueryException(info, err.qname(), msg).error(err) : null;
   }
 

@@ -5,7 +5,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -22,7 +21,7 @@ public final class FnCollationAvailable extends StandardFunc {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

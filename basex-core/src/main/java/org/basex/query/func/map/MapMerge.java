@@ -32,7 +32,7 @@ public class MapMerge extends StandardFunc {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 
@@ -146,7 +146,7 @@ public class MapMerge extends StandardFunc {
     if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc), info, qc);
     // fixed option
     final String string = duplicates.isEmpty() ? dflt.toString() : toString(duplicates, qc);
-    final Duplicates value = EnumOption.get(Duplicates.class, string);
+    final Duplicates value = Enums.get(Duplicates.class, string);
     if(value == null) throw QueryError.typeError(duplicates,
         new EnumType(Duplicates.values()), info);
 

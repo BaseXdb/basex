@@ -1,6 +1,7 @@
 package org.basex.build.json;
 
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -38,7 +39,7 @@ public final class JsonParserOptions extends JsonOptions {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

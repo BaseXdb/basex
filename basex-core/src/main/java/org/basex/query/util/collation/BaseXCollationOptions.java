@@ -44,7 +44,7 @@ public final class BaseXCollationOptions extends CollationOptions {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 
@@ -67,7 +67,7 @@ public final class BaseXCollationOptions extends CollationOptions {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

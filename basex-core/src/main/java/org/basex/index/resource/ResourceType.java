@@ -1,8 +1,8 @@
 package org.basex.index.resource;
 
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.http.*;
-import org.basex.util.options.*;
 
 /**
  * Database resource type.
@@ -96,6 +96,6 @@ public enum ResourceType {
 
   @Override
   public String toString() {
-    return EnumOption.string(this);
+    return Enums.string(this);
   }
 }

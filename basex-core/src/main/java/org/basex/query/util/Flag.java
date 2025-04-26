@@ -51,15 +51,12 @@ public enum Flag {
   FCS;
 
   /**
-   * Checks if this is one of the specified flags.
-   * @param flags flags
+   * Checks if this is one of the specified candidates.
+   * @param candidates candidates
    * @return result of check
    */
-  public boolean oneOf(final Flag[] flags) {
-    for(final Flag flag : flags) {
-      if(this == flag) return true;
-    }
-    return false;
+  public boolean oneOf(final Flag... candidates) {
+    return Enums.oneOf(this, candidates);
   }
 
   /**

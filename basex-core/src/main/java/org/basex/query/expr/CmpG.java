@@ -129,15 +129,12 @@ public class CmpG extends Cmp {
     }
 
     /**
-     * Checks if this is one of the specified types.
-     * @param ops types
+     * Checks if this is one of the specified candidates.
+     * @param candidates candidates
      * @return result of check
      */
-    public final boolean oneOf(final OpG... ops) {
-      for(final OpG op : ops) {
-        if(this == op) return true;
-      }
-      return false;
+    public boolean oneOf(final OpG...candidates) {
+      return Enums.oneOf(this, candidates);
     }
 
     /**

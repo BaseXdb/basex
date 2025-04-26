@@ -20,7 +20,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * CSV parser panel.
@@ -66,7 +65,7 @@ final class DialogCsvParser extends DialogParser {
     final StringList csv = new StringList();
     for(final CsvSep cs : CsvSep.values()) csv.add(cs.toString());
     separator = new BaseXCombo(dialog, csv.finish());
-    final CsvSep cs = EnumOption.get(CsvSep.class, copts.get(CsvOptions.SEPARATOR));
+    final CsvSep cs = Enums.get(CsvSep.class, copts.get(CsvOptions.SEPARATOR));
     if(cs != null) separator.setSelectedItem(cs.toString());
 
     final String[] formats = Arrays.stream(new CsvFormat[] {
@@ -125,7 +124,7 @@ final class DialogCsvParser extends DialogParser {
     copts.set(CsvOptions.BACKSLASHES, backslashes.isSelected());
     copts.set(CsvParserOptions.SKIP_EMPTY, skipEmpty.isSelected());
 
-    final CsvSep cs = EnumOption.get(CsvSep.class, separator.getText());
+    final CsvSep cs = Enums.get(CsvSep.class, separator.getText());
     if(cs != null) copts.set(CsvOptions.SEPARATOR, String.valueOf(cs.sep));
   }
 

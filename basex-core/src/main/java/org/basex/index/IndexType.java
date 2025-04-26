@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * This enumeration lists available index types.
@@ -31,7 +30,7 @@ public enum IndexType {
 
   @Override
   public String toString() {
-    return EnumOption.string(this);
+    return Enums.string(this);
   }
 
   /**

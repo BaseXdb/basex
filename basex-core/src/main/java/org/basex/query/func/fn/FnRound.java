@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -27,7 +26,7 @@ public class FnRound extends NumericFn {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

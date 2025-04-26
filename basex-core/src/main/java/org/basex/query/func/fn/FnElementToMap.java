@@ -58,9 +58,9 @@ public final class FnElementToMap extends PlanFn {
           pe.attribute = attr;
           final XQMap map = toMap(value, qc);
           final Value layout = map.get(LAYOUT);
-          if(!layout.isEmpty()) pe.layout = EnumOption.get(PlanLayout.class, toString(layout, qc));
+          if(!layout.isEmpty()) pe.layout = Enums.get(PlanLayout.class, toString(layout, qc));
           final Value type = map.get(TYPE);
-          if(!type.isEmpty()) pe.type = EnumOption.get(PlanType.class, toString(type, qc));
+          if(!type.isEmpty()) pe.type = Enums.get(PlanType.class, toString(type, qc));
           final Value child = map.get(CHILD);
           if(!child.isEmpty()) {
             final QNm qnm = qc.shared.parseQName(toToken(child, qc), true, sc());

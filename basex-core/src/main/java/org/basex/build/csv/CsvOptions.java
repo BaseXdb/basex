@@ -55,7 +55,7 @@ public class CsvOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 
@@ -80,7 +80,7 @@ public class CsvOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 
@@ -124,7 +124,7 @@ public class CsvOptions extends Options {
     String sep = get(FIELD_DELIMITER);
     if(sep == null) {
       sep = get(SEPARATOR);
-      final CsvSep s = EnumOption.get(CsvSep.class, sep);
+      final CsvSep s = Enums.get(CsvSep.class, sep);
       if(s != null) return s.sep;
     }
     return checkCodepoint(sep);

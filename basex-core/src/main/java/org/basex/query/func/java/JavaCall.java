@@ -32,7 +32,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type;
 import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.EnumOption;
 import org.basex.util.similarity.*;
 import org.w3c.dom.*;
 import org.w3c.dom.Text;
@@ -365,7 +364,7 @@ public abstract class JavaCall extends Arr {
       final Method meth = moduleMethod(module, name, args.length, types, qname, qc, info);
       final Requires req = meth.getAnnotation(Requires.class);
       final Perm perm = req == null ? Perm.ADMIN :
-        EnumOption.get(Perm.class, req.value().name().toLowerCase(Locale.ENGLISH));
+        Enums.get(Perm.class, req.value().name().toLowerCase(Locale.ENGLISH));
       final boolean updating = meth.getAnnotation(Updating.class) != null;
       if(updating) qc.updating();
       return new StaticJavaCall(module, meth, args, perm, updating, info);

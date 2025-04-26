@@ -17,7 +17,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -33,7 +32,7 @@ public class FnSort extends StandardFunc {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

@@ -84,15 +84,12 @@ public final class CompileContext {
     COUNT;
 
     /**
-     * Checks if this is one of the specified types.
-     * @param values values
+     * Checks if this is one of the specified candidates.
+     * @param candidates candidates
      * @return result of check
      */
-    public boolean oneOf(final Simplify... values) {
-      for(final Simplify value : values) {
-        if(this == value) return true;
-      }
-      return false;
+    public boolean oneOf(final Simplify... candidates) {
+      return Enums.oneOf(this, candidates);
     }
   }
 

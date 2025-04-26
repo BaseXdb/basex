@@ -15,8 +15,8 @@ import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.server.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -93,7 +93,7 @@ abstract class UserFn extends StandardFunc {
       final Iter iter = expr.iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         final String perm = toString(item);
-        final Perm p = EnumOption.get(Perm.class, perm);
+        final Perm p = Enums.get(Perm.class, perm);
         if(p == null) throw USER_PERMISSION_X.get(info, perm);
         perms.add(p);
       }

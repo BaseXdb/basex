@@ -17,7 +17,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Request parser.
@@ -50,7 +49,7 @@ public final class RequestParser {
     if(request != null) {
       for(final ANode attr : request.attributeIter()) {
         final String key = string(attr.name());
-        final RequestAttribute r = EnumOption.get(RequestAttribute.class, key);
+        final RequestAttribute r = Enums.get(RequestAttribute.class, key);
         if(r == null) throw HC_REQ_X.get(info, "Unknown attribute: " + key);
         hr.attributes.put(r, string(attr.string()));
       }

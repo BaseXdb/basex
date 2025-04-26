@@ -7,6 +7,7 @@ import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.io.serial.*;
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -229,7 +230,7 @@ public final class MainOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 
@@ -243,7 +244,7 @@ public final class MainOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

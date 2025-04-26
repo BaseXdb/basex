@@ -1,5 +1,6 @@
 package org.basex.build.json;
 
+import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -30,7 +31,7 @@ public class JsonOptions extends Options {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

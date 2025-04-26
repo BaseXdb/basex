@@ -15,7 +15,6 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.options.*;
 
 /**
  * Plan functions.
@@ -58,7 +57,7 @@ public abstract class PlanFn extends StandardFunc {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 
@@ -107,7 +106,7 @@ public abstract class PlanFn extends StandardFunc {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 
@@ -128,7 +127,7 @@ public abstract class PlanFn extends StandardFunc {
 
     @Override
     public String toString() {
-      return EnumOption.string(this);
+      return Enums.string(this);
     }
   }
 

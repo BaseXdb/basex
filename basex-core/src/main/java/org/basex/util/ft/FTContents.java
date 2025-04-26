@@ -1,6 +1,6 @@
 package org.basex.util.ft;
 
-import org.basex.util.options.*;
+import org.basex.util.*;
 
 /**
  * Full-text content types.
@@ -19,6 +19,6 @@ public enum FTContents {
    */
   @Override
   public String toString() {
-    return EnumOption.string(this);
+    return Enums.string(this);
   }
 }

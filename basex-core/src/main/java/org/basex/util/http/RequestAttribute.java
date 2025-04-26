@@ -1,6 +1,6 @@
 package org.basex.util.http;
 
-import org.basex.util.options.*;
+import org.basex.util.*;
 
 /**
  * HTTP Request attributes.
@@ -34,6 +34,6 @@ public enum RequestAttribute {
 
   @Override
   public String toString() {
-    return EnumOption.string(this);
+    return Enums.string(this);
   }
 }

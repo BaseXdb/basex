@@ -1,9 +1,6 @@
 package org.basex.util.options;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.*;
-
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -53,7 +50,7 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
    * @return enum or {@code null}
    */
   public V get(final String string) {
-    return get(clazz, string);
+    return Enums.get(clazz, string);
   }
 
   /**
@@ -73,32 +70,5 @@ public final class EnumOption<V extends Enum<V>> extends Option<V> {
     final StringList sl = new StringList(values.length);
     for(final V v : values) sl.add(v.toString());
     return sl.finish();
-  }
-
-  /**
-   * Helper function for converting enumeration names to strings.
-   * @param en enumeration
-   * @return lower-case string with '-' replaced by '-';
-   */
-  public static String string(final Enum<?> en) {
-    return en.name().toLowerCase(Locale.ENGLISH).replace('_', '-');
-  }
-
-  /** Enum cache. */
-  private static final ConcurrentMap<Class<? extends Enum<?>>, Map<String, ? extends Enum<?>>>
-    CACHE = new ConcurrentHashMap<>();
-
-  /**
-   * Returns the specified enum value.
-   * @param <T> enum type
-   * @param type enum class
-   * @param value value to be found
-   * @return enum or {@code null}
-   */
-  public static <T extends Enum<T>> T get(final Class<T> type, final String value) {
-    @SuppressWarnings("unchecked")
-    final Map<String, T> map = (Map<String, T>) CACHE.computeIfAbsent(type, k -> Arrays.stream(
-        type.getEnumConstants()).collect(Collectors.toMap(Enum::toString, t -> t, (f, s) -> f)));
-    return map.get(value);
   }
 }

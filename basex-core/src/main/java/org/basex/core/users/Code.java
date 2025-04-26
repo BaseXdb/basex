@@ -1,6 +1,6 @@
 package org.basex.core.users;
 
-import org.basex.util.options.*;
+import org.basex.util.*;
 
 /**
  * Codes.
@@ -14,6 +14,6 @@ public enum Code {
 
   @Override
   public String toString() {
-    return EnumOption.string(this);
+    return Enums.string(this);
   }
 }
