@@ -78,20 +78,15 @@ public final class HtmlParser extends XMLParser {
       final XMLReader reader = parser.reader(hopts, sw);
 
       // define input
-      final InputSource is = new InputSource(io.inputStream());
-      final String enc = io.encoding() != null
-          ? io.encoding()
-          : hopts.contains(ENCODING)
-            ? hopts.get(ENCODING)
-            : null;
-      if(enc != null) {
-        if(!Strings.supported(enc)) {
-          throw INVALIDOPTION_X.getIO("Unsupported encoding: " + enc + '.');
+      try(InputStream in = io.inputStream()) {
+        final InputSource is = new InputSource(in);
+        final String enc = io.encoding() != null ? io.encoding() : hopts.get(ENCODING);
+        if(enc != null) {
+          if(!Strings.supported(enc)) throw INVALIDOPTION_X.getIO("Unknown encoding: " + enc + '.');
+          is.setEncoding(Strings.normEncoding(enc));
         }
-        is.setEncoding(Strings.normEncoding(enc));
+        reader.parse(is);
       }
-
-      reader.parse(is);
       return new IOContent(token(sw.toString()), io.name());
     } catch(final SAXException ex) {
       Util.errln(ex);
