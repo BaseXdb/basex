@@ -244,7 +244,7 @@ public final class Strings {
    * @param encoding encoding
    * @return result of check
    */
-  public static boolean supported(final String encoding) {
+  public static boolean encodingSupported(final String encoding) {
     try {
       return Charset.isSupported(encoding);
     } catch(final IllegalArgumentException ex) {

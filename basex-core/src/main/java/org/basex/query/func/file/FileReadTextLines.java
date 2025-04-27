@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FileReadTextLines extends FileRead {
+public final class FileReadTextLines extends FileFn {
   @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {

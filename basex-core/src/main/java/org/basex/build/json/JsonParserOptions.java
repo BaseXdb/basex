@@ -1,5 +1,6 @@
 package org.basex.build.json;
 
+import org.basex.core.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -28,7 +29,7 @@ public final class JsonParserOptions extends JsonOptions {
   /** Option: validation (json-to-xml). */
   public static final BooleanOption VALIDATE = new BooleanOption("validate");
   /** Option: encoding (custom). */
-  public static final StringOption ENCODING = new StringOption("encoding");
+  public static final StringOption ENCODING = CommonOptions.ENCODING;
 
   /** Duplicate handling. */
   public enum JsonDuplicates {

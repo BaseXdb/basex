@@ -1,5 +1,6 @@
 package org.basex.build.csv;
 
+import org.basex.core.*;
 import org.basex.util.options.*;
 
 /**
@@ -10,7 +11,7 @@ import org.basex.util.options.*;
  */
 public final class CsvParserOptions extends CsvOptions {
   /** Option: encoding. */
-  public static final StringOption ENCODING = new StringOption("encoding");
+  public static final StringOption ENCODING = CommonOptions.ENCODING;
   /** Option: skip empty fields. */
   public static final BooleanOption SKIP_EMPTY = new BooleanOption("skip-empty", false);
 

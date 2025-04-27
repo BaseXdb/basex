@@ -82,7 +82,8 @@ public final class HtmlParser extends XMLParser {
         final InputSource is = new InputSource(in);
         final String enc = io.encoding() != null ? io.encoding() : hopts.get(ENCODING);
         if(enc != null) {
-          if(!Strings.supported(enc)) throw INVALIDOPTION_X.getIO("Unknown encoding: " + enc + '.');
+          if(!Strings.encodingSupported(enc)) throw INVALIDOPTION_X.getIO(
+              "Unknown encoding: " + enc + '.');
           is.setEncoding(Strings.normEncoding(enc));
         }
         reader.parse(is);

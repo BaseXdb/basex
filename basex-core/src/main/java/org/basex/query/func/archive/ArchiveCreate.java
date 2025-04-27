@@ -5,7 +5,6 @@ import static org.basex.query.func.archive.ArchiveText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.nio.charset.*;
 import java.util.*;
 import java.util.AbstractMap.*;
 import java.util.Map.*;
@@ -213,11 +212,7 @@ public class ArchiveCreate extends ArchiveFn {
   final String encoding(final Item header) throws QueryException {
     if(header instanceof ANode) {
       final byte[] value = ((ANode) header).attribute(Q_ENCODING);
-      if(value != null) {
-        final String encoding = Strings.normEncoding(string(value));
-        if(!Charset.isSupported(encoding)) throw ARCHIVE_ENCODE1_X.get(info, value);
-        return encoding;
-      }
+      if(value != null) return toEncodingOrNull(string(value), ARCHIVE_ENCODE1_X);
     }
     return Strings.UTF8;
   }

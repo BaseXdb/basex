@@ -12,10 +12,10 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FileAppendText extends FileWriteText {
+public final class FileAppendText extends FileFn {
   @Override
   public Item item(final QueryContext qc) throws IOException, QueryException {
-    write(true, qc);
+    write(true, false, qc);
     return Empty.VALUE;
   }
 }

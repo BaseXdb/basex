@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -28,7 +29,7 @@ public abstract class ParseFn extends StandardFunc {
     /** Normalize-newlines option. */
     public static final BooleanOption NORMALIZE_NEWLINES = new BooleanOption("normalize-newlines");
     /** Encoding option. */
-    public static final StringOption ENCODING = new StringOption("encoding");
+    public static final StringOption ENCODING = CommonOptions.ENCODING;
   }
 
   /** Input reference. */

@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
 
@@ -539,12 +538,7 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     if(encoding == null) return null;
-    try {
-      if(Charset.isSupported(encoding)) return Strings.normEncoding(encoding);
-    } catch(final IllegalArgumentException ex) {
-      // character set is invalid or unknown (e.g. empty string)
-      Util.debug(ex);
-    }
+    if(Strings.encodingSupported(encoding)) return Strings.normEncoding(encoding);
     throw err.get(info, QueryError.similar(encoding,
         Levenshtein.similar(token(encoding), Strings.encodings())));
   }

@@ -20,6 +20,6 @@ public final class DecodingException extends InputException {
    * @param ex exception
    */
   DecodingException(final Exception ex) {
-    super("Unsupported encoding: " + ex.getMessage());
+    super("Unknown encoding: " + ex.getMessage());
   }
 }

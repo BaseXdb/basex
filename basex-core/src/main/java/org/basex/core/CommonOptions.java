@@ -42,4 +42,6 @@ public interface CommonOptions {
 
   /** Base URI. */
   StringOption BASE_URI = new StringOption("base-uri");
+  /** Encoding. */
+  StringOption ENCODING = new StringOption("encoding");
 }

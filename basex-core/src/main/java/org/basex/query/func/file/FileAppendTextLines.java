@@ -15,7 +15,7 @@ import org.basex.query.value.seq.*;
 public final class FileAppendTextLines extends FileWriteTextLines {
   @Override
   public Item item(final QueryContext qc) throws IOException, QueryException {
-    write(true, qc);
+    write(true, true, qc);
     return Empty.VALUE;
   }
 }
