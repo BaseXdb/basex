@@ -220,23 +220,25 @@ public class CmpG extends Cmp {
       check = !(type1 == type2 && !type1.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.ITEM) &&
           comparable(type1, type2, true));
 
-      CmpHashG hash = null;
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
         // simple comparisons
-        if(!(this instanceof CmpSimpleG)) {
-          expr = new CmpSimpleG(expr1, expr2, op, info, check);
-        }
-      } else if(op == OpG.EQ && sc().collation == null && (type1.isNumber() && type2.isNumber() ||
-          type1.isStringOrUntyped() && type2.isStringOrUntyped()) && !st2.zeroOrOne()) {
+        if(!(this instanceof CmpSimpleG)) expr = new CmpSimpleG(expr1, expr2, op, info, check);
+      } else if(op == OpG.EQ && sc().collation == null && !st2.zeroOrOne() && (
+        type1.isNumber() && type2.isNumber() ||
+        type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
+        type1 == AtomType.BOOLEAN && type2 == AtomType.BOOLEAN
+      )) {
         // hash-based comparisons
-        hash = this instanceof CmpHashG ? (CmpHashG) this : new CmpHashG(expr1, expr2, op, info);
-        expr = hash;
+        if(!(this instanceof CmpHashG)) expr = new CmpHashG(expr1, expr2, op, info);
+      } else if(op == OpG.EQ && expr2 instanceof Range && type1.isNumberOrUntyped()) {
+        // range comparisons
+        if(!(this instanceof CmpRangeG)) expr = new CmpRangeG(expr1, expr2, op, info);
       }
       // pre-evaluate expression; discard hashed results
       if(values(false, cc)) {
-        expr = cc.preEval(expr);
-        if(hash != null) cc.qc.threads.get(hash, info).remove();
-        return expr;
+        final Expr ex = cc.preEval(expr);
+        if(expr instanceof CmpHashG) cc.qc.threads.get((CmpHashG) expr, info).remove();
+        return ex;
       }
     }
 
@@ -296,7 +298,7 @@ public class CmpG extends Cmp {
     if(size1 == 0) return false;
     final Iter iter2 = exprs[1].atomIter(qc, info);
     final long size2 = iter2.size();
-    return size2 == 0 ? false : compare(iter1, iter2, size1, size2, qc);
+    return size2 != 0 && compare(iter1, iter2, size1, size2, qc);
   }
 
   /**
@@ -311,45 +313,27 @@ public class CmpG extends Cmp {
    */
   boolean compare(final Iter iter1, final Iter iter2, final long size1, final long size2,
       final QueryContext qc) throws QueryException {
-
-    // evaluate single items
-    Iter ir1 = iter1, ir2 = iter2;
-    final boolean single1 = size1 == 1, single2 = size2 == 1;
-    if(single1 && single2) return eval(ir1.next(), ir2.next());
-
-    if(single1) {
-      // first iterator yields single result
-      final Item item1 = ir1.next();
-      for(Item item2; (item2 = qc.next(ir2)) != null;) {
-        if(eval(item1, item2)) return true;
+    // improve cache efficiency by looping the smaller array in the outer loop
+    if(size1 < size2 || size2 == -1) {
+      // (1, 2) = (3, 4, 5, 6, 7)  ->  1 = 3, 1 = 4, ..., 2 = 3, ...
+      Iter ir2 = iter2;
+      for(Item item1; (item1 = iter1.next()) != null;) {
+        if(ir2 == null) ir2 = exprs[1].atomIter(qc, info);
+        for(Item item2; (item2 = qc.next(ir2)) != null;) {
+          if(eval(item1, item2)) return true;
+        }
+        ir2 = null;
       }
-      return false;
-    }
-
-    if(single2) {
-      // second iterator yields single result
-      final Item item2 = ir2.next();
-      for(Item item1; (item1 = qc.next(ir1)) != null;) {
-        if(eval(item1, item2)) return true;
+    } else {
+      // (1, 2, 3, 4, 5) = (6, 7)  ->  1 = 6, 2 = 6, ..., 1 = 7, ...
+      Iter ir1 = iter1;
+      for(Item item2; (item2 = iter2.next()) != null;) {
+        if(ir1 == null) ir1 = exprs[0].atomIter(qc, info);
+        for(Item item1; (item1 = qc.next(ir1)) != null;) {
+          if(eval(item1, item2)) return true;
+        }
+        ir1 = null;
       }
-      return false;
-    }
-
-    // swap iterators if first iterator returns more results than second
-    final boolean swap = size1 > size2;
-    if(swap) {
-      final Iter iter = ir1;
-      ir1 = ir2;
-      ir2 = iter;
-    }
-
-    // loop through all items of first and second iterator
-    for(Item item1; (item1 = ir1.next()) != null;) {
-      if(ir2 == null) ir2 = exprs[swap ? 0 : 1].atomIter(qc, info);
-      for(Item item2; (item2 = qc.next(ir2)) != null;) {
-        if(swap ? eval(item2, item1) : eval(item1, item2)) return true;
-      }
-      ir2 = null;
     }
     return false;
   }

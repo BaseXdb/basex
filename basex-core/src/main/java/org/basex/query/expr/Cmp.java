@@ -46,7 +46,7 @@ public abstract class Cmp extends Arr {
 
   /**
    * Checks if the operands of the expression can be swapped to improve performance.
-   * @return {@code true} if operands were swapped
+   * @return result of check
    */
   final boolean swap() {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
@@ -56,8 +56,9 @@ public abstract class Cmp extends Arr {
 
     // move position() and count() to the left: position() = 123
     boolean swap = COUNT.is(expr2) || POSITION.is(expr2);
-    // keep right operand if it is a value
-    if(!swap && expr2 instanceof Value) return false;
+    // right operand is a value, and left operand yields more results: (1, 2) = 3
+    if(!swap && expr2 instanceof Value)
+      return expr1 instanceof Value && expr1.size() > expr2.size();
 
     // move static value to the right: $words = 'words'
     if(!swap) swap = expr1 instanceof Value;

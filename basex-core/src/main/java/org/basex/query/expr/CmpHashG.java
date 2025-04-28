@@ -9,7 +9,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * General comparison.
+ * General hash-based comparison.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -31,11 +31,11 @@ public final class CmpHashG extends CmpG {
    * Overwrites the original comparator.
    */
   @Override
-  boolean compare(final Iter iter1, final Iter iter2, final long is1, final long is2,
+  boolean compare(final Iter iter1, final Iter iter2, final long size1, final long size2,
       final QueryContext qc) throws QueryException {
 
     // check if iterator is based on value with more than one item
-    if(iter2.valueIter() && iter2.size() > 1) {
+    if(iter2.valueIter() && size2 > 1) {
       // retrieve cache (first call: initialize it)
       final CmpCache cache = qc.threads.get(this, info).get();
 
@@ -66,7 +66,7 @@ public final class CmpHashG extends CmpG {
         return false;
       }
     }
-    return super.compare(iter1, iter2, is1, is2, qc);
+    return super.compare(iter1, iter2, size1, size2, qc);
   }
 
   @Override
