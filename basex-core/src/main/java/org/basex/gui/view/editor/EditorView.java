@@ -122,7 +122,7 @@ public final class EditorView extends View {
 
     history = BaseXButton.get("c_history", BaseXLayout.addShortcut(RECENTLY_OPENED,
         BaseXKeys.HISTORY.toString()), false, gui);
-    stop = BaseXButton.get("c_stop", STOP, false, gui);
+    stop = BaseXButton.command(GUIMenuCmd.C_STOP, gui);
     stop.setEnabled(false);
     test = BaseXButton.get("c_test", BaseXLayout.addShortcut(RUN_TESTS,
         BaseXKeys.TESTS.toString()), false, gui);
@@ -195,10 +195,6 @@ public final class EditorView extends View {
     refreshHistory(null);
 
     info.addMouseListener((MouseClickedListener) e -> markError(true));
-    stop.addActionListener(e -> {
-      stop.setEnabled(false);
-      gui.stop();
-    });
     test.addActionListener(e -> run(getEditor(), Action.TEST));
     tabs.addChangeListener(e -> {
       final EditorArea ea = getEditor();

@@ -203,6 +203,14 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
+  /** Stops the currently opened query. */
+  C_STOP(STOP, "shift ESCAPE", false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.stop();
+    }
+  },
+
   /** Edits external variables. */
   C_EXTERNAL_VARIABLES(EXTERNAL_VARIABLES, "% shift E", false, false) {
     @Override
