@@ -110,4 +110,19 @@ public final class CatalogTest extends SandboxTest {
     query(func.args("http://doc.xml", " {'allow-external-entities': true()}"), "<doc>X</doc>");
     error(func.args("http://doc.xml", " {'allow-external-entities': false()}"), IOERR_X);
   }
+
+  /** Test method.*/
+  @Test public void parseXml() {
+    final Function func = PARSE_XML;
+
+    set(MainOptions.CATALOG, CATALOG);
+    query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>", " {'dtd': true()}"),
+        "<doc>X</doc>");
+    query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>", " {'dtd': 'no'}"),
+        "<doc/>");
+    query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
+        " {'allow-external-entities': true()}"), "<doc>X</doc>");
+    error(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
+        " {'allow-external-entities': 'no'}"), SAXERR_X);
+  }
 }

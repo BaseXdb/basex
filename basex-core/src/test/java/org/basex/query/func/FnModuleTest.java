@@ -2405,6 +2405,7 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("<a xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
         " {'xsd-validation': 'strict'}"), XSDVALIDATIONERR_X);
+    error(func.args("<a/>", " {'catalog': 'catalog.xml'}"), INVALIDOPTION_X);
   }
 
   /** Test method. */
