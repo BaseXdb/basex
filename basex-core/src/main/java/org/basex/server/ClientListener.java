@@ -26,6 +26,18 @@ import org.basex.util.log.*;
  * @author Christian Gruen
  */
 public final class ClientListener extends Thread implements ClientInfo {
+  /** Prints trace output to standard error. */
+  private static final QueryTracer TRACER = new QueryTracer() {
+    @Override
+    public boolean printTrace(final String message) {
+      return true;
+    }
+    @Override
+    public boolean moreTraces(final int count) {
+      return count <= 10_000;
+    }
+  };
+
   /** Timer for authentication time out. */
   public final Timer timeout = new Timer();
   /** Timestamp of last interaction. */
@@ -67,8 +79,7 @@ public final class ClientListener extends Thread implements ClientInfo {
     this.server = server;
     last = System.currentTimeMillis();
     setDaemon(true);
-    // register the info view for trace output
-    context.setExternal((QueryTracer) message -> true);
+    context.setExternal(TRACER);
   }
 
   @Override

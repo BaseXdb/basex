@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.atomic.*;
+import java.util.function.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
@@ -142,6 +143,8 @@ public final class QueryContext extends Job implements Closeable {
   private boolean optimized;
   /** Indicates if the query context has been closed. */
   private boolean closed;
+  /** Trace counter. */
+  private int traces;
 
   /**
    * Constructor.
@@ -447,20 +450,30 @@ public final class QueryContext extends Job implements Closeable {
    * @param string evaluation info
    */
   public void evalInfo(final String string) {
-    QueryContext qc = this;
-    while(qc.parent != null) qc = qc.parent;
-    qc.info.evalInfo(string);
+    if(parent != null) {
+      parent.evalInfo(string);
+    } else {
+      info.evalInfo(string);
+    }
   }
 
   /**
    * Sends the specified message to the tracer.
-   * @param message traced value
    * @param label label (can be {@code null})
+   * @param message message function
    */
-  public void trace(final String message, final String label) {
-    final String lbl = label != null ? label.replaceAll("\\s+", " ") : "";
-    final String msg = (lbl.isEmpty() || lbl.matches("^.*\\p{P} ?$") ? lbl : lbl + ": ") + message;
-    if(jc().tracer().print(msg)) evalInfo(msg);
+  public void trace(final String label, final Supplier<String> message) {
+    if(parent != null) {
+      parent.trace(label, message);
+    } else {
+      final QueryTracer qc = jc().tracer();
+      if(qc.moreTraces(++traces)) {
+        final String lbl = label != null ? label.replaceAll("\\s+", " ") : "";
+        final String msg = (lbl.isEmpty() || lbl.matches("^.*\\p{P} ?$") ? lbl : lbl + ": ") +
+            message.get();
+        if(qc.printTrace(msg)) evalInfo(msg);
+      }
+    }
   }
 
   /**

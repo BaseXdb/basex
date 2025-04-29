@@ -18,10 +18,12 @@ public final class ProfType extends StandardFunc {
     final Expr expr = arg(0);
     final String label = toStringOrNull(arg(1), qc);
 
-    final StringBuilder sb = new StringBuilder().append(info(expr));
     final Value value = expr.value(qc);
-    if(expr != value) sb.append(" -> ").append(info(value));
-    qc.trace(sb.toString(), label);
+    qc.trace(label, () -> {
+      final StringBuilder sb = new StringBuilder().append(info(expr));
+      if(expr != value) sb.append(" -> ").append(info(value));
+      return sb.toString();
+    });
     return value;
   }
 

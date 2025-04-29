@@ -191,7 +191,7 @@ final class DataUpdates {
           throw UPDBERROR_X.get(null, ex);
         }
       } else {
-        qc.trace(original + ": Updates are not written back.", "");
+        qc.trace("", () -> original + ": Updates are not written back.");
       }
     }
   }

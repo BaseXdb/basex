@@ -173,7 +173,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
    * Displays the specified info string.
    * @param info string to be displayed
    * @param cmd command that created the output (can be {@code null})
-   * @param time time required for running the command
+   * @param time time required for running the command (can be {@code null})
    * @param ok indicates if evaluation was successful
    * @param reset clear text area when method is called next time
    * @return total time (passed on, or updated, argument)
@@ -397,9 +397,14 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   }
 
   @Override
-  public boolean print(final String message) {
-    if(clear || all.length < 50000) setInfo(message, null, true, false);
+  public boolean printTrace(final String message) {
+    setInfo(message, null, true, false);
     return true;
+  }
+
+  @Override
+  public boolean moreTraces(final int count) {
+    return clear || count <= 10_000 && all.length <= 100_000;
   }
 
   /**

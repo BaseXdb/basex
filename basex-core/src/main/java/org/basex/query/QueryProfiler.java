@@ -42,7 +42,8 @@ public final class QueryProfiler {
     if(aggregate) {
       add(result, label, time);
     } else {
-      qc.trace(time ? Performance.formatNano(result) : Performance.formatHuman(result), label);
+      qc.trace(label, () -> time ? Performance.formatNano(result) :
+        Performance.formatHuman(result));
     }
   }
 
@@ -71,24 +72,22 @@ public final class QueryProfiler {
   public void finish() {
     final Consumer<Map<String, LongList>> trace = map -> {
       for(final Entry<String, LongList> entry : map.entrySet()) {
-        final String message, label = entry.getKey();
-        final LongList values = entry.getValue();
-        final int runs = values.size();
-        long min = Long.MAX_VALUE, max = Long.MIN_VALUE, sum = 0;
-        for(final long l : values.toArray()) {
-          if(l < min) min = l;
-          if(l > max) max = l;
-          sum += l;
-        }
-        if(map == timing) {
-          message = Performance.formatNano(sum) + " (" + runs + " runs, avg: " +
-            Performance.nanoToMilli(sum, runs) + ", min: " +
-            Performance.nanoToMilli(min) + ", max: " +
-            Performance.nanoToMilli(max) + ")";
-        } else {
-          message = Performance.formatHuman(sum / runs) + " (avg, " + runs + " runs)";
-        }
-        qc.trace(message, label);
+        qc.trace(entry.getKey(), () -> {
+          final LongList values = entry.getValue();
+          final int runs = values.size();
+          long min = Long.MAX_VALUE, max = Long.MIN_VALUE, sum = 0;
+          for(final long l : values.toArray()) {
+            if(l < min) min = l;
+            if(l > max) max = l;
+            sum += l;
+          }
+          return map == timing ?
+              Performance.formatNano(sum) + " (" + runs + " runs, avg: " +
+              Performance.nanoToMilli(sum, runs) + ", min: " +
+              Performance.nanoToMilli(min) + ", max: " +
+              Performance.nanoToMilli(max) + ")" :
+            Performance.formatHuman(sum / runs) + " (avg, " + runs + " runs)";
+        });
       }
     };
     trace.accept(timing);

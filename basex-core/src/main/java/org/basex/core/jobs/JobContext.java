@@ -15,9 +15,16 @@ import org.basex.util.*;
  */
 public final class JobContext {
   /** Prints trace output to standard error. */
-  private static final QueryTracer TRACER = message -> {
-    Util.errln(message);
-    return false;
+  private static final QueryTracer TRACER = new QueryTracer() {
+    @Override
+    public boolean printTrace(final String message) {
+      Util.errln(message);
+      return false;
+    }
+    @Override
+    public boolean moreTraces(final int count) {
+      return count <= 10_000;
+    }
   };
 
   /** Job prefix. */

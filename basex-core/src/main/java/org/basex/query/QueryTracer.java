@@ -12,5 +12,12 @@ public interface QueryTracer {
    * @param message string to be output
    * @return {@code true} if string shall be further processed by the calling function
    */
-  boolean print(String message);
+  boolean printTrace(String message);
+
+  /**
+   * Indicates if more output should be generated.
+   * @param count count of traces so far
+   * @return result of check
+   */
+  boolean moreTraces(int count);
 }

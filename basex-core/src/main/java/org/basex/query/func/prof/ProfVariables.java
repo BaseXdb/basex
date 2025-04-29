@@ -32,9 +32,8 @@ public final class ProfVariables extends StandardFunc {
         }
       });
     }
-    final String l = label == null || label.isEmpty() ? QueryText.DEBUG_ASSIGNMENTS : label;
-
-    qc.trace(sb.toString(), l);
+    qc.trace(label == null || label.isEmpty() ? QueryText.DEBUG_ASSIGNMENTS : label,
+      () -> sb.toString());
     return Empty.VALUE;
   }
 

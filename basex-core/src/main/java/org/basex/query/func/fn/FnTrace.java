@@ -22,15 +22,18 @@ public class FnTrace extends StandardFunc {
     final String label = toStringOrNull(arg(1), qc);
 
     if(input.isEmpty() || input instanceof RangeSeq || input instanceof SingletonSeq) {
-      qc.trace(input.toString(), label);
+      qc.trace(label, () -> input.toString());
     } else {
       final Iter iter = input.iter();
-      try {
-        for(Item item; (item = qc.next(iter)) != null;) {
-          qc.trace(item.serialize(SerializerMode.DEBUG.get()).toString(), label);
-        }
-      } catch(final QueryIOException ex) {
-        throw ex.getCause(info);
+      for(Item item; (item = qc.next(iter)) != null;) {
+        final Item it = item;
+        qc.trace(label, () -> {
+          try {
+            return it.serialize(SerializerMode.DEBUG.get()).toString();
+          } catch(final QueryIOException ex) {
+            return ex.getMessage(); // unexpected
+          }
+        });
       }
     }
     return input;
