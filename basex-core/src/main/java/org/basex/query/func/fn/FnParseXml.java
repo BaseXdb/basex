@@ -31,8 +31,6 @@ public final class FnParseXml extends FnParseXmlFragment {
     public static final BooleanOption INTPARSE = CommonOptions.INTPARSE;
     /** Custom option (see {@link MainOptions#DTD}). */
     public static final BooleanOption DTD = CommonOptions.DTD;
-    /** Custom option (see {@link MainOptions#CATALOG}). */
-    public static final StringOption CATALOG = CommonOptions.CATALOG;
   }
 
   @Override
