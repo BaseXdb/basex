@@ -18,7 +18,9 @@ public final class RequestAttributeNames extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final TokenList tl = new TokenList();
-    for(final String name : Collections.list(request(qc).getAttributeNames())) tl.add(name);
+    for(final String name : Collections.list(request(qc).getAttributeNames())) {
+      if(!name.startsWith("org.eclipse.jetty.")) tl.add(name);
+    }
     return StrSeq.get(tl);
   }
 }
