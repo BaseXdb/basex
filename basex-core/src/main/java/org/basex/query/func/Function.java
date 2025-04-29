@@ -1710,8 +1710,8 @@ public enum Function implements AFunction {
   _PROF_TYPE(ProfType::new, "type(value[,label])",
       params(ITEM_ZM, STRING_O), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
-  _PROF_VARIABLES(ProfVariables::new, "variables([map,label])",
-      params(MAP_ZO, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
+  _PROF_VARIABLES(ProfVariables::new, "variables([bindings,label])",
+      params(MAP_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), PROF_URI),
 
   // Random Module
 
