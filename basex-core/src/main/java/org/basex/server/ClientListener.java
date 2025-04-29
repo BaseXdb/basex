@@ -75,11 +75,11 @@ public final class ClientListener extends Thread implements ClientInfo {
    */
   public ClientListener(final Socket socket, final Context context, final BaseXServer server) {
     this.context = new Context(context, this);
+    this.context.setExternal(TRACER);
     this.socket = socket;
     this.server = server;
     last = System.currentTimeMillis();
     setDaemon(true);
-    context.setExternal(TRACER);
   }
 
   @Override
