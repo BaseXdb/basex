@@ -338,7 +338,8 @@ public final class HTTPConnection implements ClientInfo {
       } else {
         // do not allow Jetty to create a custom error html page
         // control characters and non-ASCII codes will be removed (GH-1632)
-        response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
+        // response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
+        response.setStatus(c);
       }
 
       if(body != null) {
