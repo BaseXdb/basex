@@ -1,3 +1,22 @@
+VERSION 11.9 (April 30, 2025) ------------------------------------------
+
+ - [ADD] XQuery 4.0: %method annotation, try/finally
+ - [ADD] XQFO 4.0: element-to-map(-plan), doc, function-identity
+ - [ADD] Option LOGMASKIP: anonymize IP address
+ - [ADD] prof:time, prof:memory: Aggregation performance measurements
+ - [MOD] prof:variable: Complete listing of in-scope variables
+ - [MOD] Arrays & maps, uniform data types: less memory consumption
+ - [MOD] JSON, CSV, HTML representations: less memory consumption
+ - [MOD] Records: Faster access to statically known entries
+ - [MOD] Records: implicit record creation for statically parsed maps
+ - [MOD] Sequences, arrays, maps: Unified low-level (un)boxing
+ - [MOD] XQuery: faster 'instance of' type checks
+ - [MOD] Arrays & maps: faster traversals and wildcard lookups
+ - [MOD] GUI, Shift-ESC shortcut for stopping query
+ - [FIX] Store is written again at shutdown time
+ - [FIX] RESTXQ, %rest:single: null pointer exceptions
+ - [FIX] html:doc: close stream
+
 VERSION 11.8 (March 20, 2025) ------------------------------------------
 
  - [MOD] Lightning fast construction of ordered maps of all types
