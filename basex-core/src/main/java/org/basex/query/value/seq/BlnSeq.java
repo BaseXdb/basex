@@ -58,8 +58,8 @@ public final class BlnSeq extends NativeSeq {
   }
 
   @Override
-  public Bln itemAt(final long pos) {
-    return Bln.get(values[(int) pos]);
+  public Bln itemAt(final long index) {
+    return Bln.get(values[(int) index]);
   }
 
   @Override

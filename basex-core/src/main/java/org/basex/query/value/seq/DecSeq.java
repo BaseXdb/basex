@@ -56,8 +56,8 @@ public final class DecSeq extends NativeSeq {
   }
 
   @Override
-  public Dec itemAt(final long pos) {
-    return Dec.get(values[(int) pos]);
+  public Dec itemAt(final long index) {
+    return Dec.get(values[(int) index]);
   }
 
   @Override

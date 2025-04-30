@@ -123,8 +123,8 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Int itemAt(final long pos) {
-    return Int.get(get(pos));
+  public Int itemAt(final long index) {
+    return Int.get(get(index));
   }
 
   @Override

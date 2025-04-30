@@ -56,8 +56,8 @@ public final class DblSeq extends NativeSeq {
   }
 
   @Override
-  public Dbl itemAt(final long pos) {
-    return Dbl.get(values[(int) pos]);
+  public Dbl itemAt(final long index) {
+    return Dbl.get(values[(int) index]);
   }
 
   @Override

@@ -54,8 +54,8 @@ public final class BytSeq extends NativeSeq {
   }
 
   @Override
-  public Int itemAt(final long pos) {
-    return new Int(values[(int) pos], type);
+  public Int itemAt(final long index) {
+    return new Int(values[(int) index], type);
   }
 
   @Override

@@ -107,7 +107,7 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public Item itemAt(final long pos) {
+  public Item itemAt(final long index) {
     throw Util.notExpected();
   }
 

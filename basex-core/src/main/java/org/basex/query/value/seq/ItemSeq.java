@@ -28,8 +28,8 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Item itemAt(final long pos) {
-    return items[(int) pos];
+  public Item itemAt(final long index) {
+    return items[(int) index];
   }
 
   @Override

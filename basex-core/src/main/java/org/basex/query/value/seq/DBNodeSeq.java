@@ -56,8 +56,8 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public DBNode itemAt(final long pos) {
-    return new DBNode(data, pres[(int) pos]);
+  public DBNode itemAt(final long index) {
+    return new DBNode(data, pres[(int) index]);
   }
 
   @Override

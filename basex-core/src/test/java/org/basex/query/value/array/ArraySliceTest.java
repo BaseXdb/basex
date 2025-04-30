@@ -16,7 +16,7 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class ArraySliceTest extends ArrayTest {
-  /** Exhaustively tests creating sub-arrays of arrays of a range of lengths. */
+  /** Exhaustively tests creating subarrays of arrays of a range of lengths. */
   @Test public void testSlice() {
     XQArray array = XQArray.empty();
     for(int len = 0; len < 100; len++) {

@@ -56,8 +56,8 @@ public final class FltSeq extends NativeSeq {
   }
 
   @Override
-  public Flt itemAt(final long pos) {
-    return Flt.get(values[(int) pos]);
+  public Flt itemAt(final long index) {
+    return Flt.get(values[(int) index]);
   }
 
   @Override

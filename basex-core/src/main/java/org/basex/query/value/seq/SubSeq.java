@@ -28,8 +28,8 @@ public final class SubSeq extends Seq {
   }
 
   @Override
-  public Item itemAt(final long pos) {
-    return sub.itemAt(start + pos);
+  public Item itemAt(final long index) {
+    return sub.itemAt(start + index);
   }
 
   @Override

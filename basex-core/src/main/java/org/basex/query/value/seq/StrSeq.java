@@ -56,8 +56,8 @@ public final class StrSeq extends NativeSeq {
   }
 
   @Override
-  public Item itemAt(final long pos) {
-    return get(values[(int) pos], type);
+  public Item itemAt(final long index) {
+    return get(values[(int) index], type);
   }
 
   @Override

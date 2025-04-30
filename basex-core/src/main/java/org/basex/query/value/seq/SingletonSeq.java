@@ -90,8 +90,8 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Item itemAt(final long pos) {
-    return value.itemAt(pos % value.size());
+  public Item itemAt(final long index) {
+    return value.itemAt(index % value.size());
   }
 
   @Override

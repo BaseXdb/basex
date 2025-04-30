@@ -58,8 +58,8 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public Int itemAt(final long pos) {
-    return Int.get(values[(int) pos], type);
+  public Int itemAt(final long index) {
+    return Int.get(values[(int) index], type);
   }
 
   @Override

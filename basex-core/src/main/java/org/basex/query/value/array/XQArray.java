@@ -66,9 +66,10 @@ public abstract class XQArray extends XQStruct {
   }
 
   /**
-   * Gets the value at the given position in this array.
-   * @param index index of the value to get
-   * @return the corresponding value
+   * Returns the value at the given position.
+   * The specified value must be lie within the valid bounds.
+   * @param index index position
+   * @return value
    */
   public abstract Value memberAt(long index);
 
@@ -107,41 +108,11 @@ public abstract class XQArray extends XQStruct {
   }
 
   /**
-   * Returns a copy of this array where the value at the given position is
-   * replaced by the given value.
-   * @param pos position of the value to replace
-   * @param value value to put into this array
-   * @return resulting array
-   */
-  public abstract XQArray put(long pos, Value value);
-
-  /**
-   * Appends a member.
-   * @param member member to append
-   * @param qc query context
-   * @return resulting value
-   */
-  public final XQArray appendMember(final Value member, final QueryContext qc) {
-    return insertMember(structSize(), member, qc);
-  }
-
-  /**
-   * Inserts the given value at the given position into this array.
-   * By default, the array will be converted to the tree representation,
-   * because its runtime outweighs the possibly higher memory consumption.
-   * @param pos insertion position, must be between {@code 0} and {@code arraySize()}
-   * @param value value to insert
-   * @param qc query context
-   * @return resulting array
-   */
-  public abstract XQArray insertMember(long pos, Value value, QueryContext qc);
-
-  /**
-   * Returns a subsequence of this array with the given start and length.
+   * Returns a subsequence with the given start and length.
    * @param pos starting position
    * @param length number of items
    * @param qc query context
-   * @return sub sequence
+   * @return new subarray
    */
   public final XQArray subArray(final long pos, final long length, final QueryContext qc) {
     return length == 0 ? empty() :
@@ -151,28 +122,54 @@ public abstract class XQArray extends XQStruct {
   }
 
   /**
-   * Returns a subsequence of this array with the given start and length.
-   * @param pos position of first member
-   * @param length number of members
+   * Returns a subsequence with the given start and length.
+   * @param pos position of first member (>= 0)
+   * @param length number of members 1 < length < size())
    * @param qc query context
-   * @return the sub-array
+   * @return new subarray
    */
   protected abstract XQArray subArr(long pos, long length, QueryContext qc);
 
   /**
-   * Removes the member at the given position in this array.
-   * By default, the array will be converted to the tree representation,
-   * because its runtime outweighs the possibly higher memory consumption.
-   * @param pos deletion position, must be between {@code 0} and {@code arraySize() - 1}
+   * Returns a copy of this array where the value at the given position is
+   * replaced by the given value.
+   * @param pos position of the value to replace
+   * @param value value to put into this array
+   * @return new array
+   */
+  public abstract XQArray put(long pos, Value value);
+
+  /**
+   * Appends a value.
+   * @param value value to append
    * @param qc query context
-   * @return resulting array
+   * @return new array
+   */
+  public final XQArray appendMember(final Value value, final QueryContext qc) {
+    return insertMember(structSize(), value, qc);
+  }
+
+  /**
+   * Inserts a value at the given position.
+   * @param pos insertion position, must be between 0 and {@link #structSize()}
+   * @param value value to insert
+   * @param qc query context
+   * @return new array
+   */
+  public abstract XQArray insertMember(long pos, Value value, QueryContext qc);
+
+  /**
+   * Removes a value at the given position.
+   * @param pos deletion position, must be between 0 and {@link #structSize() - 1}
+   * @param qc query context
+   * @return new array
    */
   public abstract XQArray removeMember(long pos, QueryContext qc);
 
   /**
    * Returns an array with the same values as this one, but their order reversed.
    * @param qc query context
-   * @return reversed version of this array
+   * @return new array
    */
   public XQArray reverseArray(final QueryContext qc) {
     qc.checkStop();
@@ -183,14 +180,14 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  public final void write(final DataOutput out) throws IOException, QueryException {
-    out.writeLong(structSize());
-    for(final Value value : iterable()) Store.write(out, value);
+  public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+    for(final Value value : iterable()) value.cache(lazy, ii);
   }
 
   @Override
-  public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
-    for(final Value value : iterable()) value.cache(lazy, ii);
+  public final void write(final DataOutput out) throws IOException, QueryException {
+    out.writeLong(structSize());
+    for(final Value value : iterable()) Store.write(out, value);
   }
 
   /**

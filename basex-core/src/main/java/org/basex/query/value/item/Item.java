@@ -72,7 +72,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item itemAt(final long pos) {
+  public final Item itemAt(final long index) {
     return this;
   }
 

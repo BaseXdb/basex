@@ -192,8 +192,8 @@ public final class DBNodes extends DBNodeSeq {
   }
 
   @Override
-  public DBNode itemAt(final long pos) {
-    final int pre = pres[(int) pos];
+  public DBNode itemAt(final long index) {
+    final int pre = pres[(int) index];
     return ftpos == null ? new DBNode(data, pre) : new FTPosNode(data, pre, ftpos);
   }
 

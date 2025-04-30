@@ -64,6 +64,30 @@ public abstract class Value extends Expr implements Iterable<Item> {
     return this;
   }
 
+  /**
+   * Tests if this is an empty sequence.
+   * @return result of check
+   */
+  public boolean isEmpty() {
+    return false;
+  }
+
+  /**
+   * Tests if this is an item.
+   * @return result of check
+   */
+  public boolean isItem() {
+    return false;
+  }
+
+  /**
+   * Returns the item at the given position.
+   * The specified value must be lie within the valid bounds.
+   * @param index index position
+   * @return item
+   */
+  public abstract Item itemAt(long index);
+
   @Override
   public final BasicIter<Item> iter(final QueryContext qc) {
     return iter();
@@ -86,45 +110,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Returns a materialized version of this value without dependencies to persistent data.
-   * Raises an error if the value contains function items.
-   * @param test test to check if a node can be adopted unchanged
-   * @param ii input info (can be {@code null})
-   * @param qc query context
-   * @return materialized value
-   * @throws QueryException query exception
-   */
-  public abstract Value materialize(Predicate<Data> test, InputInfo ii, QueryContext qc)
-      throws QueryException;
-
-  /**
-   * Checks if this value is materialized, i.e., contains no persistent database nodes or
-   * function items.
-   * @param test test to check if a node can be adopted unchanged
-   * @param ii input info (can be {@code null})
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public abstract boolean materialized(Predicate<Data> test, InputInfo ii) throws QueryException;
-
-  /**
-   * Tests if this is an empty sequence.
-   * @return result of check
-   */
-  public boolean isEmpty() {
-    return false;
-  }
-
-  /**
-   * Tests if this is an item.
-   * @return result of check
-   */
-  public boolean isItem() {
-    return false;
-  }
-
-  /**
-   * Returns a subsequence of this value with the given start and length.
+   * Returns a subsequence with the given start and length.
    * The following properties must hold:
    * <ul>
    *   <li>{@code pos >= 0},
@@ -134,7 +120,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * @param pos starting position
    * @param length number of items
    * @param qc query context
-   * @return sub sequence
+   * @return new subsequence
    */
   public final Value subsequence(final long pos, final long length, final QueryContext qc) {
     return length == 0 ? Empty.VALUE :
@@ -144,11 +130,31 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
+   * Returns a subsequence with the given start and length.
+   * @param pos position of first item (>= 0)
+   * @param length number of items (1 < length < size())
+   * @param qc query context
+   * @return new subsequence
+   */
+  protected abstract Value subSeq(long pos, long length, QueryContext qc);
+
+
+  /**
+   * Appends a value.
+   * @param value value to append
+   * @param qc query context
+   * @return new value
+   */
+  public final Value append(final Value value, final QueryContext qc) {
+    return insert(size(), value, qc);
+  }
+
+  /**
    * Inserts a value at the given position.
-   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
+   * @param pos insertion position, must be between 0 and {@link #size()}
    * @param value value to insert
    * @param qc query context
-   * @return resulting value
+   * @return new value
    */
   public final Value insert(final long pos, final Value value, final QueryContext qc) {
     final long size = size(), vsize = value.size();
@@ -159,40 +165,21 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Returns a subsequence of this value with the given start and length.
-   * @param pos position of first item (>= 0)
-   * @param length number of items (1 < length < size())
+   * Inserts a value at the given position.
+   * @param pos insertion position, must be between 0 and {@link #size()}
+   * @param value value to insert
    * @param qc query context
-   * @return sub sequence
+   * @return new value
    */
-  protected abstract Value subSeq(long pos, long length, QueryContext qc);
+  public abstract Value insertValue(long pos, Value value, QueryContext qc);
 
   /**
    * Removes an item at the given position.
-   * @param pos position of the item to remove, must be between 0 and {@link #size} - 1
+   * @param pos deletion position, must be between 0 and {@link #size()} - 1
    * @param qc query context
-   * @return resulting sequence
+   * @return new sequence
    */
   public abstract Value removeItem(long pos, QueryContext qc);
-
-  /**
-   * Appends a value.
-   * @param value value to append
-   * @param qc query context
-   * @return resulting value
-   */
-  public final Value append(final Value value, final QueryContext qc) {
-    return insert(size(), value, qc);
-  }
-
-  /**
-   * Inserts a value at the given position into this sequence and returns the resulting sequence.
-   * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
-   * @param value value to insert
-   * @param qc query context
-   * @return resulting value
-   */
-  public abstract Value insertValue(long pos, Value value, QueryContext qc);
 
   /**
    * Caches data of lazy items (i.e., those implementing the {@link Lazy} interface).
@@ -235,6 +222,28 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public Value copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return this;
   }
+
+  /**
+   * Returns a materialized version of this value without dependencies to persistent data.
+   * Raises an error if the value contains function items.
+   * @param test test to check if a node can be adopted unchanged
+   * @param ii input info (can be {@code null})
+   * @param qc query context
+   * @return materialized value
+   * @throws QueryException query exception
+   */
+  public abstract Value materialize(Predicate<Data> test, InputInfo ii, QueryContext qc)
+      throws QueryException;
+
+  /**
+   * Checks if this value is materialized, i.e., contains no persistent database nodes or
+   * function items.
+   * @param test test to check if a node can be adopted unchanged
+   * @param ii input info (can be {@code null})
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public abstract boolean materialized(Predicate<Data> test, InputInfo ii) throws QueryException;
 
   /**
    * Serializes the value, using the standard XML serializer,
@@ -287,14 +296,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract boolean sameType();
 
   /**
-   * Returns the item at the given position in the value.
-   * The specified value must be lie within the valid bounds.
-   * @param pos position
-   * @return item
-   */
-  public abstract Item itemAt(long pos);
-
-  /**
    * Returns all items of this value in reverse order.
    * @param qc query context
    * @return items in reverse order
@@ -317,6 +318,17 @@ public abstract class Value extends Expr implements Iterable<Item> {
     refineType();
     final Value compact = get(size(), type, this);
     return compact != null ? compact : this;
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    final Data data = data();
+    return data == null || visitor.lock(data.meta.name);
+  }
+
+  @Override
+  public final int exprSize() {
+    return 1;
   }
 
   /**
@@ -366,16 +378,5 @@ public abstract class Value extends Expr implements Iterable<Item> {
       tp = tp == null ? tp2 : tp.union(tp2);
     }
     value.type = tp;
-  }
-
-  @Override
-  public boolean accept(final ASTVisitor visitor) {
-    final Data data = data();
-    return data == null || visitor.lock(data.meta.name);
-  }
-
-  @Override
-  public final int exprSize() {
-    return 1;
   }
 }
