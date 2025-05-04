@@ -39,13 +39,6 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
   /** Element counter. */
   int nodes;
 
-  static {
-    // needed for XMLEntityManager: increase entity limit
-    System.setProperty("entityExpansionLimit", "536870912");
-    // needed for frequently visited sites: modify user agent
-    System.setProperty("http.agent", "sax");
-  }
-
   /**
    * Constructor.
    * @param builder builder reference
