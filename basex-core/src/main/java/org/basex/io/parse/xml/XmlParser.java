@@ -87,7 +87,8 @@ public final class XmlParser {
       f.setSchema(schemaFactory.newSchema());
     }
     XMLReader xmlReader = f.newSAXParser().getXMLReader();
-    if(entExpansion != null) {
+    // temporary fix; ensures that other XML parsers do not reject the property
+    if(entExpansion != null && entExpansion != 64000) {
       xmlReader.setProperty("http://www.oracle.com/xml/jaxp/properties/entityExpansionLimit",
         entExpansion);
     }
