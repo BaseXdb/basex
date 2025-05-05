@@ -123,7 +123,7 @@ public class QueryException extends Exception {
    * Returns the column number of the error.
    * @return column number, or {@code 0} if unknown
    */
-  public final int column() {
+  public final long column() {
     return info == null ? 0 : info.column();
   }
 
@@ -139,7 +139,7 @@ public class QueryException extends Exception {
    * Returns the line number of the error.
    * @return line number, or {@code 0} if unknown
    */
-  public final int line() {
+  public final long line() {
     return info == null ? 0 : info.line();
   }
 

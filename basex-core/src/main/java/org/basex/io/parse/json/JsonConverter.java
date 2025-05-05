@@ -92,7 +92,7 @@ public abstract class JsonConverter {
   public final Value convert(final IO input) throws QueryException, IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
     try(NewlineInput ni = new NewlineInput(input)) {
-      return convert(ni.encoding(encoding).cache().toString(), input.url(), null);
+      return convert(ni.encoding(encoding), input.url(), null);
     }
   }
 
@@ -104,11 +104,15 @@ public abstract class JsonConverter {
    * @return result
    * @throws QueryException query exception
    */
-  public final Value convert(final String input, final String uri,
+  public final Value convert(final TextInput input, final String uri,
       final QueryContext qc) throws QueryException {
     qctx = qc;
     init(uri);
-    new JsonParser(input, jopts, this).parse();
+    try {
+      new JsonParser(input, jopts, this).parse();
+    } catch(IOException ex) {
+      throw new QueryException(ex);
+    }
     return finish();
   }
 
