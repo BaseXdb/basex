@@ -57,9 +57,9 @@ public abstract class ALookup extends Arr {
           value = ((FuncItem) value).toMethod(struct);
         }
       } else {
-        if(!deep || key.type.isNumber()) {
-          value = ((XQArray) struct).getOrNull(key, qc, info);
-        }
+        final Item index = !deep ? key :
+          key.type.isNumber() ? (Item) SeqType.INTEGER_O.cast(key, false, qc, info) : null;
+        if(index != null) value = ((XQArray) struct).getOrNull(index, qc, info);
       }
       if(value != null) vb.add(value);
     }
