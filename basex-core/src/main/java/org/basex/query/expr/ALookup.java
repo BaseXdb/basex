@@ -57,7 +57,7 @@ public abstract class ALookup extends Arr {
           value = ((FuncItem) value).toMethod(struct);
         }
       } else {
-        if(!deep || key.type.isNumberOrUntyped()) {
+        if(!deep || key.type.isNumber()) {
           value = ((XQArray) struct).getOrNull(key, qc, info);
         }
       }
