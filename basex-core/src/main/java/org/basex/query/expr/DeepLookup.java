@@ -3,7 +3,10 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -49,6 +52,21 @@ public final class DeepLookup extends ALookup {
   private void add(final Item item, final ValueBuilder vb, final QueryContext qc)
       throws QueryException {
     if(item instanceof XQStruct) {
+      if(item instanceof XQArray) {
+        final XQArray array = (XQArray) item;
+        if(((ArrayType) array.type).valueType().mayBeStruct()) {
+          // process members individually to preserve order
+          final long size = array.structSize();
+          for(long key = 0; key < size; ++key) {
+            final Value val = array.memberAt(key);
+            vb.add(valueFor(XQMap.get(Int.get(key + 1), val), true, qc));
+            for(final Item it : val) {
+              add(it, vb, qc);
+            }
+          }
+          return;
+        }
+      }
       vb.add(valueFor(item, true, qc));
       for(final Item it : ((XQStruct) item).items(qc)) {
         add(it, vb, qc);

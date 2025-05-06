@@ -668,6 +668,15 @@ public final class SeqType {
   }
 
   /**
+   * Tests if expressions of this type may yield maps or arrays.
+   * @return result of check
+   */
+  public boolean mayBeStruct() {
+    return !zero() && (type instanceof ArrayType || ARRAY.instanceOf(type)
+        || type instanceof MapType || MAP.instanceOf(type));
+  }
+
+  /**
    * Tests if expressions of this type may yield functions.
    * @return result of check
    */
