@@ -28,6 +28,7 @@ import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.expr.*;
@@ -2378,19 +2379,36 @@ public class QueryParser extends InputParser {
           expr = new StructFilter(info(), expr, el.finish());
         } else if(current('(')) {
           expr = Functions.dynamic(expr, argumentList(false, null));
+        } else if(current('?')) {
+          expr = lookup(expr);
+          if(expr == null) break;
         } else {
-          final int p = pos;
-          if(consume("?") && !consume(':')) {
-            // parses the "Lookup" rule
-            expr = new Lookup(info(), expr, keySpecifier());
-          } else {
-            pos = p;
-            break;
-          }
+          break;
         }
       }
     }
     return expr;
+  }
+
+  /**
+   * Parses the "Lookup" rule.
+   * @param expr expression (can be {@code null})
+   * @return query expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr lookup(final Expr expr) throws QueryException {
+    final int p = pos;
+    if(consume('?')) {
+      final boolean deep = consume('?');
+      if(deep || !(wsConsume(",") || consume(")"))) {
+        final InputInfo info = info();
+        final Expr ctx = expr != null ? expr : new ContextValue(info);
+        final Expr spec = keySpecifier();
+        return deep ? new DeepLookup(info, ctx, spec) : new Lookup(info, ctx, spec);
+      }
+    }
+    pos = p;
+    return null;
   }
 
   /**
@@ -2431,13 +2449,9 @@ public class QueryParser extends InputParser {
     // ordered expression
     if(wsConsumeWs(ORDERED, null, "{") || wsConsumeWs(UNORDERED, null, "{")) return enclosedExpr();
     // unary lookup
-    final int p = pos;
-    if(consume("?")) {
-      if(!wsConsume(",") && !consume(")")) {
-        final InputInfo ii = info();
-        return new Lookup(ii, new ContextValue(ii), keySpecifier());
-      }
-      pos = p;
+    if(current('?')) {
+      final Expr lookup = lookup(null);
+      if(lookup != null) return lookup;
     }
     // context value
     if(cp == '.') {
@@ -2457,7 +2471,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr keySpecifier() throws QueryException {
-    if(wsConsume("*")) return Lookup.WILDCARD;
+    if(wsConsume("*")) return ALookup.WILDCARD;
     final int cp = current();
     if(cp == '(') return parenthesized();
     if(cp == '$') return varRef();
