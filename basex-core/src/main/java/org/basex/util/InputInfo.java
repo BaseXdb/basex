@@ -25,9 +25,9 @@ public final class InputInfo {
   /** Input string as codepoints (can be {@code null}). */
   private int[] input;
   /** Line number ({@code 0} if not initialized). */
-  private long line;
+  private int line;
   /** Column number or (if not initialized) string position. */
-  private long column;
+  private int column;
 
   /**
    * Constructor.
@@ -55,7 +55,7 @@ public final class InputInfo {
    * @param line line
    * @param col column
    */
-  public InputInfo(final String path, final long line, final long col) {
+  public InputInfo(final String path, final int line, final int col) {
     this.path = path;
     this.line = line;
     this.column = col;
@@ -73,7 +73,7 @@ public final class InputInfo {
    * Returns the line position.
    * @return line position
    */
-  public long line() {
+  public int line() {
     init();
     return line;
   }
@@ -82,7 +82,7 @@ public final class InputInfo {
    * Returns the column position.
    * @return column position
    */
-  public long column() {
+  public int column() {
     init();
     return column;
   }
@@ -102,7 +102,7 @@ public final class InputInfo {
     // positions have already been calculated
     if(line != 0) return;
 
-    final int cl = Math.min((int) column, input.length);
+    final int cl = Math.min(column, input.length);
     int l = 1, c = 1;
     for(int i = 0; i < cl; i++) {
       final int cp = input[i];
@@ -139,8 +139,7 @@ public final class InputInfo {
 
   @Override
   public int hashCode() {
-    return (path != null ? path.hashCode() : Arrays.hashCode(input))
-        + ((int) column() ^ (int) line());
+    return (path != null ? path.hashCode() : Arrays.hashCode(input)) + (column() ^ line());
   }
 
   @Override

@@ -4,7 +4,6 @@ import java.io.*;
 
 import org.basex.build.json.*;
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -48,7 +47,7 @@ final class JsonStringConverter extends JsonConverter {
     jopts.set(JsonParserOptions.LIBERAL, liberal);
     jopts.set(JsonParserOptions.ESCAPE, escape);
     final JsonStringConverter jsc = new JsonStringConverter(jopts, new TokenBuilder());
-    return (String) jsc.convert(new TextInput(new IOContent(json)), "", null).toJava();
+    return (String) jsc.convert(new IOContent(json)).toJava();
   }
 
   @Override

@@ -19,6 +19,7 @@ import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
@@ -204,7 +205,7 @@ public final class QueryContext extends Job implements Closeable {
       qs.parseMain();
       return qs.complete(qs.mark);
     } catch(final QueryException ex) {
-      return qs.complete((int) ex.column() - 1);
+      return qs.complete(ex.column() - 1);
     }
   }
 
@@ -716,13 +717,12 @@ public final class QueryContext extends Job implements Closeable {
     if(type.equalsIgnoreCase(MainParser.JSON.name())) {
       final JsonParserOptions jp = new JsonParserOptions();
       jp.set(JsonOptions.FORMAT, JsonFormat.W3);
-      final TextInput ti;
       try {
-        ti = new TextInput(Token.token(object.toString()));
+        final TextInput ti = new TextInput(new IOContent(object.toString()));
+        return JsonConverter.get(jp).convert(ti, "", null, this);
       } catch(final IOException ex) {
         throw new QueryException(ex);
       }
-      return JsonConverter.get(jp).convert(ti, "", this);
     }
 
     // parse target type

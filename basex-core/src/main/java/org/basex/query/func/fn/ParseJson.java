@@ -70,9 +70,10 @@ public abstract class ParseJson extends ParseFn {
    * @param ti text input
    * @return resulting item
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
   private Value parse(final QueryContext qc, final JsonFormat format, final TextInput ti)
-      throws QueryException {
+      throws QueryException, IOException {
 
     final JsonParserOptions options = toOptions(arg(1), new JsonParserOptions(), qc);
     if(format != null) options.set(JsonOptions.FORMAT, format);
@@ -102,6 +103,6 @@ public abstract class ParseJson extends ParseFn {
       throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.NULL));
     }
     converter.nullValue(nll);
-    return converter.convert(ti, "", qc);
+    return converter.convert(ti, "", info, qc);
   }
 }

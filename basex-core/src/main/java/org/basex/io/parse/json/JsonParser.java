@@ -19,6 +19,7 @@ import org.basex.util.hash.*;
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
+ * @author Gunther Rademacher
  */
 public final class JsonParser {
   /** Names of control characters not allowed in string literals. */
@@ -42,6 +43,9 @@ public final class JsonParser {
   private final TokenBuilder tb = new TokenBuilder();
   /** Input stream. */
   private final TextInput input;
+
+  /** Input info. */
+  private InputInfo info;
   /** Current code point. */
   private int current;
   /** Input position. */
@@ -60,30 +64,29 @@ public final class JsonParser {
    * @param conv converter
    */
   public JsonParser(final TextInput input, final JsonParserOptions opts, final JsonConverter conv) {
+    this.input = input;
+    this.conv = conv;
     liberal = opts.get(JsonParserOptions.LIBERAL);
     escape = opts.get(JsonParserOptions.ESCAPE);
     final JsonDuplicates dupl = opts.get(JsonParserOptions.DUPLICATES);
     final JsonFormat jf = opts.get(JsonOptions.FORMAT);
     duplicates = dupl != null ? dupl : jf == JsonFormat.W3_XML || jf == JsonFormat.BASIC ?
       JsonDuplicates.RETAIN : JsonDuplicates.USE_FIRST;
-    this.conv = conv;
-    this.input = input;
   }
 
   /**
    * Parses a JSON expression.
+   * @param ii input info (can be @null)
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  public void parse() throws QueryException, IOException {
+  public void parse(final InputInfo ii) throws QueryException, IOException {
+    info = ii;
     try {
       current = input.read();
       consume('\uFEFF');
       skipWs();
       value();
-    } catch(InputException ex) {
-      if(ex instanceof DecodingException) throw WHICHCHARS_X.get(info(), ex);
-      throw PARSE_JSON_X.get(info(), ex.getMessage());
     } catch(final StackOverflowError er) {
       Util.debug(er);
       throw error("Input is too deeply nested");
@@ -331,7 +334,6 @@ public final class JsonParser {
               else throw error("Illegal hexadecimal digit: %", currentAsString());
             }
             break;
-
           default:
             throw error("Unknown character escape: %", currentAsString());
         }
@@ -461,15 +463,7 @@ public final class JsonParser {
    * @return query exception
    */
   private QueryException error(final QueryError err, final String msg, final Object... ext) {
-    return err.get(info(), line, col, Util.inf(msg, ext));
-  }
-
-  /**
-   * Creates input information.
-   * @return input info
-   */
-  public InputInfo info() {
-    return new InputInfo(input.io().path(), (int) line, (int) col);
+    return err.get(info, line, col, Util.inf(msg, ext));
   }
 
   /**

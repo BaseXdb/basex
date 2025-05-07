@@ -123,8 +123,8 @@ public abstract class CsvConverter extends Job {
    */
   public final Value convert(final TextInput input, final String uri, final InputInfo ii,
       final QueryContext qc) throws QueryException, IOException {
-    init(uri);
     ti = input;
+    init(uri);
     new CsvParser(input, copts, this).parse(ii);
     return finish(ii, qc);
   }
