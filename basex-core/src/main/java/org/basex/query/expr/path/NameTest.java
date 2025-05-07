@@ -80,14 +80,14 @@ public final class NameTest extends Test {
   @Override
   public boolean matches(final ANode node) {
     if(node.type != type) return false;
-    switch(part()) {
+    return switch(part()) {
       // namespaces wildcard: only check local name
-      case LOCAL: return Token.eq(local, Token.local(node.name()));
+      case LOCAL -> Token.eq(local, Token.local(node.name()));
       // name wildcard: only check namespace
-      case URI: return Token.eq(qname.uri(), node.qname().uri());
+      case URI -> Token.eq(qname.uri(), node.qname().uri());
       // check attributes, or check everything
-      default: return qname.eq(node.qname());
-    }
+      default -> qname.eq(node.qname());
+    };
   }
 
   /**
@@ -96,14 +96,14 @@ public final class NameTest extends Test {
    * @return result of check
    */
   public boolean matches(final QNm qName) {
-    switch(part()) {
+    return switch(part()) {
       // namespaces wildcard: only check local name
-      case LOCAL: return Token.eq(local, qName.local());
+      case LOCAL -> Token.eq(local, qName.local());
       // name wildcard: only check namespace
-      case URI: return Token.eq(qname.uri(), qName.uri());
+      case URI -> Token.eq(qname.uri(), qName.uri());
       // check everything
-      default: return qname.eq(qName);
-    }
+      default -> qname.eq(qName);
+    };
   }
 
   @Override
@@ -127,31 +127,24 @@ public final class NameTest extends Test {
   @Override
   public boolean instanceOf(final Test test) {
     if(!(test instanceof final NameTest nt)) return super.instanceOf(test);
-    if(type != nt.type) return false;
-    switch(nt.part) {
-      case FULL:
-        switch(part) {
-          case FULL: return qname.eq(nt.qname);
-          case LOCAL:
-          case URI: return false;
-          default: throw Util.notExpected();
-        }
-      case LOCAL:
-        switch(part) {
-          case LOCAL:
-          case FULL: return Token.eq(qname.local(), nt.qname.local());
-          case URI: return false;
-          default: throw Util.notExpected();
-        }
-      case URI:
-        switch(part) {
-          case URI:
-          case FULL: return Token.eq(qname.uri(), nt.qname.uri());
-          case LOCAL: return false;
-          default: throw Util.notExpected();
-        }
-      default: throw Util.notExpected();
-    }
+    return type == nt.type && switch(nt.part) {
+      case FULL -> switch(part) {
+        case FULL       -> qname.eq(nt.qname);
+        case LOCAL, URI -> false;
+        default         -> throw Util.notExpected();
+      };
+      case LOCAL -> switch(part) {
+        case LOCAL, FULL -> Token.eq(qname.local(), nt.qname.local());
+        case URI         -> false;
+        default          -> throw Util.notExpected();
+      };
+      case URI -> switch(part) {
+        case URI, FULL -> Token.eq(qname.uri(), nt.qname.uri());
+        case LOCAL     -> false;
+        default        -> throw Util.notExpected();
+      };
+      default -> throw Util.notExpected();
+    };
   }
 
   @Override

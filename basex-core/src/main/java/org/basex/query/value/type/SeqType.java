@@ -464,7 +464,7 @@ public final class SeqType {
       final CompileContext cc, final InputInfo info) throws QueryException {
 
     // instance check
-    final SeqType[] at = type instanceof FuncType ft ? ft.argTypes : null;
+    final SeqType[] at = type instanceof final FuncType ft ? ft.argTypes : null;
     if((at == null || ((Checks<SeqType>) st -> st.eq(ITEM_ZM)).all(at)) && instance(value, true))
       return value;
 
@@ -545,7 +545,7 @@ public final class SeqType {
       vb.add(map.coerceTo(rt, qc, cc, info));
     } else if(item instanceof final XQMap map && type instanceof final MapType mt) {
       vb.add(map.coerceTo(mt, qc, cc, info));
-    } else if(item instanceof FItem fitem && type instanceof FuncType ft) {
+    } else if(item instanceof final FItem fitem && type instanceof final FuncType ft) {
       vb.add(fitem.coerceTo(type == FUNCTION ? item.funcType() : ft, qc, cc, info));
     } else {
       throw error.get();

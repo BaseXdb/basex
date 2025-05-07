@@ -30,12 +30,12 @@ public enum Calc {
 
       // numbers or untyped values
       if(num1) {
-        switch(numType(type1, type2)) {
-          case INTEGER: return addInt(item1, item2, info);
-          case DOUBLE:  return addDbl(item1, item2, info);
-          case FLOAT: return addFlt(item1, item2, info);
-          default: return addDec(item1, item2, info);
-        }
+        return switch(numType(type1, type2)) {
+          case INTEGER -> addInt(item1, item2, info);
+          case DOUBLE  -> addDbl(item1, item2, info);
+          case FLOAT   -> addFlt(item1, item2, info);
+          default      -> addDec(item1, item2, info);
+        };
       }
 
       // dates or durations
@@ -107,12 +107,12 @@ public enum Calc {
 
       // numbers or untyped values
       if(num1) {
-        switch(numType(type1, type2)) {
-          case INTEGER: return subtractInt(item1, item2, info);
-          case DOUBLE:  return subtractDbl(item1, item2, info);
-          case FLOAT: return subtractFlt(item1, item2, info);
-          default: return subtractDec(item1, item2, info);
-        }
+        return switch(numType(type1, type2)) {
+          case INTEGER -> subtractInt(item1, item2, info);
+          case DOUBLE  -> subtractDbl(item1, item2, info);
+          case FLOAT   -> subtractFlt(item1, item2, info);
+          default      -> subtractDec(item1, item2, info);
+        };
       }
 
       // dates or durations
@@ -202,12 +202,12 @@ public enum Calc {
       if(num1 ^ num2) throw typeError(info, type1, type2);
       // numbers or untyped values
       if(num1) {
-        switch(numType(type1, type2)) {
-          case INTEGER: return multiplyInt(item1, item2, info);
-          case DOUBLE:  return multiplyDbl(item1, item2, info);
-          case FLOAT: return multiplyFlt(item1, item2, info);
-          default: return multiplyDec(item1, item2, info);
-        }
+        return switch(numType(type1, type2)) {
+          case INTEGER -> multiplyInt(item1, item2, info);
+          case DOUBLE  -> multiplyDbl(item1, item2, info);
+          case FLOAT   -> multiplyFlt(item1, item2, info);
+          default      -> multiplyDec(item1, item2, info);
+        };
       }
       throw numberError(item1, info);
     }
@@ -287,11 +287,11 @@ public enum Calc {
       // numbers or untyped values
       if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
       if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
-      switch(numType(type1, type2)) {
-        case DOUBLE:  return divideDbl(item1, item2, info);
-        case FLOAT: return divideFlt(item1, item2, info);
-        default: return divideDec(item1, item2, info);
-      }
+      return switch(numType(type1, type2)) {
+        case DOUBLE -> divideDbl(item1, item2, info);
+        case FLOAT  -> divideFlt(item1, item2, info);
+        default     -> divideDec(item1, item2, info);
+      };
     }
 
     @Override
@@ -341,12 +341,12 @@ public enum Calc {
       final Type type1 = item1.type, type2 = item2.type;
       if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
       if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
-      switch(numType(type1, type2)) {
-        case INTEGER: return divideIntInt(item1, item2, info);
-        case DOUBLE:  return divideIntDbl(item1, item2, info);
-        case FLOAT: return divideIntFlt(item1, item2, info);
-        default: return divideIntDec(item1, item2, info);
-      }
+      return switch(numType(type1, type2)) {
+        case INTEGER -> divideIntInt(item1, item2, info);
+        case DOUBLE  -> divideIntDbl(item1, item2, info);
+        case FLOAT   -> divideIntFlt(item1, item2, info);
+        default      -> divideIntDec(item1, item2, info);
+      };
     }
 
     @Override
@@ -384,12 +384,12 @@ public enum Calc {
       final Type type1 = item1.type, type2 = item2.type;
       if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
       if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
-      switch(numType(type1, type2)) {
-        case INTEGER: return moduloInt(item1, item2, info);
-        case DOUBLE:  return moduloDbl(item1, item2, info);
-        case FLOAT: return moduloFlt(item1, item2, info);
-        default: return moduloDec(item1, item2, info);
-      }
+      return switch(numType(type1, type2)) {
+        case INTEGER -> moduloInt(item1, item2, info);
+        case DOUBLE  -> moduloDbl(item1, item2, info);
+        case FLOAT   -> moduloFlt(item1, item2, info);
+        default      -> moduloDec(item1, item2, info);
+      };
     }
 
     @Override

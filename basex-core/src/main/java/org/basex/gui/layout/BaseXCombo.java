@@ -313,7 +313,7 @@ public class BaseXCombo extends JComboBox<Object> {
   public void assign() {
     if(optionKey instanceof final NumberOption option) {
       options.set(option, getSelectedIndex());
-    } else if(optionKey instanceof EnumOption option) {
+    } else if(optionKey instanceof final EnumOption option) {
       options.set(option, getSelectedItem());
     } else if(optionKey instanceof final StringOption option) {
       options.set(option, getSelectedItem());

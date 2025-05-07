@@ -86,14 +86,13 @@ public final class CmpSR extends Single {
     if(cmp1.has(Flag.NDT) || !(cmp2 instanceof final AStr str2)) return cmp;
 
     final byte[] d = str2.string(cmp.info);
-    ParseExpr expr = null;
-    switch(cmp.op.value()) {
-      case GE: expr = new CmpSR(cmp1, d,    true,  null, true,  cmp.info); break;
-      case GT: expr = new CmpSR(cmp1, d,    false, null, true,  cmp.info); break;
-      case LE: expr = new CmpSR(cmp1, null, true,  d,    true,  cmp.info); break;
-      case LT: expr = new CmpSR(cmp1, null, true,  d,    false, cmp.info); break;
-      default:
-    }
+    final ParseExpr expr = switch(cmp.op.value()) {
+      case GE -> new CmpSR(cmp1, d,    true,  null, true,  cmp.info);
+      case GT -> new CmpSR(cmp1, d,    false, null, true,  cmp.info);
+      case LE -> new CmpSR(cmp1, null, true,  d,    true,  cmp.info);
+      case LT -> new CmpSR(cmp1, null, true,  d,    false, cmp.info);
+      default -> null;
+    };
     return expr != null ? expr.optimize(cc) : cmp;
   }
 

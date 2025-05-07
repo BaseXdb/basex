@@ -216,17 +216,17 @@ public final class HtmlParser extends XMLParser {
         super.ensureAvailable(options, name, info);
         if(options.contains(HEURISTICS)) {
           switch(options.get(HEURISTICS)) {
-          case ALL:
-            ensureAvailable(ICU_CLASS_NAME, name, info);
-            ensureAvailable(CHARDET_CLASS_NAME, name, info);
-            break;
-          case ICU:
-            ensureAvailable(ICU_CLASS_NAME, name, info);
-            break;
-          case CHARDET:
-            ensureAvailable(CHARDET_CLASS_NAME, name, info);
-            break;
-          default:
+            case ALL:
+              ensureAvailable(ICU_CLASS_NAME, name, info);
+              ensureAvailable(CHARDET_CLASS_NAME, name, info);
+              break;
+            case ICU:
+              ensureAvailable(ICU_CLASS_NAME, name, info);
+              break;
+            case CHARDET:
+              ensureAvailable(CHARDET_CLASS_NAME, name, info);
+              break;
+            default:
           }
         }
       }
@@ -236,17 +236,17 @@ public final class HtmlParser extends XMLParser {
         if(!super.available(options)) return false;
         if(!options.contains(HEURISTICS)) return true;
         switch(options.get(HEURISTICS)) {
-        case ALL:
-          if(!Reflect.available(ICU_CLASS_NAME)) return false;
-          if(!Reflect.available(CHARDET_CLASS_NAME)) return false;
-          break;
-        case ICU:
-          if(!Reflect.available(ICU_CLASS_NAME)) return false;
-          break;
-        case CHARDET:
-          if(!Reflect.available(CHARDET_CLASS_NAME)) return false;
-          break;
-        default:
+          case ALL:
+            if(!Reflect.available(ICU_CLASS_NAME)) return false;
+            if(!Reflect.available(CHARDET_CLASS_NAME)) return false;
+            break;
+          case ICU:
+            if(!Reflect.available(ICU_CLASS_NAME)) return false;
+            break;
+          case CHARDET:
+            if(!Reflect.available(CHARDET_CLASS_NAME)) return false;
+            break;
+          default:
         }
         return true;
       }

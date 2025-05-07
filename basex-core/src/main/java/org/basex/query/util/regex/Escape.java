@@ -52,20 +52,17 @@ public final class Escape extends RegExp {
       final CharRange[] rng = MAP.get(esc);
       return rng != null ? new CharClass(new CharGroup(rng), null) : null;
     }
-
-    final String e;
-    switch(esc.charAt(1)) {
-      case 'i': e = '[' + INITIAL + ']';     break;
-      case 'I': e = '[' + NOT_INITIAL + ']'; break;
-      case 'c': e = '[' + CHAR + ']';        break;
-      case 'C': e = '[' + NOT_CHAR + ']';    break;
-      case 'd': e =       DIGIT;             break;
-      case 'D': e =       NOT_DIGIT;         break;
-      case 'w': e = '[' + WORD + ']';        break;
-      case 'W': e = '[' + NOT_WORD + ']';    break;
-      default: e = esc;
-    }
-    return new Escape(e);
+    return new Escape(switch(esc.charAt(1)) {
+      case 'i' -> '[' + INITIAL + ']';
+      case 'I' -> '[' + NOT_INITIAL + ']';
+      case 'c' -> '[' + CHAR + ']';
+      case 'C' -> '[' + NOT_CHAR + ']';
+      case 'd' -> DIGIT;
+      case 'D' -> NOT_DIGIT;
+      case 'w' -> '[' + WORD + ']';
+      case 'W' -> '[' + NOT_WORD + ']';
+      default  -> esc;
+    });
   }
 
   /**
@@ -74,12 +71,12 @@ public final class Escape extends RegExp {
    * @return the escaped char
    */
   public static char getCp(final String single) {
-    switch(single.charAt(1)) {
-      case 'n': return '\n';
-      case 'r': return '\r';
-      case 't': return '\t';
-      default:  return single.charAt(1);
-    }
+    return switch(single.charAt(1)) {
+      case 'n' -> '\n';
+      case 'r' -> '\r';
+      case 't' -> '\t';
+      default  -> single.charAt(1);
+    };
   }
 
   /**
@@ -93,18 +90,17 @@ public final class Escape extends RegExp {
       if(rng != null) return rng;
     }
     if(esc.length() > 2) return new RegExp[] { new Escape(esc) };
-    final String e;
-    switch(esc.charAt(1)) {
-      case 'i': e = INITIAL;     break;
-      case 'I': e = NOT_INITIAL; break;
-      case 'c': e = CHAR;        break;
-      case 'C': e = NOT_CHAR;    break;
-      case 'd': e = DIGIT;       break;
-      case 'D': e = NOT_DIGIT;   break;
-      case 'w': e = WORD;        break;
-      case 'W': e = NOT_WORD;    break;
-      default: e = esc;
-    }
+    final String e = switch(esc.charAt(1)) {
+      case 'i' -> INITIAL;
+      case 'I' -> NOT_INITIAL;
+      case 'c' -> CHAR;
+      case 'C' -> NOT_CHAR;
+      case 'd' -> DIGIT;
+      case 'D' -> NOT_DIGIT;
+      case 'w' -> WORD;
+      case 'W' -> NOT_WORD;
+      default  -> esc;
+    };
     return new RegExp[] { new Escape(e) };
   }
 
@@ -191,22 +187,13 @@ public final class Escape extends RegExp {
    * @return char representation
    */
   static char[] escape(final int cp) {
-    switch(cp) {
-      case '[':
-      case ']':
-      case '-':
-      case '\\':
-      case '^':
-        return new char[] { '\\', (char) cp };
-      case '\n':
-        return new char[] { '\\', 'n' };
-      case '\r':
-        return new char[] { '\\', 'r' };
-      case '\t':
-        return new char[] { '\\', 't' };
-      default:
-        return Character.toChars(cp);
-    }
+    return switch(cp) {
+      case '[', ']', '-', '\\', '^' -> new char[] { '\\', (char) cp };
+      case '\n' -> new char[] { '\\', 'n' };
+      case '\r' -> new char[] { '\\', 'r' };
+      case '\t' -> new char[] { '\\', 't' };
+      default -> Character.toChars(cp);
+    };
   }
 
   /**

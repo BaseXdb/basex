@@ -258,18 +258,17 @@ abstract class RegExFn extends StandardFunc {
      * @return next token
      */
     private Token nxtToken() {
-      switch (nxtCp()) {
+      switch(nxtCp()) {
         case -1: return Token.EOP;
         case ']': return Token.RBRACKET;
         case '[': return Token.LBRACKET;
         case ')': return Token.RPAREN;
-        case '\\':
-          switch (nxtCp()) {
-            case -1: return Token.EOP;
-            case 'Q': return Token.LQUOTE;
-            case 'E': return Token.RQUOTE;
-            default: return Token.OTHER;
-          }
+        case '\\': return switch(nxtCp()) {
+          case -1 -> Token.EOP;
+          case 'Q' -> Token.LQUOTE;
+          case 'E' -> Token.RQUOTE;
+          default -> Token.OTHER;
+        };
         case '(':
           switch(nxtCp()) {
             case '?':
@@ -278,14 +277,13 @@ abstract class RegExFn extends StandardFunc {
                 case '!':
                   return Token.ASSRT_LPAREN;
                 case '<':
-                  switch(nxtCp()) {
-                    case '=':
-                    case '!':
-                      return Token.ASSRT_LPAREN;
-                    default:
+                  return switch(nxtCp()) {
+                    case '=', '!' -> Token.ASSRT_LPAREN;
+                    default -> {
                       reset();
-                      return Token.CAPT_LPAREN;
-                  }
+                      yield Token.CAPT_LPAREN;
+                    }
+                  };
                 default:
                   reset();
                   return Token.LPAREN;

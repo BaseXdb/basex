@@ -190,14 +190,14 @@ public final class Token {
     if(object instanceof final byte[] bytes) return bytes;
     if(object instanceof final ArrayOutput ao) return ao.toArray();
     if(object instanceof final TokenBuilder tb) return tb.toArray();
-    if(object instanceof Supplier<?> supplier) return token(supplier.get());
+    if(object instanceof final Supplier<?> supplier) return token(supplier.get());
 
     final String s;
     if(object == null) {
       s = "null";
     } else if(object instanceof final Throwable th) {
       s = Util.message(th);
-    } else if(object instanceof Class<?> clzz) {
+    } else if(object instanceof final Class<?> clzz) {
       s = Util.className(clzz);
     } else {
       s = object.toString();

@@ -50,9 +50,4 @@ interface TreeConstants {
     /** Parents. */      PARENT,
     /** Connections. */  CONNECTION
   }
-
-  /** Show not enough space text. */
-  byte NOT_ENOUGH_SPACE = 0;
-  /** Show no attributes text. */
-  byte NO_ATTS = 1;
 }

@@ -73,16 +73,16 @@ public abstract class Serializer implements Closeable {
 
     // choose serializer
     final SerializerOptions so = sopts == null ? SerializerMode.DEFAULT.get() : sopts;
-    switch(so.get(SerializerOptions.METHOD)) {
-      case XHTML:    return new XHTMLSerializer(os, so);
-      case HTML:     return new HTMLSerializer(os, so);
-      case TEXT:     return new TextSerializer(os, so);
-      case CSV:      return CsvSerializer.get(os, so);
-      case JSON:     return JsonSerializer.get(os, so);
-      case XML:      return new XMLSerializer(os, so);
-      case ADAPTIVE: return new AdaptiveSerializer(os, so);
-      default:       return new BaseXSerializer(os, so);
-    }
+    return switch(so.get(SerializerOptions.METHOD)) {
+      case XHTML    -> new XHTMLSerializer(os, so);
+      case HTML     -> new HTMLSerializer(os, so);
+      case TEXT     -> new TextSerializer(os, so);
+      case CSV      -> CsvSerializer.get(os, so);
+      case JSON     -> JsonSerializer.get(os, so);
+      case XML      -> new XMLSerializer(os, so);
+      case ADAPTIVE -> new AdaptiveSerializer(os, so);
+      default       -> new BaseXSerializer(os, so);
+    };
   }
 
   // PUBLIC METHODS ===============================================================================
@@ -95,7 +95,7 @@ public abstract class Serializer implements Closeable {
   public void serialize(final Item item) throws IOException {
     if(item instanceof final ANode node) {
       node(node);
-    } else if(item instanceof FItem fitem) {
+    } else if(item instanceof final FItem fitem) {
       function(fitem);
     } else {
       atomic(item);
@@ -339,7 +339,7 @@ public abstract class Serializer implements Closeable {
       return;
     }
 
-    final FTPosData ftData = node instanceof FTPosNode ft ? ft.ftpos : null;
+    final FTPosData ftData = node instanceof final FTPosNode ft ? ft.ftpos : null;
     final boolean nsExist = !data.nspaces.isEmpty();
     final TokenSet nsSet = nsExist ? new TokenSet() : null;
     final IntList parentStack = new IntList();

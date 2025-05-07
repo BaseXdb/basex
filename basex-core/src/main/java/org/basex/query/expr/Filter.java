@@ -50,7 +50,7 @@ public abstract class Filter extends AFilter {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // flatten nested filters
-    if(root instanceof Filter filter) {
+    if(root instanceof final Filter filter) {
       root = filter.root;
       exprs = ExprList.concat(filter.exprs, exprs);
     }
@@ -218,7 +218,8 @@ public abstract class Filter extends AFilter {
 
   @Override
   public final boolean equals(final Object obj) {
-    return this == obj || obj instanceof Filter fltr && root.equals(fltr.root) && super.equals(obj);
+    return this == obj || obj instanceof final Filter fltr && root.equals(fltr.root) &&
+        super.equals(obj);
   }
 
   @Override

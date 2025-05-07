@@ -295,30 +295,22 @@ public abstract class Step extends Preds {
     final NodeType type = test.type;
     if(type.oneOf(NodeType.NODE, NodeType.SCHEMA_ATTRIBUTE, NodeType.SCHEMA_ELEMENT)) return false;
 
-    switch(axis) {
+    return switch(axis) {
       // attribute::element()
-      case ATTRIBUTE:
-        return type != NodeType.ATTRIBUTE;
-      case ANCESTOR:
+      case ATTRIBUTE ->
+        type != NodeType.ATTRIBUTE;
       // parent::comment()
-      case PARENT:
-        return type.oneOf(NodeType.LEAF_TYPES);
+      case ANCESTOR, PARENT ->
+        type.oneOf(NodeType.LEAF_TYPES);
       // child::attribute()
-      case CHILD:
-      case DESCENDANT:
-      case FOLLOWING:
-      case FOLLOWING_OR_SELF:
-      case FOLLOWING_SIBLING:
-      case FOLLOWING_SIBLING_OR_SELF:
-      case PRECEDING:
-      case PRECEDING_OR_SELF:
-      case PRECEDING_SIBLING:
-      case PRECEDING_SIBLING_OR_SELF:
-        return type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE_ELEMENT,
-            NodeType.DOCUMENT_NODE, NodeType.NAMESPACE_NODE);
-      default:
-        return false;
-    }
+      case CHILD, DESCENDANT, FOLLOWING, FOLLOWING_OR_SELF, FOLLOWING_SIBLING,
+           FOLLOWING_SIBLING_OR_SELF, PRECEDING, PRECEDING_OR_SELF, PRECEDING_SIBLING,
+           PRECEDING_SIBLING_OR_SELF ->
+        type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE_ELEMENT, NodeType.DOCUMENT_NODE,
+            NodeType.NAMESPACE_NODE);
+      default ->
+        false;
+    };
   }
 
   /**
@@ -331,48 +323,40 @@ public abstract class Step extends Preds {
     final Type inputType = seqType.type;
     final NodeType type = test.type;
     if(inputType.instanceOf(NodeType.DOCUMENT_NODE) && ((Check) () -> {
-      switch(axis) {
-        case SELF:
-        case ANCESTOR_OR_SELF:
-        case FOLLOWING_OR_SELF:
-        case FOLLOWING_SIBLING_OR_SELF:
-        case PRECEDING_OR_SELF:
-        case PRECEDING_SIBLING_OR_SELF:
-          return !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
-        case CHILD:
-        case DESCENDANT:
-          return type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ATTRIBUTE);
-        case DESCENDANT_OR_SELF:
-          return type == NodeType.ATTRIBUTE;
-        default:
-          return true;
-      }
+      return switch(axis) {
+        case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
+             PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
+          !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
+        case CHILD, DESCENDANT ->
+          type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ATTRIBUTE);
+        case DESCENDANT_OR_SELF ->
+          type == NodeType.ATTRIBUTE;
+        default ->
+          true;
+      };
     }).ok()) return true;
 
     // check step after any other expression
-    switch(axis) {
+    return switch(axis) {
       // $element/self::text(), ...
-      case SELF:
-        return test.matches(seqType) == Boolean.FALSE;
+      case SELF ->
+        test.matches(seqType) == Boolean.FALSE;
       // $attribute/descendant::, $text/child::, $comment/attribute::, ...
-      case DESCENDANT:
-      case CHILD:
-      case ATTRIBUTE:
-        return inputType.oneOf(NodeType.LEAF_TYPES);
+      case DESCENDANT, CHILD, ATTRIBUTE ->
+        inputType.oneOf(NodeType.LEAF_TYPES);
       // $text/descendant-or-self::text(), ...
-      case DESCENDANT_OR_SELF:
-        return inputType.oneOf(NodeType.LEAF_TYPES) && type != NodeType.NODE &&
-          !type.instanceOf(inputType);
+      case DESCENDANT_OR_SELF ->
+        inputType.oneOf(NodeType.LEAF_TYPES) && type != NodeType.NODE &&
+        !type.instanceOf(inputType);
       // $attribute/following-sibling::, $attribute/preceding-sibling::
-      case FOLLOWING_SIBLING:
-      case PRECEDING_SIBLING:
-        return inputType == NodeType.ATTRIBUTE;
+      case FOLLOWING_SIBLING, PRECEDING_SIBLING ->
+        inputType == NodeType.ATTRIBUTE;
       // $attribute/parent::document-node()
-      case PARENT:
-        return inputType == NodeType.ATTRIBUTE && type == NodeType.DOCUMENT_NODE;
-      default:
-        return false;
-    }
+      case PARENT ->
+        inputType == NodeType.ATTRIBUTE && type == NodeType.DOCUMENT_NODE;
+      default ->
+        false;
+    };
   }
 
   /**

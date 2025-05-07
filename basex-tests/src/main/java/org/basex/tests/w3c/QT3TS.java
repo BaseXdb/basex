@@ -524,47 +524,21 @@ public final class QT3TS extends Main {
       } else if(type.equals("any-of")) {
         msg = anyOf(result, expected);
       } else if(result.value != null) {
-        switch(type) {
-          case "assert":
-            msg = assertQuery(result, expected);
-            break;
-          case "assert-count":
-            msg = assertCount(result, expected);
-            break;
-          case "assert-deep-eq":
-            msg = assertDeepEq(result, expected);
-            break;
-          case "assert-empty":
-            msg = assertEmpty(result);
-            break;
-          case "assert-eq":
-            msg = assertEq(result, expected);
-            break;
-          case "assert-false":
-            msg = assertBoolean(result, false);
-            break;
-          case "assert-permutation":
-            msg = assertPermutation(result, expected);
-            break;
-          case "assert-xml":
-            msg = assertXML(result, expected);
-            break;
-          case "serialization-matches":
-            msg = serializationMatches(result, expected);
-            break;
-          case "assert-string-value":
-            msg = assertStringValue(result, expected);
-            break;
-          case "assert-true":
-            msg = assertBoolean(result, true);
-            break;
-          case "assert-type":
-            msg = assertType(result, expected);
-            break;
-          default:
-            msg = "Test type not supported: " + type;
-            break;
-        }
+        msg = switch(type) {
+          case "assert" -> assertQuery(result, expected);
+          case "assert-count" -> assertCount(result, expected);
+          case "assert-deep-eq" -> assertDeepEq(result, expected);
+          case "assert-empty" -> assertEmpty(result);
+          case "assert-eq" -> assertEq(result, expected);
+          case "assert-false" -> assertBoolean(result, false);
+          case "assert-permutation" -> assertPermutation(result, expected);
+          case "assert-xml" -> assertXML(result, expected);
+          case "serialization-matches" -> serializationMatches(result, expected);
+          case "assert-string-value" -> assertStringValue(result, expected);
+          case "assert-true" -> assertBoolean(result, true);
+          case "assert-type" -> assertType(result, expected);
+          default -> "Test type not supported: " + type;
+        };
       } else {
         msg = expected.toString();
       }

@@ -165,12 +165,12 @@ public abstract class IndexBuilder extends Job {
 
   @Override
   public final String detailedInfo() {
-    switch(type) {
-      case TEXT: return INDEX_TEXTS_D;
-      case ATTRIBUTE: return INDEX_ATTRIBUTES_D;
-      case TOKEN: return INDEX_TOKENS_D;
-      case FULLTEXT: return INDEX_FULLTEXT_D;
-      default: throw Util.notExpected();
-    }
+    return switch(type) {
+      case TEXT      -> INDEX_TEXTS_D;
+      case ATTRIBUTE -> INDEX_ATTRIBUTES_D;
+      case TOKEN     -> INDEX_TOKENS_D;
+      case FULLTEXT  -> INDEX_FULLTEXT_D;
+      default        -> throw Util.notExpected();
+    };
   }
 }

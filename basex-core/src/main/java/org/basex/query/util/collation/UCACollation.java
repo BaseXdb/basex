@@ -50,14 +50,11 @@ final class UCACollation extends Collation {
    * @return bit mask
    */
   private static int mask(final int strength) {
-    switch(strength) {
-      case Collator.PRIMARY:
-        return 0xFFFF0000;
-      case Collator.SECONDARY:
-        return 0xFFFFFF00;
-      default:
-        return 0xFFFFFFFF;
-    }
+    return switch(strength) {
+      case Collator.PRIMARY -> 0xFFFF0000;
+      case Collator.SECONDARY -> 0xFFFFFF00;
+      default -> 0xFFFFFFFF;
+    };
   }
 
   @Override

@@ -255,7 +255,7 @@ public abstract class XQMap extends XQStruct {
       if(tp instanceof final MapType mt) {
         kt = mt.keyType() == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType();
         vt = mt.valueType().eq(SeqType.ITEM_ZM) ? null : mt.valueType();
-      } else if(tp instanceof FuncType ft) {
+      } else if(tp instanceof final FuncType ft) {
         if(ft.declType.occ.min != 0 || ft.argTypes.length != 1 ||
             !ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O)) return false;
         kt = null;

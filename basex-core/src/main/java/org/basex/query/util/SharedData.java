@@ -131,7 +131,7 @@ public final class SharedData {
    */
   public RecordType record(final RecordType rt) {
     final ArrayList<RecordType> types = recordTypes.computeIfAbsent(rt.fields().size(),
-        () -> new ArrayList<>());
+        ArrayList::new);
     for(final RecordType type : types) {
       if(type.equals(rt)) return type;
     }

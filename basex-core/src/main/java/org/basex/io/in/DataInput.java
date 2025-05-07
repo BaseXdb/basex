@@ -106,17 +106,12 @@ public final class DataInput extends BufferInput {
    */
   public int readNum() throws IOException {
     final int v = read();
-    if(v == -1) return 0;
-    switch((v & 0xC0) >>> 6) {
-      case 0:
-        return v;
-      case 1:
-        return ((v & 0x3F) << 8) + read();
-      case 2:
-        return ((v & 0x3F) << 24) + (read() << 16) + (read() << 8) + read();
-      default:
-        return (read() << 24) + (read() << 16) + (read() << 8) + read();
-    }
+    return v == -1 ? 0 : switch((v & 0xC0) >>> 6) {
+      case 0  -> v;
+      case 1  -> ((v & 0x3F) << 8) + read();
+      case 2  -> ((v & 0x3F) << 24) + (read() << 16) + (read() << 8) + read();
+      default -> (read() << 24) + (read() << 16) + (read() << 8) + read();
+    };
   }
 
   /**

@@ -115,24 +115,20 @@ public final class BaseXFileChooser {
    * @return input files
    */
   public IOFile[] selectAll(final Mode mode) {
-    int state = 0;
-    switch(mode) {
-      case FOPEN:
-        state = fc.showOpenDialog(win.component());
-        break;
-      case FDOPEN:
+    final int state = switch(mode) {
+      case FOPEN ->
+        fc.showOpenDialog(win.component());
+      case FDOPEN -> {
         fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        state = fc.showOpenDialog(win.component());
-        break;
-      case FSAVE:
-        state = fc.showSaveDialog(win.component());
-        break;
-      case DOPEN:
-      case DSAVE:
+        yield fc.showOpenDialog(win.component());
+      }
+      case FSAVE ->
+        fc.showSaveDialog(win.component());
+      case DOPEN, DSAVE -> {
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        state = fc.showDialog(win.component(), null);
-        break;
-    }
+        yield fc.showDialog(win.component(), null);
+      }
+    };
     if(state != JFileChooser.APPROVE_OPTION) return new IOFile[0];
 
     final File[] fls = fc.isMultiSelectionEnabled() ? fc.getSelectedFiles() :
@@ -156,7 +152,7 @@ public final class BaseXFileChooser {
           final String path = files[f].path();
           if(!path.contains(".")) files[f] = new IOFile(path + suffix);
         }
-      } else if(ff instanceof Filter filter) {
+      } else if(ff instanceof final Filter filter) {
         final String[] sufs = filter.suffixes;
         final int sl = sufs.length;
         for(int f = 0; f < fl && sl != 0; f++) {

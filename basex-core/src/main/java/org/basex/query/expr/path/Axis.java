@@ -183,24 +183,23 @@ public enum Axis {
    * @return inverted axis
    */
   public final Axis invert() {
-    switch(this) {
-      case ANCESTOR:                   return DESCENDANT;
-      case ANCESTOR_OR_SELF:           return DESCENDANT_OR_SELF;
-      case ATTRIBUTE:
-      case CHILD:                      return PARENT;
-      case DESCENDANT:                 return ANCESTOR;
-      case DESCENDANT_OR_SELF:         return ANCESTOR_OR_SELF;
-      case FOLLOWING_SIBLING:          return PRECEDING_SIBLING;
-      case FOLLOWING_SIBLING_OR_SELF:  return PRECEDING_SIBLING_OR_SELF;
-      case FOLLOWING:                  return PRECEDING;
-      case FOLLOWING_OR_SELF:          return PRECEDING_OR_SELF;
-      case PARENT:                     return CHILD;
-      case PRECEDING_SIBLING:          return FOLLOWING_SIBLING;
-      case PRECEDING_SIBLING_OR_SELF:  return FOLLOWING_SIBLING_OR_SELF;
-      case PRECEDING:                  return FOLLOWING;
-      case PRECEDING_OR_SELF:          return FOLLOWING_OR_SELF;
-      case SELF:                       return SELF;
-      default:                         throw Util.notExpected();
-    }
+    return switch(this) {
+      case ANCESTOR                  -> DESCENDANT;
+      case ANCESTOR_OR_SELF          -> DESCENDANT_OR_SELF;
+      case ATTRIBUTE, CHILD          -> PARENT;
+      case DESCENDANT                -> ANCESTOR;
+      case DESCENDANT_OR_SELF        -> ANCESTOR_OR_SELF;
+      case FOLLOWING_SIBLING         -> PRECEDING_SIBLING;
+      case FOLLOWING_SIBLING_OR_SELF -> PRECEDING_SIBLING_OR_SELF;
+      case FOLLOWING                 -> PRECEDING;
+      case FOLLOWING_OR_SELF         -> PRECEDING_OR_SELF;
+      case PARENT                    -> CHILD;
+      case PRECEDING_SIBLING         -> FOLLOWING_SIBLING;
+      case PRECEDING_SIBLING_OR_SELF -> FOLLOWING_SIBLING_OR_SELF;
+      case PRECEDING                 -> FOLLOWING;
+      case PRECEDING_OR_SELF         -> FOLLOWING_OR_SELF;
+      case SELF                      -> SELF;
+      default                        -> throw Util.notExpected();
+    };
   }
 }

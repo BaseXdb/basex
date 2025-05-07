@@ -1307,11 +1307,11 @@ public final class TextEditor {
     }
 
     int s = searchResults[0].sortedIndexOf(!select || isSelected() ? pos : pos - 1);
-    switch(dir) {
-      case CURRENT:  s = s < 0 ? -s - 1 : s;     break;
-      case FORWARD:  s = s < 0 ? -s - 1 : s + 1; break;
-      case BACKWARD: s = s < 0 ? -s - 2 : s - 1; break;
-    }
+    s = switch(dir) {
+      case CURRENT -> s < 0 ? -s - 1 : s;
+      case FORWARD -> s < 0 ? -s - 1 : s + 1;
+      case BACKWARD -> s < 0 ? -s - 2 : s - 1;
+    };
     final int sl = searchResults[0].size();
     if(s < 0) s = sl - 1;
     else if(s == sl) s = 0;

@@ -156,19 +156,13 @@ public final class Int extends ANum {
 
   @Override
   public Object toJava() {
-    switch((AtomType) type) {
-      case BYTE:
-        return (byte) value;
-      case SHORT:
-      case UNSIGNED_BYTE:
-        return (short) value;
-      case UNSIGNED_SHORT:
-        return (char) value;
-      case INT:
-        return (int) value;
-      default:
-        return value;
-    }
+    return switch((AtomType) type) {
+      case BYTE -> (byte) value;
+      case SHORT, UNSIGNED_BYTE -> (short) value;
+      case UNSIGNED_SHORT -> (char) value;
+      case INT -> (int) value;
+      default -> value;
+    };
   }
 
   @Override

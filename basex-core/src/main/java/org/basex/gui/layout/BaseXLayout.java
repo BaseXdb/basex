@@ -91,18 +91,12 @@ public final class BaseXLayout {
    * @param type anti-aliasing type
    */
   public static void antiAlias(final Graphics g, final String type) {
-    Object hint = null;
-    switch (type) {
-      case "Off":
-        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
-        break;
-      case "On":
-        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-        break;
-      case "GASP":
-        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_GASP;
-        break;
-    }
+    final Object hint = switch(type) {
+      case "Off"  -> RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
+      case "On"   -> RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+      case "GASP" -> RenderingHints.VALUE_TEXT_ANTIALIAS_GASP;
+      default     -> null;
+    };
     if(hint != null) ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, hint);
   }
 

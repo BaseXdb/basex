@@ -179,14 +179,14 @@ public final class PathNode {
    * @return completions
    */
   public byte[] token(final Data data) {
-    switch(kind) {
-      case Data.ELEM: return data.elemNames.key(name);
-      case Data.ATTR: return Token.concat(ATT, data.attrNames.key(name));
-      case Data.TEXT: return TEXT;
-      case Data.COMM: return COMMENT;
-      case Data.PI:   return PI;
-      default:        return Token.EMPTY;
-    }
+    return switch(kind) {
+      case Data.ELEM -> data.elemNames.key(name);
+      case Data.ATTR -> Token.concat(ATT, data.attrNames.key(name));
+      case Data.TEXT -> TEXT;
+      case Data.COMM -> COMMENT;
+      case Data.PI   -> PI;
+      default        -> Token.EMPTY;
+    };
   }
 
   /**
@@ -213,15 +213,7 @@ public final class PathNode {
     final TokenBuilder tb = new TokenBuilder();
     if(level != 0) tb.add(Text.NL);
     for(int i = 0; i < level << 1; ++i) tb.add(' ');
-    switch(kind) {
-      case Data.DOC:  tb.add(DOC); break;
-      case Data.ELEM: tb.add(data.elemNames.key(name)); break;
-      case Data.TEXT: tb.add(TEXT); break;
-      case Data.ATTR: tb.add(ATT); tb.add(data.attrNames.key(name)); break;
-      case Data.COMM: tb.add(COMMENT); break;
-      case Data.PI:   tb.add(PI); break;
-    }
-    tb.add(": " + stats);
+    tb.add(kind == Data.DOC ? DOC : token(data)).add(": " + stats);
     for(final PathNode p : children) tb.add(p.info(data, level + 1));
     return tb.finish();
   }

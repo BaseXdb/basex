@@ -150,12 +150,12 @@ public class MapMerge extends StandardFunc {
     if(value == null) throw QueryError.typeError(duplicates,
         new EnumType(Duplicates.values()), info);
 
-    switch(value) {
-      case REJECT:    return new Reject(info);
-      case COMBINE:   return new Combine(qc);
-      case USE_FIRST: return new UseFirst();
-      default:        return new UseLast();
-    }
+    return switch(value) {
+      case REJECT -> new Reject(info);
+      case COMBINE -> new Combine(qc);
+      case USE_FIRST -> new UseFirst();
+      default -> new UseLast();
+    };
   }
 
   /**

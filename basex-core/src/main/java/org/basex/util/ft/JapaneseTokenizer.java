@@ -531,31 +531,25 @@ final class JapaneseTokenizer extends Tokenizer {
      * @return part of speech
      */
     public int getHinshi() {
-      final int hinshi;
       // morphological analyzer certainly returns
       // the single ascii char as a "noun".
       final byte[] s = token(mSurface);
-      if(s.length == 1 && !letter(s[0]) && !digit(s[0])) {
-        hinshi = HINSHI_KIGOU;
-      } else {
-        final String h = getPos();
-        switch(h) {
-          case MEISHI:       hinshi = HINSHI_MEISHI; break;
-          case RENTAISHI:    hinshi = HINSHI_RENTAISHI; break;
-          case HUKUSHI:      hinshi = HINSHI_HUKUSHI; break;
-          case DOUSHI:       hinshi = HINSHI_DOUSHI; break;
-          case SETSUZOKUSHI: hinshi = HINSHI_SETSUZOKUSHI; break;
-          case SETTOUSHI:    hinshi = HINSHI_SETTOUSHI; break;
-          case JYODOUSHI:    hinshi = HINSHI_JYODOUSHI; break;
-          case JYOSHI:       hinshi = HINSHI_JYOSHI; break;
-          case KEIYOUSHI:    hinshi = HINSHI_KEIYOUSHI; break;
-          case KIGOU:        hinshi = HINSHI_KIGOU; break;
-          case KANDOUSHI:    hinshi = HINSHI_KANDOUSHI; break;
-          case FILLER:       hinshi = HINSHI_FILLER; break;
-          default:           hinshi = HINSHI_SONOTA; break;
-        }
-      }
-      return hinshi;
+      if(s.length == 1 && !letter(s[0]) && !digit(s[0])) return HINSHI_KIGOU;
+      return switch(getPos()) {
+        case MEISHI -> HINSHI_MEISHI;
+        case RENTAISHI -> HINSHI_RENTAISHI;
+        case HUKUSHI -> HINSHI_HUKUSHI;
+        case DOUSHI -> HINSHI_DOUSHI;
+        case SETSUZOKUSHI -> HINSHI_SETSUZOKUSHI;
+        case SETTOUSHI -> HINSHI_SETTOUSHI;
+        case JYODOUSHI -> HINSHI_JYODOUSHI;
+        case JYOSHI -> HINSHI_JYOSHI;
+        case KEIYOUSHI -> HINSHI_KEIYOUSHI;
+        case KIGOU -> HINSHI_KIGOU;
+        case KANDOUSHI -> HINSHI_KANDOUSHI;
+        case FILLER -> HINSHI_FILLER;
+        default -> HINSHI_SONOTA;
+      };
     }
 
     /**

@@ -383,7 +383,7 @@ public abstract class XQArray extends XQStruct {
     final SeqType mt;
     if(tp instanceof final ArrayType at) {
       mt = at.valueType();
-    } else if(tp instanceof FuncType ft) {
+    } else if(tp instanceof final FuncType ft) {
       if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.INTEGER_O)) return false;
       mt = ft.declType;
     } else {

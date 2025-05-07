@@ -146,8 +146,7 @@ public final class LongList extends ElementList {
   @Override
   public boolean equals(final Object obj) {
     if(obj == this) return true;
-    if(!(obj instanceof final LongList ll)) return false;
-    if(size != ll.size) return false;
+    if(!(obj instanceof final LongList ll) || size != ll.size) return false;
     for(int l = 0; l < size; ++l) {
       if(list[l] != ll.list[l]) return false;
     }

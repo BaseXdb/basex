@@ -211,16 +211,16 @@ public abstract class Data {
    * @return index
    */
   public final Index index(final IndexType type) {
-    switch(type) {
-      case ELEMNAME:  return elemNames;
-      case ATTRNAME:  return attrNames;
-      case TEXT:      return textIndex;
-      case ATTRIBUTE: return attrIndex;
-      case TOKEN:     return tokenIndex;
-      case FULLTEXT:  return ftIndex;
-      case PATH:      return paths;
-      default:        throw Util.notExpected();
-    }
+    return switch(type) {
+      case ELEMNAME  -> elemNames;
+      case ATTRNAME  -> attrNames;
+      case TEXT      -> textIndex;
+      case ATTRIBUTE -> attrIndex;
+      case TOKEN     -> tokenIndex;
+      case FULLTEXT  -> ftIndex;
+      case PATH      -> paths;
+      default        -> throw Util.notExpected();
+    };
   }
 
   /**
@@ -230,16 +230,17 @@ public abstract class Data {
    * @return atomized value
    */
   public final byte[] atom(final int pre) {
-    switch(kind(pre)) {
-      case TEXT: case COMM:
-        return text(pre, true);
-      case ATTR:
-        return text(pre, false);
-      case PI:
-        byte[] txt = text(pre, true);
+    return switch(kind(pre)) {
+      case TEXT, COMM ->
+        text(pre, true);
+      case ATTR ->
+        text(pre, false);
+      case PI -> {
+        final byte[] txt = text(pre, true);
         final int i = indexOf(txt, ' ');
-        return i == -1 ? EMPTY : substring(txt, i + 1);
-      default:
+        yield i == -1 ? EMPTY : substring(txt, i + 1);
+      }
+      default -> {
         // create atomized text node
         TokenBuilder tb = null;
         byte[] t = EMPTY;
@@ -248,7 +249,7 @@ public abstract class Data {
         while(p < s) {
           final int k = kind(p);
           if(k == TEXT) {
-            txt = text(p, true);
+            final byte[] txt = text(p, true);
             if(t == EMPTY) {
               t = txt;
             } else {
@@ -258,8 +259,9 @@ public abstract class Data {
           }
           p += attSize(p, k);
         }
-        return tb == null ? t : tb.finish();
-    }
+        yield tb == null ? t : tb.finish();
+      }
+    };
   }
 
   /**
@@ -329,21 +331,17 @@ public abstract class Data {
    * @return distance
    */
   public final int dist(final int pre, final int kind) {
-    switch(kind) {
-      case ELEM:
-        return table.read4(pre, 4);
-      case TEXT:
-      case COMM:
-      case PI:
-        return table.read4(pre, 8);
-      case ATTR:
+    return switch(kind) {
+      case ELEM -> table.read4(pre, 4);
+      case TEXT, COMM, PI -> table.read4(pre, 8);
+      case ATTR -> {
         int d = table.read1(pre, 0) >> 3 & IO.MAXATTS;
         // skip additional attributes if value is larger than maximum range
         if(d == IO.MAXATTS) while(d < pre && kind(pre - d) == ATTR) d++;
-        return d;
-      default:
-        return pre + 1;
-    }
+        yield d;
+      }
+      default -> pre + 1;
+    };
   }
 
   /**

@@ -1069,19 +1069,10 @@ final class GreekStemmer extends InternalStemmer {
    * @return result of check
    */
   private static boolean ev(final char[] s, final int l) {
-    if(l == 0) return false;
-    switch(s[l - 1]) {
-      case '\u03b1':
-      case '\u03b5':
-      case '\u03b7':
-      case '\u03b9':
-      case '\u03bf':
-      case '\u03c5':
-      case '\u03c9':
-        return true;
-      default:
-        return false;
-    }
+    return l != 0 && switch(s[l - 1]) {
+      case '\u03b1', '\u03b5', '\u03b7', '\u03b9', '\u03bf', '\u03c5', '\u03c9' -> true;
+      default -> false;
+    };
   }
 
   /**
@@ -1091,18 +1082,10 @@ final class GreekStemmer extends InternalStemmer {
    * @return result of check
    */
   private static boolean ey(final char[] s, final int l) {
-    if(l == 0) return false;
-    switch(s[l - 1]) {
-      case '\u03b1':
-      case '\u03b5':
-      case '\u03b7':
-      case '\u03b9':
-      case '\u03bf':
-      case '\u03c9':
-        return true;
-      default:
-        return false;
-    }
+    return l != 0 && switch(s[l - 1]) {
+      case '\u03b1', '\u03b5', '\u03b7', '\u03b9', '\u03bf', '\u03c9' -> true;
+      default -> false;
+    };
   }
 
   /**

@@ -117,7 +117,7 @@ public class FnSchemaType extends StandardFunc {
     /** List.   */ list,
     /** Atomic. */ atomic,
     /** Union.  */ union
-  };
+  }
 
   /**
    * Function creating the type annotations for given atomic types.

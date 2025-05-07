@@ -232,7 +232,7 @@ public abstract class SimpleMap extends Mapping {
     // merge filter with context value as root
     // A ! .[B]  ->  A[B]
     Preds preds = null;
-    if(next instanceof Filter filter) {
+    if(next instanceof final Filter filter) {
       if(filter.root instanceof ContextValue) preds = filter;
     } else if(next instanceof final SingleIterPath path) {
       final Step step = path.step(0);

@@ -3473,16 +3473,13 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test kindTest(final NodeType type) throws QueryException {
-    final Test tp;
-    switch(type) {
-      case DOCUMENT_NODE: tp = documentTest(); break;
-      case ELEMENT:
-      case ATTRIBUTE: tp = elemAttrTest(type); break;
-      case PROCESSING_INSTRUCTION: tp = piTest(); break;
-      case SCHEMA_ELEMENT:
-      case SCHEMA_ATTRIBUTE: tp = schemaTest(); break;
-      default: tp = null; break;
-    }
+    final Test tp = switch(type) {
+      case DOCUMENT_NODE -> documentTest();
+      case ELEMENT, ATTRIBUTE -> elemAttrTest(type);
+      case PROCESSING_INSTRUCTION -> piTest();
+      case SCHEMA_ELEMENT, SCHEMA_ATTRIBUTE -> schemaTest();
+      default -> null;
+    };
     wsCheck(")");
     return tp;
   }
@@ -3647,7 +3644,7 @@ public class QueryParser extends InputParser {
   private ArrayList<Test> nameTestUnion(final NodeType type) throws QueryException {
     final ArrayList<Test> tests = new ArrayList<>();
     Test test = null;
-    int p = pos;
+    final int p = pos;
     do {
       skipWs();
       test = simpleNodeTest(type, false);

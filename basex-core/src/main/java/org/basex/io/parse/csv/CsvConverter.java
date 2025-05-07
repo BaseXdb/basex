@@ -66,13 +66,13 @@ public abstract class CsvConverter extends Job {
    * @return CSV converter
    */
   public static CsvConverter get(final CsvParserOptions copts) {
-    switch(copts.get(CsvOptions.FORMAT)) {
-      case XQUERY:    return new CsvXQueryConverter(copts); // deprecated
-      case W3:        return new CsvW3Converter(copts);
-      case W3_ARRAYS: return new CsvW3ArraysConverter(copts);
-      case W3_XML:    return new CsvW3XmlConverter(copts);
-      default:        return new CsvDirectConverter(copts);
-    }
+    return switch(copts.get(CsvOptions.FORMAT)) {
+      case W3        -> new CsvW3Converter(copts);
+      case W3_ARRAYS -> new CsvW3ArraysConverter(copts);
+      case W3_XML    -> new CsvW3XmlConverter(copts);
+      case XQUERY    -> new CsvXQueryConverter(copts); // deprecated
+      default        -> new CsvDirectConverter(copts);
+    };
   }
 
   /**

@@ -171,14 +171,14 @@ public abstract class Cmp extends Arr {
         if(st1.zeroOrOne() && (success || st1.one())) {
           final Expr ex1 = st1.one() ? expr1 : cc.function(BOOLEAN, info, expr1);
           final QuerySupplier<Expr> not = () -> cc.function(NOT, info, ex1);
-          switch(op) {
-            case EQ: return ok ? ex1       : not.get();
-            case NE: return ok ? not.get() : ex1;
-            case GE: return ok ? ex1       : Bln.TRUE;
-            case LE: return ok ? Bln.TRUE  : not.get();
-            case GT: return ok ? Bln.FALSE : ex1;
-            default: return ok ? not.get() : Bln.FALSE;
-          }
+          return switch(op) {
+            case EQ -> ok ? ex1       : not.get();
+            case NE -> ok ? not.get() : ex1;
+            case GE -> ok ? ex1       : Bln.TRUE;
+            case LE -> ok ? Bln.TRUE  : not.get();
+            case GT -> ok ? Bln.FALSE : ex1;
+            default -> ok ? not.get() : Bln.FALSE;
+          };
         }
 
         if(this instanceof CmpG) {

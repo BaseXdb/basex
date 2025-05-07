@@ -40,15 +40,14 @@ public abstract class JsonConverter {
    * @throws QueryException query exception
    */
   public static JsonConverter get(final JsonParserOptions jopts) throws QueryException {
-    switch(jopts.get(JsonOptions.FORMAT)) {
-      case JSONML:     return new JsonMLConverter(jopts);
-      case ATTRIBUTES: return new JsonAttsConverter(jopts);
-      case XQUERY: //deprecated
-      case W3:         return new JsonW3Converter(jopts);
-      case BASIC: //deprecated
-      case W3_XML:     return new JsonW3XmlConverter(jopts);
-      default:         return new JsonDirectConverter(jopts);
-    }
+    // XQUERY and BASIC are deprecated
+    return switch(jopts.get(JsonOptions.FORMAT)) {
+      case ATTRIBUTES    -> new JsonAttsConverter(jopts);
+      case JSONML        -> new JsonMLConverter(jopts);
+      case W3, XQUERY    -> new JsonW3Converter(jopts);
+      case W3_XML, BASIC -> new JsonW3XmlConverter(jopts);
+      default            -> new JsonDirectConverter(jopts);
+    };
   }
 
   /**

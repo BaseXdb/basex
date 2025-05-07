@@ -39,34 +39,27 @@ final class MapLayout {
     this.gopts = gopts;
     size = GUIConstants.fontSize + 4;
 
-    switch(gopts.get(GUIOptions.MAPOFFSETS)) {
+    layout = switch(gopts.get(GUIOptions.MAPOFFSETS)) {
       // no title, small border
-      case 1 :
-        layout = new MapRect(0, 2, 0, 2); break;
+      case 1  -> new MapRect(0, 2, 0, 2);
       // title, no border
-      case 2 :
-        layout = new MapRect(0, size, 0, size); break;
+      case 2  -> new MapRect(0, size, 0, size);
       // title, border
-      case 3 :
-        layout = new MapRect(2, size - 1, 4, size + 1); break;
+      case 3  -> new MapRect(2, size - 1, 4, size + 1);
       // title, large border
-      case 4 :
-        layout = new MapRect(size >> 2, size, size >> 1, size + (size >> 2)); break;
+      case 4  -> new MapRect(size >> 2, size, size >> 1, size + (size >> 2));
       // no title, no border
-      default:
-        layout = new MapRect(0, 0, 0, 0); break;
-    }
-
-    switch(gopts.get(GUIOptions.MAPALGO)) {
-      // select method to construct this treemap
-      // may should be placed in makeMap to define different method for
-      // different levels
-      case 1 : algo = new StripAlgo(); break;
-      case 2 : algo = new SquarifiedAlgo(); break;
-      case 3 : algo = new SliceDiceAlgo(); break;
-      case 4 : algo = new BinaryAlgo(); break;
-      default: algo = new SplitAlgo(); break;
-    }
+      default -> new MapRect(0, 0, 0, 0);
+    };
+    // select method to construct this treemap
+    // may should be placed in makeMap to define different method for different levels
+    algo = switch(gopts.get(GUIOptions.MAPALGO)) {
+      case 1  -> new StripAlgo();
+      case 2  -> new SquarifiedAlgo();
+      case 3  -> new SliceDiceAlgo();
+      case 4  -> new BinaryAlgo();
+      default -> new SplitAlgo();
+    };
   }
 
   /**

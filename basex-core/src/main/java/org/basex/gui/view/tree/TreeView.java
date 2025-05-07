@@ -171,7 +171,7 @@ public final class TreeView extends View {
       for(int i = 0; !showAtts && i < rl; ++i) {
         if(roots[i] >= data.meta.size) break;
         if(data.kind(roots[i]) == Data.ATTR) {
-          drawMessage(g, NO_ATTS);
+          drawMessage(g, "Enable attributes in Tree Options.");
           return;
         }
       }
@@ -207,7 +207,7 @@ public final class TreeView extends View {
       }
 
       if(nes) {
-        drawMessage(g, NOT_ENOUGH_SPACE);
+        drawMessage(g, NO_PIXELS);
         return;
       }
 
@@ -285,20 +285,11 @@ public final class TreeView extends View {
    * Displays Message if there is not enough space to draw all roots or an
    * attribute-context but no attributes in cache.
    * @param g graphics reference
-   * @param t type
+   * @param message message
    */
-  private void drawMessage(final Graphics g, final byte t) {
-    final int mw = width >> 1;
-    final int mh = height >> 1;
-    String message = "";
-    switch(t) {
-      case NOT_ENOUGH_SPACE: message = NO_PIXELS;
-      break;
-      case NO_ATTS: message = "Enable attributes in Tree Options.";
-      break;
-    }
-    final int x = mw - (BaseXLayout.width(g, message) >> 1);
-    final int y = mh + fontHeight;
+  private void drawMessage(final Graphics g, final String message) {
+    final int mw = width >> 1, mh = height >> 1;
+    final int x = mw - (BaseXLayout.width(g, message) >> 1), y = mh + fontHeight;
     g.setColor(TEXT);
     g.drawString(message, x, y);
   }

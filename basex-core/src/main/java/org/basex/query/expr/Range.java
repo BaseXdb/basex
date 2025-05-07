@@ -141,15 +141,13 @@ public final class Range extends Arr {
     if(Function.LAST.is(expr)) return LAST;
     if(expr instanceof final Arith arth && Function.LAST.is(expr.arg(0))) {
       final double l = expr.arg(1) instanceof final Int itr ? itr.itr() : 0;
-      if(l != 0) {
-        switch(arth.calc) {
-          case ADD : return LAST + l;
-          case SUBTRACT: return LAST - l;
-          case MULTIPLY : return LAST * l;
-          case DIVIDE  : return LAST / l;
-          default: break;
-        }
-      }
+      if(l != 0) return switch(arth.calc) {
+        case ADD      -> LAST + l;
+        case SUBTRACT -> LAST - l;
+        case MULTIPLY -> LAST * l;
+        case DIVIDE   -> LAST / l;
+        default       -> Double.NaN;
+      };
     }
     return Double.NaN;
   }

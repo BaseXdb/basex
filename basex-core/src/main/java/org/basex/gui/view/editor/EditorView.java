@@ -206,7 +206,7 @@ public final class EditorView extends View {
     });
 
     BaseXLayout.addDrop(this, obj -> {
-      if(obj instanceof File file) open(new IOFile(file));
+      if(obj instanceof final File file) open(new IOFile(file));
     });
   }
 

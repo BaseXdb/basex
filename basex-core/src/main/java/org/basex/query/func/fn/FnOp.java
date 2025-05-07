@@ -38,41 +38,40 @@ public final class FnOp extends StandardFunc {
       params[p] = vs.addNew(p == 0 ? Q_X : Q_Y, null, qc, info);
       args[p] = new VarRef(info, params[p]);
     }
-    final Expr arg1 = args[0], arg2 = args[1], body;
-    switch(operator) {
-      case ","        : body = new List(info, arg1, arg2); break;
-      case "and"      : body = new And(info, arg1, arg2); break;
-      case "or"       : body = new Or(info, arg1, arg2); break;
-      case "+"        : body = new Arith(info, arg1, arg2, Calc.ADD); break;
-      case "-"        : body = new Arith(info, arg1, arg2, Calc.SUBTRACT); break;
-      case "*"        : body = new Arith(info, arg1, arg2, Calc.MULTIPLY); break;
-      case "div"      : body = new Arith(info, arg1, arg2, Calc.DIVIDE); break;
-      case "idiv"     : body = new Arith(info, arg1, arg2, Calc.DIVIDEINT); break;
-      case "mod"      : body = new Arith(info, arg1, arg2, Calc.MODULO); break;
-      case "="        : body = new CmpG(info, arg1, arg2, OpG.EQ); break;
-      case "<"        : body = new CmpG(info, arg1, arg2, OpG.LT); break;
-      case "<="       : body = new CmpG(info, arg1, arg2, OpG.LE); break;
-      case ">"        : body = new CmpG(info, arg1, arg2, OpG.GT); break;
-      case ">="       : body = new CmpG(info, arg1, arg2, OpG.GE); break;
-      case "!="       : body = new CmpG(info, arg1, arg2, OpG.NE); break;
-      case "eq"       : body = new CmpV(info, arg1, arg2, OpV.EQ); break;
-      case "lt"       : body = new CmpV(info, arg1, arg2, OpV.LT); break;
-      case "le"       : body = new CmpV(info, arg1, arg2, OpV.LE); break;
-      case "gt"       : body = new CmpV(info, arg1, arg2, OpV.GT); break;
-      case "ge"       : body = new CmpV(info, arg1, arg2, OpV.GE); break;
-      case "ne"       : body = new CmpV(info, arg1, arg2, OpV.NE); break;
-      case "<<"       : body = new CmpN(info, arg1, arg2, OpN.ET); break;
-      case ">>"       : body = new CmpN(info, arg1, arg2, OpN.GT); break;
-      case "is"       : body = new CmpN(info, arg1, arg2, OpN.EQ); break;
-      case "||"       : body = new Concat(info, arg1, arg2); break;
-      case "|":
-      case "union"    : body = new Union(info, arg1, arg2); break;
-      case "except"   : body = new Except(info, arg1, arg2); break;
-      case "intersect": body = new Intersect(info, arg1, arg2); break;
-      case "to"       : body = new Range(info, arg1, arg2); break;
-      case "otherwise": body = new Otherwise(info, arg1, arg2); break;
-      default         : throw UNKNOWNOP_X.get(info, operator);
-    }
+    final Expr arg1 = args[0], arg2 = args[1];
+    final Expr body = switch(operator) {
+      case "," -> new List(info, arg1, arg2);
+      case "and" -> new And(info, arg1, arg2);
+      case "or" -> new Or(info, arg1, arg2);
+      case "+" -> new Arith(info, arg1, arg2, Calc.ADD);
+      case "-" -> new Arith(info, arg1, arg2, Calc.SUBTRACT);
+      case "*" -> new Arith(info, arg1, arg2, Calc.MULTIPLY);
+      case "div" -> new Arith(info, arg1, arg2, Calc.DIVIDE);
+      case "idiv" -> new Arith(info, arg1, arg2, Calc.DIVIDEINT);
+      case "mod" -> new Arith(info, arg1, arg2, Calc.MODULO);
+      case "=" -> new CmpG(info, arg1, arg2, OpG.EQ);
+      case "<" -> new CmpG(info, arg1, arg2, OpG.LT);
+      case "<=" -> new CmpG(info, arg1, arg2, OpG.LE);
+      case ">" -> new CmpG(info, arg1, arg2, OpG.GT);
+      case ">=" -> new CmpG(info, arg1, arg2, OpG.GE);
+      case "!=" -> new CmpG(info, arg1, arg2, OpG.NE);
+      case "eq" -> new CmpV(info, arg1, arg2, OpV.EQ);
+      case "lt" -> new CmpV(info, arg1, arg2, OpV.LT);
+      case "le" -> new CmpV(info, arg1, arg2, OpV.LE);
+      case "gt" -> new CmpV(info, arg1, arg2, OpV.GT);
+      case "ge" -> new CmpV(info, arg1, arg2, OpV.GE);
+      case "ne" -> new CmpV(info, arg1, arg2, OpV.NE);
+      case "<<" -> new CmpN(info, arg1, arg2, OpN.ET);
+      case ">>" -> new CmpN(info, arg1, arg2, OpN.GT);
+      case "is" -> new CmpN(info, arg1, arg2, OpN.EQ);
+      case "||" -> new Concat(info, arg1, arg2);
+      case "|", "union" -> new Union(info, arg1, arg2);
+      case "except" -> new Except(info, arg1, arg2);
+      case "intersect" -> new Intersect(info, arg1, arg2);
+      case "to" -> new Range(info, arg1, arg2);
+      case "otherwise" -> new Otherwise(info, arg1, arg2);
+      default -> throw UNKNOWNOP_X.get(info, operator);
+    };
     final FuncType ft = FuncType.get(body.seqType(), SeqType.ITEM_ZM, SeqType.ITEM_ZM);
     return new FuncItem(info, body, params, AnnList.EMPTY, ft, pl, null);
   }

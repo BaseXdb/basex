@@ -53,17 +53,17 @@ public class KindTest extends Test {
    * @return kind test
    */
   public static KindTest get(final NodeType type) {
-    switch(type) {
-      case TEXT: return TEXT;
-      case PROCESSING_INSTRUCTION:  return PROCESSING_INSTRUCTION;
-      case ELEMENT: return ELEMENT;
-      case DOCUMENT_NODE: return DOCUMENT_NODE;
-      case ATTRIBUTE: return ATTRIBUTE;
-      case COMMENT: return COMMENT;
-      case NODE: return NODE;
-      case NAMESPACE_NODE: return NAMESPACE_NODE;
-      default: throw Util.notExpected();
-    }
+    return switch(type) {
+      case TEXT                   -> TEXT;
+      case PROCESSING_INSTRUCTION -> PROCESSING_INSTRUCTION;
+      case ELEMENT                -> ELEMENT;
+      case DOCUMENT_NODE          -> DOCUMENT_NODE;
+      case ATTRIBUTE              -> ATTRIBUTE;
+      case COMMENT                -> COMMENT;
+      case NODE                   -> NODE;
+      case NAMESPACE_NODE         -> NAMESPACE_NODE;
+      default                     -> throw Util.notExpected();
+    };
   }
 
   @Override

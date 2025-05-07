@@ -266,7 +266,7 @@ public abstract class JavaCall extends Arr {
         if(object instanceof final byte[] values)    return BytSeq.get(values);
         if(object instanceof final short[] values)   return ShrSeq.get(values);
         if(object instanceof final long[] values)    return IntSeq.get(values);
-        if(object instanceof float[] values)   return FltSeq.get(values);
+        if(object instanceof final float[] values)   return FltSeq.get(values);
         if(object instanceof final double[] values)  return DblSeq.get(values);
         // char array
         if(object instanceof final char[] values) {
