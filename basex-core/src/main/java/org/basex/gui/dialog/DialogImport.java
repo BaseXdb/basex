@@ -213,8 +213,7 @@ final class DialogImport extends BaseXBack {
     final IO io = IO.get(in);
     if(!in.isEmpty() && io instanceof IOFile) dbName = io.dbName();
 
-    final boolean dir = io.isDir();
-    final boolean archive = io.isArchive();
+    final boolean dir = io.isDir(), archive = io.isArchive();
     if(dir || archive) return;
 
     // evaluate input type

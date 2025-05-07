@@ -2485,7 +2485,7 @@ public class QueryParser extends InputParser {
         do {
           final Expr key = single();
           add(el, check(key, INVMAPKEY));
-          if(key instanceof Item && !set.add((Item) key)) throw error(MAPDUPLKEY_X, key);
+          if(key instanceof final Item item && !set.add(item)) throw error(MAPDUPLKEY_X, key);
           if(!wsConsume(":")) throw error(WRONGCHAR_X_X, ":", found());
           add(el, check(single(), INVMAPVAL));
         } while(wsConsume(","));
@@ -3188,7 +3188,7 @@ public class QueryParser extends InputParser {
   private Expr compElement() throws QueryException {
     final Expr name = compName(NOELEMNAME, true);
     if(name == null) return null;
-    if(name instanceof QNm) qnames.add((QNm) name, info());
+    if(name instanceof final QNm qnm) qnames.add(qnm, info());
     skipWs();
     return current('{') ? new CElem(info(), true, name, new Atts(), enclosedExpr()) : null;
   }
@@ -3201,7 +3201,7 @@ public class QueryParser extends InputParser {
   private Expr compAttribute() throws QueryException {
     final Expr name = compName(NOATTNAME, true);
     if(name == null) return null;
-    if(name instanceof QNm) qnames.add((QNm) name, false, info());
+    if(name instanceof final QNm qnm) qnames.add(qnm, false, info());
     skipWs();
     return current('{') ? new CAttr(info(), true, name, enclosedExpr()) : null;
   }
@@ -3433,7 +3433,7 @@ public class QueryParser extends InputParser {
     // map
     if(type instanceof MapType) {
       Type key = itemType().type;
-      if(key instanceof RecordType) key = ((RecordType) key).getDeclaration(namedRecordTypes);
+      if(key instanceof final RecordType rt) key = rt.getDeclaration(namedRecordTypes);
       if(!key.instanceOf(AtomType.ANY_ATOMIC_TYPE)) throw error(MAPTAAT_X, key);
       wsCheck(",");
       final MapType tp = MapType.get(key, sequenceType());

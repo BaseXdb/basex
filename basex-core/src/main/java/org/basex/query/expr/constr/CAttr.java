@@ -88,8 +88,8 @@ public final class CAttr extends CName {
       toString(qs, ATTRIBUTE);
     } else {
       qs.token(((QNm) name).string()).token('=');
-      if(exprs.length == 1 && exprs[0] instanceof Str) {
-        qs.quoted(((Str) exprs[0]).string());
+      if(exprs.length == 1 && exprs[0] instanceof final Str str) {
+        qs.quoted(str.string());
       } else {
         qs.token("\"{").tokens(exprs, SEP).token("}\"");
       }

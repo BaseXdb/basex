@@ -178,11 +178,9 @@ public final class Condition extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Condition)) return false;
-    final Condition c = (Condition) obj;
-    return Objects.equals(item, c.item) && Objects.equals(pos, c.pos) &&
-           Objects.equals(prev, c.prev) && Objects.equals(next, c.next) && super.equals(obj);
+    return this == obj || obj instanceof final Condition c && Objects.equals(item, c.item) &&
+        Objects.equals(pos, c.pos) && Objects.equals(prev, c.prev) &&
+        Objects.equals(next, c.next) && super.equals(obj);
   }
 
   @Override

@@ -55,8 +55,7 @@ public final class FuncType extends FType {
   @Override
   public FItem cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    if(!(item instanceof FItem)) throw typeError(item, this, info);
-    final FItem func = (FItem) item;
+    if(!(item instanceof final FItem func)) throw typeError(item, this, info);
     return this == SeqType.FUNCTION ? func : func.coerceTo(this, qc, null, info);
   }
 
@@ -68,10 +67,9 @@ public final class FuncType extends FType {
   @Override
   public boolean eq(final Type type) {
     if(this == type) return true;
-    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof FuncType))
+    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof final FuncType ft))
       return false;
 
-    final FuncType ft = (FuncType) type;
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return false;
     for(int a = 0; a < arity; a++) {
@@ -83,10 +81,9 @@ public final class FuncType extends FType {
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.FUNCTION, AtomType.ITEM)) return true;
-    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
-    if(this == SeqType.FUNCTION || !(type instanceof FuncType)) return false;
+    if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
+    if(this == SeqType.FUNCTION || !(type instanceof final FuncType ft)) return false;
 
-    final FuncType ft = (FuncType) type;
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return false;
     for(int a = 0; a < arity; a++) {

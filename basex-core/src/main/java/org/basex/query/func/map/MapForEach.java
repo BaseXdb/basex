@@ -58,10 +58,9 @@ public class MapForEach extends StandardFunc {
     if(map == XQMap.empty()) return Empty.VALUE;
 
     final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      final MapType mtype = (MapType) type;
-      final SeqType declType = SeqType.get(mtype.keyType(), Occ.EXACTLY_ONE);
-      arg(1, arg -> refineFunc(arg, cc, declType, mtype.valueType()));
+    if(type instanceof final MapType mt) {
+      final SeqType declType = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE);
+      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType()));
     }
 
     final FuncType ft = arg(1).funcType();

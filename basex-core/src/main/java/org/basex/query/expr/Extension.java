@@ -91,8 +91,8 @@ public final class Extension extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Extension &&
-        pragma.equals(((Extension) obj).pragma) && super.equals(obj);
+    return this == obj || obj instanceof final Extension ext && pragma.equals(ext.pragma) &&
+        super.equals(obj);
   }
 
   @Override

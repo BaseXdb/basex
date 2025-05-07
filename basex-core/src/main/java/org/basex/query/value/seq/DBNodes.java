@@ -199,9 +199,7 @@ public final class DBNodes extends DBNodeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof DBNodes)) return false;
-    final DBNodes n = (DBNodes) obj;
-    return data == n.data && Arrays.equals(pres, n.pres) && Objects.equals(ftpos, n.ftpos);
+    return this == obj || obj instanceof final DBNodes n && data == n.data &&
+        Arrays.equals(pres, n.pres) && Objects.equals(ftpos, n.ftpos);
   }
 }

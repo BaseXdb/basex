@@ -27,8 +27,7 @@ public final class InspectStaticContext extends StandardFunc {
     final StaticContext sctx;
     if(func.isEmpty()) {
       sctx = sc();
-    } else if(func instanceof FuncItem) {
-      final FuncItem fi = (FuncItem) func;
+    } else if(func instanceof final FuncItem fi) {
       sctx = fi.info().sc();
     } else {
       throw INVFUNCITEM_X_X.get(info, func.type, func);

@@ -49,11 +49,9 @@ abstract class ContextModifier {
       if(memData == null) memData = new MemData(qc.context.options);
       final DataUpdate dataUp = (DataUpdate) update;
       dbUpdates.computeIfAbsent(dataUp.data(), d -> new DataUpdates(d, qc)).add(dataUp, memData);
-    } else if(update instanceof NameUpdate) {
-      final NameUpdate nameUp = (NameUpdate) update;
+    } else if(update instanceof final NameUpdate nameUp) {
       nameUpdates.computeIfAbsent(nameUp.name(), n -> new NameUpdates()).add(nameUp);
-    } else if(update instanceof UserUpdate) {
-      final UserUpdate userUp = (UserUpdate) update;
+    } else if(update instanceof final UserUpdate userUp) {
       userUpdates.computeIfAbsent(userUp.name(), n -> new UserUpdates()).add(userUp);
     } else {
       throw Util.notExpected("Unknown update type: " + update);

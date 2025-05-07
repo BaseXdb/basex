@@ -62,8 +62,8 @@ public final class WsResponse extends WebResponse {
        !func.matches(Annotation._WS_ERROR, null)) {
       for(final Object value : values) {
         final RemoteEndpoint remote = ws.getSession().getRemote();
-        if(value instanceof ByteBuffer) {
-          remote.sendBytes((ByteBuffer) value);
+        if(value instanceof final ByteBuffer bb) {
+          remote.sendBytes(bb);
         } else {
           remote.sendString((String) value);
         }

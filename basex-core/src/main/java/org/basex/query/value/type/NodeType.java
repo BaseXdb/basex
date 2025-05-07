@@ -34,8 +34,8 @@ public enum NodeType implements Type {
   TEXT("text", NODE, ID.TXT) {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final InputInfo info) {
-      if(value instanceof BXText) return ((BXNode) value).getNode();
-      if(value instanceof Text) return new FTxt((Text) value);
+      if(value instanceof final BXText text) return text.getNode();
+      if(value instanceof final Text text) return new FTxt(text);
       return new FTxt(Token.token(value));
     }
   },
@@ -45,8 +45,8 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-      if(value instanceof BXPI) return ((BXNode) value).getNode();
-      if(value instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) value);
+      if(value instanceof final BXPI pi) return pi.getNode();
+      if(value instanceof final ProcessingInstruction pi) return new FPI(pi);
       final Matcher m = matcher("<\\?(.*?) (.*)\\?>", value, info);
       return new FPI(new QNm(m.group(1)), Token.token(m.group(2)));
     }
@@ -57,10 +57,10 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(value instanceof BXElem)
-        return ((BXNode) value).getNode();
-      if(value instanceof Element)
-        return FElem.build((Element) value, new TokenObjectMap<>()).finish();
+      if(value instanceof final BXElem elem)
+        return elem.getNode();
+      if(value instanceof final Element elem)
+        return FElem.build(elem, new TokenObjectMap<>()).finish();
       try {
         return new DBNode(new IOContent(Token.token(value))).childIter().next();
       } catch(final IOException ex) {
@@ -74,15 +74,12 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-      if(value instanceof BXDoc) return ((BXNode) value).getNode();
+      if(value instanceof final BXDoc doc) return doc.getNode();
       try {
-        if(value instanceof Document) {
-          final DOMWrapper dom = new DOMWrapper((Document) value, "", new MainOptions());
-          return new DBNode(MemBuilder.build(dom));
+        if(value instanceof final Document doc) {
+          return new DBNode(MemBuilder.build(new DOMWrapper(doc, "", new MainOptions())));
         }
-        if(value instanceof DocumentFragment) {
-          // document fragment
-          final DocumentFragment df = (DocumentFragment) value;
+        if(value instanceof final DocumentFragment df) {
           final String bu = df.getBaseURI();
           return FDoc.build(bu != null ? bu : "", df).finish();
         }
@@ -109,8 +106,8 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-      if(value instanceof BXAttr) return ((BXNode) value).getNode();
-      if(value instanceof Attr) return new FAttr((Attr) value);
+      if(value instanceof final BXAttr attr) return attr.getNode();
+      if(value instanceof final Attr attr) return new FAttr(attr);
       final Matcher m = matcher(" ?(.*?)=\"(.*)\"", value, info);
       return new FAttr(new QNm(m.group(1)), Token.token(m.group(2)));
     }
@@ -121,8 +118,8 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-      if(value instanceof BXComm) return ((BXNode) value).getNode();
-      if(value instanceof Comment) return new FComm((Comment) value);
+      if(value instanceof final BXComm comm) return comm.getNode();
+      if(value instanceof final Comment comm) return new FComm(comm);
       final Matcher m = matcher("<!--(.*?)-->", value, info);
       return new FComm(Token.token(m.group(1)));
     }
@@ -241,7 +238,7 @@ public enum NodeType implements Type {
   @Override
   public final boolean instanceOf(final Type type) {
     return type == this || type == AtomType.ITEM ||
-        (type instanceof ChoiceItemType ? ((ChoiceItemType) type).hasInstance(this) :
+        (type instanceof final ChoiceItemType cit ? cit.hasInstance(this) :
           type instanceof NodeType && type == parent);
   }
 

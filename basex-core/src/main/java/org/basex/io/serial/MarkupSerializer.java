@@ -121,8 +121,8 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
-    if(item instanceof XQArray) {
-      for(final Item it : flatten((XQArray) item)) super.serialize(it);
+    if(item instanceof final XQArray array) {
+      for(final Item it : flatten(array)) super.serialize(it);
     } else {
       super.serialize(item);
     }

@@ -400,9 +400,9 @@ public final class CompileContext {
     if(single && size == 1) {
       // expression yielding single item: <a/>
       add = exprs -> exprs.add(expr);
-    } else if(expr instanceof Seq && size <= limit) {
+    } else if(expr instanceof final Seq seq && size <= limit) {
       // sequence: 'a', 'b', 'c'
-      add = exprs -> { for(final Item item : (Seq) expr) exprs.add(item); };
+      add = exprs -> { for(final Item item : seq) exprs.add(item); };
     } else if(expr instanceof List && (single ?
         size <= limit && ((Checks<Expr>) ex -> ex.seqType().one()).all(expr.args()) :
         expr.args().length <= limit)) {

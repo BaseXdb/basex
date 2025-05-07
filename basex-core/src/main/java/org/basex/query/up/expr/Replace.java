@@ -96,7 +96,7 @@ public final class Replace extends Update {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Replace && value == ((Replace) obj).value &&
+    return this == obj || obj instanceof final Replace rplc && value == rplc.value &&
         super.equals(obj);
   }
 

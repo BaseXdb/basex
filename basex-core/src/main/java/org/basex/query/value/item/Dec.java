@@ -200,7 +200,7 @@ public final class Dec extends ANum {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Dec && value.compareTo(((Dec) obj).value) == 0;
+    return this == obj || obj instanceof final Dec dec && value.compareTo(dec.value) == 0;
   }
 
   // STATIC METHODS ===============================================================================

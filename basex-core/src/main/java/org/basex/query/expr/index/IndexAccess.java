@@ -74,6 +74,6 @@ public abstract class IndexAccess extends Simple {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof IndexAccess && db.equals(((IndexAccess) obj).db);
+    return obj instanceof final IndexAccess ia && db.equals(ia.db);
   }
 }

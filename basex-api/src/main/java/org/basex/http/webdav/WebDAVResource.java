@@ -91,8 +91,8 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
       public void run() throws IOException {
         if(target instanceof WebDAVRoot) {
           copyToRoot(name);
-        } else if(target instanceof WebDAVFolder) {
-          copyTo((WebDAVFolder) target, name);
+        } else if(target instanceof final WebDAVFolder folder) {
+          copyTo(folder, name);
         }
       }
     }.eval();
@@ -107,8 +107,8 @@ abstract class WebDAVResource implements CopyableResource, DeletableResource, Mo
       public void run() throws IOException {
         if(target instanceof WebDAVRoot) {
           moveToRoot(name);
-        } else if(target instanceof WebDAVFolder) {
-          moveTo((WebDAVFolder) target, name);
+        } else if(target instanceof final WebDAVFolder folder) {
+          moveTo(folder, name);
         }
       }
     }.eval();

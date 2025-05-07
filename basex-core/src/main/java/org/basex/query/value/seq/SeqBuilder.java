@@ -26,7 +26,7 @@ public interface SeqBuilder {
    * @param qc query context
    * @return this builder for convenience
    */
-  default SeqBuilder add(Value value, QueryContext qc) {
+  default SeqBuilder add(final Value value, final QueryContext qc) {
     SeqBuilder sb = this;
     for(final Item item : value) {
       qc.checkStop();
@@ -41,7 +41,7 @@ public interface SeqBuilder {
    * @param qc query context
    * @return tree sequence builder
    */
-  default TreeSeqBuilder tree(Item item, QueryContext qc) {
+  default TreeSeqBuilder tree(final Item item, final QueryContext qc) {
     return new TreeSeqBuilder().add(value(null), qc).add(item);
   }
 

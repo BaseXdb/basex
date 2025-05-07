@@ -60,11 +60,10 @@ public class ClientQuery extends Query {
   public void bind(final String name, final Object value, final String type) throws IOException {
     cache = null;
 
-    final Object vl = value instanceof BXNode ? ((BXNode) value).getNode() : value;
+    final Object vl = value instanceof final BXNode node ? node.getNode() : value;
     String t = type == null ? "" : type;
     final String v;
-    if(vl instanceof Value) {
-      final Value val = (Value) vl;
+    if(vl instanceof final Value val) {
       final Type tp = val.type;
       if(t.isEmpty()) t = val.isEmpty() ? QueryText.EMPTY_SEQUENCE + "()" : tp.toString();
 

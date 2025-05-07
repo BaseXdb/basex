@@ -101,10 +101,10 @@ public class DiskValues extends ValueIndex {
   @Override
   public final IndexIterator iter(final IndexSearch search) {
     final IntList pres;
-    if(search instanceof StringRange) {
-      pres = idRange((StringRange) search);
-    } else if(search instanceof NumericRange) {
-      pres = idRange((NumericRange) search);
+    if(search instanceof final StringRange range) {
+      pres = idRange(range);
+    } else if(search instanceof final NumericRange range) {
+      pres = idRange(range);
     } else {
       final IndexEntry ie = entry(search.token());
       pres = pres(ie.size, ie.offset);

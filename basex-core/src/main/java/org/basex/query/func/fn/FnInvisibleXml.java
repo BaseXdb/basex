@@ -70,7 +70,7 @@ public final class FnInvisibleXml extends StandardFunc {
             ? Blitz.ixmlGrammar()
             : value instanceof ANode ? value.serialize().toString()
                                      : Token.string(((Str) value).string(info));
-      } catch(QueryIOException ex) {
+      } catch(final QueryIOException ex) {
         throw ex.getCause();
       }
       final IxmlOptions opts = toOptions(arg(1), new IxmlOptions(), qc);

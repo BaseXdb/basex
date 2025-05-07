@@ -703,8 +703,7 @@ public final class IntList extends ElementList {
   @Override
   public boolean equals(final Object obj) {
     if(obj == this) return true;
-    if(!(obj instanceof IntList)) return false;
-    final IntList il = (IntList) obj;
+    if(!(obj instanceof final IntList il)) return false;
     if(size != il.size) return false;
     for(int l = 0; l < size; ++l) {
       if(list[l] != il.list[l]) return false;

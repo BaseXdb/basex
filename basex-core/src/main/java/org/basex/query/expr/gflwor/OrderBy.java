@@ -138,7 +138,7 @@ public final class OrderBy extends Clause {
       // for $i in 1 to 2 order by 1 return $i  ->  for $i in 1 to 2 return $i
       if(expr instanceof Item) return true;
       // for $i in 1 to 2 order by $i return $i  ->  for $i in sort(1 to 2) return $i
-      if(fr != null && expr instanceof VarRef && ((VarRef) expr).var == fr.var) {
+      if(fr != null && expr instanceof final VarRef vr && vr.var == fr.var) {
         fr.expr = cc.function(SORT, info, fr.expr);
         if(keys[0].desc) fr.expr = cc.function(REVERSE, info, fr.expr);
         return true;
@@ -238,10 +238,8 @@ public final class OrderBy extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof OrderBy)) return false;
-    final OrderBy o = (OrderBy) obj;
-    return Array.equals(refs, o.refs) && Array.equals(keys, o.keys);
+    return this == obj || obj instanceof final OrderBy o && Array.equals(refs, o.refs) &&
+        Array.equals(keys, o.keys);
   }
 
   @Override

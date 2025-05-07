@@ -68,8 +68,8 @@ public abstract class Cmp extends Arr {
     if(!swap) swap = expr2 instanceof ContextValue && expr2.size() == 1 &&
         !(expr1 instanceof ContextValue);
     // move path to the left: word/text() = $word
-    if(!swap) swap = !(expr1 instanceof Path && ((Path) expr1).root == null) &&
-      expr2 instanceof Path && ((Path) expr2).root == null;
+    if(!swap) swap = !(expr1 instanceof final Path pth1 && pth1.root == null) &&
+      expr2 instanceof final Path pth2 && pth2.root == null;
 
     return swap;
   }
@@ -191,39 +191,35 @@ public abstract class Cmp extends Arr {
               cc.function(NOT, info, new And(info, args).optimize(cc));
           }
 
-          if(expr1 instanceof SimpleMap) {
-            final SimpleMap map = (SimpleMap) expr1;
+          if(expr1 instanceof final SimpleMap map) {
             final int al = args.length - 1;
             final Expr last = args[al];
 
             // expr ! true() = true()  ->  exists(expr)
-            if(last instanceof Bln && (eq || ne)) {
-              return ((Bln) last).bool(info) != success ? Bln.FALSE :
+            if(last instanceof final Bln bln && (eq || ne)) {
+              return bln.bool(info) != success ? Bln.FALSE :
                 cc.function(EXISTS, info, map.remove(cc, al));
             }
 
             final Expr[] ops = last.args();
             if(ops != null && ops.length > 0 && ops[0] instanceof ContextValue) {
-              if(last instanceof CmpG) {
+              if(last instanceof final CmpG cmp) {
                 // (name ! (. = 'Ukraine')) = true()  ->  name = 'Ukraine'
                 // (code ! (. = 1)) = false()  ->  code != 1
                 final Expr op2 = ops[1];
                 if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().one())) {
-                  OpG opG = ((CmpG) last).op;
+                  OpG opG = cmp.op;
                   if(!success) opG = opG.invert();
                   return new CmpG(info, map.remove(cc, al), op2, opG).optimize(cc);
                 }
-              } else if(success && last instanceof CmpR) {
+              } else if(success && last instanceof final CmpR cmp) {
                 // (number ! (. >= 1e0) = true()  ->  number >= 1e0
-                final CmpR cmp = (CmpR) last;
                 return CmpR.get(cc, info, map.remove(cc, al), cmp.min, cmp.max);
-              } else if(success && last instanceof CmpIR) {
+              } else if(success && last instanceof final CmpIR cmp) {
                 // (integer ! (. >= 1) != false()  ->  integer >= 1
-                final CmpIR cmp = (CmpIR) last;
                 return CmpIR.get(cc, info, map.remove(cc, al), cmp.min, cmp.max);
-              } else if(success && last instanceof CmpSR) {
+              } else if(success && last instanceof final CmpSR cmp) {
                 // (string ! (. >= 'b') = true()  ->  string >= 'b'
-                final CmpSR cmp = (CmpSR) last;
                 return new CmpSR(map.remove(cc, al), cmp.min, cmp.mni, cmp.max, cmp.mxi, info).
                     optimize(cc);
               }
@@ -261,14 +257,14 @@ public abstract class Cmp extends Arr {
         return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
     // count(distinct-values(E)) = int
-    if(DISTINCT_VALUES.is(arg) && count instanceof Int) {
-      final long size1 = arg.arg(0).size(), size2 = ((Int) count).itr();
+    if(DISTINCT_VALUES.is(arg) && count instanceof final Int itr) {
+      final long size1 = arg.arg(0).size(), size2 = itr.itr();
       if(size1 != -1 && size1 == size2) return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
 
     final ExprList args = new ExprList(3);
-    if(count instanceof ANum) {
-      final double cnt = ((ANum) count).dbl();
+    if(count instanceof final ANum num) {
+      final double cnt = num.dbl();
       if(arg.seqType().zeroOrOne()) {
         // count(ZeroOrOne) < 2  ->  true()
         if(cnt > 1) {
@@ -298,9 +294,8 @@ public abstract class Cmp extends Arr {
     } else if(op == OpV.EQ || op == OpV.GE || op == OpV.LE) {
       final SeqType st2 = count.seqType();
       if(st2.type.instanceOf(AtomType.INTEGER)) {
-        if(count instanceof RangeSeq) {
+        if(count instanceof final RangeSeq rs) {
           // count(A) = 3 to 5  ->  util:within(A, 3, 5)
-          final RangeSeq rs = (RangeSeq) count;
           args.add(Int.get(rs.min())).add(Int.get(rs.max()));
         } else if(st2.one() && (count instanceof VarRef || count instanceof ContextValue)) {
           // count(A) = $c  ->  util:within(A, $c)
@@ -328,10 +323,10 @@ public abstract class Cmp extends Arr {
    */
   private Expr optStringLength(final OpV op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(!(STRING_LENGTH.is(expr1) && expr2 instanceof ANum)) return this;
+    if(!(STRING_LENGTH.is(expr1) && expr2 instanceof final ANum num)) return this;
 
     final Expr[] args = expr1.args();
-    final long[] counts = countRange(op, ((ANum) expr2).dbl());
+    final long[] counts = countRange(op, num.dbl());
     if(counts == COUNT_TRUE || counts == COUNT_FALSE) {
       // string-length(A) >= 0  ->  true()
       final Expr arg1 = args.length > 0 ? args[0] : cc.qc.focus.value;

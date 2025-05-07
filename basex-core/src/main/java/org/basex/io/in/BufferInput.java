@@ -36,7 +36,7 @@ public class BufferInput extends InputStream {
    * @return stream
    */
   public static BufferInput get(final InputStream is) {
-    return is instanceof BufferInput ? (BufferInput) is : new BufferInput(is);
+    return is instanceof final BufferInput bi ? bi : new BufferInput(is);
   }
 
   /**
@@ -47,7 +47,7 @@ public class BufferInput extends InputStream {
    */
   public static BufferInput get(final IO input) throws IOException {
     final InputStream is = input.inputStream();
-    return is instanceof BufferInput ? (BufferInput) is : new BufferInput(is, input.length());
+    return is instanceof final BufferInput bi ? bi : new BufferInput(is, input.length());
   }
 
   /**
@@ -66,7 +66,7 @@ public class BufferInput extends InputStream {
    * @param is input stream
    */
   protected BufferInput(final InputStream is) {
-    this(is, is instanceof BufferInput ? ((BufferInput) is).length : -1);
+    this(is, is instanceof final BufferInput bi ? bi.length : -1);
   }
 
   /**

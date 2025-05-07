@@ -259,7 +259,7 @@ public final class If extends Arr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof If && cond.equals(((If) obj).cond) && super.equals(obj);
+    return this == obj || obj instanceof final If iff && cond.equals(iff.cond) && super.equals(obj);
   }
 
   @Override

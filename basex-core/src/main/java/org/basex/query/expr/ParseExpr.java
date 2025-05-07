@@ -136,7 +136,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified expression
    */
   public final <T extends Expr> T copyType(final T expr) {
-    if(expr instanceof ParseExpr) ((ParseExpr) expr).exprType.assign(this);
+    if(expr instanceof final ParseExpr pe) pe.exprType.assign(this);
     return expr;
   }
 
@@ -425,7 +425,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final ANum toNumber(final Item item) throws QueryException {
     if(item.type.isUntyped()) return Dbl.get(item.dbl(info));
-    if(item instanceof ANum) return (ANum) item;
+    if(item instanceof final ANum num) return num;
     throw numberError(this, item);
   }
 
@@ -512,7 +512,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final ANode toNode(final Item item) throws QueryException {
-    if(item instanceof ANode) return (ANode) item;
+    if(item instanceof final ANode node) return node;
     throw typeError(item, NODE, info);
   }
 
@@ -574,7 +574,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Bin toBin(final Item item) throws QueryException {
-    if(item instanceof Bin) return (Bin) item;
+    if(item instanceof final Bin bin) return bin;
     throw BINARY_X.get(info, item.seqType());
   }
 
@@ -609,7 +609,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final byte[] toBytes(final Item item) throws QueryException {
     if(item.type.isStringOrUntyped()) return item.string(info);
-    if(item instanceof Bin) return ((Bin) item).binary(info);
+    if(item instanceof final Bin bin) return bin.binary(info);
     throw STRBIN_X_X.get(info, item.seqType(), item);
   }
 
@@ -667,7 +667,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XQMap toMap(final Item item) throws QueryException {
-    if(item instanceof XQMap) return (XQMap) item;
+    if(item instanceof final XQMap map) return map;
     throw typeError(item, SeqType.MAP, info);
   }
 
@@ -717,7 +717,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException if the item is not an array
    */
   protected final XQArray toArray(final Item item) throws QueryException {
-    if(item instanceof XQArray) return (XQArray) item;
+    if(item instanceof final XQArray array) return array;
     throw typeError(item, SeqType.ARRAY, info);
   }
 

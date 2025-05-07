@@ -36,22 +36,21 @@ public final class CsvW3Serializer extends CsvSerializer {
   public void serialize(final Item item) throws IOException {
     if(sep && level == 0) out.print(' ');
 
-    if(!(item instanceof XQMap))
+    if(!(item instanceof final XQMap map))
       throw CSV_SERIALIZE_X_X.getIO("Top level must be a map, found " + item.type, item);
 
-    final XQMap m = (XQMap) item;
     final TokenList tl = new TokenList();
     try {
       // print header
       if(header) {
-        if(!m.contains(CsvConverter.COLUMNS))
+        if(!map.contains(CsvConverter.COLUMNS))
           throw CSV_SERIALIZE_X.getIO("Map has no 'columns' key");
-        row(m.get(CsvConverter.COLUMNS), tl);
+        row(map.get(CsvConverter.COLUMNS), tl);
       }
       // print rows
-      if(!m.contains(CsvConverter.ROWS))
+      if(!map.contains(CsvConverter.ROWS))
         throw CSV_SERIALIZE_X.getIO("Map has no 'rows' key");
-      for(final Item record : m.get(CsvConverter.ROWS)) {
+      for(final Item record : map.get(CsvConverter.ROWS)) {
         row(((XQArray) record).iterable(), tl);
       }
     } catch(final QueryException ex) {

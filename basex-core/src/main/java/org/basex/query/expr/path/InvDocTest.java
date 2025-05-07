@@ -43,8 +43,7 @@ final class InvDocTest extends Test {
    */
   static Test get(final Expr rt) throws QueryException {
     // root unknown: use simple test
-    if(!(rt instanceof Value)) return KindTest.DOCUMENT_NODE;
-    final Value root = (Value) rt;
+    if(!(rt instanceof final Value root)) return KindTest.DOCUMENT_NODE;
 
     // use simple test if database contains only one document
     final Data data = root.data();
@@ -52,8 +51,7 @@ final class InvDocTest extends Test {
 
     // include PRE values of root nodes in document test
     final IntList pres;
-    if(root instanceof DBNodeSeq) {
-      final DBNodeSeq seq = (DBNodeSeq) root;
+    if(root instanceof final DBNodeSeq seq) {
       if(seq.all()) return KindTest.DOCUMENT_NODE;
       pres = new IntList(seq.pres());
     } else {
@@ -71,11 +69,9 @@ final class InvDocTest extends Test {
 
   @Override
   public boolean matches(final ANode node) {
-    // no database node
-    if(!(node instanceof DBNode)) return false;
-    // ensure that the PRE value is contained in the target documents
-    final DBNode db = (DBNode) node;
-    return data == db.data() && pres.sortedIndexOf(db.pre()) >= 0;
+    // database node, ensure that the PRE value is contained in the target documents
+    return node instanceof final DBNode db && data == db.data() &&
+        pres.sortedIndexOf(db.pre()) >= 0;
   }
 
   @Override
@@ -85,9 +81,8 @@ final class InvDocTest extends Test {
 
   @Override
   public boolean equals(final Object obj) {
-    if(!(obj instanceof InvDocTest)) return false;
-    final InvDocTest test = (InvDocTest) obj;
-    return data == test.data && pres.equals(test.pres);
+    return this == obj || obj instanceof final InvDocTest idt && data == idt.data &&
+        pres.equals(idt.pres);
   }
 
   @Override

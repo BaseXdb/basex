@@ -161,8 +161,7 @@ public final class Lookup extends Arr {
    * @throws QueryException query exception
    */
   private Value valueFor(final Item item, final QueryContext qc) throws QueryException {
-    if(!(item instanceof XQStruct)) throw LOOKUP_X.get(info, item);
-    final XQStruct struct = (XQStruct) item;
+    if(!(item instanceof final XQStruct struct)) throw LOOKUP_X.get(info, item);
     final Expr keys = exprs[1];
 
     // wildcard: add all values
@@ -172,8 +171,7 @@ public final class Lookup extends Arr {
     final Iter ir = keys.atomIter(qc, info);
     for(Item key; (key = ir.next()) != null;) {
       final Value value = struct.invoke(qc, info, key);
-      vb.add(value instanceof FuncItem && struct instanceof XQMap ?
-        ((FuncItem) value).toMethod(struct) : value);
+      vb.add(value instanceof FuncItem fi && struct instanceof XQMap ? fi.toMethod(struct) : value);
     }
     return vb.value(this);
   }
@@ -196,11 +194,10 @@ public final class Lookup extends Arr {
     Object key = null;
     if(keys == WILDCARD) {
       key = WILDCARD.string();
-    } else if(keys instanceof Str) {
-      final Str str = (Str) keys;
+    } else if(keys instanceof final Str str) {
       if(XMLToken.isNCName(str.string())) key = str.toJava();
-    } else if(keys instanceof Int) {
-      final long l = ((Int) keys).itr();
+    } else if(keys instanceof final Int itr) {
+      final long l = itr.itr();
       if(l >= 0) key = l;
     }
     if(key != null) qs.token(key);

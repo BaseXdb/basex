@@ -68,11 +68,8 @@ public final class RecordField {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof RecordField)) return false;
-    final RecordField rf = (RecordField) obj;
-    return optional == rf.optional && Objects.equals(seqType, rf.seqType) &&
-        Objects.equals(expr, rf.expr);
+    return this == obj || obj instanceof final RecordField rf && optional == rf.optional &&
+        Objects.equals(seqType, rf.seqType) && Objects.equals(expr, rf.expr);
   }
 
   @Override

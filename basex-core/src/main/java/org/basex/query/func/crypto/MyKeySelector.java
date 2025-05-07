@@ -51,16 +51,16 @@ final class MyKeySelector extends KeySelector {
     for(final Object l : list) {
       final XMLStructure s = (XMLStructure) l;
       PublicKey pk = null;
-      if(s instanceof KeyValue) {
+      if(s instanceof final KeyValue kv) {
         try {
-          pk = ((KeyValue) s).getPublicKey();
+          pk = kv.getPublicKey();
         } catch(final KeyException ke) {
           throw new KeySelectorException(ke);
         }
-      } else if(s instanceof X509Data) {
-        for(final Object d : ((X509Data) s).getContent()) {
-          if(d instanceof X509Certificate) {
-            pk = ((X509Certificate) d).getPublicKey();
+      } else if(s instanceof final X509Data xd) {
+        for(final Object d : xd.getContent()) {
+          if(d instanceof final X509Certificate xc) {
+            pk = xc.getPublicKey();
           }
         }
       }

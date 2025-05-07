@@ -256,10 +256,8 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof TypeswitchGroup)) return false;
-    final TypeswitchGroup tg = (TypeswitchGroup) obj;
-    return Array.equals(seqTypes, tg.seqTypes) && Objects.equals(var, tg.var) && super.equals(obj);
+    return this == obj || obj instanceof final TypeswitchGroup tg &&
+        Array.equals(seqTypes, tg.seqTypes) && Objects.equals(var, tg.var) && super.equals(obj);
   }
 
   @Override

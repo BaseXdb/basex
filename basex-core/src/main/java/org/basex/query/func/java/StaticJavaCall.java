@@ -67,8 +67,7 @@ public final class StaticJavaCall extends JavaCall {
         JavaCall.paramTypes(method, true), argTypes(exprs));
 
     // assign query context if module is inheriting the {@link QueryModule} interface
-    if(module instanceof QueryModule) {
-      final QueryModule qm = (QueryModule) module;
+    if(module instanceof final QueryModule qm) {
       qm.staticContext = sc();
       qm.queryContext = qc;
     }
@@ -117,10 +116,7 @@ public final class StaticJavaCall extends JavaCall {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof StaticJavaCall)) return false;
-    final StaticJavaCall java = (StaticJavaCall) obj;
-    return module.equals(java.module) && method.equals(java.method) &&
-        Array.equals(params, java.params) && super.equals(obj);
+    return this == obj || obj instanceof final StaticJavaCall java && module.equals(java.module) &&
+        method.equals(java.method) && Array.equals(params, java.params) && super.equals(obj);
   }
 }

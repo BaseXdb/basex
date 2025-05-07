@@ -364,7 +364,7 @@ public class QueryException extends Exception {
   private static String message(final String text, final Object[] ext, final InputInfo info) {
     final TokenList list = new TokenList(ext.length);
     for(final Object e : ext) {
-      list.add(normalize(e instanceof ExprInfo ? ((ExprInfo) e).toErrorString() : e, info));
+      list.add(normalize(e instanceof final ExprInfo ei ? ei.toErrorString() : e, info));
     }
     return Util.info(text, (Object[]) list.finish());
   }

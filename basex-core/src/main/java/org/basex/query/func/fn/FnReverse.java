@@ -64,7 +64,7 @@ public final class FnReverse extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     if(input.seqType().zeroOrOne()) return input;
-    if(input instanceof Value) return ((Value) input).reverse(cc.qc);
+    if(input instanceof final Value value) return value.reverse(cc.qc);
 
     // reverse(reverse(E))  ->  E
     if(REVERSE.is(input)) return input.arg(0);
@@ -87,8 +87,7 @@ public final class FnReverse extends StandardFunc {
       return List.get(cc, input.info(info), list.finish());
     }
     // reverse(E[test])  ->  reverse(E)[test]
-    if(input instanceof IterFilter) {
-      final IterFilter filter = (IterFilter) input;
+    if(input instanceof final IterFilter filter) {
       if(filter.root.size() != -1) return Filter.get(cc, info,
           cc.function(REVERSE, filter.info(info), filter.root), filter.exprs);
     }

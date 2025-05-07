@@ -58,7 +58,7 @@ public final class MixedPath extends Path {
           // loop through all resulting items
           final Iter ir = step.iter(qc);
           for(Item it; (it = qc.next(ir)) != null;) {
-            if(it instanceof ANode) nodes.add((ANode) it);
+            if(it instanceof final ANode node) nodes.add(node);
             else items.add(it);
           }
         }

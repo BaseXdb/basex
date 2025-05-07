@@ -327,11 +327,9 @@ public final class Window extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Window)) return false;
-    final Window w = (Window) obj;
-    return sliding == w.sliding && var.equals(w.var) && expr.equals(w.expr) &&
-        start.equals(w.start) && only == w.only && Objects.equals(end, w.end);
+    return this == obj || obj instanceof final Window w && sliding == w.sliding &&
+        var.equals(w.var) && expr.equals(w.expr) && start.equals(w.start) && only == w.only &&
+        Objects.equals(end, w.end);
   }
 
   @Override

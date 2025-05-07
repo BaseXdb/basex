@@ -45,7 +45,7 @@ public class PrintOutput extends OutputStream {
    * @return print output
    */
   public static PrintOutput get(final OutputStream out) {
-    return out instanceof PrintOutput ? (PrintOutput) out : new PrintOutput(
+    return out instanceof final PrintOutput po ? po : new PrintOutput(
            out instanceof ByteArrayOutputStream ||
            out instanceof BufferedOutputStream ||
            out instanceof BufferOutput ? out : new BufferOutput(out));

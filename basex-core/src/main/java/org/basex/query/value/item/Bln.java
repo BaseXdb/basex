@@ -126,7 +126,7 @@ public final class Bln extends Item {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Bln && value == ((Bln) obj).value;
+    return this == obj || obj instanceof final Bln bln && value == bln.value;
   }
 
   @Override

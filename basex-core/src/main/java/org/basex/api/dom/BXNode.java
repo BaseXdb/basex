@@ -154,7 +154,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final boolean isSameNode(final Node node) {
-    return node instanceof BXNode && ((BXNode) node).nd.is(nd);
+    return node instanceof final BXNode bxn && bxn.nd.is(nd);
   }
 
   @Override

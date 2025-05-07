@@ -126,7 +126,7 @@ abstract class CName extends CNode {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof CName && name.equals(((CName) obj).name) && super.equals(obj);
+    return obj instanceof final CName cname && name.equals(cname.name) && super.equals(obj);
   }
 
   @Override
@@ -137,7 +137,7 @@ abstract class CName extends CNode {
   @Override
   public final void toString(final QueryString qs, final String kind) {
     qs.token(kind);
-    if(name instanceof QNm) qs.token(((QNm) name).unique());
+    if(name instanceof final QNm qnm) qs.token(qnm.unique());
     else qs.brace(name);
     super.toString(qs, null);
   }

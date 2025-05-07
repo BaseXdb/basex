@@ -116,12 +116,12 @@ abstract class ForLet extends Clause {
    * @throws QueryException query exception
    */
   final void addPredicate(final CompileContext cc, final Expr ex) throws QueryException {
-    if(expr instanceof AxisPath && !ex.has(Flag.POS)) {
+    if(expr instanceof final AxisPath path && !ex.has(Flag.POS)) {
       // add to last step of path, provided that predicate is not positional
-      expr = ((AxisPath) expr).addPredicates(cc, ex);
-    } else if(expr instanceof Filter) {
+      expr = path.addPredicates(cc, ex);
+    } else if(expr instanceof final Filter filter) {
       // add to existing filter expression
-      expr = ((Filter) expr).addPredicate(cc, ex);
+      expr = filter.addPredicate(cc, ex);
     } else {
       // create new filter expression
       expr = Filter.get(cc, info, expr, ex);
@@ -140,8 +140,7 @@ abstract class ForLet extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    if(!(obj instanceof ForLet)) return false;
-    final ForLet fl = (ForLet) obj;
-    return expr.equals(fl.expr) && var.equals(fl.var) && scoring == fl.scoring;
+    return obj instanceof final ForLet fl && expr.equals(fl.expr) && var.equals(fl.var) &&
+        scoring == fl.scoring;
   }
 }

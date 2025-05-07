@@ -77,12 +77,12 @@ public class Arith extends Arr {
       final Expr ex = calc.optimize(expr1, expr2, info, cc);
       if(ex != null) {
         expr = ex;
-      } else if(expr1 instanceof Arith) {
-        final Calc acalc = ((Arith) expr1).calc;
+      } else if(expr1 instanceof final Arith arth1) {
+        final Calc acalc = arth1.calc;
         final boolean add = acalc.oneOf(Calc.ADD, Calc.MULTIPLY);
         final boolean sub = acalc.oneOf(Calc.SUBTRACT, Calc.DIVIDE);
         final boolean inverse = acalc == calc.invert();
-        final Expr arg1 = expr1.arg(0), arg2 = expr1.arg(1);
+        final Expr arg1 = arth1.arg(0), arg2 = arth1.arg(1);
 
         if(arg2 instanceof ANum && expr2 instanceof ANum && (acalc == calc || inverse)) {
           // (E - 3) + 2  ->  E - (3 - 2)
@@ -96,11 +96,11 @@ public class Arith extends Arr {
           expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) && add ? arg2 : this;
           if(expr != this) expr = new Cast(info, expr, SeqType.NUMERIC_O).optimize(cc);
         }
-      } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof ANum &&
-          ((ANum) expr2).dbl() < 0) {
+      } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof final ANum num &&
+          num.dbl() < 0) {
         // E + -1  ->  E - 1
         // E - -1  ->  E + 1
-        final Expr inv2 = new Unary(info, expr2, true).optimize(cc);
+        final Expr inv2 = new Unary(info, num, true).optimize(cc);
         expr = new Arith(info, expr1, inv2, calc.invert()).optimize(cc);
       }
     }
@@ -126,9 +126,10 @@ public class Arith extends Arr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.PREDICATE && Function.LAST.is(exprs[0]) && exprs[1] instanceof ANum) {
+    if(mode == Simplify.PREDICATE && Function.LAST.is(exprs[0]) &&
+        exprs[1] instanceof final ANum num) {
       // E[last() + 1]  ->  E[false()]
-      final double d = ((ANum) exprs[1]).dbl();
+      final double d = num.dbl();
       if(calc == Calc.ADD && d > 0 || calc == Calc.SUBTRACT && d < 0 ||
         calc == Calc.MULTIPLY && d > 1 || calc == Calc.DIVIDE && d < 1) expr = Bln.FALSE;
     }
@@ -144,7 +145,7 @@ public class Arith extends Arr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Arith && calc == ((Arith) obj).calc && super.equals(obj);
+    return this == obj || obj instanceof final Arith arth && calc == arth.calc && super.equals(obj);
   }
 
   @Override

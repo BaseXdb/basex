@@ -76,8 +76,7 @@ public final class IndexStaticDb extends IndexDb {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof IndexStaticDb && data() == ((IndexStaticDb) obj).data() &&
-        super.equals(obj);
+    return obj instanceof final IndexStaticDb is && data() == is.data() && super.equals(obj);
   }
 
   @Override

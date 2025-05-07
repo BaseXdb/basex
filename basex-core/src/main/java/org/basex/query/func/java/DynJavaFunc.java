@@ -130,8 +130,7 @@ final class DynJavaFunc extends DynJavaCall {
     // assign query context if module is inheriting the {@link QueryModule} interface
     final Method method = (Method) jc.executable;
     final Object instance = instance(values, isStatic(method));
-    if(instance instanceof QueryModule) {
-      final QueryModule qm = (QueryModule) instance;
+    if(instance instanceof final QueryModule qm) {
       qm.staticContext = sc();
       qm.queryContext = qc;
     }
@@ -166,7 +165,7 @@ final class DynJavaFunc extends DynJavaCall {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof DynJavaFunc && name.equals(((DynJavaFunc) obj).name) &&
+    return this == obj || obj instanceof final DynJavaFunc djf && name.equals(djf.name) &&
         super.equals(obj);
   }
 }

@@ -83,7 +83,7 @@ public final class FnPath extends ContextFn {
       node = parent;
 
       // root node: finalize traversal
-      if(origin instanceof ANode && node.is((ANode) origin)) {
+      if(origin instanceof final ANode nd && node.is(nd)) {
         relative = true;
         break;
       }

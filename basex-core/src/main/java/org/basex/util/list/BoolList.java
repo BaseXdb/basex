@@ -140,8 +140,7 @@ public final class BoolList extends ElementList {
   @Override
   public boolean equals(final Object obj) {
     if(obj == this) return true;
-    if(!(obj instanceof BoolList)) return false;
-    final BoolList bl = (BoolList) obj;
+    if(!(obj instanceof final BoolList bl)) return false;
     if(size != bl.size) return false;
     for(int l = 0; l < size; ++l) {
       if(list[l] != bl.list[l]) return false;

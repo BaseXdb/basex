@@ -56,7 +56,7 @@ public final class FTxt extends FNode {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTxt && Token.eq(value, ((FTxt) obj).value) &&
+    return this == obj || obj instanceof final FTxt ftxt && Token.eq(value, ftxt.value) &&
         super.equals(obj);
   }
 

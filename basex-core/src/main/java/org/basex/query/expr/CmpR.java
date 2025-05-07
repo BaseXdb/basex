@@ -93,12 +93,11 @@ public final class CmpR extends Single {
       return cmp;
 
     double mn, mx;
-    if(expr2 instanceof RangeSeq) {
-      final RangeSeq rs = (RangeSeq) expr2;
+    if(expr2 instanceof final RangeSeq rs) {
       mn = rs.min();
       mx = rs.max();
-    } else if(expr2 instanceof ANum && !(expr2 instanceof Dec && int1)) {
-      mn = ((ANum) expr2).dbl();
+    } else if(expr2 instanceof final ANum num && !(num instanceof Dec && int1)) {
+      mn = num.dbl();
       mx = mn;
     } else {
       return cmp;
@@ -186,12 +185,12 @@ public final class CmpR extends Single {
       throws QueryException {
 
     Double newMin = null, newMax = null;
-    if(ex instanceof CmpR) {
-      final CmpR cmp = (CmpR) ex;
+    if(ex instanceof final CmpR cmp) {
       newMin = cmp.min;
       newMax = cmp.max;
-    } else if(ex instanceof CmpG && ((CmpG) ex).op == OpG.EQ && ex.arg(1) instanceof ANum) {
-      newMin = ((ANum) ex.arg(1)).dbl();
+    } else if(ex instanceof final CmpG cmp && cmp.op == OpG.EQ &&
+        ex.arg(1) instanceof final ANum num) {
+      newMin = num.dbl();
       newMax = newMin;
     }
     if(newMin == null || !expr.equals(ex.arg(0)) || or && (max < newMin || min > newMax))
@@ -252,12 +251,11 @@ public final class CmpR extends Single {
     // statistics are not up-to-date
     final Data data = ii.db.data();
     if(data == null || !data.meta.uptodate || !data.nspaces.isEmpty() ||
-        !(expr instanceof AxisPath)) return null;
+        !(expr instanceof final AxisPath path)) return null;
 
     NameTest test = ii.test;
     if(test == null) {
       final Step step;
-      final AxisPath path = (AxisPath) expr;
       final int st = path.steps.length - 1;
       if(type == IndexType.TEXT) {
         step = st == 0 ? ii.step : path.step(st - 1);
@@ -265,8 +263,8 @@ public final class CmpR extends Single {
         step = path.step(st);
         if(step.axis != Axis.ATTRIBUTE || step.exprs.length > 0) return null;
       }
-      if(!(step.test instanceof NameTest)) return null;
-      test = (NameTest) step.test;
+      if(!(step.test instanceof final NameTest nt)) return null;
+      test = nt;
       if(test.part() != NamePart.LOCAL) return null;
     }
 
@@ -284,10 +282,8 @@ public final class CmpR extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof CmpR)) return false;
-    final CmpR c = (CmpR) obj;
-    return min == c.min && max == c.max && super.equals(obj);
+    return this == obj || obj instanceof final CmpR cmp && min == cmp.min && max == cmp.max &&
+        super.equals(obj);
   }
 
   @Override

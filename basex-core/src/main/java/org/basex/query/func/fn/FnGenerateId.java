@@ -18,8 +18,7 @@ public final class FnGenerateId extends ContextFn {
     if(node == null) return Str.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder(Token.ID);
-    if(node instanceof DBNode) {
-      final DBNode dbnode = (DBNode) node;
+    if(node instanceof final DBNode dbnode) {
       tb.addInt(dbnode.data().dbid).add('d').addInt(dbnode.pre());
     } else {
       tb.addInt(node.id);

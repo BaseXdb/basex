@@ -42,7 +42,7 @@ public final class ItemSeq extends Seq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof ItemSeq ? Array.equals(items, ((ItemSeq) obj).items) :
+    return this == obj || (obj instanceof final ItemSeq seq ? Array.equals(items, seq.items) :
       super.equals(obj));
   }
 

@@ -146,7 +146,7 @@ final class SyntaxXQuery extends Syntax {
     for(int t = 0; t < tl; t++) {
       final byte curr = text[t];
       final int open = OPENING.indexOf(curr), close = CLOSING.indexOf(curr);
-      int next = t + 1 < tl ? text[t + 1] : 0, prev = t > 0 ? text[t - 1] : 0;
+      final int next = t + 1 < tl ? text[t + 1] : 0, prev = t > 0 ? text[t - 1] : 0;
       if(quoted != 0) {
         if(curr == quoted) quoted = 0;
       } else if("\"'`".indexOf(curr) != -1) {

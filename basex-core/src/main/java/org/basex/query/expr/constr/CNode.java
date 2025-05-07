@@ -101,7 +101,7 @@ public abstract class CNode extends Arr {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof CNode && computed == ((CNode) obj).computed && super.equals(obj);
+    return obj instanceof final CNode cnode && computed == cnode.computed && super.equals(obj);
   }
 
   @Override

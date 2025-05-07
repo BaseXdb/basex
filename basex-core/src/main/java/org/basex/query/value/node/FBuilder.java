@@ -49,7 +49,7 @@ public final class FBuilder {
     final Atts ns = namespaces != null ? namespaces.optimize() : NO_NAMESPACES;
     final ANode[] at = attributes != null ? attributes.finish() : NO_NODES;
     final ANode[] ch = children != null ? children.finish() : NO_NODES;
-    return root instanceof FElem ? ((FElem) root).finish(ns, at, ch) : ((FDoc) root).finish(ch);
+    return root instanceof final FElem felem ? felem.finish(ns, at, ch) : ((FDoc) root).finish(ch);
   }
 
   /**

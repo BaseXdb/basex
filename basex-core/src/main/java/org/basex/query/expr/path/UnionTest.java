@@ -103,7 +103,7 @@ public final class UnionTest extends Test {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof UnionTest && Arrays.equals(tests, ((UnionTest) obj).tests);
+    return this == obj || obj instanceof final UnionTest ut && Arrays.equals(tests, ut.tests);
   }
 
   @Override

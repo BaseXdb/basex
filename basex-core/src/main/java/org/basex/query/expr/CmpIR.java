@@ -84,12 +84,11 @@ public final class CmpIR extends Single {
     if(!(type1.instanceOf(AtomType.INTEGER) || cmpEq && type1.isUntyped())) return cmp;
 
     long mn, mx;
-    if(expr2 instanceof RangeSeq) {
-      final RangeSeq rs = (RangeSeq) expr2;
+    if(expr2 instanceof final RangeSeq rs) {
       mn = rs.min();
       mx = rs.max();
-    } else if(expr2 instanceof Int && (eq || !cmpEq)) {
-      mn = ((Int) expr2).itr();
+    } else if(expr2 instanceof final Int itr && (eq || !cmpEq)) {
+      mn = itr.itr();
       mx = mn;
     } else {
       return cmp;
@@ -172,12 +171,12 @@ public final class CmpIR extends Single {
       throws QueryException {
 
     Long newMin = null, newMax = null;
-    if(ex instanceof CmpIR) {
-      final CmpIR cmp = (CmpIR) ex;
+    if(ex instanceof final CmpIR cmp) {
       newMin = cmp.min;
       newMax = cmp.max;
-    } else if(ex instanceof CmpG && ((CmpG) ex).op == OpG.EQ && ex.arg(1) instanceof Int) {
-      newMin = ((Int) ex.arg(1)).itr();
+    } else if(ex instanceof final CmpG cmp && cmp.op == OpG.EQ &&
+        ex.arg(1) instanceof final Int itr) {
+      newMin = itr.itr();
       newMax = newMin;
     }
     if(newMin == null || !expr.equals(ex.arg(0)) || or && (max < newMin || min > newMax))
@@ -198,10 +197,8 @@ public final class CmpIR extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof CmpIR)) return false;
-    final CmpIR c = (CmpIR) obj;
-    return min == c.min && max == c.max && super.equals(obj);
+    return this == obj || obj instanceof final CmpIR cmp && min == cmp.min && max == cmp.max &&
+        super.equals(obj);
   }
 
   @Override

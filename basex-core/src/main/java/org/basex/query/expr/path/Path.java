@@ -84,10 +84,11 @@ public abstract class Path extends ParseExpr {
       if(expr instanceof ContextValue) {
         // rewrite context value reference to self step
         expr = Step.get(expr.info(info), SELF, KindTest.NODE);
-      } else if(expr instanceof Filter) {
+      } else if(expr instanceof final Filter filter) {
         // rewrite filter expression to self step with predicates
-        final Filter f = (Filter) expr;
-        if(f.root instanceof ContextValue) expr = Step.get(f.info(), SELF, KindTest.NODE, f.exprs);
+        if(filter.root instanceof ContextValue) {
+          expr = Step.get(filter.info(), SELF, KindTest.NODE, filter.exprs);
+        }
       }
       tmp.add(expr);
       axes = axes && expr instanceof Step;
@@ -198,13 +199,10 @@ public abstract class Path extends ParseExpr {
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // merge nested predicates. example: if(a[b])  ->  if(a/b)
       final Expr last = steps[steps.length - 1];
-      if(last instanceof Step) {
-        final Step step = (Step) last;
-        if(step.exprs.length == 1 && step.seqType().type instanceof NodeType &&
-            !step.exprs[0].seqType().mayBeNumber()) {
-          final Expr ex = step.flattenEbv(this, true, cc);
-          if(ex != step) expr = ex;
-        }
+      if(last instanceof final Step step && step.exprs.length == 1 &&
+          step.seqType().type instanceof NodeType && !step.exprs[0].seqType().mayBeNumber()) {
+        final Expr ex = step.flattenEbv(this, true, cc);
+        if(ex != step) expr = ex;
       }
     }
     return cc.simplify(this, expr, mode);
@@ -246,7 +244,7 @@ public abstract class Path extends ParseExpr {
    * @return axis step, or {@code null})
    */
   private Step axisStep(final int index) {
-    return steps[index] instanceof Step ? (Step) steps[index] : null;
+    return steps[index] instanceof final Step step ? step : null;
   }
 
   /**
@@ -255,9 +253,7 @@ public abstract class Path extends ParseExpr {
    */
   public boolean simple() {
     for(final Expr step : steps) {
-      if(!(step instanceof Step)) return false;
-      final Axis axis = ((Step) step).axis;
-      if(axis != SELF && axis != CHILD && axis != ATTRIBUTE) return false;
+      if(!(step instanceof final Step stp) || !stp.axis.oneOf(SELF, CHILD, ATTRIBUTE)) return false;
     }
     return true;
   }
@@ -274,8 +270,7 @@ public abstract class Path extends ParseExpr {
 
     // flatten nested path
     Expr rt = root;
-    if(rt instanceof Path) {
-      final Path path = (Path) rt;
+    if(rt instanceof final Path path) {
       tmp.add(path.steps);
       rt = path.root;
       cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) path::description, path);
@@ -285,9 +280,8 @@ public abstract class Path extends ParseExpr {
     // add steps of input array
     for(final Expr step : steps) {
       Expr expr = step;
-      if(expr instanceof Path) {
+      if(expr instanceof final Path path) {
         // rewrite nested path to axis steps
-        final Path path = (Path) expr;
         if(path.root != null && !(path.root instanceof ContextValue)) tmp.add(path.root);
         final int pl = path.steps.length - 1;
         for(int i = 0; i < pl; i++) tmp.add(path.steps[i]);
@@ -320,7 +314,7 @@ public abstract class Path extends ParseExpr {
       if(prev != null) {
         final SeqType seqType = prev.seqType();
         if(seqType.type instanceof NodeType && (step instanceof ContextValue ||
-            step instanceof Step && ((Step) step).remove(seqType))) {
+            step instanceof final Step stp && stp.remove(seqType))) {
           removed = true;
           continue;
         }
@@ -378,18 +372,14 @@ public abstract class Path extends ParseExpr {
     for(final Expr expr : steps) {
       if(expr instanceof UtilRoot) {
         pn = UtilRoot.nodes(pn);
-      } else if(expr instanceof Step) {
-        final Step step = (Step) expr;
+      } else if(expr instanceof final Step step) {
         pn = step.nodes(pn, stats);
         // check if paths within predicates are correct
         if(!stats && pn != null) {
           for(final Expr ex : step.exprs) {
-            if(ex instanceof AxisPath) {
-              final AxisPath path = (AxisPath) ex;
-              if(path.root == null) {
-                final ArrayList<PathNode> tmp = path.pathNodes(pn, false);
-                if(tmp != null && tmp.isEmpty()) return tmp;
-              }
+            if(ex instanceof final AxisPath path && path.root == null) {
+              final ArrayList<PathNode> tmp = path.pathNodes(pn, false);
+              if(tmp != null && tmp.isEmpty()) return tmp;
             }
           }
         }
@@ -438,8 +428,8 @@ public abstract class Path extends ParseExpr {
       Expr prev = rt;
       for(final Expr step : steps) {
         final SeqType seqType = prev.seqType();
-        if(seqType.type instanceof NodeType && step instanceof Step && ((Step) step).empty(seqType))
-          return true;
+        if(seqType.type instanceof NodeType && step instanceof final Step stp &&
+            stp.empty(seqType)) return true;
         prev = step;
       }
     }
@@ -590,9 +580,7 @@ public abstract class Path extends ParseExpr {
       if(curr == null) return null;
 
       final boolean desc = curr.axis == DESCENDANT;
-      if(!desc && curr.axis != CHILD || !(curr.test instanceof NameTest)) return null;
-
-      final NameTest test = (NameTest) curr.test;
+      if(!desc && curr.axis != CHILD || !(curr.test instanceof final NameTest test)) return null;
       if(test.part() != NamePart.LOCAL) return null;
 
       final int name = data.elemNames.index(test.qname.local());
@@ -799,17 +787,15 @@ public abstract class Path extends ParseExpr {
     // create new root expression
     final ExprList indexSteps = new ExprList();
     final Expr indexRoot;
-    if(index.expr instanceof Path) {
-      final Path path = (Path) index.expr;
+    if(index.expr instanceof final Path path) {
       indexRoot = path.root;
       indexSteps.add(path.steps);
     } else {
       indexRoot = index.expr;
     }
     // only one hit: update sequence type
-    if(index.costs.results() == 1 && indexRoot instanceof ParseExpr) {
-      final Occ occ = indexRoot instanceof IndexAccess ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
-      ((ParseExpr) indexRoot).exprType.assign(occ);
+    if(index.costs.results() == 1 && indexRoot instanceof final ParseExpr expr) {
+      expr.exprType.assign(expr instanceof IndexAccess ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
     }
 
     // invert steps that occur before index step, rewrite them to predicates
@@ -878,9 +864,8 @@ public abstract class Path extends ParseExpr {
       if(step.test instanceof KindTest && s != i) continue;
       // consider child steps with name test and without predicates
       if(step.axis != CHILD || s != i && step.exprs.length > 0 ||
-          !(step.test instanceof NameTest)) return true;
+          !(step.test instanceof final NameTest test)) return true;
       // only consider local name tests
-      final NameTest test = (NameTest) step.test;
       if(test.part() != NamePart.LOCAL) return true;
       // only support unique paths with nodes on the correct level
       final ArrayList<PathNode> pn = data().paths.desc(test.qname.local());
@@ -901,19 +886,17 @@ public abstract class Path extends ParseExpr {
       // do not rewrite (a, b)/<c/>
       if(step == null || next != null && next.has(Flag.CNS)) return step;
       // (a, b)/c  ->  (a | b)/a
-      if(step instanceof List) return ((List) step).toUnion(cc);
+      if(step instanceof final List lst) return lst.toUnion(cc);
       // a[b, c]  ->  a[b | c]
-      if(step instanceof Filter) {
-        final Filter filter = (Filter) step;
-        if(!filter.mayBePositional() && filter.root instanceof List) {
-          final Expr st = ((List) filter.root).toUnion(cc);
-          if(st != filter.root) return Filter.get(cc, filter.info(), st, filter.exprs);
-        }
+      if(step instanceof final Filter fltr && !fltr.mayBePositional() &&
+          fltr.root instanceof final List lst) {
+        final Expr st = lst.toUnion(cc);
+        if(st != fltr.root) return Filter.get(cc, fltr.info(), st, fltr.exprs);
       }
       // replicate(a, 2)/b  ->  a/b
       if(step.seqType().type instanceof NodeType) {
         if(REPLICATE.is(step) && ((FnReplicate) step).singleEval(false)) return step.arg(0);
-        if(step instanceof SingletonSeq) return ((SingletonSeq) step).itemAt(0);
+        if(step instanceof final SingletonSeq ss) return ss.itemAt(0);
       }
       return step;
     };
@@ -958,10 +941,9 @@ public abstract class Path extends ParseExpr {
       boolean chngd = false;
       for(int s = 0; s < sl; s++) {
         Expr curr = steps[s];
-        if(curr instanceof Step) {
+        if(curr instanceof final Step crr) {
           Expr next = s < sl - 1 ? steps[s + 1] : null;
-          final Step crr = (Step) curr;
-          if(crr.test == KindTest.NODE && next instanceof Step && ((Step) next).axis == ATTRIBUTE) {
+          if(crr.test == KindTest.NODE && next instanceof final Step stp && stp.axis == ATTRIBUTE) {
             // rewrite node test before attribute step: node()/@*  ->  */@*
             next = Step.get(cc, null, crr.info(), crr.axis, KindTest.ELEMENT, crr.exprs);
             curr = cc.replaceWith(curr, next);
@@ -1019,9 +1001,7 @@ public abstract class Path extends ParseExpr {
     if(step.exprs.length != 1 || step.mayBePositional()) return null;
 
     final Expr pred = step.exprs[0];
-    if(!(pred instanceof Path)) return null;
-    final Path path = (Path) pred;
-    if(path.root != null) return null;
+    if(!(pred instanceof final Path path) || path.root != null) return null;
 
     final Expr[] predSteps = path.steps;
     final int sl = steps.length, pl = predSteps.length;
@@ -1053,7 +1033,7 @@ public abstract class Path extends ParseExpr {
     if(curr.mayBePositional()) return null;
 
     // merge self steps:  child::*/self::a  ->  child::a
-    final Step nxt = next instanceof Step ? (Step) next : null;
+    final Step nxt = next instanceof final Step stp ? stp : null;
     if(nxt != null && nxt.axis == SELF && !nxt.mayBePositional()) {
       final Test test = curr.test.intersect(nxt.test);
       return test == null ? null :
@@ -1090,12 +1070,9 @@ public abstract class Path extends ParseExpr {
     if(next instanceof Union) return rewrite.apply(next);
 
     // descendant-or-self::node()/(text()|*)[..]  ->  (descendant::text() | descendant::*)[..]
-    if(next instanceof Filter) {
-      final Filter filter = (Filter) next;
-      if(!filter.mayBePositional()) {
-        final Expr expr = rewrite.apply(filter.root);
-        if(expr != null) return Filter.get(cc, filter.info(), expr, filter.exprs);
-      }
+    if(next instanceof final Filter filter && !filter.mayBePositional()) {
+      final Expr expr = rewrite.apply(filter.root);
+      if(expr != null) return Filter.get(cc, filter.info(), expr, filter.exprs);
     }
     return null;
   }
@@ -1106,8 +1083,7 @@ public abstract class Path extends ParseExpr {
    * @return axis or {@code null}
    */
   private static Axis mergedAxis(final Expr expr) {
-    if(expr instanceof Step) {
-      final Step step = (Step) expr;
+    if(expr instanceof final Step step) {
       final Axis axis = step.axis;
       if(!step.mayBePositional()) {
         if(axis == CHILD || axis == DESCENDANT) return DESCENDANT;
@@ -1125,9 +1101,7 @@ public abstract class Path extends ParseExpr {
   private static Axis commonAxis(final Expr... exprs) {
     Axis common = null;
     for(final Expr ex : exprs) {
-      if(!(ex instanceof Path)) return null;
-      final Path path = (Path) ex;
-      if(path.root != null) return null;
+      if(!(ex instanceof final Path path) || path.root != null) return null;
       final Axis merged = mergedAxis(path.steps[0]);
       common = common == merged || common == null ? merged : null;
       if(common == null) return null;
@@ -1220,9 +1194,8 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean equals(final Object obj) {
-    if(!(obj instanceof Path)) return false;
-    final Path path = (Path) obj;
-    return Objects.equals(root, path.root) && Array.equals(steps, path.steps);
+    return this == obj || obj instanceof final Path path && Objects.equals(root, path.root) &&
+        Array.equals(steps, path.steps);
   }
 
   @Override

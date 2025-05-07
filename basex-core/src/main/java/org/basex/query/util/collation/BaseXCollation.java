@@ -36,8 +36,7 @@ final class BaseXCollation extends Collation {
   protected int indexOf(final String string, final String contains, final Mode mode,
       final InputInfo info) throws QueryException {
 
-    if(!(collator instanceof RuleBasedCollator)) throw CHARCOLL.get(info);
-    final RuleBasedCollator rbc = (RuleBasedCollator) collator;
+    if(!(collator instanceof final RuleBasedCollator rbc)) throw CHARCOLL.get(info);
     final CollationElementIterator iterS = rbc.getCollationElementIterator(string);
     final CollationElementIterator iterC = rbc.getCollationElementIterator(contains);
 
@@ -67,8 +66,8 @@ final class BaseXCollation extends Collation {
 
   @Override
   public byte[] key(final byte[] string, final InputInfo info) throws QueryException {
-    if(!(collator instanceof RuleBasedCollator)) throw CHARCOLL.get(info);
-    return ((RuleBasedCollator) collator).getCollationKey(Token.string(string)).toByteArray();
+    if(!(collator instanceof final RuleBasedCollator rbc)) throw CHARCOLL.get(info);
+    return rbc.getCollationKey(Token.string(string)).toByteArray();
   }
 
   /**
@@ -100,7 +99,6 @@ final class BaseXCollation extends Collation {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof BaseXCollation &&
-        collator.equals(((BaseXCollation) obj).collator);
+    return this == obj || obj instanceof final BaseXCollation bxc && collator.equals(bxc.collator);
   }
 }

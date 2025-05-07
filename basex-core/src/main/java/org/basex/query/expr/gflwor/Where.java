@@ -119,7 +119,7 @@ public final class Where extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof Where && expr.equals(((Where) obj).expr);
+    return obj instanceof final Where whr && expr.equals(whr.expr);
   }
 
   @Override

@@ -125,8 +125,8 @@ public final class RecordType extends MapType {
   }
 
   @Override
-  public boolean equals(final Object o) {
-    return this == o || o instanceof RecordType && eq((RecordType) o, emptySet(), true);
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof final RecordType rt && eq(rt, emptySet(), true);
   }
 
   /**
@@ -140,8 +140,7 @@ public final class RecordType extends MapType {
    */
   private boolean eq(final Type type, final Set<Pair> pairs, final boolean strict) {
     if(this == type) return true;
-    if(!(type instanceof RecordType)) return false;
-    final RecordType rt = (RecordType) type;
+    if(!(type instanceof final RecordType rt)) return false;
     if(extensible != rt.extensible || fields.size() != rt.fields.size()) return false;
 
     final Predicate<byte[]> compareFields = key -> {
@@ -150,11 +149,9 @@ public final class RecordType extends MapType {
       final SeqType st1 = rf1.seqType(), st2 = rf2.seqType();
       if(st1.occ != st2.occ) return false;
       final Type tp1 = st1.type, tp2 = st2.type;
-      if(tp1 instanceof RecordType && tp2 instanceof RecordType) {
-        final Pair pair = new Pair(tp1, tp2);
-        if(!pairs.contains(pair) && !((RecordType) tp1).eq(tp2, pair.addTo(pairs), strict)) {
-          return false;
-        }
+      if(tp1 instanceof final RecordType rt1 && tp2 instanceof final RecordType rt2) {
+        final Pair pair = new Pair(rt1, rt2);
+        if(!pairs.contains(pair) && !rt1.eq(rt2, pair.addTo(pairs), strict)) return false;
       } else if(!tp1.eq(tp2)) {
         return false;
       }
@@ -191,14 +188,13 @@ public final class RecordType extends MapType {
     if(this == type || type.oneOf(SeqType.RECORD, SeqType.MAP, SeqType.FUNCTION, AtomType.ITEM)) {
       return true;
     }
-    if(type instanceof ChoiceItemType) {
-      for(final SeqType st : ((ChoiceItemType) type).types) {
+    if(type instanceof final ChoiceItemType cit) {
+      for(final SeqType st : cit.types) {
         if(instanceOf(st.type, pairs)) return true;
       }
       return false;
     }
-    if(type instanceof RecordType) {
-      final RecordType rt = (RecordType) type;
+    if(type instanceof final RecordType rt) {
       if(!rt.extensible) {
         if(extensible) return false;
         for(final byte[] key : fields) {
@@ -217,12 +213,13 @@ public final class RecordType extends MapType {
             } else {
               if(!fst.occ.instanceOf(rtfst.occ)) return false;
               final Type ft = fst.type, rtft = rtfst.type;
-              if(ft instanceof RecordType && rtft instanceof RecordType) {
-                final Pair pair = new Pair(ft, rtft);
-                if(!pairs.contains(pair) && !((RecordType) ft).instanceOf(rtft, pair.addTo(pairs)))
+              if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2) {
+                final Pair pair = new Pair(rt1, rt2);
+                if(!pairs.contains(pair) && !rt1.instanceOf(rt2, pair.addTo(pairs)))
                   return false;
+              } else if(!ft.instanceOf(rtft)) {
+                return false;
               }
-              else if(!ft.instanceOf(rtft)) return false;
             }
           }
         } else if(!rtf.optional || extensible && rtf.seqType() != SeqType.ITEM_ZM) {
@@ -231,8 +228,7 @@ public final class RecordType extends MapType {
       }
       return true;
     }
-    if(!extensible && type instanceof MapType) {
-      final MapType mt = (MapType) type;
+    if(!extensible && type instanceof final MapType mt) {
       if(!mt.keyType().oneOf(AtomType.STRING, AtomType.ANY_ATOMIC_TYPE)) return false;
       final int fs = fields.size();
       for(int f = 1; f <= fs; f++) {
@@ -240,8 +236,7 @@ public final class RecordType extends MapType {
       }
       return true;
     }
-    if(type instanceof FuncType) {
-      final FuncType ft = type.funcType();
+    if(type instanceof final FuncType ft) {
       return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
           ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O);
     }
@@ -272,8 +267,7 @@ public final class RecordType extends MapType {
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
-    if(type instanceof RecordType) {
-      final RecordType rt = (RecordType) type;
+    if(type instanceof final RecordType rt) {
       final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
       for(final byte[] key : fields) {
         final RecordField f = fields.get(key);
@@ -283,12 +277,11 @@ public final class RecordType extends MapType {
           final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
           final Type ft = fst.type, rtft = rtfst.type;
           final SeqType union;
-          if(ft instanceof RecordType && rtft instanceof RecordType && !fst.zero()
-              && !rtfst.zero()) {
-            final Pair pair = new Pair(ft, rtft);
+          if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2 &&
+              !fst.zero() && !rtfst.zero()) {
+            final Pair pair = new Pair(rt1, rt2);
             if(pairs.contains(pair)) return SeqType.RECORD;
-            union = SeqType.get(((RecordType) ft).union(rtft, pair.addTo(pairs)),
-                fst.occ.union(rtfst.occ));
+            union = SeqType.get(rt1.union(rt2, pair.addTo(pairs)), fst.occ.union(rtfst.occ));
           } else {
             union = fst.union(rtfst);
           }
@@ -306,7 +299,7 @@ public final class RecordType extends MapType {
       }
       return new RecordType(extensible || rt.extensible, map);
     }
-    return type instanceof MapType ? ((MapType) type).union(keyType(), valueType()) :
+    return type instanceof final MapType mt ? mt.union(keyType(), valueType()) :
            type instanceof ArrayType ? SeqType.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
@@ -330,8 +323,7 @@ public final class RecordType extends MapType {
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 
-    if(!(type instanceof RecordType)) return null;
-    final RecordType rt = (RecordType) type;
+    if(!(type instanceof final RecordType rt)) return null;
     final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
     for(final byte[] key : fields) {
       final RecordField f = fields.get(key);
@@ -341,11 +333,11 @@ public final class RecordType extends MapType {
         final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
         final Type ft = fst.type, rtft = rtfst.type;
         final SeqType is;
-        if(ft instanceof RecordType && rtft instanceof RecordType) {
-          final Pair pair = new Pair(ft, rtft);
+        if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2) {
+          final Pair pair = new Pair(rt1, rt2);
           if(pairs.contains(pair))
             return null;
-          final Type it = ((RecordType) ft).intersect(rtft, pair.addTo(pairs));
+          final Type it = rt1.intersect(rt2, pair.addTo(pairs));
           is = it == null ? null : SeqType.get(it, fst.occ.intersect(rtfst.occ));
         } else {
           is = fst.intersect(rtfst);
@@ -458,11 +450,8 @@ public final class RecordType extends MapType {
     }
 
     @Override
-    public boolean equals(final Object o) {
-      if(this == o) return true;
-      if(!(o instanceof Pair)) return false;
-      final Pair p = (Pair) o;
-      return o1 == p.o1 && o2 == p.o2;
+    public boolean equals(final Object obj) {
+      return this == obj || obj instanceof final Pair p && o1 == p.o1 && o2 == p.o2;
     }
 
     @Override

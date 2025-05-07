@@ -110,8 +110,8 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
   @Override
   public boolean removeAll(final ANode node) {
-    if(data != null && ddo && node instanceof DBNode) {
-      final int p = binarySearch((DBNode) node, 0, size);
+    if(data != null && ddo && node instanceof final DBNode dbnode) {
+      final int p = binarySearch(dbnode, 0, size);
       if(p < 0) return false;
       remove(p);
       return true;
@@ -122,7 +122,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   @Override
   public boolean contains(final ANode node) {
     if(data != null && ddo) {
-      return node instanceof DBNode && binarySearch((DBNode) node, 0, size) > -1;
+      return node instanceof final DBNode dbnode && binarySearch(dbnode, 0, size) > -1;
     }
     return super.contains(node);
   }

@@ -134,16 +134,13 @@ public final class List extends Arr {
     for(int e = 0; e <= el; e++) {
       final Expr expr = e < el ? exprs[e] : null;
       long mn = Long.MIN_VALUE, mx = 0;
-      if(expr instanceof Int && expr.seqType().type == AtomType.INTEGER) {
-        final long l = ((Int) expr).itr();
+      if(expr instanceof final Int itr && itr.type == AtomType.INTEGER) {
+        final long l = itr.itr();
         mn = l;
         mx = l;
-      } else if(expr instanceof RangeSeq) {
-        final RangeSeq rs = (RangeSeq) expr;
-        if(rs.ascending()) {
-          mn = rs.min();
-          mx = rs.max();
-        }
+      } else if(expr instanceof final RangeSeq rs && rs.ascending()) {
+        mn = rs.min();
+        mx = rs.max();
       }
       boolean add = mn == Long.MIN_VALUE;
       if(!add) {
@@ -282,11 +279,10 @@ public final class List extends Arr {
   private Expr toRange() {
     long start = 0, end = 0, min, max;
     for(final Expr expr : exprs) {
-      if(expr instanceof Int) {
-        min = ((Int) expr).itr();
+      if(expr instanceof final Int itr) {
+        min = itr.itr();
         max = min + 1;
-      } else if(expr instanceof RangeSeq) {
-        final RangeSeq rs = (RangeSeq) expr;
+      } else if(expr instanceof final RangeSeq rs) {
         min = rs.min();
         max = rs.max() + 1;
       } else {

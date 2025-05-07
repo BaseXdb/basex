@@ -25,9 +25,8 @@ public final class ArrayPut extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Type type = arg(0).seqType().type;
-    if(type instanceof ArrayType) {
-      final SeqType mt = ((ArrayType) type).valueType().union(arg(2).seqType());
-      exprType.assign(ArrayType.get(mt));
+    if(type instanceof final ArrayType at) {
+      exprType.assign(ArrayType.get(at.valueType().union(arg(2).seqType())));
     }
     return this;
   }

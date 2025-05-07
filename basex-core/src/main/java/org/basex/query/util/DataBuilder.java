@@ -270,8 +270,7 @@ public final class DataBuilder {
    * @return number of descendants + 1 or attribute size + 1
    */
   private static int size(final ANode node, final boolean att) {
-    if(node instanceof DBNode) {
-      final DBNode dbnode = (DBNode) node;
+    if(node instanceof final DBNode dbnode) {
       final Data data = dbnode.data();
       final int kind = node.kind();
       final int pre = dbnode.pre();

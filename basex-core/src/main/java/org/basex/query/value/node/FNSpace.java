@@ -56,10 +56,8 @@ public final class FNSpace extends FNode {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FNSpace)) return false;
-    final FNSpace f = (FNSpace) obj;
-    return Token.eq(name, ((FNSpace) obj).name) && Token.eq(value, f.value) && super.equals(obj);
+    return this == obj || obj instanceof final FNSpace f && Token.eq(name, ((FNSpace) obj).name) &&
+        Token.eq(value, f.value) && super.equals(obj);
   }
 
   @Override

@@ -36,7 +36,7 @@ public final class SeqRange {
    */
   public static SeqRange get(final Expr expr, final CompileContext cc) throws QueryException {
     // check if expression is fn:subsequence or util:range
-    return expr instanceof FnSubsequence ? ((FnSubsequence) expr).range(cc) : null;
+    return expr instanceof final FnSubsequence sub ? sub.range(cc) : null;
   }
 
   /**

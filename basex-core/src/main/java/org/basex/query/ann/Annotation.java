@@ -236,6 +236,6 @@ public enum Annotation {
   @Override
   public String toString() {
     // chop parentheses if annotation has no parameters
-    return Strings.concat(name.string(), paramString.isEmpty() ? "" : ('(' + paramString + ')'));
+    return Strings.concat(name.string(), paramString.isEmpty() ? "" : '(' + paramString + ')');
   }
 }

@@ -89,12 +89,12 @@ abstract class Convert extends Single {
       // xs:int(string(I))
       // xs:int(xs:double(I))  ->  xs:int(I)
       arg = FnNumber.simplify(expr, cc);
-      if(arg == null && expr instanceof Cast && (
+      if(arg == null && expr instanceof final Cast cast && (
         castType.type.instanceOf(est.type) ||
         castType.type.instanceOf(AtomType.INT) && est.type == AtomType.DOUBLE ||
         castType.type.instanceOf(AtomType.SHORT) && est.type == AtomType.FLOAT
       )) {
-        arg = ((Cast) expr).expr;
+        arg = cast.expr;
       }
     }
     return arg;

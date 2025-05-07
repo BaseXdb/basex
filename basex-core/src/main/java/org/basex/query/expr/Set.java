@@ -115,10 +115,8 @@ abstract class Set extends Arr {
 
     // collect common root, common axis and steps
     for(final Expr expr : exprs) {
-      if(!(expr instanceof Path)) return null;
-      final Path path = (Path) expr;
-      if(path.steps.length != 1 || !(path.steps[0] instanceof Step)) return null;
-      final Step step = (Step) path.steps[0];
+      if(!(expr instanceof final Path path)) return null;
+      if(path.steps.length != 1 || !(path.steps[0] instanceof final Step step)) return null;
       if(steps.isEmpty()) {
         root = path.root;
         axis = step.axis;
@@ -185,8 +183,7 @@ abstract class Set extends Arr {
     for(final Expr expr : exprs) {
       Expr rt = expr;
       Expr[] preds = {};
-      if(expr instanceof Filter) {
-        final Filter filter = (Filter) expr;
+      if(expr instanceof final Filter filter) {
         if(filter.mayBePositional()) return null;
         rt = filter.root;
         preds = filter.exprs;

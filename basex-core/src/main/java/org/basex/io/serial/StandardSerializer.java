@@ -29,7 +29,7 @@ public abstract class StandardSerializer extends OutputSerializer {
   /** Normalization form. */
   protected final Form form;
   /** Character map. */
-  protected final IntObjectMap<byte[]> map;
+  protected final IntObjectMap<byte[]> cmap;
 
   /** Include separator. */
   protected boolean sep;
@@ -59,14 +59,14 @@ public abstract class StandardSerializer extends OutputSerializer {
       }
     }
     if(sopts.get(USE_CHARACTER_MAPS).isEmpty()) {
-      map = null;
+      cmap = null;
     } else {
-      map = new IntObjectMap<>();
+      cmap = new IntObjectMap<>();
       for(final Map.Entry<String, String> entry : sopts.toMap(USE_CHARACTER_MAPS).entrySet()) {
         final String key = entry.getKey();
         if(key.codePoints().count() != 1) throw SERPARAM_X.getIO(
             Util.info("Key in character map is not a single character: %.", key));
-        map.put(key.codePointAt(0), token(entry.getValue()));
+        cmap.put(key.codePointAt(0), token(entry.getValue()));
       }
     }
   }
@@ -94,8 +94,8 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   @Override
   protected void function(final FItem item) throws IOException {
-    if(!(item instanceof XQArray)) throw SERFUNC_X.getIO(item.seqType());
-    for(final Value value : ((XQArray) item).iterable()) {
+    if(!(item instanceof final XQArray array)) throw SERFUNC_X.getIO(item.seqType());
+    for(final Value value : array.iterable()) {
       for(final Item it : value) serialize(it);
     }
   }
@@ -120,7 +120,7 @@ public abstract class StandardSerializer extends OutputSerializer {
 
   @Override
   protected final void printChar(final int cp) throws IOException {
-    final byte[] value = map != null ? map.get(cp) : null;
+    final byte[] value = cmap != null ? cmap.get(cp) : null;
     if(value != null) out.print(value);
     else print(cp);
   }
@@ -143,8 +143,8 @@ public abstract class StandardSerializer extends OutputSerializer {
     final ItemList list = new ItemList();
     for(final Value value : array.iterable()) {
       for(final Item item : value) {
-        if(item instanceof XQArray) {
-          list.add(flatten((XQArray) item));
+        if(item instanceof final XQArray arr) {
+          list.add(flatten(arr));
         } else {
           list.add(item);
         }

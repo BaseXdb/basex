@@ -79,8 +79,7 @@ public final class RangeAccess extends IndexAccess {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof RangeAccess && index.equals(((RangeAccess) obj).index) &&
-        super.equals(obj);
+    return obj instanceof final RangeAccess ra && index.equals(ra.index) && super.equals(obj);
   }
 
   @Override

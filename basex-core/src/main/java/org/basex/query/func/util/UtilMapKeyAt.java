@@ -28,8 +28,8 @@ public final class UtilMapKeyAt extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = arg(0);
     final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      exprType.assign(((MapType) type).keyType());
+    if(type instanceof final MapType mt) {
+      exprType.assign(mt.keyType());
     }
     return this;
   }

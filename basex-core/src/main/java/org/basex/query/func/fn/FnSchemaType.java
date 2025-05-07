@@ -52,15 +52,13 @@ public class FnSchemaType extends StandardFunc {
       FuncItem members = null;
       FuncItem matches = null;
       boolean constructor = false;
-      if(type instanceof ListType) {
-        final ListType listType = (ListType) type;
+      if(type instanceof final ListType listType) {
         name = listType.qname();
         baseType = ANY_SIMPLE_TYPE;
         variety = Variety.list;
         members = TypeAnnotation.funcItem(info, listType.atomic());
         constructor = true;
-      } else if(type instanceof AtomType) {
-        final AtomType atomType = (AtomType) type;
+      } else if(type instanceof final AtomType atomType) {
         name = atomType.qname();
         if(atomType.atomic() != null) matches = Matches.funcItem(atomType, qc, info);
         switch(atomType) {

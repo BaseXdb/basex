@@ -60,22 +60,20 @@ public enum Calc {
         final CompileContext cc) throws QueryException {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
+      if(expr2 instanceof final ANum num && num.dbl() == 0) {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // merge arithmetical expressions
       if(expr1.equals(expr2)) {
         return new Arith(info, expr1, Int.get(2), MULTIPLY).optimize(cc);
       }
-      if(expr2 instanceof Unary) {
-        return new Arith(info, expr1, ((Unary) expr2).expr, SUBTRACT).optimize(cc);
+      if(expr2 instanceof final Unary unry) {
+        return new Arith(info, expr1, unry.expr, SUBTRACT).optimize(cc);
       }
-      if(expr1 instanceof Arith) {
-        final Arith arith = (Arith) expr1;
-        if(arith.calc == MULTIPLY && arith.exprs[0].equals(expr2) &&
-            arith.exprs[1] instanceof Int) {
-          final long factor = ((Int) arith.exprs[1]).itr();
-          return new Arith(info, arith.exprs[0], Int.get(factor + 1), MULTIPLY).optimize(cc);
+      if(expr1 instanceof final Arith arth) {
+        if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
+            arth.exprs[1] instanceof final Int itr) {
+          return new Arith(info, arth.exprs[0], Int.get(itr.itr() + 1), MULTIPLY).optimize(cc);
         }
       }
       return null;
@@ -140,7 +138,7 @@ public enum Calc {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
+      if(expr2 instanceof final ANum num && num.dbl() == 0) {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // replace with neutral number; ignore floating numbers due to special cases (NaN, INF)
@@ -148,15 +146,13 @@ public enum Calc {
         return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Int.ZERO : null;
       }
       // merge arithmetical expressions; ignore floating numbers due to special cases (NaN, INF)
-      if(expr2 instanceof Unary) {
-        return new Arith(info, expr1, ((Unary) expr2).expr, ADD).optimize(cc);
+      if(expr2 instanceof final Unary unry) {
+        return new Arith(info, expr1, unry.expr, ADD).optimize(cc);
       }
-      if(expr1 instanceof Arith) {
-        final Arith arith = (Arith) expr1;
-        if(arith.calc == MULTIPLY && arith.exprs[0].equals(expr2) &&
-            arith.exprs[1] instanceof Int) {
-          final long factor = ((Int) arith.exprs[1]).itr();
-          return new Arith(info, arith.exprs[0], Int.get(factor - 1), MULTIPLY).optimize(cc);
+      if(expr1 instanceof final Arith arth) {
+        if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
+            arth.exprs[1] instanceof final Int itr) {
+          return new Arith(info, arth.exprs[0], Int.get(itr.itr() - 1), MULTIPLY).optimize(cc);
         }
       }
       return null;
@@ -221,8 +217,8 @@ public enum Calc {
         final CompileContext cc) throws QueryException {
 
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum) {
-        final double dbl2 = ((ANum) expr2).dbl();
+      if(expr2 instanceof final ANum num) {
+        final double dbl2 = num.dbl();
         // check for neutral number
         if(dbl2 == 1) return new Cast(info, expr1, type.seqType()).optimize(cc);
         // check for absorbing number
@@ -234,16 +230,14 @@ public enum Calc {
           return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
         }
         if(_MATH_POW.is(expr1)) {
-          if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof ANum) {
-            final double factor = ((ANum) expr1.arg(1)).dbl();
-            return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(factor + 1));
+          if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof final ANum num) {
+            return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(num.dbl() + 1));
           }
         }
       }
-      if(expr2 instanceof Arith) {
-        final Arith arith = (Arith) expr2;
-        if(arith.calc == DIVIDE && arith.exprs[0] instanceof Int && arith.exprs[1].equals(expr1)) {
-          return new Cast(info, arith.exprs[0], type.seqType()).optimize(cc);
+      if(expr2 instanceof final Arith arth) {
+        if(arth.calc == DIVIDE && arth.exprs[0] instanceof Int && arth.exprs[1].equals(expr1)) {
+          return new Cast(info, arth.exprs[0], type.seqType()).optimize(cc);
         }
       }
       return null;
@@ -306,7 +300,7 @@ public enum Calc {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
+      if(expr2 instanceof final ANum num && num.dbl() == 1) {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
@@ -314,9 +308,8 @@ public enum Calc {
         return type == DECIMAL ? Dec.ONE : type == INTEGER ? Int.ONE : null;
       }
       if(_MATH_POW.is(expr1)) {
-        if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof ANum) {
-          final double factor = ((ANum) expr1.arg(1)).dbl();
-          return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(factor - 1));
+        if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof final ANum num) {
+          return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(num.dbl() - 1));
         }
       }
       return null;
@@ -362,7 +355,7 @@ public enum Calc {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
+      if(expr2 instanceof final ANum num && num.dbl() == 1) {
         return new Cast(info, expr1, SeqType.INTEGER_O).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
@@ -512,9 +505,9 @@ public enum Calc {
    */
   static Dur dur(final InputInfo info, final Item item) throws QueryException {
     final Type type = item.type;
-    if(item instanceof Dur) {
+    if(item instanceof final Dur dur) {
       if(type == DURATION) throw NOSUBDUR_X.get(info, item);
-      return (Dur) item;
+      return dur;
     }
     throw NODUR_X_X.get(info, type, item);
   }

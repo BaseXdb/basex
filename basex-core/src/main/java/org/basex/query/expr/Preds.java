@@ -119,13 +119,13 @@ public abstract class Preds extends Arr {
     final SeqType rst = root.seqType();
     final Predicate<Expr> first = f -> f instanceof ContextValue ||
         root.equals(f) && root.isSimple() && rst.one();
-    if(expr instanceof SimpleMap && first.test(expr.arg(0)) && !expr.arg(1).has(Flag.POS)) {
-      expr = ((SimpleMap) expr).remove(cc, 0);
+    if(expr instanceof final SimpleMap sm && first.test(expr.arg(0)) &&
+        !expr.arg(1).has(Flag.POS)) {
+      expr = sm.remove(cc, 0);
     }
 
     // paths: E[./...]  ->  E[...], E[E/...]  ->  E[...]
-    if(expr instanceof Path && rst.type instanceof NodeType) {
-      final Path path = (Path) expr;
+    if(expr instanceof final Path path && rst.type instanceof NodeType) {
       if(first.test(path.root) && !path.steps[0].has(Flag.POS)) {
         expr = Path.get(cc, expr.info(info), null, path.steps);
       }
@@ -143,11 +143,10 @@ public abstract class Preds extends Arr {
 
     // merge node tests with steps; remove redundant node tests
     // child::node()[self::*]  ->  child::*
-    if(expr instanceof SingleIterPath) {
-      final Step predStep = (Step) ((Path) expr).steps[0];
-      if(predStep.axis == Axis.SELF && !predStep.mayBePositional() && root instanceof Step &&
-          !mayBePositional()) {
-        final Step rootStep = (Step) root;
+    if(expr instanceof final SingleIterPath path) {
+      final Step predStep = (Step) path.steps[0];
+      if(predStep.axis == Axis.SELF && !predStep.mayBePositional() &&
+          root instanceof final Step rootStep && !mayBePositional()) {
         final Test test = rootStep.test.intersect(predStep.test);
         if(test != null) {
           cc.info(OPTMERGE_X, predStep);
@@ -167,10 +166,10 @@ public abstract class Preds extends Arr {
 
     // <a/>/.[pos: 1]  ->  <a/>/.[true()]
     // $child/..[pos: 2, 5]  ->  $child/..[false()]
-    if(root instanceof Step) {
-      final Axis axis = ((Step) root).axis;
-      if((axis == Axis.SELF || axis == Axis.PARENT) && expr instanceof IntPos) {
-        expr = Bln.get(((IntPos) expr).min == 1);
+    if(root instanceof final Step step) {
+      final Axis axis = step.axis;
+      if((axis == Axis.SELF || axis == Axis.PARENT) && expr instanceof final IntPos pos) {
+        expr = Bln.get(pos.min == 1);
       }
     }
 
@@ -200,12 +199,11 @@ public abstract class Preds extends Arr {
 
     // positional predicates
     for(final Expr expr : exprs) {
-      if(expr instanceof Pos && Function.LAST.is(((Pos) expr).expr) || expr instanceof SimplePos &&
-          ((SimplePos) expr).exact() && Function.LAST.is(expr.arg(0))) {
+      if(expr instanceof final Pos pos && Function.LAST.is(pos.expr) ||
+          expr instanceof final SimplePos ss && ss.exact() && Function.LAST.is(ss.arg(0))) {
         // use minimum of old value and 1
         max = Math.min(max, 1);
-      } else if(expr instanceof IntPos) {
-        final IntPos pos = (IntPos) expr;
+      } else if(expr instanceof final IntPos pos) {
         // subtract start position. example: ...[pos: 1, 2][2]  ->  2  ->  1
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
         // use minimum of old value and range. example: ...[pos: 1, 5]  ->  5
@@ -221,8 +219,8 @@ public abstract class Preds extends Arr {
     // (1, 'x')[. instance of xs:integer]  ->  xs:integer*
     SeqType st = root.seqType();
     for(final Expr expr : exprs) {
-      if(expr instanceof Instance && expr.arg(0) instanceof ContextValue) {
-        st = st.intersect(((Instance) expr).seqType.with(st.occ));
+      if(expr instanceof final Instance inst && inst.arg(0) instanceof ContextValue) {
+        st = st.intersect(inst.seqType.with(st.occ));
         // E[. instance of xs:integer][. instance of xs:string]  ->  ()
         if(st == null) return true;
       }
@@ -250,7 +248,7 @@ public abstract class Preds extends Arr {
 
     final Expr last = exprs[el - 1];
     final QuerySupplier<Expr> createRoot = () ->
-      root instanceof Path ? ((Path) root).removePredicate(cc) :
+      root instanceof final Path path ? path.removePredicate(cc) :
       el > 1 ? Filter.get(cc, info, root, Arrays.copyOfRange(exprs, 0, el - 1)) : root;
     final QueryFunction<Expr, Expr> createSimpleMap = rhs ->
       SimpleMap.get(cc, info, createRoot.get(), rhs);
@@ -272,8 +270,7 @@ public abstract class Preds extends Arr {
     // a[@id eq 'id1']      ->  a/@id = 'id1'
     // a[text() = data(.)]  ->  skip: right operand must not depend on context
     // a[b eq ('a', 'b')]   ->  skip: an error must be raised as right operand yields a sequence
-    if(last instanceof Cmp) {
-      final Cmp cmp = (Cmp) last;
+    if(last instanceof final Cmp cmp) {
       final Expr op1 = cmp.exprs[0], op2 = cmp.exprs[1];
       final SeqType st1 = op1.seqType(), st2 = op2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
@@ -288,8 +285,7 @@ public abstract class Preds extends Arr {
     // rewrite to contains text expression (right operand must not depend on context):
     // a[. contains text 'x']  ->  a contains text 'x'
     // a[text() contains text 'x']  ->  a/text() contains text 'x'
-    if(last instanceof FTContains) {
-      final FTContains cmp = (FTContains) last;
+    if(last instanceof final FTContains cmp) {
       final FTExpr ftexpr = cmp.ftexpr;
       if(!ftexpr.has(Flag.CTX)) {
         final Expr expr = createExpr.apply(cmp.expr, true);

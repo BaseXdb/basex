@@ -40,9 +40,9 @@ public abstract class Docs extends DynamicFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // pre-evaluate during dynamic compilation
-    if(cc.dynamic && arg(0) instanceof Value) {
+    if(cc.dynamic && arg(0) instanceof final Value value) {
       // target is empty
-      final Item item = arg(0).atomItem(cc.qc, info);
+      final Item item = value.atomItem(cc.qc, info);
       if(item.isEmpty()) return value(cc.qc);
       // target is not a remote URL
       queryInput = queryInput(toToken(item));
@@ -60,8 +60,8 @@ public abstract class Docs extends DynamicFn {
         if(defined(0)) {
           // check if input argument is a static string
           final Expr expr = arg(0);
-          final byte[] uri = expr instanceof Str ? ((Str) expr).string() :
-            expr instanceof Atm ? ((Atm) expr).string(null) : null;
+          final byte[] uri = expr instanceof final Str str ? str.string() :
+            expr instanceof final Atm atm ? atm.string(null) : null;
           if(uri != null) {
             // add local lock if argument may reference a database
             queryInput = queryInput(uri);

@@ -49,8 +49,7 @@ final class SimplePos extends Arr implements CmpPos {
     exprs = simplifyAll(Simplify.NUMBER, cc);
 
     final QueryFunction<Expr, Expr> simplify = expr -> {
-      if(expr instanceof ANum && !(expr instanceof Int)) {
-        final ANum num = (ANum) expr;
+      if(expr instanceof final ANum num && !(num instanceof Int)) {
         final long p = num.itr();
         if(p == num.dbl()) return Int.get(p);
       }
@@ -65,12 +64,12 @@ final class SimplePos extends Arr implements CmpPos {
     } else {
       exprs[1] = simplify.apply(exprs[1]);
     }
-    if(ex == null && exprs[0] instanceof Int) {
-      final long mn = ((Int) exprs[0]).itr();
+    if(ex == null && exprs[0] instanceof final Int itr1) {
+      final long mn = itr1.itr();
       if(exact()) {
         ex = IntPos.get(mn, mn, info);
-      } else if(exprs[1] instanceof Int) {
-        ex = IntPos.get(mn, ((Int) exprs[1]).itr(), info);
+      } else if(exprs[1] instanceof final Int itr2) {
+        ex = IntPos.get(mn, itr2.itr(), info);
       }
     }
     return ex != null ? cc.replaceWith(this, ex) : this;
@@ -119,8 +118,7 @@ final class SimplePos extends Arr implements CmpPos {
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc)
       throws QueryException {
 
-    if(!or && ex instanceof SimplePos) {
-      final SimplePos pos = (SimplePos) ex;
+    if(!or && ex instanceof final SimplePos pos) {
       final Expr expr1 = exprs[0], expr2 = exact() ? expr1 : exprs[1];
       final Expr pexpr1 = pos.exprs[0], pexpr2 = pos.exact() ? pexpr1 : pos.exprs[1];
 

@@ -45,8 +45,8 @@ public abstract class Bin extends Item {
   @Override
   public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
-    return Token.eq(binary(ii), bin);
+    final byte[] binary = item instanceof final Bin bin ? bin.binary(ii) : parse(item, ii);
+    return Token.eq(binary(ii), binary);
   }
 
   @Override
@@ -57,8 +57,8 @@ public abstract class Bin extends Item {
   @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    final byte[] bin = item instanceof Bin ? ((Bin) item).binary(ii) : parse(item, ii);
-    return Token.compare(binary(ii), bin);
+    final byte[] binary = item instanceof final Bin bin ? bin.binary(ii) : parse(item, ii);
+    return Token.compare(binary(ii), binary);
   }
 
   /**
@@ -82,9 +82,7 @@ public abstract class Bin extends Item {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Bin)) return false;
-    final Bin b = (Bin) obj;
-    return type == b.type && Token.eq(data, b.data);
+    return this == obj || obj instanceof final Bin bin && type == bin.type &&
+        Token.eq(data, bin.data);
   }
 }

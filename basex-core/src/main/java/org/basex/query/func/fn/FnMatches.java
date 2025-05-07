@@ -41,9 +41,9 @@ public final class FnMatches extends RegExFn {
 
     final SeqType st = value.seqType();
     if(st.zero() || st.one() && st.type.isStringOrUntyped()) {
-      if(pattern instanceof Str && !defined(2)) {
-        if(pattern == Str.EMPTY) return Bln.TRUE;
-        for(final byte b : ((Str) pattern).string()) {
+      if(pattern instanceof final Str str && !defined(2)) {
+        if(str == Str.EMPTY) return Bln.TRUE;
+        for(final byte b : str.string()) {
           if(contains(REGEX_CHARS, b)) return this;
         }
         return cc.function(CONTAINS, info, args());

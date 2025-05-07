@@ -164,6 +164,15 @@ public enum Axis {
    */
   abstract BasicNodeIter iter(ANode n);
 
+  /**
+   * Checks if this is one of the specified candidates.
+   * @param candidates candidates
+   * @return result of check
+   */
+  public boolean oneOf(final Axis... candidates) {
+    return Enums.oneOf(this, candidates);
+  }
+
   @Override
   public String toString() {
     return name;

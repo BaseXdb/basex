@@ -255,9 +255,8 @@ public class FnSubsequence extends StandardFunc {
           if(!one) break;
         }
       }
-    } else if(first instanceof Int) {
-      final long start = ((Int) first).itr();
-      final long diff = FnItemsAt.countInputDiff(input, second) + start;
+    } else if(first instanceof final Int itr) {
+      final long start = itr.itr(), diff = FnItemsAt.countInputDiff(input, second) + start;
       if(diff == (int) diff) {
         if(start <= 1) {
           // subsequence(E, 1, count(E) - 1)  ->  trunk(E)
@@ -269,9 +268,9 @@ public class FnSubsequence extends StandardFunc {
           return cc.function(SUBSEQUENCE, info, input, first);
         }
       }
-    } else if(second instanceof Int) {
+    } else if(second instanceof final Int itr) {
       if(!range() && first.seqType().instanceOf(SeqType.INTEGER_O)) {
-        final long length = ((Int) second).itr();
+        final long length = itr.itr();
         // subsequence(EXPR, START, 1)  ->  items-at(EXPR, START)
         if(length == 1) return cc.function(ITEMS_AT, info, input, first);
         // subsequence(EXPR, START, 0)  ->  void(EXPR)

@@ -82,22 +82,22 @@ public final class XmlParser {
     f.setValidating(dtdValidation);
     f.setXIncludeAware(xinclude);
     if(xsdValidation) {
-      SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      schemaFactory.setResourceResolver(Resolver.resources(options));
-      f.setSchema(schemaFactory.newSchema());
+      final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+      sf.setResourceResolver(Resolver.resources(options));
+      f.setSchema(sf.newSchema());
     }
-    XMLReader xmlReader = f.newSAXParser().getXMLReader();
+    final XMLReader xr = f.newSAXParser().getXMLReader();
     // temporary fix; ensures that other XML parsers do not reject the property
     if(entExpansion != null && entExpansion != 64000) {
-      xmlReader.setProperty("http://www.oracle.com/xml/jaxp/properties/entityExpansionLimit",
+      xr.setProperty("http://www.oracle.com/xml/jaxp/properties/entityExpansionLimit",
         entExpansion);
     }
     if(xsdValidation && !xsiLocation || !extEntities) {
-      xmlReader.setEntityResolver((pubId, sysId) -> {
+      xr.setEntityResolver((pubId, sysId) -> {
         throw new SAXException("External access not allowed: " + sysId);
       });
     }
-    return xmlReader;
+    return xr;
   }
 
   /** Error handler (causing no STDERR output). */

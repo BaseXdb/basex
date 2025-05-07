@@ -110,10 +110,8 @@ public final class NameTest extends Test {
   public Boolean matches(final SeqType seqType) {
     final Type tp = seqType.type;
     if(tp.intersect(type) == null) return Boolean.FALSE;
-    final Test test = seqType.test();
-    if(tp == type && test instanceof NameTest) {
-      final NameTest np = (NameTest) test;
-      if(np.part == NamePart.FULL || np.part == part) return matches(np.qname);
+    if(tp == type && seqType.test() instanceof final NameTest nt) {
+      if(nt.part == NamePart.FULL || nt.part == part) return matches(nt.qname);
     }
     return null;
   }
@@ -128,8 +126,7 @@ public final class NameTest extends Test {
 
   @Override
   public boolean instanceOf(final Test test) {
-    if(!(test instanceof NameTest)) return super.instanceOf(test);
-    final NameTest nt = (NameTest) test;
+    if(!(test instanceof final NameTest nt)) return super.instanceOf(test);
     if(type != nt.type) return false;
     switch(nt.part) {
       case FULL:
@@ -159,8 +156,7 @@ public final class NameTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
-    if(test instanceof NameTest) {
-      final NameTest nt = (NameTest) test;
+    if(test instanceof final NameTest nt) {
       if(type == nt.type) {
         if(part == nt.part || part == NamePart.FULL) {
           if(nt.matches(qname)) return this;
@@ -183,9 +179,8 @@ public final class NameTest extends Test {
 
   @Override
   public boolean equals(final Object obj) {
-    if(!(obj instanceof NameTest)) return false;
-    final NameTest nt = (NameTest) obj;
-    return type == nt.type && part == nt.part && qname.eq(nt.qname);
+    return this == obj || obj instanceof final NameTest nt && type == nt.type && part == nt.part &&
+        qname.eq(nt.qname);
   }
 
   @Override

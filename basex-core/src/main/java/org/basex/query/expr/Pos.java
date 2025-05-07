@@ -55,20 +55,18 @@ public final class Pos extends Single {
       if(pos == Empty.VALUE) return Bln.FALSE;
 
       // range sequence. example: position() = 5 to 10
-      if(pos instanceof RangeSeq) {
-        final RangeSeq rs = (RangeSeq) pos;
+      if(pos instanceof final RangeSeq rs) {
         return IntPos.get(rs.min(), rs.max(), info);
       }
       // range. example: position() = 3 to $max
-      if(pos instanceof Range && ((Range) pos).ints) {
+      if(pos instanceof final Range rng && rng.ints) {
         if(pos.isSimple()) return new SimplePos(info, pos.args());
         return ref instanceof Pos ? null : new Pos(info, pos);
       }
     }
 
     // integer tests. example: position() > 5
-    if(pos instanceof ANum) {
-      final ANum num = (ANum) pos;
+    if(pos instanceof final ANum num) {
       final long p = num.itr();
       final boolean exact = p == num.dbl();
       switch(op) {

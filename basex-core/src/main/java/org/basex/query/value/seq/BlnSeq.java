@@ -93,7 +93,7 @@ public final class BlnSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof BlnSeq ? Arrays.equals(values, ((BlnSeq) obj).values) :
+    return this == obj || (obj instanceof final BlnSeq seq ? Arrays.equals(values, seq.values) :
       super.equals(obj));
   }
 
@@ -120,8 +120,8 @@ public final class BlnSeq extends NativeSeq {
     final BoolList tmp = new BoolList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      if(value instanceof BlnSeq) {
-        tmp.add(((BlnSeq) value).values);
+      if(value instanceof final BlnSeq seq) {
+        tmp.add(seq.values);
       } else {
         for(final Item item : value) tmp.add(item.bool(null));
       }

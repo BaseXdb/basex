@@ -384,8 +384,8 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Item item, final boolean coerce) {
-    if(type instanceof ChoiceItemType) {
-      for(final SeqType tp : ((ChoiceItemType) type).types) {
+    if(type instanceof final ChoiceItemType cit) {
+      for(final SeqType tp : cit.types) {
         if(tp.instance(item, coerce)) return true;
       }
       return false;
@@ -464,7 +464,7 @@ public final class SeqType {
       final CompileContext cc, final InputInfo info) throws QueryException {
 
     // instance check
-    final SeqType[] at = type instanceof FuncType ? ((FuncType) type).argTypes : null;
+    final SeqType[] at = type instanceof FuncType ft ? ft.argTypes : null;
     if((at == null || ((Checks<SeqType>) st -> st.eq(ITEM_ZM)).all(at)) && instance(value, true))
       return value;
 
@@ -496,8 +496,8 @@ public final class SeqType {
 
     final QuerySupplier<QueryException> error = () ->
       typeError(item, with(EXACTLY_ONE), name, info);
-    if(type instanceof ChoiceItemType) {
-      for(final SeqType st : ((ChoiceItemType) type).types) {
+    if(type instanceof final ChoiceItemType cit) {
+      for(final SeqType st : cit.types) {
         try {
           final ValueBuilder tmp = new ValueBuilder(qc);
           st.coerce(item, name, tmp, qc, cc, info);
@@ -539,16 +539,14 @@ public final class SeqType {
         }
         vb.add(it);
       }
-    } else if(item instanceof XQArray && type instanceof ArrayType) {
-      vb.add(((XQArray) item).coerceTo((ArrayType) type, qc, cc, info));
-    } else if(item instanceof XQMap && type instanceof RecordType) {
-      final RecordType rt = (RecordType) type;
-      vb.add(((XQMap) item).coerceTo(rt, qc, cc, info));
-    } else if(item instanceof XQMap && type instanceof MapType) {
-      vb.add(((XQMap) item).coerceTo((MapType) type, qc, cc, info));
-    } else if(item instanceof FItem && type instanceof FuncType) {
-      final FuncType ft = type == FUNCTION ? item.funcType() : (FuncType) type;
-      vb.add(((FItem) item).coerceTo(ft, qc, cc, info));
+    } else if(item instanceof final XQArray array && type instanceof final ArrayType at) {
+      vb.add(array.coerceTo(at, qc, cc, info));
+    } else if(item instanceof final XQMap map && type instanceof final RecordType rt) {
+      vb.add(map.coerceTo(rt, qc, cc, info));
+    } else if(item instanceof final XQMap map && type instanceof final MapType mt) {
+      vb.add(map.coerceTo(mt, qc, cc, info));
+    } else if(item instanceof FItem fitem && type instanceof FuncType ft) {
+      vb.add(fitem.coerceTo(type == FUNCTION ? item.funcType() : ft, qc, cc, info));
     } else {
       throw error.get();
     }
@@ -685,12 +683,8 @@ public final class SeqType {
     // empty sequence: only check cardinality
     if(zero()) return !st.oneOrMore();
     if(!occ.instanceOf(st.occ)) return false;
-    if(type instanceof ChoiceItemType) {
-      return ((ChoiceItemType) type).instanceOf(st.with(EXACTLY_ONE));
-    }
-    if(st.type instanceof ChoiceItemType) {
-      return ((ChoiceItemType) st.type).hasInstance(this.with(EXACTLY_ONE));
-    }
+    if(type instanceof final ChoiceItemType cit) return cit.instanceOf(st.with(EXACTLY_ONE));
+    if(st.type instanceof final ChoiceItemType cit) return cit.hasInstance(this.with(EXACTLY_ONE));
     return type.instanceOf(st.type) && kindInstanceOf(st);
   }
 
@@ -723,7 +717,7 @@ public final class SeqType {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof SeqType && eq((SeqType) obj);
+    return this == obj || obj instanceof final SeqType st && eq(st);
   }
 
   /**

@@ -109,8 +109,7 @@ public final class IndexInfo {
       // check if targeted name is contained in the index
       final Step st = pred.qname();
       byte[][] qname = null;
-      if(st.test instanceof NameTest) {
-        final NameTest nt = (NameTest) st.test;
+      if(st.test instanceof final NameTest nt) {
         qname = new byte[][] { nt.local, nt.qname == null ? null : nt.qname.uri() };
       }
       if(!new IndexNames(it, data).contains(qname)) return null;

@@ -72,10 +72,8 @@ public final class FPI extends FNode {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FPI)) return false;
-    final FPI f = (FPI) obj;
-    return name.eq(f.name) && Token.eq(value, f.value) && super.equals(obj);
+    return this == obj || obj instanceof final FPI f && name.eq(f.name) &&
+        Token.eq(value, f.value) && super.equals(obj);
   }
 
   @Override

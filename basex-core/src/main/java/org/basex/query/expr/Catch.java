@@ -182,10 +182,8 @@ public final class Catch extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Catch)) return false;
-    final Catch ctch = (Catch) obj;
-    return Array.equals(vars, ctch.vars) && tests.equals(ctch.tests) && super.equals(obj);
+    return this == obj || obj instanceof final Catch ctch && Array.equals(vars, ctch.vars) &&
+        tests.equals(ctch.tests) && super.equals(obj);
   }
 
   @Override

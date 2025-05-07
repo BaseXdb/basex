@@ -76,8 +76,8 @@ public abstract class StandardFunc extends Arr {
 
     // pre-evaluate if arguments are values and not too large
     final SeqType st = definition.seqType;
-    return values(st.occ.max > 1 || st.type instanceof FType, cc) && isSimple()
-        ? cc.preEval(this) : this;
+    return values(st.occ.max > 1 || st.type instanceof FType, cc) && isSimple() ?
+      cc.preEval(this) : this;
   }
 
   /**
@@ -195,9 +195,9 @@ public abstract class StandardFunc extends Arr {
           // check whether function argument may contain non-deterministic functions
           if(hof == Integer.MAX_VALUE) return true;
           if(hof >= 0) {
-            if(!(arg(hof) instanceof Value)) return true;
-            for(final Item item : (Value) arg(hof)) {
-              if(!(item instanceof FuncItem) || ((FuncItem) item).expr.has(Flag.NDT)) return true;
+            if(!(arg(hof) instanceof final Value value)) return true;
+            for(final Item item : value) {
+              if(!(item instanceof final FuncItem fi) || fi.expr.has(Flag.NDT)) return true;
             }
           }
           break;
@@ -278,7 +278,7 @@ public abstract class StandardFunc extends Arr {
    */
   public final Expr refineFunc(final Expr expr, final CompileContext cc, final SeqType... argTypes)
       throws QueryException {
-    return expr instanceof FuncItem ? ((FuncItem) expr).refine(argTypes, cc) : expr;
+    return expr instanceof final FuncItem fi ? fi.refine(argTypes, cc) : expr;
   }
 
   /**
@@ -365,7 +365,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final DBNode toDBNode(final Item item, final boolean mainmem) throws QueryException {
-    if(item instanceof DBNode && (mainmem || !item.data().inMemory())) return (DBNode) item;
+    if(item instanceof final DBNode node && (mainmem || !node.data().inMemory())) return node;
     throw DB_NODE_X.get(info, item);
   }
 
@@ -378,7 +378,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final AStr toStr(final Expr expr, final QueryContext qc) throws QueryException {
     final Item value = expr.atomItem(qc, info);
-    return value instanceof AStr ? (AStr) value : Str.get(toToken(value));
+    return value instanceof final AStr str ? str : Str.get(toToken(value));
   }
 
   /**
@@ -390,7 +390,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final AStr toZeroStr(final Expr expr, final QueryContext qc) throws QueryException {
     final Item value = expr.atomItem(qc, info);
-    return value.isEmpty() ? Str.EMPTY : value instanceof AStr ? (AStr) value :
+    return value.isEmpty() ? Str.EMPTY : value instanceof final AStr str ? str :
       Str.get(toToken(value));
   }
 
@@ -575,8 +575,8 @@ public abstract class StandardFunc extends Arr {
     options.set(SerializerOptions.METHOD, SerialMethod.XML);
 
     final Item item = expr.item(qc, info);
-    if(item instanceof XQMap) {
-      options.assign((XQMap) item, info);
+    if(item instanceof final XQMap map) {
+      options.assign(map, info);
     } else if(!item.isEmpty()) {
       options.assign(item, info);
     }
@@ -778,8 +778,8 @@ public abstract class StandardFunc extends Arr {
       final ASTVisitor visitor) {
     return visitor.lock(() -> {
       final ArrayList<String> list = new ArrayList<>(1);
-      String name = expr instanceof Str ? string(((Str) expr).string()) :
-        expr instanceof Atm ? string(((Atm) expr).string(info)) : null;
+      String name = expr instanceof final Str str ? string(str.string()) :
+        expr instanceof final Atm atm ? string(atm.string(info)) : null;
       if(name != null) {
         if(backup) {
           final String db = Databases.name(name);
@@ -810,8 +810,8 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final boolean equals(final Object obj) {
-    return this == obj || obj instanceof StandardFunc &&
-        definition == ((StandardFunc) obj).definition && super.equals(obj);
+    return this == obj || obj instanceof final StandardFunc sf && definition == sf.definition &&
+        super.equals(obj);
   }
 
   @Override

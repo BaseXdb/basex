@@ -194,9 +194,7 @@ final class SearchContext {
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(!(obj instanceof SearchContext)) return false;
-    final SearchContext sc = (SearchContext) obj;
-    return mcase == sc.mcase && word == sc.word && regex == sc.regex &&
-        multi == sc.multi && Strings.eq(string, sc.string);
+    return obj instanceof final SearchContext sc && mcase == sc.mcase && word == sc.word &&
+        regex == sc.regex && multi == sc.multi && Strings.eq(string, sc.string);
   }
 }

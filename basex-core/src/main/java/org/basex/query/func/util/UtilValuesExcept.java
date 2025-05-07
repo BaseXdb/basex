@@ -38,8 +38,8 @@ public final class UtilValuesExcept extends StandardFunc {
       public Item next() throws QueryException {
         for(Item item = null; (item = qc.next(values)) != null;) {
           if(!items.contains(item)) {
-            if(item instanceof ANum) {
-              final double d = item.dbl(null);
+            if(item instanceof final ANum num) {
+              final double d = num.dbl();
               final int i = (int) d;
               if(d == i && ints.contains(i)) continue;
             }

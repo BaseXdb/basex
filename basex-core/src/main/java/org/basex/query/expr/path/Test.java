@@ -55,8 +55,8 @@ public abstract class Test extends ExprInfo {
     final List<Test> list = new ArrayList<>(tl);
     for(final Test test : tests) {
       if(test == null) return null;
-      if(test instanceof UnionTest) {
-        for(final Test t : ((UnionTest) test).tests) {
+      if(test instanceof final UnionTest ut) {
+        for(final Test t : ut.tests) {
           if(!list.contains(t)) list.add(t);
         }
       } else if(!list.contains(test)) {
@@ -89,7 +89,7 @@ public abstract class Test extends ExprInfo {
    * @return result of check
    */
   public final boolean matches(final Item item) {
-    return item instanceof ANode && matches((ANode) item);
+    return item instanceof final ANode node && matches(node);
   }
 
   /**
@@ -113,8 +113,7 @@ public abstract class Test extends ExprInfo {
    * @return result of check
    */
   public boolean instanceOf(final Test test) {
-    return test instanceof UnionTest ? ((UnionTest) test).instance(this) :
-      type.instanceOf(test.type);
+    return test instanceof final UnionTest ut ? ut.instance(this) : type.instanceOf(test.type);
   }
 
   /**

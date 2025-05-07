@@ -134,8 +134,8 @@ public final class FnTokenize extends RegExFn {
     final Expr value = arg(0), pattern = arg(1);
 
     // tokenize(normalize-space(A), ' ')  ->  tokenize(A)
-    if(NORMALIZE_SPACE.is(value) && pattern instanceof Str &&
-        Token.eq(((Str) pattern).string(), Token.cpToken(' '))) {
+    if(NORMALIZE_SPACE.is(value) && pattern instanceof final Str str &&
+        Token.eq(str.string(), Token.cpToken(' '))) {
       final Expr arg = value.args().length == 1 ? value.arg(0) : ContextValue.get(cc, info);
       return cc.function(TOKENIZE, info, arg);
     }
@@ -149,6 +149,6 @@ public final class FnTokenize extends RegExFn {
   public boolean whitespace() {
     final Expr pattern = arg(1);
     return pattern == Empty.VALUE || pattern == Empty.UNDEFINED ||
-        pattern instanceof Str && Token.eq(((Str) pattern).string(), WHITESPACE);
+        pattern instanceof final Str str && Token.eq(str.string(), WHITESPACE);
   }
 }

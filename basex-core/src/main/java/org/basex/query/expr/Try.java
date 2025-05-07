@@ -207,10 +207,8 @@ public final class Try extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Try)) return false;
-    final Try t = (Try) obj;
-    return Array.equals(catches, t.catches) && fnlly.equals(t.fnlly) && super.equals(obj);
+    return this == obj || obj instanceof final Try t && Array.equals(catches, t.catches) &&
+        fnlly.equals(t.fnlly) && super.equals(obj);
   }
 
   @Override

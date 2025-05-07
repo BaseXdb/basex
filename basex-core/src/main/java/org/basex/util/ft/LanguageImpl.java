@@ -46,7 +46,7 @@ abstract class LanguageImpl extends FTIterator implements Comparable<LanguageImp
 
   @Override
   public final boolean equals(final Object obj) {
-    return this == obj || obj instanceof LanguageImpl && ((LanguageImpl) obj).prec() == prec();
+    return this == obj || obj instanceof final LanguageImpl ln && ln.prec() == prec();
   }
 
   @Override

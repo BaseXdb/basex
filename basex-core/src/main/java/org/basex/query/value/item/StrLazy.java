@@ -126,10 +126,9 @@ public final class StrLazy extends AStr implements Lazy {
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(obj instanceof StrLazy) {
-      final StrLazy s = (StrLazy) obj;
-      if(input.eq(s.input) && Objects.equals(encoding, s.encoding) && error == s.error &&
-          validate == s.validate) return true;
+    if(obj instanceof final StrLazy str) {
+      if(input.eq(str.input) && Objects.equals(encoding, str.encoding) && error == str.error &&
+          validate == str.validate) return true;
     }
     // items may be different, but result may be equal...
     return super.equals(obj);

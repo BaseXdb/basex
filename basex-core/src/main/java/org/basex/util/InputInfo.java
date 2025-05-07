@@ -130,10 +130,9 @@ public final class InputInfo {
   }
 
   @Override
-  public boolean equals(final Object object) {
-    if(!(object instanceof InputInfo)) return false;
-    final InputInfo ii = (InputInfo) object;
-    return (path != null ? path.equals(ii.path) : Arrays.equals(input, ii.input)) &&
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof final InputInfo ii &&
+        (path != null ? path.equals(ii.path) : Arrays.equals(input, ii.input)) &&
         column() == ii.column() && line() == ii.line();
   }
 

@@ -179,11 +179,8 @@ public final class StaticFuncCall extends FuncCall {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof StaticFuncCall)) return false;
-    final StaticFuncCall call = (StaticFuncCall) obj;
-    return name.eq(call.name) && (func == call.func || external == call.external) &&
-        super.equals(obj);
+    return this == obj || obj instanceof final StaticFuncCall call && name.eq(call.name) &&
+        (func == call.func || external == call.external) && super.equals(obj);
   }
 
   @Override

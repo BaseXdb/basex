@@ -68,18 +68,17 @@ public class FnSum extends NumericFn {
    */
   final Expr opt(final boolean avg) throws QueryException {
     final Expr values = arg(0);
-    if(values instanceof RangeSeq) {
-      return range((RangeSeq) values, avg);
-    } else if(values instanceof SingletonSeq) {
-      final SingletonSeq seq = (SingletonSeq) values;
-      if(seq.singleItem()) {
-        Item item = seq.itemAt(0);
+    if(values instanceof final RangeSeq rs) {
+      return range(rs, avg);
+    } else if(values instanceof final SingletonSeq ss) {
+      if(ss.singleItem()) {
+        Item item = ss.itemAt(0);
         final Type type = item.type;
         if(type.isUntyped()) item = Dbl.get(item.dbl(info));
-        if(type.isNumber()) return avg ? item : Calc.MULTIPLY.eval(item, Int.get(seq.size()), info);
+        if(type.isNumber()) return avg ? item : Calc.MULTIPLY.eval(item, Int.get(ss.size()), info);
       }
-    } else if(values instanceof Path) {
-      final ArrayList<Stats> list = ((Path) values).pathStats();
+    } else if(values instanceof final Path path) {
+      final ArrayList<Stats> list = path.pathStats();
       if(list != null) {
         double sum = 0;
         long count = 0;

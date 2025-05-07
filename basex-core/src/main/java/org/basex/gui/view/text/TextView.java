@@ -183,7 +183,7 @@ public final class TextView extends View {
       cacheCmd = true;
     } else if(out.finished()) {
       // cache is exhausted... cache node set, or create new command instance
-      if(result instanceof DBNodes) cachedNodes = (DBNodes) result;
+      if(result instanceof final DBNodes nodes) cachedNodes = nodes;
       else cacheCmd = true;
     }
     // otherwise, the displayed text and the cached result are equal

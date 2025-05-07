@@ -179,19 +179,13 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
   @Override
   public void treeWillExpand(final TreeExpansionEvent event) {
     final Object obj = event.getPath().getLastPathComponent();
-    if(obj instanceof ProjectNode) {
-      final ProjectNode node = (ProjectNode) obj;
-      node.expand();
-    }
+    if(obj instanceof final ProjectNode node) node.expand();
   }
 
   @Override
   public void treeWillCollapse(final TreeExpansionEvent event) {
     final Object obj = event.getPath().getLastPathComponent();
-    if(obj instanceof ProjectNode) {
-      final ProjectNode node = (ProjectNode) obj;
-      node.collapse();
-    }
+    if(obj instanceof final ProjectNode node) node.collapse();
   }
 
   /**
@@ -200,11 +194,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
    */
   ProjectNode selectedNode() {
     final TreePath tp = selectedPath();
-    if(tp != null) {
-      final Object node = tp.getLastPathComponent();
-      if(node instanceof ProjectNode) return (ProjectNode) node;
-    }
-    return null;
+    return tp != null && tp.getLastPathComponent() instanceof final ProjectNode pn ? pn : null;
   }
 
   @Override
@@ -235,8 +225,7 @@ final class ProjectTree extends BaseXTree implements TreeWillExpandListener, Pro
     final TreePath[] paths = getSelectionPaths();
     if(paths != null) {
       for(final TreePath tp : paths) {
-        final Object node = tp.getLastPathComponent();
-        if(node instanceof ProjectNode) files.add(((ProjectNode) node).file);
+        if(tp.getLastPathComponent() instanceof final ProjectNode node) files.add(node.file);
       }
     }
     return files;

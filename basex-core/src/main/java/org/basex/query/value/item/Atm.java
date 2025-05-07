@@ -99,7 +99,7 @@ public final class Atm extends Item {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Atm && Token.eq(value, ((Atm) obj).value);
+    return this == obj || obj instanceof final Atm atm && Token.eq(value, atm.value);
   }
 
   @Override

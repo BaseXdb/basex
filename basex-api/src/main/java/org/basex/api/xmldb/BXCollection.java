@@ -181,8 +181,7 @@ public final class BXCollection implements Collection {
     final MainOptions mopts = ctx.options;
     final Data md;
     try {
-      final Parser p = cont instanceof Document ?
-        new DOMWrapper((Document) cont, id, mopts) :
+      final Parser p = cont instanceof final Document doc ? new DOMWrapper(doc, id, mopts) :
         Parser.singleParser(new IOContent((byte[]) cont, id), mopts, "");
       md = MemBuilder.build(id, p);
     } catch(final IOException ex) {
@@ -249,9 +248,8 @@ public final class BXCollection implements Collection {
       final Field f = MetaData.class.getField(name);
       final Object k = f.get(md);
 
-      if(k instanceof Boolean) {
-        final boolean b = val == null ? !(Boolean) k : val.equalsIgnoreCase(TRUE);
-        f.setBoolean(md, b);
+      if(k instanceof final Boolean bln) {
+        f.setBoolean(md, val == null ? !bln : val.equalsIgnoreCase(TRUE));
       } else if(k instanceof Integer) {
         f.setInt(md, Integer.parseInt(val));
       } else {
@@ -292,9 +290,7 @@ public final class BXCollection implements Collection {
    * @throws XMLDBException exception
    */
   private static BXXMLResource checkXML(final Resource resource) throws XMLDBException {
-    if(!(resource instanceof BXXMLResource)) {
-      throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + resource);
-    }
-    return (BXXMLResource) resource;
+    if(resource instanceof final BXXMLResource res) return res;
+    throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + resource);
   }
 }

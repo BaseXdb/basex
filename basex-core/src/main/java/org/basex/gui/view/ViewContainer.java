@@ -121,7 +121,7 @@ public final class ViewContainer extends BaseXBack {
 
     if(location != null) {
       final ViewComponent comp = layout.delete(source);
-      if(comp instanceof ViewLayout) layout = (ViewLayout) comp;
+      if(comp instanceof final ViewLayout vl) layout = vl;
 
       if(target == null) layout = addView(layout);
       else add(layout);
@@ -139,8 +139,8 @@ public final class ViewContainer extends BaseXBack {
   private boolean add(final ViewLayout vl) {
     for(int c = 0; c < vl.list.size(); c++) {
       final ViewComponent comp = vl.list.get(c);
-      if(comp instanceof ViewLayout) {
-        if(add((ViewLayout) comp)) return true;
+      if(comp instanceof final ViewLayout vlayout) {
+        if(add(vlayout)) return true;
       } else if(comp == target) {
         final boolean west = location == Location.WEST, east = location == Location.EAST;
         if(location == Location.NORTH || west) {

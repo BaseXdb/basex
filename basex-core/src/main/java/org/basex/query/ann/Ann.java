@@ -68,11 +68,8 @@ public final class Ann {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Ann)) return false;
-    final Ann ann = (Ann) obj;
-    return (name != null ? ann.name != null && name.eq(ann.name) : definition == ann.definition) &&
-        value.equals(ann.value);
+    return this == obj || obj instanceof final Ann ann && (name != null ? ann.name != null &&
+        name.eq(ann.name) : definition == ann.definition) && value.equals(ann.value);
   }
 
   /**

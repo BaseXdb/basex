@@ -104,10 +104,8 @@ public final class EditorView extends View {
       JTabbedPane.WRAP_TAB_LAYOUT);
     tabs.addMouseListener((MouseClickedListener) e -> {
       final int i = tabs.indexAtLocation(e.getX(), e.getY());
-      if(i != -1 && SwingUtilities.isMiddleMouseButton(e)) {
-        final Component comp = tabs.getComponentAt(i);
-        if(comp instanceof EditorArea) close((EditorArea) comp);
-      }
+      if(i != -1 && SwingUtilities.isMiddleMouseButton(e) &&
+          tabs.getComponentAt(i) instanceof final EditorArea edit) close(edit);
     });
 
     final SearchEditor center = new SearchEditor(gui, tabs, null);
@@ -207,8 +205,8 @@ public final class EditorView extends View {
       gui.setTitle();
     });
 
-    BaseXLayout.addDrop(this, file -> {
-      if(file instanceof File) open(new IOFile((File) file));
+    BaseXLayout.addDrop(this, obj -> {
+      if(obj instanceof File file) open(new IOFile(file));
     });
   }
 
@@ -809,12 +807,11 @@ public final class EditorView extends View {
         replaceAll("\r?\n", "<br/>").replaceAll("(<br/>.*?)<br/>.*", "$1");
       info.setToolTipText("<html>" + tt + "</html>");
 
-      if(th instanceof QueryIOException) {
-        inputInfo = ((QueryIOException) th).getCause().info();
-      } else if(th instanceof QueryException) {
-        inputInfo = ((QueryException) th).info();
-      } else if(th instanceof SAXParseException) {
-        final SAXParseException ex = (SAXParseException) th;
+      if(th instanceof final QueryIOException ex) {
+        inputInfo = ex.getCause().info();
+      } else if(th instanceof final QueryException ex) {
+        inputInfo = ex.info();
+      } else if(th instanceof final SAXParseException ex) {
         inputInfo = new InputInfo(path, ex.getLineNumber(), ex.getColumnNumber());
       } else {
         inputInfo = new InputInfo(path, 1, 1);
@@ -922,8 +919,7 @@ public final class EditorView extends View {
    * @return editor or {@code null}
    */
   public EditorArea getEditor() {
-    final Component c = tabs.getSelectedComponent();
-    return c instanceof EditorArea ? (EditorArea) c : null;
+    return tabs.getSelectedComponent() instanceof final EditorArea edit ? edit : null;
   }
 
   /**
@@ -938,10 +934,7 @@ public final class EditorView extends View {
       final String oldPath = old.file().getCanonicalPath() + (dir ? File.separator : "");
       // iterate through all tabs
       for(final Component c : tabs.getComponents()) {
-        if(!(c instanceof EditorArea)) continue;
-
-        final EditorArea ea = (EditorArea) c;
-        if(!ea.opened()) continue;
+        if(!(c instanceof final EditorArea ea) || !ea.opened()) continue;
 
         final String editPath = ea.file().file().getCanonicalPath();
         if(dir) {
@@ -1106,7 +1099,7 @@ public final class EditorView extends View {
   private EditorArea[] editors() {
     final ArrayList<EditorArea> edits = new ArrayList<>();
     for(final Component c : tabs.getComponents()) {
-      if(c instanceof EditorArea) edits.add((EditorArea) c);
+      if(c instanceof final EditorArea edit) edits.add(edit);
     }
     return edits.toArray(EditorArea[]::new);
   }

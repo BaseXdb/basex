@@ -38,8 +38,8 @@ public final class MapOfPairs extends MapMerge {
     prepareMerge(1, Duplicates.COMBINE, cc);
 
     final Type type = arg(0).seqType().type;
-    if(type instanceof MapType) {
-      final SeqType vt = ((MapType) type).valueType();
+    if(type instanceof final MapType mt) {
+      final SeqType vt = mt.valueType();
       assignType(vt.type.atomic(), vt);
     }
     return this;

@@ -73,9 +73,9 @@ public final class TypeCheck extends Single {
     }
 
     // remove redundant type check
-    if(expr instanceof TypeCheck && st.instanceOf(et)) {
+    if(expr instanceof final TypeCheck tc && st.instanceOf(et)) {
       // (EXPR coerce to xs:integer) coerce to xs:int  ->  EXPR coerce to xs:int
-      return cc.replaceWith(this, new TypeCheck(info, ((TypeCheck) expr).expr, st).optimize(cc));
+      return cc.replaceWith(this, new TypeCheck(info, tc.expr, st).optimize(cc));
     }
 
     // skip check if return type is correct
@@ -86,9 +86,9 @@ public final class TypeCheck extends Single {
     }
 
     // function item coercion
-    if(expr instanceof FuncItem && type instanceof FuncType) {
+    if(expr instanceof final FuncItem fi && type instanceof final FuncType ft) {
       if(!st.occ.check(1)) throw typeError(expr, st, info);
-      return cc.replaceWith(this, ((FuncItem) expr).coerceTo((FuncType) type, cc.qc, cc, info));
+      return cc.replaceWith(this, fi.coerceTo(ft, cc.qc, cc, info));
     }
 
     // pre-evaluate
@@ -144,10 +144,8 @@ public final class TypeCheck extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof TypeCheck)) return false;
-    final TypeCheck tc = (TypeCheck) obj;
-    return seqType().eq(tc.seqType()) && super.equals(obj);
+    return this == obj || obj instanceof final TypeCheck tc && seqType().eq(tc.seqType()) &&
+        super.equals(obj);
   }
 
   @Override

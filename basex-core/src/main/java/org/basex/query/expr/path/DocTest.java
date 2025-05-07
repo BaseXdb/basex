@@ -43,8 +43,7 @@ public final class DocTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
-    if(test instanceof DocTest) {
-      final DocTest dt = (DocTest) test;
+    if(test instanceof final DocTest dt) {
       if(child == null || dt.child == null || child.equals(dt.child))
         return child != null ? this : test;
       final Test tp = child.intersect(dt.child);
@@ -59,7 +58,7 @@ public final class DocTest extends Test {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof DocTest && obj.equals(((DocTest) obj).child);
+    return obj instanceof final DocTest dt && obj.equals(dt.child);
   }
 
   @Override

@@ -93,8 +93,7 @@ public final class BaseXTabs extends JTabbedPane {
     final int tabs = getTabCount();
     for(int t = 0; t < tabs; t++) {
       final Component tab = getTabComponentAt(t);
-      if(tab instanceof Container) {
-        final Container cont = (Container) tab;
+      if(tab instanceof final Container cont) {
         final int comps = cont.getComponentCount();
         for(int c = 0; c < comps; c++) {
           cont.getComponent(c).setEnabled(draggedTab == -1 || t == draggedTab);

@@ -225,9 +225,7 @@ public abstract class Seq extends Value {
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(!(obj instanceof Seq)) return false;
-    final Seq s = (Seq) obj;
-    if(size != s.size) return false;
+    if(!(obj instanceof final Seq s) || size != s.size) return false;
     final BasicIter<Item> iter1 = iter(), iter2 = s.iter();
     for(Item item1; (item1 = iter1.next()) != null;) {
       if(!item1.equals(iter2.next())) return false;

@@ -247,15 +247,14 @@ public final class RestXqFunction extends WebFunction {
     }
 
     // bind errors
-    final XQMap errors = ext instanceof QueryException ? ((QueryException) ext).map() :
-      XQMap.empty();
+    final XQMap errors = ext instanceof final QueryException qe ? qe.map() : XQMap.empty();
     for(final WebParam rxp : errorParams) {
       bind(rxp, args, errors.get(Str.get(rxp.name)), qc);
     }
 
     // bind permission information
-    if(ext instanceof RestXqFunction && permission.var != null) {
-      bind(permission.var, args, RestXqPerm.map((RestXqFunction) ext, conn), qc, "Error info");
+    if(ext instanceof final RestXqFunction rxf && permission.var != null) {
+      bind(permission.var, args, RestXqPerm.map(rxf, conn), qc, "Error info");
     }
     return args;
   }
@@ -308,9 +307,7 @@ public final class RestXqFunction extends WebFunction {
 
   @Override
   public int compareTo(final WebFunction func) {
-    if(!(func instanceof RestXqFunction)) return -1;
-
-    final RestXqFunction rxf = (RestXqFunction) func;
+    if(!(func instanceof final RestXqFunction rxf)) return -1;
     if(path != null) return path.compareTo(rxf.path);
     if(error != null) return error.compareTo(rxf.error);
     return permission.compareTo(rxf.permission);

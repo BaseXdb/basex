@@ -76,10 +76,10 @@ public final class FnNumber extends ContextFn {
     final Type type = arg.seqType().type;
     if(Function.STRING.is(arg)) {
       return ((FnString) arg).contextAccess() ? ContextValue.get(cc, arg.info()) : arg.arg(0);
-    } else if(arg instanceof Cast && type.isStringOrUntyped()) {
-      return ((Cast) arg).expr;
-    } else if(arg instanceof TypeCheck && (type.isUntyped() || type == ANY_ATOMIC_TYPE)) {
-      final Expr expr = ((TypeCheck) arg).expr;
+    } else if(arg instanceof final Cast cast && type.isStringOrUntyped()) {
+      return cast.expr;
+    } else if(arg instanceof final TypeCheck tc && (type.isUntyped() || type == ANY_ATOMIC_TYPE)) {
+      final Expr expr = tc.expr;
       if(expr.seqType().one() && expr.seqType().type.isUntyped()) return expr;
     }
     return null;

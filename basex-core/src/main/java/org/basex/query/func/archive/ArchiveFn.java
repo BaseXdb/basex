@@ -68,7 +68,7 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final Bin toArchive(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(item instanceof Bin) return (Bin) item;
+    if(item instanceof final Bin bin) return bin;
     if(item.type.isStringOrUntyped()) {
       return new B64Lazy(new IOFile(toPath(item, qc)), FILE_IO_ERROR_X);
     }

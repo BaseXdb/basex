@@ -51,8 +51,8 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
     // replace list with union:
     // distinct-ordered-nodes((<a/>, <b/>))  ->  <a/> | <b/>
     // distinct-ordered-nodes(($a, $a))  ->  $a
-    if(nodes instanceof List) {
-      nodes = ((List) nodes).toUnion(cc);
+    if(nodes instanceof final List list) {
+      nodes = list.toUnion(cc);
       if(nodes != arg(0)) return nodes;
     }
 

@@ -27,7 +27,7 @@ public final class BufferOutput extends OutputStream {
    * @return stream
    */
   public static BufferOutput get(final OutputStream os) {
-    return os instanceof BufferOutput ? (BufferOutput) os : new BufferOutput(os);
+    return os instanceof final BufferOutput bo ? bo : new BufferOutput(os);
   }
 
   /**

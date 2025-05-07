@@ -114,7 +114,7 @@ public final class StringRangeAccess extends IndexAccess {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof StringRangeAccess && index.equals(((StringRangeAccess) obj).index) &&
+    return this == obj || obj instanceof final StringRangeAccess sra && index.equals(sra.index) &&
         super.equals(obj);
   }
 

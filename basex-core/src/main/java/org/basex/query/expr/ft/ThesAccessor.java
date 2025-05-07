@@ -133,11 +133,8 @@ public final class ThesAccessor {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof ThesAccessor)) return false;
-    final ThesAccessor ta = (ThesAccessor) obj;
-    return Objects.equals(file, ta.file) && Objects.equals(thesaurus, ta.thesaurus) &&
-        eq(relation, ta.relation) && max == ta.max;
+    return this == obj || obj instanceof final ThesAccessor ta && Objects.equals(file, ta.file) &&
+        Objects.equals(thesaurus, ta.thesaurus) && eq(relation, ta.relation) && max == ta.max;
   }
 
   @Override

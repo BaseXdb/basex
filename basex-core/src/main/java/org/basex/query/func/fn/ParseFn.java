@@ -66,8 +66,8 @@ public abstract class ParseFn extends StandardFunc {
 
     final ParseOptions po = new ParseOptions();
     if(options instanceof Expr) {
-      if(options instanceof XQMap) {
-        toOptions((XQMap) options, po, qc);
+      if(options instanceof final XQMap map) {
+        toOptions(map, po, qc);
       } else {
         po.set(ParseOptions.ENCODING, toStringOrNull((Expr) options, qc));
       }

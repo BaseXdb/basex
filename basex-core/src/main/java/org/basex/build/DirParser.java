@@ -93,8 +93,8 @@ public final class DirParser extends Parser {
    * @throws IOException I/O exception
    */
   private void parse(final Builder builder, final IO input) throws IOException {
-    if(input instanceof IOFile && input.isDir()) {
-      for(final IO f : ((IOFile) input).children()) parse(builder, f);
+    if(input instanceof final IOFile file && file.isDir()) {
+      for(final IO f : file.children()) parse(builder, f);
     } else if(archives && input.isArchive()) {
       String name = input.name().toLowerCase(Locale.ENGLISH);
       InputStream in = input.inputStream();

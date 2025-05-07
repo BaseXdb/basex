@@ -450,7 +450,7 @@ public final class CsvRoundtripTest extends SandboxTest {
     final String serializeQuery = _CSV_SERIALIZE.args(
       result.startsWith("<") ? ' ' + result :
       result.startsWith("[") ? " (" + result.replace('\n', ',') + ")" :
-      result.startsWith("{") ? " " + result.replaceAll(",\"get\":\\(anonymous-function\\)#2", "") :
+      result.startsWith("{") ? " " + result.replace(",\"get\":(anonymous-function)#2", "") :
       result.isEmpty() ? " ()" : " " + result, " { " + options + format + " }");
     final String serialization = query(serializeQuery);
     final String roundtripQuery = function.args(" \"" + serialization.replace("\"", "\"\"") + "\"",

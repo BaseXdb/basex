@@ -115,8 +115,7 @@ public final class FTPosData {
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(!(obj instanceof FTPosData)) return false;
-    final FTPosData ft = (FTPosData) obj;
+    if(!(obj instanceof final FTPosData ft)) return false;
     if(size != ft.size) return false;
     for(int p = 0; p < size; p++) {
       if(pos[p].pre != ft.pos[p].pre || !pos[p].equals(ft.pos[p])) return false;

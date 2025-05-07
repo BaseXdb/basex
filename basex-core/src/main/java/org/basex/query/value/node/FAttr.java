@@ -73,10 +73,8 @@ public final class FAttr extends FNode {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FAttr)) return false;
-    final FAttr f = (FAttr) obj;
-    return name.eq(f.name) && Token.eq(value, f.value) && super.equals(obj);
+    return this == obj || obj instanceof final FAttr f && name.eq(f.name) &&
+        Token.eq(value, f.value) && super.equals(obj);
   }
 
   @Override

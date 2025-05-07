@@ -110,7 +110,7 @@ public final class Insert extends Update {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Insert && mode == ((Insert) obj).mode && super.equals(obj);
+    return this == obj || obj instanceof final Insert ins && mode == ins.mode && super.equals(obj);
   }
 
   @Override

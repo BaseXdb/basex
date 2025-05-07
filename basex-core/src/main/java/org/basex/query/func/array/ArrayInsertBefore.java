@@ -24,8 +24,8 @@ public final class ArrayInsertBefore extends ArrayFn {
   @Override
   protected ArrayInsertBefore opt(final CompileContext cc) {
     final Type type = arg(0).seqType().type;
-    if(type instanceof ArrayType) {
-      final SeqType mt = ((ArrayType) type).valueType().union(arg(2).seqType());
+    if(type instanceof final ArrayType at) {
+      final SeqType mt = at.valueType().union(arg(2).seqType());
       exprType.assign(ArrayType.get(mt));
     }
     return this;

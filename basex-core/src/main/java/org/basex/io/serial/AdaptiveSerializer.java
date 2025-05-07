@@ -117,10 +117,10 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   @Override
   protected final void function(final FItem item) throws IOException {
-    if(item instanceof XQArray) {
-      array((XQArray) item);
-    } else if(item instanceof XQMap) {
-      map((XQMap) item);
+    if(item instanceof final XQArray array) {
+      array(array);
+    } else if(item instanceof final XQMap map) {
+      map(map);
     } else {
       final QNm fn = item.funcName();
       if(fn == null) printChars(Token.token("(anonymous-function)"));

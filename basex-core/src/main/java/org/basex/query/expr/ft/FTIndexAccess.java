@@ -110,10 +110,8 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FTIndexAccess)) return false;
-    final FTIndexAccess f = (FTIndexAccess) obj;
-    return ftexpr.equals(f.ftexpr) && db.equals(f.db);
+    return this == obj || obj instanceof final FTIndexAccess fti && ftexpr.equals(fti.ftexpr) &&
+        db.equals(fti.db);
   }
 
   @Override
@@ -124,8 +122,7 @@ public final class FTIndexAccess extends Simple {
   @Override
   public void toString(final QueryString qs) {
     Expr expr = ftexpr;
-    if(ftexpr instanceof FTWords) {
-      final FTWords ftw = (FTWords) ftexpr;
+    if(ftexpr instanceof final FTWords ftw) {
       if(ftw.mode == FTMode.ANY && ftw.occ == null && ftw.simple) expr = ftw.query;
     }
     qs.function(Function._FT_SEARCH, db, expr);

@@ -165,7 +165,7 @@ public final class AtomicUpdateCache {
     if(update == null) return;
 
     if(!merged) {
-      if(recent instanceof StructuralUpdate) structUpdates.add((StructuralUpdate) recent);
+      if(recent instanceof final StructuralUpdate su) structUpdates.add(su);
       else valueUpdates.add(recent);
     }
     recent = update;

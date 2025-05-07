@@ -176,7 +176,7 @@ public final class SmallSeq extends TreeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof SmallSeq ? Arrays.equals(items, ((SmallSeq) obj).items) :
+    return this == obj || (obj instanceof final SmallSeq ss ? Arrays.equals(items, ss.items) :
       super.equals(obj));
   }
 }

@@ -36,8 +36,8 @@ public final class ArrayGet extends StandardFunc {
 
     // combine result type with return type of fallback function
     final Type type = array.seqType().type;
-    if(type instanceof ArrayType) {
-      final SeqType st = ((ArrayType) type).valueType();
+    if(type instanceof final ArrayType at) {
+      final SeqType st = at.valueType();
       exprType.assign(defined(2) ? st.union(arg(2).seqType()) : st);
     }
     return this;

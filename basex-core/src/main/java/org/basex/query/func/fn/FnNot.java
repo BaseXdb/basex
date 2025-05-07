@@ -51,13 +51,13 @@ public final class FnNot extends StandardFunc {
     if(NOT.is(input)) return cc.function(BOOLEAN, info, input.args());
 
     // 'a' = 'b'  ->  'a' != 'b'
-    if(input instanceof Cmp) {
-      final Expr inverted = ((Cmp) input).invert(cc);
+    if(input instanceof final Cmp cmp) {
+      final Expr inverted = cmp.invert(cc);
       if(inverted != input) return inverted;
     }
     // position() = 1  ->  position() != 1
-    if(input instanceof CmpPos) {
-      final Expr ex = ((CmpPos) input).invert(cc);
+    if(input instanceof final CmpPos pos) {
+      final Expr ex = pos.invert(cc);
       if(ex != null) return ex;
     }
     // $node/text()  ->  empty($node/text())

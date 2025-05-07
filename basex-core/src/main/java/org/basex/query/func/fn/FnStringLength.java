@@ -25,7 +25,7 @@ public final class FnStringLength extends ContextFn {
       final Item item = context(qc).item(qc, info);
       if(item.isEmpty()) return Int.ZERO;
       if(item instanceof FItem && !(item instanceof XQJava)) throw FISTRING_X.get(info, item);
-      length = item instanceof AStr ? ((AStr) item).length(info) : Token.length(item.string(info));
+      length = item instanceof final AStr str ? str.length(info) : Token.length(item.string(info));
     }
     return Int.get(length);
   }

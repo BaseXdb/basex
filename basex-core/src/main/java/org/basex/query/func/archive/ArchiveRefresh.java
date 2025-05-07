@@ -41,8 +41,8 @@ public final class ArchiveRefresh extends ArchiveCreate {
           if(content == XQArray.empty()) {
             if(Files.exists(path)) Files.delete(path);
           } else {
-            if(content instanceof Bin) {
-              Files.copy(((Bin) content).input(info), path, StandardCopyOption.REPLACE_EXISTING);
+            if(content instanceof final Bin bin) {
+              Files.copy(bin.input(info), path, StandardCopyOption.REPLACE_EXISTING);
             } else {
               Files.write(path, encode(toBytes(content, qc), encoding(header), false, qc));
             }

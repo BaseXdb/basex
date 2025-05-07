@@ -235,8 +235,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) {
     if(this == item) return true;
-    if(item instanceof FuncItem) {
-      final FuncItem func = (FuncItem) item;
+    if(item instanceof final FuncItem func) {
       return arity() == func.arity() && expr.equals(func.expr);
     }
     return false;
@@ -261,16 +260,15 @@ public final class FuncItem extends FItem implements Scope {
       final CompileContext cc) throws QueryException {
     if(arity() == 2 && !input.has(Flag.NDT)) {
       final Var actionVar = params[left ? 1 : 0], resultVar = params[left ? 0 : 1];
-      final Predicate<Expr> result = ex -> ex instanceof VarRef &&
-          ((VarRef) ex).var.equals(resultVar);
+      final Predicate<Expr> result = ex -> ex instanceof final VarRef vr &&
+          vr.var.equals(resultVar);
 
       // fold-left(SEQ, INIT, f($result, $value) { VALUE })  ->  VALUE
       if(!array && input.seqType().oneOrMore() && expr instanceof Value) return expr;
       // fold-left(SEQ, INIT, f($result, $value) { $result })  ->  $result
       if(result.test(expr)) return "";
 
-      if(expr instanceof If) {
-        final If iff = (If) expr;
+      if(expr instanceof final If iff) {
         final Expr cond = iff.cond, thn = iff.exprs[0], els = iff.exprs[1];
         if(!(cond.uses(actionVar) || cond.has(Flag.NDT))) {
           Expr cnd = cond, action = null;
@@ -283,10 +281,9 @@ public final class FuncItem extends FItem implements Scope {
             // -> if not(COND): return $result; else $result = ACTION
             cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
             action = thn;
-          } else if(cond instanceof CmpG) {
+          } else if(cond instanceof final CmpG cmp) {
             // if($result = ITEM) then ITEM else ACTION
             // -> if COND: return $result; else $result = ACTION
-            final CmpG cmp = (CmpG) cond;
             final Expr op1 = cmp.arg(0), op2 = cmp.arg(1);
             final SeqType st1 = op1.seqType(), st2 = op2.seqType();
             if(result.test(op1) && op2 instanceof Item && op2.equals(thn) &&

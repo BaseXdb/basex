@@ -21,7 +21,7 @@ final class ProjectCellRenderer extends DefaultTreeCellRenderer {
       final boolean focus) {
 
     final Color tnsc = getTextNonSelectionColor(), tsc = getTextSelectionColor();
-    if(val instanceof ProjectNode && ((ProjectNode) val).error) {
+    if(val instanceof final ProjectNode node && node.error) {
       textNonSelectionColor = GUIConstants.RED;
       textSelectionColor = GUIConstants.RED;
     }
@@ -39,7 +39,7 @@ final class ProjectCellRenderer extends DefaultTreeCellRenderer {
    * @return icon
    */
   static Icon icon(final Object val, final boolean expanded) {
-    return val instanceof ProjectFile ? BaseXImages.file(((ProjectFile) val).file) :
+    return val instanceof final ProjectFile file ? BaseXImages.file(file.file) :
       BaseXImages.dir(expanded);
   }
 }

@@ -50,8 +50,7 @@ public abstract class Filter extends AFilter {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // flatten nested filters
-    if(root instanceof Filter) {
-      final Filter filter = (Filter) root;
+    if(root instanceof Filter filter) {
       root = filter.root;
       exprs = ExprList.concat(filter.exprs, exprs);
     }
@@ -71,7 +70,7 @@ public abstract class Filter extends AFilter {
         return Path.get(cc, info, null, Step.self(cc, root, info, exprs));
       }
       // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
-      if(root instanceof AxisPath) return ((AxisPath) root).addPredicates(cc, exprs);
+      if(root instanceof final AxisPath path) return path.addPredicates(cc, exprs);
 
       // rewrite filter with document nodes to path to possibly enable index rewritings
       // example: db:get('db')[.//text() = 'x']  ->  db:get('db')/.[.//text() = 'x']
@@ -113,57 +112,55 @@ public abstract class Filter extends AFilter {
     final Predicate<Expr> simpleInt = e -> e.seqType().eq(SeqType.INTEGER_O) && e.isSimple();
     for(final Expr pred : exprs) {
       Expr ex = null;
-      if(pred instanceof IntPos) {
+      if(pred instanceof final IntPos pos) {
         // E[pos: MIN, MAX]  ->  util:range(E, MIN, MAX)
-        final IntPos pos = (IntPos) pred;
         ex = cc.function(_UTIL_RANGE, info, add.apply(expr), Int.get(pos.min), Int.get(pos.max));
-      } else if(pred instanceof SimplePos) {
-        if(((SimplePos) pred).exact()) {
+      } else if(pred instanceof final SimplePos pos) {
+        if(pos.exact()) {
           // E[pos: POS]  ->  items-at(E, POS)
           ex = cc.function(ITEMS_AT, info, add.apply(expr), pred.arg(0));
         } else {
           // E[pos: MIN, MAX]  ->  util:range(E, MIN, MAX)
           ex = cc.function(_UTIL_RANGE, info, add.apply(expr), pred.arg(0), pred.arg(1));
         }
-      } else if(pred instanceof Pos) {
-        final Expr pos = ((Pos) pred).expr;
-        if(pos instanceof Range) {
-          final Expr arg1 = pos.arg(0), arg2 = pos.arg(1);
+      } else if(pred instanceof final Pos pos) {
+        final Expr posExpr = pos.expr;
+        if(posExpr instanceof Range) {
+          final Expr arg1 = posExpr.arg(0), arg2 = posExpr.arg(1);
           if(simpleInt.test(arg1) && LAST.is(arg2)) {
             // E[pos: INT to last()]  ->  util:range(E, INT)
             ex = cc.function(_UTIL_RANGE, info, add.apply(expr), arg1);
-          } else if(arg1 == Int.ONE && arg2 instanceof Arith && LAST.is(arg2.arg(0)) &&
-              ((Arith) arg2).calc == Calc.SUBTRACT && arg2.arg(1) == Int.ONE) {
+          } else if(arg1 == Int.ONE && arg2 instanceof final Arith arth2 && LAST.is(arth2.arg(0)) &&
+              arth2.calc == Calc.SUBTRACT && arth2.arg(1) == Int.ONE) {
             // E[pos: 1 to last() - 1]  ->  trunk(E)
             ex = cc.function(TRUNK, info, add.apply(expr));
-          } else if(arg1 instanceof Arith && LAST.is(arg1.arg(0)) &&
-              ((Arith) arg1).calc == Calc.SUBTRACT && simpleInt.test(arg1.arg(1)) &&
-              arg2 == Int.MAX) {
+          } else if(arg1 instanceof final Arith arth1 && LAST.is(arth1.arg(0)) &&
+              arth1.calc == Calc.SUBTRACT && simpleInt.test(arth1.arg(1)) && arg2 == Int.MAX) {
             // E[pos: last() - INT to MAX]  ->  reverse(subsequence(reverse(E), 1, INT + 1))
             ex = cc.function(REVERSE, info, cc.function(SUBSEQUENCE, info,
                 cc.function(REVERSE, info, add.apply(expr)), Int.ONE,
                 new Arith(info, arg1.arg(1), Int.ONE, Calc.ADD).optimize(cc)));
           }
-        } else if(LAST.is(pos)) {
+        } else if(LAST.is(posExpr)) {
           // E[pos: last()]  ->  foot(E)
           ex = cc.function(FOOT, info, add.apply(expr));
-        } else if(pos instanceof Arith && LAST.is(pos.arg(0)) &&
-            ((Arith) pos).calc == Calc.SUBTRACT && simpleInt.test(pos.arg(1))) {
+        } else if(posExpr instanceof final Arith arth && LAST.is(arth.arg(0)) &&
+            arth.calc == Calc.SUBTRACT && simpleInt.test(arth.arg(1))) {
           // E[pos: last() - INT]  ->  items-at(reverse(E), INT + 1)
           ex = cc.function(ITEMS_AT, info, cc.function(REVERSE, info, add.apply(expr)),
-              new Arith(info, pos.arg(1), Int.ONE, Calc.ADD).optimize(cc));
+              new Arith(info, posExpr.arg(1), Int.ONE, Calc.ADD).optimize(cc));
         }
-      } else if(pred instanceof MixedPos) {
-        final Expr pos = ((MixedPos) pred).expr;
+      } else if(pred instanceof final MixedPos pos) {
+        final Expr posExpr = pos.expr;
         // Value instances are known to be sorted and duplicate-free (see Pos#get)
-        final boolean sorted = pos instanceof Value;
+        final boolean sorted = posExpr instanceof Value;
         // E[pos: INT1, INT2, ...]  ->  items-at(E, INT1, INT2, ...)
         // E[pos: POSITIONS, ...]  ->  items-at(E, sort(distinct-values((POSITIONS)))
-        ex = cc.function(ITEMS_AT, info, add.apply(expr), sorted ? pos :
-          cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, pos)), Bln.get(sorted));
-      } else if(pred instanceof CmpG) {
+        ex = cc.function(ITEMS_AT, info, add.apply(expr), sorted ? posExpr :
+          cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, posExpr)), Bln.get(sorted));
+      } else if(pred instanceof final CmpG cmp) {
         final Expr op1 = pred.arg(0), op2 = pred.arg(1);
-        if(POSITION.is(op1) && ((Cmp) pred).opV() == OpV.NE &&
+        if(POSITION.is(op1) && cmp.opV() == OpV.NE &&
             op2.isSimple() && op2.seqType().instanceOf(SeqType.INTEGER_O)) {
           // E[position() != pos]  ->  remove(E, pos)
           ex = cc.function(REMOVE, info, add.apply(expr), op2);
@@ -221,8 +218,7 @@ public abstract class Filter extends AFilter {
 
   @Override
   public final boolean equals(final Object obj) {
-    return this == obj || obj instanceof Filter && root.equals(((Filter) obj).root) &&
-        super.equals(obj);
+    return this == obj || obj instanceof Filter fltr && root.equals(fltr.root) && super.equals(obj);
   }
 
   @Override

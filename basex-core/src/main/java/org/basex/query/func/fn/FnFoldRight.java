@@ -32,8 +32,7 @@ public final class FnFoldRight extends FnFoldLeft {
     } else {
       final Value value = input.value(qc, arg(0));
       p = value.size();
-      if(value instanceof TreeSeq) {
-        final TreeSeq seq = (TreeSeq) value;
+      if(value instanceof final TreeSeq seq) {
         for(final ListIterator<Item> iter = seq.iterator(p); iter.hasPrevious();) {
           args.set(1, invoke(action, args.set(0, iter.previous()).inc(), qc));
           if(skip(qc, args)) break;

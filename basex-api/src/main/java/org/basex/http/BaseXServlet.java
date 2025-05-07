@@ -76,7 +76,7 @@ public abstract class BaseXServlet extends HttpServlet {
       final QNm qname = ex.qname();
       if(Token.eq(qname.uri(), QueryText.REST_URI)) {
         final Value value = ex.value();
-        if(value instanceof ANum) code = (int) ((ANum) value).itr();
+        if(value instanceof final ANum num) code = (int) num.itr();
         full = false;
       }
       conn.error(code, full ? Util.message(ex) : ex.getLocalizedMessage());

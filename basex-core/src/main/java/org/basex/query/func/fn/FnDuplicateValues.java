@@ -99,11 +99,8 @@ public class FnDuplicateValues extends StandardFunc {
         if(values instanceof RangeSeq || values instanceof Range || st.zeroOrOne())
           return Empty.VALUE;
         // util:duplicates((1 to 3) ! 1)  ->  1
-        if(values instanceof SingletonSeq && !st.mayBeArray()) {
-          final SingletonSeq ss = (SingletonSeq) values;
-          if(ss.singleItem()) {
-            return type == st.type ? ss.itemAt(0) : cc.function(Function.DATA, info, ss.itemAt(0));
-          }
+        if(values instanceof final SingletonSeq ss && !st.mayBeArray() && ss.singleItem()) {
+          return type == st.type ? ss.itemAt(0) : cc.function(Function.DATA, info, ss.itemAt(0));
         }
       }
     }

@@ -309,15 +309,16 @@ public class BaseXCombo extends JComboBox<Object> {
   /**
    * Assigns the current checkbox value to the option specified in the constructor.
    */
+  @SuppressWarnings("unchecked")
   public void assign() {
-    if(optionKey instanceof NumberOption) {
-      options.set((NumberOption) optionKey, getSelectedIndex());
-    } else if(optionKey instanceof EnumOption) {
-      options.set((EnumOption<?>) optionKey, getSelectedItem());
-    } else if(optionKey instanceof StringOption) {
-      options.set((StringOption) optionKey, getSelectedItem());
-    } else if(optionKey instanceof BooleanOption) {
-      options.set((BooleanOption) optionKey, Boolean.parseBoolean(getSelectedItem()));
+    if(optionKey instanceof final NumberOption option) {
+      options.set(option, getSelectedIndex());
+    } else if(optionKey instanceof EnumOption option) {
+      options.set(option, getSelectedItem());
+    } else if(optionKey instanceof final StringOption option) {
+      options.set(option, getSelectedItem());
+    } else if(optionKey instanceof final BooleanOption option) {
+      options.set(option, Boolean.parseBoolean(getSelectedItem()));
     } else if(optionKey instanceof StringsOption) {
       updateHistory();
     } else {
@@ -344,7 +345,7 @@ public class BaseXCombo extends JComboBox<Object> {
       tf = new BaseXTextField(gui);
       // adopt border of original editor
       final Component comp = combo.getEditor().getEditorComponent();
-      if(comp instanceof JTextField) tf.setBorder(((JTextField) comp).getBorder());
+      if(comp instanceof final JTextField text) tf.setBorder(text.getBorder());
     }
 
     @Override

@@ -141,7 +141,7 @@ public final class Int extends ANum {
   @Override
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return item instanceof Int ? value == ((Int) item).value :
+    return item instanceof final Int itr ? value == itr.value :
            item instanceof Dec ? item.equal(this, coll, ii) :
            value == item.dbl(ii);
   }
@@ -149,7 +149,7 @@ public final class Int extends ANum {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return item instanceof Int ? Long.compare(value, ((Int) item).value) :
+    return item instanceof final Int itr ? Long.compare(value, itr.value) :
            item instanceof Dec ? -item.compare(this, coll, transitive, ii) :
            Dbl.compare(dbl(ii), item.dbl(ii), transitive);
   }
@@ -180,10 +180,7 @@ public final class Int extends ANum {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Int)) return false;
-    final Int i = (Int) obj;
-    return type == i.type && value == i.value;
+    return this == obj || obj instanceof final Int itr && type == itr.type && value == itr.value;
   }
 
   // STATIC METHODS ===============================================================================

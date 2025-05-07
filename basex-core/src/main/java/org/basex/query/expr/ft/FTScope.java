@@ -66,8 +66,7 @@ public final class FTScope extends FTFilter {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTScope && same == ((FTScope) obj).same &&
-        super.equals(obj);
+    return this == obj || obj instanceof final FTScope fts && same == fts.same && super.equals(obj);
   }
 
   @Override

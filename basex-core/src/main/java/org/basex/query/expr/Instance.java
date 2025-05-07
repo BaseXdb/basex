@@ -101,7 +101,7 @@ public final class Instance extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Instance && seqType.eq(((Instance) obj).seqType) &&
+    return this == obj || obj instanceof final Instance inst && seqType.eq(inst.seqType) &&
         super.equals(obj);
   }
 

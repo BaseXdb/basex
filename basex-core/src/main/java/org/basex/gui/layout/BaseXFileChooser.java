@@ -156,8 +156,8 @@ public final class BaseXFileChooser {
           final String path = files[f].path();
           if(!path.contains(".")) files[f] = new IOFile(path + suffix);
         }
-      } else if(ff instanceof Filter) {
-        final String[] sufs = ((Filter) ff).suffixes;
+      } else if(ff instanceof Filter filter) {
+        final String[] sufs = filter.suffixes;
         final int sl = sufs.length;
         for(int f = 0; f < fl && sl != 0; f++) {
           final String path = files[f].path();

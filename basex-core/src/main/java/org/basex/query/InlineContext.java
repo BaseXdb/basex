@@ -49,7 +49,7 @@ public final class InlineContext {
     uses = VarUsage.NEVER;
     for(final Expr target : targets) {
       uses = uses.plus(target.count(var).times(minMax[1]));
-      if(target instanceof Clause) ((Clause) target).calcSize(minMax);
+      if(target instanceof final Clause clause) clause.calcSize(minMax);
     }
     if(uses == VarUsage.NEVER) return true;
 

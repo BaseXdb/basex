@@ -36,8 +36,8 @@ public final class XQIntMap extends XQHashMap {
 
   @Override
   public Int getOrNull(final Item key) throws QueryException {
-    if(key instanceof ANum) {
-      final double d = key.dbl(null);
+    if(key instanceof final ANum num) {
+      final double d = num.dbl();
       final int v = (int) d;
       if(d == v) {
         final int i = map.index(v);

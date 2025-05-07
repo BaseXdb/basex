@@ -80,8 +80,8 @@ public final class FnTail extends StandardFunc {
     // tail(replicate(I, count))  ->  replicate(I, count - 1)
     if(REPLICATE.is(input)) {
       final Expr[] args = input.args().clone();
-      if(args[1] instanceof Int && args[0].seqType().zeroOrOne()) {
-        args[1] = Int.get(((Int) args[1]).itr() - 1);
+      if(args[1] instanceof final Int itr && args[0].seqType().zeroOrOne()) {
+        args[1] = Int.get(itr.itr() - 1);
         return cc.function(REPLICATE, info, args);
       }
     }

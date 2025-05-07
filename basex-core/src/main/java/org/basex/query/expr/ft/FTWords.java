@@ -520,11 +520,9 @@ public final class FTWords extends FTExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FTWords)) return false;
-    final FTWords f = (FTWords) obj;
-    return query.equals(f.query) && mode == f.mode && Objects.equals(db, f.db) &&
-        Objects.equals(ftOpt, f.ftOpt) && Array.equals(occ, f.occ) && super.equals(obj);
+    return this == obj || obj instanceof final FTWords f && query.equals(f.query) &&
+        mode == f.mode && Objects.equals(db, f.db) && Objects.equals(ftOpt, f.ftOpt) &&
+        Array.equals(occ, f.occ) && super.equals(obj);
   }
 
   @Override

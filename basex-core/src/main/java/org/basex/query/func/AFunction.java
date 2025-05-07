@@ -32,7 +32,7 @@ public interface AFunction {
    * @return result of check
    */
   default boolean is(final Expr ex) {
-    return ex instanceof StandardFunc && ((StandardFunc) ex).definition == definition();
+    return ex instanceof final StandardFunc sf && sf.definition == definition();
   }
 
   /**

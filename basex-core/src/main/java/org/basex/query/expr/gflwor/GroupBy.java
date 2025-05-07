@@ -330,11 +330,8 @@ public final class GroupBy extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof GroupBy)) return false;
-    final GroupBy g = (GroupBy) obj;
-    return Array.equals(specs, g.specs) && Array.equals(preExpr, g.preExpr) &&
-        Array.equals(post, g.post);
+    return this == obj || obj instanceof final GroupBy group && Array.equals(specs, group.specs) &&
+        Array.equals(preExpr, group.preExpr) && Array.equals(post, group.post);
   }
 
   @Override

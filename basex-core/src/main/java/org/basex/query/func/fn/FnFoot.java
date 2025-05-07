@@ -65,8 +65,7 @@ public final class FnFoot extends StandardFunc {
       if(stl.oneOrMore()) return cc.function(FOOT, info, last);
     }
     // foot(reverse(root)[test])  ->  head(root[test])
-    if(input instanceof IterFilter) {
-      final IterFilter filter = (IterFilter) input;
+    if(input instanceof final IterFilter filter) {
       final Expr root = cc.function(REVERSE, filter.info(), filter.root);
       return cc.function(HEAD, info, Filter.get(cc, filter.info(), root, filter.exprs));
     }

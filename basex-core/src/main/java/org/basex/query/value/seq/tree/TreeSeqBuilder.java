@@ -100,7 +100,7 @@ public final class TreeSeqBuilder implements SeqBuilder {
     // shortcut for adding single items
     if(value.isItem()) return add((Item) value);
 
-    if(!(value instanceof BigSeq)) {
+    if(!(value instanceof final BigSeq big)) {
       final BasicIter<?> iter = value.iter();
       for(Item item; (item = iter.next()) != null;) {
         qc.checkStop();
@@ -109,7 +109,6 @@ public final class TreeSeqBuilder implements SeqBuilder {
       return this;
     }
 
-    final BigSeq big = (BigSeq) value;
     final Item[] ls = big.left, rs = big.right;
     final FingerTree<Item, Item> midTree = big.middle;
     if(midTree.isEmpty()) {

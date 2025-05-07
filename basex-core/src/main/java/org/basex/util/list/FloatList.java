@@ -95,8 +95,7 @@ public final class FloatList extends ElementList {
   @Override
   public boolean equals(final Object obj) {
     if(obj == this) return true;
-    if(!(obj instanceof FloatList)) return false;
-    final FloatList dl = (FloatList) obj;
+    if(!(obj instanceof final FloatList dl)) return false;
     if(size != dl.size) return false;
     for(int l = 0; l < size; ++l) {
       if(list[l] != dl.list[l]) return false;

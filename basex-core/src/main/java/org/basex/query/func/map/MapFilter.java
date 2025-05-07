@@ -34,10 +34,9 @@ public final class MapFilter extends StandardFunc {
     if(map == XQMap.empty()) return map;
 
     final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      final MapType mtype = (MapType) type;
-      final SeqType declType = SeqType.get(mtype.keyType(), Occ.EXACTLY_ONE);
-      arg(1, arg -> refineFunc(arg, cc, declType, mtype.valueType()));
+    if(type instanceof final MapType mt) {
+      final SeqType declType = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE);
+      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType()));
       exprType.assign(type);
     }
     return this;

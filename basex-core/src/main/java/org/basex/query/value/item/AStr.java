@@ -150,8 +150,7 @@ public abstract class AStr extends Item {
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(!(obj instanceof AStr)) return false;
-    final AStr a = (AStr) obj;
+    if(!(obj instanceof final AStr a)) return false;
     return type == a.type && Token.eq(value, a.value);
   }
 

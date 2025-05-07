@@ -46,7 +46,7 @@ public final class IterPosStep extends Step {
         if(iter == null) {
           iter = axis.iter(checkNode(qc));
           for(int e = 0; e < el; e++) {
-            if(exprs[e] instanceof CmpPos) cachedPos[e] = ((CmpPos) exprs[e]).positions(qc);
+            if(exprs[e] instanceof final CmpPos pos) cachedPos[e] = pos.positions(qc);
           }
         }
         for(final ANode node : iter) {

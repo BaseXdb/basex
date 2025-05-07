@@ -58,8 +58,7 @@ public final class Typeswitch extends ParseExpr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate expression
-    if(cond instanceof Value) {
-      final Value value = (Value) cond;
+    if(cond instanceof final Value value) {
       for(final TypeswitchGroup group : groups) {
         if(group.match(value, null)) {
           group.inline(value, cc);
@@ -239,10 +238,8 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Typeswitch)) return false;
-    final Typeswitch ts = (Typeswitch) obj;
-    return cond.equals(ts.cond) && Array.equals(groups, ts.groups);
+    return this == obj || obj instanceof final Typeswitch ts && cond.equals(ts.cond) &&
+        Array.equals(groups, ts.groups);
   }
 
   @Override

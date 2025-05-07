@@ -93,10 +93,10 @@ public abstract class Serializer implements Closeable {
    * @throws IOException I/O exception
    */
   public void serialize(final Item item) throws IOException {
-    if(item instanceof ANode) {
-      node((ANode) item);
-    } else if(item instanceof FItem) {
-      function((FItem) item);
+    if(item instanceof final ANode node) {
+      node(node);
+    } else if(item instanceof FItem fitem) {
+      function(fitem);
     } else {
       atomic(item);
     }
@@ -141,8 +141,8 @@ public abstract class Serializer implements Closeable {
    * @throws IOException I/O exception
    */
   protected void node(final ANode node) throws IOException {
-    if(node instanceof DBNode) {
-      node((DBNode) node);
+    if(node instanceof final DBNode dbnode) {
+      node(dbnode);
     } else {
       node((FNode) node);
     }
@@ -339,7 +339,7 @@ public abstract class Serializer implements Closeable {
       return;
     }
 
-    final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ftpos : null;
+    final FTPosData ftData = node instanceof FTPosNode ft ? ft.ftpos : null;
     final boolean nsExist = !data.nspaces.isEmpty();
     final TokenSet nsSet = nsExist ? new TokenSet() : null;
     final IntList parentStack = new IntList();
@@ -358,7 +358,7 @@ public abstract class Serializer implements Closeable {
       }
 
       if(kind == Data.TEXT) {
-        prepareText(data.text(pre, true), ft != null ? ft.get(data, pre) : null);
+        prepareText(data.text(pre, true), ftData != null ? ftData.get(data, pre) : null);
         pre++;
       } else if(kind == Data.COMM) {
         prepareComment(data.text(pre++, true));

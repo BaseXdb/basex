@@ -73,7 +73,7 @@ public final class BytSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof BytSeq ? Arrays.equals(values, ((BytSeq) obj).values) :
+    return this == obj || (obj instanceof final BytSeq seq ? Arrays.equals(values, seq.values) :
       super.equals(obj));
   }
 
@@ -100,8 +100,8 @@ public final class BytSeq extends NativeSeq {
     final ByteList tmp = new ByteList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      if(value instanceof BytSeq) {
-        tmp.add(((BytSeq) value).values);
+      if(value instanceof final BytSeq seq) {
+        tmp.add(seq.values);
       } else {
         for(final Item item : value) tmp.add((byte) item.itr(null));
       }

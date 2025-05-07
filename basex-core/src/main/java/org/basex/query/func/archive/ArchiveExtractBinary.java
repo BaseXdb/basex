@@ -41,8 +41,8 @@ public class ArchiveExtractBinary extends ArchiveFn {
     final TokenList tl = new TokenList();
     try {
       final Object archive = toInput(arg(0), qc, entries != null);
-      if(archive instanceof Bin) {
-        try(BufferInput bi = ((Bin) archive).input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
+      if(archive instanceof final Bin bin) {
+        try(BufferInput bi = bin.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
           while(in.more() && (entries == null || !entries.isEmpty())) {
             final ZipEntry ze = in.entry();
             if(ze.isDirectory() || entries != null && !entries.remove(ze.getName())) continue;

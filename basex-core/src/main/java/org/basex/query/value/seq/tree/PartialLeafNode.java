@@ -32,8 +32,8 @@ final class PartialLeafNode implements NodeLike<Item, Item> {
     }
 
     final NodeLike<Item, Item> left = nodes[pos - 1];
-    if(left instanceof PartialLeafNode) {
-      final Item[] ls = ((PartialLeafNode) left).elems, rs = elems;
+    if(left instanceof final PartialLeafNode pln) {
+      final Item[] ls = pln.elems, rs = elems;
       final int l = ls.length, r = rs.length, n = l + r;
       final Item[] vals = new Item[n];
       Array.copy(ls, l, vals);

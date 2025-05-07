@@ -200,8 +200,7 @@ public class CmpG extends Cmp {
 
     // (if(A) then B else C) = X  ->  if(A) then B = X else C = X
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(expr == this && expr1 instanceof If && !expr1.has(Flag.NDT)) {
-      final If iff = (If) expr1;
+    if(expr == this && expr1 instanceof final If iff && !expr1.has(Flag.NDT)) {
       final Expr thn = new CmpG(info, iff.arg(0), expr2, op);
       final Expr els = new CmpG(info, iff.arg(1), expr2.copy(cc, new IntObjectMap<>()), op);
       return new If(info, iff.cond, thn.optimize(cc), els.optimize(cc)).optimize(cc);
@@ -237,7 +236,7 @@ public class CmpG extends Cmp {
       // pre-evaluate expression; discard hashed results
       if(values(false, cc)) {
         final Expr ex = cc.preEval(expr);
-        if(expr instanceof CmpHashG) cc.qc.threads.get((CmpHashG) expr, info).remove();
+        if(expr instanceof final CmpHashG cmp) cc.qc.threads.get(cmp, info).remove();
         return ex;
       }
     }
@@ -256,11 +255,11 @@ public class CmpG extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     Expr ex = null;
 
-    if(expr1 instanceof Arith && expr2.seqType().instanceOf(SeqType.NUMERIC_O)) {
+    if(expr1 instanceof final Arith arth && expr2.seqType().instanceOf(SeqType.NUMERIC_O)) {
       final Expr op11 = expr1.arg(0), op12 = expr1.arg(1), op22 = expr2.arg(1);
-      final double num12 = op12 instanceof ANum ? ((ANum) op12).dbl() : Double.NaN;
+      final double num12 = op12 instanceof final ANum num ? num.dbl() : Double.NaN;
       if(op12.seqType().instanceOf(SeqType.NUMERIC_O)) {
-        final Calc calc1 = ((Arith) expr1).calc;
+        final Calc calc1 = arth.calc;
         if(calc1 == Calc.SUBTRACT && expr2 == Int.ZERO) {
           // E - NUMERIC = 0  ->  E = NUMERIC
           ex = new CmpG(info, op11, op12, op);
@@ -420,10 +419,9 @@ public class CmpG extends Cmp {
     // if required, invert second operator (first operator need never be inverted)
     final boolean not2 = Function.NOT.is(expr);
     Expr expr2 = not2 ? expr.arg(0) : expr;
-    if(!(expr2 instanceof CmpG)) return null;
+    if(!(expr2 instanceof final CmpG cmp2)) return null;
 
     // compare first and second comparison
-    final CmpG cmp2 = (CmpG) expr2;
     final OpG cmpOp = not2 ? cmp2.op.invert() : cmp2.op;
     if(op != cmpOp || sc().collation != cmp2.sc().collation || !exprs[0].equals(cmp2.exprs[0]))
       return null;
@@ -490,11 +488,9 @@ public class CmpG extends Cmp {
     final Type type = val.seqType().type;
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final OpV opV = opV();
-    if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof ContextFn &&
-        expr2 instanceof Value && opV == OpV.EQ) {
+    if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof final ContextFn func &&
+        expr2 instanceof final Value value && opV == OpV.EQ) {
       // skip functions that do not refer to the current context value
-      final ContextFn func = (ContextFn) expr1;
-      final Value value = (Value) expr2;
       if(func.exprs.length > 0 && !(func.exprs[0] instanceof ContextValue)) return this;
 
       final ArrayList<QNm> qnames = new ArrayList<>();
@@ -572,7 +568,7 @@ public class CmpG extends Cmp {
 
   @Override
   public final boolean equals(final Object obj) {
-    return this == obj || obj instanceof CmpG && op == ((CmpG) obj).op && super.equals(obj);
+    return this == obj || obj instanceof final CmpG cmp && op == cmp.op && super.equals(obj);
   }
 
   @Override

@@ -309,7 +309,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Dec cast(final Object value, final QueryContext qc, final InputInfo info) {
-      return Dec.get(value instanceof BigDecimal ? (BigDecimal) value :
+      return Dec.get(value instanceof final BigDecimal bd ? bd :
         new BigDecimal(string(token(value))));
     }
     @Override
@@ -571,7 +571,7 @@ public enum AtomType implements Type {
     @Override
     public Dur cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item instanceof Dur) return new Dur((Dur) item);
+      if(item instanceof final Dur dur) return new Dur(dur);
       if(isString(item)) return new Dur(item.string(info), info);
       throw typeError(item, this, info);
     }
@@ -592,7 +592,7 @@ public enum AtomType implements Type {
     @Override
     public YMDur cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item instanceof Dur) return new YMDur((Dur) item);
+      if(item instanceof final Dur dur) return new YMDur(dur);
       if(isString(item)) return new YMDur(item.string(info), info);
       throw typeError(item, this, info);
     }
@@ -613,7 +613,7 @@ public enum AtomType implements Type {
     @Override
     public DTDur cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item instanceof Dur) return new DTDur((Dur) item);
+      if(item instanceof final Dur dur) return new DTDur(dur);
       if(isString(item)) return new DTDur(item.string(info), info);
       throw typeError(item, this, info);
     }
@@ -804,7 +804,7 @@ public enum AtomType implements Type {
     @Override
     public Bln cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return value instanceof Boolean ? Bln.get((Boolean) value) :
+      return value instanceof final Boolean bln ? Bln.get(bln) :
         cast(Str.get(value, qc, info), qc, info);
     }
     @Override
@@ -821,14 +821,14 @@ public enum AtomType implements Type {
     @Override
     public B64 cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item instanceof Bin) return B64.get((Bin) item, info);
+      if(item instanceof final Bin bin) return B64.get(bin, info);
       if(isString(item)) return B64.get(item.string(info), info);
       throw typeError(item, this, info);
     }
     @Override
     public B64 cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return value instanceof byte[] ? B64.get((byte[]) value) : B64.get(token(value), info);
+      return value instanceof final byte[] bytes ? B64.get(bytes) : B64.get(token(value), info);
     }
     @Override
     public B64 read(final DataInput in, final QueryContext qc) throws IOException {
@@ -841,14 +841,14 @@ public enum AtomType implements Type {
     @Override
     public Hex cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item instanceof Bin) return new Hex((Bin) item, info);
+      if(item instanceof final Bin bin) return new Hex(bin, info);
       if(isString(item)) return new Hex(item.string(info), info);
       throw typeError(item, this, info);
     }
     @Override
     public Hex cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Hex(value instanceof byte[] ? (byte[]) value : token(value), info);
+      return new Hex(value instanceof final byte[] bytes ? bytes : token(value), info);
     }
     @Override
     public Hex read(final DataInput in, final QueryContext qc) throws IOException {
@@ -893,7 +893,7 @@ public enum AtomType implements Type {
     }
     @Override
     public QNm cast(final Object value, final QueryContext qc, final InputInfo info) {
-      return value instanceof QName ? new QNm((QName) value) : new QNm(value.toString());
+      return value instanceof final QName name ? new QNm(name) : new QNm(value.toString());
     }
     @Override
     public QNm read(final DataInput in, final QueryContext qc) throws IOException {
@@ -1026,11 +1026,10 @@ public enum AtomType implements Type {
   @Override
   public final boolean instanceOf(final Type type) {
     if(type == this || type == AtomType.ITEM) return true;
-    if(type instanceof AtomType) {
-      final AtomType at = (AtomType) type;
+    if(type instanceof final AtomType at) {
       return (prePost & 0xFF) >= (at.prePost & 0xFF) && (prePost & 0xFF00) <= (at.prePost & 0xFF00);
     }
-    return type instanceof ChoiceItemType && ((ChoiceItemType) type).hasInstance(this);
+    return type instanceof final ChoiceItemType cit && cit.hasInstance(this);
   }
 
   @Override
@@ -1038,9 +1037,9 @@ public enum AtomType implements Type {
     if(type instanceof ChoiceItemType || type instanceof EnumType) return type.union(this);
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
-    if(type instanceof AtomType) {
+    if(type instanceof final AtomType at) {
       final List<AtomType> ancestors = new ArrayList<>(8);
-      for(AtomType p = (AtomType) type; p != null; p = p.parent) ancestors.add(p);
+      for(AtomType p = at; p != null; p = p.parent) ancestors.add(p);
       for(AtomType p = this; p != null; p = p.parent) {
         if(ancestors.contains(p)) return p;
       }
@@ -1139,8 +1138,7 @@ public enum AtomType implements Type {
    */
   final Item checkNum(final Object value, final InputInfo info) throws QueryException {
     final Item item;
-    if(value instanceof Value) {
-      final Value val = (Value) value;
+    if(value instanceof final Value val) {
       if(val.size() != 1) throw typeError(val, this, info);
       item = (Item) val;
     } else if(value instanceof Double || value instanceof Float) {

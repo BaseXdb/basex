@@ -135,10 +135,10 @@ public class XsltTransform extends XsltFn {
    */
   private IO read(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = toNodeOrAtomItem(expr, false, qc);
-    if(item instanceof ANode) {
+    if(item instanceof final ANode node) {
       try {
         final IO io = new IOContent(item.serialize().finish());
-        io.name(string(((ANode) item).baseURI()));
+        io.name(string(node.baseURI()));
         return io;
       } catch(final QueryIOException ex) {
         throw ex.getCause(info);

@@ -24,9 +24,9 @@ public final class FetchContentType extends FetchDoc {
     final IO source = toIO(arg(0), qc);
 
     MediaType mt = null;
-    if(source instanceof IOUrl) {
+    if(source instanceof final IOUrl url) {
       try {
-        final HttpHeaders headers = ((IOUrl) source).response().headers();
+        final HttpHeaders headers = url.response().headers();
         final Optional<String> value = headers.firstValue(HTTPText.CONTENT_TYPE);
         if(value.isPresent()) mt = new MediaType(value.get());
       } catch(final IOException ex) {

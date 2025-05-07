@@ -23,8 +23,7 @@ public final class MapPairs extends MapEntries {
   protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
     final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      final MapType mt = (MapType) type;
+    if(type instanceof final MapType mt) {
       exprType.assign(cc.qc.shared.record(Str.KEY, mt.keyType().seqType(),
           Str.VALUE, mt.valueType()).seqType(Occ.ZERO_OR_MORE), map.structSize());
     }

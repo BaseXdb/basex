@@ -118,22 +118,22 @@ public class Options implements Iterable<Option<?>> {
   public final synchronized void write() {
     final StringList lines = new StringList();
     try {
-      for(final Option<?> opt : options(getClass())) {
-        final String name = opt.name();
-        if(opt instanceof Comment) {
+      for(final Option<?> option : options(getClass())) {
+        final String name = option.name();
+        if(option instanceof Comment) {
           if(!lines.isEmpty()) lines.add("");
           lines.add("# " + name);
-        } else if(opt instanceof NumbersOption) {
-          final int[] ints = get((NumbersOption) opt);
+        } else if(option instanceof final NumbersOption no) {
+          final int[] ints = get(no);
           final int is = ints == null ? 0 : ints.length;
           for(int i = 0; i < is; i++) lines.add(name + i + " = " + ints[i]);
-        } else if(opt instanceof StringsOption) {
-          final String[] strings = get((StringsOption) opt);
+        } else if(option instanceof final StringsOption so) {
+          final String[] strings = get(so);
           final int ss = strings == null ? 0 : strings.length;
           lines.add(name + " = " + ss);
           for(int s = 0; s < ss; s++) lines.add(name + (s + 1) + " = " + strings[s]);
         } else {
-          lines.add(name + " = " + get(opt));
+          lines.add(name + " = " + get(option));
         }
       }
       lines.add("").add(PROPUSER).add(user);
@@ -396,8 +396,8 @@ public class Options implements Iterable<Option<?>> {
       throws QueryException {
 
     final String nm;
-    if(name instanceof QNm) {
-      nm = string(((QNm) name).unique());
+    if(name instanceof final QNm qnm) {
+      nm = string(qnm.unique());
     } else if(name.type.isStringOrUntyped()) {
       nm = string(name.string(info));
     } else {
@@ -422,16 +422,15 @@ public class Options implements Iterable<Option<?>> {
     final TokenBuilder tb = new TokenBuilder();
     for(final Item item : value) {
       if(!tb.isEmpty()) tb.add(' ');
-      if(item instanceof XQMap) {
-        final XQMap map = (XQMap) item;
+      if(item instanceof final XQMap map) {
         map.forEach((key, v) -> {
           if(!tb.isEmpty()) tb.add(',');
           tb.add(key.string(info)).add('=');
           if(!v.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
           tb.add(string(((Item) v).string(info)).replace(",", ",,"));
         });
-      } else if(item instanceof QNm) {
-        tb.add(((QNm) item).unique());
+      } else if(item instanceof final QNm qnm) {
+        tb.add(qnm.unique());
       } else {
         tb.add(item.string(info));
       }
@@ -578,17 +577,17 @@ public class Options implements Iterable<Option<?>> {
       if(value != null) {
         final StringList list = new StringList();
         final Object value2 = definitions.get(name).value();
-        if(value instanceof String[]) {
-          for(final String s : (String[]) value) list.add(s);
-        } else if(value instanceof int[]) {
-          for(final int s : (int[]) value) list.add(Integer.toString(s));
+        if(value instanceof final String[] strings) {
+          for(final String s : strings) list.add(s);
+        } else if(value instanceof final int[] ints) {
+          for(final int i : ints) list.add(Integer.toString(i));
         } else if(value instanceof Options) {
           final String s = value.toString();
           if(value2 == null || !s.equals(value2.toString())) list.add(s);
         } else if(!value.equals(value2)) {
-          if(value instanceof Value) {
+          if(value instanceof final Value val) {
             // quick and dirty: rewrite "A" to A, true() to true, ...
-            for(final Item item : (Value) value) {
+            for(final Item item : val) {
               list.add(item.toString().replaceAll("[\"()]", ""));
             }
           } else {
@@ -619,11 +618,11 @@ public class Options implements Iterable<Option<?>> {
       final Consumer<Object> assign, final Options options) {
 
     final String name = option.name();
-    if(option instanceof BooleanOption) {
+    if(option instanceof final BooleanOption bo) {
       Boolean v;
       if(value.isEmpty() && options != null) {
         // no value given: invert current value
-        v = options.get((BooleanOption) option);
+        v = options.get(bo);
         if(v != null) v = !v.booleanValue();
       } else {
         v = Strings.toBoolean(value);
@@ -639,13 +638,12 @@ public class Options implements Iterable<Option<?>> {
     } else if(option instanceof ValueOption) {
       final Boolean b = Strings.toBoolean(value);
       assign.accept(b != null ? Bln.get(b) : Str.get(value));
-    } else if(option instanceof EnumOption) {
-      final EnumOption<?> eo = (EnumOption<?>) option;
+    } else if(option instanceof final EnumOption eo) {
       final Object v = eo.get(option instanceof EnumOption ? normalize(value) : value);
       if(v == null) return allowed(eo, value, (Object[]) eo.values());
       assign.accept(v);
-    } else if(option instanceof OptionsOption) {
-      final Options o = ((OptionsOption<?>) option).newInstance();
+    } else if(option instanceof final OptionsOption oo) {
+      final Options o = oo.newInstance();
       try {
         o.assign(value);
       } catch(final BaseXException ex) {
@@ -713,26 +711,25 @@ public class Options implements Iterable<Option<?>> {
   private static Option<?>[] options(final Class<? extends Options> clz)
       throws IllegalAccessException {
 
-    final ArrayList<Option<?>> opts = new ArrayList<>();
+    final ArrayList<Option<?>> options = new ArrayList<>();
     for(final Field f : clz.getFields()) {
       if(!Modifier.isStatic(f.getModifiers())) continue;
-      final Object obj = f.get(null);
-      if(obj instanceof Option) opts.add((Option<?>) obj);
+      if(f.get(null) instanceof final Option opt) options.add(opt);
     }
-    return opts.toArray(Option[]::new);
+    return options.toArray(Option[]::new);
   }
 
   /**
    * Reads the configuration file and initializes the options.
    * The file is located in the project home directory.
-   * @param opts options file
+   * @param io options file
    */
-  private synchronized void read(final IOFile opts) {
-    file = opts;
+  private synchronized void read(final IOFile io) {
+    file = io;
     final StringList read = new StringList(), errs = new StringList();
     final boolean exists = file.exists();
     if(exists) {
-      try(NewlineInput ni = new NewlineInput(opts)) {
+      try(NewlineInput ni = new NewlineInput(io)) {
         boolean local = false;
         for(String line; (line = ni.readLine()) != null;) {
           line = line.trim();
@@ -824,8 +821,8 @@ public class Options implements Iterable<Option<?>> {
       INVALIDOPTION_X_X_X_X.get(info, name, type, st, value);
 
     Object result = null;
-    if(option instanceof ValueOption) {
-      final SeqType est = ((ValueOption) option).seqType();
+    if(option instanceof final ValueOption vo) {
+      final SeqType est = vo.seqType();
       if(!st.instanceOf(est)) throw expected.apply(est);
       result = value;
     } else if(option instanceof BooleanOption) {
@@ -845,17 +842,16 @@ public class Options implements Iterable<Option<?>> {
       final IntList list = new IntList();
       for(final Item it :  value) list.add(Strings.toInt(string(it.string(info))));
       result = list.finish();
-    } else if(option instanceof EnumOption) {
+    } else if(option instanceof final EnumOption eo) {
       final String string = normalize(serialize(value, info));
-      final EnumOption<?> eo = (EnumOption<?>) option;
       result = eo.get(string);
       if(result == null) {
         throw INVALIDOPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
       }
-    } else if(option instanceof OptionsOption) {
-      if(!(item instanceof XQMap)) throw expected.apply(SeqType.MAP);
-      result = ((OptionsOption<?>) option).newInstance();
-      ((Options) result).assign((XQMap) item, info);
+    } else if(option instanceof final OptionsOption oo) {
+      if(!(item instanceof final XQMap map)) throw expected.apply(SeqType.MAP);
+      result = oo.newInstance();
+      ((Options) result).assign(map, info);
     }
     put(option, result);
   }

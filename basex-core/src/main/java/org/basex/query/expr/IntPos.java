@@ -120,10 +120,7 @@ public final class IntPos extends Simple implements CmpPos {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof IntPos)) return false;
-    final IntPos p = (IntPos) obj;
-    return min == p.min && max == p.max;
+    return this == obj || obj instanceof final IntPos pos && min == pos.min && max == pos.max;
   }
 
   @Override

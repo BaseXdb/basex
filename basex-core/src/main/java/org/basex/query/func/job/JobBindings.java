@@ -29,8 +29,8 @@ public final class JobBindings extends StandardFunc {
     if(job == null && jt != null) job = jt.job;
 
     final MapBuilder mb = new MapBuilder();
-    if(job instanceof QueryJob) {
-      for(final Entry<String, Value> entry : ((QueryJob) job).bindings().entrySet()) {
+    if(job instanceof final QueryJob qj) {
+      for(final Entry<String, Value> entry : qj.bindings().entrySet()) {
         mb.put(entry.getKey(), entry.getValue());
       }
     }

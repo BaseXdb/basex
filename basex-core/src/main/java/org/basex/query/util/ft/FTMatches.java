@@ -104,7 +104,6 @@ public final class FTMatches extends ObjectList<FTMatch, FTMatches> {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTMatches &&
-        pos == ((FTMatches) obj).pos && super.equals(obj);
+    return this == obj || obj instanceof final FTMatches ftm && pos == ftm.pos && super.equals(obj);
   }
 }

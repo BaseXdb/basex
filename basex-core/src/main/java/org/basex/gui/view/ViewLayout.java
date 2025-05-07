@@ -61,8 +61,8 @@ final class ViewLayout implements ViewComponent {
     // number of components changes during iteration
     for(int c = 0; c < list.size(); c++) {
       ViewComponent comp = list.get(c);
-      if(comp instanceof ViewLayout) {
-        comp = ((ViewLayout) comp).delete(panel);
+      if(comp instanceof final ViewLayout vl) {
+        comp = vl.delete(panel);
         if(comp != null) list.set(c, comp);
       } else if(comp == panel) {
         list.remove(c--);

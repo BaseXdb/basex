@@ -89,7 +89,7 @@ public abstract class Step extends Preds {
       final Expr... preds) {
 
     // optimize single last() functions
-    if(preds.length == 1 && preds[0] instanceof Pos && Function.LAST.is(((Pos) preds[0]).expr))
+    if(preds.length == 1 && preds[0] instanceof final Pos pos && Function.LAST.is(pos.expr))
       return new IterLastStep(info, axis, test, preds);
 
     // check for simple positional predicates
@@ -193,8 +193,8 @@ public abstract class Step extends Preds {
       // one result: self::node()
       ? Occ.EXACTLY_ONE :
         axis == SELF || axis == PARENT ||
-        axis == ATTRIBUTE && test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ||
-        preds.length == 1 && preds[0] instanceof CmpPos && ((CmpPos) preds[0]).exact()
+        axis == ATTRIBUTE && test instanceof final NameTest nt && nt.part == NamePart.FULL ||
+        preds.length == 1 && preds[0] instanceof final CmpPos cp && cp.exact()
       // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
       ? Occ.ZERO_OR_ONE
       : Occ.ZERO_OR_MORE;
@@ -240,8 +240,7 @@ public abstract class Step extends Preds {
     final ArrayList<PathNode> tmp = new ArrayList<>();
     final Predicate<Test> addNodes = t -> {
       int name = 0;
-      if(t instanceof NameTest) {
-        final NameTest nt = (NameTest) t;
+      if(t instanceof final NameTest nt) {
         if(nt.part() != NamePart.LOCAL) return false;
         name = names.index(nt.local);
       }
@@ -257,8 +256,8 @@ public abstract class Step extends Preds {
     };
 
     // add nodes
-    if(test instanceof UnionTest) {
-      for(final Test t : ((UnionTest) test).tests) {
+    if(test instanceof final UnionTest ut) {
+      for(final Test t : ut.tests) {
         if(!addNodes.test(t)) return null;
       }
     } else if(!addNodes.test(test)) {
@@ -422,7 +421,7 @@ public abstract class Step extends Preds {
    */
   final ANode checkNode(final QueryContext qc) throws QueryException {
     final Value value = qc.focus.value;
-    if(value instanceof ANode) return (ANode) value;
+    if(value instanceof final ANode node) return node;
     throw value == null ? QueryError.NOCTX_X.get(info, this) :
       QueryError.PATHNODE_X_X_X.get(info, this, value.type, value);
   }
@@ -439,10 +438,8 @@ public abstract class Step extends Preds {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Step)) return false;
-    final Step st = (Step) obj;
-    return axis == st.axis && test.equals(st.test) && super.equals(obj);
+    return this == obj || obj instanceof final Step st && axis == st.axis && test.equals(st.test) &&
+        super.equals(obj);
   }
 
   @Override
@@ -465,9 +462,9 @@ public abstract class Step extends Preds {
         if(axis != CHILD) tb.add(axis).add("::");
         return tb.add(type.toString(test.type == NodeType.ATTRIBUTE));
       };
-      if(test instanceof UnionTest) {
+      if(test instanceof final UnionTest ut) {
         tb.add('(');
-        for(final Test t : ((UnionTest) test).tests) add.apply(t).add(" | ");
+        for(final Test t : ut.tests) add.apply(t).add(" | ");
         tb.delete(tb.size() - 3, tb.size()).add(')');
       } else {
         add.apply(test);

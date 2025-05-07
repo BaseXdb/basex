@@ -98,7 +98,7 @@ public final class BaseXHTTP extends CLI {
 
     ServerConnector sc = null;
     for(final Connector conn : jetty.getConnectors()) {
-      if(conn instanceof ServerConnector) sc = (ServerConnector) conn;
+      if(conn instanceof final ServerConnector s) sc = s;
     }
     if(sc == null) throw new BaseXException("No Jetty connector defined in " + JETTYCONF + '.');
     if(port != 0) sc.setPort(port);

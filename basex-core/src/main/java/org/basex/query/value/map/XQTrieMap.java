@@ -71,7 +71,7 @@ public final class XQTrieMap extends XQMap {
     if(node.size == 1) {
       // single entry: no map order, initialize type
       to = null;
-      mt = MapType.get((((TrieLeaf) root).key).type, value.seqType());
+      mt = MapType.get(((TrieLeaf) root).key.type, value.seqType());
     } else {
       // initialize map order if a second entry was added
       to = oldSize == 1 ? new TrieOrder(((TrieLeaf) root).key, key) : update.order();

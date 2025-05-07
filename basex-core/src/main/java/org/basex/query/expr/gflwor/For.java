@@ -222,10 +222,8 @@ public final class For extends ForLet {
 
   @Override
   public boolean equals(final Object obj) {
-    if(!(obj instanceof For)) return false;
-    final For f = (For) obj;
-    return Objects.equals(pos, f.pos) && Objects.equals(score, f.score) && empty == f.empty &&
-        super.equals(obj);
+    return obj instanceof final For f && Objects.equals(pos, f.pos) &&
+        Objects.equals(score, f.score) && empty == f.empty && super.equals(obj);
   }
 
   @Override

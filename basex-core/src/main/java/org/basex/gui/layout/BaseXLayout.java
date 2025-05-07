@@ -114,7 +114,7 @@ public final class BaseXLayout {
   private static GUI gui(final Component comp) {
     Component c = comp;
     do {
-      if(c instanceof GUI) return (GUI) c;
+      if(c instanceof final GUI gui) return gui;
       c = c.getParent();
     } while(c != null);
     return null;
@@ -178,8 +178,7 @@ public final class BaseXLayout {
     if(sc == null) return null;
 
     final String scut;
-    if(sc instanceof BaseXKeys[]) {
-      final BaseXKeys[] scs = (BaseXKeys[]) sc;
+    if(sc instanceof final BaseXKeys[] scs) {
       if(scs.length == 0) return null;
       scut = scs[0].shortCut();
     } else {
@@ -314,7 +313,7 @@ public final class BaseXLayout {
     } else {
       // yes: add default keys
       comp.addKeyListener((KeyPressedListener) e -> {
-        final BaseXCombo combo = comp instanceof BaseXCombo ? (BaseXCombo) comp : null;
+        final BaseXCombo combo = comp instanceof final BaseXCombo bxc ? bxc : null;
         if(combo != null && combo.isPopupVisible()) return;
 
         // do not key close dialog if button or editor is focused
@@ -323,8 +322,8 @@ public final class BaseXLayout {
         } else if(ESCAPE.is(e)) {
           // do not cancel dialog if search bar is opened
           boolean close = true;
-          if(comp instanceof TextPanel) {
-            final SearchBar bar = ((TextPanel) comp).getSearch();
+          if(comp instanceof final TextPanel tp) {
+            final SearchBar bar = tp.getSearch();
             close = bar == null || !bar.deactivate(true);
           }
           if(close) dialog.cancel();

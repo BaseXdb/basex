@@ -106,8 +106,8 @@ final class WebDAVResponse extends AbstractResponse {
 
   @Override
   public Cookie setCookie(final Cookie cookie) {
-    if(cookie instanceof WebDAVCookie) {
-      response.addCookie(((WebDAVCookie) cookie).cookie);
+    if(cookie instanceof final WebDAVCookie wdc) {
+      response.addCookie(wdc.cookie);
       return cookie;
     }
 

@@ -380,9 +380,9 @@ final class BigSeq extends TreeSeq {
   @Override
   TreeSeq concat(final TreeSeq seq) {
     final Type tp = type.union(seq.type);
-    if(seq instanceof SmallSeq) {
+    if(seq instanceof final SmallSeq ss) {
       // merge with right digit
-      final Item[] newRight = concat(right, ((SmallSeq) seq).items);
+      final Item[] newRight = concat(right, ss.items);
       final int nrl = newRight.length;
       if(nrl <= MAX_DIGIT) return new BigSeq(left, middle, newRight, tp);
       final int mid = nrl / 2;

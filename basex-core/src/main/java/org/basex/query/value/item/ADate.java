@@ -528,10 +528,8 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof ADate)) return false;
-    final ADate dat = (ADate) obj;
-    return type.eq(dat.type) && year == dat.year && month == dat.month && day == dat.day &&
+    return this == obj || obj instanceof final ADate dat && type.eq(dat.type) &&
+        year == dat.year && month == dat.month && day == dat.day &&
         hour == dat.hour && minute == dat.minute && tz == dat.tz &&
         Objects.equals(seconds, dat.seconds);
   }

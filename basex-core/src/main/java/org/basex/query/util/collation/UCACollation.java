@@ -144,7 +144,6 @@ final class UCACollation extends Collation {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof UCACollation &&
-        collator.equals(((UCACollation) obj).collator);
+    return this == obj || obj instanceof final UCACollation uca && collator.equals(uca.collator);
   }
 }
