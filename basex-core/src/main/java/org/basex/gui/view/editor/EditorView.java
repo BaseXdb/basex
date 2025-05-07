@@ -867,7 +867,7 @@ public final class EditorView extends View {
     if(opened == null || ii == null) return;
 
     // mark error, jump to error position
-    final int ep = pos(opened.last, ii.line(), ii.column());
+    final int ep = pos(opened.last, (int) ii.line(), (int) ii.column());
     opened.error(ep);
 
     if(jump) {

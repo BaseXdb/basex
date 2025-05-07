@@ -2351,6 +2351,11 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void parseJson() {
     final Function func = PARSE_JSON;
     query(func.args("\"x\\u0000\""), "x\uFFFD");
+    query(func.args("\"a\\bb\\uD801\\uDC02c\\uD803d\\uDC04e\\uD805\\uD806\"",
+        " {'fallback': fn($s) {'[' || $s || ']'}}"),
+        "a[\\b]b\uD801\uDC02c[\\uD803]d[\\uDC04]e[\\uD805][\\uD806]");
+    query("try {" + func.args("nvll") + "} catch * {$err:description}",
+        "(1:1): Unexpected JSON value: 'nvll'.");
   }
 
   /** Test method. */
