@@ -486,7 +486,7 @@ public final class IOFile extends IO {
     final StringBuilder sb = new StringBuilder();
     for(final String globs : Strings.split(glob, ',')) {
       final String glb = globs.trim();
-      if(sb.length() != 0) sb.append('|');
+      if(!sb.isEmpty()) sb.append('|');
       // loop through single pattern
       boolean suffix = false;
       final int gl = glb.length();

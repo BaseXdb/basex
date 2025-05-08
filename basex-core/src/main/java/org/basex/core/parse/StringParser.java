@@ -311,7 +311,7 @@ final class StringParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String finish(final CharSequence string, final Cmd cmd) throws QueryException {
-    if(string != null && string.length() != 0) return string.toString();
+    if(string != null && !string.isEmpty()) return string.toString();
     if(cmd != null) throw help(null, cmd);
     return null;
   }

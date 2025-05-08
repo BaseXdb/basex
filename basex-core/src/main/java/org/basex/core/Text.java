@@ -240,7 +240,7 @@ public interface Text {
   /** Options error. */
   String OPT_ONEOF_X_X_X = "Invalid '%' value '%'; expected: one of %.";
 
-  /** "log". */
+  /** log. */
   String PLOTLOG = "log";
 
   /** File description: XML Documents. */
@@ -266,7 +266,7 @@ public interface Text {
   /** File description: Command scripts. */
   String BXS_FILES = "Command Scripts";
 
-  /** "Stack Trace". */
+  /** Stack Trace. */
   String STACK_TRACE = "Stack Trace";
 
   // SERVER =======================================================================================
@@ -541,7 +541,7 @@ public interface Text {
   String SINGLE_CMD = lang("single_cmd");
   /** Unknown command: % (try help). */
   String UNKNOWN_TRY_X = UNKNOWN_CMD_X + ' ' + lang("try_%", "'help'");
-  /** Try "help [...]" to get.. */
+  /** Try "help [...]" to get... */
   String TRY_SPECIFIC_X = lang("try_specific_%", "HELP [...]") + NL;
   /** Unknown command: % (similar: %). */
   String UNKNOWN_SIMILAR_X_X = UNKNOWN_CMD_X + ' ' + lang("similar_cmd_%");
@@ -556,7 +556,7 @@ public interface Text {
   String CREATING_INDEXES = lang("creating_indexes");
   /** Possible corruption. */
   String DB_CORRUPT = lang("db_corrupt");
-  /** "Command was canceled". */
+  /** Command was canceled. */
   String COMMAND_CANCELED = lang("command_canceled");
   /** Create database information. */
   String NODES_PARSED_X_X = " \"%\" (" + lang("nodes_parsed_%") + ')';
@@ -591,7 +591,7 @@ public interface Text {
   String RES_REPLACED_X_X = lang("res_replaced_%_%");
   /** Resource added. */
   String RES_ADDED_X = lang("res_added_%");
-  /** "Resource Properties". */
+  /** Resource Properties. */
   String RES_PROPS = lang("res_props");
 
   /** Skipped corrupt files. */
@@ -702,33 +702,33 @@ public interface Text {
   /** Query info: plan. */
   String QUERY_PLAN = lang("query_plan");
 
-  /** "Parsing: ". */
+  /** Parsing. */
   String PARSING_CC = PARSING + COLS;
-  /** "Compiling: ". */
+  /** Compiling. */
   String COMPILING_CC = COMPILING + COLS;
-  /** "Optimizing: ". */
+  /** Optimizing. */
   String OPTIMIZING_CC = OPTIMIZING + COLS;
-  /** "Evaluating: ". */
+  /** Evaluating. */
   String EVALUATING_CC = EVALUATING + COLS;
-  /** "Printing: ". */
+  /** Printing. */
   String PRINTING_CC = lang("printing") + COLS;
-  /** "Total time: ". */
+  /** Total time. */
   String TOTAL_TIME_CC = lang("total_time") + COLS;
-  /** "Read locking: ". */
+  /** Read locking. */
   String READ_LOCKING_CC = lang("read_locking") + COLS;
-  /** "Write locking: ". */
+  /** Write locking. */
   String WRITE_LOCKING_CC = lang("write_locking") + COLS;
-  /** "Number: ". */
+  /** Number. */
   String NUMBER_CC = lang("number") + COLS;
-  /** "Updated: ". */
+  /** Updated. */
   String UPDATED_CC = lang("updated") + COLS;
-  /** "Printed: ". */
+  /** "Printed. */
   String PRINTED_CC = lang("printed") + COLS;
-  /** "% Result". */
+  /** Result. */
   String RESULT_X = lang("result_%");
-  /** "% Results". */
+  /** Results. */
   String RESULTS_X = lang("results_%");
-  /** "Query executed in %". */
+  /** Query executed. */
   String QUERY_EXECUTED_X_X = lang("query_executed_%_%");
 
   /** Stopped info. */
@@ -785,9 +785,9 @@ public interface Text {
 
   // GENERAL COMMANDS =============================================================================
 
-  /** "Global option '%' cannot be set". */
+  /** Global option '%' cannot be set. */
   String GLOBAL_OPTION_X = lang("global_option_%");
-  /** "Unknown option '%'". */
+  /** Unknown option '%'. */
   String UNKNOWN_OPTION_X = lang("unknown_option_%");
   /** Unknown command error. */
   String UNKNOWN_OPT_SIMILAR_X_X = lang("unknown_option_%") + ' ' + lang("similar_cmd_%");
@@ -799,23 +799,23 @@ public interface Text {
   /** Statistics information. */
   String CREATE_STATS_D = lang("create_stats") + DOTS;
 
-  /** "All". */
+  /** All. */
   String ALL = lang("all");
-  /** "Name". */
+  /** Name. */
   String NAME = lang("name");
-  /** "Size". */
+  /** Size. */
   String SIZE = lang("size");
-  /** "Type". */
+  /** Type. */
   String TYPE = lang("type");
-  /** "Input path". */
+  /** Input path. */
   String INPUT_PATH = lang("input_path");
-  /** "Resources". */
+  /** Resources. */
   String RESOURCES = lang("resources");
-  /** "Encoding". */
+  /** Encoding. */
   String ENCODING = lang("encoding");
-  /** "Parameters". */
+  /** Parameters. */
   String PARAMETERS = lang("parameters");
-  /** "Path". */
+  /** Path. */
   String PATH = lang("path");
   /** External Variables. */
   String EXTERNAL_VARIABLES = lang("external_variables");
@@ -835,17 +835,17 @@ public interface Text {
   String REPLACE_ALL = lang("replace_all");
   /** Command info. */
   String REPLACE_WITH = lang("replace_with");
-  /** "Match case". */
+  /** Match case. */
   String MATCH_CASE = lang("match_case");
-  /** "Whole word". */
+  /** Whole word. */
   String WHOLE_WORD = lang("whole_word");
-  /** "Multi-line mode". */
+  /** Multi-line mode. */
   String MULTI_LINE = lang("multi_line");
-  /** "Regular expression". */
+  /** Regular expression. */
   String REGULAR_EXPR = lang("regular_expr");
-  /** "% string(s) found.". */
+  /** % string(s) found.. */
   String STRINGS_FOUND_X = lang("strings_found_%");
-  /** "Strings were replaced.". */
+  /** Strings were replaced.. */
   String STRINGS_REPLACED = lang("strings_replaced");
   /** Searching. */
   String SEARCHING = lang("searching");
@@ -873,31 +873,31 @@ public interface Text {
   /** Info on index. */
   String OUT_OF_DATE = lang("out_of_date");
 
-  /** "Database Properties". */
+  /** Database Properties. */
   String DB_PROPS = lang("db_props");
-  /** "General Information". */
+  /** General Information. */
   String GENERAL_INFO = lang("general_info");
-  /** "Global Options". */
+  /** Global Options. */
   String GLOBAL_OPTIONS = lang("global_options");
-  /** "Local Options". */
+  /** Local Options. */
   String LOCAL_OPTIONS = lang("local_options");
 
-  /** "Error". */
+  /** Error. */
   String ERROR = lang("error");
 
   // MENU ENTRIES =================================================================================
 
-  /** "Database". */
+  /** Database. */
   String DATABASE = lang("database");
-  /** "Editor". */
+  /** Editor. */
   String EDITOR = lang("editor");
-  /** "View". */
+  /** View. */
   String VIEW = lang("view");
-  /** "Options". */
+  /** Options. */
   String OPTIONS = lang("options");
-  /** "Visualization". */
+  /** Visualization. */
   String VISUALIZATION = lang("visualization");
-  /** "Help". */
+  /** Help. */
   String HELP = lang("help");
 
   // GUI COMMANDS =================================================================================
@@ -1017,26 +1017,26 @@ public interface Text {
   /** Button: "cancel". */
   String B_CANCEL = lang("cancel");
 
-  /** "Refresh". */
+  /** Refresh. */
   String REFRESH = lang("refresh");
-  /** "Find". */
+  /** Find. */
   String FIND = lang("find");
-  /** "Find files". */
+  /** Find files. */
   String FIND_FILES = lang("find_files");
-  /** "Find contents". */
+  /** Find contents. */
   String FIND_CONTENTS = lang("find_contents");
-  /** "Find next ". */
+  /** Find next . */
   String FIND_NEXT = lang("find_next");
-  /** "Find previous". */
+  /** Find previous. */
   String FIND_PREVIOUS = lang("find_previous");
-  /** "Jump to error". */
+  /** Jump to error. */
   String NEXT_ERROR = lang("next_error");
-  /** "Jump to file". */
+  /** Jump to file. */
   String JUMP_TO_FILE = lang("jump_to_file");
 
-  /** "Command". */
+  /** Command. */
   String COMMAND = lang("command");
-  /** "Backup". */
+  /** Backup. */
   String BACKUP = lang("backup");
 
   /** Button text for deleting files. */
@@ -1070,11 +1070,11 @@ public interface Text {
 
   // VISUALIZATIONS ===============================================================================
 
-  /** "No data available.". */
+  /** No data available.. */
   String NO_DATA = lang("no_data");
-  /** "Not enough pixels". */
+  /** Not enough pixels. */
   String NO_PIXELS = lang("no_pixels");
-  /** "file". */
+  /** file. */
   String FILE = lang("file");
 
   // DIALOG WINDOWS ===============================================================================
@@ -1118,7 +1118,7 @@ public interface Text {
   String ADD_ARCHIVE_NAME = lang("add_archive_name");
   /** Add remaining files as binary files. */
   String ADD_BINARY_FILES = lang("add_binary_files");
-  /** "Add Resources". */
+  /** Add Resources. */
   String ADD_RESOURCES = lang("add_resources");
   /** Skip corrupt files. */
   String SKIP_CORRUPT_FILES = lang("skip_corrupt_files");
@@ -1199,7 +1199,7 @@ public interface Text {
   /** General info. */
   String PARSER_X = lang("parser_%");
 
-  /** Dialog asking if a new database should be be created. */
+  /** Dialog asking if a new database should be created. */
   String NEW_DB_QUESTION = lang("no_db_found") + NL + lang("new_db_question");
 
   /** Users. */
@@ -1408,7 +1408,7 @@ public interface Text {
   /** Help on database options. */
   String H_DB_OPTIONS_X = lang("h_db_options_%", OPTIMIZE_ALL);
 
-  /** "Failed to open a browser". */
+  /** Failed to open a browser. */
   String H_BROWSER_ERROR_X = lang("h_browser_error_%");
   /** Database update. */
   String H_DB_FORMAT = lang("h_db_format");

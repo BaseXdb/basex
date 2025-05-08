@@ -22,7 +22,7 @@ public final class TransformModifier extends ContextModifier {
    * expression. Adding an update primitive that is declared within the MODIFY
    * clause of this transform expression will cause a query exception
    * (XUDY0014) if the data reference of the corresponding target node is not
-   * part of this set, hence the target node has not been copied. */
+   * part of this set; hence, the target node has not been copied. */
   private final Set<Data> refs = new HashSet<>();
 
   @Override

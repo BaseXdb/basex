@@ -470,7 +470,7 @@ public class Options implements Iterable<Option<?>> {
    * @param options options
    * @return error string
    */
-  public static final String similar(final Object option, final Map<String, Option<?>> options) {
+  public static String similar(final Object option, final Map<String, Option<?>> options) {
     final Object similar = Levenshtein.similar(token(option),
         options.keySet().toArray(String[]::new));
     return similar != null ? Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, option, similar) :
@@ -482,7 +482,7 @@ public class Options implements Iterable<Option<?>> {
    * @param option option
    * @return error string
    */
-  public static final String unknown(final Object option) {
+  public static String unknown(final Object option) {
     return Util.info(Text.UNKNOWN_OPTION_X, option);
   }
 
@@ -595,7 +595,7 @@ public class Options implements Iterable<Option<?>> {
           }
         }
         for(final String s : list) {
-          if(sb.length() != 0) sb.append(',');
+          if(!sb.isEmpty()) sb.append(',');
           sb.append(name).append('=').append(s.replace(",", ",,"));
         }
       }
@@ -623,7 +623,7 @@ public class Options implements Iterable<Option<?>> {
       if(value.isEmpty() && options != null) {
         // no value given: invert current value
         v = options.get(bo);
-        if(v != null) v = !v.booleanValue();
+        if(v != null) v = !v;
       } else {
         v = Strings.toBoolean(value);
       }
@@ -639,7 +639,7 @@ public class Options implements Iterable<Option<?>> {
       final Boolean b = Strings.toBoolean(value);
       assign.accept(b != null ? Bln.get(b) : Str.get(value));
     } else if(option instanceof final EnumOption eo) {
-      final Object v = eo.get(option instanceof EnumOption ? normalize(value) : value);
+      final Object v = eo.get(normalize(value));
       if(v == null) return allowed(eo, value, (Object[]) eo.values());
       assign.accept(v);
     } else if(option instanceof final OptionsOption oo) {

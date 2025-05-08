@@ -60,8 +60,7 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
     return true;
   }
 

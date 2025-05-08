@@ -66,7 +66,7 @@ final class TableHeader extends BaseXPanel {
       }
       @Override
       public void focusLost(final FocusEvent e) {
-        // tab key pressed..
+        // tab key pressed...
         if(box != null) box.stop();
         inputCol = -1;
         repaint();

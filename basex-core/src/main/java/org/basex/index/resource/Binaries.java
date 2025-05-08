@@ -72,7 +72,7 @@ final class Binaries {
   }
 
   /**
-   * Determines whether the given path is the path to a files directory.
+   * Determines whether the given path is the path to a directory with files.
    * @param path path
    * @param type resource type
    * @return result of check

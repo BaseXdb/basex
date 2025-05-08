@@ -70,7 +70,7 @@ public final class MetaData {
 
   /** Flag for full-text stemming. */
   public boolean stemming;
-  /** Flag for full-text case sensitivity. */
+  /** Flag for full-text case-sensitivity. */
   public boolean casesens;
   /** Flag for full-text diacritics removal. */
   public boolean diacritics;
@@ -179,7 +179,7 @@ public final class MetaData {
     sb.append(String.join("/", list.finish()));
 
     // add trailing slash
-    if(pl > 0 && sb.length() > 0) {
+    if(pl > 0 && !sb.isEmpty()) {
       final char ch = path.charAt(pl - 1);
       if(ch == '\\' || ch == '/') sb.append('/');
     }
@@ -193,7 +193,7 @@ public final class MetaData {
    * @return result flag
    */
   private static boolean addToPath(final StringBuilder sb, final StringList list) {
-    if(sb.length() != 0) {
+    if(!sb.isEmpty()) {
       final String segment = sb.toString();
       if(Strings.endsWith(segment, '.')) {
         if(!segment.equals(".")) return false;

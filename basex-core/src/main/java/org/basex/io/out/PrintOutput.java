@@ -53,7 +53,7 @@ public class PrintOutput extends OutputStream {
 
   /**
    * Sets the maximum number of bytes to be written.
-   * Note that the limit might break unicode characters.
+   * Note that the limit might break Unicode characters.
    * @param limit maximum
    */
   public final void setLimit(final int limit) {

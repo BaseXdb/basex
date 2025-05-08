@@ -30,9 +30,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public abstract class XQMap extends XQStruct {
-  /** The empty map. */
-  private static final XQMap EMPTY = new XQTrieMap(TrieEmpty.VALUE, null, SeqType.MAP);
-
   /**
    * Constructor.
    * @param type map type
@@ -46,7 +43,7 @@ public abstract class XQMap extends XQStruct {
    * @return (unique) instance of an empty map
    */
   public static XQMap empty() {
-    return EMPTY;
+    return XQTrieMap.EMPTY;
   }
 
   /**
@@ -81,7 +78,7 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final void refineType(final Expr expr) {
-    if(this != EMPTY) super.refineType(expr);
+    if(this != empty()) super.refineType(expr);
   }
 
   @Override
@@ -371,7 +368,7 @@ public abstract class XQMap extends XQStruct {
 
     // assign record type to speed up future type checks
     final XQMap map = mb.map();
-    if(map != EMPTY) map.type = rt;
+    if(map != empty()) map.type = rt;
     return map;
   }
 
@@ -509,7 +506,7 @@ public abstract class XQMap extends XQStruct {
         if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
       });
     } catch(final QueryException ex) {
-      Util.notExpected(ex);
+      throw Util.notExpected(ex);
     }
     qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");
   }

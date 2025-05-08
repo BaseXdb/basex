@@ -72,9 +72,7 @@ final class RestXqResponse extends WebResponse {
   }
 
   @Override
-  public Response serialize(final boolean body) throws QueryException, IOException,
-      ServletException {
-
+  public Response serialize(final boolean body) throws QueryException, IOException {
     final ArrayOutput cache = singleton != null ? new ArrayOutput() : null;
     boolean response;
 
@@ -120,7 +118,7 @@ final class RestXqResponse extends WebResponse {
         final StringBuilder msg = new StringBuilder();
         if(message != null) msg.append(message);
         if(s == 302) {
-          if(msg.length() != 0) msg.append("; ");
+          if(!msg.isEmpty()) msg.append("; ");
           msg.append(HTTPText.LOCATION + ": ").append(conn.response.getHeader(HTTPText.LOCATION));
         }
         conn.log(s, msg.toString());

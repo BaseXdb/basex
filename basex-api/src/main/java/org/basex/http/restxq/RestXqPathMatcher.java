@@ -128,7 +128,7 @@ final class RestXqPathMatcher {
           if(ch == '=') {
             regex.setLength(0);
             addRegex(i, regex);
-            if(regex.length() == 0) throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
+            if(regex.isEmpty()) throw RestXqFunction.error(info, INV_TEMPLATE_X, path);
             break;
           } else if(ch == '{') {
             ++braces;
@@ -182,7 +182,7 @@ final class RestXqPathMatcher {
   private static void decodeAndEscape(final StringBuilder literals, final StringBuilder result,
       final InputInfo info) throws QueryException {
 
-    if(literals.length() > 0) {
+    if(!literals.isEmpty()) {
       final String path = XMLToken.decodeUri(literals.toString());
       if(path.contains("\uFFFD")) throw RestXqFunction.error(info, INV_ENCODING_X, literals);
       final TokenBuilder tb = new TokenBuilder(path.length());

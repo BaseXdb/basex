@@ -27,7 +27,7 @@ public final class FnCodepointEqual extends StandardFunc {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     final Boolean test = test(qc);
-    return test != null && test.booleanValue();
+    return test != null && test;
   }
 
   /**

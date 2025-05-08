@@ -234,7 +234,7 @@ final class JapaneseTokenizer extends Tokenizer {
         if(cMark && !isFtChar(cSrfc) || "\\".equals(cSrfc) && nMark) {
           period = false;
           bs = false;
-          if(word.length() != 0) {
+          if(!word.isEmpty()) {
             more = true;
             break;
           }
@@ -272,7 +272,7 @@ final class JapaneseTokenizer extends Tokenizer {
       } else if(cMark) {
         // last token
         if("\\".equals(cSrfc)) continue;
-        if(word.length() != 0) word.append(cSrfc);
+        if(!word.isEmpty()) word.append(cSrfc);
         more = true;
         continue;
       }
@@ -288,7 +288,7 @@ final class JapaneseTokenizer extends Tokenizer {
       break;
     }
     if(more) {
-      currToken = word.length() == 0 ? tokenList.get(cpos - 1) :
+      currToken = word.isEmpty() ? tokenList.get(cpos - 1) :
         new Morpheme(word.toString(), MEISHI_FEATURE);
     }
     return more;

@@ -322,13 +322,6 @@ public abstract class Preds extends Arr {
   }
 
   @Override
-  public int exprSize() {
-    int size = 1;
-    for(final Expr expr : exprs) size += expr.exprSize();
-    return size;
-  }
-
-  @Override
   public void toString(final QueryString qs) {
     for(final Expr expr : exprs) qs.braced("[", expr, "]");
   }

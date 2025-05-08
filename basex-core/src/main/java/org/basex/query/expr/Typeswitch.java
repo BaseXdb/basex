@@ -117,7 +117,7 @@ public final class Typeswitch extends ParseExpr {
       // rewrite chosen branch
       expr = tg.rewrite(cond, cc);
     } else if(gl < 3 && groups[0].seqTypes.length == 1 && !cond.has(Flag.NDT)) {
-      // otherwise, rewrite to if expression if one or two branches are left
+      // otherwise, rewrite to 'if' expression if one or two branches are left
       final Expr iff = new Instance(info, cond, groups[0].seqTypes[0]).optimize(cc);
       final Expr thn = groups[0].rewrite(cond, cc), els = groups[1].rewrite(cond, cc);
       expr = new If(info, iff, thn, els).optimize(cc);

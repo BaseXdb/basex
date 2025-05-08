@@ -81,10 +81,8 @@ public abstract class WebResponse {
    * @return response type
    * @throws QueryException query exception
    * @throws IOException I/O exception
-   * @throws ServletException servlet exception
    */
-  protected abstract Response serialize(boolean body) throws QueryException, IOException,
-      ServletException;
+  protected abstract Response serialize(boolean body) throws QueryException, IOException;
 
   /**
    * Finalizes a response.

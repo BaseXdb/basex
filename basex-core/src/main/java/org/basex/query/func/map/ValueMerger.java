@@ -53,7 +53,7 @@ public abstract class ValueMerger {
  */
 final class UseFirst extends ValueMerger {
   @Override
-  Value get(final Item key, final Value old, final Value value) throws QueryException {
+  Value get(final Item key, final Value old, final Value value) {
     return null;
   }
 }
@@ -63,7 +63,7 @@ final class UseFirst extends ValueMerger {
  */
 final class UseLast extends ValueMerger {
   @Override
-  Value get(final Item key, final Value old, final Value value) throws QueryException {
+  Value get(final Item key, final Value old, final Value value) {
     return value;
   }
 }
@@ -84,7 +84,7 @@ final class Combine extends ValueMerger {
   }
 
   @Override
-  Value get(final Item key, final Value old, final Value value) throws QueryException {
+  Value get(final Item key, final Value old, final Value value) {
     return old.append(value, qc);
   }
 

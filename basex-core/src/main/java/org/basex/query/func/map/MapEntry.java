@@ -25,10 +25,10 @@ public final class MapEntry extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr key = arg(0), value = arg(1);
 
-    Type type = null;
+    final Type type;
     if(key instanceof final Str str && key.seqType().eq(SeqType.STRING_O)) {
       type = cc.qc.shared.record(str, value.seqType());
     } else {

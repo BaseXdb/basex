@@ -264,7 +264,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
     final byte[] unescaped = escaped && contains(value, '\\') ? unescape(value) : value;
     if(key && !printedKeys.add(unescaped)) throw error("Duplicate key: %.", value);
 
-    // create result, based on escaped string (contains unicode sequences)
+    // create result, based on escaped string (contains Unicode sequences)
     final TokenBuilder tb = new TokenBuilder();
     boolean bs = false;
     final int vl = value.length;

@@ -127,7 +127,7 @@ public class XsltTransform extends XsltFn {
   }
 
   /**
-   * Evaluates an expression (node, URI string) to a input reference.
+   * Evaluates an expression (node, URI string) to an input reference.
    * @param expr expression
    * @param qc query context
    * @return item

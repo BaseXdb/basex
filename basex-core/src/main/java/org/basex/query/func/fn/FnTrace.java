@@ -22,7 +22,7 @@ public class FnTrace extends StandardFunc {
     final String label = toStringOrNull(arg(1), qc);
 
     if(input.isEmpty() || input instanceof RangeSeq || input instanceof SingletonSeq) {
-      qc.trace(label, () -> input.toString());
+      qc.trace(label, input::toString);
     } else {
       final Iter iter = input.iter();
       for(Item item; (item = qc.next(iter)) != null;) {

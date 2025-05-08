@@ -469,14 +469,12 @@ public final class SeqType {
       return value;
 
     // coerce items if required
-    Value val = value;
     final ValueBuilder vb = new ValueBuilder(qc, value.size());
     for(final Item item : value) {
       qc.checkStop();
       coerce(item, name, vb, qc, cc, info);
     }
-    val = vb.value(type);
-
+    final Value val = vb.value(type);
     if(!occ.check(val.size())) throw typeError(value, this, name, info);
     return val;
   }
@@ -721,7 +719,7 @@ public final class SeqType {
   }
 
   /**
-   * This implementation of {@link #hashCode} is used on the alternatives of a
+   * This implementation of this method is used on the alternatives of a
    * {@link ChoiceItemType}, while {@link #mapTypes} is being maintained as a {@link HashMap}.
    * Since {@link MapType#keyType} is guaranteed to be an atomic type, we expect it to be called
    * only on {@link #SeqType} instances based on some {@link AtomType}, where suitable hash codes

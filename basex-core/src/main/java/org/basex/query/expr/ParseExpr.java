@@ -374,7 +374,7 @@ public abstract class ParseExpr extends Expr {
    * @return boolean
    * @throws QueryException query exception
    */
-  protected static final boolean toBoolean(final Item item, final InputInfo info)
+  protected static boolean toBoolean(final Item item, final InputInfo info)
       throws QueryException {
     final Type type = item.type;
     if(type == BOOLEAN) return item.bool(info);

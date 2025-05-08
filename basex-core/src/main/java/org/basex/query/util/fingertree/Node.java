@@ -46,7 +46,7 @@ public interface Node<N, E> extends NodeLike<N, E> {
    *     left sibling at position 0, the split node at position 1 and 2 and the right sibling at 3.
    *   </li>
    *   <li>
-   *     Otherwise the array contains (possibly modified versions of) left sibling at position 0,
+   *     Otherwise, the array contains (possibly modified versions of) left sibling at position 0,
    *     this node at position 1 and the right sibling at position 2.
    *   </li>
    * </ul>

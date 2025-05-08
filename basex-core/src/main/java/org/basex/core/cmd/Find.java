@@ -55,7 +55,7 @@ public final class Find extends AQuery {
         }
       }
     }
-    if(pre.length() == 0 && preds.length() == 0) return ".";
+    if(pre.isEmpty() && preds.isEmpty()) return ".";
 
     // create final string
     return pre.append(Axis.DESCENDANT_OR_SELF).append("::*").append(preds).toString();
@@ -131,7 +131,7 @@ public final class Find extends AQuery {
         if(c == '\'' || c == '"') {
           delim = c;
         } else if(!XMLToken.isChar(c) && c != '@' && c != '=' && c != '<' && c != '>' && c != '~') {
-          if(sb.length() != 0) {
+          if(!sb.isEmpty()) {
             split[s++] = sb.toString();
             sb.setLength(0);
           }
@@ -140,7 +140,7 @@ public final class Find extends AQuery {
         }
       } else if(c == delim) {
         delim = 0;
-        if(sb.length() != 0) {
+        if(!sb.isEmpty()) {
           split[s++] = sb.toString();
           sb.setLength(0);
         }
@@ -148,7 +148,7 @@ public final class Find extends AQuery {
         sb.append(c);
       }
     }
-    if(sb.length() != 0) split[s++] = sb.toString();
+    if(!sb.isEmpty()) split[s++] = sb.toString();
     return Array.copyOf(split, s);
   }
 }

@@ -203,7 +203,7 @@ public final class BaseXFileChooser {
     public String getDescription() {
       final StringBuilder sb = new StringBuilder();
       for(final String s : suffixes) {
-        if(sb.length() != 0) sb.append(", ");
+        if(!sb.isEmpty()) sb.append(", ");
         sb.append('*').append(s);
       }
       return description + " (" + sb + ')';

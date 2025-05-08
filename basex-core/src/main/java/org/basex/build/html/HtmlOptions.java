@@ -101,7 +101,7 @@ public final class HtmlOptions extends Options {
     super(opts);
   }
 
-  /**
+  /*
    * Copied from nu.validator.htmlparser.common.XmlViolationPolicy in order to avoid the
    * class path dependency of HtmlOptions on Validator.nu.
    *
@@ -151,7 +151,7 @@ public final class HtmlOptions extends Options {
       ALTER_INFOSET
   }
 
-  /**
+  /*
    * Copied from nu.validator.htmlparser.common.XmlViolationPolicy in order to avoid the
    * class path dependency of HtmlOptions on Validator.nu.
    *
@@ -181,7 +181,6 @@ public final class HtmlOptions extends Options {
    * @author hsivonen
    */
   public enum Heuristics {
-
       /**
        * Perform no heuristic sniffing.
        */

@@ -107,15 +107,15 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Returns the content type of a request as media type.
-   * @return content type
+   * Returns the content-type of a request as media type.
+   * @return content-type
    */
   public MediaType mediaType() {
     return mediaType(request);
   }
 
   /**
-   * Initializes the output and assigns the content type.
+   * Initializes the output and assigns the content-type.
    */
   public void initResponse() {
     final SerializerOptions sopts = sopts();
@@ -372,11 +372,11 @@ public final class HTTPConnection implements ClientInfo {
    * @return media type
    */
   public static MediaType mediaType(final SerializerOptions sopts) {
-    // set content type
+    // set content-type
     final String type = sopts.get(SerializerOptions.MEDIA_TYPE);
     if(!type.isEmpty()) return new MediaType(type);
 
-    // determine content type dependent on output method
+    // determine content-type dependent on output method
     final SerialMethod sm = sopts.get(SerializerOptions.METHOD);
     if(sm == SerialMethod.BASEX || sm == SerialMethod.ADAPTIVE || sm == SerialMethod.XML)
       return MediaType.APPLICATION_XML;
@@ -386,9 +386,9 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
-   * Returns the content type of a request as media type.
+   * Returns the content-type of a request as media type.
    * @param request servlet request
-   * @return content type
+   * @return content-type
    */
   public static MediaType mediaType(final HttpServletRequest request) {
     final String ct = request.getContentType();

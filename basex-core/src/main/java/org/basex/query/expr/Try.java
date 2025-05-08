@@ -143,7 +143,7 @@ public final class Try extends Single {
     for(final Catch ctch : catches) {
       changed |= ctch.inline(ic) != null;
     }
-    Expr inlined = null;
+    Expr inlined;
     try {
       inlined = expr.inline(ic);
     } catch(final QueryException ex) {

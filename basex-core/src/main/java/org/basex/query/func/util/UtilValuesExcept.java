@@ -28,7 +28,7 @@ public final class UtilValuesExcept extends StandardFunc {
 
     final IntSet ints = new IntSet();
     final ItemSet items = ItemSet.get(collation, info);
-    for(Item item = null; (item = qc.next(except)) != null;) {
+    for(Item item; (item = qc.next(except)) != null;) {
       final int v = FnDuplicateValues.toInt(item);
       if(v != Integer.MIN_VALUE) ints.add(v);
       else items.add(item);
@@ -36,7 +36,7 @@ public final class UtilValuesExcept extends StandardFunc {
     return new Iter() {
       @Override
       public Item next() throws QueryException {
-        for(Item item = null; (item = qc.next(values)) != null;) {
+        for(Item item; (item = qc.next(values)) != null;) {
           if(!items.contains(item)) {
             if(item instanceof final ANum num) {
               final double d = num.dbl();

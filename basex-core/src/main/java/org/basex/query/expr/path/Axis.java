@@ -199,7 +199,6 @@ public enum Axis {
       case PRECEDING                 -> FOLLOWING;
       case PRECEDING_OR_SELF         -> FOLLOWING_OR_SELF;
       case SELF                      -> SELF;
-      default                        -> throw Util.notExpected();
     };
   }
 }

@@ -6,7 +6,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.*;
-import java.util.stream.*;
 
 import javax.swing.*;
 
@@ -106,7 +105,7 @@ final class TextFont {
   }
 
   /**
-   * Returns an font family for the specified string.
+   * Returns a font family for the specified string.
    * @param string string
    * @return font family
    */
@@ -165,8 +164,7 @@ final class TextFont {
       }
       cachedFonts = map.entrySet().stream().
           sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).
-          map(Map.Entry::getKey).
-          collect(Collectors.toUnmodifiableList());
+          map(Map.Entry::getKey).toList();
     }
     for(final Font f : cachedFonts) {
       if(f.canDisplay(cp)) {

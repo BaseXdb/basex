@@ -31,7 +31,7 @@ public final class UtilMapValueAt extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0), index = arg(1);
     if(map == XQMap.empty()) return Empty.VALUE;
 

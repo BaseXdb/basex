@@ -52,7 +52,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
   /**
    * Returns a value with the type of the given expression and invalidates the internal array.
-   * Warning: the function must only be called if the builder is discarded afterwards.
+   * Warning: the function must only be called if the builder is discarded afterward.
    * @param expr expression
    * @return the iterator
    */

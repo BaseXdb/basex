@@ -261,7 +261,7 @@ public final class Token {
       return cps;
     }
     final IntList list = new IntList(tl);
-    forEachCp(token, cp -> list.add(cp));
+    forEachCp(token, list::add);
     return list.finish();
   }
 

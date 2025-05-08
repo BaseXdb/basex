@@ -27,7 +27,7 @@ public abstract class NumericFn extends StandardFunc {
    * @param normalize use xs:integer for integer subtypes
    * @return sequence type or {@code null}
    */
-  protected static final SeqType optType(final Expr expr, final boolean normalize) {
+  protected static SeqType optType(final Expr expr, final boolean normalize) {
     final SeqType st = expr.seqType();
     Type type = st.type;
     if(type.isUntyped()) type = AtomType.DOUBLE;

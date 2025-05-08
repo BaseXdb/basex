@@ -11,7 +11,7 @@ package org.basex.query.util.fingertree;
  * @param <E> element type
  */
 public final class TreeSlice<N, E> {
-  /** A full sub-tree. */
+  /** A full subtree. */
   private FingerTree<N, E> tree;
   /** A partial node. */
   private NodeLike<N, E> partial;
@@ -61,7 +61,7 @@ public final class TreeSlice<N, E> {
 
   /**
    * Sets the contents of this slice to the given tree and returns it with the correct type.
-   * The value with the current type is invalid afterwards and should <i>not</i> be used.
+   * The value with the current type is invalid afterward and should <i>not</i> be used.
    * @param <M> new node type
    * @param newTree the new contents
    * @return type-cast version of this slice
@@ -76,7 +76,7 @@ public final class TreeSlice<N, E> {
 
   /**
    * Sets the contents of this slice to the given node and returns it with the correct type.
-   * The value with the current type is invalid afterwards and should <i>not</i> be used.
+   * The value with the current type is invalid afterward and should <i>not</i> be used.
    * @param <M> new node type
    * @param newNode new contents
    * @return type-cast version of this slice

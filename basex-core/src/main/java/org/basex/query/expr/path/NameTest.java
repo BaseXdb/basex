@@ -128,22 +128,14 @@ public final class NameTest extends Test {
   public boolean instanceOf(final Test test) {
     if(!(test instanceof final NameTest nt)) return super.instanceOf(test);
     return type == nt.type && switch(nt.part) {
-      case FULL -> switch(part) {
-        case FULL       -> qname.eq(nt.qname);
-        case LOCAL, URI -> false;
-        default         -> throw Util.notExpected();
-      };
-      case LOCAL -> switch(part) {
-        case LOCAL, FULL -> Token.eq(qname.local(), nt.qname.local());
-        case URI         -> false;
-        default          -> throw Util.notExpected();
-      };
-      case URI -> switch(part) {
-        case URI, FULL -> Token.eq(qname.uri(), nt.qname.uri());
-        case LOCAL     -> false;
-        default        -> throw Util.notExpected();
-      };
-      default -> throw Util.notExpected();
+      case FULL ->
+        part == NamePart.FULL && qname.eq(nt.qname);
+      case LOCAL ->
+        (part == NamePart.LOCAL || part == NamePart.FULL) &&
+        Token.eq(qname.local(), nt.qname.local());
+      case URI ->
+        (part == NamePart.URI || part == NamePart.FULL) &&
+        Token.eq(qname.uri(), nt.qname.uri());
     };
   }
 

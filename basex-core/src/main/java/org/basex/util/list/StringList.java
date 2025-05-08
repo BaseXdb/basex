@@ -54,7 +54,7 @@ public final class StringList extends ObjectList<String, StringList> {
 
   /**
    * Sorts the elements in ascending order.
-   * @param cs respect case sensitivity
+   * @param cs respect case-sensitivity
    * @return self reference
    */
   public StringList sort(final boolean cs) {
@@ -63,7 +63,7 @@ public final class StringList extends ObjectList<String, StringList> {
 
   /**
    * Sorts the elements.
-   * @param cs respect case sensitivity
+   * @param cs respect case-sensitivity
    * @param asc ascending/descending flag
    * @return self reference
    */

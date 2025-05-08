@@ -1765,7 +1765,7 @@ public enum QueryError {
   }
 
   /**
-   * Throws an test exception.
+   * Throws a test exception.
    * @param value value
    * @param pos positional predicate
    * @param info input info (can be {@code null})

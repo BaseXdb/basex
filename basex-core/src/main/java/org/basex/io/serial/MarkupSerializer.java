@@ -77,7 +77,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     html5 = hv.equals(V50) || versions[0].equals(V50) && hv.isEmpty() &&
         (version.isEmpty() || version.equals(V50));
     version = checkVersion(VERSION, version, versions);
-    hv = checkVersion(VERSION, hv, V50, V401, V40);
+    checkVersion(VERSION, hv, V50, V401, V40);
 
     final boolean omitDecl = sopts.yes(OMIT_XML_DECLARATION);
     final YesNoOmit sa = sopts.get(STANDALONE);
@@ -159,9 +159,8 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   /**
-   * Print the delimiter preceding an attribute inside of an opening or empty
-   * tag. This is attribute indentation, if enabled, for all but the first
-   * attribute, but at least a single space.
+   * Prints the delimiter preceding an attribute inside an opening or empty tag. This is attribute
+   * indentation, if enabled, for all but the first attribute, but at least a single space.
    * @throws IOException I/O exception
    */
   protected void delimitAttribute() throws IOException {
@@ -437,7 +436,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   }
 
   /**
-   * Checks if indentation is to be suppressed for the the specified QName.
+   * Checks if indentation is to be suppressed for the specified QName.
    * @param qname qname to check
    * @return result of check
    * @throws QueryIOException query I/O exception

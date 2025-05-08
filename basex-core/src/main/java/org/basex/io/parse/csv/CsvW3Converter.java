@@ -118,7 +118,7 @@ public final class CsvW3Converter extends CsvXQueryConverter {
      * @param ii input info
      * @return function item
      */
-    protected static FuncItem funcItem(final Value rows, final XQMap columnIndex,
+    private static FuncItem funcItem(final Value rows, final XQMap columnIndex,
         final QueryContext qc, final InputInfo ii) {
       final VarScope vs = new VarScope();
       final SeqType rowType = POSITIVE_INTEGER_O;

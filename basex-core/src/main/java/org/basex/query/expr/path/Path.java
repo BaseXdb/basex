@@ -151,7 +151,7 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
-    // no root, no nesting: assign context value (may be null)
+    // no root, no nesting: assign context value (can be null)
     if(root == null && !cc.nestedFocus()) root = cc.qc.focus.value;
 
     // remove redundant steps, find empty steps

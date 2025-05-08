@@ -23,7 +23,7 @@ abstract class RESTCmd extends Command {
   /** REST session. */
   final RESTSession session;
 
-  /** Response status (may be {@code null}). */
+  /** Response status (can be {@code null}). */
   HTTPStatus status;
 
   /**
@@ -56,8 +56,10 @@ abstract class RESTCmd extends Command {
 
   @Override
   public boolean updating(final Context ctx) {
-    for(final Command cmd : session) updating |= cmd.updating(ctx);
-    return updating;
+    boolean up = false;
+    for(final Command cmd : session) up |= cmd.updating(ctx);
+    updating = up;
+    return up;
   }
 
   @Override

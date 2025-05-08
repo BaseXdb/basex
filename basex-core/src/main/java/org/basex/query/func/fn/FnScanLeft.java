@@ -26,19 +26,17 @@ public class FnScanLeft extends StandardFunc {
 
       @Override
       public Item next() throws QueryException {
-        while(true) {
-          Item item = init;
+        Item item = init;
+        if(item != null) {
+          init = null;
+        } else {
+          item = input.next();
           if(item != null) {
-            init = null;
-          } else {
-            item = input.next();
-            if(item != null) {
-              args.set(0, invoke(action, args.set(1, item).inc(), qc));
-              item = XQArray.get(args.get(0));
-            }
+            args.set(0, invoke(action, args.set(1, item).inc(), qc));
+            item = XQArray.get(args.get(0));
           }
-          return item;
         }
+        return item;
       }
     };
   }

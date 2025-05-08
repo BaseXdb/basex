@@ -72,7 +72,7 @@ public class BaseX extends CLI {
 
         switch(c) {
           case 'b':
-            if(bind.length() != 0) bind.append(',');
+            if(!bind.isEmpty()) bind.append(',');
             // commas are escaped by a second comma
             value = bind.append(value.replace(",", ",,")).toString();
             execute(new Set(MainOptions.BINDINGS, value), false);
@@ -91,7 +91,7 @@ public class BaseX extends CLI {
             execute(new Set(MainOptions.MAINMEM, false), false);
             break;
           case 'I':
-            if(bind.length() != 0) bind.append(',');
+            if(!bind.isEmpty()) bind.append(',');
             // commas are escaped by a second comma
             value = bind.append('=').append(value.replace(",", ",,")).toString();
             execute(new Set(MainOptions.BINDINGS, value), false);
@@ -101,10 +101,11 @@ public class BaseX extends CLI {
             out = new PrintOutput(new IOFile(value));
             session().setOutputStream(out);
             break;
-          case 'O':
-            String[] kv = value.split("=", 2);
+          case 'O': {
+            final String[] kv = value.split("=", 2);
             execute(new Set(kv[0], kv.length > 1 ? kv[1] : ""), false);
             break;
+          }
           case 'q':
             console = false;
             execute(new XQuery(value), verbose);
@@ -120,12 +121,13 @@ public class BaseX extends CLI {
           case 'R':
             execute(new Set(MainOptions.RUNQUERY, null), false);
             break;
-          case 's':
+          case 's': {
             if(sopts == null) sopts = new SerializerOptions();
-            kv = value.split("=", 2);
+            final String[] kv = value.split("=", 2);
             sopts.assign(kv[0], kv.length > 1 ? kv[1] : "");
             execute(new Set(MainOptions.SERIALIZER, sopts), false);
             break;
+          }
           case 't':
             console = false;
             execute(new Test(value), verbose);

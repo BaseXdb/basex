@@ -221,7 +221,7 @@ public final class IndexInfo {
    * Computes costs if the specified data reference exists.
    * @param data data reference
    * @param search index search definition
-   * @return costs costs, or {@code null} if index access is not possible
+   * @return costs, or {@code null} if index access is not possible
    */
   public static IndexCosts costs(final Data data, final IndexSearch search) {
     return data != null ? data.costs(search) : IndexCosts.ENFORCE_STATIC;

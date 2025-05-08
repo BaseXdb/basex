@@ -37,7 +37,7 @@ public final class TextEditor {
   IntList[] searchResults = { new IntList(), new IntList() };
   /** Start position of a text selection ({@code -1} if no text is selected). */
   int start = -1;
-  /** End position of a text selection +1 ({@code -1} if no text is selected)). */
+  /** End position of a text selection +1 ({@code -1} if no text is selected). */
   int end = -1;
   /** Start position of an error highlighting ({@code -1} for no error). */
   int error = -1;
@@ -806,7 +806,7 @@ public final class TextEditor {
    * @return returns the number spaces to move forward
    */
   int add(final StringBuilder sb, final boolean selected) {
-    if(sb.length() == 0) return 0;
+    if(sb.isEmpty()) return 0;
 
     int move = 0;
     if(!selected && gui.gopts.get(GUIOptions.AUTO)) {

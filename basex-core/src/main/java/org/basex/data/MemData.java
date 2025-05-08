@@ -108,7 +108,7 @@ public final class MemData extends Data {
       case TOKEN -> tokenIndex = index;
       case FULLTEXT -> ftIndex = index;
       default -> throw Util.notExpected();
-    };
+    }
   }
 
   @Override

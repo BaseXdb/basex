@@ -99,7 +99,7 @@ final class MapPainter {
       if(rect.w < l.x + l.w || rect.h < l.y + l.h || o < 2 || ViewData.leaf(gopts, data, pre)) {
         g.fillRect(rect.x, rect.y, rect.w, rect.h);
       } else {
-        // painting only border for non-leaf nodes..
+        // painting only border for non-leaf nodes...
         g.fillRect(rect.x, rect.y, l.x, rect.h);
         g.fillRect(rect.x, rect.y, rect.w, l.y);
         g.fillRect(rect.x + rect.w - l.w, rect.y, l.w, rect.h);

@@ -219,7 +219,6 @@ public abstract class Data {
       case TOKEN     -> tokenIndex;
       case FULLTEXT  -> ftIndex;
       case PATH      -> paths;
-      default        -> throw Util.notExpected();
     };
   }
 

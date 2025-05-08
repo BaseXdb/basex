@@ -44,9 +44,4 @@ public final class MapOfPairs extends MapMerge {
     }
     return this;
   }
-
-  @Override
-  public int hofIndex() {
-    return defined(1) ? Integer.MAX_VALUE : -1;
-  }
 }

@@ -46,7 +46,7 @@ public class HashItemSet extends ASet implements ItemSet {
         break;
       default:
         final DeepEqual deep = new DeepEqual(info);
-        this.equal = (k1, k2) -> deep.equal(k1, k2);
+        this.equal = deep::equal;
     }
     keys = new Item[capacity()];
   }

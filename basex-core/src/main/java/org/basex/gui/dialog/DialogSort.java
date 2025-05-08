@@ -14,7 +14,7 @@ import org.basex.gui.layout.*;
  * @author Christian Gruen
  */
 public final class DialogSort extends BaseXDialog {
-  /** Case sensitive. */
+  /** Case-sensitive. */
   private final BaseXCheckBox cs;
   /** Sort ascending. */
   private final BaseXCheckBox asc;

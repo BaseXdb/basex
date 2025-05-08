@@ -23,15 +23,15 @@ public final class QueryInfo {
   /** Maximum size for compilation and evaluation output per line. */
   private static final int MAX_LINE = 1 << 14;
 
-  /** Parsing time (nano seconds). */
+  /** Parsing time (nanoseconds). */
   public final AtomicLong parsing = new AtomicLong();
-  /** Compilation time (nano seconds). */
+  /** Compilation time (nanoseconds). */
   public final AtomicLong compiling = new AtomicLong();
-  /** Optimization time (nano seconds). */
+  /** Optimization time (nanoseconds). */
   public final AtomicLong optimizing = new AtomicLong();
-  /** Evaluation time (nano seconds). */
+  /** Evaluation time (nanoseconds). */
   public final AtomicLong evaluating = new AtomicLong();
-  /** Serialization time (nano seconds). */
+  /** Serialization time (nanoseconds). */
   public final AtomicLong serializing = new AtomicLong();
 
   /** Compilation info. */

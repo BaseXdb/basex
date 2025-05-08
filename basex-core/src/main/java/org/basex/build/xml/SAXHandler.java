@@ -137,7 +137,7 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @throws IOException I/O exception
    */
   private void finishText() throws IOException {
-    if(sb.length() != 0) {
+    if(!sb.isEmpty()) {
       final String s = sb.toString();
       builder.text(token(strips.peek() ? s.trim() : s));
       sb.setLength(0);

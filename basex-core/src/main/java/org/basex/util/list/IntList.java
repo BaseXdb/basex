@@ -221,7 +221,7 @@ public final class IntList extends ElementList {
 
   /**
    * Returns an array with all elements and invalidates the internal array.
-   * Warning: the function must only be called if the list is discarded afterwards.
+   * Warning: the function must only be called if the list is discarded afterward.
    * @return array (internal representation!)
    */
   public int[] finish() {

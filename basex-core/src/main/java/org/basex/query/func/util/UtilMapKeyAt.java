@@ -25,7 +25,7 @@ public final class UtilMapKeyAt extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
     final Type type = map.seqType().type;
     if(type instanceof final MapType mt) {

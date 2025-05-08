@@ -322,19 +322,17 @@ public abstract class Step extends Preds {
     // checks steps on document nodes
     final Type inputType = seqType.type;
     final NodeType type = test.type;
-    if(inputType.instanceOf(NodeType.DOCUMENT_NODE) && ((Check) () -> {
-      return switch(axis) {
-        case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
-             PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
-          !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
-        case CHILD, DESCENDANT ->
-          type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ATTRIBUTE);
-        case DESCENDANT_OR_SELF ->
-          type == NodeType.ATTRIBUTE;
-        default ->
-          true;
-      };
-    }).ok()) return true;
+    if(inputType.instanceOf(NodeType.DOCUMENT_NODE) && switch(axis) {
+      case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
+           PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
+        !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
+      case CHILD, DESCENDANT ->
+        type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ATTRIBUTE);
+      case DESCENDANT_OR_SELF ->
+        type == NodeType.ATTRIBUTE;
+      default ->
+        true;
+    }) return true;
 
     // check step after any other expression
     return switch(axis) {

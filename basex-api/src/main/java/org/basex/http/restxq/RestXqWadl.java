@@ -142,7 +142,7 @@ public final class RestXqWadl {
 
   /**
    * Adds a documentation element to the specified element.
-   * @param xqdoc documentation (may be {@code null})
+   * @param xqdoc documentation (can be {@code null})
    * @param parent parent node
    * @throws QueryException query exception
    */

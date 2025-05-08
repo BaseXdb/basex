@@ -18,7 +18,7 @@ import org.basex.util.*;
  *
  * <p>{@link NodeUpdate}s are identified by their target node's PRE values (T).
  * Depending on the {@link UpdateType} of the update, a specific PRE value on the
- * table is affected (L). Hence it is not sufficient to order primitives based on T
+ * table is affected (L). Hence, it is not sufficient to order primitives based on T
  * (see case 2,3 below). It is also not sufficient to order them based on L (see case
  * 2,3 below).</p>
  *
@@ -44,11 +44,11 @@ import org.basex.util.*;
  * the same location L and shifts S2 further back on disk. S1 and S2 are now ordered
  * incorrectly (S1,S2) and invalidate the document.
  *
- * Hence the correct order (S2,S1) can only be achieved if P1 is executed first and S1
+ * Hence, the correct order (S2,S1) can only be achieved if P1 is executed first and S1
  * subsequently shifted by inserting S2.
  *
  * The problem can exist if P1 and/or P2 are of the kind {@link InsertInto} or
- * {@link InsertAfter} and T1+size(T1) is equal T2+size(T2), hence T1 and T2 have the
+ * {@link InsertAfter} and T1+size(T1) is equal T2+size(T2); hence, T1 and T2 have the
  * same following node. The correct order is realized by executing the update first, that
  * is on the ancestor axis of the other. In this case P1 greater than P2.
  *

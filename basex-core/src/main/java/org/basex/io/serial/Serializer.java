@@ -119,7 +119,7 @@ public abstract class Serializer implements Closeable {
   }
 
   /**
-   * Resets the serializer (indentation, etc).
+   * Resets the serializer (indentation, etc.).
    */
   public void reset() { }
 

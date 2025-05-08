@@ -97,13 +97,10 @@ public final class IntPos extends Simple implements CmpPos {
 
   @Override
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
-    if(ex instanceof IntPos) {
+    if(ex instanceof IntPos pos) {
       // find range with smaller minimum
-      IntPos pos1 = this, pos2 = (IntPos) ex;
-      if(pos2.min < pos1.min) {
-        pos1 = pos2;
-        pos2 = this;
-      }
+      final boolean smaller = min < pos.min;
+      final IntPos pos1 = smaller ? this : pos, pos2 = smaller ? pos : this;
       // create intersection: pos: 1, 2 and pos: 2, 3  ->  pos: 2
       if(!or) return get(pos2.min, Math.min(pos1.max, pos2.max), info);
       // create union: pos: 1, 2 or pos: 2, 3  ->  pos: 1, 3

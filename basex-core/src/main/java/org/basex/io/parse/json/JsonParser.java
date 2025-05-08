@@ -292,7 +292,7 @@ public final class JsonParser {
       final long p = pos;
       int cp = consume();
 
-      // string is closed..
+      // string is closed...
       if(cp == '"') {
         // unpaired surrogate?
         if(high != 0) add(high, p - 6, p);
@@ -365,7 +365,7 @@ public final class JsonParser {
   /**
    * Adds the specified character.
    * @param cp character
-   * @param s start position of invalid unicode sequence
+   * @param s start position of invalid Unicode sequence
    * @param e end position
    * @throws QueryException query exception
    */

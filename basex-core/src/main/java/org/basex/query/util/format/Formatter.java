@@ -293,14 +293,14 @@ public abstract class Formatter extends FormatUtil {
           tb.add(formatZone((int) num, fp, marker));
         } else if(fp.first == 'n') {
           // output name representation
-          byte[] in = null;
-          switch(compSpec) {
-            case 'M': in = month((int) num - 1, fp.min, fp.max); break;
-            case 'F': in = day((int) num - 1, fp.min, fp.max); break;
-            case 'P': in = ampm(num == 0); break;
-            case 'C': in = calendar(); break;
-            case 'E': in = era((int) num); break;
-          }
+          byte[] in = switch(compSpec) {
+            case 'M' -> month((int) num - 1, fp.min, fp.max);
+            case 'F' -> day((int) num - 1, fp.min, fp.max);
+            case 'P' -> ampm(num == 0);
+            case 'C' -> calendar();
+            case 'E' -> era((int) num);
+            default -> null;
+          };
           if(in != null) {
             if(fp.cs == Case.LOWER) in = lc(in);
             if(fp.cs == Case.UPPER) in = uc(in);

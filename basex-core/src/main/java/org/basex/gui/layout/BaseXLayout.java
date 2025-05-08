@@ -77,7 +77,7 @@ public final class BaseXLayout {
   }
 
   /**
-   * Activates graphics anti-aliasing.
+   * Activates graphics antialiasing.
    * @param g graphics reference
    */
   public static void antiAlias(final Graphics g) {
@@ -86,9 +86,9 @@ public final class BaseXLayout {
   }
 
   /**
-   * Chooses the anti-aliasing renderer.
+   * Chooses the antialiasing renderer.
    * @param g graphics reference
-   * @param type anti-aliasing type
+   * @param type antialiasing type
    */
   public static void antiAlias(final Graphics g, final String type) {
     final Object hint = switch(type) {
@@ -590,7 +590,7 @@ public final class BaseXLayout {
         sb.append(", ").append(more.apply(bytes, maxtext)).append(Performance.formatHuman(bytes));
       }
     }
-    return sb.length() > 0 ? sb.toString() : " ";
+    return sb.isEmpty() ? " " : sb.toString();
   }
 
   /**

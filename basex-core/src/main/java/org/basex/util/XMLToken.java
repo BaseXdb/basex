@@ -322,9 +322,9 @@ public final class XMLToken {
       else tb.addByte((byte) b);
     }
 
-    Token.string(tb.next()).codePoints().forEach(cp -> {
-      tb.add(XMLToken.valid(cp) ? cp : Token.REPLACEMENT);
-    });
+    Token.string(tb.next()).codePoints().forEach(cp ->
+      tb.add(XMLToken.valid(cp) ? cp : Token.REPLACEMENT)
+    );
     return tb.finish();
   }
 
@@ -338,9 +338,9 @@ public final class XMLToken {
   }
 
   /**
-   * Returns the unicode token for the specified entity or {@code null}.
+   * Returns the Unicode token for the specified entity or {@code null}.
    * @param key key
-   * @return unicode token
+   * @return Unicode token
    */
   public static byte[] getEntity(final byte[] key) {
     return entities().get(key);

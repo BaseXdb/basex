@@ -86,20 +86,20 @@ public final class Blake3 {
     final int[] state = { value[0], value[1], value[2], value[3], value[4], value[5], value[6],
         value[7], INITIAL[0], INITIAL[1], INITIAL[2], INITIAL[3], lo, hi, length, flags };
 
-    final int[] w = words, w2 = new int[words.length];
-    round(state, w);
-    permute(w, w2);
-    round(state, w2);
-    permute(w2, w);
-    round(state, w);
-    permute(w, w2);
-    round(state, w2);
-    permute(w2, w);
-    round(state, w);
-    permute(w, w2);
-    round(state, w2);
-    permute(w2, w);
-    round(state, w);
+    final int[] wrds = new int[words.length];
+    round(state, words);
+    permute(words, wrds);
+    round(state, wrds);
+    permute(wrds, words);
+    round(state, words);
+    permute(words, wrds);
+    round(state, wrds);
+    permute(wrds, words);
+    round(state, words);
+    permute(words, wrds);
+    round(state, wrds);
+    permute(wrds, words);
+    round(state, words);
 
     for(int i = 0; i < 8; i++) {
       state[i] ^= state[i + 8];
@@ -168,15 +168,15 @@ public final class Blake3 {
   /** Node. */
   private static final class Node {
     /** Value. */
-    int[] value;
+    final int[] value;
     /** Words. */
-    int[] words;
+    final int[] words;
     /** Counter. */
-    long counter;
+    final long counter;
     /** Length. */
-    int length;
+    final int length;
     /** Flags. */
-    int flags;
+    final int flags;
 
     /**
      * Constructor.

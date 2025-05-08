@@ -400,7 +400,7 @@ public final class GFLWOR extends ParseExpr {
             changing = true;
           }
         } else {
-          // rewrite for/let combinations to single for clause
+          // rewrite for/let combinations to a single for clause
           //   for $a in $seq for $b in $a  ->  for $b in $seq
           //   for $a in $seq for $b in 1 to $a  ->  for $b in $seq ! (1 to .)
           // check next clause: skip let clause with sequences or positional for clause
@@ -700,7 +700,7 @@ public final class GFLWOR extends ParseExpr {
       for(int d = c + 1; d < clauses.size(); d++) {
         final Clause cl = clauses.get(d);
         if(!(cl instanceof Where)) {
-          // stop if clause is no 'for' or 'let' expression or nondeterministic
+          // stop if the clause is no 'for' or 'let' expression or nondeterministic
           if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT)) break;
           continue;
         }

@@ -151,11 +151,9 @@ public final class RecordType extends MapType {
       final Type tp1 = st1.type, tp2 = st2.type;
       if(tp1 instanceof final RecordType rt1 && tp2 instanceof final RecordType rt2) {
         final Pair pair = new Pair(rt1, rt2);
-        if(!pairs.contains(pair) && !rt1.eq(rt2, pair.addTo(pairs), strict)) return false;
-      } else if(!tp1.eq(tp2)) {
-        return false;
+        return pairs.contains(pair) || rt1.eq(rt2, pair.addTo(pairs), strict);
       }
-      return true;
+      return tp1.eq(tp2);
     };
 
     if(strict) {
@@ -416,8 +414,8 @@ public final class RecordType extends MapType {
 
   /**
    * Returns the declaration of this record type. If this is an unresolved instance, the declaration
-   * is expected to be present in the (already) declared named record types. Otherwise this instance
-   * is returned.
+   * is expected to be present in the (already) declared named record types. Otherwise, this
+   * instance is returned.
    * @param declaredRecordTypes the (already) declared named record types
    * @return the declared record type
    * @throws QueryException an "unknown type" error, if this is a reference that cannot be resolved.

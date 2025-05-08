@@ -195,7 +195,7 @@ public enum BaseXKeys {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(InputEvent.getModifiersExText(modifiers));
-    if(sb.length() != 0) sb.append('+');
+    if(!sb.isEmpty()) sb.append('+');
     return sb.append(getKeyText(key)).toString();
   }
 

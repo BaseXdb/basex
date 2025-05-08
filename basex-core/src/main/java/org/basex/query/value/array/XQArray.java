@@ -124,7 +124,7 @@ public abstract class XQArray extends XQStruct {
   /**
    * Returns a subsequence with the given start and length.
    * @param pos position of first member (>= 0)
-   * @param length number of members 1 < length < size())
+   * @param length number of members (1 < length < size())
    * @param qc query context
    * @return new subarray
    */

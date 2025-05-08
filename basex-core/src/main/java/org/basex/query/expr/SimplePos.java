@@ -167,7 +167,7 @@ final class SimplePos extends Arr implements CmpPos {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this), exact() ? exprs[0] : exprs);
+    plan.add(plan.create(this), exact() ? new Expr[] { exprs[0] } : exprs);
   }
 
   @Override

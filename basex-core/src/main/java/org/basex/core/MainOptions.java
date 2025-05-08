@@ -115,7 +115,7 @@ public final class MainOptions extends Options {
 
   /** Flag for full-text stemming. */
   public static final BooleanOption STEMMING = new BooleanOption("STEMMING", false);
-  /** Flag for full-text case sensitivity. */
+  /** Flag for full-text case-sensitivity. */
   public static final BooleanOption CASESENS = new BooleanOption("CASESENS", false);
   /** Flag for full-text diacritics sensitivity. */
   public static final BooleanOption DIACRITICS = new BooleanOption("DIACRITICS", false);

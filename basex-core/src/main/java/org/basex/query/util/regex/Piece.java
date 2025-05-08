@@ -28,7 +28,7 @@ public final class Piece extends RegExp {
       // #2240: replace an optional capturing group by a mandatory one, and wrap its content
       // into an optional non-capturing group
       sb.append("((?:");
-      ((Group) atom).getEncl().toRegEx(sb);
+      group.getEncl().toRegEx(sb);
       sb.append(')');
       quant.toRegEx(sb);
       sb.append(')');

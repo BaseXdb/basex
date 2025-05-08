@@ -2274,7 +2274,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the UnionNodeTest rule rule without the leading parenthesis.
+   * Parses the UnionNodeTest rule without the leading parenthesis.
    * @param element element flag
    * @return test or {@code null}
    * @throws QueryException query exception
@@ -3490,7 +3490,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test documentTest() throws QueryException {
-    Test test = null;
+    Test test;
     final boolean element = consume(ELEMENT), schema = !element && consume(SCHEMA_ELEMENT);
     if(element || schema) {
       wsCheck("(");
@@ -3643,7 +3643,7 @@ public class QueryParser extends InputParser {
    */
   private ArrayList<Test> nameTestUnion(final NodeType type) throws QueryException {
     final ArrayList<Test> tests = new ArrayList<>();
-    Test test = null;
+    Test test;
     final int p = pos;
     do {
       skipWs();

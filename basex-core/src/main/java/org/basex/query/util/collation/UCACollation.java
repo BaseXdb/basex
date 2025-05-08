@@ -24,7 +24,7 @@ final class UCACollation extends Collation {
   private final int strength;
   /** Strength mask. */
   private final int strengthMask;
-  /** Whether the the alternate handling behavior is "shifted". */
+  /** Whether the alternate handling behavior is "shifted". */
   private final boolean isShifted;
   /** Variable top. */
   private final int variableTop;

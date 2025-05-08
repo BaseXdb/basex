@@ -63,7 +63,7 @@ public abstract class Filter extends AFilter {
     // no predicates: return root
     if(exprs.length == 0) return root;
 
-    // no positional access..
+    // no positional access...
     if(!mayBePositional()) {
       // convert to axis path: .[text()]  ->  self::node()[text()]
       if(root instanceof ContextValue && root.ddo()) {
@@ -79,7 +79,7 @@ public abstract class Filter extends AFilter {
         return cc.replaceWith(this, Path.get(cc, info, root, step));
       }
 
-      // rewrite independent deterministic single filter to if expression:
+      // rewrite independent deterministic single filter to 'if' expression:
       // example: (1 to 10)[$boolean]  ->  if($boolean) then (1 to 10) else ()
       final Expr expr = exprs[0];
       if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber()) {

@@ -61,20 +61,19 @@ public abstract class NodeUpdate extends DataUpdate {
   public abstract void addAtomics(AtomicUpdateCache auc);
 
   /**
-   * Substitutes the update primitive if necessary. For instance a 'Replace Value
-   * of' primitive called on a target T with T being an element results in a 'Replace
-   * Element Content' primitive with target T. As this is ugly to process it is
-   * substituted by delete primitives for every child of T and an 'Insert into' primitive
-   * if the length of the (optional!) text node is greater zero.
+   * Substitutes the update primitive if necessary. For instance a 'Replace Value of' primitive
+   * called on a target T with T being an element results in a 'Replace Element Content' primitive
+   * with target T. As this is ugly to process it is substituted by delete primitives for every
+   * child of T and an 'Insert into' primitive if the length of the (optional!) text node is greater
+   * zero.
    *
-   * When a primitive is substituted it is still added to the list itself to be able to
-   * throw exceptions when necessary. I.e. for multiple replaces on the same target node.
-   * These update primitives don't produce atomic updates, hence this will not affect the
-   * database.
+   * When a primitive is substituted it is still added to the list itself to be able to throw
+   * exceptions when necessary. I.e. for multiple replaces on the same target node. These update
+   * primitives don't produce atomic updates; hence, this will not affect the database.
    *
    * @param tmp temporary mem data
-   * @return An array that contains the substituting primitives or this update primitive
-   * if no substitution is necessary.
+   * @return An array that contains the substituting primitives or this update primitive if no
+   * substitution is necessary.
    */
   @SuppressWarnings("unused")
   public NodeUpdate[] substitute(final MemData tmp) {

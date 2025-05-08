@@ -214,7 +214,7 @@ public class IdPreMap {
     }
 
     if(rows <= startIndex) {
-      // the delete does not affect previous updates
+      // the deletion does not affect previous updates
       add(startIndex, pre, INV, INV, inc + c, oid);
       return;
     }

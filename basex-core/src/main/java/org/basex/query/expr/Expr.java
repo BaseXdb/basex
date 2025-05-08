@@ -81,7 +81,7 @@ public abstract class Expr extends ExprInfo {
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
    * If this method is not implemented, {@link #value(QueryContext)} must be implemented instead.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   * @param ii input info (can be {@code null}; required for those {@link Value} instances
    *   that have no input info)
    * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
@@ -91,7 +91,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns an iterator on the resulting, atomized items.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   * @param ii input info (can be {@code null}; required for those {@link Value} instances
    *   that have no input info)
    * @return iterator
    * @throws QueryException query exception
@@ -109,7 +109,7 @@ public abstract class Expr extends ExprInfo {
    * Evaluates the expression and returns the resulting, atomized item,
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   * @param ii input info (can be {@code null}; required for those {@link Value} instances
    *   that have no input info)
    * @return item or {@link Empty#VALUE}
    * @throws QueryException query exception
@@ -121,7 +121,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns the atomized items.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   * @param ii input info (can be {@code null}; required for those {@link Value} instances
    *   that have no input info)
    * @return atomized item
    * @throws QueryException query exception
@@ -131,7 +131,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Computes the effective boolean value for this expression.
    * @param qc query context
-   * @param ii input info (can be {@code null}); required for those {@link Value} instances
+   * @param ii input info (can be {@code null}; required for those {@link Value} instances
    *   that have no input info)
    * @param pos position of context item (if {@code 0}, perform EBV test)
    * @return item
@@ -328,7 +328,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the arguments/operands of an expression (function, list, etc).
+   * Returns the arguments/operands of an expression (function, list, etc.).
    * @return arguments or {@code null}
    */
   public Expr[] args() {
@@ -336,7 +336,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns the specified argument/operand of an expression (function, list, etc).
+   * Returns the specified argument/operand of an expression (function, list, etc.).
    * @param a index of argument
    * @return argument or {@link Empty#UNDEFINED} if argument is undefined
    */

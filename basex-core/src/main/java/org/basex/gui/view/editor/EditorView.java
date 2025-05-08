@@ -385,7 +385,7 @@ public final class EditorView extends View {
 
   /**
    * Switches the current editor tab.
-   * @param next next next/previous tab
+   * @param next next/previous tab
    */
   public void tab(final boolean next) {
     final int s = tabs.getTabCount();

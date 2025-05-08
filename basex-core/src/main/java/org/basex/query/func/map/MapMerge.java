@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -63,7 +62,7 @@ public class MapMerge extends StandardFunc {
     // update first map if 2 maps are supplied, use map builder otherwise
     Item next = qc.next(maps);
     final MapBuilder mb = next == null ? null : new MapBuilder(arg(0).size());
-    if(mb != null) mp.forEach((k, v) -> mb.put(k,  v));
+    if(mb != null) mp.forEach(mb::put);
 
     while(current != null) {
       final XQMap map = toMap(current);

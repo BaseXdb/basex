@@ -71,7 +71,7 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
+  public Expr inline(final Expr[] exprs, final CompileContext cc) {
     return null;
   }
 

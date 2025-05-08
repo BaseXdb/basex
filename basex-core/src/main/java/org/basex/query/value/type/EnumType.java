@@ -2,7 +2,6 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.io.in.DataInput;
@@ -57,7 +56,7 @@ public final class EnumType implements Type {
   }
 
   @Override
-  public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+  public Item read(final DataInput in, final QueryContext qc) {
     throw Util.notExpected();
   }
 
@@ -79,9 +78,8 @@ public final class EnumType implements Type {
     if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
     if(AtomType.STRING.instanceOf(type)) return true;
     if(!(type instanceof final EnumType et)) return false;
-    final TokenSet tv = et.values;
-    for(final byte[] value : values) {
-      if(!tv.contains(value)) return false;
+      for(final byte[] value : values) {
+      if(!et.values.contains(value)) return false;
     }
     return true;
   }

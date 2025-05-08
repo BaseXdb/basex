@@ -69,7 +69,7 @@ public abstract class PlanFn extends StandardFunc {
     /** Type 'skip'.    */ SKIP(null);
 
     /** Target type. */
-    AtomType type;
+    final AtomType type;
 
     /**
      * Constructor.

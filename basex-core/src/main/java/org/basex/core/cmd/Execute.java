@@ -83,8 +83,10 @@ public class Execute extends Command {
   @Override
   public final boolean updating(final Context ctx) {
     if(!init(ctx)) return false;
-    for(final Command cmd : commands) updating |= cmd.updating(ctx);
-    return updating;
+    boolean up = false;
+    for(final Command cmd : commands) up |= cmd.updating(ctx);
+    updating = up;
+    return up;
   }
 
   /**

@@ -95,7 +95,7 @@ public abstract class IO {
   /** Maximum number of attributes (see bit layout in {@link Data} class). */
   public static final int MAXATTS = 0x1F;
 
-  /** Absolute file path. All paths have forward slashes, no matter which OS is used. */
+  /** Absolute file path. All paths have forward-slashes, no matter which OS is used. */
   protected String pth;
   /** Input size in bytes ({@code -1} if unknown). */
   protected long len = -1;
@@ -124,7 +124,7 @@ public abstract class IO {
    *   represented as byte array</li>
    * </ul>
    * If the content of the string value is known in advance, it is advisable
-   * to call the direct constructors of the correspondent sub class.
+   * to call the direct constructors of the correspondent subclass.
    *
    * @param location location
    * @return IO reference
@@ -305,7 +305,7 @@ public abstract class IO {
 
   /**
    * Returns the full path to the resource.
-   * The path uses forward slashes, no matter which OS is used.
+   * The path uses forward-slashes, no matter which OS is used.
    * @return path
    */
   public final String path() {
@@ -366,7 +366,7 @@ public abstract class IO {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public static final void write(final InputStream in, final OutputStream out) throws IOException {
+  public static void write(final InputStream in, final OutputStream out) throws IOException {
     try(BufferInput bi = BufferInput.get(in); BufferOutput bo = BufferOutput.get(out)) {
       for(int c; (c = bi.read()) != -1;) bo.write(c);
     }

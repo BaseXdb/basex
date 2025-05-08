@@ -14,6 +14,8 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class XQTrieMap extends XQMap {
+  /** The empty map. */
+  static final XQMap EMPTY = new XQTrieMap(TrieEmpty.VALUE, null, SeqType.MAP);
   /** Root node. */
   private final TrieNode root;
   /** Map order ({@code null} for empty and singleton maps). */
