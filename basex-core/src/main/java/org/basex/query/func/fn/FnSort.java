@@ -74,7 +74,7 @@ public class FnSort extends StandardFunc {
    * @param index index
    * @return result of check
    */
-  protected final boolean sorted(final Integer[] index) {
+  protected static boolean sorted(final Integer[] index) {
     final int il = index.length;
     for(int i = 0; i < il; i++) {
       if(index[i] != i) return false;

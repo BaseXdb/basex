@@ -158,8 +158,8 @@ public enum NodeType implements Type {
    * @param id type ID
    */
   NodeType(final String name, final Type parent, final ID id) {
-    this.test = Token.token(name);
-    this.kind = Token.token(name.replace("-node", ""));
+    test = Token.token(name);
+    kind = Token.token(name.replace("-node", ""));
     this.parent = parent;
     this.id = id;
   }

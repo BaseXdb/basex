@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.index.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -118,7 +119,7 @@ public abstract class Logical extends Arr {
         // everything behind the error is dead anyway
         final Expr[] nw = new Expr[e + 1];
         Array.copy(exprs, e, nw);
-        nw[e] = ic.cc.error(ex, exprs[e]);
+        nw[e] = FnError.get(ex, exprs[e]);
         exprs = nw;
         changed = true;
         break;

@@ -37,7 +37,7 @@ public class DbPropertyMap extends DbAccessFn {
    * @param value value
    * @return item, or {@code null} for empty sequence
    */
-  final Item item(final Object value) {
+  static Item item(final Object value) {
     if(value instanceof final Boolean bln) return Bln.get(bln);
     if(value instanceof final Integer itr) return Int.get(itr);
     if(value instanceof final Long lng)    return Int.get(lng);

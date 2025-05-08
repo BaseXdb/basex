@@ -21,7 +21,7 @@ public class MapForEach extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-    final FItem action = toFunction(arg(1), 2, MapForEach.this instanceof UpdateMapForEach, qc);
+    final FItem action = toFunction(arg(1), 2, this instanceof UpdateMapForEach, qc);
     final BasicIter<Item> keys = map.keys().iter();
 
     return new Iter() {

@@ -58,7 +58,7 @@ public final class InputInfo {
   public InputInfo(final String path, final int line, final int col) {
     this.path = path;
     this.line = line;
-    this.column = col;
+    column = col;
   }
 
   /**

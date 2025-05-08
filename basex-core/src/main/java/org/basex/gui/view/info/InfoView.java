@@ -84,7 +84,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
     }
     sections.setPrototypeDisplayValue(maxSection);
     sections.addActionListener(ev -> {
-      while(paint) Thread.yield();
+      while(paint) Performance.sleep(1);
 
       section = sections.getSelectedItem();
       final byte[] start = new TokenBuilder().bold().add(section).add(COL).norm().nline().finish();

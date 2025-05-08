@@ -47,7 +47,7 @@ public enum HTTPStatus {
    */
   HTTPStatus(final int code, final String desc) {
     this.code = code;
-    this.description = desc;
+    description = desc;
   }
 
   /**

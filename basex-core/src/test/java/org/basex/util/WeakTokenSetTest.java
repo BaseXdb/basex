@@ -30,7 +30,7 @@ public final class WeakTokenSetTest {
   }
 
   /** Verify WeakTokenSet behavior with respect to garbage collection. */
-  @RepeatedTest(value = 8)
+  @RepeatedTest(8)
   public void testGarbageCollection() {
     try {
       final List<String> strings = randomStrings();
@@ -79,9 +79,9 @@ public final class WeakTokenSetTest {
    * Create an array of 4-33 distinct random ASCII strings of length 1-16.
    * @return list of random strings
    */
-  private List<String> randomStrings() {
+  private static List<String> randomStrings() {
     final int maxLength = 2 + random.nextInt(16);
-    final int count = (int) Math.pow(2, 3 + random.nextInt(3)) - 2 + random.nextInt(4);
+    final int count = (int) StrictMath.pow(2, 3 + random.nextInt(3)) - 2 + random.nextInt(4);
     final Set<String> strings = new LinkedHashSet<>();
     do {
       final int length = 2 + random.nextInt(maxLength);

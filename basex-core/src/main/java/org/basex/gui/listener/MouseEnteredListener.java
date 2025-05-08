@@ -8,6 +8,7 @@ import java.awt.event.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 public interface MouseEnteredListener extends MouseListener {
   @Override
   default void mouseClicked(final MouseEvent e) { }

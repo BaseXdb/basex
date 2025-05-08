@@ -84,7 +84,7 @@ public class BaseXCombo extends JComboBox<Object> {
       final boolean editable, final String... values) {
     this(win, editable, values);
     this.options = options;
-    this.optionKey = option;
+    optionKey = option;
   }
 
   /**

@@ -32,7 +32,7 @@ public final class QueryJobSpec {
       final IOContent content) {
     this.options = options;
     this.bindings = bindings;
-    this.query = content.toString();
+    query = content.toString();
     simple = content.url().isEmpty();
   }
 

@@ -958,7 +958,7 @@ public enum AtomType implements Type {
 
   // map hierarchy to pre/post values
   static {
-    final HashMap<AtomType, List<AtomType>> types = new HashMap<>();
+    final EnumMap<AtomType, List<AtomType>> types = new EnumMap<>(AtomType.class);
     for(final AtomType type : values()) {
       if(type.parent != null) types.computeIfAbsent(type.parent, k -> new ArrayList<>()).add(type);
     }
@@ -970,7 +970,7 @@ public enum AtomType implements Type {
    * @param types child types
    * @param pp pre/post array
    */
-  private void assign(final HashMap<AtomType, List<AtomType>> types, final byte[] pp) {
+  private void assign(final EnumMap<AtomType, List<AtomType>> types, final byte[] pp) {
     prePost = pp[0]++;
     for(final AtomType type : types.getOrDefault(this, List.of())) type.assign(types, pp);
     prePost |= pp[1]++ << 8;

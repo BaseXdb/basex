@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FTTest extends FTData {
+public final class FTSeqTest extends FTTest {
   static {
     create(DOC);
     queries = QUERIES;

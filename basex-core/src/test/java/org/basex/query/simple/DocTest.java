@@ -10,26 +10,26 @@ import org.basex.query.*;
  */
 public final class DocTest extends QueryTest {
   static {
-    create(
-      "<?xml version='1.0' encoding='iso-8859-1'?>\n" +
-      "<html>\n" +
-      "  <!-- Header -->\n" +
-      "  <head id='0'>\n" +
-      "    <title>XML</title>\n" +
-      "  </head>\n" +
-      "  <!-- Body -->\n" +
-      "  <body id='1' bgcolor='#FFFFFF' text='#000000' link='#0000CC'>\n" +
-      "    <h1>Databases &amp; XML</h1>\n" +
-      "    <div align = 'right' >\n" +
-      "      <b>Assignments</b>\n" +
-      "      <ul>\n" +
-      "        <li>Exercise 1</li>\n" +
-      "        <li>Exercise 2</li>\n" +
-      "      </ul>\n" +
-      "    </div>\n" +
-      "  </body>\n" +
-      "  <?pi bogus?>\n" +
-      "</html>");
+    create("""
+      <?xml version='1.0' encoding='iso-8859-1'?>
+      <html>
+        <!-- Header -->
+        <head id='0'>
+          <title>XML</title>
+        </head>
+        <!-- Body -->
+        <body id='1' bgcolor='#FFFFFF' text='#000000' link='#0000CC'>
+          <h1>Databases &amp; XML</h1>
+          <div align = 'right' >
+            <b>Assignments</b>
+            <ul>
+              <li>Exercise 1</li>
+              <li>Exercise 2</li>
+            </ul>
+          </div>
+        </body>
+        <?pi bogus?>
+      </html>""");
 
     queries = new Object[][] {
       { "Root 1", nodes(0), "/" },

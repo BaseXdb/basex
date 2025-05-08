@@ -97,7 +97,7 @@ public final class IntPos extends Simple implements CmpPos {
 
   @Override
   public Expr mergeEbv(final Expr ex, final boolean or, final CompileContext cc) {
-    if(ex instanceof IntPos pos) {
+    if(ex instanceof final IntPos pos) {
       // find range with smaller minimum
       final boolean smaller = min < pos.min;
       final IntPos pos1 = smaller ? this : pos, pos2 = smaller ? pos : this;

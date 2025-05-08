@@ -401,8 +401,8 @@ public abstract class PlanFn extends StandardFunc {
       case LOCAL ->
         qnm.local();
       default ->
-        (element ? (parent == null ? qnm.uri().length == 0 :
-          Token.eq(parent.qname().uri(), qnm.uri())) : qnm.uri().length == 0) ? qnm.local() :
+        (element ? parent == null ? qnm.uri().length == 0 :
+          Token.eq(parent.qname().uri(), qnm.uri()) : qnm.uri().length == 0) ? qnm.local() :
         Token.eq(qnm.uri(), QueryText.XML_URI) ? qnm.string() : qnm.eqName();
     };
     return qc.shared.token(!element && plan.marker != null ?
@@ -501,7 +501,7 @@ public abstract class PlanFn extends StandardFunc {
    * @return array
    * @throws QueryException query exception
    */
-  private Str xml(final ANode node) throws QueryException {
+  private static Str xml(final ANode node) throws QueryException {
     try {
       return Str.get(node.serialize(new SerializerOptions()).finish());
     } catch(final QueryIOException ex) {

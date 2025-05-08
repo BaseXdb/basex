@@ -2667,7 +2667,7 @@ public class QueryParser extends InputParser {
     if(token.isEmpty()) throw error(NUMBER_X, token);
     // out of range
     if(l.compareTo(BigInteger.valueOf(max != 0 ? max : Long.MAX_VALUE)) > 0)
-      return FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O);
+      return FnError.get(RANGE_X.get(info(), token), Int.ZERO);
 
     return Int.get(negate ? -l.longValue() : l.longValue());
   }

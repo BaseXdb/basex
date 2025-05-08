@@ -8,6 +8,7 @@ import java.util.function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -137,7 +138,7 @@ public final class TypeswitchGroup extends Single {
     try {
       return super.inline(ic);
     } catch(final QueryException ex) {
-      expr = ic.cc.error(ex, this);
+      expr = FnError.get(ex, this);
       return this;
     }
   }
@@ -148,7 +149,7 @@ public final class TypeswitchGroup extends Single {
     try {
       rtrn = tc.check(expr, cc);
     } catch(final QueryException ex) {
-      rtrn = cc.error(ex, expr);
+      rtrn = FnError.get(ex, expr);
     }
     // returned expression will be handled Typeswitch#typeCheck
     if(rtrn == null) return null;

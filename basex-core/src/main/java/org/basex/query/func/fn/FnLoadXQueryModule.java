@@ -174,7 +174,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
    * @param context database context
    * @return the file path of the XQuery module in the repository (maybe {@code null})
    */
-  private String repoFilePath(final byte[] modUri, final Context context) {
+  private static String repoFilePath(final byte[] modUri, final Context context) {
     final String path = Strings.uri2path(Token.string(modUri));
     final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
     for(final String suffix : IO.XQSUFFIXES) {

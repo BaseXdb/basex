@@ -42,7 +42,7 @@ public final class MapFind extends StandardFunc {
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void find(final Iter iter, final Item key, final ArrayBuilder builder,
+  private static void find(final Iter iter, final Item key, final ArrayBuilder builder,
       final QueryContext qc) throws QueryException {
 
     for(Item item; (item = qc.next(iter)) != null;) {

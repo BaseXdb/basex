@@ -80,7 +80,7 @@ public final class Dir extends Command {
    * @param type resource type
    * @return table entry
    */
-  private TokenList entry(final boolean dir, final String name, final long size,
+  private static TokenList entry(final boolean dir, final String name, final long size,
       final ResourceType type) {
     final TokenList tl = new TokenList(4).add(name);
     if(dir) {

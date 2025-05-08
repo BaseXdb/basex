@@ -115,7 +115,7 @@ public final class SeqTypeTest {
         fld2 = new TokenObjectMap<>();
     final QNm r1Name = new QNm(Token.token("r1")),
       r2Name = new QNm(Token.token("r2"));
-    final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
+    final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // r1 record(next? as r1, x)
       r1 = SeqType.get(new RecordType(r1Name, ii), EXACTLY_ONE),
@@ -293,7 +293,7 @@ public final class SeqTypeTest {
         fld2 = new TokenObjectMap<>();
     final QNm r1Name = new QNm(Token.token("r1")),
       r2Name = new QNm(Token.token("r2"));
-    final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
+    final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // r1 record(next? as r1, x)
       r1 = SeqType.get(new RecordType(r1Name, ii), EXACTLY_ONE),
@@ -506,7 +506,7 @@ public final class SeqTypeTest {
     fld10.put(Token.token("z"), new RecordField(true, ITEM_ZM));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
-    final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
+    final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
       r1 = SeqType.get(new RecordType(false, fld1), EXACTLY_ONE),
@@ -752,7 +752,7 @@ public final class SeqTypeTest {
     fld7.put(Token.token("b"), new RecordField(false, INTEGER_O));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
-    final InputInfo ii = new InputInfo(this.getClass().getName(), 1, 1);
+    final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
       r1 = SeqType.get(new RecordType(false, fld1), EXACTLY_ONE),

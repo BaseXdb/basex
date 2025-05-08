@@ -189,7 +189,7 @@ public final class GroupBy extends Clause {
        * @return {@code true} if the compare as equal, {@code false} otherwise
        * @throws QueryException query exception
        */
-      private boolean eq(final Item[] items1, final Item[] items2, final DeepEqual[] deeps)
+      private static boolean eq(final Item[] items1, final Item[] items2, final DeepEqual[] deeps)
           throws QueryException {
 
         final int il = items1.length;

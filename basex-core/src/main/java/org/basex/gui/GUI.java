@@ -698,7 +698,7 @@ public final class GUI extends JFrame implements BaseXWindow {
   }
 
   /** Pattern for version check. */
-  private static final Pattern VERSION_CHECK = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
+  private static final Pattern VERSION_CHECK = Pattern.compile("^(Version )?([\\w.]*?)( .*|$)",
       Pattern.DOTALL);
 
   /**

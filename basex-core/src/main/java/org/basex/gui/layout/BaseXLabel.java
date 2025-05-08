@@ -92,7 +92,7 @@ public class BaseXLabel extends JLabel {
       while(tl > 0 && width < fm.stringWidth(txt + Text.DOTS)) txt = txt.substring(0, --tl);
       txt += Text.DOTS;
     }
-    super.setText(txt);
+    setText(txt);
     return this;
   }
 

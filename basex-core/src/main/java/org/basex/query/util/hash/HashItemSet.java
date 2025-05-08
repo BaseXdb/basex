@@ -37,17 +37,11 @@ public class HashItemSet extends ASet implements ItemSet {
    */
   public HashItemSet(final Mode mode, final InputInfo info, final long capacity) {
     super(capacity);
-    switch(mode) {
-      case ATOMIC:
-        this.equal = Item::atomicEqual;
-        break;
-      case EQUAL:
-        this.equal = (k1, k2) -> k1.equal(k2, null, info);
-        break;
-      default:
-        final DeepEqual deep = new DeepEqual(info);
-        this.equal = deep::equal;
-    }
+    equal = switch(mode) {
+      case ATOMIC -> Item::atomicEqual;
+      case EQUAL -> (k1, k2) -> k1.equal(k2, null, info);
+      default -> new DeepEqual(info)::equal;
+    };
     keys = new Item[capacity()];
   }
 

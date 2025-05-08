@@ -8,40 +8,42 @@ import org.basex.query.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class FTData extends QueryTest {
+abstract class FTTest extends QueryTest {
   /** Test document. */
-  protected static final String DOC =
-      "<fttest>\n" +
-      "  <co>\n" +
-      "     <w>xml in the first sentence. second sentence. " +
-      "third sentence. fourth sentence. fifth sentence.</w>\n" +
-      "     <w>XML xml XmL</w>\n" +
-      "     <w>we have xml databases</w>\n" +
-      "     <w>XML DATABASES</w>\n" +
-      "     <w>XML &amp; Databases</w>\n" +
-      "  </co>\n" +
-      "  <wc>\n" +
-      "     <w>hello</w>\n" +
-      "  </wc>\n" +
-      "  <sc>\n" +
-      "     <s>di\u00e4t-joghurt</s>\n" +
-      "     <s>diat-joghurt</s>\n" +
-      "  </sc>\n" +
-      "  <at><b>B</b>ad one</at>\n" +
-      "  <fti>adfas wordt. ook wel eens</fti>" +
-      "  <fti>wordt ook wel een s</fti>" +
-      "  <fti>adfad. wordt\nook wel.eens a</fti>" +
-      "  <fti>adfad wordt. ook\nwel een s adf</fti>" +
-      "  <fti>adfad wordt ook. wel een s</fti>" +
-      "  <atr key='value'/>" +
-      "  <w>the fifth sentence. fourth sentence. " +
-      "third sentence. second sentence. first sentence.</w>\n" +
-      "  <wld/>\n" +
-      "  <wld>yeah</wld>\n" +
-      "  <mix>A<sub/>B</mix>\n" +
-      "  <mix>B<sub/>A</mix>\n" +
-      "  <order>A B A</order>\n" +
-      "</fttest>";
+  protected static final String DOC = """
+    <fttest>
+      <co>
+         <w>xml in the first sentence. second sentence.
+    third sentence. fourth sentence. fifth sentence.</w>
+         <w>XML xml XmL</w>
+         <w>we have xml databases</w>
+         <w>XML DATABASES</w>
+         <w>XML &amp; Databases</w>
+      </co>
+      <wc>
+         <w>hello</w>
+      </wc>
+      <sc>
+         <s>di\u00e4t-joghurt</s>
+         <s>diat-joghurt</s>
+      </sc>
+      <at><b>B</b>ad one</at>
+      <fti>adfas wordt. ook wel eens</fti>
+      <fti>wordt ook wel een s</fti>
+      <fti>adfad. wordt
+    ook wel.eens a</fti>
+      <fti>adfad wordt. ook
+    wel een s adf</fti>
+      <fti>adfad wordt ook. wel een s</fti>
+      <atr key='value'/>
+      <w>the fifth sentence. fourth sentence.
+    third sentence. second sentence. first sentence.</w>
+      <wld/>
+      <wld>yeah</wld>
+      <mix>A<sub/>B</mix>
+      <mix>B<sub/>A</mix>
+      <order>A B A</order>
+    </fttest>""";
 
   static { create(DOC); }
 

@@ -44,7 +44,7 @@ final class RestXqSingleton {
     final QueryContext oldQc = qc();
     if(oldQc != null) {
       oldQc.stop();
-      do Performance.sleep(1); while(qc() == oldQc);
+      do Performance.sleep(10); while(qc() == oldQc);
     }
   }
 

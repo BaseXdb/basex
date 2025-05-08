@@ -37,7 +37,7 @@ public final class InspectStaticContext extends StandardFunc {
       case BASE_URI ->
         sctx.baseURI();
       case NAMESPACES -> {
-        MapBuilder mb = new MapBuilder();
+        final MapBuilder mb = new MapBuilder();
         Atts nsp = sctx.ns.list;
         int ns = nsp.size();
         for(int n = 0; n < ns; n++) {

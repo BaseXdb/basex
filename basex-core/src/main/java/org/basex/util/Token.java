@@ -235,7 +235,7 @@ public final class Token {
    * @return character length
    */
   public static int cl(final byte b) {
-    return b >= 0 || b < -64 ? 1 : b >= -64 && b < -32 ? 2 : b >= -32 && b < -16 ? 3 : 4;
+    return b >= 0 || b < -64 ? 1 : b < -32 ? 2 : b < -16 ? 3 : 4;
   }
 
   /**

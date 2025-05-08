@@ -176,10 +176,10 @@ public final class QueryContext extends Job implements Closeable {
     this.context = context;
     this.parent = parent;
     this.info = info != null ? info : new QueryInfo(context);
-    this.resources = parent != null ? parent.resources : new QueryResources(this);
-    this.ftPosData = parent != null ? parent.ftPosData : null;
-    this.shared = parent != null ? parent.shared : new SharedData();
-    this.user = context.user();
+    resources = parent != null ? parent.resources : new QueryResources(this);
+    ftPosData = parent != null ? parent.ftPosData : null;
+    shared = parent != null ? parent.shared : new SharedData();
+    user = context.user();
   }
 
   /**

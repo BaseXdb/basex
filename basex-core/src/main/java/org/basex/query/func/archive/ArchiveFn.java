@@ -101,7 +101,7 @@ abstract class ArchiveFn extends StandardFunc {
    * @return result of check
    * @throws IOException I/O exception
    */
-  final boolean localZip(final IO io) throws IOException {
+  static boolean localZip(final IO io) throws IOException {
     if(io instanceof IOFile) {
       if(io.hasSuffix(IO.ZIPSUFFIX)) return true;
       try(InputStream is = io.inputStream()) {

@@ -32,7 +32,7 @@ public class DbOptionMap extends StandardFunc {
    * @return item, or {@code null} for empty sequence
    * @throws QueryException query exception
    */
-  final Item item(final Object value) throws QueryException {
+  static Item item(final Object value) throws QueryException {
     if(value == null) return Empty.VALUE;
     if(value instanceof final Boolean bln) return Bln.get(bln);
     if(value instanceof final Integer itr) return Int.get(itr);

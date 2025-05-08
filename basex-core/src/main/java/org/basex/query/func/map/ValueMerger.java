@@ -1,13 +1,9 @@
 package org.basex.query.func.map;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Merger for map values.
@@ -47,108 +43,3 @@ public abstract class ValueMerger {
     return st;
   }
 }
-
-/**
- * Return {@code null} to indicate that insertion can be skipped.
- */
-final class UseFirst extends ValueMerger {
-  @Override
-  Value get(final Item key, final Value old, final Value value) {
-    return null;
-  }
-}
-
-/**
- * Return new value.
- */
-final class UseLast extends ValueMerger {
-  @Override
-  Value get(final Item key, final Value old, final Value value) {
-    return value;
-  }
-}
-
-/**
- * Concatenate values.
- */
-final class Combine extends ValueMerger {
-  /** Query context. */
-  private final QueryContext qc;
-
-  /**
-   * Constructor.
-   * @param qc query context
-   */
-  Combine(final QueryContext qc) {
-    this.qc = qc;
-  }
-
-  @Override
-  Value get(final Item key, final Value old, final Value value) {
-    return old.append(value, qc);
-  }
-
-  @Override
-  SeqType type(final SeqType st) {
-    return st.union(st.occ.add(st.occ));
-  }
-}
-
-/**
- * Reject merge.
- */
-final class Reject extends ValueMerger {
-  /** Input info (can be {@code null}). */
-  private final InputInfo info;
-
-  /**
-   * Constructor.
-   * @param info input info
-   */
-  Reject(final InputInfo info) {
-    this.info = info;
-  }
-
-  @Override
-  Value get(final Item key, final Value old, final Value value) throws QueryException {
-    throw MERGE_DUPLICATE_X.get(info, key);
-  }
-}
-
-/**
- * Invoke function to combine values.
- */
-final class Invoke extends ValueMerger {
-  /** Combiner function. */
-  private final FItem function;
-  /** Input info (can be {@code null}). */
-  private final InputInfo info;
-  /** Query context. */
-  private final QueryContext qc;
-  /** HOF arguments. */
-  private final HofArgs args;
-
-  /**
-   * Constructor.
-   * @param function combiner function
-   * @param info input info
-   * @param qc query context
-   */
-  Invoke(final FItem function, final InputInfo info, final QueryContext qc) {
-    this.function = function;
-    this.info = info;
-    this.qc = qc;
-    args = new HofArgs(2);
-  }
-
-  @Override
-  Value get(final Item key, final Value old, final Value value) throws QueryException {
-    return function.invoke(qc, info, args.set(0, old).set(1, value).get());
-  }
-
-  @Override
-  SeqType type(final SeqType st) {
-    return st.union(function.funcType().declType);
-  }
-}
-

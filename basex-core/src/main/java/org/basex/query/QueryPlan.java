@@ -162,7 +162,6 @@ public final class QueryPlan {
    */
   private void attachType(final FBuilder elem, final SeqType seqType, final long size,
       final Data data) {
-
     addAttribute(elem, TYPE, seqType);
     if(size != -1) addAttribute(elem, SIZE, size);
     if(data != null) addAttribute(elem, DATABASE, data.meta.name);

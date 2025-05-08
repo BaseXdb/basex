@@ -160,7 +160,7 @@ public final class DecFormatter extends FormatUtil {
    * @return the rendition value
    * @throws QueryException query exception
    */
-  private int[] renditionValue(final String name, final byte[] value, final InputInfo info)
+  private static int[] renditionValue(final String name, final byte[] value, final InputInfo info)
       throws QueryException {
     if(value.length != 0) {
       final int[] cps = cps(value);

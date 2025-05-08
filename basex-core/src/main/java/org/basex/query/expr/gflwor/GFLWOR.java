@@ -8,6 +8,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -100,12 +101,12 @@ public final class GFLWOR extends ParseExpr {
       while(iter.hasNext()) iter.next().compile(cc);
     } catch(final QueryException ex) {
       iter.remove();
-      clauseError(ex, iter, cc);
+      clauseError(ex, iter);
     }
     try {
       rtrn = rtrn.compile(cc);
     } catch(final QueryException ex) {
-      clauseError(ex, iter, cc);
+      clauseError(ex, iter);
     }
     return optimize(cc);
   }
@@ -988,7 +989,7 @@ public final class GFLWOR extends ParseExpr {
         }
       } catch(final QueryException ex) {
         iter.remove();
-        return clauseError(ex, iter, ic.cc);
+        return clauseError(ex, iter);
       }
     }
 
@@ -999,7 +1000,7 @@ public final class GFLWOR extends ParseExpr {
         changed = true;
       }
     } catch(final QueryException ex) {
-      return clauseError(ex, iter, ic.cc);
+      return clauseError(ex, iter);
     }
 
     return changed;
@@ -1009,13 +1010,11 @@ public final class GFLWOR extends ParseExpr {
    * Tries to recover from a compile-time exception inside a FLWOR clause.
    * @param ex thrown exception
    * @param iter iterator positioned where the failing clause was before
-   * @param cc compilation context
    * @return {@code true} if the GFLWOR expression has to stay
    * @throws QueryException query exception if the whole expression fails
    */
-  private boolean clauseError(final QueryException ex, final ListIterator<Clause> iter,
-      final CompileContext cc) throws QueryException {
-
+  private boolean clauseError(final QueryException ex, final ListIterator<Clause> iter)
+      throws QueryException {
     // check if an outer clause can prevent the error
     while(iter.hasPrevious()) {
       final Clause b4 = iter.previous();
@@ -1025,7 +1024,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        rtrn = cc.error(ex, rtrn);
+        rtrn = FnError.get(ex, rtrn);
         return true;
       }
     }

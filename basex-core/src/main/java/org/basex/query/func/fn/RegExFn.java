@@ -166,7 +166,7 @@ abstract class RegExFn extends StandardFunc {
      * @param assertionFlags inside of assertion indicators
      */
     GroupInfo(final int[] parentGroup, final boolean[] assertionFlags) {
-      this.parentGroups = parentGroup;
+      parentGroups = parentGroup;
       this.assertionFlags = assertionFlags;
     }
   }
@@ -272,22 +272,20 @@ abstract class RegExFn extends StandardFunc {
         case '(':
           switch(nxtCp()) {
             case '?':
-              switch(nxtCp()) {
-                case '=':
-                case '!':
-                  return Token.ASSRT_LPAREN;
-                case '<':
-                  return switch(nxtCp()) {
-                    case '=', '!' -> Token.ASSRT_LPAREN;
-                    default -> {
-                      reset();
-                      yield Token.CAPT_LPAREN;
-                    }
-                  };
-                default:
+              return switch(nxtCp()) {
+                case '=', '!' -> Token.ASSRT_LPAREN;
+                case '<' -> switch(nxtCp()) {
+                                    case '=', '!' -> Token.ASSRT_LPAREN;
+                                    default -> {
+                                      reset();
+                                      yield Token.CAPT_LPAREN;
+                                    }
+                                  };
+                default -> {
                   reset();
-                  return Token.LPAREN;
-              }
+                  yield Token.LPAREN;
+                }
+              };
             default:
               reset();
               return Token.CAPT_LPAREN;

@@ -15,6 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 interface CalcOpt {
   /**
    * Returns an optimized arithmetic calculation.

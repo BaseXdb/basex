@@ -3,6 +3,7 @@ package org.basex.query;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.var.*;
@@ -120,7 +121,7 @@ public final class InlineContext {
         inlined = exprs[e].inline(this);
       } catch(final QueryException ex) {
         if(!error) throw ex;
-        inlined = cc.error(ex, exprs[e]);
+        inlined = FnError.get(ex, exprs[e]);
       }
       if(inlined != null) {
         exprs[e] = inlined;

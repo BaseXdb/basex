@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -73,7 +74,7 @@ public final class SwitchGroup extends Arr {
     try {
       rtrn = tc.check(rtrn, cc);
     } catch(final QueryException ex) {
-      rtrn = cc.error(ex, rtrn);
+      rtrn = FnError.get(ex, rtrn);
     }
     // returned expression will be handled Switch#typeCheck
     if(rtrn == null) return null;

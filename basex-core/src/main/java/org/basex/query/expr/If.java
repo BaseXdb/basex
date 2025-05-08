@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpG.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -247,7 +248,7 @@ public final class If extends Arr {
       try {
         expr = tc.check(expr, cc);
       } catch(final QueryException ex) {
-        expr = cc.error(ex, expr);
+        expr = FnError.get(ex, expr);
       }
       if(expr != null) {
         changed = true;

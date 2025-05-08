@@ -44,7 +44,7 @@ abstract class ContextModifier {
    * @throws QueryException query exception
    */
   synchronized void add(final Update update, final QueryContext qc) throws QueryException {
-    if(update instanceof DataUpdate dataUp) {
+    if(update instanceof final DataUpdate dataUp) {
       // create temporary mem data instance if not available yet
       if(memData == null) memData = new MemData(qc.context.options);
       dbUpdates.computeIfAbsent(dataUp.data(), d -> new DataUpdates(d, qc)).add(dataUp, memData);

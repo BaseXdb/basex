@@ -67,7 +67,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
     // try to treat items as 32-bit integers
     final LongList list = new LongList();
     IntSet ints = new IntSet();
-    Item item = null;
+    Item item;
     while((item = qc.next(values)) != null) {
       final int v = toInt(item);
       if(v == Integer.MIN_VALUE) break;

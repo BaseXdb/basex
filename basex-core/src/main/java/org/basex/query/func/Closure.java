@@ -11,6 +11,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -137,7 +138,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     try {
       expr = expr.compile(cc);
     } catch(final QueryException ex) {
-      expr = cc.error(ex, expr);
+      expr = FnError.get(ex, expr);
     } finally {
       cc.removeScope(this);
     }
@@ -187,7 +188,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // add all newly added bindings
       if(add != null) global.putAll(add);
     } catch(final QueryException ex) {
-      expr = cc.error(ex, expr);
+      expr = FnError.get(ex, expr);
     } finally {
       cc.removeScope(this);
     }
@@ -203,7 +204,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       try {
         return cc.preEval(this);
       } catch(final QueryException ex) {
-        expr = cc.error(ex, expr);
+        expr = FnError.get(ex, expr);
       }
     }
     return this;

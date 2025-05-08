@@ -682,7 +682,7 @@ public final class SeqType {
     if(zero()) return !st.oneOrMore();
     if(!occ.instanceOf(st.occ)) return false;
     if(type instanceof final ChoiceItemType cit) return cit.instanceOf(st.with(EXACTLY_ONE));
-    if(st.type instanceof final ChoiceItemType cit) return cit.hasInstance(this.with(EXACTLY_ONE));
+    if(st.type instanceof final ChoiceItemType cit) return cit.hasInstance(with(EXACTLY_ONE));
     return type.instanceOf(st.type) && kindInstanceOf(st);
   }
 

@@ -132,6 +132,7 @@ public abstract class ACreate extends Command {
    * @author BaseX Team, BSD License
    * @author Christian Gruen
    */
+  @FunctionalInterface
   interface Code {
     /**
      * Runs the update.

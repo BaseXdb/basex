@@ -61,7 +61,7 @@ public class FnDuplicateValues extends StandardFunc {
     // try to treat items as 32-bit integers
     final LongList list = new LongList();
     IntSet ints1 = new IntSet(), ints2 = new IntSet();
-    Item item = null;
+    Item item;
     while((item = qc.next(values)) != null) {
       final int v = toInt(item);
       if(v == Integer.MIN_VALUE) break;

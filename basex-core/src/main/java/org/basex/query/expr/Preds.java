@@ -11,6 +11,7 @@ import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -137,7 +138,7 @@ public abstract class Preds extends Arr {
         expr = new InlineContext(null, root, cc).inline(expr);
       } catch(final QueryException ex) {
         // replace original expression with error
-        expr = cc.error(ex, expr);
+        expr = FnError.get(ex, expr);
       }
     }
 

@@ -431,7 +431,7 @@ public final class CsvRoundtripTest extends SandboxTest {
    * @param options options
    * @param expected expected result
    */
-  private void roundtrip(final Function function, final String input, final String options,
+  private static void roundtrip(final Function function, final String input, final String options,
       final String expected) {
 
     // parsing

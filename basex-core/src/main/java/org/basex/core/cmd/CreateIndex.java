@@ -62,7 +62,7 @@ public final class CreateIndex extends ACreate {
     data.meta.splitsize = options.get(MainOptions.SPLITSIZE);
 
     return update(data, () -> {
-      create(type, data, CreateIndex.this);
+      create(type, data, this);
       return info(INDEX_CREATED_X_X, type, jc().performance);
     });
   }

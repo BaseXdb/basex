@@ -276,7 +276,7 @@ public abstract class StandardFunc extends Arr {
    * @return original expression or refined function item
    * @throws QueryException query context
    */
-  public final Expr refineFunc(final Expr expr, final CompileContext cc, final SeqType... argTypes)
+  public static Expr refineFunc(final Expr expr, final CompileContext cc, final SeqType... argTypes)
       throws QueryException {
     return expr instanceof final FuncItem fi ? fi.refine(argTypes, cc) : expr;
   }
@@ -286,7 +286,7 @@ public abstract class StandardFunc extends Arr {
    * @param expr function
    * @return arity, or {@code -1} if unknown
    */
-  public int arity(final Expr expr) {
+  public static int arity(final Expr expr) {
     final FuncType ft = expr.funcType();
     if(ft != null) {
       final SeqType[] at = ft.argTypes;

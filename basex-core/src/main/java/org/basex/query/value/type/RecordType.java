@@ -51,7 +51,7 @@ public final class RecordType extends MapType {
     this.extensible = extensible;
     this.fields = fields;
     this.name = name;
-    this.info = null;
+    info = null;
   }
 
   /**
@@ -61,8 +61,8 @@ public final class RecordType extends MapType {
    */
   public RecordType(final QNm name, final InputInfo info) {
     super(AtomType.ANY_ATOMIC_TYPE, SeqType.ITEM_ZM, false);
-    this.extensible = true;
-    this.fields = new TokenObjectMap<>();
+    extensible = true;
+    fields = new TokenObjectMap<>();
     this.name = name;
     this.info = info;
   }

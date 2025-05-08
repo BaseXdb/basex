@@ -1,5 +1,6 @@
 package org.basex.query.func.map;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
@@ -142,7 +143,7 @@ public class MapMerge extends StandardFunc {
     if(vm != null) return vm;
     // function
     final Value duplicates = options.get(MergeOptions.DUPLICATES);
-    if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc), info, qc);
+    if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc), qc);
     // fixed option
     final String string = duplicates.isEmpty() ? dflt.toString() : toString(duplicates, qc);
     final Duplicates value = Enums.get(Duplicates.class, string);
@@ -150,7 +151,7 @@ public class MapMerge extends StandardFunc {
         new EnumType(Duplicates.values()), info);
 
     return switch(value) {
-      case REJECT -> new Reject(info);
+      case REJECT -> new Reject();
       case COMBINE -> new Combine(qc);
       case USE_FIRST -> new UseFirst();
       default -> new UseLast();
@@ -170,5 +171,94 @@ public class MapMerge extends StandardFunc {
   @Override
   public int hofIndex() {
     return defined(1) ? Integer.MAX_VALUE : -1;
+  }
+
+  /**
+   * Return {@code null} to indicate that insertion can be skipped.
+   */
+  static final class UseFirst extends ValueMerger {
+    @Override
+    Value get(final Item key, final Value old, final Value value) {
+      return null;
+    }
+  }
+
+  /**
+   * Return new value.
+   */
+  static final class UseLast extends ValueMerger {
+    @Override
+    Value get(final Item key, final Value old, final Value value) {
+      return value;
+    }
+  }
+
+  /**
+   * Concatenate values.
+   */
+  static final class Combine extends ValueMerger {
+    /** Query context. */
+    private final QueryContext qc;
+
+    /**
+     * Constructor.
+     * @param qc query context
+     */
+    Combine(final QueryContext qc) {
+      this.qc = qc;
+    }
+
+    @Override
+    Value get(final Item key, final Value old, final Value value) {
+      return old.append(value, qc);
+    }
+
+    @Override
+    SeqType type(final SeqType st) {
+      return st.union(st.occ.add(st.occ));
+    }
+  }
+
+  /**
+   * Reject merge.
+   */
+  final class Reject extends ValueMerger {
+    @Override
+    Value get(final Item key, final Value old, final Value value) throws QueryException {
+      throw MERGE_DUPLICATE_X.get(info, key);
+    }
+  }
+
+  /**
+   * Invoke function to combine values.
+   */
+  final class Invoke extends ValueMerger {
+    /** Combiner function. */
+    private final FItem function;
+    /** Query context. */
+    private final QueryContext qc;
+    /** HOF arguments. */
+    private final HofArgs args;
+
+    /**
+     * Constructor.
+     * @param function combiner function
+     * @param qc query context
+     */
+    Invoke(final FItem function, final QueryContext qc) {
+      this.function = function;
+      this.qc = qc;
+      args = new HofArgs(2);
+    }
+
+    @Override
+    Value get(final Item key, final Value old, final Value value) throws QueryException {
+      return function.invoke(qc, info, args.set(0, old).set(1, value).get());
+    }
+
+    @Override
+    SeqType type(final SeqType st) {
+      return st.union(function.funcType().declType);
+    }
   }
 }

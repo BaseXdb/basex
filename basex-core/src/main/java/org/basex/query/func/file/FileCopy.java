@@ -62,8 +62,8 @@ public class FileCopy extends FileFn {
    * @param qc query context
    * @throws IOException I/O exception
    */
-  private void relocate(final Path src, final Path trg, final boolean copy, final QueryContext qc)
-      throws IOException {
+  private static void relocate(final Path src, final Path trg, final boolean copy,
+      final QueryContext qc) throws IOException {
 
     if(Files.isDirectory(src)) {
       if(!Files.exists(trg)) Files.createDirectory(trg);

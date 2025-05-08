@@ -6,6 +6,7 @@ import org.basex.query.value.item.*;
 /**
  * Interface for resolving URIs in query modules.
  */
+@FunctionalInterface
 public interface UriResolver {
   /**
    * Locates a file, given the optional namespace URI and a path to the location.

@@ -65,9 +65,9 @@ public class MapType extends FType {
    */
   public void finalizeTypes(final Type kt, final SeqType vt) {
     if(isFinal) throw Util.notExpected();
-    this.keyType = kt;
-    this.valueType = vt;
-    this.isFinal = true;
+    keyType = kt;
+    valueType = vt;
+    isFinal = true;
   }
 
   /**

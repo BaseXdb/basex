@@ -38,7 +38,7 @@ public final class OptimizeAll extends ACreate {
     final Data data = context.data();
     if(!update(data, () -> {
       try {
-        optimizeAll(data, context, options, OptimizeAll.this);
+        optimizeAll(data, context, options, this);
         return true;
       } finally {
         context.closeDB();

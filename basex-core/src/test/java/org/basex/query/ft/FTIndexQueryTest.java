@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
-public final class FTIndexQueryTest extends FTData {
+public final class FTIndexQueryTest extends FTTest {
   static {
     create(DOC);
     queries = QUERIES;
@@ -35,7 +35,7 @@ public final class FTIndexQueryTest extends FTData {
   }
 
   /**
-   * Runs all tests from {@link FTTest}.
+   * Runs all tests from {@link FTSeqTest}.
    */
   @Test public void testFTTest() {
     init(DOC);

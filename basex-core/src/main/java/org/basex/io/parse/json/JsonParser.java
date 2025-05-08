@@ -499,7 +499,7 @@ public final class JsonParser {
    * @throws IOException I/O exception
    */
   private boolean consume(final int cp) throws IOException {
-    if(!(cp == current)) return false;
+    if(cp != current) return false;
     consume();
     return true;
   }

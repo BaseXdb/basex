@@ -318,20 +318,9 @@ public final class CompileContext {
   }
 
   /**
-   * Creates an error function instance.
-   * @param ex exception to be raised
-   * @param expr expression that caused the error message
-   * @return function
-   */
-  public StandardFunc error(final QueryException ex, final Expr expr) {
-    Util.debug(ex);
-    return FnError.get(ex, expr.seqType());
-  }
-
-  /**
    * Compiles an expression or creates an error.
    * @param expr expression
-   * @param error return error
+   * @param error return error instead of {@code fn:error} instance
    * @return compiled expression or error.
    * @throws QueryException query exception
    */
@@ -341,7 +330,7 @@ public final class CompileContext {
     } catch(final QueryException ex) {
       // replace original expression with error
       if(error) throw ex;
-      return error(ex, expr);
+      return FnError.get(ex, expr);
     }
   }
 

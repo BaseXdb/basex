@@ -630,7 +630,7 @@ public final class TextEditor {
     // adopt current indentation
     final int ind = open();
     if(ind != 0) {
-      v = new TokenBuilder().addAll(v.split("\n"), "\n".concat(" ".repeat(ind))).toString();
+      v = new TokenBuilder().addAll(v.split("\n"), "\n" + " ".repeat(ind)).toString();
     }
     // delete old string, add new one
     replace(p, pos, v);

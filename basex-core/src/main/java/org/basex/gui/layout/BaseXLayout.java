@@ -283,6 +283,7 @@ public final class BaseXLayout {
    * @author BaseX Team, BSD License
    * @author Christian Gruen
    */
+  @FunctionalInterface
   public interface DropHandler {
     /**
      * Drops a file.

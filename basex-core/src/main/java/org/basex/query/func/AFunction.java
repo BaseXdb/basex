@@ -9,6 +9,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 public interface AFunction {
   /**
    * Returns the function definition.

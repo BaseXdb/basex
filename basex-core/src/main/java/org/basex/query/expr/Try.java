@@ -57,7 +57,7 @@ public final class Try extends Single {
     try {
       super.compile(cc);
     } catch(final QueryException ex) {
-      expr = cc.error(ex, expr);
+      expr = FnError.get(ex, expr);
     }
     fnlly = fnlly.compile(cc);
     return optimize(cc);
@@ -147,7 +147,7 @@ public final class Try extends Single {
     try {
       inlined = expr.inline(ic);
     } catch(final QueryException ex) {
-      inlined = ic.cc.error(ex, expr);
+      inlined = FnError.get(ex, expr);
     }
     if(inlined != null) expr = inlined;
 

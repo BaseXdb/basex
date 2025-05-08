@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
@@ -120,7 +121,7 @@ public abstract class Mapping extends Arr {
         inlined = exprs[e].inline(ic);
       } catch(final QueryException ex) {
         // replace original expression with error
-        inlined = cc.error(ex, exprs[e]);
+        inlined = FnError.get(ex, exprs[e]);
       }
       if(inlined != null) {
         exprs[e] = inlined;
@@ -201,7 +202,7 @@ public abstract class Mapping extends Arr {
    * @param cc compilation context
    * @return resulting expression or {@code null}
    */
-  final Expr inline(final Expr expr, final Expr next, final CompileContext cc) {
+  static Expr inline(final Expr expr, final Expr next, final CompileContext cc) {
     /* inline values:
      *   'a' ! (. = 'a')  ->  'a'  = 'a'
      *   map { } ! ?*      ->  map { }?*
@@ -227,7 +228,7 @@ public abstract class Mapping extends Arr {
           inlined = ic.inline(next);
         } catch(final QueryException ex) {
           // replace original expression with error
-          inlined = cc.error(ex, next);
+          inlined = FnError.get(ex, next);
         }
         return inlined;
       }

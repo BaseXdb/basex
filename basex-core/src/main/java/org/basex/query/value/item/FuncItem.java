@@ -94,7 +94,7 @@ public final class FuncItem extends FItem implements Scope {
     this.stackSize = stackSize;
     this.name = name;
     this.focus = focus;
-    this.simple = !expr.has(Flag.CTX);
+    simple = !expr.has(Flag.CTX);
   }
 
   /**

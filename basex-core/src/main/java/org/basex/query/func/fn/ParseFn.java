@@ -91,9 +91,12 @@ public abstract class ParseFn extends StandardFunc {
     try(InputStream is = io.inputStream(); TextInput ti = normalize ? new NewlineInput(io) :
       new TextInput(io)) {
       return parse(ti.encoding(encoding).validate(true), options, qc);
+    } catch(final DecodingException ex) {
+      throw WHICHCHARS_X.get(info, ex);
+    } catch(final InputException ex) {
+      throw error.get(info, ex);
     } catch(final IOException ex) {
-      if(ex instanceof DecodingException) throw WHICHCHARS_X.get(info, ex);
-      if(ex instanceof InputException) throw error.get(info, ex);
+      Util.debug(ex);
       throw RESNF_X.get(info, io);
     }
   }
