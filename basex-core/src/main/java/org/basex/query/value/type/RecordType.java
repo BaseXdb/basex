@@ -430,35 +430,12 @@ public final class RecordType extends MapType {
 
   /**
    * An ordered pair of objects.
+   * @param o1 first object.
+   * @param o2 second object.
    */
-  private static final class Pair {
-    /** First object. */
-    private final Object o1;
-    /** Second object. */
-    private final Object o2;
-
+  private record Pair(Object o1, Object o2) {
     /**
-     * Constructor.
-     * @param o1 first object
-     * @param o2 second object
-     */
-    Pair(final Object o1, final Object o2) {
-      this.o1 = o1;
-      this.o2 = o2;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-      return this == obj || obj instanceof final Pair p && o1 == p.o1 && o2 == p.o2;
-    }
-
-    @Override
-    public int hashCode() {
-      return o1.hashCode() + o2.hashCode();
-    }
-
-    /**
-     * Add this {@code Pair} to the given set of {@code Pair}s, creating a new set, if the given set
+     * Adds this {@code Pair} to the given set of {@code Pair}s, creating a new set if the given set
      * is empty.
      * @param pairs set of {@code Pair}s
      * @return the augmented set of pairs

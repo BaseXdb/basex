@@ -78,7 +78,7 @@ public final class EnumType implements Type {
     if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
     if(AtomType.STRING.instanceOf(type)) return true;
     if(!(type instanceof final EnumType et)) return false;
-      for(final byte[] value : values) {
+    for(final byte[] value : values) {
       if(!et.values.contains(value)) return false;
     }
     return true;

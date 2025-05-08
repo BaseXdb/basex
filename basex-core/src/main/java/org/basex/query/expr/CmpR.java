@@ -218,7 +218,7 @@ public final class CmpR extends Single {
     // estimate costs for range access; all values out of range: no results
     final NumericRange nr = new NumericRange(type, Math.max(min, key.min), Math.min(max, key.max));
     // skip queries with no results
-    if(nr.min > nr.max || nr.max < key.min || nr.min > key.max) {
+    if(nr.min() > nr.max() || nr.max() < key.min || nr.min() > key.max) {
       ii.costs = IndexCosts.get(0);
       return true;
     }
@@ -233,7 +233,7 @@ public final class CmpR extends Single {
     if(mnl == -1 || mnl != mxl) return false;
 
     // don't use index if min/max values are infinite
-    if(Token.token((int) nr.min).length != Token.token((int) nr.max).length) return false;
+    if(Token.token((int) nr.min()).length != Token.token((int) nr.max()).length) return false;
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add('[').add(min).add(',').add(max).add(']');

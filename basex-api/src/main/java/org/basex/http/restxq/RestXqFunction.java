@@ -219,16 +219,16 @@ public final class RestXqFunction extends WebFunction {
 
     // bind query and form parameters
     for(final WebParam rxp : queryParams) {
-      bind(rxp, args, conn.requestCtx.queryValues().get(Str.get(rxp.name)), qc);
+      bind(rxp, args, conn.requestCtx.queryValues().get(Str.get(rxp.name())), qc);
     }
     for(final WebParam rxp : formParams) {
-      bind(rxp, args, conn.requestCtx.formValues(mopts).get(Str.get(rxp.name)), qc);
+      bind(rxp, args, conn.requestCtx.formValues(mopts).get(Str.get(rxp.name())), qc);
     }
 
     // bind header parameters
     for(final WebParam rxp : headerParams) {
       final TokenList tl = new TokenList();
-      for(final String header : Collections.list(conn.request.getHeaders(rxp.name))) {
+      for(final String header : Collections.list(conn.request.getHeaders(rxp.name()))) {
         for(final String s : header.split(", *")) tl.add(s);
       }
       bind(rxp, args, StrSeq.get(tl), qc);
@@ -240,7 +240,7 @@ public final class RestXqFunction extends WebFunction {
       Value value = Empty.VALUE;
       if(cookies != null) {
         for(final Cookie c : cookies) {
-          if(rxp.name.equals(c.getName())) value = Str.get(c.getValue());
+          if(rxp.name().equals(c.getName())) value = Str.get(c.getValue());
         }
       }
       bind(rxp, args, value, qc);
@@ -249,7 +249,7 @@ public final class RestXqFunction extends WebFunction {
     // bind errors
     final XQMap errors = ext instanceof final QueryException qe ? qe.map() : XQMap.empty();
     for(final WebParam rxp : errorParams) {
-      bind(rxp, args, errors.get(Str.get(rxp.name)), qc);
+      bind(rxp, args, errors.get(Str.get(rxp.name())), qc);
     }
 
     // bind permission information
@@ -400,8 +400,8 @@ public final class RestXqFunction extends WebFunction {
    */
   private void bind(final WebParam param, final Expr[] args, final Value value,
       final QueryContext qc) throws QueryException {
-    bind(param.var, args, value.isEmpty() ? param.value : value, qc,
-      "Value of '" + param.name + "'");
+    bind(param.var(), args, value.isEmpty() ? param.value() : value, qc,
+      "Value of '" + param.name() + "'");
   }
 
   /**

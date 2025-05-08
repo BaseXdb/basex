@@ -270,8 +270,8 @@ public final class TreeView extends View {
 
         if(big) {
           final TreeRect r = lr[0];
-          final int ww = r.x + r.w - 1;
-          final int x = r.x + 1;
+          final int ww = r.x() + r.w() - 1;
+          final int x = r.x() + 1;
           drawBigRectSquares(tg, lv, x, ww, 4);
         }
       }
@@ -351,7 +351,7 @@ public final class TreeView extends View {
   private void drawRectangle(final Graphics g, final int rn, final int lv, final TreeRect r,
       final int pre, final Draw t) {
 
-    final int y = getYperLevel(lv), h = nodeHeight, xx = r.x, ww = r.w;
+    final int y = getYperLevel(lv), h = nodeHeight, xx = r.x(), ww = r.w();
     final boolean marked = marked(xx, y), big = tr.bigRect(sub, rn, lv);
 
     boolean border = false, label = !big && fontHeight <= h + 2;
@@ -373,7 +373,7 @@ public final class TreeView extends View {
         fill = !big && !marked;
         break;
       case MARK:
-        borderColor = h > 2 && r.w > 4 ? colormark1A : colormark1;
+        borderColor = h > 2 && r.w() > 4 ? colormark1A : colormark1;
         fillColor = colormark1;
         border = true;
         fill = true;
@@ -429,18 +429,18 @@ public final class TreeView extends View {
    */
   private void drawRectangleText(final Graphics g, final int lv, final TreeRect r, final int pre) {
     String s = Token.string(tr.text(pre)).trim();
-    if(r.w < BaseXLayout.width(g, s) && r.w < BaseXLayout.width(
+    if(r.w() < BaseXLayout.width(g, s) && r.w() < BaseXLayout.width(
         g, ".." + s.substring(s.length() - 1)) + MIN_TXT_SPACE) return;
 
-    final int x = r.x;
+    final int x = r.x();
     final int y = getYperLevel(lv);
-    final int rm = x + r.w / 2;
+    final int rm = x + r.w() / 2;
 
     int tw = BaseXLayout.width(g, s);
 
-    if(tw > r.w) {
+    if(tw > r.w()) {
       s += "..";
-      while((tw = BaseXLayout.width(g, s)) + MIN_TXT_SPACE > r.w
+      while((tw = BaseXLayout.width(g, s)) + MIN_TXT_SPACE > r.w()
           && s.length() > 3) {
         s = s.substring(0, (s.length() - 2) / 2) + "..";
       }
@@ -488,12 +488,12 @@ public final class TreeView extends View {
           if(tr.bigRect(sub, r, i)) {
             if(rl > 1) {
               final TreeBorder tb = sub.treeBorder(r, i);
-              final int si = tb.size;
+              final int si = tb.size();
               for(int n = 0; n < si; ++n) {
                 list.add(sub.prePerIndex(r, i, n));
               }
             } else {
-              final int mw = rlv[0].w;
+              final int mw = rlv[0].w();
               int sPrePos = (int) (s * (x - start) / (double) mw);
               int ePrePos = (int) (s * (x - start + w) / (double) mw);
 
@@ -556,9 +556,9 @@ public final class TreeView extends View {
 
             if(ix > -1) {
               li.remove();
-              final int x = (int) (rect.w * ix / (double) sub.levelSize(rn, lv));
+              final int x = (int) (rect.w() * ix / (double) sub.levelSize(rn, lv));
               mg.setColor(colormark1);
-              mg.fillRect(rect.x + x, y, 2, nodeHeight + 1);
+              mg.fillRect(rect.x() + x, y, 2, nodeHeight + 1);
             }
           }
         } else {
@@ -587,7 +587,7 @@ public final class TreeView extends View {
   private int getBigRectPosition(final int rn, final int lv, final int pre, final TreeRect r) {
     final int idx = sub.preIndex(rn, lv, pre);
     final double ratio = idx / (double) sub.levelSize(rn, lv);
-    return r.x + (int) Math.round(r.w * ratio) + 1;
+    return r.x() + (int) Math.round(r.w() * ratio) + 1;
   }
 
   /**
@@ -622,7 +622,7 @@ public final class TreeView extends View {
 
     final int y = getYperLevel(lv);
     g.setColor(color(7));
-    g.drawLine(px, getYperLevel(lv + 1) - 1, brx == -1 ? (2 * r.x + r.w) / 2
+    g.drawLine(px, getYperLevel(lv + 1) - 1, brx == -1 ? (2 * r.x() + r.w()) / 2
         : brx, y + nodeHeight + 1);
   }
 
@@ -686,7 +686,7 @@ public final class TreeView extends View {
   private void drawThumbnails(final Graphics g, final int lv, final int pre, final TreeRect r,
       final boolean root) {
 
-    final int x = r.x;
+    final int x = r.x();
     final int y = getYperLevel(lv);
     final int h = nodeHeight;
     final String s = Token.string(tr.text(pre));
@@ -700,13 +700,13 @@ public final class TreeView extends View {
       g.setColor(color(6));
       g.drawRect(x - 1, y + h + 1, w + 3, fh + 1);
       g.setColor(BACK);
-      g.drawString(s, r.x + 1, (int) (y + h + (double) fh) - 2);
+      g.drawString(s, r.x() + 1, (int) (y + h + (double) fh) - 2);
     } else {
-      g.fillRect(r.x, y - fh, w + 2, fh);
+      g.fillRect(r.x(), y - fh, w + 2, fh);
       g.setColor(color(6));
-      g.drawRect(r.x - 1, y - fh - 1, w + 3, fh + 1);
+      g.drawRect(r.x() - 1, y - fh - 1, w + 3, fh + 1);
       g.setColor(BACK);
-      g.drawString(s, r.x + 1, (int) (y - h / (double) fh) - 2);
+      g.drawString(s, r.x() + 1, (int) (y - h / (double) fh) - 2);
     }
   }
 
@@ -734,8 +734,8 @@ public final class TreeView extends View {
         drawBigRectDescendants(g, rn, lvd, sbo, px, t);
       } else {
         final TreeBorder bo = sbo[1], bos = sub.treeBorder(rn, lvd);
-        final int bs = bo.start >= bos.start ? bo.start - bos.start : bo.start;
-        for(int j = 0; j < bo.size; ++j) {
+        final int bs = bo.start() >= bos.start() ? bo.start() - bos.start() : bo.start();
+        for(int j = 0; j < bo.size(); ++j) {
           final int dp = sub.prePerIndex(rn, lvd, j + bs);
 
           final TreeRect dr = tr.treeRectPerIndex(rn, lvd, j + bs);
@@ -756,7 +756,7 @@ public final class TreeView extends View {
    * @return center
    */
   private static int getRectCenter(final TreeRect r) {
-    return (2 * r.x + r.w) / 2;
+    return (2 * r.x() + r.w()) / 2;
   }
 
   /**
@@ -779,9 +779,9 @@ public final class TreeView extends View {
       final TreeBorder bos = sub.treeBorder(rn, lvv), bo = subt[i];
 
       final TreeRect r = tr.treeRectPerIndex(rn, lvv, 0);
-      final int bs = bo.start - bos.start;
-      final double sti = bs / (double) bos.size, eni = (bs + bo.size) / (double) bos.size;
-      final int df = r.x + (int) (r.w * sti), dt = r.x + (int) (r.w * eni);
+      final int bs = bo.start() - bos.start();
+      final double sti = bs / (double) bos.size(), eni = (bs + bo.size()) / (double) bos.size();
+      final int df = r.x() + (int) (r.w() * sti), dt = r.x() + (int) (r.w() * eni);
       final int ww = Math.max(dt - df, 2);
 
       if(levelDistance >= MIN_NODE_DIST_CONN)
@@ -799,7 +799,7 @@ public final class TreeView extends View {
 
       if(lvv + 1 < sub.subtreeHeight(rn) && !tr.bigRect(sub, rn, lvv + 1)) {
         final Data d = gui.context.data();
-        for(int j = bs; j < bs + bo.size; ++j) {
+        for(int j = bs; j < bs + bo.size(); ++j) {
           final int pre = sub.prePerIndex(rn, lvv, j);
           final int pos = getBigRectPosition(rn, lvv, pre, r);
           final int k = d.kind(pre);
@@ -842,8 +842,8 @@ public final class TreeView extends View {
 
     final int pary = getYperLevel(lv - 1) + nodeHeight;
     final int prey = getYperLevel(lv) - 1;
-    final int boRight = r.x + r.w + BORDER_PADDING - 2;
-    final int boLeft = r.x + BORDER_PADDING;
+    final int boRight = r.x() + r.w() + BORDER_PADDING - 2;
+    final int boLeft = r.x() + BORDER_PADDING;
     final int boTop = prey + 1;
 
     final Color c = getConnectionColor(t);
@@ -1016,7 +1016,7 @@ public final class TreeView extends View {
    * @return size
    */
   private int getHitBigRectNodesNum(final int rn, final int lv, final TreeRect r) {
-    final int w = r.w;
+    final int w = r.w();
     final int ls = sub.levelSize(rn, lv);
     return Math.max(ls / Math.max(w, 1), 1);
   }
