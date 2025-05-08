@@ -455,7 +455,7 @@ public final class RewritingsTest extends SandboxTest {
     check("<a><b/></a>/*[position() <  position()]", "", empty());
     check("<a><b/></a>/*[position() != position()]", "", empty());
 
-    // GH-2224: Unexpected exception of arithmetic operations with positional expression
+    // GH-2224: Unexpected exception, arithmetic operations with positional expression
     check("document { <X/> }//X[not(position() * 2 = last())]", "<X/>");
     check("document { <X/> }//X[not(position() + position() = last())]", "<X/>");
   }
@@ -1675,7 +1675,7 @@ public final class RewritingsTest extends SandboxTest {
     check("boolean(count(" + wrap("A") + "[. >= 'A']) != 0)", true, empty(COUNT));
   }
 
-  /** Switch Expression: Rewrite to if expression. */
+  /** Switch Expression: Rewrite to 'if' expression. */
   @Test public void gh1877() {
     check("switch(<_/>) case '' return 1 default return 2", 1, root(If.class));
     check("switch(<_/>) case '' case 'x' return 1 default return 2", 1, root(If.class));
@@ -3086,7 +3086,7 @@ public final class RewritingsTest extends SandboxTest {
     check("boolean(<a><b>x</b></a>/*[@nr = 0] ! string())", false, exists(CmpSimpleG.class));
     check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(DualMap.class));
 
-    // GH-2215: Unexpected exception of mapping double attributes
+    // GH-2215: Unexpected exception, mapping double attributes
     check("boolean((<a/> ! (a, b)))", false, exists(Pipeline.class));
     check("boolean(count(<T/>//*[@id = '1'] ! (@a, @b)))", false, exists(IterPath.class));
   }

@@ -61,7 +61,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testGetID() throws Exception {
-    assertEquals(resource.getId(), DOC1, "Wrong ID.");
+    assertEquals(DOC1, resource.getId(), "Wrong ID.");
   }
 
   /**
@@ -69,7 +69,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
    * @throws Exception any exception
    */
   @Test public void testGetResourceType() throws Exception {
-    assertEquals(resource.getResourceType(), XMLResource.RESOURCE_TYPE,
+    assertEquals(XMLResource.RESOURCE_TYPE, resource.getResourceType(),
       "Wrong resource type.");
   }
 
@@ -98,7 +98,7 @@ public final class XMLResourceTest extends XMLDBBaseTest {
     final Node node = resource.getContentAsDOM();
     final String root = node.getChildNodes().item(0).getNodeName();
     assertInstanceOf(Document.class, node, "Document instance expected.");
-    assertEquals(root, "first", "Wrong root tag.");
+    assertEquals("first", root, "Wrong root tag.");
   }
 
   /**

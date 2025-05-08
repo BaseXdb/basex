@@ -337,7 +337,7 @@ public final class DbModuleTest extends SandboxTest {
           " map { '" + lc(MainOptions.UPDINDEX) + "': " + b + "() }"));
       query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", b);
     }
-    assertEquals(context.options.get(MainOptions.UPDINDEX), false);
+    assertEquals(false, context.options.get(MainOptions.UPDINDEX));
 
     final String[] numberOptions = lc(MainOptions.MAXCATS, MainOptions.MAXLEN,
         MainOptions.SPLITSIZE);
@@ -737,7 +737,7 @@ public final class DbModuleTest extends SandboxTest {
     for(final String option : stringOptions)
       query(func.args(NAME, false, " map { '" + option + "': '' }"));
     // ensure that option in context was not changed
-    assertEquals(context.options.get(MainOptions.TEXTINDEX), true);
+    assertEquals(true, context.options.get(MainOptions.TEXTINDEX));
 
     // check invalid options
     error(func.args(NAME, false, " map { 'xyz': 'abc' }"),

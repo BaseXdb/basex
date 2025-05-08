@@ -71,7 +71,7 @@ public final class DatabaseTest extends XMLDBBaseTest {
    * Test.
    */
   @Test public void testGetConformanceLevel() {
-    assertEquals(database.getConformanceLevel(), "0");
+    assertEquals("0", database.getConformanceLevel());
   }
 
   /**

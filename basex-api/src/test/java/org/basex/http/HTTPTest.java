@@ -44,7 +44,7 @@ public abstract class HTTPTest extends SandboxTest {
   /**
    * Initializes the test.
    * @param url root path
-   * @param local local flag (without database server instance
+   * @param local local flag (without database server instance)
    * @param auth enforce authentication
    * @throws Exception exception
    */

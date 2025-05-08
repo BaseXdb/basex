@@ -53,7 +53,7 @@ public final class XQJTest extends SandboxTest {
 
       final XQResultSequence rs = xqpe.executeQuery();
       assertTrue(rs.next());
-      assertEquals(rs.getItemAsString(null), "Hello World!");
+      assertEquals("Hello World!", rs.getItemAsString(null));
     } finally {
       conn.close();
     }
@@ -76,7 +76,7 @@ public final class XQJTest extends SandboxTest {
 
       final XQResultSequence rs = xqpe.executeQuery();
       assertTrue(rs.next());
-      assertEquals(rs.getItemAsString(null), "&");
+      assertEquals("&", rs.getItemAsString(null));
     } finally {
       conn.close();
     }

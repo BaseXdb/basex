@@ -96,7 +96,7 @@ public final class ModuleTest extends SandboxTest {
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.uriResolver((path, uri, base) ->
         new IOContent("module namespace m='uri'; declare function m:f() { 'OK' };"));
-      assertEquals(qp.value().serialize().toString(), "OK");
+      assertEquals("OK", qp.value().serialize().toString());
     }
   }
 

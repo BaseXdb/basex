@@ -13,7 +13,7 @@ import org.junit.jupiter.api.*;
  * @author Dimitar Popov
  */
 public final class WesternTokenizerTest {
-  /** Case sensitive. */
+  /** Case-sensitive. */
   private static final int FTCS = 1;
   /** Diacritics. */
   private static final int FTDC = 2;
@@ -53,13 +53,13 @@ public final class WesternTokenizerTest {
     run(TEXT, "TEST", "TASTE", "TOAST");
   }
 
-  /** Test  + case insensitive. */
+  /** Test + case-insensitive. */
   @Test public void diaCI() {
     setFTFlags(FTDC);
     run(TEXT, "t\u00e9st", "täste", "toast");
   }
 
-  /** Test diacritics + case sensitive. */
+  /** Test diacritics + case-sensitive. */
   @Test public void diaCS() {
     setFTFlags(FTDC | FTCS);
     run(TEXT, "T\u00e9st", "t\u00c4Ste", "Toast");
@@ -101,13 +101,13 @@ public final class WesternTokenizerTest {
     run(TEXT, "\\TEST.*\\TASTE", "TOAST");
   }
 
-  /** Test wild cards + diacritics + case insensitive. */
+  /** Test wild cards + diacritics + case-insensitive. */
   @Test public void wildCardsDiaCI() {
     setFTFlags(FTWC | FTDC);
     run(TEXT, "\\t\u00e9st.*\\t\u00e4ste", "toast");
   }
 
-  /** Test wild cards + diacritics + case sensitive. */
+  /** Test wild cards + diacritics + case-sensitive. */
   @Test public void wildCardsDiaCS() {
     setFTFlags(FTWC | FTDC | FTCS);
     run(TEXT, "\\T\u00e9st.*\\t\u00c4Ste", "Toast");

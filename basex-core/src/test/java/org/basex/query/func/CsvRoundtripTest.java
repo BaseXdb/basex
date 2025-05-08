@@ -443,9 +443,9 @@ public final class CsvRoundtripTest extends SandboxTest {
     final StringBuilder format = new StringBuilder();
     if(!options.contains("'format'")) {
       if(!options.isEmpty()) format.append(", ");
-      format.append("'format': '" + (function == _CSV_PARSE ? CsvFormat.DIRECT :
+      format.append("'format': '").append(function == _CSV_PARSE ? CsvFormat.DIRECT :
         function == CSV_TO_ARRAYS ? CsvFormat.W3_ARRAYS :
-        function == CSV_TO_XML ? CsvFormat.W3_XML : CsvFormat.W3)).append("'");
+        function == CSV_TO_XML ? CsvFormat.W3_XML : CsvFormat.W3).append("'");
     }
     final String serializeQuery = _CSV_SERIALIZE.args(
       result.startsWith("<") ? ' ' + result :

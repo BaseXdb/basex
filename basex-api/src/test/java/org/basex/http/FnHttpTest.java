@@ -373,7 +373,7 @@ public abstract class FnHttpTest extends HTTPTest {
         }
       }
     }
-    if(error.length() != 0) fail(error.toString());
+    if(!error.isEmpty()) fail(error.toString());
   }
 
   /**

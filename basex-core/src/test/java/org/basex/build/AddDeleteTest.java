@@ -177,8 +177,7 @@ public final class AddDeleteTest extends SandboxTest {
   }
 
   /**
-   * Adds a broken input file to the database and checks if the file can be
-   * deleted afterwards.
+   * Adds a broken input file to the database and checks if the file can be deleted afterward.
    */
   @Test public void addCorrupt() {
     final IOFile io = new IOFile(TEMP);

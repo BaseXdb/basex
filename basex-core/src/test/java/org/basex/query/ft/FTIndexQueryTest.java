@@ -48,7 +48,7 @@ public final class FTIndexQueryTest extends FTData {
         sb.append(th.getMessage());
       }
     }
-    if(sb.length() != 0) fail(sb.toString());
+    if(!sb.isEmpty()) fail(sb.toString());
   }
 
   /**

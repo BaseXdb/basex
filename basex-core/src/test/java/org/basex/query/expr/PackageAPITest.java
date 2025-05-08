@@ -93,17 +93,17 @@ public final class PackageAPITest extends SandboxTest {
     assertTrue(nsDict.containsKey("ns2"));
     assertTrue(nsDict.containsKey("ns3"));
     HashSet<String> ts = nsDict.get("ns1");
-    assertEquals(ts.size(), 2);
+    assertEquals(2, ts.size());
     assertTrue(ts.contains(PKG1ID));
     assertTrue(ts.contains(PKG2ID));
     ts = nsDict.get("ns2");
-    assertEquals(ts.size(), 1);
+    assertEquals(1, ts.size());
     assertTrue(ts.contains(PKG1ID));
     ts = nsDict.get("ns3");
-    assertEquals(ts.size(), 1);
+    assertEquals(1, ts.size());
     assertTrue(ts.contains(PKG2ID));
     // check package dictionary
-    assertEquals(pkgDict.size(), 2);
+    assertEquals(2, pkgDict.size());
     assertTrue(pkgDict.containsKey(PKG1ID));
     assertTrue(pkgDict.containsKey(PKG2ID));
     assertEquals("pkg1", pkgDict.get(PKG1ID).path());
@@ -225,7 +225,7 @@ public final class PackageAPITest extends SandboxTest {
       "import module namespace ns3='ns3';" +
       "(ns1:test2() eq 'pkg2mod1') and (ns3:test() eq 'pkg2mod2')",
       context)) {
-      assertEquals(qp.value().serialize().toString(), "true");
+      assertEquals("true", qp.value().serialize().toString());
     }
   }
 
@@ -276,7 +276,7 @@ public final class PackageAPITest extends SandboxTest {
     // use package
     try(QueryProcessor qp = new QueryProcessor(
         "import module namespace j='jar'; j:print('test')", context)) {
-      assertEquals(qp.value().serialize().toString(), "test");
+      assertEquals("test", qp.value().serialize().toString());
     }
 
     // delete package
@@ -338,7 +338,7 @@ public final class PackageAPITest extends SandboxTest {
     // use package
     try(QueryProcessor qp = new QueryProcessor(
             "import module namespace j='test." + jar + "'; j:call('Unit Test')", context)) {
-      assertEquals(qp.value().serialize().toString(), "Hello Unit Test");
+      assertEquals("Hello Unit Test", qp.value().serialize().toString());
     }
     // dependency installed
     assertTrue(isFile(dir + "/." + jar + "/Greeter.jar"));
@@ -358,12 +358,12 @@ public final class PackageAPITest extends SandboxTest {
     // try with a package without dependencies
     try(QueryProcessor qp = new QueryProcessor(
         "import module namespace ns3='ns3'; ns3:test()", context)) {
-      assertEquals(qp.value().serialize().toString(), "pkg2mod2");
+      assertEquals("pkg2mod2", qp.value().serialize().toString());
     }
     // try with a package with dependencies
     try(QueryProcessor qp = new QueryProcessor(
         "import module namespace ns2='ns2'; ns2:test()", context)) {
-      assertEquals(qp.value().serialize().toString(), "pkg2mod2");
+      assertEquals("pkg2mod2", qp.value().serialize().toString());
     }
   }
 

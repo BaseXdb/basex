@@ -477,7 +477,7 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
    * for both directions!
    *
    * @param order update primitives (ordered as expected, that means the first given
-   * primitive is the first to be executed, hence has the highest score)
+   * primitive is the first to be executed; hence, has the highest score)
    */
   private static void compare(final NodeUpdate[] order) {
     final List<NodeUpdate> l = new ArrayList<>();
