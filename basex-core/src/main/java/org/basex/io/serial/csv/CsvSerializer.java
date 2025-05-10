@@ -91,6 +91,16 @@ public abstract class CsvSerializer extends StandardSerializer {
    * @throws IOException I/O exception
    */
   final void record(final TokenList entries) throws IOException {
+    record(entries, true);
+  }
+
+  /**
+   * Prints a record with the specified entries.
+   * @param entries record entries to be printed
+   * @param reset whether to reset the entries after serialization
+   * @throws IOException I/O exception
+   */
+  final void record(final TokenList entries, final boolean reset) throws IOException {
     int f = 0;
     if(maxCol < 0) {
       for(final byte[] val : entries) field(f++, val);
@@ -107,7 +117,7 @@ public abstract class CsvSerializer extends StandardSerializer {
       }
     }
     out.print(rowDelimiter);
-    entries.reset();
+    if(reset) entries.reset();
   }
 
   /**

@@ -217,6 +217,18 @@ public final class CsvModuleTest extends SandboxTest {
     serial(map, "'format': 'xquery', 'header': ('C', 'D')", "X\nY\n");
   }
 
+  /** Test method. */
+  @Test public void gh2428() {
+    final Function func = _CSV_SERIALIZE;
+    final String xml = " <csv xmlns='http://www.w3.org/2005/xpath-functions'><columns><column>x"
+        + "</column></columns><rows><row><field column='x'>y</field></row><row><field column='$1'>z"
+        + "</field></row></rows></csv>";
+//    query(func.args(xml.replace("$1", "x"), " { 'header': true(), 'format': 'w3-xml' }"),
+//        "x\ny\nz\n");
+    error(func.args(xml.replace("$1", "w"), " { 'header': true(), 'format': 'w3-xml' }"),
+        CSV_SERIALIZE_X_X);
+  }
+
   /**
    * Runs the specified query.
    * @param input query input
