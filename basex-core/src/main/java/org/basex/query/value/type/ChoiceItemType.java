@@ -113,13 +113,11 @@ public final class ChoiceItemType implements Type {
       final Type tp = type.intersect(st.type);
       if(tp != null) list.add(tp);
     }
-    if(list.isEmpty()) return null;
-    Type is = AtomType.ITEM;
-    for(final Type tp : list) {
-      is = is.intersect(tp);
-      if(is == null) return null;
+    switch(list.size()) {
+      case 0: return null;
+      case 1: return list.get(0);
+      default: return new ChoiceItemType(types);
     }
-    return is;
   }
 
   @Override
