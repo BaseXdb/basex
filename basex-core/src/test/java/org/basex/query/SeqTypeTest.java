@@ -712,26 +712,32 @@ public final class SeqTypeTest {
     combine(c1, DATE_O, DATE_O, op);
     combine(c1, STRING_O, STRING_O, op);
     combine(c1, INTEGER_O, null, op);
+    combine(c1, ITEM_O, c1, op);
     combine(c2, op);
     combine(c2, ELEMENT_O, ELEMENT_O, op);
     combine(c2, STRING_O, STRING_O, op);
     combine(c2, INTEGER_O, null, op);
+    combine(c2, ITEM_O, c2, op);
     combine(c3, op);
     combine(c3, NMTOKENS_O, NMTOKENS_O, op);
     combine(c3, STRING_O, STRING_O, op);
     combine(c3, INTEGER_O, null, op);
+    combine(c3, ITEM_O, c3, op);
     combine(c4, op);
     combine(c4, ARRAY_O, ARRAY_O, op);
     combine(c4, STRING_O, STRING_O, op);
     combine(c4, INTEGER_O, null, op);
+    combine(c4, ITEM_O, c4, op);
     combine(c5, op);
     combine(c5, MAP_O, MAP_O, op);
     combine(c5, STRING_O, STRING_O, op);
     combine(c5, INTEGER_O, null, op);
+    combine(c5, ITEM_O, c5, op);
     combine(c6, op);
     combine(c6, FUNCTION_O, FUNCTION_O, op);
     combine(c6, STRING_O, STRING_O, op);
     combine(c6, INTEGER_O, null, op);
+    combine(c6, ITEM_O, c6, op);
 
     final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
         fld2 = new TokenObjectMap<>(),

@@ -1,7 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
@@ -10,7 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -23,17 +20,14 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Lookup extends Arr {
-  /** Wildcard string. */
-  public static final Str WILDCARD = Str.get('*');
-
+public final class Lookup extends ALookup {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param expr key specifier and (for postfix lookups) context expression
+   * @param expr context expression and key specifier
    */
   public Lookup(final InputInfo info, final Expr... expr) {
-    super(info, SeqType.ITEM_ZM, expr);
+    super(info, expr);
   }
 
   @Override
@@ -93,7 +87,7 @@ public final class Lookup extends Arr {
         map ? cc.function(Function._MAP_ITEMS, info, in) :
           cc.function(Function._ARRAY_ITEMS, info, in) :
         map ? cc.function(Function._MAP_GET, info, in, arg, Empty.UNDEFINED, Bln.TRUE) :
-          cc.function(Function._ARRAY_GET, info, in, arg);
+          cc.function(Function._ARRAY_GET, info, in, arg, Empty.VALUE);
 
       // single key
       if(ks == 1) {
@@ -137,7 +131,7 @@ public final class Lookup extends Arr {
           }
           final Item item = qc.next(iter);
           if(item == null) return null;
-          ir = valueFor(item, qc).iter();
+          ir = valueFor(item, false, qc).iter();
         }
       }
     };
@@ -148,31 +142,7 @@ public final class Lookup extends Arr {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      vb.add(valueFor(item, qc));
-    }
-    return vb.value(this);
-  }
-
-  /**
-   * Returns the looked up values for the specified input.
-   * @param item input item
-   * @param qc query context
-   * @return supplied value builder
-   * @throws QueryException query exception
-   */
-  private Value valueFor(final Item item, final QueryContext qc) throws QueryException {
-    if(!(item instanceof final XQStruct struct)) throw LOOKUP_X.get(info, item);
-    final Expr keys = exprs[1];
-
-    // wildcard: add all values
-    if(keys == WILDCARD) return struct.items(qc);
-
-    final ValueBuilder vb = new ValueBuilder(qc);
-    final Iter ir = keys.atomIter(qc, info);
-    for(Item key; (key = ir.next()) != null;) {
-      final Value value = struct.invoke(qc, info, key);
-      vb.add(value instanceof final FuncItem fi && struct instanceof XQMap ? fi.toMethod(struct) :
-        value);
+      vb.add(valueFor(item, false, qc));
     }
     return vb.value(this);
   }
@@ -185,23 +155,5 @@ public final class Lookup extends Arr {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof Lookup && super.equals(obj);
-  }
-
-  @Override
-  public void toString(final QueryString qs) {
-    qs.token(exprs[0]).token('?');
-
-    final Expr keys = exprs[1];
-    Object key = null;
-    if(keys == WILDCARD) {
-      key = WILDCARD.string();
-    } else if(keys instanceof final Str str) {
-      if(XMLToken.isNCName(str.string())) key = str.toJava();
-    } else if(keys instanceof final Int itr) {
-      final long l = itr.itr();
-      if(l >= 0) key = l;
-    }
-    if(key != null) qs.token(key);
-    else qs.paren(keys);
   }
 }
