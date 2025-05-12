@@ -41,8 +41,9 @@ public final class DbRename extends DbAccessFn {
       }
       // rename file resources
       for(final ResourceType type : Resources.BINARIES) {
-        final IOFile src = data.meta.file(source, type), trg = data.meta.file(target, type);
-        if(src != null && trg != null) {
+        final IOFile src = data.meta.file(source, type);
+        if(src != null && src.exists()) {
+          final IOFile trg = new IOFile(data.meta.dir(type), target);
           rename(data, src, trg, qc);
           updates.add(new DBDelete(data, src, info), qc);
         }

@@ -935,6 +935,7 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, "file2", "dir1/file3"));
     query(_DB_GET_BINARY.args(NAME, "dir1/file3"));
     query(func.args(NAME, "dir1", "dir2"));
+
     query(_DB_GET_BINARY.args(NAME, "dir2/file3"));
     error(_DB_GET_BINARY.args(NAME, "dir1"), WHICHRES_X);
 
@@ -948,6 +949,17 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, "dir2", "dir3"));
     query(_DB_GET_BINARY.args(NAME, "dir3/file3"));
     query(_DB_GET_BINARY.args(NAME, "dir3/file5"));
+
+    query(_DB_PUT_VALUE.args(NAME, 1, "v/value1"));
+    query(func.args(NAME, "v", "w"));
+    query(_DB_GET_VALUE.args(NAME, "w/value1"), 1);
+    query(_DB_PUT_VALUE.args(NAME, 1, "v/value2"));
+    query(func.args(NAME, "v", "w"));
+    query(_DB_GET_VALUE.args(NAME, "w/value1"), 1);
+    query(_DB_GET_VALUE.args(NAME, "w/value2"), 1);
+    query(func.args(NAME, "w", "v"));
+    query(_DB_GET_VALUE.args(NAME, "v/value1"), 1);
+    query(_DB_GET_VALUE.args(NAME, "v/value2"), 1);
   }
 
   /** Test method. */

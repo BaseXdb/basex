@@ -40,34 +40,34 @@ public final class Rename extends ACreate {
   /**
    * Renames files.
    * @param data database
-   * @param src source path
-   * @param trg target path
+   * @param source source path
+   * @param target target path
    * @return success flag
    */
-  private boolean rename(final Data data, final String src, final String trg) {
+  private boolean rename(final Data data, final String source, final String target) {
     boolean ok = true;
     int c = 0;
-    if(!IO.equals(src, trg)) {
+    if(!IO.equals(source, target)) {
       // rename XML documents
-      final IntList docs = data.resources.docs(src);
+      final IntList docs = data.resources.docs(source);
       final int ds = docs.size();
       for(int i = 0; i < ds; i++) {
         final int pre = docs.get(i);
-        final String target = target(data, pre, src, trg);
-        if(target.isEmpty()) {
-          ok = !info(NAME_INVALID_X, target);
+        final String trg = target(data, pre, source, target);
+        if(trg.isEmpty()) {
+          ok = !info(NAME_INVALID_X, trg);
         } else {
-          data.update(pre, Data.DOC, token(target));
+          data.update(pre, Data.DOC, token(trg));
           c++;
         }
       }
 
       // rename file resources
       for(final ResourceType type : Resources.BINARIES) {
-        final IOFile source = data.meta.file(src, type);
-        if(source != null && source.exists()) {
-          final IOFile target = data.meta.file(trg, type), trgdir = target.parent();
-          if(!trgdir.md() || !source.rename(target)) ok = !info(NAME_INVALID_X, trg);
+        final IOFile src = data.meta.file(source, type);
+        if(src != null && src.exists()) {
+          final IOFile trg = new IOFile(data.meta.dir(type), target);
+          if(!trg.parent().md() || !src.rename(trg)) ok = !info(NAME_INVALID_X, target);
           c++;
         }
       }
