@@ -24,10 +24,11 @@ public final class Lookup extends ALookup {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
+   * @param modifier modifier
    * @param expr context expression and key specifier
    */
-  public Lookup(final InputInfo info, final Expr... expr) {
-    super(info, expr);
+  public Lookup(final InputInfo info, final Modifier modifier, final Expr... expr) {
+    super(info, modifier, expr);
   }
 
   @Override
@@ -77,7 +78,7 @@ public final class Lookup extends ALookup {
 
     final Type it = input.seqType().type;
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
-    if(map || array) {
+    if((map || array) && hasDefaultModifier()) {
       /* REWRITE LOOKUP:
        *  MAP?*      ->  map:items(MAP)
        *  ARRAY?*    ->  array:items(MAP)
@@ -149,7 +150,7 @@ public final class Lookup extends ALookup {
 
   @Override
   public Lookup copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new Lookup(info, copyAll(cc, vm, exprs)));
+    return copyType(new Lookup(info, modifier, copyAll(cc, vm, exprs)));
   }
 
   @Override

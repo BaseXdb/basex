@@ -72,6 +72,93 @@ public final class LookupTest extends SandboxTest {
     query("array:for-each([], function($i) { string($i) })!?([])", "");
   }
 
+  /**Test. */
+  @Test public void modifiers() {
+    query("map { 'a': 'b' } ? pairs::a", "{\"key\":\"a\",\"value\":\"b\"}");
+    query("map { 'a': 'b' } ? keys::a", "a");
+    query("map { 'a': 'b' } ? values::a", "[\"b\"]");
+    query("map { 'a': 'b' } ? items::a", "b");
+    query("map { 'a': 'b' } ? a", "b");
+
+    query("([ 1, [ \"a\", \"b\" ], 4, 5, [ \"c\", \"d\"] ])?values::*[. instance of "
+        + "array(array(xs:string))]",
+          "[[\"a\",\"b\"]]\n"
+        + "[[\"c\",\"d\"]]");
+
+    final String a = "let $A := [ (\"a\", \"b\"), (\"c\", \"d\"), (\"e\", \"f\"), 42 ] return ";
+    query(a + "$A?items::*", "a\n"
+        + "b\n"
+        + "c\n"
+        + "d\n"
+        + "e\n"
+        + "f\n"
+        + "42");
+    query(a + "$A?pairs::*", "{\"key\":1,\"value\":(\"a\",\"b\")}\n"
+        + "{\"key\":2,\"value\":(\"c\",\"d\")}\n"
+        + "{\"key\":3,\"value\":(\"e\",\"f\")}\n"
+        + "{\"key\":4,\"value\":42}");
+    query(a + "$A?values::*", "[\"a\",\"b\"]\n"
+        + "[\"c\",\"d\"]\n"
+        + "[\"e\",\"f\"]\n"
+        + "[42]");
+    query(a + "$A?keys::*", "1\n"
+        + "2\n"
+        + "3\n"
+        + "4");
+    query(a + "$A?items::2", "c\n"
+        + "d");
+    query(a + "$A?pairs::2", "{\"key\":2,\"value\":(\"c\",\"d\")}");
+    query(a + "$A?values::2", "[\"c\",\"d\"]");
+    query(a + "$A?keys::2", "2");
+    query(a + "$A?items::(3, 1)", "e\n"
+        + "f\n"
+        + "a\n"
+        + "b");
+    query(a + "$A?pairs::(3, 1)", "{\"key\":3,\"value\":(\"e\",\"f\")}\n"
+        + "{\"key\":1,\"value\":(\"a\",\"b\")}");
+    query(a + "$A?values::(3, 1)", "[\"e\",\"f\"]\n"
+        + "[\"a\",\"b\"]");
+    query(a + "$A?keys::(3, 1)", "3\n"
+        + "1");
+
+    final String m = "let $M := { \"X\": (\"a\", \"b\"), \"Y\": (\"c\", \"d\"), \"Z\": (\"e\", "
+        + "\"f\"), \"N\": 42 } return ";
+    query(m + "$M?items::*", "a\n"
+        + "b\n"
+        + "c\n"
+        + "d\n"
+        + "e\n"
+        + "f\n"
+        + "42");
+    query(m + "$M?pairs::*", "{\"key\":\"X\",\"value\":(\"a\",\"b\")}\n"
+        + "{\"key\":\"Y\",\"value\":(\"c\",\"d\")}\n"
+        + "{\"key\":\"Z\",\"value\":(\"e\",\"f\")}\n"
+        + "{\"key\":\"N\",\"value\":42}");
+    query(m + "$M?values::*", "[\"a\",\"b\"]\n"
+        + "[\"c\",\"d\"]\n"
+        + "[\"e\",\"f\"]\n"
+        + "[42]");
+    query(m + "$M?keys::*", "X\n"
+        + "Y\n"
+        + "Z\n"
+        + "N");
+    query(m + "$M?items::Y", "c\n"
+        + "d");
+    query(m + "$M?pairs::Y", "{\"key\":\"Y\",\"value\":(\"c\",\"d\")}");
+    query(m + "$M?values::Y", "[\"c\",\"d\"]");
+    query(m + "$M?keys::Y", "Y");
+    query(m + "$M?items::(\"Z\", \"X\")", "e\n"
+        + "f\n"
+        + "a\n"
+        + "b");
+    query(m + "$M?pairs::(\"Z\", \"X\")", "{\"key\":\"Z\",\"value\":(\"e\",\"f\")}\n"
+        + "{\"key\":\"X\",\"value\":(\"a\",\"b\")}");
+    query(m + "$M?values::(\"Z\", \"X\")", "[\"e\",\"f\"]\n"
+        + "[\"a\",\"b\"]");
+    query(m + "$M?keys::(\"Z\", \"X\")", "Z\n"
+        + "X");
+  }
+
   /** Test. */
   @Test public void error() {
     error("1?a", LOOKUP_X);
