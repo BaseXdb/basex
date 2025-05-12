@@ -76,4 +76,10 @@ public final class LookupTest extends SandboxTest {
   @Test public void error() {
     error("1?a", LOOKUP_X);
   }
+
+  /** Test. */
+  @Test public void deep() {
+    query("[ 'a' ]??(1.0)", "a");
+    query("[ 'a' ]??(1.1)", "");
+  }
 }
