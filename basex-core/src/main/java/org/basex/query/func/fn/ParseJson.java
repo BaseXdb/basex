@@ -13,7 +13,6 @@ import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.options.*;
 
 /**
@@ -104,6 +103,6 @@ public abstract class ParseJson extends ParseFn {
       throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.NULL));
     }
     converter.nullValue(nll);
-    return converter.convert(Token.string(ti.content()), "", qc);
+    return converter.convert(ti, "", info, qc);
   }
 }

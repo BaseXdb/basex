@@ -38,7 +38,7 @@ public final class MapPut extends StandardFunc {
       // try to propagate record type
       if(mc.field == null || mc.key == MapCompilation.EXTENDED) {
         if(mc.record.isExtensible()) type = mc.record;
-      } else if(mc.field != null) {
+      } else {
         // map:put({ 'a': 1, 'b': 2 }, 'b', 3)  ->  util:map-put-at({ 'a': 1, 'b': 2 }, 2, 3)
         if(!mc.record.hasOptional()) {
           return cc.function(_UTIL_MAP_PUT_AT, info, map, Int.get(mc.index), value);

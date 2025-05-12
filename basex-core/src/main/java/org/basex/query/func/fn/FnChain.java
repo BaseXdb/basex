@@ -24,8 +24,8 @@ public final class FnChain extends FnApply {
       final ValueList args = new ValueList();
       if(func.arity() == 1) {
         args.add(input);
-      } else if(input instanceof XQArray) {
-        for(final Value arg : ((XQArray) input).iterable()) args.add(arg);
+      } else if(input instanceof final XQArray array) {
+        for(final Value arg : array.iterable()) args.add(arg);
       } else {
         for(final Item it : input) args.add(it);
       }

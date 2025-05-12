@@ -1,10 +1,10 @@
 package org.basex.query.func.map;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.List;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
@@ -63,7 +63,7 @@ public class MapMerge extends StandardFunc {
     // update first map if 2 maps are supplied, use map builder otherwise
     Item next = qc.next(maps);
     final MapBuilder mb = next == null ? null : new MapBuilder(arg(0).size());
-    if(mb != null) mp.forEach((k, v) -> mb.put(k,  v));
+    if(mb != null) mp.forEach(mb::put);
 
     while(current != null) {
       final XQMap map = toMap(current);
@@ -143,19 +143,19 @@ public class MapMerge extends StandardFunc {
     if(vm != null) return vm;
     // function
     final Value duplicates = options.get(MergeOptions.DUPLICATES);
-    if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc), info, qc);
+    if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc), qc);
     // fixed option
     final String string = duplicates.isEmpty() ? dflt.toString() : toString(duplicates, qc);
     final Duplicates value = Enums.get(Duplicates.class, string);
     if(value == null) throw QueryError.typeError(duplicates,
         new EnumType(Duplicates.values()), info);
 
-    switch(value) {
-      case REJECT:    return new Reject(info);
-      case COMBINE:   return new Combine(qc);
-      case USE_FIRST: return new UseFirst();
-      default:        return new UseLast();
-    }
+    return switch(value) {
+      case REJECT -> new Reject();
+      case COMBINE -> new Combine(qc);
+      case USE_FIRST -> new UseFirst();
+      default -> new UseLast();
+    };
   }
 
   /**
@@ -171,5 +171,94 @@ public class MapMerge extends StandardFunc {
   @Override
   public int hofIndex() {
     return defined(1) ? Integer.MAX_VALUE : -1;
+  }
+
+  /**
+   * Return {@code null} to indicate that insertion can be skipped.
+   */
+  static final class UseFirst extends ValueMerger {
+    @Override
+    Value get(final Item key, final Value old, final Value value) {
+      return null;
+    }
+  }
+
+  /**
+   * Return new value.
+   */
+  static final class UseLast extends ValueMerger {
+    @Override
+    Value get(final Item key, final Value old, final Value value) {
+      return value;
+    }
+  }
+
+  /**
+   * Concatenate values.
+   */
+  static final class Combine extends ValueMerger {
+    /** Query context. */
+    private final QueryContext qc;
+
+    /**
+     * Constructor.
+     * @param qc query context
+     */
+    Combine(final QueryContext qc) {
+      this.qc = qc;
+    }
+
+    @Override
+    Value get(final Item key, final Value old, final Value value) {
+      return old.append(value, qc);
+    }
+
+    @Override
+    SeqType type(final SeqType st) {
+      return st.union(st.occ.add(st.occ));
+    }
+  }
+
+  /**
+   * Reject merge.
+   */
+  final class Reject extends ValueMerger {
+    @Override
+    Value get(final Item key, final Value old, final Value value) throws QueryException {
+      throw MERGE_DUPLICATE_X.get(info, key);
+    }
+  }
+
+  /**
+   * Invoke function to combine values.
+   */
+  final class Invoke extends ValueMerger {
+    /** Combiner function. */
+    private final FItem function;
+    /** Query context. */
+    private final QueryContext qc;
+    /** HOF arguments. */
+    private final HofArgs args;
+
+    /**
+     * Constructor.
+     * @param function combiner function
+     * @param qc query context
+     */
+    Invoke(final FItem function, final QueryContext qc) {
+      this.function = function;
+      this.qc = qc;
+      args = new HofArgs(2);
+    }
+
+    @Override
+    Value get(final Item key, final Value old, final Value value) throws QueryException {
+      return function.invoke(qc, info, args.set(0, old).set(1, value).get());
+    }
+
+    @Override
+    SeqType type(final SeqType st) {
+      return st.union(function.funcType().declType);
+    }
   }
 }

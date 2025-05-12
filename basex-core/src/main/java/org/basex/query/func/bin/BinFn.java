@@ -151,8 +151,8 @@ abstract class BinFn extends StandardFunc {
 
   /**
    * Checks the bounds of the specified offset value.
-   * @param offset offset value (may be empty sequence)
-   * @param length length value (may be empty sequence)
+   * @param offset offset value (can be empty sequence)
+   * @param length length value (can be empty sequence)
    * @param size size of input data
    * @return bounds (two integers)
    * @throws QueryException query exception

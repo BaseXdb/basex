@@ -27,18 +27,17 @@ public final class InspectStaticContext extends StandardFunc {
     final StaticContext sctx;
     if(func.isEmpty()) {
       sctx = sc();
-    } else if(func instanceof FuncItem) {
-      final FuncItem fi = (FuncItem) func;
+    } else if(func instanceof final FuncItem fi) {
       sctx = fi.info().sc();
     } else {
       throw INVFUNCITEM_X_X.get(info, func.type, func);
     }
 
-    switch(name) {
-      case BASE_URI:
-        return sctx.baseURI();
-      case NAMESPACES:
-        MapBuilder mb = new MapBuilder();
+    return switch(name) {
+      case BASE_URI ->
+        sctx.baseURI();
+      case NAMESPACES -> {
+        final MapBuilder mb = new MapBuilder();
         Atts nsp = sctx.ns.list;
         int ns = nsp.size();
         for(int n = 0; n < ns; n++) {
@@ -50,37 +49,40 @@ public final class InspectStaticContext extends StandardFunc {
           final Str key = Str.get(nsp.name(n));
           if(!mb.contains(key)) mb.put(key, Str.get(nsp.value(n)));
         }
-        return mb.map();
-      case ELEMENT_NAMESPACE:
-        return sctx.elemNS == null ? Empty.VALUE : Uri.get(sctx.elemNS);
-      case FUNCTION_NAMESPACE:
-        return sctx.funcNS == null ? Empty.VALUE : Uri.get(sctx.funcNS);
-      case COLLATION:
-        return Uri.get(sctx.collation == null ? COLLATION_URI : sctx.collation.uri());
-      case ORDERING:
-        return Str.get(sctx.ordered ? ORDERED : UNORDERED);
-      case CONSTRUCTION:
-        return Str.get(sctx.strip ? STRIP : PRESERVE);
-      case DEFAULT_ORDER_EMPTY:
-        return Str.get(sctx.orderGreatest ? GREATEST : LEAST);
-      case BOUNDARY_SPACE:
-        return Str.get(sctx.spaces ? PRESERVE : STRIP);
-      case COPY_NAMESPACES:
+        yield mb.map();
+      }
+      case ELEMENT_NAMESPACE ->
+        sctx.elemNS == null ? Empty.VALUE : Uri.get(sctx.elemNS);
+      case FUNCTION_NAMESPACE ->
+        sctx.funcNS == null ? Empty.VALUE : Uri.get(sctx.funcNS);
+      case COLLATION ->
+        Uri.get(sctx.collation == null ? COLLATION_URI : sctx.collation.uri());
+      case ORDERING ->
+        Str.get(sctx.ordered ? ORDERED : UNORDERED);
+      case CONSTRUCTION ->
+        Str.get(sctx.strip ? STRIP : PRESERVE);
+      case DEFAULT_ORDER_EMPTY ->
+        Str.get(sctx.orderGreatest ? GREATEST : LEAST);
+      case BOUNDARY_SPACE ->
+        Str.get(sctx.spaces ? PRESERVE : STRIP);
+      case COPY_NAMESPACES -> {
         final TokenList tl = new TokenList(2);
         tl.add(sctx.preserveNS ? PRESERVE : NO_PRESERVE);
         tl.add(sctx.inheritNS ? INHERIT : NO_INHERIT);
-        return StrSeq.get(tl);
-      case DECIMAL_FORMATS:
+        yield StrSeq.get(tl);
+      }
+      case DECIMAL_FORMATS -> {
         // enforce creation of default formatter
         sctx.decFormat(QNm.EMPTY, info);
         // loop through all formatters
-        mb = new MapBuilder();
+        final MapBuilder mb = new MapBuilder();
         for(final byte[] format : sctx.decFormats) {
           mb.put(Str.get(format), sctx.decFormats.get(format).toMap());
         }
-        return mb.map();
-      default:
+        yield mb.map();
+      }
+      default ->
         throw INSPECT_UNKNOWN_X.get(info, name);
-    }
+    };
   }
 }

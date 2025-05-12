@@ -117,8 +117,7 @@ final class FTList {
   private byte[] token() {
     if(tp[tp.length - 1] == ptok) return EMPTY;
     if(tp[ntl] == ptok || ntl == 0) {
-      ++ctl;
-      while(tp[ctl] == -1) ++ctl;
+      do ++ctl; while (tp[ctl] == -1);
       ntl = ctl + 1;
       while(tp[ntl] == -1) ++ntl;
     }

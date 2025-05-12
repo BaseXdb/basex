@@ -154,7 +154,7 @@ public final class StaticContext {
     if(uriResolver != null) {
       try {
         final Source s = uriResolver.resolve(path, baseIO.path());
-        final InputSource is = s instanceof SAXSource ? ((SAXSource) s).getInputSource() : null;
+        final InputSource is = s instanceof final SAXSource ss ? ss.getInputSource() : null;
         final String id = is != null ? is.getSystemId() : null;
         if(id != null) return IO.get(id);
       } catch(final TransformerException ex) {

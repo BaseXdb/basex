@@ -48,13 +48,13 @@ public abstract class CsvSerializer extends StandardSerializer {
    */
   public static Serializer get(final OutputStream os, final SerializerOptions so)
       throws IOException {
-    switch(so.get(SerializerOptions.CSV).get(CsvOptions.FORMAT)) {
-      case XQUERY:    return new CsvXQuerySerializer(os, so); // deprecated
-      case W3:        return new CsvW3Serializer(os, so);
-      case W3_ARRAYS: return new CsvW3ArraysSerializer(os, so);
-      case W3_XML:    return new CsvW3XmlSerializer(os, so);
-      default:        return new CsvDirectSerializer(os, so);
-    }
+    return switch(so.get(SerializerOptions.CSV).get(CsvOptions.FORMAT)) {
+      case XQUERY    -> new CsvXQuerySerializer(os, so); // deprecated
+      case W3        -> new CsvW3Serializer(os, so);
+      case W3_ARRAYS -> new CsvW3ArraysSerializer(os, so);
+      case W3_XML    -> new CsvW3XmlSerializer(os, so);
+      default        -> new CsvDirectSerializer(os, so);
+    };
   }
 
   /**
@@ -79,8 +79,8 @@ public abstract class CsvSerializer extends StandardSerializer {
     final Value hdr = copts.get(CsvOptions.HEADER);
     if(SeqType.BOOLEAN_O.instance(hdr)) {
       header = ((Bln) hdr).bool(null);
-    } else if(hdr instanceof Str) {
-      final Boolean b = Strings.toBoolean(string(((Str) hdr).string()));
+    } else if(hdr instanceof final Str str) {
+      final Boolean b = Strings.toBoolean(string(str.string()));
       if(b != null) header = b;
     }
   }
@@ -91,6 +91,16 @@ public abstract class CsvSerializer extends StandardSerializer {
    * @throws IOException I/O exception
    */
   final void record(final TokenList entries) throws IOException {
+    record(entries, true);
+  }
+
+  /**
+   * Prints a record with the specified entries.
+   * @param entries record entries to be printed
+   * @param reset whether to reset the entries after serialization
+   * @throws IOException I/O exception
+   */
+  final void record(final TokenList entries, final boolean reset) throws IOException {
     int f = 0;
     if(maxCol < 0) {
       for(final byte[] val : entries) field(f++, val);
@@ -107,7 +117,7 @@ public abstract class CsvSerializer extends StandardSerializer {
       }
     }
     out.print(rowDelimiter);
-    entries.reset();
+    if(reset) entries.reset();
   }
 
   /**

@@ -90,7 +90,7 @@ public abstract class AStr extends Item {
    */
   public int[] codepoints(final InputInfo info) throws QueryException {
     final IntList list = new IntList(length(info));
-    Token.forEachCp(string(info), cp -> list.add(cp));
+    Token.forEachCp(string(info), list::add);
     return list.finish();
   }
 
@@ -102,7 +102,7 @@ public abstract class AStr extends Item {
    */
   public long[] longCodepoints(final InputInfo info) throws QueryException {
     final LongList list = new LongList(length(info));
-    Token.forEachCp(string(info), cp -> list.add(cp));
+    Token.forEachCp(string(info), list::add);
     return list.finish();
   }
 
@@ -150,8 +150,7 @@ public abstract class AStr extends Item {
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(!(obj instanceof AStr)) return false;
-    final AStr a = (AStr) obj;
+    if(!(obj instanceof final AStr a)) return false;
     return type == a.type && Token.eq(value, a.value);
   }
 

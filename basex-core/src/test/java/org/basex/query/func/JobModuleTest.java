@@ -254,7 +254,7 @@ public final class JobModuleTest extends SandboxTest {
     Performance.sleep(100);
 
     // check if query was successfully stopped
-    assertEquals(eval(_JOB_RESULT.args(id)), "");
+    assertEquals("", eval(_JOB_RESULT.args(id)));
   }
 
   /**
@@ -271,7 +271,7 @@ public final class JobModuleTest extends SandboxTest {
 
     // ensure that the result will not be cached
     String id = query(_JOB_EVAL.args(SLOW_QUERY));
-    assertEquals(query(func.args(id)), "");
+    assertEquals("", query(func.args(id)));
 
     // receive cached result
     id = query(_JOB_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }"));

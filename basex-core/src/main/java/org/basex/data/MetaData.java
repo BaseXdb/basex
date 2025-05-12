@@ -70,7 +70,7 @@ public final class MetaData {
 
   /** Flag for full-text stemming. */
   public boolean stemming;
-  /** Flag for full-text case sensitivity. */
+  /** Flag for full-text case-sensitivity. */
   public boolean casesens;
   /** Flag for full-text diacritics removal. */
   public boolean diacritics;
@@ -179,7 +179,7 @@ public final class MetaData {
     sb.append(String.join("/", list.finish()));
 
     // add trailing slash
-    if(pl > 0 && sb.length() > 0) {
+    if(pl > 0 && !sb.isEmpty()) {
       final char ch = path.charAt(pl - 1);
       if(ch == '\\' || ch == '/') sb.append('/');
     }
@@ -193,7 +193,7 @@ public final class MetaData {
    * @return result flag
    */
   private static boolean addToPath(final StringBuilder sb, final StringList list) {
-    if(sb.length() != 0) {
+    if(!sb.isEmpty()) {
       final String segment = sb.toString();
       if(Strings.endsWith(segment, '.')) {
         if(!segment.equals(".")) return false;
@@ -326,13 +326,13 @@ public final class MetaData {
    * @return result of check
    */
   public boolean index(final IndexType type) {
-    switch(type) {
-      case TEXT:      return textindex;
-      case ATTRIBUTE: return attrindex;
-      case TOKEN:     return tokenindex;
-      case FULLTEXT:  return ftindex;
-      default:        throw Util.notExpected();
-    }
+    return switch(type) {
+      case TEXT      -> textindex;
+      case ATTRIBUTE -> attrindex;
+      case TOKEN     -> tokenindex;
+      case FULLTEXT  -> ftindex;
+      default        -> throw Util.notExpected();
+    };
   }
 
   /**
@@ -342,11 +342,11 @@ public final class MetaData {
    */
   public void index(final IndexType type, final boolean exists) {
     switch(type) {
-      case TEXT:      textindex = exists; break;
-      case ATTRIBUTE: attrindex = exists; break;
-      case TOKEN:     tokenindex = exists; break;
-      case FULLTEXT:  ftindex = exists; break;
-      default:        throw Util.notExpected();
+      case TEXT      -> textindex = exists;
+      case ATTRIBUTE -> attrindex = exists;
+      case TOKEN     -> tokenindex = exists;
+      case FULLTEXT  -> ftindex = exists;
+      default        -> throw Util.notExpected();
     }
   }
 
@@ -356,13 +356,13 @@ public final class MetaData {
    * @return index
    */
   public String names(final IndexType type) {
-    switch(type) {
-      case TEXT:      return textinclude;
-      case ATTRIBUTE: return attrinclude;
-      case TOKEN:     return tokeninclude;
-      case FULLTEXT:  return ftinclude;
-      default:        throw Util.notExpected();
-    }
+    return switch(type) {
+      case TEXT      -> textinclude;
+      case ATTRIBUTE -> attrinclude;
+      case TOKEN     -> tokeninclude;
+      case FULLTEXT  -> ftinclude;
+      default        -> throw Util.notExpected();
+    };
   }
 
   /**
@@ -372,11 +372,11 @@ public final class MetaData {
    */
   public void names(final IndexType type, final MainOptions options) {
     switch(type) {
-      case TEXT:      textinclude = options.get(MainOptions.TEXTINCLUDE); break;
-      case ATTRIBUTE: attrinclude = options.get(MainOptions.ATTRINCLUDE); break;
-      case TOKEN:     tokeninclude = options.get(MainOptions.TOKENINCLUDE); break;
-      case FULLTEXT:  ftinclude = options.get(MainOptions.FTINCLUDE); break;
-      default:        throw Util.notExpected();
+      case TEXT      -> textinclude = options.get(MainOptions.TEXTINCLUDE);
+      case ATTRIBUTE -> attrinclude = options.get(MainOptions.ATTRINCLUDE);
+      case TOKEN     -> tokeninclude = options.get(MainOptions.TOKENINCLUDE);
+      case FULLTEXT  -> ftinclude = options.get(MainOptions.FTINCLUDE);
+      default        -> throw Util.notExpected();
     }
   }
 
@@ -394,37 +394,37 @@ public final class MetaData {
       if(k.isEmpty()) break;
       final String v = Token.string(in.readToken());
       switch(k) {
-        case DBSTR:      storage = v; break;
-        case IDBSTR:     istorage = v; break;
-        case DBFNAME:    original = v; break;
-        case DBFTSW:     stopwords = v; break;
-        case DBFTLN:     language = Language.get(v); break;
-        case DBSIZE:     size = toInt(v); break;
-        case DBNDOCS:    ndocs = toInt(v); break;
-        case DBMAXLEN:   maxlen = toInt(v); break;
-        case DBMAXCATS:  maxcats = toInt(v); break;
-        case DBLASTID:   lastid = toInt(v); break;
-        case DBTIME:     time = toLong(v); break;
-        case DBFSIZE:    inputsize = toLong(v); break;
-        case DBFTDC:     diacritics = isTrue(v); break;
-        case DBUPDIDX:   updindex = isTrue(v); break;
-        case DBAUTOOPT:  autooptimize = isTrue(v); break;
-        case DBTXTIDX:   textindex = isTrue(v); break;
-        case DBATVIDX:   attrindex = isTrue(v); break;
-        case DBTOKIDX:   tokenindex = isTrue(v); break;
-        case DBFTXIDX:   ftindex = isTrue(v); break;
-        case DBTXTINC:   textinclude = v; break;
-        case DBATVINC:   attrinclude = v; break;
-        case DBTOKINC:   tokeninclude = v; break;
-        case DBFTXINC:   ftinclude = v; break;
-        case DBSPLITS:   splitsize = toInt(v); break;
-        case DBCRTTXT:   createtext = isTrue(v); break;
-        case DBCRTATV:   createattr = isTrue(v); break;
-        case DBCRTTOK:   createtoken = isTrue(v); break;
-        case DBCRTFTX:   createft = isTrue(v); break;
-        case DBFTST:     stemming = isTrue(v); break;
-        case DBFTCS:     casesens = isTrue(v); break;
-        case DBUPTODATE: uptodate = isTrue(v); break;
+        case DBSTR -> storage = v;
+        case IDBSTR -> istorage = v;
+        case DBFNAME -> original = v;
+        case DBFTSW -> stopwords = v;
+        case DBFTLN -> language = Language.get(v);
+        case DBSIZE -> size = toInt(v);
+        case DBNDOCS -> ndocs = toInt(v);
+        case DBMAXLEN -> maxlen = toInt(v);
+        case DBMAXCATS -> maxcats = toInt(v);
+        case DBLASTID -> lastid = toInt(v);
+        case DBTIME -> time = toLong(v);
+        case DBFSIZE -> inputsize = toLong(v);
+        case DBFTDC -> diacritics = isTrue(v);
+        case DBUPDIDX -> updindex = isTrue(v);
+        case DBAUTOOPT -> autooptimize = isTrue(v);
+        case DBTXTIDX -> textindex = isTrue(v);
+        case DBATVIDX -> attrindex = isTrue(v);
+        case DBTOKIDX -> tokenindex = isTrue(v);
+        case DBFTXIDX -> ftindex = isTrue(v);
+        case DBTXTINC -> textinclude = v;
+        case DBATVINC -> attrinclude = v;
+        case DBTOKINC -> tokeninclude = v;
+        case DBFTXINC -> ftinclude = v;
+        case DBSPLITS -> splitsize = toInt(v);
+        case DBCRTTXT -> createtext = isTrue(v);
+        case DBCRTATV -> createattr = isTrue(v);
+        case DBCRTTOK -> createtoken = isTrue(v);
+        case DBCRTFTX -> createft = isTrue(v);
+        case DBFTST -> stemming = isTrue(v);
+        case DBFTCS -> casesens = isTrue(v);
+        case DBUPTODATE -> uptodate = isTrue(v);
       }
     }
 

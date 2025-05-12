@@ -132,7 +132,7 @@ public final class FnReplicate extends StandardFunc {
     final Expr input = mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT,
         Simplify.DISTINCT) ? arg(0).simplifyFor(mode, cc) : arg(0);
 
-    final long count = arg(1) instanceof Int ? ((Int) arg(1)).itr() : -1;
+    final long count = arg(1) instanceof final Int itr ? itr.itr() : -1;
     if(count > 0 && (singleEval(true) || !input.has(Flag.NDT))) {
       // distinct-values(replicate(NODES, 2))  ->  distinct-values(NODES)
       // VALUE[replicate(NODES, 2)]  ->  VALUE[NODES]
@@ -153,8 +153,8 @@ public final class FnReplicate extends StandardFunc {
 
   @Override
   protected boolean values(final boolean limit, final CompileContext cc) {
-    return super.values(false, cc) && arg(1) instanceof Int &&
-        Util.inBounds(arg(0).size(), ((Int) arg(1)).itr());
+    return super.values(false, cc) && arg(1) instanceof final Int itr &&
+        Util.inBounds(arg(0).size(), itr.itr());
   }
 
   /**

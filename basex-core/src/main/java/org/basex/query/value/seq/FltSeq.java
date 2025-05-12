@@ -75,7 +75,7 @@ public final class FltSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof FltSeq ? Arrays.equals(values, ((FltSeq) obj).values) :
+    return this == obj || (obj instanceof final FltSeq seq ? Arrays.equals(values, seq.values) :
       super.equals(obj));
   }
 
@@ -102,8 +102,8 @@ public final class FltSeq extends NativeSeq {
     final FloatList tmp = new FloatList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      if(value instanceof FltSeq) {
-        tmp.add(((FltSeq) value).values);
+      if(value instanceof final FltSeq seq) {
+        tmp.add(seq.values);
       } else {
         for(final Item item : value) tmp.add(item.flt(null));
       }

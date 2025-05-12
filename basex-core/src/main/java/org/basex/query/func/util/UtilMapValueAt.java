@@ -26,12 +26,12 @@ public final class UtilMapValueAt extends StandardFunc {
     if(index < 1 || index > size) return Empty.VALUE;
 
     final Value value = map.valueAt((int) index - 1);
-    return value instanceof FuncItem && toBooleanOrFalse(arg(2), qc) ?
-      ((FuncItem) value).toMethod(map) : value;
+    return value instanceof final FuncItem fi && toBooleanOrFalse(arg(2), qc) ? fi.toMethod(map) :
+      value;
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0), index = arg(1);
     if(map == XQMap.empty()) return Empty.VALUE;
 

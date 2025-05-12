@@ -100,9 +100,9 @@ public class SqlExecute extends SqlFn {
 
               // element <sql:column name='...'>...</sql:column>
               final FBuilder column = FElem.build(Q_COLUMN).add(Q_NAME, name);
-              if(value instanceof SQLXML) {
+              if(value instanceof final SQLXML sxml) {
                 // add XML value as child element
-                final String xml = ((SQLXML) value).getString();
+                final String xml = sxml.getString();
                 try {
                   column.add(new DBNode(new IOContent(xml)).childIter().next());
                 } catch(final IOException ex) {
@@ -110,9 +110,8 @@ public class SqlExecute extends SqlFn {
                   Util.debug(ex);
                   column.add(xml);
                 }
-              } else if(value instanceof Clob) {
+              } else if(value instanceof final Clob clob) {
                 // add huge string from clob
-                final Clob clob = (Clob) value;
                 column.add(clob.getSubString(1, (int) clob.length()));
               } else {
                 // add string representation of other values

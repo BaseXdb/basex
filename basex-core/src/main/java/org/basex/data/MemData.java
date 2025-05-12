@@ -72,15 +72,11 @@ public final class MemData extends Data {
 
   @Override
   public void createIndex(final IndexType type, final Command cmd) throws IOException {
-    final IndexBuilder ib;
-    switch(type) {
-      case TEXT: case ATTRIBUTE: case TOKEN:
-        ib = new MemValuesBuilder(this, type); break;
-      case FULLTEXT:
-        throw new BaseXException(NO_MAINMEM);
-      default:
-        throw Util.notExpected();
-    }
+    final IndexBuilder ib = switch(type) {
+      case TEXT, ATTRIBUTE, TOKEN -> new MemValuesBuilder(this, type);
+      case FULLTEXT               -> throw new BaseXException(NO_MAINMEM);
+      default                     -> throw Util.notExpected();
+    };
     try {
       if(cmd != null) cmd.pushJob(ib);
       set(type, ib.build());
@@ -92,11 +88,9 @@ public final class MemData extends Data {
   @Override
   public void dropIndex(final IndexType type) throws BaseXException {
     switch(type) {
-      case TEXT:
-      case ATTRIBUTE:
-      case TOKEN:     break;
-      case FULLTEXT:  throw new BaseXException(NO_MAINMEM);
-      default:        throw Util.notExpected();
+      case TEXT, ATTRIBUTE, TOKEN: break;
+      case FULLTEXT:               throw new BaseXException(NO_MAINMEM);
+      default:                     throw Util.notExpected();
     }
     set(type, null);
   }
@@ -109,11 +103,11 @@ public final class MemData extends Data {
   private void set(final IndexType type, final ValueIndex index) {
     meta.dirty = true;
     switch(type) {
-      case TEXT:      textIndex = index; break;
-      case ATTRIBUTE: attrIndex = index; break;
-      case TOKEN:     tokenIndex = index; break;
-      case FULLTEXT:  ftIndex = index; break;
-      default:        break;
+      case TEXT -> textIndex = index;
+      case ATTRIBUTE -> attrIndex = index;
+      case TOKEN -> tokenIndex = index;
+      case FULLTEXT -> ftIndex = index;
+      default -> throw Util.notExpected();
     }
   }
 

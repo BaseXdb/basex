@@ -105,7 +105,7 @@ public final class Count extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Count && var.equals(((Count) obj).var);
+    return this == obj || obj instanceof final Count count && var.equals(count.var);
   }
 
   @Override

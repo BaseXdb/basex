@@ -113,14 +113,12 @@ public class FnMin extends StandardFunc {
         return values;
       }
       exprType.assign(type);
-      if(values instanceof Value && noColl) {
+      if(values instanceof final Value value && noColl) {
         Item item = null;
-        final Value value = (Value) values;
         final long size = value.size();
-        if(value instanceof RangeSeq) {
-          final RangeSeq rs = (RangeSeq) value;
+        if(value instanceof final RangeSeq rs) {
           item = rs.itemAt(min ^ rs.ascending() ? size - 1 : 0);
-        } else if(value instanceof SingletonSeq && ((SingletonSeq) value).singleItem()) {
+        } else if(value instanceof final SingletonSeq ss && ss.singleItem()) {
           item = value.itemAt(0);
         } else if(value.isItem()) {
           item = (Item) value;
@@ -132,8 +130,8 @@ public class FnMin extends StandardFunc {
       }
     }
 
-    if(noColl && values instanceof Path) {
-      final ArrayList<Stats> list = ((Path) values).pathStats();
+    if(noColl && values instanceof final Path path) {
+      final ArrayList<Stats> list = path.pathStats();
       if(list != null) {
         double v = min ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
         for(final Stats stats : list) {

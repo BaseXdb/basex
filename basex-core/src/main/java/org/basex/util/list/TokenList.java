@@ -89,7 +89,7 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
 
   /**
    * Sorts the elements.
-   * @param cs respect case sensitivity
+   * @param cs respect case-sensitivity
    * @return self reference
    */
   public TokenList sort(final boolean cs) {
@@ -98,7 +98,7 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
 
   /**
    * Sorts the elements.
-   * @param cs respect case sensitivity
+   * @param cs respect case-sensitivity
    * @param ascending ascending/descending order
    * @return self reference
    */

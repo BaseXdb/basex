@@ -180,10 +180,10 @@ public class BaseXTextField extends JTextField {
    * @return success flag
    */
   private boolean check(final boolean assign) {
-    if(option instanceof NumberOption) {
+    if(option instanceof final NumberOption number) {
       try {
         final int num = Integer.parseInt(getText());
-        if(assign) options.set((NumberOption) option, num);
+        if(assign) options.set(number, num);
         setBackground(back);
       } catch(final NumberFormatException ex) {
         Util.debug(ex);

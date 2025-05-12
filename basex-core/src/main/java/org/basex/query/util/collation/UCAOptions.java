@@ -83,16 +83,16 @@ public final class UCAOptions extends CollationOptions {
     }
 
     if(contains(STRENGTH)) {
-      Integer s = null;
-      switch(get(STRENGTH)) {
-        case "primary":    case "1": s = Collator.PRIMARY; break;
-        case "secondary":  case "2": s = Collator.SECONDARY; break;
-        case "tertiary":   case "3": s = Collator.TERTIARY; break;
-        case "quaternary": case "4": s = Collator.QUATERNARY; break;
-        case "identical":  case "5": s = Collator.IDENTICAL; break;
-        default: if(!fallback) throw error(STRENGTH);
-      }
-      if(s != null) rbc.setStrength(s);
+      final int s = switch(get(STRENGTH)) {
+        case "primary", "1" -> Collator.PRIMARY;
+        case "secondary", "2" -> Collator.SECONDARY;
+        case "tertiary", "3" -> Collator.TERTIARY;
+        case "quaternary", "4" -> Collator.QUATERNARY;
+        case "identical", "5" -> Collator.IDENTICAL;
+        default -> -1;
+      };
+      if(s >= 0) rbc.setStrength(s);
+      else if(!fallback) throw error(STRENGTH);
     }
 
     if(contains(ALTERNATE)) {
@@ -137,15 +137,15 @@ public final class UCAOptions extends CollationOptions {
     }
 
     if(contains(MAXVARIABLE)) {
-      int m = 0;
-      switch(get(MAXVARIABLE)) {
-        case "space":    m = Collator.ReorderCodes.SPACE; break;
-        case "punct":    m = Collator.ReorderCodes.PUNCTUATION; break;
-        case "symbol":   m = Collator.ReorderCodes.SYMBOL; break;
-        case "currency": m = Collator.ReorderCodes.CURRENCY; break;
-        default: if(!fallback) throw error(MAXVARIABLE);
-      }
-      if(m != 0) rbc.setMaxVariable(m);
+      final int m = switch(get(MAXVARIABLE)) {
+        case "space" -> Collator.ReorderCodes.SPACE;
+        case "punct" -> Collator.ReorderCodes.PUNCTUATION;
+        case "symbol" -> Collator.ReorderCodes.SYMBOL;
+        case "currency" -> Collator.ReorderCodes.CURRENCY;
+        default -> -1;
+      };
+      if(m >= 0) rbc.setMaxVariable(m);
+      else if(!fallback) throw error(MAXVARIABLE);
     }
 
     if(contains(NUMERIC)) {
@@ -156,19 +156,19 @@ public final class UCAOptions extends CollationOptions {
     if(contains(REORDER)) {
       final IntList list = new IntList();
       for(final String code : split(get(REORDER), ',')) {
-        int c = 0;
-        switch(code) {
-          case "space":    c = Collator.ReorderCodes.SPACE;       break;
-          case "punct":    c = Collator.ReorderCodes.PUNCTUATION; break;
-          case "symbol":   c = Collator.ReorderCodes.SYMBOL;      break;
-          case "currency": c = Collator.ReorderCodes.CURRENCY;    break;
-          case "digit":    c = Collator.ReorderCodes.DIGIT;       break;
-          default:
+        final int c = switch(code) {
+          case "space" -> Collator.ReorderCodes.SPACE;
+          case "punct" -> Collator.ReorderCodes.PUNCTUATION;
+          case "symbol" -> Collator.ReorderCodes.SYMBOL;
+          case "currency" -> Collator.ReorderCodes.CURRENCY;
+          case "digit" -> Collator.ReorderCodes.DIGIT;
+          default -> {
             final int[] tmp = code.length() == 4 ? UScript.getCode(code) : null;
-            if(tmp != null) c = tmp[0];
-            else if(!fallback) throw error(REORDER);
-        }
-        if(c != 0) list.add(c);
+            yield tmp != null ? tmp[0] : -1;
+          }
+        };
+        if(c > 0) list.add(c);
+        else if(!fallback) throw error(REORDER);
       }
       if(!list.isEmpty()) rbc.setReorderCodes(list.finish());
     }

@@ -59,10 +59,8 @@ public final class Treat extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Treat)) return false;
-    final Treat t = (Treat) obj;
-    return seqType().eq(t.seqType()) && super.equals(obj);
+    return this == obj || obj instanceof final Treat trt && seqType().eq(trt.seqType()) &&
+        super.equals(obj);
   }
 
   @Override

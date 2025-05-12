@@ -146,17 +146,17 @@ public final class QueryJob extends Job implements Runnable {
 
     final QueryDateTime qdt = new QueryDateTime();
     long ms;
-    if(start instanceof Int) {
+    if(start instanceof final Int itr) {
       // time
-      ms = start.itr(info) * 60000;
+      ms = itr.itr() * 60000;
       ms -= qdt.time.daySeconds().multiply(Dec.BD_1000).longValue();
       while(ms <= min) ms += 3600000;
-    } else if(start instanceof DTDur) {
+    } else if(start instanceof final DTDur dur) {
       // dayTimeDuration
-      ms = ((DTDur) start).ms(info);
-    } else if(start instanceof Dtm) {
+      ms = dur.ms(info);
+    } else if(start instanceof final Dtm dtm) {
       // dateTime
-      ms = new DTDur((Dtm) start, qdt.datm, info).ms(info);
+      ms = new DTDur(dtm, qdt.datm, info).ms(info);
     } else {
       // time
       ms = new DTDur((Tim) start, qdt.time, info).ms(info);

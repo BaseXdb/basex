@@ -7,6 +7,7 @@ package org.basex.query.util.regex.parse;
  * JavaCCParser.  The user is free to use any implementation
  * of their choice.
  */
+@FunctionalInterface
 public interface TokenManager {
   /**
    * This gets the next token from the input stream.

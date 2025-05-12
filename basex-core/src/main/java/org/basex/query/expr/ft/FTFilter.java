@@ -117,6 +117,6 @@ public abstract class FTFilter extends FTExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof FTFilter && unit == ((FTFilter) obj).unit && super.equals(obj);
+    return obj instanceof final FTFilter ftf && unit == ftf.unit && super.equals(obj);
   }
 }

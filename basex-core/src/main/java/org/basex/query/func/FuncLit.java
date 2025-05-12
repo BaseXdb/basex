@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -71,7 +72,7 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
+  public Expr inline(final Expr[] exprs, final CompileContext cc) {
     return null;
   }
 
@@ -87,7 +88,7 @@ public final class FuncLit extends Single implements Scope, XQFunctionExpr {
       expr = expr.compile(cc);
       expr.markTailCalls(null);
     } catch(final QueryException e) {
-      expr = cc.error(e, this);
+      expr = FnError.get(e, this);
     } finally {
       cc.removeScope(this);
     }

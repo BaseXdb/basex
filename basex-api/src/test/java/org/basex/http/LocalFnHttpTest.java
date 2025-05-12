@@ -4,7 +4,7 @@ import org.basex.core.*;
 import org.junit.jupiter.api.*;
 
 /**
- * This class tests the embedded HTTP Client locally (without database server instance.
+ * This class tests the embedded HTTP Client locally (without database server instance).
  *
  * @author BaseX Team, BSD License
  * @author Rositsa Shadura

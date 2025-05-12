@@ -189,7 +189,7 @@ public final class GroupBy extends Clause {
        * @return {@code true} if the compare as equal, {@code false} otherwise
        * @throws QueryException query exception
        */
-      private boolean eq(final Item[] items1, final Item[] items2, final DeepEqual[] deeps)
+      private static boolean eq(final Item[] items1, final Item[] items2, final DeepEqual[] deeps)
           throws QueryException {
 
         final int il = items1.length;
@@ -330,11 +330,8 @@ public final class GroupBy extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof GroupBy)) return false;
-    final GroupBy g = (GroupBy) obj;
-    return Array.equals(specs, g.specs) && Array.equals(preExpr, g.preExpr) &&
-        Array.equals(post, g.post);
+    return this == obj || obj instanceof final GroupBy group && Array.equals(specs, group.specs) &&
+        Array.equals(preExpr, group.preExpr) && Array.equals(post, group.post);
   }
 
   @Override

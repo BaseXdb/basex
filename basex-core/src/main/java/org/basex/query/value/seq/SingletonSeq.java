@@ -172,8 +172,8 @@ public final class SingletonSeq extends Seq {
 
     // if all items are equal, reduce value to single item
     Value val = value;
-    if(val instanceof SingletonSeq) {
-      val = ((SingletonSeq) val).value;
+    if(val instanceof final SingletonSeq ss) {
+      val = ss.value;
     } else if(vs > 1) {
       final Item item = val.itemAt(0);
       int v = 0;

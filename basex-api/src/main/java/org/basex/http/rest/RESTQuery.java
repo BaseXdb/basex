@@ -24,8 +24,7 @@ class RESTQuery extends RESTCmd {
   RESTQuery(final RESTSession session, final Map<String, Entry<Object, String>> bindings) {
     super(session);
     for(final Command cmd : session) {
-      if(cmd instanceof XQuery) {
-        final XQuery xq = (XQuery) cmd;
+      if(cmd instanceof final XQuery xq) {
         bindings.forEach(xq::bind);
       }
     }
@@ -50,8 +49,8 @@ class RESTQuery extends RESTCmd {
 
     final OutputStream os = conn.response.getOutputStream();
     for(final Command cmd : session) {
-      if(cmd instanceof XQuery) {
-        sopts.assign(((XQuery) cmd).parameters(context));
+      if(cmd instanceof final XQuery xq) {
+        sopts.assign(xq.parameters(context));
         conn.initResponse();
       }
       run(cmd, os);

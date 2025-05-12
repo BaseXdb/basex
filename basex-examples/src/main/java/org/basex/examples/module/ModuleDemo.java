@@ -61,8 +61,7 @@ public class ModuleDemo extends QueryModule {
     for(final Item item : value) {
       if(item instanceof AStr) {
         vb.add(item);
-      } else if(item instanceof ANode) {
-        ANode node = (ANode) item;
+      } else if(item instanceof ANode node) {
         vb.add(node.qname());
       }
     }
@@ -77,10 +76,8 @@ public class ModuleDemo extends QueryModule {
   public Value dbnodes(final Value value) {
     ValueBuilder vb = new ValueBuilder(queryContext);
     for(final Item item : value) {
-      if(item instanceof DBNode) {
-        final DBNode node = (DBNode) item;
-        int id = node.data().id(node.pre());
-        vb.add(Int.get(id));
+      if(item instanceof DBNode node) {
+        vb.add(Int.get(node.data().id(node.pre())));
       }
     }
     return vb.value();

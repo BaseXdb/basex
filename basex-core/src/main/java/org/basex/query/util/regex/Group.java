@@ -25,7 +25,7 @@ public final class Group extends RegExp {
   public Group(final RegExp encl, final boolean capture, final Integer[] atomPath) {
     this.encl = encl;
     this.capture = capture;
-    this.hasBackRef = false;
+    hasBackRef = false;
     this.atomPath = atomPath;
   }
 
@@ -41,7 +41,7 @@ public final class Group extends RegExp {
    * Set the back-reference flag.
    */
   public void setHasBackRef() {
-    this.hasBackRef = true;
+    hasBackRef = true;
   }
 
   /**

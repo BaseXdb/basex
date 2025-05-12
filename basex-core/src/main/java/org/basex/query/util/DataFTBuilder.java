@@ -53,10 +53,9 @@ final class DataFTBuilder {
    */
   ArrayList<DataFTMarker> build(final ANode node) {
     // only database nodes can have full-text positions
-    if(!(node instanceof DBNode)) return null;
+    if(!(node instanceof final DBNode dbnode)) return null;
 
     // not all nodes have full-text positions
-    final DBNode dbnode = (DBNode) node;
     final FTPos ftp = pos.get(dbnode.data(), dbnode.pre());
     if(ftp == null) return null;
 

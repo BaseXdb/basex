@@ -78,9 +78,7 @@ public abstract class Pragma extends ExprInfo {
    */
   @Override
   public boolean equals(final Object obj) {
-    if(!(obj instanceof Pragma)) return false;
-    final Pragma p = (Pragma) obj;
-    return name.eq(p.name) && Token.eq(value, p.value);
+    return obj instanceof final Pragma prgm && name.eq(prgm.name) && Token.eq(value, prgm.value);
   }
 
   @Override

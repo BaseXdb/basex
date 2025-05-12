@@ -141,7 +141,7 @@ public final class Int extends ANum {
   @Override
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return item instanceof Int ? value == ((Int) item).value :
+    return item instanceof final Int itr ? value == itr.value :
            item instanceof Dec ? item.equal(this, coll, ii) :
            value == item.dbl(ii);
   }
@@ -149,26 +149,20 @@ public final class Int extends ANum {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return item instanceof Int ? Long.compare(value, ((Int) item).value) :
+    return item instanceof final Int itr ? Long.compare(value, itr.value) :
            item instanceof Dec ? -item.compare(this, coll, transitive, ii) :
            Dbl.compare(dbl(ii), item.dbl(ii), transitive);
   }
 
   @Override
   public Object toJava() {
-    switch((AtomType) type) {
-      case BYTE:
-        return (byte) value;
-      case SHORT:
-      case UNSIGNED_BYTE:
-        return (short) value;
-      case UNSIGNED_SHORT:
-        return (char) value;
-      case INT:
-        return (int) value;
-      default:
-        return value;
-    }
+    return switch((AtomType) type) {
+      case BYTE -> (byte) value;
+      case SHORT, UNSIGNED_BYTE -> (short) value;
+      case UNSIGNED_SHORT -> (char) value;
+      case INT -> (int) value;
+      default -> value;
+    };
   }
 
   @Override
@@ -180,10 +174,7 @@ public final class Int extends ANum {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Int)) return false;
-    final Int i = (Int) obj;
-    return type == i.type && value == i.value;
+    return this == obj || obj instanceof final Int itr && type == itr.type && value == itr.value;
   }
 
   // STATIC METHODS ===============================================================================

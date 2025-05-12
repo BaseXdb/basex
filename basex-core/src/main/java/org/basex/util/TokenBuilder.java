@@ -411,7 +411,7 @@ public final class TokenBuilder {
 
   /**
    * Returns the token as byte array, and invalidates the internal array.
-   * Warning: the function must only be called if the builder is discarded afterwards.
+   * Warning: the function must only be called if the builder is discarded afterward.
    * @return token
    */
   public byte[] finish() {

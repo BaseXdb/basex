@@ -2275,7 +2275,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the UnionNodeTest rule rule without the leading parenthesis.
+   * Parses the UnionNodeTest rule without the leading parenthesis.
    * @param element element flag
    * @return test or {@code null}
    * @throws QueryException query exception
@@ -2499,7 +2499,7 @@ public class QueryParser extends InputParser {
         do {
           final Expr key = single();
           add(el, check(key, INVMAPKEY));
-          if(key instanceof Item && !set.add((Item) key)) throw error(MAPDUPLKEY_X, key);
+          if(key instanceof final Item item && !set.add(item)) throw error(MAPDUPLKEY_X, key);
           if(!wsConsume(":")) throw error(WRONGCHAR_X_X, ":", found());
           add(el, check(single(), INVMAPVAL));
         } while(wsConsume(","));
@@ -2681,7 +2681,7 @@ public class QueryParser extends InputParser {
     if(token.isEmpty()) throw error(NUMBER_X, token);
     // out of range
     if(l.compareTo(BigInteger.valueOf(max != 0 ? max : Long.MAX_VALUE)) > 0)
-      return FnError.get(RANGE_X.get(info(), token), SeqType.INTEGER_O);
+      return FnError.get(RANGE_X.get(info(), token), Int.ZERO);
 
     return Int.get(negate ? -l.longValue() : l.longValue());
   }
@@ -3202,7 +3202,7 @@ public class QueryParser extends InputParser {
   private Expr compElement() throws QueryException {
     final Expr name = compName(NOELEMNAME, true);
     if(name == null) return null;
-    if(name instanceof QNm) qnames.add((QNm) name, info());
+    if(name instanceof final QNm qnm) qnames.add(qnm, info());
     skipWs();
     return current('{') ? new CElem(info(), true, name, new Atts(), enclosedExpr()) : null;
   }
@@ -3215,7 +3215,7 @@ public class QueryParser extends InputParser {
   private Expr compAttribute() throws QueryException {
     final Expr name = compName(NOATTNAME, true);
     if(name == null) return null;
-    if(name instanceof QNm) qnames.add((QNm) name, false, info());
+    if(name instanceof final QNm qnm) qnames.add(qnm, false, info());
     skipWs();
     return current('{') ? new CAttr(info(), true, name, enclosedExpr()) : null;
   }
@@ -3447,7 +3447,7 @@ public class QueryParser extends InputParser {
     // map
     if(type instanceof MapType) {
       Type key = itemType().type;
-      if(key instanceof RecordType) key = ((RecordType) key).getDeclaration(namedRecordTypes);
+      if(key instanceof final RecordType rt) key = rt.getDeclaration(namedRecordTypes);
       if(!key.instanceOf(AtomType.ANY_ATOMIC_TYPE)) throw error(MAPTAAT_X, key);
       wsCheck(",");
       final MapType tp = MapType.get(key, sequenceType());
@@ -3487,16 +3487,13 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test kindTest(final NodeType type) throws QueryException {
-    final Test tp;
-    switch(type) {
-      case DOCUMENT_NODE: tp = documentTest(); break;
-      case ELEMENT:
-      case ATTRIBUTE: tp = elemAttrTest(type); break;
-      case PROCESSING_INSTRUCTION: tp = piTest(); break;
-      case SCHEMA_ELEMENT:
-      case SCHEMA_ATTRIBUTE: tp = schemaTest(); break;
-      default: tp = null; break;
-    }
+    final Test tp = switch(type) {
+      case DOCUMENT_NODE -> documentTest();
+      case ELEMENT, ATTRIBUTE -> elemAttrTest(type);
+      case PROCESSING_INSTRUCTION -> piTest();
+      case SCHEMA_ELEMENT, SCHEMA_ATTRIBUTE -> schemaTest();
+      default -> null;
+    };
     wsCheck(")");
     return tp;
   }
@@ -3507,7 +3504,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test documentTest() throws QueryException {
-    Test test = null;
+    Test test;
     final boolean element = consume(ELEMENT), schema = !element && consume(SCHEMA_ELEMENT);
     if(element || schema) {
       wsCheck("(");
@@ -3660,8 +3657,8 @@ public class QueryParser extends InputParser {
    */
   private ArrayList<Test> nameTestUnion(final NodeType type) throws QueryException {
     final ArrayList<Test> tests = new ArrayList<>();
-    Test test = null;
-    int p = pos;
+    Test test;
+    final int p = pos;
     do {
       skipWs();
       test = simpleNodeTest(type, false);

@@ -18,7 +18,7 @@ public final class ArrayBuilder {
   /** Sequence builder, only instantiated if there are at least two members. */
   private ArrBuilder array;
   /** Capacity ({@link Integer#MIN_VALUE}: create no compact data structures). */
-  private long capacity;
+  private final long capacity;
   /** The first added value is cached. */
   private Value single;
 

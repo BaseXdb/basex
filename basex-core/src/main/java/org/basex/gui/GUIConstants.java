@@ -391,7 +391,7 @@ public final class GUIConstants {
     font  = new Font(name, Font.PLAIN, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), Font.PLAIN, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), 0, LABEL.getFont().getSize());
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), Font.PLAIN, LABEL.getFont().getSize());
   }
 
   /**

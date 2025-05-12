@@ -113,7 +113,7 @@ public final class IndexNames {
       final char ch = names.charAt(s);
       if(ch == ',') {
         if(s + 1 == sl || names.charAt(s + 1) != ',') {
-          if(value.length() != 0) {
+          if(!value.isEmpty()) {
             set.add(value.toString().trim());
             value.setLength(0);
           }
@@ -124,7 +124,7 @@ public final class IndexNames {
       }
       value.append(ch);
     }
-    if(value.length() != 0) set.add(value.toString().trim());
+    if(!value.isEmpty()) set.add(value.toString().trim());
     return set;
   }
 

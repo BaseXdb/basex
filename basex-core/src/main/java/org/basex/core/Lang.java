@@ -144,14 +144,14 @@ public final class Lang {
       for(final String text : set.toArray(String[]::new)) {
         if(TEXTS.remove(text) == null) sb.append("- ").append(text).append('\n');
       }
-      if(sb.length() != 0) {
+      if(!sb.isEmpty()) {
         Util.err("Missing in %.lang:\n%", lang, sb);
         sb.setLength(0);
       }
       for(final String s : TEXTS.keySet()) {
         sb.append("- ").append(s).append('\n');
       }
-      if(sb.length() != 0) {
+      if(!sb.isEmpty()) {
         Util.err("Not defined in %.lang:\n%", lang, sb);
         sb.setLength(0);
       }

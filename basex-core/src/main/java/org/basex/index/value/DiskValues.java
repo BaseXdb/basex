@@ -101,10 +101,10 @@ public class DiskValues extends ValueIndex {
   @Override
   public final IndexIterator iter(final IndexSearch search) {
     final IntList pres;
-    if(search instanceof StringRange) {
-      pres = idRange((StringRange) search);
-    } else if(search instanceof NumericRange) {
-      pres = idRange((NumericRange) search);
+    if(search instanceof final StringRange range) {
+      pres = idRange(range);
+    } else if(search instanceof final NumericRange range) {
+      pres = idRange(range);
     } else {
       final IndexEntry ie = entry(search.token());
       pres = pres(ie.size, ie.offset);
@@ -364,14 +364,14 @@ public class DiskValues extends ValueIndex {
     // check if min and max are positive integers with the same number of digits
     final IntList pres = new IntList();
     synchronized(monitor) {
-      final int i = get(tok.min);
+      final int i = get(tok.min());
       final int entries = size();
-      for(int index = i < 0 ? -i - 1 : tok.mni ? i : i + 1; index < entries; index++) {
+      for(int index = i < 0 ? -i - 1 : tok.mni() ? i : i + 1; index < entries; index++) {
         final int count = idxl.readNum(idxr.read5(index * 5L));
         int id = idxl.readNum();
         // skip traversal if value is too large
-        final int diff = compare(key(id), tok.max);
-        if(diff > 0 || !tok.mxi && diff == 0) break;
+        final int diff = compare(key(id), tok.max());
+        if(diff > 0 || !tok.mxi() && diff == 0) break;
         // add PRE values
         for(int c = 0; c < count; c++) {
           pres.add(pre(id));
@@ -390,7 +390,7 @@ public class DiskValues extends ValueIndex {
    */
   private IntList idRange(final NumericRange tok) {
     // check if min and max are positive integers with the same number of digits
-    final double min = tok.min, max = tok.max;
+    final double min = tok.min(), max = tok.max();
     final int len = max > 0 && (long) max == max ? token(max).length : 0;
     final boolean simple = len != 0 && min > 0 && (long) min == min && token(min).length == len;
 

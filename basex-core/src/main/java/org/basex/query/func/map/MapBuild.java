@@ -57,7 +57,7 @@ public final class MapBuild extends MapMerge {
     }
     kt = kt.atomic();
 
-    final boolean noValue = value == Empty.UNDEFINED || value == Empty.UNDEFINED;
+    final boolean noValue = value == Empty.UNDEFINED || value == Empty.VALUE;
     final boolean fiValue = value instanceof FuncItem;
     SeqType vt = noValue || fiValue ? s1t : SeqType.ITEM_ZM;
     if(fiValue) {

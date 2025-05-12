@@ -30,8 +30,8 @@ public final class ArrayOfMembers extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     final Type type = array.seqType().type;
-    if(type instanceof MapType) {
-      exprType.assign(ArrayType.get(((MapType) type).valueType()));
+    if(type instanceof final MapType mt) {
+      exprType.assign(ArrayType.get(mt.valueType()));
     }
     return this;
   }

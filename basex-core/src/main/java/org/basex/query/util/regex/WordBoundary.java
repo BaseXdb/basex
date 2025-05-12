@@ -40,12 +40,11 @@ public final class WordBoundary extends RegExp {
    * @return regular expression
    */
   public static WordBoundary get(final String esc, final boolean multi) {
-    final boolean positive;
-    switch(esc.charAt(1)) {
-      case 'b': positive = true;  break;
-      case 'B': positive = false; break;
-      default: throw Util.notExpected();
-    }
+    final boolean positive = switch(esc.charAt(1)) {
+      case 'b' -> true;
+      case 'B' -> false;
+      default  -> throw Util.notExpected();
+    };
     final int pos = (positive ? 2 : 0) + (multi ? 1 : 0);
     if(INSTANCES[pos] == null) INSTANCES[pos] = new WordBoundary(positive, multi);
     return INSTANCES[pos];

@@ -162,7 +162,7 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
    * @return true if the input matches the string
    */
   private boolean matches(final String string) {
-    for(char c : string.toCharArray()) if(c != next(skipCmt)) return false;
+    for(final char c : string.toCharArray()) if(c != next(skipCmt)) return false;
     return true;
   }
 

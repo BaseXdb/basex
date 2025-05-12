@@ -61,31 +61,21 @@ final class StringParser extends CommandParser {
   private Command parse(final Cmd cmd) throws QueryException {
     switch(cmd) {
       case CREATE:
-        switch(consume(CmdCreate.class, cmd)) {
-          case BACKUP:
-            return new CreateBackup(glob(null), string(null));
-          case DATABASE: case DB:
-            return new CreateDB(name(cmd), remaining(null, true));
-          case INDEX:
-            return new CreateIndex(consume(CmdIndex.class, cmd));
-          case USER:
-            return new CreateUser(name(cmd), password());
-        }
-        break;
+        return switch(consume(CmdCreate.class, cmd)) {
+          case BACKUP -> new CreateBackup(glob(null), string(null));
+          case DATABASE, DB -> new CreateDB(name(cmd), remaining(null, true));
+          case INDEX -> new CreateIndex(consume(CmdIndex.class, cmd));
+          case USER -> new CreateUser(name(cmd), password());
+        };
       case COPY:
         return new Copy(name(cmd), name(cmd));
       case ALTER:
-        switch(consume(CmdAlter.class, cmd)) {
-          case BACKUP:
-            return new AlterBackup(name(cmd), name(cmd));
-          case DATABASE: case DB:
-            return new AlterDB(name(cmd), name(cmd));
-          case PASSWORD:
-            return new AlterPassword(name(cmd), password());
-          case USER:
-            return new AlterUser(name(cmd), name(cmd));
-        }
-        break;
+        return switch(consume(CmdAlter.class, cmd)) {
+          case BACKUP -> new AlterBackup(name(cmd), name(cmd));
+          case DATABASE, DB -> new AlterDB(name(cmd), name(cmd));
+          case PASSWORD -> new AlterPassword(name(cmd), password());
+          case USER -> new AlterUser(name(cmd), name(cmd));
+        };
       case OPEN:
         return new Open(name(cmd));
       case CHECK:
@@ -96,14 +86,10 @@ final class StringParser extends CommandParser {
       case GET:
         return new Get(string(cmd));
       case BINARY:
-        switch(consume(CmdBinary.class, cmd)) {
-          case GET:
-            return new BinaryGet(string(cmd));
-          case PUT:
-            final String sa = key(S_TO, null) ? string(cmd) : null;
-            return new BinaryPut(sa, remaining(cmd, true));
-        }
-        break;
+        return switch(consume(CmdBinary.class, cmd)) {
+          case GET -> new BinaryGet(string(cmd));
+          case PUT -> new BinaryPut(key(S_TO, null) ? string(cmd) : null, remaining(cmd, true));
+        };
       case DELETE:
         return new Delete(string(cmd));
       case RENAME:
@@ -111,19 +97,15 @@ final class StringParser extends CommandParser {
       case PUT:
         return new Put(string(cmd), remaining(cmd, true));
       case INFO:
-        switch(consume(CmdInfo.class, cmd)) {
-          case NULL:
-            return new Info();
-          case DATABASE: case DB:
-            return new InfoDB();
-          case INDEX:
-            return new InfoIndex(consume(CmdIndexInfo.class, null));
-          case STORAGE:
+        return switch(consume(CmdInfo.class, cmd)) {
+          case NULL -> new Info();
+          case DATABASE, DB -> new InfoDB();
+          case INDEX -> new InfoIndex(consume(CmdIndexInfo.class, null));
+          case STORAGE -> {
             final String arg1 = number();
-            final String arg2 = arg1 != null ? number() : null;
-            return new InfoStorage(arg1, arg2);
-        }
-        break;
+            yield new InfoStorage(arg1, arg1 != null ? number() : null);
+          }
+        };
       case INSPECT:
         return new Inspect();
       case CLOSE:
@@ -133,25 +115,17 @@ final class StringParser extends CommandParser {
       case DIR:
         return new Dir(string(null));
       case DROP:
-        switch(consume(CmdDrop.class, cmd)) {
-          case DATABASE: case DB:
-            return new DropDB(glob(cmd));
-          case INDEX:
-            return new DropIndex(consume(CmdIndex.class, cmd));
-          case USER:
-            return new DropUser(glob(cmd), key(ON, null) ? glob(cmd) : null);
-          case BACKUP:
-            return new DropBackup(glob(null));
-        }
-        break;
+        return switch(consume(CmdDrop.class, cmd)) {
+          case DATABASE, DB -> new DropDB(glob(cmd));
+          case INDEX -> new DropIndex(consume(CmdIndex.class, cmd));
+          case USER -> new DropUser(glob(cmd), key(ON, null) ? glob(cmd) : null);
+          case BACKUP -> new DropBackup(glob(null));
+        };
       case OPTIMIZE:
-        switch(consume(CmdOptimize.class, cmd)) {
-          case NULL:
-            return new Optimize();
-          case ALL:
-            return new OptimizeAll();
-        }
-        break;
+        return switch(consume(CmdOptimize.class, cmd)) {
+          case NULL -> new Optimize();
+          case ALL -> new OptimizeAll();
+        };
       case EXPORT:
         return new Export(string(cmd));
       case XQUERY:
@@ -180,17 +154,12 @@ final class StringParser extends CommandParser {
       case RESTORE:
         return new Restore(name(null));
       case SHOW:
-        switch(consume(CmdShow.class, cmd)) {
-          case SESSIONS:
-            return new ShowSessions();
-          case USERS:
-            return new ShowUsers(key(ON, null) ? name(cmd) : null);
-          case BACKUPS:
-            return new ShowBackups();
-          case OPTIONS:
-            return new ShowOptions(name(null));
-        }
-        break;
+        return switch(consume(CmdShow.class, cmd)) {
+          case SESSIONS -> new ShowSessions();
+          case USERS -> new ShowUsers(key(ON, null) ? name(cmd) : null);
+          case BACKUPS -> new ShowBackups();
+          case OPTIONS -> new ShowOptions(name(null));
+        };
       case GRANT:
         final CmdPerm perm = consume(CmdPerm.class, cmd);
         if(perm == null) throw help(null, cmd);
@@ -198,17 +167,14 @@ final class StringParser extends CommandParser {
         key(S_TO, cmd);
         return new Grant(perm, glob(cmd), db);
       case REPO:
-        switch(consume(CmdRepo.class, cmd)) {
-          case INSTALL:
-            return new RepoInstall(string(cmd), parser.info());
-          case DELETE:
-            return new RepoDelete(string(cmd), parser.info());
-          case LIST:
-            return new RepoList();
-        }
-        break;
+        return switch(consume(CmdRepo.class, cmd)) {
+          case INSTALL -> new RepoInstall(string(cmd), parser.info());
+          case DELETE -> new RepoDelete(string(cmd), parser.info());
+          case LIST -> new RepoList();
+        };
+      default:
+        throw Util.notExpected("Command specified, but not implemented yet");
     }
-    throw Util.notExpected("Command specified, but not implemented yet");
   }
 
   /**
@@ -345,7 +311,7 @@ final class StringParser extends CommandParser {
    * @throws QueryException query exception
    */
   private String finish(final CharSequence string, final Cmd cmd) throws QueryException {
-    if(string != null && string.length() != 0) return string.toString();
+    if(string != null && !string.isEmpty()) return string.toString();
     if(cmd != null) throw help(null, cmd);
     return null;
   }

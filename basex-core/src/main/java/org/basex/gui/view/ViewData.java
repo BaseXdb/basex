@@ -60,15 +60,13 @@ public final class ViewData {
     for(int i = pres.size() - 1; i >= 0; i--) {
       p = pres.get(i);
       k = data.kind(p);
-      final byte[] txt;
-      switch(k) {
-        case Data.TEXT: txt = TEXT; break;
-        case Data.COMM: txt = COMMENT; break;
-        case Data.PI:   txt = PI; break;
-        case Data.ATTR: txt = Token.concat(ATT, data.name(p, k)); break;
-        // element node
-        default: txt = data.name(p, k); break;
-      }
+      final byte[] txt = switch(k) {
+        case Data.TEXT -> TEXT;
+        case Data.COMM -> COMMENT;
+        case Data.PI   -> PI;
+        case Data.ATTR -> Token.concat(ATT, data.name(p, k));
+        default        -> data.name(p, k);
+      };
       tb.add('/').add(txt);
     }
     return tb.finish();
@@ -82,14 +80,11 @@ public final class ViewData {
    */
   public static byte[] text(final Data data, final int pre) {
     final int kind = data.kind(pre);
-    switch(kind) {
-      case Data.ELEM:
-        return data.name(pre, kind);
-      case Data.ATTR:
-        return Token.concat(ATT, data.name(pre, kind), ATT1, data.text(pre, false), ATT2);
-      default:
-        return data.text(pre, true);
-    }
+    return switch(kind) {
+      case Data.ELEM -> data.name(pre, kind);
+      case Data.ATTR -> Token.concat(ATT, data.name(pre, kind), ATT1, data.text(pre, false), ATT2);
+      default        -> data.text(pre, true);
+    };
   }
 
   /**

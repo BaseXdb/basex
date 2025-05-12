@@ -80,14 +80,14 @@ public final class Num {
   public static int get(final byte[] array, final int pos) {
     int p = pos;
     final int v = array[p++] & 0xFF;
-    switch((v & 0xC0) >>> 6) {
-      case 0: return v;
-      case 1: return (v & 0x3F) << 8 | array[p] & 0xFF;
-      case 2: return (v & 0x3F) << 24 | (array[p++] & 0xFF) << 16 |
-        (array[p++] & 0xFF) << 8 | array[p] & 0xFF;
-      default: return (array[p++] & 0xFF) << 24 | (array[p++] & 0xFF) << 16 |
-        (array[p++] & 0xFF) << 8 | array[p] & 0xFF;
-    }
+    return switch((v & 0xC0) >>> 6) {
+      case 0  -> v;
+      case 1  -> (v & 0x3F) << 8 | array[p] & 0xFF;
+      case 2  -> (v & 0x3F) << 24 | (array[p++] & 0xFF) << 16 |
+                 (array[p++] & 0xFF) << 8 | array[p] & 0xFF;
+      default -> (array[p++] & 0xFF) << 24 | (array[p++] & 0xFF) << 16 |
+                 (array[p++] & 0xFF) << 8 | array[p] & 0xFF;
+    };
   }
 
   /**

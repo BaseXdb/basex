@@ -24,7 +24,7 @@ abstract class DateTimeFn extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final Dur checkDur(final Item item) throws QueryException {
-    if(item instanceof Dur) return (Dur) item;
+    if(item instanceof final Dur dur) return dur;
     if(item.type.isUntyped()) return new Dur(item.string(info), info);
     throw typeError(item, DURATION, info);
   }

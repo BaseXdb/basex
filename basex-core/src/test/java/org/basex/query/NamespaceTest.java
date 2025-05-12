@@ -427,7 +427,7 @@ public final class NamespaceTest extends SandboxTest {
 
   /**
    * Detects duplicate prefix declaration at pre=0 in MemData instance after insert.
-   * Though result correct, prefix a is declared twice. -> Solution?
+   * Though result correct, prefix 'a' is declared twice. -> Solution?
    */
   @Test public void insertD4intoD5() {
     create(4, 5);

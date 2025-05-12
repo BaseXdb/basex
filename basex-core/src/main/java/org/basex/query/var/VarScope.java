@@ -96,8 +96,8 @@ public final class VarScope {
     }
 
     // remove unused entries from the closure
-    if(scope instanceof Closure) {
-      final Iterator<Entry<Var, Expr>> bindings = ((Closure) scope).globalBindings();
+    if(scope instanceof final Closure closure) {
+      final Iterator<Entry<Var, Expr>> bindings = closure.globalBindings();
       while(bindings.hasNext()) {
         final Var var = bindings.next().getKey();
         if(!used.get(var.id)) {

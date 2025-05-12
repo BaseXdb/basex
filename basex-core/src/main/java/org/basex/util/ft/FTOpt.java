@@ -102,11 +102,9 @@ public final class FTOpt extends ExprInfo {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FTOpt)) return false;
-    final FTOpt f = (FTOpt) obj;
-    return map.equals(f.map) && cs == f.cs && Objects.equals(sd, f.sd) && errors == f.errors &&
-        Objects.equals(sw, f.sw) && Objects.equals(th, f.th) && Objects.equals(ln, f.ln);
+    return this == obj || obj instanceof final FTOpt f && map.equals(f.map) && cs == f.cs &&
+        Objects.equals(sd, f.sd) && errors == f.errors && Objects.equals(sw, f.sw) &&
+        Objects.equals(th, f.th) && Objects.equals(ln, f.ln);
   }
 
   @Override

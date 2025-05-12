@@ -86,20 +86,20 @@ public final class Blake3 {
     final int[] state = { value[0], value[1], value[2], value[3], value[4], value[5], value[6],
         value[7], INITIAL[0], INITIAL[1], INITIAL[2], INITIAL[3], lo, hi, length, flags };
 
-    final int[] w = words, w2 = new int[words.length];
-    round(state, w);
-    permute(w, w2);
-    round(state, w2);
-    permute(w2, w);
-    round(state, w);
-    permute(w, w2);
-    round(state, w2);
-    permute(w2, w);
-    round(state, w);
-    permute(w, w2);
-    round(state, w2);
-    permute(w2, w);
-    round(state, w);
+    final int[] wrds = new int[words.length];
+    round(state, words);
+    permute(words, wrds);
+    round(state, wrds);
+    permute(wrds, words);
+    round(state, words);
+    permute(words, wrds);
+    round(state, wrds);
+    permute(wrds, words);
+    round(state, words);
+    permute(words, wrds);
+    round(state, wrds);
+    permute(wrds, words);
+    round(state, words);
 
     for(int i = 0; i < 8; i++) {
       state[i] ^= state[i + 8];
@@ -165,53 +165,35 @@ public final class Blake3 {
     for(int i = 0; i < WORDS_SIZE; i++) words2[i] = words[PERMUTATION[i]];
   }
 
-  /** Node. */
-  private static final class Node {
-    /** Value. */
-    int[] value;
-    /** Words. */
-    int[] words;
-    /** Counter. */
-    long counter;
-    /** Length. */
-    int length;
-    /** Flags. */
-    int flags;
-
-    /**
-     * Constructor.
-     * @param value value
-     * @param words words
-     * @param counter counter
-     * @param length length
-     * @param flags flags
-     */
-    private Node(final int[] value, final int[] words, final long counter, final int length,
-        final int flags) {
-      this.value = value;
-      this.words = words;
-      this.counter = counter;
-      this.length = length;
-      this.flags = flags;
-    }
-
+  /**
+   * Node.
+   * @param value   value
+   * @param words   words
+   * @param counter counter
+   * @param length  length
+   * @param flags   flags
+   */
+  private record Node(int[] value, int[] words, long counter, int length, int flags) {
     /**
      * Returns the node value.
      * @return value
      */
-    private int[] value() {
+    @Override
+    public int[] value() {
       return Arrays.copyOfRange(compress(value, words, counter, length, flags), 0, 8);
     }
 
     /**
      * Finishes the value.
+     *
      * @return result
      */
     private byte[] finish() {
       final byte[] hash = new byte[HASH_SIZE];
       for(int o = 0, i = 0;; o++) {
         for(final int c : compress(value, words, o, length, flags | 8)) {
-          for(int j = 0; j < 4; j++, i++) hash[i] = (byte) (c >> (j << 3));
+          for(int j = 0; j < 4; j++, i++)
+            hash[i] = (byte) (c >> (j << 3));
           if(i == HASH_SIZE) return hash;
         }
       }

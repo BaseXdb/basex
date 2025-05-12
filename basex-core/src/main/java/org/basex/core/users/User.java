@@ -27,7 +27,7 @@ public final class User {
   /** Database patterns for local permissions. */
   private final LinkedHashMap<String, Perm> patterns;
   /** Permission. */
-  private Perm permission = Perm.NONE;
+  private Perm permission;
   /** Name. */
   private String name;
   /** Info node (can be {@code null}). */

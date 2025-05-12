@@ -8,6 +8,7 @@ import java.util.function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -137,7 +138,7 @@ public final class TypeswitchGroup extends Single {
     try {
       return super.inline(ic);
     } catch(final QueryException ex) {
-      expr = ic.cc.error(ex, this);
+      expr = FnError.get(ex, this);
       return this;
     }
   }
@@ -148,7 +149,7 @@ public final class TypeswitchGroup extends Single {
     try {
       rtrn = tc.check(expr, cc);
     } catch(final QueryException ex) {
-      rtrn = cc.error(ex, expr);
+      rtrn = FnError.get(ex, expr);
     }
     // returned expression will be handled Typeswitch#typeCheck
     if(rtrn == null) return null;
@@ -256,10 +257,8 @@ public final class TypeswitchGroup extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof TypeswitchGroup)) return false;
-    final TypeswitchGroup tg = (TypeswitchGroup) obj;
-    return Array.equals(seqTypes, tg.seqTypes) && Objects.equals(var, tg.var) && super.equals(obj);
+    return this == obj || obj instanceof final TypeswitchGroup tg &&
+        Array.equals(seqTypes, tg.seqTypes) && Objects.equals(var, tg.var) && super.equals(obj);
   }
 
   @Override

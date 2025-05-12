@@ -45,17 +45,15 @@ public abstract class BXNode implements Node {
    * @return DOM node, or {@code null} if input is {@code null} as well
    */
   public static BXNode get(final ANode node) {
-    if(node == null) return null;
-    switch((NodeType) node.type) {
-      case DOCUMENT_NODE: return new BXDoc(node);
-      case ELEMENT: return new BXElem(node);
-      case TEXT: return new BXText(node);
-      case COMMENT: return new BXComm(node);
-      case PROCESSING_INSTRUCTION : return new BXPI(node);
-      // drop parent reference (see Xerces’ NodeImpl#getParentNode)
-      case ATTRIBUTE: return new BXAttr(new FAttr(node.qname(), node.string()));
-      default : return null;
-    }
+    return node == null ? null : switch((NodeType) node.type) {
+      case DOCUMENT_NODE -> new BXDoc(node);
+      case ELEMENT -> new BXElem(node);
+      case TEXT -> new BXText(node);
+      case COMMENT -> new BXComm(node);
+      case PROCESSING_INSTRUCTION -> new BXPI(node);
+      case ATTRIBUTE -> new BXAttr(new FAttr(node.qname(), node.string()));
+      default -> null;
+    };
   }
 
   @Override
@@ -154,7 +152,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final boolean isSameNode(final Node node) {
-    return node instanceof BXNode && ((BXNode) node).nd.is(nd);
+    return node instanceof final BXNode bxn && bxn.nd.is(nd);
   }
 
   @Override

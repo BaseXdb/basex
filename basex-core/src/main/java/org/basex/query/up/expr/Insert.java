@@ -69,8 +69,6 @@ public final class Insert extends Update {
 
       if(builder == null) builder = builder(arg(1), qc);
       final Updates updates = qc.updates();
-      NodeUpdate up;
-      DBNode dbnode;
 
       // no update primitive is created if node list is empty
       ANodeList list = builder.attributes;
@@ -79,24 +77,25 @@ public final class Insert extends Update {
         if(target.type != NodeType.ELEMENT)
           throw (sibling ? UPATTELM_X : UPATTELM2_X).get(info, target);
 
-        dbnode = updates.determineDataRef(target, qc);
+        final DBNode dbnode = updates.determineDataRef(target, qc);
         checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
-        up = new InsertAttribute(dbnode.pre(), dbnode.data(), info, checkNS(list, target));
+        final NodeUpdate up = new InsertAttribute(dbnode.pre(), dbnode.data(), info,
+            checkNS(list, target));
         updates.add(up, qc);
       }
 
       // no update primitive is created if node list is empty
       list = builder.children;
       if(list != null) {
-        dbnode = updates.determineDataRef(node, qc);
+        final DBNode dbnode = updates.determineDataRef(node, qc);
         checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
-        switch(mode) {
-          case BEFORE: up = new InsertBefore(dbnode.pre(), dbnode.data(), info, list); break;
-          case AFTER : up = new InsertAfter(dbnode.pre(), dbnode.data(), info, list); break;
-          case FIRST : up = new InsertIntoAsFirst(dbnode.pre(), dbnode.data(), info, list); break;
-          case LAST  : up = new InsertIntoAsLast(dbnode.pre(), dbnode.data(), info, list); break;
-          default    : up = new InsertInto(dbnode.pre(), dbnode.data(), info, list);
-        }
+        final NodeUpdate up = switch(mode) {
+          case BEFORE -> new InsertBefore(dbnode.pre(), dbnode.data(), info, list);
+          case AFTER -> new InsertAfter(dbnode.pre(), dbnode.data(), info, list);
+          case FIRST -> new InsertIntoAsFirst(dbnode.pre(), dbnode.data(), info, list);
+          case LAST -> new InsertIntoAsLast(dbnode.pre(), dbnode.data(), info, list);
+          default -> new InsertInto(dbnode.pre(), dbnode.data(), info, list);
+        };
         updates.add(up, qc);
       }
     }
@@ -110,7 +109,7 @@ public final class Insert extends Update {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Insert && mode == ((Insert) obj).mode && super.equals(obj);
+    return this == obj || obj instanceof final Insert ins && mode == ins.mode && super.equals(obj);
   }
 
   @Override

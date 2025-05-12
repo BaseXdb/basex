@@ -19,6 +19,8 @@ import org.basex.core.jobs.*;
 import org.basex.core.locks.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.io.serial.*;
 import org.basex.query.ann.*;
@@ -174,10 +176,10 @@ public final class QueryContext extends Job implements Closeable {
     this.context = context;
     this.parent = parent;
     this.info = info != null ? info : new QueryInfo(context);
-    this.resources = parent != null ? parent.resources : new QueryResources(this);
-    this.ftPosData = parent != null ? parent.ftPosData : null;
-    this.shared = parent != null ? parent.shared : new SharedData();
-    this.user = context.user();
+    resources = parent != null ? parent.resources : new QueryResources(this);
+    ftPosData = parent != null ? parent.ftPosData : null;
+    shared = parent != null ? parent.shared : new SharedData();
+    user = context.user();
   }
 
   /**
@@ -683,8 +685,7 @@ public final class QueryContext extends Job implements Closeable {
    */
   private Value cast(final Object value, final String type) throws QueryException {
     Object object = value;
-    if(object instanceof String) {
-      final String string = (String) object;
+    if(object instanceof final String string) {
       final StringList strings = new StringList(1);
       // strings containing multiple items (value \1 ...)
       if(string.indexOf('\1') == -1) {
@@ -708,14 +709,19 @@ public final class QueryContext extends Job implements Closeable {
 
     // no type specified: return original value or convert as Java object
     if(type == null || type.isEmpty()) {
-      return object instanceof Value ? (Value) object : JavaCall.toValue(object, this, null);
+      return object instanceof final Value val ? val : JavaCall.toValue(object, this, null);
     }
 
     // convert JSON input
     if(type.equalsIgnoreCase(MainParser.JSON.name())) {
       final JsonParserOptions jp = new JsonParserOptions();
       jp.set(JsonOptions.FORMAT, JsonFormat.W3);
-      return JsonConverter.get(jp).convert(object.toString(), "", this);
+      try {
+        final TextInput ti = new TextInput(new IOContent(object.toString()));
+        return JsonConverter.get(jp).convert(ti, "", null, this);
+      } catch(final IOException ex) {
+        throw new QueryException(ex);
+      }
     }
 
     // parse target type
@@ -725,8 +731,7 @@ public final class QueryContext extends Job implements Closeable {
     final Type tp = st.type;
 
     // cast XQuery values
-    if(object instanceof Value) {
-      final Value val = (Value) object;
+    if(object instanceof final Value val) {
       // cast single item
       if(val.isItem()) return tp.cast((Item) val, this, null);
       // cast sequence
@@ -736,8 +741,7 @@ public final class QueryContext extends Job implements Closeable {
     }
 
     // cast sequences
-    if(object instanceof Object[]) {
-      final Object[] array = (Object[]) object;
+    if(object instanceof final Object[] array) {
       final ValueBuilder vb = new ValueBuilder(this, array.length);
       for(final Object val : array) vb.add(tp.cast(val, this, null));
       return vb.value(tp);

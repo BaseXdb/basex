@@ -66,7 +66,7 @@ public final class XMLParserTest extends SandboxTest {
     }
 
     // list all errors
-    if(sb.length() != 0) fail(sb.toString());
+    if(!sb.isEmpty()) fail(sb.toString());
   }
 
   /** Empty elements with 31 attributes. */

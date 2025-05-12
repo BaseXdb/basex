@@ -106,7 +106,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof VarRef && var.slot == ((VarRef) obj).var.slot;
+    return this == obj || obj instanceof final VarRef vr && var.slot == vr.var.slot;
   }
 
   @Override

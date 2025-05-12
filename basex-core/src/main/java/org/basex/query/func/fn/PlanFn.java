@@ -69,7 +69,7 @@ public abstract class PlanFn extends StandardFunc {
     /** Type 'skip'.    */ SKIP(null);
 
     /** Target type. */
-    AtomType type;
+    final AtomType type;
 
     /**
      * Constructor.
@@ -187,24 +187,21 @@ public abstract class PlanFn extends StandardFunc {
      * @return result of check
      */
     private boolean valid(final ANode node) {
-      switch(layout) {
-        case EMPTY:
-        case EMPTY_PLUS:
-          return children(NodeType.ELEMENT, node).isEmpty() && empty(children(NodeType.TEXT, node));
-        case SIMPLE:
-        case SIMPLE_PLUS:
-          return children(NodeType.ELEMENT, node).isEmpty();
-        case LIST:
-        case LIST_PLUS:
+      return switch(layout) {
+        case EMPTY, EMPTY_PLUS ->
+          children(NodeType.ELEMENT, node).isEmpty() && empty(children(NodeType.TEXT, node));
+        case SIMPLE, SIMPLE_PLUS ->
+          children(NodeType.ELEMENT, node).isEmpty();
+        case LIST, LIST_PLUS -> {
           final ANodeList children = children(NodeType.ELEMENT, node);
-          return empty(children(NodeType.TEXT, node)) && equalNames(children) &&
+          yield empty(children(NodeType.TEXT, node)) && equalNames(children) &&
             (children.isEmpty() || children.get(0).qname().eq(child));
-        case RECORD:
-        case SEQUENCE:
-          return empty(children(NodeType.TEXT, node));
-        default:
-          return true;
-      }
+        }
+        case RECORD, SEQUENCE ->
+          empty(children(NodeType.TEXT, node));
+        default ->
+          true;
+      };
     }
 
     /**
@@ -218,57 +215,34 @@ public abstract class PlanFn extends StandardFunc {
      */
     private Item create(final ANode node, final ANode parent, final Plan plan,
         final QueryContext qc) throws QueryException {
-      switch(layout) {
-        case EMPTY:
-          return Str.EMPTY;
-        case EMPTY_PLUS:
-          return attributes(node, plan, qc).map();
-        case SIMPLE:
-          return cast(Str.get(node.string()));
-        case SIMPLE_PLUS:
-          return attributes(node, plan, qc).put(CONTENT, cast(Str.get(node.string()))).map();
-        case LIST:
-          return list(node, plan, qc);
-        case LIST_PLUS: {
-          return attributes(node, plan, qc).put(nodeName(child, true, node, plan, qc),
+
+      return switch(layout) {
+        case EMPTY ->
+          Str.EMPTY;
+        case EMPTY_PLUS ->
+          attributes(node, plan, qc).map();
+        case SIMPLE ->
+          cast(Str.get(node.string()));
+        case SIMPLE_PLUS ->
+          attributes(node, plan, qc).put(CONTENT, cast(Str.get(node.string()))).map();
+        case LIST ->
+          list(node, plan, qc);
+        case LIST_PLUS ->
+          attributes(node, plan, qc).put(nodeName(child, true, node, plan, qc),
               list(node, plan, qc)).map();
-        }
-        case RECORD: {
-          final MapBuilder map = attributes(node, plan, qc);
-          final TokenObjectMap<ANodeList> cache = new TokenObjectMap<>();
-          for(final ANode ch : children(NodeType.ELEMENT, node)) {
-            cache.computeIfAbsent(nodeName(ch, node, plan, qc), ANodeList::new).add(ch);
-          }
-          for(final byte[] name : cache) {
-            final ANodeList children = cache.get(name);
-            final PlanEntry pe = entry(children.get(0), plan);
-            if(pe.layout != PlanLayout.DEEP_SKIP) {
-              final ArrayBuilder ab = new ArrayBuilder(qc, children.size());
-              for(final ANode ch : children) {
-                ab.add(pe.apply(ch, node, plan, qc));
-              }
-              final XQArray array = ab.array();
-              map.put(name, array.structSize() == 1 ? array.memberAt(0) : array);
-            }
-          }
-          return map.map();
-        }
-        case SEQUENCE:
-          return mixed(node, parent, plan, qc, true);
-        case MIXED:
-          return mixed(node, parent, plan, qc, false);
-        case XML:
-          final SerializerOptions sopts = new SerializerOptions();
-          try {
-            return Str.get(node.serialize(sopts).finish());
-          } catch(final QueryIOException ex) {
-            throw ex.getCause(null);
-          }
-        case DEEP_SKIP:
-          return Empty.VALUE;
-        default:
+        case RECORD ->
+          record(node, plan, qc);
+        case SEQUENCE ->
+          mixed(node, parent, plan, qc, true);
+        case MIXED ->
+          mixed(node, parent, plan, qc, false);
+        case XML ->
+          xml(node);
+        case DEEP_SKIP ->
+          Empty.VALUE;
+        default ->
           throw PLAN_X_X.get(null, this, node);
-      }
+      };
     }
   }
 
@@ -304,7 +278,7 @@ public abstract class PlanFn extends StandardFunc {
           children(NodeType.ELEMENT, node).size() > 1).any(nodes)) {
         pe.layout = attributes.isEmpty() ? PlanLayout.LIST : PlanLayout.LIST_PLUS;
         pe.child = elements.get(0).qname();
-      } else if(((Checks<ANode>) node -> differentNames(node)).all(nodes)) {
+      } else if(((Checks<ANode>) PlanFn::differentNames).all(nodes)) {
         pe.layout = PlanLayout.RECORD;
       } else {
         pe.layout = PlanLayout.SEQUENCE;
@@ -419,23 +393,18 @@ public abstract class PlanFn extends StandardFunc {
    */
   static byte[] nodeName(final QNm qnm, final boolean element, final ANode parent,
       final Plan plan, final QueryContext qc) {
-    final byte[] name;
-    switch(plan.name) {
-      case EQNAME:
-        name = qnm.uri().length != 0 ? qnm.eqName() : qnm.local(); break;
-      case LEXICAL:
-        name = qnm.string(); break;
-      case LOCAL:
-        name = qnm.local(); break;
-      default:
-        if(element ? parent == null ? qnm.uri().length == 0 :
-            Token.eq(parent.qname().uri(), qnm.uri()) : qnm.uri().length == 0) {
-          name = qnm.local();
-        } else {
-          name = Token.eq(qnm.uri(), QueryText.XML_URI) ? qnm.string() : qnm.eqName();
-        }
-        break;
-    }
+    final byte[] name = switch(plan.name) {
+      case EQNAME ->
+        qnm.uri().length != 0 ? qnm.eqName() : qnm.local();
+      case LEXICAL ->
+        qnm.string();
+      case LOCAL ->
+        qnm.local();
+      default ->
+        (element ? parent == null ? qnm.uri().length == 0 :
+          Token.eq(parent.qname().uri(), qnm.uri()) : qnm.uri().length == 0) ? qnm.local() :
+        Token.eq(qnm.uri(), QueryText.XML_URI) ? qnm.string() : qnm.eqName();
+    };
     return qc.shared.token(!element && plan.marker != null ?
       Token.concat(plan.marker, name) : name);
   }
@@ -459,6 +428,36 @@ public abstract class PlanFn extends StandardFunc {
   }
 
   /**
+   * Returns a record item.
+   * @param node node
+   * @param plan plan
+   * @param qc query context
+   * @return array
+   * @throws QueryException query exception
+   */
+  private XQMap record(final ANode node, final Plan plan, final QueryContext qc)
+      throws QueryException {
+    final MapBuilder map = attributes(node, plan, qc);
+    final TokenObjectMap<ANodeList> cache = new TokenObjectMap<>();
+    for(final ANode ch : children(NodeType.ELEMENT, node)) {
+      cache.computeIfAbsent(nodeName(ch, node, plan, qc), ANodeList::new).add(ch);
+    }
+    for(final byte[] name : cache) {
+      final ANodeList children = cache.get(name);
+      final PlanEntry pe = entry(children.get(0), plan);
+      if(pe.layout != PlanLayout.DEEP_SKIP) {
+        final ArrayBuilder ab = new ArrayBuilder(qc, children.size());
+        for(final ANode ch : children) {
+          ab.add(pe.apply(ch, node, plan, qc));
+        }
+        final XQArray array = ab.array();
+        map.put(name, array.structSize() == 1 ? array.memberAt(0) : array);
+      }
+    }
+    return map.map();
+  }
+
+  /**
    * Returns a mixed-layout item.
    * @param node node
    * @param parent parent (can be {@code null}
@@ -476,27 +475,38 @@ public abstract class PlanFn extends StandardFunc {
       ab.add(new MapBuilder().put(nodeName(attr, node, plan, qc), attr.string()).map());
     }
     for(final ANode child : node.childIter()) {
-      Item item = null;
-      switch((NodeType) child.type) {
-        case COMMENT:
-          item = new MapBuilder().put(COMMENT, child.string()).map();
-          break;
-        case ELEMENT:
-          item = new MapBuilder().put(nodeName(child, parent, plan, qc),
-              entry(child, plan).apply(child, node, plan, qc)).map();
-          break;
-        case PROCESSING_INSTRUCTION:
-          item = new MapBuilder().put(PI, child.name()).
-              put(DATA, child.string()).map();
-          break;
-        case TEXT:
+      final Item item = switch((NodeType) child.type) {
+        case COMMENT ->
+          new MapBuilder().put(COMMENT, child.string()).map();
+        case ELEMENT ->
+          new MapBuilder().put(nodeName(child, parent, plan, qc),
+            entry(child, plan).apply(child, node, plan, qc)).map();
+        case PROCESSING_INSTRUCTION ->
+          new MapBuilder().put(PI, child.name()).put(DATA, child.string()).map();
+        case TEXT -> {
           final byte[] text = child.string();
-          item = ignoreEmpty && Token.normalize(text).length == 0 ? null : Str.get(text);
-          break;
-        default:
-      }
+          yield ignoreEmpty && Token.normalize(text).length == 0 ? null : Str.get(text);
+        }
+        default -> null;
+      };
       if(item != null) ab.add(item);
     }
     return ab.array();
+  }
+
+
+  /**
+   * Returns an XML item.
+   * @param node node
+   * @return array
+   * @throws QueryException query exception
+   */
+  private static Str xml(final ANode node) throws QueryException {
+    try {
+      return Str.get(node.serialize(new SerializerOptions()).finish());
+    } catch(final QueryIOException ex) {
+      throw ex.getCause(null);
+    }
+
   }
 }

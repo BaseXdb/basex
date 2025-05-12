@@ -51,8 +51,7 @@ final class ErrorInfo {
       if(e instanceof SAXException) m = e.getLocalizedMessage();
     }
 
-    if(ex instanceof SAXParseException) {
-      final SAXParseException se = (SAXParseException) ex;
+    if(ex instanceof final SAXParseException se) {
       final String id = se.getSystemId();
       if(id != null) {
         final IO io = IO.get(id);

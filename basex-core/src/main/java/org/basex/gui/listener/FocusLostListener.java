@@ -8,6 +8,7 @@ import java.awt.event.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 public interface FocusLostListener extends FocusListener {
   @Override
   default void focusGained(final FocusEvent e) { }

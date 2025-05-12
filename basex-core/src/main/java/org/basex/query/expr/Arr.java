@@ -267,7 +267,7 @@ public abstract class Arr extends ParseExpr {
     if(EMPTY.is(expr2) && arg != null && expr2.arg(0).equals(arg)) return true;
 
     // A = B, A != B
-    return expr1 instanceof Cmp && expr2 instanceof Cmp && expr1.equals(((Cmp) expr2).invert());
+    return expr1 instanceof Cmp && expr2 instanceof final Cmp cmp && expr1.equals(cmp.invert());
   }
 
   /**
@@ -369,7 +369,7 @@ public abstract class Arr extends ParseExpr {
    */
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof Arr && Array.equals(exprs, ((Arr) obj).exprs);
+    return obj instanceof final Arr arr && Array.equals(exprs, arr.exprs);
   }
 
   @Override

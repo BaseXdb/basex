@@ -65,9 +65,9 @@ public class MapType extends FType {
    */
   public void finalizeTypes(final Type kt, final SeqType vt) {
     if(isFinal) throw Util.notExpected();
-    this.keyType = kt;
-    this.valueType = vt;
-    this.isFinal = true;
+    keyType = kt;
+    valueType = vt;
+    isFinal = true;
   }
 
   /**
@@ -89,10 +89,7 @@ public class MapType extends FType {
   @Override
   public final XQMap cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    if(item instanceof XQMap) {
-      final XQMap map = (XQMap) item;
-      if(map.instanceOf(this, false)) return map;
-    }
+    if(item instanceof final XQMap map && map.instanceOf(this, false)) return map;
     throw typeError(item, this, info);
   }
 
@@ -117,14 +114,12 @@ public class MapType extends FType {
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.MAP, SeqType.FUNCTION, AtomType.ITEM)) return true;
     if(this == SeqType.MAP && type == SeqType.RECORD) return true;
-    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
+    if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
     if(type instanceof RecordType) return false;
-    if(type instanceof MapType) {
-      final MapType mt = (MapType) type;
+    if(type instanceof final MapType mt) {
       return valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
     }
-    if(type instanceof FuncType) {
-      final FuncType ft = type.funcType();
+    if(type instanceof final FuncType ft) {
       return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
           ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O);
     }
@@ -137,11 +132,7 @@ public class MapType extends FType {
     if(type == SeqType.RECORD) return SeqType.MAP;
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
-
-    if(type instanceof MapType) {
-      final MapType mt = (MapType) type;
-      return union(mt.keyType, mt.valueType);
-    }
+    if(type instanceof final MapType mt) return union(mt.keyType, mt.valueType);
     return type instanceof ArrayType ? SeqType.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
@@ -163,8 +154,7 @@ public class MapType extends FType {
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 
-    if(type instanceof MapType) {
-      final MapType mt = (MapType) type;
+    if(type instanceof final MapType mt) {
       final Type kt = keyType.intersect(mt.keyType);
       final SeqType vt = valueType.intersect(mt.valueType);
       if(kt != null && kt.atomic() != null && vt != null) return get(kt, vt);

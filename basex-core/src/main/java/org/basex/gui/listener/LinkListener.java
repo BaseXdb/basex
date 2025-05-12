@@ -6,6 +6,7 @@ package org.basex.gui.listener;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 public interface LinkListener {
   /**
    * Invoked when a link is pressed.

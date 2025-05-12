@@ -67,6 +67,7 @@ final class LuceneStemmer extends Stemmer {
     if(m == null) {
       Util.debugln("Could not initialize \"%\" Lucene stemmer method.", lang);
     } else {
+      m.setAccessible(true);
       CLASSES.put(lang, new StemmerClass(clz, m, ch));
     }
   }
@@ -129,26 +130,11 @@ final class LuceneStemmer extends Stemmer {
     return s == null ? word : token(s);
   }
 
-  /** Structure, containing stemming methods. */
-  private static final class StemmerClass {
-    /** Class implementing the stemmer. */
-    final Class<?> clz;
-    /** Method {@code stem}. */
-    final Method stem;
-    /** String indicator. */
-    final boolean chars;
-
-    /**
-     * Constructor.
-     * @param clz class implementing the stemmer
-     * @param stem method {@code stem}
-     * @param chars indicator for stemming via character array
-     */
-    StemmerClass(final Class<?> clz, final Method stem, final boolean chars) {
-      this.clz = clz;
-      this.stem = stem;
-      this.chars = chars;
-      stem.setAccessible(true);
-    }
-  }
+  /**
+   * Structure, containing stemming methods.
+   * @param clz   class implementing the stemmer
+   * @param stem  method {@code stem}
+   * @param chars string indicator
+   */
+  private record StemmerClass(Class<?> clz, Method stem, boolean chars) { }
 }

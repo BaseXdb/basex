@@ -19,7 +19,7 @@ final class ProjectCache implements Iterable<String> {
   /** Maximum number of paths to be cached. */
   private static final int MAX = 50000;
 
-  /** Cached file paths (all with forward slashes). */
+  /** Cached file paths (all with forward-slashes). */
   private final StringList cache = new StringList();
   /** Show hidden files. */
   private final boolean showHidden;

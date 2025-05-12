@@ -41,6 +41,14 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   public final ArrayList<WebParam> headerParams = new ArrayList<>();
 
   /**
+   * Web parameter.
+   * @param var variable name
+   * @param name name of parameter
+   * @param value default value
+   */
+  public record WebParam(QNm var, String name, Value value) { }
+
+  /**
    * Constructor.
    * @param function user-defined function
    * @param qc query context

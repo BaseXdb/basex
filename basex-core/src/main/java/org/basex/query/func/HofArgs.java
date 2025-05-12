@@ -4,7 +4,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
- * Encapsulation of of higher-order functions arguments.
+ * Encapsulation of higher-order functions arguments.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

@@ -147,14 +147,12 @@ public final class Str extends AStr {
   }
 
   @Override
-  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
     return type instanceof EnumType ? get(string()) : this;
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
-      throws QueryException {
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii) {
     return !(type instanceof EnumType);
   }
 

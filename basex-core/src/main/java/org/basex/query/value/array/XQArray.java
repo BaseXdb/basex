@@ -124,7 +124,7 @@ public abstract class XQArray extends XQStruct {
   /**
    * Returns a subsequence with the given start and length.
    * @param pos position of first member (>= 0)
-   * @param length number of members 1 < length < size())
+   * @param length number of members (1 < length < size())
    * @param qc query context
    * @return new subarray
    */
@@ -341,8 +341,8 @@ public abstract class XQArray extends XQStruct {
           if(indent) tb.add(' ');
         }
         final Item item = value.itemAt(i);
-        if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, ii);
-        else if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, ii);
+        if(item instanceof final XQArray array) array.string(indent, tb, level, ii);
+        else if(item instanceof final XQMap map) map.string(indent, tb, level + 1, ii);
         else tb.add(item.toString());
       }
       if(vs != 1) tb.add(')');
@@ -381,10 +381,9 @@ public abstract class XQArray extends XQStruct {
     if(type.instanceOf(tp)) return true;
 
     final SeqType mt;
-    if(tp instanceof ArrayType) {
-      mt = ((ArrayType) tp).valueType();
-    } else if(tp instanceof FuncType) {
-      final FuncType ft = (FuncType) tp;
+    if(tp instanceof final ArrayType at) {
+      mt = at.valueType();
+    } else if(tp instanceof final FuncType ft) {
       if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.INTEGER_O)) return false;
       mt = ft.declType;
     } else {
@@ -422,8 +421,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
-    if(item instanceof XQArray) {
-      final XQArray array = (XQArray) item;
+    if(item instanceof final XQArray array) {
       if(structSize() != array.structSize()) return false;
       final Iterator<Value> iter1 = iterator(0), iter2 = array.iterator(0);
       while(iter1.hasNext()) {

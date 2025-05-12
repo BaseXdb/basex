@@ -9,6 +9,7 @@ package org.basex.query.util.fingertree;
  * @param <N> node type
  * @param <E> element type
  */
+@FunctionalInterface
 public interface NodeLike<N, E> {
   /**
    * Appends this possibly partial node to the given buffer.

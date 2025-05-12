@@ -131,8 +131,6 @@ public abstract class FNode extends ANode {
 
   @Override
   public boolean equals(final Object obj) {
-    if(!(obj instanceof FNode)) return false;
-    final FNode n = (FNode) obj;
-    return type.eq(n.type) && parent == n.parent;
+    return obj instanceof final FNode n && type.eq(n.type) && parent == n.parent;
   }
 }

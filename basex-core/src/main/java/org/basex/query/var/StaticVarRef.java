@@ -114,10 +114,8 @@ final class StaticVarRef extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof StaticVarRef)) return false;
-    final StaticVarRef s = (StaticVarRef) obj;
-    return name.eq(s.name) && var == s.var;
+    return this == obj || obj instanceof final StaticVarRef svr && name.eq(svr.name) &&
+        var == svr.var;
   }
 
   @Override

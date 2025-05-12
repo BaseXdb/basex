@@ -8,6 +8,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
+import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -100,12 +101,12 @@ public final class GFLWOR extends ParseExpr {
       while(iter.hasNext()) iter.next().compile(cc);
     } catch(final QueryException ex) {
       iter.remove();
-      clauseError(ex, iter, cc);
+      clauseError(ex, iter);
     }
     try {
       rtrn = rtrn.compile(cc);
     } catch(final QueryException ex) {
-      clauseError(ex, iter, cc);
+      clauseError(ex, iter);
     }
     return optimize(cc);
   }
@@ -159,18 +160,17 @@ public final class GFLWOR extends ParseExpr {
       return new If(info, ((Where) clauses.removeFirst()).expr, cs == 1 ? rtrn : this).optimize(cc);
     }
 
-    if(first instanceof For) {
+    if(first instanceof final For fr) {
       // replace allowing empty with empty sequence
       //   for $_ allowing empty in () return $_  ->  ()
-      final For fr = (For) first;
-      if(cs == 1 && fr.size() == 0 && !fr.has(Flag.NDT) && rtrn instanceof VarRef &&
-          ((VarRef) rtrn).var == fr.var) return Empty.VALUE;
+      if(cs == 1 && fr.size() == 0 && !fr.has(Flag.NDT) && rtrn instanceof final VarRef vr &&
+          vr.var == fr.var) return Empty.VALUE;
 
       // rewrite group by to distinct-values
       //   for $e in E group by $g := G return R
       //   ->  for $g in distinct-values(for $e in E return G) return R
-      if(cs == 2 && clauses.get(1) instanceof GroupBy) {
-        final GroupSpec spec = ((GroupBy) clauses.get(1)).group();
+      if(cs == 2 && clauses.get(1) instanceof final GroupBy group) {
+        final GroupSpec spec = group.group();
         if(spec != null) {
           final Expr flwor = new GFLWOR(info, clauses.removeFirst(), spec.expr).optimize(cc);
           final Expr expr = cc.function(Function.DISTINCT_VALUES, info, flwor);
@@ -183,8 +183,8 @@ public final class GFLWOR extends ParseExpr {
     // rewrite single group
     //   group by $g := G return R
     //   ->  for $g in G return R
-    if(first instanceof GroupBy && cs == 1) {
-      final GroupSpec spec = ((GroupBy) first).group();
+    if(first instanceof final GroupBy group && cs == 1) {
+      final GroupSpec spec = group.group();
       if(spec != null) {
         final Expr expr = cc.function(Function.DATA, info, spec.expr);
         clauses.set(0, new For(spec.var, expr).optimize(cc));
@@ -249,12 +249,9 @@ public final class GFLWOR extends ParseExpr {
     final ListIterator<Clause> iter = clauses.listIterator();
     while(iter.hasNext()) {
       final Clause clause = iter.next();
-      if(clause instanceof Where) {
-        final Where where = (Where) clause;
-        if(where.expr instanceof And) {
-          iter.remove();
-          for(final Expr expr : where.expr.args()) iter.add(new Where(expr, where.info()));
-        }
+      if(clause instanceof final Where where && where.expr instanceof And) {
+        iter.remove();
+        for(final Expr expr : where.expr.args()) iter.add(new Where(expr, where.info()));
       }
     }
   }
@@ -269,7 +266,7 @@ public final class GFLWOR extends ParseExpr {
     boolean changed = false;
     for(int i = clauses.size(); --i >= 0;) {
       final Clause clause = clauses.get(i);
-      if(clause instanceof For && ((For) clause).asLet(clauses, i, cc)) {
+      if(clause instanceof final For fr && fr.asLet(clauses, i, cc)) {
         cc.info(QueryText.OPTFORTOLET_X, clause);
         changed = true;
       }
@@ -292,9 +289,8 @@ public final class GFLWOR extends ParseExpr {
     while(iter.hasPrevious()) {
       final int pos = iter.previousIndex();
       final Clause clause = iter.previous();
-      if(clause instanceof Let) {
+      if(clause instanceof final Let lt) {
         // completely remove 'let' clause
-        final Let lt = (Let) clause;
         if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT)) {
           cc.info(QueryText.OPTVAR_X, lt.var);
           // check type before removing variable (see {@link FuncType})
@@ -302,8 +298,7 @@ public final class GFLWOR extends ParseExpr {
           iter.remove();
           changed = true;
         }
-      } else if(clause instanceof For) {
-        final For fr = (For) clause;
+      } else if(clause instanceof final For fr) {
         final long fs = fr.expr.size();
         if(fs > 1 && fr.var.declType == null && !(fr.expr instanceof SingletonSeq) &&
             !fr.has(Flag.NDT) && count(fr.var, pos + 1) == VarUsage.NEVER) {
@@ -353,8 +348,7 @@ public final class GFLWOR extends ParseExpr {
     boolean changed = false;
     for(int c = clauses.size() - 1; c >= 0; c--) {
       final Clause clause = clauses.get(c);
-      if(clause instanceof For) {
-        final For fr = (For) clause;
+      if(clause instanceof final For fr) {
         if(fr.expr.size() == 0 && !fr.empty) {
           for(int d = clauses.size() - 1; d >= c; d--) clauses.remove(c);
           rtrn = fr.expr;
@@ -377,9 +371,8 @@ public final class GFLWOR extends ParseExpr {
     int cs = clauses.size();
     for(int c = cs - 1; c >= 0; c--) {
       final Clause clause = clauses.get(c);
-      if(!(clause instanceof ForLet)) continue;
+      if(!(clause instanceof final ForLet fl)) continue;
 
-      final ForLet fl = (ForLet) clause;
       final Expr inline = fl.inlineExpr(cc);
       if(inline == null) continue;
 
@@ -408,7 +401,7 @@ public final class GFLWOR extends ParseExpr {
             changing = true;
           }
         } else {
-          // rewrite for/let combinations to single for clause
+          // rewrite for/let combinations to a single for clause
           //   for $a in $seq for $b in $a  ->  for $b in $seq
           //   for $a in $seq for $b in 1 to $a  ->  for $b in $seq ! (1 to .)
           // check next clause: skip let clause with sequences or positional for clause
@@ -458,7 +451,7 @@ public final class GFLWOR extends ParseExpr {
     // replace return clause with expression
     //   for $c in (1, 2) return $c  ->  (1, 2)
     //   let $c := <a/> return $c  ->  <a/>
-    if(expr instanceof VarRef && ((VarRef) expr).var == fl.var) return inline;
+    if(expr instanceof final VarRef vr && vr.var == fl.var) return inline;
 
     // rewrite let clause with unused variable
     //   let $_ := file:write(...) return ()  ->  file:write(...)
@@ -501,24 +494,20 @@ public final class GFLWOR extends ParseExpr {
         if(isFor) {
           // for $x in (for $y in A (...) return B)  ->  for $y in A (...) for $x in B
           final For fr = (For) clause;
-          if(!fr.empty && fr.pos == null && fr.expr instanceof GFLWOR) {
-            final GFLWOR fl = (GFLWOR) fr.expr;
-            if(fl.isFLW()) {
-              cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fr.var);
-              iter.remove();
-              for(final Clause cls : fl.clauses) iter.add(cls);
-              fr.expr = fl.rtrn;
-              iter.add(fr);
-              thisRound = changed = true;
-            }
+          if(!fr.empty && fr.pos == null && fr.expr instanceof final GFLWOR fl && fl.isFLW()) {
+            cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fr.var);
+            iter.remove();
+            for(final Clause cls : fl.clauses) iter.add(cls);
+            fr.expr = fl.rtrn;
+            iter.add(fr);
+            thisRound = changed = true;
           }
         }
 
         if(!thisRound && (isFor || isLet)) {
           // let $x := (let $y := E return F)  ->  let $y := E let $x := F
           final Expr expr = isFor ? ((For) clause).expr : ((Let) clause).expr;
-          if(expr instanceof GFLWOR) {
-            final GFLWOR fl = (GFLWOR) expr;
+          if(expr instanceof final GFLWOR fl) {
             final LinkedList<Clause> cls = fl.clauses;
             if(cls.getFirst() instanceof Let) {
               // remove the binding from the outer clauses
@@ -584,8 +573,7 @@ public final class GFLWOR extends ParseExpr {
     for(int c = 1; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
       // do not move node constructors. example: for $x in 1 to 2 let $a := <x/> return $a
-      if(!(clause instanceof Let) || clause.has(Flag.NDT, Flag.CNS)) continue;
-      final Let let = (Let) clause;
+      if(!(clause instanceof final Let let) || clause.has(Flag.NDT, Flag.CNS)) continue;
 
       // find insertion position
       int insert = -1;
@@ -660,9 +648,8 @@ public final class GFLWOR extends ParseExpr {
             // skip clauses
             if(get.apply(before) != null) continue;
             // analyze for/let clauses, abort otherwise
-            if(before instanceof ForLet) {
-              final ForLet fl = (ForLet) before;
-              final Predicate<Expr> varRef = e -> e instanceof VarRef && ((VarRef) e).var == fl.var;
+            if(before instanceof final ForLet fl) {
+              final Predicate<Expr> varRef = e -> e instanceof final VarRef vr && vr.var == fl.var;
               final boolean let = before instanceof Let;
               if(let && before.seqType().instanceOf(SeqType.NODE_ZO) && varRef.test(expr)) {
                 // let $n := ZERO-OR-ONE-NODE where $n  ->  for $n in ZERO-OR-ONE-NODE
@@ -673,8 +660,8 @@ public final class GFLWOR extends ParseExpr {
                 c--;
               } else if(where && (!let || c + 1 == clauses.size() && (
                 varRef.test(rtrn) ||
-                rtrn instanceof Filter && varRef.test(((Filter) rtrn).root) ||
-                rtrn instanceof Path && varRef.test(((Path) rtrn).root)
+                rtrn instanceof final Filter filter && varRef.test(filter.root) ||
+                rtrn instanceof final Path path && varRef.test(path.root)
               )) && fl.toPredicate(cc, expr)) {
                 // for $b in /a/b where $b/c  ->  for $b in /a/b[c]
                 // let $a := 1 to 3 where $a > 1 return $a  ->  let $a := (1 to 3)[. > 1] ...
@@ -706,26 +693,22 @@ public final class GFLWOR extends ParseExpr {
     boolean changed = false;
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
-      if(!(clause instanceof For)) continue;
+      if(!(clause instanceof final For pos)) continue;
 
-      final For pos = (For) clause;
       if(pos.pos == null) continue;
 
       // find where clause ($c = 1)
       for(int d = c + 1; d < clauses.size(); d++) {
         final Clause cl = clauses.get(d);
         if(!(cl instanceof Where)) {
-          // stop if clause is no 'for' or 'let' expression or nondeterministic
+          // stop if the clause is no 'for' or 'let' expression or nondeterministic
           if(!(cl instanceof For || cl instanceof Let) || cl.has(Flag.NDT)) break;
           continue;
         }
 
         Expr expr = ((Where) cl).expr;
-        if(expr instanceof CmpG) expr = CmpIR.get(cc, (CmpG) expr, true);
-        if(!(expr instanceof CmpIR)) continue;
-
-        final CmpIR cmp = (CmpIR) expr;
-        if(!(cmp.expr instanceof VarRef)) continue;
+        if(expr instanceof final CmpG cmp) expr = CmpIR.get(cc, cmp, true);
+        if(!(expr instanceof final CmpIR cmp) || !(cmp.expr instanceof VarRef)) continue;
 
         // remove clause and ensure that the positional variable is only used once
         clauses.remove(d);
@@ -755,11 +738,11 @@ public final class GFLWOR extends ParseExpr {
     For fr = null;
     while(fr == null && iter.hasNext()) {
       final Clause clause = iter.next();
-      if(clause instanceof For) fr = (For) clause;
+      if(clause instanceof final For frr) fr = frr;
     }
     if(fr != null && fr.vars.length == 1 && iter.hasNext()) {
       final Clause clause = iter.next();
-      if(clause instanceof OrderBy && ((OrderBy) clause).merge(fr, cc)) {
+      if(clause instanceof final OrderBy order && order.merge(fr, cc)) {
         iter.remove();
         return true;
       }
@@ -775,8 +758,7 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean ifToWhere(final CompileContext cc) throws QueryException {
     final QueryFunction<Expr, If> rewritableIf = expr -> {
-      if(expr instanceof If) {
-        final If iff = (If) expr;
+      if(expr instanceof final If iff) {
         if(iff.exprs[0] == Empty.VALUE) {
           iff.cond = cc.function(Function.NOT, info, iff.cond);
           iff.swap();
@@ -789,8 +771,7 @@ public final class GFLWOR extends ParseExpr {
     boolean changed = false;
     for(int c = clauses.size(); --c >= 0;) {
       final Clause clause = clauses.get(c);
-      if(clause instanceof For) {
-        final For fr = (For) clause;
+      if(clause instanceof final For fr) {
         final If iff = rewritableIf.apply(fr.expr);
         if(iff != null && !fr.empty) {
           fr.expr = iff.exprs[0];
@@ -816,32 +797,27 @@ public final class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   private boolean flattenFor(final CompileContext cc) throws QueryException {
-    if(!clauses.isEmpty() && clauses.getFirst() instanceof For) {
-      final For fst = (For) clauses.getFirst();
-      if(!fst.empty) {
-        // flat nested FLWOR expressions
-        if(fst.expr instanceof GFLWOR) {
-          // for $a in (for $b in ... return $b + 1) ...  ->  for $b in ... for $a in $b + 1 ...
-          cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fst.var);
-          final GFLWOR sub = (GFLWOR) fst.expr;
-          clauses.set(0, new For(fst.var, null, fst.score, sub.rtrn, false));
-          if(fst.pos != null) clauses.add(1, new Count(fst.pos));
-          clauses.addAll(0, sub.clauses);
-          return true;
+    if(!clauses.isEmpty() && clauses.getFirst() instanceof final For fst && !fst.empty) {
+      // flat nested FLWOR expressions
+      if(fst.expr instanceof final GFLWOR sub) {
+        // for $a in (for $b in ... return $b + 1) ...  ->  for $b in ... for $a in $b + 1 ...
+        cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fst.var);
+        clauses.set(0, new For(fst.var, null, fst.score, sub.rtrn, false));
+        if(fst.pos != null) clauses.add(1, new Count(fst.pos));
+        clauses.addAll(0, sub.clauses);
+        return true;
+      }
+      if(clauses.size() > 1 && clauses.get(1) instanceof final Count cnt) {
+        if(fst.pos != null) {
+          // for $a at $b in ... count $c ...  ->  for $a at $b in ... let $c := $b ...
+          final Expr ref = new VarRef(cnt.info(), fst.pos).optimize(cc);
+          clauses.set(1, new Let(cnt.var, ref).optimize(cc));
+        } else {
+          // for $a in 1 to 3 count $c ...  ->  for $a at $c in 1 to 3 ...
+          clauses.set(0, new For(fst.var, cnt.var, fst.score, fst.expr, false).optimize(cc));
+          clauses.remove(1);
         }
-        if(clauses.size() > 1 && clauses.get(1) instanceof Count) {
-          final Count cnt = (Count) clauses.get(1);
-          if(fst.pos != null) {
-            // for $a at $b in ... count $c ...  ->  for $a at $b in ... let $c := $b ...
-            final Expr ref = new VarRef(cnt.info(), fst.pos).optimize(cc);
-            clauses.set(1, new Let(cnt.var, ref).optimize(cc));
-          } else {
-            // for $a in 1 to 3 count $c ...  ->  for $a at $c in 1 to 3 ...
-            clauses.set(0, new For(fst.var, cnt.var, fst.score, fst.expr, false).optimize(cc));
-            clauses.remove(1);
-          }
-          return true;
-        }
+        return true;
       }
     }
     return false;
@@ -853,18 +829,15 @@ public final class GFLWOR extends ParseExpr {
    * @return change flag
    */
   private boolean flattenReturn(final CompileContext cc) {
-    if(!clauses.isEmpty() && rtrn instanceof GFLWOR) {
-      final GFLWOR sub = (GFLWOR) rtrn;
-      if(sub.isFLW()) {
-        // flatten nested FLWOR expressions
-        // for $a in (1 to 2) return let $f := ...  ->  for $a in (1 to 2) let $f := ...
-        final Clause clause = sub.clauses.getFirst();
-        final ExprInfo ei = clause instanceof ForLet ? ((ForLet) clause).var : clause;
-        cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, ei);
-        clauses.addAll(sub.clauses);
-        rtrn = sub.rtrn;
-        return true;
-      }
+    if(!clauses.isEmpty() && rtrn instanceof final GFLWOR sub && sub.isFLW()) {
+      // flatten nested FLWOR expressions
+      // for $a in (1 to 2) return let $f := ...  ->  for $a in (1 to 2) let $f := ...
+      final Clause clause = sub.clauses.getFirst();
+      final ExprInfo ei = clause instanceof final ForLet fl ? fl.var : clause;
+      cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, ei);
+      clauses.addAll(sub.clauses);
+      rtrn = sub.rtrn;
+      return true;
     }
     return false;
   }
@@ -878,11 +851,11 @@ public final class GFLWOR extends ParseExpr {
    */
   private boolean unnestLets(final CompileContext cc) throws QueryException {
     if(!clauses.isEmpty()) {
-      final TypeCheck tc = rtrn instanceof TypeCheck ? (TypeCheck) rtrn : null;
+      final TypeCheck tc = rtrn instanceof final TypeCheck check ? check : null;
       if(rtrn instanceof GFLWOR || tc != null && tc.expr instanceof GFLWOR) {
         final GFLWOR sub = (GFLWOR) (tc == null ? rtrn : tc.expr);
         final Clause clause = sub.clauses.getFirst();
-        if(clause instanceof Let) {
+        if(clause instanceof final Let let) {
           /* example:
           function($a) as xs:integer+ {
             function($c) { ($c, if($a) then $a else $c) }(1[. = 1])
@@ -900,7 +873,7 @@ public final class GFLWOR extends ParseExpr {
           let $c := 1[. = 1]
           return ($c, if($a) then $a else $c))
           */
-          cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, ((Let) clause).var);
+          cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, let.var);
 
           // propagate all leading 'let' bindings into outer clauses
           final LinkedList<Clause> cls = sub.clauses;
@@ -1016,7 +989,7 @@ public final class GFLWOR extends ParseExpr {
         }
       } catch(final QueryException ex) {
         iter.remove();
-        return clauseError(ex, iter, ic.cc);
+        return clauseError(ex, iter);
       }
     }
 
@@ -1027,7 +1000,7 @@ public final class GFLWOR extends ParseExpr {
         changed = true;
       }
     } catch(final QueryException ex) {
-      return clauseError(ex, iter, ic.cc);
+      return clauseError(ex, iter);
     }
 
     return changed;
@@ -1037,13 +1010,11 @@ public final class GFLWOR extends ParseExpr {
    * Tries to recover from a compile-time exception inside a FLWOR clause.
    * @param ex thrown exception
    * @param iter iterator positioned where the failing clause was before
-   * @param cc compilation context
    * @return {@code true} if the GFLWOR expression has to stay
    * @throws QueryException query exception if the whole expression fails
    */
-  private boolean clauseError(final QueryException ex, final ListIterator<Clause> iter,
-      final CompileContext cc) throws QueryException {
-
+  private boolean clauseError(final QueryException ex, final ListIterator<Clause> iter)
+      throws QueryException {
     // check if an outer clause can prevent the error
     while(iter.hasPrevious()) {
       final Clause b4 = iter.previous();
@@ -1053,7 +1024,7 @@ public final class GFLWOR extends ParseExpr {
           iter.next();
           iter.remove();
         }
-        rtrn = cc.error(ex, rtrn);
+        rtrn = FnError.get(ex, rtrn);
         return true;
       }
     }
@@ -1117,10 +1088,8 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof GFLWOR)) return false;
-    final GFLWOR g = (GFLWOR) obj;
-    return clauses.equals(g.clauses) && rtrn.equals(g.rtrn);
+    return this == obj || obj instanceof final GFLWOR gflwor && clauses.equals(gflwor.clauses) &&
+        rtrn.equals(gflwor.rtrn);
   }
 
   @Override

@@ -30,9 +30,9 @@ public final class UtilRoot extends StandardFunc {
     final Iter iter = nodes.iter();
     final ANodeBuilder list = new ANodeBuilder();
     for(Item item; (item = qc.next(iter)) != null;) {
-      final ANode node = item instanceof ANode ? ((ANode) item).root() : null;
-      if(node == null || node.type != NodeType.DOCUMENT_NODE) throw NODOC_X.get(info, nodes);
-      list.add(node);
+      final ANode root = item instanceof final ANode node ? node.root() : null;
+      if(root == null || root.type != NodeType.DOCUMENT_NODE) throw NODOC_X.get(info, nodes);
+      list.add(root);
     }
     return list.value(this);
   }

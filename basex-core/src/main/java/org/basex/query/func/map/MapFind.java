@@ -42,17 +42,16 @@ public final class MapFind extends StandardFunc {
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void find(final Iter iter, final Item key, final ArrayBuilder builder,
+  private static void find(final Iter iter, final Item key, final ArrayBuilder builder,
       final QueryContext qc) throws QueryException {
 
     for(Item item; (item = qc.next(iter)) != null;) {
-      if(item instanceof XQMap) {
-        final XQMap map = (XQMap) item;
+      if(item instanceof final XQMap map) {
         final Value value = map.get(key);
         if(!value.isEmpty()) builder.add(value);
         map.forEach((k, val) -> find(val.iter(), key, builder, qc));
-      } else if(item instanceof XQArray) {
-        for(final Value value : ((XQArray) item).iterable()) {
+      } else if(item instanceof final XQArray array) {
+        for(final Value value : array.iterable()) {
           find(value.iter(), key, builder, qc);
         }
       }

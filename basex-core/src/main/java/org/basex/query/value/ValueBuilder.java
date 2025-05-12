@@ -22,7 +22,7 @@ public final class ValueBuilder {
   /** Sequence builder, only instantiated if there are at least two items. */
   private SeqBuilder sequence;
   /** Capacity ({@link Integer#MIN_VALUE}: create no compact data structures). */
-  private long capacity;
+  private final long capacity;
   /** The first added value is cached. */
   private Value single;
 

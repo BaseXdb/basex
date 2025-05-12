@@ -62,12 +62,11 @@ final class TableHeader extends BaseXPanel {
     addFocusListener(new FocusListener() {
       @Override
       public void focusGained(final FocusEvent e) {
-        filter(e.getOppositeComponent() instanceof TableView ? 0 :
-          tdata.cols.length - 1);
+        filter(e.getOppositeComponent() instanceof TableView ? 0 : tdata.cols.length - 1);
       }
       @Override
       public void focusLost(final FocusEvent e) {
-        // tab key pressed..
+        // tab key pressed...
         if(box != null) box.stop();
         inputCol = -1;
         repaint();

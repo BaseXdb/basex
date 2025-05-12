@@ -76,8 +76,7 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean eq(final Type type) {
-    return this == type ||
-        type instanceof ChoiceItemType && types.equals(((ChoiceItemType) type).types);
+    return this == type || type instanceof final ChoiceItemType cit && types.equals(cit.types);
   }
 
   /**
@@ -183,8 +182,7 @@ public final class ChoiceItemType implements Type {
   boolean hasInstance(final SeqType seqType) {
     if(!seqType.one()) throw Util.notExpected();
     final Test test = seqType.test();
-    if(test instanceof UnionTest) {
-      final UnionTest ut = (UnionTest) test;
+    if(test instanceof final UnionTest ut) {
       for (final Test t : ut.tests) {
         if(!hasInstance(SeqType.get(seqType.type, Occ.EXACTLY_ONE, t))) return false;
       }
@@ -203,8 +201,7 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof ChoiceItemType &&
-        types.equals(((ChoiceItemType) obj).types);
+    return this == obj || obj instanceof final ChoiceItemType cit && types.equals(cit.types);
   }
 
   @Override

@@ -93,7 +93,7 @@ public final class IndexDynDb extends IndexDb {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof IndexDynDb && expr.equals(((IndexDynDb) obj).expr) && super.equals(obj);
+    return obj instanceof final IndexDynDb id && expr.equals(id.expr) && super.equals(obj);
   }
 
   @Override

@@ -28,8 +28,8 @@ public final class MapItems extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
     final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      final SeqType vt = ((MapType) type).valueType();
+    if(type instanceof final MapType mt) {
+      final SeqType vt = mt.valueType();
       exprType.assign(vt.with(Occ.ZERO_OR_MORE), vt.one() ? map.structSize() : -1);
     }
     return this;

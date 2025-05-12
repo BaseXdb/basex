@@ -116,7 +116,7 @@ public enum ListType implements Type {
 
   @Override
   public final boolean instanceOf(final Type tp) {
-    return this == tp || (tp instanceof ChoiceItemType ? ((ChoiceItemType) tp).hasInstance(this) :
+    return this == tp || (tp instanceof final ChoiceItemType cit ? cit.hasInstance(this) :
       tp == AtomType.ITEM);
   }
 

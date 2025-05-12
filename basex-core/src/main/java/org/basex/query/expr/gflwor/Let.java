@@ -45,10 +45,11 @@ public final class Let extends ForLet {
 
   @Override
   LetEval eval(final Eval sub) {
-    if(!(sub instanceof LetEval)) return new LetEval(this, sub);
-    final LetEval eval = (LetEval) sub;
-    eval.lets.add(this);
-    return eval;
+    if(sub instanceof final LetEval eval) {
+      eval.lets.add(this);
+      return eval;
+    }
+    return new LetEval(this, sub);
   }
 
   /**
@@ -72,8 +73,8 @@ public final class Let extends ForLet {
       }
     }
     // coerce at compile time
-    if(expr instanceof Value) {
-      expr = var.checkType((Value) expr, cc.qc, cc);
+    if(expr instanceof final Value value) {
+      expr = var.checkType(value, cc.qc, cc);
     }
 
     // assign type to clause and variable

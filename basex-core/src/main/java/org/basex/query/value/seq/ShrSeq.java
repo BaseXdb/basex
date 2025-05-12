@@ -73,7 +73,7 @@ public final class ShrSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof ShrSeq ? Arrays.equals(values, ((ShrSeq) obj).values) :
+    return this == obj || (obj instanceof final ShrSeq seq ? Arrays.equals(values, seq.values) :
       super.equals(obj));
   }
 
@@ -101,8 +101,8 @@ public final class ShrSeq extends NativeSeq {
     final ShortList tmp = new ShortList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      if(value instanceof ShrSeq) {
-        tmp.add(((ShrSeq) value).values);
+      if(value instanceof final ShrSeq seq) {
+        tmp.add(seq.values);
       } else {
         for(final Item item : value) tmp.add((short) item.itr(null));
       }

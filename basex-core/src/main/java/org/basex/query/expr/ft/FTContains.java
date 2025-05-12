@@ -60,8 +60,7 @@ public final class FTContains extends Single {
           found = true;
           if(scoring) score += it.score();
           // cache entry for visualizations or ft:mark/ft:extract
-          if(ftPosData != null && item instanceof DBNode) {
-            final DBNode node = (DBNode) item;
+          if(ftPosData != null && item instanceof final DBNode node) {
             ftPosData.add(node.data(), node.pre(), all);
           }
         }
@@ -138,7 +137,7 @@ public final class FTContains extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTContains && ftexpr.equals(((FTContains) obj).ftexpr) &&
+    return this == obj || obj instanceof final FTContains ftc && ftexpr.equals(ftc.ftexpr) &&
         super.equals(obj);
   }
 

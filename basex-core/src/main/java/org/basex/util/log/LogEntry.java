@@ -38,8 +38,8 @@ public final class LogEntry {
       final Object[] fields = { time, address, user, type, info, runtime, ms };
       final StringBuilder sb = new StringBuilder();
       for(final Object field : fields) {
-        if(sb.length() > 0) sb.append('\t');
-        if(field != null) sb.append(field.toString());
+        if(!sb.isEmpty()) sb.append('\t');
+        if(field != null) sb.append(field);
       }
       string = sb.toString();
     }

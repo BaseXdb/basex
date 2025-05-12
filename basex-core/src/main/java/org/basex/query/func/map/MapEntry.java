@@ -25,12 +25,12 @@ public final class MapEntry extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr key = arg(0), value = arg(1);
 
-    Type type = null;
-    if(key instanceof Str && key.seqType().eq(SeqType.STRING_O)) {
-      type = cc.qc.shared.record((Str) key, value.seqType());
+    final Type type;
+    if(key instanceof final Str str && key.seqType().eq(SeqType.STRING_O)) {
+      type = cc.qc.shared.record(str, value.seqType());
     } else {
       final AtomType kt = key.seqType().type.atomic();
       type = MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE, value.seqType());

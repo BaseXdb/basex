@@ -91,14 +91,14 @@ public final class WsFunction extends WebFunction {
       final QueryContext qc) throws QueryException {
 
     final Expr[] args = new Expr[function.arity()];
-    if(msg != null) values.put("message", msg instanceof byte[] ?
-      B64.get((byte[]) msg) : Str.get((String) msg));
+    if(msg != null) values.put("message", msg instanceof final byte[] bytes ? B64.get(bytes) :
+        Str.get((String) msg));
 
     for(final WebParam param : headerParams) {
-      bind(param.var, args, values.get(param.name), qc, "Value of '" + param.name + "'");
+      bind(param.var(), args, values.get(param.name()), qc, "Value of '" + param.name() + "'");
     }
     if(message != null) {
-      bind(message.var, args, values.get(message.name), qc, "Message");
+      bind(message.var(), args, values.get(message.name()), qc, "Message");
     }
     return args;
   }
@@ -119,7 +119,7 @@ public final class WsFunction extends WebFunction {
 
   @Override
   public int compareTo(final WebFunction func) {
-    return func instanceof WsFunction ? path.compareTo(((WsFunction) func).path) : 1;
+    return func instanceof final WsFunction ws ? path.compareTo(ws.path) : 1;
   }
 
   /**

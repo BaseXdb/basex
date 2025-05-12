@@ -172,8 +172,8 @@ public final class QNm extends Item {
       throws QueryException {
     final QNm qnm;
     final StaticContext sc = ii != null ? ii.sc() : null;
-    if(item instanceof QNm) {
-      qnm = (QNm) item;
+    if(item instanceof final QNm q) {
+      qnm = q;
     } else if(item.type.isUntyped() && sc != null) {
       final byte[] nm = trim(item.string(ii));
       if(!XMLToken.isQName(nm)) throw FUNCCAST_X_X_X.get(ii, item.type, type, item);
@@ -304,10 +304,8 @@ public final class QNm extends Item {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof QNm)) return false;
-    final QNm qnm = (QNm) obj;
-    return Token.eq(uri(), qnm.uri()) && Token.eq(name, qnm.name);
+    return this == obj || obj instanceof final QNm qnm && Token.eq(uri(), qnm.uri()) &&
+        Token.eq(name, qnm.name);
   }
 
   @Override

@@ -47,8 +47,8 @@ public final class StringRangeAccess extends IndexAccess {
 
     return new DBNodeIter(data) {
       final byte kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-      final IndexIterator iter = index.min.length <= data.meta.maxlen &&
-          index.max.length <= data.meta.maxlen ? data.iter(index) : scan(data);
+      final IndexIterator iter = index.min().length <= data.meta.maxlen &&
+          index.max().length <= data.meta.maxlen ? data.iter(index) : scan(data);
 
       @Override
       public DBNode next() {
@@ -62,8 +62,8 @@ public final class StringRangeAccess extends IndexAccess {
     final IndexType it = index.type();
     final Data data = db.data(qc, it);
 
-    final IndexIterator iter = index.min.length <= data.meta.maxlen &&
-        index.max.length <= data.meta.maxlen ? data.iter(index) : scan(data);
+    final IndexIterator iter = index.min().length <= data.meta.maxlen &&
+        index.max().length <= data.meta.maxlen ? data.iter(index) : scan(data);
     final IntList list = new IntList();
     while(iter.more()) list.add(iter.pre());
     return DBNodeSeq.get(list.finish(), data, this);
@@ -90,8 +90,8 @@ public final class StringRangeAccess extends IndexAccess {
         while(++pre < sz) {
           if(data.kind(pre) != kind) continue;
           final byte[] txt = data.text(pre, text);
-          final int min = Token.compare(txt, index.min), max = Token.compare(txt, index.max);
-          if(min >= (index.mni ? 0 : 1) && max <= (index.mxi ? 0 : 1)) return true;
+          final int min = Token.compare(txt, index.min()), max = Token.compare(txt, index.max());
+          if(min >= (index.mni() ? 0 : 1) && max <= (index.mxi() ? 0 : 1)) return true;
         }
         return false;
       }
@@ -114,19 +114,19 @@ public final class StringRangeAccess extends IndexAccess {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof StringRangeAccess && index.equals(((StringRangeAccess) obj).index) &&
+    return this == obj || obj instanceof final StringRangeAccess sra && index.equals(sra.index) &&
         super.equals(obj);
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, INDEX, index.type(), MIN, index.min, MAX, index.max), db);
+    plan.add(plan.create(this, INDEX, index.type(), MIN, index.min(), MAX, index.max()), db);
   }
 
   @Override
   public void toString(final QueryString qs) {
     final Function function = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
       Function._DB_ATTRIBUTE_RANGE;
-    qs.function(function, db, Str.get(index.min), Str.get(index.max));
+    qs.function(function, db, Str.get(index.min()), Str.get(index.max()));
   }
 }

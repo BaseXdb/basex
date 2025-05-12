@@ -10,6 +10,7 @@ import jakarta.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.http.web.*;
+import org.basex.http.web.WebFunction.*;
 import org.basex.query.*;
 import org.basex.query.func.inspect.*;
 import org.basex.query.value.item.*;
@@ -98,9 +99,9 @@ public final class RestXqWadl {
 
         // create request
         final FBuilder rqst = FElem.build(Q_REQUEST);
-        for(final WebParam wp : func.queryParams) addParam(wp.name, "query", rqst, xqdoc, func);
-        for(final WebParam wp : func.formParams) addParam(wp.name, "query", rqst, xqdoc, func);
-        for(final WebParam wp : func.headerParams) addParam(wp.name, "header", rqst, xqdoc, func);
+        for(final WebParam wp : func.queryParams) addParam(wp.name(), "query", rqst, xqdoc, func);
+        for(final WebParam wp : func.formParams) addParam(wp.name(), "query", rqst, xqdoc, func);
+        for(final WebParam wp : func.headerParams) addParam(wp.name(), "header", rqst, xqdoc, func);
         method.add(rqst);
 
         // create response
@@ -142,7 +143,7 @@ public final class RestXqWadl {
 
   /**
    * Adds a documentation element to the specified element.
-   * @param xqdoc documentation (may be {@code null})
+   * @param xqdoc documentation (can be {@code null})
    * @param parent parent node
    * @throws QueryException query exception
    */

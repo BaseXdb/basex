@@ -70,14 +70,12 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
-      throws QueryException {
+  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc) {
     throw Util.notExpected();
   }
 
   @Override
-  public boolean materialized(final Predicate<Data> test, final InputInfo ii)
-      throws QueryException {
+  public boolean materialized(final Predicate<Data> test, final InputInfo ii) {
     throw Util.notExpected();
   }
 
@@ -97,7 +95,7 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+  public void cache(final boolean lazy, final InputInfo ii) {
     throw Util.notExpected();
   }
 
@@ -117,18 +115,17 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) {
     throw Util.notExpected();
   }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) {
     throw Util.notExpected();
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
     throw Util.notExpected();
   }
 

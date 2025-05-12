@@ -1,7 +1,5 @@
 package org.basex.query.value.item;
 
-import static java.lang.Float.*;
-
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -92,13 +90,13 @@ public abstract class ANum extends Item {
   public abstract ANum abs();
 
   /**
-   * Returns an ceiling value.
+   * Returns a ceiling value.
    * @return ceiling value
    */
   public abstract ANum ceiling();
 
   /**
-   * Returns an floor value.
+   * Returns a floor value.
    * @return floor value
    */
   public abstract ANum floor();
@@ -158,7 +156,7 @@ public abstract class ANum extends Item {
     final long l = itr();
     final float f = flt();
     // extract fractional part from a finite float; distribute bits to improve hashing
-    int h = floatToRawIntBits(f - l) ^ (int) (l ^ l >>> 32);
+    int h = Float.floatToRawIntBits(f - l) ^ Long.hashCode(l);
     h ^= h >>> 20 ^ h >>> 12;
     return h ^ h >>> 7 ^ h >>> 4;
   }

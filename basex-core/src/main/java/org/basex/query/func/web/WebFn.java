@@ -55,9 +55,8 @@ public abstract class WebFn extends StandardFunc {
    * @return supplied URL builder
    * @throws QueryException query exception
    */
-  public static final TokenBuilder createUrl(final byte[] href, final XQMap params,
-      final char sep, final InputInfo info) throws QueryException {
-
+  public static TokenBuilder createUrl(final byte[] href, final XQMap params, final char sep,
+      final InputInfo info) throws QueryException {
     final TokenBuilder url = new TokenBuilder().add(href);
     final AtomicInteger c = new AtomicInteger();
     params.forEach((key, value) -> {

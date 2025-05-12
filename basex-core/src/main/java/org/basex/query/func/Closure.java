@@ -11,6 +11,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -137,7 +138,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     try {
       expr = expr.compile(cc);
     } catch(final QueryException ex) {
-      expr = cc.error(ex, expr);
+      expr = FnError.get(ex, expr);
     } finally {
       cc.removeScope(this);
     }
@@ -149,7 +150,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     cc.pushScope(vs);
     try {
       // inline all values in the closure
@@ -162,12 +163,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
         final Expr ex = entry.getValue();
 
         Expr inline = null;
-        if(ex instanceof Value) {
+        if(ex instanceof final Value value) {
           // values are always inlined into the closure
-          inline = var.checkType((Value) ex, cc.qc, cc);
-        } else if(ex instanceof Closure) {
+          inline = var.checkType(value, cc.qc, cc);
+        } else if(ex instanceof final Closure cl) {
           // nested closures are inlined if their size and number of closed-over variables is small
-          final Closure cl = (Closure) ex;
           if(!cl.has(Flag.NDT) && cl.global.size() < 5
               && expr.count(var) != VarUsage.MORE_THAN_ONCE && cl.exprSize() < limit) {
             cc.info(OPTINLINE_X, entry);
@@ -188,7 +188,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       // add all newly added bindings
       if(add != null) global.putAll(add);
     } catch(final QueryException ex) {
-      expr = cc.error(ex, expr);
+      expr = FnError.get(ex, expr);
     } finally {
       cc.removeScope(this);
     }
@@ -204,7 +204,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       try {
         return cc.preEval(this);
       } catch(final QueryException ex) {
-        expr = cc.error(ex, expr);
+        expr = FnError.get(ex, expr);
       }
     }
     return this;
@@ -305,9 +305,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     if(declType == null || argType.instanceOf(declType)) {
       // return type is already correct
       checked = body;
-    } else if(body instanceof Value) {
+    } else if(body instanceof final Value value) {
       // we can type check immediately
-      final Value value = (Value) body;
       checked = declType.coerce(value, name, qc, null, info);
     } else {
       // check at each call: reject impossible arities

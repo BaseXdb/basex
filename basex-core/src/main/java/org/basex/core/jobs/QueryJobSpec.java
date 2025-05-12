@@ -32,16 +32,14 @@ public final class QueryJobSpec {
       final IOContent content) {
     this.options = options;
     this.bindings = bindings;
-    this.query = content.toString();
+    query = content.toString();
     simple = content.url().isEmpty();
   }
 
   @Override
   public boolean equals(final Object obj) {
-    if(!(obj instanceof QueryJobSpec)) return false;
-    final QueryJobSpec spec = (QueryJobSpec) obj;
-    return options.toString().equals(spec.options.toString()) && query.equals(spec.query) &&
-        bindings.equals(spec.bindings);
+    return this == obj || obj instanceof final QueryJobSpec spec && query.equals(spec.query) &&
+        bindings.equals(spec.bindings) && options.toString().equals(spec.options.toString());
   }
 
   @Override

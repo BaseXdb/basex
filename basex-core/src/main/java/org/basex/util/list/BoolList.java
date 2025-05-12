@@ -127,7 +127,7 @@ public final class BoolList extends ElementList {
 
   /**
    * Returns an array with all elements and invalidates the internal array.
-   * Warning: the function must only be called if the list is discarded afterwards.
+   * Warning: the function must only be called if the list is discarded afterward.
    * @return array (internal representation!)
    */
   public boolean[] finish() {
@@ -140,9 +140,7 @@ public final class BoolList extends ElementList {
   @Override
   public boolean equals(final Object obj) {
     if(obj == this) return true;
-    if(!(obj instanceof BoolList)) return false;
-    final BoolList bl = (BoolList) obj;
-    if(size != bl.size) return false;
+    if(!(obj instanceof final BoolList bl) || size != bl.size) return false;
     for(int l = 0; l < size; ++l) {
       if(list[l] != bl.list[l]) return false;
     }

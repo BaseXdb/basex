@@ -39,7 +39,7 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
-  public Value items(final QueryContext qc) throws QueryException {
+  public Value items(final QueryContext qc) {
     return members;
   }
 

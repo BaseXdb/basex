@@ -30,12 +30,12 @@ public enum Calc {
 
       // numbers or untyped values
       if(num1) {
-        switch(numType(type1, type2)) {
-          case INTEGER: return addInt(item1, item2, info);
-          case DOUBLE:  return addDbl(item1, item2, info);
-          case FLOAT: return addFlt(item1, item2, info);
-          default: return addDec(item1, item2, info);
-        }
+        return switch(numType(type1, type2)) {
+          case INTEGER -> addInt(item1, item2, info);
+          case DOUBLE  -> addDbl(item1, item2, info);
+          case FLOAT   -> addFlt(item1, item2, info);
+          default      -> addDec(item1, item2, info);
+        };
       }
 
       // dates or durations
@@ -60,22 +60,20 @@ public enum Calc {
         final CompileContext cc) throws QueryException {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
+      if(expr2 instanceof final ANum num && num.dbl() == 0) {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // merge arithmetical expressions
       if(expr1.equals(expr2)) {
         return new Arith(info, expr1, Int.get(2), MULTIPLY).optimize(cc);
       }
-      if(expr2 instanceof Unary) {
-        return new Arith(info, expr1, ((Unary) expr2).expr, SUBTRACT).optimize(cc);
+      if(expr2 instanceof final Unary unry) {
+        return new Arith(info, expr1, unry.expr, SUBTRACT).optimize(cc);
       }
-      if(expr1 instanceof Arith) {
-        final Arith arith = (Arith) expr1;
-        if(arith.calc == MULTIPLY && arith.exprs[0].equals(expr2) &&
-            arith.exprs[1] instanceof Int) {
-          final long factor = ((Int) arith.exprs[1]).itr();
-          return new Arith(info, arith.exprs[0], Int.get(factor + 1), MULTIPLY).optimize(cc);
+      if(expr1 instanceof final Arith arth) {
+        if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
+            arth.exprs[1] instanceof final Int itr) {
+          return new Arith(info, arth.exprs[0], Int.get(itr.itr() + 1), MULTIPLY).optimize(cc);
         }
       }
       return null;
@@ -109,12 +107,12 @@ public enum Calc {
 
       // numbers or untyped values
       if(num1) {
-        switch(numType(type1, type2)) {
-          case INTEGER: return subtractInt(item1, item2, info);
-          case DOUBLE:  return subtractDbl(item1, item2, info);
-          case FLOAT: return subtractFlt(item1, item2, info);
-          default: return subtractDec(item1, item2, info);
-        }
+        return switch(numType(type1, type2)) {
+          case INTEGER -> subtractInt(item1, item2, info);
+          case DOUBLE  -> subtractDbl(item1, item2, info);
+          case FLOAT   -> subtractFlt(item1, item2, info);
+          default      -> subtractDec(item1, item2, info);
+        };
       }
 
       // dates or durations
@@ -140,7 +138,7 @@ public enum Calc {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 0) {
+      if(expr2 instanceof final ANum num && num.dbl() == 0) {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // replace with neutral number; ignore floating numbers due to special cases (NaN, INF)
@@ -148,15 +146,13 @@ public enum Calc {
         return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Int.ZERO : null;
       }
       // merge arithmetical expressions; ignore floating numbers due to special cases (NaN, INF)
-      if(expr2 instanceof Unary) {
-        return new Arith(info, expr1, ((Unary) expr2).expr, ADD).optimize(cc);
+      if(expr2 instanceof final Unary unry) {
+        return new Arith(info, expr1, unry.expr, ADD).optimize(cc);
       }
-      if(expr1 instanceof Arith) {
-        final Arith arith = (Arith) expr1;
-        if(arith.calc == MULTIPLY && arith.exprs[0].equals(expr2) &&
-            arith.exprs[1] instanceof Int) {
-          final long factor = ((Int) arith.exprs[1]).itr();
-          return new Arith(info, arith.exprs[0], Int.get(factor - 1), MULTIPLY).optimize(cc);
+      if(expr1 instanceof final Arith arth) {
+        if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
+            arth.exprs[1] instanceof final Int itr) {
+          return new Arith(info, arth.exprs[0], Int.get(itr.itr() - 1), MULTIPLY).optimize(cc);
         }
       }
       return null;
@@ -206,12 +202,12 @@ public enum Calc {
       if(num1 ^ num2) throw typeError(info, type1, type2);
       // numbers or untyped values
       if(num1) {
-        switch(numType(type1, type2)) {
-          case INTEGER: return multiplyInt(item1, item2, info);
-          case DOUBLE:  return multiplyDbl(item1, item2, info);
-          case FLOAT: return multiplyFlt(item1, item2, info);
-          default: return multiplyDec(item1, item2, info);
-        }
+        return switch(numType(type1, type2)) {
+          case INTEGER -> multiplyInt(item1, item2, info);
+          case DOUBLE  -> multiplyDbl(item1, item2, info);
+          case FLOAT   -> multiplyFlt(item1, item2, info);
+          default      -> multiplyDec(item1, item2, info);
+        };
       }
       throw numberError(item1, info);
     }
@@ -221,8 +217,8 @@ public enum Calc {
         final CompileContext cc) throws QueryException {
 
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum) {
-        final double dbl2 = ((ANum) expr2).dbl();
+      if(expr2 instanceof final ANum num) {
+        final double dbl2 = num.dbl();
         // check for neutral number
         if(dbl2 == 1) return new Cast(info, expr1, type.seqType()).optimize(cc);
         // check for absorbing number
@@ -234,16 +230,14 @@ public enum Calc {
           return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
         }
         if(_MATH_POW.is(expr1)) {
-          if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof ANum) {
-            final double factor = ((ANum) expr1.arg(1)).dbl();
-            return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(factor + 1));
+          if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof final ANum num) {
+            return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(num.dbl() + 1));
           }
         }
       }
-      if(expr2 instanceof Arith) {
-        final Arith arith = (Arith) expr2;
-        if(arith.calc == DIVIDE && arith.exprs[0] instanceof Int && arith.exprs[1].equals(expr1)) {
-          return new Cast(info, arith.exprs[0], type.seqType()).optimize(cc);
+      if(expr2 instanceof final Arith arth) {
+        if(arth.calc == DIVIDE && arth.exprs[0] instanceof Int && arth.exprs[1].equals(expr1)) {
+          return new Cast(info, arth.exprs[0], type.seqType()).optimize(cc);
         }
       }
       return null;
@@ -293,11 +287,11 @@ public enum Calc {
       // numbers or untyped values
       if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
       if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
-      switch(numType(type1, type2)) {
-        case DOUBLE:  return divideDbl(item1, item2, info);
-        case FLOAT: return divideFlt(item1, item2, info);
-        default: return divideDec(item1, item2, info);
-      }
+      return switch(numType(type1, type2)) {
+        case DOUBLE -> divideDbl(item1, item2, info);
+        case FLOAT  -> divideFlt(item1, item2, info);
+        default     -> divideDec(item1, item2, info);
+      };
     }
 
     @Override
@@ -306,7 +300,7 @@ public enum Calc {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
+      if(expr2 instanceof final ANum num && num.dbl() == 1) {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
@@ -314,9 +308,8 @@ public enum Calc {
         return type == DECIMAL ? Dec.ONE : type == INTEGER ? Int.ONE : null;
       }
       if(_MATH_POW.is(expr1)) {
-        if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof ANum) {
-          final double factor = ((ANum) expr1.arg(1)).dbl();
-          return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(factor - 1));
+        if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof final ANum num) {
+          return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(num.dbl() - 1));
         }
       }
       return null;
@@ -348,12 +341,12 @@ public enum Calc {
       final Type type1 = item1.type, type2 = item2.type;
       if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
       if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
-      switch(numType(type1, type2)) {
-        case INTEGER: return divideIntInt(item1, item2, info);
-        case DOUBLE:  return divideIntDbl(item1, item2, info);
-        case FLOAT: return divideIntFlt(item1, item2, info);
-        default: return divideIntDec(item1, item2, info);
-      }
+      return switch(numType(type1, type2)) {
+        case INTEGER -> divideIntInt(item1, item2, info);
+        case DOUBLE  -> divideIntDbl(item1, item2, info);
+        case FLOAT   -> divideIntFlt(item1, item2, info);
+        default      -> divideIntDec(item1, item2, info);
+      };
     }
 
     @Override
@@ -362,7 +355,7 @@ public enum Calc {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(expr2 instanceof ANum && ((ANum) expr2).dbl() == 1) {
+      if(expr2 instanceof final ANum num && num.dbl() == 1) {
         return new Cast(info, expr1, SeqType.INTEGER_O).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
@@ -391,12 +384,12 @@ public enum Calc {
       final Type type1 = item1.type, type2 = item2.type;
       if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
       if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
-      switch(numType(type1, type2)) {
-        case INTEGER: return moduloInt(item1, item2, info);
-        case DOUBLE:  return moduloDbl(item1, item2, info);
-        case FLOAT: return moduloFlt(item1, item2, info);
-        default: return moduloDec(item1, item2, info);
-      }
+      return switch(numType(type1, type2)) {
+        case INTEGER -> moduloInt(item1, item2, info);
+        case DOUBLE  -> moduloDbl(item1, item2, info);
+        case FLOAT   -> moduloFlt(item1, item2, info);
+        default      -> moduloDec(item1, item2, info);
+      };
     }
 
     @Override
@@ -512,9 +505,9 @@ public enum Calc {
    */
   static Dur dur(final InputInfo info, final Item item) throws QueryException {
     final Type type = item.type;
-    if(item instanceof Dur) {
+    if(item instanceof final Dur dur) {
       if(type == DURATION) throw NOSUBDUR_X.get(info, item);
-      return (Dur) item;
+      return dur;
     }
     throw NODUR_X_X.get(info, type, item);
   }

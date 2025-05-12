@@ -168,14 +168,13 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
     final BaseXBack pnl = new BaseXBack(false).
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
 
-    for(final Object obj : buttons) {
-      pnl.add(obj instanceof BaseXButton ? (BaseXButton) obj :
-        new BaseXButton(this, obj.toString()));
+    for(final Object button : buttons) {
+      pnl.add(button instanceof final BaseXButton b ? b : new BaseXButton(this, button.toString()));
     }
 
-    final BaseXBack but = new BaseXBack(false).layout(new BorderLayout());
-    but.add(pnl, BorderLayout.EAST);
-    return but;
+    final BaseXBack button = new BaseXBack(false).layout(new BorderLayout());
+    button.add(pnl, BorderLayout.EAST);
+    return button;
   }
 
   /**
@@ -187,12 +186,11 @@ public abstract class BaseXDialog extends JDialog implements BaseXWindow {
   protected static void enableOK(final JComponent panel, final String label,
       final boolean enabled) {
 
-    for(final Component c : panel.getComponents()) {
-      if(c instanceof BaseXButton) {
-        final BaseXButton b = (BaseXButton) c;
-        if(b.getText().equals(label)) b.setEnabled(enabled);
-      } else if(c instanceof JComponent) {
-        enableOK((JComponent) c, label, enabled);
+    for(final Component comp : panel.getComponents()) {
+      if(comp instanceof final BaseXButton button) {
+        if(button.getText().equals(label)) button.setEnabled(enabled);
+      } else if(comp instanceof final JComponent jcomp) {
+        enableOK(jcomp, label, enabled);
       }
     }
   }

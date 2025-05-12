@@ -77,7 +77,7 @@ public final class StrSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof StrSeq ? Array.equals(values, ((StrSeq) obj).values) :
+    return this == obj || (obj instanceof final StrSeq seq ? Array.equals(values, seq.values) :
       super.equals(obj));
   }
 
@@ -136,8 +136,8 @@ public final class StrSeq extends NativeSeq {
     final TokenList tmp = new TokenList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      if(value instanceof StrSeq) {
-        tmp.add(((StrSeq) value).values);
+      if(value instanceof final StrSeq seq) {
+        tmp.add(seq.values);
       } else {
         for(final Item item : value) tmp.add(item.string(null));
       }

@@ -68,7 +68,7 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final Bin toArchive(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(item instanceof Bin) return (Bin) item;
+    if(item instanceof final Bin bin) return bin;
     if(item.type.isStringOrUntyped()) {
       return new B64Lazy(new IOFile(toPath(item, qc)), FILE_IO_ERROR_X);
     }
@@ -101,7 +101,7 @@ abstract class ArchiveFn extends StandardFunc {
    * @return result of check
    * @throws IOException I/O exception
    */
-  final boolean localZip(final IO io) throws IOException {
+  static boolean localZip(final IO io) throws IOException {
     if(io instanceof IOFile) {
       if(io.hasSuffix(IO.ZIPSUFFIX)) return true;
       try(InputStream is = io.inputStream()) {

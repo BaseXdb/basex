@@ -71,11 +71,11 @@ public final class DiskData extends Data {
         final String k = string(in.readToken());
         if(k.isEmpty()) break;
         switch(k) {
-          case DBTAGS: elemNames = new Names(in, meta); break;
-          case DBATTS: attrNames = new Names(in, meta); break;
-          case DBPATH: paths = new PathIndex(this, in); break;
-          case DBNS:   nspaces = new Namespaces(in); break;
-          case DBDOCS: resources.read(in); break;
+          case DBTAGS -> elemNames = new Names(in, meta);
+          case DBATTS -> attrNames = new Names(in, meta);
+          case DBPATH -> paths = new PathIndex(this, in);
+          case DBNS   -> nspaces = new Namespaces(in);
+          case DBDOCS -> resources.read(in);
         }
       }
     }
@@ -188,12 +188,11 @@ public final class DiskData extends Data {
   public void createIndex(final IndexType type, final Command cmd) throws IOException {
     // close existing index
     close(type);
-    final IndexBuilder ib;
-    switch(type) {
-      case TEXT: case ATTRIBUTE: case TOKEN: ib = new DiskValuesBuilder(this, type); break;
-      case FULLTEXT: ib = new FTBuilder(this); break;
-      default: throw Util.notExpected();
-    }
+    final IndexBuilder ib = switch(type) {
+      case TEXT, ATTRIBUTE, TOKEN -> new DiskValuesBuilder(this, type);
+      case FULLTEXT               -> new FTBuilder(this);
+      default                     -> throw Util.notExpected();
+    };
     try {
       if(cmd != null) cmd.pushJob(ib);
       set(type, ib.build());
@@ -217,11 +216,11 @@ public final class DiskData extends Data {
   private void set(final IndexType type, final ValueIndex index) {
     meta.dirty = true;
     switch(type) {
-      case TEXT:      textIndex = index; break;
-      case ATTRIBUTE: attrIndex = index; break;
-      case TOKEN:     tokenIndex = index; break;
-      case FULLTEXT:  ftIndex = index; break;
-      default:        break;
+      case TEXT      -> textIndex = index;
+      case ATTRIBUTE -> attrIndex = index;
+      case TOKEN     -> tokenIndex = index;
+      case FULLTEXT  -> ftIndex = index;
+      default        -> throw Util.notExpected();
     }
   }
 

@@ -6,6 +6,7 @@ package org.basex.core.parse;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 public interface PasswordReader {
   /**
    * Parses and returns a password.

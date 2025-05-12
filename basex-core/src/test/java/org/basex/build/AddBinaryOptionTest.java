@@ -63,7 +63,7 @@ public final class AddBinaryOptionTest extends SandboxTest {
     for(final String name : FILES) {
       if(!files.contains(name)) sb.append("\n- ").append(name);
     }
-    if(sb.length() != 0) fail(FILES.size() + " files expected, missing: " + sb);
+    if(!sb.isEmpty()) fail(FILES.size() + " files expected, missing: " + sb);
     assertEquals(FILES.size(), files.size(), "Expected number of imported files is different");
   }
 }

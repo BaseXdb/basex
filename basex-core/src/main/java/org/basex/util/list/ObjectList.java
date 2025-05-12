@@ -250,7 +250,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
 
   /**
    * Returns an array with all elements and invalidates the internal array.
-   * Warning: the function must only be called if the list is discarded afterwards.
+   * Warning: the function must only be called if the list is discarded afterward.
    * @return array (internal representation!)
    */
   public E[] finish() {
@@ -319,12 +319,9 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   @SuppressWarnings("unchecked")
   public boolean equals(final Object obj) {
     if(obj == this) return true;
-    if(!(obj instanceof ObjectList)) return false;
-    final ObjectList<?, ?> f = (ObjectList<?, ?>) obj;
-    final int s = size;
-    if(s != f.size) return false;
+    if(!(obj instanceof final ObjectList f) || size != f.size) return false;
     final E[] lst1 = list, lst2 = (E[]) f.list;
-    for(int l = 0; l < s; l++) {
+    for(int l = 0; l < size; l++) {
       if(!equals(lst1[l], lst2[l])) return false;
     }
     return true;

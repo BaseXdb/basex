@@ -58,8 +58,7 @@ public final class Typeswitch extends ParseExpr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate expression
-    if(cond instanceof Value) {
-      final Value value = (Value) cond;
+    if(cond instanceof final Value value) {
       for(final TypeswitchGroup group : groups) {
         if(group.match(value, null)) {
           group.inline(value, cc);
@@ -118,7 +117,7 @@ public final class Typeswitch extends ParseExpr {
       // rewrite chosen branch
       expr = tg.rewrite(cond, cc);
     } else if(gl < 3 && groups[0].seqTypes.length == 1 && !cond.has(Flag.NDT)) {
-      // otherwise, rewrite to if expression if one or two branches are left
+      // otherwise, rewrite to 'if' expression if one or two branches are left
       final Expr iff = new Instance(info, cond, groups[0].seqTypes[0]).optimize(cc);
       final Expr thn = groups[0].rewrite(cond, cc), els = groups[1].rewrite(cond, cc);
       expr = new If(info, iff, thn, els).optimize(cc);
@@ -239,10 +238,8 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Typeswitch)) return false;
-    final Typeswitch ts = (Typeswitch) obj;
-    return cond.equals(ts.cond) && Array.equals(groups, ts.groups);
+    return this == obj || obj instanceof final Typeswitch ts && cond.equals(ts.cond) &&
+        Array.equals(groups, ts.groups);
   }
 
   @Override

@@ -74,7 +74,7 @@ public class FnSort extends StandardFunc {
    * @param index index
    * @return result of check
    */
-  protected final boolean sorted(final Integer[] index) {
+  protected static boolean sorted(final Integer[] index) {
     final int il = index.length;
     for(int i = 0; i < il; i++) {
       if(index[i] != i) return false;
@@ -217,8 +217,7 @@ public class FnSort extends StandardFunc {
     if(input.isEmpty()) return input;
     if(exprs.length == 1) {
       // range values
-      if(input instanceof RangeSeq) {
-        final RangeSeq rs = (RangeSeq) input;
+      if(input instanceof final RangeSeq rs) {
         return rs.ascending() ? rs : rs.reverse(null);
       }
       // sortable single or singleton values

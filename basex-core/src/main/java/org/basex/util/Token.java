@@ -187,18 +187,18 @@ public final class Token {
    * @return token
    */
   public static byte[] token(final Object object) {
-    if(object instanceof byte[]) return (byte[]) object;
-    if(object instanceof ArrayOutput) return ((ArrayOutput) object).toArray();
-    if(object instanceof TokenBuilder) return ((TokenBuilder) object).toArray();
-    if(object instanceof Supplier<?>) return token(((Supplier<?>) object).get());
+    if(object instanceof final byte[] bytes) return bytes;
+    if(object instanceof final ArrayOutput ao) return ao.toArray();
+    if(object instanceof final TokenBuilder tb) return tb.toArray();
+    if(object instanceof final Supplier<?> supplier) return token(supplier.get());
 
     final String s;
     if(object == null) {
       s = "null";
-    } else if(object instanceof Throwable) {
-      s = Util.message((Throwable) object);
-    } else if(object instanceof Class<?>) {
-      s = Util.className((Class<?>) object);
+    } else if(object instanceof final Throwable th) {
+      s = Util.message(th);
+    } else if(object instanceof final Class<?> clzz) {
+      s = Util.className(clzz);
     } else {
       s = object.toString();
     }
@@ -235,7 +235,7 @@ public final class Token {
    * @return character length
    */
   public static int cl(final byte b) {
-    return b >= 0 || b < -64 ? 1 : b >= -64 && b < -32 ? 2 : b >= -32 && b < -16 ? 3 : 4;
+    return b >= 0 || b < -64 ? 1 : b < -32 ? 2 : b < -16 ? 3 : 4;
   }
 
   /**
@@ -261,7 +261,7 @@ public final class Token {
       return cps;
     }
     final IntList list = new IntList(tl);
-    forEachCp(token, cp -> list.add(cp));
+    forEachCp(token, list::add);
     return list.finish();
   }
 

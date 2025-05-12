@@ -347,7 +347,7 @@ public final class IOFile extends IO {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof IOFile && pth.equals(((IOFile) obj).pth);
+    return obj instanceof final IOFile iofile && pth.equals(iofile.pth);
   }
 
   @Override
@@ -486,7 +486,7 @@ public final class IOFile extends IO {
     final StringBuilder sb = new StringBuilder();
     for(final String globs : Strings.split(glob, ',')) {
       final String glb = globs.trim();
-      if(sb.length() != 0) sb.append('|');
+      if(!sb.isEmpty()) sb.append('|');
       // loop through single pattern
       boolean suffix = false;
       final int gl = glb.length();

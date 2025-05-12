@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.*;
 
 /**
  * Interface for converters from JSON to XQuery values.
@@ -39,15 +40,14 @@ public abstract class JsonConverter {
    * @throws QueryException query exception
    */
   public static JsonConverter get(final JsonParserOptions jopts) throws QueryException {
-    switch(jopts.get(JsonOptions.FORMAT)) {
-      case JSONML:     return new JsonMLConverter(jopts);
-      case ATTRIBUTES: return new JsonAttsConverter(jopts);
-      case XQUERY: //deprecated
-      case W3:         return new JsonW3Converter(jopts);
-      case BASIC: //deprecated
-      case W3_XML:     return new JsonW3XmlConverter(jopts);
-      default:         return new JsonDirectConverter(jopts);
-    }
+    // XQUERY and BASIC are deprecated
+    return switch(jopts.get(JsonOptions.FORMAT)) {
+      case ATTRIBUTES    -> new JsonAttsConverter(jopts);
+      case JSONML        -> new JsonMLConverter(jopts);
+      case W3, XQUERY    -> new JsonW3Converter(jopts);
+      case W3_XML, BASIC -> new JsonW3XmlConverter(jopts);
+      default            -> new JsonDirectConverter(jopts);
+    };
   }
 
   /**
@@ -92,7 +92,7 @@ public abstract class JsonConverter {
   public final Value convert(final IO input) throws QueryException, IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
     try(NewlineInput ni = new NewlineInput(input)) {
-      return convert(ni.encoding(encoding).cache().toString(), input.url(), null);
+      return convert(ni.encoding(encoding), input.url(), null, null);
     }
   }
 
@@ -100,15 +100,17 @@ public abstract class JsonConverter {
    * Converts the specified input to an XQuery value.
    * @param input input
    * @param uri uri (can be empty)
+   * @param ii input info (can be {@code null})
    * @param qc query context (if {@code null}, result may lack XQuery-specific contents)
    * @return result
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  public final Value convert(final String input, final String uri,
-      final QueryContext qc) throws QueryException {
+  public final Value convert(final TextInput input, final String uri, final InputInfo ii,
+      final QueryContext qc) throws QueryException, IOException {
     qctx = qc;
     init(uri);
-    new JsonParser(input, jopts, this).parse();
+    new JsonParser(input, jopts, this).parse(ii);
     return finish();
   }
 

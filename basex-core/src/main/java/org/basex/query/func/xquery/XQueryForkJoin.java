@@ -46,8 +46,8 @@ public final class XQueryForkJoin extends StandardFunc {
     } catch(final Exception ex) {
       // pass on query and job exceptions
       final Throwable e = Util.rootException(ex);
-      if(e instanceof QueryException) throw (QueryException) e;
-      if(e instanceof JobException) throw (JobException) e;
+      if(e instanceof final QueryException qe) throw qe;
+      if(e instanceof final JobException je) throw je;
       throw XQUERY_UNEXPECTED_X.get(info, e);
     } finally {
       pool.shutdown();

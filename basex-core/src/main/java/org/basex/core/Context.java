@@ -312,7 +312,7 @@ public final class Context {
 
   /**
    * Returns the value of an option visible to the current user.
-   * @param name name of option (case insensitive)
+   * @param name name of option (case-insensitive)
    * @return value or {@code null}
    */
   public Object option(final String name) {

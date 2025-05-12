@@ -117,8 +117,8 @@ public class ArchiveCreate extends ArchiveFn {
 
     // data to be compressed
     final Item content = file.getValue();
-    if(content instanceof Bin) {
-      out.write(ze, (Bin) content, info);
+    if(content instanceof final Bin bin) {
+      out.write(ze, bin, info);
     } else if(content != XQArray.empty()) {
       out.write(ze, encode(toBytes(content, qc), encoding(header), false, qc));
     }
@@ -172,8 +172,8 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    */
   final int level(final Item header) throws QueryException {
-    if(header instanceof ANode) {
-      final byte[] value  = ((ANode) header).attribute(Q_LEVEL);
+    if(header instanceof final ANode node) {
+      final byte[] value  = node.attribute(Q_LEVEL);
       if(value != null) {
         final int level = toInt(value);
         if(level < 0 || level > 9) throw ARCHIVE_LEVEL_X.get(info, value);
@@ -191,8 +191,8 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    */
   final long timestamp(final Item header, final QueryContext qc) throws QueryException {
-    if(header instanceof ANode) {
-      final byte[] value  = ((ANode) header).attribute(Q_LAST_MODIFIED);
+    if(header instanceof final ANode node) {
+      final byte[] value  = node.attribute(Q_LAST_MODIFIED);
       try {
         if(value != null) return toMs(new Dtm(value, info), qc);
       } catch(final QueryException ex) {
@@ -210,8 +210,8 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    */
   final String encoding(final Item header) throws QueryException {
-    if(header instanceof ANode) {
-      final byte[] value = ((ANode) header).attribute(Q_ENCODING);
+    if(header instanceof final ANode node) {
+      final byte[] value = node.attribute(Q_ENCODING);
       if(value != null) return toEncodingOrNull(string(value), ARCHIVE_ENCODE1_X);
     }
     return Strings.UTF8;

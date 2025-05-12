@@ -228,9 +228,8 @@ final class Unit {
       final String url = IO.get(ex.path()).url();
       if(!file.url().equals(url)) error.add(Q_URI, url);
 
-      if(ex instanceof UnitException) {
+      if(ex instanceof final UnitException ue) {
         // unit exception: add expected and returned values
-        final UnitException ue = (UnitException) ex;
         error.add(element(ue.returned, Q_RETURNED, ue.count));
         error.add(element(ue.expected, Q_EXPECTED, ue.count));
       } else if(!fail) {
@@ -260,8 +259,8 @@ final class Unit {
   private static FBuilder element(final Item item, final QNm name, final int count) {
     final FBuilder elem = FElem.build(name);
     if(item != null) {
-      if(item instanceof ANode) {
-        elem.add((ANode) item);
+      if(item instanceof final ANode node) {
+        elem.add(node);
       } else {
         try {
           elem.add(item.string(null));

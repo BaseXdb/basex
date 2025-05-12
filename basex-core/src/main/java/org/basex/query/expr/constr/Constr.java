@@ -87,8 +87,8 @@ public final class Constr {
    * @throws QueryException query exception
    */
   private boolean add(final Item item, final QNmSet qnames) throws QueryException {
-    if(item instanceof XQArray) {
-      for(final Value value : ((XQArray) item).iterable()) {
+    if(item instanceof final XQArray array) {
+      for(final Value value : array.iterable()) {
         for(final Item it : value) {
           if(!add(it, qnames)) return false;
         }
@@ -98,10 +98,8 @@ public final class Constr {
 
     if(item instanceof FItem) throw CONSFUNC_X.get(info, item);
 
-    if(item instanceof ANode) {
+    if(item instanceof final ANode node) {
       // type: nodes
-      final ANode node = (ANode) item;
-
       final Type type = item.type;
       if(type == NodeType.TEXT) {
         // type: text node

@@ -147,17 +147,17 @@ public final class Dec extends ANum {
     final boolean pos = value.signum() >= 0;
     final BooleanSupplier mw = () -> l.add(u).divide(BigDecimal.valueOf(2)).compareTo(value) == 0;
     final Supplier<BigDecimal> n = () -> value.setScale(prec, RoundingMode.HALF_UP);
-    switch(mode) {
-      case FLOOR:               return l;
-      case CEILING:             return u;
-      case TOWARD_ZERO:         return pos ? l : u;
-      case AWAY_FROM_ZERO:      return pos ? u : l;
-      case HALF_TO_FLOOR:       return mw.getAsBoolean() ? l : n.get();
-      case HALF_TO_CEILING:     return mw.getAsBoolean() ? u : n.get();
-      case HALF_TOWARD_ZERO:    return mw.getAsBoolean() ? pos ? l : u : n.get();
-      case HALF_AWAY_FROM_ZERO: return mw.getAsBoolean() ? pos ? u : l : n.get();
-      default:                  return value.setScale(prec, RoundingMode.HALF_EVEN);
-    }
+    return switch(mode) {
+      case FLOOR -> l;
+      case CEILING -> u;
+      case TOWARD_ZERO -> pos ? l : u;
+      case AWAY_FROM_ZERO -> pos ? u : l;
+      case HALF_TO_FLOOR -> mw.getAsBoolean() ? l : n.get();
+      case HALF_TO_CEILING -> mw.getAsBoolean() ? u : n.get();
+      case HALF_TOWARD_ZERO -> mw.getAsBoolean() ? pos ? l : u : n.get();
+      case HALF_AWAY_FROM_ZERO -> mw.getAsBoolean() ? pos ? u : l : n.get();
+      default -> value.setScale(prec, RoundingMode.HALF_EVEN);
+    };
   }
 
   @Override
@@ -200,7 +200,7 @@ public final class Dec extends ANum {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Dec && value.compareTo(((Dec) obj).value) == 0;
+    return this == obj || obj instanceof final Dec dec && value.compareTo(dec.value) == 0;
   }
 
   // STATIC METHODS ===============================================================================

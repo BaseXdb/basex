@@ -8,6 +8,7 @@ import java.awt.event.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 public interface KeyPressedListener extends KeyListener {
   @Override
   default void keyTyped(final KeyEvent e) { }

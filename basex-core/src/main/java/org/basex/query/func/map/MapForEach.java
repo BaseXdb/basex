@@ -21,7 +21,7 @@ public class MapForEach extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-    final FItem action = toFunction(arg(1), 2, MapForEach.this instanceof UpdateMapForEach, qc);
+    final FItem action = toFunction(arg(1), 2, this instanceof UpdateMapForEach, qc);
     final BasicIter<Item> keys = map.keys().iter();
 
     return new Iter() {
@@ -58,10 +58,9 @@ public class MapForEach extends StandardFunc {
     if(map == XQMap.empty()) return Empty.VALUE;
 
     final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      final MapType mtype = (MapType) type;
-      final SeqType declType = SeqType.get(mtype.keyType(), Occ.EXACTLY_ONE);
-      arg(1, arg -> refineFunc(arg, cc, declType, mtype.valueType()));
+    if(type instanceof final MapType mt) {
+      final SeqType declType = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE);
+      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType()));
     }
 
     final FuncType ft = arg(1).funcType();

@@ -494,7 +494,7 @@ public final class LockingTest extends SandboxTest {
     final CountDownLatch allDone = new CountDownLatch(FUZZING_THREADS * FUZZING_REPEATS);
     for(int i = 0; i < FUZZING_THREADS; i++) {
       threads[i] = new Thread() {
-        private String[] randomSubset(final String[] set, final boolean nullAllowed) {
+        private static String[] randomSubset(final String[] set, final boolean nullAllowed) {
           if(nullAllowed && Math.random() * set.length == 0) return null;
 
           final int start = (int) (Math.random() * set.length);

@@ -28,7 +28,7 @@ public final class DBDelete extends DBUpdate {
    */
   public DBDelete(final Data data, final IOFile path, final InputInfo info) {
     super(UpdateType.DBDELETE, data, info);
-    this.size = path.isDir() ? path.descendants().size() : 1;
+    size = path.isDir() ? path.descendants().size() : 1;
     paths.add(path);
   }
 

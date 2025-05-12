@@ -29,11 +29,10 @@ abstract class DbNew extends DbAccessFn {
   final NewInput toNewInput(final Item input, final String path) throws QueryException {
     final NewInput ni = new NewInput();
 
-    if(input instanceof ANode) {
+    if(input instanceof final ANode node) {
       if(Strings.endsWith(path, '/')) throw RESINV_X.get(info, path);
 
       // ensure that the final name is not empty
-      final ANode node = (ANode) input;
       String name = path;
       if(name.isEmpty()) {
         // adopt name from document node

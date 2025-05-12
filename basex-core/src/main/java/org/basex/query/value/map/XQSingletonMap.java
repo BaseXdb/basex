@@ -59,7 +59,7 @@ public final class XQSingletonMap extends XQMap {
   }
 
   @Override
-  public XQMap putAt(final int index, final Value value) throws QueryException {
+  public XQMap putAt(final int index, final Value value) {
     return new XQSingletonMap(k, value);
   }
 

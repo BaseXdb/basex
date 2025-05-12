@@ -56,7 +56,7 @@ public interface DataText {
   String DBFTLN = "FTLANG";
   /** Full-text stopwords. */
   String DBFTSW = "FTSTOP";
-  /** Full-text case sensitivity. */
+  /** Full-text case-sensitivity. */
   String DBFTCS = "FTCS";
   /** Full-text diacritics removal. */
   String DBFTDC = "FTDC";

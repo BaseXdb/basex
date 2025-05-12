@@ -257,10 +257,8 @@ public class Dur extends ADateDur {
 
   @Override
   public final boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Dur)) return false;
-    final Dur dur = (Dur) obj;
-    return type.eq(dur.type) && months == dur.months && seconds.equals(dur.seconds);
+    return this == obj || obj instanceof final Dur dur && type.eq(dur.type) &&
+        months == dur.months && seconds.equals(dur.seconds);
   }
 
   @Override

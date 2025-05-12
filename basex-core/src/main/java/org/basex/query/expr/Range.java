@@ -137,19 +137,17 @@ public final class Range extends Arr {
    * @return positional value or {@code Double#NaN}
    */
   private static double pos(final Expr expr) {
-    if(expr instanceof Int) return ((Int) expr).itr();
+    if(expr instanceof final Int itr) return itr.itr();
     if(Function.LAST.is(expr)) return LAST;
-    if(expr instanceof Arith && Function.LAST.is(expr.arg(0))) {
-      final double l = expr.arg(1) instanceof Int ? ((Int) expr.arg(1)).itr() : 0;
-      if(l != 0) {
-        switch(((Arith) expr).calc) {
-          case ADD : return LAST + l;
-          case SUBTRACT: return LAST - l;
-          case MULTIPLY : return LAST * l;
-          case DIVIDE  : return LAST / l;
-          default: break;
-        }
-      }
+    if(expr instanceof final Arith arth && Function.LAST.is(expr.arg(0))) {
+      final double l = expr.arg(1) instanceof final Int itr ? itr.itr() : 0;
+      if(l != 0) return switch(arth.calc) {
+        case ADD      -> LAST + l;
+        case SUBTRACT -> LAST - l;
+        case MULTIPLY -> LAST * l;
+        case DIVIDE   -> LAST / l;
+        default       -> Double.NaN;
+      };
     }
     return Double.NaN;
   }

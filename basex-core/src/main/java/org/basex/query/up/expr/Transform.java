@@ -137,8 +137,8 @@ public final class Transform extends Copy {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Transform && Array.equals(copies, ((Transform) obj).copies)
-        && super.equals(obj);
+    return this == obj || obj instanceof final Transform tf && Array.equals(copies, tf.copies) &&
+        super.equals(obj);
   }
 
   @Override

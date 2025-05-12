@@ -36,7 +36,7 @@ final class TaskContext {
     this.funcs = funcs;
     this.info = info;
     this.qc = qc;
-    this.errors = options.get(TaskOptions.ERRORS);
-    this.results = options.get(TaskOptions.RESULTS);
+    errors = options.get(TaskOptions.ERRORS);
+    results = options.get(TaskOptions.RESULTS);
   }
 }

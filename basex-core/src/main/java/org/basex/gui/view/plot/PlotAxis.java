@@ -196,7 +196,7 @@ final class PlotAxis {
     // calculate position on a logarithmic scale. to display negative
     // values on a logarithmic scale, three cases are to be distinguished:
     // 0. both extreme values are greater or equal 0.
-    // 1. the minimum value is smaller 0, hence the axis is 'mirrored' at 0.
+    // 1. the minimum value is smaller 0; hence, the axis is 'mirrored' at 0.
     // 2. both extreme values are smaller 0; axis is also 'mirrored' and
     //    values above the max value are not displayed.
     range = logMax - logMin;

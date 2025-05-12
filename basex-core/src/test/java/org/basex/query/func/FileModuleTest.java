@@ -454,7 +454,7 @@ public final class FileModuleTest extends SandboxTest {
   @Test public void tempDir() {
     final Function func = _FILE_TEMP_DIR;
     // successful queries
-    assertEquals(query(func.args()), Prop.TEMPDIR);
+    assertEquals(Prop.TEMPDIR, query(func.args()));
   }
 
   /** Test method. */

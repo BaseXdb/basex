@@ -48,7 +48,7 @@ final class TextRenderer extends BaseXBack {
   private boolean showLines;
   /** Mark current line. */
   private boolean markline;
-  /** Anti-aliasing type. */
+  /** Antialiasing type. */
   private String antiAlias;
 
   /** Border offset. */

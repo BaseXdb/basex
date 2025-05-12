@@ -73,8 +73,7 @@ final class DataUpdates {
       for(final NodeUpdate nodeUp : ((NodeUpdate) up).substitute(tmp)) {
         nodeUpdates.computeIfAbsent(nodeUp.pre, NodeUpdates::new).add(nodeUp);
       }
-    } else if(up instanceof Put) {
-      final Put p = (Put) up;
+    } else if(up instanceof final Put p) {
       final int id = p.id;
       final Put old = puts.get(id);
       if(old == null) puts.put(id, p);

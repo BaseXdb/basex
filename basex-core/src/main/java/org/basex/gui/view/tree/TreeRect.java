@@ -1,26 +1,14 @@
 package org.basex.gui.view.tree;
 
 /**
- * This is class is used to handle rectangles.
+ * Tree rectangles.
+ * @param x x position
+ * @param w width
+ *
  * @author BaseX Team, BSD License
  * @author Wolfgang Miller
  */
-final class TreeRect {
-  /** X position. */
-  final int x;
-  /** Width. */
-  final int w;
-
-  /**
-   * Initializes TreeRect.
-   * @param x x position
-   * @param w width
-   */
-  TreeRect(final int x, final int w) {
-    this.x = x;
-    this.w = w;
-  }
-
+record TreeRect(int x, int w) {
   /**
    * Verifies if the specified coordinates are inside the rectangle.
    * @param xx x position

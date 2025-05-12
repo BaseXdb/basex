@@ -431,7 +431,7 @@ public final class CsvRoundtripTest extends SandboxTest {
    * @param options options
    * @param expected expected result
    */
-  private void roundtrip(final Function function, final String input, final String options,
+  private static void roundtrip(final Function function, final String input, final String options,
       final String expected) {
 
     // parsing
@@ -443,14 +443,14 @@ public final class CsvRoundtripTest extends SandboxTest {
     final StringBuilder format = new StringBuilder();
     if(!options.contains("'format'")) {
       if(!options.isEmpty()) format.append(", ");
-      format.append("'format': '" + (function == _CSV_PARSE ? CsvFormat.DIRECT :
+      format.append("'format': '").append(function == _CSV_PARSE ? CsvFormat.DIRECT :
         function == CSV_TO_ARRAYS ? CsvFormat.W3_ARRAYS :
-        function == CSV_TO_XML ? CsvFormat.W3_XML : CsvFormat.W3)).append("'");
+        function == CSV_TO_XML ? CsvFormat.W3_XML : CsvFormat.W3).append("'");
     }
     final String serializeQuery = _CSV_SERIALIZE.args(
       result.startsWith("<") ? ' ' + result :
       result.startsWith("[") ? " (" + result.replace('\n', ',') + ")" :
-      result.startsWith("{") ? " " + result.replaceAll(",\"get\":\\(anonymous-function\\)#2", "") :
+      result.startsWith("{") ? " " + result.replace(",\"get\":(anonymous-function)#2", "") :
       result.isEmpty() ? " ()" : " " + result, " { " + options + format + " }");
     final String serialization = query(serializeQuery);
     final String roundtripQuery = function.args(" \"" + serialization.replace("\"", "\"\"") + "\"",

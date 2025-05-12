@@ -79,19 +79,18 @@ public final class RangeAccess extends IndexAccess {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof RangeAccess && index.equals(((RangeAccess) obj).index) &&
-        super.equals(obj);
+    return obj instanceof final RangeAccess ra && index.equals(ra.index) && super.equals(obj);
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, INDEX, index.type(), MIN, index.min, MAX, index.max), db);
+    plan.add(plan.create(this, INDEX, index.type(), MIN, index.min(), MAX, index.max()), db);
   }
 
   @Override
   public void toString(final QueryString qs) {
     final Function function = index.type() == IndexType.TEXT ? Function._DB_TEXT_RANGE :
       Function._DB_ATTRIBUTE_RANGE;
-    qs.function(function, db, Dbl.get(index.min), Dbl.get(index.max));
+    qs.function(function, db, Dbl.get(index.min()), Dbl.get(index.max()));
   }
 }

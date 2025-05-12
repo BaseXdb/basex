@@ -100,15 +100,15 @@ public final class DataBuilder {
    */
   private int addNode(final ANode node, final int pre, final int par) {
     if(qc != null) qc.checkStop();
-    switch((NodeType) node.type) {
-      case DOCUMENT_NODE: return addDoc(node, pre);
-      case ELEMENT: return addElem(node, pre, par);
-      case TEXT: return addText(node, pre, par);
-      case ATTRIBUTE: return addAttr(node, pre, par);
-      case COMMENT: return addComm(node, pre, par);
-      // will always be processing instruction
-      default:  return addPI(node, pre, par);
-    }
+    return switch((NodeType) node.type) {
+      case DOCUMENT_NODE -> addDoc(node, pre);
+      case ELEMENT -> addElem(node, pre, par);
+      case TEXT -> addText(node, pre, par);
+      case ATTRIBUTE -> addAttr(node, pre, par);
+      case COMMENT -> addComm(node, pre, par);
+      case PROCESSING_INSTRUCTION -> addPI(node, pre, par);
+      default -> throw Util.notExpected();
+    };
   }
 
   /**
@@ -270,8 +270,7 @@ public final class DataBuilder {
    * @return number of descendants + 1 or attribute size + 1
    */
   private static int size(final ANode node, final boolean att) {
-    if(node instanceof DBNode) {
-      final DBNode dbnode = (DBNode) node;
+    if(node instanceof final DBNode dbnode) {
       final Data data = dbnode.data();
       final int kind = node.kind();
       final int pre = dbnode.pre();

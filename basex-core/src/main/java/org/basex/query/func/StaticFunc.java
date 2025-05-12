@@ -13,6 +13,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -60,7 +61,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     super(name, params.seqType(), anns, vs, info, doc);
 
     this.params = params.vars();
-    this.defaults = params.defaults();
+    defaults = params.defaults();
     this.expr = expr;
     updating = anns.contains(Annotation.UPDATING);
 
@@ -101,7 +102,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
         expr = expr.compile(cc);
         if(declType != null) expr = new TypeCheck(info, expr, declType).optimize(cc);
       } catch(final QueryException ex) {
-        expr = cc.error(ex, expr);
+        expr = FnError.get(ex, expr);
       } finally {
         cc.removeScope(this);
         cc.removeFocus();

@@ -15,6 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 interface CalcOpt {
   /**
    * Returns an optimized arithmetic calculation.
@@ -32,7 +33,7 @@ interface CalcOpt {
             case DOUBLE:  return CalcOpt::addDbl;
             case FLOAT:   return CalcOpt::addFlt;
             case INTEGER: return CalcOpt::addInt;
-            default: break;
+            default:
           }
           break;
         case SUBTRACT:
@@ -40,7 +41,7 @@ interface CalcOpt {
             case DOUBLE:  return CalcOpt::subtractDbl;
             case FLOAT:   return CalcOpt::subtractFlt;
             case INTEGER: return CalcOpt::subtractInt;
-            default: break;
+            default:
           }
           break;
         case MULTIPLY:

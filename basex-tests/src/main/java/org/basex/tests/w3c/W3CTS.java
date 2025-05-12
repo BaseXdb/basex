@@ -576,7 +576,7 @@ public abstract class W3CTS extends Main {
   }
 
   /**
-   * Evaluates the the input files and assigns the result to the specified variables.
+   * Evaluates the input files and assigns the result to the specified variables.
    * @param nodes nodes
    * @param vars variables
    * @param pth file path

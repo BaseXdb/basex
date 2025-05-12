@@ -67,11 +67,8 @@ public final class OrderKey extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof OrderKey)) return false;
-    final OrderKey k = (OrderKey) obj;
-    return desc == k.desc && least == k.least && Objects.equals(coll, k.coll) &&
-        super.equals(obj);
+    return this == obj || obj instanceof final OrderKey k && desc == k.desc && least == k.least &&
+        Objects.equals(coll, k.coll) && super.equals(obj);
   }
 
   @Override

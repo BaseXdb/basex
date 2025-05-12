@@ -83,17 +83,16 @@ public final class CmpSR extends Single {
    */
   static Expr get(final CompileContext cc, final CmpG cmp) throws QueryException {
     final Expr cmp1 = cmp.exprs[0], cmp2 = cmp.exprs[1];
-    if(cmp1.has(Flag.NDT) || !(cmp2 instanceof AStr)) return cmp;
+    if(cmp1.has(Flag.NDT) || !(cmp2 instanceof final AStr str2)) return cmp;
 
-    final byte[] d = ((AStr) cmp2).string(cmp.info);
-    ParseExpr expr = null;
-    switch(cmp.op.value()) {
-      case GE: expr = new CmpSR(cmp1, d,    true,  null, true,  cmp.info); break;
-      case GT: expr = new CmpSR(cmp1, d,    false, null, true,  cmp.info); break;
-      case LE: expr = new CmpSR(cmp1, null, true,  d,    true,  cmp.info); break;
-      case LT: expr = new CmpSR(cmp1, null, true,  d,    false, cmp.info); break;
-      default:
-    }
+    final byte[] d = str2.string(cmp.info);
+    final ParseExpr expr = switch(cmp.op.value()) {
+      case GE -> new CmpSR(cmp1, d,    true,  null, true,  cmp.info);
+      case GT -> new CmpSR(cmp1, d,    false, null, true,  cmp.info);
+      case LE -> new CmpSR(cmp1, null, true,  d,    true,  cmp.info);
+      case LT -> new CmpSR(cmp1, null, true,  d,    false, cmp.info);
+      default -> null;
+    };
     return expr != null ? expr.optimize(cc) : cmp;
   }
 
@@ -141,17 +140,15 @@ public final class CmpSR extends Single {
     Collation coll = null;
     byte[] newMin = null, newMax = null;
     boolean newMni = true, newMxi = true;
-    if(ex instanceof CmpSR) {
-      final CmpSR cmp = (CmpSR) ex;
+    if(ex instanceof final CmpSR cmp) {
       newMin = cmp.min;
       newMax = cmp.max;
       newMni = cmp.mni;
       newMxi = cmp.mxi;
       coll = cmp.sc().collation;
-    } else if(ex instanceof CmpG) {
-      final CmpG cmp = (CmpG) ex;
-      if(cmp.op == OpG.EQ && cmp.exprs[1] instanceof Str) {
-        newMin = ((Str) cmp.exprs[1]).string();
+    } else if(ex instanceof final CmpG cmp) {
+      if(cmp.op == OpG.EQ && cmp.exprs[1] instanceof final Str str) {
+        newMin = str.string();
         newMax = newMin;
         coll = cmp.sc().collation;
       }
@@ -220,11 +217,9 @@ public final class CmpSR extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof CmpSR)) return false;
-    final CmpSR c = (CmpSR) obj;
-    return Token.eq(min, c.min) && mni == c.mni && Token.eq(max, c.max) && mxi && c.mxi &&
-        sc() == c.sc() && super.equals(obj);
+    return this == obj || obj instanceof final CmpSR cmp && Token.eq(min, cmp.min) &&
+        mni == cmp.mni && Token.eq(max, cmp.max) && mxi && cmp.mxi && sc() == cmp.sc() &&
+        super.equals(obj);
   }
 
   @Override

@@ -195,10 +195,8 @@ public final class RangeSeq extends Seq {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof RangeSeq)) return super.equals(obj);
-    final RangeSeq rs = (RangeSeq) obj;
-    return start == rs.start && size == rs.size && ascending == rs.ascending;
+    return this == obj || (obj instanceof final RangeSeq rs ? start == rs.start &&
+        size == rs.size && ascending == rs.ascending : super.equals(obj));
   }
 
   @Override

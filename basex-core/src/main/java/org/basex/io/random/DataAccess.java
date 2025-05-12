@@ -235,16 +235,12 @@ public final class DataAccess implements Closeable {
    */
   public synchronized int readNum() {
     final int value = read();
-    switch(value & 0xC0) {
-    case 0:
-      return value;
-    case 0x40:
-      return (value - 0x40 << 8) + read();
-    case 0x80:
-      return (value - 0x80 << 24) + (read() << 16) + (read() << 8) + read();
-    default:
-      return (read() << 24) + (read() << 16) + (read() << 8) + read();
-    }
+    return switch(value & 0xC0) {
+      case 0    -> value;
+      case 0x40 -> (value - 0x40 << 8) + read();
+      case 0x80 -> (value - 0x80 << 24) + (read() << 16) + (read() << 8) + read();
+      default   -> (read() << 24) + (read() << 16) + (read() << 8) + read();
+    };
   }
 
   /**

@@ -23,7 +23,6 @@ import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.Base64;
 import org.basex.util.list.*;
 
 /**
@@ -253,7 +252,7 @@ public final class Payload {
           Value value = data.get(name);
           if(filename.string().length != 0) {
             // assign file and contents, join multiple files
-            final XQMap map = value instanceof XQMap ? (XQMap) value : XQMap.empty();
+            final XQMap map = value instanceof final XQMap m ? m : XQMap.empty();
             final B64 contents = B64.get(cont.next());
             final Value files = new ItemList().add(map.get(filename)).add(contents).value();
             value = map.put(filename, files);

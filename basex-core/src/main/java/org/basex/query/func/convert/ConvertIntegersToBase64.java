@@ -30,16 +30,16 @@ public class ConvertIntegersToBase64 extends ConvertFn {
     final Value values = arg(0).atomValue(qc, info);
 
     // return internal byte array
-    if(values instanceof BytSeq) return B64.get(((BytSeq) values).toJava());
+    if(values instanceof final BytSeq bs) return B64.get(bs.toJava());
 
     // single integer
     final long size = values.size();
-    if(size == 1 && values instanceof Int) return B64.get((byte) ((Int) values).itr());
+    if(size == 1 && values instanceof final Int itr) return B64.get((byte) itr.itr());
 
     final ByteList bl = new ByteList(Seq.initialCapacity(size));
-    if(values instanceof IntSeq) {
+    if(values instanceof final IntSeq is) {
       // integer sequence
-      for(final long l : ((IntSeq) values).values()) bl.add((byte) l);
+      for(final long l : is.values()) bl.add((byte) l);
     } else {
       // other types
       final Iter iter = values.iter();

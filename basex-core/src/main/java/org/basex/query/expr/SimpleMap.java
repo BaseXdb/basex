@@ -142,15 +142,14 @@ public abstract class SimpleMap extends Mapping {
             final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULTIPLY).optimize(cc);
             return cc.function(REPLICATE, info, expr.arg(0), cnt);
           }
-          if(expr instanceof SingletonSeq && ((SingletonSeq) expr).singleItem()) {
+          if(expr instanceof final SingletonSeq ss && ss.singleItem()) {
             // SINGLETONSEQ ! replicate(., C)  ->  replicate(SINGLETONSEQ, C)
             return cc.function(REPLICATE, info, expr, args[1]);
           }
         } else if(ITEMS_AT.is(next) && !args[0].has(Flag.CTX) && args[1] instanceof ContextValue) {
-          if(expr instanceof RangeSeq) {
+          if(expr instanceof final RangeSeq rs) {
             // (A to B) ! items-at(E, .)  ->  util:range(E, A, B)
             // reverse(A to B) ! items-at(E, .)  ->  reverse(util:range(E, A, B))
-            final RangeSeq rs = (RangeSeq) expr;
             final Expr func = cc.function(_UTIL_RANGE, info, args[0],
                 Int.get(rs.min()), Int.get(rs.max()));
             return rs.ascending() ? func : cc.function(REVERSE, info, func);
@@ -175,13 +174,11 @@ public abstract class SimpleMap extends Mapping {
       }
 
       // (1 to 5) ! (. + 1)  ->  2 to 6
-      if(expr instanceof RangeSeq && next instanceof Arith) {
-        final Arith arith = (Arith) next;
+      if(expr instanceof final RangeSeq rs && next instanceof final Arith arith) {
         final boolean plus = arith.calc == Calc.ADD, minus = arith.calc == Calc.SUBTRACT;
-        if((plus || minus) && next.arg(0) instanceof ContextValue && next.arg(1) instanceof Int) {
-          final RangeSeq rs = (RangeSeq) expr;
-          final long diff = ((Int) next.arg(1)).itr();
-          final long start = rs.itemAt(0).itr() + (plus ? diff : -diff);
+        if((plus || minus) && arith.arg(0) instanceof ContextValue &&
+            arith.arg(1) instanceof final Int itr) {
+          final long diff = itr.itr(), start = rs.itemAt(0).itr() + (plus ? diff : -diff);
           return RangeSeq.get(start, rs.size(), rs.ascending());
         }
       }
@@ -190,8 +187,8 @@ public abstract class SimpleMap extends Mapping {
       Expr input = expr;
       if(REPLICATE.is(expr) && ((FnReplicate) expr).singleEval(true)) {
         input = expr.arg(0);
-      } else if(expr instanceof SingletonSeq && ((SingletonSeq) expr).singleItem()) {
-        input = ((SingletonSeq) expr).itemAt(0);
+      } else if(expr instanceof final SingletonSeq ss && ss.singleItem()) {
+        input = ss.itemAt(0);
       }
       if(input.size() == 1) {
         final Expr inlined = inline(input, next, cc);
@@ -215,20 +212,19 @@ public abstract class SimpleMap extends Mapping {
 
     if(expr.seqType().zeroOrOne()) {
       boolean inline = false;
-      if(next instanceof Cast) {
+      if(next instanceof final Cast cast) {
         // $node/@id ! xs:integer(.)  ->  xs:integer($node/@id)
-        final Cast cast = (Cast) next;
         inline = cast.expr instanceof ContextValue && cast.seqType.occ == Occ.ZERO_OR_ONE;
-      } else if(next instanceof ContextFn) {
+      } else if(next instanceof final ContextFn ctxFn) {
         // $node/.. ! base-uri(.)  ->  base-uri($node/..)
-        inline = ((ContextFn) next).inlineable();
+        inline = ctxFn.inlineable();
       }
       if(inline) {
         try {
           return new InlineContext(null, expr, cc).inline(next);
         } catch(final QueryException ex) {
           // replace original expression with error
-          return cc.error(ex, next);
+          return FnError.get(ex, next);
         }
       }
     }
@@ -236,22 +232,18 @@ public abstract class SimpleMap extends Mapping {
     // merge filter with context value as root
     // A ! .[B]  ->  A[B]
     Preds preds = null;
-    if(next instanceof Filter) {
-      final Filter filter = (Filter) next;
+    if(next instanceof final Filter filter) {
       if(filter.root instanceof ContextValue) preds = filter;
-    } else if(next instanceof SingleIterPath) {
-      final Step step = ((AxisPath) next).step(0);
+    } else if(next instanceof final SingleIterPath path) {
+      final Step step = path.step(0);
       if(step.axis == Axis.SELF && step.test == KindTest.NODE) preds = step;
     }
     if(preds != null && !preds.mayBePositional()) return Filter.get(cc, info, expr, preds.exprs);
 
     // A ! (if(B) then C else ()  ->  A[B] ! C
-    if(next instanceof If) {
-      final If iff = (If) next;
-      if(iff.exprs[1] == Empty.VALUE && !iff.exprs[0].has(Flag.POS) &&
-          !iff.cond.seqType().mayBeNumber()) {
-        return get(cc, info, Filter.get(cc, info, expr, iff.cond), iff.exprs[0]);
-      }
+    if(next instanceof final If iff && iff.exprs[1] == Empty.VALUE && !iff.exprs[0].has(Flag.POS) &&
+        !iff.cond.seqType().mayBeNumber()) {
+      return get(cc, info, Filter.get(cc, info, expr, iff.cond), iff.exprs[0]);
     }
     return null;
   }
@@ -269,18 +261,16 @@ public abstract class SimpleMap extends Mapping {
     // first operand: determine root and optional steps
     Expr root = exprs[0];
     final ExprList steps = new ExprList().add();
-    if(root instanceof AxisPath) {
-      final AxisPath ap = (AxisPath) root;
-      root = ap.root;
-      steps.add(ap.steps);
+    if(root instanceof final AxisPath path) {
+      root = path.root;
+      steps.add(path.steps);
     }
 
     // remaining operands: check for simple axis paths
     final int el = exprs.length;
     int e = 0;
     while(++e < el) {
-      if(!(exprs[e] instanceof AxisPath)) break;
-      final AxisPath path2 = (AxisPath) exprs[e];
+      if(!(exprs[e] instanceof final AxisPath path2)) break;
       if(path2.root != null || !path2.simple()) break;
       steps.add(path2.steps);
     }
@@ -352,16 +342,14 @@ public abstract class SimpleMap extends Mapping {
     };
     Expr root = simplify.apply(0);
     cc.pushFocus(root, true);
-    if(root instanceof AxisPath) {
-      final AxisPath path = (AxisPath) root;
+    if(root instanceof final AxisPath path) {
       root = path.root;
       steps.add(path.steps);
     }
     try {
       for(int e = 1; e < el; e++) {
         final Expr expr = simplify.apply(e);
-        if(!(expr instanceof AxisPath)) return this;
-        final AxisPath path = (AxisPath) expr;
+        if(!(expr instanceof final AxisPath path)) return this;
         if(path.root != null) return this;
         steps.add(path.steps);
         cc.updateFocus(expr, true);

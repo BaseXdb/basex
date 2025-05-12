@@ -65,7 +65,7 @@ public final class Cast extends Convert {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Cast && seqType.eq(((Cast) obj).seqType) &&
+    return this == obj || obj instanceof final Cast cst && seqType.eq(cst.seqType) &&
         super.equals(obj);
   }
 

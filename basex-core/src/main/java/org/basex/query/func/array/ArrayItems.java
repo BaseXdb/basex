@@ -29,8 +29,8 @@ public final class ArrayItems extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     final Type type = array.seqType().type;
-    if(type instanceof ArrayType) {
-      final SeqType vt = ((ArrayType) type).valueType();
+    if(type instanceof final ArrayType at) {
+      final SeqType vt = at.valueType();
       exprType.assign(vt.with(Occ.ZERO_OR_MORE), vt.one() ? array.structSize() : -1);
     }
     return this;

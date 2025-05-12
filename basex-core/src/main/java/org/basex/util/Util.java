@@ -113,7 +113,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void println(final Object string, final Object... ext) {
-    print((string instanceof byte[] ? string((byte[]) string) : string) + NL, ext);
+    print((string instanceof final byte[] bytes ? string(bytes) : string) + NL, ext);
   }
 
   /**
@@ -146,7 +146,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void errln(final Object object, final Object... ext) {
-    err((object instanceof Throwable ? message((Throwable) object) : object) + NL, ext);
+    err((object instanceof final Throwable th ? message(th) : object) + NL, ext);
   }
 
   /**

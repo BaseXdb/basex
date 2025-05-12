@@ -5,35 +5,14 @@ import org.basex.util.*;
 
 /**
  * This class stores a numeric range for index access.
+ * @param type index type
+ * @param min minimum value
+ * @param max maximum value
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class NumericRange implements IndexSearch {
-  /** Index type. */
-  private final IndexType type;
-  /** Minimum value. */
-  public final double min;
-  /** Maximum value. */
-  public final double max;
-
-  /**
-   * Constructor.
-   * @param type index type
-   * @param min minimum value
-   * @param max maximum value
-   */
-  public NumericRange(final IndexType type, final double min, final double max) {
-    this.type = type;
-    this.min = min;
-    this.max = max;
-  }
-
-  @Override
-  public IndexType type() {
-    return type;
-  }
-
+public record NumericRange(IndexType type, double min, double max) implements IndexSearch {
   @Override
   public byte[] token() {
     return Token.EMPTY;

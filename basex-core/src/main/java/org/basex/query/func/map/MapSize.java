@@ -23,7 +23,7 @@ public final class MapSize extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
     if(map.seqType().type instanceof MapType) {
       final long size = map.structSize();

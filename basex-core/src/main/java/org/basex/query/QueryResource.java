@@ -10,6 +10,7 @@ package org.basex.query;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 public interface QueryResource {
   /**
    * Closes a resource.

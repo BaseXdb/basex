@@ -41,9 +41,9 @@ public final class PathCache {
     if(!path.hasFreeVars() && !path.has(Flag.NDT)) {
       update(value, null);
       final Expr root = path.root;
-      if(root instanceof UtilRoot && ((UtilRoot) root).exprs[0] instanceof ContextValue &&
+      if(root instanceof UtilRoot && root.arg(0) instanceof ContextValue &&
           context instanceof ANode) {
-        test = v -> v instanceof ANode && ((ANode) v).root().equals(((ANode) context).root());
+        test = v -> v instanceof final ANode n && n.root().equals(((ANode) context).root());
       } else if(root != null && !root.has(Flag.CTX)) {
         test = v -> true;
       } else if(!(value instanceof DBNode)) {
@@ -77,7 +77,7 @@ public final class PathCache {
    * @param res result
    */
   void update(final Value value, final Value res) {
-    context = value instanceof DBNode ? ((DBNode) value).finish() : value;
+    context = value instanceof final DBNode dbnode ? dbnode.finish() : value;
     result = res;
   }
 

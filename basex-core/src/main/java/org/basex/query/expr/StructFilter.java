@@ -33,10 +33,9 @@ public final class StructFilter extends AFilter {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
+  public Expr optimize(final CompileContext cc) {
     // flatten nested filters
-    if(root instanceof StructFilter) {
-      final StructFilter filter = (StructFilter) root;
+    if(root instanceof final StructFilter filter) {
       root = filter.root;
       exprs = ExprList.concat(filter.exprs, exprs);
     }
@@ -97,7 +96,7 @@ public final class StructFilter extends AFilter {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof StructFilter && root.equals(((StructFilter) obj).root) &&
+    return this == obj || obj instanceof final StructFilter sf && root.equals(sf.root) &&
         super.equals(obj);
   }
 

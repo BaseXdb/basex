@@ -32,7 +32,7 @@ public final class HofFoldLeft1 extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr input = arg(0), action = arg(1);
     if(input.seqType().zero()) return input;
 

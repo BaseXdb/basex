@@ -149,15 +149,9 @@ public final class DialogInsert extends BaseXDialog {
   public void close() {
     final String in1 = input1.getText(), in2 = Token.string(input2.getText());
     switch(kind) {
-      case Data.ATTR: case Data.PI:
-        result.add(in1).add(in2);
-        break;
-      case Data.ELEM:
-        result.add(in1);
-        break;
-      case Data.TEXT: case Data.COMM:
-        result.add(in2);
-        break;
+      case Data.ATTR, Data.PI   -> result.add(in1).add(in2);
+      case Data.ELEM            -> result.add(in1);
+      case Data.TEXT, Data.COMM -> result.add(in2);
     }
     super.close();
   }

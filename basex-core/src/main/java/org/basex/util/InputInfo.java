@@ -58,7 +58,7 @@ public final class InputInfo {
   public InputInfo(final String path, final int line, final int col) {
     this.path = path;
     this.line = line;
-    this.column = col;
+    column = col;
   }
 
   /**
@@ -130,16 +130,15 @@ public final class InputInfo {
   }
 
   @Override
-  public boolean equals(final Object object) {
-    if(!(object instanceof InputInfo)) return false;
-    final InputInfo ii = (InputInfo) object;
-    return (path != null ? path.equals(ii.path) : Arrays.equals(input, ii.input)) &&
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof final InputInfo ii &&
+        (path != null ? path.equals(ii.path) : Arrays.equals(input, ii.input)) &&
         column() == ii.column() && line() == ii.line();
   }
 
   @Override
   public int hashCode() {
-    return (path != null ? path.hashCode() : Arrays.hashCode(input)) + column() + (line() << 16);
+    return (path != null ? path.hashCode() : Arrays.hashCode(input)) + (column() ^ line());
   }
 
   @Override

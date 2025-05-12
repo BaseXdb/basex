@@ -110,8 +110,7 @@ final class IndonesianStemmer extends InternalStemmer {
     int t = 0;
     final int s = tb.size();
     for(int c = 0; c < s; c++) {
-      final byte ch = tb.get(c);
-      if(isVowel(ch)) t++;
+      if(isVowel(tb.get(c))) t++;
     }
     return t;
   }
@@ -122,16 +121,7 @@ final class IndonesianStemmer extends InternalStemmer {
    * @return boolean
    */
   private static boolean isVowel(final byte c) {
-    switch(c) {
-      case 'a':
-      case 'e':
-      case 'i':
-      case 'o':
-      case 'u':
-        return true;
-      default:
-        return false;
-    }
+    return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
   }
 
   /**

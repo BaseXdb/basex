@@ -19,7 +19,7 @@ public class ProfTime extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     // create timer
     final Performance p = new Performance();
-    return evaluate(qc, true, () -> p.nanoRuntime());
+    return evaluate(qc, true, p::nanoRuntime);
   }
 
   @Override

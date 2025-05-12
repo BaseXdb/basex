@@ -17,7 +17,7 @@ public enum UpdateType {
    *
    * If more than one update primitive is targeted at a node T:
    *  - INSERTAFTER has to be carried out first, as it accesses
-   *    the highest PRE value (T+size(T)). Hence it's ranked highest.
+   *    the highest PRE value: T + size(T). Hence, it is ranked highest.
    *  - INSERTBEFORE v.v. (as it accesses the lowest PRE value equal T).
    */
 

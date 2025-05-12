@@ -116,7 +116,7 @@ public final class While extends Clause {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof While && expr.equals(((While) obj).expr);
+    return obj instanceof final While whl && expr.equals(whl.expr);
   }
 
   @Override

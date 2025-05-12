@@ -5,8 +5,6 @@ import static org.basex.core.Text.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.text.*;
-
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
@@ -219,8 +217,8 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       String pattern = "";
       String val1 = null;
       String val2 = null;
-      if(comp instanceof BaseXTextField) {
-        val1 = ((JTextComponent) comp).getText();
+      if(comp instanceof final BaseXTextField text) {
+        val1 = text.getText();
         if(!val1.isEmpty()) {
           if(Strings.startsWith(val1, '"')) {
             val1 = val1.replace("\"", "");
@@ -229,14 +227,12 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
             pattern = (attr ? data.meta.attrindex : data.meta.textindex) ? PATSUB : PATEX;
           }
         }
-      } else if(comp instanceof BaseXCombo) {
-        final BaseXCombo combo = (BaseXCombo) comp;
+      } else if(comp instanceof final BaseXCombo combo) {
         if(combo.getSelectedIndex() != 0) {
           val1 = combo.getSelectedItem();
           pattern = PATEX;
         }
-      } else if(comp instanceof BaseXDSlider) {
-        final BaseXDSlider slider = (BaseXDSlider) comp;
+      } else if(comp instanceof final BaseXDSlider slider) {
         if(slider.currMin != slider.min || slider.currMax != slider.max) {
           final double m = slider.currMin;
           final double n = slider.currMax;

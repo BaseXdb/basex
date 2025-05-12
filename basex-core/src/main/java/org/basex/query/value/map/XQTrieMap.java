@@ -14,6 +14,8 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class XQTrieMap extends XQMap {
+  /** The empty map. */
+  static final XQMap EMPTY = new XQTrieMap(TrieEmpty.VALUE, null, SeqType.MAP);
   /** Root node. */
   private final TrieNode root;
   /** Map order ({@code null} for empty and singleton maps). */
@@ -71,7 +73,7 @@ public final class XQTrieMap extends XQMap {
     if(node.size == 1) {
       // single entry: no map order, initialize type
       to = null;
-      mt = MapType.get((((TrieLeaf) root).key).type, value.seqType());
+      mt = MapType.get(((TrieLeaf) root).key.type, value.seqType());
     } else {
       // initialize map order if a second entry was added
       to = oldSize == 1 ? new TrieOrder(((TrieLeaf) root).key, key) : update.order();

@@ -8,7 +8,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -38,16 +37,16 @@ public final class FnError extends StandardFunc {
   }
 
   /**
-   * Creates an error function instance.
-   * @param ex query exception
-   * @param st type of the expression that caused the error message
+   * Creates an instance of this function.
+   * @param ex exception to be raised
+   * @param expr expression that caused the error message
    * @return function
    */
-  public static StandardFunc get(final QueryException ex, final SeqType st) {
+  public static StandardFunc get(final QueryException ex, final Expr expr) {
     Util.debug(ex);
-    final Str desc = Str.get(ex.getLocalizedMessage());
-    final StandardFunc sf = ERROR.get(ex.info(), ex.qname(), desc);
-    sf.exprType.assign(st);
+    final Str description = Str.get(ex.getLocalizedMessage());
+    final StandardFunc sf = ERROR.get(ex.info(), ex.qname(), description);
+    sf.exprType.assign(expr.seqType());
     return sf;
   }
 }

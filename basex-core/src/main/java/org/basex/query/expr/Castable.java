@@ -59,7 +59,7 @@ public final class Castable extends Convert {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Castable && seqType.eq(((Castable) obj).seqType) &&
+    return this == obj || obj instanceof final Castable cst && seqType.eq(cst.seqType) &&
         super.equals(obj);
   }
 

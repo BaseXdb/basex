@@ -108,7 +108,7 @@ public final class Pipeline extends Mapping {
   }
 
   @Override
-  Expr merge(final Expr expr, final Expr next, final CompileContext cc) throws QueryException {
+  Expr merge(final Expr expr, final Expr next, final CompileContext cc) {
     return expr.has(Flag.NDT) ? null : next.has(Flag.CTX) ? inline(expr, next, cc) : next;
   }
 

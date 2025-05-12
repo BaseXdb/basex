@@ -81,11 +81,8 @@ public final class GroupSpec extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof GroupSpec)) return false;
-    final GroupSpec gs = (GroupSpec) obj;
-    return var.equals(gs.var) && occluded == gs.occluded && Objects.equals(coll, gs.coll) &&
-        super.equals(obj);
+    return this == obj || obj instanceof final GroupSpec gs && var.equals(gs.var) &&
+        occluded == gs.occluded && Objects.equals(coll, gs.coll) && super.equals(obj);
   }
 
   @Override

@@ -114,6 +114,6 @@ public final class Uln extends ANum {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof Uln && value.compareTo(((Uln) obj).value) == 0;
+    return this == obj || obj instanceof final Uln uln && value.compareTo(uln.value) == 0;
   }
 }

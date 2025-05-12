@@ -164,9 +164,7 @@ public final class Uri extends AStr {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Uri)) return false;
-    final Uri u = (Uri) obj;
-    return type == u.type && Token.eq(value, u.value);
+    return this == obj || obj instanceof final Uri uri && type == uri.type &&
+        Token.eq(value, uri.value);
   }
 }

@@ -46,7 +46,7 @@ public abstract class Collation {
    * @param qc query context
    * @param info input info (can be {@code null})
    * @param err error code for unknown collation URIs
-   * @return collation instance or {@code null} for unicode point collation
+   * @return collation instance or {@code null} for Unicode point collation
    * @throws QueryException query exception
    */
   public static Collation get(final byte[] uri, final QueryContext qc, final InputInfo info,
@@ -60,7 +60,7 @@ public abstract class Collation {
     final byte[] url = u.isAbsolute() ? uri : Token.startsWith(uri, '?') ? concat(BASEX, uri) :
       info.sc().baseURI().resolve(u, info).string();
 
-    // return unicode point collation
+    // return Unicode point collation
     if(eq(COLLATION_URI, url)) return null;
 
     // create new collation or return cached instance
@@ -114,7 +114,7 @@ public abstract class Collation {
    * Returns a collation for the specified collation and input info.
    * @param coll collation
    * @param info input info (can be {@code null})
-   * @return collation instance, or {@code null} for unicode point collation
+   * @return collation instance, or {@code null} for Unicode point collation
    */
   public static Collation get(final Collation coll, final InputInfo info) {
     return coll != null ? coll : info != null ? info.sc().collation : null;

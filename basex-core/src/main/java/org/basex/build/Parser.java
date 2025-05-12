@@ -141,15 +141,14 @@ public class Parser extends Job {
       final String target) throws IOException {
 
     // use file specific parser
-    final SingleParser p;
     final MainParser mp = options.get(MainOptions.PARSER);
-    switch(mp) {
-      case HTML: p = new HtmlParser(source, options, options.get(MainOptions.HTMLPARSER)); break;
-      case JSON: p = new JsonParser(source, options, options.get(MainOptions.JSONPARSER)); break;
-      case CSV:  p = new CsvParser(source, options, options.get(MainOptions.CSVPARSER)); break;
-      default:   p = options.get(MainOptions.INTPARSE) ? new XMLParser(source, options) :
-        new SAXWrapper(source, options); break;
-    }
+    final SingleParser p = switch(mp) {
+      case HTML -> new HtmlParser(source, options, options.get(MainOptions.HTMLPARSER));
+      case JSON -> new JsonParser(source, options, options.get(MainOptions.JSONPARSER));
+      case CSV -> new CsvParser(source, options, options.get(MainOptions.CSVPARSER));
+      default -> options.get(MainOptions.INTPARSE) ? new XMLParser(source, options) :
+        new SAXWrapper(source, options);
+    };
     p.target(target);
     return p;
   }

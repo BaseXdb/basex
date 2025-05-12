@@ -79,7 +79,7 @@ abstract class ArchiveOut implements Closeable {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public static final void write(final ArchiveIn in, final OutputStream out) throws IOException {
+  public static void write(final ArchiveIn in, final OutputStream out) throws IOException {
     // keep streams open
     final byte[] data = new byte[IO.BLOCKSIZE];
     for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
@@ -93,7 +93,7 @@ abstract class ArchiveOut implements Closeable {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  static final void writeBin(final Bin bin, final OutputStream out, final InputInfo info)
+  static void writeBin(final Bin bin, final OutputStream out, final InputInfo info)
       throws IOException, QueryException {
     // keep output stream open
     final byte[] data = new byte[IO.BLOCKSIZE];

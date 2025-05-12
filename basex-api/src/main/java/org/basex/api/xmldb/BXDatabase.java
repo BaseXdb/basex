@@ -7,7 +7,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.Set;
 import org.basex.util.*;
 import org.xmldb.api.base.*;
-import org.xmldb.api.base.Collection;
 
 /**
  * Implementation of the Database Interface for the XMLDB:API.

@@ -130,8 +130,7 @@ final class DialogResources extends BaseXBack {
   }
 
   /**
-   * Refreshes the given folder node. Removes all its children and reloads
-   * it afterwards.
+   * Refreshes the given folder node. Removes all its children and reloads it afterward.
    * @param n folder
    */
   private void refreshFolder(final ResourceFolder n) {
@@ -207,24 +206,22 @@ final class DialogResources extends BaseXBack {
   void refreshNewFolder(final String p) {
     final byte[][] pathComp = split(token(p), '/');
 
-    ResourceNode n = root;
+    ResourceNode node = root;
     for(final byte[] c : pathComp) {
       // make sure folder is reloaded
-      if(n instanceof ResourceFolder)
-        ((ResourceFolder) n).reload();
+      if(node instanceof final ResourceFolder rf) rf.reload();
 
       // find next child to continue with
-      for(int i = 0; i < n.getChildCount(); i++) {
-        final ResourceNode ch = (ResourceNode) n.getChildAt(i);
+      for(int i = 0; i < node.getChildCount(); i++) {
+        final ResourceNode ch = (ResourceNode) node.getChildAt(i);
         if(eq(ch.name, c)) {
           // continue with the child if path component matches
-          n = ch;
+          node = ch;
           break;
         }
       }
     }
-
-    refreshFolder((ResourceFolder) (n instanceof ResourceFolder ? n : n.getParent()));
+    refreshFolder((ResourceFolder) (node instanceof ResourceFolder ? node : node.getParent()));
   }
 
   /**
@@ -261,7 +258,7 @@ final class DialogResources extends BaseXBack {
     @Override
     public boolean enabled(final GUI main) {
       final ResourceNode n = selection();
-      return n instanceof ResourceLeaf ? !((ResourceLeaf) n).abbr : n != null && !n.equals(root);
+      return n instanceof final ResourceLeaf rl ? !rl.abbr : n != null && !n.equals(root);
     }
   }
 
@@ -286,7 +283,7 @@ final class DialogResources extends BaseXBack {
     @Override
     public boolean enabled(final GUI main) {
       final ResourceNode n = selection();
-      return n instanceof ResourceLeaf ? !((ResourceLeaf) n).abbr : n != null && !n.equals(root);
+      return n instanceof final ResourceLeaf rl ? !rl.abbr : n != null && !n.equals(root);
     }
   }
 }

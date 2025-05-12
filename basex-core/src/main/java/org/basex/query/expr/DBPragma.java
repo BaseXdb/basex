@@ -69,7 +69,7 @@ public final class DBPragma extends Pragma {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof DBPragma && option.equals(((DBPragma) obj).option) &&
+    return this == obj || obj instanceof final DBPragma db && option.equals(db.option) &&
         super.equals(obj);
   }
 }

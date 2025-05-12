@@ -159,7 +159,7 @@ public final class BitArray {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final long word : words) {
-      if(sb.length() > 0) sb.append(' ');
+      if(!sb.isEmpty()) sb.append(' ');
       sb.append(toBinaryString(word));
     }
     return "BitArray[size: " + size + ", entries: " + sb + ']';

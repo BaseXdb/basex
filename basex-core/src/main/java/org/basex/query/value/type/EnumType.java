@@ -2,7 +2,6 @@ package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.io.in.DataInput;
@@ -57,7 +56,7 @@ public final class EnumType implements Type {
   }
 
   @Override
-  public Item read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+  public Item read(final DataInput in, final QueryContext qc) {
     throw Util.notExpected();
   }
 
@@ -76,12 +75,11 @@ public final class EnumType implements Type {
   @Override
   public boolean instanceOf(final Type type) {
     if(type == this) return true;
-    if(type instanceof ChoiceItemType) return ((ChoiceItemType) type).hasInstance(this);
+    if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
     if(AtomType.STRING.instanceOf(type)) return true;
-    if(!(type instanceof EnumType)) return false;
-    final TokenSet tv = ((EnumType) type).values;
+    if(!(type instanceof final EnumType et)) return false;
     for(final byte[] value : values) {
-      if(!tv.contains(value)) return false;
+      if(!et.values.contains(value)) return false;
     }
     return true;
   }
@@ -90,8 +88,7 @@ public final class EnumType implements Type {
   public Type union(final Type type) {
     if(type == this) return this;
     if(type instanceof ChoiceItemType) return type.union(this);
-    if(type instanceof EnumType) {
-      final EnumType et = (EnumType) type;
+    if(type instanceof final EnumType et) {
       final TokenSet tv = et.values;
       final TokenSet ts = new TokenSet();
       for(final byte[] value : values) ts.add(value);
@@ -107,9 +104,8 @@ public final class EnumType implements Type {
   public Type intersect(final Type type) {
     if(type instanceof ChoiceItemType) return type.intersect(this);
     if(instanceOf(type)) return this;
-    if(type instanceof EnumType) {
+    if(type instanceof final EnumType et) {
       final TokenSet ts = new TokenSet();
-      final EnumType et = (EnumType) type;
       final TokenSet tv = et.values;
       for(final byte[] value : values) {
         if(tv.contains(value)) ts.add(value);
@@ -175,8 +171,8 @@ public final class EnumType implements Type {
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
-    if(!(obj instanceof EnumType)) return false;
-    final TokenSet tv = ((EnumType) obj).values;
+    if(!(obj instanceof final EnumType et)) return false;
+    final TokenSet tv = et.values;
     if(values.size() != tv.size()) return false;
     for(final byte[] value : values) {
       if(!tv.contains(value)) return false;

@@ -342,8 +342,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public static Value get(final long size, final Type type, final Value... values)
       throws QueryException {
     if((values.length != 1 || values[0] instanceof TreeSeq || values[0] instanceof ItemSeq) &&
-        type instanceof AtomType) {
-      switch((AtomType) type) {
+        type instanceof final AtomType at) {
+      switch(at) {
         case BOOLEAN: return BlnSeq.get(size, values);
         case BYTE: return BytSeq.get(size, values);
         case SHORT: return ShrSeq.get(size, values);

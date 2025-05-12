@@ -90,8 +90,8 @@ final class RESTPost {
           bindings.compute(name, (k, v) -> {
             final StringList list = new StringList();
             if(v != null) {
-              if(v.getKey() instanceof String[]) {
-                for(final String obj : (String[]) v.getKey()) list.add(obj);
+              if(v.getKey() instanceof final String[] strings) {
+                for(final String string : strings) list.add(string);
               } else if(v.getKey() instanceof String) {
                 list.add(k);
               }
@@ -119,12 +119,12 @@ final class RESTPost {
       final String text = value("*/*:text/text()", doc, ctx);
 
       // choose evaluation
-      switch(cmd) {
-        case COMMAND: return RESTCommands.get(session, text, true);
-        case RUN:     return RESTRun.get(session, text, bindings);
-        case QUERY:   return RESTQuery.get(session, text, bindings);
-      }
-      throw HTTPStatus.BAD_REQUEST_X.get("Invalid POST command: " + cmd);
+      return switch(cmd) {
+        case COMMAND -> RESTCommands.get(session, text, true);
+        case RUN     -> RESTRun.get(session, text, bindings);
+        case QUERY   -> RESTQuery.get(session, text, bindings);
+        default      -> throw HTTPStatus.BAD_REQUEST_X.get("Invalid POST command: " + cmd);
+      };
     } catch(final QueryException ex) {
       throw HTTPStatus.BAD_REQUEST_X.get(ex);
     }

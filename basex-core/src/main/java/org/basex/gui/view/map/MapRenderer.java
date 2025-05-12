@@ -176,16 +176,11 @@ final class MapRenderer {
       flh = round(flhtmax, flhtmin);
       rect.thumblh = (byte) Math.max(1, (flh + ffh) * fontSize);
       rect.thumbsw = rect.thumbf;
-
-      switch(rect.thumbal) {
-        case 0:
-          h = drawToken(rect, data, false);
-          break;
-        case 1:
-          h = drawSentence(rect, data, false, rect.h);
-          break;
-      }
-
+      h = switch(rect.thumbal) {
+        case 0 -> drawToken(rect, data, false);
+        case 1 -> drawSentence(rect, data, false, rect.h);
+        default -> h;
+      };
       if(h >= rect.h || le(ffmax, ff) || le(ffhmax, ffh) || le(flhmax, flh)) {
         if(l) {
           // use last setup to draw

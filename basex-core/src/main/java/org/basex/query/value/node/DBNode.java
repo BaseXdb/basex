@@ -421,7 +421,7 @@ public class DBNode extends ANode {
 
   @Override
   public final boolean equals(final Object obj) {
-    return obj instanceof DBNode && is((DBNode) obj);
+    return obj instanceof final DBNode dbnode && is(dbnode);
   }
 
   @Override

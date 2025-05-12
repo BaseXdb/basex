@@ -70,7 +70,7 @@ public final class DblSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof DblSeq ? Arrays.equals(values, ((DblSeq) obj).values) :
+    return this == obj || (obj instanceof final DblSeq seq ? Arrays.equals(values, seq.values) :
       super.equals(obj));
   }
 
@@ -102,8 +102,8 @@ public final class DblSeq extends NativeSeq {
     final DoubleList tmp = new DoubleList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      if(value instanceof DblSeq) {
-        tmp.add(((DblSeq) value).values);
+      if(value instanceof final DblSeq seq) {
+        tmp.add(seq.values);
       } else {
         for(final Item item : value) tmp.add(item.dbl(null));
       }

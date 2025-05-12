@@ -73,24 +73,24 @@ public final class InfoIndex extends AInfo {
    * @return success flag
    */
   private static byte[] info(final CmdIndexInfo idx, final Data data, final MainOptions options) {
-    switch(idx) {
-      case ELEMNAME:
-        return info(ELEMENTS, IndexType.ELEMNAME, data, options, true);
-      case ATTRNAME:
-        return info(ATTRIBUTES, IndexType.ATTRNAME, data, options, true);
-      case PATH:
-        return info(PATH_INDEX, IndexType.PATH, data, options, true);
-      case TEXT:
-        return info(TEXT_INDEX, IndexType.TEXT, data, options, data.meta.textindex);
-      case ATTRIBUTE:
-        return info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data, options, data.meta.attrindex);
-      case TOKEN:
-        return info(TOKEN_INDEX, IndexType.TOKEN, data, options, data.meta.tokenindex);
-      case FULLTEXT:
-        return info(FULLTEXT_INDEX, IndexType.FULLTEXT, data, options, data.meta.ftindex);
-      default:
-        return Token.token(LI + NOT_AVAILABLE);
-    }
+    return switch(idx) {
+      case ELEMNAME ->
+        info(ELEMENTS, IndexType.ELEMNAME, data, options, true);
+      case ATTRNAME ->
+        info(ATTRIBUTES, IndexType.ATTRNAME, data, options, true);
+      case PATH ->
+        info(PATH_INDEX, IndexType.PATH, data, options, true);
+      case TEXT ->
+        info(TEXT_INDEX, IndexType.TEXT, data, options, data.meta.textindex);
+      case ATTRIBUTE ->
+        info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data, options, data.meta.attrindex);
+      case TOKEN ->
+        info(TOKEN_INDEX, IndexType.TOKEN, data, options, data.meta.tokenindex);
+      case FULLTEXT ->
+        info(FULLTEXT_INDEX, IndexType.FULLTEXT, data, options, data.meta.ftindex);
+      default ->
+        Token.token(LI + NOT_AVAILABLE);
+    };
   }
 
   /**

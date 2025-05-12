@@ -51,7 +51,7 @@ public final class ThesList {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final ThesAccessor th : list) {
-      if(sb.length() != 0) sb.append(", ");
+      if(!sb.isEmpty()) sb.append(", ");
       sb.append(th);
     }
     return sb.toString();

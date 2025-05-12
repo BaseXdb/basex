@@ -211,12 +211,9 @@ public final class FElem extends FNode {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FElem)) return false;
-    final FElem f = (FElem) obj;
-    return name.eq(f.name) && Arrays.equals(children, f.children) &&
-        Arrays.equals(attributes, f.attributes) && Objects.equals(namespaces, f.namespaces) &&
-        super.equals(obj);
+    return this == obj || obj instanceof final FElem f && name.eq(f.name) &&
+        Arrays.equals(children, f.children) && Arrays.equals(attributes, f.attributes) &&
+        Objects.equals(namespaces, f.namespaces) && super.equals(obj);
   }
 
   @Override

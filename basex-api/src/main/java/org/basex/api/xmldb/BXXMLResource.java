@@ -113,7 +113,7 @@ public final class BXXMLResource implements XMLResource {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
       }
     }
-    return content instanceof byte[] ? string((byte[]) content) : content;
+    return content instanceof final byte[] bytes ? string(bytes) : content;
   }
 
   @Override
@@ -121,11 +121,11 @@ public final class BXXMLResource implements XMLResource {
     // allow only strings, byte arrays and {@link File} instances
     if(value instanceof byte[]) {
       content = value;
-    } else if(value instanceof String) {
-      content = token(value.toString());
-    } else if(value instanceof File) {
+    } else if(value instanceof final String string) {
+      content = token(string);
+    } else if(value instanceof final File file) {
       try {
-        content = new IOFile((File) value).read();
+        content = new IOFile(file).read();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_CONT +
                 '\n' + ex.getMessage());

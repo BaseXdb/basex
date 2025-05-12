@@ -160,7 +160,7 @@ public final class Atts extends ElementList {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj == this || obj instanceof Atts && equals((Atts) obj);
+    return obj == this || obj instanceof final Atts atts && equals(atts);
   }
 
   /**

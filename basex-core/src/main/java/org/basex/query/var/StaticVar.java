@@ -6,6 +6,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -53,7 +54,7 @@ public final class StaticVar extends StaticDecl {
         expr = expr.compile(cc);
       } catch(final QueryException ex) {
         if(!lazy) throw ex.notCatchable();
-        expr = cc.error(ex, expr);
+        expr = FnError.get(ex, expr);
       } finally {
         cc.removeScope(this);
         cc.qc.focus = focus;

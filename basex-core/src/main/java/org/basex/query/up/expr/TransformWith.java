@@ -60,21 +60,21 @@ public final class TransformWith extends Copy {
     final ValueBuilder vb = new ValueBuilder(qc);
     try {
       for(final Item item : value) {
-        if(!(item instanceof ANode)) throw UPSOURCE_X.get(info, item);
+        if(!(item instanceof final ANode node)) throw UPSOURCE_X.get(info, item);
 
         // create main memory copy of node
-        final Item node = ((ANode) item).copy(qc);
+        final Item copy = node.copy(qc);
         // set resulting node as context
-        qf.value = node;
+        qf.value = copy;
 
         final Updates updates = new Updates(true);
         qc.updates = updates;
-        updates.addData(node.data());
+        updates.addData(copy.data());
 
         if(!arg(update()).value(qc).isEmpty()) throw UPMODIFY.get(info);
         updates.prepare(qc);
         updates.apply(qc);
-        vb.add(node);
+        vb.add(copy);
         qf.pos++;
       }
     } finally {

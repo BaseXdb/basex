@@ -286,7 +286,7 @@ public final class CmpV extends Cmp {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof CmpV && opV == ((CmpV) obj).opV && super.equals(obj);
+    return this == obj || obj instanceof final CmpV cmp && opV == cmp.opV && super.equals(obj);
   }
 
   @Override

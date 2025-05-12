@@ -75,7 +75,7 @@ public final class DecSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || (obj instanceof DecSeq ? Array.equals(values, ((DecSeq) obj).values) :
+    return this == obj || (obj instanceof final DecSeq seq ? Array.equals(values, seq.values) :
       super.equals(obj));
   }
 
@@ -103,9 +103,9 @@ public final class DecSeq extends NativeSeq {
     int t = 0;
     for(final Value value : values) {
       // speed up construction, depending on input
-      if(value instanceof DecSeq) {
-        final int vs = (int) value.size();
-        Array.copyFromStart(((DecSeq) value).values, vs, tmp, t);
+      if(value instanceof final DecSeq seq) {
+        final int vs = (int) seq.size();
+        Array.copyFromStart(seq.values, vs, tmp, t);
         t += vs;
       } else {
         for(final Item item : value) tmp[t++] = item.dec(null);

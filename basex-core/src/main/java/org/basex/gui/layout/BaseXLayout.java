@@ -77,7 +77,7 @@ public final class BaseXLayout {
   }
 
   /**
-   * Activates graphics anti-aliasing.
+   * Activates graphics antialiasing.
    * @param g graphics reference
    */
   public static void antiAlias(final Graphics g) {
@@ -86,23 +86,17 @@ public final class BaseXLayout {
   }
 
   /**
-   * Chooses the anti-aliasing renderer.
+   * Chooses the antialiasing renderer.
    * @param g graphics reference
-   * @param type anti-aliasing type
+   * @param type antialiasing type
    */
   public static void antiAlias(final Graphics g, final String type) {
-    Object hint = null;
-    switch (type) {
-      case "Off":
-        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
-        break;
-      case "On":
-        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
-        break;
-      case "GASP":
-        hint = RenderingHints.VALUE_TEXT_ANTIALIAS_GASP;
-        break;
-    }
+    final Object hint = switch(type) {
+      case "Off"  -> RenderingHints.VALUE_TEXT_ANTIALIAS_OFF;
+      case "On"   -> RenderingHints.VALUE_TEXT_ANTIALIAS_ON;
+      case "GASP" -> RenderingHints.VALUE_TEXT_ANTIALIAS_GASP;
+      default     -> null;
+    };
     if(hint != null) ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, hint);
   }
 
@@ -114,7 +108,7 @@ public final class BaseXLayout {
   private static GUI gui(final Component comp) {
     Component c = comp;
     do {
-      if(c instanceof GUI) return (GUI) c;
+      if(c instanceof final GUI gui) return gui;
       c = c.getParent();
     } while(c != null);
     return null;
@@ -178,8 +172,7 @@ public final class BaseXLayout {
     if(sc == null) return null;
 
     final String scut;
-    if(sc instanceof BaseXKeys[]) {
-      final BaseXKeys[] scs = (BaseXKeys[]) sc;
+    if(sc instanceof final BaseXKeys[] scs) {
       if(scs.length == 0) return null;
       scut = scs[0].shortCut();
     } else {
@@ -290,6 +283,7 @@ public final class BaseXLayout {
    * @author BaseX Team, BSD License
    * @author Christian Gruen
    */
+  @FunctionalInterface
   public interface DropHandler {
     /**
      * Drops a file.
@@ -314,7 +308,7 @@ public final class BaseXLayout {
     } else {
       // yes: add default keys
       comp.addKeyListener((KeyPressedListener) e -> {
-        final BaseXCombo combo = comp instanceof BaseXCombo ? (BaseXCombo) comp : null;
+        final BaseXCombo combo = comp instanceof final BaseXCombo bxc ? bxc : null;
         if(combo != null && combo.isPopupVisible()) return;
 
         // do not key close dialog if button or editor is focused
@@ -323,8 +317,8 @@ public final class BaseXLayout {
         } else if(ESCAPE.is(e)) {
           // do not cancel dialog if search bar is opened
           boolean close = true;
-          if(comp instanceof TextPanel) {
-            final SearchBar bar = ((TextPanel) comp).getSearch();
+          if(comp instanceof final TextPanel tp) {
+            final SearchBar bar = tp.getSearch();
             close = bar == null || !bar.deactivate(true);
           }
           if(close) dialog.cancel();
@@ -597,7 +591,7 @@ public final class BaseXLayout {
         sb.append(", ").append(more.apply(bytes, maxtext)).append(Performance.formatHuman(bytes));
       }
     }
-    return sb.length() > 0 ? sb.toString() : " ";
+    return sb.isEmpty() ? " " : sb.toString();
   }
 
   /**

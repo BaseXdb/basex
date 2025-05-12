@@ -137,9 +137,8 @@ public final class FnItemsAt extends StandardFunc {
       if(REPLICATE.is(input)) {
         // static integer will always be greater than 1
         final Expr[] args = input.args();
-        if(args[0].size() == 1 && args[1] instanceof Int) {
-          final long count = ((Int) args[1]).itr();
-          return l > count ? Empty.VALUE : args[0];
+        if(args[0].size() == 1 && args[1] instanceof final Int itr) {
+          return l > itr.itr() ? Empty.VALUE : args[0];
         }
       }
       // items-at(file:read-text-lines(E), pos)  ->  file:read-text-lines(E, pos, 1)
@@ -174,8 +173,7 @@ public final class FnItemsAt extends StandardFunc {
     }
 
     // items-at(E, start to end)  ->  util:range(E, start, end)
-    if(at instanceof RangeSeq) {
-      final RangeSeq rs = (RangeSeq) at;
+    if(at instanceof final RangeSeq rs) {
       Expr expr = cc.function(_UTIL_RANGE, info, input, Int.get(rs.min()), Int.get(rs.max()));
       if(!rs.ascending()) expr = cc.function(REVERSE, info, expr);
       return expr;
@@ -185,7 +183,7 @@ public final class FnItemsAt extends StandardFunc {
       final Expr arg1 = at.arg(0), arg2 = at.arg(1);
       if(arg1.seqType().instanceOf(SeqType.INTEGER_O) &&
          arg2.seqType().instanceOf(SeqType.INTEGER_O)) {
-        return cc.function(_UTIL_RANGE, info, input, at.arg(0), at.arg(1));
+        return cc.function(_UTIL_RANGE, info, input, arg1, arg2);
       }
     }
     // items-at(E, reverse(P))  ->  reverse(E, P))
@@ -212,9 +210,10 @@ public final class FnItemsAt extends StandardFunc {
       // function(E, count(E))  ->  0
       if(countInput.test(end)) return 0;
       // function(E, count(E) - 1)  ->  -1
-      if(end instanceof Arith && countInput.test(end.arg(0)) && end.arg(1) instanceof Int) {
-        final Calc calc = ((Arith) end).calc;
-        final long sum = ((Int) end.arg(1)).itr();
+      if(end instanceof final Arith arith && countInput.test(end.arg(0)) &&
+          end.arg(1) instanceof final Int itr) {
+        final Calc calc = arith.calc;
+        final long sum = itr.itr();
         if(calc == Calc.ADD) return sum;
         if(calc == Calc.SUBTRACT) return -sum;
       }

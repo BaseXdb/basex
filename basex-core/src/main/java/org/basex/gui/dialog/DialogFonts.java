@@ -33,7 +33,7 @@ public final class DialogFonts extends BaseXDialog {
   private final BaseXList size;
   /** Only display monospace fonts. */
   private final BaseXCheckBox onlyMono;
-  /** Anti-aliasing. */
+  /** Antialiasing. */
   private final BaseXCombo antiAlias;
 
   /**
@@ -66,7 +66,7 @@ public final class DialogFonts extends BaseXDialog {
     font.setValue(gopts.get(GUIOptions.FONT));
 
     final BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 8));
-    pp.add(new BaseXLabel("Anti-Aliasing"));
+    pp.add(new BaseXLabel("Antialiasing"));
     pp.add(antiAlias);
     p.add(pp);
 

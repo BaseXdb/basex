@@ -95,30 +95,12 @@ final class SnowballStemmer extends Stemmer {
     return s == null ? word : token(s);
   }
 
-  /** Structure, containing stemming methods. */
-  private static final class StemmerClass {
-    /** Class implementing the stemmer. */
-    final Class<?> clz;
-    /** Method {@code setCurrent}. */
-    final Method setCurrent;
-    /** Method {@code stem}. */
-    final Method stem;
-    /** Method {@code getCurrent}. */
-    final Method getCurrent;
-
-    /**
-     * Constructor.
-     * @param clz class implementing the stemmer
-     * @param setCurrent method {@code setCurrent}
-     * @param stem method {@code stem}
-     * @param getCurrent method {@code getCurrent}
-     */
-    StemmerClass(final Class<?> clz, final Method setCurrent, final Method stem,
-        final Method getCurrent) {
-      this.clz = clz;
-      this.setCurrent = setCurrent;
-      this.stem = stem;
-      this.getCurrent = getCurrent;
-    }
-  }
+  /**
+   * Methods of a particular stemmer.
+   * @param clz        Class implementing the stemmer.
+   * @param setCurrent Method {@code setCurrent}.
+   * @param stem       Method {@code stem}.
+   * @param getCurrent Method {@code getCurrent}.
+   */
+  private record StemmerClass(Class<?> clz, Method setCurrent, Method stem, Method getCurrent) { }
 }

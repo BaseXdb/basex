@@ -70,7 +70,7 @@ final class RestXqError implements Comparable<RestXqError> {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     for(final NameTest test : tests) {
-      if(sb.length() != 0) sb.append(", ");
+      if(!sb.isEmpty()) sb.append(", ");
       sb.append(test != null ? test : "*");
     }
     return sb.toString();

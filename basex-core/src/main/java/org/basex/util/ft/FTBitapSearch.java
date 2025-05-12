@@ -130,6 +130,7 @@ public final class FTBitapSearch {
    * @author BaseX Team, BSD License
    * @author Dimitar Popov
    */
+  @FunctionalInterface
   public interface TokenComparator {
     /**
      * Check if two tokens are equal.

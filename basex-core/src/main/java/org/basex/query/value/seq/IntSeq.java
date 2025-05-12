@@ -134,11 +134,9 @@ public final class IntSeq extends NativeSeq {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof IntSeq)) return super.equals(obj);
-    final IntSeq is = (IntSeq) obj;
-    return type == is.type && Arrays.equals(values, is.values);
-  }
+    return this == obj || (obj instanceof final IntSeq seq ? type == seq.type &&
+        Arrays.equals(values, seq.values) : super.equals(obj));
+ }
 
   // STATIC METHODS ===============================================================================
 
@@ -154,7 +152,7 @@ public final class IntSeq extends NativeSeq {
   /**
    * Creates a sequence with the specified values.
    * @param values values
-   * @param type type; must be instance of xs:integer
+   * @param type type; must be an instance of xs:integer
    * @return value
    */
   public static Value get(final long[] values, final Type type) {
@@ -182,7 +180,7 @@ public final class IntSeq extends NativeSeq {
   /**
    * Creates a typed sequence with the items of the specified values.
    * @param size size of resulting sequence
-   * @param type type; must be instance of xs:integer
+   * @param type type; must be an instance of xs:integer
    * @param values values
    * @return value
    * @throws QueryException query exception
@@ -192,8 +190,8 @@ public final class IntSeq extends NativeSeq {
     final LongList list = new LongList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
-      if(value instanceof IntSeq) {
-        list.add(((IntSeq) value).values);
+      if(value instanceof final IntSeq seq) {
+        list.add(seq.values);
       } else {
         for(final Item item : value) list.add(item.itr(null));
       }

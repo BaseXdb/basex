@@ -103,8 +103,7 @@ public final class QueryPlan {
     for(int a = 0; a < al - 1; a += 2) {
       addAttribute(elem, atts[a], atts[a + 1]);
     }
-    if(expr instanceof Expr) {
-      final Expr ex = (Expr) expr;
+    if(expr instanceof final Expr ex) {
       attachType(elem, ex.seqType(), ex.size(), ex.data());
     } else if(expr instanceof StaticDecl) {
       attachType(elem, ((StaticDecl) expr).seqType(), -1, null);
@@ -163,7 +162,6 @@ public final class QueryPlan {
    */
   private void attachType(final FBuilder elem, final SeqType seqType, final long size,
       final Data data) {
-
     addAttribute(elem, TYPE, seqType);
     if(size != -1) addAttribute(elem, SIZE, size);
     if(data != null) addAttribute(elem, DATABASE, data.meta.name);

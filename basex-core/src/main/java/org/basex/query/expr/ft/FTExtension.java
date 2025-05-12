@@ -46,8 +46,8 @@ public final class FTExtension extends FTExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTExtension &&
-        pragma.equals(((FTExtension) obj).pragma) && super.equals(obj);
+    return this == obj || obj instanceof final FTExtension fte && pragma.equals(fte.pragma) &&
+        super.equals(obj);
   }
 
   @Override

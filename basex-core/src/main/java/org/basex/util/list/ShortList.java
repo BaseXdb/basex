@@ -73,7 +73,7 @@ public final class ShortList extends ElementList {
 
   /**
    * Returns an array with all elements and invalidates the internal array.
-   * Warning: the function must only be called if the list is discarded afterwards.
+   * Warning: the function must only be called if the list is discarded afterward.
    * @return array (internal representation!)
    */
   public short[] finish() {
@@ -86,11 +86,9 @@ public final class ShortList extends ElementList {
   @Override
   public boolean equals(final Object obj) {
     if(obj == this) return true;
-    if(!(obj instanceof ShortList)) return false;
-    final ShortList bl = (ShortList) obj;
-    if(size != bl.size) return false;
+    if(!(obj instanceof final ShortList sl) || size != sl.size) return false;
     for(int l = 0; l < size; ++l) {
-      if(list[l] != bl.list[l]) return false;
+      if(list[l] != sl.list[l]) return false;
     }
     return true;
   }

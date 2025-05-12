@@ -49,8 +49,7 @@ public final class FnHead extends StandardFunc {
     }
     if(REVERSE.is(input)) {
       // head(reverse(root[test]))  ->  head(reverse(root)[test])
-      if(input.arg(0) instanceof IterFilter) {
-        final IterFilter filter = (IterFilter) input.arg(0);
+      if(input.arg(0) instanceof final IterFilter filter) {
         return cc.function(HEAD, info,
             Filter.get(cc, filter.info(), cc.function(REVERSE, info, filter.root), filter.exprs));
       }

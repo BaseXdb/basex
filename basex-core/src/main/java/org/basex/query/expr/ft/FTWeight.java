@@ -136,7 +136,7 @@ public final class FTWeight extends FTExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTWeight && weight.equals(((FTWeight) obj).weight) &&
+    return this == obj || obj instanceof final FTWeight ftw && weight.equals(ftw.weight) &&
         super.equals(obj);
   }
 

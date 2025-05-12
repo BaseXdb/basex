@@ -88,8 +88,7 @@ public final class DynFuncCall extends FuncCall {
     }
 
     // try to inline the function; avoid recursive inlining
-    if(func instanceof XQFunctionExpr) {
-      final XQFunctionExpr fe = (XQFunctionExpr) func;
+    if(func instanceof final XQFunctionExpr fe) {
       if(!cc.inlined.contains(fe)) {
         checkUp(fe, updating);
         cc.inlined.push(fe);
@@ -133,9 +132,9 @@ public final class DynFuncCall extends FuncCall {
   @Override
   FItem evalFunc(final QueryContext qc) throws QueryException {
     final Item item = body().item(qc, info);
-    if(!(item instanceof FItem)) throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
+    if(!(item instanceof final FItem func)) throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
 
-    final FItem func = checkUp((FItem) item, updating);
+    checkUp(func, updating);
     final int nargs = exprs.length - 1, arity = func.arity();
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
     return func;
@@ -150,7 +149,7 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof DynFuncCall && updating == ((DynFuncCall) obj).updating &&
+    return this == obj || obj instanceof final DynFuncCall dfc && updating == dfc.updating &&
         super.equals(obj);
   }
 

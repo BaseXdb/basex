@@ -189,14 +189,14 @@ public class FnParseUri extends StandardFunc {
   /**
    * Adds a non-empty map entry.
    * @param mb map
-   * @param k key
-   * @param v value
+   * @param key key string
+   * @param value value object
    * @throws QueryException query exception
    */
-  static void add(final MapBuilder mb, final String k, final Object v) throws QueryException {
-    final Value value = v instanceof Value ? (Value) v : v.toString().isEmpty() ? Empty.VALUE :
-      Str.get(v.toString());
-    if(!(value.isEmpty() || value == XQMap.empty())) mb.put(k, value);
+  static void add(final MapBuilder mb, final String key, final Object value) throws QueryException {
+    final Value v = value instanceof final Value vl ? vl : value.toString().isEmpty() ?
+        Empty.VALUE : Str.get(value.toString());
+    if(!(v.isEmpty() || v == XQMap.empty())) mb.put(key, v);
   }
 
   /**

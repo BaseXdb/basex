@@ -163,8 +163,8 @@ public abstract class JavaCall extends Arr {
     }
 
     // convert empty number to the smallest type
-    if(arg instanceof ANum) {
-      final double d = ((ANum) arg).dbl();
+    if(arg instanceof final ANum num) {
+      final double d = num.dbl();
       if((param == byte.class  || param == Byte.class)      && (byte)  d == d) return (byte)   d;
       if((param == short.class || param == Short.class)     && (short) d == d) return (short)  d;
       if((param == char.class  || param == Character.class) && (char)  d == d) return (char)   d;
@@ -212,7 +212,7 @@ public abstract class JavaCall extends Arr {
   final QueryException executionError(final Throwable th, final Object[] args) {
     Util.debug(th);
     final Throwable root = Util.rootException(th);
-    return root instanceof QueryException ? ((QueryException) root).info(info) :
+    return root instanceof final QueryException qe ? qe.info(info) :
       JAVAEXEC_X_X_X.get(info, root, name(), JavaCall.argTypes(args));
   }
 
@@ -244,8 +244,8 @@ public abstract class JavaCall extends Arr {
       final WrapOptions wrap) throws QueryException {
 
     // return XQuery types unchanged
-    if(object instanceof Value) return (Value) object;
-    if(object instanceof Iter) return ((Iter) object).value(qc, null);
+    if(object instanceof final Value value) return value;
+    if(object instanceof final Iter iter) return iter.value(qc, null);
 
     if(wrap != WrapOptions.ALL) {
       // null values
@@ -262,22 +262,20 @@ public abstract class JavaCall extends Arr {
         if(s == 0) return Empty.VALUE;
 
         // primitive arrays
-        if(object instanceof boolean[]) return BlnSeq.get((boolean[]) object);
-        if(object instanceof byte[])    return BytSeq.get((byte[]) object);
-        if(object instanceof short[])   return ShrSeq.get((short[]) object);
-        if(object instanceof long[])    return IntSeq.get((long[]) object);
-        if(object instanceof float[])   return FltSeq.get((float[]) object);
-        if(object instanceof double[])  return DblSeq.get((double[]) object);
+        if(object instanceof final boolean[] values) return BlnSeq.get(values);
+        if(object instanceof final byte[] values)    return BytSeq.get(values);
+        if(object instanceof final short[] values)   return ShrSeq.get(values);
+        if(object instanceof final long[] values)    return IntSeq.get(values);
+        if(object instanceof final float[] values)   return FltSeq.get(values);
+        if(object instanceof final double[] values)  return DblSeq.get(values);
         // char array
-        if(object instanceof char[]) {
-          final char[] values = (char[]) object;
+        if(object instanceof final char[] values) {
           final LongList list = new LongList(values.length);
           for(final int value : values) list.add(value);
           return IntSeq.get(list.finish(), AtomType.UNSIGNED_LONG);
         }
         // integer array
-        if(object instanceof int[]) {
-          final int[] values = (int[]) object;
+        if(object instanceof final int[] values) {
           final LongList list = new LongList(values.length);
           for(final int value : values) list.add(value);
           return IntSeq.get(list.finish(), AtomType.INT);
@@ -287,8 +285,7 @@ public abstract class JavaCall extends Arr {
           if(obj == null) throw JAVANULL.get(info);
         }
         // string array
-        if(object instanceof String[]) {
-          final String[] values = (String[]) object;
+        if(object instanceof final String[] values) {
           final TokenList list = new TokenList(values.length);
           for(final String string : values) list.add(string);
           return StrSeq.get(list);
@@ -303,10 +300,9 @@ public abstract class JavaCall extends Arr {
       // data structures
       if(wrap == WrapOptions.NONE) {
         final ValueBuilder vb = new ValueBuilder(qc);
-        if(object instanceof Iterable) {
-          for(final Object obj : (Iterable<?>) object) vb.add(toValue(obj, qc, info, wrap));
-        } else if(object instanceof Iterator) {
-          final Iterator<?> ir = (Iterator<?>) object;
+        if(object instanceof final Iterable iter) {
+          for(final Object obj : iter) vb.add(toValue(obj, qc, info, wrap));
+        } else if(object instanceof final Iterator ir) {
           while(ir.hasNext()) vb.add(toValue(ir.next(), qc, info, wrap));
         } else if(object instanceof Map) {
           final MapBuilder mb = new MapBuilder();
@@ -619,8 +615,8 @@ public abstract class JavaCall extends Arr {
    * @return type string
    */
   static String argType(final Object argument) {
-    final Object object = argument instanceof XQJava ? ((XQJava) argument).toJava() : argument;
-    return object instanceof Value ? ((Value) object).seqType().toString() :
+    final Object object = argument instanceof final XQJava java ? java.toJava() : argument;
+    return object instanceof final Value value ? value.seqType().toString() :
       object == null ? Util.info(null) :
       Util.className(object);
   }
@@ -660,16 +656,15 @@ public abstract class JavaCall extends Arr {
     if(object instanceof ProcessingInstruction) return NodeType.PROCESSING_INSTRUCTION;
     if(object instanceof Text) return NodeType.TEXT;
 
-    if(object instanceof Duration) {
-      final Duration d = (Duration) object;
-      return !d.isSet(DatatypeConstants.YEARS) && !d.isSet(DatatypeConstants.MONTHS)
-          ? AtomType.DAY_TIME_DURATION : !d.isSet(DatatypeConstants.HOURS) &&
-          !d.isSet(DatatypeConstants.MINUTES) && !d.isSet(DatatypeConstants.SECONDS)
+    if(object instanceof final Duration duration) {
+      return !duration.isSet(DatatypeConstants.YEARS) && !duration.isSet(DatatypeConstants.MONTHS)
+          ? AtomType.DAY_TIME_DURATION : !duration.isSet(DatatypeConstants.HOURS) &&
+          !duration.isSet(DatatypeConstants.MINUTES) && !duration.isSet(DatatypeConstants.SECONDS)
           ? AtomType.YEAR_MONTH_DURATION : AtomType.DURATION;
     }
 
-    if(object instanceof XMLGregorianCalendar) {
-      final QName qnm = ((XMLGregorianCalendar) object).getXMLSchemaType();
+    if(object instanceof final XMLGregorianCalendar calendar) {
+      final QName qnm = calendar.getXMLSchemaType();
       if(qnm == DatatypeConstants.DATE) return AtomType.DATE;
       if(qnm == DatatypeConstants.DATETIME) return AtomType.DATE_TIME;
       if(qnm == DatatypeConstants.TIME) return AtomType.TIME;

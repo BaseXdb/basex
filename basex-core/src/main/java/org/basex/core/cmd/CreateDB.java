@@ -113,7 +113,7 @@ public final class CreateDB extends ACreate {
       }
 
       if(!update(data, () -> {
-        CreateIndex.create(data, CreateDB.this);
+        CreateIndex.create(data, this);
         return info(parser.info() + DB_CREATED_X_X, name, jc().performance);
       })) return false;
 

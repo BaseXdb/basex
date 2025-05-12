@@ -32,11 +32,11 @@ public final class CsvW3ArraysSerializer extends CsvSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
-    if(!(item instanceof XQArray))
+    if(!(item instanceof final XQArray array))
       throw CSV_SERIALIZE_X_X.getIO("Array expected, found " + item.seqType(), item);
     final TokenList tl = new TokenList();
     try {
-      for(final Value value : ((XQArray) item).iterable()) {
+      for(final Value value : array.iterable()) {
         if(!value.isItem()) throw CSV_SERIALIZE_X_X.getIO(
             "Item expected, found " + value.seqType(), value);
         tl.add(((Item) value).string(null));

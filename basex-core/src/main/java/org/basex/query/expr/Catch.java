@@ -7,6 +7,7 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -43,12 +44,8 @@ public final class Catch extends Single {
   }
 
   @Override
-  public Catch compile(final CompileContext cc) {
-    try {
-      expr = expr.compile(cc);
-    } catch(final QueryException ex) {
-      expr = cc.error(ex, expr);
-    }
+  public Catch compile(final CompileContext cc) throws QueryException {
+    expr = cc.compileOrError(expr, false);
     return optimize(cc);
   }
 
@@ -89,7 +86,7 @@ public final class Catch extends Single {
       if(inlined == null) return null;
       expr = inlined;
     } catch(final QueryException ex) {
-      expr = ic.cc.error(ex, expr);
+      expr = FnError.get(ex, expr);
     }
     return this;
   }
@@ -182,10 +179,8 @@ public final class Catch extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Catch)) return false;
-    final Catch ctch = (Catch) obj;
-    return Array.equals(vars, ctch.vars) && tests.equals(ctch.tests) && super.equals(obj);
+    return this == obj || obj instanceof final Catch ctch && Array.equals(vars, ctch.vars) &&
+        tests.equals(ctch.tests) && super.equals(obj);
   }
 
   @Override

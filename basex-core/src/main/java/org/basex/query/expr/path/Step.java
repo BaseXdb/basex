@@ -89,7 +89,7 @@ public abstract class Step extends Preds {
       final Expr... preds) {
 
     // optimize single last() functions
-    if(preds.length == 1 && preds[0] instanceof Pos && Function.LAST.is(((Pos) preds[0]).expr))
+    if(preds.length == 1 && preds[0] instanceof final Pos pos && Function.LAST.is(pos.expr))
       return new IterLastStep(info, axis, test, preds);
 
     // check for simple positional predicates
@@ -193,8 +193,8 @@ public abstract class Step extends Preds {
       // one result: self::node()
       ? Occ.EXACTLY_ONE :
         axis == SELF || axis == PARENT ||
-        axis == ATTRIBUTE && test instanceof NameTest && ((NameTest) test).part == NamePart.FULL ||
-        preds.length == 1 && preds[0] instanceof CmpPos && ((CmpPos) preds[0]).exact()
+        axis == ATTRIBUTE && test instanceof final NameTest nt && nt.part == NamePart.FULL ||
+        preds.length == 1 && preds[0] instanceof final CmpPos cp && cp.exact()
       // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
       ? Occ.ZERO_OR_ONE
       : Occ.ZERO_OR_MORE;
@@ -240,8 +240,7 @@ public abstract class Step extends Preds {
     final ArrayList<PathNode> tmp = new ArrayList<>();
     final Predicate<Test> addNodes = t -> {
       int name = 0;
-      if(t instanceof NameTest) {
-        final NameTest nt = (NameTest) t;
+      if(t instanceof final NameTest nt) {
         if(nt.part() != NamePart.LOCAL) return false;
         name = names.index(nt.local);
       }
@@ -257,8 +256,8 @@ public abstract class Step extends Preds {
     };
 
     // add nodes
-    if(test instanceof UnionTest) {
-      for(final Test t : ((UnionTest) test).tests) {
+    if(test instanceof final UnionTest ut) {
+      for(final Test t : ut.tests) {
         if(!addNodes.test(t)) return null;
       }
     } else if(!addNodes.test(test)) {
@@ -296,30 +295,22 @@ public abstract class Step extends Preds {
     final NodeType type = test.type;
     if(type.oneOf(NodeType.NODE, NodeType.SCHEMA_ATTRIBUTE, NodeType.SCHEMA_ELEMENT)) return false;
 
-    switch(axis) {
+    return switch(axis) {
       // attribute::element()
-      case ATTRIBUTE:
-        return type != NodeType.ATTRIBUTE;
-      case ANCESTOR:
+      case ATTRIBUTE ->
+        type != NodeType.ATTRIBUTE;
       // parent::comment()
-      case PARENT:
-        return type.oneOf(NodeType.LEAF_TYPES);
+      case ANCESTOR, PARENT ->
+        type.oneOf(NodeType.LEAF_TYPES);
       // child::attribute()
-      case CHILD:
-      case DESCENDANT:
-      case FOLLOWING:
-      case FOLLOWING_OR_SELF:
-      case FOLLOWING_SIBLING:
-      case FOLLOWING_SIBLING_OR_SELF:
-      case PRECEDING:
-      case PRECEDING_OR_SELF:
-      case PRECEDING_SIBLING:
-      case PRECEDING_SIBLING_OR_SELF:
-        return type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE_ELEMENT,
-            NodeType.DOCUMENT_NODE, NodeType.NAMESPACE_NODE);
-      default:
-        return false;
-    }
+      case CHILD, DESCENDANT, FOLLOWING, FOLLOWING_OR_SELF, FOLLOWING_SIBLING,
+           FOLLOWING_SIBLING_OR_SELF, PRECEDING, PRECEDING_OR_SELF, PRECEDING_SIBLING,
+           PRECEDING_SIBLING_OR_SELF ->
+        type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE_ELEMENT, NodeType.DOCUMENT_NODE,
+            NodeType.NAMESPACE_NODE);
+      default ->
+        false;
+    };
   }
 
   /**
@@ -331,49 +322,39 @@ public abstract class Step extends Preds {
     // checks steps on document nodes
     final Type inputType = seqType.type;
     final NodeType type = test.type;
-    if(inputType.instanceOf(NodeType.DOCUMENT_NODE) && ((Check) () -> {
-      switch(axis) {
-        case SELF:
-        case ANCESTOR_OR_SELF:
-        case FOLLOWING_OR_SELF:
-        case FOLLOWING_SIBLING_OR_SELF:
-        case PRECEDING_OR_SELF:
-        case PRECEDING_SIBLING_OR_SELF:
-          return !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
-        case CHILD:
-        case DESCENDANT:
-          return type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ATTRIBUTE);
-        case DESCENDANT_OR_SELF:
-          return type == NodeType.ATTRIBUTE;
-        default:
-          return true;
-      }
-    }).ok()) return true;
+    if(inputType.instanceOf(NodeType.DOCUMENT_NODE) && switch(axis) {
+      case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
+           PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
+        !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
+      case CHILD, DESCENDANT ->
+        type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ATTRIBUTE);
+      case DESCENDANT_OR_SELF ->
+        type == NodeType.ATTRIBUTE;
+      default ->
+        true;
+    }) return true;
 
     // check step after any other expression
-    switch(axis) {
+    return switch(axis) {
       // $element/self::text(), ...
-      case SELF:
-        return test.matches(seqType) == Boolean.FALSE;
+      case SELF ->
+        test.matches(seqType) == Boolean.FALSE;
       // $attribute/descendant::, $text/child::, $comment/attribute::, ...
-      case DESCENDANT:
-      case CHILD:
-      case ATTRIBUTE:
-        return inputType.oneOf(NodeType.LEAF_TYPES);
+      case DESCENDANT, CHILD, ATTRIBUTE ->
+        inputType.oneOf(NodeType.LEAF_TYPES);
       // $text/descendant-or-self::text(), ...
-      case DESCENDANT_OR_SELF:
-        return inputType.oneOf(NodeType.LEAF_TYPES) && type != NodeType.NODE &&
-          !type.instanceOf(inputType);
+      case DESCENDANT_OR_SELF ->
+        inputType.oneOf(NodeType.LEAF_TYPES) && type != NodeType.NODE &&
+        !type.instanceOf(inputType);
       // $attribute/following-sibling::, $attribute/preceding-sibling::
-      case FOLLOWING_SIBLING:
-      case PRECEDING_SIBLING:
-        return inputType == NodeType.ATTRIBUTE;
+      case FOLLOWING_SIBLING, PRECEDING_SIBLING ->
+        inputType == NodeType.ATTRIBUTE;
       // $attribute/parent::document-node()
-      case PARENT:
-        return inputType == NodeType.ATTRIBUTE && type == NodeType.DOCUMENT_NODE;
-      default:
-        return false;
-    }
+      case PARENT ->
+        inputType == NodeType.ATTRIBUTE && type == NodeType.DOCUMENT_NODE;
+      default ->
+        false;
+    };
   }
 
   /**
@@ -422,7 +403,7 @@ public abstract class Step extends Preds {
    */
   final ANode checkNode(final QueryContext qc) throws QueryException {
     final Value value = qc.focus.value;
-    if(value instanceof ANode) return (ANode) value;
+    if(value instanceof final ANode node) return node;
     throw value == null ? QueryError.NOCTX_X.get(info, this) :
       QueryError.PATHNODE_X_X_X.get(info, this, value.type, value);
   }
@@ -439,10 +420,8 @@ public abstract class Step extends Preds {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Step)) return false;
-    final Step st = (Step) obj;
-    return axis == st.axis && test.equals(st.test) && super.equals(obj);
+    return this == obj || obj instanceof final Step st && axis == st.axis && test.equals(st.test) &&
+        super.equals(obj);
   }
 
   @Override
@@ -465,9 +444,9 @@ public abstract class Step extends Preds {
         if(axis != CHILD) tb.add(axis).add("::");
         return tb.add(type.toString(test.type == NodeType.ATTRIBUTE));
       };
-      if(test instanceof UnionTest) {
+      if(test instanceof final UnionTest ut) {
         tb.add('(');
-        for(final Test t : ((UnionTest) test).tests) add.apply(t).add(" | ");
+        for(final Test t : ut.tests) add.apply(t).add(" | ");
         tb.delete(tb.size() - 3, tb.size()).add(')');
       } else {
         add.apply(test);

@@ -61,9 +61,8 @@ public class FnEmpty extends StandardFunc {
     if(input != arg(0)) return cc.function(exists ? EXISTS : EMPTY, info, input);
 
     // replace optimized expression by boolean function
-    if(input instanceof Filter) {
+    if(input instanceof final Filter filter) {
       // rewrite filter:  exists($a[text() = string])  ->  $a/text() = string
-      final Filter filter = (Filter) input;
       input = filter.flattenEbv(filter.root, false, cc);
     } else if(INDEX_OF.is(input)) {
       // rewrite index-of:  exists(index-of($texts, string))  ->  $texts = string

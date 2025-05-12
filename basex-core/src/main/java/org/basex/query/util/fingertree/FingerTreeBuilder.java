@@ -204,7 +204,7 @@ public final class FingerTreeBuilder<E> implements Iterable<E> {
         for(final Node<N, E> l : ls) append(l);
         for(final Node<N, E> r : rs) append(r);
       } else if(middle == null) {
-        // cache previous contents and re-add them afterwards
+        // cache previous contents and re-add them afterward
         final int n = inLeft + inRight;
         final Node<N, E>[] buff = new Node[n + ll];
         copyInto(midPos - inLeft, buff, 0, n);

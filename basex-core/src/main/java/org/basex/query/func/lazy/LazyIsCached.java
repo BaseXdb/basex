@@ -21,6 +21,6 @@ public final class LazyIsCached extends StandardFunc {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     final Item value = toAtomItem(arg(0), qc);
-    return value instanceof Lazy && ((Lazy) value).isCached();
+    return value instanceof final Lazy lazy && lazy.isCached();
   }
 }

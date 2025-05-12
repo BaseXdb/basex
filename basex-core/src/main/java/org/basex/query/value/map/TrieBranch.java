@@ -35,7 +35,7 @@ final class TrieBranch extends TrieNode {
     final TrieNode sub = kids[k], nsub;
     if(sub != null) {
       final TrieNode sb = sub.put(hs, lv + 1, update);
-      // nothing has change: return existing instance
+      // nothing has changed: return existing instance
       if(sb == sub) return this;
       nsub = sb;
       bs = used;

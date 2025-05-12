@@ -39,9 +39,8 @@ public final class ArrayForEachPair extends ArrayFn {
     if(array2 == XQArray.empty()) return array2;
 
     final Type type1 = array1.seqType().type, type2 = array2.seqType().type;
-    if(type1 instanceof ArrayType && type2 instanceof ArrayType) {
-      arg(2, arg -> refineFunc(arg, cc, ((ArrayType) type1).valueType(),
-          ((ArrayType) type2).valueType(), SeqType.INTEGER_O));
+    if(type1 instanceof final ArrayType at1 && type2 instanceof final ArrayType at2) {
+      arg(2, arg -> refineFunc(arg, cc, at1.valueType(), at2.valueType(), SeqType.INTEGER_O));
     }
 
     // assign type after coercion (expression might have changed)

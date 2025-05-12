@@ -56,9 +56,9 @@ final class TreeSubtree {
    * @return pre
    */
   private int prePerIndex(final TreeBorder bo, final int ix) {
-    final int start = bo.start + ix;
+    final int start = bo.start() + ix;
     if(start < 0) return -1;
-    return nc.getPrePerLevelAndIndex(bo.level, start);
+    return nc.getPrePerLevelAndIndex(bo.level(), start);
   }
 
   /**
@@ -79,7 +79,7 @@ final class TreeSubtree {
    * @return index
    */
   private int preIndex(final TreeBorder bo, final int pre) {
-    return nc.searchPreIndex(bo.level, pre, pre, bo.start, bo.getEnd()) - bo.start;
+    return nc.searchPreIndex(bo.level(), pre, pre, bo.start(), bo.getEnd()) - bo.start();
   }
 
   /**
@@ -89,7 +89,7 @@ final class TreeSubtree {
    * @return size
    */
   int levelSize(final int rn, final int lv) {
-    return treeBorder(rn, lv).size;
+    return treeBorder(rn, lv).size();
   }
 
   /**
@@ -142,7 +142,7 @@ final class TreeSubtree {
    * @return the determined index position
    */
   private int searchPreArrayPos(final TreeBorder bo, final int pre) {
-    return nc.searchPreArrayPos(bo.level, bo.start, bo.getEnd(), pre) - bo.start;
+    return nc.searchPreArrayPos(bo.level(), bo.start(), bo.getEnd(), pre) - bo.start();
   }
 
   /**

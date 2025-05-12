@@ -44,7 +44,7 @@ public final class RequestContext {
    */
   public RequestContext(final HttpServletRequest request) {
     this.request = request;
-    this.query = request.getQueryString();
+    query = request.getQueryString();
   }
 
   /**

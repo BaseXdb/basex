@@ -47,8 +47,7 @@ public abstract class TreeSeq extends Seq {
    */
   protected final Value copyInsert(final long pos, final Value value, final QueryContext qc) {
     final long right = size - pos;
-    if(value instanceof TreeSeq && (pos == 0 || right == 0)) {
-      final TreeSeq other = (TreeSeq) value;
+    if(value instanceof final TreeSeq other && (pos == 0 || right == 0)) {
       return pos == 0 ? other.concat(this) : concat(other);
     }
 

@@ -30,7 +30,7 @@ abstract class IndexPred {
    */
   static IndexPred get(final Expr expr, final IndexInfo info) {
     if(expr instanceof ContextValue) return new IndexContext(info);
-    if(expr instanceof AxisPath) return new IndexPath((AxisPath) expr, info);
+    if(expr instanceof final AxisPath path) return new IndexPath(path, info);
     return null;
   }
 

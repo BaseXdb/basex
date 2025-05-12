@@ -49,11 +49,7 @@ public final class ArrayType extends FType {
   @Override
   public XQArray cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
-
-    if(item instanceof XQArray) {
-      final XQArray array = (XQArray) item;
-      if(array.instanceOf(this, false)) return array;
-    }
+    if(item instanceof final XQArray array && array.instanceOf(this, false)) return array;
     throw typeError(item, this, info);
   }
 
@@ -68,19 +64,18 @@ public final class ArrayType extends FType {
 
   @Override
   public boolean eq(final Type type) {
-    return this == type || type instanceof ArrayType && valueType.eq(((ArrayType) type).valueType);
+    return this == type || type instanceof final ArrayType at && valueType.eq(at.valueType);
   }
 
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(SeqType.ARRAY, SeqType.FUNCTION, AtomType.ITEM)) return true;
-    if(type instanceof ArrayType) return valueType.instanceOf(((ArrayType) type).valueType);
-    if(type instanceof FuncType) {
-      final FuncType ft = (FuncType) type;
+    if(type instanceof final ArrayType at) return valueType.instanceOf(at.valueType);
+    if(type instanceof final FuncType ft) {
       return valueType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
           ft.argTypes[0].instanceOf(SeqType.INTEGER_O);
     }
-    return type instanceof ChoiceItemType && ((ChoiceItemType) type).hasInstance(this);
+    return type instanceof final ChoiceItemType cit && cit.hasInstance(this);
   }
 
   @Override
@@ -88,7 +83,7 @@ public final class ArrayType extends FType {
     return type instanceof ChoiceItemType ? type.union(this) :
       instanceOf(type) ? type :
       type.instanceOf(this) ? this :
-      type instanceof ArrayType ? union(((ArrayType) type).valueType) :
+      type instanceof final ArrayType at ? union(at.valueType) :
       type instanceof MapType ? SeqType.FUNCTION :
       type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
@@ -108,8 +103,8 @@ public final class ArrayType extends FType {
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return (ArrayType) type;
 
-    if(type instanceof ArrayType) {
-      final SeqType mt = valueType.intersect(((ArrayType) type).valueType);
+    if(type instanceof final ArrayType at) {
+      final SeqType mt = valueType.intersect(at.valueType);
       if(mt != null) return get(mt);
     }
     return null;

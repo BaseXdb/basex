@@ -82,7 +82,7 @@ public final class DoubleList extends ElementList {
 
   /**
    * Returns an array with all elements and invalidates the internal array.
-   * Warning: the function must only be called if the list is discarded afterwards.
+   * Warning: the function must only be called if the list is discarded afterward.
    * @return array (internal representation!)
    */
   public double[] finish() {
@@ -95,9 +95,7 @@ public final class DoubleList extends ElementList {
   @Override
   public boolean equals(final Object obj) {
     if(obj == this) return true;
-    if(!(obj instanceof DoubleList)) return false;
-    final DoubleList dl = (DoubleList) obj;
-    if(size != dl.size) return false;
+    if(!(obj instanceof final DoubleList dl) || size != dl.size) return false;
     for(int l = 0; l < size; ++l) {
       if(list[l] != dl.list[l]) return false;
     }

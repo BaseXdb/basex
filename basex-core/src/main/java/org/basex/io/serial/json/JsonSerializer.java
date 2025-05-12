@@ -49,12 +49,11 @@ public abstract class JsonSerializer extends StandardSerializer {
    */
   public static Serializer get(final OutputStream os, final SerializerOptions so)
       throws IOException {
-    switch(so.get(SerializerOptions.JSON).get(JsonOptions.FORMAT)) {
-      case JSONML: return new JsonMLSerializer(os, so);
-      case BASIC: // deprecated
-      case W3_XML:  return new JsonBasicSerializer(os, so);
-      default:      return new JsonNodeSerializer(os, so);
-    }
+    return switch(so.get(SerializerOptions.JSON).get(JsonOptions.FORMAT)) {
+      case JSONML        -> new JsonMLSerializer(os, so);
+      case W3_XML, BASIC -> new JsonBasicSerializer(os, so);
+      default            -> new JsonNodeSerializer(os, so);
+    };
   }
 
   /**
@@ -81,7 +80,7 @@ public abstract class JsonSerializer extends StandardSerializer {
       if(!lines) throw SERJSON.getIO();
       out.print('\n');
     }
-    if(item == null || item instanceof QNm && ((QNm) item).eq(FN_NULL)) {
+    if(item == null || item instanceof final QNm qnm && qnm.eq(FN_NULL)) {
       out.print(JsonConstants.NULL);
     } else {
       super.serialize(item);
@@ -103,14 +102,13 @@ public abstract class JsonSerializer extends StandardSerializer {
   @Override
   public void function(final FItem item) throws IOException {
     try {
-      if(item instanceof XQMap) {
+      if(item instanceof final XQMap map) {
         level++;
         out.print('{');
 
         boolean s = false;
         final TokenSet set = nodups ? new TokenSet() : null;
-        final XQMap m = (XQMap) item;
-        for(final Item key : m.keys()) {
+        for(final Item key : map.keys()) {
           final byte[] name = key.string(null);
           if(nodups) {
             if(set.contains(name)) throw SERDUPL_X.getIO(name);
@@ -121,19 +119,19 @@ public abstract class JsonSerializer extends StandardSerializer {
           string(name);
           out.print(':');
           if(indent) out.print(' ');
-          serialize(m.get(key));
+          serialize(map.get(key));
           s = true;
         }
 
         level--;
         indent();
         out.print('}');
-      } else if(item instanceof XQArray) {
+      } else if(item instanceof final XQArray array) {
         level++;
         out.print('[');
 
         boolean s = false;
-        for(final Value value : ((XQArray) item).iterable()) {
+        for(final Value value : array.iterable()) {
           if(s) out.print(',');
           indent();
           serialize(value);

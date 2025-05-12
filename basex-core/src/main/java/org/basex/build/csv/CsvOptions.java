@@ -151,7 +151,7 @@ public class CsvOptions extends Options {
    * @param single single character string
    * @return code point or {@code -1}
    */
-  private int checkCodepoint(final String single) {
+  private static int checkCodepoint(final String single) {
     if(single.codePointCount(0, single.length()) == 1) {
       final int cp = single.codePointAt(0);
       if(XMLToken.valid(cp)) return cp;

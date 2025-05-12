@@ -30,9 +30,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public abstract class XQMap extends XQStruct {
-  /** The empty map. */
-  private static final XQMap EMPTY = new XQTrieMap(TrieEmpty.VALUE, null, SeqType.MAP);
-
   /**
    * Constructor.
    * @param type map type
@@ -46,7 +43,7 @@ public abstract class XQMap extends XQStruct {
    * @return (unique) instance of an empty map
    */
   public static XQMap empty() {
-    return EMPTY;
+    return XQTrieMap.EMPTY;
   }
 
   /**
@@ -81,7 +78,7 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final void refineType(final Expr expr) {
-    if(this != EMPTY) super.refineType(expr);
+    if(this != empty()) super.refineType(expr);
   }
 
   @Override
@@ -219,8 +216,7 @@ public abstract class XQMap extends XQStruct {
     if(coerce && tp instanceof FuncType) return false;
 
     try {
-      if(tp instanceof RecordType) {
-        final RecordType rt = (RecordType) tp;
+      if(tp instanceof final RecordType rt) {
         final TokenObjectMap<RecordField> fields = rt.fields();
         final int fs = fields.size();
         if(coerce) {
@@ -253,12 +249,10 @@ public abstract class XQMap extends XQStruct {
 
       final Type kt;
       final SeqType vt;
-      if(tp instanceof MapType) {
-        final MapType mt = (MapType) tp;
+      if(tp instanceof final MapType mt) {
         kt = mt.keyType() == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType();
         vt = mt.valueType().eq(SeqType.ITEM_ZM) ? null : mt.valueType();
-      } else if(tp instanceof FuncType) {
-        final FuncType ft = (FuncType) tp;
+      } else if(tp instanceof final FuncType ft) {
         if(ft.declType.occ.min != 0 || ft.argTypes.length != 1 ||
             !ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O)) return false;
         kt = null;
@@ -374,7 +368,7 @@ public abstract class XQMap extends XQStruct {
 
     // assign record type to speed up future type checks
     final XQMap map = mb.map();
-    if(map != EMPTY) map.type = rt;
+    if(map != empty()) map.type = rt;
     return map;
   }
 
@@ -388,8 +382,7 @@ public abstract class XQMap extends XQStruct {
   @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
-    if(!(item instanceof XQMap)) return false;
-    final XQMap map = (XQMap) item;
+    if(!(item instanceof final XQMap map)) return false;
     if(structSize() != map.structSize()) return false;
     // compilation: ordered comparison
     if(deep == null) return deepEqualOrdered(map);
@@ -470,8 +463,8 @@ public abstract class XQMap extends XQStruct {
           tb.add(',');
           if(indent) tb.add(' ');
         }
-        if(item instanceof XQMap) ((XQMap) item).string(indent, tb, level + 1, ii);
-        else if(item instanceof XQArray) ((XQArray) item).string(indent, tb, level, ii);
+        if(item instanceof final XQMap map) map.string(indent, tb, level + 1, ii);
+        else if(item instanceof final XQArray array) array.string(indent, tb, level, ii);
         else tb.add(item);
       }
       if(par) tb.add(')');
@@ -513,7 +506,7 @@ public abstract class XQMap extends XQStruct {
         if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
       });
     } catch(final QueryException ex) {
-      Util.notExpected(ex);
+      throw Util.notExpected(ex);
     }
     qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");
   }

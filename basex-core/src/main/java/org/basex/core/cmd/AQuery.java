@@ -82,8 +82,8 @@ public abstract class AQuery extends Command {
               qp.cache(this, maxResults);
               hits = result.size();
               result.serialize(ser);
-              if(exception instanceof QueryException) throw (QueryException) exception;
-              if(exception instanceof JobException) throw (JobException) exception;
+              if(exception instanceof final QueryException ex) throw ex;
+              if(exception instanceof final JobException ex) throw ex;
             } else {
               hits = 0;
               final Iter iter = qp.iter();
@@ -116,7 +116,7 @@ public abstract class AQuery extends Command {
     // error
     if(error != null) return error(queryinfo ? info() + ERROR + COL + NL + error : error);
     // critical error
-    if(exception instanceof RuntimeException) throw (RuntimeException) exception;
+    if(exception instanceof final RuntimeException ex) throw ex;
     // success
     return true;
   }

@@ -76,7 +76,7 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   @Override
-  XQHashMap build(final Item key, final Value value) throws QueryException {
+  XQHashMap build(final Item key, final Value value) {
     throw Util.notExpected();
   }
 }

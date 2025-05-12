@@ -19,8 +19,8 @@ public final class BaseXException extends IOException {
   public BaseXException(final String message, final Object... ext) {
     super(Util.info(message, ext));
     for(final Object o : ext) {
-      if(o instanceof Throwable) {
-        initCause((Throwable) o);
+      if(o instanceof final Throwable th) {
+        initCause(th);
         break;
       }
     }

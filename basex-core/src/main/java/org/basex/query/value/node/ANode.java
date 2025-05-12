@@ -60,8 +60,7 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
-      throws QueryException {
+  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
     return true;
   }
 
@@ -712,15 +711,15 @@ public abstract class ANode extends Item {
    * @return node kind, or {@code -1} if no corresponding database kind exists
    */
   public static int kind(final NodeType type) {
-    switch(type) {
-      case DOCUMENT_NODE:          return Data.DOC;
-      case ELEMENT:                return Data.ELEM;
-      case TEXT:                   return Data.TEXT;
-      case ATTRIBUTE:              return Data.ATTR;
-      case COMMENT:                return Data.COMM;
-      case PROCESSING_INSTRUCTION: return Data.PI;
-      default:                     return -1;
-    }
+    return switch(type) {
+      case DOCUMENT_NODE -> Data.DOC;
+      case ELEMENT -> Data.ELEM;
+      case TEXT -> Data.TEXT;
+      case ATTRIBUTE -> Data.ATTR;
+      case COMMENT -> Data.COMM;
+      case PROCESSING_INSTRUCTION -> Data.PI;
+      default -> -1;
+    };
   }
 
   /**

@@ -134,7 +134,7 @@ public final class Updates {
    * @throws QueryException query exception
    */
   public DBNode determineDataRef(final ANode target, final QueryContext qc) throws QueryException {
-    if(target instanceof DBNode) return (DBNode) target;
+    if(target instanceof final DBNode node) return node;
 
     // determine highest ancestor node
     ANode tmp = target;

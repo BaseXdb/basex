@@ -57,7 +57,7 @@ public final class Try extends Single {
     try {
       super.compile(cc);
     } catch(final QueryException ex) {
-      expr = cc.error(ex, expr);
+      expr = FnError.get(ex, expr);
     }
     fnlly = fnlly.compile(cc);
     return optimize(cc);
@@ -143,11 +143,11 @@ public final class Try extends Single {
     for(final Catch ctch : catches) {
       changed |= ctch.inline(ic) != null;
     }
-    Expr inlined = null;
+    Expr inlined;
     try {
       inlined = expr.inline(ic);
     } catch(final QueryException ex) {
-      inlined = ic.cc.error(ex, expr);
+      inlined = FnError.get(ex, expr);
     }
     if(inlined != null) expr = inlined;
 
@@ -207,10 +207,8 @@ public final class Try extends Single {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof Try)) return false;
-    final Try t = (Try) obj;
-    return Array.equals(catches, t.catches) && fnlly.equals(t.fnlly) && super.equals(obj);
+    return this == obj || obj instanceof final Try t && Array.equals(catches, t.catches) &&
+        fnlly.equals(t.fnlly) && super.equals(obj);
   }
 
   @Override

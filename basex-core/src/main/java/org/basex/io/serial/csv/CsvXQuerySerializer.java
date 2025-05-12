@@ -35,22 +35,21 @@ public final class CsvXQuerySerializer extends CsvSerializer {
   public void serialize(final Item item) throws IOException {
     if(sep && level == 0) out.print(' ');
 
-    if(!(item instanceof XQMap))
+    if(!(item instanceof final XQMap map))
       throw CSV_SERIALIZE_X_X.getIO("Top level must be a map, found " + item.type, item);
 
-    final XQMap m = (XQMap) item;
     final TokenList tl = new TokenList();
     try {
       // print header
       if(header) {
-        if(!m.contains(CsvXQueryConverter.NAMES))
+        if(!map.contains(CsvXQueryConverter.NAMES))
           throw CSV_SERIALIZE_X.getIO("Map has no 'names' key");
-        record(m.get(CsvXQueryConverter.NAMES), tl);
+        record(map.get(CsvXQueryConverter.NAMES), tl);
       }
       // print records
-      if(!m.contains(CsvXQueryConverter.RECORDS))
+      if(!map.contains(CsvXQueryConverter.RECORDS))
         throw CSV_SERIALIZE_X.getIO("Map has no 'records' key");
-      for(final Item record : m.get(CsvXQueryConverter.RECORDS)) {
+      for(final Item record : map.get(CsvXQueryConverter.RECORDS)) {
         record(record, tl);
       }
     } catch(final QueryException ex) {
@@ -67,9 +66,9 @@ public final class CsvXQuerySerializer extends CsvSerializer {
    * @throws IOException I/O exception
    */
   private void record(final Value line, final TokenList tl) throws QueryException, IOException {
-    if(!(line instanceof XQArray))
+    if(!(line instanceof final XQArray array))
       throw CSV_SERIALIZE_X_X.getIO("Array expected, found " + line.seqType(), line);
-    for(final Value value : ((XQArray) line).iterable()) {
+    for(final Value value : array.iterable()) {
       if(!value.isItem()) throw CSV_SERIALIZE_X_X.getIO(
           "Item expected, found " + value.seqType(), value);
       tl.add(((Item) value).string(null));

@@ -1,31 +1,15 @@
 package org.basex.gui.view.tree;
 
 /**
- * This class is used to store subtree borders.
+ * Subtree borders.
+ * @param level real Level
+ * @param start start index
+ * @param size  size
  *
  * @author BaseX Team, BSD License
  * @author Wolfgang Miller
  */
-final class TreeBorder {
-  /** Real Level. */
-  final int level;
-  /** Start index. */
-  final int start;
-  /** Size. */
-  final int size;
-
-  /**
-   * Stores subtree borders.
-   * @param level level
-   * @param start start
-   * @param size size
-   */
-  TreeBorder(final int level, final int start, final int size) {
-    this.level = level;
-    this.start = start;
-    this.size = size;
-  }
-
+record TreeBorder(int level, int start, int size) {
   /**
    * Returns end index.
    * @return end

@@ -59,8 +59,8 @@ public final class BaseXPopup extends JPopupMenu {
         show(e.getComponent(), 10, 10);
       } else {
         for(final GUICommand cmd : commands) {
-          if(cmd instanceof GUIPopupCmd) {
-            for(final BaseXKeys sc : ((GUIPopupCmd) cmd).shortcuts()) {
+          if(cmd instanceof final GUIPopupCmd popup) {
+            for(final BaseXKeys sc : popup.shortcuts()) {
               if(sc.is(e)) {
                 cmd.execute(gui);
                 e.consume();

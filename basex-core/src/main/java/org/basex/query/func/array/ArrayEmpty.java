@@ -27,7 +27,7 @@ public final class ArrayEmpty extends ArrayFn {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     if(array.seqType().type instanceof ArrayType) {
       final long size = array.structSize();

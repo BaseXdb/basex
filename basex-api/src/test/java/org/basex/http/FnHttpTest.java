@@ -373,7 +373,7 @@ public abstract class FnHttpTest extends HTTPTest {
         }
       }
     }
-    if(error.length() != 0) fail(error.toString());
+    if(!error.isEmpty()) fail(error.toString());
   }
 
   /**
@@ -774,74 +774,74 @@ public abstract class FnHttpTest extends HTTPTest {
   private static String write(final Request request) throws IOException {
     return Token.string(Client.payload(request));
   }
-}
-
-/**
- * Fake HTTP connection.
- *
- * @author BaseX Team, BSD License
- * @author Rositsa Shadura
- */
-final class FakeHttpResponse implements HttpResponse<InputStream> {
-  /** Request headers. */
-  private final Map<String, List<String>> headers = new HashMap<>();
-  /** Input stream. */
-  private InputStream input;
 
   /**
-   * Adds a header value.
-   * @param name name
-   * @param value value
+   * Fake HTTP connection.
+   *
+   * @author BaseX Team, BSD License
+   * @author Rositsa Shadura
    */
-  void header(final String name, final String value) {
-    headers.put(name, List.of(value));
-  }
+  static final class FakeHttpResponse implements HttpResponse<InputStream> {
+    /** Request headers. */
+    private final Map<String, List<String>> headers = new HashMap<>();
+    /** Input stream. */
+    private InputStream input;
 
-  /**
-   * Content type.
-   * @param token input to be assigned
-   */
-  void input(final byte[] token) {
-    input = new ArrayInput(token);
-  }
+    /**
+     * Adds a header value.
+     * @param name name
+     * @param value value
+     */
+    void header(final String name, final String value) {
+      headers.put(name, List.of(value));
+    }
 
-  @Override
-  public int statusCode() {
-    return 200;
-  }
+    /**
+     * Content type.
+     * @param token input to be assigned
+     */
+    void input(final byte[] token) {
+      input = new ArrayInput(token);
+    }
 
-  @Override
-  public HttpRequest request() {
-    return null;
-  }
+    @Override
+    public int statusCode() {
+      return 200;
+    }
 
-  @Override
-  public Optional<HttpResponse<InputStream>> previousResponse() {
-    return Optional.empty();
-  }
+    @Override
+    public HttpRequest request() {
+      return null;
+    }
 
-  @Override
-  public HttpHeaders headers() {
-    return HttpHeaders.of(headers, (a, b) -> true);
-  }
+    @Override
+    public Optional<HttpResponse<InputStream>> previousResponse() {
+      return Optional.empty();
+    }
 
-  @Override
-  public InputStream body() {
-    return input;
-  }
+    @Override
+    public HttpHeaders headers() {
+      return HttpHeaders.of(headers, (a, b) -> true);
+    }
 
-  @Override
-  public Optional<SSLSession> sslSession() {
-    return Optional.empty();
-  }
+    @Override
+    public InputStream body() {
+      return input;
+    }
 
-  @Override
-  public URI uri() {
-    return null;
-  }
+    @Override
+    public Optional<SSLSession> sslSession() {
+      return Optional.empty();
+    }
 
-  @Override
-  public Version version() {
-    return null;
+    @Override
+    public URI uri() {
+      return null;
+    }
+
+    @Override
+    public Version version() {
+      return null;
+    }
   }
 }

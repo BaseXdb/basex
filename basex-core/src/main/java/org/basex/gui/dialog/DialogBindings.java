@@ -131,7 +131,7 @@ public final class DialogBindings extends BaseXDialog {
     final StringBuilder sb = new StringBuilder();
     for(final Entry<String, String> entry : map.entrySet()) {
       final String name = entry.getKey(), value = entry.getValue();
-      if(sb.length() != 0) sb.append(',');
+      if(!sb.isEmpty()) sb.append(',');
       sb.append((name + '=' + value).replace(",", ",,"));
     }
     gui.set(MainOptions.BINDINGS, sb.toString());

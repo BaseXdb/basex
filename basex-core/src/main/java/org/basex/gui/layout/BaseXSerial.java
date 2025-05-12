@@ -99,16 +99,16 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
         update();
       });
       comp = combo;
-    } else if(option instanceof StringOption) {
-      comp = addInput(new BaseXTextField(dialog, (StringOption) option, options));
-    } else if(option instanceof NumberOption) {
-      comp = addInput(new BaseXTextField(dialog, (NumberOption) option, options));
-    } else if(option instanceof BooleanOption) {
-      comp = addCombo(new BaseXCombo(dialog, (BooleanOption) option, options));
-    } else if(option instanceof EnumOption) {
-      comp = addCombo(new BaseXCombo(dialog, (EnumOption<?>) option, options));
-    } else if(option instanceof OptionsOption) {
-      comp = addOption((OptionsOption<?>) option, options);
+    } else if(option instanceof final StringOption opt) {
+      comp = addInput(new BaseXTextField(dialog, opt, options));
+    } else if(option instanceof final NumberOption opt) {
+      comp = addInput(new BaseXTextField(dialog, opt, options));
+    } else if(option instanceof final BooleanOption opt) {
+      comp = addCombo(new BaseXCombo(dialog, opt, options));
+    } else if(option instanceof final EnumOption opt) {
+      comp = addCombo(new BaseXCombo(dialog, opt, options));
+    } else if(option instanceof final OptionsOption opt) {
+      comp = addOption(opt, options);
     } else {
       throw Util.notExpected("Unknown option type: " + option);
     }

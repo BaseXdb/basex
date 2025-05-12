@@ -535,7 +535,7 @@ final class WebDAVService {
    * @param sb string builder
    */
   private static void add(final int ch, final StringBuilder sb) {
-    if(sb.length() > 0) sb.append(',');
+    if(!sb.isEmpty()) sb.append(',');
     sb.append((char) ch).append("=&amp;#").append(ch).append(';');
   }
 }

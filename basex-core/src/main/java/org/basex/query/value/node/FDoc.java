@@ -122,10 +122,8 @@ public final class FDoc extends FNode {
 
   @Override
   public boolean equals(final Object obj) {
-    if(this == obj) return true;
-    if(!(obj instanceof FDoc)) return false;
-    final FDoc f = (FDoc) obj;
-    return Arrays.equals(children, f.children) && Token.eq(uri, f.uri) && super.equals(obj);
+    return this == obj || obj instanceof final FDoc f && Arrays.equals(children, f.children) &&
+        Token.eq(uri, f.uri) && super.equals(obj);
   }
 
   @Override

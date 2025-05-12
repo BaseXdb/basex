@@ -100,7 +100,7 @@ public final class XQJava extends FItem {
 
   @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) {
-    return this == item || item instanceof XQJava && Objects.equals(value, ((XQJava) item).value);
+    return this == item || item instanceof final XQJava java && Objects.equals(value, java.value);
   }
 
   @Override

@@ -109,8 +109,7 @@ public final class IndexInfo {
       // check if targeted name is contained in the index
       final Step st = pred.qname();
       byte[][] qname = null;
-      if(st.test instanceof NameTest) {
-        final NameTest nt = (NameTest) st.test;
+      if(st.test instanceof final NameTest nt) {
         qname = new byte[][] { nt.local, nt.qname == null ? null : nt.qname.uri() };
       }
       if(!new IndexNames(it, data).contains(qname)) return null;
@@ -222,7 +221,7 @@ public final class IndexInfo {
    * Computes costs if the specified data reference exists.
    * @param data data reference
    * @param search index search definition
-   * @return costs costs, or {@code null} if index access is not possible
+   * @return costs, or {@code null} if index access is not possible
    */
   public static IndexCosts costs(final Data data, final IndexSearch search) {
     return data != null ? data.costs(search) : IndexCosts.ENFORCE_STATIC;

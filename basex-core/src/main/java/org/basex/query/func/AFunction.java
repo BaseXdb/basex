@@ -9,6 +9,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@FunctionalInterface
 public interface AFunction {
   /**
    * Returns the function definition.
@@ -32,7 +33,7 @@ public interface AFunction {
    * @return result of check
    */
   default boolean is(final Expr ex) {
-    return ex instanceof StandardFunc && ((StandardFunc) ex).definition == definition();
+    return ex instanceof final StandardFunc sf && sf.definition == definition();
   }
 
   /**

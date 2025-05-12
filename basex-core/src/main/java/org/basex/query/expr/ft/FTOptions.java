@@ -63,7 +63,7 @@ public final class FTOptions extends FTExpr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof FTOptions && opt.equals(((FTOptions) obj).opt) &&
+    return this == obj || obj instanceof final FTOptions fto && opt.equals(fto.opt) &&
         super.equals(obj);
   }
 

@@ -38,15 +38,14 @@ final class ProjectCellEditor extends DefaultTreeCellEditor {
     // choose correct icon
     editingIcon = ProjectCellRenderer.icon(val, expanded);
     // replace label to be edited with file name
-    final Object value = val instanceof ProjectNode ? ((ProjectNode) val).file.name() : val;
+    final Object value = val instanceof final ProjectNode node ? node.file.name() : val;
     return super.getTreeCellEditorComponent(tr, value, selected, expanded, leaf, row);
   }
 
   @Override
   public boolean isCellEditable(final EventObject event) {
     // check if chosen node is not the root node
-    final Object node = tree.getLastSelectedPathComponent();
-    return super.isCellEditable(event) && node instanceof TreeNode &&
-        ((TreeNode) node).getParent().getParent() != null;
+    return super.isCellEditable(event) && tree.getLastSelectedPathComponent()
+        instanceof final TreeNode tn && tn.getParent().getParent() != null;
   }
 }

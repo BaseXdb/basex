@@ -89,9 +89,9 @@ public final class CElem extends CName {
           }
         }
         list.add(Str.get(tb.next()));
-      } else if(expr instanceof Seq && atomic.test(expr)) {
+      } else if(expr instanceof final Seq seq && atomic.test(expr)) {
         boolean more = false;
-        for(final Item item : (Seq) expr) {
+        for(final Item item : seq) {
           if(more) tb.add(' ');
           tb.add(item.string(info));
           more = true;
@@ -105,8 +105,8 @@ public final class CElem extends CName {
 
     if(exprs.length > 1 || exprs.length == 1 && !(exprs[0] instanceof Str)) {
       for(final Expr expr : exprs) {
-        if(expr instanceof Item && atomic.test(expr)) {
-          tb.add(((Item) expr).string(info));
+        if(expr instanceof final Item item && atomic.test(item)) {
+          tb.add(item.string(info));
         } else if(text.test(expr)) {
           tb.add(((Item) expr.arg(0)).string(info));
         } else {
@@ -172,8 +172,8 @@ public final class CElem extends CName {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof CElem &&
-        nspaces.equals(((CElem) obj).nspaces) && super.equals(obj);
+    return this == obj || obj instanceof final CElem celem && nspaces.equals(celem.nspaces) &&
+        super.equals(obj);
   }
 
   @Override
@@ -186,21 +186,21 @@ public final class CElem extends CName {
       final int el = exprs.length;
       for(int e = 0; e < el; e++) {
         final Expr expr = exprs[e];
-        if(expr instanceof CAttr && !((CAttr) expr).computed) {
+        if(expr instanceof final CAttr cattr && !cattr.computed) {
           qs.token(expr);
         } else {
           qs.token('>');
           boolean constr = false;
           for(int f = e; f < el && !constr; f++) {
-            constr = exprs[f] instanceof CNode ? ((CNode) exprs[f]).computed :
+            constr = exprs[f] instanceof final CNode cnode ? cnode.computed :
               !(exprs[f] instanceof Str);
           }
           if(constr) {
             qs.token('{').tokens(Arrays.copyOfRange(exprs, e, el), SEP).token("}");
           } else {
             for(int f = e; f < el; f++) {
-              if(exprs[f] instanceof Str) {
-                qs.value(((Str) exprs[f]).string());
+              if(exprs[f] instanceof final Str str) {
+                qs.value(str.string());
               } else {
                 qs.token(exprs[f]);
               }

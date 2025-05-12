@@ -80,14 +80,14 @@ public final class NameTest extends Test {
   @Override
   public boolean matches(final ANode node) {
     if(node.type != type) return false;
-    switch(part()) {
+    return switch(part()) {
       // namespaces wildcard: only check local name
-      case LOCAL: return Token.eq(local, Token.local(node.name()));
+      case LOCAL -> Token.eq(local, Token.local(node.name()));
       // name wildcard: only check namespace
-      case URI: return Token.eq(qname.uri(), node.qname().uri());
+      case URI -> Token.eq(qname.uri(), node.qname().uri());
       // check attributes, or check everything
-      default: return qname.eq(node.qname());
-    }
+      default -> qname.eq(node.qname());
+    };
   }
 
   /**
@@ -96,24 +96,22 @@ public final class NameTest extends Test {
    * @return result of check
    */
   public boolean matches(final QNm qName) {
-    switch(part()) {
+    return switch(part()) {
       // namespaces wildcard: only check local name
-      case LOCAL: return Token.eq(local, qName.local());
+      case LOCAL -> Token.eq(local, qName.local());
       // name wildcard: only check namespace
-      case URI: return Token.eq(qname.uri(), qName.uri());
+      case URI -> Token.eq(qname.uri(), qName.uri());
       // check everything
-      default: return qname.eq(qName);
-    }
+      default -> qname.eq(qName);
+    };
   }
 
   @Override
   public Boolean matches(final SeqType seqType) {
     final Type tp = seqType.type;
     if(tp.intersect(type) == null) return Boolean.FALSE;
-    final Test test = seqType.test();
-    if(tp == type && test instanceof NameTest) {
-      final NameTest np = (NameTest) test;
-      if(np.part == NamePart.FULL || np.part == part) return matches(np.qname);
+    if(tp == type && seqType.test() instanceof final NameTest nt) {
+      if(nt.part == NamePart.FULL || nt.part == part) return matches(nt.qname);
     }
     return null;
   }
@@ -128,39 +126,22 @@ public final class NameTest extends Test {
 
   @Override
   public boolean instanceOf(final Test test) {
-    if(!(test instanceof NameTest)) return super.instanceOf(test);
-    final NameTest nt = (NameTest) test;
-    if(type != nt.type) return false;
-    switch(nt.part) {
-      case FULL:
-        switch(part) {
-          case FULL: return qname.eq(nt.qname);
-          case LOCAL:
-          case URI: return false;
-          default: throw Util.notExpected();
-        }
-      case LOCAL:
-        switch(part) {
-          case LOCAL:
-          case FULL: return Token.eq(qname.local(), nt.qname.local());
-          case URI: return false;
-          default: throw Util.notExpected();
-        }
-      case URI:
-        switch(part) {
-          case URI:
-          case FULL: return Token.eq(qname.uri(), nt.qname.uri());
-          case LOCAL: return false;
-          default: throw Util.notExpected();
-        }
-      default: throw Util.notExpected();
-    }
+    if(!(test instanceof final NameTest nt)) return super.instanceOf(test);
+    return type == nt.type && switch(nt.part) {
+      case FULL ->
+        part == NamePart.FULL && qname.eq(nt.qname);
+      case LOCAL ->
+        (part == NamePart.LOCAL || part == NamePart.FULL) &&
+        Token.eq(qname.local(), nt.qname.local());
+      case URI ->
+        (part == NamePart.URI || part == NamePart.FULL) &&
+        Token.eq(qname.uri(), nt.qname.uri());
+    };
   }
 
   @Override
   public Test intersect(final Test test) {
-    if(test instanceof NameTest) {
-      final NameTest nt = (NameTest) test;
+    if(test instanceof final NameTest nt) {
       if(type == nt.type) {
         if(part == nt.part || part == NamePart.FULL) {
           if(nt.matches(qname)) return this;
@@ -183,9 +164,8 @@ public final class NameTest extends Test {
 
   @Override
   public boolean equals(final Object obj) {
-    if(!(obj instanceof NameTest)) return false;
-    final NameTest nt = (NameTest) obj;
-    return type == nt.type && part == nt.part && qname.eq(nt.qname);
+    return this == obj || obj instanceof final NameTest nt && type == nt.type && part == nt.part &&
+        qname.eq(nt.qname);
   }
 
   @Override
