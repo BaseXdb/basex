@@ -19,6 +19,7 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.ALookup.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpN.*;
 import org.basex.query.expr.CmpV.*;
@@ -2397,14 +2398,23 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr lookup(final Expr expr) throws QueryException {
-    final int p = pos;
+    int p = pos;
     if(consume('?')) {
       final boolean deep = consume('?');
       if(deep || !(wsConsume(",") || consume(")"))) {
+        p = pos;
+        Modifier mod = Modifier.NONE;
+        for(final Modifier m : Modifier.values()) {
+          if(wsConsume(m.name) && wsConsumeWs("::")) {
+            mod = m;
+            break;
+          }
+          pos = p;
+        }
         final InputInfo info = info();
         final Expr ctx = expr != null ? expr : new ContextValue(info);
         final Expr spec = keySpecifier();
-        return deep ? new DeepLookup(info, ctx, spec) : new Lookup(info, ctx, spec);
+        return deep ? new DeepLookup(info, mod, ctx, spec) : new Lookup(info, mod, ctx, spec);
       }
     }
     pos = p;

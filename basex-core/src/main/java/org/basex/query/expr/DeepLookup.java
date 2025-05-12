@@ -21,10 +21,11 @@ public final class DeepLookup extends ALookup {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
+   * @param modifier modifier
    * @param expr context expression and key specifier
    */
-  public DeepLookup(final InputInfo info, final Expr... expr) {
-    super(info, expr);
+  public DeepLookup(final InputInfo info, final Modifier modifier, final Expr... expr) {
+    super(info, modifier, expr);
   }
 
   @Override
@@ -72,7 +73,7 @@ public final class DeepLookup extends ALookup {
 
   @Override
   public DeepLookup copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new DeepLookup(info, copyAll(cc, vm, exprs)));
+    return copyType(new DeepLookup(info, modifier, copyAll(cc, vm, exprs)));
   }
 
   @Override
