@@ -129,7 +129,6 @@ final class WebDAVResponse extends AbstractResponse {
     c.setHttpOnly(true);
     c.setSecure(true);
     c.setPath("/");
-    
     response.addCookie(c);
     return new WebDAVCookie(c);
   }
