@@ -112,11 +112,11 @@ public final class ChoiceItemType implements Type {
       final Type tp = type.intersect(st.type);
       if(tp != null) list.add(tp);
     }
-    switch(list.size()) {
-      case 0: return null;
-      case 1: return list.get(0);
-      default: return new ChoiceItemType(types);
-    }
+    return switch(list.size()) {
+      case 0 -> null;
+      case 1 -> list.get(0);
+      default -> new ChoiceItemType(types);
+    };
   }
 
   @Override

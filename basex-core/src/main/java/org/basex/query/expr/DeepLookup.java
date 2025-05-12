@@ -51,43 +51,24 @@ public final class DeepLookup extends ALookup {
    */
   private void add(final Item item, final ValueBuilder vb, final QueryContext qc)
       throws QueryException {
-    if(item instanceof XQStruct) {
-      if(item instanceof XQArray) {
-        final XQArray array = (XQArray) item;
-        if(((ArrayType) array.type).valueType().mayBeStruct()) {
-          // process members individually to preserve order
-          final long size = array.structSize();
-          for(long key = 0; key < size; ++key) {
-            final Value val = array.memberAt(key);
-            vb.add(valueFor(XQMap.get(Int.get(key + 1), val), true, qc));
-            for(final Item it : val) {
-              add(it, vb, qc);
-            }
+    if(item instanceof XQStruct struct) {
+      if(struct instanceof XQArray array && ((ArrayType) array.type).valueType().mayBeStruct()) {
+        // process members individually to preserve order
+        int k = 0;
+        for(final Value val : array.iterable()) {
+          vb.add(valueFor(XQMap.get(Int.get(++k), val), true, qc));
+          for(final Item it : val) {
+            add(it, vb, qc);
           }
-          return;
         }
-      }
-      vb.add(valueFor(item, true, qc));
-      for(final Item it : ((XQStruct) item).items(qc)) {
-        add(it, vb, qc);
+      } else {
+        vb.add(valueFor(item, true, qc));
+        for(final Item it : struct.items(qc)) {
+          add(it, vb, qc);
+        }
       }
     }
   }
-
-/*
-declare function local:add($item, $key) {
-  for $entry in if ($item instance of map(*)) {
-    map:pairs($item)
-  } else if ($item instance of array(*)) {
-    for member $m at $p in $item
-    return { 'key': $p, 'value': $m }
-  }
-  return (
-    $entry[?key = $key]?value,
-    $entry?value ! local:add(., $key)
-  )
-};
-  */
 
   @Override
   public DeepLookup copy(final CompileContext cc, final IntObjectMap<Var> vm) {
