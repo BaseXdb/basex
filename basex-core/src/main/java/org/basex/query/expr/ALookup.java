@@ -44,13 +44,12 @@ public abstract class ALookup extends Arr {
    */
   final Value valueFor(final Item item, final boolean deep, final QueryContext qc)
       throws QueryException {
-    if(!(item instanceof XQStruct)) throw LOOKUP_X.get(info, item);
-    final XQStruct struct = (XQStruct) item;
+    if(!(item instanceof XQStruct struct)) throw LOOKUP_X.get(info, item);
     final Expr keys = exprs[1];
 
     // wildcard: add all values
     if(keys == WILDCARD) {
-      if(hasDefaultModifier()) return struct.items(qc);
+      if(modifier == Modifier.ITEMS) return struct.items(qc);
       final ValueBuilder vb = new ValueBuilder(qc);
       if(struct instanceof XQArray array) {
         long k = 0;
@@ -67,19 +66,15 @@ public abstract class ALookup extends Arr {
     final Iter ir = keys.atomIter(qc, info);
     for(Item key; (key = ir.next()) != null;) {
       Value value = null;
-      if(struct instanceof XQMap) {
-        value = ((XQMap) struct).getOrNull(key);
-        if(value instanceof FuncItem) {
-          value = ((FuncItem) value).toMethod(struct);
-        }
+      if(struct instanceof XQMap map) {
+        value = map.getOrNull(key);
+        if(value instanceof FuncItem fi) value = fi.toMethod(struct);
       } else {
-        final Item index;
-        if (!deep) {
+        Item index = null;
+        if(!deep) {
           index = key;
-        } else if(!key.type.isNumber()) {
-          index = null;
-        } else {
-          final Item cast = (Item) SeqType.INTEGER_O.cast(key, false, qc, info);
+        } else if(key.type.isNumber()) {
+          final Item cast = AtomType.INTEGER.cast(key, qc, info);
           index = key.equal(cast, null, info) ? cast : null;
         }
         if(index != null) value = ((XQArray) struct).getOrNull(index, qc, info);
@@ -93,17 +88,16 @@ public abstract class ALookup extends Arr {
   public final void toString(final QueryString qs) {
     qs.token(exprs[0]).token('?');
     if(this instanceof DeepLookup) qs.token('?');
-    if(modifier != Modifier.NONE) qs.concat(modifier, "::");
+    if(modifier != Modifier.ITEMS) qs.concat(modifier, "::");
 
     final Expr keys = exprs[1];
     Object key = null;
     if(keys == WILDCARD) {
       key = WILDCARD.string();
-    } else if(keys instanceof Str) {
-      final Str str = (Str) keys;
+    } else if(keys instanceof Str str) {
       if(XMLToken.isNCName(str.string())) key = str.toJava();
-    } else if(keys instanceof Int) {
-      final long l = ((Int) keys).itr();
+    } else if(keys instanceof Int itr) {
+      final long l = itr.itr();
       if(l >= 0) key = l;
     }
     if(key != null) qs.token(key);
@@ -118,53 +112,28 @@ public abstract class ALookup extends Arr {
    * @throws QueryException if an error occurs during processing
    */
   private Value modify(final Item key, final Value value) throws QueryException {
-    return hasDefaultModifier() ? value : switch(modifier) {
-      case PAIRS -> new MapBuilder().put("key", key).put("value", value).map();
+    return switch(modifier) {
+      case ITEMS -> value;
       case KEYS -> key;
-      case VALUES -> {
+      case PAIRS -> XQMap.pair(key, value);
+      default -> {
         final ArrayBuilder ab = new ArrayBuilder();
         value.forEach(it -> ab.add(it));
         yield ab.array();
       }
-      default -> throw Util.notExpected("Unexpected modifier: %", modifier);
     };
-  }
-
-  /**
-   * Checks whether this instance is using a default modifier.
-   * @return true, if the modifier is default
-   */
-  public boolean hasDefaultModifier() {
-    return modifier == Modifier.NONE || modifier == Modifier.ITEMS;
   }
 
   /** Lookup operator modifiers. */
   public enum Modifier {
-    /** Pairs modifier. */
-    PAIRS("pairs"),
-    /** Keys modifier. */
-    KEYS("keys"),
-    /** Values modifier. */
-    VALUES("values"),
-    /** Items modifier. */
-    ITEMS("items"),
-    /** No modifier. */
-    NONE("");
-
-    /** Name of axis. */
-    public final String name;
-
-    /**
-     * Constructor.
-     * @param name modifier string
-     */
-    Modifier(final String name) {
-      this.name = name;
-    }
+    /** Items modifier.  */ ITEMS,
+    /** Keys modifier.   */ KEYS,
+    /** Pairs modifier.  */ PAIRS,
+    /** Values modifier. */ VALUES;
 
     @Override
     public String toString() {
-      return name;
+      return Enums.string(this);
     }
   }
 }

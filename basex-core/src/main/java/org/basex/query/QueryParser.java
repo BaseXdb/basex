@@ -2403,9 +2403,9 @@ public class QueryParser extends InputParser {
       final boolean deep = consume('?');
       if(deep || !(wsConsume(",") || consume(")"))) {
         p = pos;
-        Modifier mod = Modifier.NONE;
+        Modifier mod = Modifier.ITEMS;
         for(final Modifier m : Modifier.values()) {
-          if(wsConsume(m.name) && wsConsumeWs("::")) {
+          if(wsConsume(m.toString()) && wsConsumeWs("::")) {
             mod = m;
             break;
           }

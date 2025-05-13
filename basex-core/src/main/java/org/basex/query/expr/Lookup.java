@@ -78,17 +78,30 @@ public final class Lookup extends ALookup {
 
     final Type it = input.seqType().type;
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
-    if((map || array) && hasDefaultModifier()) {
+    if((map || array) && (modifier == Modifier.ITEMS || keys == WILDCARD && map &&
+        (modifier == Modifier.KEYS || modifier == Modifier.PAIRS))) {
       /* REWRITE LOOKUP:
-       *  MAP?*      ->  map:items(MAP)
-       *  ARRAY?*    ->  array:items(MAP)
-       *  MAP?KEY    ->  map:get(INPUT, KEY, (), true())
-       *  ARRAY?KEY  ->  array:get(INPUT, KEY) */
-      final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == WILDCARD ?
-        map ? cc.function(Function._MAP_ITEMS, info, in) :
-          cc.function(Function._ARRAY_ITEMS, info, in) :
-        map ? cc.function(Function._MAP_GET, info, in, arg, Empty.UNDEFINED, Bln.TRUE) :
-          cc.function(Function._ARRAY_GET, info, in, arg, Empty.VALUE);
+       *  MAP?*         ->  map:items(MAP)
+       *  ARRAY?*       ->  array:items(MAP)
+       *  MAP?KEY       ->  map:get(INPUT, KEY, methods := true())
+       *  ARRAY?KEY     ->  array:get(INPUT, KEY, ())
+       *  MAP?keys::*   ->  map:keys(MAP)
+       *  MAP?pairs::*  ->  map:pairs(MAP)  */
+      final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> {
+        if(modifier == Modifier.ITEMS) {
+          return keys == WILDCARD ? map ? cc.function(Function._MAP_ITEMS, info, in) :
+            cc.function(Function._ARRAY_ITEMS, info, in) :
+          map ? cc.function(Function._MAP_GET, info, in, arg, Empty.UNDEFINED, Bln.TRUE) :
+            cc.function(Function._ARRAY_GET, info, in, arg, Empty.VALUE);
+        }
+        if(map && keys == WILDCARD) {
+          if(modifier == Modifier.KEYS)
+            return cc.function(Function._MAP_KEYS, info, in);
+          if(modifier == Modifier.PAIRS)
+            return cc.function(Function._MAP_PAIRS, info, in);
+        }
+        throw Util.notExpected();
+      };
 
       // single key
       if(ks == 1) {
