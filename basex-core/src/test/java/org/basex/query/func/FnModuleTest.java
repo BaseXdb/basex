@@ -3470,6 +3470,14 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void unparsedBinary() {
+    final Function func = UNPARSED_BINARY;
+    query(func.args(DOC) + " => bin:length()", 395);
+    error(func.args(DOC + ".xyz"), RESNF_X);
+    error(func.args(DOC + "#xyz"), FRAGID_X);
+  }
+
+  /** Test method. */
   @Test public void unparsedText() {
     final Function func = UNPARSED_TEXT;
     contains(func.args(DOC), "<html");

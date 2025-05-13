@@ -47,7 +47,8 @@ public final class B64Lazy extends B64 implements Lazy {
     try {
       return BufferInput.get(input);
     } catch(final IOException ex) {
-      throw error.get(ii, ex);
+      Util.debug(ex);
+      throw error.get(ii,  input);
     }
   }
 

@@ -712,6 +712,9 @@ public enum Function implements AFunction {
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
+  UNPARSED_BINARY(FnUnparsedBinary::new, "unparsed-binary(source)",
+      params(STRING_ZO), BASE64_BINARY_ZO, flag(NDT), FN_URI, Perm.CREATE),
+  /** XQuery function. */
   UNPARSED_TEXT(FnUnparsedText::new, "unparsed-text(source[,options])",
       params(STRING_ZO, ITEM_ZO), STRING_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */

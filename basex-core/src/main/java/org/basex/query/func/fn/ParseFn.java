@@ -58,10 +58,8 @@ public abstract class ParseFn extends StandardFunc {
       final QueryError error, final QueryContext qc) throws QueryException {
 
     IO io = input;
-    if(input == null) {
-      io = input(toToken(source));
-      if(io == null) throw INVURL_X.get(info, source);
-    }
+    if(input == null) io = input(toToken(source));
+    if(io == null) throw INVURL_X.get(info, source);
     if(Strings.contains(io.path(), '#')) throw FRAGID_X.get(info, io);
 
     final ParseOptions po = new ParseOptions();
