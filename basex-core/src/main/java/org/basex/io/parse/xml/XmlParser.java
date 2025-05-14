@@ -69,7 +69,7 @@ public final class XmlParser {
     final boolean xsdValidation = CommonOptions.STRICT.equals(
         options.get(MainOptions.XSDVALIDATION));
     final boolean xsiLocation = options.get(MainOptions.XSILOCATION);
-    final SAXParserFactory f = SAXParserFactory.newInstance();
+    final SAXParserFactory f = SAXParserFactory.newDefaultInstance();
     if(extEntities) {
       // setting these options to false will ignore external entities, rather than rejecting them
       f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
@@ -87,8 +87,7 @@ public final class XmlParser {
       f.setSchema(sf.newSchema());
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
-    // temporary fix; ensures that other XML parsers do not reject the property
-    if(entExpansion != null && entExpansion != 64000) {
+    if(entExpansion != null) {
       xr.setProperty("http://www.oracle.com/xml/jaxp/properties/entityExpansionLimit",
         entExpansion);
     }
