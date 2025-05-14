@@ -2050,7 +2050,11 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Pragma[] pragma() throws QueryException {
-    if(!wsConsumeWs("(#")) return null;
+    final int p = pos;
+    if(!wsConsume("(#") || !consumeWS()) {
+      pos = p;
+      return null;
+    }
 
     final ArrayList<Pragma> el = new ArrayList<>();
     do {
@@ -2443,7 +2447,7 @@ public class QueryParser extends InputParser {
     // variables
     if(cp == '$') return varRef();
     // parentheses
-    if(cp == '(' && next() != '#') return parenthesized();
+    if(cp == '(') return parenthesized();
     // function call
     expr = functionCall();
     if(expr != null) return expr;
@@ -2592,12 +2596,14 @@ public class QueryParser extends InputParser {
     // named function reference
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && wsConsumeWs("#")) {
-      if(reserved(name)) throw error(RESERVED_X, name.local());
       final Expr num = numericLiteral(Integer.MAX_VALUE, false);
-      if(Function.ERROR.is(num)) return num;
-      if(!(num instanceof Int)) throw error(ARITY_X, num);
-      final int arity = (int) ((Int) num).itr();
-      return Functions.item(name, arity, false, info(), qc, moduleURIs.contains(name.uri()));
+      if(!reserved(name)) {
+        if(Function.ERROR.is(num)) return num;
+        if(!(num instanceof Int)) throw error(ARITY_X, num);
+        final int arity = (int) ((Int) num).itr();
+        return Functions.item(name, arity, false, info(), qc, moduleURIs.contains(name.uri()));
+      }
+      if(num != null) throw error(RESERVED_X, name.local());
     }
     pos = p;
     return null;
@@ -2609,7 +2615,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr literal() throws QueryException {
-    return quote(current()) ? Str.get(stringLiteral()) : numericLiteral(0, false);
+    return quote(current()) ? Str.get(stringLiteral())
+                            : consume('#') ? eQName(null, QNAME_X) : numericLiteral(0, false);
   }
 
   /**
@@ -3268,10 +3275,13 @@ public class QueryParser extends InputParser {
       wsCheck("}");
       return name;
     }
+    // parse literal name
+    if(qname) {
+      consume("#");
+      return eQName(SKIPCHECK, null);
+    }
     // parse name enclosed in quotes
     if(quote(current())) return Str.get(stringLiteral());
-    // parse literal name
-    if(qname) return eQName(SKIPCHECK, null);
     final byte[] string = ncName(null);
     return string.length != 0 ? Str.get(string) : null;
   }
