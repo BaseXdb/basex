@@ -195,4 +195,13 @@ public final class HigherOrderTest extends SandboxTest {
         + "};"
         + "local:f('a')", "");
   }
+
+  /** Function equality: consider parameter types. */
+  @Test public void funcEquality() {
+    error("""
+      let $n := 'a', $p := 'b'
+      return (fn($_, $p) { }(?, $p), fn($_, $p as map(*)) { }(?, $p))[2](1)
+      """,
+      INVCONVERT_X_X_X);
+  }
 }

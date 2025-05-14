@@ -236,7 +236,12 @@ public final class FuncItem extends FItem implements Scope {
   public boolean deepEqual(final Item item, final DeepEqual deep) {
     if(this == item) return true;
     if(item instanceof final FuncItem func) {
-      return arity() == func.arity() && expr.equals(func.expr);
+      // functions must have same body and same parameters types (its names can differ)
+      int a = arity();
+      if(a == func.arity()) {
+        while(--a >= 0 && params[a].seqType().eq(func.params[a].seqType()));
+        return a == -1 && expr.equals(func.expr);
+      }
     }
     return false;
   }
