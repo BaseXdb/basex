@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
+import javax.xml.catalog.*;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.*;
 
@@ -157,7 +158,7 @@ public final class StaticContext {
         final InputSource is = s instanceof SAXSource ? ((SAXSource) s).getInputSource() : null;
         final String id = is != null ? is.getSystemId() : null;
         if(id != null) return IO.get(id);
-      } catch(final TransformerException ex) {
+      } catch(final TransformerException | CatalogException ex) {
         Util.debug(ex);
       }
     }
