@@ -26,7 +26,7 @@ public final class SmallSeq extends TreeSeq {
    * @param items items
    * @param type item type
    */
-  public SmallSeq(final Item[] items, final Type type) {
+  SmallSeq(final Item[] items, final Type type) {
     super(items.length, type);
     this.items = items;
     assert items.length >= 2 && items.length <= MAX_SMALL;

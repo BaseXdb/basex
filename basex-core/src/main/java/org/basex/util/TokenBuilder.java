@@ -64,14 +64,6 @@ public final class TokenBuilder {
   }
 
   /**
-   * Constructor with initial token.
-   * @param object initial object
-   */
-  public TokenBuilder(final Object object) {
-    this(token(object));
-  }
-
-  /**
    * Returns the number of bytes.
    * @return number of bytes
    */

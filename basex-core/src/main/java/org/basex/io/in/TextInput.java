@@ -10,7 +10,7 @@ import org.basex.util.*;
 /**
  * This class provides buffered access to textual input.
  * The input encoding will initially be guessed by analyzing the first bytes;
- * it can also be explicitly set by calling {@link #encoding()}.
+ * it can also be explicitly set by calling {@link #encoding(String)}.
  * UTF-8 will be used as default encoding.
  *
  * @author BaseX Team, BSD License
@@ -83,14 +83,6 @@ public class TextInput extends BufferInput {
       close();
       throw ex;
     }
-  }
-
-  /**
-   * Returns the encoding.
-   * @return encoding
-   */
-  public final String encoding() {
-    return decoder.encoding;
   }
 
   /**

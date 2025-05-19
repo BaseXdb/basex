@@ -1,6 +1,5 @@
 package org.basex.query.value.array;
 
-import org.basex.query.expr.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -133,15 +132,6 @@ final class TreeArrayBuilder implements ArrBuilder {
     for(int i = 0; i < a; i++) ls[i] = values[(start + i) % CAP];
     for(int i = a; i < n; i++) rs[i - a] = values[(start + i) % CAP];
     return new BigArray(ls, builder.freeze(), rs, type);
-  }
-
-  /**
-   * Creates an {@link XQArray} containing the members of this builder.
-   * @param expr expression that created the array (can be {@code null})
-   * @return resulting array
-   */
-  XQArray array(final Expr expr) {
-    return expr != null ? array((ArrayType) expr.seqType().type) : array();
   }
 
   @Override

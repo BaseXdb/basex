@@ -43,8 +43,6 @@ public final class JavaFunctionTest extends SandboxTest {
   /** Tests calling some Java static fields from XQuery. */
   @Test public void staticField() {
     query("Q{java:java.lang.Math}PI()", Math.PI);
-    query("Q{java:org.basex.util.Prop}gui()", false);
-
     query("Q{java:org.basex.util.Prop}debug()", false);
     query("Q{org.basex.util.Prop}debug()", false);
     query("Q{http://basex.org/util/Prop}debug()", false);

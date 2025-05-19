@@ -100,8 +100,6 @@ public final class Prop {
   public static String language = "English";
   /** Debug mode. */
   public static boolean debug;
-  /** GUI mode. */
-  public static boolean gui;
 
   /** Private constructor. */
   private Prop() { }

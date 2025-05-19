@@ -238,7 +238,6 @@ public final class GUIOptions extends Options {
     // reset real-time operations
     set(FILTERRT, false);
     set(EXECRT, false);
-    gui = true;
 
     // normalize and clean file paths
     for(final StringOption path : new StringOption[] { WORKPATH, PROJECTPATH })
