@@ -250,8 +250,6 @@ public enum QueryError {
   DB_PROPERTY_X(DB, "property", "Unknown database property: %."),
   /** Error code. */
   DB_RANGE_X_X(DB, "range", "Database '%' value out of range: %."),
-  /** Error code. */
-  DB_TARGET_X(DB, "target", "Invalid target path: %."),
 
   // Fetch Module
 
@@ -290,21 +288,6 @@ public enum QueryError {
   /** Error code. */
   FT_OPTIONS(FT, "options", "Wildcards and fuzzy option cannot be specified both."),
 
-  // Geo Module
-
-  /** Error code. */
-  GEO_WHICH(GEO, 1, "Unrecognized geometry type: %."),
-  /** Error code. */
-  GEO_READ(GEO, 2, "Parsing GML: %."),
-  /** Error code. */
-  GEO_TYPE(GEO, 3, "Wrong geometry: % expected, % found."),
-  /** Error code. */
-  GEO_RANGE(GEO, 4, "Out of range input index: %."),
-  /** Error code. */
-  GEO_WRITE(GEO, 5, "%."),
-  /** Error code. */
-  GEO_ARG(GEO, 6, "Illegal argument: %."),
-
   // HTTP Module
 
   /** Invalid URI. */
@@ -319,8 +302,6 @@ public enum QueryError {
   HC_REQ_X(HC, 4, "%."),
   /** Error code. */
   HC_URL(HC, 5, "No URL supplied."),
-  /** Error code. */
-  HC_PARAMS(HC, 6, "Specify request element or HTTP URI."),
 
   // Inspection Module
 
@@ -534,17 +515,6 @@ public enum QueryError {
   /** Error code. */
   XSLT_ERROR_X(XSLT, "error", "%"),
 
-  // ZIP Module
-
-  /** Error code. */
-  ZIP_NOTFOUND_X(ZIP, 1, "Path '%' not found."),
-  /** Error code. */
-  ZIP_INVALID_X_X(ZIP, 2, "% element: attribute '%' expected."),
-  /** Error code. */
-  ZIP_UNKNOWN_X(ZIP, 2, "ZIP definition: unknown element %."),
-  /** Error code. */
-  ZIP_FAIL_X(ZIP, 3, "Operation failed: %."),
-
   // W3 Functions
 
   /** Error code. */
@@ -698,8 +668,6 @@ public enum QueryError {
   /** Error code. */
   OPTION_JSON_X(FOJS, 5, "%"),
   /** Error code. */
-  FUNC_JSON_OPT_X_X(FOJS, 5, "% expected, % found."),
-  /** Error code. */
   INVALID_JSON_X(FOJS, 6, "%"),
   /** Error code. */
   ESCAPE_JSON_X(FOJS, 7, "Invalid escape sequence: %."),
@@ -744,8 +712,6 @@ public enum QueryError {
   /** Error code. */
   URIARG_X(FORG, 2, "Invalid URI: %."),
   /** Error code. */
-  BASEURIARG_X(FORG, 2, "Invalid base URI: %."),
-  /** Error code. */
   ZEROORONE(FORG, 3, "Zero or one item expected."),
   /** Error code. */
   ONEORMORE(FORG, 4, "One or more item expected."),
@@ -772,8 +738,6 @@ public enum QueryError {
   REGFLAG_X(FORX, 1, "Invalid regular flag: '%'."),
   /** Error code. */
   REGINVALID_X(FORX, 2, "Invalid regular expression: %."),
-  /** Error code. */
-  REGEMPTY_X(FORX, 3, "Pattern matches empty string: '%'."),
   /** Error code. */
   REGBACKSLASH_X(FORX, 4, "Invalid backslash in replacement string: %."),
   /** Error code. */
@@ -923,8 +887,6 @@ public enum QueryError {
   /** Error code. */
   CMPEXPR(XPST, 3, "Comparison is incomplete."),
   /** Error code. */
-  UPDATEEXPR(XPST, 3, "Expecting update expression."),
-  /** Error code. */
   NOELEMNAME(XPST, 3, "Expecting element name."),
   /** Error code. */
   ELEMNAME_X(XPST, 3, "Element name expected, '%' found."),
@@ -1001,15 +963,11 @@ public enum QueryError {
   /** Error code. */
   ORDERBY(XPST, 3, "Expecting valid expression after 'order by'."),
   /** Error code. */
-  GRPBY(XPST, 3, "Expecting valid expression after 'group by'."),
-  /** Error code. */
   FLWORRETURN(XPST, 3, "Incomplete FLWOR expression, expecting 'return'."),
   /** Error code. */
   NOSOME(XPST, 3, "Incomplete quantifier expression."),
   /** Error code. */
   IFPAR(XPST, 3, "Expecting '(' after 'if' expression."),
-  /** Error code. */
-  NODEFAULT(XPST, 3, "Expecting default expression."),
   /** Error code. */
   NOIF(XPST, 3, "Incomplete 'if' expression."),
   /** Error code. */
@@ -1075,8 +1033,6 @@ public enum QueryError {
   /** Error code. */
   INVISIBLEVAR_X(XPST, 8, "Variable requires missing module import: %."),
   /** Error code. */
-  CIRCREF_X(XPST, 8, "Static variable references itself: %"),
-  /** Error code. */
   VARPRIVATE_X(XPST, 8, "Variable % is private."),
   /** Error code. */
   TYPEUNDEF_X(XPST, 8, "Undefined type annotation: %."),
@@ -1118,8 +1074,6 @@ public enum QueryError {
   INVALIDCAST_X(XPST, 80, "Invalid cast type: %."),
   /** Error code. */
   NOURI_X(XPST, 81, "Namespace prefix not declared: %."),
-  /** Error code. */
-  NSMISS_X(XPST, 81, "QName '%' has no namespace."),
 
   /** Error code. */
   JAVANOINSTANCE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
@@ -1187,8 +1141,6 @@ public enum QueryError {
   /** Error code. */
   ELMMAP_X_X_X(XPTY, 4, "element(%) or map expected, % found: %."),
   /** Error code. */
-  ELMSTR_X_X_X(XPTY, 4, "element(%) or string expected, % found: %."),
-  /** Error code. */
   ELM_X_X_X(XPTY, 4, "element(%) expected, % found: %."),
   /** Error code. */
   FUNCUP_X(XPTY, 4, "Function is updating: %."),
@@ -1211,8 +1163,6 @@ public enum QueryError {
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),
   /** Error code. */
   PATHNODE_X_X_X(XPTY, 19, "%: node expected, % found: %."),
-  /** Error code. */
-  STEPNODE_X_X_X(XPTY, 20, "%: node expected, % found: %."),
   /** Error code. */
   NSSENS_X_X(XPTY, 117, "Cannot convert % to %."),
 
@@ -1558,7 +1508,6 @@ public enum QueryError {
     /** Error type. */ DB(DB_PREFIX,             DB_URI),
     /** Error type. */ FETCH(FETCH_PREFIX,       FETCH_URI),
     /** Error type. */ FT(FT_PREFIX,             FT_URI),
-    /** Error type. */ GEO(GEO_PREFIX,           GEO_URI),
     /** Error type. */ HTML(HTML_PREFIX,         HTML_URI),
     /** Error type. */ INSPECT(INSPECT_PREFIX,   INSPECT_URI),
     /** Error type. */ JOB(JOB_PREFIX,           JOB_URI),
@@ -1586,7 +1535,6 @@ public enum QueryError {
     /** Error type. */ CX(EXPERR_PREFIX,  EXPERROR_URI),
     /** Error type. */ FILE(FILE_PREFIX,  FILE_URI),
     /** Error type. */ HC(EXPERR_PREFIX,  EXPERROR_URI),
-    /** Error type. */ ZIP(EXPERR_PREFIX, EXPERROR_URI),
 
     // W3 errors
 

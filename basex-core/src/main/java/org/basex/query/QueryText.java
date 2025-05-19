@@ -221,7 +221,6 @@ public interface QueryText {
   /** XQuery prefix. */ byte[] FILE_PREFIX = token("file");
   /** XQuery prefix. */ byte[] FN_PREFIX = token("fn");
   /** XQuery prefix. */ byte[] FT_PREFIX = token("ft");
-  /** XQuery prefix. */ byte[] GEO_PREFIX = token("geo");
   /** XQuery prefix. */ byte[] HOF_PREFIX = token("hof");
   /** XQuery prefix. */ byte[] HTML_PREFIX = token("html");
   /** XQuery prefix. */ byte[] HTTP_PREFIX = token("http");
@@ -286,7 +285,6 @@ public interface QueryText {
   /** EXPath URI. */ byte[] BIN_URI = token(EXPATH_URI + "binary");
   /** EXPath URI. */ byte[] CRYPTO_URI = token(EXPATH_URI + "crypto");
   /** EXPath URI. */ byte[] FILE_URI = token(EXPATH_URI + "file");
-  /** EXPath URI. */ byte[] GEO_URI = token(EXPATH_URI + "geo");
   /** EXPath URI. */ byte[] HTTP_URI = token(EXPATH_URI + "http-client");
   /** EXPath URI. */ byte[] PKG_URI = token(EXPATH_URI + "pkg");
   /** EXPath URI. */ byte[] EXPERROR_URI = token(EXPATH_URI + "error");

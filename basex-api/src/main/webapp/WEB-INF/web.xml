@@ -43,16 +43,6 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
-  <!-- WebDAV Service (can be disabled by removing this entry) -->
-  <servlet>
-    <servlet-name>WebDAV</servlet-name>
-    <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>WebDAV</servlet-name>
-    <url-pattern>/webdav/*</url-pattern>
-  </servlet-mapping>
-
   <!-- Mapping for static resources (may be restricted to a sub path) -->
   <servlet>
     <servlet-name>default</servlet-name>

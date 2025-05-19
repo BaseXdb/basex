@@ -44,7 +44,6 @@ public final class NSGlobal {
     NS.add(BIN_PREFIX, BIN_URI);
     NS.add(CRYPTO_PREFIX, CRYPTO_URI);
     NS.add(FILE_PREFIX, FILE_URI);
-    NS.add(GEO_PREFIX, GEO_URI);
     NS.add(HTTP_PREFIX, HTTP_URI);
     NS.add(PKG_PREFIX, PKG_URI);
     // EXQuery namespaces
