@@ -2,6 +2,8 @@ package org.basex.util.list;
 
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -109,6 +111,12 @@ public final class TokenList extends ObjectList<byte[], TokenList> {
   @Override
   protected byte[][] newArray(final int s) {
     return new byte[s][];
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj == this || obj instanceof final TokenList l &&
+        Arrays.equals(list, 0, size, l.list, 0, l.size);
   }
 
   @Override

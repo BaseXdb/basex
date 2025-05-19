@@ -129,12 +129,8 @@ public final class ByteList extends ElementList {
 
   @Override
   public boolean equals(final Object obj) {
-    if(obj == this) return true;
-    if(!(obj instanceof final ByteList bl) || size != bl.size) return false;
-    for(int l = 0; l < size; ++l) {
-      if(list[l] != bl.list[l]) return false;
-    }
-    return true;
+    return obj == this || obj instanceof final ByteList l &&
+        Arrays.equals(list, 0, size, l.list, 0, l.size);
   }
 
   @Override

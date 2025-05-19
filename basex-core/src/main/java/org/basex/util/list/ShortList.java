@@ -85,12 +85,8 @@ public final class ShortList extends ElementList {
 
   @Override
   public boolean equals(final Object obj) {
-    if(obj == this) return true;
-    if(!(obj instanceof final ShortList sl) || size != sl.size) return false;
-    for(int l = 0; l < size; ++l) {
-      if(list[l] != sl.list[l]) return false;
-    }
-    return true;
+    return obj == this || obj instanceof final ShortList l &&
+        Arrays.equals(list, 0, size, l.list, 0, l.size);
   }
 
   @Override

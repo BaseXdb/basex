@@ -316,15 +316,9 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(final Object obj) {
-    if(obj == this) return true;
-    if(!(obj instanceof final ObjectList f) || size != f.size) return false;
-    final E[] lst1 = list, lst2 = (E[]) f.list;
-    for(int l = 0; l < size; l++) {
-      if(!equals(lst1[l], lst2[l])) return false;
-    }
-    return true;
+    return obj == this || obj instanceof final ObjectList l &&
+        Arrays.equals(list, 0, size, l.list, 0, l.size);
   }
 
   @Override

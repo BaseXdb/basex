@@ -77,4 +77,10 @@ public final class StringList extends ObjectList<String, StringList> {
   protected String[] newArray(final int s) {
     return new String[s];
   }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return obj == this || obj instanceof final StringList l &&
+        Arrays.equals(list, 0, size, l.list, 0, l.size);
+  }
 }
