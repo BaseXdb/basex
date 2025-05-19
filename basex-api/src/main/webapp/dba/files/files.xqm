@@ -27,7 +27,6 @@ declare
   %rest:query-param('info',  '{$info}')
   %rest:query-param('page',  '{$page}', '1')
   %output:method('html')
-  %output:html-version('5')
 function dba:files(
   $sort   as xs:string,
   $error  as xs:string?,

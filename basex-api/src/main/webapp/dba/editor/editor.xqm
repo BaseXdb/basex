@@ -25,7 +25,6 @@ declare
   %rest:query-param('info',  '{$info}')
   %rest:query-param('name',  '{$name}')
   %output:method('html')
-  %output:html-version('5')
 function dba:editor(
   $error  as xs:string?,
   $info   as xs:string?,

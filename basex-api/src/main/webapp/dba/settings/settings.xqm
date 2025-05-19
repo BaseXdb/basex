@@ -21,7 +21,6 @@ declare
   %rest:path('/dba/settings')
   %rest:query-param('info',  '{$info}')
   %output:method('html')
-  %output:html-version('5')
 function dba:settings(
   $info  as xs:string?
 ) as element(html) {

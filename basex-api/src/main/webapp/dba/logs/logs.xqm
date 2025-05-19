@@ -33,7 +33,6 @@ declare
   %rest:query-param('page',  '{$page}', '1')
   %rest:query-param('time',  '{$time}')
   %output:method('html')
-  %output:html-version('5')
 function dba:logs(
   $input  as xs:string?,
   $name   as xs:string?,
@@ -120,8 +119,6 @@ declare
   %rest:query-param('page', '{$page}', '1')
   %rest:query-param('time', '{$time}')
   %output:method('html')
-  %output:html-version('5')
-  %output:indent('no')
   %rest:single
 function dba:log(
   $input  as xs:string?,

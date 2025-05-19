@@ -29,7 +29,6 @@ declare
   %rest:form-param('perm', '{$perm}', 'none')
   %rest:form-param('do',   '{$do}')
   %output:method('html')
-  %output:html-version('5')
 function dba:user-create(
   $name  as xs:string?,
   $pw    as xs:string?,

@@ -31,7 +31,6 @@ declare
   %rest:form-param('perm',    '{$perm}', 'write')
   %rest:form-param('do',      '{$do}')
   %output:method('html')
-  %output:html-version('5')
 function dba:pattern-add(
   $name     as xs:string,
   $pattern  as xs:string?,

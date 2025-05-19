@@ -28,7 +28,6 @@ declare
   %rest:form-param('newname', '{$newname}')
   %rest:form-param('do',      '{$do}')
   %output:method('html')
-  %output:html-version('5')
 function dba:db-alter(
   $name     as xs:string,
   $newname  as xs:string?,

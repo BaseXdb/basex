@@ -27,7 +27,6 @@ declare
   %rest:query-param('info',  '{$info}')
   %rest:query-param('error', '{$error}')
   %output:method('html')
-  %output:html-version('5')
 function dba:databases(
   $sort   as xs:string,
   $page   as xs:integer,

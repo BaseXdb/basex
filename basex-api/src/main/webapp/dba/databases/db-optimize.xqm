@@ -32,7 +32,6 @@ declare
   %rest:form-param('lang', '{$lang}')
   %rest:form-param('do',   '{$do}')
   %output:method('html')
-  %output:html-version('5')
 function dba:db-optimize(
   $name  as xs:string,
   $all   as xs:string?,

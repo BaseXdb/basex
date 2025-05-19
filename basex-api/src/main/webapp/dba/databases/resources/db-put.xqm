@@ -34,7 +34,6 @@ declare
   %rest:form-param('binary', '{$binary}')
   %rest:form-param('do',      '{$do}')
   %output:method('html')
-  %output:html-version('5')
 function dba:db-put(
   $name    as xs:string,
   $opts    as xs:string*,

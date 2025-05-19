@@ -30,7 +30,6 @@ declare
   %rest:form-param('lang', '{$lang}')
   %rest:form-param('do',   '{$do}')
   %output:method('html')
-  %output:html-version('5')
 function dba:db-create(
   $name  as xs:string?,
   $opts  as xs:string*,

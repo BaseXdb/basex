@@ -30,7 +30,6 @@ declare
   %rest:form-param('target',   '{$target}')
   %rest:form-param('do',        '{$do}')
   %output:method('html')
-  %output:html-version('5')
 function dba:db-rename(
   $name      as xs:string,
   $resource  as xs:string?,

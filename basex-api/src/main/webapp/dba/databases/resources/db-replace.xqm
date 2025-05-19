@@ -30,7 +30,6 @@ declare
   %rest:form-param('file',     '{$file}')
   %rest:form-param('do',       '{$do}')
   %output:method('html')
-  %output:html-version('5')
 function dba:db-replace(
   $name      as xs:string,
   $resource  as xs:string?,

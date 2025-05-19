@@ -30,7 +30,6 @@ declare
   %rest:form-param('compress', '{$compress}')
   %rest:form-param('do',       '{$do}')
   %output:method('html')
-  %output:html-version('5')
 function dba:backup-create(
   $name      as xs:string,
   $comment   as xs:string?,
