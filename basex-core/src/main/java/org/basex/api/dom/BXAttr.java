@@ -31,6 +31,12 @@ public final class BXAttr extends BXNode implements Attr {
   }
 
   @Override
+  public String getPrefix() {
+    final byte[] prefix = Token.prefix(nd.name());
+    return prefix.length == 0 ? null : Token.string(prefix);
+  }
+
+  @Override
   public String getNodeValue() {
     return Token.string(nd.string());
   }

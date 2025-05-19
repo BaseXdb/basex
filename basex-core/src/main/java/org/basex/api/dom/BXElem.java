@@ -30,6 +30,12 @@ public final class BXElem extends BXNode implements Element {
   }
 
   @Override
+  public String getPrefix() {
+    final byte[] prefix = Token.prefix(nd.name());
+    return prefix.length == 0 ? null : Token.string(prefix);
+  }
+
+  @Override
   public BXNNode getAttributes() {
     return new BXNNode(finish(nd.attributeIter()));
   }

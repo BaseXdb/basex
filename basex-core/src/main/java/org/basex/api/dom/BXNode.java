@@ -70,6 +70,7 @@ public abstract class BXNode implements Node {
 
   /**
    * Returns a numeric value for the node kind.
+   * Overwritten by {@link BXCData}.
    * @return node kind
    */
   int kind() {
@@ -175,7 +176,7 @@ public abstract class BXNode implements Node {
   }
 
   @Override
-  public final String getPrefix() {
+  public String getPrefix() {
     return null;
   }
 
