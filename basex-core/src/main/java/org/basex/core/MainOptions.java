@@ -71,7 +71,7 @@ public final class MainOptions extends Options {
   /** Flag for handling xsi:schemaLocation and xsi:noNamespaceSchemaLocation attributes. */
   public static final BooleanOption XSILOCATION = new BooleanOption("XSILOCATION", true);
   /** Flag for using XInclude. */
-  public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", true);
+  public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", false);
   /** Path to XML Catalog file. */
   public static final StringOption CATALOG = new StringOption("CATALOG", "");
 
