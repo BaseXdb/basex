@@ -19,7 +19,7 @@ final class BXCData extends BXText implements CDATASection {
   }
 
   @Override
-  protected int kind() {
+  int kind() {
     // type not specified in database
     return 6;
   }
