@@ -30,7 +30,7 @@ abstract class DbNew extends DbAccessFn {
     final NewInput ni = new NewInput();
 
     if(input instanceof final ANode node) {
-      if(Strings.endsWith(path, '/')) throw RESINV_X.get(info, path);
+      if(Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
 
       // ensure that the final name is not empty
       String name = path;
@@ -41,7 +41,7 @@ abstract class DbNew extends DbAccessFn {
         // adopt path if node is part of disk database. otherwise, only adopt file name
         final int i = data == null || data.inMemory() ? name.lastIndexOf('/') : name.indexOf('/');
         if(i != -1) name = name.substring(i + 1);
-        if(name.isEmpty()) throw RESINV_X.get(info, name);
+        if(name.isEmpty()) throw DB_PATH_X.get(info, name);
       }
 
       if(node.type == NodeType.ATTRIBUTE) throw UPDOCTYPE_X.get(info, node);
@@ -72,7 +72,7 @@ abstract class DbNew extends DbAccessFn {
     else if(!(io instanceof IOContent)) name = io.name();
 
     // ensure that the final name is not empty
-    if(name.isEmpty()) throw RESINV_X.get(info, path);
+    if(name.isEmpty()) throw DB_PATH_X.get(info, path);
 
     ni.io = io;
     ni.path = target;

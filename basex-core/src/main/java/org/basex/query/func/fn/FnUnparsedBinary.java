@@ -2,13 +2,12 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -19,23 +18,17 @@ import org.basex.util.*;
 public final class FnUnparsedBinary extends ParseFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item source = arg(0).atomItem(qc, info);
-    if(source.isEmpty()) return Empty.VALUE;
-
-    final IO io = input(toToken(source));
-    if(io == null) throw INVURL_X.get(info, source);
-    if(Strings.contains(io.path(), '#')) throw FRAGID_X.get(info, io);
-
-    return new B64Lazy(io, RESNF_X);
+    final String source = toStringOrNull(arg(0), qc);
+    return source == null ? Empty.VALUE : new B64Lazy(toIO(source, false), RESWHICH_X);
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) throws QueryException {
-    return optFirst();
-  }
-
-  @Override
-  Str parse(final TextInput ti, final Object options, final QueryContext qc) {
+  Str parse(final TextInput ti, final Options options, final QueryContext qc) {
     throw Util.notExpected();
+  }
+
+  @Override
+  protected Options options(final QueryContext qc) throws QueryException {
+    return new Options();
   }
 }

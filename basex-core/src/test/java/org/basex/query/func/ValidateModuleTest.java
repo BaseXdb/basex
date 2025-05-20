@@ -44,8 +44,8 @@ public final class ValidateModuleTest extends SandboxTest {
     query(func.args(" ``[<!DOCTYPE p [<!ELEMENT p ANY>]><p/>]``", " ()"), "");
 
     // invalid arguments
-    error(func.args("unknown"), WHICHRES_X);
-    error(func.args(FILE, "unknown.dtd"), WHICHRES_X);
+    error(func.args("unknown"), RESWHICH_X);
+    error(func.args(FILE, "unknown.dtd"), RESWHICH_X);
     error(func.args(FILE), VALIDATE_ERROR_X);
     error(
       "let $doc := <root/> " +
@@ -76,8 +76,8 @@ public final class ValidateModuleTest extends SandboxTest {
       "return " + func.args(" $doc", " $dtd") + ')', true);
 
     // invalid arguments
-    error(func.args("unknown"), WHICHRES_X);
-    error(func.args(FILE, "unknown.dtd"), WHICHRES_X);
+    error(func.args("unknown"), RESWHICH_X);
+    error(func.args(FILE, "unknown.dtd"), RESWHICH_X);
   }
 
   /** Test method. */
@@ -120,8 +120,8 @@ public final class ValidateModuleTest extends SandboxTest {
     query("exists(" + func.args(INPUT, DTD) + "//@url)", true);
 
     // invalid arguments
-    error(func.args("unknown"), WHICHRES_X);
-    error(func.args(FILE, "unknown.dtd"), WHICHRES_X);
+    error(func.args("unknown"), RESWHICH_X);
+    error(func.args(FILE, "unknown.dtd"), RESWHICH_X);
   }
 
   /** Test method. */
@@ -148,8 +148,8 @@ public final class ValidateModuleTest extends SandboxTest {
     query(func.args(FILE, XSD, " map { 'cache': 1 }"), "");
 
     // invalid arguments
-    error(func.args("unknown"), WHICHRES_X);
-    error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
+    error(func.args("unknown"), RESWHICH_X);
+    error(func.args(FILE, "unknown.xsd"), RESWHICH_X);
     // specify option
     error(func.args(FILE, XSD, " map { 'unknown-argument': true() }"), VALIDATE_ERROR_X);
     error(func.args(FILE), VALIDATE_ERROR_X);
@@ -188,8 +188,8 @@ public final class ValidateModuleTest extends SandboxTest {
       "return " + func.args(" $doc", " $schema") + ')', true);
 
     // invalid arguments
-    error(func.args("unknown"), WHICHRES_X);
-    error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
+    error(func.args("unknown"), RESWHICH_X);
+    error(func.args(FILE, "unknown.xsd"), RESWHICH_X);
   }
 
   /** Test method. */
@@ -252,8 +252,8 @@ public final class ValidateModuleTest extends SandboxTest {
     query("exists(" + func.args(INPUT, XSD) + "//@url)", true);
 
     // invalid arguments
-    error(func.args("unknown"), WHICHRES_X);
-    error(func.args(FILE, "unknown.xsd"), WHICHRES_X);
+    error(func.args("unknown"), RESWHICH_X);
+    error(func.args(FILE, "unknown.xsd"), RESWHICH_X);
   }
 
   /** Test method. */

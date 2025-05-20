@@ -134,10 +134,10 @@ public final class DbModuleTest extends SandboxTest {
     error(func.args(NAME, CSV, "csv.xml",
         " map { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS_X);
 
-    error(func.args(NAME, " <a/>"), RESINV_X);
-    error(func.args(NAME, " <a/>", " ()"), RESINV_X);
-    error(func.args(NAME, " <a/>", ""), RESINV_X);
-    error(func.args(NAME, " <a/>", "/"), RESINV_X);
+    error(func.args(NAME, " <a/>"), DB_PATH_X);
+    error(func.args(NAME, " <a/>", " ()"), DB_PATH_X);
+    error(func.args(NAME, " <a/>", ""), DB_PATH_X);
+    error(func.args(NAME, " <a/>", "/"), DB_PATH_X);
 
     // add document with namespaces
     query(_DB_ADD.args(NAME, " document { <x xmlns:a='a' a:y='' /> }", "x"));
@@ -559,7 +559,7 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME) + "//title/text()", "XML");
 
     // reference invalid path
-    if(Prop.WIN) error(func.args(NAME, "*"), RESINV_X);
+    if(Prop.WIN) error(func.args(NAME, "*"), DB_PATH_X);
 
     // run function on non-existing database
     execute(new DropDB(NAME));
@@ -902,7 +902,7 @@ public final class DbModuleTest extends SandboxTest {
 
     error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
         DB_CONFLICT5_X);
-    error(_DB_PUT_VALUE.args(NAME, "VALUE", ".."), RESINV_X);
+    error(_DB_PUT_VALUE.args(NAME, "VALUE", ".."), DB_PATH_X);
   }
 
   /** Test method. */

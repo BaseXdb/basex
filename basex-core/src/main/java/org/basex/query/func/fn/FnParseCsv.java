@@ -12,7 +12,12 @@ import org.basex.query.value.*;
  */
 public class FnParseCsv extends ParseCsv {
   @Override
+  protected final CsvFormat format() {
+    return CsvFormat.W3;
+  }
+
+  @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return parse(qc, CsvFormat.W3);
+    return parse(qc);
   }
 }

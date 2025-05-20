@@ -36,6 +36,6 @@ public final class FnParseXml extends FnParseXmlFragment {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ParseXmlOptions options = toOptions(arg(1), new ParseXmlOptions(), qc);
-    return parseXml(qc, false, options);
+    return parse(qc, false, options);
   }
 }

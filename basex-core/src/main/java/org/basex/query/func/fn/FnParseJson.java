@@ -10,9 +10,14 @@ import org.basex.query.value.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnParseJson extends ParseJson {
+public class FnParseJson extends ParseJson {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return parse(qc, JsonFormat.W3);
+    return parse(qc);
+  }
+
+  @Override
+  protected final JsonFormat format() {
+    return JsonFormat.W3;
   }
 }

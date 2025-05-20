@@ -10,6 +10,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -19,9 +20,13 @@ import org.basex.util.list.*;
  */
 public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   @Override
+  public boolean nl() {
+    return true;
+  }
+
+  @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item source = arg(0).atomItem(qc, info);
-    return source.isEmpty() ? Empty.VALUE : parse(source, true, arg(1), QueryError.INVCHARS_X, qc);
+    return doc(qc);
   }
 
   @Override
@@ -36,7 +41,7 @@ public final class FnUnparsedTextLines extends FnUnparsedTextAvailable {
   }
 
   @Override
-  Value parse(final TextInput ti, final Object options, final QueryContext qc) throws IOException {
+  Value parse(final TextInput ti, final Options options, final QueryContext qc) throws IOException {
     final NewlineInput ni = (NewlineInput) ti;
     final TokenList tl = new TokenList();
     final TokenBuilder tb = new TokenBuilder();

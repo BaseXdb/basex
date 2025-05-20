@@ -68,7 +68,7 @@ abstract class DbAccessFn extends StandardFunc {
    */
   final String toDbPath(final String path) throws QueryException {
     final String norm = MetaData.normPath(path);
-    if(norm == null) throw RESINV_X.get(info, path);
+    if(norm == null) throw DB_PATH_X.get(info, path);
     return norm;
   }
 

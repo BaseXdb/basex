@@ -31,7 +31,7 @@ public class FnDocAvailable extends Docs {
   }
 
   /**
-   * Performs the doc function.
+   * Performs the {@code fn:doc} function.
    * @param qc query context
    * @return document or {@link Empty#VALUE}
    * @throws QueryException query exception

@@ -33,7 +33,7 @@ public class ValidateDtd extends ValidateFn {
 
         final Item input = toNodeOrAtomItem(arg(0), false, qc);
         final String schema = toStringOrNull(arg(1), qc);
-        final IO schm = schema != null ? toIO(schema) : null;
+        final IO schm = schema != null ? toIO(schema, true) : null;
 
         // integrate doctype declaration via serialization parameters
         SerializerOptions sp = null;

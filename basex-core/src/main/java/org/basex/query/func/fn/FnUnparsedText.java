@@ -6,8 +6,8 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -17,10 +17,8 @@ import org.basex.util.*;
  */
 public final class FnUnparsedText extends FnUnparsedTextAvailable {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item source = arg(0).atomItem(qc, info);
-    return source.isEmpty() ? Empty.VALUE :
-      (Str) parse(source, false, arg(1), QueryError.INVCHARS_X, qc);
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return (Str) doc(qc);
   }
 
   @Override
@@ -30,7 +28,7 @@ public final class FnUnparsedText extends FnUnparsedTextAvailable {
   }
 
   @Override
-  Str parse(final TextInput ti, final Object options, final QueryContext qc) throws IOException {
+  Str parse(final TextInput ti, final Options options, final QueryContext qc) throws IOException {
     return Str.get(ti.content());
   }
 }

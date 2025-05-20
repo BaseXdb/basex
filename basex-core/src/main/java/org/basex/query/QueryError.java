@@ -584,8 +584,6 @@ public enum QueryError {
   /** Error code. */
   DTDVALIDATIONERR_X(FODC, 7, "DTD Validation error: %"),
   /** Error code. */
-  RESINV_X(FODC, 7, "Resource path '%' is invalid."),
-  /** Error code. */
   INVALIDXSDOPT_X(FODC, 8, "Unsupported value of option 'xsd-validation': '%'."),
   /** Error code. */
   NOXSDVALIDATION_X(FODC, 9, "The internal parser does not support 'xsd-validation': '%'."),
@@ -769,17 +767,17 @@ public enum QueryError {
   PARSE_URI_X(FOUR, 1, "Invalid IPv6/IPvFuture authority: %."),
 
   /** Error code. */
-  RESNF_X(FOUT, 1170, "Resource '%' cannot be retrieved."),
+  RESWHICH_X(FOUT, 1170, "Resource '%' cannot be retrieved."),
   /** Error code. */
-  FRAGID_X(FOUT, 1170, "URI contains a fragment identifier: %."),
+  RESFRAG_X(FOUT, 1170, "URI contains a fragment identifier: %."),
   /** Error code. */
-  INVURL_X(FOUT, 1170, "URI is invalid: %"),
+  RESURI_X(FOUT, 1170, "URI is invalid: %"),
   /** Error code. */
-  ENCODING_X(FOUT, 1190, "Unknown encoding '%'."),
+  RESENCODING_X(FOUT, 1190, "Unknown encoding '%'."),
   /** Error code. */
-  INVCHARS_X(FOUT, 1190, "%."),
+  RESINPUT_X(FOUT, 1190, "%."),
   /** Error code. */
-  WHICHCHARS_X(FOUT, 1200, "%."),
+  RECDECODING_X(FOUT, 1200, "%."),
 
   /** Error code. */
   FTWEIGHT_X(FTDY, 16, "Weight value out of range: %."),

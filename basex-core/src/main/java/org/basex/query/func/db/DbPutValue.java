@@ -23,7 +23,7 @@ public final class DbPutValue extends DbAccessFn {
     final Value input = arg(1).value(qc);
     final String path = toDbPath(arg(2), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
-    if(path.isEmpty()) throw RESINV_X.get(info, path);
+    if(path.isEmpty()) throw DB_PATH_X.get(info, path);
 
     qc.updates().add(new DBPut(data, input.compactify(), path, info), qc);
     return Empty.VALUE;

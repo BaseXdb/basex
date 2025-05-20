@@ -40,7 +40,7 @@ public class FnParseXmlFragment extends Docs {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return parseXml(qc, true, toOptions(arg(1), new ParseXmlFragmentOptions(), qc));
+    return parse(qc, true, toOptions(arg(1), new ParseXmlFragmentOptions(), qc));
   }
 
   @Override
@@ -61,7 +61,7 @@ public class FnParseXmlFragment extends Docs {
    * @return result or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  final Item parseXml(final QueryContext qc, final boolean fragment, final Options options)
+  final Item parse(final QueryContext qc, final boolean fragment, final Options options)
       throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     if(value.isEmpty()) return Empty.VALUE;
@@ -70,8 +70,8 @@ public class FnParseXmlFragment extends Docs {
 
     final String baseURI = options.contains(CommonOptions.BASE_URI) ?
       options.get(CommonOptions.BASE_URI) : string(info.sc().baseURI().string());
-    final IO io = new IOContent(toBytes(value), baseURI, value instanceof Bin ? null :
-      Strings.UTF8);
+    final String encoding = value instanceof Bin ? null : Strings.UTF8;
+    final IO io = new IOContent(toBytes(value), baseURI, encoding);
 
     final MainOptions mopts = new MainOptions(options);
     mopts.set(MainOptions.CATALOG, qc.context.options.get(MainOptions.CATALOG));

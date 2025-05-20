@@ -330,11 +330,11 @@ public final class HtmlParser extends XMLParser {
      * Returns the parser associated with the specified HTML options, if any, or the specified
      * default parser.
      * @param options HTML options.
-     * @param defaultParser default parser (can be {@code null})
+     * @param parser default parser (can be {@code null})
      * @return parser (can be {@code null})
      */
-    public static Parser of(final HtmlOptions options, final Parser defaultParser) {
-      return options.contains(METHOD) ? options.get(METHOD).parser : defaultParser;
+    public static Parser of(final HtmlOptions options, final Parser parser) {
+      return options.contains(METHOD) ? options.get(METHOD).parser : parser;
     }
 
     @Override

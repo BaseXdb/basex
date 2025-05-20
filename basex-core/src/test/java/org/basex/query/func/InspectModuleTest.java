@@ -120,7 +120,7 @@ public final class InspectModuleTest extends SandboxTest {
     query(VOID.args(func.args(url)), "");
     query(VOID.args(" (" + func.args(url) + ", " + func.args(url) + ')'), "");
 
-    error(func.args("non-existent"), WHICHRES_X);
+    error(func.args("non-existent"), RESWHICH_X);
     error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);
   }
 
@@ -156,7 +156,7 @@ public final class InspectModuleTest extends SandboxTest {
     final String query3 = query(result + "/function[@name = 'hello:ext']");
     query(query3 + "/@external/data()", true);
 
-    error(func.args("non-existent"), WHICHRES_X);
+    error(func.args("non-existent"), RESWHICH_X);
     error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);
   }
 
@@ -240,7 +240,7 @@ public final class InspectModuleTest extends SandboxTest {
         replace("{", "{{").replace("}", "}}");
     query(_VALIDATE_XSD.args(' ' + result, "src/test/resources/xqdoc.xsd"));
 
-    error(func.args("non-existent"), WHICHRES_X);
+    error(func.args("non-existent"), RESWHICH_X);
     error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);
   }
 }

@@ -174,7 +174,7 @@ public final class JobModuleTest extends SandboxTest {
     final Function func = _JOB_EVAL;
     final String uri = " xs:anyURI('src/test/resources/input.xq')";
     query("starts-with(" + func.args(uri) + ", 'job')", true);
-    error(func.args(" xs:anyURI('src/test/resources/xxx.xq')"), WHICHRES_X);
+    error(func.args(" xs:anyURI('src/test/resources/xxx.xq')"), RESWHICH_X);
   }
 
   /** Test method. */

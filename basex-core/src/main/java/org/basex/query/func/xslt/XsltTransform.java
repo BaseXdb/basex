@@ -145,7 +145,7 @@ public class XsltTransform extends XsltFn {
       }
     }
     final Type type = item.type;
-    if(type.isStringOrUntyped()) return toIO(toString(item));
+    if(type.isStringOrUntyped()) return toIO(toString(item), true);
     throw STRNOD_X_X.get(info, type, item);
   }
 }

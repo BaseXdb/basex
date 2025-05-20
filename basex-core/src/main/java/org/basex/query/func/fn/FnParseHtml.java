@@ -1,10 +1,9 @@
 package org.basex.query.func.fn;
 
-import org.basex.build.html.HtmlParser;
+import org.basex.build.html.*;
+import org.basex.build.html.HtmlParser.*;
 import org.basex.query.*;
-import org.basex.query.func.html.*;
-import org.basex.query.value.item.*;
-import org.basex.util.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -12,9 +11,14 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public class FnParseHtml extends HtmlParse {
+public class FnParseHtml extends ParseHtml {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return parse(input(qc), HtmlParser.Parser.NU, qc);
+  public Value value(final QueryContext qc) throws QueryException {
+    return parse(qc);
+  }
+
+  @Override
+  protected final Parser parser() {
+    return HtmlParser.Parser.NU;
   }
 }

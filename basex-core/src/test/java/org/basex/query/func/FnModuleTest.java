@@ -3473,8 +3473,8 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void unparsedBinary() {
     final Function func = UNPARSED_BINARY;
     query(func.args(DOC) + " => bin:length() = (395, 413)", true);
-    error(func.args(DOC + ".xyz"), RESNF_X);
-    error(func.args(DOC + "#xyz"), FRAGID_X);
+    error(func.args(DOC + ".xyz"), RESWHICH_X);
+    error(func.args(DOC + "#xyz"), RESFRAG_X);
   }
 
   /** Test method. */
@@ -3482,7 +3482,7 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = UNPARSED_TEXT;
     contains(func.args(DOC), "<html");
     contains(func.args(DOC, "US-ASCII"), "<html");
-    error(func.args(DOC, "xyz"), ENCODING_X);
+    error(func.args(DOC, "xyz"), RESENCODING_X);
   }
 
   /** Test method. */

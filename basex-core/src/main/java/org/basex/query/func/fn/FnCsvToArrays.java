@@ -13,6 +13,11 @@ import org.basex.query.value.*;
 public final class FnCsvToArrays extends ParseCsv {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return parse(qc, CsvFormat.W3_ARRAYS);
+    return parse(qc);
+  }
+
+  @Override
+  protected CsvFormat format() {
+    return CsvFormat.W3_ARRAYS;
   }
 }

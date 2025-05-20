@@ -452,19 +452,26 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final IO toIO(final Expr expr, final QueryContext qc) throws QueryException {
-    return toIO(toString(expr, qc));
+    return toIO(toString(expr, qc), false);
   }
 
   /**
    * Returns a reference to an existing input resource.
    * @param uri URI string
-   * @return io reference
+   * @param content allow string content
+   * @return IO reference
    * @throws QueryException query exception
    */
-  protected final IO toIO(final String uri) throws QueryException {
+  protected final IO toIO(final String uri, final boolean content) throws QueryException {
     final IO io = info.sc().resolve(uri);
-    if(!io.exists()) throw WHICHRES_X.get(info, io);
-    if(io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io);
+    if(io instanceof IOContent) {
+      if(!content) throw RESURI_X.get(info, uri);
+    } else {
+      if(Strings.contains(io.path(), '#')) throw RESFRAG_X.get(info, io);
+      if(io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io);
+      if(!io.exists()) throw RESWHICH_X.get(info, io);
+      if(!Uri.get(uri).isValid()) throw RESURI_X.get(info, uri);
+    }
     return io;
   }
 
@@ -492,7 +499,7 @@ public abstract class StandardFunc extends Arr {
   protected final IOContent toContent(final String source, final QueryContext qc)
       throws QueryException {
     checkPerm(qc, Perm.ADMIN);
-    final IO io = toIO(source);
+    final IO io = toIO(source, false);
     try {
       return new IOContent(io.readString(), io.url());
     } catch(final IOException ex) {

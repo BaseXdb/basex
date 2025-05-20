@@ -22,7 +22,7 @@ public final class DbPutBinary extends DbAccessFn {
     final Item input = toNodeOrAtomItem(arg(1), false, qc);
     final String path = toDbPath(arg(2), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
-    if(path.isEmpty()) throw RESINV_X.get(info, path);
+    if(path.isEmpty()) throw DB_PATH_X.get(info, path);
 
     qc.updates().add(new DBPutBinary(data, input, path, info), qc);
     return Empty.VALUE;
