@@ -59,12 +59,8 @@ public final class FnSortWith extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    Expr expr = this;
-    if(mode == Simplify.COUNT) {
-      // count(sort(A))  -> count(A)
-      expr = arg(0);
-    }
-    return cc.simplify(this, expr, mode);
+    // count(sort(A))  ->  count(A)
+    return cc.simplify(this, mode == Simplify.COUNT ? arg(0) : this, mode);
   }
 
   @Override

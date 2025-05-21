@@ -43,8 +43,7 @@ public class ArraySortBy extends FnSortBy {
     final Expr array = arg(0);
     if(array == XQArray.empty()) return array;
 
-    final Type type = array.seqType().type;
-    if(type instanceof ArrayType) exprType.assign(type);
+    if(array.seqType().type instanceof final ArrayType at) exprType.assign(at);
     return this;
   }
 }

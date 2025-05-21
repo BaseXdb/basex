@@ -30,10 +30,9 @@ public final class ArraySort extends ArraySortBy {
     final Expr array = arg(0);
     if(array == XQArray.empty()) return array;
 
-    final Type type = array.seqType().type;
-    if(type instanceof final ArrayType at) {
+    if(array.seqType().type instanceof final ArrayType at) {
       if(defined(2)) arg(2, arg -> refineFunc(arg, cc, at.valueType()));
-      exprType.assign(type);
+      exprType.assign(at);
     }
     return this;
   }

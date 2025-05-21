@@ -14,7 +14,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -55,14 +54,13 @@ public class FnSortBy extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
-    final SeqType st = input.seqType();
-    return st.zero() ? input : adoptType(input);
+    return input.seqType().zero() ? input : adoptType(input);
   }
 
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    // count(sort(A))  -> count(A)
+    // count(sort(A))  ->  count(A)
     return cc.simplify(this, mode == Simplify.COUNT ? arg(0) : this, mode);
   }
 

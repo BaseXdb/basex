@@ -2971,6 +2971,14 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void sortWith() {
+    final Function func = SORT_WITH;
+    final String input = " ('b', 'a')";
+    query(func.args(input, " compare#2"), "a\nb");
+    query(func.args(input, " fn($a, $b) { -compare($a, $b) }"), "b\na");
+  }
+
+  /** Test method. */
   @Test public void staticBaseUri() {
     final Function func = STATIC_BASE_URI;
     query("declare base-uri 'a/'; ends-with(" + func.args() + ", '/')", true);
