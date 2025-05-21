@@ -44,4 +44,6 @@ public interface CommonOptions {
   StringOption BASE_URI = new StringOption("base-uri");
   /** Encoding. */
   StringOption ENCODING = new StringOption("encoding");
+  /** Normalize newlines. */
+  BooleanOption NORMALIZE_NEWLINES = new BooleanOption("normalize-newlines");
 }

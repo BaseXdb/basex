@@ -160,13 +160,13 @@ public enum Function implements AFunction {
       params(ITEM_ZM), INTEGER_O),
   /** XQuery function. */
   CSV_DOC(FnCsvDoc::new, "csv-doc(source[,options])",
-      params(STRING_ZO, MAP_ZO), MAP_O, flag(HOF), FN_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), MAP_O, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   CSV_TO_ARRAYS(FnCsvToArrays::new, "csv-to-arrays(value[,options])",
       params(STRING_ZO, MAP_ZO), STRING_O.arrayType().seqType(Occ.ZERO_OR_MORE)),
   /** XQuery function. */
   CSV_TO_XML(FnCsvToXml::new, "csv-to-xml(value[,options])",
-      params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_O),
+      params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_O, flag(CNS)),
   /** XQuery function. */
   CURRENT_DATE(FnCurrentDate::new, "current-date()",
       params(), DATE_O, flag(NDT)),
@@ -405,7 +405,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, NUMERIC_ZM, BOOLEAN_ZO), ITEM_ZM),
   /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(source[,options])",
-      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(HOF), FN_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT, HOF), FN_URI, Perm.CREATE),
   /** XQuery function. */
   JSON_TO_XML(FnJsonToXml::new, "json-to-xml(value[,options])",
       params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS, HOF)),
@@ -786,7 +786,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _MAP_GET(MapGet::new, "get(map,key[,default,methods])",
       params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM, BOOLEAN_ZO),
-      ITEM_ZM, flag(HOF), MAP_URI),
+      ITEM_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map)",
       params(MAP_O), ANY_ATOMIC_TYPE_ZM, MAP_URI),

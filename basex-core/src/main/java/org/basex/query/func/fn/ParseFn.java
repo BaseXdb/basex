@@ -23,14 +23,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public abstract class ParseFn extends StandardFunc {
-  /** Parse Options. */
-  public static final class ParseOptions extends Options {
-    /** Normalize-newlines option. */
-    public static final BooleanOption NORMALIZE_NEWLINES = new BooleanOption("normalize-newlines");
-    /** Encoding option. */
-    public static final StringOption ENCODING = CommonOptions.ENCODING;
-  }
-
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     return optFirst();
@@ -99,13 +91,13 @@ public abstract class ParseFn extends StandardFunc {
 
     // encoding
     final Options options = options(qc);
-    final String enc = toEncodingOrNull(options.get(ParseOptions.ENCODING), RESENCODING_X);
+    final String enc = toEncodingOrNull(options.get(CommonOptions.ENCODING), RESENCODING_X);
     final String encoding = enc != null ? enc : testResources != null ? testResources[1] : null;
 
     // newline normalization
-    Boolean normalize = options.get(ParseOptions.NORMALIZE_NEWLINES);
+    Boolean normalize = options.get(CommonOptions.NORMALIZE_NEWLINES);
     if(normalize != null) {
-      if(nl()) throw INVALIDOPTION_X.get(info, Options.unknown(ParseOptions.NORMALIZE_NEWLINES));
+      if(nl()) throw INVALIDOPTION_X.get(info, Options.unknown(CommonOptions.NORMALIZE_NEWLINES));
     } else {
       normalize = nl();
     }

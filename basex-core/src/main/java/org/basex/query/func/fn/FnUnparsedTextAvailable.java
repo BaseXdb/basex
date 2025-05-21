@@ -2,6 +2,7 @@ package org.basex.query.func.fn;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -21,6 +22,14 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class FnUnparsedTextAvailable extends ParseFn {
+  /** Parse Options. */
+  public static final class ParseOptions extends Options {
+    /** Normalize-newlines option. */
+    public static final BooleanOption NORMALIZE_NEWLINES = CommonOptions.NORMALIZE_NEWLINES;
+    /** Encoding option. */
+    public static final StringOption ENCODING = CommonOptions.ENCODING;
+  }
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try {

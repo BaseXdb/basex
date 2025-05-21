@@ -98,6 +98,6 @@ public final class FnReplace extends RegExFn {
 
   @Override
   public int hofIndex() {
-    return 4;
+    return 2;
   }
 }
