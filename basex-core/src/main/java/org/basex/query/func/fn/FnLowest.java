@@ -49,7 +49,7 @@ public class FnLowest extends StandardFunc {
         vb.add(it.type.isUntyped() ? Dbl.get(toDouble(it)) : it);
       }
       final Value low = vb.value();
-      int diff = FnSort.compare(lowest != null ? lowest : low, low, collation, info);
+      int diff = FnSortBy.compare(lowest != null ? lowest : low, low, collation, info);
       if(min) diff = -diff;
       if(diff > 0) continue;
       if(diff < 0) result.reset();

@@ -3,6 +3,7 @@ package org.basex.query.func.fn;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -54,6 +55,16 @@ public final class FnSortWith extends StandardFunc {
     // even single items must be sorted, as the input might be invalid
     final Expr input = arg(0);
     return input.seqType().zero() ? input : adoptType(input);
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    Expr expr = this;
+    if(mode == Simplify.COUNT) {
+      // count(sort(A))  -> count(A)
+      expr = arg(0);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   @Override
