@@ -760,8 +760,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _MAP_BUILD(MapBuild::new, "build(input[,keys,value,options])",
       params(ITEM_ZM, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE),
-      FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE),
-      MAP_ZO),
+      FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE), MAP_ZO),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_CONTAINS(MapContains::new, "contains(map,key)",
@@ -860,7 +859,7 @@ public enum Function implements AFunction {
       ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_GET(ArrayGet::new, "get(array,position[,default])",
-      params(ARRAY_O, INTEGER_O, ITEM_ZO), ITEM_ZM, ARRAY_URI),
+      params(ARRAY_O, INTEGER_O, ITEM_ZM), ITEM_ZM, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_HEAD(ArrayHead::new, "head(array)",
       params(ARRAY_O), ITEM_ZM, ARRAY_URI),
