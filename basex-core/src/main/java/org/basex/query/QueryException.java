@@ -38,7 +38,7 @@ public class QueryException extends Exception {
   /** Error types. */
   private static final SeqType[] TYPES = {
     SeqType.QNAME_O, SeqType.STRING_ZO, SeqType.ITEM_ZM, SeqType.STRING_ZO, SeqType.INTEGER_ZO,
-    SeqType.INTEGER_ZO, SeqType.STRING_O, SeqType.STRING_O, SeqType.MAP_O
+    SeqType.INTEGER_ZO, SeqType.ITEM_ZM, SeqType.STRING_O, SeqType.MAP_O
   };
   /** Error QNames. */
   private static final QNm[] QNAMES = new QNm[NAMES.length];
@@ -323,7 +323,7 @@ public class QueryException extends Exception {
     list.add(path() != null ? Str.get(path()) : Empty.VALUE);
     list.add(line() != 0 ? Int.get(line()) : Empty.VALUE);
     list.add(column() != 0 ? Int.get(column()) : Empty.VALUE);
-    list.add(trace);
+    list.add(Empty.VALUE);
     list.add(trace);
     list.add(map(list));
     return list;

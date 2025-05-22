@@ -26,9 +26,7 @@ public final class XQueryExtensionsTest extends SandboxTest {
 
   /** $err:additional. */
   @Test public void errAdditional() {
-    query("try { error() } catch * { count($err:additional) }", 1);
-    query("let $f := function () { error() } " +
-        "return try { $f() } catch * { count($err:additional) }", 1);
+    query("try { error() } catch * { count($err:stack-trace) }", 1);
     query("let $f := function () { error() } " +
         "return try { $f() } catch * { count($err:stack-trace) }", 1);
   }
