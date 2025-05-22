@@ -37,11 +37,11 @@ public final class UtilMapValueAt extends StandardFunc {
 
     SeqType st = null;
     final MapCompilation mc = MapCompilation.get(map).index(index);
-    if(mc.field == null) {
+    if(mc.field != null) {
+      if(!mc.record.hasOptional()) st = mc.field.seqType();
+    } else {
       // util:map-value-at({ 'a': 1 }, 2)  ->  ()
       if(mc.index != null) return Empty.VALUE;
-    } else if(!mc.record.hasOptional()) {
-      st = mc.field.seqType();
     }
     if(st == null && mc.mapType != null) st = mc.mapType.valueType().union(Occ.ZERO);
 

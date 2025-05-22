@@ -94,6 +94,9 @@ public final class MapModuleTest extends SandboxTest {
 
     check(func.args(empty) + " => map:keys()", "", empty());
     check(func.args(1) + " => map:keys()", 1, root(Int.class));
+
+    check("sum(" + func.args(" 1 to 10", " string#1") + " => map:items())",
+        55, type(func, "map(xs:string, xs:integer+)"));
   }
 
   /** Test method. */
@@ -457,6 +460,9 @@ public final class MapModuleTest extends SandboxTest {
     check(func.args(" { 'key': 1, 'value': 2 }") + " => map:keys()", 1, root(Int.class));
 
     query(func.args(" { 'key': 1, 'value': 2, 'more': 3 }"), "{1:2}");
+
+    check("map:build(1 to 10, string#1) => map:pairs() => " + func.args() + " => map:size()",
+        10, type(func, "map(xs:string, xs:integer+)"));
   }
 
   /** Test method. */
@@ -469,6 +475,9 @@ public final class MapModuleTest extends SandboxTest {
     query(func.args(" { 1: (2, 3) }") + "?value", "2\n3");
     query(func.args(" { 1: 2, 3: 4 }") + "?key", "1\n3");
     query(func.args(" { 1: 2, 3: 4 }") + "?value", "2\n4");
+
+    check("map:build(1 to 10, string#1) => " + func.args() + " => count()",
+        10, type(func, "(record(key as xs:string, value as xs:integer+))*"));
   }
 
   /** Test method. */
@@ -527,7 +536,7 @@ public final class MapModuleTest extends SandboxTest {
     check(func.args(_MAP_ENTRY.args(1, wrap(0)), 1), "{}",
         type(func, "map(xs:integer, xs:untypedAtomic)"));
     check(func.args(_MAP_ENTRY.args(1, wrap(0)), "a"), "{1:\"0\"}",
-        type(func, "map(xs:integer, xs:untypedAtomic)"));
+        empty(func));
 
     String record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
@@ -546,6 +555,10 @@ public final class MapModuleTest extends SandboxTest {
         type(func, "map(*)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
         type(func, "local:x"));
+
+    // GH-2438
+    query("let $f := fn($map) { fold-left(map:keys($map), $map, map:remove#2) } " +
+        "return $f({ 'a': () })", "{}");
   }
 
   /** Test method. */

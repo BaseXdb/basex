@@ -41,7 +41,7 @@ public class FnFoldLeft extends StandardFunc {
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean skip(final QueryContext qc, final HofArgs args) throws QueryException {
+  protected final boolean skip(final QueryContext qc, final HofArgs args) throws QueryException {
     return iff != null && test(iff[0], args, qc);
   }
 
@@ -68,7 +68,7 @@ public class FnFoldLeft extends StandardFunc {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  public final Expr unroll(final CompileContext cc, final boolean left) throws QueryException {
+  final Expr unroll(final CompileContext cc, final boolean left) throws QueryException {
     final Expr input = arg(0), init = arg(1), action = arg(2);
     final int arity = arity(action);
     if(arity == 2) {
@@ -99,7 +99,7 @@ public class FnFoldLeft extends StandardFunc {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  public final Expr optType(final CompileContext cc, final boolean array, final boolean left)
+  protected final Expr optType(final CompileContext cc, final boolean array, final boolean left)
       throws QueryException {
 
     final Expr input = arg(0), init = arg(1), action = arg(2);

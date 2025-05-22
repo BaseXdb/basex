@@ -40,18 +40,23 @@ public final class MapGet extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = arg(0), key = arg(1);
     final boolean dflt = defined(2);
+    if(map == XQMap.empty()) return dflt ? arg(2) : Empty.VALUE;
 
     final MapCompilation mc = MapCompilation.get(map).key(key);
     if(mc.key != null) {
-      if(mc.field == null) {
-        // map:get({ 'a': 1, 'a': 2 }, 'c')  ->  ()
-        if(!mc.record.isExtensible() && !dflt) return Empty.VALUE;
-      } else if(!mc.record.hasOptional()) {
+      if(mc.field != null) {
         // map:get({ 'a': 1, 'b': 2 }, 'b')  ->  util:map-value-at({ 'a': 1, 'b': 2 }, 2)
-        return cc.function(_UTIL_MAP_VALUE_AT, info, map, Int.get(mc.index), arg(3));
+        if(!mc.record.hasOptional())
+          return cc.function(_UTIL_MAP_VALUE_AT, info, map, Int.get(mc.index), arg(3));
+      } else {
+        // map:get({ 'a': 1 }, 'b')  ->  ()
+        if(!mc.record.isExtensible()) return dflt ? arg(2) : Empty.VALUE;
       }
     }
     if(mc.mapType != null) {
+      // map:get({ 1: 1 }, 'string')  ->  ()
+      if(mc.keyMismatch) return dflt ? arg(2) : Empty.VALUE;
+
       SeqType st = mc.mapType.valueType();
       st = dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO);
       // invalidate function type (%method annotation would need to be removed from type)

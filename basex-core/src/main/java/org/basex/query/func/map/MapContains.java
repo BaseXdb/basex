@@ -34,11 +34,16 @@ public final class MapContains extends StandardFunc {
 
     final MapCompilation mc = MapCompilation.get(map).key(key);
     if(mc.key != null) {
-      if(mc.field == null) {
+      if(mc.field != null) {
+        if(!mc.field.isOptional()) return Bln.TRUE;
+      } else {
         if(!mc.record.isExtensible()) return Bln.FALSE;
-      } else if(!mc.field.isOptional()) {
-        return Bln.TRUE;
       }
+    }
+
+    if(mc.mapType != null) {
+      // map:contains({ 1: 1 }, 'string')  ->  false()
+      if(mc.keyMismatch) return Bln.FALSE;
     }
     return this;
   }

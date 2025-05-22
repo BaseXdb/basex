@@ -26,11 +26,13 @@ public final class MapCompilation {
   public RecordField field;
   /** Record field index ({@code 0} if statically unknown, or if key is unknown). */
   public Integer index;
+  /** Key type mismatch. */
+  public boolean keyMismatch;
 
   /**
-   * Returns type information for the specified map and key.
+   * Returns compile-time information for the specified map.
    * @param map map expression
-   * @return record information
+   * @return map information
    */
   public static MapCompilation get(final Expr map) {
     final MapCompilation mi = new MapCompilation();
@@ -51,17 +53,21 @@ public final class MapCompilation {
   public MapCompilation key(final Expr expr) throws QueryException {
     if(record != null) {
       final Type kt = expr.seqType().type;
-      if(kt.isStringOrUntyped()) {
-        if(expr instanceof final Item item) {
+      if(expr instanceof final Item item) {
+        if(kt.isStringOrUntyped()) {
           final TokenObjectMap<RecordField> fields = record.fields();
           final byte[] k = item.string(null);
           index = fields.index(k);
           field = fields.get(k);
-          key = field != null ? k : EXTENDED;
+          if(field != null) key = k;
         }
-      } else if(kt.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
-        key = EXTENDED;
+        if(key == null && kt.instanceOf(AtomType.ANY_ATOMIC_TYPE)) key = EXTENDED;
       }
+    }
+    if(mapType != null) {
+      final Type et = expr.seqType().type.atomic(), kt = mapType.keyType();
+      keyMismatch = et != null && (kt.isStringOrUntyped() && et.isNumber() ||
+        kt.isNumber() && et.isStringOrUntyped());
     }
     return this;
   }

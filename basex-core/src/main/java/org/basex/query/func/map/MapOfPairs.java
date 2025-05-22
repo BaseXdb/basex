@@ -37,9 +37,16 @@ public final class MapOfPairs extends MapMerge {
   protected Expr opt(final CompileContext cc) throws QueryException {
     prepareMerge(1, Duplicates.COMBINE, cc);
 
-    final Type type = arg(0).seqType().type;
-    if(type instanceof final MapType mt) {
-      final SeqType vt = mt.valueType();
+    RecordField key = null, value = null;
+    final MapCompilation mc = MapCompilation.get(arg(0));
+    if(mc.record != null) {
+      key = mc.record.fields().get(Str.KEY.string());
+      value = mc.record.fields().get(Str.VALUE.string());
+    }
+    if(key != null && value != null) {
+      assignType(key.seqType().type, value.seqType());
+    } else if(mc.mapType != null) {
+      final SeqType vt = mc.mapType.valueType();
       assignType(vt.type.atomic(), vt);
     }
     return this;

@@ -35,15 +35,14 @@ public final class MapPut extends StandardFunc {
     Type type = null;
     final MapCompilation mc = MapCompilation.get(map).key(key);
     if(mc.key != null) {
-      // try to propagate record type
-      if(mc.field == null || mc.key == MapCompilation.EXTENDED) {
-        if(mc.record.isExtensible()) type = mc.record;
-      } else {
+      if(mc.field != null) {
         // map:put({ 'a': 1, 'b': 2 }, 'b', 3)  ->  util:map-put-at({ 'a': 1, 'b': 2 }, 2, 3)
-        if(!mc.record.hasOptional()) {
+        if(!mc.record.hasOptional())
           return cc.function(_UTIL_MAP_PUT_AT, info, map, Int.get(mc.index), value);
-        }
         if(value.seqType().instanceOf(mc.field.seqType())) type = mc.record;
+      } else {
+        // try to propagate record type
+        if(mc.record.isExtensible()) type = mc.record;
       }
     }
 

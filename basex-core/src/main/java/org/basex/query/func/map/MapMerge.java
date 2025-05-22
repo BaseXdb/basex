@@ -160,7 +160,7 @@ public class MapMerge extends StandardFunc {
 
   /**
    * Assigns a map type for this expression.
-   * @param kt key type
+   * @param kt key type (can be {@code null})
    * @param vt value type
    */
   final void assignType(final Type kt, final SeqType vt) {
