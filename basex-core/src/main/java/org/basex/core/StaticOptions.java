@@ -72,7 +72,7 @@ public final class StaticOptions extends Options {
   /** Log remove pattern. */
   public static final StringOption LOGCUT = new StringOption("LOGCUT", "");
   /** Log message cut-off. */
-  public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 1000);
+  public static final NumberOption LOGMSGMAXLEN = new NumberOption("LOGMSGMAXLEN", 5000);
   /** Write trace output to the logs. */
   public static final BooleanOption LOGTRACE = new BooleanOption("LOGTRACE", true);
   /** Mask IP address in the logs. */
