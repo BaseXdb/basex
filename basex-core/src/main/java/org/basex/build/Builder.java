@@ -119,10 +119,10 @@ public abstract class Builder extends Job {
     nspaces.close(meta.size);
 
     // check if data ranges exceed database limits, based on the storage details in {@link Data}
-    limit(elemNames.size(), 0x8000, LIMITELEMS);
-    limit(attrNames.size(), 0x8000, LIMITATTS);
-    limit(nspaces.size(), 0x100, LIMITNS);
-    if(meta.size < 0) limit(0, 0, LIMITRANGE);
+    checkLimit(elemNames.size(), 0x8000, LIMITELEMS);
+    checkLimit(attrNames.size(), 0x8000, LIMITATTS);
+    checkLimit(nspaces.size(), 0x100, LIMITNS);
+    if(meta.size < 0) checkLimit(0, 0, LIMITRANGE);
   }
 
   /**
@@ -330,7 +330,8 @@ public abstract class Builder extends Job {
    * @param message error message
    * @throws IOException I/O exception
    */
-  private void limit(final int value, final int limit, final String message) throws IOException {
+  private void checkLimit(final int value, final int limit, final String message)
+      throws IOException {
     if(value >= limit) throw new BuildException(message, parser.detailedInfo(), limit);
   }
 

@@ -47,6 +47,7 @@ abstract class NodeCopy extends NodeUpdate {
     final int start = memData.meta.size;
     new DataBuilder(memData, qc).build(list);
     insseq = new DataClip(memData, start, memData.meta.size, list.size());
+    checkLimit(insseq.size());
   }
 
   /**
