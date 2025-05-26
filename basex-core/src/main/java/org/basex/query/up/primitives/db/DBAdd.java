@@ -51,6 +51,7 @@ public final class DBAdd extends DBUpdate {
   public void prepare() throws QueryException {
     size = newDocs.inputs.size();
     clip = newDocs.prepare(data.meta.name, false);
+    checkLimit(clip.size());
   }
 
   @Override
