@@ -9,6 +9,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -35,7 +36,10 @@ public final class FnElementToMap extends PlanFn {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode element = toElem(arg(0), qc);
+    final Item element = arg(0).item(qc, info);
+    if(element.isEmpty()) return Empty.VALUE;
+
+    final ANode elem = toElem(element, qc);
     final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), qc);
 
     final Plan plan = new Plan();
@@ -94,7 +98,7 @@ public final class FnElementToMap extends PlanFn {
     }
 
     // create result
-    final Item value = entry(element, plan).apply(element, null, plan, qc);
-    return value.isEmpty() ? value : XQMap.get(Str.get(nodeName(element, null, plan, qc)), value);
+    final Item value = entry(elem, plan).apply(elem, null, plan, qc);
+    return value.isEmpty() ? value : XQMap.get(Str.get(nodeName(elem, null, plan, qc)), value);
   }
 }

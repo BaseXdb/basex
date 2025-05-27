@@ -1129,8 +1129,6 @@ public enum QueryError {
   /** Error code. */
   EXP_FOUND_X_X(XPTY, 4, "% expected, % found."),
   /** Error code. */
-  EXP_FOUND_X_X_X(XPTY, 4, "% expected, % found: %."),
-  /** Error code. */
   BINARY_X(XPTY, 4, "Binary expected, % found."),
   /** Error code. */
   STRBIN_X_X(XPTY, 4, "String or binary expected, % found: %."),
@@ -1732,7 +1730,7 @@ public enum QueryError {
       expected = "Number, string, boolean, URI or nodes";
       found = value.itemAt(0).seqType().toString();
     }
-    return (pos ? EXP_FOUND_X_X_X : ARGTYPE_X_X_X).get(info, expected, found, value);
+    return ARGTYPE_X_X_X.get(info, expected, found, value);
   }
 
   /**
