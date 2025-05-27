@@ -317,7 +317,6 @@ public final class HTTPConnection implements ClientInfo {
    * @param body message for response body (can be {@code null})
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("deprecation")
   public void status(final int code, final String message, final String body) throws IOException {
     try {
       response.resetBuffer();
