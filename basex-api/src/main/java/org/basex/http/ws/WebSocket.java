@@ -23,7 +23,7 @@ import org.eclipse.jetty.ee9.websocket.api.*;
 import org.eclipse.jetty.ee9.websocket.api.Session;
 import org.eclipse.jetty.ee9.websocket.api.StatusCode;
 import org.eclipse.jetty.ee9.websocket.api.UpgradeRequest;
-import org.eclipse.jetty.websocket.api.exceptions.*;
+import org.eclipse.jetty.ee9.websocket.api.exceptions.*;
 
 /**
  * This class defines an abstract WebSocket. It inherits the Jetty WebSocket adapter.
