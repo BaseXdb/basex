@@ -85,7 +85,7 @@ public class XMLInput extends InputStream {
     if(spaces) add(new NewlineInput(Token.cpToken(' ')));
     add(new NewlineInput(value));
     if(spaces) add(new NewlineInput(Token.cpToken(' ')));
-    return ++exp < 32000 && ip < 32;
+    return ++exp < (1 << 20) && ip < 32;
   }
 
   /**
