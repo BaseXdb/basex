@@ -41,6 +41,8 @@ public interface HTTPText {
   /** HTTP header string. */
   String CONTENT_ENCODING = "Content-Encoding";
   /** HTTP header string. */
+  String USER_AGENT = "User-Agent";
+  /** HTTP header string. */
   String CONTENT_TYPE = "Content-Type";
   /** HTTP header string. */
   String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";

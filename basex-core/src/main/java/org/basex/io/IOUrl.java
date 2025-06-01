@@ -139,6 +139,8 @@ public final class IOUrl extends IO {
       final URI uri = new URI(pth);
       final HttpRequest.Builder rb = HttpRequest.newBuilder(uri).timeout(Duration.ofMinutes(1));
       rb.header(HTTPText.ACCEPT, MediaType.ALL_ALL.toString());
+      rb.header(HTTPText.USER_AGENT, Prop.NAME + '/' + Prop.VERSION.replace(' ', '-') +
+          " (Java " + Prop.JAVA_VERSION + "; " + Prop.OS + " " + Prop.OS_ARCH + ')');
       new UserInfo(uri).basic(rb);
       response = client.send(rb.build(), HttpResponse.BodyHandlers.ofInputStream());
     } catch(final IOException ex) {
