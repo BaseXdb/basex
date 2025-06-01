@@ -34,7 +34,13 @@ public final class Prop {
   public static final String NL = System.lineSeparator();
   /** Returns the system's default character set. */
   public static final Charset CHARSET = Charset.defaultCharset();
-  /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
+  /** Java vendor. */
+  public static final String JAVA_VENDOR = System.getProperty("java.vendor");
+  /** Java version. */
+  public static final String JAVA_VERSION = System.getProperty("java.version");
+  /** OS architecture. */
+  public static final String OS_ARCH = System.getProperty("os.arch");
+  /** OS flag. */
   public static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.startsWith("Mac");

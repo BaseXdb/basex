@@ -38,14 +38,12 @@ public final class Util {
    * @return dummy object
    */
   public static String bug(final Throwable throwable) {
-    final TokenBuilder tb = new TokenBuilder().add(S_BUGINFO);
-    tb.add(NL).add("Contact: ").add(MAILING_LIST);
-    tb.add(NL).add("Version: ").add(TITLE);
-    tb.add(NL).add("Java: ").add(System.getProperty("java.vendor"));
-    tb.add(", ").add(System.getProperty("java.version"));
-    tb.add(NL).add("OS: ").add(System.getProperty("os.name"));
-    tb.add(", ").add(System.getProperty("os.arch"));
-    tb.add(NL).add("Stack Trace: ");
+    final TokenBuilder tb = new TokenBuilder().add(S_BUGINFO).add(NL);
+    tb.add("Contact: ").add(MAILING_LIST).add(NL);
+    tb.add("Version: ").add(TITLE).add(NL);
+    tb.add("Java: ").add(Prop.JAVA_VENDOR).add(", ").add(Prop.JAVA_VERSION).add(NL);
+    tb.add("OS: ").add(Prop.OS).add(", ").add(Prop.OS_ARCH).add(NL);
+    tb.add("Stack Trace:");
     for(final String string : toArray(throwable)) tb.add(NL).add(string);
     return tb.toString();
   }
