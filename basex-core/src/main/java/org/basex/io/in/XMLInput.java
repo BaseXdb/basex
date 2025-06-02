@@ -85,7 +85,7 @@ public class XMLInput extends InputStream {
     if(spaces) add(new NewlineInput(Token.cpToken(' ')));
     add(new NewlineInput(value));
     if(spaces) add(new NewlineInput(Token.cpToken(' ')));
-    return ++exp < (1 << 20) && ip < 32;
+    return ++exp < (inputs[0].size() + 1) * 10 && ip < 32;
   }
 
   /**
@@ -106,7 +106,7 @@ public class XMLInput extends InputStream {
    * Returns the current file position.
    * @return file position
    */
-  public int pos() {
+  public long pos() {
     return Math.max(ip, inputs[ip].size() + pp);
   }
 

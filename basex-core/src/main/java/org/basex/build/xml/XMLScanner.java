@@ -699,7 +699,7 @@ final class XMLScanner extends Job {
           if(ch != '?') throw error(WRONGCHAR, '?', ch);
           ch = nextChar();
           if(ch != '>') throw error(WRONGCHAR, '>', ch);
-          content = Arrays.copyOfRange(content, input.pos(), content.length);
+          content = Arrays.copyOfRange(content, (int) input.pos(), content.length);
         }
 
         s();

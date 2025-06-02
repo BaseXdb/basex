@@ -28,7 +28,7 @@ public class BufferInput extends InputStream {
   /** Buffer marker to jump back ({@code -1} if not available). */
   private int bmark;
   /** Number of read bytes. */
-  private int read;
+  private long read;
 
   /**
    * Returns a buffered input stream.
@@ -167,7 +167,7 @@ public class BufferInput extends InputStream {
    * Returns the number of read bytes.
    * @return read bytes
    */
-  public final int size() {
+  public final long size() {
     return read + bpos;
   }
 
