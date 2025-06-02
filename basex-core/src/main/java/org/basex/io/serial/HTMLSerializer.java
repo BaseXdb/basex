@@ -96,10 +96,10 @@ final class HTMLSerializer extends MarkupSerializer {
     // don't append value for boolean attributes
     byte[] val = value;
     if(!BOOLEAN.isEmpty() || !URIS.isEmpty()) {
-      final byte[] nm = concat(lc(elem.string()), ATT, lc(name));
-      if(BOOLEAN.contains(nm) && eq(name, val)) return;
+      final byte[] key = concat(lc(elem.string()), ATT, lc(name));
+      if(BOOLEAN.contains(key) && eq(lc(name), lc(val))) return;
       // escape URI attributes
-      if(escape && URIS.contains(nm)) val = encodeUri(val, UriEncoder.ESCAPE);
+      if(escape && URIS.contains(key)) val = encodeUri(val, UriEncoder.ESCAPE);
     }
 
     out.print(ATT1);
