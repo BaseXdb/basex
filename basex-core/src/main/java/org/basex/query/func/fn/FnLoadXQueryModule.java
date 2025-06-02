@@ -84,7 +84,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
       mqc.finalContext = false;
       try {
         final String path = src.path(), content = src.readString();
-        mqc.parse(content, path.isEmpty() ? Token.string(info.sc().baseURI().string()) : path);
+        mqc.parse(content, path.isEmpty() ? Token.string(sc().baseURI().string()) : path);
       } catch(final IOException ex) {
         Util.debug(ex);
         throw WHICHMODFILE_X.get(info, src);
@@ -108,7 +108,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
           throw ex.error() != INVCONVERT_X_X_X ? ex : MODULE_CONTEXT_TYPE_X_X.get(info, modUri,
               ex.getLocalizedMessage());
         }
-        mqc.contextValue = new ContextScope(val, mqc.contextType, new VarScope(), info.sc(), null,
+        mqc.contextValue = new ContextScope(val, mqc.contextType, new VarScope(), sc(), null,
             null);
         mqc.finalContext = true;
       }

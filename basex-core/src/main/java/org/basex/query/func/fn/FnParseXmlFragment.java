@@ -69,7 +69,7 @@ public class FnParseXmlFragment extends Docs {
     check(options, fragment, qc);
 
     final String baseURI = options.contains(CommonOptions.BASE_URI) ?
-      options.get(CommonOptions.BASE_URI) : string(info.sc().baseURI().string());
+      options.get(CommonOptions.BASE_URI) : string(sc().baseURI().string());
     final String encoding = value instanceof Bin ? null : Strings.UTF8;
     final IO io = new IOContent(toBytes(value), baseURI, encoding);
 

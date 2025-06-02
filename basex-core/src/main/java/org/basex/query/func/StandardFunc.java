@@ -463,7 +463,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final IO toIO(final String uri, final boolean content) throws QueryException {
-    final IO io = info.sc().resolve(uri);
+    final IO io = sc().resolve(uri);
     if(io instanceof IOContent) {
       if(!content) throw RESURI_X.get(info, uri);
     } else {
@@ -518,7 +518,7 @@ public abstract class StandardFunc extends Arr {
       final StringOption option) {
     final String base = options.get(option);
     return base != null && !base.isEmpty() ? base :
-      path != null && !path.isEmpty() ? path : string(info.sc().baseURI().string());
+      path != null && !path.isEmpty() ? path : string(sc().baseURI().string());
   }
 
   /**

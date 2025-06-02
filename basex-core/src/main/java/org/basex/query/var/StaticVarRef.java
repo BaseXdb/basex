@@ -107,7 +107,7 @@ final class StaticVarRef extends ParseExpr {
    * @throws QueryException query exception
    */
   void init(final StaticVar vr) throws QueryException {
-    if(vr.anns.contains(Annotation.PRIVATE) && !info.sc().baseURI().eq(vr.sc.baseURI()))
+    if(vr.anns.contains(Annotation.PRIVATE) && !sc().baseURI().eq(vr.sc.baseURI()))
       throw VARPRIVATE_X.get(info, this);
     var = vr;
   }

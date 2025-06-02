@@ -85,7 +85,7 @@ public abstract class ParseFn extends StandardFunc {
     if(source == null) return Empty.VALUE;
 
     // input
-    final String[] testResources = qc.resources.text(source, info.sc());
+    final String[] testResources = qc.resources.text(source, sc());
     final IO io = testResources != null ? IO.get(testResources[0]) :
       input != null ? input : toIO(source, false);
 

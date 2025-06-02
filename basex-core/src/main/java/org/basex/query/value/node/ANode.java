@@ -1,5 +1,6 @@
 package org.basex.query.value.node;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.util.DeepEqualOptions.*;
 import static org.basex.query.value.type.NodeType.*;
 
@@ -17,7 +18,6 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
@@ -136,9 +136,9 @@ public abstract class ANode extends Item {
     // compare base URIs
     if(options.get(BASE_URI)) {
       if(deep.nested) return Token.eq(node1.baseURI(), node2.baseURI());
-      final Uri uri1 = FnBaseUri.uri(node1, Uri.EMPTY, deep.info);
-      final Uri uri2 = FnBaseUri.uri(node2, Uri.EMPTY, deep.info);
-      if(uri1 == null ? uri2 != null : uri2 == null || !uri1.eq(uri2)) return false;
+      final Uri uri1 = node1.baseURI(Uri.EMPTY, true, deep.info);
+      final Uri uri2 = node2.baseURI(Uri.EMPTY, true, deep.info);
+      if(!uri1.eq(uri2)) return false;
     }
     if(type1 == ELEMENT) {
       // compare attributes
@@ -357,6 +357,33 @@ public abstract class ANode extends Item {
    */
   public byte[] baseURI() {
     return Token.EMPTY;
+  }
+
+  /**
+   * Returns the static base URI of a node.
+   * @param base static base URI
+   * @param empty return empty URI if a node has no base URI, or {@code null} otherwise
+   * @param info input info (can be {@code null})
+   * @return base URI or {@code null}
+   * @throws QueryException query exception
+   */
+  public Uri baseURI(final Uri base, final boolean empty, final InputInfo info)
+      throws QueryException {
+
+    if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE) && parent() == null) {
+      return empty ? Uri.EMPTY : null;
+    }
+    Uri uri = Uri.EMPTY;
+    ANode nd = this;
+    do {
+      if(nd == null) return base.resolve(uri, info);
+      final Uri bu = Uri.get(nd.baseURI(), false);
+      if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
+      uri = bu.resolve(uri, info);
+      if(nd.type == NodeType.DOCUMENT_NODE && nd instanceof DBNode) break;
+      nd = nd.parent();
+    } while(!uri.isAbsolute());
+    return uri;
   }
 
   /**

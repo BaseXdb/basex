@@ -149,7 +149,7 @@ public final class CElem extends CName {
       // return optimized node
       return elem.finish();
     } finally {
-      info.sc().ns.size(s);
+      sc().ns.size(s);
     }
   }
 
@@ -164,7 +164,7 @@ public final class CElem extends CName {
    * @return old position in namespace stack
    */
   private int addNS() {
-    final NSContext nsContext = info.sc().ns;
+    final NSContext nsContext = sc().ns;
     final int size = nsContext.size(), ns = nspaces.size();
     for(int n = 0; n < ns; n++) nsContext.add(nspaces.name(n), nspaces.value(n));
     return size;
