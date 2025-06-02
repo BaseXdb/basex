@@ -53,7 +53,8 @@ public class XsltTransform extends XsltFn {
    * @throws QueryException query exception
    */
   final Item transform(final QueryContext qc, final boolean simple) throws QueryException {
-    final IO input = read(arg(0), qc), stylesheet = read(arg(1), qc);
+    final IO input = read(arg(0), qc);
+    final IO stylesheet = read(arg(1), qc);
     final HashMap<String, String> arguments = toOptions(arg(2), qc);
     final XsltOptions options = toOptions(arg(3), new XsltOptions(), qc);
 
@@ -137,9 +138,8 @@ public class XsltTransform extends XsltFn {
     final Item item = toNodeOrAtomItem(expr, false, qc);
     if(item instanceof final ANode node) {
       try {
-        final IO io = new IOContent(item.serialize().finish());
-        io.name(string(node.baseURI()));
-        return io;
+        final Uri base = node.baseURI(sc().baseURI(), true, info);
+        return new IOContent(item.serialize().finish(), string(base.string()));
       } catch(final QueryIOException ex) {
         throw ex.getCause(info);
       }
