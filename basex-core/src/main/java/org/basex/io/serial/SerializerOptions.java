@@ -48,7 +48,7 @@ public final class SerializerOptions extends Options {
       new EnumOption<>("escape-solidus", YesNo.YES);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> ESCAPE_URI_ATTRIBUTES =
-      new EnumOption<>("escape-uri-attributes", YesNo.NO);
+      new EnumOption<>("escape-uri-attributes", YesNo.YES);
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> INCLUDE_CONTENT_TYPE =
       new EnumOption<>("include-content-type", YesNo.YES);

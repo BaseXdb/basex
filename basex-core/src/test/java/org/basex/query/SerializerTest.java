@@ -78,6 +78,18 @@ public final class SerializerTest extends SandboxTest {
         + "         style=\"width: 42px\"></div>\n"
         + "  </body>\n"
         + "</html>");
+    // URI escaping enabled: href and name will be percent-encoded
+    query(option
+        + "<html xmlns='http://www.w3.org/1999/xhtml'><body><a href='\u8f49\u7fa9.html'"
+        + " name='\u8f49\u7fa9'>Link</a></body></html>",
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><body><a href=\"%E8%BD%89%E7%BE%A9.html\""
+        + " name=\"%E8%BD%89%E7%BE%A9\">Link</a></body></html>");
+    // URI escaping disabled: raw Unicode is preserved
+    query(option + ESCAPE_URI_ATTRIBUTES.arg("no")
+        + "<html xmlns='http://www.w3.org/1999/xhtml'><body><a href='\u672a\u8f49\u7fa9.html'"
+        + " name='\u672a\u8f49\u7fa9'>Link</a></body></html>",
+        "<html xmlns=\"http://www.w3.org/1999/xhtml\"><body><a href=\"\u672a\u8f49\u7fa9.html\""
+        + " name=\"\u672a\u8f49\u7fa9\">Link</a></body></html>");
   }
 
   /** method=xhtml, meta element. */
