@@ -21,7 +21,7 @@ public interface CommonOptions {
   /** Internal option: {@link MainOptions#DTDVALIDATION}. */
   BooleanOption DTD_VALIDATION = new BooleanOption("dtd-validation", false);
   /** Internal option: {@link MainOptions#ENTEXPANSION}. */
-  NumberOption ENTITY_EXPANSION_LIMIT = new NumberOption("entity-expansion-limit", 64000);
+  NumberOption ENTITY_EXPANSION_LIMIT = new NumberOption("entity-expansion-limit", -1);
   /** Internal option: {@link MainOptions#STRIPNS}. */
   BooleanOption STRIP_SPACE = new BooleanOption("strip-space", false);
   /** Internal option: {@link MainOptions#XINCLUDE}. */

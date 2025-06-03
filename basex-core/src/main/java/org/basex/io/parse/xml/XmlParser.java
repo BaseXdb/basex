@@ -61,7 +61,7 @@ public final class XmlParser {
   public static XMLReader reader(final MainOptions options)
       throws SAXException, ParserConfigurationException {
 
-    final Integer entExpansion = options.get(MainOptions.ENTEXPANSION);
+    final int entExpansion = options.get(MainOptions.ENTEXPANSION);
     final boolean extEntities = options.get(MainOptions.EXTERNALENT);
     final boolean dtd = options.get(MainOptions.DTD);
     final boolean dtdValidation = options.get(MainOptions.DTDVALIDATION);
@@ -87,7 +87,8 @@ public final class XmlParser {
       f.setSchema(sf.newSchema());
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
-    xr.setProperty("http://www.oracle.com/xml/jaxp/properties/entityExpansionLimit", entExpansion);
+    if(entExpansion != -1) xr.setProperty(
+        "http://www.oracle.com/xml/jaxp/properties/entityExpansionLimit", entExpansion);
     if(xsdValidation && !xsiLocation || !extEntities) {
       xr.setEntityResolver((pubId, sysId) -> {
         throw new SAXException("External access not allowed: " + sysId);

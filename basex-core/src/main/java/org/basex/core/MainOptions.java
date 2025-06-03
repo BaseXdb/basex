@@ -60,7 +60,7 @@ public final class MainOptions extends Options {
   /** Whether external entities are permitted or rejected. */
   public static final BooleanOption EXTERNALENT = new BooleanOption("EXTENTITIES", true);
   /** Limit on the maximum number of entity references that may be expanded. */
-  public static final NumberOption ENTEXPANSION = new NumberOption("ENTEXPANSION", 1 << 20);
+  public static final NumberOption ENTEXPANSION = new NumberOption("ENTEXPANSION", -1);
   /** Flag for parsing DTDs. */
   public static final BooleanOption DTD = new BooleanOption("DTD", false);
   /** Flag for DTD validation. */
