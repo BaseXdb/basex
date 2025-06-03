@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -33,7 +34,14 @@ public final class ProfType extends StandardFunc {
    * @return info string
    */
   private static String info(final Expr expr) {
-    return "Type: " + expr.seqType() + ", size: " + expr.size() + ", class: " +
-        Util.className(expr);
+    String info = "Type: " + expr.seqType() + ", ";
+    if(expr instanceof XQStruct struct) {
+      final long sz = struct.structSize();
+      info += sz + " entr" + (sz != 1 ? "ies" : "y");
+    } else {
+      final long sz = expr.size();
+      info += sz + " item" + (sz != 1 ? "s" : "");
+    }
+    return info + ", class: " + Util.className(expr);
   }
 }
