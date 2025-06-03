@@ -436,37 +436,30 @@ public final class MixedTest extends SandboxTest {
       System.setErr(new PrintStream(ao));
       // inspection
       checkType(ao, "('A', 'B', 'A', 'B', 'A', 'B')",
-          "Type: xs:string+, size: 6, class: StrSeq");
+          "xs:string+, 6 items, StrSeq");
       checkType(ao, "(1, 3, 1, 3, 1, 3)",
-          "Type: xs:integer+, size: 6, class: IntSeq");
+          "xs:integer+, 6 items, IntSeq");
       checkType(ao, "data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
-          "Type: xs:untypedAtomic+, size: 6, class: StrSeq");
+          "xs:untypedAtomic+, 6 items, StrSeq");
 
       // filters
       checkType(ao, "('A', 'B', 'A', 'B', 'A', 'B')[not(. = 'C')]",
-          "Type: xs:string*, size: -1, class: IterFilter -> "
-          + "Type: xs:string+, size: 6, class: StrSeq");
+          "xs:string*, n items, IterFilter -> xs:string+, 6 items, StrSeq");
       checkType(ao, "data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))"
           + "[not(. = 'C')]",
-          "Type: xs:untypedAtomic*, size: -1, class: IterFilter -> "
-          + "Type: xs:untypedAtomic+, size: 6, class: StrSeq");
+          "xs:untypedAtomic*, n items, IterFilter -> xs:untypedAtomic+, 6 items, StrSeq");
       checkType(ao, "(1, 3, 1, 3, 1, 3)[not(. = 2)]",
-          "Type: xs:integer*, size: -1, class: IterFilter -> "
-          + "Type: xs:integer+, size: 6, class: IntSeq");
+          "xs:integer*, n items, IterFilter -> xs:integer+, 6 items, IntSeq");
 
       // map operator
       checkType(ao, "(1 to 6) ! string()",
-          "Type: xs:string+, size: 6, class: DualMap -> "
-          + "Type: xs:string+, size: 6, class: StrSeq");
+          "xs:string+, 6 items, DualMap -> xs:string+, 6 items, StrSeq");
       checkType(ao, "(1 to 6) ! xs:untypedAtomic()",
-          "Type: xs:untypedAtomic+, size: 6, class: DualMap -> "
-          + "Type: xs:untypedAtomic+, size: 6, class: StrSeq");
+          "xs:untypedAtomic+, 6 items, DualMap -> xs:untypedAtomic+, 6 items, StrSeq");
       checkType(ao, "(1 to 6) ! ('0' || .) ! xs:integer()",
-          "Type: xs:integer+, size: 6, class: DualMap -> "
-          + "Type: xs:integer+, size: 6, class: RangeSeq");
+          "xs:integer+, 6 items, DualMap -> xs:integer+, 6 items, RangeSeq");
       checkType(ao, "(1, 3, 1, 3, 1, 3) ! ('0' || .) ! xs:integer()",
-          "Type: xs:integer+, size: 6, class: DualMap -> "
-          + "Type: xs:integer+, size: 6, class: IntSeq");
+          "xs:integer+, 6 items, DualMap -> xs:integer+, 6 items, IntSeq");
     } finally {
       System.setErr(ERR);
     }

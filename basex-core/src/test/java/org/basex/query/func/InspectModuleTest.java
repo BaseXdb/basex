@@ -224,9 +224,9 @@ public final class InspectModuleTest extends SandboxTest {
     try {
       final ArrayOutput ao = new ArrayOutput();
       System.setErr(new PrintStream(ao));
-      checkType(ao, "()", "Type: empty-sequence(), size: 0, class: Empty");
-      checkType(ao, "1", "Type: xs:integer, size: 1, class: Int");
-      checkType(ao, "1 to 6", "Type: xs:integer+, size: 6, class: RangeSeq");
+      checkType(ao, "()", "empty-sequence(), 0 items, Empty");
+      checkType(ao, "1", "xs:integer, Int");
+      checkType(ao, "1 to 6", "xs:integer+, 6 items, RangeSeq");
     } finally {
       System.setErr(ERR);
     }
