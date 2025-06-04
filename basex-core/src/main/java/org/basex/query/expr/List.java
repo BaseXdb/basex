@@ -250,9 +250,6 @@ public final class List extends Arr {
       } else if(seqType().type == AtomType.INTEGER) {
         // merge numbers and ranges
         expr = toRange();
-      } else {
-        // otherwise, rewrite list to union
-        expr = toUnion(cc);
       }
     } else {
       final Expr[] ex = simplifyAll(mode, cc);
@@ -277,27 +274,28 @@ public final class List extends Arr {
    * @return range or original expression
    */
   private Expr toRange() {
-    long start = 0, end = 0, min, max;
+    long start = Long.MAX_VALUE, end = Long.MIN_VALUE, s, e;
     for(final Expr expr : exprs) {
       if(expr instanceof final Int itr) {
-        min = itr.itr();
-        max = min + 1;
-      } else if(expr instanceof final RangeSeq rs) {
-        min = rs.min();
-        max = rs.max() + 1;
+        s = itr.itr();
+        e = s;
+      } else if(expr instanceof final RangeSeq rs && rs.ascending()) {
+        s = rs.min();
+        e = rs.max();
       } else {
         return this;
       }
-      if(start == end) {
-        start = min;
-        end = max;
+      if(start > end) {
+        start = s;
+        end = e;
       } else {
-        if(max < start || min > end) return this;
-        if(min < start) start = min;
-        if(max > end) end = max;
+        // (1, 2, 0)  or  (1, 2, 4)
+        if(s < start || s > end + 1) return this;
+        if(e > end) end = e;
       }
     }
-    return RangeSeq.get(start, end - start, true);
+    // (1 to 3, 3, 4)  ->  1 to 4
+    return RangeSeq.get(start, end - start + 1, true);
   }
 
   @Override

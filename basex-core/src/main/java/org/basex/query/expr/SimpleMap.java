@@ -374,16 +374,13 @@ public abstract class SimpleMap extends Mapping {
       if(lst != last) expr = get(cc, info, new ExprList(el).add(exprs).set(el - 1, lst).finish());
     }
 
-    if(expr == this) {
-      if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE, Simplify.DISTINCT)) {
-        if(mode != Simplify.DISTINCT && seqType().zeroOrOne() &&
-            prev.seqType().type instanceof NodeType && last instanceof Bln) {
-          // boolean(@id ! true())  ->  boolean(@id)
-          expr = last == Bln.FALSE ? Bln.FALSE : remove(cc, el - 1);
-        } else {
-          // nodes ! text() = string  ->  nodes/text() = string
-          expr = toPath(mode, cc);
-        }
+    if(expr == this && mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
+      if(seqType().zeroOrOne() && prev.seqType().type instanceof NodeType && last instanceof Bln) {
+        // boolean(@id ! true())  ->  boolean(@id)
+        expr = last == Bln.FALSE ? Bln.FALSE : remove(cc, el - 1);
+      } else {
+        // $node[nodes ! text()]  ->  $node[nodes/text()]
+        expr = toPath(mode, cc);
       }
     }
     return cc.simplify(this, expr, mode);

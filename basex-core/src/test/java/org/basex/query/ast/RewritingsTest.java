@@ -12,6 +12,7 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -1175,8 +1176,8 @@ public final class RewritingsTest extends SandboxTest {
 
     // union expression will be further rewritten to single path
     check("<a/>[b, c]", "", empty(List.class), count(SingleIterPath.class, 1));
-    check("<a/>[(b, c) = '']", "", empty(List.class), count(SingleIterPath.class, 1));
-    check("<a/>[(b, c) = (b, c)]", "", empty(List.class), count(SingleIterPath.class, 2));
+    check("<a/>[(b | c) = '']", "", empty(List.class), count(SingleIterPath.class, 1));
+    check("<a/>[(b | c) = (b | c)]", "", empty(List.class), count(SingleIterPath.class, 2));
   }
 
   /** FLWOR, no results, nondeterministic expressions. */
@@ -2100,7 +2101,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Rewrite distinct sequence checks. */
   @Test public void gh1930() {
     check("(1 to 2)[. = (5, 4, 3, 1, 2, 5)]", "1\n2", exists(RangeSeq.class));
-    check("distinct-values((5, 3, 4, 2, 1, 6, 1))", "1\n2\n3\n4\n5\n6", root(RangeSeq.class));
+    check("distinct-values((5, 3, 4, 2, 1, 6, 1))", "5\n3\n4\n2\n1\n6", root(IntSeq.class));
   }
 
   /** Ancestor steps on database and fragment nodes. */
@@ -2267,23 +2268,23 @@ public final class RewritingsTest extends SandboxTest {
 
   /** distinct-values: simplify arguments. */
   @Test public void gh1967() {
-    final java.util.function.BiConsumer<String, Integer> check = (query, result) ->
+    java.util.function.BiConsumer<String, Integer> check = (query, result) ->
       check("count(distinct-values((" + query + ")))", result, root(Int.class));
 
     // values will not be pre-evaluated as range is larger than CompileContext#MAX_PREEVAL
     check.accept("1 to 10000000, 1 to 10000000", 10000000);
     check.accept("1 to 10000000, 1", 10000000);
     check.accept("1, 1 to 10000000", 10000000);
-
     check.accept("0, 1 to 10000000", 10000001);
-    check.accept("1 to 10000000, 0", 10000001);
     check.accept("1 to 10000000, 10000001", 10000001);
-    check.accept("10000001, 1 to 10000000", 10000001);
-
     check.accept("0, 1 to 10000000, 10000001", 10000002);
-    check.accept("10000001, 1 to 10000000, 0", 10000002);
-
     check.accept("1 to 50, 51 to 10000000, 10000001 to 10000006", 10000006);
+
+    check = (query, result) ->
+      check("count(distinct-values((" + query + ")))", result, root(FnCount.class));
+    check.accept("1 to 10000000, 0", 10000001);
+    check.accept("10000001, 1 to 10000000", 10000001);
+    check.accept("10000001, 1 to 10000000, 0", 10000002);
     check.accept("1 to 10000000, 1, 0, 10000000, 100, 10 to 10000, 10000001", 10000002);
 
     check("count(distinct-values((1 to 1000000, 1000002)))", 1000001, root(COUNT));

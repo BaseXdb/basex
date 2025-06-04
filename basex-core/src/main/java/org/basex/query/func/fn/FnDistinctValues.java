@@ -116,8 +116,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
     if(type != null) {
       if(!defined(1)) {
         // distinct-values(1 to 10)  ->  1 to 10
-        if(values instanceof Range || values instanceof RangeSeq || values == BlnSeq.DISTINCT)
-          return values;
+        if(values instanceof Range || values instanceof RangeSeq) return values;
         // distinct-values($string)  ->  $string
         // distinct-values($node)  ->  data($node)
         if(st.zeroOrOne() && !st.mayBeArray())

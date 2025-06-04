@@ -13,6 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -92,9 +93,18 @@ public final class IntSeq extends NativeSeq {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode.oneOf(Simplify.DISTINCT, Simplify.PREDICATE)) {
-      // replace with new sequence or range sequence
-      final int[] tmp = new IntList((int) size).add(values).ddo().finish();
+
+    int[] tmp = null;
+    if(mode == Simplify.PREDICATE) {
+      // remove duplicates, order data: (2, 1, 2)  ->  1 to 2
+      tmp = new IntList((int) size).add(values).ddo().finish();
+    } else if(mode == Simplify.DISTINCT) {
+      // remove duplicates, but preserve order: (2, 1, 2)  ->  (2, 1)
+      final IntSet is = new IntSet(size);
+      for(final int i : values) is.add(i);
+      tmp = is.keys();
+    }
+    if(tmp != null) {
       final int tl = tmp.length;
       int t = 0;
       if(seqType().type == AtomType.INTEGER) {
@@ -103,6 +113,7 @@ public final class IntSeq extends NativeSeq {
       if(t == tl) expr = RangeSeq.get(tmp[0], tl, true);
       else if(tl != size) expr = get(tmp, type);
     }
+
     return cc.simplify(this, expr, mode);
   }
 

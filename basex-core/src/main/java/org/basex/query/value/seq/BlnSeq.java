@@ -22,7 +22,9 @@ import org.basex.util.list.*;
  */
 public final class BlnSeq extends NativeSeq {
   /** Distinct boolean sequence. */
-  public static final BlnSeq DISTINCT = new BlnSeq(new boolean[] { false, true });
+  private static final BlnSeq FT = new BlnSeq(new boolean[] { false, true });
+  /** Distinct boolean sequence. */
+  private static final BlnSeq TF = new BlnSeq(new boolean[] { true, false });
   /** Values. */
   private final boolean[] values;
 
@@ -73,15 +75,15 @@ public final class BlnSeq extends NativeSeq {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(mode == Simplify.DISTINCT && this != DISTINCT) {
+    if(mode.oneOf(Simplify.DISTINCT, Simplify.PREDICATE) && this != FT && this != TF) {
       // replace with new sequence
       boolean f = false, t = false;
       for(final boolean b : values) {
         if(b) t = true;
         else f = true;
-        if(f && t) break;
+        if(f && t) return values[0] ? TF : FT;
       }
-      expr = f ^ t ? Bln.get(t) : DISTINCT;
+      return Bln.get(t);
     }
     return cc.simplify(this, expr, mode);
   }
