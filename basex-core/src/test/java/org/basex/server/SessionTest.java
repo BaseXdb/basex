@@ -420,13 +420,13 @@ public abstract class SessionTest extends SandboxTest {
     }
 
     try(Query query = session.query("declare variable $a external; $a")) {
-      query.bind("a", IntSeq.get(new long[] { 1, 2 }, AtomType.INT));
+      query.bind("a", IntSeq.get(new int[] { 1, 2 }, AtomType.INT));
       assertEqual("1", query.next());
       assertEqual("2", query.next());
     }
 
     try(Query query = session.query("declare variable $a external; $a")) {
-      query.bind("a", IntSeq.get(new long[] { 1, 2 }, AtomType.INT), "xs:integer");
+      query.bind("a", IntSeq.get(new int[] { 1, 2 }, AtomType.INT), "xs:integer");
       assertEqual("1", query.next());
       assertEqual("2", query.next());
     }

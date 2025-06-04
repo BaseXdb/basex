@@ -265,20 +265,20 @@ public abstract class JavaCall extends Arr {
         if(object instanceof final boolean[] values) return BlnSeq.get(values);
         if(object instanceof final byte[] values)    return BytSeq.get(values);
         if(object instanceof final short[] values)   return ShrSeq.get(values);
-        if(object instanceof final long[] values)    return IntSeq.get(values);
+        if(object instanceof final int[] values)     return IntSeq.get(values);
         if(object instanceof final float[] values)   return FltSeq.get(values);
         if(object instanceof final double[] values)  return DblSeq.get(values);
         // char array
         if(object instanceof final char[] values) {
-          final LongList list = new LongList(values.length);
+          final IntList list = new IntList(values.length);
           for(final int value : values) list.add(value);
           return IntSeq.get(list.finish(), AtomType.UNSIGNED_LONG);
         }
         // integer array
-        if(object instanceof final int[] values) {
-          final LongList list = new LongList(values.length);
-          for(final int value : values) list.add(value);
-          return IntSeq.get(list.finish(), AtomType.INT);
+        if(object instanceof final long[] values) {
+          final ItemList list = new ItemList(values.length);
+          for(final long value : values) list.add(Int.get(value));
+          return list.value();
         }
         // check for null values
         for(final Object obj : (Object[]) object) {

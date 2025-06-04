@@ -125,11 +125,6 @@ abstract class XQHashMap extends XQMap {
    * @return integer or {@link Integer#MIN_VALUE}
    */
   static int toInt(final Value value) {
-    if(value.seqType().eq(SeqType.INTEGER_O)) {
-      final long l = ((Int) value).itr();
-      final int i = (int) l;
-      if(i == l) return i;
-    }
-    return Integer.MIN_VALUE;
+    return value instanceof Int itr ? itr.toInt() : Integer.MIN_VALUE;
   }
 }

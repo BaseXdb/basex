@@ -28,7 +28,7 @@ public final class FnIndexWhere extends StandardFunc {
     final FItem predicate = toFunction(arg(1), 2, qc);
 
     final HofArgs args = new HofArgs(2, predicate);
-    final LongList list = new LongList();
+    final IntList list = new IntList();
     for(Item item; (item = input.next()) != null;) {
       if(test(predicate, args.set(0, item).inc(), qc)) list.add(args.pos());
     }

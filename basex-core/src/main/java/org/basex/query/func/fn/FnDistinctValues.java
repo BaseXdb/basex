@@ -65,7 +65,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
     final Collation collation = toCollation(arg(1), qc);
 
     // try to treat items as 32-bit integers
-    final LongList list = new LongList();
+    final IntList list = new IntList();
     IntSet ints = new IntSet();
     Item item;
     while((item = qc.next(values)) != null) {

@@ -138,6 +138,15 @@ public final class Int extends ANum {
     return v == value ? this : get(v);
   }
 
+  /**
+   * Returns a 32-bit integer.
+   * @return integer or {@link Integer#MIN_VALUE}
+   */
+  public int toInt() {
+    final int i = (int) value;
+    return value == i ? i : Integer.MIN_VALUE;
+  }
+
   @Override
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {

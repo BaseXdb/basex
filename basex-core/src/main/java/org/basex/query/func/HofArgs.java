@@ -15,7 +15,7 @@ public final class HofArgs {
   /** Index of positional parameter. */
   private final int posParam;
   /** Current position. */
-  private long pos;
+  private int pos;
 
   /**
    * Constructor.
@@ -87,7 +87,7 @@ public final class HofArgs {
    * Returns the current position.
    * @return position
    */
-  public long pos() {
+  public int pos() {
     return pos;
   }
 
@@ -96,8 +96,7 @@ public final class HofArgs {
    * @return self reference
    */
   public HofArgs inc() {
-    final int pp = posParam;
-    final long p = pos + 1;
+    final int pp = posParam, p = pos + 1;
     if(pp != -1) set(pp, Int.get(p));
     pos = p;
     return this;

@@ -201,13 +201,16 @@ public final class ValueBuilder {
   /** Integer sequence builder. */
   final class IntSeqBuilder implements SeqBuilder {
     /** Values. */
-    private final LongList values = new LongList(capacity);
+    private final IntList values = new IntList(capacity);
 
     @Override
     public SeqBuilder add(final Item item) {
       if(isInt(item)) {
-        values.add(((Int) item).itr());
-        return this;
+        final int i = ((Int) item).toInt();
+        if(i != Integer.MIN_VALUE) {
+          values.add(i);
+          return this;
+        }
       }
       return tree(item, qc);
     }

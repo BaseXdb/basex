@@ -59,7 +59,7 @@ public class FnDuplicateValues extends StandardFunc {
     final Collation collation = toCollation(arg(1), qc);
 
     // try to treat items as 32-bit integers
-    final LongList list = new LongList();
+    final IntList list = new IntList();
     IntSet ints1 = new IntSet(), ints2 = new IntSet();
     Item item;
     while((item = qc.next(values)) != null) {

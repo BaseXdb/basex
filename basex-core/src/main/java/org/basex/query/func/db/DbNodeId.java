@@ -47,7 +47,7 @@ public class DbNodeId extends StandardFunc {
    * @throws QueryException query exception
    */
   final Value ids(final Value nodes) throws QueryException {
-    final LongList ids = new LongList(Seq.initialCapacity(nodes.size()));
+    final IntList ids = new IntList(Seq.initialCapacity(nodes.size()));
     addIds(nodes, ids);
     return IntSeq.get(ids.finish());
   }
@@ -58,7 +58,7 @@ public class DbNodeId extends StandardFunc {
    * @param ids ID list
    * @throws QueryException query exception
    */
-  protected void addIds(final Value nodes, final LongList ids) throws QueryException {
+  protected void addIds(final Value nodes, final IntList ids) throws QueryException {
     for(final Item node : nodes) ids.add(id(toDBNode(node, false)));
   }
 

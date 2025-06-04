@@ -46,7 +46,7 @@ public final class FnIndexOf extends StandardFunc {
     final Item search = toAtomItem(arg(1), qc);
     final Collation collation = toCollation(arg(2), qc);
 
-    final LongList list = new LongList();
+    final IntList list = new IntList();
     int c = 0;
     for(Item item; (item = qc.next(input)) != null;) {
       ++c;

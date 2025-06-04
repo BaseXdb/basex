@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  */
 public final class DbNodePre extends DbNodeId {
   @Override
-  protected void addIds(final Value nodes, final LongList ids) throws QueryException {
+  protected void addIds(final Value nodes, final IntList ids) throws QueryException {
     if(nodes instanceof final DBNodeSeq seq) {
       for(final int pre : seq.pres()) ids.add(pre);
     } else {

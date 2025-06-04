@@ -95,18 +95,6 @@ public abstract class AStr extends Item {
   }
 
   /**
-   * Returns the codepoints of the string in a long array.
-   * @param info input info (can be {@code null})
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public long[] longCodepoints(final InputInfo info) throws QueryException {
-    final LongList list = new LongList(length(info));
-    Token.forEachCp(string(info), list::add);
-    return list.finish();
-  }
-
-  /**
    * Returns a substring.
    * @param info input info (can be {@code null})
    * @param start start position

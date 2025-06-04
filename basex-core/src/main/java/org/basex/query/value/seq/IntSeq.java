@@ -23,14 +23,14 @@ import org.basex.util.list.*;
  */
 public final class IntSeq extends NativeSeq {
   /** Values. */
-  private final long[] values;
+  private final int[] values;
 
   /**
    * Constructor.
    * @param values values
    * @param type type
    */
-  private IntSeq(final long[] values, final Type type) {
+  private IntSeq(final int[] values, final Type type) {
     super(values.length, type);
     this.values = values;
   }
@@ -46,8 +46,8 @@ public final class IntSeq extends NativeSeq {
   public static Value read(final DataInput in, final Type type, final QueryContext qc)
       throws IOException {
     final int size = in.readNum();
-    final long[] values = new long[size];
-    for(int s = 0; s < size; s++) values[s] = in.readLong();
+    final int[] values = new int[size];
+    for(int s = 0; s < size; s++) values[s] = in.readNum();
     return get(values, type);
   }
 
@@ -76,7 +76,7 @@ public final class IntSeq extends NativeSeq {
   @Override
   public Value reverse(final QueryContext qc) {
     final int sz = (int) size;
-    final long[] tmp = new long[sz];
+    final int[] tmp = new int[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
     return get(tmp, type);
   }
@@ -85,7 +85,7 @@ public final class IntSeq extends NativeSeq {
    * Returns the internal values.
    * @return values
    */
-  public long[] values() {
+  public int[] values() {
     return values;
   }
 
@@ -94,7 +94,7 @@ public final class IntSeq extends NativeSeq {
     Expr expr = this;
     if(mode.oneOf(Simplify.DISTINCT, Simplify.PREDICATE)) {
       // replace with new sequence or range sequence
-      final long[] tmp = new LongList((int) size).add(values).ddo().finish();
+      final int[] tmp = new IntList((int) size).add(values).ddo().finish();
       final int tl = tmp.length;
       int t = 0;
       if(seqType().type == AtomType.INTEGER) {
@@ -145,7 +145,7 @@ public final class IntSeq extends NativeSeq {
    * @param values values
    * @return value
    */
-  public static Value get(final long[] values) {
+  public static Value get(final int[] values) {
     return get(values, AtomType.INTEGER);
   }
 
@@ -155,7 +155,7 @@ public final class IntSeq extends NativeSeq {
    * @param type type; must be an instance of xs:integer
    * @return value
    */
-  public static Value get(final long[] values, final Type type) {
+  public static Value get(final int[] values, final Type type) {
     // empty?
     final int vl = values.length;
     if(vl == 0) return Empty.VALUE;
@@ -182,18 +182,23 @@ public final class IntSeq extends NativeSeq {
    * @param size size of resulting sequence
    * @param type type; must be an instance of xs:integer
    * @param values values
-   * @return value
+   * @return value, or {@code null} if sequence could not be created
    * @throws QueryException query exception
    */
   public static Value get(final Type type, final long size, final Value... values)
       throws QueryException {
-    final LongList list = new LongList(size);
+    final IntList list = new IntList(size);
     for(final Value value : values) {
       // speed up construction, depending on input
       if(value instanceof final IntSeq seq) {
         list.add(seq.values);
       } else {
-        for(final Item item : value) list.add(item.itr(null));
+        for(final Item item : value) {
+          final long l = item.itr(null);
+          final int i = (int) l;
+          if(i != l) return null;
+          list.add(i);
+        }
       }
     }
     return get(list.finish(), type);

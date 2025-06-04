@@ -32,7 +32,7 @@ public final class FnStringToCodepoints extends StandardFunc {
         }
         @Override
         public Value value(final QueryContext q, final Expr expr) throws QueryException {
-          return IntSeq.get(value.longCodepoints(info));
+          return IntSeq.get(value.codepoints(info));
         }
       };
     }
@@ -52,7 +52,7 @@ public final class FnStringToCodepoints extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return IntSeq.get(toZeroStr(arg(0), qc).longCodepoints(info));
+    return IntSeq.get(toZeroStr(arg(0), qc).codepoints(info));
   }
 
   @Override

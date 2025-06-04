@@ -51,7 +51,7 @@ public final class XQStrIntMap extends XQHashMap {
   @Override
   public Value items(final QueryContext qc) {
     final long is = structSize();
-    final LongList list = new LongList(is);
+    final IntList list = new IntList(is);
     for(int i = 1; i <= is; i++) list.add(map.value(i));
     return IntSeq.get(list.finish());
   }

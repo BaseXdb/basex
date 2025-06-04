@@ -8,6 +8,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.query.util.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -181,7 +182,9 @@ public abstract class QueryTest extends SandboxTest {
    * @return iterator
    */
   protected static Value integers(final long... integers) {
-    return IntSeq.get(integers);
+    final ItemList list = new ItemList(integers.length);
+    for(final long i : integers) list.add(Int.get(i));
+    return list.value();
   }
 
   /**

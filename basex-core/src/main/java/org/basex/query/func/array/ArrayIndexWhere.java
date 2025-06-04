@@ -23,7 +23,7 @@ public final class ArrayIndexWhere extends ArrayFn {
     final FItem predicate = toFunction(arg(1), 2, qc);
 
     final HofArgs args = new HofArgs(2, predicate);
-    final LongList list = new LongList();
+    final IntList list = new IntList();
     for(final Value value : array.iterable()) {
       if(test(predicate, args.set(0, value).inc(), qc)) list.add(args.pos());
     }
