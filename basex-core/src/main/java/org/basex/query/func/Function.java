@@ -1705,6 +1705,9 @@ public enum Function implements AFunction {
   _PROF_RUNTIME(ProfRuntime::new, "runtime([option])",
       params(STRING_O), ITEM_O, flag(NDT), PROF_URI),
   /** XQuery function. */
+  _PROF_SHRINK(ProfShrink::new, "shrink(input)",
+      params(ITEM_ZM), ITEM_ZM, PROF_URI),
+  /** XQuery function. */
   _PROF_TIME(ProfTime::new, "time(value[,label,aggregate])",
       params(ITEM_ZM, STRING_O, BOOLEAN_O), ITEM_ZM, flag(NDT), PROF_URI),
   /** XQuery function. */
@@ -1915,9 +1918,6 @@ public enum Function implements AFunction {
   _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(input,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
   /** XQuery function. */
-  _UTIL_VALUES_EXCEPT(UtilValuesExcept::new, "values-except(values,except[,collation])",
-      params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM, UTIL_URI),
-  /** XQuery function. */
   _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
       params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
@@ -1938,6 +1938,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_VALUES_EXCEPT(UtilValuesExcept::new, "values-except(values,except[,collation])",
+      params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM, UTIL_URI),
 
   // Validate Module
 
