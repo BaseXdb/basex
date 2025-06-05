@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Unmodifiable hash map implementation.
@@ -37,6 +38,16 @@ abstract class XQHashMap extends XQMap {
   @Override
   public XQMap putAt(final int index, final Value value) throws QueryException {
     return trie().putAt(index, value);
+  }
+
+  /**
+   * Replaces the value at the specified position. Called when shrinking data.
+   * @param index map index (starting with 0, must be valid)
+   * @param value value
+   */
+  @SuppressWarnings("unused")
+  void valueAt(final int index, final Value value) {
+    throw Util.notExpected();
   }
 
   @Override
@@ -77,6 +88,16 @@ abstract class XQHashMap extends XQMap {
   final XQHashMap build(final XQHashMap old) throws QueryException {
     old.forEach((QueryBiConsumer<Item, Value>) this::build);
     return this;
+  }
+
+  /**
+   * Shrinks the map values.
+   * @param qc query exception
+   * @throws QueryException query exception
+   */
+  final void shrinkValues(final QueryContext qc) throws QueryException {
+    final long is = structSize();
+    for(int i = 0; i < is; i++) valueAt(i, valueAt(i).rebuild(qc));
   }
 
   /**

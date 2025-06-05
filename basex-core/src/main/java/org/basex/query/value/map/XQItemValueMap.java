@@ -42,13 +42,18 @@ public final class XQItemValueMap extends XQHashMap {
   }
 
   @Override
-  public Item keyAt(final int pos) {
-    return map.key(pos + 1);
+  public Item keyAt(final int index) {
+    return map.key(index + 1);
   }
 
   @Override
-  public Value valueAt(final int pos) {
-    return map.value(pos + 1);
+  public Value valueAt(final int index) {
+    return map.value(index + 1);
+  }
+
+  @Override
+  void valueAt(final int index, final Value value) {
+    map.value(index + 1, value);
   }
 
   @Override
@@ -59,11 +64,10 @@ public final class XQItemValueMap extends XQHashMap {
 
   @Override
   public Value shrink(final QueryContext qc) throws QueryException {
-    // see MapBuilder#put for types with compact representation. also shrink recursive maps/arrays
+    // see MapBuilder#put for types with compact representation
+    shrinkValues(qc);
     refineType();
-    final MapType mt = (MapType) type;
-    final SeqType vt = mt.valueType();
-    return mt.keyType().oneOf(AtomType.INTEGER, AtomType.STRING, AtomType.UNTYPED_ATOMIC) ||
-      vt.mayBeStruct() ? rebuild(qc) : this;
+    return ((MapType) type).keyType().oneOf(AtomType.INTEGER, AtomType.STRING,
+        AtomType.UNTYPED_ATOMIC) ? rebuild(qc) : this;
   }
 }

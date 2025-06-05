@@ -83,6 +83,15 @@ public final class TokenObjectMap<E> extends TokenSet {
   }
 
   /**
+   * Assigns the value with the specified index.
+   * @param value value to assign
+   * @param index index of the value (starts with {@code 1})
+   */
+  public void value(final int index, final E value) {
+    values[index] = value;
+  }
+
+  /**
    * Returns a value iterator.
    * @return iterator
    */

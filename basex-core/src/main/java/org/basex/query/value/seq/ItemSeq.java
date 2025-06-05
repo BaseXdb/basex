@@ -42,10 +42,11 @@ public final class ItemSeq extends Seq {
 
   @Override
   public Value shrink(final QueryContext qc) throws QueryException {
-    // see ValueBuilder#add for types with compact representation. also shrink recursive maps/arrays
+    // see ValueBuilder#add for types with compact representation
+    for(int i = 0; i < size; i++) items[i] = items[i].rebuild(qc);
     refineType();
     return type.oneOf(AtomType.STRING, AtomType.UNTYPED_ATOMIC, AtomType.INTEGER, AtomType.DOUBLE,
-        AtomType.BOOLEAN) || seqType().mayBeStruct() ? rebuild(qc) : this;
+        AtomType.BOOLEAN) ? rebuild(qc) : this;
   }
 
   @Override

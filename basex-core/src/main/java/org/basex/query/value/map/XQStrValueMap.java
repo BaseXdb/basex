@@ -48,13 +48,18 @@ public final class XQStrValueMap extends XQHashMap {
   }
 
   @Override
-  public Str keyAt(final int pos) {
-    return Str.get(map.key(pos + 1));
+  public Str keyAt(final int index) {
+    return Str.get(map.key(index + 1));
   }
 
   @Override
-  public Value valueAt(final int pos) {
-    return map.value(pos + 1);
+  public Value valueAt(final int index) {
+    return map.value(index + 1);
+  }
+
+  @Override
+  void valueAt(final int index, final Value value) {
+    map.value(index + 1, value);
   }
 
   @Override
@@ -69,10 +74,10 @@ public final class XQStrValueMap extends XQHashMap {
 
   @Override
   public Value shrink(final QueryContext qc) throws QueryException {
-    // see MapBuilder#put for types with compact representation. also shrink recursive maps/arrays
+    // see MapBuilder#put for types with compact representation
+    shrinkValues(qc);
     refineType();
     final SeqType vt = ((MapType) type).valueType();
-    return vt.one() && (vt.type.oneOf(AtomType.INTEGER, AtomType.STRING) ||
-        vt.mayBeStruct()) ? rebuild(qc) : this;
+    return vt.one() && vt.type.oneOf(AtomType.INTEGER, AtomType.STRING) ? rebuild(qc) : this;
   }
 }

@@ -66,17 +66,28 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   @Override
-  public Item keyAt(final int pos) {
-    return Str.get(((RecordType) type).fields().key(pos + 1));
+  public Item keyAt(final int index) {
+    return Str.get(((RecordType) type).fields().key(index + 1));
   }
 
   @Override
-  public Value valueAt(final int pos) {
-    return values[pos];
+  public Value valueAt(final int index) {
+    return values[index];
+  }
+
+  @Override
+  void valueAt(final int index, final Value value) {
+    values[index] = value;
   }
 
   @Override
   XQHashMap build(final Item key, final Value value) {
     throw Util.notExpected();
+  }
+
+  @Override
+  public Value shrink(final QueryContext qc) throws QueryException {
+    shrinkValues(qc);
+    return this;
   }
 }

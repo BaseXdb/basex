@@ -315,7 +315,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Value rebuild(final QueryContext qc) throws QueryException {
+  public Item rebuild(final QueryContext qc) throws QueryException {
     return this;
   }
 

@@ -329,8 +329,9 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Rebuilds the value, to save memory.
-   * Note that the memory consumption increases during the reconstruction.
+   * Saves memory by recursively rebuilding the data structure.
+   * The function is implemented for sequences, maps and arrays.
+   * Note that the memory consumption may increase during the reconstruction.
    * @param qc query exception
    * @return value
    * @throws QueryException query exception
