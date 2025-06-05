@@ -3,10 +3,11 @@ package org.basex.query.func.util;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -16,7 +17,7 @@ import org.basex.query.value.type.*;
  */
 public final class UtilMapKeyAt extends StandardFunc {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final long index = toLong(arg(1), qc);
 

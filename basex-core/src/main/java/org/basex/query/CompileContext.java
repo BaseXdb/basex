@@ -252,8 +252,8 @@ public final class CompileContext {
    * @return optimized expression
    * @throws QueryException query exception
    */
-  public Expr preEval(final Expr expr) throws QueryException {
-    return replaceWith(expr, expr.value(qc));
+  public Value preEval(final Expr expr) throws QueryException {
+    return (Value) replaceWith(expr, expr.value(qc));
   }
 
   /**

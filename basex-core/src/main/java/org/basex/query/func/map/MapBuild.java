@@ -37,7 +37,7 @@ public final class MapBuild extends MapMerge {
         if(val != null) builder.put(key, val);
       }
     }
-    return builder.map();
+    return builder.map(this);
   }
 
   @Override

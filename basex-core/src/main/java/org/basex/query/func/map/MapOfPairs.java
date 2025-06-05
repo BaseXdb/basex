@@ -30,7 +30,7 @@ public final class MapOfPairs extends MapMerge {
       final Value val = merger.merge(key, old, pair.get(Str.VALUE));
       if(val != null) builder.put(key, val);
     }
-    return builder.map();
+    return builder.map(this);
   }
 
   @Override

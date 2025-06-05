@@ -78,7 +78,7 @@ public class MapMerge extends StandardFunc {
       current = next;
       next = current != null ? qc.next(maps) : null;
     }
-    return mb != null ? mb.map() : mp;
+    return mb != null ? mb.map(this) : mp;
   }
 
   @Override

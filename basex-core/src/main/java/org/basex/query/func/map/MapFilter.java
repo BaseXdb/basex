@@ -25,7 +25,7 @@ public final class MapFilter extends StandardFunc {
     map.forEach((key, value) -> {
       if(test(predicate, args.set(0, key).set(1, value), qc)) mb.put(key, value);
     });
-    return mb.map();
+    return mb.map(this);
   }
 
   @Override
