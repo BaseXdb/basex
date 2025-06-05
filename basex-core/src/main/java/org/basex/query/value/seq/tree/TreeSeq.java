@@ -92,6 +92,11 @@ public abstract class TreeSeq extends Seq {
    */
   abstract TreeSeq concat(TreeSeq other);
 
+  @Override
+  public final Value shrink(final QueryContext qc) throws QueryException {
+    return rebuild(qc);
+  }
+
   /**
    * Prepends the given sequence to this sequence.
    * @param seq small sequence

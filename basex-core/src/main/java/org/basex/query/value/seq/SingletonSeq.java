@@ -150,8 +150,9 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public void refineType() {
-    refineType(value);
+  public Value shrink(final QueryContext qc) throws QueryException {
+    value.shrink(qc);
+    return this;
   }
 
   // STATIC METHODS ===============================================================================

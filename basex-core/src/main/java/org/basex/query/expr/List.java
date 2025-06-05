@@ -72,30 +72,7 @@ public final class List extends Arr {
     exprType.assign(st != null ? st : SeqType.EMPTY_SEQUENCE_Z, occ, size).data(exprs);
 
     // pre-evaluate list; skip expressions with large result sizes
-    if(values(true, cc)) {
-      Type type = null;
-      final Value[] values = new Value[el];
-      int vl = 0;
-      for(final Expr expr : exprs) {
-        cc.qc.checkStop();
-        final Value value = expr.value(cc.qc);
-        final Type tp = value.type;
-        if(vl == 0) type = tp;
-        else if(type != null && !type.eq(tp)) type = null;
-        values[vl++] = value;
-      }
-
-      // size will be small enough to be cast to an integer
-      Value value = Value.get((int) size, type, values);
-      if(value == null) {
-        final ValueBuilder vb = new ValueBuilder(cc.qc, size);
-        for(int v = 0; v < vl; v++) vb.add(values[v]);
-        value = vb.value(this);
-      }
-      return cc.replaceWith(this, value);
-    }
-
-    return this;
+    return values(true, cc) ? cc.preEval(this).shrink(cc.qc) : this;
   }
 
   /**

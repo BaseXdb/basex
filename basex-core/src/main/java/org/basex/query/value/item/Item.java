@@ -315,12 +315,19 @@ public abstract class Item extends Value {
   }
 
   @Override
+  public Value rebuild(final QueryContext qc) throws QueryException {
+    return this;
+  }
+
+  @Override
   public final boolean ddo() {
     return type instanceof NodeType;
   }
 
   @Override
-  public final void refineType() { }
+  public Value shrink(final QueryContext qc) throws QueryException {
+    return this;
+  }
 
   /**
    * Returns a score value. Overwritten by {@link FTNode}.

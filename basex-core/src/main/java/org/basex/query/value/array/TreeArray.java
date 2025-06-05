@@ -1,5 +1,6 @@
 package org.basex.query.value.array;
 
+import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -28,6 +29,11 @@ abstract class TreeArray extends XQArray {
    */
   TreeArray(final Type type) {
     super(type);
+  }
+
+  @Override
+  public final Value shrink(final QueryContext qc) throws QueryException {
+    return rebuild(qc);
   }
 
   /**

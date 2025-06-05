@@ -1,6 +1,7 @@
 package org.basex.query.value.seq;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -35,5 +36,10 @@ public final class SubSeq extends Seq {
   @Override
   protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
     return new SubSeq(sub, start + pos, length);
+  }
+
+  @Override
+  public Value shrink(final QueryContext qc) throws QueryException {
+    return rebuild(qc);
   }
 }

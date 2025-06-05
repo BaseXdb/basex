@@ -194,28 +194,24 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public Value rebuild(final QueryContext qc) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc, size());
+    for(final Item item : this) vb.add(item.rebuild(qc));
+    return vb.value(type);
+  }
+
+  @Override
   public Object toJava() throws QueryException {
     // determine type (static or exact)
-    Type tp = type;
-    if(tp == AtomType.ITEM) {
-      tp = null;
-      for(final Item item : this) {
-        final Type st = item.type;
-        tp = tp == null ? st : tp.union(st);
-      }
-    }
+    refineType();
 
     // shortcut for strings (avoid intermediate token representation)
     final int sz = (int) size;
-    if(tp == AtomType.STRING) {
+    if(type == AtomType.STRING) {
       final StringList list = new StringList(sz);
       for(final Item item : this) list.add(item.string(null));
       return list.finish();
     }
-    // try to create custom Java representation
-    final Value value = get(sz, tp, this);
-    if(value != null) return value.toJava();
-
     int a = 0;
     final Object[] array = new Object[sz];
     for(final Item item : this) array[a++] = item.toJava();

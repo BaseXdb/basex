@@ -266,6 +266,11 @@ public enum NodeType implements Type {
   }
 
   @Override
+  public final boolean refinable() {
+    return this == NodeType.NODE;
+  }
+
+  @Override
   public boolean nsSensitive() {
     return false;
   }

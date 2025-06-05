@@ -298,6 +298,14 @@ public interface Type {
   boolean nsSensitive();
 
   /**
+   * Checks if the type is general enough to be refined.
+   * @return result of check
+   */
+  default boolean refinable() {
+    return false;
+  }
+
+  /**
    * Returns the given type, or the type of the specified expression if it is more specific.
    * @param expr expression
    * @return node type

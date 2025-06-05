@@ -90,6 +90,13 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
+  public Value shrink(final QueryContext qc) throws QueryException {
+    members.shrink(qc);
+    type = ArrayType.get(members.seqType().with(Occ.EXACTLY_ONE));
+    return this;
+  }
+
+  @Override
   public void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, ENTRIES, structSize()), members);
   }

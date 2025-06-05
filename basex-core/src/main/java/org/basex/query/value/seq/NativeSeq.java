@@ -35,5 +35,7 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public void refineType() { }
+  public Value shrink(final QueryContext qc) throws QueryException {
+    return this;
+  }
 }

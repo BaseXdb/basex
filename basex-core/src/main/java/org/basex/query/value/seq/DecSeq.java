@@ -90,27 +90,4 @@ public final class DecSeq extends NativeSeq {
     final int vl = values.length;
     return vl == 0 ? Empty.VALUE : vl == 1 ? Dec.get(values[0]) : new DecSeq(values);
   }
-
-  /**
-   * Creates a typed sequence with the items of the specified values.
-   * @param size size of resulting sequence
-   * @param values values
-   * @return value
-   * @throws QueryException query exception
-   */
-  public static Value get(final long size, final Value... values) throws QueryException {
-    final BigDecimal[] tmp = new BigDecimal[Array.checkCapacity(size)];
-    int t = 0;
-    for(final Value value : values) {
-      // speed up construction, depending on input
-      if(value instanceof final DecSeq seq) {
-        final int vs = (int) seq.size();
-        Array.copyFromStart(seq.values, vs, tmp, t);
-        t += vs;
-      } else {
-        for(final Item item : value) tmp[t++] = item.dec(null);
-      }
-    }
-    return get(tmp);
-  }
 }

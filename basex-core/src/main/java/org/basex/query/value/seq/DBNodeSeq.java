@@ -126,8 +126,9 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public final void refineType() {
-    refineType(this);
+  public Value shrink(final QueryContext qc) throws QueryException {
+    refineType();
+    return this;
   }
 
   @Override

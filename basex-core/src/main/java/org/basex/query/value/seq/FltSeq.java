@@ -11,7 +11,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Sequence of items of type {@link Int xs:float}, containing at least two of them.
@@ -89,25 +88,5 @@ public final class FltSeq extends NativeSeq {
   public static Value get(final float[] values) {
     final int vl = values.length;
     return vl == 0 ? Empty.VALUE : vl == 1 ? Flt.get(values[0]) : new FltSeq(values);
-  }
-
-  /**
-   * Creates a typed sequence with the items of the specified values.
-   * @param size size of resulting sequence
-   * @param values values
-   * @return value
-   * @throws QueryException query exception
-   */
-  public static Value get(final long size, final Value... values) throws QueryException {
-    final FloatList tmp = new FloatList(size);
-    for(final Value value : values) {
-      // speed up construction, depending on input
-      if(value instanceof final FltSeq seq) {
-        tmp.add(seq.values);
-      } else {
-        for(final Item item : value) tmp.add(item.flt(null));
-      }
-    }
-    return get(tmp.finish());
   }
 }

@@ -56,4 +56,14 @@ public final class XQItemValueMap extends XQHashMap {
     map.put(key, value);
     return this;
   }
+
+  @Override
+  public Value shrink(final QueryContext qc) throws QueryException {
+    // see MapBuilder#put for types with compact representation. also shrink recursive maps/arrays
+    refineType();
+    final MapType mt = (MapType) type;
+    final SeqType vt = mt.valueType();
+    return mt.keyType().oneOf(AtomType.INTEGER, AtomType.STRING, AtomType.UNTYPED_ATOMIC) ||
+      vt.mayBeStruct() ? rebuild(qc) : this;
+  }
 }

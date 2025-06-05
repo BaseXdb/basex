@@ -419,6 +419,25 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
+  public final Type refineType() throws QueryException {
+    Type refined = null;
+    for(final Value value : iterable()) {
+      final ArrayType at = ArrayType.get(value.seqType());
+      refined = refined == null ? at : refined.union(at);
+      if(refined.eq(type)) break;
+    }
+    if(refined != null) type = refined;
+    return type;
+  }
+
+  @Override
+  public final XQArray rebuild(final QueryContext qc) throws QueryException {
+    final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
+    for(final Value value : iterable()) ab.add(value.rebuild(qc));
+    return ab.array(this);
+  }
+
+  @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     if(this == item) return true;
     if(item instanceof final XQArray array) {

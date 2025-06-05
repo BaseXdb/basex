@@ -1192,6 +1192,11 @@ public enum AtomType implements Type {
   }
 
   @Override
+  public final boolean refinable() {
+    return !((Checks<AtomType>) at -> at.eq(this) || !at.instanceOf(this)).all(AtomType.values());
+  }
+
+  @Override
   public final String toString() {
     final TokenBuilder tb = new TokenBuilder();
     if(Token.eq(XS_URI, uri)) {

@@ -187,31 +187,4 @@ public final class IntSeq extends NativeSeq {
     }
     return new IntSeq(values, type);
   }
-
-  /**
-   * Creates a typed sequence with the items of the specified values.
-   * @param size size of resulting sequence
-   * @param type type; must be an instance of xs:integer
-   * @param values values
-   * @return value, or {@code null} if sequence could not be created
-   * @throws QueryException query exception
-   */
-  public static Value get(final Type type, final long size, final Value... values)
-      throws QueryException {
-    final IntList list = new IntList(size);
-    for(final Value value : values) {
-      // speed up construction, depending on input
-      if(value instanceof final IntSeq seq) {
-        list.add(seq.values);
-      } else {
-        for(final Item item : value) {
-          final long l = item.itr(null);
-          final int i = (int) l;
-          if(i != l) return null;
-          list.add(i);
-        }
-      }
-    }
-    return get(list.finish(), type);
-  }
 }

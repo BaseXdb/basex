@@ -41,6 +41,14 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
+  public Value shrink(final QueryContext qc) throws QueryException {
+    // see ValueBuilder#add for types with compact representation. also shrink recursive maps/arrays
+    refineType();
+    return type.oneOf(AtomType.STRING, AtomType.UNTYPED_ATOMIC, AtomType.INTEGER, AtomType.DOUBLE,
+        AtomType.BOOLEAN) || seqType().mayBeStruct() ? rebuild(qc) : this;
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || (obj instanceof final ItemSeq seq ? Array.equals(items, seq.items) :
       super.equals(obj));

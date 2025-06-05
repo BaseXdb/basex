@@ -53,6 +53,6 @@ abstract class StoreFn extends StandardFunc {
    * @throws QueryException query exception
    */
   void store(final byte[] key, final Value value, final QueryContext qc) throws QueryException {
-    store(qc).put(key, value.materialize(n -> false, info, qc).compactify());
+    store(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc));
   }
 }

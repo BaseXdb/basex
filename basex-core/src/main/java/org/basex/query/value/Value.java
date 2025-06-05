@@ -16,7 +16,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.seq.tree.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -303,22 +302,40 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Value reverse(QueryContext qc);
 
   /**
-   * Computes a more precise sequence type of this value.
-   */
-  public void refineType() {
-    refineType(this);
-  }
-
-  /**
-   * Returns a compactified version of this value.
+   * If possible, returns a compactified version of this value.
+   * @param qc query context
    * @return compactified value or self reference
    * @throws QueryException query exception
    */
-  public Value compactify() throws QueryException {
-    refineType();
-    final Value compact = get(size(), type, this);
-    return compact != null ? compact : this;
+  public abstract Value shrink(QueryContext qc) throws QueryException;
+
+  /**
+   * Refines the type of a value.
+   * @return refined (and assigned) type
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public Type refineType() throws QueryException {
+    if(type.refinable()) {
+      Type refined = null;
+      for(final Item item : this) {
+        final Type tp = item.type;
+        refined = refined == null ? tp : refined.union(tp);
+        if(refined == type) break;
+      }
+      if(refined != null) type = refined;
+    }
+    return type;
   }
+
+  /**
+   * Rebuilds the value, to save memory.
+   * Note that the memory consumption increases during the reconstruction.
+   * @param qc query exception
+   * @return value
+   * @throws QueryException query exception
+   */
+  public abstract Value rebuild(QueryContext qc) throws QueryException;
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
@@ -329,54 +346,5 @@ public abstract class Value extends Expr implements Iterable<Item> {
   @Override
   public final int exprSize() {
     return 1;
-  }
-
-  /**
-   * Tries to create a compactified version of the specified values.
-   * @param size size of resulting sequence
-   * @param type type
-   * @param values values
-   * @return value, or {@code null} if sequence could not be created
-   * @throws QueryException query exception
-   */
-  public static Value get(final long size, final Type type, final Value... values)
-      throws QueryException {
-    if((values.length != 1 || values[0] instanceof TreeSeq || values[0] instanceof ItemSeq) &&
-        type instanceof final AtomType at) {
-      switch(at) {
-        case BOOLEAN: return BlnSeq.get(size, values);
-        case BYTE: return BytSeq.get(size, values);
-        case SHORT: return ShrSeq.get(size, values);
-        case FLOAT: return FltSeq.get(size, values);
-        case DOUBLE: return DblSeq.get(size, values);
-        case DECIMAL: return DecSeq.get(size, values);
-        case UNSIGNED_LONG: return null;
-        case STRING: return StrSeq.get(type, size, values);
-        default:
-          if(type.instanceOf(AtomType.STRING) || type.oneOf(AtomType.UNTYPED_ATOMIC,
-              AtomType.UNTYPED_ATOMIC)) return StrSeq.get(type, size, values);
-          if(type.instanceOf(AtomType.INTEGER)) return IntSeq.get(type, size, values);
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Refines the type of a value.
-   * @param value value
-   */
-  protected static void refineType(final Value value) {
-    // check selectively if type cannot be refined any further
-    final Type vt = value.type;
-    if(vt instanceof NodeType && vt != NodeType.NODE ||
-       vt instanceof AtomType && ((Checks<AtomType>) t ->
-       !t.instanceOf(vt) || t.eq(vt)).all(AtomType.values())) return;
-
-    Type tp = null;
-    for(final Item it : value) {
-      final Type tp2 = it.type;
-      tp = tp == null ? tp2 : tp.union(tp2);
-    }
-    value.type = tp;
   }
 }

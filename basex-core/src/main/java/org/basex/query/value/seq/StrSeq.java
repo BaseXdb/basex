@@ -124,28 +124,6 @@ public final class StrSeq extends NativeSeq {
   }
 
   /**
-   * Creates a typed sequence with the items of the specified values.
-   * @param type type; must be xs:anyURI, xs:untypedAtomic or an instance of xs:string
-   * @param size size of resulting sequence
-   * @param values values
-   * @return value
-   * @throws QueryException query exception
-   */
-  public static Value get(final Type type, final long size, final Value... values)
-      throws QueryException {
-    final TokenList tmp = new TokenList(size);
-    for(final Value value : values) {
-      // speed up construction, depending on input
-      if(value instanceof final StrSeq seq) {
-        tmp.add(seq.values);
-      } else {
-        for(final Item item : value) tmp.add(item.string(null));
-      }
-    }
-    return get(tmp, type);
-  }
-
-  /**
    * Creates an item for the specified token.
    * @param string string
    * @param type type; must be xs:anyURI, xs:untypedAtomic or an instance of xs:string

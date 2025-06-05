@@ -200,7 +200,9 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public void refineType() { }
+  public Value shrink(final QueryContext qc) {
+    return this;
+  }
 
   @Override
   public String description() {

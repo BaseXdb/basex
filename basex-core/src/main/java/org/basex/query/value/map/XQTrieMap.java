@@ -118,4 +118,9 @@ public final class XQTrieMap extends XQMap {
     }
     return true;
   }
+
+  @Override
+  public Value shrink(final QueryContext qc) throws QueryException {
+    return rebuild(qc);
+  }
 }
