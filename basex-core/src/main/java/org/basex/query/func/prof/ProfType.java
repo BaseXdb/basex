@@ -34,14 +34,14 @@ public final class ProfType extends StandardFunc {
    * @return info string
    */
   private static String info(final Expr expr) {
-    String info = expr.seqType().toString();
+    String info = Util.className(expr) + " (" + expr.seqType().toString();
     if(expr instanceof XQStruct struct) {
       final long sz = struct.structSize();
-      if(sz != 1) info += ", " + (sz != -1 ? sz : "n") + " entries";
+      info += ", " + sz + ' ' + (sz == 1 ? "entry" : "entries");
     } else {
       final long sz = expr.size();
-      if(sz != 1) info += ", " + (sz != -1 ? sz : "n") + " items";
+      if(sz > 1) info += ", " + sz + " items";
     }
-    return info + ", " + Util.className(expr);
+    return info + ')';
   }
 }

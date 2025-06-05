@@ -436,30 +436,30 @@ public final class MixedTest extends SandboxTest {
       System.setErr(new PrintStream(ao));
       // inspection
       checkType(ao, "('A', 'B', 'A', 'B', 'A', 'B')",
-          "xs:string+, 6 items, StrSeq");
+          "StrSeq (xs:string+, 6 items)");
       checkType(ao, "(1, 3, 1, 3, 1, 3)",
-          "xs:integer+, 6 items, IntSeq");
+          "IntSeq (xs:integer+, 6 items)");
       checkType(ao, "data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
-          "xs:untypedAtomic+, 6 items, StrSeq");
+          "StrSeq (xs:untypedAtomic+, 6 items)");
 
       // filters
       checkType(ao, "('A', 'B', 'A', 'B', 'A', 'B')[not(. = 'C')]",
-          "xs:string*, n items, IterFilter -> xs:string+, 6 items, StrSeq");
+          "IterFilter (xs:string*) -> StrSeq (xs:string+, 6 items)");
       checkType(ao, "data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))"
           + "[not(. = 'C')]",
-          "xs:untypedAtomic*, n items, IterFilter -> xs:untypedAtomic+, 6 items, StrSeq");
+          "IterFilter (xs:untypedAtomic*) -> StrSeq (xs:untypedAtomic+, 6 items)");
       checkType(ao, "(1, 3, 1, 3, 1, 3)[not(. = 2)]",
-          "xs:integer*, n items, IterFilter -> xs:integer+, 6 items, IntSeq");
+          "IterFilter (xs:integer*) -> IntSeq (xs:integer+, 6 items)");
 
       // map operator
       checkType(ao, "(1 to 6) ! string()",
-          "xs:string+, 6 items, DualMap -> xs:string+, 6 items, StrSeq");
+          "DualMap (xs:string+, 6 items) -> StrSeq (xs:string+, 6 items)");
       checkType(ao, "(1 to 6) ! xs:untypedAtomic()",
-          "xs:untypedAtomic+, 6 items, DualMap -> xs:untypedAtomic+, 6 items, StrSeq");
+          "DualMap (xs:untypedAtomic+, 6 items) -> StrSeq (xs:untypedAtomic+, 6 items)");
       checkType(ao, "(1 to 6) ! ('0' || .) ! xs:integer()",
-          "xs:integer+, 6 items, DualMap -> xs:integer+, 6 items, RangeSeq");
+          "DualMap (xs:integer+, 6 items) -> RangeSeq (xs:integer+, 6 items)");
       checkType(ao, "(1, 3, 1, 3, 1, 3) ! ('0' || .) ! xs:integer()",
-          "xs:integer+, 6 items, DualMap -> xs:integer+, 6 items, IntSeq");
+          "DualMap (xs:integer+, 6 items) -> IntSeq (xs:integer+, 6 items)");
     } finally {
       System.setErr(ERR);
     }
