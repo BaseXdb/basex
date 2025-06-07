@@ -100,11 +100,6 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public boolean sameType() {
-    throw Util.notExpected();
-  }
-
-  @Override
   public Item itemAt(final long index) {
     throw Util.notExpected();
   }
@@ -135,12 +130,17 @@ public final class Dummy extends Value {
   }
 
   @Override
+  public boolean refineType() {
+    throw Util.notExpected();
+  }
+
+  @Override
   public Value shrink(final QueryContext qc) throws QueryException {
     throw Util.notExpected();
   }
 
   @Override
-  public Value rebuild(final QueryContext qc) throws QueryException {
+  protected Value rebuild(final QueryContext qc) throws QueryException {
     throw Util.notExpected();
   }
 

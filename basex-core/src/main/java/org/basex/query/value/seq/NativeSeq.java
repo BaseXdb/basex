@@ -30,12 +30,12 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final boolean sameType() {
+  public boolean refineType() {
     return true;
   }
 
   @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
+  public final Value shrink(final QueryContext qc) {
     return this;
   }
 }

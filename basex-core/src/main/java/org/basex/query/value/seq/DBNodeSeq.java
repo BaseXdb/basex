@@ -126,9 +126,14 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
-    refineType();
-    return this;
+  public boolean refineType() {
+    if(type == NodeType.NODE) {
+      for(final Item item : this) {
+        if(!item.type.eq(type)) return false;
+      }
+      type = itemAt(0).type;
+    }
+    return true;
   }
 
   @Override

@@ -63,10 +63,10 @@ public final class XQItemValueMap extends XQHashMap {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
-    // see MapBuilder#put for types with compact representation
+  public Item shrink(final QueryContext qc) throws QueryException {
     shrinkValues(qc);
     refineType();
+    // see MapBuilder#put for types with compact representation
     return ((MapType) type).keyType().oneOf(AtomType.INTEGER, AtomType.STRING,
         AtomType.UNTYPED_ATOMIC) ? rebuild(qc) : this;
   }

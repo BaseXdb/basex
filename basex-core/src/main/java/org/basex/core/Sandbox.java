@@ -18,6 +18,7 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.func.prof.ProfType.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -291,15 +292,38 @@ public abstract class Sandbox {
   }
 
   /**
-   * Checks the STDERR output.
-   * @param ao STDERR output
+   * Checks types at runtime.
    * @param query query to run
-   * @param expected expected output
+   * @param expr type of expression
    */
-  protected static void checkType(final ArrayOutput ao, final String query, final String expected) {
-    query(_PROF_TYPE.args(" " + query));
-    final String returned = Token.string(ao.next()).trim();
-    assertEquals(expected, returned, "\nExpected: " + expected + "\nReturned: " + returned);
+  protected static void checkType(final String query, final TypeInfo expr) {
+    checkType(query, expr.toString());
+  }
+
+  /**
+   * Checks types at runtime.
+   * @param query query to run
+   * @param expr type of expression
+   * @param result type info of result
+   */
+  protected static void checkType(final String query, final TypeInfo expr, final TypeInfo result) {
+    checkType(query, expr + " -> " + result);
+  }
+
+  /**
+   * Checks types at runtime.
+   * @param query query to run
+   * @param type expected type info string
+   */
+  private static void checkType(final String query, final String type) {
+    try(ArrayOutput ao = new ArrayOutput()) {
+      System.setErr(new PrintStream(ao));
+      query(_PROF_TYPE.args(" " + query));
+      final String returned = Token.string(ao.next()).trim();
+      assertEquals(type, returned, "\nExpected: " + type + "\nReturned: " + returned);
+    } finally {
+      System.setErr(ERR);
+    }
   }
 
   /**

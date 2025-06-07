@@ -3,10 +3,10 @@ package org.basex.query.func;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
-import java.io.*;
-
 import org.basex.*;
-import org.basex.io.out.*;
+import org.basex.query.func.prof.ProfType.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -221,15 +221,9 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(expr, " { 'mode': 'value' }"), result);
     query(func.args(expr, " { 'mode': 'expression' }"), result);
 
-    try {
-      final ArrayOutput ao = new ArrayOutput();
-      System.setErr(new PrintStream(ao));
-      checkType(ao, "()", "Empty (empty-sequence())");
-      checkType(ao, "1", "Int (xs:integer)");
-      checkType(ao, "1 to 6", "RangeSeq (xs:integer+, 6 items)");
-    } finally {
-      System.setErr(ERR);
-    }
+    checkType("()", new TypeInfo(Empty.class, "empty-sequence()", 0));
+    checkType("1", new TypeInfo(Int.class, "xs:integer", 1));
+    checkType("1 to 6", new TypeInfo(RangeSeq.class, "xs:integer+", 6));
   }
 
   /** Test method. */

@@ -77,11 +77,6 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final boolean sameType() {
-    return true;
-  }
-
-  @Override
   public boolean isItem() {
     return true;
   }
@@ -315,18 +310,23 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Item rebuild(final QueryContext qc) throws QueryException {
+  public boolean refineType() throws QueryException {
+    return true;
+  }
+
+  @Override
+  public Item shrink(final QueryContext qc) throws QueryException {
+    return this;
+  }
+
+  @Override
+  protected Item rebuild(final QueryContext qc) throws QueryException {
     return this;
   }
 
   @Override
   public final boolean ddo() {
     return type instanceof NodeType;
-  }
-
-  @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
-    return this;
   }
 
   /**

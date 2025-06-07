@@ -4,6 +4,8 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.*;
+import org.basex.query.func.prof.ProfType.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -41,6 +43,19 @@ public final class ProfModuleTest extends SandboxTest {
     query(func.args("max") + " instance of xs:integer", true);
     query(func.args("processors") + " instance of xs:integer", true);
     error(func.args("x"), QueryError.PROF_OPTION_X);
+  }
+
+  /** Test method. */
+  @Test public void shrink() {
+    final Function func = _PROF_SHRINK;
+    checkType("(1, 1 to 8) => remove(1)",
+        new TypeInfo(SubSeq.class, "xs:integer+", 8));
+    checkType(func.args(" (1, 1 to 8) => remove(1)"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 8));
+    checkType(func.args(" (1, 1 to 8) => remove(2)"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 8));
+    checkType(func.args(" (1, 1 to 8) => remove(3)"),
+        new TypeInfo(IntSeq.class, "xs:integer+", 8));
   }
 
   /** Test method. */

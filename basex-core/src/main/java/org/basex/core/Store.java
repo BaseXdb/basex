@@ -291,7 +291,7 @@ public final class Store implements Closeable {
       final Integer classId = CLASS_IDS.get(value.getClass());
       if(classId == null) {
         out.writeNum(SEQUENCE);
-        final boolean same = value.sameType();
+        final boolean same = value.refineType();
         out.writeBool(same);
         for(final Item item : value) {
           if(!same) out.writeNum(item.type.index());

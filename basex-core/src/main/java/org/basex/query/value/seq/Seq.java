@@ -135,14 +135,6 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public boolean sameType() {
-    for(final Item item : this) {
-      if(!type.eq(item.type)) return false;
-    }
-    return true;
-  }
-
-  @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc, size);
     for(final Item item : this) vb.add(item.atomValue(qc, ii));
@@ -194,9 +186,29 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public Value rebuild(final QueryContext qc) throws QueryException {
+  public boolean refineType() throws QueryException {
+    boolean same = true;
+    if(type.refinable()) {
+      Type refined = null;
+      for(final Item item : this) {
+        final Type tp = item.type;
+        if(refined == null) {
+          refined = tp;
+        } else {
+          same &= refined.eq(tp);
+          refined = refined.union(tp);
+          if(refined.eq(type)) return same;
+        }
+      }
+      type = refined;
+    }
+    return same;
+  }
+
+  @Override
+  protected final Value rebuild(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc, size());
-    for(final Item item : this) vb.add(item.rebuild(qc));
+    for(final Item item : this) vb.add(item.shrink(qc));
     return vb.value(type);
   }
 

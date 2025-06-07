@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-final class BigArray extends TreeArray {
+public final class BigArray extends TreeArray {
   /** Left digit. */
   final Value[] left;
   /** Middle tree. */

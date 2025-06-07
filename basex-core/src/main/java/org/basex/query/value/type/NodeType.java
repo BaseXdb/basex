@@ -267,6 +267,8 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean refinable() {
+    // simplified; deliberately ignores the document-node(element()) subtype,
+    // as it is not relevant for database nodes
     return this == NodeType.NODE;
   }
 

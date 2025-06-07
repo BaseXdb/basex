@@ -92,7 +92,7 @@ public final class XQTrieMap extends XQMap {
     final TrieUpdate update = new TrieUpdate(key, null, order);
     final TrieNode node = root.remove(key.hashCode(), 0, update);
     if(node == root) return this;
-    if(node == null) return empty();
+    if(node == null) return EMPTY;
 
     // drop map order if a single entry is left
     final TrieOrder to = node.size == 1 ? null : update.order();
@@ -120,7 +120,7 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
-    return rebuild(qc);
+  public Item shrink(final QueryContext qc) throws QueryException {
+    return this == EMPTY ? this : rebuild(qc);
   }
 }

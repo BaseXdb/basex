@@ -15,7 +15,7 @@ public final class XQSingletonMap extends XQMap {
   /** Key. */
   private final Item k;
   /** Value. */
-  private final Value v;
+  private Value v;
 
   /**
    * Constructor.
@@ -76,5 +76,12 @@ public final class XQSingletonMap extends XQMap {
   @Override
   public boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
     return func.test(k, v);
+  }
+
+  @Override
+  public Item shrink(final QueryContext qc) throws QueryException {
+    v = v.shrink(qc);
+    type = MapType.get(k.type, v.seqType());
+    return this;
   }
 }

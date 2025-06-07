@@ -86,7 +86,7 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
+  public Item shrink(final QueryContext qc) throws QueryException {
     shrinkValues(qc);
     return this;
   }

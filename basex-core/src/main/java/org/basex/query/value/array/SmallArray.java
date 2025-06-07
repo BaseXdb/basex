@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-final class SmallArray extends TreeArray {
+public final class SmallArray extends TreeArray {
   /** The members. */
   final Value[] members;
 

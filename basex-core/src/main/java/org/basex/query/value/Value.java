@@ -289,12 +289,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Checks if all items of the sequence are of the same type.
-   * @return result of check
-   */
-  public abstract boolean sameType();
-
-  /**
    * Returns all items of this value in reverse order.
    * @param qc query context
    * @return items in reverse order
@@ -302,7 +296,15 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Value reverse(QueryContext qc);
 
   /**
+   * Refines the type of a value.
+   * @return if the sequence is homogeneous, i.e., if all items are of the same type
+   * @throws QueryException query exception
+   */
+  public abstract boolean refineType() throws QueryException;
+
+  /**
    * If possible, returns a compactified version of this value.
+   * Note that the memory consumption may increase during the reconstruction of a data structure.
    * @param qc query context
    * @return compactified value or self reference
    * @throws QueryException query exception
@@ -310,33 +312,13 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract Value shrink(QueryContext qc) throws QueryException;
 
   /**
-   * Refines the type of a value.
-   * @return refined (and assigned) type
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public Type refineType() throws QueryException {
-    if(type.refinable()) {
-      Type refined = null;
-      for(final Item item : this) {
-        final Type tp = item.type;
-        refined = refined == null ? tp : refined.union(tp);
-        if(refined == type) break;
-      }
-      if(refined != null) type = refined;
-    }
-    return type;
-  }
-
-  /**
    * Saves memory by recursively rebuilding the data structure.
-   * The function is implemented for sequences, maps and arrays.
-   * Note that the memory consumption may increase during the reconstruction.
+   * Called by {@link #shrink(QueryContext)} and implemented for sequences, maps and arrays.
    * @param qc query exception
-   * @return value
+   * @return rebuilt data structure
    * @throws QueryException query exception
    */
-  public abstract Value rebuild(QueryContext qc) throws QueryException;
+  protected abstract Value rebuild(QueryContext qc) throws QueryException;
 
   @Override
   public boolean accept(final ASTVisitor visitor) {

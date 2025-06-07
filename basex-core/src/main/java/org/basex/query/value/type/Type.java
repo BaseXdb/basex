@@ -298,8 +298,8 @@ public interface Type {
   boolean nsSensitive();
 
   /**
-   * Checks if the type is general enough to be refined.
-   * @return result of check
+   * Checks if the type can possibly be refined, e.g. if it has subtypes.
+   * @return result of check (may also wrongly return {@code false})
    */
   default boolean refinable() {
     return false;

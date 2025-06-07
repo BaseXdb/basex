@@ -8,9 +8,12 @@ import java.io.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.io.out.*;
+import org.basex.query.func.prof.ProfType.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.seq.tree.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -431,37 +434,84 @@ public final class MixedTest extends SandboxTest {
     check("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
         "A\nB\nA\nB\nA\nB", root(StrSeq.class), type(StrSeq.class, "xs:untypedAtomic+"));
 
-    try {
-      final ArrayOutput ao = new ArrayOutput();
-      System.setErr(new PrintStream(ao));
-      // inspection
-      checkType(ao, "('A', 'B', 'A', 'B', 'A', 'B')",
-          "StrSeq (xs:string+, 6 items)");
-      checkType(ao, "(1, 3, 1, 3, 1, 3)",
-          "IntSeq (xs:integer+, 6 items)");
-      checkType(ao, "data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
-          "StrSeq (xs:untypedAtomic+, 6 items)");
+    // inspection
+    checkType("('A', 'B', 'A', 'B', 'A', 'B')",
+        new TypeInfo(StrSeq.class, "xs:string+", 6));
+    checkType("(1, 3, 1, 3, 1, 3)",
+        new TypeInfo(IntSeq.class, "xs:integer+", 6));
+    checkType("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))",
+        new TypeInfo(StrSeq.class, "xs:untypedAtomic+", 6));
 
-      // filters
-      checkType(ao, "('A', 'B', 'A', 'B', 'A', 'B')[not(. = 'C')]",
-          "IterFilter (xs:string*) -> StrSeq (xs:string+, 6 items)");
-      checkType(ao, "data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))"
-          + "[not(. = 'C')]",
-          "IterFilter (xs:untypedAtomic*) -> StrSeq (xs:untypedAtomic+, 6 items)");
-      checkType(ao, "(1, 3, 1, 3, 1, 3)[not(. = 2)]",
-          "IterFilter (xs:integer*) -> IntSeq (xs:integer+, 6 items)");
+    // filters
+    checkType("('A', 'B', 'A', 'B', 'A', 'B')[not(. = 'C')]",
+        new TypeInfo(IterFilter.class, "xs:string*", -1),
+        new TypeInfo(StrSeq.class, "xs:string+", 6));
+    checkType("data((<a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>, <a>A</a>, <a>B</a>))[not(. = 'C')]",
+        new TypeInfo(IterFilter.class, "xs:untypedAtomic*", -1),
+        new TypeInfo(StrSeq.class, "xs:untypedAtomic+", 6));
+    checkType("(1, 3, 1, 3, 1, 3)[not(. = 2)]",
+        new TypeInfo(IterFilter.class, "xs:integer*", -1),
+        new TypeInfo(IntSeq.class, "xs:integer+", 6));
 
-      // map operator
-      checkType(ao, "(1 to 6) ! string()",
-          "DualMap (xs:string+, 6 items) -> StrSeq (xs:string+, 6 items)");
-      checkType(ao, "(1 to 6) ! xs:untypedAtomic()",
-          "DualMap (xs:untypedAtomic+, 6 items) -> StrSeq (xs:untypedAtomic+, 6 items)");
-      checkType(ao, "(1 to 6) ! ('0' || .) ! xs:integer()",
-          "DualMap (xs:integer+, 6 items) -> RangeSeq (xs:integer+, 6 items)");
-      checkType(ao, "(1, 3, 1, 3, 1, 3) ! ('0' || .) ! xs:integer()",
-          "DualMap (xs:integer+, 6 items) -> IntSeq (xs:integer+, 6 items)");
-    } finally {
-      System.setErr(ERR);
-    }
+    // map operator
+    checkType("(1 to 6) ! string()",
+        new TypeInfo(DualMap.class, "xs:string+", 6),
+        new TypeInfo(StrSeq.class, "xs:string+", 6));
+    checkType("(1 to 6) ! xs:untypedAtomic()",
+        new TypeInfo(DualMap.class, "xs:untypedAtomic+", 6),
+        new TypeInfo(StrSeq.class, "xs:untypedAtomic+", 6));
+    checkType("(1 to 6) ! ('0' || .) ! xs:integer()",
+        new TypeInfo(DualMap.class, "xs:integer+", 6),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 6));
+    checkType("(1, 3, 1, 3, 1, 3) ! ('0' || .) ! xs:integer()",
+        new TypeInfo(DualMap.class, "xs:integer+", 6),
+        new TypeInfo(IntSeq.class, "xs:integer+", 6));
+  }
+
+  /** Tests the data structure before and after shrinking. */
+  @Test public void shrink() {
+    test("('x', 1 to 3) => remove(1)",
+        new TypeInfo(SmallSeq.class, "xs:anyAtomicType+", 3),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 3));
+    test("('x', 1 to 100) => remove(1)",
+        new TypeInfo(BigSeq.class, "xs:anyAtomicType+", 100),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 100));
+
+    test("map:build(1 to 3) => map:remove(1)",
+        new TypeInfo(XQTrieMap.class, "map(xs:integer, xs:integer)", 2),
+        new TypeInfo(XQIntMap.class, "map(xs:integer, xs:integer)", 2));
+    test("map { 1: ('x', 1 to 3) => remove(1) }",
+        new TypeInfo(XQSingletonMap.class, "map(xs:integer, xs:anyAtomicType+)", 1),
+        new TypeInfo(XQSingletonMap.class, "map(xs:integer, xs:integer+)", 1));
+    test("map { 1: ('x', 1 to 3) => remove(1), 2: 3 }",
+        new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:anyAtomicType+)", 2),
+        new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:integer+)", 2));
+    test("map { 1: ('x', 1 to 3) => remove(1), 2: 3 }",
+        new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:anyAtomicType+)", 2),
+        new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:integer+)", 2));
+    test("map { 'a': ('x', 1 to 3) => remove(1), 'b': 3 }",
+        new TypeInfo(XQRecordMap.class, "record(a as xs:anyAtomicType+, b as xs:integer)", 2),
+        new TypeInfo(XQRecordMap.class, "record(a as xs:anyAtomicType+, b as xs:integer)", 2));
+
+    test("[ (1, 2), 3, 4 ] => array:remove(1)",
+        new TypeInfo(SmallArray.class, "array(xs:integer+)", 2),
+        new TypeInfo(ItemArray.class, "array(xs:integer)", 2));
+    test("[ (1, 2), 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ] => array:remove(1)",
+        new TypeInfo(BigArray.class, "array(xs:integer+)", 10),
+        new TypeInfo(ItemArray.class, "array(xs:integer)", 10));
+    test("array { ('x', 1 to 3) => remove(1) }",
+        new TypeInfo(ItemArray.class, "array(xs:anyAtomicType)", 3),
+        new TypeInfo(ItemArray.class, "array(xs:integer)", 3));
+  }
+
+  /**
+   * Tests the data structure of an expression before and after shrinking it.
+   * @param query query
+   * @param before type before shrinking
+   * @param after type after shrinking
+   */
+  private void test(final String query, final TypeInfo before, final TypeInfo after) {
+    checkType(query, before);
+    checkType(_PROF_SHRINK.args(" " + query), after);
   }
 }

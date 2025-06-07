@@ -97,7 +97,7 @@ abstract class XQHashMap extends XQMap {
    */
   final void shrinkValues(final QueryContext qc) throws QueryException {
     final long is = structSize();
-    for(int i = 0; i < is; i++) valueAt(i, valueAt(i).rebuild(qc));
+    for(int i = 0; i < is; i++) valueAt(i, valueAt(i).shrink(qc));
   }
 
   /**

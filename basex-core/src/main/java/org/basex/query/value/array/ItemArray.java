@@ -17,7 +17,7 @@ import org.basex.util.*;
  */
 public final class ItemArray extends XQArray {
   /** Members. */
-  final Value members;
+  private Value members;
 
   /**
    * Constructor.
@@ -90,8 +90,8 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
-    members.shrink(qc);
+  public Item shrink(final QueryContext qc) throws QueryException {
+    members = members.shrink(qc);
     type = ArrayType.get(members.seqType().with(Occ.EXACTLY_ONE));
     return this;
   }

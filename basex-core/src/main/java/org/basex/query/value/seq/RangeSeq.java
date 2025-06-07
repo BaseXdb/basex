@@ -146,11 +146,6 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public boolean sameType() {
-    return true;
-  }
-
-  @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii) {
     return true;
   }
@@ -197,6 +192,11 @@ public final class RangeSeq extends Seq {
   public boolean equals(final Object obj) {
     return this == obj || (obj instanceof final RangeSeq rs ? start == rs.start &&
         size == rs.size && ascending == rs.ascending : super.equals(obj));
+  }
+
+  @Override
+  public boolean refineType() {
+    return true;
   }
 
   @Override

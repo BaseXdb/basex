@@ -2,6 +2,7 @@ package org.basex.query.value.array;
 
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -32,7 +33,7 @@ abstract class TreeArray extends XQArray {
   }
 
   @Override
-  public final Value shrink(final QueryContext qc) throws QueryException {
+  public final Item shrink(final QueryContext qc) throws QueryException {
     return rebuild(qc);
   }
 

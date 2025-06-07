@@ -373,22 +373,22 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  public final Type refineType() throws QueryException {
+  public final boolean refineType() throws QueryException {
     Type refined = null;
     for(final Item key : keys()) {
       final Value value = get(key);
       final MapType mt = MapType.get(key.type, value.seqType());
       refined = refined == null ? mt : refined.union(mt);
-      if(refined.eq(type)) break;
+      if(refined.eq(type)) return true;
     }
-    if(refined != null) type = refined;
-    return type;
+    type = refined;
+    return true;
   }
 
   @Override
-  public final XQMap rebuild(final QueryContext qc) throws QueryException {
+  protected final XQMap rebuild(final QueryContext qc) throws QueryException {
     final MapBuilder mb = new MapBuilder(structSize());
-    forEach((key, value) -> mb.put(key, value.rebuild(qc)));
+    forEach((key, value) -> mb.put(key, value.shrink(qc)));
     return mb.map(this);
   }
 
