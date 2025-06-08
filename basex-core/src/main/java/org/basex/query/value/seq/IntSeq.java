@@ -48,14 +48,14 @@ public final class IntSeq extends NativeSeq {
       throws IOException {
     final int size = in.readNum();
     final int[] values = new int[size];
-    for(int s = 0; s < size; s++) values[s] = in.readNum();
+    for(int s = 0; s < size; s++) values[s] = (int) in.readLong();
     return get(values, type);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     out.writeNum((int) size);
-    for(final long v : values) out.writeLong(v);
+    for(final int v : values) out.writeLong(v);
   }
 
   @Override
@@ -122,24 +122,24 @@ public final class IntSeq extends NativeSeq {
     switch((AtomType) type) {
       case BYTE:
         final ByteList bl = new ByteList((int) size);
-        for(final long value : values) bl.add((byte) value);
+        for(final int value : values) bl.add((byte) value);
         return bl.finish();
       case SHORT:
       case UNSIGNED_BYTE:
         final ShortList sl = new ShortList((int) size);
-        for(final long value : values) sl.add((short) value);
+        for(final int value : values) sl.add((short) value);
         return sl.finish();
       case UNSIGNED_SHORT:
         final char[] chars = new char[(int) size];
         int c = 0;
-        for(final long value : values) chars[c++] = (char) value;
+        for(final int value : values) chars[c++] = (char) value;
         return chars;
       case INT:
-        final IntList il = new IntList((int) size);
-        for(final long value : values) il.add((int) value);
-        return il.finish();
-      default:
         return values;
+      default:
+        final LongList il = new LongList((int) size);
+        for(final int value : values) il.add(value);
+        return il.finish();
     }
   }
 
@@ -171,15 +171,15 @@ public final class IntSeq extends NativeSeq {
     final int vl = values.length;
     if(vl == 0) return Empty.VALUE;
     // single item?
-    final long first = values[0];
+    final int first = values[0];
     if(vl == 1) return Int.get(first, type);
     // singleton or range?
     boolean singleton = true, range = true;
     int v = 0;
     while((singleton || range) && ++v < vl) {
-      final long l = values[v];
-      singleton &= l == first;
-      range &= l == first + v;
+      final int i = values[v];
+      singleton &= i == first;
+      range &= i == first + v;
     }
     if(v == vl) {
       if(singleton) return SingletonSeq.get(Int.get(first, type), vl);
