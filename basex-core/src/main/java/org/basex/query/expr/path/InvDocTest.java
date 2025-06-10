@@ -2,7 +2,6 @@ package org.basex.query.expr.path;
 
 import org.basex.data.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -37,14 +36,11 @@ final class InvDocTest extends Test {
   /**
    * Returns a document test. This test will only be called by the {@link AxisPath} expression
    * if the root is no value, or if it only contains database nodes.
-   * @param rt compile time root (can be {@code null})
+   * @param root compile time root value
    * @return document test
    * @throws QueryException query exception
    */
-  static Test get(final Expr rt) throws QueryException {
-    // root unknown: use simple test
-    if(!(rt instanceof final Value root)) return KindTest.DOCUMENT_NODE;
-
+  static Test get(final Value root) throws QueryException {
     // use simple test if database contains only one document
     final Data data = root.data();
     if(data == null || data.meta.ndocs == 1) return KindTest.DOCUMENT_NODE;

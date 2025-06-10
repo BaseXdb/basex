@@ -324,6 +324,16 @@ public final class IndexOptimizeTest extends SandboxTest {
     query("M/descendant-or-self::M[contains-token(@v, 'a')]", xml);
   }
 
+  /** ENFORCEINDEX, collections. */
+  @Test public void gh2442() {
+    execute(new CreateDB(NAME));
+    execute(new Add("1.xml", "<x>X</x>"));
+    execute(new Add("2.xml", "<x>X</x>"));
+    execute(new Optimize());
+    query("head(db:get('" + NAME + "'))//*[text() = 'X']", "<x>X</x>");
+    query("(# db:enforceindex #) { head(db:get('" + NAME + "'))//*[text() = 'X'] }", "<x>X</x>");
+  }
+
   /**
    * Creates a test database.
    */

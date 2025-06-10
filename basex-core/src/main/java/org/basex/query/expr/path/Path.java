@@ -13,6 +13,7 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
 import org.basex.query.func.Function;
@@ -776,10 +777,16 @@ public abstract class Path extends ParseExpr {
       }
     }
 
-    // skip rewriting if no index access is possible, if it is too expensive or if root is no value
+    // skip rewriting if no index access is possible or if it is too expensive
     if(index == null || data != null && index.costs.tooExpensive(data)) return this;
-    // skip optimization if it is not enforced
-    if((!(rt instanceof Value) || rt instanceof Dummy) && !index.enforce()) return this;
+    // skip optimization if root is no value and if index access is not enforced
+    Test rootTest = null;
+    if(rt instanceof Value value && !(value instanceof Dummy)) {
+      rootTest = InvDocTest.get(value);
+    } else {
+      // continue if index use is enforced (skip context-dependent or nondeterministic roots)
+      if(!index.enforce() || rt.isSimple()) return this;
+    }
 
     // rewrite for index access
     cc.info(index.optInfo);
@@ -801,7 +808,6 @@ public abstract class Path extends ParseExpr {
     // invert steps that occur before index step, rewrite them to predicates
     final Expr indexStep = indexSteps.isEmpty() ? null : indexSteps.peek();
     final ExprList invSteps = new ExprList(), lastPreds = new ExprList();
-    final Test rootTest = InvDocTest.get(rt);
     if(rootTest != KindTest.DOCUMENT_NODE || data == null || !data.meta.uptodate ||
         invertSteps(stepIndex)) {
       for(int s = stepIndex; s >= 0; s--) {
@@ -813,8 +819,16 @@ public abstract class Path extends ParseExpr {
         if(s == 0) {
           ii = info;
           newAxis = axis;
-          newTest = rootTest;
-          newPreds = new Expr[0];
+          if(rootTest != null) {
+            // ...::document-node()
+            newTest = rootTest;
+            newPreds = new Expr[0];
+          } else {
+            // index use is enforced: ...::document-node()[db:node-id(.) = db:node-id(ROOT)]
+            newTest = KindTest.DOCUMENT_NODE;
+            newPreds = new Expr[] { new CmpG(info, _DB_NODE_ID.get(info, new ContextValue(ii)),
+              _DB_NODE_ID.get(info, rt), OpG.EQ) };
+          }
         } else {
           final Step step = axisStep(s - 1);
           ii = step.info();
