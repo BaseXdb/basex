@@ -784,8 +784,8 @@ public abstract class Path extends ParseExpr {
     if(rt instanceof Value value && !(value instanceof Dummy)) {
       rootTest = InvDocTest.get(value);
     } else {
-      // continue if index use is enforced (skip context-dependent or nondeterministic roots)
-      if(!index.enforce() || rt.isSimple()) return this;
+      // continue if index use is enforced (skip context-dependent roots)
+      if(!index.enforce() || rt.has(Flag.CTX)) return this;
     }
 
     // rewrite for index access
