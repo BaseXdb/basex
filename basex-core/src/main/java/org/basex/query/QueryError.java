@@ -239,9 +239,9 @@ public enum QueryError {
   /** Error code. */
   DB_NOINDEX_X_X(DB, "no-index", "Database '%' has no % index."),
   /** Error code. */
-  DB_OPEN1_X(DB, "open", "Database '%' not found."),
+  DB_GET1_X(DB, "get", "Database '%' not found."),
   /** Error code. */
-  DB_OPEN2_X(DB, "open", "%"),
+  DB_GET2_X(DB, "get", "%"),
   /** Error code. */
   DB_OPTION_X(DB, "option", "Unknown option: %."),
   /** Error code. */

@@ -201,7 +201,7 @@ public final class QueryResources {
     try {
       return addData(Open.open(name, context, context.options, true, false));
     } catch(final IOException ex) {
-      throw DB_OPEN2_X.get(info, ex);
+      throw DB_GET2_X.get(info, ex);
     }
   }
 

@@ -59,7 +59,7 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void eval2() {
     // database creation
     final Function func = _JOB_EVAL;
-    error(_DB_GET.args("db"), DB_OPEN2_X);
+    error(_DB_GET.args("db"), DB_GET2_X);
     query(VOID.args(func.args("db:get('db')")) + ',' + _DB_CREATE.args("db"));
     query(func.args("db:drop('db')") + ',' + VOID.args(_DB_GET.args("db")));
     query(func.args("delete node <a/>"));
@@ -318,7 +318,7 @@ public final class JobModuleTest extends SandboxTest {
     final Function func = _JOB_RESULT;
     final String id = query(_JOB_EVAL.args("db:get('db')", " ()", " map { 'cache': true() }"));
     query(_JOB_WAIT.args(id));
-    error(func.args(id), DB_OPEN2_X);
+    error(func.args(id), DB_GET2_X);
   }
 
   /** Test method. */

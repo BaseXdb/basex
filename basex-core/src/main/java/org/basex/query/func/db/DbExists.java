@@ -36,7 +36,7 @@ public final class DbExists extends DbAccessFn {
       };
       return data.resources.doc(path) != -1 || exists.any(Resources.BINARIES);
     } catch(final QueryException ex) {
-      if(ex.error() == DB_OPEN2_X) return false;
+      if(ex.error() == DB_GET2_X) return false;
       throw ex;
     }
   }
@@ -46,7 +46,7 @@ public final class DbExists extends DbAccessFn {
     try {
       return compileData(cc);
     } catch(final QueryException ex) {
-      if(ex.error() == DB_OPEN2_X) return Bln.FALSE;
+      if(ex.error() == DB_GET2_X) return Bln.FALSE;
       throw ex;
     }
   }

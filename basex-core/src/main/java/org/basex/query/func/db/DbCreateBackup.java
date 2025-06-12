@@ -22,7 +22,7 @@ public final class DbCreateBackup extends BackupFn {
     final CreateBackupOptions options = toOptions(arg(1), new CreateBackupOptions(), qc);
 
     checkPerm(qc, Perm.CREATE, name);
-    if(!name.isEmpty() && !qc.context.soptions.dbExists(name)) throw DB_OPEN1_X.get(info, name);
+    if(!name.isEmpty() && !qc.context.soptions.dbExists(name)) throw DB_GET1_X.get(info, name);
 
     final String comment = options.get(CreateBackupOptions.COMMENT);
     final boolean compress = options.get(CreateBackupOptions.COMPRESS);

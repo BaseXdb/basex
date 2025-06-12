@@ -35,7 +35,7 @@ public class DbCopy extends DbAccessFn {
 
     // source database does not exist
     checkPerm(qc, Perm.CREATE, name);
-    if(!qc.context.soptions.dbExists(name)) throw DB_OPEN1_X.get(info, name);
+    if(!qc.context.soptions.dbExists(name)) throw DB_GET1_X.get(info, name);
 
     qc.updates().add(keep ? new DBCopy(name, newname, qc, info) :
       new DBAlter(name, newname, qc, info), qc);

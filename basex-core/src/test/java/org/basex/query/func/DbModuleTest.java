@@ -160,7 +160,7 @@ public final class DbModuleTest extends SandboxTest {
     // same name is disallowed
     error(func.args(NAME, NAME), DB_CONFLICT4_X);
     // source database does not exist
-    error(func.args(NAME + "alter", NAME), DB_OPEN1_X);
+    error(func.args(NAME + "alter", NAME), DB_GET1_X);
   }
 
   /** Test method. */
@@ -262,7 +262,7 @@ public final class DbModuleTest extends SandboxTest {
     // same name is disallowed
     error(func.args(NAME, NAME), DB_CONFLICT4_X);
     // source database does not exist
-    error(func.args(NAME + "copy", NAME), DB_OPEN1_X);
+    error(func.args(NAME + "copy", NAME), DB_GET1_X);
   }
 
   /** Test method. */
@@ -318,7 +318,7 @@ public final class DbModuleTest extends SandboxTest {
 
     // try to access non-existing DB
     query(_DB_DROP.args(NAME));
-    error(func.args(NAME) + ',' + _DB_DROP.args(NAME), DB_OPEN1_X);
+    error(func.args(NAME) + ',' + _DB_DROP.args(NAME), DB_GET1_X);
 
     // run update on existing DB then drop it and create a new one
     query(func.args(NAME, " <a/>", "a.xml"));
@@ -423,7 +423,7 @@ public final class DbModuleTest extends SandboxTest {
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
     // try to back up non-existing database
-    error(func.args(NAME + "backup"), DB_OPEN1_X);
+    error(func.args(NAME + "backup"), DB_GET1_X);
   }
 
   /** Test method. */
@@ -463,7 +463,7 @@ public final class DbModuleTest extends SandboxTest {
     query(call + "/text()", "value.data");
 
     query(func.args(NAME, "test"), "");
-    error(func.args("notAvailable", ""), DB_OPEN2_X);
+    error(func.args("notAvailable", ""), DB_GET2_X);
   }
 
   /** Test method. */
@@ -479,7 +479,7 @@ public final class DbModuleTest extends SandboxTest {
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), DB_NAME_X);
     // try to drop non-existing DB
-    error(func.args(dbName), DB_OPEN1_X);
+    error(func.args(dbName), DB_GET1_X);
   }
 
   /** Test method. */
@@ -543,7 +543,7 @@ public final class DbModuleTest extends SandboxTest {
   @Test public void flush() {
     final Function func = _DB_FLUSH;
     query(func.args(NAME));
-    error(func.args(NAME + "unknown"), DB_OPEN2_X);
+    error(func.args(NAME + "unknown"), DB_GET2_X);
   }
 
   /** Test method. */
@@ -563,7 +563,7 @@ public final class DbModuleTest extends SandboxTest {
 
     // run function on non-existing database
     execute(new DropDB(NAME));
-    error(func.args(NAME), DB_OPEN2_X);
+    error(func.args(NAME), DB_GET2_X);
   }
 
   /** Test method. */
@@ -677,7 +677,7 @@ public final class DbModuleTest extends SandboxTest {
     query(call + "/text()", "value/value.data");
 
     query(func.args(NAME, "test"), "");
-    error(func.args("notAvailable"), DB_OPEN2_X);
+    error(func.args("notAvailable"), DB_GET2_X);
   }
 
   /** Test method. */
