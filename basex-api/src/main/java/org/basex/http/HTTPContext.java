@@ -7,7 +7,6 @@ import jakarta.servlet.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.util.*;
 
@@ -62,12 +61,11 @@ public final class HTTPContext {
    * Initializes the HTTP context, based on the initial servlet context.
    * Parses all context parameters and passes them on to the database context.
    * @param sc servlet context
-   * @return database context
    * @throws IOException I/O exception
    */
-  public synchronized Context init(final ServletContext sc) throws IOException {
+  public synchronized void init(final ServletContext sc) throws IOException {
     // check if servlet context has already been initialized
-    if(context != null) return context;
+    if(context != null) return;
 
     final String webapp = sc.getRealPath("/");
     // system property (requested in Prop#homePath)
@@ -103,10 +101,7 @@ public final class HTTPContext {
         throw ex;
       }
     }
-
-    // initialize persistent jobs
-    new Jobs(context).init();
-    return context;
+    context.initServer();
   }
 
   /**

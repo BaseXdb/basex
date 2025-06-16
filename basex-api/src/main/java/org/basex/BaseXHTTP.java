@@ -147,7 +147,8 @@ public final class BaseXHTTP extends CLI {
 
     // initialize web.xml settings, assign system properties and run database server.
     // the call of this function may already have been triggered during the start of jetty
-    context = hc.init(wac.getServletContext());
+    hc.init(wac.getServletContext());
+    context = hc.context();
     if(password != null) context.user().password(password);
 
     // start daemon for stopping the HTTP server

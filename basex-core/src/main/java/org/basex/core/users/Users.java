@@ -18,6 +18,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
+import org.basex.util.log.*;
 
 /**
  * This class organizes all users.
@@ -104,6 +105,20 @@ public final class Users {
     } catch(final IOException | QueryException ex) {
       Util.errln(ex);
     }
+  }
+
+  /**
+   * Creates an initial admin password and writes it to the logs.
+   * @param ctx database context
+   */
+  public synchronized void init(final Context ctx) {
+    if(file.exists()) return;
+
+    final String pw = UUID.randomUUID().toString();
+    get(ADMIN).password(pw);
+    write();
+    ctx.log.writeServer(LogType.INFO,
+        "Initial " + ADMIN + " password (change after first login): " + pw);
   }
 
   /**

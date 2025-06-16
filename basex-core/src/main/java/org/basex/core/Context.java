@@ -1,5 +1,6 @@
 package org.basex.core;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.core.jobs.*;
@@ -169,6 +170,15 @@ public final class Context {
     datas.close();
     log.close();
     closeDB();
+  }
+
+  /**
+   * Initializes a server instance.
+   * @throws IOException I/O exception
+   */
+  public void initServer() throws IOException {
+    new Jobs(this).init();
+    users.init(this);
   }
 
   /**
