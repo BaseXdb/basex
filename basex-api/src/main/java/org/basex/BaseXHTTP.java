@@ -274,9 +274,6 @@ public final class BaseXHTTP extends CLI {
             Prop.put(StaticOptions.PORT, Integer.toString(p));
             Prop.put(StaticOptions.SERVERPORT, Integer.toString(p));
             break;
-          case 'P': // default admin password
-            password = arg.string();
-            break;
           case 'q': // quiet flag (hidden)
             quiet = true;
             break;

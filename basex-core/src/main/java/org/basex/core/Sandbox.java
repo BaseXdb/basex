@@ -548,8 +548,8 @@ public abstract class Sandbox {
    * @throws IOException I/O exception
    */
   public static BaseXServer createServer(final String... args) throws IOException {
-    final StringList sl = new StringList("-z", "-p" + DB_PORT, "-P" + NAME, "-q").add(args);
-    final BaseXServer server = new BaseXServer(sl.finish());
+    final StringList sl = new StringList("-p" + DB_PORT, "-z", "-c", "password " + NAME, "-q");
+    final BaseXServer server = new BaseXServer(sl.add(args).finish());
     server.context.soptions.set(StaticOptions.DBPATH, sandbox().path());
     return server;
   }
