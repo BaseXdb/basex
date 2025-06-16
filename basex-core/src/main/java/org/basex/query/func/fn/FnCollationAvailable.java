@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
@@ -15,8 +17,8 @@ import org.basex.util.*;
 public final class FnCollationAvailable extends StandardFunc {
   /** Enumeration. */
   private enum Usage {
-    /** Equality. */ EQUALITY,
-    /** Sort. */ SORT,
+    /** Compare. */ COMPARE,
+    /** Key. */ KEY,
     /** Substring. */ SUBSTRING;
 
     @Override
@@ -36,9 +38,10 @@ public final class FnCollationAvailable extends StandardFunc {
    final byte[] collation = toToken(arg(0), qc);
     final Value usage = arg(1).value(qc);
 
+    final EnumSet<Usage> usages = EnumSet.noneOf(Usage.class);
+    for(final Item use : usage) usages.add(toEnum(use, Usage.class));
     try {
       toCollation(collation, qc);
-      for(final Item use : usage) toEnum(use, Usage.class);
     } catch(final QueryException ex) {
       Util.debug(ex);
       return false;
