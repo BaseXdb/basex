@@ -13,8 +13,5 @@ CORE="$( cd -P "$MAIN/../basex-core" && pwd )"
 # API, core, and library classes
 CP=$MAIN/target/classes:$MAIN/lib/custom/*:$MAIN/lib/*:$CORE/lib/*:$CLASSPATH
 
-# Options for virtual machine (can be extended by global options)
-BASEX_JVM="-Xmx2g $BASEX_JVM"
-
 # Run code
 exec java -cp "$CP" $BASEX_JVM org.basex.BaseXHTTP "$@"

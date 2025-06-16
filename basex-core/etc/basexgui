@@ -12,8 +12,5 @@ MAIN="$( cd -P "$(dirname "$FILE")/.." && pwd )"
 # Core and library classes
 CP=$MAIN/target/classes:$MAIN/lib/custom/*:$MAIN/lib/*:$CLASSPATH
 
-# Options for virtual machine (can be extended by global options)
-BASEX_JVM="-Xmx2g $BASEX_JVM"
-
 # Run code
 exec java -cp "$CP" $BASEX_JVM org.basex.BaseXGUI "$@"
