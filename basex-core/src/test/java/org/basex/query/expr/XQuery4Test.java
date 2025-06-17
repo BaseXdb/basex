@@ -85,10 +85,10 @@ public final class XQuery4Test extends SandboxTest {
     query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 0]", "");
 
     check("1 otherwise void(2)", 1, root(Int.class));
-    check("void(1, true()) otherwise 2", 2, root(Otherwise.class));
-    check("void(1, true()) otherwise void(2, true())", "", root(Otherwise.class));
+    check("void(1) otherwise 2", 2, root(Otherwise.class));
+    check("void(1) otherwise void(2)", "", root(Otherwise.class));
 
-    check("count(void(1, true()) otherwise void(2, true()))", 0, root(COUNT));
+    check("count(void(1) otherwise void(2))", 0, root(COUNT));
     query("count((1 to 10)[. = 0] otherwise (1 to 10)[. = 2])", 1);
     query("count((1 to 10)[. = 1] otherwise (1 to 10)[. = 2])", 1);
 
@@ -129,8 +129,8 @@ public final class XQuery4Test extends SandboxTest {
     check("(3, <_>4</_>)[. = 3] otherwise ()", 3, root(IterFilter.class));
     check("(4, <_>5</_>)[. = 4] otherwise <z/>", 4, root(Otherwise.class));
 
-    check("void(1, true()) otherwise 2", 2, root(Otherwise.class));
-    check("void(2, true()) otherwise void(3, true())", "", root(Otherwise.class));
+    check("void(1) otherwise 2", 2, root(Otherwise.class));
+    check("void(2) otherwise void(3)", "", root(Otherwise.class));
 
     check("<_>6</_>[. = 6] otherwise 7", "<_>6</_>", root(Otherwise.class));
   }

@@ -922,8 +922,8 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>[path() instance of xs:string]", "<a/>", root(CElem.class));
     check("<a/>[name() = 'a']", "<a/>", exists(CmpSimpleG.class));
 
-    check("() => void(true()) => node-name()", "", root(VOID));
-    check("() => void(true()) => prefix-from-QName()", "", root(VOID));
+    check("() => void() => node-name()", "", root(VOID));
+    check("() => void() => prefix-from-QName()", "", root(VOID));
   }
 
   /** Rewrite name tests to self steps. */
@@ -1091,7 +1091,7 @@ public final class RewritingsTest extends SandboxTest {
   /** If expression with empty branches. */
   @Test public void gh1809() {
     check("if(" + wrap(1) + "[. = 1]) then () else ()", "", empty());
-    check("if(void(1, true())) then () else ()", "", root(VOID), count(VOID, 1));
+    check("if(void(1)) then () else ()", "", root(VOID), count(VOID, 1));
   }
 
   /** Redundant predicates in paths. */
@@ -1155,8 +1155,8 @@ public final class RewritingsTest extends SandboxTest {
       "  default return x\n" +
       ")/z", "", empty());
 
-    check("(x, void((), true()))/z", "", empty());
-    check("(x | void((), true()))/z", "", empty());
+    check("(x, void(()))/z", "", empty());
+    check("(x | void(()))/z", "", empty());
     check("(if(" + _RANDOM_DOUBLE.args() + ") then x)/z", "", empty());
   }
 
@@ -1183,17 +1183,17 @@ public final class RewritingsTest extends SandboxTest {
   /** FLWOR, no results, nondeterministic expressions. */
   @Test public void gh1819() {
     check("for $_ in () return <x/>", "", empty());
-    check("for $_ in void(1, true()) return 1", "", root(VOID));
+    check("for $_ in void(1) return 1", "", root(VOID));
     check("let $_ := 1 return <x/>", "<x/>", root(CElem.class));
-    check("let $_ := void(1, true()) return 1", 1, root(List.class), exists(VOID));
+    check("let $_ := void(1) return 1", 1, root(List.class), exists(VOID));
     check("for $_ in 1 to 2 return 3", "3\n3", root(SingletonSeq.class));
     check("for $_ in 1 to 2 return ()", "", empty());
 
-    check("let $_ := void(1, true()) return 1", 1, root(List.class), exists(VOID));
+    check("let $_ := void(1) return 1", 1, root(List.class), exists(VOID));
 
     // rewrite to simple map
     check("for $_ in 1 to 2 return <a/>", "<a/>\n<a/>", root(REPLICATE));
-    check("for $_ in 1 to 2 return void(1, true())", "", root(REPLICATE));
+    check("for $_ in 1 to 2 return void(1)", "", root(REPLICATE));
   }
 
   /** Merge and/or expressions. */
@@ -1763,7 +1763,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Simple map implementation for two operands. */
   @Test public void gh1889() {
     check("(1 to 2) ! <a/>", "<a/>\n<a/>", root(REPLICATE));
-    check("(3 to 13) ! void(., true())", "", root(DualMap.class));
+    check("(3 to 13) ! void(.)", "", root(DualMap.class));
   }
 
   /** Rewrite FLWOR to simple map. */
@@ -2902,8 +2902,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** where false(). */
   @Test public void gh2080() {
-    check("let $_ := void(1, true()) where false() return ()", "", root(VOID));
-    check("let $_ := void(1, true()) where false() return void(2, true())", "", root(VOID));
+    check("let $_ := void(1) where false() return ()", "", root(VOID));
+    check("let $_ := void(1) where false() return void(2)", "", root(VOID));
   }
 
   /** Rewrite value to general comparison. */

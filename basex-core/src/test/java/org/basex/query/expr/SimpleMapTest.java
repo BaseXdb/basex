@@ -40,11 +40,11 @@ public final class SimpleMapTest extends SandboxTest {
     check("1 ! ()", "", empty());
     check("() ! 1", "", empty());
     check("1 ! () ! 1", "", empty());
-    check("1 !" + VOID.args("x", true), "", empty(Int.class));
-    check("1 !" + VOID.args(" .", true) + " ! 1", "", count(Int.class, 1));
+    check("1 ! void('x')", "", empty(Int.class));
+    check("1 ! void(.) ! 1", "", count(Int.class, 1));
     check("<a/> ! <b/> ! ()", "", empty());
 
-    check(VOID.args("x", true) + " ! 1", "", empty(Int.class));
+    check("void('x') ! 1", "", empty(Int.class));
     check("() ! 'a'[.]", "", empty());
     check("() ! ('a', 'b')[.]", "", empty());
     check("() ! <_>a</_>[.]", "", empty());
@@ -108,7 +108,7 @@ public final class SimpleMapTest extends SandboxTest {
     check("(1 to 2) ! ('a', '')[.]", "a\na", exists(REPLICATE));
     check("(1 to 2) ! <x/>", "<x/>\n<x/>", exists(REPLICATE));
 
-    check("(1 to 2) !" + VOID.args(" ."), "", empty(REPLICATE));
+    check("(1 to 2) ! void(.)", "", empty(REPLICATE));
 
     // replace first or both expressions with singleton sequence
     check("(1 to 2) ! 3", "3\n3", exists(SingletonSeq.class), root(SingletonSeq.class));

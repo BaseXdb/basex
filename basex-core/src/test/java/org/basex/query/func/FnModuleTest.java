@@ -62,7 +62,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(1), 1, empty(func));
 
     // function is replaced by its argument (argument yields no result)
-    check(func.args(VOID.args(" ()")), "", empty(func));
+    check(func.args(" void()"), "", empty(func));
     // check adjusted type
     check(func.args(wrap(1)), 1, type(func, "xs:double"));
     check(func.args(wrap(1) + "! array { . }"), 1, type(func, "xs:double"));
@@ -261,7 +261,7 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = AVG;
 
     check(func.args(" ()"), "", empty());
-    check(func.args(VOID.args("X")), "", empty(func));
+    check(func.args(" void('x')"), "", empty(func));
 
     check(func.args(" 1"), 1, empty(func));
     check(func.args(" 1.0"), 1, empty(func));
@@ -703,7 +703,7 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(" (1 to 100000000) ! 'a'"), "a");
     query("count(" + func.args(" 1 to 100000000") + ')', 100000000);
-    check(func.args(VOID.args(1, true)), "", root(VOID));
+    check(func.args(" void(1)"), "", root(VOID));
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
 
     // remove duplicate expressions
@@ -1041,7 +1041,7 @@ public final class FnModuleTest extends SandboxTest {
         func.args("A", 1, " ."), "A");
 
     query(func.args(" ()", 1, " function($a, $b) { $b }"), 1);
-    query(func.args(VOID.args(1), 1, " function($a, $b) { $b }"), 1);
+    query(func.args(" void(1)", 1, " function($a, $b) { $b }"), 1);
     query(func.args(2, 1, " function($a, $b) { $b }"), 2);
     query("sort(" + func.args(" <a/>", "a", " compare#2") + ")", 1);
 
@@ -1124,7 +1124,7 @@ public final class FnModuleTest extends SandboxTest {
     query("for $i in 1 to 2 return " + func.args(" $i"), "1\n2");
     query(func.args(" (<a/>, <b/>)"), "<b/>");
 
-    check(func.args(VOID.args(" ()")), "", empty(func));
+    check(func.args(" void(())"), "", empty(func));
     check(func.args(" <a/>"), "<a/>", empty(func));
     check(func.args(" (<a/>, <b/>)[name()]"), "<b/>", type(HEAD, "(element(b)|element(a))?"));
     check(func.args(" reverse((1, 2, 3)[. > 1])"), 2, exists(HEAD));
@@ -1753,7 +1753,7 @@ public final class FnModuleTest extends SandboxTest {
     check("let $seq := (1 to 10)[. > 0] return " + func.args(" $seq", " count($seq) - 1"),
         9, root(Pipeline.class));
 
-    check(func.args(VOID.args(" ()"), 0), "", empty(func));
+    check(func.args(" void(())", 0), "", empty(func));
     check(func.args(TRUNK.args(" (1, 2, 3, <_/>)"), 2), 2, empty(TRUNK));
   }
 
@@ -1911,7 +1911,7 @@ public final class FnModuleTest extends SandboxTest {
 
     // query plan checks
     check(func.args(" ()"), "", empty());
-    check(func.args(VOID.args(123)), "", empty(func));
+    check(func.args(" void(123)"), "", empty(func));
     check(func.args(" 123"), 123, empty(func));
     check(func.args(wrap(1)), 1, exists(func));
     check(func.args(" (0 to 99999999999) ! (1 to 10000000)"), 1, root(Int.class));
@@ -2517,7 +2517,7 @@ public final class FnModuleTest extends SandboxTest {
     // known result size
     query(func.args(wrap(1) + "+ 1", 1), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3), 1"), 3);
-    query(func.args(VOID.args(" ()"), 1), "");
+    query(func.args(" void(())", 1), "");
 
     // unknown result size
     query(func.args(wrap(1) + "[. = 0]", 1), "");
@@ -2540,7 +2540,7 @@ public final class FnModuleTest extends SandboxTest {
     // known result size, dynamic position
     query(func.args(wrap(1) + "+ 1", wrap(1)), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3), 1"), 3);
-    query(func.args(VOID.args(" ()"), wrap(1)), "");
+    query(func.args(" void(())", wrap(1)), "");
 
     // unknown result size, dynamic position
     query(func.args(wrap(1) + "[. = 0]", wrap(1)), "");
@@ -2875,17 +2875,17 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" (" + wrap("1") + " + 1, 3)", 1, 2), "2\n3", root(List.class));
     check(func.args(" replicate(" + wrap("1") + " + 1, 3)", 2), "2\n2", root(REPLICATE));
 
-    check(func.args(" doc('" + DOC + "')//*", 1) + " => " + VOID.args(true),
+    check(func.args(" doc('" + DOC + "')//*", 1) + " => void()",
         "", empty(func));
-    check(func.args(" doc('" + DOC + "')//*", 2) + " => " + VOID.args(true),
+    check(func.args(" doc('" + DOC + "')//*", 2) + " => void()",
         "", empty(func), exists(TAIL));
-    check(func.args(" doc('" + DOC + "')//*", 9) + " => " + VOID.args(true),
+    check(func.args(" doc('" + DOC + "')//*", 9) + " => void()",
         "", empty(func), exists(_UTIL_RANGE));
-    check(func.args(" doc('" + DOC + "')//*", 10) + " => " + VOID.args(true),
+    check(func.args(" doc('" + DOC + "')//*", 10) + " => void()",
         "", empty(func), exists(FOOT));
-    check(func.args(" doc('" + DOC + "')//*", 11) + " => " + VOID.args(true),
+    check(func.args(" doc('" + DOC + "')//*", 11) + " => void()",
         "", empty(func), exists(FOOT));
-    check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => " + VOID.args(true),
+    check(func.args(" doc('" + DOC + "')//*", 10, 9) + " => void()",
         "", empty(func), exists(_UTIL_RANGE));
   }
 
@@ -3104,8 +3104,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (" + wrap(1) + "+ 1, 2)", 2), 2);
     query(func.args(" (" + wrap(1) + "+ 1, 2)", 3), "");
     query(func.args(" (" + wrap(1) + "+ 1, 2, 3)", 2) + "[2]", 3);
-    query(func.args(VOID.args(" ()"), 1), "");
-    query(func.args(VOID.args(" ()"), 2), "");
+    query(func.args(" void(())", 1), "");
+    query(func.args(" void(())", 2), "");
 
     // unknown result size
     query(func.args(wrap(1) + "[. = 0]", 1), "");
@@ -3278,14 +3278,14 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" ()", "A"), "A");
     query(func.args(" ()", " 1"), 1);
     query(func.args(" ()", " ()"), "");
-    query(func.args(" ()", VOID.args("x")), "");
+    query(func.args(" ()", " void('x')"), "");
 
-    query("for $i in 1 to 2 return " + func.args(VOID.args("x"), " $i"), "1\n2");
-    query(func.args(VOID.args("x"), wrap(0)), 0);
-    query(func.args(VOID.args("x"), "A"), "A");
-    query(func.args(VOID.args("x"), " 1"), 1);
-    query(func.args(VOID.args("x"), " ()"), "");
-    query(func.args(VOID.args("x"), VOID.args("x")), "");
+    query("for $i in 1 to 2 return " + func.args(" void('x')", " $i"), "1\n2");
+    query(func.args(" void('x')", wrap(0)), 0);
+    query(func.args(" void('x')", "A"), "A");
+    query(func.args(" void('x')", " 1"), 1);
+    query(func.args(" void('x')", " ()"), "");
+    query(func.args(" void('x')", " void('x')"), "");
 
     query(func.args(" 2 to 10"), 54);
     query(func.args(" 9 to 10"), 19);
@@ -3325,7 +3325,7 @@ public final class FnModuleTest extends SandboxTest {
     // known result size
     query(func.args(wrap(1) + "+ 1"), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3)"), 3);
-    query(func.args(VOID.args(" ()")), "");
+    query(func.args(" void(())"), "");
 
     // unknown result size
     query(func.args(wrap(1) + "[. = 0]"), "");
@@ -3419,7 +3419,7 @@ public final class FnModuleTest extends SandboxTest {
     // known result size
     query(func.args(wrap(1) + "+ 1"), "");
     query(func.args(" (" + wrap(1) + "+ 1, 3)"), 2);
-    query(func.args(VOID.args(" ()")), "");
+    query(func.args(" void(())"), "");
 
     // unknown result size
     query(func.args(" 1[. = 0]"), "");
@@ -3517,11 +3517,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(1), "");
     query(func.args("1, 2"), "");
     query(func.args("1, 2", true), "");
+    check(func.args(" (1 to 10000000000000) ! string()", true), "", empty());
 
-    check(func.args(" (1 to 10000000000000) ! string()"), "", empty());
-    query(func.args(" 1 + <a/>"), "");
-    query(func.args(" 2 + <a/>", false), "");
-    error(func.args(" 3 + <a/>", true), FUNCCAST_X_X);
+    error(func.args(" 1 + <a/>"), FUNCCAST_X_X);
+    error(func.args(" 1 + <a/>", false), FUNCCAST_X_X);
+    query(func.args(" 1 + <a/>", true), "");
 
     // GH-2139: Simplify inlined nondeterministic code
     check("let $doc := doc('" + DOC + "') let $a := 1 return $a", 1, root(Int.class));

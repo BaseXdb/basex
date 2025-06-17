@@ -434,7 +434,7 @@ public final class GFLWORTest extends SandboxTest {
   /** Allowing empty. */
   @Test public void allowingEmpty() {
     check("for $x allowing empty in () return $x", "", empty());
-    check("for $x allowing empty in" + VOID.args(1, true) + " return $x", "", exists(GFLWOR.class));
+    check("for $x allowing empty in void(1) return $x", "", exists(GFLWOR.class));
   }
 
   /** Merge for/let clauses. */
@@ -454,7 +454,7 @@ public final class GFLWORTest extends SandboxTest {
   /** Remove clauses that will never be executed. */
   @Test public void gh1999() {
     check("for $a in () return delete node a", "", empty());
-    check("for $a in" + VOID.args(1, true) + " return delete node a", "", root(VOID));
+    check("for $a in void(1) return delete node a", "", root(VOID));
   }
 
   /** Sliding windows. */

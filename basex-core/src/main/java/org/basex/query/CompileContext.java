@@ -348,7 +348,7 @@ public final class CompileContext {
   }
 
   /**
-   * Creates a list expression from an expression to be absorbed and a result expression.
+   * Creates a list with an expression to be absorbed and the actual result expression.
    * @param expr expression to be absorbed
    * @param result result expression
    * @param info input info (can be {@code null})
@@ -357,9 +357,10 @@ public final class CompileContext {
    */
   public Expr voidAndReturn(final Expr expr, final Expr result, final InputInfo info)
       throws QueryException {
-    // a nondeterministic expression may get deterministic when optimizing the query
-    return expr.has(Flag.NDT) ? List.get(this, info, function(Function.VOID, info, expr), result) :
-      result;
+    // an expression (for example, fn:doc) may be nondeterministic during compilation and
+    // deterministic during optimization:
+    // let $db := db:get('db') return 1  ->  void(db:get('db'), true()), 1  ->  1
+    return List.get(this, info, function(Function.VOID, info, expr, Bln.TRUE), result);
   }
 
   /**
