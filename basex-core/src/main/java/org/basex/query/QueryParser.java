@@ -66,7 +66,7 @@ public class QueryParser extends InputParser {
   private static final byte[] SKIPCHECK = {};
   /** Reserved keywords. */
   private static final TokenSet KEYWORDS = new TokenSet(
-      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE, NAMESPACE_NODE, NODE, SCHEMA_ATTRIBUTE,
+      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE_NODE, NODE, SCHEMA_ATTRIBUTE,
       SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, FN, FUNCTION, IF, SWITCH, TYPESWITCH);
 
   /** URIs of modules loaded by the current file. */
@@ -2597,13 +2597,13 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(sc.funcNS, null);
     if(name != null && wsConsumeWs("#")) {
       final Expr num = numericLiteral(Integer.MAX_VALUE, false);
-      if(!reserved(name)) {
+      if(reserved(name)) {
+        if(num != null) throw error(RESERVED_X, name.local());
+      } else {
         if(Function.ERROR.is(num)) return num;
-        if(!(num instanceof Int)) throw error(ARITY_X, (char) current());
-        final int arity = (int) ((Int) num).itr();
-        return Functions.item(name, arity, false, info(), qc, moduleURIs.contains(name.uri()));
+        if(num instanceof Int i) return Functions.item(name, (int) i.itr(), false, info(), qc,
+            moduleURIs.contains(name.uri()));
       }
-      if(num != null) throw error(RESERVED_X, name.local());
     }
     pos = p;
     return null;
