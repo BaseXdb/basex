@@ -66,7 +66,7 @@ public class QueryParser extends InputParser {
   private static final byte[] SKIPCHECK = {};
   /** Reserved keywords. */
   private static final TokenSet KEYWORDS = new TokenSet(
-      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE_NODE, NODE, SCHEMA_ATTRIBUTE,
+      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE, NAMESPACE_NODE, NODE, SCHEMA_ATTRIBUTE,
       SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, FN, FUNCTION, IF, SWITCH, TYPESWITCH);
 
   /** URIs of modules loaded by the current file. */
@@ -2599,7 +2599,7 @@ public class QueryParser extends InputParser {
       final Expr num = numericLiteral(Integer.MAX_VALUE, false);
       if(!reserved(name)) {
         if(Function.ERROR.is(num)) return num;
-        if(!(num instanceof Int)) throw error(ARITY_X, num);
+        if(!(num instanceof Int)) throw error(ARITY_X, (char) current());
         final int arity = (int) ((Int) num).itr();
         return Functions.item(name, arity, false, info(), qc, moduleURIs.contains(name.uri()));
       }
@@ -3276,12 +3276,10 @@ public class QueryParser extends InputParser {
       return name;
     }
     // parse literal name
-    if(qname) {
-      consume("#");
-      return eQName(SKIPCHECK, null);
-    }
+    consume("#");
+    if(qname) return eQName(SKIPCHECK, null);
+
     // parse name enclosed in quotes
-    if(quote(current())) return Str.get(stringLiteral());
     final byte[] string = ncName(null);
     return string.length != 0 ? Str.get(string) : null;
   }
