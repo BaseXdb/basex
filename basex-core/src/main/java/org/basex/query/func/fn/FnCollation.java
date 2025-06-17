@@ -29,7 +29,7 @@ public final class FnCollation extends StandardFunc {
     });
 
     // generate and check collation URI
-    final byte[] href = Prop.ICU ? Collation.ICU : Collation.BASEX;
+    final byte[] href = Prop.ICU ? Collation.UCA : Collation.BASEX;
     return Str.get(WebFn.createUrl(href, map.map(), ';', info).finish());
   }
 }

@@ -281,13 +281,13 @@ public interface QueryText {
   /** W3 URI. */ byte[] XQ_URI = token(W3_URL + "/2012/xquery");
   /** W3 URI. */ byte[] COLLATION_URI = concat(FN_URI, token("/collation/codepoint"));
 
-  /** EXPath URI. */ String EXPATH_URI = "http://expath.org/ns/";
-  /** EXPath URI. */ byte[] BIN_URI = token(EXPATH_URI + "binary");
-  /** EXPath URI. */ byte[] CRYPTO_URI = token(EXPATH_URI + "crypto");
-  /** EXPath URI. */ byte[] FILE_URI = token(EXPATH_URI + "file");
-  /** EXPath URI. */ byte[] HTTP_URI = token(EXPATH_URI + "http-client");
-  /** EXPath URI. */ byte[] PKG_URI = token(EXPATH_URI + "pkg");
-  /** EXPath URI. */ byte[] EXPERROR_URI = token(EXPATH_URI + "error");
+  /** EXPath URI. */ String EXPATH_URL = "http://expath.org/ns/";
+  /** EXPath URI. */ byte[] BIN_URI = token(EXPATH_URL + "binary");
+  /** EXPath URI. */ byte[] CRYPTO_URI = token(EXPATH_URL + "crypto");
+  /** EXPath URI. */ byte[] FILE_URI = token(EXPATH_URL + "file");
+  /** EXPath URI. */ byte[] HTTP_URI = token(EXPATH_URL + "http-client");
+  /** EXPath URI. */ byte[] PKG_URI = token(EXPATH_URL + "pkg");
+  /** EXPath URI. */ byte[] EXPERROR_URI = token(EXPATH_URL + "error");
 
   /** EXQuery URI. */ String EXQUERY_URL = "http://exquery.org/ns/";
   /** EXQuery URI. */ byte[] REQUEST_URI = token(EXQUERY_URL + "request");

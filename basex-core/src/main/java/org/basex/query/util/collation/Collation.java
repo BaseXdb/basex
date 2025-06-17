@@ -21,12 +21,12 @@ import org.basex.util.options.Options.*;
  * @author Christian Gruen
  */
 public abstract class Collation {
-  /** Case-insensitive collation. */
-  private static final byte[] NOCASE =
-      token("http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive");
-
+  /** HTML-ASCII case-insensitive collation. */
+  private static final byte[] HACI = concat(FN_URI, "/collation/html-ascii-case-insensitive");
+  /** Unicode case-insensitive collation. */
+  private static final byte[] UCI = concat(FN_URI, "/collation/unicode-case-insensitive");
   /** ICU (UCA) collation URL. */
-  public static final byte[] ICU = token("http://www.w3.org/2013/collation/UCA");
+  public static final byte[] UCA = concat(W3_URL, "/2013/collation/UCA");
   /** BaseX collation URI. */
   public static final byte[] BASEX = token(BASEX_URL + "/collation");
   /** Collation URI. */
@@ -84,8 +84,9 @@ public abstract class Collation {
   private static Collation get(final byte[] uri, final InputInfo info, final QueryError err)
       throws QueryException {
 
-    // case-insensitive collation
-    if(eq(NOCASE, uri)) return NoCaseCollation.INSTANCE;
+    // static collations
+    if(eq(HACI, uri)) return HtmlNoCaseCollation.INSTANCE;
+    if(eq(UCI, uri)) return UnicodeNoCaseCollation.INSTANCE;
 
     final int q = Token.indexOf(uri, '?');
     final byte[] base = q == -1 ? uri : substring(uri, 0, q);
@@ -95,7 +96,7 @@ public abstract class Collation {
     CollationOptions opts = null;
     if(eq(BASEX, base)) {
       opts = new BaseXCollationOptions(false);
-    } else if(eq(ICU, base)) {
+    } else if(eq(UCA, base)) {
       final boolean fallback = !YesNo.NO.toString().equals(args.get(UCAOptions.FALLBACK.name()));
       if(Prop.ICU) opts = new UCAOptions(fallback);
       else if(fallback) opts = new BaseXCollationOptions(fallback);

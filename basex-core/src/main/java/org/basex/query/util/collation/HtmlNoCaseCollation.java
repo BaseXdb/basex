@@ -9,9 +9,9 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class NoCaseCollation extends Collation {
+final class HtmlNoCaseCollation extends Collation {
   /** Singleton instance. */
-  static final NoCaseCollation INSTANCE = new NoCaseCollation();
+  static final HtmlNoCaseCollation INSTANCE = new HtmlNoCaseCollation();
 
   @Override
   public int compare(final byte[] string, final byte[] compare) {
@@ -70,6 +70,6 @@ final class NoCaseCollation extends Collation {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj instanceof NoCaseCollation;
+    return obj instanceof HtmlNoCaseCollation;
   }
 }
