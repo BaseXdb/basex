@@ -12,7 +12,6 @@ import java.util.concurrent.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -470,7 +469,9 @@ public final class SeqType {
     final ValueBuilder vb = new ValueBuilder(qc, value.size());
     for(final Item item : value) {
       qc.checkStop();
-      coerce(item, name, vb, qc, cc, info);
+      final Value val = coerce(item, name, qc, cc, info);
+      if(val == null) throw typeError(item, with(EXACTLY_ONE), name, info);
+      vb.add(val);
     }
     final Value val = vb.value(type);
     if(!occ.check(val.size())) throw typeError(value, this, name, info);
@@ -481,71 +482,87 @@ public final class SeqType {
    * Converts the specified item to this type.
    * @param item item to promote
    * @param name variable name (used for error message, can be {@code null})
-   * @param vb value builder
    * @param qc query context
    * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
+   * @return converted value, or {@code null} if conversion failed
    * @throws QueryException query exception
    */
-  public void coerce(final Item item, final QNm name, final ValueBuilder vb, final QueryContext qc,
+  private Value coerce(final Item item, final QNm name, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
-    final QuerySupplier<QueryException> error = () ->
-      typeError(item, with(EXACTLY_ONE), name, info);
     if(type instanceof final ChoiceItemType cit) {
       for(final SeqType st : cit.types) {
         try {
-          final ValueBuilder tmp = new ValueBuilder(qc);
-          st.coerce(item, name, tmp, qc, cc, info);
-          vb.add(tmp.value(type));
-          return;
+          final Value value = st.coerce(item, name, qc, cc, info);
+          if(value != null) return value;
         } catch(final QueryException ex) {
           Util.debug(ex);
         }
       }
-      throw error.get();
+      return null;
     }
     if(type instanceof AtomType || type instanceof EnumType) {
-      final Iter iter = item.atomValue(qc, info).iter();
-      for(Item it; (it = qc.next(iter)) != null;) {
-        Item relabel = null;
-        final Type itemType = it.type;
-        if(!itemType.instanceOf(type)) {
-          if(itemType == UNTYPED_ATOMIC) {
-            if(type.nsSensitive()) throw NSSENS_X_X.get(info, item.type, type);
-            // item will be cast
-          } else if(
-            type == DECIMAL && (itemType == DOUBLE || itemType == FLOAT) ||
-            type == DOUBLE && (itemType == FLOAT || itemType.instanceOf(DECIMAL)) ||
-            type == FLOAT && (itemType == DOUBLE || itemType.instanceOf(DECIMAL)) ||
-            type == STRING && itemType == ANY_URI ||
-            type == ANY_URI && itemType.instanceOf(STRING) ||
-            type == HEX_BINARY && itemType == BASE64_BINARY ||
-            type == BASE64_BINARY && itemType == HEX_BINARY
-          ) {
-            // item will be cast
-          } else if(!type.union(itemType).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
-            // item will be relabeled: remember old type for future comparison
-            relabel = it;
-          } else {
-            throw error.get();
-          }
-          it = (Item) cast(it, true, qc, info);
-          if(relabel != null && !it.equal(relabel, null, info)) throw error.get();
-        }
-        vb.add(it);
+      final Value value = item.atomValue(qc, info);
+      if(value.isItem()) return coerceAtom((Item) value, qc, info);
+
+      final ValueBuilder vb = new ValueBuilder(qc, value.size());
+      for(final Item it : value) {
+        final Item cast = coerceAtom(it, qc, info);
+        if(cast == null) return null;
+        vb.add(cast);
       }
-    } else if(item instanceof final XQArray array && type instanceof final ArrayType at) {
-      vb.add(array.coerceTo(at, qc, cc, info));
-    } else if(item instanceof final XQMap map && type instanceof final RecordType rt) {
-      vb.add(map.coerceTo(rt, qc, cc, info));
-    } else if(item instanceof final XQMap map && type instanceof final MapType mt) {
-      vb.add(map.coerceTo(mt, qc, cc, info));
-    } else if(item instanceof final FItem fitem && type instanceof final FuncType ft) {
-      vb.add(fitem.coerceTo(type == FUNCTION ? item.funcType() : ft, qc, cc, info));
-    } else {
-      throw error.get();
+      return vb.value();
     }
+    if(item instanceof final FItem fitem) {
+      if(item instanceof final XQArray array) {
+        if(type instanceof final ArrayType at) return array.coerceTo(at, qc, cc, info);
+      } else if(item instanceof final XQMap map) {
+        if(type instanceof final RecordType rt) return map.coerceTo(rt, qc, cc, info);
+        if(type instanceof final MapType mt) return map.coerceTo(mt, qc, cc, info);
+      }
+      if(type instanceof final FuncType ft) {
+        return fitem.coerceTo(type == FUNCTION ? item.funcType() : ft, qc, cc, info);
+      }
+    }
+    return instance(item, false) ? item : null;
+  }
+
+  /**
+   * Converts the specified atomized item to this type.
+   * @param item item to promote
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return converted value, or {@code null} if conversion failed
+   * @throws QueryException query exception
+   */
+  private Item coerceAtom(final Item item, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    final Type at = item.type;
+    if(at.instanceOf(type)) return item;
+
+    Item relabel = null;
+    if(at == UNTYPED_ATOMIC) {
+      if(type.nsSensitive()) throw NSSENS_X_X.get(info, at, type);
+      // item will be cast
+    } else if(
+      type == DECIMAL && (at == DOUBLE || at == FLOAT) ||
+      type == DOUBLE && (at == FLOAT || at.instanceOf(DECIMAL)) ||
+      type == FLOAT && (at == DOUBLE || at.instanceOf(DECIMAL)) ||
+      type == STRING && at == ANY_URI ||
+      type == ANY_URI && at.instanceOf(STRING) ||
+      type == HEX_BINARY && at == BASE64_BINARY ||
+      type == BASE64_BINARY && at == HEX_BINARY
+    ) {
+      // item will be cast
+    } else if(!type.union(at).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
+      // item will be relabeled: remember old type for future comparison
+      relabel = item;
+    } else {
+      return null;
+    }
+    final Item cast = (Item) cast(item, true, qc, info);
+    return relabel == null || cast.equal(relabel, null, info) ? cast : null;
   }
 
   /**
