@@ -98,7 +98,7 @@ public final class TreeSeqBuilder implements SeqBuilder {
   @Override
   public TreeSeqBuilder add(final Value value, final QueryContext qc) {
     // shortcut for adding single items
-    if(value.isItem()) return add((Item) value);
+    if(value.size() == 1) return add((Item) value);
 
     if(!(value instanceof final BigSeq big)) {
       final BasicIter<?> iter = value.iter();

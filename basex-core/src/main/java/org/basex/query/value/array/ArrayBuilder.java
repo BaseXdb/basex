@@ -56,7 +56,7 @@ public final class ArrayBuilder {
     final Value sngl = single;
     if(sngl != null) {
       single = null;
-      array = capacity != Integer.MIN_VALUE && sngl.isItem() && value.isItem() ?
+      array = capacity != Integer.MIN_VALUE && sngl.size() == 1 && value.size() == 1 ?
         new ItemArrayBuilder(qc, capacity) : new TreeArrayBuilder();
       add(sngl);
     }

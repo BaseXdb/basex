@@ -72,14 +72,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Tests if this is an item.
-   * @return result of check
-   */
-  public boolean isItem() {
-    return false;
-  }
-
-  /**
    * Returns the item at the given position.
    * The specified value must be lie within the valid bounds.
    * @param index index position

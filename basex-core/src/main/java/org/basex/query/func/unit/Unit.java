@@ -239,7 +239,7 @@ final class Unit {
 
       // add info
       final Value value = ex.value();
-      if(value != null && value.isItem()) {
+      if(value != null && value.size() == 1) {
         error.add(element((Item) value, Q_INFO, -1));
       } else {
         // otherwise, add error message

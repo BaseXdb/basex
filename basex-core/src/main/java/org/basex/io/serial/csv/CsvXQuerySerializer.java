@@ -69,7 +69,7 @@ public final class CsvXQuerySerializer extends CsvSerializer {
     if(!(line instanceof final XQArray array))
       throw CSV_SERIALIZE_X_X.getIO("Array expected, found " + line.seqType(), line);
     for(final Value value : array.iterable()) {
-      if(!value.isItem()) throw CSV_SERIALIZE_X_X.getIO(
+      if(value.size() != 1) throw CSV_SERIALIZE_X_X.getIO(
           "Item expected, found " + value.seqType(), value);
       tl.add(((Item) value).string(null));
     }

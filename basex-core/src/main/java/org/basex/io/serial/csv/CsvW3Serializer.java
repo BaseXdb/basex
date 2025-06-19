@@ -69,7 +69,7 @@ public final class CsvW3Serializer extends CsvSerializer {
   private void row(final Iterable<? extends Value> line, final TokenList tl)
       throws QueryException, IOException {
     for(final Value value : line) {
-      if(!value.isItem()) throw CSV_SERIALIZE_X_X.getIO(
+      if(value.size() != 1) throw CSV_SERIALIZE_X_X.getIO(
           "Item expected, found " + value.seqType(), value);
       tl.add(((Item) value).string(null));
     }

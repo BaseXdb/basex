@@ -733,7 +733,7 @@ public final class QueryContext extends Job implements Closeable {
     // cast XQuery values
     if(object instanceof final Value val) {
       // cast single item
-      if(val.isItem()) return tp.cast((Item) val, this, null);
+      if(val.size() == 1) return tp.cast((Item) val, this, null);
       // cast sequence
       final ValueBuilder vb = new ValueBuilder(this, val.size());
       for(final Item item : val) vb.add(tp.cast(item, this, null));

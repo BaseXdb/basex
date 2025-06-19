@@ -426,7 +426,7 @@ public class Options implements Iterable<Option<?>> {
         map.forEach((key, v) -> {
           if(!tb.isEmpty()) tb.add(',');
           tb.add(key.string(info)).add('=');
-          if(!v.isItem()) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
+          if(v.size() != 1) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
           tb.add(string(((Item) v).string(info)).replace(",", ",,"));
         });
       } else if(item instanceof final QNm qnm) {
@@ -815,7 +815,7 @@ public class Options implements Iterable<Option<?>> {
       throw INVALIDOPTION_X.get(info, similar(name));
     }
 
-    final Item item = value.isItem() ? (Item) value : null;
+    final Item item = value.size() == 1 ? (Item) value : null;
     final SeqType st = value.seqType();
     final QueryFunction<Object, QueryException> expected = type ->
       INVALIDOPTION_X_X_X_X.get(info, name, type, st, value);

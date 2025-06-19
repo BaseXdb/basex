@@ -504,7 +504,7 @@ public final class SeqType {
     }
     if(type instanceof AtomType || type instanceof EnumType) {
       final Value value = item.atomValue(qc, info);
-      if(value.isItem()) return coerceAtom((Item) value, qc, info);
+      if(value.size() == 1) return coerceAtom((Item) value, qc, info);
 
       final ValueBuilder vb = new ValueBuilder(qc, value.size());
       for(final Item it : value) {

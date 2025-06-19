@@ -120,7 +120,7 @@ public class FnMin extends StandardFunc {
           item = rs.itemAt(min ^ rs.ascending() ? size - 1 : 0);
         } else if(value instanceof final SingletonSeq ss && ss.singleItem()) {
           item = value.itemAt(0);
-        } else if(value.isItem()) {
+        } else if(value.size() == 1) {
           item = (Item) value;
         }
         if(item != null) {

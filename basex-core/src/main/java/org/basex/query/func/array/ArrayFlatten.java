@@ -43,7 +43,7 @@ public final class ArrayFlatten extends ArrayFn {
                   if(item != null) return item;
                   if(!values.hasNext()) return null;
                   final Value value = values.next();
-                  if(value.isItem()) {
+                  if(value.size() == 1) {
                     iter = Empty.ITER;
                     return (Item) value;
                   }

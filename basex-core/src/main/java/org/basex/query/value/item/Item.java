@@ -77,11 +77,6 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public boolean isItem() {
-    return true;
-  }
-
-  @Override
   public final Item reverse(final QueryContext qc) {
     return this;
   }

@@ -25,7 +25,7 @@ public final class ItemArrayBuilder implements ArrBuilder {
 
   @Override
   public ArrBuilder add(final Value value) {
-    if(value.isItem()) {
+    if(value.size() == 1) {
       vb.add(value);
       return this;
     }
