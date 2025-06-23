@@ -270,7 +270,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * @throws XQException XQuery exception
    */
   @Test public void testQName() throws XQException {
-    atomicTest("xs:QName('AAA')", "AAA", XQBASETYPE_QNAME);
+    atomicTest("xs:QName('AAA')", "#AAA", XQBASETYPE_QNAME);
   }
 
   /**

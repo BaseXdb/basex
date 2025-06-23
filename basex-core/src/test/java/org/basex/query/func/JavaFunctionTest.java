@@ -132,9 +132,9 @@ public final class JavaFunctionTest extends SandboxTest {
         "qm:fast()", INVNARGS_X_X);
 
     query("declare namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
-        "try{ qm:error(qm:new()) } catch * { $err:code }", "basex:error");
+        "try{ qm:error(qm:new()) } catch * { $err:code }", "#basex:error");
     query("import module namespace qm = 'java:org.basex.query.func.QueryModuleTest'; " +
-        "try { qm:error() } catch * { $err:code }", "basex:error");
+        "try { qm:error() } catch * { $err:code }", "#basex:error");
   }
 
   /** Tests ambiguous signatures. */

@@ -24,7 +24,7 @@ public final class FnFunctionAnnotations extends StandardFunc {
     if(anns.isEmpty()) return Empty.VALUE;
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Ann ann : anns) {
-      vb.add(XQMap.singleton(ann.name(), ann.value()));
+      vb.add(XQMap.get(ann.name(), ann.value()));
     }
     return vb.value();
   }

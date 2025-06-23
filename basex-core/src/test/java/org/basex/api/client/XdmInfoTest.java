@@ -262,7 +262,7 @@ public final class XdmInfoTest extends SandboxTest {
     { "xs:base64Binary" },
     { "xs:hexBinary" },
     { "xs:anyURI", "xs:anyURI('a')", "a" },
-    { "xs:QName", "xs:QName('xml:a')", "xml:a", "http://www.w3.org/XML/1998/namespace" },
+    { "xs:QName", "#xml:a", "#xml:a", "http://www.w3.org/XML/1998/namespace" },
     { "xs:NOTATION" }
   };
 }

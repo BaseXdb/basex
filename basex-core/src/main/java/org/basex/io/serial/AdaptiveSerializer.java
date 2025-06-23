@@ -83,11 +83,11 @@ public class AdaptiveSerializer extends OutputSerializer {
   @Override
   protected void atomic(final Item item) throws IOException {
     final Type type = item.type;
-    final boolean plain = this instanceof BaseXSerializer;
+    final boolean basex = this instanceof BaseXSerializer;
     try {
       if(type == DOUBLE) {
         final double d = item.dbl(null);
-        if(plain) {
+        if(basex) {
           printChars(Dbl.string(d));
         } else if(Double.isNaN(d) || Double.isInfinite(d)) {
           printChars(item.string(null));
@@ -97,11 +97,11 @@ public class AdaptiveSerializer extends OutputSerializer {
           }
         }
       } else if(type == QNAME) {
-        printChars(plain ? item.string(null) : ((QNm) item).eqName());
+        printChars(basex ? Token.concat('#', item.string(null)) : ((QNm) item).eqName());
       } else {
         final boolean simple = type == BOOLEAN || type.instanceOf(DECIMAL);
         final byte[] value = simple ? Token.token(item) : value(item.string(null), '"', false);
-        if(plain || simple || type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI)) {
+        if(basex || simple || type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI)) {
           printChars(value);
         } else {
           printChars(Token.token(type.instanceOf(DURATION) ? DURATION : type));

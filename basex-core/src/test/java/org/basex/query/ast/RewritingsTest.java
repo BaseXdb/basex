@@ -1806,7 +1806,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Inline variables into simple map. */
   @Test public void gh1895() {
     check("let $a := (<a/>, <b/>) return $a ! name()", "a\nb", root(DualMap.class));
-    check("let $doc := <e a=''/> return $doc/@a ! node-name()", "a", root(NODE_NAME));
+    check("let $doc := <e a=''/> return $doc/@a ! node-name()", "#a", root(NODE_NAME));
   }
 
   /** Simple maps, inline operands. */

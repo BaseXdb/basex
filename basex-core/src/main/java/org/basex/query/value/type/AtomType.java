@@ -893,7 +893,8 @@ public enum AtomType implements Type {
     }
     @Override
     public QNm cast(final Object value, final QueryContext qc, final InputInfo info) {
-      return value instanceof final QName name ? new QNm(name) : new QNm(value.toString());
+      return value instanceof final QName name ? new QNm(name) :
+        new QNm(value.toString().replaceAll("^#", ""));
     }
     @Override
     public QNm read(final DataInput in, final QueryContext qc) throws IOException {

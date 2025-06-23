@@ -121,9 +121,10 @@ public final class ClientModuleTest extends SandboxTest {
   @Test public void queryTypes() {
     final Object[][] types = XdmInfoTest.TYPES;
     for(final Object[] type : types) {
-      if(type == null || type.length < 3) continue;
-      query(SerializerOptions.BINARY.arg("no") +
-          _CLIENT_QUERY.args(connection(), " \"" + type[1] + '"'), type[2]);
+      if(type != null && type.length == 3) {
+        query(SerializerOptions.BINARY.arg("no") +
+            _CLIENT_QUERY.args(connection(), " \"" + type[1] + '"'), type[2]);
+      }
     }
   }
 

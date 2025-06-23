@@ -380,6 +380,6 @@ public final class FuncItemTest extends SandboxTest {
         + "declare variable $b := $a;"
         + "declare function local:f() { $b };"
         + "local:f() => function-name()",
-        "local:f");
+        "#local:f");
   }
 }

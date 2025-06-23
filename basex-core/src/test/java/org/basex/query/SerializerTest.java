@@ -296,7 +296,7 @@ public final class SerializerTest extends SandboxTest {
     query("'A'", "A");
     query("xs:anyURI('A')", "A");
     query("xs:untypedAtomic('A')", "A");
-    query("xs:QName('xml:a')", "xml:a");
+    query("xs:QName('xml:a')", "#xml:a");
     query("xs:dayTimeDuration('P1D')", "P1D");
     query("<xml><a>B</a></xml>", "<xml><a>B</a></xml>");
     query("true#0", "fn:true#0");
@@ -315,7 +315,7 @@ public final class SerializerTest extends SandboxTest {
     query("[ 'A' ]", "[\"A\"]");
     query("[ xs:anyURI('A') ]", "[\"A\"]");
     query("[ xs:untypedAtomic('A') ]", "[\"A\"]");
-    query("[ xs:QName('xml:a') ]", "[xml:a]");
+    query("[ xs:QName('xml:a') ]", "[#xml:a]");
     query("[ xs:dayTimeDuration('P1D') ]", "[\"P1D\"]");
     query("[ <xml><a>B</a></xml> ]", "[<xml><a>B</a></xml>]");
     query("[ true#0 ]", "[fn:true#0]");

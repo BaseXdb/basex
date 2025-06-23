@@ -177,7 +177,7 @@ public final class FnModuleTest extends SandboxTest {
         + "let $args := [ 1, 2, 3 ] "
         + "return " + func.args(" $func", " $args"), 6);
     query("for $a in 2 to 3 "
-        + "let $f := function-lookup(xs:QName('fn:concat'), $a) "
+        + "let $f := function-lookup(#fn:concat, $a) "
         + "return " + func.args(" $f", " array { 1 to $a }"), "12\n123");
     query(func.args(" false#0", " ['x']"), false);
     error(func.args(" string-length#1", " [ ('a', 'b') ]"), INVCONVERT_X_X_X);
@@ -202,44 +202,44 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void atomicTypeAnnotation() {
     final Function func = ATOMIC_TYPE_ANNOTATION;
 
-    query(func.args(23) + " ? name", "integer");
+    query(func.args(23) + " ? name", "#integer");
     query("let $x := 23, $y := 93.7 return " + func.args(" $x") + "? matches($y)", false);
-    query(func.args(" xs:numeric('23.2')") + " ? name", "double");
+    query(func.args(" xs:numeric('23.2')") + " ? name", "#double");
 
     final String q1 = func.args(" <a>42</a>");
-    query(q1, "{\"name\":untypedAtomic,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
+    query(q1, "{\"name\":#untypedAtomic,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
         + "\"primitive-type\":(anonymous-function)#0,\"variety\":\"atomic\",\"matches\":"
         + "(anonymous-function)#1,\"constructor\":xs:untypedAtomic#1}");
-    query(q1 + "?name eq xs:QName('xs:untypedAtomic')", true);
+    query(q1 + "?name eq #xs:untypedAtomic", true);
     query(q1 + "?is-simple", true);
     query(q1 + "?variety", "atomic");
-    query(q1 + "?base-type()?name eq xs:QName('xs:anyAtomicType')", true);
+    query(q1 + "?base-type()?name eq #xs:anyAtomicType", true);
     query(q1 + "?base-type()?is-simple", true);
     query(q1 + "?base-type()?variety", "atomic");
-    query(q1 + "?base-type()?base-type()?name eq xs:QName('xs:anySimpleType')", true);
+    query(q1 + "?base-type()?base-type()?name eq #xs:anySimpleType", true);
     query(q1 + "?base-type()?base-type()?is-simple", true);
     query(q1 + "?base-type()?base-type()=> map:contains('variety')", false);
-    query(q1 + "?base-type()?base-type()?base-type()?name eq xs:QName('xs:anyType')", true);
+    query(q1 + "?base-type()?base-type()?base-type()?name eq #xs:anyType", true);
     query(q1 + "?base-type()?base-type()?base-type()?is-simple", false);
     query(q1 + "?base-type()?base-type()?base-type()?variety", "mixed");
     query(q1 + "?base-type()?base-type()?base-type()?base-type() => exists()", false);
-    query(q1 + "?primitive-type()?name eq xs:QName('xs:untypedAtomic')", true);
+    query(q1 + "?primitive-type()?name eq #xs:untypedAtomic", true);
     query(q1 + "=> map:contains('members')", false);
     query(q1 + "=> map:contains('simple-content-type')", false);
     query(q1 + "?matches(<a>abc</a>)", true);
     query(q1 + "?constructor(<a>abc</a>)", "abc");
 
     final String q2 = "let $q2 := " + func.args(" xs:unsignedByte(255)") + "\n return $q2";
-    query(q2, "{\"name\":unsignedByte,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
+    query(q2, "{\"name\":#unsignedByte,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
         + "\"primitive-type\":(anonymous-function)#0,\"variety\":\"atomic\",\"matches\":"
         + "(anonymous-function)#1,\"constructor\":xs:unsignedByte#1}");
-    query(q2 + "?name eq xs:QName('xs:unsignedByte')", true);
+    query(q2 + "?name eq #xs:unsignedByte", true);
     query(q2 + "?is-simple", true);
-    query(q2 + "?base-type()?name eq xs:QName('xs:unsignedShort')", true);
+    query(q2 + "?base-type()?name eq #xs:unsignedShort", true);
     query(q2 + "?base-type()?is-simple", true);
     query(q2 + "?base-type()?matches($q2?base-type()?constructor(255))", true);
-    query(q2 + "?primitive-type()?name eq xs:QName('xs:decimal')", true);
-    query(q2 + "?primitive-type()?base-type()?name eq xs:QName('xs:anyAtomicType')", true);
+    query(q2 + "?primitive-type()?name eq #xs:decimal", true);
+    query(q2 + "?primitive-type()?base-type()?name eq #xs:anyAtomicType", true);
     query(q2 + "?primitive-type() => deep-equal($q2?base-type()?primitive-type())", true);
     query(q2 + "?variety", "atomic");
     query(q2 + "=> map:contains('members')", false);
@@ -1317,7 +1317,7 @@ public final class FnModuleTest extends SandboxTest {
     // queries
     query(func.args(" true#0"), "");
     query(func.args(" %local:x function() { }") +
-        "=> " + _MAP_CONTAINS.args(" xs:QName('local:x')"), true);
+        "=> " + _MAP_CONTAINS.args(" #local:x"), true);
     query(func.args(" %Q{uri}name('a', 'b') function() {}") +
         " (QName('uri', 'name'))", "a\nb");
     query(COUNT.args(func.args(" %basex:inline %basex:lazy function() {}")), 2);
@@ -1330,13 +1330,13 @@ public final class FnModuleTest extends SandboxTest {
     check("for $f in ('fn:true', 'fn:position') !" + func.args(" xs:QName(.)", 0) +
         " return (8, 9)[$f()]",
         "8\n9\n9", exists(func));
-    check("for $f in xs:QName('fn:position') return (8, 9)[" + func.args(" $f", 0) + "()]",
+    check("for $f in #fn:position return (8, 9)[" + func.args(" $f", 0) + "()]",
         "8\n9", empty(func));
 
     inline(true);
-    check(func.args(" xs:QName('fn:count')", 1) + "((1, 2))", 2, root(Int.class));
-    check(func.args(" xs:QName('fn:identity')", 1) + "(1)", 1, root(Int.class));
-    check(func.args(" xs:QName('fn:identity')", 1) + "(<a/>)", "<a/>", root(CElem.class));
+    check(func.args(" #fn:count", 1) + "((1, 2))", 2, root(Int.class));
+    check(func.args(" #fn:identity", 1) + "(1)", 1, root(Int.class));
+    check(func.args(" #fn:identity", 1) + "(<a/>)", "<a/>", root(CElem.class));
   }
 
   /** Test method. */
@@ -1440,7 +1440,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (98 to 102)", " ()", " string#1"), 99);
 
     error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
-    error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
+    error(func.args(" #x"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOMIZE_X);
@@ -1533,8 +1533,8 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" (0 to 5)[. = 0]", " not#1"), 1, root(GFLWOR.class));
     check(func.args(" (0 to 5)[. = 6]", " not#1"), "", root(GFLWOR.class));
 
-    query("function-lookup(xs:QName('fn:index-where'), <_>2</_>/text())(0, not#1)", 1);
-    query("function-lookup(xs:QName('fn:index-where'), <_>2</_>/text())(1, not#1)", "");
+    query("function-lookup(#fn:index-where, <_>2</_>/text())(0, not#1)", 1);
+    query("function-lookup(#fn:index-where, <_>2</_>/text())(1, not#1)", "");
   }
 
   /** Test method. */
@@ -1829,7 +1829,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (98 to 102)", " ()", " string#1"), 100);
 
     error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
-    error(func.args(" xs:QName('x')"), CMPTYPE_X_X_X);
+    error(func.args(" #x"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
     error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOMIZE_X);
@@ -1917,7 +1917,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" (0 to 99999999999) ! (1 to 10000000)"), 1, root(Int.class));
 
     // errors
-    error(func.args(" xs:QName('a')"), COMPARE_X_X);
+    error(func.args(" #a"), COMPARE_X_X);
     error(func.args(" ('b', 'c', 'a', 1)"), ARGTYPE_X_X_X);
     error(func.args(" (2, 3, 1, 'a')"), ARGTYPE_X_X_X);
     error(func.args(" (false(), true(), false(), 1)"), ARGTYPE_X_X_X);
@@ -1934,17 +1934,17 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void nodeTypeAnnotation() {
     final Function func = NODE_TYPE_ANNOTATION;
 
-    query("let $e := parse-xml(\"<e/>\")/* return " + func.args(" $e") + " ? name", "untyped");
+    query("let $e := parse-xml(\"<e/>\")/* return " + func.args(" $e") + " ? name", "#untyped");
     query("let $a := parse-xml(\"<e a='3'/>\")//@a return " + func.args(" $a") + " ? name",
-        "untypedAtomic");
+        "#untypedAtomic");
 
     final String q1 = func.args(" <a>42</a>");
-    query(q1, "{\"name\":untyped,\"is-simple\":false(),\"base-type\":(anonymous-function)#0,"
+    query(q1, "{\"name\":#untyped,\"is-simple\":false(),\"base-type\":(anonymous-function)#0,"
         + "\"variety\":\"mixed\"}");
-    query(q1 + "?name eq xs:QName('xs:untyped')", true);
+    query(q1 + "?name eq #xs:untyped", true);
     query(q1 + "?is-simple", false);
     query(q1 + "?variety", "mixed");
-    query(q1 + "?base-type()?name eq xs:QName('xs:anyType')", true);
+    query(q1 + "?base-type()?name eq #xs:anyType", true);
     query(q1 + "?base-type()?is-simple", false);
     query(q1 + "?base-type()?variety", "mixed");
     query(q1 + "=> map:contains('primitive-type')", false);
@@ -1952,23 +1952,23 @@ public final class FnModuleTest extends SandboxTest {
     query(q1 + "=> map:contains('simple-content-type')", false);
 
     final String q2 = func.args(" attribute a {42}");
-    query(q2, "{\"name\":untypedAtomic,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
+    query(q2, "{\"name\":#untypedAtomic,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
         + "\"primitive-type\":(anonymous-function)#0,\"variety\":\"atomic\",\"matches\":"
         + "(anonymous-function)#1,\"constructor\":xs:untypedAtomic#1}");
-    query(q2 + "?name eq xs:QName('xs:untypedAtomic')", true);
+    query(q2 + "?name eq #xs:untypedAtomic", true);
     query(q2 + "?is-simple", true);
     query(q2 + "?variety", "atomic");
-    query(q2 + "?base-type()?name eq xs:QName('xs:anyAtomicType')", true);
+    query(q2 + "?base-type()?name eq #xs:anyAtomicType", true);
     query(q2 + "?base-type()?is-simple", true);
     query(q2 + "?base-type()?variety", "atomic");
-    query(q2 + "?base-type()?base-type()?name eq xs:QName('xs:anySimpleType')", true);
+    query(q2 + "?base-type()?base-type()?name eq #xs:anySimpleType", true);
     query(q2 + "?base-type()?base-type()?is-simple", true);
     query(q2 + "?base-type()?base-type()=> map:contains('variety')", false);
-    query(q2 + "?base-type()?base-type()?base-type()?name eq xs:QName('xs:anyType')", true);
+    query(q2 + "?base-type()?base-type()?base-type()?name eq #xs:anyType", true);
     query(q2 + "?base-type()?base-type()?base-type()?is-simple", false);
     query(q2 + "?base-type()?base-type()?base-type()?variety", "mixed");
     query(q2 + "?base-type()?base-type()?base-type()?base-type() => exists()", false);
-    query(q2 + "?primitive-type()?name eq xs:QName('xs:untypedAtomic')", true);
+    query(q2 + "?primitive-type()?name eq #xs:untypedAtomic", true);
     query(q2 + "=> map:contains('members')", false);
     query(q2 + "=> map:contains('simple-content-type')", false);
     query(q2 + "?matches(<a>abc</a>)", true);
@@ -2731,13 +2731,12 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void schemaType() {
     final Function func = SCHEMA_TYPE;
 
-    query(func.args(" xs:QName('xs:integer')") + " ? name", "integer");
-    query(func.args(" xs:QName('xs:long')") + " ? primitive-type() ? name", "decimal");
-    query(func.args(" xs:QName('xs:positiveInteger')") + " ? base-type() ? name",
-        "nonNegativeInteger");
-    query(func.args(" xs:QName('xs:integer')") + " ? matches(23)", true);
-    query(func.args(" xs:QName('xs:numeric')") + " ? variety", "union");
-    query(func.args(" xs:QName('xs:numeric')") + " ? members() ? name", "double\nfloat\ndecimal");
+    query(func.args(" #xs:integer") + " ? name", "#integer");
+    query(func.args(" #xs:long") + " ? primitive-type() ? name", "#decimal");
+    query(func.args(" #xs:positiveInteger") + " ? base-type() ? name", "#nonNegativeInteger");
+    query(func.args(" #xs:integer") + " ? matches(23)", true);
+    query(func.args(" #xs:numeric") + " ? variety", "union");
+    query(func.args(" #xs:numeric") + " ? members() ? name", "#double\n#float\n#decimal");
   }
 
   /** Test method. */
