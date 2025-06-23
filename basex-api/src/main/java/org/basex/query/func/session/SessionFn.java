@@ -29,7 +29,14 @@ abstract class SessionFn extends ApiFunc {
     // WebSocket context: access existing session
     HttpSession session = wsSession(qc);
     // HTTP context: get/create session
-    if(session == null) session = request.getSession(create);
+    if(session == null) {
+      try {
+        session = request.getSession(create);
+      } catch(final NullPointerException ex) {
+        // Jetty 12, getSession: _coreRequest may be null for propagated request instances
+        Util.debug(ex);
+      }
+    }
     // no session created (may happen with WebSockets): raise error or return null reference
     if(session == null) {
       if(create) throw SESSION_NOTFOUND.get(info);
@@ -39,12 +46,12 @@ abstract class SessionFn extends ApiFunc {
   }
 
   /**
-   * Tries to return a WebSocket session instance from the (if found in the classpath).
-   * Accessed via reflection, as WebSockets are only supported for Jetty.
+   * Tries to return a WebSocket session instance.
    * @param qc query context
    * @return session instance or {@code null}
    */
   private static HttpSession wsSession(final QueryContext qc) {
+    // accessed via reflection, as WebSockets are only supported for Jetty
     final Class<?> wsClass = Reflect.find("org.basex.http.ws.WebSocket");
     if(wsClass != null) {
       final Object ws = qc.context.getExternal(wsClass);

@@ -279,7 +279,8 @@ public final class HTTPConnection implements ClientInfo {
           value = session.getAttribute(dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID);
         }
       }
-    } catch(final IllegalStateException ex) {
+    } catch(final NullPointerException | IllegalStateException ex) {
+      // Jetty 12, getSession: _coreRequest may be null for propagated request instances
       // Tomcat: https://github.com/spring-projects/spring-boot/issues/36763
       Util.debug(ex);
     }
