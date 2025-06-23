@@ -118,10 +118,10 @@ public final class RestXqErrorTest extends RestXqTest {
    */
   @Test public void errorParam() throws Exception {
     // catch errors
-    get("err:FOER0000", "declare %R:path('') function m:a() { error() };" +
+    get("#err:FOER0000", "declare %R:path('') function m:a() { error() };" +
         "declare %R:error('*') %R:error-param('code', '{$x}') " +
         "function m:b($x) { $x };", "");
-    get("x", "declare %R:path('') function m:a() { error(xs:QName('x')) };" +
+    get("#x", "declare %R:path('') function m:a() { error(xs:QName('x')) };" +
         "declare %R:error('*') %R:error-param('code', '{$x}') " +
         "function m:b($x) { $x };", "");
     get("!!!", "declare %R:path('') function m:a() { error(xs:QName('x'), '!!!') };" +
