@@ -214,7 +214,7 @@ public final class GFLWOR extends ParseExpr {
         // no referenced variables in return clause
         //   let $_ := 1 return <x/>  ->  <x/>
         //   for $_ in 1 to 2 return 3  ->  replicate(3, 2)
-        return min == 1 ? rtrn : cc.replicate(rtrn, Int.get(min), info);
+        return min == 1 ? rtrn : cc.replicate(rtrn, Itr.get(min), info);
       }
     }
 

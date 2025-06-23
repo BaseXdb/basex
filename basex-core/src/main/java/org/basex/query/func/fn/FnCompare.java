@@ -29,7 +29,7 @@ public final class FnCompare extends StandardFunc {
     if(!CmpG.comparable(type1, type2, false)) throw compareError(value1, value2, info);
 
     final long diff = value1.compare(value2, collation, true, info);
-    return Int.get(diff < 0 ? -1 : diff > 0 ? 1 : 0);
+    return Itr.get(diff < 0 ? -1 : diff > 0 ? 1 : 0);
   }
 
   @Override

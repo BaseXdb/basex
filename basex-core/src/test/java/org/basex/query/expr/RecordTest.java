@@ -227,7 +227,7 @@ public final class RecordTest extends SandboxTest {
   /** Tests for the compact record map implementation. */
   @Test public void recordMap() {
     String map = "{ 'a': 1, 'b': 2 }";
-    check(map + " => map:get('a')", 1, root(Int.class));
+    check(map + " => map:get('a')", 1, root(Itr.class));
     check(map + " => map:get('c')", "", empty());
     check(map + " => map:get(1)", "", empty());
     check(map + " => map:get(<?_ 1?> cast as xs:integer)", "", empty());

@@ -34,7 +34,7 @@ public class ConvertIntegersToBase64 extends ConvertFn {
 
     // single integer
     final long size = values.size();
-    if(size == 1 && values instanceof final Int itr) return B64.get((byte) itr.itr());
+    if(size == 1 && values instanceof final Itr itr) return B64.get((byte) itr.itr());
 
     final ByteList bl = new ByteList(Seq.initialCapacity(size));
     if(values instanceof final IntSeq is) {

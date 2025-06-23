@@ -45,7 +45,7 @@ public final class CsvW3Converter extends CsvXQueryConverter {
     for(final Item column : columns) {
       ++i;
       if(column.string(ii).length > 0 && !columnIndexBuilder.contains(column)) {
-        columnIndexBuilder.put(column, Int.get(i));
+        columnIndexBuilder.put(column, Itr.get(i));
       }
     }
     final XQMap columnIndex = columnIndexBuilder.map();

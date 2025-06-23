@@ -18,9 +18,9 @@ import org.basex.util.*;
  */
 public final class FnPosition extends StandardFunc {
   @Override
-  public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-    return Int.get(qc.focus.pos);
+    return Itr.get(qc.focus.pos);
   }
 
   @Override

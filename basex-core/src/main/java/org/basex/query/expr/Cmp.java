@@ -257,7 +257,7 @@ public abstract class Cmp extends Arr {
         return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
     // count(distinct-values(E)) = int
-    if(DISTINCT_VALUES.is(arg) && count instanceof final Int itr) {
+    if(DISTINCT_VALUES.is(arg) && count instanceof final Itr itr) {
       final long size1 = arg.arg(0).size(), size2 = itr.itr();
       if(size1 != -1 && size1 == size2) return ((FnDistinctValues) arg).duplicates(op.swap(), cc);
     }
@@ -289,21 +289,21 @@ public abstract class Cmp extends Arr {
       // count(A) > 1  ->  util:within(A, 2)
       // count(A) < 5  ->  util:within(A, 0, 4)
       if(counts != null) {
-        for(final long c : counts) args.add(Int.get(c));
+        for(final long c : counts) args.add(Itr.get(c));
       }
     } else if(op == OpV.EQ || op == OpV.GE || op == OpV.LE) {
       final SeqType st2 = count.seqType();
       if(st2.type.instanceOf(AtomType.INTEGER)) {
         if(count instanceof final RangeSeq rs) {
           // count(A) = 3 to 5  ->  util:within(A, 3, 5)
-          args.add(Int.get(rs.min())).add(Int.get(rs.max()));
+          args.add(Itr.get(rs.min())).add(Itr.get(rs.max()));
         } else if(st2.one() && (count instanceof VarRef || count instanceof ContextValue)) {
           // count(A) = $c  ->  util:within(A, $c)
           args.add(count).add(count);
         }
         if(!args.isEmpty()) {
           if(op == OpV.GE) args.remove(args.size() - 1);
-          else if(op == OpV.LE) args.set(0, Int.ONE);
+          else if(op == OpV.LE) args.set(0, Itr.ONE);
         }
       }
     }

@@ -18,6 +18,6 @@ public final class FnYearFromDateTime extends DateTimeFn {
     if(value.isEmpty()) return Empty.VALUE;
 
     final long comp = toGregorian(value, qc).yea();
-    return comp == Long.MAX_VALUE ? Empty.VALUE : Int.get(comp);
+    return comp == Long.MAX_VALUE ? Empty.VALUE : Itr.get(comp);
   }
 }

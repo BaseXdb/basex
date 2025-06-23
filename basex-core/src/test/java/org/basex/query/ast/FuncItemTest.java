@@ -65,7 +65,7 @@ public final class FuncItemTest extends SandboxTest {
         42,
         // both outer inline functions are pre-compiled
         empty(Closure.class),
-        "/*/" + Util.className(Int.class) + " = '42'"
+        "/*/" + Util.className(Itr.class) + " = '42'"
     );
   }
 
@@ -142,7 +142,7 @@ public final class FuncItemTest extends SandboxTest {
         "let $id := local:foo(function($g) { $g })" +
         "return $id(42)",
         42,
-        "/*/" + Util.className(Int.class) + " = '42'"
+        "/*/" + Util.className(Itr.class) + " = '42'"
     );
   }
 
@@ -320,12 +320,12 @@ public final class FuncItemTest extends SandboxTest {
     final String seq = "1 to 1000000000000000000";
 
     // return unchanged result
-    check("fold-left (" + seq + ", 456, fn($r, $i) { $r })", 456, root(Int.class));
-    check("fold-right(" + seq + ", 456, fn($i, $r) { $r })", 456, root(Int.class));
+    check("fold-left (" + seq + ", 456, fn($r, $i) { $r })", 456, root(Itr.class));
+    check("fold-right(" + seq + ", 456, fn($i, $r) { $r })", 456, root(Itr.class));
 
     // return constant value
-    check("fold-left (" + seq + ", 1, fn($r, $i) { 123 })", 123, root(Int.class));
-    check("fold-right(" + seq + ", 1, fn($i, $r) { 123 })", 123, root(Int.class));
+    check("fold-left (" + seq + ", 1, fn($r, $i) { 123 })", 123, root(Itr.class));
+    check("fold-right(" + seq + ", 1, fn($i, $r) { 123 })", 123, root(Itr.class));
 
     // exit early if result will not change anymore
     query("fold-left (" + seq + ", 1, fn($r, $i) { if($r < 100) then $r + $i else $r })",
@@ -358,8 +358,8 @@ public final class FuncItemTest extends SandboxTest {
     final String array = "array { 1 to 100000 }";
 
     // return unchanged result
-    check("array:fold-left(" + array + ", 456, fn($r, $i) { $r })", 456, root(Int.class));
-    check("array:fold-right(" + array + ", 456, fn($i, $r) { $r })", 456, root(Int.class));
+    check("array:fold-left(" + array + ", 456, fn($r, $i) { $r })", 456, root(Itr.class));
+    check("array:fold-right(" + array + ", 456, fn($i, $r) { $r })", 456, root(Itr.class));
 
     // bug fix
     query("array:fold-right(" + array + ", 1, fn($a, $b) { if($b > 10000000) then $b else $a+$b })",

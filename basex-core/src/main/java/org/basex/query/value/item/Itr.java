@@ -16,24 +16,24 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Int extends ANum {
+public final class Itr extends ANum {
   /** Maximum values. */
-  public static final Int MAX;
+  public static final Itr MAX;
   /** Value 0. */
-  public static final Int ZERO;
+  public static final Itr ZERO;
   /** Value 1. */
-  public static final Int ONE;
+  public static final Itr ONE;
 
   /** Constant values. */
-  private static final Int[] INTSS;
+  private static final Itr[] INTSS;
   /** Integer value. */
   private final long value;
 
   // caches the first 128 integers
   static {
     final int nl = 128;
-    INTSS = new Int[nl];
-    for(int n = 0; n < nl; n++) INTSS[n] = new Int(n);
+    INTSS = new Itr[nl];
+    for(int n = 0; n < nl; n++) INTSS[n] = new Itr(n);
     MAX = get(Long.MAX_VALUE);
     ZERO = INTSS[0];
     ONE = INTSS[1];
@@ -43,7 +43,7 @@ public final class Int extends ANum {
    * Constructor.
    * @param value value
    */
-  private Int(final long value) {
+  private Itr(final long value) {
     this(value, AtomType.INTEGER);
   }
 
@@ -52,7 +52,7 @@ public final class Int extends ANum {
    * @param value value
    * @param type item type
    */
-  public Int(final long value, final Type type) {
+  public Itr(final long value, final Type type) {
     super(type);
     this.value = value;
   }
@@ -62,8 +62,8 @@ public final class Int extends ANum {
    * @param value value
    * @return instance
    */
-  public static Int get(final long value) {
-    return value >= 0 && value < INTSS.length ? INTSS[(int) value] : new Int(value);
+  public static Itr get(final long value) {
+    return value >= 0 && value < INTSS.length ? INTSS[(int) value] : new Itr(value);
   }
 
   /**
@@ -72,8 +72,8 @@ public final class Int extends ANum {
    * @param type item type
    * @return instance
    */
-  public static Int get(final long value, final Type type) {
-    return type == AtomType.INTEGER ? get(value) : new Int(value, type);
+  public static Itr get(final long value, final Type type) {
+    return type == AtomType.INTEGER ? get(value) : new Itr(value, type);
   }
 
   @Override
@@ -117,22 +117,22 @@ public final class Int extends ANum {
   }
 
   @Override
-  public Int abs() {
+  public Itr abs() {
     return value < 0 ? get(-value) : this;
   }
 
   @Override
-  public Int ceiling() {
+  public Itr ceiling() {
     return this;
   }
 
   @Override
-  public Int floor() {
+  public Itr floor() {
     return this;
   }
 
   @Override
-  public Int round(final int prec, final RoundMode mode) {
+  public Itr round(final int prec, final RoundMode mode) {
     if(value == 0 || prec >= 0) return this;
     final long v = Dec.round(BigDecimal.valueOf(value), prec, mode).longValue();
     return v == value ? this : get(v);
@@ -150,7 +150,7 @@ public final class Int extends ANum {
   @Override
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return item instanceof final Int itr ? value == itr.value :
+    return item instanceof final Itr itr ? value == itr.value :
            item instanceof Dec ? item.equal(this, coll, ii) :
            value == item.dbl(ii);
   }
@@ -158,7 +158,7 @@ public final class Int extends ANum {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return item instanceof final Int itr ? Long.compare(value, itr.value) :
+    return item instanceof final Itr itr ? Long.compare(value, itr.value) :
            item instanceof Dec ? -item.compare(this, coll, transitive, ii) :
            Dbl.compare(dbl(ii), item.dbl(ii), transitive);
   }
@@ -183,7 +183,7 @@ public final class Int extends ANum {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final Int itr && type == itr.type && value == itr.value;
+    return this == obj || obj instanceof final Itr itr && type == itr.type && value == itr.value;
   }
 
   // STATIC METHODS ===============================================================================

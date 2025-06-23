@@ -260,7 +260,7 @@ public class CmpG extends Cmp {
       final double num12 = op12 instanceof final ANum num ? num.dbl() : Double.NaN;
       if(op12.seqType().instanceOf(SeqType.NUMERIC_O)) {
         final Calc calc1 = arth.calc;
-        if(calc1 == Calc.SUBTRACT && expr2 == Int.ZERO) {
+        if(calc1 == Calc.SUBTRACT && expr2 == Itr.ZERO) {
           // E - NUMERIC = 0  ->  E = NUMERIC
           ex = new CmpG(info, op11, op12, op);
         } else if((

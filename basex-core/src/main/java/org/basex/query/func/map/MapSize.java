@@ -17,9 +17,9 @@ import org.basex.util.*;
  */
 public final class MapSize extends StandardFunc {
   @Override
-  public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-    return Int.get(map.structSize());
+    return Itr.get(map.structSize());
   }
 
   @Override
@@ -27,7 +27,7 @@ public final class MapSize extends StandardFunc {
     final Expr map = arg(0);
     if(map.seqType().type instanceof MapType) {
       final long size = map.structSize();
-      if(size >= 0 && !map.has(Flag.NDT)) return Int.get(size);
+      if(size >= 0 && !map.has(Flag.NDT)) return Itr.get(size);
     }
     return this;
   }

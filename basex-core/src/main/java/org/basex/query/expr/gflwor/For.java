@@ -85,14 +85,14 @@ public final class For extends ForLet {
             // there's another item to serve
             ++p;
             qc.set(var, item);
-            if(pos != null) qc.set(pos, Int.get(p));
+            if(pos != null) qc.set(pos, Itr.get(p));
             if(score != null) qc.set(score, Dbl.get(item.score()));
             return true;
           }
           if(empty && iter != null && p == 0) {
             // expression yields no items, bind the empty sequence instead
             qc.set(var, Empty.VALUE);
-            if(pos != null) qc.set(pos, Int.get(p));
+            if(pos != null) qc.set(pos, Itr.get(p));
             if(score != null) qc.set(score, Dbl.ZERO);
             iter = null;
             return true;
@@ -135,7 +135,7 @@ public final class For extends ForLet {
     var.expr(expr);
     if(pos != null) {
       pos.refineType(SeqType.INTEGER_O, 1, cc);
-      pos.expr(Int.ZERO);
+      pos.expr(Itr.ZERO);
     }
     if(score != null) {
       score.refineType(SeqType.DOUBLE_O, 1, cc);
@@ -186,7 +186,7 @@ public final class For extends ForLet {
       clauses.add(p + 1, new Let(score, new VarRef(info(), var).optimize(cc), true).optimize(cc));
     }
     if(pos != null) {
-      clauses.add(p + 1, new Let(pos, Int.ONE).optimize(cc));
+      clauses.add(p + 1, new Let(pos, Itr.ONE).optimize(cc));
     }
     return true;
   }

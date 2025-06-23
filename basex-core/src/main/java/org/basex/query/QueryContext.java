@@ -263,7 +263,7 @@ public final class QueryContext extends Job implements Closeable {
       if(func.info.equals(sf.info)) {
         // disable inlining of called function to ensure explicit locks are considered
         if(!sf.anns.contains(Annotation._BASEX_INLINE)) {
-          sf.anns = sf.anns.attach(new Ann(sf.info, Annotation._BASEX_INLINE, Int.ZERO));
+          sf.anns = sf.anns.attach(new Ann(sf.info, Annotation._BASEX_INLINE, Itr.ZERO));
         }
         // create and assign function call
         final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.info, true);

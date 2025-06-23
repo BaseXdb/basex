@@ -24,6 +24,6 @@ public final class BinFind extends BinFn {
     final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
     final int pos = indexOf(bytes, search.binary(info), bounds(offset, Empty.VALUE, bl)[0]);
-    return pos == -1 ? Empty.VALUE : Int.get(pos);
+    return pos == -1 ? Empty.VALUE : Itr.get(pos);
   }
 }

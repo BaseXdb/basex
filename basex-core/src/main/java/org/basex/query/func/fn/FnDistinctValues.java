@@ -48,7 +48,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
               continue;
             }
             set = ItemSet.get(collation, info);
-            for(final int i : ints.keys()) set.add(Int.get(i));
+            for(final int i : ints.keys()) set.add(Itr.get(i));
             ints = null;
           }
           // fallback
@@ -79,7 +79,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
     // fallback
     final ValueBuilder vb = new ValueBuilder(qc).add(intseq);
     final ItemSet set = ItemSet.get(collation, info);
-    for(final int i : ints.keys()) set.add(Int.get(i));
+    for(final int i : ints.keys()) set.add(Itr.get(i));
     ints = null;
     do {
       if(set.add(item)) vb.add(item);

@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class ProfCurrentNs extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    return Int.get(System.nanoTime());
+    return Itr.get(System.nanoTime());
   }
 }

@@ -58,7 +58,7 @@ public final class FnSubstring extends StandardFunc {
    */
   private int start(final QueryContext qc) throws QueryException {
     final Item start = toAtomItem(arg(1), qc);
-    if(start instanceof final Int itr) return limit(itr.itr() - 1);
+    if(start instanceof final Itr itr) return limit(itr.itr() - 1);
     final double dbl = start.dbl(info);
     return Double.isNaN(dbl) ? Integer.MIN_VALUE : subPos(dbl);
   }
@@ -72,7 +72,7 @@ public final class FnSubstring extends StandardFunc {
    */
   private int length(final int def, final QueryContext qc) throws QueryException {
     final Item length = arg(2).atomItem(qc, info);
-    return length.isEmpty() ? def : length instanceof final Int itr ? (int) itr.itr() :
+    return length.isEmpty() ? def : length instanceof final Itr itr ? (int) itr.itr() :
       subPos(length.dbl(info) + 1);
   }
 

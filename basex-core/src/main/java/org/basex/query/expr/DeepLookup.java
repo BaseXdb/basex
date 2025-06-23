@@ -57,7 +57,7 @@ public final class DeepLookup extends ALookup {
         // process members individually to preserve order
         int k = 0;
         for(final Value val : array.iterable()) {
-          vb.add(valueFor(XQMap.get(Int.get(++k), val), true, qc));
+          vb.add(valueFor(XQMap.get(Itr.get(++k), val), true, qc));
           for(final Item it : val) {
             add(it, vb, qc);
           }

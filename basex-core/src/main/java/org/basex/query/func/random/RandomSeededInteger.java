@@ -29,7 +29,7 @@ public final class RandomSeededInteger extends StandardFunc {
 
       @Override
       public Item next() {
-        return --c >= 0 ? Int.get(max == 0 ? r.nextInt() : r.nextInt(max)) : null;
+        return --c >= 0 ? Itr.get(max == 0 ? r.nextInt() : r.nextInt(max)) : null;
       }
     };
   }

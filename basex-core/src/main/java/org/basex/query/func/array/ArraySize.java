@@ -16,9 +16,9 @@ import org.basex.util.*;
  */
 public final class ArraySize extends ArrayFn {
   @Override
-  public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    return Int.get(array.structSize());
+    return Itr.get(array.structSize());
   }
 
   @Override
@@ -26,7 +26,7 @@ public final class ArraySize extends ArrayFn {
     final Expr array = arg(0);
     if(array.seqType().type instanceof ArrayType) {
       final long size = array.structSize();
-      if(size >= 0 && !array.has(Flag.NDT)) return Int.get(size);
+      if(size >= 0 && !array.has(Flag.NDT)) return Itr.get(size);
     }
     return this;
   }

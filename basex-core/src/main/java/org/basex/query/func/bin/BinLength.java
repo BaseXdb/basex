@@ -15,6 +15,6 @@ public final class BinLength extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Bin binary = toBin(arg(0), qc);
-    return Int.get(binary.binary(info).length);
+    return Itr.get(binary.binary(info).length);
   }
 }

@@ -158,20 +158,20 @@ public final class UtilModuleTest extends SandboxTest {
 
     // merge multiple counts
     check("let $s := (1 to 6)[. < 5] return empty($s) or count($s) < 5", true,
-        root(func), count(Int.class, 2), empty(EMPTY));
+        root(func), count(Itr.class, 2), empty(EMPTY));
     check("let $s := (1 to 6)[. < 5] return exists($s) and count($s) < 5", true,
-        root(func), count(Int.class, 2), empty(EXISTS));
+        root(func), count(Itr.class, 2), empty(EXISTS));
 
     check("let $s := (1 to 6)[. < 5] return count($s) > 0 and count($s) < 5", true,
-        root(func), count(Int.class, 2), empty(COUNT));
+        root(func), count(Itr.class, 2), empty(COUNT));
     check("let $s := (1 to 6)[. < 5] return count($s) >= 0 and count($s) < 5", true,
-        root(func), count(Int.class, 2), empty(COUNT));
+        root(func), count(Itr.class, 2), empty(COUNT));
     check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
-        root(func), count(Int.class, 1), empty(COUNT));
+        root(func), count(Itr.class, 1), empty(COUNT));
     check("let $s := (1 to 6)[. < 5] return count($s) > 1 and count($s) > 2", true,
-        root(func), count(Int.class, 1), empty(COUNT));
+        root(func), count(Itr.class, 1), empty(COUNT));
     check("let $s := (1 to 6)[. < 5] return count($s) > 1 or count($s) > 2", true,
-        root(func), count(Int.class, 1), empty(COUNT));
+        root(func), count(Itr.class, 1), empty(COUNT));
 
     check("let $s := (1 to 6)[. < 5] return count($s) < 5 or count($s) > 5", true,
         count(_UTIL_COUNT_WITHIN, 2), empty(COUNT));

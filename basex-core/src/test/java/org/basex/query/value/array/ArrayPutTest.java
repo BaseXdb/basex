@@ -19,13 +19,13 @@ public final class ArrayPutTest extends ArrayTest {
     final int n = 5000;
     final ArrayBuilder ab = new ArrayBuilder(qc);
     for(int i = 0; i < n; i++) {
-      ab.add(Int.get(i));
+      ab.add(Itr.get(i));
     }
     final XQArray array1 = ab.array();
     for(int i = 0; i < n; i++) {
-      final XQArray array2 = array1.put(i, Int.get(-i));
+      final XQArray array2 = array1.put(i, Itr.get(-i));
       for(int j = 0; j < n; j++) {
-        assertEquals(i == j ? -j : j, ((Int) array2.memberAt(j)).itr());
+        assertEquals(i == j ? -j : j, ((Itr) array2.memberAt(j)).itr());
       }
     }
   }

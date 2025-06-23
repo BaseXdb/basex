@@ -87,7 +87,7 @@ public final class CmpIR extends Single {
     if(expr2 instanceof final RangeSeq rs) {
       mn = rs.min();
       mx = rs.max();
-    } else if(expr2 instanceof final Int itr && (eq || !cmpEq)) {
+    } else if(expr2 instanceof final Itr itr && (eq || !cmpEq)) {
       mn = itr.itr();
       mx = mn;
     } else {
@@ -175,7 +175,7 @@ public final class CmpIR extends Single {
       newMin = cmp.min;
       newMax = cmp.max;
     } else if(ex instanceof final CmpG cmp && cmp.op == OpG.EQ &&
-        ex.arg(1) instanceof final Int itr) {
+        ex.arg(1) instanceof final Itr itr) {
       newMin = itr.itr();
       newMax = newMin;
     }

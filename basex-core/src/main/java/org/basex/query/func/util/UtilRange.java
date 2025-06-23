@@ -29,9 +29,9 @@ public final class UtilRange extends FnSubsequence {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    if(arg(1) instanceof final Int itr) {
+    if(arg(1) instanceof final Itr itr) {
       // util:range(EXPR, -5, END)  ->  util:range(EXPR, 1, END)
-      if(itr.itr() < 1) arg(1, arg -> Int.ONE);
+      if(itr.itr() < 1) arg(1, arg -> Itr.ONE);
     }
     return super.opt(cc);
   }

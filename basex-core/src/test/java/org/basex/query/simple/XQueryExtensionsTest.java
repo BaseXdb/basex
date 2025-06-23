@@ -38,18 +38,18 @@ public final class XQueryExtensionsTest extends SandboxTest {
 
     query("<x/>/parent::* -> (self::y or count(*) eq 1)", false);
 
-    check("2 -> .", 2, root(Int.class));
-    check("2 -> .", 2, root(Int.class));
+    check("2 -> .", 2, root(Itr.class));
+    check("2 -> .", 2, root(Itr.class));
 
     check("void(()) -> void(()) -> 2", 2, root(Pipeline.class), count(VOID, 2));
     check("void(()) -> 2", 2, root(Pipeline.class));
     check("void(()) -> . -> 2", 2, root(Pipeline.class), empty(ContextValue.class));
     check("(void(()) -> void(())) -> 2", 2, count(Pipeline.class, 1));
 
-    check("(1, 2) -> (head(.) + tail(.))", 3, root(Int.class));
+    check("(1, 2) -> (head(.) + tail(.))", 3, root(Itr.class));
     check("(<a/>, <b/>) -> (foot(.), head(.))", "<b/>\n<a/>", root(Pipeline.class));
 
-    check("2 -> (. * .)", 4, root(Int.class));
+    check("2 -> (. * .)", 4, root(Itr.class));
     check("<a>2</a> -> (. * .)", 4, root(Dbl.class));
     check("<?_ 2?> -> xs:integer() -> (. * .)", 4, root(Pipeline.class));
 

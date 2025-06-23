@@ -122,8 +122,8 @@ public abstract class SimpleMap extends Mapping {
       if(!next.has(Flag.CTX)) {
         Expr count = null;
         if(size != -1) {
-          count = Int.get(size);
-        } else if(expr instanceof Range && expr.arg(0) == Int.ONE &&
+          count = Itr.get(size);
+        } else if(expr instanceof Range && expr.arg(0) == Itr.ONE &&
             expr.arg(1).seqType().instanceOf(SeqType.INTEGER_O)) {
           count = expr.arg(1);
         }
@@ -151,7 +151,7 @@ public abstract class SimpleMap extends Mapping {
             // (A to B) ! items-at(E, .)  ->  util:range(E, A, B)
             // reverse(A to B) ! items-at(E, .)  ->  reverse(util:range(E, A, B))
             final Expr func = cc.function(_UTIL_RANGE, info, args[0],
-                Int.get(rs.min()), Int.get(rs.max()));
+                Itr.get(rs.min()), Itr.get(rs.max()));
             return rs.ascending() ? func : cc.function(REVERSE, info, func);
           }
           if(expr instanceof Range) {
@@ -177,7 +177,7 @@ public abstract class SimpleMap extends Mapping {
       if(expr instanceof final RangeSeq rs && next instanceof final Arith arith) {
         final boolean plus = arith.calc == Calc.ADD, minus = arith.calc == Calc.SUBTRACT;
         if((plus || minus) && arith.arg(0) instanceof ContextValue &&
-            arith.arg(1) instanceof final Int itr) {
+            arith.arg(1) instanceof final Itr itr) {
           final long diff = itr.itr(), start = rs.itemAt(0).itr() + (plus ? diff : -diff);
           return RangeSeq.get(start, rs.size(), rs.ascending());
         }
@@ -194,7 +194,7 @@ public abstract class SimpleMap extends Mapping {
         final Expr inlined = inline(input, next, cc);
         if(inlined != null) {
           // replicate(1, 2) ! (. = 1)  ->  replicate(1 = 1, 2)
-          return expr == input ? inlined : cc.replicate(inlined, Int.get(size), info);
+          return expr == input ? inlined : cc.replicate(inlined, Itr.get(size), info);
         }
       }
 

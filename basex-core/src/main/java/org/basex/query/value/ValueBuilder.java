@@ -206,7 +206,7 @@ public final class ValueBuilder {
     @Override
     public SeqBuilder add(final Item item) {
       if(isInt(item)) {
-        final int i = ((Int) item).toInt();
+        final int i = ((Itr) item).toInt();
         if(i != Integer.MIN_VALUE) {
           values.add(i);
           return this;

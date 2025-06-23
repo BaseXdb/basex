@@ -313,7 +313,7 @@ public abstract class XQArray extends XQStruct {
    */
   private static long index(final Item key, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    return ((Int) SeqType.INTEGER_O.coerce(key, null, qc, null, ii)).itr();
+    return ((Itr) SeqType.INTEGER_O.coerce(key, null, qc, null, ii)).itr();
   }
 
   @Override
@@ -474,28 +474,28 @@ public abstract class XQArray extends XQStruct {
       }
       if(tp == AtomType.BYTE) {
         final ByteList list = new ByteList(sz);
-        for(final Value value : iterable()) list.add((byte) ((Int) value).itr());
+        for(final Value value : iterable()) list.add((byte) ((Itr) value).itr());
         return list.finish();
       }
       if(tp.oneOf(AtomType.SHORT, AtomType.UNSIGNED_BYTE)) {
         final ShortList list = new ShortList(sz);
-        for(final Value value : iterable()) list.add((short) ((Int) value).itr());
+        for(final Value value : iterable()) list.add((short) ((Itr) value).itr());
         return list.finish();
       }
       if(tp == AtomType.UNSIGNED_SHORT) {
         final char[] chars = new char[sz];
         int c = 0;
-        for(final Value value : iterable()) chars[c++] = (char) ((Int) value).itr();
+        for(final Value value : iterable()) chars[c++] = (char) ((Itr) value).itr();
         return chars;
       }
       if(tp == AtomType.INT) {
         final IntList list = new IntList(sz);
-        for(final Value value : iterable()) list.add((int) ((Int) value).itr());
+        for(final Value value : iterable()) list.add((int) ((Itr) value).itr());
         return list.finish();
       }
       if(tp.instanceOf(AtomType.INTEGER) && tp != AtomType.UNSIGNED_LONG) {
         final LongList list = new LongList(sz);
-        for(final Value value : iterable()) list.add(((Int) value).itr());
+        for(final Value value : iterable()) list.add(((Itr) value).itr());
         return list.finish();
       }
       if(tp == AtomType.FLOAT) {

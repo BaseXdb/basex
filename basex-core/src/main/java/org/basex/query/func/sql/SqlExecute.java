@@ -74,7 +74,7 @@ public class SqlExecute extends SqlFn {
 
     try {
       // updating statement: return number of updated rows
-      if(!result) return Int.get(stmt.getUpdateCount()).iter();
+      if(!result) return Itr.get(stmt.getUpdateCount()).iter();
 
       // create result set iterator
       final ResultSet rs = stmt.getResultSet();

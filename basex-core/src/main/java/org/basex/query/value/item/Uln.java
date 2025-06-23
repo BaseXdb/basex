@@ -65,7 +65,7 @@ public final class Uln extends ANum {
   @Override
   public ANum abs() {
     final long l = itr();
-    return l >= 0 ? this : Int.get(-l);
+    return l >= 0 ? this : Itr.get(-l);
   }
 
   @Override

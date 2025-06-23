@@ -114,7 +114,7 @@ public abstract class Filter extends AFilter {
       Expr ex = null;
       if(pred instanceof final IntPos pos) {
         // E[pos: MIN, MAX]  ->  util:range(E, MIN, MAX)
-        ex = cc.function(_UTIL_RANGE, info, add.apply(expr), Int.get(pos.min), Int.get(pos.max));
+        ex = cc.function(_UTIL_RANGE, info, add.apply(expr), Itr.get(pos.min), Itr.get(pos.max));
       } else if(pred instanceof final SimplePos pos) {
         if(pos.exact()) {
           // E[pos: POS]  ->  items-at(E, POS)
@@ -130,16 +130,16 @@ public abstract class Filter extends AFilter {
           if(simpleInt.test(arg1) && LAST.is(arg2)) {
             // E[pos: INT to last()]  ->  util:range(E, INT)
             ex = cc.function(_UTIL_RANGE, info, add.apply(expr), arg1);
-          } else if(arg1 == Int.ONE && arg2 instanceof final Arith arth2 && LAST.is(arth2.arg(0)) &&
-              arth2.calc == Calc.SUBTRACT && arth2.arg(1) == Int.ONE) {
+          } else if(arg1 == Itr.ONE && arg2 instanceof final Arith arth2 && LAST.is(arth2.arg(0)) &&
+              arth2.calc == Calc.SUBTRACT && arth2.arg(1) == Itr.ONE) {
             // E[pos: 1 to last() - 1]  ->  trunk(E)
             ex = cc.function(TRUNK, info, add.apply(expr));
           } else if(arg1 instanceof final Arith arth1 && LAST.is(arth1.arg(0)) &&
-              arth1.calc == Calc.SUBTRACT && simpleInt.test(arth1.arg(1)) && arg2 == Int.MAX) {
+              arth1.calc == Calc.SUBTRACT && simpleInt.test(arth1.arg(1)) && arg2 == Itr.MAX) {
             // E[pos: last() - INT to MAX]  ->  reverse(subsequence(reverse(E), 1, INT + 1))
             ex = cc.function(REVERSE, info, cc.function(SUBSEQUENCE, info,
-                cc.function(REVERSE, info, add.apply(expr)), Int.ONE,
-                new Arith(info, arg1.arg(1), Int.ONE, Calc.ADD).optimize(cc)));
+                cc.function(REVERSE, info, add.apply(expr)), Itr.ONE,
+                new Arith(info, arg1.arg(1), Itr.ONE, Calc.ADD).optimize(cc)));
           }
         } else if(LAST.is(posExpr)) {
           // E[pos: last()]  ->  foot(E)
@@ -148,7 +148,7 @@ public abstract class Filter extends AFilter {
             arth.calc == Calc.SUBTRACT && simpleInt.test(arth.arg(1))) {
           // E[pos: last() - INT]  ->  items-at(reverse(E), INT + 1)
           ex = cc.function(ITEMS_AT, info, cc.function(REVERSE, info, add.apply(expr)),
-              new Arith(info, posExpr.arg(1), Int.ONE, Calc.ADD).optimize(cc));
+              new Arith(info, posExpr.arg(1), Itr.ONE, Calc.ADD).optimize(cc));
         }
       } else if(pred instanceof final MixedPos pos) {
         final Expr posExpr = pos.expr;

@@ -16,9 +16,9 @@ import org.basex.util.*;
  */
 public final class FnLast extends StandardFunc {
   @Override
-  public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     ctxValue(qc);
-    return Int.get(qc.focus.size);
+    return Itr.get(qc.focus.size);
   }
 
   @Override
@@ -29,6 +29,6 @@ public final class FnLast extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final long size = cc.qc.focus.size;
-    return size > 1 ? Int.get(size) : this;
+    return size > 1 ? Itr.get(size) : this;
   }
 }

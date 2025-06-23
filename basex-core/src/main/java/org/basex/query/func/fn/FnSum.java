@@ -29,7 +29,7 @@ public class FnSum extends NumericFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = sum(false, qc);
-    return item != null ? item : defined(1) ? arg(1).atomItem(qc, info) : Int.ZERO;
+    return item != null ? item : defined(1) ? arg(1).atomItem(qc, info) : Itr.ZERO;
   }
 
   @Override
@@ -41,7 +41,7 @@ public class FnSum extends NumericFn {
     final SeqType st = values.seqType(), stZero = zero.seqType();
     if(zero == Empty.UNDEFINED) {
       // no default value
-      if(st.zero()) return cc.voidAndReturn(values, Int.ZERO, info);
+      if(st.zero()) return cc.voidAndReturn(values, Itr.ZERO, info);
       if(!st.mayBeArray()) {
         final SeqType ost = optType(values, false);
         if(ost != null) exprType.assign(ost);
@@ -75,7 +75,7 @@ public class FnSum extends NumericFn {
         Item item = ss.itemAt(0);
         final Type type = item.type;
         if(type.isUntyped()) item = Dbl.get(item.dbl(info));
-        if(type.isNumber()) return avg ? item : Calc.MULTIPLY.eval(item, Int.get(ss.size()), info);
+        if(type.isNumber()) return avg ? item : Calc.MULTIPLY.eval(item, Itr.get(ss.size()), info);
       }
     } else if(values instanceof final Path path) {
       final ArrayList<Stats> list = path.pathStats();
@@ -130,14 +130,14 @@ public class FnSum extends NumericFn {
     }
 
     // range is small enough to be computed with long values
-    if(max < 3037000500L) return Int.get((min + max) * (max - min + 1) / 2);
+    if(max < 3037000500L) return Itr.get((min + max) * (max - min + 1) / 2);
     // compute larger ranges
     final BigInteger bs = BigInteger.valueOf(min), be = BigInteger.valueOf(max);
     final BigInteger bi = bs.add(be).multiply(be.subtract(bs).add(BigInteger.ONE)).
         divide(BigInteger.valueOf(2));
     final long l = bi.longValue();
     // check if result is small enough to be represented as long value
-    if(bi.equals(BigInteger.valueOf(l))) return Int.get(l);
+    if(bi.equals(BigInteger.valueOf(l))) return Itr.get(l);
     throw RANGE_X.get(info, bi);
   }
 
@@ -177,6 +177,6 @@ public class FnSum extends NumericFn {
       result = Calc.ADD.eval(result, it, info);
       c++;
     }
-    return avg ? Calc.DIVIDE.eval(result, Int.get(c), info) : result;
+    return avg ? Calc.DIVIDE.eval(result, Itr.get(c), info) : result;
   }
 }

@@ -16,6 +16,6 @@ public final class ConvertDayTimeToInteger extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final DTDur value = (DTDur) checkType(arg(0), AtomType.DAY_TIME_DURATION, qc);
-    return Int.get(value.ms(info));
+    return Itr.get(value.ms(info));
   }
 }

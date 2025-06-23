@@ -23,7 +23,7 @@ public final class ArrayMembersTest extends ArrayTest {
       final ArrayList<Integer> list = new ArrayList<>(n);
       for(int i = 0; i < n; i++) {
         final int insPos = rng.nextInt(i + 1);
-        array = array.insertMember(insPos, Int.get(i), qc);
+        array = array.insertMember(insPos, Itr.get(i), qc);
         list.add(insPos, i);
       }
 
@@ -42,7 +42,7 @@ public final class ArrayMembersTest extends ArrayTest {
             if(iter2.hasNext()) {
               assertTrue(iter1.hasNext());
               final long exp = iter2.next();
-              final long got = ((Int) iter1.next()).itr();
+              final long got = ((Itr) iter1.next()).itr();
               assertEquals(exp, got);
               pos++;
             } else {
@@ -59,7 +59,7 @@ public final class ArrayMembersTest extends ArrayTest {
               assertTrue(iter1.hasPrevious());
               pos--;
               final long exp = iter2.previous();
-              final long got = ((Int) iter1.previous()).itr();
+              final long got = ((Itr) iter1.previous()).itr();
               assertEquals(exp, got);
             } else {
               assertFalse(iter1.hasPrevious());

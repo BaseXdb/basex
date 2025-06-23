@@ -77,7 +77,7 @@ public class ModuleDemo extends QueryModule {
     ValueBuilder vb = new ValueBuilder(queryContext);
     for(final Item item : value) {
       if(item instanceof DBNode node) {
-        vb.add(Int.get(node.data().id(node.pre())));
+        vb.add(Itr.get(node.data().id(node.pre())));
       }
     }
     return vb.value();

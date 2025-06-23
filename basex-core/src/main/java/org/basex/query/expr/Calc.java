@@ -65,15 +65,15 @@ public enum Calc {
       }
       // merge arithmetical expressions
       if(expr1.equals(expr2)) {
-        return new Arith(info, expr1, Int.get(2), MULTIPLY).optimize(cc);
+        return new Arith(info, expr1, Itr.get(2), MULTIPLY).optimize(cc);
       }
       if(expr2 instanceof final Unary unry) {
         return new Arith(info, expr1, unry.expr, SUBTRACT).optimize(cc);
       }
       if(expr1 instanceof final Arith arth) {
         if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
-            arth.exprs[1] instanceof final Int itr) {
-          return new Arith(info, arth.exprs[0], Int.get(itr.itr() + 1), MULTIPLY).optimize(cc);
+            arth.exprs[1] instanceof final Itr itr) {
+          return new Arith(info, arth.exprs[0], Itr.get(itr.itr() + 1), MULTIPLY).optimize(cc);
         }
       }
       return null;
@@ -143,7 +143,7 @@ public enum Calc {
       }
       // replace with neutral number; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
-        return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Int.ZERO : null;
+        return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Itr.ZERO : null;
       }
       // merge arithmetical expressions; ignore floating numbers due to special cases (NaN, INF)
       if(expr2 instanceof final Unary unry) {
@@ -151,8 +151,8 @@ public enum Calc {
       }
       if(expr1 instanceof final Arith arth) {
         if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
-            arth.exprs[1] instanceof final Int itr) {
-          return new Arith(info, arth.exprs[0], Int.get(itr.itr() - 1), MULTIPLY).optimize(cc);
+            arth.exprs[1] instanceof final Itr itr) {
+          return new Arith(info, arth.exprs[0], Itr.get(itr.itr() - 1), MULTIPLY).optimize(cc);
         }
       }
       return null;
@@ -222,7 +222,7 @@ public enum Calc {
         // check for neutral number
         if(dbl2 == 1) return new Cast(info, expr1, type.seqType()).optimize(cc);
         // check for absorbing number
-        if(dbl2 == 0) return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Int.ZERO : null;
+        if(dbl2 == 0) return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Itr.ZERO : null;
       }
       // merge arithmetical expressions
       if(type == DOUBLE) {
@@ -236,7 +236,7 @@ public enum Calc {
         }
       }
       if(expr2 instanceof final Arith arth) {
-        if(arth.calc == DIVIDE && arth.exprs[0] instanceof Int && arth.exprs[1].equals(expr1)) {
+        if(arth.calc == DIVIDE && arth.exprs[0] instanceof Itr && arth.exprs[1].equals(expr1)) {
           return new Cast(info, arth.exprs[0], type.seqType()).optimize(cc);
         }
       }
@@ -305,7 +305,7 @@ public enum Calc {
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
-        return type == DECIMAL ? Dec.ONE : type == INTEGER ? Int.ONE : null;
+        return type == DECIMAL ? Dec.ONE : type == INTEGER ? Itr.ONE : null;
       }
       if(_MATH_POW.is(expr1)) {
         if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof final ANum num) {
@@ -334,7 +334,7 @@ public enum Calc {
   /** Integer division. */
   DIVIDEINT("idiv") {
     @Override
-    public Int eval(final Item item1, final Item item2, final InputInfo info)
+    public Itr eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
 
       // numbers or untyped values
@@ -360,7 +360,7 @@ public enum Calc {
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {
-        return type.oneOf(DECIMAL, INTEGER) ? Int.ONE : null;
+        return type.oneOf(DECIMAL, INTEGER) ? Itr.ONE : null;
       }
       return null;
     }
@@ -398,7 +398,7 @@ public enum Calc {
 
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
-      if(type == INTEGER && expr2 == Int.ONE) return Int.ZERO;
+      if(type == INTEGER && expr2 == Itr.ONE) return Itr.ZERO;
       return null;
     }
 

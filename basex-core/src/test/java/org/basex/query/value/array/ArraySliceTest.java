@@ -27,14 +27,14 @@ public final class ArraySliceTest extends ArrayTest {
           assertEquals(k, sub.structSize());
           final Iterator<Value> iter = sub.iterator(0);
           for(int i = 0; i < k; i++) {
-            final long result = ((Int) iter.next()).itr();
+            final long result = ((Itr) iter.next()).itr();
             if(result != pos + i) {
               fail("Wrong value: " + result + " vs. " + (pos + i));
             }
           }
         }
       }
-      array = array.appendMember(Int.get(len), qc);
+      array = array.appendMember(Itr.get(len), qc);
     }
   }
 }

@@ -45,14 +45,14 @@ public final class FnFoot extends StandardFunc {
       return cc.function(FOOT, info, input.args());
     // foot(trunk(E))  ->  items-at(E, size)
     if(TRUNK.is(input) && size > 0)
-      return cc.function(ITEMS_AT, info, input.arg(0), Int.get(size));
+      return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(size));
     // foot(reverse(E))  ->  head(E)
     if(REVERSE.is(input))
       return cc.function(HEAD, info, input.args());
     // foot(replicate(E, count))  ->  foot(E)
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1
-      if(input.arg(1) instanceof Int) return cc.function(FOOT, info, input.arg(0));
+      if(input.arg(1) instanceof Itr) return cc.function(FOOT, info, input.arg(0));
     }
 
     // foot((1, 2))  ->  2

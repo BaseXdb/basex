@@ -35,7 +35,7 @@ public final class XQIntMap extends XQHashMap {
   }
 
   @Override
-  public Int getOrNull(final Item key) {
+  public Itr getOrNull(final Item key) {
     if(key instanceof final ANum num) {
       final double d = num.dbl();
       final int v = (int) d;
@@ -61,13 +61,13 @@ public final class XQIntMap extends XQHashMap {
   }
 
   @Override
-  public Int keyAt(final int index) {
-    return Int.get(map.key(index + 1));
+  public Itr keyAt(final int index) {
+    return Itr.get(map.key(index + 1));
   }
 
   @Override
-  public Int valueAt(final int index) {
-    return Int.get(map.value(index + 1));
+  public Itr valueAt(final int index) {
+    return Itr.get(map.value(index + 1));
   }
 
   @Override

@@ -24,8 +24,8 @@ public final class MapTest extends SandboxTest {
 
   /** Tests the map constructor. */
   @Test public void constructor() {
-    check("map { 'A': 1, 2: 3 }?A", 1, root(Int.class));
-    check("map { <_>A</_>: 1, 2: 3 }?A", 1, root(Int.class));
+    check("map { 'A': 1, 2: 3 }?A", 1, root(Itr.class));
+    check("map { <_>A</_>: 1, 2: 3 }?A", 1, root(Itr.class));
   }
 
   /** Tests the new syntax for map literals. */

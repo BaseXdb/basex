@@ -97,21 +97,21 @@ public final class Range extends Arr {
       case EQ:
         if(mn <= 1 && mx >= LAST) return Bln.TRUE;
         if(mn > LAST || mx < 1) return Bln.FALSE;
-        if(mn < 1) minMax[0] = Int.ONE;
+        if(mn < 1) minMax[0] = Itr.ONE;
         if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
-        if(mn < LAST && mx >= LAST) minMax[1] = Int.MAX;
+        if(mn < LAST && mx >= LAST) minMax[1] = Itr.MAX;
         break;
       case NE:
         if(mn <= 1 && mx >= LAST) return Bln.FALSE;
         if(results && (mn > LAST || mx < 1)) return Bln.TRUE;
-        if(mn < 1) minMax[0] = Int.ONE;
+        if(mn < 1) minMax[0] = Itr.ONE;
         if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
-        if(mn < LAST && mx >= LAST) minMax[1] = Int.MAX;
+        if(mn < LAST && mx >= LAST) minMax[1] = Itr.MAX;
         break;
       case LE:
         if(mx < 1) return Bln.FALSE;
         if(results && mx >= LAST) return Bln.TRUE;
-        if(mn < 1) minMax[0] = Int.ONE;
+        if(mn < 1) minMax[0] = Itr.ONE;
         break;
       case LT:
         if(mx <= 1) return Bln.FALSE;
@@ -137,10 +137,10 @@ public final class Range extends Arr {
    * @return positional value or {@code Double#NaN}
    */
   private static double pos(final Expr expr) {
-    if(expr instanceof final Int itr) return itr.itr();
+    if(expr instanceof final Itr itr) return itr.itr();
     if(Function.LAST.is(expr)) return LAST;
     if(expr instanceof final Arith arth && Function.LAST.is(expr.arg(0))) {
-      final double l = expr.arg(1) instanceof final Int itr ? itr.itr() : 0;
+      final double l = expr.arg(1) instanceof final Itr itr ? itr.itr() : 0;
       if(l != 0) return switch(arth.calc) {
         case ADD      -> LAST + l;
         case SUBTRACT -> LAST - l;

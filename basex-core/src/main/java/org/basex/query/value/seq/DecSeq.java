@@ -15,7 +15,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Sequence of items of type {@link Int xs:decimal}, containing at least two of them.
+ * Sequence of items of type {@link Itr xs:decimal}, containing at least two of them.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

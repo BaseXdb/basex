@@ -146,7 +146,7 @@ public class DBNode extends ANode {
         l = data.textItr(pre + as, true);
       }
     }
-    return l == Long.MIN_VALUE ? Int.parse(string(), ii) : l;
+    return l == Long.MIN_VALUE ? Itr.parse(string(), ii) : l;
   }
 
   @Override

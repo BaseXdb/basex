@@ -116,7 +116,7 @@ public final class QueryJob extends Job implements Runnable {
     // undefined
     if(string == null || string.isEmpty()) return null;
     // integer
-    if(string.matches("^\\d+$")) return Int.get(Int.parse(token(string), info));
+    if(string.matches("^\\d+$")) return Itr.get(Itr.parse(token(string), info));
     // dayTimeDuration
     if(Dur.DTD.matcher(string).matches()) return new DTDur(token(string), info);
     // time
@@ -146,7 +146,7 @@ public final class QueryJob extends Job implements Runnable {
 
     final QueryDateTime qdt = new QueryDateTime();
     long ms;
-    if(start instanceof final Int itr) {
+    if(start instanceof final Itr itr) {
       // time
       ms = itr.itr() * 60000;
       ms -= qdt.time.daySeconds().multiply(Dec.BD_1000).longValue();

@@ -22,10 +22,10 @@ public final class ProfRuntime extends StandardFunc {
     final Runtime rt = Runtime.getRuntime();
 
     final MapBuilder map = new MapBuilder();
-    map.put("used", Int.get(rt.totalMemory() - rt.freeMemory()));
-    map.put("total", Int.get(rt.totalMemory()));
-    map.put("max", Int.get(rt.maxMemory()));
-    map.put("processors", Int.get(rt.availableProcessors()));
+    map.put("used", Itr.get(rt.totalMemory() - rt.freeMemory()));
+    map.put("total", Itr.get(rt.totalMemory()));
+    map.put("max", Itr.get(rt.maxMemory()));
+    map.put("processors", Itr.get(rt.availableProcessors()));
     if(name == null) return map.map();
 
     final Value value = map.get(Str.get(name));

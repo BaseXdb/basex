@@ -122,7 +122,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public long itr(final InputInfo ii) throws QueryException {
-    return Int.parse(string(ii), ii);
+    return Itr.parse(string(ii), ii);
   }
 
   /**

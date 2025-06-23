@@ -93,21 +93,21 @@ public final class Pos extends Single {
           break;
         case GE:
           min = pos;
-          max = Int.MAX;
+          max = Itr.MAX;
           break;
         case GT:
           min = new Arith(info, integer ? pos :
-            cc.function(Function.FLOOR, info, pos), Int.ONE, Calc.ADD).optimize(cc);
-          max = Int.MAX;
+            cc.function(Function.FLOOR, info, pos), Itr.ONE, Calc.ADD).optimize(cc);
+          max = Itr.MAX;
           break;
         case LE:
-          min = Int.ONE;
+          min = Itr.ONE;
           max = pos;
           break;
         case LT:
-          min = Int.ONE;
+          min = Itr.ONE;
           max = new Arith(info, integer ?
-            pos : cc.function(Function.CEILING, info, pos), Int.ONE, Calc.SUBTRACT).optimize(cc);
+            pos : cc.function(Function.CEILING, info, pos), Itr.ONE, Calc.SUBTRACT).optimize(cc);
           break;
         default:
       }
@@ -155,7 +155,7 @@ public final class Pos extends Single {
       return IntSeq.get(il.finish());
     }
     final ItemList il = new ItemList(list.size());
-    for(final long l : list.finish()) il.add(Int.get(l));
+    for(final long l : list.finish()) il.add(Itr.get(l));
     return il.value();
   }
 

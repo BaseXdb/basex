@@ -62,8 +62,8 @@ public final class XQAtmIntMap extends XQHashMap {
   }
 
   @Override
-  public Int valueAt(final int index) {
-    return Int.get(map.value(index + 1));
+  public Itr valueAt(final int index) {
+    return Itr.get(map.value(index + 1));
   }
 
   @Override

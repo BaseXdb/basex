@@ -18,7 +18,7 @@ public final class FnChar extends StandardFunc {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).item(qc, info);
 
-    if(value instanceof Int) {
+    if(value instanceof Itr) {
       // codepoint integer
       final long cp = toLong(value, 1);
       if(cp >= 0 && cp <= Integer.MAX_VALUE && XMLToken.valid((int) cp)) return Str.get((int) cp);

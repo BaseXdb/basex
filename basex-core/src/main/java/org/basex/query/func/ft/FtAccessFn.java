@@ -48,14 +48,14 @@ abstract class FtAccessFn extends StandardFunc {
       }
       if(opts.contains(FtIndexOptions.DISTANCE)) {
         final FTDistanceOptions fopts = opts.get(FtIndexOptions.DISTANCE);
-        final Int min = Int.get(fopts.get(FTDistanceOptions.MIN));
-        final Int max = Int.get(fopts.get(FTDistanceOptions.MAX));
+        final Itr min = Itr.get(fopts.get(FTDistanceOptions.MIN));
+        final Itr max = Itr.get(fopts.get(FTDistanceOptions.MAX));
         final FTUnit unit = fopts.get(FTDistanceOptions.UNIT);
         ex = new FTDistance(info, ex, min, max, unit);
       }
       if(opts.contains(FtIndexOptions.WINDOW)) {
         final FTWindowOptions fopts = opts.get(FtIndexOptions.WINDOW);
-        final Int size = Int.get(fopts.get(FTWindowOptions.SIZE));
+        final Itr size = Itr.get(fopts.get(FTWindowOptions.SIZE));
         final FTUnit unit = fopts.get(FTWindowOptions.UNIT);
         ex = new FTWindow(info, ex, size, unit);
       }

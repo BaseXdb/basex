@@ -126,12 +126,12 @@ public final class FileReadTextLines extends FileFn {
     // skip optimization if existing function cannot be merged with new bounds
     if(al > 1 && !args[1].equals(encoding) ||
        al > 2 && !args[2].equals(validate) ||
-       al > 3 && !(args[3] instanceof Int) ||
-       al > 4 && !(args[4] instanceof Int)) return func;
+       al > 3 && !(args[3] instanceof Itr) ||
+       al > 4 && !(args[4] instanceof Itr)) return func;
 
     // old bounds
-    long s = al > 3 ? ((Int) args[3]).itr() - 1 : 0;
-    long l = al > 4 ? ((Int) args[4]).itr() : Long.MAX_VALUE;
+    long s = al > 3 ? ((Itr) args[3]).itr() - 1 : 0;
+    long l = al > 4 ? ((Itr) args[4]).itr() : Long.MAX_VALUE;
 
     // merge with new bounds: increase start offset, decrease number of lines to retrieve
     s += start;
@@ -139,7 +139,7 @@ public final class FileReadTextLines extends FileFn {
     if(length < l) l = length;
 
     // create new function instance
-    final Expr[] newArgs = { args[0], encoding, validate, Int.get(s + 1), Int.get(l) };
+    final Expr[] newArgs = { args[0], encoding, validate, Itr.get(s + 1), Itr.get(l) };
     return cc.function(Function._FILE_READ_TEXT_LINES, func.info(), newArgs);
   }
 }

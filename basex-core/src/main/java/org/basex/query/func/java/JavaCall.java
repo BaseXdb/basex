@@ -277,7 +277,7 @@ public abstract class JavaCall extends Arr {
         // integer array
         if(object instanceof final long[] values) {
           final ItemList list = new ItemList(values.length);
-          for(final long value : values) list.add(Int.get(value));
+          for(final long value : values) list.add(Itr.get(value));
           return list.value();
         }
         // check for null values

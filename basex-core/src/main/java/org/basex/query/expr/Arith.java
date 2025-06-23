@@ -65,7 +65,7 @@ public class Arith extends Arr {
 
     Expr expr = emptyExpr();
     // 0 - $x  ->  -$x
-    if(expr == this && expr1 == Int.ZERO && calc == Calc.SUBTRACT) {
+    if(expr == this && expr1 == Itr.ZERO && calc == Calc.SUBTRACT) {
       expr = new Unary(info, expr2, true).optimize(cc);
     }
     // count($n/@*) + count($n/*)  ->  count(($n/@*, $n/*))

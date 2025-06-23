@@ -324,18 +324,18 @@ public enum AtomType implements Type {
   /** Integer type. */
   INTEGER("integer", DECIMAL, XS_URI, true, false, false, true, Type.ID.ITR) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return Int.get(checkLong(value, 0, 0, info));
+      return Itr.get(checkLong(value, 0, 0, info));
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong());
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong());
     }
   },
 
@@ -343,18 +343,18 @@ public enum AtomType implements Type {
   NON_POSITIVE_INTEGER("nonPositiveInteger", INTEGER, XS_URI, true, false, false, true,
       Type.ID.NPI) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, Long.MIN_VALUE, 0, info), this);
+      return new Itr(checkLong(value, Long.MIN_VALUE, 0, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -362,90 +362,90 @@ public enum AtomType implements Type {
   NEGATIVE_INTEGER("negativeInteger", NON_POSITIVE_INTEGER, XS_URI, true, false, false, true,
       Type.ID.NIN) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, Long.MIN_VALUE, -1, info), this);
+      return new Itr(checkLong(value, Long.MIN_VALUE, -1, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
   /** Long type. */
   LONG("long", INTEGER, XS_URI, true, false, false, true, Type.ID.LNG) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, 0, info), this);
+      return new Itr(checkLong(value, 0, 0, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
   /** Int type. */
   INT("int", LONG, XS_URI, true, false, false, true, Type.ID.INT) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, -0x80000000, 0x7FFFFFFF, info), this);
+      return new Itr(checkLong(value, -0x80000000, 0x7FFFFFFF, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
   /** Short type. */
   SHORT("short", INT, XS_URI, true, false, false, true, Type.ID.SHR) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, -0x8000, 0x7FFF, info), this);
+      return new Itr(checkLong(value, -0x8000, 0x7FFF, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
   /** Byte type. */
   BYTE("byte", SHORT, XS_URI, true, false, false, true, Type.ID.BYT) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, -0x80, 0x7F, info), this);
+      return new Itr(checkLong(value, -0x80, 0x7F, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -453,18 +453,18 @@ public enum AtomType implements Type {
   NON_NEGATIVE_INTEGER("nonNegativeInteger", INTEGER, XS_URI, true, false, false, true,
       Type.ID.NNI) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, Long.MAX_VALUE, info), this);
+      return new Itr(checkLong(value, 0, Long.MAX_VALUE, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -496,54 +496,54 @@ public enum AtomType implements Type {
   /** Short type. */
   UNSIGNED_INT("unsignedInt", UNSIGNED_LONG, XS_URI, true, false, false, true, Type.ID.UIN) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, 0xFFFFFFFFL, info), this);
+      return new Itr(checkLong(value, 0, 0xFFFFFFFFL, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
   /** Unsigned Short type. */
   UNSIGNED_SHORT("unsignedShort", UNSIGNED_INT, XS_URI, true, false, false, true, Type.ID.USH) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, 0xFFFF, info), this);
+      return new Itr(checkLong(value, 0, 0xFFFF, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
   /** Unsigned byte type. */
   UNSIGNED_BYTE("unsignedByte", UNSIGNED_SHORT, XS_URI, true, false, false, true, Type.ID.UBY) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 0, 0xFF, info), this);
+      return new Itr(checkLong(value, 0, 0xFF, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -551,18 +551,18 @@ public enum AtomType implements Type {
   POSITIVE_INTEGER("positiveInteger", NON_NEGATIVE_INTEGER, XS_URI, true, false, false, true,
       Type.ID.PIN) {
     @Override
-    public Int cast(final Item item, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       return cast((Object) item, qc, info);
     }
     @Override
-    public Int cast(final Object value, final QueryContext qc, final InputInfo info)
+    public Itr cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      return new Int(checkLong(value, 1, Long.MAX_VALUE, info), this);
+      return new Itr(checkLong(value, 1, Long.MAX_VALUE, info), this);
     }
     @Override
-    public Int read(final DataInput in, final QueryContext qc) throws IOException {
-      return Int.get(in.readLong(), this);
+    public Itr read(final DataInput in, final QueryContext qc) throws IOException {
+      return Itr.get(in.readLong(), this);
     }
   },
 
@@ -1145,9 +1145,9 @@ public enum AtomType implements Type {
     } else if(value instanceof Double || value instanceof Float) {
       item = Dbl.get(((Number) value).doubleValue());
     } else if(value instanceof Number) {
-      item = Int.get(((Number) value).longValue());
+      item = Itr.get(((Number) value).longValue());
     } else if(value instanceof Character) {
-      item = Int.get((char) value);
+      item = Itr.get((char) value);
     } else {
       item = Str.get(token(value));
     }

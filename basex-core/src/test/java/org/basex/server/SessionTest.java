@@ -392,7 +392,7 @@ public abstract class SessionTest extends SandboxTest {
     }
 
     try(Query query = session.query("declare variable $a external; $a")) {
-      query.bind("a", Int.ONE, "xs:integer");
+      query.bind("a", Itr.ONE, "xs:integer");
       assertEqual("1", query.next());
     }
   }
@@ -414,7 +414,7 @@ public abstract class SessionTest extends SandboxTest {
     }
 
     try(Query query = session.query("declare variable $a external; $a")) {
-      query.bind("a", new ItemList().add(Int.ONE).add(Str.get("X")).value());
+      query.bind("a", new ItemList().add(Itr.ONE).add(Str.get("X")).value());
       assertEqual("1", query.next());
       assertEqual("X", query.next());
     }

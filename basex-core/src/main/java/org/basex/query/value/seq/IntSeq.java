@@ -17,7 +17,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * Sequence of items of type {@link Int xs:integer}, containing at least two of them.
+ * Sequence of items of type {@link Itr xs:integer}, containing at least two of them.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
@@ -59,8 +59,8 @@ public final class IntSeq extends NativeSeq {
   }
 
   @Override
-  public Int itemAt(final long index) {
-    return Int.get(values[(int) index], type);
+  public Itr itemAt(final long index) {
+    return Itr.get(values[(int) index], type);
   }
 
   @Override
@@ -172,7 +172,7 @@ public final class IntSeq extends NativeSeq {
     if(vl == 0) return Empty.VALUE;
     // single item?
     final int first = values[0];
-    if(vl == 1) return Int.get(first, type);
+    if(vl == 1) return Itr.get(first, type);
     // singleton or range?
     boolean singleton = true, range = true;
     int v = 0;
@@ -182,7 +182,7 @@ public final class IntSeq extends NativeSeq {
       range &= i == first + v;
     }
     if(v == vl) {
-      if(singleton) return SingletonSeq.get(Int.get(first, type), vl);
+      if(singleton) return SingletonSeq.get(Itr.get(first, type), vl);
       if(type == AtomType.INTEGER) return RangeSeq.get(first, vl, true);
     }
     return new IntSeq(values, type);

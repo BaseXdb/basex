@@ -36,7 +36,7 @@ public final class FnHead extends StandardFunc {
     final long size = input.size();
     // head(tail(E))  ->  items-at(E, 2)
     if(TAIL.is(input))
-      return cc.function(ITEMS_AT, info, input.arg(0), Int.get(2));
+      return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(2));
     // head(trunk(E))  ->  head(E)
     if(TRUNK.is(input) && size > 1)
       return cc.function(HEAD, info, input.args());
@@ -45,7 +45,7 @@ public final class FnHead extends StandardFunc {
       final SeqRange r = SeqRange.get(input, cc);
       // safety check (at this stage, r.length should never be 0)
       if(r != null && r.length != 0)
-        return cc.function(ITEMS_AT, info, input.arg(0), Int.get(r.start + 1));
+        return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(r.start + 1));
     }
     if(REVERSE.is(input)) {
       // head(reverse(root[test]))  ->  head(reverse(root)[test])
@@ -59,7 +59,7 @@ public final class FnHead extends StandardFunc {
     // head(replicate(E, count))  ->  head(E)
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1
-      if(input.arg(1) instanceof Int) return cc.function(HEAD, info, input.arg(0));
+      if(input.arg(1) instanceof Itr) return cc.function(HEAD, info, input.arg(0));
     }
     // head(file:read-text-lines(E))  ->  file:read-text-lines(E, 0, 1)
     if(_FILE_READ_TEXT_LINES.is(input))

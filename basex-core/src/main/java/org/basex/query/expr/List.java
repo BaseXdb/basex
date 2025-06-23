@@ -87,7 +87,7 @@ public final class List extends Arr {
     while(++e <= el) {
       if(e == el || !exprs[e].equals(exprs[s])) {
         if(e - s > 1) {
-          list.add(cc.replicate(exprs[s], Int.get(e - s), info));
+          list.add(cc.replicate(exprs[s], Itr.get(e - s), info));
           cc.info(OPTMERGE_X, list.peek());
         } else {
           while(s < e) list.add(exprs[s++]);
@@ -103,7 +103,7 @@ public final class List extends Arr {
    * @param cc compilation context
    */
   private void toRange(final CompileContext cc) {
-    if(!((Checks<Expr>) expr -> expr instanceof Int || expr instanceof RangeSeq).any(exprs)) return;
+    if(!((Checks<Expr>) expr -> expr instanceof Itr || expr instanceof RangeSeq).any(exprs)) return;
 
     long min = Long.MIN_VALUE, max = 0;
     final int el = exprs.length;
@@ -111,7 +111,7 @@ public final class List extends Arr {
     for(int e = 0; e <= el; e++) {
       final Expr expr = e < el ? exprs[e] : null;
       long mn = Long.MIN_VALUE, mx = 0;
-      if(expr instanceof final Int itr && itr.type == AtomType.INTEGER) {
+      if(expr instanceof final Itr itr && itr.type == AtomType.INTEGER) {
         final long l = itr.itr();
         mn = l;
         mx = l;
@@ -253,7 +253,7 @@ public final class List extends Arr {
   private Expr toRange() {
     long start = Long.MAX_VALUE, end = Long.MIN_VALUE, s, e;
     for(final Expr expr : exprs) {
-      if(expr instanceof final Int itr) {
+      if(expr instanceof final Itr itr) {
         s = itr.itr();
         e = s;
       } else if(expr instanceof final RangeSeq rs && rs.ascending()) {

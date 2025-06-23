@@ -221,7 +221,7 @@ public class FnSubsequence extends StandardFunc {
         // subsequence(E, 1, 1)  ->  head(E)
         // subsequence(E, pos, 1)  ->  items-at(E, pos)
         return sr.start == 0 ? cc.function(HEAD, info, input) :
-          cc.function(ITEMS_AT, info, input, Int.get(sr.start + 1));
+          cc.function(ITEMS_AT, info, input, Itr.get(sr.start + 1));
       }
       // subsequence(E, 2)  ->  tail(E)
       if(sr.length == Long.MAX_VALUE && sr.start == 1)
@@ -232,8 +232,8 @@ public class FnSubsequence extends StandardFunc {
       // subsequence(replicate(I, count), pos, length)  ->  replicate(I, length)
       if(REPLICATE.is(input)) {
         final Expr[] args = input.args().clone();
-        if(args[0].size() == 1 && args[1] instanceof Int) {
-          args[1] = Int.get(sr.length);
+        if(args[0].size() == 1 && args[1] instanceof Itr) {
+          args[1] = Itr.get(sr.length);
           return cc.function(REPLICATE, info, args);
         }
       }
@@ -250,12 +250,12 @@ public class FnSubsequence extends StandardFunc {
           if(a > 0 && (exact || !one)) {
             final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
             final long start = sr.start - a + 1, end = sr.end - start;
-            return cc.function(SUBSEQUENCE, info, list, Int.get(start), Int.get(end));
+            return cc.function(SUBSEQUENCE, info, list, Itr.get(start), Itr.get(end));
           }
           if(!one) break;
         }
       }
-    } else if(first instanceof final Int itr) {
+    } else if(first instanceof final Itr itr) {
       final long start = itr.itr(), diff = FnItemsAt.countInputDiff(input, second) + start;
       if(diff == (int) diff) {
         if(start <= 1) {
@@ -268,7 +268,7 @@ public class FnSubsequence extends StandardFunc {
           return cc.function(SUBSEQUENCE, info, input, first);
         }
       }
-    } else if(second instanceof final Int itr) {
+    } else if(second instanceof final Itr itr) {
       if(!range() && first.seqType().instanceOf(SeqType.INTEGER_O)) {
         final long length = itr.itr();
         // subsequence(EXPR, START, 1)  ->  items-at(EXPR, START)

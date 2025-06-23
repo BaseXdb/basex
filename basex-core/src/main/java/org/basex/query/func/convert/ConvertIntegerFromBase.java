@@ -28,6 +28,6 @@ public final class ConvertIntegerFromBase extends StandardFunc {
 
       res = res * base + num;
     }
-    return Int.get(res);
+    return Itr.get(res);
   }
 }

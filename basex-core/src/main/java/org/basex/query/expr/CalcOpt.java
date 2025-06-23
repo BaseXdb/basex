@@ -152,13 +152,13 @@ interface CalcOpt {
    * @return result
    * @throws QueryException query exception
    */
-  static Int divideIntDbl(final Item item1, final Item item2, final InputInfo info)
+  static Itr divideIntDbl(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final double n1 = item1.dbl(info), n2 = item2.dbl(info), n = n1 / n2;
     if(n2 == 0) throw DIVZERO_X.get(info, item1);
     if(Double.isNaN(n) || Double.isInfinite(n)) throw INVIDIV.get(info, item1 + " idiv " + item2);
     if(n < Long.MIN_VALUE || n > Long.MAX_VALUE) throw RANGE_X.get(info, item1 + " idiv " + item2);
-    return Int.get((long) n);
+    return Itr.get((long) n);
   }
 
   /**
@@ -234,13 +234,13 @@ interface CalcOpt {
    * @return result
    * @throws QueryException query exception
    */
-  static Int divideIntFlt(final Item item1, final Item item2, final InputInfo info)
+  static Itr divideIntFlt(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final double n1 = item1.flt(info), n2 = item2.flt(info), n = n1 / n2;
     if(n2 == 0) throw DIVZERO_X.get(info, item1);
     if(Double.isNaN(n) || Double.isInfinite(n)) throw INVIDIV.get(info, item1 + " idiv " + item2);
     if(n < Long.MIN_VALUE || n > Long.MAX_VALUE) throw RANGE_X.get(info, item1 + " idiv " + item2);
-    return Int.get((long) n);
+    return Itr.get((long) n);
   }
 
   /**
@@ -319,14 +319,14 @@ interface CalcOpt {
    * @return result
    * @throws QueryException query exception
    */
-  static Int divideIntDec(final Item item1, final Item item2, final InputInfo info)
+  static Itr divideIntDec(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final BigDecimal n1 = item1.dec(info), n2 = item2.dec(info);
     if(n2.signum() == 0) throw DIVZERO_X.get(info, item1);
     final BigDecimal n = n1.divideToIntegralValue(n2);
     if(Dec.BD_MINLONG.compareTo(n) > 0 || n.compareTo(Dec.BD_MAXLONG) > 0)
       throw RANGE_X.get(info, item1 + " idiv " + item2);
-    return Int.get(n.longValueExact());
+    return Itr.get(n.longValueExact());
   }
 
   /**
@@ -353,12 +353,12 @@ interface CalcOpt {
    * @return result
    * @throws QueryException query exception
    */
-  static Int addInt(final Item item1, final Item item2, final InputInfo info)
+  static Itr addInt(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final long itr1 = item1.itr(info), itr2 = item2.itr(info);
     if(itr2 > 0 ? itr1 > Long.MAX_VALUE - itr2 : itr1 < Long.MIN_VALUE - itr2)
       throw RANGE_X.get(info, itr1 + " + " + itr2);
-    return Int.get(itr1 + itr2);
+    return Itr.get(itr1 + itr2);
   }
 
   /**
@@ -369,12 +369,12 @@ interface CalcOpt {
    * @return result
    * @throws QueryException query exception
    */
-  static Int subtractInt(final Item item1, final Item item2, final InputInfo info)
+  static Itr subtractInt(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final long itr1 = item1.itr(info), itr2 = item2.itr(info);
     if(itr2 < 0 ? itr1 > Long.MAX_VALUE + itr2 : itr1 < Long.MIN_VALUE + itr2)
       throw RANGE_X.get(info, itr1 + " - " + itr2);
-    return Int.get(itr1 - itr2);
+    return Itr.get(itr1 - itr2);
   }
 
   /**
@@ -385,14 +385,14 @@ interface CalcOpt {
    * @return result
    * @throws QueryException query exception
    */
-  static Int multiplyInt(final Item item1, final Item item2, final InputInfo info)
+  static Itr multiplyInt(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final long l1 = item1.itr(info), l2 = item2.itr(info);
     if(l2 > 0 ? l1 > Long.MAX_VALUE / l2 || l1 < Long.MIN_VALUE / l2
               : l2 < -1 ? l1 > Long.MIN_VALUE / l2 || l1 < Long.MAX_VALUE / l2
                         : l2 == -1 && l1 == Long.MIN_VALUE)
       throw RANGE_X.get(info, l1 + " * " + l2);
-    return Int.get(l1 * l2);
+    return Itr.get(l1 * l2);
   }
 
   /**
@@ -403,12 +403,12 @@ interface CalcOpt {
    * @return result
    * @throws QueryException query exception
    */
-  static Int divideIntInt(final Item item1, final Item item2, final InputInfo info)
+  static Itr divideIntInt(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final long n1 = item1.itr(info), n2 = item2.itr(info);
     if(n2 == 0) throw DIVZERO_X.get(info, item1);
     if(n1 == Integer.MIN_VALUE && n2 == -1) throw RANGE_X.get(info, item1 + " idiv " + item2);
-    return Int.get(n1 / n2);
+    return Itr.get(n1 / n2);
   }
 
   /**
@@ -419,10 +419,10 @@ interface CalcOpt {
    * @return result
    * @throws QueryException query exception
    */
-  static Int moduloInt(final Item item1, final Item item2, final InputInfo info)
+  static Itr moduloInt(final Item item1, final Item item2, final InputInfo info)
       throws QueryException {
     final long itr1 = item1.itr(info), itr2 = item2.itr(info);
     if(itr2 == 0) throw DIVZERO_X.get(info, item1);
-    return Int.get(itr1 % itr2);
+    return Itr.get(itr1 % itr2);
   }
 }

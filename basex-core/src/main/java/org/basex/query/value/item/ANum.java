@@ -147,7 +147,7 @@ public abstract class ANum extends Item {
       case GE: if(d < Math.nextUp(1d)) return Bln.TRUE; break;
     }
     // convert numbers without fractional part
-    return fractional || this instanceof Int ? this : Int.get(l);
+    return fractional || this instanceof Itr ? this : Itr.get(l);
   }
 
   @Override

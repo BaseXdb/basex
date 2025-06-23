@@ -17,17 +17,17 @@ import org.basex.util.*;
  */
 public final class FnStringLength extends ContextFn {
   @Override
-  public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final int length;
     if(defined(0)) {
       length = toZeroStr(arg(0), qc).length(info);
     } else {
       final Item item = context(qc).item(qc, info);
-      if(item.isEmpty()) return Int.ZERO;
+      if(item.isEmpty()) return Itr.ZERO;
       if(item instanceof FItem && !(item instanceof XQJava)) throw FISTRING_X.get(info, item);
       length = item instanceof final AStr str ? str.length(info) : Token.length(item.string(info));
     }
-    return Int.get(length);
+    return Itr.get(length);
   }
 
   @Override

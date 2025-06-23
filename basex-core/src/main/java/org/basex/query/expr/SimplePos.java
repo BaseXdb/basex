@@ -49,9 +49,9 @@ final class SimplePos extends Arr implements CmpPos {
     exprs = simplifyAll(Simplify.NUMBER, cc);
 
     final QueryFunction<Expr, Expr> simplify = expr -> {
-      if(expr instanceof final ANum num && !(num instanceof Int)) {
+      if(expr instanceof final ANum num && !(num instanceof Itr)) {
         final long p = num.itr();
-        if(p == num.dbl()) return Int.get(p);
+        if(p == num.dbl()) return Itr.get(p);
       }
       return expr;
     };
@@ -64,11 +64,11 @@ final class SimplePos extends Arr implements CmpPos {
     } else {
       exprs[1] = simplify.apply(exprs[1]);
     }
-    if(ex == null && exprs[0] instanceof final Int itr1) {
+    if(ex == null && exprs[0] instanceof final Itr itr1) {
       final long mn = itr1.itr();
       if(exact()) {
         ex = IntPos.get(mn, mn, info);
-      } else if(exprs[1] instanceof final Int itr2) {
+      } else if(exprs[1] instanceof final Itr itr2) {
         ex = IntPos.get(mn, itr2.itr(), info);
       }
     }
@@ -123,8 +123,8 @@ final class SimplePos extends Arr implements CmpPos {
       final Expr pexpr1 = pos.exprs[0], pexpr2 = pos.exact() ? pexpr1 : pos.exprs[1];
 
       // create intersection: pos: 1, 8 and pos: 6, INF  ->  pos: 6, 8
-      final Expr min = expr1 == Int.ONE ? pexpr1 : pexpr1 == Int.ONE ? expr1 : null;
-      final Expr max = expr2 == Int.MAX ? pexpr2 : pexpr2 == Int.MAX ? expr2 : null;
+      final Expr min = expr1 == Itr.ONE ? pexpr1 : pexpr1 == Itr.ONE ? expr1 : null;
+      final Expr max = expr2 == Itr.MAX ? pexpr2 : pexpr2 == Itr.MAX ? expr2 : null;
       if(min != null && max != null) return SimplePos.get(min, max, info).optimize(cc);
       // create intersection: pos: 5 and pos: 5, 10  ->  pos: 5
       // create intersection: pos: 4, 6 and pos: 6  ->  pos: 6
@@ -139,8 +139,8 @@ final class SimplePos extends Arr implements CmpPos {
     if(exprs[0].seqType().one()) {
       final QuerySupplier<Expr> pos = () -> cc.function(Function.POSITION, info);
       if(exact()) return new CmpG(info, pos.get(), exprs[0], OpG.NE).optimize(cc);
-      if(exprs[0] == Int.ONE) return new CmpG(info, pos.get(), exprs[1], OpG.GT).optimize(cc);
-      if(exprs[1] == Int.MAX) return new CmpG(info, pos.get(), exprs[0], OpG.LT).optimize(cc);
+      if(exprs[0] == Itr.ONE) return new CmpG(info, pos.get(), exprs[1], OpG.GT).optimize(cc);
+      if(exprs[1] == Itr.MAX) return new CmpG(info, pos.get(), exprs[0], OpG.LT).optimize(cc);
     }
     return null;
   }

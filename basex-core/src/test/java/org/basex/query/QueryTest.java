@@ -183,7 +183,7 @@ public abstract class QueryTest extends SandboxTest {
    */
   protected static Value integers(final long... integers) {
     final ItemList list = new ItemList(integers.length);
-    for(final long i : integers) list.add(Int.get(i));
+    for(final long i : integers) list.add(Itr.get(i));
     return list.value();
   }
 

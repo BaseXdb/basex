@@ -12,7 +12,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
 /**
- * Sequence of items of type {@link Int xs:byte}, containing at least two of them.
+ * Sequence of items of type {@link Itr xs:byte}, containing at least two of them.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -53,8 +53,8 @@ public final class BytSeq extends NativeSeq {
   }
 
   @Override
-  public Int itemAt(final long index) {
-    return new Int(values[(int) index], type);
+  public Itr itemAt(final long index) {
+    return new Itr(values[(int) index], type);
   }
 
   @Override
@@ -85,6 +85,6 @@ public final class BytSeq extends NativeSeq {
    */
   public static Value get(final byte[] values) {
     final int vl = values.length;
-    return vl == 0 ? Empty.VALUE : vl == 1 ? Int.get(values[0], AtomType.BYTE) : new BytSeq(values);
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], AtomType.BYTE) : new BytSeq(values);
   }
 }

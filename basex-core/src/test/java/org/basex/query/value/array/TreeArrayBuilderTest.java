@@ -19,13 +19,13 @@ public final class TreeArrayBuilderTest extends ArrayTest {
   @Test public void builderTestAscending() {
     for(int len = 0; len < 2_000; len++) {
       final TreeArrayBuilder ab = new TreeArrayBuilder();
-      for(int i = 0; i < len; i++) ab.add(Int.get(i));
+      for(int i = 0; i < len; i++) ab.add(Itr.get(i));
       final XQArray array = ab.array();
       assertEquals(len, array.structSize());
       final Iterator<Value> iter = array.iterator(0);
       for(int i = 0; i < len; i++) {
         assertTrue(iter.hasNext());
-        assertEquals(i, ((Int) iter.next()).itr());
+        assertEquals(i, ((Itr) iter.next()).itr());
       }
       assertFalse(iter.hasNext());
     }
@@ -35,13 +35,13 @@ public final class TreeArrayBuilderTest extends ArrayTest {
   @Test public void builderTestDescending() {
     for(int len = 0; len < 2_000; len++) {
       final TreeArrayBuilder ab = new TreeArrayBuilder();
-      for(int i = 0; i < len; i++) ab.prepend(Int.get(len - 1 - i));
+      for(int i = 0; i < len; i++) ab.prepend(Itr.get(len - 1 - i));
       final XQArray array = ab.array();
       assertEquals(len, array.structSize());
       final Iterator<Value> iter = array.iterator(0);
       for(int i = 0; i < len; i++) {
         assertTrue(iter.hasNext());
-        assertEquals(i, ((Int) iter.next()).itr());
+        assertEquals(i, ((Itr) iter.next()).itr());
       }
       assertFalse(iter.hasNext());
     }
@@ -58,13 +58,13 @@ public final class TreeArrayBuilderTest extends ArrayTest {
       final int mid = len / 2;
       if(len % 2 == 0) {
         for(int i = 0; i < len; i++) {
-          if(i % 2 == 0) ab.prepend(Int.get(mid - 1 - i / 2));
-          else ab.add(Int.get(mid + i / 2));
+          if(i % 2 == 0) ab.prepend(Itr.get(mid - 1 - i / 2));
+          else ab.add(Itr.get(mid + i / 2));
         }
       } else {
         for(int i = 0; i < len; i++) {
-          if(i % 2 == 0) ab.prepend(Int.get(mid - i / 2));
-          else ab.add(Int.get(mid + 1 + i / 2));
+          if(i % 2 == 0) ab.prepend(Itr.get(mid - i / 2));
+          else ab.add(Itr.get(mid + 1 + i / 2));
         }
       }
 
@@ -73,7 +73,7 @@ public final class TreeArrayBuilderTest extends ArrayTest {
       final Iterator<Value> iter = array.iterator(0);
       for(int i = 0; i < len; i++) {
         assertTrue(iter.hasNext());
-        assertEquals(i, ((Int) iter.next()).itr());
+        assertEquals(i, ((Itr) iter.next()).itr());
       }
       assertFalse(iter.hasNext());
     }
@@ -91,7 +91,7 @@ public final class TreeArrayBuilderTest extends ArrayTest {
       final TreeArrayBuilder ab = new TreeArrayBuilder();
 
       for(int i = 0; i < len; i++) {
-        final Value value = Int.get(i);
+        final Value value = Itr.get(i);
         if(rng.nextBoolean()) {
           ab.prepend(value);
           deque.addFirst(i);
@@ -107,7 +107,7 @@ public final class TreeArrayBuilderTest extends ArrayTest {
       final Iterator<Value> iter2 = array.iterator(0);
       while(iter1.hasNext()) {
         assertTrue(iter2.hasNext());
-        assertEquals(iter1.next().intValue(), ((Int) iter2.next()).itr());
+        assertEquals(iter1.next().intValue(), ((Itr) iter2.next()).itr());
       }
       assertFalse(iter2.hasNext());
     }

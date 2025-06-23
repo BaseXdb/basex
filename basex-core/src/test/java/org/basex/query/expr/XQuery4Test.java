@@ -84,7 +84,7 @@ public final class XQuery4Test extends SandboxTest {
 
     query("(1 to 10)[. = 0] otherwise (1 to 10)[. = 0]", "");
 
-    check("1 otherwise void(2)", 1, root(Int.class));
+    check("1 otherwise void(2)", 1, root(Itr.class));
     check("void(1) otherwise 2", 2, root(Otherwise.class));
     check("void(1) otherwise void(2)", "", root(Otherwise.class));
 
@@ -118,8 +118,8 @@ public final class XQuery4Test extends SandboxTest {
     query("count((1, 2, 3)[. = 4] otherwise (4, 5))", 2);
 
     check("() otherwise ()", "", empty());
-    check("() otherwise 1", 1, root(Int.class));
-    check("1 otherwise ()", 1, root(Int.class));
+    check("() otherwise 1", 1, root(Itr.class));
+    check("1 otherwise ()", 1, root(Itr.class));
     check("() otherwise <x/>", "<x/>", root(CElem.class));
     check("<x/> otherwise ()", "<x/>", root(CElem.class));
 
@@ -463,21 +463,21 @@ public final class XQuery4Test extends SandboxTest {
         + "}; local:f(10000)", "");
 
     // finally
-    check("try { 1 } finally { }", 1, root(Int.class));
-    check("try { 1 } catch * { 2 } finally { }", 1, root(Int.class));
-    check("try { 1 div 0 } catch * { 2 } finally { }", 2, root(Int.class));
+    check("try { 1 } finally { }", 1, root(Itr.class));
+    check("try { 1 } catch * { 2 } finally { }", 1, root(Itr.class));
+    check("try { 1 div 0 } catch * { 2 } finally { }", 2, root(Itr.class));
 
     check("try { 1 } finally { (1 to 1000)[. = 0] }", 1, root(Try.class));
     check("try { 1 } catch * { 2 } finally { (1 to 1000)[. = 0] }", 1, root(Try.class));
     check("try { 1 div 0 } catch * { 2 } finally { (1 to 1000)[. = 0] }", 2, root(Try.class));
 
     check("try { 1 } catch * { error() } finally { message('done') }", 1, empty(ERROR));
-    check("try { 1 } catch err:FOER0 { 2 } finally { }", 1, root(Int.class), count(Int.class, 1));
+    check("try { 1 } catch err:FOER0 { 2 } finally { }", 1, root(Itr.class), count(Itr.class, 1));
     check("try { 1 } catch err:FOER0 { 2 } catch err:FOER1 { 3 } finally { }", 1,
-        root(Int.class), count(Int.class, 1));
+        root(Itr.class), count(Itr.class, 1));
 
-    check("let $a := 1 return try { $a } finally { $a[. = 0] }", 1, root(Int.class));
-    check("let $a := 1 return try { $a } catch * { $a } finally { $a[. = 0] }", 1, root(Int.class));
+    check("let $a := 1 return try { $a } finally { $a[. = 0] }", 1, root(Itr.class));
+    check("let $a := 1 return try { $a } catch * { $a } finally { $a[. = 0] }", 1, root(Itr.class));
 
     error("try { 1 } catch * { 2 } finally { 2 div 0 }", DIVZERO_X);
     error("try { error() } catch * { 2 } finally { 2 div 0 }", DIVZERO_X);

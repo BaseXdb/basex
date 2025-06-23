@@ -321,8 +321,8 @@ public class QueryException extends Exception {
     list.add(Str.get(getLocalizedMessage()));
     list.add(value() != null ? value() : Empty.VALUE);
     list.add(path() != null ? Str.get(path()) : Empty.VALUE);
-    list.add(line() != 0 ? Int.get(line()) : Empty.VALUE);
-    list.add(column() != 0 ? Int.get(column()) : Empty.VALUE);
+    list.add(line() != 0 ? Itr.get(line()) : Empty.VALUE);
+    list.add(column() != 0 ? Itr.get(column()) : Empty.VALUE);
     list.add(Empty.VALUE);
     list.add(trace);
     list.add(map(list));

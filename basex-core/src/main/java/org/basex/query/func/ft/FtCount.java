@@ -23,6 +23,6 @@ public final class FtCount extends FtAccessFn {
     }
     final int size = qc.ftPosData.size();
     qc.ftPosData = tmp;
-    return Int.get(size);
+    return Itr.get(size);
   }
 }

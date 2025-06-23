@@ -36,7 +36,7 @@ public final class Count extends Clause {
       @Override
       public boolean next(final QueryContext qc) throws QueryException {
         if(!sub.next(qc)) return false;
-        qc.set(var, Int.get(i++));
+        qc.set(var, Itr.get(i++));
         return true;
       }
     };

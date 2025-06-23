@@ -54,7 +54,7 @@ public abstract class ALookup extends Arr {
       if(struct instanceof XQArray array) {
         long k = 0;
         for(final Value val : array.iterable()) {
-          vb.add(modify(Int.get(++k), val));
+          vb.add(modify(Itr.get(++k), val));
         }
       } else {
         ((XQMap) struct).forEach((key, value) -> vb.add(modify(key, value)));
@@ -96,7 +96,7 @@ public abstract class ALookup extends Arr {
       key = WILDCARD.string();
     } else if(keys instanceof Str str) {
       if(XMLToken.isNCName(str.string())) key = str.toJava();
-    } else if(keys instanceof Int itr) {
+    } else if(keys instanceof Itr itr) {
       final long l = itr.itr();
       if(l >= 0) key = l;
     }

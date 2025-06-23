@@ -28,9 +28,9 @@ public class DbNodeId extends StandardFunc {
 
     return new Iter() {
       @Override
-      public Int next() throws QueryException {
+      public Itr next() throws QueryException {
         final Item item = qc.next(nodes);
-        return item != null ? Int.get(id(toDBNode(item, false))) : null;
+        return item != null ? Itr.get(id(toDBNode(item, false))) : null;
       }
     };
   }

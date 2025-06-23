@@ -157,7 +157,7 @@ public final class Condition extends Single {
   void bind(final QueryContext qc, final Item it, final long ps, final Item pr, final Item nx)
       throws QueryException {
     if(item != null) qc.set(item, it);
-    if(pos  != null) qc.set(pos,  Int.get(ps));
+    if(pos  != null) qc.set(pos,  Itr.get(ps));
     if(prev != null) qc.set(prev, pr == null ? Empty.VALUE : pr);
     if(next != null) qc.set(next, nx == null ? Empty.VALUE : nx);
   }

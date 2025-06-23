@@ -18,6 +18,6 @@ public final class FnDayFromDateTime extends DateTimeFn {
     if(value.isEmpty()) return Empty.VALUE;
 
     final long comp = toGregorian(value, qc).day();
-    return comp == 0 ? Empty.VALUE : Int.get(comp);
+    return comp == 0 ? Empty.VALUE : Itr.get(comp);
   }
 }

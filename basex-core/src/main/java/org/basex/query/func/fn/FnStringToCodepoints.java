@@ -25,10 +25,10 @@ public final class FnStringToCodepoints extends StandardFunc {
     if(tl == 0) return Empty.ITER;
 
     if(value.ascii(info)) {
-      return new BasicIter<Int>(tl) {
+      return new BasicIter<Itr>(tl) {
         @Override
-        public Int get(final long i) {
-          return Int.get(token[(int) i]);
+        public Itr get(final long i) {
+          return Itr.get(token[(int) i]);
         }
         @Override
         public Value value(final QueryContext q, final Expr expr) throws QueryException {
@@ -41,11 +41,11 @@ public final class FnStringToCodepoints extends StandardFunc {
       int t;
 
       @Override
-      public Int next() {
+      public Itr next() {
         if(t == tl) return null;
         final int s = t;
         t += cl(token, s);
-        return Int.get(cp(token, s));
+        return Itr.get(cp(token, s));
       }
     };
   }

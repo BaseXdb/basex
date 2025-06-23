@@ -41,7 +41,7 @@ public final class QueryModuleTest extends QueryModule {
    */
   @Requires(Permission.NONE)
   @Deterministic
-  public Str fast(final Int fruit) {
+  public Str fast(final Itr fruit) {
     final int i = (int) fruit.itr();
     final String f = FRUITS[i % FRUITS.length];
     return Str.get(f);
@@ -82,13 +82,13 @@ public final class QueryModuleTest extends QueryModule {
    * @return resulting value
    * @throws QueryException query exception
    */
-  public Int faculty(final Expr expr) throws QueryException {
+  public Itr faculty(final Expr expr) throws QueryException {
     final Iter iter = expr.iter(queryContext);
     long c = 1;
     for(Item item; (item = iter.next()) != null;) {
       c *= item.itr(null);
     }
-    return Int.get(c);
+    return Itr.get(c);
   }
 
   /**

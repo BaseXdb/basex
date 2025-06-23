@@ -40,11 +40,11 @@ public final class SimpleMapTest extends SandboxTest {
     check("1 ! ()", "", empty());
     check("() ! 1", "", empty());
     check("1 ! () ! 1", "", empty());
-    check("1 ! void('x')", "", empty(Int.class));
-    check("1 ! void(.) ! 1", "", count(Int.class, 1));
+    check("1 ! void('x')", "", empty(Itr.class));
+    check("1 ! void(.) ! 1", "", count(Itr.class, 1));
     check("<a/> ! <b/> ! ()", "", empty());
 
-    check("void('x') ! 1", "", empty(Int.class));
+    check("void('x') ! 1", "", empty(Itr.class));
     check("() ! 'a'[.]", "", empty());
     check("() ! ('a', 'b')[.]", "", empty());
     check("() ! <_>a</_>[.]", "", empty());
@@ -60,7 +60,7 @@ public final class SimpleMapTest extends SandboxTest {
     query("(1, 2) ! last()", "2\n2");
     query("map { } ! head(?_) ! string()", "");
 
-    check("1 ! .", 1, root(Int.class));
+    check("1 ! .", 1, root(Itr.class));
     check("(1, 2)[. = 1] ! .", 1, root(IterFilter.class));
     check("(1, (2, 3)[. = 2]) ! .", "1\n2", root(List.class));
     check("(1, 2) !.!.!.!.!.!.!.!.!.!.!.", "1\n2", root(RangeSeq.class));
@@ -91,8 +91,8 @@ public final class SimpleMapTest extends SandboxTest {
     check("'1' ! (., number())", "1\n1", root(SmallSeq.class));
     check("let $a := document { <a/> } return $a ! (., /)", "<a/>\n<a/>", empty(VarRef.class));
     check("let $d := document{} return $d ! /", "", root(CDoc.class));
-    check("map { 1: 2 } ! ?*", 2, root(Int.class));
-    check("let $n := map { 1: 2 } return $n ! ?*", 2, root(Int.class));
+    check("map { 1: 2 } ! ?*", 2, root(Itr.class));
+    check("let $n := map { 1: 2 } return $n ! ?*", 2, root(Itr.class));
   }
 
   /** Errors. */

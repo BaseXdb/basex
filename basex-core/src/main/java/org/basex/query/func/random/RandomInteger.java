@@ -29,6 +29,6 @@ public final class RandomInteger extends StandardFunc {
     } else {
       next = RND.nextInt();
     }
-    return Int.get(next);
+    return Itr.get(next);
   }
 }

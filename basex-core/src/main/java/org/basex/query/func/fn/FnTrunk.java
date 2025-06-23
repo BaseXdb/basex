@@ -88,20 +88,20 @@ public final class FnTrunk extends StandardFunc {
     if(size != -1) {
       // trunk(trunk(E))  ->  subsequence(E, 1, size - 2)
       if(TRUNK.is(input)) {
-        return cc.function(SUBSEQUENCE, info, input.arg(0), Int.ONE, Int.get(size - 1));
+        return cc.function(SUBSEQUENCE, info, input.arg(0), Itr.ONE, Itr.get(size - 1));
       }
       // trunk(subsequence(E, pos, length))  ->  subsequence(E, pos, length - 1)
       if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
         final SeqRange r = SeqRange.get(input, cc);
         if(r != null) return cc.function(SUBSEQUENCE, info, input.arg(0),
-            Int.get(r.start + 1), Int.get(r.length - 1));
+            Itr.get(r.start + 1), Itr.get(r.length - 1));
       }
     }
     // trunk(replicate(I, count))  ->  replicate(I, count - 1)
     if(REPLICATE.is(input)) {
       final Expr[] args = input.args().clone();
-      if(args[1] instanceof final Int itr && args[0].seqType().zeroOrOne()) {
-        args[1] = Int.get(itr.itr() - 1);
+      if(args[1] instanceof final Itr itr && args[0].seqType().zeroOrOne()) {
+        args[1] = Itr.get(itr.itr() - 1);
         return cc.function(REPLICATE, info, args);
       }
     }

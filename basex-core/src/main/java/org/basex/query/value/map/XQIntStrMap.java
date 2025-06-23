@@ -62,7 +62,7 @@ public final class XQIntStrMap extends XQHashMap {
 
   @Override
   public Item keyAt(final int index) {
-    return Int.get(map.key(index + 1));
+    return Itr.get(map.key(index + 1));
   }
 
   @Override

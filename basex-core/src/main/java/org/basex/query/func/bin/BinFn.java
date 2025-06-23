@@ -40,7 +40,7 @@ abstract class BinFn extends StandardFunc {
 
     final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(offset, Int.get(len), bl);
+    final int[] bounds = bounds(offset, Itr.get(len), bl);
 
     final ByteBuffer bb = ByteBuffer.allocate(bounds[1]).order(order);
     bb.put(bytes, bounds[0], bounds[1]).position(0);
@@ -54,7 +54,7 @@ abstract class BinFn extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  final Int unpackInteger(final QueryContext qc, final boolean signed) throws QueryException {
+  final Itr unpackInteger(final QueryContext qc, final boolean signed) throws QueryException {
     final Bin binary = toBin(arg(0), qc);
     final Item offset = arg(1).atomItem(qc, info);
     final Item size = arg(2).atomItem(qc, info);
@@ -63,7 +63,7 @@ abstract class BinFn extends StandardFunc {
     final byte[] bytes = binary.binary(info);
     final int[] bounds = bounds(offset, size, bytes.length);
     final int o = bounds[0], l = bounds[1];
-    if(l == 0) return Int.ZERO;
+    if(l == 0) return Itr.ZERO;
 
     final byte[] result = new byte[l];
     ByteBuffer.wrap(bytes, o, l).order(order).get(result);
@@ -77,7 +77,7 @@ abstract class BinFn extends StandardFunc {
     }
     final BigInteger bi = signed ? new BigInteger(result) : new BigInteger(1, result);
     final long v = bi.longValue();
-    if(BigInteger.valueOf(v).equals(bi)) return Int.get(v);
+    if(BigInteger.valueOf(v).equals(bi)) return Itr.get(v);
     throw BIN_ITL_X_X.get(info, bi);
   }
 

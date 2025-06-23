@@ -52,7 +52,7 @@ public class FnSlice extends StandardFunc {
           // slice(E, 2)  ->  util:range(E, 2)
           // slice(TEN, 2, 1)  ->  util:range(reverse(TEN), 9, 10)
           final Expr arg = slice.reverse ? cc.function(REVERSE, info, input) : input;
-          return cc.function(_UTIL_RANGE, info, arg, Int.get(slice.start), Int.get(slice.end));
+          return cc.function(_UTIL_RANGE, info, arg, Itr.get(slice.start), Itr.get(slice.end));
         }
       }
       // input size is unknown: exact range cannot be computed, check original properties

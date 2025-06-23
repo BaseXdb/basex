@@ -80,7 +80,7 @@ final class JavaMapping {
     new SimpleEntry(Dur.class, DURATION),
     new SimpleEntry(Flt.class, FLOAT),
     new SimpleEntry(Hex.class, HEX_BINARY),
-    new SimpleEntry(Int.class, INTEGER),
+    new SimpleEntry(Itr.class, INTEGER),
     new SimpleEntry(Item.class, ITEM),
     new SimpleEntry(QNm.class, QNAME),
     new SimpleEntry(Str.class, STRING),

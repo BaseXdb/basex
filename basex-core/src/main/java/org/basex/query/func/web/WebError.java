@@ -34,7 +34,7 @@ public final class WebError extends StandardFunc {
     if(code <= 0 || code > 999) throw WEB_STATUS_X.get(info, code);
 
     final QNm qname = new QNm(Token.concat(STATUS, code), REST_URI);
-    throw new QueryException(info, qname, message).value(Int.get(code));
+    throw new QueryException(info, qname, message).value(Itr.get(code));
   }
 
   @Override

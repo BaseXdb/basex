@@ -51,7 +51,7 @@ public class FnEmpty extends StandardFunc {
     }
 
     // static integer will always be greater than 1
-    if(REPLICATE.is(input) && input.arg(1) instanceof Int) {
+    if(REPLICATE.is(input) && input.arg(1) instanceof Itr) {
       input = input.arg(0);
     }
     // rewrite list to union expression:  exists((nodes1, nodes2))  ->  exists(nodes1 | nodes2)
@@ -82,7 +82,7 @@ public class FnEmpty extends StandardFunc {
     final boolean map = _MAP_KEYS.is(input), array = _ARRAY_MEMBERS.is(input);
     if(map || array) {
       input = cc.function(map ? _MAP_SIZE : _ARRAY_SIZE, info, input.args());
-      return new CmpG(info, input, Int.ZERO, exists ? OpG.NE : OpG.EQ).optimize(cc);
+      return new CmpG(info, input, Itr.ZERO, exists ? OpG.NE : OpG.EQ).optimize(cc);
     }
 
     return embed(cc, true);

@@ -42,16 +42,16 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Checks if the count function is pre-compiled. */
   @Test public void preEval() {
-    check("count(1)", 1, exists(Int.class));
+    check("count(1)", 1, exists(Itr.class));
 
     execute(new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a><a/></xml>"));
-    check("count(//a)", 3, exists(Int.class));
-    check("count(/xml/a)", 3, exists(Int.class));
-    check("count(//text())", 2, exists(Int.class));
-    check("count(//*)", 4, exists(Int.class));
-    check("count(//node())", 6, exists(Int.class));
-    check("count(//comment())", 0, exists(Int.class));
-    check("count(/self::document-node())", 1, exists(Int.class));
+    check("count(//a)", 3, exists(Itr.class));
+    check("count(/xml/a)", 3, exists(Itr.class));
+    check("count(//text())", 2, exists(Itr.class));
+    check("count(//*)", 4, exists(Itr.class));
+    check("count(//node())", 6, exists(Itr.class));
+    check("count(//comment())", 0, exists(Itr.class));
+    check("count(/self::document-node())", 1, exists(Itr.class));
   }
 
   /** Checks if descendant-or-self::node() steps are rewritten. */
@@ -627,7 +627,7 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Test. */
   @Test public void gh1694() {
-    check("count(1)", 1, exists(Int.class));
+    check("count(1)", 1, exists(Itr.class));
     execute(new CreateDB(NAME, "<_/>"));
     final String query =
       "declare function local:b($e) as xs:string { $e };\n" +
@@ -656,18 +656,18 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Test. */
   @Test public void gh1723() {
-    check("count(<a/>)", 1, root(Int.class));
-    check("count(<a/>/<b/>)", 1, root(Int.class));
-    check("count(<a/>/<b/>/<c/>/<d/>)", 1, root(Int.class));
+    check("count(<a/>)", 1, root(Itr.class));
+    check("count(<a/>/<b/>)", 1, root(Itr.class));
+    check("count(<a/>/<b/>/<c/>/<d/>)", 1, root(Itr.class));
   }
 
   /** Test. */
   @Test public void gh1733() {
     check("(<a/>, <b/>)/1", "1\n1", root(SingletonSeq.class));
-    check("<a/>/1", 1, root(Int.class));
+    check("<a/>/1", 1, root(Itr.class));
     check("<a/>/<a/>", "<a/>", root(CElem.class));
-    check("(<a/>/map { 1:2 })?1", 2, root(Int.class));
-    check("<a/>/self::a/count(.)", 1, root(Int.class));
+    check("(<a/>/map { 1:2 })?1", 2, root(Itr.class));
+    check("<a/>/self::a/count(.)", 1, root(Itr.class));
     check("<a/>/a/count(.)", "", root(DualMap.class));
 
     // no rewriting possible
@@ -766,7 +766,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Static typing of computed maps. */
   @Test public void gh1766() {
     check("let $map := map { 'c': 'x' } return $map?(1 to 6)", "", empty());
-    check("let $map := map { 'c': 'x' } return count($map?(1 to 6))", 0, root(Int.class));
+    check("let $map := map { 'c': 'x' } return count($map?(1 to 6))", 0, root(Itr.class));
 
     check("let $map := map { 1: 'x' } return $map?(1 to 6)", "x",
         type(DualMap.class, "xs:string*"));
@@ -829,7 +829,7 @@ public final class RewritingsTest extends SandboxTest {
 
   /** EBV checks. */
   @Test public void gh1769ebv() {
-    check("if((<a/>, <b/>)) then 1 else 2", 1, root(Int.class));
+    check("if((<a/>, <b/>)) then 1 else 2", 1, root(Itr.class));
     check("if(data(<a/>)) then 1 else 2", 2, exists(IterPath.class));
   }
 
@@ -964,13 +964,13 @@ public final class RewritingsTest extends SandboxTest {
   /** Inline context in filter expressions. */
   @Test public void gh1792() {
     check("1[. = 0]", "", empty());
-    check("1[. * .]", 1, root(Int.class));
-    check("2[. * . = 4]", 2, root(Int.class));
+    check("1[. * .]", 1, root(Itr.class));
+    check("2[. * . = 4]", 2, root(Itr.class));
     check("2[number()]", "", empty());
-    check("1[count(.)]", 1, root(Int.class));
-    check("1[count(.)]", 1, root(Int.class));
-    check("1[.[.[.[.[.[.[.[.[. = 1]]]]]]]]]", 1, root(Int.class));
-    check("1[1[1[1[1[1[1[1[1[1 = .]]]]]]]]]", 1, root(Int.class));
+    check("1[count(.)]", 1, root(Itr.class));
+    check("1[count(.)]", 1, root(Itr.class));
+    check("1[.[.[.[.[.[.[.[.[. = 1]]]]]]]]]", 1, root(Itr.class));
+    check("1[1[1[1[1[1[1[1[1[1 = .]]]]]]]]]", 1, root(Itr.class));
 
     check("''[string()]", "", empty());
     check("'a'[string()]", "a", root(Str.class));
@@ -1012,7 +1012,7 @@ public final class RewritingsTest extends SandboxTest {
     check("(1, 2) coerce to xs:double+", "1\n2",
         empty(TypeCheck.class), root(DblSeq.class), count(Dbl.class, 2));
     check("(-128, 127) coerce to xs:byte+", "-128\n127",
-        empty(TypeCheck.class), root(SmallSeq.class), count(Int.class, 2));
+        empty(TypeCheck.class), root(SmallSeq.class), count(Itr.class, 2));
 
     error("<a/> coerce to empty-sequence()", INVCONVERT_X_X_X);
     error("(1, 128) coerce to xs:byte+", FUNCCAST_X_X_X);
@@ -1431,7 +1431,7 @@ public final class RewritingsTest extends SandboxTest {
 
     /** Combine position predicates. */
   @Test public void gh1840() {
-    check("(1, 2, 3)[position() = 1 or position() = 1]", 1, root(Int.class));
+    check("(1, 2, 3)[position() = 1 or position() = 1]", 1, root(Itr.class));
     check("(1, 2, 3)[position() = 1 or position() = 2]", "1\n2", root(RangeSeq.class));
     check("(1, 2, 3)[position() = 1 or position() = 3]", "1\n3", count(IntPos.class, 2));
 
@@ -1439,8 +1439,8 @@ public final class RewritingsTest extends SandboxTest {
     check("(1, 2, 3)[position() = 1 to 2 or position() = 2]", "1\n2", root(RangeSeq.class));
     check("(1, 2, 3)[position() = 1 to 2 or position() = 3]", "1\n2\n3", root(RangeSeq.class));
 
-    check("(1, 2, 3)[position() = 1 to 2 and position() = 1]", 1, root(Int.class));
-    check("(1, 2, 3)[position() = 1 to 2 and position() = 2 to 3]", 2, root(Int.class));
+    check("(1, 2, 3)[position() = 1 to 2 and position() = 1]", 1, root(Itr.class));
+    check("(1, 2, 3)[position() = 1 to 2 and position() = 2 to 3]", 2, root(Itr.class));
     check("(1, 2, 3)[position() = 1 to 2 and position() = 3]", "", empty());
   }
 
@@ -1457,7 +1457,7 @@ public final class RewritingsTest extends SandboxTest {
     check("(<a/>, (<b/>, <c/>))", "<a/>\n<b/>\n<c/>", count(List.class, 1));
 
     check("count(<a/> union (<b/> union <c/>))", 3, count(Union.class, 1));
-    check("count(<a/> intersect (<b/> intersect <c/>))", 0, root(Int.class));
+    check("count(<a/> intersect (<b/> intersect <c/>))", 0, root(Itr.class));
     check("count(<a/> except (<b/> except <c/>))", 1, count(Except.class, 2));
 
     check("<a/> ! (. > '0' or (. < '1' or . < '2'))", true, count(Or.class, 1));
@@ -1785,7 +1785,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Static properties of closures. */
   @Test public void gh1892() {
     inline(true);
-    check("1 ! (let $a := . return function() { $a }) ! .()", 1, root(Int.class));
+    check("1 ! (let $a := . return function() { $a }) ! .()", 1, root(Itr.class));
     query("function() { for $a in (1, 2) return function() { $a } }() ! .()", "1\n2");
   }
 
@@ -1814,7 +1814,7 @@ public final class RewritingsTest extends SandboxTest {
     inline(true);
     check("<a/> ! name()", "a", root(Function.NAME));
     check("'s' ! <_>{ . }</_>", "<_>s</_>", root(CElem.class));
-    check("count#1 ! .('a')", 1, root(Int.class));
+    check("count#1 ! .('a')", 1, root(Itr.class));
 
     // do not generate nested node constructors
     check("namespace-uri(<a><b/></a>) ! <x xmlns='x'>{ . }</x> ! name()",
@@ -1848,9 +1848,9 @@ public final class RewritingsTest extends SandboxTest {
     inline(true);
     check("function() as xs:string+ {" + REPLICATE.args(" <x/>", 10000000000L) + " }() "
         + "=> count()",
-      "10000000000", root(Int.class));
+      "10000000000", root(Itr.class));
     check("function() as xs:double+ { 1 to 100000000000000 }() => count()",
-      "100000000000000", root(Int.class));
+      "100000000000000", root(Itr.class));
   }
 
   /** Inlining of simple map operands. */
@@ -1960,7 +1960,7 @@ public final class RewritingsTest extends SandboxTest {
     check("head((<a/>[data()], 1))", 1, root(Otherwise.class));
     check("head((<a/>[data()], <b/>[data()], <c/>[data()]))", null, empty(Otherwise.class));
 
-    check("head((1, <_/>))", 1, root(Int.class));
+    check("head((1, <_/>))", 1, root(Itr.class));
     check("head((<item/>, <default/>))", "<item/>", root(CElem.class));
 
     check("let $a := <a/>[data()] return if($a) then $a else ()", "", root(IterFilter.class));
@@ -2040,11 +2040,11 @@ public final class RewritingsTest extends SandboxTest {
         root(If.class));
 
     check("switch(" + wrap("a") + ") case 'a' return 1 default return 1", 1,
-        root(Int.class));
+        root(Itr.class));
     check("switch(" + wrap("a") + ") case 'a' return 1 case 'b' return 1 default return 1", 1,
-        root(Int.class));
+        root(Itr.class));
     check("switch(<_/>) case 'a' return 1 case 'b' return 1 case 'c' return 1 default return 1", 1,
-        root(Int.class));
+        root(Itr.class));
   }
 
   /** Rewrite integer lists to range sequences. */
@@ -2063,9 +2063,9 @@ public final class RewritingsTest extends SandboxTest {
     check("0 to 1, <a/>, 2 to 3", "0\n1\n<a/>\n2\n3", count(RangeSeq.class, 2));
     check("0, 1, <a/>, 2, 3", "0\n1\n<a/>\n2\n3", count(RangeSeq.class, 2));
     check("0, 1 to 2, <a/>, 2 to 3, 4", "0\n1\n2\n<a/>\n2\n3\n4",
-        count(RangeSeq.class, 2), empty(Int.class));
+        count(RangeSeq.class, 2), empty(Itr.class));
     check("0 to 1, 2 to 3, <a/>", "0\n1\n2\n3\n<a/>", count(RangeSeq.class, 1));
-    check("0, reverse(1 to 2), <a/>", "0\n2\n1\n<a/>", count(RangeSeq.class, 1), exists(Int.class));
+    check("0, reverse(1 to 2), <a/>", "0\n2\n1\n<a/>", count(RangeSeq.class, 1), exists(Itr.class));
     check("xs:byte(0), 1, 2, <a/>", "0\n1\n2\n<a/>", exists(RangeSeq.class));
     check("1 to 2, 1 to 2, 3, <a/>", "1\n2\n1\n2\n3\n<a/>", count(RangeSeq.class, 2));
   }
@@ -2089,8 +2089,8 @@ public final class RewritingsTest extends SandboxTest {
     // pre-evaluate lookup with zero or single input items
     check("()?1", "", empty());
     check("()?*", "", empty());
-    check("map { 1: 2 }?*", 2, root(Int.class));
-    check("[ 1 ]?*", 1, root(Int.class));
+    check("map { 1: 2 }?*", 2, root(Itr.class));
+    check("[ 1 ]?*", 1, root(Itr.class));
     check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string?)?1",
         "A", root(Str.class));
 
@@ -2128,7 +2128,7 @@ public final class RewritingsTest extends SandboxTest {
         "1x\n2x", count(DualMap.class, 2));
 
     // do not rewrite group by clauses if value is not a single atomic item
-    check("for $a in (1 to 6) group by $g := [ $a mod 1 ] return $g", 0, root(Int.class));
+    check("for $a in (1 to 6) group by $g := [ $a mod 1 ] return $g", 0, root(Itr.class));
     check("for $a allowing empty in () group by $a return $a", "", root(GFLWOR.class));
     check("for $a in (1 to 6) group by $g := [] return $g", "", root(GFLWOR.class));
     check("for $a as xs:byte in (1 to 2)[. >= 0] group by $a return $a", "1\n2",
@@ -2155,14 +2155,14 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Positional checks. */
   @Test public void gh1937() {
-    check("1[position()]", 1, root(Int.class));
+    check("1[position()]", 1, root(Itr.class));
     check("(1, 3)[position()]", "1\n3", root(IntSeq.class));
     check("('a', 'b')[position()[position() ! .]]", "a\nb", root(StrSeq.class));
 
-    check("(1, 3, 5)[last() - 2]", 1, root(Int.class));
-    check("(1, 3, 5)[position() = last() - 1]", 3, root(Int.class));
-    check("(1, 3, 5, 7)[position() = last() idiv 2]", 3, root(Int.class));
-    check("(1, 3, 5, 7)[position() = last() div 2]", 3, root(Int.class));
+    check("(1, 3, 5)[last() - 2]", 1, root(Itr.class));
+    check("(1, 3, 5)[position() = last() - 1]", 3, root(Itr.class));
+    check("(1, 3, 5, 7)[position() = last() idiv 2]", 3, root(Itr.class));
+    check("(1, 3, 5, 7)[position() = last() div 2]", 3, root(Itr.class));
 
     check("(1, 3, 5)[not(position() = 2)]", "1\n5", root(SmallSeq.class));
     check("(1, 3, 5)[not(position() > 2)]", "1\n3", root(SubSeq.class));
@@ -2269,7 +2269,7 @@ public final class RewritingsTest extends SandboxTest {
   /** distinct-values: simplify arguments. */
   @Test public void gh1967() {
     java.util.function.BiConsumer<String, Integer> check = (query, result) ->
-      check("count(distinct-values((" + query + ")))", result, root(Int.class));
+      check("count(distinct-values((" + query + ")))", result, root(Itr.class));
 
     // values will not be pre-evaluated as range is larger than CompileContext#MAX_PREEVAL
     check.accept("1 to 10000000, 1 to 10000000", 10000000);
@@ -2464,7 +2464,7 @@ public final class RewritingsTest extends SandboxTest {
     unroll(true);
     check("(1, 3) ! (. * 2)", "2\n6", empty(ArithSimple.class));
     check("sum((# db:unrolllimit 0 #) { (1, 3) ! (. * 2) })", 8, exists(ArithSimple.class));
-    check("(1, 2)[. = 1]", 1, root(Int.class));
+    check("(1, 2)[. = 1]", 1, root(Itr.class));
   }
 
   /** Identical nodes in mixed paths. */
@@ -2503,17 +2503,17 @@ public final class RewritingsTest extends SandboxTest {
     check("<a>{ 'Jack' }</a>", "<a>Jack</a>",
         count(Str.class, 1));
     check("<a>Hi { 'Jack' }123</a>", "<a>Hi Jack123</a>",
-        count(Str.class, 1), empty(Int.class));
+        count(Str.class, 1), empty(Itr.class));
     check("<a>Hi { text { 'Jack' } }123</a>", "<a>Hi Jack123</a>",
-        count(Str.class, 1), empty(CTxt.class), empty(Int.class));
+        count(Str.class, 1), empty(CTxt.class), empty(Itr.class));
     check("<a>{ 'Hi', 'Jack', 123 }</a>", "<a>Hi Jack 123</a>",
-        count(Str.class, 1), empty(CTxt.class), empty(Int.class));
+        count(Str.class, 1), empty(CTxt.class), empty(Itr.class));
     check("<a>{ 'Hi ', text { 'Jack' }, '123' }</a>", "<a>Hi Jack123</a>",
-        count(Str.class, 1), empty(CTxt.class), empty(Int.class));
+        count(Str.class, 1), empty(CTxt.class), empty(Itr.class));
     check("<a>{ 'Hi ', (text { 'Jack' }, (), '123') }</a>", "<a>Hi Jack123</a>",
-        count(Str.class, 1), empty(CTxt.class), empty(Int.class), empty(Empty.class));
+        count(Str.class, 1), empty(CTxt.class), empty(Itr.class), empty(Empty.class));
     check("<a>{ 'Hi ', (), text { 'Jack' }, '123' }</a>", "<a>Hi Jack123</a>",
-        count(Str.class, 1), empty(CTxt.class), empty(Int.class), empty(Empty.class));
+        count(Str.class, 1), empty(CTxt.class), empty(Itr.class), empty(Empty.class));
   }
 
   /** Access to values in node constructors. */
@@ -2673,11 +2673,11 @@ public final class RewritingsTest extends SandboxTest {
     execute(new CreateDB(NAME, FILE));
 
     // count
-    check("/html/(head, body) => count()", 2, root(Int.class));
-    check("//(title, li) => count()", 3, root(Int.class));
+    check("/html/(head, body) => count()", 2, root(Itr.class));
+    check("//(title, li) => count()", 3, root(Itr.class));
 
     // distinct-values
-    check("//(title, li) => distinct-values() => count()", 3, root(Int.class));
+    check("//(title, li) => distinct-values() => count()", 3, root(Itr.class));
 
     // empty paths
     check("/html/(ul, li, unknown, div, title)", "", empty());
@@ -2742,13 +2742,13 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh2071() {
     // single value
     execute(new CreateDB(NAME, "<xml><a>1</a></xml>"));
-    check("//a => count()", 1, root(Int.class));
+    check("//a => count()", 1, root(Itr.class));
     check("//a => min()", 1, root(Dbl.class));
     check("//a => max()", 1, root(Dbl.class));
     check("//a => sum()", 1, root(Dbl.class));
     check("//a => avg()", 1, root(Dbl.class));
     // access text nodes
-    check("//a/text() => count()", 1, root(Int.class));
+    check("//a/text() => count()", 1, root(Itr.class));
     check("//a/text() => min()", 1, root(Dbl.class));
     check("//a/text() => max()", 1, root(Dbl.class));
     check("//a/text() => sum()", 1, root(Dbl.class));
@@ -2756,7 +2756,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // access attributes
     execute(new CreateDB(NAME, "<xml><a b='1'/></xml>"));
-    check("//@b => count()", 1, root(Int.class));
+    check("//@b => count()", 1, root(Itr.class));
     check("//@b => min()", 1, root(Dbl.class));
     check("//@b => max()", 1, root(Dbl.class));
     check("//@b => sum()", 1, root(Dbl.class));
@@ -2764,7 +2764,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // double values
     execute(new CreateDB(NAME, "<xml><a>1.5</a><a>3.5</a></xml>"));
-    check("//a => count()", 2, root(Int.class));
+    check("//a => count()", 2, root(Itr.class));
     check("//a => min()", 1.5, root(Dbl.class));
     check("//a => max()", 3.5, root(Dbl.class));
     check("//a => sum()", 5  , root(Dbl.class));
@@ -2772,7 +2772,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // negative and positive values
     execute(new CreateDB(NAME, "<xml><a>-1</a><a>0</a><a>1</a></xml>"));
-    check("//a => count()", 3, root(Int.class));
+    check("//a => count()", 3, root(Itr.class));
     check("//a => min()", -1, root(Dbl.class));
     check("//a => max()",  1, root(Dbl.class));
     check("//a => sum()",  0, root(Dbl.class));
@@ -2780,8 +2780,8 @@ public final class RewritingsTest extends SandboxTest {
 
     // empty value must yield an error
     execute(new CreateDB(NAME, "<xml><a>-1</a><a>1</a><a/></xml>"));
-    check("//a/text() => count()", 2, root(Int.class));
-    check("//a => count()", 3, root(Int.class));
+    check("//a/text() => count()", 2, root(Itr.class));
+    check("//a => count()", 3, root(Itr.class));
     error("//a => min()", FUNCCAST_X_X);
     error("//a => max()", FUNCCAST_X_X);
     error("//a => sum()", FUNCCAST_X_X);
@@ -2789,7 +2789,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // queries across multiple elements
     execute(new CreateDB(NAME, "<xml><a>1</a><b>3</b><c>5</c></xml>"));
-    check("//(b, c, d) => count()", 2, root(Int.class));
+    check("//(b, c, d) => count()", 2, root(Itr.class));
     check("//(b, c, d) => min()", 3, root(Dbl.class));
     check("//(b, c, d) => max()", 5, root(Dbl.class));
     check("//(b, c, d) => sum()", 8, root(Dbl.class));
@@ -2799,7 +2799,7 @@ public final class RewritingsTest extends SandboxTest {
     // whitespace will be preserved in categories, but numbers will still be detected
     query(_DB_CREATE.args(NAME, " <a><b>1</b><b>3 </b><b> 5</b></a>", NAME));
     final String query = _DB_GET.args(NAME) + "//b => ";
-    check(query + "count()", 3, root(Int.class));
+    check(query + "count()", 3, root(Itr.class));
     check(query + "min()", 1, root(Dbl.class));
     check(query + "max()", 5, root(Dbl.class));
     check(query + "sum()", 9, root(Dbl.class));
@@ -2807,7 +2807,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // check default MAXCATS limit
     query(_DB_CREATE.args(NAME, " <a>{ (1 to 100) ! <b>{ . }</b> }</a>", NAME));
-    check(query + "count()", 100, root(Int.class));
+    check(query + "count()", 100, root(Itr.class));
     check(query + "min()", 1, root(Dbl.class));
     check(query + "max()", 100, root(Dbl.class));
     check(query + "sum()", 5050, root(Dbl.class));
@@ -2815,7 +2815,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // exceed MAXCATS limit
     query(_DB_CREATE.args(NAME, " <a>{ (1 to 1000) ! <b>{ . }</b> }</a>", NAME));
-    check(query + "count()", 1000, root(Int.class));
+    check(query + "count()", 1000, root(Itr.class));
     check(query + "min()", 1, root(Dbl.class));
     check(query + "max()", 1000, root(Dbl.class));
     check(query + "sum()", 500500, root(SUM));
@@ -2824,7 +2824,7 @@ public final class RewritingsTest extends SandboxTest {
     // lower MAXCATS limit
     query(_DB_CREATE.args(NAME, " <a>{ (1 to 1000) ! <b>{ . }</b> }</a>", NAME,
         " map { 'maxcats': 0 }"));
-    check(query + "count()", 1000, root(Int.class));
+    check(query + "count()", 1000, root(Itr.class));
     check(query + "min()", 1, root(Dbl.class));
     check(query + "max()", 1000, root(Dbl.class));
     check(query + "sum()", 500500, root(SUM));
@@ -3102,7 +3102,7 @@ public final class RewritingsTest extends SandboxTest {
     check("(1 to 6)[not(boolean(.))]", "", empty(BOOLEAN), exists(NOT));
     check("(1 to 6)[not(not(.))]", "1\n2\n3\n4\n5\n6", exists(BOOLEAN), empty(NOT));
     check("(1 to 6)[not(. != 1)]", 1, empty(NOT), "//@op = '='");
-    check("(1 to 6)[not(position() != 3)]", 3, root(Int.class));
+    check("(1 to 6)[not(position() != 3)]", 3, root(Itr.class));
     check("(1 to 6)[not(. = 3 or (. != 1 and . != 4))]", "1\n4", empty(NOT));
 
     final String e1 = " (1 to 6)[. = (1, 2)]", e2 = " (1 to 6)[. = (7, 8)]";

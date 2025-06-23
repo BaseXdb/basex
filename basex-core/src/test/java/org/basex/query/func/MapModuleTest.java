@@ -93,7 +93,7 @@ public final class MapModuleTest extends SandboxTest {
         INVCONVERT_X_X_X);
 
     check(func.args(empty) + " => map:keys()", "", empty());
-    check(func.args(1) + " => map:keys()", 1, root(Int.class));
+    check(func.args(1) + " => map:keys()", 1, root(Itr.class));
 
     check("sum(" + func.args(" 1 to 10", " string#1") + " => map:items())",
         55, type(func, "map(xs:string, xs:integer+)"));
@@ -363,7 +363,7 @@ public final class MapModuleTest extends SandboxTest {
         INVCONVERT_X_X_X);
 
     check(func.args(" {}") + " => map:keys()", "", empty());
-    check(func.args(" { 1: 2 }") + " => map:keys()", 1, root(Int.class));
+    check(func.args(" { 1: 2 }") + " => map:keys()", 1, root(Itr.class));
   }
 
   /**
@@ -457,7 +457,7 @@ public final class MapModuleTest extends SandboxTest {
         INVCONVERT_X_X_X);
 
     check(func.args(" ()") + " => map:keys()", "", empty());
-    check(func.args(" { 'key': 1, 'value': 2 }") + " => map:keys()", 1, root(Int.class));
+    check(func.args(" { 'key': 1, 'value': 2 }") + " => map:keys()", 1, root(Itr.class));
 
     query(func.args(" { 'key': 1, 'value': 2, 'more': 3 }"), "{1:2}");
 

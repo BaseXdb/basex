@@ -37,7 +37,7 @@ public class FruitsModule extends QueryModule {
    */
   @Deterministic
   @Requires(Permission.READ)
-  public Str fast(final Int fruit) {
+  public Str fast(final Itr fruit) {
     final int i = (int) fruit.itr();
     final String f = FRUITS[i % FRUITS.length];
     return Str.get(f);

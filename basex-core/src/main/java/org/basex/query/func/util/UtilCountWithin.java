@@ -91,8 +91,8 @@ public final class UtilCountWithin extends StandardFunc {
     if(cmm != null && arg(0).equals(expr.arg(0)) && (!or || mm[1] >= cmm[0] && mm[0] <= cmm[1])) {
       final long mn = or ? Math.min(mm[0], cmm[0]) : Math.max(mm[0], cmm[0]);
       final long mx = or ? Math.max(mm[1], cmm[1]) : Math.min(mm[1], cmm[1]);
-      final ExprList args = new ExprList(3).add(arg(0)).add(Int.get(mn));
-      if(mx < Long.MAX_VALUE) args.add(Int.get(mx));
+      final ExprList args = new ExprList(3).add(arg(0)).add(Itr.get(mn));
+      if(mx < Long.MAX_VALUE) args.add(Itr.get(mx));
       return cc.function(_UTIL_COUNT_WITHIN, info, args.finish());
     }
     return null;

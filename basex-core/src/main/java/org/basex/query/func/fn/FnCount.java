@@ -20,14 +20,14 @@ import org.basex.util.*;
  */
 public final class FnCount extends StandardFunc {
   @Override
-  public Int item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // iterative access: if the iterator size is unknown, iterate through all results
     final Iter input = arg(0).iter(qc);
     long size = input.size();
     if(size == -1) {
       do ++size; while(qc.next(input) != null);
     }
-    return Int.get(size);
+    return Itr.get(size);
   }
 
   @Override
@@ -40,7 +40,7 @@ public final class FnCount extends StandardFunc {
     // return static result size
     final Expr input = arg(0);
     final long size = input.size();
-    if(size >= 0 && !input.has(Flag.NDT)) return Int.get(size);
+    if(size >= 0 && !input.has(Flag.NDT)) return Itr.get(size);
 
     // count(map:keys(E))  ->  map:size(E)
     if(_MAP_KEYS.is(input))

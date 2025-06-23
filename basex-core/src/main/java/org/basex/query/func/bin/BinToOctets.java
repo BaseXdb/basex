@@ -20,10 +20,10 @@ public final class BinToOctets extends StandardFunc {
     final Bin binary = toBin(arg(0), qc);
     final byte[] bytes = binary.binary(info);
 
-    return new BasicIter<Int>(bytes.length) {
+    return new BasicIter<Itr>(bytes.length) {
       @Override
-      public Int get(final long i) {
-        return Int.get(bytes[(int) i] & 0xFF);
+      public Itr get(final long i) {
+        return Itr.get(bytes[(int) i] & 0xFF);
       }
       @Override
       public Value value(final QueryContext q, final Expr expr) {

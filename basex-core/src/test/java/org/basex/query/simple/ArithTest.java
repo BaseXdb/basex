@@ -37,8 +37,8 @@ public final class ArithTest extends SandboxTest {
     check("let $n := " + wrap(1) + "[. = 1] return count($n) + count($n) > 0",
         true, root(CmpSimpleG.class));
 
-    check(wrap(3) + "! (. + .)", 6, exists(Int.class), count(ArithSimple.class, 1));
-    check(wrap(3) + "! (. + . + .)", 9, exists(Int.class), count(ArithSimple.class, 1));
+    check(wrap(3) + "! (. + .)", 6, exists(Itr.class), count(ArithSimple.class, 1));
+    check(wrap(3) + "! (. + . + .)", 9, exists(Itr.class), count(ArithSimple.class, 1));
     check(wrap(3) + "! (. + -.)", 0, empty(Unary.class));
     check("xs:decimal(" + wrap(3) + ") ! (. + -.)", 0, empty(Unary.class), root(Dec.class));
   }
@@ -68,7 +68,7 @@ public final class ArithTest extends SandboxTest {
 
     check("xs:decimal(" + wrap(3) + ") ! (. - .)", 0, root(Dec.class));
     check(wrap(3) + "! (. + . - .)", 3, exists(Cast.class), empty(ArithSimple.class));
-    check(wrap(3) + "! (. - -.)", 6, exists(Int.class), empty(Unary.class),
+    check(wrap(3) + "! (. - -.)", 6, exists(Itr.class), empty(Unary.class),
         count(ArithSimple.class, 1));
   }
 
@@ -145,13 +145,13 @@ public final class ArithTest extends SandboxTest {
     check("for $i in (2, 4) return $i idiv $i", "1\n1",
         empty(ArithSimple.class), empty(GFLWOR.class));
 
-    check("xs:decimal(" + wrap(3) + ") ! (. idiv .)", 1, root(Int.class));
+    check("xs:decimal(" + wrap(3) + ") ! (. idiv .)", 1, root(Itr.class));
 
     // GH-2111
-    check("xs:float  (1.13) idiv xs:float  (1.13)", 1, root(Int.class));
-    check("xs:double (1.13) idiv xs:double (1.13)", 1, root(Int.class));
-    check("xs:double (1.13) idiv xs:float  (1.13)", 1, root(Int.class));
-    check("xs:float  (1.13) idiv xs:double (1.13)", 0, root(Int.class));
+    check("xs:float  (1.13) idiv xs:float  (1.13)", 1, root(Itr.class));
+    check("xs:double (1.13) idiv xs:double (1.13)", 1, root(Itr.class));
+    check("xs:double (1.13) idiv xs:float  (1.13)", 1, root(Itr.class));
+    check("xs:float  (1.13) idiv xs:double (1.13)", 0, root(Itr.class));
   }
 
   /** Test method. */
@@ -171,11 +171,11 @@ public final class ArithTest extends SandboxTest {
 
   /** Simplify arithmetic expressions. */
   @Test public void simplify() {
-    check(wrap(1) + "- 1 = 0", true, empty(ArithSimple.class), count(Int.class, 1));
+    check(wrap(1) + "- 1 = 0", true, empty(ArithSimple.class), count(Itr.class, 1));
     check(wrap(1) + "- 1 = " + wrap(1) + " - 1", true,
-        empty(ArithSimple.class), empty(Int.class), exists(Cast.class));
+        empty(ArithSimple.class), empty(Itr.class), exists(Cast.class));
     check(wrap(1) + "- 1 != " + wrap(1) + " - 2", true,
-        count(ArithSimple.class, 1), count(Int.class, 1));
+        count(ArithSimple.class, 1), count(Itr.class, 1));
   }
 
   /** Error in arithmetic calculation result comparison. */

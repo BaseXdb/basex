@@ -222,7 +222,7 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(expr, " { 'mode': 'expression' }"), result);
 
     checkType("()", new TypeInfo(Empty.class, "empty-sequence()", 0));
-    checkType("1", new TypeInfo(Int.class, "xs:integer", 1));
+    checkType("1", new TypeInfo(Itr.class, "xs:integer", 1));
     checkType("1 to 6", new TypeInfo(RangeSeq.class, "xs:integer+", 6));
   }
 

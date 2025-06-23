@@ -18,7 +18,7 @@ import org.junit.jupiter.api.*;
 public final class ArrayRemoveTest extends ArrayTest {
   /** Remove one element from singleton array. */
   @Test public void singletonTest() {
-    final XQArray array = XQArray.get(Int.get(42));
+    final XQArray array = XQArray.get(Itr.get(42));
     assertSame(XQArray.empty(), array.removeMember(0, qc));
   }
 
@@ -32,13 +32,13 @@ public final class ArrayRemoveTest extends ArrayTest {
         final Iterator<Value> iter2 = array2.iterator(0);
         for(int j = 0; j < k - 1; j++) {
           assertTrue(iter2.hasNext());
-          assertEquals(j < i ? j : j + 1, ((Int) iter2.next()).itr());
+          assertEquals(j < i ? j : j + 1, ((Itr) iter2.next()).itr());
         }
         assertFalse(iter2.hasNext());
       }
-      array1 = array1.appendMember(Int.get(k), qc);
+      array1 = array1.appendMember(Itr.get(k), qc);
       assertEquals(k + 1, array1.structSize());
-      assertEquals(k, ((Int) array1.memberAt(k)).itr());
+      assertEquals(k, ((Itr) array1.memberAt(k)).itr());
     }
   }
 
@@ -51,12 +51,12 @@ public final class ArrayRemoveTest extends ArrayTest {
     array2 = array2.removeMember(2, qc);
     assertContains(array2, 1, 2, 4, 6, 7, 8);
 
-    array2 = array.insertMember(0, Int.get(-1), qc).appendMember(Int.get(9), qc);
+    array2 = array.insertMember(0, Itr.get(-1), qc).appendMember(Itr.get(9), qc);
     array2 = array2.removeMember(5, qc);
     array2 = array2.removeMember(5, qc);
     assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8, 9);
 
-    array2 = array.insertMember(0, Int.get(-1), qc);
+    array2 = array.insertMember(0, Itr.get(-1), qc);
     array2 = array2.removeMember(5, qc);
     array2 = array2.removeMember(5, qc);
     assertContains(array2, -1, 0, 1, 2, 3, 6, 7, 8);
@@ -81,7 +81,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     array = array.removeMember(5, qc);
     assertContains(array, 0, 1, 2, 3, 4);
 
-    array = from(1, 2, 3, 4, 5, 6, 7, 8, 9).insertMember(0, Int.ZERO, qc);
+    array = from(1, 2, 3, 4, 5, 6, 7, 8, 9).insertMember(0, Itr.ZERO, qc);
     for(int i = 9; i >= 4; i--) {
       array = array.removeMember(i, qc);
     }
@@ -167,8 +167,8 @@ public final class ArrayRemoveTest extends ArrayTest {
     array = from(
         5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30);
-    for(int i = 4; i >= 0; i--) array = array.insertMember(0, Int.get(i), qc);
-    for(int i = 31; i <= 35; i++) array = array.appendMember(Int.get(i), qc);
+    for(int i = 4; i >= 0; i--) array = array.insertMember(0, Itr.get(i), qc);
+    for(int i = 31; i <= 35; i++) array = array.appendMember(Itr.get(i), qc);
     for(int i = 22; i >= 16; i--) array = array.removeMember(i, qc);
     assertContains(array, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
             14, 15, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
@@ -193,7 +193,7 @@ public final class ArrayRemoveTest extends ArrayTest {
   @Test public void fuzzyTest() {
     final int n = 20_000;
     final ArrayList<Value> list = new ArrayList<>(n);
-    for(int i = 0; i < n; i++) list.add(Int.get(i));
+    for(int i = 0; i < n; i++) list.add(Itr.get(i));
 
     final ArrayBuilder ab = new ArrayBuilder(qc);
     for(final Value value : list) ab.add(value);
@@ -210,7 +210,7 @@ public final class ArrayRemoveTest extends ArrayTest {
 
       if(i % 1000 == 999) {
         for(int j = 0; j < size; j++) {
-          assertEquals(((Int) list.get(j)).itr(), ((Int) array.memberAt(j)).itr());
+          assertEquals(((Itr) list.get(j)).itr(), ((Itr) array.memberAt(j)).itr());
         }
       }
     }
@@ -232,22 +232,22 @@ public final class ArrayRemoveTest extends ArrayTest {
         final Iterator<Value> iter2 = array2.iterator(0);
         for(int j = 0; j < k - 1; j++) {
           assertTrue(iter2.hasNext());
-          assertEquals(j < i ? j : j + 1, ((Int) iter2.next()).itr());
+          assertEquals(j < i ? j : j + 1, ((Itr) iter2.next()).itr());
         }
         assertFalse(iter2.hasNext());
       }
-      array1 = array1.appendMember(Int.get(k), qc);
+      array1 = array1.appendMember(Itr.get(k), qc);
     }
   }
 
   /**
-   * Creates an array containing {@link Int} instances representing the given integers.
+   * Creates an array containing {@link Itr} instances representing the given integers.
    * @param values values in the array
    * @return the array
    */
   private static XQArray from(final int... values) {
     final ArrayBuilder ab = new ArrayBuilder(qc);
-    for(final int value : values) ab.add(Int.get(value));
+    for(final int value : values) ab.add(Itr.get(value));
     return ab.array();
   }
 
@@ -261,7 +261,7 @@ public final class ArrayRemoveTest extends ArrayTest {
     final Iterator<Value> iter = array.iterator(0);
     for(final int value : values) {
       assertTrue(iter.hasNext());
-      assertEquals(value, ((Int) iter.next()).itr());
+      assertEquals(value, ((Itr) iter.next()).itr());
     }
     assertFalse(iter.hasNext());
   }

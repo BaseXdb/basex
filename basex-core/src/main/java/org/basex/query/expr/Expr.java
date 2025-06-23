@@ -347,7 +347,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Optimizes an expression for positional access.
-   * Overwritten by {@link Int}, {@link Range}, {@link RangeSeq}}.
+   * Overwritten by {@link Itr}, {@link Range}, {@link RangeSeq}}.
    * @param op comparison operator
    * @param cc compilation context
    * @return boolean result, optimized or original expression

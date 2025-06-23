@@ -66,7 +66,7 @@ public final class ProfTrack extends StandardFunc {
     // memory consumption
     if(min != -1) {
       Performance.gc(2);
-      mb.put(TrackOptions.MEMORY.name(), Int.get(Math.max(0, Performance.memory() - min)));
+      mb.put(TrackOptions.MEMORY.name(), Itr.get(Math.max(0, Performance.memory() - min)));
     }
     // evaluated value
     if(value != null) mb.put(TrackOptions.VALUE.name(), value);

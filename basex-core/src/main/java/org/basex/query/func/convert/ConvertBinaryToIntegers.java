@@ -19,10 +19,10 @@ public final class ConvertBinaryToIntegers extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final byte[] bytes = toBin(arg(0), qc).binary(info);
-    return new BasicIter<Int>(bytes.length) {
+    return new BasicIter<Itr>(bytes.length) {
       @Override
-      public Int get(final long i) {
-        return Int.get(bytes[(int) i] & 0xFF);
+      public Itr get(final long i) {
+        return Itr.get(bytes[(int) i] & 0xFF);
       }
       @Override
       public Value value(final QueryContext q, final Expr expr) {
@@ -43,7 +43,7 @@ public final class ConvertBinaryToIntegers extends StandardFunc {
    */
   public static Value toValue(final byte[] bytes) {
     final int bl = bytes.length;
-    if(bl == 1) return Int.get(bytes[0] & 0xFF);
+    if(bl == 1) return Itr.get(bytes[0] & 0xFF);
 
     final IntList list = new IntList(bl);
     for(final byte b : bytes) list.add(b & 0xFF);

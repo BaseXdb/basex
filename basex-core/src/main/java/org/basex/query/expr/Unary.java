@@ -78,7 +78,7 @@ public final class Unary extends Single {
     // default: integer
     final long l = item.itr(info);
     if(l == Long.MIN_VALUE) throw RANGE_X.get(info, item);
-    return Int.get(-l);
+    return Itr.get(-l);
   }
 
   @Override

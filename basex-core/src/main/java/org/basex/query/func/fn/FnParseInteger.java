@@ -40,7 +40,7 @@ public final class FnParseInteger extends StandardFunc {
       res = res * rdx + num;
       if(res < 0) throw INTRANGE_X.get(info, value);
     }
-    return Int.get(neg == Boolean.TRUE ? -res : res);
+    return Itr.get(neg == Boolean.TRUE ? -res : res);
   }
 
   @Override

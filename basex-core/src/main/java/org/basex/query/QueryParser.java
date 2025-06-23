@@ -2492,7 +2492,7 @@ public class QueryParser extends InputParser {
     if(quote(cp)) return Str.get(stringLiteral());
     final Expr num = numericLiteral(Long.MAX_VALUE, false);
     if(num != null) {
-      if(Function.ERROR.is(num) || num instanceof Int) return num;
+      if(Function.ERROR.is(num) || num instanceof Itr) return num;
       throw error(NUMBERITR_X_X, num.seqType(), num);
     }
     return Str.get(ncName(KEYSPEC_X));
@@ -2601,7 +2601,7 @@ public class QueryParser extends InputParser {
         if(num != null) throw error(RESERVED_X, name.local());
       } else {
         if(Function.ERROR.is(num)) return num;
-        if(num instanceof Int i) return Functions.item(name, (int) i.itr(), false, info(), qc,
+        if(num instanceof Itr itr) return Functions.item(name, (int) itr.itr(), false, info(), qc,
             moduleURIs.contains(name.uri()));
       }
     }
@@ -2698,9 +2698,9 @@ public class QueryParser extends InputParser {
     if(token.isEmpty()) throw error(NUMBER_X, token);
     // out of range
     if(l.compareTo(BigInteger.valueOf(max != 0 ? max : Long.MAX_VALUE)) > 0)
-      return FnError.get(RANGE_X.get(info(), token), Int.ZERO);
+      return FnError.get(RANGE_X.get(info(), token), Itr.ZERO);
 
-    return Int.get(negate ? -l.longValue() : l.longValue());
+    return Itr.get(negate ? -l.longValue() : l.longValue());
   }
 
   /**
@@ -3888,7 +3888,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr[] ftRange(final boolean i) throws QueryException {
-    final Expr[] occ = { Int.ZERO, Int.MAX };
+    final Expr[] occ = { Itr.ZERO, Itr.MAX };
     if(wsConsumeWs(EXACTLY)) {
       occ[0] = ftAdditive(i);
       occ[1] = occ[0];
@@ -3922,7 +3922,7 @@ public class QueryParser extends InputParser {
     token.reset();
     while(digit(current())) token.add(consume());
     if(token.isEmpty()) throw error(INTEXP);
-    return Int.get(toLong(token.toArray()));
+    return Itr.get(toLong(token.toArray()));
   }
 
   /**

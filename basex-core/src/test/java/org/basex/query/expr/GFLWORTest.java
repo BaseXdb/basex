@@ -428,7 +428,7 @@ public final class GFLWORTest extends SandboxTest {
 
   /** Inlining of positional variable. */
   @Test public void posVar() {
-    check("for $v at $p in (1, 2) where $p = 2 return $v", 2, root(Int.class));
+    check("for $v at $p in (1, 2) where $p = 2 return $v", 2, root(Itr.class));
   }
 
   /** Allowing empty. */

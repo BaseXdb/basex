@@ -35,7 +35,7 @@ public class DbOptionMap extends StandardFunc {
   static Item item(final Object value) throws QueryException {
     if(value == null) return Empty.VALUE;
     if(value instanceof final Boolean bln) return Bln.get(bln);
-    if(value instanceof final Integer itr) return Int.get(itr);
+    if(value instanceof final Integer itr) return Itr.get(itr);
     if(value instanceof final Options options) {
       final MapBuilder mb = new MapBuilder();
       for(final Option<?> opt : options) {

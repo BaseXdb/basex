@@ -707,8 +707,8 @@ public final class FnModuleTest extends SandboxTest {
     check("(1, 3) ! " + func.args(" ."), "1\n3", root(IntSeq.class));
 
     // remove duplicate expressions
-    check(func.args(" (1, <_/>, 1)"), "1\n", count(Int.class, 1));
-    check(func.args(" (1, 1)[. = 1]"), 1, root(Int.class));
+    check(func.args(" (1, <_/>, 1)"), "1\n", count(Itr.class, 1));
+    check(func.args(" (1, 1)[. = 1]"), 1, root(Itr.class));
     check(func.args(" (" + wrap(1) + "," + wrap(1) + ")[. = 1]"), 1,
         empty(List.class), empty(REPLICATE));
     // remove reverse function call
@@ -1079,7 +1079,7 @@ public final class FnModuleTest extends SandboxTest {
     unroll(true);
     check(func.args(" 2 to 5", 1, " function($a, $b) { $a + $b }"), 15,
         empty(func),
-        exists(Int.class));
+        exists(Itr.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 2 to 5", 1, " function($a, $b) { $b[" + _RANDOM_DOUBLE.args() + "] }"), "",
         empty(func),
@@ -1102,7 +1102,7 @@ public final class FnModuleTest extends SandboxTest {
     unroll(true);
     check(func.args(" 1 to 4", 10, " function($a, $b) { $a + $b }"), 20,
         empty(func),
-        exists(Int.class));
+        exists(Itr.class));
     // should be unrolled but not evaluated at compile time
     check(func.args(" 1 to 4", 10, " function($a, $b) { $b[" + _RANDOM_DOUBLE.args() + "] }"), "",
         empty(func),
@@ -1149,7 +1149,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>", exists(REPLICATE));
 
     check(func.args(" (<a/>, <b/>)"), "<b/>", root(CElem.class));
-    check(func.args(" (<a/>, 1 to 2)"), 2, root(Int.class));
+    check(func.args(" (<a/>, 1 to 2)"), 2, root(Itr.class));
   }
 
   /** Test method. */
@@ -1167,7 +1167,7 @@ public final class FnModuleTest extends SandboxTest {
     // pre-compute result size
     query("count(" + func.args(" 1 to 10000000000", " string#1") + ')', 10000000000L);
     check("count(" + func.args(" 1 to 20", " function($a) { $a, $a }") + ')',
-        40, root(Int.class));
+        40, root(Itr.class));
 
     // rewritten to FLWOR expression
     check(func.args(" 0 to 8", " function($x) { $x + 1 }"),
@@ -1334,8 +1334,8 @@ public final class FnModuleTest extends SandboxTest {
         "8\n9", empty(func));
 
     inline(true);
-    check(func.args(" #fn:count", 1) + "((1, 2))", 2, root(Int.class));
-    check(func.args(" #fn:identity", 1) + "(1)", 1, root(Int.class));
+    check(func.args(" #fn:count", 1) + "((1, 2))", 2, root(Itr.class));
+    check(func.args(" #fn:identity", 1) + "(1)", 1, root(Itr.class));
     check(func.args(" #fn:identity", 1) + "(<a/>)", "<a/>", root(CElem.class));
   }
 
@@ -1371,7 +1371,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" <a/>"), "<a/>", empty(func));
     check(func.args(" <a/>[name()]"), "<a/>", empty(func));
     check(func.args(" (<a/>, <b/>)[name()]"), "<a/>", exists(func));
-    check(func.args(" (1, error())"), 1, exists(Int.class));
+    check(func.args(" (1, error())"), 1, exists(Itr.class));
     check(func.args(" reverse((1 to " + wrap(3) + ")[. > 1])"), 3,
         "exists(//IterFilter/FnReverse)");
 
@@ -1399,8 +1399,8 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(REPLICATE.args(" <a/>", " <_>2</_>")), "<a/>",
         exists(REPLICATE));
 
-    check(func.args(" (1, <a/>)"), 1, root(Int.class));
-    check(func.args(" (1 to 2, <a/>)"), 1, root(Int.class));
+    check(func.args(" (1, <a/>)"), 1, root(Itr.class));
+    check(func.args(" (1 to 2, <a/>)"), 1, root(Itr.class));
     check(func.args(" (<a/>[. = ''], 1)"), "<a/>", root(Otherwise.class));
 
     check(func.args(" (<a/>[. = ''], <b/>, <c/>)"), "<a/>", root(Otherwise.class));
@@ -1914,7 +1914,7 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" void(123)"), "", empty(func));
     check(func.args(" 123"), 123, empty(func));
     check(func.args(wrap(1)), 1, exists(func));
-    check(func.args(" (0 to 99999999999) ! (1 to 10000000)"), 1, root(Int.class));
+    check(func.args(" (0 to 99999999999) ! (1 to 10000000)"), 1, root(Itr.class));
 
     // errors
     error(func.args(" #a"), COMPARE_X_X);
@@ -2753,7 +2753,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (1, 2)", "a"), "1\na\n2");
     query(func.args(" (1, 2)", " ('a', 'b')"), "1\na\nb\n2");
 
-    check(func.args(1, "a") + " => count()", 1, root(Int.class));
+    check(func.args(1, "a") + " => count()", 1, root(Itr.class));
     check(func.args(" 1[. = <_>1</_>]", "a"), 1, root(If.class));
     check(func.args(" (1, 2)[. = <_>3</_>]", " 'a'"), "", root(func));
     check(func.args(" (1, 2)", " 'a'[. = <_/>]"), "1\n2", root(func));
@@ -3523,7 +3523,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 1 + <a/>", true), "");
 
     // GH-2139: Simplify inlined nondeterministic code
-    check("let $doc := doc('" + DOC + "') let $a := 1 return $a", 1, root(Int.class));
+    check("let $doc := doc('" + DOC + "') let $a := 1 return $a", 1, root(Itr.class));
   }
 
   /** Test method. */
@@ -3573,7 +3573,7 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args(1, " fn($_, $p) { $p <= 10 }", " op('*')"), 3628800);
 
-    check(func.args(1, " false#0", " identity#1"), 1, root(Int.class));
+    check(func.args(1, " false#0", " identity#1"), 1, root(Itr.class));
     check(func.args(" (1, 2)", " false#0", " identity#1"), "1\n2", root(RangeSeq.class));
 
     // GH-2257

@@ -125,19 +125,19 @@ public final class FnItemsAt extends StandardFunc {
         if(l + 1 > size) return Empty.VALUE;
         // items-at(reverse(E), pos)  ->  items-at(E, size - pos)
         if(REVERSE.is(input))
-          return cc.function(ITEMS_AT, info, input.arg(0), Int.get(size - l));
+          return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(size - l));
         occ = Occ.EXACTLY_ONE;
       }
       if(l == 0) return cc.function(HEAD, info, input);
 
       // items-at(tail(E), pos)  ->  items-at(E, pos + 1)
       if(TAIL.is(input))
-        return cc.function(ITEMS_AT, info, input.arg(0), Int.get(l + 2));
+        return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(l + 2));
       // items-at(replicate(I, count), pos)  ->  I
       if(REPLICATE.is(input)) {
         // static integer will always be greater than 1
         final Expr[] args = input.args();
-        if(args[0].size() == 1 && args[1] instanceof final Int itr) {
+        if(args[0].size() == 1 && args[1] instanceof final Itr itr) {
           return l > itr.itr() ? Empty.VALUE : args[0];
         }
       }
@@ -157,7 +157,7 @@ public final class FnItemsAt extends StandardFunc {
             if(exact && one) return args[a];
             final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
             return exact ? cc.function(HEAD, info, list) :
-              cc.function(ITEMS_AT, info, list, Int.get(l - a + 1));
+              cc.function(ITEMS_AT, info, list, Itr.get(l - a + 1));
           }
           if(!one) break;
         }
@@ -174,7 +174,7 @@ public final class FnItemsAt extends StandardFunc {
 
     // items-at(E, start to end)  ->  util:range(E, start, end)
     if(at instanceof final RangeSeq rs) {
-      Expr expr = cc.function(_UTIL_RANGE, info, input, Int.get(rs.min()), Int.get(rs.max()));
+      Expr expr = cc.function(_UTIL_RANGE, info, input, Itr.get(rs.min()), Itr.get(rs.max()));
       if(!rs.ascending()) expr = cc.function(REVERSE, info, expr);
       return expr;
     }
@@ -211,7 +211,7 @@ public final class FnItemsAt extends StandardFunc {
       if(countInput.test(end)) return 0;
       // function(E, count(E) - 1)  ->  -1
       if(end instanceof final Arith arith && countInput.test(end.arg(0)) &&
-          end.arg(1) instanceof final Int itr) {
+          end.arg(1) instanceof final Itr itr) {
         final Calc calc = arith.calc;
         final long sum = itr.itr();
         if(calc == Calc.ADD) return sum;

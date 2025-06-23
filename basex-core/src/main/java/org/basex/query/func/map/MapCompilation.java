@@ -78,7 +78,7 @@ public final class MapCompilation {
    * @return map information
    */
   public MapCompilation index(final Expr expr) {
-    if(record != null && expr instanceof final Int itr) {
+    if(record != null && expr instanceof final Itr itr) {
       index = (int) itr.itr();
       final TokenObjectMap<RecordField> fields = record.fields();
       if(index > 0 && index <= fields.size()) {

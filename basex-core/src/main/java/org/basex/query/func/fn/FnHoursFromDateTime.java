@@ -18,6 +18,6 @@ public final class FnHoursFromDateTime extends DateTimeFn {
     if(value.isEmpty()) return Empty.VALUE;
 
     final long comp = toGregorian(value, qc).hour();
-    return comp == -1 ? Empty.VALUE : Int.get(comp);
+    return comp == -1 ? Empty.VALUE : Itr.get(comp);
   }
 }

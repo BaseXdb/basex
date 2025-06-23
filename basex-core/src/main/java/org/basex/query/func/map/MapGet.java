@@ -47,7 +47,7 @@ public final class MapGet extends StandardFunc {
       if(mc.field != null) {
         // map:get({ 'a': 1, 'b': 2 }, 'b')  ->  util:map-value-at({ 'a': 1, 'b': 2 }, 2)
         if(!mc.record.hasOptional())
-          return cc.function(_UTIL_MAP_VALUE_AT, info, map, Int.get(mc.index), arg(3));
+          return cc.function(_UTIL_MAP_VALUE_AT, info, map, Itr.get(mc.index), arg(3));
       } else {
         // map:get({ 'a': 1 }, 'b')  ->  ()
         if(!mc.record.isExtensible()) return dflt ? arg(2) : Empty.VALUE;
