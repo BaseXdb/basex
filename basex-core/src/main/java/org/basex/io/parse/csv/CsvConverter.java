@@ -1,7 +1,5 @@
 package org.basex.io.parse.csv;
 
-import static org.basex.query.value.type.SeqType.*;
-
 import java.io.*;
 
 import org.basex.build.csv.*;
@@ -85,7 +83,7 @@ public abstract class CsvConverter extends Job {
     attributes = copts.get(CsvOptions.FORMAT) == CsvFormat.ATTRIBUTES;
     final Value header = copts.get(CsvOptions.HEADER);
     skipEmpty = copts.get(CsvParserOptions.SKIP_EMPTY) && header != Bln.FALSE;
-    if(STRING_ZM.instance(header)) {
+    if(header.seqType().type.isStringOrUntyped()) {
       final TokenSet names = new TokenSet();
       try {
         for(final Item columnName : header) {

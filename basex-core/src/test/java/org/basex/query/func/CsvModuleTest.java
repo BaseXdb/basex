@@ -65,14 +65,20 @@ public final class CsvModuleTest extends SandboxTest {
     parse(" ' \" X\"'", "'quotes': true()", "<csv><record><entry> \" X\"</entry></record></csv>");
     parse(" '\"X \" '", "'quotes': true()", "<csv><record><entry>X  </entry></record></csv>");
 
-    parse("X\nY", "'header': false(), 'format': 'direct'", "...<record><entry>X</entry></record>");
-    parse("X\nY", "'header': 'no', 'format': 'direct'", "...<record><entry>X</entry></record>");
-    parse("X\nY", "'header': '0', 'format': 'direct'", "...<record><entry>X</entry></record>");
-    parse("X\nY", "'header': true(), 'format': 'direct'", "<csv><record><X>Y</X></record></csv>");
-    parse("X\nY", "'header': 'yes', 'format': 'direct'", "<csv><record><X>Y</X></record></csv>");
-    parse("X\nY", "'header': '1', 'format': 'direct'", "<csv><record><X>Y</X></record></csv>");
-    parse("X\nY", "'header': '01', 'format': 'direct'", "...<record><_01>X</_01></record>");
-    parse("X\nY", "'header': '1.0', 'format': 'direct'", "...<record><_1.0>X</_1.0></record>");
+    parse("X\nY", "'header': false(), 'format': 'direct'", "...<entry>X</entry>");
+    parse("X\nY", "'header': 'no', 'format': 'direct'", "...<entry>X</entry>");
+    parse("X\nY", "'header': '0', 'format': 'direct'", "...<entry>X</entry>");
+    parse("X\nY", "'header': <x>0</x>, 'format': 'direct'", "...<entry>X</entry>");
+    parse("X\nY", "'header': <x>false</x>, 'format': 'direct'", "...<entry>X</entry>");
+
+    parse("X\nY", "'header': true(), 'format': 'direct'", "...<X>Y</X>");
+    parse("X\nY", "'header': 'yes', 'format': 'direct'", "...<X>Y</X>");
+    parse("X\nY", "'header': '1', 'format': 'direct'", "...<X>Y</X>");
+    parse("X\nY", "'header': <x>true</x>, 'format': 'direct'", "...<X>Y</X>");
+    parse("X\nY", "'header': <x>1</x>, 'format': 'direct'", "...<X>Y</X>");
+
+    parse("X\nY", "'header': '01', 'format': 'direct'", "...<_01>X</_01>");
+    parse("X\nY", "'header': '1.0', 'format': 'direct'", "...<_1.0>X</_1.0>");
     parse("X\nY", "'header': ('yes', 'no'), 'format': 'direct'", "...<yes>X</yes>");
     parse("X\nY", "'header': ' h ', 'format': 'direct'", "...<h>X</h>");
 

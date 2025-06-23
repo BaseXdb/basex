@@ -65,8 +65,8 @@ public abstract class ParseCsv extends ParseFn {
     } else {
       cpopts = (CsvParserOptions) copts;
       final Value hdr = copts.get(CsvOptions.HEADER);
-      if(hdr instanceof final Str str) {
-        final Boolean b = Strings.toBoolean(string(str.string()));
+      if(hdr.size() == 1 && hdr.seqType().type.isStringOrUntyped()) {
+        final Boolean b = Strings.toBoolean(string(((Item) hdr).string(null)));
         if(b != null) copts.put(CsvOptions.HEADER, Bln.get(b));
       }
     }
