@@ -354,9 +354,9 @@ public final class FilterTest extends SandboxTest {
         exists(LAST), root(CachedFilter.class));
 
     check(expr + "[position() = -65535 to xs:integer(" + wrap(1) + ")]", "<a/>",
-        root(_UTIL_RANGE), "//Int = 1");
+        root(_UTIL_RANGE), "//Itr = 1");
     check(expr + "[position() = 0 to xs:integer(" + wrap(1) + ")]", "<a/>",
-        root(_UTIL_RANGE), "//Int = 1");
+        root(_UTIL_RANGE), "//Itr = 1");
   }
 
   /** Dynamic positional range expressions. */

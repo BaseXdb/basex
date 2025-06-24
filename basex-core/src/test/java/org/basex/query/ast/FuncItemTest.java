@@ -189,7 +189,7 @@ public final class FuncItemTest extends SandboxTest {
         "fn:count($x())",
         1,
         // the query should be pre-evaluated
-        "QueryPlan/Int = 1"
+        "QueryPlan/Itr = 1"
     );
   }
 
