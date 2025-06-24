@@ -15,6 +15,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
@@ -429,6 +430,12 @@ public class Options implements Iterable<Option<?>> {
           if(v.size() != 1) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
           tb.add(string(((Item) v).string(info)).replace(",", ",,"));
         });
+      } else if(item instanceof final XQArray array) {
+        // workaround for array options
+        for(final Value member : array.iterable()) {
+          if(!tb.isEmpty()) tb.add(' ');
+          tb.add(serialize(member, info));
+        }
       } else if(item instanceof final QNm qnm) {
         tb.add(qnm.unique());
       } else {
