@@ -97,7 +97,8 @@ public class AdaptiveSerializer extends OutputSerializer {
           }
         }
       } else if(type == QNAME) {
-        printChars(basex ? Token.concat('#', item.string(null)) : ((QNm) item).eqName());
+        printChar('#');
+        printChars(basex ? item.string(null) : ((QNm) item).unique());
       } else {
         final boolean simple = type == BOOLEAN || type.instanceOf(DECIMAL);
         final byte[] value = simple ? Token.token(item) : value(item.string(null), '"', false);
