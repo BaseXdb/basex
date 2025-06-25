@@ -2962,7 +2962,7 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void sortBy() {
     final Function func = SORT_BY;
     final String input = " ('b', 'a')";
-    query(func.args(input), "a\nb");
+    query(func.args(input, " ()"), "a\nb");
     query(func.args(input, " {}"), "a\nb");
     query(func.args(input, " { 'key': data#1 }"), "a\nb");
     query(func.args(input, " { 'key': data#1, 'order': 'descending' }"), "b\na");

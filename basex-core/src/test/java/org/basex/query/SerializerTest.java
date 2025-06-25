@@ -253,7 +253,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "'A'", "\"A\"");
     query(option + "xs:anyURI('A')", "\"A\"");
     query(option + "xs:untypedAtomic('A')", "\"A\"");
-    query(option + "xs:QName('xml:a')", "Q{http://www.w3.org/XML/1998/namespace}a");
+    query(option + "xs:QName('xml:a')", "#Q{http://www.w3.org/XML/1998/namespace}a");
     query(option + "xs:dayTimeDuration('P1D')", "xs:duration(\"P1D\")");
     query(option + "<xml><a>B</a></xml>", "<xml><a>B</a></xml>");
     query(option + "true#0", "fn:true#0");
@@ -272,7 +272,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "[ 'A' ]", "[\"A\"]");
     query(option + "[ xs:anyURI('A') ]", "[\"A\"]");
     query(option + "[ xs:untypedAtomic('A') ]", "[\"A\"]");
-    query(option + "[ xs:QName('xml:a') ]", "[Q{http://www.w3.org/XML/1998/namespace}a]");
+    query(option + "[ xs:QName('xml:a') ]", "[#Q{http://www.w3.org/XML/1998/namespace}a]");
     query(option + "[ xs:dayTimeDuration('P1D') ]", "[xs:duration(\"P1D\")]");
     query(option + "[ <xml><a>B</a></xml> ]", "[<xml><a>B</a></xml>]");
     query(option + "[ true#0 ]", "[fn:true#0]");

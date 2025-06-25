@@ -428,7 +428,7 @@ public final class MapTest extends SandboxTest {
 
     query("map:build(10_000_000_000)", "{10000000000:10000000000}");
     query("map:build(1, value := fn { 10_000_000_000 })", "{1:10000000000}");
-    query("map:build(1, keys := fn { 10_000_000_000 })", "{10000000000:1}");
+    query("map:build(1, key := fn { 10_000_000_000 })", "{10000000000:1}");
     query("map:build(xs:byte(1)) -> map:keys(.) -> (. instance of xs:byte)", true);
 
     check("map:merge(({ 1: 1 }, { 2: 2 }, { 3: 3 }))",
