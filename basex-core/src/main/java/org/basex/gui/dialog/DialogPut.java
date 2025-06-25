@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
-final class DialogAdd extends BaseXBack {
+final class DialogPut extends BaseXBack {
   /** Dialog reference. */
   private final DialogProps dialog;
   /** Target path. */
@@ -25,17 +25,17 @@ final class DialogAdd extends BaseXBack {
   /** General options. */
   private final DialogImport general;
   /** Add button. */
-  private final BaseXButton add;
+  private final BaseXButton put;
 
   /**
    * Constructor.
    * @param dialog dialog reference
    */
-  DialogAdd(final DialogProps dialog) {
+  DialogPut(final DialogProps dialog) {
     this.dialog = dialog;
     setLayout(new BorderLayout());
 
-    add(new BaseXLabel(ADD_RESOURCES).large().border(0, 0, 16, 0), BorderLayout.NORTH);
+    add(new BaseXLabel(PUT_RESOURCES).large().border(0, 0, 16, 0), BorderLayout.NORTH);
 
     target = new BaseXTextField(dialog, "/");
 
@@ -53,9 +53,9 @@ final class DialogAdd extends BaseXBack {
     add(tabs, BorderLayout.CENTER);
 
     // buttons
-    add = new BaseXButton(dialog, ADD + DOTS);
+    put = new BaseXButton(dialog, PUT + DOTS);
 
-    add(dialog.newButtons(add), BorderLayout.SOUTH);
+    add(dialog.newButtons(put), BorderLayout.SOUTH);
     action(general.parsers);
   }
 
@@ -67,10 +67,10 @@ final class DialogAdd extends BaseXBack {
     final String src = general.input();
     final String trg = target.getText().trim();
 
-    if(comp == add) {
+    if(comp == put) {
       general.setOptions();
       final Runnable run = () -> dialog.resources.refreshNewFolder(trg);
-      DialogProgress.execute(dialog, run, new Add(trg, src));
+      DialogProgress.execute(dialog, run, new Put(trg, src));
     } else {
       boolean ok = general.action(comp, false);
       if(comp == general.browse || comp == general.input) target.setText(general.dbName);
@@ -84,7 +84,7 @@ final class DialogAdd extends BaseXBack {
         inf = RES_NOT_FOUND;
       }
       general.info.setText(inf, Msg.ERROR);
-      add.setEnabled(ok);
+      put.setEnabled(ok);
     }
   }
 }

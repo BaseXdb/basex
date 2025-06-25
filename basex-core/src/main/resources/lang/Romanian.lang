@@ -3,10 +3,8 @@
 
 about_%              = Despre %
 access_denied_%      = Acces refuzat: %.
-add                  = Adăugare
 add_archive_name     = Adaugă numele arhivei in calea documentului
 add_binary_files     = Adăugaţi fişiere rămase ca fişiere RAW
-add_resources        = Adăugaţi resurse
 adjust_nodes         = Reglaţi noduri la text
 admin_static         = Utilizatorul admin nu poate fi modificat.
 algorithm            = Algoritm
@@ -279,6 +277,8 @@ printed              = Tipărit
 printing             = In curs de tipărire
 project              = Project
 properties           = Proprietăți
+put                  = Adăugare
+put_resources        = Adăugaţi resurse
 pw_changed_%         = Parola utilizatorului '%' a  fost schimbata.
 query                = Interogare
 query_executed_%_%   = Interogare % executata in %.

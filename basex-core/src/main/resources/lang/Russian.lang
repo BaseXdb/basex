@@ -3,10 +3,8 @@
 
 about_%              = О %
 access_denied_%      = Доступ запрещен: %
-add                  = Добавить
 add_archive_name     = Добавить имя архива в путь документа
 add_binary_files     = Добавить другие файлы в исходном виде
-add_resources        = Добавить ресурсы
 adjust_nodes         = Подгонять размер узла к ширине текста
 admin_static         = Администратор не может быть изменен
 algorithm            = Алгоритм
@@ -279,6 +277,8 @@ printed              = Выведено
 printing             = Вывод на экран
 project              = Проект
 properties           = Свойства
+put                  = Добавить
+put_resources        = Добавить ресурсы
 pw_changed_%         = Пароль пользователя '%' был изменен
 query                = Запрос
 query_executed_%_%   = Запрос% выполнен за %.

@@ -155,7 +155,7 @@ public abstract class IndexBuilder extends Job {
 
   @Override
   public final String shortInfo() {
-    return CREATING_INDEXES;
+    return CREATING_INDEXES + DOTS;
   }
 
   @Override

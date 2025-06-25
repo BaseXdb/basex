@@ -24,8 +24,7 @@ import org.basex.util.*;
  */
 public final class Add extends ACreate {
   /** Builder. */
-  private Builder builder;
-
+  Builder builder;
   /** Data to insert. */
   Data tmpData;
 
@@ -167,15 +166,5 @@ public final class Add extends ACreate {
   @Override
   public void build(final CmdBuilder cb) {
     cb.init().arg(S_TO, 0).add(1);
-  }
-
-  @Override
-  public String shortInfo() {
-    return ADD;
-  }
-
-  @Override
-  public double progressInfo() {
-    return builder != null ? builder.progressInfo() : 0;
   }
 }

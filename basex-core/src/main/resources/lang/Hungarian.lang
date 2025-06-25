@@ -3,10 +3,8 @@
 
 about_%              = % névjegye
 access_denied_%      = Hozzáférés megtagadva: %.
-add                  = Hozzáadás
 add_archive_name     = Archívumnév hozzáadása a dokumentum-útvonalhoz
 add_binary_files     = A többi fájl raw fájlként történő hozzáadása
-add_resources        = Erőforrások hozzáadása
 adjust_nodes         = Csomópontok szöveggé alakítása
 admin_static         = A Rendszergazda felhasználó nem módosítható.
 algorithm            = Algoritmus
@@ -279,6 +277,8 @@ printed              = Megjelenítve
 printing             = Megjelenítés
 project              = Projekt
 properties           = Tulajdonságok
+put                  = Hozzáadás
+put_resources        = Erőforrások hozzáadása
 pw_changed_%         = '%' felhasználó jelszava megváltozott.
 query                = Lekérdezés
 query_executed_%_%   = % lekérdezés lefutott % alatt.

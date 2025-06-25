@@ -3,10 +3,8 @@
 
 about_%              = %について
 access_denied_%      = アクセスが拒否されました: %。
-add                  = 追加
 add_archive_name     = ドキュメントパスにアーカイブ名を含める
 add_binary_files     = 残りのファイルをRAWファイルとして追加します
-add_resources        = リソースの追加
 adjust_nodes         = ノードをテキストに調整
 admin_static         = Admin ユーザーは編集できません。
 algorithm            = アルゴリズム
@@ -279,6 +277,8 @@ printed              = 印刷しました
 printing             = 印刷中
 project              = プロジェクト
 properties           = プロパティ
+put                  = 追加
+put_resources        = リソースの追加
 pw_changed_%         = ユーザー '%' のパスワードを変更しました。
 query                = クエリー
 query_executed_%_%   = % % のクエリーが実行されました。

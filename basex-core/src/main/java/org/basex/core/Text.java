@@ -1060,7 +1060,7 @@ public interface Text {
   /** Button for deleting all. */
   String DELETE_ALL = lang("delete_all");
   /** Button for adding. */
-  String ADD = lang("add");
+  String PUT = lang("put");
   /** Button for resetting options. */
   String RESET = lang("reset");
   /** Clear button. */
@@ -1119,7 +1119,7 @@ public interface Text {
   /** Add remaining files as binary files. */
   String ADD_BINARY_FILES = lang("add_binary_files");
   /** Add Resources. */
-  String ADD_RESOURCES = lang("add_resources");
+  String PUT_RESOURCES = lang("put_resources");
   /** Skip corrupt files. */
   String SKIP_CORRUPT_FILES = lang("skip_corrupt_files");
   /** SAX parsing information. */

@@ -3,10 +3,8 @@
 
 about_%              = Acerca de %
 access_denied_%      = Acceso denegado: %.
-add                  = Añadir
 add_archive_name     = Incluir el nombre de archivo en la ruta del documento
 add_binary_files     = Añadir otros ficheros en formato binario
-add_resources        = Añadir recursos
 adjust_nodes         = Ajustar nodos al texto
 admin_static         = El usuario Admin no puede ser modificado.
 algorithm            = Algorithmo
@@ -279,6 +277,8 @@ printed              = Impreso
 printing             = Imprimiendo
 project              = Proyecto
 properties           = Propiedades
+put                  = Añadir
+put_resources        = Añadir recursos
 pw_changed_%         = Se ha cambiado la clave del usuario '%'.
 query                = Consulta
 query_executed_%_%   = Consulta % ejecutada en %.

@@ -126,7 +126,7 @@ public final class CreateBackup extends ABackup {
 
   @Override
   public String shortInfo() {
-    return BACKUP;
+    return BACKUP + DOTS;
   }
 
   @Override

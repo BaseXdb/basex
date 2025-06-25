@@ -206,7 +206,7 @@ public abstract class Builder extends Job {
 
   @Override
   public final String shortInfo() {
-    return CREATING_DB;
+    return CREATING_DB + DOTS;
   }
 
   @Override

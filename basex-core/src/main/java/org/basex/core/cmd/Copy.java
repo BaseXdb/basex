@@ -94,7 +94,7 @@ public final class Copy extends Command {
 
   @Override
   public String shortInfo() {
-    return COPY;
+    return COPY + DOTS;
   }
 
   @Override

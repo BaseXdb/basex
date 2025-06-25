@@ -555,7 +555,7 @@ public final class QueryContext extends Job implements Closeable {
 
   @Override
   public String shortInfo() {
-    return SAVE;
+    return SAVE + DOTS;
   }
 
   /**

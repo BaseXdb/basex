@@ -109,7 +109,7 @@ public final class Restore extends ABackup {
 
   @Override
   public String shortInfo() {
-    return RESTORE;
+    return RESTORE + DOTS;
   }
 
   @Override

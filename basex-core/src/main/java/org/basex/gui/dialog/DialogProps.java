@@ -74,7 +74,7 @@ public final class DialogProps extends BaseXDialog {
   private final DialogIndex[] indexes = new DialogIndex[LABELS.length];
 
   /** Add panel. */
-  DialogAdd addPanel;
+  DialogPut addPanel;
   /** Resource panel. */
   DialogResources resources;
 
@@ -93,7 +93,7 @@ public final class DialogProps extends BaseXDialog {
     set(resources, BorderLayout.WEST);
 
     // tabs
-    addPanel = new DialogAdd(this);
+    addPanel = new DialogPut(this);
     addPanel.border(8);
 
     final int ll = LABELS.length;

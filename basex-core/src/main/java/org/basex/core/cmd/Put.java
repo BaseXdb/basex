@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.*;
 import java.util.function.*;
 
+import org.basex.build.*;
 import org.basex.core.parse.*;
 import org.basex.core.users.*;
 import org.basex.data.*;
@@ -20,6 +21,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Put extends ACreate {
+  /** Add command. */
+  private Add add;
+
   /**
    * Constructor.
    * The input needs to be set via {@link #setInput(InputStream)}.
@@ -86,7 +90,7 @@ public final class Put extends ACreate {
       exec.accept(0);
     } else {
       // otherwise, add new document as xml
-      final Add add = new Add(path);
+      add = new Add(path);
       try {
         add.setInput(in);
         add.init(context, out);
@@ -111,5 +115,16 @@ public final class Put extends ACreate {
   @Override
   public void build(final CmdBuilder cb) {
     cb.init().arg(0).add(1);
+  }
+
+  @Override
+  public String shortInfo() {
+    return PUT + DOTS;
+  }
+
+  @Override
+  public double progressInfo() {
+    final Builder builder = add != null ? add.builder : null;
+    return builder != null ? builder.progressInfo() : 0;
   }
 }

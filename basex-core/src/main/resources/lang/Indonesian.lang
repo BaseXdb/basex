@@ -3,10 +3,8 @@
 
 about_%              = Perihal %
 access_denied_%      = Akses ditolak: %.
-add                  = Tambah
 add_archive_name     = Tamhah nama arsip dalam rintis dokumen
 add_binary_files     = Tambah berkas lainnya sebagai berkas mentah
-add_resources        = Tambah sumber daya
 adjust_nodes         = Sesuaikan simpul menjadi teks
 admin_static         = Pengguna Admin tidak dapat diubah.
 algorithm            = Algoritma
@@ -279,6 +277,8 @@ printed              = Tercetak
 printing             = Mencetak
 project              = Proyek
 properties           = Ciri
+put                  = Tambah
+put_resources        = Tambah sumber daya
 pw_changed_%         = Kata kunci dari pengguna '%' telah berubah.
 query                = Kueri
 query_executed_%_%   = Kueri% dijalankan dalam %.
