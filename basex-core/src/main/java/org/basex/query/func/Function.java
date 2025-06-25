@@ -622,7 +622,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()),
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
-  SORT_BY(FnSortBy::new, "sort-by(input[,keys])",
+  SORT_BY(FnSortBy::new, "sort-by(input,keys)",
       params(ITEM_ZM, MAP_ZM), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   SORT_WITH(FnSortWith::new, "sort-with(input,comparators)",
@@ -755,7 +755,7 @@ public enum Function implements AFunction {
   // Map Module
 
   /** XQuery function. */
-  _MAP_BUILD(MapBuild::new, "build(input[,keys,value,options])",
+  _MAP_BUILD(MapBuild::new, "build(input[,key,value,options])",
       params(ITEM_ZM, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE),
       FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType(Occ.ZERO_OR_ONE), MAP_ZO),
       MAP_O, flag(HOF), MAP_URI),
@@ -898,7 +898,7 @@ public enum Function implements AFunction {
       params(ARRAY_O, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType()),
       ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_SORT_BY(ArraySortBy::new, "sort-by(array[,keys])",
+  _ARRAY_SORT_BY(ArraySortBy::new, "sort-by(array,keys)",
       params(ARRAY_O, MAP_ZM), ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SPLIT(ArraySplit::new, "split(array)",
