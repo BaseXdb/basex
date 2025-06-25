@@ -174,7 +174,8 @@ public final class Client {
         if(!ui.assign(rb, response)) return response;
       }
       return client.send(rb.build(), handler);
-    } catch(final InterruptedException ex) {
+    } catch(final InterruptedException | IllegalArgumentException ex) {
+      // illegal argument exception may be caused by wrongly encoded redirect URL
       Util.debug(ex);
       throw new IOException(ex.getMessage());
     }
