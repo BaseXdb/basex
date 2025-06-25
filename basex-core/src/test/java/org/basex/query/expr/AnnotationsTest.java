@@ -26,6 +26,8 @@ public final class AnnotationsTest extends SandboxTest {
     query("declare %private variable $x := 1; $x", 1);
     query("declare namespace a='a';declare %a:a variable $x := 1; $x", 1);
     query("declare namespace a='a';declare %a:a(1) %a:b(2) variable $x:=1; $x", 1);
+    query("declare namespace a='a';declare %a:a(#x) %a:b(#Q{y}z) variable $x:=1; $x", 1);
+    query("declare namespace a='a';declare %a:a(# x) %a:b(# Q{y}z) variable $x:=1; $x", 1);
   }
 
   /** Parsing errors and conflicts. */

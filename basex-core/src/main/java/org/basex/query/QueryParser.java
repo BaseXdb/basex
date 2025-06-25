@@ -453,7 +453,12 @@ public class QueryParser extends InputParser {
               wsCheck(")");
               expr = Bln.get(truee);
             } else {
-              expr = quote(current()) ? Str.get(stringLiteral()) : numericLiteral(0, true);
+              if(quote(current())) expr = Str.get(stringLiteral());
+              else if(!consume('#')) expr = numericLiteral(0, true);
+              else {
+                skipWs();
+                expr = eQName(null, QNAME_X);
+              }
               if(!(expr instanceof Item)) {
                 if(Function.ERROR.is(expr)) expr.item(qc, ii);
                 throw error(ANNVALUE_X, currentAsString());
@@ -2614,8 +2619,10 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr literal() throws QueryException {
-    return quote(current()) ? Str.get(stringLiteral())
-                            : consume('#') ? eQName(null, QNAME_X) : numericLiteral(0, false);
+    if(quote(current())) return Str.get(stringLiteral());
+    if(!consume('#')) return numericLiteral(0, false);
+    skipWs();
+    return eQName(null, QNAME_X);
   }
 
   /**
@@ -3276,6 +3283,7 @@ public class QueryParser extends InputParser {
     }
     // parse literal name
     consume("#");
+    skipWs();
     if(qname) return eQName(SKIPCHECK, null);
 
     // parse name enclosed in quotes
