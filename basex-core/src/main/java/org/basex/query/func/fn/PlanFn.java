@@ -39,7 +39,7 @@ public abstract class PlanFn extends StandardFunc {
   static final Str CHILD = Str.get("child");
 
   /** Conversion plan. */
-  final class Plan {
+  static final class Plan {
     /** Plan entries. */
     final QNmMap<PlanEntry> entries = new QNmMap<>();
     /** Name format. */
