@@ -113,8 +113,8 @@ public final class ValidateModuleTest extends SandboxTest {
       "let $report := " + func.args(" $doc", " $schema") +
       "return $report update {" +
       "  delete node .//message/text()," +
-      "  for $a in .//@* return replace value of node $a with ''" +
-        '}',
+      "  for $a in .//@* return replace value of node $a with '' " +
+      "}",
       "<report><status>invalid</status><message level=\"\" line=\"\" column=\"\"/></report>");
     // check URL attribute
     query("exists(" + func.args(INPUT, DTD) + "//@url)", true);
@@ -142,16 +142,16 @@ public final class ValidateModuleTest extends SandboxTest {
       "return validate:xsd($doc, $schema)", "");
 
     // caching
-    query(func.args(FILE, XSD, " map { 'cache': true() }"), "");
-    query(func.args(FILE, XSD, " map { 'cache': 'yes' }"), "");
-    query(func.args(FILE, XSD, " map { 'cache': 'on' }"), "");
-    query(func.args(FILE, XSD, " map { 'cache': 1 }"), "");
+    query(func.args(FILE, XSD, " { 'cache': true() }"), "");
+    query(func.args(FILE, XSD, " { 'cache': 'yes' }"), "");
+    query(func.args(FILE, XSD, " { 'cache': 'on' }"), "");
+    query(func.args(FILE, XSD, " { 'cache': 1 }"), "");
 
     // invalid arguments
     error(func.args("unknown"), RESWHICH_X);
     error(func.args(FILE, "unknown.xsd"), RESWHICH_X);
     // specify option
-    error(func.args(FILE, XSD, " map { 'unknown-argument': true() }"), VALIDATE_ERROR_X);
+    error(func.args(FILE, XSD, " { 'unknown-argument': true() }"), VALIDATE_ERROR_X);
     error(func.args(FILE), VALIDATE_ERROR_X);
     error(
       "let $doc := <root/> " +
@@ -245,8 +245,8 @@ public final class ValidateModuleTest extends SandboxTest {
       "let $report := " + func.args(" $doc", " $schema") +
       "return $report update {" +
       "  delete node .//message/text()," +
-      "  for $a in .//@* return replace value of node $a with ''" +
-        '}',
+      "  for $a in .//@* return replace value of node $a with '' " +
+      "}",
       "<report><status>invalid</status><message level=\"\" line=\"\" column=\"\"/></report>");
     // check URL attribute
     query("exists(" + func.args(INPUT, XSD) + "//@url)", true);

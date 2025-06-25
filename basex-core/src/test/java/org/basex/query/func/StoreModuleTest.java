@@ -107,7 +107,7 @@ public final class StoreModuleTest extends SandboxTest {
 
     error(func.args("key", " true#0"), BASEX_STORE_X);
     error(func.args("key", " [ function() { 123 } ]"), BASEX_STORE_X);
-    error(func.args("key", " map { 0: concat(1, ?) }"), BASEX_STORE_X);
+    error(func.args("key", " { 0: concat(1, ?) }"), BASEX_STORE_X);
     error(func.args("key", " Q{java.util.Random}new()"), BASEX_STORE_X);
   }
 
@@ -233,18 +233,18 @@ public final class StoreModuleTest extends SandboxTest {
 
     query(put.args("EmptySequence", " ()"));
     query(put.args("SmallSequenceSameType", " (1 to 2) ! <x/>"));
-    query(put.args("SmallSequenceDifferentTypes", " (1, 2, [ 3 ], map { 4: '4' })"));
+    query(put.args("SmallSequenceDifferentTypes", " (1, 2, [ 3 ], { 4: '4' })"));
     query(put.args("BigSequenceSameType", " (1 to 1000) ! <x/>"));
     query(put.args("BigSequenceDifferentTypes", " ((1 to 10) ! string(), 11, 12.5, 13.8e0)"));
 
-    query(put.args("XQMap1", " map { }"));
-    query(put.args("XQMap2", " map { 1: () }"));
-    query(put.args("XQMap3", " map { 'a': 'A', 'b': [ 'B' ], 'c': map { 'C': 'CC' } }"));
+    query(put.args("XQMap1", " {}"));
+    query(put.args("XQMap2", " { 1: () }"));
+    query(put.args("XQMap3", " { 'a': 'A', 'b': [ 'B' ], 'c': { 'C': 'CC' } }"));
     query(put.args("XQMap4", " map:merge((1 to 1000) ! map:entry(., string(.)))"));
 
-    query(put.args("XQArray1", " array { }"));
+    query(put.args("XQArray1", " array {}"));
     query(put.args("XQArray2", " array { 1 }"));
-    query(put.args("XQArray3", " array { 1, [ 2 ], map { 'C': 'CC' } }"));
+    query(put.args("XQArray3", " array { 1, [ 2 ], { 'C': 'CC' } }"));
     query(put.args("XQArray4", " array { 1 to 1000 }"));
     query(put.args("XQArray5", " [ 1 to 1000 ]"));
 

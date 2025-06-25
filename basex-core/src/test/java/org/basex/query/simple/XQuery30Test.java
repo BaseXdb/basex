@@ -73,7 +73,7 @@ public final class XQuery30Test extends QueryTest {
 
       { "Try/catch 1", strings("X"), "try { 1+'a' } catch * { 'X' }" },
       { "Try/catch 2", strings("X"), "try { for $i in (42, 0)" +
-        "return 1 idiv $i } catch * {'X'}" },
+        "return 1 idiv $i } catch * { 'X' }" },
       { "Try/catch 3", integers(42), "try { error(xs:QName('local:error')) } " +
         "catch local:error { 42 }" },
       { "Try/catch 4", integers(42), "try { error(xs:QName('local:error')) } " +

@@ -66,11 +66,11 @@ public final class UpdateModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void mapForEach() {
     final Function func = _UPDATE_MAP_FOR_EACH;
-    query(func.args(" map { 1: 2 }", " %updating function($a, $b) {"
+    query(func.args(" { 1: 2 }", " %updating function($a, $b) {"
         + _UPDATE_OUTPUT.args(" $a + $b") + " }"), 3);
-    query(func.args(" map { 1: 2 }", " function($a, $b) {"
+    query(func.args(" { 1: 2 }", " function($a, $b) {"
         + VOID.args(" $a + $b") + " }"), "");
-    error(func.args(" map { 1: 2 }", " compare#2"), FUNCNOTUP_X);
+    error(func.args(" { 1: 2 }", " compare#2"), FUNCNOTUP_X);
   }
 
   /** Test method. */

@@ -42,8 +42,8 @@ public final class XQueryModuleTest extends SandboxTest {
   @Test public void evalBaseUri() {
     final Function func = _XQUERY_EVAL;
     // queries
-    query(func.args("static-base-uri()", " map { }",
-      " map { 'base-uri': 'http://x.x/' }"), "http://x.x/");
+    query(func.args("static-base-uri()", " {}",
+      " { 'base-uri': 'http://x.x/' }"), "http://x.x/");
   }
 
   /** Test method. */
@@ -51,48 +51,48 @@ public final class XQueryModuleTest extends SandboxTest {
     final Function func = _XQUERY_EVAL;
     // queries
     query(_DB_CREATE.args(NAME));
-    error(func.args(DOC.args(NAME).trim(), " map { }",
-      " map { 'permission': 'none' }"), XQUERY_PERM_X);
-    error(func.args(_DB_GET.args(NAME).trim(), " map { }",
-      " map { 'permission': 'none' }"), XQUERY_PERM_X);
-    error(func.args(_FILE_EXISTS.args("x").trim(), " map { }",
-      " map { 'permission': 'none' }"), XQUERY_PERM_X);
+    error(func.args(DOC.args(NAME).trim(), " {}",
+      " { 'permission': 'none' }"), XQUERY_PERM_X);
+    error(func.args(_DB_GET.args(NAME).trim(), " {}",
+      " { 'permission': 'none' }"), XQUERY_PERM_X);
+    error(func.args(_FILE_EXISTS.args("x").trim(), " {}",
+      " { 'permission': 'none' }"), XQUERY_PERM_X);
   }
 
   /** Test method. */
   @Test public void evalMemory() {
     final Function func = _XQUERY_EVAL;
     // queries
-    error(func.args("(1 to 10000000000000) ! <a/>", " map { }",
-        " map { 'memory': 10 }"), XQUERY_MEMORY);
+    error(func.args("(1 to 10000000000000) ! <a/>", " {}",
+        " { 'memory': 10 }"), XQUERY_MEMORY);
   }
 
   /** Test method. */
   @Test public void evalTimeout() {
     final Function func = _XQUERY_EVAL;
     // queries
-    query("try { " + func.args("(1 to 10000000000000)[. = 0]", " map { }",
-        " map { 'timeout': 1 }") + " } catch * { () }", "");
-    error(func.args("(1 to 10000000000000)[. = 0]", " map { }",
-        " map { 'timeout': 1 }"), XQUERY_TIMEOUT);
+    query("try { " + func.args("(1 to 10000000000000)[. = 0]", " {}",
+        " { 'timeout': 1 }") + " } catch * { () }", "");
+    error(func.args("(1 to 10000000000000)[. = 0]", " {}",
+        " { 'timeout': 1 }"), XQUERY_TIMEOUT);
   }
 
   /** Test method. */
   @Test public void evalBindings() {
     final Function func = _XQUERY_EVAL;
     // queries
-    query(func.args("declare variable $a external; $a", " map { '$a': 'b' }"), "b");
-    query(func.args("declare variable $a external; $a", " map { 'a': 'b' }"), "b");
-    query(func.args("declare variable $a external; $a", " map { 'a': (1, 2) }"), "1\n2");
+    query(func.args("declare variable $a external; $a", " { '$a': 'b' }"), "b");
+    query(func.args("declare variable $a external; $a", " { 'a': 'b' }"), "b");
+    query(func.args("declare variable $a external; $a", " { 'a': (1, 2) }"), "1\n2");
     query(func.args("declare variable $local:a external; $local:a",
-      " map { xs:QName('local:a'): 1 }"), 1);
-    query(func.args(".", " map { '': 1 }"), 1);
+      " { xs:QName('local:a'): 1 }"), 1);
+    query(func.args(".", " { '': 1 }"), 1);
 
     // ensure that global bindings will not overwrite local bindings
     set(MainOptions.BINDINGS, "a=X");
     try {
       error(func.args("declare variable $a external; $a", " ()"), VAREMPTY_X);
-      query(func.args("declare variable $a external; $a", " map { '$a': 'b' }"), "b");
+      query(func.args("declare variable $a external; $a", " { '$a': 'b' }"), "b");
     } finally {
       set(MainOptions.BINDINGS, "");
     }
@@ -143,12 +143,12 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args(" ()"), "");
 
     // options
-    query(func.args(" (1 to 2) ! function() { 1 }", " map { 'results': false() }"), "");
-    query(func.args(" (error#0, true#0)", " map { 'errors': false() }"), true);
-    query(func.args(" (true#0, false#0)", " map { 'parallel': -1 }"), "true\nfalse");
-    query(func.args(" (true#0, false#0)", " map { 'parallel': 100 }"), "true\nfalse");
-    query(func.args(" (true#0, false#0)", " map { 'parallel': 1000000000 }"), "true\nfalse");
-    query(func.args(" (true#0, false#0)", " map { 'parallel': <_>1</_> }"), "true\nfalse");
+    query(func.args(" (1 to 2) ! function() { 1 }", " { 'results': false() }"), "");
+    query(func.args(" (error#0, true#0)", " { 'errors': false() }"), true);
+    query(func.args(" (true#0, false#0)", " { 'parallel': -1 }"), "true\nfalse");
+    query(func.args(" (true#0, false#0)", " { 'parallel': 100 }"), "true\nfalse");
+    query(func.args(" (true#0, false#0)", " { 'parallel': 1000000000 }"), "true\nfalse");
+    query(func.args(" (true#0, false#0)", " { 'parallel': <_>1</_> }"), "true\nfalse");
 
     // optimizations
     check(func.args(" ()"), "", empty());
@@ -177,22 +177,22 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args("1") + "/@updating/string()", false);
     query(func.args("1") + "/QueryPlan/@compiled/string()", false);
 
-    query(func.args("1", " map { 'compile': true() }") + "/QueryPlan/@compiled/string()", true);
-    query(func.args("1", " map { 'plan': false() }") + "/QueryPlan", "");
+    query(func.args("1", " { 'compile': true() }") + "/QueryPlan/@compiled/string()", true);
+    query(func.args("1", " { 'plan': false() }") + "/QueryPlan", "");
 
     final String lib = "module namespace x='x'; declare function x:x() { 1 + 2 };";
     query(func.args(lib) + "/name()", "LibraryModule");
-    query(func.args(lib, " map { 'compile': true() }") + "/name()", "LibraryModule");
+    query(func.args(lib, " { 'compile': true() }") + "/name()", "LibraryModule");
 
     query(func.args("delete node <a/>") + "/name()", "MainModule");
     query(func.args("delete node <a/>") + "/@updating/string()", true);
 
     error(func.args("1+"), CALCEXPR);
     query("\n\ntry {" + func.args("1 +",
-        " map { 'pass': true() }") + "} catch * { $err:line-number }", 1);
+        " { 'pass': true() }") + "} catch * { $err:line-number }", 1);
 
     query("contains(try {" + func.args("1 +",
-        " map { 'base-uri': 'XXXX', 'pass': 'true' }") + "} catch * { $err:module }, 'XXXX')",
+        " { 'base-uri': 'XXXX', 'pass': 'true' }") + "} catch * { $err:module }, 'XXXX')",
         true);
 
     // queries

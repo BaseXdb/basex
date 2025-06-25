@@ -139,10 +139,10 @@ public final class ModuleTest extends SandboxTest {
 
     // import of m works from m1, m2
     query("fn:load-xquery-module('m',"
-        + "{'location-hints': ('" + m1.path() + "', '" + m2.path() + "')})?variables?*", 42);
+        + "{ 'location-hints': ('" + m1.path() + "', '" + m2.path() + "') })?variables?*", 42);
     // import of m fails from m1, m2, o
-    error("fn:load-xquery-module('m', {'location-hints': ('" + m1.path() + "', '" + m2.path()
-        + "', '" + o.path() + "')})", QueryError.MODULE_FOUND_OTHER_X_X);
+    error("fn:load-xquery-module('m', { 'location-hints': ('" + m1.path() + "', '" + m2.path()
+        + "', '" + o.path() + "') })", QueryError.MODULE_FOUND_OTHER_X_X);
   }
 
   /** Tests rejection of functions and variables, when their modules are not explicitly imported. */

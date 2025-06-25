@@ -30,7 +30,7 @@ public final class JobModuleTest extends SandboxTest {
     query(_JOB_LIST.args() + "[. != " + _JOB_CURRENT.args() + "] ! " + _JOB_WAIT.args(" ."));
     // consume cached results
     query("for $id in " + _JOB_LIST_DETAILS.args() + "[@cached = 'true'] " +
-        " return try { " + _JOB_RESULT.args(" $id") + " } catch * { }");
+        " return try { " + _JOB_RESULT.args(" $id") + " } catch * {}");
   }
 
   /** Test method. */
@@ -39,7 +39,7 @@ public final class JobModuleTest extends SandboxTest {
 
     final int ms = 500;
     final String id = query(_JOB_EVAL.args("declare variable $ms external;"
-        + "prof:sleep($ms)", " map { 'ms': " + ms + " }"));
+        + "prof:sleep($ms)", " { 'ms': " + ms + " }"));
     Performance.sleep(ms / 2);
     query(func.args(id) + "?ms", ms);
   }
@@ -48,11 +48,11 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void eval1() {
     final Function func = _JOB_EVAL;
     query(func.args("1"));
-    query(func.args(".", " map { '': '1' }"));
-    query(func.args(".", " map { '': <a/> }"));
-    query(func.args("declare variable $a external;$a", " map { 'a': <a/> }"));
-    query(func.args("static-base-uri()", " map { 'base-uri': 'abc.xq' }"));
-    query(func.args("1", " ()", " map { 'id': '123' }"));
+    query(func.args(".", " { '': '1' }"));
+    query(func.args(".", " { '': <a/> }"));
+    query(func.args("declare variable $a external;$a", " { 'a': <a/> }"));
+    query(func.args("static-base-uri()", " { 'base-uri': 'abc.xq' }"));
+    query(func.args("1", " ()", " { 'id': '123' }"));
   }
 
   /** Test method. */
@@ -75,7 +75,7 @@ public final class JobModuleTest extends SandboxTest {
 
     // error in List implementation
     query("trace(true()) and (" + VOID.args(
-        func.args("prof:sleep(100)", " ()", " map { 'id': 'eval4' }"))  + ", true())",
+        func.args("prof:sleep(100)", " ()", " { 'id': 'eval4' }"))  + ", true())",
         "true");
   }
 
@@ -83,14 +83,14 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void evalError() {
     // errors
     final Function func = _JOB_EVAL;
-    error(func.args("1", " ()", " map { 'start': 'abc' }"), DATEFORMAT_X_X_X);
+    error(func.args("1", " ()", " { 'start': 'abc' }"), DATEFORMAT_X_X_X);
     error(func.args("1", " ()",
-        " map { 'start': '2030-01-01T01:01:01', 'end': '2029-01-01T01:01:01' }"), JOBS_RANGE_X);
-    error(func.args("1", " ()", " map { 'interval': '12345' }"), DATEFORMAT_X_X_X);
-    error(func.args("1", " ()", " map { 'interval': '-PT1S' }"), JOBS_RANGE_X);
-    error(func.args("1", " ()", " map { 'id': 'job123' }"), JOBS_ID_INVALID_X);
-    error(func.args("1", " ()", " map { 'id': 'job123' }"), JOBS_ID_INVALID_X);
-    error("(1, 2) ! " + func.args(SLOW_QUERY, " ()", " map { 'id': 'abc', 'cache': true() }"),
+        " { 'start': '2030-01-01T01:01:01', 'end': '2029-01-01T01:01:01' }"), JOBS_RANGE_X);
+    error(func.args("1", " ()", " { 'interval': '12345' }"), DATEFORMAT_X_X_X);
+    error(func.args("1", " ()", " { 'interval': '-PT1S' }"), JOBS_RANGE_X);
+    error(func.args("1", " ()", " { 'id': 'job123' }"), JOBS_ID_INVALID_X);
+    error(func.args("1", " ()", " { 'id': 'job123' }"), JOBS_ID_INVALID_X);
+    error("(1, 2) ! " + func.args(SLOW_QUERY, " ()", " { 'id': 'abc', 'cache': true() }"),
         JOBS_ID_EXISTS_X);
   }
 
@@ -98,7 +98,7 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void evalStart() {
     // delayed execution
     final Function func = _JOB_EVAL;
-    final String id = query(func.args(" 'prof:sleep(200)'", " ()", " map { 'start': 'PT0.2S' }"));
+    final String id = query(func.args(" 'prof:sleep(200)'", " ()", " { 'start': 'PT0.2S' }"));
     // ensure that query is not run again
     Performance.sleep(100);
     query(_JOB_FINISHED.args(id), true);
@@ -112,7 +112,7 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void evalInterval() {
     // scheduled execution
     final Function func = _JOB_EVAL;
-    final String id = query(func.args("prof:sleep(400)", " ()", " map { 'interval': 'PT1S' }"));
+    final String id = query(func.args("prof:sleep(400)", " ()", " { 'interval': 'PT1S' }"));
     // ensure that query is running
     Performance.sleep(200);
     query(_JOB_FINISHED.args(id), false);
@@ -136,7 +136,7 @@ public final class JobModuleTest extends SandboxTest {
     // scheduled execution
     final Function func = _JOB_EVAL;
     final String id = query(func.args("123", " ()",
-      " map { 'interval': 'PT1S', 'end': 'PT1.5S' }"));
+      " { 'interval': 'PT1S', 'end': 'PT1.5S' }"));
     // ensure that query is running
     Performance.sleep(500);
     query(_JOB_LIST.args() + "='" + id + '\'', true);
@@ -145,26 +145,26 @@ public final class JobModuleTest extends SandboxTest {
 
     // error
     error(func.args("1", " ()",
-      " map { 'start': 'PT2S', 'interval': 'PT1S', 'end': 'PT1S' }"),
+      " { 'start': 'PT2S', 'interval': 'PT1S', 'end': 'PT1S' }"),
       JOBS_RANGE_X);
   }
 
   /** Test method. */
   @Test public void evalService() {
     final Function func = _JOB_EVAL;
-    query(func.args("1", " ()", " map { 'id': 'ID', 'service': true() }"));
+    query(func.args("1", " ()", " { 'id': 'ID', 'service': true() }"));
     query(_FILE_EXISTS.args(_DB_OPTION.args("dbpath") + "|| '/jobs.xml'"), true);
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", true);
     query(_JOB_REMOVE.args("id"));
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", true);
-    query(_JOB_REMOVE.args("ID", " map { 'service': true() }"));
+    query(_JOB_REMOVE.args("ID", " { 'service': true() }"));
     query("exists(" + _JOB_SERVICES.args() + "[@id = 'ID'])", false);
   }
 
   /** Test method. */
   @Test public void evalSleep() {
     final Function func = _JOB_EVAL;
-    query(func.args("1", " ()", " map { 'cache': true() }") + " ! (" +
+    query(func.args("1", " ()", " { 'cache': true() }") + " ! (" +
         _PROF_SLEEP.args(500) + ", " + _JOB_LIST_DETAILS.args(" .") + "/@duration = 'PT0S'"
     + ")", true);
   }
@@ -183,7 +183,7 @@ public final class JobModuleTest extends SandboxTest {
 
     // write UUID into logs
     final String uuid = UUID.randomUUID().toString();
-    final String id = query(func.args("1", " ()", " map { 'log': '" + uuid + "' }"));
+    final String id = query(func.args("1", " ()", " { 'log': '" + uuid + "' }"));
     query(_JOB_WAIT.args(id));
     // find log entry
     final String date = DateTime.format(new Date(), DateTime.DATE);
@@ -264,7 +264,7 @@ public final class JobModuleTest extends SandboxTest {
   @Test public void result() throws Exception {
     // receive result of asynchronous execution
     final Function func = _JOB_RESULT;
-    query("let $q :=" + _JOB_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }") +
+    query("let $q :=" + _JOB_EVAL.args(SLOW_QUERY, " ()", " { 'cache': true() }") +
       " return (" + WHILE_DO.args(" ()",
         " function($_) { not(" + _JOB_FINISHED.args(" $q") + ") }",
         " function($_) { " + _PROF_SLEEP.args(1) + " }") + "," + func.args(" $q") + ")", 1);
@@ -274,7 +274,7 @@ public final class JobModuleTest extends SandboxTest {
     assertEquals("", query(func.args(id)));
 
     // receive cached result
-    id = query(_JOB_EVAL.args(SLOW_QUERY, " ()", " map { 'cache': true() }"));
+    id = query(_JOB_EVAL.args(SLOW_QUERY, " ()", " { 'cache': true() }"));
     while(true) {
       try {
         assertEquals("1", eval(func.args(id)));
@@ -290,7 +290,7 @@ public final class JobModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void resultEmpty() {
     final Function func = _JOB_RESULT;
-    final String id = query(_JOB_EVAL.args("()", " ()", " map { 'cache': true() }"));
+    final String id = query(_JOB_EVAL.args("()", " ()", " { 'cache': true() }"));
     query(_JOB_WAIT.args(id));
     query(_JOB_LIST_DETAILS.args(id), "");
     query(func.args(id), "");
@@ -299,24 +299,24 @@ public final class JobModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void resultRemove() {
     final Function func = _JOB_RESULT;
-    final String id = query(_JOB_EVAL.args("1", " ()", " map { 'cache': true() }"));
+    final String id = query(_JOB_EVAL.args("1", " ()", " { 'cache': true() }"));
     query(_JOB_WAIT.args(id));
     query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', true);
-    query(func.args(id, " map { 'keep': true () }"), 1);
+    query(func.args(id, " { 'keep': true () }"), 1);
     query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', true);
-    query(func.args(id, " map { 'keep': true () }"), 1);
+    query(func.args(id, " { 'keep': true () }"), 1);
     query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', true);
 
-    query(func.args(id, " map { 'keep': false() }"), 1);
+    query(func.args(id, " { 'keep': false() }"), 1);
     query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', false);
-    query(func.args(id, " map { 'keep': false() }"), "");
+    query(func.args(id, " { 'keep': false() }"), "");
     query("exists(" + _JOB_LIST_DETAILS.args(id) + ')', false);
   }
 
   /** Test method. */
   @Test public void resultError() {
     final Function func = _JOB_RESULT;
-    final String id = query(_JOB_EVAL.args("db:get('db')", " ()", " map { 'cache': true() }"));
+    final String id = query(_JOB_EVAL.args("db:get('db')", " ()", " { 'cache': true() }"));
     query(_JOB_WAIT.args(id));
     error(func.args(id), DB_GET2_X);
   }
@@ -324,7 +324,7 @@ public final class JobModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void waitFor() {
     final Function func = _JOB_WAIT;
-    query(func.args(_JOB_EVAL.args("1", " ()", " map { 'start': 'PT0.1S' }")));
+    query(func.args(_JOB_EVAL.args("1", " ()", " { 'start': 'PT0.1S' }")));
     error(func.args(_JOB_CURRENT.args()), JOBS_SELF_X);
   }
 

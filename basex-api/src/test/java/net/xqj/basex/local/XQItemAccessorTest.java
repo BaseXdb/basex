@@ -394,7 +394,7 @@ public final class XQItemAccessorTest extends XQJBaseTest {
    * @throws XQException XQuery exception
    */
   @Test public void testProcessingInstruction() throws XQException {
-    nodeTest("processing-instruction {'a'} {'b'}", "<?a b?>",
+    nodeTest("processing-instruction { 'a' } { 'b' }", "<?a b?>",
       XQITEMKIND_PI);
   }
 

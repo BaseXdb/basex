@@ -81,7 +81,7 @@ public final class MixUpdatesTest extends SandboxTest {
 
   /** Test method. */
   @Test public void functionItem() {
-    query("let $x := <a>a</a> update { } return (delete node $x/text(), [$x])", "[<a/>]");
+    query("let $x := <a>a</a> update {} return (delete node $x/text(), [$x])", "[<a/>]");
   }
 
   /** Test method. */
@@ -103,9 +103,9 @@ public final class MixUpdatesTest extends SandboxTest {
 
   /** Test method. */
   @Test public void gh2136() {
-    query(_XQUERY_EVAL.args(" '<a/> update { }'"), "<a/>");
-    query(_XQUERY_EVAL.args(" 'function() { <a/> update { } }'") + "()", "<a/>");
-    query(_XQUERY_EVAL.args(" 'function() { <a/> update { } }'") + " ! .()", "<a/>");
+    query(_XQUERY_EVAL.args(" '<a/> update {}'"), "<a/>");
+    query(_XQUERY_EVAL.args(" 'function() { <a/> update {} }'") + "()", "<a/>");
+    query(_XQUERY_EVAL.args(" 'function() { <a/> update {} }'") + " ! .()", "<a/>");
 
     query("<x/> !" + FOR_EACH_PAIR.args(" .", " .", " contains#2"), true);
     query("<x/> !" + _UPDATE_FOR_EACH_PAIR.args(" .", " .", " contains#2"), true);

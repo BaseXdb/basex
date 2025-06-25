@@ -96,7 +96,7 @@ public final class NamespaceTest extends SandboxTest {
     error("namespace p { '' }", CNINVNS_X);
     error("namespace p { 'http://www.w3.org/2000/xmlns/' }", CNINVNS_X);
 
-    error("namespace xml {'' }", CNXML);
+    error("namespace xml { '' }", CNXML);
     error("namespace xml { 'http://www.w3.org//XML/1998/namespace' }", CNXML);
 
     error("namespace xmlns { 'u' }", CNINV_X);
@@ -113,7 +113,7 @@ public final class NamespaceTest extends SandboxTest {
     error("<_ xmlns='A'>{ element E { namespace { '' } { 'B' } } }</_>",
         DUPLNSCONS_X);
 
-    error("element e { namespace {''} {'u'} }",
+    error("element e { namespace { '' } { 'u' } }",
         EMPTYNSCONS);
     error("<e xmlns=''>{ namespace { '' } { 'B' } }</e>",
         EMPTYNSCONS);
@@ -220,7 +220,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void insertAttributeWithNs() {
     create(1);
-    query("insert node attribute { QName('ns', 'prefix:local') } { } into /*");
+    query("insert node attribute { QName('ns', 'prefix:local') } {} into /*");
     final Data data = context.data();
     assertFalse(data.nsFlag(0));
     assertTrue(data.nsFlag(1));
@@ -607,7 +607,7 @@ public final class NamespaceTest extends SandboxTest {
    */
   @Test public void duplAttribute1() {
     error(
-      "<e xmlns='URI' a=''/> update { insert node attribute a { } into . }",
+      "<e xmlns='URI' a=''/> update { insert node attribute a {} into . }",
       UPATTDUPL_X);
   }
 

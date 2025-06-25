@@ -118,7 +118,7 @@ public final class FastReplaceTest extends SandboxTest {
    */
   @Test public void replaceAttribute() {
     query("replace node (//item)[1]/attribute() with " +
-      "(attribute att1 {'0'}, attribute att2 {'1'})");
+      "(attribute att1 { '0' }, attribute att2 { '1' })");
     query("(//item)[1]/attribute()/string()", "0\n1");
   }
 
@@ -128,7 +128,7 @@ public final class FastReplaceTest extends SandboxTest {
    */
   @Test public void replaceAttribute2() {
     query("for $i in //item return replace node $i/attribute() with " +
-        "(attribute att1 {'0'}, attribute att2 {'1'})");
+        "(attribute att1 { '0' }, attribute att2 { '1' })");
     query("//item/attribute()/string()");
   }
 }

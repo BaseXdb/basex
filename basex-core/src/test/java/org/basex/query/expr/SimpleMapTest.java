@@ -58,7 +58,7 @@ public final class SimpleMapTest extends SandboxTest {
     query("5 ! string(.)", "5");
     query("(1, 2) ! position()", "1\n2");
     query("(1, 2) ! last()", "2\n2");
-    query("map { } ! head(?_) ! string()", "");
+    query("{} ! head(?_) ! string()", "");
 
     check("1 ! .", 1, root(Itr.class));
     check("(1, 2)[. = 1] ! .", 1, root(IterFilter.class));
@@ -91,8 +91,8 @@ public final class SimpleMapTest extends SandboxTest {
     check("'1' ! (., number())", "1\n1", root(SmallSeq.class));
     check("let $a := document { <a/> } return $a ! (., /)", "<a/>\n<a/>", empty(VarRef.class));
     check("let $d := document{} return $d ! /", "", root(CDoc.class));
-    check("map { 1: 2 } ! ?*", 2, root(Itr.class));
-    check("let $n := map { 1: 2 } return $n ! ?*", 2, root(Itr.class));
+    check("{ 1: 2 } ! ?*", 2, root(Itr.class));
+    check("let $n := { 1: 2 } return $n ! ?*", 2, root(Itr.class));
   }
 
   /** Errors. */

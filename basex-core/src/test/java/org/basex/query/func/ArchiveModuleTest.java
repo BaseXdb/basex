@@ -37,16 +37,16 @@ public final class ArchiveModuleTest extends SandboxTest {
     countEntries(func.args(" <archive:entry encoding='US-ASCII'>X</archive:entry>", ""), 1);
     countEntries(func.args(" <archive:entry " +
         "last-modified='2000-01-01T12:12:12'>X</archive:entry>", ""), 1);
-    countEntries(func.args(" <archive:entry>X</archive:entry>", "", " map { }"), 1);
+    countEntries(func.args(" <archive:entry>X</archive:entry>", "", " {}"), 1);
     countEntries(func.args(" <archive:entry>X</archive:entry>", "",
-        " map { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
-    countEntries(func.args("X", "", " map { }"), 1);
+        " { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
+    countEntries(func.args("X", "", " {}"), 1);
     countEntries(func.args(" <archive:entry>X</archive:entry>", "",
-        " map { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
+        " { 'format': 'zip', 'algorithm': 'deflate' }"), 1);
     countEntries(func.args(" <archive:entry>X</archive:entry>", "",
-        " map { 'format': 'zip' }"), 1);
+        " { 'format': 'zip' }"), 1);
     countEntries(func.args(" <archive:entry>X</archive:entry>", "",
-        " map { 'format': 'gzip' }"), 1);
+        " { 'format': 'gzip' }"), 1);
 
     // different number of entries and contents
     error(func.args("X", " ()"), ARCHIVE_NUMBER_X_X);
@@ -68,37 +68,37 @@ public final class ArchiveModuleTest extends SandboxTest {
     error(func.args(" <archive:entry encoding='US-ASCII'>X</archive:entry>", "\u00fc"),
         ARCHIVE_ENCODE2_X);
     // format not supported
-    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'format': 'rar' }"),
+    error(func.args(" <archive:entry>X</archive:entry>", "", " { 'format': 'rar' }"),
         ARCHIVE_FORMAT);
     // unknown option
-    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'x': 'y' }"), INVALIDOPTION_X);
-    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'format': 'xxx' }"),
+    error(func.args(" <archive:entry>X</archive:entry>", "", " { 'x': 'y' }"), INVALIDOPTION_X);
+    error(func.args(" <archive:entry>X</archive:entry>", "", " { 'format': 'xxx' }"),
         ARCHIVE_FORMAT);
     // algorithm not supported
-    error(func.args(" <archive:entry>X</archive:entry>", "", " map { 'algorithm': 'unknown' }"),
+    error(func.args(" <archive:entry>X</archive:entry>", "", " { 'algorithm': 'unknown' }"),
         ARCHIVE_FORMAT_X_X);
     // algorithm not supported
-    error(func.args(" ('x', 'y')", " ('a', 'b')", " map { 'format': 'gzip' }"), ARCHIVE_SINGLE_X);
+    error(func.args(" ('x', 'y')", " ('a', 'b')", " { 'format': 'gzip' }"), ARCHIVE_SINGLE_X);
   }
 
   /** Test method. */
   @Test public void createFrom() {
     final Function func = _ARCHIVE_CREATE_FROM;
     countEntries(func.args(DIR), 5);
-    countEntries(func.args(DIR, " map { }"), 5);
-    countEntries(func.args(DIR, " map { 'algorithm': 'stored' }"), 5);
+    countEntries(func.args(DIR, " {}"), 5);
+    countEntries(func.args(DIR, " { 'algorithm': 'stored' }"), 5);
 
-    countEntries(func.args(DIR, " map { 'recursive': false() }"), 4);
-    query(_ARCHIVE_ENTRIES.args(func.args(DIR, " map { 'root-dir': true() }")) +
+    countEntries(func.args(DIR, " { 'recursive': false() }"), 4);
+    query(_ARCHIVE_ENTRIES.args(func.args(DIR, " { 'root-dir': true() }")) +
         "[not(starts-with(., 'dir/'))]", "");
 
-    query("parse-xml(" + _ARCHIVE_EXTRACT_TEXT.args(func.args(DIR, " map { }"),
+    query("parse-xml(" + _ARCHIVE_EXTRACT_TEXT.args(func.args(DIR, " {}"),
         "input.xml") + ") instance of document-node()", true);
 
     // errors
     error(func.args("UNUNUNKNOWN"), FILE_NO_DIR_X);
-    error(func.args(DIR, " map { }", "UNUNUNKNOWN"), FILE_NOT_FOUND_X);
-    error(func.args(DIR, " map { }", "."), FILE_IS_DIR_X);
+    error(func.args(DIR, " {}", "UNUNUNKNOWN"), FILE_NOT_FOUND_X);
+    error(func.args(DIR, " {}", "."), FILE_IS_DIR_X);
   }
 
   /** Test method. */
@@ -121,7 +121,7 @@ public final class ArchiveModuleTest extends SandboxTest {
         "let $updated := " + func.args(" $archive", " tail($entries)") +
         "return count(archive:entries($updated))", 1);
     // updates an existing entry
-    error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " => " + func.args("X"),
+    error(_ARCHIVE_CREATE.args("X", "X", " { 'format': 'gzip' }") + " => " + func.args("X"),
         ARCHIVE_MODIFY_X);
   }
 
@@ -317,7 +317,7 @@ public final class ArchiveModuleTest extends SandboxTest {
         func.args(" <archive:entry>X</archive:entry>", "Y") + " => " +
         _ARCHIVE_EXTRACT_TEXT.args(), "Y");
     // updates an existing entry
-    error(_ARCHIVE_CREATE.args("X", "X", " map { 'format': 'gzip' }") + " => " +
+    error(_ARCHIVE_CREATE.args("X", "X", " { 'format': 'gzip' }") + " => " +
         func.args("X", "Y"), ARCHIVE_MODIFY_X);
   }
 

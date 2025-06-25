@@ -24,11 +24,10 @@ public final class FTQueryTest extends SandboxTest {
   /** Wildcard queries. */
   @Test public void gh1800() {
     final String text = "999 aa 1111";
-    query(_DB_CREATE.args(NAME, " <name>" + text + "</name>", NAME,
-        " map { 'ftindex': true() }"));
+    query(_DB_CREATE.args(NAME, " <name>" + text + "</name>", NAME, " { 'ftindex': true() }"));
 
     final Function func = _FT_SEARCH;
-    final String options = " map { 'mode': 'all words', 'wildcards': true() }";
+    final String options = " { 'mode': 'all words', 'wildcards': true() }";
     query(func.args(NAME, " ('aa.*', '1111.*')", options), text);
     query(func.args(NAME, " ('aa.*', '111.*')",  options), text);
     query(func.args(NAME, " ('aa.*', '11.*')",   options), text);
@@ -47,12 +46,12 @@ public final class FTQueryTest extends SandboxTest {
   @Test public void gh1802() {
     final String text = "ab\u1e25";
     final Function func = _FT_SEARCH;
-    final String options = " map { 'wildcards': true() }";
+    final String options = " { 'wildcards': true() }";
 
     // run queries with and without diacritics
     for(final boolean dc : new boolean[] { false, true }) {
       query(_DB_CREATE.args(NAME, " <name>" + text + "</name>", NAME,
-          " map { 'ftindex': true(), 'diacritics': " + dc + "() }"));
+          " { 'ftindex': true(), 'diacritics': " + dc + "() }"));
       query(func.args(NAME, "...",      options), text);
       query(func.args(NAME, "..\u1e25", options), text);
       query(func.args(NAME, ".b.",      options), text);
@@ -82,14 +81,14 @@ public final class FTQueryTest extends SandboxTest {
 
   /** XQuery, full-text search: Levenshtein errors. */
   @Test public void gh1673() {
-    query(_DB_CREATE.args(NAME, " <x>1</x>", NAME, " map { 'ftindex': true() }"));
+    query(_DB_CREATE.args(NAME, " <x>1</x>", NAME, " { 'ftindex': true() }"));
 
     query(_FT_SEARCH.args(NAME, "2"), "");
     query(_FT_CONTAINS.args("1", "2"), false);
-    query(_FT_SEARCH.args(NAME, "2", " map { 'fuzzy': true(), 'errors': 0 }"), "");
-    query(_FT_CONTAINS.args("1", "2", " map { 'fuzzy': true(), 'errors': 0 }"), false);
-    query(_FT_SEARCH.args(NAME, "2", " map { 'fuzzy': true(), 'errors': 1 }"), 1);
-    query(_FT_CONTAINS.args("1", "2", " map { 'fuzzy': true(), 'errors': 1 }"), true);
+    query(_FT_SEARCH.args(NAME, "2", " { 'fuzzy': true(), 'errors': 0 }"), "");
+    query(_FT_CONTAINS.args("1", "2", " { 'fuzzy': true(), 'errors': 0 }"), false);
+    query(_FT_SEARCH.args(NAME, "2", " { 'fuzzy': true(), 'errors': 1 }"), 1);
+    query(_FT_CONTAINS.args("1", "2", " { 'fuzzy': true(), 'errors': 1 }"), true);
 
     query("'a' contains text 'b' using fuzzy 0 errors", false);
     query("'a' contains text 'b' using fuzzy 1 errors", true);
@@ -99,14 +98,14 @@ public final class FTQueryTest extends SandboxTest {
   /** Fuzzy search: handling many similar terms. */
   @Test public void gh2014() {
     query(_DB_CREATE.args(NAME, " <a><b>aaaa aabc aaab</b><b>bbbb</b><b>aaad</b></a>",
-        NAME, " map { 'ftindex': true() }"));
+        NAME, " { 'ftindex': true() }"));
     query(_FT_SEARCH.args(NAME, "aaaa"), "aaaa aabc aaab");
-    query(_FT_SEARCH.args(NAME, "aaaa", " map { 'fuzzy': true() }"), "aaaa aabc aaab\naaad");
+    query(_FT_SEARCH.args(NAME, "aaaa", " { 'fuzzy': true() }"), "aaaa aabc aaab\naaad");
 
     query(_DB_CREATE.args(NAME, " <x>{ for $i in 1 to 100000 " +
         "return <b>{ format-number($i, '000000000000') }</b>} </x>",
-        NAME, " map { 'ftindex': true() }"));
-    query("count(" + _FT_SEARCH.args(NAME, "000000000000", " map { 'fuzzy': true() }") + ')',
+        NAME, " { 'ftindex': true() }"));
+    query("count(" + _FT_SEARCH.args(NAME, "000000000000", " { 'fuzzy': true() }") + ')',
         8146);
   }
 
@@ -118,8 +117,8 @@ public final class FTQueryTest extends SandboxTest {
 
   /** Full-Text Search: Fuzzy Phrases. */
   @Test public void gh2081() {
-    query(_DB_CREATE.args(NAME, " <_>test a text</_>", NAME, " map { 'ftindex': true() }"));
-    query(_FT_SEARCH.args(NAME, "test a", " map { 'fuzzy': true() }"), "test a text");
-    query(_FT_SEARCH.args(NAME, "a test", " map { 'fuzzy': true() }"), "test a text");
+    query(_DB_CREATE.args(NAME, " <_>test a text</_>", NAME, " { 'ftindex': true() }"));
+    query(_FT_SEARCH.args(NAME, "test a", " { 'fuzzy': true() }"), "test a text");
+    query(_FT_SEARCH.args(NAME, "a test", " { 'fuzzy': true() }"), "test a text");
   }
 }

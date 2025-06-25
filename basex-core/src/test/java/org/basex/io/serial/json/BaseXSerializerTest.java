@@ -39,12 +39,12 @@ public final class BaseXSerializerTest extends SandboxTest {
     serialize("contains(?, 'x')", "(anonymous-function)#1");
 
     // maps
-    serialize("map { 'x': 'y' }", "{'x':'y'}");
-    serialize("map { 'x': () }", "{'x':()}");
-    serialize("map { 'x': (1, 2) }", "{'x':(1,2)}");
-    serialize("map { 'x': true#0 }", "{'x':fn:true#0}");
-    serialize("map { 'x': (true#0, false#0) }", "{'x':(fn:true#0,fn:false#0)}");
-    serialize("map { xs:date('2001-01-01'): 'd', '2001-01-01': 'd' }",
+    serialize("{ 'x': 'y' }", "{'x':'y'}");
+    serialize("{ 'x': () }", "{'x':()}");
+    serialize("{ 'x': (1, 2) }", "{'x':(1,2)}");
+    serialize("{ 'x': true#0 }", "{'x':fn:true#0}");
+    serialize("{ 'x': (true#0, false#0) }", "{'x':(fn:true#0,fn:false#0)}");
+    serialize("{ xs:date('2001-01-01'): 'd', '2001-01-01': 'd' }",
         "{'2001-01-01':'d','2001-01-01':'d'}");
 
     // arrays
@@ -54,9 +54,9 @@ public final class BaseXSerializerTest extends SandboxTest {
     serialize("[ () ]", "[()]");
 
     serialize("[ <a/> ]", "[<a/>]");
-    serialize("[ <a/> update { } ]", "[<a/>]");
+    serialize("[ <a/> update {} ]", "[<a/>]");
     serialize("[ document { <a/> } ]", "[<a/>]");
-    serialize("[ document { <a/> } update { } ]", "[<a/>]");
+    serialize("[ document { <a/> } update {} ]", "[<a/>]");
   }
 
   /**

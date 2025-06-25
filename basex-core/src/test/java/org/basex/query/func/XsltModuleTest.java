@@ -35,8 +35,8 @@ public final class XsltModuleTest extends SandboxTest {
 
     style = wrap("<xsl:param name='t'/><xsl:template match='/'>" +
         "<X><xsl:value-of select='$t'/></X></xsl:template>");
-    query(func.args(doc, ' ' + style, " map { 't': '1' }"), "<X>1</X>");
-    query(func.args(doc, ' ' + style, " map { 't' : text { '1' } }"), "<X>1</X>");
+    query(func.args(doc, ' ' + style, " { 't': '1' }"), "<X>1</X>");
+    query(func.args(doc, ' ' + style, " { 't' : text { '1' } }"), "<X>1</X>");
   }
 
   /** Test method. */
@@ -50,7 +50,7 @@ public final class XsltModuleTest extends SandboxTest {
 
     style = wrap("<xsl:param name='t'/><xsl:output omit-xml-declaration='yes'/>" +
       "<xsl:template match='/'><xsl:value-of select='$t'/></xsl:template>");
-    query(func.args(doc, ' ' + style, " map { 't': '1' }"), 1);
+    query(func.args(doc, ' ' + style, " { 't': '1' }"), 1);
   }
 
   /** Test method. */

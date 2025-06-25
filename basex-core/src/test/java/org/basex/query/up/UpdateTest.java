@@ -74,7 +74,7 @@ public final class UpdateTest extends SandboxTest {
   /** Transform expression shadowing another variable. */
   @Test public void shadowing() {
     query("let $c := <x/> return copy $c := $c modify () return $c", "<x/>");
-    query("declare variable $d := document{ <x/> } update { }; $d/x", "<x/>");
+    query("declare variable $d := document{ <x/> } update {}; $d/x", "<x/>");
   }
 
   /** Transform expression containing a simple expression. */
@@ -142,7 +142,7 @@ public final class UpdateTest extends SandboxTest {
   @Test public void insertIntoAsFirst2() {
     query(transform("<a att='0'/>",
         "insert node <b/> as first into $input, replace node $input/@att with " +
-        "(attribute {'att1'}{0}, attribute {'att2'}{0})"),
+        "(attribute { 'att1' } { 0 }, attribute { 'att2' } { 0 })"),
         "<a att1=\"0\" att2=\"0\"><b/></a>");
   }
 
@@ -236,7 +236,7 @@ public final class UpdateTest extends SandboxTest {
 
     // replace with a + delete a + insert a
     q = transform("<x a='a'/>",
-        "delete node $input/@a, replace node $input/@a with attribute a {'b'}," +
+        "delete node $input/@a, replace node $input/@a with attribute a { 'b' }," +
         "insert node attribute a { 'b' } into $input");
     error(q, UPATTDUPL_X);
   }
@@ -254,7 +254,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void replaceAttribute() {
     query(transform("<a att0='0'/>",
-        "replace node $input/@att0 with (attribute att1 {'1'}, attribute att2 {'2'})"),
+        "replace node $input/@att0 with (attribute att1 { '1' }, attribute att2 { '2' })"),
         "<a att1=\"1\" att2=\"2\"/>");
   }
 
@@ -264,7 +264,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void replaceAttribute2() {
     query(transform("<a><b att0='0'/><c/></a>",
-        "replace node $input/b/@att0 with attribute att1 {'1'}"),
+        "replace node $input/b/@att0 with attribute att1 { '1' }"),
         "<a><b att1=\"1\"/><c/></a>");
   }
 
@@ -274,7 +274,7 @@ public final class UpdateTest extends SandboxTest {
    */
   @Test public void replaceAttribute3() {
     query(transform("<a id='0' id2='0'/>",
-        "replace node $input/@id with (attribute b {'1'}, attribute c {'2'})"),
+        "replace node $input/@id with (attribute b { '1' }, attribute c { '2' })"),
         "<a b=\"1\" c=\"2\" id2=\"0\"/>");
   }
 
@@ -1014,7 +1014,7 @@ public final class UpdateTest extends SandboxTest {
   /** Tests the combination of transform expressions and xquery:eval(). */
   @Test public void evalFItem() {
     query("declare function local:c() { copy $a := <a/> modify () return $a };" +
-      "xquery:eval('declare variable $c external; $c()', map { 'c': local:c#0 })", "<a/>");
+      "xquery:eval('declare variable $c external; $c()', { 'c': local:c#0 })", "<a/>");
   }
 
   /** Tests adding an attribute and thus crossing the {@link IO#MAXATTS} line. */
@@ -1033,18 +1033,18 @@ public final class UpdateTest extends SandboxTest {
 
   /** Tests the "update" and "transform with" operators. */
   @Test public void update() {
-    query("<x/> update { }", "<x/>");
+    query("<x/> update {}", "<x/>");
     query("<x/> update { insert node <y/> into . }", "<x><y/></x>");
-    query("<x/> update { }", "<x/>");
-    query("<x/> update { } update { }", "<x/>");
-    query("<x/> update { }", "<x/>");
-    query("(<x/>, <y/>) update { }", "<x/>\n<y/>");
-    error(_UPDATE_OUTPUT.args("a") + " update { }", UPNOT_X);
+    query("<x/> update {}", "<x/>");
+    query("<x/> update {} update {}", "<x/>");
+    query("<x/> update {}", "<x/>");
+    query("(<x/>, <y/>) update {}", "<x/>\n<y/>");
+    error(_UPDATE_OUTPUT.args("a") + " update {}", UPNOT_X);
     error("<x/> update { 1 }", UPMODIFY);
 
-    query("(<a>X</a>/text() update { })/..", "");
+    query("(<a>X</a>/text() update {})/..", "");
 
-    query("<x/> transform with { }", "<x/>");
+    query("<x/> transform with {}", "<x/>");
     query("<x/> transform with { insert node <y/> into . }", "<x><y/></x>");
     error(_UPDATE_OUTPUT.args("a") + " transform with {}", UPNOT_X);
     error("<x/> transform with { 1 }", UPMODIFY);
@@ -1157,13 +1157,13 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh1576() {
     query(_UPDATE_OUTPUT.args(" [ ]"), "[]");
     query(_UPDATE_OUTPUT.args(" [ 1, (2, [ 3, 4 ]) ]"), "[1,(2,[3,4])]");
-    query(_UPDATE_OUTPUT.args(" map { }"), "{}");
-    query(_UPDATE_OUTPUT.args(" map { 1: map { 2: 3 }}"), "{1:{2:3}}");
+    query(_UPDATE_OUTPUT.args(" {}"), "{}");
+    query(_UPDATE_OUTPUT.args(" { 1: { 2: 3 }}"), "{1:{2:3}}");
 
     error(_UPDATE_OUTPUT.args(" true#0"), BASEX_STORE_X);
     error(_UPDATE_OUTPUT.args(" [ true#0 ]"), BASEX_STORE_X);
     error(_UPDATE_OUTPUT.args(" [1, (2, [ 3, true#0 ])]"), BASEX_STORE_X);
-    error(_UPDATE_OUTPUT.args(" map { 1: map { 2: true#0 }}"), BASEX_STORE_X);
+    error(_UPDATE_OUTPUT.args(" { 1: { 2: true#0 }}"), BASEX_STORE_X);
   }
 
   /** Test. */
@@ -1173,8 +1173,8 @@ public final class UpdateTest extends SandboxTest {
 
   /** Do not merge non-updating expressions. */
   @Test public void gh1943() {
-    query("let $c := <a/> ! (. update { }, . update { }) return $c[1] is $c[2]", false);
-    query("let $a := <a/> let $c := ($a update { }, $a update { }) return $c[1] is $c[2]", false);
+    query("let $c := <a/> ! (. update {}, . update {}) return $c[1] is $c[2]", false);
+    query("let $a := <a/> let $c := ($a update {}, $a update {}) return $c[1] is $c[2]", false);
 
     query("<a/> ! (copy $_ := . modify () return $_)", "<a/>");
     query("let $a := <a/> let $c := ("
@@ -1273,7 +1273,7 @@ public final class UpdateTest extends SandboxTest {
   /** Update document, ADDCACHE option. */
   @Test public void gh1989() {
     createDB("<a/>");
-    query(_DB_PUT.args(NAME, DOC, "Sandbox.xml", " map { 'addcache': true() }"));
+    query(_DB_PUT.args(NAME, DOC, "Sandbox.xml", " { 'addcache': true() }"));
     query(_DB_EXISTS.args(NAME), true);
     query(_DB_EXISTS.args(NAME + ".0"), false);
   }
@@ -1290,11 +1290,11 @@ public final class UpdateTest extends SandboxTest {
 
   /** Too many element/attribute names. */
   @Test public void gh2042() {
-    error("<_>{ (1 to 100000) ! element { 'x' || . } {} }</_> update { }",
+    error("<_>{ (1 to 100000) ! element { 'x' || . } {} }</_> update {}",
         BASEX_LIMIT_X_X);
-    error("<_>{ (1 to 100000) ! <_>{ attribute { 'x' || . } {} }</_>}</_> update { }",
+    error("<_>{ (1 to 100000) ! <_>{ attribute { 'x' || . } {} }</_>}</_> update {}",
         BASEX_LIMIT_X_X);
-    error("<_>{ (1 to 1000) ! <_>{ namespace { 'x' || . } { . } }</_>}</_> update { }",
+    error("<_>{ (1 to 1000) ! <_>{ namespace { 'x' || . } { . } }</_>}</_> update {}",
         BASEX_LIMIT_X_X);
   }
 
@@ -1331,7 +1331,7 @@ public final class UpdateTest extends SandboxTest {
   @Test public void gh2206() {
     final BiConsumer<String, String> run = (query, uri) ->
       query("(<_>{ " + query + "}</_> update {}) ! namespace-uri(*)", uri);
-    run.accept("web:response-header(headers := map { 'a':'b' })//*:header",
+    run.accept("web:response-header(headers := { 'a':'b' })//*:header",
         "http://expath.org/ns/http-client");
     run.accept("json-to-xml('{\"A\":1}')/*/*", "http://www.w3.org/2005/xpath-functions");
     run.accept("analyze-string('a', 'a')/*", "http://www.w3.org/2005/xpath-functions");

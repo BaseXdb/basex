@@ -42,27 +42,27 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" ('A', 'B')", " ('C', 'B')"), true);
 
     // check match options
-    query(func.args("Assignments", "Azzignments", " map { 'fuzzy': 'yes' }"), true);
-    query(func.args("Assignments", "Azzignments", " map { 'fuzzy': 'no' }"), false);
-    query(func.args("Assignments", "assignment", " map { 'stemming': true() }"), true);
-    query(func.args("Assignment", "assignments", " map { 'stemming': true() }"), true);
-    query(func.args("A", "a", " map { 'case': 'upper' }"), true);
-    query(func.args("a", "A", " map { 'case': 'lower' }"), true);
-    query(func.args("A", "a", " map { 'case': 'insensitive' }"), true);
-    query(func.args("A", "a", " map { 'case': 'sensitive' }"), false);
+    query(func.args("Assignments", "Azzignments", " { 'fuzzy': 'yes' }"), true);
+    query(func.args("Assignments", "Azzignments", " { 'fuzzy': 'no' }"), false);
+    query(func.args("Assignments", "assignment", " { 'stemming': true() }"), true);
+    query(func.args("Assignment", "assignments", " { 'stemming': true() }"), true);
+    query(func.args("A", "a", " { 'case': 'upper' }"), true);
+    query(func.args("a", "A", " { 'case': 'lower' }"), true);
+    query(func.args("A", "a", " { 'case': 'insensitive' }"), true);
+    query(func.args("A", "a", " { 'case': 'sensitive' }"), false);
     // check search modes
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'phrase' }"), false);
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'all' }"), false);
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'any' }"), false);
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'any word' }"), true);
-    query(func.args("Exercise 1", "1 Exercise", " map { 'mode': 'all words' }"), true);
+    query(func.args("Exercise 1", "1 Exercise", " { 'mode': 'phrase' }"), false);
+    query(func.args("Exercise 1", "1 Exercise", " { 'mode': 'all' }"), false);
+    query(func.args("Exercise 1", "1 Exercise", " { 'mode': 'any' }"), false);
+    query(func.args("Exercise 1", "1 Exercise", " { 'mode': 'any word' }"), true);
+    query(func.args("Exercise 1", "1 Exercise", " { 'mode': 'all words' }"), true);
 
     query(func.args("databases and xml", "databases xml",
-        " map { 'mode': 'all words', 'distance': map { 'min': 0, 'max': 1 } }"), true);
+        " { 'mode': 'all words', 'distance': { 'min': 0, 'max': 1 } }"), true);
     query(func.args("databases and xml", "databases xml",
-        " map { 'mode': 'all words', 'distance': map { 'max': 0 } }"), false);
+        " { 'mode': 'all words', 'distance': { 'max': 0 } }"), false);
     query(func.args("databases and xml", "databases xml",
-        " map { 'mode': 'all words', 'window': map { 'size': 3 } }"), true);
+        " { 'mode': 'all words', 'window': { 'size': 3 } }"), true);
 
     // GH-2296
     query(func.args("serch", "serch", " { 'fuzzy': true() }"), true);
@@ -78,8 +78,8 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args("serch", "行イ音便", " { 'fuzzy': true() }"), false);
 
     // check buggy options
-    error(func.args("x", "x", " map { 'x': 'y' }"), INVALIDOPTION_X);
-    error(func.args("x", "x", " map { 'mode': '' }"), INVALIDOPTION_X);
+    error(func.args("x", "x", " { 'x': 'y' }"), INVALIDOPTION_X);
+    error(func.args("x", "x", " { 'mode': '' }"), INVALIDOPTION_X);
     error(func.args("x", "x", " 1"), INVCONVERT_X_X_X);
   }
 
@@ -140,18 +140,18 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" []"), "");
 
     query(func.args("A bc"), "a bc");
-    query(func.args("A bc", " map { 'case': 'sensitive' }"), "A bc");
-    query(func.args("\u00e4", " map { 'diacritics': 'sensitive' }"), "\u00e4");
-    query(func.args("gifts", " map { 'stemming': 'true' }"), "gift");
+    query(func.args("A bc", " { 'case': 'sensitive' }"), "A bc");
+    query(func.args("\u00e4", " { 'diacritics': 'sensitive' }"), "\u00e4");
+    query(func.args("gifts", " { 'stemming': 'true' }"), "gift");
 
     query("declare ft-option using stemming; " + func.args("Gifts"), "gift");
     query(func.args(""), "");
     query(func.args("a!b:c"), "a!b:c");
 
-    query(_FT_NORMALIZE.args("&#778;", " map { 'stemming': true(), 'language': 'de' }"), "");
+    query(_FT_NORMALIZE.args("&#778;", " { 'stemming': true(), 'language': 'de' }"), "");
     query("'/' ! " + func.args(" ."), "/");
 
-    query(_FT_NORMALIZE.args("a*", " map { 'stemming': true(), 'language': 'de' }"), "a*");
+    query(_FT_NORMALIZE.args("a*", " { 'stemming': true(), 'language': 'de' }"), "a*");
   }
 
   /** Test method. */
@@ -180,29 +180,29 @@ public final class FtModuleTest extends SandboxTest {
     execute(new CreateIndex(CmdIndex.FULLTEXT));
 
     // check match options
-    query(func.args(NAME, "Assignments", " map { }"), "Assignments");
-    query(func.args(NAME, "Azzignments", " map { 'fuzzy': 'yes' }"), "Assignments");
-    query(func.args(NAME, "Azzignments", " map { 'fuzzy': 'no' }"), "");
+    query(func.args(NAME, "Assignments", " {}"), "Assignments");
+    query(func.args(NAME, "Azzignments", " { 'fuzzy': 'yes' }"), "Assignments");
+    query(func.args(NAME, "Azzignments", " { 'fuzzy': 'no' }"), "");
     // check search modes
-    query(func.args(NAME, "1 Exercise", " map { 'mode': 'phrase' }"), "");
-    query(func.args(NAME, "1 Exercise", " map { 'mode': 'all' }"), "");
-    query(func.args(NAME, "1 Exercise", " map { 'mode': 'any' }"), "");
-    query(func.args(NAME, "1 Exercise", " map { 'mode': 'any word' }"), "Exercise 1\nExercise 2");
-    query(func.args(NAME, "1 Exercise", " map { 'mode': 'all words' }"), "Exercise 1");
+    query(func.args(NAME, "1 Exercise", " { 'mode': 'phrase' }"), "");
+    query(func.args(NAME, "1 Exercise", " { 'mode': 'all' }"), "");
+    query(func.args(NAME, "1 Exercise", " { 'mode': 'any' }"), "");
+    query(func.args(NAME, "1 Exercise", " { 'mode': 'any word' }"), "Exercise 1\nExercise 2");
+    query(func.args(NAME, "1 Exercise", " { 'mode': 'all words' }"), "Exercise 1");
 
     query(func.args(NAME, "databases xml",
-        " map { 'mode': 'all words', 'distance': map { 'min': 0, 'max': 1 } }"),
+        " { 'mode': 'all words', 'distance': { 'min': 0, 'max': 1 } }"),
         "Databases and XML");
     query(func.args(NAME, "databases xml",
-        " map { 'mode': 'all words', 'distance': map { 'max': 0 } }"),
+        " { 'mode': 'all words', 'distance': { 'max': 0 } }"),
         "");
     query(func.args(NAME, "databases xml",
-        " map { 'mode': 'all words', 'window': map { 'size': 3 } }"),
+        " { 'mode': 'all words', 'window': { 'size': 3 } }"),
         "Databases and XML");
 
     // check buggy options
-    error(func.args(NAME, "x", " map { 'x': 'y' }"), INVALIDOPTION_X);
-    error(func.args(NAME, "x", " map { 'mode': '' }"), INVALIDOPTION_X);
+    error(func.args(NAME, "x", " { 'x': 'y' }"), INVALIDOPTION_X);
+    error(func.args(NAME, "x", " { 'mode': '' }"), INVALIDOPTION_X);
     error(func.args(NAME, "x", " 1"), INVCONVERT_X_X_X);
   }
 
@@ -212,10 +212,10 @@ public final class FtModuleTest extends SandboxTest {
     final String doc = " doc('src/test/resources/thesaurus.xml')";
 
     query(func.args(doc, "happy"), "lucky\nhappy");
-    query(func.args(doc, "happy", " map { 'levels': 0 }"), "");
-    query(func.args(doc, "happy", " map { 'levels': 5 }"), "lucky\nhappy");
-    query(func.args(doc, "happy", " map { 'relationship': 'RT' }"), "lucky\nhappy");
-    query(func.args(doc, "happy", " map { 'relationship': 'XYZ' }"), "");
+    query(func.args(doc, "happy", " { 'levels': 0 }"), "");
+    query(func.args(doc, "happy", " { 'levels': 5 }"), "lucky\nhappy");
+    query(func.args(doc, "happy", " { 'relationship': 'RT' }"), "lucky\nhappy");
+    query(func.args(doc, "happy", " { 'relationship': 'XYZ' }"), "");
   }
 
   /** Test method. */
@@ -226,9 +226,9 @@ public final class FtModuleTest extends SandboxTest {
     query(func.args(" []"), "");
 
     query(func.args("A bc"), "a\nbc");
-    query(func.args("A bc", " map { 'case': 'sensitive' }"), "A\nbc");
-    query(func.args("\u00e4", " map { 'diacritics': 'sensitive' }"), "\u00e4");
-    query(func.args("gifts", " map { 'stemming': 'true' }"), "gift");
+    query(func.args("A bc", " { 'case': 'sensitive' }"), "A\nbc");
+    query(func.args("\u00e4", " { 'diacritics': 'sensitive' }"), "\u00e4");
+    query(func.args("gifts", " { 'stemming': 'true' }"), "gift");
 
     query("declare ft-option using stemming; " + func.args("Gifts"), "gift");
     query("count(" + func.args("") + ')', 0);

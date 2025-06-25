@@ -129,10 +129,10 @@ public final class ArrayTest extends SandboxTest {
     query("element a { [ <b>c</b> ] }", "<a><b>c</b></a>");
     query("element a { [ <b>c</b>, <b>d</b> ] }", "<a><b>c</b><b>d</b></a>");
 
-    query("element { [ 'a' ] } { }", "<a/>");
+    query("element { [ 'a' ] } {}", "<a/>");
 
-    error("element { [ 'a', 'b' ] } { }", SEQFOUND_X);
-    error("element { [] } { }", STRQNM_X_X);
+    error("element { [ 'a', 'b' ] } {}", SEQFOUND_X);
+    error("element { [] } {}", STRQNM_X_X);
   }
 
   /** Attribute constructor. */
@@ -148,10 +148,10 @@ public final class ArrayTest extends SandboxTest {
     query("attribute a { [ 1 ] }/string()", 1);
     query("attribute a { [ 1, 2 ] }/string()", "1 2");
 
-    query("attribute { [ 'a' ] } { }/name()", "a");
+    query("attribute { [ 'a' ] } {}/name()", "a");
 
-    error("attribute { [ 'a', 'b' ] } { }", SEQFOUND_X);
-    error("attribute { [] } { }", STRQNM_X_X);
+    error("attribute { [ 'a', 'b' ] } {}", SEQFOUND_X);
+    error("attribute { [] } {}", STRQNM_X_X);
   }
 
   /** Attribute constructor. */
@@ -182,8 +182,8 @@ public final class ArrayTest extends SandboxTest {
   @Test public void piConstructor() {
     query("processing-instruction { [ 'a' ] } { [ 'b' ] }", "<?a b?>");
 
-    error("processing-instruction { [] } { }", STRNCN_X_X);
-    error("processing-instruction { [ 'a', 'b' ] } { }", SEQFOUND_X);
+    error("processing-instruction { [] } {}", STRNCN_X_X);
+    error("processing-instruction { [ 'a', 'b' ] } {}", SEQFOUND_X);
   }
 
   /** Group by clause. */

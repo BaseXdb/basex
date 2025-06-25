@@ -41,12 +41,12 @@ public final class XQuery4Test extends SandboxTest {
 
   /** Lookup operator. */
   @Test public void lookup() {
-    query("map { } ? ''", "");
-    query("map { '': 1 } ? ''", 1);
+    query("{} ? ''", "");
+    query("{ '': 1 } ? ''", 1);
 
-    query("let $m := map { '': 1 } return $m?''", 1);
-    query("let $_ := '' return map { '': 1 } ? $_", 1);
-    query("let $_ := '' let $m := map { '': 1 } return $m?$_", 1);
+    query("let $m := { '': 1 } return $m?''", 1);
+    query("let $_ := '' return { '': 1 } ? $_", 1);
+    query("let $_ := '' let $m := { '': 1 } return $m?$_", 1);
 
     query("declare variable $_ := 1; [ 9 ]?$_", 9);
   }
@@ -60,8 +60,9 @@ public final class XQuery4Test extends SandboxTest {
 
     query("declare record local:rect(height, width, area := %method fn() { ?height × ?width }); "
         + "let $r := local:rect(3, 4) return local:rect(5, 6, $r?area)?area()", 12);
-    query("{'self': %method fn() { . } }?self() => map:keys()", "self");
-    query("let $f := %method fn() {?i}, $h := ({'i': 7, 'f': $f}, {'i': 11, 'g': $f})?('f', 'g') "
+    query("{ 'self': %method fn() { . } }?self() => map:keys()", "self");
+    query("let $f := %method fn() {?i} "
+        + "let $h := ({ 'i': 7, 'f': $f }, { 'i': 11, 'g': $f })?('f', 'g') "
         + "return $h[1]() * $h[2]()", 77);
 
     error("(" + rect + "=> map:get('area'))()", NOCTX_X);
@@ -137,7 +138,7 @@ public final class XQuery4Test extends SandboxTest {
 
   /** Function items (fn syntax). */
   @Test public void fn() {
-    query("fn() { }()", "");
+    query("fn() {}()", "");
     query("fn($a) { $a }(())", "");
     query("fn($a) { $a }(1)", 1);
     query("fn($a) { $a }(1 to 2)", "1\n2");
@@ -153,11 +154,11 @@ public final class XQuery4Test extends SandboxTest {
 
   /** GFLWOR: for key/value. */
   @Test public void forKeyValue() {
-    query("for key $k value $v in map { } return $k * $v", "");
+    query("for key $k value $v in {} return $k * $v", "");
 
-    query("for key $k in map { 2: 3 } return $k", 2);
-    query("for value $v in map { 2: 3 } return $v", 3);
-    query("for key $k value $v in map { 2: 3 } return $k * $v", 6);
+    query("for key $k in { 2: 3 } return $k", 2);
+    query("for value $v in { 2: 3 } return $v", 3);
+    query("for key $k value $v in { 2: 3 } return $k * $v", 6);
 
     error("for key $k allowing empty in 1 return ()", WRONGCHAR_X_X);
     error("for value $v allowing empty in 1 return ()", WRONGCHAR_X_X);
@@ -192,8 +193,8 @@ public final class XQuery4Test extends SandboxTest {
     query("- function{ . }(1)", -1);
     query("--function{ . }(1)", 1);
 
-    query("() =!> (function { })()", "");
-    query("1 =!> (function { })()", "");
+    query("() =!> (function {})()", "");
+    query("1 =!> (function {})()", "");
     query("() =!> (function { . })()", "");
     query("1 =!> (function { . })()", 1);
     query("(1, 2) =!> (function { . })()", "1\n2");
@@ -252,9 +253,9 @@ public final class XQuery4Test extends SandboxTest {
     query("1 =!> ([ 'A' ])()", "A");
     query("1 =!> (array { 'B' })()", "B");
     query("(1, 2) =!> (array { 'C', 'D' })()", "C\nD");
-    query("1 =!> (map { 1: 'V' })()", "V");
-    query("(1, 2) =!> (map { 1: 'W', 2: 'X' })()", "W\nX");
-    query("let $map := map { 0: 'off', 1: 'on' } return 1 =!> $map()", "on");
+    query("1 =!> ({ 1: 'V' })()", "V");
+    query("(1, 2) =!> ({ 1: 'W', 2: 'X' })()", "W\nX");
+    query("let $map := { 0: 'off', 1: 'on' } return 1 =!> $map()", "on");
     query("(1, 2) =!> ([ 3[2], 1[0] ])()", "");
 
     query("256 ! 2 =!> xs:byte()", 2);
@@ -336,20 +337,20 @@ public final class XQuery4Test extends SandboxTest {
 
   /** New if syntax. */
   @Test public void iff() {
-    query("if(0) { }", "");
+    query("if(0) {}", "");
     query("if(1) { 2 }", 2);
     query("if(1) { 2 } else { 3 }", 2);
-    query("if(0) { } else { 1 }", 1);
-    query("if(0) { } else if(1) { 2 }", 2);
-    query("if(0) { } else if(0) { } else { 1 }", 1);
-    query("if(0) { } else if(0) { } else if(0) { } else if(0) { } else { 1 }", 1);
+    query("if(0) {} else { 1 }", 1);
+    query("if(0) {} else if(1) { 2 }", 2);
+    query("if(0) {} else if(0) {} else { 1 }", 1);
+    query("if(0) {} else if(0) {} else if(0) {} else if(0) {} else { 1 }", 1);
 
-    error("if() { }", NOIF);
-    error("if(0) { } else", WRONGCHAR_X_X);
-    error("if(0) { } else ()", WRONGCHAR_X_X);
-    error("if(0) { } else if() { }", NOIF);
-    error("if(0) { } else if(0) then", WRONGCHAR_X_X);
-    error("if(0) { } else if(0) { } else", WRONGCHAR_X_X);
+    error("if() {}", NOIF);
+    error("if(0) {} else", WRONGCHAR_X_X);
+    error("if(0) {} else ()", WRONGCHAR_X_X);
+    error("if(0) {} else if() {}", NOIF);
+    error("if(0) {} else if(0) then", WRONGCHAR_X_X);
+    error("if(0) {} else if(0) {} else", WRONGCHAR_X_X);
   }
 
   /** Constructor functions. */
@@ -459,21 +460,21 @@ public final class XQuery4Test extends SandboxTest {
         + "  try { 0 } catch * { 1 } "
         + "}; local:f(10000)", 0);
     query("declare function local:f($a) {"
-        + "  try { } catch * { if($a > 0) { local:f($a - 1) } } "
+        + "  try {} catch * { if($a > 0) { local:f($a - 1) } } "
         + "}; local:f(10000)", "");
 
     // finally
-    check("try { 1 } finally { }", 1, root(Itr.class));
-    check("try { 1 } catch * { 2 } finally { }", 1, root(Itr.class));
-    check("try { 1 div 0 } catch * { 2 } finally { }", 2, root(Itr.class));
+    check("try { 1 } finally {}", 1, root(Itr.class));
+    check("try { 1 } catch * { 2 } finally {}", 1, root(Itr.class));
+    check("try { 1 div 0 } catch * { 2 } finally {}", 2, root(Itr.class));
 
     check("try { 1 } finally { (1 to 1000)[. = 0] }", 1, root(Try.class));
     check("try { 1 } catch * { 2 } finally { (1 to 1000)[. = 0] }", 1, root(Try.class));
     check("try { 1 div 0 } catch * { 2 } finally { (1 to 1000)[. = 0] }", 2, root(Try.class));
 
     check("try { 1 } catch * { error() } finally { message('done') }", 1, empty(ERROR));
-    check("try { 1 } catch err:FOER0 { 2 } finally { }", 1, root(Itr.class), count(Itr.class, 1));
-    check("try { 1 } catch err:FOER0 { 2 } catch err:FOER1 { 3 } finally { }", 1,
+    check("try { 1 } catch err:FOER0 { 2 } finally {}", 1, root(Itr.class), count(Itr.class, 1));
+    check("try { 1 } catch err:FOER0 { 2 } catch err:FOER1 { 3 } finally {}", 1,
         root(Itr.class), count(Itr.class, 1));
 
     check("let $a := 1 return try { $a } finally { $a[. = 0] }", 1, root(Itr.class));
@@ -482,8 +483,8 @@ public final class XQuery4Test extends SandboxTest {
     error("try { 1 } catch * { 2 } finally { 2 div 0 }", DIVZERO_X);
     error("try { error() } catch * { 2 } finally { 2 div 0 }", DIVZERO_X);
     error("try { 1 } catch * { error() } finally { 2 div 0 }", DIVZERO_X);
-    error("try { 1 div 0 } catch err:FOER0 { 2 } finally { }", DIVZERO_X);
-    error("try { 1 div 0 } catch err:FOER0 { 2 } catch err:FOER1 { 2 } finally { }", DIVZERO_X);
+    error("try { 1 div 0 } catch err:FOER0 { 2 } finally {}", DIVZERO_X);
+    error("try { 1 div 0 } catch err:FOER0 { 2 } catch err:FOER1 { 2 } finally {}", DIVZERO_X);
 
     error("try { 1 } finally { 1 }", FINALLY_X);
     error("try { error() } finally { 1 }", FINALLY_X);

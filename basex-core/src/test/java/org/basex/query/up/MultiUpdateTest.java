@@ -279,7 +279,7 @@ public final class MultiUpdateTest extends SandboxTest {
     error(input + " update { insert nodes attribute new {} after 'x' }", UPTRGTYP2_X);
 
     error("document {} update { insert nodes attribute new {} before . }", UPTRGTYP2_X);
-    error("attribute old { } update { insert nodes attribute new {} after . }", UPTRGTYP2_X);
+    error("attribute old {} update { insert nodes attribute new {} after . }", UPTRGTYP2_X);
 
     error("document { <a/> } update { insert nodes attribute new {} before * }", UPATTELM_X);
     error("document { <a/> } update { insert nodes attribute new {} after * }", UPATTELM_X);

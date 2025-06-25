@@ -277,7 +277,7 @@ public final class UtilModuleTest extends SandboxTest {
     query(func.args(" <x/>", " ()"), "<x/>");
     query(func.args(" <x/>", " ('')"), "<x/>");
 
-    query(func.args(" document { }"), "");
+    query(func.args(" document {}"), "");
     query(func.args(" text { 'T' }"), "T");
     query(func.args(" comment { 'C' }"), "<!--C-->");
     query(func.args(" attribute N { 'V' }"), "N=\"V\"");

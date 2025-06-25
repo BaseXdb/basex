@@ -200,7 +200,7 @@ public final class ArrayModuleTest extends SandboxTest {
   @Test public void indexWhere() {
     final Function func = _ARRAY_INDEX_WHERE;
 
-    query(func.args(" array { }", " boolean#1"), "");
+    query(func.args(" array {}", " boolean#1"), "");
     query(func.args(" array { 0 }", " boolean#1"), "");
     query(func.args(" array { 1 }", " boolean#1"), 1);
     query(func.args(" array { 0, 4, 9 }", " boolean#1"), "2\n3");
@@ -252,7 +252,7 @@ public final class ArrayModuleTest extends SandboxTest {
     check(func.args(" ([ <a/> ], [ ])") + "?*", "<a/>", empty(func));
 
     // GH-1954
-    query(func.args(" if (<a/>/text()) then array { } else ()") + " ! array:size(.)", 0);
+    query(func.args(" if (<a/>/text()) then array {} else ()") + " ! array:size(.)", 0);
   }
 
   /** Test method. */
@@ -272,16 +272,16 @@ public final class ArrayModuleTest extends SandboxTest {
   @Test public void ofMembers() {
     final Function func = _ARRAY_OF_MEMBERS;
     query(func.args(" ()"), "[]");
-    query(func.args(" map { 'value': 1 }"), "[1]");
-    query(func.args(" (1 to 3) ! map { 'value': . }"), "[1,2,3]");
-    query(func.args(" (map { 'value': 1 }, map { 'value': () }, map { 'value': 2 to 3 })"),
+    query(func.args(" { 'value': 1 }"), "[1]");
+    query(func.args(" (1 to 3) ! { 'value': . }"), "[1,2,3]");
+    query(func.args(" ({ 'value': 1 }, { 'value': () }, { 'value': 2 to 3 })"),
         "[1,(),(2,3)]");
 
-    query(func.args(" map { 'value': <a/> }") + "?1", "<a/>");
-    query(func.args(" (map { 'value': <a/> }, map { 'value': () })") + "?1", "<a/>");
-    query(func.args(" (map { 'value': <a/> }, map { 'value': () })") + "?*", "<a/>");
+    query(func.args(" { 'value': <a/> }") + "?1", "<a/>");
+    query(func.args(" ({ 'value': <a/> }, { 'value': () })") + "?1", "<a/>");
+    query(func.args(" ({ 'value': <a/> }, { 'value': () })") + "?*", "<a/>");
 
-    query(func.args(" if (<a/>/text()) then map { 'value': () } else ()") + " ! array:size(.)", 0);
+    query(func.args(" if (<a/>/text()) then { 'value': () } else ()") + " ! array:size(.)", 0);
   }
 
   /** Test method. */
@@ -334,7 +334,7 @@ public final class ArrayModuleTest extends SandboxTest {
   @Test public void slice() {
     final Function func = _ARRAY_SLICE;
 
-    String in = "array { } =>";
+    String in = "array {} =>";
     query(in + func.args(+0), "[]");
     query(in + func.args(+1, +2, +3), "[]");
     query(in + func.args(-1, -2, -3), "[]");

@@ -172,7 +172,7 @@ public final class InlineTest extends SandboxTest {
   @Test public void gh1424() {
     inline(true);
     check("declare function local:f() {"
-        + "  let $func := function($key) { map { $key: 'ok' }($key) }"
+        + "  let $func := function($key) { { $key: 'ok' }($key) }"
         + "  let $input := <ok/>"
         + "  let $call := $func(name($input))"
         + "  return function() { $call }"

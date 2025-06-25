@@ -51,11 +51,11 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_SIZE.args(PATH1), 2);
     query(_FILE_DELETE.args(PATH1));
 
-    query(func.args(PATH1, "a\u00e4", " map { 'encoding': 'CP1252' }"));
+    query(func.args(PATH1, "a\u00e4", " { 'encoding': 'CP1252' }"));
     query(_FILE_READ_TEXT.args(PATH1, "CP1252"), "a\u00e4");
     query(_FILE_DELETE.args(PATH1));
 
-    query(func.args(PATH1, "<a/>", " map { 'method': 'text' }"));
+    query(func.args(PATH1, "<a/>", " { 'method': 'text' }"));
     query(_FILE_READ_TEXT.args(PATH1), "<a/>");
   }
 
@@ -470,10 +470,10 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_SIZE.args(PATH1), 1);
     query(_FILE_DELETE.args(PATH1));
 
-    query(func.args(PATH1, "a\u00e4", " map { 'encoding': 'CP1252' }"));
+    query(func.args(PATH1, "a\u00e4", " { 'encoding': 'CP1252' }"));
     query(_FILE_READ_TEXT.args(PATH1, "CP1252"), "a\u00e4");
 
-    query(func.args(PATH1, "<a/>", " map { 'method': 'text' }"));
+    query(func.args(PATH1, "<a/>", " { 'method': 'text' }"));
     query(_FILE_READ_TEXT.args(PATH1), "<a/>");
     query(_FILE_DELETE.args(PATH1));
 

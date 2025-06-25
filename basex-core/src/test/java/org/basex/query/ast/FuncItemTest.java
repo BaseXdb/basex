@@ -197,7 +197,7 @@ public final class FuncItemTest extends SandboxTest {
   @Test public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
         "return $f(function() { 1, 2 })", INVCONVERT_X_X_X);
-    error("let $x as fn (xs:byte) as item() := fn($x as item()) {$x} return $x(384)",
+    error("let $x as fn (xs:byte) as item() := fn($x as item()) { $x } return $x(384)",
         FUNCCAST_X_X_X);
     error("let $x as fn(xs:anyAtomicType) as xs:string? := { 1:'A', 'x':'B' } return $x?*",
         LOOKUP_X);
@@ -255,7 +255,7 @@ public final class FuncItemTest extends SandboxTest {
         empty()
     );
     // GH-2324
-    query("declare variable $f := map {"
+    query("declare variable $f := {"
         + "  'A': function($r, $f) { $r/x ! $f?B(., $f) },"
         + "  'B': function($r, $f) { $r/x ! $f?A(., $f) }"
         + "};"
@@ -311,8 +311,8 @@ public final class FuncItemTest extends SandboxTest {
   /** Simplification of map/array arguments. */
   @Test public void simplify() {
     check("[0](data(<_>1</_>))", 0, empty(DATA));
-    check("map { 'a': 0 }(data(<_>a</_>))", 0, empty(DATA));
-    check("map { 1: 0 }(data(<_>1</_>))", "", empty(DATA));
+    check("{ 'a': 0 }(data(<_>a</_>))", 0, empty(DATA));
+    check("{ 1: 0 }(data(<_>1</_>))", "", empty(DATA));
   }
 
   /** Fold optimizations. */
@@ -368,7 +368,7 @@ public final class FuncItemTest extends SandboxTest {
 
   /** Checks order of keyword placeholder parameters of partially evaluated function. */
   @Test public void placeholderOrder() {
-    query("declare function local:f($s as xs:string, $i as xs:integer) {$s, $i}; "
+    query("declare function local:f($s as xs:string, $i as xs:integer) { $s, $i }; "
         + "let $result := local:f(i := ?, s := ?)(4.0, xs:anyURI('XQuery'))"
         + "return ($result[1] instance of xs:string, $result[2] instance of xs:integer)",
         "true\ntrue");

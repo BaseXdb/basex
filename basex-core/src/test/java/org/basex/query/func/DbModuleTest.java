@@ -96,27 +96,27 @@ public final class DbModuleTest extends SandboxTest {
 
     // specify parsing options
     query(func.args(NAME, " '<a> </a>'", "strip.xml",
-        " map { '" + lc(MainOptions.STRIPWS) + "': true() }"));
+        " { '" + lc(MainOptions.STRIPWS) + "': true() }"));
     query(_DB_GET.args(NAME, "strip.xml"), "<a/>");
     query(func.args(NAME, " '<a> </a>'", "nostrip.xml",
-        " map { '" + lc(MainOptions.STRIPWS) + "': false() }"));
+        " { '" + lc(MainOptions.STRIPWS) + "': false() }"));
     query(_DB_GET.args(NAME, "nostrip.xml"), "<a> </a>");
 
     // specify parsing options
     query(func.args(NAME, CSV, "csv1.xml",
-        " map { 'parser': 'csv', 'csvparser': 'header=true' }"));
+        " { 'parser': 'csv', 'csvparser': 'header=true' }"));
     query("exists(" + _DB_GET.args(NAME, "csv1.xml") + "//City)", true);
     query(func.args(NAME, CSV, "csv2.xml",
-        " map { 'parser': 'csv', 'csvparser': map { 'header': 'true' } }"));
+        " { 'parser': 'csv', 'csvparser': { 'header': 'true' } }"));
     query("exists(" + _DB_GET.args(NAME, "csv2.xml") + "//City)", true);
     query(func.args(NAME, CSV, "csv3.xml",
-        " map { 'parser': 'csv', 'csvparser': map { 'header': true() } }"));
+        " { 'parser': 'csv', 'csvparser': { 'header': true() } }"));
     query("exists(" + _DB_GET.args(NAME, "csv3.xml") + "//City)", true);
     query(func.args(NAME, CSV, "csv4.xml",
-        " map { 'parser': 'csv', 'csvparser': map { 'header': true(), 'skip-empty': true() } }"));
+        " { 'parser': 'csv', 'csvparser': { 'header': true(), 'skip-empty': true() } }"));
     query("empty(" + _DB_GET.args(NAME, "csv4.xml") + "//City)", true);
 
-    final String addcache = " map { 'addcache': true() }";
+    final String addcache = " { 'addcache': true() }";
     query(func.args(NAME, " <cache/>", "C1.xml", addcache));
     query("exists(" + _DB_GET.args(NAME, "C1.xml") + ")", true);
     query(func.args(NAME, " <cache/>", "C2.xml", addcache));
@@ -125,14 +125,14 @@ public final class DbModuleTest extends SandboxTest {
     query("exists(" + _DB_GET.args(NAME, "C3.xml") + ")", true);
 
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X);
+        " { 'parser': ('csv', 'html') }"), BASEX_OPTIONS_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': 'csv', 'csvparser': map { 'header': ('true', 'false') } }"),
+        " { 'parser': 'csv', 'csvparser': { 'header': ('true', 'false') } }"),
         INVALIDOPTION_X_X_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': 'csv', 'csvparser': map { 'headr': 'true' } }"), BASEX_OPTIONS_X);
+        " { 'parser': 'csv', 'csvparser': { 'headr': 'true' } }"), BASEX_OPTIONS_X);
     error(func.args(NAME, CSV, "csv.xml",
-        " map { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS_X);
+        " { 'parser': 'csv', 'csvparser': 'headr=true' }"), BASEX_OPTIONS_X);
 
     error(func.args(NAME, " <a/>"), DB_PATH_X);
     error(func.args(NAME, " <a/>", " ()"), DB_PATH_X);
@@ -334,7 +334,7 @@ public final class DbModuleTest extends SandboxTest {
     // specify index options
     for(final boolean b : new boolean[] { false, true }) {
       query(func.args(NAME, " ()", " ()",
-          " map { '" + lc(MainOptions.UPDINDEX) + "': " + b + "() }"));
+          " { '" + lc(MainOptions.UPDINDEX) + "': " + b + "() }"));
       query(_DB_INFO.args(NAME) + "//" + lc(MainOptions.UPDINDEX) + "/text()", b);
     }
     assertEquals(false, context.options.get(MainOptions.UPDINDEX));
@@ -347,23 +347,23 @@ public final class DbModuleTest extends SandboxTest {
     final String[] stringOptions = lc(MainOptions.LANGUAGE, MainOptions.STOPWORDS);
 
     for(final String option : numberOptions) {
-      query(func.args(NAME, " ()", " ()", " map { '" + option + "': 1 }"));
+      query(func.args(NAME, " ()", " ()", " { '" + option + "': 1 }"));
     }
     for(final String option : boolOptions) {
       for(final boolean v : new boolean[] { true, false }) {
-        query(func.args(NAME, " ()", " ()", " map { '" + option + "': " + v + "() }"));
+        query(func.args(NAME, " ()", " ()", " { '" + option + "': " + v + "() }"));
       }
     }
     for(final String option : stringOptions) {
-      query(func.args(NAME, " ()", " ()", " map { '" + option + "': '' }"));
+      query(func.args(NAME, " ()", " ()", " { '" + option + "': '' }"));
     }
 
     // specify parsing options
     query(func.args(NAME, " '<a> </a>'", "a.xml",
-        " map { '" + lc(MainOptions.STRIPWS) + "': true() }"));
+        " { '" + lc(MainOptions.STRIPWS) + "': true() }"));
     query(_DB_GET.args(NAME), "<a/>");
     query(func.args(NAME, " '<a> </a>'", "a.xml",
-        " map { '" + lc(MainOptions.STRIPWS) + "': false() }"));
+        " { '" + lc(MainOptions.STRIPWS) + "': false() }"));
     query(_DB_GET.args(NAME), "<a> </a>");
 
     query("(# db:stripws true #) { " + func.args(NAME, " '<a> </a>'", "a.xml") + " }");
@@ -374,11 +374,11 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_GET.args(NAME) + "/* ! name()", "json");
 
     // specify unknown or invalid options
-    error(func.args(NAME, " ()", " ()", " map { 'xyz': 'abc' }"),
+    error(func.args(NAME, " ()", " ()", " { 'xyz': 'abc' }"),
         BASEX_OPTIONS_X);
-    error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
+    error(func.args(NAME, " ()", " ()", " { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
         BASEX_OPTIONS_X);
-    error(func.args(NAME, " ()", " ()", " map { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
+    error(func.args(NAME, " ()", " ()", " { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
         BASEX_OPTIONS_X);
 
     // invalid names
@@ -413,11 +413,11 @@ public final class DbModuleTest extends SandboxTest {
     query("count(" + _DB_BACKUPS.args() + ")", 2);
 
     final int size1 = Integer.parseInt(query(_DB_BACKUPS.args(NAME) + "/@size ! data()"));
-    query(func.args(NAME, " map { 'compress': false() }"));
+    query(func.args(NAME, " { 'compress': false() }"));
     final int size2 = Integer.parseInt(query(_DB_BACKUPS.args(NAME) + "/@size ! data()"));
     assertTrue(size1 < size2, "Compressed backup is not smaller than uncompressed one");
 
-    query(func.args(NAME, " map { 'comment': 'BLA' }"));
+    query(func.args(NAME, " { 'comment': 'BLA' }"));
     query(_DB_BACKUPS.args(NAME) + "/@comment ! data()", "BLA");
 
     // invalid names
@@ -533,7 +533,7 @@ public final class DbModuleTest extends SandboxTest {
     final IOFile path = new IOFile(new IOFile(Prop.TEMPDIR, NAME), XML.replaceAll(".*/", ""));
     query(_FILE_EXISTS.args(path));
     // serializes as text; ensures that the output contains no angle bracket
-    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME), " map { 'method': 'text' }"));
+    query(func.args(NAME, new IOFile(Prop.TEMPDIR, NAME), " { 'method': 'text' }"));
     query("0[contains(" + _FILE_READ_TEXT.args(path) + ", '&lt;')]", "");
     // deletes the exported file
     query(_FILE_DELETE.args(path));
@@ -685,7 +685,7 @@ public final class DbModuleTest extends SandboxTest {
     final Function func = _DB_NAME;
     query(func.args(_DB_GET.args(NAME)), NAME);
     query(func.args(_DB_GET.args(NAME) + "/*"), NAME);
-    error(func.args(" <x/> update { }"), DB_NODE_X);
+    error(func.args(" <x/> update {}"), DB_NODE_X);
   }
 
   /** Test method. */
@@ -729,24 +729,24 @@ public final class DbModuleTest extends SandboxTest {
 
     // check single options
     for(final String option : numberOptions)
-      query(func.args(NAME, false, " map { '" + option + "': 1 }"));
+      query(func.args(NAME, false, " { '" + option + "': 1 }"));
     for(final String option : boolOptions) {
       for(final boolean bool : new boolean[] { true, false })
-        query(func.args(NAME, false, " map { '" + option + "': " + bool + "() }"));
+        query(func.args(NAME, false, " { '" + option + "': " + bool + "() }"));
     }
     for(final String option : stringOptions)
-      query(func.args(NAME, false, " map { '" + option + "': '' }"));
+      query(func.args(NAME, false, " { '" + option + "': '' }"));
     // ensure that option in context was not changed
     assertEquals(true, context.options.get(MainOptions.TEXTINDEX));
 
     // check invalid options
-    error(func.args(NAME, false, " map { 'xyz': 'abc' }"),
+    error(func.args(NAME, false, " { 'xyz': 'abc' }"),
         BASEX_OPTIONS_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.UPDINDEX) + "': 1 }"),
+    error(func.args(NAME, false, " { '" + lc(MainOptions.UPDINDEX) + "': 1 }"),
         BASEX_OPTIONS_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
+    error(func.args(NAME, false, " { '" + lc(MainOptions.MAXLEN) + "': 'a' }"),
         BASEX_OPTIONS_X);
-    error(func.args(NAME, false, " map { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
+    error(func.args(NAME, false, " { '" + lc(MainOptions.TEXTINDEX) + "': 'nope' }"),
         BASEX_OPTIONS_X);
 
     // check if optimize call adopts original options
@@ -779,7 +779,7 @@ public final class DbModuleTest extends SandboxTest {
     for(final String option : indexes) options.append('\'').append(option).append("': true(),");
     for(final String option : includes) options.append('\'').append(option).append("': 'a',");
     options.append('\'').append(lc(MainOptions.UPDINDEX)).append("': true()");
-    query(func.args(NAME, true, " map { " + options + '}'));
+    query(func.args(NAME, true, " { " + options + " }"));
 
     for(final String ind : indexes) query(_DB_INFO.args(NAME) + "//" + ind + "/text()", true);
     for(final String inc : includes) query(_DB_INFO.args(NAME) + "//" + inc + "/text()", "a");
@@ -814,7 +814,7 @@ public final class DbModuleTest extends SandboxTest {
     final Function func = _DB_PATH;
     query(func.args(_DB_GET.args(NAME)), XML.replaceAll(".*/", ""));
     query(func.args(_DB_GET.args(NAME) + "/*"), XML.replaceAll(".*/", ""));
-    error(func.args(" <x/> update { }"), DB_NODE_X);
+    error(func.args(" <x/> update {}"), DB_NODE_X);
   }
 
   /** Test method. */
@@ -852,7 +852,7 @@ public final class DbModuleTest extends SandboxTest {
     query("count(" + COLLECTION.args(NAME + '/' + XML) + "/R2)", 0);
     query("count(" + COLLECTION.args(NAME + '/' + XML) + "/html)", 1);
 
-    final String addcache = " map { 'addcache': true() }";
+    final String addcache = " { 'addcache': true() }";
     query(func.args(NAME, " <cache/>", "1.xml", addcache));
     query("exists(" + _DB_GET.args(NAME, "1.xml") + ")", true);
     query(func.args(NAME, " <cache/>", "2.xml", addcache));

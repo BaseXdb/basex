@@ -92,13 +92,13 @@ public final class ClientModuleTest extends SandboxTest {
         func.args(" $a", "1") + '+' + func.args(" $b", "2"), 3);
     // arguments
     query(func.args(connection(), "declare variable $a external; $a*2",
-        " map { 'a': 1 }"), 2);
+        " { 'a': 1 }"), 2);
     query(func.args(connection(), "declare variable $a external; count($a)",
-        " map { 'a': () }"), 0);
+        " { 'a': () }"), 0);
     query(func.args(connection(), "declare variable $a external; count($a)",
-        " map { 'a': (1 to 5) }"), 5);
+        " { 'a': (1 to 5) }"), 5);
     query(func.args(connection(), "declare context item external; .",
-        " map { '': (1, <a/>, 'a') }"), "1\n<a/>\na");
+        " { '': (1, <a/>, 'a') }"), "1\n<a/>\na");
     // binary data
     query(func.args(connection(), "xs:hexBinary('41')"), "A");
     query(func.args(connection(), "xs:base64Binary('QQ==')"), "A");
@@ -109,10 +109,10 @@ public final class ClientModuleTest extends SandboxTest {
       SerializerOptions.ENCODING.arg("US-ASCII") + "'\u00e4'"), "\u00e4");
     query(func.args(connection(), "xs:base64Binary('QQ==')"), "A");
     // query errors: returning function items
-    error(func.args(connection(), "function() { }"), CLIENT_FITEM_X);
+    error(func.args(connection(), "function() {}"), CLIENT_FITEM_X);
     error(func.args(connection(), "true#0"), CLIENT_FITEM_X);
-    error(func.args(connection(), "array { }"), CLIENT_FITEM_X);
-    error(func.args(connection(), "map { }"), CLIENT_FITEM_X);
+    error(func.args(connection(), "array {}"), CLIENT_FITEM_X);
+    error(func.args(connection(), "{}"), CLIENT_FITEM_X);
     // query errors: server-side errors
     error(func.args(connection(), "x"), NOCTX_X);
   }

@@ -28,7 +28,7 @@ public final class RestXqPathTest extends RestXqTest {
    * @throws Exception exception
    */
   @Test public void getTest() throws Exception {
-    get("ok", "declare %R:path('/test') function m:f() {'ok'};", "test");
+    get("ok", "declare %R:path('/test') function m:f() { 'ok' };", "test");
   }
 
   /**
@@ -180,8 +180,8 @@ public final class RestXqPathTest extends RestXqTest {
    */
   @Test public void various() throws Exception {
     // correct syntax
-    get("x", "declare %R:path('') function m:f() {'x'};", "");
+    get("x", "declare %R:path('') function m:f() { 'x' };", "");
     // invalid annotation
-    get(500, "declare %R:path('') %R:xyz function m:f() {'x'};", "");
+    get(500, "declare %R:path('') %R:xyz function m:f() { 'x' };", "");
   }
 }

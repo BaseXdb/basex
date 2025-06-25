@@ -57,7 +57,7 @@ public final class FTIndexQueryTest extends FTTest {
   @Test public void testExt() {
     init("<x>A x B</x>");
     assertQuery("Ext 1", "//*[text() contains text 'A B' all words distance exactly 0 words]");
-    assertQuery("Ext 2", _FT_MARK.args(" //*[text() contains text {'A B'} all words], 'b'"));
+    assertQuery("Ext 2", _FT_MARK.args(" //*[text() contains text { 'A B' } all words], 'b'"));
     assertQuery("Ext 3", _FT_MARK.args(" //*[text() contains text 'A' ftand 'B'], 'b'"));
   }
 

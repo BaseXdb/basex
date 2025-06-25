@@ -78,9 +78,9 @@ public final class RestXqMethodTest extends RestXqTest {
     head("declare %R:HEAD %R:path('') function m:f() { <R:response/> };");
     head("declare %R:HEAD %R:path('') function m:f() as element(R:response) { <R:response/> };");
     // wrong type
-    headError("declare %R:HEAD %R:path('') function m:f() { };");
+    headError("declare %R:HEAD %R:path('') function m:f() {};");
     headError("declare %R:HEAD %R:path('') function m:f() { <response/> };");
-    headError("declare %R:HEAD %R:path('') function m:f() as element(R:response)* { };");
+    headError("declare %R:HEAD %R:path('') function m:f() as element(R:response)* {};");
 
     // correct return type
     head("declare %R:GET %R:path('') function m:f() { () };");
@@ -92,7 +92,7 @@ public final class RestXqMethodTest extends RestXqTest {
    * @throws Exception exception
    */
   @Test public void options() throws Exception {
-    options("declare %R:OPTIONS %R:path('') function m:f() { };", "");
+    options("declare %R:OPTIONS %R:path('') function m:f() {};", "");
     options("declare %R:OPTIONS %R:path('') function m:f() { 1 };", "1");
 
     options("declare %R:GET %R:path('') function m:f() { <R:response/> };", "");

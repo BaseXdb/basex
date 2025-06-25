@@ -32,7 +32,7 @@ public final class MapModuleTest extends SandboxTest {
     query(func.args(" (0, 1)", " boolean#1") + " => map:size()", 2);
     query(func.args(" (0, 1)", " function($i) { boolean($i)[.] }"), "{true():1}");
 
-    query(func.args(" (1 to 100)", " function($i) { }"), "{}");
+    query(func.args(" (1 to 100)", " function($i) {}"), "{}");
     query(func.args(" (1 to 100)", " boolean#1") + " => map:size()", 1);
     query(func.args(" (1 to 100)", " string#1") + " => map:size()", 100);
     query(func.args(" (1 to 100)", " function($i) { $i mod 10 }") + " => map:size()", 10);
@@ -564,7 +564,7 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void size() {
     final Function func = _MAP_SIZE;
-    query(func.args(" { }"), 0);
+    query(func.args(" {}"), 0);
   }
 
   /**

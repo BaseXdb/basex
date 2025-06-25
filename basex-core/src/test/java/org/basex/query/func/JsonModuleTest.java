@@ -22,7 +22,7 @@ public final class JsonModuleTest extends SandboxTest {
 
     final String path = "src/test/resources/example.json";
     query(func.args(path) + "//name ! string()", "Smith");
-    query(func.args(path, " map { 'format': 'xquery' }") + "?name", "Smith");
+    query(func.args(path, " { 'format': 'xquery' }") + "?name", "Smith");
   }
 
   /** Test method. */
@@ -32,7 +32,6 @@ public final class JsonModuleTest extends SandboxTest {
     parse(" []", "", "");
     parse("[]", "", "<json type=\"array\"/>");
     parse("{}", "", "<json type=\"object\"/>");
-    parse("{ } ", "", "<json type=\"object\"/>");
     parse("{ \"\\t\" : 0 }", "",
         "<json type=\"object\"><_0009 type=\"number\">0</_0009></json>");
     parse("{ \"a\" :0 }", "", "<json type=\"object\"><a type=\"number\">0</a></json>");
@@ -52,7 +51,6 @@ public final class JsonModuleTest extends SandboxTest {
     // merging data types
     parse("[]", "'merge': true()", "<json arrays=\"json\"/>");
     parse("{}", "'merge': true()", "<json objects=\"json\"/>");
-    parse("{ } ", "'merge': true()", "<json objects=\"json\"/>");
     parse("{ \"\\t\" : 0 }", "'merge': true()",
         "<json objects=\"json\" numbers=\"_0009\"><_0009>0</_0009></json>");
     parse("{ \"a\" :0 }", "'merge': true()",
@@ -100,7 +98,7 @@ public final class JsonModuleTest extends SandboxTest {
   @Test public void parseXQuery() {
     final Function func = _JSON_PARSE;
     // queries
-    String options = " map { 'format': 'xquery' }";
+    String options = " { 'format': 'xquery' }";
     query(func.args("{}", options), "{}");
     query(func.args("{\"A\":1}", options), "{\"A\":1}");
     query(func.args("{\"\":null}", options), "{\"\":()}");
@@ -130,7 +128,7 @@ public final class JsonModuleTest extends SandboxTest {
     query(func.args("-123.456E0001", options), "-1234.56");
     query(func.args("[ -123.456E0001, 0 ]", options), "[-1234.56,0]");
 
-    options = " map { 'format': 'xquery', 'number-parser': xs:decimal#1 }";
+    options = " { 'format': 'xquery', 'number-parser': xs:decimal#1 }";
     String input = "1234567890123456789012345678901234567890";
     query(func.args(input, options), input);
     input = "1234567890123456789012345678901234567890.123456789012345678901234567890123456789";
@@ -142,19 +140,19 @@ public final class JsonModuleTest extends SandboxTest {
     final Function func = _JSON_PARSE;
     // queries
     query(func.args("[\"A\",{\"B\":\"C\"}]",
-        " map { 'format': 'jsonml' }"),
+        " { 'format': 'jsonml' }"),
         "<A B=\"C\"/>");
     query("array:size(" + func.args("[\"A\",{\"B\":\"C\"}]",
-        " map { 'format': 'xquery' }") + ')',
+        " { 'format': 'xquery' }") + ')',
         2);
     query(func.args("\"\\t\\u000A\"",
-        " map { 'format': 'xquery', 'escape': true(), 'liberal': true() }"),
+        " { 'format': 'xquery', 'escape': true(), 'liberal': true() }"),
         "\\t\\n");
     query("string-to-codepoints(" + func.args("\"\\t\\u000A\"",
-        " map { 'format': 'xquery', 'escape': false(), 'liberal': true() }") + ')',
+        " { 'format': 'xquery', 'escape': false(), 'liberal': true() }") + ')',
         "9\n10");
 
-    error(func.args("42", " map { 'spec': 'garbage' }"), INVALIDOPTION_X);
+    error(func.args("42", " { 'spec': 'garbage' }"), INVALIDOPTION_X);
   }
 
   /** Test method. */
@@ -212,7 +210,7 @@ public final class JsonModuleTest extends SandboxTest {
       final Function function) {
 
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " map { " + options + " }");
+      function.args(input, " { " + options + " }");
     final String exp = expected.toString();
     if(exp.startsWith("...")) {
       contains(query, exp.substring(3));

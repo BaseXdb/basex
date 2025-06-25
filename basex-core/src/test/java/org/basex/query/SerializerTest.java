@@ -96,7 +96,7 @@ public final class SerializerTest extends SandboxTest {
   @Test public void gh1933() {
     final String query1 = "let $string := serialize("
         + "<head><meta http-equiv='Content-Type'/></head>";
-    final String query2 = ", map { 'method': 'xhtml' })"
+    final String query2 = ", { 'method': 'xhtml' })"
         + "return count(analyze-string($string, '<meta ')//fn:match)";
 
     query(query1 + query2, 1);
@@ -233,9 +233,9 @@ public final class SerializerTest extends SandboxTest {
     final String option = METHOD.arg("json") + JSON_LINES.arg("on");
     query(option + "()", "");
     query(option + "1, 2", "1\n2");
-    query(option + "[1], {'2':3}", "[1]\n{\"2\":3}");
+    query(option + "[1], { '2': 3 }", "[1]\n{\"2\":3}");
 
-    query(option + INDENT.arg("yes") + "[1], {'2':3}", "[ 1 ]\n{ \"2\": 3 }");
+    query(option + INDENT.arg("yes") + "[1], { '2': 3 }", "[ 1 ]\n{ \"2\": 3 }");
   }
 
   /** Test: method=adaptive. */

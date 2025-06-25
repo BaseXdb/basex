@@ -104,25 +104,25 @@ public final class JsonSerializerTest extends SandboxTest {
     final JsonFormat format = JsonFormat.W3;
 
     // objects
-    serialize("map { }", "{}", format);
-    serialize("map { '': () }", "{'':null}", format);
-    serialize("map { 'A' : 'B' }", "{'A':'B'}", format);
-    serialize("map { 'A': 1 }", "{'A':1}", format);
-    serialize("map { 'A': 1.2 }", "{'A':1.2}", format);
-    serialize("map { 'A': .2 }", "{'A':0.2}", format);
-    serialize("map { 'A': .0 }", "{'A':0}", format);
-    serialize("map { 'A': true() }", "{'A':true}", format);
-    serialize("map { 'A': false() }", "{'A':false}", format);
-    serialize("map { 'A': false() }", "{'A':false}", format);
-    serialize("map { true(): false() }", "{'true':false}", format);
-    serialize("map { 1: 'E' }", "{'1':'E'}", format);
+    serialize("{}", "{}", format);
+    serialize("{ '': () }", "{'':null}", format);
+    serialize("{ 'A' : 'B' }", "{'A':'B'}", format);
+    serialize("{ 'A': 1 }", "{'A':1}", format);
+    serialize("{ 'A': 1.2 }", "{'A':1.2}", format);
+    serialize("{ 'A': .2 }", "{'A':0.2}", format);
+    serialize("{ 'A': .0 }", "{'A':0}", format);
+    serialize("{ 'A': true() }", "{'A':true}", format);
+    serialize("{ 'A': false() }", "{'A':false}", format);
+    serialize("{ 'A': false() }", "{'A':false}", format);
+    serialize("{ true(): false() }", "{'true':false}", format);
+    serialize("{ 1: 'E' }", "{'1':'E'}", format);
 
-    error("map { 'A': 1 div 0.0e0 }", format, SERNUMBER_X);
-    error("map { 'A': -1 div 0.0e0 }", format, SERNUMBER_X);
-    error("map { 'A': 0 div 0.0e0 }", format, SERNUMBER_X);
+    error("{ 'A': 1 div 0.0e0 }", format, SERNUMBER_X);
+    error("{ 'A': -1 div 0.0e0 }", format, SERNUMBER_X);
+    error("{ 'A': 0 div 0.0e0 }", format, SERNUMBER_X);
 
-    error("map { true(): true#0 }", format, SERJSONFUNC_X);
-    error("map { 'A': ('B', 'C') }", format, SERJSONSEQ);
+    error("{ true(): true#0 }", format, SERJSONFUNC_X);
+    error("{ 'A': ('B', 'C') }", format, SERJSONSEQ);
 
     // arrays
     serialize("[()]", "[null]", format);
@@ -133,11 +133,11 @@ public final class JsonSerializerTest extends SandboxTest {
     error("[ (1, 2) ]", format, SERJSONSEQ);
 
     // mixed
-    serialize("map { 'A': map { } }", "{'A':{}}", format);
-    serialize("map { 'A': map { 'B': 'C' } }", "{'A':{'B':'C'}}", format);
-    serialize("map { 'A': array { 'B' } }", "{'A':['B']}", format);
-    serialize("map { '0': () }", "{'0':null}", format);
-    serialize("map { '-1': () }", "{'-1':null}", format);
+    serialize("{ 'A': {} }", "{'A':{}}", format);
+    serialize("{ 'A': { 'B': 'C' } }", "{'A':{'B':'C'}}", format);
+    serialize("{ 'A': array { 'B' } }", "{'A':['B']}", format);
+    serialize("{ '0': () }", "{'0':null}", format);
+    serialize("{ '-1': () }", "{'-1':null}", format);
 
     // atomic items
     serialize("()", "null", format);

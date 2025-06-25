@@ -15,17 +15,17 @@ import org.junit.jupiter.api.*;
 public final class LookupTest extends SandboxTest {
   /** Test. */
   @Test public void map() {
-    query("map { 'a': 'b' } ? a", "b");
-    query("(map { 'a': 'b' }, map { 'c': 'd' }) ? a", "b");
-    query("map { 'a': 'b', 'c': 'd' } ? ('a', 'c')", "b\nd");
-    query("(map { 'a': 'b' }, map { 'c': 'd' }) ? ('a', 'c')", "b\nd");
-    query("map:merge(for $i in 1 to 5 return map { $i: $i+1 })? 2", 3);
+    query("{ 'a': 'b' } ? a", "b");
+    query("({ 'a': 'b' }, { 'c': 'd' }) ? a", "b");
+    query("{ 'a': 'b', 'c': 'd' } ? ('a', 'c')", "b\nd");
+    query("({ 'a': 'b' }, { 'c': 'd' }) ? ('a', 'c')", "b\nd");
+    query("map:merge(for $i in 1 to 5 return { $i: $i+1 })? 2", 3);
 
-    query("map { 'first' : 'Jenna', 'last' : 'Scott' } ? first", "Jenna");
-    query("(map { 'first': 'Tom' }, map { 'first': 'Dick' }, map { 'first': 'Harry' }) ? first",
+    query("{ 'first' : 'Jenna', 'last' : 'Scott' } ? first", "Jenna");
+    query("({ 'first': 'Tom' }, { 'first': 'Dick' }, { 'first': 'Harry' }) ? first",
         "Tom\nDick\nHarry");
 
-    query("<_>X</_>[map { 'Y': <_/> }?(text())]", "");
+    query("<_>X</_>[{ 'Y': <_/> }?(text())]", "");
   }
 
   /** Test. */
@@ -44,17 +44,17 @@ public final class LookupTest extends SandboxTest {
 
   /** Test. */
   @Test public void mixed() {
-    query("(map { 1: 'm' }, array { 'a' }) ? 1", "m\na");
+    query("({ 1: 'm' }, array { 'a' }) ? 1", "m\na");
   }
 
   /** Test. */
   @Test public void wildcard() {
-    query("(map { 1: 'm' }, array { 'a' }) ? *", "m\na");
+    query("({ 1: 'm' }, array { 'a' }) ? *", "m\na");
   }
 
   /** Test. */
   @Test public void unary() {
-    query("(map { 1: 'm' }, array { 'a' }) ! ?*", "m\na");
+    query("({ 1: 'm' }, array { 'a' }) ! ?*", "m\na");
     query("array { 1 }[?1] ! ?1", 1);
   }
 
@@ -74,11 +74,11 @@ public final class LookupTest extends SandboxTest {
 
   /**Test. */
   @Test public void modifiers() {
-    query("map { 'a': 'b' } ? pairs::a", "{\"key\":\"a\",\"value\":\"b\"}");
-    query("map { 'a': 'b' } ? keys::a", "a");
-    query("map { 'a': 'b' } ? values::a", "[\"b\"]");
-    query("map { 'a': 'b' } ? items::a", "b");
-    query("map { 'a': 'b' } ? a", "b");
+    query("{ 'a': 'b' } ? pairs::a", "{\"key\":\"a\",\"value\":\"b\"}");
+    query("{ 'a': 'b' } ? keys::a", "a");
+    query("{ 'a': 'b' } ? values::a", "[\"b\"]");
+    query("{ 'a': 'b' } ? items::a", "b");
+    query("{ 'a': 'b' } ? a", "b");
 
     query("([ 1, [ \"a\", \"b\" ], 4, 5, [ \"c\", \"d\"] ])?values::*[. instance of "
         + "array(array(xs:string))]",

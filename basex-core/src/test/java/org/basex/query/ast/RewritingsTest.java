@@ -562,8 +562,8 @@ public final class RewritingsTest extends SandboxTest {
     check("text { 0 }/child::node()", "", empty());
     check("attribute a { 0 }/following-sibling::node()", "", empty());
     check("attribute a { 0 }/preceding-sibling::node()", "", empty());
-    check("comment { }/following-sibling::node()", "", exists(IterPath.class));
-    check("comment { }/preceding-sibling::node()", "", exists(IterStep.class));
+    check("comment {}/following-sibling::node()", "", exists(IterPath.class));
+    check("comment {}/preceding-sibling::node()", "", exists(IterStep.class));
 
     check("attribute a { 0 }/child::node()", "", empty());
     check("attribute a { 0 }/descendant::*", "", empty());
@@ -597,8 +597,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Type promotions. */
   @Test public void gh1801() {
-    check("map { xs:string(<_/>): '' } instance of map(xs:string, xs:string)", true);
-    check("map { string(<_/>): '' } instance of map(xs:string, xs:string)", true);
+    check("{ xs:string(<_/>): '' } instance of map(xs:string, xs:string)", true);
+    check("{ string(<_/>): '' } instance of map(xs:string, xs:string)", true);
   }
 
   /** Type checks. */
@@ -644,7 +644,7 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1726() {
     final String query =
       "let $xml := if((1, 0)[.]) then ( " +
-      "  element a { element b { } update { } } " +
+      "  element a { element b {} update {} } " +
       ") else ( " +
       "  error() " +
       ") " +
@@ -666,7 +666,7 @@ public final class RewritingsTest extends SandboxTest {
     check("(<a/>, <b/>)/1", "1\n1", root(SingletonSeq.class));
     check("<a/>/1", 1, root(Itr.class));
     check("<a/>/<a/>", "<a/>", root(CElem.class));
-    check("(<a/>/map { 1:2 })?1", 2, root(Itr.class));
+    check("(<a/>/{ 1:2 })?1", 2, root(Itr.class));
     check("<a/>/self::a/count(.)", 1, root(Itr.class));
     check("<a/>/a/count(.)", "", root(DualMap.class));
 
@@ -765,12 +765,12 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Static typing of computed maps. */
   @Test public void gh1766() {
-    check("let $map := map { 'c': 'x' } return $map?(1 to 6)", "", empty());
-    check("let $map := map { 'c': 'x' } return count($map?(1 to 6))", 0, root(Itr.class));
+    check("let $map := { 'c': 'x' } return $map?(1 to 6)", "", empty());
+    check("let $map := { 'c': 'x' } return count($map?(1 to 6))", 0, root(Itr.class));
 
-    check("let $map := map { 1: 'x' } return $map?(1 to 6)", "x",
+    check("let $map := { 1: 'x' } return $map?(1 to 6)", "x",
         type(DualMap.class, "xs:string*"));
-    check("let $map := map { 1: 'x' } return count($map?(1 to 6))", 1,
+    check("let $map := { 1: 'x' } return count($map?(1 to 6))", 1,
         type(DualMap.class, "xs:string*"));
   }
 
@@ -1241,9 +1241,9 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1825() {
     check("[ 1 ](" + wrap(1) + ") instance of xs:integer", true, root(Bln.class));
 
-    check("map { 'a': 2 }(" + wrap("a") + ") instance of xs:integer?", true, root(Bln.class));
-    check("map { 1: 2 }(<_/>) instance of xs:integer?", true, root(Bln.class));
-    check("map { 1: (2, 'a') }(<_/>) instance of xs:anyAtomicType*", true, root(Bln.class));
+    check("{ 'a': 2 }(" + wrap("a") + ") instance of xs:integer?", true, root(Bln.class));
+    check("{ 1: 2 }(<_/>) instance of xs:integer?", true, root(Bln.class));
+    check("{ 1: (2, 'a') }(<_/>) instance of xs:anyAtomicType*", true, root(Bln.class));
   }
 
   /** Rewriting of positional predicate. */
@@ -1335,7 +1335,7 @@ public final class RewritingsTest extends SandboxTest {
       "  map:entry(<e/> ! string(), '')" +
       "}; local:f()?*", "");
     query("declare function local:f() as map(xs:string, xs:string) {" +
-      "  map:put(map { }, <e/> ! string(), '')" +
+      "  map:put({}, <e/> ! string(), '')" +
       "}; local:f()?*", "");
   }
 
@@ -1566,7 +1566,7 @@ public final class RewritingsTest extends SandboxTest {
     sb.append("let $n := <n/>\n");
     sb.append("return string-join(\n");
     for(final String var : vars) {
-      sb.append("  for $").append(var).append(" in (function() { }, function() { $n })\n");
+      sb.append("  for $").append(var).append(" in (function() {}, function() { $n })\n");
     }
     sb.append("  return if(").append(query).append(") then 't' else 'f' \n");
     return sb.append(")").toString();
@@ -1595,7 +1595,7 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Enforce index pragma, full-text. */
   @Test public void gh1860() {
-    query(_DB_CREATE.args(NAME, "<_>a</_>", "_.xml", " map { 'ftindex': true() }"));
+    query(_DB_CREATE.args(NAME, "<_>a</_>", "_.xml", " { 'ftindex': true() }"));
     query("(# db:enforceindex #) {\n" +
       "  let $t := 'a'\n" +
       "  for $db in '" + NAME + "'\n" +
@@ -2089,13 +2089,13 @@ public final class RewritingsTest extends SandboxTest {
     // pre-evaluate lookup with zero or single input items
     check("()?1", "", empty());
     check("()?*", "", empty());
-    check("map { 1: 2 }?*", 2, root(Itr.class));
+    check("{ 1: 2 }?*", 2, root(Itr.class));
     check("[ 1 ]?*", 1, root(Itr.class));
-    check("((map { 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string?)?1",
+    check("(({ 1: 'A', 'x': 'B' }) treat as function(xs:anyAtomicType) as xs:string?)?1",
         "A", root(Str.class));
 
     // do not pre-evaluate lookups with multiple input items
-    check("([ 1 ], map { 2: 3 })?*", "1\n3", root(Lookup.class));
+    check("([ 1 ], { 2: 3 })?*", "1\n3", root(Lookup.class));
   }
 
   /** Rewrite distinct sequence checks. */
@@ -2352,7 +2352,7 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Axis steps: Rewrites. */
   @Test public void gh1976() {
-    check("document { }/parent::node()", "", root(Empty.class));
+    check("document {}/parent::node()", "", root(Empty.class));
 
     check("attribute a {}/child::document-node()", "", root(Empty.class));
     check("attribute a {}/self::document-node()", "", root(Empty.class));
@@ -2364,18 +2364,18 @@ public final class RewritingsTest extends SandboxTest {
     check("text { '' }/descendant-or-self::document-node()", "", root(Empty.class));
     check("text { '' }/descendant-or-self::*", "", root(Empty.class));
 
-    check("document { }/ancestor-or-self::node()", "", root(CDoc.class));
+    check("document {}/ancestor-or-self::node()", "", root(CDoc.class));
     check("attribute a {}/descendant-or-self::attribute()", "a=\"\"", root(CAttr.class));
     check("text { '' }/descendant-or-self::text()", "", root(CTxt.class));
 
     check("text { '' }[self::node()]", "", root(CTxt.class));
     check("text { '' }[self::text()]", "", root(CTxt.class));
     check("text { '' }[descendant-or-self::text()]", "", root(CTxt.class));
-    check("document { }[ancestor-or-self::node()]", "", root(CDoc.class));
-    check("document { }[ancestor-or-self::document-node()]", "", root(CDoc.class));
+    check("document {}[ancestor-or-self::node()]", "", root(CDoc.class));
+    check("document {}[ancestor-or-self::document-node()]", "", root(CDoc.class));
 
     check("text { '' }[self::element()]", "", empty());
-    check("document { }[ancestor-or-self::element()]", "", empty());
+    check("document {}[ancestor-or-self::element()]", "", empty());
   }
 
   /** descendant-or-self -> descendant. */
@@ -2390,7 +2390,7 @@ public final class RewritingsTest extends SandboxTest {
     check("document { <a/> }//self::a", "<a/>",
         exists("IterStep[@axis = 'descendant'][@test = 'a']"));
 
-    check("(document { }, <a/>)/descendant-or-self::document-node()", "",
+    check("(document {}, <a/>)/descendant-or-self::document-node()", "",
         exists("IterStep[@axis = 'self']"));
 
     check("(<a/> | text { 'a' })/ancestor-or-self::text()", "a",
@@ -2404,21 +2404,21 @@ public final class RewritingsTest extends SandboxTest {
 
     check("text { 'a' }/ancestor-or-self::text()", "a", root(CTxt.class));
     check("(<a/> | <b/>)/ancestor-or-self::text()", "", empty());
-    check("document { }/descendant-or-self::document-node()", "", root(CDoc.class));
+    check("document {}/descendant-or-self::document-node()", "", root(CDoc.class));
     check("(<a/> | <b/>)/descendant-or-self::document-node()", "", empty());
   }
 
   /** Lookup operator, iterative evaluation. */
   @Test public void gh1984() {
     query("head(([ 2 ], 3) ?1)", 2);
-    query("[ map { }, map { } ] ?* [ ?* ]", "");
+    query("[ {}, {} ] ?* [ ?* ]", "");
   }
 
   /** Simple maps, group by: Context check. */
   @Test public void gh1987() {
     query("function($m) { function() { $m?* } ! (" +
         "for $b in $m?0 let $c := .() group by $d := () return $c" +
-        ")}(map { 0: 1 })", 1);
+        ")}({ 0: 1 })", 1);
   }
 
   /** Casts, cardinality tests. */
@@ -2497,7 +2497,7 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Element constructors: Text concatenation. */
   @Test public void gh2031() {
-    check("<a>{ }</a>", "<a/>", empty(Empty.class));
+    check("<a>{}</a>", "<a/>", empty(Empty.class));
     check("<a>{ () }</a>", "<a/>", empty(Empty.class));
 
     check("<a>{ 'Jack' }</a>", "<a>Jack</a>",
@@ -2583,8 +2583,8 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Attribute constructor. */
   @Test public void gh2054() {
-    query("<x attr=\"a{ }\"/>", "<x attr=\"a\"/>");
-    query("<x>a{ }</x>", "<x>a</x>");
+    query("<x attr=\"a{}\"/>", "<x attr=\"a\"/>");
+    query("<x>a{}</x>", "<x>a</x>");
   }
 
   /** Rewrite let/where to for. */
@@ -2823,7 +2823,7 @@ public final class RewritingsTest extends SandboxTest {
 
     // lower MAXCATS limit
     query(_DB_CREATE.args(NAME, " <a>{ (1 to 1000) ! <b>{ . }</b> }</a>", NAME,
-        " map { 'maxcats': 0 }"));
+        " { 'maxcats': 0 }"));
     check(query + "count()", 1000, root(Itr.class));
     check(query + "min()", 1, root(Dbl.class));
     check(query + "max()", 1000, root(Dbl.class));
@@ -2995,7 +2995,7 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Full-text search, enforceindex enabled, AIOOB. */
   @Test public void gh2110() {
-    query(_DB_CREATE.args(NAME, "<_>a</_>", "_.xml", " map { 'ftindex': true() }"));
+    query(_DB_CREATE.args(NAME, "<_>a</_>", "_.xml", " { 'ftindex': true() }"));
 
     query("declare option db:enforceindex 'true';"
         + "let $db := '" + NAME + "' "
@@ -3115,7 +3115,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Function Arity of Partial Function Applications. */
   @Test public void gh2166() {
     query("declare function local:a() { function($a) { $a(1) }(local:b(2, ?)) };"
-        + "declare function local:b($b, $c) { };"
+        + "declare function local:b($b, $c) {};"
         + "local:a()", "");
   }
 
@@ -3313,7 +3313,7 @@ public final class RewritingsTest extends SandboxTest {
   /** Database optimization: Enabling UPDINDEX. */
   @Test public void gh2272() {
     query("db:create('test')");
-    query("db:put('test', <a/>, 'a.xml'), db:optimize('test', true(), map { 'updindex': true() })");
+    query("db:put('test', <a/>, 'a.xml'), db:optimize('test', true(), { 'updindex': true() })");
   }
 
   /** Faster EBV checks. */

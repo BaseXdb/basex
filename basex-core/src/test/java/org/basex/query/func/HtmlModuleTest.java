@@ -21,8 +21,8 @@ public final class HtmlModuleTest extends SandboxTest {
 
     final String path = "src/test/resources/input.html";
     query(func.args(path) + "//body ! name()", "body");
-    query(func.args(path, " map { 'nons': false() }") + "//*:body ! name()", "body");
-    query(func.args(path, " {'method': 'nu'}") + "//Q{http://www.w3.org/1999/xhtml}body ! name()",
+    query(func.args(path, " { 'nons': false() }") + "//*:body ! name()", "body");
+    query(func.args(path, " { 'method': 'nu' }") + "//Q{http://www.w3.org/1999/xhtml}body ! name()",
         "body");
   }
 
@@ -35,8 +35,8 @@ public final class HtmlModuleTest extends SandboxTest {
     // check if the function returns an HTML root node
     query("exists(" + func.args("&lt;html/&gt;") + "/*:html)", true);
     // check if the function returns <html/>
-    query(func.args("&lt;html/&gt;", " map { 'nons': true() }"), "<html/>");
-    query(func.args("&lt;html/&gt;", " {'method': 'nu'}"),
+    query(func.args("&lt;html/&gt;", " { 'nons': true() }"), "<html/>");
+    query(func.args("&lt;html/&gt;", " { 'method': 'nu' }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body/></html>");
   }
 

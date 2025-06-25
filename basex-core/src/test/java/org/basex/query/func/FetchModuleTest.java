@@ -54,18 +54,18 @@ public final class FetchModuleTest extends SandboxTest {
     final Function func = _FETCH_DOC;
     // successful queries
     query(func.args(XML));
-    query("exists(" + func.args(XML, " map { 'stripws': true() }") +
+    query("exists(" + func.args(XML, " { 'stripws': true() }") +
         "//text()[not(normalize-space())])", false);
-    query("exists(" + func.args(XML, " map { 'stripws': false() }") +
+    query("exists(" + func.args(XML, " { 'stripws': false() }") +
         "//text()[not(normalize-space())])", true);
     query(COUNT.args(func.args(CSV,
-        " map { 'parser': 'csv', 'csvparser': 'header=true' }") + "//City"), 3);
+        " { 'parser': 'csv', 'csvparser': 'header=true' }") + "//City"), 3);
     query(COUNT.args(func.args(CSV,
-        " map { 'parser': 'csv', 'csvparser': map { 'header': true() } }") + "//City"), 3);
+        " { 'parser': 'csv', 'csvparser': { 'header': true() } }") + "//City"), 3);
     query(COUNT.args(func.args(CSV,
-        " map { 'parser': 'csv', 'csvparser': map { 'header': 'true' } }") + "//City"), 3);
+        " { 'parser': 'csv', 'csvparser': { 'header': 'true' } }") + "//City"), 3);
 
-    error(func.args(XML, " map { 'parser': 'unknown' }"), BASEX_OPTIONS_X);
+    error(func.args(XML, " { 'parser': 'unknown' }"), BASEX_OPTIONS_X);
     error(func.args(XML + 'x'), RESWHICH_X);
     error(func.args("httttp://x"), FETCH_OPEN_X);
   }

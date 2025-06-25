@@ -89,7 +89,7 @@ public final class CatalogTest extends SandboxTest {
   @Test public void dbCreate() {
     final Function func = _DB_CREATE;
     query(func.args("document", DIR + "doc.xml", " ()",
-      " map { 'catalog': '" + CATALOG + "', 'dtd': true() }"));
+      " { 'catalog': '" + CATALOG + "', 'dtd': true() }"));
     query(_DB_GET.args("document"), "<doc>X</doc>");
   }
 
@@ -97,7 +97,7 @@ public final class CatalogTest extends SandboxTest {
   @Test public void fetchXml() {
     final Function func = _FETCH_DOC;
     query(func.args(DIR + "doc.xml",
-      " map { 'catalog': '" + CATALOG + "', 'dtd': true() }"), "<doc>X</doc>");
+      " { 'catalog': '" + CATALOG + "', 'dtd': true() }"), "<doc>X</doc>");
   }
 
   /** Test method.*/
@@ -105,10 +105,10 @@ public final class CatalogTest extends SandboxTest {
     final Function func = DOC;
 
     set(MainOptions.CATALOG, CATALOG);
-    query(func.args("http://doc.xml", " {'dtd': true()}"), "<doc>X</doc>");
-    query(func.args("http://doc.xml", " {'dtd': false()}"), "<doc/>");
-    query(func.args("http://doc.xml", " {'allow-external-entities': true()}"), "<doc>X</doc>");
-    error(func.args("http://doc.xml", " {'allow-external-entities': false()}"), IOERR_X);
+    query(func.args("http://doc.xml", " { 'dtd': true() }"), "<doc>X</doc>");
+    query(func.args("http://doc.xml", " { 'dtd': false() }"), "<doc/>");
+    query(func.args("http://doc.xml", " { 'allow-external-entities': true() }"), "<doc>X</doc>");
+    error(func.args("http://doc.xml", " { 'allow-external-entities': false() }"), IOERR_X);
   }
 
   /** Test method.*/
@@ -116,13 +116,13 @@ public final class CatalogTest extends SandboxTest {
     final Function func = PARSE_XML;
 
     set(MainOptions.CATALOG, CATALOG);
-    query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>", " {'dtd': true()}"),
-        "<doc>X</doc>");
-    query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>", " {'dtd': 'no'}"),
-        "<doc/>");
     query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
-        " {'allow-external-entities': true()}"), "<doc>X</doc>");
+        " { 'dtd': true() }"), "<doc>X</doc>");
+    query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
+        " { 'dtd': 'no' }"), "<doc/>");
+    query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
+        " { 'allow-external-entities': true() }"), "<doc>X</doc>");
     error(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
-        " {'allow-external-entities': 'no'}"), SAXERR_X);
+        " { 'allow-external-entities': 'no' }"), SAXERR_X);
   }
 }

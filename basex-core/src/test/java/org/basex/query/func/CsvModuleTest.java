@@ -22,7 +22,7 @@ public final class CsvModuleTest extends SandboxTest {
 
     final String path = "src/test/resources/input.csv";
     query(func.args(path) + "//entry[. = 'Picard'] ! string()", "Picard");
-    query(func.args(path, " map { 'header': true() }") + "/descendant::Name[1] ! string()",
+    query(func.args(path, " { 'header': true() }") + "/descendant::Name[1] ! string()",
         "Picard");
   }
 
@@ -204,16 +204,16 @@ public final class CsvModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void serializeXQuery() {
-    serial(" map { 'records': [ 'A', 'B' ] }",
+    serial(" { 'records': [ 'A', 'B' ] }",
         "'format': 'xquery'", "A,B\n");
-    serial(" map { 'records': [ 'A', 'B' ] }",
+    serial(" { 'records': [ 'A', 'B' ] }",
         "'header': false(), 'format': 'xquery'", "A,B\n");
-    serial(" map { 'names': [ 'A', 'B' ], 'records': () }",
+    serial(" { 'names': [ 'A', 'B' ], 'records': () }",
         "'header': true(), 'format': 'xquery'", "A,B\n");
-    serial(" map { 'names': [ 'A' ], 'records': [ '1' ] }",
+    serial(" { 'names': [ 'A' ], 'records': [ '1' ] }",
         "'header': true(), 'format': 'xquery'", "A\n1\n");
 
-    final String map = "{'names': ['A', 'B'], 'records': (['X'], ['Y'])}";
+    final String map = "{ 'names': ['A', 'B'], 'records': (['X'], ['Y']) }";
     serial(map, "'format': 'xquery', 'header': false()", "X\nY\n");
     serial(map, "'format': 'xquery', 'header': 'no'", "X\nY\n");
     serial(map, "'format': 'xquery', 'header': '0'", "X\nY\n");
@@ -266,7 +266,7 @@ public final class CsvModuleTest extends SandboxTest {
       final Function function) {
 
     final String query = options.isEmpty() ? function.args(input) :
-      function.args(input, " map { " + options + " }");
+      function.args(input, " { " + options + " }");
     if(expected.startsWith("...")) {
       contains(query, expected.substring(3));
     } else {

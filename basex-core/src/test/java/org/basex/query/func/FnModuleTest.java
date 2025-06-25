@@ -845,8 +845,8 @@ public final class FnModuleTest extends SandboxTest {
         " fn($n) { $n instance of xs:byte }"),
         1);
 
-    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
-        " fn($map) { map { 'string': replace($map?string, $map?remove, ''),"
+    query(func.args(" { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
+        " fn($map) { { 'string': replace($map?string, $map?remove, ''),"
         + "'remove': $map?remove =!> string-to-codepoints() "
         + "  =!> (fn($n) { $n + 2 })() =!> codepoints-to-string() } }",
         " fn($map) { not(characters($map?string) = $map?remove) }")
@@ -1316,7 +1316,7 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = FUNCTION_ANNOTATIONS;
     // queries
     query(func.args(" true#0"), "");
-    query(func.args(" %local:x function() { }") +
+    query(func.args(" %local:x function() {}") +
         "=> " + _MAP_CONTAINS.args(" #local:x"), true);
     query(func.args(" %Q{uri}name('a', 'b') function() {}") +
         " (QName('uri', 'name'))", "a\nb");
@@ -1455,9 +1455,9 @@ public final class FnModuleTest extends SandboxTest {
 
     final String path = "src/test/resources/input.html";
     query(func.args(path) + "//Q{http://www.w3.org/1999/xhtml}body ! name()", "body");
-    query(func.args(path, " {'method': 'tagsoup', 'nons': false()}")
+    query(func.args(path, " { 'method': 'tagsoup', 'nons': false() }")
         + "//Q{http://www.w3.org/1999/xhtml}body ! name()", "body");
-    query(func.args(path, " {'method': 'tagsoup'}") + "//body ! name()", "body");
+    query(func.args(path, " { 'method': 'tagsoup' }") + "//body ! name()", "body");
   }
 
   /** Test method. */
@@ -1643,7 +1643,7 @@ public final class FnModuleTest extends SandboxTest {
     // parser generation failure
     error(func.args("s: ~[#10ffff]."), IXML_GEN_X);
     // invalid input with fail option
-    error("let $parser := " + func.args("s: ~[\"x\"]*.", " map {'fail-on-error': true()}") + "\n"
+    error("let $parser := " + func.args("s: ~[\"x\"]*.", " { 'fail-on-error': true() }") + "\n"
         + "return $parser('x')", IXML_INP_X_X_X);
   }
 
@@ -1768,7 +1768,7 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void jsonToXml() {
     final Function func = JSON_TO_XML;
     contains(func.args("null"), "xmlns");
-    contains(func.args("null") + " update { }", "xmlns");
+    contains(func.args("null") + " update {}", "xmlns");
   }
 
   /** Test method. */
@@ -1777,21 +1777,21 @@ public final class FnModuleTest extends SandboxTest {
     final String module = "src/test/resources/hello.xqm";
     query(_REPO_INSTALL.args(module));
 
-    query(func.args("world", " {'variables': {QName('world', 'ext'): 42}}")
+    query(func.args("world", " { 'variables': { QName('world', 'ext'): 42 } }")
         + "?variables(QName('world', 'ext'))", 42);
     query("let $expr := '2 + 2'\n"
         + "let $module := `xquery version '4.0'; \n"
         + "                module namespace dyn='http://example.com/dyn';\n"
-        + "                declare %public variable $dyn:value := {$expr};`\n"
+        + "                declare %public variable $dyn:value := { $expr };`\n"
         + "let $exec := load-xquery-module('http://example.com/dyn', \n"
-        + "                                {'content':$module})\n"
+        + "                                { 'content': $module })\n"
         + "let $variables := $exec?variables\n"
         + "return $variables(QName('http://example.com/dyn', 'value'))", 4);
 
     error(func.args(""), MODULE_URI_EMPTY);
     error(func.args("x"), MODULE_NOT_FOUND_X);
-    error(func.args("x", " {'content': '%@?$'}"), MODULE_STATIC_ERROR_X_X);
-    error(func.args("x", " {'content': 'module namespace y = \"y\";'}"), MODULE_FOUND_OTHER_X);
+    error(func.args("x", " { 'content': '%@?$' }"), MODULE_STATIC_ERROR_X_X);
+    error(func.args("x", " { 'content': 'module namespace y = \"y\";' }"), MODULE_FOUND_OTHER_X);
     error(func.args("x.xq", " { 'content': 'declare function local:f() {}; ()' }"),
         MODULE_FOUND_MAIN_X);
     error(func.args("world"), VAREMPTY_X);
@@ -1978,7 +1978,7 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(" []"), INVCONVERT_X_X_X);
     error(func.args(" {}"), INVCONVERT_X_X_X);
     error(func.args(" [<x/>, <y/>]"), INVCONVERT_X_X_X);
-    error(func.args(" text{'a'}"), INVCONVERT_X_X_X);
+    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
   }
 
   /** Test method. */
@@ -2107,27 +2107,27 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" ()"), "");
     query(func.args("42"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
-    query(func.args("42", " map {'encoding': '" + Strings.UTF16LE + "'}"),
+    query(func.args("42", " { 'encoding': '" + Strings.UTF16LE + "' }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
     query(func.args(_CONVERT_STRING_TO_HEX.args("<html><head><meta charset='" + Strings.UTF16LE
         + "'></head><body>42</body>", Strings.UTF16LE),
-        " map {'encoding': '" + Strings.UTF16LE + "', 'xml-policy': 'ALTER_INFOSET'}"),
+        " { 'encoding': '" + Strings.UTF16LE + "', 'xml-policy': 'ALTER_INFOSET' }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"" + Strings.UTF16LE
         + "\"/></head><body>42</body></html>");
     query(func.args(_CONVERT_STRING_TO_BASE64.args("<html><head><meta charset='ISO-8859-7'></head>"
-        + "<body>\u20AC</body>", "ISO-8859-7"), " map {'heuristics': 'NONE'}"),
+        + "<body>\u20AC</body>", "ISO-8859-7"), " { 'heuristics': 'NONE' }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><meta charset=\"ISO-8859-7\"/></head>"
         + "<body>\u20AC</body></html>");
-    query(func.args("42", " map {'heuristics': 'ICU'}"),
+    query(func.args("42", " { 'heuristics': 'ICU' }"),
         "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head/><body>42</body></html>");
-    query(func.args("42", " {'method': 'tagsoup'}"), "<html><body>42</body></html>");
+    query(func.args("42", " { 'method': 'tagsoup' }"), "<html><body>42</body></html>");
 
     error(func.args(42), STRBIN_X_X);
     error(func.args("42", 42), INVCONVERT_X_X_X);
-    error(func.args("42", " map {'1234': ''}"), INVALIDOPTION_X);
-    error(func.args("42", " map {'heuristics': '5678'}"), INVALIDOPTION_X);
-    error(func.args("42", " map {'heuristics': 'CHARDET'}"), BASEX_CLASSPATH_X_X);
-    error(func.args("42", " map {'heuristics': 'ALL'}"), BASEX_CLASSPATH_X_X);
+    error(func.args("42", " { '1234': '' }"), INVALIDOPTION_X);
+    error(func.args("42", " { 'heuristics': '5678' }"), INVALIDOPTION_X);
+    error(func.args("42", " { 'heuristics': 'CHARDET' }"), BASEX_CLASSPATH_X_X);
+    error(func.args("42", " { 'heuristics': 'ALL' }"), BASEX_CLASSPATH_X_X);
   }
 
   /** Test method. */
@@ -2352,9 +2352,9 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = PARSE_JSON;
     query(func.args("\"x\\u0000\""), "x\uFFFD");
     query(func.args("\"a\\bb\\uD801\\uDC02c\\uD803d\\uDC04e\\uD805\\uD806\"",
-        " {'fallback': fn($s) {'[' || $s || ']'}}"),
+        " { 'fallback': fn($s) { '[' || $s || ']' } }"),
         "a[\\b]b\uD801\uDC02c[\\uD803]d[\\uDC04]e[\\uD805][\\uD806]");
-    query("try {" + func.args("nvll") + "} catch * {$err:description}",
+    query("try {" + func.args("nvll") + "} catch * { $err:description }",
         "(1:1): Unexpected JSON value: 'nvll'.");
   }
 
@@ -2369,11 +2369,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("<a/>") + "/*[1][not(child::node())]", "<a/>");
     query(func.args("<a/>") + "/*[1][self::a][not(child::node())]", "<a/>");
     query(func.args("<x> <y> </y> </x>"), "<x> <y> </y> </x>");
-    query(func.args("<x> <y> </y> </x>", " {'strip-space': false()}"), "<x> <y> </y> </x>");
-    query(func.args("<x> <y> </y> </x>", " {'strip-space': true()}"), "<x><y/></x>");
+    query(func.args("<x> <y> </y> </x>", " { 'strip-space': false() }"), "<x> <y> </y> </x>");
+    query(func.args("<x> <y> </y> </x>", " { 'strip-space': true() }"), "<x><y/></x>");
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
-    query(func.args("<x:doc xmlns:x='X'/>", " {'stripns': false()}"), "<x:doc xmlns:x=\"X\"/>");
-    query(func.args("<x:doc xmlns:x='X'/>", " {'stripns': true()}"), "<doc/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': false() }"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': true() }"), "<doc/>");
     query(func.args(_CONVERT_STRING_TO_HEX.args("<?xml version='1.0' encoding='" + Strings.UTF16LE
         + "'?><x>42</x>", Strings.UTF16LE)), "<x>42</x>");
     query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
@@ -2385,43 +2385,45 @@ public final class FnModuleTest extends SandboxTest {
         + "<!ELEMENT b EMPTY>"
         + "<!ENTITY e SYSTEM '" + path + "'>]>";
     query(func.args(dtd + "<a>&amp;e;</a>"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'no'}"), "<a/>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd': 'yes'}"), "<a><b/></a>");
-    query(func.args(dtd + "<b>&amp;e;</b>", " {'dtd': 'yes'}"), "<b><b/></b>");
-    query(func.args(dtd + "<a><b/></a>", " {'dtd-validation': 'yes'}"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'no'}"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes'}"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " {'dtd-validation': 'yes', 'dtd': 'yes'}"),
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': 'no' }"), "<a/>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': 'yes' }"), "<a><b/></a>");
+    query(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd': 'yes' }"), "<b><b/></b>");
+    query(func.args(dtd + "<a><b/></a>", " { 'dtd-validation': 'yes' }"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'no' }"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes' }"), "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes', 'dtd': 'yes' }"),
         "<a><b/></a>");
     query(func.args("<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
-        " {'xsd-validation': 'strict'}"),
+        " { 'xsd-validation': 'strict' }"),
         "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
         + "xsi:noNamespaceSchemaLocation=\"src/test/resources/validate.xsd\"/>");
 
     query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
-        + "'/></a>", " {'xinclude': 'no'}"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
+        + "'/></a>", " { 'xinclude': 'no' }"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
         + "<xi:include href=\"" + path + "\"/></a>");
     query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
-        + "'/></a>", " {'xinclude': 'yes'}"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
+        + "'/></a>", " { 'xinclude': 'yes' }"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
         + "<b xml:base=\"src/test/resources/parse-xml.entity\"/></a>");
 
-    error(func.args(dtd + "<b>&amp;e;</b>", " {'dtd-validation': 'yes'}"), DTDVALIDATIONERR_X);
+    error(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd-validation': 'yes' }"), DTDVALIDATIONERR_X);
     error(func.args("<a xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
-        " {'xsd-validation': 'strict'}"), XSDVALIDATIONERR_X);
-    error(func.args("<a/>", " {'catalog': 'catalog.xml'}"), INVALIDOPTION_X);
+        " { 'xsd-validation': 'strict' }"), XSDVALIDATIONERR_X);
+    error(func.args("<a/>", " { 'catalog': 'catalog.xml' }"), INVALIDOPTION_X);
   }
 
   /** Test method. */
   @Test public void parseXmlFragment() {
     final Function func = PARSE_XML_FRAGMENT;
     query(func.args("<x> <y> </y> </x> <z/>"), "<x> <y> </y> </x> <z/>");
-    query(func.args("<x> <y> </y> </x> <z/>", " {'strip-space': 'no'}"), "<x> <y> </y> </x> <z/>");
-    query(func.args("<x> <y> </y> </x> <z/>", " {'strip-space': 'yes'}"), "<x><y/></x><z/>");
+    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': 'no' }"),
+        "<x> <y> </y> </x> <z/>");
+    query(func.args("<x> <y> </y> </x> <z/>", " { 'strip-space': 'yes' }"),
+        "<x><y/></x><z/>");
     query(func.args("<x:doc xmlns:x='X'/>"), "<x:doc xmlns:x=\"X\"/>");
-    query(func.args("<x:doc xmlns:x='X'/>", " {'stripns': false()}"), "<x:doc xmlns:x=\"X\"/>");
-    query(func.args("<x:doc xmlns:x='X'/>", " {'stripns': true()}"), "<doc/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': false() }"), "<x:doc xmlns:x=\"X\"/>");
+    query(func.args("<x:doc xmlns:x='X'/>", " { 'stripns': true() }"), "<doc/>");
     query(func.args(_CONVERT_STRING_TO_HEX.args("<?xml version='1.0' encoding='" + Strings.UTF16LE
         + "'?><x/><y/>", Strings.UTF16LE)), "<x/><y/>");
     query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
@@ -2596,13 +2598,13 @@ public final class FnModuleTest extends SandboxTest {
 
     query(func.args("a", "a", " ()"), "");
 
-    query(func.args("b", "b", " fn($k, $g) { }"), "");
+    query(func.args("b", "b", " fn($k, $g) {}"), "");
     query(func.args("c", "c", " fn($k, $g) { upper-case($k) }"), "C");
     query(func.args("de", ".", " fn($k, $g) { $k || $k }"), "ddee");
 
     query(func.args("Chapter 9", "[0-9]+", " fn($k, $g) { string(number($k) + 1) }"),
         "Chapter 10");
-    query("let $map := map { 'LAX': 'Los Angeles', 'LHR': 'London' } return"
+    query("let $map := { 'LAX': 'Los Angeles', 'LHR': 'London' } return"
         + func.args("LHR to LAX", "[A-Z]{3}", " fn($s, $g) { $map($s) }"),
         "London to Los Angeles");
     query(func.args("57°43′30″", "([0-9]+)°([0-9]+)′([0-9]+)″", " fn($s, $g) "
@@ -2632,8 +2634,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("X", ".", " contains#2"), true);
     query(func.args("1", "(.)", " fn($n, $_) { $n + 1 }"), 2);
 
-    query(func.args("bab", "a", " fn($_, $__) { }"), "bb");
-    query(func.args("bab", "(a)", " fn($_, $__) { }"), "bb");
+    query(func.args("bab", "a", " fn($_, $__) {}"), "bb");
+    query(func.args("bab", "(a)", " fn($_, $__) {}"), "bb");
     query(func.args("bab", "(a)", " fn($_, $__) { '' }"), "bb");
     query(func.args("abcde", "b(.)d", "$1"), "ace");
     query(func.args("abcde", "b(.)d", "$1", "j"), "ace");
@@ -2763,23 +2765,23 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void serialize() {
     final Function func = SERIALIZE;
     contains(func.args(" <x/>"), "<x/>");
-    contains(func.args(" <x/>", " map { }"), "<x/>");
-    contains(func.args(" <x>a</x>", " map { 'method': 'text' }"), "a");
+    contains(func.args(" <x/>", " {}"), "<x/>");
+    contains(func.args(" <x>a</x>", " { 'method': 'text' }"), "a");
 
     // character maps
-    query(func.args("1;2", " map { 'use-character-maps': ';=,,' }"), "1,2");
-    query(func.args("1;2", " map { 'use-character-maps': map { ';': ',' } }"), "1,2");
+    query(func.args("1;2", " { 'use-character-maps': ';=,,' }"), "1,2");
+    query(func.args("1;2", " { 'use-character-maps': { ';': ',' } }"), "1,2");
 
     // boolean arguments
-    query(func.args("1", " map { 'indent': 'yes' }"), 1);
-    query(func.args("1", " map { 'indent': false() }"), 1);
-    query(func.args("1", " map { 'indent': true() }"), 1);
-    query(func.args("1", " map { 'indent': 1 }"), 1);
-    error(func.args("1", " map { 'indent': 2 }"), INVALIDOPTION_X);
+    query(func.args("1", " { 'indent': 'yes' }"), 1);
+    query(func.args("1", " { 'indent': false() }"), 1);
+    query(func.args("1", " { 'indent': true() }"), 1);
+    query(func.args("1", " { 'indent': 1 }"), 1);
+    error(func.args("1", " { 'indent': 2 }"), INVALIDOPTION_X);
 
-    query(func.args("<html/>", " map { 'html-version': 5 }"), "&lt;html/&gt;");
-    query(func.args("<html/>", " map { 'html-version': 5.0 }"), "&lt;html/&gt;");
-    query(func.args("<html/>", " map { 'html-version': 5.0000 }"), "&lt;html/&gt;");
+    query(func.args("<html/>", " { 'html-version': 5 }"), "&lt;html/&gt;");
+    query(func.args("<html/>", " { 'html-version': 5.0 }"), "&lt;html/&gt;");
+    query(func.args("<html/>", " { 'html-version': 5.0000 }"), "&lt;html/&gt;");
   }
 
   /** Test method. */
@@ -3554,9 +3556,9 @@ public final class FnModuleTest extends SandboxTest {
         " fn($n) { if($n instance of xs:short) then xs:byte($n) else xs:short($n) }"),
         1);
 
-    query(func.args(" map { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
+    query(func.args(" { 'string': 'muckanaghederdauhaulia', 'remove': 'a' }",
         " fn($map) { characters($map?string) = $map?remove }",
-        " fn($map) { map { 'string': replace($map?string, $map?remove, ''),"
+        " fn($map) { { 'string': replace($map?string, $map?remove, ''),"
         + "'remove': $map?remove =!> string-to-codepoints() "
         + "  =!> (fn($n) { $n + 2 })() =!> codepoints-to-string() } }")
         + "?string", "unhdrduhul");
@@ -3589,7 +3591,7 @@ public final class FnModuleTest extends SandboxTest {
   @Test public void xmlToJson() {
     final Function func = XML_TO_JSON;
     query(func.args(" <map xmlns='http://www.w3.org/2005/xpath-functions'>"
-        + "<string key=''>í</string></map>", " map { 'indent' : 'no' }"), "{\"\":\"\u00ed\"}");
+        + "<string key=''>í</string></map>", " { 'indent' : 'no' }"), "{\"\":\"\u00ed\"}");
     query(func.args(" <fn:string key='root'>X</fn:string>"), "\"X\"");
   }
 }

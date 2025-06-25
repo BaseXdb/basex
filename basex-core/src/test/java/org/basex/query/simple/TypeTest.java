@@ -36,15 +36,15 @@ public final class TypeTest extends QueryTest {
             "{1: 1, 'a': 2} instance of map((xs:integer|xs:string), item())"},
         { "Type 8", booleans(false), "{1: 1} instance of map((xs:unsignedByte|xs:byte), item())"},
         { "Type 9", booleans(true),
-            "{'a' cast as enum('a'): 1} instance of map(enum('a'), item())"},
+            "{ 'a' cast as enum('a'): 1 } instance of map(enum('a'), item())"},
         { "Type 10", booleans(false),
-            "{'b' cast as enum('b'): 1} instance of map(enum('a'), item())"},
-        { "Type 11", booleans(true), "fn($a as (enum('a')|enum('b'))) as item()* {$a} "
+            "{ 'b' cast as enum('b'): 1 } instance of map(enum('a'), item())"},
+        { "Type 11", booleans(true), "fn($a as (enum('a')|enum('b'))) as item()* { $a } "
             + "instance of fn(enum('a', 'b')) as item()*"
         },
-        { "Type 12", booleans(true), "fn() as record(a as xs:integer) {map{'a': 42}} instance of "
+        { "Type 12", booleans(true), "fn() as record(a as xs:integer) { { 'a': 42 } } instance of "
             + "fn() as record(a? as xs:integer)"},
-        { "Type 13", booleans(false), "fn() as record(a? as xs:integer) {map{}} instance of "
+        { "Type 13", booleans(false), "fn() as record(a? as xs:integer) { {} } instance of "
             + "fn() as record(a as xs:integer)"},
 
         { "TypeErr 1", "1 instance of xs:abcde" },
@@ -52,15 +52,15 @@ public final class TypeTest extends QueryTest {
         { "TypeErr 3", "1 instance of item" },
 
         { "Subtyping 1", booleans(true), "declare namespace p1='p1'; declare namespace p2='p2'; "
-            + "declare variable $x external := ''; function() as element(p1:a)? {$x} "
+            + "declare variable $x external := ''; function() as element(p1:a)? { $x } "
             + "instance of function() as element(p1:*)?" },
         { "Subtyping 1", booleans(false), "declare namespace p1='p1'; declare namespace p2='p2'; "
-            + "declare variable $x external := ''; function() as element(p1:*|p2:*)? {$x} "
+            + "declare variable $x external := ''; function() as element(p1:*|p2:*)? { $x } "
             + "instance of function() as element(p1:*)?" },
         { "Subtyping 1", booleans(true), "declare variable $x external := ''; function() as "
-            + "element(a|b)? {$x} instance of function() as element(*:a|*:b)?" },
+            + "element(a|b)? { $x } instance of function() as element(*:a|*:b)?" },
         { "Subtyping 1", booleans(false), "declare variable $x external := ''; function() as "
-            + "element(a|b|c)? {$x} instance of function() as (element(a)|element(b))?" },
+            + "element(a|b|c)? { $x } instance of function() as (element(a)|element(b))?" },
     };
   }
 }

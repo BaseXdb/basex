@@ -194,7 +194,7 @@ public final class JavaFunctionTest extends SandboxTest {
   /** Process arrays. */
   @Test public void array() {
     final String mod = "import module namespace n = 'org.basex.query.func.JavaFunctionExample'; ";
-    query(mod + "n:strings(array { })", "");
+    query(mod + "n:strings(array {})", "");
     query(mod + "n:strings(array { '1' })", 1);
     query(mod + "n:longs(array { 1 })", 1);
     query(mod + "n:chars() => codepoints-to-string()", "ab");

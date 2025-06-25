@@ -148,7 +148,7 @@ public final class MixedTest extends SandboxTest {
     query("<A>{ document { <a><b/><c/></a> }/a/* }</A>/c/preceding-sibling::b", "<b/>");
     query("<A>{ (document { <a><b/><c/></a> } update {})/a/* }</A>/c/preceding-sibling::b", "<b/>");
 
-    error("let $doc := document { <a><b/></a> } update { }"
+    error("let $doc := document { <a><b/></a> } update {}"
         + "return id('id', element c { $doc/*/node() }/*)", IDDOC);
   }
 
@@ -480,16 +480,16 @@ public final class MixedTest extends SandboxTest {
     test("map:build(1 to 3) => map:remove(1)",
         new TypeInfo(XQTrieMap.class, "map(xs:integer, xs:integer)", 2),
         new TypeInfo(XQIntMap.class, "map(xs:integer, xs:integer)", 2));
-    test("map { 1: ('x', 1 to 3) => remove(1) }",
+    test("{ 1: ('x', 1 to 3) => remove(1) }",
         new TypeInfo(XQSingletonMap.class, "map(xs:integer, xs:anyAtomicType+)", 1),
         new TypeInfo(XQSingletonMap.class, "map(xs:integer, xs:integer+)", 1));
-    test("map { 1: ('x', 1 to 3) => remove(1), 2: 3 }",
+    test("{ 1: ('x', 1 to 3) => remove(1), 2: 3 }",
         new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:anyAtomicType+)", 2),
         new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:integer+)", 2));
-    test("map { 1: ('x', 1 to 3) => remove(1), 2: 3 }",
+    test("{ 1: ('x', 1 to 3) => remove(1), 2: 3 }",
         new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:anyAtomicType+)", 2),
         new TypeInfo(XQIntValueMap.class, "map(xs:integer, xs:integer+)", 2));
-    test("map { 'a': ('x', 1 to 3) => remove(1), 'b': 3 }",
+    test("{ 'a': ('x', 1 to 3) => remove(1), 'b': 3 }",
         new TypeInfo(XQRecordMap.class, "record(a as xs:anyAtomicType+, b as xs:integer)", 2),
         new TypeInfo(XQRecordMap.class, "record(a as xs:anyAtomicType+, b as xs:integer)", 2));
 

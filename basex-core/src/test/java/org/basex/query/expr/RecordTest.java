@@ -20,13 +20,13 @@ public final class RecordTest extends SandboxTest {
   @Test public void instanceOf() {
     query("declare record x(x); { 'x': () } instance of x", true);
 
-    query("{ } instance of record()", true);
+    query("{} instance of record()", true);
     query("{ 'x': () } instance of record()", false);
     query("declare record local:empty(); {} instance of local:empty", true);
     query("declare record local:empty(); { 'x': () } instance of local:empty", false);
 
     query("{ 'x': () } instance of record(x)", true);
-    query("{ } instance of record(x)", false);
+    query("{} instance of record(x)", false);
 
     query("{ 'x': (), 'y': () } instance of record(x, *)", true);
     query("{ 'x': (), 'y': () } instance of record(x)", false);
@@ -41,61 +41,65 @@ public final class RecordTest extends SandboxTest {
 
   /** Recursive records. */
   @Test public void recRec() {
-    query("declare variable $v as list := {'value':42,'next':{'value':43,'next':{'value':44}}};\n"
+    query("declare variable $v as list := "
+        + "{ 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44 } } };\n"
         + "declare record list(value as item()*, next? as list);\n"
         + "$v",
         "{\"value\":42,\"next\":{\"value\":43,\"next\":{\"value\":44}}}");
-    query("declare variable $v :=\n"
-        + "  {'value':42,'next':{'value':43,'next':{'value':44}}} instance of list;\n"
+    query("declare variable $v := "
+        + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44 } } } instance of list;\n"
         + "declare record list(value as item()*, next? as list);\n"
         + "$v",
         true);
-    query("declare variable $v :=\n"
-        + "  {'value':42,'next':{'value':43,'next':{'value':44,'next':()}}} instance of list;\n"
+    query("declare variable $v := "
+        + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44, 'next': () } } } "
+        + "instance of list;\n"
         + "declare record list(value as item()*, next? as list);"
         + "$v",
         false);
     // recursive RecordType.instanceOf
     query("declare record list1(value, next? as list1);\n"
         + "declare record list2(value, next? as list2);\n"
-        + "fn($l as list2) as list1 {$l} ({'value': ()})",
+        + "fn($l as list2) as list1 { $l }({ 'value': () })",
         "{\"value\":()}");
     // recursive RecordType.eq and RecordType.instanceOf
     query("declare record list1(value, next? as list1);\n"
         + "declare record list2(value, next? as list2);\n"
-        + "declare function local:f1($l as list1) as list2 {$l};\n"
-        + "declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 {$f($l)};\n"
-        + "local:f2(local:f1#1, {'value': ()})",
+        + "declare function local:f1($l as list1) as list2 { $l };\n"
+        + "declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
+        + "local:f2(local:f1#1, { 'value': () })",
         "{\"value\":()}");
     // recursive RecordType.eq and RecordType.instanceOf
-    query("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 {$f($l)};\n"
+    query("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
         + "declare record list1(value, next? as list1);\n"
         + "declare record list2(value, next? as record(value, next? as list2));\n"
-        + "local:f2(fn($l as list1) as list2 {$l}, {'value': 42, 'next': {'value': 43}})",
+        + "local:f2(fn($l as list1) as list2 { $l }, { 'value': 42, 'next': { 'value': 43 } })",
         "{\"value\":42,\"next\":{\"value\":43}}");
     // recursive RecordType.union
     query("declare record list1(value, next? as list1);declare record list2(item, next? as list2);"
-        + "fn($l1 as list1, $l2 as list2) {map:merge(($l1, $l2))} ({'value':42,'next':{'value':43}}"
-        + ",{'item':44,'next':{'item':45}})", "{\"value\":42,\"next\":{\"value\":43},\"item\":44}");
+        + "fn($l1 as list1, $l2 as list2) { "
+        + "map:merge(($l1, $l2))}("
+        + "{ 'value': 42, 'next': { 'value': 43 } }, { 'item': 44,'next': { 'item': 45 } })",
+        "{\"value\":42,\"next\":{\"value\":43},\"item\":44}");
     // recursive RecordType.intersect
     query("declare record list1(next? as list1, x, y?);\n"
         + "declare record list2(next? as list2, x, z?);\n"
-        + "let $f := fn($r as record(next? as list2, x as xs:boolean)) as xs:boolean {$r?x}\n"
-        + "let $r as record(next? as list1, x as xs:untypedAtomic) := {'x':<a>0</a>}\n"
+        + "let $f := fn($r as record(next? as list2, x as xs:boolean)) as xs:boolean { $r?x }\n"
+        + "let $r as record(next? as list1, x as xs:untypedAtomic) := { 'x': <a>0</a> }\n"
         + "return $f($r)",
         "false");
 
     //  cannot convert empty-sequence() to optional list
     error("declare variable $v as list :=\n"
-        + "  {'value':42,'next':{'value':43,'next':{'value':44,'next':()}}};\n"
+        + "  { 'value':42, 'next': { 'value':43, 'next': { 'value': 44, 'next':() } } };\n"
         + "declare record list(value as item()*, next? as list);\n"
         + "$v",
         INVCONVERT_X_X_X);
     // recursive RecordType.eq and RecordType.instanceOf
-    error("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 {$f($l)};\n"
+    error("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
         + "declare record list1(value, next? as list1);\n"
         + "declare record list2(value, next? as record(value as xs:string, next? as list2));\n"
-        + "local:f2(fn($l as list1) as list2 {$l}, {'value': 42, 'next': {'value': 43}})",
+        + "local:f2(fn($l as list1) as list2 { $l }, { 'value': 42, 'next': { 'value': 43 } })",
         INVCONVERT_X_X_X);
   }
 
@@ -115,7 +119,7 @@ public final class RecordTest extends SandboxTest {
         "{\"r\":3,\"i\":2}\n{\"r\":3,\"i\":()}");
     query("declare namespace p = 'P'\n;"
         + "declare record p:person(first as xs:string, last as xs:string, *);\n"
-        + "p:person('John', 'Smith', {'last': 'Miller', 'middle': 'A.'})",
+        + "p:person('John', 'Smith', { 'last': 'Miller', 'middle': 'A.' })",
         "{\"first\":\"John\",\"last\":\"Smith\",\"middle\":\"A.\"}");
     // recursive record type constructor function
     query("declare function local:f($x, $y) {local:list($x, $y)};\n"

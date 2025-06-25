@@ -25,16 +25,16 @@ public final class WebModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void createUrl() {
     final Function func = _WEB_CREATE_URL;
-    query(func.args("http://x.com", " map { }"), "http://x.com");
-    query(func.args("url", " map { 'a': 'b' }"), "url?a=b");
-    query(func.args("url", " map { 'a': ('b', 'c') }"), "url?a=b&a=c");
-    query(func.args("url", " map { 12: true() }"), "url?12=true");
+    query(func.args("http://x.com", " {}"), "http://x.com");
+    query(func.args("url", " { 'a': 'b' }"), "url?a=b");
+    query(func.args("url", " { 'a': ('b', 'c') }"), "url?a=b&a=c");
+    query(func.args("url", " { 12: true() }"), "url?12=true");
 
-    query(func.args("url", " map { }", "a"), "url#a");
+    query(func.args("url", " {}", "a"), "url#a");
 
-    error(func.args("url", " map { (): 'a' }"), EMPTYFOUND);
-    error(func.args("url", " map { ('a', 'b'): () }"), SEQFOUND_X);
-    error(func.args("url", " map { 'a': true#0 }"), FIATOMIZE_X);
+    error(func.args("url", " { (): 'a' }"), EMPTYFOUND);
+    error(func.args("url", " { ('a', 'b'): () }"), SEQFOUND_X);
+    error(func.args("url", " { 'a': true#0 }"), FIATOMIZE_X);
   }
 
   /** Test method. */
@@ -70,7 +70,7 @@ public final class WebModuleTest extends SandboxTest {
   @Test public void forward() {
     final Function func = _WEB_FORWARD;
     query(func.args("a/b") + "/text() = 'a/b'", true);
-    query(func.args("a/b", " map { 'c': 'd' }") + "/text() = 'a/b?c=d'", true);
+    query(func.args("a/b", " { 'c': 'd' }") + "/text() = 'a/b?c=d'", true);
   }
 
   /** Test method. */
@@ -79,9 +79,9 @@ public final class WebModuleTest extends SandboxTest {
     query(func.args("a/b") + "/*:response/*:header/@value = 'a/b'", true);
     query(func.args("a/b") + "/*:response/*:header/@name = 'Location'", true);
     query(func.args("a/b") + "/*:response/@status = 302", true);
-    query(func.args("a/b", " map { }", "a") + "/*:response/*:header/@value = 'a/b#a'", true);
+    query(func.args("a/b", " {}", "a") + "/*:response/*:header/@value = 'a/b#a'", true);
 
-    query(func.args("a/b", " map { 'a': 'b' }") +
+    query(func.args("a/b", " { 'a': 'b' }") +
         "/*:response/*:header[@name = 'Location']/@value/string()", "a/b?a=b");
 
     // GH-1585
@@ -95,21 +95,21 @@ public final class WebModuleTest extends SandboxTest {
     query(func.args() + "/output:serialization-parameters/output:media-type", "");
 
     // overwrite header
-    query(func.args(" map { 'media-type': 'X' }") +
+    query(func.args(" { 'media-type': 'X' }") +
         "/output:serialization-parameters/output:media-type/@value/string()", "X");
     // header is not generated if value is empty
-    query("count(" + func.args(" map { 'media-type': '' }") +
+    query("count(" + func.args(" { 'media-type': '' }") +
         "/output:serialization-parameters/*)", 0);
 
     // overwrite header
-    query(func.args(" map { }", " map { 'Cache-Control': 'X' }") +
+    query(func.args(" {}", " { 'Cache-Control': 'X' }") +
         "/http:response/http:header[@name = 'Cache-Control']/@value/string()", "X");
     // header is not generated if value is empty
-    query("count(" + func.args(" map { }", " map { 'Cache-Control': '' }") +
+    query("count(" + func.args(" {}", " { 'Cache-Control': '' }") +
         "/http:response/*)", 0);
 
     // status/message arguments
-    query(func.args(" map { }", " map { }", " map { 'status': 200, 'message': 'OK' }") +
+    query(func.args(" {}", " {}", " { 'status': 200, 'message': 'OK' }") +
         "/http:response ! (@status, @message) ! string()", "200\nOK");
 
     // GH-1585
