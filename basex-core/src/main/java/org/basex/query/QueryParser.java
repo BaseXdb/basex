@@ -29,7 +29,6 @@ import org.basex.query.expr.ft.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
-import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.up.expr.*;

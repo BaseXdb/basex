@@ -62,8 +62,7 @@ public abstract class ParseHtml extends ParseFn {
   }
 
   @Override
-  final Value parse(final TextInput ti, final Options options, final QueryContext qc)
-      throws QueryException, IOException {
+  final Value parse(final TextInput ti, final Options options, final QueryContext qc) {
     // may be applicable once input is streamed by HTML parser
     throw Util.notExpected();
   }

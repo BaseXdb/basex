@@ -5,8 +5,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 
-import jakarta.servlet.http.*;
-
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
@@ -20,10 +18,9 @@ import org.basex.util.http.*;
 import org.basex.util.list.*;
 import org.basex.util.log.*;
 import org.eclipse.jetty.ee9.websocket.api.*;
-import org.eclipse.jetty.ee9.websocket.api.Session;
-import org.eclipse.jetty.ee9.websocket.api.StatusCode;
-import org.eclipse.jetty.ee9.websocket.api.UpgradeRequest;
 import org.eclipse.jetty.ee9.websocket.api.exceptions.*;
+
+import jakarta.servlet.http.*;
 
 /**
  * This class defines an abstract WebSocket. It inherits the Jetty WebSocket adapter.

@@ -118,7 +118,7 @@ public abstract class ALookup extends Arr {
       case PAIRS -> XQMap.pair(key, value);
       default -> {
         final ArrayBuilder ab = new ArrayBuilder();
-        value.forEach(it -> ab.add(it));
+        value.forEach(ab::add);
         yield ab.array();
       }
     };

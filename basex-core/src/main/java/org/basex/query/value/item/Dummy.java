@@ -135,12 +135,12 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
+  public Value shrink(final QueryContext qc) {
     throw Util.notExpected();
   }
 
   @Override
-  protected Value rebuild(final QueryContext qc) throws QueryException {
+  protected Value rebuild(final QueryContext qc) {
     throw Util.notExpected();
   }
 

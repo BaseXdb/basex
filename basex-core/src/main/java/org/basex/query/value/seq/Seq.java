@@ -186,7 +186,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public boolean refineType() throws QueryException {
+  public boolean refineType() {
     boolean same = true;
     if(type.refinable()) {
       Type refined = null;

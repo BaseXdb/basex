@@ -318,6 +318,7 @@ public final class HTTPConnection implements ClientInfo {
    * @param body message for response body (can be {@code null})
    * @throws IOException I/O exception
    */
+  @SuppressWarnings("deprecation")
   public void status(final int code, final String message, final String body) throws IOException {
     try {
       response.resetBuffer();
@@ -338,8 +339,7 @@ public final class HTTPConnection implements ClientInfo {
       } else {
         // do not allow Jetty to create a custom error html page
         // control characters and non-ASCII codes will be removed (GH-1632)
-        // response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
-        response.setStatus(c);
+        response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
       }
 
       if(body != null) {

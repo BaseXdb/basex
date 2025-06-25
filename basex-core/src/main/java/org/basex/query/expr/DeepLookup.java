@@ -29,11 +29,6 @@ public final class DeepLookup extends ALookup {
   }
 
   @Override
-  public Expr optimize(final CompileContext cc) throws QueryException {
-    return this;
-  }
-
-  @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter iter = exprs[0].iter(qc);

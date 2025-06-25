@@ -28,7 +28,7 @@ public final class FnUnparsedBinary extends ParseFn {
   }
 
   @Override
-  protected Options options(final QueryContext qc) throws QueryException {
+  protected Options options(final QueryContext qc) {
     return new Options();
   }
 }
