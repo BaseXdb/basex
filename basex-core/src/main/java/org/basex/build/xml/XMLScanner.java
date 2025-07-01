@@ -985,9 +985,10 @@ final class XMLScanner extends Job {
     byte[] sd = token(NO);
     if(!consume(sd)) {
       sd = token(YES);
-      if(!consume(sd) || fragment) throw error(DECLSTANDALONE);
+      if(!consume(sd)) sd = null;
     }
     check((char) d);
+    if(sd == null || fragment) throw error(DECLSTANDALONE);
     return sd;
   }
 

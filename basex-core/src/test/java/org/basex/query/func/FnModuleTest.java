@@ -2428,6 +2428,11 @@ public final class FnModuleTest extends SandboxTest {
         + "'?><x/><y/>", Strings.UTF16LE)), "<x/><y/>");
     query(func.args(_CONVERT_STRING_TO_BASE64.args("<?xml version='1.0' encoding='ISO-8859-7'?><x>"
         + "\u20AC</x><y>\u20AF</y>", "ISO-8859-7")), "<x>\u20AC</x><y>\u20AF</y>");
+
+    // GH-2449
+    query(func.args("<?xml version='1.0' encoding='utf8'?><a/>"), "<a/>");
+    error(func.args("<?xml version='1.0' encoding='utf8' standalone='no'?><a/>"), SAXERR_X);
+    error(func.args("<?xml version='1.0' encoding='utf8' standalone='yes'?><a/>"), SAXERR_X);
   }
 
   /** Test method. */
