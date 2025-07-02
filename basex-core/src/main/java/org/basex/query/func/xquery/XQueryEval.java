@@ -3,6 +3,7 @@ package org.basex.query.func.xquery;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.math.*;
 import java.util.*;
 import java.util.Map.*;
 
@@ -16,6 +17,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -31,7 +33,8 @@ public class XQueryEval extends StandardFunc {
     /** Permission. */
     public static final EnumOption<Perm> PERMISSION = new EnumOption<>("permission", Perm.ADMIN);
     /** Timeout in seconds. */
-    public static final NumberOption TIMEOUT = new NumberOption("timeout", 0);
+    public static final ValueOption TIMEOUT =
+        new ValueOption("timeout", AtomType.DECIMAL.seqType(), Dec.ZERO);
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
     /** Query base-uri. */
@@ -94,7 +97,8 @@ public class XQueryEval extends StandardFunc {
       }
 
       // timeout
-      final long ms = options.get(XQueryOptions.TIMEOUT) * 1000L;
+      final long ms = ((ANum) options.get(XQueryOptions.TIMEOUT)).dec(info).
+          multiply(BigDecimal.valueOf(1000)).longValue();
       if(ms != 0) {
         if(to == null) to = new Timer(true);
         to.schedule(new TimerTask() {

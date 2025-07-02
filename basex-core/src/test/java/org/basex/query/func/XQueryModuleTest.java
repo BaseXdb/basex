@@ -75,6 +75,8 @@ public final class XQueryModuleTest extends SandboxTest {
         " { 'timeout': 1 }") + " } catch * { () }", "");
     error(func.args("(1 to 10000000000000)[. = 0]", " {}",
         " { 'timeout': 1 }"), XQUERY_TIMEOUT);
+    error(func.args("(1 to 10000000000000)[. = 0]", " {}",
+        " { 'timeout': .1 }"), XQUERY_TIMEOUT);
   }
 
   /** Test method. */
