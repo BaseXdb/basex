@@ -1392,11 +1392,11 @@ public enum Function implements AFunction {
   _FILE_CREATE_DIR(FileCreateDir::new, "create-dir(path)",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
-  _FILE_CREATE_TEMP_DIR(FileCreateTempDir::new, "create-temp-dir(prefix[,suffix,dir])",
-      params(STRING_O, STRING_ZO, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
+  _FILE_CREATE_TEMP_DIR(FileCreateTempDir::new, "create-temp-dir([prefix,suffix,dir])",
+      params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
-  _FILE_CREATE_TEMP_FILE(FileCreateTempFile::new, "create-temp-file(prefix[,suffix,dir])",
-      params(STRING_O, STRING_ZO, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
+  _FILE_CREATE_TEMP_FILE(FileCreateTempFile::new, "create-temp-file([prefix,suffix,dir])",
+      params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_CURRENT_DIR(FileCurrentDir::new, "current-dir()",
       params(), STRING_O, flag(), FILE_URI, Perm.CREATE),

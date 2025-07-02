@@ -175,7 +175,7 @@ public final class FileModuleTest extends SandboxTest {
   @Test public void createTempFile() {
     final Function func = _FILE_CREATE_TEMP_FILE;
     // successful queries
-    final String tmp = query(func.args("", ""));
+    final String tmp = query(func.args());
     query(_FILE_EXISTS.args(tmp), true);
     query(_FILE_IS_DIR.args(tmp), false);
     query(_FILE_IS_FILE.args(tmp), true);
