@@ -1428,6 +1428,9 @@ public enum Function implements AFunction {
   _FILE_LINE_SEPARATOR(FileLineSeparator::new, "line-separator()",
       params(), STRING_O, FILE_URI),
   /** XQuery function. */
+  _FILE_IS_LINK(FileIsLink::new, "is-link(path)",
+      params(STRING_O), BOOLEAN_O, flag(NDT), FILE_URI, Perm.ADMIN),
+  /** XQuery function. */
   _FILE_LIST(FileList::new, "list(path[,recursive,pattern])",
       params(STRING_O, BOOLEAN_ZO, STRING_ZO), STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */

@@ -266,6 +266,15 @@ public final class FileModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void isLink() {
+    final Function func = _FILE_IS_LINK;
+    // successful queries
+    query(func.args(PATH), false);
+    query(_FILE_WRITE.args(PATH1, " ()"));
+    query(func.args(PATH1), false);
+  }
+
+  /** Test method. */
   @Test public void lastModified() {
     final Function func = _FILE_LAST_MODIFIED;
     // successful queries
