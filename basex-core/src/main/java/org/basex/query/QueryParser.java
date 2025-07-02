@@ -1337,13 +1337,84 @@ public class QueryParser extends InputParser {
    */
   private void letClause(final LinkedList<Clause> clauses) throws QueryException {
     do {
-      final boolean score = wsConsumeWs(SCORE);
-      final Var lt = score ? newVar(SeqType.DOUBLE_O) : newVar();
-      wsCheck(":=");
-      final Expr expr = check(single(), NOVARDECL);
-      clauses.add(new Let(localVars.add(lt), expr, score));
+      if(wsConsumeWs(SCORE)) {
+        letValueBinding(newVar(SeqType.DOUBLE_O), true, clauses);
+      } else {
+        final int p = pos;
+        final InputInfo ii = info();
+        if(wsConsumeWs("$") && (current('(') || current('[') || current('{'))) {
+          letStructBinding(ii, clauses);
+        } else {
+          pos = p;
+          letValueBinding(newVar(), false, clauses);
+        }
+      }
     } while(wsConsume(","));
   }
+
+  /**
+   * Parses the "LetValueBinding" rule.
+   * @param var variable to bind
+   * @param score score flag
+   * @param clauses list of clauses
+   * @throws QueryException query exception
+   */
+  private void letValueBinding(final Var var, final boolean score, final LinkedList<Clause> clauses)
+      throws QueryException {
+
+    wsCheck(":=");
+    final Expr expr = check(single(), NOVARDECL);
+    clauses.add(new Let(localVars.add(var), expr, score));
+  }
+
+  /**
+   * Parses the "LetSequenceBinding" rule.
+   * Parses the "LetArrayBinding" rule.
+   * Parses the "LetMapBinding" rule.
+   * @param ii input info
+   * @param clauses list of clauses
+   * @throws QueryException query exception
+   */
+  private void letStructBinding(final InputInfo ii, final LinkedList<Clause> clauses)
+      throws QueryException {
+
+    final LetStructBinding binding = switch (consume()) {
+      case '[' -> new LetStructBinding(']', SeqType.ARRAY_O);
+      case '{' -> new LetStructBinding('}', SeqType.MAP_O);
+      default -> new LetStructBinding(')', SeqType.ITEM_ZM);
+    };
+
+    skipWs();
+    final LinkedList<Var> var = new LinkedList<>();
+    do {
+      var.add(newVar());
+    } while(wsConsumeWs(","));
+    check(binding.endCp);
+    final SeqType asType = Objects.requireNonNullElse(optAsType(), SeqType.ITEM_ZM);
+    final SeqType st = asType.intersect(binding.type);
+    if(st == null) throw error(NOSUB_X_X, binding.type, asType);
+    final Var seq = new Var(var.getLast().name, st, qc, ii);
+
+    wsCheck(":=");
+    clauses.add(new Let(seq, check(single(), NOVARDECL)));
+    final VarRef seqRef = new VarRef(ii, seq);
+    int i = 0;
+    for(final Var v : var) {
+      final Expr expr = switch (binding.endCp) {
+        case ']' -> Function._ARRAY_GET.get(v.info, seqRef, Itr.get(++i), Empty.VALUE);
+        case '}' -> Function._MAP_GET.get(v.info, seqRef, Str.get(v.name.local()), Empty.VALUE);
+        default -> new CachedFilter(v.info, seqRef, Itr.get(++i));
+      };
+      clauses.add(new Let(localVars.add(v), expr));
+    }
+  }
+
+  /**
+   * Represents the parameters of a structure binding in a let clause.
+   * @param endCp end character of binding (')', ']', '}')
+   * @param type type of binding structure (array(*), map(*), item()*)
+   */
+  private record LetStructBinding(char endCp, SeqType type) { }
 
   /**
    * Parses the "TumblingWindowClause" rule.
