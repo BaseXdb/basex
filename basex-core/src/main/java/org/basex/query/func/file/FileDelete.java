@@ -36,8 +36,8 @@ public final class FileDelete extends FileFn {
   private static void delete(final Path path, final QueryContext qc) throws IOException {
     if(Files.isDirectory(path)) {
       try(DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
-        qc.checkStop();
         for(final Path child : children) {
+          qc.checkStop();
           delete(child, qc);
         }
       }

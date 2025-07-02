@@ -448,6 +448,11 @@ public final class FileModuleTest extends SandboxTest {
     // successful queries
     query(_FILE_WRITE.args(PATH1, "abcd"));
     query(func.args(PATH1), 4);
+    query(func.args(PATH1, false), 4);
+    query(func.args(PATH1, true), 4);
+
+    query(func.args(PATH, false), 0);
+    query(func.args(PATH, true), 4);
   }
 
   /** Test method. */

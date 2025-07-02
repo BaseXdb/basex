@@ -1392,17 +1392,17 @@ public enum Function implements AFunction {
   _FILE_CREATE_DIR(FileCreateDir::new, "create-dir(path)",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
-  _FILE_CREATE_TEMP_DIR(FileCreateTempDir::new, "create-temp-dir(prefix,suffix[,dir])",
-      params(STRING_O, STRING_O, STRING_O), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
+  _FILE_CREATE_TEMP_DIR(FileCreateTempDir::new, "create-temp-dir(prefix[,suffix,dir])",
+      params(STRING_O, STRING_ZO, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
-  _FILE_CREATE_TEMP_FILE(FileCreateTempFile::new, "create-temp-file(prefix,suffix[,dir])",
-      params(STRING_O, STRING_O, STRING_O), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
+  _FILE_CREATE_TEMP_FILE(FileCreateTempFile::new, "create-temp-file(prefix[,suffix,dir])",
+      params(STRING_O, STRING_ZO, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_CURRENT_DIR(FileCurrentDir::new, "current-dir()",
       params(), STRING_O, flag(), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_DELETE(FileDelete::new, "delete(path[,recursive])",
-      params(STRING_O, BOOLEAN_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_DESCENDANTS(FileDescendants::new, "descendants(path)",
       params(STRING_O), STRING_ZM, flag(NDT), FILE_URI, Perm.ADMIN),
@@ -1429,7 +1429,7 @@ public enum Function implements AFunction {
       params(), STRING_O, FILE_URI),
   /** XQuery function. */
   _FILE_LIST(FileList::new, "list(path[,recursive,pattern])",
-      params(STRING_O, BOOLEAN_O, STRING_O), STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O, BOOLEAN_ZO, STRING_ZO), STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_LIST_ROOTS(FileListRoots::new, "list-roots()",
       params(), STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
@@ -1453,7 +1453,7 @@ public enum Function implements AFunction {
       params(STRING_O), ANY_URI_O, FILE_URI),
   /** XQuery function. */
   _FILE_READ_BINARY(FileReadBinary::new, "read-binary(path[,offset,length])",
-      params(STRING_O, INTEGER_O, INTEGER_O), BASE64_BINARY_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O, INTEGER_ZO, INTEGER_ZO), BASE64_BINARY_O, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_READ_TEXT(FileReadText::new, "read-text(path[,encoding,fallback])",
       params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
@@ -1464,10 +1464,10 @@ public enum Function implements AFunction {
       STRING_ZM, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_RESOLVE_PATH(FileResolvePath::new, "resolve-path(path[,base])",
-      params(STRING_O, STRING_O), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
+      params(STRING_O, STRING_ZO), STRING_O, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
-  _FILE_SIZE(FileSize::new, "size(path)",
-      params(STRING_O), INTEGER_O, flag(NDT), FILE_URI, Perm.CREATE),
+  _FILE_SIZE(FileSize::new, "size(path[,recursive])",
+      params(STRING_O, BOOLEAN_ZO), INTEGER_O, flag(NDT), FILE_URI, Perm.CREATE),
   /** XQuery function. */
   _FILE_TEMP_DIR(FileTempDir::new, "temp-dir()",
       params(), STRING_O, FILE_URI),
@@ -1476,7 +1476,7 @@ public enum Function implements AFunction {
       params(STRING_O, ITEM_ZM, ITEM_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_WRITE_BINARY(FileWriteBinary::new, "write-binary(path,value[,offset])",
-      params(STRING_O, BINARY_O, INTEGER_O), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O, BINARY_O, INTEGER_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_WRITE_TEXT(FileWriteText::new, "write-text(path,value[,encoding])",
       params(STRING_O, STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
