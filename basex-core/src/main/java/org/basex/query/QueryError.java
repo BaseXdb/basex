@@ -1097,6 +1097,8 @@ public enum QueryError {
   /** Error code. */
   NOSUBDUR_X(XPTY, 4, "Subtype of xs:duration expected: %."),
   /** Error code. */
+  NOSUB_X_X(XPTY, 4, "Subtype of % expected: %."),
+  /** Error code. */
   STRQNM_X_X(XPTY, 4, "String or QName expected, % found: %."),
   /** Error code. */
   STRNCN_X_X(XPTY, 4, "String or NCName expected, % found: %."),
