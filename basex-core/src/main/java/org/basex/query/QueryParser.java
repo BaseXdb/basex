@@ -1393,11 +1393,11 @@ public class QueryParser extends InputParser {
     final SeqType asType = Objects.requireNonNullElse(optAsType(), SeqType.ITEM_ZM);
     final SeqType st = asType.intersect(binding.type);
     if(st == null) throw error(NOSUB_X_X, binding.type, asType);
-    final Var seq = new Var(var.getLast().name, st, qc, ii);
+    final Var struct = new Var(var.getLast().name, st, qc, ii);
 
     wsCheck(":=");
-    clauses.add(new Let(seq, check(single(), NOVARDECL)));
-    final VarRef seqRef = new VarRef(ii, seq);
+    clauses.add(new Let(localVars.add(struct), check(single(), NOVARDECL)));
+    final VarRef seqRef = new VarRef(ii, struct);
     int i = 0;
     for(final Var v : var) {
       final Expr expr = switch (binding.endCp) {

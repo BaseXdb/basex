@@ -463,6 +463,12 @@ public final class GFLWORTest extends SandboxTest {
         + "only end when $p = 2 return <w>{ $w }</w>", "<w>2</w>");
   }
 
+  /** Destructuring let. */
+  @Test public void gh2452() {
+    query("let $($a, $b) := (1 to 6) ! string()\nfor $i in 1 to 3\nreturn ($a, $b, $i)",
+        "1\n2\n1\n1\n2\n2\n1\n2\n3");
+  }
+
   /** Merge where clauses. */
   @Test public void mergeWhere() {
     check("for $i at $p in (1 to 4) where $i <= 3 return $p",
