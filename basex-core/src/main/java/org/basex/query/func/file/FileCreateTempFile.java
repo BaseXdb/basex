@@ -25,37 +25,38 @@ public class FileCreateTempFile extends FileFn {
   /**
    * Creates a temporary file or directory.
    * @param qc query context
-   * @param dir create a directory instead of a file
+   * @param directory create a directory instead of a file
    * @return path of created file or directory
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final Str createTemp(final boolean dir, final QueryContext qc)
+  final Str createTemp(final boolean directory, final QueryContext qc)
       throws QueryException, IOException {
 
-    final String prefix = defined(0) ? toString(arg(0), qc) : "";
-    final String suffix = defined(1) ? toString(arg(1), qc) : "";
-    final Path root;
-    if(defined(2)) {
-      root = toPath(arg(2), qc);
-      if(Files.isRegularFile(root)) throw FILE_NO_DIR_X.get(info, root);
-    } else {
-      root = Paths.get(Prop.TEMPDIR);
-    }
+    final String prefix = toStringOrNull(arg(0), qc);
+    final String suffix = toStringOrNull(arg(1), qc);
+    final String dir = toStringOrNull(arg(2), qc);
+    final Path root = dir != null ? toPath(dir) : Paths.get(Prop.TEMPDIR);
+
+    if(Files.isRegularFile(root)) throw FILE_NO_DIR_X.get(info, root);
 
     // choose non-existing file path
     final Random rnd = new Random();
     Path file;
     do {
-      file = root.resolve(prefix + rnd.nextLong() + suffix);
+      final StringBuilder path = new StringBuilder();
+      if(prefix != null) path.append(prefix);
+      path.append(rnd.nextLong());
+      if(suffix != null) path.append(suffix);
+      file = root.resolve(path.toString());
     } while(Files.exists(file));
 
     // create directory or file
-    if(dir) {
+    if(directory) {
       Files.createDirectory(file);
     } else {
       Files.createFile(file);
     }
-    return get(file, dir);
+    return get(file, directory);
   }
 }

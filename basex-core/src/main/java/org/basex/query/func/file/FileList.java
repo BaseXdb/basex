@@ -27,11 +27,12 @@ public class FileList extends FileFn {
     try {
       final Path dir = toPath(arg(0), qc).toRealPath();
       final boolean recursive = toBooleanOrFalse(arg(1), qc);
-      final Pattern pattern = defined(2) ? Pattern.compile(IOFile.regex(
-          toString(arg(2), qc), false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE) : null;
+      final String pattern = toStringOrNull(arg(2), qc);
 
+      final Pattern pttrn = pattern == null ? null :
+        Pattern.compile(IOFile.regex(pattern, false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
       final TokenList tl = new TokenList();
-      list(dir, recursive, pattern, tl, dir.getNameCount(), qc);
+      list(dir, recursive, pttrn, tl, dir.getNameCount(), qc);
       return StrSeq.get(tl);
     } catch(final NoSuchFileException | NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
