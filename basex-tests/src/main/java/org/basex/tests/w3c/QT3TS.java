@@ -347,7 +347,11 @@ public final class QT3TS extends Main {
         for(final HashMap<String, String> src : env.resources) {
           final String file = src.get(FILE);
           if(file == null) continue;
-          query.addResource(src.get(URI), file(base, file), src.get(QT3Constants.ENCODING));
+          final String uri = src.get(URI);
+          final String path = file(base, file);
+          final String encoding = src.get(QT3Constants.ENCODING);
+          query.addResource(uri, path, encoding);
+          if(encoding == null) locations.put(uri, new IOFile(path));
         }
         // bind collections
         query.addCollection(env.collURI, env.collSources.toArray());
