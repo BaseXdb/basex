@@ -373,7 +373,7 @@ public abstract class XQMap extends XQStruct {
   }
 
   @Override
-  public final boolean refineType() throws QueryException {
+  public boolean refineType() throws QueryException {
     Type refined = null;
     for(final Item key : keys()) {
       final Value value = get(key);
