@@ -469,6 +469,17 @@ public final class GFLWORTest extends SandboxTest {
         "1\n2\n1\n1\n2\n2\n1\n2\n3");
   }
 
+  /** Java call in copy/modify/return. */
+  @Test public void gh2455() {
+    query("declare namespace ll = \"java:java.util.LinkedList\";\n"
+        + "declare variable $linkedList := ll:new();\n"
+        + "\n"
+        + "copy $test := <A>{ll:size($linkedList)}</A>\n"
+        + "modify ()\n"
+        + "return $test",
+        "<A>0</A>");
+  }
+
   /** Merge where clauses. */
   @Test public void mergeWhere() {
     check("for $i at $p in (1 to 4) where $i <= 3 return $p",
