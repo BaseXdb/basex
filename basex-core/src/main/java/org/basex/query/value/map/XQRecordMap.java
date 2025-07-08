@@ -28,6 +28,11 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   @Override
+  public boolean refineType() throws QueryException {
+    return true;
+  }
+
+  @Override
   public long structSize() {
     return values.length;
   }
