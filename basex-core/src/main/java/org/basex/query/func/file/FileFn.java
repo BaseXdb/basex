@@ -10,9 +10,12 @@ import java.nio.file.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -24,45 +27,43 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 abstract class FileFn extends StandardFunc {
-  /** Line separator. */
-  private static final byte[] NL = token(Prop.NL);
-
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public final Value value(final QueryContext qc) throws QueryException {
     try {
-      return item(qc);
+      return eval(qc);
     } catch(final NoSuchFileException ex) {
       throw FILE_NOT_FOUND_X.get(info, ex);
-    } catch(final AccessDeniedException ex) {
-      throw FILE_IE_ERROR_ACCESS_X.get(info, ex);
+    } catch(final NotDirectoryException ex) {
+      throw FILE_NO_DIR_X.get(info, ex);
     } catch(final FileAlreadyExistsException ex) {
       throw FILE_EXISTS_X.get(info, ex);
     } catch(final DirectoryNotEmptyException ex) {
       throw FILE_ID_DIR2_X.get(info, ex);
+    } catch(final AccessDeniedException ex) {
+      throw FILE_IE_ERROR_ACCESS_X.get(info, ex);
     } catch(final IOException ex) {
       throw FILE_IO_ERROR_X.get(info, ex);
     }
   }
 
   /**
-   * Evaluates the expression and returns the resulting item.
+   * Evaluates the expression and returns the resulting value.
    * @param qc query context
    * @return result
    * @throws QueryException query exception
    * @throws IOException query exception
    */
-  @SuppressWarnings("unused")
-  public Item item(final QueryContext qc) throws QueryException, IOException {
-    return super.item(qc, null);
-  }
+  public abstract Value eval(final QueryContext qc) throws QueryException, IOException;
 
   /**
-   * Checks that the parent of the specified path is a directory, but is no directory itself.
-   * @param path file to be written
+   * Evaluates an expression and returns the path to a file in which a result is written.
+   * @param expr path expression
+   * @param qc query context
    * @return specified file
    * @throws QueryException query exception
    */
-  final Path toParent(final Path path) throws QueryException {
+  final Path toTarget(final Expr expr, final QueryContext qc) throws QueryException {
+    final Path path = toPath(expr, qc);
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
     final Path parent = path.getParent();
     if(parent != null && !Files.exists(parent))
@@ -75,13 +76,14 @@ abstract class FileFn extends StandardFunc {
    * @param append append flag
    * @param lines write lines
    * @param qc query context
+   * @return empty value
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  final void write(final boolean append, final boolean lines, final QueryContext qc)
+  final Empty write(final boolean append, final boolean lines, final QueryContext qc)
       throws QueryException, IOException {
 
-    final Path path = toParent(toPath(arg(0), qc));
+    final Path path = toTarget(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(2), FILE_UNKNOWN_ENCODING_X, qc);
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? null :
       Charset.forName(encoding);
@@ -89,12 +91,13 @@ abstract class FileFn extends StandardFunc {
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       if(lines) {
         final Iter values = arg(1).iter(qc);
+        final byte[] nl = cs == null ? token(Prop.NL) : Prop.NL.getBytes(cs);
         for(Item item; (item = qc.next(values)) != null;) {
           if(!item.type.isStringOrUntyped()) throw typeError(item, AtomType.STRING, info);
 
           final byte[] token = item.string(info);
           out.write(cs == null ? token : string(token).getBytes(cs));
-          out.write(cs == null ? NL : Prop.NL.getBytes(cs));
+          out.write(nl);
         }
       } else {
         // workaround to preserve streamable string items
@@ -109,6 +112,7 @@ abstract class FileFn extends StandardFunc {
         }
       }
     }
+    return Empty.VALUE;
   }
 
   /**

@@ -53,10 +53,9 @@ public final class FileReadTextLines extends FileFn {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value eval(final QueryContext qc) throws IOException, QueryException {
     final TokenBuilder tb = new TokenBuilder();
     final TokenList tl = new TokenList();
-
     final long[] minMax = minMax(qc);
     try(NewlineInput ni = input(qc)) {
       for(long c = 1; c < minMax[1] && ni.readLine(tb); c++) {
@@ -64,8 +63,6 @@ public final class FileReadTextLines extends FileFn {
         if(c >= minMax[0]) tl.add(tb.toArray());
       }
       return StrSeq.get(tl);
-    } catch(final IOException ex) {
-      throw FILE_IO_ERROR_X.get(info, ex);
     }
   }
 

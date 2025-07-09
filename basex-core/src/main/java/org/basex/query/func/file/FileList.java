@@ -1,7 +1,5 @@
 package org.basex.query.func.file;
 
-import static org.basex.query.QueryError.*;
-
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
@@ -23,24 +21,16 @@ import org.basex.util.list.*;
  */
 public class FileList extends FileFn {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    try {
-      final Path dir = toPath(arg(0), qc).toRealPath();
-      final boolean recursive = toBooleanOrFalse(arg(1), qc);
-      final String pattern = toStringOrNull(arg(2), qc);
+  public Value eval(final QueryContext qc) throws QueryException, IOException {
+    final Path dir = toPath(arg(0), qc).toRealPath();
+    final boolean recursive = toBooleanOrFalse(arg(1), qc);
+    final String pattern = toStringOrNull(arg(2), qc);
 
-      final Pattern pttrn = pattern == null ? null :
-        Pattern.compile(IOFile.regex(pattern, false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
-      final TokenList tl = new TokenList();
-      list(dir, recursive, pttrn, tl, dir.getNameCount(), qc);
-      return StrSeq.get(tl);
-    } catch(final NoSuchFileException | NotDirectoryException ex) {
-      throw FILE_NO_DIR_X.get(info, ex);
-    } catch(final AccessDeniedException ex) {
-      throw FILE_IE_ERROR_ACCESS_X.get(info, ex);
-    } catch(final IOException ex) {
-      throw FILE_IO_ERROR_X.get(info, ex);
-    }
+    final Pattern pttrn = pattern == null ? null :
+      Pattern.compile(IOFile.regex(pattern, false), Prop.CASE ? 0 : Pattern.CASE_INSENSITIVE);
+    final TokenList tl = new TokenList();
+    list(dir, recursive, pttrn, tl, dir.getNameCount(), qc);
+    return StrSeq.get(tl);
   }
 
   /**
@@ -49,19 +39,12 @@ public class FileList extends FileFn {
    * @param qc query context
    * @return file paths
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  Value paths(final boolean recursive, final QueryContext qc) throws QueryException {
-    try {
-      final TokenList tl = new TokenList();
-      list(toPath(arg(0), qc), recursive, null, tl, -1, qc);
-      return StrSeq.get(tl);
-    } catch(final NoSuchFileException | NotDirectoryException ex) {
-      throw FILE_NO_DIR_X.get(info, ex);
-    } catch(final AccessDeniedException ex) {
-      throw FILE_IE_ERROR_ACCESS_X.get(info, ex);
-    } catch(final IOException ex) {
-      throw FILE_IO_ERROR_X.get(info, ex);
-    }
+  Value paths(final boolean recursive, final QueryContext qc) throws QueryException, IOException {
+    final TokenList tl = new TokenList();
+    list(toPath(arg(0), qc), recursive, null, tl, -1, qc);
+    return StrSeq.get(tl);
   }
 
   /**
@@ -94,7 +77,10 @@ public class FileList extends FileFn {
       }
     } catch(final IOException ex) {
       // skip entries that cannot be accessed; throw exception only on root level
-      if(index == -1 || index == root.getNameCount()) throw ex;
+      if(index == -1 || index == root.getNameCount()) {
+        Util.debug(ex);
+        throw ex;
+      }
     }
 
     // add directories

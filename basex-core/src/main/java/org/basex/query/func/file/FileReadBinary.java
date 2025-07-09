@@ -8,6 +8,7 @@ import java.nio.file.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -18,7 +19,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileReadBinary extends FileFn {
   @Override
-  public B64 item(final QueryContext qc) throws QueryException, IOException {
+  public Value eval(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(arg(0), qc);
     final Item offset = arg(1).atomItem(qc, info);
     final Item length = arg(2).atomItem(qc, info);

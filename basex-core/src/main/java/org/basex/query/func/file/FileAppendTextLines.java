@@ -3,8 +3,7 @@ package org.basex.query.func.file;
 import java.io.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -14,8 +13,7 @@ import org.basex.query.value.seq.*;
  */
 public final class FileAppendTextLines extends FileWriteTextLines {
   @Override
-  public Item item(final QueryContext qc) throws IOException, QueryException {
-    write(true, true, qc);
-    return Empty.VALUE;
+  public Value eval(final QueryContext qc) throws IOException, QueryException {
+    return write(true, true, qc);
   }
 }

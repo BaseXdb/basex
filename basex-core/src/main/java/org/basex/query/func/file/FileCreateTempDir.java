@@ -3,7 +3,7 @@ package org.basex.query.func.file;
 import java.io.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -13,7 +13,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileCreateTempDir extends FileCreateTempFile {
   @Override
-  public Str item(final QueryContext qc) throws QueryException, IOException {
+  public Value eval(final QueryContext qc) throws QueryException, IOException {
     return createTemp(true, qc);
   }
 }

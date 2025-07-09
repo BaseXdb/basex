@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.file.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -15,7 +15,7 @@ import org.basex.query.value.seq.*;
  */
 public final class FileDelete extends FileFn {
   @Override
-  public Item item(final QueryContext qc) throws QueryException, IOException {
+  public Value eval(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(arg(0), qc);
     final boolean recursive = toBooleanOrFalse(arg(1), qc);
 

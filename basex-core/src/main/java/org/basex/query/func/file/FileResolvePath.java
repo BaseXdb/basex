@@ -6,7 +6,7 @@ import static org.basex.util.Strings.*;
 import java.nio.file.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -16,7 +16,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileResolvePath extends FileFn {
   @Override
-  public Str item(final QueryContext qc) throws QueryException {
+  public Value eval(final QueryContext qc) throws QueryException {
     final Path path = toPath(toString(arg(0), qc)), abs;
     final String file = toStringOrNull(arg(1), qc);
     if(file != null) {

@@ -15,7 +15,7 @@ import org.basex.util.list.*;
  */
 public final class FileListRoots extends FileFn {
   @Override
-  public Value value(final QueryContext qc) {
+  public Value eval(final QueryContext qc) {
     final TokenList tl = new TokenList();
     for(final Path path : FileSystems.getDefault().getRootDirectories()) {
       tl.add(get(path, true).string());

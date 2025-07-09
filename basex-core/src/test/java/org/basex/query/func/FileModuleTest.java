@@ -17,6 +17,7 @@ import org.junit.jupiter.api.*;
  *
  * @author BaseX Team, BSD License
  * @author Rositsa Shadura
+ * @author Christian Gruen
  */
 public final class FileModuleTest extends SandboxTest {
   /** Test path. */
@@ -115,7 +116,7 @@ public final class FileModuleTest extends SandboxTest {
     // successful queries
     query(_FILE_WRITE.args(PATH1, "abcd"));
     error(func.args(PATH1), FILE_NO_DIR_X);
-    error(func.args(PATH1 + NAME), FILE_NO_DIR_X);
+    error(func.args(PATH1 + NAME), FILE_NOT_FOUND_X);
     query(_FILE_WRITE.args(PATH1, " ()"));
     error(func.args(PATH1), FILE_NO_DIR_X);
     contains(func.args(PATH), NAME);
@@ -209,7 +210,7 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_WRITE.args(PATH3, "abcd"));
 
     error(func.args(PATH3), FILE_NO_DIR_X);
-    error(func.args(PATH3 + NAME), FILE_NO_DIR_X);
+    error(func.args(PATH3 + NAME), FILE_NOT_FOUND_X);
     contains(func.args(PATH1), "x");
   }
 
@@ -285,7 +286,7 @@ public final class FileModuleTest extends SandboxTest {
     // successful queries
     query(_FILE_WRITE.args(PATH1, "abcd"));
     error(func.args(PATH1), FILE_NO_DIR_X);
-    error(func.args(PATH1 + NAME), FILE_NO_DIR_X);
+    error(func.args(PATH1 + NAME), FILE_NOT_FOUND_X);
     query(_FILE_WRITE.args(PATH1, " ()"));
     error(func.args(PATH1), FILE_NO_DIR_X);
     query(func.args(PATH), NAME);

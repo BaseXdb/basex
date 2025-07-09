@@ -6,7 +6,7 @@ import java.io.*;
 import java.nio.file.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -17,7 +17,7 @@ import org.basex.query.value.seq.*;
  */
 public class FileCopy extends FileFn {
   @Override
-  public Item item(final QueryContext qc) throws IOException, QueryException {
+  public Value eval(final QueryContext qc) throws IOException, QueryException {
     relocate(true, qc);
     return Empty.VALUE;
   }

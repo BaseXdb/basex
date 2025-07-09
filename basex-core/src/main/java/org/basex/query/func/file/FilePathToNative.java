@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.file.*;
 
 import org.basex.query.*;
-import org.basex.query.value.item.*;
+import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -14,8 +14,8 @@ import org.basex.query.value.item.*;
  */
 public final class FilePathToNative extends FileFn {
   @Override
-  public Str item(final QueryContext qc) throws QueryException, IOException {
-    final Path nat = toPath(arg(0), qc).toRealPath();
-    return get(nat, Files.isDirectory(nat));
+  public Value eval(final QueryContext qc) throws QueryException, IOException {
+    final Path path = toPath(arg(0), qc).toRealPath();
+    return get(path, Files.isDirectory(path));
   }
 }

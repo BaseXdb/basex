@@ -1,5 +1,7 @@
 package org.basex.query.func.file;
 
+import java.io.*;
+
 import org.basex.query.*;
 import org.basex.query.value.*;
 
@@ -11,7 +13,7 @@ import org.basex.query.value.*;
  */
 public final class FileChildren extends FileList {
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
+  public Value eval(final QueryContext qc) throws QueryException, IOException {
     return paths(false, qc);
   }
 }

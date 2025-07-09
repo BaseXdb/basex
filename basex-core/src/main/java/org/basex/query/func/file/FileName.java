@@ -3,7 +3,9 @@ package org.basex.query.func.file;
 import java.nio.file.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 
 /**
  * Function implementation.
@@ -11,9 +13,9 @@ import org.basex.query.value.item.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FileName extends FileFn {
+public final class FileName extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc) throws QueryException {
+  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Path path = toPath(arg(0), qc).getFileName();
     return path == null ? Str.EMPTY : Str.get(path.toString());
   }

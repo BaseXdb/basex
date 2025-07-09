@@ -5,6 +5,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -15,7 +16,7 @@ import org.basex.query.value.item.*;
  */
 public final class FileLastModified extends FileFn {
   @Override
-  public Item item(final QueryContext qc) throws IOException, QueryException {
+  public Value eval(final QueryContext qc) throws IOException, QueryException {
     final Path path = toPath(arg(0), qc);
     final BasicFileAttributes attrs = Files.readAttributes(path, BasicFileAttributes.class);
     return Dtm.get(attrs.lastModifiedTime().toMillis());

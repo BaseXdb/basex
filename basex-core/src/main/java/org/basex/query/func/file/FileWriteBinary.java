@@ -9,6 +9,7 @@ import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.func.archive.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
@@ -20,7 +21,7 @@ import org.basex.query.value.seq.*;
  */
 public class FileWriteBinary extends FileFn {
   @Override
-  public Item item(final QueryContext qc) throws IOException, QueryException {
+  public Value eval(final QueryContext qc) throws IOException, QueryException {
     write(false, qc);
     return Empty.VALUE;
   }
@@ -33,7 +34,7 @@ public class FileWriteBinary extends FileFn {
    * @throws IOException I/O exception
    */
   final void write(final boolean append, final QueryContext qc) throws QueryException, IOException {
-    final Path path = toParent(toPath(arg(0), qc));
+    final Path path = toTarget(arg(0), qc);
     if(defined(2)) {
       // write file chunk
       final Bin binary = toBin(arg(1), qc);

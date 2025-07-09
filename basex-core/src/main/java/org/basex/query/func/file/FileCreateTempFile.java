@@ -7,6 +7,7 @@ import java.nio.file.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -18,14 +19,14 @@ import org.basex.util.*;
  */
 public class FileCreateTempFile extends FileFn {
   @Override
-  public Str item(final QueryContext qc) throws QueryException, IOException {
+  public Value eval(final QueryContext qc) throws QueryException, IOException {
     return createTemp(false, qc);
   }
 
   /**
    * Creates a temporary file or directory.
-   * @param qc query context
    * @param directory create a directory instead of a file
+   * @param qc query context
    * @return path of created file or directory
    * @throws QueryException query exception
    * @throws IOException I/O exception
