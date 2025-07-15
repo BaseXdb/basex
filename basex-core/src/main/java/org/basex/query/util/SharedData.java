@@ -28,7 +28,7 @@ public final class SharedData {
    */
   public SharedData() {
     record(SeqType.RECORD);
-    record(SeqType.PAIR);
+    record(SeqType.KEY_VALUE_PAIR);
     record(SeqType.MEMBER);
   }
 

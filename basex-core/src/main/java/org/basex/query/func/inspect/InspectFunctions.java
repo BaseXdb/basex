@@ -25,7 +25,9 @@ public final class InspectFunctions extends StandardFunc {
     // returns all functions from the query context
     if(!defined(0)) {
       final ValueBuilder vb = new ValueBuilder(qc);
-      for(final StaticFunc sf : qc.functions.funcs()) addItems(vb, sf, qc);
+      for(final StaticFunc sf : qc.functions.funcs()) {
+        if(!NSGlobal.reserved(sf.name.uri())) addItems(vb, sf, qc);
+      }
       return vb.value(this);
     }
 

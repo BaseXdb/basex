@@ -18,7 +18,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
+import org.basex.query.util.hash.*;
 
 /**
  * Stores a sequence type definition.
@@ -139,6 +139,12 @@ public final class SeqType {
   /** Zero or more xs:base64Binary. */
   public static final SeqType BASE64_BINARY_ZM = BASE64_BINARY.seqType(ZERO_OR_MORE);
 
+  /** String or hex-binary or base64-binary. */
+  public static final ChoiceItemType STRING_OR_BINARY =
+      ChoiceItemType.get(STRING_O, HEX_BINARY_O, BASE64_BINARY_O);
+  /** Zero or one string or hex-binary or base64-binary. */
+  public static final SeqType STRING_OR_BINARY_ZO = STRING_OR_BINARY.seqType(Occ.ZERO_OR_ONE);
+
   /** Single node. */
   public static final SeqType NODE_O = NODE.seqType();
   /** Zero or one nodes. */
@@ -223,30 +229,124 @@ public final class SeqType {
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
 
   /** The general record type. */
-  public static final RecordType RECORD = new RecordType(true, new TokenObjectMap<>(0));
-  /** Pair record. */
-  public static final RecordType PAIR;
-  /** Member record. */
-  public static final RecordType MEMBER;
-
-  static {
-    TokenObjectMap<RecordField> map = new TokenObjectMap<>(2);
-    map.put(Str.KEY.string(), new RecordField(false, SeqType.ANY_ATOMIC_TYPE_O));
-    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
-    PAIR = new RecordType(true, map, null);
-    map = new TokenObjectMap<>(1);
-    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
-    MEMBER = new RecordType(true, map, null);
-  }
-
+  public static final RecordType RECORD = RecordType.get(true, null);
   /** Single record. */
   public static final SeqType RECORD_O = RECORD.seqType();
-  /** Single pair. */
-  public static final SeqType PAIR_O = PAIR.seqType();
-  /** Zero or more pairs. */
-  public static final SeqType PAIR_ZM = PAIR.seqType(ZERO_OR_MORE);
+
+  /** Member record. */
+  public static final RecordType MEMBER = RecordType.get(false, null).
+      field(Str.VALUE.string(), false, ITEM_ZM);
   /** Zero or more members. */
   public static final SeqType MEMBER_ZM = MEMBER.seqType(ZERO_OR_MORE);
+
+  /** Built-in record type fn:key-value-pair. */
+  public static final RecordType KEY_VALUE_PAIR =
+    RecordType.get(true, new QNm("key-value-pair", QueryText.FN_URI)).
+    field("key", false, SeqType.ANY_ATOMIC_TYPE_O).
+    field("value", false, SeqType.ITEM_ZM);
+  /** Single key-value-pair. */
+  public static final SeqType KEY_VALUE_PAIR_O = KEY_VALUE_PAIR.seqType();
+  /** Zero or more key-value-pairs. */
+  public static final SeqType KEY_VALUE_PAIR_ZM = KEY_VALUE_PAIR.seqType(ZERO_OR_MORE);
+
+  /** Built-in record type fn:load-xquery-module-record. */
+  public static final RecordType LOAD_XQUERY_MODULE_RECORD =
+    RecordType.get(false, new QNm("load-xquery-module-record", QueryText.FN_URI)).
+    field("variables", false, MapType.get(AtomType.QNAME, SeqType.ITEM_ZO).seqType()).
+    field("functions", false, MapType.get(AtomType.QNAME,
+      MapType.get(AtomType.INTEGER, SeqType.FUNCTION_O).seqType()).seqType());
+  /** Single load-xquery-module-record. */
+  public static final SeqType LOAD_XQUERY_MODULE_RECORD_O = LOAD_XQUERY_MODULE_RECORD.seqType();
+
+  /** Built-in record type fn:parsed-csv-structure-record. */
+  public static final RecordType PARSED_CSV_STRUCTURE_RECORD =
+    RecordType.get(false, new QNm("parsed-csv-structure-record", QueryText.FN_URI)).
+    field("columns", false, SeqType.STRING_ZM).
+    field("column-index", false, MapType.get(AtomType.STRING,
+      SeqType.INTEGER_O).seqType(Occ.ZERO_OR_ONE)).
+    field("rows", false, ArrayType.get(SeqType.STRING_O).seqType(Occ.ZERO_OR_MORE)).
+    field("get", false, FuncType.get(SeqType.STRING_O, SeqType.POSITIVE_INTEGER_O,
+      ChoiceItemType.get(SeqType.POSITIVE_INTEGER_O, SeqType.STRING_O).seqType()).seqType());
+  /** Single parsed-csv-structure-record. */
+  public static final SeqType PARSED_CSV_STRUCTURE_RECORD_O = PARSED_CSV_STRUCTURE_RECORD.seqType();
+
+  /** Built-in record type fn:random-number-generator-record. */
+  public static final RecordType RANDOM_NUMBER_GENERATOR_RECORD =
+    RecordType.get(true, new QNm("random-number-generator-record", QueryText.FN_URI));
+  /** Type of fn:random-number-generator-record member 'next'. */
+  public static final FuncType RANDOM_NUMBER_GENERATOR_RECORD_NEXT =
+    FuncType.get(RANDOM_NUMBER_GENERATOR_RECORD.seqType());
+  static {
+    RANDOM_NUMBER_GENERATOR_RECORD.
+    field("number", false, SeqType.DOUBLE_O).
+    field("next", false, RANDOM_NUMBER_GENERATOR_RECORD_NEXT.seqType()).
+    field("permute", false, FuncType.get(SeqType.ITEM_ZM, SeqType.ITEM_ZM).seqType());
+  }
+  /** Single random-number-generator-record. */
+  public static final SeqType RANDOM_NUMBER_GENERATOR_RECORD_O =
+      RANDOM_NUMBER_GENERATOR_RECORD.seqType();
+
+  /** Built-in record type fn:schema-type-record. */
+  public static final RecordType SCHEMA_TYPE_RECORD =
+      RecordType.get(true, new QNm("schema-type-record", QueryText.FN_URI));
+  /** Type of fn:schema-type-record member 'variety'. */
+  public static final EnumType SCHEMA_TYPE_RECORD_VARIETY =
+      EnumType.get("atomic", "list", "union", "empty", "simple", "element-only", "mixed");
+  /** Type of fn:schema-type-record member 'constructor'. */
+  public static final FuncType SCHEMA_TYPE_RECORD_CONSTRUCTOR =
+      FuncType.get(SeqType.ANY_ATOMIC_TYPE_ZM, SeqType.ANY_ATOMIC_TYPE_ZO);
+  static {
+    SCHEMA_TYPE_RECORD.
+
+    field("name", false, SeqType.QNAME_ZO).
+    field("is-simple", false, SeqType.BOOLEAN_O).
+    field("base-type", false, FuncType.get(SCHEMA_TYPE_RECORD.seqType(Occ.ZERO_OR_ONE)).seqType()).
+    field("primitive-type", true, FuncType.get(SCHEMA_TYPE_RECORD.seqType()).seqType()).
+    field("variety", true, SCHEMA_TYPE_RECORD_VARIETY.seqType()).
+    field("members", true, FuncType.get(SCHEMA_TYPE_RECORD.seqType(Occ.ZERO_OR_MORE)).seqType()).
+    field("simple-content-type", true, FuncType.get(SCHEMA_TYPE_RECORD.seqType()).seqType()).
+    field("matches", true, FuncType.get(SeqType.BOOLEAN_O, SeqType.ANY_ATOMIC_TYPE_O).seqType()).
+    field("constructor", true, SCHEMA_TYPE_RECORD_CONSTRUCTOR.seqType());
+  }
+  /** Single schema-type-record. */
+  public static final SeqType SCHEMA_TYPE_RECORD_O = SCHEMA_TYPE_RECORD.seqType();
+  /** Zero or one schema-type-records. */
+  public static final SeqType SCHEMA_TYPE_RECORD_ZO = SCHEMA_TYPE_RECORD.seqType(ZERO_OR_ONE);
+
+  /** Built-in record type fn:uri-structure-record. */
+  public static final RecordType URI_STRUCTURE_RECORD =
+    RecordType.get(true, new QNm("uri-structure-record", QueryText.FN_URI)).
+    field("uri", true, SeqType.STRING_ZO).
+    field("scheme", true, SeqType.STRING_ZO).
+    field("absolute", true, SeqType.BOOLEAN_ZO).
+    field("hierarchical", true, SeqType.BOOLEAN_ZO).
+    field("authority", true, SeqType.STRING_ZO).
+    field("userinfo", true, SeqType.STRING_ZO).
+    field("host", true, SeqType.STRING_ZO).
+    field("port", true, SeqType.INTEGER_ZO).
+    field("path", true, SeqType.STRING_ZO).
+    field("query", true, SeqType.STRING_ZO).
+    field("fragment", true, SeqType.STRING_ZO).
+    field("path-segments", true, SeqType.STRING_ZM).
+    field("query-parameters", true,
+        MapType.get(AtomType.STRING, SeqType.STRING_ZM).seqType(Occ.ZERO_OR_ONE)).
+    field("filepath", true, SeqType.STRING_ZO);
+  /** Single uri-structure-record. */
+  public static final SeqType URI_STRUCTURE_RECORD_O = URI_STRUCTURE_RECORD.seqType();
+
+  /** Built-in named record types. */
+  public static final QNmMap<RecordType> BUILT_IN_NAMED_RECORD_TYPES = new QNmMap<>();
+  static {
+    for(RecordType rt : Arrays.asList(
+        SeqType.KEY_VALUE_PAIR,
+        SeqType.LOAD_XQUERY_MODULE_RECORD,
+        SeqType.PARSED_CSV_STRUCTURE_RECORD,
+        SeqType.RANDOM_NUMBER_GENERATOR_RECORD,
+        SeqType.SCHEMA_TYPE_RECORD,
+        SeqType.URI_STRUCTURE_RECORD)) {
+      BUILT_IN_NAMED_RECORD_TYPES.put(rt.name(), rt);
+    }
+  }
 
   /** Item type. */
   public final Type type;

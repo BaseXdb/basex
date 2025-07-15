@@ -162,8 +162,8 @@ public final class FnLoadXQueryModule extends StandardFunc {
     }
 
     final MapBuilder result = new MapBuilder();
-    result.put("functions", functions.map());
     result.put("variables", variables.map());
+    result.put("functions", functions.map());
     return result.map();
   }
 

@@ -44,7 +44,6 @@ public class FnSchemaType extends StandardFunc {
 
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Type type : types) {
-      if(type == null) continue;
       final QNm name;
       final AtomType baseType;
       final Variety variety;
@@ -98,14 +97,15 @@ public class FnSchemaType extends StandardFunc {
       final MapBuilder mb = new MapBuilder();
       mb.put("name", name);
       mb.put("is-simple", Bln.get(!type.oneOf(ANY_TYPE, UNTYPED)));
-      mb.put("base-type", TypeAnnotation.funcItem(info, baseType));
+      mb.put("base-type", baseType == null ? TypeAnnotation.funcItem(info)
+                                           : TypeAnnotation.funcItem(info, baseType));
       if(primType != null) mb.put("primitive-type", TypeAnnotation.funcItem(info, primType));
-      if(variety != null) mb.put("variety", variety.name());
+      if(variety != null) mb.put("variety",
+          SCHEMA_TYPE_RECORD_VARIETY.cast(Str.get(variety.name()), qc, info));
       if(members != null) mb.put("members", members);
       if(matches != null) mb.put("matches", matches);
-      if(constructor) {
-        mb.put("constructor", (FuncItem) Functions.item(name, 1, true, info, qc, true));
-      }
+      if(constructor) mb.put("constructor", SCHEMA_TYPE_RECORD_CONSTRUCTOR.cast(
+          (FuncItem) Functions.item(name, 1, true, info, qc, true), qc, info));
       vb.add(mb.map());
     }
     return vb.value();
@@ -123,18 +123,20 @@ public class FnSchemaType extends StandardFunc {
    * Function creating the type annotations for given atomic types.
    */
   private static final class TypeAnnotation extends Arr {
-    /** Function type. */
-    private static final FuncType FUNC_TYPE = FuncType.get(MAP_ZM);
+    /** Sequence type. */
+    private final SeqType seqType;
     /** The types to be annotated. */
     private final AtomType[] types;
 
     /**
      * Constructor.
+     * @param seqType sequence type of the function item
      * @param info input info
      * @param types the types to be annotated
      */
-    private TypeAnnotation(final InputInfo info, final AtomType... types) {
-      super(info, FUNC_TYPE.declType);
+    private TypeAnnotation(final SeqType seqType, final InputInfo info, final AtomType... types) {
+      super(info, seqType);
+      this.seqType = seqType;
       this.types = types;
     }
 
@@ -145,8 +147,9 @@ public class FnSchemaType extends StandardFunc {
      * @return the function item
      */
     public static FuncItem funcItem(final InputInfo info, final AtomType... types) {
-      return new FuncItem(info, new TypeAnnotation(info, types), new Var[] { }, AnnList.EMPTY,
-          FUNC_TYPE, 0, null);
+      final SeqType seqType = SCHEMA_TYPE_RECORD.seqType(Occ.get(types.length, types.length));
+      return new FuncItem(info, new TypeAnnotation(seqType, info, types), new Var[] { },
+          AnnList.EMPTY, FuncType.get(seqType), 0, null);
     }
 
     @Override
@@ -156,7 +159,7 @@ public class FnSchemaType extends StandardFunc {
 
     @Override
     public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-      return new TypeAnnotation(info, types);
+      return new TypeAnnotation(seqType, info, types);
     }
 
     @Override

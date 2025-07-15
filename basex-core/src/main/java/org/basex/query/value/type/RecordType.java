@@ -5,10 +5,13 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.Set;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -26,6 +29,8 @@ public final class RecordType extends MapType {
   private TokenObjectMap<RecordField> fields;
   /** Record type name (can be {@code null}). */
   private final QNm name;
+  /** Annotations (can be {@code null}). */
+  private final AnnList anns;
   /** Input info ({@code null}, if this is not an unresolved reference). */
   private InputInfo info;
 
@@ -35,7 +40,7 @@ public final class RecordType extends MapType {
    * @param fields field declarations
    */
   public RecordType(final boolean extensible, final TokenObjectMap<RecordField> fields) {
-    this(extensible, fields, null);
+    this(extensible, fields, null, AnnList.EMPTY);
   }
 
   /**
@@ -43,14 +48,16 @@ public final class RecordType extends MapType {
    * @param extensible extensible flag
    * @param fields field declarations
    * @param name record type name (can be {@code null})
+   * @param anns annotations
    */
   public RecordType(final boolean extensible, final TokenObjectMap<RecordField> fields,
-      final QNm name) {
+      final QNm name, final AnnList anns) {
     super(extensible ? AtomType.ANY_ATOMIC_TYPE : AtomType.STRING,
         extensible ? SeqType.ITEM_ZM : unionType(fields));
     this.extensible = extensible;
     this.fields = fields;
     this.name = name;
+    this.anns = anns;
     info = null;
   }
 
@@ -64,7 +71,44 @@ public final class RecordType extends MapType {
     extensible = true;
     fields = new TokenObjectMap<>();
     this.name = name;
+    this.anns = null;
     this.info = info;
+  }
+
+  /**
+   * Creates a record type.
+   * @param name record type name
+   * @param extensible extensible flag
+   * @return record type
+   */
+  public static RecordType get(final boolean extensible, final QNm name) {
+    return new RecordType(extensible, new TokenObjectMap<>(), name, AnnList.EMPTY);
+  }
+
+  /**
+   * Adds a field to this record type.
+   * @param fieldName field name
+   * @param optional optional flag
+   * @param seqType sequence type of the field
+   * @return this record type
+   */
+  public RecordType field(final Object fieldName, final boolean optional, final SeqType seqType) {
+    fields.put(Token.token(fieldName), new RecordField(optional, seqType));
+    return this;
+  }
+
+  /**
+   * Adds a field to this record type.
+   * @param fieldName field name
+   * @param optional optional flag
+   * @param seqType sequence type of the field
+   * @param expr initializing expression (can be {@code null})
+   * @return this record type
+   */
+  public RecordType field(final String fieldName, final boolean optional, final SeqType seqType,
+      final Expr expr) {
+    fields.put(Token.token(fieldName), new RecordField(optional, seqType, expr));
+    return this;
   }
 
   /**
@@ -117,6 +161,27 @@ public final class RecordType extends MapType {
    */
   public QNm name() {
     return name;
+  }
+
+  /**
+   * Returns the annotations of this record type.
+   * @return annotations (can be {@code null})
+   */
+  public AnnList anns() {
+    return anns;
+  }
+
+  /**
+   * Return the minimum number of fields that must be present in a record of this type.
+   * @return minimum number of fields
+   */
+  public int minFields() {
+    int min = 0;
+    for(final RecordField rf : fields.values()) {
+      if(rf.optional || rf.expr() != null) return min;
+      ++min;
+    }
+    return min;
   }
 
   @Override
@@ -423,7 +488,8 @@ public final class RecordType extends MapType {
   public RecordType getDeclaration(final QNmMap<RecordType> declaredRecordTypes)
       throws QueryException {
     if(info == null) return this;
-    final RecordType rt = declaredRecordTypes.get(name);
+    RecordType rt = declaredRecordTypes.get(name);
+    if(rt == null) rt = SeqType.BUILT_IN_NAMED_RECORD_TYPES.get(name);
     if(rt == null) throw TYPEUNKNOWN_X.get(info, AtomType.similar(name));
     return rt;
   }

@@ -6,6 +6,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -40,7 +41,7 @@ final class PlainDoc extends Inspect {
     final FBuilder root = element("context");
     for(final StaticVar sv : qc.vars) root.add(variable(sv));
     for(final StaticFunc sf : qc.functions.funcs()) {
-      root.add(function(sf.name, sf, sf.funcType(), sf.anns));
+      if(!NSGlobal.reserved(sf.name.uri())) root.add(function(sf.name, sf, sf.funcType(), sf.anns));
     }
     return root.finish();
   }

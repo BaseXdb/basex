@@ -41,7 +41,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     return new MapBuilder().
       // derived from Java's random class
       put(NUMBER, Dbl.get(((i1 >>> 22 << 27) + (i2 >>> 21)) / (double) (1L << 53))).
-      put(NEXT, nextFunc(i2)).
+      put(NEXT, SeqType.RANDOM_NUMBER_GENERATOR_RECORD_NEXT.cast(nextFunc(i2),  qc, ii)).
       put(PERMUTE, permuteFunc(i1, qc)).map();
   }
 
