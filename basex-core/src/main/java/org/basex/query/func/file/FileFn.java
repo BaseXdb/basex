@@ -53,7 +53,7 @@ abstract class FileFn extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException query exception
    */
-  public abstract Value eval(final QueryContext qc) throws QueryException, IOException;
+  public abstract Value eval(QueryContext qc) throws QueryException, IOException;
 
   /**
    * Evaluates an expression and returns the path to a file in which a result is written.
