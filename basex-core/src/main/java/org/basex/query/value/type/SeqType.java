@@ -273,22 +273,26 @@ public final class SeqType {
   /** Built-in record type fn:random-number-generator-record. */
   public static final RecordType RANDOM_NUMBER_GENERATOR_RECORD =
     RecordType.get(true, new QNm("random-number-generator-record", QueryText.FN_URI));
+  /** Single random-number-generator-record. */
+  public static final SeqType RANDOM_NUMBER_GENERATOR_RECORD_O =
+      RANDOM_NUMBER_GENERATOR_RECORD.seqType();
   /** Type of fn:random-number-generator-record member 'next'. */
   public static final FuncType RANDOM_NUMBER_GENERATOR_RECORD_NEXT =
-    FuncType.get(RANDOM_NUMBER_GENERATOR_RECORD.seqType());
+    FuncType.get(RANDOM_NUMBER_GENERATOR_RECORD_O);
   static {
     RANDOM_NUMBER_GENERATOR_RECORD.
     field("number", false, SeqType.DOUBLE_O).
     field("next", false, RANDOM_NUMBER_GENERATOR_RECORD_NEXT.seqType()).
     field("permute", false, FuncType.get(SeqType.ITEM_ZM, SeqType.ITEM_ZM).seqType());
   }
-  /** Single random-number-generator-record. */
-  public static final SeqType RANDOM_NUMBER_GENERATOR_RECORD_O =
-      RANDOM_NUMBER_GENERATOR_RECORD.seqType();
 
   /** Built-in record type fn:schema-type-record. */
   public static final RecordType SCHEMA_TYPE_RECORD =
       RecordType.get(true, new QNm("schema-type-record", QueryText.FN_URI));
+  /** Single schema-type-record. */
+  public static final SeqType SCHEMA_TYPE_RECORD_O = SCHEMA_TYPE_RECORD.seqType();
+  /** Zero or one schema-type-records. */
+  public static final SeqType SCHEMA_TYPE_RECORD_ZO = SCHEMA_TYPE_RECORD.seqType(ZERO_OR_ONE);
   /** Type of fn:schema-type-record member 'variety'. */
   public static final EnumType SCHEMA_TYPE_RECORD_VARIETY =
       EnumType.get("atomic", "list", "union", "empty", "simple", "element-only", "mixed");
@@ -297,21 +301,16 @@ public final class SeqType {
       FuncType.get(SeqType.ANY_ATOMIC_TYPE_ZM, SeqType.ANY_ATOMIC_TYPE_ZO);
   static {
     SCHEMA_TYPE_RECORD.
-
     field("name", false, SeqType.QNAME_ZO).
     field("is-simple", false, SeqType.BOOLEAN_O).
     field("base-type", false, FuncType.get(SCHEMA_TYPE_RECORD.seqType(Occ.ZERO_OR_ONE)).seqType()).
-    field("primitive-type", true, FuncType.get(SCHEMA_TYPE_RECORD.seqType()).seqType()).
+    field("primitive-type", true, FuncType.get(SCHEMA_TYPE_RECORD_O).seqType()).
     field("variety", true, SCHEMA_TYPE_RECORD_VARIETY.seqType()).
     field("members", true, FuncType.get(SCHEMA_TYPE_RECORD.seqType(Occ.ZERO_OR_MORE)).seqType()).
-    field("simple-content-type", true, FuncType.get(SCHEMA_TYPE_RECORD.seqType()).seqType()).
+    field("simple-content-type", true, FuncType.get(SCHEMA_TYPE_RECORD_O).seqType()).
     field("matches", true, FuncType.get(SeqType.BOOLEAN_O, SeqType.ANY_ATOMIC_TYPE_O).seqType()).
     field("constructor", true, SCHEMA_TYPE_RECORD_CONSTRUCTOR.seqType());
   }
-  /** Single schema-type-record. */
-  public static final SeqType SCHEMA_TYPE_RECORD_O = SCHEMA_TYPE_RECORD.seqType();
-  /** Zero or one schema-type-records. */
-  public static final SeqType SCHEMA_TYPE_RECORD_ZO = SCHEMA_TYPE_RECORD.seqType(ZERO_OR_ONE);
 
   /** Built-in record type fn:uri-structure-record. */
   public static final RecordType URI_STRUCTURE_RECORD =
