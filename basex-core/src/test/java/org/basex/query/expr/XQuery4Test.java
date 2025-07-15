@@ -5,7 +5,9 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.func.map.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -674,5 +676,47 @@ public final class XQuery4Test extends SandboxTest {
         false);
 
     error("fn($a as map(xs:float, item())) { $a }({ 1.2: 0, 1.2000000001: 0 })", INVCONVERT_X_X_X);
+  }
+
+  /** Map constructor. */
+  @Test public void mapConstructor() {
+    check("{}", "{}", root(XQTrieMap.class));
+    check("{ 1: 2 }", "{1:2}", root(XQSingletonMap.class));
+    check("{ 1: 2, 3: 4 }", "{1:2,3:4}", root(XQIntMap.class));
+
+    check("{ () }", "{}", root(XQTrieMap.class));
+    check("{ {} }", "{}", root(XQTrieMap.class));
+    check("{ { 1: 2 } }", "{1:2}", root(XQSingletonMap.class));
+    check("{ { 1: 2 }[?1 = 2] }", "{1:2}", root(XQSingletonMap.class));
+    check("{ { 1: 2 }[?1 = 0] }", "{}", root(XQTrieMap.class));
+    check("{ (), { 1: 2 }[?1 = 0] }", "{}", root(XQTrieMap.class));
+
+    check("{ map:build((1 to 6) ! xs:int()) }", "{1:1,2:2,3:3,4:4,5:5,6:6}",
+        root(MapBuild.class));
+    check("{ 0: 0, map:build((1 to 6) ! xs:int()), () }",
+        "{0:0,1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
+    check("{ (1 to 6) ! { .: . } }", "{1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
+
+    check("{ 'one': 1, { 'two': 2 } }", "{\"one\":1,\"two\":2}", root(XQRecordMap.class));
+    check("{ 'one': 1, { 2: 'two' } }", "{\"one\":1,2:\"two\"}", root(XQItemValueMap.class));
+
+    check("{ 0: <a/>, 1: <b/> } => map:size()", 2, root(Itr.class));
+    check("{ 0: 0, { 1: 1 } } => map:size()", 2, root(Itr.class));
+    check("{ 0: 0, (1 to 6) ! { .: . } } => map:size()", 7, root(_MAP_SIZE));
+
+    check("{ 1: 1, <a/>[. = 'b'] }", "{1:1}",
+        root(CMap.class), type(CMap.class, "map(*)"));
+    check("{ 1: <a/>[. = 'b'], 2: 1 }", "{1:(),2:1}",
+        root(CMap.class), type(CMap.class, "map(xs:integer, item()?)"));
+    check("{ 1: (<a/>, <b/>)[. = 'b'], 2: 1 }", "{1:(),2:1}",
+        root(CMap.class), type(CMap.class, "map(xs:integer, item()*)"));
+    check("{ (1 to 6)[. = 1]: (<a/>, <b/>)[. = 'b'], 2: 1 }", "{1:(),2:1}",
+        root(CMap.class), type(CMap.class, "map(xs:integer, item()*)"));
+    error("{ 1: 1, <a/>[. = ''] }", INVCONVERT_X_X_X);
+
+    error("{ 1: 1, 1: 1 }", MAPDUPLKEY_X);
+    error("{ 1: <a/>, 1: 1 }", MAPDUPLKEY_X);
+    error("{ 1: <a/>, { 1: 1 } }", MAPDUPLKEY_X);
+    error("{ 1: <a/>, (1 to 6) ! { .: . } }", MAPDUPLKEY_X);
   }
 }

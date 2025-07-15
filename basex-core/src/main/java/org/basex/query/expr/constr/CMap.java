@@ -7,10 +7,12 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -34,18 +36,44 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // { <_>A</_>: 1 }  ->  { 'A': 1 }
-    final int el = exprs.length;
-    for(int e = 0; e < el; e += 2) exprs[e] = exprs[e].simplifyFor(Simplify.DATA, cc);
+    // flatten nested maps: { 1: 2, { 3 : 4, 5: 6 }, () }  ->  { 1: 2, 3: 4, 5: 6 }
+    int el = exprs.length;
+    if(((Checks<Expr>) expr -> expr == Empty.UNDEFINED).any(exprs)) {
+      final ExprList list = new ExprList(el);
+      for(int e = 0; e < el; e += 2) {
+        if(nested(e) && exprs[e] instanceof final XQMap map) {
+          map.forEach((key, value) -> list.add(key).add(value));
+        } else if(!nested(e) || exprs[e] != Empty.VALUE) {
+          list.add(exprs[e]).add(exprs[e + 1]);
+        }
+      }
+      exprs = list.finish();
+    }
 
-    // { $a: $b }  ->  map:entry($a, $b)
+    // atomize keys: { <_>A</_>: 1 }  ->  { 'A': 1 }
+    el = exprs.length;
+    for(int e = 0; e < el; e += 2) {
+      if(!nested(e)) {
+        exprs[e] = exprs[e].simplifyFor(Simplify.DATA, cc);
+      }
+    }
+
+    // empty map, single map entry?  { $a: $b }  ->  map:entry($a, $b)
     if(el == 0) return XQMap.empty();
-    if(el == 2) return cc.function(_MAP_ENTRY, info, exprs);
+    if(el == 2) {
+      if(!nested(0)) {
+        cc.function(_MAP_ENTRY, info, exprs);
+      } else if(exprs[0].seqType().instanceOf(SeqType.MAP_O)) {
+        return exprs[0];
+      }
+    }
 
-    // use record constructor (not too large, only strings as keys)?
+    // not too large, only strings as keys? replace with record constructor
     boolean record = el < 32;
     for(int e = 0; e < el && record; e += 2) {
-      if(!(exprs[e] instanceof AStr && exprs[e].seqType().eq(SeqType.STRING_O))) record = false;
+      if(nested(e) || !(exprs[e] instanceof AStr && exprs[e].seqType().eq(SeqType.STRING_O))) {
+        record = false;
+      }
     }
     if(record) {
       final TokenObjectMap<RecordField> fields = new TokenObjectMap<>(el / 2);
@@ -59,14 +87,24 @@ public final class CMap extends Arr {
     }
 
     // determine static types
-    AtomType kt = AtomType.ANY_ATOMIC_TYPE;
-    SeqType vt = SeqType.ITEM_ZM;
+    Type kt = null;
+    SeqType vt = null;
     for(int e = 0; e < el; e += 2) {
-      final SeqType kst = exprs[e].seqType(), dst = exprs[e + 1].seqType();
-      final AtomType akt = kst.type.atomic();
-      kt = akt == null || !kst.one() || kst.mayBeArray() ? AtomType.ANY_ATOMIC_TYPE :
-        e == 0 ? akt : (AtomType) kt.union(akt);
-      vt = e == 0 ? dst : vt.union(dst);
+      Type ekt = AtomType.ANY_ATOMIC_TYPE;
+      SeqType evt = SeqType.ITEM_ZM;
+      if(nested(e)) {
+        if(exprs[e].seqType().type instanceof final MapType mt) {
+          ekt = mt.keyType();
+          evt = mt.valueType();
+        }
+      } else {
+        final SeqType kst = exprs[e].seqType();
+        final Type akt = kst.type.atomic();
+        if(akt != null) ekt = akt;
+        evt = exprs[e + 1].seqType();
+      }
+      kt = e == 0 ? ekt : kt.union(ekt);
+      vt = e == 0 ? evt : vt.union(evt);
     }
     exprType.assign(MapType.get(kt, vt));
 
@@ -77,19 +115,39 @@ public final class CMap extends Arr {
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final int el = exprs.length;
     final MapBuilder mb = new MapBuilder(el >>> 1);
-    for(int e = 0; e < el; e += 2) {
-      final Item key = toAtomItem(exprs[e], qc);
-      final Value value = exprs[e + 1].value(qc);
+    final QueryBiConsumer<Item, Value> add = (key, value) -> {
       if(mb.contains(key)) throw MAPDUPLKEY_X.get(info, key);
       mb.put(key, value);
+    };
+    for(int e = 0; e < el; e += 2) {
+      if(exprs[e + 1] != Empty.UNDEFINED) {
+        add.accept(toAtomItem(exprs[e], qc), exprs[e + 1].value(qc));
+      } else {
+        final Iter iter = exprs[e].iter(qc);
+        for(Item item; (item = iter.next()) != null;) toMap(item).forEach(add);
+      }
     }
     return mb.map(this);
   }
 
   @Override
   public long structSize() {
-    return exprs.length >> 1;
+    final int el = exprs.length;
+    for(int e = 0; e < el; e += 2) {
+      if(nested(e)) return -1;
+    }
+    return el >> 1;
   }
+
+  /**
+   * Returns if the specified expression refers to a nested map.
+   * @param e offset to key/value pair
+   * @return result of check
+   */
+  private boolean nested(final int e) {
+    return exprs[e + 1] == Empty.UNDEFINED;
+  }
+
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
@@ -112,7 +170,8 @@ public final class CMap extends Arr {
     final int el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       if(e != 0) qs.token(',');
-      qs.token(exprs[e]).token(':').token(exprs[e + 1]);
+      qs.token(exprs[e]);
+      if(exprs[e + 1] != Empty.UNDEFINED) qs.token(':').token(exprs[e + 1]);
     }
     qs.token(" }");
   }

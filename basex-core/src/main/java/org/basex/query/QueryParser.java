@@ -2586,11 +2586,14 @@ public class QueryParser extends InputParser {
       if(!wsConsume("}")) {
         final ItemSet set = new HashItemSet(ItemSet.Mode.ATOMIC, info);
         do {
-          final Expr key = single();
-          add(el, check(key, INVMAPKEY));
-          if(key instanceof final Item item && !set.add(item)) throw error(MAPDUPLKEY_X, key);
-          if(!wsConsume(":")) throw error(WRONGCHAR_X_X, ":", found());
-          add(el, check(single(), INVMAPVAL));
+          final Expr first = single();
+          add(el, check(first, INVMAPKEY));
+          if(wsConsume(":")) {
+            if(first instanceof final Item item && !set.add(item)) throw error(MAPDUPLKEY_X, first);
+            add(el, check(single(), INVMAPVAL));
+          } else {
+            add(el, Empty.UNDEFINED);
+          }
         } while(wsConsume(","));
         wsCheck("}");
       }
