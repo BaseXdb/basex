@@ -91,7 +91,7 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_O, ANY_ATOMIC_TYPE_O), BOOLEAN_O),
   /** XQuery function. */
   ATOMIC_TYPE_ANNOTATION(FnAtomicTypeAnnotation::new, "atomic-type-annotation(value)",
-      params(ANY_ATOMIC_TYPE_O), MAP_O),
+      params(ANY_ATOMIC_TYPE_O), SCHEMA_TYPE_RECORD_O),
   /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables::new,
       "available-environment-variables()",
@@ -157,7 +157,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), INTEGER_O),
   /** XQuery function. */
   CSV_DOC(FnCsvDoc::new, "csv-doc(source[,options])",
-      params(STRING_ZO, MAP_ZO), MAP_O, flag(NDT), FN_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), PARSED_CSV_STRUCTURE_RECORD_O, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   CSV_TO_ARRAYS(FnCsvToArrays::new, "csv-to-arrays(value[,options])",
       params(STRING_ZO, MAP_ZO), STRING_O.arrayType().seqType(Occ.ZERO_OR_MORE)),
@@ -337,7 +337,7 @@ public enum Function implements AFunction {
       params(NODE_ZM), BOOLEAN_O),
   /** XQuery function. */
   HASH(FnHash::new, "hash(value[,algorithm,options])",
-      params(ANY_ATOMIC_TYPE_ZO, STRING_ZO, MAP_ZO), HEX_BINARY_O),
+      params(STRING_OR_BINARY_ZO, STRING_ZO, MAP_ZO), HEX_BINARY_O),
   /** XQuery function. */
   HEAD(FnHead::new, "head(input)",
       params(ITEM_ZM), ITEM_ZO),
@@ -414,7 +414,7 @@ public enum Function implements AFunction {
       params(), INTEGER_O, flag(POS, CTX)),
   /** XQuery function. */
   LOAD_XQUERY_MODULE(FnLoadXQueryModule::new, "load-xquery-module(module-uri[,options])",
-      params(STRING_O, MAP_ZO), MAP_O, flag(NDT, HOF), FN_URI, Perm.ADMIN),
+      params(STRING_O, MAP_ZO), LOAD_XQUERY_MODULE_RECORD_O, flag(NDT, HOF), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   LOCAL_NAME(FnLocalName::new, "local-name([node])",
       params(NODE_ZO), STRING_O),
@@ -478,7 +478,7 @@ public enum Function implements AFunction {
       params(NODE_ZO), QNAME_ZO),
   /** XQuery function. */
   NODE_TYPE_ANNOTATION(FnNodeTypeAnnotation::new, "node-type-annotation(node)",
-      params(NODE_O), MAP_O),
+      params(NODE_O), SCHEMA_TYPE_RECORD_O),
   /** XQuery function. */
   NORMALIZE_SPACE(FnNormalizeSpace::new, "normalize-space([value])",
       params(STRING_ZO), STRING_O),
@@ -502,31 +502,31 @@ public enum Function implements AFunction {
       params(NODE_ZM), NODE_ZM),
   /** XQuery function. */
   PARSE_CSV(FnParseCsv::new, "parse-csv(value[,options])",
-      params(STRING_ZO, MAP_ZO), MAP_O),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), PARSED_CSV_STRUCTURE_RECORD_O),
   /** XQuery function. */
   PARSE_IETF_DATE(FnParseIetfDate::new, "parse-ietf-date(value)",
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
-  PARSE_HTML(FnParseHtml::new, "parse-html(html[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO),
+  PARSE_HTML(FnParseHtml::new, "parse-html(value[,options])",
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO),
   /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
       params(STRING_ZO, INTEGER_ZO), INTEGER_ZO),
   /** XQuery function. */
   PARSE_JSON(FnParseJson::new, "parse-json(value[,options])",
-      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(CNS, HOF)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZO, flag(CNS, HOF)),
   /** XQuery function. */
   PARSE_QNAME(FnParseQName::new, "parse-QName(value)",
       params(STRING_ZO), QNAME_ZO),
   /** XQuery function. */
   PARSE_URI(FnParseUri::new, "parse-uri(value[,options])",
-      params(STRING_ZO, MAP_ZO), MAP_O),
+      params(STRING_ZO, MAP_ZO), URI_STRUCTURE_RECORD_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARTIAL_APPLY(FnPartialApply::new, "partial-apply(function,arguments)",
       params(FUNCTION_O, MAP_O), FUNCTION_O, flag(HOF)),
@@ -551,7 +551,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, STRING_O), QNAME_O),
   /** XQuery function. */
   RANDOM_NUMBER_GENERATOR(FnRandomNumberGenerator::new, "random-number-generator([seed])",
-      params(ANY_ATOMIC_TYPE_ZO), MAP_O, flag(HOF, NDT)),
+      params(ANY_ATOMIC_TYPE_ZO), RANDOM_NUMBER_GENERATOR_RECORD_O, flag(HOF, NDT)),
   /** XQuery function. */
   REMOVE(FnRemove::new, "remove(input,positions)",
       params(ITEM_ZM, INTEGER_ZM), ITEM_ZM),
@@ -589,7 +589,7 @@ public enum Function implements AFunction {
       ARRAY_ZM, flag(HOF)),
   /** XQuery function. */
   SCHEMA_TYPE(FnSchemaType::new, "schema-type(name)",
-      params(QNAME_O), MAP_ZO),
+      params(QNAME_O), SCHEMA_TYPE_RECORD_ZO),
   /** XQuery function. */
   SECONDS(FnSeconds::new, "seconds(value)",
       params(DECIMAL_ZO), DAY_TIME_DURATION_ZO),
@@ -801,10 +801,10 @@ public enum Function implements AFunction {
       params(MAP_ZM, MAP_ZO), MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_PAIR(MapPair::new, "pair(key,value)",
-      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), PAIR_O, MAP_URI),
+      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), KEY_VALUE_PAIR_O, MAP_URI),
   /** XQuery function. */
   _MAP_PAIRS(MapPairs::new, "pairs(map)",
-      params(MAP_O), PAIR_ZM, MAP_URI),
+      params(MAP_O), KEY_VALUE_PAIR_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_PUT(MapPut::new, "put(map,key,value)",
       params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
@@ -1543,7 +1543,7 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), HTML_URI, Perm.CREATE),
   /** XQuery function. */
   _HTML_PARSE(HtmlParse::new, "parse(value[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, HTML_URI),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, HTML_URI),
   /** XQuery function. */
   _HTML_PARSER(HtmlParser::new, "parser()",
       params(), STRING_O, HTML_URI),

@@ -139,6 +139,29 @@ public final class RecordTest extends SandboxTest {
         + "let $box := geom:rectangle(3, 2)\n"
         + "return $box?area($box)",
         6);
+    // constructor via function item
+    query("declare record local:r(x); local:r#1(42)", "{\"x\":42}");
+    // constructor via function lookup
+    query("declare record local:r(x); function-lookup(#local:r, 1)(42)", "{\"x\":42}");
+    // built-in record type constructor
+    query("fn:key-value-pair('x', 42)", "{\"key\":\"x\",\"value\":42}");
+    // built-in record type constructor via function item
+    query("fn:key-value-pair#2('x', 42)", "{\"key\":\"x\",\"value\":42}");
+    // built-in record type constructor via function lookup
+    query("function-lookup(#fn:key-value-pair, 2)('x', 42)", "{\"key\":\"x\",\"value\":42}");
+
+    // function declaration and record constructor with the same signature
+    error("declare function local:f($x) {local:r($x)};\n"
+        + "declare function local:r($x) {43};\n"
+        + "declare record local:r(x);\n"
+        + "local:f(42)"
+        , DUPLFUNC_X);
+    // record constructor and function declaration with the same signature
+    error("declare function local:f($x) {local:r($x)};\n"
+        + "declare record local:r(x);\n"
+        + "declare function local:r($x) {43};\n"
+        + "local:f(42)"
+        , DUPLFUNC_X);
   }
 
   /** Static typing. */
