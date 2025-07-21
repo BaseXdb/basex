@@ -43,12 +43,12 @@ final class InvDocTest extends Test {
   static Test get(final Value root) throws QueryException {
     // use simple test if database contains only one document
     final Data data = root.data();
-    if(data == null || data.meta.ndocs == 1) return KindTest.DOCUMENT_NODE;
+    if(data == null || data.meta.ndocs == 1) return NodeTest.DOCUMENT_NODE;
 
     // include PRE values of root nodes in document test
     final IntList pres;
     if(root instanceof final DBNodeSeq seq) {
-      if(seq.all()) return KindTest.DOCUMENT_NODE;
+      if(seq.all()) return NodeTest.DOCUMENT_NODE;
       pres = new IntList(seq.pres());
     } else {
       // loop through all documents and add PRE values of documents

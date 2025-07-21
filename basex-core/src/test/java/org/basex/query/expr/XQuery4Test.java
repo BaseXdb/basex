@@ -719,4 +719,34 @@ public final class XQuery4Test extends SandboxTest {
     error("{ 1: <a/>, { 1: 1 } }", MAPDUPLKEY_X);
     error("{ 1: <a/>, (1 to 6) ! { .: . } }", MAPDUPLKEY_X);
   }
+
+  /** Path extensions: get(). */
+  @Test public void pathGet() {
+    query("<a><b/></a>/get(#b)", "<b/>");
+    query("<a><b/></a>/child::get(#b)", "<b/>");
+    query("<a><b/></a>/self::get(#a)", "<a><b/></a>");
+    query("<a><b/></a>/descendant-or-self::get(#b)", "<b/>");
+    query("<a><b/></a>/descendant-or-self::get(#c)", "");
+  }
+
+  /** Path extensions: type(). */
+  @Test public void pathType() {
+    query("<a><b/></a>/type(item())", "<b/>");
+    query("<a><b/></a>/type(item()?)", "<b/>");
+    query("<a><b/></a>/type(item()*)", "<b/>");
+    query("<a><b/></a>/type(item()+)", "<b/>");
+    query("<a><b/></a>/type(element())", "<b/>");
+    query("<a><b/></a>/type(element()?)", "<b/>");
+    query("<a><b/></a>/type(element()*)", "<b/>");
+    query("<a><b/></a>/type(element()+)", "<b/>");
+    query("<a><b/></a>/child::type(element())", "<b/>");
+    query("<a><b/></a>/self::type(element())", "<a><b/></a>");
+    query("<a><b/></a>/descendant-or-self::type(element())", "<a><b/></a>\n<b/>");
+    query("<a><b/></a>/descendant-or-self::type(text())", "");
+    query("<a><b/></a>/descendant-or-self::type(xs:integer)", "");
+    query("<a><b/></a>/descendant-or-self::type(xs:integer?)", "");
+    query("<a><b/></a>/descendant-or-self::type(xs:integer*)", "");
+    query("<a><b/></a>/descendant-or-self::type(xs:integer+)", "");
+    query("<a><b/></a>/descendant-or-self::type(empty-sequence())", "");
+  }
 }

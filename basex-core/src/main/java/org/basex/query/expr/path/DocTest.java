@@ -49,7 +49,7 @@ public final class DocTest extends Test {
       final Test tp = child.intersect(dt.child);
       return tp == null ? null : new DocTest(tp);
     }
-    if(test instanceof KindTest) return type.instanceOf(test.type) ? this : null;
+    if(test instanceof NodeTest) return type.instanceOf(test.type) ? this : null;
     if(test instanceof UnionTest) return test.intersect(this);
     if(test instanceof InvDocTest) return this;
     // NameTest

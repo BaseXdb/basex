@@ -2197,7 +2197,7 @@ public class QueryParser extends InputParser {
       if(consume('/')) {
         // two slashes: absolute descendant path
         checkAxis(Axis.DESCENDANT);
-        add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, KindTest.NODE));
+        add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.NODE));
         mark();
         expr = step(true);
       } else {
@@ -2233,7 +2233,7 @@ public class QueryParser extends InputParser {
     while(true) {
       if(consume('/')) {
         if(consume('/')) {
-          add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, KindTest.NODE));
+          add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.NODE));
           checkAxis(Axis.DESCENDANT);
         } else {
           checkAxis(Axis.CHILD);
@@ -2297,7 +2297,7 @@ public class QueryParser extends InputParser {
     Test test = null;
     if(wsConsume("..")) {
       axis = Axis.PARENT;
-      test = KindTest.NODE;
+      test = NodeTest.NODE;
       checkTest(test, true);
     } else if(consume('@')) {
       axis = Axis.ATTRIBUTE;
@@ -2324,7 +2324,7 @@ public class QueryParser extends InputParser {
       if(axis == null) {
         axis = Axis.CHILD;
         test = simpleNodeTest(NodeType.ELEMENT, true);
-        if(test == KindTest.NAMESPACE_NODE) throw error(NSAXIS);
+        if(test == NodeTest.NAMESPACE_NODE) throw error(NSAXIS);
         if(test != null && test.type == NodeType.ATTRIBUTE) axis = Axis.ATTRIBUTE;
         checkTest(test, axis != Axis.ATTRIBUTE);
       }
@@ -2401,7 +2401,7 @@ public class QueryParser extends InputParser {
       }
       // name test: *
       pos = p;
-      return KindTest.get(type);
+      return NodeTest.get(type);
     }
     if(consume("Q{")) {
       // name test: Q{uri}*
@@ -2421,7 +2421,7 @@ public class QueryParser extends InputParser {
         if(nt != null) {
           // kind test
           final Test test = kindTest(nt);
-          return test == null ? KindTest.get(nt) : test;
+          return test == null ? NodeTest.get(nt) : test;
         }
         if(name.eq(new QNm(GET))) {
           // dynamic name test
@@ -2435,12 +2435,9 @@ public class QueryParser extends InputParser {
           // type test
           final SeqType st = sequenceType();
           wsCheck(")");
-          if(st.one()) {
-            nt = st.type == AtomType.ITEM ? NodeType.NODE :
-              st.type instanceof NodeType n ? n : null;
-            if(nt != null) return KindTest.get(nt);
-          }
-          // TODO: introduce generic TypeTest
+          nt = st.zero() ? null : st.type == AtomType.ITEM ? NodeType.NODE :
+            st.type instanceof NodeType n ? n : null;
+          return nt == null ? NodeTest.FALSE : NodeTest.get(nt);
         }
       } else {
         pos = p;
@@ -3639,7 +3636,7 @@ public class QueryParser extends InputParser {
       test = Test.get(nameTestUnion(NodeType.ELEMENT));
       if(test == null) return null;
     }
-    return new DocTest(test != null ? test : KindTest.ELEMENT);
+    return new DocTest(test != null ? test : NodeTest.ELEMENT);
   }
 
   /**
@@ -3693,7 +3690,7 @@ public class QueryParser extends InputParser {
     } else {
       return null;
     }
-    return Test.get(NodeType.PROCESSING_INSTRUCTION, new QNm(name), null);
+    return NameTest.get(NodeType.PROCESSING_INSTRUCTION, new QNm(name), null);
   }
 
   /**

@@ -40,7 +40,7 @@ public final class CPI extends CName {
       final byte[] nm = ncname(false, cc.qc);
       name = Str.get(nm);
       exprType.assign(SeqType.get(NodeType.PROCESSING_INSTRUCTION, Occ.EXACTLY_ONE,
-          Test.get(NodeType.PROCESSING_INSTRUCTION, new QNm(nm), null)));
+          NameTest.get(NodeType.PROCESSING_INSTRUCTION, new QNm(nm), null)));
     }
     optValue(cc);
     return this;

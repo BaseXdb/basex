@@ -294,11 +294,11 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrence indicator
-   * @param test kind test (can be {@code null}; {@link KindTest} is redundant and ignored)
+   * @param test kind test (can be {@code null}; {@link NodeTest} is redundant and ignored)
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ, final Test test) {
-    return occ == ZERO || test == null || test instanceof KindTest ? get(type, occ) :
+    return occ == ZERO || test == null || test instanceof NodeTest ? get(type, occ) :
       new SeqType(type, occ, test);
   }
 

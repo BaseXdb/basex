@@ -117,15 +117,15 @@ public final class Catch extends Single {
    */
   boolean simplify(final ArrayList<Test> list, final CompileContext cc) {
     // check if all errors are already caught
-    if(list.contains(KindTest.ELEMENT)) {
+    if(list.contains(NodeTest.ELEMENT)) {
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
       return false;
     }
 
     // drop remaining tests in favor or wildcard test
-    if(tests.contains(KindTest.ELEMENT) && tests.size() != 1) {
+    if(tests.contains(NodeTest.ELEMENT) && tests.size() != 1) {
       tests.clear();
-      tests.add(KindTest.ELEMENT);
+      tests.add(NodeTest.ELEMENT);
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
     }
 
@@ -148,7 +148,7 @@ public final class Catch extends Single {
    * @return result of check
    */
   boolean global() {
-    return tests.size() == 1 && tests.get(0) instanceof KindTest;
+    return tests.size() == 1 && tests.get(0) instanceof NodeTest;
   }
 
   /**
@@ -159,7 +159,7 @@ public final class Catch extends Single {
   boolean matches(final QueryException ex) {
     final QNm name = ex.qname();
     for(final Test test : tests) {
-      if(test instanceof KindTest || ((NameTest) test).matches(name)) return true;
+      if(test instanceof NodeTest || ((NameTest) test).matches(name)) return true;
     }
     return false;
   }

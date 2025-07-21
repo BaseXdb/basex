@@ -1,5 +1,6 @@
 package org.basex.query.expr.path;
 
+import org.basex.data.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -10,27 +11,27 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class KindTest extends Test {
+public class NodeTest extends Test {
   /** Generic document node test. */
-  public static final KindTest DOCUMENT_NODE = new KindTest(NodeType.DOCUMENT_NODE);
+  public static final NodeTest DOCUMENT_NODE = new NodeTest(NodeType.DOCUMENT_NODE);
   /** Generic element node test. */
-  public static final KindTest ELEMENT = new KindTest(NodeType.ELEMENT) {
+  public static final NodeTest ELEMENT = new NodeTest(NodeType.ELEMENT) {
     @Override
     public String toString(final boolean full) { return full ? type.toString() : "*"; }
   };
   /** Generic attribute node test. */
-  public static final KindTest ATTRIBUTE = new KindTest(NodeType.ATTRIBUTE);
+  public static final NodeTest ATTRIBUTE = new NodeTest(NodeType.ATTRIBUTE);
   /** Generic PI node test. */
-  public static final KindTest PROCESSING_INSTRUCTION =
-      new KindTest(NodeType.PROCESSING_INSTRUCTION);
+  public static final NodeTest PROCESSING_INSTRUCTION =
+      new NodeTest(NodeType.PROCESSING_INSTRUCTION);
   /** Generic text node test. No other {@link NodeType#TEXT} tests exist. */
-  public static final KindTest TEXT = new KindTest(NodeType.TEXT);
+  public static final NodeTest TEXT = new NodeTest(NodeType.TEXT);
   /** Generic comment node test. No other {@link NodeType#COMMENT} tests exist. */
-  public static final KindTest COMMENT = new KindTest(NodeType.COMMENT);
+  public static final NodeTest COMMENT = new NodeTest(NodeType.COMMENT);
   /** Generic namespace node test. No other {@link NodeType#COMMENT} tests exist. */
-  public static final KindTest NAMESPACE_NODE = new KindTest(NodeType.NAMESPACE_NODE);
+  public static final NodeTest NAMESPACE_NODE = new NodeTest(NodeType.NAMESPACE_NODE);
   /** Generic node test. No other {@link NodeType#NODE} tests exist. */
-  public static final KindTest NODE = new KindTest(NodeType.NODE) {
+  public static final NodeTest NODE = new NodeTest(NodeType.NODE) {
     @Override
     public boolean matches(final ANode node) { return true; }
     @Override
@@ -38,12 +39,21 @@ public class KindTest extends Test {
     @Override
     public Test intersect(final Test test) { return test; }
   };
+  /** Node test that always yields false. */
+  public static final NodeTest FALSE = new NodeTest(NodeType.NODE) {
+    @Override
+    public boolean matches(final ANode node) { return false; }
+    @Override
+    public boolean instanceOf(final Test test) { return false; }
+    @Override
+    public Test intersect(final Test test) { return null; }
+  };
 
   /**
    * Constructor.
    * @param type node type
    */
-  KindTest(final NodeType type) {
+  NodeTest(final NodeType type) {
     super(type);
   }
 
@@ -52,7 +62,7 @@ public class KindTest extends Test {
    * @param type node type
    * @return kind test
    */
-  public static KindTest get(final NodeType type) {
+  public static NodeTest get(final NodeType type) {
     return switch(type) {
       case TEXT                   -> TEXT;
       case PROCESSING_INSTRUCTION -> PROCESSING_INSTRUCTION;
@@ -67,8 +77,13 @@ public class KindTest extends Test {
   }
 
   @Override
-  public final KindTest copy() {
+  public final NodeTest copy() {
     return this;
+  }
+
+  @Override
+  public Test optimize(final Data data) {
+    return this == FALSE ? null : this;
   }
 
   @Override
@@ -85,12 +100,12 @@ public class KindTest extends Test {
 
   @Override
   public boolean instanceOf(final Test test) {
-    return (test instanceof KindTest || test instanceof UnionTest) && super.instanceOf(test);
+    return (test instanceof NodeTest || test instanceof UnionTest) && super.instanceOf(test);
   }
 
   @Override
   public Test intersect(final Test test) {
-    if(test instanceof KindTest)
+    if(test instanceof NodeTest)
       return instanceOf(test) ? this : test.instanceOf(this) ? test : null;
     if(test instanceof NameTest || test instanceof DocTest)
       return test.instanceOf(this) ? test : null;

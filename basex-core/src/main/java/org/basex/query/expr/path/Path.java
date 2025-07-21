@@ -84,11 +84,11 @@ public abstract class Path extends ParseExpr {
       Expr expr = step;
       if(expr instanceof ContextValue) {
         // rewrite context value reference to self step
-        expr = Step.get(expr.info(info), SELF, KindTest.NODE);
+        expr = Step.get(expr.info(info), SELF, NodeTest.NODE);
       } else if(expr instanceof final Filter filter) {
         // rewrite filter expression to self step with predicates
         if(filter.root instanceof ContextValue) {
-          expr = Step.get(filter.info(), SELF, KindTest.NODE, filter.exprs);
+          expr = Step.get(filter.info(), SELF, NodeTest.NODE, filter.exprs);
         }
       }
       tmp.add(expr);
@@ -667,7 +667,7 @@ public abstract class Path extends ParseExpr {
       for(int t = 0; t < ts; t++) {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm qName = qNames.get(ts - t - 1);
-        final Test test = qName == null ? KindTest.ELEMENT :
+        final Test test = qName == null ? NodeTest.ELEMENT :
           new NameTest(qName, NamePart.LOCAL, NodeType.ELEMENT, null);
         stps[t] = Step.get(cc, root, curr.info(), CHILD, test, preds);
       }
@@ -808,7 +808,7 @@ public abstract class Path extends ParseExpr {
     // invert steps that occur before index step, rewrite them to predicates
     final Expr indexStep = indexSteps.isEmpty() ? null : indexSteps.peek();
     final ExprList invSteps = new ExprList(), lastPreds = new ExprList();
-    if(rootTest != KindTest.DOCUMENT_NODE || data == null || !data.meta.uptodate ||
+    if(rootTest != NodeTest.DOCUMENT_NODE || data == null || !data.meta.uptodate ||
         invertSteps(stepIndex)) {
       for(int s = stepIndex; s >= 0; s--) {
         final Axis axis = axisStep(s).axis.invert();
@@ -825,7 +825,7 @@ public abstract class Path extends ParseExpr {
             newPreds = new Expr[0];
           } else {
             // index use is enforced: ...::document-node()[db:node-id(.) = db:node-id(ROOT)]
-            newTest = KindTest.DOCUMENT_NODE;
+            newTest = NodeTest.DOCUMENT_NODE;
             newPreds = new Expr[] { new CmpG(info, _DB_NODE_ID.get(info, new ContextValue(ii)),
               _DB_NODE_ID.get(info, rt), OpG.EQ) };
           }
@@ -838,7 +838,7 @@ public abstract class Path extends ParseExpr {
         }
         // skip step if it is always successful
         if(newAxis != ANCESTOR && newAxis != ANCESTOR_OR_SELF ||
-            newTest != KindTest.NODE && newTest != KindTest.DOCUMENT_NODE ||
+            newTest != NodeTest.NODE && newTest != NodeTest.DOCUMENT_NODE ||
             newPreds.length > 0) {
           final Expr expr = invSteps.isEmpty() ?
             indexStep != null ? indexStep : indexRoot : invSteps.peek();
@@ -875,7 +875,7 @@ public abstract class Path extends ParseExpr {
     for(int s = i; s >= 0; s--) {
       final Step step = axisStep(s);
       // ensure that the index step does not use wildcard
-      if(step.test instanceof KindTest && s != i) continue;
+      if(step.test instanceof NodeTest && s != i) continue;
       // consider child steps with name test and without predicates
       if(step.axis != CHILD || s != i && step.exprs.length > 0 ||
           !(step.test instanceof final NameTest test)) return true;
@@ -957,9 +957,9 @@ public abstract class Path extends ParseExpr {
         Expr curr = steps[s];
         if(curr instanceof final Step crr) {
           Expr next = s < sl - 1 ? steps[s + 1] : null;
-          if(crr.test == KindTest.NODE && next instanceof final Step stp && stp.axis == ATTRIBUTE) {
+          if(crr.test == NodeTest.NODE && next instanceof final Step stp && stp.axis == ATTRIBUTE) {
             // rewrite node test before attribute step: node()/@*  ->  */@*
-            next = Step.get(cc, null, crr.info(), crr.axis, KindTest.ELEMENT, crr.exprs);
+            next = Step.get(cc, null, crr.info(), crr.axis, NodeTest.ELEMENT, crr.exprs);
             curr = cc.replaceWith(curr, next);
             chngd = true;
           } else if(next != null) {
@@ -1055,7 +1055,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // merge descendant-or-self::node()
-    if(curr.axis != DESCENDANT_OR_SELF || curr.test != KindTest.NODE || curr.exprs.length > 0)
+    if(curr.axis != DESCENDANT_OR_SELF || curr.test != NodeTest.NODE || curr.exprs.length > 0)
       return null;
 
     // examples:

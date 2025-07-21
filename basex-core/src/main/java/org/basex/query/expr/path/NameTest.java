@@ -26,11 +26,23 @@ public final class NameTest extends Test {
   private boolean simple;
 
   /**
-   * Convenience constructor for element tests.
+   * Returns a name test.
+   * @param type node type (element, attribute, processing instruction)
    * @param name node name
+   * @param defaultNs default element namespace (used for optimizations, can be {@code null})
+   * @return test
    */
-  public NameTest(final QNm name) {
-    this(name, NamePart.FULL, NodeType.ELEMENT, null);
+  public static NameTest get(final NodeType type, final QNm name, final byte[] defaultNs) {
+    final NamePart part = type == NodeType.PROCESSING_INSTRUCTION ? NamePart.LOCAL : NamePart.FULL;
+    return new NameTest(name, part, type, defaultNs);
+  }
+
+  /**
+   * Convenience constructor for element tests.
+   * @param qname node name
+   */
+  public NameTest(final QNm qname) {
+    this(qname, NamePart.FULL, NodeType.ELEMENT, null);
   }
 
   /**
@@ -153,7 +165,7 @@ public final class NameTest extends Test {
           return new NameTest(qnm, NamePart.FULL, type, defaultNs);
         }
       }
-    } else if(test instanceof KindTest) {
+    } else if(test instanceof NodeTest) {
       if(type.instanceOf(test.type)) return this;
     } else if(test instanceof UnionTest) {
       return test.intersect(this);

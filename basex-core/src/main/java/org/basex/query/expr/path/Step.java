@@ -43,7 +43,7 @@ public abstract class Step extends Preds {
    */
   public static Expr self(final CompileContext cc, final Expr root, final InputInfo info,
       final Expr... preds) throws QueryException {
-    return self(cc, root, info, KindTest.NODE, preds);
+    return self(cc, root, info, NodeTest.NODE, preds);
   }
 
   /**
@@ -171,7 +171,7 @@ public abstract class Step extends Preds {
     if(expr != null && axis == SELF) {
       final SeqType seqType = expr.seqType();
       // node test: adopt type of context expression: <a/>/self::node()
-      if(test == KindTest.NODE) exprType.assign(seqType.type);
+      if(test == NodeTest.NODE) exprType.assign(seqType.type);
       // no predicates: step will yield single result: $elements/self::element()
       if(exprs.length == 0 && test.matches(seqType) == Boolean.TRUE) {
         exprType.assign(Occ.EXACTLY_ONE);
@@ -189,7 +189,7 @@ public abstract class Step extends Preds {
    */
   public static SeqType seqType(final Axis axis, final Test test, final Expr... preds) {
     final Type type = axis == ATTRIBUTE ? NodeType.ATTRIBUTE : test.type;
-    final Occ occ = axis == SELF && test == KindTest.NODE && preds.length == 0
+    final Occ occ = axis == SELF && test == NodeTest.NODE && preds.length == 0
       // one result: self::node()
       ? Occ.EXACTLY_ONE :
         axis == SELF || axis == PARENT ||
@@ -198,7 +198,7 @@ public abstract class Step extends Preds {
       // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
       ? Occ.ZERO_OR_ONE
       : Occ.ZERO_OR_MORE;
-    final Test t = test instanceof KindTest ? null : test;
+    final Test t = test instanceof NodeTest ? null : test;
     return SeqType.get(type, occ, t);
   }
 
@@ -433,7 +433,7 @@ public abstract class Step extends Preds {
   @Override
   public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
-    if(test == KindTest.NODE) {
+    if(test == NodeTest.NODE) {
       if(axis == PARENT) tb.add("..");
       if(axis == SELF) tb.add('.');
     }
