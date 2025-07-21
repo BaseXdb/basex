@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.path.*;
+import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -78,10 +79,10 @@ final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  protected void checkTest(final Test test, final boolean element) {
+  protected void checkTest(final ExprInfo ei, final boolean element) {
     final TokenBuilder tb = new TokenBuilder();
     if(!element) tb.add('@');
-    if(test != null) tb.add(test.toString(false).replace("*:", ""));
+    if(ei instanceof Test test) tb.add(test.toString(false).replace("*:", ""));
     name = tb.finish();
     // use inexact matching only if the element is at the end:
     checkTest(pos < length);

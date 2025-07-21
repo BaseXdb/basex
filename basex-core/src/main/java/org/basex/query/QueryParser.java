@@ -2265,11 +2265,11 @@ public class QueryParser extends InputParser {
 
   /**
    * Performs an optional test check.
-   * @param test node test
+   * @param ei expression info
    * @param element element flag
    */
   @SuppressWarnings("unused")
-  void checkTest(final Test test, final boolean element) { }
+  void checkTest(final ExprInfo ei, final boolean element) { }
 
   /**
    * Checks a predicate.
@@ -2295,17 +2295,19 @@ public class QueryParser extends InputParser {
    * @return step or {@code null}
    * @throws QueryException query exception
    */
-  private Step axisStep(final boolean error) throws QueryException {
+  private Expr axisStep(final boolean error) throws QueryException {
+    final ExprList preds = new ExprList();
     Axis axis = null;
-    Test test = null;
+    ArrayList<ExprInfo> list = null;
     if(wsConsume("..")) {
       axis = Axis.PARENT;
-      test = NodeTest.NODE;
-      checkTest(test, true);
+      list = new ArrayList<>();
+      list.add(NodeTest.NODE);
+      checkTest(list.get(0), true);
     } else if(consume('@')) {
       axis = Axis.ATTRIBUTE;
-      test = nodeTest(axis);
-      if(test == null) {
+      list = nodeTest(axis);
+      if(list.isEmpty()) {
         --pos;
         throw error(NOATTNAME);
       }
@@ -2316,8 +2318,10 @@ public class QueryParser extends InputParser {
           if(wsConsumeWs("::")) {
             alterPos = pos;
             axis = ax;
-            test = nodeTest(ax);
-            if(test == null) throw error(AXISMISS_X, axis);
+            list = nodeTest(axis);
+            if(list.isEmpty()) {
+              throw error(AXISMISS_X, axis);
+            }
             break;
           }
           pos = p;
@@ -2326,63 +2330,63 @@ public class QueryParser extends InputParser {
 
       if(axis == null) {
         axis = Axis.CHILD;
-        test = simpleNodeTest(NodeType.ELEMENT, true);
-        if(test == NodeTest.NAMESPACE_NODE) throw error(NSAXIS);
-        if(test != null && test.type == NodeType.ATTRIBUTE) axis = Axis.ATTRIBUTE;
-        checkTest(test, axis != Axis.ATTRIBUTE);
+        list = new ArrayList<>();
+        final ExprInfo ei = simpleNodeTest(NodeType.ELEMENT, true);
+        if(ei == NodeTest.NAMESPACE_NODE) throw error(NSAXIS);
+        if(ei instanceof Test tst) {
+          if(tst.type == NodeType.ATTRIBUTE) axis = Axis.ATTRIBUTE;
+          checkTest(tst, axis != Axis.ATTRIBUTE);
+        }
+        list.add(ei);
       }
-      if(test == null) {
+      if(list.isEmpty()) {
         if(error) throw error(STEPMISS_X, found());
         return null;
       }
     }
 
-    final ExprList el = new ExprList();
     while(wsConsume("[")) {
       checkPred(true);
-      add(el, expr());
+      add(preds, expr());
       wsCheck("]");
       checkPred(false);
     }
-    return new CachedStep(info(), axis, test, el.finish());
+    final Test test = list.size() == 1 ? (Test) list.get(0) : NodeTest.NODE;
+    return new CachedStep(info(), axis, test, preds.finish());
   }
 
   /**
    * Parses the NodeTest rule.
    * @param axis axis
-   * @return test or {@code null}
+   * @return tests and gets, or {@code null}
    * @throws QueryException query exception
    */
-  private Test nodeTest(final Axis axis) throws QueryException {
-    final boolean element = axis != Axis.ATTRIBUTE;
-    final Test test;
+  private ArrayList<ExprInfo> nodeTest(final Axis axis) throws QueryException {
+    final ArrayList<ExprInfo> exprs = new ArrayList<>(1);
+    final ArrayList<Test> tests = new ArrayList<>(1);
+    final QueryPredicate<Expr> add = e -> {
+      final boolean element = axis != Axis.ATTRIBUTE;
+      final ExprInfo ei = simpleNodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
+      if(ei == null) return false;
+      if(ei instanceof Test test) {
+        checkTest(test, element);
+        if(!tests.contains(test)) tests.add(test);
+      } else {
+        exprs.add(ei);
+      }
+      return true;
+    };
     if(consume("(")) {
-      test = unionNodeTest(element);
+      do {
+        skipWs();
+        if(!add.test(null)) return null;
+      } while(wsConsume("|"));
+      if(!consume(')')) throw error(WRONGCHAR_X_X, ')', found());
     } else {
-      test = simpleNodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
-      checkTest(test, element);
+      if(!add.test(null)) return null;
     }
-    return test;
-  }
-
-  /**
-   * Parses the UnionNodeTest rule without the leading parenthesis.
-   * @param element element flag
-   * @return test or {@code null}
-   * @throws QueryException query exception
-   */
-  private Test unionNodeTest(final boolean element) throws QueryException {
-    final NodeType nodeType = element ? NodeType.ELEMENT : NodeType.ATTRIBUTE;
-    final ArrayList<Test> tests = new ArrayList<>();
-    do {
-      skipWs();
-      final Test test = simpleNodeTest(nodeType, true);
-      checkTest(test, element);
-      if(test == null) return null;
-      if(!tests.contains(test)) tests.add(test);
-    } while(wsConsume("|"));
-    if(!consume(')')) throw error(WRONGCHAR_X_X, ')', found());
-    return Test.get(tests);
+    if(!tests.isEmpty()) exprs.add(0, Test.get(tests));
+    return exprs;
   }
 
   /**
@@ -2391,10 +2395,10 @@ public class QueryParser extends InputParser {
    * Parses the "KindTest" rule.
    * @param type node type (either {@link NodeType#ELEMENT} or {@link NodeType#ATTRIBUTE})
    * @param all check all tests, or only names
-   * @return test or {@code null}
+   * @return node test, get() expression (if {@code all} is true), or {@code null}
    * @throws QueryException query exception
    */
-  private Test simpleNodeTest(final NodeType type, final boolean all) throws QueryException {
+  private ExprInfo simpleNodeTest(final NodeType type, final boolean all) throws QueryException {
     int p = pos;
     if(consume('*')) {
       p = pos;
@@ -2430,10 +2434,7 @@ public class QueryParser extends InputParser {
           // dynamic name test
           final Expr expr = expr();
           wsCheck(")");
-          if(expr instanceof QNm) {
-            return new NameTest((QNm) expr, NamePart.FULL, type, sc.elemNS);
-          }
-          // TODO: introduce generic ExprTest
+          return expr;
         } else if(name.eq(new QNm(TYPE))) {
           // type test
           final SeqType st = sequenceType();
@@ -3771,7 +3772,7 @@ public class QueryParser extends InputParser {
     final int p = pos;
     do {
       skipWs();
-      test = simpleNodeTest(type, false);
+      test = (Test) simpleNodeTest(type, false);
       if(test == null) break;
       tests.add(test);
     } while(wsConsume("|"));
