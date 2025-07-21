@@ -66,7 +66,8 @@ public class QueryParser extends InputParser {
   /** Reserved keywords. */
   private static final TokenSet KEYWORDS = new TokenSet(
       ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE_NODE, NODE, SCHEMA_ATTRIBUTE,
-      SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, FN, FUNCTION, IF, SWITCH, TYPESWITCH);
+      SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN, FUNCTION, GET, IF,
+      ITEM, MAP, RECORD, SWITCH, TYPE, TYPESWITCH);
 
   /** URIs of modules loaded by the current file. */
   public final TokenSet moduleURIs = new TokenSet();
@@ -2300,12 +2301,7 @@ public class QueryParser extends InputParser {
       checkTest(test, true);
     } else if(consume('@')) {
       axis = Axis.ATTRIBUTE;
-      if(wsConsume("(")) {
-        test = unionNodeTest(false);
-      } else {
-        test = simpleNodeTest(NodeType.ATTRIBUTE, true);
-        checkTest(test, false);
-      }
+      test = nodeTest(axis);
       if(test == null) {
         --pos;
         throw error(NOATTNAME);
@@ -2317,13 +2313,7 @@ public class QueryParser extends InputParser {
           if(wsConsumeWs("::")) {
             alterPos = pos;
             axis = ax;
-            final boolean element = ax != Axis.ATTRIBUTE;
-            if(consume("(")) {
-              test = unionNodeTest(element);
-            } else {
-              test = simpleNodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
-              checkTest(test, element);
-            }
+            test = nodeTest(ax);
             if(test == null) throw error(AXISMISS_X, axis);
             break;
           }
@@ -2352,6 +2342,24 @@ public class QueryParser extends InputParser {
       checkPred(false);
     }
     return new CachedStep(info(), axis, test, el.finish());
+  }
+
+  /**
+   * Parses the NodeTest rule.
+   * @param axis axis
+   * @return test or {@code null}
+   * @throws QueryException query exception
+   */
+  private Test nodeTest(final Axis axis) throws QueryException {
+    final boolean element = axis != Axis.ATTRIBUTE;
+    final Test test;
+    if(consume("(")) {
+      test = unionNodeTest(element);
+    } else {
+      test = simpleNodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
+      checkTest(test, element);
+    }
+    return test;
   }
 
   /**
@@ -2409,11 +2417,30 @@ public class QueryParser extends InputParser {
     if(name != null) {
       p = pos;
       if(all && wsConsumeWs("(")) {
-        final NodeType nt = NodeType.find(name);
+        NodeType nt = NodeType.find(name);
         if(nt != null) {
           // kind test
           final Test test = kindTest(nt);
           return test == null ? KindTest.get(nt) : test;
+        }
+        if(name.eq(new QNm(GET))) {
+          // dynamic name test
+          final Expr expr = expr();
+          wsCheck(")");
+          if(expr instanceof QNm) {
+            return new NameTest((QNm) expr, NamePart.FULL, type, sc.elemNS);
+          }
+          // TODO: introduce generic ExprTest
+        } else if(name.eq(new QNm(TYPE))) {
+          // type test
+          final SeqType st = sequenceType();
+          wsCheck(")");
+          if(st.one()) {
+            nt = st.type == AtomType.ITEM ? NodeType.NODE :
+              st.type instanceof NodeType n ? n : null;
+            if(nt != null) return KindTest.get(nt);
+          }
+          // TODO: introduce generic TypeTest
         }
       } else {
         pos = p;
@@ -2442,7 +2469,6 @@ public class QueryParser extends InputParser {
     if(expr != null) {
       while(true) {
         if(wsConsume("[")) {
-          // parses the "Predicate" rule
           final ExprList el = new ExprList();
           do {
             add(el, expr());
@@ -2450,7 +2476,6 @@ public class QueryParser extends InputParser {
           } while(wsConsume("["));
           expr = new CachedFilter(info(), expr, el.finish());
         } else if(consume("?[")) {
-          // parses the "Predicate" rule
           final ExprList el = new ExprList();
           do {
             add(el, expr());
