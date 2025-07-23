@@ -38,7 +38,7 @@ public abstract class Preds extends Arr {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     // called at an early stage as it affects the optimization of predicates
-    final Expr root = type(cc.qc.focus.value);
+    final Expr root = type(cc.qc.focus.value, false);
     final int el = exprs.length;
     final boolean value = this instanceof StructFilter;
     if(el != 0) cc.get(value ? null : this, !value, () -> {
@@ -58,9 +58,10 @@ public abstract class Preds extends Arr {
   /**
    * Assigns the expression type.
    * @param expr root expression (can be {@code null})
+   * @param optimize compilation/optimization
    * @return actual root expression (can be {@code null})
    */
-  protected abstract Expr type(Expr expr);
+  protected abstract Expr type(Expr expr, boolean optimize);
 
   /**
    * Checks if the specified item matches the predicates.
