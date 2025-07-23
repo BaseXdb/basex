@@ -3085,7 +3085,8 @@ public final class RewritingsTest extends SandboxTest {
 
     // GH-2182: EBV tests, rewriting to descendant::text()
     check("boolean(<a><b>x</b></a>/*[@nr = 0] ! string())", false, exists(CmpSimpleG.class));
-    check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(DualMap.class));
+    check("<a><b/></a>/*[self::c[empty(node())]]", "",
+        exists(IterPath.class), exists(SingleIterPath.class));
 
     // GH-2215: Unexpected exception, mapping double attributes
     check("boolean((<a/> ! (a, b)))", false, exists(Pipeline.class));
@@ -3337,6 +3338,10 @@ public final class RewritingsTest extends SandboxTest {
         true, root(Bln.class));
     check("(1 to 10000000000000, 'x')[. instance of xs:integer][. instance of xs:string]",
         "", empty());
+
+    // GH-2460
+    check("<a><b/>x</a>/node()[. instance of element()]", "<b/>", type(IterPath.class,
+        "element()*"));
   }
 
   /** Include data reference in equality check. */

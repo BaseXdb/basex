@@ -135,7 +135,7 @@ public abstract class Step extends Preds {
    */
   final Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     // updates the static type
-    final Expr rt = type(root != null ? root : cc.qc.focus.value);
+    final Expr rt = type(root != null ? root : cc.qc.focus.value, true);
 
     // choose stricter axis
     final Axis old = axis;
@@ -166,9 +166,12 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  protected final Expr type(final Expr expr) {
+  protected final Expr type(final Expr expr, final boolean optimize) {
     exprType.data(expr);
-    if(expr != null && axis == SELF) {
+    if(!optimize && exprs.length != 0) {
+      // reset type (discard refined type information derived from predicates)
+      exprType.assign(test.type.seqType(Occ.ZERO_OR_MORE));
+    } else if(expr != null && axis == SELF) {
       final SeqType seqType = expr.seqType();
       // node test: adopt type of context expression: <a/>/self::node()
       if(test == NodeTest.NODE) exprType.assign(seqType.type);
