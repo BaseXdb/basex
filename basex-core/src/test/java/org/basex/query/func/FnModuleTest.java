@@ -1351,6 +1351,10 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void hash() {
     final Function func = HASH;
+    query("string(" + func.args(" ()") + ")", "");
+    query("string(" + func.args("") + ")", "D41D8CD98F00B204E9800998ECF8427E");
+    query("string(" + func.args("", " ()") + ")", "D41D8CD98F00B204E9800998ECF8427E");
+
     query(func.args(" ()", "crc-32"), "");
     query("string( " + func.args("", "CRC-32") + ')', "00000000");
     query("string( " + func.args("BaseX", "CRC-32") + ')', "4C06FC7F");
@@ -1358,6 +1362,8 @@ public final class FnModuleTest extends SandboxTest {
 
     query("string( " + func.args("X", "BLAKE3") + ')',
         "F7B966D4B544408E21361E62D4D554FEDB411BD8E108D70B4B654620A4B06CD2");
+
+    error(func.args("", ""), HASH_ALGORITHM_X);
   }
 
   /** Test method. */

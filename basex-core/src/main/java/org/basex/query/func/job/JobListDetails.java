@@ -25,15 +25,15 @@ public final class JobListDetails extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Context ctx = qc.context;
-    final TokenList ids = defined(0) ? new TokenList(1).add(toToken(arg(0), qc)) :
-      qc.context.jobs.ids();
+    final String id = toStringOrNull(arg(0), qc);
 
+    final TokenList ids = id != null ? new TokenList(1).add(id) : qc.context.jobs.ids();
     final int max = ctx.soptions.get(StaticOptions.LOGMSGMAXLEN);
     final JobPool jobs = ctx.jobs;
     final ValueBuilder vb = new ValueBuilder(qc);
 
-    for(final byte[] id : ids) {
-      final String key = Token.string(id);
+    for(final byte[] k : ids) {
+      final String key = Token.string(k);
       Job job = jobs.active.get(key);
       final QueryJobResult jr = jobs.results.get(key);
       if(job == null && jr != null) job = jr.job;

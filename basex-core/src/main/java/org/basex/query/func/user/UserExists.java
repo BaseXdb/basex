@@ -19,6 +19,6 @@ public final class UserExists extends UserFn {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    return qc.context.users.get(toName(arg(0), qc)) != null;
+    return qc.context.users.get(toName(arg(0), false, qc)) != null;
   }
 }

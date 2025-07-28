@@ -28,12 +28,14 @@ abstract class StoreFn extends StandardFunc {
   /**
    * Evaluates an expression to a store name.
    * @param expr expression
+   * @param empty accept empty names
    * @param qc query context
    * @return store name
    * @throws QueryException query exception
    */
-  final String toName(final Expr expr, final QueryContext qc) throws QueryException {
-    return toName(expr, false, STORE_NAME_X, qc);
+  final String toName(final Expr expr, final boolean empty, final QueryContext qc)
+      throws QueryException {
+    return toName(expr, empty, STORE_NAME_X, qc);
   }
 
   /**

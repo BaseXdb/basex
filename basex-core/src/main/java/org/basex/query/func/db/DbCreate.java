@@ -24,11 +24,11 @@ import org.basex.util.list.*;
 public final class DbCreate extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(arg(0), false, qc);
+    final String name = toName(arg(0), qc);
     checkPerm(qc, Perm.CREATE, name);
 
     final StringList paths = new StringList();
-    final Iter iter = arg(2).iter(qc);
+    final Iter iter = arg(2).atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) {
       paths.add(toDbPath(toString(item)));
     }

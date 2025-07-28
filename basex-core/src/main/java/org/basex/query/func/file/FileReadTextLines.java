@@ -93,11 +93,11 @@ public final class FileReadTextLines extends FileFn {
    * @throws QueryException query exception
    */
   private long[] minMax(final QueryContext qc) throws QueryException {
-   final Item offset = arg(3).atomItem(qc, info);
-    final Item length = arg(4).atomItem(qc, info);
+   final Long offset = toLongOrNull(arg(3), qc);
+    final Long length = toLongOrNull(arg(4), qc);
 
-    final long off = offset.isEmpty() ? 1 : toLong(offset);
-    final long len = length.isEmpty() ? Long.MAX_VALUE : toLong(length);
+    final long off = offset != null ? offset : 1;
+    final long len = length != null ? length : Long.MAX_VALUE;
     final long end = off + len < 0 ? Long.MAX_VALUE : off + len;
     return new long[] { off, end };
   }

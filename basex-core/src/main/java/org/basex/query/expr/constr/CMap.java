@@ -124,7 +124,9 @@ public final class CMap extends Arr {
         add.accept(toAtomItem(exprs[e], qc), exprs[e + 1].value(qc));
       } else {
         final Iter iter = exprs[e].iter(qc);
-        for(Item item; (item = iter.next()) != null;) toMap(item).forEach(add);
+        for(Item item; (item = iter.next()) != null;) {
+          toMap(item).forEach(add);
+        }
       }
     }
     return mb.map(this);

@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class DbCreateBackup extends BackupFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(arg(0), true, qc);
+    final String name = toBackup(arg(0), qc);
     final CreateBackupOptions options = toOptions(arg(1), new CreateBackupOptions(), qc);
 
     checkPerm(qc, Perm.CREATE, name);

@@ -1,7 +1,5 @@
 package org.basex.query.func.index;
 
-import static org.basex.util.Token.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.query.*;
@@ -36,7 +34,7 @@ public abstract class IndexFn extends StandardFunc {
   /** QName. */
   static final QNm Q_ATTRIBUTE = new QNm("attribute");
   /** Flag: flat output. */
-  static final byte[] FLAT = token("flat");
+  static final String FLAT = "flat";
 
   @Override
   public final boolean accept(final ASTVisitor visitor) {

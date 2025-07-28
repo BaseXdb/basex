@@ -8,7 +8,7 @@ import java.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -23,13 +23,11 @@ public final class ArchiveDelete extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Bin archive = toArchive(arg(0), qc);
-    final Iter entries = arg(1).iter(qc);
+    final Value entries = arg(1).atomValue(qc, info);
 
     // entries to be deleted
-    final TokenSet names = new TokenSet();
-    for(Item item; (item = qc.next(entries)) != null;) {
-      names.add(toString(item, qc));
-    }
+    final TokenSet names = new TokenSet(entries.size());
+    for(final Item item : entries) names.add(toString(item, qc));
 
     try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
       final String format = in.format();

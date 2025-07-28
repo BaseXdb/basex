@@ -18,10 +18,10 @@ public final class AdminWriteLog extends AdminFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String message = toString(arg(0), qc);
-    final String type = defined(1) ? toString(arg(1), qc) : LogType.INFO.toString();
-    if(type.matches(".*\\s.*$")) throw ADMIN_TYPE_X.get(info, type);
+    final String type = toStringOrNull(arg(1), qc);
+    if(type != null && type.matches(".*\\s.*$")) throw ADMIN_TYPE_X.get(info, type);
 
-    qc.context.log.write(type, message, null, qc.context);
+    qc.context.log.write(type != null ? type : LogType.INFO.toString(), message, null, qc.context);
     return Empty.VALUE;
   }
 }

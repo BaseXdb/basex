@@ -23,13 +23,13 @@ public final class BinDecodeString extends BinFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Bin binary = toBinOrNull(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
-    final Item offset = arg(2).atomItem(qc, info);
-    final Item size = arg(3).atomItem(qc, info);
+    final Long offset = toLongOrNull(arg(2), qc);
+    final Long size = toLongOrNull(arg(3), qc);
     if(binary == null) return Empty.VALUE;
 
     byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(offset, offset.isEmpty() ? Empty.VALUE : size, bl);
+    final int[] bounds = bounds(offset, offset != null ? size : null, bl);
     final int o = bounds[0], tl = bounds[1];
     final String enc = encoding == Strings.UTF16 && bl > 1 && bytes[0] == -1 && bytes[1] == -2 ?
       Strings.UTF16LE : encoding;

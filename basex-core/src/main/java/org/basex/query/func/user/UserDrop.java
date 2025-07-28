@@ -21,6 +21,7 @@ public final class UserDrop extends UserFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final User user = toInactiveUser(arg(0), qc);
     final StringList patterns = toPatterns(arg(1), qc);
+
     if(user.name().equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
     qc.updates().add(new Drop(user, patterns, qc, info), qc);
     return Empty.VALUE;

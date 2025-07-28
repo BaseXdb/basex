@@ -35,12 +35,12 @@ abstract class BinFn extends StandardFunc {
    */
   final ByteBuffer unpack(final QueryContext qc, final long len) throws QueryException {
     final Bin binary = toBin(arg(0), qc);
-    final Item offset = arg(1).atomItem(qc, info);
+    final long offset = toLong(arg(1), qc);
     final ByteOrder order = order(arg(2), qc);
 
     final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(offset, Itr.get(len), bl);
+    final int[] bounds = bounds(offset, len, bl);
 
     final ByteBuffer bb = ByteBuffer.allocate(bounds[1]).order(order);
     bb.put(bytes, bounds[0], bounds[1]).position(0);
@@ -56,8 +56,8 @@ abstract class BinFn extends StandardFunc {
    */
   final Itr unpackInteger(final QueryContext qc, final boolean signed) throws QueryException {
     final Bin binary = toBin(arg(0), qc);
-    final Item offset = arg(1).atomItem(qc, info);
-    final Item size = arg(2).atomItem(qc, info);
+    final long offset = toLong(arg(1), qc);
+    final long size = toLong(arg(2), qc);
     final ByteOrder order = order(arg(3), qc);
 
     final byte[] bytes = binary.binary(info);
@@ -114,22 +114,23 @@ abstract class BinFn extends StandardFunc {
   final Item pad(final QueryContext qc, final boolean left) throws QueryException {
     final Bin binary = toBinOrNull(arg(0), qc);
     final long size = toLong(arg(1), qc);
-    final long octet = defined(2) ? toLong(arg(2), qc) : 0;
+    final Long octet = toLongOrNull(arg(2), qc);
     if(binary == null) return Empty.VALUE;
 
     final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
 
     if(size < 0) throw BIN_NS_X.get(info, size);
-    if(octet < 0 || octet > 255) throw BIN_OOR_X.get(info, octet);
+    final long oct = octet != null ? octet : 0;
+    if(oct < 0 || oct > 255) throw BIN_OOR_X.get(info, octet);
 
     final byte[] tmp = new byte[(int) (bl + size)];
     if(left) {
-      Arrays.fill(tmp, 0, (int) size, (byte) octet);
+      Arrays.fill(tmp, 0, (int) size, (byte) oct);
       Array.copyFromStart(bytes, bl, tmp, (int) size);
     } else {
       Array.copy(bytes, bl, tmp);
-      Arrays.fill(tmp, bl, tmp.length, (byte) octet);
+      Arrays.fill(tmp, bl, tmp.length, (byte) oct);
     }
     return B64.get(tmp);
   }
@@ -142,9 +143,8 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final ByteOrder order(final Expr expr, final QueryContext qc) throws QueryException {
-    if(expr == Empty.UNDEFINED) return ByteOrder.BIG_ENDIAN;
-    final byte[] order = toToken(expr, qc);
-    if(eq(order, BIG)) return ByteOrder.BIG_ENDIAN;
+    final byte[] order = toTokenOrNull(expr, qc);
+    if(order == null || eq(order, BIG)) return ByteOrder.BIG_ENDIAN;
     if(eq(order, LITTLE)) return ByteOrder.LITTLE_ENDIAN;
     throw BIN_USO_X.get(info, order);
   }
@@ -157,20 +157,18 @@ abstract class BinFn extends StandardFunc {
    * @return bounds (two integers)
    * @throws QueryException query exception
    */
-  final int[] bounds(final Item offset, final Item length, final int size) throws QueryException {
-    final Long off = offset.isEmpty() ? null : toLong(offset);
-    final Long len = length.isEmpty() ? null : toLong(length);
-
+  final int[] bounds(final Long offset, final Long length, final int size) throws QueryException {
     int of = 0;
-    if(off != null) {
-      if(off < 0 || off > size) throw BIN_IOOR_X_X.get(info, off, size);
-      of = (int) off.longValue();
+    if(offset != null) {
+      if(offset < 0 || offset > size) throw BIN_IOOR_X_X.get(info, offset, size);
+      of = (int) offset.longValue();
     }
     final int sz;
-    if(len != null) {
-      if(len < 0) throw BIN_NS_X.get(info, off);
-      if(of + len > size || len > Integer.MAX_VALUE) throw BIN_IOOR_X_X.get(info, of + len, size);
-      sz = (int) len.longValue();
+    if(length != null) {
+      if(length < 0) throw BIN_NS_X.get(info, offset);
+      if(of + length > size || length > Integer.MAX_VALUE)
+        throw BIN_IOOR_X_X.get(info, of + length, size);
+      sz = (int) length.longValue();
     } else {
       sz = size - of;
     }

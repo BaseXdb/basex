@@ -58,7 +58,9 @@ public final class Concat extends Arr {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
       if(cc.values(true, expr)) {
-        for(final Item item : expr.atomValue(cc.qc, info)) tb.add(item.string(info));
+        for(final Item item : expr.atomValue(cc.qc, info)) {
+          tb.add(item.string(info));
+        }
       } else {
         if(!tb.isEmpty()) list.add(Str.get(tb.next()));
         list.add(expr);

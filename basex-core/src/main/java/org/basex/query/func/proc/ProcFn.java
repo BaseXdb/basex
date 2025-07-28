@@ -10,7 +10,6 @@ import java.util.*;
 import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -42,10 +41,7 @@ abstract class ProcFn extends StandardFunc {
     // arguments
     final String command = toString(arg(0), qc);
     final StringList args = new StringList().add(command);
-    final Iter iter = arg(1).iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      args.add(toString(item));
-    }
+    for(final Item item : arg(1).atomValue(qc, info)) args.add(toString(item));
 
     // options
     final ProcOptions options = toOptions(arg(2), new ProcOptions(), qc);

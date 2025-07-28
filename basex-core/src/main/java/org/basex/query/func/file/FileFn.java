@@ -90,8 +90,8 @@ abstract class FileFn extends StandardFunc {
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       if(lines) {
-        final Iter values = arg(1).iter(qc);
         final byte[] nl = cs == null ? token(Prop.NL) : Prop.NL.getBytes(cs);
+        final Iter values = arg(1).atomIter(qc, info);
         for(Item item; (item = qc.next(values)) != null;) {
           if(!item.type.isStringOrUntyped()) throw typeError(item, AtomType.STRING, info);
 

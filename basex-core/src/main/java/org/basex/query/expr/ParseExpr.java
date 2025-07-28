@@ -324,6 +324,19 @@ public abstract class ParseExpr extends Expr {
    * Evaluates an expression to a string.
    * @param expr expression
    * @param qc query context
+   * @return string (zero-length if the expression yields an empty sequence)
+   * @throws QueryException query exception
+   */
+  protected final String toZeroString(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? "" : toString(item);
+  }
+
+  /**
+   * Evaluates an expression to a string.
+   * @param expr expression
+   * @param qc query context
    * @return string, or {@code null} if the expression yields an empty sequence
    * @throws QueryException query exception
    */
@@ -446,7 +459,7 @@ public abstract class ParseExpr extends Expr {
    * Evaluates an expression to a long number.
    * @param expr expression
    * @param qc query context
-   * @return integer value
+   * @return long number
    * @throws QueryException query exception
    */
   protected final long toLong(final Expr expr, final QueryContext qc) throws QueryException {
@@ -454,9 +467,21 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Converts an item to an integer.
+   * Evaluates an expression to a long number.
+   * @param expr expression
+   * @param qc query context
+   * @return long number, or {@code null} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  protected final Long toLongOrNull(final Expr expr, final QueryContext qc) throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? null : toLong(item);
+  }
+
+  /**
+   * Converts an item to a long number.
    * @param item item to be converted
-   * @return integer
+   * @return long number
    * @throws QueryException query exception
    */
   protected final long toLong(final Item item) throws QueryException {
@@ -470,10 +495,10 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Converts an item to a specific integer.
+   * Converts an item to a specific long number.
    * @param item item to be converted
    * @param min minimum allowed value
-   * @return integer
+   * @return long number
    * @throws QueryException query exception
    */
   protected final long toLong(final Item item, final long min) throws QueryException {

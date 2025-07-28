@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.security.*;
-import java.util.*;
 import java.util.zip.*;
 
 import org.basex.io.*;
@@ -12,10 +11,8 @@ import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -27,24 +24,14 @@ public final class FnHash extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    final Item arg = arg(1).item(qc, info);
-
-    final String algorithm;
-    if(arg instanceof XQMap) {
-      algorithm = toOptions(arg, new HashOptions(), qc).get(HashOptions.ALGORITHM);
-    } else {
-      final Item item = arg.atomItem(qc, info);
-      algorithm = item.isEmpty() ? HashOptions.ALGORITHM.value() : toString(item);
-    }
-    if(value.isEmpty()) return Empty.VALUE;
-
-    return new Hex(hash(value, algorithm.trim().toUpperCase(Locale.ENGLISH), qc));
+    final String algorithm = toStringOrNull(arg(1), qc);
+    return value.isEmpty() ? Empty.VALUE : new Hex(hash(value, algorithm, qc));
   }
 
   /**
    * Computes the hash value.
    * @param value value to be hashed
-   * @param algorithm algorithm
+   * @param algorithm algorithm (if {@code null}, "MD5" is used)
    * @param qc query context
    * @return result
    * @throws QueryException query exception
@@ -52,7 +39,7 @@ public final class FnHash extends StandardFunc {
   private byte[] hash(final Item value, final String algorithm, final QueryContext qc)
       throws QueryException {
 
-    if(algorithm.equals("CRC-32")) {
+    if("CRC-32".equals(algorithm)) {
       final CRC32 crc = new CRC32();
       crc.update(toBytes(value));
       final byte[] result = new byte[4];
@@ -61,13 +48,13 @@ public final class FnHash extends StandardFunc {
       return result;
     }
 
-    if(algorithm.equals("BLAKE3")) {
+    if("BLAKE3".equals(algorithm)) {
       return new Blake3().digest(toBytes(value));
     }
 
     final MessageDigest md;
     try {
-      md = MessageDigest.getInstance(algorithm);
+      md = MessageDigest.getInstance(algorithm != null ? algorithm : "MD5");
     } catch(final NoSuchAlgorithmException ex) {
       Util.debug(ex);
       throw HASH_ALGORITHM_X.get(info, algorithm);
@@ -88,11 +75,5 @@ public final class FnHash extends StandardFunc {
     }
     // non-streaming item, string
     return md.digest(toBytes(value));
-  }
-
-  /** Hash options. */
-  public static final class HashOptions extends Options {
-    /** Algorithm. */
-    public static final StringOption ALGORITHM = new StringOption("algorithm", "MD5");
   }
 }

@@ -9,7 +9,7 @@ import java.util.AbstractMap.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
-import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -25,16 +25,14 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
   @Override
   public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final IOFile root = new IOFile(toPath(arg(0), qc));
-    if(!root.isDir()) throw FILE_NO_DIR_X.get(info, root);
-
     final CreateFromOptions options = toOptions(arg(1), new CreateFromOptions(), qc);
+    Value entries = arg(2).value(qc);
+
     final boolean recursive = options.get(CreateFromOptions.RECURSIVE);
     final boolean rootDir = options.get(CreateFromOptions.ROOT_DIR);
+    if(!root.isDir()) throw FILE_NO_DIR_X.get(info, root);
 
-    final Iter entries;
-    if(defined(2)) {
-      entries = arg(2).iter(qc);
-    } else {
+    if(entries.isEmpty()) {
       final TokenList tl = new TokenList();
       if(recursive) {
         for(final String file : root.descendants()) tl.add(file);
@@ -43,7 +41,7 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
           if(!file.isDir()) tl.add(file.name());
         }
       }
-      entries = StrSeq.get(tl).iter();
+      entries = StrSeq.get(tl);
     }
 
     final int level = level(options);
@@ -53,9 +51,7 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
     try(ArchiveOut out = ArchiveOut.get(format, info, ao)) {
       out.level(level);
       try {
-        while(true) {
-          final Item item = qc.next(entries);
-          if(item == null) break;
+        for(final Item item : entries) {
           final IOFile file = new IOFile(root, toString(item, qc));
           if(!file.exists()) throw FILE_NOT_FOUND_X.get(info, file);
           if(file.isDir()) throw FILE_IS_DIR_X.get(info, file);

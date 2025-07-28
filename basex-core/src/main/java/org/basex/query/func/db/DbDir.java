@@ -23,25 +23,8 @@ import org.basex.util.list.*;
  */
 public final class DbDir extends DbList {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    // overwrites implementation of the super class
-    return resources(qc).iter(qc);
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    // overwrites implementation of the super class
-    return resources(qc);
-  }
-
-  /**
-   * Returns an iterator over all resources in a databases.
-   * @param qc query context
-   * @return resource iterator
-   * @throws QueryException query exception
-   */
-  private Value resources(final QueryContext qc) throws QueryException {
-    final Data data = toData(qc);
+  Iter resources(final String name, final QueryContext qc) throws QueryException {
+    final Data data = toData(name, qc);
     final String string = toString(arg(1), qc);
 
     String path = MetaData.normPath(string);
@@ -57,11 +40,11 @@ public final class DbDir extends DbList {
     final long ds = docs.size(), ts = data.meta.time;
     for(int d = 0; d < ds; d++) {
       final int pre = docs.get(d);
-      String name = string(substring(data.text(pre, true), path.length()));
-      final int i = name.indexOf('/');
+      String nm = string(substring(data.text(pre, true), path.length()));
+      final int i = nm.indexOf('/');
       final boolean dir = i >= 0;
-      if(dir) name = name.substring(0, i);
-      if(set.add(name)) vb.add(elem(dir, name, ts, data.size(pre, Data.DOC), ResourceType.XML));
+      if(dir) nm = nm.substring(0, i);
+      if(set.add(nm)) vb.add(elem(dir, nm, ts, data.size(pre, Data.DOC), ResourceType.XML));
     }
     // list file resources
     if(!data.inMemory()) {
@@ -69,12 +52,12 @@ public final class DbDir extends DbList {
         final IOFile bin = data.meta.file(path, type);
         for(final IOFile file : bin.children()) {
           final boolean dir = file.isDir();
-          final String name = dir ? file.name() : type.dbPath(file.name());
-          if(set.add(name)) vb.add(elem(file.isDir(), name, file.timeStamp(), file.length(), type));
+          final String nm = dir ? file.name() : type.dbPath(file.name());
+          if(set.add(nm)) vb.add(elem(file.isDir(), nm, file.timeStamp(), file.length(), type));
         }
       }
     }
-    return vb.value(this);
+    return vb.value(this).iter();
   }
 
   /**

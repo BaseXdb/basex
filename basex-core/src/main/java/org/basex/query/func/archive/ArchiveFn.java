@@ -51,7 +51,7 @@ abstract class ArchiveFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final HashSet<String> toEntries(final Expr expr, final QueryContext qc) throws QueryException {
-    final HashSet<String> entries = new HashSet<>();
+    final HashSet<String> entries = new LinkedHashSet<>();
     final Iter names = expr.iter(qc);
     for(Item item; (item = qc.next(names)) != null;) {
       entries.add(toString(item, qc));

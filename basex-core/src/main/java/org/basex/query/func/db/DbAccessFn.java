@@ -61,6 +61,18 @@ abstract class DbAccessFn extends StandardFunc {
   }
 
   /**
+   * Evaluates an expression to a normalized database path.
+   * @param expr expression
+   * @param qc query context
+   * @return normalized path, or {@code null} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  final String toDbPathOrNull(final Expr expr, final QueryContext qc) throws QueryException {
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? null : toDbPath(toString(expr, qc));
+  }
+
+  /**
    * Converts a path to a normalized database path.
    * @param path input path
    * @return normalized path
@@ -75,14 +87,12 @@ abstract class DbAccessFn extends StandardFunc {
   /**
    * Evaluates an expression to a database name.
    * @param expr expression
-   * @param empty allow empty name
    * @param qc query context
-   * @return database name (empty string for general data)
+   * @return name of database
    * @throws QueryException query exception
    */
-  protected final String toName(final Expr expr, final boolean empty, final QueryContext qc)
-      throws QueryException {
-    return toName(expr, empty, DB_NAME_X, qc);
+  protected final String toName(final Expr expr, final QueryContext qc) throws QueryException {
+    return toName(expr, false, DB_NAME_X, qc);
   }
 
   @Override
@@ -92,22 +102,22 @@ abstract class DbAccessFn extends StandardFunc {
 
   /**
    * Performs the attribute function.
-   * @param expr expression (can be {@code Empty#UNDEFINED})
+   * @param name name of attribute (can be empty sequence)
    * @param data data reference
    * @param ia index access
    * @param qc query context
    * @return iterator
    * @throws QueryException query exception
    */
-  final Iter attribute(final Expr expr, final Data data, final IndexAccess ia,
+  final Iter attribute(final Expr name, final Data data, final IndexAccess ia,
       final QueryContext qc) throws QueryException {
 
     // no attribute specified: return iterator
-    if(expr == Empty.UNDEFINED) return ia.iter(qc);
+    final byte[] nm = toTokenOrNull(name, qc);
+    if(nm == null) return ia.iter(qc);
 
     // parse and compile the name test
-    final byte[] name = toToken(expr, qc);
-    final QNm qnm = qc.shared.qName(name, sc().ns.uri(prefix(name)));
+    final QNm qnm = qc.shared.qName(nm, sc().ns.uri(prefix(nm)));
 
     // return empty sequence if test will yield no results
     final NameTest nt = new NameTest(qnm, NamePart.FULL, NodeType.ATTRIBUTE, sc().elemNS);
