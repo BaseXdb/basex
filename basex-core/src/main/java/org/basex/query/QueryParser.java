@@ -93,6 +93,8 @@ public class QueryParser extends InputParser {
   private final QNmMap<RecordType> namedRecordTypes = new QNmMap<>();
   /** Named record type references. */
   private final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
+  /** Options. */
+  private final QNmMap<String> options = new QNmMap<>();
 
   /** Declared flags. */
   private final HashSet<String> decl = new HashSet<>();
@@ -158,7 +160,7 @@ public class QueryParser extends InputParser {
 
       final VarScope vs = localVars.popContext();
       final MainModule mm = new MainModule(expr, vs, sc);
-      mm.set(funcs, vars, publicTypes, moduleURIs, namespaces, moduleDoc);
+      mm.set(funcs, vars, publicTypes, moduleURIs, namespaces, options, moduleDoc);
       finish(mm);
       check(mm);
       return mm;
@@ -208,7 +210,7 @@ public class QueryParser extends InputParser {
 
       qc.modStack.pop();
       final LibraryModule lm = new LibraryModule(sc);
-      lm.set(funcs, vars, publicTypes, moduleURIs, namespaces, moduleDoc);
+      lm.set(funcs, vars, publicTypes, moduleURIs, namespaces, options, moduleDoc);
       return lm;
     } catch(final QueryException expr) {
       mark();
@@ -587,6 +589,7 @@ public class QueryParser extends InputParser {
       for(final String lock : Locking.queryLocks(token(value))) qc.locks.add(lock);
     }
     // ignore unknown options
+    options.put(qname, value);
   }
 
   /**
@@ -644,21 +647,21 @@ public class QueryParser extends InputParser {
     if(sc.decFormats.get(name) != null) throw error(DECDUPL);
 
     // create new format
-    final DecFormatOptions options = new DecFormatOptions();
+    final DecFormatOptions dfo = new DecFormatOptions();
     // collect all property declarations
     while(true) {
       skipWs();
       final String prop = string(ncName(null));
       if(prop.isEmpty()) break;
       wsCheck("=");
-      if(options.get(prop) != null) throw error(DECDUPLPROP_X, prop);
+      if(dfo.get(prop) != null) throw error(DECDUPLPROP_X, prop);
       try {
-        options.assign(prop, string(stringLiteral()));
+        dfo.assign(prop, string(stringLiteral()));
       } catch(final BaseXException ex) {
         throw error(FORMPROP_X, ex);
       }
     }
-    sc.decFormats.put(name, new DecFormatter(options, info()));
+    sc.decFormats.put(name, new DecFormatter(dfo, info()));
     return true;
   }
 
@@ -2148,9 +2151,9 @@ public class QueryParser extends InputParser {
       if(eq(name.prefix(), DB_PREFIX)) {
         // project-specific declaration
         final String key = string(uc(name.local()));
-        final MainOptions options = qc.context.options;
-        final Option<?> option = options.option(key);
-        if(option == null) throw error(BASEX_OPTIONSINV_X, options.similar(key));
+        final MainOptions mopts = qc.context.options;
+        final Option<?> option = mopts.option(key);
+        if(option == null) throw error(BASEX_OPTIONSINV_X, mopts.similar(key));
         el.add(new DBPragma(name, option, value));
       } else if(eq(name.prefix(), BASEX_PREFIX)) {
         // project-specific declaration

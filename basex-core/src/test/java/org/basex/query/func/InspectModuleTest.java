@@ -156,6 +156,11 @@ public final class InspectModuleTest extends SandboxTest {
     final String query3 = query(result + "/function[@name = 'hello:ext']");
     query(query3 + "/@external/data()", true);
 
+    final String query4 = query(result + "/option[@name = 'name']");
+    query(query4 + "/@uri ! data()", "uri");
+    query(query4 + "/literal/@type ! data()", "xs:string");
+    query(query4 + "/literal ! data()", "ignored");
+
     error(func.args("non-existent"), RESWHICH_X);
     error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);
   }

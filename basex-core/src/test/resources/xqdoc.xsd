@@ -24,7 +24,7 @@
             attributeFormDefault="unqualified">
 
   <!-- Simple type for defining the uris associated
-       with things such as library modules associated
+       with things such as modules associated
        with functions, variables, imports, etc. -->
   <xsd:simpleType name="uri">
     <xsd:restriction base="xsd:string"/>
@@ -103,7 +103,7 @@
   
   
   <!-- Complex type used for defining the comments associated
-       with a library module, imports, variables, or functions. 
+       with a module, imports, variables, or functions. 
        The follow xqdoc 'directives' map to the equivalent
        elements defined below ... with the exception of description
        where there is no directive.
@@ -180,7 +180,7 @@
   </xsd:complexType>
 
   <!-- Complex type used for defining the namespaces defined within
-     the library module. -->
+     the module. -->
   <xsd:complexType name="namespaces">
     <xsd:sequence>
       <xsd:element name="namespace" minOccurs="0" maxOccurs="unbounded">
@@ -193,7 +193,7 @@
   </xsd:complexType>
 
   <!-- Complex type used for defining the variable names defined within
-     the library module and any comments associated with the variables. -->
+     the module and any comments associated with the variables. -->
   <xsd:complexType name="variables">
     <xsd:sequence>
       <xsd:element name="variable" minOccurs="0" maxOccurs="unbounded">
@@ -234,7 +234,7 @@
   </xsd:complexType>
   
   <!-- Complex type used for defining the imported modules within the 
-     the library module and any comments associated with the imports. -->
+     the module and any comments associated with the imports. -->
   <xsd:complexType name="imports">
     <xsd:sequence>
       <xsd:element name="import" minOccurs="0" maxOccurs="unbounded">
@@ -257,7 +257,7 @@
   </xsd:complexType>
 
   <!-- Complex type used for defining the functions contained within the 
-     the library module and any comments associated with the functions. 
+     the module and any comments associated with the functions. 
      Any 'invoked' functions associated with this function should also
      be defined.  -->
   <xsd:complexType name="functions">
@@ -283,8 +283,31 @@
     </xsd:sequence>
   </xsd:complexType>
   
+  <!-- Complex type used for defining the options contained within the 
+     the module. -->
+  <xsd:complexType name="options">
+    <xsd:sequence>
+      <xsd:element name="option" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="literal" minOccurs="0" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:complexContent>
+                  <xsd:extension base="mixed-text">
+                    <xsd:attribute name="type" type="xsd:string" use="required"/>
+                  </xsd:extension>
+                </xsd:complexContent>      
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="name" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  
   <!-- Complex type used for defining the global root element of xqdoc. 
-       There should be '1' xqdoc xml file for each library module. -->
+       There should be '1' xqdoc xml file for each module. -->
   <xsd:element name="xqdoc">
     <xsd:complexType>
       <xsd:sequence>
@@ -294,6 +317,7 @@
         <xsd:element name="namespaces" type="namespaces" minOccurs="0"/>
         <xsd:element name="variables" type="variables" minOccurs="0"/>
         <xsd:element name="functions" type="functions" minOccurs="0"/>
+        <xsd:element name="options" type="options" minOccurs="0"/>
       </xsd:sequence>
     </xsd:complexType>
   </xsd:element>

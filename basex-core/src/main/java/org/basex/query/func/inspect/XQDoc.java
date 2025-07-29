@@ -72,6 +72,9 @@ final class XQDoc extends Inspect {
     for(final byte[] prefix : module.namespaces) {
       nsCache.put(prefix, module.namespaces.get(prefix));
     }
+    for(final QNm name : module.options) {
+      nsCache.put(name.prefix(), name.uri());
+    }
     final QueryBiConsumer<QNm, StaticDecl> addNs = (name, sd) -> {
       if(name.hasPrefix()) nsCache.put(name.prefix(), name.uri());
       for(final Ann ann : sd.anns) {
@@ -138,6 +141,11 @@ final class XQDoc extends Inspect {
     }
     xqdoc.add(functions);
 
+    // options
+    final FBuilder options = element("options");
+    options(module.options, options, false);
+    xqdoc.add(options);
+
     return xqdoc.finish();
   }
 
@@ -175,7 +183,7 @@ final class XQDoc extends Inspect {
   private void annotations(final AnnList anns, final FBuilder parent) throws QueryException {
     if(!anns.isEmpty()) {
       final FBuilder annotations = element("annotations");
-      annotation(anns, annotations, false);
+      annotations(anns, annotations, false);
       parent.add(annotations);
     }
   }

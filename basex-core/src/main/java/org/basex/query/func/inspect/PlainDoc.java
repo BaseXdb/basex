@@ -58,6 +58,7 @@ final class PlainDoc extends Inspect {
     if(doc != null) comment(doc, root);
     for(final StaticVar sv : module.vars) root.add(variable(sv));
     for(final StaticFunc sf : module.funcs) root.add(function(sf.name, sf, sf.funcType(), sf.anns));
+    options(module.options, root, true);
     return root.finish();
   }
 
@@ -76,7 +77,7 @@ final class PlainDoc extends Inspect {
     variable.add(Q_EXTERNAL, sv.external);
 
     comment(sv, variable);
-    annotation(sv.anns, variable, true);
+    annotations(sv.anns, variable, true);
     return variable.finish();
   }
 
@@ -120,7 +121,7 @@ final class PlainDoc extends Inspect {
       function.add(argument);
     }
 
-    annotation(anns, function, true);
+    annotations(anns, function, true);
 
     if(doc != null) {
       for(final byte[] key : doc) {
