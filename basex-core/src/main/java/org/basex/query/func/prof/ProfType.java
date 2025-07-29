@@ -35,7 +35,7 @@ public final class ProfType extends StandardFunc {
    */
   private static String info(final Expr expr) {
     return new TypeInfo(expr.getClass(), expr.seqType().toString(),
-        expr instanceof XQStruct struct ? struct.structSize() : expr.size()).toString();
+        expr instanceof final XQStruct struct ? struct.structSize() : expr.size()).toString();
   }
 
   /**

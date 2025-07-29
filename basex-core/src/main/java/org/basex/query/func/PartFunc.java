@@ -115,7 +115,7 @@ public final class PartFunc extends Arr {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof PartFunc pf && placeholders == pf.placeholders &&
+    return this == obj || obj instanceof final PartFunc pf && placeholders == pf.placeholders &&
         Arrays.equals(placeholderPerm, pf.placeholderPerm) && super.equals(obj);
   }
 

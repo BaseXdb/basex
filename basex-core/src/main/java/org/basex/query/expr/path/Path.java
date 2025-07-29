@@ -781,7 +781,7 @@ public abstract class Path extends ParseExpr {
     if(index == null || data != null && index.costs.tooExpensive(data)) return this;
     // skip optimization if root is no value and if index access is not enforced
     Test rootTest = null;
-    if(rt instanceof Value value && !(value instanceof Dummy)) {
+    if(rt instanceof final Value value && !(value instanceof Dummy)) {
       rootTest = InvDocTest.get(value);
     } else {
       // continue if index use is enforced (skip context-dependent roots)

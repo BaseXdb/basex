@@ -19,7 +19,6 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.ALookup.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.CmpN.*;
 import org.basex.query.expr.CmpV.*;
@@ -2439,7 +2438,7 @@ public class QueryParser extends InputParser {
           final SeqType st = sequenceType();
           wsCheck(")");
           nt = st.zero() ? null : st.type == AtomType.ITEM ? NodeType.NODE :
-            st.type instanceof NodeType n ? n : null;
+            st.type instanceof final NodeType n ? n : null;
           return nt == null ? NodeTest.FALSE : NodeTest.get(nt);
         }
       } else {
@@ -2503,23 +2502,10 @@ public class QueryParser extends InputParser {
    */
   private Expr lookup(final Expr expr) throws QueryException {
     int p = pos;
-    if(consume('?')) {
-      final boolean deep = consume('?');
-      if(deep || !(wsConsume(",") || consume(")"))) {
-        p = pos;
-        Modifier mod = Modifier.ITEMS;
-        for(final Modifier m : Modifier.values()) {
-          if(wsConsume(m.toString()) && wsConsumeWs("::")) {
-            mod = m;
-            break;
-          }
-          pos = p;
-        }
-        final InputInfo info = info();
-        final Expr ctx = expr != null ? expr : new ContextValue(info);
-        final Expr spec = keySpecifier();
-        return deep ? new DeepLookup(info, mod, ctx, spec) : new Lookup(info, mod, ctx, spec);
-      }
+    if(consume('?') && !wsConsume(",") && !consume(")")) {
+      final InputInfo info = info();
+      final Expr ctx = expr != null ? expr : new ContextValue(info);
+      return new Lookup(info, ctx, keySpecifier());
     }
     pos = p;
     return null;
@@ -2585,7 +2571,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr keySpecifier() throws QueryException {
-    if(wsConsume("*")) return ALookup.WILDCARD;
+    if(wsConsume("*")) return Lookup.WILDCARD;
     final int cp = current();
     if(cp == '(') return parenthesized();
     if(cp == '$') return varRef();
@@ -2704,8 +2690,8 @@ public class QueryParser extends InputParser {
         if(num != null) throw error(RESERVED_X, name.local());
       } else {
         if(Function.ERROR.is(num)) return num;
-        if(num instanceof Itr itr) return Functions.item(name, (int) itr.itr(), false, info(), qc,
-            moduleURIs.contains(name.uri()));
+        if(num instanceof final Itr itr) return Functions.item(name, (int) itr.itr(), false,
+            info(), qc, moduleURIs.contains(name.uri()));
       }
     }
     pos = p;
