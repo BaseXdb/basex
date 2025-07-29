@@ -368,6 +368,12 @@ public final class XQuery4Test extends SandboxTest {
     query("declare function local:inc($x) { $x + 1 }; local:inc(x := 1)", 2);
     query("declare function local:inc($x, $y) { $x + $y }; local:inc(x := 1, y := 1)", 2);
     query("declare function local:inc($x, $y) { $x + $y }; local:inc(1, y := 1)", 2);
+    // GH-2463
+    error("declare function local:inc($x) { }; local:inc(,)", FUNCARG_X);
+    error("declare function local:inc($x) { }; local:inc(x := 0,)", FUNCARG_X);
+    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y)", FUNCARG_X);
+    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y := )", FUNCARG_X);
+    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y := 0,)", FUNCARG_X);
   }
 
   /** String templates. */
