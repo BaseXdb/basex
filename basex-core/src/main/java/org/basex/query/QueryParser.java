@@ -2811,7 +2811,7 @@ public class QueryParser extends InputParser {
     if(expr != null) fb.add(expr, null);
     wsCheck("(");
     if(!wsConsumeWs(")")) {
-      boolean kw = false;
+      boolean keywordFound = false;
       do {
         final int p = pos;
         QNm name = null;
@@ -2819,19 +2819,18 @@ public class QueryParser extends InputParser {
           final QNm qnm = eQName(null, null);
           if(wsConsume(":=")) {
             name = qnm;
-            kw = true;
+            keywordFound = true;
           } else {
             pos = p;
           }
         }
-        if(!kw || name != null) {
-          Expr arg = single();
-          if(arg == null) {
-            arg = Empty.UNDEFINED;
-            if(!wsConsume("?")) throw error(FUNCARG_X, found());
-          }
-          if(fb.add(arg, name)) throw error(KEYWORDTWICE_X, name);
+        Expr arg = null;
+        if(!keywordFound || name != null) {
+          arg = single();
+          if(arg == null && wsConsume("?")) arg = Empty.UNDEFINED;
         }
+        if(arg == null) throw error(FUNCARG_X, found());
+        if(fb.add(arg, name)) throw error(KEYWORDTWICE_X, name);
       } while(wsConsumeWs(","));
       if(!consume(")")) throw error(FUNCARG_X, found());
     }
