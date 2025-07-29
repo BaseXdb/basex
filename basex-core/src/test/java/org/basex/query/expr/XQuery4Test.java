@@ -755,4 +755,25 @@ public final class XQuery4Test extends SandboxTest {
     query("<a><b/></a>/descendant-or-self::type(xs:integer+)", "");
     query("<a><b/></a>/descendant-or-self::type(empty-sequence())", "");
   }
+
+  /** Destructuring let. */
+  @Test public void destructuringLet() {
+    String value = "1 to 3";
+    query("let $($a) := " + value + " return [ $a ]", "[(1,2,3)]");
+    query("let $($a, $b) := " + value + " return [ $a, $b ]", "[1,(2,3)]");
+    query("let $($a, $b, $c) := " + value + " return [ $a, $b, $c ]", "[1,2,3]");
+    query("let $($a, $b, $c, $d) := " + value + " return [ $a, $b, $c, $d ]", "[1,2,3,()]");
+
+    value = "[ 1, 2, 3 ]";
+    query("let $[$a] := " + value + " return [ $a ]", "[1]");
+    query("let $[$a, $b] := " + value + " return [ $a, $b ]", "[1,2]");
+    query("let $[$a, $b, $c] := " + value + " return [ $a, $b, $c ]", "[1,2,3]");
+    error("let $[$a, $b, $c, $d] := " + value + " return [ $a, $b, $c, $d ]", ARRAYBOUNDS_X_X);
+
+    value = "{ 'a': 1, 'b': 2, 'c': 3 }";
+    query("let ${$a} := " + value + " return [ $a ]", "[1]");
+    query("let ${$a, $b} := " + value + " return [ $a, $b ]", "[1,2]");
+    query("let ${$a, $b, $c} := " + value + " return [ $a, $b, $c ]", "[1,2,3]");
+    query("let ${$a, $b, $c, $d} := " + value + " return [ $a, $b, $c, $d ]", "[1,2,3,()]");
+  }
 }

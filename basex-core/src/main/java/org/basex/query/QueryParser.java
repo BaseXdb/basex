@@ -1381,34 +1381,35 @@ public class QueryParser extends InputParser {
   private void letStructBinding(final InputInfo ii, final LinkedList<Clause> clauses)
       throws QueryException {
 
-    final LetStructBinding binding = switch (consume()) {
+    final LetStructBinding binding = switch(consume()) {
       case '[' -> new LetStructBinding(']', SeqType.ARRAY_O);
       case '{' -> new LetStructBinding('}', SeqType.MAP_O);
       default -> new LetStructBinding(')', SeqType.ITEM_ZM);
     };
 
     skipWs();
-    final LinkedList<Var> var = new LinkedList<>();
+    final LinkedList<Var> vrs = new LinkedList<>();
     do {
-      var.add(newVar());
+      vrs.add(newVar());
     } while(wsConsumeWs(","));
     check(binding.endCp);
     final SeqType asType = Objects.requireNonNullElse(optAsType(), SeqType.ITEM_ZM);
     final SeqType st = asType.intersect(binding.type);
     if(st == null) throw error(NOSUB_X_X, binding.type, asType);
-    final Var struct = new Var(var.getLast().name, st, qc, ii);
+    final Var struct = new Var(vrs.getLast().name, st, qc, ii);
 
     wsCheck(":=");
     clauses.add(new Let(localVars.add(struct), check(single(), NOVARDECL)));
     final VarRef seqRef = new VarRef(ii, struct);
     int i = 0;
-    for(final Var v : var) {
-      final Expr expr = switch (binding.endCp) {
-        case ']' -> Function._ARRAY_GET.get(v.info, seqRef, Itr.get(++i), Empty.VALUE);
-        case '}' -> Function._MAP_GET.get(v.info, seqRef, Str.get(v.name.local()), Empty.VALUE);
-        default -> new CachedFilter(v.info, seqRef, Itr.get(++i));
+    for(final Var var : vrs) {
+      final Expr expr = switch(binding.endCp) {
+        case ']' -> Function._ARRAY_GET.get(var.info, seqRef, Itr.get(++i));
+        case '}' -> Function._MAP_GET.get(var.info, seqRef, Str.get(var.name.local()));
+        default -> (++i < vrs.size() ? Function.ITEMS_AT : Function.SUBSEQUENCE).
+          get(var.info, seqRef, Itr.get(i));
       };
-      clauses.add(new Let(localVars.add(v), expr));
+      clauses.add(new Let(localVars.add(var), expr));
     }
   }
 
