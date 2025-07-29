@@ -775,5 +775,15 @@ public final class XQuery4Test extends SandboxTest {
     query("let ${$a, $b} := " + value + " return [ $a, $b ]", "[1,2]");
     query("let ${$a, $b, $c} := " + value + " return [ $a, $b, $c ]", "[1,2,3]");
     query("let ${$a, $b, $c, $d} := " + value + " return [ $a, $b, $c, $d ]", "[1,2,3,()]");
+
+    // GH-2452
+    query("""
+      let $($a, $b) := (1 to 6) ! string()
+      for $i in 1 to 3
+      return [ $a, $b, $i ]
+    """, """
+      ["1",("2","3","4","5","6"),1]
+      ["1",("2","3","4","5","6"),2]
+      ["1",("2","3","4","5","6"),3]""");
   }
 }

@@ -463,12 +463,6 @@ public final class GFLWORTest extends SandboxTest {
         + "only end when $p = 2 return <w>{ $w }</w>", "<w>2</w>");
   }
 
-  /** Destructuring let. */
-  @Test public void gh2452() {
-    query("let $($a, $b) := (1 to 6) ! string()\nfor $i in 1 to 3\nreturn ($a, $b, $i)",
-        "1\n2\n1\n1\n2\n2\n1\n2\n3");
-  }
-
   /** Java call in copy/modify/return. */
   @Test public void gh2455() {
     query("declare namespace ll = \"java:java.util.LinkedList\";\n"
