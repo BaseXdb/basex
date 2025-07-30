@@ -310,7 +310,7 @@ public final class QNm extends Item {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(unique());
+    qs.token(concat('#', unique()));
   }
 
   // STATIC METHODS ===============================================================================
