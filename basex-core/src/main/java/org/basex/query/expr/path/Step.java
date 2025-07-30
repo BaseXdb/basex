@@ -161,8 +161,16 @@ public abstract class Step extends Preds {
     }
     test = t;
 
-    // optimize predicates, choose best implementation
-    return optimize(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
+    // optimize predicates
+    if(optimize(cc, this)) return cc.emptySeq(this);
+    // adopt sequence type if it is more specific
+    final SeqType st = seqType();
+    if(st.type.instanceOf(test.type) && !st.type.eq(test.type)) {
+      test = st.test();
+      if(test == null) test = NodeTest.get((NodeType) st.type);
+    }
+    // choose best implementation
+    return copyType(get(info, axis, test, exprs));
   }
 
   @Override

@@ -3,10 +3,13 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
+import org.basex.query.CompileContext.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -90,6 +93,29 @@ public final class Instance extends Single {
       if(++c > max || !seqType.instance(item)) return false;
     }
     return c != 0 || !seqType.oneOrMore();
+  }
+
+  @Override
+  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+    // E[. instance of element(a)]  ->  E[self::a]
+    final Expr ex = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this;
+    return cc.simplify(this, ex, mode);
+  }
+
+  /**
+   * Optimizes this expression as predicate.
+   * @param cc compilation context
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  private Expr optPred(final CompileContext cc) throws QueryException {
+    if(expr instanceof ContextValue && expr.seqType().type instanceof NodeType &&
+        seqType.type instanceof NodeType nt) {
+      final Test test = seqType.test();
+      final Expr step = Step.self(cc, null, info, test != null ? test : NodeTest.get(nt));
+      return step != Empty.VALUE ? Path.get(cc, info, null, step) : Bln.FALSE;
+    }
+    return this;
   }
 
   @Override
