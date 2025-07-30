@@ -72,13 +72,8 @@ final class RestXqSingleton {
    */
   private QueryContext qc() {
     synchronized(MUTEX) {
-      try {
-        return session.getAttribute(id) instanceof final QueryContext qctx ? qctx : null;
-      } catch(final IllegalStateException ex) {
-        // invalidated session (no other way to check this state)
-        Util.debug(ex);
-        return null;
-      }
+      return HTTPConnection.getAttribute(session, id)
+          instanceof final QueryContext qctx ? qctx : null;
     }
   }
 }

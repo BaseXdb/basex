@@ -267,22 +267,13 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientName() {
-    Object value = null;
-    try {
-      // check for request ID
-      value = request.getAttribute(HTTPText.CLIENT_ID);
-      // check for session ID (DBA, global)
-      if(value == null) {
-        final HttpSession session = request.getSession(false);
-        if(session != null) {
-          final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
-          value = session.getAttribute(dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID);
-        }
-      }
-    } catch(final NullPointerException | IllegalStateException ex) {
-      // Jetty 12, getSession: _coreRequest may be null for propagated request instances
-      // Tomcat: https://github.com/spring-projects/spring-boot/issues/36763
-      Util.debug(ex);
+    // check for request ID
+    Object value = getAttribute(request, HTTPText.CLIENT_ID);
+    // check for session ID (DBA, global)
+    if(value == null) {
+      final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
+      final String name = dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID;
+      value = getAttribute(request.getSession(false), name);
     }
     return clientName(value, context);
   }
@@ -416,6 +407,45 @@ public final class HTTPConnection implements ClientInfo {
       }
     }
     return request.getRemoteAddr();
+  }
+
+  /**
+   * Returns a request attribute.
+   * @param request servlet request (can be {@code null})
+   * @param name name of the attribute
+   * @return value, or {@code null} if it does not exist or cannot be retrieved
+   */
+  public static Object getAttribute(final HttpServletRequest request, final String name) {
+    if(request != null) {
+      try {
+        return request.getAttribute(name);
+      } catch(final IllegalStateException ex) {
+        // Tomcat
+        // - https://github.com/spring-projects/spring-boot/issues/36763
+        Util.debug(ex);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns a session attribute.
+   * @param session HTTP session (can be {@code null})
+   * @param name name of the attribute
+   * @return value, or {@code null} if it does not exist or cannot be retrieved
+   */
+  public static Object getAttribute(final HttpSession session, final String name) {
+    if(session != null) {
+      try {
+        return session.getAttribute(name);
+      } catch(final NullPointerException | IllegalStateException ex) {
+        // Jetty 12
+        // - getSession: _coreRequest may be null for propagated request instances
+        // - checkValidForRead: Invalid for read
+        Util.debug(ex);
+      }
+    }
+    return null;
   }
 
   // PRIVATE METHODS ==============================================================================
