@@ -27,14 +27,14 @@ public final class NameTest extends Test {
 
   /**
    * Returns a name test.
-   * @param type node type (element, attribute, processing instruction)
-   * @param name node name
+   * @param type node type (must be element, attribute, or processing instruction)
+   * @param qname node name
    * @param defaultNs default element namespace (used for optimizations, can be {@code null})
    * @return test
    */
-  public static NameTest get(final NodeType type, final QNm name, final byte[] defaultNs) {
+  public static NameTest get(final NodeType type, final QNm qname, final byte[] defaultNs) {
     final NamePart part = type == NodeType.PROCESSING_INSTRUCTION ? NamePart.LOCAL : NamePart.FULL;
-    return new NameTest(name, part, type, defaultNs);
+    return new NameTest(qname, part, type, defaultNs);
   }
 
   /**
@@ -49,7 +49,7 @@ public final class NameTest extends Test {
    * Constructor.
    * @param qname name
    * @param part part of name to be tested
-   * @param type node type
+   * @param type node type (must be element, attribute, or processing instruction)
    * @param defaultNs default element namespace (used for optimizations, can be {@code null})
    */
   public NameTest(final QNm qname, final NamePart part, final NodeType type,

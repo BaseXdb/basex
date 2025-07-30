@@ -466,13 +466,9 @@ public class CmpG extends Cmp {
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-
-    Expr expr = this;
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // E[local-name() = 'a']  ->  E[self::*:a]
-      expr = optPred(cc);
-    }
-    return cc.simplify(this, expr, mode);
+    // E[node-name() = #a]  ->  E[self::a]
+    final Expr ex = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this;
+    return cc.simplify(this, ex, mode);
   }
 
   /**
@@ -488,29 +484,29 @@ public class CmpG extends Cmp {
     final Type type = val.seqType().type;
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final OpV opV = opV();
-    if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof final ContextFn func &&
+    if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof final ContextFn fn &&
         expr2 instanceof final Value value && opV == OpV.EQ) {
       // skip functions that do not refer to the current context value
-      if(func.exprs.length > 0 && !(func.exprs[0] instanceof ContextValue)) return this;
+      if(fn.exprs.length > 0 && !(fn.exprs[0] instanceof ContextValue)) return this;
 
       final ArrayList<QNm> qnames = new ArrayList<>();
       NamePart part = null;
       if(expr2.seqType().type.isStringOrUntyped()) {
         // local-name() eq 'a'  ->  self::*:a
-        if(LOCAL_NAME.is(func)) {
+        if(LOCAL_NAME.is(fn)) {
           part = NamePart.LOCAL;
           for(final Item item : value) {
             final byte[] name = item.string(info);
             if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
           }
-        } else if(NAMESPACE_URI.is(func)) {
+        } else if(NAMESPACE_URI.is(fn)) {
           // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1}* | self::Q{URI2}*
           for(final Item item : value) {
             final byte[] uri = item.string(info);
             if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.cpToken(':'), uri));
           }
           if(qnames.size() == value.size()) part = NamePart.URI;
-        } else if(NAME.is(func)) {
+        } else if(NAME.is(fn)) {
           // (db-without-ns)[name() = 'city']  ->  (db-without-ns)[self::city]
           final Data data = cc.qc.focus.value.data();
           final byte[] dataNs = data != null ? data.defaultNs() : null;
@@ -522,8 +518,8 @@ public class CmpG extends Cmp {
             }
           }
         }
-      } else if(NODE_NAME.is(func) && expr2.seqType().type == AtomType.QNAME) {
-        // node-name() = xs:QName('prefix:local')  ->  self::prefix:local
+      } else if(NODE_NAME.is(fn) && expr2.seqType().type == AtomType.QNAME) {
+        // node-name() = #prefix:local  ->  self::prefix:local
         part = NamePart.FULL;
         for(final Item item : value) {
           qnames.add((QNm) item);

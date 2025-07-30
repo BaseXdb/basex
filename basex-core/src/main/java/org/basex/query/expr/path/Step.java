@@ -38,7 +38,7 @@ public abstract class Step extends Preds {
    * @param root root context expression; if {@code null}, the current context will be used
    * @param info input info (can be {@code null})
    * @param preds predicates
-   * @return step
+   * @return step or empty sequence
    * @throws QueryException query exception
    */
   public static Expr self(final CompileContext cc, final Expr root, final InputInfo info,
@@ -53,7 +53,7 @@ public abstract class Step extends Preds {
    * @param info input info (can be {@code null})
    * @param test test
    * @param preds predicates
-   * @return step
+   * @return step or empty sequence
    * @throws QueryException query exception
    */
   public static Expr self(final CompileContext cc, final Expr root, final InputInfo info,
@@ -69,7 +69,7 @@ public abstract class Step extends Preds {
    * @param axis axis
    * @param test node test
    * @param preds predicates
-   * @return step
+   * @return step or empty sequence
    * @throws QueryException query exception
    */
   public static Expr get(final CompileContext cc, final Expr root, final InputInfo info,
@@ -130,7 +130,7 @@ public abstract class Step extends Preds {
    * Optimizes the step for the given root expression.
    * @param cc compilation context
    * @param root root context expression; if {@code null}, the current context will be used
-   * @return optimized step
+   * @return optimized step or empty sequence
    * @throws QueryException query exception
    */
   final Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
