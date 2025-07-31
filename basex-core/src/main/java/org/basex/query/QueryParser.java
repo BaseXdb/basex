@@ -2296,18 +2296,16 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr axisStep(final boolean error) throws QueryException {
-    final ExprList preds = new ExprList();
     Axis axis = null;
-    ArrayList<ExprInfo> list = null;
+    ArrayList<ExprInfo> list = new ArrayList<>();
     if(wsConsume("..")) {
       axis = Axis.PARENT;
-      list = new ArrayList<>();
       list.add(NodeTest.NODE);
       checkTest(list.get(0), true);
     } else if(consume('@')) {
       axis = Axis.ATTRIBUTE;
       list = nodeTest(axis);
-      if(list.isEmpty()) {
+      if(list == null) {
         --pos;
         throw error(NOATTNAME);
       }
@@ -2319,9 +2317,7 @@ public class QueryParser extends InputParser {
             alterPos = pos;
             axis = ax;
             list = nodeTest(axis);
-            if(list.isEmpty()) {
-              throw error(AXISMISS_X, axis);
-            }
+            if(list == null) throw error(AXISMISS_X, axis);
             break;
           }
           pos = p;
@@ -2330,29 +2326,49 @@ public class QueryParser extends InputParser {
 
       if(axis == null) {
         axis = Axis.CHILD;
-        list = new ArrayList<>();
         final ExprInfo ei = simpleNodeTest(NodeType.ELEMENT, true);
         if(ei == NodeTest.NAMESPACE_NODE) throw error(NSAXIS);
         if(ei instanceof Test tst) {
           if(tst.type == NodeType.ATTRIBUTE) axis = Axis.ATTRIBUTE;
           checkTest(tst, axis != Axis.ATTRIBUTE);
         }
-        list.add(ei);
-      }
-      if(list.isEmpty()) {
-        if(error) throw error(STEPMISS_X, found());
-        return null;
+        if(ei != null) list.add(ei);
       }
     }
+    if(list.isEmpty()) {
+      if(error) throw error(STEPMISS_X, found());
+      return null;
+    }
 
+    final ExprList preds = new ExprList();
     while(wsConsume("[")) {
       checkPred(true);
       add(preds, expr());
       wsCheck("]");
       checkPred(false);
     }
-    final Test test = list.size() == 1 ? (Test) list.get(0) : NodeTest.NODE;
-    return new CachedStep(info(), axis, test, preds.finish());
+
+    final int ls = list.size();
+    if(ls == 1 && list.get(0) instanceof Test test) {
+      return new CachedStep(info(), axis, test, preds.finish());
+    }
+
+    final InputInfo ii = info();
+    final ExprList exprs = new ExprList(ls);
+    for(int l = 0; l < ls; l++) {
+      final ExprInfo ei = list.get(l);
+      if(ei instanceof Test test) {
+        exprs.add(new CachedStep(info(), axis, test));
+      } else {
+        int s = localVars.openScope();
+        Let lt = new Let(localVars.add(new Var(new QNm("names"), null, qc, ii)), (Expr) ei);
+        exprs.add(new GFLWOR(ii, lt, new CachedStep(info(), axis, NodeTest.ELEMENT,
+            Function._UTIL_SELECT.get(ii, new VarRef(ii, lt.var)))));
+        localVars.closeScope(s);
+      }
+    }
+    final Expr root = exprs.size() == 1 ? exprs.get(0) : new Union(ii, exprs.finish());
+    return new CachedFilter(ii, root, preds.finish());
   }
 
   /**
@@ -2432,7 +2448,7 @@ public class QueryParser extends InputParser {
         }
         if(name.eq(new QNm(GET))) {
           // dynamic name test
-          final Expr expr = expr();
+          final Expr expr = single();
           wsCheck(")");
           return expr;
         } else if(name.eq(new QNm(TYPE))) {

@@ -1936,6 +1936,9 @@ public enum Function implements AFunction {
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
       params(NODE_ZM), DOCUMENT_NODE_ZM, UTIL_URI),
   /** XQuery function. */
+  _UTIL_SELECT(UtilSelect::new, "select(keys[,node])",
+      params(ANY_ATOMIC_TYPE_ZM, NODE_ZO), BOOLEAN_O, UTIL_URI),
+  /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),
   /** XQuery function. */

@@ -5,10 +5,11 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.map.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * XQuery 4.0 tests.
@@ -728,11 +729,31 @@ public final class XQuery4Test extends SandboxTest {
 
   /** Path extensions: get(). */
   @Test public void pathGet() {
-    query("<a><b/></a>/get(#b)", "<b/>");
-    query("<a><b/></a>/child::get(#b)", "<b/>");
-    query("<a><b/></a>/self::get(#a)", "<a><b/></a>");
-    query("<a><b/></a>/descendant-or-self::get(#b)", "<b/>");
-    query("<a><b/></a>/descendant-or-self::get(#c)", "");
+    check("<a><b/></a>/self::get(#a)", "<a><b/></a>", root(CElem.class));
+    check("<a><b/></a>/get(#b)", "<b/>", type(IterStep.class, "element(b)*"));
+    check("<a><b/></a>/child::get(#b)", "<b/>", type(IterStep.class, "element(b)*"));
+    check("<a><b/></a>/descendant-or-self::get(#b)", "<b/>", type(IterStep.class, "element(b)*"));
+    check("<a><b/></a>/get(#c)", "", type(IterStep.class, "element(c)*"));
+    check("<a><b/></a>/get(())", "", empty());
+
+    check("<a><b/></a>/get((#b, 1))", "<b/>", exists(_UTIL_SELECT));
+    check("<a><b/></a>/get((#c, 1))", "", exists(_UTIL_SELECT));
+
+    check("<a><b/><c/></a>/get((#c, #b))", "<b/>\n<c/>",
+        type(IterStep.class, "(element(c)|element(b))*"));
+    check("let $names := (#c, #b) return <a><b/><c/></a>/get($names)", "<b/>\n<c/>",
+        type(IterStep.class, "(element(c)|element(b))*"));
+
+    check("<a><b/><c/></a>/(c | get(#b))", "<b/>\n<c/>",
+        type(Union.class, "(element(c)|element(b))*"));
+    check("<a><b/><c/></a>/(get(#c) | b)", "<b/>\n<c/>",
+        type(Union.class, "(element(c)|element(b))*"));
+    check("<a><b/><c/></a>/(get(xs:QName('c')))", "<c/>",
+        type(IterStep.class, "element(c)*"));
+    check("<a><b/><c/></a>/(get(xs:QName(<?_ c?>)))", "<c/>",
+        exists(CmpSimpleG.class), exists(NODE_NAME));
+    check("let $name := #b return <a><b/><c/></a>/(c | get($name))", "<b/>\n<c/>",
+        type(Union.class, "(element(c)|element(b))*"));
   }
 
   /** Path extensions: type(). */

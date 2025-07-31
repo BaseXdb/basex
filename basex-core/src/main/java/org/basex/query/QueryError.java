@@ -915,7 +915,7 @@ public enum QueryError {
   /** Error code. */
   EVALUNARY(XPST, 3, "Unary operator expects a numeric value."),
   /** Error code. */
-  STEPMISS_X(XPST, 3, "Expecting valid step%."),
+  STEPMISS_X(XPST, 3, "Expecting step%."),
   /** Error code. */
   AXISMISS_X(XPST, 3, "Expecting node test after % axis."),
   /** Error code. */
