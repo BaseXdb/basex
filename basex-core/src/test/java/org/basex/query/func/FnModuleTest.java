@@ -199,6 +199,40 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void atomicEqual() {
+    final Function func = ATOMIC_EQUAL;
+    check(func.args(" <_>A</_>", "A"), true, root(Bln.class));
+    check("some((1 to 6) !" + func.args(" .", " .") + ')', true, root(Bln.class));
+
+    check(func.args(wrap(1), "1"), true, exists(CmpSimpleG.class));
+    check(func.args(" <?_ 1?>", "1"), true, exists(CmpSimpleG.class));
+    check(func.args(" false()", " boolean(" + wrap(1)) + ')', false, exists(NOT));
+    check("some((1 to 6) !" + func.args(" .", " . + 1") + ')', false, exists(CmpSimpleG.class));
+    check(func.args(" xs:anyURI('A')", " <?_ A?>"), true, root(CmpSimpleG.class));
+    check(func.args(" <?_ A?>", " xs:anyURI('A')"), true, root(CmpSimpleG.class));
+    check(func.args(" #a", " xs:QName(<?_ a?>)"), true, root(CmpSimpleG.class));
+    check(func.args(" xs:QName(<?_ a?>)", " #a"), true, root(CmpSimpleG.class));
+    check(func.args(" xs:integer(<?_ 1?>)", 1), true, root(CmpSimpleG.class));
+    check(func.args(1, " xs:integer(<?_ 1?>)"), true, root(CmpSimpleG.class));
+    check(func.args(" xs:byte(<?_ 1?>)", " xs:byte(1)"), true, root(CmpSimpleG.class));
+    check(func.args(" xs:byte(1)", " xs:byte(<?_ 1?>)"), true, root(CmpSimpleG.class));
+
+    check("declare default collation '?lang=de';" + func.args(wrap(1), "1"), true, root(func));
+    check(func.args(" array:build((1 to 10)[. = 1] ! string())", "1"), true, root(func));
+    check(func.args("1", " array:build((1 to 10)[. = 1] ! string())"), true, root(func));
+    check(func.args("1", " ([ <?_ 1?> ], 1)[. instance of array(*)]"), true, root(func));
+    check(func.args(" ([ <?_ 1?> ], 1)[. instance of array(*)]", "1"), true, root(func));
+    check(func.args(" #a", " <?_ 1?>"), false, root(func));
+    check(func.args(" <?_ 1?>", " #a"), false, root(func));
+    check(func.args(" <?_ 1?>", " true()"), false, root(func));
+
+    error(func.args(" ()", " <?_ 1?>"), EMPTYFOUND);
+    error(func.args(" <?_ 1?>", " ()"), EMPTYFOUND);
+    error(func.args(" true#0", " 1"), FIATOMIZE_X);
+    error(func.args(" 1", " true#0"), FIATOMIZE_X);
+  }
+
+  /** Test method. */
   @Test public void atomicTypeAnnotation() {
     final Function func = ATOMIC_TYPE_ANNOTATION;
 
