@@ -75,16 +75,17 @@ public final class BaseXHTTP extends CLI {
 
     if(!quiet) Util.println(header());
 
-    hc = HTTPContext.get();
-    hc.init(soptions);
-
-    // create jetty instance and set default context to HTTP path
+    // initialize configuration files and initialize HTTP context
     final String webapp = soptions.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
-    locate(WEBCONF, webapp);
-    final Path p = Paths.get(locate(JETTYCONF, webapp).toString());
-    final URI uri = p.toUri();
-    final Resource resource = new PathResourceFactory().newResource(uri);
+    final IOFile webXml = locate(WEBCONF, webapp), jettyXml = locate(JETTYCONF, webapp);
+
+    hc = HTTPContext.get();
+    hc.init(soptions, webXml);
+
+    // create jetty instance
+    final URI jettyUri = Paths.get(jettyXml.toString()).toUri();
+    final Resource resource = new PathResourceFactory().newResource(jettyUri);
     jetty = (Server) new XmlConfiguration(resource).configure();
 
     // enable GZIP support
