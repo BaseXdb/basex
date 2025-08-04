@@ -10,7 +10,6 @@ import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -25,11 +24,9 @@ public final class DbDelete extends DbAccessFn {
     final String path = toDbPath(arg(1), qc);
 
     // delete XML resources
-    final IntList docs = data.resources.docs(path);
-    final int ds = docs.size();
     final Updates updates = qc.updates();
-    for(int d = 0; d < ds; d++) {
-      updates.add(new DeleteNode(docs.get(d), data, info), qc);
+    for(final int pre : data.resources.docs(path).toArray()) {
+      updates.add(new DeleteNode(pre, data, info), qc);
     }
     // delete file resources
     for(final ResourceType type : Resources.BINARIES) {

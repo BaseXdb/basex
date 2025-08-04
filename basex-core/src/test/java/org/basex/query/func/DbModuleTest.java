@@ -884,6 +884,12 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, 123, "binary3"));
     query(_DB_GET_BINARY.args(NAME, "binary3"), 123);
 
+    // GH-2462: replace existing resource
+    query(_DB_PUT.args(NAME, "<xml/>", "mixed"));
+    query(func.args(NAME, "<xml/>", "mixed"));
+    query(_DB_GET_BINARY.args(NAME, "mixed"), "<xml/>");
+    query(_DB_GET.args(NAME, "mixed"), "");
+
     error(func.args(NAME, "bin/x", "x") + ", " + func.args(NAME, "bin//x", "x"), DB_CONFLICT5_X);
   }
 
@@ -899,6 +905,12 @@ public final class DbModuleTest extends SandboxTest {
 
     query(func.args(NAME, " string(attribute a { 'x' })", "value3"));
     query(_DB_GET_VALUE.args(NAME, "value3"), "x");
+
+    // GH-2462: replace existing resource
+    query(_DB_PUT.args(NAME, "<xml/>", "mixed"));
+    query(func.args(NAME, "<xml/>", "mixed"));
+    query(_DB_GET_VALUE.args(NAME, "mixed"), "<xml/>");
+    query(_DB_GET.args(NAME, "mixed"), "");
 
     error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
         DB_CONFLICT5_X);

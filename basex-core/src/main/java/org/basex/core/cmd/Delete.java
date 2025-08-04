@@ -31,25 +31,45 @@ public final class Delete extends ACreate {
     if(path == null) return error(PATH_INVALID_X, args[0]);
 
     return update(data, () -> {
-      context.invalidate();
-
-      // delete XML documents
-      final IntList docs = data.resources.docs(path);
-      int size = docs.size();
-      if(size != 0) {
-        final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-        for(int d = 0; d < size; d++) auc.addDelete(docs.get(d));
-        auc.execute(false);
-      }
-      // delete file resources
+      int size = xml(data, path);
       for(final ResourceType type : Resources.BINARIES) {
-        final IOFile bin = data.meta.file(path, type);
-        if(bin != null && bin.exists()) {
-          size += bin.isDir() ? bin.descendants().size() : 1;
-          bin.delete();
-        }
+        size += binaries(data, path, type);
       }
       return info(RES_DELETED_X_X, size, jc().performance);
     });
+  }
+
+  /**
+   * Deletes XML resources.
+   * @param data data reference
+   * @param path path to resources
+   * @return number of deleted nodes
+   */
+  static int xml(final Data data, final String path) {
+    final IntList docs = data.resources.docs(path);
+    int size = docs.size();
+    if(size != 0) {
+      final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+      for(int d = 0; d < size; d++) auc.addDelete(docs.get(d));
+      auc.execute(false);
+    }
+    return size;
+  }
+
+  /**
+   * Deletes binary resources.
+   * @param data data reference
+   * @param path path to resources
+   * @param type resource type
+   * @return number of deleted files
+   */
+  static int binaries(final Data data, final String path, final ResourceType type) {
+    int size = 0;
+    final IOFile bin = data.meta.file(path, type);
+    if(bin != null && bin.exists()) {
+      size += bin.isDir() ? bin.descendants().size() : 1;
+      bin.delete();
+    }
+    return size;
   }
 }

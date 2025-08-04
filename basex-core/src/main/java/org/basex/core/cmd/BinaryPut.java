@@ -62,10 +62,22 @@ public final class BinaryPut extends ACreate {
     if(path.isEmpty()) return error(PATH_INVALID_X, create ? path : args[0]);
 
     final IOFile bin = data.meta.file(path, ResourceType.BINARY);
-    return update(data, () -> {
-      put(in, bin);
-      return info(QUERY_EXECUTED_X_X, "", jc().performance);
-    });
+    final String pth = path;
+    return update(data, () -> put(data, bin, pth));
+  }
+
+  /**
+   * Puts a binary resource in the specified database.
+   * @param data database
+   * @param bin binary file (can be {@code null})
+   * @param path target path
+   * @return success flag
+   * @throws IOException I/O exception
+   */
+  private boolean put(final Data data, final IOFile bin, final String path) throws IOException {
+    Delete.xml(data, path);
+    put(in, bin);
+    return info(QUERY_EXECUTED_X_X, "", jc().performance);
   }
 
   /**

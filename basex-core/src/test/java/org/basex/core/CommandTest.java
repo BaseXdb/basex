@@ -152,6 +152,13 @@ public class CommandTest extends SandboxTest {
     ok(new BinaryPut(NAME2, FILE));
     // adopt name from specified file
     ok(new BinaryPut("", FILE));
+    // GH-2462: replace existing resource
+    ok(new Delete(FN));
+    ok(new Put(FN, "<x/>"));
+    ok(new Get(FN));
+    ok(new BinaryPut(FN, FILE));
+    no(new Get(FN));
+
     // reject invalid or missing names
     no(new BinaryPut("", "</a>"));
     no(new BinaryPut("../x", FILE));
