@@ -68,8 +68,6 @@ public final class Put extends ACreate {
    * @return success flag
    */
   private boolean put(final Data data, final IOFile bin, final String path) {
-    context.invalidate();
-
     // retrieve old list of resources
     final AtomicUpdateCache auc = new AtomicUpdateCache(data);
     final IntList docs = data.resources.docs(path);
