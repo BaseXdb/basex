@@ -367,7 +367,7 @@ public abstract class ANode extends Item {
    * @return base URI or {@code null}
    * @throws QueryException query exception
    */
-  public Uri baseURI(final Uri base, final boolean empty, final InputInfo info)
+  public final Uri baseURI(final Uri base, final boolean empty, final InputInfo info)
       throws QueryException {
 
     if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE) && parent() == null) {
@@ -376,14 +376,13 @@ public abstract class ANode extends Item {
     Uri uri = Uri.EMPTY;
     ANode nd = this;
     do {
-      if(nd == null) return base.resolve(uri, info);
       final Uri bu = Uri.get(nd.baseURI(), false);
       if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
       uri = bu.resolve(uri, info);
       if(nd.type == NodeType.DOCUMENT_NODE && nd instanceof DBNode) break;
       nd = nd.parent();
-    } while(!uri.isAbsolute());
-    return uri;
+    } while(!uri.isAbsolute() && nd != null);
+    return nd == null || uri == Uri.EMPTY ? base.resolve(uri, info) : uri;
   }
 
   /**
