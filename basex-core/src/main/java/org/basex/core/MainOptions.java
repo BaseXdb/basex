@@ -79,6 +79,8 @@ public final class MainOptions extends Options {
 
   /** Cache new documents before adding them to a database. */
   public static final BooleanOption ADDCACHE = new BooleanOption("ADDCACHE", false);
+  /** Replace existing documents. */
+  public static final BooleanOption REPLACE = new BooleanOption("REPLACE", true);
 
   // Indexing
 

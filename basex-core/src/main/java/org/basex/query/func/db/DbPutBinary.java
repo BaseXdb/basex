@@ -2,6 +2,8 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
+import java.util.*;
+
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
@@ -11,6 +13,7 @@ import org.basex.query.up.primitives.node.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -18,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DbPutBinary extends DbAccessFn {
+public class DbPutBinary extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
@@ -38,16 +41,19 @@ public class DbPutBinary extends DbAccessFn {
    */
   final Empty put(final Data data, final String path, final Update up, final QueryContext qc)
       throws QueryException {
+
+    final HashMap<String, String> options = toOptions(arg(3), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
     if(path.isEmpty()) throw DB_PATH_X.get(info, path);
 
-    // delete XML resources
-    final Updates updates = qc.updates();
-    for(int pre : data.resources.docs(path).toArray()) {
-      updates.add(new DeleteNode(pre, data, info), qc);
+    final IntList docs = data.resources.docs(path);
+    if(put(docs, data, path, options)) {
+      // delete XML resources
+      final Updates updates = qc.updates();
+      for(int pre : docs.toArray()) updates.add(new DeleteNode(pre, data, info), qc);
+      // add binary resource
+      updates.add(up, qc);
     }
-    // add binary resource
-    updates.add(up, qc);
     return Empty.VALUE;
   }
 }

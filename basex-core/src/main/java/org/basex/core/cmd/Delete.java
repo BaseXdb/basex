@@ -30,30 +30,19 @@ public final class Delete extends ACreate {
     final String path = MetaData.normPath(args[0]);
     if(path == null) return error(PATH_INVALID_X, args[0]);
 
+    final IntList docs = data.resources.docs(path);
     return update(data, () -> {
-      int size = xml(data, path);
+      // delete XML documents
+      final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+      for(final int pre : docs.toArray()) auc.addDelete(pre);
+      auc.execute(false);
+      // delete binaries
+      int size = docs.size();
       for(final ResourceType type : Resources.BINARIES) {
         size += binaries(data, path, type);
       }
       return info(RES_DELETED_X_X, size, jc().performance);
     });
-  }
-
-  /**
-   * Deletes XML resources.
-   * @param data data reference
-   * @param path path to resources
-   * @return number of deleted nodes
-   */
-  static int xml(final Data data, final String path) {
-    final IntList docs = data.resources.docs(path);
-    int size = docs.size();
-    if(size != 0) {
-      final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-      for(int d = 0; d < size; d++) auc.addDelete(docs.get(d));
-      auc.execute(false);
-    }
-    return size;
   }
 
   /**

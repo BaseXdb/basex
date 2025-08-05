@@ -3,7 +3,11 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
+import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.*;
@@ -11,6 +15,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -77,5 +82,26 @@ abstract class DbNew extends DbAccessFn {
     ni.io = io;
     ni.path = target;
     return ni;
+  }
+
+  /**
+   * Checks if a PUT operation should be performed.
+   * @param docs existing documents
+   * @param data data reference
+   * @param path target path
+   * @param options options
+   * @return result of check
+   */
+  final boolean put(final IntList docs, final Data data, final String path,
+      final HashMap<String, String> options) {
+    final String pr = options.get(MainOptions.REPLACE.name().toLowerCase(Locale.ENGLISH));
+    if(pr == null || Strings.toBoolean(pr)) return true;
+
+    boolean add = docs.isEmpty();
+    for(final ResourceType type : Resources.BINARIES) {
+      final IOFile bin = data.meta.file(path, type);
+      add &= bin == null || !bin.exists();
+    }
+    return add;
   }
 }

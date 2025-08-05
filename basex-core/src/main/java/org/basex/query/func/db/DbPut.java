@@ -35,28 +35,29 @@ public final class DbPut extends DbNew {
     final IntList docs = data.resources.docs(path);
     int d = 0;
 
-    if(input instanceof Bin) {
-      // store binary resource
-      if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
-      updates.add(new DBPutBinary(data, input, path, info), qc);
-    } else {
-      // store XML document: replace existing document or add new one
-      final NewInput ni = toNewInput(input, path);
-      final Update update = docs.isEmpty() ?
-        new DBAdd(data, ni, options, true, qc, info) :
-        new ReplaceDoc(docs.get(d++), data, ni, options, qc, info);
-      updates.add(update, qc);
+    if(put(docs, data, path, options)) {
+      if(input instanceof Bin) {
+        // store binary resource
+        if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
+        updates.add(new DBPutBinary(data, input, path, info), qc);
+      } else {
+        // store XML document: replace existing document or add new one
+        final NewInput ni = toNewInput(input, path);
+        final Update update = docs.isEmpty() ?
+          new DBAdd(data, ni, options, true, qc, info) :
+          new ReplaceDoc(docs.get(d++), data, ni, options, qc, info);
+        updates.add(update, qc);
 
-      // delete file resources
-      for(final ResourceType type : Resources.BINARIES) {
-        final IOFile bin = data.meta.file(path, type);
-        if(bin != null && bin.exists()) updates.add(new DBDelete(data, bin, info), qc);
+        // delete file resources
+        for(final ResourceType type : Resources.BINARIES) {
+          final IOFile bin = data.meta.file(path, type);
+          if(bin != null) updates.add(new DBDelete(data, bin, info), qc);
+        }
       }
+      // delete spare documents
+      final int ds = docs.size();
+      for(; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
     }
-
-    // delete spare documents
-    final int ds = docs.size();
-    for(; d < ds; d++) updates.add(new DeleteNode(docs.get(d), data, info), qc);
     return Empty.VALUE;
   }
 }

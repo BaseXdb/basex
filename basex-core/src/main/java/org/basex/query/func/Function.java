@@ -1320,11 +1320,11 @@ public enum Function implements AFunction {
   _DB_PUT(DbPut::new, "put(database,input,path[,options])",
       params(STRING_O, ITEM_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_PUT_BINARY(DbPutBinary::new, "put-binary(database,input,path)",
-      params(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_PUT_BINARY(DbPutBinary::new, "put-binary(database,input,path[,options])",
+      params(STRING_O, STRING_O, ITEM_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_PUT_VALUE(DbPutValue::new, "put-value(database,input,path)",
-      params(STRING_O, ITEM_ZM, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_PUT_VALUE(DbPutValue::new, "put-value(database,input,path[,options])",
+      params(STRING_O, ITEM_ZM, ITEM_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RENAME(DbRename::new, "rename(database,path,new-path)",
       params(STRING_O, STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
