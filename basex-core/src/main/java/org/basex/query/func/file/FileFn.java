@@ -32,7 +32,8 @@ abstract class FileFn extends StandardFunc {
     try {
       return eval(qc);
     } catch(final NoSuchFileException ex) {
-      throw FILE_NOT_FOUND_X.get(info, ex);
+      Util.debug(ex);
+      throw FILE_NOT_FOUND_X.get(info, ex.getMessage());
     } catch(final NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
     } catch(final FileAlreadyExistsException ex) {
