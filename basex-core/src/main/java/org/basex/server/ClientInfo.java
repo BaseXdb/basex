@@ -34,7 +34,9 @@ public interface ClientInfo {
   default String clientName(final Object id, final Context ctx) {
     // try to get string representation of supplied user ID
     try {
-      if(id instanceof final Item item) return Token.string(item.string(null));
+      if(id instanceof final Item item && item.size() == 1) {
+        return Token.string(item.string(null));
+      }
     } catch(final QueryException ex) {
       Util.debug(ex);
     }
