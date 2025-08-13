@@ -1993,9 +1993,9 @@ public class QueryParser extends InputParser {
   private Expr pipeline() throws QueryException {
     final Expr expr = arrow();
     if(expr != null) {
-      if(wsConsumeWs("->") || wsConsumeWs("-\uFF1E")) {
+      if(wsConsumeWs("->")) {
         final ExprList el = new ExprList(expr);
-        do add(el, arrow()); while(wsConsumeWs("->") || wsConsumeWs("-\uFF1E"));
+        do add(el, arrow()); while(wsConsumeWs("->"));
         return new Pipeline(info(), el.finish());
       }
     }
@@ -2011,8 +2011,8 @@ public class QueryParser extends InputParser {
     Expr expr = unary();
     if(expr != null) {
       while(true) {
-        final boolean mapping = wsConsume("=!>") || wsConsume("=!\uFF1E");
-        if(!mapping && !consume("=>") && !consume("=\uFF1E")) break;
+        final boolean mapping = wsConsume("=!>");
+        if(!mapping && !consume("=>")) break;
 
         QNm name = null;
         Expr ex;
