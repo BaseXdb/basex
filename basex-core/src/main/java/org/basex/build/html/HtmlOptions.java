@@ -47,8 +47,8 @@ public final class HtmlOptions extends Options {
   public static final EnumOption<HtmlParser.Method> METHOD = new EnumOption<>("method",
       HtmlParser.Method.class);
 
-  /** fn:parse-html option: html-version. */
-  public static final StringOption HTML_VERSION = new StringOption("html-version");
+  /** fn:parse-html option: fail-on-error. */
+  public static final BooleanOption FAIL_ON_ERROR = new BooleanOption("fail-on-error", false);
   /** fn:parse-html option: include-template-content. */
   public static final BooleanOption INCLUDE_TEMPLATE_CONTENT =
       new BooleanOption("include-template-content");

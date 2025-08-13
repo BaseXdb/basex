@@ -177,7 +177,26 @@ public final class HtmlParser extends XMLParser {
       @Override
       XMLReader reader(final HtmlOptions hopts, final StringWriter sw) throws SAXException {
         final nu.validator.htmlparser.sax.HtmlParser reader =
-            new nu.validator.htmlparser.sax.HtmlParser(XmlViolationPolicy.ALTER_INFOSET);
+            new nu.validator.htmlparser.sax.HtmlParser();
+        if(hopts.get(FAIL_ON_ERROR)) {
+          reader.setErrorHandler(new ErrorHandler() {
+            @Override
+            public void warning(final SAXParseException e) throws SAXException {
+            }
+
+            @Override
+            public void error(final SAXParseException e) throws SAXException {
+              throw e;
+            }
+
+            @Override
+            public void fatalError(final SAXParseException e) throws SAXException {
+              throw e;
+            }
+          });
+        } else {
+          reader.setXmlPolicy(XmlViolationPolicy.ALTER_INFOSET);
+        }
         final ContentHandler writer = new XmlSerializer(sw);
         reader.setContentHandler(writer);
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
