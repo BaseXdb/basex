@@ -39,6 +39,15 @@ public final class ChoiceItemType implements Type {
     union = tp;
   }
 
+  /**
+   * Creates a choice item type.
+   * @param types alternative item types
+   * @return choice item type
+   */
+  public static ChoiceItemType get(final SeqType... types) {
+    return new ChoiceItemType(Arrays.asList(types));
+  }
+
   @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
