@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.map.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -25,9 +24,7 @@ public final class UtilMapValueAt extends StandardFunc {
     final long size = map.structSize();
     if(index < 1 || index > size) return Empty.VALUE;
 
-    final Value value = map.valueAt((int) index - 1);
-    return value instanceof final FuncItem fi && toBooleanOrFalse(arg(2), qc) ? fi.toMethod(map) :
-      value;
+    return map.valueAt((int) index - 1);
   }
 
   @Override
