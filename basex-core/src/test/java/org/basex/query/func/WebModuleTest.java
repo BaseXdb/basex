@@ -83,6 +83,8 @@ public final class WebModuleTest extends SandboxTest {
 
     query(func.args("a/b", " { 'a': 'b' }") +
         "/*:response/*:header[@name = 'Location']/@value/string()", "a/b?a=b");
+    query(func.args("a/b", " status := 301") +
+        "/*:response/@status/number()", 301);
 
     // GH-1585
     query("count((" + func.args("a") + " update {})/http:response)", 1);

@@ -2004,8 +2004,8 @@ public enum Function implements AFunction {
   _WEB_FORWARD(WebForward::new, "forward(href[,params])",
       params(STRING_O, MAP_ZO), ELEMENT_O, WEB_URI),
   /** XQuery function. */
-  _WEB_REDIRECT(WebRedirect::new, "redirect(href[,params,anchor])",
-      params(STRING_O, MAP_ZO, STRING_ZO), ELEMENT_O, WEB_URI),
+  _WEB_REDIRECT(WebRedirect::new, "redirect(href[,params,anchor,status])",
+      params(STRING_O, MAP_ZO, STRING_ZO, INTEGER_ZO), ELEMENT_O, WEB_URI),
   /** XQuery function. */
   _WEB_RESPONSE_HEADER(WebResponseHeader::new, "response-header([output,headers,attributes])",
       params(MAP_ZO, MAP_ZO, MAP_ZO), ELEMENT_O, WEB_URI),
