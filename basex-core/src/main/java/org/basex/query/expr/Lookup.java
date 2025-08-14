@@ -10,7 +10,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -171,9 +170,7 @@ public final class Lookup extends Arr {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter ir = keys.atomIter(qc, info);
     for(Item key; (key = ir.next()) != null;) {
-      final Value value = struct.invoke(qc, info, key);
-      vb.add(value instanceof final FuncItem fi && struct instanceof XQMap ? fi.toMethod(struct) :
-        value);
+      vb.add(struct.invoke(qc, info, key));
     }
     return vb.value(this);
   }

@@ -153,13 +153,12 @@ public final class AnnList implements Iterable<Ann> {
    * Checks all annotations for parsing errors.
    * @param variable variable flag (triggers different error codes)
    * @param visible check visibility annotations
-   * @param allowMethod allow method annotations
    * @return self reference
    * @throws QueryException query exception
    */
-  public AnnList check(final boolean variable, final boolean visible, final boolean allowMethod)
+  public AnnList check(final boolean variable, final boolean visible)
       throws QueryException {
-    boolean up = false, vis = false, meth = false;
+    boolean up = false, vis = false;
     for(final Ann ann : anns) {
       final Annotation def = ann.definition;
       if(def == Annotation.UPDATING) {
@@ -169,10 +168,6 @@ public final class AnnList implements Iterable<Ann> {
         // only one visibility modifier allowed
         if(vis) throw (variable ? DUPLVARVIS : DUPLFUNVIS).get(ann.info);
         vis = true;
-      } else if(def == Annotation.METHOD) {
-        if(!allowMethod) throw NOMETHOD.get(ann.info);
-        if(meth) throw DUPLMETHOD.get(ann.info);
-        meth = true;
       }
     }
     return this;

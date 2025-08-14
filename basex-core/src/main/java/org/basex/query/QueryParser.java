@@ -393,17 +393,17 @@ public class QueryParser extends InputParser {
         if(wsConsumeWs(VARIABLE)) {
           // variables cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGVAR);
-          varDecl(anns.check(true, true, false));
+          varDecl(anns.check(true, true));
         } else if(wsConsumeWs(FUNCTION)) {
-          functionDecl(anns.check(false, true, false));
+          functionDecl(anns.check(false, true));
         } else if(wsConsumeWs(TYPE)) {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
-          typeDecl(anns.check(false, true, false));
+          typeDecl(anns.check(false, true));
         } else if(wsConsumeWs(RECORD)) {
           // types cannot be updating
           if(anns.contains(Annotation.UPDATING)) throw error(UPDATINGTYPE);
-          namedRecordTypeDecl(anns.check(false, true, false));
+          namedRecordTypeDecl(anns.check(false, true));
         } else if(!anns.isEmpty()) {
           throw error(VARFUNC);
         } else {
@@ -2499,6 +2499,8 @@ public class QueryParser extends InputParser {
             wsCheck("]");
           } while(wsConsume("?["));
           expr = new StructFilter(info(), expr, el.finish());
+        } else if(consume("?>")) {
+          expr = methodCall(expr);
         } else if(current('(')) {
           expr = Functions.dynamic(expr, argumentList(false, null));
         } else if(current('?')) {
@@ -2527,6 +2529,28 @@ public class QueryParser extends InputParser {
     }
     pos = p;
     return null;
+  }
+
+  /**
+   * Parses the "MethodCall" rule.
+   * @param expr expression
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr methodCall(final Expr expr) throws QueryException {
+    skipWs();
+    final InputInfo info = info();
+    final Str key = Str.get(ncName(NONCNAME_X));
+    final int s = localVars.openScope();
+    final For fr = new For(localVars.add(new Var(new QNm("method"), null, qc, info)), expr);
+    final VarRef arg = new VarRef(info, fr.var);
+    final FuncBuilder fb = argumentList(false, arg);
+    if(fb.placeholders != 0) throw error(INVPLACEHOLDER_X, key);
+    final Lookup func = new Lookup(info, arg, key);
+    final Expr call = Functions.dynamic(func, fb);
+    final GFLWOR gflwor = new GFLWOR(info, fr, call);
+    localVars.closeScope(s);
+    return gflwor;
   }
 
   /**
@@ -2670,7 +2694,7 @@ public class QueryParser extends InputParser {
 
     // inline function
     final int p = pos;
-    final AnnList anns = annotations(false).check(false, true, true);
+    final AnnList anns = annotations(false).check(false, true);
     if(wsConsume(FUNCTION) || wsConsume(FN)) {
       final boolean args = wsConsume("("), focus = !args && current('{');
       if(args || focus) {
@@ -2682,8 +2706,6 @@ public class QueryParser extends InputParser {
           expr = enclosedExpr();
         } else {
           // focus function
-          final Ann method = anns.get(Annotation.METHOD);
-          if(method != null) throw NOMETHOD.get(method.info);
           final InputInfo ii = info();
           final QNm name = new QNm("arg");
           params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, localVars);
@@ -3490,7 +3512,7 @@ public class QueryParser extends InputParser {
     if(wsConsume("(")) return choiceItemType();
 
     // parse annotations and type name
-    final AnnList anns = annotations(false).check(false, false, true);
+    final AnnList anns = annotations(false).check(false, false);
     skipWs();
     SeqType st = null;
     Type type;

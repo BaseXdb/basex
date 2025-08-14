@@ -30,9 +30,6 @@ public final class MapGet extends StandardFunc {
     } else {
       value = map.get(key);
     }
-    if(value instanceof final FuncItem fi && toBooleanOrFalse(arg(3), qc)) {
-      value = fi.toMethod(map);
-    }
     return value;
   }
 

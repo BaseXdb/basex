@@ -97,20 +97,6 @@ public final class FuncItem extends FItem implements Scope {
     simple = !expr.has(Flag.CTX);
   }
 
-  /**
-   * Binds a context value to the function item.
-   * @param context context value
-   * @return function item with bound focus, or original function if no method annotation exists
-   */
-  public FuncItem toMethod(final Value context) {
-    if(anns.contains(Annotation.METHOD)) {
-      final QueryFocus qf = new QueryFocus();
-      qf.value = context;
-      return new FuncItem(this, anns.remove(Annotation.METHOD), qf);
-    }
-    return this;
-  }
-
   @Override
   public int arity() {
     return params.length;
