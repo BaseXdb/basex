@@ -10,7 +10,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -63,8 +62,7 @@ public final class Lookup extends Arr {
       // map lookup may result in empty sequence
       occ = occ.union(Occ.ZERO);
     }
-    // invalidate function type (%method annotation would need to be removed from type)
-    exprType.assign(st.mayBeFunction() ? AtomType.ITEM : st.type, occ);
+    exprType.assign(st.type, occ);
     return this;
   }
 
@@ -86,13 +84,12 @@ public final class Lookup extends Arr {
       /* REWRITE LOOKUP:
        *  MAP?*      ->  map:items(MAP)
        *  ARRAY?*    ->  array:items(MAP)
-       *  MAP?KEY    ->  map:get(INPUT, KEY, methods := true())
+       *  MAP?KEY    ->  map:get(INPUT, KEY)
        *  ARRAY?KEY  ->  array:get(INPUT, KEY) */
       final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> {
-        return keys == WILDCARD ? map ? cc.function(Function._MAP_ITEMS, info, in) :
-          cc.function(Function._ARRAY_ITEMS, info, in) :
-        map ? cc.function(Function._MAP_GET, info, in, arg, Empty.UNDEFINED, Bln.TRUE) :
-          cc.function(Function._ARRAY_GET, info, in, arg);
+        return keys == WILDCARD ?
+          cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
+          cc.function(map ? Function._MAP_GET : Function._ARRAY_GET, info, in, arg);
       };
 
       // single key

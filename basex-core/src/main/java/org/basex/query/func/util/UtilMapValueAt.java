@@ -22,9 +22,7 @@ public final class UtilMapValueAt extends StandardFunc {
     final long index = toLong(arg(1), qc);
 
     final long size = map.structSize();
-    if(index < 1 || index > size) return Empty.VALUE;
-
-    return map.valueAt((int) index - 1);
+    return index > 0 && index <= size ? map.valueAt((int) index - 1) : Empty.VALUE;
   }
 
   @Override
@@ -42,8 +40,7 @@ public final class UtilMapValueAt extends StandardFunc {
     }
     if(st == null && mc.mapType != null) st = mc.mapType.valueType().union(Occ.ZERO);
 
-    // invalidate function type (%method annotation would need to be removed from type)
-    if(st != null && !(st.mayBeFunction() && defined(2))) exprType.assign(st);
+    if(st != null) exprType.assign(st);
     return this;
   }
 }

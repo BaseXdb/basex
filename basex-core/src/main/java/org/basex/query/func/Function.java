@@ -783,9 +783,8 @@ public enum Function implements AFunction {
       params(MAP_O, FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
       ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
-  _MAP_GET(MapGet::new, "get(map,key[,default,methods])",
-      params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM, BOOLEAN_ZO),
-      ITEM_ZM, MAP_URI),
+  _MAP_GET(MapGet::new, "get(map,key[,default])",
+      params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM), ITEM_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map)",
       params(MAP_O), ANY_ATOMIC_TYPE_ZM, MAP_URI),
@@ -1927,8 +1926,8 @@ public enum Function implements AFunction {
   _UTIL_MAP_PUT_AT(UtilMapPutAt::new, "map-put-at(input,index,value)",
       params(MAP_O, INTEGER_O, ITEM_ZM), MAP_O, UTIL_URI),
   /** XQuery function. */
-  _UTIL_MAP_VALUE_AT(UtilMapValueAt::new, "map-value-at(input,index[,methods])",
-      params(MAP_O, INTEGER_O, BOOLEAN_ZO), ITEM_ZM, UTIL_URI),
+  _UTIL_MAP_VALUE_AT(UtilMapValueAt::new, "map-value-at(input,index)",
+      params(MAP_O, INTEGER_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_RANGE(UtilRange::new, "range(input,first,last)",
       params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
