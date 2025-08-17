@@ -138,9 +138,9 @@ public final class WebSocket extends WebSocketAdapter implements ClientInfo {
 
   @Override
   public String clientName() {
-    Object value = atts.get(HTTPText.CLIENT_ID);
-    if(value == null && session != null) value = session.getAttribute(HTTPText.CLIENT_ID);
-    return clientName(value, context);
+    final Object value = atts.get(HTTPText.CLIENT_ID);
+    return clientName(value != null ? value :
+      HTTPConnection.getAttribute(session, HTTPText.CLIENT_ID), context);
   }
 
   /**

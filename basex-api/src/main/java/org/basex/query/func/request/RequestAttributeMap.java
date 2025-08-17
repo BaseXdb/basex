@@ -2,6 +2,7 @@ package org.basex.query.func.request;
 
 import java.util.*;
 
+import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.func.java.*;
@@ -23,7 +24,7 @@ public final class RequestAttributeMap extends ApiFunc {
 
     final MapBuilder map = new MapBuilder();
     for(final String name : Collections.list(request.getAttributeNames())) {
-      map.put(name, JavaCall.toValue(request.getAttribute(name), qc, info));
+      map.put(name, JavaCall.toValue(HTTPConnection.getAttribute(request, name), qc, info));
     }
     return map.map();
   }

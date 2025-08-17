@@ -44,7 +44,7 @@ public final class RequestContext {
    */
   public RequestContext(final HttpServletRequest request) {
     this.request = request;
-    this.query = request.getQueryString();
+    query = request.getQueryString();
   }
 
   /**
@@ -89,7 +89,8 @@ public final class RequestContext {
     if(values == null) {
       // combine query parameters of previous and current request
       final MapBuilder mb = new MapBuilder();
-      final RequestContext forward = (RequestContext) request.getAttribute(HTTPText.FORWARD);
+      final RequestContext forward = (RequestContext)
+          HTTPConnection.getAttribute(request, HTTPText.FORWARD);
       if(forward != null && forward.query != null) addParams(forward.query, mb);
       final String string = request.getQueryString();
       if(string != null) addParams(string, mb);
@@ -132,7 +133,8 @@ public final class RequestContext {
    */
   public IOContent body() throws IOException {
     if(body == null) {
-      final RequestContext forward = (RequestContext) request.getAttribute(HTTPText.FORWARD);
+      final RequestContext forward = (RequestContext)
+          HTTPConnection.getAttribute(request, HTTPText.FORWARD);
       if(forward != null && forward.body != null) {
         body = forward.body;
       } else {
