@@ -410,6 +410,27 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   /**
+   * Returns all request attributes.
+   * @param request servlet request (can be {@code null})
+   * @return map
+   */
+  public static HashMap<String, Object> getAttributes(final HttpServletRequest request) {
+    final HashMap<String, Object> map = new HashMap<>();
+    try {
+      final Enumeration<String> names = request.getAttributeNames();
+      while(names.hasMoreElements()) {
+        final String name = names.nextElement();
+        map.put(name, request.getAttribute(name));
+      }
+    } catch(final IllegalStateException ex) {
+      // Tomcat
+      // - https://github.com/spring-projects/spring-boot/issues/36763
+      Util.debug(ex);
+    }
+    return map;
+  }
+
+  /**
    * Returns a request attribute.
    * @param request servlet request (can be {@code null})
    * @param name name of the attribute
