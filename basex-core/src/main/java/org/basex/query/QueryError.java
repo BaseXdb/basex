@@ -873,8 +873,6 @@ public enum QueryError {
   /** Error code. */
   NUMBER_X(XPST, 3, "Incomplete number: '%'."),
   /** Error code. */
-  NUMBERITR_X_X(XPST, 3, "Integer expected, % found: '%'."),
-  /** Error code. */
   QUERYEND_X(XPST, 3, "Unexpected end of query: '%'."),
   /** Error code. */
   MODEXPR(XPST, 3, "No expression allowed in a library module."),
