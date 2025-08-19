@@ -2617,12 +2617,15 @@ public class QueryParser extends InputParser {
     final int cp = current();
     if(cp == '(') return parenthesized();
     if(cp == '$') return varRef();
-    if(quote(cp)) return Str.get(stringLiteral());
-    final Expr num = numericLiteral(Long.MAX_VALUE, false);
-    if(num != null) {
-      if(Function.ERROR.is(num) || num instanceof Itr) return num;
-      throw error(NUMBERITR_X_X, num.seqType(), num);
+    if(cp == '.') {
+      if(next() == '.') return null;
+      if(!digit(next())) {
+        consume();
+        return new ContextValue(info());
+      }
     }
+    final Expr lit = literal();
+    if(lit != null) return lit;
     return Str.get(ncName(KEYSPEC_X));
   }
 
