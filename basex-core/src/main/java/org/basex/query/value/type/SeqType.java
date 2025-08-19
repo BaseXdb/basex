@@ -387,6 +387,7 @@ public final class SeqType {
       }
       return false;
     }
+    if(type instanceof final EnumType et) return et.instance(item);
     return item.instanceOf(type, coerce) && (test == null || test.matches(item));
   }
 
