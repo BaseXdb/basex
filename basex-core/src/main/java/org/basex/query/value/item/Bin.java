@@ -51,7 +51,8 @@ public abstract class Bin extends Item {
 
   @Override
   public final boolean atomicEqual(final Item item) throws QueryException {
-    return this == item || type == item.type && Token.eq(binary(null), ((Bin) item).binary(null));
+    return this == item || item instanceof final Bin bin &&
+        Token.eq(binary(null), bin.binary(null));
   }
 
   @Override
