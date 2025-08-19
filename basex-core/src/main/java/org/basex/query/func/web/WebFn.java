@@ -73,12 +73,12 @@ public abstract class WebFn extends StandardFunc {
    * Creates a REST response.
    * @param response status and message
    * @param headers response headers
-   * @param output serialization parameters (can be {@code null})
+   * @param attributes serialization parameters (can be {@code null})
    * @return response
    * @throws QueryException query exception
    */
   final FNode createResponse(final ResponseOptions response, final HashMap<String, String> headers,
-      final HashMap<String, String> output) throws QueryException {
+      final HashMap<String, String> attributes) throws QueryException {
 
     // root element
     final FBuilder rrest = FElem.build(HTTPText.Q_REST_RESPONSE).declareNS();
@@ -97,13 +97,13 @@ public abstract class WebFn extends StandardFunc {
     rrest.add(hresp);
 
     // serialization parameters
-    if(output != null) {
+    if(attributes != null) {
       final SerializerOptions sopts = SerializerMode.DEFAULT.get();
-      for(final String entry : output.keySet())
+      for(final String entry : attributes.keySet())
         if(sopts.option(entry) == null) throw QueryError.UNKNOWNOPTION_X.get(info, entry);
 
       final FBuilder param = FElem.build(SerializerOptions.Q_ROOT).declareNS();
-      output.forEach((name, value) -> {
+      attributes.forEach((name, value) -> {
         if(!value.isEmpty()) {
           final QNm qnm = new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI);
           param.add(FElem.build(qnm).add(HTTPText.Q_VALUE, value));

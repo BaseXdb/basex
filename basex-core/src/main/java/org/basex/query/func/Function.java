@@ -2007,7 +2007,7 @@ public enum Function implements AFunction {
   _WEB_REDIRECT(WebRedirect::new, "redirect(href[,params,anchor,status])",
       params(STRING_O, MAP_ZO, STRING_ZO, INTEGER_ZO), ELEMENT_O, WEB_URI),
   /** XQuery function. */
-  _WEB_RESPONSE_HEADER(WebResponseHeader::new, "response-header([output,headers,attributes])",
+  _WEB_RESPONSE_HEADER(WebResponseHeader::new, "response-header([output,headers,response])",
       params(MAP_ZO, MAP_ZO, MAP_ZO), ELEMENT_O, WEB_URI),
 
   // XQuery Module

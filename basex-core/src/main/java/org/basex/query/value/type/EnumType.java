@@ -47,9 +47,8 @@ public final class EnumType implements Type {
    * @return result of check
    */
   public boolean instance(final Item item) {
-    if(!item.instanceOf(AtomType.STRING, false)) return false;
     try {
-      return values.contains(item.string(null));
+      return item.type.instanceOf(AtomType.STRING) && values.contains(item.string(null));
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }

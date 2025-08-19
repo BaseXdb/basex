@@ -63,17 +63,6 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   /**
-   * Construct a new function item from an existing one, with replaced annotations and focus.
-   * @param fi the existing function item
-   * @param anns the new annotations
-   * @param focus the new focus
-   */
-  public FuncItem(final FuncItem fi, final AnnList anns, final QueryFocus focus) {
-    this(fi.info, fi.expr, fi.params, anns, FuncType.get(anns, ((FuncType) fi.type).declType,
-        ((FuncType) fi.type).argTypes), fi.stackSize, fi.name, focus);
-  }
-
-  /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body

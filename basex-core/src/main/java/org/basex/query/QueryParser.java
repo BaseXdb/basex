@@ -2563,48 +2563,23 @@ public class QueryParser extends InputParser {
    */
   private Expr primary() throws QueryException {
     skipWs();
-    // function item
-    Expr expr = functionItem();
-    if(expr != null) return expr;
 
     final int cp = current();
-    // direct constructor
     if(cp == '<') return dirConstructor(true);
-    // string constructor and template
     if(cp == '`') return stringConstructor();
-    // variables
-    if(cp == '$') return varRef();
-    // parentheses
     if(cp == '(') return parenthesized();
-    // function call
-    expr = functionCall();
-    if(expr != null) return expr;
-    // computed constructors
-    expr = compConstructor();
-    if(expr != null) return expr;
-    // map constructor
-    expr = mapConstructor();
-    if(expr != null) return expr;
-    // square array constructor
-    expr = arrayConstructor();
-    if(expr != null) return expr;
-    // ordered expression
+    if(cp == '$') return varRef();
+    if(cp == '.' && !digit(next())) return contextValue();
     if(wsConsumeWs(ORDERED, null, "{") || wsConsumeWs(UNORDERED, null, "{")) return enclosedExpr();
-    // unary lookup
-    if(current('?')) {
-      final Expr lookup = lookup(null);
-      if(lookup != null) return lookup;
-    }
-    // context value
-    if(cp == '.') {
-      if(next() == '.') return null;
-      if(!digit(next())) {
-        consume();
-        return new ContextValue(info());
-      }
-    }
-    // literals
-    return literal();
+
+    Expr expr = functionItem();
+    if(expr == null) expr = functionCall();
+    if(expr == null) expr = compConstructor();
+    if(expr == null) expr = mapConstructor();
+    if(expr == null) expr = arrayConstructor();
+    if(expr == null) expr = lookup(null);
+    if(expr == null) expr = literal();
+    return expr;
   }
 
   /**
@@ -2614,19 +2589,25 @@ public class QueryParser extends InputParser {
    */
   private Expr keySpecifier() throws QueryException {
     if(wsConsume("*")) return Lookup.WILDCARD;
+
     final int cp = current();
     if(cp == '(') return parenthesized();
     if(cp == '$') return varRef();
-    if(cp == '.') {
-      if(next() == '.') return null;
-      if(!digit(next())) {
-        consume();
-        return new ContextValue(info());
-      }
-    }
-    final Expr lit = literal();
-    if(lit != null) return lit;
-    return Str.get(ncName(KEYSPEC_X));
+    if(cp == '.' && !digit(next())) return contextValue();
+
+    final Expr expr = literal();
+    return expr != null ? expr : Str.get(ncName(KEYSPEC_X));
+  }
+
+  /**
+   * Parses the "ContextValue" rule.
+   * @return expression or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr contextValue() throws QueryException {
+    if(next() == '.') return null;
+    check('.');
+    return new ContextValue(info());
   }
 
   /**

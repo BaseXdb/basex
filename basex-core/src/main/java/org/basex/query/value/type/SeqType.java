@@ -387,7 +387,9 @@ public final class SeqType {
       }
       return false;
     }
-    if(type instanceof final EnumType et) return et.instance(item);
+    if(type instanceof final EnumType et) {
+      return et.instance(item);
+    }
     return item.instanceOf(type, coerce) && (test == null || test.matches(item));
   }
 
@@ -677,15 +679,6 @@ public final class SeqType {
    */
   public boolean mayBeArray() {
     return !zero() && (type instanceof ArrayType || ARRAY.instanceOf(type));
-  }
-
-  /**
-   * Tests if expressions of this type may yield maps or arrays.
-   * @return result of check
-   */
-  public boolean mayBeStruct() {
-    return !zero() && (type instanceof ArrayType || ARRAY.instanceOf(type)
-        || type instanceof MapType || MAP.instanceOf(type));
   }
 
   /**
