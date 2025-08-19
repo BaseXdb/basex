@@ -80,6 +80,7 @@ public final class FileReadTextLines extends FileFn {
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
+    if(!Files.isReadable(path)) throw FILE_ACCESS_X.get(info, path.toAbsolutePath());
 
     final NewlineInput ni = new NewlineInput(new IOFile(path));
     ni.encoding(encoding).validate(!fallback);

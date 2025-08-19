@@ -25,6 +25,7 @@ public final class FileReadBinary extends FileFn {
     final Long length = toLongOrNull(arg(2), qc);
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
+    if(!Files.isReadable(path)) throw FILE_ACCESS_X.get(info, path.toAbsolutePath());
 
     // read full file
     final long off = offset != null ? offset : 0;

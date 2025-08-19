@@ -269,7 +269,7 @@ public enum QueryError {
   /** Error code. */
   FILE_IS_DIR_X(FILE, "is-dir", "'%' is a directory."),
   /** Error code. */
-  FILE_ID_DIR2_X(FILE, "is-dir", "'%' is a non-empty directory."),
+  FILE_IS_DIR2_X(FILE, "is-dir", "'%' is a non-empty directory."),
   /** Error code. */
   FILE_IS_RELATIVE_X(FILE, "is-relative", "Base directory is relative: '%'."),
   /** Error code. */
@@ -281,7 +281,7 @@ public enum QueryError {
   /** Error code. */
   FILE_IO_ERROR_X(FILE, "io-error", "%"),
   /** Error code. */
-  FILE_IE_ERROR_ACCESS_X(FILE, "io-error", "Access to '%' is denied."),
+  FILE_ACCESS_X(FILE, "io-error", "Access to '%' is denied."),
 
   // Fulltext Module
 

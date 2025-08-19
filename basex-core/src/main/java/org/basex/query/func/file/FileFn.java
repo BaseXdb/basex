@@ -39,9 +39,9 @@ abstract class FileFn extends StandardFunc {
     } catch(final FileAlreadyExistsException ex) {
       throw FILE_EXISTS_X.get(info, ex);
     } catch(final DirectoryNotEmptyException ex) {
-      throw FILE_ID_DIR2_X.get(info, ex);
+      throw FILE_IS_DIR2_X.get(info, ex);
     } catch(final AccessDeniedException ex) {
-      throw FILE_IE_ERROR_ACCESS_X.get(info, ex);
+      throw FILE_ACCESS_X.get(info, ex);
     } catch(final IOException ex) {
       throw FILE_IO_ERROR_X.get(info, ex);
     }
