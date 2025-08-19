@@ -171,6 +171,7 @@ public class FnParseUri extends StandardFunc {
     final MapBuilder mb = new MapBuilder();
     add(mb, URI, value);
     add(mb, SCHEME, scheme);
+    if(absolute) add(mb, ABSOLUTE, Bln.TRUE);
     add(mb, HIERARCHICAL, hierarchical);
     add(mb, AUTHORITY, authority);
     add(mb, USERINFO, userinfo);
@@ -182,7 +183,6 @@ public class FnParseUri extends StandardFunc {
     add(mb, PATH_SEGMENTS, StrSeq.get(segments));
     add(mb, QUERY_PARAMETERS, queries);
     add(mb, FILEPATH, filepath);
-    if(absolute) add(mb, ABSOLUTE, Bln.TRUE);
     return mb.map();
   }
 
