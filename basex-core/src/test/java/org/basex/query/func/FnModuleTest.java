@@ -1079,9 +1079,6 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(2, 1, " function($a, $b) { $b }"), 2);
     query("sort(" + func.args(" <a/>", "a", " compare#2") + ")", 1);
 
-    query(func.args(" 1 to 6", "ok", " fn($r, $i, $p) { $r[$i = $p] }"), "ok");
-    query(func.args(" 2 to 7", "-", " fn($r, $i, $p) { $r[$i = $p] }"), "");
-
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
     check(func.args(" 1 to 10", " xs:byte(1)", " function($n, $_) {" +
@@ -1123,9 +1120,6 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void foldRight() {
     final Function func = FOLD_RIGHT;
-    query(func.args(" 1 to 6", "ok", " fn($i, $r, $p) { $r[$i = 7 - $p] }"), "ok");
-    query(func.args(" 1 to 6", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
-
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
     // should not be unrolled

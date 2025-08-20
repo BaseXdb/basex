@@ -20,7 +20,7 @@ public class ArrayFoldLeft extends FnFoldLeft {
     final XQArray array = toArray(arg(0), qc);
     final FItem action = action(qc);
 
-    final HofArgs args = new HofArgs(3, action).set(0, arg(1).value(qc));
+    final HofArgs args = new HofArgs(2).set(0, arg(1).value(qc));
     for(final Value value : array.iterable()) {
       args.set(1, value).inc();
       if(skip(qc, args)) break;

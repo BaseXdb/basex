@@ -22,7 +22,7 @@ public final class FnFoldRight extends FnFoldLeft {
     final Iter input = arg(0).iter(qc);
     final FItem action = action(qc);
 
-    final HofArgs args = new HofArgs(3, action).set(1, arg(1).value(qc));
+    final HofArgs args = new HofArgs(2).set(1, arg(1).value(qc));
     long p = input.size();
     if(p != -1) {
       for(; p > 0; p--) {

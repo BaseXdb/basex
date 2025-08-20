@@ -114,16 +114,12 @@ public final class ArrayModuleTest extends SandboxTest {
   @Test public void foldLeft() {
     final Function func = _ARRAY_FOLD_LEFT;
     query(func.args(" [ 1, 2 ]", 0, " function($a, $b) { $a + $b }"), 3);
-    query(func.args(" array { 1 to 6 }", "ok", " fn($r, $i, $p) { $r[$i = $p] }"), "ok");
-    query(func.args(" array { 2 to 7 }", "-", " fn($r, $i, $p) { $r[$i = $p] }"), "");
   }
 
   /** Test method. */
   @Test public void foldRight() {
     final Function func = _ARRAY_FOLD_RIGHT;
     query(func.args(" [ 1, 2 ]", " ()", " function($a, $b) { $b, $a }"), "2\n1");
-    query(func.args(" array { 1 to 6 }", "ok", " fn($i, $r, $p) { $r[$i = 7 - $p] }"), "ok");
-    query(func.args(" array { 2 to 7 }", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
   }
 
   /** Test method. */

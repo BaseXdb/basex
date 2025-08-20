@@ -25,7 +25,7 @@ public class FnFoldLeft extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final FItem action = action(qc);
 
-    final HofArgs args = new HofArgs(3, action).set(0, arg(1).value(qc));
+    final HofArgs args = new HofArgs(2).set(0, arg(1).value(qc));
     for(Item item; (item = input.next()) != null;) {
       args.set(1, item).inc();
       if(skip(qc, args)) break;
@@ -52,7 +52,7 @@ public class FnFoldLeft extends StandardFunc {
    * @throws QueryException query exception
    */
   public final FItem action(final QueryContext qc) throws QueryException {
-    return iff != null ? iff[1] : toFunction(arg(2), 3, qc);
+    return iff != null ? iff[1] : toFunction(arg(2), 2, qc);
   }
 
   @Override
@@ -69,24 +69,21 @@ public class FnFoldLeft extends StandardFunc {
    * @throws QueryException query exception
    */
   final Expr unroll(final CompileContext cc, final boolean left) throws QueryException {
-    final Expr input = arg(0), init = arg(1), action = arg(2);
-    final int arity = arity(action);
-    if(arity == 2) {
-      final ExprList unroll = cc.unroll(input, true);
-      if(unroll != null) {
-        final Expr func = coerceFunc(2, cc, arity);
-        Expr expr = init;
-        if(left) {
-          for(final Expr ex : unroll) {
-            expr = new DynFuncCall(info, func, expr, ex).optimize(cc);
-          }
-        } else {
-          for(int es = unroll.size() - 1; es >= 0; es--) {
-            expr = new DynFuncCall(info, func, unroll.get(es), expr).optimize(cc);
-          }
+    final Expr input = arg(0), init = arg(1);
+    final ExprList unroll = cc.unroll(input, true);
+    if(unroll != null) {
+      final Expr func = coerceFunc(2, cc);
+      Expr expr = init;
+      if(left) {
+        for(final Expr ex : unroll) {
+          expr = new DynFuncCall(info, func, expr, ex).optimize(cc);
         }
-        return expr;
+      } else {
+        for(int es = unroll.size() - 1; es >= 0; es--) {
+          expr = new DynFuncCall(info, func, unroll.get(es), expr).optimize(cc);
+        }
       }
+      return expr;
     }
     return this;
   }
@@ -120,7 +117,7 @@ public class FnFoldLeft extends StandardFunc {
         SeqType.ITEM_O : ist.with(Occ.EXACTLY_ONE);
       SeqType st = zst, ost;
       do {
-        final SeqType[] types = { left ? st : i1t, left ? i1t : st, SeqType.INTEGER_O };
+        final SeqType[] types = { left ? st : i1t, left ? i1t : st };
         arg(2, arg -> refineFunc(action, cc, types));
         ost = st;
         st = st.union(arg(2).funcType().declType);
