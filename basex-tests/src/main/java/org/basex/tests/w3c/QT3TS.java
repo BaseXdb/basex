@@ -470,6 +470,21 @@ public final class QT3TS extends Main {
     "('schema-location-hint', 'schemaImport', 'schemaValidation', " +
     "'staticTyping', 'typedData', 'XQUpdate', 'fn-transform-XSLT')";
 
+  /** Tests cases to be skipped due to deviations from the spec. */
+  private static final String DEVIATIONS = "(" +
+    // positional args of fold functions - removed in https://github.com/qt4cg/qtspecs/pull/1867
+    "'Keywords-array-fold-left-1', 'Keywords-array-fold-right-1', " +
+    "'Keywords-fn-fold-left-1', 'Keywords-fn-fold-right-1', " +
+    // else of braced if - removed in https://github.com/qt4cg/qtspecs/pull/1712
+    "'CondExpr-Braced-002', 'CondExpr-Braced-003', 'CondExpr-Braced-004', 'CondExpr-Braced-005', " +
+    "'CondExpr-Braced-006', 'CondExpr-Braced-007', 'CondExpr-Braced-008', 'CondExpr-Braced-009', " +
+    "'CondExpr-Braced-010', 'CondExpr-Braced-011', 'CondExpr-Braced-012', 'CondExpr-Braced-013', " +
+    "'CondExpr-Braced-014', 'CondExpr-Braced-015', 'CondExpr-Braced-016', 'CondExpr-Braced-017', " +
+    "'CondExpr-Braced-018', 'CondExpr-Braced-020', 'CondExpr-Braced-021', 'CondExpr-Braced-022', " +
+    "'K-CondExpr-Braced-7', 'braced-if-001', 'braced-if-004', 'braced-if-005', 'braced-if-006', " +
+    "'braced-if-007', 'braced-if-008'" +
+    ")";
+
   /**
    * Checks if the current test case is supported.
    * @param test test case
@@ -490,7 +505,9 @@ public final class QT3TS extends Main {
       "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)'))" +
-    "]";
+      "]," +
+      // skip tests where BaseX implementation deviates from the spec
+      "@name[. = " + DEVIATIONS + "]";
     return new XQuery(query, ctx).context(test).value().size() == 0;
   }
 
