@@ -482,7 +482,13 @@ public final class QT3TS extends Main {
     "'CondExpr-Braced-014', 'CondExpr-Braced-015', 'CondExpr-Braced-016', 'CondExpr-Braced-017', " +
     "'CondExpr-Braced-018', 'CondExpr-Braced-020', 'CondExpr-Braced-021', 'CondExpr-Braced-022', " +
     "'K-CondExpr-Braced-7', 'braced-if-001', 'braced-if-004', 'braced-if-005', 'braced-if-006', " +
-    "'braced-if-007', 'braced-if-008'" +
+    "'braced-if-007', 'braced-if-008', " +
+    // reserved keywords in computed node constructors - still being discussed in
+    // https://github.com/qt4cg/qtspecs/issues/1528
+    "'K2-ComputeConAttr-65', 'K2-ComputeConAttr-66', 'K2-ComputeConAttr-72', " +
+    "'K2-ComputeConElem-20', 'K2-ComputeConElem-21', 'K2-ComputeConElem-25', 'nscons-047', " +
+    "'nscons-048', 'K2-ComputeConPI-16', 'K2-ComputeConPI-17', 'K2-ForExprWithout-42a', " +
+    "'K2-ForExprWithout-43a', 'K2-ForExprWithout-44a'" +
     ")";
 
   /**
