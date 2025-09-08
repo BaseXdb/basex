@@ -1748,7 +1748,11 @@ public class QueryParser extends InputParser {
         }
       }
       for(final OpG c : OpG.values()) {
-        if(wsConsumeWs(c.name)) return new CmpG(info(), expr, check(ftContains(), CMPEXPR), c);
+        if(wsConsume(c.name)) {
+          if(c == OpG.LT && current('?')) throw error(CMPEXPR); // longest token rule asks for "<?"
+          skipWs();
+          return new CmpG(info(), expr, check(ftContains(), CMPEXPR), c);
+        }
       }
     }
     return expr;
