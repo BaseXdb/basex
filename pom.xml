@@ -144,6 +144,18 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
+        <groupId>org.eclipse.jetty.compression</groupId>
+        <artifactId>jetty-compression-server</artifactId>
+        <version>${jettyVersion}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.compression</groupId>
+        <artifactId>jetty-compression-gzip</artifactId>
+        <version>${jettyVersion}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>2.0.17</version>
