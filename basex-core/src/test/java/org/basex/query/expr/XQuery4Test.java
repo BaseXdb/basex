@@ -57,13 +57,13 @@ public final class XQuery4Test extends SandboxTest {
   /** Method call. */
   @Test public void methodCall() {
     final String rect = "{ 'height': 3, 'width': 4, 'area': fn { ?height × ?width } }";
-    query(rect + "?>area()", 12);
+    query(rect + "=?>area()", 12);
     query(rect + "?area instance of fn() as item()*", false);
     query(rect + "('area') instance of fn(item()*) as item()*", true);
 
     query("declare record local:rect(height, width, area := fn { ?height × ?width }); "
-        + "let $r := local:rect(3, 4) return local:rect(5, 6, $r?area)?>area()", 30);
-    query("{ 'self': fn { . } }?>self() => map:keys()", "self");
+        + "let $r := local:rect(3, 4) return local:rect(5, 6, $r?area)=?>area()", 30);
+    query("{ 'self': fn { . } }=?>self() => map:keys()", "self");
     query("let $f := fn {trace(., \"context\")?i}\n"
         + "let $g := ({ 'i': 7, 'f': $f }, { 'i': 11, 'g': $f })\n"
         + "let $h := $g?('f', 'g')\n"
