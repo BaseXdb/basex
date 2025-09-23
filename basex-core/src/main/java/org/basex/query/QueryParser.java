@@ -2503,7 +2503,7 @@ public class QueryParser extends InputParser {
             wsCheck("]");
           } while(wsConsume("?["));
           expr = new StructFilter(info(), expr, el.finish());
-        } else if(consume("?>")) {
+        } else if(consume("=?>")) {
           expr = methodCall(expr);
         } else if(current('(')) {
           expr = Functions.dynamic(expr, argumentList(false, null));
