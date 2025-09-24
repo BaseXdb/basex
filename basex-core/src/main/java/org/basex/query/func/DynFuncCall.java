@@ -72,7 +72,14 @@ public final class DynFuncCall extends FuncCall {
     if(ft != null) {
       if(ft.argTypes != null) {
         final int arity = ft.argTypes.length;
-        if(nargs != arity) throw arityError(func, nargs, arity, false, info);
+        if(nargs != arity) {
+          Expr funcItem = func;
+          if(func instanceof VarRef ref) {
+            final Expr expr = ref.var.expr();
+            if(expr instanceof FuncItem) funcItem = expr;
+          }
+          throw arityError(funcItem, nargs, arity, false, info);
+        }
       }
       if(!sc().mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);

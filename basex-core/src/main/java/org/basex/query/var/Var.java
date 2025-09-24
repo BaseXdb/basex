@@ -94,6 +94,14 @@ public final class Var extends ExprInfo {
   }
 
   /**
+   * Returns the input expression.
+   * @return input expression (can be {@code null} if not yet set)
+   */
+  public Expr expr() {
+    return ex;
+  }
+
+  /**
    * Returns the result size.
    * @return result size
    */

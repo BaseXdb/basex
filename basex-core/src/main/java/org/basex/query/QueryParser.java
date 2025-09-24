@@ -2506,7 +2506,7 @@ public class QueryParser extends InputParser {
         } else if(consume("=?>")) {
           expr = methodCall(expr);
         } else if(current('(')) {
-          expr = Functions.dynamic(expr, argumentList(false, null));
+          expr = dynamicFunctionCall(expr);
         } else if(current('?')) {
           expr = lookup(expr);
           if(expr == null) break;
@@ -2551,6 +2551,25 @@ public class QueryParser extends InputParser {
     final FuncBuilder fb = argumentList(false, arg);
     if(fb.placeholders != 0) throw error(INVPLACEHOLDER_X, key);
     final Lookup func = new Lookup(info, arg, key);
+    final Expr call = Functions.dynamic(func, fb);
+    final GFLWOR gflwor = new GFLWOR(info, fr, call);
+    localVars.closeScope(s);
+    return gflwor;
+  }
+
+  /**
+   * Parses the "DynamicFunctionCall" rule.
+   * @param expr expression
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr dynamicFunctionCall(final Expr expr) throws QueryException {
+    final InputInfo info = info();
+    final FuncBuilder fb = argumentList(false, null);
+    if(expr.seqType().one()) return Functions.dynamic(expr, fb);
+    final int s = localVars.openScope();
+    final For fr = new For(localVars.add(new Var(new QNm("fn"), null, qc, info)), expr);
+    final VarRef func = new VarRef(info, fr.var);
     final Expr call = Functions.dynamic(func, fb);
     final GFLWOR gflwor = new GFLWOR(info, fr, call);
     localVars.closeScope(s);
