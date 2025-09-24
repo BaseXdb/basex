@@ -42,6 +42,8 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_ALLOW_DUPLICATE_NAMES("allow-duplicate-names(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
+  _OUTPUT_BINARY("binary(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
   _OUTPUT_BYTE_ORDER_MARK("byte-order-mark(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_CDATA_SECTION_ELEMENTS("cdata-section-elements(value)", params(STRING), OUTPUT_URI),
@@ -54,6 +56,8 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_ENCODING("encoding(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
+  _OUTPUT_ESCAPE_SOLIDUS("escape-solidus(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
   _OUTPUT_ESCAPE_URI_ATTRIBUTES("escape-uri-attributes(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_HTML_VERSION("html-version(value)", params(STRING), OUTPUT_URI),
@@ -62,13 +66,19 @@ public enum Annotation {
   /** XQuery annotation. */
   _OUTPUT_INDENT("indent(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
+  _OUTPUT_INDENT_ATTRIBUTES("indent-attributes(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
   _OUTPUT_INDENTS("indents(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_ITEM_SEPARATOR("item-separator(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_JSON("json(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
+  _OUTPUT_JSON_LINES("json-lines(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
   _OUTPUT_JSON_NODE_OUTPUT_METHOD("json-node-output-method(value)", params(STRING), OUTPUT_URI),
+  /** XQuery annotation. */
+  _OUTPUT_LIMIT("limit(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
   _OUTPUT_MEDIA_TYPE("media-type(value)", params(STRING), OUTPUT_URI),
   /** XQuery annotation. */
