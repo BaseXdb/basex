@@ -101,11 +101,11 @@ public final class HigherOrderTest extends SandboxTest {
 
   /**  Test for invalid function expressions. */
   @Test public void invalidFunTest() {
-    error("()()", INVFUNCITEM_X_X);
     error("1()", INVFUNCITEM_X_X);
     error("1.0()", INVFUNCITEM_X_X);
     error("1e0()", INVFUNCITEM_X_X);
     error("'x'()", INVFUNCITEM_X_X);
+    error("(true#0, 2)()", INVFUNCITEM_X_X);
   }
 
   /**  Tests the creation of a cast function as function item. */

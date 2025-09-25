@@ -10,6 +10,8 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.List;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -67,6 +69,21 @@ public final class DynFuncCall extends FuncCall {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr func = body();
 
+    // ()()  ->  ()
+    if(func.seqType().zero()) return func;
+
+    // unroll calls with multiple functions
+    // example: (true#0, false#0)()  ->  true#0(), false#0()
+    final ExprList unroll = cc.unroll(func, false);
+    if(unroll != null) {
+      final ExprList results = new ExprList(unroll.size());
+      for(final Expr ex : unroll) {
+        results.add(new DynFuncCall(info, ex, Arrays.copyOf(exprs, exprs.length - 1)).optimize(cc));
+      }
+      return List.get(cc, info, results.finish());
+    }
+
+    // assign function type
     final int nargs = exprs.length - 1;
     final FuncType ft = func.funcType();
     if(ft != null) {
@@ -99,12 +116,55 @@ public final class DynFuncCall extends FuncCall {
           cc.inlined.pop();
         }
       }
-    } else if(func instanceof Value) {
-      // raise error (values tested at this stage are no functions)
-      throw INVFUNCITEM_X_X.get(info, func.seqType(), func);
     }
-
     return this;
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Item item : body().value(qc)) {
+      vb.add(eval(item, qc));
+    }
+    return vb.value(this);
+  }
+
+  @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    return new Iter() {
+      final Iter iter = body().iter(qc);
+      Iter value;
+
+      @Override
+      public Item next() throws QueryException {
+        while(true) {
+          if(value == null) {
+            final Item item = iter.next();
+            if(item == null) return null;
+            value = eval(item, qc).iter();
+          }
+          final Item item = value.next();
+          if(item != null) return item;
+          value = null;
+        }
+      }
+    };
+  }
+
+  /**
+   * Evaluates a function item.
+   * @param item function to be evaluated
+   * @param qc query context
+   * @return the function
+   * @throws QueryException query exception
+   */
+  Value eval(final Item item, final QueryContext qc) throws QueryException {
+    if(!(item instanceof final FItem func)) throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
+
+    checkUp(func, updating);
+    final int nargs = exprs.length - 1, arity = func.arity();
+    if(nargs != arity) throw arityError(func, nargs, arity, false, info);
+    return evalFunc(func, qc);
   }
 
   @Override
@@ -127,17 +187,6 @@ public final class DynFuncCall extends FuncCall {
     final int last = copy.length - 1;
     final Expr[] args = Arrays.copyOf(copy, last);
     return copyType(new DynFuncCall(info, updating, ndt, copy[last], args));
-  }
-
-  @Override
-  FItem evalFunc(final QueryContext qc) throws QueryException {
-    final Item item = body().item(qc, info);
-    if(!(item instanceof final FItem func)) throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
-
-    checkUp(func, updating);
-    final int nargs = exprs.length - 1, arity = func.arity();
-    if(nargs != arity) throw arityError(func, nargs, arity, false, info);
-    return func;
   }
 
   @Override

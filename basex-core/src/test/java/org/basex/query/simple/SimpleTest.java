@@ -125,8 +125,6 @@ public final class SimpleTest extends QueryTest {
       { "Seq 3", integers(1, 2), "((( 1, 2 )  )    )" },
       { "Seq 4", integers(1, 2, 3), "(1, (( 2,3 )  )    )" },
       { "Seq 5", integers(1, 2, 3, 4), "(1, (( 2,3 )  ),4   )" },
-      { "Seq 6", "()()" },
-      { "Seq 7", "() ()" },
 
       { "IntersectExcept 1", emptySequence(), "<a/> intersect <b/>" },
       { "IntersectExcept 2", emptySequence(), "<a/> intersect <b/> except <c/>" },

@@ -9,6 +9,7 @@ import org.basex.query.expr.path.*;
 import org.basex.query.func.map.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -806,5 +807,43 @@ public final class XQuery4Test extends SandboxTest {
       ["1",("2","3","4","5","6"),1]
       ["1",("2","3","4","5","6"),2]
       ["1",("2","3","4","5","6"),3]""");
+  }
+
+  /** Calls of dynamic function sequences. */
+  @Test public void dynamicFunctionSequences() {
+    // empty sequences
+    query("()()", "");
+    query("()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()", "");
+    query("(true#0[. instance of xs:integer])()", "");
+
+    // non-empty sequences
+    query("((), true#0)()", "true");
+    query("(true#0, true#0)()", "true\ntrue");
+    query("((true#0, 1, true#0)[. instance of fn(*)])()", "true\ntrue");
+    query("(substring-before(?, 'b'), substring-before(?, 'c'))('abc')", "a\nab");
+    query("(tokenize#1, string-length#1)('a b')", "a\nb\n3");
+
+    // arrow expression
+    query("'|' => (substring-before('ab|yz', ?), substring-after('ab|yz', ?))()", "ab\nyz");
+    query("'|' =!> (substring-before('ab|yz', ?), substring-after('ab|yz', ?))()", "ab\nyz");
+    query("'ab|yz' ! ('|' => (substring-before(., ?), substring-after(., ?))())", "ab\nyz");
+
+    // maps and arrays
+    query("{ 'a': (count#1, sum#1) }('a')(2)", "1\n2");
+    query("{ 'a': (count#1, sum#1) }?a(2)", "1\n2");
+    query("{ 'count': count#1, 'sum': sum#1  }?*(2)", "1\n2");
+    query("[ (count#1, sum#1) ](1)(2)", "1\n2");
+    query("[ (count#1, sum#1) ]?1(2)", "1\n2");
+
+    // ensure that iterative evaluation will ignore invalid input
+    query("head((true#0, 1)())", "true");
+
+    // ensure that single functions are optimized when sequence is unrolled
+    unroll(true);
+    inline(true);
+    check("(true#0, false#0)()", "true\nfalse", root(BlnSeq.class));
+    check("((true#0, 1, false#0)[. instance of fn(*)])()", "true\nfalse", root(BlnSeq.class));
+    check("(substring-before(?, 'b'), substring-before(?, 'c'))('abc')", "a\nab",
+        root(StrSeq.class));
   }
 }
