@@ -18,12 +18,6 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class InlineTest extends SandboxTest {
-  /** Resets optimizations. */
-  @BeforeEach public void init() {
-    inline(false);
-    unroll(false);
-  }
-
   /** Tests if inlining works in {@link Arith} expressions. */
   @Test public void plusTest() {
     check("let $x := 21 return $x + 21", 42, empty(GFLWOR.class));

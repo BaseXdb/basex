@@ -36,8 +36,6 @@ public final class RewritingsTest extends SandboxTest {
   /** Drops the database, resets optimizations. */
   @AfterEach public void tearDown() {
     execute(new DropDB(NAME));
-    inline(false);
-    unroll(false);
   }
 
   /** Checks if the count function is pre-compiled. */
@@ -2635,6 +2633,13 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Comparisons with boolean lists. */
   @Test public void gh2060() {
+    check("for $a in 1 to 6 "
+        + "let $b := boolean($a mod 2) "
+        + "let $c := boolean($a mod 3) "
+        + "return every $d in ($b, $c) satisfies $d",
+        "true\nfalse\nfalse\nfalse\ntrue\nfalse",
+        root(DualMap.class), exists(And.class));
+
     unroll(true);
     check("some $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(Or.class));
     check("every $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(And.class));
@@ -2643,14 +2648,6 @@ public final class RewritingsTest extends SandboxTest {
         + "where every $b in (1, 2) satisfies $a/* = $b "
         + "return $a/b/text()",
         1, empty(NOT), empty(And.class), count(CmpG.class, 2));
-    unroll(false);
-
-    check("for $a in 1 to 6 "
-        + "let $b := boolean($a mod 2) "
-        + "let $c := boolean($a mod 3) "
-        + "return every $d in ($b, $c) satisfies $d",
-        "true\nfalse\nfalse\nfalse\ntrue\nfalse",
-        root(DualMap.class), exists(And.class));
   }
 
   /** XQuery, simple map and filter expressions: Unroll lists. */

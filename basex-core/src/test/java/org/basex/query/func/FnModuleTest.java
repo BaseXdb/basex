@@ -19,7 +19,6 @@ import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,12 +33,6 @@ public final class FnModuleTest extends SandboxTest {
   /** Months. */
   private static final String MONTHS = " ('January', 'February', 'March', 'April', 'May', "
       + "'June', 'July', 'August', 'September', 'October', 'November', 'December')";
-
-  /** Resets optimizations. */
-  @AfterEach public void init() {
-    inline(false);
-    unroll(false);
-  }
 
   /** Test method. */
   @Test public void abs() {

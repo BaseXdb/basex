@@ -12,12 +12,6 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class HofModuleTest extends SandboxTest {
-  /** Resets optimizations. */
-  @AfterEach public void init() {
-    inline(false);
-    unroll(false);
-  }
-
   /** Test method. */
   @Test public void foldLeft1() {
     final Function func = _HOF_FOLD_LEFT1;

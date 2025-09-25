@@ -13,12 +13,6 @@ import org.junit.jupiter.api.*;
  * @author Leo Woerteler
  */
 public final class HigherOrderTest extends SandboxTest {
-  /** Resets optimizations. */
-  @AfterEach public void init() {
-    inline(false);
-    unroll(false);
-  }
-
   /**
    * Test for name shadowing.
    */

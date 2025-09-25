@@ -27,12 +27,6 @@ public final class IndexOptimizeTest extends SandboxTest {
     set(MainOptions.QUERYINFO, true);
   }
 
-  /** Resets optimizations. */
-  @AfterEach public void init() {
-    inline(false);
-    unroll(false);
-  }
-
   /** Checks the open command. */
   @Test public void openDocTest() {
     createDoc();

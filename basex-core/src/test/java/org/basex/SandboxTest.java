@@ -23,4 +23,10 @@ public abstract class SandboxTest extends Sandbox {
   @AfterAll public static void finishTests() {
     finishSandbox();
   }
+
+  /** Resets optimizations. */
+  @AfterEach public void resetOptions() {
+    inline(false);
+    unroll(false);
+  }
 }

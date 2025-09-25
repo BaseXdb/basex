@@ -13,12 +13,6 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class UpdateModuleTest extends SandboxTest {
-  /** Resets optimizations. */
-  @AfterEach public void init() {
-    inline(false);
-    unroll(false);
-  }
-
   /** Test method. */
   @Test public void apply() {
     final Function func = _UPDATE_APPLY;
