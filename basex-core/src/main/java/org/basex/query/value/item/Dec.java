@@ -172,14 +172,12 @@ public final class Dec extends ANum {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-
-    if(!transitive && (item instanceof Dbl || item instanceof Flt))
-      return -item.compare(this, coll, transitive, ii);
-
-    final double n = item.dbl(ii);
     if(transitive) {
+      final double n = item.dbl(ii);
       if(n == Double.NEGATIVE_INFINITY || Double.isNaN(n)) return 1;
       if(n == Double.POSITIVE_INFINITY) return -1;
+    } else if(item instanceof Dbl || item instanceof Flt) {
+      return -item.compare(this, coll, transitive, ii);
     }
     return value.compareTo(item.dec(ii));
   }
