@@ -103,8 +103,7 @@ abstract class TextDecoder {
     int read(final TextInput ti) throws IOException {
       int cp = ti.readByte();
       if(cp < 0x80) return cp;
-      if(cp < 0xC0) return invalid(false, (byte) cp);
-
+      if(cp < 0xC2 || cp > 0xF4) return invalid(false, (byte) cp);
       final int cl = Token.cl((byte) cp);
       final byte[] bytes = new byte[cl];
       bytes[0] = (byte) cp;
