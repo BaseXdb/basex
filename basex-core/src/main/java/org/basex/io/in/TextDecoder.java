@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.util.*;
 
@@ -49,6 +50,33 @@ abstract class TextDecoder {
   }
 
   /**
+   * Reads a UTF-16 codepoint.
+   * @param ti text input
+   * @param be low/big endian
+   * @return codepoint
+   * @throws IOException I/O exception
+   */
+  final int readUTF16(final TextInput ti, final boolean be) throws IOException {
+    final int a = ti.readByte();
+    if(a < 0) return a;
+    final int b = ti.readByte();
+    if(b < 0) return invalid(true, (byte) a);
+
+    final int cp = be ? a << 8 | b : a | b << 8;
+    if(cp < 0xD800 || cp > 0xDFFF) return cp;
+    if(cp >= 0xDC00 && cp <= 0xDFFF) return invalid(true, (byte) a, (byte) b);
+
+    final int c = ti.readByte();
+    if(c < 0) return invalid(true, (byte) a, (byte) b);
+    final int d = ti.readByte();
+    if(d < 0) return invalid(true, (byte) a, (byte) b, (byte) c);
+
+    final int l = be ? c << 8 | d : c | d << 8;
+    if(l < 0xDC00 || l > 0xDFFF) return invalid(true, (byte) a, (byte) b, (byte) c, (byte) d);
+    return 0x10000 + ((cp & 0x3FF) << 10) + (l & 0x3FF);
+  }
+
+  /**
    * Throws an exception for an incomplete codepoint or returns the replacement character (\\uFFFD).
    * @param incomplete add placeholder for missing byte
    * @param bytes bytes
@@ -58,10 +86,10 @@ abstract class TextDecoder {
   final int invalid(final boolean incomplete, final byte... bytes) throws IOException {
     if(validate) {
       final TokenBuilder tb = new TokenBuilder();
+      final IntUnaryOperator toHex = c -> c + (c > 9 ? '7' : '0');
       for(final int b : bytes) {
         if(!tb.isEmpty()) tb.add(", ");
-        final int c = b >> 4 & 0x0F, d = b & 0x0F;
-        tb.add(c + (c > 9 ? '7' : '0')).add(d + (d > 9 ? '7' : '0'));
+        tb.add(toHex.applyAsInt(b >> 4 & 0x0F)).add(toHex.applyAsInt(b & 0x0F));
       }
       if(incomplete) tb.add(", ??");
       throw new DecodingException("Invalid " + encoding + " character encoding: " + tb);
@@ -71,22 +99,21 @@ abstract class TextDecoder {
 
   /** UTF8 Decoder. */
   private static final class UTF8 extends TextDecoder {
-    /** UTF8 cache. */
-    private final byte[] cache = new byte[4];
-
     @Override
     int read(final TextInput ti) throws IOException {
-      int ch = ti.readByte();
-      if(ch < 0x80) return ch;
-      if(ch < 0xC0) return invalid(false, (byte) ch);
-      cache[0] = (byte) ch;
-      final int cl = Token.cl((byte) ch);
+      int cp = ti.readByte();
+      if(cp < 0x80) return cp;
+      if(cp < 0xC0) return invalid(false, (byte) cp);
+
+      final int cl = Token.cl((byte) cp);
+      final byte[] bytes = new byte[cl];
+      bytes[0] = (byte) cp;
       for(int c = 1; c < cl; ++c) {
-        ch = ti.readByte();
-        cache[c] = (byte) ch;
-        if(ch < 0x80) return invalid(ch < 0, Arrays.copyOf(cache, ch < 0 ? c : c + 1));
+        cp = ti.readByte();
+        bytes[c] = (byte) cp;
+        if(cp < 0x80) return invalid(cp < 0, Arrays.copyOf(bytes, cp < 0 ? c : c + 1));
       }
-      return Token.cp(cache, 0);
+      return Token.cp(bytes, 0);
     }
   }
 
@@ -94,11 +121,7 @@ abstract class TextDecoder {
   private static final class UTF16LE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
-      final int a = ti.readByte();
-      if(a < 0) return a;
-      final int b = ti.readByte();
-      if(b < 0) return invalid(true, (byte) a);
-      return a | b << 8;
+      return readUTF16(ti, false);
     }
   }
 
@@ -106,11 +129,7 @@ abstract class TextDecoder {
   private static final class UTF16BE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
-      final int a = ti.readByte();
-      if(a < 0) return a;
-      final int b = ti.readByte();
-      if(b < 0) return invalid(true, (byte) a);
-      return a << 8 | b;
+      return readUTF16(ti, true);
     }
   }
 
