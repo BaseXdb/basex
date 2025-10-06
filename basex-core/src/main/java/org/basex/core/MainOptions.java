@@ -3,12 +3,16 @@ package org.basex.core;
 import java.util.*;
 import java.util.stream.*;
 
+import javax.xml.transform.*;
+
 import org.basex.build.csv.*;
 import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
+import org.w3c.dom.ls.*;
+import org.xml.sax.*;
 
 /**
  * This class contains database options which are used all around the project.
@@ -72,7 +76,7 @@ public final class MainOptions extends Options {
   public static final BooleanOption XSILOCATION = new BooleanOption("XSILOCATION", true);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", false);
-  /** Path to XML Catalog file. */
+  /** Path to XML Catalog files. */
   public static final StringOption CATALOG = new StringOption("CATALOG", "");
 
   // Adding documents
@@ -250,6 +254,9 @@ public final class MainOptions extends Options {
     }
   }
 
+  /** Resolver instance (lazy instantiation). */
+  private XMLResolver resolver;
+
   /**
    * Default constructor.
    */
@@ -271,6 +278,7 @@ public final class MainOptions extends Options {
    */
   public MainOptions(final MainOptions options) {
     super(options);
+    resolver = options.resolver;
   }
 
   /**
@@ -281,6 +289,7 @@ public final class MainOptions extends Options {
   public MainOptions(final MainOptions options, final boolean xml) {
     this(false);
     for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
+    resolver = options.resolver;
   }
 
   /**
@@ -293,5 +302,35 @@ public final class MainOptions extends Options {
       final Object value = options.get(source);
       if(value != null) put(target, value);
     });
+  }
+
+  /**
+   * Assigns a resolver, which implements the {@link EntityResolver}, {@link LSResourceResolver},
+   *   and {@link URIResolver} interfaces.
+   * @param rslvr resolver
+   * @throws BaseXException resolver does not implement all required interfaces
+   */
+  public void setResolver(final Object rslvr) throws BaseXException {
+    resolver = new XMLResolver(rslvr);
+  }
+
+  /**
+   * Assigns the XML resolver from the specified options.
+   * @param options main options
+   */
+  public void setResolver(final MainOptions options) {
+    final XMLResolver rslvr = options.resolver;
+    put(CATALOG, rslvr.catalog());
+    resolver = rslvr;
+  }
+
+  /**
+   * Returns an XML resolver.
+   * @return XML resolver
+   */
+  public XMLResolver resolver() {
+    final String catalog = get(CATALOG);
+    if(resolver == null || !catalog.equals(resolver.catalog())) resolver = new XMLResolver(catalog);
+    return resolver;
   }
 }

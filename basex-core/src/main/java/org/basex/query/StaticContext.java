@@ -74,7 +74,7 @@ public final class StaticContext {
     final MainOptions mopts = qc.context.options;
     mixUpdates = mopts.get(MainOptions.MIXUPDATES);
     withdb = mopts.get(MainOptions.WITHDB);
-    uriResolver = Resolver.uris(mopts);
+    uriResolver = mopts.resolver().uriResolver();
   }
 
   /**

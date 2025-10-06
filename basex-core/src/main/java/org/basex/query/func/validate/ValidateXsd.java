@@ -90,7 +90,7 @@ public class ValidateXsd extends ValidateFn {
           }
           sf.setErrorHandler(this);
 
-          final LSResourceResolver ls = Resolver.resources(qc.context.options);
+          final LSResourceResolver ls = qc.context.options.resolver().lsResourceResolver();
           if(ls != null) sf.setResourceResolver(ls);
 
           // assign parser features

@@ -7,7 +7,6 @@ import javax.xml.parsers.*;
 import javax.xml.validation.*;
 
 import org.basex.core.*;
-import org.basex.util.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
@@ -83,7 +82,7 @@ public final class XmlParser {
     f.setXIncludeAware(xinclude);
     if(xsdValidation) {
       final SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      sf.setResourceResolver(Resolver.resources(options));
+      sf.setResourceResolver(options.resolver().lsResourceResolver());
       f.setSchema(sf.newSchema());
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
