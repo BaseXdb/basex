@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import java.net.*;
+import java.util.*;
 
 import javax.xml.catalog.*;
 import javax.xml.transform.*;
@@ -69,9 +70,10 @@ public final class Resolver {
         return Reflect.get(Reflect.find(resolver, configuration), conf);
       }
       // return JDK 11 resolver
-      final URI uri = URI.create(IO.get(catalog).url());
+      final ArrayList<URI> uris = new ArrayList<>();
+      for(final String cat : Strings.split(catalog, ';')) uris.add(URI.create(IO.get(cat).url()));
       final CatalogFeatures cf = CatalogFeatures.defaults();
-      return CatalogManager.catalogResolver(CatalogManager.catalog(cf, uri));
+      return CatalogManager.catalogResolver(CatalogManager.catalog(cf, uris.toArray(URI[]::new)));
     }
     return null;
   }
