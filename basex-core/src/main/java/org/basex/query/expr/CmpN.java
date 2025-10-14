@@ -46,6 +46,22 @@ public final class CmpN extends Cmp {
       }
     },
 
+    /** Node comparison: follows-or-is. */
+    LE("precedes-or-is") {
+      @Override
+      public boolean eval(final ANode node1, final ANode node2) {
+        return node1.compare(node2) <= 0;
+      }
+    },
+
+    /** Node comparison: follows-or-is. */
+    GE("follows-or-is") {
+      @Override
+      public boolean eval(final ANode node1, final ANode node2) {
+        return node1.compare(node2) >= 0;
+      }
+    },
+
     /** Node comparison: follows. */
     GT(">>", "follows") {
       @Override
