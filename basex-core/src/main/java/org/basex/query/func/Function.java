@@ -773,14 +773,14 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
   /** XQuery function. */
   _MAP_FILTER(MapFilter::new, "filter(map,predicate)",
-      params(MAP_O, FuncType.get(BOOLEAN_ZO, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
+      params(MAP_O, FuncType.get(BOOLEAN_ZO, ANY_ATOMIC_TYPE_O, ITEM_ZM, INTEGER_O).seqType()),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_FIND(MapFind::new, "find(input,key)",
       params(ITEM_ZM, ANY_ATOMIC_TYPE_O), ARRAY_O, MAP_URI),
   /** XQuery function. */
   _MAP_FOR_EACH(MapForEach::new, "for-each(map,action)",
-      params(MAP_O, FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
+      params(MAP_O, FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O, ITEM_ZM, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_GET(MapGet::new, "get(map,key[,default])",
