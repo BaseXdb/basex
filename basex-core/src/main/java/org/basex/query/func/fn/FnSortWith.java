@@ -1,5 +1,7 @@
 package org.basex.query.func.fn;
 
+import static org.basex.query.QueryError.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -23,6 +25,7 @@ public final class FnSortWith extends StandardFunc {
   public Value value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
     final Value comparators = arg(1).value(qc);
+    if(comparators.isEmpty()) throw EMPTYFOUND.get(info);
 
     final FItem[] cmps = new FItem[(int) comparators.size()];
     int c = 0;
@@ -54,7 +57,7 @@ public final class FnSortWith extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     // even single items must be sorted, as the input might be invalid
     final Expr input = arg(0);
-    return input.seqType().zero() ? input : adoptType(input);
+    return adoptType(input);
   }
 
   @Override

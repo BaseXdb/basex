@@ -626,7 +626,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, MAP_ZM), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   SORT_WITH(FnSortWith::new, "sort-with(input,comparators)",
-      params(ITEM_ZM, FuncType.get(INTEGER_O, ITEM_O, ITEM_O).seqType(Occ.ZERO_OR_MORE)),
+      params(ITEM_ZM, FuncType.get(INTEGER_O, ITEM_O, ITEM_O).seqType(Occ.ONE_OR_MORE)),
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   STARTS_WITH(FnStartsWith::new, "starts-with(value,substring[,collation])",
