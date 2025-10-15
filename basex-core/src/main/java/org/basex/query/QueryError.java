@@ -1070,6 +1070,8 @@ public enum QueryError {
   INVALIDCAST_X(XPST, 80, "Invalid cast type: %."),
   /** Error code. */
   NOURI_X(XPST, 81, "Namespace prefix not declared: %."),
+  /** Error code. */
+  PREFIXNOURI_X(XPST, 154, "QName includes prefix, but no URI: %."),
 
   /** Error code. */
   JAVANOINSTANCE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
