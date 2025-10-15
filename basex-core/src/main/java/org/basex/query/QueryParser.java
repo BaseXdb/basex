@@ -84,6 +84,8 @@ public class QueryParser extends InputParser {
   private final ArrayList<StaticVar> vars = new ArrayList<>();
   /** Parsed functions. */
   private final ArrayList<StaticFunc> funcs = new ArrayList<>();
+  /** Function references. */
+  private final ArrayList<FuncRef> funcRefs = new ArrayList<>();
   /** Types. */
   private final QNmMap<SeqType> declaredTypes = new QNmMap<>();
   /** Public types. */
@@ -269,6 +271,13 @@ public class QueryParser extends InputParser {
     qnames.assignURI(this, 0);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
+
+    for (final FuncRef fr : funcRefs) fr.resolve(qc);
+
+    if(qc.contextValue != null) {
+      final Expr ctx = qc.contextValue.expr;
+      if(!sc.mixUpdates && ctx.has(Flag.UPD)) throw error(UPCTX, ctx);
+    }
   }
 
   /**
@@ -559,7 +568,7 @@ public class QueryParser extends InputParser {
       sc.elemNS = uri.length == 0 ? null : uri;
     } else {
       if(!decl.add(FUNCTION)) throw error(DUPLNS);
-      sc.funcNS = uri.length == 0 ? null : uri;
+      sc.funcNS = uri;
     }
     return true;
   }
@@ -882,7 +891,6 @@ public class QueryParser extends InputParser {
     qc.contextValue = new ContextScope(expr, st, vs, sc, info(), docBuilder.toString());
 
     if(sc.module != null) throw error(DECITEM);
-    if(!sc.mixUpdates && expr.has(Flag.UPD)) throw error(UPCTX, expr);
   }
 
   /**
@@ -2030,7 +2038,7 @@ public class QueryParser extends InputParser {
           if(ex == null) ex = arrayConstructor();
           if(ex == null) ex = functionItem();
           if(ex == null) {
-            name = eQName(sc.funcNS, ARROWSPEC_X);
+            name = eQName(null, ARROWSPEC_X);
             if(reserved(name)) throw error(RESERVED_X, name.local());
           }
         }
@@ -2711,15 +2719,19 @@ public class QueryParser extends InputParser {
     if(!anns.isEmpty()) throw error(NOANN);
 
     // named function reference
-    final QNm name = eQName(sc.funcNS, null);
+    final QNm name = eQName(null, null);
     if(name != null && wsConsumeWs("#")) {
       final Expr num = numericLiteral(Integer.MAX_VALUE, false);
       if(reserved(name)) {
         if(num != null) throw error(RESERVED_X, name.local());
       } else {
         if(Function.ERROR.is(num)) return num;
-        if(num instanceof final Itr itr) return Functions.item(name, (int) itr.itr(), false,
-            info(), qc, moduleURIs.contains(name.uri()));
+        if(num instanceof final Itr itr) {
+          final FuncRef fr = new FuncRef(name, (int) itr.itr(), info(),
+              moduleURIs.contains(name.uri()));
+          funcRefs.add(fr);
+          return fr;
+        }
       }
     }
     pos = p;
@@ -2938,11 +2950,14 @@ public class QueryParser extends InputParser {
    */
   private Expr functionCall() throws QueryException {
     final int p = pos;
-    final QNm name = eQName(sc.funcNS, null);
+    final QNm name = eQName(null, null);
     if(name != null && !reserved(name)) {
       skipWs();
       if(current('(')) {
-        return Functions.get(name, argumentList(true, null), qc, moduleURIs.contains(name.uri()));
+        final FuncRef fr = new FuncRef(name, argumentList(true, null),
+            moduleURIs.contains(name.uri()));
+        funcRefs.add(fr);
+        return fr;
       }
     }
     pos = p;

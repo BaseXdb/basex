@@ -1256,8 +1256,6 @@ public enum QueryError {
   /** Error code. */
   WRONGMODULE_X_X_X(XQST, 59, "Imported module '%' has unexpected namespace: '%' vs '%'."),
   /** Error code. */
-  FUNNONS_X(XQST, 60, "Namespace needed for function '%'."),
-  /** Error code. */
   DUPLORD(XQST, 65, "Duplicate 'ordering' declaration."),
   /** Error code. */
   DUPLNS(XQST, 66, "Duplicate 'default namespace' declaration."),

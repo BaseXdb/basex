@@ -74,18 +74,20 @@ public final class Functions {
 
   /**
    * Creates a function call or a function item expression.
-   * @param name function name
+   * @param qnm function name
    * @param fb function arguments
    * @param qc query context
    * @param hasImport indicates whether a module import for the function name's URI was present
    * @return function call
    * @throws QueryException query exception
    */
-  public static Expr get(final QNm name, final FuncBuilder fb, final QueryContext qc,
+  public static Expr get(final QNm qnm, final FuncBuilder fb, final QueryContext qc,
       final boolean hasImport) throws QueryException {
 
     // partial function call?
-    if(fb.placeholders > 0) return dynamic(item(name, fb.arity, false, fb.info, qc, hasImport), fb);
+    if(fb.placeholders > 0) return dynamic(item(qnm, fb.arity, false, fb.info, qc, hasImport), fb);
+
+    final QNm name = funcName(qnm, fb.arity, fb.info, qc);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) return constructorCall(name, fb);
@@ -137,7 +139,7 @@ public final class Functions {
 
   /**
    * Creates a function item expression.
-   * @param name function name
+   * @param qnm function name
    * @param arity number of arguments
    * @param runtime {@code true} if this method is called at runtime
    * @param info input info (can be {@code null})
@@ -146,10 +148,11 @@ public final class Functions {
    * @return literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
-  public static Expr item(final QNm name, final int arity, final boolean runtime,
+  public static Expr item(final QNm qnm, final int arity, final boolean runtime,
       final InputInfo info, final QueryContext qc, final boolean hasImport) throws QueryException {
 
     final FuncBuilder fb = new FuncBuilder(info, arity, runtime);
+    final QNm name = funcName(qnm, arity, info, qc);
 
     // constructor function
     if(eq(name.uri(), XS_URI)) {
@@ -203,6 +206,24 @@ public final class Functions {
     final Closure closure = (Closure) item(call, fb, null, name, false, false);
     qc.functions.register(closure);
     return closure;
+  }
+
+  /**
+   * Returns the actual function name of a function call or named function reference. For an
+   * unprefixed name, the default function namespace is used, unless a matching function exists
+   * with no namespace.
+   * @param name function name
+   * @param arity number of arguments
+   * @param info input info (can be {@code null})
+   * @param qc query context
+   * @return function name
+   */
+  private static QNm funcName(final QNm name, final int arity, final InputInfo info,
+      final QueryContext qc) {
+
+    if(name.hasURI() || qc.functions.get(name, arity) != null) return name;
+    final StaticContext sc = info != null ? info.sc() : null;
+    return new QNm(name.local(), sc != null && sc.funcNS != null ? sc.funcNS : FN_URI);
   }
 
   /**
