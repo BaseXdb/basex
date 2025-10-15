@@ -3,7 +3,6 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 
 import java.util.*;
-import java.util.regex.*;
 
 import org.basex.data.*;
 import org.basex.query.value.item.*;
@@ -38,22 +37,22 @@ public final class IndexNames {
         return;
       }
 
-      final String uri, ln;
-      final Matcher m = QNm.EQNAME.matcher(entry);
-      if(m.find()) { // Q{uri}name, Q{uri}*
-        uri = m.group(1);
-        ln = m.group(2).equals("*") ? null : m.group(2);
+      final byte[] name, uri;
+      final byte[][] parsed = QNm.parseExpanded(token(entry), true);
+      if(parsed != null) { // Q{uri}name, Q{uri}*
+        name = parsed[0];
+        uri = parsed[1];
       } else if(entry.startsWith("*:")) { // *:name
+        name = token(entry.substring(2));
         uri = null;
-        ln = entry.substring(2);
       } else if(XMLToken.isNCName(token(entry))) { // name
-        uri = "";
-        ln = entry;
+        name = token(entry);
+        uri = EMPTY;
       } else { // invalid
         Util.debugln("Included name is invalid: %", entry);
         continue;
       }
-      qnames.add(ln == null ? null : token(ln), uri == null ? null : token(uri));
+      qnames.add(name == null ? null : name, uri == null ? null : uri);
     }
   }
 
