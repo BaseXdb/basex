@@ -689,7 +689,8 @@ public final class QT3TS extends Main {
   private String assertEq(final QT3Result result, final XdmValue expected) {
     final String exp = expected.getString();
     try {
-      final String query = "declare variable $returned external; $returned eq " + exp;
+      final String query = "declare variable $returned external; " +
+          "count($returned) = 1 and $returned eq " + exp;
       return environment(new XQuery(query, ctx), result.env).variable("$returned", result.value).
           value().getBoolean() ? null : exp;
     } catch(final XQueryException err) {
