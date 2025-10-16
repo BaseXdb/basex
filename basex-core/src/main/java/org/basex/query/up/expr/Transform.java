@@ -158,6 +158,6 @@ public final class Transform extends Copy {
       else more = true;
       qs.token(copy.var.id()).token(":=").token(copy.expr);
     }
-    qs.token(MODIFY).token(update()).token(RETURN).token(target());
+    qs.token(MODIFY).token(arg(update())).token(RETURN).token(arg(target()));
   }
 }
