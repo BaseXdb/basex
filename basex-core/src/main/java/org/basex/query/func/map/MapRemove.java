@@ -19,7 +19,7 @@ public final class MapRemove extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     XQMap map = toMap(arg(0), qc);
-    final Iter keys = arg(1).iter(qc);
+    final Iter keys = arg(1).atomIter(qc, info);
 
     for(Item item; (item = qc.next(keys)) != null;) {
       map = map.remove(toAtomItem(item, qc));

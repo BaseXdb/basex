@@ -2,8 +2,8 @@ package org.basex.query.func.util;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -19,12 +19,10 @@ public final class UtilStripNamespaces extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toNode(arg(0), qc);
-    final Iter iter = arg(1).iter(qc);
+    final Value names = arg(1).atomValue(qc, info);
 
-    final TokenSet prefixes = new TokenSet();
-    for(Item item; (item = qc.next(iter)) != null;) {
-      prefixes.add(toToken(item));
-    }
-    return DataBuilder.stripNamespaces(node, prefixes, qc.context, info);
+    final TokenSet set = new TokenSet(names.size());
+    for(final Item item : names) set.add(toToken(item));
+    return DataBuilder.stripNamespaces(node, set, qc.context, info);
   }
 }

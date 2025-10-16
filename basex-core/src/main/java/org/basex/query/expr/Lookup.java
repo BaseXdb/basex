@@ -1,5 +1,7 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.gflwor.*;
@@ -8,7 +10,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -20,15 +21,17 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Lookup extends ALookup {
+public final class Lookup extends Arr {
+  /** Wildcard string. */
+  public static final Str WILDCARD = Str.get('*');
+
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param modifier modifier
    * @param expr context expression and key specifier
    */
-  public Lookup(final InputInfo info, final Modifier modifier, final Expr... expr) {
-    super(info, modifier, expr);
+  public Lookup(final InputInfo info, final Expr... expr) {
+    super(info, SeqType.ITEM_ZM, expr);
   }
 
   @Override
@@ -59,8 +62,7 @@ public final class Lookup extends ALookup {
       // map lookup may result in empty sequence
       occ = occ.union(Occ.ZERO);
     }
-    // invalidate function type (%method annotation would need to be removed from type)
-    exprType.assign(st.mayBeFunction() ? AtomType.ITEM : st.type, occ);
+    exprType.assign(st.type, occ);
     return this;
   }
 
@@ -78,29 +80,16 @@ public final class Lookup extends ALookup {
 
     final Type it = input.seqType().type;
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
-    if((map || array) && (modifier == Modifier.ITEMS || keys == WILDCARD && map &&
-        (modifier == Modifier.KEYS || modifier == Modifier.PAIRS))) {
+    if(map || array) {
       /* REWRITE LOOKUP:
-       *  MAP?*         ->  map:items(MAP)
-       *  ARRAY?*       ->  array:items(MAP)
-       *  MAP?KEY       ->  map:get(INPUT, KEY, methods := true())
-       *  ARRAY?KEY     ->  array:get(INPUT, KEY, ())
-       *  MAP?keys::*   ->  map:keys(MAP)
-       *  MAP?pairs::*  ->  map:pairs(MAP)  */
+       *  MAP?*      ->  map:items(MAP)
+       *  ARRAY?*    ->  array:items(MAP)
+       *  MAP?KEY    ->  map:get(INPUT, KEY)
+       *  ARRAY?KEY  ->  array:get(INPUT, KEY) */
       final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> {
-        if(modifier == Modifier.ITEMS) {
-          return keys == WILDCARD ? map ? cc.function(Function._MAP_ITEMS, info, in) :
-            cc.function(Function._ARRAY_ITEMS, info, in) :
-          map ? cc.function(Function._MAP_GET, info, in, arg, Empty.UNDEFINED, Bln.TRUE) :
-            cc.function(Function._ARRAY_GET, info, in, arg, Empty.VALUE);
-        }
-        if(map && keys == WILDCARD) {
-          if(modifier == Modifier.KEYS)
-            return cc.function(Function._MAP_KEYS, info, in);
-          if(modifier == Modifier.PAIRS)
-            return cc.function(Function._MAP_PAIRS, info, in);
-        }
-        throw Util.notExpected();
+        return keys == WILDCARD ?
+          cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
+          cc.function(map ? Function._MAP_GET : Function._ARRAY_GET, info, in, arg);
       };
 
       // single key
@@ -145,7 +134,7 @@ public final class Lookup extends ALookup {
           }
           final Item item = qc.next(iter);
           if(item == null) return null;
-          ir = valueFor(item, false, qc).iter();
+          ir = valueFor(item, qc).iter();
         }
       }
     };
@@ -156,18 +145,58 @@ public final class Lookup extends ALookup {
     final ValueBuilder vb = new ValueBuilder(qc);
     final Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      vb.add(valueFor(item, false, qc));
+      vb.add(valueFor(item, qc));
+    }
+    return vb.value(this);
+  }
+
+  /**
+   * Returns the looked up values for the specified input.
+   * @param item input item
+   * @param qc query context
+   * @return supplied value builder
+   * @throws QueryException query exception
+   */
+  private Value valueFor(final Item item, final QueryContext qc) throws QueryException {
+    if(!(item instanceof final XQStruct struct)) throw LOOKUP_X.get(info, item);
+    final Expr keys = exprs[1];
+
+    // wildcard: add all values
+    if(keys == WILDCARD) return struct.items(qc);
+
+    final ValueBuilder vb = new ValueBuilder(qc);
+    final Iter ir = keys.atomIter(qc, info);
+    for(Item key; (key = ir.next()) != null;) {
+      vb.add(struct.invoke(qc, info, key));
     }
     return vb.value(this);
   }
 
   @Override
   public Lookup copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new Lookup(info, modifier, copyAll(cc, vm, exprs)));
+    return copyType(new Lookup(info, copyAll(cc, vm, exprs)));
   }
 
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof Lookup && super.equals(obj);
+  }
+
+  @Override
+  public void toString(final QueryString qs) {
+    qs.token(exprs[0]).token('?');
+
+    final Expr keys = exprs[1];
+    Object key = null;
+    if(keys == WILDCARD) {
+      key = WILDCARD.string();
+    } else if(keys instanceof final Str str) {
+      if(XMLToken.isNCName(str.string())) key = str.toJava();
+    } else if(keys instanceof final Itr itr) {
+      final long l = itr.itr();
+      if(l >= 0) key = l;
+    }
+    if(key != null) qs.token(key);
+    else qs.paren(keys);
   }
 }

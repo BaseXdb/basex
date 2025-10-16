@@ -61,7 +61,7 @@ class IndexPath extends IndexPred {
   Step qname() {
     final int s = path.steps.length - 1;
     final Step st = step(s);
-    return info.text && st.axis == Axis.CHILD && st.test == KindTest.TEXT ? step(s - 1) : st;
+    return info.text && st.axis == Axis.CHILD && st.test == NodeTest.TEXT ? step(s - 1) : st;
   }
 
   @Override

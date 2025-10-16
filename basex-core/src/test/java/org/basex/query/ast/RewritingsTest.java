@@ -36,8 +36,6 @@ public final class RewritingsTest extends SandboxTest {
   /** Drops the database, resets optimizations. */
   @AfterEach public void tearDown() {
     execute(new DropDB(NAME));
-    inline(false);
-    unroll(false);
   }
 
   /** Checks if the count function is pre-compiled. */
@@ -2635,6 +2633,13 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Comparisons with boolean lists. */
   @Test public void gh2060() {
+    check("for $a in 1 to 6 "
+        + "let $b := boolean($a mod 2) "
+        + "let $c := boolean($a mod 3) "
+        + "return every $d in ($b, $c) satisfies $d",
+        "true\nfalse\nfalse\nfalse\ntrue\nfalse",
+        root(DualMap.class), exists(And.class));
+
     unroll(true);
     check("some $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(Or.class));
     check("every $i in 1 to 2 satisfies contains(<_/>/*, string($i))", false, exists(And.class));
@@ -2643,14 +2648,6 @@ public final class RewritingsTest extends SandboxTest {
         + "where every $b in (1, 2) satisfies $a/* = $b "
         + "return $a/b/text()",
         1, empty(NOT), empty(And.class), count(CmpG.class, 2));
-    unroll(false);
-
-    check("for $a in 1 to 6 "
-        + "let $b := boolean($a mod 2) "
-        + "let $c := boolean($a mod 3) "
-        + "return every $d in ($b, $c) satisfies $d",
-        "true\nfalse\nfalse\nfalse\ntrue\nfalse",
-        root(DualMap.class), exists(And.class));
   }
 
   /** XQuery, simple map and filter expressions: Unroll lists. */
@@ -3085,7 +3082,8 @@ public final class RewritingsTest extends SandboxTest {
 
     // GH-2182: EBV tests, rewriting to descendant::text()
     check("boolean(<a><b>x</b></a>/*[@nr = 0] ! string())", false, exists(CmpSimpleG.class));
-    check("<a><b/></a>/*[self::c[empty(node())]]", "", exists(DualMap.class));
+    check("<a><b/></a>/*[self::c[empty(node())]]", "",
+        exists(IterPath.class), exists(SingleIterPath.class));
 
     // GH-2215: Unexpected exception, mapping double attributes
     check("boolean((<a/> ! (a, b)))", false, exists(Pipeline.class));
@@ -3337,6 +3335,10 @@ public final class RewritingsTest extends SandboxTest {
         true, root(Bln.class));
     check("(1 to 10000000000000, 'x')[. instance of xs:integer][. instance of xs:string]",
         "", empty());
+
+    // GH-2460
+    check("<a><b/>x</a>/node()[. instance of element()]", "<b/>", type(IterPath.class,
+        "element()*"));
   }
 
   /** Include data reference in equality check. */

@@ -11,6 +11,7 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.parse.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -86,6 +87,11 @@ public final class StaticFuncCall extends FuncCall {
   public StaticFuncCall optimize(final CompileContext cc) {
     // do not inline a static function after compilation as it must be recursive
     return this;
+  }
+
+  @Override
+  public Value value(final QueryContext qc) throws QueryException {
+    return evalFunc(func, qc);
   }
 
   @Override
@@ -170,11 +176,6 @@ public final class StaticFuncCall extends FuncCall {
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.staticFuncCall(this) && super.accept(visitor);
-  }
-
-  @Override
-  public StaticFunc evalFunc(final QueryContext qc) {
-    return func;
   }
 
   @Override

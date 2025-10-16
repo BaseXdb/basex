@@ -80,6 +80,7 @@ public final class FileReadTextLines extends FileFn {
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
+    if(!Files.isReadable(path)) throw FILE_ACCESS_X.get(info, path.toAbsolutePath());
 
     final NewlineInput ni = new NewlineInput(new IOFile(path));
     ni.encoding(encoding).validate(!fallback);
@@ -93,11 +94,11 @@ public final class FileReadTextLines extends FileFn {
    * @throws QueryException query exception
    */
   private long[] minMax(final QueryContext qc) throws QueryException {
-   final Item offset = arg(3).atomItem(qc, info);
-    final Item length = arg(4).atomItem(qc, info);
+   final Long offset = toLongOrNull(arg(3), qc);
+    final Long length = toLongOrNull(arg(4), qc);
 
-    final long off = offset.isEmpty() ? 1 : toLong(offset);
-    final long len = length.isEmpty() ? Long.MAX_VALUE : toLong(length);
+    final long off = offset != null ? offset : 1;
+    final long len = length != null ? length : Long.MAX_VALUE;
     final long end = off + len < 0 ? Long.MAX_VALUE : off + len;
     return new long[] { off, end };
   }

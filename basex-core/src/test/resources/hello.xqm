@@ -6,6 +6,8 @@
  :)
 module namespace hello = "world";
 
+declare option Q{uri}name "ignored";
+
 (:~ Variable marked as lazy. :)
 declare %basex:lazy variable $hello:lazy := xs:QName(string(<a>hello:foo</a>));
 

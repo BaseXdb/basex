@@ -20,10 +20,8 @@ import org.basex.util.list.*;
 public final class DbRestore extends BackupFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // extract database name from backup file
-    final String name = toName(arg(0), true, qc);
+    final String name = toBackup(arg(0), qc);
 
-    // find backup with or without date suffix
     checkPerm(qc, Perm.CREATE, Databases.name(name));
     final StringList backups = qc.context.databases.backups(name);
     if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);

@@ -269,7 +269,7 @@ public enum QueryError {
   /** Error code. */
   FILE_IS_DIR_X(FILE, "is-dir", "'%' is a directory."),
   /** Error code. */
-  FILE_ID_DIR2_X(FILE, "is-dir", "'%' is a non-empty directory."),
+  FILE_IS_DIR2_X(FILE, "is-dir", "'%' is a non-empty directory."),
   /** Error code. */
   FILE_IS_RELATIVE_X(FILE, "is-relative", "Base directory is relative: '%'."),
   /** Error code. */
@@ -281,7 +281,7 @@ public enum QueryError {
   /** Error code. */
   FILE_IO_ERROR_X(FILE, "io-error", "%"),
   /** Error code. */
-  FILE_IE_ERROR_ACCESS_X(FILE, "io-error", "Access to '%' is denied."),
+  FILE_ACCESS_X(FILE, "io-error", "Access to '%' is denied."),
 
   // Fulltext Module
 
@@ -873,8 +873,6 @@ public enum QueryError {
   /** Error code. */
   NUMBER_X(XPST, 3, "Incomplete number: '%'."),
   /** Error code. */
-  NUMBERITR_X_X(XPST, 3, "Integer expected, % found: '%'."),
-  /** Error code. */
   QUERYEND_X(XPST, 3, "Unexpected end of query: '%'."),
   /** Error code. */
   MODEXPR(XPST, 3, "No expression allowed in a library module."),
@@ -915,7 +913,7 @@ public enum QueryError {
   /** Error code. */
   EVALUNARY(XPST, 3, "Unary operator expects a numeric value."),
   /** Error code. */
-  STEPMISS_X(XPST, 3, "Expecting valid step%."),
+  STEPMISS_X(XPST, 3, "Expecting step%."),
   /** Error code. */
   AXISMISS_X(XPST, 3, "Expecting node test after % axis."),
   /** Error code. */
@@ -1023,6 +1021,8 @@ public enum QueryError {
   /** Error code. */
   NONCNAME_X(XPST, 3, "Expecting NCName, found '%'."),
   /** Error code. */
+  INVPLACEHOLDER_X(XPST, 3, "Method call must not have argument placeholders: '%'."),
+  /** Error code. */
   STATIC_X(XPST, 5, "No XML Schema support: %."),
   /** Error code. */
   VARUNDEF_X(XPST, 8, "Undeclared variable: %."),
@@ -1070,6 +1070,8 @@ public enum QueryError {
   INVALIDCAST_X(XPST, 80, "Invalid cast type: %."),
   /** Error code. */
   NOURI_X(XPST, 81, "Namespace prefix not declared: %."),
+  /** Error code. */
+  PREFIXNOURI_X(XPST, 154, "QName includes prefix, but no URI: %."),
 
   /** Error code. */
   JAVANOINSTANCE_X_X(XPTY, 4, "% instance expected as first argument, % found."),
@@ -1201,8 +1203,6 @@ public enum QueryError {
   /** Error code. */
   DUPLNSCONS_X(XQDY, 102, "Duplicate declaration of namespace '%'."),
   /** Error code. */
-  NOMETHOD(XPST, 107, "The annotation %method is not allowed here."),
-  /** Error code. */
   MAPDUPLKEY_X(XQDY, 137, "Map contains duplicate key: %."),
 
   /** Error code. */
@@ -1257,8 +1257,6 @@ public enum QueryError {
   WHICHMODFILE_X(XQST, 59, "Cannot retrieve module: %."),
   /** Error code. */
   WRONGMODULE_X_X_X(XQST, 59, "Imported module '%' has unexpected namespace: '%' vs '%'."),
-  /** Error code. */
-  FUNNONS_X(XQST, 60, "Namespace needed for function '%'."),
   /** Error code. */
   DUPLORD(XQST, 65, "Duplicate 'ordering' declaration."),
   /** Error code. */
@@ -1315,8 +1313,6 @@ public enum QueryError {
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** Error code. */
   DUPLFUNVIS(XQST, 106, "More than one visibility annotation declared."),
-  /** Error code. */
-  DUPLMETHOD(XQST, 106, "More than one %method annotation declared."),
   /** Error code. */
   OUTPUTLIB_X(XQST, 108, "Declaration not allowed in library module: output:%."),
   /** Error code. */

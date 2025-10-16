@@ -92,6 +92,8 @@ public class DbNodeId extends StandardFunc {
    * @return node ID
    */
   protected int id(final DBNode node) {
-    return node.data().id(node.pre());
+    final int pre = node.pre();
+    final Data data = node.data();
+    return data.meta.updindex ? data.id(pre) : pre;
   }
 }

@@ -30,18 +30,6 @@ public abstract class Test extends ExprInfo {
   }
 
   /**
-   * Returns a node test, a name test or {@code null}.
-   * @param type node type (element, attribute, processing instruction)
-   * @param name node name (can be {@code null})
-   * @param defaultNs default element namespace (used for optimizations, can be {@code null})
-   * @return test
-   */
-  public static Test get(final NodeType type, final QNm name, final byte[] defaultNs) {
-    final NamePart part = type == NodeType.PROCESSING_INSTRUCTION ? NamePart.LOCAL : NamePart.FULL;
-    return new NameTest(name, part, type, defaultNs);
-  }
-
-  /**
    * Creates a single test.
    * @param tests tests to be merged (can contain {@code null} references)
    * @return single test, union test, or {@code null} if test cannot be created.

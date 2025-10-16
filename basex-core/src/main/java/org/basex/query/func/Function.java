@@ -626,7 +626,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, MAP_ZM), ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   SORT_WITH(FnSortWith::new, "sort-with(input,comparators)",
-      params(ITEM_ZM, FuncType.get(INTEGER_O, ITEM_O, ITEM_O).seqType(Occ.ZERO_OR_MORE)),
+      params(ITEM_ZM, FuncType.get(INTEGER_O, ITEM_O, ITEM_O).seqType(Occ.ONE_OR_MORE)),
       ITEM_ZM, flag(HOF)),
   /** XQuery function. */
   STARTS_WITH(FnStartsWith::new, "starts-with(value,substring[,collation])",
@@ -773,19 +773,18 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
   /** XQuery function. */
   _MAP_FILTER(MapFilter::new, "filter(map,predicate)",
-      params(MAP_O, FuncType.get(BOOLEAN_ZO, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
+      params(MAP_O, FuncType.get(BOOLEAN_ZO, ANY_ATOMIC_TYPE_O, ITEM_ZM, INTEGER_O).seqType()),
       MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
   _MAP_FIND(MapFind::new, "find(input,key)",
       params(ITEM_ZM, ANY_ATOMIC_TYPE_O), ARRAY_O, MAP_URI),
   /** XQuery function. */
   _MAP_FOR_EACH(MapForEach::new, "for-each(map,action)",
-      params(MAP_O, FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
+      params(MAP_O, FuncType.get(ITEM_ZM, ANY_ATOMIC_TYPE_O, ITEM_ZM, INTEGER_O).seqType()),
       ITEM_ZM, flag(HOF), MAP_URI),
   /** XQuery function. */
-  _MAP_GET(MapGet::new, "get(map,key[,default,methods])",
-      params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM, BOOLEAN_ZO),
-      ITEM_ZM, MAP_URI),
+  _MAP_GET(MapGet::new, "get(map,key[,default])",
+      params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM), ITEM_ZM, MAP_URI),
   /** XQuery function. */
   _MAP_KEYS(MapKeys::new, "keys(map)",
       params(MAP_O), ANY_ATOMIC_TYPE_ZM, MAP_URI),
@@ -1320,11 +1319,11 @@ public enum Function implements AFunction {
   _DB_PUT(DbPut::new, "put(database,input,path[,options])",
       params(STRING_O, ITEM_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_PUT_BINARY(DbPutBinary::new, "put-binary(database,input,path)",
-      params(STRING_O, STRING_O, ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_PUT_BINARY(DbPutBinary::new, "put-binary(database,input,path[,options])",
+      params(STRING_O, STRING_O, ITEM_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
-  _DB_PUT_VALUE(DbPutValue::new, "put-value(database,input,path)",
-      params(STRING_O, ITEM_ZM, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_PUT_VALUE(DbPutValue::new, "put-value(database,input,path[,options])",
+      params(STRING_O, ITEM_ZM, ITEM_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_RENAME(DbRename::new, "rename(database,path,new-path)",
       params(STRING_O, STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1927,14 +1926,17 @@ public enum Function implements AFunction {
   _UTIL_MAP_PUT_AT(UtilMapPutAt::new, "map-put-at(input,index,value)",
       params(MAP_O, INTEGER_O, ITEM_ZM), MAP_O, UTIL_URI),
   /** XQuery function. */
-  _UTIL_MAP_VALUE_AT(UtilMapValueAt::new, "map-value-at(input,index[,methods])",
-      params(MAP_O, INTEGER_O, BOOLEAN_ZO), ITEM_ZM, UTIL_URI),
+  _UTIL_MAP_VALUE_AT(UtilMapValueAt::new, "map-value-at(input,index)",
+      params(MAP_O, INTEGER_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_RANGE(UtilRange::new, "range(input,first,last)",
       params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
       params(NODE_ZM), DOCUMENT_NODE_ZM, UTIL_URI),
+  /** XQuery function. */
+  _UTIL_SELECT(UtilSelect::new, "select(keys[,node])",
+      params(ANY_ATOMIC_TYPE_ZM, NODE_ZO), BOOLEAN_O, UTIL_URI),
   /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),
@@ -2002,10 +2004,10 @@ public enum Function implements AFunction {
   _WEB_FORWARD(WebForward::new, "forward(href[,params])",
       params(STRING_O, MAP_ZO), ELEMENT_O, WEB_URI),
   /** XQuery function. */
-  _WEB_REDIRECT(WebRedirect::new, "redirect(href[,params,anchor])",
-      params(STRING_O, MAP_ZO, STRING_ZO), ELEMENT_O, WEB_URI),
+  _WEB_REDIRECT(WebRedirect::new, "redirect(href[,params,anchor,status])",
+      params(STRING_O, MAP_ZO, STRING_ZO, INTEGER_ZO), ELEMENT_O, WEB_URI),
   /** XQuery function. */
-  _WEB_RESPONSE_HEADER(WebResponseHeader::new, "response-header([output,headers,attributes])",
+  _WEB_RESPONSE_HEADER(WebResponseHeader::new, "response-header([output,headers,response])",
       params(MAP_ZO, MAP_ZO, MAP_ZO), ELEMENT_O, WEB_URI),
 
   // XQuery Module

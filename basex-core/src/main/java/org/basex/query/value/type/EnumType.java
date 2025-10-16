@@ -45,6 +45,19 @@ public final class EnumType implements Type {
     return new EnumType(val);
   }
 
+  /**
+   * Checks if the given item is an instance of this type.
+   * @param item item to be checked
+   * @return result of check
+   */
+  public boolean instance(final Item item) {
+    try {
+      return item.type.instanceOf(AtomType.STRING) && values.contains(item.string(null));
+    } catch(final QueryException ex) {
+      throw Util.notExpected(ex);
+    }
+  }
+
   @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {

@@ -20,7 +20,7 @@ public final class UserUpdateInfo extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ANode node = toElem(arg(0), Q_INFO, qc, ELM_X_X_X);
-    final User user = defined(1) ? toUser(arg(1), qc) : null;
+    final User user = toUser(arg(1), true, qc);
 
     qc.updates().add(new UpdateInfo(node.materialize(n -> false, info, qc), user, qc, info), qc);
     return Empty.VALUE;

@@ -21,7 +21,7 @@ import org.basex.util.list.*;
 public final class DbAlterBackup extends DbAccessFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(arg(0), false, qc), newname = toName(arg(1), false, qc);
+    final String name = toName(arg(0), qc), newname = toName(arg(1), qc);
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 
     checkPerm(qc, Perm.CREATE, name);

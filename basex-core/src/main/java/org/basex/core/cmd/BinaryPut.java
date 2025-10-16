@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
+import org.basex.core.*;
 import org.basex.core.parse.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.core.users.*;
@@ -12,7 +13,9 @@ import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.query.up.atomic.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.xml.sax.*;
 
 /**
@@ -62,10 +65,29 @@ public final class BinaryPut extends ACreate {
     if(path.isEmpty()) return error(PATH_INVALID_X, create ? path : args[0]);
 
     final IOFile bin = data.meta.file(path, ResourceType.BINARY);
-    return update(data, () -> {
+    final String pth = path;
+    return update(data, () -> put(data, bin, pth));
+  }
+
+  /**
+   * Puts a binary resource in the specified database.
+   * @param data database
+   * @param bin binary file (can be {@code null})
+   * @param path target path
+   * @return success flag
+   * @throws IOException I/O exception
+   */
+  private boolean put(final Data data, final IOFile bin, final String path) throws IOException {
+    final IntList docs = data.resources.docs(path);
+    if(options.get(MainOptions.REPLACE) || docs.isEmpty() && !bin.exists()) {
+      // delete XML documents
+      final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+      for(final int pre : docs.toArray()) auc.addDelete(pre);
+      auc.execute(false);
+
       put(in, bin);
-      return info(QUERY_EXECUTED_X_X, "", jc().performance);
-    });
+    }
+    return info(QUERY_EXECUTED_X_X, "", jc().performance);
   }
 
   /**

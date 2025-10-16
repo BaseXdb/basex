@@ -1,6 +1,5 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.func.db.DbAccessFn.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -13,7 +12,6 @@ import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -26,23 +24,7 @@ import org.basex.util.list.*;
  */
 public final class DbListDetails extends DbList {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    // overwrites implementation of the super class
-    return defined(0) ? resources(qc) : list(qc);
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    // overwrites implementation of the super class
-    return iter(qc).value(qc, this);
-  }
-
-  /**
-   * Lists details for all databases.
-   * @param qc query context
-   * @return iterator
-   */
-  private static Iter list(final QueryContext qc) {
+  Iter list(final QueryContext qc) {
     final Context ctx = qc.context;
     final StringList dbs = ctx.databases.list(qc.user, null);
     return new BasicIter<FNode>(dbs.size()) {
@@ -69,19 +51,15 @@ public final class DbListDetails extends DbList {
     };
   }
 
-  /**
-   * Returns an iterator over all resources in a databases.
-   * @param qc query context
-   * @return resource iterator
-   * @throws QueryException query exception
-   */
-  private Iter resources(final QueryContext qc) throws QueryException {
-    final Data data = toData(qc);
-    final String path = defined(1) ? toString(arg(1), qc) : "";
+  @Override
+  Iter resources(final String name, final QueryContext qc) throws QueryException {
+    final Data data = toData(name, qc);
+    final String path = toZeroString(arg(1), qc);
 
-    final IntList docs = data.resources.docs(path);
-    final StringList binaries = data.resources.paths(path, ResourceType.BINARY);
-    final StringList values = data.resources.paths(path, ResourceType.VALUE);
+    final Resources resources = data.resources;
+    final IntList docs = resources.docs(path);
+    final StringList binaries = resources.paths(path, ResourceType.BINARY);
+    final StringList values = resources.paths(path, ResourceType.VALUE);
     final int ds = docs.size(), bs = ds + binaries.size(), size = bs + values.size();
 
     return new BasicIter<FNode>(size) {

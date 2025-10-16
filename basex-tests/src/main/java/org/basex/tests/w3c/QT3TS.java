@@ -470,6 +470,33 @@ public final class QT3TS extends Main {
     "('schema-location-hint', 'schemaImport', 'schemaValidation', " +
     "'staticTyping', 'typedData', 'XQUpdate', 'fn-transform-XSLT')";
 
+  /** Tests cases to be skipped due to deviations from the spec, or
+   * as the testing effort does not justify the outcome. */
+  private static final String SKIP = "(" +
+    // positional args of fold functions - removed in https://github.com/qt4cg/qtspecs/pull/1867
+    "'Keywords-array-fold-left-1', 'Keywords-array-fold-right-1', " +
+    "'Keywords-fn-fold-left-1', 'Keywords-fn-fold-right-1', " +
+    "'fold-left-010', 'fold-right-008', " +
+    // else of braced if - removed in https://github.com/qt4cg/qtspecs/pull/1712
+    "'CondExpr-Braced-002', 'CondExpr-Braced-003', 'CondExpr-Braced-004', 'CondExpr-Braced-005', " +
+    "'CondExpr-Braced-006', 'CondExpr-Braced-007', 'CondExpr-Braced-008', 'CondExpr-Braced-009', " +
+    "'CondExpr-Braced-010', 'CondExpr-Braced-011', 'CondExpr-Braced-012', 'CondExpr-Braced-013', " +
+    "'CondExpr-Braced-014', 'CondExpr-Braced-015', 'CondExpr-Braced-016', 'CondExpr-Braced-017', " +
+    "'CondExpr-Braced-018', 'CondExpr-Braced-020', 'CondExpr-Braced-021', 'CondExpr-Braced-022', " +
+    "'K-CondExpr-Braced-7', 'braced-if-001', 'braced-if-004', 'braced-if-005', 'braced-if-006', " +
+    "'braced-if-007', 'braced-if-008', 'PathExpr-10', " +
+    // reserved keywords in computed node constructors - still being discussed in
+    // https://github.com/qt4cg/qtspecs/issues/1528
+    "'K2-ComputeConAttr-65', 'K2-ComputeConAttr-66', 'K2-ComputeConAttr-72', " +
+    "'K2-ComputeConElem-20', 'K2-ComputeConElem-21', 'K2-ComputeConElem-25', 'nscons-047', " +
+    "'nscons-048', 'K2-ComputeConPI-16', 'K2-ComputeConPI-17', 'K2-ForExprWithout-42a', " +
+    "'K2-ForExprWithout-43a', 'K2-ForExprWithout-44a', " +
+    // too much effort to support in the test suite
+    "'fn-available-environment-variables-011', " +
+    "'environment-variable-005', 'environment-variable-006', 'environment-variable-007', " +
+    "'cbcl-collection-002', 'cbcl-collection-003', 'cbcl-collection-004', " +
+    "'')";
+
   /**
    * Checks if the current test case is supported.
    * @param test test case
@@ -490,7 +517,9 @@ public final class QT3TS extends Main {
       "@type = 'default-language' and @value != 'en' or " +
       // skip non-XQuery tests
       "@type = 'spec' and not(matches(@value, 'XQ(\\d\\d\\+|40)'))" +
-    "]";
+      "]," +
+      // skip tests where BaseX implementation deviates from the spec
+      "@name[. = " + SKIP + "]";
     return new XQuery(query, ctx).context(test).value().size() == 0;
   }
 
@@ -660,7 +689,8 @@ public final class QT3TS extends Main {
   private String assertEq(final QT3Result result, final XdmValue expected) {
     final String exp = expected.getString();
     try {
-      final String query = "declare variable $returned external; $returned eq " + exp;
+      final String query = "declare variable $returned external; " +
+          "count($returned) = 1 and $returned eq " + exp;
       return environment(new XQuery(query, ctx), result.env).variable("$returned", result.value).
           value().getBoolean() ? null : exp;
     } catch(final XQueryException err) {

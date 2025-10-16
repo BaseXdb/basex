@@ -63,17 +63,6 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   /**
-   * Construct a new function item from an existing one, with replaced annotations and focus.
-   * @param fi the existing function item
-   * @param anns the new annotations
-   * @param focus the new focus
-   */
-  public FuncItem(final FuncItem fi, final AnnList anns, final QueryFocus focus) {
-    this(fi.info, fi.expr, fi.params, anns, FuncType.get(anns, ((FuncType) fi.type).declType,
-        ((FuncType) fi.type).argTypes), fi.stackSize, fi.name, focus);
-  }
-
-  /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr function body
@@ -95,20 +84,6 @@ public final class FuncItem extends FItem implements Scope {
     this.name = name;
     this.focus = focus;
     simple = !expr.has(Flag.CTX);
-  }
-
-  /**
-   * Binds a context value to the function item.
-   * @param context context value
-   * @return function item with bound focus, or original function if no method annotation exists
-   */
-  public FuncItem toMethod(final Value context) {
-    if(anns.contains(Annotation.METHOD)) {
-      final QueryFocus qf = new QueryFocus();
-      qf.value = context;
-      return new FuncItem(this, anns.remove(Annotation.METHOD), qf);
-    }
-    return this;
   }
 
   @Override

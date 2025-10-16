@@ -78,7 +78,7 @@ public final class FnItemsAt extends StandardFunc {
    */
   private Iter evalIter(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
-    final Iter at = arg(1).iter(qc);
+    final Iter at = arg(1).atomIter(qc, info);
     // hidden option, indicates whether the positions are sorted
     final boolean sorted = toBooleanOrFalse(arg(2), qc);
 

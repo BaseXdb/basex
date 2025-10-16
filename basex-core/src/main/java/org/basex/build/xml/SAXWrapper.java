@@ -55,7 +55,7 @@ public final class SAXWrapper extends SingleParser {
         reader = XmlParser.reader(options);
       }
       if(reader.getEntityResolver() == null) {
-        final EntityResolver er = Resolver.entities(options);
+        final EntityResolver er = options.resolver().entityResolver();
         if(er != null) reader.setEntityResolver(er);
       }
 

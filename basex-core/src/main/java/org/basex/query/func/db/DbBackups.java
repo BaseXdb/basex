@@ -1,13 +1,9 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.func.db.DbAccessFn.*;
-import static org.basex.query.QueryError.*;
-
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -22,10 +18,11 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class DbBackups extends StandardFunc {
+public final class DbBackups extends DbAccessFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final String name = defined(0) ? toName(arg(0), true, DB_NAME_X, qc) : null;
+    final String name = toStringOrNull(arg(0), qc);
+    if(name != null && !name.isEmpty()) toName(Str.get(name), qc);
 
     final Context ctx = qc.context;
     final StringList backups = name == null ? ctx.databases.backups() : ctx.databases.backups(name);
@@ -47,13 +44,12 @@ public final class DbBackups extends StandardFunc {
   }
 
   @Override
-  public boolean accept(final ASTVisitor visitor) {
-    return (defined(0) ? dataLock(arg(0), true, visitor) : visitor.lock((String) null)) &&
-        super.accept(visitor);
+  public Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc, this);
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+  public boolean accept(final ASTVisitor visitor) {
+    return visitAll(visitor, args());
   }
 }

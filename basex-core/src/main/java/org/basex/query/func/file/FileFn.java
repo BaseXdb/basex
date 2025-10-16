@@ -32,15 +32,16 @@ abstract class FileFn extends StandardFunc {
     try {
       return eval(qc);
     } catch(final NoSuchFileException ex) {
-      throw FILE_NOT_FOUND_X.get(info, ex);
+      Util.debug(ex);
+      throw FILE_NOT_FOUND_X.get(info, ex.getMessage());
     } catch(final NotDirectoryException ex) {
       throw FILE_NO_DIR_X.get(info, ex);
     } catch(final FileAlreadyExistsException ex) {
       throw FILE_EXISTS_X.get(info, ex);
     } catch(final DirectoryNotEmptyException ex) {
-      throw FILE_ID_DIR2_X.get(info, ex);
+      throw FILE_IS_DIR2_X.get(info, ex);
     } catch(final AccessDeniedException ex) {
-      throw FILE_IE_ERROR_ACCESS_X.get(info, ex);
+      throw FILE_ACCESS_X.get(info, ex);
     } catch(final IOException ex) {
       throw FILE_IO_ERROR_X.get(info, ex);
     }
@@ -53,7 +54,7 @@ abstract class FileFn extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException query exception
    */
-  public abstract Value eval(final QueryContext qc) throws QueryException, IOException;
+  public abstract Value eval(QueryContext qc) throws QueryException, IOException;
 
   /**
    * Evaluates an expression and returns the path to a file in which a result is written.
@@ -90,8 +91,8 @@ abstract class FileFn extends StandardFunc {
 
     try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
       if(lines) {
-        final Iter values = arg(1).iter(qc);
         final byte[] nl = cs == null ? token(Prop.NL) : Prop.NL.getBytes(cs);
+        final Iter values = arg(1).atomIter(qc, info);
         for(Item item; (item = qc.next(values)) != null;) {
           if(!item.type.isStringOrUntyped()) throw typeError(item, AtomType.STRING, info);
 

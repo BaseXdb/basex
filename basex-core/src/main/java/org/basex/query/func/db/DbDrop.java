@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class DbDrop extends DbAccessFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(arg(0), false, qc);
+    final String name = toName(arg(0), qc);
 
     checkPerm(qc, Perm.CREATE, name);
     if(!qc.context.soptions.dbExists(name)) throw DB_GET1_X.get(info, name);

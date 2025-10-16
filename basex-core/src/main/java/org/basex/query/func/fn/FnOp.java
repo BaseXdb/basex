@@ -61,9 +61,12 @@ public final class FnOp extends StandardFunc {
       case "gt" -> new CmpV(info, arg1, arg2, OpV.GT);
       case "ge" -> new CmpV(info, arg1, arg2, OpV.GE);
       case "ne" -> new CmpV(info, arg1, arg2, OpV.NE);
-      case "<<" -> new CmpN(info, arg1, arg2, OpN.ET);
-      case ">>" -> new CmpN(info, arg1, arg2, OpN.GT);
+      case "<<", "precedes" -> new CmpN(info, arg1, arg2, OpN.LT);
+      case ">>", "follows" -> new CmpN(info, arg1, arg2, OpN.GT);
       case "is" -> new CmpN(info, arg1, arg2, OpN.EQ);
+      case "is-not" -> new CmpN(info, arg1, arg2, OpN.NE);
+      case "precedes-or-is" -> new CmpN(info, arg1, arg2, OpN.LE);
+      case "follows-or-is" -> new CmpN(info, arg1, arg2, OpN.GE);
       case "||" -> new Concat(info, arg1, arg2);
       case "|", "union" -> new Union(info, arg1, arg2);
       case "except" -> new Except(info, arg1, arg2);

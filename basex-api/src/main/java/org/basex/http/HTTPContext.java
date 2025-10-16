@@ -8,6 +8,8 @@ import jakarta.servlet.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.value.node.*;
 import org.basex.util.*;
 
 /**
@@ -25,6 +27,10 @@ public final class HTTPContext {
   private IOException exception;
   /** Server instance. */
   private BaseXServer server;
+  /** Reference to web.xml file. */
+  private IOFile initFile;
+  /** Initialization parameters. */
+  private Map<String, ?> initParams;
 
   /** Singleton instance. */
   private static volatile HTTPContext instance;
@@ -42,7 +48,7 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns the database context. Creates a new instance if not done so before.
+   * Returns the database context.
    * @return database context
    */
   public Context context() {
@@ -50,11 +56,33 @@ public final class HTTPContext {
   }
 
   /**
+   * Returns initialization parameters.
+   * @return map
+   */
+  @SuppressWarnings("unchecked")
+  public Map<String, ?> initParams() {
+    if(initParams == null && context != null && initFile != null) {
+      try {
+        final String query = "{ .//*:init-param ! { *:param-name: data(*:param-value) } }";
+        try(QueryProcessor qp = new QueryProcessor(query, context).context(new DBNode(initFile))) {
+          initParams = (HashMap<String, ?>) qp.value().toJava();
+        }
+      } catch(final Exception ex) {
+        Util.debug(ex);
+      }
+    }
+    if(initParams == null) initParams = new HashMap<>();
+    return initParams;
+  }
+
+  /**
    * Initializes the HTTP context with static options.
    * @param sopts static options
+   * @param webXml web.xml file
    */
-  public void init(final StaticOptions sopts) {
+  public void init(final StaticOptions sopts, final IOFile webXml) {
     soptions = sopts;
+    initFile = webXml;
   }
 
   /**

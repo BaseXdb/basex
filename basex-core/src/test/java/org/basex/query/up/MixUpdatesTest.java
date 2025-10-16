@@ -19,12 +19,6 @@ public final class MixUpdatesTest extends SandboxTest {
     set(MainOptions.MIXUPDATES, true);
   }
 
-  /** Resets optimizations. */
-  @AfterEach public void init() {
-    inline(false);
-    unroll(false);
-  }
-
   /** Transform expression containing a simple expression. */
   @Test public void transSimple() {
     error("<a/> update { '' }", UPMODIFY);

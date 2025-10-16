@@ -18,12 +18,6 @@ import org.junit.jupiter.api.*;
  * @author Christian Gruen
  */
 public final class SimpleMapTest extends SandboxTest {
-  /** Resets optimizations. */
-  @AfterEach public void init() {
-    inline(false);
-    unroll(false);
-  }
-
   /** Basic tests. */
   @Test public void basic() {
     query("1 ! 2", 2);

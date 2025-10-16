@@ -13,9 +13,11 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -115,7 +117,7 @@ public abstract class Inspect {
    * @param uri include URI
    * @throws QueryException query exception
    */
-  final void annotation(final AnnList anns, final FBuilder parent, final boolean uri)
+  final void annotations(final AnnList anns, final FBuilder parent, final boolean uri)
       throws QueryException {
 
     for(final Ann ann : anns) {
@@ -129,6 +131,23 @@ public abstract class Inspect {
         annotation.add(element("literal").add(Q_TYPE, arg.type).add(arg.string(null)));
       }
       parent.add(annotation);
+    }
+  }
+
+  /**
+   * Creates option child elements.
+   * @param options options
+   * @param parent parent element
+   * @param uri include URI
+   */
+  final void options(final QNmMap<String> options, final FBuilder parent, final boolean uri) {
+    for(final QNm name : options) {
+      final FBuilder option = element("option");
+      option.add(Q_NAME, NSGlobal.prefix(name.uri()).length == 0 ? name.string() :
+        name.prefixId(XQ_URI));
+      if(uri) option.add(Q_URI, name.uri());
+      option.add(element("literal").add(Q_TYPE, SeqType.STRING_O).add(options.get(name)));
+      parent.add(option);
     }
   }
 

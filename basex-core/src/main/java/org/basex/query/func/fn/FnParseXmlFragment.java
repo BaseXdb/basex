@@ -74,7 +74,7 @@ public class FnParseXmlFragment extends Docs {
     final IO io = new IOContent(toBytes(value), baseURI, encoding);
 
     final MainOptions mopts = new MainOptions(options);
-    mopts.set(MainOptions.CATALOG, qc.context.options.get(MainOptions.CATALOG));
+    mopts.setResolver(qc.context.options);
     try {
       final boolean ip = fragment || mopts.get(MainOptions.INTPARSE);
       return new DBNode(ip ? new XMLParser(io, mopts, fragment) : Parser.xmlParser(io, mopts));

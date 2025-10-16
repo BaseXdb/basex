@@ -21,11 +21,11 @@ public class MapForEach extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-    final FItem action = toFunction(arg(1), 2, this instanceof UpdateMapForEach, qc);
+    final FItem action = toFunction(arg(1), 3, this instanceof UpdateMapForEach, qc);
     final BasicIter<Item> keys = map.keys().iter();
 
     return new Iter() {
-      final HofArgs args = new HofArgs(2);
+      final HofArgs args = new HofArgs(3, action);
       Iter iter = Empty.ITER;
 
       @Override
@@ -35,7 +35,7 @@ public class MapForEach extends StandardFunc {
           if(item != null) return item;
           final Item key = keys.next();
           if(key == null) return null;
-          iter = invoke(action, args.set(0, key).set(1, map.get(key)), qc).iter();
+          iter = invoke(action, args.set(0, key).set(1, map.get(key)).inc(), qc).iter();
         }
       }
     };
@@ -44,11 +44,11 @@ public class MapForEach extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-    final FItem action = toFunction(arg(1), 2, this instanceof UpdateMapForEach, qc);
+    final FItem action = toFunction(arg(1), 3, this instanceof UpdateMapForEach, qc);
 
-    final HofArgs args = new HofArgs(2);
+    final HofArgs args = new HofArgs(3, action);
     final ValueBuilder vb = new ValueBuilder(qc, map.structSize());
-    map.forEach((key, value) -> vb.add(invoke(action, args.set(0, key).set(1, value), qc)));
+    map.forEach((key, value) -> vb.add(invoke(action, args.set(0, key).set(1, value).inc(), qc)));
     return vb.value(this);
   }
 
@@ -60,7 +60,7 @@ public class MapForEach extends StandardFunc {
     final Type type = map.seqType().type;
     if(type instanceof final MapType mt) {
       final SeqType declType = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE);
-      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType()));
+      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType(), SeqType.INTEGER_O));
     }
 
     final FuncType ft = arg(1).funcType();

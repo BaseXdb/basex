@@ -10,7 +10,6 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -35,16 +34,14 @@ public class FileWriteBinary extends FileFn {
    */
   final void write(final boolean append, final QueryContext qc) throws QueryException, IOException {
     final Path path = toTarget(arg(0), qc);
-    if(defined(2)) {
+    final Long offset = toLongOrNull(arg(2), qc);
+    if(offset != null) {
       // write file chunk
-      final Bin binary = toBin(arg(1), qc);
-      final long offset = toLong(arg(2), qc);
-
       try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
         final long length = raf.length();
         if(offset < 0 || offset > length) throw FILE_OUT_OF_RANGE_X_X.get(info, offset, length);
         raf.seek(offset);
-        raf.write(binary.binary(info));
+        raf.write(toBin(arg(1), qc).binary(info));
       }
     } else {
       // write full file

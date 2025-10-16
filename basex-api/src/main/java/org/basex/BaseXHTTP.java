@@ -14,11 +14,11 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.log.*;
+import org.eclipse.jetty.compression.gzip.*;
+import org.eclipse.jetty.compression.server.*;
 import org.eclipse.jetty.ee9.webapp.*;
 import org.eclipse.jetty.ee9.websocket.server.config.*;
-import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.handler.gzip.*;
 import org.eclipse.jetty.util.resource.*;
 import org.eclipse.jetty.xml.*;
 
@@ -75,28 +75,32 @@ public final class BaseXHTTP extends CLI {
 
     if(!quiet) Util.println(header());
 
-    hc = HTTPContext.get();
-    hc.init(soptions);
-
-    // create jetty instance and set default context to HTTP path
+    // initialize configuration files and initialize HTTP context
     final String webapp = soptions.get(StaticOptions.WEBPATH);
     final WebAppContext wac = new WebAppContext(webapp, "/");
-    locate(WEBCONF, webapp);
-    final Path p = Paths.get(locate(JETTYCONF, webapp).toString());
-    final URI uri = p.toUri();
-    final Resource resource = new PathResourceFactory().newResource(uri);
+    final IOFile webXml = locate(WEBCONF, webapp), jettyXml = locate(JETTYCONF, webapp);
+
+    hc = HTTPContext.get();
+    hc.init(soptions, webXml);
+
+    // create jetty instance
+    final URI jettyUri = Paths.get(jettyXml.toString()).toUri();
+    final Resource resource = new PathResourceFactory().newResource(jettyUri);
     jetty = (Server) new XmlConfiguration(resource).configure();
 
-    // enable GZIP support
+    // try to use GZIP compression (changed with Jetty 12.1)
+    Supplier<Handler> supplier = wac;
     if(soptions.get(StaticOptions.GZIP)) {
-      final GzipHandler gzip = new GzipHandler();
-      gzip.addIncludedMethods(HttpMethod.POST.asString(), HttpMethod.PUT.asString());
-      gzip.setInflateBufferSize(1024);
-      gzip.setHandler(wac);
-      jetty.setHandler(gzip);
-    } else {
-      jetty.setHandler(wac);
+      final String clzz = "org.eclipse.jetty.compression.server.CompressionHandler";
+      if(Reflect.available(clzz)) {
+        // create anonymous class, as a lambda expression would yield a ClassNotFoundException
+        // if the compression handler is not included in the classpath
+        supplier = gzip(wac);
+      } else if(Reflect.available("org.eclipse.jetty.server.handler.gzip.GzipHandler")) {
+        Util.errln("Please add " + clzz + " to the classpath to enable GZIP compression");
+      }
     }
+    jetty.setHandler(supplier);
     JettyWebSocketServletContainerInitializer.configure(wac, null);
 
     ServerConnector sc = null;
@@ -230,6 +234,27 @@ public final class BaseXHTTP extends CLI {
       target.write(data);
     }
     return target;
+  }
+
+  /**
+   * Returns a GZIP handler.
+   * @param wac web application context
+   * @return handler
+   */
+  private static Supplier<Handler> gzip(final WebAppContext wac) {
+    return new Supplier<>() {
+      @Override
+      public Handler get() {
+        final CompressionHandler ch = new CompressionHandler();
+        final GzipCompression gc = new GzipCompression();
+        ch.putCompression(gc);
+        final CompressionConfig cc = CompressionConfig.builder().defaults().
+            compressIncludeMethod("PUT").decompressIncludeMethod("PUT").build();
+        ch.putConfiguration("/", cc);
+        ch.setHandler(wac);
+        return ch;
+      }
+    };
   }
 
   @Override

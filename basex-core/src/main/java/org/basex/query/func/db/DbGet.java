@@ -16,7 +16,9 @@ public final class DbGet extends DbAccessFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
-    final String path = defined(1) ? toDbPath(arg(1), qc) : "";
+    String path = toDbPathOrNull(arg(1), qc);
+    if(path == null) path = "";
+
     return DBNodeSeq.get(data.resources.docs(path), data, true, path.isEmpty());
   }
 

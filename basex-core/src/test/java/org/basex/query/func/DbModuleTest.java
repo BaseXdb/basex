@@ -873,6 +873,17 @@ public final class DbModuleTest extends SandboxTest {
     // GH-1302: check replacements of new paths
     query(func.args(NAME, XML, "6.xml") + ',' + func.args(NAME, XML, "7.xml"));
     query(func.args(NAME, " <a/>", "8.xml") + ',' + func.args(NAME, " <a/>", "9.xml"));
+
+    // GH-2459
+    query(func.args(NAME, "<x/>", "10.xml"));
+    query(_DB_GET.args(NAME, "10.xml"), "<x/>");
+    query(func.args(NAME, "<y/>", "10.xml"));
+    query(_DB_GET.args(NAME, "10.xml"), "<y/>");
+    query(func.args(NAME, "<z/>", "10.xml", " { 'replace': false() }"));
+    query(_DB_GET.args(NAME, "10.xml"), "<y/>");
+    query(_DB_PUT_BINARY.args(NAME, "xxx", "10.xml"));
+    query(func.args(NAME, "<z/>", "10.xml", " { 'replace': false() }"));
+    query(_DB_GET.args(NAME, "10.xml"), "");
   }
 
   /** Test method. */
@@ -883,6 +894,19 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_GET_BINARY.args(NAME, "binary2"), "b");
     query(func.args(NAME, 123, "binary3"));
     query(_DB_GET_BINARY.args(NAME, "binary3"), 123);
+
+    // GH-2462: replace existing resource
+    query(_DB_PUT.args(NAME, "<xml/>", "mixed"));
+    query(func.args(NAME, "<xml/>", "mixed"));
+    query(_DB_GET_BINARY.args(NAME, "mixed"), "<xml/>");
+    query(_DB_GET.args(NAME, "mixed"), "");
+
+    // GH-2459
+    query(func.args(NAME, "<blu/>", "mixed", " { 'replace': true() }"));
+    query(_DB_GET_BINARY.args(NAME, "mixed"), "<blu/>");
+    query(func.args(NAME, "<bla/>", "mixed", " { 'replace': false() }"));
+    query(_DB_GET_BINARY.args(NAME, "mixed"), "<blu/>");
+    query(_DB_GET.args(NAME, "mixed"), "");
 
     error(func.args(NAME, "bin/x", "x") + ", " + func.args(NAME, "bin//x", "x"), DB_CONFLICT5_X);
   }
@@ -899,6 +923,19 @@ public final class DbModuleTest extends SandboxTest {
 
     query(func.args(NAME, " string(attribute a { 'x' })", "value3"));
     query(_DB_GET_VALUE.args(NAME, "value3"), "x");
+
+    // GH-2462: replace existing resource
+    query(_DB_PUT.args(NAME, "<xml/>", "mixed"));
+    query(func.args(NAME, "<xml/>", "mixed"));
+    query(_DB_GET_VALUE.args(NAME, "mixed"), "<xml/>");
+    query(_DB_GET.args(NAME, "mixed"), "");
+
+    // GH-2459
+    query(func.args(NAME, "<blu/>", "mixed", " { 'replace': true() }"));
+    query(_DB_GET_VALUE.args(NAME, "mixed"), "<blu/>");
+    query(func.args(NAME, "<bla/>", "mixed", " { 'replace': false() }"));
+    query(_DB_GET_VALUE.args(NAME, "mixed"), "<blu/>");
+    query(_DB_GET.args(NAME, "mixed"), "");
 
     error(func.args(NAME, "x", "value/x") + ", " + func.args(NAME, "x", "value//x"),
         DB_CONFLICT5_X);

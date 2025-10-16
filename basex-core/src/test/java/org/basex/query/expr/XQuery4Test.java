@@ -5,8 +5,12 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.query.expr.constr.*;
+import org.basex.query.expr.path.*;
+import org.basex.query.func.map.*;
 import org.basex.query.value.item.*;
-import org.junit.jupiter.api.*;
+import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * XQuery 4.0 tests.
@@ -51,23 +55,23 @@ public final class XQuery4Test extends SandboxTest {
     query("declare variable $_ := 1; [ 9 ]?$_", 9);
   }
 
-  /** Method annotation. */
-  @Test public void method() {
-    final String rect = "{ 'height': 3, 'width': 4, 'area': %method fn() { ?height × ?width } }";
-    query(rect + "?area()", 12);
-    query(rect + "?area instance of %method fn() as item()*", false);
-    query(rect + "('area') instance of %method fn() as item()*", true);
+  /** Method call. */
+  @Test public void methodCall() {
+    final String rect = "{ 'height': 3, 'width': 4, 'area': fn { ?height × ?width } }";
+    query(rect + "=?>area()", 12);
+    query(rect + "?area instance of fn() as item()*", false);
+    query(rect + "('area') instance of fn(item()*) as item()*", true);
 
-    query("declare record local:rect(height, width, area := %method fn() { ?height × ?width }); "
-        + "let $r := local:rect(3, 4) return local:rect(5, 6, $r?area)?area()", 12);
-    query("{ 'self': %method fn() { . } }?self() => map:keys()", "self");
-    query("let $f := %method fn() {?i} "
-        + "let $h := ({ 'i': 7, 'f': $f }, { 'i': 11, 'g': $f })?('f', 'g') "
-        + "return $h[1]() * $h[2]()", 77);
+    query("declare record local:rect(height, width, area := fn { ?height × ?width }); "
+        + "let $r := local:rect(3, 4) return local:rect(5, 6, $r?area)=?>area()", 30);
+    query("{ 'self': fn { . } }=?>self() => map:keys()", "self");
+    query("let $f := fn {trace(., \"context\")?i}\n"
+        + "let $g := ({ 'i': 7, 'f': $f }, { 'i': 11, 'g': $f })\n"
+        + "let $h := $g?('f', 'g')\n"
+        + "return $h[1]($g[1]) * $h[2]($g[2])", 77);
 
-    error("(" + rect + "=> map:get('area'))()", NOCTX_X);
-    error(rect + "('area')()", NOCTX_X);
-    error("%method fn { . }", NOMETHOD);
+    error("(" + rect + "=> map:get('area'))()", INVARITY_X_X);
+    error(rect + "('area')()", INVARITY_X_X);
   }
 
   /** Otherwise expression. */
@@ -366,6 +370,12 @@ public final class XQuery4Test extends SandboxTest {
     query("declare function local:inc($x) { $x + 1 }; local:inc(x := 1)", 2);
     query("declare function local:inc($x, $y) { $x + $y }; local:inc(x := 1, y := 1)", 2);
     query("declare function local:inc($x, $y) { $x + $y }; local:inc(1, y := 1)", 2);
+    // GH-2463
+    error("declare function local:inc($x) { }; local:inc(,)", FUNCARG_X);
+    error("declare function local:inc($x) { }; local:inc(x := 0,)", FUNCARG_X);
+    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y)", FUNCARG_X);
+    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y := )", FUNCARG_X);
+    error("declare function local:inc($x, $y) { }; local:inc(x := 0, y := 0,)", FUNCARG_X);
   }
 
   /** String templates. */
@@ -674,5 +684,166 @@ public final class XQuery4Test extends SandboxTest {
         false);
 
     error("fn($a as map(xs:float, item())) { $a }({ 1.2: 0, 1.2000000001: 0 })", INVCONVERT_X_X_X);
+  }
+
+  /** Map constructor. */
+  @Test public void mapConstructor() {
+    check("{}", "{}", root(XQTrieMap.class));
+    check("{ 1: 2 }", "{1:2}", root(XQSingletonMap.class));
+    check("{ 1: 2, 3: 4 }", "{1:2,3:4}", root(XQIntMap.class));
+
+    check("{ () }", "{}", root(XQTrieMap.class));
+    check("{ {} }", "{}", root(XQTrieMap.class));
+    check("{ { 1: 2 } }", "{1:2}", root(XQSingletonMap.class));
+    check("{ { 1: 2 }[?1 = 2] }", "{1:2}", root(XQSingletonMap.class));
+    check("{ { 1: 2 }[?1 = 0] }", "{}", root(XQTrieMap.class));
+    check("{ (), { 1: 2 }[?1 = 0] }", "{}", root(XQTrieMap.class));
+
+    check("{ map:build((1 to 6) ! xs:int()) }", "{1:1,2:2,3:3,4:4,5:5,6:6}",
+        root(MapBuild.class));
+    check("{ 0: 0, map:build((1 to 6) ! xs:int()), () }",
+        "{0:0,1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
+    check("{ (1 to 6) ! { .: . } }", "{1:1,2:2,3:3,4:4,5:5,6:6}", root(CMap.class));
+
+    check("{ 'one': 1, { 'two': 2 } }", "{\"one\":1,\"two\":2}", root(XQRecordMap.class));
+    check("{ 'one': 1, { 2: 'two' } }", "{\"one\":1,2:\"two\"}", root(XQItemValueMap.class));
+
+    check("{ 0: <a/>, 1: <b/> } => map:size()", 2, root(Itr.class));
+    check("{ 0: 0, { 1: 1 } } => map:size()", 2, root(Itr.class));
+    check("{ 0: 0, (1 to 6) ! { .: . } } => map:size()", 7, root(_MAP_SIZE));
+
+    check("{ 1: 1, <a/>[. = 'b'] }", "{1:1}",
+        root(CMap.class), type(CMap.class, "map(*)"));
+    check("{ 1: <a/>[. = 'b'], 2: 1 }", "{1:(),2:1}",
+        root(CMap.class), type(CMap.class, "map(xs:integer, item()?)"));
+    check("{ 1: (<a/>, <b/>)[. = 'b'], 2: 1 }", "{1:(),2:1}",
+        root(CMap.class), type(CMap.class, "map(xs:integer, item()*)"));
+    check("{ (1 to 6)[. = 1]: (<a/>, <b/>)[. = 'b'], 2: 1 }", "{1:(),2:1}",
+        root(CMap.class), type(CMap.class, "map(xs:integer, item()*)"));
+    error("{ 1: 1, <a/>[. = ''] }", INVCONVERT_X_X_X);
+
+    error("{ 1: 1, 1: 1 }", MAPDUPLKEY_X);
+    error("{ 1: <a/>, 1: 1 }", MAPDUPLKEY_X);
+    error("{ 1: <a/>, { 1: 1 } }", MAPDUPLKEY_X);
+    error("{ 1: <a/>, (1 to 6) ! { .: . } }", MAPDUPLKEY_X);
+  }
+
+  /** Path extensions: get(). */
+  @Test public void pathGet() {
+    check("<a><b/></a>/self::get(#a)", "<a><b/></a>", root(CElem.class));
+    check("<a><b/></a>/get(#b)", "<b/>", type(IterStep.class, "element(b)*"));
+    check("<a><b/></a>/child::get(#b)", "<b/>", type(IterStep.class, "element(b)*"));
+    check("<a><b/></a>/descendant-or-self::get(#b)", "<b/>", type(IterStep.class, "element(b)*"));
+    check("<a><b/></a>/get(#c)", "", type(IterStep.class, "element(c)*"));
+    check("<a><b/></a>/get(())", "", empty());
+
+    check("<a><b/></a>/get((#b, 1))", "<b/>", exists(_UTIL_SELECT));
+    check("<a><b/></a>/get((#c, 1))", "", exists(_UTIL_SELECT));
+
+    check("<a><b/><c/></a>/get((#c, #b))", "<b/>\n<c/>",
+        type(IterStep.class, "(element(c)|element(b))*"));
+    check("let $names := (#c, #b) return <a><b/><c/></a>/get($names)", "<b/>\n<c/>",
+        type(IterStep.class, "(element(c)|element(b))*"));
+
+    check("<a><b/><c/></a>/(c | get(#b))", "<b/>\n<c/>",
+        type(Union.class, "(element(c)|element(b))*"));
+    check("<a><b/><c/></a>/(get(#c) | b)", "<b/>\n<c/>",
+        type(Union.class, "(element(c)|element(b))*"));
+    check("<a><b/><c/></a>/(get(xs:QName('c')))", "<c/>",
+        type(IterStep.class, "element(c)*"));
+    check("<a><b/><c/></a>/(get(xs:QName(<?_ c?>)))", "<c/>",
+        exists(CmpSimpleG.class), exists(NODE_NAME));
+    check("let $name := #b return <a><b/><c/></a>/(c | get($name))", "<b/>\n<c/>",
+        type(Union.class, "(element(c)|element(b))*"));
+  }
+
+  /** Path extensions: type(). */
+  @Test public void pathType() {
+    query("<a><b/></a>/type(item())", "<b/>");
+    query("<a><b/></a>/type(item()?)", "<b/>");
+    query("<a><b/></a>/type(item()*)", "<b/>");
+    query("<a><b/></a>/type(item()+)", "<b/>");
+    query("<a><b/></a>/type(element())", "<b/>");
+    query("<a><b/></a>/type(element()?)", "<b/>");
+    query("<a><b/></a>/type(element()*)", "<b/>");
+    query("<a><b/></a>/type(element()+)", "<b/>");
+    query("<a><b/></a>/child::type(element())", "<b/>");
+    query("<a><b/></a>/self::type(element())", "<a><b/></a>");
+    query("<a><b/></a>/descendant-or-self::type(element())", "<a><b/></a>\n<b/>");
+    query("<a><b/></a>/descendant-or-self::type(text())", "");
+    query("<a><b/></a>/descendant-or-self::type(xs:integer)", "");
+    query("<a><b/></a>/descendant-or-self::type(xs:integer?)", "");
+    query("<a><b/></a>/descendant-or-self::type(xs:integer*)", "");
+    query("<a><b/></a>/descendant-or-self::type(xs:integer+)", "");
+    query("<a><b/></a>/descendant-or-self::type(empty-sequence())", "");
+  }
+
+  /** Destructuring let. */
+  @Test public void destructuringLet() {
+    String value = "1 to 3";
+    query("let $($a) := " + value + " return [ $a ]", "[(1,2,3)]");
+    query("let $($a, $b) := " + value + " return [ $a, $b ]", "[1,(2,3)]");
+    query("let $($a, $b, $c) := " + value + " return [ $a, $b, $c ]", "[1,2,3]");
+    query("let $($a, $b, $c, $d) := " + value + " return [ $a, $b, $c, $d ]", "[1,2,3,()]");
+
+    value = "[ 1, 2, 3 ]";
+    query("let $[$a] := " + value + " return [ $a ]", "[1]");
+    query("let $[$a, $b] := " + value + " return [ $a, $b ]", "[1,2]");
+    query("let $[$a, $b, $c] := " + value + " return [ $a, $b, $c ]", "[1,2,3]");
+    error("let $[$a, $b, $c, $d] := " + value + " return [ $a, $b, $c, $d ]", ARRAYBOUNDS_X_X);
+
+    value = "{ 'a': 1, 'b': 2, 'c': 3 }";
+    query("let ${$a} := " + value + " return [ $a ]", "[1]");
+    query("let ${$a, $b} := " + value + " return [ $a, $b ]", "[1,2]");
+    query("let ${$a, $b, $c} := " + value + " return [ $a, $b, $c ]", "[1,2,3]");
+    query("let ${$a, $b, $c, $d} := " + value + " return [ $a, $b, $c, $d ]", "[1,2,3,()]");
+
+    // GH-2452
+    query("""
+      let $($a, $b) := (1 to 6) ! string()
+      for $i in 1 to 3
+      return [ $a, $b, $i ]
+    """, """
+      ["1",("2","3","4","5","6"),1]
+      ["1",("2","3","4","5","6"),2]
+      ["1",("2","3","4","5","6"),3]""");
+  }
+
+  /** Calls of dynamic function sequences. */
+  @Test public void dynamicFunctionSequences() {
+    // empty sequences
+    query("()()", "");
+    query("()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()", "");
+    query("(true#0[. instance of xs:integer])()", "");
+
+    // non-empty sequences
+    query("((), true#0)()", "true");
+    query("(true#0, true#0)()", "true\ntrue");
+    query("((true#0, 1, true#0)[. instance of fn(*)])()", "true\ntrue");
+    query("(substring-before(?, 'b'), substring-before(?, 'c'))('abc')", "a\nab");
+    query("(tokenize#1, string-length#1)('a b')", "a\nb\n3");
+
+    // arrow expression
+    query("'|' => (substring-before('ab|yz', ?), substring-after('ab|yz', ?))()", "ab\nyz");
+    query("'|' =!> (substring-before('ab|yz', ?), substring-after('ab|yz', ?))()", "ab\nyz");
+    query("'ab|yz' ! ('|' => (substring-before(., ?), substring-after(., ?))())", "ab\nyz");
+
+    // maps and arrays
+    query("{ 'a': (count#1, sum#1) }('a')(2)", "1\n2");
+    query("{ 'a': (count#1, sum#1) }?a(2)", "1\n2");
+    query("{ 'count': count#1, 'sum': sum#1  }?*(2)", "1\n2");
+    query("[ (count#1, sum#1) ](1)(2)", "1\n2");
+    query("[ (count#1, sum#1) ]?1(2)", "1\n2");
+
+    // ensure that iterative evaluation will ignore invalid input
+    query("head((true#0, 1)())", "true");
+
+    // ensure that single functions are optimized when sequence is unrolled
+    unroll(true);
+    inline(true);
+    check("(true#0, false#0)()", "true\nfalse", root(BlnSeq.class));
+    check("((true#0, 1, false#0)[. instance of fn(*)])()", "true\nfalse", root(BlnSeq.class));
+    check("(substring-before(?, 'b'), substring-before(?, 'c'))('abc')", "a\nab",
+        root(StrSeq.class));
   }
 }

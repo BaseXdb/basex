@@ -96,7 +96,7 @@ public abstract class ContextFn extends StandardFunc {
     final SeqType st = expr.seqType();
     if(st.instanceOf(SeqType.ELEMENT_O) || st.instanceOf(SeqType.DOCUMENT_NODE_O)) {
       final Expr[] preds = pred != null ? new Expr[] { pred.get() } : new Expr[0];
-      final Expr step = Step.get(cc, expr, info, Axis.DESCENDANT, KindTest.TEXT, preds);
+      final Expr step = Step.get(cc, expr, info, Axis.DESCENDANT, NodeTest.TEXT, preds);
       return Path.get(cc, info, expr, step);
     }
     return this;

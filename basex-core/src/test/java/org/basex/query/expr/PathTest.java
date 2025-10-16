@@ -295,4 +295,33 @@ public final class PathTest extends SandboxTest {
     check(el + "/child::(text()|e|text()) ! string()", "e\nt",
         type(IterStep.class, "(text()|element(e))*"));
   }
+
+  /** Refine node tests. */
+  @Test public void gh2464() {
+    String[] tests = { empty(Instance.class), type(IterPath.class, "node()*"),
+        "//IterStep/@test = 'node()'" };
+    check("<a/>/node()[self::node()]", "", tests);
+    check("<a/>/node()[. instance of node()]", "", tests);
+
+    tests = new String[] { empty(Instance.class), type(IterPath.class, "element()*"),
+        "//IterStep/@test = '*'" };
+    check("<a/>/node()[self::*]", "", tests);
+    check("<a/>/node()[. instance of element()]", "", tests);
+    check("<a/>/*[. instance of element()]", "", tests);
+
+    tests = new String[] { empty(Instance.class), type(IterPath.class, "element(a)*"),
+        "//IterStep/@test = 'a'" };
+    check("<a/>/node()[self::a]", "", tests);
+    check("<a/>/node()[. instance of element(a)]", "", tests);
+    check("<a/>/*[. instance of element(a)]", "", tests);
+    check("<a/>/*[. instance of element(a)]", "", tests);
+    check("<a/>/a[. instance of element(a)]", "", tests);
+    check("<a/>/*[node-name() = #a]", "", tests);
+    check("<a/>/a[node-name() = #a]", "", tests);
+
+    check("<a/>/.[element()]", "", "//IterStep/@test = '*'");
+    check("<a/>/.[*]", "", "//IterStep/@test = '*'");
+    check("<a/>/.[a]", "", "//IterStep/@test = '*'");
+    check("<a/>/.[element(a)]", "", "//IterStep/@test = '*'");
+  }
 }

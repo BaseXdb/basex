@@ -38,12 +38,12 @@ public abstract class Step extends Preds {
    * @param root root context expression; if {@code null}, the current context will be used
    * @param info input info (can be {@code null})
    * @param preds predicates
-   * @return step
+   * @return step or empty sequence
    * @throws QueryException query exception
    */
   public static Expr self(final CompileContext cc, final Expr root, final InputInfo info,
       final Expr... preds) throws QueryException {
-    return self(cc, root, info, KindTest.NODE, preds);
+    return self(cc, root, info, NodeTest.NODE, preds);
   }
 
   /**
@@ -53,7 +53,7 @@ public abstract class Step extends Preds {
    * @param info input info (can be {@code null})
    * @param test test
    * @param preds predicates
-   * @return step
+   * @return step or empty sequence
    * @throws QueryException query exception
    */
   public static Expr self(final CompileContext cc, final Expr root, final InputInfo info,
@@ -69,7 +69,7 @@ public abstract class Step extends Preds {
    * @param axis axis
    * @param test node test
    * @param preds predicates
-   * @return step
+   * @return step or empty sequence
    * @throws QueryException query exception
    */
   public static Expr get(final CompileContext cc, final Expr root, final InputInfo info,
@@ -130,12 +130,12 @@ public abstract class Step extends Preds {
    * Optimizes the step for the given root expression.
    * @param cc compilation context
    * @param root root context expression; if {@code null}, the current context will be used
-   * @return optimized step
+   * @return optimized step or empty sequence
    * @throws QueryException query exception
    */
   final Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     // updates the static type
-    final Expr rt = type(root != null ? root : cc.qc.focus.value);
+    final Expr rt = type(root != null ? root : cc.qc.focus.value, true);
 
     // choose stricter axis
     final Axis old = axis;
@@ -161,17 +161,28 @@ public abstract class Step extends Preds {
     }
     test = t;
 
-    // optimize predicates, choose best implementation
-    return optimize(cc, this) ? cc.emptySeq(this) : copyType(get(info, axis, test, exprs));
+    // optimize predicates
+    if(optimize(cc, this)) return cc.emptySeq(this);
+    // adopt sequence type if it is more specific
+    final SeqType st = seqType();
+    if(st.type.instanceOf(test.type) && !st.type.eq(test.type)) {
+      test = st.test();
+      if(test == null) test = NodeTest.get((NodeType) st.type);
+    }
+    // choose best implementation
+    return copyType(get(info, axis, test, exprs));
   }
 
   @Override
-  protected final Expr type(final Expr expr) {
+  protected final Expr type(final Expr expr, final boolean optimize) {
     exprType.data(expr);
-    if(expr != null && axis == SELF) {
+    if(!optimize && exprs.length != 0) {
+      // reset type (discard refined type information derived from predicates)
+      exprType.assign(test.type.seqType(Occ.ZERO_OR_MORE));
+    } else if(expr != null && axis == SELF) {
       final SeqType seqType = expr.seqType();
       // node test: adopt type of context expression: <a/>/self::node()
-      if(test == KindTest.NODE) exprType.assign(seqType.type);
+      if(test == NodeTest.NODE) exprType.assign(seqType.type);
       // no predicates: step will yield single result: $elements/self::element()
       if(exprs.length == 0 && test.matches(seqType) == Boolean.TRUE) {
         exprType.assign(Occ.EXACTLY_ONE);
@@ -189,7 +200,7 @@ public abstract class Step extends Preds {
    */
   public static SeqType seqType(final Axis axis, final Test test, final Expr... preds) {
     final Type type = axis == ATTRIBUTE ? NodeType.ATTRIBUTE : test.type;
-    final Occ occ = axis == SELF && test == KindTest.NODE && preds.length == 0
+    final Occ occ = axis == SELF && test == NodeTest.NODE && preds.length == 0
       // one result: self::node()
       ? Occ.EXACTLY_ONE :
         axis == SELF || axis == PARENT ||
@@ -198,7 +209,7 @@ public abstract class Step extends Preds {
       // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
       ? Occ.ZERO_OR_ONE
       : Occ.ZERO_OR_MORE;
-    final Test t = test instanceof KindTest ? null : test;
+    final Test t = test instanceof NodeTest ? null : test;
     return SeqType.get(type, occ, t);
   }
 
@@ -433,7 +444,7 @@ public abstract class Step extends Preds {
   @Override
   public void toString(final QueryString qs) {
     final TokenBuilder tb = new TokenBuilder();
-    if(test == KindTest.NODE) {
+    if(test == NodeTest.NODE) {
       if(axis == PARENT) tb.add("..");
       if(axis == SELF) tb.add('.');
     }

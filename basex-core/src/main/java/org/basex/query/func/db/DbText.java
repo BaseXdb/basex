@@ -83,11 +83,10 @@ public class DbText extends DbAccessFn {
    * @throws QueryException query exception
    */
   private TokenSet tokens(final QueryContext qc) throws QueryException {
-    final TokenSet set = new TokenSet();
-    final Iter iter = arg(1).iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      set.put(toToken(item));
+    final TokenSet token = new TokenSet();
+    for(final Item item : arg(1).atomValue(qc, info)) {
+      token.put(toToken(item));
     }
-    return set;
+    return token;
   }
 }

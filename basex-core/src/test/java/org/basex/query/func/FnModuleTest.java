@@ -19,7 +19,6 @@ import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
-import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,12 +33,6 @@ public final class FnModuleTest extends SandboxTest {
   /** Months. */
   private static final String MONTHS = " ('January', 'February', 'March', 'April', 'May', "
       + "'June', 'July', 'August', 'September', 'October', 'November', 'December')";
-
-  /** Resets optimizations. */
-  @AfterEach public void init() {
-    inline(false);
-    unroll(false);
-  }
 
   /** Test method. */
   @Test public void abs() {
@@ -196,6 +189,40 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" true#0", " [1]"), true);
     error(func.args(" concat#2", " ['x']"), APPLY_X_X);
     error(func.args(" put#2", " [<_/>, '']"), FUNCUP_X);
+  }
+
+  /** Test method. */
+  @Test public void atomicEqual() {
+    final Function func = ATOMIC_EQUAL;
+    check(func.args(" <_>A</_>", "A"), true, root(Bln.class));
+    check("some((1 to 6) !" + func.args(" .", " .") + ')', true, root(Bln.class));
+
+    check(func.args(wrap(1), "1"), true, exists(CmpSimpleG.class));
+    check(func.args(" <?_ 1?>", "1"), true, exists(CmpSimpleG.class));
+    check(func.args(" false()", " boolean(" + wrap(1)) + ')', false, exists(NOT));
+    check("some((1 to 6) !" + func.args(" .", " . + 1") + ')', false, exists(CmpSimpleG.class));
+    check(func.args(" xs:anyURI('A')", " <?_ A?>"), true, root(CmpSimpleG.class));
+    check(func.args(" <?_ A?>", " xs:anyURI('A')"), true, root(CmpSimpleG.class));
+    check(func.args(" #a", " xs:QName(<?_ a?>)"), true, root(CmpSimpleG.class));
+    check(func.args(" xs:QName(<?_ a?>)", " #a"), true, root(CmpSimpleG.class));
+    check(func.args(" xs:integer(<?_ 1?>)", 1), true, root(CmpSimpleG.class));
+    check(func.args(1, " xs:integer(<?_ 1?>)"), true, root(CmpSimpleG.class));
+    check(func.args(" xs:byte(<?_ 1?>)", " xs:byte(1)"), true, root(CmpSimpleG.class));
+    check(func.args(" xs:byte(1)", " xs:byte(<?_ 1?>)"), true, root(CmpSimpleG.class));
+
+    check("declare default collation '?lang=de';" + func.args(wrap(1), "1"), true, root(func));
+    check(func.args(" array:build((1 to 10)[. = 1] ! string())", "1"), true, root(func));
+    check(func.args("1", " array:build((1 to 10)[. = 1] ! string())"), true, root(func));
+    check(func.args("1", " ([ <?_ 1?> ], 1)[. instance of array(*)]"), true, root(func));
+    check(func.args(" ([ <?_ 1?> ], 1)[. instance of array(*)]", "1"), true, root(func));
+    check(func.args(" #a", " <?_ 1?>"), false, root(func));
+    check(func.args(" <?_ 1?>", " #a"), false, root(func));
+    check(func.args(" <?_ 1?>", " true()"), false, root(func));
+
+    error(func.args(" ()", " <?_ 1?>"), EMPTYFOUND);
+    error(func.args(" <?_ 1?>", " ()"), EMPTYFOUND);
+    error(func.args(" true#0", " 1"), FIATOMIZE_X);
+    error(func.args(" 1", " true#0"), FIATOMIZE_X);
   }
 
   /** Test method. */
@@ -1351,6 +1378,10 @@ public final class FnModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void hash() {
     final Function func = HASH;
+    query("string(" + func.args(" ()") + ")", "");
+    query("string(" + func.args("") + ")", "D41D8CD98F00B204E9800998ECF8427E");
+    query("string(" + func.args("", " ()") + ")", "D41D8CD98F00B204E9800998ECF8427E");
+
     query(func.args(" ()", "crc-32"), "");
     query("string( " + func.args("", "CRC-32") + ')', "00000000");
     query("string( " + func.args("BaseX", "CRC-32") + ')', "4C06FC7F");
@@ -1358,6 +1389,8 @@ public final class FnModuleTest extends SandboxTest {
 
     query("string( " + func.args("X", "BLAKE3") + ')',
         "F7B966D4B544408E21361E62D4D554FEDB411BD8E108D70B4B654620A4B06CD2");
+
+    error(func.args("", ""), HASH_ALGORITHM_X);
   }
 
   /** Test method. */
@@ -3005,7 +3038,7 @@ public final class FnModuleTest extends SandboxTest {
     check("for $s in ('a', 'b') return $s[" + func.args() + ']', "a\nb", empty(func));
     check("for $s in ('a', 'b') return $s[" + func.args() + " = 'a']", "a", empty(func));
     check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "",
-        empty(func), exists(SingleIterPath.class), root(IterFilter.class));
+        empty(func), exists(SingleIterPath.class), root(DualIterMap.class));
 
     error(func.args(), NOCTX_X);
     error(func.args(" true#0"), FISTRING_X);

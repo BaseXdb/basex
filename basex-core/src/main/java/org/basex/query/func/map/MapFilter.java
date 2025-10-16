@@ -18,12 +18,12 @@ public final class MapFilter extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
-    final FItem predicate = toFunction(arg(1), 2, qc);
+    final FItem predicate = toFunction(arg(1), 3, qc);
 
     final MapBuilder mb = new MapBuilder();
-    final HofArgs args = new HofArgs(2);
+    final HofArgs args = new HofArgs(3, predicate);
     map.forEach((key, value) -> {
-      if(test(predicate, args.set(0, key).set(1, value), qc)) mb.put(key, value);
+      if(test(predicate, args.set(0, key).set(1, value).inc(), qc)) mb.put(key, value);
     });
     return mb.map(this);
   }
@@ -36,7 +36,7 @@ public final class MapFilter extends StandardFunc {
     final Type type = map.seqType().type;
     if(type instanceof final MapType mt) {
       final SeqType declType = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE);
-      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType()));
+      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType(), SeqType.INTEGER_O));
       exprType.assign(type);
     }
     return this;

@@ -15,13 +15,13 @@ public final class BinInsertBefore extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Bin binary = toBinOrNull(arg(0), qc);
-    final Item offset = arg(1).atomItem(qc, info);
+    final Long offset = toLongOrNull(arg(1), qc);
     final Bin extra = toBinOrNull(arg(2), qc);
     if(binary == null) return Empty.VALUE;
 
     final byte[] bytes = binary.binary(info);
     final int bl = bytes.length;
-    final int[] bounds = bounds(offset, Empty.VALUE, bl);
+    final int[] bounds = bounds(offset, null, bl);
 
     if(extra == null) return binary;
     final byte[] xtr = extra.binary(info);

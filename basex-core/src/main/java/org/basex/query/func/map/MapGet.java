@@ -30,9 +30,6 @@ public final class MapGet extends StandardFunc {
     } else {
       value = map.get(key);
     }
-    if(value instanceof final FuncItem fi && toBooleanOrFalse(arg(3), qc)) {
-      value = fi.toMethod(map);
-    }
     return value;
   }
 
@@ -57,10 +54,8 @@ public final class MapGet extends StandardFunc {
       // map:get({ 1: 1 }, 'string')  ->  ()
       if(mc.keyMismatch) return dflt ? arg(2) : Empty.VALUE;
 
-      SeqType st = mc.mapType.valueType();
-      st = dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO);
-      // invalidate function type (%method annotation would need to be removed from type)
-      if(!(st.mayBeFunction() && defined(3))) exprType.assign(st);
+      final SeqType st = mc.mapType.valueType();
+      exprType.assign(dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO));
     }
     return this;
   }

@@ -1,16 +1,12 @@
 package org.basex.query.func.db;
 
-import static org.basex.query.func.db.DbAccessFn.*;
-
 import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -24,15 +20,16 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DbList extends StandardFunc {
+public class DbList extends DbAccessFn {
   @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return defined(0) ? resources(qc) : list(qc).iter();
+  public final Iter iter(final QueryContext qc) throws QueryException {
+    final String name = toZeroString(arg(0), qc);
+    return name.isEmpty() ? list(qc) : resources(name, qc);
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return defined(0) ? resources(qc).value(qc, this) : list(qc);
+  public final Value value(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc, this);
   }
 
   /**
@@ -40,22 +37,23 @@ public class DbList extends StandardFunc {
    * @param qc query context
    * @return databases
    */
-  private static Value list(final QueryContext qc) {
+  Iter list(final QueryContext qc) {
     final StringList dbs = qc.context.databases.list(qc.user, null);
     final TokenList list = new TokenList(dbs.size());
     for(final String name : dbs) list.add(name);
-    return StrSeq.get(list);
+    return StrSeq.get(list).iter();
   }
 
   /**
    * Returns an iterator over all resources in a databases.
+   * @param name name of database
    * @param qc query context
    * @return resource iterator
    * @throws QueryException query exception
    */
-  private Iter resources(final QueryContext qc) throws QueryException {
-    final Data data = toData(qc);
-    final String path = defined(1) ? toString(arg(1), qc) : "";
+  Iter resources(final String name, final QueryContext qc) throws QueryException {
+    final Data data = toData(name, qc);
+    final String path = toZeroString(arg(1), qc);
 
     final Resources resources = data.resources;
     final IntList docs = resources.docs(path);
@@ -72,7 +70,7 @@ public class DbList extends StandardFunc {
       @Override
       public Value value(final QueryContext q, final Expr expr) throws QueryException {
         final TokenList tl = new TokenList(Seq.initialCapacity(size));
-        for(int i = 0; i < size; i++) tl.add(path(i));
+        for(int t = 0; t < size; t++) tl.add(path(t));
         return StrSeq.get(tl);
       }
 
@@ -81,12 +79,6 @@ public class DbList extends StandardFunc {
           Token.token(i < bs ? binaries.get(i - ds) : values.get(i - bs));
       }
     };
-  }
-
-  @Override
-  public final boolean accept(final ASTVisitor visitor) {
-    return (defined(0) ? dataLock(arg(0), false, visitor) : visitor.lock((String) null)) &&
-        super.accept(visitor);
   }
 
   /**

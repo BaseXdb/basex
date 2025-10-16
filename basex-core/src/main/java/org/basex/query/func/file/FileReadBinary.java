@@ -21,15 +21,15 @@ public final class FileReadBinary extends FileFn {
   @Override
   public Value eval(final QueryContext qc) throws QueryException, IOException {
     final Path path = toPath(arg(0), qc);
-    final Item offset = arg(1).atomItem(qc, info);
-    final Item length = arg(2).atomItem(qc, info);
-    final long off = offset.isEmpty() ? 0 : toLong(offset);
-    long len = length.isEmpty() ? Long.MAX_VALUE : toLong(length);
-
+    final Long offset = toLongOrNull(arg(1), qc);
+    final Long length = toLongOrNull(arg(2), qc);
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
     if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
+    if(!Files.isReadable(path)) throw FILE_ACCESS_X.get(info, path.toAbsolutePath());
 
     // read full file
+    final long off = offset != null ? offset : 0;
+    long len = length != null ? length : Long.MAX_VALUE;
     if(off == 0 && len == Long.MAX_VALUE) {
       return new B64Lazy(new IOFile(path), FILE_IO_ERROR_X);
     }

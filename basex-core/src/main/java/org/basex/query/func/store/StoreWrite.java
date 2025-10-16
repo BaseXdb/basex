@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class StoreWrite extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = defined(0) ? toName(arg(0), qc) : "";
+    final String name = toName(arg(0), true, qc);
     try {
       store(qc).write(name);
     } catch(final IOException ex) {

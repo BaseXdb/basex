@@ -9,8 +9,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.list.*;
 
-import jakarta.servlet.http.*;
-
 /**
  * Function implementation.
  *
@@ -20,12 +18,16 @@ import jakarta.servlet.http.*;
 public final class RequestHeader extends ApiFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final HttpServletRequest request = request(qc);
     final String name = toString(arg(0), qc);
 
     final TokenList list = new TokenList(1);
-    for(final String value : Collections.list(request.getHeaders(name))) list.add(value);
-    return !list.isEmpty() ? StrSeq.get(list) : defined(1) ? Str.get(toToken(arg(1), qc)) :
-      Empty.VALUE;
+    for(final String value : Collections.list(request(qc).getHeaders(name))) {
+      list.add(value);
+    }
+    if(list.isEmpty()) {
+      final Value dflt = arg(1).atomValue(qc, info);
+      for(final Item item : dflt) list.add(toToken(item));
+    }
+    return StrSeq.get(list);
   }
 }

@@ -53,13 +53,9 @@ public final class RandomSeededInteger extends StandardFunc {
   private long[] args(final QueryContext qc) throws QueryException {
     final long seed = toLong(arg(0), qc);
     final long num = toLong(arg(1), qc);
+    final Long max = toLongOrNull(arg(2), qc);
     if(num < 0) throw RANGE_NEGATIVE_X.get(info, num);
-
-    long max = 0;
-    if(defined(2)) {
-      max = toLong(arg(2), qc);
-      if(max < 1 || max > Integer.MAX_VALUE) throw RANDOM_BOUNDS_X.get(info, max);
-    }
-    return new long[] { seed, num, max };
+    if(max != null && (max < 1 || max > Integer.MAX_VALUE)) throw RANDOM_BOUNDS_X.get(info, max);
+    return new long[] { seed, num, max != null ? max : 0 };
   }
 }

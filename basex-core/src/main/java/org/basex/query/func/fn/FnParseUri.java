@@ -56,8 +56,8 @@ public class FnParseUri extends StandardFunc {
   static final HashSet<String> NON_HIERARCHICAL = new HashSet<>(
       Arrays.asList("jar", "mailto", "news", "tag", "tel", "urn"));
   /** Scheme/port mappings. */
-  static final Map<String, String> PORTS = Map.of(
-      "http", "80", "https", "443", "ftp", "21", "ssh", "22");
+  static final Map<String, Long> PORTS = Map.of(
+      "http", 80l, "https", 443l, "ftp", 21l, "ssh", 22l);
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -66,7 +66,7 @@ public class FnParseUri extends StandardFunc {
     if(value == null) return Empty.VALUE;
 
     String string = value.replace('\\', '/'), fragment = "", query = "", scheme = "";
-    String filepath = "", authority = "", userinfo = "", host = "", port = "", path;
+    String filepath = "", authority = "", userinfo = "", host = "", path;
 
     // strip off the fragment identifier and any query
     final Regex r = new Regex();
@@ -138,14 +138,19 @@ public class FnParseUri extends StandardFunc {
       host = r.group(3);
     }
     if(host == null) host = "";
+
     // an IPv6/IPvFuture address may contain a colon
+    Item prt = Empty.VALUE;
+    String port = null;
     if(r.has(authority, "^(([^@]*)@)?(\\[[^\\]]*\\])(:([^:]*))?$")) {
       port = r.group(5);
     } else if(r.has(authority, "^(([^@]*)@)?([^:]+)(:([^:]*))?$")) {
       port = r.group(5);
     }
-    if(port == null) port = "";
-    if(omitPort(port, scheme, options)) port = "";
+    if(port != null) {
+      final long p = Strings.toInt(port);
+      prt = omitPort(p, scheme, options) ? Empty.VALUE : Itr.get(p);
+    }
 
     path = string;
     if(filepath.isEmpty() && (scheme.isEmpty() || scheme.equalsIgnoreCase(FILE))) {
@@ -176,7 +181,7 @@ public class FnParseUri extends StandardFunc {
     add(mb, AUTHORITY, authority);
     add(mb, USERINFO, userinfo);
     add(mb, HOST, host);
-    add(mb, PORT, port);
+    add(mb, PORT, prt);
     add(mb, PATH, path);
     add(mb, QUERY, query);
     add(mb, FRAGMENT, fragment);
@@ -206,7 +211,7 @@ public class FnParseUri extends StandardFunc {
    * @param options options
    * @return result of check
    */
-  static boolean omitPort(final String port, final String scheme, final UriOptions options) {
+  static boolean omitPort(final long port, final String scheme, final UriOptions options) {
     return options.get(UriOptions.OMIT_DEFAULT_PORTS) &&
         Objects.equals(PORTS.get(scheme), port);
   }

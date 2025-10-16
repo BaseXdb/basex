@@ -30,26 +30,35 @@ public final class Delete extends ACreate {
     final String path = MetaData.normPath(args[0]);
     if(path == null) return error(PATH_INVALID_X, args[0]);
 
+    final IntList docs = data.resources.docs(path);
     return update(data, () -> {
-      context.invalidate();
-
       // delete XML documents
-      final IntList docs = data.resources.docs(path);
+      final AtomicUpdateCache auc = new AtomicUpdateCache(data);
+      for(final int pre : docs.toArray()) auc.addDelete(pre);
+      auc.execute(false);
+      // delete binaries
       int size = docs.size();
-      if(size != 0) {
-        final AtomicUpdateCache auc = new AtomicUpdateCache(data);
-        for(int d = 0; d < size; d++) auc.addDelete(docs.get(d));
-        auc.execute(false);
-      }
-      // delete file resources
       for(final ResourceType type : Resources.BINARIES) {
-        final IOFile bin = data.meta.file(path, type);
-        if(bin != null && bin.exists()) {
-          size += bin.isDir() ? bin.descendants().size() : 1;
-          bin.delete();
-        }
+        size += binaries(data, path, type);
       }
       return info(RES_DELETED_X_X, size, jc().performance);
     });
+  }
+
+  /**
+   * Deletes binary resources.
+   * @param data data reference
+   * @param path path to resources
+   * @param type resource type
+   * @return number of deleted files
+   */
+  static int binaries(final Data data, final String path, final ResourceType type) {
+    int size = 0;
+    final IOFile bin = data.meta.file(path, type);
+    if(bin != null && bin.exists()) {
+      size += bin.isDir() ? bin.descendants().size() : 1;
+      bin.delete();
+    }
+    return size;
   }
 }

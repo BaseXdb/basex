@@ -393,11 +393,11 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrence indicator
-   * @param test kind test (can be {@code null}; {@link KindTest} is redundant and ignored)
+   * @param test kind test (can be {@code null}; {@link NodeTest} is redundant and ignored)
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ, final Test test) {
-    return occ == ZERO || test == null || test instanceof KindTest ? get(type, occ) :
+    return occ == ZERO || test == null || test instanceof NodeTest ? get(type, occ) :
       new SeqType(type, occ, test);
   }
 
@@ -485,6 +485,9 @@ public final class SeqType {
         if(tp.instance(item, coerce)) return true;
       }
       return false;
+    }
+    if(type instanceof final EnumType et) {
+      return et.instance(item);
     }
     return item.instanceOf(type, coerce) && (test == null || test.matches(item));
   }
@@ -775,15 +778,6 @@ public final class SeqType {
    */
   public boolean mayBeArray() {
     return !zero() && (type instanceof ArrayType || ARRAY.instanceOf(type));
-  }
-
-  /**
-   * Tests if expressions of this type may yield maps or arrays.
-   * @return result of check
-   */
-  public boolean mayBeStruct() {
-    return !zero() && (type instanceof ArrayType || ARRAY.instanceOf(type)
-        || type instanceof MapType || MAP.instanceOf(type));
   }
 
   /**

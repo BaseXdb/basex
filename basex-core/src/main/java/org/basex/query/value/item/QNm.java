@@ -28,7 +28,7 @@ public final class QNm extends Item {
   /** QName: empty (invalid). */
   public static final QNm EMPTY = new QNm(Token.EMPTY);
   /** EQName syntax. */
-  public static final Pattern EQNAME = Pattern.compile("^Q\\{([^{}]*)\\}(.+)$");
+  private static final Pattern EQNAME = Pattern.compile("^Q\\{([^{}]*)\\}(.+)$");
 
   /** Name with optional prefix. */
   private final byte[] name;
@@ -310,7 +310,7 @@ public final class QNm extends Item {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(unique());
+    qs.token(concat('#', unique()));
   }
 
   // STATIC METHODS ===============================================================================
@@ -353,24 +353,37 @@ public final class QNm extends Item {
   public static QNm parse(final byte[] value, final byte[] dflt, final StaticContext sc,
       final InputInfo info) throws QueryException {
 
-    byte[] uri = null, name = value;
-    final Matcher matcher = EQNAME.matcher(Token.string(value));
-    if(matcher.matches()) {
-      uri = token(matcher.group(1));
-      name = token(matcher.group(2));
+    final byte[][] parsed = parseExpanded(value, false);
+    if(parsed != null) return new QNm(parsed[0], parsed[1]);
+
+    byte[] uri = null;
+    final int i = indexOf(value, ':');
+    if(i == -1) {
+      uri = dflt;
     } else {
-      final int i = indexOf(name, ':');
-      if(i == -1) {
-        uri = dflt;
-      } else {
-        final byte[] prefix = substring(name, 0, i);
-        if(sc != null) uri = sc.ns.uri(prefix);
-        if(uri == null) throw NOURI_X.get(info, prefix);
-      }
+      final byte[] prefix = substring(value, 0, i);
+      if(sc != null) uri = sc.ns.uri(prefix);
+      if(uri == null) throw NOURI_X.get(info, prefix);
     }
-    if(XMLToken.isQName(name)) return new QNm(name, uri);
+    if(XMLToken.isQName(value)) return new QNm(value, uri);
 
     throw INVNAME_X.get(info, value);
+  }
+
+  /**
+   * Parses an EQName and returns its components.
+   * @param value QName value
+   * @param wc allow name wildcard
+   * @return components: name and URI, or {@code null} if no QName is found
+   */
+  public static byte[][] parseExpanded(final byte[] value, final boolean wc) {
+    final Matcher matcher = EQNAME.matcher(Token.string(value));
+    if(matcher.matches()) {
+      final byte[] uri = token(matcher.group(1)), name = token(matcher.group(2));
+      if(wc && Token.eq(name, cpToken('*'))) return new byte[][] { null, uri };
+      if(XMLToken.isQName(name)) return new byte[][] { name, uri };
+    }
+    return null;
   }
 
   /**

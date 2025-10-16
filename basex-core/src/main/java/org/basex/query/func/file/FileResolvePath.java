@@ -18,12 +18,12 @@ public final class FileResolvePath extends FileFn {
   @Override
   public Value eval(final QueryContext qc) throws QueryException {
     final Path path = toPath(toString(arg(0), qc)), abs;
-    final String file = toStringOrNull(arg(1), qc);
-    if(file != null) {
-      Path base = toPath(file);
-      if(!base.isAbsolute()) throw FILE_IS_RELATIVE_X.get(info, base);
-      if(!endsWith(file, '/') && !endsWith(file, '\\')) base = base.getParent();
-      abs = base.resolve(path).normalize();
+    final String base = toStringOrNull(arg(1), qc);
+    if(base != null) {
+      Path bs = toPath(base);
+      if(!bs.isAbsolute()) throw FILE_IS_RELATIVE_X.get(info, bs);
+      if(!endsWith(base, '/') && !endsWith(base, '\\')) bs = bs.getParent();
+      abs = bs.resolve(path).normalize();
     } else {
       abs = absolute(path);
     }

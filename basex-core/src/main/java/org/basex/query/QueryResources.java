@@ -485,19 +485,18 @@ public final class QueryResources {
     if(single && io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io.path());
 
     // create parsing options with custom values
-    final boolean mainmem = !context.options.get(MainOptions.FORCECREATE);
-    final MainOptions options;
+    final MainOptions mopts = context.options, options;
+    final boolean mainmem = !mopts.get(MainOptions.FORCECREATE);
     if(mainmem) {
-      final String catalog = context.options.get(MainOptions.CATALOG);
-      if(docOpts == DOC_OPTIONS && catalog.isEmpty()) {
+      if(docOpts == DOC_OPTIONS && mopts.resolver().standard()) {
         options = MAIN_OPTIONS;
       } else {
         options = new MainOptions(docOpts);
-        options.set(MainOptions.CATALOG, catalog);
+        options.setResolver(mopts);
       }
     } else {
       docOpts.checkDbAccess(info);
-      options = context.options;
+      options = mopts;
     }
 
     try {

@@ -1,13 +1,13 @@
 package org.basex.query.util;
 
 import java.util.*;
-import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+
 
 /**
  * Shared data references.
@@ -37,7 +37,7 @@ public final class SharedData {
    * @param token QName token
    * @param elem always resolve URI
    * @param sc static context
-   * @return QName, or {@code null} if QName cannot be parsed.
+   * @return QName, or {@code null} if QName cannot be parsed
    * @see QNm#parse(byte[], byte[], StaticContext, InputInfo)
    */
   public QNm parseQName(final byte[] token, final boolean elem, final StaticContext sc) {
@@ -47,12 +47,8 @@ public final class SharedData {
       final byte[] uri = prefix.length != 0 || elem ? sc.ns.uri(prefix) : null;
       return qName(name, uri);
     }
-    final Matcher matcher = QNm.EQNAME.matcher(Token.string(name));
-    if(matcher.matches()) {
-      final byte[] nm = Token.token(matcher.group(2)), uri = Token.token(matcher.group(1));
-      if(XMLToken.isNCName(nm)) return qName(nm, uri);
-    }
-    return null;
+    final byte[][] parsed = QNm.parseExpanded(name, false);
+    return parsed != null ? qName(parsed[0], parsed[1]) : null;
   }
 
   /**

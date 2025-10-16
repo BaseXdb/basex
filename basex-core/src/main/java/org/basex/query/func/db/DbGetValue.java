@@ -36,11 +36,11 @@ public class DbGetValue extends DbAccessFn {
    */
   final Value value(final ResourceType type, final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
+    final String path = toDbPathOrNull(arg(1), qc);
     if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
 
     try {
-      if(defined(1)) {
-        final String path = toDbPath(arg(1), qc);
+      if(path != null) {
         final IOFile bin = data.meta.file(path, type);
         if(!bin.exists() || bin.isDir()) throw WHICHRES_X.get(info, path);
         return resource(bin, qc);
@@ -48,8 +48,8 @@ public class DbGetValue extends DbAccessFn {
 
       final MapBuilder mb = new MapBuilder();
       final IOFile bin = data.meta.dir(type);
-      for(final String path : data.resources.paths("", type)) {
-        mb.put(path, resource(type.filePath(bin, path), qc));
+      for(final String pth : data.resources.paths("", type)) {
+        mb.put(pth, resource(type.filePath(bin, pth), qc));
       }
       return mb.map();
     } catch(final IOException ex) {

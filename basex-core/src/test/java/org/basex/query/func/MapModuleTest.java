@@ -183,6 +183,8 @@ public final class MapModuleTest extends SandboxTest {
     query(func.args(" { 1: 2 }", " true#0"), "{1:2}");
     // reject function with higher arity
     error(func.args(" { 'abc': 'a', 'def': 'g' }", " substring#2"), INVCONVERT_X_X_X);
+
+    query(func.args(" map:build(3 to 8)", " fn($k, $v, $p) { $p mod 5 = 0 }"), "{7:7}");
   }
 
   /** Test method. */
@@ -206,6 +208,8 @@ public final class MapModuleTest extends SandboxTest {
         " function($k, $v) { $v }") + ')', 20);
 
     check(func.args(" { 'aa': 'a' }", " matches#2"), true, type(func, "xs:boolean*"));
+
+    query(func.args(" map:build(3 to 8)", " fn($k, $v, $p) { $p }"), "1\n2\n3\n4\n5\n6");
   }
 
   /** Test method. */

@@ -68,7 +68,9 @@ public abstract class ParseFn extends StandardFunc {
 
     final IO io = new IOContent(toBytes(value));
     try(TextInput ti = nl() ? new NewlineInput(io) : new TextInput(io)) {
-      return parse(ti, options(qc), qc);
+      return parse(ti.validate(true), options(qc), qc);
+    } catch(final DecodingException ex) {
+      throw RECDECODING_X.get(info, ex);
     } catch(final IOException ex) {
       throw error().get(info, ex);
     }

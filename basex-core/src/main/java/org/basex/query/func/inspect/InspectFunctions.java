@@ -22,8 +22,10 @@ import org.basex.query.value.item.*;
 public final class InspectFunctions extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    final String source = toStringOrNull(arg(0), qc);
+
     // returns all functions from the query context
-    if(!defined(0)) {
+    if(source == null) {
       final ValueBuilder vb = new ValueBuilder(qc);
       for(final StaticFunc sf : qc.functions.funcs()) {
         if(!NSGlobal.reserved(sf.name.uri())) addItems(vb, sf, qc);
@@ -32,8 +34,8 @@ public final class InspectFunctions extends StandardFunc {
     }
 
     // URI specified: compile module and return all newly added functions
-    final IOContent source = toContent(toString(arg(0), qc), qc);
-    Value funcs = qc.resources.functions(source.path());
+    final IOContent src = toContent(source, qc);
+    Value funcs = qc.resources.functions(src.path());
     if(funcs != null) return funcs;
 
     // cache existing functions
@@ -41,7 +43,7 @@ public final class InspectFunctions extends StandardFunc {
     Collections.addAll(old, qc.functions.funcs());
 
     try {
-      qc.parse(source.toString(), source.path());
+      qc.parse(src.toString(), src.path());
       qc.functions.compileAll(new CompileContext(qc, true));
     } catch(final QueryException ex) {
       throw INSPECT_PARSE_X.get(info, ex);
@@ -53,7 +55,7 @@ public final class InspectFunctions extends StandardFunc {
       if(!old.contains(sf)) addItems(vb, sf, qc);
     }
     funcs = vb.value(this);
-    qc.resources.addFunctions(source.path(), funcs);
+    qc.resources.addFunctions(src.path(), funcs);
     return funcs;
   }
 

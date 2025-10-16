@@ -1,7 +1,6 @@
 package org.basex.query.func.index;
 
 import static org.basex.index.stats.StatsType.*;
-import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.index.name.*;
@@ -25,9 +24,9 @@ public final class IndexFacets extends IndexFn {
   @Override
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final boolean flat = defined(1) && eq(toToken(arg(1), qc), FLAT);
+    final String type = toZeroString(arg(1), qc);
 
-    return FDoc.build().add(flat ? flat(data, qc) :
+    return FDoc.build().add(type.equals(FLAT) ? flat(data, qc) :
       tree(data, data.paths.root().get(0), qc)).finish();
   }
 

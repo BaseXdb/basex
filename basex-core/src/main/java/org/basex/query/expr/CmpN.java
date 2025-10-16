@@ -30,16 +30,40 @@ public final class CmpN extends Cmp {
       }
     },
 
-    /** Node comparison: before. */
-    ET("<<", "\uFF1C\uFF1C") {
+    /** Node comparison: different. */
+    NE("is-not") {
+      @Override
+      public boolean eval(final ANode node1, final ANode node2) {
+        return !node1.is(node2);
+      }
+    },
+
+    /** Node comparison: precedes. */
+    LT("<<", "precedes") {
       @Override
       public boolean eval(final ANode node1, final ANode node2) {
         return node1.compare(node2) < 0;
       }
     },
 
-    /** Node comparison: after. */
-    GT(">>", "\uFF1E\uFF1E") {
+    /** Node comparison: follows-or-is. */
+    LE("precedes-or-is") {
+      @Override
+      public boolean eval(final ANode node1, final ANode node2) {
+        return node1.compare(node2) <= 0;
+      }
+    },
+
+    /** Node comparison: follows-or-is. */
+    GE("follows-or-is") {
+      @Override
+      public boolean eval(final ANode node1, final ANode node2) {
+        return node1.compare(node2) >= 0;
+      }
+    },
+
+    /** Node comparison: follows. */
+    GT(">>", "follows") {
       @Override
       public boolean eval(final ANode node1, final ANode node2) {
         return node1.compare(node2) > 0;

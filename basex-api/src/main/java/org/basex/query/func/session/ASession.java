@@ -2,6 +2,7 @@ package org.basex.query.func.session;
 
 import java.util.*;
 
+import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.query.func.java.*;
 import org.basex.query.value.*;
@@ -77,7 +78,7 @@ public final class ASession {
    */
   public Value get(final String key, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    final Object value = session.getAttribute(key);
+    final Object value = HTTPConnection.getAttribute(session, key);
     return value != null ? JavaCall.toValue(value, qc, info) : null;
   }
 

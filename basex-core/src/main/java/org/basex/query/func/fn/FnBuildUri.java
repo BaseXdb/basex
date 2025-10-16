@@ -35,14 +35,14 @@ public final class FnBuildUri extends FnParseUri {
     String userinfo = get(parts, USERINFO, qc);
     if(userinfo.contains(":") && !options.get(UriOptions.ALLOW_DEPRECATED_FEATURES)) userinfo = "";
 
-    String port = string(toZeroToken(parts.get(Str.get(PORT)), qc));
-    if(omitPort(port, scheme, options)) port = "";
+    Long port = toLongOrNull(parts.get(Str.get(PORT)), qc);
+    if(port != null && omitPort(port, scheme, options)) port = null;
 
     final String host = get(parts, HOST, qc), authority = get(parts, AUTHORITY, qc);
-    if(!(userinfo.isEmpty() && host.isEmpty() && port.isEmpty())) {
+    if(!(userinfo.isEmpty() && host.isEmpty() && port == null)) {
       if(!userinfo.isEmpty()) uri.add(userinfo).add('@');
       uri.add(host);
-      if(!port.isEmpty()) uri.add(':').add(port);
+      if(port != null) uri.add(':').add(port);
     } else if(!authority.isEmpty()) {
       uri.add(authority);
     }

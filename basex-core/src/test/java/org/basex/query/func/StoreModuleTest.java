@@ -125,13 +125,14 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_WRITE.args("READ"));
     query(_STORE_CLEAR.args());
     query(_STORE_KEYS.args(), "");
+    query(func.args(""));
+    query(_STORE_KEYS.args(), "key");
     query(func.args("READ"));
     query(_STORE_KEYS.args(), "key");
 
     error(func.args("unknown"), STORE_NOTFOUND_X);
 
     // invalid names
-    error(func.args(""), STORE_NAME_X);
     for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
   }
 
@@ -150,6 +151,8 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_PUT.args("key", "WRITE"));
     query(func.args());
     query(_STORE_KEYS.args(), "key");
+    query(func.args(""));
+    query(_STORE_KEYS.args(), "key");
     query(func.args("store"));
     try {
       query(_STORE_KEYS.args(), "key");
@@ -158,7 +161,6 @@ public final class StoreModuleTest extends SandboxTest {
     }
 
     // invalid names
-    error(func.args(""), STORE_NAME_X);
     for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
   }
 

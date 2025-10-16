@@ -27,8 +27,8 @@ public final class DbExists extends DbAccessFn {
       throws QueryException {
     try {
       final Data data = toData(qc);
-      if(!defined(1)) return true;
-      final String path = toDbPath(arg(1), qc);
+      final String path = toDbPathOrNull(arg(1), qc);
+      if(path == null) return true;
 
       final Checks<ResourceType> exists = type -> {
         final IOFile bin = data.meta.file(path, type);

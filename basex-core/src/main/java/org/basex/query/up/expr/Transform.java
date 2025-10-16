@@ -43,7 +43,10 @@ public final class Transform extends Copy {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     // type of let variable must not match expression type (name of node may change)
-    for(final Let copy : copies) copy.exprType.assign(copy.expr.compile(cc));
+    for(final Let copy : copies) {
+      copy.compile(cc);
+      copy.exprType.assign(copy.expr);
+    }
     return super.compile(cc);
   }
 

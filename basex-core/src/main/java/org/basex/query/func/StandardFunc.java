@@ -647,8 +647,47 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Data toData(final QueryContext qc) throws QueryException {
     final Data data = exprType.data();
-    return data != null ? data : qc.resources.database(
-        toName(arg(0), false, DB_NAME_X, qc), qc.user, definition.has(Flag.UPD), info);
+    return data != null ? data : toData(toName(arg(0), false, DB_NAME_X, qc), qc);
+  }
+
+  /**
+   * Evaluates an expression to a name.
+   * @param expr expression
+   * @param empty accept empty names
+   * @param error error to raise
+   * @param qc query context
+   * @return name
+   * @throws QueryException query exception
+   */
+  protected final String toName(final Expr expr, final boolean empty, final QueryError error,
+      final QueryContext qc) throws QueryException {
+    final String name = toZeroString(expr, qc);
+    if(empty && name.isEmpty() || Databases.validName(name)) return name;
+    throw error.get(info, name);
+  }
+
+  /**
+   * Evaluates an expression to a number of milliseconds.
+   * @param expr expression
+   * @param qc query context
+   * @return number of milliseconds
+   * @throws QueryException query exception
+   */
+  protected final long toMs(final Expr expr, final QueryContext qc) throws QueryException {
+    final Dtm dtm = (Dtm) checkType(expr, AtomType.DATE_TIME, qc);
+    if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
+    return dtm.toJava().toGregorianCalendar().getTimeInMillis();
+  }
+
+  /**
+   * Returns a database instance.
+   * @param name name of database
+   * @param qc query context
+   * @return database instance
+   * @throws QueryException query exception
+   */
+  protected final Data toData(final String name, final QueryContext qc) throws QueryException {
+    return qc.resources.database(name, qc.user, definition.has(Flag.UPD), info);
   }
 
   /**
@@ -734,35 +773,6 @@ public abstract class StandardFunc extends Arr {
   protected final Value invoke(final FItem function, final HofArgs args, final QueryContext qc)
       throws QueryException {
     return function.invoke(qc, info, args.get());
-  }
-
-  /**
-   * Evaluates an expression to a name.
-   * @param expr expression
-   * @param empty allow empty name
-   * @param error error to raise
-   * @param qc query context
-   * @return name
-   * @throws QueryException query exception
-   */
-  protected final String toName(final Expr expr, final boolean empty, final QueryError error,
-      final QueryContext qc) throws QueryException {
-    final String name = toString(expr, qc);
-    if(empty && name.isEmpty() || Databases.validName(name)) return name;
-    throw error.get(info, name);
-  }
-
-  /**
-   * Evaluates an expression to a number of milliseconds.
-   * @param expr expression
-   * @param qc query context
-   * @return number of milliseconds
-   * @throws QueryException query exception
-   */
-  protected final long toMs(final Expr expr, final QueryContext qc) throws QueryException {
-    final Dtm dtm = (Dtm) checkType(expr, AtomType.DATE_TIME, qc);
-    if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
-    return dtm.toJava().toGregorianCalendar().getTimeInMillis();
   }
 
   /**

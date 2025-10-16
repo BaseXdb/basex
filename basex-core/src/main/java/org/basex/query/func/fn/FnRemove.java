@@ -82,7 +82,7 @@ public final class FnRemove extends StandardFunc {
    */
   private LongList positions(final QueryContext qc) throws QueryException {
     final LongList pos = new LongList();
-    final Iter iter = arg(1).iter(qc);
+    final Iter iter = arg(1).atomIter(qc, info);
     for(Item item; (item = qc.next(iter)) != null;) pos.add(toLong(item) - 1);
     return pos.ddo();
   }

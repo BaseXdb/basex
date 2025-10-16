@@ -146,6 +146,6 @@ abstract class XQHashMap extends XQMap {
    * @return integer or {@link Integer#MIN_VALUE}
    */
   static int toInt(final Value value) {
-    return value instanceof Itr itr ? itr.toInt() : Integer.MIN_VALUE;
+    return value instanceof final Itr itr ? itr.toInt() : Integer.MIN_VALUE;
   }
 }

@@ -152,6 +152,27 @@ public class CommandTest extends SandboxTest {
     ok(new BinaryPut(NAME2, FILE));
     // adopt name from specified file
     ok(new BinaryPut("", FILE));
+    // GH-2462: replace existing resource
+    ok(new Delete(FN));
+    ok(new Put(FN, "<x/>"));
+    ok(new Get(FN));
+    ok(new BinaryPut(FN, FILE));
+    no(new Get(FN));
+    // GH-2459
+    try {
+      ok(new XQuery(_DB_PUT_BINARY.args(NAME, "A", FN)));
+      ok(new Set(MainOptions.REPLACE, false));
+      ok(new BinaryPut(FN, FILE));
+      ok(new XQuery(_DB_GET_BINARY.args(NAME, FN)));
+      ok(new XQuery("if(not(" + ATOMIC_EQUAL.args(_DB_GET_BINARY.args(NAME, FN),
+          " xs:base64Binary('QQ==')") + ")) { error() }"));
+      ok(new XQuery(_DB_PUT.args(NAME, "<a/>", FN)));
+      ok(new BinaryPut(FN, FILE));
+      no(new XQuery(_DB_GET_BINARY.args(NAME, FN)));
+    } finally {
+      ok(new Set(MainOptions.REPLACE, true));
+    }
+
     // reject invalid or missing names
     no(new BinaryPut("", "</a>"));
     no(new BinaryPut("../x", FILE));
@@ -501,7 +522,18 @@ public class CommandTest extends SandboxTest {
     // a failing replace should not remove existing documents
     no(new Put(FN, "<a>"));
     assertEquals("1", ok(new XQuery(count)));
-  }
+    // GH-2459
+    try {
+      ok(new XQuery(_DB_PUT_BINARY.args(NAME, "A", FN)));
+      ok(new Set(MainOptions.REPLACE, false));
+      ok(new Put(FN, FILE));
+      ok(new XQuery(_DB_GET_BINARY.args(NAME, FN)));
+      ok(new XQuery("if(not(" + ATOMIC_EQUAL.args(_DB_GET_BINARY.args(NAME, FN),
+          " xs:base64Binary('QQ==')") + ")) { error() }"));
+    } finally {
+      ok(new Set(MainOptions.REPLACE, true));
+    }
+}
 
   /** Command test. */
   @Test public final void restore() {
