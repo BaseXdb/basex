@@ -20,23 +20,6 @@ import org.basex.util.hash.*;
  * @author Gunther Rademacher
  */
 public final class RecordType extends MapType {
-  /** The general record type. */
-  public static final RecordType RECORD = new RecordType(true, new TokenObjectMap<>(0));
-  /** Pair record. */
-  public static final RecordType PAIR;
-  /** Member record. */
-  public static final RecordType MEMBER;
-
-  static {
-    TokenObjectMap<RecordField> map = new TokenObjectMap<>(2);
-    map.put(Str.KEY.string(), new RecordField(false, SeqType.ANY_ATOMIC_TYPE_O));
-    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
-    PAIR = new RecordType(true, map, null);
-    map = new TokenObjectMap<>(1);
-    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
-    MEMBER = new RecordType(true, map, null);
-  }
-
   /** Extensible flag. */
   private boolean extensible;
   /** Record fields. */
@@ -200,7 +183,7 @@ public final class RecordType extends MapType {
    * @return result of check
    */
   private boolean instanceOf(final Type type, final Set<Pair> pairs) {
-    if(this == type || type.oneOf(RECORD, MapType.MAP, FuncType.FUNCTION, AtomType.ITEM)) {
+    if(this == type || type.oneOf(SeqType.RECORD, SeqType.MAP, SeqType.FUNCTION, AtomType.ITEM)) {
       return true;
     }
     if(type instanceof final ChoiceItemType cit) {
@@ -278,7 +261,7 @@ public final class RecordType extends MapType {
    */
   private Type union(final Type type, final Set<Pair> pairs) {
     if(type instanceof ChoiceItemType) return type.union(this);
-    if(type == MapType.MAP) return MapType.MAP;
+    if(type == SeqType.MAP) return SeqType.MAP;
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
@@ -295,7 +278,7 @@ public final class RecordType extends MapType {
           if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2 &&
               !fst.zero() && !rtfst.zero()) {
             final Pair pair = new Pair(rt1, rt2);
-            if(pairs.contains(pair)) return RECORD;
+            if(pairs.contains(pair)) return SeqType.RECORD;
             union = SeqType.get(rt1.union(rt2, pair.addTo(pairs)), fst.occ.union(rtfst.occ));
           } else {
             union = fst.union(rtfst);
@@ -315,7 +298,7 @@ public final class RecordType extends MapType {
       return new RecordType(extensible || rt.extensible, map);
     }
     return type instanceof final MapType mt ? mt.union(keyType(), valueType()) :
-           type instanceof ArrayType ? FuncType.FUNCTION :
+           type instanceof ArrayType ? SeqType.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
@@ -379,7 +362,7 @@ public final class RecordType extends MapType {
   public String toString() {
     if(name != null) return Token.string(name.prefixString());
     final QueryString qs = new QueryString().token(RECORD).token('(');
-    if(this == RECORD) {
+    if(this == SeqType.RECORD) {
       qs.token('*');
     } else {
       int i = 0;
@@ -400,8 +383,8 @@ public final class RecordType extends MapType {
         if(f.optional) qs.token('?');
         if(f.seqType != null) {
           Type type = f.seqType.type;
-          if(f.seqType.instanceOf(SeqType.ARRAY_ZM)) type = ArrayType.ARRAY;
-          else if(f.seqType.instanceOf(SeqType.MAP_ZM)) type = MapType.MAP;
+          if(f.seqType.instanceOf(SeqType.ARRAY_ZM)) type = SeqType.ARRAY;
+          else if(f.seqType.instanceOf(SeqType.MAP_ZM)) type = SeqType.MAP;
           qs.token(AS).token(type.seqType(f.seqType.occ));
         }
       }

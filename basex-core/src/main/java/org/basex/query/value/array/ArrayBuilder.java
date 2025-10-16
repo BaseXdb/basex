@@ -73,7 +73,7 @@ public final class ArrayBuilder {
    * @return value
    */
   public XQArray array() {
-    return array(ArrayType.ARRAY);
+    return array(SeqType.ARRAY);
   }
 
   /**

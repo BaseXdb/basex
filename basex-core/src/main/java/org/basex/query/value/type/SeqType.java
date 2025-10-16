@@ -18,6 +18,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Stores a sequence type definition.
@@ -182,14 +183,16 @@ public final class SeqType {
       G_YEAR_MONTH.seqType(), G_MONTH.seqType(), G_MONTH_DAY.seqType(), G_DAY.seqType())).
       seqType(ZERO_OR_ONE);
 
-  // Complex types must be placed last to avoid circular dependencies
+  // types that instantiate sequence types must be placed last to avoid circular dependencies
 
+  /** The general function type. */
+  public static final FuncType FUNCTION = new FuncType(null, (SeqType[]) null);
   /** Single function. */
-  public static final SeqType FUNCTION_O = FuncType.FUNCTION.seqType();
+  public static final SeqType FUNCTION_O = FUNCTION.seqType();
   /** Zero of single function. */
-  public static final SeqType FUNCTION_ZO = FuncType.FUNCTION.seqType(ZERO_OR_ONE);
+  public static final SeqType FUNCTION_ZO = FUNCTION.seqType(ZERO_OR_ONE);
   /** Zero of more functions. */
-  public static final SeqType FUNCTION_ZM = FuncType.FUNCTION.seqType(ZERO_OR_MORE);
+  public static final SeqType FUNCTION_ZM = FUNCTION.seqType(ZERO_OR_MORE);
   /** Predicate function. */
   public static final SeqType PREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, INTEGER_O).seqType();
   /** Predicate function. */
@@ -198,25 +201,42 @@ public final class SeqType {
   public static final SeqType BIPREDICATE_O = FuncType.get(BOOLEAN_ZO, ITEM_O, ITEM_O).seqType();
   /** Action function. */
   public static final SeqType ACTION_O = FuncType.get(ITEM_ZM, ITEM_O, INTEGER_O).seqType();
+  /** Java function type. */
+  public static final FuncType JAVA = new FuncType(null);
 
+  /** The general map type. */
+  public static final MapType MAP = ITEM_ZM.mapType(ANY_ATOMIC_TYPE);
   /** Single map. */
-  public static final SeqType MAP_O = MapType.MAP.seqType();
+  public static final SeqType MAP_O = MAP.seqType();
   /** Zero or one map. */
-  public static final SeqType MAP_ZO = MapType.MAP.seqType(ZERO_OR_ONE);
+  public static final SeqType MAP_ZO = MAP.seqType(ZERO_OR_ONE);
   /** Zero or more maps. */
-  public static final SeqType MAP_ZM = MapType.MAP.seqType(ZERO_OR_MORE);
+  public static final SeqType MAP_ZM = MAP.seqType(ZERO_OR_MORE);
 
+  /** The general array type. */
+  public static final ArrayType ARRAY = ITEM_ZM.arrayType();
   /** Single array. */
-  public static final SeqType ARRAY_O = ArrayType.ARRAY.seqType();
+  public static final SeqType ARRAY_O = ARRAY.seqType();
   /** Zero or one array. */
-  public static final SeqType ARRAY_ZO = ArrayType.ARRAY.seqType(ZERO_OR_ONE);
+  public static final SeqType ARRAY_ZO = ARRAY.seqType(ZERO_OR_ONE);
   /** Zero or more arrays. */
-  public static final SeqType ARRAY_ZM = ArrayType.ARRAY.seqType(ZERO_OR_MORE);
+  public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
+
+  /** The general record type. */
+  public static final RecordType RECORD = new RecordType(true, new TokenObjectMap<>(0));
+  /** Member record. */
+  public static final RecordType MEMBER;
+
+  static {
+    final TokenObjectMap<RecordField> map = new TokenObjectMap<>(1);
+    map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
+    MEMBER = new RecordType(true, map, null);
+  }
 
   /** Single record. */
-  public static final SeqType RECORD_O = RecordType.RECORD.seqType();
+  public static final SeqType RECORD_O = RECORD.seqType();
   /** Zero or more members. */
-  public static final SeqType MEMBER_ZM = RecordType.MEMBER.seqType(ZERO_OR_MORE);
+  public static final SeqType MEMBER_ZM = MEMBER.seqType(ZERO_OR_MORE);
 
   /** Item type. */
   public final Type type;
@@ -495,7 +515,7 @@ public final class SeqType {
         if(type instanceof final MapType mt) return map.coerceTo(mt, qc, cc, info);
       }
       if(type instanceof final FuncType ft) {
-        return fitem.coerceTo(type == FuncType.FUNCTION ? item.funcType() : ft, qc, cc, info);
+        return fitem.coerceTo(type == FUNCTION ? item.funcType() : ft, qc, cc, info);
       }
     }
     return instance(item, false) ? item : null;
@@ -648,7 +668,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeArray() {
-    return !zero() && (type instanceof ArrayType || ArrayType.ARRAY.instanceOf(type));
+    return !zero() && (type instanceof ArrayType || ARRAY.instanceOf(type));
   }
 
   /**

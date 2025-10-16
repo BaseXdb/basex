@@ -18,9 +18,9 @@ public final class Types {
   static {
     for(final AtomType type : AtomType.values()) TYPES[type.index()] = type;
     for(final NodeType type : NodeType.values()) TYPES[type.index()] = type;
-    TYPES[ID.FUN.asByte()] = FuncType.FUNCTION;
-    TYPES[ID.MAP.asByte()] = MapType.MAP;
-    TYPES[ID.ARRAY.asByte()] = ArrayType.ARRAY;
+    TYPES[ID.FUN.asByte()] = SeqType.FUNCTION;
+    TYPES[ID.MAP.asByte()] = SeqType.MAP;
+    TYPES[ID.ARRAY.asByte()] = SeqType.ARRAY;
   }
 
   /**

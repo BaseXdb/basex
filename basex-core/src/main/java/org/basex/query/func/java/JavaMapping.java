@@ -99,8 +99,8 @@ final class JavaMapping {
     new SimpleEntry(FPI.class, PROCESSING_INSTRUCTION),
     new SimpleEntry(FTxt.class, TEXT),
     // function types
-    new SimpleEntry(XQArray.class, ArrayType.ARRAY),
-    new SimpleEntry(XQMap.class, MapType.MAP),
+    new SimpleEntry(XQArray.class, SeqType.ARRAY),
+    new SimpleEntry(XQMap.class, SeqType.MAP),
   };
 
   /** Atomic mappings. */

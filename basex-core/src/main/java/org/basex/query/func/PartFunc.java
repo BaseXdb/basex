@@ -56,7 +56,7 @@ public final class PartFunc extends Arr {
 
     final Expr func = body();
     final FuncType ft = func.funcType();
-    if(ft != null && ft != FuncType.FUNCTION) {
+    if(ft != null && ft != SeqType.FUNCTION) {
       final int nargs = exprs.length - 1, arity = ft.argTypes.length;
       if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 

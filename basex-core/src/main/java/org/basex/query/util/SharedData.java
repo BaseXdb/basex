@@ -27,9 +27,8 @@ public final class SharedData {
    * Constructor.
    */
   public SharedData() {
-    record(RecordType.RECORD);
-    record(RecordType.PAIR);
-    record(RecordType.MEMBER);
+    record(SeqType.RECORD);
+    record(SeqType.MEMBER);
   }
 
   /**

@@ -18,9 +18,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ArrayType extends FType {
-  /** The general array type. */
-  public static final ArrayType ARRAY = SeqType.ITEM_ZM.arrayType();
-
   /** Type of the array values. */
   private final SeqType valueType;
 
@@ -72,7 +69,7 @@ public final class ArrayType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(ARRAY, FuncType.FUNCTION, AtomType.ITEM)) return true;
+    if(this == type || type.oneOf(SeqType.ARRAY, SeqType.FUNCTION, AtomType.ITEM)) return true;
     if(type instanceof final ArrayType at) return valueType.instanceOf(at.valueType);
     if(type instanceof final FuncType ft) {
       return valueType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
@@ -87,7 +84,7 @@ public final class ArrayType extends FType {
       instanceOf(type) ? type :
       type.instanceOf(this) ? this :
       type instanceof final ArrayType at ? union(at.valueType) :
-      type instanceof MapType ? FuncType.FUNCTION :
+      type instanceof MapType ? SeqType.FUNCTION :
       type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
@@ -124,13 +121,13 @@ public final class ArrayType extends FType {
   }
 
   @Override
-  public Type.ID id() {
-    return Type.ID.ARRAY;
+  public ID id() {
+    return ID.ARRAY;
   }
 
   @Override
   public String toString() {
-    final Object[] param = this == ARRAY ? WILDCARD : new Object[] { valueType };
+    final Object[] param = this == SeqType.ARRAY ? WILDCARD : new Object[] { valueType };
     return new QueryString().token(QueryText.ARRAY).params(param).toString();
   }
 }
