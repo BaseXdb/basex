@@ -25,14 +25,12 @@
   </modules>
 
   <properties>
-    <compileSource>17</compileSource>
+    <maven.compiler.release>17</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
     <jettyVersion>12.1.2</jettyVersion>
     <junit.version>6.0.0</junit.version>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
   </properties>
 
   <dependencyManagement>
@@ -231,69 +229,9 @@
       <name>BaseX Maven Repository</name>
       <url>https://files.basex.org/maven</url>
     </repository>
-    <repository>
-      <id>central</id>
-      <name>Central Maven Repository</name>
-      <url>https://repo1.maven.org/maven2/</url>
-    </repository>
   </repositories>
 
   <profiles>
-    <profile>
-      <id>only-eclipse</id>
-      <activation>
-        <property>
-          <name>m2e.version</name>
-        </property>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <!-- Eclipse m2e plugin does not "support plugin execution" -->
-            <!-- we need to tell it to ignore the goals -->
-            <plugin>
-              <groupId>org.eclipse.m2e</groupId>
-              <artifactId>lifecycle-mapping</artifactId>
-              <version>1.0.0</version>
-              <inherited>true</inherited>
-              <configuration>
-                <lifecycleMappingMetadata>
-                  <pluginExecutions>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <versionRange>[2.0,)</versionRange>
-                        <goals>
-                          <goal>copy-dependencies</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <ignore />
-                      </action>
-                    </pluginExecution>
-                    <pluginExecution>
-                      <pluginExecutionFilter>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>javacc-maven-plugin</artifactId>
-                        <versionRange>[2.6,)</versionRange>
-                        <goals>
-                          <goal>javacc</goal>
-                        </goals>
-                      </pluginExecutionFilter>
-                      <action>
-                        <ignore />
-                      </action>
-                    </pluginExecution>
-                  </pluginExecutions>
-                </lifecycleMappingMetadata>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
     <profile>
       <id>ossrh</id>
       <build>
@@ -540,6 +478,7 @@
             <autoReleaseAfterClose>true</autoReleaseAfterClose>
           </configuration>
         </plugin>
+
       </plugins>
     </pluginManagement>
 
