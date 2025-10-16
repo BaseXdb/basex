@@ -433,58 +433,6 @@ public final class MapModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void ofPairs() {
-    final Function func = _MAP_OF_PAIRS;
-
-    final String input = " ({ 'key': 1, 'value': 2 }, "
-        + "{ 'key': 1, 'value': " + wrap(3) + " cast as xs:integer })";
-    query(func.args(input), "{1:(2,3)}");
-    query(func.args(input, " { 'duplicates': op('*') }"), "{1:6}");
-
-    check(func.args(input),
-        "{1:(2,3)}", type(func, "map(xs:integer, xs:integer+)"));
-    check(func.args(input, " { 'duplicates': 'use-first' }"),
-        "{1:2}", type(func, "map(xs:integer, xs:integer)"));
-    check(func.args(input, " { 'duplicates': 'use-any' }"),
-        "{1:3}", type(func, "map(xs:integer, xs:integer)"));
-    check(func.args(input, " { 'duplicates': 'use-last' }"),
-        "{1:3}", type(func, "map(xs:integer, xs:integer)"));
-    check(func.args(input, " { 'duplicates': 'combine' }"),
-        "{1:(2,3)}", type(func, "map(xs:integer, xs:integer+)"));
-    check(func.args(input, " { 'duplicates': op('+') }"),
-        "{1:5}", type(func, "map(xs:integer, xs:anyAtomicType?)"));
-    check(func.args(input, " { " + wrap("duplicates") + ": op('+') }"),
-        "{1:5}", type(func, "map(xs:integer, item()*)"));
-    error(func.args(input, " { 'duplicates': 'reject' }"),
-        MERGE_DUPLICATE_X);
-    error(func.args(input, " { 'duplicates': 'rejecting' }"),
-        INVCONVERT_X_X_X);
-
-    check(func.args(" ()") + " => map:keys()", "", empty());
-    check(func.args(" { 'key': 1, 'value': 2 }") + " => map:keys()", 1, root(Itr.class));
-
-    query(func.args(" { 'key': 1, 'value': 2, 'more': 3 }"), "{1:2}");
-
-    check("map:build(1 to 10, string#1) => map:pairs() => " + func.args() + " => map:size()",
-        10, type(func, "map(xs:string, xs:integer+)"));
-  }
-
-  /** Test method. */
-  @Test public void pairs() {
-    final Function func = _MAP_PAIRS;
-    query(func.args(" {}"), "");
-    query(func.args(" { 1: 2 }") + "?key", 1);
-    query(func.args(" { 1: 2 }") + "?value", 2);
-    query(func.args(" { 1: (2, 3) }") + "?key", 1);
-    query(func.args(" { 1: (2, 3) }") + "?value", "2\n3");
-    query(func.args(" { 1: 2, 3: 4 }") + "?key", "1\n3");
-    query(func.args(" { 1: 2, 3: 4 }") + "?value", "2\n4");
-
-    check("map:build(1 to 10, string#1) => " + func.args() + " => count()",
-        10, type(func, "(record(key as xs:string, value as xs:integer+))*"));
-  }
-
-  /** Test method. */
   @Test public void put() {
     // no entry
     final Function func = _MAP_PUT;

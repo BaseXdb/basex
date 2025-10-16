@@ -796,15 +796,6 @@ public enum Function implements AFunction {
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
       params(MAP_ZM, MAP_ZO), MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
-  _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(input[,options])",
-      params(MAP_ZM, MAP_ZO), MAP_O, flag(HOF), MAP_URI),
-  /** XQuery function. */
-  _MAP_PAIR(MapPair::new, "pair(key,value)",
-      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), PAIR_O, MAP_URI),
-  /** XQuery function. */
-  _MAP_PAIRS(MapPairs::new, "pairs(map)",
-      params(MAP_O), PAIR_ZM, MAP_URI),
-  /** XQuery function. */
   _MAP_PUT(MapPut::new, "put(map,key,value)",
       params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
   /** XQuery function. */

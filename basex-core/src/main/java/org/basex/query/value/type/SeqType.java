@@ -215,10 +215,6 @@ public final class SeqType {
 
   /** Single record. */
   public static final SeqType RECORD_O = RecordType.RECORD.seqType();
-  /** Single pair. */
-  public static final SeqType PAIR_O = RecordType.PAIR.seqType();
-  /** Zero or more pairs. */
-  public static final SeqType PAIR_ZM = RecordType.PAIR.seqType(ZERO_OR_MORE);
   /** Zero or more members. */
   public static final SeqType MEMBER_ZM = RecordType.MEMBER.seqType(ZERO_OR_MORE);
 
