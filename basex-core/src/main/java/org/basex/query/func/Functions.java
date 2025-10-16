@@ -157,8 +157,8 @@ public final class Functions {
     // constructor function
     if(eq(name.uri(), XS_URI)) {
       if(arity > 0) fb.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc);
-      final Expr expr = constructorCall(name, fb);
-      final FuncType ft = FuncType.get(fb.anns, null, fb.params);
+      final Cast expr = constructorCall(name, fb);
+      final FuncType ft = FuncType.get(fb.anns, expr.castType(), fb.params);
       return item(expr, fb, ft, name, false, arity == 0);
     }
 
@@ -247,7 +247,7 @@ public final class Functions {
    * @param name function name
    * @return function definition if found, {@code null} otherwise
    */
-  static FuncDefinition builtIn(final QNm name) {
+  public static FuncDefinition builtIn(final QNm name) {
     return BUILT_IN.get(name);
   }
 
@@ -329,7 +329,9 @@ public final class Functions {
   private static StaticFuncCall staticCall(final QNm name, final FuncBuilder fb,
       final QueryContext qc, final boolean hasImport) throws QueryException {
 
-    if(NSGlobal.reserved(name.uri())) throw qc.functions.similarError(name, fb.info);
+    if(NSGlobal.reserved(name.uri()) && !SeqType.BUILT_IN_NAMED_RECORD_TYPES.contains(name)) {
+      throw qc.functions.similarError(name, fb.info);
+    }
 
     final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.info,
         hasImport);
