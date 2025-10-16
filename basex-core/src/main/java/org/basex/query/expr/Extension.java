@@ -36,10 +36,15 @@ public final class Extension extends Single {
   }
 
   @Override
+  public boolean vacuous() {
+    return expr.vacuous();
+  }
+
+  @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     final Object state = pragma.init(cc.qc, info);
     try {
-      expr = expr.compile(cc);
+      super.compile(cc);
     } finally {
       pragma.finish(cc.qc, state);
     }
