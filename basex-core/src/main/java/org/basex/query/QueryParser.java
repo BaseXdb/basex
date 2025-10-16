@@ -959,7 +959,6 @@ public class QueryParser extends InputParser {
     final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
     final byte[] uri = name.uri();
-    if(uri.length == 0) throw FUNNONS_X.get(ii, name.string());
     if(NSGlobal.reserved(uri) || Functions.builtIn(name) != null)
       throw FNRESERVED_X.get(ii, name.string());
     final StaticFunc func = qc.functions.declare(name, params, expr, anns, doc, vs, ii);
