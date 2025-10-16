@@ -19,6 +19,11 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class FuncType extends FType {
+  /** The general function type. */
+  public static final FuncType FUNCTION = new FuncType(null, (SeqType[]) null);
+  /** Java function type. */
+  public static final FuncType JAVA = new FuncType(null);
+
   /** Annotations. */
   public final AnnList anns;
   /** Return type of the function. */
@@ -56,7 +61,7 @@ public final class FuncType extends FType {
   public FItem cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     if(!(item instanceof final FItem func)) throw typeError(item, this, info);
-    return this == SeqType.FUNCTION ? func : func.coerceTo(this, qc, null, info);
+    return this == FuncType.FUNCTION ? func : func.coerceTo(this, qc, null, info);
   }
 
   @Override
@@ -67,8 +72,8 @@ public final class FuncType extends FType {
   @Override
   public boolean eq(final Type type) {
     if(this == type) return true;
-    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof final FuncType ft))
-      return false;
+    if(this == FuncType.FUNCTION || type == FuncType.FUNCTION ||
+        !(type instanceof final FuncType ft)) return false;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return false;
@@ -80,9 +85,9 @@ public final class FuncType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(SeqType.FUNCTION, AtomType.ITEM)) return true;
+    if(this == type || type.oneOf(FuncType.FUNCTION, AtomType.ITEM)) return true;
     if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
-    if(this == SeqType.FUNCTION || !(type instanceof final FuncType ft)) return false;
+    if(this == FuncType.FUNCTION || !(type instanceof final FuncType ft)) return false;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return false;
@@ -105,12 +110,12 @@ public final class FuncType extends FType {
     if(ft == null) return AtomType.ITEM;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
-    if(arity != nargs) return SeqType.FUNCTION;
+    if(arity != nargs) return FuncType.FUNCTION;
 
     final SeqType[] arg = new SeqType[arity];
     for(int a = 0; a < arity; a++) {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
-      if(arg[a] == null) return SeqType.FUNCTION;
+      if(arg[a] == null) return FuncType.FUNCTION;
     }
     return get(anns.union(ft.anns), declType.union(ft.declType), arg);
   }
@@ -178,10 +183,10 @@ public final class FuncType extends FType {
     if(name.uri().length == 0) {
       switch(Token.string(name.local())) {
         case QueryText.FUNCTION:
-        case QueryText.FN:       return SeqType.FUNCTION;
-        case QueryText.MAP:      return SeqType.MAP;
-        case QueryText.RECORD:   return SeqType.RECORD;
-        case QueryText.ARRAY:    return SeqType.ARRAY;
+        case QueryText.FN:       return FuncType.FUNCTION;
+        case QueryText.MAP:      return MapType.MAP;
+        case QueryText.RECORD:   return RecordType.RECORD;
+        case QueryText.ARRAY:    return ArrayType.ARRAY;
       }
     }
     return null;
@@ -216,7 +221,7 @@ public final class FuncType extends FType {
   @Override
   public String toString() {
     final QueryString qs = new QueryString().token(anns).token(QueryText.FUNCTION);
-    if(this == SeqType.FUNCTION) qs.params(WILDCARD);
+    if(this == FuncType.FUNCTION) qs.params(WILDCARD);
     else qs.params(argTypes).token(QueryText.AS).token(declType);
     return qs.toString();
   }

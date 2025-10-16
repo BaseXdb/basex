@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.value.type.AtomType.*;
 
 import java.io.*;
 
@@ -18,6 +19,9 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public class MapType extends FType {
+  /** The general map type. */
+  public static final MapType MAP = SeqType.ITEM_ZM.mapType(ANY_ATOMIC_TYPE);
+
   /** Key type of the map. */
   private Type keyType;
   /** Value types (can be {@code null}, indicating that no type was specified). */
@@ -112,8 +116,8 @@ public class MapType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(SeqType.MAP, SeqType.FUNCTION, AtomType.ITEM)) return true;
-    if(this == SeqType.MAP && type == SeqType.RECORD) return true;
+    if(this == type || type.oneOf(MAP, FuncType.FUNCTION, AtomType.ITEM)) return true;
+    if(this == MAP && type == RecordType.RECORD) return true;
     if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
     if(type instanceof RecordType) return false;
     if(type instanceof final MapType mt) {
@@ -129,11 +133,11 @@ public class MapType extends FType {
   @Override
   public Type union(final Type type) {
     if(type instanceof ChoiceItemType) return type.union(this);
-    if(type == SeqType.RECORD) return SeqType.MAP;
+    if(type == RecordType.RECORD) return MAP;
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
     if(type instanceof final MapType mt) return union(mt.keyType, mt.valueType);
-    return type instanceof ArrayType ? SeqType.FUNCTION :
+    return type instanceof ArrayType ? FuncType.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
@@ -150,7 +154,7 @@ public class MapType extends FType {
   @Override
   public Type intersect(final Type type) {
     if(type instanceof ChoiceItemType) return type.intersect(this);
-    if(type == SeqType.RECORD) return SeqType.RECORD;
+    if(type == RecordType.RECORD) return RecordType.RECORD;
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 
@@ -163,8 +167,8 @@ public class MapType extends FType {
   }
 
   @Override
-  public ID id() {
-    return ID.MAP;
+  public Type.ID id() {
+    return Type.ID.MAP;
   }
 
   @Override
@@ -179,7 +183,7 @@ public class MapType extends FType {
 
   @Override
   public String toString() {
-    final Object[] param = this == SeqType.MAP ? WILDCARD : new Object[] { keyType, valueType};
+    final Object[] param = this == MAP ? WILDCARD : new Object[] { keyType, valueType};
     return new QueryString().token(QueryText.MAP).params(param).toString();
   }
 }

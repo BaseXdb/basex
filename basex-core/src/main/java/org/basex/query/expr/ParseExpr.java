@@ -671,7 +671,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final FItem toFunction(final Expr expr, final QueryContext qc) throws QueryException {
-    return (FItem) checkType(expr.item(qc, info), SeqType.FUNCTION);
+    return (FItem) checkType(expr.item(qc, info), FuncType.FUNCTION);
   }
 
   /**
@@ -693,7 +693,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final XQMap toMap(final Item item) throws QueryException {
     if(item instanceof final XQMap map) return map;
-    throw typeError(item, SeqType.MAP, info);
+    throw typeError(item, MapType.MAP, info);
   }
 
   /**
@@ -743,7 +743,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final XQArray toArray(final Item item) throws QueryException {
     if(item instanceof final XQArray array) return array;
-    throw typeError(item, SeqType.ARRAY, info);
+    throw typeError(item, ArrayType.ARRAY, info);
   }
 
   /**

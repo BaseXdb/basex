@@ -20,7 +20,7 @@ final class EmptyArray extends XQArray {
 
   /** Hidden constructor. */
   private EmptyArray() {
-    super(SeqType.ARRAY);
+    super(ArrayType.ARRAY);
   }
 
   @Override
