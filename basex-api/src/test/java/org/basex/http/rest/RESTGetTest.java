@@ -10,6 +10,7 @@ import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.func.*;
 import org.basex.util.http.*;
+import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
 /**

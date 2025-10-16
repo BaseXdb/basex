@@ -1,6 +1,6 @@
 package org.basex.http.restxq;
 
-import org.basex.util.http.*;
+import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
 /**

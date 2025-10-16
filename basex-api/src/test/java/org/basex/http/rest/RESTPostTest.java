@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.util.http.*;
+import org.basex.util.http.MediaType;
 import org.junit.jupiter.api.*;
 
 /**
