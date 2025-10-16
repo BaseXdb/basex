@@ -18,7 +18,7 @@ import org.basex.util.list.*;
 public final class ArrayRemove extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    XQArray array = toArray(arg(0), qc);
+    final XQArray array = toArray(arg(0), qc);
     final Value positions = arg(1).atomValue(qc, info);
 
     // collect and sort positions and remove duplicates

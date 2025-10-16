@@ -451,7 +451,7 @@ public final class DecFormatter extends FormatUtil {
             pic.pc = true;
             pix.add(percentRendition);
           }
-          else if (ch == permille) {
+          else if(ch == permille) {
             pic.pm = true;
             pix.add(permilleRendition);
           } else {
@@ -493,7 +493,7 @@ public final class DecFormatter extends FormatUtil {
       if(exp && pic.minInt == 0 && optInt > 0) {
         pic.minInt = 1;
       }
-      // if (after making the above adjustments)...
+      // if, after making the above adjustments...
       if(pic.minInt == 0 && pic.minFrac == 0) {
         pic.minFrac = 1;
       }

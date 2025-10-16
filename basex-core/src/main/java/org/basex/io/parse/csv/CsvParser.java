@@ -110,7 +110,7 @@ public final class CsvParser {
         if(quotes && entry.isEmpty()) {
           // parse quote
           quoted = true;
-        } else if (strictQuoting) {
+        } else if(strictQuoting) {
           throw QueryError.CSV_QUOTING_X.get(ii, new TokenBuilder().add(entry).add(quoteCharacter));
         } else {
           ch = input.read();

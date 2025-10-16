@@ -242,18 +242,15 @@ public final class BaseXHTTP extends CLI {
    * @return handler
    */
   private static Supplier<Handler> gzip(final WebAppContext wac) {
-    return new Supplier<>() {
-      @Override
-      public Handler get() {
-        final CompressionHandler ch = new CompressionHandler();
-        final GzipCompression gc = new GzipCompression();
-        ch.putCompression(gc);
-        final CompressionConfig cc = CompressionConfig.builder().defaults().
-            compressIncludeMethod("PUT").decompressIncludeMethod("PUT").build();
-        ch.putConfiguration("/", cc);
-        ch.setHandler(wac);
-        return ch;
-      }
+    return () -> {
+      final CompressionHandler ch = new CompressionHandler();
+      final GzipCompression gc = new GzipCompression();
+      ch.putCompression(gc);
+      final CompressionConfig cc = CompressionConfig.builder().defaults().
+          compressIncludeMethod("PUT").decompressIncludeMethod("PUT").build();
+      ch.putConfiguration("/", cc);
+      ch.setHandler(wac);
+      return ch;
     };
   }
 

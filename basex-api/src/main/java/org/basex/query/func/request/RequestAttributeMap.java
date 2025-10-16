@@ -21,7 +21,7 @@ public final class RequestAttributeMap extends ApiFunc {
     final MapBuilder map = new MapBuilder();
     for(final Entry<String, Object> entry : HTTPConnection.getAttributes(request(qc)).entrySet()) {
       final Object object = entry.getValue();
-      if(object instanceof Value value) map.put(entry.getKey(), value);
+      if(object instanceof final Value value) map.put(entry.getKey(), value);
     }
     return map.map();
   }

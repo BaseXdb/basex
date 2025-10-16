@@ -94,7 +94,7 @@ public final class While extends Clause {
 
   @Override
   boolean skippable(final Clause cl) {
-    // do not slide LET clauses over WHILE (WHILE may filter out many items)
+    // do not slide LET clauses over WHILE
     return !(cl instanceof Let);
   }
 

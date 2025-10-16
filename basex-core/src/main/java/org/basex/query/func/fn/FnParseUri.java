@@ -57,7 +57,7 @@ public class FnParseUri extends StandardFunc {
       Arrays.asList("jar", "mailto", "news", "tag", "tel", "urn"));
   /** Scheme/port mappings. */
   static final Map<String, Long> PORTS = Map.of(
-      "http", 80l, "https", 443l, "ftp", 21l, "ssh", 22l);
+      "http", 80L, "https", 443L, "ftp", 21L, "ssh", 22L);
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -176,6 +176,7 @@ public class FnParseUri extends StandardFunc {
     final MapBuilder mb = new MapBuilder();
     add(mb, URI, value);
     add(mb, SCHEME, scheme);
+    if(absolute) add(mb, ABSOLUTE, Bln.TRUE);
     add(mb, HIERARCHICAL, hierarchical);
     add(mb, AUTHORITY, authority);
     add(mb, USERINFO, userinfo);
@@ -187,7 +188,6 @@ public class FnParseUri extends StandardFunc {
     add(mb, PATH_SEGMENTS, StrSeq.get(segments));
     add(mb, QUERY_PARAMETERS, queries);
     add(mb, FILEPATH, filepath);
-    if(absolute) add(mb, ABSOLUTE, Bln.TRUE);
     return mb.map();
   }
 

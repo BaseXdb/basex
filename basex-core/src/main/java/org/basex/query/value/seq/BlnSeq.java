@@ -73,7 +73,7 @@ public final class BlnSeq extends NativeSeq {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    Expr expr = this;
+    final Expr expr = this;
     if(mode.oneOf(Simplify.DISTINCT, Simplify.PREDICATE) && this != FT && this != TF) {
       // replace with new sequence
       boolean f = false, t = false;

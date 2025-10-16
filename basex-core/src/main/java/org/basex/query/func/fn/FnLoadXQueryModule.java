@@ -72,9 +72,9 @@ public final class FnLoadXQueryModule extends StandardFunc {
       ((XQMap) opt.get(VENDOR_OPTIONS)).coerceTo(QNAME_MAP_TYPE, qc, null, ii);
     }
 
-    if (opt.contains(XQUERY_VERSION)) {
+    if(opt.contains(XQUERY_VERSION)) {
       final String version = opt.get(XQUERY_VERSION).toString();
-      if (!isSupported(version)) throw MODULE_XQUERY_VERSION_X.get(info, version);
+      if(!isSupported(version)) throw MODULE_XQUERY_VERSION_X.get(info, version);
     }
 
     final QueryContext mqc = new QueryContext(qc);
@@ -162,8 +162,8 @@ public final class FnLoadXQueryModule extends StandardFunc {
     }
 
     final MapBuilder result = new MapBuilder();
-    result.put("functions", functions.map());
     result.put("variables", variables.map());
+    result.put("functions", functions.map());
     return result.map();
   }
 
