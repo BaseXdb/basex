@@ -4,10 +4,7 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.query.util.parse.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -21,13 +18,11 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-public class FuncRef extends Arr {
+public final class FuncRef extends Single {
   /** Function to resolve this reference. */
-  private final ThrowingFunction<QueryContext, Expr, QueryException> resolve;
+  private final QueryFunction<QueryContext, Expr> resolve;
   /** Function to convert to string. */
   private final Consumer<QueryString> toString;
-  /** Function call or function item after resolution. */
-  private Expr expr;
 
   /**
    * Constructor for static function calls.
@@ -60,29 +55,11 @@ public class FuncRef extends Arr {
    * @param resolve function to resolve the reference
    * @param toString function to convert to string
    */
-  private FuncRef(final InputInfo info,
-      final ThrowingFunction<QueryContext, Expr, QueryException> resolve,
+  private FuncRef(final InputInfo info, final QueryFunction<QueryContext, Expr> resolve,
       final Consumer<QueryString> toString) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, null, SeqType.ITEM_ZM);
     this.resolve = resolve;
     this.toString = toString;
-  }
-
-  /**
-   * Functional interface for functions that may throw an exception.
-   * @param <T> parameter type
-   * @param <R> result type
-   * @param <E> exception type
-   */
-  @FunctionalInterface
-  public interface ThrowingFunction<T, R, E extends Exception> {
-    /**
-     * Applies this function to the given argument.
-     * @param t argument
-     * @return result
-     * @throws E exception
-     */
-    R apply(T t) throws E;
   }
 
   /**
@@ -94,38 +71,20 @@ public class FuncRef extends Arr {
     expr = resolve.apply(qc);
   }
 
-  /**
-   * Returns the resolved expression.
-   * @return expression
-   */
-  private Expr expr() {
-    if(expr == null) throw Util.notExpected();
-    return expr;
-  }
-
   @Override
-  public boolean has(final Flag... flags) {
-    return expr().has(flags);
+  public void checkUp() throws QueryException {
+    expr.checkUp();
   }
 
   @Override
   public boolean vacuous() {
-    return expr().vacuous();
-  }
-
-  @Override
-  public Iter iter(final QueryContext qc) throws QueryException {
-    return expr().iter(qc);
+    return expr.vacuous();
   }
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    return expr().compile(cc);
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    throw Util.notExpected();
+    super.compile(cc);
+    return expr;
   }
 
   @Override

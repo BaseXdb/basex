@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -22,7 +23,7 @@ public abstract class Single extends ParseExpr {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param expr expression
+   * @param expr expression ({@code null} for {@link FuncRef} instances)
    * @param seqType sequence type
    */
   protected Single(final InputInfo info, final Expr expr, final SeqType seqType) {
