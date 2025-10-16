@@ -354,6 +354,8 @@ public final class QueryContext extends Job implements Closeable {
       } else {
         // required for XQueryParse
         functions.compileAll(cc);
+        // required for fn:load-xquery-module
+        vars.compileAll(cc);
       }
     } catch(final StackOverflowError ex) {
       Util.debug(ex);

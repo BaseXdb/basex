@@ -48,7 +48,6 @@ public final class StaticFuncs extends ExprInfo {
       throws QueryException {
 
     final byte[] uri = name.uri();
-    if(uri.length == 0) throw FUNNONS_X.get(info, name.string());
     if(NSGlobal.reserved(uri) || Functions.builtIn(name) != null)
       throw FNRESERVED_X.get(info, name.string());
 

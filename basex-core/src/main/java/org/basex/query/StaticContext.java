@@ -1,6 +1,5 @@
 package org.basex.query;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import javax.xml.catalog.*;
@@ -15,6 +14,7 @@ import org.basex.query.util.format.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.Util;
 import org.basex.util.hash.*;
 import org.xml.sax.*;
 
@@ -39,7 +39,7 @@ public final class StaticContext {
   /** Default element/type namespace. */
   public byte[] elemNS;
   /** Default function namespace. */
-  public byte[] funcNS = FN_URI;
+  public byte[] funcNS;
   /** Name of module (not assigned for main module). */
   public QNm module;
 

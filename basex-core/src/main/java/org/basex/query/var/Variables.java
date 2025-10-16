@@ -72,6 +72,17 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   }
 
   /**
+   * Compiles all static variables.
+   * @param cc compilation context
+   * @throws QueryException query exception
+   */
+  public void compileAll(final CompileContext cc) throws QueryException {
+    for(final StaticVar var : this) {
+      var.compile(cc);
+    }
+  }
+
+  /**
    * Returns a new reference to the (possibly not yet declared) variable with the given name.
    * @param name variable name
    * @param info input info (can be {@code null})
