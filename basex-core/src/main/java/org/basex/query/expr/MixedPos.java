@@ -29,11 +29,6 @@ final class MixedPos extends Single implements CmpPos {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    return super.compile(cc).optimize(cc);
-  }
-
-  @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.DISTINCT, cc);
 

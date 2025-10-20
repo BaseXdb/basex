@@ -54,11 +54,7 @@ public final class Try extends Single {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     for(final Catch ctch : catches) ctch.compile(cc);
-    try {
-      super.compile(cc);
-    } catch(final QueryException ex) {
-      expr = FnError.get(ex, expr);
-    }
+    expr = cc.compileOrError(expr, false);
     fnlly = fnlly.compile(cc);
     return optimize(cc);
   }

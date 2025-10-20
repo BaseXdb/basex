@@ -72,8 +72,7 @@ public final class FuncRef extends Single {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    super.compile(cc);
-    return expr;
+    return expr.compile(cc);
   }
 
   @Override

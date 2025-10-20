@@ -55,11 +55,6 @@ public final class GroupSpec extends Single {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    return super.compile(cc).optimize(cc);
-  }
-
-  @Override
   public GroupSpec optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.DATA, cc);
 

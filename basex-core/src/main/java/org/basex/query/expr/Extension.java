@@ -44,7 +44,7 @@ public final class Extension extends Single {
   public Expr compile(final CompileContext cc) throws QueryException {
     final Object state = pragma.init(cc.qc, info);
     try {
-      super.compile(cc);
+      expr = expr.compile(cc);
     } finally {
       pragma.finish(cc.qc, state);
     }

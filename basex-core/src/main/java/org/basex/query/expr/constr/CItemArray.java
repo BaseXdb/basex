@@ -30,11 +30,6 @@ public final class CItemArray extends Single {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    return super.compile(cc).optimize(cc);
-  }
-
-  @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // [ $value ], array { $item }  ->  util:array-member(...)
     final long size = expr.size();
