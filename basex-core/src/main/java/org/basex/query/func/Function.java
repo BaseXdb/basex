@@ -891,6 +891,10 @@ public enum Function implements AFunction {
   _ARRAY_SORT_BY(ArraySortBy::new, "sort-by(array,keys)",
       params(ARRAY_O, MAP_ZM), ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
+  _ARRAY_SORT_WITH(ArraySortWith::new, "sort-with(array,comparators)",
+      params(ARRAY_O, FuncType.get(INTEGER_O, ITEM_ZM, ITEM_ZM).seqType(Occ.ONE_OR_MORE)),
+      ARRAY_O, flag(HOF), ARRAY_URI),
+  /** XQuery function. */
   _ARRAY_SPLIT(ArraySplit::new, "split(array)",
       params(ARRAY_O), ARRAY_ZM, ARRAY_URI),
   /** XQuery function. */
