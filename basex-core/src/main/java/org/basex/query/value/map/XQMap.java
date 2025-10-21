@@ -358,6 +358,7 @@ public abstract class XQMap extends XQStruct {
     }
     // add remaining values
     if(mb.size() < ms) {
+      if(!rt.isExtensible()) throw typeError(this, rt.seqType(), ii);
       forEach((key, value) -> {
         if(!mb.contains(key)) {
           qc.checkStop();

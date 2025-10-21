@@ -151,7 +151,7 @@ public final class MapBuilder {
    * @return map size
    */
   public long size() {
-    return map != null ? map.size() : 0;
+    return map != null ? map.structSize() : 0;
   }
 
   /**

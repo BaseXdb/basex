@@ -257,4 +257,44 @@ public final class RecordTest extends SandboxTest {
     map = "for $b in 1 to 6 return { 'a': 1, 'b': $b }";
     check(map + " => map:get('b')", "1\n2\n3\n4\n5\n6", type(DualMap.class, "xs:integer+"));
   }
+
+  /** Coercion of records. */
+  @Test public void coercion() {
+    query("let $m as record() := {} return $m", "{}");
+    query("let $m as record(*) := {} return $m", "{}");
+    query("let $m as record(a?) := {} return $m", "{}");
+    query("let $m as record(a?, *) := {} return $m", "{}");
+
+    query("let $m as record(*) := { 'a': 1 } return $m", "{\"a\":1}");
+    query("let $m as record(a) := { 'a': 1 } return $m", "{\"a\":1}");
+    query("let $m as record(a, b?) := { 'a': 1 } return $m", "{\"a\":1}");
+    query("let $m as record(a?, b) := { 'b': 2 } return $m", "{\"b\":2}");
+    query("let $m as record(a?, b?, *) := { 'c': 3 } return $m", "{\"c\":3}");
+    query("let $m as record(a, b?, *) := { 'a': 1 } return $m", "{\"a\":1}");
+    query("let $m as record(a?, b, *) := { 'b': 2 } return $m", "{\"b\":2}");
+    query("let $m as record(a, *) := { 'a': 1 } return $m", "{\"a\":1}");
+
+    query("let $m as record(a, *) := { 'a': 1, 'b': 2 } return $m", "{\"a\":1,\"b\":2}");
+    query("let $m as record(a, b) := { 'a': 1, 'b': 2 } return $m", "{\"a\":1,\"b\":2}");
+    query("let $m as record(a, b) := { 'b': 2, 'a': 1 } return $m", "{\"a\":1,\"b\":2}");
+    query("let $m as record(a, b, *) := { 'b': 2, 'a': 1 } return $m", "{\"a\":1,\"b\":2}");
+    query("let $m as record(a, b?, *) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1,\"c\":3}");
+    query("let $m as record(b?, a, *) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1,\"c\":3}");
+
+    error("let $m as record(a) := {} return $m", INVCONVERT_X_X_X);
+    error("let $m as record(a?, b) := {} return $m", INVCONVERT_X_X_X);
+    error("let $m as record(a, b?) := {} return $m", INVCONVERT_X_X_X);
+
+    error("let $m as record() := { 'a': 1 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record(b) := { 'a': 1 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record(b?) := { 'a': 1 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record(b, *) := { 'a': 1 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record(a?, b?) := { 'c': 3 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record(a?, b) := { 'c': 3 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record(a, b?) := { 'c': 3 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record(c?, b) := { 'c': 3 } return $m", INVCONVERT_X_X_X);
+
+    error("let $m as record(a) := { 'a': 1, 'b': 2 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record(b) := { 'a': 1, 'b': 2 } return $m", INVCONVERT_X_X_X);
+  }
 }
