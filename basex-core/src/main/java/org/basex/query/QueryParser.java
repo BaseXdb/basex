@@ -286,11 +286,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void check(final MainModule main) throws QueryException {
-    // add record constructor functions for built-in record types
-    for(final RecordType rt : SeqType.BUILT_IN_NAMED_RECORD_TYPES.values()) {
-      if(qc.functions.get(rt.name(), rt.minFields()) == null) declareRecordConstructor(rt, info());
-    }
-
     // check function calls and variable references
     qc.functions.check(qc);
     qc.vars.check();
