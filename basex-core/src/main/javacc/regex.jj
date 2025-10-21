@@ -250,7 +250,7 @@ PARSER_END(RegExParser)
         throw new ParseException("Illegal back-reference: \\" + backref);
       g.setHasBackRef();
       int diff = 0;
-      while (atomPath.get(diff) == g.getAtomPath()[diff]) {
+      while(atomPath.get(diff) == g.getAtomPath()[diff]) {
         ++diff;
       }
       // If the atom paths of group and backref differ in a branch (even index), the backref is in

@@ -244,7 +244,7 @@ abstract class RegExFn extends StandardFunc {
             break;
           case RPAREN:
             if(!quoted && classLevel == 0) {
-              if (open.size() == assrtMark) assrtMark = 0;
+              if(open.size() == assrtMark) assrtMark = 0;
               open.pop();
             }
             break;

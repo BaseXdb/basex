@@ -25,8 +25,8 @@ import org.basex.util.hash.*;
  * Abstract value.
  *
  * This class also implements the {@link Iterable} interface, which is why all of its
- * values can also be retrieved via enhanced for (for-each) loops. The default
- * {@link #iter()} method will provide better performance.
+ * values can also be retrieved via for-each loops. The default {@link #iter()} method will
+ * provide better performance.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

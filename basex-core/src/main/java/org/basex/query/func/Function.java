@@ -796,15 +796,6 @@ public enum Function implements AFunction {
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
       params(MAP_ZM, MAP_ZO), MAP_O, flag(HOF), MAP_URI),
   /** XQuery function. */
-  _MAP_OF_PAIRS(MapOfPairs::new, "of-pairs(input[,options])",
-      params(MAP_ZM, MAP_ZO), MAP_O, flag(HOF), MAP_URI),
-  /** XQuery function. */
-  _MAP_PAIR(MapPair::new, "pair(key,value)",
-      params(ANY_ATOMIC_TYPE_O, ITEM_ZM), KEY_VALUE_PAIR_O, MAP_URI),
-  /** XQuery function. */
-  _MAP_PAIRS(MapPairs::new, "pairs(map)",
-      params(MAP_O), KEY_VALUE_PAIR_ZM, MAP_URI),
-  /** XQuery function. */
   _MAP_PUT(MapPut::new, "put(map,key,value)",
       params(MAP_O, ANY_ATOMIC_TYPE_O, ITEM_ZM), MAP_O, MAP_URI),
   /** XQuery function. */
@@ -899,6 +890,10 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _ARRAY_SORT_BY(ArraySortBy::new, "sort-by(array,keys)",
       params(ARRAY_O, MAP_ZM), ARRAY_O, flag(HOF), ARRAY_URI),
+  /** XQuery function. */
+  _ARRAY_SORT_WITH(ArraySortWith::new, "sort-with(array,comparators)",
+      params(ARRAY_O, FuncType.get(INTEGER_O, ITEM_ZM, ITEM_ZM).seqType(Occ.ONE_OR_MORE)),
+      ARRAY_O, flag(HOF), ARRAY_URI),
   /** XQuery function. */
   _ARRAY_SPLIT(ArraySplit::new, "split(array)",
       params(ARRAY_O), ARRAY_ZM, ARRAY_URI),

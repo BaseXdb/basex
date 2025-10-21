@@ -136,14 +136,10 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
     cc.pushScope(vs);
     try {
-      expr = expr.compile(cc);
-    } catch(final QueryException ex) {
-      expr = FnError.get(ex, expr);
+      expr = cc.compileOrError(expr, false);
     } finally {
       cc.removeScope(this);
     }
-
-    // convert all function calls in tail position to proper tail calls
     expr.markTailCalls(cc);
 
     return optimize(cc);

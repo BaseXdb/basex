@@ -272,7 +272,7 @@ public class QueryParser extends InputParser {
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
 
-    for (final FuncRef fr : funcRefs) fr.resolve(qc);
+    for(final FuncRef fr : funcRefs) fr.resolve(qc);
 
     if(qc.contextValue != null) {
       final Expr ctx = qc.contextValue.expr;
@@ -2359,7 +2359,7 @@ public class QueryParser extends InputParser {
         axis = Axis.CHILD;
         final ExprInfo ei = simpleNodeTest(NodeType.ELEMENT, true);
         if(ei == NodeTest.NAMESPACE_NODE) throw error(NSAXIS);
-        if(ei instanceof Test tst) {
+        if(ei instanceof final Test tst) {
           if(tst.type == NodeType.ATTRIBUTE) axis = Axis.ATTRIBUTE;
           checkTest(tst, axis != Axis.ATTRIBUTE);
         }
@@ -2380,7 +2380,7 @@ public class QueryParser extends InputParser {
     }
 
     final int ls = list.size();
-    if(ls == 1 && list.get(0) instanceof Test test) {
+    if(ls == 1 && list.get(0) instanceof final Test test) {
       return new CachedStep(info(), axis, test, preds.finish());
     }
 
@@ -2388,11 +2388,11 @@ public class QueryParser extends InputParser {
     final ExprList exprs = new ExprList(ls);
     for(int l = 0; l < ls; l++) {
       final ExprInfo ei = list.get(l);
-      if(ei instanceof Test test) {
+      if(ei instanceof final Test test) {
         exprs.add(new CachedStep(info(), axis, test));
       } else {
-        int s = localVars.openScope();
-        Let lt = new Let(localVars.add(new Var(new QNm("names"), null, qc, ii)), (Expr) ei);
+        final int s = localVars.openScope();
+        final Let lt = new Let(localVars.add(new Var(new QNm("names"), null, qc, ii)), (Expr) ei);
         exprs.add(new GFLWOR(ii, lt, new CachedStep(info(), axis, NodeTest.ELEMENT,
             Function._UTIL_SELECT.get(ii, new VarRef(ii, lt.var)))));
         localVars.closeScope(s);
@@ -2415,7 +2415,7 @@ public class QueryParser extends InputParser {
       final boolean element = axis != Axis.ATTRIBUTE;
       final ExprInfo ei = simpleNodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
       if(ei == null) return false;
-      if(ei instanceof Test test) {
+      if(ei instanceof final Test test) {
         checkTest(test, element);
         if(!tests.contains(test)) tests.add(test);
       } else {
@@ -2552,7 +2552,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr lookup(final Expr expr) throws QueryException {
-    int p = pos;
+    final int p = pos;
     if(consume('?') && !wsConsume(",") && !consume(")")) {
       final InputInfo info = info();
       final Expr ctx = expr != null ? expr : new ContextValue(info);

@@ -50,7 +50,7 @@ public class DbPutBinary extends DbNew {
     if(put(docs, data, path, options)) {
       // delete XML resources
       final Updates updates = qc.updates();
-      for(int pre : docs.toArray()) updates.add(new DeleteNode(pre, data, info), qc);
+      for(final int pre : docs.toArray()) updates.add(new DeleteNode(pre, data, info), qc);
       // add binary resource
       updates.add(up, qc);
     }

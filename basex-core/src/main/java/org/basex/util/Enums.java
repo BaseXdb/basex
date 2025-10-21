@@ -42,7 +42,7 @@ public final class Enums {
   @SafeVarargs
   public static <V extends Enum<V>> boolean oneOf(final V value, final V... candidates) {
     for(final V c : candidates) {
-      if (value == c) return true;
+      if(value == c) return true;
     }
     return false;
   }

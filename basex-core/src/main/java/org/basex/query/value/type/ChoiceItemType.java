@@ -192,7 +192,7 @@ public final class ChoiceItemType implements Type {
     if(!seqType.one()) throw Util.notExpected();
     final Test test = seqType.test();
     if(test instanceof final UnionTest ut) {
-      for (final Test t : ut.tests) {
+      for(final Test t : ut.tests) {
         if(!hasInstance(SeqType.get(seqType.type, Occ.EXACTLY_ONE, t))) return false;
       }
       return true;

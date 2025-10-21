@@ -239,16 +239,6 @@ public final class SeqType {
   /** Zero or more members. */
   public static final SeqType MEMBER_ZM = MEMBER.seqType(ZERO_OR_MORE);
 
-  /** Built-in record type fn:key-value-pair. */
-  public static final RecordType KEY_VALUE_PAIR =
-    RecordType.get(true, new QNm("key-value-pair", QueryText.FN_URI)).
-    field("key", false, SeqType.ANY_ATOMIC_TYPE_O).
-    field("value", false, SeqType.ITEM_ZM);
-  /** Single key-value-pair. */
-  public static final SeqType KEY_VALUE_PAIR_O = KEY_VALUE_PAIR.seqType();
-  /** Zero or more key-value-pairs. */
-  public static final SeqType KEY_VALUE_PAIR_ZM = KEY_VALUE_PAIR.seqType(ZERO_OR_MORE);
-
   /** Built-in record type fn:load-xquery-module-record. */
   public static final RecordType LOAD_XQUERY_MODULE_RECORD =
     RecordType.get(false, new QNm("load-xquery-module-record", QueryText.FN_URI)).
@@ -337,7 +327,6 @@ public final class SeqType {
   public static final QNmMap<RecordType> BUILT_IN_NAMED_RECORD_TYPES = new QNmMap<>();
   static {
     for(RecordType rt : Arrays.asList(
-        SeqType.KEY_VALUE_PAIR,
         SeqType.LOAD_XQUERY_MODULE_RECORD,
         SeqType.PARSED_CSV_STRUCTURE_RECORD,
         SeqType.RANDOM_NUMBER_GENERATOR_RECORD,

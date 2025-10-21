@@ -20,10 +20,34 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class FnSortWith extends StandardFunc {
+public class FnSortWith extends StandardFunc {
+  @Override
+  public Iter iter(final QueryContext qc) throws QueryException {
+    final Iter input = arg(0).iter(qc);
+    final ValueList values = new ValueList(Seq.initialCapacity(input.size()));
+    for(Item item; (item = qc.next(input)) != null;) values.add(item);
+    sort(values, qc);
+
+    return new BasicIter<>(values.size()) {
+      @Override
+      public Item get(final long l) {
+        return (Item) values.get((int) l);
+      }
+    };
+  }
+
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = arg(0).iter(qc);
+    return iter(qc).value(qc, this);
+  }
+
+  /**
+   * Sort the input data and returns an iterator.
+   * @param values values to be sorted
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  protected final void sort(final ValueList values, final QueryContext qc) throws QueryException {
     final Value comparators = arg(1).value(qc);
     if(comparators.isEmpty()) throw EMPTYFOUND.get(info);
 
@@ -31,10 +55,10 @@ public final class FnSortWith extends StandardFunc {
     int c = 0;
     for(final Item item : comparators) cmps[c++] = toFunction(item, 2, qc);
 
-    final Comparator<Item> comparator = (item1, item2) -> {
+    final Comparator<Value> comparator = (value1, value2) -> {
       try {
         for(final FItem cmp : cmps) {
-          final long diff = toLong(cmp.invoke(qc, info, item1, item2).item(qc, info));
+          final long diff = toLong(cmp.invoke(qc, info, value1, value2).item(qc, info));
           if(diff != 0) return diff < 0 ? -1 : 1;
         }
         return 0;
@@ -43,14 +67,11 @@ public final class FnSortWith extends StandardFunc {
       }
     };
 
-    final ItemList items = new ItemList(Seq.initialCapacity(input.size()));
-    for(Item item; (item = qc.next(input)) != null;) items.add(item);
     try {
-      Arrays.sort(items.list, 0, items.size(), comparator);
+      Arrays.sort(values.list, 0, values.size(), comparator);
     } catch(final QueryRTException ex) {
       throw ex.getCause();
     }
-    return items.value(this);
   }
 
   @Override

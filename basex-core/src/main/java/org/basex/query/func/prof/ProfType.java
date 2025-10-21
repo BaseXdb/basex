@@ -47,13 +47,14 @@ public final class ProfType extends StandardFunc {
   public record TypeInfo(Class<?> clazz, String type, long size) {
     @Override
     public String toString() {
-      String info = Util.className(clazz) + " (" + type;
+      final StringBuilder info = new StringBuilder().append(Util.className(clazz));
+      info.append(" (").append(type);
       if(XQStruct.class.isAssignableFrom(clazz)) {
-        info += ", " + size + ' ' + (size == 1 ? "entry" : "entries");
+        info.append(", ").append(size).append(' ').append(size == 1 ? "entry" : "entries");
       } else {
-        if(size > 1) info += ", " + size + " items";
+        if(size > 1) info.append(", ").append(size).append(" items");
       }
-      return info + ')';
+      return info.append(')').toString();
     }
   }
 }

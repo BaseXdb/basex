@@ -76,7 +76,7 @@ public class FnUnparsedTextAvailable extends ParseFn {
 
   @Override
   protected final Options options(final QueryContext qc) throws QueryException {
-    Expr options = arg(1);
+    final Expr options = arg(1);
     final ParseOptions po = new ParseOptions();
     if(options instanceof final XQMap map) {
       toOptions(map, po, qc);

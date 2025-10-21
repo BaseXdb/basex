@@ -1,7 +1,5 @@
 package org.basex.query.func;
 
-import java.util.function.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.parse.*;
@@ -21,8 +19,6 @@ import org.basex.util.hash.*;
 public final class FuncRef extends Single {
   /** Function to resolve this reference. */
   private final QueryFunction<QueryContext, Expr> resolve;
-  /** Function to convert to string. */
-  private final Consumer<QueryString> toString;
 
   /**
    * Constructor for static function calls.
@@ -31,9 +27,7 @@ public final class FuncRef extends Single {
    * @param hasImport indicates whether a module import for the function name's URI was present
    */
   public FuncRef(final QNm name, final FuncBuilder fb, final boolean hasImport) {
-    this(fb.info,
-        qc -> Functions.get(name, fb, qc, hasImport),
-        qs -> qs.token(name.prefixId()).params(fb.args()));
+    this(fb.info, qc -> Functions.get(name, fb, qc, hasImport));
   }
 
   /**
@@ -44,22 +38,17 @@ public final class FuncRef extends Single {
    * @param hasImport indicates whether a module import for the function name's URI was present
    */
   public FuncRef(final QNm name, final int arity, final InputInfo info, final boolean hasImport) {
-    this(info,
-        qc -> Functions.item(name, arity, false, info, qc, hasImport),
-        qs -> qs.token(name.prefixId()).token('#').token(arity));
+    this(info, qc -> Functions.item(name, arity, false, info, qc, hasImport));
   }
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param resolve function to resolve the reference
-   * @param toString function to convert to string
    */
-  private FuncRef(final InputInfo info, final QueryFunction<QueryContext, Expr> resolve,
-      final Consumer<QueryString> toString) {
+  private FuncRef(final InputInfo info, final QueryFunction<QueryContext, Expr> resolve) {
     super(info, null, SeqType.ITEM_ZM);
     this.resolve = resolve;
-    this.toString = toString;
   }
 
   /**
@@ -83,8 +72,7 @@ public final class FuncRef extends Single {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    super.compile(cc);
-    return expr;
+    return expr.compile(cc);
   }
 
   @Override
@@ -94,6 +82,6 @@ public final class FuncRef extends Single {
 
   @Override
   public void toString(final QueryString qs) {
-    toString.accept(qs);
+    expr.toString(qs);
   }
 }

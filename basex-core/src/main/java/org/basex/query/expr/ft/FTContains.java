@@ -74,9 +74,8 @@ public final class FTContains extends Single {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    super.compile(cc);
     ftexpr = ftexpr.compile(cc);
-    return optimize(cc);
+    return super.compile(cc);
   }
 
   @Override

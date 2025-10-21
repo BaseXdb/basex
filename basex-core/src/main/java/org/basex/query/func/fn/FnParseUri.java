@@ -57,7 +57,7 @@ public class FnParseUri extends StandardFunc {
       Arrays.asList("jar", "mailto", "news", "tag", "tel", "urn"));
   /** Scheme/port mappings. */
   static final Map<String, Long> PORTS = Map.of(
-      "http", 80l, "https", 443l, "ftp", 21l, "ssh", 22l);
+      "http", 80L, "https", 443L, "ftp", 21L, "ssh", 22L);
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {

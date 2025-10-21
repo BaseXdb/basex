@@ -19,6 +19,7 @@ import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
+import org.basex.util.http.MediaType;
 import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;

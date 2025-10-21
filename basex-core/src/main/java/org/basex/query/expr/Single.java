@@ -39,7 +39,7 @@ public abstract class Single extends ParseExpr {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     expr = expr.compile(cc);
-    return this;
+    return optimize(cc);
   }
 
   @Override

@@ -55,12 +55,6 @@ public final class Condition extends Single {
   }
 
   @Override
-  public Expr compile(final CompileContext cc) throws QueryException {
-    expr = expr.compile(cc);
-    return optimize(cc);
-  }
-
-  @Override
   public Condition optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.EBV, cc);
     return this;
