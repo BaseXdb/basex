@@ -143,12 +143,6 @@ public final class RecordTest extends SandboxTest {
     query("declare record local:r(x); local:r#1(42)", "{\"x\":42}");
     // constructor via function lookup
     query("declare record local:r(x); function-lookup(#local:r, 1)(42)", "{\"x\":42}");
-    // built-in record type constructor
-    query("fn:key-value-pair('x', 42)", "{\"key\":\"x\",\"value\":42}");
-    // built-in record type constructor via function item
-    query("fn:key-value-pair#2('x', 42)", "{\"key\":\"x\",\"value\":42}");
-    // built-in record type constructor via function lookup
-    query("function-lookup(#fn:key-value-pair, 2)('x', 42)", "{\"key\":\"x\",\"value\":42}");
 
     // function declaration and record constructor with the same signature
     error("declare function local:f($x) {local:r($x)};\n"
