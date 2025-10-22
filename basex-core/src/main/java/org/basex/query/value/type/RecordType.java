@@ -155,6 +155,19 @@ public final class RecordType extends MapType {
     return anns;
   }
 
+  /**
+   * Return the minimum number of fields that must be present in a record of this type.
+   * @return minimum number of fields
+   */
+  public int minFields() {
+    int min = 0;
+    for(final RecordField rf : fields.values()) {
+      if(rf.optional || rf.expr() != null) return min;
+      ++min;
+    }
+    return min;
+  }
+
   @Override
   public boolean eq(final Type type) {
     return eq(type, emptySet(), false);

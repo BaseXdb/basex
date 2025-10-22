@@ -329,7 +329,9 @@ public final class Functions {
   private static StaticFuncCall staticCall(final QNm name, final FuncBuilder fb,
       final QueryContext qc, final boolean hasImport) throws QueryException {
 
-    if(NSGlobal.reserved(name.uri())) throw qc.functions.similarError(name, fb.info);
+    if(NSGlobal.reserved(name.uri()) && !Records.BUILT_IN.contains(name)) {
+      throw qc.functions.similarError(name, fb.info);
+    }
 
     final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.info,
         hasImport);
