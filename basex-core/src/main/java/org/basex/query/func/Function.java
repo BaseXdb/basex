@@ -91,7 +91,7 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_O, ANY_ATOMIC_TYPE_O), BOOLEAN_O),
   /** XQuery function. */
   ATOMIC_TYPE_ANNOTATION(FnAtomicTypeAnnotation::new, "atomic-type-annotation(value)",
-      params(ANY_ATOMIC_TYPE_O), MAP_O),
+      params(ANY_ATOMIC_TYPE_O), Records.SCHEMA_TYPE.get().seqType()),
   /** XQuery function. */
   AVAILABLE_ENVIRONMENT_VARIABLES(FnAvailableEnvironmentVariables::new,
       "available-environment-variables()",
@@ -107,7 +107,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
   BUILD_URI(FnBuildUri::new, "build-uri(parts[,options])",
-      params(MAP_O, MAP_ZO), STRING_O),
+      params(Records.URI_STRUCTURE.get().seqType(), MAP_ZO), STRING_O),
   /** XQuery function. */
   CEILING(FnCeiling::new, "ceiling(value)",
       params(NUMERIC_ZO), NUMERIC_ZO),
@@ -157,7 +157,8 @@ public enum Function implements AFunction {
       params(ITEM_ZM), INTEGER_O),
   /** XQuery function. */
   CSV_DOC(FnCsvDoc::new, "csv-doc(source[,options])",
-      params(STRING_ZO, MAP_ZO), MAP_O, flag(NDT), FN_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), Records.PARSED_CSV_STRUCTURE.get().seqType(Occ.ZERO_OR_ONE),
+      flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   CSV_TO_ARRAYS(FnCsvToArrays::new, "csv-to-arrays(value[,options])",
       params(STRING_ZO, MAP_ZO), STRING_O.arrayType().seqType(Occ.ZERO_OR_MORE)),
@@ -414,7 +415,8 @@ public enum Function implements AFunction {
       params(), INTEGER_O, flag(POS, CTX)),
   /** XQuery function. */
   LOAD_XQUERY_MODULE(FnLoadXQueryModule::new, "load-xquery-module(module-uri[,options])",
-      params(STRING_O, MAP_ZO), MAP_O, flag(NDT, HOF), FN_URI, Perm.ADMIN),
+      params(STRING_O, MAP_ZO), Records.LOAD_XQUERY_MODULE.get().seqType(),
+      flag(NDT, HOF), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   LOCAL_NAME(FnLocalName::new, "local-name([node])",
       params(NODE_ZO), STRING_O),
@@ -502,7 +504,8 @@ public enum Function implements AFunction {
       params(NODE_ZM), NODE_ZM),
   /** XQuery function. */
   PARSE_CSV(FnParseCsv::new, "parse-csv(value[,options])",
-      params(STRING_OR_BINARY_ZO, MAP_ZO), MAP_O),
+      params(STRING_OR_BINARY_ZO, Records.PARSED_CSV_STRUCTURE.get().seqType(Occ.ZERO_OR_ONE)),
+      MAP_O),
   /** XQuery function. */
   PARSE_IETF_DATE(FnParseIetfDate::new, "parse-ietf-date(value)",
       params(STRING_ZO), DATE_TIME_ZO),
@@ -520,7 +523,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), QNAME_ZO),
   /** XQuery function. */
   PARSE_URI(FnParseUri::new, "parse-uri(value[,options])",
-      params(STRING_ZO, MAP_ZO), MAP_O),
+      params(STRING_ZO, Records.URI_STRUCTURE.get().seqType(Occ.ZERO_OR_ONE)), MAP_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value[,options])",
       params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
@@ -551,7 +554,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, STRING_O), QNAME_O),
   /** XQuery function. */
   RANDOM_NUMBER_GENERATOR(FnRandomNumberGenerator::new, "random-number-generator([seed])",
-      params(ANY_ATOMIC_TYPE_ZO), MAP_O, flag(HOF, NDT)),
+      params(ANY_ATOMIC_TYPE_ZO), Records.RANDOM_NUMBER_GENERATOR.get().seqType(), flag(HOF, NDT)),
   /** XQuery function. */
   REMOVE(FnRemove::new, "remove(input,positions)",
       params(ITEM_ZM, INTEGER_ZM), ITEM_ZM),
@@ -589,7 +592,7 @@ public enum Function implements AFunction {
       ARRAY_ZM, flag(HOF)),
   /** XQuery function. */
   SCHEMA_TYPE(FnSchemaType::new, "schema-type(name)",
-      params(QNAME_O), MAP_ZO),
+      params(QNAME_O), Records.SCHEMA_TYPE.get().seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
   SECONDS(FnSeconds::new, "seconds(value)",
       params(DECIMAL_ZO), DAY_TIME_DURATION_ZO),
