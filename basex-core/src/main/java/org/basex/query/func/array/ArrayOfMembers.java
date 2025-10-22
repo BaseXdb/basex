@@ -2,6 +2,7 @@ package org.basex.query.func.array;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -21,7 +22,7 @@ public final class ArrayOfMembers extends ArrayFn {
 
     final ArrayBuilder ab = new ArrayBuilder(qc);
     for(Item item; (item = qc.next(input)) != null;) {
-      ab.add(toRecord(item, Types.MEMBER, qc).get(Str.VALUE));
+      ab.add(toRecord(item, Records.MEMBER.get(), qc).get(Str.VALUE));
     }
     return ab.array(this);
   }

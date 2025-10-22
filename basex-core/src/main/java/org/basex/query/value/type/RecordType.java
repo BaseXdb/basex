@@ -83,6 +83,18 @@ public final class RecordType extends MapType {
   }
 
   /**
+   * Adds a field to this record type.
+   * @param fieldName field name
+   * @param optional optional flag
+   * @param seqType sequence type of the field
+   * @return this record type
+   */
+  public RecordType add(final String fieldName, final boolean optional, final SeqType seqType) {
+    fields.put(Token.token(fieldName), new RecordField(seqType, optional));
+    return this;
+  }
+
+  /**
    * Calculate union type of field sequence types.
    * @param rfs field declarations
    * @return union type

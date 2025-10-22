@@ -7,8 +7,6 @@ import static org.basex.query.value.type.Occ.*;
 
 import java.util.*;
 
-import org.basex.query.util.list.*;
-import org.basex.query.value.item.*;
 import org.basex.util.hash.*;
 
 /**
@@ -227,22 +225,14 @@ public final class Types {
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
 
+  /** Type of fn:schema-type-record member 'variety'. */
+  public static final EnumType SCHEMA_TYPE_RECORD_VARIETY =
+      EnumType.get("atomic", "list", "union", "empty", "simple", "element-only", "mixed");
+
   /** The general record type. */
   public static final RecordType RECORD = new RecordType(new TokenObjectMap<>(0), true);
   /** Single record. */
   public static final SeqType RECORD_O = RECORD.seqType();
-
-  /** Member record. */
-  public static final RecordType MEMBER;
-
-  static {
-    final TokenObjectMap<RecordField> map = new TokenObjectMap<>(1);
-    map.put(Str.VALUE.string(), new RecordField(ITEM_ZM));
-    MEMBER = new RecordType(map, false, null, AnnList.EMPTY);
-  }
-
-  /** Zero or more members. */
-  public static final SeqType MEMBER_ZM = MEMBER.seqType(ZERO_OR_MORE);
 
   /** Indexed item types. */
   private static final Type[] TYPES = new Type[Type.ID.LAST.asByte()];
