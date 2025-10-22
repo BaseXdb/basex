@@ -230,7 +230,7 @@ public final class SeqType {
   static {
     final TokenObjectMap<RecordField> map = new TokenObjectMap<>(1);
     map.put(Str.VALUE.string(), new RecordField(false, SeqType.ITEM_ZM));
-    MEMBER = new RecordType(true, map, null);
+    MEMBER = new RecordType(false, map, null);
   }
 
   /** Single record. */
