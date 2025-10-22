@@ -42,8 +42,8 @@ final class PlainDoc extends Inspect {
     for(final StaticVar sv : qc.vars) root.add(variable(sv));
     for(final StaticFunc sf : qc.functions.funcs()) {
       if(!NSGlobal.reserved(sf.name.uri())) {
-      root.add(function(sf.name, sf, sf.funcType(), sf.anns));
-    }
+        root.add(function(sf.name, sf, sf.funcType(), sf.anns));
+      }
     }
     return root.finish();
   }
