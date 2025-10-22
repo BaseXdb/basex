@@ -29,7 +29,7 @@ final class SimplePos extends Arr implements CmpPos {
    * @param exprs single or min/max expressions
    */
   SimplePos(final InputInfo info, final Expr... exprs) {
-    super(info, SeqType.BOOLEAN_O, exprs);
+    super(info, Types.BOOLEAN_O, exprs);
   }
 
   /**

@@ -40,7 +40,7 @@ public final class CmpIR extends Single {
    * @param info input info (can be {@code null})
    */
   private CmpIR(final Expr expr, final long min, final long max, final InputInfo info) {
-    super(info, expr, SeqType.BOOLEAN_O);
+    super(info, expr, Types.BOOLEAN_O);
     this.min = min;
     this.max = max;
   }

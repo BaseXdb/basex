@@ -36,7 +36,7 @@ public final class Transform extends Copy {
    * @param rtrn return expression
    */
   public Transform(final InputInfo info, final Let[] copies, final Expr modify, final Expr rtrn) {
-    super(info, SeqType.ITEM_ZM, modify, rtrn);
+    super(info, Types.ITEM_ZM, modify, rtrn);
     this.copies = copies;
   }
 

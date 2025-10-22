@@ -25,7 +25,7 @@ public final class CArray extends Arr {
    * @param exprs array expressions
    */
   public CArray(final InputInfo info, final Expr... exprs) {
-    super(info, SeqType.ARRAY_O, exprs);
+    super(info, Types.ARRAY_O, exprs);
   }
 
   @Override

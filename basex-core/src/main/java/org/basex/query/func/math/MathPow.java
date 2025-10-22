@@ -33,7 +33,7 @@ public final class MathPow extends MathFn {
     if(exp instanceof final ANum num) {
       final double e = num.dbl();
       if(e == 0) return Dbl.ONE;
-      if(e == 1) return new Cast(info, base, SeqType.DOUBLE_O).optimize(cc);
+      if(e == 1) return new Cast(info, base, Types.DOUBLE_O).optimize(cc);
       if(e == -1) return new Arith(info, Dbl.ONE, base, Calc.DIVIDE).optimize(cc);
     }
     // merge nested function calls

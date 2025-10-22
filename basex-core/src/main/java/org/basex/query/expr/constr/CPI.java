@@ -30,7 +30,7 @@ public final class CPI extends CName {
    * @param value value
    */
   public CPI(final InputInfo info, final boolean computed, final Expr name, final Expr value) {
-    super(info, SeqType.PROCESSING_INSTRUCTION_O, computed, name, value);
+    super(info, Types.PROCESSING_INSTRUCTION_O, computed, name, value);
   }
 
   @Override

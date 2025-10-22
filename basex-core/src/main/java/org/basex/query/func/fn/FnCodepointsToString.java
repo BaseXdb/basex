@@ -60,7 +60,7 @@ public final class FnCodepointsToString extends StandardFunc {
     // codepoints-to-string(string-to-codepoints(A))  ->  string(A)
     if(STRING_TO_CODEPOINTS.is(values)) return cc.function(STRING, info, values.args());
 
-    singleInt = values.seqType().instanceOf(SeqType.INTEGER_O);
+    singleInt = values.seqType().instanceOf(Types.INTEGER_O);
     return this;
   }
 

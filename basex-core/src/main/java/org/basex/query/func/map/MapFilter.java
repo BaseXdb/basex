@@ -36,7 +36,7 @@ public final class MapFilter extends StandardFunc {
     final Type type = map.seqType().type;
     if(type instanceof final MapType mt) {
       final SeqType declType = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE);
-      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType(), SeqType.INTEGER_O));
+      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType(), Types.INTEGER_O));
       exprType.assign(type);
     }
     return this;

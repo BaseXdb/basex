@@ -40,7 +40,7 @@ public final class Let extends ForLet {
    * @param scoring scoring flag
    */
   public Let(final Var var, final Expr expr, final boolean scoring) {
-    super(var.info, scoring ? SeqType.DOUBLE_O : SeqType.ITEM_ZM, var, expr, scoring, var);
+    super(var.info, scoring ? Types.DOUBLE_O : Types.ITEM_ZM, var, expr, scoring, var);
   }
 
   @Override

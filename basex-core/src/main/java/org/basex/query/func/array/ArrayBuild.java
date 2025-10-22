@@ -40,7 +40,7 @@ public final class ArrayBuild extends StandardFunc {
     // array:build(1 to 3)  ->  array { 1 to 3 }
     if(!defined(1)) return new CItemArray(info, input);
 
-    arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), SeqType.INTEGER_O));
+    arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), Types.INTEGER_O));
     final FuncType ft = arg(1).funcType();
     if(ft != null) exprType.assign(ArrayType.get(ft.declType));
     return this;

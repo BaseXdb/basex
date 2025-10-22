@@ -56,17 +56,6 @@ public abstract class XQMap extends XQStruct {
     return new XQSingletonMap(key, value);
   }
 
-  /**
-   * Creates a map with 'key' and 'value' entries.
-   * @param key key
-   * @param value value
-   * @return map
-   * @throws QueryException query exception
-   */
-  public static XQMap pair(final Item key, final Value value) throws QueryException {
-    return new MapBuilder(2).put(Str.KEY, key).put(Str.VALUE, value).map();
-  }
-
   @Override
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeNum((int) structSize());
@@ -227,7 +216,7 @@ public abstract class XQMap extends XQStruct {
             final SeqType st = rf.seqType();
             if(rf.isOptional() || key == null || key.type != AtomType.STRING ||
               !Token.eq(fields.key(f), key.string(null)) ||
-              st != SeqType.ITEM_ZM && !st.instance(getOrNull(key))) return false;
+              st != Types.ITEM_ZM && !st.instance(getOrNull(key))) return false;
           }
           return keys.next() == null || rt.isExtensible();
         }
@@ -251,12 +240,12 @@ public abstract class XQMap extends XQStruct {
       final SeqType vt;
       if(tp instanceof final MapType mt) {
         kt = mt.keyType() == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType();
-        vt = mt.valueType().eq(SeqType.ITEM_ZM) ? null : mt.valueType();
+        vt = mt.valueType().eq(Types.ITEM_ZM) ? null : mt.valueType();
       } else if(tp instanceof final FuncType ft) {
         if(ft.declType.occ.min != 0 || ft.argTypes.length != 1 ||
-            !ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O)) return false;
+            !ft.argTypes[0].instanceOf(Types.ANY_ATOMIC_TYPE_O)) return false;
         kt = null;
-        vt = ft.declType.eq(SeqType.ITEM_ZM) ? null : ft.declType;
+        vt = ft.declType.eq(Types.ITEM_ZM) ? null : ft.declType;
       } else {
         return false;
       }

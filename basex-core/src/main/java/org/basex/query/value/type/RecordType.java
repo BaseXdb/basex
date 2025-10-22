@@ -47,7 +47,7 @@ public final class RecordType extends MapType {
   public RecordType(final boolean extensible, final TokenObjectMap<RecordField> fields,
       final QNm name) {
     super(extensible ? AtomType.ANY_ATOMIC_TYPE : AtomType.STRING,
-        extensible ? SeqType.ITEM_ZM : unionType(fields));
+        extensible ? Types.ITEM_ZM : unionType(fields));
     this.extensible = extensible;
     this.fields = fields;
     this.name = name;
@@ -60,7 +60,7 @@ public final class RecordType extends MapType {
    * @param info input info
    */
   public RecordType(final QNm name, final InputInfo info) {
-    super(AtomType.ANY_ATOMIC_TYPE, SeqType.ITEM_ZM, false);
+    super(AtomType.ANY_ATOMIC_TYPE, Types.ITEM_ZM, false);
     extensible = true;
     fields = new TokenObjectMap<>();
     this.name = name;
@@ -73,7 +73,7 @@ public final class RecordType extends MapType {
    * @return union type
    */
   private static SeqType unionType(final TokenObjectMap<RecordField> rfs) {
-    if(rfs.isEmpty()) return SeqType.ITEM_ZM;
+    if(rfs.isEmpty()) return Types.ITEM_ZM;
     SeqType ust = null;
     final int fs = rfs.size();
     for(int f = 1; f <= fs; f++) {
@@ -183,7 +183,7 @@ public final class RecordType extends MapType {
    * @return result of check
    */
   private boolean instanceOf(final Type type, final Set<Pair> pairs) {
-    if(this == type || type.oneOf(SeqType.RECORD, SeqType.MAP, SeqType.FUNCTION, AtomType.ITEM)) {
+    if(this == type || type.oneOf(Types.RECORD, Types.MAP, Types.FUNCTION, AtomType.ITEM)) {
       return true;
     }
     if(type instanceof final ChoiceItemType cit) {
@@ -220,7 +220,7 @@ public final class RecordType extends MapType {
               }
             }
           }
-        } else if(!rtf.optional || extensible && rtf.seqType() != SeqType.ITEM_ZM) {
+        } else if(!rtf.optional || extensible && rtf.seqType() != Types.ITEM_ZM) {
           return false;
         }
       }
@@ -236,7 +236,7 @@ public final class RecordType extends MapType {
     }
     if(type instanceof final FuncType ft) {
       return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
-          ft.argTypes[0].instanceOf(SeqType.ANY_ATOMIC_TYPE_O);
+          ft.argTypes[0].instanceOf(Types.ANY_ATOMIC_TYPE_O);
     }
     return false;
   }
@@ -261,7 +261,7 @@ public final class RecordType extends MapType {
    */
   private Type union(final Type type, final Set<Pair> pairs) {
     if(type instanceof ChoiceItemType) return type.union(this);
-    if(type == SeqType.MAP) return SeqType.MAP;
+    if(type == Types.MAP) return Types.MAP;
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
 
@@ -278,7 +278,7 @@ public final class RecordType extends MapType {
           if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2 &&
               !fst.zero() && !rtfst.zero()) {
             final Pair pair = new Pair(rt1, rt2);
-            if(pairs.contains(pair)) return SeqType.RECORD;
+            if(pairs.contains(pair)) return Types.RECORD;
             union = SeqType.get(rt1.union(rt2, pair.addTo(pairs)), fst.occ.union(rtfst.occ));
           } else {
             union = fst.union(rtfst);
@@ -298,7 +298,7 @@ public final class RecordType extends MapType {
       return new RecordType(extensible || rt.extensible, map);
     }
     return type instanceof final MapType mt ? mt.union(keyType(), valueType()) :
-           type instanceof ArrayType ? SeqType.FUNCTION :
+           type instanceof ArrayType ? Types.FUNCTION :
            type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
@@ -362,7 +362,7 @@ public final class RecordType extends MapType {
   public String toString() {
     if(name != null) return Token.string(name.prefixString());
     final QueryString qs = new QueryString().token(RECORD).token('(');
-    if(this == SeqType.RECORD) {
+    if(this == Types.RECORD) {
       qs.token('*');
     } else {
       int i = 0;
@@ -383,8 +383,8 @@ public final class RecordType extends MapType {
         if(f.optional) qs.token('?');
         if(f.seqType != null) {
           Type type = f.seqType.type;
-          if(f.seqType.instanceOf(SeqType.ARRAY_ZM)) type = SeqType.ARRAY;
-          else if(f.seqType.instanceOf(SeqType.MAP_ZM)) type = SeqType.MAP;
+          if(f.seqType.instanceOf(Types.ARRAY_ZM)) type = Types.ARRAY;
+          else if(f.seqType.instanceOf(Types.MAP_ZM)) type = Types.MAP;
           qs.token(AS).token(type.seqType(f.seqType.occ));
         }
       }

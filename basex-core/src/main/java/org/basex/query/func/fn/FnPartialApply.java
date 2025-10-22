@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.value.type.SeqType.*;
-
 import java.util.*;
 
 import org.basex.query.*;
@@ -24,7 +22,7 @@ import org.basex.query.var.*;
 public class FnPartialApply extends StandardFunc {
   /** The type of parameter "arguments". */
   private static final SeqType ARGS_TYPE = MapType.get(AtomType.POSITIVE_INTEGER,
-      ITEM_ZM).seqType();
+      Types.ITEM_ZM).seqType();
   /** The name of parameter "arguments". */
   private static final QNm ARGS_NAME = new QNm("arguments");
 

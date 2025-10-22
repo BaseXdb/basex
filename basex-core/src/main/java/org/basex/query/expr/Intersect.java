@@ -38,7 +38,7 @@ public final class Intersect extends Set {
     flatten(cc);
 
     // determine type
-    SeqType st = SeqType.NODE_ZM;
+    SeqType st = Types.NODE_ZM;
     for(final Expr expr : exprs) {
       final SeqType st2 = expr.seqType();
       if(!st2.zero()) {

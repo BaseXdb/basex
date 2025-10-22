@@ -30,7 +30,7 @@ public abstract class Filter extends AFilter {
    * @param preds predicate expressions
    */
   protected Filter(final InputInfo info, final Expr root, final Expr... preds) {
-    super(info, SeqType.ITEM_ZM, root, preds);
+    super(info, Types.ITEM_ZM, root, preds);
   }
 
   /**
@@ -109,7 +109,7 @@ public abstract class Filter extends AFilter {
     boolean opt = false;
     final ExprList preds = new ExprList(exprs.length);
     final QueryFunction<Expr, Expr> add = e -> preds.isEmpty() ? e : get(cc, info, e, preds.next());
-    final Predicate<Expr> simpleInt = e -> e.seqType().eq(SeqType.INTEGER_O) && e.isSimple();
+    final Predicate<Expr> simpleInt = e -> e.seqType().eq(Types.INTEGER_O) && e.isSimple();
     for(final Expr pred : exprs) {
       Expr ex = null;
       if(pred instanceof final IntPos pos) {
@@ -161,7 +161,7 @@ public abstract class Filter extends AFilter {
       } else if(pred instanceof final CmpG cmp) {
         final Expr op1 = pred.arg(0), op2 = pred.arg(1);
         if(POSITION.is(op1) && cmp.opV() == OpV.NE &&
-            op2.isSimple() && op2.seqType().instanceOf(SeqType.INTEGER_O)) {
+            op2.isSimple() && op2.seqType().instanceOf(Types.INTEGER_O)) {
           // E[position() != pos]  ->  remove(E, pos)
           ex = cc.function(REMOVE, info, add.apply(expr), op2);
         }
@@ -209,7 +209,7 @@ public abstract class Filter extends AFilter {
       final Expr ex = root.simplifyFor(mode, cc);
       if(ex != root) expr = get(cc, info, ex, exprs);
     } else if(mode == Simplify.COUNT && exprs.length == 1 &&
-        exprs[0].seqType().instanceOf(SeqType.NODE_ZO)) {
+        exprs[0].seqType().instanceOf(Types.NODE_ZO)) {
       // $nodes[@attr]  ->  $nodes ! @attr
       expr = SimpleMap.get(cc, info, root, exprs[0]);
     }

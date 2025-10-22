@@ -729,7 +729,7 @@ public final class QueryContext extends Job implements Closeable {
     // parse target type
     final StaticContext sc = main != null ? main.sc : new StaticContext(this);
     final SeqType st = new QueryParser(type, null, this, sc).parseSeqType();
-    if(st.eq(SeqType.EMPTY_SEQUENCE_Z)) return Empty.VALUE;
+    if(st.eq(Types.EMPTY_SEQUENCE_Z)) return Empty.VALUE;
     final Type tp = st.type;
 
     // cast XQuery values

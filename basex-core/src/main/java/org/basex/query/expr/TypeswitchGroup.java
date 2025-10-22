@@ -40,7 +40,7 @@ public final class TypeswitchGroup extends Single {
    */
   public TypeswitchGroup(final InputInfo info, final Var var, final SeqType[] seqTypes,
       final Expr rtrn) {
-    super(info, rtrn, SeqType.ITEM_ZM);
+    super(info, rtrn, Types.ITEM_ZM);
     this.var = var;
     this.seqTypes = seqTypes;
   }

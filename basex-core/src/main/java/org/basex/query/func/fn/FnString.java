@@ -34,7 +34,7 @@ public final class FnString extends ContextFn {
 
     final boolean context = contextAccess();
     final Expr item = context ? cc.qc.focus.value : arg(0);
-    if(item != null && item.seqType().eq(SeqType.STRING_O)) {
+    if(item != null && item.seqType().eq(Types.STRING_O)) {
       // string('x')  ->  'x'
       // $string[string() = 'a']  ->  $string[. = 'a']
       return context && cc.nestedFocus() ? ContextValue.get(cc, info) : item;

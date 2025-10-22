@@ -26,7 +26,7 @@ public final class Cast extends Convert {
    * @param seqType sequence type to cast to (zero or one item)
    */
   public Cast(final InputInfo info, final Expr expr, final SeqType seqType) {
-    super(info, expr, seqType, SeqType.ITEM_ZM);
+    super(info, expr, seqType, Types.ITEM_ZM);
   }
 
   @Override

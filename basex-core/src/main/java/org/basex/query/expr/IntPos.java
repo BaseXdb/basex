@@ -34,7 +34,7 @@ public final class IntPos extends Simple implements CmpPos {
    * @param info input info (can be {@code null})
    */
   private IntPos(final long min, final long max, final InputInfo info) {
-    super(info, SeqType.BOOLEAN_O);
+    super(info, Types.BOOLEAN_O);
     this.min = min;
     this.max = max;
   }

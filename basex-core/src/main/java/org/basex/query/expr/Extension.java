@@ -26,7 +26,7 @@ public final class Extension extends Single {
    * @param expr enclosed expression
    */
   public Extension(final InputInfo info, final Pragma pragma, final Expr expr) {
-    super(info, expr, SeqType.ITEM_ZM);
+    super(info, expr, Types.ITEM_ZM);
     this.pragma = pragma;
   }
 

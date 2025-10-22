@@ -33,7 +33,7 @@ import org.basex.util.options.*;
  */
 public final class FnLoadXQueryModule extends StandardFunc {
   /** The type of the value of the 'variables' and 'vendor-options' option. */
-  public static final MapType QNAME_MAP_TYPE = MapType.get(AtomType.QNAME, SeqType.ITEM_ZM);
+  private static final MapType QNAME_MAP_TYPE = MapType.get(AtomType.QNAME, Types.ITEM_ZM);
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -190,19 +190,19 @@ public final class FnLoadXQueryModule extends StandardFunc {
   public static final class LoadXQueryModuleOptions extends Options {
     /** load-xquery-module option xquery-version. */
     public static final ValueOption XQUERY_VERSION = new ValueOption("xquery-version",
-        SeqType.DECIMAL_O, null);
+        Types.DECIMAL_O, null);
     /** load-xquery-module option location-hints. */
     public static final StringsOption LOCATION_HINTS = new StringsOption("location-hints",
         (String[]) null);
     /** load-xquery-module option content. */
     public static final StringOption CONTENT = new StringOption("content");
     /** load-xquery-module option context-item. */
-    public static final ValueOption CONTEXT_ITEM = new ValueOption("context-item", SeqType.ITEM_ZO,
+    public static final ValueOption CONTEXT_ITEM = new ValueOption("context-item", Types.ITEM_ZO,
         null);
     /** load-xquery-module option variable. */
-    public static final ValueOption VARIABLES = new ValueOption("variables", SeqType.MAP_O, null);
+    public static final ValueOption VARIABLES = new ValueOption("variables", Types.MAP_O, null);
     /** load-xquery-module option vendor-options. */
     public static final ValueOption VENDOR_OPTIONS = new ValueOption("vendor-options",
-        SeqType.MAP_O, null);
+        Types.MAP_O, null);
   }
 }

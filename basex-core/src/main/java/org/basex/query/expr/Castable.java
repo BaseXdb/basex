@@ -24,7 +24,7 @@ public final class Castable extends Convert {
    * @param seqType sequence type to check
    */
   public Castable(final InputInfo info, final Expr expr, final SeqType seqType) {
-    super(info, expr, seqType, SeqType.BOOLEAN_O);
+    super(info, expr, seqType, Types.BOOLEAN_O);
   }
 
   @Override

@@ -30,7 +30,7 @@ public final class CNSpace extends CName {
    * @param value value
    */
   public CNSpace(final InputInfo info, final boolean computed, final Expr name, final Expr value) {
-    super(info, SeqType.NAMESPACE_NODE_O, computed, name, value);
+    super(info, Types.NAMESPACE_NODE_O, computed, name, value);
   }
 
   @Override

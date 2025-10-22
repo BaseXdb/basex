@@ -47,7 +47,7 @@ public class FnSum extends NumericFn {
         if(ost != null) exprType.assign(ost);
       }
     } else if(st.zero()) {
-      if(zero == Empty.VALUE || stZero.instanceOf(SeqType.ANY_ATOMIC_TYPE_ZO)) {
+      if(zero == Empty.VALUE || stZero.instanceOf(Types.ANY_ATOMIC_TYPE_ZO)) {
         return cc.voidAndReturn(values, zero, info);
       }
     } else if(!st.mayBeArray() && !stZero.mayBeArray()) {

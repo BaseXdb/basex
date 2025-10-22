@@ -63,7 +63,7 @@ public final class FnPartition extends ArrayFn {
     }
 
     final SeqType mt = st.with(Occ.EXACTLY_ONE);
-    arg(1, arg -> refineFunc(arg, cc, st.with(Occ.ZERO_OR_MORE), mt, SeqType.INTEGER_O));
+    arg(1, arg -> refineFunc(arg, cc, st.with(Occ.ZERO_OR_MORE), mt, Types.INTEGER_O));
     exprType.assign(ArrayType.get(mt));
     return this;
   }

@@ -80,12 +80,12 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    */
   Closure(final InputInfo info, final Expr expr, final Var[] params, final AnnList anns,
       final VarScope vs, final Map<Var, Expr> global, final SeqType declType, final QNm name) {
-    super(info, expr, SeqType.FUNCTION_O);
+    super(info, expr, Types.FUNCTION_O);
     this.params = params;
     this.anns = anns;
     this.vs = vs;
     this.global = global == null ? Collections.emptyMap() : global;
-    this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
+    this.declType = declType == null || declType.eq(Types.ITEM_ZM) ? null : declType;
     this.name = name;
   }
 
@@ -419,7 +419,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     final int pl = params.length;
     for(int p = 0; p < pl; p++) params[p].declType = ft.argTypes[p];
     final SeqType dt = ft.declType;
-    if(!dt.eq(SeqType.ITEM_ZM)) declType = dt;
+    if(!dt.eq(Types.ITEM_ZM)) declType = dt;
   }
 
   /**
@@ -464,7 +464,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       qs.token(RETURN);
     }
     qs.token(FN).params(params);
-    qs.token(AS).token(declType != null ? declType : SeqType.ITEM_ZM).brace(expr);
+    qs.token(AS).token(declType != null ? declType : Types.ITEM_ZM).brace(expr);
     if(inlined) qs.token(')');
   }
 }

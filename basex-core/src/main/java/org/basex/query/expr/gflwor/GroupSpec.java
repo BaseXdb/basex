@@ -37,7 +37,7 @@ public final class GroupSpec extends Single {
    * @param coll collation (can be {@code null})
    */
   public GroupSpec(final InputInfo info, final Var var, final Expr expr, final Collation coll) {
-    super(info, expr, SeqType.ITEM_ZM);
+    super(info, expr, Types.ITEM_ZM);
     this.var = var;
     this.coll = coll;
   }

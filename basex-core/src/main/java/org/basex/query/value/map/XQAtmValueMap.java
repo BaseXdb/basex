@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  */
 public final class XQAtmValueMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.UNTYPED_ATOMIC, SeqType.ITEM_ZM);
+  private static final MapType TYPE = MapType.get(AtomType.UNTYPED_ATOMIC, Types.ITEM_ZM);
   /** Hash map. */
   private final TokenObjectMap<Value> map;
 

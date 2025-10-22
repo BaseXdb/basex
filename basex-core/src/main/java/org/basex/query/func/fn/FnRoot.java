@@ -28,7 +28,7 @@ public final class FnRoot extends ContextFn {
     final Expr expr;
     if(defined(0)) {
       expr = arg(0);
-      if(expr.seqType().instanceOf(SeqType.DOCUMENT_NODE_ZO)) return expr;
+      if(expr.seqType().instanceOf(Types.DOCUMENT_NODE_ZO)) return expr;
     } else {
       expr = value;
     }

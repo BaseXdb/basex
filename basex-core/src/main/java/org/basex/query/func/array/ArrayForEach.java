@@ -36,7 +36,7 @@ public final class ArrayForEach extends ArrayFn {
 
     final Type type = array.seqType().type;
     if(type instanceof final ArrayType at) {
-      arg(1, arg -> refineFunc(arg, cc, at.valueType(), SeqType.INTEGER_O));
+      arg(1, arg -> refineFunc(arg, cc, at.valueType(), Types.INTEGER_O));
     }
 
     // assign type after coercion (expression might have changed)

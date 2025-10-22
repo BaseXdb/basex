@@ -29,7 +29,7 @@ public final class StructFilter extends AFilter {
    * @param preds predicate expressions
    */
   public StructFilter(final InputInfo info, final Expr root, final Expr... preds) {
-    super(info, SeqType.FUNCTION_O, root, preds);
+    super(info, Types.FUNCTION_O, root, preds);
   }
 
   @Override
@@ -75,7 +75,7 @@ public final class StructFilter extends AFilter {
 
           map.forEach((key, value) -> {
             qc.checkStop();
-            qf.value = XQMap.pair(key, value);
+            qf.value = new MapBuilder(2).put(Str.KEY, key).put(Str.VALUE, value).map();
             qf.pos = a.incrementAndGet();
             if(expr.test(qc, info, a.get())) mb.put(key, value);
           });

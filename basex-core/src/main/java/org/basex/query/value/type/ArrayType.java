@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.value.type.Types.*;
 
 import java.io.*;
 
@@ -69,11 +70,11 @@ public final class ArrayType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(SeqType.ARRAY, SeqType.FUNCTION, AtomType.ITEM)) return true;
+    if(this == type || type.oneOf(ARRAY, FUNCTION, AtomType.ITEM)) return true;
     if(type instanceof final ArrayType at) return valueType.instanceOf(at.valueType);
     if(type instanceof final FuncType ft) {
       return valueType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
-          ft.argTypes[0].instanceOf(SeqType.INTEGER_O);
+          ft.argTypes[0].instanceOf(INTEGER_O);
     }
     return type instanceof final ChoiceItemType cit && cit.hasInstance(this);
   }
@@ -84,7 +85,7 @@ public final class ArrayType extends FType {
       instanceOf(type) ? type :
       type.instanceOf(this) ? this :
       type instanceof final ArrayType at ? union(at.valueType) :
-      type instanceof MapType ? SeqType.FUNCTION :
+      type instanceof MapType ? FUNCTION :
       type instanceof FuncType ? type.union(this) : AtomType.ITEM;
   }
 
@@ -112,7 +113,7 @@ public final class ArrayType extends FType {
 
   @Override
   public FuncType funcType() {
-    return FuncType.get(valueType, SeqType.INTEGER_O);
+    return FuncType.get(valueType, INTEGER_O);
   }
 
   @Override
@@ -127,7 +128,7 @@ public final class ArrayType extends FType {
 
   @Override
   public String toString() {
-    final Object[] param = this == SeqType.ARRAY ? WILDCARD : new Object[] { valueType };
+    final Object[] param = this == ARRAY ? WILDCARD : new Object[] { valueType };
     return new QueryString().token(QueryText.ARRAY).params(param).toString();
   }
 }

@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
+import static org.basex.query.value.type.Types.*;
 
 import java.util.*;
 
@@ -43,7 +44,7 @@ public final class FuncType extends FType {
    */
   private FuncType(final AnnList anns, final SeqType declType, final SeqType... argTypes) {
     this.anns = anns;
-    this.declType = declType == null ? SeqType.ITEM_ZM : declType;
+    this.declType = declType == null ? ITEM_ZM : declType;
     this.argTypes = argTypes;
   }
 
@@ -56,7 +57,7 @@ public final class FuncType extends FType {
   public FItem cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     if(!(item instanceof final FItem func)) throw typeError(item, this, info);
-    return this == SeqType.FUNCTION ? func : func.coerceTo(this, qc, null, info);
+    return this == FUNCTION ? func : func.coerceTo(this, qc, null, info);
   }
 
   @Override
@@ -67,8 +68,7 @@ public final class FuncType extends FType {
   @Override
   public boolean eq(final Type type) {
     if(this == type) return true;
-    if(this == SeqType.FUNCTION || type == SeqType.FUNCTION || !(type instanceof final FuncType ft))
-      return false;
+    if(this == FUNCTION || type == FUNCTION || !(type instanceof final FuncType ft)) return false;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return false;
@@ -80,9 +80,9 @@ public final class FuncType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(SeqType.FUNCTION, AtomType.ITEM)) return true;
+    if(this == type || type.oneOf(FUNCTION, AtomType.ITEM)) return true;
     if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
-    if(this == SeqType.FUNCTION || !(type instanceof final FuncType ft)) return false;
+    if(this == FUNCTION || !(type instanceof final FuncType ft)) return false;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return false;
@@ -105,12 +105,12 @@ public final class FuncType extends FType {
     if(ft == null) return AtomType.ITEM;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
-    if(arity != nargs) return SeqType.FUNCTION;
+    if(arity != nargs) return FUNCTION;
 
     final SeqType[] arg = new SeqType[arity];
     for(int a = 0; a < arity; a++) {
       arg[a] = argTypes[a].intersect(ft.argTypes[a]);
-      if(arg[a] == null) return SeqType.FUNCTION;
+      if(arg[a] == null) return FUNCTION;
     }
     return get(anns.union(ft.anns), declType.union(ft.declType), arg);
   }
@@ -178,10 +178,10 @@ public final class FuncType extends FType {
     if(name.uri().length == 0) {
       switch(Token.string(name.local())) {
         case QueryText.FUNCTION:
-        case QueryText.FN:       return SeqType.FUNCTION;
-        case QueryText.MAP:      return SeqType.MAP;
-        case QueryText.RECORD:   return SeqType.RECORD;
-        case QueryText.ARRAY:    return SeqType.ARRAY;
+        case QueryText.FN:       return FUNCTION;
+        case QueryText.MAP:      return MAP;
+        case QueryText.RECORD:   return RECORD;
+        case QueryText.ARRAY:    return ARRAY;
       }
     }
     return null;
@@ -198,7 +198,7 @@ public final class FuncType extends FType {
     final int pl = params.length;
     final SeqType[] argTypes = new SeqType[pl];
     for(int p = 0; p < pl; p++) {
-      argTypes[p] = params[p] == null ? SeqType.ITEM_ZM : params[p].declaredType();
+      argTypes[p] = params[p] == null ? ITEM_ZM : params[p].declaredType();
     }
     return new FuncType(anns, declType, argTypes);
   }
@@ -216,7 +216,7 @@ public final class FuncType extends FType {
   @Override
   public String toString() {
     final QueryString qs = new QueryString().token(anns).token(QueryText.FUNCTION);
-    if(this == SeqType.FUNCTION) qs.params(WILDCARD);
+    if(this == FUNCTION) qs.params(WILDCARD);
     else qs.params(argTypes).token(QueryText.AS).token(declType);
     return qs.toString();
   }

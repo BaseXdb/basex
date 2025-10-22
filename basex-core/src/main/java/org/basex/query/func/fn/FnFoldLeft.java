@@ -117,10 +117,10 @@ public class FnFoldLeft extends StandardFunc {
       }
 
       final SeqType i1t = array ? ist.type instanceof final ArrayType at ? at.valueType() :
-        SeqType.ITEM_O : ist.with(Occ.EXACTLY_ONE);
+        Types.ITEM_O : ist.with(Occ.EXACTLY_ONE);
       SeqType st = zst, ost;
       do {
-        final SeqType[] types = { left ? st : i1t, left ? i1t : st, SeqType.INTEGER_O };
+        final SeqType[] types = { left ? st : i1t, left ? i1t : st, Types.INTEGER_O };
         arg(2, arg -> refineFunc(action, cc, types));
         ost = st;
         st = st.union(arg(2).funcType().declType);

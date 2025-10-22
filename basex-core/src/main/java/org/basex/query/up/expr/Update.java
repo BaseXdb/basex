@@ -26,7 +26,7 @@ abstract class Update extends Arr {
    * @param expr expressions
    */
   Update(final InputInfo info, final Expr... expr) {
-    super(info, SeqType.EMPTY_SEQUENCE_Z, expr);
+    super(info, Types.EMPTY_SEQUENCE_Z, expr);
   }
 
   @Override

@@ -25,11 +25,11 @@ public final class FnPath extends ContextFn {
   /** Path options. */
   public static class PathOptions extends Options {
     /** Option. */
-    public static final ValueOption ORIGIN = new ValueOption("origin", SeqType.NODE_ZO);
+    public static final ValueOption ORIGIN = new ValueOption("origin", Types.NODE_ZO);
     /** Option. */
     public static final BooleanOption LEXICAL = new BooleanOption("lexical", false);
     /** Option. */
-    public static final ValueOption NAMESPACES = new ValueOption("namespaces", SeqType.MAP_O);
+    public static final ValueOption NAMESPACES = new ValueOption("namespaces", Types.MAP_O);
     /** Option. */
     public static final BooleanOption INDEXES = new BooleanOption("indexes", true);
   }

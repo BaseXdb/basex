@@ -42,7 +42,7 @@ public final class DeepEqualOptions extends Options {
       new BooleanOption("in-scope-namespaces", false);
   /** Option: items-equal. */
   public static final ValueOption ITEMS_EQUAL =
-      new ValueOption("items-equal", SeqType.FUNCTION_O);
+      new ValueOption("items-equal", Types.FUNCTION_O);
   /** Option: map-order. */
   public static final BooleanOption MAP_ORDER =
       new BooleanOption("map-order", false);

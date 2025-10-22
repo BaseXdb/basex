@@ -39,7 +39,7 @@ public class MapMerge extends StandardFunc {
   /** Merge options. */
   public static final class MergeOptions extends Options {
     /** Duplicates handling. */
-    public static final ValueOption DUPLICATES = new ValueOption("duplicates", SeqType.ITEM_ZM);
+    public static final ValueOption DUPLICATES = new ValueOption("duplicates", Types.ITEM_ZM);
   }
 
   /** Cached value merger instance. */
@@ -102,7 +102,7 @@ public class MapMerge extends StandardFunc {
       // rewrite map:merge(map:entry, map) to map:put(map, key, value)
       if(!defined(1) && arg(0) instanceof List && arg(0).args().length == 2) {
         final Expr[] args = arg(0).args();
-        if(_MAP_ENTRY.is(args[0]) && args[1].seqType().instanceOf(SeqType.MAP_O)) {
+        if(_MAP_ENTRY.is(args[0]) && args[1].seqType().instanceOf(Types.MAP_O)) {
           return cc.function(_MAP_PUT, info, args[1], args[0].arg(0), args[0].arg(1));
         }
       }
@@ -165,7 +165,7 @@ public class MapMerge extends StandardFunc {
    */
   final void assignType(final Type kt, final SeqType vt) {
     exprType.assign(MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE,
-      vm != null ? vm.type(vt) : SeqType.ITEM_ZM));
+      vm != null ? vm.type(vt) : Types.ITEM_ZM));
   }
 
   @Override

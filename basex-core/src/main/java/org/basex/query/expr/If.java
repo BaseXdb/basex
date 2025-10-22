@@ -44,7 +44,7 @@ public final class If extends Arr {
    * @param branch2 'else' branch
    */
   public If(final InputInfo info, final Expr cond, final Expr branch1, final Expr branch2) {
-    super(info, SeqType.ITEM_ZM, branch1, branch2);
+    super(info, Types.ITEM_ZM, branch1, branch2);
     this.cond = cond;
   }
 
@@ -114,7 +114,7 @@ public final class If extends Arr {
     exprType.assign(st1.union(st2)).data(exprs);
 
     // logical rewritings
-    if(st1.eq(SeqType.BOOLEAN_O) && st2.eq(SeqType.BOOLEAN_O)) {
+    if(st1.eq(Types.BOOLEAN_O) && st2.eq(Types.BOOLEAN_O)) {
       if(br1 == Bln.TRUE) return br2 == Bln.FALSE ?
         // if(A) then true() else false()  ->  boolean(A)
         cc.function(BOOLEAN, info, cond) :

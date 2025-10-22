@@ -37,7 +37,7 @@ public final class Switch extends ParseExpr {
    * @param groups case groups (last one is default case)
    */
   public Switch(final InputInfo info, final Expr cond, final SwitchGroup[] groups) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, Types.ITEM_ZM);
     this.cond = cond;
     this.groups = groups;
   }

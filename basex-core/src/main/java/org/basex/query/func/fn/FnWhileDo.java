@@ -35,14 +35,14 @@ public class FnWhileDo extends StandardFunc {
     if(action instanceof FuncItem) {
       SeqType ost;
       do {
-        final SeqType[] types = { st, SeqType.INTEGER_O };
+        final SeqType[] types = { st, Types.INTEGER_O };
         arg(a, arg -> refineFunc(action, cc, types));
         ost = st;
         st = st.union(arg(a).funcType().declType);
       } while(!st.eq(ost));
 
       if(predicate instanceof FuncItem) {
-        final SeqType[] types = { st, SeqType.INTEGER_O };
+        final SeqType[] types = { st, Types.INTEGER_O };
         arg(p, arg -> refineFunc(predicate, cc, types));
         if(!until && ((FuncItem) arg(p)).expr == Bln.FALSE) return input;
       }

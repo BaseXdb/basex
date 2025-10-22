@@ -30,7 +30,7 @@ public final class XQJava extends FItem {
    * @param value value (can be {@code null})
    */
   public XQJava(final Object value) {
-    super(SeqType.JAVA);
+    super(Types.JAVA);
     this.value = value;
   }
 

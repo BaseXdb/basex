@@ -29,7 +29,7 @@ public final class MapEntry extends StandardFunc {
     final Expr key = arg(0), value = arg(1);
 
     final Type type;
-    if(key instanceof final Str str && key.seqType().eq(SeqType.STRING_O)) {
+    if(key instanceof final Str str && key.seqType().eq(Types.STRING_O)) {
       type = cc.qc.shared.record(str, value.seqType());
     } else {
       final AtomType kt = key.seqType().type.atomic();

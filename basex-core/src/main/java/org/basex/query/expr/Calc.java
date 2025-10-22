@@ -356,7 +356,7 @@ public enum Calc {
       // check for neutral number
       final Type type = numType(expr1.seqType().type, expr2.seqType().type);
       if(expr2 instanceof final ANum num && num.dbl() == 1) {
-        return new Cast(info, expr1, SeqType.INTEGER_O).optimize(cc);
+        return new Cast(info, expr1, Types.INTEGER_O).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
       if(expr1.equals(expr2)) {

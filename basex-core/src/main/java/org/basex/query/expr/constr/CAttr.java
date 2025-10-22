@@ -34,7 +34,7 @@ public final class CAttr extends CName {
    * @param value attribute value
    */
   public CAttr(final InputInfo info, final boolean computed, final Expr name, final Expr... value) {
-    super(info, SeqType.ATTRIBUTE_O, computed, name, value);
+    super(info, Types.ATTRIBUTE_O, computed, name, value);
   }
 
   @Override

@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  */
 public final class XQIntValueMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.INTEGER, SeqType.ITEM_ZM);
+  private static final MapType TYPE = MapType.get(AtomType.INTEGER, Types.ITEM_ZM);
   /** Hash map. */
   private final IntObjectMap<Value> map;
 

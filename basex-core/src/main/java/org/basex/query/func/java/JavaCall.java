@@ -62,7 +62,7 @@ public abstract class JavaCall extends Arr {
    * @param info input info (can be {@code null})
    */
   JavaCall(final Expr[] args, final Perm perm, final boolean updating, final InputInfo info) {
-    super(info, SeqType.ITEM_ZM, args);
+    super(info, Types.ITEM_ZM, args);
     this.updating = updating;
     this.perm = perm;
   }

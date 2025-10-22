@@ -40,7 +40,7 @@ public final class ArrayForEachPair extends ArrayFn {
 
     final Type type1 = array1.seqType().type, type2 = array2.seqType().type;
     if(type1 instanceof final ArrayType at1 && type2 instanceof final ArrayType at2) {
-      arg(2, arg -> refineFunc(arg, cc, at1.valueType(), at2.valueType(), SeqType.INTEGER_O));
+      arg(2, arg -> refineFunc(arg, cc, at1.valueType(), at2.valueType(), Types.INTEGER_O));
     }
 
     // assign type after coercion (expression might have changed)

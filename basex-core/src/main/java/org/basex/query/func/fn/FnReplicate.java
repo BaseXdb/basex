@@ -137,7 +137,7 @@ public final class FnReplicate extends StandardFunc {
       // distinct-values(replicate(NODES, 2))  ->  distinct-values(NODES)
       // VALUE[replicate(NODES, 2)]  ->  VALUE[NODES]
       if(mode == Simplify.DISTINCT ||
-          mode == Simplify.PREDICATE && input.seqType().instanceOf(SeqType.NODE_ZM)) {
+          mode == Simplify.PREDICATE && input.seqType().instanceOf(Types.NODE_ZM)) {
         return cc.simplify(this, input, mode);
       }
     }

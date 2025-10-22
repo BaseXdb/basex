@@ -156,7 +156,7 @@ public final class Functions {
 
     // constructor function
     if(eq(name.uri(), XS_URI)) {
-      if(arity > 0) fb.add(CAST_PARAM[0], SeqType.ANY_ATOMIC_TYPE_ZO, qc);
+      if(arity > 0) fb.add(CAST_PARAM[0], Types.ANY_ATOMIC_TYPE_ZO, qc);
       final Expr expr = constructorCall(name, fb);
       final FuncType ft = FuncType.get(fb.anns, null, fb.params);
       return item(expr, fb, ft, name, false, arity == 0);
@@ -194,7 +194,7 @@ public final class Functions {
     final JavaCall java = JavaCall.get(name, fb.args(), qc, info);
     if(java != null) {
       final SeqType[] sts = new SeqType[arity];
-      Arrays.fill(sts, SeqType.ITEM_ZM);
+      Arrays.fill(sts, Types.ITEM_ZM);
       final SeqType st = FuncType.get(fb.anns, null, sts).seqType();
       return new FuncLit(info, java, fb.params, fb.anns, st, name, fb.vs);
     }
@@ -408,7 +408,7 @@ public final class Functions {
       return new FuncItem(fb.info, expr, params, anns, ft, vs.stackSize(), name);
     }
     // otherwise: create closure
-    final SeqType declType = updating ? SeqType.EMPTY_SEQUENCE_Z : ft != null ? ft.declType : null;
+    final SeqType declType = updating ? Types.EMPTY_SEQUENCE_Z : ft != null ? ft.declType : null;
     return new Closure(fb.info, expr, params, anns, vs, null, declType, name);
   }
 

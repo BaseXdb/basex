@@ -2,7 +2,7 @@ package org.basex.query;
 
 import static org.basex.query.value.type.AtomType.*;
 import static org.basex.query.value.type.Occ.*;
-import static org.basex.query.value.type.SeqType.*;
+import static org.basex.query.value.type.Types.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
@@ -167,25 +167,25 @@ public final class SeqTypeTest {
     final MapType m = MapType.get(STRING, INTEGER_O);
     assertTrue(m.instanceOf(m));
     assertTrue(m.instanceOf(ITEM));
-    assertTrue(m.instanceOf(SeqType.FUNCTION));
-    assertTrue(m.instanceOf(SeqType.MAP));
+    assertTrue(m.instanceOf(FUNCTION));
+    assertTrue(m.instanceOf(MAP));
     assertTrue(m.instanceOf(MapType.get(ANY_ATOMIC_TYPE, INTEGER_O)));
     assertTrue(m.instanceOf(MapType.get(STRING, INTEGER_O)));
     assertTrue(m.instanceOf(MapType.get(STRING, INTEGER_ZO)));
     assertFalse(m.instanceOf(MapType.get(INTEGER, ITEM_ZM)));
-    assertFalse(m.instanceOf(SeqType.ARRAY));
+    assertFalse(m.instanceOf(ARRAY));
     assertFalse(m.instanceOf(MapType.get(STRING, BOOLEAN_O)));
 
     // arrays
     final ArrayType a = ArrayType.get(INTEGER_O);
     assertTrue(a.instanceOf(a));
     assertTrue(a.instanceOf(ITEM));
-    assertTrue(a.instanceOf(SeqType.FUNCTION));
-    assertTrue(a.instanceOf(SeqType.ARRAY));
+    assertTrue(a.instanceOf(FUNCTION));
+    assertTrue(a.instanceOf(ARRAY));
     assertTrue(a.instanceOf(ArrayType.get(INTEGER_O)));
     assertTrue(a.instanceOf(ArrayType.get(INTEGER_O)));
     assertTrue(a.instanceOf(ArrayType.get(INTEGER_ZO)));
-    assertFalse(a.instanceOf(SeqType.MAP));
+    assertFalse(a.instanceOf(MAP));
     assertFalse(a.instanceOf(ArrayType.get(BOOLEAN_O)));
 
     // nodes
@@ -816,47 +816,47 @@ public final class SeqTypeTest {
    * May-be tests.
    */
   @Test public void mayBe() {
-    assertTrue(SeqType.ITEM_O.mayBeNumber());
-    assertFalse(SeqType.FUNCTION_O.mayBeNumber());
-    assertFalse(SeqType.MAP_O.mayBeNumber());
-    assertFalse(SeqType.ARRAY_O.mayBeNumber());
-    assertFalse(SeqType.RECORD_O.mayBeNumber());
-    assertTrue(SeqType.ANY_ATOMIC_TYPE_O.mayBeNumber());
-    assertTrue(SeqType.NUMERIC_O.mayBeNumber());
-    assertTrue(SeqType.INTEGER_O.mayBeNumber());
-    assertTrue(AtomType.BYTE.seqType().mayBeNumber());
-    assertFalse(SeqType.STRING_O.mayBeNumber());
-    assertFalse(SeqType.NODE_O.mayBeNumber());
-    assertFalse(SeqType.ELEMENT_O.mayBeNumber());
-    assertFalse(SeqType.NMTOKENS_O.mayBeNumber());
+    assertTrue(ITEM_O.mayBeNumber());
+    assertFalse(FUNCTION_O.mayBeNumber());
+    assertFalse(MAP_O.mayBeNumber());
+    assertFalse(ARRAY_O.mayBeNumber());
+    assertFalse(RECORD_O.mayBeNumber());
+    assertTrue(ANY_ATOMIC_TYPE_O.mayBeNumber());
+    assertTrue(NUMERIC_O.mayBeNumber());
+    assertTrue(INTEGER_O.mayBeNumber());
+    assertTrue(BYTE.seqType().mayBeNumber());
+    assertFalse(STRING_O.mayBeNumber());
+    assertFalse(NODE_O.mayBeNumber());
+    assertFalse(ELEMENT_O.mayBeNumber());
+    assertFalse(NMTOKENS_O.mayBeNumber());
 
-    assertTrue(SeqType.ITEM_O.mayBeArray());
-    assertTrue(SeqType.FUNCTION_O.mayBeArray());
-    assertFalse(SeqType.MAP_O.mayBeArray());
-    assertTrue(SeqType.ARRAY_O.mayBeArray());
-    assertFalse(SeqType.RECORD_O.mayBeArray());
-    assertFalse(SeqType.ANY_ATOMIC_TYPE_O.mayBeArray());
-    assertFalse(SeqType.NUMERIC_O.mayBeArray());
-    assertFalse(SeqType.INTEGER_O.mayBeArray());
-    assertFalse(AtomType.BYTE.seqType().mayBeArray());
-    assertFalse(SeqType.STRING_O.mayBeArray());
-    assertFalse(SeqType.NODE_O.mayBeArray());
-    assertFalse(SeqType.ELEMENT_O.mayBeArray());
-    assertFalse(SeqType.NMTOKENS_O.mayBeArray());
+    assertTrue(ITEM_O.mayBeArray());
+    assertTrue(FUNCTION_O.mayBeArray());
+    assertFalse(MAP_O.mayBeArray());
+    assertTrue(ARRAY_O.mayBeArray());
+    assertFalse(RECORD_O.mayBeArray());
+    assertFalse(ANY_ATOMIC_TYPE_O.mayBeArray());
+    assertFalse(NUMERIC_O.mayBeArray());
+    assertFalse(INTEGER_O.mayBeArray());
+    assertFalse(BYTE.seqType().mayBeArray());
+    assertFalse(STRING_O.mayBeArray());
+    assertFalse(NODE_O.mayBeArray());
+    assertFalse(ELEMENT_O.mayBeArray());
+    assertFalse(NMTOKENS_O.mayBeArray());
 
-    assertTrue(SeqType.ITEM_O.mayBeFunction());
-    assertTrue(SeqType.FUNCTION_O.mayBeFunction());
-    assertTrue(SeqType.MAP_O.mayBeFunction());
-    assertTrue(SeqType.ARRAY_O.mayBeFunction());
-    assertTrue(SeqType.RECORD_O.mayBeFunction());
-    assertFalse(SeqType.ANY_ATOMIC_TYPE_O.mayBeFunction());
-    assertFalse(SeqType.NUMERIC_O.mayBeFunction());
-    assertFalse(SeqType.INTEGER_O.mayBeFunction());
-    assertFalse(AtomType.BYTE.seqType().mayBeFunction());
-    assertFalse(SeqType.STRING_O.mayBeFunction());
-    assertFalse(SeqType.NODE_O.mayBeFunction());
-    assertFalse(SeqType.ELEMENT_O.mayBeFunction());
-    assertFalse(SeqType.NMTOKENS_O.mayBeFunction());
+    assertTrue(ITEM_O.mayBeFunction());
+    assertTrue(FUNCTION_O.mayBeFunction());
+    assertTrue(MAP_O.mayBeFunction());
+    assertTrue(ARRAY_O.mayBeFunction());
+    assertTrue(RECORD_O.mayBeFunction());
+    assertFalse(ANY_ATOMIC_TYPE_O.mayBeFunction());
+    assertFalse(NUMERIC_O.mayBeFunction());
+    assertFalse(INTEGER_O.mayBeFunction());
+    assertFalse(BYTE.seqType().mayBeFunction());
+    assertFalse(STRING_O.mayBeFunction());
+    assertFalse(NODE_O.mayBeFunction());
+    assertFalse(ELEMENT_O.mayBeFunction());
+    assertFalse(NMTOKENS_O.mayBeFunction());
   }
 
   /**

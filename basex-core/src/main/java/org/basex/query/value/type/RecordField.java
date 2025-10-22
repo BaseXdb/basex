@@ -63,7 +63,7 @@ public final class RecordField {
    * @return sequence type
    */
   public SeqType seqType() {
-    return seqType == null ? SeqType.ITEM_ZM : seqType;
+    return seqType == null ? Types.ITEM_ZM : seqType;
   }
 
   @Override

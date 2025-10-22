@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  */
 public final class XQStrIntMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.STRING, SeqType.INTEGER_O);
+  private static final MapType TYPE = MapType.get(AtomType.STRING, Types.INTEGER_O);
   /** Hash map. */
   private final TokenIntMap map;
 

@@ -73,7 +73,7 @@ public class FnForEachPair extends StandardFunc {
     if(st2.zero()) return input2;
 
     arg(2, arg -> refineFunc(arg(2), cc, st1.with(Occ.EXACTLY_ONE), st2.with(Occ.EXACTLY_ONE),
-        SeqType.INTEGER_O));
+        Types.INTEGER_O));
 
     // assign type after refinement
     final FuncType ft = arg(2).funcType();

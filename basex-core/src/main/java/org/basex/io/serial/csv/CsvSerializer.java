@@ -77,7 +77,7 @@ public abstract class CsvSerializer extends StandardSerializer {
       if(col > maxCol) maxCol = col;
     }
     final Value hdr = copts.get(CsvOptions.HEADER);
-    if(SeqType.BOOLEAN_O.instance(hdr)) {
+    if(Types.BOOLEAN_O.instance(hdr)) {
       header = ((Bln) hdr).bool(null);
     } else if(hdr instanceof final Str str) {
       final Boolean b = Strings.toBoolean(string(str.string()));

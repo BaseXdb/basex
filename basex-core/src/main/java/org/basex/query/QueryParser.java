@@ -870,7 +870,7 @@ public class QueryParser extends InputParser {
     if(!decl.add(VALUEE)) throw error(DUPLVALUE);
 
     final SeqType cst = sc.contextType;
-    SeqType st = cst != null ? cst : item ? SeqType.ITEM_O : SeqType.ITEM_ZM;
+    SeqType st = cst != null ? cst : item ? Types.ITEM_O : Types.ITEM_ZM;
     if(wsConsumeWs(AS)) {
       st = item ? itemType() : sequenceType();
       sc.contextType = st;
@@ -1055,7 +1055,7 @@ public class QueryParser extends InputParser {
           final String paramName = ++i == 0 ? "options" : "options" + i;
           key = Token.token(paramName);
         } while(fields.contains(key));
-        params.add(new QNm(key), SeqType.MAP_O, XQMap.empty(), null);
+        params.add(new QNm(key), Types.MAP_O, XQMap.empty(), null);
       }
       params.seqType(rt.seqType()).finish(qc, localVars);
 
@@ -1242,7 +1242,7 @@ public class QueryParser extends InputParser {
       }
 
       if(wsConsumeWs(COUNT, NOCOUNT, "$")) {
-        final Var var = localVars.add(newVar(SeqType.INTEGER_O));
+        final Var var = localVars.add(newVar(Types.INTEGER_O));
         curr.put(var.name.unique(), var);
         clauses.add(new Count(var));
       }
@@ -1295,8 +1295,8 @@ public class QueryParser extends InputParser {
       final Var fr = member == null && key == null && value == null ? newVar() : null;
       final boolean empty = fr != null && wsConsume(ALLOWING);
       if(empty) wsCheck(EMPTYY);
-      final Var at = wsConsumeWs(AT) ? newVar(SeqType.INTEGER_O) : null;
-      final Var score = wsConsumeWs(SCORE) ? newVar(SeqType.DOUBLE_O) : null;
+      final Var at = wsConsumeWs(AT) ? newVar(Types.INTEGER_O) : null;
+      final Var score = wsConsumeWs(SCORE) ? newVar(Types.DOUBLE_O) : null;
       wsCheck(IN);
       final InputInfo ii = info();
       final Expr expr = check(single(), NOVARDECL);
@@ -1349,7 +1349,7 @@ public class QueryParser extends InputParser {
   private void letClause(final LinkedList<Clause> clauses) throws QueryException {
     do {
       if(wsConsumeWs(SCORE)) {
-        letValueBinding(newVar(SeqType.DOUBLE_O), true, clauses);
+        letValueBinding(newVar(Types.DOUBLE_O), true, clauses);
       } else {
         final int p = pos;
         final InputInfo ii = info();
@@ -1390,9 +1390,9 @@ public class QueryParser extends InputParser {
       throws QueryException {
 
     final LetStructBinding binding = switch(consume()) {
-      case '[' -> new LetStructBinding(']', SeqType.ARRAY_O);
-      case '{' -> new LetStructBinding('}', SeqType.MAP_O);
-      default -> new LetStructBinding(')', SeqType.ITEM_ZM);
+      case '[' -> new LetStructBinding(']', Types.ARRAY_O);
+      case '{' -> new LetStructBinding('}', Types.MAP_O);
+      default -> new LetStructBinding(')', Types.ITEM_ZM);
     };
 
     skipWs();
@@ -1401,7 +1401,7 @@ public class QueryParser extends InputParser {
       vrs.add(newVar());
     } while(wsConsumeWs(","));
     check(binding.endCp);
-    final SeqType asType = Objects.requireNonNullElse(optAsType(), SeqType.ITEM_ZM);
+    final SeqType asType = Objects.requireNonNullElse(optAsType(), Types.ITEM_ZM);
     final SeqType st = asType.intersect(binding.type);
     if(st == null) throw error(NOSUB_X_X, binding.type, asType);
     final Var struct = new Var(vrs.getLast().name, st, qc, ii);
@@ -1465,10 +1465,10 @@ public class QueryParser extends InputParser {
   private Condition windowCond(final boolean start) throws QueryException {
     skipWs();
     final InputInfo ii = info();
-    final Var var = current('$')          ? localVars.add(newVar(SeqType.ITEM_O))    : null;
-    final Var at  = wsConsumeWs(AT)       ? localVars.add(newVar(SeqType.INTEGER_O)) : null;
-    final Var prv = wsConsumeWs(PREVIOUS) ? localVars.add(newVar(SeqType.ITEM_ZO))   : null;
-    final Var nxt = wsConsumeWs(NEXT)     ? localVars.add(newVar(SeqType.ITEM_ZO))   : null;
+    final Var var = current('$')          ? localVars.add(newVar(Types.ITEM_O))    : null;
+    final Var at  = wsConsumeWs(AT)       ? localVars.add(newVar(Types.INTEGER_O)) : null;
+    final Var prv = wsConsumeWs(PREVIOUS) ? localVars.add(newVar(Types.ITEM_ZO))   : null;
+    final Var nxt = wsConsumeWs(NEXT)     ? localVars.add(newVar(Types.ITEM_ZO))   : null;
     final Expr expr = wsConsume(WHEN)     ? check(single(), NOEXPR) : Bln.TRUE;
     return new Condition(start, var, at, prv, nxt, expr, ii);
   }
@@ -1643,7 +1643,7 @@ public class QueryParser extends InputParser {
       }
       Var var = null;
       if(current('$')) {
-        var = localVars.add(newVar(SeqType.ITEM_ZM));
+        var = localVars.add(newVar(Types.ITEM_ZM));
         if(cs) wsCheck(AS);
       }
       if(cs) {
@@ -2704,7 +2704,7 @@ public class QueryParser extends InputParser {
           // focus function
           final InputInfo ii = info();
           final QNm name = new QNm("arg");
-          params = new Params().add(name, SeqType.ITEM_ZM, null, ii).finish(qc, localVars);
+          params = new Params().add(name, Types.ITEM_ZM, null, ii).finish(qc, localVars);
           expr = new Pipeline(ii, localVars.resolve(name, ii), enclosedExpr());
         }
         final VarScope vs = localVars.popContext();
@@ -3492,7 +3492,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(EMPTY_SEQUENCE, INCOMPLETE, "(")) {
       wsCheck("(");
       wsCheck(")");
-      return SeqType.EMPTY_SEQUENCE_Z;
+      return Types.EMPTY_SEQUENCE_Z;
     }
 
     // parse item type and occurrence indicator
@@ -4303,7 +4303,7 @@ public class QueryParser extends InputParser {
     final int s = localVars.openScope();
     Let[] fl = { };
     do {
-      final Var var = newVar(SeqType.NODE_O);
+      final Var var = newVar(Types.NODE_O);
       wsCheck(":=");
       final Expr expr = check(single(), INCOMPLETE);
       fl = Array.add(fl, new Let(localVars.add(var), expr));

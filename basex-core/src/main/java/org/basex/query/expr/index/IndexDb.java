@@ -21,7 +21,7 @@ public abstract class IndexDb extends ParseExpr {
    * @param info input info (can be {@code null})
    */
   IndexDb(final InputInfo info) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, Types.ITEM_ZM);
   }
 
   /**

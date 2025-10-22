@@ -71,7 +71,7 @@ public final class XQueryForkJoin extends StandardFunc {
         exprType.assign(dt.with(dt.occ.multiply(st.occ)));
       }
     } else if(results == Boolean.FALSE) {
-      exprType.assign(SeqType.EMPTY_SEQUENCE_Z);
+      exprType.assign(Types.EMPTY_SEQUENCE_Z);
     }
     return this;
   }

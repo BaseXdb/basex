@@ -43,7 +43,7 @@ public final class CElem extends CName {
    */
   public CElem(final InputInfo info, final boolean computed, final Expr name, final Atts nspaces,
       final Expr... exprs) {
-    super(info, SeqType.ELEMENT_O, computed, name, exprs);
+    super(info, Types.ELEMENT_O, computed, name, exprs);
     this.nspaces = nspaces;
   }
 
@@ -68,7 +68,7 @@ public final class CElem extends CName {
     }
 
     // merge adjacent and nested text values
-    final Predicate<Expr> atomic = arg -> arg.seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM);
+    final Predicate<Expr> atomic = arg -> arg.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM);
     final Predicate<Expr> text = arg -> arg instanceof CTxt && arg.arg(0) instanceof Item;
     final TokenBuilder tb = new TokenBuilder();
     final ExprList list = new ExprList(exprs.length);

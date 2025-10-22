@@ -37,7 +37,7 @@ public final class Catch extends Single {
    */
   public Catch(final InputInfo info, final Expr expr, final Var[] vars,
       final ArrayList<Test> tests) {
-    super(info, expr, SeqType.ITEM_ZM);
+    super(info, expr, Types.ITEM_ZM);
     this.tests = tests;
     this.vars = vars;
     this.expr = expr;

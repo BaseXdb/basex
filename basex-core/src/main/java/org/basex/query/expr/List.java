@@ -27,7 +27,7 @@ public final class List extends Arr {
    * @param exprs expressions
    */
   public List(final InputInfo info, final Expr... exprs) {
-    super(info, SeqType.ITEM_ZM, exprs);
+    super(info, Types.ITEM_ZM, exprs);
   }
 
   /**
@@ -69,7 +69,7 @@ public final class List extends Arr {
       if(size != -1) size = sz == -1 ? -1 : size + sz;
       occ = occ.add(expr.seqType().occ);
     }
-    exprType.assign(st != null ? st : SeqType.EMPTY_SEQUENCE_Z, occ, size).data(exprs);
+    exprType.assign(st != null ? st : Types.EMPTY_SEQUENCE_Z, occ, size).data(exprs);
 
     // pre-evaluate list; skip expressions with large result sizes
     return values(true, cc) ? cc.preEval(this).shrink(cc.qc) : this;

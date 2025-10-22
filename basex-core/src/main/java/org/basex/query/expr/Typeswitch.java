@@ -34,7 +34,7 @@ public final class Typeswitch extends ParseExpr {
    * @param groups case groups (last one is default)
    */
   public Typeswitch(final InputInfo info, final Expr cond, final TypeswitchGroup[] groups) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, Types.ITEM_ZM);
     this.cond = cond;
     this.groups = groups;
   }

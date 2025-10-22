@@ -37,7 +37,7 @@ public final class OrderBy extends Clause {
    * @param info input info (can be {@code null})
    */
   public OrderBy(final VarRef[] refs, final OrderKey[] keys, final InputInfo info) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, Types.ITEM_ZM);
     this.refs = refs;
     this.keys = keys;
   }

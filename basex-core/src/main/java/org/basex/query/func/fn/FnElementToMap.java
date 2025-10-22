@@ -31,7 +31,7 @@ public final class FnElementToMap extends PlanFn {
         new EnumOption<>("name-format", NameFormat.DEFAULT);
     /** Option. */
     public static final ValueOption PLAN =
-        new ValueOption("plan", SeqType.MAP_ZO);
+        new ValueOption("plan", Types.MAP_ZO);
   }
 
   @Override

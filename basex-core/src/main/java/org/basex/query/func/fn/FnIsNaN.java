@@ -28,6 +28,6 @@ public final class FnIsNaN extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    return arg(0).seqType().instanceOf(SeqType.DECIMAL_O) ? Bln.FALSE : this;
+    return arg(0).seqType().instanceOf(Types.DECIMAL_O) ? Bln.FALSE : this;
   }
 }

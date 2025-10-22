@@ -49,7 +49,7 @@ public final class Window extends Clause {
    */
   public Window(final boolean sliding, final Var var, final Expr expr, final Condition start,
       final boolean only, final Condition end) throws QueryException {
-    super(var.info, SeqType.ITEM_ZM, vars(var, start, end));
+    super(var.info, Types.ITEM_ZM, vars(var, start, end));
     this.sliding = sliding;
     this.var = var;
     this.expr = expr;

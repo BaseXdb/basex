@@ -152,7 +152,7 @@ public final class DeepEqual {
   public Bln itemsEqual(final Item item1, final Item item2) throws QueryException {
     if(itemsEqual != null) {
       final Value value = itemsEqual.invoke(qc, info, item1, item2);
-      final Value test = SeqType.BOOLEAN_ZO.coerce(value, null, qc, null, info);
+      final Value test = Types.BOOLEAN_ZO.coerce(value, null, qc, null, info);
       if(!test.isEmpty()) return (Bln) test;
     }
     return null;

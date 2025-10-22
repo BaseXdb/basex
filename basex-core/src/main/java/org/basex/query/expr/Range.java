@@ -36,7 +36,7 @@ public final class Range extends Arr {
    * @param range (min/max) expressions
    */
   public Range(final InputInfo info, final Expr... range) {
-    super(info, SeqType.INTEGER_ZM, range);
+    super(info, Types.INTEGER_ZM, range);
   }
 
   @Override
@@ -49,7 +49,7 @@ public final class Range extends Arr {
 
       final Expr min = exprs[0], max = exprs[1];
       final SeqType st1 = min.seqType(), st2 = max.seqType();
-      ints = st1.instanceOf(SeqType.INTEGER_O) && st2.instanceOf(SeqType.INTEGER_O);
+      ints = st1.instanceOf(Types.INTEGER_O) && st2.instanceOf(Types.INTEGER_O);
       if(min.equals(max)) {
         exprType.assign(Occ.EXACTLY_ONE);
         if(ints && !min.has(Flag.NDT)) expr = min;

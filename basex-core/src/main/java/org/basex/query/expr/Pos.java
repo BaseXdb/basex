@@ -30,7 +30,7 @@ public final class Pos extends Single {
    * @param expr expression yielding an empty sequence, an integer or an integer range
    */
   private Pos(final InputInfo info, final Expr expr) {
-    super(info, expr, SeqType.BOOLEAN_O);
+    super(info, expr, Types.BOOLEAN_O);
   }
 
   /**

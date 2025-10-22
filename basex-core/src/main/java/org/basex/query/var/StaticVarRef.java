@@ -32,7 +32,7 @@ final class StaticVarRef extends ParseExpr {
    * @param hasImport indicates whether a module import for the variable name's URI was present
    */
   StaticVarRef(final InputInfo info, final QNm name, final boolean hasImport) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, Types.ITEM_ZM);
     this.name = name;
     this.hasImport = hasImport;
   }

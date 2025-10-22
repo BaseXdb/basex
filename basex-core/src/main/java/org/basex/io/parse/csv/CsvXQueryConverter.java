@@ -20,7 +20,7 @@ import org.basex.util.list.*;
  */
 public class CsvXQueryConverter extends CsvConverter {
   /** String array type. */
-  private static final ArrayType STRING_ARRAY = ArrayType.get(SeqType.STRING_O);
+  private static final ArrayType STRING_ARRAY = ArrayType.get(Types.STRING_O);
 
   /** Field names. */
   public static final Str NAMES = Str.get("names");

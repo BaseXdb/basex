@@ -51,7 +51,7 @@ public final class CmpR extends Single {
    * @param info input info (can be {@code null})
    */
   private CmpR(final Expr expr, final double min, final double max, final InputInfo info) {
-    super(info, expr, SeqType.BOOLEAN_O);
+    super(info, expr, Types.BOOLEAN_O);
     this.min = min;
     this.max = max;
   }

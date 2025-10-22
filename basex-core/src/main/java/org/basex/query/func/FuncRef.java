@@ -47,7 +47,7 @@ public final class FuncRef extends Single {
    * @param resolve function to resolve the reference
    */
   private FuncRef(final InputInfo info, final QueryFunction<QueryContext, Expr> resolve) {
-    super(info, null, SeqType.ITEM_ZM);
+    super(info, null, Types.ITEM_ZM);
     this.resolve = resolve;
   }
 

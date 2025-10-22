@@ -181,8 +181,7 @@ public final class FnItemsAt extends StandardFunc {
     // items-at(E, S to E)  ->  util:range(E, S, E)
     if(at instanceof Range) {
       final Expr arg1 = at.arg(0), arg2 = at.arg(1);
-      if(arg1.seqType().instanceOf(SeqType.INTEGER_O) &&
-         arg2.seqType().instanceOf(SeqType.INTEGER_O)) {
+      if(arg1.seqType().instanceOf(Types.INTEGER_O) && arg2.seqType().instanceOf(Types.INTEGER_O)) {
         return cc.function(_UTIL_RANGE, info, input, arg1, arg2);
       }
     }

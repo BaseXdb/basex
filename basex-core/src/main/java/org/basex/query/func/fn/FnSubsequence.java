@@ -269,7 +269,7 @@ public class FnSubsequence extends StandardFunc {
         }
       }
     } else if(second instanceof final Itr itr) {
-      if(!range() && first.seqType().instanceOf(SeqType.INTEGER_O)) {
+      if(!range() && first.seqType().instanceOf(Types.INTEGER_O)) {
         final long length = itr.itr();
         // subsequence(EXPR, START, 1)  ->  items-at(EXPR, START)
         if(length == 1) return cc.function(ITEMS_AT, info, input, first);

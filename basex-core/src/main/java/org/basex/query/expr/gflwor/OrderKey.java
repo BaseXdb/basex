@@ -37,7 +37,7 @@ public final class OrderKey extends Single {
    */
   public OrderKey(final InputInfo info, final Expr key, final boolean desc, final boolean least,
       final Collation coll) {
-    super(info, key, SeqType.ITEM_ZM);
+    super(info, key, Types.ITEM_ZM);
     this.desc = desc;
     this.least = least;
     this.coll = coll;

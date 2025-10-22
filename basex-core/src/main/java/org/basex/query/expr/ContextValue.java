@@ -22,7 +22,7 @@ public final class ContextValue extends Simple {
    * @param info input info (can be {@code null})
    */
   public ContextValue(final InputInfo info) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, Types.ITEM_ZM);
   }
 
   /**

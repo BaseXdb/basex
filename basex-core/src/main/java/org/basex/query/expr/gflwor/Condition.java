@@ -46,7 +46,7 @@ public final class Condition extends Single {
    */
   public Condition(final boolean start, final Var item, final Var pos, final Var prev,
       final Var next, final Expr expr, final InputInfo info) {
-    super(info, expr, SeqType.ITEM_ZM);
+    super(info, expr, Types.ITEM_ZM);
     this.start = start;
     this.item = item;
     this.pos = pos;
@@ -69,7 +69,7 @@ public final class Condition extends Single {
   void compile(final Expr ex, final CompileContext cc) throws QueryException {
     final SeqType st = ex.seqType();
     if(item != null) item.refineType(st.with(Occ.EXACTLY_ONE), 1, cc);
-    if(pos  != null) pos.refineType(SeqType.INTEGER_O, 1, cc);
+    if(pos  != null) pos.refineType(Types.INTEGER_O, 1, cc);
     if(prev != null) prev.refineType(st.with(Occ.ZERO_OR_ONE), -1, cc);
     if(next != null) next.refineType(st.with(Occ.ZERO_OR_ONE), -1, cc);
     compile(cc);

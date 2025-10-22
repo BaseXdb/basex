@@ -26,7 +26,7 @@ public final class CItemArray extends Single {
    * @param expr array members
    */
   public CItemArray(final InputInfo info, final Expr expr) {
-    super(info, expr, SeqType.ARRAY_O);
+    super(info, expr, Types.ARRAY_O);
   }
 
   @Override

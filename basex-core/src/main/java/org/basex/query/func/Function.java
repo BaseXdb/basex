@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Flag.*;
-import static org.basex.query.value.type.SeqType.*;
+import static org.basex.query.value.type.Types.*;
 
 import java.util.*;
 import java.util.function.*;

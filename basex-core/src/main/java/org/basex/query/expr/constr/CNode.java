@@ -77,11 +77,11 @@ public abstract class CNode extends Arr {
     SeqType st = null;
     if(exprs.length == 1 && !(this instanceof CPI || this instanceof CAttr)) {
       final SeqType st1 = exprs[0].seqType();
-      if(st1.zeroOrOne() && st1.instanceOf(SeqType.ANY_ATOMIC_TYPE_ZO) && !has(Flag.NDT)) {
+      if(st1.zeroOrOne() && st1.instanceOf(Types.ANY_ATOMIC_TYPE_ZO) && !has(Flag.NDT)) {
         if(mode == Simplify.STRING) {
-          st = SeqType.STRING_ZO;
+          st = Types.STRING_ZO;
         } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
-          st = this instanceof CComm ? SeqType.STRING_ZO : SeqType.UNTYPED_ATOMIC_ZO;
+          st = this instanceof CComm ? Types.STRING_ZO : Types.UNTYPED_ATOMIC_ZO;
         }
       }
     }

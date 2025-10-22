@@ -50,6 +50,6 @@ public abstract class StaticDecl extends StaticScope {
    * @return return type
    */
   public final SeqType seqType() {
-    return declType != null ? declType : expr != null ? expr.seqType() : SeqType.ITEM_ZM;
+    return declType != null ? declType : expr != null ? expr.seqType() : Types.ITEM_ZM;
   }
 }

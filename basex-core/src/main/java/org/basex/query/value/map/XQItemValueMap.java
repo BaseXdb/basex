@@ -22,7 +22,7 @@ public final class XQItemValueMap extends XQHashMap {
    * @param capacity initial capacity
    */
   XQItemValueMap(final int capacity) {
-    super(SeqType.MAP);
+    super(Types.MAP);
     map = new ItemObjectMap<>(capacity);
   }
 

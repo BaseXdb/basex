@@ -1,7 +1,6 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.value.type.SeqType.*;
 
 import java.io.*;
 import java.util.*;
@@ -32,7 +31,7 @@ import de.bottlecaps.markup.*;
 public final class FnInvisibleXml extends StandardFunc {
   /** The function's argument type. */
   private static final SeqType ARG_TYPE = new ChoiceItemType(
-    Arrays.asList(STRING_O, SeqType.get(NodeType.ELEMENT, Occ.EXACTLY_ONE,
+    Arrays.asList(Types.STRING_O, SeqType.get(NodeType.ELEMENT, Occ.EXACTLY_ONE,
       NameTest.get(NodeType.ELEMENT, new QNm("ixml"), null)))).seqType(Occ.ZERO_OR_ONE);
   /** The invisible XML parser generator. */
   private Generator generator;
@@ -90,11 +89,11 @@ public final class FnInvisibleXml extends StandardFunc {
       } catch(final BlitzException ex) {
         throw IXML_GEN_X.get(info, ex);
       }
-      final Var var = new VarScope().addNew(new QNm("input"), STRING_O, qc, info);
+      final Var var = new VarScope().addNew(new QNm("input"), Types.STRING_O, qc, info);
       final Var[] params = { var };
       final Expr arg = new VarRef(info, var);
       final ParseInvisibleXml parseFunction = new ParseInvisibleXml(info, parser, arg);
-      final FuncType ft = FuncType.get(parseFunction.seqType(), STRING_O);
+      final FuncType ft = FuncType.get(parseFunction.seqType(), Types.STRING_O);
       return new FuncItem(info, parseFunction, params, AnnList.EMPTY, ft, params.length, null);
     }
   }
@@ -114,7 +113,7 @@ public final class FnInvisibleXml extends StandardFunc {
      */
     private ParseInvisibleXml(final InputInfo info, final de.bottlecaps.markup.blitz.Parser parser,
         final Expr... args) {
-      super(info, DOCUMENT_NODE_O, args);
+      super(info, Types.DOCUMENT_NODE_O, args);
       this.parser = parser;
     }
 

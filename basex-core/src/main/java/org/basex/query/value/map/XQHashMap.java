@@ -122,7 +122,7 @@ abstract class XQHashMap extends XQMap {
    * @throws QueryException query exception
    */
   static byte[] toStr(final Value value) throws QueryException {
-    if(value.seqType().eq(SeqType.STRING_O)) {
+    if(value.seqType().eq(Types.STRING_O)) {
       return ((AStr) value).string(null);
     }
     return null;
@@ -134,7 +134,7 @@ abstract class XQHashMap extends XQMap {
    * @return token or {@code null}
    */
   static byte[] toAtm(final Value value) {
-    if(value.seqType().eq(SeqType.UNTYPED_ATOMIC_O)) {
+    if(value.seqType().eq(Types.UNTYPED_ATOMIC_O)) {
       return ((Atm) value).string(null);
     }
     return null;

@@ -46,7 +46,7 @@ public final class FunctionArgsTest extends SandboxTest {
             qu.append((char) (48 + t));
           } else { // any type (skip test)
             qu.append("'").append((char) (65 + t)).append("'");
-            if(SeqType.STRING_O.instanceOf(fd.types[t])) any++;
+            if(Types.STRING_O.instanceOf(fd.types[t])) any++;
           }
         } else {
           // test wrong number of arguments

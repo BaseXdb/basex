@@ -22,7 +22,7 @@ public abstract class FuncCall extends Arr {
    * @param exprs sub-expressions
    */
   FuncCall(final InputInfo info, final Expr[] exprs) {
-    super(info, SeqType.ITEM_ZM, exprs);
+    super(info, Types.ITEM_ZM, exprs);
   }
 
   /**

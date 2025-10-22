@@ -25,7 +25,7 @@ final class MixedPos extends Single implements CmpPos {
    * @param expr positions; if a value is supplied, the entries are sorted
    */
   MixedPos(final InputInfo info, final Expr expr) {
-    super(info, expr, SeqType.BOOLEAN_O);
+    super(info, expr, Types.BOOLEAN_O);
   }
 
   @Override

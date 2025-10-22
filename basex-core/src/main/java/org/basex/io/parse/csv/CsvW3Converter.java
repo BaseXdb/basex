@@ -1,7 +1,7 @@
 package org.basex.io.parse.csv;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.value.type.SeqType.*;
+import static org.basex.query.value.type.Types.*;
 
 import java.util.*;
 
@@ -37,7 +37,7 @@ public final class CsvW3Converter extends CsvXQueryConverter {
   protected Value finish(final InputInfo ii, final QueryContext qc) throws QueryException {
     final XQMap map = (XQMap) super.finish(ii, qc);
     Value columns = copts.get(CsvOptions.HEADER);
-    if(columns.seqType().instanceOf(SeqType.BOOLEAN_O)) {
+    if(columns.seqType().instanceOf(BOOLEAN_O)) {
       columns = map.get(CsvXQueryConverter.NAMES).atomValue(qc, ii);
     }
     final MapBuilder columnIndexBuilder = new MapBuilder();

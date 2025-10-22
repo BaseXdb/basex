@@ -174,7 +174,7 @@ public final class CmpV extends Cmp {
    * @param opV operator
    */
   public CmpV(final InputInfo info, final Expr expr1, final Expr expr2, final OpV opV) {
-    super(info, expr1, expr2, SeqType.BOOLEAN_ZO);
+    super(info, expr1, expr2, Types.BOOLEAN_ZO);
     this.opV = opV;
   }
 

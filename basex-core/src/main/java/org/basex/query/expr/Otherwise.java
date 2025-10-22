@@ -27,7 +27,7 @@ public final class Otherwise extends Arr {
    * @param exprs expressions
    */
   public Otherwise(final InputInfo info, final Expr... exprs) {
-    super(info, SeqType.ITEM_ZM, exprs);
+    super(info, Types.ITEM_ZM, exprs);
   }
 
   @Override

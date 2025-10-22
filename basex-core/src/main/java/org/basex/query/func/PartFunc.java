@@ -37,7 +37,7 @@ public final class PartFunc extends Arr {
    */
   public PartFunc(final InputInfo info, final Expr[] exprs, final int placeholders,
       final int[] placeholderPerm) {
-    super(info, SeqType.FUNCTION_O, exprs);
+    super(info, Types.FUNCTION_O, exprs);
     this.placeholders = placeholders;
     this.placeholderPerm = placeholderPerm;
   }
@@ -56,7 +56,7 @@ public final class PartFunc extends Arr {
 
     final Expr func = body();
     final FuncType ft = func.funcType();
-    if(ft != null && ft != SeqType.FUNCTION) {
+    if(ft != null && ft != Types.FUNCTION) {
       final int nargs = exprs.length - 1, arity = ft.argTypes.length;
       if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 

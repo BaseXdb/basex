@@ -33,7 +33,7 @@ public final class FTIndexAccess extends Simple {
    * @param db index database
    */
   public FTIndexAccess(final InputInfo info, final FTExpr ftexpr, final IndexDb db) {
-    super(info, SeqType.TEXT_ZM);
+    super(info, Types.TEXT_ZM);
     this.ftexpr = ftexpr;
     this.db = db;
     exprType.data(db.data());

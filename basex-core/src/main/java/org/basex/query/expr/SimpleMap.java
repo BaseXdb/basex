@@ -31,7 +31,7 @@ public abstract class SimpleMap extends Mapping {
    * @param exprs expressions
    */
   SimpleMap(final InputInfo info, final Expr... exprs) {
-    super(info, SeqType.ITEM_ZM, exprs);
+    super(info, Types.ITEM_ZM, exprs);
   }
 
   @Override
@@ -124,7 +124,7 @@ public abstract class SimpleMap extends Mapping {
         if(size != -1) {
           count = Itr.get(size);
         } else if(expr instanceof Range && expr.arg(0) == Itr.ONE &&
-            expr.arg(1).seqType().instanceOf(SeqType.INTEGER_O)) {
+            expr.arg(1).seqType().instanceOf(Types.INTEGER_O)) {
           count = expr.arg(1);
         }
         // (1 to 2) ! <x/>  ->  replicate(<x/>, 2, true())
@@ -158,7 +158,7 @@ public abstract class SimpleMap extends Mapping {
             // (START to END) ! items-at(X, .)  ->  util:range(X, START, END)
             return cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
           }
-          if(expr.seqType().instanceOf(SeqType.INTEGER_ZM)) {
+          if(expr.seqType().instanceOf(Types.INTEGER_ZM)) {
             // INTEGERS ! items-at(X, .)  ->  items-at(X, INTEGERS)
             return cc.function(ITEMS_AT, info, args[0], expr);
           }

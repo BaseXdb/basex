@@ -29,7 +29,7 @@ public final class TransformWith extends Copy {
    * @param modify modify expression
    */
   public TransformWith(final InputInfo info, final Expr target, final Expr modify) {
-    super(info, SeqType.NODE_ZM, modify, target);
+    super(info, Types.NODE_ZM, modify, target);
   }
 
   @Override

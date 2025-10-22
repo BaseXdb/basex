@@ -1,7 +1,6 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.value.type.AtomType.*;
-import static org.basex.query.value.type.SeqType.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -124,7 +123,7 @@ public class FnSchemaType extends StandardFunc {
    */
   private static final class TypeAnnotation extends Arr {
     /** Function type. */
-    private static final FuncType FUNC_TYPE = FuncType.get(MAP_ZM);
+    private static final FuncType FUNC_TYPE = FuncType.get(Types.MAP_ZM);
     /** The types to be annotated. */
     private final AtomType[] types;
 
@@ -170,7 +169,8 @@ public class FnSchemaType extends StandardFunc {
    */
   private static final class Matches extends Arr {
     /** Function type. */
-    private static final FuncType FUNC_TYPE = FuncType.get(BOOLEAN_O, ANY_ATOMIC_TYPE_O);
+    private static final FuncType FUNC_TYPE = FuncType.get(Types.BOOLEAN_O,
+        Types.ANY_ATOMIC_TYPE_O);
     /** The type to be matched. */
     final AtomType type;
 
@@ -181,7 +181,7 @@ public class FnSchemaType extends StandardFunc {
      * @param args the arguments
      */
     private Matches(final InputInfo info, final AtomType type, final Expr... args) {
-      super(info, BOOLEAN_O, args);
+      super(info, Types.BOOLEAN_O, args);
       this.type = type;
     }
 
@@ -194,7 +194,7 @@ public class FnSchemaType extends StandardFunc {
      */
     public static FuncItem funcItem(final AtomType type, final QueryContext qc,
         final InputInfo info) {
-      final Var var = new VarScope().addNew(new QNm("value"), ANY_ATOMIC_TYPE_O, qc, info);
+      final Var var = new VarScope().addNew(new QNm("value"), Types.ANY_ATOMIC_TYPE_O, qc, info);
       final Var[] params = { var };
       return new FuncItem(info, new Matches(info, type, new VarRef(info, var)), params,
           AnnList.EMPTY, FUNC_TYPE, params.length, null);

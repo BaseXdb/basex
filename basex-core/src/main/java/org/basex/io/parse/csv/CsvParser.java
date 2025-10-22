@@ -73,7 +73,7 @@ public final class CsvParser {
     trimRows = opts.get(CsvOptions.TRIM_ROWS);
     selectColumns = opts.get(CsvOptions.SELECT_COLUMNS);
     for(final int sc : selectColumns) {
-      if(sc < 1) throw QueryError.typeError(Itr.get(sc), SeqType.POSITIVE_INTEGER_O, null);
+      if(sc < 1) throw QueryError.typeError(Itr.get(sc), Types.POSITIVE_INTEGER_O, null);
     }
   }
 

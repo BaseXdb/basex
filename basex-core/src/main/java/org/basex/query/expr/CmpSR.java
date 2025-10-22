@@ -52,7 +52,7 @@ public final class CmpSR extends Single {
   CmpSR(final Expr expr, final byte[] min, final boolean mni, final byte[] max, final boolean mxi,
       final InputInfo info) {
 
-    super(info, expr, SeqType.BOOLEAN_O);
+    super(info, expr, Types.BOOLEAN_O);
     this.min = min;
     this.mni = mni;
     this.max = max;

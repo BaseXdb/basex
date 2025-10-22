@@ -37,8 +37,8 @@ public class QueryException extends Exception {
   };
   /** Error types. */
   private static final SeqType[] TYPES = {
-    SeqType.QNAME_O, SeqType.STRING_ZO, SeqType.ITEM_ZM, SeqType.STRING_ZO, SeqType.INTEGER_ZO,
-    SeqType.INTEGER_ZO, SeqType.ITEM_ZM, SeqType.STRING_O, SeqType.MAP_O
+      Types.QNAME_O, Types.STRING_ZO, Types.ITEM_ZM, Types.STRING_ZO, Types.INTEGER_ZO,
+      Types.INTEGER_ZO, Types.ITEM_ZM, Types.STRING_O, Types.MAP_O
   };
   /** Error QNames. */
   private static final QNm[] QNAMES = new QNm[NAMES.length];

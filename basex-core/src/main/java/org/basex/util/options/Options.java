@@ -856,7 +856,7 @@ public class Options implements Iterable<Option<?>> {
         throw INVALIDOPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
       }
     } else if(option instanceof final OptionsOption oo) {
-      if(!(item instanceof final XQMap map)) throw expected.apply(SeqType.MAP);
+      if(!(item instanceof final XQMap map)) throw expected.apply(Types.MAP);
       result = oo.newInstance();
       ((Options) result).assign(map, info);
     }

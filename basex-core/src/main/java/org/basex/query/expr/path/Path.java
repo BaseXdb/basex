@@ -112,7 +112,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // examples: 'text', (a union b)
-    if(step != null && (step.seqType().instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM) || step.ddo())) {
+    if(step != null && (step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) || step.ddo())) {
       return stps[0];
     }
     // example: (1 to 10)/<xml/>
@@ -696,7 +696,7 @@ public abstract class Path extends ParseExpr {
      * - previous expression yields nodes (otherwise, an error must be raised at runtime)
      * - last expression is no step, and yields a single result or no node */
     if(!(type1 instanceof NodeType) || s2 instanceof Step || size() != 1 &&
-       !type2.instanceOf(AtomType.ANY_ATOMIC_TYPE) && !type2.instanceOf(SeqType.FUNCTION))
+       !type2.instanceOf(AtomType.ANY_ATOMIC_TYPE) && !type2.instanceOf(Types.FUNCTION))
       return this;
 
     /* remove last step from new root expression. examples:

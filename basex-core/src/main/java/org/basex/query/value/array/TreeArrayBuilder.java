@@ -103,7 +103,7 @@ final class TreeArrayBuilder implements ArrBuilder {
    * @return resulting array
    */
   XQArray array() {
-    return array(SeqType.ARRAY);
+    return array(Types.ARRAY);
   }
 
   @Override

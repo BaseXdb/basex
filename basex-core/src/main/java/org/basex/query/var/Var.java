@@ -50,8 +50,8 @@ public final class Var extends ExprInfo {
     this.name = name;
     this.info = info;
     this.slot = slot;
-    this.declType = declType == null || declType.eq(SeqType.ITEM_ZM) ? null : declType;
-    this.exprType = exprType != null ? exprType : new ExprType(SeqType.ITEM_ZM);
+    this.declType = declType == null || declType.eq(Types.ITEM_ZM) ? null : declType;
+    this.exprType = exprType != null ? exprType : new ExprType(Types.ITEM_ZM);
     id = qc.varIDs++;
   }
 
@@ -124,7 +124,7 @@ public final class Var extends ExprInfo {
    * @return declared type
    */
   public SeqType declaredType() {
-    return declType == null ? SeqType.ITEM_ZM : declType;
+    return declType == null ? Types.ITEM_ZM : declType;
   }
 
   /**

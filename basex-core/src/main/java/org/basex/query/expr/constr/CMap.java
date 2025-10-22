@@ -31,7 +31,7 @@ public final class CMap extends Arr {
    * @param expr key and value expression, interleaved
    */
   public CMap(final InputInfo info, final Expr[] expr) {
-    super(info, SeqType.MAP_O, expr);
+    super(info, Types.MAP_O, expr);
   }
 
   @Override
@@ -63,7 +63,7 @@ public final class CMap extends Arr {
     if(el == 2) {
       if(!nested(0)) {
         cc.function(_MAP_ENTRY, info, exprs);
-      } else if(exprs[0].seqType().instanceOf(SeqType.MAP_O)) {
+      } else if(exprs[0].seqType().instanceOf(Types.MAP_O)) {
         return exprs[0];
       }
     }
@@ -71,7 +71,7 @@ public final class CMap extends Arr {
     // not too large, only strings as keys? replace with record constructor
     boolean record = el < 32;
     for(int e = 0; e < el && record; e += 2) {
-      if(nested(e) || !(exprs[e] instanceof AStr && exprs[e].seqType().eq(SeqType.STRING_O))) {
+      if(nested(e) || !(exprs[e] instanceof AStr && exprs[e].seqType().eq(Types.STRING_O))) {
         record = false;
       }
     }
@@ -91,7 +91,7 @@ public final class CMap extends Arr {
     SeqType vt = null;
     for(int e = 0; e < el; e += 2) {
       Type ekt = AtomType.ANY_ATOMIC_TYPE;
-      SeqType evt = SeqType.ITEM_ZM;
+      SeqType evt = Types.ITEM_ZM;
       if(nested(e)) {
         if(exprs[e].seqType().type instanceof final MapType mt) {
           ekt = mt.keyType();

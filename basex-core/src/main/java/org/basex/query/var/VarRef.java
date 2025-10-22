@@ -30,7 +30,7 @@ public final class VarRef extends ParseExpr {
    * @param var variable
    */
   public VarRef(final InputInfo info, final Var var) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, Types.ITEM_ZM);
     this.var = var;
   }
 

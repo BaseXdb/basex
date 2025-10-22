@@ -268,7 +268,7 @@ public final class FuncItem extends FItem implements Scope {
             final SeqType st1 = op1.seqType(), st2 = op2.seqType();
             if(result.test(op1) && op2 instanceof Item && op2.equals(thn) &&
               cmp.opG() == OpG.EQ && st1.eq(st2) && (
-              st1.instanceOf(SeqType.DECIMAL_O) || st1.instanceOf(SeqType.STRING_O))) {
+              st1.instanceOf(Types.DECIMAL_O) || st1.instanceOf(Types.STRING_O))) {
               action = els;
             }
           }

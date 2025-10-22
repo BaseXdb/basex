@@ -29,7 +29,7 @@ public final class Unary extends Single {
    * @param minus minus flag
    */
   public Unary(final InputInfo info, final Expr expr, final boolean minus) {
-    super(info, expr, SeqType.NUMERIC_ZO);
+    super(info, expr, Types.NUMERIC_ZO);
     this.minus = minus;
   }
 
@@ -46,7 +46,7 @@ public final class Unary extends Single {
 
     // --123  ->  123
     // --$byte  ->  xs:byte($byte)
-    if(!minus && st.instanceOf(SeqType.NUMERIC_ZO)) {
+    if(!minus && st.instanceOf(Types.NUMERIC_ZO)) {
       final Expr cast = new Cast(info, expr, SeqType.get(type, st.occ)).optimize(cc);
       return cc.replaceWith(this, cast);
     }

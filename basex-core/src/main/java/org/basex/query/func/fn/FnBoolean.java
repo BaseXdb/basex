@@ -31,7 +31,7 @@ public final class FnBoolean extends StandardFunc {
     // boolean(true()))  ->  true()
     final Expr input = arg(0);
     final SeqType st = input.seqType();
-    if(st.eq(SeqType.BOOLEAN_O)) return input;
+    if(st.eq(Types.BOOLEAN_O)) return input;
 
     // boolean($node/text())  ->  exists($node/text())
     if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, input);

@@ -16,7 +16,7 @@ import org.basex.util.list.*;
  */
 public final class XQAtmIntMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.UNTYPED_ATOMIC, SeqType.INTEGER_O);
+  private static final MapType TYPE = MapType.get(AtomType.UNTYPED_ATOMIC, Types.INTEGER_O);
   /** Hash map. */
   private final TokenIntMap map;
 

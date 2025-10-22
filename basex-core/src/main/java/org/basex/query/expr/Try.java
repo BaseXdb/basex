@@ -38,7 +38,7 @@ public final class Try extends Single {
    * @param catches catch expressions
    */
   public Try(final InputInfo info, final Expr expr, final Expr fnlly, final Catch... catches) {
-    super(info, expr, SeqType.ITEM_ZM);
+    super(info, expr, Types.ITEM_ZM);
     this.catches = catches;
     this.fnlly = fnlly;
   }

@@ -29,7 +29,7 @@ public final class SwitchGroup extends Arr {
    * @param exprs return expression (placed first) and cases (default branch has 0 cases)
    */
   public SwitchGroup(final InputInfo info, final Expr... exprs) {
-    super(info, SeqType.ITEM_ZM, exprs);
+    super(info, Types.ITEM_ZM, exprs);
     deep = new DeepEqual(info);
   }
 

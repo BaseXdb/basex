@@ -186,7 +186,7 @@ public abstract class Cmp extends Arr {
           // (A, B) = false()  ->  not(A and B)
           final Expr[] args = expr1.args();
           if((eq || ne) && expr1 instanceof List &&
-              ((Checks<Expr>) expr -> expr.seqType().eq(SeqType.BOOLEAN_O)).all(args)) {
+              ((Checks<Expr>) expr -> expr.seqType().eq(Types.BOOLEAN_O)).all(args)) {
             return success ? new Or(info, args).optimize(cc) :
               cc.function(NOT, info, new And(info, args).optimize(cc));
           }

@@ -31,7 +31,7 @@ public final class Lookup extends Arr {
    * @param expr context expression and key specifier
    */
   public Lookup(final InputInfo info, final Expr... expr) {
-    super(info, SeqType.ITEM_ZM, expr);
+    super(info, Types.ITEM_ZM, expr);
   }
 
   @Override
@@ -86,11 +86,9 @@ public final class Lookup extends Arr {
        *  ARRAY?*    ->  array:items(MAP)
        *  MAP?KEY    ->  map:get(INPUT, KEY)
        *  ARRAY?KEY  ->  array:get(INPUT, KEY) */
-      final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> {
-        return keys == WILDCARD ?
-          cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
-          cc.function(map ? Function._MAP_GET : Function._ARRAY_GET, info, in, arg);
-      };
+      final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == WILDCARD ?
+        cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
+        cc.function(map ? Function._MAP_GET : Function._ARRAY_GET, info, in, arg);
 
       // single key
       if(ks == 1) {

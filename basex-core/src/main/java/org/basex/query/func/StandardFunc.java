@@ -49,7 +49,7 @@ public abstract class StandardFunc extends Arr {
    * Constructor.
    */
   protected StandardFunc() {
-    super(null, SeqType.ITEM_ZM);
+    super(null, Types.ITEM_ZM);
   }
 
   /**
@@ -343,7 +343,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final ADate toGregorian(final Item item, final QueryContext qc)
       throws QueryException {
-    return (ADate) SeqType.GREGORIAN_ZO.coerce(item, null, qc, null, info);
+    return (ADate) Types.GREGORIAN_ZO.coerce(item, null, qc, null, info);
   }
 
   /**

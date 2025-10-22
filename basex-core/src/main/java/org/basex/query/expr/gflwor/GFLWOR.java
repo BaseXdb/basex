@@ -39,7 +39,7 @@ public final class GFLWOR extends ParseExpr {
    * @param rtrn return expression
    */
   public GFLWOR(final InputInfo info, final LinkedList<Clause> clauses, final Expr rtrn) {
-    super(info, SeqType.ITEM_ZM);
+    super(info, Types.ITEM_ZM);
     this.clauses = clauses;
     this.rtrn = rtrn;
   }
@@ -651,7 +651,7 @@ public final class GFLWOR extends ParseExpr {
             if(before instanceof final ForLet fl) {
               final Predicate<Expr> varRef = e -> e instanceof final VarRef vr && vr.var == fl.var;
               final boolean let = before instanceof Let;
-              if(let && before.seqType().instanceOf(SeqType.NODE_ZO) && varRef.test(expr)) {
+              if(let && before.seqType().instanceOf(Types.NODE_ZO) && varRef.test(expr)) {
                 // let $n := ZERO-OR-ONE-NODE where $n  ->  for $n in ZERO-OR-ONE-NODE
                 // let $a := <a/>[text()] while $a  ->  for $a in <a/>[text()]
                 clauses.set(i, ((Let) before).toFor(cc).optimize(cc));

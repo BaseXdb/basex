@@ -41,7 +41,7 @@ public final class GroupBy extends Clause {
   public GroupBy(final GroupSpec[] specs, final VarRef[] pre, final Var[] post,
       final InputInfo info) {
 
-    super(info, SeqType.ITEM_ZM, vars(specs, post));
+    super(info, Types.ITEM_ZM, vars(specs, post));
     this.specs = specs;
     this.post = post;
     preExpr = Array.copy(pre, new Expr[pre.length]);
@@ -62,7 +62,7 @@ public final class GroupBy extends Clause {
    */
   private GroupBy(final GroupSpec[] specs, final Expr[] pre, final Var[] post, final int nonOcc,
       final InputInfo info) {
-    super(info, SeqType.ITEM_ZM, vars(specs, post));
+    super(info, Types.ITEM_ZM, vars(specs, post));
     this.specs = specs;
     preExpr = pre;
     this.post = post;

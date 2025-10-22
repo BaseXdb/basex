@@ -33,7 +33,7 @@ public class Arith extends Arr {
    * @param calc calculation operator
    */
   public Arith(final InputInfo info, final Expr expr1, final Expr expr2, final Calc calc) {
-    super(info, SeqType.ANY_ATOMIC_TYPE_ZO, expr1, expr2);
+    super(info, Types.ANY_ATOMIC_TYPE_ZO, expr1, expr2);
     this.calc = calc;
   }
 
@@ -94,7 +94,7 @@ public class Arith extends Arr {
           // E + NUMBER - NUMBER  ->  E
           // NUMBER * E div NUMBER  ->  E
           expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) && add ? arg2 : this;
-          if(expr != this) expr = new Cast(info, expr, SeqType.NUMERIC_O).optimize(cc);
+          if(expr != this) expr = new Cast(info, expr, Types.NUMERIC_O).optimize(cc);
         }
       } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof final ANum num &&
           num.dbl() < 0) {

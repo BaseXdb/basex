@@ -146,7 +146,7 @@ public abstract class Inspect {
       option.add(Q_NAME, NSGlobal.prefix(name.uri()).length == 0 ? name.string() :
         name.prefixId(XQ_URI));
       if(uri) option.add(Q_URI, name.uri());
-      option.add(element("literal").add(Q_TYPE, SeqType.STRING_O).add(options.get(name)));
+      option.add(element("literal").add(Q_TYPE, Types.STRING_O).add(options.get(name)));
       parent.add(option);
     }
   }

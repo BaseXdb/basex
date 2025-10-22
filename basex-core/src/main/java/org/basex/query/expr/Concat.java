@@ -23,7 +23,7 @@ public final class Concat extends Arr {
    * @param exprs expressions
    */
   public Concat(final InputInfo info, final Expr... exprs) {
-    super(info, SeqType.STRING_O, exprs);
+    super(info, Types.STRING_O, exprs);
   }
 
   @Override

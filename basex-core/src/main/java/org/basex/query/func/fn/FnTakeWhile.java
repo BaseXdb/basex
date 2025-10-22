@@ -42,7 +42,7 @@ public final class FnTakeWhile extends StandardFunc {
     final SeqType st = input.seqType();
     if(st.zero()) return input;
 
-    arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), SeqType.INTEGER_O));
+    arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), Types.INTEGER_O));
     exprType.assign(st.union(Occ.ZERO)).data(input);
     return this;
   }

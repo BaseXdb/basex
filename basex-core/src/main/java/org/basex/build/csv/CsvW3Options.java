@@ -1,7 +1,7 @@
 package org.basex.build.csv;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.value.type.SeqType.*;
+import static org.basex.query.value.type.Types.*;
 
 import org.basex.build.csv.CsvOptions.*;
 import org.basex.query.*;

@@ -40,7 +40,7 @@ public final class Union extends Set {
 
     // determine type
     SeqType st = SeqType.union(exprs, false);
-    if(st == null) st = SeqType.NODE_ZM;
+    if(st == null) st = Types.NODE_ZM;
     if(!(st.type instanceof NodeType)) return null;
 
     exprType.assign(st.union(Occ.ONE_OR_MORE)).data(exprs);
@@ -133,7 +133,7 @@ public final class Union extends Set {
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       for(final Expr ex : exprs) {
         // boolean(a union <a/>)  ->  boolean(true())
-        if(ex.seqType().instanceOf(SeqType.NODE_OM) && !expr.has(Flag.NDT)) expr = Bln.TRUE;
+        if(ex.seqType().instanceOf(Types.NODE_OM) && !expr.has(Flag.NDT)) expr = Bln.TRUE;
       }
     }
     return cc.simplify(this, expr, mode);

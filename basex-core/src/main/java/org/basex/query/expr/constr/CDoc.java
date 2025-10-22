@@ -26,7 +26,7 @@ public final class CDoc extends CNode {
    * @param expr expression
    */
   public CDoc(final InputInfo info, final boolean computed, final Expr expr) {
-    super(info, SeqType.DOCUMENT_NODE_O, computed, expr);
+    super(info, Types.DOCUMENT_NODE_O, computed, expr);
   }
 
   @Override

@@ -49,7 +49,7 @@ public final class For extends ForLet {
    * @param empty {@code allowing empty} flag
    */
   public For(final Var var, final Var pos, final Var score, final Expr expr, final boolean empty) {
-    super(var.info, SeqType.ITEM_ZO, var, expr, score != null, vars(var, pos, score));
+    super(var.info, Types.ITEM_ZO, var, expr, score != null, vars(var, pos, score));
     this.pos = pos;
     this.score = score;
     this.empty = empty;
@@ -122,7 +122,7 @@ public final class For extends ForLet {
   public For optimize(final CompileContext cc) throws QueryException {
     // for $a as xs:integer in $array  ->  for $a as xs:integer in data($array)
     final SeqType dt = var.declType;
-    if(dt != null && dt.instanceOf(SeqType.ANY_ATOMIC_TYPE_ZM) && expr.seqType().mayBeArray()) {
+    if(dt != null && dt.instanceOf(Types.ANY_ATOMIC_TYPE_ZM) && expr.seqType().mayBeArray()) {
       expr = cc.function(DATA, info, expr);
     }
 
@@ -134,11 +134,11 @@ public final class For extends ForLet {
     var.refineType(seqType(), size(), cc);
     var.expr(expr);
     if(pos != null) {
-      pos.refineType(SeqType.INTEGER_O, 1, cc);
+      pos.refineType(Types.INTEGER_O, 1, cc);
       pos.expr(Itr.ZERO);
     }
     if(score != null) {
-      score.refineType(SeqType.DOUBLE_O, 1, cc);
+      score.refineType(Types.DOUBLE_O, 1, cc);
       score.expr(Dbl.ZERO);
     }
     return this;

@@ -50,7 +50,7 @@ public final class MapBuilder {
       final int c = Array.initialCapacity(capacity);
       final boolean ki = k == AtomType.INTEGER, ks = k == AtomType.STRING,
           ku = k == AtomType.UNTYPED_ATOMIC;
-      final boolean vi = v.eq(SeqType.INTEGER_O), vs = v.eq(SeqType.STRING_O);
+      final boolean vi = v.eq(Types.INTEGER_O), vs = v.eq(Types.STRING_O);
       map = ki ? vi ? new XQIntMap(c) : vs ? new XQIntStrMap(c) : new XQIntValueMap(c) :
             ks ? vs ? new XQStrMap(c) : vi ? new XQStrIntMap(c) : new XQStrValueMap(c) :
             ku ? vs ? new XQAtmStrMap(c) : vi ? new XQAtmIntMap(c) : new XQAtmValueMap(c) :

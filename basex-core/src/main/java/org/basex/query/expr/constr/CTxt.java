@@ -26,7 +26,7 @@ public final class CTxt extends CNode {
    * @param value value
    */
   public CTxt(final InputInfo info, final Expr value) {
-    super(info, SeqType.TEXT_ZO, true, value);
+    super(info, Types.TEXT_ZO, true, value);
   }
 
   @Override

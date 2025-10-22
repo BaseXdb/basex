@@ -11,7 +11,6 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -163,7 +162,7 @@ public class CmpG extends Cmp {
    * @param op operator
    */
   public CmpG(final InputInfo info, final Expr expr1, final Expr expr2, final OpG op) {
-    super(info, expr1, expr2, SeqType.BOOLEAN_O);
+    super(info, expr1, expr2, Types.BOOLEAN_O);
     this.op = op;
   }
 
@@ -173,7 +172,7 @@ public class CmpG extends Cmp {
     // () eq local:expensive()  ->  ()
     // void(123) = 1  ->  boolean(void('123'))
     Expr expr = emptyExpr();
-    if(expr != this) return cc.replaceWith(this, cc.function(Function.BOOLEAN, info, expr));
+    if(expr != this) return cc.replaceWith(this, cc.function(BOOLEAN, info, expr));
 
     // remove redundant type conversions
     final Type t1 = exprs[0].seqType().type.atomic(), t2 = exprs[1].seqType().type.atomic();
@@ -255,16 +254,16 @@ public class CmpG extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     Expr ex = null;
 
-    if(expr1 instanceof final Arith arth && expr2.seqType().instanceOf(SeqType.NUMERIC_O)) {
+    if(expr1 instanceof final Arith arth && expr2.seqType().instanceOf(Types.NUMERIC_O)) {
       final Expr op11 = expr1.arg(0), op12 = expr1.arg(1), op22 = expr2.arg(1);
       final double num12 = op12 instanceof final ANum num ? num.dbl() : Double.NaN;
-      if(op12.seqType().instanceOf(SeqType.NUMERIC_O)) {
+      if(op12.seqType().instanceOf(Types.NUMERIC_O)) {
         final Calc calc1 = arth.calc;
         if(calc1 == Calc.SUBTRACT && expr2 == Itr.ZERO) {
           // E - NUMERIC = 0  ->  E = NUMERIC
           ex = new CmpG(info, op11, op12, op);
         } else if((
-          Function.POSITION.is(op11) ||
+          POSITION.is(op11) ||
           !Double.isNaN(num12) &&
           (expr2 instanceof ANum || expr2 instanceof Arith && op22 instanceof ANum)
         ) && (
@@ -417,7 +416,7 @@ public class CmpG extends Cmp {
      * E != 'a' or not(E = 'b')  ->  E != ('a', 'b')  */
 
     // if required, invert second operator (first operator need never be inverted)
-    final boolean not2 = Function.NOT.is(expr);
+    final boolean not2 = NOT.is(expr);
     Expr expr2 = not2 ? expr.arg(0) : expr;
     if(!(expr2 instanceof final CmpG cmp2)) return null;
 
@@ -456,7 +455,7 @@ public class CmpG extends Cmp {
       /* rewriting is possible in all other cases. examples:
        * $number != 1  and  $number != 2             ->  not($number = (1, 2))
        * $numbers = 2  and  not($numbers != (3, 4))  ->  not($numbers != (2, 3, 4))  */
-      expr2 = cc.function(Function.NOT, info, newList.apply(op.invert()));
+      expr2 = cc.function(NOT, info, newList.apply(op.invert()));
     }
 
     // return merged expression
@@ -547,7 +546,7 @@ public class CmpG extends Cmp {
 
     Expr expr1 = exprs[0];
     IndexType type = null;
-    if(Function.TOKENIZE.is(expr1)) {
+    if(TOKENIZE.is(expr1)) {
       if(!(expr1.arg(0).seqType().zeroOrOne() && ((FnTokenize) expr1).whitespace())) return false;
       expr1 = expr1.arg(0);
       type = IndexType.TOKEN;

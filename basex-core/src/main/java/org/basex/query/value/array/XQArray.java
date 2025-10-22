@@ -313,7 +313,7 @@ public abstract class XQArray extends XQStruct {
    */
   private static long index(final Item key, final QueryContext qc, final InputInfo ii)
       throws QueryException {
-    return ((Itr) SeqType.INTEGER_O.coerce(key, null, qc, null, ii)).itr();
+    return ((Itr) Types.INTEGER_O.coerce(key, null, qc, null, ii)).itr();
   }
 
   @Override
@@ -384,12 +384,12 @@ public abstract class XQArray extends XQStruct {
     if(tp instanceof final ArrayType at) {
       mt = at.valueType();
     } else if(tp instanceof final FuncType ft) {
-      if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(SeqType.INTEGER_O)) return false;
+      if(ft.argTypes.length != 1 || !ft.argTypes[0].instanceOf(Types.INTEGER_O)) return false;
       mt = ft.declType;
     } else {
       return false;
     }
-    if(!mt.eq(SeqType.ITEM_ZM)) {
+    if(!mt.eq(Types.ITEM_ZM)) {
       // check types of values
       for(final Value value : iterable()) {
         if(!mt.instance(value)) return false;
@@ -457,7 +457,7 @@ public abstract class XQArray extends XQStruct {
     // determine type (static or exact)
     final int sz = (int) structSize();
     SeqType dt = funcType().declType;
-    if(sz > 0 && dt.eq(SeqType.ITEM_ZM)) {
+    if(sz > 0 && dt.eq(Types.ITEM_ZM)) {
       dt = null;
       for(final Value value : iterable()) {
         final SeqType st = value.seqType();

@@ -59,7 +59,7 @@ public final class MapBuild extends MapMerge {
 
     final boolean noValue = value == Empty.UNDEFINED || value == Empty.VALUE;
     final boolean fiValue = value instanceof FuncItem;
-    SeqType vt = noValue || fiValue ? s1t : SeqType.ITEM_ZM;
+    SeqType vt = noValue || fiValue ? s1t : Types.ITEM_ZM;
     if(fiValue) {
       arg(2, arg -> refineFunc(arg, cc, s1t));
       vt = arg(2).funcType().declType;
