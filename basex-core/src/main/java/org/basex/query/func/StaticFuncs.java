@@ -8,7 +8,6 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.java.*;
-import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.item.*;
@@ -46,10 +45,6 @@ public final class StaticFuncs extends ExprInfo {
   public StaticFunc declare(final QNm name, final Params params, final Expr expr,
       final AnnList anns, final String doc, final VarScope vs, final InputInfo info)
       throws QueryException {
-
-    final byte[] uri = name.uri();
-    if(NSGlobal.reserved(uri) || Functions.builtIn(name) != null)
-      throw FNRESERVED_X.get(info, name.string());
 
     final StaticFunc sf = new StaticFunc(name, params, expr, anns, vs, info, doc);
     if(!cache(name.prefixId()).register(sf)) throw DUPLFUNC_X.get(sf.info, name.string());

@@ -247,7 +247,7 @@ public final class Functions {
    * @param name function name
    * @return function definition if found, {@code null} otherwise
    */
-  static FuncDefinition builtIn(final QNm name) {
+  public static FuncDefinition builtIn(final QNm name) {
     return BUILT_IN.get(name);
   }
 
