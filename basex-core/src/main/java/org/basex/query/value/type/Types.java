@@ -7,6 +7,7 @@ import static org.basex.query.value.type.Occ.*;
 
 import java.util.*;
 
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.util.hash.*;
 
@@ -227,18 +228,19 @@ public final class Types {
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
 
   /** The general record type. */
-  public static final RecordType RECORD = new RecordType(true, new TokenObjectMap<>(0));
+  public static final RecordType RECORD = new RecordType(new TokenObjectMap<>(0), true);
+  /** Single record. */
+  public static final SeqType RECORD_O = RECORD.seqType();
+
   /** Member record. */
   public static final RecordType MEMBER;
 
   static {
     final TokenObjectMap<RecordField> map = new TokenObjectMap<>(1);
-    map.put(Str.VALUE.string(), new RecordField(false, ITEM_ZM));
-    MEMBER = new RecordType(false, map, null);
+    map.put(Str.VALUE.string(), new RecordField(ITEM_ZM));
+    MEMBER = new RecordType(map, false, null, AnnList.EMPTY);
   }
 
-  /** Single record. */
-  public static final SeqType RECORD_O = RECORD.seqType();
   /** Zero or more members. */
   public static final SeqType MEMBER_ZM = MEMBER.seqType(ZERO_OR_MORE);
 

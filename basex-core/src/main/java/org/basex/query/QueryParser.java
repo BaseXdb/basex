@@ -1021,58 +1021,69 @@ public class QueryParser extends InputParser {
           localVars.popContext();
           exprRequired = true;
         }
-        fields.put(name, new RecordField(optional, seqType, expr));
+        fields.put(name, new RecordField(seqType, optional, expr));
       } while(wsConsume(","));
       wsCheck(")");
     }
-    final RecordType rt = new RecordType(extensible, fields, qn);
+    final RecordType rt = new RecordType(fields, extensible, qn, anns);
     declaredTypes.put(qn, rt.seqType());
     namedRecordTypes.put(qn, rt);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
       publicTypes.put(qn, rt.seqType());
     }
+    if(qn.uri().length != 0) declareRecordConstructor(rt, ii);
+  }
 
-    if(qn.uri().length != 0) {
-      localVars.pushContext(false);
-      final Params params = new Params();
-      boolean defaults = false;
-      for(final byte[] key : fields) {
-        final RecordField rf = fields.get(key);
-        final boolean optional = rf.isOptional();
-        final Expr initExpr = rf.expr();
-        if(optional || initExpr != null) {
-          defaults = true;
-        } else if(defaults) {
-          throw error(PARAMOPTIONAL_X, key);
-        }
-        final SeqType fst = rf.seqType();
-        final SeqType pst = optional ? fst.union(Occ.ZERO) : fst;
-        final Expr init = initExpr == null && optional ? Empty.VALUE : initExpr;
-        params.add(new QNm(key), pst, init, null);
-      }
-      if(rt.isExtensible()) {
-        byte[] key;
-        int i = -1;
-        do {
-          final String paramName = ++i == 0 ? "options" : "options" + i;
-          key = Token.token(paramName);
-        } while(fields.contains(key));
-        params.add(new QNm(key), Types.MAP_O, XQMap.empty(), null);
-      }
-      params.seqType(rt.seqType()).finish(qc, localVars);
+  /**
+   * Declares a record constructor function for the specified record type.
+   * @param rt record type
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  private void declareRecordConstructor(final RecordType rt, final InputInfo ii)
+      throws QueryException {
 
-      final Var[] pv = params.vars();
-      final Expr[] args = new Expr[pv.length];
-      for(int i = 0; i < pv.length; ++i) {
-        args[i] = new VarRef(null, pv[i]);
+    final QNm name = rt.name();
+    final TokenObjectMap<RecordField> fields = rt.fields();
+    localVars.pushContext(false);
+    final Params params = new Params();
+    boolean defaults = false;
+    for(final byte[] key : fields) {
+      final RecordField rf = fields.get(key);
+      final boolean optional = rf.isOptional();
+      final Expr initExpr = rf.expr();
+      if(optional || initExpr != null) {
+        defaults = true;
+      } else if(defaults) {
+        throw error(PARAMOPTIONAL_X, key);
       }
-      final Expr expr = new CRecord(ii, rt, args);
-      final String doc = docBuilder.toString();
-      final VarScope vs = localVars.popContext();
-      final StaticFunc func = qc.functions.declare(qn, params, expr, anns, doc, vs, info());
-      funcs.add(func);
+      final SeqType fst = rf.seqType();
+      final SeqType pst = optional ? fst.union(Occ.ZERO) : fst;
+      final Expr init = initExpr == null && optional ? Empty.VALUE : initExpr;
+      params.add(new QNm(key), pst, init, null);
     }
+    if(rt.isExtensible()) {
+      byte[] key;
+      int i = -1;
+      do {
+        final String paramName = ++i == 0 ? "options" : "options" + i;
+        key = Token.token(paramName);
+      } while(fields.contains(key));
+      params.add(new QNm(key), Types.MAP_O, XQMap.empty(), null);
+    }
+    params.seqType(rt.seqType()).finish(qc, localVars);
+
+    final Var[] pv = params.vars();
+    final Expr[] args = new Expr[pv.length];
+    for(int i = 0; i < pv.length; ++i) {
+      args[i] = new VarRef(null, pv[i]);
+    }
+    final Expr expr = new CRecord(ii, rt, args);
+    final String doc = docBuilder.toString();
+    final VarScope vs = localVars.popContext();
+    final StaticFunc func = qc.functions.declare(name, params, expr, rt.anns(), doc, vs, info());
+    funcs.add(func);
   }
 
   /**
@@ -3593,11 +3604,11 @@ public class QueryParser extends InputParser {
           final boolean optional = wsConsume("?");
           final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
           if(fields.contains(name)) throw error(DUPFIELD_X, name);
-          fields.put(name, new RecordField(optional, seqType));
+          fields.put(name, new RecordField(seqType, optional));
         } while(wsConsume(","));
         wsCheck(")");
       }
-      return qc.shared.record(extensible, fields);
+      return qc.shared.record(new RecordType(fields, extensible));
     }
     // map
     if(type instanceof MapType) {

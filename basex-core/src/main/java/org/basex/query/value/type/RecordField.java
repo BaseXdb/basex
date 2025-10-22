@@ -22,24 +22,32 @@ public final class RecordField {
   private final Expr expr;
 
   /**
-   * Constructor.
-   * @param optional optional flag
+   * Constructor for a mandatory field.
    * @param seqType field type (can be {@code null})
-   * @param expr initializing expression (can be {@code null})
    */
-  public RecordField(final boolean optional, final SeqType seqType, final Expr expr) {
-    this.optional = optional;
-    this.seqType = seqType;
-    this.expr = expr;
+  public RecordField(final SeqType seqType) {
+    this(seqType, false);
   }
 
   /**
    * Constructor.
-   * @param optional optional flag
    * @param seqType field type (can be {@code null})
+   * @param optional optional flag
    */
-  public RecordField(final boolean optional, final SeqType seqType) {
-    this(optional, seqType, null);
+  public RecordField(final SeqType seqType, final boolean optional) {
+    this(seqType, optional, null);
+  }
+
+  /**
+   * Constructor.
+   * @param seqType field type (can be {@code null})
+   * @param optional optional flag
+   * @param expr initializing expression (can be {@code null})
+   */
+  public RecordField(final SeqType seqType, final boolean optional, final Expr expr) {
+    this.seqType = seqType;
+    this.optional = optional;
+    this.expr = expr;
   }
 
   /**

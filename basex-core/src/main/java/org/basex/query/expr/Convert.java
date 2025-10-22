@@ -40,7 +40,7 @@ abstract class Convert extends Single {
    * Returns a stricter cast type.
    * @return sequence type
    */
-  final SeqType castType() {
+  public final SeqType castType() {
     final SeqType est = expr.seqType();
     Type type = seqType.type;
     Occ occ = seqType.occ;

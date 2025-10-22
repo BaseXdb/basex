@@ -122,18 +122,18 @@ public final class SeqTypeTest {
       // r2 record(next? as r2, x)
       r2 = SeqType.get(new RecordType(r2Name, ii), EXACTLY_ONE);
 
-    fld1.put(Token.token("next"), new RecordField(true, r1));
-    fld1.put(Token.token("x"), new RecordField(false, ITEM_ZM));
+    fld1.put(Token.token("next"), new RecordField(r1, true));
+    fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
 
-    fld2.put(Token.token("next"), new RecordField(true, r2));
-    fld2.put(Token.token("x"), new RecordField(false, ITEM_ZM));
+    fld2.put(Token.token("next"), new RecordField(r2, true));
+    fld2.put(Token.token("x"), new RecordField(ITEM_ZM));
 
     final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
     final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
     recordTypeRefs.put(r1Name, (RecordType) r1.type);
     recordTypeRefs.put(r2Name, (RecordType) r2.type);
-    declaredRecordTypes.put(r1Name, new RecordType(false, fld1));
-    declaredRecordTypes.put(r2Name, new RecordType(false, fld2));
+    declaredRecordTypes.put(r1Name, new RecordType(fld1));
+    declaredRecordTypes.put(r2Name, new RecordType(fld2));
     RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
 
     assertTrue(r1.eq(r2));
@@ -300,18 +300,18 @@ public final class SeqTypeTest {
       // r2 record(next? as r2, x)
       r2 = SeqType.get(new RecordType(r2Name, ii), EXACTLY_ONE);
 
-    fld1.put(Token.token("next"), new RecordField(true, r1));
-    fld1.put(Token.token("x"), new RecordField(false, ITEM_ZM));
+    fld1.put(Token.token("next"), new RecordField(r1, true));
+    fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
 
-    fld2.put(Token.token("next"), new RecordField(true, r2));
-    fld2.put(Token.token("x"), new RecordField(false, ITEM_ZM));
+    fld2.put(Token.token("next"), new RecordField(r2, true));
+    fld2.put(Token.token("x"), new RecordField(ITEM_ZM));
 
     final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
     final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
     recordTypeRefs.put(r1Name, (RecordType) r1.type);
     recordTypeRefs.put(r2Name, (RecordType) r2.type);
-    declaredRecordTypes.put(r1Name, new RecordType(false, fld1));
-    declaredRecordTypes.put(r2Name, new RecordType(false, fld2));
+    declaredRecordTypes.put(r1Name, new RecordType(fld1));
+    declaredRecordTypes.put(r2Name, new RecordType(fld2));
     RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
 
     assertTrue(RECORD_O.instanceOf(FUNCTION_O));
@@ -492,57 +492,57 @@ public final class SeqTypeTest {
         fld8 = new TokenObjectMap<>(),
         fld9 = new TokenObjectMap<>(),
         fld10 = new TokenObjectMap<>();
-    fld1.put(Token.token("a"), new RecordField(false, INTEGER_O));
-    fld2.put(Token.token("a"), new RecordField(false, STRING_O));
-    fld3.put(Token.token("a"), new RecordField(false, ANY_ATOMIC_TYPE_O));
-    fld4.put(Token.token("a"), new RecordField(false, INTEGER_O));
-    fld5.put(Token.token("a"), new RecordField(true, INTEGER_O));
-    fld6.put(Token.token("b"), new RecordField(true, INTEGER_O));
-    fld7.put(Token.token("a"), new RecordField(true, INTEGER_O));
-    fld7.put(Token.token("b"), new RecordField(true, INTEGER_O));
-    fld10.put(Token.token("next"), new RecordField(true, RECORD_O));
-    fld10.put(Token.token("x"), new RecordField(false, ITEM_ZM));
-    fld10.put(Token.token("y"), new RecordField(true, ITEM_ZM));
-    fld10.put(Token.token("z"), new RecordField(true, ITEM_ZM));
+    fld1.put(Token.token("a"), new RecordField(INTEGER_O));
+    fld2.put(Token.token("a"), new RecordField(STRING_O));
+    fld3.put(Token.token("a"), new RecordField(ANY_ATOMIC_TYPE_O));
+    fld4.put(Token.token("a"), new RecordField(INTEGER_O));
+    fld5.put(Token.token("a"), new RecordField(INTEGER_O, true));
+    fld6.put(Token.token("b"), new RecordField(INTEGER_O, true));
+    fld7.put(Token.token("a"), new RecordField(INTEGER_O, true));
+    fld7.put(Token.token("b"), new RecordField(INTEGER_O, true));
+    fld10.put(Token.token("next"), new RecordField(RECORD_O, true));
+    fld10.put(Token.token("x"), new RecordField(ITEM_ZM));
+    fld10.put(Token.token("y"), new RecordField(ITEM_ZM, true));
+    fld10.put(Token.token("z"), new RecordField(ITEM_ZM, true));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = SeqType.get(new RecordType(false, fld1), EXACTLY_ONE),
+      r1 = SeqType.get(new RecordType(fld1), EXACTLY_ONE),
       // record(a as xs:string)
-      r2 = SeqType.get(new RecordType(false, fld2), EXACTLY_ONE),
+      r2 = SeqType.get(new RecordType(fld2), EXACTLY_ONE),
       // record(a as xs:anyAtomicType)
-      r3 = SeqType.get(new RecordType(false, fld3), EXACTLY_ONE),
+      r3 = SeqType.get(new RecordType(fld3), EXACTLY_ONE),
       // record(a as xs:integer, *)
-      r4 = SeqType.get(new RecordType(true, fld4), EXACTLY_ONE),
+      r4 = SeqType.get(new RecordType(fld4, true), EXACTLY_ONE),
       // record(a as xs:integer?, *)
-      r5 = SeqType.get(new RecordType(true, fld5), EXACTLY_ONE),
+      r5 = SeqType.get(new RecordType(fld5, true), EXACTLY_ONE),
       // record(b as xs:integer?, *)
-      r6 = SeqType.get(new RecordType(true, fld6), EXACTLY_ONE),
+      r6 = SeqType.get(new RecordType(fld6, true), EXACTLY_ONE),
       // record(b as xs:integer?, *)
-      r7 = SeqType.get(new RecordType(true, fld7), EXACTLY_ONE),
+      r7 = SeqType.get(new RecordType(fld7, true), EXACTLY_ONE),
       // r8 record(next? as r8, x, y)
       r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
       // r9 record(next? as r8, x, z)
       r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE),
       // r10 record(next? as record(*), x, y, z)
-      r10 = SeqType.get(new RecordType(false, fld10), EXACTLY_ONE);
+      r10 = SeqType.get(new RecordType(fld10), EXACTLY_ONE);
 
-    fld8.put(Token.token("next"), new RecordField(true, r8));
-    fld8.put(Token.token("x"), new RecordField(false, ITEM_ZM));
-    fld8.put(Token.token("y"), new RecordField(false, ITEM_ZM));
+    fld8.put(Token.token("next"), new RecordField(r8, true));
+    fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
+    fld8.put(Token.token("y"), new RecordField(ITEM_ZM));
 
-    fld9.put(Token.token("next"), new RecordField(true, r9));
-    fld9.put(Token.token("x"), new RecordField(false, ITEM_ZM));
-    fld9.put(Token.token("z"), new RecordField(false, ITEM_ZM));
+    fld9.put(Token.token("next"), new RecordField(r9, true));
+    fld9.put(Token.token("x"), new RecordField(ITEM_ZM));
+    fld9.put(Token.token("z"), new RecordField(ITEM_ZM));
 
     final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
     final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
     recordTypeRefs.put(r8Name, (RecordType) r8.type);
     recordTypeRefs.put(r9Name, (RecordType) r9.type);
-    declaredRecordTypes.put(r8Name, new RecordType(false, fld8));
-    declaredRecordTypes.put(r9Name, new RecordType(false, fld9));
+    declaredRecordTypes.put(r8Name, new RecordType(fld8));
+    declaredRecordTypes.put(r9Name, new RecordType(fld9));
     RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
 
     combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
@@ -748,51 +748,51 @@ public final class SeqTypeTest {
         fld7 = new TokenObjectMap<>(),
         fld8 = new TokenObjectMap<>(),
         fld9 = new TokenObjectMap<>();
-    fld1.put(Token.token("a"), new RecordField(false, INTEGER_O));
-    fld2.put(Token.token("a"), new RecordField(false, STRING_O));
-    fld3.put(Token.token("a"), new RecordField(false, ANY_ATOMIC_TYPE_O));
-    fld4.put(Token.token("a"), new RecordField(false, INTEGER_O));
-    fld5.put(Token.token("a"), new RecordField(true, INTEGER_O));
-    fld6.put(Token.token("b"), new RecordField(true, INTEGER_O));
-    fld7.put(Token.token("a"), new RecordField(false, INTEGER_O));
-    fld7.put(Token.token("b"), new RecordField(false, INTEGER_O));
+    fld1.put(Token.token("a"), new RecordField(INTEGER_O));
+    fld2.put(Token.token("a"), new RecordField(STRING_O));
+    fld3.put(Token.token("a"), new RecordField(ANY_ATOMIC_TYPE_O));
+    fld4.put(Token.token("a"), new RecordField(INTEGER_O));
+    fld5.put(Token.token("a"), new RecordField(INTEGER_O, true));
+    fld6.put(Token.token("b"), new RecordField(INTEGER_O, true));
+    fld7.put(Token.token("a"), new RecordField(INTEGER_O));
+    fld7.put(Token.token("b"), new RecordField(INTEGER_O));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = SeqType.get(new RecordType(false, fld1), EXACTLY_ONE),
+      r1 = SeqType.get(new RecordType(fld1), EXACTLY_ONE),
       // record(a as xs:string)
-      r2 = SeqType.get(new RecordType(false, fld2), EXACTLY_ONE),
+      r2 = SeqType.get(new RecordType(fld2), EXACTLY_ONE),
       // record(a as xs:anyAtomicType)
-      r3 = SeqType.get(new RecordType(false, fld3), EXACTLY_ONE),
+      r3 = SeqType.get(new RecordType(fld3), EXACTLY_ONE),
       // record(a as xs:integer, *)
-      r4 = SeqType.get(new RecordType(true, fld4), EXACTLY_ONE),
+      r4 = SeqType.get(new RecordType(fld4, true), EXACTLY_ONE),
       // record(a as xs:integer?, *)
-      r5 = SeqType.get(new RecordType(true, fld5), EXACTLY_ONE),
+      r5 = SeqType.get(new RecordType(fld5, true), EXACTLY_ONE),
       // record(b as xs:integer?, *)
-      r6 = SeqType.get(new RecordType(true, fld6), EXACTLY_ONE),
+      r6 = SeqType.get(new RecordType(fld6, true), EXACTLY_ONE),
       // record(b as xs:integer?, *)
-      r7 = SeqType.get(new RecordType(true, fld7), EXACTLY_ONE),
+      r7 = SeqType.get(new RecordType(fld7, true), EXACTLY_ONE),
       // r8 record(next? as r8, x, y)
       r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
       // r9 record(next? as r8, x, z)
       r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE);
 
-    fld8.put(Token.token("next"), new RecordField(true, r8));
-    fld8.put(Token.token("x"), new RecordField(false, ITEM_ZM));
-    fld8.put(Token.token("y"), new RecordField(false, ITEM_ZM));
+    fld8.put(Token.token("next"), new RecordField(r8, true));
+    fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
+    fld8.put(Token.token("y"), new RecordField(ITEM_ZM));
 
-    fld9.put(Token.token("next"), new RecordField(true, r9));
-    fld9.put(Token.token("x"), new RecordField(false, ITEM_ZM));
-    fld9.put(Token.token("z"), new RecordField(false, ITEM_ZM));
+    fld9.put(Token.token("next"), new RecordField(r9, true));
+    fld9.put(Token.token("x"), new RecordField(ITEM_ZM));
+    fld9.put(Token.token("z"), new RecordField(ITEM_ZM));
 
     final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
     final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
     recordTypeRefs.put(r8Name, (RecordType) r8.type);
     recordTypeRefs.put(r9Name, (RecordType) r9.type);
-    declaredRecordTypes.put(r8Name, new RecordType(false, fld8));
-    declaredRecordTypes.put(r9Name, new RecordType(false, fld9));
+    declaredRecordTypes.put(r8Name, new RecordType(fld8));
+    declaredRecordTypes.put(r9Name, new RecordType(fld9));
     RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
 
     combine(RECORD_O, FUNCTION_O, RECORD_O, op);

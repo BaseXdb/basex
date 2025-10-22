@@ -80,10 +80,11 @@ public final class CMap extends Arr {
       final ExprList args = new ExprList(el / 2);
       for(int e = 0; e < el; e += 2) {
         final Expr key = exprs[e], value = exprs[e + 1];
-        fields.put(((AStr) key).string(info), new RecordField(false, value.seqType()));
+        fields.put(((AStr) key).string(info), new RecordField(value.seqType()));
         args.add(value);
       }
-      return new CRecord(info, cc.qc.shared.record(false, fields), args.finish()).optimize(cc);
+      final RecordType rt = cc.qc.shared.record(new RecordType(fields));
+      return new CRecord(info, rt, args.finish()).optimize(cc);
     }
 
     // determine static types

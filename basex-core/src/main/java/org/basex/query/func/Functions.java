@@ -157,8 +157,8 @@ public final class Functions {
     // constructor function
     if(eq(name.uri(), XS_URI)) {
       if(arity > 0) fb.add(CAST_PARAM[0], Types.ANY_ATOMIC_TYPE_ZO, qc);
-      final Expr expr = constructorCall(name, fb);
-      final FuncType ft = FuncType.get(fb.anns, null, fb.params);
+      final Cast expr = constructorCall(name, fb);
+      final FuncType ft = FuncType.get(fb.anns, expr.castType(), fb.params);
       return item(expr, fb, ft, name, false, arity == 0);
     }
 

@@ -5,10 +5,12 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.Set;
 import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.util.hash.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -26,31 +28,43 @@ public final class RecordType extends MapType {
   private TokenObjectMap<RecordField> fields;
   /** Record type name (can be {@code null}). */
   private final QNm name;
+  /** Annotations. */
+  private final AnnList anns;
   /** Input info ({@code null}, if this is not an unresolved reference). */
   private InputInfo info;
 
   /**
-   * Constructor for RecordType declarations and literal RecordType instances.
-   * @param extensible extensible flag
+   * Constructor for non-extensible record type.
    * @param fields field declarations
    */
-  public RecordType(final boolean extensible, final TokenObjectMap<RecordField> fields) {
-    this(extensible, fields, null);
+  public RecordType(final TokenObjectMap<RecordField> fields) {
+    this(fields, false);
   }
 
   /**
-   * Constructor for RecordType declarations and literal RecordType instances.
-   * @param extensible extensible flag
+   * Constructor.
    * @param fields field declarations
-   * @param name record type name (can be {@code null})
+   * @param extensible extensible flag
    */
-  public RecordType(final boolean extensible, final TokenObjectMap<RecordField> fields,
-      final QNm name) {
+  public RecordType(final TokenObjectMap<RecordField> fields, final boolean extensible) {
+    this(fields, extensible, null, AnnList.EMPTY);
+  }
+
+  /**
+   * Constructor.
+   * @param fields field declarations
+   * @param extensible extensible flag
+   * @param name record type name (can be {@code null})
+   * @param anns annotations
+   */
+  public RecordType(final TokenObjectMap<RecordField> fields, final boolean extensible,
+      final QNm name, final AnnList anns) {
     super(extensible ? AtomType.ANY_ATOMIC_TYPE : AtomType.STRING,
         extensible ? Types.ITEM_ZM : unionType(fields));
     this.extensible = extensible;
     this.fields = fields;
     this.name = name;
+    this.anns = anns;
     info = null;
   }
 
@@ -61,10 +75,11 @@ public final class RecordType extends MapType {
    */
   public RecordType(final QNm name, final InputInfo info) {
     super(AtomType.ANY_ATOMIC_TYPE, Types.ITEM_ZM, false);
-    extensible = true;
-    fields = new TokenObjectMap<>();
     this.name = name;
     this.info = info;
+    extensible = true;
+    fields = new TokenObjectMap<>(0);
+    anns = AnnList.EMPTY;
   }
 
   /**
@@ -117,6 +132,14 @@ public final class RecordType extends MapType {
    */
   public QNm name() {
     return name;
+  }
+
+  /**
+   * Returns the annotations of this record type.
+   * @return annotations
+   */
+  public AnnList anns() {
+    return anns;
   }
 
   @Override
@@ -283,19 +306,19 @@ public final class RecordType extends MapType {
           } else {
             union = fst.union(rtfst);
           }
-          map.put(key, new RecordField(f.optional || rtf.optional, union));
+          map.put(key, new RecordField(union, f.optional || rtf.optional));
         } else {
           // field missing in type
-          map.put(key, new RecordField(true, f.seqType));
+          map.put(key, new RecordField(f.seqType, true));
         }
       }
       for(final byte[] key : rt.fields) {
         if(!fields.contains(key)) {
           // field missing in this RecordType
-          map.put(key, new RecordField(true, rt.fields.get(key).seqType));
+          map.put(key, new RecordField(rt.fields.get(key).seqType, true));
         }
       }
-      return new RecordType(extensible || rt.extensible, map);
+      return new RecordType(map, extensible || rt.extensible);
     }
     return type instanceof final MapType mt ? mt.union(keyType(), valueType()) :
            type instanceof ArrayType ? Types.FUNCTION :
@@ -341,21 +364,21 @@ public final class RecordType extends MapType {
           is = fst.intersect(rtfst);
         }
         if(is == null) return null;
-        map.put(key, new RecordField(f.optional && rtf.optional, is));
+        map.put(key, new RecordField(is, f.optional && rtf.optional));
       } else {
         // field missing in type
         if(!rt.extensible) return null;
-        map.put(key, new RecordField(false, f.seqType));
+        map.put(key, new RecordField(f.seqType));
       }
     }
     for(final byte[] key : rt.fields) {
       if(!fields.contains(key)) {
         // field missing in this RecordType
         if(!extensible) return null;
-        map.put(key, new RecordField(false, rt.fields.get(key).seqType));
+        map.put(key, new RecordField(rt.fields.get(key).seqType));
       }
     }
-    return new RecordType(extensible && rt.extensible, map);
+    return new RecordType(map, extensible && rt.extensible);
   }
 
   @Override
