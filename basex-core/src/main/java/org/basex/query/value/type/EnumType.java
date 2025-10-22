@@ -33,12 +33,16 @@ public final class EnumType implements Type {
   }
 
   /**
-   * Constructor.
+   * Returns an enumeration type.
+   * @param <T> type of enumeration values
    * @param values enumeration values (at least one)
+   * @return enum type
    */
-  public EnumType(final Enum<?>[] values) {
-    this.values = new TokenSet(values.length);
-    for(final Enum<?> v : values) this.values.add(v.toString());
+  @SafeVarargs
+  public static <T> EnumType get(final T... values) {
+    final TokenSet set = new TokenSet(values.length);
+    for(final T value : values) set.add(value.toString());
+    return new EnumType(set);
   }
 
   /**

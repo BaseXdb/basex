@@ -337,7 +337,7 @@ public enum Function implements AFunction {
       params(NODE_ZM), BOOLEAN_O),
   /** XQuery function. */
   HASH(FnHash::new, "hash(value[,algorithm,options])",
-      params(ANY_ATOMIC_TYPE_ZO, STRING_ZO, MAP_ZO), HEX_BINARY_O),
+      params(STRING_OR_BINARY_ZO, STRING_ZO, MAP_ZO), HEX_BINARY_O),
   /** XQuery function. */
   HEAD(FnHead::new, "head(input)",
       params(ITEM_ZM), ITEM_ZO),
@@ -502,19 +502,19 @@ public enum Function implements AFunction {
       params(NODE_ZM), NODE_ZM),
   /** XQuery function. */
   PARSE_CSV(FnParseCsv::new, "parse-csv(value[,options])",
-      params(STRING_ZO, MAP_ZO), MAP_O),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), MAP_O),
   /** XQuery function. */
   PARSE_IETF_DATE(FnParseIetfDate::new, "parse-ietf-date(value)",
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
   PARSE_HTML(FnParseHtml::new, "parse-html(html[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO),
   /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
       params(STRING_ZO, INTEGER_ZO), INTEGER_ZO),
   /** XQuery function. */
   PARSE_JSON(FnParseJson::new, "parse-json(value[,options])",
-      params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(CNS, HOF)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZO, flag(CNS, HOF)),
   /** XQuery function. */
   PARSE_QNAME(FnParseQName::new, "parse-QName(value)",
       params(STRING_ZO), QNAME_ZO),
@@ -523,10 +523,10 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), MAP_O),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
   /** XQuery function. */
   PARTIAL_APPLY(FnPartialApply::new, "partial-apply(function,arguments)",
       params(FUNCTION_O, MAP_O), FUNCTION_O, flag(HOF)),
@@ -1028,19 +1028,19 @@ public enum Function implements AFunction {
 
   /** XQuery function. */
   _BIN_AND(BinAnd::new, "and(binary1,binary2)",
-      params(BASE64_BINARY_ZO, BASE64_BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
+      params(BINARY_ZO, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_BIN(BinBin::new, "bin(string)",
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_DECODE_STRING(BinDecodeString::new, "decode-string(binary[,encoding,offset,size])",
-      params(BASE64_BINARY_ZO, STRING_ZO, INTEGER_O, INTEGER_O), STRING_ZO, BIN_URI),
+      params(BINARY_ZO, STRING_ZO, INTEGER_O, INTEGER_O), STRING_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_ENCODE_STRING(BinEncodeString::new, "encode-string(string[,encoding])",
       params(STRING_ZO, STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_FIND(BinFind::new, "find(binary,offset,search)",
-      params(BASE64_BINARY_ZO, INTEGER_O, BASE64_BINARY_ZO), INTEGER_ZO, BIN_URI),
+      params(BINARY_ZO, INTEGER_O, BASE64_BINARY_ZO), INTEGER_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_FROM_OCTETS(BinFromOctets::new, "from-octets(integers)",
       params(INTEGER_ZM), BASE64_BINARY_O, BIN_URI),
@@ -1049,22 +1049,22 @@ public enum Function implements AFunction {
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_INSERT_BEFORE(BinInsertBefore::new, "insert-before(binary,offset,extra)",
-      params(BASE64_BINARY_ZO, INTEGER_O, BASE64_BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
+      params(BINARY_ZO, INTEGER_O, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_JOIN(BinJoin::new, "join(binaries)",
-      params(BASE64_BINARY_ZM), BASE64_BINARY_O, BIN_URI),
+      params(BINARY_ZM), BASE64_BINARY_O, BIN_URI),
   /** XQuery function. */
   _BIN_LENGTH(BinLength::new, "length(binary)",
-      params(BASE64_BINARY_O), INTEGER_O, BIN_URI),
+      params(BINARY_O), INTEGER_O, BIN_URI),
   /** XQuery function. */
   _BIN_NOT(BinNot::new, "not(binary)",
-      params(BASE64_BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
+      params(BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_OCTAL(BinOctal::new, "octal(string)",
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_OR(BinOr::new, "or(binary1,binary2)",
-      params(BASE64_BINARY_ZO, BASE64_BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
+      params(BINARY_ZO, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_PACK_DOUBLE(BinPackDouble::new, "pack-double(double[,order])",
       params(DOUBLE_O, STRING_O), BASE64_BINARY_O, BIN_URI),
@@ -1076,35 +1076,35 @@ public enum Function implements AFunction {
       params(INTEGER_O, INTEGER_O, STRING_O), BASE64_BINARY_O, BIN_URI),
   /** XQuery function. */
   _BIN_PAD_LEFT(BinPadLeft::new, "pad-left(binary,size[,octet])",
-      params(BASE64_BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
+      params(BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_PAD_RIGHT(BinPadRight::new, "pad-right(binary,size[,octet])",
-      params(BASE64_BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
+      params(BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_PART(BinPart::new, "part(binary,offset[,size])",
-      params(BASE64_BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
+      params(BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_SHIFT(BinShift::new, "shift(binary,by)",
-      params(BASE64_BINARY_ZO, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
+      params(BINARY_ZO, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_TO_OCTETS(BinToOctets::new, "to-octets(binary)",
-      params(BASE64_BINARY_ZO), INTEGER_ZM, BIN_URI),
+      params(BINARY_ZO), INTEGER_ZM, BIN_URI),
   /** XQuery function. */
   _BIN_UNPACK_DOUBLE(BinUnpackDouble::new, "unpack-double(binary,offset[,order])",
-      params(BASE64_BINARY_O, INTEGER_O, STRING_O), DOUBLE_O, BIN_URI),
+      params(BINARY_O, INTEGER_O, STRING_O), DOUBLE_O, BIN_URI),
   /** XQuery function. */
   _BIN_UNPACK_FLOAT(BinUnpackFloat::new, "unpack-float(binary,offset[,order])",
-      params(BASE64_BINARY_O, INTEGER_O, STRING_O), FLOAT_O, BIN_URI),
+      params(BINARY_O, INTEGER_O, STRING_O), FLOAT_O, BIN_URI),
   /** XQuery function. */
   _BIN_UNPACK_INTEGER(BinUnpackInteger::new, "unpack-integer(binary,offset,size[,order])",
-      params(BASE64_BINARY_O, INTEGER_O, INTEGER_O, STRING_O), INTEGER_O, BIN_URI),
+      params(BINARY_O, INTEGER_O, INTEGER_O, STRING_O), INTEGER_O, BIN_URI),
   /** XQuery function. */
   _BIN_UNPACK_UNSIGNED_INTEGER(BinUnpackUnsignedInteger::new,
       "unpack-unsigned-integer(binary,offset,size[,order])",
-      params(BASE64_BINARY_O, INTEGER_O, INTEGER_O, STRING_O), INTEGER_O, BIN_URI),
+      params(BINARY_O, INTEGER_O, INTEGER_O, STRING_O), INTEGER_O, BIN_URI),
   /** XQuery function. */
   _BIN_XOR(BinXor::new, "xor(binary1,binary2)",
-      params(BASE64_BINARY_ZO, BASE64_BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
+      params(BINARY_ZO, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
 
   // Client Module
 
@@ -1201,7 +1201,7 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), CSV_URI, Perm.CREATE),
   /** XQuery function. */
   _CSV_PARSE(CsvParse::new, "parse(value[,options])",
-      params(STRING_ZO, MAP_ZO), ITEM_ZO, CSV_URI),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZO, CSV_URI),
   /** XQuery function. */
   _CSV_SERIALIZE(CsvSerialize::new, "serialize(input[,options])",
       params(ITEM_ZO, ITEM_ZO), STRING_O, CSV_URI),
@@ -1537,7 +1537,7 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), HTML_URI, Perm.CREATE),
   /** XQuery function. */
   _HTML_PARSE(HtmlParse::new, "parse(value[,options])",
-      params(ANY_ATOMIC_TYPE_ZO, MAP_ZO), DOCUMENT_NODE_ZO, HTML_URI),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, HTML_URI),
   /** XQuery function. */
   _HTML_PARSER(HtmlParser::new, "parser()",
       params(), STRING_O, HTML_URI),
@@ -1636,7 +1636,7 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), JSON_URI, Perm.CREATE),
   /** XQuery function. */
   _JSON_PARSE(JsonParse::new, "parse(value[,options])",
-      params(STRING_ZO, MAP_ZO), ITEM_ZO, JSON_URI),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), ITEM_ZO, JSON_URI),
   /** XQuery function. */
   _JSON_SERIALIZE(JsonSerialize::new, "serialize(input[,options])",
       params(ITEM_ZO, MAP_ZO), STRING_O, JSON_URI),

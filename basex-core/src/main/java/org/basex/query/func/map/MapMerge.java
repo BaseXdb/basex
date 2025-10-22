@@ -148,7 +148,7 @@ public class MapMerge extends StandardFunc {
     final String string = duplicates.isEmpty() ? dflt.toString() : toString(duplicates, qc);
     final Duplicates value = Enums.get(Duplicates.class, string);
     if(value == null) throw QueryError.typeError(duplicates,
-        new EnumType(Duplicates.values()), info);
+        EnumType.get(Duplicates.values()), info);
 
     return switch(value) {
       case REJECT -> new Reject();

@@ -120,6 +120,10 @@ public final class Types {
 
   /** Single binary. */
   public static final SeqType BINARY_O = BINARY.seqType();
+  /** Zero or one binary. */
+  public static final SeqType BINARY_ZO = BINARY.seqType(ZERO_OR_ONE);
+  /** Zero or more binary. */
+  public static final SeqType BINARY_ZM = BINARY.seqType(ZERO_OR_MORE);
   /** One xs:hexBinary. */
   public static final SeqType HEX_BINARY_O = HEX_BINARY.seqType();
   /** Single xs:base64Binary. */
@@ -128,6 +132,16 @@ public final class Types {
   public static final SeqType BASE64_BINARY_ZO = BASE64_BINARY.seqType(ZERO_OR_ONE);
   /** Zero or more xs:base64Binary. */
   public static final SeqType BASE64_BINARY_ZM = BASE64_BINARY.seqType(ZERO_OR_MORE);
+
+  /** String or xs:hex-binary or xs:base64-binary. */
+  public static final ChoiceItemType STRING_OR_BINARY =
+      ChoiceItemType.get(STRING_O, HEX_BINARY_O, BASE64_BINARY_O);
+  /** Single string or xs:hex-binary or xs:base64-binary. */
+  public static final SeqType STRING_OR_BINARY_O = STRING_OR_BINARY.seqType();
+  /** Zero or one string or xs:hex-binary or xs:base64-binary. */
+  public static final SeqType STRING_OR_BINARY_ZO = STRING_OR_BINARY.seqType(ZERO_OR_ONE);
+  /** Zero or more string or xs:hex-binary or xs:base64-binary. */
+  public static final SeqType STRING_OR_BINARY_ZM = STRING_OR_BINARY.seqType(ZERO_OR_MORE);
 
   /** Single node. */
   public static final SeqType NODE_O = NODE.seqType();
@@ -228,10 +242,7 @@ public final class Types {
   /** Zero or more members. */
   public static final SeqType MEMBER_ZM = MEMBER.seqType(ZERO_OR_MORE);
 
-  /** Private constructor. */
-  private Types() { }
-
-  /** Types. */
+  /** Indexed item types. */
   private static final Type[] TYPES = new Type[Type.ID.LAST.asByte()];
 
   static {
@@ -241,6 +252,9 @@ public final class Types {
     TYPES[Type.ID.MAP.asByte()] = MAP;
     TYPES[Type.ID.ARRAY.asByte()] = ARRAY;
   }
+
+  /** Private constructor. */
+  private Types() { }
 
   /**
    * Returns the type at the specified index.
