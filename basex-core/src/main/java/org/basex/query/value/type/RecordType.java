@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -458,7 +459,8 @@ public final class RecordType extends MapType {
   public RecordType getDeclaration(final QNmMap<RecordType> declaredRecordTypes)
       throws QueryException {
     if(info == null) return this;
-    final RecordType rt = declaredRecordTypes.get(name);
+    RecordType rt = declaredRecordTypes.get(name);
+    if(rt == null) rt = Records.BUILT_IN.get(name);
     if(rt == null) throw TYPEUNKNOWN_X.get(info, AtomType.similar(name));
     return rt;
   }
