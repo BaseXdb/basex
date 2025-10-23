@@ -153,7 +153,6 @@ public final class CMap extends Arr {
     return exprs[e + 1] == Empty.UNDEFINED;
   }
 
-
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new CMap(info, copyAll(cc, vm, exprs)));

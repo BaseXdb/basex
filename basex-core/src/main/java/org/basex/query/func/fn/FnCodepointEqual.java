@@ -44,7 +44,6 @@ public final class FnCodepointEqual extends StandardFunc {
     return eq(toToken(value1), toToken(value2));
   }
 
-
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr value1 = arg(0), value2 = arg(1);

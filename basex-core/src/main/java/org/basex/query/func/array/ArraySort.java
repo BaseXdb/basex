@@ -24,7 +24,6 @@ public final class ArraySort extends ArraySortBy {
     return index(values, keys, collations, invert, qc);
   }
 
-
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr array = arg(0);

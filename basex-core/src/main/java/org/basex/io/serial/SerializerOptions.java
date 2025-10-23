@@ -128,8 +128,7 @@ public final class SerializerOptions extends Options {
       new EnumOption<>("indent-attributes", YesNo.NO);
 
   /** QName. */
-  public static final QNm Q_ROOT =
-      new QNm(OUTPUT_PREFIX, "serialization-parameters", OUTPUT_URI);
+  public static final QNm Q_ROOT = new QNm(OUTPUT_PREFIX, "serialization-parameters", OUTPUT_URI);
   /** Name test. */
   public static final NameTest T_ROOT = new NameTest(Q_ROOT);
   /** Value. */

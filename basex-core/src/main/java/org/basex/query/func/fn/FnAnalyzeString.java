@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public final class FnAnalyzeString extends RegExFn {
   /** QName. */
-  private static final QNm Q_ANALYZE_STRING_RESULT = new QNm("analyze-string-result", FN_URI);
+  public static final QNm Q_ANALYZE_STRING_RESULT = new QNm("analyze-string-result", FN_URI);
   /** QName. */
   private static final QNm Q_MATCH = new QNm("match", FN_URI);
   /** QName. */

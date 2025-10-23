@@ -905,7 +905,6 @@ public enum AtomType implements Type {
   /** NOTATION Type. */
   NOTATION("NOTATION", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.NOT);
 
-
   /** Language pattern. */
   private static final Pattern LANGPATTERN = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z\\d]{1,8})*");
 

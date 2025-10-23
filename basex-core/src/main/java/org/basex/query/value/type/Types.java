@@ -72,6 +72,8 @@ public final class Types {
   public static final SeqType STRING_ZM = STRING.seqType(ZERO_OR_MORE);
   /** One or more strings. */
   public static final SeqType STRING_OM = STRING.seqType(ONE_OR_MORE);
+  /** Single NCName. */
+  public static final SeqType NCNAME_O = NCNAME.seqType();
   /** Zero or one NCName. */
   public static final SeqType NCNAME_ZO = NCNAME.seqType(ZERO_OR_ONE);
   /** Single language. */

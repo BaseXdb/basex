@@ -79,6 +79,15 @@ public final class SeqType {
   }
 
   /**
+   * Returns a named element test.
+   * @param name name of element
+   * @return sequence type
+   */
+  public static SeqType get(final QNm name) {
+    return get(NodeType.ELEMENT, Occ.EXACTLY_ONE, new NameTest(name));
+  }
+
+  /**
    * Returns an array type for this sequence type.
    * @return array type
    */

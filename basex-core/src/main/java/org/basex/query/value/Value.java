@@ -129,7 +129,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
    */
   protected abstract Value subSeq(long pos, long length, QueryContext qc);
 
-
   /**
    * Appends a value.
    * @param value value to append

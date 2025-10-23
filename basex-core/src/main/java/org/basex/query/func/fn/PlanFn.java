@@ -494,7 +494,6 @@ public abstract class PlanFn extends StandardFunc {
     return ab.array();
   }
 
-
   /**
    * Returns an XML item.
    * @param node node

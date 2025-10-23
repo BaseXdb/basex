@@ -16,6 +16,11 @@ import org.basex.util.hash.*;
  */
 public enum Records {
   /** Record definition. */
+  DIVIDED_DECIMALS("divided-decimals", false,
+    field("quotient", Types.DECIMAL_O),
+    field("remainder", Types.DECIMAL_O)
+  ),
+  /** Record definition. */
   LOAD_XQUERY_MODULE("load-xquery-module", false,
     field("variables", MapType.get(AtomType.QNAME, Types.ITEM_ZO).seqType()),
     field("functions", MapType.get(AtomType.QNAME,

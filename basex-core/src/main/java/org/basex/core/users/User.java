@@ -66,7 +66,6 @@ public final class User {
     info = user.info;
   }
 
-
   /**
    * Indicates if passwords are stored for a user.
    * @return result of check
