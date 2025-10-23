@@ -38,7 +38,7 @@ public final class DocTest extends Test {
       if(found || !child.matches(n)) return false;
       found = true;
     }
-    return true;
+    return found;
   }
 
   @Override

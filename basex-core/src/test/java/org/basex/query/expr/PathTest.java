@@ -324,4 +324,23 @@ public final class PathTest extends SandboxTest {
     check("<a/>/.[a]", "", "//IterStep/@test = '*'");
     check("<a/>/.[element(a)]", "", "//IterStep/@test = '*'");
   }
+
+  /** Instance checks: document-node(...). */
+  @Test public void gh2521() {
+    query("document {} instance of document-node()", true);
+    query("document { <a/> } instance of document-node()", true);
+    query("document { <a/>, <b/> } instance of document-node()", true);
+    query("document { 'text' } instance of document-node()", true);
+
+    query("document {} instance of document-node(*)", false);
+    query("document { <a/> } instance of document-node(*)", true);
+    query("document { <a/>, <b/> } instance of document-node(*)", false);
+    query("document { 'text' } instance of document-node(*)", false);
+
+    query("document {} instance of document-node(a)", false);
+    query("document { <a/> } instance of document-node(a)", true);
+    query("document { <a/>, <b/> } instance of document-node(a)", false);
+    query("document { <b/> } instance of document-node(a)", false);
+    query("document { 'text' } instance of document-node(a)", false);
+  }
 }
