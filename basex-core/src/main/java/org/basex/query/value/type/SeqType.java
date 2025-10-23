@@ -67,6 +67,15 @@ public final class SeqType {
   }
 
   /**
+   * Returns a sequence type with occurrence indicator {@link Occ#EXACTLY_ONE}.
+   * @param test kind test
+   * @return sequence type
+   */
+  public static SeqType get(final Test test) {
+    return get(test.type, Occ.EXACTLY_ONE, test);
+  }
+
+  /**
    * Returns a sequence type.
    * @param type type
    * @param occ occurrence indicator
@@ -76,15 +85,6 @@ public final class SeqType {
   public static SeqType get(final Type type, final Occ occ, final Test test) {
     return occ == ZERO || test == null || test instanceof NodeTest ? get(type, occ) :
       new SeqType(type, occ, test);
-  }
-
-  /**
-   * Returns a named element test.
-   * @param name name of element
-   * @return sequence type
-   */
-  public static SeqType get(final QNm name) {
-    return get(NodeType.ELEMENT, Occ.EXACTLY_ONE, new NameTest(name));
   }
 
   /**

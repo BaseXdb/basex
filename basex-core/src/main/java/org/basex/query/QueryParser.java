@@ -3553,7 +3553,7 @@ public class QueryParser extends InputParser {
       type = NodeType.find(name);
       if(type != null) {
         // extended node type
-        if(!wsConsume(")")) st = SeqType.get(type, Occ.EXACTLY_ONE, kindTest((NodeType) type));
+        if(!wsConsume(")")) st = SeqType.get(kindTest((NodeType) type));
       } else if(name.eq(AtomType.ITEM.qname())) {
         // item type
         type = AtomType.ITEM;
@@ -3742,7 +3742,7 @@ public class QueryParser extends InputParser {
     } else {
       return null;
     }
-    return NameTest.get(NodeType.PROCESSING_INSTRUCTION, new QNm(name), null);
+    return NameTest.get(NodeType.PROCESSING_INSTRUCTION, new QNm(name));
   }
 
   /**

@@ -577,7 +577,7 @@ public abstract class ParseExpr extends Expr {
   protected final ANode toElem(final Expr expr, final QNm name, final QueryContext qc,
       final QueryError error) throws QueryException {
     final ANode node = toElem(expr, qc);
-    if(new NameTest(name).matches(node)) return node;
+    if(NameTest.get(name).matches(node)) return node;
     throw error.get(info, name.prefixId(), node.type, node);
   }
 

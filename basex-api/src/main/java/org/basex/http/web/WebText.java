@@ -114,11 +114,11 @@ public interface WebText {
   /** Serializer node test. */
   NameTest T_OUTPUT_SERIAL = SerializerOptions.T_ROOT;
   /** HTTP Response test. */
-  NameTest T_HTTP_RESPONSE = new NameTest(new QNm("response", HTTP_URI));
+  NameTest T_HTTP_RESPONSE = NameTest.get(new QNm("response", HTTP_URI));
   /** RESTXQ Response test. */
-  NameTest T_REST_RESPONSE = new NameTest(new QNm("response", REST_URI));
+  NameTest T_REST_RESPONSE = NameTest.get(new QNm("response", REST_URI));
   /** RESTXQ Forward test. */
-  NameTest T_REST_FORWARD = new NameTest(new QNm("forward", REST_URI));
+  NameTest T_REST_FORWARD = NameTest.get(new QNm("forward", REST_URI));
   /** HTTP Header test. */
-  NameTest T_HTTP_HEADER = new NameTest(new QNm("header", HTTP_URI));
+  NameTest T_HTTP_HEADER = NameTest.get(new QNm("header", HTTP_URI));
 }

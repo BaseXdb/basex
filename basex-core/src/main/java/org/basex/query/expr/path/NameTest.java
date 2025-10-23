@@ -29,20 +29,20 @@ public final class NameTest extends Test {
    * Returns a name test.
    * @param type node type (must be element, attribute, or processing instruction)
    * @param qname node name
-   * @param defaultNs default element namespace (used for optimizations, can be {@code null})
    * @return test
    */
-  public static NameTest get(final NodeType type, final QNm qname, final byte[] defaultNs) {
+  public static NameTest get(final NodeType type, final QNm qname) {
     final NamePart part = type == NodeType.PROCESSING_INSTRUCTION ? NamePart.LOCAL : NamePart.FULL;
-    return new NameTest(qname, part, type, defaultNs);
+    return new NameTest(qname, part, type, null);
   }
 
   /**
-   * Convenience constructor for element tests.
+   * Returns a named element test.
    * @param qname node name
+   * @return test
    */
-  public NameTest(final QNm qname) {
-    this(qname, NamePart.FULL, NodeType.ELEMENT, null);
+  public static NameTest get(final QNm qname) {
+    return new NameTest(qname, NamePart.FULL, NodeType.ELEMENT, null);
   }
 
   /**

@@ -63,8 +63,7 @@ public final class CElem extends CName {
     if(name instanceof Value) {
       final QNm nm = qname(true, cc.qc);
       name = nm;
-      exprType.assign(SeqType.get(NodeType.ELEMENT, Occ.EXACTLY_ONE,
-          NameTest.get(NodeType.ELEMENT, nm, null)));
+      exprType.assign(SeqType.get(NameTest.get(NodeType.ELEMENT, nm)));
     }
 
     // merge adjacent and nested text values

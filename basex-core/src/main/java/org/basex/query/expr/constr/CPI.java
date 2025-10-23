@@ -39,8 +39,7 @@ public final class CPI extends CName {
     if(name instanceof Value) {
       final byte[] nm = ncname(false, cc.qc);
       name = Str.get(nm);
-      exprType.assign(SeqType.get(NodeType.PROCESSING_INSTRUCTION, Occ.EXACTLY_ONE,
-          NameTest.get(NodeType.PROCESSING_INSTRUCTION, new QNm(nm), null)));
+      exprType.assign(SeqType.get(NameTest.get(NodeType.PROCESSING_INSTRUCTION, new QNm(nm))));
     }
     optValue(cc);
     return this;

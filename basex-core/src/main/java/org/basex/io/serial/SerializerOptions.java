@@ -130,7 +130,7 @@ public final class SerializerOptions extends Options {
   /** QName. */
   public static final QNm Q_ROOT = new QNm(OUTPUT_PREFIX, "serialization-parameters", OUTPUT_URI);
   /** Name test. */
-  public static final NameTest T_ROOT = new NameTest(Q_ROOT);
+  public static final NameTest T_ROOT = NameTest.get(Q_ROOT);
   /** Value. */
   private static final QNm Q_VALUE = new QNm("value");
 
