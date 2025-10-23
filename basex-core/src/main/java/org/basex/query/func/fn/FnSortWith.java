@@ -59,7 +59,7 @@ public class FnSortWith extends StandardFunc {
       try {
         for(final FItem cmp : cmps) {
           final long diff = toLong(cmp.invoke(qc, info, value1, value2).item(qc, info));
-          if(diff != 0) return diff < 0 ? -1 : 1;
+          if(diff != 0) return Long.signum(diff);
         }
         return 0;
       } catch(final QueryException ex) {

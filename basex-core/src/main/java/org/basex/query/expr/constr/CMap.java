@@ -80,7 +80,9 @@ public final class CMap extends Arr {
       final ExprList args = new ExprList(el / 2);
       for(int e = 0; e < el; e += 2) {
         final Expr key = exprs[e], value = exprs[e + 1];
-        fields.put(((AStr) key).string(info), new RecordField(value.seqType()));
+        if(fields.put(((AStr) key).string(info), new RecordField(value.seqType())) != null) {
+          throw MAPDUPLKEY_X.get(info, key);
+        }
         args.add(value);
       }
       final RecordType rt = cc.qc.shared.record(new RecordType(fields));

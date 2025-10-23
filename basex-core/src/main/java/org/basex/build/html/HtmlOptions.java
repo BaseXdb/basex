@@ -49,9 +49,6 @@ public final class HtmlOptions extends Options {
 
   /** fn:parse-html option: fail-on-error. */
   public static final BooleanOption FAIL_ON_ERROR = new BooleanOption("fail-on-error", false);
-  /** fn:parse-html option: include-template-content. */
-  public static final BooleanOption INCLUDE_TEMPLATE_CONTENT =
-      new BooleanOption("include-template-content");
 
   /** Validator.nu option: unicode-normalization-checking. */
   public static final BooleanOption UNICODE_NORMALIZATION_CHECKING =

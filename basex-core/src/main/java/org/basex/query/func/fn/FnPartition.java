@@ -1,4 +1,4 @@
-package org.basex.query.func.array;
+package org.basex.query.func.fn;
 
 import static org.basex.query.func.Function.*;
 
@@ -18,7 +18,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnPartition extends ArrayFn {
+public final class FnPartition extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);
