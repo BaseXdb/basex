@@ -61,10 +61,6 @@ public final class MainOptions extends Options {
   public static final BooleanOption STRIPWS = new BooleanOption("STRIPWS", false);
   /** Strip namespaces. */
   public static final BooleanOption STRIPNS = new BooleanOption("STRIPNS", false);
-  /** Whether external entities are permitted or rejected. */
-  public static final BooleanOption EXTERNALENT = new BooleanOption("EXTENTITIES", true);
-  /** Limit on the maximum number of entity references that may be expanded. */
-  public static final NumberOption ENTEXPANSION = new NumberOption("ENTEXPANSION", -1);
   /** Flag for parsing DTDs. */
   public static final BooleanOption DTD = new BooleanOption("DTD", false);
   /** Flag for DTD validation. */
@@ -204,8 +200,6 @@ public final class MainOptions extends Options {
     XMLPARSINGMAP.put(CommonOptions.INTPARSE, INTPARSE);
     XMLPARSINGMAP.put(CommonOptions.STRIP_SPACE, STRIPWS);
     XMLPARSINGMAP.put(CommonOptions.STRIPNS, STRIPNS);
-    XMLPARSINGMAP.put(CommonOptions.ALLOW_EXTERNAL_ENTITIES, EXTERNALENT);
-    XMLPARSINGMAP.put(CommonOptions.ENTITY_EXPANSION_LIMIT, ENTEXPANSION);
     XMLPARSINGMAP.put(CommonOptions.DTD, DTD);
     XMLPARSINGMAP.put(CommonOptions.DTD_VALIDATION, DTDVALIDATION);
     XMLPARSINGMAP.put(CommonOptions.XSD_VALIDATION, XSDVALIDATION);

@@ -17,11 +17,6 @@ public final class FnParseXml extends FnParseXmlFragment {
   public static final class ParseXmlOptions extends ParseXmlFragmentOptions {
     /** DTD validation. */
     public static final BooleanOption DTD_VALIDATION = CommonOptions.DTD_VALIDATION;
-    /** Whether external entities are permitted. */
-    public static final BooleanOption ALLOW_EXTERNAL_ENTITIES =
-        CommonOptions.ALLOW_EXTERNAL_ENTITIES;
-    /** Limit on the maximum number of entity references that may be expanded. */
-    public static final NumberOption ENTITY_EXPANSION_LIMIT = CommonOptions.ENTITY_EXPANSION_LIMIT;
     /** Whether any xi:include elements in the input are to be processed. */
     public static final BooleanOption XINCLUDE = CommonOptions.XINCLUDE;
     /** XSD validation. */

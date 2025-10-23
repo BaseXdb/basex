@@ -16,10 +16,6 @@ import org.basex.util.options.*;
 public final class DocOptions extends Options {
   /** DTD validation. */
   public static final BooleanOption DTD_VALIDATION = CommonOptions.DTD_VALIDATION;
-  /** Whether external entities are permitted or rejected. */
-  public static final BooleanOption ALLOW_EXTERNAL_ENTITIES = CommonOptions.ALLOW_EXTERNAL_ENTITIES;
-  /** Limit on the maximum number of entity references that may be expanded. */
-  public static final NumberOption ENTITY_EXPANSION_LIMIT = CommonOptions.ENTITY_EXPANSION_LIMIT;
   /** Remove whitespace-only text nodes. */
   public static final BooleanOption STRIP_SPACE = CommonOptions.STRIP_SPACE;
   /** Flag for using XInclude. */

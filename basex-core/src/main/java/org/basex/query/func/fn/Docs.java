@@ -92,9 +92,7 @@ public abstract class Docs extends DynamicFn {
     final Predicate<BooleanOption> bool = o -> options.get(o) == Boolean.TRUE;
     final boolean dtd = bool.test(CommonOptions.DTD) || bool.test(MainOptions.DTD);
     final boolean xinclude = bool.test(CommonOptions.XINCLUDE) || bool.test(MainOptions.XINCLUDE);
-    final boolean externalent = bool.test(CommonOptions.ALLOW_EXTERNAL_ENTITIES) ||
-        bool.test(MainOptions.EXTERNALENT);
-    if(dtd || xinclude || externalent) checkPerm(qc, Perm.CREATE);
+    if(dtd || xinclude) checkPerm(qc, Perm.CREATE);
 
     final boolean intparse = fragment || bool.test(CommonOptions.INTPARSE) ||
         bool.test(MainOptions.INTPARSE);

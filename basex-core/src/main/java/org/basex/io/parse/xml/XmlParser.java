@@ -60,8 +60,6 @@ public final class XmlParser {
   public static XMLReader reader(final MainOptions options)
       throws SAXException, ParserConfigurationException {
 
-    final int entExpansion = options.get(MainOptions.ENTEXPANSION);
-    final boolean extEntities = options.get(MainOptions.EXTERNALENT);
     final boolean dtd = options.get(MainOptions.DTD);
     final boolean dtdValidation = options.get(MainOptions.DTDVALIDATION);
     final boolean xinclude = options.get(MainOptions.XINCLUDE);
@@ -69,12 +67,10 @@ public final class XmlParser {
         options.get(MainOptions.XSDVALIDATION));
     final boolean xsiLocation = options.get(MainOptions.XSILOCATION);
     final SAXParserFactory f = SAXParserFactory.newDefaultInstance();
-    if(extEntities) {
-      // setting these options to false will ignore external entities, rather than rejecting them
-      f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
-      f.setFeature("http://xml.org/sax/features/external-general-entities", dtd);
-      f.setFeature("http://xml.org/sax/features/external-parameter-entities", dtd);
-    }
+    // setting these options to false will ignore external entities, rather than rejecting them
+    f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
+    f.setFeature("http://xml.org/sax/features/external-general-entities", dtd);
+    f.setFeature("http://xml.org/sax/features/external-parameter-entities", dtd);
     f.setFeature("http://xml.org/sax/features/validation", dtdValidation);
     f.setFeature("http://xml.org/sax/features/use-entity-resolver2", false);
     f.setNamespaceAware(true);
@@ -86,9 +82,7 @@ public final class XmlParser {
       f.setSchema(sf.newSchema());
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
-    if(entExpansion != -1) xr.setProperty(
-        "http://www.oracle.com/xml/jaxp/properties/entityExpansionLimit", entExpansion);
-    if(xsdValidation && !xsiLocation || !extEntities) {
+    if(xsdValidation && !xsiLocation) {
       xr.setEntityResolver((pubId, sysId) -> {
         throw new SAXException("External access not allowed: " + sysId);
       });
