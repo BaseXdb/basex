@@ -192,7 +192,7 @@ public final class Payload {
 
     if(payloads != null) {
       final String encoding = type.parameter(CHARSET);
-      final byte[] part = new TextInput(bl.finish()).encoding(encoding).content();
+      final byte[] part = new TextInput(new IOContent(bl.finish()), encoding).content();
       payloads.add(parse(base64 ? Base64.decode(part) : part, type));
     }
     return true;
@@ -347,7 +347,7 @@ public final class Payload {
     final boolean xml = type.isXml(), text = type.isText();
     if(xml || text) {
       // convert text to UTF8; skip redundant XML declaration
-      data = new NewlineInput(body).encoding(type.parameter(CHARSET)).content();
+      data = new NewlineInput(new IOContent(body), type.parameter(CHARSET)).content();
       if(xml && startsWith(data, DECLSTART)) {
         final int d = indexOf(data, DECLEND, DECLSTART.length);
         if(d != -1) data = substring(data, d + DECLEND.length);

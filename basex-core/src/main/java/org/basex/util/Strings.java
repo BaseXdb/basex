@@ -6,7 +6,9 @@ import java.security.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.query.*;
 import org.basex.util.list.*;
+import org.basex.util.similarity.*;
 
 /**
  * <p>This class provides convenience operations for strings.</p>
@@ -215,26 +217,17 @@ public final class Strings {
 
   /**
    * Returns a unified representation of the specified encoding.
-   * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
-   * @return encoding
+   * @param encoding input encoding
+   * @param dflt return default values if supplied encoding is {@code null} or ambiguous
+   * @return encoding or {@code null}
    */
-  public static String normEncoding(final String encoding) {
-    return normEncoding(encoding, false);
-  }
-
-  /**
-   * Returns a unified representation of the specified encoding.
-   * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
-   * @param utf16 normalize UTF-16 encoding
-   * @return encoding
-   */
-  public static String normEncoding(final String encoding, final boolean utf16) {
-    if(encoding == null) return UTF8;
+  public static String normEncoding(final String encoding, final boolean dflt) {
+    if(encoding == null) return dflt ? UTF8 : null;
     final String e = encoding.toUpperCase(Locale.ENGLISH);
     if(eq(e, ALL_UTF8)) return UTF8;
     if(e.equals(UTF16LE)) return UTF16LE;
     if(e.equals(UTF16BE)) return UTF16BE;
-    if(eq(e, ALL_UTF16))  return utf16 ? UTF16BE : UTF16;
+    if(eq(e, ALL_UTF16))  return dflt ? UTF16BE : UTF16;
     if(eq(e, ALL_UTF32))  return UTF32;
     return encoding;
   }
@@ -242,15 +235,16 @@ public final class Strings {
   /**
    * Checks if the specified encoding is supported.
    * @param encoding encoding
-   * @return result of check
+   * @return error message or {@code null}
    */
-  public static boolean encodingSupported(final String encoding) {
+  public static String checkEncoding(final String encoding) {
     try {
-      return Charset.isSupported(encoding);
+      if(Charset.isSupported(encoding)) return null;
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
-      return false;
     }
+    return "Unknown encoding: " + Token.string(QueryError.similar(encoding,
+        Levenshtein.similar(Token.token(encoding), encodings()))) + '.';
   }
 
   /**

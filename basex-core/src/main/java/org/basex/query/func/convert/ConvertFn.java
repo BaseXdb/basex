@@ -62,8 +62,8 @@ public abstract class ConvertFn extends StandardFunc {
    */
   public static byte[] toString(final InputStream is, final String encoding, final boolean validate)
       throws IOException {
-    try(TextInput ti = new TextInput(is)) {
-      return ti.encoding(encoding).validate(validate).content();
+    try(TextInput ti = new TextInput(is, encoding)) {
+      return ti.validate(validate).content();
     }
   }
 }

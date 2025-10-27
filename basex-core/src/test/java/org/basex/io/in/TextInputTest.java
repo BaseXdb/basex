@@ -99,8 +99,8 @@ public final class TextInputTest {
    * @throws IOException I/O exception
    */
   private static void encoding(final String enc, final String input) throws IOException {
-    try(TextInput ti = new TextInput(input.getBytes(enc))) {
-      assertSame(ti.encoding(enc).content(), Token.token(input));
+    try(TextInput ti = new TextInput(new IOContent(input.getBytes(enc)), enc)) {
+      assertSame(ti.content(), Token.token(input));
     }
   }
 
@@ -109,7 +109,7 @@ public final class TextInputTest {
    * @param data data to be tested
    */
   private static void run(final byte[] data) {
-    try(TextInput ti = new TextInput(data)) {
+    try(TextInput ti = new TextInput(new IOContent(data))) {
       ti.read();
       ti.reset();
 

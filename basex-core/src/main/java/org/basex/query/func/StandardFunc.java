@@ -33,7 +33,6 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 import org.basex.util.options.*;
-import org.basex.util.similarity.*;
 
 /**
  * Built-in functions.
@@ -547,9 +546,9 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     if(encoding == null) return null;
-    if(Strings.encodingSupported(encoding)) return Strings.normEncoding(encoding);
-    throw err.get(info, QueryError.similar(encoding,
-        Levenshtein.similar(token(encoding), Strings.encodings())));
+    final String error = Strings.checkEncoding(encoding);
+    if(error != null) throw err.get(info, error);
+    return Strings.normEncoding(encoding, false);
   }
 
   /**

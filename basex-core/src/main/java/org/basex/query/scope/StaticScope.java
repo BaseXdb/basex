@@ -2,6 +2,7 @@ package org.basex.query.scope;
 
 import java.io.*;
 
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -103,7 +104,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
     };
 
     final TokenBuilder input = new TokenBuilder();
-    try(NewlineInput nli = new NewlineInput(doc)) {
+    try(NewlineInput nli = new NewlineInput(new IOContent(doc))) {
       while(nli.readLine(input)) {
         String line = input.toString().replaceAll("^\\s*:? *", "");
         if(line.matches("^@\\w+\\s+.*")) {

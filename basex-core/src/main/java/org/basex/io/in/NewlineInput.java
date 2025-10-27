@@ -24,7 +24,17 @@ public final class NewlineInput extends TextInput {
    * @throws IOException I/O exception
    */
   public NewlineInput(final InputStream is) throws IOException {
-    super(is);
+    this(is, null);
+  }
+
+  /**
+   * Constructor.
+   * @param is input stream
+   * @param encoding encoding (ignored if {@code null})
+   * @throws IOException I/O exception
+   */
+  public NewlineInput(final InputStream is, final String encoding) throws IOException {
+    super(is, encoding);
   }
 
   /**
@@ -33,21 +43,22 @@ public final class NewlineInput extends TextInput {
    * @throws IOException I/O exception
    */
   public NewlineInput(final IO in) throws IOException {
-    super(in);
+    this(in, null);
   }
 
   /**
    * Constructor.
-   * @param token token
+   * @param in input
+   * @param encoding encoding (ignored if {@code null})
    * @throws IOException I/O exception
    */
-  public NewlineInput(final byte[] token) throws IOException {
-    super(token);
+  public NewlineInput(final IO in, final String encoding) throws IOException {
+    super(in, encoding);
   }
 
   @Override
-  public NewlineInput encoding(final String encoding) throws IOException {
-    super.encoding(encoding);
+  public NewlineInput validate(final boolean flag) {
+    super.validate(flag);
     return this;
   }
 

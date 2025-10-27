@@ -91,8 +91,8 @@ public abstract class JsonConverter {
    */
   public final Value convert(final IO input) throws QueryException, IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
-    try(NewlineInput ni = new NewlineInput(input)) {
-      return convert(ni.encoding(encoding), input.url(), null, null);
+    try(NewlineInput ni = new NewlineInput(input, encoding)) {
+      return convert(ni, input.url(), null, null);
     }
   }
 

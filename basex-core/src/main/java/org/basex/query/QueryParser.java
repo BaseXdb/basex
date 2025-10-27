@@ -326,7 +326,8 @@ public class QueryParser extends InputParser {
     // parse xquery encoding (ignored, as input always comes in as string)
     if(wsConsumeWs(ENCODING)) {
       final String encoding = string(stringLiteral());
-      if(!Strings.encodingSupported(encoding)) throw error(XQUERYENC2_X, encoding);
+      final String error = Strings.checkEncoding(encoding);
+      if(error != null) throw error(XQUERYENC2_X, error);
     } else if(!version) {
       pos = p;
       return;

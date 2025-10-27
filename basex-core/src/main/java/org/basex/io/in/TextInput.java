@@ -28,8 +28,18 @@ public class TextInput extends BufferInput {
    * @throws IOException I/O exception
    */
   public TextInput(final InputStream is) throws IOException {
+    this(is, null);
+  }
+
+  /**
+   * Constructor.
+   * @param is input stream
+   * @param encoding encoding (ignored if {@code null})
+   * @throws IOException I/O exception
+   */
+  public TextInput(final InputStream is, final String encoding) throws IOException {
     super(is);
-    guess();
+    guess(encoding);
   }
 
   /**
@@ -38,47 +48,51 @@ public class TextInput extends BufferInput {
    * @throws IOException I/O exception
    */
   public TextInput(final IO io) throws IOException {
-    super(io);
-    guess();
+    this(io, null);
   }
 
   /**
    * Constructor.
-   * @param token token
+   * @param io input
+   * @param encoding encoding (ignored if {@code null})
    * @throws IOException I/O exception
    */
-  public TextInput(final byte[] token) throws IOException {
-    this(new IOContent(token));
+  public TextInput(final IO io, final String encoding) throws IOException {
+    super(io);
+    guess(encoding);
   }
 
   /**
    * Reads the first bytes of the input stream to guess the text encoding.
+   * @param encoding encoding (ignored if {@code null})
    * @throws IOException I/O exception
    */
-  private void guess() throws IOException {
+  private void guess(final String encoding) throws IOException {
     try {
-      final int a = readByte();
-      final int b = readByte();
-      final int c = readByte();
-      final int d = readByte();
-      String e = UTF8;
+      final int a = readByte(), b = readByte(), c = readByte(), d = readByte();
+      String enc = normEncoding(encoding, false);
       int skip = 0;
-      if(a == 0xFF && b == 0xFE) { // BOM: FF FE
-        e = UTF16LE;
-        skip = 2;
-      } else if(a == 0xFE && b == 0xFF) { // BOM: FE FF
-        e = UTF16BE;
-        skip = 2;
-      } else if(a == 0xEF && b == 0xBB && c == 0xBF) { // BOM: EF BB BF
+      if(Strings.eq(enc, UTF8, null) && a == 0xEF && b == 0xBB && c == 0xBF) {
+        enc = UTF8;
         skip = 3;
-      } else if(a == '<' && b == 0 && c == '?' && d == 0) {
-        e = UTF16LE;
-      } else if(a == 0 && b == '<' && c == 0 && d == '?') {
-        e = UTF16BE;
+      } else if(Strings.eq(enc, UTF16, UTF16LE, null) && a == 0xFF && b == 0xFE) {
+        enc = UTF16LE;
+        skip = 2;
+      } else if(Strings.eq(enc, UTF16, UTF16BE, null) && a == 0xFE && b == 0xFF) {
+        enc = UTF16BE;
+        skip = 2;
+      } else if(Strings.eq(enc, UTF16, null) && a == '<' && b == 0 && c == '?' && d == 0) {
+        enc = UTF16LE;
+      } else if(Strings.eq(enc, UTF16, null) && a == 0 && b == '<' && c == 0 && d == '?') {
+        enc = UTF16BE;
+      } else if(Strings.eq(enc, UTF16)) {
+        enc = UTF16BE;
+      } else if(enc == null) {
+        enc = UTF8;
       }
       reset();
       for(int s = 0; s < skip; s++) readByte();
-      decoder = TextDecoder.get(e);
+      decoder = TextDecoder.get(enc);
     } catch(final IOException ex) {
       close();
       throw ex;
@@ -91,7 +105,7 @@ public class TextInput extends BufferInput {
    * @param flag flag to be set
    * @return self reference
    */
-  public final TextInput validate(final boolean flag) {
+  public TextInput validate(final boolean flag) {
     validate = flag;
     decoder.validate = flag;
     return this;
@@ -105,9 +119,9 @@ public class TextInput extends BufferInput {
    */
   public TextInput encoding(final String encoding) throws IOException {
     if(encoding != null && !encoding.isEmpty()) {
-      String e = normEncoding(encoding);
-      if(e == UTF16) e = decoder.encoding == UTF16LE ? UTF16LE : UTF16BE;
-      decoder = TextDecoder.get(e);
+      final String enc = normEncoding(encoding, false);
+      decoder = TextDecoder.get(enc != UTF16 ? enc :
+        decoder.encoding.equals(UTF16LE) ? UTF16LE : UTF16BE);
       decoder.validate = validate;
     }
     return this;

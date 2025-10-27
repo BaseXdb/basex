@@ -20,9 +20,17 @@ import org.basex.util.*;
  */
 abstract class TextDecoder {
   /** Encoding. */
-  String encoding;
+  final String encoding;
   /** Indicates if input must be valid. */
   boolean validate;
+
+  /**
+   * Constructor.
+   * @param encoding encoding
+   */
+  TextDecoder(final String encoding) {
+    this.encoding = encoding;
+  }
 
   /**
    * Returns the next codepoint.
@@ -34,19 +42,18 @@ abstract class TextDecoder {
 
   /**
    * Returns a decoder for the specified encoding.
-   * @param enc encoding, normalized via {@link Strings#normEncoding}
+   * @param encoding normed encoding
    * @return decoder
    * @throws IOException I/O exception
    */
-  static TextDecoder get(final String enc) throws IOException {
-    final TextDecoder td;
-    if(enc == UTF8) td = new UTF8();
-    else if(enc == UTF32) td = new UTF32();
-    else if(enc == UTF16LE) td = new UTF16LE();
-    else if(enc == UTF16 || enc == UTF16BE) td = new UTF16BE();
-    else td = new Generic(enc);
-    td.encoding = enc;
-    return td;
+  static TextDecoder get(final String encoding) throws IOException {
+    return switch(encoding) {
+      case UTF8 -> new UTF8();
+      case UTF32 -> new UTF32();
+      case UTF16LE -> new UTF16LE();
+      case UTF16, UTF16BE -> new UTF16BE();
+      default -> new Generic(encoding);
+    };
   }
 
   /**
@@ -99,6 +106,11 @@ abstract class TextDecoder {
 
   /** UTF8 Decoder. */
   private static final class UTF8 extends TextDecoder {
+    /** Constructor. */
+    UTF8() {
+      super(UTF8);
+    }
+
     @Override
     int read(final TextInput ti) throws IOException {
       int cp = ti.readByte();
@@ -118,6 +130,11 @@ abstract class TextDecoder {
 
   /** UTF16LE Decoder. */
   private static final class UTF16LE extends TextDecoder {
+    /** Constructor. */
+    UTF16LE() {
+      super(UTF16LE);
+    }
+
     @Override
     int read(final TextInput ti) throws IOException {
       return readUTF16(ti, false);
@@ -126,6 +143,11 @@ abstract class TextDecoder {
 
   /** UTF16BE Decoder. */
   private static final class UTF16BE extends TextDecoder {
+    /** Constructor. */
+    UTF16BE() {
+      super(UTF16BE);
+    }
+
     @Override
     int read(final TextInput ti) throws IOException {
       return readUTF16(ti, true);
@@ -134,6 +156,11 @@ abstract class TextDecoder {
 
   /** UTF32 Decoder. */
   private static final class UTF32 extends TextDecoder {
+    /** Constructor. */
+    UTF32() {
+      super(UTF32);
+    }
+
     @Override
     int read(final TextInput ti) throws IOException {
       final int a = ti.readByte();
@@ -165,6 +192,7 @@ abstract class TextDecoder {
      * @throws IOException I/O exception
      */
     private Generic(final String encoding) throws IOException {
+      super(encoding);
       try {
         csd = Charset.forName(encoding).newDecoder();
       } catch(final Exception ex) {

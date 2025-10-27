@@ -82,9 +82,9 @@ public class XMLInput extends InputStream {
    * @throws IOException I/O exception
    */
   public boolean add(final byte[] value, final boolean spaces) throws IOException {
-    if(spaces) add(new NewlineInput(Token.cpToken(' ')));
-    add(new NewlineInput(value));
-    if(spaces) add(new NewlineInput(Token.cpToken(' ')));
+    if(spaces) add(new NewlineInput(new IOContent(Token.cpToken(' '))));
+    add(new NewlineInput(new IOContent(value)));
+    if(spaces) add(new NewlineInput(new IOContent(Token.cpToken(' '))));
     return ++exp < (inputs[0].size() + 1) * 10 && ip < 32;
   }
 

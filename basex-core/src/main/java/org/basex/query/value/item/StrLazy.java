@@ -94,13 +94,9 @@ public final class StrLazy extends AStr implements Lazy {
    * @throws QueryException query exception
    */
   private TextInput get(final InputInfo info) throws QueryException {
-    NewlineInput nli = null;
     try {
-      nli = new NewlineInput(input);
-      nli.encoding(encoding).validate(validate);
-      return nli;
+      return new NewlineInput(input, encoding).validate(validate);
     } catch(final IOException ex) {
-      if(nli != null) try { nli.close(); } catch(final IOException e) { Util.debug(e); }
       throw error.get(info, ex);
     }
   }

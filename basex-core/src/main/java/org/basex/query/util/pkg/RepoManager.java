@@ -224,7 +224,7 @@ public final class RepoManager {
       throws QueryException, IOException {
 
     final byte[] manifest = new RepoArchive(content).read(MANIFEST_MF);
-    try(NewlineInput nli = new NewlineInput(manifest)) {
+    try(NewlineInput nli = new NewlineInput(new IOContent(manifest))) {
       for(String s; (s = nli.readLine()) != null;) {
         // write file to rewritten file path
         final Matcher main = MAIN_CLASS.matcher(s);

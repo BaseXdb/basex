@@ -85,7 +85,7 @@ public enum QueryError {
   /** Error code. */
   ARCHIVE_TIMESTAMP_X(ARCHIVE, "descriptor", "xs:dateTime value is invalid : '%'."),
   /** Error code. */
-  ARCHIVE_ENCODE1_X(ARCHIVE, "encode", "Unknown encoding '%'."),
+  ARCHIVE_ENCODE1_X(ARCHIVE, "encode", "%"),
   /** Error code. */
   ARCHIVE_ENCODE2_X(ARCHIVE, "encode", "String conversion: %."),
   /** Error code. */
@@ -118,7 +118,7 @@ public enum QueryError {
   /** Error code. */
   BIN_NNC(BIN, "non-numeric-character", "Invalid character in constructor string."),
   /** Error code. */
-  BIN_UE_X(BIN, "unknown-encoding", "Unknown encoding '%'."),
+  BIN_UE_X(BIN, "unknown-encoding", "%"),
   /** Error code. */
   BIN_CE_X(BIN, "conversion-error", "%."),
   /** Error code. */
@@ -146,7 +146,7 @@ public enum QueryError {
   /** Error code. */
   CONVERT_BINARY_X_X(CONVERT, "binary", "Conversion of '%' to encoding '%' failed."),
   /** Error code. */
-  CONVERT_ENCODING_X(CONVERT, "encoding", "Unknown encoding '%'."),
+  CONVERT_ENCODING_X(CONVERT, "encoding", "%"),
   /** Error code. */
   CONVERT_BASE_X(CONVERT, "base", "Unsupported base: %."),
   /** Error code. */
@@ -256,7 +256,7 @@ public enum QueryError {
   /** Error code. */
   FETCH_OPEN_X(FETCH, "open", "%"),
   /** Error code. */
-  FETCH_ENCODING_X(FETCH, "encoding", "Unknown encoding '%'."),
+  FETCH_ENCODING_X(FETCH, "encoding", "%"),
 
   // File Module
 
@@ -273,7 +273,7 @@ public enum QueryError {
   /** Error code. */
   FILE_IS_RELATIVE_X(FILE, "is-relative", "Base directory is relative: '%'."),
   /** Error code. */
-  FILE_UNKNOWN_ENCODING_X(FILE, "unknown-encoding", "Unknown encoding '%'."),
+  FILE_UNKNOWN_ENCODING_X(FILE, "unknown-encoding", "%"),
   /** Error code. */
   FILE_OUT_OF_RANGE_X_X(FILE, "out-of-range", "Requested file chunk [%,%] exceeds file bounds."),
   /** Error code. */
@@ -343,7 +343,7 @@ public enum QueryError {
   // Process Module
 
   /** Error code. */
-  PROC_ENCODING_X(PROC, "encoding", "Unknown encoding '%'."),
+  PROC_ENCODING_X(PROC, "encoding", "%"),
   /** Error code. */
   PROC_ERROR_X(PROC, "error", "%"),
   /** Error code. */
@@ -773,7 +773,7 @@ public enum QueryError {
   /** Error code. */
   RESURI_X(FOUT, 1170, "URI is invalid: %"),
   /** Error code. */
-  RESENCODING_X(FOUT, 1190, "Unknown encoding '%'."),
+  RESENCODING_X(FOUT, 1190, "%"),
   /** Error code. */
   RESINPUT_X(FOUT, 1190, "%."),
   /** Error code. */
@@ -819,7 +819,7 @@ public enum QueryError {
   /** Error code. */
   SERDT(SEPM, 4, "If 'doctype-system' is specified, the root must be a single element."),
   /** Error code. */
-  SERENCODING_X(SESU, 7, "Unknown encoding '%'."),
+  SERENCODING_X(SESU, 7, "%"),
   /** Error code. */
   SERENC_X_X(SERE, 8, "Character '#x%;' cannot be mapped to '%'."),
   /** Error code. */
@@ -1286,7 +1286,7 @@ public enum QueryError {
   /** Error code. */
   NSEMPTYURI(XQST, 85, "Namespace URI cannot be empty."),
   /** Error code. */
-  XQUERYENC2_X(XQST, 87, "Unknown encoding: %."),
+  XQUERYENC2_X(XQST, 87, "%"),
   /** Error code. */
   NSMODURI(XQST, 88, "Module namespace cannot be empty."),
   /** Error code. */

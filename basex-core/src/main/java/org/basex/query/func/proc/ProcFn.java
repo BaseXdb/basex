@@ -48,12 +48,8 @@ abstract class ProcFn extends StandardFunc {
     Charset cs = Prop.CHARSET;
     final String encoding = options.get(ProcOptions.ENCODING);
     if(encoding != null) {
-      try {
-        cs = Charset.forName(encoding);
-      } catch(final Exception ex) {
-        Util.debug(ex);
-        throw PROC_ENCODING_X.get(info, encoding);
-      }
+      final String error = Strings.checkEncoding(encoding);
+      if(error != null) throw PROC_ENCODING_X.get(info, error);
     }
     final long seconds = options.get(ProcOptions.TIMEOUT);
     final String dir = options.get(ProcOptions.DIR);

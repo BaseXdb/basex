@@ -52,12 +52,9 @@ public abstract class OutputSerializer extends Serializer {
     if(encoding == Strings.UTF8) {
       po = PrintOutput.get(os);
     } else {
-      try {
-        po = new EncoderOutput(os, Charset.forName(encoding));
-      } catch(final Exception ex) {
-        Util.debug(ex);
-        throw SERENCODING_X.getIO(encoding);
-      }
+      final String error = Strings.checkEncoding(encoding);
+      if(error != null) throw SERENCODING_X.getIO(error);
+      po = new EncoderOutput(os, Charset.forName(encoding));
     }
     final int limit = sopts.get(LIMIT);
     if(limit != -1) po.setLimit(limit);

@@ -8,6 +8,7 @@ import java.math.*;
 import java.util.function.*;
 
 import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
@@ -232,7 +233,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public TextInput stringInput(final InputInfo ii) throws IOException, QueryException {
-    return new TextInput(string(ii));
+    return new TextInput(new IOContent(string(ii)));
   }
 
   @Override

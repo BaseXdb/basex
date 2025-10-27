@@ -37,13 +37,12 @@ final class RESTPost {
    */
   public static RESTCmd get(final RESTSession session) throws IOException {
     final HTTPConnection conn = session.conn;
-    String encoding = conn.request.getCharacterEncoding();
-    if(encoding == null) encoding = Strings.UTF8;
+    final String encoding = conn.request.getCharacterEncoding();
 
     // perform queries
     final DBNode doc;
-    try(NewlineInput ni = new NewlineInput(conn.request.getInputStream())) {
-      doc = new DBNode(new IOContent(ni.encoding(encoding).content()));
+    try(NewlineInput ni = new NewlineInput(conn.request.getInputStream(), encoding)) {
+      doc = new DBNode(new IOContent(ni.content()));
     } catch(final IOException ex) {
       throw HTTPStatus.BAD_REQUEST_X.get(ex);
     }
