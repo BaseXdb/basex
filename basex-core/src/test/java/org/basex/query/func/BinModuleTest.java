@@ -34,12 +34,15 @@ public final class BinModuleTest extends SandboxTest {
     hexQuery(func.args("0"),                "00");
     hexQuery(func.args("00"),               "00");
     hexQuery(func.args("000000000"),        "0000");
+    hexQuery(func.args("0 "),              "00");
+    hexQuery(func.args("0_0 "),            "00");
     hexQuery(func.args("1"),                "01");
     hexQuery(func.args("10"),               "02");
     hexQuery(func.args("11111111"),         "FF");
     hexQuery(func.args("111111111"),        "01FF");
     hexQuery(func.args("1101000111010101"), "D1D5");
     hexQuery(func.args("1000111010101"),    "11D5");
+
     // errors
     error(func.args("X"), BIN_NNC);
   }
@@ -108,6 +111,8 @@ public final class BinModuleTest extends SandboxTest {
     hexQuery(func.args(""),               "");
     hexQuery(func.args("1"),              "01");
     hexQuery(func.args("FF"),             "FF");
+    hexQuery(func.args("FF "),            "FF");
+    hexQuery(func.args("F_F"),            "FF");
     hexQuery(func.args("111"),            "0111");
     hexQuery(func.args("FFF"),            "0FFF");
     hexQuery(func.args("000"),            "0000");
@@ -176,6 +181,8 @@ public final class BinModuleTest extends SandboxTest {
     hexQuery(func.args(""),         "");
     hexQuery(func.args("0"),        "00");
     hexQuery(func.args("00"),       "00");
+    hexQuery(func.args("00 "),      "00");
+    hexQuery(func.args("0_0"),      "00");
     hexQuery(func.args("000"),      "0000");
     hexQuery(func.args("007"),      "0007");
     hexQuery(func.args("1"),        "01");
