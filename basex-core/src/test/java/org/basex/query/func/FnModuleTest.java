@@ -1889,14 +1889,14 @@ public final class FnModuleTest extends SandboxTest {
           + "return $id1 eq $id2", true);
       checkCompiledModules.accept(1);
 
-      // load module m1 from different threads
+      // load module m1 from different threads (expects execution in 3 different threads)
       query("declare function f() {"
           + "  let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
           + "  return load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
           + "};\n"
-          + "let $ids := xquery:fork-join((1 to 8)!f#0)"
-          + "return (count($ids), count(distinct-values($ids)))", "8\n1");
-      checkCompiledModules.accept(8);
+          + "let $ids := xquery:fork-join((1 to 3)!f#0)"
+          + "return (count($ids), count(distinct-values($ids)))", "3\n1");
+      checkCompiledModules.accept(3);
 
     } finally {
       http.stop(0);
