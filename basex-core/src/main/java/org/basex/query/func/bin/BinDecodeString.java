@@ -31,12 +31,10 @@ public final class BinDecodeString extends BinFn {
     final int bl = bytes.length;
     final int[] bounds = bounds(offset, offset != null ? size : null, bl);
     final int o = bounds[0], tl = bounds[1];
-    final String enc = encoding == Strings.UTF16 && bl > 1 && bytes[0] == -1 && bytes[1] == -2 ?
-      Strings.UTF16LE : encoding;
     if(o > 0 || tl < bl) bytes = Arrays.copyOfRange(bytes, o, o + tl);
 
     try {
-      return Str.get(ConvertFn.toString(new ArrayInput(bytes), enc, true));
+      return Str.get(ConvertFn.toString(new ArrayInput(bytes), encoding, true, o == 0));
     } catch(final IOException ex) {
       throw BIN_CE_X.get(info, ex);
     }

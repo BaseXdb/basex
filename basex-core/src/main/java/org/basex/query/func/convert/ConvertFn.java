@@ -57,12 +57,13 @@ public abstract class ConvertFn extends StandardFunc {
    * @param is input stream
    * @param encoding encoding (can be {@code null})
    * @param validate validate string
+   * @param guess guess the encoding
    * @return resulting value
    * @throws IOException I/O exception
    */
-  public static byte[] toString(final InputStream is, final String encoding, final boolean validate)
-      throws IOException {
-    try(TextInput ti = new TextInput(is, encoding)) {
+  public static byte[] toString(final InputStream is, final String encoding, final boolean validate,
+      final boolean guess) throws IOException {
+    try(TextInput ti = new TextInput(is, encoding, guess)) {
       return ti.validate(validate).content();
     }
   }

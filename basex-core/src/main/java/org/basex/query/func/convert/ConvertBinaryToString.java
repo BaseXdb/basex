@@ -23,7 +23,7 @@ public final class ConvertBinaryToString extends ConvertFn {
     final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
     try(BufferInput bi = value.input(info)) {
-      return Str.get(toString(bi, encoding, !fallback));
+      return Str.get(toString(bi, encoding, !fallback, true));
     } catch(final IOException ex) {
       throw CONVERT_STRING_X.get(info, ex);
     }
