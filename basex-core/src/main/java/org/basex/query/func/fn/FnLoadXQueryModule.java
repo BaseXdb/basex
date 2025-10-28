@@ -7,6 +7,8 @@ import static org.basex.query.func.fn.FnLoadXQueryModule.LoadXQueryModuleOptions
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -15,6 +17,7 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.scope.*;
+import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
@@ -34,13 +37,36 @@ import org.basex.util.options.*;
 public final class FnLoadXQueryModule extends StandardFunc {
   /** The type of the value of the 'variables' and 'vendor-options' option. */
   private static final MapType QNAME_MAP_TYPE = MapType.get(AtomType.QNAME, Types.ITEM_ZM);
+  /** Per-query (top-level QueryContext) thread-local cache for compiled modules. */
+  private static final Map<QueryContext, ThreadLocal<Map<CacheKey, XQMap>>> MOD_CACHE =
+      Collections.synchronizedMap(new WeakHashMap<>());
+  /** Per-query (top-level QueryContext) cache for source content, shared by all threads. */
+  private static final Map<QueryContext, ConcurrentHashMap<String, String>> SRC_CACHE =
+      Collections.synchronizedMap(new WeakHashMap<>());
+  /** Number of read modules (for statistics). */
+  public static final AtomicInteger COMPILED_MODULES = new AtomicInteger();
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] modUri = toToken(arg(0).atomItem(qc, info));
     if(modUri.length == 0) throw MODULE_URI_EMPTY.get(info);
-    final LoadXQueryModuleOptions opt = toOptions(arg(1), new LoadXQueryModuleOptions(), qc);
+    final Item arg1 = arg(1).item(qc, ii);
+    final XQMap options = arg1.isEmpty() ? XQMap.empty() : toMap(arg1, qc);
 
+    // check for cached result
+    QueryContext cacheContext = qc;
+    while(cacheContext.parent != null) cacheContext = cacheContext.parent;
+    final ThreadLocal<Map<CacheKey, XQMap>> tl = MOD_CACHE.computeIfAbsent(cacheContext,
+        q -> ThreadLocal.withInitial(HashMap::new));
+    final Map<CacheKey, XQMap> modCache = tl.get();
+    final CacheKey cacheKey = new CacheKey(modUri, options);
+    final XQMap cached = modCache.get(cacheKey);
+    if(cached != null) return cached;
+    COMPILED_MODULES.incrementAndGet();
+
+    final ConcurrentHashMap<String, String> srcCache =
+        SRC_CACHE.computeIfAbsent(cacheContext, q -> new ConcurrentHashMap<>());
+    final LoadXQueryModuleOptions opt = toOptions(options, new LoadXQueryModuleOptions(), qc);
     final List<IO> srcs = new ArrayList<>();
     final String cont = opt.get(CONTENT);
     if(cont != null) {
@@ -83,7 +109,19 @@ public final class FnLoadXQueryModule extends StandardFunc {
     for(final IO src : srcs) {
       mqc.finalContext = false;
       try {
-        final String path = src.path(), content = src.readString();
+        final String path = src.path();
+        String content;
+        if(src instanceof IOContent) {
+          content = src.readString();
+        } else {
+          content = srcCache.get(path);
+          if(content == null) {
+            final String fresh = src.readString();
+            // first thread’s read wins, others take the published value
+            final String prev = srcCache.putIfAbsent(path, fresh);
+            content = prev != null ? prev : fresh;
+          }
+        }
         mqc.parse(content, path.isEmpty() ? Token.string(sc().baseURI().string()) : path);
       } catch(final IOException ex) {
         Util.debug(ex);
@@ -164,7 +202,9 @@ public final class FnLoadXQueryModule extends StandardFunc {
     final MapBuilder result = new MapBuilder();
     result.put("variables", variables.map());
     result.put("functions", functions.map());
-    return result.map();
+    final XQMap map = result.map();
+    modCache.put(cacheKey, map);
+    return map;
   }
 
   /**
@@ -204,5 +244,86 @@ public final class FnLoadXQueryModule extends StandardFunc {
     /** load-xquery-module option vendor-options. */
     public static final ValueOption VENDOR_OPTIONS = new ValueOption("vendor-options",
         Types.MAP_O, null);
+  }
+
+  /**
+   * Cache key for loaded modules.
+   */
+  private static final class CacheKey {
+    /** Module URI from function argument. */
+    private final byte[] modUri;
+    /** Options map from function argument. */
+    private final XQMap opts;
+    /** Pre-computed hash code. */
+    private final int hashCode;
+
+    /** Constructor.
+     * @param modUri module URI
+     * @param options options map
+     * @throws QueryException query exception
+     */
+    CacheKey(final byte[] modUri, final XQMap options) throws QueryException {
+      this.modUri = modUri;
+      this.opts = options;
+      this.hashCode = 31 * Arrays.hashCode(modUri) + mapHashCode(options.toJava());
+    }
+
+    @Override public boolean equals(final Object o) {
+      if(this == o) return true;
+      if(!(o instanceof CacheKey k)) return false;
+      try {
+        return Token.eq(this.modUri, k.modUri) && new DeepEqual().equal(this.opts, k.opts);
+      } catch(QueryException e) {
+        throw Util.notExpected(e);
+      }
+    }
+
+    @Override public int hashCode() {
+      return hashCode;
+    }
+
+    /**
+     * Computes a hash code for a map, recursively processing nested maps and Object arrays.
+     * @param map map to process
+     * @return hash code
+     */
+    private static int mapHashCode(final Map<?, ?> map) {
+      int h = 0;
+      for (Map.Entry<?, ?> entry : map.entrySet()) {
+        h += valueHashCode(entry.getKey()) ^ valueHashCode(entry.getValue());
+      }
+      return h;
+    }
+
+    /**
+     * Computes a hash code for a value, recursively processing nested maps and Object arrays.
+     * @param value value to process
+     * @return hash code
+     */
+    private static int valueHashCode(final Object value) {
+      if(value == null) return 0;
+      if(value instanceof final Map<?, ?> map) return mapHashCode(map);
+      if(value instanceof final Object[]  arr) return arrayHashCode(arr);
+      if(value instanceof final int[]     arr) return Arrays.hashCode(arr);
+      if(value instanceof final byte[]    arr) return Arrays.hashCode(arr);
+      if(value instanceof final short[]   arr) return Arrays.hashCode(arr);
+      if(value instanceof final long[]    arr) return Arrays.hashCode(arr);
+      if(value instanceof final char[]    arr) return Arrays.hashCode(arr);
+      if(value instanceof final float[]   arr) return Arrays.hashCode(arr);
+      if(value instanceof final double[]  arr) return Arrays.hashCode(arr);
+      if(value instanceof final boolean[] arr) return Arrays.hashCode(arr);
+      return value.hashCode();
+    }
+
+    /**
+     * Computes a hash code for an array, recursively processing nested maps and Object arrays.
+     * @param arr array to process
+     * @return hash code
+     */
+    private static int arrayHashCode(final Object[] arr) {
+      int result = 1;
+      for(final Object element : arr) result = 31 * result + valueHashCode(element);
+      return result;
+    }
   }
 }

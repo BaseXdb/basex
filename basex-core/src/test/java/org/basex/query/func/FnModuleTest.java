@@ -5,6 +5,8 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -16,10 +18,13 @@ import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.Test;
+
+import com.sun.net.httpserver.*;
 
 /**
  * This class tests standard functions.
@@ -1791,10 +1796,14 @@ public final class FnModuleTest extends SandboxTest {
     contains(func.args("null") + " update {}", "xmlns");
   }
 
-  /** Test method. */
-  @Test public void loadXQueryModule() {
+  /**
+   * Test method.
+   * @throws Exception exception
+   */
+  @Test public void loadXQueryModule() throws Exception {
     final Function func = LOAD_XQUERY_MODULE;
     final String module = "src/test/resources/hello.xqm";
+
     query(_REPO_INSTALL.args(module));
 
     query(func.args("world", " { 'variables': { QName('world', 'ext'): 42 } }")
@@ -1815,6 +1824,83 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("x.xq", " { 'content': 'declare function local:f() {}; ()' }"),
         MODULE_FOUND_MAIN_X);
     error(func.args("world"), VAREMPTY_X);
+
+    // caching tests
+    // run simple HTTP server for module hosting
+    final HttpServer http = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+    try {
+      http.start();
+      final String url = "http://127.0.0.1:" + http.getAddress().getPort();
+
+      final Map<String, String> modules = Map.of(
+          "/m1.xqm",
+            "module namespace m='m1';\n" +
+            "declare function m:id() { 'RANDOM_UUID' };"
+                ,
+          "/m2.xqm",
+            "module namespace m='m2';\n" +
+            "declare function m:id() {\n" +
+            "  let $m := load-xquery-module('m1', {'location-hints': [ '" + url + "/m1.xqm' ]})\n" +
+            "  return $m?functions?(QName('m1', 'id'))?0()\n" +
+            "};"
+        );
+
+      http.createContext("/", exchange -> {
+        exchange.getResponseHeaders().add("Content-Type", "application/xquery");
+        exchange.getResponseHeaders().add("Cache-Control", "no-store, no-cache, must-revalidate");
+        final String path = exchange.getRequestURI().getPath();
+        final byte[] bytes = modules.get(path).replace("RANDOM_UUID",
+            UUID.randomUUID().toString()).getBytes(StandardCharsets.UTF_8);
+        exchange.sendResponseHeaders(200, bytes.length);
+        try(OutputStream os = exchange.getResponseBody()) {
+          os.write(bytes);
+        }
+      });
+
+      FnLoadXQueryModule.COMPILED_MODULES.set(0);
+      Consumer<Integer> checkCompiledModules = compiledModules -> {
+        assertEquals(compiledModules, FnLoadXQueryModule.COMPILED_MODULES.getAndSet(0),
+            "Unexpected number of compiled modules");
+      };
+
+      // load module m1 with differently ordered options
+      query("let $opts1 := {'xquery-version': 3.1, 'location-hints': [ '" + url + "/m1.xqm' ]}\n"
+          + "let $opts2 := {'location-hints': [ '" + url + "/m1.xqm' ], 'xquery-version': 3.1}\n"
+          + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
+          + "let $id2 := load-xquery-module('m1', $opts2)?functions?(QName('m1', 'id'))?0()\n"
+          + "return $id1 eq $id2", true);
+      checkCompiledModules.accept(1);
+
+      // load module m1 from different modules
+      query("let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
+          + "let $opts2 := {'location-hints': [ '" + url + "/m2.xqm' ]}\n"
+          + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
+          + "let $id2 := load-xquery-module('m2', $opts2)?functions?(QName('m2', 'id'))?0()\n"
+          + "return $id1 eq $id2", true);
+      checkCompiledModules.accept(2);
+
+      // load module m1 from different contexts
+      query("let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
+          + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
+          + "let $id2 := xquery:eval(\"\n"
+          + "  let $opts2 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
+          + "  return load-xquery-module('m1', $opts2)?functions?(QName('m1', 'id'))?0()\n"
+          + "\")\n"
+          + "return $id1 eq $id2", true);
+      checkCompiledModules.accept(1);
+
+      // load module m1 from different threads
+      query("declare function f() {"
+          + "  let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
+          + "  return load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
+          + "};\n"
+          + "let $ids := xquery:fork-join((1 to 8)!f#0)"
+          + "return (count($ids), count(distinct-values($ids)))", "8\n1");
+      checkCompiledModules.accept(8);
+
+    } finally {
+      http.stop(0);
+    }
   }
 
   /** Test method. */
