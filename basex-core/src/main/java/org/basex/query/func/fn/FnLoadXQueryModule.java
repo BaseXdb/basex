@@ -37,12 +37,6 @@ import org.basex.util.options.*;
 public final class FnLoadXQueryModule extends StandardFunc {
   /** The type of the value of the 'variables' and 'vendor-options' option. */
   private static final MapType QNAME_MAP_TYPE = MapType.get(AtomType.QNAME, Types.ITEM_ZM);
-  /** Per-query (top-level QueryContext) thread-local cache for compiled modules. */
-  private static final Map<QueryContext, ThreadLocal<Map<CacheKey, XQMap>>> MOD_CACHE =
-      Collections.synchronizedMap(new WeakHashMap<>());
-  /** Per-query (top-level QueryContext) cache for source content, shared by all threads. */
-  private static final Map<QueryContext, ConcurrentHashMap<String, String>> SRC_CACHE =
-      Collections.synchronizedMap(new WeakHashMap<>());
   /** Number of read modules (for statistics). */
   public static final AtomicInteger COMPILED_MODULES = new AtomicInteger();
 
@@ -56,16 +50,13 @@ public final class FnLoadXQueryModule extends StandardFunc {
     // check for cached result
     QueryContext cacheContext = qc;
     while(cacheContext.parent != null) cacheContext = cacheContext.parent;
-    final ThreadLocal<Map<CacheKey, XQMap>> tl = MOD_CACHE.computeIfAbsent(cacheContext,
-        q -> ThreadLocal.withInitial(HashMap::new));
-    final Map<CacheKey, XQMap> modCache = tl.get();
+    final Map<CacheKey, XQMap> modCache = cacheContext.threads.compiledModuleCache().get();
     final CacheKey cacheKey = new CacheKey(modUri, options);
     final XQMap cached = modCache.get(cacheKey);
     if(cached != null) return cached;
     COMPILED_MODULES.incrementAndGet();
 
-    final ConcurrentHashMap<String, String> srcCache =
-        SRC_CACHE.computeIfAbsent(cacheContext, q -> new ConcurrentHashMap<>());
+    final ConcurrentHashMap<String, String> srcCache = cacheContext.threads.sourceCache();
     final LoadXQueryModuleOptions opt = toOptions(options, new LoadXQueryModuleOptions(), qc);
     final List<IO> srcs = new ArrayList<>();
     final String cont = opt.get(CONTENT);
@@ -249,7 +240,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
   /**
    * Cache key for loaded modules.
    */
-  private static final class CacheKey {
+  public static final class CacheKey {
     /** Module URI from function argument. */
     private final byte[] modUri;
     /** Options map from function argument. */
@@ -262,7 +253,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
      * @param options options map
      * @throws QueryException query exception
      */
-    CacheKey(final byte[] modUri, final XQMap options) throws QueryException {
+    private CacheKey(final byte[] modUri, final XQMap options) throws QueryException {
       this.modUri = modUri;
       this.opts = options;
       this.hashCode = 31 * Arrays.hashCode(modUri) + mapHashCode(options.toJava());
