@@ -11,7 +11,6 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -176,7 +175,7 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(!StaticFunc.inline(cc, anns, expr) || expr.has(Flag.CTX)) return null;
+    if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
     cc.info(OPTINLINE_X, this);
 
     // create let bindings for all variables

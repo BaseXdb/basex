@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.util.*;
 import java.util.function.*;
 
-import org.basex.core.*;
 import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -296,7 +295,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(!inline(cc, anns, expr) || has(Flag.CTX) || dontEnter || selfRecursive()) return null;
+    if(!cc.inlineable(anns, expr) || has(Flag.CTX) || dontEnter || selfRecursive()) return null;
     cc.info(OPTINLINE_X, (Supplier<?>) () -> concat(name.prefixId(), '#', params.length));
 
     // create let bindings for all variables
@@ -310,27 +309,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     // create the return clause
     final Expr rtrn = expr.copy(cc, vm).optimize(cc);
     return clauses.isEmpty() ? rtrn : new GFLWOR(info, clauses, rtrn).optimize(cc);
-  }
-
-  /**
-   * Checks if inlining conditions are given.
-   * @param cc compilation context
-   * @param anns annotations (can be {@code null})
-   * @param expr expression
-   * @return result of check
-   */
-  public static boolean inline(final CompileContext cc, final AnnList anns, final Expr expr) {
-    final Ann inline = anns.get(Annotation._BASEX_INLINE);
-    final long limit;
-    if(inline != null) {
-      final Value value = inline.value();
-      limit = value.isEmpty() ? Long.MAX_VALUE : ((ANum) value.itemAt(0)).itr();
-    } else if(anns.contains(Annotation._BASEX_LOCK)) {
-      limit = 0;
-    } else {
-      limit = cc.qc.context.options.get(MainOptions.INLINELIMIT);
-    }
-    return expr.exprSize() < limit;
   }
 
   @Override

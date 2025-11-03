@@ -150,10 +150,12 @@ public abstract class AQuery extends Command {
       init(ctx);
       return qp.updating;
     } catch(final QueryException | JobException ex) {
+      Util.debug(ex);
       qp.close();
       exception = ex;
       return false;
     } catch(final RuntimeException ex) {
+      Util.debug(ex);
       qp.close();
       exception = ex;
       throw ex;

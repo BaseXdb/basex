@@ -261,7 +261,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(!StaticFunc.inline(cc, anns, expr) || expr.has(Flag.CTX)) return null;
+    if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
 
     cc.info(OPTINLINE_X, this);
 
