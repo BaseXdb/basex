@@ -1658,6 +1658,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("s : 'ab'**'cd', 'ef'++'gh'.") + "('abcdabefghef')",
         "<s>abcdabefghef</s>");
 
+    query(func.args(" <ixml><rule name='s'/></ixml>") + "('')", "<s/>");
+    error(func.args(" document { <ixml><rule name='s'/></ixml> }"), IXML_GRM_X_X_X);
+
     // invalid grammar
     error(func.args("?%$"), IXML_GRM_X_X_X);
     // parser generation failure
