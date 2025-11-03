@@ -123,24 +123,6 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
   }
 
   /**
-   * Checks if this function calls itself recursively.
-   * @return result of check
-   */
-  private boolean selfRecursive() {
-    return !expr.accept(new ASTVisitor() {
-      @Override
-      public boolean staticFuncCall(final StaticFuncCall call) {
-        return call.func != StaticFunc.this;
-      }
-
-      @Override
-      public boolean inlineFunc(final Scope scope) {
-        return scope.visit(this);
-      }
-    });
-  }
-
-  /**
    * Returns the minimum arity.
    * @return the minimum arity.
    */
@@ -293,9 +275,13 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
     return expr == null || expr.accept(visitor);
   }
 
+  /**
+   * Only called by {@link StaticFuncCall#compile(CompileContext)}.
+   * {@inheritDoc}
+   */
   @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
-    if(!cc.inlineable(anns, expr) || has(Flag.CTX) || dontEnter || selfRecursive()) return null;
+    if(!cc.inlineable(anns, expr) || has(Flag.CTX) || dontEnter) return null;
     cc.info(OPTINLINE_X, (Supplier<?>) () -> concat(name.prefixId(), '#', params.length));
 
     // create let bindings for all variables

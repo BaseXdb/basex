@@ -8,6 +8,7 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
+import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.parse.*;
@@ -76,11 +77,41 @@ public final class StaticFuncCall extends FuncCall {
     func.compile(cc);
 
     // try to inline the function
-    final Expr inlined = func.inline(exprs, cc);
-    if(inlined != null) return inlined;
+    if(!selfRecursive()) {
+      final Expr inlined = func.inline(exprs, cc);
+      if(inlined != null) return inlined;
+    }
 
     exprType.assign(func.seqType());
     return this;
+  }
+
+  /**
+   * Checks if the function is self-recursive.
+   * @return result of check
+   */
+  private boolean selfRecursive() {
+    final ASTVisitor visitor = new ASTVisitor() {
+      @Override
+      public boolean staticFuncCall(final StaticFuncCall call) {
+        return call.func != func;
+      }
+      @Override
+      public boolean inlineFunc(final Scope scope) {
+        return scope.visit(this);
+      }
+      @Override
+      public boolean funcItem(final FuncItem fi) {
+        for(final Expr expr : exprs) {
+          if(expr == fi) return false;
+        }
+        return fi != func.expr;
+      }
+    };
+    for(final Expr expr : exprs) {
+      if(!expr.accept(visitor)) return true;
+    }
+    return !func.expr.accept(visitor);
   }
 
   @Override

@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 
 import java.util.*;
 import java.util.Map.*;
+import java.util.function.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
@@ -47,6 +48,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   private final EnumMap<Flag, Boolean> map = new EnumMap<>(Flag.class);
   /** Compilation flag. */
   private boolean compiled;
+  /** Indicates if code is currently being compiled or evaluated. */
+  private boolean dontEnter;
 
   /** Local variables in the scope of this function. */
   private final VarScope vs;
@@ -384,17 +387,21 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    for(final Expr ex : global.values()) {
-      if(!ex.accept(visitor)) return false;
-    }
-    return visitor.inlineFunc(this);
+    return !dontEnter && (boolean) enter(() -> {
+      for(final Expr ex : global.values()) {
+        if(!ex.accept(visitor)) return false;
+      }
+      return visitor.inlineFunc(this);
+    });
   }
 
   @Override
   public int exprSize() {
-    int size = 1;
-    for(final Expr ex : global.values()) size += ex.exprSize();
-    return size + expr.exprSize();
+    return dontEnter ? 1 : (int) enter(() -> {
+      int size = 1;
+      for(final Expr ex : global.values()) size += ex.exprSize();
+      return size + expr.exprSize();
+    });
   }
 
   @Override
@@ -436,6 +443,20 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
   }
 
+  /**
+   * Runs code and avoids recursive executions of the same code.
+   * @param code code to be executed
+   * @return result
+   */
+  private Object enter(final Supplier<Object> code) {
+    dontEnter = true;
+    try {
+      return code.get();
+    } finally {
+      dontEnter = false;
+    }
+  }
+
   @Override
   public boolean equals(final Object obj) {
     return this == obj;
@@ -457,14 +478,21 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public void toString(final QueryString qs) {
-    final boolean inlined = !global.isEmpty();
-    if(inlined) {
-      qs.token("((: inline-closure :)");
-      global.forEach((k, v) -> qs.token(LET).token(k).token(":=").token(v));
-      qs.token(RETURN);
+    if(dontEnter) {
+      qs.token(DOTS);
+    } else {
+      enter(() -> {
+        final boolean inlined = !global.isEmpty();
+        if(inlined) {
+          qs.token("((: closure :) ");
+          global.forEach((k, v) -> qs.token(LET).token(k).token(":=").token(v));
+          qs.token(RETURN);
+        }
+        qs.token(FN).params(params);
+        qs.token(AS).token(declType != null ? declType : Types.ITEM_ZM).brace(expr);
+        if(inlined) qs.token(')');
+        return null;
+      });
     }
-    qs.token(FN).params(params);
-    qs.token(AS).token(declType != null ? declType : Types.ITEM_ZM).brace(expr);
-    if(inlined) qs.token(')');
   }
 }
