@@ -16,6 +16,7 @@ import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -90,6 +91,10 @@ public final class DynFuncCall extends FuncCall {
       if(ft.argTypes != null) {
         final int arity = ft.argTypes.length;
         if(nargs != arity) throw arityError(func, nargs, arity, false, info);
+        for(int a = 0; a < arity; ++a) {
+          final SeqType st = func instanceof XQMap ? Types.ANY_ATOMIC_TYPE_O : ft.argTypes[a];
+          exprs[a] = new TypeCheck(info, exprs[a], st).compile(cc);
+        }
       }
       if(!sc().mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
