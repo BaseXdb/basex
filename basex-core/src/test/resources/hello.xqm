@@ -22,9 +22,6 @@ declare %basex:lazy variable $hello:func := function() {
   xs:QName(string(<a>hello:foo</a>))
 };
 
-(:~ External function. :)
-declare function hello:ext() external;
-
 (:~ Function returning a QName. :)
 declare function hello:inlined() {
   xs:QName(string(<a>hello:foo</a>))

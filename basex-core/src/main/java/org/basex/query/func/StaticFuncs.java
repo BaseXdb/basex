@@ -257,7 +257,6 @@ public final class StaticFuncs extends ExprInfo {
                 throw INVISIBLEFUNC_X.get(call.info(), call.name);
               }
             }
-            if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
             if(func.updating) qc.updating();
           } else if(((JavaCall) call.external).updating) qc.updating();
         }
@@ -312,6 +311,7 @@ public final class StaticFuncs extends ExprInfo {
       final int arity = call.arity();
       for(final StaticFunc func : funcs) {
         if(arity >= func.min && arity <= func.arity()) {
+          if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
           call.setFunc(func);
           return true;
         }

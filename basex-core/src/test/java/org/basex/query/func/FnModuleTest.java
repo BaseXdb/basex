@@ -1810,6 +1810,8 @@ public final class FnModuleTest extends SandboxTest {
         + "                                { 'content': $module })\n"
         + "let $variables := $exec?variables\n"
         + "return $variables(QName('http://example.com/dyn', 'value'))", 4);
+    query(func.args("m", " {'content': 'module namespace m=\"m\"; declare function m:f() {42};'}")
+        + "?functions=>map:keys()", "#m:f");
 
     error(func.args(""), MODULE_URI_EMPTY);
     error(func.args("x"), MODULE_NOT_FOUND_X);
@@ -1818,6 +1820,8 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("x.xq", " { 'content': 'declare function local:f() {}; ()' }"),
         MODULE_FOUND_MAIN_X);
     error(func.args("world"), VAREMPTY_X);
+    error(func.args("world", " { 'location-hints': [\"src/test/resources/hello-ext.xqm\"] }"),
+        FUNCNOIMPL_X);
   }
 
   /** Test method. */
