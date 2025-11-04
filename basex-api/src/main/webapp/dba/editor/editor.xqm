@@ -58,14 +58,22 @@ function dba:editor(
       </td>
     </tr>,
     <tr>
-      <td width='50%'>
-        <textarea id='editor' autofocus='' spellcheck='false'/>
+      <td colspan='2' class='inner'>
+        <table width='100%'>
+          <tr>
+            <td id='left' class='resize'>
+              <textarea id='editor' autofocus='' spellcheck='false'/>
+              <div class='resizer'/>
+            </td>
+            <td>{
+              <textarea id='output' readonly='' spellcheck='false'/>,
+              html:js('loadCodeMirror("xquery", true, true);'),
+              html:js('initResizer();'),
+              $edited ! html:js('openFile("' || file:name(.) || '");')
+            }</td>
+          </tr>
+        </table>
       </td>
-      <td width='50%'>{
-        <textarea id='output' readonly='' spellcheck='false'/>,
-        html:js('loadCodeMirror("xquery", true, true);'),
-        $edited ! html:js('openFile("' || file:name(.) || '");')
-      }</td>
     </tr>
   ) => html:wrap({ 'header': $dba:CAT, 'info': $info, 'error': $error })
 };
