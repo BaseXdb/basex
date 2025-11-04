@@ -1313,7 +1313,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 12345.67", "#.##0,00", "de"), "12.345,67");
     query(func.args(" 12345.67", "#.##0,00", " { 'decimal-separator': ',', "
         + "'grouping-separator': '.' }"), "12.345,67");
-    query(func.args(" 12345.67", "#\u2019##0.00", "de-CH"), "12\u2019345.67");
+    query(func.args(" 12345.67", "#'##0.00", "de-CH"), "12'345.67");
     query(func.args(" 12345.67", "#.##0,00", " { "
         + "'decimal-separator': ',', 'grouping-separator': '.' }"), "12.345,67");
     query(func.args(" 12345.67", "#.##0,00", " { 'format-name': 'de' }"), "12.345,67");
