@@ -31,7 +31,7 @@ function dba:users(
   $info   as xs:string?
 ) as element(html) {
   <tr>
-    <td>
+    <td width='50%'>
       <form method='post' autocomplete='off'>
       <h2>Users</h2>
       {
@@ -61,7 +61,7 @@ function dba:users(
       <div>&#xa0;</div>
     </td>
     <td class='vertical'/>
-    <td>
+    <td width='50%'>
       <form method='post' autocomplete='off'>{
         <h2>User Information</h2>,
         html:button('users-info', 'Update'),

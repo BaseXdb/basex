@@ -45,7 +45,7 @@ function dba:user(
   let $admin := $name eq 'admin'
   return (
     <tr>
-      <td>
+      <td width='50%'>
         <form method='post' autocomplete='off'>
           <h2>{
             html:link('Users', $dba:CAT), ' » ',
@@ -103,7 +103,7 @@ function dba:user(
         </form>
       </td>
       <td class='vertical'/>
-      <td>{
+      <td width='50%'>{
         if (not($admin)) {
           <_>
             <h3>Local Permissions</h3>

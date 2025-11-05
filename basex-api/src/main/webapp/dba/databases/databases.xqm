@@ -58,7 +58,7 @@ function dba:databases(
   )
   return (
     <tr>
-      <td>
+      <td width='50%'>
         <form method='post' autocomplete='off'>
           <h2>Databases</h2>
           {
@@ -88,7 +88,7 @@ function dba:databases(
         </form>
       </td>
       <td class='vertical'/>
-      <td>
+      <td width='50%'>
         <h2>Upload Backups</h2>
         <form method='post' enctype='multipart/form-data' autocomplete='off'>{
           <input type='file' name='files' multiple='multiple'/>,

@@ -32,7 +32,7 @@ function dba:sessions(
   $info   as xs:string?
 ) as element(html) {
   <tr>
-    <td>
+    <td width='50%'>
       <form method='post' autocomplete='off'>
       <h2>Web Sessions</h2>
       {
@@ -72,7 +72,7 @@ function dba:sessions(
       </form>
     </td>
     <td class='vertical'/>
-    <td>
+    <td width='50%'>
       <h2>Database Sessions</h2>
       {
         let $headers := (
