@@ -408,4 +408,15 @@ public final class FuncItemTest extends SandboxTest {
       declare function h() { 1 };
       f()""", 1);
   }
+
+  /** Function call, wrong argument type. */
+  @Test public void gh2526() {
+    query("{1: 2}(<x>1</x>)", "");
+
+    error("""
+      declare %basex:inline(0) function local:self($f as fn(xs:string) as item()*) {
+        $f(1.1)
+      };
+      local:self(identity#1)""", INVCONVERT_X_X_X);
+  }
 }
