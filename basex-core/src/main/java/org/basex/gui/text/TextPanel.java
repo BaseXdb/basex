@@ -1057,12 +1057,14 @@ public class TextPanel extends BaseXPanel {
         if(name.startsWith(input) || name.replace(":", "").startsWith(input)) add.accept(pair);
       }
     }
-    // add matches that contain the input string
-    if(pairs.size() != ll + 1) {
-      pairs.add(null);
-      for(int l = 0; l < ll; l++) {
-        for(final Entry<String, String> pair : LISTS.get(l)) {
-          if(SmartStrings.charsOccurIn(pair.getKey(), input)) add.accept(pair);
+    // add matches that start with and contain the input string
+    for(final boolean strt : new boolean[] { true, false }) {
+      if(pairs.size() != ll + 1) {
+        pairs.add(null);
+        for(int l = 0; l < ll; l++) {
+          for(final Entry<String, String> pair : LISTS.get(l)) {
+            if(SmartStrings.containsChars(pair.getKey(), input, strt)) add.accept(pair);
+          }
         }
       }
     }

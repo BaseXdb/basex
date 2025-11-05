@@ -49,13 +49,15 @@ public final class SmartStrings {
    * Checks if all characters of the specified substring occur in a string in the given order.
    * @param string string
    * @param sub substring
+   * @param start string must start with first character
    * @return result of check
    */
-  public static boolean charsOccurIn(final String string, final String sub) {
+  public static boolean containsChars(final String string, final String sub, final boolean start) {
     final int sl = string.length(), tl = sub.length();
     int t = 0;
     for(int s = 0; s < sl && t < tl; s++) {
       if(equals(string.charAt(s), sub.charAt(t))) t++;
+      else if(start && t == 0) return false;
     }
     return t == tl;
   }

@@ -196,7 +196,7 @@ final class ProjectFiles {
     final String query = files.replace('\\', '/');
     final HashSet<String> exclude = new HashSet<>();
     for(final boolean onlyName : new boolean[] { true, false }) {
-      for(int mode = 0; mode < 5; mode++) {
+      for(int mode = 0; mode < 3; mode++) {
         for(final String path : cache) {
           // check if file has already been added, or if its contents have been scanned
           if(exclude.contains(path)) continue;
@@ -204,7 +204,7 @@ final class ProjectFiles {
           final String file = onlyName ? path.substring(path.lastIndexOf('/') + 1) : path;
           if(mode == 0 ? SmartStrings.startsWith(file, query) :
              mode == 1 ? SmartStrings.contains(file, query) :
-             SmartStrings.charsOccurIn(file, query)) {
+             SmartStrings.containsChars(file, query, false)) {
 
             // check file contents
             if(filterContent(path, search)) {
