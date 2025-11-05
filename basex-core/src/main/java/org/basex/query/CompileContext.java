@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
@@ -428,5 +429,25 @@ public final class CompileContext {
    */
   public boolean largeResult(final Expr expr) {
     return expr.size() > MAX_PREEVAL;
+  }
+
+  /**
+   * Checks if the conditions are given for inlining a function body.
+   * @param anns annotations (can be {@code null})
+   * @param expr expression (function body)
+   * @return result of check
+   */
+  public boolean inlineable(final AnnList anns, final Expr expr) {
+    final Ann inline = anns.get(Annotation._BASEX_INLINE);
+    final long limit;
+    if(inline != null) {
+      final Value value = inline.value();
+      limit = value.isEmpty() ? Long.MAX_VALUE : ((ANum) value.itemAt(0)).itr();
+    } else if(anns.contains(Annotation._BASEX_LOCK)) {
+      limit = 0;
+    } else {
+      limit = qc.context.options.get(MainOptions.INLINELIMIT);
+    }
+    return expr.exprSize() < limit;
   }
 }

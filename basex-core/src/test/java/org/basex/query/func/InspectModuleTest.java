@@ -122,6 +122,8 @@ public final class InspectModuleTest extends SandboxTest {
 
     error(func.args("non-existent"), RESWHICH_X);
     error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);
+    error(func.args("src/test/resources/hello-ext.xqm")
+        + "[function-name(.) = QName('world', 'ext')]()", FUNCNOIMPL_X);
   }
 
   /** Test method. */
@@ -153,13 +155,15 @@ public final class InspectModuleTest extends SandboxTest {
     query(query2 + "/annotation/@name/data()[ends-with(., 'ignored')]", "ignored");
     query(query2 + "/annotation/@uri/data()[. = 'ns']", "ns");
 
-    final String query3 = query(result + "/function[@name = 'hello:ext']");
-    query(query3 + "/@external/data()", true);
+    final String query3 = query(func.args("src/test/resources/hello-ext.xqm"));
+    query(query3 + "/function[@name = 'hello:ext']/@external/data()", true);
 
     final String query4 = query(result + "/option[@name = 'name']");
     query(query4 + "/@uri ! data()", "uri");
     query(query4 + "/literal/@type ! data()", "xs:string");
     query(query4 + "/literal ! data()", "ignored");
+
+    query(func.args("src/test/resources/hello-ext.xqm") + "//function/@name/string()", "hello:ext");
 
     error(func.args("non-existent"), RESWHICH_X);
     error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);
@@ -238,6 +242,8 @@ public final class InspectModuleTest extends SandboxTest {
     final String result = query(func.args("src/test/resources/hello.xqm")).
         replace("{", "{{").replace("}", "}}");
     query(_VALIDATE_XSD.args(' ' + result, "src/test/resources/xqdoc.xsd"));
+    query(func.args("src/test/resources/hello-ext.xqm") + "//*:function/*:name/string()",
+        "hello:ext");
 
     error(func.args("non-existent"), RESWHICH_X);
     error(func.args("src/test/resources/error.xqm"), INSPECT_PARSE_X);

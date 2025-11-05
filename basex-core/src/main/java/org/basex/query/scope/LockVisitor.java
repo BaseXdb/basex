@@ -69,7 +69,7 @@ public final class LockVisitor extends ASTVisitor {
   @Override
   public boolean staticFuncCall(final StaticFuncCall call) {
     final StaticFunc func = call.func();
-    return cached(func) || focusAndVisit(func);
+    return func == null || cached(func) || focusAndVisit(func);
   }
 
   @Override
@@ -88,7 +88,7 @@ public final class LockVisitor extends ASTVisitor {
    * @return if scope has already been cached
    */
   private boolean cached(final Scope scope) {
-    if(scope == null || scopes.containsKey(scope)) return true;
+    if(scopes.containsKey(scope)) return true;
     scopes.put(scope, null);
     return false;
   }

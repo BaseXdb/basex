@@ -3425,7 +3425,7 @@
   }
 
   // Compute the lines that are visible in a given viewport (defaults
-  // the the current scroll position). viewport may contain top,
+  // the current scroll position). viewport may contain top,
   // height, and ensure (see op.scrollToPos) properties.
   function visibleLines(display, doc, viewport) {
     var top = viewport && viewport.top != null ? Math.max(0, viewport.top) : display.scroller.scrollTop;
@@ -4426,7 +4426,7 @@
     // The element in which the editor lives.
     d.wrapper = elt("div", [d.scrollbarFiller, d.gutterFiller, d.scroller], "CodeMirror");
     // See #6982. FIXME remove when this has been fixed for a while in Chrome
-    if (chrome && chrome_version >= 105) { d.wrapper.style.clipPath = "inset(0px)"; }
+    if (chrome && chrome_version === 105) { d.wrapper.style.clipPath = "inset(0px)"; }
 
     // This attribute is respected by automatic translation systems such as Google Translate,
     // and may also be respected by tools used by human translators.
@@ -9877,7 +9877,7 @@
 
   addLegacyProps(CodeMirror);
 
-  CodeMirror.version = "5.65.17";
+  CodeMirror.version = "5.65.20";
 
   return CodeMirror;
 

@@ -103,7 +103,7 @@ declare function html:wrap(
           </td>
         </tr>
       </table>
-      <table width='100%'>{ $rows }</table>
+      <table width='100%' class='inner'>{ $rows }</table>
       <hr/>
       <div id='footer' class='right'><sup>BaseX Team, BSD License</sup></div>
       <div class='small'/>

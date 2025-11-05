@@ -1318,7 +1318,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 12345.67", "#.##0,00", "de"), "12.345,67");
     query(func.args(" 12345.67", "#.##0,00", " { 'decimal-separator': ',', "
         + "'grouping-separator': '.' }"), "12.345,67");
-    query(func.args(" 12345.67", "#\u2019##0.00", "de-CH"), "12\u2019345.67");
+    query(func.args(" 12345.67", "#'##0.00", "de-CH"), "12'345.67");
     query(func.args(" 12345.67", "#.##0,00", " { "
         + "'decimal-separator': ',', 'grouping-separator': '.' }"), "12.345,67");
     query(func.args(" 12345.67", "#.##0,00", " { 'format-name': 'de' }"), "12.345,67");
@@ -1663,6 +1663,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("s : 'ab'**'cd', 'ef'++'gh'.") + "('abcdabefghef')",
         "<s>abcdabefghef</s>");
 
+    query(func.args(" <ixml><rule name='s'/></ixml>") + "('')", "<s/>");
+    error(func.args(" document { <ixml><rule name='s'/></ixml> }"), IXML_GRM_X_X_X);
+
     // invalid grammar
     error(func.args("?%$"), IXML_GRM_X_X_X);
     // parser generation failure
@@ -1816,6 +1819,8 @@ public final class FnModuleTest extends SandboxTest {
         + "                                { 'content': $module })\n"
         + "let $variables := $exec?variables\n"
         + "return $variables(QName('http://example.com/dyn', 'value'))", 4);
+    query(func.args("m", " {'content': 'module namespace m=\"m\"; declare function m:f() {42};'}")
+        + "?functions=>map:keys()", "#m:f");
 
     error(func.args(""), MODULE_URI_EMPTY);
     error(func.args("x"), MODULE_NOT_FOUND_X);
@@ -1824,6 +1829,8 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("x.xq", " { 'content': 'declare function local:f() {}; ()' }"),
         MODULE_FOUND_MAIN_X);
     error(func.args("world"), VAREMPTY_X);
+    error(func.args("world", " { 'location-hints': [\"src/test/resources/hello-ext.xqm\"] }"),
+        FUNCNOIMPL_X);
 
     // caching tests
     // run simple HTTP server for module hosting

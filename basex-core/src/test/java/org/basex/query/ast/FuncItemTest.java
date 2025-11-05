@@ -142,7 +142,7 @@ public final class FuncItemTest extends SandboxTest {
         "let $id := local:foo(function($g) { $g })" +
         "return $id(42)",
         42,
-        "/*/" + Util.className(Itr.class) + " = '42'"
+        "//*/" + Util.className(Itr.class) + " = '42'"
     );
   }
 
@@ -381,5 +381,42 @@ public final class FuncItemTest extends SandboxTest {
         + "declare function local:f() { $b };"
         + "local:f() => function-name()",
         "#local:f");
+  }
+
+  /** Circular default parameters: stack overflow. */
+  @Test public void gh2525() {
+    query("declare record local:rec(i, inc := fn { local:rec(?i + 1) }); local:rec(2)?i", 2);
+    query("""
+      declare record local:rec(i as xs:integer, inc as fn(local:rec) as local:rec := function ($r) {
+        local:rec($r?i + 1)
+      });
+      local:rec(2)?i""", 2);
+
+    query("declare function local:f($x := local:f#0) { $x }; local:f()", "local:f#0");
+    query("declare function f($a := fn() { f() } ) {}; f()", "");
+    query("""
+      declare function f($a := fn() { g() } ) {};
+      declare function g($a := fn() { f() } ) {};
+      f()""", "");
+    query("""
+      declare function f($a := fn() { g() } ) {};
+      declare function g($a := fn() { f() } ) { f() };
+      f(), g()""", "");
+    query("""
+      declare function f($a := fn() { g() } ) { $a() };
+      declare function g($a := fn() { h() } ) { $a() };
+      declare function h() { 1 };
+      f()""", 1);
+  }
+
+  /** Function call, wrong argument type. */
+  @Test public void gh2526() {
+    query("{1: 2}(<x>1</x>)", "");
+
+    error("""
+      declare %basex:inline(0) function local:self($f as fn(xs:string) as item()*) {
+        $f(1.1)
+      };
+      local:self(identity#1)""", INVCONVERT_X_X_X);
   }
 }

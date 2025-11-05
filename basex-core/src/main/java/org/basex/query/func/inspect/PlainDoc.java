@@ -60,7 +60,11 @@ final class PlainDoc extends Inspect {
     final TokenObjectMap<TokenList> doc = module.doc();
     if(doc != null) comment(doc, root);
     for(final StaticVar sv : module.vars) root.add(variable(sv));
-    for(final StaticFunc sf : module.funcs) root.add(function(sf.name, sf, sf.funcType(), sf.anns));
+    for(final StaticFunc sf : module.funcs) {
+      if(!NSGlobal.reserved(sf.name.uri())) {
+        root.add(function(sf.name, sf, sf.funcType(), sf.anns));
+      }
+    }
     options(module.options, root, true);
     return root.finish();
   }
