@@ -1,3 +1,8 @@
+/** Link to the resizer area. */
+var _resizer;
+/** Link to the left editor component. */
+var _left;
+
 /**
  * Opens a file.
  * @param {string} file optional file name
@@ -103,4 +108,39 @@ function fileExists(name) {
 function fileName() {
   const file = document.getElementById("file")
   if(file) return file.value.trim();
+}
+
+/**
+ * Initializes the panel resizer.
+ */
+function initResizer() {
+  _left = document.getElementById("left");
+  _resizer = document.querySelector(".resizer");
+
+  _left.style.width = localStorage.getItem("leftWidth") || "50%";
+  _resizer.addEventListener("pointerdown", e => {
+    document.addEventListener("pointermove", resize);
+    document.addEventListener("pointerup", stopResize);
+    _resizer.setPointerCapture(e.pointerId);
+  });
+}
+
+/**
+ * Resizes the left panel.
+ * @param {e} event
+ */
+function resize(e) {
+  const w = (-28 + e.clientX) / _left.parentElement.clientWidth;
+  _left.style.width = (Math.min(0.9, Math.max(.05, w)) * 100) + "%";
+}
+
+/**
+ * Stops resizing.
+ * @param {e} event
+ */
+function stopResize(e) {
+  document.removeEventListener("pointermove", resize);
+  document.removeEventListener("pointerup", stopResize);
+  _resizer.releasePointerCapture(e.pointerId);
+  localStorage.setItem("leftWidth", _left.style.width);
 }

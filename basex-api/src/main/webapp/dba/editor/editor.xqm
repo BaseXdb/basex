@@ -58,12 +58,14 @@ function dba:editor(
       </td>
     </tr>,
     <tr>
-      <td width='50%'>
+      <td id='left' class='resize'>
         <textarea id='editor' autofocus='' spellcheck='false'/>
+        <div class='resizer'/>
       </td>
-      <td width='50%'>{
+      <td>{
         <textarea id='output' readonly='' spellcheck='false'/>,
         html:js('loadCodeMirror("xquery", true, true);'),
+        html:js('initResizer();'),
         $edited ! html:js('openFile("' || file:name(.) || '");')
       }</td>
     </tr>
