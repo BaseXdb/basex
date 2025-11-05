@@ -105,7 +105,7 @@ public final class FuncItem extends FItem implements Scope {
     final QNm qnm = funcName();
     final TokenBuilder tb = new TokenBuilder();
     tb.add(qnm != null ? qnm.prefixId() : "fn").add('#').addInt(arity());
-    if(focus != null) tb.add('-').addInt(hashCode());
+    if(focus != null || qnm == null) tb.add('-').addInt(hashCode());
     return tb.toString();
   }
 

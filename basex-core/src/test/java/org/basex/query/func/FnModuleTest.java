@@ -1338,6 +1338,16 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void functionIdentity() {
+    final Function func = FUNCTION_IDENTITY;
+
+    query(func.args(" true#0"), "fn:true#0");
+    query(func.args(" <a/>/name#0") + " => contains('fn:name#0-')", true);
+    query(func.args(" fn() {}") + " => contains('fn#0-')", true);
+    query(func.args(" fn() { 1 }") + " ne " + func.args(" fn() { 2 }"), true);
+  }
+
+  /** Test method. */
   @Test public void functionLookup() {
     final Function func = FUNCTION_LOOKUP;
 
