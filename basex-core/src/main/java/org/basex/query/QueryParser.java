@@ -2580,7 +2580,8 @@ public class QueryParser extends InputParser {
     final VarRef arg = new VarRef(info, fr.var);
     final FuncBuilder fb = argumentList(false, arg);
     if(fb.placeholders != 0) throw error(INVPLACEHOLDER_X, key);
-    final Lookup func = new Lookup(info, arg, key);
+    final Lookup val = new Lookup(info, arg, key);
+    final TypeCheck func = new TypeCheck(info, val, Types.FUNCTION_O);
     final Expr call = Functions.dynamic(func, fb);
     final GFLWOR gflwor = new GFLWOR(info, fr, call);
     localVars.closeScope(s);

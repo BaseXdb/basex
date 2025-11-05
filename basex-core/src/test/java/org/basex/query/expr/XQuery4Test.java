@@ -65,13 +65,14 @@ public final class XQuery4Test extends SandboxTest {
     query("declare record local:rect(height, width, area := fn { ?height × ?width }); "
         + "let $r := local:rect(3, 4) return local:rect(5, 6, $r?area)=?>area()", 30);
     query("{ 'self': fn { . } }=?>self() => map:keys()", "self");
-    query("let $f := fn {trace(., \"context\")?i}\n"
+    query("let $f := fn {?i}\n"
         + "let $g := ({ 'i': 7, 'f': $f }, { 'i': 11, 'g': $f })\n"
         + "let $h := $g?('f', 'g')\n"
         + "return $h[1]($g[1]) * $h[2]($g[2])", 77);
 
     error("(" + rect + "=> map:get('area'))()", INVARITY_X_X);
     error(rect + "('area')()", INVARITY_X_X);
+    error("{} =?> x()", INVCONVERT_X_X_X);
   }
 
   /** Otherwise expression. */
