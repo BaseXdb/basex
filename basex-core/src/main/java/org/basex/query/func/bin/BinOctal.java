@@ -1,14 +1,10 @@
 package org.basex.query.func.bin;
 
-import static org.basex.query.QueryError.*;
-
-import java.math.*;
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -17,6 +13,20 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class BinOctal extends BinFn {
+  /** Octal/binary map. */
+  private static final IntObjectMap<String> MAP = new IntObjectMap<>(8);
+
+  static {
+    MAP.put('0', "000");
+    MAP.put('1', "001");
+    MAP.put('2', "010");
+    MAP.put('3', "011");
+    MAP.put('4', "100");
+    MAP.put('5', "101");
+    MAP.put('6', "110");
+    MAP.put('7', "111");
+  }
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] string = toDigits(qc);
@@ -24,20 +34,13 @@ public final class BinOctal extends BinFn {
     final int tl = string.length;
     if(tl == 0) return B64.EMPTY;
 
-    try {
-      byte[] bin = Token.token(new BigInteger(Token.string(string), 8).toString(2));
-      final int expl = tl * 3, binl = bin.length;
-      if(binl != expl) {
-        // add leading zeroes
-        final byte[] tmp = new byte[expl];
-        Arrays.fill(tmp, 0, expl - binl, (byte) '0');
-        Array.copyFromStart(bin, binl, tmp, expl - binl);
-        bin = tmp;
-      }
-      return B64.get(binary2bytes(bin));
-    } catch(final NumberFormatException ex) {
-      Util.debug(ex);
-      throw BIN_NNC.get(info);
+    final TokenBuilder tb = new TokenBuilder(tl * 3);
+    for(final byte b : string) {
+      final String bits = MAP.get(b);
+      if(bits != null) tb.add(bits);
+      else tb.addByte(b);
     }
+    if(tb.get(0) == '0' && tb.get(1) == '0') tb.delete(0, 2);
+    return B64.get(binary2bytes(tb.finish()));
   }
 }

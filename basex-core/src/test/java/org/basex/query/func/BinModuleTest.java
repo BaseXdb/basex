@@ -240,14 +240,17 @@ public final class BinModuleTest extends SandboxTest {
     hexQuery(func.args("00"),       "00");
     hexQuery(func.args("00 "),      "00");
     hexQuery(func.args("0_0"),      "00");
-    hexQuery(func.args("000"),      "0000");
-    hexQuery(func.args("007"),      "0007");
+    hexQuery(func.args("000"),      "00");
+    hexQuery(func.args("007"),      "07");
     hexQuery(func.args("1"),        "01");
     hexQuery(func.args("10"),       "08");
     hexQuery(func.args("77"),       "3F");
     hexQuery(func.args("11223047"), "252627");
     // errors
     error(func.args("X"), BIN_NNC);
+    error(func.args("8"), BIN_NNC);
+    error(func.args("80"), BIN_NNC);
+    error(func.args("08"), BIN_NNC);
   }
 
   /** Test method. */
