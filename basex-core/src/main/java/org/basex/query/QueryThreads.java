@@ -1,12 +1,10 @@
 package org.basex.query;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
 
@@ -27,10 +25,7 @@ public final class QueryThreads {
   private final IdentityHashMap<FTWords, ThreadLocal<FTTokenizer>> ftCache =
       new IdentityHashMap<>();
   /** Per-thread cache for modules compiled by fn:load-xquery-module). */
-  private final ThreadLocal<Map<FnLoadXQueryModule.CacheKey, XQMap>> compiledModuleCache =
-      ThreadLocal.withInitial(HashMap::new);
-  /** Cache for source snapshots. */
-  private final ConcurrentHashMap<String, String> sourceCache = new ConcurrentHashMap<>();
+  private final ThreadLocal<Map<String, XQMap>> moduleCache = ThreadLocal.withInitial(HashMap::new);
 
   /**
    * Returns local thread for the given expression.
@@ -64,16 +59,8 @@ public final class QueryThreads {
    * Returns the per-thread compiled-result cache.
    * @return compiled module cache
    */
-  public ThreadLocal<Map<FnLoadXQueryModule.CacheKey, XQMap>> compiledModuleCache() {
-    return compiledModuleCache;
-  }
-
-  /**
-   * Returns the source snapshot cache.
-   * @return source cache
-   */
-  public ConcurrentHashMap<String, String> sourceCache() {
-    return sourceCache;
+  public ThreadLocal<Map<String, XQMap>> moduleCache() {
+    return moduleCache;
   }
 
   /**
@@ -83,7 +70,6 @@ public final class QueryThreads {
     for(final ThreadLocal<PathCache> cache : pathCache.values()) cache.remove();
     for(final ThreadLocal<CmpCache> cache : cmpCache.values()) cache.remove();
     for(final ThreadLocal<FTTokenizer> cache : ftCache.values()) cache.remove();
-    compiledModuleCache.remove();
-    sourceCache.clear();
+    moduleCache.remove();
   }
 }

@@ -18,7 +18,6 @@ import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -1864,28 +1863,18 @@ public final class FnModuleTest extends SandboxTest {
         }
       });
 
-      FnLoadXQueryModule.COMPILED_MODULES.set(0);
-      Consumer<Integer> checkCompiledModules = compiledModules -> {
-        assertEquals(compiledModules, FnLoadXQueryModule.COMPILED_MODULES.getAndSet(0),
-            "Unexpected number of compiled modules");
-      };
-
       // load module m1 with differently ordered options
       query("let $opts1 := {'xquery-version': 3.1, 'location-hints': [ '" + url + "/m1.xqm' ]}\n"
           + "let $opts2 := {'location-hints': [ '" + url + "/m1.xqm' ], 'xquery-version': 3.1}\n"
           + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
           + "let $id2 := load-xquery-module('m1', $opts2)?functions?(QName('m1', 'id'))?0()\n"
           + "return $id1 eq $id2", true);
-      checkCompiledModules.accept(1);
-
       // load module m1 from different modules
       query("let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
           + "let $opts2 := {'location-hints': [ '" + url + "/m2.xqm' ]}\n"
           + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
           + "let $id2 := load-xquery-module('m2', $opts2)?functions?(QName('m2', 'id'))?0()\n"
           + "return $id1 eq $id2", true);
-      checkCompiledModules.accept(2);
-
       // load module m1 from different contexts
       query("let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
           + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
@@ -1894,8 +1883,6 @@ public final class FnModuleTest extends SandboxTest {
           + "  return load-xquery-module('m1', $opts2)?functions?(QName('m1', 'id'))?0()\n"
           + "\")\n"
           + "return $id1 eq $id2", true);
-      checkCompiledModules.accept(1);
-
       // load module m1 from different threads (expects execution in 3 different threads)
       query("declare function f() {"
           + "  let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
@@ -1903,7 +1890,6 @@ public final class FnModuleTest extends SandboxTest {
           + "};\n"
           + "let $ids := xquery:fork-join((1 to 3)!f#0)"
           + "return (count($ids), count(distinct-values($ids)))", "3\n1");
-      checkCompiledModules.accept(3);
 
     } finally {
       http.stop(0);
