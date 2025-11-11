@@ -1857,7 +1857,15 @@ public final class FnModuleTest extends SandboxTest {
         "declare function m:id() {\n" +
         "  let $m := load-xquery-module('m1', { 'location-hints': [ '" + url + "/m1.xqm' ] })\n" +
         "  return $m?functions?(QName('m1', 'id'))?0()\n" +
-        "};"
+        "};",
+      "/m3.xqm",
+        "module namespace m = 'm';\n" +
+        "declare context item as xs:long external;\n" +
+        "declare variable $m:m3 := .;",
+      "/m4.xqm",
+        "module namespace m = 'm';\n" +
+        "declare context item as xs:short external;\n" +
+        "declare variable $m:m4 := .;"
     );
     try(ServerSocket ss = new ServerSocket(port)) {
       new Thread(() -> {
@@ -1927,6 +1935,20 @@ public final class FnModuleTest extends SandboxTest {
           + "};\n"
           + "let $ids := xquery:fork-join((1 to 3)!f#0)"
           + "return (count($ids), count(distinct-values($ids)))", "3\n1");
+
+      // load module m from different sources
+      query("let $opts := {"
+          + "  'location-hints': ('" + url + "/m3.xqm', '" + url + "/m4.xqm'), "
+          + "  'context-item': xs:byte(1)"
+          + "}\n"
+          + "let $vars := load-xquery-module('m', $opts)?variables\n"
+          + "return $vars?(#Q{m}m3) + $vars?(#Q{m}m4)", 2);
+      error("let $opts := {"
+          + "  'location-hints': ('" + url + "/m3.xqm', '" + url + "/m4.xqm'), "
+          + "  'context-item': xs:int(1)"
+          + "}\n"
+          + "return load-xquery-module('m', $opts)",
+          MODULE_CONTEXT_TYPE_X_X);
     }
   }
 
