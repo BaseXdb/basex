@@ -214,6 +214,8 @@ public final class FuncItem extends FItem implements Scope {
       int a = arity();
       if(a == func.arity()) {
         while(--a >= 0 && params[a].seqType().eq(func.params[a].seqType()));
+        System.out.println(expr);
+        System.out.println(func.expr);
         return a == -1 && expr.equals(func.expr);
       }
     }

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.net.*;
-import java.nio.charset.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -22,8 +21,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.Test;
-
-import com.sun.net.httpserver.*;
 
 /**
  * This class tests standard functions.
@@ -1812,14 +1809,14 @@ public final class FnModuleTest extends SandboxTest {
         + "?variables(QName('world', 'ext'))", 42);
     query("let $expr := '2 + 2'\n"
         + "let $module := `xquery version '4.0'; \n"
-        + "                module namespace dyn='http://example.com/dyn';\n"
-        + "                declare %public variable $dyn:value := { $expr };`\n"
-        + "let $exec := load-xquery-module('http://example.com/dyn', \n"
-        + "                                { 'content': $module })\n"
-        + "let $variables := $exec?variables\n"
+        + "  module namespace dyn='http://example.com/dyn';\n"
+        + "  declare %public variable $dyn:value := { $expr };`\n"
+        + "let $module := load-xquery-module('http://example.com/dyn', { 'content': $module })\n"
+        + "let $variables := $module?variables\n"
         + "return $variables(QName('http://example.com/dyn', 'value'))", 4);
-    query(func.args("m", " {'content': 'module namespace m=\"m\"; declare function m:f() {42};'}")
-        + "?functions=>map:keys()", "#m:f");
+    query(func.args("m", " { 'content': 'module namespace m=\"m\"; "
+        + "declare function m:f() { 42 };' }")
+        + "?functions => map:keys()", "#m:f");
 
     error(func.args(""), MODULE_URI_EMPTY);
     error(func.args("x"), MODULE_NOT_FOUND_X);
@@ -1831,68 +1828,90 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("world", " { 'location-hints': [\"src/test/resources/hello-ext.xqm\"] }"),
         FUNCNOIMPL_X);
 
-    // caching tests
+    // advanced and caching tests
     // run simple HTTP server for module hosting
-    final HttpServer http = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-    try {
-      http.start();
-      final String url = "http://127.0.0.1:" + http.getAddress().getPort();
-
-      final Map<String, String> modules = Map.of(
-          "/m1.xqm",
-            "module namespace m='m1';\n" +
-            "declare function m:id() { 'RANDOM_UUID' };"
-                ,
-          "/m2.xqm",
-            "module namespace m='m2';\n" +
-            "declare function m:id() {\n" +
-            "  let $m := load-xquery-module('m1', {'location-hints': [ '" + url + "/m1.xqm' ]})\n" +
-            "  return $m?functions?(QName('m1', 'id'))?0()\n" +
-            "};"
-        );
-
-      http.createContext("/", exchange -> {
-        exchange.getResponseHeaders().add("Content-Type", "application/xquery");
-        exchange.getResponseHeaders().add("Cache-Control", "no-store, no-cache, must-revalidate");
-        final String path = exchange.getRequestURI().getPath();
-        final byte[] bytes = modules.get(path).replace("RANDOM_UUID",
-            UUID.randomUUID().toString()).getBytes(StandardCharsets.UTF_8);
-        exchange.sendResponseHeaders(200, bytes.length);
-        try(OutputStream os = exchange.getResponseBody()) {
-          os.write(bytes);
+    final int port = 62626;
+    final String url = "http://localhost:" + port;
+    final Map<String, String> modules = Map.of(
+      "/m1.xqm",
+        "module namespace m = 'm1';\n" +
+        "declare variable $m:node := <x/>;\n" +
+        "declare function m:id() { 'RANDOM_UUID' };",
+      "/m2.xqm",
+        "module namespace m = 'm2';\n" +
+        "declare function m:id() {\n" +
+        "  let $m := load-xquery-module('m1', { 'location-hints': [ '" + url + "/m1.xqm' ] })\n" +
+        "  return $m?functions?(QName('m1', 'id'))?0()\n" +
+        "};"
+    );
+    try(ServerSocket ss = new ServerSocket(port)) {
+      new Thread(() -> {
+        try {
+          while(true) {
+            try(Socket s = ss.accept()) {
+              final BufferedReader br = new BufferedReader(
+                  new InputStreamReader(s.getInputStream()));
+              final String uri = br.readLine().replaceAll("GET | .*", "");
+              final OutputStream os = s.getOutputStream();
+              os.write(Token.token("HTTP/1.1 200 OK\r\n\r\n"));
+              os.write(Token.token(modules.get(uri)));
+              os.flush();
+            }
+          }
+        } catch(final Exception ex) {
+          // raised when the server is stopped
+          Util.errln(ex);
         }
-      });
+      }).start();
+      Performance.sleep(100);
 
-      // load module m1 with differently ordered options
-      query("let $opts1 := {'xquery-version': 3.1, 'location-hints': [ '" + url + "/m1.xqm' ]}\n"
-          + "let $opts2 := {'location-hints': [ '" + url + "/m1.xqm' ], 'xquery-version': 3.1}\n"
+      // load module m1 with same options
+      query("let $opts1 := { 'location-hints': '" + url + "/m1.xqm' }\n"
+          + "let $opts2 := { 'location-hints': '" + url + "/m1.xqm' }\n"
           + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
           + "let $id2 := load-xquery-module('m1', $opts2)?functions?(QName('m1', 'id'))?0()\n"
           + "return $id1 eq $id2", true);
+      query("let $opts1 := { 'location-hints': '" + url + "/m1.xqm' }\n"
+          + "let $opts2 := { 'location-hints': '" + url + "/m1.xqm' }\n"
+          + "let $node1 := load-xquery-module('m1', $opts1)?variables?(#Q{m1}node)\n"
+          + "let $node2 := load-xquery-module('m1', $opts2)?variables?(#Q{m1}node)\n"
+          + "return $node1 is $node2", true);
+
+      // load module m1 with differently ordered options
+      query("let $opts1 := { 'xquery-version': 3.1, 'location-hints': '" + url + "/m1.xqm' }\n"
+          + "let $opts2 := { 'location-hints': '" + url + "/m1.xqm', 'xquery-version': 3.1 }\n"
+          + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
+          + "let $id2 := load-xquery-module('m1', $opts2)?functions?(QName('m1', 'id'))?0()\n"
+          + "return $id1 eq $id2", true);
+      query("let $opts1 := { 'xquery-version': 3.1, 'location-hints': '" + url + "/m1.xqm' }\n"
+          + "let $opts2 := { 'location-hints': '" + url + "/m1.xqm', 'xquery-version': 3.1 }\n"
+          + "let $node1 := load-xquery-module('m1', $opts1)?variables?(#Q{m1}node)\n"
+          + "let $node2 := load-xquery-module('m1', $opts2)?variables?(#Q{m1}node)\n"
+          + "return $node1 is $node2", false);
+
       // load module m1 from different modules
-      query("let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
-          + "let $opts2 := {'location-hints': [ '" + url + "/m2.xqm' ]}\n"
+      query("let $opts1 := { 'location-hints': '" + url + "/m1.xqm' }\n"
+          + "let $opts2 := { 'location-hints': '" + url + "/m2.xqm' }\n"
           + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
           + "let $id2 := load-xquery-module('m2', $opts2)?functions?(QName('m2', 'id'))?0()\n"
           + "return $id1 eq $id2", true);
+
       // load module m1 from different contexts
-      query("let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
+      query("let $opts1 := { 'location-hints': '" + url + "/m1.xqm' }\n"
           + "let $id1 := load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
           + "let $id2 := xquery:eval(\"\n"
-          + "  let $opts2 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
+          + "  let $opts2 := { 'location-hints': '" + url + "/m1.xqm' }\n"
           + "  return load-xquery-module('m1', $opts2)?functions?(QName('m1', 'id'))?0()\n"
           + "\")\n"
           + "return $id1 eq $id2", true);
+
       // load module m1 from different threads (expects execution in 3 different threads)
       query("declare function f() {"
-          + "  let $opts1 := {'location-hints': [ '" + url + "/m1.xqm' ]}\n"
+          + "  let $opts1 := { 'location-hints': '" + url + "/m1.xqm' }\n"
           + "  return load-xquery-module('m1', $opts1)?functions?(QName('m1', 'id'))?0()\n"
           + "};\n"
           + "let $ids := xquery:fork-join((1 to 3)!f#0)"
           + "return (count($ids), count(distinct-values($ids)))", "3\n1");
-
-    } finally {
-      http.stop(0);
     }
   }
 

@@ -23,6 +23,7 @@ import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 import org.basex.util.options.*;
 
 /**
@@ -39,35 +40,39 @@ public final class FnLoadXQueryModule extends StandardFunc {
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] modUri = toToken(arg(0).atomItem(qc, info));
     if(modUri.length == 0) throw MODULE_URI_EMPTY.get(info);
-    final Item options = arg(1).item(qc, info);
+
+    final Item arg1 = arg(1).item(qc, ii);
+    final XQMap options = arg1.isEmpty() ? XQMap.empty() : toMap(arg1, qc);
     final LoadXQueryModuleOptions opt = toOptions(options, new LoadXQueryModuleOptions(), qc);
+    final String[] hints = opt.get(LOCATION_HINTS);
 
     // check for cached result
-    QueryContext qcAnc = qc;
-    while(qcAnc.parent != null) qcAnc = qcAnc.parent;
-    final Map<String, XQMap> modCache = qcAnc.threads.moduleCache().get();
-    final String cacheKey = new TokenBuilder(modUri).add('#').add(options.hashCode()).toString();
-    final XQMap cached = modCache.get(cacheKey);
-    if(cached != null) return cached;
+    Map<String, XQMap> modCache = null;
+    String cacheKey = null;
+    if(hints.length == 1 && options.structSize() == 1) {
+      QueryContext qcAnc = qc;
+      while(qcAnc.parent != null) qcAnc = qcAnc.parent;
+      modCache = qcAnc.threads.moduleCache().get();
+      cacheKey = new TokenBuilder(modUri).add('#').add(hints[0]).toString();
+      if(modCache.containsKey(cacheKey)) return modCache.get(cacheKey);
+    }
 
     final List<IO> srcs = new ArrayList<>();
     final String cont = opt.get(CONTENT);
     if(cont != null) {
       srcs.add(new IOContent(cont));
     } else {
-      final String[] locs;
-      if(opt.contains(LOCATION_HINTS)) {
-        locs = opt.get(LOCATION_HINTS);
-      } else {
+      final StringList locs = new StringList().add(hints);
+      if(locs.isEmpty()) {
         final byte[] loc = qc.modDeclared.get(modUri);
         if(loc != null) {
-          locs = new String[] { Token.string(loc) };
+          locs.add(Token.string(loc));
         } else {
           final String path = repoFilePath(modUri, qc.context);
-          locs = path == null ? new String[0] : new String[] { path };
+          if(path != null) locs.add(path);
         }
       }
-      if(locs.length == 0) throw MODULE_NOT_FOUND_X.get(info, modUri);
+      if(locs.isEmpty()) throw MODULE_NOT_FOUND_X.get(info, modUri);
       for(final String loc : locs) srcs.add(ii.sc().resolve(loc, ii.path()));
     }
 
@@ -117,8 +122,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
           throw ex.error() != INVCONVERT_X_X_X ? ex : MODULE_CONTEXT_TYPE_X_X.get(info, modUri,
               ex.getLocalizedMessage());
         }
-        mqc.contextValue = new ContextScope(val, mqc.contextType, new VarScope(), sc(), null,
-            null);
+        mqc.contextValue = new ContextScope(val, mqc.contextType, new VarScope(), sc(), null, null);
         mqc.finalContext = true;
       }
       mqc.compile(true);
@@ -174,7 +178,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     result.put("variables", variables.map());
     result.put("functions", functions.map());
     final XQMap map = result.map();
-    modCache.put(cacheKey, map);
+    if(modCache != null) modCache.put(cacheKey, map);
     return map;
   }
 
@@ -204,7 +208,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
         Types.DECIMAL_O, null);
     /** load-xquery-module option location-hints. */
     public static final StringsOption LOCATION_HINTS = new StringsOption("location-hints",
-        (String[]) null);
+        new String[0]);
     /** load-xquery-module option content. */
     public static final StringOption CONTENT = new StringOption("content");
     /** load-xquery-module option context-item. */
