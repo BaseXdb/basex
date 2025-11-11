@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 
 /**
@@ -23,6 +24,8 @@ public final class QueryThreads {
   /** Full-text tokenizers. */
   private final IdentityHashMap<FTWords, ThreadLocal<FTTokenizer>> ftCache =
       new IdentityHashMap<>();
+  /** Per-thread cache for modules compiled by fn:load-xquery-module). */
+  private final ThreadLocal<Map<String, XQMap>> moduleCache = ThreadLocal.withInitial(HashMap::new);
 
   /**
    * Returns local thread for the given expression.
@@ -53,11 +56,20 @@ public final class QueryThreads {
   }
 
   /**
+   * Returns the per-thread compiled-result cache.
+   * @return compiled module cache
+   */
+  public ThreadLocal<Map<String, XQMap>> moduleCache() {
+    return moduleCache;
+  }
+
+  /**
    * Closes threads.
    */
   void close() {
     for(final ThreadLocal<PathCache> cache : pathCache.values()) cache.remove();
     for(final ThreadLocal<CmpCache> cache : cmpCache.values()) cache.remove();
     for(final ThreadLocal<FTTokenizer> cache : ftCache.values()) cache.remove();
+    moduleCache.remove();
   }
 }
