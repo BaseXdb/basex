@@ -207,8 +207,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     public static final ValueOption XQUERY_VERSION = new ValueOption("xquery-version",
         Types.DECIMAL_O, null);
     /** load-xquery-module option location-hints. */
-    public static final StringsOption LOCATION_HINTS = new StringsOption("location-hints",
-        new String[0]);
+    public static final StringsOption LOCATION_HINTS = new StringsOption("location-hints");
     /** load-xquery-module option content. */
     public static final StringOption CONTENT = new StringOption("content");
     /** load-xquery-module option context-item. */
