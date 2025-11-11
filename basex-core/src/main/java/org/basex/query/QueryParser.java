@@ -845,16 +845,6 @@ public class QueryParser extends InputParser {
       qc.libs.put(tPath, lib);
       final byte[] muri = lib.sc.module.uri();
       if(!uri.equals(string(muri))) throw error(WRONGMODULE_X_X_X, info, io.name(), uri, muri);
-
-      // check if context value declaration types are compatible to each other
-      final StaticContext sctx = qp.sc;
-      if(sctx.contextType != null) {
-        if(sc.contextType == null) {
-          sc.contextType = sctx.contextType;
-        } else if(!sctx.contextType.eq(sc.contextType)) {
-          throw error(VALUETYPES_X_X, sctx.contextType, sc.contextType);
-        }
-      }
       qc.modStack.pop();
     }
 
@@ -882,8 +872,7 @@ public class QueryParser extends InputParser {
     if(wsConsumeWs(AS)) {
       st = item ? itemType() : sequenceType();
       sc.contextType = st;
-      qc.contextType = st;
-      if(cst != null && !cst.eq(st)) throw error(VALUETYPES_X_X, cst, st);
+      if(sc.module == null) qc.contextType = st;
     }
 
     final boolean external = wsConsumeWs(EXTERNAL);

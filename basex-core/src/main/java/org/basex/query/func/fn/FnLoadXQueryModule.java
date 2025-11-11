@@ -94,11 +94,17 @@ public final class FnLoadXQueryModule extends StandardFunc {
     final QueryContext mqc = new QueryContext(qc);
     for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
     int nParsed = 0;
+    final Value ctx = opt.get(CONTEXT_ITEM);
+    if(ctx != null) {
+      mqc.contextValue = new ContextScope(ctx, mqc.contextType, new VarScope(), sc(), null, null);
+      mqc.finalContext = true;
+    }
     for(final IO src : srcs) {
-      mqc.finalContext = false;
+      final AModule lib;
       try {
         final String path = src.path(), content = src.readString();
-        mqc.parse(content, path.isEmpty() ? Token.string(sc().baseURI().string()) : path);
+        final String uri = path.isEmpty() ? Token.string(sc().baseURI().string()) : path;
+        lib = mqc.parse(content, uri);
       } catch(final IOException ex) {
         Util.debug(ex);
         throw WHICHMODFILE_X.get(info, src);
@@ -113,17 +119,8 @@ public final class FnLoadXQueryModule extends StandardFunc {
         throw ex.error() != INVCONVERT_X_X_X ? ex : MODULE_PARAMETER_TYPE_X_X.get(info, modUri,
             ex.getLocalizedMessage());
       }
-      if(!mqc.finalContext && opt.contains(CONTEXT_ITEM)) {
-        Value val = opt.get(CONTEXT_ITEM);
-        try {
-          if(mqc.contextType != null)  val = mqc.contextType.coerce(val, null, mqc, null, info);
-        } catch(final QueryException ex) {
-          Util.debug(ex);
-          throw ex.error() != INVCONVERT_X_X_X ? ex : MODULE_CONTEXT_TYPE_X_X.get(info, modUri,
-              ex.getLocalizedMessage());
-        }
-        mqc.contextValue = new ContextScope(val, mqc.contextType, new VarScope(), sc(), null, null);
-        mqc.finalContext = true;
+      if(ctx != null && lib.sc.contextType != null && !lib.sc.contextType.instance(ctx)) {
+        throw MODULE_CONTEXT_TYPE_X_X.get(info, modUri, ctx.seqType());
       }
       mqc.compile(true);
       if(mqc.main != null) throw MODULE_FOUND_MAIN_X.get(info, modUri);
