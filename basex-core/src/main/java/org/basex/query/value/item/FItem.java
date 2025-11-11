@@ -82,7 +82,7 @@ public abstract class FItem extends Item implements XQFunction {
     if(nargs < arity) throw arityError(this, arity, nargs, false, info);
 
     // optimize: continue with coercion if current type is only an instance of new type
-    if(type instanceof FuncType && (cc != null ? type.eq(ft) : type.instanceOf(ft))) return this;
+    if(type.eq(ft)) return this;
 
     // create new compilation context and variable scope
     final VarScope vs = new VarScope();

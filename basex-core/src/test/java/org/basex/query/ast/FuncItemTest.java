@@ -204,6 +204,8 @@ public final class FuncItemTest extends SandboxTest {
     error("let $x as fn(xs:integer) as xs:integer := [1, 2] return $x?*", LOOKUP_X);
     error("let $x as fn(*) := { 1:'A', 'x':'B' } return $x?*", LOOKUP_X);
     error("let $x as fn(*) := [1, 2] return $x?*", LOOKUP_X);
+    error("declare variable $f as fn(xs:integer) as xs:string := string#1; $f('x')",
+        INVCONVERT_X_X_X);
 
     query("let $f as fn() as xs:anyAtomicType := fn() { <a/> } " +
       "return $f() ! (. = ('1', '2'))", "false");
