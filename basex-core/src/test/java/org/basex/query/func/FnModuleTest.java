@@ -1827,6 +1827,9 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("m", " { 'content': 'module namespace m=\"m\"; "
         + "declare function m:f() { 42 };' }")
         + "?functions => map:keys()", "#m:f");
+    query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context item as "
+        + "xs:decimal external; declare variable $x:x := .;', 'context-item': 1 }") + "?variables"
+        + "?#Q{x}x", 1);
 
     error(func.args(""), MODULE_URI_EMPTY);
     error(func.args("x"), MODULE_NOT_FOUND_X);
@@ -1837,6 +1840,8 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("world"), VAREMPTY_X);
     error(func.args("world", " { 'location-hints': [\"src/test/resources/hello-ext.xqm\"] }"),
         FUNCNOIMPL_X);
+    error(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context item as "
+        + "xs:integer external;', 'context-item': 1.0 }"), MODULE_CONTEXT_TYPE_X_X);
 
     // advanced and caching tests
     // run simple HTTP server for module hosting

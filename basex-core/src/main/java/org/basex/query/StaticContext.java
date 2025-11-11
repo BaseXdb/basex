@@ -57,7 +57,7 @@ public final class StaticContext {
   public boolean inheritNS = true;
 
   /** Static type of context value. */
-  SeqType contextType;
+  public SeqType contextType;
   /** Sets a custom URI resolver. */
   UriResolver resolver;
   /** Sets an XML catalog URI resolver. */

@@ -344,6 +344,11 @@ public final class QueryContext extends Job implements Closeable {
         try {
           contextValue.compile(cc);
           focus.value = contextValue.value(this);
+          for(final LibraryModule lib : libs.values()) {
+            if(lib.sc.contextType != null && !lib.sc.contextType.instance(focus.value)) {
+              throw VALUETYPES_X_X.get(contextValue.info, lib.sc.contextType, contextType);
+            }
+          }
         } catch(final QueryException ex) {
           Util.debug(ex);
           throw ex.error() == NOCTX_X ? CIRCCTX.get(ex.info()) : ex;
