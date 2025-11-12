@@ -340,7 +340,8 @@ public final class SeqType {
       type == STRING && at == ANY_URI ||
       type == ANY_URI && at.instanceOf(STRING) ||
       type == HEX_BINARY && at == BASE64_BINARY ||
-      type == BASE64_BINARY && at == HEX_BINARY
+      type == BASE64_BINARY && at == HEX_BINARY ||
+      type instanceof EnumType && at == ANY_URI
     ) {
       // item will be cast
     } else if(!type.union(at).oneOf(ANY_ATOMIC_TYPE, NUMERIC)) {
