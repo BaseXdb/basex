@@ -87,7 +87,8 @@ public final class FnLoadXQueryModule extends StandardFunc {
     }
 
     if(opt.contains(XQUERY_VERSION)) {
-      final String version = opt.get(XQUERY_VERSION).toString();
+      String version = opt.get(XQUERY_VERSION).toString();
+      if(!version.contains(".")) version += ".0";
       if(!isSupported(version)) throw MODULE_XQUERY_VERSION_X.get(info, version);
     }
 
@@ -160,14 +161,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     final MapBuilder variables = new MapBuilder();
     for(final StaticVar var : mqc.vars) {
       if(!var.anns.contains(Annotation.PRIVATE) && Token.eq(var.name.uri(), modUri)) {
-        try {
-          variables.put(var.name, var.value(mqc));
-        } catch(final QueryException ex) {
-          throw ex;
-        } catch(final Exception ex) {
-          Util.debug(ex);
-          throw VAREMPTY_X.get(info, var.name());
-        }
+        variables.put(var.name, var.value(mqc));
       }
     }
 

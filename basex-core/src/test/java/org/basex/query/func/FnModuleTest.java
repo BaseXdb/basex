@@ -1830,6 +1830,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare context item as "
         + "xs:decimal external; declare variable $x:x := .;', 'context-item': 1 }") + "?variables"
         + "?#Q{x}x", 1);
+    query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare variable $x:x := 1;', "
+        + "'xquery-version': 4.0 }") + "?variables?#Q{x}x", 1);
 
     error(func.args(""), MODULE_URI_EMPTY);
     error(func.args("x"), MODULE_NOT_FOUND_X);
