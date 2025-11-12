@@ -329,6 +329,32 @@ public final class IndexOptimizeTest extends SandboxTest {
   }
 
   /**
+   * Index access with namespaces.
+   */
+  @Test public void gh1763() {
+    final String doc = "<a xmlns:x=\"X\"><b>B</b></a>";
+    execute(new CreateDB(NAME, doc));
+    check("/a[.//text() = 'B']", doc, exists(ValueAccess.class));
+    check("//a[.//text() = 'B']", doc, exists(ValueAccess.class));
+    check("/a/b[text() = 'B']/..", doc, exists(ValueAccess.class));
+    check("//b[text() = 'B']/..", doc, exists(ValueAccess.class));
+    check("//*[text() = 'B']/..", doc, exists(ValueAccess.class));
+
+    // the following queries could be rewritten for index access
+    check("/a[*:b = 'B']", doc, empty(ValueAccess.class));
+    check("//a[*:b = 'B']", doc, empty(ValueAccess.class));
+    check("/*:a[*:b = 'B']", doc, empty(ValueAccess.class));
+    check("//*:a[*:b = 'B']", doc, empty(ValueAccess.class));
+    check("/*[*:b = 'B']", doc, empty(ValueAccess.class));
+    check("//*[*:b = 'B']", doc, empty(ValueAccess.class));
+
+    check("/a[b = 'B']", doc, empty(ValueAccess.class));
+    check("//a[b = 'B']", doc, empty(ValueAccess.class));
+    check("/*[b = 'B']", doc, empty(ValueAccess.class));
+    check("//*[b = 'B']", doc, empty(ValueAccess.class));
+  }
+
+  /**
    * Creates a test database.
    */
   private static void createDoc() {

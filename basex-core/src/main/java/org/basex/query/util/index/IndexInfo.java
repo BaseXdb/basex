@@ -81,7 +81,7 @@ public final class IndexInfo {
     } else if(last.test.type == NodeType.ELEMENT) {
       // ensure that addressed elements only have text nodes as children
       // stop if database is unknown/out-dated, if namespaces occur, or if name test is not simple
-      if(data == null || !(data.meta.uptodate && data.nspaces.isEmpty()) ||
+      if(data == null || !data.meta.uptodate || !data.nspaces.isEmpty() ||
           !(last.test instanceof NameTest)) return null;
 
       test = (NameTest) last.test;
