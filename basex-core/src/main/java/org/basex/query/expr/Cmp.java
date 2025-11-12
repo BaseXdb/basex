@@ -142,10 +142,10 @@ public abstract class Cmp extends Arr {
       // keep if no context is available: last() = last()
       !expr1.has(Flag.NDT) && (!expr1.has(Flag.CTX) || cc.qc.focus.value != null)
     ) {
-      // 1 = 1  ->  true()
-      // <x/> ne <x/>  ->  false()
-      // (1, 2) >= (1, 2)  ->  true()
-      // (1, 2, 3)[last() = last()]  ->  (1, 2, 3)
+      // 1 = 1 → true()
+      // <x/> ne <x/> → false()
+      // (1, 2) >= (1, 2) → true()
+      // (1, 2, 3)[last() = last()] → (1, 2, 3)
       return Bln.get(op == OpV.EQ || op == OpV.GE || op == OpV.LE);
     }
     return this;
@@ -166,8 +166,8 @@ public abstract class Cmp extends Arr {
       if(expr2 instanceof Bln) {
         final boolean ok = expr2 == Bln.TRUE, success = ne ^ ok;
 
-        // boolean(A) = true()  ->  boolean(A)
-        // boolean(A) <= true()  ->  true()
+        // boolean(A) = true() → boolean(A)
+        // boolean(A) <= true() → true()
         if(st1.zeroOrOne() && (success || st1.one())) {
           final Expr ex1 = st1.one() ? expr1 : cc.function(BOOLEAN, info, expr1);
           final QuerySupplier<Expr> not = () -> cc.function(NOT, info, ex1);
@@ -182,8 +182,8 @@ public abstract class Cmp extends Arr {
         }
 
         if(this instanceof CmpG) {
-          // (A, B) = true()  ->  A or B
-          // (A, B) = false()  ->  not(A and B)
+          // (A, B) = true() → A or B
+          // (A, B) = false() → not(A and B)
           final Expr[] args = expr1.args();
           if((eq || ne) && expr1 instanceof List &&
               ((Checks<Expr>) expr -> expr.seqType().eq(Types.BOOLEAN_O)).all(args)) {
@@ -195,7 +195,7 @@ public abstract class Cmp extends Arr {
             final int al = args.length - 1;
             final Expr last = args[al];
 
-            // expr ! true() = true()  ->  exists(expr)
+            // expr ! true() = true() → exists(expr)
             if(last instanceof final Bln bln && (eq || ne)) {
               return bln.bool(info) != success ? Bln.FALSE :
                 cc.function(EXISTS, info, map.remove(cc, al));
@@ -204,8 +204,8 @@ public abstract class Cmp extends Arr {
             final Expr[] ops = last.args();
             if(ops != null && ops.length > 0 && ops[0] instanceof ContextValue) {
               if(last instanceof final CmpG cmp) {
-                // (name ! (. = 'Ukraine')) = true()  ->  name = 'Ukraine'
-                // (code ! (. = 1)) = false()  ->  code != 1
+                // (name ! (. = 'Ukraine')) = true() → name = 'Ukraine'
+                // (code ! (. = 1)) = false() → code != 1
                 final Expr op2 = ops[1];
                 if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().one())) {
                   OpG opG = cmp.op;
@@ -213,13 +213,13 @@ public abstract class Cmp extends Arr {
                   return new CmpG(info, map.remove(cc, al), op2, opG).optimize(cc);
                 }
               } else if(success && last instanceof final CmpR cmp) {
-                // (number ! (. >= 1e0) = true()  ->  number >= 1e0
+                // (number ! (. >= 1e0) = true() → number >= 1e0
                 return CmpR.get(cc, info, map.remove(cc, al), cmp.min, cmp.max);
               } else if(success && last instanceof final CmpIR cmp) {
-                // (integer ! (. >= 1) != false()  ->  integer >= 1
+                // (integer ! (. >= 1) != false() → integer >= 1
                 return CmpIR.get(cc, info, map.remove(cc, al), cmp.min, cmp.max);
               } else if(success && last instanceof final CmpSR cmp) {
-                // (string ! (. >= 'b') = true()  ->  string >= 'b'
+                // (string ! (. >= 'b') = true() → string >= 'b'
                 return new CmpSR(map.remove(cc, al), cmp.min, cmp.mni, cmp.max, cmp.mxi, info).
                     optimize(cc);
               }
@@ -227,7 +227,7 @@ public abstract class Cmp extends Arr {
           }
         }
       }
-      // BOOL = not(BOOL)  ->  false()
+      // BOOL = not(BOOL) → false()
       if((eq || ne) && st1.one() && st2.one() && (NOT.is(expr2) && expr1.equals(expr2.arg(0)) ||
           NOT.is(expr1) && expr2.equals(expr1.arg(0)))) return Bln.get(ne);
     }
@@ -266,13 +266,13 @@ public abstract class Cmp extends Arr {
     if(count instanceof final ANum num) {
       final double cnt = num.dbl();
       if(arg.seqType().zeroOrOne()) {
-        // count(ZeroOrOne) < 2  ->  true()
+        // count(ZeroOrOne) < 2 → true()
         if(cnt > 1) {
           return Bln.get(op == OpV.LT || op == OpV.LE || op == OpV.NE);
         }
-        // count(ZeroOrOne)  < 1  ->  empty(ZeroOrOne)
-        // count(ZeroOrOne)  = 1  ->  exists(ZeroOrOne)
-        // count(ZeroOrOne) <= 1  ->  true()
+        // count(ZeroOrOne)  < 1 → empty(ZeroOrOne)
+        // count(ZeroOrOne)  = 1 → exists(ZeroOrOne)
+        // count(ZeroOrOne) <= 1 → true()
         if(cnt == 1) {
           return op == OpV.NE || op == OpV.LT ? cc.function(EMPTY, info, arg) :
                  op == OpV.EQ || op == OpV.GE ? cc.function(EXISTS, info, arg) :
@@ -280,14 +280,14 @@ public abstract class Cmp extends Arr {
         }
       }
       final long[] counts = countRange(op, cnt);
-      // count(A) >= 0  ->  true()
+      // count(A) >= 0 → true()
       if(counts == COUNT_TRUE) return Bln.TRUE;
       if(counts == COUNT_FALSE) return Bln.FALSE;
-      // count(A) > 0  ->  exists(A)
+      // count(A) > 0 → exists(A)
       if(counts == COUNT_EMPTY) return cc.function(EMPTY, info, arg);
       if(counts == COUNT_EXISTS) return cc.function(EXISTS, info, arg);
-      // count(A) > 1  ->  util:within(A, 2)
-      // count(A) < 5  ->  util:within(A, 0, 4)
+      // count(A) > 1 → util:within(A, 2)
+      // count(A) < 5 → util:within(A, 0, 4)
       if(counts != null) {
         for(final long c : counts) args.add(Itr.get(c));
       }
@@ -295,10 +295,10 @@ public abstract class Cmp extends Arr {
       final SeqType st2 = count.seqType();
       if(st2.type.instanceOf(AtomType.INTEGER)) {
         if(count instanceof final RangeSeq rs) {
-          // count(A) = 3 to 5  ->  util:within(A, 3, 5)
+          // count(A) = 3 to 5 → util:within(A, 3, 5)
           args.add(Itr.get(rs.min())).add(Itr.get(rs.max()));
         } else if(st2.one() && (count instanceof VarRef || count instanceof ContextValue)) {
-          // count(A) = $c  ->  util:within(A, $c)
+          // count(A) = $c → util:within(A, $c)
           args.add(count).add(count);
         }
         if(!args.isEmpty()) {
@@ -309,7 +309,7 @@ public abstract class Cmp extends Arr {
     }
     if(args.isEmpty()) return this;
 
-    // count(A) = 1  ->  util:within(A, 1, 1)
+    // count(A) = 1 → util:within(A, 1, 1)
     args.insert(0, arg);
     return cc.function(_UTIL_COUNT_WITHIN, info, args.finish());
   }
@@ -328,7 +328,7 @@ public abstract class Cmp extends Arr {
     final Expr[] args = expr1.args();
     final long[] counts = countRange(op, num.dbl());
     if(counts == COUNT_TRUE || counts == COUNT_FALSE) {
-      // string-length(A) >= 0  ->  true()
+      // string-length(A) >= 0 → true()
       final Expr arg1 = args.length > 0 ? args[0] : cc.qc.focus.value;
       if(arg1 != null) {
         final SeqType st1 = arg1.seqType();
@@ -337,7 +337,7 @@ public abstract class Cmp extends Arr {
       }
     }
     if(counts == COUNT_EMPTY || counts == COUNT_EXISTS) {
-      // string-length(A) > 0  ->  boolean(string(A))
+      // string-length(A) > 0 → boolean(string(A))
       final Function func = counts == COUNT_EMPTY ? NOT : BOOLEAN;
       return cc.function(func, info, cc.function(STRING, info, args));
     }

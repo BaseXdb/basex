@@ -29,7 +29,7 @@ public final class FnAtomicEqual extends StandardFunc {
     Type tp1 = st1.type.atomic(), tp2 = st2.type.atomic();
 
     // convert function call to general comparison (covers the most common cases)
-    // atomic-equal(2, 3)  ->  2 = 3
+    // atomic-equal(2, 3) → 2 = 3
     if(sc().collation == null && st1.one() && st2.one() && !st1.mayBeArray() &&
         !st2.mayBeArray() && tp1 != null && tp2 != null) {
       if(tp1.oneOf(AtomType.UNTYPED_ATOMIC, AtomType.ANY_URI)) tp1 = AtomType.STRING;

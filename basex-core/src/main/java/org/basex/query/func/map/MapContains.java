@@ -42,7 +42,7 @@ public final class MapContains extends StandardFunc {
     }
 
     if(mc.mapType != null) {
-      // map:contains({ 1: 1 }, 'string')  ->  false()
+      // map:contains({ 1: 1 }, 'string') → false()
       if(mc.keyMismatch) return Bln.FALSE;
     }
     return this;

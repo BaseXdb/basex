@@ -30,13 +30,13 @@ public final class CArray extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // [ E ]  ->  util:array-member(E)
+    // [ E ] → util:array-member(E)
     final int el = exprs.length;
     if(el == 0) return XQArray.empty();
     if(el == 1) return cc.replaceWith(this, cc.function(_UTIL_ARRAY_MEMBER, info, exprs));
 
     // if possible, rewrite to curly array constructor
-    // [ 1, 2, 3 ]  ->  array { 1, 2, 3 }
+    // [ 1, 2, 3 ] → array { 1, 2, 3 }
     if(((Checks<Expr>) expr -> expr.seqType().one()).all(exprs)) {
       return cc.replaceWith(this, new CItemArray(info, List.get(cc, info, exprs)).optimize(cc));
     }
@@ -55,7 +55,7 @@ public final class CArray extends Arr {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    // data([ (1, 2) ])  ->  data((1, 2))
+    // data([ (1, 2) ]) → data((1, 2))
     if(mode.oneOf(Simplify.NUMBER, Simplify.DATA)) expr = List.get(cc, info, simplifyAll(mode, cc));
     return cc.simplify(this, expr, mode);
   }

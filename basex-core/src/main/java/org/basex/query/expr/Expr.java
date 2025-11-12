@@ -291,13 +291,13 @@ public abstract class Expr extends ExprInfo {
   public final Expr simplify(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // boolean(<a/>)  ->  true()
-      // E[()]  ->  E[false()]
+      // boolean(<a/>) → true()
+      // E[()] → E[false()]
       final SeqType st = seqType();
       final boolean nodes = st.instanceOf(Types.NODE_OM);
       if((nodes || st.zero()) && !has(Flag.NDT)) expr = Bln.get(nodes);
     } else if(mode == Simplify.COUNT && !(this instanceof Value)) {
-      // count(db:get('db')//with-known-result-size)  ->  replicate('', size)
+      // count(db:get('db')//with-known-result-size) → replicate('', size)
       final long size = size();
       if(size != -1 && !has(Flag.NDT)) expr = SingletonSeq.get(Str.EMPTY, size);
     }

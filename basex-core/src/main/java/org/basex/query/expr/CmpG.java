@@ -170,8 +170,8 @@ public class CmpG extends Cmp {
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     // pre-evaluate if one value is empty:
-    // () eq local:expensive()  ->  ()
-    // void(123) = 1  ->  boolean(void('123'))
+    // () eq local:expensive() → ()
+    // void(123) = 1 → boolean(void('123'))
     Expr expr = emptyExpr();
     if(expr != this) return cc.replaceWith(this, cc.function(BOOLEAN, info, expr));
 
@@ -198,7 +198,7 @@ public class CmpG extends Cmp {
     // optimize expression
     expr = opt(cc);
 
-    // (if(A) then B else C) = X  ->  if(A) then B = X else C = X
+    // (if(A) then B else C) = X → if(A) then B = X else C = X
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(expr == this && expr1 instanceof final If iff && !expr1.has(Flag.NDT)) {
       final Expr thn = new CmpG(info, iff.arg(0), expr2, op);
@@ -261,7 +261,7 @@ public class CmpG extends Cmp {
       if(op12.seqType().instanceOf(Types.NUMERIC_O)) {
         final Calc calc1 = arth.calc;
         if(calc1 == Calc.SUBTRACT && expr2 == Itr.ZERO) {
-          // E - NUMERIC = 0  ->  E = NUMERIC
+          // E - NUMERIC = 0 → E = NUMERIC
           ex = new CmpG(info, op11, op12, op);
         } else if((
           POSITION.is(op11) ||
@@ -272,10 +272,10 @@ public class CmpG extends Cmp {
           calc1.oneOf(Calc.MULTIPLY, Calc.DIVIDE) && num12 != 0 &&
             (op.oneOf(OpG.EQ, OpG.NE) || num12 > 0)
         )) {
-          // position() + 1 < last()  ->  position() < last() - 1
-          // count(E) div 2 = 1  ->  count(E) = 1 * 2
-          // $a - 1 = $b + 1  ->  $a = $b + 2
-          // $x * -1 = 1  ->  $x = 1 div -1  (no rewrite if RHS of */div (<,<=,>=,>) is negative)
+          // position() + 1 < last() → position() < last() - 1
+          // count(E) div 2 = 1 → count(E) = 1 * 2
+          // $a - 1 = $b + 1 → $a = $b + 2
+          // $x * -1 = 1 → $x = 1 div -1  (no rewrite if RHS of */div (<,<=,>=,>) is negative)
           final Expr arg2 = new Arith(info, expr2, op12, calc1.invert()).optimize(cc);
           ex = new CmpG(info, op11, arg2, op);
         }
@@ -314,7 +314,7 @@ public class CmpG extends Cmp {
       final QueryContext qc) throws QueryException {
     // improve cache efficiency by looping the smaller array in the outer loop
     if(size1 < size2 || size2 == -1) {
-      // (1, 2) = (3, 4, 5, 6, 7)  ->  1 = 3, 1 = 4, ..., 2 = 3, ...
+      // (1, 2) = (3, 4, 5, 6, 7) → 1 = 3, 1 = 4, ..., 2 = 3, ...
       Iter ir2 = iter2;
       for(Item item1; (item1 = iter1.next()) != null;) {
         if(ir2 == null) ir2 = exprs[1].atomIter(qc, info);
@@ -324,7 +324,7 @@ public class CmpG extends Cmp {
         ir2 = null;
       }
     } else {
-      // (1, 2, 3, 4, 5) = (6, 7)  ->  1 = 6, 2 = 6, ..., 1 = 7, ...
+      // (1, 2, 3, 4, 5) = (6, 7) → 1 = 6, 2 = 6, ..., 1 = 7, ...
       Iter ir1 = iter1;
       for(Item item2; (item2 = iter2.next()) != null;) {
         if(ir1 == null) ir1 = exprs[0].atomIter(qc, info);
@@ -410,11 +410,11 @@ public class CmpG extends Cmp {
     if(expr instanceof Single) return expr.mergeEbv(this, or, cc);
 
     /* OR: merge comparisons
-     * E = 'a' or E = 'b'  ->  E = ('a', 'b')
+     * E = 'a' or E = 'b' → E = ('a', 'b')
      * AND: invert operator, wrap with not()
-     * E != 'a' and E != 'b'  ->  not(E = ('a', 'b'))
+     * E != 'a' and E != 'b' → not(E = ('a', 'b'))
      * negation: invert operator
-     * E != 'a' or not(E = 'b')  ->  E != ('a', 'b')  */
+     * E != 'a' or not(E = 'b') → E != ('a', 'b')  */
 
     // if required, invert second operator (first operator need never be inverted)
     final boolean not2 = NOT.is(expr);
@@ -443,8 +443,8 @@ public class CmpG extends Cmp {
        * $numbers = 3  or  not($numbers = 4)  */
       if(not2 && (seqR2 || seqL)) return null;
       /* rewriting is possible in all other cases. examples:
-       * $number != 1  or  not($number = 2)   ->  $number != (1, 2)
-       * $numbers = 2  or  $numbers = (3, 4)  ->  $numbers = (2, 3, 4)  */
+       * $number != 1  or  not($number = 2)  → $number != (1, 2)
+       * $numbers = 2  or  $numbers = (3, 4) → $numbers = (2, 3, 4)  */
       expr2 = newList.apply(op);
     } else {
       /* do not merge if left operand or first right operand is not a single item, or if
@@ -454,8 +454,8 @@ public class CmpG extends Cmp {
        * $number = 1       and  not($number = (2, 3)  */
       if(seqL || seqR1 || seqR2 && !not2) return null;
       /* rewriting is possible in all other cases. examples:
-       * $number != 1  and  $number != 2             ->  not($number = (1, 2))
-       * $numbers = 2  and  not($numbers != (3, 4))  ->  not($numbers != (2, 3, 4))  */
+       * $number != 1  and  $number != 2            → not($number = (1, 2))
+       * $numbers = 2  and  not($numbers != (3, 4)) → not($numbers != (2, 3, 4))  */
       expr2 = cc.function(NOT, info, newList.apply(op.invert()));
     }
 
@@ -466,7 +466,7 @@ public class CmpG extends Cmp {
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    // E[node-name() = #a]  ->  E[self::a]
+    // E[node-name() = #a] → E[self::a]
     final Expr ex = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this;
     return cc.simplify(this, ex, mode);
   }
@@ -492,7 +492,7 @@ public class CmpG extends Cmp {
       final ArrayList<QNm> qnames = new ArrayList<>();
       Scope scope = null;
       if(expr2.seqType().type.isStringOrUntyped()) {
-        // local-name() eq 'a'  ->  self::*:a
+        // local-name() eq 'a' → self::*:a
         if(LOCAL_NAME.is(fn)) {
           scope = Scope.LOCAL;
           for(final Item item : value) {
@@ -500,14 +500,14 @@ public class CmpG extends Cmp {
             if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
           }
         } else if(NAMESPACE_URI.is(fn)) {
-          // namespace-uri() = ('URI1', 'URI2')  ->  self::Q{URI1}* | self::Q{URI2}*
+          // namespace-uri() = ('URI1', 'URI2') → self::Q{URI1}* | self::Q{URI2}*
           for(final Item item : value) {
             final byte[] uri = item.string(info);
             if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.cpToken(':'), uri));
           }
           if(qnames.size() == value.size()) scope = Scope.URI;
         } else if(NAME.is(fn)) {
-          // (db-without-ns)[name() = 'city']  ->  (db-without-ns)[self::city]
+          // (db-without-ns)[name() = 'city'] → (db-without-ns)[self::city]
           final Data data = cc.qc.focus.value.data();
           final byte[] dataNs = data != null ? data.defaultNs() : null;
           if(dataNs != null && dataNs.length == 0) {
@@ -519,7 +519,7 @@ public class CmpG extends Cmp {
           }
         }
       } else if(NODE_NAME.is(fn) && expr2.seqType().type == AtomType.QNAME) {
-        // node-name() = #prefix:local  ->  self::prefix:local
+        // node-name() = #prefix:local → self::prefix:local
         scope = NameTest.Scope.FULL;
         for(final Item item : value) {
           qnames.add((QNm) item);

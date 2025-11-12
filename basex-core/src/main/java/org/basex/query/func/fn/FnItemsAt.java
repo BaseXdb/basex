@@ -119,21 +119,21 @@ public final class FnItemsAt extends StandardFunc {
 
       final long size = input.size();
       if(size != -1) {
-        // items-at(E, last)  ->  foot(E)
+        // items-at(E, last) → foot(E)
         if(l + 1 == size) return cc.function(FOOT, info, input);
-        // items-at(E, too-large)  ->  ()
+        // items-at(E, too-large) → ()
         if(l + 1 > size) return Empty.VALUE;
-        // items-at(reverse(E), pos)  ->  items-at(E, size - pos)
+        // items-at(reverse(E), pos) → items-at(E, size - pos)
         if(REVERSE.is(input))
           return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(size - l));
         occ = Occ.EXACTLY_ONE;
       }
       if(l == 0) return cc.function(HEAD, info, input);
 
-      // items-at(tail(E), pos)  ->  items-at(E, pos + 1)
+      // items-at(tail(E), pos) → items-at(E, pos + 1)
       if(TAIL.is(input))
         return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(l + 2));
-      // items-at(replicate(I, count), pos)  ->  I
+      // items-at(replicate(I, count), pos) → I
       if(REPLICATE.is(input)) {
         // static integer will always be greater than 1
         final Expr[] args = input.args();
@@ -141,13 +141,13 @@ public final class FnItemsAt extends StandardFunc {
           return l > itr.itr() ? Empty.VALUE : args[0];
         }
       }
-      // items-at(file:read-text-lines(E), pos)  ->  file:read-text-lines(E, pos, 1)
+      // items-at(file:read-text-lines(E), pos) → file:read-text-lines(E, pos, 1)
       if(_FILE_READ_TEXT_LINES.is(input))
         return FileReadTextLines.opt(this, l, 1, cc);
 
-      // items-at((I1, I2, I3), 2)  ->  I2
-      // items-at((I, E), 2)  ->  head(E)
-      // items-at((I, E1, E2), 3)  ->  items-at((E1, E2), 2)
+      // items-at((I1, I2, I3), 2) → I2
+      // items-at((I, E), 2) → head(E)
+      // items-at((I, E1, E2), 3) → items-at((E1, E2), 2)
       if(input instanceof List) {
         final Expr[] args = input.args();
         final int al = args.length;
@@ -166,26 +166,26 @@ public final class FnItemsAt extends StandardFunc {
 
     final long diff = countInputDiff(arg(0), arg(1));
     if(diff != Long.MIN_VALUE) {
-      // items-at(E, count(E))  ->  foot(E)
+      // items-at(E, count(E)) → foot(E)
       if(diff == 0) return cc.function(FOOT, info, input);
-      // items-at(E, count(E) + 1)  ->  ()
+      // items-at(E, count(E) + 1) → ()
       if(diff > 0) return Empty.VALUE;
     }
 
-    // items-at(E, start to end)  ->  util:range(E, start, end)
+    // items-at(E, start to end) → util:range(E, start, end)
     if(at instanceof final RangeSeq rs) {
       Expr expr = cc.function(_UTIL_RANGE, info, input, Itr.get(rs.min()), Itr.get(rs.max()));
       if(!rs.ascending()) expr = cc.function(REVERSE, info, expr);
       return expr;
     }
-    // items-at(E, S to E)  ->  util:range(E, S, E)
+    // items-at(E, S to E) → util:range(E, S, E)
     if(at instanceof Range) {
       final Expr arg1 = at.arg(0), arg2 = at.arg(1);
       if(arg1.seqType().instanceOf(Types.INTEGER_O) && arg2.seqType().instanceOf(Types.INTEGER_O)) {
         return cc.function(_UTIL_RANGE, info, input, arg1, arg2);
       }
     }
-    // items-at(E, reverse(P))  ->  reverse(E, P))
+    // items-at(E, reverse(P)) → reverse(E, P))
     if(REVERSE.is(at))
       return cc.function(REVERSE, info, cc.function(ITEMS_AT, info, input, at.arg(0)));
 
@@ -206,9 +206,9 @@ public final class FnItemsAt extends StandardFunc {
     if(end != Empty.UNDEFINED) {
       final Predicate<Expr> countInput = e ->
         Function.COUNT.is(e) && e.arg(0).equals(input) && !e.has(Flag.NDT);
-      // function(E, count(E))  ->  0
+      // function(E, count(E)) → 0
       if(countInput.test(end)) return 0;
-      // function(E, count(E) - 1)  ->  -1
+      // function(E, count(E) - 1) → -1
       if(end instanceof final Arith arith && countInput.test(end.arg(0)) &&
           end.arg(1) instanceof final Itr itr) {
         final Calc calc = arith.calc;

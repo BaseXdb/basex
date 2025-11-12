@@ -68,16 +68,16 @@ public final class FnTail extends StandardFunc {
     // two results: return last item
     if(size == 2) return cc.function(FOOT, info, input);
 
-    // tail(tail(E))  ->  subsequence(E, 3)
+    // tail(tail(E)) → subsequence(E, 3)
     if(TAIL.is(input))
       return cc.function(SUBSEQUENCE, info, input.arg(0), Itr.get(3));
-    // tail(subsequence(E, pos, length))  ->  subsequence(E, pos + 1, length - 1)
+    // tail(subsequence(E, pos, length)) → subsequence(E, pos + 1, length - 1)
     if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
       final SeqRange r = SeqRange.get(input, cc);
       if(r != null) return cc.function(SUBSEQUENCE, info, input.arg(0),
           Itr.get(r.start + 2), Itr.get(r.length - 1));
     }
-    // tail(replicate(I, count))  ->  replicate(I, count - 1)
+    // tail(replicate(I, count)) → replicate(I, count - 1)
     if(REPLICATE.is(input)) {
       final Expr[] args = input.args().clone();
       if(args[1] instanceof final Itr itr && args[0].seqType().zeroOrOne()) {
@@ -85,12 +85,12 @@ public final class FnTail extends StandardFunc {
         return cc.function(REPLICATE, info, args);
       }
     }
-    // head(file:read-text-lines(E))  ->  file:read-text-lines(E, 1)
+    // head(file:read-text-lines(E)) → file:read-text-lines(E, 1)
     if(_FILE_READ_TEXT_LINES.is(input))
       return FileReadTextLines.opt(this, 1, Long.MAX_VALUE, cc);
 
-    // tail(1, 2, 3)  ->  tail(2, 3)
-    // tail((1 to 4), 5))  ->  tail(1 to 4), 5
+    // tail(1, 2, 3) → tail(2, 3)
+    // tail((1 to 4), 5)) → tail(1 to 4), 5
     if(input instanceof List) {
       final Expr[] args = input.args();
       final Expr first = args[0];

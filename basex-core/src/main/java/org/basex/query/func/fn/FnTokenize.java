@@ -133,7 +133,7 @@ public final class FnTokenize extends RegExFn {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr value = arg(0), pattern = arg(1);
 
-    // tokenize(normalize-space(A), ' ')  ->  tokenize(A)
+    // tokenize(normalize-space(A), ' ') → tokenize(A)
     if(NORMALIZE_SPACE.is(value) && pattern instanceof final Str str &&
         Token.eq(str.string(), Token.cpToken(' '))) {
       final Expr arg = value.args().length == 1 ? value.arg(0) : ContextValue.get(cc, info);

@@ -41,8 +41,8 @@ public final class FnData extends ContextFn {
       if(st.zero()) return input;
       final AtomType type = st.type.atomic();
       if(type == st.type) {
-        // data('x')  ->  'x'
-        // $string[data() = 'a']  ->  $string[. = 'a']
+        // data('x') → 'x'
+        // $string[data() = 'a'] → $string[. = 'a']
         return context && cc.nestedFocus() ? ContextValue.get(cc, info) : input;
       }
       // ignore arrays: data((1 to 6) ! [ ., . ])
@@ -55,7 +55,7 @@ public final class FnData extends ContextFn {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    // data(xs:untypedAtomic(E))  ->  data(E)
+    // data(xs:untypedAtomic(E)) → data(E)
     exprs = simplifyAll(Simplify.DATA, cc);
   }
 
@@ -64,15 +64,15 @@ public final class FnData extends ContextFn {
     Expr expr = this;
     final Expr input = contextAccess() ? ContextValue.get(cc, info) : arg(0);
     if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING)) {
-      // data(<a/>) = ''  ->  <a/> = ''
-      // A[B ! data() = '']  ->  A[B ! . = '']
+      // data(<a/>) = '' → <a/> = ''
+      // A[B ! data() = ''] → A[B ! . = '']
       expr = input;
     } else if(mode == Simplify.COUNT) {
-      // count(data($x))  ->  count($x)
+      // count(data($x)) → count($x)
       // do not simplify array input: count(data([ 1, 2, 3 ]))
       if(!input.seqType().mayBeArray()) expr = input;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // if(data($node))  ->  if($node/descendant::text())
+      // if(data($node)) → if($node/descendant::text())
       expr = simplifyEbv(input, cc, null);
     }
     return cc.simplify(this, expr, mode);

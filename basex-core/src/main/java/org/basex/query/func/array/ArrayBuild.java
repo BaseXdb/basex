@@ -35,9 +35,9 @@ public final class ArrayBuild extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
-    // array:build(())  ->  {}
+    // array:build(()) → {}
     if(st.zero()) return cc.voidAndReturn(input, XQArray.empty(), info);
-    // array:build(1 to 3)  ->  array { 1 to 3 }
+    // array:build(1 to 3) → array { 1 to 3 }
     if(!defined(1)) return new CItemArray(info, input);
 
     arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), Types.INTEGER_O));

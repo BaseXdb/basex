@@ -65,22 +65,22 @@ public abstract class Filter extends AFilter {
 
     // no positional access...
     if(!mayBePositional()) {
-      // convert to axis path: .[text()]  ->  self::node()[text()]
+      // convert to axis path: .[text()] → self::node()[text()]
       if(root instanceof ContextValue && root.ddo()) {
         return Path.get(cc, info, null, Step.self(cc, root, info, exprs));
       }
-      // convert to axis path: (//x)[text() = 'a']  ->  //x[text() = 'a']
+      // convert to axis path: (//x)[text() = 'a'] → //x[text() = 'a']
       if(root instanceof final AxisPath path) return path.addPredicates(cc, exprs);
 
       // rewrite filter with document nodes to path to possibly enable index rewritings
-      // example: db:get('db')[.//text() = 'x']  ->  db:get('db')/.[.//text() = 'x']
+      // example: db:get('db')[.//text() = 'x'] → db:get('db')/.[.//text() = 'x']
       if(root.seqType().type == NodeType.DOCUMENT_NODE && root.ddo()) {
         final Expr step = Step.self(cc, root, info, exprs);
         return cc.replaceWith(this, Path.get(cc, info, root, step));
       }
 
       // rewrite independent deterministic single filter to 'if' expression:
-      // example: (1 to 10)[$boolean]  ->  if($boolean) then (1 to 10) else ()
+      // example: (1 to 10)[$boolean] → if($boolean) then (1 to 10) else ()
       final Expr expr = exprs[0];
       if(exprs.length == 1 && expr.isSimple() && !expr.seqType().mayBeNumber()) {
         final Expr iff = new If(info, expr, root).optimize(cc);
@@ -88,7 +88,7 @@ public abstract class Filter extends AFilter {
       }
 
       // unroll filters with few items
-      // example: (1, 2)[. = 1]  ->  1[. = 1], 2[. = 1]
+      // example: (1, 2)[. = 1] → 1[. = 1], 2[. = 1]
       final ExprList unroll = cc.unroll(root, false);
       if(unroll != null) {
         final long last = root.size() - 1;
@@ -113,14 +113,14 @@ public abstract class Filter extends AFilter {
     for(final Expr pred : exprs) {
       Expr ex = null;
       if(pred instanceof final IntPos pos) {
-        // E[pos: MIN, MAX]  ->  util:range(E, MIN, MAX)
+        // E[pos: MIN, MAX] → util:range(E, MIN, MAX)
         ex = cc.function(_UTIL_RANGE, info, add.apply(expr), Itr.get(pos.min), Itr.get(pos.max));
       } else if(pred instanceof final SimplePos pos) {
         if(pos.exact()) {
-          // E[pos: POS]  ->  items-at(E, POS)
+          // E[pos: POS] → items-at(E, POS)
           ex = cc.function(ITEMS_AT, info, add.apply(expr), pred.arg(0));
         } else {
-          // E[pos: MIN, MAX]  ->  util:range(E, MIN, MAX)
+          // E[pos: MIN, MAX] → util:range(E, MIN, MAX)
           ex = cc.function(_UTIL_RANGE, info, add.apply(expr), pred.arg(0), pred.arg(1));
         }
       } else if(pred instanceof final Pos pos) {
@@ -128,25 +128,25 @@ public abstract class Filter extends AFilter {
         if(posExpr instanceof Range) {
           final Expr arg1 = posExpr.arg(0), arg2 = posExpr.arg(1);
           if(simpleInt.test(arg1) && LAST.is(arg2)) {
-            // E[pos: INT to last()]  ->  util:range(E, INT)
+            // E[pos: INT to last()] → util:range(E, INT)
             ex = cc.function(_UTIL_RANGE, info, add.apply(expr), arg1);
           } else if(arg1 == Itr.ONE && arg2 instanceof final Arith arth2 && LAST.is(arth2.arg(0)) &&
               arth2.calc == Calc.SUBTRACT && arth2.arg(1) == Itr.ONE) {
-            // E[pos: 1 to last() - 1]  ->  trunk(E)
+            // E[pos: 1 to last() - 1] → trunk(E)
             ex = cc.function(TRUNK, info, add.apply(expr));
           } else if(arg1 instanceof final Arith arth1 && LAST.is(arth1.arg(0)) &&
               arth1.calc == Calc.SUBTRACT && simpleInt.test(arth1.arg(1)) && arg2 == Itr.MAX) {
-            // E[pos: last() - INT to MAX]  ->  reverse(subsequence(reverse(E), 1, INT + 1))
+            // E[pos: last() - INT to MAX] → reverse(subsequence(reverse(E), 1, INT + 1))
             ex = cc.function(REVERSE, info, cc.function(SUBSEQUENCE, info,
                 cc.function(REVERSE, info, add.apply(expr)), Itr.ONE,
                 new Arith(info, arg1.arg(1), Itr.ONE, Calc.ADD).optimize(cc)));
           }
         } else if(LAST.is(posExpr)) {
-          // E[pos: last()]  ->  foot(E)
+          // E[pos: last()] → foot(E)
           ex = cc.function(FOOT, info, add.apply(expr));
         } else if(posExpr instanceof final Arith arth && LAST.is(arth.arg(0)) &&
             arth.calc == Calc.SUBTRACT && simpleInt.test(arth.arg(1))) {
-          // E[pos: last() - INT]  ->  items-at(reverse(E), INT + 1)
+          // E[pos: last() - INT] → items-at(reverse(E), INT + 1)
           ex = cc.function(ITEMS_AT, info, cc.function(REVERSE, info, add.apply(expr)),
               new Arith(info, posExpr.arg(1), Itr.ONE, Calc.ADD).optimize(cc));
         }
@@ -154,15 +154,15 @@ public abstract class Filter extends AFilter {
         final Expr posExpr = pos.expr;
         // Value instances are known to be sorted and duplicate-free (see Pos#get)
         final boolean sorted = posExpr instanceof Value;
-        // E[pos: INT1, INT2, ...]  ->  items-at(E, INT1, INT2, ...)
-        // E[pos: POSITIONS, ...]  ->  items-at(E, sort(distinct-values((POSITIONS)))
+        // E[pos: INT1, INT2, ...] → items-at(E, INT1, INT2, ...)
+        // E[pos: POSITIONS, ...] → items-at(E, sort(distinct-values((POSITIONS)))
         ex = cc.function(ITEMS_AT, info, add.apply(expr), sorted ? posExpr :
           cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, posExpr)), Bln.get(sorted));
       } else if(pred instanceof final CmpG cmp) {
         final Expr op1 = pred.arg(0), op2 = pred.arg(1);
         if(POSITION.is(op1) && cmp.opV() == OpV.NE &&
             op2.isSimple() && op2.seqType().instanceOf(Types.INTEGER_O)) {
-          // E[position() != pos]  ->  remove(E, pos)
+          // E[position() != pos] → remove(E, pos)
           ex = cc.function(REMOVE, info, add.apply(expr), op2);
         }
       }
@@ -203,14 +203,14 @@ public abstract class Filter extends AFilter {
 
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // E[a[. = 'x']]  ->  E[a = 'x']
+      // E[a[. = 'x']] → E[a = 'x']
       expr = flattenEbv(root, true, cc);
     } else if(mode == Simplify.DISTINCT && !mayBePositional()) {
       final Expr ex = root.simplifyFor(mode, cc);
       if(ex != root) expr = get(cc, info, ex, exprs);
     } else if(mode == Simplify.COUNT && exprs.length == 1 &&
         exprs[0].seqType().instanceOf(Types.NODE_ZO)) {
-      // $nodes[@attr]  ->  $nodes ! @attr
+      // $nodes[@attr] → $nodes ! @attr
       expr = SimpleMap.get(cc, info, root, exprs[0]);
     }
     return cc.simplify(this, expr, mode);

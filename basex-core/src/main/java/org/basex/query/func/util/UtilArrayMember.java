@@ -29,7 +29,7 @@ public final class UtilArrayMember extends StandardFunc {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    // number(util:array-member(123))  ->  number(123)
+    // number(util:array-member(123)) → number(123)
     if(mode.oneOf(Simplify.NUMBER, Simplify.DATA)) expr = arg(0).simplify(mode, cc);
     return cc.simplify(this, expr, mode);
   }

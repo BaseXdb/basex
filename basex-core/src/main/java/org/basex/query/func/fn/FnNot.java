@@ -43,28 +43,28 @@ public final class FnNot extends StandardFunc {
    * @throws QueryException query exception
    */
   private Expr invert(final Expr input, final CompileContext cc) throws QueryException {
-    // exists(A)  ->  empty(A)
+    // exists(A) → empty(A)
     if(EXISTS.is(input)) return cc.function(EMPTY, info, input.args());
-    // empty(A)  ->  exists(A)
+    // empty(A) → exists(A)
     if(EMPTY.is(input)) return cc.function(EXISTS, info, input.args());
-    // not(A)  ->  boolean(A)
+    // not(A) → boolean(A)
     if(NOT.is(input)) return cc.function(BOOLEAN, info, input.args());
 
-    // 'a' = 'b'  ->  'a' != 'b'
+    // 'a' = 'b' → 'a' != 'b'
     if(input instanceof final Cmp cmp) {
       final Expr inverted = cmp.invert(cc);
       if(inverted != input) return inverted;
     }
-    // position() = 1  ->  position() != 1
+    // position() = 1 → position() != 1
     if(input instanceof final CmpPos pos) {
       final Expr ex = pos.invert(cc);
       if(ex != null) return ex;
     }
-    // $node/text()  ->  empty($node/text())
+    // $node/text() → empty($node/text())
     final SeqType st = input.seqType();
     if(st.type instanceof NodeType) return cc.function(EMPTY, info, input);
 
-    // A = 1 or position() = 1  ->  A != 1 and position() != 1
+    // A = 1 or position() = 1 → A != 1 and position() != 1
     if(input instanceof Logical) {
       Expr[] args = input.args();
       final ExprList tmp = new ExprList(args.length);
@@ -81,7 +81,7 @@ public final class FnNot extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    // not(boolean(A))  ->  not(A)
+    // not(boolean(A)) → not(A)
     arg(0, arg -> arg.simplifyFor(Simplify.EBV, cc));
   }
 

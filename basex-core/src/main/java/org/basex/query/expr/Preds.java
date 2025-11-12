@@ -113,11 +113,11 @@ public abstract class Preds extends Arr {
   private void optimize(final Expr pred, final ExprList list, final Expr root,
       final CompileContext cc) throws QueryException {
 
-    // E[exists($nodes)]  ->  E[$nodes]
+    // E[exists($nodes)] → E[$nodes]
     // E[count($nodes)]  will not be rewritten
     Expr expr = pred.simplifyFor(Simplify.PREDICATE, cc);
 
-    // map operator: E[. ! ...]  ->  E[...], E[E ! ...]  ->  E[...]
+    // map operator: E[. ! ...] → E[...], E[E ! ...] → E[...]
     final SeqType rst = root.seqType();
     final Predicate<Expr> first = f -> f instanceof ContextValue ||
         root.equals(f) && root.isSimple() && rst.one();
@@ -126,14 +126,14 @@ public abstract class Preds extends Arr {
       expr = sm.remove(cc, 0);
     }
 
-    // paths: E[./...]  ->  E[...], E[E/...]  ->  E[...]
+    // paths: E[./...] → E[...], E[E/...] → E[...]
     if(expr instanceof final Path path && rst.type instanceof NodeType) {
       if(first.test(path.root) && !path.steps[0].has(Flag.POS)) {
         expr = Path.get(cc, expr.info(info), null, path.steps);
       }
     }
 
-    // inline root item (ignore nodes): 1[. = 1]  ->  1[1 = 1]
+    // inline root item (ignore nodes): 1[. = 1] → 1[1 = 1]
     if(root instanceof Item && !(rst.type instanceof NodeType)) {
       try {
         expr = new InlineContext(null, root, cc).inline(expr);
@@ -144,7 +144,7 @@ public abstract class Preds extends Arr {
     }
 
     // merge node tests with steps; remove redundant node tests
-    // child::node()[self::*]  ->  child::*
+    // child::node()[self::*] → child::*
     if(expr instanceof final SingleIterPath path) {
       final Step predStep = (Step) path.steps[0];
       if(predStep.axis == Axis.SELF && !predStep.mayBePositional() &&
@@ -160,14 +160,14 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // positional tests: x[1]  ->  x[pos: 1]
+    // positional tests: x[1] → x[pos: 1]
     if(expr.seqType().type.instanceOf(AtomType.NUMERIC)) {
       final Expr ex = Pos.get(expr, OpV.EQ, info, cc, null);
       if(ex != null) expr = ex;
     }
 
-    // <a/>/.[pos: 1]  ->  <a/>/.[true()]
-    // $child/..[pos: 2, 5]  ->  $child/..[false()]
+    // <a/>/.[pos: 1] → <a/>/.[true()]
+    // $child/..[pos: 2, 5] → $child/..[false()]
     if(root instanceof final Step step) {
       final Axis axis = step.axis;
       if((axis == Axis.SELF || axis == Axis.PARENT) && expr instanceof final IntPos pos) {
@@ -175,7 +175,7 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // recursive optimization of AND expressions: E[A and [B and C]]  ->  E[A][B][C]
+    // recursive optimization of AND expressions: E[A and [B and C]] → E[A][B][C]
     if(expr instanceof And && !expr.has(Flag.POS)) {
       cc.info(OPTPRED_X, expr);
       for(final Expr arg : expr.args()) {
@@ -206,9 +206,9 @@ public abstract class Preds extends Arr {
         // use minimum of old value and 1
         max = Math.min(max, 1);
       } else if(expr instanceof final IntPos pos) {
-        // subtract start position. example: ...[pos: 1, 2][2]  ->  2  ->  1
+        // subtract start position. example: ...[pos: 1, 2][2] → 2 → 1
         if(max != Long.MAX_VALUE) max = Math.max(0, max - pos.min + 1);
-        // use minimum of old value and range. example: ...[pos: 1, 5]  ->  5
+        // use minimum of old value and range. example: ...[pos: 1, 5] → 5
         max = Math.min(max, pos.max - pos.min + 1);
       } else {
         // resulting size will be unknown for any other filter
@@ -218,12 +218,12 @@ public abstract class Preds extends Arr {
       if(max == 0) return true;
     }
 
-    // (1, 'x')[. instance of xs:integer]  ->  xs:integer*
+    // (1, 'x')[. instance of xs:integer] → xs:integer*
     SeqType st = root.seqType();
     for(final Expr expr : exprs) {
       if(expr instanceof final Instance inst && inst.arg(0) instanceof ContextValue) {
         st = st.intersect(inst.seqType.with(st.occ));
-        // E[. instance of xs:integer][. instance of xs:string]  ->  ()
+        // E[. instance of xs:integer][. instance of xs:string] → ()
         if(st == null) return true;
       }
     }
@@ -260,7 +260,7 @@ public abstract class Preds extends Arr {
       compare                     ? createSimpleMap.apply(rhs) : this;
 
     if(rst.type instanceof NodeType) {
-      // rewrite to path: root[path]  ->  root/path
+      // rewrite to path: root[path] → root/path
       final Expr expr = createExpr.apply(last, false);
       if(expr != this) return expr;
     } else if(ebv) {
@@ -268,10 +268,10 @@ public abstract class Preds extends Arr {
     }
 
     // rewrite to general comparison
-    // a[. = 'x']           ->  a = 'x'
-    // a[@id eq 'id1']      ->  a/@id = 'id1'
-    // a[text() = data(.)]  ->  skip: right operand must not depend on context
-    // a[b eq ('a', 'b')]   ->  skip: an error must be raised as right operand yields a sequence
+    // a[. = 'x']          → a = 'x'
+    // a[@id eq 'id1']     → a/@id = 'id1'
+    // a[text() = data(.)] → skip: right operand must not depend on context
+    // a[b eq ('a', 'b')]  → skip: an error must be raised as right operand yields a sequence
     if(last instanceof final Cmp cmp) {
       final Expr op1 = cmp.exprs[0], op2 = cmp.exprs[1];
       final SeqType st1 = op1.seqType(), st2 = op2.seqType();
@@ -285,8 +285,8 @@ public abstract class Preds extends Arr {
     }
 
     // rewrite to contains text expression (right operand must not depend on context):
-    // a[. contains text 'x']  ->  a contains text 'x'
-    // a[text() contains text 'x']  ->  a/text() contains text 'x'
+    // a[. contains text 'x'] → a contains text 'x'
+    // a[text() contains text 'x'] → a/text() contains text 'x'
     if(last instanceof final FTContains cmp) {
       final FTExpr ftexpr = cmp.ftexpr;
       if(!ftexpr.has(Flag.CTX)) {
@@ -295,7 +295,7 @@ public abstract class Preds extends Arr {
       }
     }
 
-    // rewrite to simple map: $node[string()]  ->  $node ! string()
+    // rewrite to simple map: $node[string()] → $node ! string()
     if(rst.zeroOrOne()) return createSimpleMap.apply(last);
 
     return this;

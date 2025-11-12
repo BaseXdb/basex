@@ -467,7 +467,7 @@ public final class TextEditor {
       while(start > 0 && text[start - 1] != '\n') --start;
       while(end < size() && text[end] != '\n') ++end;
     } else if(start > end) {
-      // selection -> start < end
+      // selection: start < end
       final int s = start;
       start = end;
       end = s;

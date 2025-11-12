@@ -50,9 +50,9 @@ public final class FnAllEqual extends StandardFunc {
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())
         return cc.voidAndReturn(values, Bln.TRUE, info);
 
-      // all-equal(1 to 10)  ->  false
+      // all-equal(1 to 10) → false
       if(values instanceof RangeSeq) return Bln.FALSE;
-      // all-equal(reverse($data))  ->  all-equal($data)
+      // all-equal(reverse($data)) → all-equal($data)
       if(REVERSE.is(values) || SORT.is(values) ||
           REPLICATE.is(values) && values.arg(1) instanceof Itr) {
         final Expr[] args = exprs.clone();

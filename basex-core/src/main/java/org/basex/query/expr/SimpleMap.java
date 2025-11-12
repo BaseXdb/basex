@@ -127,8 +127,8 @@ public abstract class SimpleMap extends Mapping {
             expr.arg(1).seqType().instanceOf(Types.INTEGER_O)) {
           count = expr.arg(1);
         }
-        // (1 to 2) ! <x/>  ->  replicate(<x/>, 2, true())
-        // (1 to $c) ! 'A'  ->  replicate('A', $c, false())
+        // (1 to 2) ! <x/> → replicate(<x/>, 2, true())
+        // (1 to $c) ! 'A' → replicate('A', $c, false())
         if(count != null) return cc.replicate(next, count, info);
       }
 
@@ -138,42 +138,42 @@ public abstract class SimpleMap extends Mapping {
         if(REPLICATE.is(next) && ((FnReplicate) next).singleEval(true) &&
             args[0] instanceof ContextValue && !args[1].has(Flag.CTX)) {
           if(REPLICATE.is(expr) && ((FnReplicate) expr).singleEval(true)) {
-            // replicate(E, C) ! replicate(., D)  ->  replicate(E, C * D)
+            // replicate(E, C) ! replicate(., D) → replicate(E, C * D)
             final Expr cnt = new Arith(info, expr.arg(1), args[1], Calc.MULTIPLY).optimize(cc);
             return cc.function(REPLICATE, info, expr.arg(0), cnt);
           }
           if(expr instanceof final SingletonSeq ss && ss.singleItem()) {
-            // SINGLETONSEQ ! replicate(., C)  ->  replicate(SINGLETONSEQ, C)
+            // SINGLETONSEQ ! replicate(., C) → replicate(SINGLETONSEQ, C)
             return cc.function(REPLICATE, info, expr, args[1]);
           }
         } else if(ITEMS_AT.is(next) && !args[0].has(Flag.CTX) && args[1] instanceof ContextValue) {
           if(expr instanceof final RangeSeq rs) {
-            // (A to B) ! items-at(E, .)  ->  util:range(E, A, B)
-            // reverse(A to B) ! items-at(E, .)  ->  reverse(util:range(E, A, B))
+            // (A to B) ! items-at(E, .) → util:range(E, A, B)
+            // reverse(A to B) ! items-at(E, .) → reverse(util:range(E, A, B))
             final Expr func = cc.function(_UTIL_RANGE, info, args[0],
                 Itr.get(rs.min()), Itr.get(rs.max()));
             return rs.ascending() ? func : cc.function(REVERSE, info, func);
           }
           if(expr instanceof Range) {
-            // (START to END) ! items-at(X, .)  ->  util:range(X, START, END)
+            // (START to END) ! items-at(X, .) → util:range(X, START, END)
             return cc.function(_UTIL_RANGE, info, args[0], expr.arg(0), expr.arg(1));
           }
           if(expr.seqType().instanceOf(Types.INTEGER_ZM)) {
-            // INTEGERS ! items-at(X, .)  ->  items-at(X, INTEGERS)
+            // INTEGERS ! items-at(X, .) → items-at(X, INTEGERS)
             return cc.function(ITEMS_AT, info, args[0], expr);
           }
         } else if(DATA.is(next) && (((FnData) next).contextAccess() ||
             args[0] instanceof ContextValue)) {
-          // E ! data(.)  ->  data(E)
+          // E ! data(.) → data(E)
           return cc.function(DATA, info, expr);
         } else if(STRING_TO_CODEPOINTS.is(expr) && CODEPOINTS_TO_STRING.is(next) &&
             args[0] instanceof ContextValue) {
-          // string-to-codepoints(E) ! codepoints-to-string(.)  ->  characters(E)
+          // string-to-codepoints(E) ! codepoints-to-string(.) → characters(E)
           return cc.function(CHARACTERS, info, expr.args());
         }
       }
 
-      // (1 to 5) ! (. + 1)  ->  2 to 6
+      // (1 to 5) ! (. + 1) → 2 to 6
       if(expr instanceof final RangeSeq rs && next instanceof final Arith arith) {
         final boolean plus = arith.calc == Calc.ADD, minus = arith.calc == Calc.SUBTRACT;
         if((plus || minus) && arith.arg(0) instanceof ContextValue &&
@@ -193,12 +193,12 @@ public abstract class SimpleMap extends Mapping {
       if(input.size() == 1) {
         final Expr inlined = inline(input, next, cc);
         if(inlined != null) {
-          // replicate(1, 2) ! (. = 1)  ->  replicate(1 = 1, 2)
+          // replicate(1, 2) ! (. = 1) → replicate(1 = 1, 2)
           return expr == input ? inlined : cc.replicate(inlined, Itr.get(size), info);
         }
       }
 
-      // (1, 2) ! (. + 1)  ->  1 ! (. + 1), 2 ! (. + 1)
+      // (1, 2) ! (. + 1) → 1 ! (. + 1), 2 ! (. + 1)
       final ExprList unroll = cc.unroll(expr, false);
       if(unroll != null) {
         final ExprList results = new ExprList(unroll.size());
@@ -213,10 +213,10 @@ public abstract class SimpleMap extends Mapping {
     if(expr.seqType().zeroOrOne()) {
       boolean inline = false;
       if(next instanceof final Cast cast) {
-        // $node/@id ! xs:integer(.)  ->  xs:integer($node/@id)
+        // $node/@id ! xs:integer(.) → xs:integer($node/@id)
         inline = cast.expr instanceof ContextValue && cast.seqType.occ == Occ.ZERO_OR_ONE;
       } else if(next instanceof final ContextFn ctxFn) {
-        // $node/.. ! base-uri(.)  ->  base-uri($node/..)
+        // $node/.. ! base-uri(.) → base-uri($node/..)
         inline = ctxFn.inlineable();
       }
       if(inline) {
@@ -230,7 +230,7 @@ public abstract class SimpleMap extends Mapping {
     }
 
     // merge filter with context value as root
-    // A ! .[B]  ->  A[B]
+    // A ! .[B] → A[B]
     Preds preds = null;
     if(next instanceof final Filter filter) {
       if(filter.root instanceof ContextValue) preds = filter;
@@ -240,7 +240,7 @@ public abstract class SimpleMap extends Mapping {
     }
     if(preds != null && !preds.mayBePositional()) return Filter.get(cc, info, expr, preds.exprs);
 
-    // A ! (if(B) then C else ()  ->  A[B] ! C
+    // A ! (if(B) then C else () → A[B] ! C
     if(next instanceof final If iff && iff.exprs[1] == Empty.VALUE && !iff.exprs[0].has(Flag.POS) &&
         !iff.cond.seqType().mayBeNumber()) {
       return get(cc, info, Filter.get(cc, info, expr, iff.cond), iff.exprs[0]);
@@ -277,13 +277,13 @@ public abstract class SimpleMap extends Mapping {
     if(e == 1) return null;
 
     // all operands are steps
-    //   db:get('animals') ! xml  ->  db:get('animals')/xml
-    //   a ! b ! c  ->  /a/b/c
+    //   db:get('animals') ! xml → db:get('animals')/xml
+    //   a ! b ! c → /a/b/c
     final Expr path = Path.get(cc, info, root, steps.finish());
     if(e == el) return path;
 
     // create expression with path and remaining operands
-    //   a ! b ! string()  ->  a/b ! string()
+    //   a ! b ! string() → a/b ! string()
     final ExprList list = new ExprList(el - e + 1).add(path);
     for(; e < el; e++) list.add(exprs[e]);
     return get(cc, info, list.finish());
@@ -369,17 +369,17 @@ public abstract class SimpleMap extends Mapping {
     final Expr last = exprs[el - 1], prev = exprs[el - 2];
     if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING, Simplify.COUNT,
         Simplify.DISTINCT)) {
-      // distinct-values(@id ! data())  ->  distinct-values(@id)
+      // distinct-values(@id ! data()) → distinct-values(@id)
       final Expr lst = cc.get(prev, true, () -> last.simplifyFor(mode, cc));
       if(lst != last) expr = get(cc, info, new ExprList(el).add(exprs).set(el - 1, lst).finish());
     }
 
     if(expr == this && mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       if(seqType().zeroOrOne() && prev.seqType().type instanceof NodeType && last instanceof Bln) {
-        // boolean(@id ! true())  ->  boolean(@id)
+        // boolean(@id ! true()) → boolean(@id)
         expr = last == Bln.FALSE ? Bln.FALSE : remove(cc, el - 1);
       } else {
-        // $node[nodes ! text()]  ->  $node[nodes/text()]
+        // $node[nodes ! text()] → $node[nodes/text()]
         expr = toPath(mode, cc);
       }
     }

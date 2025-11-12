@@ -29,14 +29,14 @@ public final class FnString extends ContextFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // string(data(E))  ->  string(E)
+    // string(data(E)) → string(E)
     exprs = simplifyAll(Simplify.STRING, cc);
 
     final boolean context = contextAccess();
     final Expr item = context ? cc.qc.focus.value : arg(0);
     if(item != null && item.seqType().eq(Types.STRING_O)) {
-      // string('x')  ->  'x'
-      // $string[string() = 'a']  ->  $string[. = 'a']
+      // string('x') → 'x'
+      // $string[string() = 'a'] → $string[. = 'a']
       return context && cc.nestedFocus() ? ContextValue.get(cc, info) : item;
     }
     return this;
@@ -48,10 +48,10 @@ public final class FnString extends ContextFn {
     final Expr item = contextAccess() ? ContextValue.get(cc, info) : arg(0);
     final SeqType st = item.seqType();
     if(mode == Simplify.STRING && st.type.isStringOrUntyped() && st.one()) {
-      // $node[string() = 'x']  ->  $node[. = 'x']
+      // $node[string() = 'x'] → $node[. = 'x']
       expr = item;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // boolean(string($node))  ->  boolean($node/descendant::text())
+      // boolean(string($node)) → boolean($node/descendant::text())
       expr = simplifyEbv(item, cc, null);
     }
     return cc.simplify(this, expr, mode);

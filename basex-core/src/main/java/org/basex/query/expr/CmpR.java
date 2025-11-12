@@ -123,7 +123,7 @@ public final class CmpR extends Single {
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();
 
-    // position() = .1e0  ->  false()
+    // position() = .1e0 → false()
     if(Function.POSITION.is(expr)) {
       final long mn = Math.max((long) Math.ceil(min), 1), mx = (long) Math.floor(max);
       return cc.replaceWith(this, IntPos.get(mn, mx, info));

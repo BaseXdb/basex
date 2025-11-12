@@ -49,8 +49,8 @@ public class FnSlice extends StandardFunc {
       if(size != -1) {
         final Slice slice = slice(size, cc.qc);
         if(slice.step == 1) {
-          // slice(E, 2)  ->  util:range(E, 2)
-          // slice(TEN, 2, 1)  ->  util:range(reverse(TEN), 9, 10)
+          // slice(E, 2) → util:range(E, 2)
+          // slice(TEN, 2, 1) → util:range(reverse(TEN), 9, 10)
           final Expr arg = slice.reverse ? cc.function(REVERSE, info, input) : input;
           return cc.function(_UTIL_RANGE, info, arg, Itr.get(slice.start), Itr.get(slice.end));
         }
@@ -58,9 +58,9 @@ public class FnSlice extends StandardFunc {
       // input size is unknown: exact range cannot be computed, check original properties
       final long start = toLong(1, 1, cc.qc), end = toLong(2, Long.MAX_VALUE, cc.qc);
       if(end == Long.MAX_VALUE && toLong(3, 1, cc.qc) == 1) {
-        // slice(E, -1)  ->  foot(E)
+        // slice(E, -1) → foot(E)
         if(start == -1) return cc.function(FOOT, info, input);
-        // slice(E, 1)  ->  E
+        // slice(E, 1) → E
         if(start == 0 || start == 1) return input;
         // no rewritings possible for greater start values (slice always returns last item)
       }

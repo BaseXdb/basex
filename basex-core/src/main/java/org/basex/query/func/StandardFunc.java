@@ -319,8 +319,8 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected Expr embed(final CompileContext cc, final boolean skip) throws QueryException {
-    // head($nodes ! name())  ->  head($nodes) ! name()
-    // foot((1 to 8) ! <_>{ . }</_>)  ->  foot((1 to 8)) ! <_>{ . }</_>
+    // head($nodes ! name()) → head($nodes) ! name()
+    // foot((1 to 8) ! <_>{ . }</_>) → foot((1 to 8)) ! <_>{ . }</_>
     // do not rewrite positional access:  foot($nodes ! position())
     if(arg(0) instanceof SimpleMap) {
       final Expr[] ops = arg(0).args();

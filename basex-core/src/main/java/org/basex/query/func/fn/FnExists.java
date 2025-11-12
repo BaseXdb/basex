@@ -24,7 +24,7 @@ public final class FnExists extends FnEmpty {
     Expr expr = this;
     final Expr input = arg(0);
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE) && input.seqType().type instanceof NodeType) {
-      // if(exists($nodes))  ->  if($nodes)
+      // if(exists($nodes)) → if($nodes)
       expr = input;
     }
     return cc.simplify(this, expr, mode);

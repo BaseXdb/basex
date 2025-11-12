@@ -36,7 +36,7 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // flatten nested maps: { 1: 2, { 3 : 4, 5: 6 }, () }  ->  { 1: 2, 3: 4, 5: 6 }
+    // flatten nested maps: { 1: 2, { 3 : 4, 5: 6 }, () } → { 1: 2, 3: 4, 5: 6 }
     int el = exprs.length;
     if(((Checks<Expr>) expr -> expr == Empty.UNDEFINED).any(exprs)) {
       final ExprList list = new ExprList(el);
@@ -50,7 +50,7 @@ public final class CMap extends Arr {
       exprs = list.finish();
     }
 
-    // atomize keys: { <_>A</_>: 1 }  ->  { 'A': 1 }
+    // atomize keys: { <_>A</_>: 1 } → { 'A': 1 }
     el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       if(!nested(e)) {
@@ -58,7 +58,7 @@ public final class CMap extends Arr {
       }
     }
 
-    // empty map, single map entry?  { $a: $b }  ->  map:entry($a, $b)
+    // empty map, single map entry?  { $a: $b } → map:entry($a, $b)
     if(el == 0) return XQMap.empty();
     if(el == 2) {
       if(!nested(0)) {

@@ -28,7 +28,7 @@ abstract class Copy extends Arr {
   @Override
   public final Expr optimize(final CompileContext cc) {
     // do not assign original sequence type (name of node may change):
-    // <a/> update { rename node . as 'x' }  ->  <x/>
+    // <a/> update { rename node . as 'x' } → <x/>
     final SeqType st = arg(target()).seqType();
     exprType.assign(st.type, st.occ);
     return this;

@@ -40,23 +40,23 @@ public final class FnFoot extends StandardFunc {
     if(st.zeroOrOne()) return input;
 
     final long size = input.size();
-    // foot(tail(E))  ->  foot(E)
+    // foot(tail(E)) → foot(E)
     if(TAIL.is(input) && size > 1)
       return cc.function(FOOT, info, input.args());
-    // foot(trunk(E))  ->  items-at(E, size)
+    // foot(trunk(E)) → items-at(E, size)
     if(TRUNK.is(input) && size > 0)
       return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(size));
-    // foot(reverse(E))  ->  head(E)
+    // foot(reverse(E)) → head(E)
     if(REVERSE.is(input))
       return cc.function(HEAD, info, input.args());
-    // foot(replicate(E, count))  ->  foot(E)
+    // foot(replicate(E, count)) → foot(E)
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1
       if(input.arg(1) instanceof Itr) return cc.function(FOOT, info, input.arg(0));
     }
 
-    // foot((1, 2))  ->  2
-    // foot((1, (2 to 3))  ->  foot(2 to 3)
+    // foot((1, 2)) → 2
+    // foot((1, (2 to 3)) → foot(2 to 3)
     if(input instanceof List) {
       final Expr[] args = input.args();
       final Expr last = args[args.length - 1];
@@ -64,7 +64,7 @@ public final class FnFoot extends StandardFunc {
       if(stl.one()) return last;
       if(stl.oneOrMore()) return cc.function(FOOT, info, last);
     }
-    // foot(reverse(root)[test])  ->  head(root[test])
+    // foot(reverse(root)[test]) → head(root[test])
     if(input instanceof final IterFilter filter) {
       final Expr root = cc.function(REVERSE, filter.info(), filter.root);
       return cc.function(HEAD, info, Filter.get(cc, filter.info(), root, filter.exprs));

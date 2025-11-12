@@ -43,7 +43,7 @@ public final class UtilSelect extends ContextFn {
 
     if(expr2 != null) {
       if(st1.type == AtomType.QNAME && st2.instanceOf(Types.NODE_O)) {
-        // util:select((#a, #b))  ->  node-name() = (#a, #b)
+        // util:select((#a, #b)) → node-name() = (#a, #b)
         final Expr[] args = defined(1) ? new Expr[] { expr2 } : new Expr[0];
         final Expr op1 = cc.function(Function.NODE_NAME, info, args);
         return new CmpG(info, op1, expr1, OpG.EQ).optimize(cc);

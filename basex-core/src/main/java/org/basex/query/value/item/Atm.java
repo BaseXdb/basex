@@ -91,7 +91,7 @@ public final class Atm extends Item {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // E[xs:untypedAtomic('x')]  ->  E[true()]
+      // E[xs:untypedAtomic('x')] → E[true()]
       expr = Bln.get(this != EMPTY);
     }
     return cc.simplify(this, expr, mode);

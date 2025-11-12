@@ -47,9 +47,9 @@ public final class FnAllDifferent extends StandardFunc {
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())
         return cc.voidAndReturn(values, Bln.TRUE, info);
 
-      // all-different(1 to 10)  ->  true
+      // all-different(1 to 10) → true
       if(values instanceof RangeSeq) return Bln.TRUE;
-      // all-different(reverse($data))  ->  all-different($data)
+      // all-different(reverse($data)) → all-different($data)
       if(REVERSE.is(values) || SORT.is(values)) {
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);

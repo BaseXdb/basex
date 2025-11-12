@@ -145,7 +145,7 @@ final class PlotAxis {
     int i = 0;
 
     // find first non-empty value
-    // empty string is treated as non-existing value -> coordinate = -1
+    // empty string is treated as non-existing value (coordinate = -1)
     while(i < vl && vals[i].length == 0) co[tmpI[i++]] = -1;
 
     // count number of unique values

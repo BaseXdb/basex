@@ -57,7 +57,7 @@ public final class FnCodepointsToString extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0);
 
-    // codepoints-to-string(string-to-codepoints(A))  ->  string(A)
+    // codepoints-to-string(string-to-codepoints(A)) → string(A)
     if(STRING_TO_CODEPOINTS.is(values)) return cc.function(STRING, info, values.args());
 
     singleInt = values.seqType().instanceOf(Types.INTEGER_O);

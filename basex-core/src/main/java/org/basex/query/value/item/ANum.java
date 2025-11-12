@@ -126,8 +126,8 @@ public abstract class ANum extends Item {
     Expr expr = this;
     final double d = dbl();
     if(mode == Simplify.PREDICATE && (d != itr() || d < 1) || mode == Simplify.EBV && d == 0) {
-      // predicate: E[0]  ->  E[false()]
-      // EBV: if(0)  ->  if(false())
+      // predicate: E[0] → E[false()]
+      // EBV: if(0) → if(false())
       expr = Bln.FALSE;
     }
     return cc.simplify(this, expr, mode);

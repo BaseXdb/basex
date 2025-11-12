@@ -49,10 +49,10 @@ public final class Except extends Set {
       } else if(!expr.has(Flag.CNS, Flag.NDT)) {
         final int same = ((Checks<Expr>) ex -> ex.equals(expr)).index(list);
         // identical to first operand: return empty sequence
-        // example: text() except text()  ->  ()
+        // example: text() except text() → ()
         if(same == 0) return Empty.VALUE;
         // identical to subsequent operand: remove duplicate
-        // example: node() except * except *  ->  node() except *
+        // example: node() except * except * → node() except *
         if(same > 0) cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
         else list.add(expr);
       } else {

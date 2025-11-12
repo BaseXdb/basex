@@ -29,7 +29,7 @@ public final class FnNormalizeSpace extends ContextFn {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // $node[normalize-space(.)]  ->  $node[descendant::text()[normalize-space(.)]]
+      // $node[normalize-space(.)] → $node[descendant::text()[normalize-space(.)]]
       final Expr item = contextAccess() ? ContextValue.get(cc, info) : arg(0);
       expr = simplifyEbv(item, cc, () -> cc.function(Function.NORMALIZE_SPACE, info));
     }

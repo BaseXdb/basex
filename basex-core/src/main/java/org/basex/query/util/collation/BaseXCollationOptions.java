@@ -102,7 +102,7 @@ public final class BaseXCollationOptions extends CollationOptions {
         try {
           assign(name, value);
         } catch(final BaseXException ex) {
-          // fallback == true -> ignore invalid values
+          // fallback == true (ignore invalid values)
           Util.debug(ex);
         }
       }

@@ -142,13 +142,13 @@ public abstract class Step extends Preds {
     final Type type = seqType().type;
     if(axis == DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE) ||
        axis == ANCESTOR_OR_SELF && type.oneOf(NodeType.LEAF_TYPES)) {
-      // descendant-or-self::document-node()  ->  self::document-node()
-      // ancestor-or-self::text()  ->  self::text()
+      // descendant-or-self::document-node() → self::document-node()
+      // ancestor-or-self::text() → self::text()
       axis = SELF;
     } else if(rt != null && rt.seqType().type.intersect(type) == null) {
-      // root()/descendant-or-self::x  ->  root()/descendant::x
+      // root()/descendant-or-self::x → root()/descendant::x
       if(axis == DESCENDANT_OR_SELF) axis = DESCENDANT;
-      // $text/ancestor-or-self::x  ->  $text/ancestor::x
+      // $text/ancestor-or-self::x → $text/ancestor::x
       else if(axis == ANCESTOR_OR_SELF) axis = ANCESTOR;
     }
     if(axis != old) cc.info(QueryText.OPTREWRITE_X_X, old, this);
@@ -374,10 +374,10 @@ public abstract class Step extends Preds {
    * @return {@code true} if the step can be removed
    */
   final boolean remove(final SeqType seqType) {
-    // <xml/>/.  ->  <xml/>
-    // <xml/>/self::node()  ->  <xml/>
-    // $text/descendant-or-self::text()  ->  $text
-    // $doc/ancestor-or-self::text()  ->  $doc
+    // <xml/>/. → <xml/>
+    // <xml/>/self::node() → <xml/>
+    // $text/descendant-or-self::text() → $text
+    // $doc/ancestor-or-self::text() → $doc
     final Type prevType = seqType.type;
     return exprs.length == 0 && (
       axis == SELF ||

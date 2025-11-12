@@ -2313,7 +2313,7 @@ public final class RewritingsTest extends SandboxTest {
     check("count((<a/>, <b/>)[self::a])", 1, exists(DualMap.class));
   }
 
-  /** EBV tests, count -> exists. */
+  /** EBV tests, count → exists. */
   @Test public void gh1974() {
     check("boolean(count((1, 2)[. <= 2]))", true, root(EXISTS));
     check("boolean(count((1, 2)[. >= 3]))", false, root(EXISTS));
@@ -2376,7 +2376,7 @@ public final class RewritingsTest extends SandboxTest {
     check("document {}[ancestor-or-self::element()]", "", empty());
   }
 
-  /** descendant-or-self -> descendant. */
+  /** descendant-or-self → descendant. */
   @Test public void gh1979() {
     check("document { <a/> }/descendant-or-self::a", "<a/>",
         exists("IterStep[@axis = 'descendant']"));

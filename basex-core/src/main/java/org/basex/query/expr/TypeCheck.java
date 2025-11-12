@@ -39,12 +39,12 @@ public final class TypeCheck extends Single {
     final Type type = st.type;
 
     if(type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
-      // data(EXPR) coerce to xs:int  ->  EXPR coerce to xs:int
+      // data(EXPR) coerce to xs:int → EXPR coerce to xs:int
       expr = expr.simplifyFor(Simplify.DATA, cc);
     }
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
         st.occ.instanceOf(expr.seqType().occ)) {
-      // exactly-one(ITEM) coerce to item()  ->  ITEM coerce to item()
+      // exactly-one(ITEM) coerce to item() → ITEM coerce to item()
       expr = cc.replaceWith(expr, expr.arg(0));
     }
 
@@ -54,13 +54,13 @@ public final class TypeCheck extends Single {
     // refine type check (ignore arrays as coerced result may have a different size)
     if(!et.mayBeArray() || !type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
       // occurrence indicator:
-      //   exactly-one/one-or-more  ->  exactly-one
+      //   exactly-one/one-or-more → exactly-one
       final Occ nocc = et.occ.intersect(st.occ);
       // raise static error if no intersection is possible:
       //   () coerce to item()
       if(nocc == null) throw typeError(expr, st, info);
       // refine result type:
-      //   INTEGERS coerce to item()  ->  INTEGERS coerce to xs:integer
+      //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
       if(check == 1) st = nst;
       // adopt result size and data reference from input expression
       exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).
@@ -69,13 +69,13 @@ public final class TypeCheck extends Single {
 
     // remove redundant type check
     if(expr instanceof final TypeCheck tc && st.instanceOf(et)) {
-      // (EXPR coerce to xs:integer) coerce to xs:int  ->  EXPR coerce to xs:int
+      // (EXPR coerce to xs:integer) coerce to xs:int → EXPR coerce to xs:int
       return cc.replaceWith(this, new TypeCheck(info, tc.expr, st).optimize(cc));
     }
 
     // skip check if return type is correct
     if(et.instanceOf(st)) {
-      // (1, 3) coerce to xs:integer*  ->  (1, 3)
+      // (1, 3) coerce to xs:integer* → (1, 3)
       cc.info(OPTTYPE_X_X, st, expr);
       return expr;
     }

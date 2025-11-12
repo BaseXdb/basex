@@ -46,16 +46,16 @@ public final class FnSort extends FnSortBy {
         final Value value = quickValue((Value) input);
         if(value != null) return value;
       } else if(REVERSE.is(input) || SORT.is(input)) {
-        // sort(reverse(EXPR))  ->  sort(EXPR)
+        // sort(reverse(EXPR)) → sort(EXPR)
         final Expr[] args = exprs.clone();
         args[0] = args[0].arg(0);
         return cc.function(SORT, info, args);
       } else if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
-        // sort(replicate(10, 5))  ->  replicate(10, 5)
+        // sort(replicate(10, 5)) → replicate(10, 5)
         final SeqType rst = input.arg(0).seqType();
         if(rst.zeroOrOne() && rst.type.isSortable()) return input;
       } else if(_DB_NODE_PRE.is(input) && input.arg(0).ddo()) {
-        // sort(db:node-pre(db:text(...)))  ->  db:node-pre(db:text(...))
+        // sort(db:node-pre(db:text(...))) → db:node-pre(db:text(...))
         return input;
       }
     }

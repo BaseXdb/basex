@@ -529,8 +529,8 @@ public abstract class JavaCall extends Arr {
    */
   public static String classPath(final String name) {
     // prepend standard package if name starts with uppercase letter and has no dots
-    //   String  ->  java.lang.String
-    //   char[]  ->  char[]
+    //   String → java.lang.String
+    //   char[] → char[]
     return name.replaceAll("^([A-Z][^.]+)$", JAVA_LANG_DOT + "$1");
   }
 

@@ -36,7 +36,7 @@ public final class MapPut extends StandardFunc {
     final MapCompilation mc = MapCompilation.get(map).key(key);
     if(mc.key != null) {
       if(mc.field != null) {
-        // map:put({ 'a': 1, 'b': 2 }, 'b', 3)  ->  util:map-put-at({ 'a': 1, 'b': 2 }, 2, 3)
+        // map:put({ 'a': 1, 'b': 2 }, 'b', 3) → util:map-put-at({ 'a': 1, 'b': 2 }, 2, 3)
         if(!mc.record.hasOptional())
           return cc.function(_UTIL_MAP_PUT_AT, info, map, Itr.get(mc.index), value);
         if(value.seqType().instanceOf(mc.field.seqType())) type = mc.record;

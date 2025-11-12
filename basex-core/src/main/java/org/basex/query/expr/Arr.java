@@ -188,12 +188,12 @@ public abstract class Arr extends ParseExpr {
     for(final Expr expr : exprs) {
       // pre-evaluate values
       if(expr instanceof Value && (!predicate || !expr.seqType().mayBeNumber())) {
-        // skip evaluation: true() or $bool  ->  true()
+        // skip evaluation: true() or $bool → true()
         if(expr.test(cc.qc, info, 0) == or) return true;
-        // ignore result: true() and $bool  ->  $bool
+        // ignore result: true() and $bool → $bool
         cc.info(QueryText.OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else if(!pos && list.contains(expr) && !expr.has(Flag.NDT)) {
-        // ignore duplicates: A[$node and $node]  ->  A[$node]
+        // ignore duplicates: A[$node and $node] → A[$node]
         cc.info(QueryText.OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);
@@ -219,13 +219,13 @@ public abstract class Arr extends ParseExpr {
       for(int m = l + 1; m < list.size(); m++) {
         final Expr expr1 = list.get(l), expr2 = list.get(m);
         if(!expr1.has(Flag.NDT) && !(predicate && expr1.has(Flag.POS))) {
-          // A or not(A)  ->  true()
-          // A[not(B)][B]  ->  ()
-          // empty(A) or exists(A)  ->  true()
+          // A or not(A) → true()
+          // A[not(B)][B] → ()
+          // empty(A) or exists(A) → true()
           if(contradict(expr1, expr2, true) || contradict(expr2, expr1, true)) return true;
 
-          // 'a'[. = 'a' or . = 'b']  ->  'a'[. = ('a', 'b')]
-          // $v[. != 'a'][. != 'b']  ->  $v[not(. = ('a', 'b')]
+          // 'a'[. = 'a' or . = 'b'] → 'a'[. = ('a', 'b')]
+          // $v[. != 'a'][. != 'b'] → $v[not(. = ('a', 'b')]
           final Expr merged = expr1.mergeEbv(expr2, or, cc);
           if(merged != null) {
             cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
@@ -237,7 +237,7 @@ public abstract class Arr extends ParseExpr {
     }
     exprs = list.next();
 
-    // not($a) and not($b)  ->  not($a or $b)
+    // not($a) and not($b) → not($a or $b)
     final Function not = NOT;
     final Checks<Expr> fnNot = ex -> not.is(ex) && !(predicate && ex.has(Flag.POS));
     if(exprs.length > 1 && fnNot.all(exprs)) {
@@ -309,17 +309,17 @@ public abstract class Arr extends ParseExpr {
       final ExprList curr = entries.apply(expr).removeAll(lefts);
       if(curr.isEmpty()) {
         // no additional tests: return common tests
-        // A intersect (A union B)  ->  A
-        // (A and B) or (A and B and C)  ->  A
+        // A intersect (A union B) → A
+        // (A and B) or (A and B and C) → A
         return left.seqType().type instanceof NodeType && !left.ddo() ?
           cc.function(Function.DISTINCT_ORDERED_NODES, info, left) : left;
       } else if(curr.size() == 1) {
         // single additional test: add this test
-        // (A and B) or (A and C)  ->  A and (B or C)
+        // (A and B) or (A and C) → A and (B or C)
         rights.add(curr.get(0));
       } else {
         // multiple additional tests: simplify expression
-        // (A and B) or (A and C and D)  ->  A and (B or (C and D))
+        // (A and B) or (A and C and D) → A and (B or (C and D))
         rights.add(f.apply(true, curr.finish()));
       }
     }

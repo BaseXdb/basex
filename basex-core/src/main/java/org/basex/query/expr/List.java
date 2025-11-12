@@ -126,7 +126,7 @@ public final class List extends Arr {
           min = mn;
           max = mx;
         } else if(mn == max + 1) {
-          // extend range: 1 - 2, 3 - 4  ->  1 - 4
+          // extend range: 1 - 2, 3 - 4 → 1 - 4
           max = mx;
         } else {
           // finalize existing range
@@ -214,7 +214,7 @@ public final class List extends Arr {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // E[A, B]  ->  E[A | B]
+      // E[A, B] → E[A | B]
       expr = toUnion(cc);
     } else if(mode == Simplify.DISTINCT) {
       final int el = exprs.length;
@@ -271,7 +271,7 @@ public final class List extends Arr {
         if(e > end) end = e;
       }
     }
-    // (1 to 3, 3, 4)  ->  1 to 4
+    // (1 to 3, 3, 4) → 1 to 4
     return RangeSeq.get(start, end - start + 1, true);
   }
 

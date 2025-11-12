@@ -38,13 +38,13 @@ public final class FnNumber extends ContextFn {
     final Expr value = context ? cc.qc.focus.value : arg(0);
     final Type type = argType(cc);
 
-    // number(1e1)  ->  1e1
-    // $double[number() = 1]  ->  $double[. = 1]
+    // number(1e1) → 1e1
+    // $double[number() = 1] → $double[. = 1]
     if(type == DOUBLE) return context && cc.nestedFocus() ? ContextValue.get(cc, info) : value;
 
     // number(string(E))
     // number(xs:untypedAtomic(E))
-    // number(ITEM coerce to xs:untypedAtomic)  ->  number(E)
+    // number(ITEM coerce to xs:untypedAtomic) → number(E)
     if(type != null) {
       final Expr arg = simplify(value, cc);
       if(arg != null) return cc.function(Function.NUMBER, info, arg);

@@ -80,7 +80,7 @@ public class DbNodeId extends StandardFunc {
 
     final Expr input = arg(0);
     if(mode == Simplify.COUNT) {
-      // count(db:node-id(db:text($x)))  ->  count(db:text($x))
+      // count(db:node-id(db:text($x))) → count(db:text($x))
       if(input.ddo()) expr = input;
     }
     return cc.simplify(this, expr, mode);

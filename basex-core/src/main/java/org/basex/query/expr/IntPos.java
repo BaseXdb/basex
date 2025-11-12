@@ -101,9 +101,9 @@ public final class IntPos extends Simple implements CmpPos {
       // find range with smaller minimum
       final boolean smaller = min < pos.min;
       final IntPos pos1 = smaller ? this : pos, pos2 = smaller ? pos : this;
-      // create intersection: pos: 1, 2 and pos: 2, 3  ->  pos: 2
+      // create intersection: pos: 1, 2 and pos: 2, 3 → pos: 2
       if(!or) return get(pos2.min, Math.min(pos1.max, pos2.max), info);
-      // create union: pos: 1, 2 or pos: 2, 3  ->  pos: 1, 3
+      // create union: pos: 1, 2 or pos: 2, 3 → pos: 1, 3
       if(pos1.max + 1 >= pos2.min) return get(pos1.min, Math.max(pos1.max, pos2.max), info);
       // disjoint ranges, no rewrite: pos: 1 or pos: 3
     }

@@ -44,12 +44,12 @@ public final class AtomicUpdatesTest extends SandboxTest {
     query(transform("<doc><tree id=\"0\"/></doc>",
         "replace node $input//@id with (attribute id {\"1\"}, attribute id2 {\"2\"})"),
         "<doc><tree id=\"1\" id2=\"2\"/></doc>");
-    // LAZY REPLACE: 8 value updates -> element, attribute, text, comment, processing instruction
+    // LAZY REPLACE: 8 value updates (element, attribute, text, comment, processing instruction)
     query(transform("<doc><tree1 a='0'>text1<a/><!--comm1--><a/><?p1 i1?><?p11?></tree1></doc> ",
         "replace node $input//tree1 with " +
         "<tree2 b='1'>text2<a/><!--comm2--><a/><?p2 i2?><?p22?></tree2>"),
         "<doc><tree2 b=\"1\">text2<a/><!--comm2--><a/><?p2 i2?><?p22 ?></tree2></doc>");
-    // LAZY REPLACE: 2 value updates -> single attribute
+    // LAZY REPLACE: 2 value updates (single attribute)
     query(transform("<doc><tree id1=\"0\"/></doc>",
         "replace node $input//@id1 with attribute id2 {\"1\"}"),
         "<doc><tree id2=\"1\"/></doc>");
@@ -177,14 +177,14 @@ public final class AtomicUpdatesTest extends SandboxTest {
     query(transform(doc, "insert node <c/> into $input/b, insert node <d/> into $input/b"),
         "<a><b><c/><d/></b></a>");
 
-    // delete(x) -> insert(x+1)
+    // delete(x) → insert(x+1)
     auc = atomics(doc);
     auc.addDelete(2);
     auc.addInsert(3, 1, elemClip(md, "<d/>", false));
     assertEquals(1, auc.updatesSize());
     query(transform(doc, "insert node <d/> into $input, delete node $input/b"), "<a><d/></a>");
 
-    // delete(x) -> insert(x+1) with affecting insert before x
+    // delete(x) → insert(x+1) with affecting insert before x
     auc = atomics("<a><b/><c/></a>");
     auc.addDelete(2);
     auc.addDelete(3);

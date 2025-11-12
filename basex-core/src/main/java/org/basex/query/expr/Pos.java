@@ -46,7 +46,7 @@ public final class Pos extends Single {
   public static Expr get(final Expr positions, final OpV op, final InputInfo info,
       final CompileContext cc, final Expr ref) throws QueryException {
 
-    // static result. example: position() > 0  ->  true
+    // static result. example: position() > 0 → true
     Expr pos = positions.optimizePos(op, cc);
     if(pos instanceof Bln) return pos;
 
@@ -112,11 +112,11 @@ public final class Pos extends Single {
         default:
       }
       if(min != null) {
-        // position() <= $pos  ->  pos: 1, $pos
+        // position() <= $pos → pos: 1, $pos
         if(pos.isSimple()) return SimplePos.get(min, max, info);
-        // position() = last()  ->  pos: last()
+        // position() = last() → pos: last()
         if(max == null) return ref instanceof Pos ? null : new Pos(info, min);
-        // position() < last()  ->  position() = 1 to last() - 1
+        // position() < last() → position() = 1 to last() - 1
         if(integer) return get(new Range(info, min, max).optimize(cc), OpV.EQ, info, cc, ref);
       }
     }
@@ -199,7 +199,7 @@ public final class Pos extends Single {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     if(mode == Simplify.PREDICATE) {
-      // pos: last() + 1  ->  false()
+      // pos: last() + 1 → false()
       final Expr ex = expr.simplifyFor(mode, cc);
       if(ex != expr) return ex;
     }

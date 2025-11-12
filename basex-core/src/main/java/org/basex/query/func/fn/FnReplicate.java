@@ -109,14 +109,14 @@ public final class FnReplicate extends StandardFunc {
     long sz = -1, c = -1;
     if(count instanceof Value) {
       c = toLong(count, cc.qc);
-      // replicate(<a/>, 0)  ->  ()
+      // replicate(<a/>, 0) → ()
       if(c == 0) return Empty.VALUE;
-      // replicate(<a/>, 1)  ->  <a/>
+      // replicate(<a/>, 1) → <a/>
       if(c == 1) return input;
       sz = input.size();
       if(sz != -1) sz = c > 1 && Util.inBounds(sz, c) ? sz * c : -1;
     }
-    // replicate(void(<a/>), 2)  ->  void(<a/>)
+    // replicate(void(<a/>), 2) → void(<a/>)
     if(input == Empty.VALUE || sz == 0 && single) return input;
 
     // adopt sequence type
@@ -127,15 +127,15 @@ public final class FnReplicate extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // data(replicate(<a>1</a>, 2))  ->  data(replicate(xs:untypedAtomic('1'), 2))
-    // distinct-values(replicate(('a', 'a'), 2))  ->  distinct-values('a', 2)
+    // data(replicate(<a>1</a>, 2)) → data(replicate(xs:untypedAtomic('1'), 2))
+    // distinct-values(replicate(('a', 'a'), 2)) → distinct-values('a', 2)
     final Expr input = mode.oneOf(Simplify.STRING, Simplify.NUMBER, Simplify.DATA, Simplify.COUNT,
         Simplify.DISTINCT) ? arg(0).simplifyFor(mode, cc) : arg(0);
 
     final long count = arg(1) instanceof final Itr itr ? itr.itr() : -1;
     if(count > 0 && (singleEval(true) || !input.has(Flag.NDT))) {
-      // distinct-values(replicate(NODES, 2))  ->  distinct-values(NODES)
-      // VALUE[replicate(NODES, 2)]  ->  VALUE[NODES]
+      // distinct-values(replicate(NODES, 2)) → distinct-values(NODES)
+      // VALUE[replicate(NODES, 2)] → VALUE[NODES]
       if(mode == Simplify.DISTINCT ||
           mode == Simplify.PREDICATE && input.seqType().instanceOf(Types.NODE_ZM)) {
         return cc.simplify(this, input, mode);

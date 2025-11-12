@@ -96,10 +96,10 @@ public final class IntSeq extends NativeSeq {
 
     int[] tmp = null;
     if(mode == Simplify.PREDICATE) {
-      // remove duplicates, order data: (2, 1, 2)  ->  1 to 2
+      // remove duplicates, order data: (2, 1, 2) → 1 to 2
       tmp = new IntList((int) size).add(values).ddo().finish();
     } else if(mode == Simplify.DISTINCT) {
-      // remove duplicates, but preserve order: (2, 1, 2)  ->  (2, 1)
+      // remove duplicates, but preserve order: (2, 1, 2) → (2, 1)
       final IntSet is = new IntSet(size);
       for(final int i : values) is.add(i);
       tmp = is.keys();

@@ -83,7 +83,7 @@ public class FnSortWith extends StandardFunc {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // count(sort(A))  ->  count(A)
+    // count(sort(A)) → count(A)
     return cc.simplify(this, mode == Simplify.COUNT ? arg(0) : this, mode);
   }
 

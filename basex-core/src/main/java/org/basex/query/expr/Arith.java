@@ -43,7 +43,7 @@ public class Arith extends Arr {
     if(values(false, cc)) return cc.preEval(this);
 
     // move values to second position
-    // 1 + position()  ->  position() + 1
+    // 1 + position() → position() + 1
     Expr expr1 = exprs[0], expr2 = exprs[1];
     if((calc == Calc.ADD || calc == Calc.MULTIPLY) && expr1 instanceof Value &&
         !(expr2 instanceof Value)) {
@@ -64,16 +64,16 @@ public class Arith extends Arr {
     exprType.assign(type, one ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
 
     Expr expr = emptyExpr();
-    // 0 - $x  ->  -$x
+    // 0 - $x → -$x
     if(expr == this && expr1 == Itr.ZERO && calc == Calc.SUBTRACT) {
       expr = new Unary(info, expr2, true).optimize(cc);
     }
-    // count($n/@*) + count($n/*)  ->  count(($n/@*, $n/*))
+    // count($n/@*) + count($n/*) → count(($n/@*, $n/*))
     if(expr == this && Function.COUNT.is(expr1) && calc == Calc.ADD && Function.COUNT.is(expr2)) {
       expr = cc.function(Function.COUNT, info, List.get(cc, info, expr1.arg(0), expr2.arg(0)));
     }
     if(expr == this && nums && noarray && st1.one() && st2.one()) {
-      // example: number($a) + 0  ->  number($a)
+      // example: number($a) + 0 → number($a)
       final Expr ex = calc.optimize(expr1, expr2, info, cc);
       if(ex != null) {
         expr = ex;
@@ -85,21 +85,21 @@ public class Arith extends Arr {
         final Expr arg1 = arth1.arg(0), arg2 = arth1.arg(1);
 
         if(arg2 instanceof ANum && expr2 instanceof ANum && (acalc == calc || inverse)) {
-          // (E - 3) + 2  ->  E - (3 - 2)
-          // (E * 3 div 2  ->  E * (3 div 2)
+          // (E - 3) + 2 → E - (3 - 2)
+          // (E * 3 div 2 → E * (3 div 2)
           final Calc ncalc = add ? calc : sub ? calc.invert() : null;
           if(ncalc != null) expr = new Arith(info, arg1,
               new Arith(info, arg2, expr2, ncalc).optimize(cc), acalc).optimize(cc);
         } else if(inverse) {
-          // E + NUMBER - NUMBER  ->  E
-          // NUMBER * E div NUMBER  ->  E
+          // E + NUMBER - NUMBER → E
+          // NUMBER * E div NUMBER → E
           expr = arg2.equals(expr2) ? arg1 : arg1.equals(expr2) && add ? arg2 : this;
           if(expr != this) expr = new Cast(info, expr, Types.NUMERIC_O).optimize(cc);
         }
       } else if(calc.oneOf(Calc.ADD, Calc.SUBTRACT) && expr2 instanceof final ANum num &&
           num.dbl() < 0) {
-        // E + -1  ->  E - 1
-        // E - -1  ->  E + 1
+        // E + -1 → E - 1
+        // E - -1 → E + 1
         final Expr inv2 = new Unary(info, num, true).optimize(cc);
         expr = new Arith(info, expr1, inv2, calc.invert()).optimize(cc);
       }
@@ -128,7 +128,7 @@ public class Arith extends Arr {
     Expr expr = this;
     if(mode == Simplify.PREDICATE && Function.LAST.is(exprs[0]) &&
         exprs[1] instanceof final ANum num) {
-      // E[last() + 1]  ->  E[false()]
+      // E[last() + 1] → E[false()]
       final double d = num.dbl();
       if(calc == Calc.ADD && d > 0 || calc == Calc.SUBTRACT && d < 0 ||
         calc == Calc.MULTIPLY && d > 1 || calc == Calc.DIVIDE && d < 1) expr = Bln.FALSE;

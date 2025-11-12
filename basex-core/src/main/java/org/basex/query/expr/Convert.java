@@ -82,7 +82,7 @@ abstract class Convert extends Single {
     Expr arg = null;
     if(est.one() && !est.mayBeArray() && castType.type.instanceOf(AtomType.NUMERIC)) {
       // xs:int(string(I))
-      // xs:int(xs:double(I))  ->  xs:int(I)
+      // xs:int(xs:double(I)) → xs:int(I)
       arg = FnNumber.simplify(expr, cc);
       if(arg == null && expr instanceof final Cast cast && (
         castType.type.instanceOf(est.type) ||

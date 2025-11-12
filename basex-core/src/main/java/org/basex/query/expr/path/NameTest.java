@@ -155,7 +155,7 @@ public final class NameTest extends Test {
           // Q{uri1}local1 = *:local2, Q{uri1}local1 = Q{uri2}*
           if(nt.matches(qname)) return this;
         } else if(nt.scope == Scope.URI) {
-          // *:local1 = Q{uri2}*  ->  Q{uri2}local1
+          // *:local1 = Q{uri2}* → Q{uri2}local1
           return new NameTest(new QNm(local, nt.qname.uri()), Scope.FULL, type, defaultNs);
         } else {
           // *:local1 = Q{uri2}local2, Q{uri1}* = Q{uri2}local2, Q{uri1}* = *:local2

@@ -22,8 +22,8 @@ class IndexContext extends IndexPred {
   /**
    * Returns the last step pointing to the requested nodes. Examples:
    * <ul>
-   *   <li>{@code /xml/a[. = 'A']}         ->  {@code a}</li>
-   *   <li>{@code /xml/a/text()[. = 'A']}  ->  {@code text()}</li>
+   *   <li>{@code /xml/a[. = 'A']}        → {@code a}</li>
+   *   <li>{@code /xml/a/text()[. = 'A']} → {@code text()}</li>
    * </ul>
    * @return parent step
    */
@@ -35,8 +35,8 @@ class IndexContext extends IndexPred {
   /**
    * Returns the local name and namespace URI of the last name test. Examples:
    * <ul>
-   *   <li> //x[. = 'TEXT']  -> x </li>
-   *   <li> //@x[. = 'TEXT'] -> x </lI>
+   *   <li> {@code //x[. = 'TEXT']}  → {@code x}</li>
+   *   <li> {@code //@x[. = 'TEXT']} → {@code x}</lI>
    * </ul>
    * @return parent step
    */

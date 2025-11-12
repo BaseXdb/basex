@@ -87,8 +87,8 @@ public abstract class Mapping extends Arr {
       final boolean items = items();
       final int el = exprs.length;
       for(int e = 1; e < el && uses != VarUsage.MORE_THAN_ONCE; e++) {
-        // EXPR -> ($a)  -> single use
-        // EXPR ! ($a)  -> more than one use
+        // EXPR -> ($a) ...single usage
+        // EXPR ! ($a)  ...multiple usages
         final VarUsage vu = exprs[e].count(var);
         if(vu != VarUsage.NEVER) uses = items ? VarUsage.MORE_THAN_ONCE : uses.plus(vu);
       }
@@ -183,7 +183,7 @@ public abstract class Mapping extends Arr {
     }
 
     // remove context value references (ignore first expression)
-    // (1 to 10) ! .  ->  (1 to 10)
+    // (1 to 10) ! . → (1 to 10)
     for(int n = list.size() - 1; n > 0; n--) {
       if(list.get(n) instanceof ContextValue) list.remove(n);
     }
@@ -204,18 +204,18 @@ public abstract class Mapping extends Arr {
    */
   static Expr inline(final Expr expr, final Expr next, final CompileContext cc) {
     /* inline values:
-     *   'a' ! (. = 'a')  ->  'a'  = 'a'
-     *   map { } ! ?*      ->  map { }?*
-     *   123 ! number()   ->  number(123)
+     *   'a' ! (. = 'a') → 'a'  = 'a'
+     *   map { } ! ?*    → map { }?*
+     *   123 ! number()  → number(123)
      * inline context reference
-     *   . ! number() = 2  ->  number() = 2
+     *   . ! number() = 2 → number() = 2
      * inline variable references
-     *   $a ! (. + .)  ->  $a + $a
+     *   $a ! (. + .) → $a + $a
      * inline any other expression
-     *   ($a + $b) ! (. * 2)  ->  ($a + $b) * 2
-     *   ($n + 2) ! abs(.) ->  abs(. + 2)
+     *   ($a + $b) ! (. * 2) → ($a + $b) * 2
+     *   ($n + 2) ! abs(.)   → abs(. + 2)
      * values
-     *   (<X/>, <Y/>) -> count(.)  ->  count((<X/>, <Y/>))
+     *   (<X/>, <Y/>) -> count(.) → count((<X/>, <Y/>))
      * skip positional access and higher-order functions
      *   <X/> ! function-lookup#2(xs:QName('fn:name'), 0)()
      *   <X/> ! last#0()

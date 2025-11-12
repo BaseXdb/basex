@@ -183,8 +183,8 @@ public abstract class Path extends ParseExpr {
     if(expr == this) expr = index(cc, rt);
     /* rewrite descendant to child steps. this optimization is called after the index rewritings,
      * as it is cheaper to invert a descendant step. examples:
-     * - //B [. = '...']  ->  IA('...', B)
-     * - /A/B[. = '...']  ->  IA('...', B)/parent::A *[parent::document-node()] */
+     * - //B [. = '...'] → IA('...', B)
+     * - /A/B[. = '...'] → IA('...', B)/parent::A *[parent::document-node()] */
     if(expr == this) expr = children(cc, rt);
     // return optimized expression
     if(expr != this) return expr;
@@ -199,7 +199,7 @@ public abstract class Path extends ParseExpr {
 
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
-      // merge nested predicates. example: if(a[b])  ->  if(a/b)
+      // merge nested predicates. example: if(a[b]) → if(a/b)
       final Expr last = steps[steps.length - 1];
       if(last instanceof final Step step && step.exprs.length == 1 &&
           step.seqType().type instanceof NodeType && !step.exprs[0].seqType().mayBeNumber()) {
@@ -322,7 +322,7 @@ public abstract class Path extends ParseExpr {
         }
       }
 
-      // step is empty sequence. example: $doc/NON-EXISTING-STEP  ->  $doc/()  ->  ()
+      // step is empty sequence. example: $doc/NON-EXISTING-STEP → $doc/() → ()
       final Expr expr = steps[s];
       if(expr == Empty.VALUE) return cc.emptySeq(this);
 
@@ -330,7 +330,7 @@ public abstract class Path extends ParseExpr {
       list.add(expr);
 
       // ignore remaining steps if step yields no results
-      // example: A/void(.)/B  ->  A/void(.)
+      // example: A/void(.)/B → A/void(.)
       if(expr.seqType().zero() && s + 1 < sl) {
         cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
         break;
@@ -701,9 +701,9 @@ public abstract class Path extends ParseExpr {
       return this;
 
     /* remove last step from new root expression. examples:
-     * - (<a/>, <b/>)/map { name(): . }  ->  (<a/>, <b/>) ! map { name(): . }
-     * - <a/>/<b/>  ->  <a/> ! <b/>
-     * - $a/b/string  ->  $a/b ! string() */
+     * - (<a/>, <b/>)/map { name(): . } → (<a/>, <b/>) ! map { name(): . }
+     * - <a/>/<b/> → <a/> ! <b/>
+     * - $a/b/string → $a/b ! string() */
     if(sl > 1) s1 = get(cc, info, root, Arrays.copyOfRange(steps, 0, sl - 1));
     if(s1 != null) s2 = SimpleMap.get(cc, info, s1, s2);
     return cc.replaceWith(this, s2);
@@ -900,15 +900,15 @@ public abstract class Path extends ParseExpr {
     final QueryBiFunction<Expr, Expr, Expr> rewrite = (step, next) -> {
       // do not rewrite (a, b)/<c/>
       if(step == null || next != null && next.has(Flag.CNS)) return step;
-      // (a, b)/c  ->  (a | b)/a
+      // (a, b)/c → (a | b)/a
       if(step instanceof final List lst) return lst.toUnion(cc);
-      // a[b, c]  ->  a[b | c]
+      // a[b, c] → a[b | c]
       if(step instanceof final Filter fltr && !fltr.mayBePositional() &&
           fltr.root instanceof final List lst) {
         final Expr st = lst.toUnion(cc);
         if(st != fltr.root) return Filter.get(cc, fltr.info(), st, fltr.exprs);
       }
-      // replicate(a, 2)/b  ->  a/b
+      // replicate(a, 2)/b → a/b
       if(step.seqType().type instanceof NodeType) {
         if(REPLICATE.is(step) && ((FnReplicate) step).singleEval(false)) return step.arg(0);
         if(step instanceof final SingletonSeq ss) return ss.itemAt(0);
@@ -959,12 +959,12 @@ public abstract class Path extends ParseExpr {
         if(curr instanceof final Step crr) {
           Expr next = s < sl - 1 ? steps[s + 1] : null;
           if(crr.test == NodeTest.NODE && next instanceof final Step stp && stp.axis == ATTRIBUTE) {
-            // rewrite node test before attribute step: node()/@*  ->  */@*
+            // rewrite node test before attribute step: node()/@* → */@*
             next = Step.get(cc, null, crr.info(), crr.axis, NodeTest.ELEMENT, crr.exprs);
             curr = cc.replaceWith(curr, next);
             chngd = true;
           } else if(next != null) {
-            // merge steps: //*  ->  /descendant::*
+            // merge steps: //* → /descendant::*
             next = mergeStep(crr, next, s > 0 ? steps[s - 1] : root, cc);
             if(next != null) {
               cc.info(QueryText.OPTMERGE_X, next);
@@ -989,9 +989,9 @@ public abstract class Path extends ParseExpr {
    */
   private Expr movePredicates(final CompileContext cc) throws QueryException {
     // examples:
-    // a[b]/b      ->  a/b
-    // a[b]/b/c    ->  a/b/c
-    // a[b/c]/b/c  ->  a/b/c
+    // a[b]/b     → a/b
+    // a[b]/b/c   → a/b/c
+    // a[b/c]/b/c → a/b/c
     return cc.get(root, true, () -> {
       final int sl = steps.length;
       for(int s = 0; s < sl; s++) {
@@ -1047,7 +1047,7 @@ public abstract class Path extends ParseExpr {
     // do not merge if current step contains positional predicates
     if(curr.mayBePositional()) return null;
 
-    // merge self steps:  child::*/self::a  ->  child::a
+    // merge self steps:  child::*/self::a → child::a
     final Step nxt = next instanceof final Step stp ? stp : null;
     if(nxt != null && nxt.axis == SELF && !nxt.mayBePositional()) {
       final Test test = curr.test.intersect(nxt.test);
@@ -1060,9 +1060,9 @@ public abstract class Path extends ParseExpr {
       return null;
 
     // examples:
-    // - descendant-or-self::node()/*  ->  descendant::*
-    // - descendant-or-self::node()/descendant::*  ->  descendant::*
-    // - descendant-or-self::node()/descendant-or-self::*  ->  descendant-or-self::*
+    // - descendant-or-self::node()/* → descendant::*
+    // - descendant-or-self::node()/descendant::* → descendant::*
+    // - descendant-or-self::node()/descendant-or-self::* → descendant-or-self::*
     final Axis merged = mergedAxis(nxt);
     if(merged != null) return Step.get(cc, prev, nxt.info(), merged, nxt.test, nxt.exprs);
 
@@ -1081,10 +1081,10 @@ public abstract class Path extends ParseExpr {
       }
       return null;
     };
-    // descendant-or-self::node()/(* | text())  ->  (descendant::text() | (descendant::*)
+    // descendant-or-self::node()/(* | text()) → (descendant::text() | (descendant::*)
     if(next instanceof Union) return rewrite.apply(next);
 
-    // descendant-or-self::node()/(text()|*)[..]  ->  (descendant::text() | descendant::*)[..]
+    // descendant-or-self::node()/(text()|*)[..] → (descendant::text() | descendant::*)[..]
     if(next instanceof final Filter filter && !filter.mayBePositional()) {
       final Expr expr = rewrite.apply(filter.root);
       if(expr != null) return Filter.get(cc, filter.info(), expr, filter.exprs);

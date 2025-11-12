@@ -42,14 +42,14 @@ public final class FnCount extends StandardFunc {
     final long size = input.size();
     if(size >= 0 && !input.has(Flag.NDT)) return Itr.get(size);
 
-    // count(map:keys(E))  ->  map:size(E)
+    // count(map:keys(E)) → map:size(E)
     if(_MAP_KEYS.is(input))
       return cc.function(_MAP_SIZE, info, input.args());
-    // count(util:array-members(E))  ->  array:size(E)
+    // count(util:array-members(E)) → array:size(E)
     if(_ARRAY_MEMBERS.is(input))
       return cc.function(_ARRAY_SIZE, info, input.args());
-    // count(string-to-codepoints(E))  ->  string-length(E)
-    // count(characters(E))  ->  string-length(E)
+    // count(string-to-codepoints(E)) → string-length(E)
+    // count(characters(E)) → string-length(E)
     if(STRING_TO_CODEPOINTS.is(input) || CHARACTERS.is(input))
       return cc.function(STRING_LENGTH, info, input.args());
 
@@ -61,8 +61,8 @@ public final class FnCount extends StandardFunc {
     final Expr input = arg(0);
     Expr expr = this;
     if(mode == Simplify.EBV) {
-      // if(count($nodes))  ->  if($nodes)
-      // if(count($items))  ->  if(exists($items))
+      // if(count($nodes)) → if($nodes)
+      // if(count($items)) → if(exists($items))
       expr = input.seqType().type instanceof NodeType ? input : cc.function(EXISTS, info, exprs);
     }
     return cc.simplify(this, expr, mode);

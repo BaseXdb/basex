@@ -34,13 +34,13 @@ public final class FnHead extends StandardFunc {
     if(st.zeroOrOne()) return input;
 
     final long size = input.size();
-    // head(tail(E))  ->  items-at(E, 2)
+    // head(tail(E)) → items-at(E, 2)
     if(TAIL.is(input))
       return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(2));
-    // head(trunk(E))  ->  head(E)
+    // head(trunk(E)) → head(E)
     if(TRUNK.is(input) && size > 1)
       return cc.function(HEAD, info, input.args());
-    // head(subsequence(E, pos))  ->  items-at(E, pos)
+    // head(subsequence(E, pos)) → items-at(E, pos)
     if(SUBSEQUENCE.is(input) || _UTIL_RANGE.is(input)) {
       final SeqRange r = SeqRange.get(input, cc);
       // safety check (at this stage, r.length should never be 0)
@@ -48,20 +48,20 @@ public final class FnHead extends StandardFunc {
         return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(r.start + 1));
     }
     if(REVERSE.is(input)) {
-      // head(reverse(root[test]))  ->  head(reverse(root)[test])
+      // head(reverse(root[test])) → head(reverse(root)[test])
       if(input.arg(0) instanceof final IterFilter filter) {
         return cc.function(HEAD, info,
             Filter.get(cc, filter.info(), cc.function(REVERSE, info, filter.root), filter.exprs));
       }
-      // head(reverse(E))  ->  foot(E)
+      // head(reverse(E)) → foot(E)
       return cc.function(FOOT, info, input.args());
     }
-    // head(replicate(E, count))  ->  head(E)
+    // head(replicate(E, count)) → head(E)
     if(REPLICATE.is(input)) {
       // static integer will always be greater than 1
       if(input.arg(1) instanceof Itr) return cc.function(HEAD, info, input.arg(0));
     }
-    // head(file:read-text-lines(E))  ->  file:read-text-lines(E, 0, 1)
+    // head(file:read-text-lines(E)) → file:read-text-lines(E, 0, 1)
     if(_FILE_READ_TEXT_LINES.is(input))
       return FileReadTextLines.opt(this, 0, 1, cc);
 
@@ -70,14 +70,14 @@ public final class FnHead extends StandardFunc {
       final Expr[] args = input.args();
       final Expr first = args[0];
       final SeqType stFirst = first.seqType();
-      // head((1, 2))  ->  1
+      // head((1, 2)) → 1
       if(stFirst.one()) return first;
-      // head((1 to 2), 3))  ->  head(1 to 2)
+      // head((1 to 2), 3)) → head(1 to 2)
       if(stFirst.oneOrMore()) return cc.function(HEAD, info, first);
       final int al = args.length;
       if(stFirst.zeroOrOne() && (al == 2 || args[1].seqType().occ != Occ.ZERO_OR_ONE)) {
-        // head(($a[.], 1))         ->  $a[.] otherwise 1
-        // head(($a[.], $b[.], 1))  ->  (will not be rewritten)
+        // head(($a[.], 1))        → $a[.] otherwise 1
+        // head(($a[.], $b[.], 1)) → (will not be rewritten)
         final Expr dflt = List.get(cc, info, Arrays.copyOfRange(args, 1, al));
         return new Otherwise(info, first, cc.function(HEAD, info, dflt)).optimize(cc);
       }

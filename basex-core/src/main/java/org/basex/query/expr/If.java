@@ -68,17 +68,17 @@ public final class If extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     if(EMPTY.is(cond)) {
-      // if(empty(A)) then B else C  ->  if(exists(A)) then C else B
+      // if(empty(A)) then B else C → if(exists(A)) then C else B
       cond = cc.function(EXISTS, cond.info(info), cond.arg(0));
       swap();
       cc.info(QueryText.OPTSWAP_X, this);
     } else if(NOT.is(cond)) {
-      // if(not(A)) then B else C  ->  if(A) then C else B
+      // if(not(A)) then B else C → if(A) then C else B
       cond = cond.arg(0);
       swap();
       cc.info(QueryText.OPTSWAP_X, this);
     }
-    // if(exists($nodes))  ->  if($nodes)
+    // if(exists($nodes)) → if($nodes)
     cond = cond.simplifyFor(Simplify.EBV, cc);
 
     return cc.replaceWith(this, opt(cc));
@@ -94,19 +94,19 @@ public final class If extends Arr {
     // choose static branch at compile time
     if(cond instanceof Value) return expr(cc.qc);
 
-    // if(...empty sequence...) then A else B  ->  B
+    // if(...empty sequence...) then A else B → B
     final Expr br1 = exprs[0], br2 = exprs[1];
     final SeqType ct = cond.seqType();
     final boolean ndt = cond.has(Flag.NDT);
     if(ct.zero() && !ndt) return br2;
 
     // rewrite to otherwise:
-    //   if(exists(VALUE)) then VALUE else DEFAULT  ->  VALUE otherwise DEFAULT
-    //   if(NODES) then NODES else DEFAULT  ->  NODES otherwise DEFAULT
+    //   if(exists(VALUE)) then VALUE else DEFAULT → VALUE otherwise DEFAULT
+    //   if(NODES) then NODES else DEFAULT → NODES otherwise DEFAULT
     final Expr cmp = EXISTS.is(cond) ? cond.arg(0) : ct.type instanceof NodeType ? cond : null;
     if(!ndt && cmp != null && cmp.equals(br1)) return new Otherwise(info, br1, br2).optimize(cc);
 
-    // if(A) then B else B  ->  void(A), B
+    // if(A) then B else B → void(A), B
     if(br1.equals(br2)) return cc.voidAndReturn(cond, br1, info);
 
     // determine type
@@ -116,19 +116,19 @@ public final class If extends Arr {
     // logical rewritings
     if(st1.eq(Types.BOOLEAN_O) && st2.eq(Types.BOOLEAN_O)) {
       if(br1 == Bln.TRUE) return br2 == Bln.FALSE ?
-        // if(A) then true() else false()  ->  boolean(A)
+        // if(A) then true() else false() → boolean(A)
         cc.function(BOOLEAN, info, cond) :
-        // if(A) then true() else C  ->  A or C
+        // if(A) then true() else C → A or C
         new Or(info, cond, br2).optimize(cc);
       if(br2 == Bln.TRUE) return br1 == Bln.FALSE ?
-        // if(A) then false() else true()  ->  not(A)
+        // if(A) then false() else true() → not(A)
         cc.function(NOT, info, cond) :
-        // if(A) then B else true()  ->  not(A) or B
+        // if(A) then B else true() → not(A) or B
         new Or(info, cc.function(NOT, info, cond), br1).optimize(cc);
-      // if(A) then false() else C  ->  not(A) and C
+      // if(A) then false() else C → not(A) and C
       if(br1 == Bln.FALSE) return
         new And(info, cc.function(NOT, info, cond), br2).optimize(cc);
-      // if(A) then B else false()  ->  A and B
+      // if(A) then B else false() → A and B
       if(br2 == Bln.FALSE) return
         new And(info, cond, br1).optimize(cc);
 

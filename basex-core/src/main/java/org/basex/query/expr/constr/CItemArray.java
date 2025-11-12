@@ -31,7 +31,7 @@ public final class CItemArray extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // [ $value ], array { $item }  ->  util:array-member(...)
+    // [ $value ], array { $item } → util:array-member(...)
     final long size = expr.size();
     if(size == 0) return XQArray.empty();
     if(size == 1) return cc.replaceWith(this, cc.function(_UTIL_ARRAY_MEMBER, info, expr));
@@ -48,7 +48,7 @@ public final class CItemArray extends Single {
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr ex = this;
-    // number(array { 1 })  ->  number(1)
+    // number(array { 1 }) → number(1)
     if(mode.oneOf(Simplify.NUMBER, Simplify.DATA)) ex = expr.simplifyFor(mode, cc);
     return cc.simplify(this, ex, mode);
   }

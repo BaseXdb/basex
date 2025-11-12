@@ -92,7 +92,7 @@ public final class Instance extends Single {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[. instance of element(a)]  ->  E[self::a]
+    // E[. instance of element(a)] → E[self::a]
     final Expr ex = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this;
     return cc.simplify(this, ex, mode);
   }

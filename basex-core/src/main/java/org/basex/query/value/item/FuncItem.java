@@ -242,9 +242,9 @@ public final class FuncItem extends FItem implements Scope {
       final Predicate<Expr> result = ex -> ex instanceof final VarRef vr &&
           vr.var.equals(resultVar);
 
-      // fold-left(SEQ, INIT, f($result, $value) { VALUE })  ->  VALUE
+      // fold-left(SEQ, INIT, f($result, $value) { VALUE }) → VALUE
       if(!array && input.seqType().oneOrMore() && expr instanceof Value) return expr;
-      // fold-left(SEQ, INIT, f($result, $value) { $result })  ->  $result
+      // fold-left(SEQ, INIT, f($result, $value) { $result }) → $result
       if(result.test(expr)) return "";
 
       if(expr instanceof final If iff) {
@@ -253,16 +253,16 @@ public final class FuncItem extends FItem implements Scope {
           Expr cnd = cond, action = null;
           if(result.test(thn)) {
             // if(COND) then $result else ACTION
-            // -> if COND: return $result; else $result = ACTION
+            // → if COND: return $result; else $result = ACTION
             action = els;
           } else if(result.test(els)) {
             // if(COND) then ACTION else $result
-            // -> if not(COND): return $result; else $result = ACTION
+            // → if not(COND): return $result; else $result = ACTION
             cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
             action = thn;
           } else if(cond instanceof final CmpG cmp) {
             // if($result = ITEM) then ITEM else ACTION
-            // -> if COND: return $result; else $result = ACTION
+            // → if COND: return $result; else $result = ACTION
             final Expr op1 = cmp.arg(0), op2 = cmp.arg(1);
             final SeqType st1 = op1.seqType(), st2 = op2.seqType();
             if(result.test(op1) && op2 instanceof Item && op2.equals(thn) &&

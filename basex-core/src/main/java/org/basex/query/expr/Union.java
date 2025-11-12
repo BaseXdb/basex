@@ -48,8 +48,8 @@ public final class Union extends Set {
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.VALUE || list.contains(expr) && !expr.has(Flag.CNS, Flag.NDT)) {
-        // remove empty operands: * union ()  ->  *
-        // remove duplicates: * union *  ->  *
+        // remove empty operands: * union () → *
+        // remove duplicates: * union * → *
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);
@@ -132,7 +132,7 @@ public final class Union extends Set {
     Expr expr = this;
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       for(final Expr ex : exprs) {
-        // boolean(a union <a/>)  ->  boolean(true())
+        // boolean(a union <a/>) → boolean(true())
         if(ex.seqType().instanceOf(Types.NODE_OM) && !expr.has(Flag.NDT)) expr = Bln.TRUE;
       }
     }

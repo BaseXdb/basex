@@ -32,7 +32,7 @@ public final class FnPosition extends StandardFunc {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     if(mode == Simplify.PREDICATE) {
-      // E[position()]  ->  E[true()]
+      // E[position()] → E[true()]
       expr = Bln.TRUE;
     }
     return cc.simplify(this, expr, mode);

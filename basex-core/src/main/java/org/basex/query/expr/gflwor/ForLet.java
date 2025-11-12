@@ -102,7 +102,7 @@ abstract class ForLet extends Clause {
     Expr pred = cc.get(expr, true, () -> ic.inline(ex));
 
     // attach predicates to axis path or filter, or create a new filter
-    // for $i in 1 where $i  ->  for $i in 1[boolean(.)]
+    // for $i in 1 where $i → for $i in 1[boolean(.)]
     if(pred.seqType().mayBeNumber()) pred = cc.function(Function.BOOLEAN, info, pred);
 
     addPredicate(cc, pred);

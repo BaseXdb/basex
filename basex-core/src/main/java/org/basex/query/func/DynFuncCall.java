@@ -70,11 +70,11 @@ public final class DynFuncCall extends FuncCall {
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr func = body();
 
-    // ()()  ->  ()
+    // ()() → ()
     if(func.seqType().zero()) return func;
 
     // unroll calls with multiple functions
-    // example: (true#0, false#0)()  ->  true#0(), false#0()
+    // example: (true#0, false#0)() → true#0(), false#0()
     final ExprList unroll = cc.unroll(func, false);
     if(unroll != null) {
       final ExprList results = new ExprList(unroll.size());

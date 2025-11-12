@@ -53,10 +53,10 @@ public final class Intersect extends Set {
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
       if(expr == Empty.VALUE) {
-        // empty operand: * intersect ()  ->  ()
+        // empty operand: * intersect () → ()
         return Empty.VALUE;
       } else if(list.contains(expr) && !expr.has(Flag.CNS, Flag.NDT)) {
-        // remove duplicates: * intersect *  ->  *
+        // remove duplicates: * intersect * → *
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else {
         list.add(expr);

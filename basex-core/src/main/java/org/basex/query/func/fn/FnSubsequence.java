@@ -205,11 +205,11 @@ public class FnSubsequence extends StandardFunc {
       final long size = sr.adjust(input.size());
       if(size != -1) {
         if(sr.length == size) return input;
-        // subsequence(E, last)  ->  foot(E)
+        // subsequence(E, last) → foot(E)
         if(sr.start == size - 1) return cc.function(FOOT, info, input);
-        // subsequence(E, 2)  ->  tail(E)
+        // subsequence(E, 2) → tail(E)
         if(sr.start == 1 && sr.end == size) return cc.function(TAIL, info, input);
-        // subsequence(E, 1, last - 1)  ->  trunk(E)
+        // subsequence(E, 1, last - 1) → trunk(E)
         if(sr.start == 0 && sr.end == size - 1) return cc.function(TRUNK, info, input);
         sz = sr.length;
       } else if(st.zeroOrOne()) {
@@ -218,18 +218,18 @@ public class FnSubsequence extends StandardFunc {
       }
 
       if(sr.length == 1) {
-        // subsequence(E, 1, 1)  ->  head(E)
-        // subsequence(E, pos, 1)  ->  items-at(E, pos)
+        // subsequence(E, 1, 1) → head(E)
+        // subsequence(E, pos, 1) → items-at(E, pos)
         return sr.start == 0 ? cc.function(HEAD, info, input) :
           cc.function(ITEMS_AT, info, input, Itr.get(sr.start + 1));
       }
-      // subsequence(E, 2)  ->  tail(E)
+      // subsequence(E, 2) → tail(E)
       if(sr.length == Long.MAX_VALUE && sr.start == 1)
         return cc.function(TAIL, info, input);
-      // subsequence(file:read-text-lines(E), pos, length)  ->  file:read-text-lines(E, pos, length)
+      // subsequence(file:read-text-lines(E), pos, length) → file:read-text-lines(E, pos, length)
       if(_FILE_READ_TEXT_LINES.is(input))
         return FileReadTextLines.opt(this, sr.start, sr.length, cc);
-      // subsequence(replicate(I, count), pos, length)  ->  replicate(I, length)
+      // subsequence(replicate(I, count), pos, length) → replicate(I, length)
       if(REPLICATE.is(input)) {
         final Expr[] args = input.args().clone();
         if(args[0].size() == 1 && args[1] instanceof Itr) {
@@ -237,8 +237,8 @@ public class FnSubsequence extends StandardFunc {
           return cc.function(REPLICATE, info, args);
         }
       }
-      // subsequence((I1, I2, I3, I4), 2, 2)  ->  (I2, I3)
-      // subsequence((I, E1, E2), 2, 2)  ->  subsequence((E1, E2), 1, 2)
+      // subsequence((I1, I2, I3, I4), 2, 2) → (I2, I3)
+      // subsequence((I, E1, E2), 2, 2) → subsequence((E1, E2), 1, 2)
       if(input instanceof List && sr.start > 0) {
         final Expr[] args = input.args();
         if(((Checks<Expr>) ex -> ex.seqType().one()).all(args)) {
@@ -259,21 +259,21 @@ public class FnSubsequence extends StandardFunc {
       final long start = itr.itr(), diff = FnItemsAt.countInputDiff(input, second) + start;
       if(diff == (int) diff) {
         if(start <= 1) {
-          // subsequence(E, 1, count(E) - 1)  ->  trunk(E)
+          // subsequence(E, 1, count(E) - 1) → trunk(E)
           if(diff == 0) return cc.function(TRUNK, info, input);
-          // subsequence(E, 1, count(E) + 10)  ->  E
+          // subsequence(E, 1, count(E) + 10) → E
           if(diff >= 1) return input;
         } else if(start <= diff) {
-          // subsequence(E, 3, count(E) - 1)  ->  subsequence(E, 3)
+          // subsequence(E, 3, count(E) - 1) → subsequence(E, 3)
           return cc.function(SUBSEQUENCE, info, input, first);
         }
       }
     } else if(second instanceof final Itr itr) {
       if(!range() && first.seqType().instanceOf(Types.INTEGER_O)) {
         final long length = itr.itr();
-        // subsequence(EXPR, START, 1)  ->  items-at(EXPR, START)
+        // subsequence(EXPR, START, 1) → items-at(EXPR, START)
         if(length == 1) return cc.function(ITEMS_AT, info, input, first);
-        // subsequence(EXPR, START, 0)  ->  void(EXPR)
+        // subsequence(EXPR, START, 0) → void(EXPR)
         if(length <= 0) return cc.voidAndReturn(input, Empty.VALUE, info);
       }
     }

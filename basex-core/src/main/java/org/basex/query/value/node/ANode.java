@@ -85,10 +85,10 @@ public abstract class ANode extends Item {
       throws QueryException {
     Expr expr = this;
     if(mode == Simplify.STRING) {
-      // boolean(<a>A</a>)  ->  boolean('A')
+      // boolean(<a>A</a>) → boolean('A')
       expr = Str.get(string());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
-      // data(<a>A</a>)  ->  data(xs:untypedAtomic('A'))
+      // data(<a>A</a>) → data(xs:untypedAtomic('A'))
       expr = Atm.get(string());
     }
     return cc.simplify(this, expr, mode);

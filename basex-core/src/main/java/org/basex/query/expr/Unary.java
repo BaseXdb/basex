@@ -44,8 +44,8 @@ public final class Unary extends Single {
     final Occ occ = st.oneOrMore() && !st.mayBeArray() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
     exprType.assign(type, occ);
 
-    // --123  ->  123
-    // --$byte  ->  xs:byte($byte)
+    // --123 → 123
+    // --$byte → xs:byte($byte)
     if(!minus && st.instanceOf(Types.NUMERIC_ZO)) {
       final Expr cast = new Cast(info, expr, SeqType.get(type, st.occ)).optimize(cc);
       return cc.replaceWith(this, cast);

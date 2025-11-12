@@ -49,8 +49,8 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
     Expr nodes = arg(0);
 
     // replace list with union:
-    // distinct-ordered-nodes((<a/>, <b/>))  ->  <a/> | <b/>
-    // distinct-ordered-nodes(($a, $a))  ->  $a
+    // distinct-ordered-nodes((<a/>, <b/>)) → <a/> | <b/>
+    // distinct-ordered-nodes(($a, $a)) → $a
     if(nodes instanceof final List list) {
       nodes = list.toUnion(cc);
       if(nodes != arg(0)) return nodes;
@@ -58,13 +58,13 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
 
     final Type type = nodes.seqType().type;
     if(type instanceof NodeType) {
-      // distinct-ordered-nodes(replicate(*, 2))  ->  distinct-ordered-nodes(*)
+      // distinct-ordered-nodes(replicate(*, 2)) → distinct-ordered-nodes(*)
       if(REPLICATE.is(nodes) && ((FnReplicate) nodes).singleEval(false))
         return nodes.arg(0);
-      // distinct-ordered-nodes(reverse(*))  ->  distinct-ordered-nodes(*)
+      // distinct-ordered-nodes(reverse(*)) → distinct-ordered-nodes(*)
       if(REVERSE.is(nodes) || SORT.is(nodes))
         return cc.function(DISTINCT_ORDERED_NODES, info, nodes.arg(0));
-      // distinct-ordered-nodes(/a/b/c)  ->  /a/b/c
+      // distinct-ordered-nodes(/a/b/c) → /a/b/c
       if(nodes.ddo())
         return nodes;
       // adopt type of input

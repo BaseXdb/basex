@@ -28,12 +28,12 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // boolean(true()))  ->  true()
+    // boolean(true())) → true()
     final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.eq(Types.BOOLEAN_O)) return input;
 
-    // boolean($node/text())  ->  exists($node/text())
+    // boolean($node/text()) → exists($node/text())
     if(st.type instanceof NodeType) return cc.function(Function.EXISTS, info, input);
 
     return this;
@@ -41,7 +41,7 @@ public final class FnBoolean extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    // boolean(exists(<a/>))  ->  boolean(<a/>)
+    // boolean(exists(<a/>)) → boolean(<a/>)
     arg(0, arg -> arg.simplifyFor(Simplify.EBV, cc));
   }
 
@@ -50,8 +50,8 @@ public final class FnBoolean extends StandardFunc {
     Expr expr = this;
     final Expr input = arg(0);
     if(mode == Simplify.EBV || mode == Simplify.PREDICATE && !input.seqType().mayBeNumber()) {
-      // if(boolean($number))  ->  if($number)
-      // E[boolean($nodes)]  ->  E[$nodes]
+      // if(boolean($number)) → if($number)
+      // E[boolean($nodes)] → E[$nodes]
       expr = input;
     }
     return cc.simplify(this, expr, mode);

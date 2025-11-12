@@ -56,7 +56,7 @@ public final class FnStringJoin extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0), separator = defined(1) ? arg(1) : Str.EMPTY;
 
-    // string-join(characters(A))  ->  string(A)
+    // string-join(characters(A)) → string(A)
     if(CHARACTERS.is(values) && separator == Str.EMPTY)
       return cc.function(STRING, info, values.args());
 

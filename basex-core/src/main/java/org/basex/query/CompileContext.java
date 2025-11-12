@@ -360,7 +360,7 @@ public final class CompileContext {
       throws QueryException {
     // an expression (for example, fn:doc) may be nondeterministic during compilation and
     // deterministic during optimization:
-    // let $db := db:get('db') return 1  ->  void(db:get('db'), true()), 1  ->  1
+    // let $db := db:get('db') return 1 → void(db:get('db'), true()), 1 → 1
     return List.get(this, info, function(Function.VOID, info, expr, Bln.TRUE), result);
   }
 

@@ -82,19 +82,19 @@ public final class Lookup extends Arr {
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
     if(map || array) {
       /* REWRITE LOOKUP:
-       *  MAP?*      ->  map:items(MAP)
-       *  ARRAY?*    ->  array:items(MAP)
-       *  MAP?KEY    ->  map:get(INPUT, KEY)
-       *  ARRAY?KEY  ->  array:get(INPUT, KEY) */
+       *  MAP?*     → map:items(MAP)
+       *  ARRAY?*   → array:items(MAP)
+       *  MAP?KEY   → map:get(INPUT, KEY)
+       *  ARRAY?KEY → array:get(INPUT, KEY) */
       final QueryBiFunction<Expr, Expr, Expr> rewrite = (in, arg) -> keys == WILDCARD ?
         cc.function(map ? Function._MAP_ITEMS : Function._ARRAY_ITEMS, info, in) :
         cc.function(map ? Function._MAP_GET : Function._ARRAY_GET, info, in, arg);
 
       // single key
       if(ks == 1) {
-        // single input:  INPUT?KEY  ->  REWRITE(INPUT, KEY)
+        // single input:  INPUT?KEY → REWRITE(INPUT, KEY)
         if(is == 1) return rewrite.apply(input, keys);
-        // multiple inputs:  INPUTS?KEY  ->  INPUTS ! REWRITE(., KEY)
+        // multiple inputs:  INPUTS?KEY → INPUTS ! REWRITE(., KEY)
         return SimpleMap.get(cc, info, input,
             cc.get(input, true, () -> rewrite.apply(ContextValue.get(cc, info), keys)));
       }
@@ -102,11 +102,11 @@ public final class Lookup extends Arr {
       // multiple deterministic keys, inputs are values or variable references
       if(ks != -1 && (input instanceof Value || input instanceof VarRef)) {
         if(is == 1) {
-          // single input:  INPUT?KEYS  ->  KEYS ! REWRITE(INPUT, .)
+          // single input:  INPUT?KEYS → KEYS ! REWRITE(INPUT, .)
           return SimpleMap.get(cc, info, keys,
               cc.get(keys, true, () -> rewrite.apply(input, ContextValue.get(cc, info))));
         }
-        // multiple inputs:  INPUTS?KEYS  ->  for $item in INPUTS return KEYS ! REWRITE($item, .)
+        // multiple inputs:  INPUTS?KEYS → for $item in INPUTS return KEYS ! REWRITE($item, .)
         final Var var = cc.vs().addNew(new QNm("item"), null, cc.qc, info);
         final For fr = new For(var, input).optimize(cc);
         final Expr ex = cc.get(keys, true, () ->

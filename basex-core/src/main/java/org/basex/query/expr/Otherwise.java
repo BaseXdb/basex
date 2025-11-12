@@ -80,7 +80,7 @@ public final class Otherwise extends Arr {
     removeEmpty(cc);
 
     // chop remaining expressions if an operator yields one or more items
-    // 1 otherwise 2  ->  1
+    // 1 otherwise 2 → 1
     int el = exprs.length - 1;
     int e = -1;
     while(++e < el && !exprs[e].seqType().oneOrMore());

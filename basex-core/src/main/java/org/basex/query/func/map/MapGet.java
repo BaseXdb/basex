@@ -42,16 +42,16 @@ public final class MapGet extends StandardFunc {
     final MapCompilation mc = MapCompilation.get(map).key(key);
     if(mc.key != null) {
       if(mc.field != null) {
-        // map:get({ 'a': 1, 'b': 2 }, 'b')  ->  util:map-value-at({ 'a': 1, 'b': 2 }, 2)
+        // map:get({ 'a': 1, 'b': 2 }, 'b') → util:map-value-at({ 'a': 1, 'b': 2 }, 2)
         if(!mc.record.hasOptional())
           return cc.function(_UTIL_MAP_VALUE_AT, info, map, Itr.get(mc.index), arg(3));
       } else {
-        // map:get({ 'a': 1 }, 'b')  ->  ()
+        // map:get({ 'a': 1 }, 'b') → ()
         if(!mc.record.isExtensible()) return dflt ? arg(2) : Empty.VALUE;
       }
     }
     if(mc.mapType != null) {
-      // map:get({ 1: 1 }, 'string')  ->  ()
+      // map:get({ 1: 1 }, 'string') → ()
       if(mc.keyMismatch) return dflt ? arg(2) : Empty.VALUE;
 
       final SeqType st = mc.mapType.valueType();

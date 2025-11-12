@@ -112,7 +112,7 @@ public final class CmpIR extends Single {
     final SeqType st = expr.seqType();
     single = st.zeroOrOne() && !st.mayBeArray();
 
-    // position() = 1 to 2  ->  pos: 1, 2
+    // position() = 1 to 2 → pos: 1, 2
     if(Function.POSITION.is(expr)) return cc.replaceWith(this, IntPos.get(min, max, info));
 
     return expr instanceof Value ? cc.preEval(this) : this;

@@ -99,14 +99,14 @@ public final class FnDistinctValues extends FnDuplicateValues {
     final SeqType st = values.seqType();
     if(st.zero()) return values;
 
-    // X => sort() => distinct-values()  ->  X => distinct-values() => sort()
+    // X => sort() => distinct-values() → X => distinct-values() => sort()
     if(SORT.is(values) && (values.args().length == 1 ||
         values.arg(0).seqType().type.instanceOf(AtomType.ANY_ATOMIC_TYPE))) {
       final ExprList list = new ExprList().add(values.args());
       list.set(0, cc.function(DISTINCT_VALUES, info, values.arg(0)));
       return cc.function(SORT, info, list.finish());
     }
-    // distinct-values(distinct-values($data))  ->  distinct-values($data)
+    // distinct-values(distinct-values($data)) → distinct-values($data)
     if(DISTINCT_VALUES.is(values) && arg(1).equals(values.arg(1))) return values;
 
     final Expr opt = optStats(cc);
@@ -115,10 +115,10 @@ public final class FnDistinctValues extends FnDuplicateValues {
     final AtomType type = st.type.atomic();
     if(type != null) {
       if(!defined(1)) {
-        // distinct-values(1 to 10)  ->  1 to 10
+        // distinct-values(1 to 10) → 1 to 10
         if(values instanceof Range || values instanceof RangeSeq) return values;
-        // distinct-values($string)  ->  $string
-        // distinct-values($node)  ->  data($node)
+        // distinct-values($string) → $string
+        // distinct-values($node) → data($node)
         if(st.zeroOrOne() && !st.mayBeArray())
           return type == st.type ? values : cc.function(Function.DATA, info, exprs);
       }
