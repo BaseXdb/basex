@@ -29,8 +29,6 @@ public final class NameTest extends Test {
 
   /** Local name; assigned if URI can be ignored at runtime. */
   public byte[] local;
-  /** URI; assigned if local name can be ignored at runtime. */
-  public byte[] uri;
 
   /**
    * Returns a name test.
@@ -65,7 +63,6 @@ public final class NameTest extends Test {
     this.scope = scope;
     this.defaultNs = defaultNs != null ? defaultNs : Token.EMPTY;
     if(scope == Scope.LOCAL) local = qname.local();
-    else if(scope == Scope.URI) uri = qname.uri();
   }
 
   @Override
@@ -104,7 +101,7 @@ public final class NameTest extends Test {
       // namespace wildcard: only check local name
       local != null ? Token.eq(local, Token.local(node.name())) :
       // name wildcard: only check namespace
-      uri != null ? Token.eq(uri, node.qname().uri()) :
+      scope == Scope.URI ? Token.eq(qname.uri(), node.qname().uri()) :
       // check attributes, or check everything
       qname.eq(node.qname())
     );
@@ -120,7 +117,7 @@ public final class NameTest extends Test {
       // namespace wildcard: only check local name
       local != null ? Token.eq(local, qName.local()) :
       // name wildcard: only check namespace
-      uri != null ? Token.eq(uri, qName.uri()) :
+      scope == Scope.URI ? Token.eq(qname.uri(), qName.uri()) :
       // check attributes, or check everything
       qname.eq(qName);
   }
@@ -130,7 +127,7 @@ public final class NameTest extends Test {
     final Type tp = seqType.type;
     if(tp.intersect(type) == null) return Boolean.FALSE;
     if(tp == type && seqType.test() instanceof final NameTest nt) {
-      if(nt.scope == Scope.FULL || nt.scope == scope) return matches(nt.qname);
+      if(nt.scope == scope || nt.scope == Scope.FULL) return matches(nt.qname);
     }
     return null;
   }
@@ -159,7 +156,7 @@ public final class NameTest extends Test {
           if(nt.matches(qname)) return this;
         } else if(nt.scope == Scope.URI) {
           // *:local1 = Q{uri2}*  ->  Q{uri2}local1
-          return new NameTest(new QNm(local, nt.uri), Scope.FULL, type, defaultNs);
+          return new NameTest(new QNm(local, nt.qname.uri()), Scope.FULL, type, defaultNs);
         } else {
           // *:local1 = Q{uri2}local2, Q{uri1}* = Q{uri2}local2, Q{uri1}* = *:local2
           return test.intersect(this);
