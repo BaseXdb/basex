@@ -258,9 +258,8 @@ public final class CmpR extends Single {
         step = path.step(st);
         if(step.axis != Axis.ATTRIBUTE || step.exprs.length > 0) return null;
       }
-      if(!(step.test instanceof final NameTest nt)) return null;
+      if(!(step.test instanceof final NameTest nt) || nt.local == null) return null;
       test = nt;
-      if(test.part() != NamePart.LOCAL) return null;
     }
 
     final Names names = type == IndexType.TEXT ? data.elemNames : data.attrNames;

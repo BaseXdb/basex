@@ -445,52 +445,52 @@ public final class RestXqFunction extends WebFunction {
     for(final Item arg : ann.value()) {
       final String err = toString(arg);
       final QNm name;
-      final NamePart part;
+      final NameTest.Scope scope;
       if(err.equals("*")) {
         name = null;
-        part = null;
+        scope = null;
       } else if(err.startsWith("*:")) {
         final byte[] local = token(err.substring(2));
         if(!XMLToken.isNCName(local)) throw error(INV_CODE_X, err);
         name = new QNm(local);
-        part = NamePart.LOCAL;
+        scope = NameTest.Scope.LOCAL;
       } else if(err.endsWith(":*")) {
         final byte[] prefix = token(err.substring(0, err.length() - 2));
         if(!XMLToken.isNCName(prefix)) throw error(INV_CODE_X, err);
         name = new QNm(concat(prefix, cpToken(':')), function.sc);
-        part = NamePart.URI;
+        scope = NameTest.Scope.URI;
       } else {
         final Matcher m = EQNAME.matcher(err);
         if(m.matches()) {
           final byte[] uri = token(m.group(1)), local = token(m.group(2));
           if(local.length == 1 && local[0] == '*') {
             name = new QNm(cpToken(':'), uri);
-            part = NamePart.URI;
+            scope = NameTest.Scope.URI;
           } else {
             if(!XMLToken.isNCName(local) || !Uri.get(uri).isValid()) throw error(INV_CODE_X, err);
             name = new QNm(local, uri);
-            part = NamePart.FULL;
+            scope = NameTest.Scope.FULL;
           }
         } else {
           final byte[] nm = token(err);
           if(!XMLToken.isQName(nm)) throw error(INV_CODE_X, err);
           name = new QNm(nm, function.sc);
-          part = NamePart.FULL;
+          scope = NameTest.Scope.FULL;
         }
       }
 
       // message
       if(name != null && name.hasPrefix() && !name.hasURI()) throw error(INV_NONS_X, name);
-      final NameTest test = part != null ? new NameTest(name, part, NodeType.ELEMENT, null) : null;
+      final NameTest nt = scope != null ? new NameTest(name, scope, NodeType.ELEMENT, null) : null;
 
       final Function<NameTest, String> toString = t -> t != null ? t.toString() : "*";
       if(!error.isEmpty()) {
         final NameTest first = error.get(0);
-        if(first != null ? first.part() != part : part != null) {
-          throw error(INV_PRECEDENCE_X_X, toString.apply(first), toString.apply(test));
+        if(first != null ? first.scope != scope : scope != null) {
+          throw error(INV_PRECEDENCE_X_X, toString.apply(first), toString.apply(nt));
         }
       }
-      if(!error.add(test)) throw error(INV_ERR_TWICE_X, toString.apply(test));
+      if(!error.add(nt)) throw error(INV_ERR_TWICE_X, toString.apply(nt));
     }
   }
 }

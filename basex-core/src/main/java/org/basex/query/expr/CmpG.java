@@ -11,6 +11,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.expr.path.NameTest.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -489,11 +490,11 @@ public class CmpG extends Cmp {
       if(fn.exprs.length > 0 && !(fn.exprs[0] instanceof ContextValue)) return this;
 
       final ArrayList<QNm> qnames = new ArrayList<>();
-      NamePart part = null;
+      Scope scope = null;
       if(expr2.seqType().type.isStringOrUntyped()) {
         // local-name() eq 'a'  ->  self::*:a
         if(LOCAL_NAME.is(fn)) {
-          part = NamePart.LOCAL;
+          scope = Scope.LOCAL;
           for(final Item item : value) {
             final byte[] name = item.string(info);
             if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
@@ -504,13 +505,13 @@ public class CmpG extends Cmp {
             final byte[] uri = item.string(info);
             if(Token.eq(Token.normalize(uri), uri)) qnames.add(new QNm(Token.cpToken(':'), uri));
           }
-          if(qnames.size() == value.size()) part = NamePart.URI;
+          if(qnames.size() == value.size()) scope = Scope.URI;
         } else if(NAME.is(fn)) {
           // (db-without-ns)[name() = 'city']  ->  (db-without-ns)[self::city]
           final Data data = cc.qc.focus.value.data();
           final byte[] dataNs = data != null ? data.defaultNs() : null;
           if(dataNs != null && dataNs.length == 0) {
-            part = NamePart.LOCAL;
+            scope = Scope.LOCAL;
             for(final Item item : value) {
               final byte[] name = item.string(info);
               if(XMLToken.isNCName(name)) qnames.add(new QNm(name));
@@ -519,16 +520,16 @@ public class CmpG extends Cmp {
         }
       } else if(NODE_NAME.is(fn) && expr2.seqType().type == AtomType.QNAME) {
         // node-name() = #prefix:local  ->  self::prefix:local
-        part = NamePart.FULL;
+        scope = NameTest.Scope.FULL;
         for(final Item item : value) {
           qnames.add((QNm) item);
         }
       }
 
-      if(part != null) {
+      if(scope != null) {
         final ExprList paths = new ExprList(2);
         for(final QNm qname : qnames) {
-          final Test test = new NameTest(qname, part, (NodeType) type, sc().elemNS);
+          final Test test = new NameTest(qname, scope, (NodeType) type, sc().elemNS);
           final Expr step = Step.self(cc, null, info, test);
           if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
         }

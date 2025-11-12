@@ -85,9 +85,9 @@ public final class IndexInfo {
           !(last.test instanceof NameTest)) return null;
 
       test = (NameTest) last.test;
-      if(test.part() != NamePart.LOCAL) return null;
+      if(test.local == null) return null;
 
-      final Stats stats = data.elemNames.stats(data.elemNames.index(test.qname.local()));
+      final Stats stats = data.elemNames.stats(data.elemNames.index(test.local));
       if(stats == null || !stats.isLeaf()) return null;
       text = true;
     } else if(last.test.type == NodeType.ATTRIBUTE) {
@@ -97,7 +97,7 @@ public final class IndexInfo {
       return null;
     }
 
-    // check if the index contains result for the specified elements or attributes
+    // check if the index contains results for the specified elements or attributes
     final IndexType it = type != null ? type : text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     if(text ? it != IndexType.TEXT && it != IndexType.FULLTEXT :
       it != IndexType.TOKEN && it != IndexType.ATTRIBUTE) return null;
@@ -106,12 +106,9 @@ public final class IndexInfo {
     if(data != null) {
       // check if required index exists
       if(!data.meta.index(it)) return null;
-      // check if targeted name is contained in the index
-      final Step st = pred.qname();
-      byte[][] qname = null;
-      if(st.test instanceof final NameTest nt) {
-        qname = new byte[][] { nt.local, nt.qname == null ? null : nt.qname.uri() };
-      }
+      // check if values of targeted name are indexed
+      final byte[][] qname = pred.qname().test instanceof final NameTest nt ?
+        new byte[][] { nt.qname.local(), nt.qname.uri() } : null;
       if(!new IndexNames(it, data).contains(qname)) return null;
     }
     return it;

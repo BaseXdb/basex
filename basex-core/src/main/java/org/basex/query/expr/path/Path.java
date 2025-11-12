@@ -16,6 +16,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
+import org.basex.query.expr.path.NameTest.*;
 import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.func.util.*;
@@ -582,9 +583,9 @@ public abstract class Path extends ParseExpr {
 
       final boolean desc = curr.axis == DESCENDANT;
       if(!desc && curr.axis != CHILD || !(curr.test instanceof final NameTest test)) return null;
-      if(test.part() != NamePart.LOCAL) return null;
+      if(test.local == null) return null;
 
-      final int name = data.elemNames.index(test.qname.local());
+      final int name = data.elemNames.index(test.local);
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {
@@ -668,7 +669,7 @@ public abstract class Path extends ParseExpr {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm qName = qNames.get(ts - t - 1);
         final Test test = qName == null ? NodeTest.ELEMENT :
-          new NameTest(qName, NamePart.LOCAL, NodeType.ELEMENT, null);
+          new NameTest(qName, Scope.LOCAL, NodeType.ELEMENT, null);
         stps[t] = Step.get(cc, root, curr.info(), CHILD, test, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
@@ -880,9 +881,9 @@ public abstract class Path extends ParseExpr {
       if(step.axis != CHILD || s != i && step.exprs.length > 0 ||
           !(step.test instanceof final NameTest test)) return true;
       // only consider local name tests
-      if(test.part() != NamePart.LOCAL) return true;
+      if(test.local == null) return true;
       // only support unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data().paths.desc(test.qname.local());
+      final ArrayList<PathNode> pn = data().paths.desc(test.local);
       if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
     }
     return false;

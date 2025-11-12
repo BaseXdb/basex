@@ -204,7 +204,7 @@ public abstract class Step extends Preds {
       // one result: self::node()
       ? Occ.EXACTLY_ONE :
         axis == SELF || axis == PARENT ||
-        axis == ATTRIBUTE && test instanceof final NameTest nt && nt.part == NamePart.FULL ||
+        axis == ATTRIBUTE && test instanceof final NameTest nt && nt.scope == NameTest.Scope.FULL ||
         preds.length == 1 && preds[0] instanceof final CmpPos cp && cp.exact()
       // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
       ? Occ.ZERO_OR_ONE
@@ -252,7 +252,7 @@ public abstract class Step extends Preds {
     final Predicate<Test> addNodes = t -> {
       int name = 0;
       if(t instanceof final NameTest nt) {
-        if(nt.part() != NamePart.LOCAL) return false;
+        if(nt.local == null) return false;
         name = names.index(nt.local);
       }
       for(final PathNode pn : nodes) {

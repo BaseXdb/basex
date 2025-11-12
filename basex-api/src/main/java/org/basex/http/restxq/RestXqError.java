@@ -17,7 +17,7 @@ final class RestXqError implements Comparable<RestXqError> {
   private final ArrayList<NameTest> tests = new ArrayList<>(1);
   /** Function for comparing tests. */
   private static final Function<NameTest, Integer> COMPARE =
-      test -> test == null ? -1 : test.part().ordinal();
+      test -> test == null ? -1 : test.scope.ordinal();
 
   /**
    * Adds a test if it has not been specified before.

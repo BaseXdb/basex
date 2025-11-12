@@ -120,7 +120,7 @@ abstract class DbAccessFn extends StandardFunc {
     final QNm qnm = qc.shared.qName(nm, sc().ns.uri(prefix(nm)));
 
     // return empty sequence if test will yield no results
-    final NameTest nt = new NameTest(qnm, NamePart.FULL, NodeType.ATTRIBUTE, sc().elemNS);
+    final NameTest nt = new NameTest(qnm, NameTest.Scope.FULL, NodeType.ATTRIBUTE, sc().elemNS);
     if(nt.optimize(data) == null) return Empty.ITER;
 
     // wrap iterator with name test
