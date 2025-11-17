@@ -38,6 +38,10 @@ function dba:editor(
     config:edited-file()
   }
   return (
+    <colgroup>
+      <col id='left'/>
+      <col id='right'/>
+    </colgroup>,
     <tr>
       <td colspan='2'>
         <form autocomplete='off' action='javascript:void(0);'>{
@@ -58,7 +62,7 @@ function dba:editor(
       </td>
     </tr>,
     <tr>
-      <td id='left' class='resize'>
+      <td class='resize'>
         <textarea id='editor' autofocus='' spellcheck='false'/>
         <div class='resizer'/>
       </td>

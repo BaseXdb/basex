@@ -23,7 +23,7 @@ declare variable $html:NUMBER := ('decimal', 'number', 'bytes');
  : @return page
  :)
 declare function html:wrap(
-  $rows     as element(tr)*,
+  $rows     as element()*,
   $options  as map(*) := {}
 ) as element(html) {
   let $header := head($options?header) ! utils:capitalize(.)
@@ -103,7 +103,7 @@ declare function html:wrap(
           </td>
         </tr>
       </table>
-      <table width='100%' class='inner'>{ $rows }</table>
+      <table width='100%'>{ $rows }</table>
       <hr/>
       <div id='footer' class='right'><sup>BaseX Team, BSD License</sup></div>
       <div class='small'/>

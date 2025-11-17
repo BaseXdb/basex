@@ -117,7 +117,7 @@ function initResizer() {
   _left = document.getElementById("left");
   _resizer = document.querySelector(".resizer");
 
-  _left.style.width = localStorage.getItem("leftWidth") || "50%";
+  _left.style.width = (localStorage.getItem("editorWidth") || 50) + "%";
   _resizer.addEventListener("pointerdown", e => {
     document.addEventListener("pointermove", resize);
     document.addEventListener("pointerup", stopResize);
@@ -130,8 +130,8 @@ function initResizer() {
  * @param {e} event
  */
 function resize(e) {
-  const w = (-28 + e.clientX) / _left.parentElement.clientWidth;
-  _left.style.width = (Math.min(0.9, Math.max(.05, w)) * 100) + "%";
+  const w = (-28 + e.clientX) / _left.parentElement.clientWidth * 100;
+  _left.style.width = Math.min(85, Math.max(10, w)) + "%";
 }
 
 /**
@@ -142,5 +142,5 @@ function stopResize(e) {
   document.removeEventListener("pointermove", resize);
   document.removeEventListener("pointerup", stopResize);
   _resizer.releasePointerCapture(e.pointerId);
-  localStorage.setItem("leftWidth", _left.style.width);
+  localStorage.setItem("editorWidth", _left.style.width.replace(/%/, ''));
 }

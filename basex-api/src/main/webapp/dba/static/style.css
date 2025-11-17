@@ -31,10 +31,6 @@ table {
   table-layout: fixed;
 }
 
-.inner {
-  table-layout: auto;
-}
-
 th {
   vertical-align: top;
   text-align: left;
