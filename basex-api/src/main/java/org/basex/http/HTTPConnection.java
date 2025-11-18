@@ -273,7 +273,12 @@ public final class HTTPConnection implements ClientInfo {
     if(value == null) {
       final boolean dba = (path() + '/').contains('/' + HTTPText.DBA_CLIENT_ID + '/');
       final String name = dba ? HTTPText.DBA_CLIENT_ID : HTTPText.CLIENT_ID;
-      value = getAttribute(request.getSession(false), name);
+      try {
+        value = getAttribute(request.getSession(false), name);
+      } catch(final NullPointerException ex) {
+        // Jetty 12, getSession: _coreRequest may be null for propagated request instances
+        Util.debug(ex);
+      }
     }
     return clientName(value, context);
   }
