@@ -33,15 +33,13 @@ public final class DualMap extends SimpleMap {
 
       @Override
       public Item next() throws QueryException {
-        qc.checkStop();
-
         final QueryFocus qf = qc.focus;
         final Value qv = qf.value;
         try {
           Item item;
           do {
             // left operand
-            item = iter1.next();
+            item = qc.next(iter1);
             if(item == null) break;
             // right operand
             qf.value = item;
