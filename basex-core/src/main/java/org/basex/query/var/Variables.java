@@ -51,11 +51,14 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
     final byte[] modURI = moduleUri(module);
     final byte[] varURI = var.name.uri();
-    if(!Token.eq(modURI, varURI) && imports.contains(varURI)) {
-      final StaticVar sv = findVar(var.name, varURI);
-      if(sv != null && !sv.anns.contains(Annotation.PRIVATE)) {
-        // variable already declared in imported module
-        throw VARDUPL_X.get(var.info, var.name.string());
+    if(!Token.eq(modURI, varURI)) {
+      if(module != null && !anns.contains(Annotation.PRIVATE)) throw MODULENS_X.get(var.info, var);
+      if(imports.contains(varURI)) {
+        final StaticVar sv = findVar(var.name, varURI);
+        if(sv != null && !sv.anns.contains(Annotation.PRIVATE)) {
+          // variable already declared in imported module
+          throw VARDUPL_X.get(var.info, var.name.string());
+        }
       }
     }
     final QNmMap<StaticVar> vars = varsByModule.computeIfAbsent(modURI, QNmMap::new);

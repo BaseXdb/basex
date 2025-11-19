@@ -898,10 +898,6 @@ public class QueryParser extends InputParser {
    */
   private void varDecl(final AnnList anns) throws QueryException {
     final Var var = newVar();
-    if(!anns.contains(Annotation.PRIVATE)) {
-      if(sc.module != null && !eq(var.name.uri(), sc.module.uri())) throw error(MODULENS_X, var);
-    }
-
     localVars.pushContext(false);
     final boolean external = wsConsumeWs(EXTERNAL);
     Expr expr = null;
