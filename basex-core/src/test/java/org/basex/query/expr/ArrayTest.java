@@ -17,7 +17,7 @@ public final class ArrayTest extends SandboxTest {
   /** Constructor. */
   @Test public void squareConstructor() {
     query("[]", "[]");
-    query("[()]", "[()]");
+    query("[ () ]", "[()]");
     query("[ 1 ]", "[1]");
     query("[ 1, 2 ]", "[1,2]");
     query("[ 1 to 2 ]", "[(1,2)]");
@@ -124,7 +124,7 @@ public final class ArrayTest extends SandboxTest {
   /** Element constructor. */
   @Test public void elementConstructor() {
     query("element a { [] }", "<a/>");
-    query("element a { [()] }", "<a/>");
+    query("element a { [ () ] }", "<a/>");
     query("element a { [ 1 ] }", "<a>1</a>");
     query("element a { [ <b>c</b> ] }", "<a><b>c</b></a>");
     query("element a { [ <b>c</b>, <b>d</b> ] }", "<a><b>c</b><b>d</b></a>");
@@ -138,13 +138,13 @@ public final class ArrayTest extends SandboxTest {
   /** Attribute constructor. */
   @Test public void attributeConstructor() {
     query("<e a='{ [] }'/>/@a/string()", "");
-    query("<e a='{ [()] }'/>/@a/string()", "");
+    query("<e a='{ [ () ] }'/>/@a/string()", "");
     query("<e a='{ [ 1 ] }'/>/@a/string()", 1);
     query("<e a='{ [ 1 to 2 ] }'/>/@a/string()", "1 2");
     query("<e a='{ array { 1 to 2 } }'/>/@a/string()", "1 2");
 
     query("attribute a { [] }/string()", "");
-    query("attribute a { [()] }/string()", "");
+    query("attribute a { [ () ] }/string()", "");
     query("attribute a { [ 1 ] }/string()", 1);
     query("attribute a { [ 1, 2 ] }/string()", "1 2");
 
@@ -166,7 +166,7 @@ public final class ArrayTest extends SandboxTest {
   /** Text constructor. */
   @Test public void textConstructor() {
     query("<e>{ [] }</e>/string()", "");
-    query("<e>{ [()] }</e>/string()", "");
+    query("<e>{ [ () ] }</e>/string()", "");
     query("<e>{ [ 1 ] }</e>/string()", 1);
     query("<e>{ [ 1, 2 ] }</e>/string()", "1 2");
   }

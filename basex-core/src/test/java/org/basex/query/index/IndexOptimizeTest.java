@@ -242,13 +242,13 @@ public final class IndexOptimizeTest extends SandboxTest {
 
     // texts
 
-    indexCheck("//(a|b)[text() = 'A']/name()", "a");
-    indexCheck("//*[(a|b)/text() = 'A']/name()", "xml");
-    indexCheck("//(a|b)/text()[. = 'A']", "A");
+    indexCheck("//(a | b)[text() = 'A']/name()", "a");
+    indexCheck("//*[(a | b)/text() = 'A']/name()", "xml");
+    indexCheck("//(a | b)/text()[. = 'A']", "A");
 
     // attributes
-    indexCheck("//*[(@y|@z) = 'Y']/name()", "a");
-    indexCheck("//(@y|@z)[. = 'Y']/name()", "y");
+    indexCheck("//*[(@y | @z) = 'Y']/name()", "a");
+    indexCheck("//(@y | @z)[. = 'Y']/name()", "y");
   }
 
   /** Checks if expressions are rewritten for enforced index access. */

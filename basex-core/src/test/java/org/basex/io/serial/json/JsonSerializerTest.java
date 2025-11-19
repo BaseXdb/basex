@@ -125,10 +125,10 @@ public final class JsonSerializerTest extends SandboxTest {
     error("{ 'A': ('B', 'C') }", format, SERJSONSEQ);
 
     // arrays
-    serialize("[()]", "[null]", format);
-    serialize("[2]", "[2]", format);
-    serialize("[2, 3]", "[2,3]", format);
-    serialize("[2, (), 4]", "[2,null,4]", format);
+    serialize("[ () ]", "[null]", format);
+    serialize("[ 2 ]", "[2]", format);
+    serialize("[ 2, 3 ]", "[2,3]", format);
+    serialize("[ 2, (), 4 ]", "[2,null,4]", format);
 
     error("[ (1, 2) ]", format, SERJSONSEQ);
 
