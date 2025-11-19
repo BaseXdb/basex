@@ -81,7 +81,7 @@ public enum Records {
         add("members", true, FuncType.get(stp.seqType(Occ.ZERO_OR_MORE)).seqType()).
         add("simple-content-type", true, FuncType.get(stp.seqType()).seqType()).
         add("matches", true, FuncType.get(Types.BOOLEAN_O, Types.ANY_ATOMIC_TYPE_O).seqType()).
-        add("constructo", true, FuncType.get(Types.ANY_ATOMIC_TYPE_ZM,
+        add("constructor", true, FuncType.get(Types.ANY_ATOMIC_TYPE_ZM,
             Types.ANY_ATOMIC_TYPE_ZO).seqType());
   }
 

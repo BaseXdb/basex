@@ -1,9 +1,6 @@
 package org.basex.query.var;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
-import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -20,21 +17,18 @@ import org.basex.util.hash.*;
  */
 final class StaticVarRef extends ParseExpr {
   /** Variable name. */
-  private final QNm name;
+  public final QNm name;
   /** Referenced variable. */
   private StaticVar var;
-  /** Indicates whether a module import for the variable name's URI was present. */
-  final boolean hasImport;
+
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param name variable name
-   * @param hasImport indicates whether a module import for the variable name's URI was present
    */
-  StaticVarRef(final InputInfo info, final QNm name, final boolean hasImport) {
+  StaticVarRef(final InputInfo info, final QNm name) {
     super(info, Types.ITEM_ZM);
     this.name = name;
-    this.hasImport = hasImport;
   }
 
   @Override
@@ -75,7 +69,7 @@ final class StaticVarRef extends ParseExpr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    final StaticVarRef ref = new StaticVarRef(info, name, hasImport);
+    final StaticVarRef ref = new StaticVarRef(info, name);
     ref.var = var;
     return copyType(ref);
   }
@@ -104,11 +98,8 @@ final class StaticVarRef extends ParseExpr {
   /**
    * Initializes this reference with the given variable.
    * @param vr variable
-   * @throws QueryException query exception
    */
-  void init(final StaticVar vr) throws QueryException {
-    if(vr.anns.contains(Annotation.PRIVATE) && !sc().baseURI().eq(vr.sc.baseURI()))
-      throw VARPRIVATE_X.get(info, this);
+  void init(final StaticVar vr) {
     var = vr;
   }
 

@@ -293,9 +293,10 @@ public class QueryParser extends InputParser {
       }
     }
 
-    // check function calls and variable references
+    // check function calls
     qc.functions.check(qc);
-    qc.vars.check();
+    // resolve variable references
+    qc.vars.resolve();
 
     if(qc.updating) {
       // check updating semantics if updating expressions exist
@@ -897,7 +898,9 @@ public class QueryParser extends InputParser {
    */
   private void varDecl(final AnnList anns) throws QueryException {
     final Var var = newVar();
-    if(sc.module != null && !eq(var.name.uri(), sc.module.uri())) throw error(MODULENS_X, var);
+    if(!anns.contains(Annotation.PRIVATE)) {
+      if(sc.module != null && !eq(var.name.uri(), sc.module.uri())) throw error(MODULENS_X, var);
+    }
 
     localVars.pushContext(false);
     final boolean external = wsConsumeWs(EXTERNAL);
@@ -909,7 +912,7 @@ public class QueryParser extends InputParser {
     }
     final VarScope vs = localVars.popContext();
     final String doc = docBuilder.toString();
-    final StaticVar sv = qc.vars.declare(var, expr, anns, external, vs, doc);
+    final StaticVar sv = qc.vars.declare(var, sc.module, moduleURIs, expr, anns, external, vs, doc);
     vars.add(sv);
   }
 

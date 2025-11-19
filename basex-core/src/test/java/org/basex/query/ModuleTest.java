@@ -145,6 +145,39 @@ public final class ModuleTest extends SandboxTest {
         + "', '" + o.path() + "') })", QueryError.MODULE_FOUND_OTHER_X_X);
   }
 
+  /** Tests visibility. */
+  @Test public void visibility() {
+    final IOFile sandbox = sandbox();
+    final IOFile m = new IOFile(sandbox, "m.xqm");
+    write(m, "module namespace m = 'm';\n"
+        + "declare %private variable $m:x := 'module';\n"
+        + "declare function m:f() {$m:x};");
+    final IOFile n1 = new IOFile(sandbox, "n1.xqm");
+    write(n1, "module namespace n = 'n';\n"
+        + "declare function n:f() {$x};");
+    final IOFile n2 = new IOFile(sandbox, "n2.xqm");
+    write(n2, "module namespace n = 'n';\n"
+        + "declare %private variable $x := 42;");
+    final IOFile o = new IOFile(sandbox, "o.xqm");
+    write(o, "module namespace o = 'o';\n"
+        + "import module 'o' at '" + o.path() + "';\n"
+        + "declare function o:f() {$o:x};");
+
+    // private variable does not clash with the same name in another module
+    query("import module namespace m = 'm' at '" + m.path() + "';\n"
+        + "declare variable $m:x := 'main';\n"
+        + "m:f(), $m:x", "module\nmain");
+
+    // private variable is visible throughout module, even in different file
+    query("import module namespace n = 'n' at '" + n1.path() + "', '" + n2.path() + "';\n"
+        + "n:f()", 42);
+
+    // variable in main module is not visible in imported module
+    error("import module namespace o = 'o' at '" + o.path() + "';\n"
+        + "declare variable $o:x := 42;\n"
+        + "o:f()", QueryError.VARUNDEF_X);
+  }
+
   /** Tests rejection of functions and variables, when their modules are not explicitly imported. */
   @Test public void gh2048() {
     final IOFile sandbox = sandbox();
