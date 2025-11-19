@@ -492,7 +492,7 @@ public enum Function implements AFunction {
       Records.SCHEMA_TYPE.get().seqType()),
   /** XQuery function. */
   NORMALIZE_SPACE(FnNormalizeSpace::new, "normalize-space([value])",
-      params(STRING_ZO), STRING_O),
+      params(ANY_ATOMIC_TYPE_ZO), STRING_O),
   /** XQuery function. */
   NORMALIZE_UNICODE(FnNormalizeUnicode::new, "normalize-unicode(value[,form])",
       params(STRING_ZO, STRING_ZO), STRING_O),
@@ -659,7 +659,7 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), STRING_O),
   /** XQuery function. */
   STRING_LENGTH(FnStringLength::new, "string-length([value])",
-      params(STRING_ZO), INTEGER_O),
+      params(ANY_ATOMIC_TYPE_ZO), INTEGER_O),
   /** XQuery function. */
   STRING_TO_CODEPOINTS(FnStringToCodepoints::new, "string-to-codepoints(value)",
       params(STRING_ZO), INTEGER_ZM),
