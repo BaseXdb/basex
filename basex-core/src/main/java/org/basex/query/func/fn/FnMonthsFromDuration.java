@@ -15,6 +15,6 @@ public final class FnMonthsFromDuration extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    return value == Empty.VALUE ? Empty.VALUE : Itr.get(checkDur(value).mon());
+    return value == Empty.VALUE ? Empty.VALUE : Itr.get(toDur(value).mon());
   }
 }

@@ -13,7 +13,7 @@ import org.basex.util.*;
 public final class StoreRemove extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] key = toKey(qc);
+    final byte[] key = toToken(arg(0), qc);
     store(qc).remove(key);
     return Empty.VALUE;
   }

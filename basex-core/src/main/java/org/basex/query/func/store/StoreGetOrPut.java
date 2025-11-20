@@ -14,7 +14,7 @@ import org.basex.query.value.item.*;
 public final class StoreGetOrPut extends StoreFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] key = toKey(qc);
+    final byte[] key = toToken(arg(0), qc);
     final FItem put = toFunction(arg(1), 0, qc);
 
     Value value = store(qc).get(key);

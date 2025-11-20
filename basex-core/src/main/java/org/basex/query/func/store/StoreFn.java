@@ -16,16 +16,6 @@ import org.basex.query.value.*;
  */
 abstract class StoreFn extends StandardFunc {
   /**
-   * Returns the key argument.
-   * @param qc query context
-   * @return key
-   * @throws QueryException query exception
-   */
-  final byte[] toKey(final QueryContext qc) throws QueryException {
-    return toToken(arg(0), qc);
-  }
-
-  /**
    * Evaluates an expression to a store name.
    * @param expr expression
    * @param empty accept empty names
@@ -41,7 +31,7 @@ abstract class StoreFn extends StandardFunc {
   /**
    * Returns the store.
    * @param qc query context
-   * @return state map
+   * @return store
    */
   static Store store(final QueryContext qc) {
     return qc.context.store;
