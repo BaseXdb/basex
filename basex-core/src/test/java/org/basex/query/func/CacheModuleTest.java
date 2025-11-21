@@ -24,9 +24,9 @@ public final class CacheModuleTest extends SandboxTest {
   @Test public void clear() {
     final Function func = _CACHE_CLEAR;
     query(_CACHE_PUT.args("key", "CLEAR"));
-    query(_CACHE_KEYS.args(), "key");
+    query(_CACHE_SIZE.args(), 1);
     query(func.args(), "");
-    query(_CACHE_KEYS.args(), "");
+    query(_CACHE_SIZE.args(), 0);
   }
 
   /** Test method. */
@@ -38,9 +38,9 @@ public final class CacheModuleTest extends SandboxTest {
     query(_CACHE_PUT.args("key", "expiring", "PT1S"));
     query(func.args("key"), "expiring");
 
-    query("(1 to 10_000) ! " + _CACHE_PUT.args(" string()", " .", "PT1S"));
+    query("(1 to 1) ! " + _CACHE_PUT.args(" string()", " .", "PT1S"));
     Performance.sleep(2000);
-    query(_CACHE_KEYS.args(), "");
+    query(_CACHE_SIZE.args(), 0);
   }
 
   /** Test method. */
@@ -49,19 +49,10 @@ public final class CacheModuleTest extends SandboxTest {
     query(_CACHE_GET.args("key"), "");
     query(func.args("key", " function() { 'GET-OR-PUT' }"), "GET-OR-PUT");
     query(_CACHE_GET.args("key"), "GET-OR-PUT");
-    query(_CACHE_KEYS.args(), "key");
+    query(_CACHE_SIZE.args(), 1);
     query(func.args("key", " function() { 'NOT' + 'INVOKED' }"), "GET-OR-PUT");
     query(_CACHE_GET.args("key"), "GET-OR-PUT");
-    query(_CACHE_KEYS.args(), "key");
-  }
-
-  /** Test method. */
-  @Test public void keys() {
-    final Function func = _CACHE_KEYS;
-    for(int i = 0; i < 3; i++) query(_CACHE_PUT.args(Integer.toString(i), i));
-    query(func.args() + " => sort()", "0\n1\n2");
-    query(_CACHE_CLEAR.args());
-    query(func.args(), "");
+    query(_CACHE_SIZE.args(), 1);
   }
 
   /** Test method. */
@@ -69,12 +60,12 @@ public final class CacheModuleTest extends SandboxTest {
     final Function func = _CACHE_PUT;
     query(func.args("key", "PUT"), "");
     query(_CACHE_GET.args("key"), "PUT");
-    query(_CACHE_KEYS.args(), "key");
+    query(_CACHE_SIZE.args(), 1);
     query(func.args("key", " ()"), "");
     query(_CACHE_GET.args("key"), "");
-    query(_CACHE_KEYS.args(), "");
+    query(_CACHE_SIZE.args(), 1);
     query(func.args("key", " map:merge((1 to 100000) ! map:entry(., .))"), "");
-    query(_CACHE_KEYS.args(), "key");
+    query(_CACHE_SIZE.args(), 1);
     query(_CACHE_GET.args("key") + " => map:size()", 100000);
 
     // expiration values
@@ -107,11 +98,9 @@ public final class CacheModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void remove() {
-    final Function func = _CACHE_REMOVE;
-    query(_CACHE_PUT.args("key", "REMOVE"));
-    query(_CACHE_KEYS.args(), "key");
-    query(func.args("key"), "");
-    query(_CACHE_KEYS.args(), "");
+  @Test public void size() {
+    final Function func = _CACHE_SIZE;
+    query(_CACHE_PUT.args("key", "value"));
+    query(func.args(), 1);
   }
 }

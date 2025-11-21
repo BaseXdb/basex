@@ -37,7 +37,7 @@ abstract class CacheFn extends StandardFunc {
 
     final String time = expires.isEmpty() ? qc.context.soptions.get(
         StaticOptions.CACHEEXPIRY) : Token.string(expires.string(info));
-    final long ms = QueryJob.toDelay(QueryJob.toTime(time, info), 0, info);
-    cache(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc), ms);
+    final long lifetime = QueryJob.toDelay(QueryJob.toTime(time, info), 0, info);
+    cache(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc), lifetime);
   }
 }

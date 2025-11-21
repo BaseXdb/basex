@@ -1,42 +1,39 @@
 package org.basex.core;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.query.value.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
- * This class provides a main-memory key/value store.
+ * This class provides a main-memory cache.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Cache {
-  /** Cache. */
-  private final TokenObjectMap<Entry> cache = new TokenObjectMap<>();
-  /** Timer for cleaning up cache. */
-  private Timer timer;
-
-  /**
-   * Returns all keys.
-   * @return keys
-   */
-  public synchronized Value keys() {
-    final TokenList list = new TokenList();
-    for(final byte[] key : cache) list.add(key);
-    return StrSeq.get(list);
+  /** Cache entry. */
+  private static final class Entry {
+    /** Value. */                Value value;
+    /** Current time, in ms. */  long current;
+    /** Lifetime time, in ms. */ long lifetime;
   }
+  /** Cache entries. */
+  private final TokenObjectMap<Entry> cache = new TokenObjectMap<>();
+  /** Executor for cleaning up the cache. */
+  private final ScheduledThreadPoolExecutor cleanup = new ScheduledThreadPoolExecutor(1);
+  /** Currently registered cleanup task. */
+  private ScheduledFuture<?> task;
 
   /**
    * Returns a value.
    * @param key key
-   * @return value or empty sequence
+   * @return value or {@code null}
    */
   public synchronized Value get(final byte[] key) {
     final Entry entry = cache.get(key);
-    if(entry == null) return Empty.VALUE;
+    if(entry == null) return null;
 
     entry.current = System.currentTimeMillis();
     return entry.value;
@@ -46,23 +43,34 @@ public final class Cache {
    * Stores a value.
    * @param key key
    * @param value value
-   * @param expires expiration time in milliseconds
+   * @param lifetime lifetime, in milliseconds
    */
-  public synchronized void put(final byte[] key, final Value value, final long expires) {
-    if(value.isEmpty() || expires <= 0) {
-      remove(key);
+  public synchronized void put(final byte[] key, final Value value, final long lifetime) {
+    if(lifetime <= 0) {
+      cache.remove(key);
     } else {
-      cache.put(key, new Entry(value, System.currentTimeMillis(), expires));
-      cleanup();
+      final Entry entry = new Entry();
+      entry.value = value;
+      entry.current = System.currentTimeMillis();
+      entry.lifetime = lifetime;
+      cache.put(key, entry);
+
+      // schedule cleanup if no task exists, or if its lifetime is longer than new lifetime
+      if(task == null || task.getDelay(TimeUnit.MILLISECONDS) > lifetime) {
+        if(task != null) task.cancel(false);
+        schedule(lifetime);
+      }
     }
   }
 
   /**
-   * Removes a value.
-   * @param key key
+   * Returns the number of entries in the cache.
+   * @return number of entries
    */
-  public synchronized void remove(final byte[] key) {
-    cache.remove(key);
+  public synchronized int size() {
+    int size = 0;
+    for(final Iterator<byte[]> iter = cache.iterator(); iter.hasNext(); iter.next()) size++;
+    return size;
   }
 
   /**
@@ -75,53 +83,36 @@ public final class Cache {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Cleans up the cache.
+   * Schedules a new cleanup task.
+   * @param delay delay in milliseconds
    */
-  private synchronized void cleanup() {
-    if(timer != null) return;
-
-    final TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        synchronized(Cache.this) {
-          final long current = System.currentTimeMillis();
-          for(final byte[] key : cache) {
-            final Entry entry = cache.get(key);
-            if(current > entry.current + entry.expires) cache.remove(key);
-          }
-          if(!cache.iterator().hasNext()) {
-            cache.clear();
-            timer.cancel();
-            timer = null;
-          }
-        }
-      }
-    };
-    timer = new Timer(true);
-    timer.schedule(task, 0, 1000);
+  private synchronized void schedule(final long delay) {
+    // minimum delay: 1 second
+    task = cleanup.schedule(this::cleanup, Math.max(1000, delay), TimeUnit.MILLISECONDS);
   }
 
   /**
-   * Cache entry.
+   * Cleans up the cache.
    */
-  private static final class Entry {
-    /** Value. */
-    Value value;
-    /** Current time. */
-    long current;
-    /** Expiration time in milliseconds. */
-    long expires;
-
-    /**
-     * Constructor.
-     * @param value value
-     * @param current current time
-     * @param expires duration to keep
-     */
-    private Entry(final Value value, final long current, final long expires) {
-      this.value = value;
-      this.current = current;
-      this.expires = expires;
+  private synchronized void cleanup() {
+    final long current = System.currentTimeMillis();
+    long delay = Long.MAX_VALUE;
+    for(final byte[] key : cache) {
+      final Entry entry = cache.get(key);
+      final long lifetime = entry.current + entry.lifetime - current;
+      if(lifetime < 0) {
+        cache.remove(key);
+      } else if(lifetime < delay) {
+        delay = lifetime;
+      }
+    }
+    if(delay < Long.MAX_VALUE) {
+      // register cleanup task for entry that becomes obsolete next
+      schedule(delay);
+    } else {
+      // no entries left: reset cache
+      cache.clear();
+      task = null;
     }
   }
 }

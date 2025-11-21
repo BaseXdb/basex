@@ -1133,13 +1133,10 @@ public enum Function implements AFunction {
       params(STRING_O, FuncType.get(ITEM_ZM).seqType(), DURATION_ZO),
       ITEM_ZM, flag(HOF, NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
-  _CACHE_KEYS(CacheKeys::new, "keys()", params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
   _CACHE_PUT(CachePut::new, "put(key,value[,expires])",
       params(STRING_O, ITEM_ZM, DURATION_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
-  _CACHE_REMOVE(CacheRemove::new, "remove(key)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  _CACHE_SIZE(CacheSize::new, "size()", params(), INTEGER_O, flag(NDT), CACHE_URI, Perm.CREATE),
 
   // Client Module
 

@@ -19,7 +19,7 @@ public final class CacheGetOrPut extends CacheFn {
     final Item expires = arg(2).atomItem(qc, info);
 
     Value value = cache(qc).get(key);
-    if(value.isEmpty()) {
+    if(value == null) {
       value = invoke(put, new HofArgs(), qc);
       cache(key, value, expires, qc);
     }
