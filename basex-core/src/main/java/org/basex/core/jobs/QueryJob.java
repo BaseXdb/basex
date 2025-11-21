@@ -32,6 +32,8 @@ public final class QueryJob extends Job implements Runnable {
   private QueryProcessor qp;
   /** Remove flag. */
   private boolean remove;
+  /** Running flag. */
+  private boolean running;
 
   /**
    * Constructor, which creates and registers the specified job.
@@ -172,84 +174,97 @@ public final class QueryJob extends Job implements Runnable {
     remove = true;
   }
 
+  /**
+   * Indicates if the job is currently running.
+   * @return result of check
+   */
+  boolean running() {
+    return running;
+  }
+
   @Override
   public void run() {
-    result.init();
-
-    final JobContext jc = jc();
-    final String id = jc.id();
-    final Context ctx = jc.context;
-    final JobOptions opts = job.options;
-
-    String log = opts.get(JobOptions.LOG);
-    if(log != null && log.isEmpty()) log = null;
-    if(log != null) ctx.log.write(LogType.REQUEST, log, null, "JOB:" + id, ctx);
-
-    final Performance perf = new Performance();
-    qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
+    running = true;
     try {
-      // parse, push and register query. order is important!
-      for(final Entry<String, Value> binding : job.bindings.entrySet()) {
-        final String key = binding.getKey();
-        final Value value = binding.getValue();
-        if(key.isEmpty()) qp.context(value);
-        else qp.variable(key, value);
-      }
-      qp.parse();
-      updating = qp.updating;
-      result.time = perf.nanoRuntime();
+      result.init();
 
-      // register job
-      pushJob(qp);
-      register(ctx);
-      // reset timer
-      perf.nanoRuntime();
-      if(remove) ctx.jobs.tasks.remove(id);
+      final JobContext jc = jc();
+      final String id = jc.id();
+      final Context ctx = jc.context;
+      final JobOptions opts = job.options;
 
-      // retrieve result; copy persistent database nodes
-      result.value = qp.value().materialize(d -> d == null || d.inMemory(), null, qp.qc);
-    } catch(final JobException ex) {
-      // query was interrupted: remove cached result
-      Util.debug(ex);
-      ctx.jobs.results.remove(id);
-    } catch(final QueryException ex) {
-      result.exception = ex;
-    } catch(final Throwable ex) {
-      result.exception = XQUERY_UNEXPECTED_X.get(null, ex);
-    } finally {
-      // close and invalidate query after result has been assigned. order is important!
-      if(Boolean.TRUE.equals(opts.get(JobOptions.CACHE))) {
-        ctx.jobs.scheduleResult(this);
-        state(JobState.CACHED);
-      } else {
-        state(JobState.SCHEDULED);
-      }
+      String log = opts.get(JobOptions.LOG);
+      if(log != null && log.isEmpty()) log = null;
+      if(log != null) ctx.log.write(LogType.REQUEST, log, null, "JOB:" + id, ctx);
 
-      if(ctx.jobs.active.containsKey(id)) {
-        qp.close();
-        unregister(ctx);
-        popJob();
-        qp = null;
-        result.time += jc.performance.nanoRuntime();
-      }
-
-      // write concluding log entry, invalidate performance measurements
-      if(log != null) {
-        final LogType type;
-        String msg = null;
-        if(result.exception != null) {
-          type = LogType.ERROR;
-          msg = result.exception.getMessage();
-        } else {
-          type = LogType.OK;
+      final Performance perf = new Performance();
+      qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
+      try {
+        // parse, push and register query. order is important!
+        for(final Entry<String, Value> binding : job.bindings.entrySet()) {
+          final String key = binding.getKey();
+          final Value value = binding.getValue();
+          if(key.isEmpty()) qp.context(value);
+          else qp.variable(key, value);
         }
-        ctx.log.write(type, msg, perf, "JOB:" + id, ctx);
-      }
-      jc.performance = null;
+        qp.parse();
+        updating = qp.updating;
+        result.time = perf.nanoRuntime();
 
-      if(remove) ctx.jobs.tasks.remove(id);
-      if(notify != null) notify.accept(result);
-      if(result.value != null && result.value.isEmpty()) ctx.jobs.results.remove(id);
+        // register job
+        pushJob(qp);
+        register(ctx);
+        // reset timer
+        perf.nanoRuntime();
+        if(remove) ctx.jobs.tasks.remove(id);
+
+        // retrieve result; copy persistent database nodes
+        result.value = qp.value().materialize(d -> d == null || d.inMemory(), null, qp.qc);
+      } catch(final JobException ex) {
+        // query was interrupted: remove cached result
+        Util.debug(ex);
+        ctx.jobs.results.remove(id);
+      } catch(final QueryException ex) {
+        result.exception = ex;
+      } catch(final Throwable ex) {
+        result.exception = XQUERY_UNEXPECTED_X.get(null, ex);
+      } finally {
+        // close and invalidate query after result has been assigned. order is important!
+        if(Boolean.TRUE.equals(opts.get(JobOptions.CACHE))) {
+          ctx.jobs.scheduleResult(this);
+          state(JobState.CACHED);
+        } else {
+          state(JobState.SCHEDULED);
+        }
+
+        if(ctx.jobs.active.containsKey(id)) {
+          qp.close();
+          unregister(ctx);
+          popJob();
+          qp = null;
+          result.time += jc.performance.nanoRuntime();
+        }
+
+        // write concluding log entry, invalidate performance measurements
+        if(log != null) {
+          final LogType type;
+          String msg = null;
+          if(result.exception != null) {
+            type = LogType.ERROR;
+            msg = result.exception.getMessage();
+          } else {
+            type = LogType.OK;
+          }
+          ctx.log.write(type, msg, perf, "JOB:" + id, ctx);
+        }
+        jc.performance = null;
+
+        if(remove) ctx.jobs.tasks.remove(id);
+        if(notify != null) notify.accept(result);
+        if(result.value != null && result.value.isEmpty()) ctx.jobs.results.remove(id);
+      }
+    } finally {
+      running = false;
     }
   }
 

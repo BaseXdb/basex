@@ -51,7 +51,7 @@ public final class QueryJobTask extends TimerTask {
       cancel();
     }
     // skip execution if same job is still running
-    if(!jobs.active.containsKey(job.jc().id())) new Thread(job).start();
+    if(!job.running()) new Thread(job).start();
   }
 
   @Override
