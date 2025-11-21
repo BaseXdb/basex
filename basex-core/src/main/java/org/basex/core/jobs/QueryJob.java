@@ -50,8 +50,8 @@ public final class QueryJob extends Job implements Runnable {
 
     // check when job is to be started
     final JobOptions opts = job.options;
-    final Item start = time(opts.get(JobOptions.START), info);
-    long delay = start == null ? 0 : delay(start, 0, info);
+    final Item start = toTime(opts.get(JobOptions.START), info);
+    long delay = start == null ? 0 : toDelay(start, 0, info);
 
     // check when job is to be repeated
     long interval = 0;
@@ -64,8 +64,8 @@ public final class QueryJob extends Job implements Runnable {
     if(delay < 0) throw JOBS_RANGE_X.get(info, start);
 
     // check when job is to be stopped
-    final Item end = time(opts.get(JobOptions.END), info);
-    final long duration = end == null ? Long.MAX_VALUE : delay(end, delay, info);
+    final Item end = toTime(opts.get(JobOptions.END), info);
+    final long duration = end == null ? Long.MAX_VALUE : toDelay(end, delay, info);
     if(duration <= delay) throw JOBS_RANGE_X.get(info, end);
 
     // check job results are to be cached
@@ -112,7 +112,7 @@ public final class QueryJob extends Job implements Runnable {
    * @return item or {@code null}
    * @throws QueryException query exception
    */
-  private static Item time(final String string, final InputInfo info) throws QueryException {
+  public static Item toTime(final String string, final InputInfo info) throws QueryException {
     // undefined
     if(string == null || string.isEmpty()) return null;
     // integer
@@ -141,7 +141,7 @@ public final class QueryJob extends Job implements Runnable {
    * @return milliseconds to wait
    * @throws QueryException query exception
    */
-  private static long delay(final Item start, final long min, final InputInfo info)
+  public static long toDelay(final Item start, final long min, final InputInfo info)
       throws QueryException {
 
     final QueryDateTime qdt = new QueryDateTime();

@@ -33,7 +33,7 @@ public enum QueryError {
   /** Error code. */
   BASEX_DBPATH2_X(BASEX, "doc", "Database path '%' yields more than one document."),
   /** Error code. */
-  BASEX_STORE_X(BASEX, "store", "Value cannot be stored: %."),
+  BASEX_FUNCTION_X(BASEX, "function", "Value is a function: %."),
   /** Error code. */
   BASEX_WHICH_X(BASEX, "function", "Function not found: %."),
   /** Error code. */

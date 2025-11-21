@@ -55,13 +55,13 @@ public abstract class FItem extends Item implements XQFunction {
   @Override
   public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
-    throw BASEX_STORE_X.get(info(ii), this);
+    throw BASEX_FUNCTION_X.get(info(ii), this);
   }
 
   @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    throw BASEX_STORE_X.get(info(ii), this);
+    throw BASEX_FUNCTION_X.get(info(ii), this);
   }
 
   /**

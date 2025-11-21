@@ -1160,10 +1160,10 @@ public final class UpdateTest extends SandboxTest {
     query(_UPDATE_OUTPUT.args(" {}"), "{}");
     query(_UPDATE_OUTPUT.args(" { 1: { 2: 3 }}"), "{1:{2:3}}");
 
-    error(_UPDATE_OUTPUT.args(" true#0"), BASEX_STORE_X);
-    error(_UPDATE_OUTPUT.args(" [ true#0 ]"), BASEX_STORE_X);
-    error(_UPDATE_OUTPUT.args(" [1, (2, [ 3, true#0 ])]"), BASEX_STORE_X);
-    error(_UPDATE_OUTPUT.args(" { 1: { 2: true#0 }}"), BASEX_STORE_X);
+    error(_UPDATE_OUTPUT.args(" true#0"), BASEX_FUNCTION_X);
+    error(_UPDATE_OUTPUT.args(" [ true#0 ]"), BASEX_FUNCTION_X);
+    error(_UPDATE_OUTPUT.args(" [1, (2, [ 3, true#0 ])]"), BASEX_FUNCTION_X);
+    error(_UPDATE_OUTPUT.args(" { 1: { 2: true#0 }}"), BASEX_FUNCTION_X);
   }
 
   /** Test. */

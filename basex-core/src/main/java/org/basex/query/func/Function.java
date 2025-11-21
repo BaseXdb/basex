@@ -13,6 +13,7 @@ import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
 import org.basex.query.func.bin.*;
+import org.basex.query.func.cache.*;
 import org.basex.query.func.client.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.func.crypto.*;
@@ -1118,6 +1119,27 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _BIN_XOR(BinXor::new, "xor(binary1,binary2)",
       params(BINARY_ZO, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
+
+  // Cache Module
+
+  /** XQuery function. */
+  _CACHE_CLEAR(CacheClear::new, "clear()",
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_GET(CacheGet::new, "get(key)",
+      params(STRING_O), ITEM_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_GET_OR_PUT(CacheGetOrPut::new, "get-or-put(key,put[,expires])",
+      params(STRING_O, FuncType.get(ITEM_ZM).seqType(), DURATION_ZO),
+      ITEM_ZM, flag(HOF, NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_KEYS(CacheKeys::new, "keys()", params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_PUT(CachePut::new, "put(key,value[,expires])",
+      params(STRING_O, ITEM_ZM, DURATION_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_REMOVE(CacheRemove::new, "remove(key)",
+      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
 
   // Client Module
 

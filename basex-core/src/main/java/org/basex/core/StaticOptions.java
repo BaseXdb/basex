@@ -30,10 +30,12 @@ public final class StaticOptions extends Options {
   public static final StringOption LANG = new StringOption("LANG", Prop.language);
   /** Locking strategy. */
   public static final BooleanOption FAIRLOCK = new BooleanOption("FAIRLOCK", false);
-  /** Timeout (seconds) for remembering result of asynchronous queries. */
+  /** Timeout (seconds) for remembering result of jobs. */
   public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
   /** Write store at shutdown. */
   public static final BooleanOption WRITESTORE = new BooleanOption("WRITESTORE", true);
+  /** Expiration time (seconds) for cache entries. */
+  public static final StringOption CACHEEXPIRY = new StringOption("CACHEEXPIRY", "PT1H");
 
   /** Comment: written to the options file. */
   public static final Comment C_CLIENT = new Comment("Client/Server Architecture");
