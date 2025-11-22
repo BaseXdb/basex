@@ -28,7 +28,7 @@ public final class Cache {
   /**
    * Returns a value.
    * @param key key
-   * @param name name of cache (empty string for default cache)
+   * @param name name of cache
    * @return value or {@code null}
    */
   public synchronized Value get(final String key, final String name) {
@@ -39,7 +39,7 @@ public final class Cache {
    * Stores a value.
    * @param key key
    * @param value value
-   * @param name name of cache (empty string for default cache)
+   * @param name name of cache
    */
   public synchronized void put(final String key, final Value value, final String name) {
     cache(name).put(key, value);
@@ -47,7 +47,7 @@ public final class Cache {
 
   /**
    * Returns the number of entries.
-   * @param name name of cache (empty string for default cache)
+   * @param name name of cache
    * @return number of entries
    */
   public synchronized int size(final String name) {
@@ -56,7 +56,7 @@ public final class Cache {
 
   /**
    * Clears a cache.
-   * @param name name of cache (empty string for default cache)
+   * @param name name of cache
    */
   public synchronized void remove(final String name) {
     caches.remove(name);
@@ -64,7 +64,7 @@ public final class Cache {
 
   /**
    * Returns the names of all caches.
-   * @return number of entries
+   * @return names
    */
   public synchronized TokenList names() {
     final TokenList list = new TokenList(caches.size());
