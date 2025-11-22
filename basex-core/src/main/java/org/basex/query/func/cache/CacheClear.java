@@ -12,8 +12,8 @@ import org.basex.util.*;
  */
 public final class CacheClear extends CacheFn {
   @Override
-  public Empty item(final QueryContext qc, final InputInfo ii) {
-    cache(qc).clear();
+  public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    cache(qc).reset();
     return Empty.VALUE;
   }
 }

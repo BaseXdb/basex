@@ -141,7 +141,7 @@ public final class Context {
     jobs = new JobPool(soptions);
     external = new HashSet<>();
     store = new Store(this);
-    cache = new Cache();
+    cache = new Cache(this);
     client = null;
   }
 

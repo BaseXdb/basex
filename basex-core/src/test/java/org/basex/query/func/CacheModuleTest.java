@@ -4,7 +4,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -24,9 +23,10 @@ public final class CacheModuleTest extends SandboxTest {
   @Test public void clear() {
     final Function func = _CACHE_CLEAR;
     query(_CACHE_PUT.args("key", "CLEAR"));
-    query(_CACHE_SIZE.args(), 1);
-    query(func.args(), "");
-    query(_CACHE_SIZE.args(), 0);
+    query(_CACHE_PUT.args("key", "CLEAR", "cache"));
+    query(_CACHE_NAMES.args() + " => count()", 2);
+    query(func.args());
+    query(_CACHE_NAMES.args() + " => count()", 0);
   }
 
   /** Test method. */
@@ -35,12 +35,12 @@ public final class CacheModuleTest extends SandboxTest {
     query(func.args("key"), "");
 
     // test expiration of cache entries
-    query(_CACHE_PUT.args("key", "expiring", "PT1S"));
-    query(func.args("key"), "expiring");
-
-    query("(1 to 1) ! " + _CACHE_PUT.args(" string()", " .", "PT1S"));
-    Performance.sleep(2000);
-    query(_CACHE_SIZE.args(), 0);
+    query(_CACHE_PUT.args("key", "GET"));
+    query(func.args("key"), "GET");
+    query(_CACHE_PUT.args("key", "specific", "cache"));
+    query(func.args("key"), "GET");
+    query(func.args("key", ""), "GET");
+    query(func.args("key", "cache"), "specific");
   }
 
   /** Test method. */
@@ -56,6 +56,15 @@ public final class CacheModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void names() {
+    final Function func = _CACHE_NAMES;
+    query(_CACHE_PUT.args("key", "NAMES"));
+    query(func.args(), "");
+    query(_CACHE_PUT.args("key", "NAMES", "cache"));
+    query(func.args(), "\ncache");
+  }
+
+  /** Test method. */
   @Test public void put() {
     final Function func = _CACHE_PUT;
     query(func.args("key", "PUT"), "");
@@ -68,28 +77,13 @@ public final class CacheModuleTest extends SandboxTest {
     query(_CACHE_SIZE.args(), 1);
     query(_CACHE_GET.args("key") + " => map:size()", 100000);
 
-    // expiration values
-    query(func.args("duration", "expiring", " xs:dayTimeDuration('PT1M')"));
-    query(_CACHE_GET.args("duration"), "expiring");
-    query(func.args("duration", "expiring", "PT1M"));
-    query(_CACHE_GET.args("duration"), "expiring");
-    query(func.args("duration", "expiring", "PT0S"));
-    query(_CACHE_GET.args("duration"), "");
-    error(func.args("duration", "expiring", "PTS"), DATEFORMAT_X_X_X);
-
-    query(func.args("dateTime", "expiring", " xs:dateTime('9999-01-01T01:01:01')"));
-    query(_CACHE_GET.args("dateTime"), "expiring");
-    query(func.args("dateTime", "expiring", "9999-01-01T01:01:01"));
-    query(_CACHE_GET.args("dateTime"), "expiring");
-    query(func.args("dateTime", "expiring", "2001-01-01T01:01:01"));
-    query(_CACHE_GET.args("dateTime"), "");
-    error(func.args("dateTime", "expiring", "9999-99-99T99:99:99"), DATEFORMAT_X_X_X);
-
-    query(func.args("time", "expiring", " xs:time('12:12:12')"));
-    query(func.args("time", "expiring", "12:12:12"));
-    error(func.args("time", "expiring", "99:99:99"), DATEFORMAT_X_X_X);
-
-    query(func.args("minutes", "expiring", 59));
+    query(func.args("key", "PUT"));
+    query(func.args("key", "PUT1", "cache1"));
+    query(func.args("key", "PUT2", "cache2"));
+    query(_CACHE_GET.args("key"), "PUT");
+    query(_CACHE_GET.args("key", ""), "PUT");
+    query(_CACHE_GET.args("key", "cache1"), "PUT1");
+    query(_CACHE_GET.args("key", "cache2"), "PUT2");
 
     error(func.args("error", " true#0"), BASEX_FUNCTION_X);
     error(func.args("error", " [ function() { 123 } ]"), BASEX_FUNCTION_X);
@@ -98,9 +92,34 @@ public final class CacheModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void remove() {
+    final Function func = _CACHE_REMOVE;
+    query(_CACHE_PUT.args("key", "REMOVE"));
+    query(_CACHE_SIZE.args(), 1);
+    query(func.args(), "");
+    query(_CACHE_SIZE.args(), 0);
+
+    query(_CACHE_PUT.args("key", "REMOVE"));
+    query(func.args(""), "");
+    query(_CACHE_SIZE.args(), 0);
+
+    query(_CACHE_PUT.args("key", "REMOVE", "cache"));
+    query(_CACHE_NAMES.args(), "cache");
+    query(func.args("cache"), "");
+    query(_CACHE_NAMES.args(), "");
+    query(_CACHE_SIZE.args("cache"), 0);
+  }
+
+  /** Test method. */
   @Test public void size() {
     final Function func = _CACHE_SIZE;
-    query(_CACHE_PUT.args("key", "value"));
+    query(_CACHE_PUT.args("key", "SIZE"));
+    query(_CACHE_PUT.args("key1", "SIZE1", "cache"));
+    query(_CACHE_PUT.args("key2", "SIZE2", "cache"));
+
     query(func.args(), 1);
+    query(func.args(""), 1);
+    query(func.args("cache"), 2);
+    query(func.args("unknown"));
   }
 }

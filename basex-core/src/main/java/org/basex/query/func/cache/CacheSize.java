@@ -12,7 +12,9 @@ import org.basex.util.*;
  */
 public final class CacheSize extends CacheFn {
   @Override
-  public Itr item(final QueryContext qc, final InputInfo ii) {
-    return Itr.get(cache(qc).size());
+  public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final String name = toZeroString(arg(0), qc);
+
+    return Itr.get(cache(qc).size(name));
   }
 }

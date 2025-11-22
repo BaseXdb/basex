@@ -34,8 +34,8 @@ public final class StaticOptions extends Options {
   public static final NumberOption CACHETIMEOUT = new NumberOption("CACHETIMEOUT", 3600);
   /** Write store at shutdown. */
   public static final BooleanOption WRITESTORE = new BooleanOption("WRITESTORE", true);
-  /** Expiration time (seconds) for cache entries. */
-  public static final StringOption CACHEEXPIRY = new StringOption("CACHEEXPIRY", "PT1H");
+  /** Maximum number of cache entries. */
+  public static final NumberOption CACHEMAX = new NumberOption("CACHEMAX", 65536);
 
   /** Comment: written to the options file. */
   public static final Comment C_CLIENT = new Comment("Client/Server Architecture");

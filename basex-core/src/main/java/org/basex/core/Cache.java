@@ -1,118 +1,98 @@
 package org.basex.core;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 import org.basex.query.value.*;
-import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
- * This class provides a main-memory cache.
+ * This class provides access to main-memory caches.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public final class Cache {
-  /** Cache entry. */
-  private static final class Entry {
-    /** Value. */                Value value;
-    /** Current time, in ms. */  long current;
-    /** Lifetime time, in ms. */ long lifetime;
+  /** Caches. */
+  private final HashMap<String, LinkedHashMap<String, Value>> caches = new HashMap<>();
+  /** Database context. */
+  private final Context context;
+
+  /**
+   * Constructor.
+   * @param context database context
+   */
+  public Cache(final Context context) {
+    this.context = context;
   }
-  /** Cache entries. */
-  private final TokenObjectMap<Entry> cache = new TokenObjectMap<>();
-  /** Executor for cleaning up the cache. */
-  private final ScheduledThreadPoolExecutor cleanup = new ScheduledThreadPoolExecutor(1);
-  /** Currently registered cleanup task. */
-  private ScheduledFuture<?> task;
 
   /**
    * Returns a value.
    * @param key key
+   * @param name name of cache (empty string for default cache)
    * @return value or {@code null}
    */
-  public synchronized Value get(final byte[] key) {
-    final Entry entry = cache.get(key);
-    if(entry == null) return null;
-
-    entry.current = System.currentTimeMillis();
-    return entry.value;
+  public synchronized Value get(final String key, final String name) {
+    return caches.containsKey(name) ? cache(name).get(key) : null;
   }
 
   /**
    * Stores a value.
    * @param key key
    * @param value value
-   * @param lifetime lifetime, in milliseconds
+   * @param name name of cache (empty string for default cache)
    */
-  public synchronized void put(final byte[] key, final Value value, final long lifetime) {
-    if(lifetime <= 0) {
-      cache.remove(key);
-    } else {
-      final Entry entry = new Entry();
-      entry.value = value;
-      entry.current = System.currentTimeMillis();
-      entry.lifetime = lifetime;
-      cache.put(key, entry);
-
-      // schedule cleanup if no task exists, or if its lifetime is longer than new lifetime
-      if(task == null || task.getDelay(TimeUnit.MILLISECONDS) > lifetime) {
-        if(task != null) task.cancel(false);
-        schedule(lifetime);
-      }
-    }
+  public synchronized void put(final String key, final Value value, final String name) {
+    cache(name).put(key, value);
   }
 
   /**
-   * Returns the number of entries in the cache.
+   * Returns the number of entries.
+   * @param name name of cache (empty string for default cache)
    * @return number of entries
    */
-  public synchronized int size() {
-    int size = 0;
-    for(final Iterator<byte[]> iter = cache.iterator(); iter.hasNext(); iter.next()) size++;
-    return size;
+  public synchronized int size(final String name) {
+    return caches.containsKey(name) ? cache(name).size() : 0;
   }
 
   /**
-   * Clears the map.
+   * Clears a cache.
+   * @param name name of cache (empty string for default cache)
    */
-  public synchronized void clear() {
-    cache.clear();
-  }
-
-  // PRIVATE FUNCTIONS ============================================================================
-
-  /**
-   * Schedules a new cleanup task.
-   * @param delay delay in milliseconds
-   */
-  private synchronized void schedule(final long delay) {
-    // minimum delay: 1 second
-    task = cleanup.schedule(this::cleanup, Math.max(1000, delay), TimeUnit.MILLISECONDS);
+  public synchronized void remove(final String name) {
+    caches.remove(name);
   }
 
   /**
-   * Cleans up the cache.
+   * Returns the names of all caches.
+   * @return number of entries
    */
-  private synchronized void cleanup() {
-    final long current = System.currentTimeMillis();
-    long delay = Long.MAX_VALUE;
-    for(final byte[] key : cache) {
-      final Entry entry = cache.get(key);
-      final long lifetime = entry.current + entry.lifetime - current;
-      if(lifetime < 0) {
-        cache.remove(key);
-      } else if(lifetime < delay) {
-        delay = lifetime;
-      }
-    }
-    if(delay < Long.MAX_VALUE) {
-      // register cleanup task for entry that becomes obsolete next
-      schedule(delay);
-    } else {
-      // no entries left: reset cache
-      cache.clear();
-      task = null;
-    }
+  public synchronized TokenList names() {
+    final TokenList list = new TokenList(caches.size());
+    for(final String name : caches.keySet()) list.add(name);
+    return list;
+  }
+
+  /**
+   * Clears all caches.
+   */
+  public synchronized void reset() {
+    caches.clear();
+  }
+
+  /**
+   * Choose cache, or create new one.
+   * @param name name of cache (empty string for default cache)
+   * @return cache
+   */
+  private LinkedHashMap<String, Value> cache(final String name) {
+    return caches.computeIfAbsent(name, k -> {
+      final int max = context.soptions.get(StaticOptions.CACHEMAX);
+      return new LinkedHashMap<>(8, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(final Map.Entry<String, Value> eldest) {
+          return size() > max;
+        }
+      };
+    });
   }
 }

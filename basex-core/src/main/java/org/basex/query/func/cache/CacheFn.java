@@ -1,12 +1,9 @@
 package org.basex.query.func.cache;
 
 import org.basex.core.*;
-import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
-import org.basex.util.*;
 
 /**
  * Cache function.
@@ -28,16 +25,12 @@ abstract class CacheFn extends StandardFunc {
    * Caches a materialized, compact version of the specified value.
    * @param key key
    * @param value value
-   * @param expires expiration value (dayTimeDuration, dateTime, time, minutes/integer)
+   * @param name name of cache (empty string for default cache)
    * @param qc query context
    * @throws QueryException query exception
    */
-  final void cache(final byte[] key, final Value value, final Item expires, final QueryContext qc)
+  final void cache(final String key, final Value value, final String name, final QueryContext qc)
       throws QueryException {
-
-    final String time = expires.isEmpty() ? qc.context.soptions.get(
-        StaticOptions.CACHEEXPIRY) : Token.string(expires.string(info));
-    final long lifetime = QueryJob.toDelay(QueryJob.toTime(time, info), 0, info);
-    cache(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc), lifetime);
+    cache(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc), name);
   }
 }

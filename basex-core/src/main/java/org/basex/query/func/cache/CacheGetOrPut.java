@@ -14,14 +14,14 @@ import org.basex.query.value.item.*;
 public final class CacheGetOrPut extends CacheFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] key = toToken(arg(0), qc);
+    final String key = toString(arg(0), qc);
     final FItem put = toFunction(arg(1), 0, qc);
-    final Item expires = arg(2).atomItem(qc, info);
+    final String name = toZeroString(arg(2), qc);
 
-    Value value = cache(qc).get(key);
+    Value value = cache(qc).get(key, name);
     if(value == null) {
       value = invoke(put, new HofArgs(), qc);
-      cache(key, value, expires, qc);
+      cache(key, value, name, qc);
     }
     return value;
   }

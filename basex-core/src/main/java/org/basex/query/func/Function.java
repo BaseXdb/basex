@@ -1126,17 +1126,24 @@ public enum Function implements AFunction {
   _CACHE_CLEAR(CacheClear::new, "clear()",
       params(), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
-  _CACHE_GET(CacheGet::new, "get(key)",
-      params(STRING_O), ITEM_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+  _CACHE_GET(CacheGet::new, "get(key[,name])",
+      params(STRING_O, STRING_ZO), ITEM_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
-  _CACHE_GET_OR_PUT(CacheGetOrPut::new, "get-or-put(key,put[,expires])",
-      params(STRING_O, FuncType.get(ITEM_ZM).seqType(), DURATION_ZO),
+  _CACHE_GET_OR_PUT(CacheGetOrPut::new, "get-or-put(key,put[,name])",
+      params(STRING_O, FuncType.get(ITEM_ZM).seqType(), STRING_ZO),
       ITEM_ZM, flag(HOF, NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
-  _CACHE_PUT(CachePut::new, "put(key,value[,expires])",
-      params(STRING_O, ITEM_ZM, DURATION_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  _CACHE_NAMES(CacheNames::new, "names()",
+      params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
-  _CACHE_SIZE(CacheSize::new, "size()", params(), INTEGER_O, flag(NDT), CACHE_URI, Perm.CREATE),
+  _CACHE_PUT(CachePut::new, "put(key,value[,name])",
+      params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_REMOVE(CacheRemove::new, "remove([name])",
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_SIZE(CacheSize::new, "size([name])",
+      params(STRING_ZO), INTEGER_O, flag(NDT), CACHE_URI, Perm.CREATE),
 
   // Client Module
 
