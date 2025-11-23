@@ -35,7 +35,6 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
   /**
    * Declares a new static variable in a given module.
    * @param var variable
-   * @param module local module where declaration occurs, or {@code null} for the main module
    * @param imports imported module URIs
    * @param expr bound expression, possibly {@code null}
    * @param anns annotations
@@ -45,23 +44,25 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @return static variable reference
    * @throws QueryException query exception
    */
-  public StaticVar declare(final Var var, final QNm module, final TokenSet imports, final Expr expr,
+  public StaticVar declare(final Var var, final TokenSet imports, final Expr expr,
       final AnnList anns, final boolean external, final VarScope vs, final String doc)
       throws QueryException {
 
-    final byte[] modURI = moduleUri(module);
-    final byte[] varURI = var.name.uri();
-    if(!Token.eq(modURI, varURI)) {
-      if(module != null && !anns.contains(Annotation.PRIVATE)) throw MODULENS_X.get(var.info, var);
-      if(imports.contains(varURI)) {
-        final StaticVar sv = findVar(var.name, varURI);
+    final byte[] modUri = moduleUri(var.info.sc().module);
+    final byte[] varUri = var.name.uri();
+    if(!Token.eq(modUri, varUri)) {
+      if(modUri != Token.EMPTY && !anns.contains(Annotation.PRIVATE)) {
+        throw MODULENS_X.get(var.info, var);
+      }
+      if(imports.contains(varUri)) {
+        final StaticVar sv = findVar(var.name, varUri);
         if(sv != null && !sv.anns.contains(Annotation.PRIVATE)) {
           // variable already declared in imported module
           throw VARDUPL_X.get(var.info, var.name.string());
         }
       }
     }
-    final QNmMap<StaticVar> vars = varsByModule.computeIfAbsent(modURI, QNmMap::new);
+    final QNmMap<StaticVar> vars = varsByModule.computeIfAbsent(modUri, QNmMap::new);
     if(vars.contains(var.name)) throw VARDUPL_X.get(var.info, var.name.string());
 
     final StaticVar sv = new StaticVar(var, expr, anns, external, vs, doc);
@@ -95,20 +96,20 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
       final StaticVarRef ref = ur.ref;
 
       // try to resolve the reference within the local module
-      final byte[] modURI = moduleUri(ref.sc().module);
-      StaticVar var = findVar(ref.name, modURI);
+      final byte[] modUri = moduleUri(ref.sc().module);
+      StaticVar var = findVar(ref.name, modUri);
 
       if(var == null) {
         // try to resolve the reference from a module
-        final byte[] refURI = ref.name.uri();
-        var = findVar(ref.name, refURI);
+        final byte[] refUri = ref.name.uri();
+        var = findVar(ref.name, refUri);
         if(var == null) throw VARUNDEF_X.get(ref.info(), ref);
-        if(!Token.eq(modURI, refURI) && !ur.hasImport) {
+        if(!Token.eq(modUri, refUri) && !ur.hasImport) {
           throw INVISIBLEVAR_X.get(ref.info(), ref.name);
         }
       }
 
-      if(var.anns.contains(Annotation.PRIVATE) && !Token.eq(modURI, moduleUri(var.sc.module))) {
+      if(var.anns.contains(Annotation.PRIVATE) && !Token.eq(modUri, moduleUri(var.sc.module))) {
         throw VARPRIVATE_X.get(ref.info(), ref);
       }
       ref.init(var);

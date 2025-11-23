@@ -908,7 +908,7 @@ public class QueryParser extends InputParser {
     }
     final VarScope vs = localVars.popContext();
     final String doc = docBuilder.toString();
-    final StaticVar sv = qc.vars.declare(var, sc.module, moduleURIs, expr, anns, external, vs, doc);
+    final StaticVar sv = qc.vars.declare(var, moduleURIs, expr, anns, external, vs, doc);
     vars.add(sv);
   }
 
