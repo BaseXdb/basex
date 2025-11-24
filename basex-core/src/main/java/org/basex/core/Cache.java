@@ -23,6 +23,7 @@ public final class Cache {
    */
   public Cache(final Context context) {
     this.context = context;
+    clear();
   }
 
   /**
@@ -32,7 +33,7 @@ public final class Cache {
    * @return value or {@code null}
    */
   public synchronized Value get(final String key, final String name) {
-    return caches.containsKey(name) ? cache(name).get(key) : null;
+    return caches.containsKey(name) ? caches.get(name).get(key) : null;
   }
 
   /**
@@ -42,7 +43,7 @@ public final class Cache {
    * @param name name of cache
    */
   public synchronized void put(final String key, final Value value, final String name) {
-    cache(name).put(key, value);
+    caches.computeIfAbsent(name, n -> create()).put(key, value);
   }
 
   /**
@@ -51,7 +52,7 @@ public final class Cache {
    * @return number of entries
    */
   public synchronized int size(final String name) {
-    return caches.containsKey(name) ? cache(name).size() : 0;
+    return caches.containsKey(name) ? caches.get(name).size() : 0;
   }
 
   /**
@@ -75,24 +76,22 @@ public final class Cache {
   /**
    * Clears all caches.
    */
-  public synchronized void reset() {
+  public synchronized void clear() {
     caches.clear();
+    caches.put("", create());
   }
 
   /**
-   * Choose cache, or create new one.
-   * @param name name of cache (empty string for default cache)
+   * Creates a new cache.
    * @return cache
    */
-  private LinkedHashMap<String, Value> cache(final String name) {
-    return caches.computeIfAbsent(name, k -> {
-      final int max = context.soptions.get(StaticOptions.CACHEMAX);
-      return new LinkedHashMap<>(8, 0.75f, true) {
-        @Override
-        protected boolean removeEldestEntry(final Map.Entry<String, Value> eldest) {
-          return size() > max;
-        }
-      };
-    });
+  private LinkedHashMap<String, Value> create() {
+    final int max = context.soptions.get(StaticOptions.CACHEMAX);
+    return new LinkedHashMap<>(8, 0.75f, true) {
+      @Override
+      protected boolean removeEldestEntry(final Map.Entry<String, Value> eldest) {
+        return size() > max;
+      }
+    };
   }
 }

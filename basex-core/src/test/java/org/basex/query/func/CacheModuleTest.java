@@ -26,7 +26,7 @@ public final class CacheModuleTest extends SandboxTest {
     query(_CACHE_PUT.args("key", "CLEAR", "cache"));
     query(_CACHE_NAMES.args() + " => count()", 2);
     query(func.args());
-    query(_CACHE_NAMES.args() + " => count()", 0);
+    query(_CACHE_NAMES.args() + " => count()", 1);
   }
 
   /** Test method. */
