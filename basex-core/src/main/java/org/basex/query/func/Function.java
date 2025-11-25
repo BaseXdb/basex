@@ -174,7 +174,7 @@ public enum Function implements AFunction {
       params(), DATE_O, flag(NDT)),
   /** XQuery function. */
   CURRENT_DATETIME(FnCurrentDateTime::new, "current-dateTime()",
-      params(), DATE_TIME_O, flag(NDT)),
+      params(), DATE_TIME_STAMP_O, flag(NDT)),
   /** XQuery function. */
   CURRENT_TIME(FnCurrentTime::new, "current-time()",
       params(), TIME_O, flag(NDT)),
@@ -721,7 +721,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), STRING_O),
   /** XQuery function. */
   UNIX_DATETIME(FnUnixDateTime::new, "unix-dateTime([value])",
-      params(INTEGER_ZO), DATE_TIME_O),
+      params(INTEGER_ZO), DATE_TIME_STAMP_O),
   /** XQuery function. */
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),
@@ -1196,7 +1196,7 @@ public enum Function implements AFunction {
       params(INTEGER_O, INTEGER_O), STRING_O, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_INTEGER_TO_DATETIME(ConvertIntegerToDateTime::new, "integer-to-dateTime(value)",
-      params(INTEGER_O), DATE_TIME_O, CONVERT_URI),
+      params(INTEGER_O), DATE_TIME_STAMP_O, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_INTEGER_TO_DAYTIME(ConvertIntegerToDayTime::new, "integer-to-dayTime(value)",
       params(INTEGER_O), DAY_TIME_DURATION_O, CONVERT_URI),
@@ -1456,7 +1456,7 @@ public enum Function implements AFunction {
       params(STRING_O), BOOLEAN_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_LAST_MODIFIED(FileLastModified::new, "last-modified(path)",
-      params(STRING_O), DATE_TIME_O, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O), DATE_TIME_STAMP_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_LINE_SEPARATOR(FileLineSeparator::new, "line-separator()",
       params(), STRING_O, FILE_URI),

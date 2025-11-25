@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.log.*;
 
@@ -124,7 +125,7 @@ public final class QueryJob extends Job implements Runnable {
     // time
     if(ADate.TIME.matcher(string).matches()) return new Tim(token(string), info);
     // dateTime
-    return new Dtm(token(string), info);
+    return new Dtm(token(string), AtomType.DATE_TIME, info);
   }
 
   /**

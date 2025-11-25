@@ -702,6 +702,8 @@ public enum QueryError {
   /** Error code. */
   INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
   /** Error code. */
+  MISSINGZONE_X(FORG, 1, "xs:dateTimeStamp value must have a timezone: %."),
+  /** Error code. */
   FUNCCAST_X_X(FORG, 1, "Cannot convert to %: %."),
   /** Error code. */
   FUNCCAST_X_X_X(FORG, 1, "Cannot convert % to %: %."),

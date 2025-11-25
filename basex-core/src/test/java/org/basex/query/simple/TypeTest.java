@@ -46,6 +46,8 @@ public final class TypeTest extends QueryTest {
             + "fn() as record(a? as xs:integer)"},
         { "Type 13", booleans(false), "fn() as record(a? as xs:integer) { {} } instance of "
             + "fn() as record(a as xs:integer)"},
+        { "Type 14", strings("xs:dateTimeStamp"), "type-of(current-dateTime())" },
+        { "Type 15", strings("xs:dateTime"), "type-of(current-dateTime() cast as xs:dateTime)" },
 
         { "TypeErr 1", "1 instance of xs:abcde" },
         { "TypeErr 2", "1 instance of xs:string()" },
