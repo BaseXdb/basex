@@ -148,8 +148,9 @@ public final class Var extends ExprInfo {
       throws QueryException {
 
     if(declType != null) {
-      if(declType.occ.intersect(st.occ) == null)
-        throw INVCONVERT_X_X_X.get(info, st, declType, Token.concat('$', name.string()));
+      if(declType.occ.intersect(st.occ) == null) {
+        throw typeError(declType, st, null, name, info);
+      }
       if(st.instanceOf(declType)) {
         if(cc != null) cc.info(OPTTYPE_X, this);
         declType = null;
@@ -236,7 +237,7 @@ public final class Var extends ExprInfo {
    * @return variable ID
    */
   public byte[] id() {
-    return Token.concat("$", name.string(), "_", id);
+    return Token.concat(name.varString(), "_", id);
   }
 
   @Override
@@ -247,6 +248,6 @@ public final class Var extends ExprInfo {
 
   @Override
   public String toErrorString() {
-    return Strings.concat("$", name.string());
+    return Token.string(name.varString());
   }
 }

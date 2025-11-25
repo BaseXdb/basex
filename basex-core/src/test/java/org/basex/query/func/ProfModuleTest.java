@@ -115,6 +115,6 @@ public final class ProfModuleTest extends SandboxTest {
     query(func.args(" {}"), "");
     query("function-lookup(xs:QName('" + name + "'), 1)({})", "");
     query("function-lookup(xs:QName(" + wrap(name) + "), 1)({})", "");
-    error(func.args(1), QueryError.INVCONVERT_X_X_X);
+    error(func.args(1), QueryError.INVTYPE_X);
   }
 }

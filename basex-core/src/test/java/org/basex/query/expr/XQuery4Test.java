@@ -36,7 +36,7 @@ public final class XQuery4Test extends SandboxTest {
     query("declare context value as item()* := (1, 2); .", "1\n2");
     query("declare context value as xs:integer* := (1, 2); .", "1\n2");
 
-    error("declare context value as xs:integer := (1, 2); .", INVCONVERT_X_X_X);
+    error("declare context value as xs:integer := (1, 2); .", INVTYPE_X);
     error("declare context value := 1; declare context value := 2; .", DUPLVALUE);
     error("declare context value := 1; declare context item := 2; .", DUPLVALUE);
     error("declare context item := 1; declare context item := 2; .", DUPLVALUE);
@@ -671,7 +671,7 @@ public final class XQuery4Test extends SandboxTest {
     query("fn($a as array(xs:byte)) { $a }([ 1, 2 ]) instance of array(xs:byte)", true);
     query("fn($a as array(xs:double)) { $a }([ 1, 2 ]) instance of array(xs:integer)", false);
 
-    error("fn($a as array(xs:integer)) { $a }([ 1.2 ])", INVCONVERT_X_X_X);
+    error("fn($a as array(xs:integer)) { $a }([ 1.2 ])", INVTYPE_X);
   }
 
   /** Map coercion. */
@@ -683,7 +683,7 @@ public final class XQuery4Test extends SandboxTest {
     query("fn($a as map(xs:double, item())) { $a }({ 1.2: 0 }) instance of map(xs:integer, item())",
         false);
 
-    error("fn($a as map(xs:float, item())) { $a }({ 1.2: 0, 1.2000000001: 0 })", INVCONVERT_X_X_X);
+    error("fn($a as map(xs:float, item())) { $a }({ 1.2: 0, 1.2000000001: 0 })", INVTYPE_X);
   }
 
   /** Map constructor. */
@@ -720,7 +720,7 @@ public final class XQuery4Test extends SandboxTest {
         root(CMap.class), type(CMap.class, "map(xs:integer, item()*)"));
     check("{ (1 to 6)[. = 1]: (<a/>, <b/>)[. = 'b'], 2: 1 }", "{1:(),2:1}",
         root(CMap.class), type(CMap.class, "map(xs:integer, item()*)"));
-    error("{ 1: 1, <a/>[. = ''] }", INVCONVERT_X_X_X);
+    error("{ 1: 1, <a/>[. = ''] }", INVTYPE_X);
 
     error("{ 1: 1, 1: 1 }", MAPDUPLKEY_X);
     error("{ 1: <a/>, 1: 1 }", MAPDUPLKEY_X);

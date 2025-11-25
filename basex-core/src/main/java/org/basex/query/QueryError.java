@@ -1091,10 +1091,6 @@ public enum QueryError {
   /** Error code. */
   NONAME_X(XPTY, 4, "Name expected, '%' found."),
   /** Error code. */
-  EMPTYFOUND(XPTY, 4, "Item expected, empty sequence found."),
-  /** Error code. */
-  SEQFOUND_X(XPTY, 4, "Item expected, sequence found: %."),
-  /** Error code. */
   NONUMBER_X_X(XPTY, 4, "Number expected, % found: %."),
   /** Error code. */
   NODUR_X_X(XPTY, 4, "Duration expected, % found: %."),
@@ -1107,7 +1103,7 @@ public enum QueryError {
   /** Error code. */
   STRNCN_X_X(XPTY, 4, "String or NCName expected, % found: %."),
   /** Error code. */
-  INVCONVERT_X_X_X(XPTY, 4, "Cannot convert % to %: %."),
+  INVTYPE_X(XPTY, 4, "%."),
   /** Error code. */
   CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
   /** Error code. */
@@ -1456,7 +1452,7 @@ public enum QueryError {
   }
 
   /**
-   * Throws a query exception. If {@link InputInfo#internal()} returns {@code true},
+   * Returns a query exception. If {@link InputInfo#internal()} returns {@code true},
    * a static error instance ({@link QueryException#ERROR}) will be returned.
    * @param info input info (can be {@code null})
    * @param ext extended info
@@ -1468,7 +1464,7 @@ public enum QueryError {
   }
 
   /**
-   * Throws a query I/O exception without {@link InputInfo} reference.
+   * Returns a query I/O exception without {@link InputInfo} reference.
    * @param ext extended info
    * @return query I/O exception
    */
@@ -1624,7 +1620,7 @@ public enum QueryError {
   }
 
   /**
-   * Throws a comparison exception.
+   * Returns a comparison exception.
    * @param item1 first item
    * @param item2 second item
    * @param info input info (can be {@code null})
@@ -1638,9 +1634,9 @@ public enum QueryError {
   }
 
   /**
-   * Throws a type exception.
+   * Returns a type exception.
    * @param value value
-   * @param type target type
+   * @param type expected type
    * @param info input info (can be {@code null})
    * @return query exception
    */
@@ -1649,9 +1645,9 @@ public enum QueryError {
   }
 
   /**
-   * Throws a type exception.
+   * Returns a type exception.
    * @param expr expression
-   * @param st target type
+   * @param st expected type
    * @param info input info (can be {@code null})
    * @return query exception
    */
@@ -1660,38 +1656,64 @@ public enum QueryError {
   }
 
   /**
-   * Throws a type exception.
+   * Returns a type exception.
    * @param expr expression
-   * @param st target type
+   * @param st expected type
    * @param name name (can be {@code null})
    * @param info input info (can be {@code null})
    * @return query exception
    */
   public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
       final InputInfo info) {
-    return typeError(expr, st, name, info, true);
+    return typeError(st, expr.seqType(), expr, name, info);
   }
 
   /**
-   * Throws a type exception.
-   * @param expr expression
-   * @param st target type
-   * @param name variable name (can be {@code null})
+   * Returns a type exception.
+   * @param st expected type
+   * @param ist type of the input expression
+   * @param expr expression (can be {@code null})
+   * @param name name (can be {@code null})
    * @param info input info (can be {@code null})
-   * @param coerce coerce or treat
    * @return query exception
    */
-  public static QueryException typeError(final Expr expr, final SeqType st, final QNm name,
-      final InputInfo info, final boolean coerce) {
+  public static QueryException typeError(final SeqType st, final SeqType ist, final Expr expr,
+      final QNm name, final InputInfo info) {
 
-    final TokenBuilder tb = new TokenBuilder();
-    if(name != null) tb.add('$').add(name.string()).add(" := ");
-    final QueryError error = coerce ? INVCONVERT_X_X_X : NOTREAT_X_X_X;
-    return error.get(info, expr.seqType(), st, tb.add(expr.toErrorString()).finish());
+    final TokenBuilder desc = new TokenBuilder();
+    if(ist.occ.instanceOf(st.occ)) {
+      // focus on cardinality: add expected type and input type
+      desc.add(st.occ == Occ.EXACTLY_ONE ? "Item" : "Value").add(" of type ").add(st);
+      desc.add(" expected, ").add(ist).add(" found");
+    } else {
+      // add cardinality string
+      desc.add(Strings.capitalize(st.occ.desc)).add(" expected");
+      // add expected type if type information other than cardinality differs from input
+      if(!(ist.type.instanceOf(st.type) && ist.testInstanceOf(st))) {
+        desc.add(" (").add(st).add(")");
+      }
+      // add number of results or type of input
+      if(expr != null) {
+        desc.add(", ");
+        if(expr instanceof Value value) desc.add(value.size());
+        else desc.add(expr.seqType());
+        desc.add(" found");
+      }
+    }
+    // add input (variable, expression)
+    if(name != null || !ist.eq(Types.EMPTY_SEQUENCE_Z)) {
+      desc.add(": ");
+      if(name != null) desc.add(name.varString());
+      if(expr != null) {
+        if(name != null) desc.add(" := ");
+        desc.add(expr.toErrorString());
+      }
+    }
+    return INVTYPE_X.get(info, desc);
   }
 
   /**
-   * Throws an arity exception.
+   * Returns an arity exception.
    * @param info input info (can be {@code null})
    * @param expr expression
    * @param supplied expected arity
@@ -1707,7 +1729,7 @@ public enum QueryError {
   }
 
   /**
-   * Throws a test exception.
+   * Returns a test exception.
    * @param value value
    * @param pos positional predicate
    * @param info input info (can be {@code null})
@@ -1732,7 +1754,7 @@ public enum QueryError {
   }
 
   /**
-   * Throws a number exception.
+   * Returns a number exception.
    * @param expr parsing expression
    * @param item item
    * @return query exception
@@ -1742,7 +1764,7 @@ public enum QueryError {
   }
 
   /**
-   * Throws a number exception.
+   * Returns a number exception.
    * @param item found item
    * @param info input info (can be {@code null})
    * @return query exception
@@ -1752,7 +1774,7 @@ public enum QueryError {
   }
 
   /**
-   * Throws an invalid value exception.
+   * Returns an invalid value exception.
    * @param type expected type
    * @param value value
    * @param info input info (can be {@code null})
@@ -1769,7 +1791,7 @@ public enum QueryError {
    * @return string
    */
   public static String arguments(final long number) {
-    return numberAndString(number, "argument");
+    return number + " " + Strings.plural("argument", number);
   }
 
   /**
@@ -1778,7 +1800,7 @@ public enum QueryError {
    * @return string
    */
   public static String parameters(final long number) {
-    return numberAndString(number, "parameter");
+    return number + " " + Strings.plural("parameter", number);
   }
 
   /**
@@ -1814,25 +1836,13 @@ public enum QueryError {
   }
 
   /**
-   * Returns a correct singular/plural form for the specified number and string.
-   * @param number number
-   * @param string string
-   * @return string
-   */
-  private static String numberAndString(final long number, final String string) {
-    final TokenBuilder tb = new TokenBuilder().addLong(number).add(' ').add(string);
-    if(number != 1) tb.add('s');
-    return tb.toString();
-  }
-
-  /**
    * Returns an info message for similar strings.
    * @param string original string
    * @param similar similar string (can be {@code null})
    * @return info message
    */
-  public static byte[] similar(final Object string, final Object similar) {
-    return similar == null ? Token.token(string) : Util.inf("% (similar: %)", string, similar);
+  public static String similar(final Object string, final Object similar) {
+    return similar == null ? Util.info(string) : Util.info("% (similar: %)", string, similar);
   }
 
   /**

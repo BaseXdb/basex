@@ -196,6 +196,6 @@ public final class HigherOrderTest extends SandboxTest {
       let $n := 'a', $p := 'b'
       return (fn($_, $p) { }(?, $p), fn($_, $p as map(*)) { }(?, $p))[2](1)
       """,
-      INVCONVERT_X_X_X);
+      INVTYPE_X);
   }
 }
