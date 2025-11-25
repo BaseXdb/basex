@@ -258,7 +258,7 @@ public final class SeqType {
     for(final Item item : value) {
       qc.checkStop();
       final Value val = coerce(item, name, qc, cc, info);
-      if(val == null) throw typeError(item, with(EXACTLY_ONE), name, info);
+      if(val == null) throw typeError(value, this, name, info);
       vb.add(val);
     }
     final Value val = vb.value(type);
