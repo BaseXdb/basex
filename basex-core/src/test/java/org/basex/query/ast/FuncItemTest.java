@@ -421,4 +421,12 @@ public final class FuncItemTest extends SandboxTest {
       };
       local:self(identity#1)""", INVTYPE_X);
   }
+
+  /** Map lookup causing double to integer comparison; StructFilter context setting. */
+  @Test public void gh2546() {
+    query("let $m := { 1: 0 } return $m({ \"x\": 1e0 }?x)", "0");
+    query("let $m := { 1: 0 } return $m(1e0)", "0");
+    query("let $filter := fn($k, $v) { $k = $v }\n"
+        + "return { 0: 0 }?[$filter(?key, ?value)]", "{0:0}");
+  }
 }

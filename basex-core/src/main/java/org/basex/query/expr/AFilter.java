@@ -70,7 +70,8 @@ public abstract class AFilter extends Preds {
     if(changed) root = inlined;
 
     // do not inline context reference in predicates
-    changed |= ic.var != null && ic.cc.ok(root, true, () -> ic.inline(exprs));
+    final Expr ctx = this instanceof StructFilter ? null : root;
+    changed |= ic.var != null && ic.cc.ok(ctx, true, () -> ic.inline(exprs));
 
     return changed ? optimize(ic.cc) : null;
   }
