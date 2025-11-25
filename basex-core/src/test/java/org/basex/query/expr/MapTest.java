@@ -35,7 +35,7 @@ public final class MapTest extends SandboxTest {
 
   /** Tests keys. */
   @Test public void keys() {
-    error(" { ('a', 'b'): 'b' }", SEQFOUND_X);
+    error(" { ('a', 'b'): 'b' }", INVTYPE_X);
     error(" { 'a': 'b', 'a': 'c' }", MAPDUPLKEY_X);
     error(" { xs:time('01:01:01'): 1, xs:time('01:01:01'): 1 }", MAPDUPLKEY_X);
 
@@ -78,7 +78,7 @@ public final class MapTest extends SandboxTest {
 
   /** GitHub bug (#1012). */
   @Test public void gh1012() {
-    error("{}(())", INVCONVERT_X_X_X);
+    error("{}(())", INVTYPE_X);
   }
 
   /** GitHub bug (#1297). */

@@ -79,7 +79,7 @@ public final class FileModuleTest extends SandboxTest {
     final Function func = _FILE_APPEND_TEXT;
     // queries
     error(func.args(PATH, "x"), FILE_IS_DIR_X);
-    error(func.args(PATH1, " 123"), INVCONVERT_X_X_X);
+    error(func.args(PATH1, " 123"), INVTYPE_X);
 
     query(func.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1);
@@ -92,7 +92,7 @@ public final class FileModuleTest extends SandboxTest {
     final Function func = _FILE_APPEND_TEXT_LINES;
     // queries
     error(func.args(PATH, "x"), FILE_IS_DIR_X);
-    error(func.args(PATH1, 123), INVCONVERT_X_X_X);
+    error(func.args(PATH1, 123), INVTYPE_X);
 
     query(func.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
@@ -520,7 +520,7 @@ public final class FileModuleTest extends SandboxTest {
     final Function func = _FILE_WRITE_TEXT;
     // queries
     error(func.args(PATH, "x"), FILE_IS_DIR_X);
-    error(func.args(PATH1, " 123"), INVCONVERT_X_X_X);
+    error(func.args(PATH1, " 123"), INVTYPE_X);
 
     query(func.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1);
@@ -538,7 +538,7 @@ public final class FileModuleTest extends SandboxTest {
     final Function func = _FILE_WRITE_TEXT_LINES;
     // queries
     error(func.args(PATH, "x"), FILE_IS_DIR_X);
-    error(func.args(PATH1, " 123"), INVCONVERT_X_X_X);
+    error(func.args(PATH1, " 123"), INVTYPE_X);
 
     query(func.args(PATH1, "x"));
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());

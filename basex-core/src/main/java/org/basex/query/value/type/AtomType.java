@@ -1227,7 +1227,7 @@ public enum AtomType implements Type {
    * @param qname name of type
    * @return info string
    */
-  public static byte[] similar(final QNm qname) {
+  public static String similar(final QNm qname) {
     final byte[] ln = lc(qname.local());
 
     final Function<AtomType, byte[]> local = tp -> {

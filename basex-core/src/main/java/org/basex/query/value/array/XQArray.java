@@ -534,18 +534,22 @@ public abstract class XQArray extends XQStruct {
 
   @Override
   public void toString(final QueryString qs) {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final Value value : iterable()) {
-      if(!tb.moreInfo()) break;
-      tb.add(tb.isEmpty() ? " " : ", ");
-      final long vs = value.size();
-      if(vs != 1) tb.add('(');
-      for(int m = 0; m < vs; m++) {
-        if(m != 0) tb.add(", ");
-        tb.add(value.itemAt(m));
+    if(structSize() == 0) {
+      qs.token("[]");
+    } else {
+      final TokenBuilder tb = new TokenBuilder();
+      for(final Value value : iterable()) {
+        if(!tb.moreInfo()) break;
+        tb.add(tb.isEmpty() ? " " : ", ");
+        final long vs = value.size();
+        if(vs != 1) tb.add('(');
+        for(int m = 0; m < vs; m++) {
+          if(m != 0) tb.add(", ");
+          tb.add(value.itemAt(m));
+        }
+        if(vs != 1) tb.add(')');
       }
-      if(vs != 1) tb.add(')');
+      qs.braced("[ ", tb.add(' ').finish(), " ]");
     }
-    qs.braced("[ ", tb.add(' ').finish(), " ]");
   }
 }

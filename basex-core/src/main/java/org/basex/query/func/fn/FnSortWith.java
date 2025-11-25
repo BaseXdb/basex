@@ -13,6 +13,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -49,7 +50,7 @@ public class FnSortWith extends StandardFunc {
    */
   protected final void sort(final ValueList values, final QueryContext qc) throws QueryException {
     final Value comparators = arg(1).value(qc);
-    if(comparators.isEmpty()) throw EMPTYFOUND.get(info);
+    if(comparators.isEmpty()) throw typeError(comparators, Types.ITEM_OM, info);
 
     final FItem[] cmps = new FItem[(int) comparators.size()];
     int c = 0;

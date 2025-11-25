@@ -323,7 +323,7 @@ public interface Type {
    * @param qname name of type
    * @return info string
    */
-  static byte[] similar(final QNm qname) {
+  static String similar(final QNm qname) {
     final byte[] ln = Token.lc(qname.local());
 
     final TokenList list = new TokenList();

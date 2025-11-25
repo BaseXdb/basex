@@ -28,7 +28,7 @@ public final class SeqType {
   public final Type type;
   /** Occurrence indicator. */
   public final Occ occ;
-  /** Node kind test (can be {@code null}). */
+  /** Node test (can be {@code null}). */
   private final Test test;
   /** Array type (lazy instantiation). */
   private ArrayType arrayType;
@@ -48,7 +48,7 @@ public final class SeqType {
    * Private constructor.
    * @param type type
    * @param occ occurrence indicator
-   * @param test node kind test (can be {@code null})
+   * @param test node test (can be {@code null})
    */
   private SeqType(final Type type, final Occ occ, final Test test) {
     this.type = type;
@@ -68,7 +68,7 @@ public final class SeqType {
 
   /**
    * Returns a sequence type with occurrence indicator {@link Occ#EXACTLY_ONE}.
-   * @param test kind test
+   * @param test node test
    * @return sequence type
    */
   public static SeqType get(final Test test) {
@@ -79,7 +79,7 @@ public final class SeqType {
    * Returns a sequence type.
    * @param type type
    * @param occ occurrence indicator
-   * @param test kind test (can be {@code null}; {@link NodeTest} is redundant and ignored)
+   * @param test node test (can be {@code null}; {@link NodeTest} is redundant and ignored)
    * @return sequence type
    */
   public static SeqType get(final Type type, final Occ occ, final Test test) {
@@ -148,7 +148,7 @@ public final class SeqType {
     // try shortcut (type of value may be specific enough)
     if(!(coerce && type instanceof FType || type instanceof ChoiceItemType)) {
       final SeqType st = value.seqType();
-      if(st.type.instanceOf(type) && st.kindInstanceOf(this)) return true;
+      if(st.type.instanceOf(type) && st.testInstanceOf(this)) return true;
     }
     // check single item
     if(size == 1) return instance((Item) value, coerce);
@@ -262,7 +262,7 @@ public final class SeqType {
       vb.add(val);
     }
     final Value val = vb.value(type);
-    if(!occ.check(val.size())) throw typeError(value, this, name, info);
+    if(!occ.check(val.size())) throw typeError(value, this, info);
     return val;
   }
 
@@ -487,22 +487,21 @@ public final class SeqType {
     if(!occ.instanceOf(st.occ)) return false;
     if(type instanceof final ChoiceItemType cit) return cit.instanceOf(st.with(EXACTLY_ONE));
     if(st.type instanceof final ChoiceItemType cit) return cit.hasInstance(with(EXACTLY_ONE));
-    return type.instanceOf(st.type) && kindInstanceOf(st);
+    return type.instanceOf(st.type) && testInstanceOf(st);
   }
 
   /**
-   * Checks if the kind of this sequence type is an instance of the kind of the specified
-   * sequence type.
+   * Checks if the node test is an instance of the node test of the specified sequence type.
    * @param st sequence type to check
    * @return result of check
    */
-  public boolean kindInstanceOf(final SeqType st) {
+  public boolean testInstanceOf(final SeqType st) {
     return st.test == null || test != null && test.instanceOf(st.test);
   }
 
   /**
-   * Returns the kind test.
-   * @return kind test
+   * Returns the node test.
+   * @return node test
    */
   public Test test() {
     return test;
@@ -547,7 +546,7 @@ public final class SeqType {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(!one() && type instanceof FType) {
+    if(!one() && type instanceof FType && !(type instanceof MapType || type instanceof ArrayType)) {
       tb.add('(').add(typeString()).add(')');
     } else {
       tb.add(typeString());

@@ -510,14 +510,18 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final void toString(final QueryString qs) {
-    final TokenBuilder tb = new TokenBuilder();
-    try {
-      forEach((key, value) -> {
-        if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
-      });
-    } catch(final QueryException ex) {
-      throw Util.notExpected(ex);
+    if(structSize() == 0) {
+      qs.token("{}");
+    } else {
+      final TokenBuilder tb = new TokenBuilder();
+      try {
+        forEach((key, value) -> {
+          if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
+        });
+      } catch(final QueryException ex) {
+        throw Util.notExpected(ex);
+      }
+      qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");
     }
-    qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");
   }
 }

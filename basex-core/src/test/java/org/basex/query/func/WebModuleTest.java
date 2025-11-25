@@ -32,8 +32,8 @@ public final class WebModuleTest extends SandboxTest {
 
     query(func.args("url", " {}", "a"), "url#a");
 
-    error(func.args("url", " { (): 'a' }"), EMPTYFOUND);
-    error(func.args("url", " { ('a', 'b'): () }"), SEQFOUND_X);
+    error(func.args("url", " { (): 'a' }"), INVTYPE_X);
+    error(func.args("url", " { ('a', 'b'): () }"), INVTYPE_X);
     error(func.args("url", " { 'a': true#0 }"), FIATOMIZE_X);
   }
 

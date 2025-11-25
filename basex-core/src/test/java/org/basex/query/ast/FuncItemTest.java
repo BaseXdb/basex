@@ -196,7 +196,7 @@ public final class FuncItemTest extends SandboxTest {
   /** Tests for coercion of function items. */
   @Test public void funcItemCoercion() {
     error("let $f := function($g as function() as item()) { $g() }" +
-        "return $f(function() { 1, 2 })", INVCONVERT_X_X_X);
+        "return $f(function() { 1, 2 })", INVTYPE_X);
     error("let $x as fn (xs:byte) as item() := fn($x as item()) { $x } return $x(384)",
         FUNCCAST_X_X_X);
     error("let $x as fn(xs:anyAtomicType) as xs:string? := { 1:'A', 'x':'B' } return $x?*",
@@ -205,7 +205,7 @@ public final class FuncItemTest extends SandboxTest {
     error("let $x as fn(*) := { 1:'A', 'x':'B' } return $x?*", LOOKUP_X);
     error("let $x as fn(*) := [1, 2] return $x?*", LOOKUP_X);
     error("declare variable $f as fn(xs:integer) as xs:string := string#1; $f('x')",
-        INVCONVERT_X_X_X);
+        INVTYPE_X);
 
     query("let $f as fn() as xs:anyAtomicType := fn() { <a/> } " +
       "return $f() ! (. = ('1', '2'))", "false");
@@ -419,6 +419,6 @@ public final class FuncItemTest extends SandboxTest {
       declare %basex:inline(0) function local:self($f as fn(xs:string) as item()*) {
         $f(1.1)
       };
-      local:self(identity#1)""", INVCONVERT_X_X_X);
+      local:self(identity#1)""", INVTYPE_X);
   }
 }

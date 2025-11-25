@@ -576,7 +576,7 @@ public abstract class StandardFunc extends Arr {
     Item item = expr.item(qc, info);
     if(empty && item.isEmpty()) return null;
     if(!(item instanceof ANode)) item = item.atomItem(qc, info);
-    if(item.isEmpty()) throw EMPTYFOUND.get(info);
+    if(item.isEmpty()) throw typeError(item, Types.ITEM_O, info);
     return item;
   }
 

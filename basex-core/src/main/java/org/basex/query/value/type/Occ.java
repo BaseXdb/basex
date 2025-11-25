@@ -7,16 +7,18 @@ package org.basex.query.value.type;
  * @author Christian Gruen
  */
 public enum Occ {
-  /** Zero.         */ ZERO(0, 0, ""),
-  /** Zero or one.  */ ZERO_OR_ONE(0, 1, "?"),
-  /** Exactly one.  */ EXACTLY_ONE(1, 1, ""),
-  /** One or more.  */ ONE_OR_MORE(1, Long.MAX_VALUE, "+"),
-  /** Zero or more. */ ZERO_OR_MORE(0, Long.MAX_VALUE, "*");
+  /** Zero.         */ ZERO(0, 0, "", "empty sequence"),
+  /** Zero or one.  */ ZERO_OR_ONE(0, 1, "?", "at most one item"),
+  /** Exactly one.  */ EXACTLY_ONE(1, 1, "", "one item"),
+  /** One or more.  */ ONE_OR_MORE(1, Long.MAX_VALUE, "+", "at least one item"),
+  /** Zero or more. */ ZERO_OR_MORE(0, Long.MAX_VALUE, "*", "zero or more items");
 
   /** Minimal result size ({@code 0} or more). */
   public final long min;
   /** Maximal result size (equal to {@link #min} or more). */
   public final long max;
+  /** Description. */
+  public final String desc;
   /** String representation. */
   private final String string;
 
@@ -25,11 +27,13 @@ public enum Occ {
    * @param min minimal result size (0, 1 or larger than 1)
    * @param max maximal result size (0, 1 or larger than 1)
    * @param string string representation
+   * @param desc description
    */
-  Occ(final long min, final long max, final String string) {
+  Occ(final long min, final long max, final String string, final String desc) {
     this.min = min;
     this.max = max;
     this.string = string;
+    this.desc = desc;
   }
 
   /**

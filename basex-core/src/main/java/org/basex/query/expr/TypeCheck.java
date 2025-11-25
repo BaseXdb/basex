@@ -20,8 +20,8 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class TypeCheck extends Single {
-  /** Check: 1: only check occurrence indicator. */
-  private int check;
+  /** Cardinality check. */
+  private boolean cardinality;
 
   /**
    * Constructor.
@@ -49,7 +49,7 @@ public final class TypeCheck extends Single {
     }
 
     final SeqType et = expr.seqType(), nst = et.with(st.occ);
-    check = nst.instanceOf(st) ? 1 : 0;
+    cardinality = nst.instanceOf(st);
 
     // refine type check (ignore arrays as coerced result may have a different size)
     if(!et.mayBeArray() || !type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
@@ -61,7 +61,7 @@ public final class TypeCheck extends Single {
       if(nocc == null) throw typeError(expr, st, info);
       // refine result type:
       //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
-      if(check == 1) st = nst;
+      if(cardinality) st = nst;
       // adopt result size and data reference from input expression
       exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).
         data(type instanceof NodeType ? expr : null);
@@ -82,7 +82,7 @@ public final class TypeCheck extends Single {
 
     // function item coercion
     if(expr instanceof final FuncItem fi && type instanceof final FuncType ft) {
-      if(!st.occ.check(1)) throw typeError(expr, st, info);
+      if(!st.occ.check(1)) throw typeError(fi, st, info);
       return cc.replaceWith(this, fi.coerceTo(ft, cc.qc, cc, info));
     }
 
@@ -105,7 +105,7 @@ public final class TypeCheck extends Single {
     final SeqType st = seqType();
 
     // only check occurrence indicator
-    if(check == 1) {
+    if(cardinality) {
       if(!st.occ.check(value.size())) throw typeError(value, st, info);
       return value;
     }
@@ -133,7 +133,7 @@ public final class TypeCheck extends Single {
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     final TypeCheck ex = copyType(new TypeCheck(info, expr.copy(cc, vm), seqType()));
-    ex.check = check;
+    ex.cardinality = cardinality;
     return ex;
   }
 

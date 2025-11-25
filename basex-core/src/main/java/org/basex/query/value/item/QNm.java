@@ -287,6 +287,14 @@ public final class QNm extends Item {
     return hasPrefix() ? string() : prefixId();
   }
 
+  /**
+   * Returns a representation as variable.
+   * @return representation as variable
+   */
+  public byte[] varString() {
+    return Token.concat("$", string());
+  }
+
   @Override
   public QName toJava() {
     return new QName(Token.string(uri()), Token.string(local()), Token.string(prefix()));

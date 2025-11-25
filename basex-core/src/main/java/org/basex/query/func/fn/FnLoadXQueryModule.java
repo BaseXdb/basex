@@ -117,7 +117,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
         mqc.vars.bindExternal(mqc, bindings, false);
       } catch(final QueryException ex) {
         Util.debug(ex);
-        throw ex.error() != INVCONVERT_X_X_X ? ex : MODULE_PARAMETER_TYPE_X_X.get(info, modUri,
+        throw ex.error() != INVTYPE_X ? ex : MODULE_PARAMETER_TYPE_X_X.get(info, modUri,
             ex.getLocalizedMessage());
       }
       if(ctx != null && lib.sc.contextType != null && !lib.sc.contextType.instance(ctx)) {
