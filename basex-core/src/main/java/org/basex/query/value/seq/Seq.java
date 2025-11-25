@@ -48,7 +48,7 @@ public abstract class Seq extends Value {
 
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw typeError(this, Types.ITEM_O, ii);
+    throw typeError(this, AtomType.ITEM, ii);
   }
 
   @Override

@@ -22,7 +22,7 @@ public final class WsSend extends WsFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item message = arg(0).item(qc, info);
     final Value ids = arg(1).atomValue(qc, info);
-    if(message.isEmpty()) throw typeError(message, Types.ITEM_O, info);
+    if(message.isEmpty()) throw typeError(message, AtomType.ITEM, info);
 
     final StringList list = new StringList(ids.size());
     for(final Item item : ids) list.add(toString(item));

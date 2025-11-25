@@ -262,7 +262,7 @@ public final class SeqType {
       vb.add(val);
     }
     final Value val = vb.value(type);
-    if(!occ.check(val.size())) throw typeError(value, this, info);
+    if(!occ.check(val.size())) throw typeError(value, this, name, info);
     return val;
   }
 
