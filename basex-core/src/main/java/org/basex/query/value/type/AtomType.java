@@ -42,6 +42,9 @@ public enum AtomType implements Type {
   /** Any atomic type. */
   ANY_ATOMIC_TYPE("anyAtomicType", ITEM, XS_URI, false, false, false, false, Type.ID.AAT),
 
+  /** Error type. */
+  ERROR("error", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.ERR),
+
   /** Untyped Atomic type. */
   UNTYPED_ATOMIC("untypedAtomic", ANY_ATOMIC_TYPE, XS_URI, false, true, false, true, Type.ID.ATM) {
     @Override
@@ -1051,6 +1054,8 @@ public enum AtomType implements Type {
 
   @Override
   public final Type union(final Type type) {
+    if(this == ERROR) return type;
+    if(type == ERROR) return this;
     if(type instanceof ChoiceItemType || type instanceof EnumType) return type.union(this);
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
@@ -1066,6 +1071,8 @@ public enum AtomType implements Type {
 
   @Override
   public final Type intersect(final Type type) {
+    if(this == ERROR) return type;
+    if(type == ERROR) return this;
     return type instanceof ChoiceItemType ? type.intersect(this) :
       instanceOf(type) ? this : type.instanceOf(this) ? type : null;
   }

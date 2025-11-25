@@ -17,6 +17,10 @@ public final class TypeTest extends QueryTest {
         { "Simple 4", strings("42"), "(42 cast as enum('42')) cast as enum('42', '43')" },
         { "Simple 5", booleans(true), "(42 cast as enum('42')) castable as enum('42', '43')" },
         { "Simple 6", booleans(false), "(42 cast as enum('42')) castable as enum('43')" },
+        { "Simple 7", booleans(true), "() castable as xs:error?" },
+        { "Simple 8", booleans(false), "42 castable as xs:error?" },
+        { "Simple 9", emptySequence(), "() cast as xs:error?" },
+        { "Simple 10", emptySequence(), "xs:error(())" },
 
         { "SimpleErr 1", "1 castable as xs:integer+" },
         { "SimpleErr 2", "1 castable as xs:integer()" },
@@ -25,6 +29,8 @@ public final class TypeTest extends QueryTest {
         { "SimpleErr 5", "1 castable as xs:NOTATION" },
         { "SimpleErr 6", "1 castable as xs:anyAtomicType" },
         { "SimpleErr 7", "(42 cast as enum('42')) cast as enum('x')" },
+        { "SimpleErr 8", "42 cast as xs:error?" },
+        { "SimpleErr 9", "xs:error(42)" },
 
         { "Type 1", booleans(true), "1 instance of item()" },
         { "Type 2", booleans(true), "1 instance of xs:anyAtomicType" },
@@ -48,6 +54,8 @@ public final class TypeTest extends QueryTest {
             + "fn() as record(a as xs:integer)"},
         { "Type 14", strings("xs:dateTimeStamp"), "type-of(current-dateTime())" },
         { "Type 15", strings("xs:dateTime"), "type-of(current-dateTime() cast as xs:dateTime)" },
+        { "Type 16", booleans(false), "42 instance of xs:error" },
+        { "Type 16", booleans(true), "() instance of xs:error?" },
 
         { "TypeErr 1", "1 instance of xs:abcde" },
         { "TypeErr 2", "1 instance of xs:string()" },
