@@ -222,6 +222,7 @@ public final class XQuery4Test extends SandboxTest {
     query("1 => [ 8 ]()", 8);
     query("8 => fn { . }()", 8);
     query("8 => fn($n) { $n }()", 8);
+    query("declare variable $v := 42 => f(); declare function f($x) {$x}; $v", 42);
   }
 
   /** Mapping arrow operator. */
