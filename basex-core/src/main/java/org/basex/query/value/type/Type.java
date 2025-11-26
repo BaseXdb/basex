@@ -39,13 +39,13 @@ public interface Type {
     /** schema-attribute().       */ SCA(18),
 
     // item type
+    /** choice item type.         */ CIT(29),
     /** item().                   */ ITEM(32),
 
     // atomic types
     /** xs:untyped.               */ UTY(33),
     /** xs:anyType.               */ ATY(34),
     /** xs:anySimpleType.         */ AST(35),
-    /** xs:error.                 */ ERR(0),
     /** xs:anyAtomicType.         */ AAT(36),
     /** xs:untypedAtomic.         */ ATM(37),
     /** xs:string.                */ STR(38),
@@ -97,9 +97,7 @@ public interface Type {
     /** xs:numeric.               */ NUM(84),
     /** java().                   */ JAVA(86),
     /** enum().                   */ ENM(87),
-
-    // item type
-    /** choice item type.         */ CIT(88),
+    /** xs:error.                 */ ERR(88),
 
     /** last dummy type.          */ LAST(89);
 
