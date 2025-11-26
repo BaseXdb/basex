@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * DateTime item ({@code xs:dateTime}).
+ * DateTime item ({@code xs:dateTime} and {@code xs:dateTimeStamp}).
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -23,9 +23,13 @@ public final class Dtm extends ADate {
   /**
    * Constructor.
    * @param date date
+   * @param type item type
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
    */
-  public Dtm(final ADate date) {
-    super(AtomType.DATE_TIME, date);
+  public Dtm(final ADate date, final Type type, final InputInfo info) throws QueryException {
+    super(type, date);
+    if(type == AtomType.DATE_TIME_STAMP && !hasTz()) throw MISSINGZONE_X.get(info, date);
     if(hour == -1) {
       hour = 0;
       minute = 0;
@@ -56,11 +60,12 @@ public final class Dtm extends ADate {
   /**
    * Constructor.
    * @param dateTime date time
+   * @param type item type
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
-  public Dtm(final byte[] dateTime, final InputInfo info) throws QueryException {
-    super(AtomType.DATE_TIME);
+  public Dtm(final byte[] dateTime, final Type type, final InputInfo info) throws QueryException {
+    super(type);
     final int i = Token.indexOf(dateTime, 'T');
     if(i == -1) throw dateError(dateTime, XDTM, info);
     date(Token.substring(dateTime, 0, i), XDTM, info);
@@ -78,7 +83,7 @@ public final class Dtm extends ADate {
   public Dtm(final Dtm dateTime, final Dur dur, final boolean plus, final InputInfo info)
       throws QueryException {
 
-    this(dateTime);
+    this(dateTime, dateTime.type, info);
     if(dur instanceof final DTDur dtd) {
       calc(dtd, plus);
       if(year <= MIN_YEAR || year > MAX_YEAR) throw YEARRANGE_X.get(info, year);
@@ -90,7 +95,7 @@ public final class Dtm extends ADate {
   @Override
   public Dtm timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
       throws QueryException {
-    final Dtm dtm = new Dtm(this);
+    final Dtm dtm = new Dtm(this, AtomType.DATE_TIME, info);
     dtm.tz(dur, undefined, info);
     return dtm;
   }
@@ -102,9 +107,14 @@ public final class Dtm extends ADate {
    */
   public static Dtm get(final long ms) {
     try {
-      return new Dtm(Token.token(DateTime.format(new Date(ms))), null);
+      return new Dtm(Token.token(DateTime.format(new Date(ms))), AtomType.DATE_TIME_STAMP, null);
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }
+  }
+
+  @Override
+  public boolean comparable(final Item item) {
+    return item instanceof Dtm;
   }
 }

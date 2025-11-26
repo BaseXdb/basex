@@ -9,6 +9,7 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -107,7 +108,7 @@ public final class FnParseIetfDate extends StandardFunc {
         addNumber(tb, Math.abs(z % 60), 2);
       }
       try {
-        return new Dtm(tb.finish(), info);
+        return new Dtm(tb.finish(), AtomType.DATE_TIME, info);
       } catch(final QueryException ex) {
         Util.debug(ex);
         throw QueryError.IETF_INV_X.get(info, original);

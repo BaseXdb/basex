@@ -42,6 +42,9 @@ public enum AtomType implements Type {
   /** Any atomic type. */
   ANY_ATOMIC_TYPE("anyAtomicType", ITEM, XS_URI, false, false, false, false, Type.ID.AAT),
 
+  /** Error type. */
+  ERROR("error", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.ERR),
+
   /** Untyped Atomic type. */
   UNTYPED_ATOMIC("untypedAtomic", ANY_ATOMIC_TYPE, XS_URI, false, true, false, true, Type.ID.ATM) {
     @Override
@@ -634,8 +637,8 @@ public enum AtomType implements Type {
     @Override
     public Dtm cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item.type == DATE) return new Dtm((ADate) item);
-      if(isString(item)) return new Dtm(item.string(info), info);
+      if(item.type.oneOf(DATE, DATE_TIME_STAMP)) return new Dtm((ADate) item, DATE_TIME, info);
+      if(isString(item)) return new Dtm(item.string(info), DATE_TIME, info);
       throw typeError(item, this, info);
     }
     @Override
@@ -645,19 +648,36 @@ public enum AtomType implements Type {
     }
     @Override
     public Dtm read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
-      return new Dtm(in.readToken(), null);
+      return new Dtm(in.readToken(), DATE_TIME, null);
     }
   },
 
   /** DateTimeStamp type. */
-  DATE_TIME_STAMP("dateTimeStamp", null, XS_URI, false, false, false, true, Type.ID.DTS),
+  DATE_TIME_STAMP("dateTimeStamp", DATE_TIME, XS_URI, false, false, false, true, Type.ID.DTS) {
+    @Override
+    public Dtm cast(final Item item, final QueryContext qc, final InputInfo info)
+        throws QueryException {
+      if(item.type.oneOf(DATE, DATE_TIME)) return new Dtm((ADate) item, DATE_TIME_STAMP, info);
+      if(isString(item)) return new Dtm(item.string(info), DATE_TIME_STAMP, info);
+      throw typeError(item, this, info);
+    }
+    @Override
+    public Dtm cast(final Object value, final QueryContext qc, final InputInfo info)
+        throws QueryException {
+      return cast(Str.get(value, qc, info), qc, info);
+    }
+    @Override
+    public Dtm read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+      return new Dtm(in.readToken(), DATE_TIME_STAMP, null);
+    }
+  },
 
   /** Date type. */
   DATE("date", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.DAT) {
     @Override
     public Dat cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item.type == DATE_TIME) return new Dat((ADate) item);
+      if(item.type.instanceOf(DATE_TIME)) return new Dat((ADate) item);
       if(isString(item)) return new Dat(item.string(info), info);
       throw typeError(item, this, info);
     }
@@ -677,7 +697,7 @@ public enum AtomType implements Type {
     @Override
     public Tim cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item.type == DATE_TIME) return new Tim((ADate) item);
+      if(item.type.instanceOf(DATE_TIME)) return new Tim((ADate) item);
       if(isString(item)) return new Tim(item.string(info), info);
       throw typeError(item, this, info);
     }
@@ -697,7 +717,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(info), this, info);
       throw typeError(item, this, info);
     }
@@ -717,7 +737,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(info), this, info);
       throw typeError(item, this, info);
     }
@@ -737,7 +757,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(info), this, info);
       throw typeError(item, this, info);
     }
@@ -757,7 +777,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(info), this, info);
       throw typeError(item, this, info);
     }
@@ -777,7 +797,7 @@ public enum AtomType implements Type {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
-      if(item.type.oneOf(DATE_TIME, DATE)) return new GDt((ADate) item, this);
+      if(item.type.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE)) return new GDt((ADate) item, this);
       if(isString(item)) return new GDt(item.string(info), this, info);
       throw typeError(item, this, info);
     }
@@ -1034,6 +1054,8 @@ public enum AtomType implements Type {
 
   @Override
   public final Type union(final Type type) {
+    if(this == ERROR) return type;
+    if(type == ERROR) return this;
     if(type instanceof ChoiceItemType || type instanceof EnumType) return type.union(this);
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
@@ -1049,6 +1071,8 @@ public enum AtomType implements Type {
 
   @Override
   public final Type intersect(final Type type) {
+    if(this == ERROR) return type;
+    if(type == ERROR) return this;
     return type instanceof ChoiceItemType ? type.intersect(this) :
       instanceOf(type) ? this : type.instanceOf(this) ? type : null;
   }

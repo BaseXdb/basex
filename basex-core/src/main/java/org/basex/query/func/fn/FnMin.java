@@ -56,8 +56,10 @@ public class FnMin extends StandardFunc {
     final Type type = item.type;
     if(!type.isSortable()) throw COMPARE_X_X.get(info, type, item);
 
-    final boolean string = item instanceof AStr, numeric = !string && !(
+    final boolean string = item instanceof AStr;
+    final boolean numeric = !string && !(
         type == BOOLEAN || item instanceof ADate || item instanceof Dur || item instanceof Bin);
+    final boolean dateTime = type.instanceOf(DATE_TIME);
     if(numeric) {
       if(type.isUntyped()) item = DOUBLE.cast(item, qc, info);
       if(item == Dbl.NAN || item == Flt.NAN) return item;
@@ -68,7 +70,8 @@ public class FnMin extends StandardFunc {
         if(type2.isUntyped()) it = DOUBLE.cast(it, qc, info);
         if(it == Dbl.NAN || it == Flt.NAN) return it;
       }
-      if(!(numeric ? it instanceof ANum : string ? it instanceof AStr : type == type2)) {
+      if(!(numeric ? it instanceof ANum : string ? it instanceof AStr : dateTime ?
+        type2.instanceOf(DATE_TIME) : type == type2)) {
         throw ARGTYPE_X_X_X.get(info, type, type2, it);
       }
       if(min ^ item.compare(it, collation, true, info) < 0) item = it;

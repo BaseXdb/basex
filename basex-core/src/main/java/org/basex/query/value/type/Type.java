@@ -45,6 +45,7 @@ public interface Type {
     /** xs:untyped.               */ UTY(33),
     /** xs:anyType.               */ ATY(34),
     /** xs:anySimpleType.         */ AST(35),
+    /** xs:error.                 */ ERR(0),
     /** xs:anyAtomicType.         */ AAT(36),
     /** xs:untypedAtomic.         */ ATM(37),
     /** xs:string.                */ STR(38),

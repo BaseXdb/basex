@@ -44,8 +44,8 @@ public enum Calc {
         if(type1 == YEAR_MONTH_DURATION) return new YMDur((YMDur) item1, (YMDur) item2, true, info);
         if(type1 == DAY_TIME_DURATION) return new DTDur((DTDur) item1, (DTDur) item2, true, info);
       }
-      if(type1 == DATE_TIME) return new Dtm((Dtm) item1, dur(info, item2), true, info);
-      if(type2 == DATE_TIME) return new Dtm((Dtm) item2, dur(info, item1), true, info);
+      if(type1.instanceOf(DATE_TIME)) return new Dtm((Dtm) item1, dur(info, item2), true, info);
+      if(type2.instanceOf(DATE_TIME)) return new Dtm((Dtm) item2, dur(info, item1), true, info);
       if(type1 == DATE) return new Dat((Dat) item1, dur(info, item2), true, info);
       if(type2 == DATE) return new Dat((Dat) item2, dur(info, item1), true, info);
       if(type1 == TIME && type2 == DAY_TIME_DURATION)
@@ -83,7 +83,8 @@ public enum Calc {
     public Type type(final Type type1, final Type type2) {
       if(type1 == YEAR_MONTH_DURATION && type2 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
       if(type1 == DAY_TIME_DURATION && type2 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
-      if(type1 == DATE_TIME || type2 == DATE_TIME) return DATE_TIME;
+      if(type1.instanceOf(DATE_TIME)) return type1;
+      if(type2.instanceOf(DATE_TIME)) return type2;
       if(type1 == DATE || type2 == DATE) return DATE;
       if(type1 == TIME && type2 == DAY_TIME_DURATION ||
          type1 == DAY_TIME_DURATION && type2 == TIME) return TIME;
@@ -117,7 +118,7 @@ public enum Calc {
 
       // dates or durations
       if(type1 == type2) {
-        if(type1 == DATE_TIME || type1 == DATE || type1 == TIME)
+        if(type1.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE, TIME))
           return new DTDur((ADate) item1, (ADate) item2, info);
         if(type1 == YEAR_MONTH_DURATION)
           return new YMDur((YMDur) item1, (YMDur) item2, false, info);
@@ -125,7 +126,7 @@ public enum Calc {
           return new DTDur((DTDur) item1, (DTDur) item2, false, info);
         throw numberError(item1, info);
       }
-      if(type1 == DATE_TIME) return new Dtm((Dtm) item1, dur(info, item2), false, info);
+      if(type1.instanceOf(DATE_TIME)) return new Dtm((Dtm) item1, dur(info, item2), false, info);
       if(type1 == DATE) return new Dat((Dat) item1, dur(info, item2), false, info);
       if(type1 == TIME && type2 == DAY_TIME_DURATION)
         return new Tim((Tim) item1, (DTDur) item2, false);
@@ -160,10 +161,10 @@ public enum Calc {
 
     @Override
     public Type type(final Type type1, final Type type2) {
-      if(type1 == DATE_TIME && type2 == DATE_TIME ||
+      if(type1.instanceOf(DATE_TIME) && type2.instanceOf(DATE_TIME) ||
          type1 == DATE && type2 == DATE) return DAY_TIME_DURATION;
       if(type1 == TIME && type2 == TIME) return DAY_TIME_DURATION;
-      if(type1 == DATE_TIME) return DATE_TIME;
+      if(type1.instanceOf(DATE_TIME)) return type1;
       if(type1 == DATE) return DATE;
       if(type1 == TIME && type2 == DAY_TIME_DURATION) return TIME;
       return numType(type1, type2);

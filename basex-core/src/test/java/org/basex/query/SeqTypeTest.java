@@ -24,6 +24,8 @@ import org.junit.jupiter.api.*;
 public final class SeqTypeTest {
   /** Occurrences. */
   private static final Occ[] OCCS = { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_MORE, ONE_OR_MORE };
+  /** Error type. */
+  private static final SeqType ERROR_O = ERROR.seqType();
 
   /** Tests for {@link Occ#intersect(Occ)}. */
   @Test public void occIntersect() {
@@ -138,6 +140,8 @@ public final class SeqTypeTest {
 
     assertTrue(r1.eq(r2));
     assertTrue(r2.eq(r1));
+    assertFalse(DATE_TIME_O.eq(DATE_TIME_STAMP_O));
+    assertFalse(DATE_TIME_STAMP_O.eq(DATE_TIME_O));
   }
 
   /**
@@ -150,6 +154,9 @@ public final class SeqTypeTest {
     assertFalse(ANY_ATOMIC_TYPE_ZM.instanceOf(BOOLEAN_O));
     assertTrue(DOUBLE_O.instanceOf(DOUBLE_ZM));
     assertFalse(DOUBLE_ZM.instanceOf(DOUBLE_O));
+    assertFalse(DATE_TIME_O.instanceOf(DATE_TIME_STAMP_O));
+    assertTrue(DATE_TIME_STAMP_O.instanceOf(DATE_TIME_O));
+    assertTrue(ERROR_O.instanceOf(ANY_ATOMIC_TYPE_O));
 
     // functions
     final SeqType f = FuncType.get(DECIMAL_ZO, BOOLEAN_O).seqType();
@@ -337,12 +344,18 @@ public final class SeqTypeTest {
     combine(ATTRIBUTE_O, op);
     combine(ELEMENT_O, op);
     combine(NODE_O, op);
+    combine(DATE_TIME_O, op);
+    combine(DATE_TIME_STAMP_O, op);
+    combine(ERROR_O, op);
 
     combine(STRING_O, INTEGER_O, ANY_ATOMIC_TYPE_O, op);
     combine(STRING_O, STRING_O, STRING_O, op);
     combine(STRING_O, ATTRIBUTE_O, ITEM_O, op);
     combine(NORMALIZED_STRING.seqType(), STRING_O, STRING_O, op);
     combine(STRING_O, NORMALIZED_STRING.seqType(), STRING_O, op);
+    combine(DATE_TIME_STAMP_O, DATE_TIME_O, DATE_TIME_O, op);
+    combine(DATE_TIME_O, DATE_TIME_STAMP_O, DATE_TIME_O, op);
+    combine(ERROR_O, POSITIVE_INTEGER_O, POSITIVE_INTEGER_O, op);
 
     combine(ATTRIBUTE_O, ELEMENT_O, NODE_O, op);
     combine(NODE_O, ELEMENT_O, NODE_O, op);
@@ -578,6 +591,12 @@ public final class SeqTypeTest {
     combine(ATTRIBUTE_O, op);
     combine(ELEMENT_O, op);
     combine(NODE_O, op);
+    combine(DATE_TIME_O, op);
+    combine(DATE_TIME_STAMP_O, op);
+    combine(ERROR_O, ITEM_O, ITEM_O, op);
+
+    combine(DATE_TIME_O, DATE_TIME_STAMP_O, DATE_TIME_STAMP_O, op);
+    combine(DATE_TIME_STAMP_O, DATE_TIME_O, DATE_TIME_STAMP_O, op);
 
     combine(EMPTY_SEQUENCE_Z, ITEM_O, null, op);
     combine(ATTRIBUTE_O, ATTRIBUTE_O, ATTRIBUTE_O, op);
@@ -829,6 +848,9 @@ public final class SeqTypeTest {
     assertFalse(NODE_O.mayBeNumber());
     assertFalse(ELEMENT_O.mayBeNumber());
     assertFalse(NMTOKENS_O.mayBeNumber());
+    assertFalse(DATE_TIME_O.mayBeNumber());
+    assertFalse(DATE_TIME_STAMP_O.mayBeNumber());
+    assertFalse(ERROR_O.mayBeNumber());
 
     assertTrue(ITEM_O.mayBeArray());
     assertTrue(FUNCTION_O.mayBeArray());
@@ -843,6 +865,9 @@ public final class SeqTypeTest {
     assertFalse(NODE_O.mayBeArray());
     assertFalse(ELEMENT_O.mayBeArray());
     assertFalse(NMTOKENS_O.mayBeArray());
+    assertFalse(DATE_TIME_O.mayBeArray());
+    assertFalse(DATE_TIME_STAMP_O.mayBeArray());
+    assertFalse(ERROR_O.mayBeArray());
 
     assertTrue(ITEM_O.mayBeFunction());
     assertTrue(FUNCTION_O.mayBeFunction());
@@ -857,6 +882,9 @@ public final class SeqTypeTest {
     assertFalse(NODE_O.mayBeFunction());
     assertFalse(ELEMENT_O.mayBeFunction());
     assertFalse(NMTOKENS_O.mayBeFunction());
+    assertFalse(DATE_TIME_O.mayBeFunction());
+    assertFalse(DATE_TIME_STAMP_O.mayBeFunction());
+    assertFalse(ERROR_O.mayBeFunction());
   }
 
   /**
