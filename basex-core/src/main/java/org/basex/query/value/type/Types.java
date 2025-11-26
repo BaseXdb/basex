@@ -35,6 +35,9 @@ public final class Types {
   /** Zero or more xs:anyAtomicType. */
   public static final SeqType ANY_ATOMIC_TYPE_ZM = ANY_ATOMIC_TYPE.seqType(ZERO_OR_MORE);
 
+  /** Error. */
+  public static final SeqType ERROR_O = ERROR.seqType();
+
   /** Numeric. */
   public static final SeqType NUMERIC_O = NUMERIC.seqType();
   /** Zero or one numeric. */

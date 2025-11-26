@@ -64,13 +64,21 @@ public final class TypeTest extends QueryTest {
         { "Subtyping 1", booleans(true), "declare namespace p1='p1'; declare namespace p2='p2'; "
             + "declare variable $x external := ''; function() as element(p1:a)? { $x } "
             + "instance of function() as element(p1:*)?" },
-        { "Subtyping 1", booleans(false), "declare namespace p1='p1'; declare namespace p2='p2'; "
+        { "Subtyping 2", booleans(false), "declare namespace p1='p1'; declare namespace p2='p2'; "
             + "declare variable $x external := ''; function() as element(p1:*|p2:*)? { $x } "
             + "instance of function() as element(p1:*)?" },
-        { "Subtyping 1", booleans(true), "declare variable $x external := ''; function() as "
+        { "Subtyping 3", booleans(true), "declare variable $x external := ''; function() as "
             + "element(a|b)? { $x } instance of function() as element(*:a|*:b)?" },
-        { "Subtyping 1", booleans(false), "declare variable $x external := ''; function() as "
+        { "Subtyping 4", booleans(false), "declare variable $x external := ''; function() as "
             + "element(a|b|c)? { $x } instance of function() as (element(a)|element(b))?" },
+        { "Subtyping 5", booleans(true),
+            "fn($x as xs:int) as xs:int {'x'} instance of fn((xs:error | xs:int)) as xs:int"},
+        { "Subtyping 6", booleans(true),
+            "fn($x as (xs:error | xs:int)) as xs:int {'x'} instance of fn(xs:int) as xs:int"},
+        { "Subtyping 7", booleans(true),
+            "fn($x as xs:int) as xs:int {'x'} instance of fn(xs:int) as (xs:error | xs:int)"},
+        { "Subtyping 8", booleans(true),
+            "fn($x as xs:int) as (xs:error | xs:int) {'x'} instance of fn(xs:int) as xs:int"},
     };
   }
 }
