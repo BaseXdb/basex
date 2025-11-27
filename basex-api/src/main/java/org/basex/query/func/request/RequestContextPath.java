@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class RequestContextPath extends ApiFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(request(qc).getContextPath());
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return toStr(request(qc).getContextPath());
   }
 }

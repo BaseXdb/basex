@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class RequestRemoteHostname extends ApiFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(request(qc).getRemoteHost());
+    return toStr(request(qc).getRemoteHost());
   }
 }

@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class RequestRemoteAddress extends ApiFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(request(qc).getRemoteAddr());
+    return toStr(request(qc).getRemoteAddr());
   }
 }

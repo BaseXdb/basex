@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public final class RequestAddress extends ApiFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Str.get(request(qc).getLocalAddr());
+  public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return toStr(request(qc).getLocalAddr());
   }
 }

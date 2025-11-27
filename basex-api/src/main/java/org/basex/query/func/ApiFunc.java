@@ -6,6 +6,7 @@ import jakarta.servlet.http.*;
 
 import org.basex.http.*;
 import org.basex.query.*;
+import org.basex.query.value.item.*;
 
 /**
  * Request function.
@@ -34,5 +35,14 @@ public abstract class ApiFunc extends StandardFunc {
    */
   public final HttpServletRequest request(final QueryContext qc) throws QueryException {
     return requestContext(qc).request;
+  }
+
+  /**
+   * Returns a non-null string.
+   * @param string string (can be {@code null})
+   * @return string
+   */
+  public final Str toStr(final String string) {
+    return Str.get(string != null ? string : "");
   }
 }

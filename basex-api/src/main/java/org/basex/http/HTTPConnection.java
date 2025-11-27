@@ -262,7 +262,8 @@ public final class HTTPConnection implements ClientInfo {
 
   @Override
   public String clientAddress() {
-    return getRemoteAddr() + ':' + request.getRemotePort();
+    final String addr = getRemoteAddr();
+    return addr != null ? addr + ':' + request.getRemotePort() : null;
   }
 
   @Override
