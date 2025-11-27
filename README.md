@@ -13,7 +13,7 @@ Compiling BaseX
 
 The code base of BaseX can be accessed on [GitHub]: https://github.com/BaseXdb/basex
 
-JDK 11 and JUnit are currently required to compile the complete sources of the
+JDK 17 and JUnit are currently required to compile the complete sources of the
 main project. Our default IDE is Eclipse.
 
 You can launch the following classes, which are all placed in the basex-core

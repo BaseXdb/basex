@@ -272,7 +272,7 @@ public class QueryParser extends InputParser {
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
 
-    for(final FuncRef fr : funcRefs) fr.resolve(qc);
+    for(final FuncRef fr : funcRefs) fr.resolve();
 
     if(qc.contextValue != null) {
       final Expr ctx = qc.contextValue.expr;
@@ -2065,8 +2065,15 @@ public class QueryParser extends InputParser {
           arg = expr;
         }
         final FuncBuilder fb = argumentList(ex == null, arg);
-        expr = ex != null ? Functions.dynamic(ex, fb) :
-          Functions.get(name, fb, qc, moduleURIs.contains(name.uri()));
+        if(ex != null) {
+          expr = Functions.dynamic(ex, fb);
+        } else  {
+          final QNm funcName = name;
+          final boolean hasImport = moduleURIs.contains(funcName.uri());
+          final FuncRef ref = new FuncRef(() -> Functions.get(funcName, fb, qc, hasImport));
+          funcRefs.add(ref);
+          expr = ref;
+        }
         if(mapping) {
           expr = new GFLWOR(ii, fr, expr);
           localVars.closeScope(s);
@@ -2738,8 +2745,10 @@ public class QueryParser extends InputParser {
       } else {
         if(Function.ERROR.is(num)) return num;
         if(num instanceof final Itr itr) {
-          final FuncRef fr = new FuncRef(name, (int) itr.itr(), info(),
-              moduleURIs.contains(name.uri()));
+          final int i = (int) itr.itr();
+          final InputInfo info = info();
+          final boolean hasImport = moduleURIs.contains(name.uri());
+          final FuncRef fr = new FuncRef(() -> Functions.item(name, i, false, info, qc, hasImport));
           funcRefs.add(fr);
           return fr;
         }
@@ -2965,8 +2974,9 @@ public class QueryParser extends InputParser {
     if(name != null && !reserved(name)) {
       skipWs();
       if(current('(')) {
-        final FuncRef fr = new FuncRef(name, argumentList(true, null),
-            moduleURIs.contains(name.uri()));
+        final FuncBuilder fb = argumentList(true, null);
+        final boolean hasImport = moduleURIs.contains(name.uri());
+        final FuncRef fr = new FuncRef(() -> Functions.get(name, fb, qc, hasImport));
         funcRefs.add(fr);
         return fr;
       }
