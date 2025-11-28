@@ -14,7 +14,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -29,8 +28,8 @@ public final class Store implements Closeable {
   /** File pattern. */
   private static final Pattern PATTERN = Pattern.compile(NAME + "-(.*)\\" + IO.BASEXSUFFIX);
 
-  /** Store entries. */
-  private final TokenObjectMap<Value> map = new TokenObjectMap<>();
+  /** Stores. */
+  private final HashMap<String, Value> map = new HashMap<>();
   /** Database context. */
   private final Context context;
 
@@ -56,7 +55,7 @@ public final class Store implements Closeable {
   public synchronized Value keys() {
     init();
     final TokenList list = new TokenList(map.size());
-    for(final byte[] key : map) list.add(key);
+    for(final String key : map.keySet()) list.add(key);
     return StrSeq.get(list);
   }
 
@@ -65,7 +64,7 @@ public final class Store implements Closeable {
    * @param key key
    * @return value or empty sequence
    */
-  public synchronized Value get(final byte[] key) {
+  public synchronized Value get(final String key) {
     init();
     final Value value = map.get(key);
     return value != null ? value : Empty.VALUE;
@@ -76,7 +75,7 @@ public final class Store implements Closeable {
    * @param key key
    * @param value value
    */
-  public synchronized void put(final byte[] key, final Value value) {
+  public synchronized void put(final String key, final Value value) {
     init();
     if(value.isEmpty()) {
       map.remove(key);
@@ -90,7 +89,7 @@ public final class Store implements Closeable {
    * Removes a value.
    * @param key key
    */
-  public synchronized void remove(final byte[] key) {
+  public synchronized void remove(final String key) {
     init();
     map.remove(key);
     timestamp = -1;
@@ -143,7 +142,7 @@ public final class Store implements Closeable {
     if(exists) {
       try(DataInput in = new DataInput(file)) {
         for(int s = in.readNum() - 1; s >= 0; s--) {
-          map.put(in.readToken(), read(in, qc));
+          map.put(Token.string(in.readToken()), read(in, qc));
         }
       }
       timestamp = file.timeStamp();
@@ -173,12 +172,10 @@ public final class Store implements Closeable {
       // write store to disk
       file.parent().md();
       try(DataOutput out = new DataOutput(file)) {
-        int size = 0;
-        for(final Iterator<byte[]> iter = map.iterator(); iter.hasNext(); iter.next()) size++;
-        out.writeNum(size);
-        for(final byte[] key : map) {
-          out.writeToken(key);
-          write(out, map.get(key));
+        out.writeNum(map.size());
+        for(final Map.Entry<String, Value> entry : map.entrySet()) {
+          out.writeToken(Token.token(entry.getKey()));
+          write(out, entry.getValue());
         }
       }
       timestamp = file.timeStamp();

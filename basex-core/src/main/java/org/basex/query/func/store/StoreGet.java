@@ -12,7 +12,7 @@ import org.basex.query.value.*;
 public final class StoreGet extends StoreFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] key = toToken(arg(0), qc);
+    final String key = toString(arg(0), qc);
     return store(qc).get(key);
   }
 }

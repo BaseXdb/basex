@@ -44,7 +44,7 @@ abstract class StoreFn extends StandardFunc {
    * @param qc query context
    * @throws QueryException query exception
    */
-  void store(final byte[] key, final Value value, final QueryContext qc) throws QueryException {
+  void store(final String key, final Value value, final QueryContext qc) throws QueryException {
     store(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc));
   }
 }

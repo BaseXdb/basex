@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class StorePut extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] key = toToken(arg(0), qc);
+    final String key = toString(arg(0), qc);
     final Value value = arg(1).value(qc);
 
     store(key, value, qc);
