@@ -18,14 +18,12 @@ abstract class StoreFn extends StandardFunc {
   /**
    * Evaluates an expression to a store name.
    * @param expr expression
-   * @param empty accept empty names
    * @param qc query context
    * @return store name
    * @throws QueryException query exception
    */
-  final String toName(final Expr expr, final boolean empty, final QueryContext qc)
-      throws QueryException {
-    return toName(expr, empty, STORE_NAME_X, qc);
+  final String toName(final Expr expr, final QueryContext qc) throws QueryException {
+    return toName(expr, true, STORE_NAME_X, qc);
   }
 
   /**
@@ -41,10 +39,12 @@ abstract class StoreFn extends StandardFunc {
    * Stores a materialized, compact version of the specified value in the store.
    * @param key key
    * @param value value
+   * @param name name of store
    * @param qc query context
    * @throws QueryException query exception
    */
-  void store(final String key, final Value value, final QueryContext qc) throws QueryException {
-    store(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc));
+  void store(final String key, final Value value, final String name, final QueryContext qc)
+      throws QueryException {
+    store(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc), name, info, qc);
   }
 }

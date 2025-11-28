@@ -1,9 +1,10 @@
 package org.basex.core;
 
+import static org.basex.query.QueryError.*;
+
 import java.io.*;
 import java.lang.invoke.*;
 import java.util.*;
-import java.util.regex.*;
 
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
@@ -24,21 +25,12 @@ import org.basex.util.list.*;
  */
 public final class Store implements Closeable {
   /** Name of store files. */
-  private static final String NAME = Util.className(Store.class).toLowerCase(Locale.ENGLISH);
-  /** File pattern. */
-  private static final Pattern PATTERN = Pattern.compile(NAME + "-(.*)\\" + IO.BASEXSUFFIX);
+  private static final String NAME = "store";
 
   /** Stores. */
-  private final HashMap<String, Value> map = new HashMap<>();
+  private final HashMap<String, StoreEntry> stores = new HashMap<>();
   /** Database context. */
   private final Context context;
-
-  /** File name of current store. */
-  private String filename = "";
-  /** Timestamp of current store (set to {@code -1} if store is dirty). */
-  private long timestamp = -1;
-  /** Initialization flag. */
-  private boolean initialized;
 
   /**
    * Constructor.
@@ -50,58 +42,99 @@ public final class Store implements Closeable {
 
   /**
    * Returns all keys.
+   * @param name name of store
+   * @param info input info
+   * @param qc query context
    * @return keys
+   * @throws QueryException query exception
    */
-  public synchronized Value keys() {
-    init();
-    final TokenList list = new TokenList(map.size());
-    for(final String key : map.keySet()) list.add(key);
-    return StrSeq.get(list);
+  public synchronized Value keys(final String name, final InputInfo info, final QueryContext qc)
+      throws QueryException {
+    final StoreEntry entry = entry(name, false, info, qc);
+    if(entry != null) {
+      final TokenList list = new TokenList(entry.map.size());
+      for(final String key : entry.map.keySet()) list.add(key);
+      return StrSeq.get(list);
+    }
+    return Empty.VALUE;
   }
 
   /**
    * Returns a value.
    * @param key key
+   * @param name name of store
+   * @param info input info
+   * @param qc query context
    * @return value or empty sequence
+   * @throws QueryException query exception
    */
-  public synchronized Value get(final String key) {
-    init();
-    final Value value = map.get(key);
-    return value != null ? value : Empty.VALUE;
+  public synchronized Value get(final String key, final String name, final InputInfo info,
+      final QueryContext qc) throws QueryException {
+    final StoreEntry entry = entry(name, false, info, qc);
+    if(entry != null) {
+      final Value value = entry.map.get(key);
+      if(value != null) return value;
+    }
+    return Empty.VALUE;
   }
 
   /**
    * Stores a value.
    * @param key key
    * @param value value
+   * @param name name of store
+   * @param info input info
+   * @param qc query context
+   * @throws QueryException query exception
    */
-  public synchronized void put(final String key, final Value value) {
-    init();
+  public synchronized void put(final String key, final Value value, final String name,
+      final InputInfo info, final QueryContext qc) throws QueryException {
+    final StoreEntry entry = entry(name, true, info, qc);
     if(value.isEmpty()) {
-      map.remove(key);
+      entry.map.remove(key);
     } else {
-      map.put(key, value);
+      entry.map.put(key, value);
     }
-    timestamp = -1;
+    entry.dirty = true;
   }
 
   /**
    * Removes a value.
    * @param key key
+   * @param name name of store
+   * @param info input info
+   * @param qc query context
+   * @throws QueryException query exception
    */
-  public synchronized void remove(final String key) {
-    init();
-    map.remove(key);
-    timestamp = -1;
+  public synchronized void remove(final String key, final String name, final InputInfo info,
+      final QueryContext qc) throws QueryException {
+    put(key, Empty.VALUE, name, info, qc);
   }
 
   /**
-   * Clears the map.
+   * Clears all stores.
    */
   public synchronized void clear() {
-    initialized = true;
-    map.clear();
-    timestamp = -1;
+    stores.clear();
+    for(final String name : listStores()) {
+      storeFile(name).delete();
+    }
+  }
+
+  /**
+   * Resets the stores.
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  public synchronized void reset(final InputInfo info) throws QueryException {
+    for(final String name : stores.keySet()) {
+      try {
+        writeStore(name, false);
+      } catch(final IOException | QueryException ex) {
+        throw STORE_IO_X.get(info, ex);
+      }
+    }
+    stores.clear();
   }
 
   /**
@@ -109,98 +142,73 @@ public final class Store implements Closeable {
    * @return keys
    */
   public synchronized Value list() {
-    final TokenList list = new TokenList();
-    for(final IOFile file : context.soptions.dbPath().children()) {
-      final Matcher m = PATTERN.matcher(file.name());
-      if(m.matches()) list.add(m.group(1));
+    final TreeSet<String> names = listStores();
+    for(final Map.Entry<String, StoreEntry> entry : stores.entrySet()) {
+      if(entry.getValue().map.isEmpty()) names.remove(entry.getKey());
+      else names.add(entry.getKey());
     }
+    names.remove("");
+    final TokenList list = new TokenList(names.size());
+    for(final String name : names) list.add(name);
     return StrSeq.get(list);
   }
 
   /**
    * Reads a store from disk.
-   * @param store name (empty for standard store)
+   * @param name name of store
    * @param qc query context
-   * @throws IOException I/O exception
-   * @return success flag (also {@code true} if standard store is requested and does not exist)
+   * @param info input info
    * @throws QueryException query exception
    */
-  public synchronized boolean read(final String store, final QueryContext qc)
-      throws IOException, QueryException {
-
-    // return false if a requested non-standard store does not exist
-    final IOFile file = file(store);
-    final boolean standard = standard(store), exists = file.exists();
-    if(!(standard || exists)) return false;
-
-    // skip read if store in memory is up to date
-    initialized = true;
-    if(exists && filename.equals(file.name()) && timestamp == file.timeStamp()) return true;
-
-    // regenerate store in memory
-    map.clear();
-    if(exists) {
-      try(DataInput in = new DataInput(file)) {
-        for(int s = in.readNum() - 1; s >= 0; s--) {
-          map.put(Token.string(in.readToken()), read(in, qc));
-        }
-      }
-      timestamp = file.timeStamp();
-    } else {
-      timestamp = -1;
+  public synchronized void read(final String name, final InputInfo info, final QueryContext qc)
+      throws QueryException {
+    if(storeFile(name).exists()) {
+      readStore(name, info, qc);
+    } else if(standardStore(name)) {
+      stores.put("", new StoreEntry());
     }
-    filename = file.name();
-    return true;
   }
 
   /**
    * Writes the current store to disk.
-   * @param store name (empty for standard store)
-   * @throws IOException I/O exception
+   * @param name name of store.
+   * @param info input info
    * @throws QueryException query exception
    */
-  public synchronized void write(final String store) throws IOException, QueryException {
-    if(!initialized) return;
-
-    init();
-    final IOFile file = file(store);
-    if(standard(store) && map.isEmpty()) {
-      // delete standard store if it is empty
-      file.delete();
-      timestamp = -1;
-    } else {
-      // write store to disk
-      file.parent().md();
-      try(DataOutput out = new DataOutput(file)) {
-        out.writeNum(map.size());
-        for(final Map.Entry<String, Value> entry : map.entrySet()) {
-          out.writeToken(Token.token(entry.getKey()));
-          write(out, entry.getValue());
-        }
-      }
-      timestamp = file.timeStamp();
+  public synchronized void write(final String name, final InputInfo info) throws QueryException {
+    try {
+      writeStore(name, true);
+    } catch(final IOException ex) {
+      throw STORE_IO_X.get(info, ex);
     }
-    filename = file.name();
   }
 
   /**
-   * Deletes a store on disk.
-   * @param store name (empty for standard store)
-   * @return success flag
+   * Deletes a store.
+   * @param name name of store
+   * @param info input info
+   * @param qc query context
+   * @throws QueryException query exception
    */
-  public synchronized boolean delete(final String store) {
-    final IOFile file = file(store);
-    return file.exists() && file.delete();
+  public synchronized void delete(final String name, final InputInfo info,
+      final QueryContext qc) throws QueryException {
+    if(standardStore(name)) {
+      entry(name, false, info, qc).map.clear();
+    } else {
+      stores.remove(name);
+    }
+    storeFile(name).delete();
   }
 
   @Override
   public synchronized void close() {
-    final boolean writestore = context.soptions.get(StaticOptions.WRITESTORE);
-    if(writestore && initialized && !filename.contains("-") && timestamp == -1) {
-      try {
-        write("");
-      } catch(final IOException | QueryException ex) {
-        Util.stack(ex);
+    if(context.soptions.get(StaticOptions.WRITESTORE)) {
+      for(final String name : stores.keySet()) {
+        try {
+          writeStore(name, false);
+        } catch(final IOException | QueryException ex) {
+          Util.stack(ex);
+        }
       }
     }
   }
@@ -208,35 +216,108 @@ public final class Store implements Closeable {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Initializes the store.
+   * Returns or creates the specified store.
+   * @param name name of store
+   * @param create create store if it does not exist
+   * @param info input info
+   * @param qc query context
+   * @return store or {@code null}
+   * @throws QueryException query exception
    */
-  private synchronized void init() {
-    if(initialized) return;
-    try(QueryContext qc = new QueryContext(context)) {
-      read("", qc);
-    } catch(final IOException | QueryException ex) {
-      Util.stack(ex);
+  private StoreEntry entry(final String name, final boolean create, final InputInfo info,
+      final QueryContext qc) throws QueryException {
+    if(!stores.containsKey(name)) {
+      if(storeFile(name).exists()) {
+        readStore(name, info, qc);
+      } else if(create) {
+        stores.put(name, new StoreEntry());
+      }
+    }
+    return stores.get(name);
+  }
+
+  /**
+   * Reads a store from disk.
+   * @param name name of store
+   * @param qc query context
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  private void readStore(final String name, final InputInfo info, final QueryContext qc)
+      throws QueryException {
+    final HashMap<String, Value> map = new HashMap<>();
+    try(DataInput in = new DataInput(storeFile(name))) {
+      for(int s = in.readNum() - 1; s >= 0; s--) {
+        map.put(Token.string(in.readToken()), read(in, qc));
+      }
+    } catch(final IOException ex) {
+      throw QueryError.STORE_IO_X.get(info, ex);
+    }
+    stores.put(name, new StoreEntry(map));
+  }
+
+  /**
+   * Writes the current store to disk.
+   * @param name name of store
+   * @param enforce always write dirty store (not only dirty ones)
+   * @throws IOException I/O exception
+   * @throws QueryException query exception
+   */
+  private void writeStore(final String name, final boolean enforce)
+      throws IOException, QueryException {
+    final StoreEntry entry = stores.get(name);
+    final IOFile file = storeFile(name);
+    if(entry != null && (entry.dirty || enforce)) {
+      final HashMap<String, Value> map = entry.map;
+      if(map.isEmpty()) {
+        file.delete();
+      } else {
+        file.parent().md();
+        try(DataOutput out = new DataOutput(file)) {
+          out.writeNum(map.size());
+          for(final Map.Entry<String, Value> e : map.entrySet()) {
+            out.writeToken(Token.token(e.getKey()));
+            write(out, e.getValue());
+          }
+        }
+      }
+      entry.dirty = false;
     }
   }
 
   /**
-   * Reads a file reference for the specified store.
-   * @param store name (empty for standard store)
+   * Returns the names of all stores from disk.
+   * @return keys
+   */
+  private synchronized TreeSet<String> listStores() {
+    final TreeSet<String> names = new TreeSet<>();
+    for(final IOFile file : context.soptions.dbPath().children()) {
+      final String name = file.name();
+      if(name.matches("store(-.+|)\\" + IO.BASEXSUFFIX)) {
+        names.add(name.replaceAll("^store-?|\\" + IO.BASEXSUFFIX, ""));
+      }
+    }
+    return names;
+  }
+
+  /**
+   * Returns a file reference for the specified store.
+   * @param name name of store
    * @return file
    */
-  private IOFile file(final String store) {
+  private IOFile storeFile(final String name) {
     final TokenBuilder tb = new TokenBuilder().add(NAME);
-    if(!standard(store)) tb.add('-').add(store);
+    if(!standardStore(name)) tb.add('-').add(name);
     return context.soptions.dbPath(tb.add(IO.BASEXSUFFIX).toString());
   }
 
   /**
    * Checks if the supplied store refers to the standard store.
-   * @param store name (empty for standard store)
+   * @param name name of store
    * @return result of check
    */
-  private static boolean standard(final String store) {
-    return store.isEmpty();
+  private static boolean standardStore(final String name) {
+    return name.isEmpty();
   }
 
   // STATIC FUNCTIONS =============================================================================
@@ -302,7 +383,7 @@ public final class Store implements Closeable {
   }
 
   /**
-   * Reads a store from disk.
+   * Reads a value from disk.
    * @param in input stream
    * @param qc query context
    * @return value, or {@code null} if data could not be read
@@ -331,6 +412,31 @@ public final class Store implements Closeable {
       return (Value) METHODS[classId].invoke(in, type, qc);
     } catch(final Throwable th) {
       throw new IOException(th);
+    }
+  }
+
+  /**
+   * Single entry of a store.
+   */
+  private static final class StoreEntry {
+    /** Map with data. */
+    private final HashMap<String, Value> map;
+    /** Dirty flag. */
+    private boolean dirty;
+
+    /**
+     * Default constructor.
+     */
+    private StoreEntry() {
+      this(new HashMap<>());
+    }
+
+    /**
+     * Constructor.
+     * @param map map
+     */
+    private StoreEntry(final HashMap<String, Value> map) {
+      this.map = map;
     }
   }
 }

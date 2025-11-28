@@ -1,4 +1,4 @@
-package org.basex.query.func.cache;
+package org.basex.query.func.store;
 
 import org.basex.query.*;
 import org.basex.query.value.seq.*;
@@ -10,12 +10,10 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class CacheRemove extends CacheFn {
+public final class StoreReset extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toZeroString(arg(0), qc);
-
-    cache(qc).remove(name);
+    store(qc).reset(info);
     return Empty.VALUE;
   }
 }

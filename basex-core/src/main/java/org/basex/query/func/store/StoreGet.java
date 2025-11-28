@@ -13,6 +13,7 @@ public final class StoreGet extends StoreFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final String key = toString(arg(0), qc);
-    return store(qc).get(key);
+    final String name = toName(arg(1), qc);
+    return store(qc).get(key, name, info, qc);
   }
 }

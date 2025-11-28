@@ -56,20 +56,23 @@ public final class Cache {
   }
 
   /**
-   * Clears a cache.
+   * Deletes a cache.
    * @param name name of cache
    */
-  public synchronized void remove(final String name) {
-    caches.remove(name);
+  public synchronized void delete(final String name) {
+    if(name.isEmpty()) caches.get(name).clear();
+    else caches.remove(name);
   }
 
   /**
    * Returns the names of all caches.
    * @return names
    */
-  public synchronized TokenList names() {
+  public synchronized TokenList list() {
     final TokenList list = new TokenList(caches.size());
-    for(final String name : caches.keySet()) list.add(name);
+    for(final String name : caches.keySet()) {
+      if(!name.isEmpty()) list.add(name);
+    }
     return list;
   }
 

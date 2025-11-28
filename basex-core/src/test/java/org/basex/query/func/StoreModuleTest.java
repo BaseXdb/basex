@@ -10,7 +10,6 @@ import java.util.Map.*;
 
 import org.basex.*;
 import org.basex.io.*;
-import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -41,23 +40,30 @@ public final class StoreModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void delete() {
     final Function func = _STORE_DELETE;
-    query(_STORE_PUT.args("key", "CLEAR"));
-    query(_STORE_WRITE.args("DELETE"));
-    query(_STORE_KEYS.args(), "key");
-    query(func.args("DELETE"));
-    query(_STORE_KEYS.args(), "key");
-    error(func.args("DELETE"), STORE_NOTFOUND_X);
+    query(_STORE_PUT.args("key", "value"));
+    query(func.args());
+    query(_STORE_GET.args("key"), "");
 
-    error(func.args("unknown"), STORE_NOTFOUND_X);
+    query(_STORE_PUT.args("key", "value"));
+    query(func.args(""));
+    query(_STORE_GET.args("key"), "");
+
+    query(_STORE_PUT.args("key", "value"));
+    query(_STORE_PUT.args("key", "value", "DELETE"));
+    query(func.args("DELETE"));
+    query(_STORE_GET.args("key", "DELETE"), "");
+    query(_STORE_GET.args("key"), "value");
+
     // invalid names
-    error(func.args(""), STORE_NAME_X);
     for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
   }
 
   /** Test method. */
   @Test public void get() {
     final Function func = _STORE_GET;
+    query(func.args(""), "");
     query(func.args("key"), "");
+    query(func.args("key", "cache"), "");
   }
 
   /** Test method. */
@@ -84,12 +90,16 @@ public final class StoreModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void list() {
     final Function func = _STORE_LIST;
+    query(func.args() + " ! `[{ . }]`", "");
+
+    query(_STORE_PUT.args("a", "A", "LIST"));
+    query(func.args() + " ! `[{ . }]`", "[LIST]");
     query(_STORE_WRITE.args());
-    query(_STORE_WRITE.args("a"));
-    query(_STORE_WRITE.args("b"));
-    query(func.args() + " => sort()", "a\nb");
-    query(func.args() + " ! " + _STORE_DELETE.args(" ."));
-    query(func.args(), "");
+    query(func.args() + " ! `[{ . }]`", "[LIST]");
+    query(_STORE_REMOVE.args("a", "LIST"));
+    query(func.args() + " ! `[{ . }]`", "");
+    query(_STORE_WRITE.args());
+    query(func.args() + " ! `[{ . }]`", "");
   }
 
   /** Test method. */
@@ -101,9 +111,9 @@ public final class StoreModuleTest extends SandboxTest {
     query(func.args("key", " ()"), "");
     query(_STORE_GET.args("key"), "");
     query(_STORE_KEYS.args(), "");
-    query(func.args("key", " map:merge((1 to 100000) ! map:entry(., .))"), "");
+    query(func.args("key", " map:merge((1 to 100_000) ! map:entry(., .))"), "");
     query(_STORE_KEYS.args(), "key");
-    query(_STORE_GET.args("key") + " => map:size()", 100000);
+    query(_STORE_GET.args("key") + " => map:size()", 100_000);
 
     error(func.args("key", " true#0"), BASEX_FUNCTION_X);
     error(func.args("key", " [ function() { 123 } ]"), BASEX_FUNCTION_X);
@@ -118,19 +128,18 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_PUT.args("key", "READ"));
     query(_STORE_KEYS.args(), "key");
     query(_STORE_WRITE.args());
-    query(_STORE_CLEAR.args());
+    query(_STORE_KEYS.args(), "key");
+    query(_STORE_REMOVE.args("key"));
     query(_STORE_KEYS.args(), "");
     query(func.args());
     query(_STORE_KEYS.args(), "key");
     query(_STORE_WRITE.args("READ"));
-    query(_STORE_CLEAR.args());
+    query(_STORE_REMOVE.args("key"));
     query(_STORE_KEYS.args(), "");
     query(func.args(""));
     query(_STORE_KEYS.args(), "key");
     query(func.args("READ"));
     query(_STORE_KEYS.args(), "key");
-
-    error(func.args("unknown"), STORE_NOTFOUND_X);
 
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
@@ -143,6 +152,18 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_KEYS.args(), "key");
     query(func.args("key"), "");
     query(_STORE_KEYS.args(), "");
+  }
+
+  /** Test method. */
+  @Test public void reset() {
+    final Function func = _STORE_RESET;
+    query(_STORE_PUT.args("key", "RESET"));
+    query(_STORE_PUT.args("key", "RESET", "cache"));
+    query(_STORE_GET.args("key"), "RESET");
+    query(_STORE_GET.args("key", "cache"), "RESET");
+    query(func.args(), "");
+    query(_STORE_GET.args("key"), "RESET");
+    query(_STORE_GET.args("key", "cache"), "RESET");
   }
 
   /** Test method. */
@@ -288,7 +309,7 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_READ.args());
     query(_STORE_KEYS.args(), "X");
 
-    query(_STORE_CLEAR.args());
+    query(_STORE_REMOVE.args("X"));
     query(_STORE_KEYS.args(), "");
     query(_STORE_READ.args());
     query(_STORE_KEYS.args(), "X");
@@ -310,40 +331,29 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_READ.args());
     query(_STORE_KEYS.args(), "");
 
-    write(storeA, bytes);
+    storeA.write(bytes);
     query(_STORE_READ.args("a"));
-    query(_STORE_KEYS.args(), "X");
+    query(_STORE_KEYS.args(), "");
+    query(_STORE_KEYS.args("a"), "X");
+
     query(_STORE_READ.args());
     query(_STORE_KEYS.args(), "");
     query(_STORE_READ.args("a"));
-    query(_STORE_KEYS.args(), "X");
+    query(_STORE_KEYS.args("a"), "X");
 
-    write(storeA, bytes);
+    storeA.write(bytes);
     query(_STORE_READ.args("a"));
-    query(_STORE_KEYS.args(), "X");
-    write(storeA, bytes);
-    query(_STORE_CLEAR.args());
+    query(_STORE_KEYS.args("a"), "X");
+    storeA.write(bytes);
+    query(_STORE_REMOVE.args("a", "X"));
     query(_STORE_READ.args("a"));
-    query(_STORE_KEYS.args(), "X");
-    write(storeA, new byte[0]);
+    query(_STORE_KEYS.args("a"), "X");
+    storeA.write(new byte[0]);
     query(_STORE_READ.args("a"));
-    query(_STORE_KEYS.args(), "");
-    write(storeA, bytes);
+    query(_STORE_KEYS.args("a"), "");
+    storeA.write(bytes);
     query(_STORE_READ.args("a"));
-    query(_STORE_KEYS.args(), "X");
-
+    query(_STORE_KEYS.args("a"), "X");
     storeA.delete();
-    error(_STORE_READ.args("a"), STORE_NOTFOUND_X);
-  }
-
-  /**
-   * Reads bytes to a store file. A delay is used to ensure that the timestamp of the file changes.
-   * @param file file
-   * @param bytes contents
-   * @throws IOException I/O exception
-   */
-  private static void write(final IOFile file, final byte[] bytes) throws IOException {
-    Performance.sleep(10);
-    file.write(bytes);
   }
 }

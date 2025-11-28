@@ -11,7 +11,8 @@ import org.basex.query.value.*;
  */
 public final class StoreKeys extends StoreFn {
   @Override
-  public Value value(final QueryContext qc) {
-    return store(qc).keys();
+  public Value value(final QueryContext qc) throws QueryException {
+    final String name = toName(arg(0), qc);
+    return store(qc).keys(name, info, qc);
   }
 }

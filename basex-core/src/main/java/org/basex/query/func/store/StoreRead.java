@@ -1,9 +1,5 @@
 package org.basex.query.func.store;
 
-import static org.basex.query.QueryError.*;
-
-import java.io.*;
-
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.value.seq.*;
@@ -18,12 +14,8 @@ import org.basex.util.*;
 public final class StoreRead extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(arg(0), true, qc);
-    try {
-      if(!store(qc).read(name, qc)) throw STORE_NOTFOUND_X.get(info, name);
-    } catch(final IOException ex) {
-      throw STORE_IO_X.get(info, ex);
-    }
+    final String name = toName(arg(0), qc);
+    store(qc).read(name, info, qc);
     return Empty.VALUE;
   }
 

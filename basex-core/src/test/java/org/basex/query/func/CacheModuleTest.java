@@ -24,9 +24,32 @@ public final class CacheModuleTest extends SandboxTest {
     final Function func = _CACHE_CLEAR;
     query(_CACHE_PUT.args("key", "CLEAR"));
     query(_CACHE_PUT.args("key", "CLEAR", "cache"));
-    query(_CACHE_LIST.args() + " => count()", 2);
+    query(_CACHE_PUT.args("key", "CLEAR", "cache2"));
+    query(_CACHE_LIST.args(), "cache\ncache2");
     query(func.args());
-    query(_CACHE_LIST.args() + " => count()", 1);
+    query(_CACHE_LIST.args(), "");
+  }
+
+  /** Test method. */
+  @Test public void delete() {
+    final Function func = _CACHE_DELETE;
+    query(func.args(), "");
+    query(_CACHE_LIST.args(), "");
+
+    query(_CACHE_PUT.args("key", "DELETE"));
+    query(_CACHE_SIZE.args(), 1);
+    query(func.args(), "");
+    query(_CACHE_SIZE.args(), 0);
+
+    query(_CACHE_PUT.args("key", "DELETE"));
+    query(func.args(""), "");
+    query(_CACHE_SIZE.args(), 0);
+
+    query(_CACHE_PUT.args("key", "DELETE", "cache"));
+    query(_CACHE_LIST.args(), "cache");
+    query(func.args("cache"), "");
+    query(_CACHE_LIST.args(), "");
+    query(_CACHE_SIZE.args("cache"), 0);
   }
 
   /** Test method. */
@@ -61,7 +84,7 @@ public final class CacheModuleTest extends SandboxTest {
     query(_CACHE_PUT.args("key", "NAMES"));
     query(func.args(), "");
     query(_CACHE_PUT.args("key", "NAMES", "cache"));
-    query(func.args(), "\ncache");
+    query(func.args(), "cache");
   }
 
   /** Test method. */
@@ -89,25 +112,6 @@ public final class CacheModuleTest extends SandboxTest {
     error(func.args("error", " [ function() { 123 } ]"), BASEX_FUNCTION_X);
     error(func.args("error", " { 0: concat(1, ?) }"), BASEX_FUNCTION_X);
     error(func.args("error", " Q{java.util.Random}new()"), BASEX_FUNCTION_X);
-  }
-
-  /** Test method. */
-  @Test public void remove() {
-    final Function func = _CACHE_REMOVE;
-    query(_CACHE_PUT.args("key", "REMOVE"));
-    query(_CACHE_SIZE.args(), 1);
-    query(func.args(), "");
-    query(_CACHE_SIZE.args(), 0);
-
-    query(_CACHE_PUT.args("key", "REMOVE"));
-    query(func.args(""), "");
-    query(_CACHE_SIZE.args(), 0);
-
-    query(_CACHE_PUT.args("key", "REMOVE", "cache"));
-    query(_CACHE_LIST.args(), "cache");
-    query(func.args("cache"), "");
-    query(_CACHE_LIST.args(), "");
-    query(_CACHE_SIZE.args("cache"), 0);
   }
 
   /** Test method. */

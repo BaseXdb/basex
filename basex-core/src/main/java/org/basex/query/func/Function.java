@@ -1126,6 +1126,9 @@ public enum Function implements AFunction {
   _CACHE_CLEAR(CacheClear::new, "clear()",
       params(), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
+  _CACHE_DELETE(CacheDelete::new, "delete([name])",
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
   _CACHE_GET(CacheGet::new, "get(key[,name])",
       params(STRING_O, STRING_ZO), ITEM_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
@@ -1138,9 +1141,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _CACHE_PUT(CachePut::new, "put(key,value[,name])",
       params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
-  /** XQuery function. */
-  _CACHE_REMOVE(CacheRemove::new, "remove([name])",
-      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
   _CACHE_SIZE(CacheSize::new, "size([name])",
       params(STRING_ZO), INTEGER_O, flag(NDT), CACHE_URI, Perm.CREATE),
@@ -1822,28 +1822,32 @@ public enum Function implements AFunction {
   _STORE_CLEAR(StoreClear::new, "clear()",
       params(), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
-  _STORE_DELETE(StoreDelete::new, "delete(name)",
+  _STORE_DELETE(StoreDelete::new, "delete([name])",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
-  _STORE_GET(StoreGet::new, "get(key)",
-      params(STRING_O), ITEM_ZM, flag(NDT), STORE_URI, Perm.CREATE),
+  _STORE_GET(StoreGet::new, "get(key[,name])",
+      params(STRING_O, STRING_ZO), ITEM_ZM, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
-  _STORE_GET_OR_PUT(StoreGetOrPut::new, "get-or-put(key,put)",
-      params(STRING_O, FuncType.get(ITEM_ZM).seqType()),
+  _STORE_GET_OR_PUT(StoreGetOrPut::new, "get-or-put(key,put[,name])",
+      params(STRING_O, FuncType.get(ITEM_ZM).seqType(), STRING_ZO),
       ITEM_ZM, flag(HOF, NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
-  _STORE_KEYS(StoreKeys::new, "keys()", params(), STRING_ZM, flag(NDT), STORE_URI, Perm.CREATE),
+  _STORE_KEYS(StoreKeys::new, "keys([name])",
+      params(STRING_ZO), STRING_ZM, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
   _STORE_LIST(StoreList::new, "list()", params(), STRING_ZM, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
-  _STORE_PUT(StorePut::new, "put(key,value)",
-      params(STRING_O, ITEM_ZM), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+  _STORE_PUT(StorePut::new, "put(key,value[,name])",
+      params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
   _STORE_READ(StoreRead::new, "read([name])",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
-  _STORE_REMOVE(StoreRemove::new, "remove(key)",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+  _STORE_REMOVE(StoreRemove::new, "remove(key[,name])",
+      params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _STORE_RESET(StoreReset::new, "reset()",
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
   _STORE_WRITE(StoreWrite::new, "write([name])",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),

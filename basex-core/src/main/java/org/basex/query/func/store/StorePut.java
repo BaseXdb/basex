@@ -16,8 +16,9 @@ public final class StorePut extends StoreFn {
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String key = toString(arg(0), qc);
     final Value value = arg(1).value(qc);
+    final String name = toName(arg(2), qc);
 
-    store(key, value, qc);
+    store(key, value, name, qc);
     return Empty.VALUE;
   }
 }
