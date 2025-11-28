@@ -24,9 +24,9 @@ public final class CacheModuleTest extends SandboxTest {
     final Function func = _CACHE_CLEAR;
     query(_CACHE_PUT.args("key", "CLEAR"));
     query(_CACHE_PUT.args("key", "CLEAR", "cache"));
-    query(_CACHE_NAMES.args() + " => count()", 2);
+    query(_CACHE_LIST.args() + " => count()", 2);
     query(func.args());
-    query(_CACHE_NAMES.args() + " => count()", 1);
+    query(_CACHE_LIST.args() + " => count()", 1);
   }
 
   /** Test method. */
@@ -56,8 +56,8 @@ public final class CacheModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void names() {
-    final Function func = _CACHE_NAMES;
+  @Test public void list() {
+    final Function func = _CACHE_LIST;
     query(_CACHE_PUT.args("key", "NAMES"));
     query(func.args(), "");
     query(_CACHE_PUT.args("key", "NAMES", "cache"));
@@ -104,9 +104,9 @@ public final class CacheModuleTest extends SandboxTest {
     query(_CACHE_SIZE.args(), 0);
 
     query(_CACHE_PUT.args("key", "REMOVE", "cache"));
-    query(_CACHE_NAMES.args(), "cache");
+    query(_CACHE_LIST.args(), "cache");
     query(func.args("cache"), "");
-    query(_CACHE_NAMES.args(), "");
+    query(_CACHE_LIST.args(), "");
     query(_CACHE_SIZE.args("cache"), 0);
   }
 

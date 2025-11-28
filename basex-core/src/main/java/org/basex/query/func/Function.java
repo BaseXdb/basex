@@ -1133,7 +1133,7 @@ public enum Function implements AFunction {
       params(STRING_O, FuncType.get(ITEM_ZM).seqType(), STRING_ZO),
       ITEM_ZM, flag(HOF, NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
-  _CACHE_NAMES(CacheNames::new, "names()",
+  _CACHE_LIST(CacheList::new, "list()",
       params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
   /** XQuery function. */
   _CACHE_PUT(CachePut::new, "put(key,value[,name])",

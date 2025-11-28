@@ -10,7 +10,7 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class CacheNames extends CacheFn {
+public final class CacheList extends CacheFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return StrSeq.get(cache(qc).names());
