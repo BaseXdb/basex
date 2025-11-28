@@ -23,7 +23,6 @@ public final class Cache {
    */
   public Cache(final Context context) {
     this.context = context;
-    clear();
   }
 
   /**
@@ -60,8 +59,7 @@ public final class Cache {
    * @param name name of cache
    */
   public synchronized void delete(final String name) {
-    if(name.isEmpty()) caches.get(name).clear();
-    else caches.remove(name);
+    caches.remove(name);
   }
 
   /**
@@ -81,7 +79,6 @@ public final class Cache {
    */
   public synchronized void clear() {
     caches.clear();
-    caches.put("", create());
   }
 
   /**

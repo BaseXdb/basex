@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -81,10 +82,13 @@ public final class CacheModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void list() {
     final Function func = _CACHE_LIST;
+    query(func.args() + " => count()", 0);
     query(_CACHE_PUT.args("key", "NAMES"));
-    query(func.args(), "");
+    query(func.args() + " => count()", 0);
     query(_CACHE_PUT.args("key", "NAMES", "cache"));
-    query(func.args(), "cache");
+    query(func.args() + " => count()", 1);
+    query(_CACHE_DELETE.args("cache"));
+    query(func.args() + " => count()", 0);
   }
 
   /** Test method. */
@@ -107,6 +111,12 @@ public final class CacheModuleTest extends SandboxTest {
     query(_CACHE_GET.args("key", ""), "PUT");
     query(_CACHE_GET.args("key", "cache1"), "PUT1");
     query(_CACHE_GET.args("key", "cache2"), "PUT2");
+
+    final int cachemax = context.soptions.get(StaticOptions.CACHEMAX);
+    query("(0 to " + cachemax + ") ! " + func.args(" string()", " ."));
+    query(_CACHE_GET.args("0"), "");
+    query(_CACHE_GET.args("1"), 1);
+    query(_CACHE_GET.args(String.valueOf(cachemax)), cachemax);
 
     error(func.args("error", " true#0"), BASEX_FUNCTION_X);
     error(func.args("error", " [ function() { 123 } ]"), BASEX_FUNCTION_X);
