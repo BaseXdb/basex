@@ -13,7 +13,7 @@ import org.basex.util.*;
 public final class StoreReset extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    store(qc).reset(info);
+    stores(qc).reset(info);
     return Empty.VALUE;
   }
 }

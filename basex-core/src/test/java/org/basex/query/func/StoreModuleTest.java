@@ -24,35 +24,37 @@ public final class StoreModuleTest extends SandboxTest {
 
   /** Initializes a test. */
   @BeforeEach public void initTest() {
-    final Function clear = _STORE_CLEAR;
-    query(clear.args());
+    query(_STORE_CLEAR.args());
   }
 
   /** Test method. */
   @Test public void clear() {
     final Function func = _STORE_CLEAR;
     query(_STORE_PUT.args("key", "CLEAR"));
+    query(_STORE_PUT.args("key", "CLEAR", "cache"));
     query(_STORE_KEYS.args(), "key");
+    query(_STORE_KEYS.args("cache"), "key");
     query(func.args(), "");
     query(_STORE_KEYS.args(), "");
+    query(_STORE_KEYS.args("cache"), "");
+    query(_STORE_LIST.args() + " => count()", 0);
   }
 
   /** Test method. */
   @Test public void delete() {
     final Function func = _STORE_DELETE;
     query(_STORE_PUT.args("key", "value"));
-    query(func.args());
-    query(_STORE_GET.args("key"), "");
+    query(_STORE_GET.args("key"), "value");
+    query(_STORE_WRITE.args(""));
+    assertTrue(context.soptions.dbPath("store" + IO.BASEXSUFFIX).exists());
 
-    query(_STORE_PUT.args("key", "value"));
+    query(_STORE_PUT.args("key", "value", "DELETE"));
+    query(_STORE_GET.args("key", "DELETE"), "value");
+    query(_STORE_WRITE.args("DELETE"));
     query(func.args(""));
     query(_STORE_GET.args("key"), "");
-
-    query(_STORE_PUT.args("key", "value"));
-    query(_STORE_PUT.args("key", "value", "DELETE"));
-    query(func.args("DELETE"));
-    query(_STORE_GET.args("key", "DELETE"), "");
-    query(_STORE_GET.args("key"), "value");
+    query(_STORE_GET.args("key", "DELETE"), "value");
+    assertFalse(context.soptions.dbPath("store" + IO.BASEXSUFFIX).exists());
 
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
@@ -64,16 +66,22 @@ public final class StoreModuleTest extends SandboxTest {
     query(func.args(""), "");
     query(func.args("key"), "");
     query(func.args("key", "cache"), "");
+
+    query(_STORE_PUT.args("key", "GET1"));
+    query(func.args("key"), "GET1");
+    query(_STORE_PUT.args("key", "GET2", "cache"));
+    query(func.args("key", "cache"), "GET2");
   }
 
   /** Test method. */
   @Test public void getOrPut() {
     final Function func = _STORE_GET_OR_PUT;
     query(_STORE_GET.args("key"), "");
-    query(func.args("key", " function() { 'GET-OR-PUT' }"), "GET-OR-PUT");
+    query(func.args("key", " fn() { 'GET-OR-PUT' }"), "GET-OR-PUT");
     query(_STORE_GET.args("key"), "GET-OR-PUT");
     query(_STORE_KEYS.args(), "key");
-    query(func.args("key", " function() { 'NOT' + 'INVOKED' }"), "GET-OR-PUT");
+
+    query(func.args("key", " fn() { 'NOT' + 'INVOKED' }"), "GET-OR-PUT");
     query(_STORE_GET.args("key"), "GET-OR-PUT");
     query(_STORE_KEYS.args(), "key");
   }
@@ -85,21 +93,24 @@ public final class StoreModuleTest extends SandboxTest {
     query(func.args() + " => sort()", "0\n1\n2");
     query(_STORE_CLEAR.args());
     query(func.args(), "");
+
+    for(int i = 0; i < 3; i++) query(_STORE_PUT.args(Integer.toString(i), i, "cache"));
+    query(func.args("cache") + " => sort()", "0\n1\n2");
   }
 
   /** Test method. */
   @Test public void list() {
     final Function func = _STORE_LIST;
-    query(func.args() + " ! `[{ . }]`", "");
+    query(func.args() + " ! concat('!', .)", "");
 
     query(_STORE_PUT.args("a", "A", "LIST"));
-    query(func.args() + " ! `[{ . }]`", "[LIST]");
+    query(func.args() + " ! concat('!', .)", "!LIST");
     query(_STORE_WRITE.args());
-    query(func.args() + " ! `[{ . }]`", "[LIST]");
+    query(func.args() + " ! concat('!', .)", "!LIST");
     query(_STORE_REMOVE.args("a", "LIST"));
-    query(func.args() + " ! `[{ . }]`", "");
+    query(func.args() + " ! concat('!', .)", "");
     query(_STORE_WRITE.args());
-    query(func.args() + " ! `[{ . }]`", "");
+    query(func.args() + " ! concat('!', .)", "");
   }
 
   /** Test method. */
@@ -111,12 +122,19 @@ public final class StoreModuleTest extends SandboxTest {
     query(func.args("key", " ()"), "");
     query(_STORE_GET.args("key"), "");
     query(_STORE_KEYS.args(), "");
-    query(func.args("key", " map:merge((1 to 100_000) ! map:entry(., .))"), "");
+    query(func.args("key", " map:merge((1 to 10_000) ! map:entry(., .))"), "");
     query(_STORE_KEYS.args(), "key");
-    query(_STORE_GET.args("key") + " => map:size()", 100_000);
+    query(_STORE_GET.args("key") + " => map:size()", 10_000);
+
+    query(func.args("key", "", "cache"), "");
+    query(_STORE_KEYS.args("cache"), "key");
+    query(_STORE_LIST.args() + " => count()", 1);
+    query(func.args("key", " ()", "cache"), "");
+    query(_STORE_KEYS.args("cache"), "");
+    query(_STORE_LIST.args() + " => count()", 0);
 
     error(func.args("key", " true#0"), BASEX_FUNCTION_X);
-    error(func.args("key", " [ function() { 123 } ]"), BASEX_FUNCTION_X);
+    error(func.args("key", " [ fn() { 123 } ]"), BASEX_FUNCTION_X);
     error(func.args("key", " { 0: concat(1, ?) }"), BASEX_FUNCTION_X);
     error(func.args("key", " Q{java.util.Random}new()"), BASEX_FUNCTION_X);
   }
@@ -131,13 +149,16 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_KEYS.args(), "key");
     query(_STORE_REMOVE.args("key"));
     query(_STORE_KEYS.args(), "");
+
     query(func.args());
     query(_STORE_KEYS.args(), "key");
     query(_STORE_WRITE.args("READ"));
     query(_STORE_REMOVE.args("key"));
     query(_STORE_KEYS.args(), "");
+
     query(func.args(""));
     query(_STORE_KEYS.args(), "key");
+
     query(func.args("READ"));
     query(_STORE_KEYS.args(), "key");
 
@@ -152,6 +173,11 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_KEYS.args(), "key");
     query(func.args("key"), "");
     query(_STORE_KEYS.args(), "");
+
+    query(_STORE_PUT.args("key", "REMOVE", "cache"));
+    query(_STORE_LIST.args() + "=> count()", 1);
+    query(func.args("key", "cache"), "");
+    query(_STORE_LIST.args() + "=> count()", 0);
   }
 
   /** Test method. */
@@ -171,15 +197,29 @@ public final class StoreModuleTest extends SandboxTest {
     final Function func = _STORE_WRITE;
     query(_STORE_PUT.args("key", "WRITE"));
     query(func.args());
+    assertTrue(context.soptions.dbPath("store" + IO.BASEXSUFFIX).exists());
+
     query(_STORE_KEYS.args(), "key");
     query(func.args(""));
     query(_STORE_KEYS.args(), "key");
-    query(func.args("store"));
-    try {
-      query(_STORE_KEYS.args(), "key");
-    } finally {
-      query(_STORE_DELETE.args("store"));
-    }
+    query(_STORE_READ.args(""));
+    query(_STORE_KEYS.args(), "key");
+
+    query(_STORE_REMOVE.args("key"));
+    query(func.args());
+    assertFalse(context.soptions.dbPath("store" + IO.BASEXSUFFIX).exists());
+
+    query(_STORE_PUT.args("key", "WRITE", "cache"));
+    query(func.args("cache"));
+    assertTrue(context.soptions.dbPath("store-cache" + IO.BASEXSUFFIX).exists());
+
+    query(_STORE_GET.args("key", "cache"), "WRITE");
+    query(_STORE_READ.args("cache"));
+    query(_STORE_GET.args("key", "cache"), "WRITE");
+
+    query(_STORE_REMOVE.args("key", "cache"));
+    query(func.args("cache"));
+    assertFalse(context.soptions.dbPath("store-cache" + IO.BASEXSUFFIX).exists());
 
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
@@ -222,6 +262,7 @@ public final class StoreModuleTest extends SandboxTest {
     query(put.args("xs:yearMonthDuration", " xs:yearMonthDuration('P1Y')"));
     query(put.args("xs:dayTimeDuration", " xs:dayTimeDuration('P1D')"));
     query(put.args("xs:dateTime", " xs:dateTime('2001-01-01T01:01:01')"));
+    query(put.args("xs:dateTimeStamp", " xs:dateTimeStamp('2001-01-01T01:01:01+01:00')"));
     query(put.args("xs:date", " xs:date('2001-01-01')"));
     query(put.args("xs:time", " xs:time('01:01:01')"));
     query(put.args("xs:gYearMonth", " xs:gYearMonth('2001-01')"));

@@ -13,6 +13,6 @@ import org.basex.query.value.seq.*;
 public final class CacheList extends CacheFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return StrSeq.get(cache(qc).list());
+    return StrSeq.get(caches(qc).list());
   }
 }

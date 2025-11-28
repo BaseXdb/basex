@@ -15,7 +15,7 @@ public final class CacheDelete extends CacheFn {
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toZeroString(arg(0), qc);
 
-    cache(qc).delete(name);
+    caches(qc).delete(name);
     return Empty.VALUE;
   }
 }

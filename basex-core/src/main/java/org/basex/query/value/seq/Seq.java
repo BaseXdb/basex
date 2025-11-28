@@ -281,7 +281,7 @@ public abstract class Seq extends Value {
   // STATIC METHODS ===============================================================================
 
   /**
-   * Creates a value from the input stream. Called from {@link Store#read(DataInput, QueryContext)}.
+   * Creates a value from the input stream. Called from {@link Stores#read(DataInput, QueryContext)}.
    * @param in data input
    * @param type type
    * @param qc query context

@@ -15,6 +15,6 @@ public final class CacheSize extends CacheFn {
   public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toZeroString(arg(0), qc);
 
-    return Itr.get(cache(qc).size(name));
+    return Itr.get(caches(qc).size(name));
   }
 }

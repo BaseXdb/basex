@@ -15,7 +15,7 @@ public final class StoreRemove extends StoreFn {
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String key = toString(arg(0), qc);
     final String name = toName(arg(1), qc);
-    store(qc).remove(key, name, info, qc);
+    stores(qc).remove(key, name, info, qc);
     return Empty.VALUE;
   }
 }

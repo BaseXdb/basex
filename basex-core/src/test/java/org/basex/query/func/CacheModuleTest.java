@@ -16,8 +16,7 @@ import org.junit.jupiter.api.*;
 public final class CacheModuleTest extends SandboxTest {
   /** Initializes a test. */
   @BeforeEach public void initTest() {
-    final Function clear = _CACHE_CLEAR;
-    query(clear.args());
+    query(_CACHE_CLEAR.args());
   }
 
   /** Test method. */
@@ -116,7 +115,7 @@ public final class CacheModuleTest extends SandboxTest {
     query("(0 to " + cachemax + ") ! " + func.args(" string()", " ."));
     query(_CACHE_GET.args("0"), "");
     query(_CACHE_GET.args("1"), 1);
-    query(_CACHE_GET.args(String.valueOf(cachemax)), cachemax);
+    query(_CACHE_GET.args(Integer.toString(cachemax)), cachemax);
 
     error(func.args("error", " true#0"), BASEX_FUNCTION_X);
     error(func.args("error", " [ function() { 123 } ]"), BASEX_FUNCTION_X);

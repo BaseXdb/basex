@@ -11,7 +11,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Cache {
+public final class Caches {
   /** Caches. */
   private final HashMap<String, LinkedHashMap<String, Value>> caches = new HashMap<>();
   /** Database context. */
@@ -21,7 +21,7 @@ public final class Cache {
    * Constructor.
    * @param context database context
    */
-  public Cache(final Context context) {
+  public Caches(final Context context) {
     this.context = context;
   }
 

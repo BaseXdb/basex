@@ -31,8 +31,8 @@ abstract class StoreFn extends StandardFunc {
    * @param qc query context
    * @return store
    */
-  static Store store(final QueryContext qc) {
-    return qc.context.store;
+  static Stores stores(final QueryContext qc) {
+    return qc.context.stores;
   }
 
   /**
@@ -45,6 +45,6 @@ abstract class StoreFn extends StandardFunc {
    */
   void store(final String key, final Value value, final String name, final QueryContext qc)
       throws QueryException {
-    store(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc), name, info, qc);
+    stores(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc), name, info, qc);
   }
 }

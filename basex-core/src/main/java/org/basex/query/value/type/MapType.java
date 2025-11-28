@@ -99,7 +99,7 @@ public class MapType extends FType {
       throws IOException, QueryException {
     int size = in.readNum();
     final MapBuilder mb = new MapBuilder(size);
-    while(--size >= 0) mb.put((Item) Store.read(in, qc), Store.read(in, qc));
+    while(--size >= 0) mb.put((Item) Stores.read(in, qc), Stores.read(in, qc));
     return mb.map();
   }
 

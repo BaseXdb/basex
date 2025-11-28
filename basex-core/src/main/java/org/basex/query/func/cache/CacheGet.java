@@ -16,7 +16,7 @@ public final class CacheGet extends CacheFn {
     final String key = toString(arg(0), qc);
     final String name = toZeroString(arg(1), qc);
 
-    final Value value = cache(qc).get(key, name);
+    final Value value = caches(qc).get(key, name);
     return value != null ? value : Empty.VALUE;
   }
 }

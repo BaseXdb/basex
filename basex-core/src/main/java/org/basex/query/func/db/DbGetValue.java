@@ -67,7 +67,7 @@ public class DbGetValue extends DbAccessFn {
    */
   Value resource(final IOFile path, final QueryContext qc) throws IOException, QueryException {
     try(DataInput in = new DataInput(path)) {
-      return Store.read(in, qc);
+      return Stores.read(in, qc);
     }
   }
 

@@ -15,7 +15,7 @@ public final class StoreWrite extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toName(arg(0), qc);
-    store(qc).write(name, info);
+    stores(qc).write(name, info);
     return Empty.VALUE;
   }
 

@@ -17,8 +17,8 @@ abstract class CacheFn extends StandardFunc {
    * @param qc query context
    * @return cache
    */
-  static Cache cache(final QueryContext qc) {
-    return qc.context.cache;
+  static Caches caches(final QueryContext qc) {
+    return qc.context.caches;
   }
 
   /**
@@ -31,6 +31,6 @@ abstract class CacheFn extends StandardFunc {
    */
   final void cache(final String key, final Value value, final String name, final QueryContext qc)
       throws QueryException {
-    cache(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc), name);
+    caches(qc).put(key, value.materialize(n -> false, info, qc).shrink(qc), name);
   }
 }

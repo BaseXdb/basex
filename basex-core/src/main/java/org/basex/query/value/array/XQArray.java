@@ -187,7 +187,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(structSize());
-    for(final Value value : iterable()) Store.write(out, value);
+    for(final Value value : iterable()) Stores.write(out, value);
   }
 
   /**

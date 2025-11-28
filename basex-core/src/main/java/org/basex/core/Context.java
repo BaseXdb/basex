@@ -47,9 +47,9 @@ public final class Context {
   /** Locking. */
   public final Locking locking;
   /** Key/value store. */
-  public final Store store;
+  public final Stores stores;
   /** Cache. */
-  public final Cache cache;
+  public final Caches caches;
 
   /** External objects (HTTP context, HTTP requests). */
   private final HashSet<Object> external;
@@ -117,8 +117,8 @@ public final class Context {
     repo = ctx.repo;
     log = ctx.log;
     jobs = ctx.jobs;
-    store = ctx.store;
-    cache = ctx.cache;
+    stores = ctx.stores;
+    caches = ctx.caches;
     external = new HashSet<>(ctx.external);
   }
 
@@ -140,8 +140,8 @@ public final class Context {
     user = users.get(UserText.ADMIN);
     jobs = new JobPool(soptions);
     external = new HashSet<>();
-    store = new Store(this);
-    cache = new Cache(this);
+    stores = new Stores(this);
+    caches = new Caches(this);
     client = null;
   }
 
@@ -168,7 +168,7 @@ public final class Context {
   public synchronized void close() {
     if(closed) return;
     closed = true;
-    store.close();
+    stores.close();
     jobs.close();
     sessions.close();
     datas.close();

@@ -60,8 +60,8 @@ public abstract class XQMap extends XQStruct {
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeNum((int) structSize());
     for(final Item key : keys()) {
-      Store.write(out, key);
-      Store.write(out, get(key));
+      Stores.write(out, key);
+      Stores.write(out, get(key));
     }
   }
 

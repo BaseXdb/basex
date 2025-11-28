@@ -18,17 +18,17 @@ import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class provides a main-memory key/value store.
+ * This class provides access to main-memory key/value stores.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class Store implements Closeable {
+public final class Stores implements Closeable {
   /** Name of store files. */
   private static final String NAME = "store";
 
   /** Stores. */
-  private final HashMap<String, StoreEntry> stores = new HashMap<>();
+  private final HashMap<String, Store> stores = new HashMap<>();
   /** Database context. */
   private final Context context;
 
@@ -36,7 +36,7 @@ public final class Store implements Closeable {
    * Constructor.
    * @param context database context
    */
-  public Store(final Context context) {
+  public Stores(final Context context) {
     this.context = context;
   }
 
@@ -50,10 +50,10 @@ public final class Store implements Closeable {
    */
   public synchronized Value keys(final String name, final InputInfo info, final QueryContext qc)
       throws QueryException {
-    final StoreEntry entry = entry(name, false, info, qc);
-    if(entry != null) {
-      final TokenList list = new TokenList(entry.map.size());
-      for(final String key : entry.map.keySet()) list.add(key);
+    final Store store = get(name, false, info, qc);
+    if(store != null) {
+      final TokenList list = new TokenList(store.map.size());
+      for(final String key : store.map.keySet()) list.add(key);
       return StrSeq.get(list);
     }
     return Empty.VALUE;
@@ -70,9 +70,9 @@ public final class Store implements Closeable {
    */
   public synchronized Value get(final String key, final String name, final InputInfo info,
       final QueryContext qc) throws QueryException {
-    final StoreEntry entry = entry(name, false, info, qc);
-    if(entry != null) {
-      final Value value = entry.map.get(key);
+    final Store store = get(name, false, info, qc);
+    if(store != null) {
+      final Value value = store.map.get(key);
       if(value != null) return value;
     }
     return Empty.VALUE;
@@ -89,13 +89,13 @@ public final class Store implements Closeable {
    */
   public synchronized void put(final String key, final Value value, final String name,
       final InputInfo info, final QueryContext qc) throws QueryException {
-    final StoreEntry entry = entry(name, true, info, qc);
+    final Store store = get(name, true, info, qc);
     if(value.isEmpty()) {
-      entry.map.remove(key);
+      store.map.remove(key);
     } else {
-      entry.map.put(key, value);
+      store.map.put(key, value);
     }
-    entry.dirty = true;
+    store.dirty = true;
   }
 
   /**
@@ -143,7 +143,7 @@ public final class Store implements Closeable {
    */
   public synchronized Value list() {
     final TreeSet<String> names = listStores();
-    for(final Map.Entry<String, StoreEntry> entry : stores.entrySet()) {
+    for(final Map.Entry<String, Store> entry : stores.entrySet()) {
       if(entry.getValue().map.isEmpty()) names.remove(entry.getKey());
       else names.add(entry.getKey());
     }
@@ -165,7 +165,7 @@ public final class Store implements Closeable {
     if(storeFile(name).exists()) {
       readStore(name, info, qc);
     } else if(standardStore(name)) {
-      stores.put("", new StoreEntry());
+      stores.remove("");
     }
   }
 
@@ -193,7 +193,7 @@ public final class Store implements Closeable {
   public synchronized void delete(final String name, final InputInfo info,
       final QueryContext qc) throws QueryException {
     if(standardStore(name)) {
-      entry(name, false, info, qc).map.clear();
+      get(name, false, info, qc).map.clear();
     } else {
       stores.remove(name);
     }
@@ -224,13 +224,13 @@ public final class Store implements Closeable {
    * @return store or {@code null}
    * @throws QueryException query exception
    */
-  private StoreEntry entry(final String name, final boolean create, final InputInfo info,
+  private Store get(final String name, final boolean create, final InputInfo info,
       final QueryContext qc) throws QueryException {
     if(!stores.containsKey(name)) {
       if(storeFile(name).exists()) {
         readStore(name, info, qc);
       } else if(create) {
-        stores.put(name, new StoreEntry());
+        stores.put(name, new Store());
       }
     }
     return stores.get(name);
@@ -253,7 +253,7 @@ public final class Store implements Closeable {
     } catch(final IOException ex) {
       throw QueryError.STORE_IO_X.get(info, ex);
     }
-    stores.put(name, new StoreEntry(map));
+    stores.put(name, new Store(map));
   }
 
   /**
@@ -265,7 +265,7 @@ public final class Store implements Closeable {
    */
   private void writeStore(final String name, final boolean enforce)
       throws IOException, QueryException {
-    final StoreEntry entry = stores.get(name);
+    final Store entry = stores.get(name);
     final IOFile file = storeFile(name);
     if(entry != null && (entry.dirty || enforce)) {
       final HashMap<String, Value> map = entry.map;
@@ -418,7 +418,7 @@ public final class Store implements Closeable {
   /**
    * Single entry of a store.
    */
-  private static final class StoreEntry {
+  private static final class Store {
     /** Map with data. */
     private final HashMap<String, Value> map;
     /** Dirty flag. */
@@ -427,7 +427,7 @@ public final class Store implements Closeable {
     /**
      * Default constructor.
      */
-    private StoreEntry() {
+    private Store() {
       this(new HashMap<>());
     }
 
@@ -435,7 +435,7 @@ public final class Store implements Closeable {
      * Constructor.
      * @param map map
      */
-    private StoreEntry(final HashMap<String, Value> map) {
+    private Store(final HashMap<String, Value> map) {
       this.map = map;
     }
   }

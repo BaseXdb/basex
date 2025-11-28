@@ -59,7 +59,7 @@ public final class ArrayType extends FType {
       throws IOException, QueryException {
     int size = in.readNum();
     final ArrayBuilder ab = new ArrayBuilder(qc, size);
-    while(--size >= 0) ab.add(Store.read(in, qc));
+    while(--size >= 0) ab.add(Stores.read(in, qc));
     return ab.array();
   }
 

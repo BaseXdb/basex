@@ -15,7 +15,7 @@ public final class StoreRead extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toName(arg(0), qc);
-    store(qc).read(name, info, qc);
+    stores(qc).read(name, info, qc);
     return Empty.VALUE;
   }
 

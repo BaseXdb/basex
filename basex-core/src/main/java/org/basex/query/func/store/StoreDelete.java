@@ -14,7 +14,7 @@ public final class StoreDelete extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toName(arg(0), qc);
-    store(qc).delete(name, info, qc);
+    stores(qc).delete(name, info, qc);
     return Empty.VALUE;
   }
 }

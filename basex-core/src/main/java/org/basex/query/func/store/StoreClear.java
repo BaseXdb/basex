@@ -13,7 +13,7 @@ import org.basex.util.*;
 public final class StoreClear extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) {
-    store(qc).clear();
+    stores(qc).clear();
     return Empty.VALUE;
   }
 }

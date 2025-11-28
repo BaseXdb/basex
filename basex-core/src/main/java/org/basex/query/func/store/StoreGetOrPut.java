@@ -18,7 +18,7 @@ public final class StoreGetOrPut extends StoreFn {
     final FItem put = toFunction(arg(1), 0, qc);
     final String name = toName(arg(2), qc);
 
-    Value value = store(qc).get(key, name, info, qc);
+    Value value = stores(qc).get(key, name, info, qc);
     if(value.isEmpty()) {
       value = invoke(put, new HofArgs(), qc);
       store(key, value, name, qc);
