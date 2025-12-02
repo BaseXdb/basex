@@ -77,15 +77,14 @@ public final class Functions {
    * @param qnm function name
    * @param fb function arguments
    * @param qc query context
-   * @param hasImport indicates whether a module import for the function name's URI was present
    * @return function call
    * @throws QueryException query exception
    */
-  public static Expr get(final QNm qnm, final FuncBuilder fb, final QueryContext qc,
-      final boolean hasImport) throws QueryException {
+  public static Expr get(final QNm qnm, final FuncBuilder fb, final QueryContext qc)
+      throws QueryException {
 
     // partial function call?
-    if(fb.placeholders > 0) return dynamic(item(qnm, fb.arity, false, fb.info, qc, hasImport), fb);
+    if(fb.placeholders > 0) return dynamic(item(qnm, fb.arity, false, fb.info, qc), fb);
 
     final QNm name = funcName(qnm, fb.arity, fb.info, qc);
 
@@ -103,7 +102,7 @@ public final class Functions {
     }
 
     // user-defined function
-    return staticCall(name, fb, qc, hasImport);
+    return staticCall(name, fb, qc);
   }
 
   /**
@@ -144,12 +143,11 @@ public final class Functions {
    * @param runtime {@code true} if this method is called at runtime
    * @param info input info (can be {@code null})
    * @param qc query context
-   * @param hasImport indicates whether a module import for the function name's URI was present
    * @return literal if found, {@code null} otherwise
    * @throws QueryException query exception
    */
   public static Expr item(final QNm qnm, final int arity, final boolean runtime,
-      final InputInfo info, final QueryContext qc, final boolean hasImport) throws QueryException {
+      final InputInfo info, final QueryContext qc) throws QueryException {
 
     final FuncBuilder fb = new FuncBuilder(info, arity, runtime);
     final QNm name = funcName(qnm, arity, info, qc);
@@ -181,9 +179,9 @@ public final class Functions {
     }
 
     // user-defined function
-    final StaticFunc sf = qc.functions.get(name, arity);
+    final StaticFunc sf = qc.functions.get(info.sc(), name, arity);
     if(sf != null) {
-      final Expr func = item(sf, fb, qc, hasImport);
+      final Expr func = item(sf, fb, qc);
       if(sf.updating) qc.updating();
       return func;
     }
@@ -200,12 +198,7 @@ public final class Functions {
     }
     if(runtime) return null;
 
-    // closure
-    final StaticFuncCall call = staticCall(name, fb, qc, hasImport);
-    // safe cast (no context dependency, no runtime evaluation)
-    final Closure closure = (Closure) item(call, fb, null, name, false, false);
-    qc.functions.register(closure);
-    return closure;
+    throw qc.functions.unknownFunctionError(name, arity, info);
   }
 
   /**
@@ -214,16 +207,16 @@ public final class Functions {
    * with no namespace.
    * @param name function name
    * @param arity number of arguments
-   * @param info input info (can be {@code null})
+   * @param info input info
    * @param qc query context
    * @return function name
    */
   private static QNm funcName(final QNm name, final int arity, final InputInfo info,
       final QueryContext qc) {
 
-    if(name.hasURI() || qc.functions.get(name, arity) != null) return name;
-    final StaticContext sc = info != null ? info.sc() : null;
-    return new QNm(name.local(), sc != null && sc.funcNS != null ? sc.funcNS : FN_URI);
+    final StaticContext sc = info.sc();
+    if(name.hasURI() || qc.functions.get(sc, name, arity) != null) return name;
+    return new QNm(name.local(), sc.funcNS != null ? sc.funcNS : FN_URI);
   }
 
   /**
@@ -322,20 +315,18 @@ public final class Functions {
    * @param name function name
    * @param fb function arguments
    * @param qc query context
-   * @param hasImport indicates whether a module import for the function name's URI was present
    * @return function call
    * @throws QueryException query exception
    */
   private static StaticFuncCall staticCall(final QNm name, final FuncBuilder fb,
-      final QueryContext qc, final boolean hasImport) throws QueryException {
+      final QueryContext qc) throws QueryException {
 
     if(NSGlobal.reserved(name.uri()) && !Records.BUILT_IN.contains(name)) {
       throw qc.functions.similarError(name, fb.info);
     }
 
-    final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.info,
-        hasImport);
-    qc.functions.register(call);
+    final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.info);
+    qc.functions.setFunc(call, qc);
     return call;
   }
 
@@ -344,19 +335,18 @@ public final class Functions {
    * @param sf static function
    * @param fb function arguments
    * @param qc query context
-   * @param hasImport indicates whether a module import for the function name's URI was present
    * @return function item
    * @throws QueryException query exception
    */
-  public static Expr item(final StaticFunc sf, final FuncBuilder fb, final QueryContext qc,
-      final boolean hasImport) throws QueryException {
+  public static Expr item(final StaticFunc sf, final FuncBuilder fb, final QueryContext qc)
+      throws QueryException {
 
     final FuncType sft = sf.funcType();
     final int arity = fb.params.length;
     for(int a = 0; a < arity; a++) fb.add(sf.paramName(a), sft.argTypes[a], qc);
     final FuncType ft = FuncType.get(fb.anns, sft.declType, Arrays.copyOf(sft.argTypes, arity));
 
-    final StaticFuncCall call = staticCall(sf.name, fb, qc, hasImport);
+    final StaticFuncCall call = staticCall(sf.name, fb, qc);
     if(call.func != null) fb.anns = call.func.anns;
     return item(call, fb, ft, sf.name, sf.updating, false);
   }

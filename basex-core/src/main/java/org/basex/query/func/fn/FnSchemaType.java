@@ -105,7 +105,7 @@ public class FnSchemaType extends StandardFunc {
       if(matches != null) mb.put("matches", matches);
       if(constructor) {
         mb.put("constructor", FuncType.get(Types.ANY_ATOMIC_TYPE_ZM, Types.ANY_ATOMIC_TYPE_ZO).cast(
-            (FuncItem) Functions.item(name, 1, true, info, qc, true), qc, info));
+            (FuncItem) Functions.item(name, 1, true, info, qc), qc, info));
       }
       vb.add(mb.map());
     }

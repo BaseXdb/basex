@@ -1,6 +1,7 @@
 package org.basex.query.func.inspect;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
@@ -18,7 +19,20 @@ public final class InspectFunction extends StandardFunc {
     final FItem function = toFunction(arg(0), qc);
 
     final QNm name = function.funcName();
-    final StaticFunc sf = name == null ? null : qc.functions.get(name, function.arity());
-    return new PlainDoc(qc, info).function(name, sf, function.funcType(), function.annotations());
+    StaticFunc func = null;
+    if(name != null) {
+      final int arity = function.arity();
+      func = qc.functions.get(ii.sc(), name, arity);
+      if(func == null) {
+        for(final StaticFunc sf : qc.functions) {
+          if(!sf.annotations().contains(Annotation.PRIVATE) && sf.funcName().eq(name)
+              && sf.minArity() <= arity && sf.arity() >= arity) {
+            func = sf;
+            break;
+          }
+        }
+      }
+    }
+    return new PlainDoc(qc, info).function(name, func, function.funcType(), function.annotations());
   }
 }
