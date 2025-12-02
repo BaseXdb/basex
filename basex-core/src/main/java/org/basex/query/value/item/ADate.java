@@ -395,14 +395,15 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    return type == item.type && compare(item, deep.info) == 0 &&
-      (!deep.options.get(DeepEqualOptions.TIMEZONES) || tz == ((ADate) item).tz);
+    return (type.instanceOf(item.type) || item.type.instanceOf(type))
+        && compare(item, deep.info) == 0
+        && (!deep.options.get(DeepEqualOptions.TIMEZONES) || tz == ((ADate) item).tz);
   }
 
   @Override
   public final boolean atomicEqual(final Item item) throws QueryException {
-    return this == item || type == item.type && compare(item, null) == 0 &&
-        hasTz() == ((ADate) item).hasTz();
+    return this == item || (type.instanceOf(item.type) || item.type.instanceOf(type))
+        && compare(item, null) == 0 && hasTz() == ((ADate) item).hasTz();
   }
 
   @Override

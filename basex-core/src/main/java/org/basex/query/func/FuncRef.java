@@ -2,8 +2,6 @@ package org.basex.query.func;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.parse.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -18,46 +16,23 @@ import org.basex.util.hash.*;
  */
 public final class FuncRef extends Single {
   /** Function to resolve this reference. */
-  private final QueryFunction<QueryContext, Expr> resolve;
-
-  /**
-   * Constructor for static function calls.
-   * @param name function name
-   * @param fb function builder
-   * @param hasImport indicates whether a module import for the function name's URI was present
-   */
-  public FuncRef(final QNm name, final FuncBuilder fb, final boolean hasImport) {
-    this(fb.info, qc -> Functions.get(name, fb, qc, hasImport));
-  }
-
-  /**
-   * Constructor for named function references.
-   * @param name function name
-   * @param arity function arity
-   * @param info input info (can be {@code null})
-   * @param hasImport indicates whether a module import for the function name's URI was present
-   */
-  public FuncRef(final QNm name, final int arity, final InputInfo info, final boolean hasImport) {
-    this(info, qc -> Functions.item(name, arity, false, info, qc, hasImport));
-  }
+  private final QuerySupplier<Expr> resolve;
 
   /**
    * Constructor.
-   * @param info input info (can be {@code null})
    * @param resolve function to resolve the reference
    */
-  private FuncRef(final InputInfo info, final QueryFunction<QueryContext, Expr> resolve) {
-    super(info, null, Types.ITEM_ZM);
+  public FuncRef(final QuerySupplier<Expr> resolve) {
+    super(null, null, Types.ITEM_ZM);
     this.resolve = resolve;
   }
 
   /**
    * Resolves the function reference.
-   * @param qc query context
    * @throws QueryException query exception
    */
-  public void resolve(final QueryContext qc) throws QueryException {
-    expr = resolve.apply(qc);
+  public void resolve() throws QueryException {
+    expr = resolve.get();
   }
 
   @Override

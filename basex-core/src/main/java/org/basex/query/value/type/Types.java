@@ -35,6 +35,9 @@ public final class Types {
   /** Zero or more xs:anyAtomicType. */
   public static final SeqType ANY_ATOMIC_TYPE_ZM = ANY_ATOMIC_TYPE.seqType(ZERO_OR_MORE);
 
+  /** Error. */
+  public static final SeqType ERROR_O = ERROR.seqType();
+
   /** Numeric. */
   public static final SeqType NUMERIC_O = NUMERIC.seqType();
   /** Zero or one numeric. */
@@ -112,6 +115,8 @@ public final class Types {
   public static final SeqType DATE_TIME_O = DATE_TIME.seqType();
   /** Zero or one date-time. */
   public static final SeqType DATE_TIME_ZO = DATE_TIME.seqType(ZERO_OR_ONE);
+  /** One date-time-stamp. */
+  public static final SeqType DATE_TIME_STAMP_O = DATE_TIME_STAMP.seqType();
   /** One time. */
   public static final SeqType TIME_O = TIME.seqType();
   /** Zero or one time. */

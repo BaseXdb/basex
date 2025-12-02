@@ -312,7 +312,7 @@ public abstract class XQMap extends XQStruct {
     forEach((key, value) -> {
       qc.checkStop();
       final Item k = (Item) kt.coerce(key, null, qc, cc, ii);
-      if(mb.contains(k)) throw typeError(this, mt.seqType(), ii);
+      if(mb.contains(k)) throw typeError(this, mt, ii);
       mb.put(k, vt.coerce(value, null, qc, cc, ii));
     });
     return mb.map();
@@ -342,12 +342,12 @@ public abstract class XQMap extends XQStruct {
       if(value != null) {
         mb.put(key, rf.seqType().coerce(value, null, qc, cc, ii));
       } else if(!rf.isOptional()) {
-        throw typeError(this, rt.seqType(), ii);
+        throw typeError(this, rt, ii);
       }
     }
     // add remaining values
     if(mb.size() < ms) {
-      if(!rt.isExtensible()) throw typeError(this, rt.seqType(), ii);
+      if(!rt.isExtensible()) throw typeError(this, rt, ii);
       forEach((key, value) -> {
         if(!mb.contains(key)) {
           qc.checkStop();
@@ -510,14 +510,18 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final void toString(final QueryString qs) {
-    final TokenBuilder tb = new TokenBuilder();
-    try {
-      forEach((key, value) -> {
-        if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
-      });
-    } catch(final QueryException ex) {
-      throw Util.notExpected(ex);
+    if(structSize() == 0) {
+      qs.token("{}");
+    } else {
+      final TokenBuilder tb = new TokenBuilder();
+      try {
+        forEach((key, value) -> {
+          if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
+        });
+      } catch(final QueryException ex) {
+        throw Util.notExpected(ex);
+      }
+      qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");
     }
-    qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");
   }
 }

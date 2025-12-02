@@ -31,9 +31,15 @@ public final class ChoiceItemType implements Type {
    * @param types alternative item types
    */
   public ChoiceItemType(final List<SeqType> types) {
-    this.types = types;
+    if(types.contains(Types.ERROR_O)) {
+      final ArrayList<SeqType> list = new ArrayList<>(types);
+      do { } while(list.remove(Types.ERROR_O));
+      this.types = list.isEmpty() ? types : list;
+    } else {
+      this.types = types;
+    }
     Type tp = null;
-    for(final SeqType st : types) {
+    for(final SeqType st : this.types) {
       tp = tp == null ? st.type : tp.union(st.type);
     }
     union = tp;
@@ -116,15 +122,15 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public Type intersect(final Type type) {
-    final ArrayList<Type> list = new ArrayList<>();
+    final ArrayList<SeqType> list = new ArrayList<>();
     for(final SeqType st : types) {
       final Type tp = type.intersect(st.type);
-      if(tp != null) list.add(tp);
+      if(tp != null) list.add(tp.seqType());
     }
     return switch(list.size()) {
       case 0 -> null;
-      case 1 -> list.get(0);
-      default -> new ChoiceItemType(types);
+      case 1 -> list.get(0).type;
+      default -> new ChoiceItemType(list);
     };
   }
 

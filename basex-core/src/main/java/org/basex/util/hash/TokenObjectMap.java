@@ -36,7 +36,7 @@ public final class TokenObjectMap<E> extends TokenSet {
    * Stores the specified key and value. If the key exists, the value is updated.
    * @param key key
    * @param value value
-   * @return old value
+   * @return old value (can be {@code null}
    */
   @SuppressWarnings("unchecked")
   public E put(final byte[] key, final E value) {

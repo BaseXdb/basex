@@ -227,8 +227,10 @@ public abstract class Formatter extends FormatUtil {
           case 'w':
             num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             // first week of month: fix value, according to ISO 8601
-            if(num == 0) num = new Dtm(new Dtm(date), new DTDur(date.day() * 24, 0),
-                false, info).toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
+            if(num == 0) {
+              num = new Dtm(new Dtm(date, AtomType.DATE_TIME, info), new DTDur(date.day() * 24, 0),
+                  false, info).toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
+            }
             err = tim;
             break;
           case 'H':

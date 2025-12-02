@@ -165,7 +165,7 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = APPLY;
 
     query(func.args(" true#0", " []"), true);
-    query(func.args(" count#1", " [(1, 2, 3)]"));
+    query(func.args(" count#1", " [ (1, 2, 3) ]"), 3);
     query(func.args(" string-join#1", " [ reverse(1 to 5) ! string() ]"), 54321);
     query("let $func := function($a, $b, $c) { $a + $b + $c } "
         + "let $args := [ 1, 2, 3 ] "
@@ -173,23 +173,23 @@ public final class FnModuleTest extends SandboxTest {
     query("for $a in 2 to 3 "
         + "let $f := function-lookup(#fn:concat, $a) "
         + "return " + func.args(" $f", " array { 1 to $a }"), "12\n123");
-    query(func.args(" false#0", " ['x']"), false);
-    error(func.args(" string-length#1", " [ ('a', 'b') ]"), INVCONVERT_X_X_X);
+    query(func.args(" false#0", " [ 'x' ]"), false);
+    error(func.args(" string-length#1", " [ ('a', 'b') ]"), INVTYPE_X);
 
     // no pre-evaluation (higher-order arguments), but type adjustment
     inline(true);
     check(func.args(" true#0", " []"), true, type(func, "xs:boolean"));
-    check(func.args(" count#1", " [1]"), 1, type(func, "xs:integer"));
-    check(func.args(" abs#1", " [1]"), 1, type(func, "xs:integer"));
-    check(func.args(" reverse#1", " [()]"), "", type(func, "empty-sequence()"));
+    check(func.args(" count#1", " [ 1 ]"), 1, type(func, "xs:integer"));
+    check(func.args(" abs#1", " [ 1 ]"), 1, type(func, "xs:integer"));
+    check(func.args(" reverse#1", " [ () ]"), "", type(func, "empty-sequence()"));
     check("(true#0, 1)[. instance of function(*)] ! " + func.args(" .", " []"), true,
         type(func, "item()*"));
 
     // code coverage tests
     query("string-length(" + func.args(" reverse#1", " ['a']") + ")", 1);
-    query(func.args(" true#0", " [1]"), true);
-    error(func.args(" concat#2", " ['x']"), APPLY_X_X);
-    error(func.args(" put#2", " [<_/>, '']"), FUNCUP_X);
+    query(func.args(" true#0", " [ 1 ]"), true);
+    error(func.args(" concat#2", " [ 'x' ]"), APPLY_X_X);
+    error(func.args(" put#2", " [ <_/>, '' ]"), FUNCUP_X);
   }
 
   /** Test method. */
@@ -220,8 +220,8 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" <?_ 1?>", " #a"), false, root(func));
     check(func.args(" <?_ 1?>", " true()"), false, root(func));
 
-    error(func.args(" ()", " <?_ 1?>"), EMPTYFOUND);
-    error(func.args(" <?_ 1?>", " ()"), EMPTYFOUND);
+    error(func.args(" ()", " <?_ 1?>"), INVTYPE_X);
+    error(func.args(" <?_ 1?>", " ()"), INVTYPE_X);
     error(func.args(" true#0", " 1"), FIATOMIZE_X);
     error(func.args(" 1", " true#0"), FIATOMIZE_X);
   }
@@ -278,10 +278,10 @@ public final class FnModuleTest extends SandboxTest {
 
     error(q2 + "?constructor(256)", FUNCCAST_X_X_X);
 
-    error(func.args(" ()"), EMPTYFOUND);
-    error(func.args(" []"), EMPTYFOUND);
+    error(func.args(" ()"), INVTYPE_X);
+    error(func.args(" []"), INVTYPE_X);
     error(func.args(" {}"), FIATOMIZE_X);
-    error(func.args(" [1, 2]"), SEQFOUND_X);
+    error(func.args(" [ 1, 2 ]"), INVTYPE_X);
   }
 
   /** Test method. */
@@ -722,7 +722,7 @@ public final class FnModuleTest extends SandboxTest {
     check("(<a><b/></a> ! (., *)) => sort() => reverse() => sort() => " + func.args(),
         "<a><b/></a>\n<b/>", empty(SORT), empty(REVERSE));
 
-    error(func.args(1), INVCONVERT_X_X_X);
+    error(func.args(1), INVTYPE_X);
   }
 
   /** Test method. */
@@ -887,7 +887,7 @@ public final class FnModuleTest extends SandboxTest {
     query("head(" + func.args(" (1, 2)", " fn($s as xs:integer+) { $s[2], $s[1] }",
         " fn($x, $p) { $p = 1 }") + ')', 2);
     error("head(" + func.args(" (1, 2)", " fn($s as xs:integer) { $s[2], 1 }",
-        " fn($x, $p) { $p = 1 }") + ')', INVCONVERT_X_X_X);
+        " fn($x, $p) { $p = 1 }") + ')', INVTYPE_X);
   }
 
   /** Test method. */
@@ -2078,7 +2078,7 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(" ('b', 'c', 'a', 1)"), ARGTYPE_X_X_X);
     error(func.args(" (2, 3, 1, 'a')"), ARGTYPE_X_X_X);
     error(func.args(" (false(), true(), false(), 1)"), ARGTYPE_X_X_X);
-    error(func.args(" 'x'", 1), INVCONVERT_X_X_X);
+    error(func.args(" 'x'", 1), INVTYPE_X);
   }
 
   /** Test method. */
@@ -2131,11 +2131,11 @@ public final class FnModuleTest extends SandboxTest {
     query(q2 + "?matches(<a>abc</a>)", true);
     query(q2 + "?constructor(attribute a {42})", "42");
 
-    error(func.args(" ()"), INVCONVERT_X_X_X);
-    error(func.args(" []"), INVCONVERT_X_X_X);
-    error(func.args(" {}"), INVCONVERT_X_X_X);
-    error(func.args(" [<x/>, <y/>]"), INVCONVERT_X_X_X);
-    error(func.args(" text { 'a' }"), INVCONVERT_X_X_X);
+    error(func.args(" ()"), INVTYPE_X);
+    error(func.args(" []"), INVTYPE_X);
+    error(func.args(" {}"), INVTYPE_X);
+    error(func.args(" [<x/>, <y/>]"), INVTYPE_X);
+    error(func.args(" text { 'a' }"), INVTYPE_X);
   }
 
   /** Test method. */
@@ -2280,7 +2280,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("42", " { 'method': 'tagsoup' }"), "<html><body>42</body></html>");
 
     error(func.args(42), STRBIN_X_X);
-    error(func.args("42", 42), INVCONVERT_X_X_X);
+    error(func.args("42", 42), INVTYPE_X);
     error(func.args("42", " { '1234': '' }"), INVALIDOPTION_X);
     error(func.args("42", " { 'heuristics': '5678' }"), INVALIDOPTION_X);
     error(func.args("42", " { 'heuristics': 'CHARDET' }"), BASEX_CLASSPATH_X_X);
@@ -2598,7 +2598,7 @@ public final class FnModuleTest extends SandboxTest {
 
     query("let $f := " + func.args(" dateTime#2", " {2: xs:time('00:00:00')}") + " return $f("
         + "xs:date('2025-03-01'))", "2025-03-01T00:00:00");
-    error(func.args(" string-length#1", " {1: 42}"), INVCONVERT_X_X_X);
+    error(func.args(" name#1", " {1: 42}"), INVTYPE_X);
   }
 
   /** Test method. */
@@ -2828,7 +2828,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" <a/>", wrap(2)), "<a/>\n<a/>");
 
     query(func.args(" 1[. = 1]", 2), "1\n1");
-    error(func.args(" <a/>", -1), INVCONVERT_X_X_X);
+    error(func.args(" <a/>", -1), INVTYPE_X);
 
     check(func.args(" <a/>", 0), "", empty());
     check(func.args(" ()", wrap(2)), "", empty());
@@ -3210,8 +3210,12 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = STRING_LENGTH;
     query(func.args(" ()"), 0);
     query(func.args("A"), 1);
+    query(func.args(111), 3);
+    query(func.args(" ([ (), 'a' ])"), 1);
+
     query("<_>A</_>[" + func.args() + ']', "<_>A</_>");
-    query(func.args(" ([()], 'a')"), 1);
+    query("<_>A</_>[" + func.args(" .") + ']', "<_>A</_>");
+
     error("true#0[" + func.args() + ']', FIATOMIZE_X);
   }
 
@@ -3455,7 +3459,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" -3037000500 to 3037000500"), 0);
     query(func.args(" ()", " ()"), "");
     query(func.args(1, "x"), 1);
-    error(func.args(" ()", " (1, 2)"), SEQFOUND_X);
+    error(func.args(" ()", " (1, 2)"), INVTYPE_X);
 
     query(func.args(" (1, 3, 5)"), 9);
     query(func.args(" (-3, -1, 1, 3)"), 0);
@@ -3746,7 +3750,7 @@ public final class FnModuleTest extends SandboxTest {
     query("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
         " fn($s as xs:integer+) { $s[2], $s[1] }") + ')', 2);
     error("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
-        " fn($s as xs:integer) { $s[2], 1 }") + ')', INVCONVERT_X_X_X);
+        " fn($s as xs:integer) { $s[2], 1 }") + ')', INVTYPE_X);
   }
 
   /** Test method. */

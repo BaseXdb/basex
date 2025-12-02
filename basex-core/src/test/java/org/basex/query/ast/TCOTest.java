@@ -143,4 +143,23 @@ public final class TCOTest extends SandboxTest {
 
         42);
   }
+
+  /** Checks if static type xs:error affects tail call optimization. */
+  @Test public void typeCheckOnFnError() {
+    check("declare function local:sum($result, $values) as xs:integer\n"
+        + "{\n"
+        + "  if (empty($values)) then\n"
+        + "    $result\n"
+        + "  else\n"
+        + "    let $head := head($values)\n"
+        + "    return\n"
+        + "      if ($head instance of xs:integer) then\n"
+        + "        local:sum($result + $head, tail($values))\n"
+        + "      else\n"
+        + "        fn:error() cast as xs:error\n"
+        + "};\n"
+        + "local:sum(0, 1 to 100000)", 5000050000L,
+        exists(Util.className(StaticFuncCall.class) + "[@tailCall eq 'true']")
+    );
+  }
 }

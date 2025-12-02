@@ -105,10 +105,10 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_KEYS.args(), "key");
     query(_STORE_GET.args("key") + " => map:size()", 100000);
 
-    error(func.args("key", " true#0"), BASEX_STORE_X);
-    error(func.args("key", " [ function() { 123 } ]"), BASEX_STORE_X);
-    error(func.args("key", " { 0: concat(1, ?) }"), BASEX_STORE_X);
-    error(func.args("key", " Q{java.util.Random}new()"), BASEX_STORE_X);
+    error(func.args("key", " true#0"), BASEX_FUNCTION_X);
+    error(func.args("key", " [ function() { 123 } ]"), BASEX_FUNCTION_X);
+    error(func.args("key", " { 0: concat(1, ?) }"), BASEX_FUNCTION_X);
+    error(func.args("key", " Q{java.util.Random}new()"), BASEX_FUNCTION_X);
   }
 
   /** Test method. */

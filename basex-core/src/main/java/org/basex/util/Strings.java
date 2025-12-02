@@ -243,8 +243,8 @@ public final class Strings {
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
     }
-    return "Unknown encoding: " + Token.string(QueryError.similar(encoding,
-        Levenshtein.similar(Token.token(encoding), encodings()))) + '.';
+    return "Unknown encoding: " + QueryError.similar(encoding,
+        Levenshtein.similar(Token.token(encoding), encodings())) + '.';
   }
 
   /**
@@ -257,6 +257,16 @@ public final class Strings {
     if(!string.isEmpty())
       sb.append(Character.toUpperCase(string.charAt(0))).append(string.substring(1));
     return sb.toString();
+  }
+
+  /**
+   * Returns a regular English singular/plural form for the specified noun.
+   * @param noun noun
+   * @param n number of entries
+   * @return string
+   */
+  public static String plural(final String noun, final long n) {
+    return (n == 1) ? noun : noun + 's';
   }
 
   /**

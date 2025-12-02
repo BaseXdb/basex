@@ -7,6 +7,7 @@ import org.basex.build.csv.CsvOptions.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -28,7 +29,7 @@ public final class CsvW3Options extends CsvW3ArraysOptions {
   public CsvParserOptions finish(final InputInfo ii, final CsvFormat format) throws QueryException {
     final Value header = get(HEADER);
     if(!BOOLEAN_O.instance(header) && !STRING_ZM.instance(header))
-      throw typeError(header, STRING_OM, ii);
+      throw typeError(header, AtomType.STRING, ii);
 
     final CsvParserOptions copts = super.finish(ii, format);
     copts.set(CsvOptions.TRIM_ROWS, get(TRIM_ROWS));

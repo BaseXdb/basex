@@ -39,6 +39,7 @@ public interface Type {
     /** schema-attribute().       */ SCA(18),
 
     // item type
+    /** choice item type.         */ CIT(29),
     /** item().                   */ ITEM(32),
 
     // atomic types
@@ -96,9 +97,7 @@ public interface Type {
     /** xs:numeric.               */ NUM(84),
     /** java().                   */ JAVA(86),
     /** enum().                   */ ENM(87),
-
-    // item type
-    /** choice item type.         */ CIT(88),
+    /** xs:error.                 */ ERR(88),
 
     /** last dummy type.          */ LAST(89);
 
@@ -323,7 +322,7 @@ public interface Type {
    * @param qname name of type
    * @return info string
    */
-  static byte[] similar(final QNm qname) {
+  static String similar(final QNm qname) {
     final byte[] ln = Token.lc(qname.local());
 
     final TokenList list = new TokenList();

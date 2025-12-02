@@ -587,10 +587,10 @@ public final class RewritingsTest extends SandboxTest {
     check("(1, 2)[. != 0] ! (xs:byte(.)) ! (xs:integer(.) + 2)", "3\n4",
         count(Cast.class, 1), type(ArithSimple.class, "xs:integer"));
 
-    error("(if(" + wrap("!") + "= 'a') then 'b') cast as xs:string", INVCONVERT_X_X_X);
-    error("((1 to 1000000000) ! (. || 'x')) cast as xs:string", INVCONVERT_X_X_X);
-    error("() cast as xs:string", INVCONVERT_X_X_X);
-    error("(1 to 100000)[. < 3] cast as xs:integer", INVCONVERT_X_X_X);
+    error("(if(" + wrap("!") + "= 'a') then 'b') cast as xs:string", INVTYPE_X);
+    error("((1 to 1000000000) ! (. || 'x')) cast as xs:string", INVTYPE_X);
+    error("() cast as xs:string", INVTYPE_X);
+    error("(1 to 100000)[. < 3] cast as xs:integer", INVTYPE_X);
   }
 
   /** Type promotions. */
@@ -849,8 +849,8 @@ public final class RewritingsTest extends SandboxTest {
     check("data(string(<_/>)) instance of xs:string", true, root(Bln.class));
     check("data(xs:NMTOKENS(<_/>) ! xs:untypedAtomic(.)) instance of xs:untypedAtomic*",
         true, root(Bln.class));
-    error("data(data(" + wrap("a") + ") coerce to element(e))", INVCONVERT_X_X_X);
-    error("data(" + wrap("a") + "coerce to element(e))", INVCONVERT_X_X_X);
+    error("data(data(" + wrap("a") + ") coerce to element(e))", INVTYPE_X);
+    error("data(" + wrap("a") + "coerce to element(e))", INVTYPE_X);
   }
 
   /** Remove redundant atomizations. */
@@ -1012,13 +1012,13 @@ public final class RewritingsTest extends SandboxTest {
     check("(-128, 127) coerce to xs:byte+", "-128\n127",
         empty(TypeCheck.class), root(SmallSeq.class), count(Itr.class, 2));
 
-    error("<a/> coerce to empty-sequence()", INVCONVERT_X_X_X);
+    error("<a/> coerce to empty-sequence()", INVTYPE_X);
     error("(1, 128) coerce to xs:byte+", FUNCCAST_X_X_X);
   }
 
   /** Treat and coerce, error messages. */
   @Test public void gh1799() {
-    error("'a' coerce to node()", INVCONVERT_X_X_X);
+    error("'a' coerce to node()", INVTYPE_X);
     error("'a' treat as  node()", NOTREAT_X_X_X);
   }
 
@@ -1944,7 +1944,7 @@ public final class RewritingsTest extends SandboxTest {
         "<a/>", root(CElem.class));
     check("function() as element(xml:a)? { <xml:a/>/self::xml:* }()",
         "<xml:a/>", root(CElem.class));
-    error("function() as element(a)? { <xml:a/>/self::xml:a }()", INVCONVERT_X_X_X);
+    error("function() as element(a)? { <xml:a/>/self::xml:a }()", INVTYPE_X);
   }
 
   /** Axis followed by attribute step. */

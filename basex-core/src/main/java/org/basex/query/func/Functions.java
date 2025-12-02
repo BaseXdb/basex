@@ -256,7 +256,7 @@ public final class Functions {
    * @param qname name of type
    * @return info string
    */
-  static byte[] similar(final QNm qname) {
+  static String similar(final QNm qname) {
     // find similar function in several attempts
     final byte[] local = lc(qname.local()), uri = qname.uri();
 

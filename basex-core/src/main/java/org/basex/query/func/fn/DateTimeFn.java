@@ -1,6 +1,5 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.AtomType.*;
 
 import org.basex.query.*;
@@ -17,18 +16,6 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 abstract class DateTimeFn extends StandardFunc {
-  /**
-   * Checks if the specified item is a Duration item. If it is untyped, a duration is returned.
-   * @param item item to be checked
-   * @return duration
-   * @throws QueryException query exception
-   */
-  protected final Dur checkDur(final Item item) throws QueryException {
-    if(item instanceof final Dur dur) return dur;
-    if(item.type.isUntyped()) return new Dur(item.string(info), info);
-    throw typeError(item, DURATION, info);
-  }
-
   /**
    * Returns the timezone.
    * @param it input item

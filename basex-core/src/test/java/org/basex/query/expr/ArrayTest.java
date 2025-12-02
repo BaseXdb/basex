@@ -17,7 +17,7 @@ public final class ArrayTest extends SandboxTest {
   /** Constructor. */
   @Test public void squareConstructor() {
     query("[]", "[]");
-    query("[()]", "[()]");
+    query("[ () ]", "[()]");
     query("[ 1 ]", "[1]");
     query("[ 1, 2 ]", "[1,2]");
     query("[ 1 to 2 ]", "[(1,2)]");
@@ -48,7 +48,7 @@ public final class ArrayTest extends SandboxTest {
     query("[ 1, 2, 3 ]?([ 1 ])", 1);
     query("[ 1, 2, 3 ]?([ 1, 2 ])", "1\n2");
 
-    error("[1]?(string(<_>1</_>))", INVCONVERT_X_X_X);
+    error("[1]?(string(<_>1</_>))", INVTYPE_X);
 
     error("[](0)", ARRAYEMPTY);
     error("[](1)", ARRAYEMPTY);
@@ -78,8 +78,8 @@ public final class ArrayTest extends SandboxTest {
     query("[[ 8 ]] div 5", 1.6);
     query("[[ 9 ]] mod [[ 5 ]]", 4);
 
-    error("[ 1, 2 ] + 3", SEQFOUND_X);
-    error("1 + [ 2, 3 ]", SEQFOUND_X);
+    error("[ 1, 2 ] + 3", INVTYPE_X);
+    error("1 + [ 2, 3 ]", INVTYPE_X);
   }
 
   /** Value comparison. */
@@ -95,8 +95,8 @@ public final class ArrayTest extends SandboxTest {
     query("[[ 9 ]] le 5", false);
     query("[[ 10 ]] ge 6", true);
 
-    error("[ 1, 2 ] eq 3", SEQFOUND_X);
-    error("1 eq [ 2, 3 ]", SEQFOUND_X);
+    error("[ 1, 2 ] eq 3", INVTYPE_X);
+    error("1 eq [ 2, 3 ]", INVTYPE_X);
 
     query("[] eq <a>a</a>", "");
     query("not([] eq 'a')", true);
@@ -124,33 +124,33 @@ public final class ArrayTest extends SandboxTest {
   /** Element constructor. */
   @Test public void elementConstructor() {
     query("element a { [] }", "<a/>");
-    query("element a { [()] }", "<a/>");
+    query("element a { [ () ] }", "<a/>");
     query("element a { [ 1 ] }", "<a>1</a>");
     query("element a { [ <b>c</b> ] }", "<a><b>c</b></a>");
     query("element a { [ <b>c</b>, <b>d</b> ] }", "<a><b>c</b><b>d</b></a>");
 
     query("element { [ 'a' ] } {}", "<a/>");
 
-    error("element { [ 'a', 'b' ] } {}", SEQFOUND_X);
+    error("element { [ 'a', 'b' ] } {}", INVTYPE_X);
     error("element { [] } {}", STRQNM_X_X);
   }
 
   /** Attribute constructor. */
   @Test public void attributeConstructor() {
     query("<e a='{ [] }'/>/@a/string()", "");
-    query("<e a='{ [()] }'/>/@a/string()", "");
+    query("<e a='{ [ () ] }'/>/@a/string()", "");
     query("<e a='{ [ 1 ] }'/>/@a/string()", 1);
     query("<e a='{ [ 1 to 2 ] }'/>/@a/string()", "1 2");
     query("<e a='{ array { 1 to 2 } }'/>/@a/string()", "1 2");
 
     query("attribute a { [] }/string()", "");
-    query("attribute a { [()] }/string()", "");
+    query("attribute a { [ () ] }/string()", "");
     query("attribute a { [ 1 ] }/string()", 1);
     query("attribute a { [ 1, 2 ] }/string()", "1 2");
 
     query("attribute { [ 'a' ] } {}/name()", "a");
 
-    error("attribute { [ 'a', 'b' ] } {}", SEQFOUND_X);
+    error("attribute { [ 'a', 'b' ] } {}", INVTYPE_X);
     error("attribute { [] } {}", STRQNM_X_X);
   }
 
@@ -160,13 +160,13 @@ public final class ArrayTest extends SandboxTest {
     query("namespace a { [ 'b' ] }/string()", "b");
     query("namespace a { [ 'b', 'c' ] }/string()", "b c");
 
-    error("namespace { [ 'a', 'b' ] } { 'u' }", SEQFOUND_X);
+    error("namespace { [ 'a', 'b' ] } { 'u' }", INVTYPE_X);
   }
 
   /** Text constructor. */
   @Test public void textConstructor() {
     query("<e>{ [] }</e>/string()", "");
-    query("<e>{ [()] }</e>/string()", "");
+    query("<e>{ [ () ] }</e>/string()", "");
     query("<e>{ [ 1 ] }</e>/string()", 1);
     query("<e>{ [ 1, 2 ] }</e>/string()", "1 2");
   }
@@ -183,7 +183,7 @@ public final class ArrayTest extends SandboxTest {
     query("processing-instruction { [ 'a' ] } { [ 'b' ] }", "<?a b?>");
 
     error("processing-instruction { [] } {}", STRNCN_X_X);
-    error("processing-instruction { [ 'a', 'b' ] } {}", SEQFOUND_X);
+    error("processing-instruction { [ 'a', 'b' ] } {}", INVTYPE_X);
   }
 
   /** Group by clause. */
@@ -191,7 +191,7 @@ public final class ArrayTest extends SandboxTest {
     query("for $a in ('A', 'B') group by $b := [ 'a' ] return $a", "A\nB");
     query("for $a in ('A', 'B') group by $b := [] return $a", "A\nB");
 
-    error("for $a in ('A', 'B') group by $b := [ 'a', 'b' ] return $a", SEQFOUND_X);
+    error("for $a in ('A', 'B') group by $b := [ 'a', 'b' ] return $a", INVTYPE_X);
   }
 
   /** Order by clause. */
@@ -199,7 +199,7 @@ public final class ArrayTest extends SandboxTest {
     query("for $a in ('A', 'B') order by [ 'a' ] return $a", "A\nB");
     query("for $a in ('A', 'B') order by [] return $a", "A\nB");
 
-    error("for $a in ('A', 'B') order by [ 'a', 'b' ] return $a", SEQFOUND_X);
+    error("for $a in ('A', 'B') order by [ 'a', 'b' ] return $a", INVTYPE_X);
   }
 
   /** Switch expression. */
@@ -209,7 +209,7 @@ public final class ArrayTest extends SandboxTest {
     query("for $a in ('a', [ 'a' ]) " +
         "return switch($a) case 'a' return 'a' default return 'b'", "a\na");
 
-    error("switch([ 'a', 'b' ]) case 'a' return 'a' default return 'b'", SEQFOUND_X);
+    error("switch([ 'a', 'b' ]) case 'a' return 'a' default return 'b'", INVTYPE_X);
   }
 
   /** Cast expression. */
@@ -217,8 +217,8 @@ public final class ArrayTest extends SandboxTest {
     query("[] cast as xs:integer?", "");
     query("xs:integer([ 1 ])", 1);
 
-    error("[] cast as xs:integer", INVCONVERT_X_X_X);
-    error("[ 1, 2 ] cast as xs:integer", INVCONVERT_X_X_X);
+    error("[] cast as xs:integer", INVTYPE_X);
+    error("[ 1, 2 ] cast as xs:integer", INVTYPE_X);
   }
 
   /** Functions. */

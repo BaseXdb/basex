@@ -74,7 +74,7 @@ public final class UpdateModuleTest extends SandboxTest {
     query(func.args(" ('x', 'y')"), "x\ny");
     query(func.args(" <a/>"), "<a/>");
     error(func.args("x") + ", 1", UPALL);
-    error(func.args(" count#1"), BASEX_STORE_X);
+    error(func.args(" count#1"), BASEX_FUNCTION_X);
     error("copy $c := <a/> modify " + func.args("x") + " return $c", BASEX_UPDATE);
   }
 }

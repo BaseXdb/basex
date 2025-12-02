@@ -396,6 +396,18 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Checks if the specified item is a Duration item. If it is untyped, a duration is returned.
+   * @param item item to be checked
+   * @return duration
+   * @throws QueryException query exception
+   */
+  protected final Dur toDur(final Item item) throws QueryException {
+    if(item instanceof final Dur dur) return dur;
+    if(item.type.isUntyped()) return new Dur(item.string(info), info);
+    throw typeError(item, AtomType.DURATION, info);
+  }
+
+  /**
    * Evaluates an expression to a collation.
    * @param expr expression
    * @param qc query context
@@ -564,7 +576,7 @@ public abstract class StandardFunc extends Arr {
     Item item = expr.item(qc, info);
     if(empty && item.isEmpty()) return null;
     if(!(item instanceof ANode)) item = item.atomItem(qc, info);
-    if(item.isEmpty()) throw EMPTYFOUND.get(info);
+    if(item.isEmpty()) throw typeError(item, AtomType.ITEM, info);
     return item;
   }
 

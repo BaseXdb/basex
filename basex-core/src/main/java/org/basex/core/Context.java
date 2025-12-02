@@ -48,6 +48,8 @@ public final class Context {
   public final Locking locking;
   /** Key/value store. */
   public final Store store;
+  /** Cache. */
+  public final Cache cache;
 
   /** External objects (HTTP context, HTTP requests). */
   private final HashSet<Object> external;
@@ -116,6 +118,7 @@ public final class Context {
     log = ctx.log;
     jobs = ctx.jobs;
     store = ctx.store;
+    cache = ctx.cache;
     external = new HashSet<>(ctx.external);
   }
 
@@ -138,6 +141,7 @@ public final class Context {
     jobs = new JobPool(soptions);
     external = new HashSet<>();
     store = new Store(this);
+    cache = new Cache(this);
     client = null;
   }
 

@@ -1,0 +1,125 @@
+package org.basex.query.func;
+
+import static org.basex.query.QueryError.*;
+import static org.basex.query.func.Function.*;
+
+import org.basex.*;
+import org.junit.jupiter.api.*;
+
+/**
+ * This class tests the functions of the Cache Module.
+ *
+ * @author BaseX Team, BSD License
+ * @author Christian Gruen
+ */
+public final class CacheModuleTest extends SandboxTest {
+  /** Initializes a test. */
+  @BeforeEach public void initTest() {
+    final Function clear = _CACHE_CLEAR;
+    query(clear.args());
+  }
+
+  /** Test method. */
+  @Test public void clear() {
+    final Function func = _CACHE_CLEAR;
+    query(_CACHE_PUT.args("key", "CLEAR"));
+    query(_CACHE_PUT.args("key", "CLEAR", "cache"));
+    query(_CACHE_NAMES.args() + " => count()", 2);
+    query(func.args());
+    query(_CACHE_NAMES.args() + " => count()", 1);
+  }
+
+  /** Test method. */
+  @Test public void get() {
+    final Function func = _CACHE_GET;
+    query(func.args("key"), "");
+
+    // test expiration of cache entries
+    query(_CACHE_PUT.args("key", "GET"));
+    query(func.args("key"), "GET");
+    query(_CACHE_PUT.args("key", "specific", "cache"));
+    query(func.args("key"), "GET");
+    query(func.args("key", ""), "GET");
+    query(func.args("key", "cache"), "specific");
+  }
+
+  /** Test method. */
+  @Test public void getOrPut() {
+    final Function func = _CACHE_GET_OR_PUT;
+    query(_CACHE_GET.args("key"), "");
+    query(func.args("key", " function() { 'GET-OR-PUT' }"), "GET-OR-PUT");
+    query(_CACHE_GET.args("key"), "GET-OR-PUT");
+    query(_CACHE_SIZE.args(), 1);
+    query(func.args("key", " function() { 'NOT' + 'INVOKED' }"), "GET-OR-PUT");
+    query(_CACHE_GET.args("key"), "GET-OR-PUT");
+    query(_CACHE_SIZE.args(), 1);
+  }
+
+  /** Test method. */
+  @Test public void names() {
+    final Function func = _CACHE_NAMES;
+    query(_CACHE_PUT.args("key", "NAMES"));
+    query(func.args(), "");
+    query(_CACHE_PUT.args("key", "NAMES", "cache"));
+    query(func.args(), "\ncache");
+  }
+
+  /** Test method. */
+  @Test public void put() {
+    final Function func = _CACHE_PUT;
+    query(func.args("key", "PUT"), "");
+    query(_CACHE_GET.args("key"), "PUT");
+    query(_CACHE_SIZE.args(), 1);
+    query(func.args("key", " ()"), "");
+    query(_CACHE_GET.args("key"), "");
+    query(_CACHE_SIZE.args(), 1);
+    query(func.args("key", " map:merge((1 to 100000) ! map:entry(., .))"), "");
+    query(_CACHE_SIZE.args(), 1);
+    query(_CACHE_GET.args("key") + " => map:size()", 100000);
+
+    query(func.args("key", "PUT"));
+    query(func.args("key", "PUT1", "cache1"));
+    query(func.args("key", "PUT2", "cache2"));
+    query(_CACHE_GET.args("key"), "PUT");
+    query(_CACHE_GET.args("key", ""), "PUT");
+    query(_CACHE_GET.args("key", "cache1"), "PUT1");
+    query(_CACHE_GET.args("key", "cache2"), "PUT2");
+
+    error(func.args("error", " true#0"), BASEX_FUNCTION_X);
+    error(func.args("error", " [ function() { 123 } ]"), BASEX_FUNCTION_X);
+    error(func.args("error", " { 0: concat(1, ?) }"), BASEX_FUNCTION_X);
+    error(func.args("error", " Q{java.util.Random}new()"), BASEX_FUNCTION_X);
+  }
+
+  /** Test method. */
+  @Test public void remove() {
+    final Function func = _CACHE_REMOVE;
+    query(_CACHE_PUT.args("key", "REMOVE"));
+    query(_CACHE_SIZE.args(), 1);
+    query(func.args(), "");
+    query(_CACHE_SIZE.args(), 0);
+
+    query(_CACHE_PUT.args("key", "REMOVE"));
+    query(func.args(""), "");
+    query(_CACHE_SIZE.args(), 0);
+
+    query(_CACHE_PUT.args("key", "REMOVE", "cache"));
+    query(_CACHE_NAMES.args(), "cache");
+    query(func.args("cache"), "");
+    query(_CACHE_NAMES.args(), "");
+    query(_CACHE_SIZE.args("cache"), 0);
+  }
+
+  /** Test method. */
+  @Test public void size() {
+    final Function func = _CACHE_SIZE;
+    query(_CACHE_PUT.args("key", "SIZE"));
+    query(_CACHE_PUT.args("key1", "SIZE1", "cache"));
+    query(_CACHE_PUT.args("key2", "SIZE2", "cache"));
+
+    query(func.args(), 1);
+    query(func.args(""), 1);
+    query(func.args("cache"), 2);
+    query(func.args("unknown"));
+  }
+}

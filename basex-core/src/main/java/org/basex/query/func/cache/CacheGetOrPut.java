@@ -1,4 +1,4 @@
-package org.basex.query.func.store;
+package org.basex.query.func.cache;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -11,16 +11,17 @@ import org.basex.query.value.item.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class StoreGetOrPut extends StoreFn {
+public final class CacheGetOrPut extends CacheFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final byte[] key = toToken(arg(0), qc);
+    final String key = toString(arg(0), qc);
     final FItem put = toFunction(arg(1), 0, qc);
+    final String name = toZeroString(arg(2), qc);
 
-    Value value = store(qc).get(key);
-    if(value.isEmpty()) {
+    Value value = cache(qc).get(key, name);
+    if(value == null) {
       value = invoke(put, new HofArgs(), qc);
-      store(key, value, qc);
+      cache(key, value, name, qc);
     }
     return value;
   }

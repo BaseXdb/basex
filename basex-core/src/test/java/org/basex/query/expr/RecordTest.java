@@ -94,13 +94,13 @@ public final class RecordTest extends SandboxTest {
         + "  { 'value':42, 'next': { 'value':43, 'next': { 'value': 44, 'next':() } } };\n"
         + "declare record list(value as item()*, next? as list);\n"
         + "$v",
-        INVCONVERT_X_X_X);
+        INVTYPE_X);
     // recursive RecordType.eq and RecordType.instanceOf
     error("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
         + "declare record list1(value, next? as list1);\n"
         + "declare record list2(value, next? as record(value as xs:string, next? as list2));\n"
         + "local:f2(fn($l as list1) as list2 { $l }, { 'value': 42, 'next': { 'value': 43 } })",
-        INVCONVERT_X_X_X);
+        INVTYPE_X);
   }
 
   /** Record constructor function. */
@@ -303,20 +303,20 @@ public final class RecordTest extends SandboxTest {
     query("let $m as record(a, b?, *) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1,\"c\":3}");
     query("let $m as record(b?, a, *) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1,\"c\":3}");
 
-    error("let $m as record(a) := {} return $m", INVCONVERT_X_X_X);
-    error("let $m as record(a?, b) := {} return $m", INVCONVERT_X_X_X);
-    error("let $m as record(a, b?) := {} return $m", INVCONVERT_X_X_X);
+    error("let $m as record(a) := {} return $m", INVTYPE_X);
+    error("let $m as record(a?, b) := {} return $m", INVTYPE_X);
+    error("let $m as record(a, b?) := {} return $m", INVTYPE_X);
 
-    error("let $m as record() := { 'a': 1 } return $m", INVCONVERT_X_X_X);
-    error("let $m as record(b) := { 'a': 1 } return $m", INVCONVERT_X_X_X);
-    error("let $m as record(b?) := { 'a': 1 } return $m", INVCONVERT_X_X_X);
-    error("let $m as record(b, *) := { 'a': 1 } return $m", INVCONVERT_X_X_X);
-    error("let $m as record(a?, b?) := { 'c': 3 } return $m", INVCONVERT_X_X_X);
-    error("let $m as record(a?, b) := { 'c': 3 } return $m", INVCONVERT_X_X_X);
-    error("let $m as record(a, b?) := { 'c': 3 } return $m", INVCONVERT_X_X_X);
-    error("let $m as record(c?, b) := { 'c': 3 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record() := { 'a': 1 } return $m", INVTYPE_X);
+    error("let $m as record(b) := { 'a': 1 } return $m", INVTYPE_X);
+    error("let $m as record(b?) := { 'a': 1 } return $m", INVTYPE_X);
+    error("let $m as record(b, *) := { 'a': 1 } return $m", INVTYPE_X);
+    error("let $m as record(a?, b?) := { 'c': 3 } return $m", INVTYPE_X);
+    error("let $m as record(a?, b) := { 'c': 3 } return $m", INVTYPE_X);
+    error("let $m as record(a, b?) := { 'c': 3 } return $m", INVTYPE_X);
+    error("let $m as record(c?, b) := { 'c': 3 } return $m", INVTYPE_X);
 
-    error("let $m as record(a) := { 'a': 1, 'b': 2 } return $m", INVCONVERT_X_X_X);
-    error("let $m as record(b) := { 'a': 1, 'b': 2 } return $m", INVCONVERT_X_X_X);
+    error("let $m as record(a) := { 'a': 1, 'b': 2 } return $m", INVTYPE_X);
+    error("let $m as record(b) := { 'a': 1, 'b': 2 } return $m", INVTYPE_X);
   }
 }

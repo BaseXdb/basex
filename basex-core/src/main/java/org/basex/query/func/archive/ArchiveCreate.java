@@ -17,6 +17,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -194,7 +195,7 @@ public class ArchiveCreate extends ArchiveFn {
     if(header instanceof final ANode node) {
       final byte[] value  = node.attribute(Q_LAST_MODIFIED);
       try {
-        if(value != null) return toMs(new Dtm(value, info), qc);
+        if(value != null) return toMs(new Dtm(value, AtomType.DATE_TIME, info), qc);
       } catch(final QueryException ex) {
         Util.debug(ex);
         throw ARCHIVE_TIMESTAMP_X.get(info, value);

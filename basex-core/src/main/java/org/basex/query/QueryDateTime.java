@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -37,7 +38,7 @@ public final class QueryDateTime {
     final String znm = zon.substring(0, 3), zns = zon.substring(3);
     time = new Tim(token(hms + znm + ':' + zns), null);
     date = new Dat(token(ymd + znm + ':' + zns), null);
-    datm = new Dtm(token(ymd + 'T' + hms + znm + ':' + zns), null);
+    datm = new Dtm(token(ymd + 'T' + hms + znm + ':' + zns), AtomType.DATE_TIME_STAMP, null);
     zone = new DTDur(Strings.toInt(znm), Strings.toInt(zns));
     nano = System.nanoTime();
   }

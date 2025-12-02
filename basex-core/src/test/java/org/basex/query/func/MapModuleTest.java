@@ -90,7 +90,7 @@ public final class MapModuleTest extends SandboxTest {
     error(func.args(input, empty, pos, " { 'duplicates': 'reject' }"),
         MERGE_DUPLICATE_X);
     error(func.args(input, empty, pos, " { 'duplicates': 'rejecting' }"),
-        INVCONVERT_X_X_X);
+        INVTYPE_X);
 
     check(func.args(empty) + " => map:keys()", "", empty());
     check(func.args(1) + " => map:keys()", 1, root(Itr.class));
@@ -151,8 +151,8 @@ public final class MapModuleTest extends SandboxTest {
 
     check(func.args(" <_>A</_>", 0), "{\"A\":0}", empty(CElem.class), root(XQSingletonMap.class));
 
-    error("exists(" + func.args(" ()", 2) + ')', EMPTYFOUND);
-    error("exists(" + func.args(" (1, 2)", 2) + ')', SEQFOUND_X);
+    error("exists(" + func.args(" ()", 2) + ')', INVTYPE_X);
+    error("exists(" + func.args(" (1, 2)", 2) + ')', INVTYPE_X);
   }
 
   /** Test method. */
@@ -182,7 +182,7 @@ public final class MapModuleTest extends SandboxTest {
     // function coercion: allow function with lower arity
     query(func.args(" { 1: 2 }", " true#0"), "{1:2}");
     // reject function with higher arity
-    error(func.args(" { 'abc': 'a', 'def': 'g' }", " substring#2"), INVCONVERT_X_X_X);
+    error(func.args(" { 'abc': 'a', 'def': 'g' }", " substring#2"), INVTYPE_X);
 
     query(func.args(" map:build(3 to 8)", " fn($k, $v, $p) { $p mod 5 = 0 }"), "{7:7}");
   }
@@ -364,7 +364,7 @@ public final class MapModuleTest extends SandboxTest {
     error(func.args(input, " { 'duplicates': 'reject' }"),
         MERGE_DUPLICATE_X);
     error(func.args(input, " { 'duplicates': 'rejecting' }"),
-        INVCONVERT_X_X_X);
+        INVTYPE_X);
 
     check(func.args(" {}") + " => map:keys()", "", empty());
     check(func.args(" { 1: 2 }") + " => map:keys()", 1, root(Itr.class));

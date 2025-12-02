@@ -15,6 +15,6 @@ public final class FnHoursFromDuration extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    return value.isEmpty() ? Empty.VALUE : Itr.get(checkDur(value).hour());
+    return value.isEmpty() ? Empty.VALUE : Itr.get(toDur(value).hour());
   }
 }

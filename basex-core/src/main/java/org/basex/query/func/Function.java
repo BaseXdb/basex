@@ -13,6 +13,7 @@ import org.basex.query.func.admin.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.func.array.*;
 import org.basex.query.func.bin.*;
+import org.basex.query.func.cache.*;
 import org.basex.query.func.client.*;
 import org.basex.query.func.convert.*;
 import org.basex.query.func.crypto.*;
@@ -173,7 +174,7 @@ public enum Function implements AFunction {
       params(), DATE_O, flag(NDT)),
   /** XQuery function. */
   CURRENT_DATETIME(FnCurrentDateTime::new, "current-dateTime()",
-      params(), DATE_TIME_O, flag(NDT)),
+      params(), DATE_TIME_STAMP_O, flag(NDT)),
   /** XQuery function. */
   CURRENT_TIME(FnCurrentTime::new, "current-time()",
       params(), TIME_O, flag(NDT)),
@@ -492,7 +493,7 @@ public enum Function implements AFunction {
       Records.SCHEMA_TYPE.get().seqType()),
   /** XQuery function. */
   NORMALIZE_SPACE(FnNormalizeSpace::new, "normalize-space([value])",
-      params(STRING_ZO), STRING_O),
+      params(ANY_ATOMIC_TYPE_ZO), STRING_O),
   /** XQuery function. */
   NORMALIZE_UNICODE(FnNormalizeUnicode::new, "normalize-unicode(value[,form])",
       params(STRING_ZO, STRING_ZO), STRING_O),
@@ -659,7 +660,7 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), STRING_O),
   /** XQuery function. */
   STRING_LENGTH(FnStringLength::new, "string-length([value])",
-      params(STRING_ZO), INTEGER_O),
+      params(ANY_ATOMIC_TYPE_ZO), INTEGER_O),
   /** XQuery function. */
   STRING_TO_CODEPOINTS(FnStringToCodepoints::new, "string-to-codepoints(value)",
       params(STRING_ZO), INTEGER_ZM),
@@ -720,7 +721,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), STRING_O),
   /** XQuery function. */
   UNIX_DATETIME(FnUnixDateTime::new, "unix-dateTime([value])",
-      params(INTEGER_ZO), DATE_TIME_O),
+      params(INTEGER_ZO), DATE_TIME_STAMP_O),
   /** XQuery function. */
   UNORDERED(FnUnordered::new, "unordered(input)",
       params(ITEM_ZM), ITEM_ZM),
@@ -1119,6 +1120,31 @@ public enum Function implements AFunction {
   _BIN_XOR(BinXor::new, "xor(binary1,binary2)",
       params(BINARY_ZO, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
 
+  // Cache Module
+
+  /** XQuery function. */
+  _CACHE_CLEAR(CacheClear::new, "clear()",
+      params(), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_GET(CacheGet::new, "get(key[,name])",
+      params(STRING_O, STRING_ZO), ITEM_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_GET_OR_PUT(CacheGetOrPut::new, "get-or-put(key,put[,name])",
+      params(STRING_O, FuncType.get(ITEM_ZM).seqType(), STRING_ZO),
+      ITEM_ZM, flag(HOF, NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_NAMES(CacheNames::new, "names()",
+      params(), STRING_ZM, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_PUT(CachePut::new, "put(key,value[,name])",
+      params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_REMOVE(CacheRemove::new, "remove([name])",
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), CACHE_URI, Perm.CREATE),
+  /** XQuery function. */
+  _CACHE_SIZE(CacheSize::new, "size([name])",
+      params(STRING_ZO), INTEGER_O, flag(NDT), CACHE_URI, Perm.CREATE),
+
   // Client Module
 
   /** XQuery function. */
@@ -1170,7 +1196,7 @@ public enum Function implements AFunction {
       params(INTEGER_O, INTEGER_O), STRING_O, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_INTEGER_TO_DATETIME(ConvertIntegerToDateTime::new, "integer-to-dateTime(value)",
-      params(INTEGER_O), DATE_TIME_O, CONVERT_URI),
+      params(INTEGER_O), DATE_TIME_STAMP_O, CONVERT_URI),
   /** XQuery function. */
   _CONVERT_INTEGER_TO_DAYTIME(ConvertIntegerToDayTime::new, "integer-to-dayTime(value)",
       params(INTEGER_O), DAY_TIME_DURATION_O, CONVERT_URI),
@@ -1430,7 +1456,7 @@ public enum Function implements AFunction {
       params(STRING_O), BOOLEAN_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_LAST_MODIFIED(FileLastModified::new, "last-modified(path)",
-      params(STRING_O), DATE_TIME_O, flag(NDT), FILE_URI, Perm.ADMIN),
+      params(STRING_O), DATE_TIME_STAMP_O, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_LINE_SEPARATOR(FileLineSeparator::new, "line-separator()",
       params(), STRING_O, FILE_URI),
