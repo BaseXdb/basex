@@ -145,8 +145,8 @@ public final class ModuleTest extends SandboxTest {
         + "', '" + o.path() + "') })", QueryError.MODULE_FOUND_OTHER_X_X);
   }
 
-  /** Tests visibility. */
-  @Test public void visibility() {
+  /** Tests variable visibility. */
+  @Test public void variableVisibility() {
     final IOFile sandbox = sandbox();
     final IOFile m = new IOFile(sandbox, "m.xqm");
     write(m, "module namespace m = 'm';\n"
