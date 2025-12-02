@@ -189,7 +189,7 @@ public class QueryParser extends InputParser {
       skipWs();
       final byte[] prefix = ncName(NONAME_X);
       wsCheck("=");
-      final byte[] uri = stringLiteral();
+      final byte[] uri = uriLiteral();
       if(uri.length == 0) throw error(NSMODURI);
 
       sc.module = new QNm(prefix, uri);
@@ -531,7 +531,7 @@ public class QueryParser extends InputParser {
   private void namespaceDecl() throws QueryException {
     final byte[] prefix = ncName(NONAME_X);
     wsCheck("=");
-    final byte[] uri = stringLiteral();
+    final byte[] uri = uriLiteral();
     if(sc.ns.staticURI(prefix) != null) throw error(DUPLNSDECL_X, prefix);
     sc.ns.add(prefix, uri, info());
     namespaces.put(prefix, uri);
@@ -567,7 +567,7 @@ public class QueryParser extends InputParser {
     final boolean elem = wsConsumeWs(ELEMENT);
     if(!elem && !wsConsumeWs(FUNCTION)) return false;
     wsCheck(NAMESPACE);
-    final byte[] uri = stringLiteral();
+    final byte[] uri = uriLiteral();
     if(eq(XML_URI, uri)) throw error(BINDXMLURI_X_X, uri, XML);
     if(eq(XMLNS_URI, uri)) throw error(BINDXMLURI_X_X, uri, XMLNS);
 
@@ -689,7 +689,7 @@ public class QueryParser extends InputParser {
   private boolean defaultCollationDecl() throws QueryException {
     if(!wsConsumeWs(COLLATION)) return false;
     if(!decl.add(COLLATION)) throw error(DUPLCOLL);
-    sc.collation = Collation.get(stringLiteral(), qc, info(), WHICHDEFCOLL_X);
+    sc.collation = Collation.get(uriLiteral(), qc, info(), WHICHDEFCOLL_X);
     return true;
   }
 
@@ -699,7 +699,7 @@ public class QueryParser extends InputParser {
    */
   private void baseURIDecl() throws QueryException {
     if(!decl.add(BASE_URI)) throw error(DUPLBASE);
-    sc.baseURI(string(stringLiteral()));
+    sc.baseURI(string(uriLiteral()));
   }
 
   /**
@@ -717,7 +717,7 @@ public class QueryParser extends InputParser {
       wsCheck(ELEMENT);
       wsCheck(NAMESPACE);
     }
-    final byte[] uri = stringLiteral();
+    final byte[] uri = uriLiteral();
     if(prefix != null && uri.length == 0) throw error(NSEMPTY);
     if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
     addLocations(new TokenList());
@@ -735,7 +735,7 @@ public class QueryParser extends InputParser {
       wsCheck("=");
     }
 
-    final byte[] uri = trim(stringLiteral());
+    final byte[] uri = uriLiteral();
     if(uri.length == 0) throw error(NSMODURI);
     if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
     if(moduleURIs.contains(token(uri))) throw error(DUPLMODULE_X, uri);
@@ -770,7 +770,7 @@ public class QueryParser extends InputParser {
     final boolean add = wsConsume(AT);
     if(add) {
       do {
-        final byte[] uri = stringLiteral();
+        final byte[] uri = uriLiteral();
         if(!Uri.get(uri).isValid() || IO.get(string(uri)) instanceof IOContent)
           throw error(INVURI_X, uri);
         list.add(uri);
@@ -1502,7 +1502,7 @@ public class QueryParser extends InputParser {
       if(least) wsCheck(LEAST);
     }
     final Collation coll = wsConsumeWs(COLLATION) ?
-      Collation.get(stringLiteral(), qc, info(), FLWORCOLL_X) : sc.collation;
+      Collation.get(uriLiteral(), qc, info(), FLWORCOLL_X) : sc.collation;
     return new OrderKey(info(), expr, desc, least, coll);
   }
 
@@ -1548,7 +1548,7 @@ public class QueryParser extends InputParser {
         by = ref;
       }
 
-      final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(stringLiteral(),
+      final Collation coll = wsConsumeWs(COLLATION) ? Collation.get(uriLiteral(),
           qc, info(), FLWORCOLL_X) : sc.collation;
       final GroupSpec spec = new GroupSpec(var.info, localVars.add(var), by, coll);
       if(specs == null) {
@@ -2888,6 +2888,15 @@ public class QueryParser extends InputParser {
       token.add(quote);
     }
     return token.toArray();
+  }
+
+  /**
+   * Parses the "URILiteral" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private byte[] uriLiteral() throws QueryException {
+    return normalize(stringLiteral());
   }
 
   /**
