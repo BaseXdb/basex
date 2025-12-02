@@ -27,7 +27,7 @@ public final class InspectFunctions extends StandardFunc {
     // returns all functions from the query context
     if(source == null) {
       final ValueBuilder vb = new ValueBuilder(qc);
-      for(final StaticFunc sf : qc.functions.funcs()) {
+      for(final StaticFunc sf : qc.functions) {
         if(!NSGlobal.reserved(sf.name.uri())) addItems(vb, sf, qc);
       }
       return vb.value(this);
@@ -40,7 +40,7 @@ public final class InspectFunctions extends StandardFunc {
 
     // cache existing functions
     final HashSet<StaticFunc> old = new HashSet<>();
-    Collections.addAll(old, qc.functions.funcs());
+    qc.functions.forEach(old::add);
 
     try {
       qc.parse(src.toString(), src.path());
@@ -51,7 +51,7 @@ public final class InspectFunctions extends StandardFunc {
 
     // collect new functions
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final StaticFunc sf : qc.functions.funcs()) {
+    for(final StaticFunc sf : qc.functions) {
       if(!old.contains(sf)) addItems(vb, sf, qc);
     }
     funcs = vb.value(this);
@@ -84,7 +84,7 @@ public final class InspectFunctions extends StandardFunc {
     for(int a = sf.minArity(); a <= sf.arity(); ++a) {
       final FuncBuilder fb = new FuncBuilder(sf.info, a, true);
       // safe cast (no context dependency, runtime evaluation)
-      vb.add((FuncItem) Functions.item(sf, fb, qc, true));
+      vb.add((FuncItem) Functions.item(sf, fb, qc));
     }
   }
 }

@@ -68,8 +68,6 @@ public class QueryParser extends InputParser {
       SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN, FUNCTION, GET, IF,
       ITEM, MAP, RECORD, SWITCH, TYPE, TYPESWITCH);
 
-  /** URIs of modules loaded by the current file. */
-  public final TokenSet moduleURIs = new TokenSet();
   /** Query context. */
   public final QueryContext qc;
   /** Static context. */
@@ -84,8 +82,6 @@ public class QueryParser extends InputParser {
   private final ArrayList<StaticVar> vars = new ArrayList<>();
   /** Parsed functions. */
   private final ArrayList<StaticFunc> funcs = new ArrayList<>();
-  /** Function references. */
-  private final ArrayList<FuncRef> funcRefs = new ArrayList<>();
   /** Types. */
   private final QNmMap<SeqType> declaredTypes = new QNmMap<>();
   /** Public types. */
@@ -161,7 +157,7 @@ public class QueryParser extends InputParser {
 
       final VarScope vs = localVars.popContext();
       final MainModule mm = new MainModule(expr, vs, sc);
-      mm.set(funcs, vars, publicTypes, moduleURIs, namespaces, options, moduleDoc);
+      mm.set(funcs, vars, publicTypes, sc.imports, namespaces, options, moduleDoc);
       finish(mm);
       check(mm);
       return mm;
@@ -211,7 +207,7 @@ public class QueryParser extends InputParser {
 
       qc.modStack.pop();
       final LibraryModule lm = new LibraryModule(sc);
-      lm.set(funcs, vars, publicTypes, moduleURIs, namespaces, options, moduleDoc);
+      lm.set(funcs, vars, publicTypes, sc.imports, namespaces, options, moduleDoc);
       return lm;
     } catch(final QueryException expr) {
       mark();
@@ -271,13 +267,6 @@ public class QueryParser extends InputParser {
     qnames.assignURI(this, 0);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
-
-    for(final FuncRef fr : funcRefs) fr.resolve();
-
-    if(qc.contextValue != null) {
-      final Expr ctx = qc.contextValue.expr;
-      if(!sc.mixUpdates && ctx.has(Flag.UPD)) throw error(UPCTX, ctx);
-    }
   }
 
   /**
@@ -288,14 +277,20 @@ public class QueryParser extends InputParser {
   private void check(final MainModule main) throws QueryException {
     // add record constructor functions for built-in record types
     for(final RecordType rt : Records.BUILT_IN.values()) {
-      if(qc.functions.get(rt.name(), rt.minFields()) == null) {
+      if(qc.functions.get(sc, rt.name(), rt.minFields()) == null) {
         declareRecordConstructor(rt, info());
       }
     }
 
-    // check function calls and variable references
-    qc.functions.check(qc);
+    // resolve function calls
+    qc.functions.resolve();
+    // check variable references
     qc.vars.check();
+
+    if(qc.contextValue != null) {
+      final Expr ctx = qc.contextValue.expr;
+      if(!sc.mixUpdates && ctx.has(Flag.UPD)) throw error(UPCTX, ctx);
+    }
 
     if(qc.updating) {
       // check updating semantics if updating expressions exist
@@ -738,8 +733,8 @@ public class QueryParser extends InputParser {
     final byte[] uri = trim(stringLiteral());
     if(uri.length == 0) throw error(NSMODURI);
     if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
-    if(moduleURIs.contains(token(uri))) throw error(DUPLMODULE_X, uri);
-    moduleURIs.add(uri);
+    if(sc.imports.contains(token(uri))) throw error(DUPLMODULE_X, uri);
+    sc.imports.add(uri);
 
     // add non-default namespace
     if(prefix != EMPTY) {
@@ -943,7 +938,9 @@ public class QueryParser extends InputParser {
     if(reserved(name)) throw error(RESERVED_X, name.local());
 
     wsCheck("(");
-    if(sc.module != null && !eq(name.uri(), sc.module.uri())) throw error(MODULENS_X, name);
+    if(!anns.contains(Annotation.PRIVATE)) {
+      if(sc.module != null && !eq(name.uri(), sc.module.uri())) throw error(MODULENS_X, name);
+    }
 
     localVars.pushContext(false);
     final Params params = paramList(true);
@@ -953,7 +950,7 @@ public class QueryParser extends InputParser {
     final byte[] uri = name.uri();
     if(NSGlobal.reserved(uri) || Functions.builtIn(name) != null)
       throw FNRESERVED_X.get(ii, name.string());
-    final StaticFunc func = qc.functions.declare(name, params, expr, anns, doc, vs, ii);
+    final StaticFunc func = qc.functions.declare(sc, name, params, expr, anns, doc, vs, ii);
     funcs.add(func);
   }
 
@@ -1079,7 +1076,8 @@ public class QueryParser extends InputParser {
     final Expr expr = new CRecord(ii, rt, args);
     final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
-    final StaticFunc func = qc.functions.declare(name, params, expr, rt.anns(), doc, vs, info());
+    final StaticFunc func = qc.functions.declare(sc, name, params, expr, rt.anns(), doc, vs,
+        info());
     funcs.add(func);
   }
 
@@ -2069,10 +2067,7 @@ public class QueryParser extends InputParser {
           expr = Functions.dynamic(ex, fb);
         } else  {
           final QNm funcName = name;
-          final boolean hasImport = moduleURIs.contains(funcName.uri());
-          final FuncRef ref = new FuncRef(() -> Functions.get(funcName, fb, qc, hasImport));
-          funcRefs.add(ref);
-          expr = ref;
+          expr = qc.functions.newRef(() -> Functions.get(funcName, fb, qc));
         }
         if(mapping) {
           expr = new GFLWOR(ii, fr, expr);
@@ -2747,10 +2742,7 @@ public class QueryParser extends InputParser {
         if(num instanceof final Itr itr) {
           final int i = (int) itr.itr();
           final InputInfo info = info();
-          final boolean hasImport = moduleURIs.contains(name.uri());
-          final FuncRef fr = new FuncRef(() -> Functions.item(name, i, false, info, qc, hasImport));
-          funcRefs.add(fr);
-          return fr;
+          return qc.functions.newRef(() -> Functions.item(name, i, false, info, qc));
         }
       }
     }
@@ -2975,10 +2967,7 @@ public class QueryParser extends InputParser {
       skipWs();
       if(current('(')) {
         final FuncBuilder fb = argumentList(true, null);
-        final boolean hasImport = moduleURIs.contains(name.uri());
-        final FuncRef fr = new FuncRef(() -> Functions.get(name, fb, qc, hasImport));
-        funcRefs.add(fr);
-        return fr;
+        return qc.functions.newRef(() -> Functions.get(name, fb, qc));
       }
     }
     pos = p;

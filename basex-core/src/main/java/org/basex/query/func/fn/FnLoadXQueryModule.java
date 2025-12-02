@@ -137,12 +137,12 @@ public final class FnLoadXQueryModule extends StandardFunc {
     }
 
     final QNmMap<Map<Integer, Expr>> funcs = new QNmMap<>();
-    for(final StaticFunc sf : mqc.functions.funcs()) {
+    for(final StaticFunc sf : mqc.functions) {
       if(sf.updating()) mqc.updating();
       if(!sf.anns.contains(Annotation.PRIVATE) && Token.eq(sf.name.uri(), modUri)) {
         for(int a = sf.minArity(); a <= sf.arity(); ++a) {
-          final FuncBuilder fb = new FuncBuilder(info, a, true);
-          final Expr item = Functions.item(sf, fb, mqc, true);
+          final FuncBuilder fb = new FuncBuilder(sf.info, a, true);
+          final Expr item = Functions.item(sf, fb, mqc);
           funcs.computeIfAbsent(sf.name, HashMap::new).put(a, item);
         }
       }

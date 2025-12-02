@@ -145,6 +145,59 @@ public final class ModuleTest extends SandboxTest {
         + "', '" + o.path() + "') })", QueryError.MODULE_FOUND_OTHER_X_X);
   }
 
+  /** Tests function visibility. */
+  @Test public void functionVisibility() {
+    final IOFile sandbox = sandbox();
+    final IOFile p = new IOFile(sandbox, "p.xqm");
+    write(p, "module namespace p = 'p';\n"
+        + "declare %private function p:x() {'module'};\n"
+        + "declare function p:f() {p:x()};");
+    final IOFile q1 = new IOFile(sandbox, "q1.xqm");
+    write(q1, "module namespace q = 'q';\n"
+        + "declare function q:f() {x()};");
+    final IOFile q2 = new IOFile(sandbox, "q2.xqm");
+    write(q2, "module namespace q = 'q';\n"
+        + "declare %private function x() {42};");
+    final IOFile r = new IOFile(sandbox, "r.xqm");
+    write(r, "module namespace r = 'r';\n"
+        + "declare function r:f() {\n"
+        + "  fn:divided-decimals-record(1, 2),\n"
+        + "  fn:divided-decimals-record#2(3, 4),\n"
+        + "  5 => fn:divided-decimals-record(6),\n"
+        + "  function-lookup(#fn:divided-decimals-record, 2)(7, 8)\n"
+        + "};");
+    final IOFile s = new IOFile(sandbox, "s.xqm");
+    write(s, "module namespace s = 's';\n"
+        + "import module 's' at '" + s.path() + "';\n"
+        + "declare function s:f() {s:x()};");
+
+    // private function does not clash with the same name in another module
+    query("import module namespace p = 'p' at '" + p.path() + "';\n"
+        + "declare function p:x() {'main'};\n"
+        + "p:f(), p:x()", "module\nmain");
+
+    // private function is visible throughout module, even in different file
+    query("import module namespace q = 'q' at '" + q1.path() + "', '" + q2.path() + "';\n"
+        + "q:f()", 42);
+
+    // built-in record constructor visible in library module
+    query("import module namespace r = 'r' at '" + r.path() + "';\n"
+        + "r:f()",
+          "{\"quotient\":1,\"remainder\":2}\n"
+        + "{\"quotient\":3,\"remainder\":4}\n"
+        + "{\"quotient\":5,\"remainder\":6}\n"
+        + "{\"quotient\":7,\"remainder\":8}");
+
+    // private function reported as such
+    error("import module namespace p = 'p' at '" + p.path() + "';\n"
+        + "p:x()", QueryError.FUNCPRIVATE_X);
+
+    // function in main module is not visible in imported module
+    error("import module namespace s = 's' at '" + s.path() + "';\n"
+        + "declare function s:x() {42};\n"
+        + "s:f()", QueryError.WHICHFUNC_X);
+  }
+
   /** Tests rejection of functions and variables, when their modules are not explicitly imported. */
   @Test public void gh2048() {
     final IOFile sandbox = sandbox();
@@ -157,13 +210,11 @@ public final class ModuleTest extends SandboxTest {
         + "};\n"
         + "declare variable $c:hello := 'can you see me now';");
 
-    // function is still visible to fn:function-lookup
+    // function is not visible to fn:function-lookup (not in dynamically known function definitions)
     query("import module namespace b = 'b'  at '" + b.path() + "';\n"
-        + "declare namespace c = 'c';\n"
-        + "fn:function-lookup(xs:QName('c:hello'), 0)()", "can you see me now");
+        + "fn:function-lookup(#Q{c}hello, 0)", "");
     // function is still visible to inspect:functions
     query("import module namespace b  = 'b'  at '" + b.path() + "';\n"
-        + "declare namespace c = 'c';\n"
         + "inspect:functions()", "Q{c}hello#0");
 
     error("import module namespace b = 'b'  at '" + b.path() + "';\n"
