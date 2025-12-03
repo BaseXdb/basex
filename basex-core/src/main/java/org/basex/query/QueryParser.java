@@ -743,9 +743,14 @@ public class QueryParser extends InputParser {
 
     // add non-default namespace
     if(prefix != EMPTY) {
-      if(sc.ns.staticURI(prefix) != null) throw error(DUPLNSDECL_X, prefix);
-      sc.ns.add(prefix, uri, info());
-      namespaces.put(prefix, uri);
+      final byte[] su = sc.ns.staticURI(prefix);
+      if(su == null) {
+        sc.ns.add(prefix, uri, info());
+        namespaces.put(prefix, uri);
+      } else {
+        final byte[] mu = sc.module == null ? null : sc.module.uri();
+        if(!Token.eq(su, uri) || !Token.eq(mu, uri)) throw error(DUPLNSDECL_X, prefix);
+      }
     }
 
     // check modules at specified locations
