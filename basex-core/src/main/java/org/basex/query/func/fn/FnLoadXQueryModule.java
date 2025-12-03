@@ -64,9 +64,9 @@ public final class FnLoadXQueryModule extends StandardFunc {
     } else {
       final StringList locs = new StringList().add(hints);
       if(locs.isEmpty()) {
-        final byte[] loc = qc.modDeclared.get(modUri);
-        if(loc != null) {
-          locs.add(Token.string(loc));
+        final TokenList files = qc.modDeclared.get(modUri);
+        if(files != null) {
+          for(final byte[] file : files) locs.add(Token.string(file));
         } else {
           final String path = repoFilePath(modUri, qc.context);
           if(path != null) locs.add(path);

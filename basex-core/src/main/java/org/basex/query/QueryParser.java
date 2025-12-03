@@ -752,8 +752,8 @@ public class QueryParser extends InputParser {
     final ModInfo mi = new ModInfo();
     if(!addLocations(mi.paths)) {
       // check module files that have been pre-declared by a test API
-      final byte[] pth = qc.modDeclared.get(uri);
-      if(pth != null) mi.paths.add(pth);
+      final TokenList pths = qc.modDeclared.get(uri);
+      if(pths != null) pths.forEach(mi.paths::add);
     }
     mi.uri = uri;
     mi.info = info();
