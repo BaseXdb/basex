@@ -13,6 +13,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
+import org.basex.util.list.*;
 
 /**
  * This class is an entry point for evaluating XQuery strings.
@@ -217,7 +218,7 @@ public final class QueryProcessor extends Job implements Closeable {
    * @param file file name
    */
   public void module(final String uri, final String file) {
-    qc.modDeclared.put(token(uri), token(file));
+    qc.modDeclared.computeIfAbsent(token(uri), TokenList::new).add(token(file));
   }
 
   @Override
