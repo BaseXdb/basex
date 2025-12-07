@@ -118,7 +118,7 @@ public final class QueryContext extends Job implements Closeable {
   /** Parsed modules, containing the file path and library module. */
   public final TokenObjectMap<LibraryModule> libs = new TokenObjectMap<>();
   /** Pre-declared modules, containing module URI and their file paths (required for test APIs). */
-  public final TokenObjectMap<byte[]> modDeclared = new TokenObjectMap<>();
+  public final TokenObjectMap<TokenList> modDeclared = new TokenObjectMap<>();
   /** Stack of module files that are currently parsed. */
   public final TokenList modStack = new TokenList();
 

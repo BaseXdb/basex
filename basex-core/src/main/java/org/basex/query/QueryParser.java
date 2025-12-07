@@ -743,17 +743,22 @@ public class QueryParser extends InputParser {
 
     // add non-default namespace
     if(prefix != EMPTY) {
-      if(sc.ns.staticURI(prefix) != null) throw error(DUPLNSDECL_X, prefix);
-      sc.ns.add(prefix, uri, info());
-      namespaces.put(prefix, uri);
+      final byte[] su = sc.ns.staticURI(prefix);
+      if(su == null) {
+        sc.ns.add(prefix, uri, info());
+        namespaces.put(prefix, uri);
+      } else {
+        final byte[] mu = sc.module == null ? null : sc.module.uri();
+        if(!Token.eq(su, uri) || !Token.eq(mu, uri)) throw error(DUPLNSDECL_X, prefix);
+      }
     }
 
     // check modules at specified locations
     final ModInfo mi = new ModInfo();
     if(!addLocations(mi.paths)) {
       // check module files that have been pre-declared by a test API
-      final byte[] pth = qc.modDeclared.get(uri);
-      if(pth != null) mi.paths.add(pth);
+      final TokenList pths = qc.modDeclared.get(uri);
+      if(pths != null) pths.forEach(mi.paths::add);
     }
     mi.uri = uri;
     mi.info = info();
