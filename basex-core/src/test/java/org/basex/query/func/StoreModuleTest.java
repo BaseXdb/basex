@@ -41,6 +41,16 @@ public final class StoreModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void close() {
+    final Function func = _STORE_CLOSE;
+    query(_STORE_PUT.args("key", "RESET"));
+    query(_STORE_PUT.args("key", "RESET", "cache"));
+    query(func.args(), "");
+    query(_STORE_GET.args("key"), "RESET");
+    query(_STORE_GET.args("key", "cache"), "RESET");
+  }
+
+  /** Test method. */
   @Test public void delete() {
     final Function func = _STORE_DELETE;
     query(_STORE_PUT.args("key", "value"));
@@ -162,6 +172,11 @@ public final class StoreModuleTest extends SandboxTest {
     query(func.args("READ"));
     query(_STORE_KEYS.args(), "key");
 
+    query(_STORE_PUT.args("key", "READ", "NEW"));
+    query(_STORE_KEYS.args("NEW"), "key");
+    query(func.args("NEW"));
+    query(_STORE_KEYS.args("NEW"), "");
+
     // invalid names
     for(final char ch : INVALID) error(func.args(ch), STORE_NAME_X);
   }
@@ -178,18 +193,6 @@ public final class StoreModuleTest extends SandboxTest {
     query(_STORE_LIST.args() + "=> count()", 1);
     query(func.args("key", "cache"), "");
     query(_STORE_LIST.args() + "=> count()", 0);
-  }
-
-  /** Test method. */
-  @Test public void reset() {
-    final Function func = _STORE_RESET;
-    query(_STORE_PUT.args("key", "RESET"));
-    query(_STORE_PUT.args("key", "RESET", "cache"));
-    query(_STORE_GET.args("key"), "RESET");
-    query(_STORE_GET.args("key", "cache"), "RESET");
-    query(func.args(), "");
-    query(_STORE_GET.args("key"), "RESET");
-    query(_STORE_GET.args("key", "cache"), "RESET");
   }
 
   /** Test method. */

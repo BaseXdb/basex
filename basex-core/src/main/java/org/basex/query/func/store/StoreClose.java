@@ -10,10 +10,12 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class StoreReset extends StoreFn {
+public final class StoreClose extends StoreFn {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    stores(qc).reset(info);
+    final String name = toName(arg(0), qc);
+
+    stores(qc).close(name, info);
     return Empty.VALUE;
   }
 }

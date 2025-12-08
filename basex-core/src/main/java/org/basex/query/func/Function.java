@@ -1822,8 +1822,11 @@ public enum Function implements AFunction {
   _STORE_CLEAR(StoreClear::new, "clear()",
       params(), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
+  _STORE_CLOSE(StoreClose::new, "close([name])",
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+  /** XQuery function. */
   _STORE_DELETE(StoreDelete::new, "delete([name])",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
   _STORE_GET(StoreGet::new, "get(key[,name])",
       params(STRING_O, STRING_ZO), ITEM_ZM, flag(NDT), STORE_URI, Perm.CREATE),
@@ -1841,16 +1844,13 @@ public enum Function implements AFunction {
       params(STRING_O, ITEM_ZM, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
   _STORE_READ(StoreRead::new, "read([name])",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
   _STORE_REMOVE(StoreRemove::new, "remove(key[,name])",
       params(STRING_O, STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
   /** XQuery function. */
-  _STORE_RESET(StoreReset::new, "reset()",
-      params(), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
-  /** XQuery function. */
   _STORE_WRITE(StoreWrite::new, "write([name])",
-      params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
+      params(STRING_ZO), EMPTY_SEQUENCE_Z, flag(NDT), STORE_URI, Perm.CREATE),
 
   // Strings Module
 

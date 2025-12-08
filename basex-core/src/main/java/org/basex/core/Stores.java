@@ -122,19 +122,18 @@ public final class Stores implements Closeable {
   }
 
   /**
-   * Resets the stores.
+   * Closes a store.
+   * @param name name of store
    * @param info input info
    * @throws QueryException query exception
    */
-  public synchronized void reset(final InputInfo info) throws QueryException {
-    for(final String name : stores.keySet()) {
-      try {
-        writeStore(name, false);
-      } catch(final IOException | QueryException ex) {
-        throw STORE_IO_X.get(info, ex);
-      }
+  public synchronized void close(final String name, final InputInfo info) throws QueryException {
+    try {
+      writeStore(name, false);
+    } catch(final IOException ex) {
+      throw STORE_IO_X.get(info, ex);
     }
-    stores.clear();
+    stores.remove(name);
   }
 
   /**
@@ -164,8 +163,8 @@ public final class Stores implements Closeable {
       throws QueryException {
     if(storeFile(name).exists()) {
       readStore(name, info, qc);
-    } else if(standardStore(name)) {
-      stores.remove("");
+    } else {
+      stores.remove(name);
     }
   }
 
@@ -186,17 +185,9 @@ public final class Stores implements Closeable {
   /**
    * Deletes a store.
    * @param name name of store
-   * @param info input info
-   * @param qc query context
-   * @throws QueryException query exception
    */
-  public synchronized void delete(final String name, final InputInfo info,
-      final QueryContext qc) throws QueryException {
-    if(standardStore(name)) {
-      get(name, false, info, qc).map.clear();
-    } else {
-      stores.remove(name);
-    }
+  public synchronized void delete(final String name) {
+    stores.remove(name);
     storeFile(name).delete();
   }
 
