@@ -38,7 +38,8 @@ public final class SingletonSeq extends Seq {
   }
 
   /**
-   * Creates a value from the input stream. Called from {@link Stores#read(DataInput, QueryContext)}.
+   * Creates a value from the input stream.
+   * Called from {@link Stores#read(DataInput, QueryContext)}.
    * @param in data input
    * @param type type
    * @param qc query context
