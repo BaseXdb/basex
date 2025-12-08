@@ -35,6 +35,13 @@ public final class SimpleTest extends QueryTest {
       { "Double 7", booleans(true), "xs:double('-INF') < 0" },
       { "Double 8", "xs:double('-inf')" },
 
+      { "UnsignedLong 1", booleans(false), "xs:unsignedLong('3') eq 3.1"},
+      { "UnsignedLong 2", booleans(false), "3.1 eq xs:unsignedLong('3')"},
+      { "UnsignedLong 3", booleans(true), "xs:unsignedLong(3) lt 3.1"},
+      { "UnsignedLong 4", booleans(true), "3.1 gt xs:unsignedLong(3)"},
+      { "UnsignedLong 5", integers(1), "compare(3.1, xs:unsignedLong('3'))"},
+      { "UnsignedLong 6", integers(-1), "compare(xs:unsignedLong('3'), 3.1)"},
+
       { "Annotation 1", integers(1), "declare %local:x(.1) variable $a := 1; $a" },
       { "Annotation 2", integers(1), "declare %local:x(1.) variable $a := 1; $a" },
       { "Annotation 3", "declare %local:x(.) variable $a := 1; $a" },
