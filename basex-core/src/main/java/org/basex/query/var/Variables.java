@@ -5,26 +5,37 @@ import static org.basex.query.QueryError.*;
 import java.util.*;
 
 import org.basex.query.*;
+import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
- * Container of global variables of a module.
+ * Container of global variables of a query.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public final class Variables extends ExprInfo implements Iterable<StaticVar> {
-  /** The variables. */
-  private final QNmMap<VarEntry> vars = new QNmMap<>();
+  /**
+   * An unresolved variable reference.
+   * @param ref reference
+   * @param hasImport whether there was an import statement for the ref's URI
+   */
+  private record UnresolvedRef(StaticVarRef ref, boolean hasImport) { }
+  /** All unresolved variable references. */
+  private final ArrayList<UnresolvedRef> unresolvedRefs = new ArrayList<>();
+  /** The variables by declaring module. */
+  private final TokenObjectMap<QNmMap<StaticVar>> varsByModule = new TokenObjectMap<>();
 
   /**
-   * Declares a new static variable.
+   * Declares a new static variable in a given module.
    * @param var variable
+   * @param imports imported module URIs
    * @param expr bound expression, possibly {@code null}
    * @param anns annotations
    * @param external {@code external} flag
@@ -33,10 +44,29 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @return static variable reference
    * @throws QueryException query exception
    */
-  public StaticVar declare(final Var var, final Expr expr, final AnnList anns,
-      final boolean external, final VarScope vs, final String doc) throws QueryException {
+  public StaticVar declare(final Var var, final TokenSet imports, final Expr expr,
+      final AnnList anns, final boolean external, final VarScope vs, final String doc)
+      throws QueryException {
+
+    final byte[] modUri = QNm.uri(var.info.sc().module);
+    final byte[] varUri = var.name.uri();
+    if(!Token.eq(modUri, varUri)) {
+      if(modUri != Token.EMPTY && !anns.contains(Annotation.PRIVATE)) {
+        throw MODULENS_X.get(var.info, var);
+      }
+      if(imports.contains(varUri)) {
+        final StaticVar sv = get(var.name, varUri);
+        if(sv != null && !sv.anns.contains(Annotation.PRIVATE)) {
+          // variable already declared in imported module
+          throw VARDUPL_X.get(var.info, var.name.string());
+        }
+      }
+    }
+    final QNmMap<StaticVar> vars = varsByModule.computeIfAbsent(modUri, QNmMap::new);
+    if(vars.contains(var.name)) throw VARDUPL_X.get(var.info, var.name.string());
+
     final StaticVar sv = new StaticVar(var, expr, anns, external, vs, doc);
-    varEntry(var.name).setVar(sv);
+    vars.put(var.name, sv);
     return sv;
   }
 
@@ -45,30 +75,37 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    for(final VarEntry ve : vars.values()) ve.var.checkUp();
+    for(final StaticVar var : this) var.checkUp();
   }
 
   /**
-   * Checks if all variables were declared and are visible to all their references.
+   * Resolves all references and checks for existing and visible declarations.
    * @throws QueryException query exception
    */
-  public void check() throws QueryException {
-    for(final VarEntry ve : vars.values()) {
-      final StaticVar var = ve.var;
+  public void resolve() throws QueryException {
+    for(final UnresolvedRef ur : unresolvedRefs) {
+      final StaticVarRef ref = ur.ref;
+
+      // try to resolve the reference within the local module
+      final byte[] modUri = QNm.uri(ref.sc().module);
+      StaticVar var = get(ref.name, modUri);
+
       if(var == null) {
-        final StaticVarRef ref = ve.refs.get(0);
-        throw VARUNDEF_X.get(ref.info(), ref);
-      }
-      final QNm varMod = var.info.sc().module;
-      final byte[] varModUri = varMod == null ? Token.EMPTY : varMod.uri();
-      for(final StaticVarRef ref : ve.refs) {
-        if(!ref.hasImport) {
-          final QNm refMod = ref.info().sc().module;
-          final byte[] refModUri = refMod == null ? Token.EMPTY : refMod.uri();
-          if(!Token.eq(varModUri, refModUri))  throw INVISIBLEVAR_X.get(ref.info(), var.name);
+        // try to resolve the reference from a module
+        final byte[] refUri = ref.name.uri();
+        var = get(ref.name, refUri);
+        if(var == null) throw VARUNDEF_X.get(ref.info(), ref);
+        if(!Token.eq(modUri, refUri) && !ur.hasImport) {
+          throw INVISIBLEVAR_X.get(ref.info(), ref.name);
         }
       }
+
+      if(var.anns.contains(Annotation.PRIVATE) && !Token.eq(modUri, QNm.uri(var.sc.module))) {
+        throw VARPRIVATE_X.get(ref.info(), ref);
+      }
+      ref.init(var);
     }
+    unresolvedRefs.clear();
   }
 
   /**
@@ -77,38 +114,32 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @throws QueryException query exception
    */
   public void compileAll(final CompileContext cc) throws QueryException {
-    for(final StaticVar var : this) {
-      var.compile(cc);
-    }
+    for(final StaticVar var : this) var.compile(cc);
   }
 
   /**
    * Returns a new reference to the (possibly not yet declared) variable with the given name.
    * @param name variable name
-   * @param info input info (can be {@code null})
-   * @param hasImport indicates whether a module import for the variable name's URI was present
+   * @param info input info
+   * @param imports URIs of imported modules
    * @return reference
-   * @throws QueryException if the variable is not visible
    */
-  public StaticVarRef newRef(final QNm name, final InputInfo info, final boolean hasImport)
-      throws QueryException {
-    final StaticVarRef ref = new StaticVarRef(info, name, hasImport);
-    varEntry(name).addRef(ref);
+  public StaticVarRef newRef(final QNm name, final InputInfo info, final TokenSet imports) {
+    if(info == null) throw Util.notExpected();
+    final StaticVarRef ref = new StaticVarRef(info, name);
+    unresolvedRefs.add(new UnresolvedRef(ref, imports.contains(name.uri())));
     return ref;
   }
 
   /**
-   * Returns a variable entry for the specified QName.
+   * Returns the variable for the specified QName and module, or {@code null} if it does not exist.
    * @param name QName
-   * @return variable entry
+   * @param module module URI
+   * @return variable entry, or {@code null}
    */
-  private VarEntry varEntry(final QNm name) {
-    VarEntry entry = vars.get(name);
-    if(entry == null) {
-      entry = new VarEntry();
-      vars.put(name, entry);
-    }
-    return entry;
+  private StaticVar get(final QNm name, final byte[] module) {
+    final QNmMap<StaticVar> vars = varsByModule.get(module);
+    return vars == null ? null : vars.get(name);
   }
 
   /**
@@ -123,73 +154,51 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
 
     for(final QNm qnm : bindings) {
       if(qnm != QNm.EMPTY) {
-        final VarEntry ve = vars.get(qnm);
-        if(ve != null) ve.var.bind(bindings.get(qnm), qc, cast);
+        final Value val = bindings.get(qnm);
+        for(final QNmMap<StaticVar> vars : varsByModule.values()) {
+          final StaticVar var = vars.get(qnm);
+          if(var != null) var.bind(val, qc, cast);
+        }
       }
     }
   }
 
   @Override
   public Iterator<StaticVar> iterator() {
-    final Iterator<QNm> qnames = vars.iterator();
     return new Iterator<>() {
+      /** Iterator over modules. */
+      private final Iterator<QNmMap<StaticVar>> modules = varsByModule.values().iterator();
+      /** Iterator over StaticVar objects of the current module. */
+      private Iterator<StaticVar> vars = Collections.emptyIterator();
+
       @Override
       public boolean hasNext() {
-        return qnames.hasNext();
+        while(!vars.hasNext()) {
+          if(!modules.hasNext()) return false;
+          vars = modules.next().values().iterator();
+        }
+        return true;
       }
 
       @Override
       public StaticVar next() {
-        return vars.get(qnames.next()).var;
-      }
-
-      @Override
-      public void remove() {
-        throw Util.notExpected();
+        if(!vars.hasNext()) throw new NoSuchElementException();
+        return vars.next();
       }
     };
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    if(vars.isEmpty()) return;
+    if(varsByModule.isEmpty()) return;
 
-    final ArrayList<ExprInfo> list = new ArrayList<>(vars.size());
-    for(final VarEntry ve : vars.values()) list.add(ve.var);
+    final ArrayList<ExprInfo> list = new ArrayList<>();
+    for(final StaticVar var : this) list.add(var);
     plan.add(plan.create(this), list.toArray());
   }
 
   @Override
   public void toString(final QueryString qs) {
-    for(final VarEntry ve : vars.values()) qs.token(ve.var);
-  }
-
-  /** Entry for static variables and their references. */
-  private static final class VarEntry {
-    /** The static variable. */
-    StaticVar var;
-    /** Variable references. */
-    final ArrayList<StaticVarRef> refs = new ArrayList<>(1);
-
-    /**
-     * Sets the variable for existing references.
-     * @param vr variable to set
-     * @throws QueryException if the variable was already declared
-     */
-    void setVar(final StaticVar vr) throws QueryException {
-      if(var != null) throw VARDUPL_X.get(vr.info, var.name.string());
-      var = vr;
-      for(final StaticVarRef ref : refs) ref.init(var);
-    }
-
-    /**
-     * Adds a reference to this variable.
-     * @param ref reference to add
-     * @throws QueryException query exception
-     */
-    void addRef(final StaticVarRef ref) throws QueryException {
-      refs.add(ref);
-      if(var != null) ref.init(var);
-    }
+    for(final StaticVar var : this) qs.token(var);
   }
 }

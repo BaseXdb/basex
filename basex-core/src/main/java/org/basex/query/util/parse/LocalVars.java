@@ -1,8 +1,5 @@
 package org.basex.query.util.parse;
 
-import static org.basex.query.QueryError.*;
-import static org.basex.util.Token.*;
-
 import java.util.*;
 
 import org.basex.query.*;
@@ -88,25 +85,12 @@ public final class LocalVars {
    * @param name variable name
    * @param info input info (can be {@code null})
    * @return referenced variable
-   * @throws QueryException if the variable is not defined
    */
-  public ParseExpr resolve(final QNm name, final InputInfo info) throws QueryException {
+  public ParseExpr resolve(final QNm name, final InputInfo info) {
     // local variable
     final VarRef ref = resolveLocal(name, info);
     if(ref != null) return ref;
-
-    // static variable
-    final byte[] uri = name.uri();
-
-    // accept variable reference...
-    // - if a variable uses the module or an imported URI, or
-    // - if it is specified in the main module
-    final QNm module = parser.sc.module;
-    final boolean hasImport = parser.moduleURIs.contains(uri);
-    if(module == null || eq(module.uri(), uri) || hasImport)
-      return parser.qc.vars.newRef(name, info, hasImport);
-
-    throw parser.error(VARUNDEF_X, info, '$' + string(name.string()));
+    return parser.qc.vars.newRef(name, info, parser.moduleURIs);
   }
 
   /**
