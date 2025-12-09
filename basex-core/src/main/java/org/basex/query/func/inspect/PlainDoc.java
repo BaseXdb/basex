@@ -40,7 +40,7 @@ final class PlainDoc extends Inspect {
   FNode context() throws QueryException {
     final FBuilder root = element("context");
     for(final StaticVar sv : qc.vars) root.add(variable(sv));
-    for(final StaticFunc sf : qc.functions.funcs()) {
+    for(final StaticFunc sf : qc.functions) {
       if(!NSGlobal.reserved(sf.name.uri())) {
         root.add(function(sf.name, sf, sf.funcType(), sf.anns));
       }
