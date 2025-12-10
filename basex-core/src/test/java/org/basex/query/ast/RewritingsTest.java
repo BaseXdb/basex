@@ -171,9 +171,11 @@ public final class RewritingsTest extends SandboxTest {
     check("<a>5</a>[text() <= -800000000]", "", exists(cmpr));
     check("<a>5</a>[text() > 8000000000000000000]", "", exists(cmpr));
     check("<a>5</a>[text() < -8000000000000000000]", "", exists(cmpr));
-    check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", true, empty(cmpr));
+    check("exists(<x>1234567890.12345678</x>[. = 1234567890.1234567])", false, empty(cmpr));
+    check("exists(<x>1234567890.12345678e0</x>[. = 1234567890.1234567e0])", true, empty(cmpr));
 
-    check("exists(<x>123456789012345678</x> [. = 123456789012345679])", true, empty(cmpr));
+    check("exists(<x>123456789012345678</x> [. = 123456789012345679])", false, empty(cmpr));
+    check("exists(<x>123456789012345678e0</x> [. = 123456789012345679e0])", true, empty(cmpr));
     check("<a>5</a>[xs:integer(.) > 8000000000000000000]", "", empty(cmpr));
     check("<a>5</a>[xs:integer(.) < -8000000000000000000]", "", empty(cmpr));
     check("(1, 1234567890.12345678)[. = 1234567890.1234567]", "", empty(cmpr));
@@ -885,9 +887,13 @@ public final class RewritingsTest extends SandboxTest {
         "2\n3\n4\n5\n6\n7", empty(Cast.class));
 
     check("for $n in (10000000000000000, 1)[. != 0] return number($n) = 10000000000000001",
-        "true\nfalse", exists(NUMBER));
+        "false\nfalse", exists(NUMBER));
+    check("for $n in (10000000000000000, 1)[. != 0] return number($n) = "
+        + "xs:double(10000000000000001)", "true\nfalse", exists(NUMBER));
     check("for $n in (10000000000000000, 1)[. != 0] return xs:double($n) = 10000000000000001",
-        "true\nfalse", exists(Cast.class));
+        "false\nfalse", exists(Cast.class));
+    check("for $n in (10000000000000000, 1)[. != 0] return xs:double($n) = "
+        + "xs:double(10000000000000001)", "true\nfalse", exists(Cast.class));
 
     check("number(<?_ 1?>) + number(<_>2</_>)", 3, count(NUMBER, 1));
     check("xs:double(<?_ 1?>) + xs:double(<_>2</_>)", 3, count(Cast.class, 1));

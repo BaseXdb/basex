@@ -107,14 +107,22 @@ public final class Flt extends ANum {
   @Override
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return item.type == AtomType.DOUBLE ? item.equal(this, coll, ii) : value == item.flt(ii);
+    final Item it = untypedToFlt(item, ii);
+    return it instanceof Flt flt ? value == flt.value :
+      it instanceof Dbl ? it.equal(this, coll, ii) :
+      Float.isFinite(value) ? dec(ii).compareTo(it.dec(ii)) == 0 : false;
   }
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return item instanceof Dbl || transitive && item instanceof Dec
-        ? -item.compare(this, coll, transitive, ii) : compare(value, item.flt(ii), transitive);
+    final Item it = untypedToFlt(item, ii);
+    return it instanceof Flt flt ? compare(value, flt.value, transitive) :
+      it instanceof Dbl ? -it.compare(this, coll, transitive, ii) :
+      Float.isFinite(value) ? dec(ii).compareTo(it.dec(ii)) :
+      value == Float.NEGATIVE_INFINITY ? -1 :
+      value == Float.POSITIVE_INFINITY ? 1 :
+      transitive ? -1 : NAN_DUMMY;
   }
 
   /**

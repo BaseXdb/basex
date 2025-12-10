@@ -84,6 +84,38 @@ public abstract class ANum extends Item {
   protected abstract float flt();
 
   /**
+   * Converts an item to decimal, if it is untyped, or to double if decimal conversion cannot
+   * succeed.
+   * @param item item
+   * @param ii input info
+   * @return converted item (unchanged if not untyped, otherwise decimal or double)
+   * @throws QueryException query exception
+   */
+  protected static Item untypedToDec(final Item item, final InputInfo ii) throws QueryException {
+    if(!item.type.isUntyped()) return item;
+    final byte[] token = item.string(ii);
+    for(final byte b : token) if(b == 'e' || b == 'E' || b == 'N') return Dbl.get(item.dbl(ii));
+    return Dec.get(item.dec(ii));
+  }
+
+  /**
+   * Converts an item to float, if it is untyped, or to double if float conversion fails.
+   * @param item item
+   * @param ii input info
+   * @return converted item (unchanged if not untyped, otherwise float or double)
+   * @throws QueryException query exception
+   */
+  protected static Item untypedToFlt(final Item item, final InputInfo ii) throws QueryException {
+    if(!item.type.isUntyped()) return item;
+    try {
+      return Flt.get(item.flt(ii));
+    } catch(QueryException ex) {
+      Util.debug(ex);
+      return Dbl.get(item.dbl(ii));
+    }
+  }
+
+  /**
    * Returns an absolute value.
    * @return absolute value
    */

@@ -107,14 +107,17 @@ public final class Dbl extends ANum {
   @Override
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return value == item.dbl(ii);
+    return !item.type.instanceOf(AtomType.DECIMAL) ? value == item.dbl(ii) :
+      Double.isFinite(value) ? dec(ii).compareTo(item.dec(ii)) == 0 : false;
   }
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return transitive && item instanceof Dec ? -item.compare(this, coll, transitive, ii) :
-      compare(value, item.dbl(ii), transitive);
+    return !item.type.instanceOf(AtomType.DECIMAL) ? compare(value, item.dbl(ii), transitive) :
+      Double.isFinite(value) ? dec(ii).compareTo(item.dec(ii)) :
+      value == Double.NEGATIVE_INFINITY ? -1 : value == Double.POSITIVE_INFINITY ? 1 :
+      transitive ? -1 : NAN_DUMMY;
   }
 
   /**

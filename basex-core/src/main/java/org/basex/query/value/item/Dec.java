@@ -163,23 +163,24 @@ public final class Dec extends ANum {
   @Override
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    final Type tp = item.type;
-    return tp.isUntyped() ? dbl() == item.dbl(ii) :
-      tp == AtomType.DOUBLE || tp == AtomType.FLOAT ? item.equal(this, coll, ii) :
-      value.compareTo(item.dec(ii)) == 0;
+    final Item it = untypedToDec(item, ii);
+    return !(it instanceof Dbl || it instanceof Flt) || Double.isFinite(it.dbl(ii)) ?
+      value.compareTo(it.dec(ii)) == 0 :
+      false;
   }
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    if(transitive) {
-      final double n = item.dbl(ii);
-      if(n == Double.NEGATIVE_INFINITY || Double.isNaN(n)) return 1;
-      if(n == Double.POSITIVE_INFINITY) return -1;
-    } else if(item instanceof Dbl || item instanceof Flt) {
-      return -item.compare(this, coll, transitive, ii);
+    final Item it = untypedToDec(item, ii);
+    if(it instanceof Dbl || it instanceof Flt) {
+      final double n = it.dbl(ii);
+      if(!Double.isFinite(n)) {
+        return n == Double.NEGATIVE_INFINITY ? 1 : n == Double.POSITIVE_INFINITY ? -1 :
+          transitive ? 1 : NAN_DUMMY;
+      }
     }
-    return value.compareTo(item.dec(ii));
+    return value.compareTo(it.dec(ii));
   }
 
   @Override
