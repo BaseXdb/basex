@@ -151,16 +151,14 @@ public final class Itr extends ANum {
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
     return item instanceof final Itr itr ? value == itr.value :
-           item instanceof Dec ? item.equal(this, coll, ii) :
-           value == item.dbl(ii);
+      untypedToDec(item, ii).equal(this, coll, ii);
   }
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
     return item instanceof final Itr itr ? Long.compare(value, itr.value) :
-           item instanceof Dec ? -item.compare(this, coll, transitive, ii) :
-           Dbl.compare(dbl(ii), item.dbl(ii), transitive);
+      -untypedToDec(item, ii).compare(this, coll, transitive, ii);
   }
 
   @Override

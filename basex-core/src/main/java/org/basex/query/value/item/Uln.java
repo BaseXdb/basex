@@ -88,19 +88,17 @@ public final class Uln extends ANum {
   @Override
   public boolean equal(final Item item, final Collation coll, final InputInfo ii)
       throws QueryException {
-    return item.type == AtomType.UNSIGNED_LONG ? value.equals(((Uln) item).value) :
-      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT || item.type == AtomType.DECIMAL ?
-        item.equal(this, coll, ii) :
-        value.compareTo(BigInteger.valueOf(item.itr(ii))) == 0;
+    return item instanceof final Uln uln ? value.equals(uln.value) :
+      item instanceof Itr ? value.equals(BigInteger.valueOf(item.itr(ii))) :
+      untypedToDec(item, ii).equal(this, coll, ii);
   }
 
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return item.type == AtomType.UNSIGNED_LONG ? value.compareTo(((Uln) item).value) :
-      item.type == AtomType.DOUBLE || item.type == AtomType.FLOAT || item.type == AtomType.DECIMAL ?
-        -item.compare(this, coll, transitive, ii) :
-        value.compareTo(BigInteger.valueOf(item.itr(ii)));
+    return item instanceof final Uln uln ? value.compareTo(uln.value) :
+      item instanceof Itr ? value.compareTo(BigInteger.valueOf(item.itr(ii))) :
+      -untypedToDec(item, ii).compare(this, coll, transitive, ii);
   }
 
   @Override

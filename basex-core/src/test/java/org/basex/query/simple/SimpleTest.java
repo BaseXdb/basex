@@ -53,10 +53,10 @@ public final class SimpleTest extends QueryTest {
       { "Compare 5",  booleans(false), "1234567890.12345678 = 1234567890.1234567" },
       { "Compare 6",  booleans(false), "123456789012345678  = 123456789012345679" },
       // GH-2112, GH-2115
-      { "Compare 7",  booleans(false), "xs:decimal(1.13) gt xs:double(1.13)" },
-      { "Compare 8",  booleans(false), "xs:decimal(1.13) gt xs:float(1.13)" },
-      { "Compare 9",  booleans(true),  "xs:decimal(1.13) le xs:double(1.13)" },
-      { "Compare 10", booleans(true),  "xs:decimal(1.13) le xs:float(1.13)" },
+      { "Compare 7",  booleans(true), "xs:decimal(1.13) gt xs:double(1.13)" },
+      { "Compare 8",  booleans(true), "xs:decimal(1.13) gt xs:float(1.13)" },
+      { "Compare 9",  booleans(false),  "xs:decimal(1.13) le xs:double(1.13)" },
+      { "Compare 10", booleans(false),  "xs:decimal(1.13) le xs:float(1.13)" },
       // GH-2113, GH-2114
       { "Compare 11", booleans(false), "xs:float (1.13) ge xs:double(1.13)" },
       { "Compare 12", booleans(true),  "xs:float (1.13) le xs:double(1.13)" },
