@@ -89,7 +89,7 @@ public class AdaptiveSerializer extends OutputSerializer {
         final double d = item.dbl(null);
         if(basex) {
           printChars(Dbl.string(d));
-        } else if(Double.isNaN(d) || Double.isInfinite(d)) {
+        } else if(!Double.isFinite(d)) {
           printChars(item.string(null));
         } else {
           synchronized(Token.AD) {

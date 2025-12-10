@@ -156,7 +156,7 @@ interface CalcOpt {
       throws QueryException {
     final double n1 = item1.dbl(info), n2 = item2.dbl(info), n = n1 / n2;
     if(n2 == 0) throw DIVZERO_X.get(info, item1);
-    if(Double.isNaN(n) || Double.isInfinite(n)) throw INVIDIV.get(info, item1 + " idiv " + item2);
+    if(!Double.isFinite(n)) throw INVIDIV.get(info, item1 + " idiv " + item2);
     if(n < Long.MIN_VALUE || n > Long.MAX_VALUE) throw RANGE_X.get(info, item1 + " idiv " + item2);
     return Itr.get((long) n);
   }
@@ -238,7 +238,7 @@ interface CalcOpt {
       throws QueryException {
     final double n1 = item1.flt(info), n2 = item2.flt(info), n = n1 / n2;
     if(n2 == 0) throw DIVZERO_X.get(info, item1);
-    if(Double.isNaN(n) || Double.isInfinite(n)) throw INVIDIV.get(info, item1 + " idiv " + item2);
+    if(!Double.isFinite(n)) throw INVIDIV.get(info, item1 + " idiv " + item2);
     if(n < Long.MIN_VALUE || n > Long.MAX_VALUE) throw RANGE_X.get(info, item1 + " idiv " + item2);
     return Itr.get((long) n);
   }

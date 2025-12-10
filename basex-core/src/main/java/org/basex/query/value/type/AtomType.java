@@ -1142,7 +1142,7 @@ public enum AtomType implements Type {
     final Type type = item.type;
     if(type.oneOf(DOUBLE, FLOAT)) {
       final double d = item.dbl(info);
-      if(Double.isNaN(d) || Double.isInfinite(d)) throw valueError(this, item.string(info), info);
+      if(!Double.isFinite(d)) throw valueError(this, item.string(info), info);
       if(min != max && (d < min || d > max)) throw castError(item, info);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) throw INTRANGE_X.get(info, d);
       return (long) d;
