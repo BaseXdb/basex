@@ -7,7 +7,6 @@ import static org.basex.query.value.type.AtomType.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
-import org.basex.query.util.collation.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -98,12 +97,6 @@ public final class GDt extends ADate {
   @Override
   public GDt timeZone(final DTDur dur, final boolean undefined, final InputInfo info) {
     throw Util.notExpected();
-  }
-
-  @Override
-  public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
-    throw compareError(item, this, ii);
   }
 
   @Override

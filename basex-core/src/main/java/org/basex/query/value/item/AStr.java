@@ -119,12 +119,6 @@ public abstract class AStr extends Item {
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return Token.eq(string(ii), item.string(ii), Collation.get(coll, ii));
-  }
-
-  @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     return comparable(item) && Token.eq(string(deep.info), item.string(deep.info), deep);
   }

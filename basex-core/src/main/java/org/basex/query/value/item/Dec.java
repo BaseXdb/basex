@@ -161,26 +161,38 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    final Item it = untypedToDec(item, ii);
-    return !(it instanceof Dbl || it instanceof Flt) || Double.isFinite(it.dbl(ii)) ?
-      value.compareTo(it.dec(ii)) == 0 :
-      false;
-  }
-
-  @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    final Item it = untypedToDec(item, ii);
-    if(it instanceof Dbl || it instanceof Flt) {
-      final double n = it.dbl(ii);
-      if(!Double.isFinite(n)) {
-        return n == Double.NEGATIVE_INFINITY ? 1 : n == Double.POSITIVE_INFINITY ? -1 :
+    return compare(this, item, transitive, ii);
+  }
+
+  /**
+   * Compares the numeric values of two items.
+   * @param item1 first value
+   * @param item2 second value
+   * @param transitive transitive comparison
+   * @param ii input info
+   * @return difference difference
+   * @throws QueryException query exception
+   */
+  static int compare(final Item item1, final Item item2, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    final Item it2;
+    if(item2.type.isUntyped()) {
+      final byte[] string = item2.string(ii);
+      final BigDecimal bd = Dec.parse(string, ii, false);
+      it2 = bd != null ? Dec.get(bd) : Dbl.get(Dbl.parse(string, ii));
+    } else {
+      it2 = item2;
+    }
+    if(it2 instanceof Dbl || it2 instanceof Flt) {
+      final double d = it2.dbl(ii);
+      if(!Double.isFinite(d)) {
+        return d == Double.NEGATIVE_INFINITY ? 1 : d == Double.POSITIVE_INFINITY ? -1 :
           transitive ? 1 : NAN_DUMMY;
       }
     }
-    return value.compareTo(it.dec(ii));
+    return item1.dec(ii).compareTo(it2.dec(ii));
   }
 
   @Override
@@ -208,14 +220,19 @@ public final class Dec extends ANum {
    * Converts the given token into a decimal value.
    * @param value value to be converted
    * @param info input info (can be {@code null})
-   * @return double value
+   * @param error raise error for an invalid input
+   * @return decimal or {@code null}
    * @throws QueryException query exception
    */
-  public static BigDecimal parse(final byte[] value, final InputInfo info) throws QueryException {
+  public static BigDecimal parse(final byte[] value, final InputInfo info,
+      final boolean error) throws QueryException {
     try {
       if(!contains(value, 'e') && !contains(value, 'E'))
         return new BigDecimal(Token.string(value).trim());
-    } catch(final NumberFormatException ex) { Util.debug(ex); }
-    throw AtomType.DECIMAL.castError(value, info);
+    } catch(final NumberFormatException ex) {
+      Util.debug(ex);
+    }
+    if(error) throw AtomType.DECIMAL.castError(value, info);
+    return null;
   }
 }

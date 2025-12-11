@@ -74,8 +74,7 @@ public final class Flt extends ANum {
 
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    if(Float.isNaN(value) || Float.isInfinite(value))
-      throw valueError(AtomType.DECIMAL, string(), ii);
+    if(!Double.isFinite(value)) throw valueError(AtomType.DECIMAL, string(), ii);
     return new BigDecimal(value);
   }
 
@@ -105,37 +104,12 @@ public final class Flt extends ANum {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    final Item it = untypedToFlt(item, ii);
-    return it instanceof Flt flt ? value == flt.value :
-      it instanceof Dbl ? it.equal(this, coll, ii) :
-      Float.isFinite(value) ? dec(ii).compareTo(it.dec(ii)) == 0 : false;
-  }
-
-  @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    final Item it = untypedToFlt(item, ii);
-    return it instanceof Flt flt ? compare(value, flt.value, transitive) :
-      it instanceof Dbl ? -it.compare(this, coll, transitive, ii) :
-      Float.isFinite(value) ? dec(ii).compareTo(it.dec(ii)) :
-      value == Float.NEGATIVE_INFINITY ? -1 :
-      value == Float.POSITIVE_INFINITY ? 1 :
-      transitive ? -1 : NAN_DUMMY;
-  }
-
-  /**
-   * Compares two floats.
-   * @param f1 first floats
-   * @param f2 second floats
-   * @param transitive transitive comparison
-   * @return result of comparison
-   */
-  static int compare(final float f1, final float f2, final boolean transitive) {
-    final boolean nan = Float.isNaN(f1), fNan = Float.isNaN(f2);
-    return nan || fNan ? transitive ? nan == fNan ? 0 : nan ? -1 : 1 : NAN_DUMMY :
-      f1 < f2 ? -1 : f1 > f2 ? 1 : 0;
+    final float f = item.flt(ii);
+    return item.type.instanceOf(AtomType.DECIMAL) || item instanceof Dbl ?
+      -item.compare(this, coll, transitive, ii) :
+      Dbl.compare(value, Float.isInfinite(f) ? item.dbl(ii) : f, transitive);
   }
 
   @Override

@@ -25,8 +25,7 @@ public final class FnCompare extends StandardFunc {
     final Collation collation = toCollation(arg(2), qc);
 
     if(value1 == null || value2 == null) return Empty.VALUE;
-    final Type type1 = value1.type, type2 = value2.type;
-    if(!CmpG.comparable(type1, type2, false)) throw compareError(value1, value2, info);
+    if(!value1.comparable(value2)) throw compareError(value1, value2, info);
 
     final long diff = value1.compare(value2, collation, true, info);
     return Itr.get(diff < 0 ? -1 : diff > 0 ? 1 : 0);

@@ -388,12 +388,6 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return compare(item, ii) == 0;
-  }
-
-  @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     return (type.instanceOf(item.type) || item.type.instanceOf(type))
         && compare(item, deep.info) == 0
@@ -411,12 +405,13 @@ public abstract class ADate extends ADateDur {
     return toSeconds().intValue();
   }
 
-  /**
-   * {@inheritDoc}
-   * Overwritten by {@link GDt}.
-   */
   @Override
-  public int compare(final Item item, final Collation coll, final boolean transitive,
+  public boolean comparable(final Item item) {
+    return item instanceof ADate;
+  }
+
+  @Override
+  public final int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
     return compare(item, ii);
   }

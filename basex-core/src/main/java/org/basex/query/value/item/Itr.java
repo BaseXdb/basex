@@ -148,17 +148,10 @@ public final class Itr extends ANum {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return item instanceof final Itr itr ? value == itr.value :
-      untypedToDec(item, ii).equal(this, coll, ii);
-  }
-
-  @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
     return item instanceof final Itr itr ? Long.compare(value, itr.value) :
-      -untypedToDec(item, ii).compare(this, coll, transitive, ii);
+      Dec.compare(this, item, transitive, ii);
   }
 
   @Override

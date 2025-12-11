@@ -113,7 +113,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(string(ii), ii);
+    return Dec.parse(string(ii), ii, true);
   }
 
   /**
@@ -175,7 +175,10 @@ public abstract class Item extends Value {
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean equal(Item item, Collation coll, InputInfo ii) throws QueryException;
+  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
+      throws QueryException {
+    return compare(item, coll, false, ii) == 0;
+  }
 
   /**
    * Compares items for deep equality.

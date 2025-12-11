@@ -72,6 +72,15 @@ public final class SimpleTest extends QueryTest {
       { "Compare 52", booleans(true),  "xs:untypedAtomic('41') <= xs:hexBinary('41')" },
       { "Compare 53", booleans(true),  "xs:hexBinary('41') <= xs:untypedAtomic('41')" },
 
+      { "Compare 60", booleans(false),
+        "string-join(replicate(1, 40)) -> (xs:float(.) = <x>{ . }</x>)" },
+      { "Compare 61", booleans(false),
+        "string-join(replicate(1, 40)) -> (<x>{ . }</x> = xs:float(.))" },
+      { "Compare 62", booleans(true),
+        "string-join(replicate(1, 40)) -> (xs:double(.) = <x>{ . }</x>)" },
+      { "Compare 63", booleans(true),
+        "string-join(replicate(1, 40)) -> (<x>{ . }</x> = xs:double(.))" },
+
       { "FLWOR 1", integers(3), "(for $i in 1 to 5 return $i)[3]" },
       { "FLWOR 2", integers(4),
         "(for $a in 1 to 5 for $b in 1 to 5 return $a * $b)[7]" },

@@ -168,24 +168,6 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    final QNm qnm;
-    final StaticContext sc = ii != null ? ii.sc() : null;
-    if(item instanceof final QNm q) {
-      qnm = q;
-    } else if(item.type.isUntyped() && sc != null) {
-      final byte[] nm = trim(item.string(ii));
-      if(!XMLToken.isQName(nm)) throw FUNCCAST_X_X_X.get(ii, item.type, type, item);
-      qnm = new QNm(nm, sc);
-      if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
-    } else {
-      throw compareError(this, item, ii);
-    }
-    return eq(qnm);
-  }
-
-  @Override
   public boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
     return type == item.type && equal(item, null, deep.info) && (
       !deep.options.get(DeepEqualOptions.NAMESPACE_PREFIXES) ||
@@ -206,7 +188,20 @@ public final class QNm extends Item {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    throw compareError(item, this, ii);
+    final QNm qnm;
+    final StaticContext sc = ii != null ? ii.sc() : null;
+    if(item instanceof final QNm q) {
+      qnm = q;
+    } else if(item.type.isUntyped() && sc != null) {
+      final byte[] nm = trim(item.string(ii));
+      if(!XMLToken.isQName(nm)) throw FUNCCAST_X_X_X.get(ii, item.type, type, item);
+      qnm = new QNm(nm, sc);
+      if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
+    } else {
+      throw compareError(this, item, ii);
+    }
+    final int c = Token.compare(uri(), qnm.uri());
+    return c != 0 ? c : Token.compare(local(), qnm.local());
   }
 
   /**

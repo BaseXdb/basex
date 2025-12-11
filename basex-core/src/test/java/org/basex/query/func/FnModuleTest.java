@@ -1470,10 +1470,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (98 to 102)", " key := string#1"), 99);
     query(func.args(" (98 to 102)", " ()", " string#1"), 99);
 
+    query(func.args(" #x"), "#x");
+    query(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), "9999");
+
     error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
-    error(func.args(" #x"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
-    error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOMIZE_X);
   }
 
@@ -1985,10 +1986,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" (98 to 102)", " key := string#1"), 100);
     query(func.args(" (98 to 102)", " ()", " string#1"), 100);
 
+    query(func.args(" #x"), "#x");
+    query(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), "9998");
+
     error(func.args(" replicate(<_/>, 2)"), FUNCCAST_X_X);
-    error(func.args(" #x"), CMPTYPE_X_X_X);
     error(func.args(" (1, 'x')"), CMPTYPES_X_X_X_X);
-    error(func.args(" (xs:gYear('9998'), xs:gYear('9999'))"), CMPTYPE_X_X_X);
     error(func.args(" true#0"), FIATOMIZE_X);
   }
 

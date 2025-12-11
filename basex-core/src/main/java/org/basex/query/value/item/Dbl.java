@@ -104,31 +104,23 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return !item.type.instanceOf(AtomType.DECIMAL) ? value == item.dbl(ii) :
-      Double.isFinite(value) ? dec(ii).compareTo(item.dec(ii)) == 0 : false;
-  }
-
-  @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return !item.type.instanceOf(AtomType.DECIMAL) ? compare(value, item.dbl(ii), transitive) :
-      Double.isFinite(value) ? dec(ii).compareTo(item.dec(ii)) :
-      value == Double.NEGATIVE_INFINITY ? -1 : value == Double.POSITIVE_INFINITY ? 1 :
-      transitive ? -1 : NAN_DUMMY;
+    return item.type.instanceOf(AtomType.DECIMAL) ?
+      -item.compare(this, coll, transitive, ii) :
+      compare(value, item.dbl(ii), transitive);
   }
 
   /**
-   * Compares two doubles.
-   * @param d1 first double
-   * @param d2 second double
+   * Compares two double values (identical for floats).
+   * @param d1 first double value
+   * @param d2 second double value
    * @param transitive transitive comparison
-   * @return result of comparison (-1, 0, 1)
+   * @return difference
    */
   static int compare(final double d1, final double d2, final boolean transitive) {
-    final boolean nan = Double.isNaN(d1), dNan = Double.isNaN(d2);
-    return nan || dNan ? transitive ? nan == dNan ? 0 : nan ? -1 : 1 : NAN_DUMMY :
+    final boolean n1 = Double.isNaN(d1), n2 = Double.isNaN(d2);
+    return n1 || n2 ? transitive ? n1 == n2 ? 0 : n1 ? -1 : 1 : NAN_DUMMY :
       d1 < d2 ? -1 : d1 > d2 ? 1 : 0;
   }
 

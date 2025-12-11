@@ -31,8 +31,8 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
+  public final int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
     throw FIATOMIZE_X.get(info(ii), this);
   }
 

@@ -210,15 +210,20 @@ public class CmpG extends Cmp {
     if(expr == this) expr = CmpIR.get(cc, this, false);
     if(expr == this) expr = CmpR.get(cc, this);
     if(expr == this) expr = CmpSR.get(cc, this);
-
     if(expr == this) {
-      // determine types, choose best implementation
+      // skip runtime type check if items are known to be comparable (covers most common types)
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
-      // skip type check if types are identical, have a specific atomic type and are comparable
-      check = !(type1 == type2 && !type1.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.ITEM) &&
-          comparable(type1, type2, true));
+      if(type1 == type2 && !type1.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.ITEM)
+          || type1.isUntyped() || type2.isUntyped()
+          || type1.isNumber() && type2.isNumber()
+          || type1.isStringOrUntyped() && type2.isStringOrUntyped()
+          || type1.instanceOf(AtomType.BINARY) && type2.instanceOf(AtomType.BINARY)
+          || type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION)) {
+        check = false;
+      }
 
+      // choose best implementation
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) expr = new CmpSimpleG(expr1, expr2, op, info, check);
@@ -233,6 +238,7 @@ public class CmpG extends Cmp {
         // range comparisons
         if(!(this instanceof CmpRangeG)) expr = new CmpRangeG(expr1, expr2, op, info);
       }
+
       // pre-evaluate expression; discard hashed results
       if(values(false, cc)) {
         final Expr ex = cc.preEval(expr);
@@ -345,15 +351,14 @@ public class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   final boolean eval(final Item item1, final Item item2) throws QueryException {
-    if(check) {
-      final Type type1 = item1.type, type2 = item2.type;
-      if(!comparable(type1, type2, true)) throw compareError(item1, item2, info);
-    }
+    if(check && !(item1.comparable(item2) || item1.type.isUntyped() || item2.type.isUntyped()))
+      throw compareError(item1, item2, info);
     return op.value().eval(item1, item2, info);
   }
 
   /**
-   * Checks if an expression with the specified types can be rewritten to a general comparison.
+   * Compile-time check: Checks if an expression with the specified types can be rewritten
+   * to a general comparison.
    * @param st1   first sequence type
    * @param st2   second sequence type
    * @param eqne  eq/ne comparison
@@ -367,23 +372,6 @@ public class CmpG extends Cmp {
       type1 == AtomType.QNAME && type2 == AtomType.QNAME ||
       type1.instanceOf(AtomType.NUMERIC) && type2.instanceOf(AtomType.NUMERIC) ||
       type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION);
-  }
-
-  /**
-   * Checks if types can be compared.
-   * @param type1 first type to compare
-   * @param type2 second type to compare
-   * @param untyped allow untyped atomics
-   * @return result of check
-   */
-  public static boolean comparable(final Type type1, final Type type2, final boolean untyped) {
-    return type1 == type2 ||
-      type1.isNumber() && type2.isNumber() ||
-      type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
-      untyped && (type1.isUntyped() || type2.isUntyped()) ||
-      type1.instanceOf(AtomType.DATE_TIME) && type2.instanceOf(AtomType.DATE_TIME) ||
-      type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION) ||
-      type1.instanceOf(AtomType.BINARY) && type2.instanceOf(AtomType.BINARY);
   }
 
   @Override

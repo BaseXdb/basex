@@ -233,16 +233,11 @@ public class Dur extends ADateDur {
   }
 
   @Override
-  public boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, ii));
-    return months == dur.months && seconds.compareTo(dur.seconds) == 0;
-  }
-
-  @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    throw compareError(item, this, ii);
+    final Dur dur = (Dur) (item instanceof Dur ? item : type.cast(item, null, ii));
+    final int m = Long.compare(months, dur.months);
+    return m != 0 ? m : seconds.compareTo(dur.seconds);
   }
 
   @Override
