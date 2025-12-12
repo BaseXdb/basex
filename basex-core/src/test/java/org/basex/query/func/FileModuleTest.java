@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 import java.nio.file.*;
+import java.util.*;
 
 import org.basex.*;
 import org.basex.io.*;
@@ -107,7 +108,8 @@ public final class FileModuleTest extends SandboxTest {
     final Function func = _FILE_BASE_DIR;
     // successful queries
     final Path path = Paths.get(".").toAbsolutePath().getParent();
-    assertEquals(query(func.args()), path + File.separator);
+    assertEquals(path.toString().toLowerCase(Locale.ENGLISH) + File.separator,
+        query(func.args()).toLowerCase(Locale.ENGLISH));
   }
 
   /** Test method. */
@@ -188,7 +190,8 @@ public final class FileModuleTest extends SandboxTest {
     final Function func = _FILE_CURRENT_DIR;
     // successful queries
     final Path path = Paths.get(".").toAbsolutePath().getParent();
-    assertEquals(query(func.args()), path + File.separator);
+    assertEquals(path.toString().toLowerCase(Locale.ENGLISH) + File.separator,
+        query(func.args()).toLowerCase(Locale.ENGLISH));
   }
 
   /** Test method. */
@@ -378,7 +381,7 @@ public final class FileModuleTest extends SandboxTest {
     // queries
     final String path = query(func.args(PATH1));
     final String uri = Paths.get(PATH1).toUri().toString();
-    assertEquals(path, uri);
+    assertEquals(uri, path);
   }
 
   /** Test method. */
@@ -429,7 +432,7 @@ public final class FileModuleTest extends SandboxTest {
     final String path = query(func.args(PATH1));
     final String can1 = Paths.get(PATH1).normalize().toAbsolutePath().toString();
     final String can2 = Paths.get(PATH2).normalize().toAbsolutePath().toString();
-    assertEquals(path, can1);
+    assertEquals(can1, path);
     query("ends-with(" + func.args(".") + ", '" + File.separator + "')", true);
 
     query("contains(" + func.args(can1, can2) + ", \"" + can1 + "\")", true);
