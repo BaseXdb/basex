@@ -1,5 +1,7 @@
 package org.basex.query.value.item;
 
+import java.math.*;
+
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
@@ -112,6 +114,43 @@ public abstract class ANum extends Item {
   @Override
   public final boolean comparable(final Item item) {
     return item instanceof ANum;
+  }
+
+  /**
+   * Compares a number with the numeric value of an item.
+   * @param item value to be compared
+   * @param transitive transitive comparison
+   * @param ii input info
+   * @return difference difference
+   * @throws QueryException query exception
+   */
+  final int compare(final Item item, final boolean transitive, final InputInfo ii)
+      throws QueryException {
+    // if possible, compare numbers as long values
+    final Item num2;
+    if(item.type.isUntyped()) {
+      final byte[] string = item.string(ii);
+      final long l = Token.toLong(string);
+      if(l != Long.MIN_VALUE) {
+        num2 = Itr.get(l);
+      } else {
+        final BigDecimal bd = Dec.parse(string, ii, false);
+        num2 = bd != null ? Dec.get(bd) : Dbl.get(Dbl.parse(string, ii));
+      }
+    } else {
+      num2 = item;
+    }
+
+    if(num2 instanceof Itr itr2) {
+      if(this instanceof Itr) return Long.compare(itr(), itr2.itr());
+    } else if(num2 instanceof Dbl || num2 instanceof Flt) {
+      final double d = num2.dbl(ii);
+      if(!Double.isFinite(d)) {
+        return d == Double.NEGATIVE_INFINITY ? 1 : d == Double.POSITIVE_INFINITY ? -1 :
+          transitive ? 1 : NAN_DUMMY;
+      }
+    }
+    return dec(ii).compareTo(num2.dec(ii));
   }
 
   @Override

@@ -163,36 +163,8 @@ public final class Dec extends ANum {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return compare(this, item, transitive, ii);
-  }
-
-  /**
-   * Compares the numeric values of two items.
-   * @param item1 first value
-   * @param item2 second value
-   * @param transitive transitive comparison
-   * @param ii input info
-   * @return difference difference
-   * @throws QueryException query exception
-   */
-  static int compare(final Item item1, final Item item2, final boolean transitive,
-      final InputInfo ii) throws QueryException {
-    final Item it2;
-    if(item2.type.isUntyped()) {
-      final byte[] string = item2.string(ii);
-      final BigDecimal bd = Dec.parse(string, ii, false);
-      it2 = bd != null ? Dec.get(bd) : Dbl.get(Dbl.parse(string, ii));
-    } else {
-      it2 = item2;
-    }
-    if(it2 instanceof Dbl || it2 instanceof Flt) {
-      final double d = it2.dbl(ii);
-      if(!Double.isFinite(d)) {
-        return d == Double.NEGATIVE_INFINITY ? 1 : d == Double.POSITIVE_INFINITY ? -1 :
-          transitive ? 1 : NAN_DUMMY;
-      }
-    }
-    return item1.dec(ii).compareTo(it2.dec(ii));
+    return item instanceof final Dec dec ? value.compareTo(dec.value) :
+      compare(item, transitive, ii);
   }
 
   @Override
@@ -221,17 +193,39 @@ public final class Dec extends ANum {
    * @param value value to be converted
    * @param info input info (can be {@code null})
    * @param error raise error for an invalid input
-   * @return decimal or {@code null}
+   * @return decimal, or {@code null} value is invalid and no error is raised
    * @throws QueryException query exception
    */
   public static BigDecimal parse(final byte[] value, final InputInfo info,
       final boolean error) throws QueryException {
-    try {
-      if(!contains(value, 'e') && !contains(value, 'E'))
-        return new BigDecimal(Token.string(value).trim());
-    } catch(final NumberFormatException ex) {
-      Util.debug(ex);
+
+    // check if conversion can be successful (reject exponential notation)
+    boolean valid = value.length != 0, dot = false;
+    if(valid) {
+      for(final byte v : value) {
+        if(v == '.') {
+          dot = true;
+        } else if(!(digit(v) || ws(v) || v == '+' || v == '-')) {
+          valid = false;
+          break;
+        }
+      }
     }
+
+    if(valid) {
+      // shortcut for non-fractional values
+      if(!dot) {
+        final long l = toLong(value);
+        if(l != Long.MIN_VALUE) return BigDecimal.valueOf(l);
+      }
+      // decimal conversion
+      try {
+        return new BigDecimal(Token.string(value).trim());
+      } catch(final NumberFormatException ex) {
+        Util.debug(ex);
+      }
+    }
+
     if(error) throw AtomType.DECIMAL.castError(value, info);
     return null;
   }

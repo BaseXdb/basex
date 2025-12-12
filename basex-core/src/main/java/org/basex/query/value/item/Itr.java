@@ -151,7 +151,7 @@ public final class Itr extends ANum {
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
     return item instanceof final Itr itr ? Long.compare(value, itr.value) :
-      Dec.compare(this, item, transitive, ii);
+      compare(item, transitive, ii);
   }
 
   @Override
