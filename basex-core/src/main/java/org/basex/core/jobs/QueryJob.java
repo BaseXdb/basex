@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.Map.*;
+import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
 import org.basex.core.*;
@@ -34,7 +35,7 @@ public final class QueryJob extends Job implements Runnable {
   /** Remove flag. */
   private boolean remove;
   /** Running flag. */
-  private boolean running;
+  private final AtomicBoolean running = new AtomicBoolean(false);
 
   /**
    * Constructor, which creates and registers the specified job.
@@ -98,7 +99,7 @@ public final class QueryJob extends Job implements Runnable {
       }
 
       // create and schedule job task
-      final QueryJobTask task = new QueryJobTask(this, jobs, delay, interval, duration);
+      final QueryJobTask task = new QueryJobTask(this, delay, interval, duration);
       jobs.tasks.put(id, task);
       if(interval > 0) {
         jobs.timer.scheduleAtFixedRate(task, delay, interval);
@@ -176,16 +177,14 @@ public final class QueryJob extends Job implements Runnable {
   }
 
   /**
-   * Indicates if the job is currently running.
-   * @return result of check
+   * Starts the job if it is not currently running.
    */
-  boolean running() {
-    return running;
+  void startIfNotRunning() {
+    if(running.compareAndSet(false, true)) new Thread(this).start();
   }
 
   @Override
   public void run() {
-    running = true;
     try {
       result.init();
 
@@ -265,7 +264,7 @@ public final class QueryJob extends Job implements Runnable {
         if(result.value != null && result.value.isEmpty()) ctx.jobs.results.remove(id);
       }
     } finally {
-      running = false;
+      running.set(false);
     }
   }
 

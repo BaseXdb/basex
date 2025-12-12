@@ -13,8 +13,6 @@ import org.basex.util.*;
 public final class QueryJobTask extends TimerTask {
   /** Job. */
   public final QueryJob job;
-  /** Job pool. */
-  public final JobPool jobs;
   /** Interval. */
   public final long interval;
   /** End time (@link {@link Long#MAX_VALUE}: no end). */
@@ -26,16 +24,13 @@ public final class QueryJobTask extends TimerTask {
   /**
    * Constructor.
    * @param job job
-   * @param jobs job pool
    * @param delay delay (ms)
    * @param interval interval (ms; no repetition: {@code 0})
    * @param duration total duration (ms; no limit: {@link Long#MAX_VALUE})
    */
-  public QueryJobTask(final QueryJob job, final JobPool jobs, final long delay,
-      final long interval, final long duration) {
-
+  public QueryJobTask(final QueryJob job, final long delay, final long interval,
+      final long duration) {
     this.job = job;
-    this.jobs = jobs;
     this.interval = interval;
     final long time = System.currentTimeMillis();
     start = time + delay;
@@ -50,8 +45,7 @@ public final class QueryJobTask extends TimerTask {
       job.remove();
       cancel();
     }
-    // skip execution if same job is still running
-    if(!job.running()) new Thread(job).start();
+    job.startIfNotRunning();
   }
 
   @Override
