@@ -550,7 +550,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Item toAtomItem(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    if(item.isEmpty()) throw typeError(item, AtomType.ITEM, info);
+    if(item.isEmpty()) throw typeError(item, ITEM, info);
     return item;
   }
 

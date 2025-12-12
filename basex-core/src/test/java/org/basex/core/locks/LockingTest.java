@@ -511,7 +511,7 @@ public final class LockingTest extends SandboxTest {
             final LockTester th = new LockTester(null, read, write, latch);
             th.start();
             try {
-              Thread.sleep(HOLD_TIME);
+              sleep(HOLD_TIME);
               if(!latch.await(FUZZING_THREADS * HOLD_TIME + WAIT, TimeUnit.MILLISECONDS))
                 throw new RuntimeException("Looks like thread is stuck in a deadlock.");
             } catch(final InterruptedException e) {

@@ -92,7 +92,7 @@ public final class DualMap extends SimpleMap {
 
   @Override
   public DualMap copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new DualMap(info, Arr.copyAll(cc, vm, exprs)));
+    return copyType(new DualMap(info, copyAll(cc, vm, exprs)));
   }
 
   @Override

@@ -64,7 +64,7 @@ public final class UserInfo {
    * @param rb HTTP request builder
    */
   public void basic(final HttpRequest.Builder rb) {
-    if(username != null && password != null) rb.header(HTTPText.AUTHORIZATION,
+    if(username != null && password != null) rb.header(AUTHORIZATION,
         AuthMethod.BASIC + " " + Base64.encode(username + ':' + password));
   }
 
@@ -109,7 +109,7 @@ public final class UserInfo {
         + ALGORITHM + '=' + MD5 + ','
         + OPAQUE + "=\"" + auth.get(OPAQUE) + '"';
     }
-    rb.header(HTTPText.AUTHORIZATION, request.authMethod + " " + value);
+    rb.header(AUTHORIZATION, request.authMethod + " " + value);
     return true;
   }
 }

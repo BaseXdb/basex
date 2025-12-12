@@ -27,7 +27,7 @@ public final class FnReplace extends RegExFn {
 
     final boolean func = replacement instanceof FItem;
     final FItem action = func ? toFunction(replacement, 2, qc) : null;
-    final byte[] replace = func ? null : replacement.isEmpty() ? Token.EMPTY : toToken(replacement);
+    final byte[] replace = func ? null : replacement.isEmpty() ? EMPTY : toToken(replacement);
 
     // shortcut for simple character replacements
     if(flags.length == 0) {

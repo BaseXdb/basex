@@ -52,7 +52,7 @@ public final class IndexNames {
         Util.debugln("Included name is invalid: %", entry);
         continue;
       }
-      qnames.add(name == null ? null : name, uri == null ? null : uri);
+      qnames.add(name, uri);
     }
   }
 

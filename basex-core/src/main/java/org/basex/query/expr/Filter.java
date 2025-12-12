@@ -95,7 +95,7 @@ public abstract class Filter extends AFilter {
         final ExprList results = new ExprList(unroll.size());
         for(final Expr ex : unroll) {
           results.add(get(cc, info, ex, results.size() == last ? exprs :
-            Arr.copyAll(cc, new IntObjectMap<>(), exprs)));
+            copyAll(cc, new IntObjectMap<>(), exprs)));
         }
         return List.get(cc, info, results.finish());
       }

@@ -53,6 +53,6 @@ public final class CachedMap extends SimpleMap {
 
   @Override
   public SimpleMap copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new CachedMap(info, Arr.copyAll(cc, vm, exprs)));
+    return copyType(new CachedMap(info, copyAll(cc, vm, exprs)));
   }
 }

@@ -25,7 +25,7 @@ public class FnSchemaType extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final QNm name = toQNm(arg(0).atomItem(qc, info));
-    Type type = AtomType.find(name, true);
+    Type type = find(name, true);
     if(type == null) type = ListType.find(name);
     return annotate(qc, info, type);
   }

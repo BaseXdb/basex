@@ -51,7 +51,7 @@ public final class FTOrder extends FTFilter {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, QueryText.ORDERED, TRUE), exprs);
+    plan.add(plan.create(this, ORDERED, TRUE), exprs);
   }
 
   @Override

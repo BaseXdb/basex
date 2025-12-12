@@ -125,7 +125,7 @@ final class SimplePos extends Arr implements CmpPos {
       // create intersection: pos: 1, 8 and pos: 6, INF → pos: 6, 8
       final Expr min = expr1 == Itr.ONE ? pexpr1 : pexpr1 == Itr.ONE ? expr1 : null;
       final Expr max = expr2 == Itr.MAX ? pexpr2 : pexpr2 == Itr.MAX ? expr2 : null;
-      if(min != null && max != null) return SimplePos.get(min, max, info).optimize(cc);
+      if(min != null && max != null) return get(min, max, info).optimize(cc);
       // create intersection: pos: 5 and pos: 5, 10 → pos: 5
       // create intersection: pos: 4, 6 and pos: 6 → pos: 6
       if(exact() && (expr1.equals(pexpr1) || expr1.equals(pexpr2))) return this;

@@ -1045,7 +1045,7 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    if(type == this || type == AtomType.ITEM) return true;
+    if(type == this || type == ITEM) return true;
     if(type instanceof final AtomType at) {
       return (prePost & 0xFF) >= (at.prePost & 0xFF) && (prePost & 0xFF00) <= (at.prePost & 0xFF00);
     }
@@ -1217,7 +1217,7 @@ public enum AtomType implements Type {
 
   @Override
   public final boolean refinable() {
-    return !((Checks<AtomType>) at -> at.eq(this) || !at.instanceOf(this)).all(AtomType.values());
+    return !((Checks<AtomType>) at -> at.eq(this) || !at.instanceOf(this)).all(values());
   }
 
   @Override

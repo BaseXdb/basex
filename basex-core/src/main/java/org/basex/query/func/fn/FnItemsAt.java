@@ -9,7 +9,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.func.*;
-import org.basex.query.func.Function;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -205,7 +204,7 @@ public final class FnItemsAt extends StandardFunc {
   static long countInputDiff(final Expr input, final Expr end) {
     if(end != Empty.UNDEFINED) {
       final Predicate<Expr> countInput = e ->
-        Function.COUNT.is(e) && e.arg(0).equals(input) && !e.has(Flag.NDT);
+        COUNT.is(e) && e.arg(0).equals(input) && !e.has(Flag.NDT);
       // function(E, count(E)) → 0
       if(countInput.test(end)) return 0;
       // function(E, count(E) - 1) → -1

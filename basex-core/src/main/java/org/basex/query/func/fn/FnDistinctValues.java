@@ -10,7 +10,6 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
@@ -120,7 +119,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
         // distinct-values($string) → $string
         // distinct-values($node) → data($node)
         if(st.zeroOrOne() && !st.mayBeArray())
-          return type == st.type ? values : cc.function(Function.DATA, info, exprs);
+          return type == st.type ? values : cc.function(DATA, info, exprs);
       }
       // assign atomic type of argument
       exprType.assign(type);
@@ -139,8 +138,8 @@ public final class FnDistinctValues extends FnDuplicateValues {
     if(op == OpV.LT) return Bln.FALSE;
     if(op == OpV.GE) return Bln.TRUE;
 
-    final Expr dupl = cc.function(Function.DUPLICATE_VALUES, info, exprs);
-    return cc.function(op == OpV.LE || op == OpV.EQ ? Function.EMPTY : Function.EXISTS, info, dupl);
+    final Expr dupl = cc.function(DUPLICATE_VALUES, info, exprs);
+    return cc.function(op == OpV.LE || op == OpV.EQ ? EMPTY : EXISTS, info, dupl);
   }
 
   /**

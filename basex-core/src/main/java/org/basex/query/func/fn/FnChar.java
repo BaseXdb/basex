@@ -36,7 +36,7 @@ public final class FnChar extends StandardFunc {
         // HTML character reference name
         final byte[] result = XMLToken.getEntity(token);
         if(result != null) return Str.get(result);
-        throw CHARINV_X.get(info, QueryError.similar(token, XMLToken.similarEntity(token)));
+        throw CHARINV_X.get(info, similar(token, XMLToken.similarEntity(token)));
       }
     }
     throw CHARINV_X.get(info, value);

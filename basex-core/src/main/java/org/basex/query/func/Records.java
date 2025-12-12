@@ -62,7 +62,7 @@ public enum Records {
   public static final QNmMap<RecordType> BUILT_IN = new QNmMap<>();
 
   static {
-    for(final Records record : Records.values()) {
+    for(final Records record : values()) {
       BUILT_IN.put(record.get().name(), record.get());
     }
 
@@ -101,7 +101,7 @@ public enum Records {
    * @param name name
    * @param field record field
    */
-  private record NamedRecordField(byte[] name, RecordField field) { };
+  private record NamedRecordField(byte[] name, RecordField field) { }
 
   /**
    * Constructor.
@@ -109,7 +109,6 @@ public enum Records {
    * @param extensible extensible flag
    * @param fields field declarations
    */
-  @SafeVarargs
   Records(final String name, final boolean extensible, final NamedRecordField... fields) {
     final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.length);
     for(final NamedRecordField field : fields) {

@@ -37,9 +37,9 @@ public class CmpG extends Cmp {
     /** General comparison: less or equal. */
     LE("<=") {
       @Override
-      public OpG swap() { return OpG.GE; }
+      public OpG swap() { return GE; }
       @Override
-      public OpG invert() { return OpG.GT; }
+      public OpG invert() { return GT; }
       @Override
       public OpV value() { return OpV.LE; }
     },
@@ -47,9 +47,9 @@ public class CmpG extends Cmp {
     /** General comparison: less. */
     LT("<") {
       @Override
-      public OpG swap() { return OpG.GT; }
+      public OpG swap() { return GT; }
       @Override
-      public OpG invert() { return OpG.GE; }
+      public OpG invert() { return GE; }
       @Override
       public OpV value() { return OpV.LT; }
     },
@@ -77,9 +77,9 @@ public class CmpG extends Cmp {
     /** General comparison: equal. */
     EQ("=") {
       @Override
-      public OpG swap() { return OpG.EQ; }
+      public OpG swap() { return EQ; }
       @Override
-      public OpG invert() { return OpG.NE; }
+      public OpG invert() { return NE; }
       @Override
       public OpV value() { return OpV.EQ; }
     },
@@ -87,7 +87,7 @@ public class CmpG extends Cmp {
     /** General comparison: not equal. */
     NE("!=") {
       @Override
-      public OpG swap() { return OpG.NE; }
+      public OpG swap() { return NE; }
       @Override
       public OpG invert() { return EQ; }
       @Override

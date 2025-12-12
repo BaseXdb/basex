@@ -55,6 +55,6 @@ public final class IterFilter extends Filter {
 
   @Override
   public IterFilter copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new IterFilter(info, root.copy(cc, vm), Arr.copyAll(cc, vm, exprs)));
+    return copyType(new IterFilter(info, root.copy(cc, vm), copyAll(cc, vm, exprs)));
   }
 }

@@ -34,7 +34,7 @@ public final class BinOctal extends BinFn {
     final int tl = string.length;
     if(tl == 0) return B64.EMPTY;
 
-    final TokenBuilder tb = new TokenBuilder(tl * 3);
+    final TokenBuilder tb = new TokenBuilder(tl * 3L);
     for(final byte b : string) {
       final String bits = MAP.get(b);
       if(bits != null) tb.add(bits);
