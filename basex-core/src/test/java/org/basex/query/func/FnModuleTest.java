@@ -2075,8 +2075,9 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(wrap(1)), 1, exists(func));
     check(func.args(" (0 to 99999999999) ! (1 to 10000000)"), 1, root(Itr.class));
 
+    query(func.args(" #a"), "#a");
+
     // errors
-    error(func.args(" #a"), COMPARE_X_X);
     error(func.args(" ('b', 'c', 'a', 1)"), ARGTYPE_X_X_X);
     error(func.args(" (2, 3, 1, 'a')"), ARGTYPE_X_X_X);
     error(func.args(" (false(), true(), false(), 1)"), ARGTYPE_X_X_X);

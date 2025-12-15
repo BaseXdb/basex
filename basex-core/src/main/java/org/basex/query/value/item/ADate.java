@@ -406,11 +406,6 @@ public abstract class ADate extends ADateDur {
   }
 
   @Override
-  public boolean comparable(final Item item) {
-    return item instanceof ADate;
-  }
-
-  @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
     return compare(item, ii);

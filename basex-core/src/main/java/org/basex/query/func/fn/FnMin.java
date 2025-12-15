@@ -52,14 +52,11 @@ public class FnMin extends StandardFunc {
     Item item = iter.next();
     if(item == null) return Empty.VALUE;
 
-    // ensure that item is sortable
     final Type type = item.type;
-    if(!type.isSortable()) throw COMPARE_X_X.get(info, type, item);
-
     final boolean string = item instanceof AStr;
-    final boolean numeric = !string && !(
-        type == BOOLEAN || item instanceof ADate || item instanceof Dur || item instanceof Bin);
-    final boolean dateTime = type.instanceOf(DATE_TIME);
+    final boolean dateTime = item instanceof Dtm, duration = item instanceof Dur;
+    final boolean numeric = !(string || dateTime || duration || type == BOOLEAN || type == QNAME ||
+        item instanceof ADate || item instanceof Dur || item instanceof Bin);
     if(numeric) {
       if(type.isUntyped()) item = DOUBLE.cast(item, qc, info);
       if(item == Dbl.NAN || item == Flt.NAN) return item;
@@ -70,8 +67,8 @@ public class FnMin extends StandardFunc {
         if(type2.isUntyped()) it = DOUBLE.cast(it, qc, info);
         if(it == Dbl.NAN || it == Flt.NAN) return it;
       }
-      if(!(numeric ? it instanceof ANum : string ? it instanceof AStr : dateTime ?
-        type2.instanceOf(DATE_TIME) : type == type2)) {
+      if(!(numeric ? it instanceof ANum : string ? it instanceof AStr :
+         dateTime ? it instanceof Dtm : duration ? it instanceof Dur : type == type2)) {
         throw ARGTYPE_X_X_X.get(info, type, type2, it);
       }
       if(min ^ item.compare(it, collation, true, info) < 0) item = it;

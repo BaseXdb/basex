@@ -570,7 +570,7 @@ public enum AtomType implements Type {
   },
 
   /** Duration type. */
-  DURATION("duration", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.DUR) {
+  DURATION("duration", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.DUR) {
     @Override
     public Dur cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
@@ -713,7 +713,7 @@ public enum AtomType implements Type {
   },
 
   /** Year month type. */
-  G_YEAR_MONTH("gYearMonth", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.YMO) {
+  G_YEAR_MONTH("gYearMonth", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.YMO) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
@@ -733,7 +733,7 @@ public enum AtomType implements Type {
   },
 
   /** Year type. */
-  G_YEAR("gYear", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.YEA) {
+  G_YEAR("gYear", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.YEA) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
@@ -753,7 +753,7 @@ public enum AtomType implements Type {
   },
 
   /** Month day type. */
-  G_MONTH_DAY("gMonthDay", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.MDA) {
+  G_MONTH_DAY("gMonthDay", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.MDA) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
@@ -773,7 +773,7 @@ public enum AtomType implements Type {
   },
 
   /** Day type. */
-  G_DAY("gDay", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.DAY) {
+  G_DAY("gDay", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.DAY) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
@@ -793,7 +793,7 @@ public enum AtomType implements Type {
   },
 
   /** Month type. */
-  G_MONTH("gMonth", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.MON) {
+  G_MONTH("gMonth", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.MON) {
     @Override
     public GDt cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
@@ -897,7 +897,7 @@ public enum AtomType implements Type {
   },
 
   /** QName Type. */
-  QNAME("QName", ANY_ATOMIC_TYPE, XS_URI, false, false, false, false, Type.ID.QNM) {
+  QNAME("QName", ANY_ATOMIC_TYPE, XS_URI, false, false, false, true, Type.ID.QNM) {
     @Override
     public QNm cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {

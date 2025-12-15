@@ -112,4 +112,9 @@ public final class Dtm extends ADate {
       throw Util.notExpected(ex);
     }
   }
+
+  @Override
+  public boolean comparable(final Item item) {
+    return item instanceof Dtm;
+  }
 }
