@@ -152,13 +152,13 @@ public abstract class WebFunction implements Comparable<WebFunction> {
    * Binds a value to a function argument.
    * @param name variable name
    * @param args arguments
-   * @param value value to be bound
+   * @param value value to be bound (can be {@code null})
    * @param qc query context
-   * @param info info string
+   * @param input input description
    * @throws QueryException query exception
    */
   protected final void bind(final QNm name, final Expr[] args, final Value value,
-      final QueryContext qc, final String info) throws QueryException {
+      final QueryContext qc, final String input) throws QueryException {
 
     // skip nulled values
     if(value == null) return;
@@ -171,7 +171,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
         // casts and binds the value
         final SeqType st = var.declaredType();
         args[p] = value.seqType().instanceOf(st) ? value : st.cast(value, false, qc, null);
-        if(args[p] == null) throw error(ARG_TYPE_X_X_X, info, st, value);
+        if(args[p] == null) throw error(ARG_TYPE_X_X_X, input, st, value.toErrorString());
         break;
       }
     }

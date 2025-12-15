@@ -64,7 +64,7 @@ public interface WebText {
   /** Error message. */
   String INV_NONS_X = "No namespace declared for '%'.";
   /** Error message. */
-  String ARG_TYPE_X_X_X = "% must be %, supplied: %.";
+  String ARG_TYPE_X_X_X = "% must be of type %, supplied: %.";
   /** Error message. */
   String PARAM_MISSING_X = "Parameter $% missing in function declaration.";
   /** Error message. */
@@ -82,9 +82,9 @@ public interface WebText {
   /** Error message. */
   String BODY_TYPE_X_X = "Body cannot be parsed as %: %.";
   /** Error message. */
-  String PATH_CONFLICT_X_X = "Multiple services defined for path \"%\":%";
+  String PATH_CONFLICT_X_X = "Multiple functions exist for path \"%\":%";
   /** Error message. */
-  String ERROR_CONFLICT_X_X = "Multiple services defined for error \"%\":%";
+  String ERROR_CONFLICT_X_X = "Multiple functions exist for error path \"%\":%";
   /** Error message. */
   String ERROR_QS_X = "Invalid quality factor: qs=%";
   /** Error message. */
