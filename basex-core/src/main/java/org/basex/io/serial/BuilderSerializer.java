@@ -37,7 +37,7 @@ public class BuilderSerializer extends Serializer {
 
   @Override
   protected final void pi(final byte[] name, final byte[] value) throws IOException {
-    builder.pi(concat(name, cpToken(' '), value));
+    builder.pi(value.length > 0 ? concat(name, cpToken(' '), value) : name);
   }
 
   @Override

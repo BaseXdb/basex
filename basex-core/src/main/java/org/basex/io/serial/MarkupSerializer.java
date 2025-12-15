@@ -4,9 +4,9 @@ import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.Token.normalize;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.out.PrintOutput.*;
 import org.basex.query.*;
@@ -39,7 +39,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   /** Indicates if root element has been serialized. */
   boolean root;
   /** Script flag. */
-  boolean script;
+  int script;
 
   /** HTML5 flag. */
   final boolean html5;
@@ -233,9 +233,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   protected void pi(final byte[] name, final byte[] value) throws IOException {
     if(sep) indent();
     out.print(PI_O);
-    out.print(name);
-    out.print(' ');
-    out.print(value);
+    out.print(value.length > 0 ? concat(name, cpToken(' '), value) : name);
     out.print(PI_C);
     sep = true;
   }
@@ -378,10 +376,14 @@ abstract class MarkupSerializer extends StandardSerializer {
     skip++;
     if(empty) finishOpen();
     level++;
-    startOpen(new QNm(META));
-    attribute(HTTP_EQUIV, CONTENT_TYPE, false);
-    attribute(CONTENT, concat(media.isEmpty() ? MediaType.TEXT_HTML : media, "; ",
-      CHARSET, "=", encoding), false);
+    startOpen(new QNm(elem.hasPrefix() ? concat(elem.prefix(), ":", META) : META));
+    if(html5) {
+      attribute(CHARSET, token(encoding), false);
+    } else {
+      attribute(HTTP_EQUIV, CONTENT_TYPE, false);
+      attribute(CONTENT, concat(media.isEmpty() ? MediaType.TEXT_HTML : media, "; ",
+        CHARSET, "=", encoding), false);
+    }
     out.print(html ? ELEM_C : ELEM_SC);
     level--;
     if(empty) finishClose();
@@ -442,21 +444,30 @@ abstract class MarkupSerializer extends StandardSerializer {
    * @throws QueryIOException query I/O exception
    */
   boolean suppressIndentation(final QNm qname) throws QueryIOException {
-    if(suppress == null) suppress = qnames(SUPPRESS_INDENTATION);
-    return suppress.contains(qname);
+    if(suppress == null) {
+      suppress = new QNmSet();
+      for(final QNm name : qnames(SUPPRESS_INDENTATION)) {
+        suppress.add(new QNm(lc(name.string()), name.uri()));
+      }
+    }
+    return !suppress.isEmpty() && suppress.contains(new QNm(lc(qname.string()), qname.uri()));
   }
 
   /**
-   * Returns the values of an option as QNames.
+   * Returns the value of an option as a list of QNames.
    * @param option option to be found
-   * @return set of QNames
+   * @return QNames
    * @throws QueryIOException query I/O exception
    */
-  private QNmSet qnames(final StringOption option) throws QueryIOException {
-    try {
-      return QNm.set(sopts.get(option), sc);
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
+  private ArrayList<QNm> qnames(final StringOption option) throws QueryIOException {
+    final ArrayList<QNm> list = new ArrayList<>();
+    for(final byte[] name : distinctTokens(token(sopts.get(option)))) {
+      try {
+        list.add(QNm.parse(name, sc != null ? sc.elemNS : null, sc, null));
+      } catch(final QueryException ex) {
+        throw new QueryIOException(ex);
+      }
     }
+    return list;
   }
 }

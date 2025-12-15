@@ -13,7 +13,6 @@ import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -317,21 +316,6 @@ public final class QNm extends Item {
   }
 
   // STATIC METHODS ===============================================================================
-
-  /**
-   * Returns the requested value as set of QNames.
-   * @param value value to be parsed
-   * @param sc static context (can be {@code null})
-   * @return set with QNames
-   * @throws QueryException query exception
-   */
-  public static QNmSet set(final String value, final StaticContext sc) throws QueryException {
-    final QNmSet set = new QNmSet();
-    for(final byte[] name : distinctTokens(token(value))) {
-      if(name.length != 0) set.add(parse(name, sc == null ? null : sc.elemNS, sc, null));
-    }
-    return set;
-  }
 
   /**
    * Converts a value to a QName.

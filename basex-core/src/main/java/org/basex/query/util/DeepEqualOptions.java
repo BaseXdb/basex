@@ -1,5 +1,7 @@
 package org.basex.query.util;
 
+import static org.basex.util.Token.*;
+
 import java.text.*;
 
 import org.basex.query.*;
@@ -105,7 +107,12 @@ public final class DeepEqualOptions extends Options {
    * @throws QueryException query exception
    */
   public boolean unordered(final QNm qname) throws QueryException {
-    if(unordered == null) unordered = QNm.set(get(UNORDERED_ELEMENTS), null);
+    if(unordered == null) {
+      unordered = new QNmSet();
+      for(final byte[] name : distinctTokens(token(get(UNORDERED_ELEMENTS)))) {
+        unordered.add(QNm.parse(name, null, null, null));
+      }
+    }
     return unordered.contains(qname);
   }
 }

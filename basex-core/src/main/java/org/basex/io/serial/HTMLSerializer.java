@@ -140,7 +140,7 @@ final class HTMLSerializer extends MarkupSerializer {
 
   @Override
   protected void print(final int cp) throws IOException {
-    if(script) out.print(cp);
+    if(script > 0) out.print(cp);
     else if(cp > 0x7F && cp < 0xA0 && !html5) throw SERILL_X.getIO(Integer.toHexString(cp));
     else if(cp == 0xA0) out.print(E_NBSP);
     else super.print(cp);
@@ -154,7 +154,6 @@ final class HTMLSerializer extends MarkupSerializer {
     out.print(name.string());
     indAttrLength = out.lineLength();
     sep = indent;
-    script = SCRIPTS.contains(lc(name.local()));
     if(content && eq(lc(elem.local()), HEAD)) skip++;
   }
 
@@ -162,6 +161,7 @@ final class HTMLSerializer extends MarkupSerializer {
   protected void finishOpen() throws IOException {
     super.finishOpen();
     printCT(false, true);
+    if(SCRIPTS.contains(lc(elem.local()))) script++;
   }
 
   @Override
@@ -186,7 +186,7 @@ final class HTMLSerializer extends MarkupSerializer {
   @Override
   protected void finishClose() throws IOException {
     super.finishClose();
-    script = script && !SCRIPTS.contains(lc(elem.local()));
+    if(SCRIPTS.contains(lc(elem.local()))) script--;
   }
 
   @Override
