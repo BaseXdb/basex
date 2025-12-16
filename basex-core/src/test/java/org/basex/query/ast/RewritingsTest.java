@@ -1901,7 +1901,7 @@ public final class RewritingsTest extends SandboxTest {
   @Test public void gh1908() {
     check("<a/> treat as element(a)", "<a/>", root(CElem.class));
     check("attribute a {} treat as attribute(a)", "a=\"\"", root(CAttr.class));
-    check("<?a ?> treat as processing-instruction(a)", "<?a ?>", root(CPI.class));
+    check("<?a?> treat as processing-instruction(a)", "<?a?>", root(CPI.class));
     check("<xml:a/> treat as element(xml:a)", "<xml:a/>", root(CElem.class));
     check("element Q{_}a {} treat as element(Q{_}a)", "<a xmlns=\"_\"/>", root(CElem.class));
 
@@ -1911,7 +1911,7 @@ public final class RewritingsTest extends SandboxTest {
     check("function() as attribute(a) { attribute a {} }() " +
         "instance of attribute(a)",
         true, root(Bln.class));
-    check("function() as processing-instruction(a) { <?a ?> }() " +
+    check("function() as processing-instruction(a) { <?a?> }() " +
         "instance of processing-instruction(a)",
         true, root(Bln.class));
 
