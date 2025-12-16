@@ -49,17 +49,19 @@ public final class ModuleLoader {
    * implementing {@link QueryResource}.
    */
   public void close() {
-    if(loader != LOADER) {
-      try {
-        ((URLClassLoader) loader).close();
-      } catch(final IOException ex) {
-        Util.stack(ex);
-      }
-    }
     for(final Object jm : javaModules) {
       for(final Class<?> c : jm.getClass().getInterfaces()) {
         if(c == QueryResource.class) Reflect.invoke(CLOSE, jm);
       }
+    }
+    try {
+      while(loader != LOADER) {
+        final ClassLoader parent = loader.getParent();
+        ((URLClassLoader) loader).close();
+        loader = parent;
+      }
+    } catch(final IOException ex) {
+      Util.stack(ex);
     }
   }
 
