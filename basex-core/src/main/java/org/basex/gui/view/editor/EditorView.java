@@ -1000,23 +1000,18 @@ public final class EditorView extends View {
   }
 
   /**
-   * Choose a unique tab file.
+   * Choose a unique dummy file reference for a new tab.
    * @return io reference
    */
   private IOFile newTabFile() {
-    // collect numbers of existing files
-    final BoolList bl = new BoolList();
+    int n = 0;
     for(final EditorArea edit : editors()) {
-      if(edit.opened()) continue;
-      final String n = edit.file().name().substring(FILE.length());
-      bl.set(n.isEmpty() ? 1 : Strings.toInt(n), true);
+      final String name = edit.file().name(), num = name.replaceAll("^" + FILE + "(\\d*)$", "$1");
+      if(!edit.opened() && !name.equals(num)) {
+        n = Math.max(n, num.isEmpty() ? 1 : Strings.toInt(num));
+      }
     }
-    // find first free file number
-    int b = 0;
-    final int bs = bl.size();
-    while(++b < bs && bl.get(b));
-    // create io reference
-    return new IOFile(gui.gopts.get(GUIOptions.WORKPATH), FILE + (b == 1 ? "" : b));
+    return new IOFile(gui.gopts.get(GUIOptions.WORKPATH), FILE + (n == 0 ? "" : n + 1));
   }
 
   /**
