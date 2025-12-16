@@ -394,6 +394,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   INSERT_BEFORE(FnInsertBefore::new, "insert-before(input,position,insert)",
       params(ITEM_ZM, INTEGER_O, ITEM_ZM), ITEM_ZM),
+  /** XQuery function. */
+  INSERT_SEPARATOR(FnInsertSeparator::new, "insert-separator(input,separator)",
+      params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function (obsolete). */
   INTERSPERSE(FnIntersperse::new, "intersperse(input,separator)",
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
@@ -616,7 +619,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   SECONDS_FROM_TIME(FnSecondsFromTime::new, "seconds-from-time(value)",
       params(TIME_ZO), DECIMAL_ZO),
-  /** XQuery function. */
+  /** XQuery function (obsolete). */
   SEQUENCE_JOIN(FnSequenceJoin::new, "sequence-join(input,separator)",
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */

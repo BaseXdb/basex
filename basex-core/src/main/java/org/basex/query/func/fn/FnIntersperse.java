@@ -6,5 +6,5 @@ package org.basex.query.func.fn;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FnIntersperse extends FnSequenceJoin {
+public final class FnIntersperse extends FnInsertSeparator {
 }
