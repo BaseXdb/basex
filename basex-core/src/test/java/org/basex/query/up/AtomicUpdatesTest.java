@@ -48,7 +48,7 @@ public final class AtomicUpdatesTest extends SandboxTest {
     query(transform("<doc><tree1 a='0'>text1<a/><!--comm1--><a/><?p1 i1?><?p11?></tree1></doc> ",
         "replace node $input//tree1 with " +
         "<tree2 b='1'>text2<a/><!--comm2--><a/><?p2 i2?><?p22?></tree2>"),
-        "<doc><tree2 b=\"1\">text2<a/><!--comm2--><a/><?p2 i2?><?p22 ?></tree2></doc>");
+        "<doc><tree2 b=\"1\">text2<a/><!--comm2--><a/><?p2 i2?><?p22?></tree2></doc>");
     // LAZY REPLACE: 2 value updates (single attribute)
     query(transform("<doc><tree id1=\"0\"/></doc>",
         "replace node $input//@id1 with attribute id2 {\"1\"}"),

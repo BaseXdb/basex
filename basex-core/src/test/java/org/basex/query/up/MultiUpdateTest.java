@@ -65,22 +65,22 @@ public final class MultiUpdateTest extends SandboxTest {
 
   /** Rename processing instructions. */
   @Test public void renamePIs() {
-    final String input = "<xml><?old ?><?old ?></xml>";
+    final String input = "<xml><?old?><?old?></xml>";
     query(input + " update { rename nodes ./processing-instruction(unknown) as 'new' }",
         input);
     query(input + " update { rename nodes head(./processing-instruction()) as 'new' }",
-        "<xml><?new ?><?old ?></xml>");
+        "<xml><?new?><?old?></xml>");
     query(input + " update { rename nodes tail(./processing-instruction()) as 'new' }",
-        "<xml><?old ?><?new ?></xml>");
+        "<xml><?old?><?new?></xml>");
     query(input + " update { rename nodes ./processing-instruction() as 'new' }",
-        "<xml><?new ?><?new ?></xml>");
+        "<xml><?new?><?new?></xml>");
   }
 
   /** Rename mixed nodes. */
   @Test public void renameMixed() {
-    final String input = "<element attribute=''><?pi ?></element>";
+    final String input = "<element attribute=''><?pi?></element>";
     query(input + " update { rename nodes (., @*, node()) as 'new' }",
-        "<new new=\"\"><?new ?></new>");
+        "<new new=\"\"><?new?></new>");
   }
 
   /** Rename: errors. */
@@ -154,7 +154,7 @@ public final class MultiUpdateTest extends SandboxTest {
 
   /** Replace mixed nodes. */
   @Test public void replaceMixed() {
-    final String input = "<xml><element attribute=''/><?pi ?></xml>";
+    final String input = "<xml><element attribute=''/><?pi?></xml>";
     query(input + " update { replace nodes ./node() with <new/> }",
         "<xml><new/><new/></xml>");
     query(input + " update { replace nodes ./node() with 'new' }",
@@ -199,9 +199,9 @@ public final class MultiUpdateTest extends SandboxTest {
 
   /** Replace value of other nodes. */
   @Test public void replaceValueOfOthers() {
-    final String input = "<xml><!--X--><?pi ?></xml>";
+    final String input = "<xml><!--X--><?pi?></xml>";
     query(input + " update { replace value of nodes comment() with 'NEW' }",
-        "<xml><!--NEW--><?pi ?></xml>");
+        "<xml><!--NEW--><?pi?></xml>");
     query(input + " update { replace value of nodes processing-instruction() with 'NEW' }",
         "<xml><!--X--><?pi NEW?></xml>");
     query(input + " update { replace value of nodes node() with 'NEW' }",
