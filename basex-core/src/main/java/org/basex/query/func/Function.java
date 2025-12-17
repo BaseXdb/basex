@@ -333,6 +333,9 @@ public enum Function implements AFunction {
   FUNCTION_NAME(FnFunctionName::new, "function-name(function)",
       params(FUNCTION_O), QNAME_ZO),
   /** XQuery function. */
+  GENERATE(FnGenerate::new, "generate(init,step)",
+      params(ITEM_O, FuncType.get(ITEM_ZO, ITEM_O, INTEGER_O).seqType()), ITEM_ZM),
+  /** XQuery function. */
   GENERATE_ID(FnGenerateId::new, "generate-id([node])",
       params(NODE_ZO), STRING_O),
   /** XQuery function. */
