@@ -292,7 +292,7 @@ public final class PackageAPITest extends SandboxTest {
     execute(new RepoInstall(REPO + "hello.jar", null));
 
     final IOFile jar = new IOFile(REPO, "org/basex/modules/Hello.jar");
-    final IOFile xqm = new IOFile(REPO, "org/basex/modules/Hello.xqm");
+    final IOFile xqm = new IOFile(REPO, "org/basex/modules/hello.xqm");
     assertTrue(jar.exists(), "File not found: " + jar);
     assertTrue(xqm.exists(), "File not found: " + xqm);
 
