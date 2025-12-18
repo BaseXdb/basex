@@ -127,19 +127,20 @@ public final class RepoManager {
           repo.delete(pkg);
         }
 
-        if(pkg.type() == PkgType.COMBINED) {
-          // delete associated JAR file
-          final IOFile pkgFile = repo.path(pkgPath.replaceAll("\\.[^.]+$", IO.JARSUFFIX));
-          if(!pkgFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
-        }
-
         // delete package directory or file
         final IOFile pkgFile = repo.path(pkgPath);
         if(!pkgFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
 
         // delete directory with extracted jars
-        final IOFile extDir = pkgFile.parent().resolve('.' + pkg.name().replaceAll("^.*\\.", ""));
+        final String className = Strings.uriToClasspath(pkg.name().replaceAll("^.*\\.", ""));
+        final IOFile extDir = pkgFile.parent().resolve('.' + className);
         if(!extDir.delete()) throw REPO_DELETE_X.get(info, extDir);
+
+        if(pkg.type() == PkgType.COMBINED) {
+          // delete associated JAR file
+          final IOFile jarFile = pkgFile.parent().resolve(className + IO.JARSUFFIX);
+          if(!jarFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
+        }
         deleted = true;
       }
     }
@@ -167,6 +168,14 @@ public final class RepoManager {
         for(final String path : child.descendants(IOFile.NO_HIDDEN)) {
           add(name + '.' + path.replaceAll("\\..*", "").replace('/', '.'), name + '/' + path, map);
         }
+      }
+    }
+    // detect combined modules where names have different case
+    for(final Pkg xqm : new ArrayList<>(map.values())) {
+      if(xqm.type == PkgType.XQUERY) {
+        final String jarName = Strings.uriToClasspath(xqm.name);
+        final Pkg jar = map.get(jarName);
+        if(jar != null && xqm.merge(jar).type == PkgType.COMBINED) map.remove(jarName);
       }
     }
     return new ArrayList<>(map.values());
@@ -208,7 +217,7 @@ public final class RepoManager {
     try(QueryContext qc = new QueryContext(context)) {
       final byte[] uri = qc.parseLibrary(string(content), path).sc.module.uri();
       // copy file to rewritten URI file path
-      return write(Strings.uri2path(string(uri)) + IO.XQMSUFFIX, content);
+      return write(Strings.uri2path(string(uri)), IO.XQMSUFFIX, content);
     }
   }
 
@@ -228,7 +237,7 @@ public final class RepoManager {
       for(String s; (s = nli.readLine()) != null;) {
         // write file to rewritten file path
         final Matcher main = MAIN_CLASS.matcher(s);
-        if(main.find()) return write(main.group(1).replace('.', '/') + IO.JARSUFFIX, content);
+        if(main.find()) return write(main.group(1), IO.JARSUFFIX, content);
       }
     }
     throw REPO_PARSE_X_X.get(info, path, MANIFEST);
@@ -236,21 +245,25 @@ public final class RepoManager {
 
   /**
    * Writes a package to disk.
-   * @param path file path
+   * @param pkg package
+   * @param suffix file suffix
    * @param content package content
    * @return {@code true} if existing package was replaced
    * @throws IOException I/O exception
    */
-  private boolean write(final String path, final byte[] content) throws IOException {
+  private boolean write(final String pkg, final String suffix, final byte[] content)
+      throws IOException {
     final IOFile repo = new IOFile(context.soptions.get(StaticOptions.REPOPATH));
-    final IOFile target = new IOFile(repo, path);
+    final boolean isJar = suffix.equals(IO.JARSUFFIX);
+    final String pth = isJar ? Strings.uriToClasspath(pkg) : pkg;
+    final IOFile target = new IOFile(repo, Strings.uri2path(pth) + suffix);
     final boolean exists = target.exists();
     if(!target.parent().md()) throw new BaseXException("Could not create %.", target);
     target.write(content);
 
     // extract files from JAR package
-    if(target.hasSuffix(IO.JARSUFFIX)) {
-      final String pkgPath = path.replaceAll(IO.JARSUFFIX + '$', "");
+    if(isJar) {
+      final String pkgPath =  Strings.uri2path(pkg);
       final String pkgName = target.name().replaceAll(IO.JARSUFFIX + '$', "");
       try(JarFile jarFile = new JarFile(target.file())) {
         for(final JarEntry entry : Collections.list(jarFile.entries())) {

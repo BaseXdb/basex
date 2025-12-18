@@ -289,19 +289,19 @@ public final class PackageAPITest extends SandboxTest {
    */
   @Test public void installJar() {
     // ensure that all files are installed
-    execute(new RepoInstall(REPO + "Hello.jar", null));
+    execute(new RepoInstall(REPO + "hello.jar", null));
 
     final IOFile jar = new IOFile(REPO, "org/basex/modules/Hello.jar");
-    final IOFile xqm = new IOFile(REPO, "org/basex/modules/Hello.xqm");
+    final IOFile xqm = new IOFile(REPO, "org/basex/modules/hello.xqm");
     assertTrue(jar.exists(), "File not found: " + jar);
     assertTrue(xqm.exists(), "File not found: " + xqm);
 
     // run query
-    String query = "import module namespace h='http://basex.org/modules/Hello';h:hello('Universe')";
+    String query = "import module namespace h='http://basex.org/modules/hello';h:hello('Universe')";
     query(query, "Hello Universe");
 
     // run query, ensure that wrong types will be rejected
-    query = "import module namespace h='http://basex.org/modules/Hello';h:hello(123)";
+    query = "import module namespace h='http://basex.org/modules/hello';h:hello(123)";
     try(QueryProcessor qp = new QueryProcessor(query, context)) {
       qp.value();
     } catch(final QueryException ex) {
@@ -309,13 +309,14 @@ public final class PackageAPITest extends SandboxTest {
     }
 
     // ensure that all files were deleted
-    execute(new RepoDelete("org.basex.modules.Hello", null));
+    execute(new RepoDelete("org.basex.modules.hello", null));
     assertFalse(jar.exists(), "File was not deleted:" + jar);
     assertFalse(xqm.exists(), "File was not deleted:" + xqm);
 
     // ensure that package can only be deleted once
     try {
-      new RepoDelete("org.basex.modules.Hello", null).execute(context);
+      new RepoDelete("org.basex.modules.hello", null).execute(context);
+      fail("RepoDelete did not detect missing package.");
     } catch(final BaseXException ex) {
       assertTrue(ex.toString().contains(REPO_NOTFOUND_X.toString()));
     }
