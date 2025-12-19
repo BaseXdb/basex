@@ -64,6 +64,11 @@ public final class CItemArray extends Single {
   }
 
   @Override
+  public long structSize() {
+    return expr.size();
+  }
+
+  @Override
   public String description() {
     return "curly " + ARRAY + " constructor";
   }

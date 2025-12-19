@@ -33,7 +33,7 @@ public class ArraySortBy extends FnSortBy {
     final Integer[] index = index(values, qc);
     if(sorted(index)) return array;
 
-    final ArrayBuilder ab = new ArrayBuilder(qc);
+    final ArrayBuilder ab = new ArrayBuilder(qc, as);
     for(final int i : index) ab.add(values[i]);
     return ab.array(this);
   }
@@ -45,5 +45,10 @@ public class ArraySortBy extends FnSortBy {
 
     if(array.seqType().type instanceof final ArrayType at) exprType.assign(at);
     return this;
+  }
+
+  @Override
+  public long structSize() {
+    return arg(0).structSize();
   }
 }

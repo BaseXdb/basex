@@ -20,7 +20,7 @@ public final class ArrayOfMembers extends ArrayFn {
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter input = arg(0).iter(qc);
 
-    final ArrayBuilder ab = new ArrayBuilder(qc);
+    final ArrayBuilder ab = new ArrayBuilder(qc, input.size());
     for(Item item; (item = qc.next(input)) != null;) {
       ab.add(toRecord(item, Records.MEMBER.get(), qc).get(Str.VALUE));
     }

@@ -25,4 +25,9 @@ public final class ArrayReverse extends ArrayFn {
     if(type instanceof ArrayType) exprType.assign(type);
     return this;
   }
+
+  @Override
+  public long structSize() {
+    return arg(0).structSize();
+  }
 }

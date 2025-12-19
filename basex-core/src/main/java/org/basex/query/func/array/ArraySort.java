@@ -40,4 +40,9 @@ public final class ArraySort extends ArraySortBy {
   public int hofIndex() {
     return 2;
   }
+
+  @Override
+  public long structSize() {
+    return arg(0).structSize();
+  }
 }

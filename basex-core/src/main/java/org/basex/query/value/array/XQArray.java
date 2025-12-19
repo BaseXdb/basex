@@ -356,7 +356,7 @@ public abstract class XQArray extends XQStruct {
 
     if(materialized(test, ii)) return this;
 
-    final ArrayBuilder ab = new ArrayBuilder(qc);
+    final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
     for(final Value value : iterable()) {
       qc.checkStop();
       ab.add(value.materialize(test, ii, qc));
@@ -410,12 +410,12 @@ public abstract class XQArray extends XQStruct {
   public final XQArray coerceTo(final ArrayType at, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
-    final ArrayBuilder ab = new ArrayBuilder(qc);
+    final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
     for(final Value value : iterable()) {
       qc.checkStop();
       ab.add(at.valueType().coerce(value, null, qc, cc, ii));
     }
-    return ab.array();
+    return ab.array(at);
   }
 
   @Override

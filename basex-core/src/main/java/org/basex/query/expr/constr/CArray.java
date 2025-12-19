@@ -47,7 +47,7 @@ public final class CArray extends Arr {
 
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ArrayBuilder ab = new ArrayBuilder(qc);
+    final ArrayBuilder ab = new ArrayBuilder(qc, exprs.length);
     for(final Expr expr : exprs) ab.add(expr.value(qc));
     return ab.array(this);
   }
@@ -68,6 +68,11 @@ public final class CArray extends Arr {
   @Override
   public boolean equals(final Object obj) {
     return obj instanceof CArray && super.equals(obj);
+  }
+
+  @Override
+  public long structSize() {
+    return exprs.length;
   }
 
   @Override

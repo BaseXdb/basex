@@ -24,10 +24,11 @@ public final class ArrayForEachPair extends ArrayFn {
     final FItem action = toFunction(arg(2), 3, qc);
 
     final HofArgs args = new HofArgs(3, action);
-    final ArrayBuilder ab = new ArrayBuilder(qc);
-    final Iterator<Value> as = array1.iterator(0), bs = array2.iterator(0);
-    while(as.hasNext() && bs.hasNext()) {
-      ab.add(invoke(action, args.set(0, as.next()).set(1, bs.next()).inc(), qc));
+    final long as = Math.min(array1.structSize(), array2.structSize());
+    final ArrayBuilder ab = new ArrayBuilder(qc, as);
+    final Iterator<Value> iter1 = array1.iterator(0), iter2 = array2.iterator(0);
+    while(iter1.hasNext() && iter2.hasNext()) {
+      ab.add(invoke(action, args.set(0, iter1.next()).set(1, iter2.next()).inc(), qc));
     }
     return ab.array(this);
   }
@@ -48,6 +49,12 @@ public final class ArrayForEachPair extends ArrayFn {
     if(ft != null) exprType.assign(ArrayType.get(ft.declType));
 
     return this;
+  }
+
+  @Override
+  public long structSize() {
+    final long as1 = arg(0).structSize(), as2 = arg(0).structSize();
+    return as1 != -1 && as2 != -1 ? Math.min(as1, as2) : -1;
   }
 
   @Override

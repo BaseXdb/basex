@@ -55,7 +55,9 @@ public final class ArraySplit extends ArrayFn {
     if(array == XQArray.empty()) return Empty.VALUE;
 
     final Type ft = array.seqType().type;
-    if(ft instanceof ArrayType) exprType.assign(ft.seqType(Occ.ZERO_OR_MORE));
+    if(ft instanceof ArrayType) {
+      exprType.assign(ft.seqType(Occ.ZERO_OR_MORE), array.structSize());
+    }
     return this;
   }
 }

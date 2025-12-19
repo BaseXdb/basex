@@ -91,10 +91,9 @@ final class XsltReport {
     final ValueBuilder vb = new ValueBuilder(qc);
     try {
       for(final Object message : messages) {
-        final ArrayBuilder ab = new ArrayBuilder(qc);
-        for(final Item item : convert(new IOContent(MW_GW.invoke(message).toString()), false)) {
-          ab.add(item);
-        }
+        final Value value = convert(new IOContent(MW_GW.invoke(message).toString()), false);
+        final ArrayBuilder ab = new ArrayBuilder(qc, value.size());
+        for(final Item item : value) ab.add(item);
         vb.add(ab.array());
       }
     } catch(final Exception ex) {

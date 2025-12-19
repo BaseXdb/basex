@@ -346,6 +346,7 @@ public interface QueryText {
   /** Query Info. */ String DIR = "dir";
   /** Query Info. */ String PRE = "pre";
   /** Query Info. */ String SIZE = "size";
+  /** Query Info. */ String STRUCT_SIZE = "structSize";
   /** Query Info. */ String AXIS = "axis";
   /** Query Info. */ String TEST = "test";
   /** Query Info. */ String MIN = "min";

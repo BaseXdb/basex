@@ -26,7 +26,7 @@ public final class ArraySize extends ArrayFn {
     final Expr array = arg(0);
     if(array.seqType().type instanceof ArrayType) {
       final long size = array.structSize();
-      if(size >= 0 && !array.has(Flag.NDT)) return Itr.get(size);
+      if(size != -1 && !array.has(Flag.NDT)) return Itr.get(size);
     }
     return this;
   }

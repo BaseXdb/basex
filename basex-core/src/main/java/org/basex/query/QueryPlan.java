@@ -104,9 +104,9 @@ public final class QueryPlan {
       addAttribute(elem, atts[a], atts[a + 1]);
     }
     if(expr instanceof final Expr ex) {
-      attachType(elem, ex.seqType(), ex.size(), ex.data());
+      attachType(elem, ex.seqType(), ex.size(), ex.structSize(), ex.data());
     } else if(expr instanceof StaticDecl) {
-      attachType(elem, ((StaticDecl) expr).seqType(), -1, null);
+      attachType(elem, ((StaticDecl) expr).seqType(), -1, -1, null);
     }
     final InputInfo info = expr.info();
     if(info != null) attach(elem, info);
@@ -148,7 +148,7 @@ public final class QueryPlan {
       addAttribute(elem, NAME, var.toErrorString());
       addAttribute(elem, ID, var.id);
       if(var.declType != null) addAttribute(elem, AS, var.declType);
-      if(type) attachType(elem, var.seqType(), var.size(), var.data());
+      if(type) attachType(elem, var.seqType(), var.size(), -1, var.data());
     }
     return elem;
   }
@@ -158,12 +158,14 @@ public final class QueryPlan {
    * @param elem element to which attributes will be added
    * @param seqType sequence type
    * @param size result size
+   * @param structSize struct size
    * @param data data reference (can be {@code null})
    */
   private void attachType(final FBuilder elem, final SeqType seqType, final long size,
-      final Data data) {
+      final long structSize, final Data data) {
     addAttribute(elem, TYPE, seqType);
     if(size != -1) addAttribute(elem, SIZE, size);
+    if(structSize != -1) addAttribute(elem, STRUCT_SIZE, structSize);
     if(data != null) addAttribute(elem, DATABASE, data.meta.name);
   }
 

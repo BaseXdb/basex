@@ -26,7 +26,7 @@ public final class ArraySlice extends FnSlice {
     for(long i = slice.start; i <= slice.end; i += slice.step) {
       ab.add(array.memberAt(i - 1));
     }
-    return ab.array();
+    return ab.array(this);
   }
 
   @Override

@@ -35,7 +35,7 @@ public final class FnPartition extends StandardFunc {
             final Value val = value;
             value = item;
             if(!val.isEmpty()) {
-              final ArrayBuilder ab = new ArrayBuilder(qc);
+              final ArrayBuilder ab = new ArrayBuilder(qc, val.size());
               for(final Item it : val) ab.add(it);
               return ab.array();
             }

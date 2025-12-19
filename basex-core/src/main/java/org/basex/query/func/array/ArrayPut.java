@@ -30,4 +30,9 @@ public final class ArrayPut extends ArrayFn {
     }
     return this;
   }
+
+  @Override
+  public long structSize() {
+    return arg(0).structSize();
+  }
 }

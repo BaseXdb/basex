@@ -48,4 +48,10 @@ public final class ArrayRemove extends ArrayFn {
     if(type instanceof ArrayType) exprType.assign(type);
     return this;
   }
+
+  @Override
+  public long structSize() {
+    final long as = arg(0).structSize();
+    return as != -1 ? as - 1 : -1;
+  }
 }

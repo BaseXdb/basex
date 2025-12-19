@@ -67,7 +67,7 @@ public final class StructFilter extends AFilter {
             qf.pos = a.incrementAndGet();
             if(expr.test(qc, info, a.get())) ab.add(value);
           }
-          item = ab.array();
+          item = ab.array(this);
         } else {
           // maps
           final MapBuilder mb = new MapBuilder();
@@ -79,7 +79,7 @@ public final class StructFilter extends AFilter {
             qf.pos = a.incrementAndGet();
             if(expr.test(qc, info, a.get())) mb.put(key, value);
           });
-          item = mb.map();
+          item = mb.map(this);
         }
       }
       return item;

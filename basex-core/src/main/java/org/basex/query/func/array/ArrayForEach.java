@@ -22,7 +22,7 @@ public final class ArrayForEach extends ArrayFn {
     final FItem action = toFunction(arg(1), 2, qc);
 
     final HofArgs args = new HofArgs(2, action);
-    final ArrayBuilder ab = new ArrayBuilder(qc);
+    final ArrayBuilder ab = new ArrayBuilder(qc, array.structSize());
     for(final Value value : array.iterable()) {
       ab.add(invoke(action, args.set(0, value).inc(), qc));
     }
@@ -44,6 +44,11 @@ public final class ArrayForEach extends ArrayFn {
     if(ft != null) exprType.assign(ArrayType.get(ft.declType));
 
     return this;
+  }
+
+  @Override
+  public long structSize() {
+    return arg(0).structSize();
   }
 
   @Override

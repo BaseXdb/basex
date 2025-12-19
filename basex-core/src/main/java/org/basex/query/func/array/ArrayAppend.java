@@ -34,4 +34,10 @@ public final class ArrayAppend extends ArrayFn {
     }
     return this;
   }
+
+  @Override
+  public long structSize() {
+    final long as = arg(0).structSize();
+    return as != -1 ? as + 1 : -1;
+  }
 }

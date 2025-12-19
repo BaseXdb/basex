@@ -23,12 +23,12 @@ public final class ArrayBuild extends StandardFunc {
     if(action == null) return XQArray.items(arg(0).value(qc));
 
     final Iter input = arg(0).iter(qc);
-    final ArrayBuilder ab = new ArrayBuilder(qc);
+    final ArrayBuilder ab = new ArrayBuilder(qc, input.size());
     final HofArgs args = new HofArgs(2, action);
     for(Item item; (item = qc.next(input)) != null;) {
       ab.add(invoke(action, args.set(0, item).inc(), qc));
     }
-    return ab.array();
+    return ab.array(this);
   }
 
   @Override
