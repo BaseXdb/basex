@@ -48,7 +48,7 @@ public final class ArrayForEach extends ArrayFn {
 
   @Override
   public long structSize() {
-    return arg(0).structSize();
+    return structSize(0);
   }
 
   @Override

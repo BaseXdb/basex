@@ -43,6 +43,7 @@ public final class ArraySort extends ArraySortBy {
 
   @Override
   public long structSize() {
-    return arg(0).structSize();
+    final Expr expr1 = arg(0);
+    return expr1.seqType().instanceOf(Types.ARRAY_O) ? expr1.structSize() : -1;
   }
 }

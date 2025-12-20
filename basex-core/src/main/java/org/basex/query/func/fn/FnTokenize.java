@@ -148,7 +148,7 @@ public final class FnTokenize extends RegExFn {
    */
   public boolean whitespace() {
     final Expr pattern = arg(1);
-    return pattern == Empty.VALUE || pattern == Empty.UNDEFINED ||
+    return pattern.size() == 0 ||
         pattern instanceof final Str str && Token.eq(str.string(), WHITESPACE);
   }
 }
