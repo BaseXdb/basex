@@ -457,7 +457,7 @@ public abstract class XQArray extends XQStruct {
     // determine type (static or exact)
     final int sz = (int) structSize();
     SeqType dt = funcType().declType;
-    if(sz > 0 && dt.eq(Types.ITEM_ZM)) {
+    if(sz > 0 && dt.type == AtomType.ITEM) {
       dt = null;
       for(final Value value : iterable()) {
         final SeqType st = value.seqType();
