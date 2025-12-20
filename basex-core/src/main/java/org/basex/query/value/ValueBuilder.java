@@ -2,6 +2,7 @@ package org.basex.query.value;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
@@ -52,24 +53,23 @@ public final class ValueBuilder {
   public ValueBuilder add(final Value value) {
     if(!value.isEmpty()) {
       qc.checkStop();
-      final Value sngl = single;
-      if(sngl != null) {
-        single = null;
-        if(capacity != Integer.MIN_VALUE) {
-          sequence = isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
-                     isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder() :
-                     isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
-                     isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
-                     isBln(sngl) && isBln(value) ? new BlnSeqBuilder() : null;
+      if(sequence == null) {
+        final Value sngl = single;
+        if(sngl == null) {
+          single = value;
+          return this;
         }
-        if(sequence == null) sequence = new TreeSeqBuilder();
+        single = null;
+        sequence = capacity == Integer.MIN_VALUE ? new TreeSeqBuilder() :
+                   isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
+                   isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder() :
+                   isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
+                   isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
+                   isBln(sngl) && isBln(value) ? new BlnSeqBuilder() :
+                   new ItemSeqBuilder();
         add(sngl);
       }
-      if(sequence != null) {
-        sequence = sequence.add(value, qc);
-      } else {
-        single = value;
-      }
+      sequence = sequence.add(value, qc);
     }
     return this;
   }
@@ -258,6 +258,23 @@ public final class ValueBuilder {
     @Override
     public Value value(final Type type) {
       return BlnSeq.get(values.finish());
+    }
+  }
+
+  /** Item sequence builder. */
+  final class ItemSeqBuilder implements SeqBuilder {
+    /** Items. */
+    private final ItemList items = new ItemList(capacity);
+
+    @Override
+    public SeqBuilder add(final Item item) {
+      items.add(item);
+      return this;
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return items.value(type);
     }
   }
 }

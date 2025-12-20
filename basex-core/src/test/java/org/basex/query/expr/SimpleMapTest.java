@@ -7,7 +7,6 @@ import org.basex.*;
 import org.basex.query.expr.constr.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.seq.tree.*;
 import org.basex.query.var.*;
 import org.junit.jupiter.api.*;
 
@@ -82,7 +81,7 @@ public final class SimpleMapTest extends SandboxTest {
 
   /** Inline simple expressions into next operand. */
   @Test public void inline() {
-    check("'1' ! (., number())", "1\n1", root(SmallSeq.class));
+    check("'1' ! (., number())", "1\n1", root(ItemSeq.class));
     check("let $a := document { <a/> } return $a ! (., /)", "<a/>\n<a/>", empty(VarRef.class));
     check("let $d := document{} return $d ! /", "", root(CDoc.class));
     check("{ 1: 2 } ! ?*", 2, root(Itr.class));

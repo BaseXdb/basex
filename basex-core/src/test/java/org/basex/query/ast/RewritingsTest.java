@@ -1016,7 +1016,7 @@ public final class RewritingsTest extends SandboxTest {
     check("(1, 2) coerce to xs:double+", "1\n2",
         empty(TypeCheck.class), root(DblSeq.class), count(Dbl.class, 2));
     check("(-128, 127) coerce to xs:byte+", "-128\n127",
-        empty(TypeCheck.class), root(SmallSeq.class), count(Itr.class, 2));
+        empty(TypeCheck.class), root(ItemSeq.class), count(Itr.class, 2));
 
     error("<a/> coerce to empty-sequence()", INVTYPE_X);
     error("(1, 128) coerce to xs:byte+", FUNCCAST_X_X_X);
@@ -2121,7 +2121,7 @@ public final class RewritingsTest extends SandboxTest {
 
     check("for $a in (1, 2) group by $a return $a", "1\n2", root(RangeSeq.class));
     check("for $a in (1, 3) group by $a return $a", "1\n3", root(IntSeq.class));
-    check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(SmallSeq.class));
+    check("for $a in (1, 'a', 1) group by $a return $a", "1\na", root(ItemSeq.class));
 
     check("for $p in (1 to 2)[. >= 0] group by $q := string($p) return $q",
         "1\n2", root(DISTINCT_VALUES), exists(DualMap.class));

@@ -53,18 +53,18 @@ public final class ArrayBuilder {
    * @return reference to this builder for convenience
    */
   public ArrayBuilder add(final Value value) {
-    final Value sngl = single;
-    if(sngl != null) {
+    if(array == null) {
+      final Value sngl = single;
+      if(sngl == null) {
+        single = value;
+        return this;
+      }
       single = null;
-      array = capacity != Integer.MIN_VALUE && sngl.size() == 1 && value.size() == 1 ?
-        new ItemArrayBuilder(qc, capacity) : new TreeArrayBuilder();
+      array = capacity == Integer.MIN_VALUE || sngl.size() != 1 || value.size() != 1 ?
+        new TreeArrayBuilder() : new ItemArrayBuilder(qc, capacity);
       add(sngl);
     }
-    if(array != null) {
-      array = array.add(value);
-    } else {
-      single = value;
-    }
+    array = array.add(value);
     return this;
   }
 
