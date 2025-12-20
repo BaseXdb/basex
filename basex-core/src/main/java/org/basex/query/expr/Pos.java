@@ -60,7 +60,7 @@ public final class Pos extends Single {
         return IntPos.get(rs.min(), rs.max(), info);
       }
       // range. example: position() = 3 to $max
-      if(pos instanceof final Range rng && rng.ints) {
+      if(pos instanceof final Range rng && rng.integers()) {
         if(pos.isSimple()) return new SimplePos(info, pos.args());
         return ref instanceof Pos ? null : new Pos(info, pos);
       }

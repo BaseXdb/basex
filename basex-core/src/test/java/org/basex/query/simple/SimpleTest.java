@@ -308,6 +308,10 @@ public final class SimpleTest extends QueryTest {
           "let $a := <a/> " +
           "let $b := (# db:copynode false #) { <_>{ $a }</_> } " +
           "return $b/a is $a" },
+
+      { "Range 1", integers(100), "count((1 to 10) ! (. to . + 9))" },
+      { "Range 2", integers(100), "count((1 to 10) ! (. to . - -9))" },
+      { "Range 3", integers(1_000_000_000), "count((1 to 100_000) ! (. to . + 9_999))" },
     };
   }
 }

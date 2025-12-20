@@ -27,8 +27,6 @@ import org.basex.util.hash.*;
 public final class Range extends Arr {
   /** Dummy value for representing the last item in a sequence. */
   private static final long LAST = 1L << 52;
-  /** Expressions yield integers. */
-  boolean ints;
 
   /**
    * Constructor.
@@ -48,14 +46,34 @@ public final class Range extends Arr {
       if(values(false, cc)) return cc.preEval(this);
 
       final Expr min = exprs[0], max = exprs[1];
-      final SeqType st1 = min.seqType(), st2 = max.seqType();
-      ints = st1.instanceOf(Types.INTEGER_O) && st2.instanceOf(Types.INTEGER_O);
-      if(min.equals(max)) {
-        exprType.assign(Occ.EXACTLY_ONE);
-        if(ints && !min.has(Flag.NDT)) expr = min;
+      if(!min.has(Flag.NDT)) {
+        if(min.equals(max)) {
+          // identical operands: $int to $int
+          exprType.assign(Occ.EXACTLY_ONE);
+          if(integers()) expr = min;
+        } else if(max instanceof Arith arith && min.equals(max.arg(0))) {
+          if(arith.calc.oneOf(Calc.ADD, Calc.SUBTRACT) && arith.arg(1) instanceof Itr itr) {
+            // known result size: . to . + 10
+            final long n = (arith.calc == Calc.ADD ? itr.itr() : -itr.itr()) + 1;
+            if(n < 1) {
+              expr = Empty.VALUE;
+            } else {
+              exprType.assign(seqType(), n);
+            }
+          }
+        }
       }
     }
     return cc.replaceWith(this, expr);
+  }
+
+  /**
+   * Indicates if the range operands are known to return single integers.
+   * @return result of check
+   */
+  boolean integers() {
+    final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
+    return st1.instanceOf(Types.INTEGER_O) && st2.instanceOf(Types.INTEGER_O);
   }
 
   @Override
@@ -75,9 +93,7 @@ public final class Range extends Arr {
 
   @Override
   public Range copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    final Range r = copyType(new Range(info, copyAll(cc, vm, exprs)));
-    r.ints = ints;
-    return r;
+    return copyType(new Range(info, copyAll(cc, vm, exprs)));
   }
 
   @Override
