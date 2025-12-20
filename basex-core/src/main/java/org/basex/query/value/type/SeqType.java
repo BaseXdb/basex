@@ -147,8 +147,7 @@ public final class SeqType {
 
     // try shortcut (type of value may be specific enough)
     if(!(coerce && type instanceof FType || type instanceof ChoiceItemType)) {
-      final SeqType st = value.seqType();
-      if(st.type.instanceOf(type) && st.testInstanceOf(this)) return true;
+      if(value.type.instanceOf(type) && test == null) return true;
     }
     // check single item
     if(size == 1) return instance((Item) value, coerce);
