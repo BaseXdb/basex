@@ -75,19 +75,17 @@ public final class DualMap extends SimpleMap {
   public Value value(final QueryContext qc) throws QueryException {
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
-    try {
-      final ValueBuilder vb = new ValueBuilder(qc, size());
-      final Iter iter = exprs[0].iter(qc);
-      for(Item item; (item = qc.next(iter)) != null;) {
+    final ValueBuilder vb = new ValueBuilder(qc, size());
+    final Iter iter = exprs[0].iter(qc);
+    for(Item item; (item = qc.next(iter)) != null;) {
+      try {
         qf.value = item;
-        item = exprs[1].item(qc, info);
-        if(!item.isEmpty()) vb.add(item);
+        vb.add(exprs[1].item(qc, info));
+      } finally {
         qf.value = qv;
       }
-      return vb.value(this);
-    } finally {
-      qf.value = qv;
     }
+    return vb.value(this);
   }
 
   @Override
