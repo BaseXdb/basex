@@ -13,7 +13,6 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.seq.tree.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
@@ -471,10 +470,10 @@ public final class MixedTest extends SandboxTest {
   /** Tests the data structure before and after shrinking. */
   @Test public void shrink() {
     test("('x', 1 to 3) => remove(1)",
-        new TypeInfo(SmallSeq.class, "xs:anyAtomicType+", 3),
+        new TypeInfo(SubSeq.class, "xs:anyAtomicType+", 3),
         new TypeInfo(RangeSeq.class, "xs:integer+", 3));
     test("('x', 1 to 100) => remove(1)",
-        new TypeInfo(BigSeq.class, "xs:anyAtomicType+", 100),
+        new TypeInfo(SubSeq.class, "xs:anyAtomicType+", 100),
         new TypeInfo(RangeSeq.class, "xs:integer+", 100));
 
     test("map:build(1 to 3) => map:remove(1)",

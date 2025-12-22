@@ -4,23 +4,23 @@ import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 
 /**
- * An interface for creating sequences.
+ * Abstract array builder.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public interface ArrBuilder {
+public abstract class ArrBuilder {
   /**
-   * Adds a member to the end of the sequence.
-   * @param value value to add
+   * Appends a member.
+   * @param value value to append
    * @return reference to this builder for convenience
    */
-  ArrBuilder add(Value value);
+  abstract ArrBuilder add(Value value);
 
   /**
    * Creates an array containing the values of this builder.
    * @param type type of all members in this sequence
    * @return resulting sequence
    */
-  XQArray array(ArrayType type);
+  abstract XQArray array(ArrayType type);
 }

@@ -17,6 +17,7 @@ import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.prof.ProfType.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
@@ -1099,6 +1100,21 @@ public final class FnModuleTest extends SandboxTest {
     check(func.args(" 2 to 5", 1, " function($a, $b) { $b[" + _RANDOM_DOUBLE.args() + "] }"), "",
         empty(func),
         exists(_RANDOM_DOUBLE));
+
+    // ensure that builder takes advantage of regularities
+    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { $seq, $i }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
+    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { $seq, -$i }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
+    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { $i, $seq }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
+    checkType(func.args(" 0 to 999", " ()", " fn($seq, $i) { -$i, $seq }"),
+        new TypeInfo(RangeSeq.class, "xs:integer+", 1000));
+
+    checkType(func.args(" 0 to 9", " ()", " fn($seq, $i) { $seq, 1 }"),
+        new TypeInfo(SingletonSeq.class, "xs:integer+", 10));
+    checkType(func.args(" 0 to 9", " ()", " fn($seq, $i) { 1, $seq }"),
+        new TypeInfo(SingletonSeq.class, "xs:integer+", 10));
   }
 
   /** Test method. */

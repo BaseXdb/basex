@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class TreeSeqBuilder implements SeqBuilder {
+public final class TreeSeqBuilder extends SeqBuilder {
   /** Capacity of the root. */
   private static final int CAP = 2 * TreeSeq.MAX_DIGIT;
   /** Size of inner nodes. */

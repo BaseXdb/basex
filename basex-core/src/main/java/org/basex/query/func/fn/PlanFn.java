@@ -470,7 +470,7 @@ public abstract class PlanFn extends StandardFunc {
   private XQArray mixed(final ANode node, final ANode parent, final Plan plan,
       final QueryContext qc, final boolean ignoreEmpty) throws QueryException {
 
-    final ArrayBuilder ab = new ArrayBuilder();
+    final ArrayBuilder ab = new ArrayBuilder(qc);
     for(final ANode attr : children(NodeType.ATTRIBUTE, node)) {
       ab.add(new MapBuilder().put(nodeName(attr, node, plan, qc), attr.string()).map());
     }

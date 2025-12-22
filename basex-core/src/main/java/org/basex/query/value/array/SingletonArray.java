@@ -46,7 +46,7 @@ public final class SingletonArray extends XQArray {
   }
 
   @Override
-  public XQArray put(final long pos, final Value value) {
+  public XQArray putMember(final long pos, final Value value, final QueryContext qc) {
     return get(value);
   }
 

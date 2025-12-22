@@ -1,4 +1,4 @@
- package org.basex.query.value.item;
+package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
@@ -246,7 +246,7 @@ public abstract class Item extends Value {
 
   @Override
   public Value insertValue(final long pos, final Value value, final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, value.size() + 1);
     vb.add(pos == 0 ? value : this);
     vb.add(pos == 0 ? this : value);
     return vb.value(type.union(value.type));

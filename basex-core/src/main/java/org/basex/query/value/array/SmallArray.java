@@ -37,7 +37,8 @@ public final class SmallArray extends TreeArray {
   }
 
   @Override
-  public XQArray put(final long pos, final Value value) {
+  public XQArray putMember(final long pos, final Value value, final QueryContext qc) {
+    qc.checkStop();
     final Value[] values = members.clone();
     values[(int) pos] = value;
     return new SmallArray(values, union(value));

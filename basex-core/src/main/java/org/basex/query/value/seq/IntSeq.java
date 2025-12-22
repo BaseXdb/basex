@@ -175,17 +175,14 @@ public final class IntSeq extends NativeSeq {
     final int first = values[0];
     if(vl == 1) return Itr.get(first, type);
     // singleton or range?
-    boolean singleton = true, range = true;
-    int v = 0;
-    while((singleton || range) && ++v < vl) {
+    boolean same = true, asc = true, desc = true;
+    for(int v = 1; v < vl && (same || asc || desc); v++) {
       final int i = values[v];
-      singleton &= i == first;
-      range &= i == first + v;
+      if(same && i != first) same = false;
+      if(asc  && i != first + v) asc = false;
+      if(desc && i != first - v) desc = false;
     }
-    if(v == vl) {
-      if(singleton) return SingletonSeq.get(Itr.get(first, type), vl);
-      if(type == AtomType.INTEGER) return RangeSeq.get(first, vl, true);
-    }
-    return new IntSeq(values, type);
+    return same ? SingletonSeq.get(Itr.get(first, type), vl) :
+      asc || desc ? RangeSeq.get(first, vl, asc) : new IntSeq(values, type);
   }
 }

@@ -131,13 +131,13 @@ public abstract class XQArray extends XQStruct {
   protected abstract XQArray subArr(long pos, long length, QueryContext qc);
 
   /**
-   * Returns a copy of this array where the value at the given position is
-   * replaced by the given value.
+   * Replaces a value at the specified position.
    * @param pos position of the value to replace
    * @param value value to put into this array
+   * @param qc query context
    * @return new array
    */
-  public abstract XQArray put(long pos, Value value);
+  public abstract XQArray putMember(long pos, Value value, QueryContext qc);
 
   /**
    * Appends a value.

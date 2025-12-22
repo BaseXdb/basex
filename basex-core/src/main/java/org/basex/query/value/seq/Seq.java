@@ -106,12 +106,12 @@ public abstract class Seq extends Value {
   }
 
   /**
-   * Creates a tree representation of this array.
+   * Creates a tree-based version of this sequence.
    * @param qc query context
-   * @return array
+   * @return value
    */
   private Value toTree(final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder(qc, Integer.MIN_VALUE);
+    final ValueBuilder vb = new ValueBuilder(qc, Long.MIN_VALUE);
     for(final Item item : this) vb.add(item);
     return vb.value(type);
   }

@@ -51,22 +51,22 @@ public abstract class TreeSeq extends Seq {
       return pos == 0 ? other.concat(this) : concat(other);
     }
 
-    final TreeSeqBuilder tsb = new TreeSeqBuilder();
+    final TreeSeqBuilder sb = new TreeSeqBuilder();
     if(pos < MAX_SMALL) {
-      tsb.add(value, qc);
-      for(long i = pos; --i >= 0;) tsb.prepend(itemAt(i));
+      sb.add(value, qc);
+      for(long i = pos; --i >= 0;) sb.prepend(itemAt(i));
     } else {
-      tsb.add(subsequence(0, pos, qc), qc);
-      tsb.add(value, qc);
+      sb.add(subsequence(0, pos, qc), qc);
+      sb.add(value, qc);
     }
 
     if(right < MAX_SMALL) {
-      for(long i = size - right; i < size; i++) tsb.add(itemAt(i));
+      for(long i = size - right; i < size; i++) sb.add(itemAt(i));
     } else {
-      tsb.add(subsequence(pos, right, qc), qc);
+      sb.add(subsequence(pos, right, qc), qc);
     }
 
-    return tsb.value(type.union(value.type));
+    return sb.value(type.union(value.type));
   }
 
   /**

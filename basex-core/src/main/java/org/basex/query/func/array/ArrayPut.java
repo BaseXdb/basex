@@ -19,7 +19,7 @@ public final class ArrayPut extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
     final long position = toLong(arg(1), qc);
     final Value member = arg(2).value(qc);
-    return array.put(toPos(array, position, false), member);
+    return array.putMember(toPos(array, position, false), member, qc);
   }
 
   @Override

@@ -11,7 +11,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-final class TreeArrayBuilder implements ArrBuilder {
+final class TreeArrayBuilder extends ArrBuilder {
   /** Capacity of the root. */
   private static final int CAP = 2 * TreeArray.MAX_DIGIT;
   /** Size of inner nodes. */

@@ -4,6 +4,8 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.query.value.array.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -25,6 +27,9 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" [ ]", 1), "[1]");
     query(func.args(" [ 1 ]", 2), "[1,2]");
     query(func.args(" [ 1, 2, 3 ]", " (4, 5)"), "[1,2,3,(4,5)]");
+
+    check(func.args(" [ 1 ]", "x"), "[1,\"x\"]",
+        type(ItemArray.class, "array(xs:anyAtomicType)"), type(ItemSeq.class, "xs:anyAtomicType+"));
   }
 
   /** Test method. */

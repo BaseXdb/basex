@@ -165,7 +165,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Removes an item at the given position.
-   * @param pos deletion position, must be between 0 and {@link #size()} - 1
+   * @param pos deletion position, must be greater than 0 and smaller than {@link #size()} - 1
+   *   (use {@link #subSeq(long, long, QueryContext)} to remove first or last item)
    * @param qc query context
    * @return new sequence
    */

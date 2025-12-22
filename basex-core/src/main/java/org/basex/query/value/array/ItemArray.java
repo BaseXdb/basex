@@ -54,13 +54,13 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
-  public XQArray put(final long pos, final Value value) {
-    return toTree().put(pos, value);
+  public XQArray putMember(final long pos, final Value value, final QueryContext qc) {
+    return toTree(qc).putMember(pos, value, qc);
   }
 
   @Override
   public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
-    return toTree().insertMember(pos, value, qc);
+    return toTree(qc).insertMember(pos, value, qc);
   }
 
   @Override
@@ -80,11 +80,12 @@ public final class ItemArray extends XQArray {
   }
 
   /**
-   * Creates a tree representation of this array.
+   * Creates a tree-based version of this array.
+   * @param qc query context
    * @return array
    */
-  private XQArray toTree() {
-    final ArrayBuilder ab = new ArrayBuilder();
+  private XQArray toTree(final QueryContext qc) {
+    final ArrayBuilder ab = new ArrayBuilder(qc, Long.MIN_VALUE);
     for(final Item member : members) ab.add(member);
     return ab.array((ArrayType) type);
   }

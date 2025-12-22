@@ -12,26 +12,19 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class ArrayBuilder {
-  /** QueryContext (can be {@code null}). */
+  /** QueryContext. */
   private final QueryContext qc;
 
-  /** Sequence builder, only instantiated if there are at least two members. */
-  private ArrBuilder array;
-  /** Capacity ({@link Integer#MIN_VALUE}: create no compact data structures). */
+  /** Builder, only instantiated if there are at least two items. */
+  private ArrBuilder builder;
+  /** Capacity ({@link Long#MIN_VALUE}: create no compact data structures). */
   private final long capacity;
   /** The first added value is cached. */
   private Value single;
 
   /**
    * Constructor.
-   */
-  public ArrayBuilder() {
-    this(null);
-  }
-
-  /**
-   * Constructor.
-   * @param qc query context (can be {@code null}, required for interrupting running queries)
+   * @param qc query context (required for interrupting running queries)
    */
   public ArrayBuilder(final QueryContext qc) {
     this(qc, -1);
@@ -39,12 +32,12 @@ public final class ArrayBuilder {
 
   /**
    * Constructor.
-   * @param qc query context (can be {@code null}, required for interrupting running queries)
-   * @param capacity initial capacity ({@link Integer#MIN_VALUE}: create no compact data structures)
+   * @param qc query context (required for interrupting running queries)
+   * @param capacity initial capacity ({@link Long#MIN_VALUE}: create no compact data structures)
    */
   public ArrayBuilder(final QueryContext qc, final long capacity) {
     this.qc = qc;
-    this.capacity = qc != null ? capacity : Integer.MIN_VALUE;
+    this.capacity = capacity;
   }
 
   /**
@@ -53,18 +46,19 @@ public final class ArrayBuilder {
    * @return reference to this builder for convenience
    */
   public ArrayBuilder add(final Value value) {
-    final Value sngl = single;
-    if(sngl != null) {
+    if(builder == null) {
+      qc.checkStop();
+      final Value sngl = single;
+      if(sngl == null) {
+        single = value;
+        return this;
+      }
       single = null;
-      array = capacity != Integer.MIN_VALUE && sngl.size() == 1 && value.size() == 1 ?
-        new ItemArrayBuilder(qc, capacity) : new TreeArrayBuilder();
+      builder = capacity == Long.MIN_VALUE || sngl.size() != 1 || value.size() != 1 ?
+        new TreeArrayBuilder() : new ItemArrayBuilder();
       add(sngl);
     }
-    if(array != null) {
-      array = array.add(value);
-    } else {
-      single = value;
-    }
+    builder = builder.add(value);
     return this;
   }
 
@@ -84,10 +78,10 @@ public final class ArrayBuilder {
    */
   public XQArray array(final ArrayType type) {
     try {
-      return array != null ? array.array(type) : single != null ? XQArray.get(single) :
+      return builder != null ? builder.array(type) : single != null ? XQArray.get(single) :
         XQArray.empty();
     } finally {
-      array = null;
+      builder = null;
       single = null;
     }
   }
@@ -99,5 +93,27 @@ public final class ArrayBuilder {
    */
   public XQArray array(final Expr expr) {
     return expr != null ? array((ArrayType) expr.seqType().type) : array();
+  }
+
+  /** Item array builder. */
+  final class ItemArrayBuilder extends ArrBuilder {
+    /** Value builder. */
+    private final ValueBuilder vb = new ValueBuilder(qc, capacity);
+
+    @Override
+    public ArrBuilder add(final Value value) {
+      if(value.size() == 1) {
+        vb.add(value);
+        return this;
+      }
+      final TreeArrayBuilder ab = new TreeArrayBuilder();
+      for(final Value member : vb.value()) ab.add(member);
+      return ab.add(value);
+    }
+
+    @Override
+    public XQArray array(final ArrayType type) {
+      return new ItemArray(vb.value(type.valueType().type));
+    }
   }
 }

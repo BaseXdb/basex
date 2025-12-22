@@ -201,13 +201,20 @@ public final class List extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    // special case: concatenate two sequences
-    if(exprs.length == 2) return exprs[0].value(qc).append(exprs[1].value(qc), qc);
-
-    // general case: concatenate all sequences (unknown size: do not create compact data structures)
-    final ValueBuilder vb = new ValueBuilder(qc, size() != -1 ? size() : Integer.MIN_VALUE);
-    for(final Expr expr : exprs) vb.add(expr.value(qc));
-    return vb.value(this);
+    // known result size: use builders with optimized data structures
+    final long size = size();
+    if(size != -1) {
+      final ValueBuilder vb = new ValueBuilder(qc, size);
+      for(final Expr expr : exprs) vb.add(expr.value(qc));
+      return vb.value(this);
+    }
+    // otherwise, append values (uses tree structure)
+    Value value = null;
+    for(final Expr expr : exprs) {
+      final Value v = expr.value(qc);
+      value = value != null ? value.append(v, qc) : v;
+    }
+    return value;
   }
 
   @Override

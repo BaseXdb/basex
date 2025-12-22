@@ -2,6 +2,7 @@ package org.basex.query.value;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.seq.tree.*;
@@ -19,9 +20,9 @@ public final class ValueBuilder {
   /** QueryContext. */
   private final QueryContext qc;
 
-  /** Sequence builder, only instantiated if there are at least two items. */
-  private SeqBuilder sequence;
-  /** Capacity ({@link Integer#MIN_VALUE}: create no compact data structures). */
+  /** Builder, only instantiated if there are at least two items. */
+  private SeqBuilder builder;
+  /** Capacity ({@link Long#MIN_VALUE}: create no compact data structures). */
   private final long capacity;
   /** The first added value is cached. */
   private Value single;
@@ -37,7 +38,7 @@ public final class ValueBuilder {
   /**
    * Constructor.
    * @param qc query context (required for interrupting running queries)
-   * @param capacity initial capacity ({@link Integer#MIN_VALUE}: create no compact data structures)
+   * @param capacity initial capacity ({@link Long#MIN_VALUE}: create no compact data structures)
    */
   public ValueBuilder(final QueryContext qc, final long capacity) {
     this.qc = qc;
@@ -52,24 +53,23 @@ public final class ValueBuilder {
   public ValueBuilder add(final Value value) {
     if(!value.isEmpty()) {
       qc.checkStop();
-      final Value sngl = single;
-      if(sngl != null) {
-        single = null;
-        if(capacity != Integer.MIN_VALUE) {
-          sequence = isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
-                     isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder() :
-                     isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
-                     isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
-                     isBln(sngl) && isBln(value) ? new BlnSeqBuilder() : null;
+      if(builder == null) {
+        final Value sngl = single;
+        if(sngl == null) {
+          single = value;
+          return this;
         }
-        if(sequence == null) sequence = new TreeSeqBuilder();
+        single = null;
+        builder = capacity == Long.MIN_VALUE ? new TreeSeqBuilder() :
+          isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
+          isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder() :
+          isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
+          isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
+          isBln(sngl) && isBln(value) ? new BlnSeqBuilder() :
+          new ItemSeqBuilder();
         add(sngl);
       }
-      if(sequence != null) {
-        sequence = sequence.add(value, qc);
-      } else {
-        single = value;
-      }
+      builder = builder.add(value, qc);
     }
     return this;
   }
@@ -90,9 +90,9 @@ public final class ValueBuilder {
    */
   public Value value(final Type type) {
     try {
-      return sequence != null ? sequence.value(type) : single != null ? single : Empty.VALUE;
+      return builder != null ? builder.value(type) : single != null ? single : Empty.VALUE;
     } finally {
-      sequence = null;
+      builder = null;
       single = null;
     }
   }
@@ -154,12 +154,12 @@ public final class ValueBuilder {
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + Util.className(sequence != null ? sequence :
+    return Util.className(this) + '[' + Util.className(builder != null ? builder :
       single != null ? single : Empty.VALUE) + ']';
   }
 
   /** String sequence builder. */
-  final class StrSeqBuilder implements SeqBuilder {
+  final class StrSeqBuilder extends SeqBuilder {
     /** Values. */
     private final TokenList values = new TokenList(capacity);
 
@@ -179,7 +179,7 @@ public final class ValueBuilder {
   }
 
   /** Untyped atomic sequence builder. */
-  final class AtmSeqBuilder implements SeqBuilder {
+  final class AtmSeqBuilder extends SeqBuilder {
     /** Values. */
     private final TokenList values = new TokenList(capacity);
 
@@ -199,7 +199,7 @@ public final class ValueBuilder {
   }
 
   /** Integer sequence builder. */
-  final class IntSeqBuilder implements SeqBuilder {
+  final class IntSeqBuilder extends SeqBuilder {
     /** Values. */
     private final IntList values = new IntList(capacity);
 
@@ -222,7 +222,7 @@ public final class ValueBuilder {
   }
 
   /** Double sequence builder. */
-  final class DblSeqBuilder implements SeqBuilder {
+  final class DblSeqBuilder extends SeqBuilder {
     /** Values. */
     private final DoubleList values = new DoubleList(capacity);
 
@@ -242,7 +242,7 @@ public final class ValueBuilder {
   }
 
   /** Boolean sequence builder. */
-  final class BlnSeqBuilder implements SeqBuilder {
+  final class BlnSeqBuilder extends SeqBuilder {
     /** Values. */
     private final BoolList values = new BoolList(capacity);
 
@@ -258,6 +258,23 @@ public final class ValueBuilder {
     @Override
     public Value value(final Type type) {
       return BlnSeq.get(values.finish());
+    }
+  }
+
+  /** Item sequence builder. */
+  final class ItemSeqBuilder extends SeqBuilder {
+    /** Items. */
+    private final ItemList items = new ItemList(capacity);
+
+    @Override
+    public SeqBuilder add(final Item item) {
+      items.add(item);
+      return this;
+    }
+
+    @Override
+    public Value value(final Type type) {
+      return items.value(type);
     }
   }
 }

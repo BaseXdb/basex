@@ -2,11 +2,13 @@ package org.basex.query.value.array;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.basex.query.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Tests for {@link XQArray#put(long, org.basex.query.value.Value)}.
+ * Tests for {@link XQArray#putMember(long, Value, QueryContext)}.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
@@ -23,7 +25,7 @@ public final class ArrayPutTest extends ArrayTest {
     }
     final XQArray array1 = ab.array();
     for(int i = 0; i < n; i++) {
-      final XQArray array2 = array1.put(i, Itr.get(-i));
+      final XQArray array2 = array1.putMember(i, Itr.get(-i), qc);
       for(int j = 0; j < n; j++) {
         assertEquals(i == j ? -j : j, ((Itr) array2.memberAt(j)).itr());
       }

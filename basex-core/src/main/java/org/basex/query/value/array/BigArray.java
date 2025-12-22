@@ -68,7 +68,8 @@ public final class BigArray extends TreeArray {
   }
 
   @Override
-  public XQArray put(final long pos, final Value value) {
+  public XQArray putMember(final long pos, final Value value, final QueryContext qc) {
+    qc.checkStop();
     final Type tp = union(value);
     long p = pos;
     final int ll = left.length;

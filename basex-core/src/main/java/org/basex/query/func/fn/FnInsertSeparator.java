@@ -21,7 +21,7 @@ public class FnInsertSeparator extends StandardFunc {
     final Iter input = arg(0).iter(qc);
     final Value separator = arg(1).value(qc);
 
-    final ValueBuilder vb = new ValueBuilder(qc);
+    final ValueBuilder vb = new ValueBuilder(qc, size());
     Item item = input.next();
     if(item != null) {
       vb.add(item);
