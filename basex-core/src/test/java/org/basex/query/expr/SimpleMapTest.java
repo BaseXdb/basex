@@ -90,7 +90,9 @@ public final class SimpleMapTest extends SandboxTest {
 
   /** Errors. */
   @Test public void error() {
-    error("(1 + 'a') ! 2", NONUMBER_X_X);
+    error("(1 + 'a') ! 2", CALCTYPE_X_X_X_X_X);
+    query("('a' || <?_ x?>)[. = 'x'] ! error()", "");
+    query("('a' || <?_ x?>) ! () ! error()", "");
   }
 
   /** Replicate results. */

@@ -198,7 +198,7 @@ public final class JobModuleTest extends SandboxTest {
     query(func.args("1 + 2"), 3);
     query(func.args("(1 to 1000)[. = 0]"), "");
     query(func.args("(1 to 1000)[. = 1]"), 1);
-    error(func.args("1 + ''"), NONUMBER_X_X);
+    error(func.args("1 + ''"), CALCTYPE_X_X_X_X_X);
   }
 
   /** Test method. */

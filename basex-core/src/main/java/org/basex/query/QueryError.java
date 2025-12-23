@@ -1103,7 +1103,7 @@ public enum QueryError {
   /** Error code. */
   INVTYPE_X(XPTY, 4, "%."),
   /** Error code. */
-  CALCTYPE_X_X_X(XPTY, 4, "% not defined for % and %."),
+  CALCTYPE_X_X_X_X_X(XPTY, 4, "Arithmetics not defined for % and %: % % %."),
   /** Error code. */
   INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),
   /** Error code. */
@@ -1758,17 +1758,7 @@ public enum QueryError {
    * @return query exception
    */
   public static QueryException numberError(final ParseExpr expr, final Item item) {
-    return numberError(item, expr.info());
-  }
-
-  /**
-   * Returns a number exception.
-   * @param item found item
-   * @param info input info (can be {@code null})
-   * @return query exception
-   */
-  public static QueryException numberError(final Item item, final InputInfo info) {
-    return NONUMBER_X_X.get(info, item.type, item);
+    return NONUMBER_X_X.get(expr.info(), item.type, item);
   }
 
   /**

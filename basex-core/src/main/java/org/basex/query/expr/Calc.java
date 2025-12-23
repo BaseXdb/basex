@@ -26,33 +26,27 @@ public enum Calc {
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
-      if(num1 ^ num2) throw numberError(num1 ? item2 : item1, info);
-
-      // numbers or untyped values
-      if(num1) {
+      if(num1 && num2) {
         return switch(numType(type1, type2)) {
           case INTEGER -> addInt(item1, item2, info);
           case DOUBLE  -> addDbl(item1, item2, info);
           case FLOAT   -> addFlt(item1, item2, info);
           default      -> addDec(item1, item2, info);
         };
-      }
-
-      // dates or durations
-      if(type1 == type2) {
-        if(!(item1 instanceof Dur)) throw numberError(item1, info);
+      } else if(type1 == type2) {
         if(type1 == YEAR_MONTH_DURATION) return new YMDur((YMDur) item1, (YMDur) item2, true, info);
         if(type1 == DAY_TIME_DURATION) return new DTDur((DTDur) item1, (DTDur) item2, true, info);
+      } else {
+        if(type1.instanceOf(DATE_TIME)) return new Dtm((Dtm) item1, dur(info, item2), true, info);
+        if(type2.instanceOf(DATE_TIME)) return new Dtm((Dtm) item2, dur(info, item1), true, info);
+        if(type1 == DATE) return new Dat((Dat) item1, dur(info, item2), true, info);
+        if(type2 == DATE) return new Dat((Dat) item2, dur(info, item1), true, info);
+        if(type1 == TIME && type2 == DAY_TIME_DURATION)
+          return new Tim((Tim) item1, (DTDur) item2, true);
+        if(type2 == TIME && type1 == DAY_TIME_DURATION)
+          return new Tim((Tim) item2, (DTDur) item1, true);
       }
-      if(type1.instanceOf(DATE_TIME)) return new Dtm((Dtm) item1, dur(info, item2), true, info);
-      if(type2.instanceOf(DATE_TIME)) return new Dtm((Dtm) item2, dur(info, item1), true, info);
-      if(type1 == DATE) return new Dat((Dat) item1, dur(info, item2), true, info);
-      if(type2 == DATE) return new Dat((Dat) item2, dur(info, item1), true, info);
-      if(type1 == TIME && type2 == DAY_TIME_DURATION)
-        return new Tim((Tim) item1, (DTDur) item2, true);
-      if(type2 == TIME && type1 == DAY_TIME_DURATION)
-        return new Tim((Tim) item2, (DTDur) item1, true);
-      throw typeError(info, type1, type2);
+      throw typeError(info, item1, item2);
     }
 
     @Override
@@ -81,8 +75,10 @@ public enum Calc {
 
     @Override
     public Type type(final Type type1, final Type type2) {
-      if(type1 == YEAR_MONTH_DURATION && type2 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
-      if(type1 == DAY_TIME_DURATION && type2 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
+      if(type1 == type2) {
+        if(type1 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
+        if(type1 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
+      }
       if(type1.instanceOf(DATE_TIME)) return type1;
       if(type2.instanceOf(DATE_TIME)) return type2;
       if(type1 == DATE || type2 == DATE) return DATE;
@@ -104,33 +100,27 @@ public enum Calc {
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
-      if(num1 ^ num2) throw numberError(num1 ? item2 : item1, info);
-
-      // numbers or untyped values
-      if(num1) {
+      if(num1 && num2) {
         return switch(numType(type1, type2)) {
           case INTEGER -> subtractInt(item1, item2, info);
           case DOUBLE  -> subtractDbl(item1, item2, info);
           case FLOAT   -> subtractFlt(item1, item2, info);
           default      -> subtractDec(item1, item2, info);
         };
-      }
-
-      // dates or durations
-      if(type1 == type2) {
-        if(type1.oneOf(DATE_TIME_STAMP, DATE_TIME, DATE, TIME))
-          return new DTDur((ADate) item1, (ADate) item2, info);
+      } else if(type1.instanceOf(DATE_TIME) && type2.instanceOf(DATE_TIME)) {
+        return new DTDur((ADate) item1, (ADate) item2, info);
+      } else if(type1 == type2) {
+        if(type1.oneOf(DATE, TIME)) return new DTDur((ADate) item1, (ADate) item2, info);
+        if(type1 == DAY_TIME_DURATION) return new DTDur((DTDur) item1, (DTDur) item2, false, info);
         if(type1 == YEAR_MONTH_DURATION)
           return new YMDur((YMDur) item1, (YMDur) item2, false, info);
-        if(type1 == DAY_TIME_DURATION)
-          return new DTDur((DTDur) item1, (DTDur) item2, false, info);
-        throw numberError(item1, info);
+      } else {
+        if(type1.instanceOf(DATE_TIME)) return new Dtm((Dtm) item1, dur(info, item2), false, info);
+        if(type1 == DATE) return new Dat((Dat) item1, dur(info, item2), false, info);
+        if(type1 == TIME && type2 == DAY_TIME_DURATION)
+          return new Tim((Tim) item1, (DTDur) item2, false);
       }
-      if(type1.instanceOf(DATE_TIME)) return new Dtm((Dtm) item1, dur(info, item2), false, info);
-      if(type1 == DATE) return new Dat((Dat) item1, dur(info, item2), false, info);
-      if(type1 == TIME && type2 == DAY_TIME_DURATION)
-        return new Tim((Tim) item1, (DTDur) item2, false);
-      throw typeError(info, type1, type2);
+      throw typeError(info, item1, item2);
     }
 
     @Override
@@ -161,9 +151,11 @@ public enum Calc {
 
     @Override
     public Type type(final Type type1, final Type type2) {
-      if(type1.instanceOf(DATE_TIME) && type2.instanceOf(DATE_TIME) ||
-         type1 == DATE && type2 == DATE) return DAY_TIME_DURATION;
-      if(type1 == TIME && type2 == TIME) return DAY_TIME_DURATION;
+      if(type1.instanceOf(DATE_TIME) && type2.instanceOf(DATE_TIME)) return DAY_TIME_DURATION;
+      if(type1 == type2) {
+        if(type1.oneOf(DATE, TIME, DAY_TIME_DURATION)) return DAY_TIME_DURATION;
+        if(type1 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
+      }
       if(type1.instanceOf(DATE_TIME)) return type1;
       if(type1 == DATE) return DATE;
       if(type1 == TIME && type2 == DAY_TIME_DURATION) return TIME;
@@ -182,27 +174,16 @@ public enum Calc {
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
-      if(type1 == YEAR_MONTH_DURATION) {
-        if(item2 instanceof ANum) return new YMDur((Dur) item1, item2.dbl(info), true, info);
-        throw numberError(item2, info);
-      }
-      if(type2 == YEAR_MONTH_DURATION) {
-        if(item1 instanceof ANum) return new YMDur((Dur) item2, item1.dbl(info), true, info);
-        throw numberError(item1, info);
-      }
-      if(type1 == DAY_TIME_DURATION) {
-        if(item2 instanceof ANum) return new DTDur((Dur) item1, item2.dbl(info), true, info);
-        throw numberError(item2, info);
-      }
-      if(type2 == DAY_TIME_DURATION) {
-        if(item1 instanceof ANum) return new DTDur((Dur) item2, item1.dbl(info), true, info);
-        throw numberError(item1, info);
-      }
-
       final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
-      if(num1 ^ num2) throw typeError(info, type1, type2);
-      // numbers or untyped values
-      if(num1) {
+      if(type1 == YEAR_MONTH_DURATION) {
+        if(num2) return new YMDur((Dur) item1, item2.dbl(info), true, info);
+      } else if(type2 == YEAR_MONTH_DURATION) {
+        if(num1) return new YMDur((Dur) item2, item1.dbl(info), true, info);
+      } else if(type1 == DAY_TIME_DURATION) {
+        if(num2) return new DTDur((Dur) item1, item2.dbl(info), true, info);
+      } else if(type2 == DAY_TIME_DURATION) {
+        if(num1) return new DTDur((Dur) item2, item1.dbl(info), true, info);
+      } else if(num1 && num2) {
         return switch(numType(type1, type2)) {
           case INTEGER -> multiplyInt(item1, item2, info);
           case DOUBLE  -> multiplyDbl(item1, item2, info);
@@ -210,7 +191,8 @@ public enum Calc {
           default      -> multiplyDec(item1, item2, info);
         };
       }
-      throw numberError(item1, info);
+
+      throw typeError(info, item1, item2);
     }
 
     @Override
@@ -263,6 +245,7 @@ public enum Calc {
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
+      final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
       if(type1 == type2) {
         if(type1 == YEAR_MONTH_DURATION) {
           final BigDecimal bd = BigDecimal.valueOf(((YMDur) item2).ymd());
@@ -277,22 +260,18 @@ public enum Calc {
         }
       }
       if(type1 == YEAR_MONTH_DURATION) {
-        if(item2 instanceof ANum) return new YMDur((Dur) item1, item2.dbl(info), false, info);
-        throw numberError(item2, info);
-      }
-      if(type1 == DAY_TIME_DURATION) {
-        if(item2 instanceof ANum) return new DTDur((Dur) item1, item2.dbl(info), false, info);
-        throw numberError(item2, info);
+        if(num2) return new YMDur((Dur) item1, item2.dbl(info), false, info);
+      } else if(type1 == DAY_TIME_DURATION) {
+        if(num2) return new DTDur((Dur) item1, item2.dbl(info), false, info);
+      } else if(num1 && num2) {
+        return switch(numType(type1, type2)) {
+          case DOUBLE -> divideDbl(item1, item2, info);
+          case FLOAT  -> divideFlt(item1, item2, info);
+          default     -> divideDec(item1, item2, info);
+        };
       }
 
-      // numbers or untyped values
-      if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
-      if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
-      return switch(numType(type1, type2)) {
-        case DOUBLE -> divideDbl(item1, item2, info);
-        case FLOAT  -> divideFlt(item1, item2, info);
-        default     -> divideDec(item1, item2, info);
-      };
+      throw typeError(info, item1, item2);
     }
 
     @Override
@@ -318,8 +297,7 @@ public enum Calc {
 
     @Override
     public Type type(final Type type1, final Type type2) {
-      if(type1 == YEAR_MONTH_DURATION && type2 == YEAR_MONTH_DURATION ||
-         type1 == DAY_TIME_DURATION && type2 == DAY_TIME_DURATION) return DECIMAL;
+      if(type1 == type2 && type1.oneOf(YEAR_MONTH_DURATION, DAY_TIME_DURATION)) return DECIMAL;
       if(type1 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
       if(type1 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
       final Type type = numType(type1, type2);
@@ -337,17 +315,17 @@ public enum Calc {
     @Override
     public Itr eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
-
-      // numbers or untyped values
       final Type type1 = item1.type, type2 = item2.type;
-      if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
-      if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
-      return switch(numType(type1, type2)) {
-        case INTEGER -> divideIntInt(item1, item2, info);
-        case DOUBLE  -> divideIntDbl(item1, item2, info);
-        case FLOAT   -> divideIntFlt(item1, item2, info);
-        default      -> divideIntDec(item1, item2, info);
-      };
+      final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
+      if(num1 && num2) {
+        return switch(numType(type1, type2)) {
+          case INTEGER -> divideIntInt(item1, item2, info);
+          case DOUBLE  -> divideIntDbl(item1, item2, info);
+          case FLOAT   -> divideIntFlt(item1, item2, info);
+          default      -> divideIntDec(item1, item2, info);
+        };
+      }
+      throw typeError(info, item1, item2);
     }
 
     @Override
@@ -383,14 +361,16 @@ public enum Calc {
     public Item eval(final Item item1, final Item item2, final InputInfo info)
         throws QueryException {
       final Type type1 = item1.type, type2 = item2.type;
-      if(!type1.isNumberOrUntyped()) throw numberError(item1, info);
-      if(!type2.isNumberOrUntyped()) throw numberError(item2, info);
-      return switch(numType(type1, type2)) {
-        case INTEGER -> moduloInt(item1, item2, info);
-        case DOUBLE  -> moduloDbl(item1, item2, info);
-        case FLOAT   -> moduloFlt(item1, item2, info);
-        default      -> moduloDec(item1, item2, info);
-      };
+      final boolean num1 = type1.isNumberOrUntyped(), num2 = type2.isNumberOrUntyped();
+      if(num1 && num2) {
+        return switch(numType(type1, type2)) {
+          case INTEGER -> moduloInt(item1, item2, info);
+          case DOUBLE  -> moduloDbl(item1, item2, info);
+          case FLOAT   -> moduloFlt(item1, item2, info);
+          default      -> moduloDec(item1, item2, info);
+        };
+      }
+      throw typeError(info, item1, item2);
     }
 
     @Override
@@ -489,12 +469,12 @@ public enum Calc {
   /**
    * Returns a type error.
    * @param info input info (can be {@code null})
-   * @param type1 first type
-   * @param type2 second type
+   * @param item1 first item
+   * @param item2 second item
    * @return query exception
    */
-  final QueryException typeError(final InputInfo info, final Type type1, final Type type2) {
-    return CALCTYPE_X_X_X.get(info, info(), type1, type2);
+  final QueryException typeError(final InputInfo info, final Item item1, final Item item2) {
+    return CALCTYPE_X_X_X_X_X.get(info, item1.type, item2.type, item1, name, item2);
   }
 
   /**
@@ -511,14 +491,6 @@ public enum Calc {
       return dur;
     }
     throw NODUR_X_X.get(info, type, item);
-  }
-
-  /**
-   * Returns a string representation of the operator.
-   * @return string
-   */
-  final String info() {
-    return '\'' + name + "' expression";
   }
 
   @Override

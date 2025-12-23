@@ -312,6 +312,13 @@ public final class SimpleTest extends QueryTest {
       { "Range 1", integers(100), "count((1 to 10) ! (. to . + 9))" },
       { "Range 2", integers(100), "count((1 to 10) ! (. to . - -9))" },
       { "Range 3", integers(1_000_000_000), "count((1 to 100_000) ! (. to . + 9_999))" },
+
+      { "Arith 1", strings("P6M"), "string(.5 * xs:yearMonthDuration('P1Y'))" },
+      { "Arith 2", strings("P6M"), "string(<_>.5</_> * xs:yearMonthDuration('P1Y'))" },
+      { "Arith 3", strings("P6M"), "string(xs:yearMonthDuration('P1Y') * .5)" },
+      { "Arith 4", strings("P6M"), "string(xs:yearMonthDuration('P1Y') * <_>.5</_>)" },
+      { "Arith 5", strings("P2Y"), "string(xs:yearMonthDuration('P1Y') div .5)" },
+      { "Arith 6", strings("P2Y"), "string(xs:yearMonthDuration('P1Y') div <_>.5</_>)" },
     };
   }
 }
