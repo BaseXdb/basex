@@ -1,6 +1,6 @@
 package org.basex.query.value;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -17,8 +17,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ValueBuilder {
-  /** QueryContext. */
-  private final QueryContext qc;
+  /** Interruptible job. */
+  private final Job job;
 
   /** Builder, only instantiated if there are at least two items. */
   private SeqBuilder builder;
@@ -29,19 +29,19 @@ public final class ValueBuilder {
 
   /**
    * Constructor.
-   * @param qc query context (required for interrupting running queries)
+   * @param job interruptible job
    */
-  public ValueBuilder(final QueryContext qc) {
-    this(qc, -1);
+  public ValueBuilder(final Job job) {
+    this(job, -1);
   }
 
   /**
    * Constructor.
-   * @param qc query context (required for interrupting running queries)
+   * @param job interruptible job
    * @param capacity initial capacity ({@link Long#MIN_VALUE}: create no compact data structures)
    */
-  public ValueBuilder(final QueryContext qc, final long capacity) {
-    this.qc = qc;
+  public ValueBuilder(final Job job, final long capacity) {
+    this.job = job;
     this.capacity = capacity;
   }
 
@@ -52,7 +52,7 @@ public final class ValueBuilder {
    */
   public ValueBuilder add(final Value value) {
     if(!value.isEmpty()) {
-      qc.checkStop();
+      job.checkStop();
       if(builder == null) {
         final Value sngl = single;
         if(sngl == null) {
@@ -69,7 +69,7 @@ public final class ValueBuilder {
           new ItemSeqBuilder();
         add(sngl);
       }
-      builder = builder.add(value, qc);
+      builder = builder.add(value, job);
     }
     return this;
   }
@@ -169,7 +169,7 @@ public final class ValueBuilder {
         values.add(((Str) item).string());
         return this;
       }
-      return tree(item, qc);
+      return tree(item, job);
     }
 
     @Override
@@ -189,7 +189,7 @@ public final class ValueBuilder {
         values.add(((Atm) item).string(null));
         return this;
       }
-      return tree(item, qc);
+      return tree(item, job);
     }
 
     @Override
@@ -212,7 +212,7 @@ public final class ValueBuilder {
           return this;
         }
       }
-      return tree(item, qc);
+      return tree(item, job);
     }
 
     @Override
@@ -232,7 +232,7 @@ public final class ValueBuilder {
         values.add(((Dbl) item).dbl());
         return this;
       }
-      return tree(item, qc);
+      return tree(item, job);
     }
 
     @Override
@@ -252,7 +252,7 @@ public final class ValueBuilder {
         values.add(((Bln) item).bool(null));
         return this;
       }
-      return tree(item, qc);
+      return tree(item, job);
     }
 
     @Override

@@ -11,6 +11,7 @@ import java.util.function.*;
 
 import org.basex.api.dom.*;
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.out.DataOutput;
@@ -262,13 +263,13 @@ public abstract class ANode extends Item {
   /**
    * Creates a database node copy from this node.
    * @param options main options
-   * @param qc query context (can be {@code null}; if supplied, allows interruption of process)
+   * @param job interruptible job (can be {@code null})
    * @return database node
    * @throws QueryException query exception
    */
-  public final DBNode copy(final MainOptions options, final QueryContext qc) throws QueryException {
+  public final DBNode copy(final MainOptions options, final Job job) throws QueryException {
     final MemData data = new MemData(options);
-    new DataBuilder(data, qc).build(this);
+    new DataBuilder(data, job).build(this);
     return new DBNode(data);
   }
 

@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.function.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -129,23 +130,23 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
+  protected Seq subSeq(final long pos, final long length, final Job job) {
     return new RangeSeq(get(pos), length, ascending);
   }
 
   @Override
-  public Value insertValue(final long pos, final Value val, final QueryContext qc) {
+  public Value insertValue(final long pos, final Value val, final Job job) {
     if(val instanceof Itr itr) {
       final long i = itr.itr(), step = ascending ? 1 : -1;
       if(pos == 0 && get(0) - step == i || pos == size() && get(size - 1) + step == i) {
         return new RangeSeq(pos == 0 ? i : start, size + 1, ascending);
       }
     }
-    return super.insertValue(pos, val, qc);
+    return super.insertValue(pos, val, job);
   }
 
   @Override
-  public Value reverse(final QueryContext qc) {
+  public Value reverse(final Job job) {
     return get(get(size - 1), size(), !ascending);
   }
 
@@ -212,7 +213,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) {
+  public Value shrink(final Job job) {
     return this;
   }
 

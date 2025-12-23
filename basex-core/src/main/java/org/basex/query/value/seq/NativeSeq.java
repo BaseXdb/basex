@@ -1,5 +1,6 @@
 package org.basex.query.value.seq;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -35,7 +36,7 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
-  public final Value shrink(final QueryContext qc) {
+  public final Value shrink(final Job job) {
     return this;
   }
 }

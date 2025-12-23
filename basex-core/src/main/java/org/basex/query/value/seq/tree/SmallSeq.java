@@ -2,6 +2,7 @@ package org.basex.query.value.seq.tree;
 
 import java.util.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -56,7 +57,7 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq reverse(final QueryContext qc) {
+  public TreeSeq reverse(final Job job) {
     final int il = items.length;
     final Item[] tmp = new Item[il];
     for(int i = 0; i < il; i++) tmp[i] = items[il - 1 - i];
@@ -64,9 +65,9 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public Value insertValue(final long pos, final Value value, final QueryContext qc) {
-    qc.checkStop();
-    if(value.size() > 1) return copyInsert(pos, value, qc);
+  public Value insertValue(final long pos, final Value value, final Job job) {
+    job.checkStop();
+    if(value.size() > 1) return copyInsert(pos, value, job);
 
     final Item item = (Item) value;
     final Type tp = type.union(item.type);
@@ -81,8 +82,8 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  public Value removeItem(final long pos, final QueryContext qc) {
-    qc.checkStop();
+  public Value removeItem(final long pos, final Job job) {
+    job.checkStop();
     final int il = items.length, p = (int) pos;
     if(il == 2) return items[p == 0 ? 1 : 0];
 
@@ -93,8 +94,8 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
-    qc.checkStop();
+  protected Seq subSeq(final long pos, final long length, final Job job) {
+    job.checkStop();
     final int p = (int) pos, l = (int) length;
     return new SmallSeq(slice(items, p, p + l), type);
   }

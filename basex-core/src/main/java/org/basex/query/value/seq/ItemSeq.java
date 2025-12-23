@@ -1,5 +1,6 @@
 package org.basex.query.value.seq;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -33,7 +34,7 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Value reverse(final QueryContext qc) {
+  public Value reverse(final Job job) {
     final int sz = (int) size;
     final Item[] tmp = new Item[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = items[i];
@@ -41,12 +42,12 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
-    for(int i = 0; i < size; i++) items[i] = items[i].shrink(qc);
+  public Value shrink(final Job job) throws QueryException {
+    for(int i = 0; i < size; i++) items[i] = items[i].shrink(job);
     refineType();
     // see ValueBuilder#add for types with compact representation
     return type.oneOf(AtomType.STRING, AtomType.UNTYPED_ATOMIC, AtomType.INTEGER, AtomType.DOUBLE,
-        AtomType.BOOLEAN) ? rebuild(qc) : this;
+        AtomType.BOOLEAN) ? rebuild(job) : this;
   }
 
   @Override

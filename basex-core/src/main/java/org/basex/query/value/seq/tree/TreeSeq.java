@@ -2,6 +2,7 @@ package org.basex.query.value.seq.tree;
 
 import java.util.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -38,14 +39,14 @@ public abstract class TreeSeq extends Seq {
   }
 
   /**
-   * Helper for {@link #insert(long, Value, QueryContext)} that copies all items into a
+   * Helper for {@link #insert(long, Value, Job)} that copies all items into a
    * {@link TreeSeq}.
    * @param pos position at which the value should be inserted, must be between 0 and {@link #size}
    * @param value value to insert
-   * @param qc query context
+   * @param job interruptible job
    * @return resulting value
    */
-  protected final Value copyInsert(final long pos, final Value value, final QueryContext qc) {
+  protected final Value copyInsert(final long pos, final Value value, final Job job) {
     final long right = size - pos;
     if(value instanceof final TreeSeq other && (pos == 0 || right == 0)) {
       return pos == 0 ? other.concat(this) : concat(other);
@@ -53,17 +54,17 @@ public abstract class TreeSeq extends Seq {
 
     final TreeSeqBuilder sb = new TreeSeqBuilder();
     if(pos < MAX_SMALL) {
-      sb.add(value, qc);
+      sb.add(value, job);
       for(long i = pos; --i >= 0;) sb.prepend(itemAt(i));
     } else {
-      sb.add(subsequence(0, pos, qc), qc);
-      sb.add(value, qc);
+      sb.add(subsequence(0, pos, job), job);
+      sb.add(value, job);
     }
 
     if(right < MAX_SMALL) {
       for(long i = size - right; i < size; i++) sb.add(itemAt(i));
     } else {
-      sb.add(subsequence(pos, right, qc), qc);
+      sb.add(subsequence(pos, right, job), job);
     }
 
     return sb.value(type.union(value.type));
@@ -93,8 +94,8 @@ public abstract class TreeSeq extends Seq {
   abstract TreeSeq concat(TreeSeq other);
 
   @Override
-  public final Value shrink(final QueryContext qc) throws QueryException {
-    return rebuild(qc);
+  public final Value shrink(final Job job) throws QueryException {
+    return rebuild(job);
   }
 
   /**

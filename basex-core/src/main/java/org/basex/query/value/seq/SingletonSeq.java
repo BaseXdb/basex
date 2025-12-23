@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.function.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -71,23 +72,23 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  protected Value subSeq(final long pos, final long length, final QueryContext qc) {
-    return singleItem() ? get(value, length) : super.subSeq(pos, length, qc);
+  protected Value subSeq(final long pos, final long length, final Job job) {
+    return singleItem() ? get(value, length) : super.subSeq(pos, length, job);
   }
 
   @Override
-  public Value insertValue(final long pos, final Value val, final QueryContext qc) {
-    return val.equals(value) ? get(value, size + 1) : super.insertValue(pos, val, qc);
+  public Value insertValue(final long pos, final Value val, final Job job) {
+    return val.equals(value) ? get(value, size + 1) : super.insertValue(pos, val, job);
   }
 
   @Override
-  public Value removeItem(final long pos, final QueryContext qc) {
-    return singleItem() ? get(value, size - 1) : super.removeItem(pos, qc);
+  public Value removeItem(final long pos, final Job job) {
+    return singleItem() ? get(value, size - 1) : super.removeItem(pos, job);
   }
 
   @Override
-  public Value reverse(final QueryContext qc) {
-    return singleItem() ? this : get(value.reverse(qc), count());
+  public Value reverse(final Job job) {
+    return singleItem() ? this : get(value.reverse(job), count());
   }
 
   @Override
@@ -151,8 +152,8 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) throws QueryException {
-    value.shrink(qc);
+  public Value shrink(final Job job) throws QueryException {
+    value.shrink(job);
     return this;
   }
 

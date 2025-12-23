@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.function.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
@@ -90,35 +91,35 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  protected Value subSeq(final long pos, final long length, final QueryContext qc) {
-    qc.checkStop();
+  protected Value subSeq(final long pos, final long length, final Job job) {
+    job.checkStop();
     return new SubSeq(this, pos, length);
   }
 
   @Override
-  public Value insertValue(final long pos, final Value value, final QueryContext qc) {
-    return toTree(qc).insertValue(pos, value, qc);
+  public Value insertValue(final long pos, final Value value, final Job job) {
+    return toTree(job).insertValue(pos, value, job);
   }
 
   @Override
-  public Value removeItem(final long pos, final QueryContext qc) {
-    return toTree(qc).removeItem(pos, qc);
+  public Value removeItem(final long pos, final Job job) {
+    return toTree(job).removeItem(pos, job);
   }
 
   /**
    * Creates a tree-based version of this sequence.
-   * @param qc query context
+   * @param job interruptible job
    * @return value
    */
-  private Value toTree(final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder(qc, Long.MIN_VALUE);
+  private Value toTree(final Job job) {
+    final ValueBuilder vb = new ValueBuilder(job, Long.MIN_VALUE);
     for(final Item item : this) vb.add(item);
     return vb.value(type);
   }
 
   @Override
-  public Value reverse(final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder(qc, size);
+  public Value reverse(final Job job) {
+    final ValueBuilder vb = new ValueBuilder(job, size);
     for(long i = size - 1; i >= 0; i--) vb.add(itemAt(i));
     return vb.value(type);
   }
@@ -206,9 +207,9 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  protected final Value rebuild(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc, size());
-    for(final Item item : this) vb.add(item.shrink(qc));
+  protected final Value rebuild(final Job job) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(job, size());
+    for(final Item item : this) vb.add(item.shrink(job));
     return vb.value(type);
   }
 

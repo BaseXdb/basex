@@ -6,6 +6,7 @@ import static org.basex.query.func.Function.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
@@ -93,7 +94,7 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
-  public final Value reverse(final QueryContext qc) {
+  public final Value reverse(final Job job) {
     final int sz = (int) size;
     final int[] tmp = new int[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = pres[i];

@@ -1,6 +1,6 @@
 package org.basex.query.value.seq;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.tree.*;
@@ -23,13 +23,13 @@ public abstract class SeqBuilder {
   /**
    * Appends items.
    * @param value items to append
-   * @param qc query context
+   * @param job interruptible job
    * @return this builder for convenience
    */
-  public SeqBuilder add(final Value value, final QueryContext qc) {
+  public SeqBuilder add(final Value value, final Job job) {
     SeqBuilder sb = this;
     for(final Item item : value) {
-      qc.checkStop();
+      job.checkStop();
       sb = sb.add(item);
     }
     return sb;
@@ -45,10 +45,10 @@ public abstract class SeqBuilder {
   /**
    * Converts the builder to a tree sequence builder.
    * @param item item to append
-   * @param qc query context
+   * @param job interruptible job
    * @return tree sequence builder
    */
-  protected final TreeSeqBuilder tree(final Item item, final QueryContext qc) {
-    return new TreeSeqBuilder().add(value(null), qc).add(item);
+  protected final TreeSeqBuilder tree(final Item item, final Job job) {
+    return new TreeSeqBuilder().add(value(null), job).add(item);
   }
 }

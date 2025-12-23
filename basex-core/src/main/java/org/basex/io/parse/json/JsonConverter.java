@@ -3,6 +3,7 @@ package org.basex.io.parse.json;
 import java.io.*;
 
 import org.basex.build.json.*;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
@@ -18,7 +19,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public abstract class JsonConverter {
+public abstract class JsonConverter extends Job {
   /** Shared data references. */
   protected final SharedData shared = new SharedData();
   /** JSON options. */
@@ -30,8 +31,8 @@ public abstract class JsonConverter {
   protected QueryFunction<byte[], Item> numberParser;
   /** Null value. */
   protected Value nullValue = Empty.VALUE;
-  /** Query context (can be {@code null}). */
-  protected QueryContext qctx;
+  /** Interruptible job. */
+  protected Job job;
 
   /**
    * Returns a JSON converter for the given configuration.
@@ -92,7 +93,7 @@ public abstract class JsonConverter {
   public final Value convert(final IO input) throws QueryException, IOException {
     final String encoding = jopts.get(JsonParserOptions.ENCODING);
     try(NewlineInput ni = new NewlineInput(input, encoding)) {
-      return convert(ni, input.url(), null, null);
+      return convert(ni, input.url(), null, this);
     }
   }
 
@@ -101,14 +102,14 @@ public abstract class JsonConverter {
    * @param input input
    * @param uri uri (can be empty)
    * @param ii input info (can be {@code null})
-   * @param qc query context (if {@code null}, result may lack XQuery-specific contents)
+   * @param jb interruptible job
    * @return result
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
   public final Value convert(final TextInput input, final String uri, final InputInfo ii,
-      final QueryContext qc) throws QueryException, IOException {
-    qctx = qc;
+      final Job jb) throws QueryException, IOException {
+    job = jb;
     init(uri);
     new JsonParser(input, jopts, this).parse(ii);
     return finish();

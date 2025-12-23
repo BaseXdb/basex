@@ -164,7 +164,7 @@ public interface Type {
   /**
    * Reads an item from the input stream.
    * @param in data input
-   * @param qc query context
+   * @param qc interruptible job
    * @return item
    * @throws IOException I/O exception
    * @throws QueryException query exception

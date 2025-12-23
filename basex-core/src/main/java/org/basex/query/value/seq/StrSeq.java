@@ -3,6 +3,7 @@ package org.basex.query.value.seq;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
@@ -62,7 +63,7 @@ public final class StrSeq extends NativeSeq {
   }
 
   @Override
-  public Value reverse(final QueryContext qc) {
+  public Value reverse(final Job job) {
     final int sz = (int) size;
     final byte[][] array = new byte[sz][];
     for(int i = 0; i < sz; i++) array[sz - i - 1] = values[i];

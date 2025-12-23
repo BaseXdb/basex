@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
@@ -16,14 +17,14 @@ import org.junit.jupiter.api.*;
  */
 public final class VariousArrayTest extends ArrayTest {
   /**
-   * Test for {@link XQArray#insertMember(long, Value, org.basex.query.QueryContext)}.
+   * Test for {@link XQArray#insertMember(long, Value, Job)}.
    */
   @Test public void consSnocTest() {
     final int n = 200_000;
     XQArray array = XQArray.empty();
     for(int i = 0; i < n; i++) {
       final Itr val = Itr.get(i);
-      array = array.insertMember(0, val, qc).appendMember(val, qc);
+      array = array.insertMember(0, val, job).appendMember(val, job);
     }
 
     assertEquals(2 * n, array.structSize());
@@ -39,19 +40,19 @@ public final class VariousArrayTest extends ArrayTest {
   @Test public void queueTest() {
     final int n = 2_000_000, k = n / 100;
     XQArray array = XQArray.empty();
-    for(int i = 0; i < k; i++) array = array.insertMember(0, Itr.get(i), qc);
+    for(int i = 0; i < k; i++) array = array.insertMember(0, Itr.get(i), job);
 
     for(int i = k; i < n; i++) {
       assertEquals(k, array.structSize());
       assertEquals(i - k, ((Itr) array.memberAt(array.structSize() - 1)).itr());
-      array = array.subArray(0, array.structSize() - 1, qc);
-      array = array.insertMember(0, Itr.get(i), qc);
+      array = array.subArray(0, array.structSize() - 1, job);
+      array = array.insertMember(0, Itr.get(i), job);
     }
 
     assertEquals(k, array.structSize());
     for(int i = 0; i < k; i++) {
       assertEquals(n - k + i, ((Itr) array.memberAt(array.structSize() - 1)).itr());
-      array = array.subArray(0, array.structSize() - 1, qc);
+      array = array.subArray(0, array.structSize() - 1, job);
       assertEquals(k - i - 1, array.structSize());
     }
 
@@ -68,16 +69,16 @@ public final class VariousArrayTest extends ArrayTest {
     for(int i = 0; i < n; i++) {
       assertEquals(i, array.structSize());
       final Itr val = Itr.get(i);
-      array = array.insertMember(0, val, qc).insertMember(0, val, qc);
+      array = array.insertMember(0, val, job).insertMember(0, val, job);
       assertEquals(i, ((Itr) array.memberAt(0)).itr());
-      array = array.subArray(1, array.structSize() - 1, qc);
+      array = array.subArray(1, array.structSize() - 1, job);
     }
 
     assertEquals(n, array.structSize());
 
     for(int i = n; --i >= 0;) {
       assertEquals(i, ((Itr) array.memberAt(0)).itr());
-      array = array.subArray(1, array.structSize() - 1, qc);
+      array = array.subArray(1, array.structSize() - 1, job);
       assertEquals(i, array.structSize());
     }
 
@@ -94,7 +95,7 @@ public final class VariousArrayTest extends ArrayTest {
 
     for(int i = 0; i < n; i++) {
       final Itr val = Itr.get(i);
-      array = array.insertMember(0, val, qc).appendMember(val, qc);
+      array = array.insertMember(0, val, job).appendMember(val, job);
       final int k = 2 * (i + 1);
       final Iterator<Value> iter = array.iterator(0);
       for(int j = 0; j < k; j++) {

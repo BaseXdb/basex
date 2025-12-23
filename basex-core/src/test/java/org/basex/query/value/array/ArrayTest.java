@@ -1,26 +1,26 @@
 package org.basex.query.value.array;
 
 import org.basex.*;
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Tests for {@link XQArray#reverse(QueryContext)}.
+ * Tests for {@link XQArray#reverse(Job)}.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public abstract class ArrayTest extends SandboxTest {
-  /** Query context. */
-  static QueryContext qc;
+  /** Interruptible job. */
+  static Job job;
 
   /** Initializes the test. */
   @BeforeAll public static void init() {
-    qc = new QueryContext(context);
+    job = new Job() { };
   }
 
   /** Finalizes the test. */
   @AfterAll public static void close() {
-    qc = null;
+    job = null;
   }
 }

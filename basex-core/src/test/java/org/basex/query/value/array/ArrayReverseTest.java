@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Tests for {@link XQArray#reverse(QueryContext)}.
+ * Tests for {@link XQArray#reverse(Job)}.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
@@ -21,9 +21,9 @@ public final class ArrayReverseTest extends ArrayTest {
     final Random rng = new Random(42);
     for(int n = 0; n < 1_000; n++) {
       XQArray array = XQArray.empty();
-      for(int i = 0; i < n; i++) array = array.insertMember(rng.nextInt(i + 1), Itr.get(i), qc);
+      for(int i = 0; i < n; i++) array = array.insertMember(rng.nextInt(i + 1), Itr.get(i), job);
       assertEquals(n, array.structSize());
-      final XQArray rev = array.reverseArray(qc);
+      final XQArray rev = array.reverseArray(job);
       final ListIterator<Value> af = array.iterator(0), ab = array.iterator(n);
       final ListIterator<Value> rf = rev.iterator(0), rb = rev.iterator(n);
       for(int i = 0; i < n; i++) {

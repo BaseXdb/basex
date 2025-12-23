@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.io.out.*;
 import org.basex.io.out.DataOutput;
@@ -110,67 +111,67 @@ public abstract class Value extends Expr implements Iterable<Item> {
    * </ul>
    * @param pos starting position
    * @param length number of items
-   * @param qc query context
+   * @param job interruptible job
    * @return new subsequence
    */
-  public final Value subsequence(final long pos, final long length, final QueryContext qc) {
+  public final Value subsequence(final long pos, final long length, final Job job) {
     return length == 0 ? Empty.VALUE :
            length == 1 ? itemAt(pos) :
            length == size() ? this :
-           subSeq(pos, length, qc);
+           subSeq(pos, length, job);
   }
 
   /**
    * Returns a subsequence with the given start and length.
    * @param pos position of first item (>= 0)
    * @param length number of items (1 < length < size())
-   * @param qc query context
+   * @param job interruptible job
    * @return new subsequence
    */
-  protected abstract Value subSeq(long pos, long length, QueryContext qc);
+  protected abstract Value subSeq(long pos, long length, Job job);
 
   /**
    * Appends a value.
    * @param value value to append
-   * @param qc query context
+   * @param job interruptible job
    * @return new value
    */
-  public final Value append(final Value value, final QueryContext qc) {
-    return insert(size(), value, qc);
+  public final Value append(final Value value, final Job job) {
+    return insert(size(), value, job);
   }
 
   /**
    * Inserts a value at the given position.
    * @param pos insertion position, must be between 0 and {@link #size()}
    * @param value value to insert
-   * @param qc query context
+   * @param job interruptible job
    * @return new value
    */
-  public final Value insert(final long pos, final Value value, final QueryContext qc) {
+  public final Value insert(final long pos, final Value value, final Job job) {
     final long size = size(), vsize = value.size();
     return size == 0 ? value :
            vsize == 0 ? this :
-           pos == size && size < vsize ? value.insertValue(0, this, qc) :
-           insertValue(pos, value, qc);
+           pos == size && size < vsize ? value.insertValue(0, this, job) :
+           insertValue(pos, value, job);
   }
 
   /**
    * Inserts a value at the given position.
    * @param pos insertion position, must be between 0 and {@link #size()}
    * @param value value to insert
-   * @param qc query context
+   * @param job interruptible job
    * @return new value
    */
-  public abstract Value insertValue(long pos, Value value, QueryContext qc);
+  public abstract Value insertValue(long pos, Value value, Job job);
 
   /**
    * Removes an item at the given position.
    * @param pos deletion position, must be greater than 0 and smaller than {@link #size()} - 1
-   *   (use {@link #subSeq(long, long, QueryContext)} to remove first or last item)
-   * @param qc query context
+   *   (use {@link #subSeq(long, long, Job)} to remove first or last item)
+   * @param job interruptible job
    * @return new sequence
    */
-  public abstract Value removeItem(long pos, QueryContext qc);
+  public abstract Value removeItem(long pos, Job job);
 
   /**
    * Caches data of lazy items (i.e., those implementing the {@link Lazy} interface).
@@ -282,10 +283,10 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   /**
    * Returns all items of this value in reverse order.
-   * @param qc query context
+   * @param job interruptible job
    * @return items in reverse order
    */
-  public abstract Value reverse(QueryContext qc);
+  public abstract Value reverse(Job job);
 
   /**
    * Refines the type of a value.
@@ -297,20 +298,20 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * If possible, returns a compactified version of this value.
    * Note that the memory consumption may increase during the reconstruction of a data structure.
-   * @param qc query context
+   * @param job interruptible job
    * @return compactified value or self reference
    * @throws QueryException query exception
    */
-  public abstract Value shrink(QueryContext qc) throws QueryException;
+  public abstract Value shrink(Job job) throws QueryException;
 
   /**
    * Saves memory by recursively rebuilding the data structure.
-   * Called by {@link #shrink(QueryContext)} and implemented for sequences, maps and arrays.
-   * @param qc query exception
+   * Called by {@link #shrink(Job)} and implemented for sequences, maps and arrays.
+   * @param job query exception
    * @return rebuilt data structure
    * @throws QueryException query exception
    */
-  protected abstract Value rebuild(QueryContext qc) throws QueryException;
+  protected abstract Value rebuild(Job job) throws QueryException;
 
   @Override
   public boolean accept(final ASTVisitor visitor) {

@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
@@ -111,70 +112,70 @@ public abstract class XQArray extends XQStruct {
    * Returns a subsequence with the given start and length.
    * @param pos starting position
    * @param length number of items
-   * @param qc query context
+   * @param job interruptible job
    * @return new subarray
    */
-  public final XQArray subArray(final long pos, final long length, final QueryContext qc) {
+  public final XQArray subArray(final long pos, final long length, final Job job) {
     return length == 0 ? empty() :
            length == 1 ? get(memberAt(pos)) :
            length == structSize() ? this :
-           subArr(pos, length, qc);
+           subArr(pos, length, job);
   }
 
   /**
    * Returns a subsequence with the given start and length.
    * @param pos position of first member (>= 0)
    * @param length number of members (1 < length < size())
-   * @param qc query context
+   * @param job interruptible job
    * @return new subarray
    */
-  protected abstract XQArray subArr(long pos, long length, QueryContext qc);
+  protected abstract XQArray subArr(long pos, long length, Job job);
 
   /**
    * Replaces a value at the specified position.
    * @param pos position of the value to replace
    * @param value value to put into this array
-   * @param qc query context
+   * @param job interruptible job
    * @return new array
    */
-  public abstract XQArray putMember(long pos, Value value, QueryContext qc);
+  public abstract XQArray putMember(long pos, Value value, Job job);
 
   /**
    * Appends a value.
    * @param value value to append
-   * @param qc query context
+   * @param job interruptible job
    * @return new array
    */
-  public final XQArray appendMember(final Value value, final QueryContext qc) {
-    return insertMember(structSize(), value, qc);
+  public final XQArray appendMember(final Value value, final Job job) {
+    return insertMember(structSize(), value, job);
   }
 
   /**
    * Inserts a value at the given position.
    * @param pos insertion position, must be between 0 and {@link #structSize()}
    * @param value value to insert
-   * @param qc query context
+   * @param job interruptible job
    * @return new array
    */
-  public abstract XQArray insertMember(long pos, Value value, QueryContext qc);
+  public abstract XQArray insertMember(long pos, Value value, Job job);
 
   /**
    * Removes a value at the given position.
    * @param pos deletion position, must be between 0 and {@link #structSize() - 1}
-   * @param qc query context
+   * @param job interruptible job
    * @return new array
    */
-  public abstract XQArray removeMember(long pos, QueryContext qc);
+  public abstract XQArray removeMember(long pos, Job job);
 
   /**
    * Returns an array with the same values as this one, but their order reversed.
-   * @param qc query context
+   * @param job interruptible job
    * @return new array
    */
-  public XQArray reverseArray(final QueryContext qc) {
-    qc.checkStop();
+  public XQArray reverseArray(final Job job) {
+    job.checkStop();
     final long size = structSize();
-    final ArrayBuilder ab = new ArrayBuilder(qc, size);
+    final ArrayBuilder ab = new ArrayBuilder(job, size);
     for(long i = size - 1; i >= 0; i--) ab.add(memberAt(i));
     return ab.array(this);
   }
@@ -446,9 +447,9 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  protected final XQArray rebuild(final QueryContext qc) throws QueryException {
-    final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
-    for(final Value value : iterable()) ab.add(value.shrink(qc));
+  protected final XQArray rebuild(final Job job) throws QueryException {
+    final ArrayBuilder ab = new ArrayBuilder(job, structSize());
+    for(final Value value : iterable()) ab.add(value.shrink(job));
     return ab.array(this);
   }
 

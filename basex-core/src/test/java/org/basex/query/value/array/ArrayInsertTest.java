@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.junit.jupiter.api.*;
 
 /**
- * Tests for {@link XQArray#insertMember(long, Value, QueryContext)}.
+ * Tests for {@link XQArray#insertMember(long, Value, Job)}.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
@@ -26,7 +26,7 @@ public final class ArrayInsertTest extends ArrayTest {
     for(int i = 0; i < n; i++) {
       final int insPos = rng.nextInt(i + 1);
       list.add(insPos, i);
-      array = array.insertMember(insPos, Itr.get(i), qc);
+      array = array.insertMember(insPos, Itr.get(i), job);
       final int size = i + 1;
       assertEquals(size, array.structSize());
       assertEquals(size, list.size());
@@ -46,12 +46,12 @@ public final class ArrayInsertTest extends ArrayTest {
     final int n = 1_000;
     XQArray array = XQArray.empty();
 
-    for(int i = 0; i < n; i++) array = array.appendMember(Itr.get(i), qc);
+    for(int i = 0; i < n; i++) array = array.appendMember(Itr.get(i), job);
     assertEquals(n, array.structSize());
 
     final Itr val = Itr.get(n);
     for(int i = 0; i <= n; i++) {
-      final XQArray array2 = array.insertMember(i, val, qc);
+      final XQArray array2 = array.insertMember(i, val, job);
       assertEquals(n, ((Itr) array2.memberAt(i)).itr());
       assertEquals(n + 1L, array2.structSize());
       for(int j = 0; j < n; j++) {

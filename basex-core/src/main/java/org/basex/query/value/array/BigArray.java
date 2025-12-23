@@ -2,7 +2,7 @@ package org.basex.query.value.array;
 
 import java.util.*;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -68,8 +68,8 @@ public final class BigArray extends TreeArray {
   }
 
   @Override
-  public XQArray putMember(final long pos, final Value value, final QueryContext qc) {
-    qc.checkStop();
+  public XQArray putMember(final long pos, final Value value, final Job job) {
+    job.checkStop();
     final Type tp = union(value);
     long p = pos;
     final int ll = left.length;
@@ -92,8 +92,8 @@ public final class BigArray extends TreeArray {
   }
 
   @Override
-  public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
-    qc.checkStop();
+  public XQArray insertMember(final long pos, final Value value, final Job job) {
+    job.checkStop();
     final Type tp = union(value);
     final int ll = left.length;
     if(pos <= ll) {
@@ -109,7 +109,7 @@ public final class BigArray extends TreeArray {
     }
 
     final long ms = middle.size();
-    if(pos - ll < ms) return new BigArray(left, middle.insert(pos - ll, value, qc), right, tp);
+    if(pos - ll < ms) return new BigArray(left, middle.insert(pos - ll, value, job), right, tp);
 
     final int rl = right.length, p = (int) (pos - ll - ms);
     final Value[] temp = slice(right, 0, rl + 1);
@@ -123,8 +123,8 @@ public final class BigArray extends TreeArray {
   }
 
   @Override
-  public XQArray removeMember(final long pos, final QueryContext qc) {
-    qc.checkStop();
+  public XQArray removeMember(final long pos, final Job job) {
+    job.checkStop();
     final int ll = left.length, rl = right.length;
     if(pos < ll) {
       // delete from left digit
@@ -215,7 +215,7 @@ public final class BigArray extends TreeArray {
     }
 
     // delete in middle tree
-    final TreeSlice<Value, Value> slice = middle.remove(pos - ll, qc);
+    final TreeSlice<Value, Value> slice = middle.remove(pos - ll, job);
 
     if(slice.isTree()) {
       // middle tree did not underflow
@@ -253,8 +253,8 @@ public final class BigArray extends TreeArray {
   }
 
   @Override
-  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
-    qc.checkStop();
+  protected XQArray subArr(final long pos, final long length, final Job job) {
+    job.checkStop();
 
     // the easy cases
     final int ll = left.length, rl = right.length;
@@ -388,13 +388,13 @@ public final class BigArray extends TreeArray {
   }
 
   @Override
-  public XQArray reverseArray(final QueryContext qc) {
-    qc.checkStop();
+  public XQArray reverseArray(final Job job) {
+    job.checkStop();
     final int ll = left.length, rl = right.length;
     final Value[] newLeft = new Value[rl], newRight = new Value[ll];
     for(int i = 0; i < rl; i++) newLeft[i] = right[rl - 1 - i];
     for(int i = 0; i < ll; i++) newRight[i] = left[ll - 1 - i];
-    return new BigArray(newLeft, middle.reverse(qc), newRight, type);
+    return new BigArray(newLeft, middle.reverse(job), newRight, type);
   }
 
   @Override

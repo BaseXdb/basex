@@ -1,6 +1,6 @@
 package org.basex.query.value.array;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -37,16 +37,16 @@ public final class SmallArray extends TreeArray {
   }
 
   @Override
-  public XQArray putMember(final long pos, final Value value, final QueryContext qc) {
-    qc.checkStop();
+  public XQArray putMember(final long pos, final Value value, final Job job) {
+    job.checkStop();
     final Value[] values = members.clone();
     values[(int) pos] = value;
     return new SmallArray(values, union(value));
   }
 
   @Override
-  public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
-    qc.checkStop();
+  public XQArray insertMember(final long pos, final Value value, final Job job) {
+    job.checkStop();
     final Type tp = union(value);
     final int ml = members.length, p = (int) pos;
     final Value[] out = new Value[ml + 1];
@@ -59,8 +59,8 @@ public final class SmallArray extends TreeArray {
   }
 
   @Override
-  public XQArray removeMember(final long pos, final QueryContext qc) {
-    qc.checkStop();
+  public XQArray removeMember(final long pos, final Job job) {
+    job.checkStop();
     final int ml = members.length;
     if(ml == 2) return get(members[pos == 0 ? 1 : 0]);
 
@@ -72,14 +72,14 @@ public final class SmallArray extends TreeArray {
   }
 
   @Override
-  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
-    qc.checkStop();
+  protected XQArray subArr(final long pos, final long length, final Job job) {
+    job.checkStop();
     final int p = (int) pos, l = (int) length;
     return new SmallArray(slice(members, p, p + l), type);
   }
 
   @Override
-  public XQArray reverseArray(final QueryContext qc) {
+  public XQArray reverseArray(final Job job) {
     final int ml = members.length;
     final Value[] tmp = new Value[ml];
     for(int m = 0; m < ml; m++) tmp[m] = members[ml - 1 - m];

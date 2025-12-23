@@ -1,6 +1,6 @@
 package org.basex.query.value.array;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -12,8 +12,8 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public final class ArrayBuilder {
-  /** QueryContext. */
-  private final QueryContext qc;
+  /** Interruptible job. */
+  private final Job job;
 
   /** Builder, only instantiated if there are at least two items. */
   private ArrBuilder builder;
@@ -24,19 +24,19 @@ public final class ArrayBuilder {
 
   /**
    * Constructor.
-   * @param qc query context (required for interrupting running queries)
+   * @param job interruptible job
    */
-  public ArrayBuilder(final QueryContext qc) {
-    this(qc, -1);
+  public ArrayBuilder(final Job job) {
+    this(job, -1);
   }
 
   /**
    * Constructor.
-   * @param qc query context (required for interrupting running queries)
+   * @param job interruptible job
    * @param capacity initial capacity ({@link Long#MIN_VALUE}: create no compact data structures)
    */
-  public ArrayBuilder(final QueryContext qc, final long capacity) {
-    this.qc = qc;
+  public ArrayBuilder(final Job job, final long capacity) {
+    this.job = job;
     this.capacity = capacity;
   }
 
@@ -47,7 +47,7 @@ public final class ArrayBuilder {
    */
   public ArrayBuilder add(final Value value) {
     if(builder == null) {
-      qc.checkStop();
+      job.checkStop();
       final Value sngl = single;
       if(sngl == null) {
         single = value;
@@ -98,7 +98,7 @@ public final class ArrayBuilder {
   /** Item array builder. */
   final class ItemArrayBuilder extends ArrBuilder {
     /** Value builder. */
-    private final ValueBuilder vb = new ValueBuilder(qc, capacity);
+    private final ValueBuilder vb = new ValueBuilder(job, capacity);
 
     @Override
     public ArrBuilder add(final Value value) {

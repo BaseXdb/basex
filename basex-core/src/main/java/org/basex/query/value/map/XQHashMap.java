@@ -1,5 +1,6 @@
 package org.basex.query.value.map;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -92,12 +93,12 @@ abstract class XQHashMap extends XQMap {
 
   /**
    * Shrinks the map values.
-   * @param qc query exception
+   * @param job interruptible job
    * @throws QueryException query exception
    */
-  final void shrinkValues(final QueryContext qc) throws QueryException {
+  final void shrinkValues(final Job job) throws QueryException {
     final long is = structSize();
-    for(int i = 0; i < is; i++) valueAt(i, valueAt(i).shrink(qc));
+    for(int i = 0; i < is; i++) valueAt(i, valueAt(i).shrink(job));
   }
 
   /**

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
@@ -24,8 +25,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class DataBuilder {
-  /** Query context. */
-  private final QueryContext qc;
+  /** Interruptible job. */
+  private final Job job;
   /** Target data instance. */
   private final MemData data;
   /** Full-text result builder. */
@@ -34,11 +35,11 @@ public final class DataBuilder {
   /**
    * Constructor.
    * @param data target data
-   * @param qc query context (can be {@code null})
+   * @param job interruptible job (can be {@code null})
    */
-  public DataBuilder(final MemData data, final QueryContext qc) {
+  public DataBuilder(final MemData data, final Job job) {
     this.data = data;
-    this.qc = qc;
+    this.job = job != null ? job : new Job() { };
   }
 
   /**
@@ -99,7 +100,7 @@ public final class DataBuilder {
    * @return PRE value of next node
    */
   private int addNode(final ANode node, final int pre, final int par) {
-    if(qc != null) qc.checkStop();
+    job.checkStop();
     return switch((NodeType) node.type) {
       case DOCUMENT_NODE -> addDoc(node, pre);
       case ELEMENT -> addElem(node, pre, par);

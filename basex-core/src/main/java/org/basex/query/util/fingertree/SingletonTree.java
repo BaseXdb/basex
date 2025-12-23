@@ -1,6 +1,6 @@
 package org.basex.query.util.fingertree;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 
 /**
  * A tree consisting of a single value.
@@ -71,7 +71,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> reverse(final QueryContext qc) {
+  public FingerTree<N, E> reverse(final Job job) {
     return new SingletonTree<>(elem.reverse());
   }
 
@@ -81,7 +81,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> insert(final long pos, final E val, final QueryContext qc) {
+  public FingerTree<N, E> insert(final long pos, final E val, final Job job) {
     @SuppressWarnings("unchecked")
     final Node<N, E>[] siblings = new Node[4];
     if(!elem.insert(siblings, pos, val)) {
@@ -96,7 +96,7 @@ final class SingletonTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public TreeSlice<N, E> remove(final long pos, final QueryContext qc) {
+  public TreeSlice<N, E> remove(final long pos, final Job job) {
     final NodeLike<N, E>[] removed = elem.remove(null, null, pos);
     return new TreeSlice<>(removed[1]);
   }

@@ -2,7 +2,7 @@ package org.basex.query.value.array;
 
 import java.util.*;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
@@ -38,27 +38,27 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public XQArray putMember(final long pos, final Value value, final QueryContext qc) {
+  public XQArray putMember(final long pos, final Value value, final Job job) {
     throw Util.notExpected();
   }
 
   @Override
-  public XQArray reverseArray(final QueryContext qc) {
+  public XQArray reverseArray(final Job job) {
     return this;
   }
 
   @Override
-  public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
+  public XQArray insertMember(final long pos, final Value value, final Job job) {
     return get(value);
   }
 
   @Override
-  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
+  protected XQArray subArr(final long pos, final long length, final Job job) {
     throw Util.notExpected();
   }
 
   @Override
-  public XQArray removeMember(final long pos, final QueryContext qc) {
+  public XQArray removeMember(final long pos, final Job job) {
     throw Util.notExpected();
   }
 

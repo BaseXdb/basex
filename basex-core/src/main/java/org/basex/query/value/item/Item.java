@@ -7,6 +7,7 @@ import java.io.*;
 import java.math.*;
 import java.util.function.*;
 
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -78,7 +79,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item reverse(final QueryContext qc) {
+  public final Item reverse(final Job job) {
     return this;
   }
 
@@ -240,20 +241,20 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final Item subSeq(final long start, final long length, final QueryContext qc) {
+  public final Item subSeq(final long start, final long length, final Job job) {
     throw Util.notExpected();
   }
 
   @Override
-  public Value insertValue(final long pos, final Value value, final QueryContext qc) {
-    final ValueBuilder vb = new ValueBuilder(qc, value.size() + 1);
+  public Value insertValue(final long pos, final Value value, final Job job) {
+    final ValueBuilder vb = new ValueBuilder(job, value.size() + 1);
     vb.add(pos == 0 ? value : this);
     vb.add(pos == 0 ? this : value);
     return vb.value(type.union(value.type));
   }
 
   @Override
-  public final Item removeItem(final long pos, final QueryContext qc) {
+  public final Item removeItem(final long pos, final Job job) {
     throw Util.notExpected();
   }
 
@@ -314,12 +315,12 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Item shrink(final QueryContext qc) throws QueryException {
+  public Item shrink(final Job job) throws QueryException {
     return this;
   }
 
   @Override
-  protected Item rebuild(final QueryContext qc) throws QueryException {
+  protected Item rebuild(final Job job) throws QueryException {
     return this;
   }
 

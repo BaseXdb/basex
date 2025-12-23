@@ -2,6 +2,7 @@ package org.basex.query.value.item;
 
 import java.util.function.*;
 
+import org.basex.core.jobs.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -80,17 +81,17 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public Item insertValue(final long pos, final Value value, final QueryContext qc) {
+  public Item insertValue(final long pos, final Value value, final Job job) {
     throw Util.notExpected();
   }
 
   @Override
-  public Item removeItem(final long pos, final QueryContext qc) {
+  public Item removeItem(final long pos, final Job job) {
     throw Util.notExpected();
   }
 
   @Override
-  public Value subSeq(final long start, final long length, final QueryContext qc) {
+  public Value subSeq(final long start, final long length, final Job job) {
     throw Util.notExpected();
   }
 
@@ -105,7 +106,7 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public Value reverse(final QueryContext qc) {
+  public Value reverse(final Job job) {
     throw Util.notExpected();
   }
 
@@ -135,12 +136,12 @@ public final class Dummy extends Value {
   }
 
   @Override
-  public Value shrink(final QueryContext qc) {
+  public Value shrink(final Job job) {
     throw Util.notExpected();
   }
 
   @Override
-  protected Value rebuild(final QueryContext qc) {
+  protected Value rebuild(final Job job) {
     throw Util.notExpected();
   }
 

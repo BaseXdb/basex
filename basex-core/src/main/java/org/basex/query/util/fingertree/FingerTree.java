@@ -2,7 +2,7 @@ package org.basex.query.util.fingertree;
 
 import java.util.*;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.util.*;
 
 /**
@@ -184,28 +184,28 @@ public abstract class FingerTree<N, E> implements Iterable<E> {
 
   /**
    * Creates a reversed version of this tree.
-   * @param qc query context
+   * @param job interruptible job
    * @return reversed tree
    */
-  public abstract FingerTree<N, E> reverse(QueryContext qc);
+  public abstract FingerTree<N, E> reverse(Job job);
 
   /**
    * Inserts the given value at the given position into this tree.
    * @param pos position to insert at
    * @param val value to insert
-   * @param qc query context
+   * @param job interruptible job
    * @return resulting tree
    */
-  public abstract FingerTree<N, E> insert(long pos, E val, QueryContext qc);
+  public abstract FingerTree<N, E> insert(long pos, E val, Job job);
 
   /**
    * Removes an element from this tree.
    * @param pos position of the element to remove
-   * @param qc query context
+   * @param job interruptible job
    * @return resulting (potentially partial) tree
    * @throws AssertionError if this tree is empty
    */
-  public abstract TreeSlice<N, E> remove(long pos, QueryContext qc);
+  public abstract TreeSlice<N, E> remove(long pos, Job job);
 
   /**
    * Extracts a slice from this tree containing the {@code len} elements starting with that at

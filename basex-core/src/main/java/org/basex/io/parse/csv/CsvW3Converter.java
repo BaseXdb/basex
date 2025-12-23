@@ -38,7 +38,8 @@ public final class CsvW3Converter extends CsvXQueryConverter {
     final XQMap map = (XQMap) super.finish(ii, qc);
     Value columns = copts.get(CsvOptions.HEADER);
     if(columns.seqType().instanceOf(BOOLEAN_O)) {
-      columns = map.get(CsvXQueryConverter.NAMES).atomValue(qc, ii);
+      columns = map.get(CsvXQueryConverter.NAMES);
+      if(qc != null) columns = columns.atomValue(qc, ii);
     }
     final MapBuilder columnIndexBuilder = new MapBuilder();
     int i = 0;

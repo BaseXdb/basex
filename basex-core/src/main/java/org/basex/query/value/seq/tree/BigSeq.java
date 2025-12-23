@@ -2,6 +2,7 @@ package org.basex.query.value.seq.tree;
 
 import java.util.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -67,19 +68,19 @@ public final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq reverse(final QueryContext qc) {
-    qc.checkStop();
+  public TreeSeq reverse(final Job job) {
+    job.checkStop();
     final int ll = left.length, rl = right.length;
     final Item[] newLeft = new Item[rl], newRight = new Item[ll];
     for(int i = 0; i < rl; i++) newLeft[i] = right[rl - 1 - i];
     for(int i = 0; i < ll; i++) newRight[i] = left[ll - 1 - i];
-    return new BigSeq(newLeft, middle.reverse(qc), newRight, type);
+    return new BigSeq(newLeft, middle.reverse(job), newRight, type);
   }
 
   @Override
-  public Value insertValue(final long pos, final Value value, final QueryContext qc) {
-    qc.checkStop();
-    if(value.size() > 1) return copyInsert(pos, value, qc);
+  public Value insertValue(final long pos, final Value value, final Job job) {
+    job.checkStop();
+    if(value.size() > 1) return copyInsert(pos, value, job);
 
     final Item item = (Item) value;
     final Type tp = type.union(item.type);
@@ -97,7 +98,7 @@ public final class BigSeq extends TreeSeq {
     }
 
     final long ms = middle.size();
-    if(pos - ll < ms) return new BigSeq(left, middle.insert(pos - ll, item, qc), right, tp);
+    if(pos - ll < ms) return new BigSeq(left, middle.insert(pos - ll, item, job), right, tp);
 
     final int rl = right.length, p = (int) (pos - ll - ms);
     final Item[] temp = slice(right, 0, rl + 1);
@@ -111,8 +112,8 @@ public final class BigSeq extends TreeSeq {
   }
 
   @Override
-  public TreeSeq removeItem(final long pos, final QueryContext qc) {
-    qc.checkStop();
+  public TreeSeq removeItem(final long pos, final Job job) {
+    job.checkStop();
     final int ll = left.length, rl = right.length;
     if(pos < ll) {
       // delete from left digit
@@ -203,7 +204,7 @@ public final class BigSeq extends TreeSeq {
     }
 
     // delete in middle tree
-    final TreeSlice<Item, Item> slice = middle.remove(pos - ll, qc);
+    final TreeSlice<Item, Item> slice = middle.remove(pos - ll, job);
 
     if(slice.isTree()) {
       // middle tree did not underflow
@@ -241,8 +242,8 @@ public final class BigSeq extends TreeSeq {
   }
 
   @Override
-  protected Seq subSeq(final long pos, final long length, final QueryContext qc) {
-    qc.checkStop();
+  protected Seq subSeq(final long pos, final long length, final Job job) {
+    job.checkStop();
 
     // the easy cases
     final int ll = left.length, rl = right.length;

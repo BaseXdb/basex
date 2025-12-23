@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
@@ -65,7 +66,7 @@ public final class BlnSeq extends NativeSeq {
   }
 
   @Override
-  public Value reverse(final QueryContext qc) {
+  public Value reverse(final Job job) {
     final int sz = (int) size;
     final boolean[] tmp = new boolean[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];

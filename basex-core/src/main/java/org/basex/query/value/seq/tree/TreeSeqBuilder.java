@@ -1,6 +1,6 @@
 package org.basex.query.value.seq.tree;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
@@ -96,14 +96,14 @@ public final class TreeSeqBuilder extends SeqBuilder {
   }
 
   @Override
-  public TreeSeqBuilder add(final Value value, final QueryContext qc) {
+  public TreeSeqBuilder add(final Value value, final Job job) {
     // shortcut for adding single items
     if(value.size() == 1) return add((Item) value);
 
     if(!(value instanceof final BigSeq big)) {
       final BasicIter<?> iter = value.iter();
       for(Item item; (item = iter.next()) != null;) {
-        qc.checkStop();
+        job.checkStop();
         add(item);
       }
       return this;
@@ -113,11 +113,11 @@ public final class TreeSeqBuilder extends SeqBuilder {
     final FingerTree<Item, Item> midTree = big.middle;
     if(midTree.isEmpty()) {
       for(final Item l : ls) {
-        qc.checkStop();
+        job.checkStop();
         add(l);
       }
       for(final Item r : rs) {
-        qc.checkStop();
+        job.checkStop();
         add(r);
       }
       return this;
@@ -138,15 +138,15 @@ public final class TreeSeqBuilder extends SeqBuilder {
       inLeft = inRight = 0;
       tree.append(midTree);
       for(int i = ls.length; --i >= 0;) {
-        qc.checkStop();
+        job.checkStop();
         prepend(ls[i]);
       }
       for(int i = k; --i >= 0;) {
-        qc.checkStop();
+        job.checkStop();
         prepend(temp[i]);
       }
       for(final Item r : rs) {
-        qc.checkStop();
+        job.checkStop();
         add(r);
       }
       return this;
@@ -168,7 +168,7 @@ public final class TreeSeqBuilder extends SeqBuilder {
     tree.append(midTree);
     inRight = 0;
     for(final Item r : rs) {
-      qc.checkStop();
+      job.checkStop();
       add(r);
     }
     return this;

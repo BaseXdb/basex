@@ -2,6 +2,7 @@ package org.basex.query.value.array;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -54,45 +55,45 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
-  public XQArray putMember(final long pos, final Value value, final QueryContext qc) {
-    return toTree(qc).putMember(pos, value, qc);
+  public XQArray putMember(final long pos, final Value value, final Job job) {
+    return toTree(job).putMember(pos, value, job);
   }
 
   @Override
-  public XQArray insertMember(final long pos, final Value value, final QueryContext qc) {
-    return toTree(qc).insertMember(pos, value, qc);
+  public XQArray insertMember(final long pos, final Value value, final Job job) {
+    return toTree(job).insertMember(pos, value, job);
   }
 
   @Override
-  public XQArray removeMember(final long pos, final QueryContext qc) {
+  public XQArray removeMember(final long pos, final Job job) {
     return structSize() == 2 ? get(members.itemAt(pos == 0 ? 1 : 0)) :
-      new ItemArray(members.removeItem(pos, qc));
+      new ItemArray(members.removeItem(pos, job));
   }
 
   @Override
-  protected XQArray subArr(final long pos, final long length, final QueryContext qc) {
-    return new ItemArray(members.subsequence(pos, length, qc));
+  protected XQArray subArr(final long pos, final long length, final Job job) {
+    return new ItemArray(members.subsequence(pos, length, job));
   }
 
   @Override
-  public XQArray reverseArray(final QueryContext qc) {
-    return new ItemArray(members.reverse(qc));
+  public XQArray reverseArray(final Job job) {
+    return new ItemArray(members.reverse(job));
   }
 
   /**
    * Creates a tree-based version of this array.
-   * @param qc query context
+   * @param job interruptible job
    * @return array
    */
-  private XQArray toTree(final QueryContext qc) {
-    final ArrayBuilder ab = new ArrayBuilder(qc, Long.MIN_VALUE);
+  private XQArray toTree(final Job job) {
+    final ArrayBuilder ab = new ArrayBuilder(job, Long.MIN_VALUE);
     for(final Item member : members) ab.add(member);
     return ab.array((ArrayType) type);
   }
 
   @Override
-  public Item shrink(final QueryContext qc) throws QueryException {
-    members = members.shrink(qc);
+  public Item shrink(final Job job) throws QueryException {
+    members = members.shrink(job);
     type = ArrayType.get(members.seqType().with(Occ.EXACTLY_ONE));
     return this;
   }

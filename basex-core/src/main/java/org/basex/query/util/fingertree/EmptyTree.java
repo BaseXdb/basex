@@ -1,6 +1,6 @@
 package org.basex.query.util.fingertree;
 
-import org.basex.query.*;
+import org.basex.core.jobs.*;
 import org.basex.util.*;
 
 /**
@@ -83,17 +83,17 @@ final class EmptyTree<N, E> extends FingerTree<N, E> {
   }
 
   @Override
-  public FingerTree<N, E> reverse(final QueryContext qc) {
+  public FingerTree<N, E> reverse(final Job job) {
     return this;
   }
 
   @Override
-  public FingerTree<N, E> insert(final long pos, final E val, final QueryContext qc) {
+  public FingerTree<N, E> insert(final long pos, final E val, final Job job) {
     throw Util.notExpected();
   }
 
   @Override
-  public TreeSlice<N, E> remove(final long pos, final QueryContext qc) {
+  public TreeSlice<N, E> remove(final long pos, final Job job) {
     throw Util.notExpected();
   }
 

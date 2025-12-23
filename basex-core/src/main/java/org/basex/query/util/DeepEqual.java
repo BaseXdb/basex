@@ -21,14 +21,14 @@ public final class DeepEqual {
 
   /** Input info (can be {@code null}). */
   public final InputInfo info;
-  /** Query context (to interrupt process, can be {@code null}). */
+  /** Query context (can be {@code null}). */
   public final QueryContext qc;
   /** Collation. */
   public final Collation coll;
   /** Options. */
   public final DeepEqualOptions options;
 
-  /** Comparison function. */
+  /** Comparison function (requires {@link #qc} to be assigned). */
   public FItem itemsEqual;
   /** Flag for nested node comparisons. */
   public boolean nested;

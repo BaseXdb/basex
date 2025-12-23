@@ -1,5 +1,6 @@
 package org.basex.query.value.map;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -120,7 +121,7 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
-  public Item shrink(final QueryContext qc) throws QueryException {
-    return this == EMPTY ? this : rebuild(qc);
+  public Item shrink(final Job job) throws QueryException {
+    return this == EMPTY ? this : rebuild(job);
   }
 }
