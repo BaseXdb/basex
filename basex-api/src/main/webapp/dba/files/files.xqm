@@ -100,7 +100,7 @@ function dba:files(
               'date': $modified,
               'bytes': $size,
               'action': fn() {
-                sequence-join(
+                insert-separator(
                   if (not($dir)) {
                     html:link('Download', 'file/' || encode-for-uri($name)),
                     if ($size <= $limit) {

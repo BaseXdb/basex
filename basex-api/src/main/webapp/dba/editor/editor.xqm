@@ -46,7 +46,7 @@ function dba:editor(
       <td colspan='2'>
         <form autocomplete='off' action='javascript:void(0);'>{
           <datalist id='files'>{ config:editor-files() ! element option { . } }</datalist>,
-          sequence-join((
+          insert-separator((
             <input type='text' id='file' name='file' placeholder='Name of file'
                    list='files' oninput='checkButtons()' onpropertychange='checkButtons()'/>,
             <button type='submit' name='open' id='open' disabled=''

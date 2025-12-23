@@ -1,3 +1,25 @@
+VERSION 12.1 (December 23, 2025) ---------------------------------------
+
+ RESTXQ
+ - improved local locking for resources supplied via arguments
+
+ Storage
+ - PUT operations: replace or ignore existing resources
+
+ XQuery
+ - Cache Functions: Store transient data in main-memory LRU caches
+ - Key/Value Store: All opened stores are now kept in main memory
+ - faster generation and conversion of sequences and arrays
+ - fn:load-xquery-module: retrieve module only once at runtime
+
+ XQuery 4.0
+ - Function declarations: The 'local' prefix can now be omitted
+ - Destructuring: let $($head, $tail) := ...
+ - Map construction generalized: { 1: 2, $map-entries }
+ - Pseudo path function: $xml/get($node-name)
+ - New node comparators (is-not, precedes, follows, ...)
+ - %method annotation replace by =?> operator
+
 VERSION 12.0 (June 26, 2025) -------------------------------------------
 
   🔧 Core Upgrades
