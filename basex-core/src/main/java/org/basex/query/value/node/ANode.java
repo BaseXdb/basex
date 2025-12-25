@@ -103,9 +103,9 @@ public abstract class ANode extends Item {
   @Override
   public final int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return item.type.isStringOrUntyped()
-        ? Token.compare(string(), item.string(ii), Collation.get(coll, ii))
-        : -item.compare(this, coll, transitive, ii);
+    return item.type.isStringOrUntyped() ?
+      Token.compare(string(), item.string(ii), Collation.get(coll, ii)) :
+      -item.compare(this, coll, transitive, ii);
   }
 
   @Override

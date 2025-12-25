@@ -168,9 +168,9 @@ public final class Token {
    */
   public static byte[][] tokens(final String... strings) {
     final int sl = strings.length;
-    final byte[][] tokens = new byte[sl][];
-    for(int s = 0; s < sl; ++s) tokens[s] = token(strings[s]);
-    return tokens;
+    final byte[][] tmp = new byte[sl][];
+    for(int s = 0; s < sl; ++s) tmp[s] = token(strings[s]);
+    return tmp;
   }
 
   /**
@@ -363,21 +363,21 @@ public final class Token {
     if(m) n = -n;
     int nl = numDigits(n);
     if(m) ++nl;
-    final byte[] num = new byte[nl];
+    final byte[] tmp = new byte[nl];
 
     // faster division by 10 for values < 81920 (see Integer.getChars)
     while(n > 81919) {
       final int q = n / 10;
-      num[--nl] = (byte) (n - (q << 3) - (q << 1) + '0');
+      tmp[--nl] = (byte) (n - q * 10 + '0');
       n = q;
     }
     while(n != 0) {
       final int q = n * 52429 >>> 19;
-      num[--nl] = (byte) (n - (q << 3) - (q << 1) + '0');
+      tmp[--nl] = (byte) (n - q * 10 + '0');
       n = q;
     }
-    if(m) num[--nl] = '-';
-    return num;
+    if(m) tmp[--nl] = '-';
+    return tmp;
   }
 
   /**
@@ -390,15 +390,15 @@ public final class Token {
     // use fast variant for powers of two
     for(int shift = 1, p = 2; shift < 6; shift++, p <<= 1) {
       if(radix == p) {
-        final byte[] bytes = new byte[(64 + shift - 1) / shift];
+        final byte[] tmp = new byte[(64 + shift - 1) / shift];
         final int mask = (1 << shift) - 1;
         long n = value;
-        int pos = bytes.length;
+        int pos = tmp.length;
         do {
-          bytes[--pos] = DIGITS[(int) (n & mask)];
+          tmp[--pos] = DIGITS[(int) (n & mask)];
           n >>>= shift;
         } while(n != 0);
-        return substring(bytes, pos);
+        return substring(tmp, pos);
       }
     }
 
@@ -623,7 +623,7 @@ public final class Token {
       final byte b = token[p];
       if(b < '0' || b > '9') break;
       if(v >= MAX_LONG && (b > '7' || v > MAX_LONG)) return Long.MIN_VALUE;
-      v = (v << 3) + (v << 1) + b - '0';
+      v = v * 10 + b - '0';
     }
     while(p < end && ws(token[p])) ++p;
     return p < end ? Long.MIN_VALUE : m ? -v : v;
@@ -659,7 +659,7 @@ public final class Token {
       final byte b = token[p];
       if(b < '0' || b > '9') break;
       if(v >= MAX_INT && (b > '7' || v > MAX_INT)) return Integer.MIN_VALUE;
-      v = (v << 3) + (v << 1) + b - '0';
+      v = v * 10 + b - '0';
     }
     while(p < end && ws(token[p])) ++p;
     return p < end || v < 0 ? Integer.MIN_VALUE : m ? -v : v;
@@ -672,9 +672,9 @@ public final class Token {
    */
   public static int hashCode(final byte[] token) {
     final int tl = token.length, s = Math.max(1, tl / MAX_HASH_OPS);
-    int h = 0;
+    int h = 1;
     for(int t = 0; t < tl; t += s) {
-      h = (h << 5) - h + token[t];
+      h = h * 31 + token[t];
     }
     return h;
   }
@@ -737,12 +737,7 @@ public final class Token {
    * @return result of comparison (-1, 0, 1)
    */
   public static int compare(final byte[] token, final byte[] compare) {
-    final int tl = token.length, cl = compare.length, l = Math.min(tl, cl);
-    for(int i = 0; i < l; ++i) {
-      final int c = (token[i] & 0xFF) - (compare[i] & 0xFF);
-      if(c != 0) return Integer.signum(c);
-    }
-    return Integer.signum(tl - cl);
+    return Integer.signum(Arrays.compareUnsigned(token, compare));
   }
 
   /**
@@ -826,7 +821,7 @@ public final class Token {
    */
   public static int indexOf(final byte[] token, final int ch, final int pos) {
     final int tl = token.length;
-    if(ch < 0x80) {
+    if(ch <= 0x7F) {
       for(int t = pos; t < tl; t++) {
         if(token[t] == ch) return t;
       }
@@ -847,7 +842,7 @@ public final class Token {
   public static int lastIndexOf(final byte[] token, final int ch) {
     final int tl = token.length;
     int p = -1;
-    if(ch < 0x80) {
+    if(ch <= 0x7F) {
       for(int t = tl - 1; t >= 0; --t) {
         if(token[t] == ch) return t;
       }
@@ -882,12 +877,9 @@ public final class Token {
     final int tl = token.length - sl;
     if(pos > tl) return -1;
 
-    // compare tokens character wise
-    for(int t = pos; t <= tl; ++t) {
-      int s = 0;
-      while(sub[s] == token[t + s]) {
-        if(++s == sl) return t;
-      }
+    final byte first = sub[0];
+    for(int t = pos; t <= tl; t++) {
+      if(token[t] == first && Arrays.mismatch(token, t + 1, t + sl, sub, 1, sl) == -1) return t;
     }
     return -1;
   }
@@ -931,12 +923,8 @@ public final class Token {
    * @return result of check
    */
   public static boolean startsWith(final byte[] token, final byte[] sub, final int pos) {
-    final int sl = sub.length;
-    if(sl > token.length - pos) return false;
-    for(int s = 0, p = pos; s < sl; ++s, ++p) {
-      if(sub[s] != token[p]) return false;
-    }
-    return true;
+    final int sl = sub.length, tl = token.length;
+    return sl <= tl - pos && Arrays.mismatch(sub, 0, sl, token, pos, pos + sl) == -1;
   }
 
   /**
@@ -956,13 +944,8 @@ public final class Token {
    * @return result of check
    */
   public static boolean endsWith(final byte[] token, final byte[] sub) {
-    final int sl = sub.length;
-    final int tl = token.length;
-    if(sl > tl) return false;
-    for(int s = sl; s > 0; s--) {
-      if(sub[sl - s] != token[tl - s]) return false;
-    }
-    return true;
+    final int sl = sub.length, tl = token.length;
+    return sl <= tl && Arrays.mismatch(sub, 0, sl, token, tl - sl, tl) == -1;
   }
 
   /**
@@ -1153,9 +1136,9 @@ public final class Token {
    */
   public static byte[] concat(final Object... objects) {
     final int ol = objects.length;
-    final byte[][] tokens = new byte[ol][];
-    for(int o = 0; o < ol; o++) tokens[o] = token(objects[o]);
-    return concat(tokens);
+    final byte[][] tmp = new byte[ol][];
+    for(int o = 0; o < ol; o++) tmp[o] = token(objects[o]);
+    return concat(tmp);
   }
 
   /**
@@ -1165,17 +1148,21 @@ public final class Token {
    * @return resulting token
    */
   public static byte[] delete(final byte[] token, final int ch) {
-    // ascii character
     final int tl = token.length;
-    if(ch < 0x80) {
-      // skip deletion if character is not found
-      if(!contains(token, ch)) return token;
-
-      final TokenBuilder tb = new TokenBuilder(tl);
+    if(ch <= 0x7F) {
+      // ascii characters: skip deletion if character is not found
+      int c = 0;
       for(final byte b : token) {
-        if(b != ch) tb.add(b);
+        if(b == ch) c++;
       }
-      return tb.finish();
+      if(c == 0) return token;
+
+      final byte[] tmp = new byte[tl - c];
+      c = 0;
+      for(final byte b : token) {
+        if(b != ch) tmp[c++] = b;
+      }
+      return tmp;
     }
     // remove character
     final TokenBuilder tb = new TokenBuilder(tl);
@@ -1190,27 +1177,45 @@ public final class Token {
    */
   public static byte[] normalize(final byte[] token) {
     final int tl = token.length;
-    if(tl == 0) return token;
-    final byte[] tmp = new byte[tl];
-    int c = 0;
-    boolean ws1 = true;
-    for(final byte b : token) {
-      final boolean ws2 = ws(b);
-      if(ws2 && ws1) continue;
-      tmp[c++] = ws2 ? (byte) ' ' : b;
-      ws1 = ws2;
+    int s = 0, e = tl - 1;
+    while(s <= e && ws(token[s])) s++;
+    while(e > s && ws(token[e])) e--;
+    if(s > e) return EMPTY;
+
+    int size = 0;
+    boolean inWs = false, replace = false;
+    for(int i = s; i <= e; i++) {
+      final byte b = token[i];
+      final boolean ws = ws(token[i]);
+      if(!(ws && inWs)) {
+        size++;
+        inWs = ws;
+        if(ws && b != ' ') replace = true;
+      }
     }
-    if(c > 0 && ws(tmp[c - 1])) --c;
-    return c == tl ? tmp : Arrays.copyOf(tmp, c);
+    if(size == tl && !replace) return token;
+
+    final byte[] tmp = new byte[size];
+    int c = 0;
+    inWs = false;
+    for(int i = s; i <= e; i++) {
+      final byte b = token[i];
+      final boolean ws = ws(b);
+      if(!(ws && inWs)) {
+        tmp[c++] = ws ? (byte) ' ' : b;
+        inWs = ws;
+      }
+    }
+    return tmp;
   }
 
   /**
-   * Checks if the specified character is a whitespace.
+   * Checks if the specified character is a whitespace (0x09, 0x0A, 0x0D, 0x20).
    * @param ch the character to be checked
    * @return result of check
    */
   public static boolean ws(final int ch) {
-    return ch == 0x09 || ch == 0x0A || ch == 0x0D || ch == 0x20;
+    return ch >= 0 && ch <= 32 && (1L << ch & 0x100002600L) != 0;
   }
 
   /**
@@ -1258,9 +1263,9 @@ public final class Token {
   public static byte[] uc(final byte[] token, final boolean ascii) {
     if(ascii) {
       final int tl = token.length;
-      final byte[] tok = new byte[tl];
-      for(int t = 0; t < tl; t++) tok[t] = (byte) uc(token[t]);
-      return tok;
+      final byte[] tmp = new byte[tl];
+      for(int t = 0; t < tl; t++) tmp[t] = (byte) uc(token[t]);
+      return tmp;
     }
     return token(string(token).toUpperCase(Locale.ENGLISH));
   }
@@ -1309,9 +1314,9 @@ public final class Token {
   public static byte[] lc(final byte[] token, final boolean ascii) {
     if(ascii) {
       final int tl = token.length;
-      final byte[] tok = new byte[tl];
-      for(int t = 0; t < tl; t++) tok[t] = (byte) lc(token[t]);
-      return tok;
+      final byte[] tmp = new byte[tl];
+      for(int t = 0; t < tl; t++) tmp[t] = (byte) lc(token[t]);
+      return tmp;
     }
     return token(string(token).toLowerCase(Locale.ENGLISH));
   }
@@ -1405,9 +1410,11 @@ public final class Token {
    * @return hex representation
    */
   public static byte[] hex(final int value, final int length) {
-    final TokenBuilder tb = new TokenBuilder(length);
-    for(int l = length - 1; l >= 0; l--) tb.add(HEX_TABLE[value >> (l << 2) & 0xF]);
-    return tb.finish();
+    final byte[] tmp = new byte[length];
+    for(int l = 0; l < length; l++) {
+      tmp[length - l - 1] = HEX_TABLE[value >> (l << 2) & 0xF];
+    }
+    return tmp;
   }
 
   /**
@@ -1418,13 +1425,13 @@ public final class Token {
    */
   public static byte[] hex(final byte[] value, final boolean uc) {
     final int vl = value.length, u = uc ? 0x37 : 0x57;
-    final byte[] data = new byte[Array.checkCapacity((long) vl << 1)];
+    final byte[] tmp = new byte[Array.checkCapacity((long) vl << 1)];
     for(int v = 0, d = 0; v < vl; v++) {
       final int a = value[v], b = a >> 4 & 0x0F, c = a & 0x0F;
-      data[d++] = (byte) (b + (b > 9 ? u : '0'));
-      data[d++] = (byte) (c + (c > 9 ? u : '0'));
+      tmp[d++] = (byte) (b + (b > 9 ? u : '0'));
+      tmp[d++] = (byte) (c + (c > 9 ? u : '0'));
     }
-    return data;
+    return tmp;
   }
 
   /**

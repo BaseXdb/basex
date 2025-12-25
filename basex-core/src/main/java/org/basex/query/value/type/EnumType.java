@@ -178,9 +178,9 @@ public final class EnumType implements Type {
 
   @Override
   public int hashCode() {
-    int h = 0;
+    int h = 1;
     for(final byte[] v : values) {
-      h = (h << 5) - h + Token.hashCode(v);
+      h = h * 31 + Token.hashCode(v);
     }
     return h;
   }

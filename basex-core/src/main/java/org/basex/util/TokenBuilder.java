@@ -148,23 +148,21 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final int cp) {
-    if(cp <= 0x7F) {
-      addByte((byte) cp);
+    // fast track
+    if(cp <= 0x7F) return addByte((byte) cp);
+
+    if(cp <= 0x7FF) {
+      addByte((byte) (cp >> 6 | 0xC0));
     } else {
-      if(cp <= 0x7FF) {
-        addByte((byte) (cp >>  6 & 0x1F | 0xC0));
+      if(cp <= 0xFFFF) {
+        addByte((byte) (cp >> 12 | 0xE0));
       } else {
-        if(cp <= 0xFFFF) {
-          addByte((byte) (cp >> 12 & 0x0F | 0xE0));
-        } else {
-          addByte((byte) (cp >> 18 & 0x07 | 0xF0));
-          addByte((byte) (cp >> 12 & 0x3F | 0x80));
-        }
-        addByte((byte) (cp >>  6 & 0x3F | 0x80));
+        addByte((byte) (cp >> 18 | 0xF0));
+        addByte((byte) (cp >> 12 & 0x3F | 0x80));
       }
-      addByte((byte) (cp & 0x3F | 0x80));
+      addByte((byte) (cp >> 6 & 0x3F | 0x80));
     }
-    return this;
+    return addByte((byte) (cp & 0x3F | 0x80));
   }
 
   /**

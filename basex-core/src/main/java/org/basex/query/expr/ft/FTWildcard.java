@@ -74,7 +74,7 @@ public final class FTWildcard {
           boolean f = false;
           while(true) {
             c = ++i < il ? input[i] : 0;
-            if(digit(c)) mn = (mn << 3) + (mn << 1) + c - '0';
+            if(digit(c)) mn = mn * 10 + c - '0';
             else if(f && c == ',') break;
             else return false;
             f = true;
@@ -82,7 +82,7 @@ public final class FTWildcard {
           f = false;
           while(true) {
             c = ++i < il ? input[i] : 0;
-            if(digit(c)) mx = (mx << 3) + (mx << 1) + c - '0';
+            if(digit(c)) mx = mx * 10 + c - '0';
             else if(f && c == '}') break;
             else return false;
             f = true;

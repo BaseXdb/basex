@@ -85,7 +85,7 @@ public final class Inline {
 
     long value = 0;
     for(final byte b : token) {
-      value = (value << 3) + (value << 1) + b - '0';
+      value = value * 10 + b - '0';
       // skip conversion if byte is no digit, or if number is too large
       if(b < '0' || b > '9' || value > Integer.MAX_VALUE) return -1;
     }
