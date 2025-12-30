@@ -64,19 +64,18 @@ public final class DualIterMap extends SimpleMap {
   public Value value(final QueryContext qc) throws QueryException {
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
-    try {
-      final ValueBuilder vb = new ValueBuilder(qc, size());
-      final Iter iter1 = exprs[0].iter(qc);
-      for(Item item1; (item1 = qc.next(iter1)) != null;) {
-        qf.value = item1;
+    final ValueBuilder vb = new ValueBuilder(qc, size());
+    final Iter iter1 = exprs[0].iter(qc);
+    for(Item item1; (item1 = qc.next(iter1)) != null;) {
+      qf.value = item1;
+      try {
         final Iter iter2 = exprs[1].iter(qc);
         for(Item item2; (item2 = qc.next(iter2)) != null;) vb.add(item2);
+      } finally {
         qf.value = qv;
       }
-      return vb.value(this);
-    } finally {
-      qf.value = qv;
     }
+    return vb.value(this);
   }
 
   @Override

@@ -78,8 +78,8 @@ public final class DualMap extends SimpleMap {
     final ValueBuilder vb = new ValueBuilder(qc, size());
     final Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
+      qf.value = item;
       try {
-        qf.value = item;
         vb.add(exprs[1].item(qc, info));
       } finally {
         qf.value = qv;
