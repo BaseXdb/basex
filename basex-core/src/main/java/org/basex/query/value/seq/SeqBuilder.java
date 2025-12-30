@@ -18,7 +18,7 @@ public abstract class SeqBuilder {
    * @param item item to append
    * @return reference to this builder for convenience
    */
-  public abstract SeqBuilder add(Item item);
+  protected abstract SeqBuilder add(Item item);
 
   /**
    * Appends items.
@@ -26,7 +26,17 @@ public abstract class SeqBuilder {
    * @param job interruptible job
    * @return this builder for convenience
    */
-  public SeqBuilder add(final Value value, final Job job) {
+  public final SeqBuilder add(final Value value, final Job job) {
+    return value.size() == 1 ? add((Item) value) : addSequence(value, job);
+  }
+
+  /**
+   * Appends a sequence.
+   * @param value items to append
+   * @param job interruptible job
+   * @return this builder for convenience
+   */
+  protected SeqBuilder addSequence(final Value value, final Job job) {
     SeqBuilder sb = this;
     for(final Item item : value) {
       job.checkStop();
@@ -48,7 +58,7 @@ public abstract class SeqBuilder {
    * @param job interruptible job
    * @return tree sequence builder
    */
-  protected final TreeSeqBuilder tree(final Item item, final Job job) {
+  protected final SeqBuilder tree(final Item item, final Job job) {
     return new TreeSeqBuilder().add(value(null), job).add(item);
   }
 }

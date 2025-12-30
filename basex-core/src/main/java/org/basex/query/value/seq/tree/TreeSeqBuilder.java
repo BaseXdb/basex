@@ -1,7 +1,6 @@
 package org.basex.query.value.seq.tree;
 
 import org.basex.core.jobs.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.fingertree.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -69,7 +68,7 @@ public final class TreeSeqBuilder extends SeqBuilder {
   }
 
   @Override
-  public TreeSeqBuilder add(final Item item) {
+  protected TreeSeqBuilder add(final Item item) {
     if(inRight < TreeSeq.MAX_DIGIT) {
       // just insert the item
       items[(mid + inRight) % CAP] = item;
@@ -96,13 +95,9 @@ public final class TreeSeqBuilder extends SeqBuilder {
   }
 
   @Override
-  public TreeSeqBuilder add(final Value value, final Job job) {
-    // shortcut for adding single items
-    if(value.size() == 1) return add((Item) value);
-
+  protected SeqBuilder addSequence(final Value value, final Job job) {
     if(!(value instanceof final BigSeq big)) {
-      final BasicIter<?> iter = value.iter();
-      for(Item item; (item = iter.next()) != null;) {
+      for(final Item item : value) {
         job.checkStop();
         add(item);
       }
