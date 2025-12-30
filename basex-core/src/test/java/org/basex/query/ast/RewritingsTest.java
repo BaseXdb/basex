@@ -3398,4 +3398,19 @@ public final class RewritingsTest extends SandboxTest {
     query("let $a := 'x' let $b := if($a) then (<a/>, <b/>) else error() return $b/name()",
         "a\nb");
   }
+
+  /** DualIterMap context value setting. */
+  @Test public void gh2569() {
+    check("let $node := <X><A/><B/><C/></X>\n"
+        + "let $pos := $node/A ! position()\n"
+        + "let $nodes := for $c at $i in $node/* where $i gt $pos return $c\n"
+        + "let $flat := $nodes ! (if (*) then * else .)\n"
+        + "return element Y {$flat except $flat[1]}",
+        "<Y><C/></Y>", exists(DualIterMap.class));
+    check("let $node := <X><A/><B/><C/></X>\n"
+        + "return $node/A ! position()\n"
+        + "  -> (for $c at $i in $node/* where $i gt . return $c) ! (* otherwise .)\n"
+        + "  -> element Y {. except head(.)}",
+        "<Y><C/></Y>", exists(DualIterMap.class));
+  }
 }
