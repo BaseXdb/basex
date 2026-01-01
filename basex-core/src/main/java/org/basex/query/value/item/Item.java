@@ -14,7 +14,6 @@ import org.basex.io.in.*;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -169,19 +168,6 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Compares items for equality. Called by {@link OpV}.
-   * @param item item to be compared
-   * @param coll collation (can be {@code null})
-   * @param ii input info (can be {@code null})
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public final boolean equal(final Item item, final Collation coll, final InputInfo ii)
-      throws QueryException {
-    return compare(item, coll, false, ii) == 0;
-  }
-
-  /**
    * Compares items for deep equality.
    * Called by {@link DeepEqual}.
    * @param item item to be compared
@@ -201,7 +187,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean atomicEqual(final Item item) throws QueryException {
-    return this == item || comparable(item) && equal(item, null, null);
+    return this == item || comparable(item) && compare(item, null, false, null) == 0;
   }
 
   /**

@@ -152,8 +152,8 @@ public class CmpG extends Cmp {
 
   /** Operator. */
   OpG op;
-  /** Type check at runtime. */
-  boolean check = true;
+  /** Indicates if input is comparable. */
+  boolean comparable;
 
   /**
    * Constructor.
@@ -211,7 +211,7 @@ public class CmpG extends Cmp {
     if(expr == this) expr = CmpR.get(cc, this);
     if(expr == this) expr = CmpSR.get(cc, this);
     if(expr == this) {
-      // skip runtime type check if items are known to be comparable (covers most common types)
+      // skip runtime type check if items are known to be comparable
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
       if(type1 == type2 && !type1.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.ITEM)
@@ -220,23 +220,23 @@ public class CmpG extends Cmp {
           || type1.isStringOrUntyped() && type2.isStringOrUntyped()
           || type1.instanceOf(AtomType.BINARY) && type2.instanceOf(AtomType.BINARY)
           || type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION)) {
-        check = false;
+        comparable = true;
       }
 
       // choose best implementation
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
         // simple comparisons
-        if(!(this instanceof CmpSimpleG)) expr = new CmpSimpleG(expr1, expr2, op, info, check);
+        if(!(this instanceof CmpSimpleG)) expr = copyType(new CmpSimpleG(expr1, expr2, op, info));
       } else if(op == OpG.EQ && sc().collation == null && !st2.zeroOrOne() && (
         type1.isNumber() && type2.isNumber() ||
         type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
         type1 == AtomType.BOOLEAN && type2 == AtomType.BOOLEAN
       )) {
         // hash-based comparisons
-        if(!(this instanceof CmpHashG)) expr = new CmpHashG(expr1, expr2, op, info);
+        if(!(this instanceof CmpHashG)) expr = copyType(new CmpHashG(expr1, expr2, op, info));
       } else if(op == OpG.EQ && expr2 instanceof Range && type1.isNumberOrUntyped()) {
         // range comparisons
-        if(!(this instanceof CmpRangeG)) expr = new CmpRangeG(expr1, expr2, op, info);
+        if(!(this instanceof CmpRangeG)) expr = copyType(new CmpRangeG(expr1, expr2, op, info));
       }
 
       // pre-evaluate expression; discard hashed results
@@ -351,9 +351,10 @@ public class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   final boolean eval(final Item item1, final Item item2) throws QueryException {
-    if(check && !(item1.comparable(item2) || item1.type.isUntyped() || item2.type.isUntyped()))
-      throw compareError(item1, item2, info);
-    return op.value().eval(item1, item2, info);
+    if(comparable || item1.comparable(item2) || item1.type.isUntyped() || item2.type.isUntyped()) {
+      return op.value().eval(item1.compare(item2, null, false, info));
+    }
+    throw compareError(item1, item2, info);
   }
 
   /**
@@ -546,10 +547,19 @@ public class CmpG extends Cmp {
 
   @Override
   public CmpG copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    final CmpG cmp = new CmpG(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op);
-    cmp.check = check;
-    return copyType(cmp);
+    return copyType(new CmpG(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op));
   }
+
+  /**
+   * Finalizes the copy of a general comparison.
+   * @param cmp comparison
+   * @return enriched expression
+   */
+  final CmpG copyType(final CmpG cmp) {
+    cmp.comparable = comparable;
+    return super.copyType(cmp);
+  }
+
 
   @Override
   public final boolean equals(final Object obj) {

@@ -31,7 +31,7 @@ public final class FnIndexOf extends StandardFunc {
       public Itr next() throws QueryException {
         for(Item item; (item = qc.next(input)) != null;) {
           ++c;
-          if(item.comparable(search) && item.equal(search, collation, info)) {
+          if(item.comparable(search) && item.compare(search, collation, false, info) == 0) {
             return Itr.get(c);
           }
         }
@@ -50,7 +50,9 @@ public final class FnIndexOf extends StandardFunc {
     int c = 0;
     for(Item item; (item = qc.next(input)) != null;) {
       ++c;
-      if(item.comparable(search) && item.equal(search, collation, info)) list.add(c);
+      if(item.comparable(search) && item.compare(search, collation, false, info) == 0) {
+        list.add(c);
+      }
     }
     return IntSeq.get(list.finish());
   }

@@ -19,12 +19,9 @@ public final class CmpSimpleG extends CmpG {
    * @param expr2 second expression
    * @param op operator
    * @param info input info (can be {@code null})
-   * @param check check flag
    */
-  CmpSimpleG(final Expr expr1, final Expr expr2, final OpG op, final InputInfo info,
-      final boolean check) {
+  CmpSimpleG(final Expr expr1, final Expr expr2, final OpG op, final InputInfo info) {
     super(info, expr1, expr2, op);
-    this.check = check;
   }
 
   @Override
@@ -33,12 +30,13 @@ public final class CmpSimpleG extends CmpG {
     final Item item1 = exprs[0].item(qc, info);
     if(item1.isEmpty()) return false;
     final Item item2 = exprs[1].item(qc, info);
-    return !item2.isEmpty() && eval(item1, item2);
+    if(item2.isEmpty()) return false;
+    return eval(item1, item2);
   }
 
   @Override
   public CmpG copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new CmpSimpleG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, info, check));
+    return copyType(new CmpSimpleG(exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op, info));
   }
 
   @Override

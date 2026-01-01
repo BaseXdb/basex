@@ -305,7 +305,7 @@ public abstract class Preds extends Arr {
    * Checks if at least one of the predicates may be positional.
    * @return result of check
    */
-  public boolean mayBePositional() {
+  public final boolean mayBePositional() {
     for(final Expr expr : exprs) {
       if(mayBePositional(expr)) return true;
     }

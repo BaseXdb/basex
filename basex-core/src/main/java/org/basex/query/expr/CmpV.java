@@ -28,11 +28,7 @@ public final class CmpV extends Cmp {
     /** Item comparison: less or equal. */
     LE("le") {
       @Override
-      public boolean eval(final Item item1, final Item item2, final InputInfo info)
-          throws QueryException {
-        final int v = item1.compare(item2, null, false, info);
-        return v != Item.NAN_DUMMY && v <= 0;
-      }
+      public boolean eval(final int v) { return v != Item.NAN_DUMMY && v <= 0; }
       @Override
       public OpV swap() { return GE; }
       @Override
@@ -44,11 +40,7 @@ public final class CmpV extends Cmp {
     /** Item comparison: less. */
     LT("lt") {
       @Override
-      public boolean eval(final Item item1, final Item item2, final InputInfo info)
-          throws QueryException {
-        final int v = item1.compare(item2, null, false, info);
-        return v != Item.NAN_DUMMY && v < 0;
-      }
+      public boolean eval(final int v) { return v != Item.NAN_DUMMY && v < 0; }
       @Override
       public OpV swap() { return GT; }
       @Override
@@ -60,10 +52,7 @@ public final class CmpV extends Cmp {
     /** Item comparison: greater of equal. */
     GE("ge") {
       @Override
-      public boolean eval(final Item item1, final Item item2, final InputInfo info)
-          throws QueryException {
-        return item1.compare(item2, null, false, info) >= 0;
-      }
+      public boolean eval(final int v) { return v >= 0; }
       @Override
       public OpV swap() { return LE; }
       @Override
@@ -75,10 +64,7 @@ public final class CmpV extends Cmp {
     /** Item comparison: greater. */
     GT("gt") {
       @Override
-      public boolean eval(final Item item1, final Item item2, final InputInfo info)
-          throws QueryException {
-        return item1.compare(item2, null, false, info) > 0;
-      }
+      public boolean eval(final int v) { return v > 0; }
       @Override
       public OpV swap() { return LT; }
       @Override
@@ -90,10 +76,7 @@ public final class CmpV extends Cmp {
     /** Item comparison: equal. */
     EQ("eq") {
       @Override
-      public boolean eval(final Item item1, final Item item2, final InputInfo info)
-          throws QueryException {
-        return item1.equal(item2, null, info);
-      }
+      public boolean eval(final int v) { return v == 0; }
       @Override
       public OpV swap() { return EQ; }
       @Override
@@ -105,10 +88,7 @@ public final class CmpV extends Cmp {
     /** Item comparison: not equal. */
     NE("ne") {
       @Override
-      public boolean eval(final Item item1, final Item item2, final InputInfo info)
-          throws QueryException {
-        return !item1.equal(item2, null, info);
-      }
+      public boolean eval(final int v) { return v != 0; }
       @Override
       public OpV swap() { return NE; }
       @Override
@@ -130,14 +110,10 @@ public final class CmpV extends Cmp {
 
     /**
      * Evaluates the expression.
-     * @param item1 first item
-     * @param item2 second item
-     * @param info input info (can be {@code null})
+     * @param diff difference
      * @return result
-     * @throws QueryException query exception
      */
-    public abstract boolean eval(Item item1, Item item2, InputInfo info)
-        throws QueryException;
+    public abstract boolean eval(int diff);
 
     /**
      * Swaps the comparator.
@@ -257,7 +233,7 @@ public final class CmpV extends Cmp {
    * @throws QueryException query exception
    */
   private boolean test(final Item item1, final Item item2) throws QueryException {
-    if(item1.comparable(item2)) return opV.eval(item1, item2, info);
+    if(item1.comparable(item2)) return opV.eval(item1.compare(item2, null, false, info));
     throw compareError(item1, item2, info);
   }
 

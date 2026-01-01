@@ -26,17 +26,16 @@ public final class IterFilter extends Filter {
   }
 
   @Override
-  public Iter iter(final QueryContext qc) {
+  public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      Iter iter;
+      final Iter iter = root.iter(qc);
 
       @Override
       public Item next() throws QueryException {
-        // first call - initialize iterator
-        if(iter == null) iter = root.iter(qc);
-        // filter sequence
-        for(Item item; (item = qc.next(iter)) != null;) {
-          if(test(item, qc)) return item;
+        final QueryContext q = qc;
+        final Iter ir = iter;
+        for(Item item; (item = q.next(ir)) != null;) {
+          if(test(item, q)) return item;
         }
         return null;
       }

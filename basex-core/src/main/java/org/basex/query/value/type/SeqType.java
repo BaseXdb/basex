@@ -350,7 +350,7 @@ public final class SeqType {
       return null;
     }
     final Item cast = (Item) cast(item, true, qc, info);
-    return relabel == null || cast.equal(relabel, null, info) ? cast : null;
+    return relabel == null || cast.compare(relabel, null, false, info) == 0 ? cast : null;
   }
 
   /**
