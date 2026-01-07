@@ -6,13 +6,13 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.lang.reflect.*;
-import java.net.*;
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.java.*;
+import org.basex.query.util.pkg.ClassLoaderCache.*;
 import org.basex.util.*;
 
 /**
@@ -22,19 +22,17 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ModuleLoader {
-  /** Default class loader. */
-  private static final ClassLoader LOADER = Thread.currentThread().getContextClassLoader();
   /** Close method. */
   private static final Method CLOSE = Reflect.method(QueryResource.class, "close");
 
   /** Database context. */
   private final Context context;
-  /** Cached URLs to be added to the class loader. */
-  private final ArrayList<URL> urls = new ArrayList<>(0);
   /** Java modules. */
   private final HashSet<Object> javaModules = new HashSet<>();
-  /** Current class loader. */
-  private ClassLoader loader = LOADER;
+  /** Current class loaders. */
+  private ArrayList<Loader> loaders = new ArrayList<>();
+  /** Resolved classes. */
+  private final HashMap<String, Class<?>> resolved = new HashMap<>();
 
   /**
    * Constructor.
@@ -54,15 +52,10 @@ public final class ModuleLoader {
         if(c == QueryResource.class) Reflect.invoke(CLOSE, jm);
       }
     }
-    try {
-      while(loader != LOADER) {
-        final ClassLoader parent = loader.getParent();
-        ((URLClassLoader) loader).close();
-        loader = parent;
-      }
-    } catch(final IOException ex) {
-      Util.stack(ex);
-    }
+    javaModules.clear();
+    for(final Loader l : loaders) l.release();
+    loaders.clear();
+    resolved.clear();
   }
 
   /**
@@ -77,7 +70,6 @@ public final class ModuleLoader {
       throws QueryException {
 
     // add Java repository package
-    final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
     final boolean java = uri.startsWith(JAVA_PREFIX_COLON);
     String className;
     if(java) {
@@ -101,6 +93,7 @@ public final class ModuleLoader {
         }
       }
       // check XQuery modules
+      final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
       final String path = Strings.uri2path(uri);
       for(final String suffix : IO.XQSUFFIXES) {
         final IOFile file = new IOFile(repoPath, path + suffix);
@@ -114,13 +107,10 @@ public final class ModuleLoader {
     }
     className = JavaCall.classPath(className);
 
-    // load Java module
-    final IOFile jar = new IOFile(repoPath, Strings.uri2path(className) + IO.JARSUFFIX);
-    if(jar.exists()) addURL(jar);
-
     // create Java class instance
     final Class<?> clz;
     try {
+      addLoader(jarUrls(context, className));
       clz = findClass(className);
     } catch(final ClassNotFoundException ex) {
       Util.debug(ex);
@@ -147,13 +137,18 @@ public final class ModuleLoader {
    * @throws ClassNotFoundException class not found exception
    */
   public Class<?> findClass(final String name) throws ClassNotFoundException {
-    // create new class loader for cached URLs at first access
-    if(!urls.isEmpty()) {
-      loader = new URLClassLoader(urls.toArray(URL[]::new), loader);
-      urls.clear();
+    Class<?> c = resolved.get(name);
+    if(c != null) return c;
+    c = Reflect.find(name);
+    if(c != null) return c;
+    for(int i = loaders.size() - 1; i >= 0; --i) {
+      c = loaders.get(i).find(name);
+      if(c != null) {
+        resolved.put(name, c);
+        return c;
+      }
     }
-    // no external classes added: use default class loader
-    return loader == LOADER ? Reflect.forName(name) : Class.forName(name, true, loader);
+    throw new ClassNotFoundException(name);
   }
 
   /**
@@ -168,7 +163,54 @@ public final class ModuleLoader {
     return null;
   }
 
+  /**
+   * Calculates jar file URLs that are relevant for class loading in the context of the specified
+   * package.
+   * @param pkgPath package path
+   * @param modDir module directory
+   * @param info input info (can be {@code null})
+   * @return list of jar file URLs (may be empty)
+   * @throws QueryException query exception
+   */
+  public static List<String> pkgUrls(final IOFile pkgPath, final IOFile modDir,
+      final InputInfo info) throws QueryException {
+
+    final ArrayList<String> urls = new ArrayList<>();
+    // check if package contains a jar descriptor
+    final IOFile jarDesc = new IOFile(pkgPath, PkgText.JARDESC);
+    if(jarDesc.exists()) {
+      final JarDesc desc = new JarParser(info).parse(jarDesc);
+      for(final byte[] u : desc.jars) addURL(urls, new IOFile(modDir, string(u)));
+    }
+    return urls;
+  }
+
+  /**
+   * Calculates jar file URLs that are relevant for class loading in the context of the specified
+   * Java module.
+   * @param context database context
+   * @param className class name
+   * @return list of jar file URLs (may be empty)
+   */
+  public static List<String> jarUrls(final Context context, final String className) {
+    final ArrayList<String> urls = new ArrayList<>();
+    final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
+    final IOFile jar = new IOFile(repoPath, Strings.uri2path(className) + IO.JARSUFFIX);
+    if(jar.exists()) addURL(urls, jar);
+    return urls;
+  }
+
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Create or get a class loader for the specified URLs from the class loader cache, and add it to
+   * the list of loaders.
+   * @param urls URLs
+   * @throws IOException I/O exception
+   */
+  private void addLoader(final List<String> urls) throws IOException {
+    if(!urls.isEmpty()) loaders.add(ClassLoaderCache.acquire(urls));
+  }
 
   /**
    * Adds a package from the package repository.
@@ -195,16 +237,12 @@ public final class ModuleLoader {
     if(!pkgDesc.exists()) Util.debugln(PkgText.MISSDESC, id);
 
     pkg = new PkgParser(info).parse(pkgDesc);
-    // check if package contains a jar descriptor
-    final IOFile jarDesc = new IOFile(pkgPath, PkgText.JARDESC);
-    // choose module directory (support for both 2010 and 2012 specs)
-    IOFile modDir = new IOFile(pkgPath, PkgText.CONTENT);
-    if(!modDir.exists()) modDir = new IOFile(pkgPath, pkg.abbrev());
-
-    // add jars to classpath
-    if(jarDesc.exists()) {
-      final JarDesc desc = new JarParser(info).parse(jarDesc);
-      for(final byte[] u : desc.jars) addURL(new IOFile(modDir, string(u)));
+    final IOFile modDir = pkg.modDir(pkgPath);
+    try {
+      addLoader(pkgUrls(pkgPath, modDir, info));
+    } catch(final Throwable th) {
+      final Throwable t = Util.rootException(th);
+      throw MODINIT_X_X_X.get(info, pkg.name, t.getMessage(), Util.className(t));
     }
 
     // package has dependencies. they have to be loaded first
@@ -227,19 +265,16 @@ public final class ModuleLoader {
   }
 
   /**
-   * Adds a URL to the cache.
+   * Adds a jar URL and all extracted files to the list of URLs.
+   * @param urls list of URLs
    * @param jar jar file to be added
    */
-  private void addURL(final IOFile jar) {
-    try {
-      urls.add(new URL(jar.url()));
-      // parse files of extracted subdirectory
-      final IOFile extDir = new IOFile(jar.parent(), '.' + jar.dbName());
-      if(extDir.exists()) {
-        for(final IOFile file : extDir.children()) urls.add(new URL(file.url()));
-      }
-    } catch(final MalformedURLException ex) {
-      Util.errln(ex);
+  private static void addURL(final List<String> urls, final IOFile jar) {
+    urls.add(jar.url());
+    // parse files of extracted subdirectory
+    final IOFile extDir = new IOFile(jar.parent(), '.' + jar.dbName());
+    if(extDir.exists()) {
+      for(final IOFile file : extDir.children()) urls.add(file.url());
     }
   }
 }

@@ -139,4 +139,15 @@ public final class Pkg {
   public static String version(final String pkg) {
     return pkg.substring(pkg.lastIndexOf('-') + 1);
   }
+
+  /**
+   * Choose module directory (support for both 2010 and 2012 specs).
+   * @param pkgPath package path
+   * @return module directory
+   */
+  public IOFile modDir(final IOFile pkgPath) {
+    IOFile modDir = new IOFile(pkgPath, PkgText.CONTENT);
+    if(!modDir.exists()) modDir = new IOFile(pkgPath, abbrev());
+    return modDir;
+  }
 }

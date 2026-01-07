@@ -119,7 +119,13 @@ public final class RepoManager {
     for(final Pkg pkg : packages()) {
       final String pkgPath = pkg.path();
       if(pkg.name().equals(name) || pkg.id().equals(name) || pkgPath.equals(name)) {
-        if(pkg.type() == PkgType.EXPATH) {
+
+        final boolean isExpath = pkg.type() == PkgType.EXPATH;
+        ClassLoaderCache.invalidate(isExpath
+            ? ModuleLoader.pkgUrls(repo.path(pkgPath), pkg.modDir(repo.path(pkgPath)), info)
+            : ModuleLoader.jarUrls(context, Strings.uriToClasspath(name)));
+
+        if(isExpath) {
           // check if package to be deleted participates in a dependency
           final String dep = dependency(pkg);
           if(dep != null) throw REPO_DELETE_X_X.get(info, dep, name);
@@ -127,9 +133,7 @@ public final class RepoManager {
           repo.delete(pkg);
         }
 
-        // delete package directory or file
         final IOFile pkgFile = repo.path(pkgPath);
-        if(!pkgFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
 
         // delete directory with extracted jars
         final String className = Strings.uriToClasspath(pkg.name().replaceAll("^.*\\.", ""));
@@ -141,6 +145,10 @@ public final class RepoManager {
           final IOFile jarFile = pkgFile.parent().resolve(className + IO.JARSUFFIX);
           if(!jarFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
         }
+
+        // delete package directory or file
+        if(!pkgFile.delete()) throw REPO_DELETE_X.get(info, pkgPath);
+
         deleted = true;
       }
     }

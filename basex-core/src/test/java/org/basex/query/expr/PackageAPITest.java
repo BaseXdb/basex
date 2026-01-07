@@ -280,7 +280,8 @@ public final class PackageAPITest extends SandboxTest {
     }
 
     // delete package
-    assertTrue(new IOFile(REPO, dir).delete(), "Repo directory could not be deleted.");
+    assertTrue(new IOFile(REPO, dir).exists());
+    execute(new RepoDelete("jarPkg", null));
     assertFalse(new IOFile(REPO, dir).exists());
   }
 
