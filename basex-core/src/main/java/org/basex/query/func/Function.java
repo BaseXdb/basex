@@ -1044,83 +1044,86 @@ public enum Function implements AFunction {
   // Binary Module
 
   /** XQuery function. */
-  _BIN_AND(BinAnd::new, "and(binary1,binary2)",
+  _BIN_AND(BinAnd::new, "and(value1,value2)",
       params(BINARY_ZO, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_BIN(BinBin::new, "bin(string)",
+  _BIN_BIN(BinBin::new, "bin(value)",
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_DECODE_STRING(BinDecodeString::new, "decode-string(binary[,encoding,offset,size])",
-      params(BINARY_ZO, STRING_ZO, INTEGER_O, INTEGER_O), STRING_ZO, BIN_URI),
+  _BIN_DECODE_STRING(BinDecodeString::new, "decode-string(value[,encoding,offset,size])",
+      params(BINARY_ZO, STRING_ZO, INTEGER_ZO, INTEGER_ZO), STRING_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_ENCODE_STRING(BinEncodeString::new, "encode-string(string[,encoding])",
+  _BIN_ENCODE_STRING(BinEncodeString::new, "encode-string(value[,encoding])",
       params(STRING_ZO, STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_FIND(BinFind::new, "find(binary,offset,search)",
+  _BIN_FIND(BinFind::new, "find(value,offset,search)",
       params(BINARY_ZO, INTEGER_O, BASE64_BINARY_ZO), INTEGER_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_FROM_OCTETS(BinFromOctets::new, "from-octets(integers)",
+  _BIN_FROM_OCTETS(BinFromOctets::new, "from-octets(values)",
       params(INTEGER_ZM), BASE64_BINARY_O, BIN_URI),
   /** XQuery function. */
-  _BIN_HEX(BinHex::new, "hex(string)",
+  _BIN_HEX(BinHex::new, "hex(value)",
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_INSERT_BEFORE(BinInsertBefore::new, "insert-before(binary,offset,extra)",
+  _BIN_INFER_ENCODING(BinInferEncoding::new, "infer-encoding(value[,encoding])",
+      params(BINARY_ZO, STRING_ZO), Records.INFER_ENCODING.get().seqType(), BIN_URI),
+  /** XQuery function. */
+  _BIN_INSERT_BEFORE(BinInsertBefore::new, "insert-before(value,offset,extra)",
       params(BINARY_ZO, INTEGER_O, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_JOIN(BinJoin::new, "join(binaries)",
+  _BIN_JOIN(BinJoin::new, "join(values)",
       params(BINARY_ZM), BASE64_BINARY_O, BIN_URI),
   /** XQuery function. */
-  _BIN_LENGTH(BinLength::new, "length(binary)",
+  _BIN_LENGTH(BinLength::new, "length(value)",
       params(BINARY_O), INTEGER_O, BIN_URI),
   /** XQuery function. */
-  _BIN_NOT(BinNot::new, "not(binary)",
+  _BIN_NOT(BinNot::new, "not(value)",
       params(BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_OCTAL(BinOctal::new, "octal(string)",
+  _BIN_OCTAL(BinOctal::new, "octal(value)",
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_OR(BinOr::new, "or(binary1,binary2)",
+  _BIN_OR(BinOr::new, "or(value1,value2)",
       params(BINARY_ZO, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_PACK_DOUBLE(BinPackDouble::new, "pack-double(double[,order])",
+  _BIN_PACK_DOUBLE(BinPackDouble::new, "pack-double(value[,order])",
       params(DOUBLE_O, STRING_O), BASE64_BINARY_O, BIN_URI),
   /** XQuery function. */
-  _BIN_PACK_FLOAT(BinPackFloat::new, "pack-float(float[,order])",
+  _BIN_PACK_FLOAT(BinPackFloat::new, "pack-float(value[,order])",
       params(FLOAT_O, STRING_O), BASE64_BINARY_O, BIN_URI),
   /** XQuery function. */
-  _BIN_PACK_INTEGER(BinPackInteger::new, "pack-integer(integer,size[,order])",
+  _BIN_PACK_INTEGER(BinPackInteger::new, "pack-integer(value,size[,order])",
       params(INTEGER_O, INTEGER_O, STRING_O), BASE64_BINARY_O, BIN_URI),
   /** XQuery function. */
-  _BIN_PAD_LEFT(BinPadLeft::new, "pad-left(binary,size[,octet])",
+  _BIN_PAD_LEFT(BinPadLeft::new, "pad-left(value,size[,octet])",
       params(BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_PAD_RIGHT(BinPadRight::new, "pad-right(binary,size[,octet])",
+  _BIN_PAD_RIGHT(BinPadRight::new, "pad-right(value,size[,octet])",
       params(BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_PART(BinPart::new, "part(binary,offset[,size])",
+  _BIN_PART(BinPart::new, "part(value,offset[,size])",
       params(BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_SHIFT(BinShift::new, "shift(binary,by)",
+  _BIN_SHIFT(BinShift::new, "shift(value,by)",
       params(BINARY_ZO, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
-  _BIN_TO_OCTETS(BinToOctets::new, "to-octets(binary)",
+  _BIN_TO_OCTETS(BinToOctets::new, "to-octets(value)",
       params(BINARY_ZO), INTEGER_ZM, BIN_URI),
   /** XQuery function. */
-  _BIN_UNPACK_DOUBLE(BinUnpackDouble::new, "unpack-double(binary,offset[,order])",
+  _BIN_UNPACK_DOUBLE(BinUnpackDouble::new, "unpack-double(value,offset[,order])",
       params(BINARY_O, INTEGER_O, STRING_O), DOUBLE_O, BIN_URI),
   /** XQuery function. */
-  _BIN_UNPACK_FLOAT(BinUnpackFloat::new, "unpack-float(binary,offset[,order])",
+  _BIN_UNPACK_FLOAT(BinUnpackFloat::new, "unpack-float(value,offset[,order])",
       params(BINARY_O, INTEGER_O, STRING_O), FLOAT_O, BIN_URI),
   /** XQuery function. */
-  _BIN_UNPACK_INTEGER(BinUnpackInteger::new, "unpack-integer(binary,offset,size[,order])",
+  _BIN_UNPACK_INTEGER(BinUnpackInteger::new, "unpack-integer(value,offset,size[,order])",
       params(BINARY_O, INTEGER_O, INTEGER_O, STRING_O), INTEGER_O, BIN_URI),
   /** XQuery function. */
   _BIN_UNPACK_UNSIGNED_INTEGER(BinUnpackUnsignedInteger::new,
-      "unpack-unsigned-integer(binary,offset,size[,order])",
+      "unpack-unsigned-integer(value,offset,size[,order])",
       params(BINARY_O, INTEGER_O, INTEGER_O, STRING_O), INTEGER_O, BIN_URI),
   /** XQuery function. */
-  _BIN_XOR(BinXor::new, "xor(binary1,binary2)",
+  _BIN_XOR(BinXor::new, "xor(value1,value2)",
       params(BINARY_ZO, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
 
   // Cache Module

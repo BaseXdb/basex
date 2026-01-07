@@ -172,6 +172,14 @@ public class BufferInput extends InputStream {
   }
 
   /**
+   * Returns the buffer position.
+   * @return buffer position
+   */
+  public final long position() {
+    return bpos;
+  }
+
+  /**
    * Returns the input length (can be {@code -1}).
    * @return input length
    */

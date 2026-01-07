@@ -90,10 +90,10 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item bit(final Bit op, final QueryContext qc) throws QueryException {
-    final Bin binary1 = toBinOrNull(arg(0), qc), binary2 = toBinOrNull(arg(1), qc);
-    if(binary1 == null || binary2 == null) return Empty.VALUE;
+    final Bin value1 = toBinOrNull(arg(0), qc), value2 = toBinOrNull(arg(1), qc);
+    if(value1 == null || value2 == null) return Empty.VALUE;
 
-    final byte[] bytes1 = binary1.binary(info), bytes2 = binary2.binary(info);
+    final byte[] bytes1 = value1.binary(info), bytes2 = value2.binary(info);
     final int bl1 = bytes1.length, bl2 = bytes2.length;
     if(bl1 != bl2) throw BIN_DLA_X_X.get(info, bl1, bl2);
 
@@ -113,12 +113,12 @@ abstract class BinFn extends StandardFunc {
    * @throws QueryException query exception
    */
   final Item pad(final QueryContext qc, final boolean left) throws QueryException {
-    final Bin binary = toBinOrNull(arg(0), qc);
+    final Bin value = toBinOrNull(arg(0), qc);
     final long size = toLong(arg(1), qc);
     final Long octet = toLongOrNull(arg(2), qc);
-    if(binary == null) return Empty.VALUE;
+    if(value == null) return Empty.VALUE;
 
-    final byte[] bytes = binary.binary(info);
+    final byte[] bytes = value.binary(info);
     final int bl = bytes.length;
 
     if(size < 0) throw BIN_NS_X.get(info, size);

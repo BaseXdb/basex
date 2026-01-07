@@ -21,20 +21,22 @@ import org.basex.util.*;
 public final class BinDecodeString extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Bin binary = toBinOrNull(arg(0), qc);
+    final Bin value = toBinOrNull(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
     final Long offset = toLongOrNull(arg(2), qc);
     final Long size = toLongOrNull(arg(3), qc);
-    if(binary == null) return Empty.VALUE;
+    if(value == null) return Empty.VALUE;
 
-    byte[] bytes = binary.binary(info);
-    final int bl = bytes.length;
-    final int[] bounds = bounds(offset, offset != null ? size : null, bl);
-    final int o = bounds[0], tl = bounds[1];
-    if(o > 0 || tl < bl) bytes = Arrays.copyOfRange(bytes, o, o + tl);
+    byte[] bytes = value.binary(info);
+    if(offset != null || size != null) {
+      final int bl = bytes.length;
+      final int[] bounds = bounds(offset, offset != null ? size : null, bl);
+      final int o = bounds[0], tl = bounds[1];
+      if(o > 0 || tl < bl) bytes = Arrays.copyOfRange(bytes, o, o + tl);
+    }
 
     try {
-      return Str.get(ConvertFn.toString(new ArrayInput(bytes), encoding, true, o == 0));
+      return Str.get(ConvertFn.toString(new ArrayInput(bytes), encoding, true));
     } catch(final IOException ex) {
       throw BIN_CE_X.get(info, ex);
     }

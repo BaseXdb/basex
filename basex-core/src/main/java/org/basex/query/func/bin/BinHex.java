@@ -17,13 +17,13 @@ import org.basex.util.*;
 public final class BinHex extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    byte[] string = toDigits(qc);
-    if(string == null) return Empty.VALUE;
+    byte[] value = toDigits(qc);
+    if(value == null) return Empty.VALUE;
 
     // add leading zero
-    if((string.length & 1) != 0) string = concat(cpToken('0'), string);
+    if((value.length & 1) != 0) value = concat(cpToken('0'), value);
     try {
-      return B64.get(Hex.parse(string, info));
+      return B64.get(Hex.parse(value, info));
     } catch(final QueryException ex) {
       Util.debug(ex);
       throw BIN_NNC.get(info);

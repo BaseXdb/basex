@@ -19,11 +19,11 @@ import org.basex.util.*;
 public final class BinEncodeString extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] string = toTokenOrNull(arg(0), qc);
+    final byte[] value = toTokenOrNull(arg(0), qc);
     final String encoding = toEncodingOrNull(arg(1), BIN_UE_X, qc);
-    if(string == null) return Empty.VALUE;
+    if(value == null) return Empty.VALUE;
     try {
-      return B64.get(ConvertFn.toBinary(string, encoding));
+      return B64.get(ConvertFn.toBinary(value, encoding));
     } catch(final CharacterCodingException ex) {
       throw BIN_CE_X.get(info, ex);
     }

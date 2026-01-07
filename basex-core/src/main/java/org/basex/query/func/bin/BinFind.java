@@ -16,12 +16,12 @@ import org.basex.util.*;
 public final class BinFind extends BinFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Bin binary = toBinOrNull(arg(0), qc);
+    final Bin value = toBinOrNull(arg(0), qc);
     final Long offset = toLongOrNull(arg(1), qc);
     final Bin search = toBin(arg(2), qc);
-    if(binary == null) return Empty.VALUE;
+    if(value == null) return Empty.VALUE;
 
-    final byte[] bytes = binary.binary(info);
+    final byte[] bytes = value.binary(info);
     final int bl = bytes.length;
     final int pos = indexOf(bytes, search.binary(info), bounds(offset, null, bl)[0]);
     return pos == -1 ? Empty.VALUE : Itr.get(pos);

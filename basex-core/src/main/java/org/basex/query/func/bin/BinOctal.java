@@ -29,13 +29,13 @@ public final class BinOctal extends BinFn {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] string = toDigits(qc);
-    if(string == null) return Empty.VALUE;
-    final int tl = string.length;
+    final byte[] value = toDigits(qc);
+    if(value == null) return Empty.VALUE;
+    final int tl = value.length;
     if(tl == 0) return B64.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder(tl * 3L);
-    for(final byte b : string) {
+    for(final byte b : value) {
       final String bits = MAP.get(b);
       if(bits != null) tb.add(bits);
       else tb.addByte(b);

@@ -21,6 +21,11 @@ public enum Records {
     field("remainder", Types.DECIMAL_O)
   ),
   /** Record definition. */
+  INFER_ENCODING("infer-encoding", false,
+    field("encoding", Types.STRING_O, false),
+    field("offset", Types.INTEGER_O, false)
+  ),
+  /** Record definition. */
   LOAD_XQUERY_MODULE("load-xquery-module", false,
     field("variables", MapType.get(AtomType.QNAME, Types.ITEM_ZO).seqType()),
     field("functions", MapType.get(AtomType.QNAME,

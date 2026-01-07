@@ -18,14 +18,14 @@ import org.basex.util.*;
 public final class BinShift extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Bin binary = toBinOrNull(arg(0), qc);
+    final Bin value = toBinOrNull(arg(0), qc);
     final long by = toLong(arg(1), qc);
 
     // special cases
-    if(binary == null) return Empty.VALUE;
-    if(by == 0) return binary;
+    if(value == null) return Empty.VALUE;
+    if(by == 0) return value;
 
-    final byte[] bytes = binary.binary(info);
+    final byte[] bytes = value.binary(info);
     final int bl = bytes.length;
 
     // single byte

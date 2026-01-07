@@ -38,24 +38,8 @@ public class TextInput extends BufferInput {
    * @throws IOException I/O exception
    */
   public TextInput(final InputStream is, final String encoding) throws IOException {
-    this(is, encoding, true);
-  }
-
-  /**
-   * Constructor.
-   * @param is input stream
-   * @param encoding encoding (ignored if {@code null})
-   * @param guess guess the encoding
-   * @throws IOException I/O exception
-   */
-  public TextInput(final InputStream is, final String encoding, final boolean guess)
-      throws IOException {
     super(is);
-    if(guess) {
-      guess(encoding);
-    } else {
-      decoder = TextDecoder.get(normEncoding(encoding, true));
-    }
+    guess(encoding);
   }
 
   /**
@@ -141,6 +125,14 @@ public class TextInput extends BufferInput {
       decoder.validate = validate;
     }
     return this;
+  }
+
+  /**
+   * Returns the encoding.
+   * @return encoding
+   */
+  public String encoding() {
+    return decoder.encoding;
   }
 
   /**

@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class BinLength extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Bin binary = toBin(arg(0), qc);
-    return Itr.get(binary.binary(info).length);
+    final Bin value = toBin(arg(0), qc);
+    return Itr.get(value.binary(info).length);
   }
 }

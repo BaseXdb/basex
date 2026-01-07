@@ -15,10 +15,10 @@ import org.basex.util.*;
 public final class BinNot extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Bin binary = toBinOrNull(arg(0), qc);
-    if(binary == null) return Empty.VALUE;
+    final Bin value = toBinOrNull(arg(0), qc);
+    if(value == null) return Empty.VALUE;
 
-    final byte[] bytes = binary.binary(info);
+    final byte[] bytes = value.binary(info);
     final int bl = bytes.length;
     if(bl == 1) return B64.get((byte) ~bytes[0]);
 

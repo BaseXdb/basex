@@ -65,7 +65,7 @@ public final class BinModuleTest extends SandboxTest {
     query(func.args(hex("")),             "");
 
     query(func.args(hex("40EFBBBF4142"), " ()", 0), "@\uFEFFAB");
-    query(func.args(hex("40EFBBBF4142"), " ()", 1), "\uFEFFAB");
+    query(func.args(hex("40EFBBBF4142"), " ()", 1), "AB");
     error(func.args(hex("40EFBBBF4142"), " ()", 2), BIN_CE_X);
     error(func.args(hex("40EFBBBF4142"), " ()", 3), BIN_CE_X);
     query(func.args(hex("40EFBBBF4142"), " ()", 4), "AB");
@@ -73,7 +73,7 @@ public final class BinModuleTest extends SandboxTest {
     query(func.args(hex("40EFBBBF4142"), " ()", 6), "");
 
     query(func.args(hex("40EFBBBF4142"), "utf-8", 0), "@\uFEFFAB");
-    query(func.args(hex("40EFBBBF4142"), "utf-8", 1), "\uFEFFAB");
+    query(func.args(hex("40EFBBBF4142"), "utf-8", 1), "AB");
     error(func.args(hex("40EFBBBF4142"), "utf-8", 2), BIN_CE_X);
     error(func.args(hex("40EFBBBF4142"), "utf-8", 3), BIN_CE_X);
     query(func.args(hex("40EFBBBF4142"), "utf-8", 4), "AB");

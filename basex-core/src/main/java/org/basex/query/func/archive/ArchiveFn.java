@@ -37,7 +37,7 @@ abstract class ArchiveFn extends StandardFunc {
     if(encoding == Strings.UTF8 && !enforce) return value;
     try {
       final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
-      return ConvertFn.toString(new ArrayInput(value), encoding, validate, true);
+      return ConvertFn.toString(new ArrayInput(value), encoding, validate);
     } catch(final IOException ex) {
       throw ARCHIVE_ENCODE2_X.get(info, ex);
     }

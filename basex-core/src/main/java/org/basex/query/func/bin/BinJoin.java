@@ -18,17 +18,17 @@ import org.basex.util.list.*;
 public final class BinJoin extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr binaries = arg(0);
+    final Expr values = arg(0);
 
     final ByteList bl;
-    if(binaries instanceof final SingletonSeq ss && ss.singleItem()) {
+    if(values instanceof final SingletonSeq ss && ss.singleItem()) {
       final byte[] bytes = toBin(ss.itemAt(0)).binary(info);
       final long bs = ss.size();
       bl = new ByteList(bs * bytes.length);
       for(int b = 0; b < bs; b++) bl.add(bytes);
     } else {
       bl = new ByteList();
-      final Iter iter = binaries.atomIter(qc, info);
+      final Iter iter = values.atomIter(qc, info);
       for(Item item; (item = qc.next(iter)) != null;) {
         bl.add(toBin(item).binary(info));
       }
