@@ -146,6 +146,15 @@ public final class QNm extends Item {
   }
 
   /**
+   * Returns the URI of the given QName, or an empty string if {@code null}.
+   * @param qnm name (can be {@code null})
+   * @return URI
+   */
+  public static byte[] uri(final QNm qnm) {
+    return qnm == null ? Token.EMPTY : qnm.uri();
+  }
+
+  /**
    * Checks if the URI of this QName has been explicitly set.
    * @return result of check
    */
