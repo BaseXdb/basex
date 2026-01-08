@@ -347,60 +347,61 @@ public abstract class JavaCall extends Arr {
       name = name.substring(0, n);
     }
     final String uri = string(qname.uri());
+    if(!uri.isEmpty()) {
+      // check if URI starts with "java:" prefix. if yes, skip rewritings
+      final boolean enforce = uri.startsWith(JAVA_PREFIX_COLON);
+      final String className = classPath(enforce ? uri.substring(JAVA_PREFIX_COLON.length()) :
+        Strings.uriToClasspath(Strings.uri2path(uri)));
 
-    // check if URI starts with "java:" prefix. if yes, skip rewritings
-    final boolean enforce = uri.startsWith(JAVA_PREFIX_COLON);
-    final String className = classPath(enforce ? uri.substring(JAVA_PREFIX_COLON.length()) :
-      Strings.uriToClasspath(Strings.uri2path(uri)));
-
-    // function in imported Java module
-    final ModuleLoader modules = qc.resources.modules();
-    final Object module  = modules.findModule(className);
-    if(module != null) {
-      final Method meth = moduleMethod(module, name, args.length, types, qname, qc, info);
-      final Requires req = meth.getAnnotation(Requires.class);
-      final Perm perm = req == null ? Perm.ADMIN :
-        Enums.get(Perm.class, req.value().name().toLowerCase(Locale.ENGLISH));
-      final boolean updating = meth.getAnnotation(Updating.class) != null;
-      if(updating) qc.updating();
-      return new StaticJavaCall(module, meth, args, perm, updating, info);
-    }
-
-    /* skip Java class lookup if...
-     * - no java prefix was supplied, and
-     * - if URI equals namespace of library module or if it is globally declared
-     *
-     * examples:
-     * - declare function local:f($i) { if($i) then local:f($i - 1) else () }
-     * - module namespace _ = '_'; declare function _:_() { _:_() };
-     * - fn:does-not-exist(), util:not-available()
-     */
-    if(enforce || (info.sc().module == null || !eq(info.sc().module.uri(), qname.uri())) &&
-        NSGlobal.prefix(qname.uri()).length == 0) {
-
-      // Java constructor, function, or variable
-      Class<?> clazz = null;
-      try {
-        clazz = modules.findClass(className);
-      } catch(final ClassNotFoundException ex) {
-        Util.debug(ex);
-      } catch(final Throwable th) {
-        // catch linkage and other errors as well
-        throw JAVAINIT_X_X.get(info, Util.className(th), th);
+      // function in imported Java module
+      final ModuleLoader modules = qc.resources.modules();
+      final Object module  = modules.findModule(className);
+      if(module != null) {
+        final Method meth = moduleMethod(module, name, args.length, types, qname, qc, info);
+        final Requires req = meth.getAnnotation(Requires.class);
+        final Perm perm = req == null ? Perm.ADMIN :
+          Enums.get(Perm.class, req.value().name().toLowerCase(Locale.ENGLISH));
+        final boolean updating = meth.getAnnotation(Updating.class) != null;
+        if(updating) qc.updating();
+        return new StaticJavaCall(module, meth, args, perm, updating, info);
       }
 
-      if(clazz == null) {
-        // class not found, java prefix was specified
-        if(enforce) throw JAVACLASS_X.get(info, className);
-      } else {
-        // constructor
-        if(name.equals(NEW)) {
-          final DynJavaConstr djc = new DynJavaConstr(clazz, types, args, info);
-          if(djc.init(enforce)) return djc;
+      /* skip Java class lookup if...
+       * - no java prefix was supplied, and
+       * - if URI equals namespace of library module or if it is globally declared
+       *
+       * examples:
+       * - declare function local:f($i) { if($i) then local:f($i - 1) else () }
+       * - module namespace _ = '_'; declare function _:_() { _:_() };
+       * - fn:does-not-exist(), util:not-available()
+       */
+      if(enforce || (info.sc().module == null || !eq(info.sc().module.uri(), qname.uri())) &&
+          NSGlobal.prefix(qname.uri()).length == 0) {
+
+        // Java constructor, function, or variable
+        Class<?> clazz = null;
+        try {
+          clazz = modules.findClass(className);
+        } catch(final ClassNotFoundException ex) {
+          Util.debug(ex);
+        } catch(final Throwable th) {
+          // catch linkage and other errors as well
+          throw JAVAINIT_X_X.get(info, Util.className(th), th);
         }
-        // field or method
-        final DynJavaFunc djf = new DynJavaFunc(clazz, name, types, args, info);
-        if(djf.init(enforce)) return djf;
+
+        if(clazz == null) {
+          // class not found, java prefix was specified
+          if(enforce) throw JAVACLASS_X.get(info, className);
+        } else {
+          // constructor
+          if(name.equals(NEW)) {
+            final DynJavaConstr djc = new DynJavaConstr(clazz, types, args, info);
+            if(djc.init(enforce)) return djc;
+          }
+          // field or method
+          final DynJavaFunc djf = new DynJavaFunc(clazz, name, types, args, info);
+          if(djf.init(enforce)) return djf;
+        }
       }
     }
     return null;
