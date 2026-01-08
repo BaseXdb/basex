@@ -80,6 +80,7 @@ final class DialogXmlParser extends DialogParser {
   @Override
   boolean action(final boolean active) {
     final boolean ip = intparse.isSelected(), uc = usecat.isSelected();
+    if(uc) intparse.setSelected(!uc);
     intparse.setEnabled(!uc);
     xinclude.setEnabled(!ip);
     usecat.setEnabled(!ip);
