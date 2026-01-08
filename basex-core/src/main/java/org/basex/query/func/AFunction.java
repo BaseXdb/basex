@@ -43,7 +43,7 @@ public interface AFunction {
    * @return string representation with leading space (simplifies nesting of returned string)
    */
   default String args(final Object... args) {
-    return definition().args(args);
+    return definition().args(false, args);
   }
 
   /**

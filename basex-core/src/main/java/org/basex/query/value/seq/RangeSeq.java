@@ -229,7 +229,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public void toString(final QueryString qs) {
-    final String arg = new QueryString().token(min()).token(TO).token(max()).toString();
+    final String arg = min() + " " + TO + " " + max();
     if(ascending) {
       qs.paren(arg);
     } else {

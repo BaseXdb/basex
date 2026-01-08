@@ -44,7 +44,7 @@ public final class Treat extends Single {
     final Value value = expr.value(qc);
     final SeqType st = seqType();
     if(st.instance(value)) return value;
-    throw NOTREAT_X_X_X.get(info, expr.seqType(), st, expr.toErrorString());
+    throw NOTREAT_X_X_X.get(info, expr.seqType(), st, expr);
   }
 
   @Override

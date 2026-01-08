@@ -187,15 +187,18 @@ public final class FuncDefinition {
    * <li>booleans (which will be suffixed with parentheses)</li>
    * <li>strings starting with a space (which will be chopped)</li>
    * </ul>
+   * @param error error mode
    * @param args arguments
    * @return string representation with leading space (simplifies nesting of returned string)
    */
-  String args(final Object... args) {
+  public String args(final boolean error, final Object... args) {
     final TokenBuilder tb = new TokenBuilder().add(' ').add(name.string()).add('(');
     int c = 0;
     for(final Object arg : args) {
       if(c++ > 0) tb.add(", ");
-      if(arg instanceof Expr || arg instanceof Number) {
+      if(arg instanceof ExprInfo ei) {
+        tb.add(error ? ei.toErrorString() : ei.toString());
+      } else if(arg instanceof Number) {
         tb.add(arg);
       } else if(arg instanceof Boolean) {
         tb.add(arg + "()");

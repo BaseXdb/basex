@@ -55,8 +55,8 @@ public abstract class ExprInfo {
    * Defaults to {@link #toString()}.
    * @return class name
    */
-  public String toErrorString() {
-    return toString();
+  public final String toErrorString() {
+    return new QueryString(true).token(this).toString();
   }
 
   @Override

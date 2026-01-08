@@ -516,9 +516,11 @@ public abstract class XQMap extends XQStruct {
     } else {
       final TokenBuilder tb = new TokenBuilder();
       try {
-        forEach((key, value) -> {
-          if(tb.moreInfo()) tb.add(key).add(MAPASG).add(value).add(SEP);
-        });
+        for(final Item key : keys()) {
+          if(!tb.moreInfo()) break;
+          final Value value = get(key);
+          tb.add(key).add(MAPASG).add(qs.error() ? value.toErrorString() : value).add(SEP);
+        }
       } catch(final QueryException ex) {
         throw Util.notExpected(ex);
       }

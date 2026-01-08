@@ -1723,7 +1723,7 @@ public enum QueryError {
       final boolean param, final InputInfo info) {
     final String input = param ? "Function with " + parameters(supplied) : arguments(supplied);
     final String arity = arity(input, new IntList().add(expected));
-    return INVARITY_X_X.get(info, arity, expr.toErrorString());
+    return INVARITY_X_X.get(info, arity, expr);
   }
 
   /**

@@ -19,7 +19,6 @@ import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Function item.
@@ -331,23 +330,14 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   @Override
-  public String toErrorString() {
-    final QueryString qs = new QueryString();
-    if(name != null) {
+  public void toString(final QueryString qs) {
+    if(qs.error() && name != null) {
       qs.concat(name.prefixId(), "#", arity());
     } else {
-      final StringList list = new StringList(arity());
-      for(final Var param : params) list.add(param.toErrorString());
-      qs.token(anns).token(FN).params(list.finish());
-      qs.token(AS).token(funcType().declType).brace(expr);
+      if(name != null) {
+        qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
+      }
+      qs.token(anns).token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
     }
-    return qs.toString();
-  }
-
-  @Override
-  public void toString(final QueryString qs) {
-    qs.token(anns);
-    if(name != null) qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
-    qs.token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
   }
 }

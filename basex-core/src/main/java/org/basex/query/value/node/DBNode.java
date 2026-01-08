@@ -430,24 +430,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final String toErrorString() {
-    final QueryString qs = new QueryString();
-    toString(qs, true);
-    return qs.toString();
-  }
-
-  @Override
   public void toString(final QueryString qs) {
-    toString(qs, false);
-  }
-
-  /**
-   * Returns a string representation of the sequence.
-   * @param qs query string builder
-   * @param error error representation
-   */
-  private void toString(final QueryString qs, final boolean error) {
-    if(error || data.inMemory()) {
+    if(qs.error() || data.inMemory()) {
       switch((NodeType) type) {
         case ATTRIBUTE:
           qs.concat(name(), "=", QueryString.toQuoted(string()));

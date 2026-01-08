@@ -545,12 +545,14 @@ public abstract class XQArray extends XQStruct {
         final long vs = value.size();
         if(vs != 1) tb.add('(');
         for(int m = 0; m < vs; m++) {
+          if(!tb.moreInfo()) break;
           if(m != 0) tb.add(", ");
-          tb.add(value.itemAt(m));
+          final Item item = value.itemAt(m);
+          tb.add(qs.error() ? item.toErrorString() : item);
         }
         if(vs != 1) tb.add(')');
       }
-      qs.braced("[ ", tb.add(' ').finish(), " ]");
+      qs.braced("[ ", tb.finish(), " ]");
     }
   }
 }

@@ -242,12 +242,11 @@ public final class Var extends ExprInfo {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(id());
-    if(declType != null) qs.token(AS).token(declType);
-  }
-
-  @Override
-  public String toErrorString() {
-    return Token.string(name.varString());
+    if(qs.error()) {
+      qs.token(name.varString());
+    } else {
+      qs.token(id());
+      if(declType != null) qs.token(AS).token(declType);
+    }
   }
 }

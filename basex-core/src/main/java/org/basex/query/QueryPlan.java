@@ -145,7 +145,7 @@ public final class QueryPlan {
    */
   public FBuilder attachVariable(final FBuilder elem, final Var var, final boolean type) {
     if(var != null) {
-      addAttribute(elem, NAME, var.toErrorString());
+      addAttribute(elem, NAME, var.name.varString());
       addAttribute(elem, ID, var.id);
       if(var.declType != null) addAttribute(elem, AS, var.declType);
       if(type) attachType(elem, var.seqType(), var.size(), -1, var.data());

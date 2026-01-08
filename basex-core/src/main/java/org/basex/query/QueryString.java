@@ -17,6 +17,23 @@ public final class QueryString {
   private static final String NO_SPACE = "|/<([ \n\t";
   /** Query string. */
   private final TokenBuilder tb = new TokenBuilder();
+  /** Error output. */
+  private final boolean error;
+
+  /**
+   * Constructor.
+   */
+  public QueryString() {
+    this(false);
+  }
+
+  /**
+   * Constructor.
+   * @param error error output
+   */
+  public QueryString(final boolean error) {
+    this.error = error;
+  }
 
   /**
    * Adds a token.
@@ -35,10 +52,10 @@ public final class QueryString {
    */
   public QueryString token(final Object token) {
     space();
-    if(token instanceof ExprInfo) {
-      ((ExprInfo) token).toString(this);
-    } else if(token instanceof AnnList) {
-      ((AnnList) token).toString(this);
+    if(token instanceof ExprInfo ei) {
+      ei.toString(this);
+    } else if(token instanceof AnnList al) {
+      al.toString(this);
     } else {
       final byte[] t = Token.token(token);
       tb.add(last() == ' ' && Token.startsWith(t, ' ') ? Token.substring(t, 1) : t);
@@ -53,7 +70,7 @@ public final class QueryString {
    * @return self reference
    */
   public QueryString function(final Function function, final Object... args) {
-    token(function.args(args).trim());
+    token(function.definition().args(error, args).trim());
     return this;
   }
 
@@ -194,6 +211,14 @@ public final class QueryString {
    */
   private char last() {
     return tb.isEmpty() ? ' ' : (char) tb.get(tb.size() - 1);
+  }
+
+  /**
+   * Returns the error flag.
+   * @return flag
+   */
+  public boolean error() {
+    return error;
   }
 
   @Override

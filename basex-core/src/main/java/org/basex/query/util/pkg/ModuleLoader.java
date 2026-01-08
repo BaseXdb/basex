@@ -172,8 +172,8 @@ public final class ModuleLoader {
    * @return list of jar file URLs (may be empty)
    * @throws QueryException query exception
    */
-  public static List<String> pkgUrls(final IOFile pkgPath, final IOFile modDir,
-      final InputInfo info) throws QueryException {
+  static List<String> pkgUrls(final IOFile pkgPath, final IOFile modDir, final InputInfo info)
+      throws QueryException {
 
     final ArrayList<String> urls = new ArrayList<>();
     // check if package contains a jar descriptor
@@ -192,7 +192,7 @@ public final class ModuleLoader {
    * @param className class name
    * @return list of jar file URLs (may be empty)
    */
-  public static List<String> jarUrls(final Context context, final String className) {
+  static List<String> jarUrls(final Context context, final String className) {
     final ArrayList<String> urls = new ArrayList<>();
     final String repoPath = context.soptions.get(StaticOptions.REPOPATH);
     final IOFile jar = new IOFile(repoPath, Strings.uri2path(className) + IO.JARSUFFIX);
@@ -203,8 +203,8 @@ public final class ModuleLoader {
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Create or get a class loader for the specified URLs from the class loader cache, and add it to
-   * the list of loaders.
+   * Creates or gets a class loader for the specified URLs from the class loader cache,
+   * and adds it to the list of loaders.
    * @param urls URLs
    * @throws IOException I/O exception
    */

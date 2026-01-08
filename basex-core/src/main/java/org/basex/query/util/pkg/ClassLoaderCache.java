@@ -23,14 +23,14 @@ final class ClassLoaderCache {
   }
 
   /**
-   * Acquire cache entry for a module. If the module is not cached, or if any of the files have
+   * Acquires a cache entry for a module. If the module is not cached, or if any of the files have
    * changed, a new loader is created. Otherwise, the existing loader is returned and its reference
    * count is incremented.
    * @param fileUrls URLs
    * @return cache entry
    * @throws IOException I/O exception
    */
-  public static Loader acquire(final List<String> fileUrls) throws IOException {
+  static Loader acquire(final List<String> fileUrls) throws IOException {
     final List<String> keys = normalize(fileUrls);
     final int n = keys.size();
     final URL[] urls = new URL[n];
@@ -60,10 +60,10 @@ final class ClassLoaderCache {
   }
 
   /**
-   * Invalidate cache entry for the given URLs, if any.
+   * Invalidates a cache entry for the given URLs, if any.
    * @param fileUrls URLs
    */
-  public static void invalidate(final List<String> fileUrls) {
+  static void invalidate(final List<String> fileUrls) {
     final Loader loader = CACHE.remove(normalize(fileUrls));
     if(loader != null) loader.invalidate();
   }
@@ -80,17 +80,17 @@ final class ClassLoaderCache {
   }
 
   /** Cache entry. */
-  public static final class Loader {
+  static final class Loader {
     /** The class loader. */
     private final URLClassLoader loader;
     /** The time stamps collected for the URLs at loader creation time. */
     private final long[] lastModified;
     /** Number of references to this instance. */
     private final AtomicInteger refs = new AtomicInteger(1);
-    /** Whether we had to replace this instance due to file changes. */
-    private volatile boolean stale;
     /** Cached classes. */
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
+    /** Whether we had to replace this instance due to file changes. */
+    private volatile boolean stale;
 
     /**
      * Constructor.
@@ -107,7 +107,7 @@ final class ClassLoaderCache {
      * @param name fully qualified class name
      * @return reference, or {@code null} if the class is not found
      */
-    public Class<?> find(final String name) {
+    Class<?> find(final String name) {
       final Class<?> cached = classes.get(name);
       if(cached != null) return cached;
       try {
@@ -121,14 +121,14 @@ final class ClassLoaderCache {
     }
 
     /**
-     * Release this Loader after use, but keep it cached.
+     * Releases this Loader after use, but keep it cached.
      */
-    public void release() {
+    void release() {
       if(refs.decrementAndGet() == 0 && stale) close();
     }
 
     /**
-     * Invalidate this Loader.
+     * Invalidates this Loader.
      */
     private void invalidate() {
       stale = true;
@@ -136,7 +136,7 @@ final class ClassLoaderCache {
     }
 
     /**
-     * Close the class loader, ignoring any exceptions.
+     * Closes the class loader, ignoring any exceptions.
      */
     private void close() {
       try {

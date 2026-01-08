@@ -117,18 +117,17 @@ public final class VarRef extends ParseExpr {
   @Override
   public void toXml(final QueryPlan plan) {
     final FBuilder elem = plan.create(this);
-    plan.addAttribute(elem, NAME, var.toErrorString());
+    plan.addAttribute(elem, NAME, var.name.varString());
     plan.addAttribute(elem, ID, var.id);
     plan.add(elem);
   }
 
   @Override
   public void toString(final QueryString qs) {
-    qs.token(var.id());
-  }
-
-  @Override
-  public String toErrorString() {
-    return var.toErrorString();
+    if(qs.error()) {
+      qs.token(var);
+    } else {
+      qs.token(var.id());
+    }
   }
 }
