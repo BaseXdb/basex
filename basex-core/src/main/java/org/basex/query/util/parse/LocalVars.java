@@ -90,7 +90,7 @@ public final class LocalVars {
     // local variable
     final VarRef ref = resolveLocal(name, info);
     if(ref != null) return ref;
-    return parser.qc.vars.newRef(name, info, parser.moduleURIs);
+    return parser.qc.vars.newRef(name, info, parser.sc.imports);
   }
 
   /**

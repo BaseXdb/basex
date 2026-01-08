@@ -42,6 +42,8 @@ public final class StaticContext {
   public byte[] funcNS;
   /** Name of module (not assigned for main module). */
   public QNm module;
+  /** URIs of modules loaded by the current file. */
+  public final TokenSet imports = new TokenSet();
 
   /** Construction mode. */
   public boolean strip;

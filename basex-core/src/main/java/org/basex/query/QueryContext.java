@@ -259,7 +259,7 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query exception
    */
   public void assign(final StaticFunc func, final Expr... args) throws QueryException {
-    for(final StaticFunc sf : functions.funcs()) {
+    for(final StaticFunc sf : functions) {
       if(func.info.equals(sf.info)) {
         if(!sf.anns.contains(Annotation._BASEX_INLINE)) {
           // explicit lock: disable inlining. otherwise, enforce inlining for large function bodies
@@ -267,7 +267,7 @@ public final class QueryContext extends Job implements Closeable {
           sf.anns = sf.anns.attach(new Ann(sf.info, Annotation._BASEX_INLINE, value));
         }
         // create and assign function call
-        final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.info, true);
+        final StaticFuncCall call = new StaticFuncCall(sf.name, args, null, sf.info);
         call.setFunc(sf);
         main = new MainModule(call, new VarScope(), sf.sc);
         updating = sf.updating();
