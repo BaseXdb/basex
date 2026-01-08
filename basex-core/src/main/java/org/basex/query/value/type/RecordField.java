@@ -45,7 +45,7 @@ public final class RecordField {
    * @param expr initializing expression (can be {@code null})
    */
   public RecordField(final SeqType seqType, final boolean optional, final Expr expr) {
-    this.seqType = seqType;
+    this.seqType = seqType != null ? seqType : Types.ITEM_ZM;
     this.optional = optional;
     this.expr = expr;
   }
@@ -71,13 +71,13 @@ public final class RecordField {
    * @return sequence type
    */
   public SeqType seqType() {
-    return seqType == null ? Types.ITEM_ZM : seqType;
+    return seqType;
   }
 
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final RecordField rf && optional == rf.optional &&
-        Objects.equals(seqType, rf.seqType) && Objects.equals(expr, rf.expr);
+        seqType.eq(rf.seqType) && Objects.equals(expr, rf.expr);
   }
 
   @Override

@@ -33,12 +33,10 @@ public final class MapContains extends StandardFunc {
     if(map == XQMap.empty()) return Bln.FALSE;
 
     final MapCompilation mc = MapCompilation.get(map).key(key);
-    if(mc.key != null) {
-      if(mc.field != null) {
-        if(!mc.field.isOptional()) return Bln.TRUE;
-      } else {
-        if(!mc.record.isExtensible()) return Bln.FALSE;
-      }
+    if(mc.field != null) {
+      if(!mc.field.isOptional()) return Bln.TRUE;
+    } else if(mc.validKey) {
+      if(!mc.record.isExtensible()) return Bln.FALSE;
     }
 
     if(mc.mapType != null) {

@@ -175,9 +175,9 @@ public final class RecordTest extends SandboxTest {
   @Test public void typeRemove() {
     final Function func = _MAP_REMOVE;
     check("declare record local:x(x); local:x(1) => map:remove('x')", "{}",
-        type(func, "map(xs:string, item()*)"));
+        root(XQTrieMap.class));
     check("declare record local:x(x); local:x(1) => map:remove(<_>x</_>)", "{}",
-        type(func, "map(xs:string, item()*)"));
+        root(XQTrieMap.class));
     check("declare record local:x(x); local:x(1) => map:remove('y')", "{\"x\":1}",
         empty(func));
     check("declare record local:x(x); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
@@ -186,9 +186,9 @@ public final class RecordTest extends SandboxTest {
         empty(func));
 
     check("declare record local:x(x, *); local:x(1) => map:remove('x')", "{}",
-        type(func, "map(*)"));
+        type(func, "record(*)"));
     check("declare record local:x(x, *); local:x(1) => map:remove(<_>x</_>)", "{}",
-        type(func, "map(*)"));
+        type(func, "record(*)"));
     check("declare record local:x(x, *); local:x(1) => map:remove('y')", "{\"x\":1}",
         type(func, "local:x"));
     check("declare record local:x(x, *); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
@@ -197,9 +197,9 @@ public final class RecordTest extends SandboxTest {
         type(func, "local:x"));
 
     check("declare record local:x(x, y?); local:x(1) => map:remove('x')", "{}",
-        type(func, "map(xs:string, item()*)"));
+        type(func, "record(y? as item()*)"));
     check("declare record local:x(x, y?); local:x(1) => map:remove(<_>x</_>)", "{}",
-        type(func, "map(xs:string, item()*)"));
+        type(func, "record(y? as item()*)"));
     check("declare record local:x(x, y?); local:x(1) => map:remove('y')", "{\"x\":1}",
         type(func, "local:x"));
     check("declare record local:x(x, y?); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
@@ -218,9 +218,9 @@ public final class RecordTest extends SandboxTest {
     check("declare record local:x(x); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
         type(_UTIL_MAP_PUT_AT, "local:x"));
     check("declare record local:x(x); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
-        type(func, "map(xs:string, item()*)"));
+        type(func, "record(x as item()*, y as xs:integer)"));
     check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
-        type(func, "map(*)"));
+        type(func, "record(x as item()*, y as xs:integer)"));
     check("declare record local:x(x); local:x(1) => map:put(0, 0)", "{\"x\":1,0:0}",
         type(func, "map(*)"));
 

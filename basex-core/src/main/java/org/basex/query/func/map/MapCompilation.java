@@ -13,9 +13,6 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class MapCompilation {
-  /** Extended key (not defined in a record). */
-  public static final byte[] EXTENDED = {};
-
   /** Map type ({@code null} if statically unknown). */
   public MapType mapType;
   /** Record type ({@code null} if statically unknown). */
@@ -28,6 +25,8 @@ public final class MapCompilation {
   public Integer index;
   /** Key type mismatch. */
   public boolean keyMismatch;
+  /** Key is statically unknown, but known to be valid. */
+  public boolean validKey;
 
   /**
    * Returns compile-time information for the specified map.
@@ -56,12 +55,11 @@ public final class MapCompilation {
       if(expr instanceof final Item item) {
         if(kt.isStringOrUntyped()) {
           final TokenObjectMap<RecordField> fields = record.fields();
-          final byte[] k = item.string(null);
-          index = fields.index(k);
-          field = fields.get(k);
-          if(field != null) key = k;
+          key = item.string(null);
+          index = fields.index(key);
+          field = fields.get(key);
         }
-        if(key == null && kt.instanceOf(AtomType.ANY_ATOMIC_TYPE)) key = EXTENDED;
+        if(field == null && kt.instanceOf(AtomType.ANY_ATOMIC_TYPE)) validKey = true;
       }
     }
     if(mapType != null) {

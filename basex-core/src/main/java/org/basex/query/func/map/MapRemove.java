@@ -34,14 +34,22 @@ public final class MapRemove extends StandardFunc {
 
     Type type = null;
     final MapCompilation mc = MapCompilation.get(map).key(key);
-    if(mc.key != null) {
-      // try to propagate record type
-      final boolean extensible = mc.record.isExtensible();
-      if(mc.field == null && !extensible) return map;
-      if(mc.key == MapCompilation.EXTENDED && extensible || mc.field == null ||
-          mc.field.isOptional()) {
+    if(mc.field != null) {
+      if(mc.field.isOptional()) {
+        // structure does not change: propagate record type
         type = mc.record;
+      } else {
+        // otherwise, derive new record type
+        final RecordType rt = cc.qc.shared.record(mc.record.remove(mc.key));
+        // return empty map if it will contain no entries
+        if(rt.fields().isEmpty() && !rt.isExtensible()) return XQMap.empty();
+        type = rt;
       }
+    } else if(mc.validKey) {
+      // return input map if nothing changes: map:remove({ 'a': 1 }, 'b') → { 'a': 1 }
+      if(!mc.record.isExtensible()) return map;
+      // structure does not change: propagate record type
+      type = mc.record;
     }
 
     if(type == null && mc.mapType != null) {

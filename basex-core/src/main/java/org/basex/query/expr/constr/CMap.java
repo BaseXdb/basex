@@ -25,6 +25,7 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class CMap extends Arr {
+
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -69,7 +70,7 @@ public final class CMap extends Arr {
     }
 
     // not too large, only strings as keys? replace with record constructor
-    boolean record = el < 32;
+    boolean record = el < RecordType.MAX_GENERATED_SIZE;
     for(int e = 0; e < el && record; e += 2) {
       if(nested(e) || !(exprs[e] instanceof AStr && exprs[e].seqType().eq(Types.STRING_O))) {
         record = false;

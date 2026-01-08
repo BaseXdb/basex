@@ -459,7 +459,7 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
         type(_UTIL_MAP_PUT_AT, "map(xs:string, xs:anyAtomicType)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "map(xs:string, xs:integer)"));
+        type(func, "record(x as xs:integer, y as xs:integer)"));
 
     record = "declare record local:x(x? as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
@@ -467,7 +467,7 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
         type(func, "map(xs:string, xs:anyAtomicType)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "map(xs:string, xs:integer)"));
+        type(func, "record(x? as xs:integer, y as xs:integer)"));
 
     record = "declare record local:x(x as xs:integer, *);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
@@ -492,7 +492,7 @@ public final class MapModuleTest extends SandboxTest {
 
     String record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
-        type(func, "map(xs:string, xs:integer)"));
+        root(XQTrieMap.class));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
         empty(func));
 
@@ -504,7 +504,7 @@ public final class MapModuleTest extends SandboxTest {
 
     record = "declare record local:x(x as xs:integer, *);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
-        type(func, "map(*)"));
+        type(func, "record(*)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
         type(func, "local:x"));
 
