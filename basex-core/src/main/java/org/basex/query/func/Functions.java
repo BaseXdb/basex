@@ -284,8 +284,8 @@ public final class Functions {
     for(final QNm qnm : fb.keywords) {
       int n = nl;
       while(--n >= 0 && !qnm.eq(names[n]));
-      if(n == -1) throw KEYWORDUNKNOWN_X_X.get(fb.info, function, qnm);
-      if(list.get(n) != null) throw ARGTWICE_X_X.get(fb.info, function, qnm);
+      if(n == -1) throw PARAMUNKNOWN_X_X.get(fb.info, function, qnm.prefixString());
+      if(list.get(n) != null) throw PARAMTWICE_X_X.get(fb.info, function, qnm.prefixString());
       list.set(n, fb.keywords.get(qnm));
     }
     return list.finish();
@@ -421,7 +421,7 @@ public final class Functions {
     final int arity = args.length;
     for(int a = arity - 1; a >= 0; a--) {
       if(args[a] == null) {
-        if(a < min) throw ARGMISSING_X_X.get(fb.info, function, names[a].prefixString());
+        if(a < min) throw PARAMMISSING_X_X.get(fb.info, function, names[a].prefixString());
         args[a] = Empty.UNDEFINED;
       }
     }

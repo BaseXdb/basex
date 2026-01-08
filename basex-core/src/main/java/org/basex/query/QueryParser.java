@@ -3017,7 +3017,7 @@ public class QueryParser extends InputParser {
           if(arg == null && wsConsume("?")) arg = Empty.UNDEFINED;
         }
         if(arg == null) throw error(FUNCARG_X, found());
-        if(fb.add(arg, name)) throw error(KEYWORDTWICE_X, name);
+        if(fb.add(arg, name)) throw error(PARAMTWICE_X, name.prefixString());
       } while(wsConsumeWs(","));
       if(!consume(")")) throw error(FUNCARG_X, found());
     }

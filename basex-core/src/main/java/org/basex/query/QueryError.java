@@ -1043,13 +1043,13 @@ public enum QueryError {
   /** Error code. */
   INVISIBLEFUNC_X(XPST, 17, "Function requires missing module import: %."),
   /** Error code. */
-  KEYWORDTWICE_X(XPST, 17, "Keyword supplied twice: %."),
+  PARAMMISSING_X_X(XPST, 17, "%: No argument supplied for parameter %."),
   /** Error code. */
-  ARGMISSING_X_X(XPST, 17, "%: No argument supplied: %."),
+  PARAMTWICE_X(XPST, 17, "Multiple arguments supplied for parameter %."),
   /** Error code. */
-  ARGTWICE_X_X(XPST, 17, "%: Argument supplied twice: %."),
+  PARAMTWICE_X_X(XPST, 17, "%: Multiple arguments supplied for parameter %."),
   /** Error code. */
-  KEYWORDUNKNOWN_X_X(XPST, 17, "%: Unknown keyword: %."),
+  PARAMUNKNOWN_X_X(XPST, 17, "%: Parameter % does not exist."),
   /** Error code. */
   ABSTRACTFUNC_X(XPST, 17, "No function exists for abstract type: %."),
   /** Error code. */

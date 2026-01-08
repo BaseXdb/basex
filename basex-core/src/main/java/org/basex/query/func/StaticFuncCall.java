@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.ann.*;
@@ -138,7 +139,9 @@ public final class StaticFuncCall extends FuncCall {
     if(keywords != null) {
       final QNm[] names = new QNm[arity];
       for(int n = 0; n < arity; n++) names[n] = sf.paramName(n);
-      exprs = Functions.prepareArgs(new FuncBuilder(info, exprs, keywords), names, this);
+      System.out.println("[1]");
+      exprs = Functions.prepareArgs(new FuncBuilder(info, exprs, keywords), names,
+          (Supplier<byte[]>) () -> name.prefixId());
       keywords = null;
     }
     // adopt default expressions
@@ -146,13 +149,14 @@ public final class StaticFuncCall extends FuncCall {
     for(int a = arity - 1; a >= 0; a--) {
       if(exprs[a] == null) {
         final Expr dflt = sf.defaults[a];
-        if(dflt == null) throw ARGMISSING_X_X.get(info, this, sf.paramName(a).prefixString());
+        if(dflt == null) throw PARAMMISSING_X_X.get(info, name.prefixId(),
+            sf.paramName(a).prefixString());
         exprs[a] = dflt;
       }
     }
     // check visibility
-    if(sf.anns.contains(Annotation.PRIVATE)
-        && !Token.eq(QNm.uri(sf.sc.module), QNm.uri(sc().module))) {
+    if(sf.anns.contains(Annotation.PRIVATE) &&
+        !Token.eq(QNm.uri(sf.sc.module), QNm.uri(sc().module))) {
       throw FUNCPRIVATE_X.get(info, name.string());
     }
   }
