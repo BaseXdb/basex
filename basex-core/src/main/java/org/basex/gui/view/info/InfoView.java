@@ -397,9 +397,8 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
   }
 
   @Override
-  public boolean printTrace(final String message) {
+  public void printTrace(final String message) {
     setInfo(message, null, true, false);
-    return true;
   }
 
   @Override

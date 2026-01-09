@@ -26,12 +26,8 @@ import org.basex.util.log.*;
  * @author Christian Gruen
  */
 public final class ClientListener extends Thread implements ClientInfo {
-  /** Prints trace output to standard error. */
+  /** Limits trace output. */
   private static final QueryTracer TRACER = new QueryTracer() {
-    @Override
-    public boolean printTrace(final String message) {
-      return true;
-    }
     @Override
     public boolean moreTraces(final int count) {
       return count <= 10_000;

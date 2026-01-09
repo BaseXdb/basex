@@ -481,7 +481,8 @@ public final class QueryContext extends Job implements Closeable {
         final String lbl = label != null ? label.replaceAll("\\s+", " ") : "";
         final String msg = (lbl.isEmpty() || lbl.matches("^.*\\p{P} ?$") ? lbl : lbl + ": ") +
             message.get();
-        if(qc.printTrace(msg)) evalInfo(msg);
+        qc.printTrace(msg);
+        if(qc.cacheTrace()) evalInfo(msg);
       }
     }
   }

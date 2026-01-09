@@ -261,8 +261,12 @@ public final class Log implements QueryTracer {
   }
 
   @Override
-  public boolean printTrace(final String message) {
+  public void printTrace(final String message) {
     writeServer(LogType.TRACE, message);
+  }
+
+  @Override
+  public boolean cacheTrace() {
     return false;
   }
 

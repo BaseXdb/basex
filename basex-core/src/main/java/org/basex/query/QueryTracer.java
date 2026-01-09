@@ -10,14 +10,26 @@ public interface QueryTracer {
   /**
    * Processes tracing output.
    * @param message string to be output
-   * @return {@code true} if string shall be further processed by the calling function
    */
-  boolean printTrace(String message);
+  @SuppressWarnings("unused")
+  default void printTrace(final String message) {
+  }
 
   /**
    * Indicates if more output should be generated.
    * @param count count of traces so far
    * @return result of check
    */
-  boolean moreTraces(int count);
+  @SuppressWarnings("unused")
+  default boolean moreTraces(final int count) {
+    return true;
+  }
+
+  /**
+   * Indicates if the trace output should be cached.
+   * @return result of check
+   */
+  default boolean cacheTrace() {
+    return true;
+  }
 }
