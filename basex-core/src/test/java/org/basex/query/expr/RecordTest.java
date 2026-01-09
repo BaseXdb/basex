@@ -214,9 +214,9 @@ public final class RecordTest extends SandboxTest {
   @Test public void typePut() {
     final Function func = _MAP_PUT;
     check("declare record local:x(x); local:x(1) => map:put('x', 2)", "{\"x\":2}",
-        type(_UTIL_MAP_PUT_AT, "local:x"));
+        type(RecordSet.class, "local:x"));
     check("declare record local:x(x); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
-        type(_UTIL_MAP_PUT_AT, "local:x"));
+        type(RecordSet.class, "local:x"));
     check("declare record local:x(x); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
         type(func, "record(x as item()*, y as xs:integer)"));
     check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
@@ -225,12 +225,12 @@ public final class RecordTest extends SandboxTest {
         type(func, "map(*)"));
 
     check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)", "{\"x\":<x/>}",
-        type(_UTIL_MAP_PUT_AT, "map(xs:string, item())"));
+        type(RecordSet.class, "map(xs:string, item())"));
 
     check("declare record local:x(x, *); local:x(1) => map:put('x', 2)", "{\"x\":2}",
-        type(_UTIL_MAP_PUT_AT, "local:x"));
+        type(RecordSet.class, "local:x"));
     check("declare record local:x(x, *); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
-        type(_UTIL_MAP_PUT_AT, "local:x"));
+        type(RecordSet.class, "local:x"));
     check("declare record local:x(x, *); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
         type(func, "local:x"));
     check("declare record local:x(x, *); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
@@ -269,7 +269,7 @@ public final class RecordTest extends SandboxTest {
         root(XQRecordMap.class));
 
     map = "{ 'a': 1, 'b': <?_ 2?> cast as xs:integer }";
-    check(map + " => map:get('a')", 1, type(_UTIL_MAP_VALUE_AT, "xs:integer"));
+    check(map + " => map:get('a')", 1, type(RecordGet.class, "xs:integer"));
     check(map + " => map:get('c')", "", empty());
     check(map + " => map:get(1)", "", empty());
     check(map + " => map:get(<?_ 1?> cast as xs:integer)", "", empty());

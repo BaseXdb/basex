@@ -1964,15 +1964,6 @@ public enum Function implements AFunction {
   _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
       params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
-  _UTIL_MAP_KEY_AT(UtilMapKeyAt::new, "map-key-at(input,index)",
-      params(MAP_O, INTEGER_O), ANY_ATOMIC_TYPE_ZO, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_MAP_PUT_AT(UtilMapPutAt::new, "map-put-at(input,index,value)",
-      params(MAP_O, INTEGER_O, ITEM_ZM), MAP_O, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_MAP_VALUE_AT(UtilMapValueAt::new, "map-value-at(input,index)",
-      params(MAP_O, INTEGER_O), ITEM_ZM, UTIL_URI),
-  /** XQuery function. */
   _UTIL_RANGE(UtilRange::new, "range(input,first,last)",
       params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */

@@ -1,7 +1,5 @@
 package org.basex.query.func.map;
 
-import static org.basex.query.func.Function.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -43,9 +41,7 @@ public final class MapGet extends StandardFunc {
     boolean notFound = false;
     if(mc.field != null) {
       // map:get({ 'a': 1, 'b': 2 }, 'b') → util:map-value-at({ 'a': 1, 'b': 2 }, 2)
-      if(!mc.record.hasOptional()) {
-        return cc.function(_UTIL_MAP_VALUE_AT, info, map, Itr.get(mc.index), arg(3));
-      }
+      if(!mc.record.hasOptional()) return new RecordGet(info, map, mc.index);
     } else if(mc.validKey) {
       // map:get({ 'a': 1 }, 'b') → ()
       if(!mc.record.isExtensible()) notFound = true;

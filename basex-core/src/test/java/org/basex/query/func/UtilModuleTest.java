@@ -188,66 +188,6 @@ public final class UtilModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void mapKeyAt() {
-    final Function func = _UTIL_MAP_KEY_AT;
-    query(func.args(" {}", 0), "");
-    query(func.args(" {}", 1), "");
-
-    final String map = " { 1: 'uno', 10: 'dieci', 100: 'cento' }";
-    query(func.args(map, 0), "");
-    query(func.args(map, 1), 1);
-    query(func.args(map, 2), 10);
-    query(func.args(map, 3), 100);
-    query(func.args(map, 4), "");
-    query(func.args(map, 2147483647L), "");
-    query(func.args(map, 2147483648L), "");
-    query(func.args(map, 4294967295L), "");
-    query(func.args(map, 4294967296L), "");
-  }
-
-  /** Test method. */
-  @Test public void mapPutAt() {
-    final Function func = _UTIL_MAP_PUT_AT;
-    query(func.args(" { 9: 8 }", 1, 0), "{9:0}");
-    query(func.args(" { 9: 8, 7: 6 }", 0, 0), "{9:8,7:6}");
-    query(func.args(" { 9: 8, 7: 6 }", 1, 0), "{9:0,7:6}");
-    query(func.args(" { 9: 8, 7: 6 }", 2, 0), "{9:8,7:0}");
-    query(func.args(" { 9: 8, 7: 6 }", 3, 0), "{9:8,7:6}");
-
-    query(func.args(" { '9': 8, '7': 6 }", 0, 0), "{\"9\":8,\"7\":6}");
-    query(func.args(" { '9': 8, '7': 6 }", 1, 0), "{\"9\":0,\"7\":6}");
-    query(func.args(" { '9': 8, '7': 6 }", 2, 0), "{\"9\":8,\"7\":0}");
-    query(func.args(" { '9': 8, '7': 6 }", 3, 0), "{\"9\":8,\"7\":6}");
-
-    query(func.args(" { '9': 8, '7': 6 }", 0, "a"), "{\"9\":8,\"7\":6}");
-    query(func.args(" { '9': 8, '7': 6 }", 1, "a"), "{\"9\":\"a\",\"7\":6}");
-    query(func.args(" { '9': 8, '7': 6 }", 2, "a"), "{\"9\":8,\"7\":\"a\"}");
-    query(func.args(" { '9': 8, '7': 6 }", 3, "a"), "{\"9\":8,\"7\":6}");
-
-    query("map:build(1 to 100) => " + func.args(1, 0) + " => map:get(1)", 0);
-    query("map:build((1 to 100) ! string()) => " + func.args(1, 0) + " => map:get('1')", 0);
-    query("map:build((1 to 100) ! string()) => " + func.args(1, "0") + " => map:get('1')", 0);
-  }
-
-  /** Test method. */
-  @Test public void mapValueAt() {
-    final Function func = _UTIL_MAP_VALUE_AT;
-    query(func.args(" {}", 0), "");
-    query(func.args(" {}", 1), "");
-
-    final String map = " { 1: 'uno', 10: 'dieci', 100: 'cento' }";
-    query(func.args(map, 0), "");
-    query(func.args(map, 1), "uno");
-    query(func.args(map, 2), "dieci");
-    query(func.args(map, 3), "cento");
-    query(func.args(map, 4), "");
-    query(func.args(map, 2147483647L), "");
-    query(func.args(map, 2147483648L), "");
-    query(func.args(map, 4294967295L), "");
-    query(func.args(map, 4294967296L), "");
-  }
-
-  /** Test method. */
   @Test public void range() {
     final Function func = _UTIL_RANGE;
     query(func.args(" ()", 1, 2), "");
