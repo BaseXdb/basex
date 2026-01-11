@@ -25,7 +25,7 @@ public final class MapCompilation {
   public Integer index;
   /** Key type mismatch. */
   public boolean keyMismatch;
-  /** Key is statically unknown, but known to be valid. */
+  /** Key is known to be valid. */
   public boolean validKey;
 
   /**
@@ -59,7 +59,7 @@ public final class MapCompilation {
           index = fields.index(key);
           field = fields.get(key);
         }
-        if(field == null && kt.instanceOf(AtomType.ANY_ATOMIC_TYPE)) validKey = true;
+        if(kt.instanceOf(AtomType.ANY_ATOMIC_TYPE)) validKey = true;
       }
     }
     if(mapType != null) {

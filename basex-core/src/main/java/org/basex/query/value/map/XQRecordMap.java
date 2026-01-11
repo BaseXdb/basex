@@ -7,6 +7,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Compact map implementation for records with fixed entries.
@@ -41,7 +42,7 @@ public final class XQRecordMap extends XQHashMap {
   @Override
   public XQMap put(final Item key, final Value value) throws QueryException {
     if(key.type.isStringOrUntyped()) {
-      final int i = ((RecordType) type).fields().index(key.string(null));
+      final int i = fields().index(key.string(null));
       if(i != 0) return putAt(i - 1, value);
     }
     return super.put(key, value);
@@ -49,7 +50,8 @@ public final class XQRecordMap extends XQHashMap {
 
   @Override
   public XQMap putAt(final int index, final Value value) throws QueryException {
-    if(value.seqType().instanceOf(((RecordType) type).fields().value(index + 1).seqType())) {
+    if(value == values[index]) return this;
+    if(value.seqType().instanceOf(fields().value(index + 1).seqType())) {
       final Value[] copy = values.clone();
       copy[index] = value;
       return new XQRecordMap(copy, type);
@@ -60,7 +62,7 @@ public final class XQRecordMap extends XQHashMap {
   @Override
   public Value getOrNull(final Item key) throws QueryException {
     if(key.type.isStringOrUntyped()) {
-      final int i = ((RecordType) type).fields().index(key.string(null));
+      final int i = fields().index(key.string(null));
       if(i != 0) return valueAt(i - 1);
     }
     return null;
@@ -68,12 +70,20 @@ public final class XQRecordMap extends XQHashMap {
 
   @Override
   public Value keys() {
-    return StrSeq.get(((RecordType) type).fields().keys());
+    return StrSeq.get(fields().keys());
   }
 
   @Override
   public Item keyAt(final int index) {
-    return Str.get(((RecordType) type).fields().key(index + 1));
+    return Str.get(fields().key(index + 1));
+  }
+
+  /**
+   * Returns the record fields.
+   * @return fields
+   */
+  private TokenObjectMap<RecordField> fields() {
+    return ((RecordType) type).fields();
   }
 
   @Override

@@ -39,11 +39,18 @@ final class TrieOrder {
    * @return keys
    */
   Value keys() {
-    if(removed != null) {
-      added = added.remove(removed);
-      removed = null;
-    }
+    optimize();
     return added.keys();
+  }
+
+  /**
+   * Returns the key at the specified position.
+   * @param index map index (starting with 0, must be valid)
+   * @return key
+   */
+  Item keyAt(final int index) {
+    optimize();
+    return added.keyAt(index);
   }
 
   /**
@@ -62,6 +69,16 @@ final class TrieOrder {
    */
   TrieOrder remove(final Item key) {
     return new TrieOrder(added, removed != null ? removed.add(key) : new TrieKeys(key));
+  }
+
+  /**
+   * Optimizes the data structure.
+   */
+  private void optimize() {
+    if(removed != null) {
+      added = added.remove(removed);
+      removed = null;
+    }
   }
 
   @Override

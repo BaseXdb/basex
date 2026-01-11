@@ -69,6 +69,15 @@ final class TrieKeys implements Iterable<Item> {
   }
 
   /**
+   * Returns the key at the specified position.
+   * @param index map index (starting with 0, must be valid)
+   * @return key
+   */
+  Item keyAt(final int index) {
+    return keys[index];
+  }
+
+  /**
    * Removes the specified keys from the list.
    * @param list list with keys to be removed
    * @return new list

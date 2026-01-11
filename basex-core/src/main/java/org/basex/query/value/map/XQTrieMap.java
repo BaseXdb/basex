@@ -41,13 +41,12 @@ public final class XQTrieMap extends XQMap {
 
   @Override
   public Value keys() {
-    final long size = structSize();
-    return size == 0 ? Empty.VALUE : size == 1 ? ((TrieLeaf) root).key : order.keys();
+    return order != null ? order.keys() : structSize() == 1 ? ((TrieLeaf) root).key : Empty.VALUE;
   }
 
   @Override
   public Item keyAt(final int index) {
-    return keys().itemAt(index);
+    return order != null ? order.keyAt(index) : ((TrieLeaf) root).key;
   }
 
   @Override

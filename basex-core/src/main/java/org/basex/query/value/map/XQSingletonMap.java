@@ -61,7 +61,7 @@ public final class XQSingletonMap extends XQMap {
 
   @Override
   public XQMap putAt(final int index, final Value value) {
-    return new XQSingletonMap(k, value);
+    return value != v ? new XQSingletonMap(k, value) : this;
   }
 
   @Override
