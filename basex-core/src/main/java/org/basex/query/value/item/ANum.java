@@ -141,7 +141,7 @@ public abstract class ANum extends Item {
       num2 = item;
     }
 
-    if(num2 instanceof Itr itr2) {
+    if(num2 instanceof final Itr itr2) {
       if(this instanceof Itr) return Long.compare(itr(), itr2.itr());
     } else if(num2 instanceof Dbl || num2 instanceof Flt) {
       final double d = num2.dbl(ii);

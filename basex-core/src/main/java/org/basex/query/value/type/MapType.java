@@ -113,18 +113,15 @@ public class MapType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(MAP, FUNCTION, AtomType.ITEM)) return true;
-    if(this == MAP && type == RECORD) return true;
-    if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
-    if(type instanceof RecordType) return false;
+    if(this == type || type.oneOf(RECORD, MAP, FUNCTION, AtomType.ITEM)) return true;
     if(type instanceof final MapType mt) {
-      return valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
+      return this != MAP && valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
     }
     if(type instanceof final FuncType ft) {
       return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
           ft.argTypes[0].instanceOf(ANY_ATOMIC_TYPE_O);
     }
-    return false;
+    return type instanceof final ChoiceItemType cit && cit.hasInstance(this);
   }
 
   @Override

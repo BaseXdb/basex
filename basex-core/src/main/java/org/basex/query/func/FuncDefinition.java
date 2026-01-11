@@ -196,7 +196,7 @@ public final class FuncDefinition {
     int c = 0;
     for(final Object arg : args) {
       if(c++ > 0) tb.add(", ");
-      if(arg instanceof ExprInfo ei) {
+      if(arg instanceof final ExprInfo ei) {
         tb.add(error ? ei.toErrorString() : ei.toString());
       } else if(arg instanceof Number) {
         tb.add(arg);

@@ -1693,7 +1693,7 @@ public enum QueryError {
       // add number of results or type of input
       if(expr != null) {
         desc.add(", ");
-        if(expr instanceof Value value) desc.add(value.size());
+        if(expr instanceof final Value value) desc.add(value.size());
         else desc.add(expr.seqType());
         desc.add(" found");
       }

@@ -136,7 +136,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Value insertValue(final long pos, final Value val, final Job job) {
-    if(val instanceof Itr itr) {
+    if(val instanceof final Itr itr) {
       final long i = itr.itr(), step = ascending ? 1 : -1;
       if(pos == 0 && get(0) - step == i || pos == size() && get(size - 1) + step == i) {
         return new RangeSeq(pos == 0 ? i : start, size + 1, ascending);

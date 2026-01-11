@@ -80,18 +80,6 @@ public final class SharedData {
   }
 
   /**
-   * Creates a non-extensible record or returns an existing instance.
-   * @param key key
-   * @param type type
-   * @return new or already registered record type
-   */
-  public RecordType record(final Str key, final SeqType type) {
-    final TokenObjectMap<RecordField> map = new TokenObjectMap<>(1);
-    map.put(key.string(), new RecordField(type));
-    return record(new RecordType(map));
-  }
-
-  /**
    * Creates a new record or returns an existing instance.
    * @param rt record type
    * @return new or already registered record type

@@ -52,9 +52,9 @@ public final class QueryString {
    */
   public QueryString token(final Object token) {
     space();
-    if(token instanceof ExprInfo ei) {
+    if(token instanceof final ExprInfo ei) {
       ei.toString(this);
-    } else if(token instanceof AnnList al) {
+    } else if(token instanceof final AnnList al) {
       al.toString(this);
     } else {
       final byte[] t = Token.token(token);
