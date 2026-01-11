@@ -458,7 +458,7 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
         type(RecordSet.class, "local:x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(RecordSet.class, "map(xs:string, xs:anyAtomicType)"));
+        type(RecordSet.class, "record(x as xs:anyAtomicType)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
         type(func, "record(x as xs:integer, y as xs:integer)"));
 
@@ -466,7 +466,7 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
         type(func, "local:x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(func, "map(xs:string, xs:anyAtomicType)"));
+        type(func, "record(x as xs:anyAtomicType)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
         type(func, "record(x? as xs:integer, y as xs:integer)"));
 
@@ -474,7 +474,7 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
         type(RecordSet.class, "local:x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(RecordSet.class, "map(*)"));
+        type(RecordSet.class, "record(x as xs:anyAtomicType, *)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
         type(func, "local:x"));
   }

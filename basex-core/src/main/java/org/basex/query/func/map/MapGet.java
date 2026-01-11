@@ -38,10 +38,13 @@ public final class MapGet extends StandardFunc {
     if(map == XQMap.empty()) return dflt ? arg(2) : Empty.VALUE;
 
     final MapCompilation mc = MapCompilation.get(map).key(key);
+    SeqType st = null;
     boolean notFound = false;
     if(mc.field != null) {
-      // map:get({ 'a': 1, 'b': 2 }, 'b') → util:map-value-at({ 'a': 1, 'b': 2 }, 2)
-      if(!mc.record.hasOptional()) return new RecordGet(info, map, mc.index);
+      // use optimized getter for records
+      if(!mc.record.hasOptional()) return new RecordGet(info, map, mc.index).optimize(cc);
+      // type of result (if it exists)
+      st = mc.field.seqType();
     } else if(mc.validKey) {
       // map:get({ 'a': 1 }, 'b') → ()
       if(!mc.record.isExtensible()) notFound = true;
@@ -50,10 +53,11 @@ public final class MapGet extends StandardFunc {
     if(mc.mapType != null) {
       // map:get({ 1: 1 }, 'string') → ()
       if(mc.keyMismatch) notFound = true;
-
-      final SeqType st = mc.mapType.valueType();
-      exprType.assign(dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO));
+      // type of result (if it exists)
+      else if(st == null) st = mc.mapType.valueType();
     }
+
+    if(st != null) exprType.assign(dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO));
     return notFound ? dflt ? arg(2) : Empty.VALUE : this;
   }
 }

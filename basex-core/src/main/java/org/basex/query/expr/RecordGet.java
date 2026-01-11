@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class RecordGet extends Single {
-  /** Record type. */
+  /** Type of processed record. */
   private final RecordType type;
   /** Index of record entry (starting with 1). */
   private final int index;
@@ -26,7 +26,7 @@ public final class RecordGet extends Single {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param record record
+   * @param record record expression
    * @param index index of record entry (starting with 1)
    */
   public RecordGet(final InputInfo info, final Expr record, final int index) {
@@ -48,7 +48,7 @@ public final class RecordGet extends Single {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return new RecordGet(info, expr.copy(cc, vm), index);
+    return copyType(new RecordGet(info, expr.copy(cc, vm), index));
   }
 
   @Override

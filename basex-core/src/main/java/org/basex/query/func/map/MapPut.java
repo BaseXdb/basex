@@ -32,29 +32,36 @@ public final class MapPut extends StandardFunc {
     final Expr map = arg(0), key = arg(1), value = arg(2);
     if(map == XQMap.empty()) return cc.function(_MAP_ENTRY, info, key, value);
 
-    Type type = null;
+    Type tp = null;
     final MapCompilation mc = MapCompilation.get(map).key(key);
     if(mc.field != null) {
-      // map:put({ 'a': 1, 'b': 2 }, 'b', 3) → util:map-put-at({ 'a': 1, 'b': 2 }, 2, 3)
-      if(!mc.record.hasOptional()) return new RecordSet(info, map, mc.index, value);
-      // structure does not change (new value has same type): propagate record type
-      if(value.seqType().instanceOf(mc.field.seqType())) type = mc.record;
+      // use optimized getter for records
+      if(!mc.record.hasOptional()) return new RecordSet(info, map, mc.index, value).optimize(cc);
+
+      final SeqType vt = value.seqType(), ft = mc.field.seqType();
+      if(vt.instanceOf(ft)) {
+        // structure does not change (new value has same type): propagate record type
+        tp = mc.record;
+      } else {
+        // otherwise, derive new record type
+        tp = cc.qc.shared.record(mc.record.copy(null, mc.key, vt.union(ft)));
+      }
     } else if(mc.validKey) {
       if(mc.record.isExtensible()) {
         // structure does not change: propagate record type
-        type = mc.record;
+        tp = mc.record;
       } else if(mc.key != null) {
         // otherwise, derive new record type
-        type = cc.qc.shared.record(mc.record.add(mc.key, value.seqType()));
+        tp = cc.qc.shared.record(mc.record.copy(null, mc.key, value.seqType()));
       }
     }
 
-    if(type == null && mc.mapType != null) {
+    if(tp == null && mc.mapType != null) {
       // create new map type (potentially assigned record type must not be propagated)
       final Type akt = key.seqType().type.atomic();
-      if(akt != null) type = mc.mapType.union(akt, value.seqType());
+      if(akt != null) tp = mc.mapType.union(akt, value.seqType());
     }
-    if(type != null) exprType.assign(type);
+    if(tp != null) exprType.assign(tp);
     return this;
   }
 }

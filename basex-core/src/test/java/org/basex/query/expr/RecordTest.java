@@ -225,7 +225,7 @@ public final class RecordTest extends SandboxTest {
         type(func, "map(*)"));
 
     check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)", "{\"x\":<x/>}",
-        type(RecordSet.class, "map(xs:string, item())"));
+        type(RecordSet.class, "record(x as item())"));
 
     check("declare record local:x(x, *); local:x(1) => map:put('x', 2)", "{\"x\":2}",
         type(RecordSet.class, "local:x"));

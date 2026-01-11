@@ -71,7 +71,9 @@ public final class ArrayType extends FType {
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(ARRAY, FUNCTION, AtomType.ITEM)) return true;
-    if(type instanceof final ArrayType at) return valueType.instanceOf(at.valueType);
+    if(type instanceof final ArrayType at) {
+      return this != ARRAY && valueType.instanceOf(at.valueType);
+    }
     if(type instanceof final FuncType ft) {
       return valueType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
           ft.argTypes[0].instanceOf(INTEGER_O);

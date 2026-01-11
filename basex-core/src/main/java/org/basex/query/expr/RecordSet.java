@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class RecordSet extends Arr {
-  /** Record type. */
+  /** Type of processed record. */
   private final RecordType type;
   /** Index of record entry (starting with 1). */
   private final int index;
@@ -26,7 +26,7 @@ public final class RecordSet extends Arr {
   /**
    * Constructor.
    * @param info input info (can be {@code null})
-   * @param record record
+   * @param record record expression
    * @param index index of record entry (starting with 1)
    * @param value value to assign
    */
@@ -38,13 +38,15 @@ public final class RecordSet extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    final Expr map = exprs[0], value = exprs[1];
+    final Expr value = exprs[1];
     Type tp = null;
-    final RecordField field = type.fields().value(index);
-    if(value.seqType().instanceOf(field.seqType())) {
+    final SeqType vt = value.seqType(), ft = type.fields().value(index).seqType();
+    if(vt.instanceOf(ft)) {
+      // structure does not change (new value has same type): propagate record type
       tp = type;
-    } else if(map.seqType().type instanceof final MapType mt) {
-      tp = type.union(mt.keyType(), value.seqType());
+    } else {
+      // otherwise, derive new record type
+      tp = cc.qc.shared.record(type.copy(null, type.fields().key(index), vt.union(ft)));
     }
     if(tp != null) exprType.assign(tp);
     return values(false, cc) ? cc.preEval(this) : this;
@@ -57,7 +59,7 @@ public final class RecordSet extends Arr {
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return new RecordSet(info, exprs[0].copy(cc, vm), index, exprs[1].copy(cc, vm));
+    return copyType(new RecordSet(info, exprs[0].copy(cc, vm), index, exprs[1].copy(cc, vm)));
   }
 
   @Override

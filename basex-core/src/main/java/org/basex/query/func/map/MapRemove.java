@@ -32,34 +32,33 @@ public final class MapRemove extends StandardFunc {
     final Expr map = arg(0), key = arg(1);
     if(map == XQMap.empty()) return map;
 
-    Type type = null;
+    Type tp = null;
     final MapCompilation mc = MapCompilation.get(map).key(key);
     if(mc.field != null) {
       if(mc.field.isOptional()) {
         // structure does not change: propagate record type
-        type = mc.record;
+        tp = mc.record;
       } else {
         // otherwise, derive new record type
-        final RecordType rt = cc.qc.shared.record(mc.record.remove(mc.key));
+        final RecordType rt = cc.qc.shared.record(mc.record.copy(mc.key, null, null));
         // return empty map if it will contain no entries
         if(rt.fields().isEmpty() && !rt.isExtensible()) return XQMap.empty();
-        type = rt;
+        tp = rt;
       }
     } else if(mc.validKey) {
       // return input map if nothing changes: map:remove({ 'a': 1 }, 'b') → { 'a': 1 }
       if(!mc.record.isExtensible()) return map;
       // structure does not change: propagate record type
-      type = mc.record;
+      tp = mc.record;
     }
 
-    if(type == null && mc.mapType != null) {
-      // map:get({ 1: 1 }, 'string') → ()
+    if(tp == null && mc.mapType != null) {
+      // map:remove({ 1: 1 }, 'string') → { 1: 1 }
       if(mc.keyMismatch) return map;
-
       // create new map type (potentially assigned record type must not be propagated)
-      type = MapType.get(mc.mapType.keyType(), mc.mapType.valueType());
+      tp = MapType.get(mc.mapType.keyType(), mc.mapType.valueType());
     }
-    if(type != null) exprType.assign(type);
+    if(tp != null) exprType.assign(tp);
     return this;
   }
 }

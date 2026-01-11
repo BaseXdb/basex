@@ -411,28 +411,18 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Removes a field from the record.
-   * @param key name of the field to be removed
-   * @return new record type (unnamed, no annotations)
+   * Creates a copy of the record type.
+   * @param remove key to remove (can be {@code null})
+   * @param put key to add or replace (can be {@code null})
+   * @param seqType sequence type of the field to add or replace (ignored if put is {@code null})
+   * @return new type
    */
-  public RecordType remove(final byte[] key) {
-    final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.size() - 1);
+  public RecordType copy(final byte[] remove, final byte[] put, final SeqType seqType) {
+    final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.size());
     for(final byte[] field : fields) {
-      if(!Token.eq(key, field)) map.put(field, fields.get(field));
+      if(remove == null || !Token.eq(remove, field)) map.put(field, fields.get(field));
     }
-    return new RecordType(map, extensible);
-  }
-
-  /**
-   * Adds a mandatory field to the record.
-   * @param key name of new field
-   * @param st type of new field
-   * @return new record type (unnamed, no annotations)
-   */
-  public RecordType add(final byte[] key, final SeqType st) {
-    final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.size() + 1);
-    for(final byte[] field : fields) map.put(field, fields.get(field));
-    map.put(key, new RecordField(st));
+    if(put != null) map.put(put, new RecordField(seqType));
     return new RecordType(map, extensible);
   }
 
