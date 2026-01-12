@@ -19,7 +19,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -464,16 +463,19 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
 
   @Override
   public void toXml(final QueryPlan plan) {
-    final ArrayList<Object> list = new ArrayList<>();
-    global.forEach((key, value) -> {
-      list.add(key);
-      list.add(value);
-    });
+    if(dontEnter) return;
 
-    final FBuilder elem = plan.create(this);
-    final int arity = arity();
-    for(int a = 0; a < arity; a++) plan.addAttribute(elem, ARG + a, params[a].name.string());
-    plan.add(elem, list.toArray());
+    enter(() -> {
+      final ArrayList<Object> list = new ArrayList<>();
+      list.add(params);
+      global.forEach((key, value) -> {
+        list.add(key);
+        list.add(value);
+      });
+      list.add(expr);
+      plan.add(plan.create(this), list.toArray());
+      return null;
+    });
   }
 
   @Override
