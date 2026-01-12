@@ -79,7 +79,7 @@ public final class QueryJob extends Job implements Runnable {
     // number of scheduled and active tasks must not exceed limit
     final JobPool jobs = context.jobs;
     if(jobs.tasks.size() + jobs.active.size() >= JobPool.MAX_REGISTERED)
-      throw JOBS_OVERFLOW.get(info);
+      throw JOBS_OVERFLOW_X.get(info, JobPool.MAX_REGISTERED);
 
     synchronized(jobs.tasks) {
       // custom job ID: check if it is invalid or has already been assigned
@@ -94,7 +94,9 @@ public final class QueryJob extends Job implements Runnable {
       }
       if(cache) {
         // check if too many query results are cached
-        if(jobs.results.size() >= JobPool.MAX_CACHED) throw JOBS_OVERFLOW.get(info);
+        if(jobs.results.size() >= JobPool.MAX_CACHED) {
+          throw JOBS_CACHED_X.get(info, JobPool.MAX_CACHED);
+        }
         jobs.results.put(id, result);
       }
 
