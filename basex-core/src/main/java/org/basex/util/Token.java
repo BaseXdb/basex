@@ -671,8 +671,9 @@ public final class Token {
    * @return hash code
    */
   public static int hashCode(final byte[] token) {
+    // warning: a change in the hash computation affects existing databases
     final int tl = token.length, s = Math.max(1, tl / MAX_HASH_OPS);
-    int h = 1;
+    int h = 0;
     for(int t = 0; t < tl; t += s) {
       h = h * 31 + token[t];
     }
