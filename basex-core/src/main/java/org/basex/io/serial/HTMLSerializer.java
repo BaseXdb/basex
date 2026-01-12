@@ -179,8 +179,9 @@ final class HTMLSerializer extends MarkupSerializer {
       }
       if(html5 && EMPTIES5.contains(lc)) return;
       sep = false;
-      finishClose();
+      super.finishClose();
     }
+    if(SCRIPTS.contains(lc(elem.local()))) script++;
   }
 
   @Override

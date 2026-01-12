@@ -324,4 +324,17 @@ public final class SerializerTest extends SandboxTest {
 
     query("{ 1: (), 2: 3, 4: (5, 6) }", "{1:(),2:3,4:(5,6)}");
   }
+
+  /** HTML Serialization: escaping entities in multiple script elements. */
+  @Test public void gh2575() {
+    final String option = METHOD.arg("html");
+    contains(option + "<html><script>&amp;&amp;</script></html>", ">&&<");
+
+    contains(option + "<html><style>123</style><script>&amp;&amp;</script></html>", ">&&<");
+    contains(option + "<html><style>&amp;&amp;</style><script>123</script></html>", ">&&<");
+    contains(option + "<html><head><style/></head><script>&amp;&amp;</script></html>", ">&&<");
+
+    contains(option + "<html><style/><script>&amp;&amp;</script></html>", ">&&<");
+    contains(option + "<html><style/><body><script>&amp;&amp;</script></body></html>", ">&&<");
+  }
 }
