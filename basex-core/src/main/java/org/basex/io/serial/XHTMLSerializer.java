@@ -76,9 +76,8 @@ final class XHTMLSerializer extends MarkupSerializer {
 
   @Override
   boolean inline() {
-    return contains(HTMLSerializer.INLINES, closed) ||
-        opening && contains(HTMLSerializer.INLINES, elem) ||
-        super.inline();
+    final TokenSet inlines = html5 ? HTMLSerializer.INLINES5 : HTMLSerializer.INLINES;
+    return contains(inlines, closed) || opening && contains(inlines, elem) || super.inline();
   }
 
   @Override

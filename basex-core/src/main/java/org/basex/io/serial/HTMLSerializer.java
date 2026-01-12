@@ -18,63 +18,48 @@ import org.basex.util.hash.*;
  */
 final class HTMLSerializer extends MarkupSerializer {
   /** (X)HTML: elements with an empty content model. */
-  static final TokenSet EMPTIES;
+  static final TokenSet EMPTIES = new TokenSet("area", "base", "basefont", "br", "col", "embed",
+      "frame", "hr", "img", "input", "isindex", "link", "meta", "param");
   /** HTML5: elements with an empty content model. */
-  static final TokenSet EMPTIES5;
+  static final TokenSet EMPTIES5 = new TokenSet("area", "base", "br", "col", "command", "embed",
+      "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
   /** (X)HTML: formatted elements. */
-  static final TokenSet FORMATTEDS;
+  static final TokenSet FORMATTEDS = new TokenSet("pre", "script", "style", "textarea", "title");
   /** (X)HTML: inline elements. */
-  static final TokenSet INLINES;
+  static final TokenSet INLINES = new TokenSet("a", "abbr", "acronym", "b", "bdo", "big", "br",
+      "button", "cite", "code", "dfn", "em", "i", "img", "input", "kbd", "label", "map", "object",
+      "q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "sub", "sup",
+      "textarea", "tt", "u", "var");
+  /** HTML5: inline elements. */
+  static final TokenSet INLINES5 = new TokenSet("a", "abbr", "area", "audio", "b", "bdi", "bdo",
+      "br", "button", "canvas", "cite", "code", "data", "datalist", "dfn", "em", "embed", "i",
+      "img", "input", "kbd", "keygen", "label", "map", "mark", "math", "meter", "noscript",
+      "object", "output", "picture", "progress", "q", "rp", "rt", "ruby", "s", "samp", "select",
+      "small", "span", "strong", "sub", "sup", "svg", "textarea", "time", "u", "var", "video",
+      "wbr");
   /** (X)HTML: URI attributes. */
-  static final TokenSet URIS;
-
+  static final TokenSet URIS = new TokenSet("a@href", "a@name", "applet@codebase", "area@href",
+      "base@href", "blockquote@cite", "body@background", "button@datasrc", "del@cite",
+      "div@datasrc", "form@action", "frame@longdesc", "frame@src", "head@profile",
+      "iframe@longdesc", "iframe@src", "img@longdesc", "img@src", "img@usemap", "input@datasrc",
+      "input@src", "input@usemap", "ins@cite", "link@href", "object@archive", "object@classid",
+      "object@codebase", "object@data", "object@datasrc", "object@usemap", "q@cite", "script@for",
+      "script@src", "select@datasrc", "span@datasrc", "table@datasrc", "textarea@datasrc");
   /** HTML: script elements. */
-  private static final TokenSet SCRIPTS;
+  private static final TokenSet SCRIPTS = new TokenSet("script", "style");
   /** HTML: boolean attributes. */
-  private static final TokenSet BOOLEAN;
-
-  // HTML Serializer: cache elements
-  static {
-    // script elements
-    SCRIPTS = new TokenSet("script", "style");
-    // boolean attributes
-    BOOLEAN = new TokenSet("area@nohref", "audio@autoplay", "audio@controls",
-        "audio@loop", "audio@muted", "button@disabled", "button@autofocus", "button@formnovalidate",
-        "details@open", "dialog@open", "dir@compact", "dl@compact", "fieldset@disabled",
-        "form@novalidate", "frame@noresize", "hr@noshade", "img@ismap", "input@checked",
-        "input@disabled", "input@multiple", "input@readonly", "input@required", "input@autofocus",
-        "input@formnovalidate", "iframe@seamless", "keygen@autofocus", "keygen@disabled",
-        "menu@compact", "object@declare", "object@typemustmatch", "ol@compact", "ol@reversed",
-        "optgroup@disabled", "option@selected", "option@disabled", "script@defer", "script@async",
-        "select@multiple", "select@disabled", "select@autofocus", "select@required", "style@scoped",
-        "td@nowrap", "textarea@disabled", "textarea@readonly", "textarea@autofocus",
-        "textarea@required", "th@nowrap", "track@default", "ul@compact", "video@autoplay",
-        "video@controls", "video@loop", "video@muted");
-    // elements with an empty content model
-    EMPTIES = new TokenSet("area", "base", "basefont", "br", "col", "embed", "frame",
-        "hr", "img", "input", "isindex", "link", "meta", "param");
-    // elements with an empty content model
-    EMPTIES5 = new TokenSet("area", "base", "br", "col", "command", "embed", "hr",
-        "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr");
-    // formatted elements
-    FORMATTEDS = new TokenSet("pre", "script", "style", "textarea", "title");
-    // inline elements
-    INLINES = new TokenSet("a", "abbr", "acronym", "applet", "area", "audio", "b", "basefont",
-        "bdi", "bdo", "big", "br", "button", "canvas", "cite", "code", "data", "datalist", "del",
-        "dfn", "em", "embed", "font", "i", "iframe", "img", "input", "ins", "kbd", "label", "link",
-        "map", "mark", "math", "meta", "meter", "noscript", "object", "output", "picture",
-        "progress", "q", "ruby", "s", "samp", "script", "select", "slot", "small", "span", "strike",
-        "strong", "sub", "sup", "svg", "template", "textarea", "time", "tt", "u", "var", "video",
-        "wbr");
-    // URI attributes
-    URIS = new TokenSet("a@href", "a@name", "applet@codebase", "area@href",
-        "base@href", "blockquote@cite", "body@background", "button@datasrc", "del@cite",
-        "div@datasrc", "form@action", "frame@longdesc", "frame@src", "head@profile",
-        "iframe@longdesc", "iframe@src", "img@longdesc", "img@src", "img@usemap", "input@datasrc",
-        "input@src", "input@usemap", "ins@cite", "link@href", "object@archive", "object@classid",
-        "object@codebase", "object@data", "object@datasrc", "object@usemap", "q@cite", "script@for",
-        "script@src", "select@datasrc", "span@datasrc", "table@datasrc", "textarea@datasrc");
-  }
+  private static final TokenSet BOOLEAN = new TokenSet("area@nohref", "audio@autoplay",
+      "audio@controls", "audio@loop", "audio@muted", "button@disabled", "button@autofocus",
+      "button@formnovalidate", "details@open", "dialog@open", "dir@compact", "dl@compact",
+      "fieldset@disabled", "form@novalidate", "frame@noresize", "hr@noshade", "img@ismap",
+      "input@checked", "input@disabled", "input@multiple", "input@readonly", "input@required",
+      "input@autofocus", "input@formnovalidate", "iframe@seamless", "keygen@autofocus",
+      "keygen@disabled", "menu@compact", "object@declare", "object@typemustmatch", "ol@compact",
+      "ol@reversed", "optgroup@disabled", "option@selected", "option@disabled", "script@defer",
+      "script@async", "select@multiple", "select@disabled", "select@autofocus", "select@required",
+      "style@scoped", "td@nowrap", "textarea@disabled", "textarea@readonly", "textarea@autofocus",
+      "textarea@required", "th@nowrap", "track@default", "ul@compact", "video@autoplay",
+      "video@controls", "video@loop", "video@muted");
 
   /**
    * Constructor, specifying serialization options.
@@ -201,8 +186,9 @@ final class HTMLSerializer extends MarkupSerializer {
 
   @Override
   boolean inline() {
-    return INLINES.contains(lc(closed.local())) ||
-        opening && INLINES.contains(lc(elem.local())) ||
+    final TokenSet inlines = html5 ? INLINES5 : INLINES;
+    return inlines.contains(lc(closed.local())) ||
+        opening && inlines.contains(lc(elem.local())) ||
         super.inline();
   }
 

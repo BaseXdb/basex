@@ -337,4 +337,19 @@ public final class SerializerTest extends SandboxTest {
     contains(option + "<html><style/><script>&amp;&amp;</script></html>", ">&&<");
     contains(option + "<html><style/><body><script>&amp;&amp;</script></body></html>", ">&&<");
   }
+
+  /** HTML5 indentation. */
+  @Test public void indentHTML5() {
+    final String option = METHOD.arg("html") + INDENT.arg("on");
+    query(option + "<html/>",
+        "<!DOCTYPE HTML>\n<html></html>");
+    query(option + "<html><head/></html>",
+        "<!DOCTYPE HTML>\n<html>\n  <head>\n    <meta charset=\"UTF-8\">\n  </head>\n</html>");
+    query(option + "<html><script/></html>",
+        "<!DOCTYPE HTML>\n<html>\n  <script></script>\n</html>");
+    query(option + "<html><meta/></html>",
+        "<!DOCTYPE HTML>\n<html>\n  <meta>\n</html>");
+    query(option + "<html><meta/><meta/></html>",
+        "<!DOCTYPE HTML>\n<html>\n  <meta>\n  <meta>\n</html>");
+  }
 }
