@@ -101,17 +101,15 @@ public final class Lookup extends Arr {
 
       // multiple deterministic keys, inputs are values or variable references
       if(ks != -1 && (input instanceof Value || input instanceof VarRef)) {
-        if(is == 1) {
-          // single input:  INPUT?KEYS → KEYS ! REWRITE(INPUT, .)
-          return SimpleMap.get(cc, info, keys,
-              cc.get(keys, true, () -> rewrite.apply(input, ContextValue.get(cc, info))));
-        }
-        // multiple inputs:  INPUTS?KEYS → for $item in INPUTS return KEYS ! REWRITE($item, .)
-        final Var var = cc.vs().addNew(new QNm("item"), null, cc.qc, info);
-        final For fr = new For(var, input).optimize(cc);
-        final Expr ex = cc.get(keys, true, () ->
-          rewrite.apply(new VarRef(info, var).optimize(cc), ContextValue.get(cc, info)));
-        return new GFLWOR(info, fr, SimpleMap.get(cc, info, keys, ex)).optimize(cc);
+        // single input:  INPUT?KEYS → KEYS ! REWRITE(INPUT, .)
+        if(is == 1) return SimpleMap.get(cc, info, keys,
+            cc.get(keys, true, () -> rewrite.apply(input, ContextValue.get(cc, info))));
+        // multiple inputs:  INPUT?KEYS → for $item in INPUT return KEYS ! REWRITE($item, .)
+        final FLWORBuilder flwor = new FLWORBuilder(1, cc, info);
+        final Expr next = cc.get(keys, true, () ->
+          rewrite.apply(flwor.ref(flwor.item), ContextValue.get(cc, info)));
+        final Expr rtrn = SimpleMap.get(cc, info, keys, next);
+        return flwor.finish(input, null, rtrn);
       }
     }
     return this;

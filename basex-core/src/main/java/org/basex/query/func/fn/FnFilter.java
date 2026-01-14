@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
@@ -10,8 +8,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -22,7 +18,8 @@ import org.basex.util.hash.*;
 public final class FnFilter extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = arg(0).iter(qc);
+    // implementation for dynamic function lookup
+   final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
     final HofArgs args = new HofArgs(2, predicate);
@@ -38,31 +35,13 @@ public final class FnFilter extends StandardFunc {
     final Expr input = arg(0), predicate = arg(1);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
-
     final int arity = arity(predicate);
-    if(arity == 1) {
-      // INPUT[PREDICATE(.)]
-      final Expr pred = cc.get(input, true, () ->
-        new DynFuncCall(info, coerceFunc(1, cc, 1), ContextValue.get(cc, info)).optimize(cc)
-      );
-      return Filter.get(cc, info, input, pred);
-    } else if(arity == 2) {
-      // for $i at $p in INPUT where PREDICATE($i, $p) return $i
-      final IntObjectMap<Var> vm = new IntObjectMap<>();
-      final LinkedList<Clause> clauses = new LinkedList<>();
+    if(arity == -1) return this;
 
-      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
-      final Var p = cc.copy(new Var(new QNm("pos"), Types.INTEGER_O, cc.qc, info), vm);
-      clauses.add(new For(i, p, null, input, false).optimize(cc));
-
-      final Expr pred = coerceFunc(1, cc);
-      final Expr item = new VarRef(info, i).optimize(cc);
-      final Expr pos = new VarRef(info, p).optimize(cc);
-      final Expr dfc = new DynFuncCall(info, pred, item, pos).optimize(cc);
-      clauses.add(new Where(dfc, info).optimize(cc));
-
-      return new GFLWOR(info, clauses, new VarRef(info, i).optimize(cc)).optimize(cc);
-    }
-    return this;
+    // for $item at $pos in INPUT where PREDICATE($item, $pos) return $item
+    final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
+    final Expr where = flwor.function(this, 1, false);
+    final Expr rtrn = flwor.ref(flwor.item);
+    return flwor.finish(input, where, rtrn);
   }
 }

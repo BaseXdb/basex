@@ -1569,6 +1569,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" ()", " boolean#1"), "");
     query(func.args(0, " boolean#1"), "");
     query(func.args(1, " boolean#1"), 1);
+    query(func.args(0, " true#0"), 1);
+    query(func.args(0, " false#0"), "");
     query(func.args(" (0, 4, 9)", " boolean#1"), "2\n3");
     query(func.args(" 1 to 9", " function($n) { $n mod 5 = 0 }"), 5);
     query(func.args(MONTHS, " contains(?, 'z')"), "");

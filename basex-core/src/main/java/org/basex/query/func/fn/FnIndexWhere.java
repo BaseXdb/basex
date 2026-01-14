@@ -1,7 +1,5 @@
 package org.basex.query.func.fn;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
@@ -11,8 +9,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
-import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -24,6 +20,7 @@ import org.basex.util.list.*;
 public final class FnIndexWhere extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
     final FItem predicate = toFunction(arg(1), 2, qc);
 
@@ -40,25 +37,13 @@ public final class FnIndexWhere extends StandardFunc {
     final Expr input = arg(0), predicate = arg(1);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
-
     final int arity = arity(predicate);
-    if(arity >= 1) {
-      // for $i at $p in INPUT where PREDICATE($i, $p) return $p
-      final IntObjectMap<Var> vm = new IntObjectMap<>();
-      final LinkedList<Clause> clauses = new LinkedList<>();
+    if(arity == -1) return this;
 
-      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
-      final Var p = cc.copy(new Var(new QNm("pos"), Types.INTEGER_O, cc.qc, info), vm);
-      clauses.add(new For(i, p, null, input, false).optimize(cc));
-
-      final Expr item = new VarRef(info, i).optimize(cc);
-      final Expr pos = new VarRef(info, p).optimize(cc);
-      final Expr[] args = arity == 1 ? new Expr[] { item } : new Expr[] { item, pos };
-      final Expr dfc = new DynFuncCall(info, coerceFunc(1, cc, arity), args).optimize(cc);
-      clauses.add(new Where(dfc, info).optimize(cc));
-
-      return new GFLWOR(info, clauses, new VarRef(info, p).optimize(cc)).optimize(cc);
-    }
-    return this;
+    // for $item at $pos in INPUT where PREDICATE($item, $pos) return $pos
+    final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
+    final Expr where = flwor.function(this, 1, false);
+    final Expr rtrn = flwor.ref(flwor.pos);
+    return flwor.finish(input, where, rtrn);
   }
 }

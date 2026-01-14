@@ -6,13 +6,9 @@ import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.func.update.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.var.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -23,6 +19,7 @@ import org.basex.util.hash.*;
 public class FnForEach extends StandardFunc {
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
+    // implementation for dynamic function lookup
     final Iter input = arg(0).iter(qc);
     final FItem action = toFunction(arg(1), 2, this instanceof UpdateForEach, qc);
 
@@ -39,23 +36,12 @@ public class FnForEach extends StandardFunc {
     final Expr input = arg(0), action = arg(1);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
-
     final int arity = arity(action);
-    if(arity == 1 || arity == 2) {
-      // for $i in INPUT return ACTION($i)
-      // for $i at $p in INPUT return ACTION($i, $p)
-      final IntObjectMap<Var> vm = new IntObjectMap<>();
-      final Var i = cc.copy(new Var(new QNm("item"), null, cc.qc, info), vm);
-      final Var p = arity != 1 ? cc.copy(new Var(new QNm("pos"), null, cc.qc, info), vm) : null;
-      final For fr = new For(i, p, null, input, false).optimize(cc);
+    if(arity == -1) return this;
 
-      final Expr act = coerceFunc(1, cc, arity);
-      final boolean updating = this instanceof UpdateForEach, ndt = act.has(Flag.NDT);
-      final ExprList args = new ExprList(new VarRef(info, i).optimize(cc));
-      if(arity == 2) args.add(new VarRef(info, p).optimize(cc));
-      final Expr rtrn = new DynFuncCall(info, updating, ndt, act, args.finish()).optimize(cc);
-      return new GFLWOR(info, fr, rtrn).optimize(cc);
-    }
-    return this;
+    // for $item at $pos in INPUT return ACTION($item, $pos)
+    final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
+    final Expr rtrn = flwor.function(this, 1, this instanceof UpdateForEach);
+    return flwor.finish(input, null, rtrn);
   }
 }
