@@ -524,8 +524,9 @@ public abstract class Formatter extends FormatUtil {
    */
   private static void alpha(final TokenBuilder tb, final long n, final String a) {
     final int al = a.length();
-    if(n > al) alpha(tb, (n - 1) / al, a);
-    if(n > 0) tb.add(a.charAt((int) ((n - 1) % al)));
+    final long m = n < 0 ? -1 - n : n - 1;
+    if(m >= al) alpha(tb, m / al, a);
+    if(m >= 0) tb.add(a.charAt((int) (m % al)));
     else tb.add('0');
   }
 
