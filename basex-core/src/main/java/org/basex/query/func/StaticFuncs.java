@@ -239,7 +239,14 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   QueryException similarError(final QNm qname, final InputInfo info) {
     // check local functions
     final QNmSet names = new QNmSet();
-    for(final StaticFunc func : this) if(func.expr != null) names.add(func.name);
+    if(info != null) {
+      for(final StaticFunc func : this) {
+        if(func.expr != null && (!func.anns.contains(Annotation.PRIVATE)
+            || Token.eq(QNm.uri(info.sc().module), QNm.uri(func.sc.module)))) {
+          names.add(func.name);
+        }
+      }
+    }
     final QNm similar = (QNm) Levenshtein.similar(qname.local(), names.keys(),
         o -> ((QNm) o).local());
 
