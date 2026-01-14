@@ -43,7 +43,7 @@ public final class FnSubsequenceWhere extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    return iterValue(qc);
   }
 
   @Override

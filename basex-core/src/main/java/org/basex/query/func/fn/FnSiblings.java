@@ -38,7 +38,7 @@ public final class FnSiblings extends ContextFn {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    return iterValue(qc);
   }
 
   @Override

@@ -42,7 +42,7 @@ public final class HofScanLeft extends StandardFunc {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    return iterValue(qc);
   }
 
   @Override

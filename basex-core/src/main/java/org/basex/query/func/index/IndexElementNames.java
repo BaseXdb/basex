@@ -26,7 +26,7 @@ public class IndexElementNames extends IndexFn {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    return iterValue(qc);
   }
 
   /**

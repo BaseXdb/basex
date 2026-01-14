@@ -21,7 +21,7 @@ public final class DbAttributeRange extends DbTextRange {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
+    return iterValue(qc);
   }
 
   @Override

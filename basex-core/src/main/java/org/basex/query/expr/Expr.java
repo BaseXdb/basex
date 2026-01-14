@@ -89,6 +89,18 @@ public abstract class Expr extends ExprInfo {
   public abstract Item item(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
+   * Default implementation for returning the result of an iterator.
+   * This method can be called by {@link #value(QueryContext)} if {@link #iter(QueryContext)} is
+   * implemented and {@link #item(QueryContext, InputInfo)} is not.
+   * @param qc query context
+   * @return value
+   * @throws QueryException query exception
+   */
+  public final Value iterValue(final QueryContext qc) throws QueryException {
+    return iter(qc).value(qc, this);
+  }
+
+  /**
    * Evaluates the expression and returns an iterator on the resulting, atomized items.
    * @param qc query context
    * @param ii input info (can be {@code null}; required for those {@link Value} instances
