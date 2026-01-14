@@ -44,9 +44,4 @@ public final class FnTransitiveClosure extends StandardFunc {
     final Expr node = arg(0);
     return node.seqType().zero() ? node : this;
   }
-
-  @Override
-  public int hofIndex() {
-    return 1;
-  }
 }

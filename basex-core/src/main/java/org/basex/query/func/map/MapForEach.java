@@ -68,9 +68,4 @@ public class MapForEach extends StandardFunc {
 
     return this;
   }
-
-  @Override
-  public final int hofIndex() {
-    return 1;
-  }
 }

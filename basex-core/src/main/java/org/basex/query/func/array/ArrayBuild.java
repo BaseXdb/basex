@@ -50,9 +50,4 @@ public final class ArrayBuild extends StandardFunc {
   public long structSize() {
     return arg(0).size();
   }
-
-  @Override
-  public int hofIndex() {
-    return 1;
-  }
 }

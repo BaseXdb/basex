@@ -87,9 +87,4 @@ public class FnSortWith extends StandardFunc {
     // count(sort(A)) → count(A)
     return cc.simplify(this, mode == Simplify.COUNT ? arg(0) : this, mode);
   }
-
-  @Override
-  public int hofIndex() {
-    return 1;
-  }
 }

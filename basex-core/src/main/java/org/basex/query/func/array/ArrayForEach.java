@@ -50,9 +50,4 @@ public final class ArrayForEach extends ArrayFn {
   public long structSize() {
     return structSize(0);
   }
-
-  @Override
-  public int hofIndex() {
-    return 1;
-  }
 }

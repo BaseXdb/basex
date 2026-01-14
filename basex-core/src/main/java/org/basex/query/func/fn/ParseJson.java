@@ -38,6 +38,11 @@ public abstract class ParseJson extends ParseFn {
   }
 
   @Override
+  public final int hofOffsets() {
+    return defined(1) ? Integer.MAX_VALUE : 0;
+  }
+
+  @Override
   final Value parse(final TextInput ti, final Options options, final QueryContext qc)
       throws QueryException, IOException {
 

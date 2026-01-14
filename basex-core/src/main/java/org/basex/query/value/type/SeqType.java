@@ -467,6 +467,14 @@ public final class SeqType {
   }
 
   /**
+   * Tests if expressions of this type may yield maps.
+   * @return result of check
+   */
+  public boolean mayBeMap() {
+    return !zero() && (type instanceof ArrayType || Types.MAP.instanceOf(type));
+  }
+
+  /**
    * Tests if expressions of this type may yield functions.
    * @return result of check
    */

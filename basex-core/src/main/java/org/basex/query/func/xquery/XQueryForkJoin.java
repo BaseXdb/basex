@@ -75,9 +75,4 @@ public final class XQueryForkJoin extends StandardFunc {
     }
     return this;
   }
-
-  @Override
-  public int hofIndex() {
-    return 0;
-  }
 }

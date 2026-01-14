@@ -25,9 +25,4 @@ public final class CacheGetOrPut extends CacheFn {
     }
     return value;
   }
-
-  @Override
-  public int hofIndex() {
-    return 1;
-  }
 }

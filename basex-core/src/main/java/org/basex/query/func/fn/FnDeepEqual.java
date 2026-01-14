@@ -59,4 +59,9 @@ public final class FnDeepEqual extends StandardFunc {
     }
     return this;
   }
+
+  @Override
+  public int hofOffsets() {
+    return arg(2).seqType().mayBeMap() ? Integer.MAX_VALUE : 0;
+  }
 }

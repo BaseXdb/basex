@@ -46,9 +46,4 @@ public final class FnTakeWhile extends StandardFunc {
     exprType.assign(st.union(Occ.ZERO)).data(input);
     return this;
   }
-
-  @Override
-  public int hofIndex() {
-    return 1;
-  }
 }

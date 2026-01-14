@@ -88,9 +88,4 @@ public final class FnSort extends FnSortBy {
     final boolean[] invert = { false };
     return index(values, keys, collations, invert, qc);
   }
-
-  @Override
-  public int hofIndex() {
-    return 2;
-  }
 }

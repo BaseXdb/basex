@@ -97,7 +97,7 @@ public final class FnReplace extends RegExFn {
   }
 
   @Override
-  public int hofIndex() {
-    return 2;
+  public int hofOffsets() {
+    return arg(2).seqType().mayBeFunction() ? hofOffset(2) : 0;
   }
 }

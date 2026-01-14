@@ -169,8 +169,8 @@ public class MapMerge extends StandardFunc {
   }
 
   @Override
-  public int hofIndex() {
-    return defined(1) ? Integer.MAX_VALUE : -1;
+  public int hofOffsets() {
+    return defined(1) ? Integer.MAX_VALUE : 0;
   }
 
   /**

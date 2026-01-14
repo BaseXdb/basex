@@ -56,9 +56,4 @@ public final class ArrayForEachPair extends ArrayFn {
     final long as1 = structSize(0), as2 = structSize(1);
     return as1 != -1 && as2 != -1 ? Math.min(as1, as2) : -1;
   }
-
-  @Override
-  public int hofIndex() {
-    return 2;
-  }
 }

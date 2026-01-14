@@ -104,9 +104,4 @@ public class FnLowest extends StandardFunc {
     }
     return adoptType(input);
   }
-
-  @Override
-  public final int hofIndex() {
-    return 2;
-  }
 }

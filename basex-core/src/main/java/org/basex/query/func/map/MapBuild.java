@@ -73,8 +73,7 @@ public final class MapBuild extends MapMerge {
   }
 
   @Override
-  public int hofIndex() {
-    final boolean key = defined(1), value = defined(2), options = defined(3);
-    return options || key && value ? Integer.MAX_VALUE : key ? 1 : value ? 2 : -1;
+  public int hofOffsets() {
+    return defined(3) ? Integer.MAX_VALUE : hofOffset(1) | hofOffset(2);
   }
 }

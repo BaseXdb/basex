@@ -75,9 +75,4 @@ public class FnApply extends StandardFunc {
     if(ar > as) throw APPLY_X_X.get(info, arguments(as), func, args);
     return func.invoke(qc, info, args.finish());
   }
-
-  @Override
-  public int hofIndex() {
-    return 0;
-  }
 }

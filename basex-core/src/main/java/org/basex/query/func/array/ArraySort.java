@@ -37,11 +37,6 @@ public final class ArraySort extends ArraySortBy {
   }
 
   @Override
-  public int hofIndex() {
-    return 2;
-  }
-
-  @Override
   public long structSize() {
     final Expr expr1 = arg(0);
     return expr1.seqType().instanceOf(Types.ARRAY_O) ? expr1.structSize() : -1;

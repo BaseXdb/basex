@@ -86,9 +86,4 @@ public class FnForEachPair extends StandardFunc {
     }
     return this;
   }
-
-  @Override
-  public final int hofIndex() {
-    return 2;
-  }
 }

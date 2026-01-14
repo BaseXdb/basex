@@ -25,9 +25,4 @@ public final class StoreGetOrPut extends StoreFn {
     }
     return value;
   }
-
-  @Override
-  public int hofIndex() {
-    return 1;
-  }
 }

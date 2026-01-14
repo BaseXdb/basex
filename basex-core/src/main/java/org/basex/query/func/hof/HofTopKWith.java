@@ -66,9 +66,4 @@ public final class HofTopKWith extends StandardFunc {
       }
     };
   }
-
-  @Override
-  public int hofIndex() {
-    return 1;
-  }
 }

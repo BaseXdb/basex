@@ -51,9 +51,4 @@ public class FnScanLeft extends StandardFunc {
     final Expr input = arg(0), init = arg(1);
     return input.seqType().zero() ? init : this;
   }
-
-  @Override
-  public final int hofIndex() {
-    return 2;
-  }
 }

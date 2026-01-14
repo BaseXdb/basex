@@ -71,9 +71,4 @@ public class FnPartialApply extends StandardFunc {
     return new FuncItem(info, funcCall, params, AnnList.EMPTY, FuncType.get(ft.declType, argTypes),
         params.length, null);
   }
-
-  @Override
-  public int hofIndex() {
-    return 0;
-  }
 }

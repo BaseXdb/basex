@@ -178,13 +178,11 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final boolean has(final Flag... flags) {
-    // check function
-    int hof = hofIndex();
-    if(hof >= 0 && hof < Integer.MAX_VALUE && !defined(hof)) hof = -1;
+    final int ho = hofOffsets();
     for(final Flag flag : flags) {
       switch(flag) {
         case HOF:
-          if(hof >= 0) return true;
+          if(ho > 0) return true;
           continue;
         case UPD:
           if(hasUPD()) return true;
@@ -193,20 +191,18 @@ public abstract class StandardFunc extends Arr {
           if(hasCTX()) return true;
           break;
         case NDT:
-          // check whether function argument may contain non-deterministic functions
-          if(hof == Integer.MAX_VALUE) return true;
-          if(hof >= 0) {
-            if(!(arg(hof) instanceof final Value value)) return true;
-            for(final Item item : value) {
-              if(!(item instanceof final FuncItem fi) || fi.expr.has(Flag.NDT)) return true;
-            }
+          // check whether function arguments may contain non-deterministic code
+          final int al = args().length;
+          for(int a = 0; a < al; a++) {
+            if((ho & (1 << a)) != 0 && (!(arg(a) instanceof final Item item) ||
+                !(item instanceof final FuncItem fi) || fi.expr.has(Flag.NDT))) return true;
           }
           break;
         default:
       }
       if(definition.has(flag)) return true;
     }
-    // check arguments (without function invocation; it only applies to function itself)
+    // check arguments (without function invocation; it only applies to the function itself)
     return super.has(Flag.remove(flags, Flag.HOF));
   }
 
@@ -216,7 +212,7 @@ public abstract class StandardFunc extends Arr {
    */
   public boolean hasUPD() {
     // mix updates: higher-order function may be updating
-    return definition.has(Flag.UPD) || sc().mixUpdates && hofIndex() >= 0;
+    return definition.has(Flag.UPD) || sc().mixUpdates && hofOffsets() > 0;
   }
 
   /**
@@ -228,13 +224,30 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Returns the index of a single higher-order function parameter.
-   * Used to assess further properties of a function item, e.g. if its body is nondeterministic.
-   * @return index, {@code -1} if no HOF parameter exists, or {@code Integer#MAX_VALUE} if the
-   *   number cannot be returned or if multiple HOF parameters exist
+   * Returns the offsets to possible higher-order function arguments.
+   * Used to assess further properties, e.g. if a function is nondeterministic.
+   * @return bit offsets to function arguments (1: first argument, 2: second argument, 4: ...),
+   *   {@code 0} if no HOF parameter exists, or
+   *   {@code Integer#MAX_VALUE} if the functions cannot be accessed via offsets
    */
-  public int hofIndex() {
-    return definition.has(Flag.HOF) ? Integer.MAX_VALUE : -1;
+  protected int hofOffsets() {
+    if(definition.has(Flag.HOF)) return Integer.MAX_VALUE;
+    int bits = 0;
+    final int tl = definition.types.length;
+    for(int t = 0; t < tl; t++) {
+      if(definition.types[t].type instanceof FuncType) bits |= hofOffset(t);
+    }
+    return bits;
+  }
+
+  /**
+   * Returns a higher-order bit offset for the specified argument if it is present.
+   * @param i index of argument
+   * @return bit offset or {@code 0}
+   * @see #hofOffsets
+   */
+  protected final int hofOffset(final int i) {
+    return defined(i) ? 1 << i : 0;
   }
 
   @Override

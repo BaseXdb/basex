@@ -67,9 +67,4 @@ public final class FnPartition extends StandardFunc {
     exprType.assign(ArrayType.get(mt));
     return this;
   }
-
-  @Override
-  public int hofIndex() {
-    return 1;
-  }
 }
