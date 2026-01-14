@@ -183,7 +183,7 @@ public class QueryParser extends InputParser {
       wsCheck(MODULE);
       wsCheck(NAMESPACE);
       skipWs();
-      final byte[] prefix = ncName(NONAME_X);
+      final byte[] prefix = ncName(NONAME_X, false);
       wsCheck("=");
       final byte[] uri = uriLiteral();
       if(uri.length == 0) throw error(NSMODURI);
@@ -524,7 +524,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void namespaceDecl() throws QueryException {
-    final byte[] prefix = ncName(NONAME_X);
+    final byte[] prefix = ncName(NONAME_X, false);
     wsCheck("=");
     final byte[] uri = uriLiteral();
     if(sc.ns.staticURI(prefix) != null) throw error(DUPLNSDECL_X, prefix);
@@ -662,7 +662,7 @@ public class QueryParser extends InputParser {
     // collect all property declarations
     while(true) {
       skipWs();
-      final String prop = string(ncName(null));
+      final String prop = string(ncName(null, false));
       if(prop.isEmpty()) break;
       wsCheck("=");
       if(dfo.get(prop) != null) throw error(DECDUPLPROP_X, prop);
@@ -705,7 +705,7 @@ public class QueryParser extends InputParser {
   private void schemaImport() throws QueryException {
     byte[] prefix = null;
     if(wsConsumeWs(NAMESPACE)) {
-      prefix = ncName(NONAME_X);
+      prefix = ncName(NONAME_X, false);
       if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
       wsCheck("=");
     } else if(wsConsumeWs(DEFAULT)) {
@@ -726,7 +726,7 @@ public class QueryParser extends InputParser {
   private void moduleImport() throws QueryException {
     byte[] prefix = EMPTY;
     if(wsConsumeWs(NAMESPACE)) {
-      prefix = ncName(NONAME_X);
+      prefix = ncName(NONAME_X, false);
       wsCheck("=");
     }
 
@@ -1005,7 +1005,7 @@ public class QueryParser extends InputParser {
           extensible = true;
           break;
         }
-        final byte[] name = ncName(NONCNAME_X);
+        final byte[] name = ncName(NONCNAME_X, false);
         final boolean optional = wsConsume("?");
         final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
         if(fields.contains(name)) throw error(DUPFIELD_X, name);
@@ -2448,7 +2448,7 @@ public class QueryParser extends InputParser {
       p = pos;
       if(consume(':') && !consume('*')) {
         // name test: *:name
-        return new NameTest(new QNm(ncName(QNAME_X)), NameTest.Scope.LOCAL, type, sc.elemNS);
+        return new NameTest(new QNm(ncName(QNAME_X, true)), NameTest.Scope.LOCAL, type, sc.elemNS);
       }
       // name test: *
       pos = p;
@@ -2568,7 +2568,7 @@ public class QueryParser extends InputParser {
   private Expr methodCall(final Expr expr) throws QueryException {
     skipWs();
     final InputInfo info = info();
-    final Str key = Str.get(ncName(NONCNAME_X));
+    final Str key = Str.get(ncName(NONCNAME_X, false));
     final int s = localVars.openScope();
     final For fr = new For(localVars.add(new Var(new QNm("method"), null, qc, info)), expr);
     final VarRef arg = new VarRef(info, fr.var);
@@ -2624,7 +2624,7 @@ public class QueryParser extends InputParser {
     if(cp == '.' && !digit(next())) return contextValue();
 
     final Expr expr = literal();
-    return expr != null ? expr : Str.get(ncName(KEYSPEC_X));
+    return expr != null ? expr : Str.get(ncName(KEYSPEC_X, false));
   }
 
   /**
@@ -3313,7 +3313,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr dirPI() throws QueryException {
-    final byte[] name = ncName(NOPINAME);
+    final byte[] name = ncName(NOPINAME, false);
     if(eq(lc(name), XML)) throw error(PIXML_X, name);
 
     final boolean space = skipWs();
@@ -3436,7 +3436,7 @@ public class QueryParser extends InputParser {
     if(qname) return eQName(SKIPCHECK, null);
 
     // parse name enclosed in quotes
-    final byte[] string = ncName(null);
+    final byte[] string = ncName(null, false);
     return string.length != 0 ? Str.get(string) : null;
   }
 
@@ -3608,7 +3608,7 @@ public class QueryParser extends InputParser {
         do {
           extensible = wsConsume("*");
           if(extensible) break;
-          final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X);
+          final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X, false);
           final boolean optional = wsConsume("?");
           final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
           if(fields.contains(name)) throw error(DUPFIELD_X, name);
@@ -3738,7 +3738,7 @@ public class QueryParser extends InputParser {
     if(quote(current())) {
       name = trim(stringLiteral());
       if(!XMLToken.isNCName(name)) throw error(INVNCNAME_X, name);
-    } else if(ncName()) {
+    } else if(ncName(false)) {
       name = token.toArray();
     } else {
       return null;
@@ -4377,12 +4377,13 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "NCName" rule.
    * @param error optional error message
+   * @param qnmPfx allow NCName as a QName prefix
    * @return name (empty if no token was found)
    * @throws QueryException query exception
    */
-  private byte[] ncName(final QueryError error) throws QueryException {
+  private byte[] ncName(final QueryError error, final boolean qnmPfx) throws QueryException {
     token.reset();
-    if(ncName()) return token.toArray();
+    if(ncName(qnmPfx)) return token.toArray();
     if(error != null) throw error(error, currentAsString());
     return EMPTY;
   }
@@ -4398,10 +4399,10 @@ public class QueryParser extends InputParser {
     // parse URIQualifiedName
     final int p = pos;
     if(consume("Q{")) {
-      final byte[] uri = bracedURILiteral(), name1 = ncName(null);
+      final byte[] uri = bracedURILiteral(), name1 = ncName(null, true);
       if(name1.length != 0) {
         if(!consume(':')) return new QNm(name1, uri);
-        final byte[] name2 = ncName(null);
+        final byte[] name2 = ncName(null, true);
         if(name2.length != 0) {
           if(uri.length == 0) throw error(PREFIXNOURI_X, name2);
           return new QNm(name1, name2, uri);
@@ -4435,7 +4436,7 @@ public class QueryParser extends InputParser {
    */
   private byte[] qName(final QueryError error) throws QueryException {
     token.reset();
-    if(!ncName()) {
+    if(!ncName(true)) {
       if(error != null) throw error(error, currentAsString());
     } else if(consume(':')) {
       if(XMLToken.isNCStartChar(current())) {
@@ -4452,11 +4453,18 @@ public class QueryParser extends InputParser {
 
   /**
    * Helper method for parsing NCNames.
+   * @param qnmPfx allow NCName as a QName prefix
    * @return true for success
+   * @throws QueryException query exception
    */
-  private boolean ncName() {
+  private boolean ncName(final boolean qnmPfx) throws QueryException {
     if(!XMLToken.isNCStartChar(current())) return false;
     do token.add(consume()); while(XMLToken.isNCChar(current()));
+    if(!qnmPfx && current() == ':' && XMLToken.isNCStartChar(next())) {
+      token.add(consume());
+      do token.add(consume()); while(XMLToken.isNCChar(current()));
+      throw error(NONCNAME_X, token.finish());
+    }
     return true;
   }
 
