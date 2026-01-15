@@ -37,11 +37,6 @@ public class FnSortWith extends StandardFunc {
     };
   }
 
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
-  }
-
   /**
    * Sort the input data and returns an iterator.
    * @param values values to be sorted

@@ -5,7 +5,6 @@ import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
@@ -24,11 +23,6 @@ public class IndexTexts extends IndexFn {
     final IndexEntries entries = ascending.isEmpty() ? new IndexEntries(prefix, type()) :
       new IndexEntries(prefix, toBoolean(ascending), type());
     return entries(data, entries, this);
-  }
-
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   /**

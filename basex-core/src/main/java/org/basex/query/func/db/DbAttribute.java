@@ -21,7 +21,8 @@ public class DbAttribute extends DbText {
 
   @Override
   public final Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
+    // overwrite implementation of superclass
+    return iter(qc).value(qc, this);
   }
 
   @Override

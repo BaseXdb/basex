@@ -6,7 +6,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
@@ -21,11 +20,6 @@ public class FnOutermost extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return iter(true, qc);
-  }
-
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   /**

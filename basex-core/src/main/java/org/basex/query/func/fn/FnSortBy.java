@@ -47,11 +47,6 @@ public class FnSortBy extends StandardFunc {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
-  }
-
-  @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     return input.seqType().zero() ? input : adoptType(input);

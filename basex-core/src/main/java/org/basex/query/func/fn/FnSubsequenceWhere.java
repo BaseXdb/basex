@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
@@ -39,11 +38,6 @@ public final class FnSubsequenceWhere extends StandardFunc {
         return null;
       }
     };
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   @Override

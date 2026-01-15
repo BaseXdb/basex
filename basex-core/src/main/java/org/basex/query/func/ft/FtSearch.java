@@ -33,11 +33,6 @@ public final class FtSearch extends FtAccessFn {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
-  }
-
-  @Override
   public boolean accept(final ASTVisitor visitor) {
     return dataLock(arg(0), false, visitor) && super.accept(visitor);
   }

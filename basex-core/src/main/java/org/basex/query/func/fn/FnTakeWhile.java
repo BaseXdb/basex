@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
@@ -29,11 +28,6 @@ public final class FnTakeWhile extends StandardFunc {
         return item != null && test(predicate, args.set(0, item).inc(), qc) ? item : null;
       }
     };
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   @Override

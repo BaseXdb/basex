@@ -27,11 +27,6 @@ public class DbList extends DbAccessFn {
     return name.isEmpty() ? list(qc) : resources(name, qc);
   }
 
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
-  }
-
   /**
    * Returns a list of all databases.
    * @param qc query context

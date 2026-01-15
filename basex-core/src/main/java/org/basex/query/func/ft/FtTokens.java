@@ -8,7 +8,6 @@ import org.basex.query.func.*;
 import org.basex.query.func.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.value.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 
@@ -29,11 +28,6 @@ public final class FtTokens extends StandardFunc {
       prefix = lexer.nextToken();
     }
     return IndexFn.entries(data, new IndexEntries(prefix, IndexType.FULLTEXT), this);
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   @Override

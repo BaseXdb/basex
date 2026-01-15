@@ -59,7 +59,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
-   * The implementation of this method is optional.
+   * If this method is not implemented, either {@link #value(QueryContext)} or
+   * {@link #item(QueryContext, InputInfo)} must be implemented instead.
    * @param qc query context
    * @return iterator
    * @throws QueryException query exception
@@ -68,8 +69,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting value.
-   * If this method is not implemented, {@link #item(QueryContext, InputInfo)} must be implemented
-   * instead.
+   * If this method is not implemented, either {@link #iter(QueryContext)} or
+   * {@link #item(QueryContext, InputInfo)} must be implemented instead.
    * @param qc query context
    * @return value
    * @throws QueryException query exception
@@ -79,7 +80,8 @@ public abstract class Expr extends ExprInfo {
   /**
    * Evaluates the expression and returns the resulting item,
    * or {@link Empty#VALUE} if the expression yields an empty sequence.
-   * If this method is not implemented, {@link #value(QueryContext)} must be implemented instead.
+   * If this method is not implemented, either {@link #iter(QueryContext)} or
+   * {@link #value(QueryContext)} must be implemented instead.
    * @param qc query context
    * @param ii input info (can be {@code null}; required for those {@link Value} instances
    *   that have no input info)
@@ -87,18 +89,6 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract Item item(QueryContext qc, InputInfo ii) throws QueryException;
-
-  /**
-   * Default implementation for returning the result of an iterator.
-   * This method can be called by {@link #value(QueryContext)} if {@link #iter(QueryContext)} is
-   * implemented and {@link #item(QueryContext, InputInfo)} is not.
-   * @param qc query context
-   * @return value
-   * @throws QueryException query exception
-   */
-  public final Value iterValue(final QueryContext qc) throws QueryException {
-    return iter(qc).value(qc, this);
-  }
 
   /**
    * Evaluates the expression and returns an iterator on the resulting, atomized items.

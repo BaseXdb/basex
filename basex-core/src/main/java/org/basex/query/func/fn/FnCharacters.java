@@ -53,12 +53,6 @@ public final class FnCharacters extends StandardFunc {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final AStr value = toZeroStr(arg(0), qc);
-    return StrSeq.get(value.characters(info));
-  }
-
-  @Override
   protected Expr opt(final CompileContext cc) {
     final Expr value = arg(0);
     return value.seqType().zero() ? value : this;

@@ -9,7 +9,6 @@ import java.sql.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -54,11 +53,6 @@ public class SqlExecute extends SqlFn {
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }
-  }
-
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   /**

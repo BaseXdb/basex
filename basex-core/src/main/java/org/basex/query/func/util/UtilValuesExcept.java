@@ -8,7 +8,6 @@ import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
@@ -49,11 +48,6 @@ public final class UtilValuesExcept extends StandardFunc {
         return null;
       }
     };
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   @Override

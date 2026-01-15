@@ -33,6 +33,8 @@ public abstract class ParseExpr extends Expr {
   public final ExprType exprType;
   /** Input information. */
   protected InputInfo info;
+  /** Iterator-based implementation. */
+  private final boolean iterImpl;
 
   /**
    * Constructor.
@@ -42,6 +44,15 @@ public abstract class ParseExpr extends Expr {
   protected ParseExpr(final InputInfo info, final SeqType seqType) {
     this.info = info;
     exprType = new ExprType(seqType);
+
+    // check via reflection if the expression has an iterative implementation
+    boolean ii = false;
+    for(Class<?> clz = getClass(); clz != ParseExpr.class && !ii; clz = clz.getSuperclass()) {
+      try {
+        ii = clz.getMethod("iter", QueryContext.class).getDeclaringClass() == clz;
+      } catch(@SuppressWarnings("unused") final Exception ex) { /* ignore */ }
+    }
+    iterImpl = ii;
   }
 
   @Override
@@ -51,7 +62,7 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return item(qc, info);
+    return iterImpl ? iter(qc).value(qc, this) : item(qc, info);
   }
 
   @Override

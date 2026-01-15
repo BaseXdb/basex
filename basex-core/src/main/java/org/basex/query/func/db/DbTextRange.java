@@ -7,7 +7,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -20,11 +19,6 @@ public class DbTextRange extends DbAccessFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     final Data data = toData(qc);
     return rangeAccess(data, qc).iter(qc);
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   @Override

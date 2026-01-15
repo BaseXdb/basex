@@ -37,11 +37,6 @@ public final class FnSiblings extends ContextFn {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
-  }
-
-  @Override
   protected Expr opt(final CompileContext cc) {
     final Value value = cc.qc.focus.value;
     final Expr expr = defined(0) ? arg(0) : value;

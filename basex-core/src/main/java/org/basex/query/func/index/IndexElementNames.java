@@ -7,7 +7,6 @@ import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 
 /**
  * Function implementation.
@@ -22,11 +21,6 @@ public class IndexElementNames extends IndexFn {
     final IndexType type = type();
     return entries(type == IndexType.ELEMNAME ? data.elemNames : data.attrNames,
       new IndexEntries(EMPTY, type));
-  }
-
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   /**

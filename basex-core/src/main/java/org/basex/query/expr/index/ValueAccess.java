@@ -120,11 +120,6 @@ public final class ValueAccess extends IndexAccess {
     return nodes.value(this).iter();
   }
 
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
-  }
-
   /**
    * Returns an index iterator.
    * @param term search term

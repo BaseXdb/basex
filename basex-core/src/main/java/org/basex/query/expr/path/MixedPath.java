@@ -89,11 +89,6 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
-  }
-
-  @Override
   public boolean vacuous() {
     return steps[steps.length - 1].vacuous();
   }

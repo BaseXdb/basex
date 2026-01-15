@@ -8,7 +8,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.ft.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -28,11 +27,6 @@ public class FtMark extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return mark(qc, false);
-  }
-
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    return iterValue(qc);
   }
 
   /**
