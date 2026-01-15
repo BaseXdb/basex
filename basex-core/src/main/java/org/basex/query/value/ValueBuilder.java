@@ -19,13 +19,15 @@ import org.basex.util.list.*;
 public final class ValueBuilder {
   /** Interruptible job. */
   private final Job job;
-
-  /** Builder, only instantiated if there are at least two items. */
-  private SeqBuilder builder;
-  /** Capacity ({@link Long#MIN_VALUE}: create no compact data structures). */
+  /** Capacity. */
   private final long capacity;
+
   /** The first added value is cached. */
   private Value single;
+  /** Builder, only instantiated if there are at least two items. */
+  private SeqBuilder builder;
+  /** Count down for building a tree. */
+  private int tree;
 
   /**
    * Constructor.
@@ -46,6 +48,16 @@ public final class ValueBuilder {
   }
 
   /**
+   * Builds a tree.
+   * @param always build tree always, or only after initial capacity is reached
+   * @return reference to this builder for convenience
+   */
+  public ValueBuilder tree(final boolean always) {
+    tree = always ? 1 : Array.INITIAL_CAPACITY;
+    return this;
+  }
+
+  /**
    * Appends a value to the sequence.
    * @param value value to append
    * @return reference to this builder for convenience
@@ -60,7 +72,7 @@ public final class ValueBuilder {
           return this;
         }
         single = null;
-        builder = capacity == Long.MIN_VALUE ? new TreeSeqBuilder() :
+        builder = buildTree(sngl) ? new TreeSeqBuilder() :
           isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
           isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder() :
           isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
@@ -69,9 +81,25 @@ public final class ValueBuilder {
           new ItemSeqBuilder();
         add(sngl);
       }
+      if(buildTree(value)) {
+        final Value v = builder.value(AtomType.ITEM);
+        builder = new TreeSeqBuilder();
+        add(v);
+      }
       builder = builder.add(value, job);
     }
     return this;
+  }
+
+  /**
+   * Indicates if a tree should be built.
+   * @param value value to append
+   * @return result of check
+   */
+  private boolean buildTree(final Value value) {
+    if(tree <= 0) return false;
+    tree -= value.size();
+    return tree <= 0;
   }
 
   /**

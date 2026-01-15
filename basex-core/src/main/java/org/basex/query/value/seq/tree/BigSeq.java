@@ -79,7 +79,6 @@ public final class BigSeq extends TreeSeq {
 
   @Override
   public Value insertValue(final long pos, final Value value, final Job job) {
-    job.checkStop();
     if(value.size() > 1) return copyInsert(pos, value, job);
 
     final Item item = (Item) value;
@@ -379,7 +378,7 @@ public final class BigSeq extends TreeSeq {
   }
 
   @Override
-  TreeSeq concat(final TreeSeq seq) {
+  TreeSeq append(final TreeSeq seq) {
     final Type tp = type.union(seq.type);
     if(seq instanceof final SmallSeq ss) {
       // merge with right digit

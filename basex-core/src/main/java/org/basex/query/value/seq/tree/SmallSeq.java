@@ -66,7 +66,6 @@ public final class SmallSeq extends TreeSeq {
 
   @Override
   public Value insertValue(final long pos, final Value value, final Job job) {
-    job.checkStop();
     if(value.size() > 1) return copyInsert(pos, value, job);
 
     final Item item = (Item) value;
@@ -101,7 +100,7 @@ public final class SmallSeq extends TreeSeq {
   }
 
   @Override
-  TreeSeq concat(final TreeSeq other) {
+  TreeSeq append(final TreeSeq other) {
     return other.prepend(this);
   }
 

@@ -49,7 +49,7 @@ public abstract class TreeSeq extends Seq {
   protected final Value copyInsert(final long pos, final Value value, final Job job) {
     final long right = size - pos;
     if(value instanceof final TreeSeq other && (pos == 0 || right == 0)) {
-      return pos == 0 ? other.concat(this) : concat(other);
+      return pos == 0 ? other.append(this) : append(other);
     }
 
     final TreeSeqBuilder sb = new TreeSeqBuilder();
@@ -87,11 +87,11 @@ public abstract class TreeSeq extends Seq {
   public abstract BasicIter<Item> iter();
 
   /**
-   * Concatenates this sequence with another one.
+   * Appends the given sequence to this sequence.
    * @param other array to append to the end of this array
    * @return resulting array
    */
-  abstract TreeSeq concat(TreeSeq other);
+  abstract TreeSeq append(TreeSeq other);
 
   @Override
   public final Value shrink(final Job job) throws QueryException {
