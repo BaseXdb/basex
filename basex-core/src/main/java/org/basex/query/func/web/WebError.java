@@ -6,7 +6,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
@@ -17,16 +16,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class WebError extends StandardFunc {
-  @Override
-  public Iter iter(final QueryContext qc) {
-    return new Iter() {
-      @Override
-      public Item next() throws QueryException {
-        return item(qc, info);
-      }
-    };
-  }
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final long code = toLong(arg(0), qc);

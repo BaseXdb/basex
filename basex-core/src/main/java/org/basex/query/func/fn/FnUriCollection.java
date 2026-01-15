@@ -37,9 +37,8 @@ public final class FnUriCollection extends FnCollection {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : collection(qc)) vb.add(toUri(item));
-    return vb.value(this);
+    // overwrite implementation of superclass
+    return iter(qc).value(qc, this);
   }
 
   /**

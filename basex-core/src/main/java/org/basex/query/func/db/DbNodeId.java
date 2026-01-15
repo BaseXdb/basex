@@ -24,32 +24,50 @@ public class DbNodeId extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
     final Iter nodes = arg(0).iter(qc);
-    if(nodes.size() >= 0) return ids(nodes.value(qc, null)).iter();
+    final long size = nodes.size();
 
     return new Iter() {
       @Override
       public Itr next() throws QueryException {
         final Item item = qc.next(nodes);
-        return item != null ? Itr.get(id(toDBNode(item, false))) : null;
+        return item != null ? Itr.get(id(item)) : null;
+      }
+      @Override
+      public Itr get(final long i) throws QueryException {
+        return Itr.get(id(nodes.get(i)));
+      }
+      @Override
+      public long size() throws QueryException {
+        return size;
+      }
+      @Override
+      public Value value(final QueryContext q, final Expr expr) throws QueryException {
+        final IntList ids = new IntList(size);
+        addIds(nodes.value(qc, expr), ids);
+        return IntSeq.get(ids.finish());
       }
     };
   }
 
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    return ids(arg(0).value(qc));
+  /**
+   * Returns a node ID.
+   * @param item item
+   * @return node ID
+   * @throws QueryException query exception
+   */
+  private int id(final Item item) throws QueryException {
+    return id(toDBNode(item, false));
   }
 
   /**
-   * Creates the result.
-   * @param nodes nodes
-   * @return node IDs
-   * @throws QueryException query exception
+   * Returns a node ID.
+   * @param node database node
+   * @return node ID
    */
-  final Value ids(final Value nodes) throws QueryException {
-    final IntList ids = new IntList(Seq.initialCapacity(nodes.size()));
-    addIds(nodes, ids);
-    return IntSeq.get(ids.finish());
+  int id(final DBNode node) {
+    final int pre = node.pre();
+    final Data data = node.data();
+    return data.meta.updindex ? data.id(pre) : pre;
   }
 
   /**
@@ -58,8 +76,8 @@ public class DbNodeId extends StandardFunc {
    * @param ids ID list
    * @throws QueryException query exception
    */
-  protected void addIds(final Value nodes, final IntList ids) throws QueryException {
-    for(final Item node : nodes) ids.add(id(toDBNode(node, false)));
+  void addIds(final Value nodes, final IntList ids) throws QueryException {
+    for(final Item node : nodes) ids.add(id(node));
   }
 
   @Override
@@ -75,7 +93,8 @@ public class DbNodeId extends StandardFunc {
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
     Expr expr = this;
 
     final Expr input = arg(0);
@@ -84,16 +103,5 @@ public class DbNodeId extends StandardFunc {
       if(input.ddo()) expr = input;
     }
     return cc.simplify(this, expr, mode);
-  }
-
-  /**
-   * Returns the node value.
-   * @param node database node
-   * @return node ID
-   */
-  protected int id(final DBNode node) {
-    final int pre = node.pre();
-    final Data data = node.data();
-    return data.meta.updindex ? data.id(pre) : pre;
   }
 }

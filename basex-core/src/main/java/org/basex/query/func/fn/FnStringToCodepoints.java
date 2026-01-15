@@ -51,11 +51,6 @@ public final class FnStringToCodepoints extends StandardFunc {
   }
 
   @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    return IntSeq.get(toZeroStr(arg(0), qc).codepoints(info));
-  }
-
-  @Override
   protected Expr opt(final CompileContext cc) {
     final Expr value = arg(0);
     return value.seqType().zero() ? value : this;

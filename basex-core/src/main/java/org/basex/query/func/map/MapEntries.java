@@ -18,8 +18,9 @@ import org.basex.query.value.type.*;
 public class MapEntries extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
+    final XQMap map = toMap(arg(0), qc);
+
     return new Iter() {
-      final XQMap map = toMap(arg(0), qc);
       final BasicIter<Item> keys = map.keys().iter();
 
       @Override
@@ -27,25 +28,18 @@ public class MapEntries extends StandardFunc {
         final Item key = keys.next();
         return key != null ? entry(key, map.get(key)) : null;
       }
+
       @Override
       public Item get(final long i) throws QueryException {
         final Item key = keys.get(i);
         return entry(key, map.get(key));
       }
+
       @Override
       public long size() {
         return map.structSize();
       }
     };
-  }
-
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    final XQMap map = toMap(arg(0), qc);
-
-    final ValueBuilder vb = new ValueBuilder(qc, structSize());
-    map.forEach((key, value) -> vb.add(entry(key, value)));
-    return vb.value(this);
   }
 
   @Override

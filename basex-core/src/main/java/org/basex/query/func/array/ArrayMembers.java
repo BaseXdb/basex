@@ -24,7 +24,7 @@ public final class ArrayMembers extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
 
-    return new Iter() {
+    return new BasicIter<>(array.structSize()) {
       final Iterator<Value> values = array.iterable().iterator();
 
       @Override
@@ -35,20 +35,7 @@ public final class ArrayMembers extends StandardFunc {
       public Item get(final long i) {
         return record(array.memberAt(i));
       }
-      @Override
-      public long size() {
-        return array.structSize();
-      }
     };
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final XQArray array = toArray(arg(0), qc);
-
-    final ValueBuilder vb = new ValueBuilder(qc, structSize());
-    for(final Value member : array.iterable()) vb.add(record(member));
-    return vb.value(this);
   }
 
   @Override

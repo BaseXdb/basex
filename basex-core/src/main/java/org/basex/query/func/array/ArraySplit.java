@@ -22,7 +22,7 @@ public final class ArraySplit extends ArrayFn {
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
 
-    return new Iter() {
+    return new BasicIter<>(array.structSize()) {
       final Iterator<Value> values = array.iterable().iterator();
 
       @Override
@@ -33,20 +33,7 @@ public final class ArraySplit extends ArrayFn {
       public Item get(final long i) {
         return XQArray.get(array.memberAt(i));
       }
-      @Override
-      public long size() {
-        return array.structSize();
-      }
     };
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final XQArray array = toArray(arg(0), qc);
-
-    final ValueBuilder vb = new ValueBuilder(qc, structSize());
-    for(final Value member : array.iterable()) vb.add(XQArray.get(member));
-    return vb.value();
   }
 
   @Override

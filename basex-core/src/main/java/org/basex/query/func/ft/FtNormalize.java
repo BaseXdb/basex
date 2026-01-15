@@ -14,6 +14,7 @@ import org.basex.util.*;
 public final class FtNormalize extends FtTokenize {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    // overwrite implementation of superclass
     return item(qc, info);
   }
 

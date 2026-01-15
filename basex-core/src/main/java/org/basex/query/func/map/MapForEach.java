@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.func.update.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -22,9 +21,10 @@ public class MapForEach extends StandardFunc {
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
     final FItem action = toFunction(arg(1), 3, this instanceof UpdateMapForEach, qc);
-    final BasicIter<Item> keys = map.keys().iter();
 
     return new Iter() {
+      final long size = action.funcType().declType.one() ? map.structSize() : -1;
+      final BasicIter<Item> keys = map.keys().iter();
       final HofArgs args = new HofArgs(3, action);
       Iter iter = Empty.ITER;
 
@@ -38,18 +38,18 @@ public class MapForEach extends StandardFunc {
           iter = invoke(action, args.set(0, key).set(1, map.get(key)).inc(), qc).iter();
         }
       }
+
+      @Override
+      public Item get(final long i) throws QueryException {
+        final Item key = keys.get((int) i);
+        return invoke(action, args.set(0, key).set(1, map.get(key)).inc(), qc).item(qc, info);
+      }
+
+      @Override
+      public long size() {
+        return size;
+      }
     };
-  }
-
-  @Override
-  public final Value value(final QueryContext qc) throws QueryException {
-    final XQMap map = toMap(arg(0), qc);
-    final FItem action = toFunction(arg(1), 3, this instanceof UpdateMapForEach, qc);
-
-    final HofArgs args = new HofArgs(3, action);
-    final ValueBuilder vb = new ValueBuilder(qc, map.structSize());
-    map.forEach((key, value) -> vb.add(invoke(action, args.set(0, key).set(1, value).inc(), qc)));
-    return vb.value(this);
   }
 
   @Override

@@ -18,6 +18,7 @@ import org.basex.query.value.type.*;
 public class ArraySortBy extends FnSortBy {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
+    // overwrite implementation of superclass
     return value(qc).iter();
   }
 

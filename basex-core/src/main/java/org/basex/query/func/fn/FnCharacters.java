@@ -30,7 +30,7 @@ public final class FnCharacters extends StandardFunc {
       return new BasicIter<Str>(tl) {
         @Override
         public Str get(final long i) {
-          return Str.get(new byte[] { token[(int) i] });
+          return Str.get(token[(int) i]);
         }
         @Override
         public Value value(final QueryContext q, final Expr expr) throws QueryException {
