@@ -57,12 +57,15 @@ public final class FnGenerate extends StandardFunc {
     final Expr init = arg(0), step = arg(1);
 
     Expr expr = this;
-    if(mode.oneOf(Simplify.DISTINCT, Simplify.PREDICATE)) {
+    if(mode == Simplify.DISTINCT ||
+        mode == Simplify.PREDICATE && seqType().instanceOf(Types.NODE_ZM)) {
       // 'x' = generate('y', fn { 'y' }) → 'x' = 'y'
       // distinct-values(generate(1, identity#1)) → distinct-values(1)
-      if(init instanceof Item && step instanceof FuncItem fi && fi.arity() < 3 && (
-          fi.expr.equals(init) || fi.funcName().eq(Function.IDENTITY.definition().name))) {
-        expr = init;
+      if(init instanceof Item && step instanceof FuncItem fi && fi.arity() < 3) {
+        final QNm name = fi.funcName();
+        if(fi.expr.equals(init) || name != null && name.eq(Function.IDENTITY.definition().name)) {
+          expr = init;
+        }
       }
     }
     return cc.simplify(this, expr, mode);

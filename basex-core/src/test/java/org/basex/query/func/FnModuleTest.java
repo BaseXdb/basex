@@ -1381,6 +1381,32 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void generate() {
+    final Function func = GENERATE;
+    query(func.args(" ()", " fn {}"), "");
+    query(func.args(" 1", " fn {}"), 1);
+    query(func.args(" ()", " fn { if(.) { . -1 } }"), "");
+    query(func.args(3, " fn { if(.) { . -1 } }"), "3\n2\n1\n0");
+
+    String init = "x", step = " fn { . || 'x' }";
+    query("head(" + func.args(init, step) + ")", init);
+    query("count(" + func.args(init, step) + ") > 10", true);
+    query(func.args(init, step) + "[1]", init);
+    query("'" + init + "' = " + func.args(init, step), true);
+    query("'x'[. = " + func.args(init, step) + ']', "x");
+
+    step = " fn() { '" + init + "' }";
+    query(func.args(init, step) + "=>" + DISTINCT_VALUES.args(), init);
+    query("'" + init + "' = " + func.args(init, step), true);
+    query("'x'[. = " + func.args(init, step) + ']', "x");
+
+    step = " identity#1";
+    query(func.args(init, step) + "=>" + DISTINCT_VALUES.args(), init);
+    query("'" + init + "' = " + func.args(init, step), true);
+    query("'x'[. = " + func.args(init, step) + ']', "x");
+  }
+
+  /** Test method. */
   @Test public void generateId() {
     final Function func = GENERATE_ID;
 
