@@ -438,7 +438,7 @@ public final class RecordType extends MapType {
         if(i++ != 0) {
           qs.token(',').token(' ');
           if(i > 3) {
-            qs.token("...");
+            qs.token(QueryText.DOTS);
             break;
           }
         }

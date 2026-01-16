@@ -5,7 +5,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * Atomization iterator.
+ * Atomizing iterator.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen

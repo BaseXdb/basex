@@ -19,6 +19,7 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -46,13 +47,13 @@ public abstract class ParseExpr extends Expr {
     exprType = new ExprType(seqType);
 
     // check via reflection if the expression has an iterative implementation
-    boolean ii = false;
-    for(Class<?> clz = getClass(); clz != ParseExpr.class && !ii; clz = clz.getSuperclass()) {
+    boolean iter = false;
+    for(Class<?> clz = getClass(); clz != ParseExpr.class && !iter; clz = clz.getSuperclass()) {
       try {
-        ii = clz.getMethod("iter", QueryContext.class).getDeclaringClass() == clz;
+        iter = clz.getMethod("iter", QueryContext.class).getDeclaringClass() == clz;
       } catch(@SuppressWarnings("unused") final Exception ex) { /* ignore */ }
     }
-    iterImpl = ii;
+    iterImpl = iter;
   }
 
   @Override
@@ -67,7 +68,27 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return value(qc).item(qc, info);
+    return iterImpl ? item(iter(qc), qc) : value(qc).item(qc, info);
+  }
+
+  @Override
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return iterImpl ? item(atomIter(qc, info), qc) : super.atomItem(qc, info);
+  }
+
+  /**
+   * Returns a single item, or {@link Empty#VALUE} if the expression yields an empty sequence.
+   * @param iter iterator
+   * @param qc query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  private Item item(final Iter iter, final QueryContext qc) throws QueryException {
+    final Item item1 = iter.next();
+    if(item1 == null) return Empty.VALUE;
+    final Item item2 = iter.next();
+    if(item2 == null) return item1;
+    throw typeError(item1.append(item2, qc), AtomType.ITEM, info);
   }
 
   @Override
@@ -78,30 +99,24 @@ public abstract class ParseExpr extends Expr {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-
     // single item
     if(seqType().zeroOrOne()) return item(qc, info).test(qc, info, pos);
-
     // empty sequence?
     final Iter iter = iter(qc);
-    final Item first = iter.next();
-    if(first == null) return false;
-
+    final Item item1 = iter.next();
+    if(item1 == null) return false;
     // sequence starting with node?
-    if(first instanceof ANode) return true;
-
+    if(item1 instanceof ANode) return true;
     // single item?
-    Item next = iter.next();
-    if(next == null) return first.test(qc, info, pos);
-
+    Item item2 = iter.next();
+    if(item2 == null) return item1.test(qc, info, pos);
     // positional sequence?
-    if(pos == 0 || !(first instanceof ANum)) throw testError(first.append(next, qc), false, ii);
-
-    if(first.test(qc, info, pos)) return true;
+    if(pos == 0 || !(item1 instanceof ANum)) throw testError(item1.append(item2, qc), false, info);
+    if(item1.test(qc, info, pos)) return true;
     do {
-      if(!(next instanceof ANum)) throw testError(first.append(next, qc), true, info);
-      if(next.test(qc, info, pos)) return true;
-    } while((next = iter.next()) != null);
+      if(!(item2 instanceof ANum)) throw testError(item1.append(item2, qc), true, info);
+      if(item2.test(qc, info, pos)) return true;
+    } while((item2 = iter.next()) != null);
     return false;
   }
 

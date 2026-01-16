@@ -127,6 +127,8 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
+    if(body().size() == 1) return eval(qc);
+
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Item item : body().value(qc)) {
       vb.add(eval(item, qc));
@@ -136,6 +138,8 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
+    if(body().size() == 1) return eval(qc).iter();
+
     return new Iter() {
       final Iter iter = body().iter(qc);
       Iter value;
@@ -154,6 +158,16 @@ public final class DynFuncCall extends FuncCall {
         }
       }
     };
+  }
+
+  /**
+   * Evaluates a single function item.
+   * @param qc query context
+   * @return the function
+   * @throws QueryException query exception
+   */
+  private Value eval(final QueryContext qc) throws QueryException {
+    return eval(body().item(qc, info), qc);
   }
 
   /**
