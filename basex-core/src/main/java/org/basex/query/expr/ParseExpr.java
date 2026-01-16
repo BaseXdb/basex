@@ -5,6 +5,7 @@ import static org.basex.query.value.type.AtomType.*;
 import static org.basex.query.value.type.NodeType.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.core.users.*;
 import org.basex.data.*;
@@ -30,6 +31,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class ParseExpr extends Expr {
+  /** Indicates which expressions have an iterator implementation. */
+  private static final ConcurrentHashMap<Class<? extends ParseExpr>, Boolean> ITERIMPLS =
+      new ConcurrentHashMap<>();
   /** Expression type. */
   public final ExprType exprType;
   /** Input information. */
@@ -45,15 +49,14 @@ public abstract class ParseExpr extends Expr {
   protected ParseExpr(final InputInfo info, final SeqType seqType) {
     this.info = info;
     exprType = new ExprType(seqType);
-
-    // check via reflection if the expression has an iterative implementation
-    boolean iter = false;
-    for(Class<?> clz = getClass(); clz != ParseExpr.class && !iter; clz = clz.getSuperclass()) {
-      try {
-        iter = clz.getMethod("iter", QueryContext.class).getDeclaringClass() == clz;
-      } catch(@SuppressWarnings("unused") final Exception ex) { /* ignore */ }
-    }
-    iterImpl = iter;
+    iterImpl = ITERIMPLS.computeIfAbsent(getClass(), c -> {
+      for(Class<?> clz = getClass(); clz != ParseExpr.class; clz = clz.getSuperclass()) {
+        try {
+          if(clz.getMethod("iter", QueryContext.class).getDeclaringClass() == clz) return true;
+        } catch(@SuppressWarnings("unused") final Exception ex) { /* ignore */ }
+      }
+      return false;
+    });
   }
 
   @Override
