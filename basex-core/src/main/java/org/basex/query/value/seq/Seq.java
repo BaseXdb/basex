@@ -112,7 +112,7 @@ public abstract class Seq extends Value {
    * @return value
    */
   private Value toTree(final Job job) {
-    final ValueBuilder vb = new ValueBuilder(job, size).tree(true);
+    final ValueBuilder vb = new ValueBuilder(job, size).tree(1);
     for(final Item item : this) vb.add(item);
     return vb.value(type);
   }

@@ -201,15 +201,30 @@ public final class List extends Arr {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    // special case: concatenate two sequences
-    if(exprs.length == 2) return exprs[0].value(qc).append(exprs[1].value(qc), qc);
-
-    // general case: concatenate all sequences (unknown size: create tree)
-    final long size = size();
-    final ValueBuilder vb = new ValueBuilder(qc, size);
-    if(size == -1) vb.tree(false);
-    for(final Expr expr : exprs) vb.add(expr.value(qc));
-    return vb.value(this);
+    final Expr[] ex = exprs;
+    Value value = Empty.VALUE;
+    final int el = ex.length;
+    for(int e = 0; e < el;) {
+      value = ex[e++].value(qc);
+      if(value.isEmpty()) continue;
+      while(e < el) {
+        final Value value2 = ex[e++].value(qc);
+        if(value2.isEmpty()) continue;
+        while(e < el) {
+          final Value value3 = ex[e++].value(qc);
+          if(value3.isEmpty()) continue;
+          final long size = size();
+          final ValueBuilder vb = new ValueBuilder(qc, size);
+          if(size == -1) vb.tree(value.size() + value2.size() + value3.size() >=
+              Array.INITIAL_CAPACITY ? 1 : Array.INITIAL_CAPACITY);
+          vb.add(value).add(value2).add(value3);
+          while(e < el) vb.add(ex[e++].value(qc));
+          return vb.value(this);
+        }
+        return value.append(value2, qc);
+      }
+    }
+    return value;
   }
 
   @Override

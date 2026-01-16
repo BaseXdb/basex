@@ -22,11 +22,11 @@ public final class ValueBuilder {
   /** Capacity. */
   private final long capacity;
 
-  /** The first added value is cached. */
-  private Value single;
-  /** Builder, only instantiated if there are at least two items. */
+  /** Builder, instantiated if there is more than one value. */
   private SeqBuilder builder;
-  /** Count down for building a tree. */
+  /** First value. */
+  private Value single;
+  /** Count down for building a tree (ignored if {@code 0} or smaller). */
   private int tree;
 
   /**
@@ -49,11 +49,11 @@ public final class ValueBuilder {
 
   /**
    * Builds a tree.
-   * @param always build tree always, or only after initial capacity is reached
+   * @param min minimum size to build tree
    * @return reference to this builder for convenience
    */
-  public ValueBuilder tree(final boolean always) {
-    tree = always ? 1 : Array.INITIAL_CAPACITY;
+  public ValueBuilder tree(final int min) {
+    tree = min;
     return this;
   }
 
@@ -63,43 +63,34 @@ public final class ValueBuilder {
    * @return reference to this builder for convenience
    */
   public ValueBuilder add(final Value value) {
-    if(!value.isEmpty()) {
-      job.checkStop();
-      if(builder == null) {
-        final Value sngl = single;
-        if(sngl == null) {
-          single = value;
-          return this;
-        }
-        single = null;
-        builder = buildTree(sngl) ? new TreeSeqBuilder() :
-          isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
-          isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder() :
-          isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
-          isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
-          isBln(sngl) && isBln(value) ? new BlnSeqBuilder() :
-          new ItemSeqBuilder();
-        add(sngl);
-      }
-      if(buildTree(value)) {
-        final Value v = builder.value(AtomType.ITEM);
-        builder = new TreeSeqBuilder();
-        add(v);
-      }
-      builder = builder.add(value, job);
-    }
-    return this;
-  }
+    if(value.isEmpty()) return this;
+    job.checkStop();
 
-  /**
-   * Indicates if a tree should be built.
-   * @param value value to append
-   * @return result of check
-   */
-  private boolean buildTree(final Value value) {
-    if(tree <= 0) return false;
-    tree -= value.size();
-    return tree <= 0;
+    SeqBuilder sb = builder;
+    int tr = tree;
+    if(sb == null) {
+      final Value sngl = single;
+      if(sngl == null) {
+        single = value;
+        return this;
+      }
+      single = null;
+      sb = tr > 0 && (tr -= sngl.size()) <= 0 ? new TreeSeqBuilder() :
+        isStr(sngl) && isStr(value) ? new StrSeqBuilder() :
+        isAtm(sngl) && isAtm(value) ? new AtmSeqBuilder() :
+        isInt(sngl) && isInt(value) ? new IntSeqBuilder() :
+        isDbl(sngl) && isDbl(value) ? new DblSeqBuilder() :
+        isBln(sngl) && isBln(value) ? new BlnSeqBuilder() :
+        new ItemSeqBuilder();
+      sb = sb.add(sngl, job);
+      tree = tr;
+    }
+    if(tr > 0 && (tr -= value.size()) <= 0) {
+      sb = new TreeSeqBuilder().add(sb.value(AtomType.ITEM), job);
+      tree = tr;
+    }
+    builder = sb.add(value, job);
+    return this;
   }
 
   /**
