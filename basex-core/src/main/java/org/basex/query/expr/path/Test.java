@@ -32,26 +32,48 @@ public abstract class Test extends ExprInfo {
   /**
    * Creates a single test.
    * @param tests tests to be merged (can contain {@code null} references)
-   * @return single test, union test, or {@code null} if test cannot be created.
+   * @return test, or {@code null} due to missing tests or {@code null} references
    */
   public static Test get(final List<Test> tests) {
-    final int tl = tests.size();
-    if(tl == 0) return null;
-    if(tl == 1) return tests.get(0);
+    final int ts = tests.size();
+    if(ts == 0) return null;
+    if(ts == 1) return tests.get(0);
 
-    // merge name tests
-    final List<Test> list = new ArrayList<>(tl);
+    final List<Test> list = new ArrayList<>(ts);
     for(final Test test : tests) {
-      if(test == null) return null;
       if(test instanceof final UnionTest ut) {
-        for(final Test t : ut.tests) {
-          if(!list.contains(t)) list.add(t);
-        }
-      } else if(!list.contains(test)) {
-        list.add(test);
+        for(final Test t : ut.tests) merge(t, list);
+      } else if(test != null) {
+        merge(test, list);
+      } else {
+        return null;
       }
     }
     return list.size() == 1 ? list.get(0) : new UnionTest(list.toArray(Test[]::new));
+  }
+
+  /**
+   * Merges a test into the union test list.
+   * @param test test to be merged
+   * @param list list
+   */
+  private static void merge(final Test test, final List<Test> list) {
+    final boolean skip = test instanceof final NameTest nt && nt.scope != NameTest.Scope.FULL;
+    final int ls = list.size();
+    for(int l = 0; l < ls; l++) {
+      final Test t = list.get(l);
+      // skip partial name tests (*:A, A:*)
+      if(skip || t instanceof final NameTest nt && nt.scope != NameTest.Scope.FULL) continue;
+      // * union A
+      if(test.instanceOf(t)) return;
+      // A union *
+      if(t.instanceOf(test)) {
+        list.set(l, test);
+        return;
+      }
+    }
+    // A union B
+    list.add(test);
   }
 
   /**

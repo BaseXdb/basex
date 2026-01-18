@@ -1371,6 +1371,22 @@ public final class RewritingsTest extends SandboxTest {
     check("<_/>/(<b/>[*] union <c/>[*])", "", exists(Union.class));
   }
 
+  /** Set Expressions. */
+  @Test public void set() {
+    // union
+    check("<_><a/></_>/(a union a)", "<a/>", empty(Union.class));
+    check("<_><a/></_>/(a union b)", "<a/>", empty(Union.class));
+    // intersect
+    check("<_><a/></_>/(node() intersect * intersect a)", "<a/>", empty(Intersect.class));
+    check("<_><a/></_>/(a intersect * intersect node())", "<a/>", empty(Intersect.class));
+    check("<_><a/></_>/(a intersect b)", "", empty());
+    // except
+    check("<_><a/></_>/(* except text())", "<a/>", empty(Except.class));
+    check("<_><a/></_>/(a except b)", "<a/>", empty(Except.class));
+    check("<_><a/></_>/(node() except * except a)", "", count(Except.class, 1));
+    check("<_><a/></_>/(a except *)", "", empty());
+  }
+
   /** Logical expressions, DNFs/CNFs. */
   @Test public void gh1839() {
     // no rewriting
@@ -1462,7 +1478,7 @@ public final class RewritingsTest extends SandboxTest {
 
     check("count(<a/> union (<b/> union <c/>))", 3, count(Union.class, 1));
     check("count(<a/> intersect (<b/> intersect <c/>))", 0, root(Itr.class));
-    check("count(<a/> except (<b/> except <c/>))", 1, count(Except.class, 2));
+    check("count(<a/> except (<b/> except <c/>))", 1, root(Itr.class));
 
     check("<a/> ! (. > '0' or (. < '1' or . < '2'))", true, count(Or.class, 1));
     check("<a/> ! (. = '0' and (. < '1' and . != '2'))", false, count(And.class, 1));
@@ -1978,11 +1994,11 @@ public final class RewritingsTest extends SandboxTest {
 
   /** Discard redundant union tests. */
   @Test public void gh1914() {
-    check("<a/>/(self::*|self::a)", "<a/>", root(CElem.class));
+    check("<a/>/(self::* | self::a)", "<a/>", root(CElem.class));
 
-    check("<a/>/(* | a)", "", type(IterStep.class, "(element()|element(a))*"));
-    check("<a/>/(a | *)", "", type(IterStep.class, "(element(a)|element())*"));
-    check("<a/>/(a | * | b)", "", type(IterStep.class, "(element(a)|element()|element(b))*"));
+    check("<a/>/(* | a)", "", type(IterStep.class, "element()*"));
+    check("<a/>/(a | *)", "", type(IterStep.class, "element()*"));
+    check("<a/>/(a | * | b)", "", type(IterStep.class, "element()*"));
 
     check("(<a/> | <b/> | <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));
     check("(<a/>, <b/>, <a/>)/self::b", "<b/>", type(Union.class, "(element(a)|element(b))+"));

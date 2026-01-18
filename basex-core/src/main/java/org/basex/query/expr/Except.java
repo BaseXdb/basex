@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -35,16 +36,23 @@ public final class Except extends Set {
   }
 
   @Override
-  Expr opt(final CompileContext cc) {
+  Expr opt(final CompileContext cc) throws QueryException {
     // determine type
     final SeqType st = exprs[0].seqType();
     if(st.zero()) return exprs[0];
     if(!(st.type instanceof NodeType)) return null;
 
-    final ExprList list = new ExprList(exprs.length);
+    // * except A except B → * except (A union B)
+    final int el = exprs.length;
+    if(el > 2) {
+      final Expr union = new Union(info, Arrays.copyOfRange(exprs, 1, el)).optimize(cc);
+      return new Except(info, exprs[0], union).optimize(cc);
+    }
+
+    final ExprList list = new ExprList(el);
     for(final Expr expr : exprs) {
-      if(expr == Empty.VALUE) {
-        // ignore empty operands
+      if(expr == Empty.VALUE || !list.isEmpty() && st.intersect(expr.seqType()) == null) {
+        // ignore empty operands or incompatible node types
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else if(!expr.has(Flag.CNS, Flag.NDT)) {
         final int same = ((Checks<Expr>) ex -> ex.equals(expr)).index(list);
@@ -67,6 +75,7 @@ public final class Except extends Set {
 
   @Override
   And mergePredicates(final Expr[] preds, final CompileContext cc) throws QueryException {
+    // *[A] except *[B] except *[C] → *[A and not(B) and not(C)]
     final ExprList list = new ExprList(preds.length);
     for(final Expr pred : preds) {
       list.add(list.isEmpty() ? pred : cc.function(Function.NOT, info, pred));

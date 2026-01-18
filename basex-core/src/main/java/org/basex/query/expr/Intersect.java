@@ -75,7 +75,8 @@ public final class Intersect extends Set {
 
   @Override
   And mergePredicates(final Expr[] preds, final CompileContext cc) {
-    return new And(info, preds);
+    // *[A] intersect *[B] → *[A and B]
+  return new And(info, preds);
   }
 
   @Override

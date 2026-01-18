@@ -32,9 +32,9 @@ public final class UnionTest extends Test {
    * @return union type
    */
   private static NodeType unionType(final Test[] tests) {
-    Type unionType = tests[0].type;
-    for(int i = 1; i < tests.length; ++i) unionType = unionType.union(tests[i].type);
-    return (NodeType) unionType;
+    Type type = tests[0].type;
+    for(int i = 1; i < tests.length; ++i) type = type.union(tests[i].type);
+    return (NodeType) type;
   }
 
   @Override

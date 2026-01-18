@@ -68,6 +68,7 @@ public final class Union extends Set {
 
   @Override
   Or mergePredicates(final Expr[] preds, final CompileContext cc) {
+    // *[A] union *[B] → *[A or B]
     return new Or(info, preds);
   }
 

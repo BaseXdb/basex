@@ -109,11 +109,10 @@ abstract class Set extends Arr {
   private Expr mergePaths(final CompileContext cc) throws QueryException {
     Expr root = null;
     Axis axis = null;
-    Test test = null;
-    Expr[] preds = null;
-    final ArrayList<Step> steps = new ArrayList<>(exprs.length);
+    final int sl = exprs.length;
+    final ArrayList<Step> steps = new ArrayList<>(sl);
 
-    // collect common root, common axis and steps
+    // collect common root, common axis, and individual steps
     for(final Expr expr : exprs) {
       if(!(expr instanceof final Path path)) return null;
       if(path.steps.length != 1 || !(path.steps[0] instanceof final Step step)) return null;
@@ -125,46 +124,70 @@ abstract class Set extends Arr {
         // further operands: abort if root or axis differs
         return null;
       }
+      // do not merge paths with positional predicates
+      if(step.mayBePositional()) return null;
       steps.add(step);
     }
-    final int sl = steps.size();
 
-    // try to merge node tests
-    if(this instanceof Union) {
-      final ArrayList<Test> tests = new ArrayList<>(sl);
-      int s = -1;
-      while(++s < sl) {
-        final Step step = steps.get(s);
-        if(step.mayBePositional()) break;
-        if(preds == null) {
-          preds = step.exprs;
-        } else if(!Arrays.equals(preds, step.exprs)) {
-          break;
-        }
-        tests.add(step.test);
+    // try to merge tests (precondition: predicates are identical)
+    Expr[] preds = null;
+    final ArrayList<Test> tests = new ArrayList<>(sl);
+    for(int s = 0; s < sl; s++) {
+      final Step step = steps.get(s);
+      if(preds == null) {
+        preds = step.exprs;
+      } else if(!Arrays.equals(preds, step.exprs)) {
+        preds = null;
+        break;
       }
-      // all steps were parsed. try to merge tests
-      if(s == sl) test = Test.get(tests);
+      tests.add(step.test);
     }
 
-    // try to merge first predicates of all steps
+    Test test = null;
+    if(preds != null) {
+      if(this instanceof Union) {
+        // a union b → (a|b)
+        test = Test.get(tests);
+      } else if(this instanceof Intersect) {
+        // * intersect a → a, a intersect b → ()
+        for(final Test t : tests) {
+          if(test == null || t.instanceOf(test)) {
+            test = t;
+          } else if(!test.instanceOf(t)) {
+            return Empty.VALUE;
+          }
+        }
+      } else {
+        // a except a → (), a except * → ()
+        for(final Test t : tests) {
+          if(test == null) {
+            test = t;
+          } else if(test.instanceOf(t)) {
+            return Empty.VALUE;
+          }
+        }
+        test = null;
+      }
+    }
+
+    // try to merge predicates (precondition: tests are identical)
     if(test == null) {
-      final ExprList list = new ExprList(sl);
-      int s = -1;
-      while(++s < sl) {
+      for(int s = 0; s < sl; s++) {
         final Step step = steps.get(s);
-        if(step.mayBePositional()) break;
         if(test == null) {
           test = step.test;
         } else if(!test.equals(step.test)) {
+          test = null;
           break;
         }
-        list.add(newPredicate(step.exprs, cc));
       }
-      preds = s < sl ? null : new Expr[] { cc.get(root, true,
-          () -> mergePredicates(list.finish(), cc).optimize(cc)) };
     }
-    if(test == null || preds == null) return null;
+    if(test == null) return null;
+
+    final ExprList list = new ExprList(sl);
+    for(final Step step : steps) list.add(newPredicate(step.exprs, cc));
+    preds = new Expr[] { cc.get(root, true,
+        () -> mergePredicates(list.finish(), cc).optimize(cc)) };
 
     final Expr step = Step.get(cc, root, info, axis, test, preds);
     return Path.get(cc, info, root, step);
