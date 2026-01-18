@@ -103,12 +103,12 @@ public final class RangeSeq extends Seq {
   }
 
   /**
-   * Returns the specified value.
-   * @param pos position
-   * @return minimum value
+   * Returns the position for the specified index.
+   * @param index index
+   * @return offset
    */
-  public long get(final long pos) {
-    return start + (ascending ? pos : -pos);
+  private long get(final long index) {
+    return start + (ascending ? index : -index);
   }
 
   @Override
