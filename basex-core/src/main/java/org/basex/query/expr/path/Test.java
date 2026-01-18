@@ -58,21 +58,22 @@ public abstract class Test extends ExprInfo {
    * @param list list
    */
   private static void merge(final Test test, final List<Test> list) {
-    final boolean skip = test instanceof final NameTest nt && nt.scope != NameTest.Scope.FULL;
+    final boolean ntest = test instanceof NameTest;
+    final boolean utest = ntest && ((NameTest) test).scope == NameTest.Scope.URI;
     final int ls = list.size();
     for(int l = 0; l < ls; l++) {
       final Test t = list.get(l);
-      // skip partial name tests (*:A, A:*)
-      if(skip || t instanceof final NameTest nt && nt.scope != NameTest.Scope.FULL) continue;
+      // skip URI-based comparisons (may not be assigned yet at parse time)
+      if(ntest && t instanceof NameTest nt && (utest || nt.scope == NameTest.Scope.URI)) continue;
       // * union A
       if(test.instanceOf(t)) return;
-      // A union *
+      // A union * → *
       if(t.instanceOf(test)) {
         list.set(l, test);
         return;
       }
     }
-    // A union B
+    // A union B → (A|B)
     list.add(test);
   }
 

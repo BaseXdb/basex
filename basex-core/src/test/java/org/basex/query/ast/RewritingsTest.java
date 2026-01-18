@@ -1374,16 +1374,46 @@ public final class RewritingsTest extends SandboxTest {
   /** Set Expressions. */
   @Test public void set() {
     // union
-    check("<_><a/></_>/(a union a)", "<a/>", empty(Union.class));
-    check("<_><a/></_>/(a union b)", "<a/>", empty(Union.class));
+    check("<_><a/></_>/(a union a)", "<a/>",
+        empty(Union.class), type(IterPath.class, "element(a)*"));
+    check("<_><a/></_>/(a union b)", "<a/>",
+        empty(Union.class), type(IterPath.class, "(element(a)|element(b))*"));
+    check("<_><a/></_>/(*:a union *:b)", "<a/>",
+        empty(Union.class), type(IterPath.class, "(element(*:a)|element(*:b))*"));
+    check("<_><a/></_>/(Q{}a union Q{}b)", "<a/>",
+        empty(Union.class));
+    check("declare namespace a = 'A'; declare namespace b = 'A'; " +
+        "<_><a:a/></_>/(a:a union b:a)", "<a:a xmlns:a=\"A\"/>",
+        empty(Union.class));
+    check("declare namespace a = 'A'; declare namespace b = 'B'; " +
+        "<_><a:a/></_>/(a:a union b:a)", "<a:a xmlns:a=\"A\"/>",
+        empty(Union.class), type(IterPath.class, "(element(a:a)|element(b:a))*"));
+    check("declare namespace a = 'A'; declare namespace b = 'B'; " +
+        "<_><b:a/></_>/(a:a union b:a)", "<b:a xmlns:b=\"B\"/>",
+        empty(Union.class), type(IterPath.class, "(element(a:a)|element(b:a))*"));
+    check("<_><a/></_>/(a union *)", "<a/>",
+        empty(Union.class), type(IterPath.class, "element()*"));
+    check("<_><a/></_>/(* union a)", "<a/>",
+        empty(Union.class), type(IterPath.class, "element()*"));
+    check("<_><a/></_>/(*:a union *)", "<a/>",
+        empty(Union.class), type(IterPath.class, "element()*"));
+    check("<_><a/></_>/(* union *:a)", "<a/>",
+        empty(Union.class), type(IterPath.class, "element()*"));
+    check("<_><a/></_>/(* union Q{uri}a)", "<a/>",
+        empty(Union.class), type(IterPath.class, "element()*"));
     // intersect
-    check("<_><a/></_>/(node() intersect * intersect a)", "<a/>", empty(Intersect.class));
-    check("<_><a/></_>/(a intersect * intersect node())", "<a/>", empty(Intersect.class));
+    check("<_><a/></_>/(node() intersect * intersect a)", "<a/>",
+        empty(Intersect.class), type(IterPath.class, "element(a)*"));
+    check("<_><a/></_>/(a intersect * intersect node())", "<a/>",
+        empty(Intersect.class), type(IterPath.class, "element(a)*"));
     check("<_><a/></_>/(a intersect b)", "", empty());
     // except
-    check("<_><a/></_>/(* except text())", "<a/>", empty(Except.class));
-    check("<_><a/></_>/(a except b)", "<a/>", empty(Except.class));
-    check("<_><a/></_>/(node() except * except a)", "", count(Except.class, 1));
+    check("<_><a/></_>/(* except text())", "<a/>",
+        empty(Except.class), type(IterPath.class, "element()*"));
+    check("<_><a/></_>/(a except b)", "<a/>",
+        empty(Except.class), type(IterPath.class, "element(a)*"));
+    check("<_><a/></_>/(node() except * except a)", "",
+        count(Except.class, 1), type(MixedPath.class, "node()*"));
     check("<_><a/></_>/(a except *)", "", empty());
   }
 
