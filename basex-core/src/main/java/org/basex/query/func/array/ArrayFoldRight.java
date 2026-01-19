@@ -25,7 +25,7 @@ public final class ArrayFoldRight extends ArrayFoldLeft {
     final long p = array.structSize();
     for(final ListIterator<Value> iter = array.iterator(p); iter.hasPrevious();) {
       args.set(1, invoke(action, args.set(0, iter.previous()).inc(), qc));
-      if(skip(qc, args)) break;
+      if(exit(qc, args)) break;
     }
     return args.get(1);
   }

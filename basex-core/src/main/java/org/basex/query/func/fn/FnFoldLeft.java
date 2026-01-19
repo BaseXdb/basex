@@ -28,20 +28,20 @@ public class FnFoldLeft extends StandardFunc {
     final HofArgs args = new HofArgs(3, action).set(0, arg(1).value(qc));
     for(Item item; (item = input.next()) != null;) {
       args.set(1, item).inc();
-      if(skip(qc, args)) break;
+      if(exit(qc, args)) break;
       args.set(0, invoke(action, args, qc));
     }
     return args.get(0);
   }
 
   /**
-   * Checks if the evaluation can be exited early.
+   * Checks if the iteration can be exited early.
    * @param qc query context
    * @param args arguments
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean skip(final QueryContext qc, final HofArgs args) throws QueryException {
+  protected final boolean exit(final QueryContext qc, final HofArgs args) throws QueryException {
     return exitOrAction != null && invoke(exitOrAction[0], args, qc).test(qc, info, 0);
   }
 
