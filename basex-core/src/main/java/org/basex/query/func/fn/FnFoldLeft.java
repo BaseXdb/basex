@@ -17,8 +17,8 @@ import org.basex.query.value.type.*;
  * @author Christian Gruen
  */
 public class FnFoldLeft extends StandardFunc {
-  /** Optimized condition and else branch. */
-  private FuncItem[] iff;
+  /** Condition to check whether loop can be exited and action to produce next result. */
+  private FuncItem[] exitOrAction;
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
@@ -42,7 +42,7 @@ public class FnFoldLeft extends StandardFunc {
    * @throws QueryException query exception
    */
   protected final boolean skip(final QueryContext qc, final HofArgs args) throws QueryException {
-    return iff != null && test(iff[0], args, qc);
+    return exitOrAction != null && invoke(exitOrAction[0], args, qc).test(qc, info, 0);
   }
 
   /**
@@ -52,7 +52,7 @@ public class FnFoldLeft extends StandardFunc {
    * @throws QueryException query exception
    */
   public final FItem action(final QueryContext qc) throws QueryException {
-    return iff != null ? iff[1] : toFunction(arg(2), 3, qc);
+    return exitOrAction != null ? exitOrAction[1] : toFunction(arg(2), 3, qc);
   }
 
   @Override
@@ -109,11 +109,10 @@ public class FnFoldLeft extends StandardFunc {
 
     final SeqType zst = init.seqType();
     if(action instanceof final FuncItem fiAction) {
-      if(iff == null) {
-        final Object fold = fiAction.fold(input, array, left, cc);
+      if(exitOrAction == null) {
+        final Object fold = fiAction.fold(input, init, left, array, cc);
         if(fold instanceof final Expr expr) return expr;
-        if(fold instanceof String) return init;
-        if(fold instanceof final FuncItem[] fi) iff = fi;
+        if(fold instanceof final FuncItem[] fi) exitOrAction = fi;
       }
 
       final SeqType i1t = array ? ist.type instanceof final ArrayType at ? at.valueType() :

@@ -1,7 +1,7 @@
 package org.basex.query.value.item;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.QueryText.*;
+import static org.basex.query.func.Function.*;
 
 import java.util.*;
 import java.util.function.*;
@@ -175,7 +175,7 @@ public final class FuncItem extends FItem implements Scope {
   @Override
   public Expr inline(final Expr[] exprs, final CompileContext cc) throws QueryException {
     if(!cc.inlineable(anns, expr) || expr.has(Flag.CTX)) return null;
-    cc.info(OPTINLINE_X, this);
+    cc.info(QueryText.OPTINLINE_X, this);
 
     // create let bindings for all variables
     final LinkedList<Clause> clauses = new LinkedList<>();
@@ -226,55 +226,79 @@ public final class FuncItem extends FItem implements Scope {
   }
 
   /**
-   * Optimizes the function item for a fold operation.
+   * Derives constant values or early exit operations for fold actions.
    * @param input input sequence
-   * @param array indicates if an array is processed
+   * @param init initial expression
    * @param left indicates if this is a left/right fold
+   * @param array indicates if an array is processed
    * @param cc compilation context
-   * @return optimized expression or {@code null}
+   * @return constant value, early-exit expressions, or {@code null}
    * @throws QueryException query exception
    */
-  public Object fold(final Expr input, final boolean array, final boolean left,
+  public Object fold(final Expr input, final Expr init, final boolean left, final boolean array,
       final CompileContext cc) throws QueryException {
-    if(arity() == 2 && !input.has(Flag.NDT)) {
-      final Var actionVar = params[left ? 1 : 0], resultVar = params[left ? 0 : 1];
-      final Predicate<Expr> result = ex -> ex instanceof final VarRef vr &&
-          vr.var.equals(resultVar);
 
-      // fold-left(SEQ, INIT, f($result, $value) { VALUE }) → VALUE
-      if(!array && input.seqType().oneOrMore() && expr instanceof Value) return expr;
-      // fold-left(SEQ, INIT, f($result, $value) { $result }) → $result
-      if(result.test(expr)) return "";
+    final int arity = arity();
+    if(!input.has(Flag.NDT)) {
+      final IntFunction<Var> param = i -> i < arity ? params[i] : null;
+      final Var value = param.apply(left ? 1 : 0), result = param.apply(left ? 0 : 1);
+      final BiPredicate<Expr, Var> isRef = (ex, var) -> ex instanceof final VarRef vr &&
+          vr.var.equals(var);
 
+      // fold-left(INPUT, INIT, fn($result, $value) { $result }) → INIT
+      if(isRef.test(expr, result)) return init;
+
+      if(input.seqType().oneOrMore()) {
+        // fold-left(INPUT, INIT, fn($result, $value) { VALUE }) → VALUE
+        if(!array && expr instanceof Value) return expr;
+        // fold-left(INPUT, INIT, fn($result, $value) { $value }) → foot($value)
+        if(isRef.test(expr, value)) return cc.function(
+            left ? array ? _ARRAY_FOOT : FOOT : array ? _ARRAY_HEAD : HEAD, info, input);
+      }
+
+      Expr exit = null, action = null;
+      final Expr expr1 = expr.arg(0), expr2 = expr.arg(1);
+      final boolean ref1 = isRef.test(expr1, result), ref2 = isRef.test(expr2, result);
       if(expr instanceof final If iff) {
-        final Expr cond = iff.cond, thn = iff.exprs[0], els = iff.exprs[1];
-        if(!(cond.uses(actionVar) || cond.has(Flag.NDT))) {
-          Expr cnd = cond, action = null;
-          if(result.test(thn)) {
-            // if(COND) then $result else ACTION
-            // → if COND: return $result; else $result = ACTION
-            action = els;
-          } else if(result.test(els)) {
-            // if(COND) then ACTION else $result
-            // → if not(COND): return $result; else $result = ACTION
-            cnd = cc.function(org.basex.query.func.Function.NOT, info, cond);
-            action = thn;
-          } else if(cond instanceof final CmpG cmp) {
-            // if($result = ITEM) then ITEM else ACTION
-            // → if COND: return $result; else $result = ACTION
+        if(!(iff.cond.uses(value) || iff.cond.has(Flag.NDT))) {
+          if(ref1) {
+            // if(COND) then $result else ACTION → exit on COND
+            exit = iff.cond;
+            action = expr2;
+          } else if(ref2) {
+            // if(COND) then ACTION else $result → exit on not(COND)
+            exit = cc.function(NOT, info, iff.cond);
+            action = expr1;
+          } else if(iff.cond instanceof final CmpG cmp) {
             final Expr op1 = cmp.arg(0), op2 = cmp.arg(1);
             final SeqType st1 = op1.seqType(), st2 = op2.seqType();
-            if(result.test(op1) && op2 instanceof Item && op2.equals(thn) &&
-              cmp.opG() == OpG.EQ && st1.eq(st2) && (
-              st1.instanceOf(Types.DECIMAL_O) || st1.instanceOf(Types.STRING_O))) {
-              action = els;
+            if(isRef.test(op1, result) && op2 instanceof Item && st1.eq(st2) &&
+                (st1.instanceOf(Types.DECIMAL_O) || st1.instanceOf(Types.STRING_O))) {
+              if(cmp.opG() == OpG.EQ && op2.equals(expr1)) {
+                // if($result = ITEM) then ITEM else ACTION → exit on equality
+                exit = iff.cond;
+                action = expr2;
+              } else if(cmp.opG() == OpG.NE && op2.equals(expr2)) {
+                // if($result != ITEM) then ACTION else ITEM → exit on not(inequality)
+                exit = cc.function(NOT, info, iff.cond);
+                action = expr1;
+              }
             }
           }
-          if(action != null) return new FuncItem[] {
-            new FuncItem(info, cnd, params, anns, funcType(), stackSize, null, focus),
-            new FuncItem(info, action, params, anns, funcType(), stackSize, null, focus)
-          };
         }
+      } else if(init.seqType().eq(Types.BOOLEAN_O) && expr instanceof final Logical logical &&
+          !expr.has(Flag.NDT) && (ref1 || ref2)) {
+        // $result or  ACTION → exit on boolean($result)
+        // $result and ACTION → exit on not($result)
+        exit = cc.function(logical instanceof Or ? BOOLEAN : NOT, info, ref1 ? expr1 : expr2);
+        action = cc.function(BOOLEAN, info, ref1 ? expr2 : expr1);
+      }
+
+      if(exit != null) {
+        return new FuncItem[] {
+          new FuncItem(info, exit, params, anns, funcType(), stackSize, null, focus),
+          new FuncItem(info, action, params, anns, funcType(), stackSize, null, focus)
+        };
       }
     }
     return null;
@@ -321,12 +345,13 @@ public final class FuncItem extends FItem implements Scope {
 
   @Override
   public String description() {
-    return FUNCTION + ' ' + ITEM;
+    return QueryText.FUNCTION + ' ' + QueryText.ITEM;
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, NAME, name == null ? null : name.prefixId()), params, expr);
+    plan.add(plan.create(this, QueryText.NAME, name == null ? null : name.prefixId()),
+        params, expr);
   }
 
   @Override
@@ -337,7 +362,8 @@ public final class FuncItem extends FItem implements Scope {
       if(name != null) {
         qs.concat("(: ", name.prefixId(), "#", arity(), " :)");
       }
-      qs.token(anns).token(FN).params(params).token(AS).token(funcType().declType).brace(expr);
+      qs.token(anns).token(QueryText.FN).params(params);
+      qs.token(QueryText.AS).token(funcType().declType).brace(expr);
     }
   }
 }

@@ -319,52 +319,93 @@ public final class FuncItemTest extends SandboxTest {
 
   /** Fold optimizations. */
   @Test public void fold() {
-    final String seq = "1 to 1000000000000000000";
+    // all expressions will have a terrible runtime when the optimization fails
+    inline(true);
+
+    final String seq = " 1 to 1_000_000_000_000_000_000";
 
     // return unchanged result
-    check("fold-left (" + seq + ", 456, fn($r, $i) { $r })", 456, root(Itr.class));
-    check("fold-right(" + seq + ", 456, fn($i, $r) { $r })", 456, root(Itr.class));
+    check(FOLD_LEFT.args(seq, 456, " fn($r, $i) { $r }"), 456, root(Itr.class));
+    check(FOLD_RIGHT.args(seq, 456, " fn($i, $r) { $r }"), 456, root(Itr.class));
 
     // return constant value
-    check("fold-left (" + seq + ", 1, fn($r, $i) { 123 })", 123, root(Itr.class));
-    check("fold-right(" + seq + ", 1, fn($i, $r) { 123 })", 123, root(Itr.class));
+    check(FOLD_LEFT.args(seq, 1, " fn($r, $i) { 123 }"), 123, root(Itr.class));
+    check(FOLD_RIGHT.args(seq, 1, " fn($i, $r) { 123 }"), 123, root(Itr.class));
 
     // exit early if result will not change anymore
-    query("fold-left (" + seq + ", 1, fn($r, $i) { if($r < 100) then $r + $i else $r })",
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { if($r < 100) then $r + $i else $r }"),
         106);
-    query("fold-left (" + seq + ", 1, fn($r, $i) { if($r > 100) then $r + $i else $r })",
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { if($r > 100) then $r + $i else $r }"),
         1);
-    query("fold-right(" + seq + ", 1, fn($i, $r) { if($r < 10) then $r + $i else $r })",
+    query(FOLD_RIGHT.args(seq, 1, " fn($i, $r) { if($r < 10) then $r + $i else $r }"),
         1000000000000000001L);
-    query("fold-right(" + seq + ", 1, fn($i, $r) { if($r > 10) then $r else $r + $i })",
+    query(FOLD_RIGHT.args(seq, 1, " fn($i, $r) { if($r > 10) then $r else $r + $i }"),
         1000000000000000001L);
 
-    query("fold-left (" + seq + ", 0, fn($r, $i) { if($r eq 10) then 10 else $r + $i })",
+    query(FOLD_LEFT.args(seq, 0, " fn($r, $i) { if($r eq 10) then 10 else $r + $i }"),
         10);
-    query("fold-right(reverse(" + seq + "), 0, fn($i, $r) { if($r eq 10) then 10 else $r + $i })",
+    query(FOLD_RIGHT.args(" reverse(" + seq + ")", 0,
+        " fn($i, $r) { if($r eq 10) then 10 else $r + $i }"),
         10);
-    query("fold-left (" + seq + ", 0, fn($r, $i) { if($r = 10) then 10 else $r + $i })",
+    query(FOLD_LEFT.args(seq, 0, " fn($r, $i) { if($r = 10) then 10 else $r + $i }"),
         10);
-    query("fold-right(reverse(" + seq + "), 0, fn($i, $r) { if($r = 10) then 10 else $r + $i })",
+    query(FOLD_RIGHT.args(" reverse(" + seq + ")", 0,
+        " fn($i, $r) { if($r = 10) then 10 else $r + $i }"),
         10);
-    query("fold-left (" + seq + ", '0', fn($r, $i) { if($r = '9') then '9' else string($i) })",
+    query(FOLD_LEFT.args(seq, '0', " fn($r, $i) { if($r = '9') then '9' else string($i) }"),
         9);
-    query("fold-right(reverse(" + seq + "), '0', "
-        + "fn($i, $r) { if($r = '9') then '9' else string($i) })",
+    query(FOLD_RIGHT.args(" reverse(" + seq + "), '0', "
+        + "fn($i, $r) { if($r = '9') then '9' else string($i) }"),
         9);
 
     // bug fix
-    query("fold-right(1 to 100000, 1, fn($a, $b) { if($b > 10000000) then $b else $a + $b })",
+    query(FOLD_RIGHT.args(" 1 to 100000", 1,
+        " fn($a, $b) { if($b > 10000000) then $b else $a + $b }"),
         10094951);
 
-    final String array = "array { 1 to 100000 }";
-
     // return unchanged result
-    check("array:fold-left(" + array + ", 456, fn($r, $i) { $r })", 456, root(Itr.class));
-    check("array:fold-right(" + array + ", 456, fn($i, $r) { $r })", 456, root(Itr.class));
+    final String array = " array { 1 to 100000 }";
+    check(_ARRAY_FOLD_LEFT.args(array, 456, " fn($r, $i) { $r }"), 456, root(Itr.class));
+    check(_ARRAY_FOLD_RIGHT.args(array, 456, " fn($i, $r) { $r }"), 456, root(Itr.class));
+
+    query(FOLD_LEFT.args(seq, 1, " fn() { () }"), "");
+    query(FOLD_LEFT.args(seq, 1, " fn() { 1 }"), 1);
+    query(FOLD_LEFT.args(seq, 1, " fn() { 1, 2, 3 }"), "1\n2\n3");
+
+    query(FOLD_LEFT.args(seq, 1, " fn { . }"), 1);
+    query(FOLD_LEFT.args(seq, 1, " fn { 1 }"), 1);
+    query(FOLD_LEFT.args(seq, 1, " fn { if(.) then . else 123 }"), 1);
+
+    query(FOLD_LEFT.args(seq, 1, " fn($r) { $r }"), 1);
+    query(FOLD_LEFT.args(seq, 1, " fn($r) { 1 }"), 1);
+    query(FOLD_LEFT.args(seq, 1, " fn($r) { if($r) then $r else 123 }"), 1);
+
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { $r }"), 1);
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { 1 }"), 1);
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { if($r) then $r else 123 }"), 1);
+
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { if($r > 10) then $r else $i }"), 11);
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { if($r < 10) then $i else $r }"), 10);
+
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { if($r = 12) then 12 else $i }"), 12);
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { if($r != 12) then $i else 12 }"), 12);
+
+    query(FOLD_LEFT.args(seq, 1, " fn($r, $i) { $i }"), 1000000000000000000L);
+    query(FOLD_RIGHT.args(seq, 1, " fn($i, $r) { $i }"), 1L);
+
+    query(FOLD_LEFT.args(seq, false, " fn($r, $i) { $r or $i > 10 }"), true);
+    query(FOLD_LEFT.args(seq, true,  " fn($r, $i) { $r or $i > 10 }"), true);
+    query(FOLD_LEFT.args(seq, false, " fn($r, $i) { $r and $i < 10 }"), false);
+    query(FOLD_LEFT.args(seq, true,  " fn($r, $i) { $r and $i < 10 }"), false);
+
+    query(FOLD_LEFT.args(seq, false, " fn($r, $i) { $i > 10 or $r }"), true);
+    query(FOLD_LEFT.args(seq, true,  " fn($r, $i) { $i > 10 or $r }"), true);
+    query(FOLD_LEFT.args(seq, false, " fn($r, $i) { $i < 10 and $r }"), false);
+    query(FOLD_LEFT.args(seq, true,  " fn($r, $i) { $i < 10 and $r }"), false);
 
     // bug fix
-    query("array:fold-right(" + array + ", 1, fn($a, $b) { if($b > 10000000) then $b else $a+$b })",
+    query(_ARRAY_FOLD_RIGHT.args(array, 1,
+        " fn($a, $b) { if($b > 10000000) then $b else $a + $b }"),
         10094951);
   }
 
