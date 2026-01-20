@@ -994,7 +994,7 @@ public final class TextEditor {
       startSelect();
       if(word) nextWord(true);
       else lineEnd(true);
-      endSelection();
+      checkSelection();
     }
     delete();
   }
@@ -1008,9 +1008,10 @@ public final class TextEditor {
       if(pos() == 0) return;
       startSelect();
       if(word) prevWord(true);
-      else bol(true);
-      endSelection();
+      else lineStart(true);
+      checkSelection();
     }
+    if(!isSelected()) prev();
     delete();
   }
 
