@@ -123,11 +123,15 @@ public class AdaptiveSerializer extends OutputSerializer {
     } else if(item instanceof final XQMap map) {
       map(map);
     } else {
-      final QNm fn = item.funcName();
-      if(fn == null) printChars(Token.token("(anonymous-function)"));
-      else printChars(fn.prefixId());
-      printChar('#');
-      printChars(Token.token(item.arity()));
+      if(this instanceof BaseXSerializer) {
+        printChars(Token.token(item.toErrorString()));
+      } else {
+        final QNm fn = item.funcName();
+        if(fn == null) printChars(Token.token("(anonymous-function)"));
+        else printChars(fn.prefixId());
+        printChar('#');
+        printChars(Token.token(item.arity()));
+      }
     }
   }
 

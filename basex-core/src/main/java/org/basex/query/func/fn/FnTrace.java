@@ -1,10 +1,11 @@
 package org.basex.query.func.fn;
 
+import java.util.function.*;
+
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -22,18 +23,17 @@ public class FnTrace extends StandardFunc {
     final String label = toStringOrNull(arg(1), qc);
 
     if(input.isEmpty() || input instanceof RangeSeq || input instanceof SingletonSeq) {
-      qc.trace(label, input::toString);
+      qc.trace(label, input::toErrorString);
     } else {
-      final Iter iter = input.iter();
-      for(Item item; (item = qc.next(iter)) != null;) {
-        final Item it = item;
-        qc.trace(label, () -> {
+      for(final Item item : input) {
+        final Supplier<String> message = item instanceof FItem ? input::toErrorString : () -> {
           try {
-            return it.serialize(SerializerMode.DEBUG.get()).toString();
+            return item.serialize(SerializerMode.DEBUG.get()).toString();
           } catch(final QueryIOException ex) {
             return ex.getMessage(); // unexpected
           }
-        });
+        };
+        qc.trace(label, message);
       }
     }
     return input;

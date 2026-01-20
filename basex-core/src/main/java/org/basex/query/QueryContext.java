@@ -478,11 +478,14 @@ public final class QueryContext extends Job implements Closeable {
     } else {
       final QueryTracer qc = jc().tracer();
       if(qc.moreTraces(++traces)) {
-        final String lbl = label != null ? label.replaceAll("\\s+", " ") : "";
-        final String msg = (lbl.isEmpty() || lbl.matches("^.*\\p{P} ?$") ? lbl : lbl + ": ") +
-            message.get();
-        qc.printTrace(msg);
-        if(qc.cacheTrace()) evalInfo(msg);
+        String lbl = label != null ? label.replaceAll("\\s+", " ").trim() : "";
+        if(!lbl.isEmpty()) {
+          if(!lbl.matches("^.*\\p{P}$")) lbl += ':';
+          lbl += ' ';
+        }
+        final String string = lbl + message.get();
+        qc.printTrace(string);
+        if(qc.cacheTrace()) evalInfo(string);
       }
     }
   }
