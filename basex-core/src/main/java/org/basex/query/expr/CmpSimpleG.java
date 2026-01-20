@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -28,9 +29,9 @@ public final class CmpSimpleG extends CmpG {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     final Item item1 = exprs[0].item(qc, info);
-    if(item1.isEmpty()) return false;
+    if(item1 == Empty.VALUE) return false;
     final Item item2 = exprs[1].item(qc, info);
-    if(item2.isEmpty()) return false;
+    if(item2 == Empty.VALUE) return false;
     return eval(item1, item2);
   }
 

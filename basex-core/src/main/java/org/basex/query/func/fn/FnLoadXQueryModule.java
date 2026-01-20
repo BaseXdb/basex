@@ -41,8 +41,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
     final byte[] modUri = toToken(arg(0).atomItem(qc, info));
     if(modUri.length == 0) throw MODULE_URI_EMPTY.get(info);
 
-    final Item arg1 = arg(1).item(qc, ii);
-    final XQMap options = arg1.isEmpty() ? XQMap.empty() : toMap(arg1, qc);
+    final XQMap options = toEmptyMap(arg(1), qc);
     final LoadXQueryModuleOptions opt = toOptions(options, new LoadXQueryModuleOptions(), qc);
     final String[] hints = opt.get(LOCATION_HINTS);
 

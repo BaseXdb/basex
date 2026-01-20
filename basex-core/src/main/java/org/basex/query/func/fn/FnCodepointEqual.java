@@ -38,9 +38,9 @@ public final class FnCodepointEqual extends StandardFunc {
    */
   private Boolean test(final QueryContext qc) throws QueryException {
     final Item value1 = arg(0).atomItem(qc, info);
-    if(value1.isEmpty()) return null;
+    if(value1 == Empty.VALUE) return null;
     final Item value2 = arg(1).atomItem(qc, info);
-    if(value2.isEmpty()) return null;
+    if(value2 == Empty.VALUE) return null;
     return eq(toToken(value1), toToken(value2));
   }
 

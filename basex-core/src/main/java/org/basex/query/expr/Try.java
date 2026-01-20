@@ -110,7 +110,7 @@ public final class Try extends Single {
       throw ex;
     } finally {
       final Value fnl = fnlly.value(qc);
-      if(!fnl.isEmpty()) throw FINALLY_X.get(info, fnl);
+      if(fnl != Empty.VALUE) throw FINALLY_X.get(info, fnl);
     }
   }
 

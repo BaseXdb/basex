@@ -178,7 +178,7 @@ public final class Pos extends Single {
     ctxValue(qc);
 
     final Value value = expr.value(qc);
-    if(value.isEmpty()) return false;
+    if(value == Empty.VALUE) return false;
 
     final long p = qc.focus.pos, vs = value.size();
     final double min = toDouble(value.itemAt(0));

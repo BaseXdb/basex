@@ -209,9 +209,9 @@ public final class CmpV extends Cmp {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item1 = exprs[0].atomItem(qc, info);
-    if(item1.isEmpty()) return Empty.VALUE;
+    if(item1 == Empty.VALUE) return Empty.VALUE;
     final Item item2 = exprs[1].atomItem(qc, info);
-    if(item2.isEmpty()) return Empty.VALUE;
+    if(item2 == Empty.VALUE) return Empty.VALUE;
     return Bln.get(test(item1, item2));
   }
 
@@ -219,9 +219,9 @@ public final class CmpV extends Cmp {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     final Item item1 = exprs[0].atomItem(qc, info);
-    if(item1.isEmpty()) return false;
+    if(item1 == Empty.VALUE) return false;
     final Item item2 = exprs[1].atomItem(qc, info);
-    if(item2.isEmpty()) return false;
+    if(item2 == Empty.VALUE) return false;
     return test(item1, item2);
   }
 

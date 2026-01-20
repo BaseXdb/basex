@@ -8,6 +8,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -46,7 +47,7 @@ public final class CRecord extends Arr {
       for(int f = 1; f <= fs; f++) {
         boolean add = true;
         final Value value = exprs[f - 1].value(qc);
-        if(value.isEmpty()) {
+        if(value == Empty.VALUE) {
           final RecordField rf = fields.value(f);
           if(rf.isOptional() && rf.expr() == null) add = false;
         }

@@ -8,6 +8,7 @@ import org.basex.query.func.fn.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -132,7 +133,7 @@ public final class SwitchGroup extends Arr {
    */
   boolean match(final Item cond, final int e, final QueryContext qc) throws QueryException {
     final Value value = exprs[e].atomValue(qc, info);
-    if(cond.isEmpty()) return cond == value;
+    if(cond == Empty.VALUE) return cond == value;
     for(final Item item : value) {
       if(deep.equal(cond, item)) return true;
     }

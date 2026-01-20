@@ -10,6 +10,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -48,7 +49,7 @@ public final class StructFilter extends AFilter {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     Item item = root.item(qc, info);
-    if(item.isEmpty()) return item;
+    if(item == Empty.VALUE) return item;
     if(!(item instanceof XQStruct)) throw STRUCT_FILTER_X.get(info, item);
 
     final QueryFocus focus = qc.focus, qf = new QueryFocus();

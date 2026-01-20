@@ -63,7 +63,7 @@ public final class ValueBuilder {
    * @return reference to this builder for convenience
    */
   public ValueBuilder add(final Value value) {
-    if(value.isEmpty()) return this;
+    if(value == Empty.VALUE) return this;
     job.checkStop();
 
     SeqBuilder sb = builder;

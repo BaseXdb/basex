@@ -16,6 +16,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.index.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -102,7 +103,7 @@ public final class CmpSR extends Single {
     // atomic evaluation of arguments (faster)
     if(single) {
       final Item item = expr.item(qc, info);
-      return !item.isEmpty() && eval(item);
+      return item != Empty.VALUE && eval(item);
     }
 
     // iterative evaluation

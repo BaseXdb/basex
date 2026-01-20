@@ -37,11 +37,10 @@ public abstract class WebFn extends StandardFunc {
    */
   final String createUrl(final QueryContext qc) throws QueryException {
     final byte[] href = toToken(arg(0), qc);
-    final Item params = arg(1).item(qc, info);
+    final XQMap params = toEmptyMap(arg(1), qc);
     final byte[] anchor = toZeroToken(arg(2), qc);
 
-    final XQMap map = params.isEmpty() ? XQMap.empty() : toMap(params);
-    final TokenBuilder url = createUrl(href, map, '&', info);
+    final TokenBuilder url = createUrl(href, params, '&', info);
     if(anchor.length > 0) url.add('#').add(Token.encodeUri(anchor, UriEncoder.URI));
     return url.toString();
   }

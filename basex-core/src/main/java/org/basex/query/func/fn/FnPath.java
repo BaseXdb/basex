@@ -44,7 +44,7 @@ public final class FnPath extends ContextFn {
     final TokenList steps = new TokenList();
     final boolean indexes = options.get(PathOptions.INDEXES);
     final Value ns = options.get(PathOptions.NAMESPACES);
-    final XQMap namespaces = ns == Empty.VALUE ? XQMap.empty() : toMap(ns, qc);
+    final XQMap namespaces = ns.isEmpty() ? XQMap.empty() : toMap(ns, qc);
     final boolean lexical = options.get(PathOptions.LEXICAL);
     final Value origin = options.get(PathOptions.ORIGIN);
 

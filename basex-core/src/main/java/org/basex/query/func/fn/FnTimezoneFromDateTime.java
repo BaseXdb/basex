@@ -15,8 +15,6 @@ public final class FnTimezoneFromDateTime extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    if(value.isEmpty()) return Empty.VALUE;
-
-    return zon(toGregorian(value, qc));
+    return value.isEmpty() ? Empty.VALUE : zon(toGregorian(value, qc));
   }
 }

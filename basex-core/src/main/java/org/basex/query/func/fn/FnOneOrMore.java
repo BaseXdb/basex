@@ -8,6 +8,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -42,7 +43,7 @@ public final class FnOneOrMore extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value input = arg(0).value(qc);
-    if(input.isEmpty()) throw ONEORMORE.get(info);
+    if(input == Empty.VALUE) throw ONEORMORE.get(info);
     return input;
   }
 

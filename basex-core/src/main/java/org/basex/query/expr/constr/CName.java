@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -77,7 +78,7 @@ abstract class CName extends CNode {
    */
   final byte[] ncname(final boolean empty, final QueryContext qc) throws QueryException {
     final Item item = name.atomItem(qc, info);
-    if(item.isEmpty()) {
+    if(item == Empty.VALUE) {
       if(empty) return EMPTY;
     } else {
       final Type type = item.type;

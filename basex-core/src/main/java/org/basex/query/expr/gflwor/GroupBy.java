@@ -136,7 +136,7 @@ public final class GroupBy extends Clause {
               // If the values are compared using a special collation, we let them collide
               // here and let the comparison do all the work later.
               // This enables other non-collation specs to avoid the collision.
-              hash = 31 * hash + (atom.isEmpty() || spec.coll != null ? 0 : atom.hashCode());
+              hash = 31 * hash + (atom == Empty.VALUE || spec.coll != null ? 0 : atom.hashCode());
             }
             qc.set(spec.var, atom);
           }
@@ -195,7 +195,7 @@ public final class GroupBy extends Clause {
         final int il = items1.length;
         for(int i = 0; i < il; i++) {
           final Item item1 = items1[i], item2 = items2[i];
-          final boolean empty1 = item1.isEmpty(), empty2 = item2.isEmpty();
+          final boolean empty1 = item1 == Empty.VALUE, empty2 = item2 == Empty.VALUE;
           if(empty1 ^ empty2 || !empty1 && !deeps[i].equal(item1, item2)) return false;
         }
         return true;

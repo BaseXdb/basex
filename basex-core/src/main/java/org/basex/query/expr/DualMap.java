@@ -4,6 +4,7 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -45,7 +46,7 @@ public final class DualMap extends SimpleMap {
             qf.value = item;
             item = expr2.item(qc, info);
             qf.value = qv;
-          } while(item.isEmpty());
+          } while(item == Empty.VALUE);
           return item;
         } finally {
           qf.value = qv;

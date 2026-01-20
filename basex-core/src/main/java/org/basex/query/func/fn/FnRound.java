@@ -33,8 +33,7 @@ public class FnRound extends NumericFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item mode = arg(2).atomItem(qc, info);
-    return round(qc, mode.isEmpty() ? RoundMode.HALF_TO_CEILING :
-      toEnum(mode, RoundMode.class));
+    return round(qc, mode.isEmpty() ? RoundMode.HALF_TO_CEILING : toEnum(mode, RoundMode.class));
   }
 
   /**

@@ -31,9 +31,9 @@ public class ArithSimple extends Arith {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item1 = exprs[0].item(qc, info);
-    if(item1.isEmpty()) return Empty.VALUE;
+    if(item1 == Empty.VALUE) return Empty.VALUE;
     final Item item2 = exprs[1].item(qc, info);
-    if(item2.isEmpty()) return Empty.VALUE;
+    if(item2 == Empty.VALUE) return Empty.VALUE;
     return calcOpt.eval(item1, item2, info);
   }
 

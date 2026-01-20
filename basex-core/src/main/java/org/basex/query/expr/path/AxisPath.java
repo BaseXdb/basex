@@ -5,6 +5,7 @@ import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -41,7 +42,7 @@ public abstract class AxisPath extends Path {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     final Value cached = cache(qc);
-    return cached != null ? !cached.isEmpty() : iterator(qc).next() != null;
+    return cached != null ? cached != Empty.VALUE : iterator(qc).next() != null;
   }
 
   /**
@@ -52,7 +53,7 @@ public abstract class AxisPath extends Path {
    */
   private Value cache(final QueryContext qc) throws QueryException {
     final Value value = qc.focus.value;
-    if(root == null && value != null && value.isEmpty()) return value;
+    if(root == null && value == Empty.VALUE) return value;
 
     final PathCache cache = qc.threads.get(this).get();
     switch(cache.state) {

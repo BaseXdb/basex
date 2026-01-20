@@ -6,6 +6,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -153,7 +154,7 @@ public final class DeepEqual {
     if(itemsEqual != null) {
       final Value value = itemsEqual.invoke(qc, info, item1, item2);
       final Value test = Types.BOOLEAN_ZO.coerce(value, null, qc, null, info);
-      if(!test.isEmpty()) return (Bln) test;
+      if(test != Empty.VALUE) return (Bln) test;
     }
     return null;
   }

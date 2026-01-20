@@ -65,7 +65,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Tests if this is an empty sequence.
+   * Tests if this is an empty sequence. If the empty sequence is known to be {@link Empty#VALUE},
+   * it can be replaced with a slightly faster direct comparison.
    * @return result of check
    */
   public boolean isEmpty() {

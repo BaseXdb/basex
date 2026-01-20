@@ -409,6 +409,18 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
+   * Evaluates an expression to a map.
+   * @param expr expression
+   * @param qc query context
+   * @return map (empty map if the expression yields an empty sequence)
+   * @throws QueryException query exception
+   */
+  protected final XQMap toEmptyMap(final Expr expr, final QueryContext qc) throws QueryException {
+    final Item item = expr.item(qc, info);
+    return item.isEmpty() ? XQMap.empty() : toMap(item);
+  }
+
+  /**
    * Checks if the specified item is a Duration item. If it is untyped, a duration is returned.
    * @param item item to be checked
    * @return duration
@@ -587,9 +599,13 @@ public abstract class StandardFunc extends Arr {
   protected final Item toNodeOrAtomItem(final Expr expr, final boolean empty, final QueryContext qc)
       throws QueryException {
     Item item = expr.item(qc, info);
-    if(empty && item.isEmpty()) return null;
-    if(!(item instanceof ANode)) item = item.atomItem(qc, info);
-    if(item.isEmpty()) throw typeError(item, AtomType.ITEM, info);
+    if(!(item instanceof ANode)) {
+      item = item.atomItem(qc, info);
+      if(item.isEmpty()) {
+        if(empty) return null;
+        throw typeError(item, AtomType.ITEM, info);
+      }
+    }
     return item;
   }
 
@@ -639,9 +655,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final <E extends Options> E toOptions(final Expr expr, final E options,
       final QueryContext qc) throws QueryException {
-
-    final Item item = expr.item(qc, info);
-    if(!item.isEmpty()) options.assign(toMap(item), info);
+    options.assign(toEmptyMap(expr, qc), info);
     return options;
   }
 
@@ -656,9 +670,7 @@ public abstract class StandardFunc extends Arr {
       throws QueryException {
 
     final HashMap<String, Value> hm = new HashMap<>();
-    final Item item = expr.item(qc, info);
-    final XQMap map = item.isEmpty() ? XQMap.empty() : toMap(item);
-    map.forEach((key, value) -> {
+    toEmptyMap(expr, qc).forEach((key, value) -> {
       final byte[] k = key.type.isStringOrUntyped() ? key.string(info) : toQNm(key).unique();
       hm.put(string(k), value);
     });
@@ -785,7 +797,7 @@ public abstract class StandardFunc extends Arr {
   protected final boolean test(final FItem predicate, final HofArgs args,
       final QueryContext qc) throws QueryException {
     final Item item = invoke(predicate, args, qc).atomItem(qc, info);
-    return !item.isEmpty() && toBoolean(item);
+    return item != Empty.VALUE && toBoolean(item);
   }
 
   /**

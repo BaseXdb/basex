@@ -206,13 +206,13 @@ public final class List extends Arr {
     final int el = ex.length;
     for(int e = 0; e < el;) {
       value = ex[e++].value(qc);
-      if(value.isEmpty()) continue;
+      if(value == Empty.VALUE) continue;
       while(e < el) {
         final Value value2 = ex[e++].value(qc);
-        if(value2.isEmpty()) continue;
+        if(value2 == Empty.VALUE) continue;
         while(e < el) {
           final Value value3 = ex[e++].value(qc);
-          if(value3.isEmpty()) continue;
+          if(value3 == Empty.VALUE) continue;
           final long size = size();
           final ValueBuilder vb = new ValueBuilder(qc, size);
           if(size == -1) vb.tree(value.size() + value2.size() + value3.size() >=

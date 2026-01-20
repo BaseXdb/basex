@@ -58,7 +58,7 @@ public final class IterMap extends SimpleMap {
                 iters[pos--] = null;
               } else {
                 item = exprs[pos].item(qc, info);
-                if(item.isEmpty()) {
+                if(item == Empty.VALUE) {
                   item = null;
                   pos--;
                 } else {
