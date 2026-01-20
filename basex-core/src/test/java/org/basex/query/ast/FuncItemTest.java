@@ -100,8 +100,8 @@ public final class FuncItemTest extends SandboxTest {
   /** Checks for circular references leading to stack overflows. */
   @Test public void noLoopTest() {
     check("declare function local:Y($f) { $f(function() { $f }) };" +
-        "let $f := local:Y(function($x) { $x() }) return ($f ! .)[1]",
-        "(anonymous-function)#1",
+        "let $f := local:Y(function($x) { $x() }) return exists($f ! .)",
+        true,
         exists(FuncItem.class)
     );
   }
@@ -130,8 +130,8 @@ public final class FuncItemTest extends SandboxTest {
         "declare function local:bar($f) { $f(function($_) { $f }) };" +
         "let $a := local:foo(local:foo(function($e) { $e() })) " +
         "let $b := local:bar($a) " +
-        "return ($b ! .)[1]",
-        "(anonymous-function)#1",
+        "return exists($b ! .)",
+        true,
         exists(FuncItem.class)
     );
   }

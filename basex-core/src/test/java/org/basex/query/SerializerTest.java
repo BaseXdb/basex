@@ -300,7 +300,7 @@ public final class SerializerTest extends SandboxTest {
     query("xs:dayTimeDuration('P1D')", "P1D");
     query("<xml><a>B</a></xml>", "<xml><a>B</a></xml>");
     query("true#0", "fn:true#0");
-    query("fn() {}", "(anonymous-function)#0");
+    query("fn() {}", "fn() as empty-sequence() { () }");
     query("xs:float(1)", 1);
 
     query("[]", "[]");
@@ -319,7 +319,7 @@ public final class SerializerTest extends SandboxTest {
     query("[ xs:dayTimeDuration('P1D') ]", "[\"P1D\"]");
     query("[ <xml><a>B</a></xml> ]", "[<xml><a>B</a></xml>]");
     query("[ true#0 ]", "[fn:true#0]");
-    query("[ fn() {} ]", "[(anonymous-function)#0]");
+    query("[ fn() {} ]", "[fn() as empty-sequence() { () }]");
     query("[ xs:float(1) ]", "[\"1\"]"); // should be revised for 'adaptive' method
 
     query("{ 1: (), 2: 3, 4: (5, 6) }", "{1:(),2:3,4:(5,6)}");

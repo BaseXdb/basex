@@ -110,6 +110,10 @@ public final class XQJava extends FItem {
 
   @Override
   public void toString(final QueryString qs) {
-    qs.quoted(string(null));
+    if(qs.error()) {
+      qs.concat(funcName().prefixId(), "#0");
+    } else {
+      qs.quoted(string(null));
+    }
   }
 }

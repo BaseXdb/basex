@@ -236,9 +236,13 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" xs:numeric('23.2')") + " ? name", "#double");
 
     final String q1 = func.args(" <a>42</a>");
-    query(q1, "{\"name\":#untypedAtomic,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
-        + "\"primitive-type\":(anonymous-function)#0,\"variety\":\"atomic\",\"matches\":"
-        + "(anonymous-function)#1,\"constructor\":xs:untypedAtomic#1}");
+    query(q1, "{\"name\":#untypedAtomic,"
+        + "\"is-simple\":true(),"
+        + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"variety\":\"atomic\","
+        + "\"matches\":fn($value) as xs:boolean { matches($value) },"
+        + "\"constructor\":xs:untypedAtomic#1}");
     query(q1 + "?name eq #xs:untypedAtomic", true);
     query(q1 + "?is-simple", true);
     query(q1 + "?variety", "atomic");
@@ -259,9 +263,13 @@ public final class FnModuleTest extends SandboxTest {
     query(q1 + "?constructor(<a>abc</a>)", "abc");
 
     final String q2 = "let $q2 := " + func.args(" xs:unsignedByte(255)") + "\n return $q2";
-    query(q2, "{\"name\":#unsignedByte,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
-        + "\"primitive-type\":(anonymous-function)#0,\"variety\":\"atomic\",\"matches\":"
-        + "(anonymous-function)#1,\"constructor\":xs:unsignedByte#1}");
+    query(q2, "{\"name\":#unsignedByte,"
+        + "\"is-simple\":true(),"
+        + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"variety\":\"atomic\","
+        + "\"matches\":fn($value) as xs:boolean { matches($value) },"
+        + "\"constructor\":xs:unsignedByte#1}");
     query(q2 + "?name eq #xs:unsignedByte", true);
     query(q2 + "?is-simple", true);
     query(q2 + "?base-type()?name eq #xs:unsignedShort", true);
@@ -2163,7 +2171,9 @@ public final class FnModuleTest extends SandboxTest {
         "#untypedAtomic");
 
     final String q1 = func.args(" <a>42</a>");
-    query(q1, "{\"name\":#untyped,\"is-simple\":false(),\"base-type\":(anonymous-function)#0,"
+    query(q1, "{\"name\":#untyped,"
+        + "\"is-simple\":false(),"
+        + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"variety\":\"mixed\"}");
     query(q1 + "?name eq #xs:untyped", true);
     query(q1 + "?is-simple", false);
@@ -2176,9 +2186,13 @@ public final class FnModuleTest extends SandboxTest {
     query(q1 + "=> map:contains('simple-content-type')", false);
 
     final String q2 = func.args(" attribute a {42}");
-    query(q2, "{\"name\":#untypedAtomic,\"is-simple\":true(),\"base-type\":(anonymous-function)#0,"
-        + "\"primitive-type\":(anonymous-function)#0,\"variety\":\"atomic\",\"matches\":"
-        + "(anonymous-function)#1,\"constructor\":xs:untypedAtomic#1}");
+    query(q2, "{\"name\":#untypedAtomic,"
+        + "\"is-simple\":true(),"
+        + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
+        + "\"variety\":\"atomic\","
+        + "\"matches\":fn($value) as xs:boolean { matches($value) },"
+        + "\"constructor\":xs:untypedAtomic#1}");
     query(q2 + "?name eq #xs:untypedAtomic", true);
     query(q2 + "?is-simple", true);
     query(q2 + "?variety", "atomic");

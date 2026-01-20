@@ -435,7 +435,8 @@ public final class CsvRoundtripTest extends SandboxTest {
       final String expected) {
 
     // parsing
-    final String parseQuery = function.args(input, " { " + options + " }");
+    final String adaptive = "declare option output:method 'adaptive'; ";
+    final String parseQuery = adaptive + function.args(input, " { " + options + " }");
     final String result = query(parseQuery);
     compare(parseQuery, result, expected, null);
 
@@ -453,8 +454,8 @@ public final class CsvRoundtripTest extends SandboxTest {
       result.startsWith("{") ? " " + result.replace(",\"get\":(anonymous-function)#2", "") :
       result.isEmpty() ? " ()" : " " + result, " { " + options + format + " }");
     final String serialization = query(serializeQuery);
-    final String roundtripQuery = function.args(" \"" + serialization.replace("\"", "\"\"") + "\"",
-        " { " + options + " }");
+    final String roundtripQuery = adaptive +
+        function.args(" \"" + serialization.replace("\"", "\"\"") + "\"", " { " + options + " }");
     compare(roundtripQuery, query(roundtripQuery), expected, null);
   }
 }
