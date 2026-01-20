@@ -1,5 +1,23 @@
 VERSION 12.2 (January 20, 2025) ----------------------------------------
 
+ XQUERY 4.0
+ - support for private variables and functions without namespace
+
+ PERFORMANCE
+ - offset-based access to records with fixed entries
+ - improved propagation/modification of static record types
+ - union/intersect/except: more compile-time rewritings
+ - fold functions: improved short-circuiting
+ - faster general comparisons
+ - JDK 17+ Optimization tweaks
+
+ DEBUGGING
+ - better error messages
+ - unlimited trace output on command line
+
+ BUG FIXES
+ - RESTXQ, %input annotation: map/array construction
+ - HTML serialization, script elements
 
 VERSION 12.1 (December 23, 2025) ---------------------------------------
 
