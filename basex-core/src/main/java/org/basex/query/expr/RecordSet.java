@@ -46,7 +46,7 @@ public final class RecordSet extends Arr {
       tp = type;
     } else {
       // otherwise, derive new record type
-      tp = cc.qc.shared.record(type.copy(null, type.fields().key(index), vt.union(ft)));
+      tp = type.copy(null, type.fields().key(index), vt.union(ft), cc);
     }
     if(tp != null) exprType.assign(tp);
     return values(false, cc) ? cc.preEval(this) : this;

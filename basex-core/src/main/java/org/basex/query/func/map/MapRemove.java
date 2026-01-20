@@ -38,11 +38,11 @@ public final class MapRemove extends StandardFunc {
       if(mc.field.isOptional()) {
         // structure does not change: propagate record type
         tp = mc.record;
-      } else {
+      } else if(mc.record.fields().size() <= RecordType.MAX_GENERATED_SIZE) {
         // otherwise, derive new record type
-        final RecordType rt = cc.qc.shared.record(mc.record.copy(mc.key, null, null));
+        final RecordType rt = mc.record.copy(mc.key, null, null, cc);
         // return empty map if it will contain no entries
-        if(rt.fields().isEmpty() && !rt.isExtensible()) return XQMap.empty();
+        if(rt != null && rt.fields().isEmpty() && !rt.isExtensible()) return XQMap.empty();
         tp = rt;
       }
     } else if(mc.validKey) {

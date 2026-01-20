@@ -411,19 +411,24 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Creates a copy of the record type.
+   * Creates a new compile-time instance of the record type.
    * @param remove key to remove (can be {@code null})
    * @param put key to add or replace (can be {@code null})
    * @param seqType sequence type of the field to add or replace (ignored if put is {@code null})
-   * @return new type
+   * @param cc compilation context
+   * @return new type or {@code null} if number of fields exceeds limit
    */
-  public RecordType copy(final byte[] remove, final byte[] put, final SeqType seqType) {
+  public RecordType copy(final byte[] remove, final byte[] put, final SeqType seqType,
+      final CompileContext cc) {
+
     final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.size());
     for(final byte[] field : fields) {
       if(remove == null || !Token.eq(remove, field)) map.put(field, fields.get(field));
     }
     if(put != null) map.put(put, new RecordField(seqType));
-    return new RecordType(map, extensible);
+
+    return map.size() > MAX_GENERATED_SIZE ? null :
+      cc.qc.shared.record(new RecordType(map, extensible));
   }
 
   @Override

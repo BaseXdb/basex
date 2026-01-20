@@ -42,17 +42,17 @@ public final class MapPut extends StandardFunc {
       if(vt.instanceOf(ft)) {
         // structure does not change (new value has same type): propagate record type
         tp = mc.record;
-      } else {
+      } else if(mc.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
         // otherwise, derive new record type
-        tp = cc.qc.shared.record(mc.record.copy(null, mc.key, vt.union(ft)));
+        tp = mc.record.copy(null, mc.key, vt.union(ft), cc);
       }
     } else if(mc.validKey) {
       if(mc.record.isExtensible()) {
         // structure does not change: propagate record type
         tp = mc.record;
-      } else if(mc.key != null) {
+      } else if(mc.key != null && mc.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
         // otherwise, derive new record type
-        tp = cc.qc.shared.record(mc.record.copy(null, mc.key, value.seqType()));
+        tp = mc.record.copy(null, mc.key, value.seqType(), cc);
       }
     }
 
