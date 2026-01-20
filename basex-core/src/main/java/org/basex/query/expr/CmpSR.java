@@ -8,7 +8,6 @@ import org.basex.index.*;
 import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -82,7 +81,7 @@ public final class CmpSR extends Single {
     if(cmp1.has(Flag.NDT) || !(cmp2 instanceof final AStr str2)) return cmp;
 
     final byte[] d = str2.string(cmp.info);
-    final ParseExpr expr = switch(cmp.op.value()) {
+    final ParseExpr expr = switch(cmp.op) {
       case GE -> new CmpSR(cmp1, d,    true,  null, true,  cmp.info);
       case GT -> new CmpSR(cmp1, d,    false, null, true,  cmp.info);
       case LE -> new CmpSR(cmp1, null, true,  d,    true,  cmp.info);
@@ -143,7 +142,7 @@ public final class CmpSR extends Single {
       newMxi = cmp.mxi;
       coll = cmp.sc().collation;
     } else if(ex instanceof final CmpG cmp) {
-      if(cmp.op == OpG.EQ && cmp.exprs[1] instanceof final Str str) {
+      if(cmp.op == CmpOp.EQ && cmp.exprs[1] instanceof final Str str) {
         newMin = str.string();
         newMax = newMin;
         coll = cmp.sc().collation;
@@ -172,7 +171,7 @@ public final class CmpSR extends Single {
       final int diff = Token.compare(newMin, newMax);
       // return comparison for exact hit
       if(diff == 0 && newMni && newMxi) return
-          new CmpG(info, expr, Str.get(newMin), OpG.EQ).optimize(cc);
+          new CmpG(info, expr, Str.get(newMin), CmpOp.EQ).optimize(cc);
       // remove comparisons that will never yield results
       if(diff >= 0) return Bln.FALSE;
     }

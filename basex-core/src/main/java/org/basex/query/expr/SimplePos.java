@@ -4,8 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpG.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -59,7 +57,7 @@ final class SimplePos extends Arr implements CmpPos {
 
     Expr ex = null;
     if(exact()) {
-      ex = exprs[0].optimizePos(OpV.EQ, cc);
+      ex = exprs[0].optimizePos(CmpOp.EQ, cc);
       if(!(ex instanceof Bln)) ex = null;
     } else {
       exprs[1] = simplify.apply(exprs[1]);
@@ -138,9 +136,9 @@ final class SimplePos extends Arr implements CmpPos {
   public Expr invert(final CompileContext cc) throws QueryException {
     if(exprs[0].seqType().one()) {
       final QuerySupplier<Expr> pos = () -> cc.function(Function.POSITION, info);
-      if(exact()) return new CmpG(info, pos.get(), exprs[0], OpG.NE).optimize(cc);
-      if(exprs[0] == Itr.ONE) return new CmpG(info, pos.get(), exprs[1], OpG.GT).optimize(cc);
-      if(exprs[1] == Itr.MAX) return new CmpG(info, pos.get(), exprs[0], OpG.LT).optimize(cc);
+      if(exact()) return new CmpG(info, pos.get(), exprs[0], CmpOp.NE).optimize(cc);
+      if(exprs[0] == Itr.ONE) return new CmpG(info, pos.get(), exprs[1], CmpOp.GT).optimize(cc);
+      if(exprs[1] == Itr.MAX) return new CmpG(info, pos.get(), exprs[0], CmpOp.LT).optimize(cc);
     }
     return null;
   }

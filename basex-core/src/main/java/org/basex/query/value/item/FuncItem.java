@@ -9,7 +9,6 @@ import java.util.function.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
@@ -274,11 +273,11 @@ public final class FuncItem extends FItem implements Scope {
             final SeqType st1 = op1.seqType(), st2 = op2.seqType();
             if(isRef.test(op1, result) && op2 instanceof Item && st1.eq(st2) &&
                 (st1.instanceOf(Types.DECIMAL_O) || st1.instanceOf(Types.STRING_O))) {
-              if(cmp.opG() == OpG.EQ && op2.equals(expr1)) {
+              if(cmp.cmpOp() == CmpOp.EQ && op2.equals(expr1)) {
                 // if($result = ITEM) then ITEM else ACTION → exit on equality
                 exit = iff.cond;
                 action = expr2;
-              } else if(cmp.opG() == OpG.NE && op2.equals(expr2)) {
+              } else if(cmp.cmpOp() == CmpOp.NE && op2.equals(expr2)) {
                 // if($result != ITEM) then ACTION else ITEM → exit on not(inequality)
                 exit = cc.function(NOT, info, iff.cond);
                 action = expr1;

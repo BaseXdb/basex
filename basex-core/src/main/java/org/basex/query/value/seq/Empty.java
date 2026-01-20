@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -91,7 +90,7 @@ public final class Empty extends Item {
   }
 
   @Override
-  public Expr optimizePos(final OpV op, final CompileContext cc) {
+  public Expr optimizePos(final CmpOp op, final CompileContext cc) {
     return Bln.FALSE;
   }
 

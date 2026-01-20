@@ -13,7 +13,6 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.NameTest.*;
@@ -828,7 +827,7 @@ public abstract class Path extends ParseExpr {
             // index use is enforced: ...::document-node()[db:node-id(.) = db:node-id(ROOT)]
             newTest = NodeTest.DOCUMENT_NODE;
             newPreds = new Expr[] { new CmpG(info, _DB_NODE_ID.get(info, new ContextValue(ii)),
-              _DB_NODE_ID.get(info, rt), OpG.EQ) };
+              _DB_NODE_ID.get(info, rt), CmpOp.EQ) };
           }
         } else {
           final Step step = axisStep(s - 1);

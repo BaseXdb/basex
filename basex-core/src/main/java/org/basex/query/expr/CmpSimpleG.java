@@ -21,7 +21,7 @@ public final class CmpSimpleG extends CmpG {
    * @param op operator
    * @param info input info (can be {@code null})
    */
-  CmpSimpleG(final Expr expr1, final Expr expr2, final OpG op, final InputInfo info) {
+  CmpSimpleG(final Expr expr1, final Expr expr2, final CmpOp op, final InputInfo info) {
     super(info, expr1, expr2, op);
   }
 

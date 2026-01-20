@@ -7,7 +7,6 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.ft.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
@@ -162,7 +161,7 @@ public abstract class Preds extends Arr {
 
     // positional tests: x[1] → x[pos: 1]
     if(expr.seqType().type.instanceOf(AtomType.NUMERIC)) {
-      final Expr ex = Pos.get(expr, OpV.EQ, info, cc, null);
+      final Expr ex = Pos.get(expr, CmpOp.EQ, info, cc, null);
       if(ex != null) expr = ex;
     }
 
@@ -280,7 +279,7 @@ public abstract class Preds extends Arr {
         type1 == type2 || type1.isStringOrUntyped() && type2.isStringOrUntyped()
       )) && !op2.has(Flag.CTX)) {
         final Expr expr = createExpr.apply(op1, true);
-        if(expr != this) return new CmpG(cmp.info, expr, op2, cmp.opG()).optimize(cc);
+        if(expr != this) return new CmpG(cmp.info, expr, op2, cmp.cmpOp()).optimize(cc);
       }
     }
 

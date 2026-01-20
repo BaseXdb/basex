@@ -5,7 +5,6 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -356,7 +355,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+  public Expr optimizePos(final CmpOp op, final CompileContext cc) throws QueryException {
     return simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.DISTINCT, cc);
   }
 

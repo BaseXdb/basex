@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -32,7 +31,7 @@ final class MixedPos extends Single implements CmpPos {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.DISTINCT, cc);
 
-    final Expr ex = Pos.get(expr, OpV.EQ, info, cc, this);
+    final Expr ex = Pos.get(expr, CmpOp.EQ, info, cc, this);
     return ex != null ? cc.replaceWith(this, ex) : this;
   }
 

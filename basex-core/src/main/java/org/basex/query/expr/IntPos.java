@@ -4,7 +4,6 @@ import static java.lang.Long.*;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -89,7 +88,7 @@ public final class IntPos extends Simple implements CmpPos {
   public Expr invert(final CompileContext cc) throws QueryException {
     if(exact()) {
       final Expr pos = cc.function(Function.POSITION, info);
-      return new CmpG(info, pos, Itr.get(min), OpG.NE).optimize(cc);
+      return new CmpG(info, pos, Itr.get(min), CmpOp.NE).optimize(cc);
     }
     return min == 1 ? get(max + 1, MAX_VALUE, info) :
       max == MAX_VALUE ? get(1, min - 1, info) : null;

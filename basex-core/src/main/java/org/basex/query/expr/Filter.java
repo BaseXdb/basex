@@ -6,7 +6,6 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.util.list.*;
@@ -160,7 +159,7 @@ public abstract class Filter extends AFilter {
           cc.function(SORT, info, cc.function(DISTINCT_VALUES, info, posExpr)), Bln.get(sorted));
       } else if(pred instanceof final CmpG cmp) {
         final Expr op1 = pred.arg(0), op2 = pred.arg(1);
-        if(POSITION.is(op1) && cmp.opV() == OpV.NE &&
+        if(POSITION.is(op1) && cmp.op == CmpOp.NE &&
             op2.isSimple() && op2.seqType().instanceOf(Types.INTEGER_O)) {
           // E[position() != pos] → remove(E, pos)
           ex = cc.function(REMOVE, info, add.apply(expr), op2);

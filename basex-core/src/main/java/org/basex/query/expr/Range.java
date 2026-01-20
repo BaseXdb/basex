@@ -7,7 +7,6 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.Function;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
@@ -97,7 +96,7 @@ public final class Range extends Arr {
   }
 
   @Override
-  public Expr optimizePos(final OpV op, final CompileContext cc) throws QueryException {
+  public Expr optimizePos(final CmpOp op, final CompileContext cc) throws QueryException {
     final Predicate<Expr> type = e -> {
       final SeqType st = e.seqType();
       return st.one() && (st.type.instanceOf(AtomType.INTEGER) || st.type.isUntyped());

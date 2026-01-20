@@ -2,7 +2,6 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
@@ -36,7 +35,7 @@ public final class FnAtomicEqual extends StandardFunc {
       if(tp2.oneOf(AtomType.UNTYPED_ATOMIC, AtomType.ANY_URI)) tp2 = AtomType.STRING;
       if(tp1 == tp2 && (tp1.oneOf(AtomType.QNAME, AtomType.BOOLEAN) ||
           tp1.instanceOf(AtomType.DECIMAL) || tp1.instanceOf(AtomType.STRING))) {
-        return new CmpG(info, value1, value2, OpG.EQ).optimize(cc);
+        return new CmpG(info, value1, value2, CmpOp.EQ).optimize(cc);
       }
     }
     return this;

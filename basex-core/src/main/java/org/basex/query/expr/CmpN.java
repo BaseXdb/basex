@@ -3,8 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpG.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -20,83 +18,8 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CmpN extends Cmp {
-  /** Comparators. */
-  public enum OpN {
-    /** Node comparison: same. */
-    EQ("is") {
-      @Override
-      public boolean eval(final ANode node1, final ANode node2) {
-        return node1.is(node2);
-      }
-    },
-
-    /** Node comparison: different. */
-    NE("is-not") {
-      @Override
-      public boolean eval(final ANode node1, final ANode node2) {
-        return !node1.is(node2);
-      }
-    },
-
-    /** Node comparison: precedes. */
-    LT("<<", "precedes") {
-      @Override
-      public boolean eval(final ANode node1, final ANode node2) {
-        return node1.compare(node2) < 0;
-      }
-    },
-
-    /** Node comparison: follows-or-is. */
-    LE("precedes-or-is") {
-      @Override
-      public boolean eval(final ANode node1, final ANode node2) {
-        return node1.compare(node2) <= 0;
-      }
-    },
-
-    /** Node comparison: follows-or-is. */
-    GE("follows-or-is") {
-      @Override
-      public boolean eval(final ANode node1, final ANode node2) {
-        return node1.compare(node2) >= 0;
-      }
-    },
-
-    /** Node comparison: follows. */
-    GT(">>", "follows") {
-      @Override
-      public boolean eval(final ANode node1, final ANode node2) {
-        return node1.compare(node2) > 0;
-      }
-    };
-
-    /** String representations. */
-    public final String[] names;
-
-    /**
-     * Constructor.
-     * @param names string representations
-     */
-    OpN(final String... names) {
-      this.names = names;
-    }
-
-    /**
-     * Evaluates the expression.
-     * @param node1 first node
-     * @param node2 second node
-     * @return result
-     */
-    public abstract boolean eval(ANode node1, ANode node2);
-
-    @Override
-    public String toString() {
-      return names[0];
-    }
-  }
-
   /** Comparator. */
-  private final OpN op;
+  private final CmpOp op;
 
   /**
    * Constructor.
@@ -105,7 +28,7 @@ public final class CmpN extends Cmp {
    * @param expr2 second expression
    * @param op comparator
    */
-  public CmpN(final InputInfo info, final Expr expr1, final Expr expr2, final OpN op) {
+  public CmpN(final InputInfo info, final Expr expr1, final Expr expr2, final CmpOp op) {
     super(info, expr1, expr2, Types.BOOLEAN_ZO);
     this.op = op;
   }
@@ -145,12 +68,7 @@ public final class CmpN extends Cmp {
   }
 
   @Override
-  public OpV opV() {
-    return null;
-  }
-
-  @Override
-  public OpG opG() {
+  public CmpOp cmpOp() {
     return null;
   }
 
@@ -166,16 +84,16 @@ public final class CmpN extends Cmp {
 
   @Override
   public String description() {
-    return "'" + op + "' comparison";
+    return "'" + op.toNodeString() + "' comparison";
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, OP, op.names[0]), exprs);
+    plan.add(plan.create(this, OP, op.toNodeString()), exprs);
   }
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, " " + op + ' ', true);
+    qs.tokens(exprs, " " + op.toNodeString() + ' ', true);
   }
 }

@@ -10,7 +10,6 @@ import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
@@ -183,7 +182,7 @@ public final class CmpR extends Single {
     if(ex instanceof final CmpR cmp) {
       newMin = cmp.min;
       newMax = cmp.max;
-    } else if(ex instanceof final CmpG cmp && cmp.op == OpG.EQ &&
+    } else if(ex instanceof final CmpG cmp && cmp.op == CmpOp.EQ &&
         ex.arg(1) instanceof final ANum num) {
       newMin = num.dbl();
       newMax = newMin;

@@ -4,7 +4,6 @@ import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -39,7 +38,7 @@ public final class FnPosition extends StandardFunc {
   }
 
   @Override
-  public Expr optimizePos(final OpV op, final CompileContext cc) {
-    return Bln.get(op == OpV.EQ || op == OpV.GE || op == OpV.LE);
+  public Expr optimizePos(final CmpOp op, final CompileContext cc) {
+    return Bln.get(op.oneOf(CmpOp.EQ, CmpOp.GE, CmpOp.LE));
   }
 }

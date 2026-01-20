@@ -2,7 +2,6 @@ package org.basex.query.func.util;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -46,7 +45,7 @@ public final class UtilSelect extends ContextFn {
         // util:select((#a, #b)) → node-name() = (#a, #b)
         final Expr[] args = defined(1) ? new Expr[] { expr2 } : new Expr[0];
         final Expr op1 = cc.function(Function.NODE_NAME, info, args);
-        return new CmpG(info, op1, expr1, OpG.EQ).optimize(cc);
+        return new CmpG(info, op1, expr1, CmpOp.EQ).optimize(cc);
       }
     }
     return this;

@@ -4,7 +4,6 @@ import static java.lang.Long.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -43,14 +42,14 @@ public final class Pos extends Single {
    * @return optimized expression or {@code null}
    * @throws QueryException query exception
    */
-  public static Expr get(final Expr positions, final OpV op, final InputInfo info,
+  public static Expr get(final Expr positions, final CmpOp op, final InputInfo info,
       final CompileContext cc, final Expr ref) throws QueryException {
 
     // static result. example: position() > 0 → true
     Expr pos = positions.optimizePos(op, cc);
     if(pos instanceof Bln) return pos;
 
-    if(op == OpV.EQ) {
+    if(op == CmpOp.EQ) {
       // normalize positions (sort, remove duplicates and illegal positions)
       if(cc.values(true, pos)) pos = ddo((Value) pos);
       if(pos == Empty.VALUE) return Bln.FALSE;
@@ -117,12 +116,12 @@ public final class Pos extends Single {
         // position() = last() → pos: last()
         if(max == null) return ref instanceof Pos ? null : new Pos(info, min);
         // position() < last() → position() = 1 to last() - 1
-        if(integer) return get(new Range(info, min, max).optimize(cc), OpV.EQ, info, cc, ref);
+        if(integer) return get(new Range(info, min, max).optimize(cc), CmpOp.EQ, info, cc, ref);
       }
     }
 
     // position() = (1, 2, 4)
-    if(op == OpV.EQ && pos.isSimple()) {
+    if(op == CmpOp.EQ && pos.isSimple()) {
       return ref instanceof MixedPos ? null : new MixedPos(info, pos);
     }
 
@@ -163,7 +162,7 @@ public final class Pos extends Single {
   public Expr optimize(final CompileContext cc) throws QueryException {
     expr = expr.simplifyFor(Simplify.NUMBER, cc).simplifyFor(Simplify.DISTINCT, cc);
 
-    final Expr ex = get(expr, OpV.EQ, info, cc, this);
+    final Expr ex = get(expr, CmpOp.EQ, info, cc, this);
     return ex != null ? cc.replaceWith(this, ex) : this;
   }
 

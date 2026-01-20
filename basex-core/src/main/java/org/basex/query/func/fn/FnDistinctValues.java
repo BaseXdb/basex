@@ -8,7 +8,6 @@ import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
@@ -134,12 +133,12 @@ public final class FnDistinctValues extends FnDuplicateValues {
    * @return new function or {@code null}
    * @throws QueryException query context
    */
-  public Expr duplicates(final OpV op, final CompileContext cc) throws QueryException {
-    if(op == OpV.LT) return Bln.FALSE;
-    if(op == OpV.GE) return Bln.TRUE;
+  public Expr duplicates(final CmpOp op, final CompileContext cc) throws QueryException {
+    if(op == CmpOp.LT) return Bln.FALSE;
+    if(op == CmpOp.GE) return Bln.TRUE;
 
     final Expr dupl = cc.function(DUPLICATE_VALUES, info, exprs);
-    return cc.function(op == OpV.LE || op == OpV.EQ ? EMPTY : EXISTS, info, dupl);
+    return cc.function(op.oneOf(CmpOp.LE, CmpOp.EQ) ? EMPTY : EXISTS, info, dupl);
   }
 
   /**

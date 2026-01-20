@@ -5,7 +5,6 @@ import java.math.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.fn.FnRound.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -173,7 +172,7 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public final Expr optimizePos(final OpV op, final CompileContext cc) {
+  public final Expr optimizePos(final CmpOp op, final CompileContext cc) {
     final double d = dbl();
     final long l = (long) d;
     final boolean fractional = d != l;

@@ -9,7 +9,6 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.expr.path.NameTest.*;
 import org.basex.query.func.fn.*;
@@ -32,127 +31,9 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public class CmpG extends Cmp {
-  /** Comparators. */
-  public enum OpG {
-    /** General comparison: less or equal. */
-    LE("<=") {
-      @Override
-      public OpG swap() { return GE; }
-      @Override
-      public OpG invert() { return GT; }
-      @Override
-      public OpV value() { return OpV.LE; }
-    },
-
-    /** General comparison: less. */
-    LT("<") {
-      @Override
-      public OpG swap() { return GT; }
-      @Override
-      public OpG invert() { return GE; }
-      @Override
-      public OpV value() { return OpV.LT; }
-    },
-
-    /** General comparison: greater of equal. */
-    GE(">=") {
-      @Override
-      public OpG swap() { return LE; }
-      @Override
-      public OpG invert() { return LT; }
-      @Override
-      public OpV value() { return OpV.GE; }
-    },
-
-    /** General comparison: greater. */
-    GT(">") {
-      @Override
-      public OpG swap() { return LT; }
-      @Override
-      public OpG invert() { return LE; }
-      @Override
-      public OpV value() { return OpV.GT; }
-    },
-
-    /** General comparison: equal. */
-    EQ("=") {
-      @Override
-      public OpG swap() { return EQ; }
-      @Override
-      public OpG invert() { return NE; }
-      @Override
-      public OpV value() { return OpV.EQ; }
-    },
-
-    /** General comparison: not equal. */
-    NE("!=") {
-      @Override
-      public OpG swap() { return NE; }
-      @Override
-      public OpG invert() { return EQ; }
-      @Override
-      public OpV value() { return OpV.NE; }
-    };
-
-    /** String representation. */
-    public final String name;
-
-    /**
-     * Constructor.
-     * @param name string representation
-     */
-    OpG(final String name) {
-      this.name = name;
-    }
-
-    /**
-     * Swaps the comparator.
-     * @return swapped comparator
-     */
-    public abstract OpG swap();
-
-    /**
-     * Inverts the comparator.
-     * @return inverted comparator
-     */
-    public abstract OpG invert();
-
-    /**
-     * Returns the value comparator.
-     * @return comparator
-     */
-    public abstract OpV value();
-
-    @Override
-    public String toString() {
-      return name;
-    }
-
-    /**
-     * Checks if this is one of the specified candidates.
-     * @param candidates candidates
-     * @return result of check
-     */
-    public boolean oneOf(final OpG... candidates) {
-      return Enums.oneOf(this, candidates);
-    }
-
-    /**
-     * Returns the comparator for the specified value comparison operator.
-     * @param opV operator to be found
-     * @return comparator or {@code null}
-     */
-    static OpG get(final OpV opV) {
-      for(final OpG value : values()) {
-        if(value.value() == opV) return value;
-      }
-      return null;
-    }
-  }
-
-  /** Operator. */
-  OpG op;
-  /** Indicates if input is comparable. */
+  /** Comparator. */
+  CmpOp op;
+  /** Indicates if input is known to be comparable. */
   boolean comparable;
 
   /**
@@ -162,7 +43,7 @@ public class CmpG extends Cmp {
    * @param expr2 second expression
    * @param op operator
    */
-  public CmpG(final InputInfo info, final Expr expr1, final Expr expr2, final OpG op) {
+  public CmpG(final InputInfo info, final Expr expr1, final Expr expr2, final CmpOp op) {
     super(info, expr1, expr2, Types.BOOLEAN_O);
     this.op = op;
   }
@@ -227,14 +108,14 @@ public class CmpG extends Cmp {
       if(st1.zeroOrOne() && !st1.mayBeArray() && st2.zeroOrOne() && !st2.mayBeArray()) {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) expr = copyType(new CmpSimpleG(expr1, expr2, op, info));
-      } else if(op == OpG.EQ && sc().collation == null && !st2.zeroOrOne() && (
+      } else if(op == CmpOp.EQ && sc().collation == null && !st2.zeroOrOne() && (
         type1.isNumber() && type2.isNumber() ||
         type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
         type1 == AtomType.BOOLEAN && type2 == AtomType.BOOLEAN
       )) {
         // hash-based comparisons
         if(!(this instanceof CmpHashG)) expr = copyType(new CmpHashG(expr1, expr2, op, info));
-      } else if(op == OpG.EQ && expr2 instanceof Range && type1.isNumberOrUntyped()) {
+      } else if(op == CmpOp.EQ && expr2 instanceof Range && type1.isNumberOrUntyped()) {
         // range comparisons
         if(!(this instanceof CmpRangeG)) expr = copyType(new CmpRangeG(expr1, expr2, op, info));
       }
@@ -276,7 +157,7 @@ public class CmpG extends Cmp {
         ) && (
           calc1.oneOf(Calc.ADD, Calc.SUBTRACT) ||
           calc1.oneOf(Calc.MULTIPLY, Calc.DIVIDE) && num12 != 0 &&
-            (op.oneOf(OpG.EQ, OpG.NE) || num12 > 0)
+            (op.oneOf(CmpOp.EQ, CmpOp.NE) || num12 > 0)
         )) {
           // position() + 1 < last() → position() < last() - 1
           // count(E) div 2 = 1 → count(E) = 1 * 2
@@ -352,7 +233,7 @@ public class CmpG extends Cmp {
    */
   final boolean eval(final Item item1, final Item item2) throws QueryException {
     if(comparable || item1.comparable(item2) || item1.type.isUntyped() || item2.type.isUntyped()) {
-      return op.value().eval(item1.compare(item2, null, false, info));
+      return op.eval(item1.compare(item2, null, false, info));
     }
     throw compareError(item1, item2, info);
   }
@@ -362,13 +243,13 @@ public class CmpG extends Cmp {
    * to a general comparison.
    * @param st1   first sequence type
    * @param st2   second sequence type
-   * @param eqne  eq/ne comparison
+   * @param op    comparator
    * @return result of check
    */
-  public static boolean compatible(final SeqType st1, final SeqType st2, final boolean eqne) {
+  public static boolean compatible(final SeqType st1, final SeqType st2, final CmpOp op) {
     final Type type1 = st1.type, type2 = st2.type;
     return type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
-        (type1.isSortable() || !eqne) ||
+        (type1.isSortable() || !op.oneOf(CmpOp.EQ, CmpOp.NE)) ||
       type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
       type1 == AtomType.QNAME && type2 == AtomType.QNAME ||
       type1.instanceOf(AtomType.NUMERIC) && type2.instanceOf(AtomType.NUMERIC) ||
@@ -384,12 +265,7 @@ public class CmpG extends Cmp {
   }
 
   @Override
-  public final OpV opV() {
-    return op.value();
-  }
-
-  @Override
-  public final OpG opG() {
+  public final CmpOp cmpOp() {
     return op;
   }
 
@@ -412,13 +288,13 @@ public class CmpG extends Cmp {
     if(!(expr2 instanceof final CmpG cmp2)) return null;
 
     // compare first and second comparison
-    final OpG cmpOp = not2 ? cmp2.op.invert() : cmp2.op;
+    final CmpOp cmpOp = not2 ? cmp2.op.invert() : cmp2.op;
     if(op != cmpOp || sc().collation != cmp2.sc().collation || !exprs[0].equals(cmp2.exprs[0]))
       return null;
 
     // function for creating new comparison
     final Expr exprL = exprs[0], exprR1 = exprs[1], exprR2 = cmp2.exprs[1];
-    final QueryFunction<OpG, Expr> newList = newOp -> {
+    final QueryFunction<CmpOp, Expr> newList = newOp -> {
       final Expr exprR = List.get(cc, info, exprR1, exprR2);
       return new CmpG(info, exprL, exprR, newOp).optimize(cc);
     };
@@ -473,9 +349,8 @@ public class CmpG extends Cmp {
 
     final Type type = val.seqType().type;
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    final OpV opV = opV();
     if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof final ContextFn fn &&
-        expr2 instanceof final Value value && opV == OpV.EQ) {
+        expr2 instanceof final Value value && op == CmpOp.EQ) {
       // skip functions that do not refer to the current context value
       if(fn.exprs.length > 0 && !(fn.exprs[0] instanceof ContextValue)) return this;
 
@@ -533,7 +408,7 @@ public class CmpG extends Cmp {
   @Override
   public final boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // only equality expressions on default collation can be rewritten
-    if(op != OpG.EQ || sc().collation != null) return false;
+    if(op != CmpOp.EQ || sc().collation != null) return false;
 
     Expr expr1 = exprs[0];
     IndexType type = null;
@@ -573,7 +448,7 @@ public class CmpG extends Cmp {
 
   @Override
   public final void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, QueryText.OP, op.name), exprs);
+    plan.add(plan.create(this, QueryText.OP, op), exprs);
   }
 
   @Override

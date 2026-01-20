@@ -3,8 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.CmpG.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.func.*;
 import org.basex.query.func.fn.*;
@@ -92,16 +90,10 @@ public abstract class Cmp extends Arr {
   public abstract Expr invert();
 
   /**
-   * Returns the value comparator of the expression.
-   * @return operator, or {@code null} for node comparisons
-   */
-  public abstract OpV opV();
-
-  /**
    * Returns the general comparator of the expression.
    * @return operator, or {@code null} for node comparisons
    */
-  public abstract OpG opG();
+  public abstract CmpOp cmpOp();
 
   /**
    * Performs various optimizations.
@@ -110,7 +102,7 @@ public abstract class Cmp extends Arr {
    * @throws QueryException query exception
    */
   final Expr opt(final CompileContext cc) throws QueryException {
-    final OpV op = opV();
+    final CmpOp op = cmpOp();
     Expr expr = optPos(op, cc);
     if(expr == this) expr = optEqual(op, cc);
     if(expr == this) expr = optCount(op, cc);
@@ -126,7 +118,7 @@ public abstract class Cmp extends Arr {
    * @param cc compilation context
    * @return optimized or original expression
    */
-  private Expr optEqual(final OpV op, final CompileContext cc) {
+  private Expr optEqual(final CmpOp op, final CompileContext cc) {
     if(!(this instanceof CmpG)) return this;
 
     final Expr expr1 = exprs[0], expr2 = exprs[1];
@@ -134,7 +126,7 @@ public abstract class Cmp extends Arr {
     final Type type1 = st1.type;
     if(expr1.equals(expr2) &&
       // keep: () = (), (1,2) != (1,2), (1,2) eq (1,2)
-      (op != OpV.EQ ? st1.one() : st1.oneOrMore()) &&
+      (op != CmpOp.EQ ? st1.one() : st1.oneOrMore()) &&
       // keep: xs:double('NaN') = xs:double('NaN')
       (type1.isStringOrUntyped() || type1.instanceOf(AtomType.DECIMAL) ||
           type1 == AtomType.BOOLEAN) &&
@@ -146,7 +138,7 @@ public abstract class Cmp extends Arr {
       // <x/> ne <x/> → false()
       // (1, 2) >= (1, 2) → true()
       // (1, 2, 3)[last() = last()] → (1, 2, 3)
-      return Bln.get(op == OpV.EQ || op == OpV.GE || op == OpV.LE);
+      return Bln.get(op.oneOf(CmpOp.EQ, CmpOp.GE, CmpOp.LE));
     }
     return this;
   }
@@ -158,11 +150,11 @@ public abstract class Cmp extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  private Expr optBoolean(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optBoolean(final CmpOp op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     if(st1.type == AtomType.BOOLEAN && st2.type == AtomType.BOOLEAN) {
-      final boolean eq = op == OpV.EQ, ne = op == OpV.NE;
+      final boolean eq = op == CmpOp.EQ, ne = op == CmpOp.NE;
       if(expr2 instanceof Bln) {
         final boolean ok = expr2 == Bln.TRUE, success = ne ^ ok;
 
@@ -208,9 +200,9 @@ public abstract class Cmp extends Arr {
                 // (code ! (. = 1)) = false() → code != 1
                 final Expr op2 = ops[1];
                 if(!op2.has(Flag.CTX) && (eq && ok || op2.seqType().one())) {
-                  OpG opG = cmp.op;
-                  if(!success) opG = opG.invert();
-                  return new CmpG(info, map.remove(cc, al), op2, opG).optimize(cc);
+                  CmpOp cmpOp = cmp.op;
+                  if(!success) cmpOp = cmpOp.invert();
+                  return new CmpG(info, map.remove(cc, al), op2, cmpOp).optimize(cc);
                 }
               } else if(success && last instanceof final CmpR cmp) {
                 // (number ! (. >= 1e0) = true() → number >= 1e0
@@ -241,7 +233,7 @@ public abstract class Cmp extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  private Expr optCount(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optCount(final CmpOp op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0];
     if(!COUNT.is(expr1)) return this;
 
@@ -268,15 +260,15 @@ public abstract class Cmp extends Arr {
       if(arg.seqType().zeroOrOne()) {
         // count(ZeroOrOne) < 2 → true()
         if(cnt > 1) {
-          return Bln.get(op == OpV.LT || op == OpV.LE || op == OpV.NE);
+          return Bln.get(op.oneOf(CmpOp.LT, CmpOp.LE, CmpOp.NE));
         }
         // count(ZeroOrOne)  < 1 → empty(ZeroOrOne)
         // count(ZeroOrOne)  = 1 → exists(ZeroOrOne)
         // count(ZeroOrOne) <= 1 → true()
         if(cnt == 1) {
-          return op == OpV.NE || op == OpV.LT ? cc.function(EMPTY, info, arg) :
-                 op == OpV.EQ || op == OpV.GE ? cc.function(EXISTS, info, arg) :
-                 Bln.get(op == OpV.LE);
+          return op.oneOf(CmpOp.NE, CmpOp.LT) ? cc.function(EMPTY, info, arg) :
+                 op.oneOf(CmpOp.EQ, CmpOp.GE) ? cc.function(EXISTS, info, arg) :
+                 Bln.get(op == CmpOp.LE);
         }
       }
       final long[] counts = countRange(op, cnt);
@@ -291,7 +283,7 @@ public abstract class Cmp extends Arr {
       if(counts != null) {
         for(final long c : counts) args.add(Itr.get(c));
       }
-    } else if(op == OpV.EQ || op == OpV.GE || op == OpV.LE) {
+    } else if(op.oneOf(CmpOp.EQ, CmpOp.GE, CmpOp.LE)) {
       final SeqType st2 = count.seqType();
       if(st2.type.instanceOf(AtomType.INTEGER)) {
         if(count instanceof final RangeSeq rs) {
@@ -302,8 +294,8 @@ public abstract class Cmp extends Arr {
           args.add(count).add(count);
         }
         if(!args.isEmpty()) {
-          if(op == OpV.GE) args.remove(args.size() - 1);
-          else if(op == OpV.LE) args.set(0, Itr.ONE);
+          if(op == CmpOp.GE) args.remove(args.size() - 1);
+          else if(op == CmpOp.LE) args.set(0, Itr.ONE);
         }
       }
     }
@@ -321,7 +313,7 @@ public abstract class Cmp extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  private Expr optStringLength(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optStringLength(final CmpOp op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     if(!(STRING_LENGTH.is(expr1) && expr2 instanceof final ANum num)) return this;
 
@@ -351,16 +343,16 @@ public abstract class Cmp extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  private Expr optEmptyString(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optEmptyString(final CmpOp op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType();
     if(st1.one() && st1.type.isStringOrUntyped() && expr2 == Str.EMPTY) {
-      if(op == OpV.LT) return Bln.FALSE;
-      if(op == OpV.GE) return Bln.TRUE;
+      if(op == CmpOp.LT) return Bln.FALSE;
+      if(op == CmpOp.GE) return Bln.TRUE;
       // do not rewrite GT, as it may be rewritten to a range expression later on
-      if(op != OpV.GT) {
+      if(op != CmpOp.GT) {
         // EQ and LE can be treated identically
-        final Function func = op == OpV.NE ? BOOLEAN : NOT;
+        final Function func = op == CmpOp.NE ? BOOLEAN : NOT;
         return cc.function(func, info, cc.function(DATA, info, exprs[0]));
       }
     }
@@ -374,7 +366,7 @@ public abstract class Cmp extends Arr {
    * @return optimized or original expression
    * @throws QueryException query exception
    */
-  private Expr optPos(final OpV op, final CompileContext cc) throws QueryException {
+  private Expr optPos(final CmpOp op, final CompileContext cc) throws QueryException {
     if(POSITION.is(exprs[0]) && exprs[1].seqType().type.isNumberOrUntyped()) {
       final Expr expr = Pos.get(exprs[1], op, info, cc, null);
       if(expr != null) return expr;
@@ -388,33 +380,33 @@ public abstract class Cmp extends Arr {
    * @param count count to compare against
    * @return comparison type, min/max range or {@code null}
    */
-  private static long[] countRange(final OpV op, final double count) {
+  private static long[] countRange(final CmpOp op, final double count) {
     // skip special cases
     if(!Double.isFinite(count)) return null;
 
     // > (v<0), != (v<0), >= (v<=0), != integer(v)
     final long cnt = (long) count;
-    if((op == OpV.GT || op == OpV.NE) && count < 0 ||
-        op == OpV.GE && count <= 0 ||
-        op == OpV.NE && count != cnt) return COUNT_TRUE;
+    if((op.oneOf(CmpOp.GT, CmpOp.NE)) && count < 0 ||
+        op == CmpOp.GE && count <= 0 ||
+        op == CmpOp.NE && count != cnt) return COUNT_TRUE;
     // < (v<=0), <= (v<0), = (v<0), != integer(v)
-    if(op == OpV.LT && count <= 0 ||
-      (op == OpV.LE || op == OpV.EQ) && count < 0 ||
-       op == OpV.EQ && count != cnt) return COUNT_FALSE;
+    if(op == CmpOp.LT && count <= 0 ||
+      (op.oneOf(CmpOp.LE, CmpOp.EQ)) && count < 0 ||
+       op == CmpOp.EQ && count != cnt) return COUNT_FALSE;
     // < (v<=1), <= (v<1), = (v=0)
-    if(op == OpV.LT && count <= 1 ||
-       op == OpV.LE && count < 1 ||
-       op == OpV.EQ && count == 0) return COUNT_EMPTY;
+    if(op == CmpOp.LT && count <= 1 ||
+       op == CmpOp.LE && count < 1 ||
+       op == CmpOp.EQ && count == 0) return COUNT_EMPTY;
     // > (v<1), >= (v<=1), != (v=0)
-    if(op == OpV.GT && count < 1 ||
-       op == OpV.GE && count <= 1 ||
-       op == OpV.NE && count == 0) return COUNT_EXISTS;
+    if(op == CmpOp.GT && count < 1 ||
+       op == CmpOp.GE && count <= 1 ||
+       op == CmpOp.NE && count == 0) return COUNT_EXISTS;
     // range queries
-    if(op == OpV.GT) return new long[] { (long) Math.floor(count) + 1 };
-    if(op == OpV.GE) return new long[] { (long) Math.ceil(count) };
-    if(op == OpV.LT) return new long[] { 0, (long) Math.ceil(count) - 1 };
-    if(op == OpV.LE) return new long[] { 0, (long) Math.floor(count) };
-    if(op == OpV.EQ) return new long[] { cnt, cnt };
+    if(op == CmpOp.GT) return new long[] { (long) Math.floor(count) + 1 };
+    if(op == CmpOp.GE) return new long[] { (long) Math.ceil(count) };
+    if(op == CmpOp.LT) return new long[] { 0, (long) Math.ceil(count) - 1 };
+    if(op == CmpOp.LE) return new long[] { 0, (long) Math.floor(count) };
+    if(op == CmpOp.EQ) return new long[] { cnt, cnt };
     return null;
   }
 }

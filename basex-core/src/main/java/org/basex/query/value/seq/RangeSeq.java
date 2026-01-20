@@ -12,7 +12,6 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.Function;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -164,7 +163,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Expr optimizePos(final OpV op, final CompileContext cc) {
+  public Expr optimizePos(final CmpOp op, final CompileContext cc) {
     final long min = min(), max = max();
     switch(op) {
       case LE:

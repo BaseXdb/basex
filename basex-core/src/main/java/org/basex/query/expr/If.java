@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -133,9 +132,9 @@ public final class If extends Arr {
         new And(info, cond, br1).optimize(cc);
 
       if(contradict(br1, br2, false)) return new CmpG(
-          info, cc.function(BOOLEAN, info, cond), br1, OpG.EQ).optimize(cc);
+          info, cc.function(BOOLEAN, info, cond), br1, CmpOp.EQ).optimize(cc);
       if(contradict(br2, br1, false)) return new CmpG(
-          info, cc.function(BOOLEAN, info, cond), br2, OpG.NE).optimize(cc);
+          info, cc.function(BOOLEAN, info, cond), br2, CmpOp.NE).optimize(cc);
     }
     return this;
   }

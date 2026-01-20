@@ -19,9 +19,6 @@ import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpG.*;
-import org.basex.query.expr.CmpN.*;
-import org.basex.query.expr.CmpV.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.ft.*;
@@ -1592,7 +1589,7 @@ public class QueryParser extends InputParser {
 
     final InputInfo ii = clauses.peek().info();
     final GFLWOR flwor = new GFLWOR(ii, clauses, rtrn);
-    final CmpG cmp = new CmpG(ii, flwor, Bln.get(some), OpG.EQ);
+    final CmpG cmp = new CmpG(ii, flwor, Bln.get(some), CmpOp.EQ);
     return some ? cmp : Function.NOT.get(ii, cmp);
   }
 
@@ -1759,19 +1756,21 @@ public class QueryParser extends InputParser {
   private Expr comparison() throws QueryException {
     final Expr expr = ftContains();
     if(expr != null) {
-      for(final OpV c : OpV.values()) {
-        if(wsConsumeWs(c.name)) return new CmpV(info(), expr, check(ftContains(), CMPEXPR), c);
-      }
-      for(final OpN c : OpN.values()) {
-        for(final String name : c.names) {
-          if(wsConsumeWs(name)) return new CmpN(info(), expr, check(ftContains(), CMPEXPR), c);
+      for(final CmpOp op : CmpOp.values()) {
+        if(wsConsumeWs(op.toValueString())) {
+          return new CmpV(info(), expr, check(ftContains(), CMPEXPR), op);
         }
       }
-      for(final OpG c : OpG.values()) {
-        if(wsConsume(c.name)) {
-          if(c == OpG.LT && current('?')) throw error(CMPEXPR); // longest token rule asks for "<?"
+      for(final CmpOp op : CmpOp.values()) {
+        for(final String name : op.nodes) {
+          if(wsConsumeWs(name)) return new CmpN(info(), expr, check(ftContains(), CMPEXPR), op);
+        }
+      }
+      for(final CmpOp op : CmpOp.values()) {
+        if(wsConsume(op.toString())) {
+          if(op == CmpOp.LT && current('?')) throw error(CMPEXPR); // longest token rule asks for <?
           skipWs();
-          return new CmpG(info(), expr, check(ftContains(), CMPEXPR), c);
+          return new CmpG(info(), expr, check(ftContains(), CMPEXPR), op);
         }
       }
     }

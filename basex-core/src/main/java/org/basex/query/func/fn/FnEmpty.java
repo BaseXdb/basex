@@ -5,7 +5,6 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
@@ -69,8 +68,8 @@ public class FnEmpty extends StandardFunc {
       // rewrite index-of:  exists(index-of($texts, string)) → $texts = string
       final Expr[] args = input.args();
       if(args.length == 2 && args[1].seqType().one() &&
-          CmpG.compatible(args[0].seqType(), args[1].seqType(), true)) {
-        input = new CmpG(info, args[0], args[1], OpG.EQ).optimize(cc);
+          CmpG.compatible(args[0].seqType(), args[1].seqType(), CmpOp.EQ)) {
+        input = new CmpG(info, args[0], args[1], CmpOp.EQ).optimize(cc);
       }
     } else if(STRING_TO_CODEPOINTS.is(input) || CHARACTERS.is(input)) {
       // exists(string-to-codepoints(E)) → boolean(string(E))
@@ -83,7 +82,7 @@ public class FnEmpty extends StandardFunc {
     final boolean map = _MAP_KEYS.is(input), array = _ARRAY_MEMBERS.is(input);
     if(map || array) {
       input = cc.function(map ? _MAP_SIZE : _ARRAY_SIZE, info, input.args());
-      return new CmpG(info, input, Itr.ZERO, exists ? OpG.NE : OpG.EQ).optimize(cc);
+      return new CmpG(info, input, Itr.ZERO, exists ? CmpOp.NE : CmpOp.EQ).optimize(cc);
     }
 
     return embed(cc, true);

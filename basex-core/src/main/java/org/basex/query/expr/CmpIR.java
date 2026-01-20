@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -80,7 +79,7 @@ public final class CmpIR extends Single {
     // only rewrite integer or equality comparisons
     // allowed: $integer > 2, $value = 10 to 20; rejected: $double  > 2
     final Type type1 = expr1.seqType().type;
-    final boolean cmpEq = cmp.op == OpG.EQ;
+    final boolean cmpEq = cmp.op == CmpOp.EQ;
     if(!(type1.instanceOf(AtomType.INTEGER) || cmpEq && type1.isUntyped())) return cmp;
 
     long mn, mx;
@@ -169,7 +168,7 @@ public final class CmpIR extends Single {
     if(ex instanceof final CmpIR cmp) {
       newMin = cmp.min;
       newMax = cmp.max;
-    } else if(ex instanceof final CmpG cmp && cmp.op == OpG.EQ &&
+    } else if(ex instanceof final CmpG cmp && cmp.op == CmpOp.EQ &&
         ex.arg(1) instanceof final Itr itr) {
       newMin = itr.itr();
       newMax = newMin;

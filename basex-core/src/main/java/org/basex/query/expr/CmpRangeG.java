@@ -22,7 +22,7 @@ public final class CmpRangeG extends CmpG {
    * @param op operator
    * @param info input info (can be {@code null})
    */
-  CmpRangeG(final Expr expr1, final Expr expr2, final OpG op, final InputInfo info) {
+  CmpRangeG(final Expr expr1, final Expr expr2, final CmpOp op, final InputInfo info) {
     super(info, expr1, expr2, op);
   }
 

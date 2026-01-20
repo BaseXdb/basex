@@ -7,7 +7,6 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -185,7 +184,7 @@ public final class Switch extends ParseExpr {
     }
 
     final Expr list = List.get(cc, groups[0].info, Arrays.copyOfRange(exprs, 1, exprs.length));
-    final CmpG cmp = new CmpG(groups[0].info, cond, list, OpG.EQ);
+    final CmpG cmp = new CmpG(groups[0].info, cond, list, CmpOp.EQ);
     return new If(info, cmp.optimize(cc), groups[0].rtrn(), groups[1].rtrn()).optimize(cc);
   }
 

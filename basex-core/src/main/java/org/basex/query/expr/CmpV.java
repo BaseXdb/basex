@@ -8,7 +8,6 @@ import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -23,135 +22,19 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class CmpV extends Cmp {
-  /** Comparators. */
-  public enum OpV {
-    /** Item comparison: less or equal. */
-    LE("le") {
-      @Override
-      public boolean eval(final int v) { return v != Item.NAN_DUMMY && v <= 0; }
-      @Override
-      public OpV swap() { return GE; }
-      @Override
-      public OpV invert() { return GT; }
-      @Override
-      public OpG general() { return OpG.LE; }
-    },
-
-    /** Item comparison: less. */
-    LT("lt") {
-      @Override
-      public boolean eval(final int v) { return v != Item.NAN_DUMMY && v < 0; }
-      @Override
-      public OpV swap() { return GT; }
-      @Override
-      public OpV invert() { return GE; }
-      @Override
-      public OpG general() { return OpG.LT; }
-    },
-
-    /** Item comparison: greater of equal. */
-    GE("ge") {
-      @Override
-      public boolean eval(final int v) { return v >= 0; }
-      @Override
-      public OpV swap() { return LE; }
-      @Override
-      public OpV invert() { return LT; }
-      @Override
-      public OpG general() { return OpG.GE; }
-    },
-
-    /** Item comparison: greater. */
-    GT("gt") {
-      @Override
-      public boolean eval(final int v) { return v > 0; }
-      @Override
-      public OpV swap() { return LT; }
-      @Override
-      public OpV invert() { return LE; }
-      @Override
-      public OpG general() { return OpG.GT; }
-    },
-
-    /** Item comparison: equal. */
-    EQ("eq") {
-      @Override
-      public boolean eval(final int v) { return v == 0; }
-      @Override
-      public OpV swap() { return EQ; }
-      @Override
-      public OpV invert() { return NE; }
-      @Override
-      public OpG general() { return OpG.EQ; }
-    },
-
-    /** Item comparison: not equal. */
-    NE("ne") {
-      @Override
-      public boolean eval(final int v) { return v != 0; }
-      @Override
-      public OpV swap() { return NE; }
-      @Override
-      public OpV invert() { return EQ; }
-      @Override
-      public OpG general() { return OpG.NE; }
-    };
-
-    /** String representation. */
-    public final String name;
-
-    /**
-     * Constructor.
-     * @param name string representation
-     */
-    OpV(final String name) {
-      this.name = name;
-    }
-
-    /**
-     * Evaluates the expression.
-     * @param diff difference
-     * @return result
-     */
-    public abstract boolean eval(int diff);
-
-    /**
-     * Swaps the comparator.
-     * @return swapped comparator
-     */
-    public abstract OpV swap();
-
-    /**
-     * Inverts the comparator.
-     * @return inverted comparator
-     */
-    public abstract OpV invert();
-
-    /**
-     * Returns the general comparator.
-     * @return comparator
-     */
-    public abstract OpG general();
-
-    @Override
-    public String toString() {
-      return name;
-    }
-  }
-
-  /** Operator. */
-  private OpV opV;
+  /** Comparator. */
+  private CmpOp op;
 
   /**
    * Constructor.
    * @param info input info (can be {@code null})
    * @param expr1 first expression
    * @param expr2 second expression
-   * @param opV operator
+   * @param op operator
    */
-  public CmpV(final InputInfo info, final Expr expr1, final Expr expr2, final OpV opV) {
+  public CmpV(final InputInfo info, final Expr expr1, final Expr expr2, final CmpOp op) {
     super(info, expr1, expr2, Types.BOOLEAN_ZO);
-    this.opV = opV;
+    this.op = op;
   }
 
   @Override
@@ -163,7 +46,7 @@ public final class CmpV extends Cmp {
     if(swap()) {
       cc.info(OPTSWAP_X, this);
       Collections.reverse(Arrays.asList(exprs));
-      opV = opV.swap();
+      op = op.swap();
     }
 
     Expr expr = emptyExpr();
@@ -200,8 +83,8 @@ public final class CmpV extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Predicate<SeqType> p = st -> single ? st.one() : st.zeroOrOne();
-    if(p.test(st1) && p.test(st2) && CmpG.compatible(st1, st2, opV == OpV.EQ || opV == OpV.NE)) {
-      return new CmpG(info, expr1, expr2, OpG.get(opV)).optimize(cc);
+    if(p.test(st1) && p.test(st2) && CmpG.compatible(st1, st2, op)) {
+      return new CmpG(info, expr1, expr2, op).optimize(cc);
     }
     return this;
   }
@@ -233,7 +116,7 @@ public final class CmpV extends Cmp {
    * @throws QueryException query exception
    */
   private boolean test(final Item item1, final Item item2) throws QueryException {
-    if(item1.comparable(item2)) return opV.eval(item1.compare(item2, null, false, info));
+    if(item1.comparable(item2)) return op.eval(item1.compare(item2, null, false, info));
     throw compareError(item1, item2, info);
   }
 
@@ -242,41 +125,36 @@ public final class CmpV extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
-      new CmpV(info, expr1, expr2, opV.invert()) : null;
+      new CmpV(info, expr1, expr2, op.invert()) : null;
   }
 
   @Override
-  public OpV opV() {
-    return opV;
-  }
-
-  @Override
-  public OpG opG() {
-    return opV.general();
+  public CmpOp cmpOp() {
+    return op;
   }
 
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
-    return copyType(new CmpV(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), opV));
+    return copyType(new CmpV(info, exprs[0].copy(cc, vm), exprs[1].copy(cc, vm), op));
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final CmpV cmp && opV == cmp.opV && super.equals(obj);
+    return this == obj || obj instanceof final CmpV cmp && op == cmp.op && super.equals(obj);
   }
 
   @Override
   public String description() {
-    return "'" + opV + "' comparison";
+    return "'" + op.toValueString() + "' comparison";
   }
 
   @Override
   public void toXml(final QueryPlan plan) {
-    plan.add(plan.create(this, OP, opV.name), exprs);
+    plan.add(plan.create(this, OP, op.toValueString()), exprs);
   }
 
   @Override
   public void toString(final QueryString qs) {
-    qs.tokens(exprs, " " + opV + ' ', true);
+    qs.tokens(exprs, " " + op.toValueString() + ' ', true);
   }
 }

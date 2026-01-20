@@ -2,7 +2,6 @@ package org.basex.query.func.fn;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.CmpG.*;
 import org.basex.query.expr.gflwor.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
@@ -58,7 +57,7 @@ public class FnEvery extends StandardFunc {
 
     // some : FLWOR = true()
     // every: not(FLWOR = false())
-    final Expr cmp = new CmpG(info, expr, Bln.get(some), OpG.EQ).optimize(cc);
+    final Expr cmp = new CmpG(info, expr, Bln.get(some), CmpOp.EQ).optimize(cc);
     return some ? cmp : cc.function(Function.NOT, info, cmp);
   }
 
