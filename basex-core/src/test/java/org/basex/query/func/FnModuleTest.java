@@ -3217,6 +3217,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" ()"), "");
     query(func.args("A"), "A");
     query(func.args(wrap("A")), "A");
+    query("(" + wrap("A") + ", 1, 'X') ! " + func.args(), "A\n1\nX");
 
     check("for $s in ('a', 'b') return " + func.args(" $s"), "a\nb", empty(func));
     check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(func));
@@ -3225,8 +3226,18 @@ public final class FnModuleTest extends SandboxTest {
     check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "",
         empty(func), exists(SingleIterPath.class), root(DualIterMap.class));
 
+    check(func.args(" 'x' || " + wrap("x")), "xx", empty(func));
+    check("('x' || " + wrap("x") + ") => " + func.args(), "xx", empty(func));
+    check("exists((1 to 10)[" + func.args() + "])", true, root(Bln.class));
+    check("exists((1 to 10)[" + func.args(" .") + "])", true, root(Bln.class));
+    check("<a>x</a>[" + func.args() + " = 'x']", "<a>x</a>", empty(func));
+    check("<a>x</a>[" + func.args(" .") + " = 'x']", "<a>x</a>", empty(func));
+    check("(1 to 6) ! (. || 'x')[" + func.args() + " = 'x']", "", empty(func));
+    check("(1 to 6) ! (. || 'x')[" + func.args(" .") + " = 'x']", "", empty(func));
+
     error(func.args(), NOCTX_X);
     error(func.args(" true#0"), FISTRING_X);
+    error("true#0 ! " + func.args(), FISTRING_X);
   }
 
   /** Test method. */
@@ -3276,6 +3287,11 @@ public final class FnModuleTest extends SandboxTest {
 
     query("<_>A</_>[" + func.args() + ']', "<_>A</_>");
     query("<_>A</_>[" + func.args(" .") + ']', "<_>A</_>");
+
+    check("(1 to 6) ! string() ! " + func.args(), "1\n1\n1\n1\n1\n1", empty(STRING));
+    check("(1 to 6) ! string(.) ! " + func.args(), "1\n1\n1\n1\n1\n1", empty(STRING));
+
+    check("boolean(" + func.args(wrap("123")) + ")", true, empty(func));
 
     error("true#0[" + func.args() + ']', FIATOMIZE_X);
   }

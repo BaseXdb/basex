@@ -49,6 +49,10 @@ public final class FnCharacters extends StandardFunc {
         t = e;
         return Str.get(Arrays.copyOfRange(token, s, e));
       }
+      @Override
+      public Value value(final QueryContext q, final Expr expr) throws QueryException {
+        return StrSeq.get(value.characters(info));
+      }
     };
   }
 

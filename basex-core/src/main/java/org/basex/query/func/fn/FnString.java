@@ -33,11 +33,11 @@ public final class FnString extends ContextFn {
     exprs = simplifyAll(Simplify.STRING, cc);
 
     final boolean context = contextAccess();
-    final Expr item = context ? cc.qc.focus.value : arg(0);
-    if(item != null && item.seqType().eq(Types.STRING_O)) {
+    final Expr value = context ? cc.qc.focus.value : arg(0);
+    if(value != null && value.seqType().eq(Types.STRING_O)) {
       // string('x') → 'x'
       // $string[string() = 'a'] → $string[. = 'a']
-      return context && cc.nestedFocus() ? ContextValue.get(cc, info) : item;
+      return context && cc.nestedFocus() ? ContextValue.get(cc, info) : value;
     }
     return this;
   }
@@ -53,6 +53,8 @@ public final class FnString extends ContextFn {
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // boolean(string($node)) → boolean($node/descendant::text())
       expr = simplifyEbv(item, cc, null);
+      // boolean(string($number)) → true()
+      if(item.seqType().instanceOf(Types.NUMERIC_O)) return Bln.TRUE;
     }
     return cc.simplify(this, expr, mode);
   }

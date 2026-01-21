@@ -41,7 +41,7 @@ public final class FnItemsAt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item evalItem(final QueryContext qc) throws QueryException {
-    final Item at = exprs[1].atomItem(qc, info);
+    final Item at = arg(1).atomItem(qc, info);
     if(!at.isEmpty()) {
       // retrieve (possibly invalid) position
       final double d = toDouble(at) - 1;

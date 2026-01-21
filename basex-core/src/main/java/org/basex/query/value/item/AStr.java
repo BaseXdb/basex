@@ -39,6 +39,7 @@ public abstract class AStr extends Item {
   AStr(final byte[] value, final Type type) {
     super(type);
     this.value = value;
+    if(value.length < 2) offsets = ASCII;
   }
 
   @Override
@@ -53,11 +54,13 @@ public abstract class AStr extends Item {
    * @throws QueryException query exception
    */
   public boolean ascii(final InputInfo info) throws QueryException {
-    if(offsets == null) {
-      final int[] off = Token.cpOffsets(string(info));
-      offsets = off == null ? ASCII : off;
+    int[] off = offsets;
+    if(off == null) {
+      off = Token.cpOffsets(string(info));
+      if(off == null) off = ASCII;
+      offsets = off;
     }
-    return offsets == ASCII;
+    return off == ASCII;
   }
 
   /**
