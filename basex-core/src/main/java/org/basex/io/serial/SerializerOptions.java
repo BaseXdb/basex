@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.build.csv.*;
@@ -100,6 +101,9 @@ public final class SerializerOptions extends Options {
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> JSON_LINES =
       new EnumOption<>("json-lines", YesNo.NO);
+  /** Serialization parameter: yes/no. */
+  public static final EnumOption<YesNo> CANONICAL =
+      new EnumOption<>("canonical", YesNo.NO);
 
   /** Specific serialization parameter. */
   public static final OptionsOption<CsvOptions> CSV =
@@ -133,6 +137,12 @@ public final class SerializerOptions extends Options {
   public static final NameTest T_ROOT = NameTest.get(Q_ROOT);
   /** Value. */
   private static final QNm Q_VALUE = new QNm("value");
+
+  /** Options to consider for canonical serialization. */
+  private static final Set<Option<?>> CANONICAL_OPTIONS = Set.of(
+    METHOD, CANONICAL, NORMALIZATION_FORM, MEDIA_TYPE, HTML_VERSION, INCLUDE_CONTENT_TYPE,
+    JSON_LINES, JSON_NODE_OUTPUT_METHOD
+  );
 
   /** Newlines. */
   public enum Newline {
@@ -246,6 +256,25 @@ public final class SerializerOptions extends Options {
         throw (option != null ? SERPARAM_X : OUTPUT_X).get(info, ex);
       }
     }
+  }
+
+  /**
+   * Finalizes the serialization options.
+   * @return self reference
+   */
+  public SerializerOptions finish() {
+    // reset options that are to be ignored for canonicalization
+    if(yes(CANONICAL)) {
+      final SerialMethod m = get(METHOD);
+      if(m == SerialMethod.XML || m == SerialMethod.XHTML || m == SerialMethod.JSON) {
+        for(final Option<?> option : this) {
+          if(!CANONICAL_OPTIONS.contains(option)) put(option, option.value());
+        }
+      } else {
+        set(CANONICAL, YesNo.NO);
+      }
+    }
+    return this;
   }
 
   /**

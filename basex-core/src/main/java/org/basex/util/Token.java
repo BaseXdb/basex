@@ -750,6 +750,21 @@ public final class Token {
   }
 
   /**
+   * Compares a substring of two tokens lexicographically.
+   * @param token first token
+   * @param tFrom the index (inclusive) of the first element in the first token to be compared
+   * @param tTo the index (exclusive) of the last element in the first token to be compared
+   * @param compare token to be compared
+   * @param cFrom the index (inclusive) of the first element in the second token to be compared
+   * @param cTo the index (exclusive) of the last element in the second token to be compared
+   * @return result of comparison (-1, 0, 1)
+   */
+  public static int compare(final byte[] token, final int tFrom, final int tTo,
+      final byte[] compare, final int cFrom, final int cTo)  {
+    return Integer.signum(Arrays.compareUnsigned(token, tFrom, tTo, compare, cFrom, cTo));
+  }
+
+  /**
    * Compares two tokens lexicographically.
    * @param token first token
    * @param compare token to be compared

@@ -167,13 +167,19 @@ public final class Dbl extends ANum {
    * @return string
    */
   public static byte[] string(final double value) {
+    // handle known edge cases
+    if(value == 0) return Token.token(0);
+    if(value == Double.MIN_VALUE) return Token.token("5e-324");
+    if(value == -Double.MIN_VALUE) return Token.token("-5e-324");
+    if(value == 1e23) return Token.token("1e+23");
+    if(value == -1e23) return Token.token("-1e+23");
+
     final byte[] token = Token.fastToken(value);
     if(token != null) return token;
 
     final BigDecimal bd = BigDecimal.valueOf(value).stripTrailingZeros();
     final double abs = Math.abs(value);
-    return value == 0 && Double.doubleToRawLongBits(value) < 0 ? Token.NEGATIVE_ZERO :
-      abs >= 1e-6 && abs < 1e21 ? Token.token(bd.toPlainString()) :
-        Token.token(bd.toString().replace('E', 'e').replace("e+", "e"));
+    return abs >= 1e-6 && abs < 1e21 ? Token.token(bd.toPlainString()) :
+      Token.token(bd.toString().replace('E', 'e'));
   }
 }

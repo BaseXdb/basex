@@ -1,6 +1,7 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -36,11 +37,23 @@ public abstract class Serializer implements Closeable {
   protected QNm closed = QNm.EMPTY;
   /** Indentation flag. */
   protected boolean indent;
+  /** Canocical serialization flag. */
+  protected boolean canonical;
 
   /** Stack with currently available namespaces. */
   private final Atts nspaces = new Atts(2).add(XML, QueryText.XML_URI).add(EMPTY, EMPTY);
   /** Stack with namespace size pointers. */
   private final IntList nstack = new IntList();
+
+  /**
+   * Attribute/namespace.
+   * @param name attribute name or namespace prefix
+   * @param uri URI (can be {@code null})
+   * @param value attribute value (can be {@code null})
+   */
+  private record Att(byte[] name, byte[] value, byte[] uri) { }
+  /** Attribute/namespace collector. */
+  private final ArrayList<Att> attributes = new ArrayList<>();
 
   /** Static context. */
   protected StaticContext sc;
@@ -72,7 +85,7 @@ public abstract class Serializer implements Closeable {
       throws IOException {
 
     // choose serializer
-    final SerializerOptions so = sopts == null ? SerializerMode.DEFAULT.get() : sopts;
+    final SerializerOptions so = sopts == null ? SerializerMode.DEFAULT.get() : sopts.finish();
     return switch(so.get(SerializerOptions.METHOD)) {
       case XHTML    -> new XHTMLSerializer(os, so);
       case HTML     -> new HTMLSerializer(os, so);
@@ -207,6 +220,9 @@ public abstract class Serializer implements Closeable {
 
     final byte[] ancUri = nsUri(prefix);
     if(ancUri == null || !eq(ancUri, uri)) {
+      if(canonical && uri.length > 0 && !Uri.get(uri).isAbsolute()) {
+        throw SERRELURI.getIO(uri);
+      }
       attribute(prefix.length == 0 ? XMLNS : concat(XMLNS_COLON, prefix), uri, standalone);
       nspaces.add(prefix, uri);
     }
@@ -277,7 +293,7 @@ public abstract class Serializer implements Closeable {
   /**
    * Serializes a text.
    * @param value value
-   * @param ftp full-text positions, used for visualization highlighting
+   * @param ftp full-text positions, used for visualization highlighting (can be {@code null})
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
@@ -319,6 +335,53 @@ public abstract class Serializer implements Closeable {
   // PRIVATE METHODS ==============================================================================
 
   /**
+   * Adds an attribute to be serialized.
+   * @param name attribute name including prefix, if any
+   * @param value attribute value (can be null)
+   * @param uri namespace uri (can be {@code null})
+   */
+  private void addAttribute(final byte[] name, final byte[] value, final byte[] uri) {
+    attributes.add(new Att(name, value, uri != null ? uri : EMPTY));
+  }
+
+  /**
+   * Adds a namespace to be serialized.
+   * @param prefix prefix
+   * @param uri URI
+   */
+  private void addNamespace(final byte[] prefix, final byte[] uri) {
+    attributes.add(new Att(prefix, null, uri));
+  }
+
+  /**
+   * Emits attributes in canonical sorting order and clears the attributes.
+   * @throws IOException I/O exception.
+   */
+  private void emitAttributes() throws IOException {
+    if(canonical) {
+      attributes.sort((a, b) -> {
+        final int d = compare(a.uri, b.uri);
+        return d != 0 ? d : compare(a.name, indexOf(a.name, ':') + 1, a.name.length,
+            b.name, indexOf(b.name, ':') + 1, b.name.length);
+      });
+    }
+    for(final Att att : attributes) attribute(att.name, att.value, false);
+    attributes.clear();
+  }
+
+  /**
+   * Emits attributes in canonical sorting order and clears the attributes.
+   * @throws IOException I/O exception.
+   */
+  private void emitNamespaces() throws IOException {
+    if(canonical) {
+      attributes.sort((a, b) -> compare(a.name, b.name));
+    }
+    for(final Att att : attributes) namespace(att.name, att.uri, false);
+    attributes.clear();
+  }
+
+  /**
    * Serializes a node of the specified data reference.
    * @param node database node
    * @throws IOException I/O exception
@@ -334,6 +397,7 @@ public abstract class Serializer implements Closeable {
       while(pre < size && !finished()) {
         node((ANode) new DBNode(data, pre));
         pre += data.size(pre, data.kind(pre));
+        if(canonical) indent = true;
       }
       closeDoc();
       return;
@@ -389,7 +453,7 @@ public abstract class Serializer implements Closeable {
             final int nl = ns.size();
             for(int n = 0; n < nl; n++) {
               nsPrefix = ns.name(n);
-              if(nsSet.add(nsPrefix)) namespace(nsPrefix, ns.value(n), false);
+              if(nsSet.add(nsPrefix)) addNamespace(nsPrefix, ns.value(n));
             }
             // check ancestors only on top level
             if(level != 0) break;
@@ -398,6 +462,7 @@ public abstract class Serializer implements Closeable {
           } while(p >= 0 && data.kind(p) == Data.ELEM);
 
           // reset namespace cache
+          emitNamespaces();
           nsSet.clear();
         }
 
@@ -406,9 +471,10 @@ public abstract class Serializer implements Closeable {
         final int as = pre + data.attSize(pre, kind);
         while(++pre != as) {
           final byte[] n = data.name(pre, Data.ATTR), v = data.text(pre, false);
-          attribute(n, v, false);
+          addAttribute(n, v, canonical ? data.nspaces.uri(data.uriId(pre, Data.ATTR)) : null);
           if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
         }
+        emitAttributes();
         parentStack.push(par);
       }
     }
@@ -440,7 +506,17 @@ public abstract class Serializer implements Closeable {
       namespace(node.name(), node.string(), true);
     } else if(type == NodeType.DOCUMENT_NODE) {
       openDoc(node.baseURI());
-      for(final ANode nd : node.childIter()) node(nd);
+      if(canonical) {
+        int roots = 0;
+        for(final ANode nd : node.childIter()) {
+          node(nd);
+          if(nd.type == NodeType.ELEMENT) ++roots;
+          indent = true;
+        }
+        if(roots != 1) throw SERWELLFORM_X.getIO(node);
+      } else {
+        for(final ANode nd : node.childIter()) node(nd);
+      }
       closeDoc();
     } else if(skip == 0 || !skipElement(node)) {
       // serialize elements (code will never be called for attributes)
@@ -450,18 +526,20 @@ public abstract class Serializer implements Closeable {
       // serialize declared namespaces
       final Atts nsp = node.namespaces();
       final int ps = nsp.size();
-      for(int p = 0; p < ps; p++) namespace(nsp.name(p), nsp.value(p), false);
+      for(int p = 0; p < ps; p++) addNamespace(nsp.name(p), nsp.value(p));
       // add new or updated namespace
-      namespace(name.prefix(), name.uri(), false);
+      addNamespace(name.prefix(), name.uri());
+      emitNamespaces();
 
       // serialize attributes
       final boolean i = indent;
       BasicNodeIter iter = node.attributeIter();
       for(ANode nd; (nd = iter.next()) != null;) {
         final byte[] n = nd.name(), v = nd.string();
-        attribute(n, v, false);
+        addAttribute(n, v, canonical ? nsUri(prefix(n)) : null);
         if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
       }
+      emitAttributes();
 
       // serialize children
       iter = node.childIter();

@@ -42,6 +42,7 @@ public abstract class OutputSerializer extends Serializer {
 
     this.sopts = sopts;
     indent = sopts.yes(INDENT);
+    canonical = sopts.yes(CANONICAL);
 
     // project-specific options
     indents = sopts.get(INDENTS);

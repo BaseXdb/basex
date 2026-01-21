@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.Token.normalize;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.build.json.*;
 import org.basex.io.out.PrintOutput.*;
@@ -16,6 +17,7 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.options.Options.*;
 
@@ -66,7 +68,7 @@ public abstract class JsonSerializer extends StandardSerializer {
     super(os, sopts);
     jopts = sopts.get(SerializerOptions.JSON);
     escape = jopts.get(JsonSerialOptions.ESCAPE);
-    escapeSolidus = escape && jopts.get(JsonSerialOptions.ESCAPE_SOLIDUS) &&
+    escapeSolidus = escape && !canonical && jopts.get(JsonSerialOptions.ESCAPE_SOLIDUS) &&
         sopts.get(SerializerOptions.ESCAPE_SOLIDUS) == YesNo.YES;
     nodups = sopts.get(SerializerOptions.ALLOW_DUPLICATE_NAMES) == YesNo.NO;
     lines = sopts.get(SerializerOptions.JSON_LINES) == YesNo.YES;
@@ -108,7 +110,7 @@ public abstract class JsonSerializer extends StandardSerializer {
 
         boolean s = false;
         final TokenSet set = nodups ? new TokenSet() : null;
-        for(final Item key : map.keys()) {
+        for(final Item key : keys(map)) {
           final byte[] name = key.string(null);
           if(nodups) {
             if(set.contains(name)) throw SERDUPL_X.getIO(name);
@@ -150,14 +152,36 @@ public abstract class JsonSerializer extends StandardSerializer {
     sep = true;
   }
 
+  /**
+   * Returns the keys of the given map, in canonical order, if required. Per RFC8785, "property name
+   * strings to be sorted are formatted as arrays of UTF-16 [UNICODE] code units. The sorting is
+   * based on pure value comparisons, where code units are treated as unsigned integers, independent
+   * of locale settings". This is achieved here by sorting the keys as strings.
+   * @param map map
+   * @return keys
+   * @throws QueryException query exception
+   */
+  private Iterable<Item> keys(final XQMap map) throws QueryException {
+    final Value ks = map.keys();
+    if(!canonical || ks.size() < 2) return ks;
+
+    record Key(String string, Item item) { }
+    final ArrayList<Key> list = new ArrayList<>();
+    for(final Item k : ks) list.add(new Key(Token.string(k.string(null)), k));
+    return list.stream().sorted(Comparator.comparing(Key::string)).map(Key::item).toList();
+  }
+
   @Override
   protected void atomic(final Item item) throws IOException {
     try {
       final Type type = item.type;
-      if(type.oneOf(AtomType.DOUBLE, AtomType.FLOAT)) {
+      if(type.oneOf(AtomType.DOUBLE, AtomType.FLOAT) || canonical && type.isNumber()) {
         final double d = item.dbl(null);
-        if(!Double.isFinite(d)) throw SERNUMBER_X.getIO(d);
-        out.print(Dbl.string(d));
+        if(Double.isFinite(d)) {
+          out.print(Dbl.string(d));
+        } else {
+          throw SERNUMBER_X.getIO(d);
+        }
       } else if(type == AtomType.BOOLEAN || type.isNumber()) {
         out.print(item.string(null));
       } else {
