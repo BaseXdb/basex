@@ -100,6 +100,9 @@ public final class SerializerOptions extends Options {
   /** Serialization parameter: yes/no. */
   public static final EnumOption<YesNo> JSON_LINES =
       new EnumOption<>("json-lines", YesNo.NO);
+  /** Serialization parameter: yes/no. */
+  public static final EnumOption<YesNo> CANONICAL =
+      new EnumOption<>("canonical", YesNo.NO);
 
   /** Specific serialization parameter. */
   public static final OptionsOption<CsvOptions> CSV =

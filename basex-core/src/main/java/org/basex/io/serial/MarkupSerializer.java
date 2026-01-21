@@ -274,7 +274,14 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected void finishEmpty() throws IOException {
-    out.print(ELEM_SC);
+    if(canonical) {
+      out.print(ELEM_C);
+      out.print(ELEM_OS);
+      out.print(elem.string());
+      out.print(ELEM_C);
+    } else {
+      out.print(ELEM_SC);
+    }
   }
 
   @Override

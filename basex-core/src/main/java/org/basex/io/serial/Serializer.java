@@ -1,6 +1,7 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
+import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -18,6 +19,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
+import org.basex.util.options.Options.*;
 
 /**
  * This is an interface for serializing XQuery values.
@@ -26,6 +28,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Serializer implements Closeable {
+  /** New line token to be emitted during canonicalization. */
+  private static final byte[] NL = { '\n' };
   /** Stack with names of opened elements. */
   protected final Stack<QNm> opened = new Stack<>();
   /** Current level. */
@@ -36,6 +40,8 @@ public abstract class Serializer implements Closeable {
   protected QNm closed = QNm.EMPTY;
   /** Indentation flag. */
   protected boolean indent;
+  /** Canocical serialization flag. */
+  protected boolean canonical;
 
   /** Stack with currently available namespaces. */
   private final Atts nspaces = new Atts(2).add(XML, QueryText.XML_URI).add(EMPTY, EMPTY);
@@ -74,13 +80,13 @@ public abstract class Serializer implements Closeable {
     // choose serializer
     final SerializerOptions so = sopts == null ? SerializerMode.DEFAULT.get() : sopts;
     return switch(so.get(SerializerOptions.METHOD)) {
-      case XHTML    -> new XHTMLSerializer(os, so);
-      case HTML     -> new HTMLSerializer(os, so);
-      case TEXT     -> new TextSerializer(os, so);
-      case CSV      -> CsvSerializer.get(os, so);
-      case JSON     -> JsonSerializer.get(os, so);
-      case XML      -> new XMLSerializer(os, so);
-      case ADAPTIVE -> new AdaptiveSerializer(os, so);
+      case XHTML    -> new XHTMLSerializer(os, restrictIfCanonical(so));
+      case HTML     -> new HTMLSerializer(os, ignoreCanonical(so));
+      case TEXT     -> new TextSerializer(os, ignoreCanonical(so));
+      case CSV      -> CsvSerializer.get(os, ignoreCanonical(so));
+      case JSON     -> JsonSerializer.get(os, restrictIfCanonical(so));
+      case XML      -> new XMLSerializer(os, restrictIfCanonical(so));
+      case ADAPTIVE -> new AdaptiveSerializer(os, ignoreCanonical(so));
       default       -> new BaseXSerializer(os, so);
     };
   }
@@ -207,6 +213,9 @@ public abstract class Serializer implements Closeable {
 
     final byte[] ancUri = nsUri(prefix);
     if(ancUri == null || !eq(ancUri, uri)) {
+      if(canonical && uri.length > 0 && !Uri.get(uri).isAbsolute()) {
+        throw SERRELURI.getIO(uri);
+      }
       attribute(prefix.length == 0 ? XMLNS : concat(XMLNS_COLON, prefix), uri, standalone);
       nspaces.add(prefix, uri);
     }
@@ -277,7 +286,7 @@ public abstract class Serializer implements Closeable {
   /**
    * Serializes a text.
    * @param value value
-   * @param ftp full-text positions, used for visualization highlighting
+   * @param ftp full-text positions, used for visualization highlighting (can be {@code null})
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
@@ -316,7 +325,79 @@ public abstract class Serializer implements Closeable {
   @SuppressWarnings("unused")
   protected void function(final FItem item) throws IOException { }
 
-  // PRIVATE METHODS ==============================================================================
+  // PRIVATE CLASSES AND METHODS ===============================================================
+
+  /** Collector for canonical attribute serialization. */
+  private final class CanonicalAtts {
+    /**
+     * Attribute item (URI, name, value) with canonical sort order.
+     * @param uri namespace uri (can be {@code null})
+     * @param name attribute name including prefix, if any
+     * @param value attribute value
+     */
+    private record Att(byte[] uri, byte[] name, byte[] value) {
+      /** Constructor. */
+      Att {
+        if(uri == null) uri = EMPTY;
+      }
+    }
+    /** Collected attributes. */
+    private final ArrayList<Att> list = new ArrayList<>();
+
+    /**
+     * Add an attribute.
+     * @param uri namespace uri (can be {@code null})
+     * @param name attribute name including prefix, if any
+     * @param value attribute value
+     */
+    void add(final byte[] uri, final byte[] name, final byte[] value) {
+      list.add(new Att(uri, name, value));
+    }
+
+    /**
+     * Emit attributes in canonical sorting order.
+     * @throws IOException I/O exception.
+     */
+    void emit() throws IOException {
+      list.sort((a, b) -> {
+        final int d = compare(a.uri, b.uri);
+        return d != 0 ? d : compare(a.name, indexOf(a.name, ':') + 1, a.name.length,
+                                    b.name, indexOf(b.name, ':') + 1, b.name.length);
+      });
+      for(final Att a : list) attribute(a.name(), a.value(), false);
+    }
+  }
+
+  /** Collector for canonical namespace serialization. */
+  private final class CanonicalNS {
+    /**
+     * Namespace item.
+     * @param prefix namespace prefix
+     * @param uri namespace URI
+     */
+    private record NS(byte[] prefix, byte[] uri) { }
+    /** Collected namespaces. */
+    private final ArrayList<NS> list = new ArrayList<>();
+
+    /**
+     * Add a namespace.
+     * @param prefix namespace prefix
+     * @param uri namespace URI
+     */
+    void add(final byte[] prefix, final byte[] uri) {
+      list.add(new NS(prefix, uri));
+    }
+
+    /**
+     * Emit Namespaces in canonical sorting order.
+     * @throws IOException I/O exception.
+     */
+    void emit() throws IOException {
+      // canonical: order namespace nodes by prefix
+      list.sort((a, b) -> compare(a.prefix, b.prefix));
+      for(final NS ns : list) namespace(ns.prefix, ns.uri, false);
+    }
+  }
 
   /**
    * Serializes a node of the specified data reference.
@@ -331,7 +412,13 @@ public abstract class Serializer implements Closeable {
     final int size = pre + data.size(pre, kind);
     if(kind == Data.DOC) {
       openDoc(data.text(pre++, true));
+      byte[] nl = null;
       while(pre < size && !finished()) {
+        if(nl != null) {
+          text(nl, null);
+        } else if(canonical) {
+          nl = NL;
+        }
         node((ANode) new DBNode(data, pre));
         pre += data.size(pre, data.kind(pre));
       }
@@ -383,20 +470,29 @@ public abstract class Serializer implements Closeable {
         // database contains namespaces: add declarations
         if(nsExist) {
           nsSet.add(nsUri);
+          final CanonicalNS decls = canonical ? new CanonicalNS() : null;
           int p = pre;
           do {
             final Atts ns = data.namespaces(p);
             final int nl = ns.size();
             for(int n = 0; n < nl; n++) {
               nsPrefix = ns.name(n);
-              if(nsSet.add(nsPrefix)) namespace(nsPrefix, ns.value(n), false);
+              if(nsSet.add(nsPrefix)) {
+                final byte[] uri = ns.value(n);
+                if(decls == null) {
+                  namespace(nsPrefix, uri, false);
+                }
+                else {
+                  decls.add(nsPrefix, uri);
+                }
+              }
             }
             // check ancestors only on top level
             if(level != 0) break;
 
             p = data.parent(p, data.kind(p));
           } while(p >= 0 && data.kind(p) == Data.ELEM);
-
+          if(decls != null) decls.emit();
           // reset namespace cache
           nsSet.clear();
         }
@@ -404,11 +500,17 @@ public abstract class Serializer implements Closeable {
         // serialize attributes
         indentStack.push(indent);
         final int as = pre + data.attSize(pre, kind);
+        final CanonicalAtts atts = canonical ? new CanonicalAtts() : null;
         while(++pre != as) {
           final byte[] n = data.name(pre, Data.ATTR), v = data.text(pre, false);
-          attribute(n, v, false);
-          if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
+          if(atts == null) {
+            attribute(n, v, false);
+            if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
+          } else {
+            atts.add(data.nspaces.uri(data.uriId(pre, Data.ATTR)), n, v);
+          }
         }
+        if(atts != null) atts.emit();
         parentStack.push(par);
       }
     }
@@ -440,7 +542,24 @@ public abstract class Serializer implements Closeable {
       namespace(node.name(), node.string(), true);
     } else if(type == NodeType.DOCUMENT_NODE) {
       openDoc(node.baseURI());
-      for(final ANode nd : node.childIter()) node(nd);
+      if(!canonical) {
+        for(final ANode nd : node.childIter()) node(nd);
+      } else {
+        int roots = 0;
+        byte[] nl = null;
+        for(final ANode nd : node.childIter()) {
+          if(nd.type != NodeType.TEXT) {
+            if(nl != null) {
+              text(nl, null);
+            } else if(canonical) {
+              nl = NL;
+            }
+            node(nd);
+            if(nd.type == NodeType.ELEMENT) ++roots;
+          }
+        }
+        if(roots != 1) throw SERWELLFORM_X.getIO(node);
+      }
       closeDoc();
     } else if(skip == 0 || !skipElement(node)) {
       // serialize elements (code will never be called for attributes)
@@ -450,18 +569,38 @@ public abstract class Serializer implements Closeable {
       // serialize declared namespaces
       final Atts nsp = node.namespaces();
       final int ps = nsp.size();
-      for(int p = 0; p < ps; p++) namespace(nsp.name(p), nsp.value(p), false);
+      final CanonicalNS decls = canonical ? new CanonicalNS() : null;
+      for(int p = 0; p < ps; p++) {
+        final byte[] pfx = nsp.name(p), uri = nsp.value(p);
+        if(decls == null) {
+          namespace(pfx, uri, false);
+        } else {
+          decls.add(pfx, uri);
+        }
+      }
       // add new or updated namespace
-      namespace(name.prefix(), name.uri(), false);
+      final byte[] pfx = name.prefix(), uri = name.uri();
+      if(decls == null) {
+        namespace(pfx, uri, false);
+      } else {
+        decls.add(pfx, uri);
+        decls.emit();
+      }
 
       // serialize attributes
       final boolean i = indent;
       BasicNodeIter iter = node.attributeIter();
+      final CanonicalAtts atts = canonical ? new CanonicalAtts() : null;
       for(ANode nd; (nd = iter.next()) != null;) {
         final byte[] n = nd.name(), v = nd.string();
-        attribute(n, v, false);
-        if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
+        if(atts == null) {
+          attribute(n, v, false);
+          if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
+        } else {
+          atts.add(nsUri(prefix(n)), n, v);
+        }
       }
+      if(atts != null) atts.emit();
 
       // serialize children
       iter = node.childIter();
@@ -547,5 +686,39 @@ public abstract class Serializer implements Closeable {
 
     if(quoting) tb.add(quote);
     return tb.finish();
+  }
+
+  /**
+   * Returns the given serializer options, or a restricted copy if canonical serialization is
+   * enabled.
+   * @param so serializer options
+   * @return original or restricted serializer options
+   */
+  private static SerializerOptions restrictIfCanonical(final SerializerOptions so) {
+    if(!so.yes(SerializerOptions.CANONICAL)) return so;
+    final SerializerOptions opts = new SerializerOptions();
+    opts.set(SerializerOptions.CANONICAL, YesNo.YES);
+    opts.set(SerializerOptions.NORMALIZATION_FORM, opts.get(SerializerOptions.NORMALIZATION_FORM));
+    opts.set(SerializerOptions.MEDIA_TYPE, opts.get(SerializerOptions.MEDIA_TYPE));
+    opts.set(SerializerOptions.HTML_VERSION, opts.get(SerializerOptions.HTML_VERSION));
+    opts.set(SerializerOptions.INCLUDE_CONTENT_TYPE,
+        opts.get(SerializerOptions.INCLUDE_CONTENT_TYPE));
+    opts.set(SerializerOptions.JSON_LINES, opts.get(SerializerOptions.JSON_LINES));
+    opts.set(SerializerOptions.JSON_NODE_OUTPUT_METHOD,
+        opts.get(SerializerOptions.JSON_NODE_OUTPUT_METHOD));
+    return opts;
+  }
+
+  /**
+   * Returns the given serializer options, or a copy with canonical set to 'no' in case it was set
+   * to 'yes'.
+   * @param so serializer options
+   * @return original or restricted serializer options
+   */
+  private static SerializerOptions ignoreCanonical(final SerializerOptions so) {
+    if(!so.yes(SerializerOptions.CANONICAL)) return so;
+    final SerializerOptions opts = new SerializerOptions(so);
+    opts.set(SerializerOptions.CANONICAL, YesNo.NO);
+    return opts;
   }
 }

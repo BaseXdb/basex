@@ -854,6 +854,10 @@ public enum QueryError {
   SERJSON(SERE, 23, "Only one item can be serialized with JSON."),
   /** Error code. */
   SERJSONSEQ(SERE, 23, "Value has more than one item."),
+  /** Error code. */
+  SERRELURI(SERE, 24, "Canonical XML serialization failed: found relative namespace URI: '%'"),
+  /** Error code. */
+  SERWELLFORM_X(SERE, 24, "Canonical XML serialization failed: not wellformed: '%'"),
 
   /** Error code. */
   NOCTX_X(XPDY, 2, "%: Context value is undefined."),

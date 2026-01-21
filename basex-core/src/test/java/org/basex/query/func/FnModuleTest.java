@@ -3005,6 +3005,47 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("<html/>", " { 'html-version': 5 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " { 'html-version': 5.0 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " { 'html-version': 5.0000 }"), "&lt;html/&gt;");
+
+    final String canonicalXml = " { 'method': 'xml', 'canonical': true() }";
+    query(func.args(" <a xmlns:p='urn:test:x' p:z='1' a='2'/>", canonicalXml),
+        "<a xmlns:p=\"urn:test:x\" a=\"2\" p:z=\"1\"></a>");
+
+    final String canonicalJson = " {'method': 'json', 'canonical': true()}";
+    query(func.args(" [0x7fff_ffff_ffff_ffff]", canonicalJson), "[9223372036854776000]");
+
+    // The tests below were adapted from Apache 2.0–licensed code from project
+    // erdtman/java-json-canonicalization at https://github.com/erdtman/java-json-canonicalization
+
+    // arrays
+    query(func.args(" parse-json('[\n  56,\n  {\n    \"d\": true,\n    \"10\": null,\n    \"1\": [ "
+        + "]\n  }\n]')", canonicalJson),
+        "[56,{\"1\":[],\"10\":null,\"d\":true}]");
+    // french
+    query(func.args(" parse-json('{\n  \"peach\": \"This sorting order\",\n  \"p\u00E9ch\u00E9\": "
+        + "\"is wrong according to French\",\n  \"p\u00EAche\": \"but canonicalization MUST\",\n  "
+        + "\"sin\":   \"ignore locale\"\n}')", canonicalJson),
+        "{\"peach\":\"This sorting order\",\"p\u00E9ch\u00E9\":\"is wrong according to French\",\""
+        + "p\u00EAche\":\"but canonicalization MUST\",\"sin\":\"ignore locale\"}");
+    // structures
+    query(func.args(" parse-json('{\n  \"1\": {\"f\": {\"f\": \"hi\",\"F\": 5} ,\"\\n\": 56.0},\n  "
+        + "\"10\": { },\n  \"\": \"empty\",\n  \"a\": { },\n  \"111\": [ {\"e\": \"yes\",\"E\": \"n"
+        + "o\" } ],\n  \"A\": {\"b\": \"123\"}\n}')", canonicalJson),
+        "{\"\":\"empty\",\"1\":{\"\\n\":56,\"f\":{\"F\":5,\"f\":\"hi\"}},\"10\":{},\"111\":[{\"E\":"
+        + "\"no\",\"e\":\"yes\"}],\"A\":{\"b\":\"123\"},\"a\":{}}");
+    // values
+    query(func.args(" parse-json('{\n  \"numbers\": [333333333.33333329, 1E30, 4.50, 2e-3, 0.000000"
+        + "000000000000000000001],\n  \"string\": \"\\u20ac$\\u000D\\u000aA''\\u0042\\u0022\\u005c"
+        + "\\\\\\\"\\/\",\n  \"literals\": [null, true, false]\n}')", canonicalJson),
+        "{\"literals\":[null,true,false],\"numbers\":[333333333.3333333,1e+30,4.5,0.002,1e-27],\"st"
+        + "ring\":\"\u20AC$\\r\\nA'B\\\"\\\\\\\\\\\"/\"}");
+    // weird
+    query(func.args(" parse-json('{\r\n  \"\u20AC\": \"Euro Sign\",\r\n  \"1\": \"One\",\r\n  \"\\u"
+        + "0080\": \"Control\",\r\n  \"\\ud83d\\ude02\": \"Smiley\",\r\n  \"\u00F6\": \"Latin Small"
+        + " Letter O With Diaeresis\",\r\n  \"\uFB33\": \"Hebrew Letter Dalet With Dagesh\",\r\n  "
+        + "\"</script>\": \"Browser Challenge\"\r\n}')", canonicalJson),
+        "{\"1\":\"One\",\"</script>\":\"Browser Challenge\",\"\u0080\":\"Control\",\"\u00F6\":\"Lat"
+        + "in Small Letter O With Diaeresis\",\"\u20AC\":\"Euro Sign\",\"\uD83D\uDE02\":\"Smiley\","
+        + "\"\uFB33\":\"Hebrew Letter Dalet With Dagesh\"}");
   }
 
   /** Test method. */
