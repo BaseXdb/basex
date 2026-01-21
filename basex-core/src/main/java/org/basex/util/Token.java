@@ -98,10 +98,14 @@ public final class Token {
   /** Maximum values for converting tokens to long values. */
   private static final long MAX_LONG = Long.MAX_VALUE / 10;
 
-  /** Table with integer sizes. */
-  private static final int[] INTSIZE = {
-    9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, Integer.MAX_VALUE
-  };
+  /** Table for converting integers to tokens. */
+  private static final byte[] PAIRS = new byte[200];
+  static {
+    for(int i = 0; i < 100; i++) {
+      PAIRS[i * 2] = (byte) (i / 10 + '0');
+      PAIRS[i * 2 + 1] = (byte) (i % 10 + '0');
+    }
+  }
   /** Cache for single ASCII-character tokens. */
   private static final byte[][] CHAR;
 
@@ -341,7 +345,7 @@ public final class Token {
   }
 
   /**
-   * Creates a byte array representation of the specified boolean value.
+   * Creates a token representation of the specified boolean value.
    * @param bool boolean value to be converted
    * @return boolean value in byte array
    */
@@ -350,7 +354,7 @@ public final class Token {
   }
 
   /**
-   * Creates a byte array representation of the specified integer value.
+   * Creates a token representation of the specified integer value.
    * @param integer int value to be converted
    * @return integer value in byte array
    */
@@ -359,29 +363,31 @@ public final class Token {
     if(integer == Integer.MIN_VALUE) return MIN_INT;
 
     int n = integer;
-    final boolean m = n < 0;
-    if(m) n = -n;
+    final boolean neg = n < 0;
+    if(neg) n = -n;
     int nl = numDigits(n);
-    if(m) ++nl;
+    if(neg) ++nl;
     final byte[] tmp = new byte[nl];
 
-    // faster division by 10 for values < 81920 (see Integer.getChars)
-    while(n > 81919) {
-      final int q = n / 10;
-      tmp[--nl] = (byte) (n - q * 10 + '0');
+    while(n >= 100) {
+      final int q = n / 100, r = (n % 100) * 2;
+      tmp[--nl] = PAIRS[r + 1];
+      tmp[--nl] = PAIRS[r];
       n = q;
     }
-    while(n != 0) {
-      final int q = n * 52429 >>> 19;
-      tmp[--nl] = (byte) (n - q * 10 + '0');
-      n = q;
+    if(n >= 10) {
+      final int r = n * 2;
+      tmp[--nl] = PAIRS[r + 1];
+      tmp[--nl] = PAIRS[r];
+    } else {
+      tmp[--nl] = (byte) (n + '0');
     }
-    if(m) tmp[--nl] = '-';
+    if(neg) tmp[--nl] = '-';
     return tmp;
   }
 
   /**
-   * Creates a byte array representation of the specified integer value.
+   * Creates a token representation of the specified integer value.
    * @param value value to be converted
    * @param radix radix
    * @return integer value in byte array
@@ -422,30 +428,32 @@ public final class Token {
   }
 
   /**
-   * Checks number of digits of the specified integer.
+   * Returns the number of digits of the specified integer.
    * @param integer number to be checked
    * @return number of digits
    */
   public static int numDigits(final int integer) {
-    for(int i = 0;; ++i) {
-      if(integer <= INTSIZE[i]) return i + 1;
-    }
+    int d = 1, i = integer;
+    if(i >= 100000000) { d += 8; i /= 100000000; }
+    if(i >= 10000) { d += 4; i /= 10000; }
+    if(i >= 100) { d += 2; i /= 100; }
+    if(i >= 10) d++;
+    return d;
   }
 
   /**
-   * Creates a byte array representation from the specified long value,
+   * Creates a token representation from the specified long value,
    * using Java's standard method.
    * @param integer value to be converted
    * @return byte array
    */
   public static byte[] token(final long integer) {
-    return integer >= 0 && integer <= 9 ? cpToken('0' + (int) integer) :
-           integer >= Integer.MIN_VALUE && integer <= Integer.MAX_VALUE ?
+    return integer >= Integer.MIN_VALUE && integer <= Integer.MAX_VALUE ?
         token((int) integer) : token(Long.toString(integer));
   }
 
   /**
-   * Creates a byte array representation from the specified double value.
+   * Creates a token representation from the specified double value.
    * @param dbl double value to be converted
    * @return byte array
    */
@@ -464,7 +472,7 @@ public final class Token {
   }
 
   /**
-   * Creates a byte array representation from the specified float value.
+   * Creates a token representation from the specified float value.
    * @param flt float value to be converted
    * @return byte array
    */
