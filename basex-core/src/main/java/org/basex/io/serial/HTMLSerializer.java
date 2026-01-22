@@ -8,6 +8,7 @@ import java.io.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
+import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
@@ -114,13 +115,20 @@ final class HTMLSerializer extends MarkupSerializer {
 
   @Override
   protected void pi(final byte[] name, final byte[] value) throws IOException {
-    if(sep) indent();
-    if(contains(value, '>')) throw SERPI.getIO();
-    out.print(PI_O);
-    out.print(name);
-    out.print(' ');
-    out.print(value);
-    out.print(ELEM_C);
+    if(html5) {
+      final TokenBuilder tb = new TokenBuilder().add('?').add(name);
+      // ensure proper handling of sequences of dashes (----)
+      if(value.length > 0) tb.add(' ').add(string(value).replace("--", "- -").replace("--", "- -"));
+      comment(tb.add('?').finish());
+    } else {
+      if(sep) indent();
+      if(contains(value, '>')) throw SERPI.getIO();
+      out.print(PI_O);
+      out.print(name);
+      out.print(' ');
+      out.print(value);
+      out.print(ELEM_C);
+    }
   }
 
   @Override
