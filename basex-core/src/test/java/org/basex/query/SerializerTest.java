@@ -124,8 +124,9 @@ public final class SerializerTest extends SandboxTest {
 
     query(option + "<option selected='selected'/>", "<option selected></option>");
 
-    query(option + "<?x y?>", "<?x y>");
-    error(option + "<?x > ?>", SERPI);
+    query(option + "<?x y?>", "<!--?x y?-->");
+    query(option + HTML_VERSION.arg("4.01") + "<?x y?>", "<?x y>");
+    error(option + HTML_VERSION.arg("4.01") + "<?x > ?>", SERPI);
 
     query(option + INDENT.arg("yes")
         + "<html><body><PRE><u>test</u></PRE></body></html>",
