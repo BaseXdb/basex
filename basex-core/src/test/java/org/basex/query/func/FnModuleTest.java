@@ -975,6 +975,19 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void elementToMap() {
+    final Function func = Function.ELEMENT_TO_MAP;
+    query(func.args(" <a>10</a>") + "?a instance of xs:integer", true);
+    query(func.args(" <a>10.0</a>") + "?a instance of xs:decimal", true);
+    query(func.args(" <a>10e0</a>") + "?a instance of xs:double", true);
+    query(func.args(" <a>x</a>") + "?a instance of xs:string", true);
+    query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'boolean' } } }") +
+        "?a instance of xs:untypedAtomic", true);
+    query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'numeric' } } }") +
+        "?a instance of xs:untypedAtomic", true);
+  }
+
+  /** Test method. */
   @Test public void error() {
     final Function func = ERROR;
 

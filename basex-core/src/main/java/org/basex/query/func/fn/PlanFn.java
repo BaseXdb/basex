@@ -147,15 +147,24 @@ public abstract class PlanFn extends StandardFunc {
      * @param item item
      * @return cast item
      */
-    Item cast(final Item item) {
-      if(type != null && type.type != null) {
+    Item cast(final Str item) {
+      if(type != null) {
         try {
-          return type.type.cast(item, null, info);
+          if(type.type == AtomType.BOOLEAN) {
+            final Boolean b = Bln.parse(item.string());
+            if(b != null) return Bln.get(b);
+          } else if(type.type == AtomType.NUMERIC) {
+            if(Token.contains(item.string(), 'e')) return Dbl.get(item.dbl(info));
+            if(Token.contains(item.string(), '.')) return Dec.get(item.dec(info));
+            return Itr.get(item.itr(null));
+          } else {
+            return item;
+          }
         } catch(final QueryException ex) {
           Util.debug(ex);
         }
       }
-      return item;
+      return Atm.get(item.string());
     }
 
     /**
@@ -363,7 +372,7 @@ public abstract class PlanFn extends StandardFunc {
     final MapBuilder mb = new MapBuilder(attributes.size());
     for(final ANode attr : attributes) {
       final PlanEntry entry = plan.entries.get(attr.qname());
-      final Item value = Str.get(attr.string());
+      final Str value = Str.get(attr.string());
       mb.put(nodeName(attr, node, plan, qc), entry != null ? entry.cast(value) : value);
     }
     return mb;
