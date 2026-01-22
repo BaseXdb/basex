@@ -36,6 +36,10 @@ public interface JsonConstants {
   byte[] OBJECT = token("object");
   /** Token: map. */
   byte[] MAP = token("map");
+  /** Token: positive infinity. */
+  byte[] INF = token("1e9999");
+  /** Token: negative infinity. */
+  byte[] NINF = token("-1e9999");
 
   /** Token: pair. */
   byte[] PAIR = token("pair");

@@ -180,7 +180,9 @@ public abstract class JsonSerializer extends StandardSerializer {
         if(Double.isFinite(d)) {
           out.print(Dbl.string(d));
         } else {
-          throw SERNUMBER_X.getIO(d);
+          if(canonical) throw SERNUMBER_X.getIO(d);
+          out.print(d == Double.POSITIVE_INFINITY ? JsonConstants.INF :
+            d == Double.NEGATIVE_INFINITY ? JsonConstants.NINF : JsonConstants.NULL);
         }
       } else if(type == AtomType.BOOLEAN || type.isNumber()) {
         out.print(item.string(null));

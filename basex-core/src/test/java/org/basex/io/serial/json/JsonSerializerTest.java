@@ -117,9 +117,9 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("{ true(): false() }", "{'true':false}", format);
     serialize("{ 1: 'E' }", "{'1':'E'}", format);
 
-    error("{ 'A': 1 div 0.0e0 }", format, SERNUMBER_X);
-    error("{ 'A': -1 div 0.0e0 }", format, SERNUMBER_X);
-    error("{ 'A': 0 div 0.0e0 }", format, SERNUMBER_X);
+    serialize("{ 'A': 1 div 0.0e0 }", "{'A':1e9999}", format);
+    serialize("{ 'A': -1 div 0.0e0 }", "{'A':-1e9999}", format);
+    serialize("{ 'A': 0 div 0.0e0 }", "{'A':null}", format);
 
     error("{ true(): true#0 }", format, SERJSONFUNC_X);
     error("{ 'A': ('B', 'C') }", format, SERJSONSEQ);
