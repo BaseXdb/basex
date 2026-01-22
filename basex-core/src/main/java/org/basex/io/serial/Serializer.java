@@ -220,9 +220,7 @@ public abstract class Serializer implements Closeable {
 
     final byte[] ancUri = nsUri(prefix);
     if(ancUri == null || !eq(ancUri, uri)) {
-      if(canonical && uri.length > 0 && !Uri.get(uri).isAbsolute()) {
-        throw SERRELURI.getIO(uri);
-      }
+      if(canonical && uri.length > 0 && !Uri.get(uri).isAbsolute()) throw SERCANONURI.getIO(uri);
       attribute(prefix.length == 0 ? XMLNS : concat(XMLNS_COLON, prefix), uri, standalone);
       nspaces.add(prefix, uri);
     }
@@ -394,10 +392,15 @@ public abstract class Serializer implements Closeable {
     final int size = pre + data.size(pre, kind);
     if(kind == Data.DOC) {
       openDoc(data.text(pre++, true));
+      int roots = 0;
       while(pre < size && !finished()) {
         node((ANode) new DBNode(data, pre));
-        pre += data.size(pre, data.kind(pre));
-        if(canonical) indent = true;
+        final int k = data.kind(pre);
+        if(canonical) {
+          if(k == Data.ELEM && ++roots > 1) throw SERCANONROOTS_X.getIO(node);
+          indent = true;
+        }
+        pre += data.size(pre, k);
       }
       closeDoc();
       return;
@@ -506,16 +509,13 @@ public abstract class Serializer implements Closeable {
       namespace(node.name(), node.string(), true);
     } else if(type == NodeType.DOCUMENT_NODE) {
       openDoc(node.baseURI());
-      if(canonical) {
-        int roots = 0;
-        for(final ANode nd : node.childIter()) {
-          node(nd);
-          if(nd.type == NodeType.ELEMENT) ++roots;
+      int roots = 0;
+      for(final ANode nd : node.childIter()) {
+        node(nd);
+        if(canonical) {
+          if(nd.type == NodeType.ELEMENT && ++roots > 1) throw SERCANONROOTS_X.getIO(node);
           indent = true;
         }
-        if(roots != 1) throw SERWELLFORM_X.getIO(node);
-      } else {
-        for(final ANode nd : node.childIter()) node(nd);
       }
       closeDoc();
     } else if(skip == 0 || !skipElement(node)) {

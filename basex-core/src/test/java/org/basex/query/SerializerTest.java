@@ -352,4 +352,15 @@ public final class SerializerTest extends SandboxTest {
     query(option + "<html><meta/><meta/></html>",
         "<!DOCTYPE HTML>\n<html>\n  <meta>\n  <meta>\n</html>");
   }
+
+  /** Canonical serialization. */
+  @Test public void canonical() {
+    final String option = METHOD.arg("xml") + CANONICAL.arg("yes");
+    // relative namespace URIs are not allowed
+    error(option + "<x xmlns='relative'/>", SERCANONURI);
+    // document must only have one element root node
+    error(option + "document { <x/>, <x/> }", SERCANONROOTS_X);
+    // document must only have one element root node (use 'update {}': create database node)
+    error(option + "document { <x/>, <x/> } update {}", SERCANONROOTS_X);
+  }
 }
