@@ -410,7 +410,7 @@ public final class BinModuleTest extends SandboxTest {
     query(func.args(hex("0000000000000000"), 0),                           0);
     query(func.args(hex("3FF0000000000000"), 0),                           1);
     query(func.args(hex("BFF0000000000000"), 0),                           -1);
-    query(func.args(hex("8000000000000000"), 0),                           "-0");
+    query(func.args(hex("8000000000000000"), 0),                           0);
     query(func.args(hex("0000000000000000"), 0),                           0);
     query(func.args(hex("7FF0000000000000"), 0),                           "INF");
     query(func.args(hex("FFF0000000000000"), 0),                           "-INF");

@@ -146,11 +146,11 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("1", "1", format);
 
     serialize("0.0e0", "0", format);
-    serialize("-0.0e0", "-0", format);
+    serialize("-0.0e0", "0", format);
     serialize("1e-6", "0.000001", format);
     serialize("1e-7", "1e-7", format);
     serialize("1e20", "100000000000000000000", format);
-    serialize("1e21", "1e21", format);
+    serialize("1e21", "1e+21", format);
     serialize("12345678.9e0", "12345678.9", format);
     serialize("12345678901234e0", "12345678901234", format);
     serialize("123456789012345e0", "123456789012345", format);
