@@ -145,6 +145,13 @@ final class DialogVisualPrefs extends BaseXBack {
 
   /** Look and feels. */
   private static final String[] LOOKANDFEELS = {
+    // https://www.formdev.com/flatlaf/
+    "com.formdev.flatlaf.FlatLightLaf",
+    "com.formdev.flatlaf.FlatDarkLaf",
+    "com.formdev.flatlaf.FlatIntelliJLaf",
+    "com.formdev.flatlaf.FlatDarculaLaf",
+    "com.formdev.flatlaf.themes.FlatMacLightLaf",
+    "com.formdev.flatlaf.themes.FlatMacDarkLaf",
     // http://www.jtattoo.net/
     "com.jtattoo.plaf.acryl.AcrylLookAndFeel",
     "com.jtattoo.plaf.aero.AeroLookAndFeel",
