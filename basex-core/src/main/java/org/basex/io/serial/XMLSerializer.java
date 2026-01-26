@@ -1,7 +1,5 @@
 package org.basex.io.serial;
 
-import static org.basex.data.DataText.*;
-
 import java.io.*;
 
 import org.basex.query.value.item.*;

@@ -1,7 +1,7 @@
 package org.basex.io.serial;
 
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.XMLToken.*;
 
 import java.io.*;
 
@@ -30,11 +30,14 @@ final class XHTMLSerializer extends MarkupSerializer {
   protected void attribute(final byte[] name, final byte[] value, final boolean standalone)
       throws IOException {
 
-    // escape URI attributes
-    final byte[] nm = concat(lc(elem.local()), ATT, lc(name));
-    final byte[] val = escape && HTMLSerializer.URIS.contains(nm) ?
-      encodeUri(value, UriEncoder.ESCAPE) : value;
-    super.attribute(name, val, standalone);
+    final byte[] v;
+    if(escape && HTMLSerializer.URIS.contains(concat(lc(elem.local()), AT, lc(name)))) {
+      // escape URI attributes
+      v = encodeUri(value, UriEncoder.ESCAPE);
+    } else {
+      v = value;
+    }
+    super.attribute(name, v, standalone);
   }
 
   @Override

@@ -4,7 +4,7 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 
-import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * This class defines syntax highlighting for XML files.
@@ -123,11 +123,11 @@ public final class SyntaxXML extends Syntax {
 
   @Override
   public byte[] commentOpen() {
-    return DataText.COMM_O;
+    return XMLToken.COMM_O;
   }
 
   @Override
   public byte[] commentEnd() {
-    return DataText.COMM_C;
+    return XMLToken.COMM_C;
   }
 }

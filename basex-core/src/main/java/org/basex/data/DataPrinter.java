@@ -71,7 +71,8 @@ public final class DataPrinter {
     if(k == Data.ELEM) {
       cont = data.name(pre, Data.ELEM);
     } else if(k == Data.ATTR) {
-      cont = Token.concat(data.name(pre, Data.ATTR), ATT1, data.text(pre, false), ATT2);
+      final byte[] n = data.name(pre, Data.ATTR), v = data.text(pre, false);
+      cont = Token.concat(n, XMLToken.ATT1, v, XMLToken.ATT2);
     } else {
       cont = data.text(pre, true);
     }

@@ -14,6 +14,106 @@ import org.basex.util.similarity.*;
  * @author Christian Gruen
  */
 public final class XMLToken {
+  /** Document declaration. */
+  public static final byte[] DOCDECL1 = token("xml version=\"");
+  /** Document declaration. */
+  public static final byte[] DOCDECL2 = token("\" encoding=\"");
+  /** Document declaration. */
+  public static final byte[] DOCDECL3 = token("\" standalone=\"");
+
+  /** HTML. */
+  public static final byte[] HTML = token("html");
+  /** Doctype output. */
+  public static final byte[] DOCTYPE = token("DOCTYPE");
+  /** Doctype system keyword. */
+  public static final byte[] SYSTEM = token("SYSTEM");
+  /** Doctype public keyword. */
+  public static final byte[] PUBLIC = token("PUBLIC");
+
+  /** Ampersand entity. */
+  public static final byte[] E_AMP = token("&amp;");
+  /** Quote entity. */
+  public static final byte[] E_QUOT = token("&quot;");
+  /** GreaterThan entity. */
+  public static final byte[] E_GT = token("&gt;");
+  /** LessThan entity. */
+  public static final byte[] E_LT = token("&lt;");
+  /** Carriage return. */
+  public static final byte[] E_CR = token("&#xD;");
+  /** Newline. */
+  public static final byte[] E_NL = token("&#xA;");
+  /** Line separator. */
+  public static final byte[] E_2028 = token("&#x2028;");
+  /** HTML: Non-breaking space entity. */
+  public static final byte[] E_NBSP = token("&nbsp;");
+
+  /** Token: size. */
+  public static final byte[] T_SIZE = token("size");
+
+  /** Comment output. */
+  public static final byte[] COMM_O = token("<!--");
+  /** Comment output. */
+  public static final byte[] COMM_C = token("-->");
+  /** XQuery comment. */
+  public static final byte[] XQCOMM_O = token("(:");
+  /** XQuery comment. */
+  public static final byte[] XQCOMM_C = token(":)");
+  /** Javascript comment. */
+  public static final byte[] JSCOMM_O = token("/*");
+  /** Javascript comment. */
+  public static final byte[] JSCOMM_C = token("*/");
+
+  /** PI output. */
+  public static final byte[] PI_O = token("<?");
+  /** PI output. */
+  public static final byte[] PI_C = token("?>");
+
+  /** Element output. */
+  public static final byte[] ELEM_O = cpToken('<');
+  /** Element output. */
+  public static final byte[] ELEM_C = cpToken('>');
+  /** Element output. */
+  public static final byte[] ELEM_OS = token("</");
+  /** Element output. */
+  public static final byte[] ELEM_SC = token("/>");
+
+  /** Attributes: at symbol. */
+  public static final byte[] AT = cpToken('@');
+  /** Attribute output. */
+  public static final byte[] ATT1 = token("=\"");
+  /** Attribute output. */
+  public static final byte[] ATT2 = cpToken('\"');
+
+  /** Opening CDATA. */
+  public static final byte[] CDATA_O = token("<![CDATA[");
+  /** Closing CDATA. */
+  public static final byte[] CDATA_C = token("]]>");
+
+  /** XML spaces: attribute name. */
+  public static final byte[] XML_SPACE = token("xml:space");
+  /** XML spaces: default. */
+  public static final byte[] DEFAULT = token("default");
+  /** XML spaces: preserve. */
+  public static final byte[] PRESERVE = token("preserve");
+
+  /** Content-Type. */
+  public static final byte[] CONTENT_TYPE = token("Content-Type");
+  /** HTML: head element. */
+  public static final byte[] HEAD = token("head");
+  /** HTML: meta element. */
+  public static final byte[] META = token("meta");
+  /** HTML: http-equiv attribute. */
+  public static final byte[] HTTP_EQUIV = token("http-equiv");
+  /** HTML: content attribute. */
+  public static final byte[] CONTENT = token("content");
+  /** HTML: charset. */
+  public static final byte[] CHARSET = token("charset");
+
+  /** XHTML namespace. */
+  public static final byte[] XHTML_URI = token("http://www.w3.org/1999/xhtml");
+  /** XML namespace. */
+  public static final byte[] XML_URI = token("http://www.w3.org/XML/1998/namespace");
+
   /** Index for all HTML entities (lazy initialization). */
   private static TokenObjectMap<byte[]> entities;
 
@@ -129,12 +229,12 @@ public final class XMLToken {
   }
 
   /**
-   * Returns a valid string representation of the specified value.
+   * Returns a valid token representation of the specified value.
    * @param value object (can be {@code null}, will be converted to token otherwise)
    * @param validate validate input
    * @return token, or {@code null} if validation is enabled and if invalid characters are found
    */
-  public static byte[] token(final Object value, final boolean validate) {
+  public static byte[] check(final Object value, final boolean validate) {
     if(value == null) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();

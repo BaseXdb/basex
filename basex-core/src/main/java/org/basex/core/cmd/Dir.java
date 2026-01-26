@@ -39,7 +39,7 @@ public final class Dir extends Command {
 
     final Table table = new Table();
     table.description = ENTRIES_X;
-    table.header.add(INPUT_PATH).add(TYPE).add(DataText.CONTENT_TYPE).add(SIZE);
+    table.header.add(INPUT_PATH).add(TYPE).add(XMLToken.CONTENT_TYPE).add(SIZE);
     final ArrayList<TokenList> contents = table.contents;
 
     final Data data = context.data();

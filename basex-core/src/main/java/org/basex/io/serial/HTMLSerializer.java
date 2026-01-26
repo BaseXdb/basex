@@ -1,8 +1,8 @@
 package org.basex.io.serial;
 
-import static org.basex.data.DataText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.XMLToken.*;
 
 import java.io.*;
 
@@ -82,7 +82,7 @@ final class HTMLSerializer extends MarkupSerializer {
     // don't append value for boolean attributes
     byte[] val = value;
     if(!BOOLEAN.isEmpty() || !URIS.isEmpty()) {
-      final byte[] key = concat(lc(elem.string()), ATT, lc(name));
+      final byte[] key = concat(lc(elem.string()), AT, lc(name));
       if(BOOLEAN.contains(key) && eq(lc(name), lc(val))) return;
       // escape URI attributes
       if(escape && URIS.contains(key)) val = encodeUri(val, UriEncoder.ESCAPE);

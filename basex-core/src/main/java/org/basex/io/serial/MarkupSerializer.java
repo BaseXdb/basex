@@ -1,9 +1,9 @@
 package org.basex.io.serial;
 
-import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.XMLToken.*;
 
 import java.io.*;
 import java.util.*;
@@ -28,9 +28,6 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 abstract class MarkupSerializer extends StandardSerializer {
-  /** Token. */
-  private static final QNm Q_HTTP_EQUIV = new QNm(HTTP_EQUIV);
-
   /** System document type. */
   String docsys;
   /** Public document type. */
@@ -329,8 +326,9 @@ abstract class MarkupSerializer extends StandardSerializer {
   @Override
   protected boolean skipElement(final ANode node) {
     if(node.type == NodeType.ELEMENT && eq(node.name(), META)) {
-      final byte[] value = node.attribute(Q_HTTP_EQUIV);
-      return value != null && eq(trim(value), CONTENT_TYPE);
+      if(node.attribute(new QNm(CHARSET)) != null) return true;
+      final byte[] value = node.attribute(new QNm(HTTP_EQUIV));
+      if(value != null && eq(lc(trim(value)), lc(CONTENT_TYPE))) return true;
     }
     return false;
   }
@@ -338,8 +336,8 @@ abstract class MarkupSerializer extends StandardSerializer {
   /**
    * Prints the document type declaration.
    * @param name name of element
-   * @param pub doctype-public parameter
-   * @param sys doctype-system parameter
+   * @param pub doctype-public parameter (can be {@code null})
+   * @param sys doctype-system parameter (can be {@code null})
    * @throws IOException I/O exception
    */
   protected final void printDoctype(final byte[] name, final String pub, final String sys)
@@ -347,13 +345,11 @@ abstract class MarkupSerializer extends StandardSerializer {
 
     if(level != 0 || root) return;
     if(sep) indent();
-    out.print(DOCTYPE);
-    out.print(name);
-    if(sys != null || pub != null) {
-      if(pub != null) out.print(' ' + PUBLIC + " \"" + pub + '"');
-      else out.print(' ' + SYSTEM);
-      if(sys != null) out.print(" \"" + sys + '"');
-    }
+    final TokenBuilder tb = new TokenBuilder().add('<').add('!').add(DOCTYPE).add(' ').add(name);
+    if(pub != null || sys != null) tb.add(' ').add(pub != null ? PUBLIC : SYSTEM);
+    if(pub != null) tb.add(" \"").add(pub).add('"');
+    if(sys != null) tb.add(" \"").add(sys).add('"');
+    out.print(tb.finish());
     out.print(ELEM_C);
     sep = true;
   }

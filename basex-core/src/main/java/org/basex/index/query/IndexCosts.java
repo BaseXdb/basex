@@ -1,4 +1,4 @@
-package org.basex.query.util.index;
+package org.basex.index.query;
 
 import org.basex.data.*;
 import org.basex.util.*;

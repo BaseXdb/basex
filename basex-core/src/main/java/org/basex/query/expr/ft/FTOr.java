@@ -2,6 +2,7 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;

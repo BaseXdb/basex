@@ -181,7 +181,7 @@ public final class PathNode {
   public byte[] token(final Data data) {
     return switch(kind) {
       case Data.ELEM -> data.elemNames.key(name);
-      case Data.ATTR -> Token.concat(ATT, data.attrNames.key(name));
+      case Data.ATTR -> Token.concat(XMLToken.AT, data.attrNames.key(name));
       case Data.TEXT -> TEXT;
       case Data.COMM -> COMMENT;
       case Data.PI   -> PI;

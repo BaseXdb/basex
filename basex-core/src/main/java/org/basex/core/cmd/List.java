@@ -110,7 +110,7 @@ public final class List extends Command {
 
     final Table table = new Table();
     table.description = RESOURCES_X;
-    table.header.add(INPUT_PATH).add(TYPE).add(DataText.CONTENT_TYPE).add(SIZE);
+    table.header.add(INPUT_PATH).add(TYPE).add(XMLToken.CONTENT_TYPE).add(SIZE);
 
     try {
       final Data data = Open.open(db, context, options, true, true);

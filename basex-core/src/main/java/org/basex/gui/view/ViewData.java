@@ -64,7 +64,7 @@ public final class ViewData {
         case Data.TEXT -> TEXT;
         case Data.COMM -> COMMENT;
         case Data.PI   -> PI;
-        case Data.ATTR -> Token.concat(ATT, data.name(p, k));
+        case Data.ATTR -> Token.concat(XMLToken.AT, data.name(p, k));
         default        -> data.name(p, k);
       };
       tb.add('/').add(txt);
@@ -82,7 +82,8 @@ public final class ViewData {
     final int kind = data.kind(pre);
     return switch(kind) {
       case Data.ELEM -> data.name(pre, kind);
-      case Data.ATTR -> Token.concat(ATT, data.name(pre, kind), ATT1, data.text(pre, false), ATT2);
+      case Data.ATTR -> Token.concat(XMLToken.AT, data.name(pre, kind), XMLToken.ATT1,
+          data.text(pre, false), XMLToken.ATT2);
       default        -> data.text(pre, true);
     };
   }

@@ -7,8 +7,8 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.io.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -173,11 +173,11 @@ public class XMLParser extends SingleParser {
     elms.push(en);
     boolean strip = strips.peek();
     if(stripWS) {
-      final int a = atts.get(DataText.XML_SPACE);
+      final int a = atts.get(XMLToken.XML_SPACE);
       if(a != -1) {
         final byte[] s = atts.value(a);
-        if(eq(s, DataText.DEFAULT)) strip = true;
-        else if(eq(s, DataText.PRESERVE)) strip = false;
+        if(eq(s, XMLToken.DEFAULT)) strip = true;
+        else if(eq(s, XMLToken.PRESERVE)) strip = false;
       }
     }
     strips.push(strip);

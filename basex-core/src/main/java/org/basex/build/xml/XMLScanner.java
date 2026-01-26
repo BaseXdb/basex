@@ -32,10 +32,10 @@ final class XMLScanner extends Job {
 
   /** Scanning states. */
   private enum Scan {
-    /** Content state.   */ CONTENT,
-    /** Element state.   */ ELEMENT,
-    /** Attribute state. */ ATT,
-    /** Quoted state.    */ QUOTE,
+    /** Content state.   */ CNTNT,
+    /** Element state.   */ ELMNT,
+    /** Attribute state. */ ATTRBT,
+    /** Quoted state.    */ QUT,
   }
 
   /** Character buffer for the current token. */
@@ -53,7 +53,7 @@ final class XMLScanner extends Job {
   private final boolean fragment;
 
   /** Current scanner state. */
-  private Scan scan = Scan.CONTENT;
+  private Scan scan = Scan.CNTNT;
   /** Scanning prolog (will be invalidated when root element is parsed). */
   private boolean prolog = true;
   /** Parameter entity parsing. */
@@ -131,10 +131,10 @@ final class XMLScanner extends Job {
 
     // checks the scanner state
     switch(scan) {
-      case CONTENT: scanCONTENT(ch); break;
-      case ELEMENT:
-      case ATT: scanELEMENT(ch); break;
-      case QUOTE: scanATTVALUE(ch);
+      case CNTNT: scanCONTENT(ch); break;
+      case ELMNT:
+      case ATTRBT: scanELEMENT(ch); break;
+      case QUT: scanATTVALUE(ch);
     }
     return true;
   }
@@ -185,7 +185,7 @@ final class XMLScanner extends Job {
     }
 
     prolog = false;
-    scan = Scan.ELEMENT;
+    scan = Scan.ELMNT;
 
     // closing element...
     if(c == '/') {
@@ -207,20 +207,20 @@ final class XMLScanner extends Job {
     // scan element end...
     if(c == '>') {
       type = Type.R_BR;
-      scan = Scan.CONTENT;
+      scan = Scan.CNTNT;
     } else if(c == '=') {
       // scan equal sign...
       type = Type.EQ;
     } else if(c == '\'' || c == '"') {
       // scan quote...
       type = Type.QUOTE;
-      scan = Scan.QUOTE;
+      scan = Scan.QUT;
       quote = c;
     } else if(c == '/') {
       // scan empty element end...
       type = Type.CLOSE_R_BR;
       if((c = nextChar()) == '>') {
-        scan = Scan.CONTENT;
+        scan = Scan.CNTNT;
       } else {
         token.add(c);
         throw error(CLOSING);
@@ -230,10 +230,10 @@ final class XMLScanner extends Job {
       type = Type.WS;
     } else if(isStartChar(c)) {
       // scan name of attribute or element...
-      type = scan == Scan.ATT ? Type.ATTNAME : Type.ELEMNAME;
+      type = scan == Scan.ATTRBT ? Type.ATTNAME : Type.ELEMNAME;
       do token.add(c); while(isChar(c = nextChar()));
       prev(1);
-      scan = Scan.ATT;
+      scan = Scan.ATTRBT;
     } else {
       // undefined character...
       throw error(CHARACTER, (char) c);
@@ -248,7 +248,7 @@ final class XMLScanner extends Job {
   private void scanATTVALUE(final int ch) throws IOException {
     if(ch == quote) {
       type = Type.QUOTE;
-      scan = Scan.ATT;
+      scan = Scan.ATTRBT;
     } else {
       type = Type.ATTVALUE;
       attValue(ch);
@@ -859,7 +859,7 @@ final class XMLScanner extends Job {
       name(true);
       s(); externalID(false, false); s();
       check('>');
-    } else if(consume(COMS)) {
+    } else if(consume(XMLToken.COMM_O)) {
       comment();
     } else if(consume(XML)) {
       pi();

@@ -218,14 +218,14 @@ public abstract class ANode extends Item {
 
   /**
    * Returns if whitespace needs to be preserved.
-   * @return node kind
+   * @return result of check
    */
   private boolean preserve() {
-    final QNm xs = new QNm(DataText.XML_SPACE, QueryText.XML_URI);
+    final QNm xs = new QNm(XMLToken.XML_SPACE, QueryText.XML_URI);
     for(ANode node = this; node != null; node = node.parent()) {
       if(node.type == ELEMENT) {
         final byte[] v = node.attribute(xs);
-        if(v != null) return Token.eq(v, DataText.PRESERVE);
+        if(v != null) return Token.eq(v, XMLToken.PRESERVE);
       }
     }
     return false;

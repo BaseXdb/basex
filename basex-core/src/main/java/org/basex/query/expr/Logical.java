@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;

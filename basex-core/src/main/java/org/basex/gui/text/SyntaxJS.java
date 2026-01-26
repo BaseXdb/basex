@@ -5,7 +5,6 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.*;
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.util.*;
 
 /**
@@ -123,11 +122,11 @@ final class SyntaxJS extends Syntax {
 
   @Override
   public byte[] commentOpen() {
-    return DataText.JSCOMM_O;
+    return XMLToken.JSCOMM_O;
   }
 
   @Override
   public byte[] commentEnd() {
-    return DataText.JSCOMM_C;
+    return XMLToken.JSCOMM_C;
   }
 }

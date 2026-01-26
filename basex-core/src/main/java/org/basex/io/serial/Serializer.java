@@ -1,8 +1,8 @@
 package org.basex.io.serial;
 
-import static org.basex.data.DataText.*;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.XMLToken.*;
 
 import java.io.*;
 import java.util.*;
@@ -27,6 +27,17 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class Serializer implements Closeable {
+  /** Version: 1.0. */
+  protected static final String V10 = "1.0";
+  /** Version: 1.1. */
+  protected static final String V11 = "1.1";
+  /** Version: 4.0. */
+  protected static final String V40 = "4.0";
+  /** Version: 4.01. */
+  protected static final String V401 = "4.01";
+  /** Version: 5.0. */
+  protected static final String V50 = "5.0";
+
   /** Stack with names of opened elements. */
   protected final Stack<QNm> opened = new Stack<>();
   /** Current level. */

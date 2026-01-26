@@ -646,7 +646,7 @@ public class Options implements Iterable<Option<?>> {
       final Boolean b = Strings.toBoolean(value);
       assign.accept(b != null ? Bln.get(b) : Str.get(value));
     } else if(option instanceof final EnumOption eo) {
-      final Object v = eo.get(normalize(value));
+      final Object v = eo.get(normalizeEnum(value));
       if(v == null) return allowed(eo, value, (Object[]) eo.values());
       assign.accept(v);
     } else if(option instanceof final OptionsOption oo) {
@@ -850,7 +850,7 @@ public class Options implements Iterable<Option<?>> {
       for(final Item it :  value) list.add(Strings.toInt(string(it.string(info))));
       result = list.finish();
     } else if(option instanceof final EnumOption eo) {
-      final String string = normalize(serialize(value, info));
+      final String string = normalizeEnum(serialize(value, info));
       result = eo.get(string);
       if(result == null) {
         throw INVALIDOPTION_X.get(info, allowed(eo, string, (Object[]) eo.values()));
@@ -865,14 +865,23 @@ public class Options implements Iterable<Option<?>> {
 
   /**
    * Normalizes an enumeration value.
+   * Contains various tweaks for peculiarities of output declarations.
    * @param value value
    * @return normalized value
    */
-  private static synchronized String normalize(final String value) {
-    final String v = value.trim();
-    if(v.isEmpty()) return YesNoOmit.OMIT.toString();
+  private static synchronized String normalizeEnum(final String value) {
+    String v = value.trim();
+    // Boolean properties
     final Boolean b = Strings.toBoolean(v);
-    return b == Boolean.TRUE ? Text.YES : b == Boolean.FALSE ? Text.NO : v;
+    if(b == Boolean.TRUE) return Text.YES;
+    if(b == Boolean.FALSE) return Text.NO;
+    if(v.isEmpty()) return YesNoOmit.OMIT.toString();
+    // QName properties
+    if(v.startsWith("Q{")) {
+      final byte[][] parsed = QNm.parseExpanded(token(v), false);
+      if(parsed != null && parsed[1].length == 0) v = string(parsed[0]);
+    }
+    return v;
   }
 
   /**

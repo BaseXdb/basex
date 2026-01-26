@@ -113,7 +113,7 @@ public final class Str extends AStr {
    */
   public static Str get(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    final byte[] token = XMLToken.token(value, qc.context.options.get(MainOptions.CHECKSTRINGS));
+    final byte[] token = XMLToken.check(value, qc.context.options.get(MainOptions.CHECKSTRINGS));
     if(token == null) throw INVCODE_X.get(info, value);
     return Str.get(token);
   }

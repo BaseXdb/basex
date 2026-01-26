@@ -62,7 +62,7 @@ public final class ASession {
   public Value names() {
     final TokenList tl = new TokenList();
     for(final String name : Collections.list(session.getAttributeNames())) {
-      final byte[] token = XMLToken.token(name, true);
+      final byte[] token = XMLToken.check(name, true);
       if(token != null) tl.add(token);
     }
     return StrSeq.get(tl);

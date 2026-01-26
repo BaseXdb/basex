@@ -115,127 +115,6 @@ public interface DataText {
   /** Database - ID-PRE mapping. */
   String DATAIDP = "idp";
 
-  // XML SERIALIZATION ============================================================================
-
-  /** Version. */
-  String V10 = "1.0";
-  /** Version. */
-  String V11 = "1.1";
-  /** Version. */
-  String V40 = "4.0";
-  /** Version. */
-  String V401 = "4.01";
-  /** Version. */
-  String V50 = "5.0";
-
-  /** Document declaration. */
-  String DOCDECL1 = "xml version=\"";
-  /** Document declaration. */
-  String DOCDECL2 = "\" encoding=\"";
-  /** Document declaration. */
-  String DOCDECL3 = "\" standalone=\"";
-
-  /** HTML. */
-  byte[] HTML = token("html");
-  /** Doctype output. */
-  String DOCTYPE = "<!DOCTYPE ";
-  /** Doctype system keyword. */
-  String SYSTEM = "SYSTEM";
-  /** Doctype public keyword. */
-  String PUBLIC = "PUBLIC";
-
-  /** Ampersand entity. */
-  byte[] E_AMP = token("&amp;");
-  /** Quote entity. */
-  byte[] E_QUOT = token("&quot;");
-  /** GreaterThan entity. */
-  byte[] E_GT = token("&gt;");
-  /** LessThan entity. */
-  byte[] E_LT = token("&lt;");
-  /** Carriage return. */
-  byte[] E_CR = token("&#xD;");
-  /** Newline. */
-  byte[] E_NL = token("&#xA;");
-  /** Line separator. */
-  byte[] E_2028 = token("&#x2028;");
-  /** HTML: Non-breaking space entity. */
-  byte[] E_NBSP = token("&nbsp;");
-
-  /** Token: size. */
-  byte[] T_SIZE = token("size");
-
-  /** Comment output. */
-  byte[] COMM_O = token("<!--");
-  /** Comment output. */
-  byte[] COMM_C = token("-->");
-  /** XQuery comment. */
-  byte[] XQCOMM_O = token("(:");
-  /** XQuery comment. */
-  byte[] XQCOMM_C = token(":)");
-  /** Javascript comment. */
-  byte[] JSCOMM_O = token("/*");
-  /** Javascript comment. */
-  byte[] JSCOMM_C = token("*/");
-
-  /** PI output. */
-  byte[] PI_O = token("<?");
-  /** PI output. */
-  byte[] PI_C = token("?>");
-
-  /** Element output. */
-  byte[] ELEM_O = cpToken('<');
-  /** Element output. */
-  byte[] ELEM_C = cpToken('>');
-  /** Element output. */
-  byte[] ELEM_OS = token("</");
-  /** Element output. */
-  byte[] ELEM_SC = token("/>");
-
-  /** Attribute output. */
-  byte[] ATT1 = token("=\"");
-  /** Attribute output. */
-  byte[] ATT2 = token("\"");
-
-  /** Document output. */
-  byte[] DOC = token("doc()");
-  /** Text output. */
-  byte[] TEXT = token("text()");
-  /** Comment output. */
-  byte[] COMMENT = token("comment()");
-  /** Processing instruction output. */
-  byte[] PI = token("processing-instruction()");
-  /** Attribute output. */
-  byte[] ATT = cpToken('@');
-  /** Opening CDATA. */
-  byte[] CDATA_O = token("<![CDATA[");
-  /** Closing CDATA. */
-  byte[] CDATA_C = token("]]>");
-
-  /** XML spaces: attribute name. */
-  byte[] XML_SPACE = token("xml:space");
-  /** XML spaces: default. */
-  byte[] DEFAULT = token("default");
-  /** XML spaces: preserve. */
-  byte[] PRESERVE = token("preserve");
-
-  /** Content-Type. */
-  byte[] CONTENT_TYPE = token("Content-Type");
-  /** HTML: head element. */
-  byte[] HEAD = token("head");
-  /** HTML: meta element. */
-  byte[] META = token("meta");
-  /** HTML: http-equiv attribute. */
-  byte[] HTTP_EQUIV = token("http-equiv");
-  /** HTML: content attribute. */
-  byte[] CONTENT = token("content");
-  /** HTML: charset. */
-  byte[] CHARSET = token("charset");
-
-  /** XHTML namespace. */
-  byte[] XHTML_URI = token("http://www.w3.org/1999/xhtml");
-  /** XML namespace. */
-  byte[] XML_URI = token("http://www.w3.org/XML/1998/namespace");
-
   // TABLE SERIALIZATION ==========================================================================
 
   /** First table Header. */
@@ -261,4 +140,19 @@ public interface DataText {
   byte[] TABLEURI = token("URI");
   /** Table kinds. */
   byte[][] TABLEKINDS = tokens("DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  ");
+
+  /** Token: size. */
+  byte[] T_SIZE = token("size");
+
+  // NODE TYPES ===================================================================================
+
+  /** Document output. */
+  byte[] DOC = token("doc()");
+  /** Text output. */
+  byte[] TEXT = token("text()");
+  /** Comment output. */
+  byte[] COMMENT = token("comment()");
+  /** Processing instruction output. */
+  byte[] PI = token("processing-instruction()");
+
 }

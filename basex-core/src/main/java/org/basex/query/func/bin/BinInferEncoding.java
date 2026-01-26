@@ -24,9 +24,6 @@ public final class BinInferEncoding extends BinFn {
 
     try(TextInput ti = new TextInput(value.input(info), encoding)) {
       final String enc = ti.encoding();
-
-      Util.println("% vs %", encoding, enc);
-
       final MapBuilder map = new MapBuilder();
       map.put("encoding", Str.get(enc));
       map.put("offset", Itr.get(ti.position()));

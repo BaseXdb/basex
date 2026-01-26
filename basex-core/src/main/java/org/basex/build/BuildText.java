@@ -112,14 +112,6 @@ public interface BuildText {
 
   /** DTD: XML. */
   byte[] DOCDECL = token("<?xml");
-  /** DTD: Doctype. */
-  byte[] DOCTYPE = token("DOCTYPE");
-  /** DTD: System. */
-  byte[] SYSTEM = token("SYSTEM");
-  /** DTD: Public. */
-  byte[] PUBLIC = token("PUBLIC");
-  /** DTD: opening comment. */
-  byte[] COMS = token("<!--");
   /** DTD: NOTATION. */
   byte[] NOTA = token("<!NOTATION");
   /** DTD: ELEMENT. */

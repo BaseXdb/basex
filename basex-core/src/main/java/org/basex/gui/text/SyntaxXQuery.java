@@ -7,7 +7,6 @@ import java.awt.*;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
@@ -132,12 +131,12 @@ final class SyntaxXQuery extends Syntax {
 
   @Override
   public byte[] commentOpen() {
-    return DataText.XQCOMM_O;
+    return XMLToken.XQCOMM_O;
   }
 
   @Override
   public byte[] commentEnd() {
-    return DataText.XQCOMM_C;
+    return XMLToken.XQCOMM_C;
   }
 
   @Override

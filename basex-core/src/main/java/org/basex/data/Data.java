@@ -15,7 +15,6 @@ import org.basex.index.resource.*;
 import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
-import org.basex.query.util.index.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -432,7 +431,7 @@ public abstract class Data {
       if(uriId > 0) {
         uri = nspaces.uri(uriId);
       } else if(hasPrefix && eq(prefix(name), XML)) {
-        uri = DataText.XML_URI;
+        uri = XMLToken.XML_URI;
       }
     }
     return new byte[][] { name, uri == null ? EMPTY : uri };
