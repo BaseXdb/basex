@@ -126,7 +126,7 @@ final class MapRenderer {
 
       if(draw) {
         // color each full-text hit
-        g.setColor(rect.pos != null && rect.pos.contains(span.pos) && !span.del ? GREEN : textc);
+        g.setColor(rect.pos != null && rect.pos.contains(span.pos) && !span.del ? green : textc);
         g.drawString(string(token), xx + ll, yy);
       }
       ll += wl;
@@ -310,7 +310,7 @@ final class MapRenderer {
         int cttmp = 0;
         int wltmp = wl / ct;
         while(cttmp < ct) {
-          if(pp - ct + cttmp < ftp.size()) g.setColor(GREEN);
+          if(pp - ct + cttmp < ftp.size()) g.setColor(green);
 
           while(ll + wltmp >= ww) {
             if(draw) g.fillRect(xx + ll, yy, ww - ll, rect.thumbfh);
@@ -337,7 +337,7 @@ final class MapRenderer {
         }
 
         if(draw) {
-          g.setColor(TEXT);
+          g.setColor(textColor);
           g.fillRect(xx + ll, yy, (int) rect.thumbsw, rect.thumbfh);
           g.setColor(textc);
         }
@@ -403,7 +403,7 @@ final class MapRenderer {
 
       if(draw) {
         // draw word
-        g.setColor(ftp != null && ftp.contains(count) ? GREEN : textc);
+        g.setColor(ftp != null && ftp.contains(count) ? green : textc);
         g.fillRect((int) (xx + ll), yy, wl, rect.thumbfh);
       }
 
@@ -413,7 +413,7 @@ final class MapRenderer {
       if(psl < dl1 && sl == data1[psl]) {
         // new sentence, draw dot
         if(draw) {
-          g.setColor(TEXT);
+          g.setColor(textColor);
           g.fillRect((int) (xx + ll), yy, (int) rect.thumbsw, rect.thumbfh);
           g.setColor(textc);
         }
@@ -673,7 +673,7 @@ final class MapRenderer {
         wl = 0;
       }
       final boolean pm = !lod(list.get(i)[list.get(i).length - 1]);
-      if(ttcol.get(i)) g.setColor(GREEN);
+      if(ttcol.get(i)) g.setColor(green);
       g.drawString(string(list.get(i)), xx + wl, yy);
       if(i == ul) {
         g.drawLine(xx + wl, yy + 1, xx + wl + (pm ? l - sw : l), yy + 1);

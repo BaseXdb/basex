@@ -95,7 +95,7 @@ public final class EditorView extends View {
   public EditorView(final ViewNotifier notifier) {
     super(EDITORVIEW, notifier);
     layout(new BorderLayout());
-    setBackground(PANEL);
+    setBackground(panelColor);
 
     tabs = new BaseXTabs(gui);
     tabs.setFocusable(Prop.MAC);
@@ -139,7 +139,7 @@ public final class EditorView extends View {
     buttons.add(find);
 
     context = new BaseXLabel("").resize(1.25f);
-    context.setForeground(dgray);
+    context.setForeground(darkGray);
 
     final BaseXBack north = new BaseXBack(false).layout(new BorderLayout(10, 0)).border(0, 0, 4, 0);
     north.add(buttons, BorderLayout.WEST);

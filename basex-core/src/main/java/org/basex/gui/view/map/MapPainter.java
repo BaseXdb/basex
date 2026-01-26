@@ -124,7 +124,7 @@ final class MapPainter {
 
       final int kind = data.kind(pre);
       if(kind == Data.ELEM || kind == Data.DOC) {
-        g.setColor(GUIConstants.TEXT);
+        g.setColor(GUIConstants.textColor);
         g.setFont(GUIConstants.font);
         renderer.chopText(ViewData.label(gopts, data, pre), rect.x, rect.y, rect.w);
       } else {

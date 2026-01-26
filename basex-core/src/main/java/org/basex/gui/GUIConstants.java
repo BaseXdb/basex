@@ -1,5 +1,6 @@
 package org.basex.gui;
 
+import static org.basex.gui.GUICommand.*;
 import static org.basex.gui.GUIMenuCmd.*;
 
 import java.awt.*;
@@ -184,48 +185,41 @@ public final class GUIConstants {
     }
   }
 
-  // DUMMY OBJECTS ============================================================
-
-  /** Dummy text field. */
-  private static final JTextField TEXTFIELD = new JTextField();
-  /** Dummy label, used for size calculations. */
-  private static final JLabel LABEL = new JLabel();
-
   // COLORS =======================================================================================
 
-  /** Background color. */
-  public static final Color BACK = new Color(TEXTFIELD.getBackground().getRGB());
-  /** Text color. */
-  public static final Color TEXT = new Color(TEXTFIELD.getForeground().getRGB());
-  /** Panel color. */
-  public static final Color PANEL = new Color(LABEL.getBackground().getRGB());
+  /** Indicates if a dark color mode is used. */
+  public static boolean dark;
 
-  /** Dark theme. */
-  private static final boolean INVERT = BACK.getRed() + BACK.getGreen() + BACK.getBlue() < 384;
+  /** Background color. */
+  public static Color backColor;
+  /** Text color. */
+  public static Color textColor;
+  /** Panel color. */
+  public static Color panelColor;
 
   /** Color: red. */
-  public static final Color RED = color(224, 0, 0);
+  public static Color red;
   /** Color: light red. */
-  public static final Color LRED = color(255, 216, 216);
+  public static Color lightRed;
   /** Color: green. */
-  public static final Color GREEN = color(32, 160, 32);
+  public static Color green;
   /** Color: cyan. */
-  public static final Color BLUE = color(32, 96, 192);
+  public static Color blue;
   /** Color: purple. */
-  public static final Color PURPLE = color(160, 32, 160);
-  /** Color: gray. */
-  public static final Color GRAY = color(0, 160, 160);
-  /** Color: dark gray. */
-  public static final Color DGRAY = color(112, 112, 112);
+  public static Color purple;
+  /** Color: cyan. */
+  public static Color cyan;
+  /** Color: brown. */
+  public static Color brown;
 
   /** Cell color. */
-  public static Color lgray;
+  public static Color lightGray;
   /** Button color. */
   public static Color gray;
   /** Middle gray color. */
-  public static Color mgray;
-  /** Background color. */
-  public static Color dgray;
+  public static Color middleGray;
+  /** Dark gray color. */
+  public static Color darkGray;
 
   /** Cached color gradient. */
   private static final Color[] COLORS = new Color[100];
@@ -308,9 +302,10 @@ public final class GUIConstants {
    * @return fonts
    */
   public static String[] monoFonts() {
+    final JTextField text = new JTextField();
     final StringList monos = new StringList();
     for(final String name : fonts()) {
-      if(isMono(LABEL.getFontMetrics(new Font(name, Font.PLAIN, 100)))) monos.add(name);
+      if(isMono(text.getFontMetrics(new Font(name, Font.PLAIN, 100)))) monos.add(name);
     }
     return monos.finish();
   }
@@ -354,10 +349,25 @@ public final class GUIConstants {
    * @param opts gui options
    */
   public static synchronized void init(final GUIOptions opts) {
-    lgray = color(224, 224, 224);
+    final JTextField text = new JTextField();
+    final JLabel label = new JLabel();
+    backColor = new Color(text.getBackground().getRGB());
+    textColor = new Color(text.getForeground().getRGB());
+    panelColor = new Color(label.getBackground().getRGB());
+    dark = backColor.getRed() + backColor.getGreen() + backColor.getBlue() < 384;
+
+    red = color(224, 0, 0);
+    lightRed = color(255, 216, 216);
+    green = color(32, 160, 32);
+    blue = color(32, 96, 192);
+    purple = color(160, 32, 160);
+    cyan = color(0, 160, 160);
+    brown = color(112, 112, 112);
+
+    lightGray = color(224, 224, 224);
     gray = color(160, 160, 160);
-    mgray = color(128, 128, 128);
-    dgray = color(64, 64, 64);
+    middleGray = color(128, 128, 128);
+    darkGray = color(64, 64, 64);
 
     // create color array
     final int r = opts.get(GUIOptions.COLORRED);
@@ -391,7 +401,7 @@ public final class GUIConstants {
     font  = new Font(name, Font.PLAIN, fontSize);
     mfont = new Font(opts.get(GUIOptions.MONOFONT), Font.PLAIN, fontSize);
     bfont = new Font(name, Font.BOLD, fontSize);
-    dmfont = new Font(opts.get(GUIOptions.MONOFONT), Font.PLAIN, LABEL.getFont().getSize());
+    dmfont = new Font(opts.get(GUIOptions.MONOFONT), Font.PLAIN, label.getFont().getSize());
   }
 
   /**
@@ -416,20 +426,19 @@ public final class GUIConstants {
   }
 
   /**
-   * Returns the specified color with the specified RGB values, or its inverted version
-   * if {@link #INVERT} is true.
+   * Returns the specified color with the specified RGB values, or a version suited for dark mode.
    * @param r red component
    * @param g green component
    * @param b blue component
    * @return converted color
    */
   private static Color color(final int r, final int g, final int b) {
-    return INVERT ? new Color(255 - r, 255 - g, 255 - b) : new Color(r, g, b);
+    return color(r, g, b, 255);
   }
 
   /**
-   * Returns the specified color with the specified RGB and alpha values, or its inverted version
-   * if {@link #INVERT} is true.
+   * Returns the specified color with the specified RGB and alpha values,
+   * or a version suited for dark mode.
    * @param r red component
    * @param g green component
    * @param b blue component
@@ -437,6 +446,11 @@ public final class GUIConstants {
    * @return converted color
    */
   private static Color color(final int r, final int g, final int b, final int a) {
-    return INVERT ? new Color(255 - r, 255 - g, 255 - b, 255 - a) : new Color(r, g, b, a);
+    if(dark) {
+      final double l = .2126 * r + .7152 * g + .0722 * b, m = (255 - l) / l;
+      return new Color((int) Math.min(255, r * m), (int) Math.min(255, g * m),
+          (int) Math.min(255, b * m), a);
+    }
+    return new Color(r, g, b, a);
   }
 }

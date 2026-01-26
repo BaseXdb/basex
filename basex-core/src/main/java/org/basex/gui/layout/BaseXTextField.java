@@ -187,7 +187,7 @@ public class BaseXTextField extends JTextField {
         setBackground(back);
       } catch(final NumberFormatException ex) {
         Util.debug(ex);
-        setBackground(GUIConstants.LRED);
+        setBackground(GUIConstants.lightRed);
         return false;
       }
     } else {

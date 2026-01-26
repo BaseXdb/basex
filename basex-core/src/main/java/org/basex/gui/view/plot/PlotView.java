@@ -254,7 +254,7 @@ public final class PlotView extends View {
     final int sz = sizeFactor();
 
     g.setFont(font);
-    g.setColor(TEXT);
+    g.setColor(textColor);
     final Data data = gui.context.data();
     if(data == null || plotWidth - sz < 0 || plotHeight - sz < 0) {
       BaseXLayout.drawCenter(g, data == null ? NO_DATA : NO_PIXELS, w, h / 2 - MARGIN[0]);
@@ -685,7 +685,7 @@ public final class PlotView extends View {
 
     g2d.rotate(ROTATE, imgW, textH);
     g2d.setFont(font);
-    g2d.setColor(im ? color3 : TEXT);
+    g2d.setColor(im ? color3 : textColor);
     g2d.drawString(caption, fs, fs);
     return img;
   }

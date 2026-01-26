@@ -127,7 +127,7 @@ public final class BaseXScrollBar extends BaseXPanel {
     barPos = (int) Math.max(0, Math.min(pos * factor, barH - barSize));
 
     // paint scrollbar background
-    g.setColor(GUIConstants.PANEL);
+    g.setColor(GUIConstants.panelColor);
     g.fillRect(0, 0, SIZE, hh);
 
     // draw scroll slider
@@ -136,7 +136,7 @@ public final class BaseXScrollBar extends BaseXPanel {
 
     final int d = 2;
     bh += barSize / 2;
-    g.setColor(GUIConstants.dgray);
+    g.setColor(GUIConstants.darkGray);
     g.drawLine(5, bh, SIZE - 6, bh);
     g.drawLine(5, bh - d, SIZE - 6, bh - d);
     g.drawLine(5, bh + d, SIZE - 6, bh + d);
@@ -167,7 +167,7 @@ public final class BaseXScrollBar extends BaseXPanel {
       pol[0][i] += SIZE / 2 - 3;
       pol[1][i] += y + SIZE / 2 - 3;
     }
-    g.setColor(focus ? GUIConstants.TEXT : GUIConstants.dgray);
+    g.setColor(focus ? GUIConstants.textColor : GUIConstants.darkGray);
     g.fillPolygon(pol[0], pol[1], 3);
   }
 

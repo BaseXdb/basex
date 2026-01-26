@@ -269,7 +269,7 @@ public class BaseXCombo extends JComboBox<Object> {
    */
   public synchronized void highlight(final boolean hits) {
     final BaseXTextField tf = textField();
-    (tf != null ? tf : this).setBackground(hits ? GUIConstants.BACK : GUIConstants.LRED);
+    (tf != null ? tf : this).setBackground(hits ? GUIConstants.backColor : GUIConstants.lightRed);
   }
 
   @Override

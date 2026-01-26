@@ -42,13 +42,13 @@ final class SyntaxJSON extends Syntax {
     if(quoted) {
       back = !back && ch == '\\';
     } else {
-      if("{}[]:,".indexOf(ch) != -1) return GRAY;
+      if("{}[]:,".indexOf(ch) != -1) return cyan;
       final byte[] token = token(iter.currString());
-      if(KEYWORDS.contains(token)) return BLUE;
-      if(digit(ch) && !Double.isNaN(toDouble(token))) return PURPLE;
+      if(KEYWORDS.contains(token)) return blue;
+      if(digit(ch) && !Double.isNaN(toDouble(token))) return purple;
     }
 
     if(quote) quoted ^= true;
-    return quote || quoted ? DGRAY : RED;
+    return quote || quoted ? brown : red;
   }
 }

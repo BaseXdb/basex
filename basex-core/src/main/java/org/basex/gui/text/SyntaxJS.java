@@ -63,7 +63,7 @@ final class SyntaxJS extends Syntax {
       } else {
         back = ch == '\\';
       }
-      return DGRAY;
+      return brown;
     }
 
     // comment
@@ -86,7 +86,7 @@ final class SyntaxJS extends Syntax {
     }
     if(comment1 != 0 || comment2 != 0) {
       var = false;
-      return GRAY;
+      return cyan;
     }
 
     // quotes
@@ -96,25 +96,25 @@ final class SyntaxJS extends Syntax {
       back = true;
     } else if(ch == '"' || ch == '\'') {
       quote = ch;
-      return DGRAY;
+      return brown;
     }
 
     // variables
     if(ch == '$') {
       var = true;
-      return GREEN;
+      return green;
     }
     if(var) {
       var = XMLToken.isNCStartChar(ch);
-      return GREEN;
+      return green;
     }
 
     // digits
-    if(Token.digit(ch)) return PURPLE;
+    if(Token.digit(ch)) return purple;
     // special characters
-    if(!XMLToken.isNCStartChar(ch)) return GRAY;
+    if(!XMLToken.isNCStartChar(ch)) return cyan;
     // check for keywords
-    if(KEYWORDS.contains(iter.currString())) return BLUE;
+    if(KEYWORDS.contains(iter.currString())) return blue;
 
     // standard text
     return plain;

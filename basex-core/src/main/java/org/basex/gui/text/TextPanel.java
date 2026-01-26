@@ -91,7 +91,7 @@ public class TextPanel extends BaseXPanel {
 
     setFocusable(true);
     setFocusTraversalKeysEnabled(!editable);
-    setBackground(BACK);
+    setBackground(backColor);
     setOpaque(editable);
 
     addMouseMotionListener(this);

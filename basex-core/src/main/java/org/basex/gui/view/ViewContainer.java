@@ -57,7 +57,7 @@ public final class ViewContainer extends BaseXBack {
    */
   public ViewContainer(final GUI gui, final View... view) {
     layout(new BorderLayout());
-    setBackground(BACK);
+    setBackground(backColor);
 
     this.gui = gui;
     logo = BaseXImages.get("logo_large");
@@ -223,10 +223,10 @@ public final class ViewContainer extends BaseXBack {
 
     ((Graphics2D) g).setStroke(STROKE);
     if(location != null) {
-      g.setColor(dgray);
+      g.setColor(darkGray);
       g.drawRect(pos[0], pos[1], pos[2] - 1, pos[3] - 1);
       ((Graphics2D) g).setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-      g.setColor(lgray);
+      g.setColor(lightGray);
       g.fillRect(pos[0], pos[1], pos[2], pos[3]);
     }
   }

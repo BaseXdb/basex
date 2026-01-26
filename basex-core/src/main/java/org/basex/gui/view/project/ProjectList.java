@@ -89,7 +89,7 @@ final class ProjectList extends JList<String> implements ProjectCommands {
           int x = (int) label.getPreferredSize().getWidth() + 2;
 
           final String s = file.name();
-          g.setColor(GUIConstants.TEXT);
+          g.setColor(GUIConstants.textColor);
           g.drawString(s, x, y);
           x += fm.stringWidth(s);
           g.setColor(GUIConstants.gray);
@@ -112,8 +112,8 @@ final class ProjectList extends JList<String> implements ProjectCommands {
         label.setBackground(getSelectionBackground());
         label.setForeground(getSelectionForeground());
       } else {
-        label.setBackground(GUIConstants.BACK);
-        label.setForeground(GUIConstants.TEXT);
+        label.setBackground(GUIConstants.backColor);
+        label.setForeground(GUIConstants.textColor);
       }
       return label;
     }

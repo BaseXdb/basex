@@ -50,7 +50,7 @@ public final class BaseXSerial extends BaseXBack implements ActionListener {
     add(panel);
 
     info = new BaseXLabel(sopts + " ").border(4, 0, 8, 0);
-    info.setForeground(GUIConstants.dgray);
+    info.setForeground(GUIConstants.darkGray);
     add(info);
 
     params.addActionListener(this);

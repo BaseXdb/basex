@@ -35,7 +35,7 @@ final class DialogInstallURL extends BaseXDialog {
     info = new BaseXLabel(" ");
 
     final BaseXLabel link = new BaseXLabel("<html><u>" + REPO_URL + "</u></html>");
-    link.setForeground(GUIConstants.BLUE);
+    link.setForeground(GUIConstants.blue);
     link.setCursor(GUIConstants.CURSORHAND);
     link.addMouseListener((MouseClickedListener) e -> BaseXDialog.browse(gui, REPO_URL));
 

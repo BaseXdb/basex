@@ -43,7 +43,7 @@ public final class DialogAbout extends BaseXDialog {
 
     pp.add(new BaseXLabel(TITLE, false, true));
     final BaseXLabel url = new BaseXLabel("<html><u>" + PUBLIC_URL + "</u></html>");
-    url.setForeground(GUIConstants.BLUE);
+    url.setForeground(GUIConstants.blue);
     url.setCursor(GUIConstants.CURSORHAND);
     url.addMouseListener((MouseClickedListener) e -> BaseXDialog.browse(gui, PUBLIC_URL));
 

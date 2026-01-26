@@ -414,9 +414,9 @@ public final class BaseXLayout {
 
     g.setColor(gray);
     g.drawRect(xs, ys, xe - xs - 1, ye - ys - 1);
-    g.setColor(BACK);
+    g.setColor(backColor);
     g.drawRect(xs + 1, ys + 1, xe - xs - 3, ye - ys - 3);
-    g.setColor(focus ? lgray : BACK);
+    g.setColor(focus ? lightGray : backColor);
     g.fillRect(xs + 1, ys + 1, xe - xs - 2, ye - ys - 2);
   }
 
@@ -447,7 +447,7 @@ public final class BaseXLayout {
     final int xx = Math.min(w - tw - 8, x);
     g.setColor(color(c));
     g.fillRect(xx - 1, y - th, tw + 4, th);
-    g.setColor(BACK);
+    g.setColor(backColor);
     g.drawString(tt, xx, y - 4);
   }
 

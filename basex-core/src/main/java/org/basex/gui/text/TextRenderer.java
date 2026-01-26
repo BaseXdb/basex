@@ -160,13 +160,13 @@ final class TextRenderer extends BaseXBack {
     if(edit) {
       if(showLines) {
         final int lx = offset - OFFSET * 3 / 2;
-        g.setColor(GUIConstants.lgray);
+        g.setColor(GUIConstants.lightGray);
         g.drawLine(lx, 0, lx, height);
       }
       if(margin != -1) {
         // line margin
         final int lx = offset + font.charWidth(' ') * margin;
-        g.setColor(GUIConstants.lgray);
+        g.setColor(GUIConstants.lightGray);
         g.drawLine(lx, 0, lx, height);
       }
     }
@@ -269,7 +269,7 @@ final class TextRenderer extends BaseXBack {
       GUIOptions.INDENT.value();
     font = new TextFont(getFont(), indent, this);
     setStyle(Font.PLAIN);
-    syntax.init(GUIConstants.TEXT);
+    syntax.init(GUIConstants.textColor);
 
     offset = OFFSET;
     if(g != null && edit && showLines) {
@@ -415,7 +415,7 @@ final class TextRenderer extends BaseXBack {
     if(x == offset) markLine(g);
 
     // choose color for enabled text, depending on highlighting, link, or current syntax
-    final Color color = isEnabled() ? markNext ? GUIConstants.GREEN : link ?
+    final Color color = isEnabled() ? markNext ? GUIConstants.green : link ?
       GUIConstants.color4 : syntax.getColor(iter) : GUIConstants.gray;
     final int cp = iter.curr();
     markNext = cp == TokenBuilder.MARK;
@@ -506,7 +506,7 @@ final class TextRenderer extends BaseXBack {
    * @param xx x position
    */
   private void drawCaret(final Graphics g, final int xx) {
-    g.setColor(GUIConstants.dgray);
+    g.setColor(GUIConstants.darkGray);
     g.fillRect(xx, lineY, 2, fontHeight);
     cursor[0] = xx;
     cursor[1] = lineY + fontHeight;
@@ -519,7 +519,7 @@ final class TextRenderer extends BaseXBack {
   private void drawError(final Graphics g) {
     final int ww = stringWidth == 0 ? font.charWidth(' ') : stringWidth;
     final int s = Math.max(2, fontHeight / 6);
-    g.setColor(GUIConstants.RED);
+    g.setColor(GUIConstants.red);
     for(int xp = x; xp < x + ww; xp += 2) g.drawLine(xp - 1, y + 2, xp, y + s + 1);
     if(edit) markErrorLine(g);
   }

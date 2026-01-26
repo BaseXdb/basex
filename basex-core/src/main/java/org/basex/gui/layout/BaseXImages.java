@@ -10,6 +10,7 @@ import javax.imageio.*;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 
+import org.basex.gui.*;
 import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -32,24 +33,6 @@ public final class BaseXImages {
   /** System icons. */
   private static final FileSystemView FS = FileSystemView.getFileSystemView();
 
-  /** Icon for XML resources. */
-  private static final Icon DB_XML = icon("db_xml");
-  /** Icon for binary resources. */
-  private static final Icon DB_BIN = icon("db_bin");
-  /** Icon for value resources. */
-  private static final Icon DB_VAL = icon("db_val");
-
-  /** Icon for closed directories. */
-  private static final Icon DIR_CLOSED = icon("dir_closed");
-  /** Icon for opened directories. */
-  private static final Icon DIR_OPENED = icon("dir_opened");
-  /** Icon for textual files. */
-  private static final Icon FILE_TEXT = icon("file_text");
-  /** Icon for XML/XQuery file types. */
-  private static final Icon FILE_XML = icon("file_xml");
-  /** Icon for XML/XQuery file types. */
-  private static final Icon FILE_XQUERY = icon("file_xquery");
-
   /** Private constructor. */
   private BaseXImages() { }
 
@@ -67,7 +50,8 @@ public final class BaseXImages {
         final URL url = BaseXImages.class.getResource(path);
         if(url == null) throw Util.notExpected("Image missing: " + path);
         try {
-          images[i] = ImageIO.read(url);
+          final BufferedImage image = ImageIO.read(url);
+          images[i] = GUIConstants.dark ? invert(image) : image;
         } catch(final IOException ex) {
           throw Util.notExpected(ex);
         }
@@ -75,6 +59,25 @@ public final class BaseXImages {
       IMAGES.put(name, new BaseMultiResolutionImage(images));
     }
     return IMAGES.get(name);
+  }
+
+  /**
+   * Inverts gray-scale images.
+   * @param image image
+   * @return inverted image, or original image if it contains colors
+   */
+  private static BufferedImage invert(final BufferedImage image) {
+    final BufferedImage tmp = new BufferedImage(image.getWidth(), image.getHeight(),
+        BufferedImage.TYPE_INT_ARGB);
+    for(int x = 0; x < image.getWidth(); x++) {
+      for(int y = 0; y < image.getHeight(); y++) {
+        final int rgb = image.getRGB(x, y);
+        final int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+        if(r != g || r != b) return image;
+        tmp.setRGB(x, y, rgb ^ 0x00FFFFFF);
+      }
+    }
+    return tmp;
   }
 
   /**
@@ -92,7 +95,7 @@ public final class BaseXImages {
    * @return icon
    */
   public static Icon dir(final boolean opened) {
-    return opened ? DIR_OPENED : DIR_CLOSED;
+    return icon(opened ? "dir_opened" : "dir_closed");
   }
 
   /**
@@ -101,7 +104,8 @@ public final class BaseXImages {
    * @return icon
    */
   public static Icon resource(final ResourceType type) {
-    return type == ResourceType.XML ? DB_XML : type == ResourceType.BINARY ? DB_BIN : DB_VAL;
+    return icon(type == ResourceType.XML ? "db_xml" :
+      type == ResourceType.BINARY ? "db_bin" : "db_val");
   }
 
   /**
@@ -110,27 +114,27 @@ public final class BaseXImages {
    * @return icon
    */
   public static Icon file(final IOFile file) {
-    if(file == null) return FILE_TEXT;
-
-    // fallback code for displaying icons
-    final String path = file.path();
-    final MediaType type = MediaType.get(path);
-    if(type.isXml()) return FILE_XML;
-    if(type.isXQuery()) return FILE_XQUERY;
-
-    if(Prop.WIN) {
-      // retrieve system icons (only supported on Windows)
-      final int p = path.lastIndexOf(path, '.');
-      final String suffix = p == -1 ? null : path.substring(p + 1);
-      Icon icon = null;
-      if(suffix != null) icon = FILES.get(suffix);
-      if(icon == null) {
-        icon = FS.getSystemIcon(file.file());
-        if(suffix != null) FILES.put(suffix, icon);
+    String name = "file_text";
+    if(file != null) {
+      final String path = file.path();
+      final MediaType type = MediaType.get(path);
+      if(type.isXml()) {
+        name = "file_xml";
+      } else if(type.isXQuery()) {
+        name = "file_xquery";
+      } else if(Prop.WIN) {
+        // retrieve system icons (only supported on Windows)
+        final int p = path.lastIndexOf(path, '.');
+        final String suffix = p == -1 ? null : path.substring(p + 1);
+        Icon icon = null;
+        if(suffix != null) icon = FILES.get(suffix);
+        if(icon == null) {
+          icon = FS.getSystemIcon(file.file());
+          if(suffix != null) FILES.put(suffix, icon);
+        }
+        return icon;
       }
-      return icon;
     }
-    // default icon
-    return FILE_TEXT;
+    return icon(name);
   }
 }

@@ -53,7 +53,7 @@ public final class BaseXMem extends BaseXPanel {
     final int hh = getHeight();
 
     // draw memory box
-    g.setColor(BACK);
+    g.setColor(backColor);
     g.fillRect(0, 0, ww - 3, hh - 3);
     g.setColor(gray);
     g.drawLine(0, 0, ww - 4, 0);
@@ -75,7 +75,7 @@ public final class BaseXMem extends BaseXPanel {
     final String mem = Performance.formatHuman(used);
     final int fw = (ww - fm.stringWidth(mem)) / 2;
     final int h = fm.getHeight() - 3;
-    g.setColor(full ? colormark3 : dgray);
+    g.setColor(full ? colormark3 : darkGray);
     g.drawString(mem, fw, h);
   }
 

@@ -22,8 +22,8 @@ final class ProjectCellRenderer extends DefaultTreeCellRenderer {
 
     final Color tnsc = getTextNonSelectionColor(), tsc = getTextSelectionColor();
     if(val instanceof final ProjectNode node && node.error) {
-      textNonSelectionColor = GUIConstants.RED;
-      textSelectionColor = GUIConstants.RED;
+      textNonSelectionColor = GUIConstants.red;
+      textSelectionColor = GUIConstants.red;
     }
     super.getTreeCellRendererComponent(tree, val, select, expanded, leaf, row, focus);
     setIcon(icon(val, expanded));

@@ -288,7 +288,7 @@ public final class TreeView extends View {
   private void drawMessage(final Graphics g, final String message) {
     final int mw = width >> 1, mh = height >> 1;
     final int x = mw - (BaseXLayout.width(g, message) >> 1), y = mh + fontHeight;
-    g.setColor(TEXT);
+    g.setColor(textColor);
     g.drawString(message, x, y);
   }
 
@@ -351,24 +351,24 @@ public final class TreeView extends View {
     final boolean marked = marked(xx, y), big = tr.bigRect(sub, rn, lv);
 
     boolean border = false, label = !big && fontHeight <= h + 2;
-    Color borderColor = null, textColor = TEXT, fillColor;
+    Color borderCol = null, textCol = textColor, fillColor;
     final boolean fill;
     switch(t) {
       case RECTANGLE:
-        borderColor = getColorPerLevel(lv, false);
+        borderCol = getColorPerLevel(lv, false);
         fillColor = getColorPerLevel(lv, true);
         border = true;
         fill = true;
         break;
       case HIGHLIGHT:
-        borderColor = color4;
-        final int alpha = 0xDD000000, rgb = lgray.getRGB();
+        borderCol = color4;
+        final int alpha = 0xDD000000, rgb = lightGray.getRGB();
         fillColor = new Color(rgb + alpha, true);
         if(h > 4) border = true;
         fill = !big && !marked;
         break;
       case MARK:
-        borderColor = h > 2 && r.w() > 4 ? colormark1A : colormark1;
+        borderCol = h > 2 && r.w() > 4 ? colormark1A : colormark1;
         fillColor = colormark1;
         border = true;
         fill = true;
@@ -376,32 +376,32 @@ public final class TreeView extends View {
       case DESCENDANTS:
         final int alphaD = 0xDD000000, rgbD = color(6).getRGB();
         fillColor = new Color(rgbD + alphaD, true);
-        borderColor = color(8);
-        textColor = BACK;
+        borderCol = color(8);
+        textCol = backColor;
         fill = !marked;
         border = true;
         if(h < 4) {
           fillColor = color(7);
-          borderColor = fillColor;
+          borderCol = fillColor;
           label = false;
         }
         break;
       case PARENT:
       default:
         fillColor = color(6);
-        textColor = BACK;
+        textCol = backColor;
         fill = !big && !marked;
         border = !big;
         if(h < 4) {
           fillColor = color(7);
-          borderColor = color(8);
+          borderCol = color(8);
           label = false;
         }
         break;
     }
 
     if(border) {
-      g.setColor(borderColor);
+      g.setColor(borderCol);
       g.drawRect(xx, y, ww, h);
     }
     if(fill) {
@@ -409,7 +409,7 @@ public final class TreeView extends View {
       g.fillRect(xx + 1, y + 1, ww - 1, h - 1);
     }
     if(label && fill) {
-      g.setColor(textColor);
+      g.setColor(textCol);
       drawRectangleText(g, lv, r, pre);
     }
   }
@@ -669,13 +669,13 @@ public final class TreeView extends View {
       g.fillRect(x, y + h, w + 2, fh + 2);
       g.setColor(color(6));
       g.drawRect(x - 1, y + h + 1, w + 3, fh + 1);
-      g.setColor(BACK);
+      g.setColor(backColor);
       g.drawString(s, r.x() + 1, (int) (y + h + (double) fh) - 2);
     } else {
       g.fillRect(r.x(), y - fh, w + 2, fh);
       g.setColor(color(6));
       g.drawRect(r.x() - 1, y - fh - 1, w + 3, fh + 1);
-      g.setColor(BACK);
+      g.setColor(backColor);
       g.drawString(s, r.x() + 1, (int) (y - h / (double) fh) - 2);
     }
   }

@@ -41,9 +41,9 @@ final class ViewMover extends BaseXPanel {
   @Override
   public void paintComponent(final Graphics g) {
     final int w = getWidth(), h = getHeight();
-    g.setColor(GUIConstants.PANEL);
+    g.setColor(GUIConstants.panelColor);
     g.fillRect(0, 0, w, h);
-    g.setColor(move || in ? GUIConstants.mgray : GUIConstants.gray);
+    g.setColor(move || in ? GUIConstants.middleGray : GUIConstants.gray);
     for(int y = h - 1; y >= 0; y -= 2) g.drawLine(0, y, w, y);
   }
 

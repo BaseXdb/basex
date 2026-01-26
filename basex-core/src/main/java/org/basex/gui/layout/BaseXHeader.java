@@ -15,7 +15,7 @@ public final class BaseXHeader extends BaseXLabel {
    */
   public BaseXHeader(final String string) {
     super(string, true, false);
-    setForeground(GUIConstants.dgray);
+    setForeground(GUIConstants.darkGray);
     resize(1.7f);
     border(0, 0, 4, 4);
   }

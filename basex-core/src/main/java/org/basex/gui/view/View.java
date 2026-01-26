@@ -23,7 +23,7 @@ public abstract class View extends BaseXPanel {
   protected View(final String name, final ViewNotifier notifier) {
     super(notifier.gui);
     setFocusable(true);
-    setBackground(GUIConstants.BACK);
+    setBackground(GUIConstants.backColor);
     setName(name);
     addMouseListener(this);
     addMouseMotionListener(this);

@@ -87,7 +87,7 @@ final class TableContent extends BaseXBack {
       // draw line
       g.setColor(GUIConstants.color2);
       g.drawLine(0, posY + rowH - 1, w, posY + rowH - 1);
-      g.setColor(GUIConstants.BACK);
+      g.setColor(GUIConstants.backColor);
       g.drawLine(0, posY + rowH, w, posY + rowH);
 
       // verify if current node is marked or focused
@@ -100,7 +100,7 @@ final class TableContent extends BaseXBack {
         g.setColor(GUIConstants.color(col + 4));
         g.drawLine(0, posY - 1, w, posY - 1);
       }
-      g.setColor(GUIConstants.TEXT);
+      g.setColor(GUIConstants.textColor);
 
       // skip drawing of text during animation
       if(rowH < fsz) continue;
@@ -154,7 +154,7 @@ final class TableContent extends BaseXBack {
         if(fx > w - sw - 2) fx = w - sw - 2;
         g.setColor(GUIConstants.color(col + 2));
         g.fillRect(fx - 2, posY, sw, rowH - 1);
-        g.setColor(GUIConstants.TEXT);
+        g.setColor(GUIConstants.textColor);
         BaseXLayout.chopString(g, focusStr, fx + 1, posY + 2, sw, fsz);
 
         // cache focused string
