@@ -164,8 +164,8 @@ public final class MapBuilder {
   }
 
   /**
-   * Returns the built map and assigns the type of the .
-   * @param expr building expression
+   * Returns the built map and annotates it with the type of the specified expression.
+   * @param expr expression that created the map
    * @return map
    */
   public XQMap map(final Expr expr) {

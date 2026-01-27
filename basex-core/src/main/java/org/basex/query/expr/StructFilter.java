@@ -91,7 +91,12 @@ public final class StructFilter extends AFilter {
 
   @Override
   protected Expr type(final Expr expr, final boolean optimize) {
-    exprType.assign(root.seqType());
+    final Type type = root.seqType().type;
+    if(type instanceof final ArrayType at) {
+      exprType.assign(at);
+    } else if(type instanceof final MapType mt) {
+      exprType.assign(MapType.get(mt.keyType(), mt.valueType()));
+    }
     return null;
   }
 

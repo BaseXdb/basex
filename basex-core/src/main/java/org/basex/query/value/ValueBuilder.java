@@ -94,7 +94,7 @@ public final class ValueBuilder {
   }
 
   /**
-   * Returns a {@link Value} representation of the items currently stored in this builder.
+   * Returns the built value.
    * @return value
    */
   public Value value() {
@@ -102,9 +102,8 @@ public final class ValueBuilder {
   }
 
   /**
-   * Returns a {@link Value} representation of the items currently stored in this builder
-   * annotated with the given item type.
-   * @param type type (only considered if new result value is created)
+   * Returns the built value and annotates it with the specified type.
+   * @param type type (only considered if a new value is created)
    * @return value
    */
   public Value value(final Type type) {
@@ -117,8 +116,7 @@ public final class ValueBuilder {
   }
 
   /**
-   * Returns a {@link Value} representation of the items currently stored in this builder
-   * annotated with the type of the given expression.
+   * Returns the built array and annotates it with the type of the specified expression.
    * @param expr expression that created the value (can be {@code null})
    * @return value
    */

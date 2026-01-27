@@ -660,6 +660,9 @@ public final class XQuery4Test extends SandboxTest {
     query("{ 1: 2, 3: 4}?['a']?['a']?['a']", "{1:2,3:4}");
     query("{ 1: 2, 3: 4}?[?key = 1]?[?key = 1]?[?key = 1]", "{1:2}");
     query("{ 1: 2, 3: 4}?[?value = 2]?[?value = 2]?[?value = 2]", "{1:2}");
+
+    query("([ 1 ], { 2: 3 }) ! .?[false()]", "[]\n{}");
+    query("replicate(([ 1 ], { 2: 3 }), 3) ! .?[false()]", "[]\n{}\n[]\n{}\n[]\n{}");
   }
 
   /** Array coercion. */

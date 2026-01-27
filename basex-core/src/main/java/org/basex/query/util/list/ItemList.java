@@ -50,7 +50,7 @@ public final class ItemList extends ObjectList<Item, ItemList> {
 
   /**
    * Returns a value with the type of the given expression.
-   * @param type type (can be {@code null}, only considered if new sequence is created)
+   * @param type type (can be {@code null}; only considered if a new sequence is created)
    * @return the value
    */
   public Value value(final Type type) {

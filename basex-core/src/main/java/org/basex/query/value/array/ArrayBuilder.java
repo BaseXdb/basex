@@ -63,17 +63,25 @@ public final class ArrayBuilder {
   }
 
   /**
-   * Returns a {@link Value} representation of the items currently stored in this builder.
-   * @return value
+   * Returns the built array.
+   * @return array
    */
   public XQArray array() {
     return array(Types.ARRAY);
   }
 
   /**
-   * Returns a {@link Value} representation of the items currently stored in this builder
-   * annotated with the given item type.
-   * @param type type (only considered if new result value is created)
+   * Returns the built array and annotates it with the type of the specified expression.
+   * @param expr expression that created the array
+   * @return array
+   */
+  public XQArray array(final Expr expr) {
+    return expr.seqType().type instanceof ArrayType at  ? array(at) : array();
+  }
+
+  /**
+   * Returns the built array and annotates it with the specified type.
+   * @param type type (only considered if a new value is created)
    * @return value
    */
   public XQArray array(final ArrayType type) {
@@ -84,15 +92,6 @@ public final class ArrayBuilder {
       builder = null;
       single = null;
     }
-  }
-
-  /**
-   * Creates an {@link XQArray} containing the members of this builder.
-   * @param expr expression that created the array (can be {@code null})
-   * @return resulting array
-   */
-  public XQArray array(final Expr expr) {
-    return expr != null ? array((ArrayType) expr.seqType().type) : array();
   }
 
   /** Item array builder. */
