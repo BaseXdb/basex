@@ -57,7 +57,6 @@ public final class MapPut extends StandardFunc {
     }
 
     if(tp == null && mc.mapType != null) {
-      // create new map type (potentially assigned record type must not be propagated)
       final Type akt = key.seqType().type.atomic();
       if(akt != null) tp = mc.mapType.union(akt, value.seqType());
     }

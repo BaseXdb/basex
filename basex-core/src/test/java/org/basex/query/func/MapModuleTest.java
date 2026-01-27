@@ -517,7 +517,18 @@ public final class MapModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void size() {
     final Function func = _MAP_SIZE;
-    query(func.args(" {}"), 0);
+
+    query("{ (1 to 6) ! { .: . }[?* = 1] } =>" + func.args(), 1);
+
+    check("declare record local:coord(x, y, *); local:coord(1, 2) =>" + func.args(), 2, root(func));
+    check("declare record local:coord(x, y?); local:coord(1, 2) =>" + func.args(), 2, root(func));
+    check("({}, <a/>/*) =>" + func.args(), 0, root(func));
+
+    check("map:build(1 to 1_000_000_000) =>" + func.args(), 1_000_000_000, root(Itr.class));
+
+    check(func.args(" {}"), 0, root(Itr.class));
+    check(func.args(" { 'a': <a/> }"), 1, root(Itr.class));
+    check("{} => map:put('a', <a/>) => map:put('b', <b/>) =>" + func.args(), 2, root(Itr.class));
   }
 
   /**

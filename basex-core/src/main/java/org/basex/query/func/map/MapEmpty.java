@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -30,7 +29,14 @@ public final class MapEmpty extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
-    if(map.seqType().type instanceof MapType) {
+
+    final MapCompilation mc = MapCompilation.get(map);
+    if(mc.record != null) {
+      if(!mc.record.isExtensible() && !mc.record.hasOptional()) {
+        return Bln.get(mc.record.fields().isEmpty());
+      }
+    }
+    if(mc.mapType != null) {
       final long size = map.structSize();
       if(size >= 0 && !map.has(Flag.NDT)) return Bln.get(size == 0);
     }

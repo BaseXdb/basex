@@ -55,8 +55,7 @@ public final class MapRemove extends StandardFunc {
     if(tp == null && mc.mapType != null) {
       // map:remove({ 1: 1 }, 'string') → { 1: 1 }
       if(mc.keyMismatch) return map;
-      // create new map type (potentially assigned record type must not be propagated)
-      tp = MapType.get(mc.mapType.keyType(), mc.mapType.valueType());
+      tp = MapType.get(mc.mapType);
     }
     if(tp != null) exprType.assign(tp);
     return this;

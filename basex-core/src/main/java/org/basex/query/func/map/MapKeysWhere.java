@@ -30,8 +30,8 @@ public final class MapKeysWhere extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Type tp = arg(0).seqType().type;
-    if(tp instanceof final MapType mt) {
+    final Expr map = arg(0);
+    if(map.seqType().type instanceof final MapType mt) {
       final Type kt = mt.keyType();
       arg(1, arg -> refineFunc(arg, cc, kt.seqType()));
       exprType.assign(kt);

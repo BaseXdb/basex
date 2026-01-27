@@ -45,9 +45,8 @@ public class MapEntries extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
-    final Type type = map.seqType().type;
-    if(type instanceof MapType) {
-      exprType.assign(type.seqType(Occ.ZERO_OR_MORE), map.structSize());
+    if(map.seqType().type instanceof MapType mt) {
+      exprType.assign(MapType.get(mt).seqType(Occ.ZERO_OR_MORE), map.structSize());
     }
     return this;
   }

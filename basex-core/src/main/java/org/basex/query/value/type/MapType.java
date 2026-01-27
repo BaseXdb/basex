@@ -60,6 +60,15 @@ public class MapType extends FType {
   }
 
   /**
+   * Creates a new map type; drops record type information.
+   * @param mapType map type
+   * @return map type
+   */
+  public static MapType get(final MapType mapType) {
+    return get(mapType.keyType, mapType.valueType);
+  }
+
+  /**
    * Supply final value of key type and value type.
    * @param kt key type
    * @param vt value type

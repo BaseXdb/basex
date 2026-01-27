@@ -35,8 +35,7 @@ public final class MapCompilation {
    */
   public static MapCompilation get(final Expr map) {
     final MapCompilation mi = new MapCompilation();
-    final Type type = map.seqType().type;
-    if(type instanceof final MapType mt) {
+    if(map.seqType().type instanceof final MapType mt) {
       mi.mapType = mt;
       if(mt instanceof final RecordType rt) mi.record = rt;
     }
@@ -51,8 +50,8 @@ public final class MapCompilation {
    */
   public MapCompilation key(final Expr expr) throws QueryException {
     if(record != null) {
-      final Type kt = expr.seqType().type;
       if(expr instanceof final Item item) {
+        final Type kt = expr.seqType().type;
         if(kt.isStringOrUntyped()) {
           final TokenObjectMap<RecordField> fields = record.fields();
           key = item.string(null);
