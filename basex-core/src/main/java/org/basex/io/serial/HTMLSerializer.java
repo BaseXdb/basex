@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
 
 import java.io.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -116,9 +117,10 @@ final class HTMLSerializer extends MarkupSerializer {
   @Override
   protected void pi(final byte[] name, final byte[] value) throws IOException {
     if(html5) {
-      final TokenBuilder tb = new TokenBuilder().add('?').add(name);
-      // ensure proper handling of sequences of dashes (----)
-      if(value.length > 0) tb.add(' ').add(string(value).replace("--", "- -").replace("--", "- -"));
+      // output PIs as comments; properly escape multiple dashes (----)
+      final Function<byte[], String> esc = v -> string(v).replace("--", "- -").replace("--", "- -");
+      final TokenBuilder tb = new TokenBuilder().add('?').add(esc.apply(name));
+      if(value.length > 0) tb.add(' ').add(esc.apply(value));
       comment(tb.add('?').finish());
     } else {
       if(sep) indent();
