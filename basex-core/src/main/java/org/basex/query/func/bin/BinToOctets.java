@@ -7,7 +7,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -37,9 +36,9 @@ public final class BinToOctets extends StandardFunc {
         final int bl = bytes.length;
         if(bl == 1) return get(0);
 
-        final IntList list = new IntList(bl);
-        for(final byte b : bytes) list.add(b & 0xFF);
-        return IntSeq.get(list.finish());
+        final int[] list = new int[bl];
+        for(int b = 0; b < bl; b++) list[b] = bytes[b] & 0xFF;
+        return IntSeq.get(list);
       }
     };
   }

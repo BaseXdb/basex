@@ -5,9 +5,7 @@ import java.util.*;
 import org.basex.data.*;
 import org.basex.index.resource.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
@@ -59,19 +57,8 @@ public class DbList extends DbAccessFn {
     return new BasicIter<Str>(size) {
       @Override
       public Str get(final long i) {
-        return i < size ? Str.get(path((int) i)) : null;
-      }
-
-      @Override
-      public Value value(final QueryContext q, final Expr expr) throws QueryException {
-        final TokenList tl = new TokenList(Seq.initialCapacity(size));
-        for(int t = 0; t < size; t++) tl.add(path(t));
-        return StrSeq.get(tl);
-      }
-
-      private byte[] path(final int i) {
-        return i < ds ? data.text(docs.get(i), true) :
-          Token.token(i < bs ? binaries.get(i - ds) : values.get(i - bs));
+        return Str.get(i < ds ? data.text(docs.get((int) i), true) :
+          Token.token(i < bs ? binaries.get((int) i - ds) : values.get((int) i - bs)));
       }
     };
   }

@@ -6,7 +6,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Unmodifiable hash map implementation for untyped atomics and strings.
@@ -50,9 +49,9 @@ public final class XQAtmStrMap extends XQHashMap {
 
   @Override
   public Value items(final QueryContext qc) {
-    final long is = structSize();
-    final TokenList list = new TokenList(is);
-    for(int i = 1; i <= is; i++) list.add(map.value(i));
+    final int ls = (int) structSize();
+    final byte[][] list = new byte[ls][];
+    for(int l = 0; l < ls; l++) list[l] = map.value(l + 1);
     return StrSeq.get(list);
   }
 

@@ -47,6 +47,10 @@ public final class FnStringToCodepoints extends StandardFunc {
         t += cl(token, s);
         return Itr.get(cp(token, s));
       }
+      @Override
+      public Value value(final QueryContext q, final Expr expr) throws QueryException {
+        return IntSeq.get(value.codepoints(info));
+      }
     };
   }
 

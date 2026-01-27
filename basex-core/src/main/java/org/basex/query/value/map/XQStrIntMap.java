@@ -6,7 +6,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * Unmodifiable hash map implementation for strings and integers.
@@ -50,10 +49,10 @@ public final class XQStrIntMap extends XQHashMap {
 
   @Override
   public Value items(final QueryContext qc) {
-    final long is = structSize();
-    final IntList list = new IntList(is);
-    for(int i = 1; i <= is; i++) list.add(map.value(i));
-    return IntSeq.get(list.finish());
+    final int ls = (int) structSize();
+    final int[] list = new int[ls];
+    for(int l = 0; l < ls; l++) list[l] = map.value(l + 1);
+    return IntSeq.get(list);
   }
 
   @Override

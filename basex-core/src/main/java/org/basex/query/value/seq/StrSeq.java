@@ -65,9 +65,9 @@ public final class StrSeq extends NativeSeq {
   @Override
   public Value reverse(final Job job) {
     final int sz = (int) size;
-    final byte[][] array = new byte[sz][];
-    for(int i = 0; i < sz; i++) array[sz - i - 1] = values[i];
-    return get(array, type);
+    final byte[][] tmp = new byte[sz][];
+    for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
+    return get(tmp, type);
   }
 
   @Override

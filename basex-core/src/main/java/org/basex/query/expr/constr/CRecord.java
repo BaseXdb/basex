@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -62,9 +61,10 @@ public final class CRecord extends Arr {
     }
 
     // create compact record map
-    final ValueList values = new ValueList(exprs.length);
-    for(final Expr expr : exprs) values.add(expr.value(qc));
-    return new XQRecordMap(values.finish(), rt);
+    final int el = exprs.length;
+    final Value[] values = new Value[el];
+    for(int e = 0; e < el; e++) values[e] = exprs[e].value(qc);
+    return new XQRecordMap(values, rt);
   }
 
   @Override
