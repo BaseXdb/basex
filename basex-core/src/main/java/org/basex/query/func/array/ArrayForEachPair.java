@@ -53,7 +53,7 @@ public final class ArrayForEachPair extends ArrayFn {
 
   @Override
   public long structSize() {
-    final long as1 = structSize(0), as2 = structSize(1);
+    final long as1 = arraySize(arg(0)), as2 = arraySize(arg(1));
     return as1 != -1 && as2 != -1 ? Math.min(as1, as2) : -1;
   }
 }

@@ -30,12 +30,23 @@ abstract class ArrayFn extends StandardFunc {
   }
 
   /**
-   * Returns the size of the array passed via the specified argument.
-   * @param a index of argument
+   * Returns the array size of the specified expression.
+   * @param expr expression
    * @return array size
    */
-  final long structSize(final int a) {
-    final Expr expr1 = arg(a);
-    return expr1.seqType().instanceOf(Types.ARRAY_O) ? expr1.structSize() : -1;
+  final long arraySize(final Expr expr) {
+    return arraySize(expr, 0);
+  }
+
+  /**
+   * Returns the array size of the specified expression, plus offset.
+   * @param expr expression
+   * @param offset offset to add (can be negative)
+   * @return resulting array size
+   */
+  final long arraySize(final Expr expr, final int offset) {
+    long size = -1;
+    if(expr.seqType().instanceOf(Types.ARRAY_O)) size = expr.structSize();
+    return size == -1 ? -1 : size + offset;
   }
 }

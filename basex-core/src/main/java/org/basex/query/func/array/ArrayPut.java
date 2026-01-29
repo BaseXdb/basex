@@ -33,6 +33,6 @@ public final class ArrayPut extends ArrayFn {
 
   @Override
   public long structSize() {
-    return structSize(0);
+    return arraySize(arg(0));
   }
 }

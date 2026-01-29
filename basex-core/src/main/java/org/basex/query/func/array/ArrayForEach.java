@@ -48,6 +48,6 @@ public final class ArrayForEach extends ArrayFn {
 
   @Override
   public long structSize() {
-    return structSize(0);
+    return arraySize(arg(0));
   }
 }

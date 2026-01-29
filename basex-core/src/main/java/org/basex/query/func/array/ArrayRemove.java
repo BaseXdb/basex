@@ -51,7 +51,6 @@ public final class ArrayRemove extends ArrayFn {
 
   @Override
   public long structSize() {
-    final long as = structSize(0);
-    return as != -1 ? as - 1 : -1;
+    return arraySize(arg(0), -1);
   }
 }

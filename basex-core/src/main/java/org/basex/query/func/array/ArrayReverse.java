@@ -28,6 +28,6 @@ public final class ArrayReverse extends ArrayFn {
 
   @Override
   public long structSize() {
-    return structSize(0);
+    return arraySize(arg(0));
   }
 }
