@@ -197,9 +197,9 @@ public final class RecordTest extends SandboxTest {
         type(func, "local:x"));
 
     check("declare record local:x(x, y?); local:x(1) => map:remove('x')", "{}",
-        type(func, "record(y? as item()*)"));
+        type(func, "record(y?)"));
     check("declare record local:x(x, y?); local:x(1) => map:remove(<_>x</_>)", "{}",
-        type(func, "record(y? as item()*)"));
+        type(func, "record(y?)"));
     check("declare record local:x(x, y?); local:x(1) => map:remove('y')", "{\"x\":1}",
         type(func, "local:x"));
     check("declare record local:x(x, y?); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
@@ -218,14 +218,14 @@ public final class RecordTest extends SandboxTest {
     check("declare record local:x(x); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
         type(RecordSet.class, "local:x"));
     check("declare record local:x(x); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
-        type(func, "record(x as item()*, y as xs:integer)"));
+        type(func, "record(x, y)"));
     check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
-        type(func, "record(x as item()*, y as xs:integer)"));
+        type(func, "record(x, y)"));
     check("declare record local:x(x); local:x(1) => map:put(0, 0)", "{\"x\":1,0:0}",
         type(func, "map(*)"));
 
     check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)", "{\"x\":<x/>}",
-        type(RecordSet.class, "record(x as item())"));
+        type(RecordSet.class, "record(x)"));
 
     check("declare record local:x(x, *); local:x(1) => map:put('x', 2)", "{\"x\":2}",
         type(RecordSet.class, "local:x"));
