@@ -428,36 +428,21 @@ public final class RecordType extends MapType {
   @Override
   public String toString() {
     if(name != null) return Token.string(name.prefixString());
+
     final QueryString qs = new QueryString().token(RECORD).token('(');
+    final TokenBuilder tb = new TokenBuilder();
     if(this == Types.RECORD) {
-      qs.token('*');
+      tb.add('*');
     } else {
-      int i = 0;
       for(final byte[] key : fields) {
-        if(i++ != 0) {
-          qs.token(',').token(' ');
-          if(i > 3) {
-            qs.token(QueryText.DOTS);
-            break;
-          }
-        }
-        if(XMLToken.isNCName(key)) {
-          qs.token(key);
-        } else {
-          qs.quoted(key);
-        }
-        final RecordField f = fields.get(key);
-        if(f.optional) qs.token('?');
-        if(f.seqType != null) {
-          Type type = f.seqType.type;
-          if(f.seqType.instanceOf(Types.ARRAY_ZM)) type = Types.ARRAY;
-          else if(f.seqType.instanceOf(Types.MAP_ZM)) type = Types.MAP;
-          qs.token(AS).token(type.seqType(f.seqType.occ));
-        }
+        if(!tb.isEmpty()) tb.add(", ");
+        if(!tb.moreInfo()) break;
+        tb.add(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key));
+        if(fields.get(key).optional) tb.add('?');
       }
-      if(extensible) qs.token(',').token(' ').token('*');
+      if(extensible) tb.add(", *");
     }
-    return qs.token(')').toString();
+    return qs.token(tb.finish()).token(')').toString();
   }
 
   /**

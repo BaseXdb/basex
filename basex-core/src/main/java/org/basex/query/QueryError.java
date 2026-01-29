@@ -6,8 +6,10 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -1674,27 +1676,43 @@ public enum QueryError {
 
   /**
    * Returns a type exception.
-   * @param st expected type
+   * @param est expected type
    * @param ist type of the input expression
    * @param expr expression (can be {@code null})
    * @param name name (can be {@code null})
    * @param info input info (can be {@code null})
    * @return query exception
    */
-  public static QueryException typeError(final SeqType st, final SeqType ist, final Expr expr,
+  public static QueryException typeError(final SeqType est, final SeqType ist, final Expr expr,
       final QNm name, final InputInfo info) {
 
     final TokenBuilder desc = new TokenBuilder();
-    if(ist.occ.instanceOf(st.occ)) {
-      // focus on cardinality: add expected type and input type
-      desc.add(st.occ == Occ.EXACTLY_ONE ? "Item" : "Value").add(" of type ").add(st);
-      desc.add(" expected, ").add(ist).add(" found");
+    if(ist.occ.instanceOf(est.occ)) {
+      // cardinality matches, focus on type:
+      desc.add(est.occ == Occ.EXACTLY_ONE ? "Item" : "Value");
+      desc.add(" of type ").add(est).add(" expected, ");
+      // try to find missing record entry:
+      boolean missing = false;
+      if(est.type instanceof RecordType rt && expr instanceof XQMap map) {
+        final TokenObjectMap<RecordField> fields = rt.fields();
+        for(final byte[] key : fields) {
+          try {
+            if(map.contains(Str.get(key)) || fields.get(key).isOptional()) continue;
+          } catch(QueryException ex) {
+            // not expected (the exception is only caused by atomizing the key)
+            throw Util.notExpected(ex);
+          }
+          desc.add(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key)).add(" missing");
+          missing = true;
+        }
+      }
+      if(!missing) desc.add(ist).add(" found");
     } else {
       // add cardinality string
-      desc.add(Strings.capitalize(st.occ.desc)).add(" expected");
+      desc.add(Strings.capitalize(est.occ.desc)).add(" expected");
       // add expected type if type information other than cardinality differs from input
-      if(!(ist.type.instanceOf(st.type) && ist.testInstanceOf(st))) {
-        desc.add(" (").add(st).add(")");
+      if(!(ist.type.instanceOf(est.type) && ist.testInstanceOf(est))) {
+        desc.add(" (").add(est).add(")");
       }
       // add number of results or type of input
       if(expr != null) {

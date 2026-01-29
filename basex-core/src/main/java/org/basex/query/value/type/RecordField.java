@@ -16,7 +16,7 @@ import org.basex.query.expr.*;
 public final class RecordField {
   /** Optional flag. */
   final boolean optional;
-  /** Field type (can be {@code null}). */
+  /** Field type. */
   final SeqType seqType;
   /** Initializing expression (can be {@code null}). */
   private final Expr expr;
