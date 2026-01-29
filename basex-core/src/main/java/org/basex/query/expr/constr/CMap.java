@@ -7,6 +7,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -25,7 +26,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public final class CMap extends Arr {
-
   /**
    * Constructor.
    * @param info input info (can be {@code null})
@@ -37,36 +37,32 @@ public final class CMap extends Arr {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    // flatten nested maps: { 1: 2, { 3 : 4, 5: 6 }, () } → { 1: 2, 3: 4, 5: 6 }
+    // flatten nested maps: { 1: 2, { 3: 4, 5: 6 }, () } → { 1: 2, 3: 4, 5: 6 }
     int el = exprs.length;
     if(((Checks<Expr>) expr -> expr == Empty.UNDEFINED).any(exprs)) {
-      final ExprList list = new ExprList(el);
+      final ExprList list = new ExprList();
       for(int e = 0; e < el; e += 2) {
-        if(nested(e) && exprs[e] instanceof final XQMap map) {
-          map.forEach((key, value) -> list.add(key).add(value));
-        } else if(!nested(e) || exprs[e] != Empty.VALUE) {
-          list.add(exprs[e]).add(exprs[e + 1]);
-        }
+        final Expr expr = exprs[e];
+        if(!(nested(e) && flatten(expr, list))) list.add(expr).add(exprs[e + 1]);
       }
       exprs = list.finish();
+      el = exprs.length;
     }
 
     // atomize keys: { <_>A</_>: 1 } → { 'A': 1 }
-    el = exprs.length;
     for(int e = 0; e < el; e += 2) {
       if(!nested(e)) {
         exprs[e] = exprs[e].simplifyFor(Simplify.DATA, cc);
       }
     }
 
-    // empty map, single map entry?  { $a: $b } → map:entry($a, $b)
+    // empty map?
     if(el == 0) return XQMap.empty();
     if(el == 2) {
-      if(!nested(0)) {
-        cc.function(_MAP_ENTRY, info, exprs);
-      } else if(exprs[0].seqType().instanceOf(Types.MAP_O)) {
-        return exprs[0];
-      }
+      // { $a: $b } → map:entry($a, $b)
+      if(!nested(0)) return cc.function(_MAP_ENTRY, info, exprs);
+      // { { 'a': <a/> } } → { 'a': <a/> }
+      if(exprs[0].seqType().instanceOf(Types.MAP_O)) return exprs[0];
     }
 
     // not too large, only strings as keys? replace with record constructor
@@ -113,6 +109,41 @@ public final class CMap extends Arr {
     exprType.assign(MapType.get(kt, vt));
 
     return values(true, cc) ? cc.preEval(this) : this;
+  }
+
+  /**
+   * Flattens nested map constructors.
+   * @param expr expression to flatten
+   * @param list list of expressions
+   * @return {@code true} if the expression was flattened
+   * @throws QueryException query exception
+   */
+  private boolean flatten(final Expr expr, final ExprList list) throws QueryException {
+    if(expr == Empty.VALUE) {
+      // ignore empty values
+    } else if(expr instanceof CMap) {
+      // { 1: <a/> }
+      list.add(expr.args());
+    } else if(expr instanceof CRecord) {
+      // { 'a': <a/> }
+      final RecordType rt = (RecordType) expr.seqType().type;
+      final boolean extensible = rt.isExtensible();
+      if(extensible || rt.hasOptional()) return false;
+      final TokenObjectMap<RecordField> fields = rt.fields();
+      final int fs = fields.size();
+      for(int f = 1; f <= fs; f++) list.add(Str.get(fields.key(f))).add(expr.arg(f - 1));
+    } else if(Function._MAP_ENTRY.is(expr)) {
+      // map:entry('a', 'b')
+      list.add(expr.arg(0)).add(expr.arg(1));
+    } else if(expr instanceof final Value value && value.type instanceof MapType) {
+      // { 'a': 'b' }
+      for(final Item item : value) {
+        ((XQMap) item).forEach((k, v) -> list.add(k).add(v));
+      }
+    } else {
+      return false;
+    }
+    return true;
   }
 
   @Override
