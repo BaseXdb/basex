@@ -14,7 +14,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- * XQuery 3.0 function types.
+ * XQuery function types.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler

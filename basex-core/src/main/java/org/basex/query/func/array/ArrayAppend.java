@@ -28,8 +28,7 @@ public final class ArrayAppend extends ArrayFn {
     final Expr array = arg(0), add = arg(1);
     if(array == XQArray.empty()) return cc.function(_UTIL_ARRAY_MEMBER, info, add);
 
-    final Type type = array.seqType().type;
-    if(type instanceof final ArrayType at) {
+    if(array.seqType().type instanceof final ArrayType at) {
       exprType.assign(ArrayType.get(at.valueType().union(add.seqType())));
     }
     return this;

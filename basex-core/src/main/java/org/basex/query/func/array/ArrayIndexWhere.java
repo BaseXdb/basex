@@ -35,8 +35,8 @@ public final class ArrayIndexWhere extends ArrayFn {
     final Expr array = arg(0);
     if(array == XQArray.empty()) return Empty.VALUE;
 
-    final Type type = array.seqType().type;
-    if(type instanceof final ArrayType at) {
+    if(arraySize(array) == 1) exprType.assign(Occ.ZERO_OR_ONE);
+    if(array.seqType().type instanceof final ArrayType at) {
       arg(1, arg -> refineFunc(arg, cc, at.valueType(), Types.INTEGER_O));
     }
     return this;

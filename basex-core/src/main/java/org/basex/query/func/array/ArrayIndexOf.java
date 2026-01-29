@@ -7,6 +7,7 @@ import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.list.*;
 
 /**
@@ -35,6 +36,9 @@ public final class ArrayIndexOf extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
-    return array == XQArray.empty() ? Empty.VALUE : this;
+    if(array == XQArray.empty()) return Empty.VALUE;
+
+    if(arraySize(array) == 1) exprType.assign(Occ.ZERO_OR_ONE);
+    return this;
   }
 }

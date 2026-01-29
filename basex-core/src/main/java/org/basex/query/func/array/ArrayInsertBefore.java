@@ -1,6 +1,7 @@
 package org.basex.query.func.array;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.XQArray;
 import org.basex.query.value.type.*;
@@ -23,10 +24,9 @@ public final class ArrayInsertBefore extends ArrayFn {
 
   @Override
   protected ArrayInsertBefore opt(final CompileContext cc) {
-    final Type type = arg(0).seqType().type;
-    if(type instanceof final ArrayType at) {
-      final SeqType mt = at.valueType().union(arg(2).seqType());
-      exprType.assign(ArrayType.get(mt));
+    final Expr array = arg(0);
+    if(array.seqType().type instanceof final ArrayType at) {
+      exprType.assign(ArrayType.get(at.valueType().union(arg(2).seqType())));
     }
     return this;
   }

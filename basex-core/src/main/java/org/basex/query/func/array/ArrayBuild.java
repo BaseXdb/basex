@@ -16,16 +16,17 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ArrayBuild extends StandardFunc {
+public final class ArrayBuild extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Expr input = arg(0);
     final FItem action = toFunctionOrNull(arg(1), 2, qc);
-    if(action == null) return XQArray.items(arg(0).value(qc));
+    if(action == null) return XQArray.items(input.value(qc));
 
-    final Iter input = arg(0).iter(qc);
-    final ArrayBuilder ab = new ArrayBuilder(qc, input.size());
+    final Iter iter = input.iter(qc);
+    final ArrayBuilder ab = new ArrayBuilder(qc, iter.size());
     final HofArgs args = new HofArgs(2, action);
-    for(Item item; (item = qc.next(input)) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       ab.add(invoke(action, args.set(0, item).inc(), qc));
     }
     return ab.array(this);

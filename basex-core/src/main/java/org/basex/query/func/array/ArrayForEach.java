@@ -34,8 +34,7 @@ public final class ArrayForEach extends ArrayFn {
     final Expr array = arg(0);
     if(array == XQArray.empty()) return array;
 
-    final Type type = array.seqType().type;
-    if(type instanceof final ArrayType at) {
+    if(array.seqType().type instanceof final ArrayType at) {
       arg(1, arg -> refineFunc(arg, cc, at.valueType(), Types.INTEGER_O));
     }
 

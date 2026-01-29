@@ -3,15 +3,12 @@ package org.basex.query.func.array;
 import java.util.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.type.*;
-import org.basex.util.hash.*;
 
 /**
  * Function implementation.
@@ -19,7 +16,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ArrayMembers extends StandardFunc {
+public final class ArrayMembers extends ArrayFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
@@ -38,24 +35,14 @@ public final class ArrayMembers extends StandardFunc {
     };
   }
 
-  @Override
-  protected Expr opt(final CompileContext cc) {
-    final Expr array = arg(0);
-    final Type type = array.seqType().type;
-    if(type instanceof final ArrayType at) {
-      final TokenObjectMap<RecordField> fields = new TokenObjectMap<>(1);
-      fields.put(Str.VALUE.string(), new RecordField(at.valueType()));
-      exprType.assign(cc.qc.shared.record(new RecordType(fields)).seqType(), array.structSize());
-    }
-    return this;
-  }
-
   /**
    * Creates a value record.
    * @param value value of the record
    * @return map
    */
   private static XQMap record(final Value value) {
-    return XQMap.get(Str.VALUE, value);
+    final XQMap map = XQMap.get(Str.VALUE, value);
+    map.type = Records.MEMBER.get();
+    return map;
   }
 }

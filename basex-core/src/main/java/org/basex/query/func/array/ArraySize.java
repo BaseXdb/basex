@@ -5,7 +5,6 @@ import org.basex.query.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -24,10 +23,7 @@ public final class ArraySize extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
-    if(array.seqType().type instanceof ArrayType) {
-      final long size = array.structSize();
-      if(size != -1 && !array.has(Flag.NDT)) return Itr.get(size);
-    }
-    return this;
+    final long size = arraySize(array);
+    return size == -1 || array.has(Flag.NDT) ? this : Itr.get(size);
   }
 }

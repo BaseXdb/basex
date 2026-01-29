@@ -29,9 +29,8 @@ public final class ArrayOfMembers extends ArrayFn {
 
   @Override
   protected Expr opt(final CompileContext cc) {
-    final Expr array = arg(0);
-    final Type type = array.seqType().type;
-    if(type instanceof final MapType mt) {
+    final Expr input = arg(0);
+    if(input.seqType().type instanceof final MapType mt) {
       exprType.assign(ArrayType.get(mt.valueType()));
     }
     return this;
