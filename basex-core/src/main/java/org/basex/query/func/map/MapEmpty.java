@@ -2,7 +2,6 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -14,7 +13,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapEmpty extends StandardFunc {
+public final class MapEmpty extends MapFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Bln.get(test(qc, ii, 0));
@@ -29,17 +28,7 @@ public final class MapEmpty extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
-
-    final MapCompilation mc = MapCompilation.get(map);
-    if(mc.record != null) {
-      if(!mc.record.isExtensible() && !mc.record.hasOptional()) {
-        return Bln.get(mc.record.fields().isEmpty());
-      }
-    }
-    if(mc.mapType != null) {
-      final long size = map.structSize();
-      if(size >= 0 && !map.has(Flag.NDT)) return Bln.get(size == 0);
-    }
-    return this;
+    final long size = mapSize(map);
+    return size == -1 || map.has(Flag.NDT) ? this : Bln.get(size == 0);
   }
 }

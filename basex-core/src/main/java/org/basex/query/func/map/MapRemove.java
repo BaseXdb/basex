@@ -2,7 +2,6 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -15,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapRemove extends StandardFunc {
+public final class MapRemove extends MapFn {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     XQMap map = toMap(arg(0), qc);
@@ -33,29 +32,29 @@ public final class MapRemove extends StandardFunc {
     if(map == XQMap.empty()) return map;
 
     Type tp = null;
-    final MapCompilation mc = MapCompilation.get(map).key(key);
-    if(mc.field != null) {
-      if(mc.field.isOptional()) {
+    final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
+    if(mti.field != null) {
+      if(mti.field.isOptional()) {
         // structure does not change: propagate record type
-        tp = mc.record;
-      } else if(mc.record.fields().size() <= RecordType.MAX_GENERATED_SIZE) {
+        tp = mti.record;
+      } else if(mti.record.fields().size() <= RecordType.MAX_GENERATED_SIZE) {
         // otherwise, derive new record type
-        final RecordType rt = mc.record.copy(mc.key, null, null, cc);
+        final RecordType rt = mti.record.copy(mti.key, null, null, cc);
         // return empty map if it will contain no entries
         if(rt != null && rt.fields().isEmpty() && !rt.isExtensible()) return XQMap.empty();
         tp = rt;
       }
-    } else if(mc.validKey) {
+    } else if(mti.validKey) {
       // return input map if nothing changes: map:remove({ 'a': 1 }, 'b') → { 'a': 1 }
-      if(!mc.record.isExtensible()) return map;
+      if(!mti.record.isExtensible()) return map;
       // structure does not change: propagate record type
-      tp = mc.record;
+      tp = mti.record;
     }
 
-    if(tp == null && mc.mapType != null) {
+    if(tp == null && mti.mapType != null) {
       // map:remove({ 1: 1 }, 'string') → { 1: 1 }
-      if(mc.keyMismatch) return map;
-      tp = MapType.get(mc.mapType);
+      if(mti.keyMismatch) return map;
+      tp = MapType.get(mti.mapType);
     }
     if(tp != null) exprType.assign(tp);
     return this;

@@ -6,12 +6,12 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
 /**
- * Merger for map values.
+ * Merger for duplicate map values.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public abstract class ValueMerger {
+public abstract class MapDuplicates {
   /**
    * Returns a merged version of the old and new value.
    * @param key key

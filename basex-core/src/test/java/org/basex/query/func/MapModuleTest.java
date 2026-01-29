@@ -208,7 +208,10 @@ public final class MapModuleTest extends SandboxTest {
     query("count(" + func.args(" map:merge((1 to 10) ! map:entry(., (., .)))",
         " function($k, $v) { $v }") + ')', 20);
 
-    check(func.args(" { 'aa': 'a' }", " matches#2"), true, type(func, "xs:boolean*"));
+    check(func.args(" { 'aa': 'a' }", " matches#2"), true,
+        type(func, "xs:boolean"));
+    check(func.args(" { 'aa': 'a', 'bb': 'b' }", " matches#2"), "true\ntrue",
+        type(func, "xs:boolean+"));
 
     query(func.args(" map:build(3 to 8)", " fn($k, $v, $p) { $p }"), "1\n2\n3\n4\n5\n6");
   }

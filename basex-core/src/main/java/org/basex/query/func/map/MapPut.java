@@ -4,7 +4,6 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -17,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapPut extends StandardFunc {
+public final class MapPut extends MapFn {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
@@ -33,32 +32,32 @@ public final class MapPut extends StandardFunc {
     if(map == XQMap.empty()) return cc.function(_MAP_ENTRY, info, key, value);
 
     Type tp = null;
-    final MapCompilation mc = MapCompilation.get(map).key(key);
-    if(mc.field != null) {
+    final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
+    if(mti.field != null) {
       // use optimized getter for records
-      if(!mc.record.hasOptional()) return new RecordSet(info, map, mc.index, value).optimize(cc);
+      if(!mti.record.hasOptional()) return new RecordSet(info, map, mti.index, value).optimize(cc);
 
-      final SeqType vt = value.seqType(), ft = mc.field.seqType();
+      final SeqType vt = value.seqType(), ft = mti.field.seqType();
       if(vt.instanceOf(ft)) {
         // structure does not change (new value has same type): propagate record type
-        tp = mc.record;
-      } else if(mc.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
+        tp = mti.record;
+      } else if(mti.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
         // otherwise, derive new record type
-        tp = mc.record.copy(null, mc.key, vt.union(ft), cc);
+        tp = mti.record.copy(null, mti.key, vt.union(ft), cc);
       }
-    } else if(mc.validKey) {
-      if(mc.record.isExtensible()) {
+    } else if(mti.validKey) {
+      if(mti.record.isExtensible()) {
         // structure does not change: propagate record type
-        tp = mc.record;
-      } else if(mc.key != null && mc.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
+        tp = mti.record;
+      } else if(mti.key != null && mti.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
         // otherwise, derive new record type
-        tp = mc.record.copy(null, mc.key, value.seqType(), cc);
+        tp = mti.record.copy(null, mti.key, value.seqType(), cc);
       }
     }
 
-    if(tp == null && mc.mapType != null) {
+    if(tp == null && mti.mapType != null) {
       final Type akt = key.seqType().type.atomic();
-      if(akt != null) tp = mc.mapType.union(akt, value.seqType());
+      if(akt != null) tp = mti.mapType.union(akt, value.seqType());
     }
     if(tp != null) exprType.assign(tp);
     return this;

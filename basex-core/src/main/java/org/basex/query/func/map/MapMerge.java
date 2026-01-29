@@ -21,7 +21,7 @@ import org.basex.util.options.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class MapMerge extends StandardFunc {
+public class MapMerge extends MapFn {
   /** Duplicate handling. */
   public enum Duplicates {
     /** Reject.    */ REJECT,
@@ -43,13 +43,13 @@ public class MapMerge extends StandardFunc {
   }
 
   /** Cached value merger instance. */
-  ValueMerger vm;
+  MapDuplicates md;
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter maps = arg(0).iter(qc);
     final MergeOptions options = toOptions(arg(1), new MergeOptions(), qc);
-    final ValueMerger merger = merger(options, qc, Duplicates.USE_FIRST);
+    final MapDuplicates dups = duplicates(options, qc, Duplicates.USE_FIRST);
 
     // empty input: return empty map
     final Item first = qc.next(maps);
@@ -69,7 +69,7 @@ public class MapMerge extends StandardFunc {
       final XQMap map = toMap(current);
       for(final Item key : map.keys()) {
         final Value old = mb != null ? mb.get(key) : mp.getOrNull(key);
-        final Value val = merger.merge(key, old, map.get(key));
+        final Value val = dups.merge(key, old, map.get(key));
         if(val != null) {
           if(mb != null) mb.put(key, val);
           else mp = mp.put(key, val);
@@ -124,23 +124,23 @@ public class MapMerge extends StandardFunc {
     if(arg(arg) instanceof Value) {
       MergeOptions options = new MergeOptions();
       if(defined(arg)) options = toOptions(arg(arg), options, cc.qc);
-      vm = merger(options, cc.qc, dflt);
+      md = duplicates(options, cc.qc, dflt);
     }
   }
 
   /**
-   * Creates a value merger.
+   * Creates a merger for duplicate values.
    * @param options merge options
    * @param qc query context
    * @param dflt default duplicate operation
    * @return merger
    * @throws QueryException query exception
    */
-  final ValueMerger merger(final MergeOptions options, final QueryContext qc, final Duplicates dflt)
-      throws QueryException {
+  final MapDuplicates duplicates(final MergeOptions options, final QueryContext qc,
+      final Duplicates dflt) throws QueryException {
 
     // return static options instance
-    if(vm != null) return vm;
+    if(md != null) return md;
     // function
     final Value duplicates = options.get(MergeOptions.DUPLICATES);
     if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc), qc);
@@ -165,7 +165,7 @@ public class MapMerge extends StandardFunc {
    */
   final void assignType(final Type kt, final SeqType vt) {
     exprType.assign(MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE,
-      vm != null ? vm.type(vt) : Types.ITEM_ZM));
+      md != null ? md.type(vt) : Types.ITEM_ZM));
   }
 
   @Override
@@ -176,7 +176,7 @@ public class MapMerge extends StandardFunc {
   /**
    * Return {@code null} to indicate that insertion can be skipped.
    */
-  static final class UseFirst extends ValueMerger {
+  static final class UseFirst extends MapDuplicates {
     @Override
     Value get(final Item key, final Value old, final Value value) {
       return null;
@@ -186,7 +186,7 @@ public class MapMerge extends StandardFunc {
   /**
    * Return new value.
    */
-  static final class UseLast extends ValueMerger {
+  static final class UseLast extends MapDuplicates {
     @Override
     Value get(final Item key, final Value old, final Value value) {
       return value;
@@ -196,7 +196,7 @@ public class MapMerge extends StandardFunc {
   /**
    * Concatenate values.
    */
-  static final class Combine extends ValueMerger {
+  static final class Combine extends MapDuplicates {
     /** Query context. */
     private final QueryContext qc;
 
@@ -222,7 +222,7 @@ public class MapMerge extends StandardFunc {
   /**
    * Reject merge.
    */
-  final class Reject extends ValueMerger {
+  final class Reject extends MapDuplicates {
     @Override
     Value get(final Item key, final Value old, final Value value) throws QueryException {
       throw MERGE_DUPLICATE_X.get(info, key);
@@ -232,7 +232,7 @@ public class MapMerge extends StandardFunc {
   /**
    * Invoke function to combine values.
    */
-  final class Invoke extends ValueMerger {
+  final class Invoke extends MapDuplicates {
     /** Combiner function. */
     private final FItem function;
     /** Query context. */

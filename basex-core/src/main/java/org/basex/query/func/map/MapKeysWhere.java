@@ -14,7 +14,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class MapKeysWhere extends StandardFunc {
+public final class MapKeysWhere extends MapFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
@@ -35,6 +35,7 @@ public final class MapKeysWhere extends StandardFunc {
       final Type kt = mt.keyType();
       arg(1, arg -> refineFunc(arg, cc, kt.seqType()));
       exprType.assign(kt);
+      if(mapSize(map) == 1) exprType.assign(Occ.ZERO_OR_ONE);
     }
     return this;
   }

@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public class MapForEach extends StandardFunc {
+public class MapForEach extends MapFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
@@ -58,13 +58,15 @@ public class MapForEach extends StandardFunc {
     if(map == XQMap.empty()) return Empty.VALUE;
 
     if(map.seqType().type instanceof final MapType mt) {
-      final SeqType declType = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE);
-      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType(), Types.INTEGER_O));
+      final SeqType kt = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE), vt = mt.valueType();
+      arg(1, arg -> refineFunc(arg, cc, kt, vt, Types.INTEGER_O));
     }
 
     final FuncType ft = arg(1).funcType();
-    if(ft != null) exprType.assign(ft.declType.type);
-
+    if(ft != null) {
+      final SeqType st = ft.declType;
+      exprType.assign(st.type.seqType(Occ.ZERO_OR_MORE), st.one() ? map.structSize() : -1);
+    }
     return this;
   }
 }

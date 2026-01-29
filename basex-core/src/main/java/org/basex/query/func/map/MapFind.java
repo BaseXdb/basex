@@ -2,7 +2,6 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
@@ -15,7 +14,7 @@ import org.basex.query.value.map.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapFind extends StandardFunc {
+public final class MapFind extends MapFn {
   @Override
   public XQArray value(final QueryContext qc) throws QueryException {
     final Iter input = arg(0).iter(qc);

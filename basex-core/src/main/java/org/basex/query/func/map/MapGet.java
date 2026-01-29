@@ -2,7 +2,6 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -15,7 +14,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapGet extends StandardFunc {
+public final class MapGet extends MapFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
@@ -37,24 +36,24 @@ public final class MapGet extends StandardFunc {
     final boolean dflt = defined(2);
     if(map == XQMap.empty()) return dflt ? arg(2) : Empty.VALUE;
 
-    final MapCompilation mc = MapCompilation.get(map).key(key);
+    final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
     SeqType st = null;
     boolean notFound = false;
-    if(mc.field != null) {
+    if(mti.field != null) {
       // use optimized getter for records
-      if(!mc.record.hasOptional()) return new RecordGet(info, map, mc.index).optimize(cc);
+      if(!mti.record.hasOptional()) return new RecordGet(info, map, mti.index).optimize(cc);
       // type of result (if it exists)
-      st = mc.field.seqType();
-    } else if(mc.validKey) {
+      st = mti.field.seqType();
+    } else if(mti.validKey) {
       // map:get({ 'a': 1 }, 'b') → ()
-      if(!mc.record.isExtensible()) notFound = true;
+      if(!mti.record.isExtensible()) notFound = true;
     }
 
-    if(mc.mapType != null) {
+    if(mti.mapType != null) {
       // map:get({ 1: 1 }, 'string') → ()
-      if(mc.keyMismatch) notFound = true;
+      if(mti.keyMismatch) notFound = true;
       // type of result (if it exists)
-      else if(st == null) st = mc.mapType.valueType();
+      else if(st == null) st = mti.mapType.valueType();
     }
 
     if(st != null) exprType.assign(dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO));

@@ -2,7 +2,6 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -16,13 +15,15 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class MapEntry extends StandardFunc {
+public final class MapEntry extends MapFn {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item key = toAtomItem(arg(0), qc);
     final Value value = arg(1).value(qc);
 
-    return XQMap.get(key, value);
+    final XQMap map = XQMap.get(key, value);
+    if(seqType().type instanceof final RecordType rt) map.type = rt;
+    return map;
   }
 
   @Override

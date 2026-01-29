@@ -2,7 +2,6 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.type.*;
 
@@ -12,7 +11,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
-public final class MapKeys extends StandardFunc {
+public final class MapKeys extends MapFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return toMap(arg(0), qc).keys();

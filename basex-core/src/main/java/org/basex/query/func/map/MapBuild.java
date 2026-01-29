@@ -24,16 +24,16 @@ public final class MapBuild extends MapMerge {
     final FItem keys = toFunctionOrNull(arg(1), 2, qc);
     final FItem value = toFunctionOrNull(arg(2), 2, qc);
     final MergeOptions options = toOptions(arg(3), new MergeOptions(), qc);
-    final ValueMerger merger = merger(options, qc, Duplicates.COMBINE);
+    final MapDuplicates dups = duplicates(options, qc, Duplicates.COMBINE);
 
     final HofArgs args = new HofArgs(2, keys, value);
-    final MapBuilder builder = new MapBuilder(input.size());
+    final MapBuilder builder = new MapBuilder();
     for(Item item; (item = qc.next(input)) != null;) {
       args.set(0, item).inc();
       final Iter iter = (keys != null ? invoke(keys, args, qc) : item).atomIter(qc, info);
       for(Item key; (key = qc.next(iter)) != null;) {
         final Value old = builder.get(key);
-        final Value val = merger.merge(key, old, value != null ? invoke(value, args, qc) : item);
+        final Value val = dups.merge(key, old, value != null ? invoke(value, args, qc) : item);
         if(val != null) builder.put(key, val);
       }
     }
@@ -69,7 +69,10 @@ public final class MapBuild extends MapMerge {
   @Override
   public long structSize() {
     final Expr input = arg(0), keys = arg(1);
-    return input instanceof RangeSeq && keys.size() == 0 ? input.size() : -1;
+    final SeqType st = input.seqType();
+    final long size = input.size();
+    return keys.size() == 0 && (size == 1 && !st.mayBeArray() && st.type.atomic() != null ||
+        input instanceof RangeSeq) ? size : -1;
   }
 
   @Override

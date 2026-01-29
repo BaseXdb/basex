@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapFilter extends StandardFunc {
+public final class MapFilter extends MapFn {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
@@ -34,8 +34,8 @@ public final class MapFilter extends StandardFunc {
     if(map == XQMap.empty()) return map;
 
     if(map.seqType().type instanceof final MapType mt) {
-      final SeqType declType = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE);
-      arg(1, arg -> refineFunc(arg, cc, declType, mt.valueType(), Types.INTEGER_O));
+      final SeqType kt = SeqType.get(mt.keyType(), Occ.EXACTLY_ONE), vt = mt.valueType();
+      arg(1, arg -> refineFunc(arg, cc, kt, vt, Types.INTEGER_O));
       exprType.assign(MapType.get(mt));
     }
     return this;

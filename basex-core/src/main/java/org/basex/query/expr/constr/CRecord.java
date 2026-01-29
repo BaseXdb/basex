@@ -68,6 +68,12 @@ public final class CRecord extends Arr {
   }
 
   @Override
+  public long structSize() {
+    final RecordType rt = (RecordType) seqType().type;
+    return rt.isExtensible() || rt.hasOptional() ? -1 : exprs.length;
+  }
+
+  @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new CRecord(info, seqType().type, copyAll(cc, vm, args())));
   }

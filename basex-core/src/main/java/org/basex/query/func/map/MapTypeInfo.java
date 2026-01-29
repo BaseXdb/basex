@@ -12,7 +12,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class MapCompilation {
+public final class MapTypeInfo {
   /** Map type ({@code null} if statically unknown). */
   public MapType mapType;
   /** Record type ({@code null} if statically unknown). */
@@ -33,13 +33,14 @@ public final class MapCompilation {
    * @param map map expression
    * @return map information
    */
-  public static MapCompilation get(final Expr map) {
-    final MapCompilation mi = new MapCompilation();
-    if(map.seqType().type instanceof final MapType mt) {
-      mi.mapType = mt;
-      if(mt instanceof final RecordType rt) mi.record = rt;
+  public static MapTypeInfo get(final Expr map) {
+    final MapTypeInfo mti = new MapTypeInfo();
+    final SeqType st = map.seqType();
+    if(st.one() && st.type instanceof final MapType mt) {
+      mti.mapType = mt;
+      if(mt instanceof final RecordType rt) mti.record = rt;
     }
-    return mi;
+    return mti;
   }
 
   /**
@@ -48,7 +49,7 @@ public final class MapCompilation {
    * @return map information
    * @throws QueryException query exception
    */
-  public MapCompilation key(final Expr expr) throws QueryException {
+  public MapTypeInfo key(final Expr expr) throws QueryException {
     if(record != null) {
       if(expr instanceof final Item item) {
         final Type kt = expr.seqType().type;
@@ -74,7 +75,7 @@ public final class MapCompilation {
    * @param expr index expression
    * @return map information
    */
-  public MapCompilation index(final Expr expr) {
+  public MapTypeInfo index(final Expr expr) {
     if(record != null && expr instanceof final Itr itr) {
       index = (int) itr.itr();
       final TokenObjectMap<RecordField> fields = record.fields();

@@ -2,9 +2,7 @@ package org.basex.query.func.map;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.*;
 import org.basex.query.iter.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
@@ -15,7 +13,7 @@ import org.basex.query.value.type.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class MapEntries extends StandardFunc {
+public class MapEntries extends MapFn {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
     final XQMap map = toMap(arg(0), qc);
@@ -26,13 +24,13 @@ public class MapEntries extends StandardFunc {
       @Override
       public XQMap next() throws QueryException {
         final Item key = keys.next();
-        return key != null ? entry(key, map.get(key)) : null;
+        return key != null ? XQMap.get(key, map.get(key)) : null;
       }
 
       @Override
       public Item get(final long i) throws QueryException {
         final Item key = keys.get(i);
-        return entry(key, map.get(key));
+        return XQMap.get(key, map.get(key));
       }
 
       @Override
@@ -49,17 +47,5 @@ public class MapEntries extends StandardFunc {
       exprType.assign(MapType.get(mt).seqType(Occ.ZERO_OR_MORE), map.structSize());
     }
     return this;
-  }
-
-  /**
-   * Returns a single map entry as a new map.
-   * @param key key
-   * @param value value
-   * @return created map entry
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  XQMap entry(final Item key, final Value value) throws QueryException {
-    return XQMap.get(key, value);
   }
 }
