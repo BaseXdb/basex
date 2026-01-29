@@ -203,7 +203,7 @@ public final class FuncDefinition {
       } else if(arg instanceof Boolean) {
         tb.add(arg + "()");
       } else {
-        final String str = arg instanceof byte[] token ? Token.string(token) : arg.toString();
+        final String str = arg instanceof final byte[] token ? Token.string(token) : arg.toString();
         if(Strings.startsWith(str, ' ')) {
           tb.add(str.substring(1));
         } else {

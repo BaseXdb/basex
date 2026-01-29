@@ -38,7 +38,7 @@ public final class UtilRoot extends StandardFunc {
   }
 
   @Override
-  public Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) {
     final Expr nodes = arg(0);
     final SeqType st = nodes.seqType();
     if(st.instanceOf(Types.DOCUMENT_NODE_ZM)) return nodes;

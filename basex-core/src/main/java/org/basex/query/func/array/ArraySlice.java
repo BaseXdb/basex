@@ -30,7 +30,7 @@ public final class ArraySlice extends FnSlice {
   }
 
   @Override
-  public Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) {
     final Type type = arg(0).seqType().type;
     if(type instanceof ArrayType) exprType.assign(type);
     return this;

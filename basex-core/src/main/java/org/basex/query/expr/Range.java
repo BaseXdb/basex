@@ -50,7 +50,7 @@ public final class Range extends Arr {
           // identical operands: $int to $int
           exprType.assign(Occ.EXACTLY_ONE);
           if(integers()) expr = min;
-        } else if(max instanceof Arith arith && min.equals(max.arg(0))) {
+        } else if(max instanceof final Arith arith && min.equals(max.arg(0))) {
           if(arith.calc.oneOf(Calc.ADD, Calc.SUBTRACT) && arith.arg(1) instanceof final Itr itr) {
             // known result size: . to . + 10
             final long n = (arith.calc == Calc.ADD ? itr.itr() : -itr.itr()) + 1;

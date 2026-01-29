@@ -37,7 +37,7 @@ public class FnSlice extends StandardFunc {
   }
 
   @Override
-  public Expr opt(final CompileContext cc) throws QueryException {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.zero()) return input;

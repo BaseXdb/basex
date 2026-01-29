@@ -117,7 +117,7 @@ public final class ExprType {
    * @param type type
    */
   public void assign(final Type type) {
-    seqType = SeqType.get(type, seqType.occ);
+    if(type != seqType.type) seqType = SeqType.get(type, seqType.occ);
   }
 
   /**

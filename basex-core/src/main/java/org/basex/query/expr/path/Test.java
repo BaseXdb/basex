@@ -64,7 +64,8 @@ public abstract class Test extends ExprInfo {
     for(int l = 0; l < ls; l++) {
       final Test t = list.get(l);
       // skip URI-based comparisons (may not be assigned yet at parse time)
-      if(ntest && t instanceof NameTest nt && (utest || nt.scope == NameTest.Scope.URI)) continue;
+      if(ntest && t instanceof final NameTest nt && (utest || nt.scope == NameTest.Scope.URI))
+        continue;
       // * union A
       if(test.instanceOf(t)) return;
       // A union * → *
