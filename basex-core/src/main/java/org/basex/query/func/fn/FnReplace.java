@@ -98,6 +98,6 @@ public final class FnReplace extends RegExFn {
 
   @Override
   public int hofOffsets() {
-    return arg(2).seqType().mayBeFunction() ? hofOffset(2) : 0;
+    return functionOption(2) ? hofOffset(2) : 0;
   }
 }

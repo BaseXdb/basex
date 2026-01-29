@@ -178,11 +178,10 @@ public abstract class StandardFunc extends Arr {
 
   @Override
   public final boolean has(final Flag... flags) {
-    final int ho = hofOffsets();
     for(final Flag flag : flags) {
       switch(flag) {
         case HOF:
-          if(ho > 0) return true;
+          if(hofOffsets() > 0) return true;
           continue;
         case UPD:
           if(hasUPD()) return true;
@@ -192,9 +191,9 @@ public abstract class StandardFunc extends Arr {
           break;
         case NDT:
           // check whether function arguments may contain non-deterministic code
-          final int al = args().length;
+          final int hof = hofOffsets(), al = args().length;
           for(int a = 0; a < al; a++) {
-            if((ho & (1 << a)) != 0 && (!(arg(a) instanceof final Item item) ||
+            if((hof & (1 << a)) != 0 && (!(arg(a) instanceof final Item item) ||
                 !(item instanceof final FuncItem fi) || fi.expr.has(Flag.NDT))) return true;
           }
           break;
@@ -849,6 +848,25 @@ public abstract class StandardFunc extends Arr {
       list.add(name);
       return list;
     });
+  }
+
+  /**
+   * Indicates if the supplied options argument may contain a function.
+   * @param i index of argument
+   * @return result of check
+   */
+  protected final boolean functionOption(final int i) {
+    if(!(arg(i) instanceof final Value value)) return true;
+    if(value instanceof final XQMap map) {
+      for(final Item key : map.keys()) {
+        try {
+          if(map.get(key) instanceof FItem) return true;
+        } catch(final QueryException ex) {
+          Util.debug(ex);
+        }
+      }
+    }
+    return false;
   }
 
   /**

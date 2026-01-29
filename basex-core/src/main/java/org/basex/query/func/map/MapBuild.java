@@ -74,6 +74,6 @@ public final class MapBuild extends MapMerge {
 
   @Override
   public int hofOffsets() {
-    return defined(3) ? Integer.MAX_VALUE : hofOffset(1) | hofOffset(2);
+    return functionOption(3) ? Integer.MAX_VALUE : hofOffset(1) | hofOffset(2);
   }
 }

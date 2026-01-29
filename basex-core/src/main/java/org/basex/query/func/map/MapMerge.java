@@ -170,7 +170,7 @@ public class MapMerge extends StandardFunc {
 
   @Override
   public int hofOffsets() {
-    return defined(1) ? Integer.MAX_VALUE : 0;
+    return functionOption(1) ? Integer.MAX_VALUE : 0;
   }
 
   /**
