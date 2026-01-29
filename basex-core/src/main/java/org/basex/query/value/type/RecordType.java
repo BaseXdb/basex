@@ -278,13 +278,8 @@ public final class RecordType extends MapType {
       }
       return true;
     }
-    if(!extensible && type instanceof final MapType mt) {
-      if(!mt.keyType().oneOf(AtomType.STRING, AtomType.ANY_ATOMIC_TYPE)) return false;
-      final int fs = fields.size();
-      for(int f = 1; f <= fs; f++) {
-        if(!fields.value(f).seqType().instanceOf(mt.valueType())) return false;
-      }
-      return true;
+    if(type instanceof final MapType mt) {
+      return keyType().instanceOf(mt.keyType()) && valueType().instanceOf(mt.valueType());
     }
     if(type instanceof final FuncType ft) {
       return funcType().declType.instanceOf(ft.declType) && ft.argTypes.length == 1 &&
@@ -385,8 +380,7 @@ public final class RecordType extends MapType {
         final SeqType is;
         if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2) {
           final Pair pair = new Pair(rt1, rt2);
-          if(pairs.contains(pair))
-            return null;
+          if(pairs.contains(pair)) return null;
           final Type it = rt1.intersect(rt2, pair.addTo(pairs));
           is = it == null ? null : SeqType.get(it, fst.occ.intersect(rtfst.occ));
         } else {

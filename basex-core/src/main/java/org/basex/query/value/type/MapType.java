@@ -135,8 +135,7 @@ public class MapType extends FType {
 
   @Override
   public Type union(final Type type) {
-    if(type instanceof ChoiceItemType) return type.union(this);
-    if(type == RECORD) return MAP;
+    if(type instanceof ChoiceItemType || type instanceof RecordType) return type.union(this);
     if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
     if(type instanceof final MapType mt) return union(mt.keyType, mt.valueType);
@@ -156,15 +155,14 @@ public class MapType extends FType {
 
   @Override
   public Type intersect(final Type type) {
-    if(type instanceof ChoiceItemType) return type.intersect(this);
-    if(type == RECORD) return RECORD;
+    if(type instanceof ChoiceItemType || type instanceof RecordType) return type.intersect(this);
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 
     if(type instanceof final MapType mt) {
       final Type kt = keyType.intersect(mt.keyType);
       final SeqType vt = valueType.intersect(mt.valueType);
-      if(kt != null && kt.atomic() != null && vt != null) return get(kt, vt);
+      if(kt != null && vt != null) return get(kt, vt);
     }
     return null;
   }
