@@ -371,6 +371,7 @@ public interface QueryText {
 
   // OPTIMIZATIONS ================================================================================
 
+  /** Optimization info. */ String OPTEVALUATE = "evaluate";
   /** Optimization info. */ String OPTREWRITE = "rewrite";
   /** Optimization info. */ String OPTREWRITE_X_X = "rewrite %: %";
   /** Optimization info. */ String OPTMERGE_X = "merge: %";

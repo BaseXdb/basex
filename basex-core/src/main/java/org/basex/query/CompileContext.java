@@ -307,8 +307,9 @@ public final class CompileContext {
         final boolean eqDesc = exprDesc.equals(resDesc), eqString = Token.eq(exprString, resString);
 
         final TokenBuilder tb = new TokenBuilder();
-        tb.add(QueryText.OPTREWRITE).add(' ').add(exprDesc);
-        if(eqString && !eqDesc) tb.add(" to ").add(resDesc);
+        final boolean eval = !(expr instanceof Value) && result instanceof Value;
+        tb.add(eval ? QueryText.OPTEVALUATE : QueryText.OPTREWRITE).add(' ').add(exprDesc);
+        if(eqString && !eqDesc) tb.add(eval ? ": " : " to ").add(resDesc);
         tb.add(": ").add(exprString);
         if(!eqString) tb.add(" -> ").add(resString);
         return tb.toString();
