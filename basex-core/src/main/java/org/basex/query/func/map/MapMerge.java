@@ -164,7 +164,7 @@ public class MapMerge extends MapFn {
    * @param vt value type
    */
   final void assignType(final Type kt, final SeqType vt) {
-    exprType.assign(MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE,
+    exprType.assign(MapType.get(kt != null ? kt : BasicType.ANY_ATOMIC_TYPE,
       md != null ? md.type(vt) : Types.ITEM_ZM));
   }
 

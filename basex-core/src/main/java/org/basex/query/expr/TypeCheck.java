@@ -38,7 +38,7 @@ public final class TypeCheck extends Single {
     SeqType st = seqType();
     final Type type = st.type;
 
-    if(type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
+    if(type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
       // data(EXPR) coerce to xs:int → EXPR coerce to xs:int
       expr = expr.simplifyFor(Simplify.DATA, cc);
     }
@@ -52,7 +52,7 @@ public final class TypeCheck extends Single {
     cardinality = nst.instanceOf(st);
 
     // refine type check (ignore arrays as coerced result may have a different size)
-    if(!et.mayBeArray() || !type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
+    if(!et.mayBeArray() || !type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
       // occurrence indicator:
       //   exactly-one/one-or-more → exactly-one
       final Occ nocc = et.occ.intersect(st.occ);

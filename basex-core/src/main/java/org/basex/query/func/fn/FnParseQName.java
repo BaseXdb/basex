@@ -23,7 +23,7 @@ public final class FnParseQName extends StandardFunc {
     if(value == null) return Empty.VALUE;
 
     final QNm qnm = qc.shared.parseQName(value, true, sc());
-    if(qnm == null) throw valueError(AtomType.QNAME, value, info);
+    if(qnm == null) throw valueError(BasicType.QNAME, value, info);
     if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(info, qnm.prefix());
     return qnm;
   }

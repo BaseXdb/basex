@@ -25,7 +25,7 @@ interface CalcOpt {
    * @return operator or {@code null}
    */
   static CalcOpt get(final SeqType st1, final SeqType st2, final Calc calc) {
-    final AtomType type = Calc.numType(st1.type, st2.type);
+    final BasicType type = Calc.numType(st1.type, st2.type);
     if(type.isNumber()) {
       switch(calc) {
         case ADD:

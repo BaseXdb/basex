@@ -95,12 +95,12 @@ public class CmpG extends Cmp {
       // skip runtime type check if items are known to be comparable
       final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
       final Type type1 = st1.type, type2 = st2.type;
-      if(type1 == type2 && !type1.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.ITEM)
+      if(type1 == type2 && !type1.oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.ITEM)
           || type1.isUntyped() || type2.isUntyped()
           || type1.isNumber() && type2.isNumber()
           || type1.isStringOrUntyped() && type2.isStringOrUntyped()
-          || type1.instanceOf(AtomType.BINARY) && type2.instanceOf(AtomType.BINARY)
-          || type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION)) {
+          || type1.instanceOf(BasicType.BINARY) && type2.instanceOf(BasicType.BINARY)
+          || type1.instanceOf(BasicType.DURATION) && type2.instanceOf(BasicType.DURATION)) {
         comparable = true;
       }
 
@@ -111,7 +111,7 @@ public class CmpG extends Cmp {
       } else if(op == CmpOp.EQ && sc().collation == null && !st2.zeroOrOne() && (
         type1.isNumber() && type2.isNumber() ||
         type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
-        type1 == AtomType.BOOLEAN && type2 == AtomType.BOOLEAN
+        type1 == BasicType.BOOLEAN && type2 == BasicType.BOOLEAN
       )) {
         // hash-based comparisons
         if(!(this instanceof CmpHashG)) expr = copyType(new CmpHashG(expr1, expr2, op, info));
@@ -236,24 +236,6 @@ public class CmpG extends Cmp {
       return op.eval(item1.compare(item2, null, false, info));
     }
     throw compareError(item1, item2, info);
-  }
-
-  /**
-   * Compile-time check: Checks if an expression with the specified types can be rewritten
-   * to a general comparison.
-   * @param st1   first sequence type
-   * @param st2   second sequence type
-   * @param op    comparator
-   * @return result of check
-   */
-  public static boolean compatible(final SeqType st1, final SeqType st2, final CmpOp op) {
-    final Type type1 = st1.type, type2 = st2.type;
-    return type1 == type2 && !AtomType.ANY_ATOMIC_TYPE.instanceOf(type1) &&
-        (type1.isSortable() || !op.oneOf(CmpOp.EQ, CmpOp.NE)) ||
-      type1.isStringOrUntyped() && type2.isStringOrUntyped() ||
-      type1 == AtomType.QNAME && type2 == AtomType.QNAME ||
-      type1.instanceOf(AtomType.NUMERIC) && type2.instanceOf(AtomType.NUMERIC) ||
-      type1.instanceOf(AtomType.DURATION) && type2.instanceOf(AtomType.DURATION);
   }
 
   @Override
@@ -383,7 +365,7 @@ public class CmpG extends Cmp {
             }
           }
         }
-      } else if(NODE_NAME.is(fn) && expr2.seqType().type == AtomType.QNAME) {
+      } else if(NODE_NAME.is(fn) && expr2.seqType().type == BasicType.QNAME) {
         // node-name() = #prefix:local → self::prefix:local
         scope = NameTest.Scope.FULL;
         for(final Item item : value) {

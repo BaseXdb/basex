@@ -58,9 +58,9 @@ abstract class CName extends CNode {
   final QNm qname(final boolean elem, final QueryContext qc) throws QueryException {
     final Item item = name.atomItem(qc, info);
     final Type type = item.type;
-    if(type == AtomType.QNAME) return (QNm) item;
+    if(type == BasicType.QNAME) return (QNm) item;
 
-    if(!type.isStringOrUntyped() || type == AtomType.ANY_URI)
+    if(!type.isStringOrUntyped() || type == BasicType.ANY_URI)
       throw STRQNM_X_X.get(info, item.seqType(), item);
 
     final QNm qnm = qc.shared.parseQName(item.string(info), elem, sc());
@@ -82,7 +82,7 @@ abstract class CName extends CNode {
       if(empty) return EMPTY;
     } else {
       final Type type = item.type;
-      if(type.isStringOrUntyped() && type != AtomType.ANY_URI) return trim(item.string(info));
+      if(type.isStringOrUntyped() && type != BasicType.ANY_URI) return trim(item.string(info));
     }
     throw STRNCN_X_X.get(info, item.seqType(), item);
   }

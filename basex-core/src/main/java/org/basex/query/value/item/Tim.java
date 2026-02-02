@@ -18,7 +18,7 @@ public final class Tim extends ADate {
    * @param value time
    */
   public Tim(final ADate value) {
-    super(AtomType.TIME, value);
+    super(BasicType.TIME, value);
     clean();
   }
 
@@ -29,7 +29,7 @@ public final class Tim extends ADate {
    * @throws QueryException query exception
    */
   public Tim(final byte[] value, final InputInfo info) throws QueryException {
-    super(AtomType.TIME);
+    super(BasicType.TIME);
     time(value, XTIME, info);
     clean();
   }
@@ -41,7 +41,7 @@ public final class Tim extends ADate {
    * @param plus plus/minus flag
    */
   public Tim(final Tim value, final DTDur dur, final boolean plus) {
-    super(AtomType.TIME, value);
+    super(BasicType.TIME, value);
     calc(dur, plus);
     clean();
   }

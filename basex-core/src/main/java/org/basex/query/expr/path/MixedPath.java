@@ -29,7 +29,7 @@ public final class MixedPath extends Path {
    * @param steps axis steps
    */
   MixedPath(final InputInfo info, final Expr root, final Expr... steps) {
-    super(info, AtomType.ITEM, root, steps);
+    super(info, BasicType.ITEM, root, steps);
   }
 
   @Override

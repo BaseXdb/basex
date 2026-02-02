@@ -66,7 +66,7 @@ public final class UtilValuesExcept extends StandardFunc {
     final SeqType st = values.seqType();
     if(st.zero()) return values;
 
-    final AtomType type = st.type.atomic();
+    final BasicType type = st.type.atomic();
     if(except.seqType().zero()) {
       return type == st.type ? values : cc.function(Function.DATA, info, values);
     }

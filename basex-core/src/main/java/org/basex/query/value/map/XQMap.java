@@ -196,7 +196,7 @@ public abstract class XQMap extends XQStruct {
   @Override
   public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    return funcType().declType.type.instanceOf(AtomType.ANY_ATOMIC_TYPE) ||
+    return funcType().declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) ||
         test((key, value) -> value.materialized(test, ii));
   }
 
@@ -215,7 +215,7 @@ public abstract class XQMap extends XQStruct {
             final RecordField rf = fields.value(f);
             final Item key = keys.next();
             final SeqType st = rf.seqType();
-            if(rf.isOptional() || key == null || key.type != AtomType.STRING ||
+            if(rf.isOptional() || key == null || key.type != BasicType.STRING ||
               !Token.eq(fields.key(f), key.string(null)) ||
               st != Types.ITEM_ZM && !st.instance(getOrNull(key))) return false;
           }
@@ -229,7 +229,7 @@ public abstract class XQMap extends XQStruct {
         }
         if(!rt.isExtensible()) {
           for(final Item key : keys()) {
-            if(!key.type.instanceOf(AtomType.STRING) || !fields.contains(key.string(null)))
+            if(!key.type.instanceOf(BasicType.STRING) || !fields.contains(key.string(null)))
               return false;
           }
         }
@@ -240,7 +240,7 @@ public abstract class XQMap extends XQStruct {
       final Type kt;
       final SeqType vt;
       if(tp instanceof final MapType mt) {
-        kt = mt.keyType() == AtomType.ANY_ATOMIC_TYPE ? null : mt.keyType();
+        kt = mt.keyType() == BasicType.ANY_ATOMIC_TYPE ? null : mt.keyType();
         vt = mt.valueType().eq(Types.ITEM_ZM) ? null : mt.valueType();
       } else if(tp instanceof final FuncType ft) {
         if(ft.declType.occ.min != 0 || ft.argTypes.length != 1 ||

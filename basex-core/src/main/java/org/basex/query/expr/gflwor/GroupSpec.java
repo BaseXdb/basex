@@ -59,7 +59,7 @@ public final class GroupSpec extends Single {
     expr = expr.simplifyFor(Simplify.DATA, cc);
 
     exprType.assign(expr);
-    final AtomType type = expr.seqType().type.atomic();
+    final BasicType type = expr.seqType().type.atomic();
     if(type != null) var.refineType(SeqType.get(type, seqType().occ), cc);
     return this;
   }

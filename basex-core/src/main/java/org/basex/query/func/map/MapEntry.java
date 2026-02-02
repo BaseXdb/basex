@@ -36,8 +36,8 @@ public final class MapEntry extends MapFn {
       fields.put(str.string(), new RecordField(value.seqType()));
       type = cc.qc.shared.record(new RecordType(fields));
     } else {
-      final AtomType kt = key.seqType().type.atomic();
-      type = MapType.get(kt != null ? kt : AtomType.ANY_ATOMIC_TYPE, value.seqType());
+      final BasicType kt = key.seqType().type.atomic();
+      type = MapType.get(kt != null ? kt : BasicType.ANY_ATOMIC_TYPE, value.seqType());
     }
     exprType.assign(type);
     return this;

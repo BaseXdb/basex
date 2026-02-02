@@ -1,7 +1,7 @@
 package org.basex.io.serial;
 
 import static org.basex.io.serial.SerializerOptions.*;
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 
 import java.io.*;
 import java.util.*;

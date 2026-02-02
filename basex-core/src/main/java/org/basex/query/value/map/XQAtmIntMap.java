@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  */
 public final class XQAtmIntMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.UNTYPED_ATOMIC, Types.INTEGER_O);
+  private static final MapType TYPE = MapType.get(BasicType.UNTYPED_ATOMIC, Types.INTEGER_O);
   /** Hash map. */
   private final TokenIntMap map;
 
@@ -44,7 +44,7 @@ public final class XQAtmIntMap extends XQHashMap {
 
   @Override
   public Value keys() {
-    return StrSeq.get(map.keys(), AtomType.UNTYPED_ATOMIC);
+    return StrSeq.get(map.keys(), BasicType.UNTYPED_ATOMIC);
   }
 
   @Override

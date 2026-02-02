@@ -34,7 +34,7 @@ public class B64 extends Bin {
    * @param data binary data
    */
   private B64(final byte[] data) {
-    super(data, AtomType.BASE64_BINARY);
+    super(data, BasicType.BASE64_BINARY);
   }
 
   /**
@@ -121,7 +121,7 @@ public class B64 extends Bin {
       return Base64.decode(value);
     } catch(final IllegalArgumentException ex) {
       Util.debug(ex);
-      throw AtomType.BASE64_BINARY.castError(value, info);
+      throw BasicType.BASE64_BINARY.castError(value, info);
     }
   }
 

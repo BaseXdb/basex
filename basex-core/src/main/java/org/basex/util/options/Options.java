@@ -402,7 +402,7 @@ public class Options implements Iterable<Option<?>> {
     } else if(name.type.isStringOrUntyped()) {
       nm = string(name.string(info));
     } else {
-      throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, name.type, name);
+      throw INVALIDOPTION_X_X_X.get(info, BasicType.STRING, name.type, name);
     }
 
     if(definitions.isEmpty()) {
@@ -427,7 +427,7 @@ public class Options implements Iterable<Option<?>> {
         map.forEach((key, v) -> {
           if(!tb.isEmpty()) tb.add(',');
           tb.add(key.string(info)).add('=');
-          if(v.size() != 1) throw INVALIDOPTION_X_X_X.get(info, AtomType.STRING, v.seqType(), v);
+          if(v.size() != 1) throw INVALIDOPTION_X_X_X.get(info, BasicType.STRING, v.seqType(), v);
           tb.add(string(((Item) v).string(info)).replace(",", ",,"));
         });
       } else if(item instanceof final XQArray array) {
@@ -834,10 +834,10 @@ public class Options implements Iterable<Option<?>> {
       result = value;
     } else if(option instanceof BooleanOption) {
       final Boolean b = item != null ? Strings.toBoolean(string(item.string(info))) : null;
-      if(b == null) throw expected.apply(AtomType.BOOLEAN);
+      if(b == null) throw expected.apply(BasicType.BOOLEAN);
       result = b;
     } else if(option instanceof NumberOption) {
-      if(item == null) throw expected.apply(AtomType.INTEGER);
+      if(item == null) throw expected.apply(BasicType.INTEGER);
       result = (int) item.itr(info);
     } else if(option instanceof StringOption) {
       result = serialize(value, info);

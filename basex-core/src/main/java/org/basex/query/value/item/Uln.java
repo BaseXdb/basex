@@ -28,7 +28,7 @@ public final class Uln extends ANum {
    * @param value integer value
    */
   public Uln(final BigInteger value) {
-    super(AtomType.UNSIGNED_LONG);
+    super(BasicType.UNSIGNED_LONG);
     this.value = value;
   }
 

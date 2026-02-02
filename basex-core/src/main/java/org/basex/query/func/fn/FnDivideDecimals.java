@@ -20,8 +20,8 @@ import org.basex.util.*;
 public final class FnDivideDecimals extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final BigDecimal value = checkType(arg(0), AtomType.DECIMAL, qc).dec(info);
-    final BigDecimal divisor = checkType(arg(1), AtomType.DECIMAL, qc).dec(info);
+    final BigDecimal value = checkType(arg(0), BasicType.DECIMAL, qc).dec(info);
+    final BigDecimal divisor = checkType(arg(1), BasicType.DECIMAL, qc).dec(info);
     final Item precision = arg(2).atomItem(qc, info);
     if(divisor.signum() == 0) throw DIVZERO_X.get(info, value);
 

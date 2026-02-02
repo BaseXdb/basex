@@ -23,7 +23,7 @@ public final class FnResolveQName extends StandardFunc {
     final byte[] value = toTokenOrNull(arg(0), qc);
     final ANode element = toElem(arg(1), qc);
     if(value == null) return Empty.VALUE;
-    if(!XMLToken.isQName(value)) throw valueError(AtomType.QNAME, value, info);
+    if(!XMLToken.isQName(value)) throw valueError(BasicType.QNAME, value, info);
 
     final byte[] prefix = Token.prefix(value);
     byte[] uri = element.uri(prefix);

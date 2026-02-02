@@ -68,7 +68,7 @@ public final class XQItemValueMap extends XQHashMap {
     shrinkValues(job);
     refineType();
     // see MapBuilder#put for types with compact representation
-    return ((MapType) type).keyType().oneOf(AtomType.INTEGER, AtomType.STRING,
-        AtomType.UNTYPED_ATOMIC) ? rebuild(job) : this;
+    return ((MapType) type).keyType().oneOf(BasicType.INTEGER, BasicType.STRING,
+        BasicType.UNTYPED_ATOMIC) ? rebuild(job) : this;
   }
 }

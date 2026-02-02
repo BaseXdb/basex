@@ -33,7 +33,7 @@ public final class Dbl extends ANum {
    * @param value value
    */
   private Dbl(final double value) {
-    super(AtomType.DOUBLE);
+    super(BasicType.DOUBLE);
     this.value = value;
   }
 
@@ -74,7 +74,7 @@ public final class Dbl extends ANum {
 
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    if(!Double.isFinite(value)) throw valueError(AtomType.DECIMAL, string(), ii);
+    if(!Double.isFinite(value)) throw valueError(BasicType.DECIMAL, string(), ii);
     return new BigDecimal(value);
   }
 
@@ -106,7 +106,7 @@ public final class Dbl extends ANum {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return item.type.instanceOf(AtomType.DECIMAL) ?
+    return item.type.instanceOf(BasicType.DECIMAL) ?
       -item.compare(this, coll, transitive, ii) :
       compare(value, item.dbl(ii), transitive);
   }
@@ -158,7 +158,7 @@ public final class Dbl extends ANum {
     if(Token.eq(v, Token.NAN)) return Double.NaN;
     if(Token.eq(v, Token.POSITIVE_INF)) return Double.POSITIVE_INFINITY;
     if(Token.eq(v, Token.NEGATIVE_INF)) return Double.NEGATIVE_INFINITY;
-    throw AtomType.DOUBLE.castError(value, info);
+    throw BasicType.DOUBLE.castError(value, info);
   }
 
   /**

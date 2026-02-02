@@ -67,7 +67,7 @@ public final class Dec extends ANum {
    * @param value decimal value
    */
   private Dec(final BigDecimal value) {
-    super(AtomType.DECIMAL);
+    super(BasicType.DECIMAL);
     this.value = value;
   }
 
@@ -226,7 +226,7 @@ public final class Dec extends ANum {
       }
     }
 
-    if(error) throw AtomType.DECIMAL.castError(value, info);
+    if(error) throw BasicType.DECIMAL.castError(value, info);
     return null;
   }
 }

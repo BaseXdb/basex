@@ -94,7 +94,7 @@ abstract class FileFn extends StandardFunc {
         final byte[] nl = cs == null ? token(Prop.NL) : Prop.NL.getBytes(cs);
         final Iter values = arg(1).atomIter(qc, info);
         for(Item item; (item = qc.next(values)) != null;) {
-          if(!item.type.isStringOrUntyped()) throw typeError(item, AtomType.STRING, info);
+          if(!item.type.isStringOrUntyped()) throw typeError(item, BasicType.STRING, info);
 
           final byte[] token = item.string(info);
           out.write(cs == null ? token : string(token).getBytes(cs));

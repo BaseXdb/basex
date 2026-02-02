@@ -21,14 +21,14 @@ import org.w3c.dom.*;
 import org.w3c.dom.Text;
 
 /**
- * XQuery node types.
+ * XDM node types.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
  */
 public enum NodeType implements Type {
   /** Node type. */
-  NODE("node", AtomType.ITEM, ID.NOD),
+  NODE("node", BasicType.ITEM, ID.NOD),
 
   /** Text type. */
   TEXT("text", NODE, ID.TXT) {
@@ -139,8 +139,11 @@ public enum NodeType implements Type {
     ATTRIBUTE, COMMENT, NAMESPACE_NODE, PROCESSING_INSTRUCTION, TEXT
   };
 
-  /** Test. */
-  private final byte[] test;
+  /** Cached types. */
+  private static final TokenObjectMap<NodeType> TYPES = new TokenObjectMap<>();
+
+  /** Name. */
+  private final byte[] name;
   /** Kind. */
   private final byte[] kind;
   /** Parent type. */
@@ -158,10 +161,24 @@ public enum NodeType implements Type {
    * @param id type ID
    */
   NodeType(final String name, final Type parent, final ID id) {
-    test = Token.token(name);
+    this.name = Token.token(name);
     kind = Token.token(name.replace("-node", ""));
     this.parent = parent;
     this.id = id;
+  }
+
+  // map hierarchy to pre/post values
+  static {
+    for(final NodeType type : values()) TYPES.put(type.name, type);
+  }
+
+  /**
+   * Finds and returns the specified node type.
+   * @param qname name of type
+   * @return type or {@code null}
+   */
+  public static NodeType get(final QNm qname) {
+    return qname.uri().length == 0 ? TYPES.get(qname.local()) : null;
   }
 
   @Override
@@ -227,7 +244,7 @@ public enum NodeType implements Type {
    * @return type
    */
   public final byte[] test() {
-    return test;
+    return name;
   }
 
   @Override
@@ -237,7 +254,7 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return type == this || type == AtomType.ITEM ||
+    return type == this || type == BasicType.ITEM ||
         (type instanceof final ChoiceItemType cit ? cit.hasInstance(this) :
           type instanceof NodeType && type == parent);
   }
@@ -245,7 +262,7 @@ public enum NodeType implements Type {
   @Override
   public final Type union(final Type type) {
     return type == this ? this : type instanceof NodeType ? NODE :
-      type instanceof ChoiceItemType ? type.union(this) : AtomType.ITEM;
+      type instanceof ChoiceItemType ? type.union(this) : BasicType.ITEM;
   }
 
   @Override
@@ -255,9 +272,9 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final AtomType atomic() {
-    return oneOf(PROCESSING_INSTRUCTION, COMMENT) ? AtomType.STRING :
-      this == NODE ? AtomType.ANY_ATOMIC_TYPE : AtomType.UNTYPED_ATOMIC;
+  public final BasicType atomic() {
+    return oneOf(PROCESSING_INSTRUCTION, COMMENT) ? BasicType.STRING :
+      this == NODE ? BasicType.ANY_ATOMIC_TYPE : BasicType.UNTYPED_ATOMIC;
   }
 
   @Override
@@ -275,11 +292,6 @@ public enum NodeType implements Type {
   @Override
   public boolean nsSensitive() {
     return false;
-  }
-
-  @Override
-  public final String toString() {
-    return toString("");
   }
 
   /**
@@ -303,21 +315,11 @@ public enum NodeType implements Type {
    * @return string representation
    */
   public final String toString(final String arg) {
-    return new TokenBuilder().add(test).add('(').add(arg).add(')').toString();
+    return new TokenBuilder().add(name).add('(').add(arg).add(')').toString();
   }
 
-  /**
-   * Finds and returns the specified node type.
-   * @param name name of type
-   * @return type or {@code null}
-   */
-  public static NodeType find(final QNm name) {
-    if(name.uri().length == 0) {
-      final byte[] ln = name.local();
-      for(final NodeType type : values()) {
-        if(Token.eq(ln, type.test)) return type;
-      }
-    }
-    return null;
+  @Override
+  public final String toString() {
+    return toString("");
   }
 }

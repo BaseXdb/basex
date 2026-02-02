@@ -128,7 +128,7 @@ public final class QueryJob extends Job implements Runnable {
     // time
     if(ADate.TIME.matcher(string).matches()) return new Tim(token(string), info);
     // dateTime
-    return new Dtm(token(string), AtomType.DATE_TIME, info);
+    return new Dtm(token(string), BasicType.DATE_TIME, info);
   }
 
   /**

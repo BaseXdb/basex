@@ -498,7 +498,7 @@ public class QueryParser extends InputParser {
 
           final int al = def.params.length;
           for(int i = 0; i < is; i++) {
-            final AtomType type = def.params[Math.min(al - 1, i)];
+            final BasicType type = def.params[Math.min(al - 1, i)];
             final Item item = items.get(i);
             if(!item.type.instanceOf(type)) {
               throw error(BASEX_ANN_X_X_X, ii, def, type, item.seqType());
@@ -2467,7 +2467,7 @@ public class QueryParser extends InputParser {
     if(name != null) {
       p = pos;
       if(all && wsConsumeWs("(")) {
-        NodeType nt = NodeType.find(name);
+        NodeType nt = NodeType.get(name);
         if(nt != null) {
           // kind test
           final Test test = kindTest(nt);
@@ -2482,7 +2482,7 @@ public class QueryParser extends InputParser {
           // type test
           final SeqType st = sequenceType();
           wsCheck(")");
-          nt = st.zero() ? null : st.type == AtomType.ITEM ? NodeType.NODE :
+          nt = st.zero() ? null : st.type == BasicType.ITEM ? NodeType.NODE :
             st.type instanceof final NodeType n ? n : null;
           return nt == null ? NodeTest.FALSE : NodeTest.get(nt);
         }
@@ -3478,19 +3478,19 @@ public class QueryParser extends InputParser {
     } else {
       final QNm name = eQName(sc.elemNS, TYPEINVALID);
       if(!name.hasURI() && eq(name.local(), token(ENUM))) {
-        if(!wsConsume("(")) throw error(WHICHCAST_X, AtomType.similar(name));
+        if(!wsConsume("(")) throw error(WHICHCAST_X, BasicType.similar(name));
         type = enumerationType();
       } else {
-        type = ListType.find(name);
+        type = ListType.get(name);
         if(type == null) {
-          type = AtomType.find(name, false);
+          type = BasicType.get(name, false);
           if(consume("(")) throw error(SIMPLETYPE_X, name.prefixId(XML));
-          if(type == null ? name.eq(AtomType.ANY_SIMPLE_TYPE.qname()) :
-            type.oneOf(AtomType.ANY_ATOMIC_TYPE, AtomType.NOTATION))
+          if(type == null ? name.eq(BasicType.ANY_SIMPLE_TYPE.qname()) :
+            type.oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.NOTATION))
             throw error(INVALIDCAST_X, name.prefixId(XML));
           if(type == null) {
             final SeqType st = declaredTypes.get(name);
-            if(st == null) throw error(WHICHCAST_X, AtomType.similar(name));
+            if(st == null) throw error(WHICHCAST_X, BasicType.similar(name));
             type = st.type;
           }
         }
@@ -3543,20 +3543,20 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(null, TYPEINVALID);
     if(!name.hasURI() && eq(name.local(), token(ENUM))) {
       // enumeration
-      if(!wsConsume("(")) throw error(WHICHCAST_X, AtomType.similar(name));
+      if(!wsConsume("(")) throw error(WHICHCAST_X, BasicType.similar(name));
       type = enumerationType();
     } else if(wsConsume("(")) {
       // function type
-      type = FuncType.find(name);
+      type = FuncType.get(name);
       if(type != null) return functionTest(anns, type).seqType();
       // node type
-      type = NodeType.find(name);
+      type = NodeType.get(name);
       if(type != null) {
         // extended node type
         if(!wsConsume(")")) st = SeqType.get(kindTest((NodeType) type));
-      } else if(name.eq(AtomType.ITEM.qname())) {
+      } else if(name.eq(BasicType.ITEM.qname())) {
         // item type
-        type = AtomType.ITEM;
+        type = BasicType.ITEM;
         wsCheck(")");
       }
       // no type found
@@ -3564,8 +3564,8 @@ public class QueryParser extends InputParser {
     } else {
       // attach default element namespace
       if(!name.hasURI()) name.uri(sc.elemNS);
-      // atomic type
-      type = AtomType.find(name, false);
+      // basic type
+      type = BasicType.get(name, false);
       // declared type
       if(type == null) {
         st = declaredTypes.get(name);
@@ -3621,7 +3621,7 @@ public class QueryParser extends InputParser {
     if(type instanceof MapType) {
       Type key = itemType().type;
       if(key instanceof final RecordType rt) key = rt.getDeclaration(namedRecordTypes);
-      if(!key.instanceOf(AtomType.ANY_ATOMIC_TYPE)) throw error(MAPTAAT_X, key);
+      if(!key.instanceOf(BasicType.ANY_ATOMIC_TYPE)) throw error(MAPTAAT_X, key);
       wsCheck(",");
       final MapType tp = MapType.get(key, sequenceType());
       wsCheck(")");
@@ -3713,13 +3713,14 @@ public class QueryParser extends InputParser {
 
     if(wsConsumeWs(",")) {
       final QNm name = eQName(sc.elemNS, QNAME_X);
-      Type ann = ListType.find(name);
-      if(ann == null) ann = AtomType.find(name, true);
-      if(ann == null) throw error(TYPEUNDEF_X, AtomType.similar(name));
+      Type ann = ListType.get(name);
+      if(ann == null) ann = BasicType.get(name, true);
+      if(ann == null) throw error(TYPEUNDEF_X, BasicType.similar(name));
       // parse (and ignore) optional question mark
       if(type == NodeType.ELEMENT) wsConsume("?");
-      if(!ann.oneOf(AtomType.ANY_TYPE, AtomType.UNTYPED) && (type == NodeType.ELEMENT ||
-         !ann.oneOf(AtomType.ANY_SIMPLE_TYPE, AtomType.ANY_ATOMIC_TYPE, AtomType.UNTYPED_ATOMIC))) {
+      if(!ann.oneOf(BasicType.ANY_TYPE, BasicType.UNTYPED) && (type == NodeType.ELEMENT ||
+         !ann.oneOf(BasicType.ANY_SIMPLE_TYPE, BasicType.ANY_ATOMIC_TYPE,
+             BasicType.UNTYPED_ATOMIC))) {
         throw error(STATIC_X, ann);
       }
     }

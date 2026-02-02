@@ -63,7 +63,7 @@ public final class RecordType extends MapType {
    */
   public RecordType(final TokenObjectMap<RecordField> fields, final boolean extensible,
       final QNm name, final AnnList anns) {
-    super(extensible ? AtomType.ANY_ATOMIC_TYPE : AtomType.STRING,
+    super(extensible ? BasicType.ANY_ATOMIC_TYPE : BasicType.STRING,
         extensible ? Types.ITEM_ZM : unionType(fields));
     this.extensible = extensible;
     this.fields = fields;
@@ -78,7 +78,7 @@ public final class RecordType extends MapType {
    * @param info input info
    */
   public RecordType(final QNm name, final InputInfo info) {
-    super(AtomType.ANY_ATOMIC_TYPE, Types.ITEM_ZM, false);
+    super(BasicType.ANY_ATOMIC_TYPE, Types.ITEM_ZM, false);
     this.name = name;
     this.info = info;
     extensible = true;
@@ -235,7 +235,7 @@ public final class RecordType extends MapType {
    * @return result of check
    */
   private boolean instanceOf(final Type type, final Set<Pair> pairs) {
-    if(this == type || type.oneOf(Types.RECORD, Types.MAP, Types.FUNCTION, AtomType.ITEM)) {
+    if(this == type || type.oneOf(Types.RECORD, Types.MAP, Types.FUNCTION, BasicType.ITEM)) {
       return true;
     }
     if(type instanceof final ChoiceItemType cit) {
@@ -346,7 +346,7 @@ public final class RecordType extends MapType {
     }
     return type instanceof final MapType mt ? mt.union(keyType(), valueType()) :
            type instanceof ArrayType ? Types.FUNCTION :
-           type instanceof FuncType ? type.union(this) : AtomType.ITEM;
+           type instanceof FuncType ? type.union(this) : BasicType.ITEM;
   }
 
   @Override
@@ -477,7 +477,7 @@ public final class RecordType extends MapType {
     if(info == null) return this;
     RecordType rt = declaredRecordTypes.get(name);
     if(rt == null) rt = Records.BUILT_IN.get(name);
-    if(rt == null) throw TYPEUNKNOWN_X.get(info, AtomType.similar(name));
+    if(rt == null) throw TYPEUNKNOWN_X.get(info, BasicType.similar(name));
     return rt;
   }
 

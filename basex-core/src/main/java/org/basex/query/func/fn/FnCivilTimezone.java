@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnCivilTimezone extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Dtm value = (Dtm) checkType(arg(0), AtomType.DATE_TIME, qc);
+    final Dtm value = (Dtm) checkType(arg(0), BasicType.DATE_TIME, qc);
     final String place = toStringOrNull(arg(1), qc);
 
     final Instant instant = value.toJava().toGregorianCalendar().toInstant();

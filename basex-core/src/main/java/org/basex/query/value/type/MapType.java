@@ -122,7 +122,7 @@ public class MapType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(RECORD, MAP, FUNCTION, AtomType.ITEM)) return true;
+    if(this == type || type.oneOf(RECORD, MAP, FUNCTION, BasicType.ITEM)) return true;
     if(type instanceof final MapType mt) {
       return this != MAP && valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
     }
@@ -140,7 +140,7 @@ public class MapType extends FType {
     if(type.instanceOf(this)) return this;
     if(type instanceof final MapType mt) return union(mt.keyType, mt.valueType);
     return type instanceof ArrayType ? FUNCTION :
-           type instanceof FuncType ? type.union(this) : AtomType.ITEM;
+           type instanceof FuncType ? type.union(this) : BasicType.ITEM;
   }
 
   /**
@@ -178,7 +178,7 @@ public class MapType extends FType {
   }
 
   @Override
-  public final AtomType atomic() {
+  public final BasicType atomic() {
     return null;
   }
 

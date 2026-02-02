@@ -21,7 +21,7 @@ public final class Hex extends Bin {
    * @param value bytes
    */
   public Hex(final byte[] value) {
-    super(value, AtomType.HEX_BINARY);
+    super(value, BasicType.HEX_BINARY);
   }
 
   /**
@@ -74,7 +74,7 @@ public final class Hex extends Bin {
   public static byte[] parse(final byte[] value, final InputInfo info) throws QueryException {
     final byte[] bytes = parse(value);
     if(bytes != null) return bytes;
-    throw AtomType.HEX_BINARY.castError(value, info);
+    throw BasicType.HEX_BINARY.castError(value, info);
   }
 
   /**

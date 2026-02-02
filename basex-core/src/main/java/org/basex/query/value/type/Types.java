@@ -1,6 +1,6 @@
 package org.basex.query.value.type;
 
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
@@ -245,7 +245,7 @@ public final class Types {
   private static final Type[] TYPES = new Type[Type.ID.LAST.asByte()];
 
   static {
-    for(final AtomType type : AtomType.values()) TYPES[type.index()] = type;
+    for(final BasicType type : BasicType.values()) TYPES[type.index()] = type;
     for(final NodeType type : NodeType.values()) TYPES[type.index()] = type;
     TYPES[Type.ID.FUN.asByte()] = FUNCTION;
     TYPES[Type.ID.MAP.asByte()] = MAP;

@@ -83,7 +83,7 @@ public final class Pos extends Single {
     // numeric tests
     final SeqType st = pos.seqType();
     final Type type = st.type;
-    final boolean integer = type.instanceOf(AtomType.INTEGER);
+    final boolean integer = type.instanceOf(BasicType.INTEGER);
     if(st.zeroOrOne() && type.isNumberOrUntyped()) {
       Expr min = null, max = null;
       switch(op) {

@@ -44,7 +44,7 @@ public final class Str extends AStr {
    * @param value value
    */
   private Str(final byte[] value) {
-    this(value, AtomType.STRING);
+    this(value, BasicType.STRING);
   }
 
   /**
@@ -91,7 +91,7 @@ public final class Str extends AStr {
    * @return instance
    */
   public static Str get(final byte[] value, final Type type) {
-    return type == AtomType.STRING ? get(value) : new Str(value, type);
+    return type == BasicType.STRING ? get(value) : new Str(value, type);
   }
 
   /**

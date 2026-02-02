@@ -41,7 +41,7 @@ public final class Empty extends Item {
    * Private constructor.
    */
   private Empty() {
-    super(AtomType.ITEM);
+    super(BasicType.ITEM);
   }
 
   @Override

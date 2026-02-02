@@ -343,7 +343,7 @@ public abstract class Item extends Value {
 
   @Override
   public String description() {
-    return type == AtomType.ITEM ? ITEM : type + " " + ITEM;
+    return type == BasicType.ITEM ? ITEM : type + " " + ITEM;
   }
 
   @Override

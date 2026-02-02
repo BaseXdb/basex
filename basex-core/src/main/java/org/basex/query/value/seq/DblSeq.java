@@ -28,7 +28,7 @@ public final class DblSeq extends NativeSeq {
    * @param values bytes
    */
   private DblSeq(final double[] values) {
-    super(values.length, AtomType.DOUBLE);
+    super(values.length, BasicType.DOUBLE);
     this.values = values;
   }
 

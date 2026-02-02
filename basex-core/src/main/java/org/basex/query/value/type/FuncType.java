@@ -14,7 +14,7 @@ import org.basex.query.var.*;
 import org.basex.util.*;
 
 /**
- * XQuery function types.
+ * XDM function types.
  *
  * @author BaseX Team, BSD License
  * @author Leo Woerteler
@@ -46,6 +46,61 @@ public final class FuncType extends FType {
     this.anns = anns;
     this.declType = declType == null ? ITEM_ZM : declType;
     this.argTypes = argTypes;
+  }
+
+  /**
+   * Getter for function types.
+   * @param anns annotations
+   * @param declType declared return type
+   * @param args argument types
+   * @return function type
+   */
+  public static FuncType get(final AnnList anns, final SeqType declType, final SeqType... args) {
+    return new FuncType(anns, declType, args);
+  }
+
+  /**
+   * Getter for function types without annotations.
+   * @param declType declared return type
+   * @param args argument types
+   * @return function type
+   */
+  public static FuncType get(final SeqType declType, final SeqType... args) {
+    return get(AnnList.EMPTY, declType, args);
+  }
+
+  /**
+   * Getter for a function's type.
+   * @param anns annotations
+   * @param declType declared return type (can be {@code null})
+   * @param params parameters (can contain {@code null} references)
+   * @return function type
+   */
+  public static FuncType get(final AnnList anns, final SeqType declType, final Var[] params) {
+    final int pl = params.length;
+    final SeqType[] argTypes = new SeqType[pl];
+    for(int p = 0; p < pl; p++) {
+      argTypes[p] = params[p] == null ? ITEM_ZM : params[p].declaredType();
+    }
+    return new FuncType(anns, declType, argTypes);
+  }
+
+  /**
+   * Finds and returns the specified function type.
+   * @param name name of type
+   * @return type or {@code null}
+   */
+  public static Type get(final QNm name) {
+    if(name.uri().length == 0) {
+      switch(Token.string(name.local())) {
+        case QueryText.FUNCTION:
+        case QueryText.FN:       return FUNCTION;
+        case QueryText.MAP:      return MAP;
+        case QueryText.RECORD:   return RECORD;
+        case QueryText.ARRAY:    return ARRAY;
+      }
+    }
+    return null;
   }
 
   @Override
@@ -80,7 +135,7 @@ public final class FuncType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(FUNCTION, AtomType.ITEM)) return true;
+    if(this == type || type.oneOf(FUNCTION, BasicType.ITEM)) return true;
     if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
     if(this == FUNCTION || !(type instanceof final FuncType ft)) return false;
 
@@ -102,7 +157,7 @@ public final class FuncType extends FType {
     if(type.instanceOf(this)) return this;
 
     final FuncType ft = type.funcType();
-    if(ft == null) return AtomType.ITEM;
+    if(ft == null) return BasicType.ITEM;
 
     final int arity = argTypes.length, nargs = ft.argTypes.length;
     if(arity != nargs) return FUNCTION;
@@ -140,27 +195,6 @@ public final class FuncType extends FType {
   }
 
   /**
-   * Getter for function types.
-   * @param anns annotations
-   * @param declType declared return type
-   * @param args argument types
-   * @return function type
-   */
-  public static FuncType get(final AnnList anns, final SeqType declType, final SeqType... args) {
-    return new FuncType(anns, declType, args);
-  }
-
-  /**
-   * Getter for function types without annotations.
-   * @param declType declared return type
-   * @param args argument types
-   * @return function type
-   */
-  public static FuncType get(final SeqType declType, final SeqType... args) {
-    return get(AnnList.EMPTY, declType, args);
-  }
-
-  /**
    * Return function type with fewer arguments.
    * @param arity arity of target type
    * @return function type
@@ -169,42 +203,8 @@ public final class FuncType extends FType {
     return get(anns, declType, Arrays.copyOf(argTypes, arity));
   }
 
-  /**
-   * Finds and returns the specified function type.
-   * @param name name of type
-   * @return type or {@code null}
-   */
-  public static Type find(final QNm name) {
-    if(name.uri().length == 0) {
-      switch(Token.string(name.local())) {
-        case QueryText.FUNCTION:
-        case QueryText.FN:       return FUNCTION;
-        case QueryText.MAP:      return MAP;
-        case QueryText.RECORD:   return RECORD;
-        case QueryText.ARRAY:    return ARRAY;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Getter for a function's type.
-   * @param anns annotations
-   * @param declType declared return type (can be {@code null})
-   * @param params parameters
-   * @return function type
-   */
-  public static FuncType get(final AnnList anns, final SeqType declType, final Var[] params) {
-    final int pl = params.length;
-    final SeqType[] argTypes = new SeqType[pl];
-    for(int p = 0; p < pl; p++) {
-      argTypes[p] = params[p] == null ? ITEM_ZM : params[p].declaredType();
-    }
-    return new FuncType(anns, declType, argTypes);
-  }
-
   @Override
-  public AtomType atomic() {
+  public BasicType atomic() {
     return null;
   }
 

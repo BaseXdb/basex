@@ -111,7 +111,7 @@ public final class List extends Arr {
     for(int e = 0; e <= el; e++) {
       final Expr expr = e < el ? exprs[e] : null;
       long mn = Long.MIN_VALUE, mx = 0;
-      if(expr instanceof final Itr itr && itr.type == AtomType.INTEGER) {
+      if(expr instanceof final Itr itr && itr.type == BasicType.INTEGER) {
         final long l = itr.itr();
         mn = l;
         mx = l;
@@ -241,7 +241,7 @@ public final class List extends Arr {
       if(exprs.length != el) {
         // remove duplicate list expressions
         expr = List.get(cc, info, exprs);
-      } else if(seqType().type == AtomType.INTEGER) {
+      } else if(seqType().type == BasicType.INTEGER) {
         // merge numbers and ranges
         expr = toRange();
       }

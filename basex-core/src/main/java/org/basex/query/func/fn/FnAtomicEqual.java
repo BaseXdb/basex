@@ -31,10 +31,10 @@ public final class FnAtomicEqual extends StandardFunc {
     // atomic-equal(2, 3) → 2 = 3
     if(sc().collation == null && st1.one() && st2.one() && !st1.mayBeArray() &&
         !st2.mayBeArray() && tp1 != null && tp2 != null) {
-      if(tp1.oneOf(AtomType.UNTYPED_ATOMIC, AtomType.ANY_URI)) tp1 = AtomType.STRING;
-      if(tp2.oneOf(AtomType.UNTYPED_ATOMIC, AtomType.ANY_URI)) tp2 = AtomType.STRING;
-      if(tp1 == tp2 && (tp1.oneOf(AtomType.QNAME, AtomType.BOOLEAN) ||
-          tp1.instanceOf(AtomType.DECIMAL) || tp1.instanceOf(AtomType.STRING))) {
+      if(tp1.oneOf(BasicType.UNTYPED_ATOMIC, BasicType.ANY_URI)) tp1 = BasicType.STRING;
+      if(tp2.oneOf(BasicType.UNTYPED_ATOMIC, BasicType.ANY_URI)) tp2 = BasicType.STRING;
+      if(tp1 == tp2 && (tp1.oneOf(BasicType.QNAME, BasicType.BOOLEAN) ||
+          tp1.instanceOf(BasicType.DECIMAL) || tp1.instanceOf(BasicType.STRING))) {
         return new CmpG(info, value1, value2, CmpOp.EQ).optimize(cc);
       }
     }

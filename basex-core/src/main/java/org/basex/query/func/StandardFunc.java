@@ -91,9 +91,9 @@ public abstract class StandardFunc extends Arr {
       // consider variable-size parameters
       final int p = Math.min(a, definition.types.length - 1);
       final Type type = definition.types[p].type;
-      if(type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
-        final Simplify mode = type.instanceOf(AtomType.NUMERIC) ? Simplify.NUMBER :
-            type.instanceOf(AtomType.STRING) ? Simplify.STRING : Simplify.DATA;
+      if(type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+        final Simplify mode = type.instanceOf(BasicType.NUMERIC) ? Simplify.NUMBER :
+            type.instanceOf(BasicType.STRING) ? Simplify.STRING : Simplify.DATA;
         arg(a, arg -> arg.simplifyFor(mode, cc));
       }
     }
@@ -365,7 +365,7 @@ public abstract class StandardFunc extends Arr {
    * @return date
    * @throws QueryException query exception
    */
-  protected final ADate toDate(final Item item, final AtomType type, final QueryContext qc)
+  protected final ADate toDate(final Item item, final BasicType type, final QueryContext qc)
       throws QueryException {
     return (ADate) (item.type.isUntyped() ? type.cast(item, qc, info) : checkType(item, type));
   }
@@ -428,7 +428,7 @@ public abstract class StandardFunc extends Arr {
   protected final Dur toDur(final Item item) throws QueryException {
     if(item instanceof final Dur dur) return dur;
     if(item.type.isUntyped()) return new Dur(item.string(info), info);
-    throw typeError(item, AtomType.DURATION, info);
+    throw typeError(item, BasicType.DURATION, info);
   }
 
   /**
@@ -602,7 +602,7 @@ public abstract class StandardFunc extends Arr {
       item = item.atomItem(qc, info);
       if(item.isEmpty()) {
         if(empty) return null;
-        throw typeError(item, AtomType.ITEM, info);
+        throw typeError(item, BasicType.ITEM, info);
       }
     }
     return item;
@@ -711,7 +711,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final long toMs(final Expr expr, final QueryContext qc) throws QueryException {
-    final Dtm dtm = (Dtm) checkType(expr, AtomType.DATE_TIME, qc);
+    final Dtm dtm = (Dtm) checkType(expr, BasicType.DATE_TIME, qc);
     if(dtm.yea() > 292278993) throw INTRANGE_X.get(info, dtm.yea());
     return dtm.toJava().toGregorianCalendar().getTimeInMillis();
   }

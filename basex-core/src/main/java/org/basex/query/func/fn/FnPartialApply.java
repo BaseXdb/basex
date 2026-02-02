@@ -21,7 +21,7 @@ import org.basex.query.var.*;
  */
 public class FnPartialApply extends StandardFunc {
   /** The type of parameter "arguments". */
-  private static final SeqType ARGS_TYPE = MapType.get(AtomType.POSITIVE_INTEGER,
+  private static final SeqType ARGS_TYPE = MapType.get(BasicType.POSITIVE_INTEGER,
       Types.ITEM_ZM).seqType();
   /** The name of parameter "arguments". */
   private static final QNm ARGS_NAME = new QNm("arguments");

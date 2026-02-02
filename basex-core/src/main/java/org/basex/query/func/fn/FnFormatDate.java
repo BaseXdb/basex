@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class FnFormatDate extends FormatFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return formatDate(AtomType.DATE, qc);
+    return formatDate(BasicType.DATE, qc);
   }
 }

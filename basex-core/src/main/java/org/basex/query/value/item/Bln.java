@@ -30,7 +30,7 @@ public final class Bln extends Item {
    * @param value boolean value
    */
   private Bln(final boolean value) {
-    super(AtomType.BOOLEAN);
+    super(BasicType.BOOLEAN);
     this.value = value;
   }
 
@@ -104,7 +104,7 @@ public final class Bln extends Item {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    final boolean b = item.type == AtomType.BOOLEAN ? item.bool(ii) : parse(item, ii);
+    final boolean b = item.type == BasicType.BOOLEAN ? item.bool(ii) : parse(item, ii);
     return value == b ? 0 : b ? -1 : 1;
   }
 
@@ -140,7 +140,7 @@ public final class Bln extends Item {
   public static boolean parse(final Item item, final InputInfo info) throws QueryException {
     final Boolean b = parse(item.string(info));
     if(b != null) return b;
-    throw AtomType.BOOLEAN.castError(item, info);
+    throw BasicType.BOOLEAN.castError(item, info);
   }
 
   /**

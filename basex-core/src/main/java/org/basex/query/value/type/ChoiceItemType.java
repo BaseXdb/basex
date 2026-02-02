@@ -160,7 +160,7 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
-  public AtomType atomic() {
+  public BasicType atomic() {
     return union.atomic();
   }
 

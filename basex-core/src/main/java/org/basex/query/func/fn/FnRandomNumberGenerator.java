@@ -22,7 +22,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   private static final FuncType PERMUTE_TYPE = FuncType.get(Types.ITEM_ZM, Types.ITEM_ZM);
   /** Type for next function. */
   private static final FuncType NEXT_TYPE =
-      FuncType.get(MapType.get(AtomType.STRING, Types.ITEM_O).seqType());
+      FuncType.get(MapType.get(BasicType.STRING, Types.ITEM_O).seqType());
 
   /** Number key. */
   private static final Str NUMBER = Str.get("number");

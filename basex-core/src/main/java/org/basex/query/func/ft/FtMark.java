@@ -41,7 +41,7 @@ public class FtMark extends StandardFunc {
     final Long length = toLongOrNull(arg(2), qc);
 
     final byte[] m = name.isEmpty() ? MARK : toToken(name);
-    if(!XMLToken.isQName(m)) throw valueError(AtomType.QNAME, m, info);
+    if(!XMLToken.isQName(m)) throw valueError(BasicType.QNAME, m, info);
     final int l = length != null ? (int) Math.min(Integer.MAX_VALUE, length) :
       extract ? 150 : Integer.MAX_VALUE;
 

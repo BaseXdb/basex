@@ -1,6 +1,6 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -21,12 +21,11 @@ import org.basex.util.hash.*;
  * @author Gunther Rademacher
  */
 public class FnSchemaType extends StandardFunc {
-
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final QNm name = toQNm(arg(0).atomItem(qc, info));
-    Type type = find(name, true);
-    if(type == null) type = ListType.find(name);
+    Type type = get(name, true);
+    if(type == null) type = ListType.get(name);
     return annotate(qc, info, type);
   }
 
@@ -44,9 +43,9 @@ public class FnSchemaType extends StandardFunc {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final Type type : types) {
       final QNm name;
-      final AtomType baseType;
+      final BasicType baseType;
       final Variety variety;
-      AtomType primType = null;
+      BasicType primType = null;
       FuncItem members = null;
       FuncItem matches = null;
       boolean constructor = false;
@@ -56,10 +55,10 @@ public class FnSchemaType extends StandardFunc {
         variety = Variety.list;
         members = TypeAnnotation.funcItem(info, listType.atomic());
         constructor = true;
-      } else if(type instanceof final AtomType atomType) {
-        name = atomType.qname();
-        if(atomType.atomic() != null) matches = Matches.funcItem(atomType, qc, info);
-        switch(atomType) {
+      } else if(type instanceof final BasicType BasicType) {
+        name = BasicType.qname();
+        if(BasicType.atomic() != null) matches = Matches.funcItem(BasicType, qc, info);
+        switch(BasicType) {
           case ANY_TYPE:
             baseType = null;
             variety = Variety.mixed;
@@ -83,10 +82,10 @@ public class FnSchemaType extends StandardFunc {
             constructor = true;
             break;
           default:
-            final AtomType parent = atomType.parent();
+            final BasicType parent = BasicType.parent();
             baseType = parent == NUMERIC ? ANY_ATOMIC_TYPE : parent;
             variety = Variety.atomic;
-            for(primType = atomType; !primType.parent().oneOf(ANY_ATOMIC_TYPE, NUMERIC, null);)
+            for(primType = BasicType; !primType.parent().oneOf(ANY_ATOMIC_TYPE, NUMERIC, null);)
               primType = primType.parent();
             constructor = !type.oneOf(QNAME, NOTATION);
         }
@@ -127,7 +126,7 @@ public class FnSchemaType extends StandardFunc {
     /** Sequence type. */
     private final SeqType seqType;
     /** The types to be annotated. */
-    private final AtomType[] types;
+    private final BasicType[] types;
 
     /**
      * Constructor.
@@ -135,7 +134,7 @@ public class FnSchemaType extends StandardFunc {
      * @param info input info
      * @param types the types to be annotated
      */
-    private TypeAnnotation(final SeqType seqType, final InputInfo info, final AtomType... types) {
+    private TypeAnnotation(final SeqType seqType, final InputInfo info, final BasicType... types) {
       super(info, seqType);
       this.seqType = seqType;
       this.types = types;
@@ -147,7 +146,7 @@ public class FnSchemaType extends StandardFunc {
      * @param info input info
      * @return the function item
      */
-    public static FuncItem funcItem(final InputInfo info, final AtomType... types) {
+    public static FuncItem funcItem(final InputInfo info, final BasicType... types) {
       final SeqType st = Records.SCHEMA_TYPE.get().seqType(Occ.get(types.length, types.length));
       return new FuncItem(info, new TypeAnnotation(st, info, types), new Var[] { },
           AnnList.EMPTY, FuncType.get(st), 0, null);
@@ -177,7 +176,7 @@ public class FnSchemaType extends StandardFunc {
     private static final FuncType FUNC_TYPE = FuncType.get(Types.BOOLEAN_O,
         Types.ANY_ATOMIC_TYPE_O);
     /** The type to be matched. */
-    final AtomType type;
+    final BasicType type;
 
     /**
      * Constructor.
@@ -185,7 +184,7 @@ public class FnSchemaType extends StandardFunc {
      * @param type the type to be matched
      * @param args the arguments
      */
-    private Matches(final InputInfo info, final AtomType type, final Expr... args) {
+    private Matches(final InputInfo info, final BasicType type, final Expr... args) {
       super(info, Types.BOOLEAN_O, args);
       this.type = type;
     }
@@ -197,7 +196,7 @@ public class FnSchemaType extends StandardFunc {
      * @param info input info
      * @return the function item
      */
-    public static FuncItem funcItem(final AtomType type, final QueryContext qc,
+    public static FuncItem funcItem(final BasicType type, final QueryContext qc,
         final InputInfo info) {
       final Var var = new VarScope().addNew(new QNm("value"), Types.ANY_ATOMIC_TYPE_O, qc, info);
       final Var[] params = { var };

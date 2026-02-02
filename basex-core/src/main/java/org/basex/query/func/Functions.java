@@ -299,10 +299,10 @@ public final class Functions {
    * @throws QueryException query exception
    */
   private static Cast constructorCall(final QNm name, final FuncBuilder fb) throws QueryException {
-    Type type = ListType.find(name);
-    if(type == null) type = AtomType.find(name, false);
-    if(type == null) throw WHICHFUNC_X.get(fb.info, AtomType.similar(name));
-    if(type.oneOf(AtomType.NOTATION, AtomType.ANY_ATOMIC_TYPE))
+    Type type = ListType.get(name);
+    if(type == null) type = BasicType.get(name, false);
+    if(type == null) throw WHICHFUNC_X.get(fb.info, BasicType.similar(name));
+    if(type.oneOf(BasicType.NOTATION, BasicType.ANY_ATOMIC_TYPE))
       throw ABSTRACTFUNC_X.get(fb.info, name.prefixId());
 
     final Expr[] prepared = prepareArgs(fb, CAST_PARAM, 0, 1, name.string());

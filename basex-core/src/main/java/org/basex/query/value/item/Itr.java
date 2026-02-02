@@ -44,7 +44,7 @@ public final class Itr extends ANum {
    * @param value value
    */
   private Itr(final long value) {
-    this(value, AtomType.INTEGER);
+    this(value, BasicType.INTEGER);
   }
 
   /**
@@ -73,7 +73,7 @@ public final class Itr extends ANum {
    * @return instance
    */
   public static Itr get(final long value, final Type type) {
-    return type == AtomType.INTEGER ? get(value) : new Itr(value, type);
+    return type == BasicType.INTEGER ? get(value) : new Itr(value, type);
   }
 
   @Override
@@ -156,7 +156,7 @@ public final class Itr extends ANum {
 
   @Override
   public Object toJava() {
-    return switch((AtomType) type) {
+    return switch((BasicType) type) {
       case BYTE -> (byte) value;
       case SHORT, UNSIGNED_BYTE -> (short) value;
       case UNSIGNED_SHORT -> (char) value;
@@ -189,6 +189,6 @@ public final class Itr extends ANum {
   public static long parse(final byte[] value, final InputInfo info) throws QueryException {
     final long l = Token.toLong(value);
     if(l != Long.MIN_VALUE || Token.eq(Token.trim(value), Token.MIN_LONG)) return l;
-    throw AtomType.INTEGER.castError(value, info);
+    throw BasicType.INTEGER.castError(value, info);
   }
 }

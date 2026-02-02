@@ -175,7 +175,7 @@ public abstract class JsonSerializer extends StandardSerializer {
   protected void atomic(final Item item) throws IOException {
     try {
       final Type type = item.type;
-      if(type.oneOf(AtomType.DOUBLE, AtomType.FLOAT) || canonical && type.isNumber()) {
+      if(type.oneOf(BasicType.DOUBLE, BasicType.FLOAT) || canonical && type.isNumber()) {
         final double d = item.dbl(null);
         if(Double.isFinite(d)) {
           out.print(Dbl.string(d));
@@ -184,7 +184,7 @@ public abstract class JsonSerializer extends StandardSerializer {
           out.print(d == Double.POSITIVE_INFINITY ? JsonConstants.INF :
             d == Double.NEGATIVE_INFINITY ? JsonConstants.NINF : JsonConstants.NULL);
         }
-      } else if(type == AtomType.BOOLEAN || type.isNumber()) {
+      } else if(type == BasicType.BOOLEAN || type.isNumber()) {
         out.print(item.string(null));
       } else {
         string(item.string(null));

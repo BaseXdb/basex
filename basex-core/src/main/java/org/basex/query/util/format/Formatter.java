@@ -166,7 +166,7 @@ public abstract class Formatter extends FormatUtil {
     if(contains(place, '/')) { // IANA time zone name
       try {
         final ZoneRules rules = ZoneId.of(string(place)).getRules();
-        final ZoneOffset offset = dt.type == AtomType.TIME
+        final ZoneOffset offset = dt.type == BasicType.TIME
             ? rules.getStandardOffset(Instant.now())
             : rules.getOffset(dt.toJava().toGregorianCalendar().toInstant());
         date = dt.timeZone(DTDur.get(offset.getTotalSeconds() * 1000L), false, info);
@@ -192,7 +192,7 @@ public abstract class Formatter extends FormatUtil {
         long num = 0;
 
         final Type type = date.type;
-        final boolean dat = type == AtomType.DATE, tim = type == AtomType.TIME;
+        final boolean dat = type == BasicType.DATE, tim = type == BasicType.TIME;
         boolean err = false;
         switch(compSpec) {
           case 'Y':
@@ -228,7 +228,7 @@ public abstract class Formatter extends FormatUtil {
             num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             // first week of month: fix value, according to ISO 8601
             if(num == 0) {
-              num = new Dtm(new Dtm(date, AtomType.DATE_TIME, info), new DTDur(date.day() * 24, 0),
+              num = new Dtm(new Dtm(date, BasicType.DATE_TIME, info), new DTDur(date.day() * 24, 0),
                   false, info).toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             }
             err = tim;

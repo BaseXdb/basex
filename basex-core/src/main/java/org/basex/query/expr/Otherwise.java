@@ -97,7 +97,7 @@ public final class Otherwise extends Arr {
       occ = occ == null ? o : occ.union(o);
     }
     final SeqType st = SeqType.union(exprs, false);
-    exprType.assign(st != null ? st.type : AtomType.ITEM, occ).data(exprs);
+    exprType.assign(st != null ? st.type : BasicType.ITEM, occ).data(exprs);
 
     return this;
   }

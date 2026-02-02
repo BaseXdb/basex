@@ -80,7 +80,7 @@ public final class CmpIR extends Single {
     // allowed: $integer > 2, $value = 10 to 20; rejected: $double  > 2
     final Type type1 = expr1.seqType().type;
     final boolean cmpEq = cmp.op == CmpOp.EQ;
-    if(!(type1.instanceOf(AtomType.INTEGER) || cmpEq && type1.isUntyped())) return cmp;
+    if(!(type1.instanceOf(BasicType.INTEGER) || cmpEq && type1.isUntyped())) return cmp;
 
     long mn, mx;
     if(expr2 instanceof final RangeSeq rs) {

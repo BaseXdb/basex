@@ -21,7 +21,7 @@ public final class FnString extends ContextFn {
     final Item value = context(qc).item(qc, info);
 
     if(value.isEmpty()) return Str.EMPTY;
-    if(value.type == AtomType.STRING) return value;
+    if(value.type == BasicType.STRING) return value;
     if(!(value instanceof FItem) || value instanceof XQJava) return Str.get(value.string(info));
 
     throw FISTRING_X.get(info, value);

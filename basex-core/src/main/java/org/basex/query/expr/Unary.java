@@ -39,8 +39,8 @@ public final class Unary extends Single {
 
     // no negation, numeric value: return operand
     final SeqType st = expr.seqType();
-    final Type type = st.type.isUntyped() ? AtomType.DOUBLE :
-      st.type.instanceOf(AtomType.INTEGER) ? AtomType.INTEGER : st.type;
+    final Type type = st.type.isUntyped() ? BasicType.DOUBLE :
+      st.type.instanceOf(BasicType.INTEGER) ? BasicType.INTEGER : st.type;
     final Occ occ = st.oneOrMore() && !st.mayBeArray() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
     exprType.assign(type, occ);
 
@@ -67,9 +67,9 @@ public final class Unary extends Single {
     if(!type.isNumber()) throw numberError(this, item);
 
     if(!minus) return item;
-    if(type == AtomType.DOUBLE) return Dbl.get(-item.dbl(info));
-    if(type == AtomType.FLOAT) return Flt.get(-item.flt(info));
-    if(type == AtomType.DECIMAL) return Dec.get(item.dec(info).negate());
+    if(type == BasicType.DOUBLE) return Dbl.get(-item.dbl(info));
+    if(type == BasicType.FLOAT) return Flt.get(-item.flt(info));
+    if(type == BasicType.DECIMAL) return Dec.get(item.dec(info).negate());
     // default: integer
     final long l = item.itr(info);
     if(l == Long.MIN_VALUE) throw RANGE_X.get(info, item);

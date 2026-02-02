@@ -74,7 +74,7 @@ public class DbGetValue extends DbAccessFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     if(!defined(1)) {
-      exprType.assign(MapType.get(AtomType.STRING, Types.ITEM_ZM).seqType());
+      exprType.assign(MapType.get(BasicType.STRING, Types.ITEM_ZM).seqType());
     }
     return this;
   }

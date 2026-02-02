@@ -1761,8 +1761,8 @@ public enum QueryError {
       final InputInfo info) {
     final String expected, found;
     final Type type = value.seqType().type;
-    if(type.instanceOf(AtomType.NUMERIC) || type.instanceOf(AtomType.STRING) ||
-        type.oneOf(AtomType.BOOLEAN, AtomType.ANY_URI)) {
+    if(type.instanceOf(BasicType.NUMERIC) || type.instanceOf(BasicType.STRING) ||
+        type.oneOf(BasicType.BOOLEAN, BasicType.ANY_URI)) {
       expected = "Single " + type;
       found = "sequence";
     } else if(pos) {

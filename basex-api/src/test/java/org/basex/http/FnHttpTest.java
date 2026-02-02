@@ -128,7 +128,7 @@ public abstract class FnHttpTest extends HTTPTest {
       final Value value = qp.value();
       checkResponse(value, 2, 200);
 
-      assertEquals(AtomType.STRING, value.itemAt(1).type);
+      assertEquals(BasicType.STRING, value.itemAt(1).type);
     }
 
     // Get3 - with status-only='true'

@@ -99,7 +99,7 @@ public final class Range extends Arr {
   public Expr optimizePos(final CmpOp op, final CompileContext cc) throws QueryException {
     final Predicate<Expr> type = e -> {
       final SeqType st = e.seqType();
-      return st.one() && (st.type.instanceOf(AtomType.INTEGER) || st.type.isUntyped());
+      return st.one() && (st.type.instanceOf(BasicType.INTEGER) || st.type.isUntyped());
     };
     if(!type.test(exprs[0]) || !type.test(exprs[1])) return this;
 

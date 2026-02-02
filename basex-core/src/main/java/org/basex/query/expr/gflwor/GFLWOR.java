@@ -306,14 +306,14 @@ public final class GFLWOR extends ParseExpr {
             // replace with positional variable
             //   for $i at $p in ('a', 'b') return $p → for $p in 1 to 2 return $p
             fr.expr = cc.replaceWith(fr.expr, RangeSeq.get(1, fs, true));
-            fr.exprType.assign(AtomType.INTEGER);
+            fr.exprType.assign(BasicType.INTEGER);
             fr.var = fr.pos;
             fr.remove(cc, fr.pos);
           } else {
             // replace with singleton sequence (will never be accessed)
             //   for $i in 1 to 3 return <a/> → for $i in replicate('', 3) return $i
             fr.expr = cc.replaceWith(fr.expr, SingletonSeq.get(Str.EMPTY, fs));
-            fr.exprType.assign(AtomType.STRING);
+            fr.exprType.assign(BasicType.STRING);
           }
           changed = true;
         }

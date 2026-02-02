@@ -108,7 +108,7 @@ public final class FnParseIetfDate extends StandardFunc {
         addNumber(tb, Math.abs(z % 60), 2);
       }
       try {
-        return new Dtm(tb.finish(), AtomType.DATE_TIME, info);
+        return new Dtm(tb.finish(), BasicType.DATE_TIME, info);
       } catch(final QueryException ex) {
         Util.debug(ex);
         throw QueryError.IETF_INV_X.get(info, original);

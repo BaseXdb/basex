@@ -39,7 +39,7 @@ public final class FnData extends ContextFn {
     if(input != null) {
       final SeqType st = input.seqType();
       if(st.zero()) return input;
-      final AtomType type = st.type.atomic();
+      final BasicType type = st.type.atomic();
       if(type == st.type) {
         // data('x') → 'x'
         // $string[data() = 'a'] → $string[. = 'a']

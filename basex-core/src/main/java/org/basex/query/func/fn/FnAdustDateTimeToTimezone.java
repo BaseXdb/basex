@@ -14,6 +14,6 @@ import org.basex.util.*;
 public final class FnAdustDateTimeToTimezone extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return adjust(AtomType.DATE_TIME, qc);
+    return adjust(BasicType.DATE_TIME, qc);
   }
 }

@@ -12,7 +12,7 @@ import org.basex.util.list.*;
 import org.basex.util.similarity.*;
 
 /**
- * XQuery types.
+ * XDM types.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -42,7 +42,7 @@ public interface Type {
     /** choice item type.         */ CIT(29),
     /** item().                   */ ITEM(32),
 
-    // atomic types
+    // basic types
     /** xs:untyped.               */ UTY(33),
     /** xs:anyType.               */ ATY(34),
     /** xs:anySimpleType.         */ AST(35),
@@ -274,7 +274,7 @@ public interface Type {
    * Returns the atomic type.
    * @return atomic type (can be {@code null}, e.g. for function types)
    */
-  AtomType atomic();
+  BasicType atomic();
 
   /**
    * Returns the type ID.

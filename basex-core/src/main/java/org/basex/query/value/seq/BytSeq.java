@@ -27,7 +27,7 @@ public final class BytSeq extends NativeSeq {
    * @param values bytes
    */
   private BytSeq(final byte[] values) {
-    super(values.length, AtomType.BYTE);
+    super(values.length, BasicType.BYTE);
     this.values = values;
   }
 
@@ -87,6 +87,7 @@ public final class BytSeq extends NativeSeq {
    */
   public static Value get(final byte[] values) {
     final int vl = values.length;
-    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], AtomType.BYTE) : new BytSeq(values);
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], BasicType.BYTE) :
+      new BytSeq(values);
   }
 }

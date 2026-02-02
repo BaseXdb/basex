@@ -1,6 +1,6 @@
 package org.basex.query.func.java;
 
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.NodeType.*;
 
 import java.math.*;

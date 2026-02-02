@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  */
 public final class XQStrMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.STRING, Types.STRING_O);
+  private static final MapType TYPE = MapType.get(BasicType.STRING, Types.STRING_O);
   /** Hash map. */
   private final TokenObjectMap<byte[]> map;
 

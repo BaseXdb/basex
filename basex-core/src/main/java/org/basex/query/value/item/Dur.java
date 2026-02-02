@@ -45,7 +45,7 @@ public class Dur extends ADateDur {
    * @throws QueryException query exception
    */
   public Dur(final byte[] value, final InputInfo info) throws QueryException {
-    this(value, AtomType.DURATION, info);
+    this(value, BasicType.DURATION, info);
   }
 
   /**
@@ -61,7 +61,7 @@ public class Dur extends ADateDur {
    * @param dur duration
    */
   public Dur(final Dur dur) {
-    this(dur, AtomType.DURATION);
+    this(dur, BasicType.DURATION);
   }
 
   /**

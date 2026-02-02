@@ -1,7 +1,7 @@
 package org.basex.query.func.fn;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 
 import java.math.*;
 import java.util.*;
@@ -43,7 +43,7 @@ public class FnSum extends NumericFn {
       // no default value
       if(st.zero()) return cc.voidAndReturn(values, Itr.ZERO, info);
       if(!st.mayBeArray()) {
-        final SeqType ost = optType(values, false);
+        final SeqType ost = optType(values);
         if(ost != null) exprType.assign(ost);
       }
     } else if(st.zero()) {
@@ -52,7 +52,7 @@ public class FnSum extends NumericFn {
       }
     } else if(!st.mayBeArray() && !stZero.mayBeArray()) {
       if(st.oneOrMore()) return cc.function(Function.SUM, info, values);
-      final SeqType ost = optType(values, false), zst = optType(zero, false);
+      final SeqType ost = optType(values), zst = optType(zero);
       final Type type = ost != null && zst != null ? ost.type.union(zst.type) : ANY_ATOMIC_TYPE;
       final Occ occ = stZero.oneOrMore() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
       exprType.assign(type, occ);

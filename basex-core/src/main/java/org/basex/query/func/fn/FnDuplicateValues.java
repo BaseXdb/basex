@@ -89,7 +89,7 @@ public class FnDuplicateValues extends StandardFunc {
     final SeqType st = values.seqType();
     if(st.zero()) return values;
 
-    final AtomType type = st.type.atomic();
+    final BasicType type = st.type.atomic();
     if(type != null) {
       // assign atomic type of argument
       exprType.assign(type);
@@ -113,7 +113,7 @@ public class FnDuplicateValues extends StandardFunc {
    * @return integer or {@link Integer#MIN_VALUE}
    */
   public static int toInt(final Item item) {
-    if(item.type == AtomType.INTEGER) {
+    if(item.type == BasicType.INTEGER) {
       final long l = ((Itr) item).itr();
       final int i = (int) l;
       if(i == l) return i;

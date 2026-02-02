@@ -16,7 +16,7 @@ public abstract class NumericFn extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr expr = optFirst();
     if(expr != this) return expr;
-    final SeqType st = optType(arg(0), false);
+    final SeqType st = optType(arg(0));
     if(st != null) exprType.assign(st);
     return this;
   }
@@ -24,14 +24,12 @@ public abstract class NumericFn extends StandardFunc {
   /**
    * Returns a numeric type for the specified type.
    * @param expr expression
-   * @param normalize use xs:integer for integer subtypes
    * @return sequence type or {@code null}
    */
-  protected static SeqType optType(final Expr expr, final boolean normalize) {
+  protected static SeqType optType(final Expr expr) {
     final SeqType st = expr.seqType();
     Type type = st.type;
-    if(type.isUntyped()) type = AtomType.DOUBLE;
-    else if(normalize && type.instanceOf(AtomType.INTEGER)) type = AtomType.INTEGER;
+    if(type.isUntyped()) type = BasicType.DOUBLE;
     if(type.isNumber()) return type.seqType(st.occ.intersect(Occ.ZERO_OR_ONE));
     return null;
   }

@@ -27,16 +27,16 @@ public enum Records {
   ),
   /** Record definition. */
   LOAD_XQUERY_MODULE("load-xquery-module", false,
-    field("variables", MapType.get(AtomType.QNAME, Types.ITEM_ZO).seqType()),
-    field("functions", MapType.get(AtomType.QNAME,
-      MapType.get(AtomType.INTEGER, Types.FUNCTION_O).seqType()).seqType())),
+    field("variables", MapType.get(BasicType.QNAME, Types.ITEM_ZO).seqType()),
+    field("functions", MapType.get(BasicType.QNAME,
+      MapType.get(BasicType.INTEGER, Types.FUNCTION_O).seqType()).seqType())),
   /** Record definition. */
   MEMBER("member", false,
     field("value", Types.ITEM_ZM)),
   /** Record definition. */
   PARSED_CSV_STRUCTURE("parsed-csv-structure", false,
     field("columns", Types.STRING_ZM),
-    field("column-index", MapType.get(AtomType.STRING, Types.INTEGER_O).seqType(Occ.ZERO_OR_ONE)),
+    field("column-index", MapType.get(BasicType.STRING, Types.INTEGER_O).seqType(Occ.ZERO_OR_ONE)),
     field("rows", ArrayType.get(Types.STRING_O).seqType(Occ.ZERO_OR_MORE)),
     field("get", FuncType.get(Types.STRING_O, Types.POSITIVE_INTEGER_O,
       ChoiceItemType.get(Types.POSITIVE_INTEGER_O, Types.STRING_O).seqType()).seqType())),
@@ -58,7 +58,7 @@ public enum Records {
     field("query", Types.STRING_ZO, true),
     field("fragment", Types.STRING_ZO, true),
     field("path-segments", Types.STRING_ZM, true),
-    field("query-parameters", MapType.get(AtomType.STRING, Types.STRING_ZM).
+    field("query-parameters", MapType.get(BasicType.STRING, Types.STRING_ZM).
         seqType(Occ.ZERO_OR_ONE), true),
     field("filepath", Types.STRING_ZO, true)
   );

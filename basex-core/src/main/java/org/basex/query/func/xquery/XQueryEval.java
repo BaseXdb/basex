@@ -34,7 +34,7 @@ public class XQueryEval extends StandardFunc {
     public static final EnumOption<Perm> PERMISSION = new EnumOption<>("permission", Perm.ADMIN);
     /** Timeout in seconds. */
     public static final ValueOption TIMEOUT =
-        new ValueOption("timeout", AtomType.DECIMAL.seqType(), Dec.ZERO);
+        new ValueOption("timeout", BasicType.DECIMAL.seqType(), Dec.ZERO);
     /** Maximum amount of megabytes that may be allocated by the query. */
     public static final NumberOption MEMORY = new NumberOption("memory", 0);
     /** Query base-uri. */

@@ -86,7 +86,7 @@ public final class ValueBuilder {
       tree = tr;
     }
     if(tr > 0 && (tr -= value.size()) <= 0) {
-      sb = new TreeSeqBuilder().add(sb.value(AtomType.ITEM), job);
+      sb = new TreeSeqBuilder().add(sb.value(BasicType.ITEM), job);
       tree = tr;
     }
     builder = sb.add(value, job);
@@ -98,7 +98,7 @@ public final class ValueBuilder {
    * @return value
    */
   public Value value() {
-    return value(AtomType.ITEM);
+    return value(BasicType.ITEM);
   }
 
   /**
@@ -130,7 +130,7 @@ public final class ValueBuilder {
    * @return result of check
    */
   static boolean isStr(final Value value) {
-    return value instanceof Str && value.type == AtomType.STRING;
+    return value instanceof Str && value.type == BasicType.STRING;
   }
 
   /**
@@ -139,7 +139,7 @@ public final class ValueBuilder {
    * @return result of check
    */
   static boolean isAtm(final Value value) {
-    return value.type == AtomType.UNTYPED_ATOMIC;
+    return value.type == BasicType.UNTYPED_ATOMIC;
   }
 
   /**
@@ -148,7 +148,7 @@ public final class ValueBuilder {
    * @return result of check
    */
   static boolean isInt(final Value value) {
-    return value.type == AtomType.INTEGER;
+    return value.type == BasicType.INTEGER;
   }
 
   /**
@@ -157,7 +157,7 @@ public final class ValueBuilder {
    * @return result of check
    */
   static boolean isDbl(final Value value) {
-    return value.type == AtomType.DOUBLE;
+    return value.type == BasicType.DOUBLE;
   }
 
   /**
@@ -166,7 +166,7 @@ public final class ValueBuilder {
    * @return result of check
    */
   static boolean isBln(final Value value) {
-    return value.type == AtomType.BOOLEAN;
+    return value.type == BasicType.BOOLEAN;
   }
 
   @Override
@@ -211,7 +211,7 @@ public final class ValueBuilder {
 
     @Override
     public Value value(final Type type) {
-      return StrSeq.get(values, AtomType.UNTYPED_ATOMIC);
+      return StrSeq.get(values, BasicType.UNTYPED_ATOMIC);
     }
   }
 

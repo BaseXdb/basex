@@ -9,29 +9,28 @@ import java.util.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * XQuery list types.
+ * XDM list types.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public enum ListType implements Type {
   /** NMTOKENS type. */
-  NMTOKENS("NMTOKENS", AtomType.NMTOKEN),
+  NMTOKENS("NMTOKENS", BasicType.NMTOKEN),
   /** ENTITIES type. */
-  ENTITIES("ENTITIES", AtomType.ENTITY),
+  ENTITIES("ENTITIES", BasicType.ENTITY),
   /** IDREFS type. */
-  IDREFS("IDREFS", AtomType.IDREF);
+  IDREFS("IDREFS", BasicType.IDREF);
 
-  /** Atom Type. */
-  private final AtomType type;
   /** Name. */
-  private final QNm name;
+  private final byte[] name;
+  /** Atom Type. */
+  private final BasicType type;
 
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
@@ -39,19 +38,34 @@ public enum ListType implements Type {
   /**
    * Constructor.
    * @param name name
-   * @param type atomic type
+   * @param type type
    */
-  ListType(final String name, final AtomType type) {
-    this.name = new QNm(name, XS_URI);
+  ListType(final String name, final BasicType type) {
+    this.name = token(name);
     this.type = type;
   }
 
   /**
-   * Returns the name of this type.
+   * Finds and returns the specified type.
+   * @param qname name of type
+   * @return type or {@code null}
+   */
+  public static ListType get(final QNm qname) {
+    if(Token.eq(qname.uri(), XS_URI)) {
+      final byte[] ln = qname.local();
+      for(final ListType type : values()) {
+        if(Token.eq(ln, type.name)) return type;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Returns the name of a type.
    * @return name
    */
   public final QNm qname() {
-    return name;
+    return new QNm(name, XS_URI);
   }
 
   @Override
@@ -117,12 +131,12 @@ public enum ListType implements Type {
   @Override
   public final boolean instanceOf(final Type tp) {
     return this == tp || (tp instanceof final ChoiceItemType cit ? cit.hasInstance(this) :
-      tp == AtomType.ITEM);
+      tp == BasicType.ITEM);
   }
 
   @Override
   public final Type union(final Type tp) {
-    return this == tp ? tp : tp instanceof ChoiceItemType ? tp.union(this) : AtomType.ITEM;
+    return this == tp ? tp : tp instanceof ChoiceItemType ? tp.union(this) : BasicType.ITEM;
   }
 
   @Override
@@ -132,7 +146,7 @@ public enum ListType implements Type {
   }
 
   @Override
-  public final AtomType atomic() {
+  public final BasicType atomic() {
     return type;
   }
 
@@ -148,18 +162,6 @@ public enum ListType implements Type {
 
   @Override
   public final String toString() {
-    return Strings.concat(NSGlobal.prefix(name.uri()), ':', name.string());
-  }
-
-  /**
-   * Finds and returns the specified type.
-   * @param qname name of type
-   * @return type or {@code null}
-   */
-  public static ListType find(final QNm qname) {
-    for(final ListType lt : values()) {
-      if(lt.name.eq(qname)) return lt;
-    }
-    return null;
+    return new TokenBuilder().add(XS_PREFIX).add(':').add(name).toString();
   }
 }

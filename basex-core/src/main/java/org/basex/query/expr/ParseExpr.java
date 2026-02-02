@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.NodeType.*;
 
 import java.util.*;
@@ -91,7 +91,7 @@ public abstract class ParseExpr extends Expr {
     if(item1 == null) return Empty.VALUE;
     final Item item2 = iter.next();
     if(item2 == null) return item1;
-    throw typeError(item1.append(item2, qc), AtomType.ITEM, info);
+    throw typeError(item1.append(item2, qc), BasicType.ITEM, info);
   }
 
   @Override
@@ -771,7 +771,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final Item checkType(final Expr expr, final AtomType type, final QueryContext qc)
+  protected final Item checkType(final Expr expr, final BasicType type, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
     return item.type.isUntyped() ? type.cast(item, qc, info) : checkType(item, type);

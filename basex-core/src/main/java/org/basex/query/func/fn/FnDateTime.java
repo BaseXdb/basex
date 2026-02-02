@@ -22,9 +22,9 @@ public final class FnDateTime extends StandardFunc {
     if(date.isEmpty() || time.isEmpty()) return Empty.VALUE;
 
     final Dat dat = date.type.isUntyped() ? new Dat(date.string(info), info) :
-      (Dat) checkType(date, AtomType.DATE);
+      (Dat) checkType(date, BasicType.DATE);
     final Tim tim = time.type.isUntyped() ? new Tim(time.string(info), info) :
-      (Tim) checkType(time, AtomType.TIME);
+      (Tim) checkType(time, BasicType.TIME);
     return new Dtm(dat, tim, info);
   }
 

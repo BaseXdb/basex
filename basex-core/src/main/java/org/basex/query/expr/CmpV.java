@@ -83,10 +83,7 @@ public final class CmpV extends Cmp {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
     final Predicate<SeqType> p = st -> single ? st.one() : st.zeroOrOne();
-    if(p.test(st1) && p.test(st2) && CmpG.compatible(st1, st2, op)) {
-      return new CmpG(info, expr1, expr2, op).optimize(cc);
-    }
-    return this;
+    return p.test(st1) && p.test(st2) ? new CmpG(info, expr1, expr2, op).optimize(cc) : this;
   }
 
   @Override

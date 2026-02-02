@@ -1,6 +1,6 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -32,7 +32,7 @@ abstract class DateTimeFn extends StandardFunc {
    * @return adjusted item
    * @throws QueryException query exception
    */
-  final Item adjust(final AtomType type, final QueryContext qc) throws QueryException {
+  final Item adjust(final BasicType type, final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     final Item zone = arg(1).atomItem(qc, info);
     if(value.isEmpty()) return Empty.VALUE;

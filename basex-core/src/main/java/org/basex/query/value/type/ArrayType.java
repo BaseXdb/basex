@@ -70,7 +70,7 @@ public final class ArrayType extends FType {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(this == type || type.oneOf(ARRAY, FUNCTION, AtomType.ITEM)) return true;
+    if(this == type || type.oneOf(ARRAY, FUNCTION, BasicType.ITEM)) return true;
     if(type instanceof final ArrayType at) {
       return this != ARRAY && valueType.instanceOf(at.valueType);
     }
@@ -88,7 +88,7 @@ public final class ArrayType extends FType {
       type.instanceOf(this) ? this :
       type instanceof final ArrayType at ? union(at.valueType) :
       type instanceof MapType ? FUNCTION :
-      type instanceof FuncType ? type.union(this) : AtomType.ITEM;
+      type instanceof FuncType ? type.union(this) : BasicType.ITEM;
   }
 
   /**
@@ -119,7 +119,7 @@ public final class ArrayType extends FType {
   }
 
   @Override
-  public AtomType atomic() {
+  public BasicType atomic() {
     return valueType.type.atomic();
   }
 

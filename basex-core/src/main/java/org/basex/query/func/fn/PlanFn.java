@@ -63,19 +63,19 @@ public abstract class PlanFn extends StandardFunc {
 
   /** Types. */
   enum PlanType {
-    /** Type 'boolean'. */ BOOLEAN(AtomType.BOOLEAN),
-    /** Type 'numeric'. */ NUMERIC(AtomType.NUMERIC),
-    /** Type 'string'.  */ STRING(AtomType.STRING),
+    /** Type 'boolean'. */ BOOLEAN(BasicType.BOOLEAN),
+    /** Type 'numeric'. */ NUMERIC(BasicType.NUMERIC),
+    /** Type 'string'.  */ STRING(BasicType.STRING),
     /** Type 'skip'.    */ SKIP(null);
 
     /** Target type. */
-    final AtomType type;
+    final BasicType type;
 
     /**
      * Constructor.
      * @param type type
      */
-    PlanType(final AtomType type) {
+    PlanType(final BasicType type) {
       this.type = type;
     }
 
@@ -150,10 +150,10 @@ public abstract class PlanFn extends StandardFunc {
     Item cast(final Str item) {
       if(type != null) {
         try {
-          if(type.type == AtomType.BOOLEAN) {
+          if(type.type == BasicType.BOOLEAN) {
             final Boolean b = Bln.parse(item.string());
             if(b != null) return Bln.get(b);
-          } else if(type.type == AtomType.NUMERIC) {
+          } else if(type.type == BasicType.NUMERIC) {
             if(Token.contains(item.string(), 'e')) return Dbl.get(item.dbl(info));
             if(Token.contains(item.string(), '.')) return Dec.get(item.dec(info));
             return Itr.get(item.itr(null));

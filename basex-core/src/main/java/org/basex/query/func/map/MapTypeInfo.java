@@ -59,7 +59,7 @@ public final class MapTypeInfo {
           index = fields.index(key);
           field = fields.get(key);
         }
-        if(kt.instanceOf(AtomType.ANY_ATOMIC_TYPE)) validKey = true;
+        if(kt.instanceOf(BasicType.ANY_ATOMIC_TYPE)) validKey = true;
       }
     }
     if(mapType != null) {

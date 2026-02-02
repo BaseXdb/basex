@@ -1,6 +1,6 @@
 package org.basex.io.serial;
 
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 
 import java.io.*;
 
@@ -42,7 +42,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
           try(BufferInput bi = item.input(null)) {
             for(int b; (b = bi.read()) != -1;) out.write(b);
           }
-        } else if(item.type == AtomType.DOUBLE) {
+        } else if(item.type == BasicType.DOUBLE) {
           printChars(Dbl.string(item.dbl(null)));
         } else {
           if(item.type == QNAME) printChar('#');

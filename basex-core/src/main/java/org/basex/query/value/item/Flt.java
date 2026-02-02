@@ -33,7 +33,7 @@ public final class Flt extends ANum {
    * @param value value
    */
   private Flt(final float value) {
-    super(AtomType.FLOAT);
+    super(BasicType.FLOAT);
     this.value = value;
   }
 
@@ -74,7 +74,7 @@ public final class Flt extends ANum {
 
   @Override
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    if(!Double.isFinite(value)) throw valueError(AtomType.DECIMAL, string(), ii);
+    if(!Double.isFinite(value)) throw valueError(BasicType.DECIMAL, string(), ii);
     return new BigDecimal(value);
   }
 
@@ -107,7 +107,7 @@ public final class Flt extends ANum {
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
     final float f = item.flt(ii);
-    return item.type.instanceOf(AtomType.DECIMAL) || item instanceof Dbl ?
+    return item.type.instanceOf(BasicType.DECIMAL) || item instanceof Dbl ?
       -item.compare(this, coll, transitive, ii) :
       Dbl.compare(value, Float.isInfinite(f) ? item.dbl(ii) : f, transitive);
   }
@@ -150,6 +150,6 @@ public final class Flt extends ANum {
         Util.debug(ex);
       }
     }
-    throw AtomType.FLOAT.castError(value, info);
+    throw BasicType.FLOAT.castError(value, info);
   }
 }

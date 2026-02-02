@@ -2,7 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.expr.CalcOpt.*;
 
 import java.math.*;
@@ -457,7 +457,7 @@ public enum Calc {
    * @param type2 second item type
    * @return type
    */
-  public static AtomType numType(final Type type1, final Type type2) {
+  public static BasicType numType(final Type type1, final Type type2) {
     if(!type1.isNumberOrUntyped() || !type2.isNumberOrUntyped()) return ANY_ATOMIC_TYPE;
     if(type1 == DOUBLE || type2 == DOUBLE || type1.isUntyped() || type2.isUntyped()) return DOUBLE;
     if(type1 == FLOAT || type2 == FLOAT) return FLOAT;

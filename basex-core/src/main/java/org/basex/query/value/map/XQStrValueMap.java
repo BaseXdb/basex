@@ -16,7 +16,7 @@ import org.basex.util.hash.*;
  */
 public final class XQStrValueMap extends XQHashMap {
   /** Map type. */
-  private static final MapType TYPE = MapType.get(AtomType.STRING, Types.ITEM_ZM);
+  private static final MapType TYPE = MapType.get(BasicType.STRING, Types.ITEM_ZM);
   /** Hash map. */
   private final TokenObjectMap<Value> map;
 
@@ -79,6 +79,6 @@ public final class XQStrValueMap extends XQHashMap {
     refineType();
     // see MapBuilder#put for types with compact representation
     final SeqType vt = ((MapType) type).valueType();
-    return vt.one() && vt.type.oneOf(AtomType.INTEGER, AtomType.STRING) ? rebuild(job) : this;
+    return vt.one() && vt.type.oneOf(BasicType.INTEGER, BasicType.STRING) ? rebuild(job) : this;
   }
 }

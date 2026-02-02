@@ -22,10 +22,10 @@ public final class FnQName extends StandardFunc {
     final byte[] uri = toZeroToken(arg(0), qc), qname = toToken(arg(1), qc);
     final byte[] name = !contains(qname, ':') && eq(uri, XML_URI)
         ? concat(XML_COLON, qname) : qname;
-    if(!XMLToken.isQName(name)) throw valueError(AtomType.QNAME, qname, info);
+    if(!XMLToken.isQName(name)) throw valueError(BasicType.QNAME, qname, info);
 
     final QNm qnm = qc.shared.qName(name, uri);
-    if(qnm.hasPrefix() && uri.length == 0) throw valueError(AtomType.ANY_URI, qnm.uri(), info);
+    if(qnm.hasPrefix() && uri.length == 0) throw valueError(BasicType.ANY_URI, qnm.uri(), info);
     return qnm;
   }
 }

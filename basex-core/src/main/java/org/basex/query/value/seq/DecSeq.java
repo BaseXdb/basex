@@ -30,7 +30,7 @@ public final class DecSeq extends NativeSeq {
    * @param values bytes
    */
   private DecSeq(final BigDecimal[] values) {
-    super(values.length, AtomType.DECIMAL);
+    super(values.length, BasicType.DECIMAL);
     this.values = values;
   }
 

@@ -67,8 +67,7 @@ public class FnEmpty extends StandardFunc {
     } else if(INDEX_OF.is(input)) {
       // rewrite index-of:  exists(index-of($texts, string)) → $texts = string
       final Expr[] args = input.args();
-      if(args.length == 2 && args[1].seqType().one() &&
-          CmpG.compatible(args[0].seqType(), args[1].seqType(), CmpOp.EQ)) {
+      if(args.length == 2 && args[1].seqType().one()) {
         input = new CmpG(info, args[0], args[1], CmpOp.EQ).optimize(cc);
       }
     } else if(STRING_TO_CODEPOINTS.is(input) || CHARACTERS.is(input)) {

@@ -232,11 +232,11 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
   ELEMENT_TO_MAP(FnElementToMap::new, "element-to-map(element[,options])",
-      params(ELEMENT_ZO, MAP_ZO), ITEM_ZO.mapType(AtomType.STRING).seqType(Occ.ZERO_OR_ONE)),
+      params(ELEMENT_ZO, MAP_ZO), ITEM_ZO.mapType(BasicType.STRING).seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
   ELEMENT_TO_MAP_PLAN(FnElementToMapPlan::new, "element-to-map-plan(input)",
       params(ChoiceItemType.get(DOCUMENT_NODE_O, ELEMENT_O).seqType(Occ.ZERO_OR_MORE)),
-      RECORD_O.mapType(AtomType.STRING).seqType()),
+      RECORD_O.mapType(BasicType.STRING).seqType()),
   /** XQuery function. */
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
       params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
@@ -319,7 +319,7 @@ public enum Function implements AFunction {
       params(TIME_ZO, STRING_O, STRING_ZO, STRING_ZO, STRING_ZO), STRING_ZO),
   /** XQuery function. */
   FUNCTION_ANNOTATIONS(FnFunctionAnnotations::new, "function-annotations(function)",
-      params(FUNCTION_O), ANY_ATOMIC_TYPE_ZM.mapType(AtomType.QNAME).seqType(Occ.ZERO_OR_MORE)),
+      params(FUNCTION_O), ANY_ATOMIC_TYPE_ZM.mapType(BasicType.QNAME).seqType(Occ.ZERO_OR_MORE)),
   /** XQuery function. */
   FUNCTION_ARITY(FnFunctionArity::new, "function-arity(function)",
       params(FUNCTION_O), INTEGER_O),

@@ -46,8 +46,8 @@ public final class ItemSeq extends Seq {
     for(int i = 0; i < size; i++) items[i] = items[i].shrink(job);
     refineType();
     // see ValueBuilder#add for types with compact representation
-    return type.oneOf(AtomType.STRING, AtomType.UNTYPED_ATOMIC, AtomType.INTEGER, AtomType.DOUBLE,
-        AtomType.BOOLEAN) ? rebuild(job) : this;
+    return type.oneOf(BasicType.STRING, BasicType.UNTYPED_ATOMIC, BasicType.INTEGER,
+        BasicType.DOUBLE, BasicType.BOOLEAN) ? rebuild(job) : this;
   }
 
   @Override
@@ -67,6 +67,6 @@ public final class ItemSeq extends Seq {
    */
   public static Value get(final Item[] items, final int size, final Type type) {
     return size == 0 ? Empty.VALUE : size == 1 ? items[0] :
-      new ItemSeq(items, size, type != null ? type : AtomType.ITEM);
+      new ItemSeq(items, size, type != null ? type : BasicType.ITEM);
   }
 }

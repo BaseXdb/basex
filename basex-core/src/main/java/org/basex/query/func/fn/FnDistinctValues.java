@@ -99,7 +99,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
 
     // X => sort() => distinct-values() → X => distinct-values() => sort()
     if(SORT.is(values) && (values.args().length == 1 ||
-        values.arg(0).seqType().type.instanceOf(AtomType.ANY_ATOMIC_TYPE))) {
+        values.arg(0).seqType().type.instanceOf(BasicType.ANY_ATOMIC_TYPE))) {
       final ExprList list = new ExprList().add(values.args());
       list.set(0, cc.function(DISTINCT_VALUES, info, values.arg(0)));
       return cc.function(SORT, info, list.finish());
@@ -110,7 +110,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
     final Expr opt = optStats(cc);
     if(opt != null) return opt;
 
-    final AtomType type = st.type.atomic();
+    final BasicType type = st.type.atomic();
     if(type != null) {
       if(!defined(1)) {
         // distinct-values(1 to 10) → 1 to 10

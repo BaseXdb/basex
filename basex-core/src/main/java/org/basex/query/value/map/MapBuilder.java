@@ -48,8 +48,8 @@ public final class MapBuilder {
       final Type k = key.type;
       final SeqType v = value.seqType();
       final int c = Array.initialCapacity(capacity);
-      final boolean ki = k == AtomType.INTEGER, ks = k == AtomType.STRING,
-          ku = k == AtomType.UNTYPED_ATOMIC;
+      final boolean ki = k == BasicType.INTEGER, ks = k == BasicType.STRING,
+          ku = k == BasicType.UNTYPED_ATOMIC;
       final boolean vi = v.eq(Types.INTEGER_O), vs = v.eq(Types.STRING_O);
       map = ki ? vi ? new XQIntMap(c) : vs ? new XQIntStrMap(c) : new XQIntValueMap(c) :
             ks ? vs ? new XQStrMap(c) : vi ? new XQStrIntMap(c) : new XQStrValueMap(c) :

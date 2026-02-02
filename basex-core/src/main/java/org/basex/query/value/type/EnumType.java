@@ -4,7 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
-import org.basex.io.in.DataInput;
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -52,7 +52,7 @@ public final class EnumType implements Type {
    */
   public boolean instance(final Item item) {
     try {
-      return item.type.instanceOf(AtomType.STRING) && values.contains(item.string(null));
+      return item.type.instanceOf(BasicType.STRING) && values.contains(item.string(null));
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }
@@ -93,7 +93,7 @@ public final class EnumType implements Type {
   public boolean instanceOf(final Type type) {
     if(type == this) return true;
     if(type instanceof final ChoiceItemType cit) return cit.hasInstance(this);
-    if(AtomType.STRING.instanceOf(type)) return true;
+    if(BasicType.STRING.instanceOf(type)) return true;
     if(!(type instanceof final EnumType et)) return false;
     for(final byte[] value : values) {
       if(!et.values.contains(value)) return false;
@@ -113,8 +113,8 @@ public final class EnumType implements Type {
       final int sz = ts.size();
       return sz == values.size() ? this : sz == tv.size() ? et : new EnumType(ts);
     }
-    return type.instanceOf(AtomType.STRING) ? AtomType.STRING :
-      type.instanceOf(AtomType.ANY_ATOMIC_TYPE) ? AtomType.ANY_ATOMIC_TYPE : AtomType.ITEM;
+    return type.instanceOf(BasicType.STRING) ? BasicType.STRING :
+      type.instanceOf(BasicType.ANY_ATOMIC_TYPE) ? BasicType.ANY_ATOMIC_TYPE : BasicType.ITEM;
   }
 
   @Override
@@ -162,8 +162,8 @@ public final class EnumType implements Type {
   }
 
   @Override
-  public AtomType atomic() {
-    return AtomType.STRING;
+  public BasicType atomic() {
+    return BasicType.STRING;
   }
 
   @Override

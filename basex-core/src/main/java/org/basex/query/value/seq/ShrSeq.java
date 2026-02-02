@@ -27,7 +27,7 @@ public final class ShrSeq extends NativeSeq {
    * @param values shorts
    */
   private ShrSeq(final short[] values) {
-    super(values.length, AtomType.SHORT);
+    super(values.length, BasicType.SHORT);
     this.values = values;
   }
 
@@ -87,7 +87,7 @@ public final class ShrSeq extends NativeSeq {
    */
   public static Value get(final short[] values) {
     final int vl = values.length;
-    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], AtomType.SHORT) :
+    return vl == 0 ? Empty.VALUE : vl == 1 ? Itr.get(values[0], BasicType.SHORT) :
       new ShrSeq(values);
   }
 }

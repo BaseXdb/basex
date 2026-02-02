@@ -46,7 +46,7 @@ public final class FnAllEqual extends StandardFunc {
     final Expr values = arg(0);
     if(!defined(1)) {
       final SeqType st = values.seqType();
-      final AtomType type = st.type.atomic();
+      final BasicType type = st.type.atomic();
       if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeArray())
         return cc.voidAndReturn(values, Bln.TRUE, info);
 

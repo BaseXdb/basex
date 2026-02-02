@@ -97,7 +97,7 @@ public abstract class XQStruct extends FItem {
   protected static Item key(final Value key, final QueryContext qc, final InputInfo ii)
       throws QueryException {
     final Item item = key.atomItem(qc, ii);
-    if(item == Empty.VALUE) throw typeError(item, AtomType.ITEM, ii);
+    if(item == Empty.VALUE) throw typeError(item, BasicType.ITEM, ii);
     return item;
   }
 

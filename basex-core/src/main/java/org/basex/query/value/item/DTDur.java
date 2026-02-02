@@ -26,7 +26,7 @@ public final class DTDur extends Dur {
    * @param dur duration item
    */
   public DTDur(final Dur dur) {
-    super(AtomType.DAY_TIME_DURATION);
+    super(BasicType.DAY_TIME_DURATION);
     seconds = dur.seconds == null ? BigDecimal.ZERO : dur.seconds;
   }
 
@@ -36,7 +36,7 @@ public final class DTDur extends Dur {
    * @param minutes minutes
    */
   public DTDur(final long hours, final long minutes) {
-    super(AtomType.DAY_TIME_DURATION);
+    super(BasicType.DAY_TIME_DURATION);
     seconds = BigDecimal.valueOf(hours).multiply(BD_60).add(BigDecimal.valueOf(minutes)).
         multiply(BD_60);
   }
@@ -46,7 +46,7 @@ public final class DTDur extends Dur {
    * @param seconds seconds
    */
   public DTDur(final BigDecimal seconds) {
-    super(AtomType.DAY_TIME_DURATION);
+    super(BasicType.DAY_TIME_DURATION);
     this.seconds = seconds;
   }
 
@@ -57,7 +57,7 @@ public final class DTDur extends Dur {
    * @throws QueryException query exception
    */
   public DTDur(final byte[] value, final InputInfo info) throws QueryException {
-    super(AtomType.DAY_TIME_DURATION);
+    super(BasicType.DAY_TIME_DURATION);
 
     final String val = Token.string(value).trim();
     final Matcher mt = DTD.matcher(val);
@@ -122,7 +122,7 @@ public final class DTDur extends Dur {
    * @throws QueryException query exception
    */
   public DTDur(final ADate date, final ADate sub, final InputInfo info) throws QueryException {
-    super(AtomType.DAY_TIME_DURATION);
+    super(BasicType.DAY_TIME_DURATION);
     seconds = date.toSeconds().subtract(sub.toSeconds());
     final double d = seconds.doubleValue();
     if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw SECRANGE_X.get(info, d);

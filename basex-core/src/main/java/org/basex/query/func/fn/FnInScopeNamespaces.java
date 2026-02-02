@@ -27,7 +27,7 @@ public final class FnInScopeNamespaces extends StandardFunc {
       final byte[] name = atts.name(a), value = atts.value(a);
       final int nl = name.length, vl = value.length;
       if(nl + vl != 0) {
-        final Type nt = nl != 0 ? AtomType.NCNAME : new EnumType(new TokenSet(Token.EMPTY));
+        final Type nt = nl != 0 ? BasicType.NCNAME : new EnumType(new TokenSet(Token.EMPTY));
         mb.put(Str.get(name, nt), Uri.get(value));
       }
     }

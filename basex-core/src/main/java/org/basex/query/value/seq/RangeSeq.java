@@ -37,7 +37,7 @@ public final class RangeSeq extends Seq {
    * @param ascending ascending order
    */
   private RangeSeq(final long start, final long size, final boolean ascending) {
-    super(size, AtomType.INTEGER);
+    super(size, BasicType.INTEGER);
     this.start = start;
     this.ascending = ascending;
   }

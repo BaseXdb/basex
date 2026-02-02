@@ -65,7 +65,7 @@ public class DBNodeSeq extends NativeSeq {
   public final Value atomValue(final QueryContext qc, final InputInfo ii) {
     final ValueBuilder vb = new ValueBuilder(qc, size);
     for(int i = 0; i < size; i++) vb.add(itemAt(i).atomValue(qc, ii));
-    return vb.value(AtomType.ANY_ATOMIC_TYPE);
+    return vb.value(BasicType.ANY_ATOMIC_TYPE);
   }
 
   /**
@@ -115,7 +115,7 @@ public class DBNodeSeq extends NativeSeq {
         final int sz = (int) size;
         final Item[] items = new Item[sz];
         for(int i = 0; i < size; i++) items[i] = Atm.get(data.atom(pres[i]));
-        expr = ItemSeq.get(items, sz, AtomType.UNTYPED_ATOMIC);
+        expr = ItemSeq.get(items, sz, BasicType.UNTYPED_ATOMIC);
       }
     }
     return cc.simplify(this, expr, mode);

@@ -91,7 +91,7 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final TokenList values) {
-    return get(values, AtomType.STRING);
+    return get(values, BasicType.STRING);
   }
 
   /**
@@ -111,7 +111,7 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final byte[][] values) {
-    return get(values, AtomType.STRING);
+    return get(values, BasicType.STRING);
   }
 
   /**
@@ -132,7 +132,7 @@ public final class StrSeq extends NativeSeq {
    * @return value
    */
   private static Item get(final byte[] string, final Type type) {
-    return type == AtomType.UNTYPED_ATOMIC ? Atm.get(string) :
-      type == AtomType.ANY_URI ? Uri.get(string) : Str.get(string, type);
+    return type == BasicType.UNTYPED_ATOMIC ? Atm.get(string) :
+      type == BasicType.ANY_URI ? Uri.get(string) : Str.get(string, type);
   }
 }

@@ -49,7 +49,7 @@ public abstract class Seq extends Value {
 
   @Override
   public final Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    throw typeError(this, AtomType.ITEM, ii);
+    throw typeError(this, BasicType.ITEM, ii);
   }
 
   @Override
@@ -139,7 +139,7 @@ public abstract class Seq extends Value {
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc, size);
     for(final Item item : this) vb.add(item.atomValue(qc, ii));
-    return vb.value(AtomType.ANY_ATOMIC_TYPE);
+    return vb.value(BasicType.ANY_ATOMIC_TYPE);
   }
 
   @Override
@@ -153,7 +153,7 @@ public abstract class Seq extends Value {
       } else {
         final Item[] items = new Item[(int) size];
         for(int i = 0; i < size; i++) items[i] = Atm.get(itemAt(i).string(null));
-        expr = ItemSeq.get(items, (int) size, AtomType.UNTYPED_ATOMIC);
+        expr = ItemSeq.get(items, (int) size, BasicType.UNTYPED_ATOMIC);
       }
     }
     return cc.simplify(this, expr, mode);
@@ -178,7 +178,7 @@ public abstract class Seq extends Value {
   @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    if(!type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
+    if(!type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
       for(final Item item : this) {
         if(!item.materialized(test, ii)) return false;
       }
@@ -220,7 +220,7 @@ public abstract class Seq extends Value {
 
     // shortcut for strings (avoid intermediate token representation)
     final int sz = (int) size;
-    if(type == AtomType.STRING) {
+    if(type == BasicType.STRING) {
       final StringList list = new StringList(sz);
       for(final Item item : this) list.add(item.string(null));
       return list.finish();
@@ -244,7 +244,7 @@ public abstract class Seq extends Value {
 
   @Override
   public String description() {
-    return type == AtomType.ITEM ? SEQUENCE : type + " " + SEQUENCE;
+    return type == BasicType.ITEM ? SEQUENCE : type + " " + SEQUENCE;
   }
 
   @Override

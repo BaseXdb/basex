@@ -1,7 +1,7 @@
 package org.basex.query.value.type;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.Occ.*;
 
 import java.util.*;
@@ -289,13 +289,13 @@ public final class SeqType {
       }
       return null;
     }
-    if(type instanceof AtomType || type instanceof EnumType) {
+    if(type instanceof BasicType || type instanceof EnumType) {
       final Value value = item.atomValue(qc, info);
-      if(value.size() == 1) return coerceAtom((Item) value, qc, info);
+      if(value.size() == 1) return coerceAtomic((Item) value, qc, info);
 
       final ValueBuilder vb = new ValueBuilder(qc, value.size());
       for(final Item it : value) {
-        final Item cast = coerceAtom(it, qc, info);
+        final Item cast = coerceAtomic(it, qc, info);
         if(cast == null) return null;
         vb.add(cast);
       }
@@ -323,7 +323,7 @@ public final class SeqType {
    * @return converted value, or {@code null} if conversion failed
    * @throws QueryException query exception
    */
-  private Item coerceAtom(final Item item, final QueryContext qc, final InputInfo info)
+  private Item coerceAtomic(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     final Type at = item.type;
     if(at.instanceOf(type)) return item;
@@ -362,7 +362,7 @@ public final class SeqType {
     if(intersect(st) != null) return true;
     if(occ.intersect(st.occ) == null) return false;
     final Type tp = st.type;
-    if(tp instanceof AtomType || tp instanceof ChoiceItemType) {
+    if(tp instanceof BasicType || tp instanceof ChoiceItemType) {
       if(type.isUntyped()) return !tp.nsSensitive();
       return tp == DOUBLE && (type.intersect(FLOAT) != null || type.intersect(DECIMAL) != null) ||
              tp == FLOAT && type.intersect(DECIMAL) != null ||
@@ -479,7 +479,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeFunction() {
-    return !zero() && (type instanceof FType || type == AtomType.ITEM);
+    return !zero() && (type instanceof FType || type == BasicType.ITEM);
   }
 
   /**
@@ -532,7 +532,7 @@ public final class SeqType {
    * This implementation of this method is used on the alternatives of a
    * {@link ChoiceItemType}, while {@link #mapTypes} is being maintained as a {@link HashMap}.
    * Since {@link MapType#keyType} is guaranteed to be an atomic type, we expect it to be called
-   * only on {@link #SeqType} instances based on some {@link AtomType}, where suitable hash codes
+   * only on {@link #SeqType} instances based on some {@link BasicType}, where suitable hash codes
    * are available for {@link #type}, and {@link #occ}.
    */
   @Override

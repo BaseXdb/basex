@@ -272,7 +272,7 @@ public abstract class JavaCall extends Arr {
         if(object instanceof final char[] values) {
           final IntList list = new IntList(values.length);
           for(final int value : values) list.add(value);
-          return IntSeq.get(list.finish(), AtomType.UNSIGNED_LONG);
+          return IntSeq.get(list.finish(), BasicType.UNSIGNED_LONG);
         }
         // integer array
         if(object instanceof final long[] values) {
@@ -659,21 +659,21 @@ public abstract class JavaCall extends Arr {
 
     if(object instanceof final Duration duration) {
       return !duration.isSet(DatatypeConstants.YEARS) && !duration.isSet(DatatypeConstants.MONTHS)
-          ? AtomType.DAY_TIME_DURATION : !duration.isSet(DatatypeConstants.HOURS) &&
+          ? BasicType.DAY_TIME_DURATION : !duration.isSet(DatatypeConstants.HOURS) &&
           !duration.isSet(DatatypeConstants.MINUTES) && !duration.isSet(DatatypeConstants.SECONDS)
-          ? AtomType.YEAR_MONTH_DURATION : AtomType.DURATION;
+          ? BasicType.YEAR_MONTH_DURATION : BasicType.DURATION;
     }
 
     if(object instanceof final XMLGregorianCalendar calendar) {
       final QName qnm = calendar.getXMLSchemaType();
-      if(qnm == DatatypeConstants.DATE) return AtomType.DATE;
-      if(qnm == DatatypeConstants.DATETIME) return AtomType.DATE_TIME;
-      if(qnm == DatatypeConstants.TIME) return AtomType.TIME;
-      if(qnm == DatatypeConstants.GYEARMONTH) return AtomType.G_YEAR_MONTH;
-      if(qnm == DatatypeConstants.GMONTHDAY) return AtomType.G_MONTH_DAY;
-      if(qnm == DatatypeConstants.GYEAR) return AtomType.G_YEAR;
-      if(qnm == DatatypeConstants.GMONTH) return AtomType.G_MONTH;
-      if(qnm == DatatypeConstants.GDAY) return AtomType.G_DAY;
+      if(qnm == DatatypeConstants.DATE) return BasicType.DATE;
+      if(qnm == DatatypeConstants.DATETIME) return BasicType.DATE_TIME;
+      if(qnm == DatatypeConstants.TIME) return BasicType.TIME;
+      if(qnm == DatatypeConstants.GYEARMONTH) return BasicType.G_YEAR_MONTH;
+      if(qnm == DatatypeConstants.GMONTHDAY) return BasicType.G_MONTH_DAY;
+      if(qnm == DatatypeConstants.GYEAR) return BasicType.G_YEAR;
+      if(qnm == DatatypeConstants.GMONTH) return BasicType.G_MONTH;
+      if(qnm == DatatypeConstants.GDAY) return BasicType.G_DAY;
     }
     return null;
   }

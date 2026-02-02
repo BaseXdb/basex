@@ -41,7 +41,7 @@ public final class QNm extends Item {
    * @param name name (possibly prefixed)
    */
   public QNm(final byte[] name) {
-    super(AtomType.QNAME);
+    super(BasicType.QNAME);
     this.name = name;
     prefix = indexOf(name, ':');
   }

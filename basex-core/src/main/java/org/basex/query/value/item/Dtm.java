@@ -29,7 +29,7 @@ public final class Dtm extends ADate {
    */
   public Dtm(final ADate date, final Type type, final InputInfo info) throws QueryException {
     super(type, date);
-    if(type == AtomType.DATE_TIME_STAMP && !hasTz()) throw MISSINGZONE_X.get(info, date);
+    if(type == BasicType.DATE_TIME_STAMP && !hasTz()) throw MISSINGZONE_X.get(info, date);
     if(hour == -1) {
       hour = 0;
       minute = 0;
@@ -45,7 +45,7 @@ public final class Dtm extends ADate {
    * @throws QueryException query exception
    */
   public Dtm(final Dat date, final Tim time, final InputInfo info) throws QueryException {
-    super(AtomType.DATE_TIME, date);
+    super(BasicType.DATE_TIME, date);
 
     hour = time.hour;
     minute = time.minute;
@@ -95,7 +95,7 @@ public final class Dtm extends ADate {
   @Override
   public Dtm timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
       throws QueryException {
-    final Dtm dtm = new Dtm(this, AtomType.DATE_TIME, info);
+    final Dtm dtm = new Dtm(this, BasicType.DATE_TIME, info);
     dtm.tz(dur, undefined, info);
     return dtm;
   }
@@ -107,7 +107,7 @@ public final class Dtm extends ADate {
    */
   public static Dtm get(final long ms) {
     try {
-      return new Dtm(Token.token(DateTime.format(new Date(ms))), AtomType.DATE_TIME_STAMP, null);
+      return new Dtm(Token.token(DateTime.format(new Date(ms))), BasicType.DATE_TIME_STAMP, null);
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }

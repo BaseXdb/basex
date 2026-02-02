@@ -66,7 +66,7 @@ abstract class Convert extends Single {
 
       final Type et = est.type;
       if(et.instanceOf(castType.type) && est.occ.instanceOf(castType.occ) &&
-          (et.eq(castType.type) || castType.type == AtomType.NUMERIC)) return true;
+          (et.eq(castType.type) || castType.type == BasicType.NUMERIC)) return true;
     }
     return null;
   }
@@ -80,14 +80,14 @@ abstract class Convert extends Single {
   final Expr simplify(final SeqType castType, final CompileContext cc) {
     final SeqType est = expr.seqType();
     Expr arg = null;
-    if(est.one() && !est.mayBeArray() && castType.type.instanceOf(AtomType.NUMERIC)) {
+    if(est.one() && !est.mayBeArray() && castType.type.instanceOf(BasicType.NUMERIC)) {
       // xs:int(string(I))
       // xs:int(xs:double(I)) → xs:int(I)
       arg = FnNumber.simplify(expr, cc);
       if(arg == null && expr instanceof final Cast cast && (
         castType.type.instanceOf(est.type) ||
-        castType.type.instanceOf(AtomType.INT) && est.type == AtomType.DOUBLE ||
-        castType.type.instanceOf(AtomType.SHORT) && est.type == AtomType.FLOAT
+        castType.type.instanceOf(BasicType.INT) && est.type == BasicType.DOUBLE ||
+        castType.type.instanceOf(BasicType.SHORT) && est.type == BasicType.FLOAT
       )) {
         arg = cast.expr;
       }

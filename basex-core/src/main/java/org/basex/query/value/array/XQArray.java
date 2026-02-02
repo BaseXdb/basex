@@ -98,7 +98,7 @@ public abstract class XQArray extends XQStruct {
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc, structSize());
     for(final Value value : iterable()) vb.add(value.atomValue(qc, ii));
-    return vb.value(AtomType.ANY_ATOMIC_TYPE);
+    return vb.value(BasicType.ANY_ATOMIC_TYPE);
   }
 
   @Override
@@ -368,7 +368,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
-    if(!funcType().declType.type.instanceOf(AtomType.ANY_ATOMIC_TYPE)) {
+    if(!funcType().declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
       for(final Value value : iterable()) {
         if(!value.materialized(test, ii)) return false;
       }
@@ -458,7 +458,7 @@ public abstract class XQArray extends XQStruct {
     // determine type (static or exact)
     final int sz = (int) structSize();
     SeqType dt = funcType().declType;
-    if(sz > 0 && dt.type == AtomType.ITEM) {
+    if(sz > 0 && dt.type == BasicType.ITEM) {
       dt = null;
       for(final Value value : iterable()) {
         final SeqType st = value.seqType();
@@ -468,48 +468,48 @@ public abstract class XQArray extends XQStruct {
     // convert to specific arrays
     if(dt.one()) {
       final Type tp = dt.type;
-      if(tp == AtomType.BOOLEAN) {
+      if(tp == BasicType.BOOLEAN) {
         final BoolList list = new BoolList(sz);
         for(final Value value : iterable()) list.add(((Bln) value).bool(null));
         return list.finish();
       }
-      if(tp == AtomType.BYTE) {
+      if(tp == BasicType.BYTE) {
         final ByteList list = new ByteList(sz);
         for(final Value value : iterable()) list.add((byte) ((Itr) value).itr());
         return list.finish();
       }
-      if(tp.oneOf(AtomType.SHORT, AtomType.UNSIGNED_BYTE)) {
+      if(tp.oneOf(BasicType.SHORT, BasicType.UNSIGNED_BYTE)) {
         final ShortList list = new ShortList(sz);
         for(final Value value : iterable()) list.add((short) ((Itr) value).itr());
         return list.finish();
       }
-      if(tp == AtomType.UNSIGNED_SHORT) {
+      if(tp == BasicType.UNSIGNED_SHORT) {
         final char[] chars = new char[sz];
         int c = 0;
         for(final Value value : iterable()) chars[c++] = (char) ((Itr) value).itr();
         return chars;
       }
-      if(tp == AtomType.INT) {
+      if(tp == BasicType.INT) {
         final IntList list = new IntList(sz);
         for(final Value value : iterable()) list.add((int) ((Itr) value).itr());
         return list.finish();
       }
-      if(tp.instanceOf(AtomType.INTEGER) && tp != AtomType.UNSIGNED_LONG) {
+      if(tp.instanceOf(BasicType.INTEGER) && tp != BasicType.UNSIGNED_LONG) {
         final LongList list = new LongList(sz);
         for(final Value value : iterable()) list.add(((Itr) value).itr());
         return list.finish();
       }
-      if(tp == AtomType.FLOAT) {
+      if(tp == BasicType.FLOAT) {
         final FloatList list = new FloatList(sz);
         for(final Value value : iterable()) list.add(((Flt) value).flt());
         return list.finish();
       }
-      if(tp == AtomType.DOUBLE) {
+      if(tp == BasicType.DOUBLE) {
         final DoubleList list = new DoubleList(sz);
         for(final Value value : iterable()) list.add(((Dbl) value).dbl());
         return list.finish();
       }
-      if(tp.instanceOf(AtomType.STRING)) {
+      if(tp.instanceOf(BasicType.STRING)) {
         final StringList list = new StringList(sz);
         for(final Value value : iterable()) list.add((String) value.toJava());
         return list.finish();

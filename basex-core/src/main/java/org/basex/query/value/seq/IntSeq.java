@@ -109,7 +109,7 @@ public final class IntSeq extends NativeSeq {
     if(tmp != null) {
       final int tl = tmp.length;
       int t = 0;
-      if(seqType().type == AtomType.INTEGER) {
+      if(seqType().type == BasicType.INTEGER) {
         while(++t < tl && tmp[0] + t == tmp[t]);
       }
       if(t == tl) expr = RangeSeq.get(tmp[0], tl, true);
@@ -121,7 +121,7 @@ public final class IntSeq extends NativeSeq {
 
   @Override
   public Object toJava() {
-    switch((AtomType) type) {
+    switch((BasicType) type) {
       case BYTE:
         final ByteList bl = new ByteList((int) size);
         for(final int value : values) bl.add((byte) value);
@@ -159,7 +159,7 @@ public final class IntSeq extends NativeSeq {
    * @return value
    */
   public static Value get(final int[] values) {
-    return get(values, AtomType.INTEGER);
+    return get(values, BasicType.INTEGER);
   }
 
   /**

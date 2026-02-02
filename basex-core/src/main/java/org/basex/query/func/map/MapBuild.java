@@ -49,7 +49,7 @@ public final class MapBuild extends MapMerge {
     if(st.zero()) return cc.voidAndReturn(input, XQMap.empty(), info);
 
     final boolean noKey = keys.size() == 0, fiKey = keys instanceof FuncItem;
-    Type kt = noKey || fiKey ? s1t.type : AtomType.ITEM;
+    Type kt = noKey || fiKey ? s1t.type : BasicType.ITEM;
     if(fiKey) {
       arg(1, arg -> refineFunc(arg, cc, s1t));
       kt = arg(1).funcType().declType.type;

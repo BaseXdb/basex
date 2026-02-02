@@ -24,7 +24,7 @@ abstract class FormatFn extends StandardFunc {
    * @return string or {@link Empty#VALUE}
    * @throws QueryException query exception
    */
-  final Item formatDate(final AtomType tp, final QueryContext qc) throws QueryException {
+  final Item formatDate(final BasicType tp, final QueryContext qc) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
     if(value.isEmpty()) return Empty.VALUE;
 

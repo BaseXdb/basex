@@ -1,6 +1,6 @@
 package org.basex.query;
 
-import static org.basex.query.value.type.AtomType.*;
+import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.Types.*;
 import static org.junit.jupiter.api.Assertions.*;

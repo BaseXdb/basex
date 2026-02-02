@@ -25,7 +25,7 @@ public final class YMDur extends Dur {
    * @param value duration item
    */
   public YMDur(final Dur value) {
-    super(AtomType.YEAR_MONTH_DURATION);
+    super(BasicType.YEAR_MONTH_DURATION);
     months = value.months;
     seconds = BigDecimal.ZERO;
   }
@@ -73,7 +73,7 @@ public final class YMDur extends Dur {
    * @throws QueryException query exception
    */
   public YMDur(final byte[] value, final InputInfo info) throws QueryException {
-    super(AtomType.YEAR_MONTH_DURATION);
+    super(BasicType.YEAR_MONTH_DURATION);
     final String val = Token.string(value).trim();
     final Matcher mt = YMD.matcher(val);
     if(!mt.matches() || Strings.endsWith(val, 'P')) throw dateError(value, XYMD, info);

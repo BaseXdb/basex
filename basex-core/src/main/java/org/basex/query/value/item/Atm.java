@@ -26,7 +26,7 @@ public final class Atm extends Item {
    * @param value value
    */
   private Atm(final byte[] value) {
-    super(AtomType.UNTYPED_ATOMIC);
+    super(BasicType.UNTYPED_ATOMIC);
     this.value = value;
   }
 

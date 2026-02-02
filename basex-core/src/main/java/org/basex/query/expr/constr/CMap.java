@@ -90,7 +90,7 @@ public final class CMap extends Arr {
     Type kt = null;
     SeqType vt = null;
     for(int e = 0; e < el; e += 2) {
-      Type ekt = AtomType.ANY_ATOMIC_TYPE;
+      Type ekt = BasicType.ANY_ATOMIC_TYPE;
       SeqType evt = Types.ITEM_ZM;
       if(nested(e)) {
         if(exprs[e].seqType().type instanceof final MapType mt) {

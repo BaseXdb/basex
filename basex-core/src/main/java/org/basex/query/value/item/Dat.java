@@ -19,7 +19,7 @@ public final class Dat extends ADate {
    * @param value date
    */
   public Dat(final ADate value) {
-    super(AtomType.DATE, value);
+    super(BasicType.DATE, value);
     clean();
   }
 
@@ -30,7 +30,7 @@ public final class Dat extends ADate {
    * @throws QueryException query exception
    */
   public Dat(final byte[] value, final InputInfo info) throws QueryException {
-    super(AtomType.DATE);
+    super(BasicType.DATE);
     date(value, XDATE, info);
   }
 

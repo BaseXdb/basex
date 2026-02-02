@@ -87,8 +87,8 @@ public final class CmpR extends Single {
     // only rewrite numeric comparisons, skip decimals
     // allowed: $node > 20; rejected: $decimal = 1 to 10
     final Type type1 = expr1.seqType().type;
-    final boolean int1 = type1.instanceOf(AtomType.INTEGER);
-    if(!(type1.isUntyped() || type1.oneOf(AtomType.FLOAT, AtomType.DOUBLE) || int1))
+    final boolean int1 = type1.instanceOf(BasicType.INTEGER);
+    if(!(type1.isUntyped() || type1.oneOf(BasicType.FLOAT, BasicType.DOUBLE) || int1))
       return cmp;
 
     double mn, mx;

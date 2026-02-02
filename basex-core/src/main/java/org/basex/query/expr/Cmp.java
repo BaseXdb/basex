@@ -128,8 +128,8 @@ public abstract class Cmp extends Arr {
       // keep: () = (), (1,2) != (1,2), (1,2) eq (1,2)
       (op != CmpOp.EQ ? st1.one() : st1.oneOrMore()) &&
       // keep: xs:double('NaN') = xs:double('NaN')
-      (type1.isStringOrUntyped() || type1.instanceOf(AtomType.DECIMAL) ||
-          type1 == AtomType.BOOLEAN) &&
+      (type1.isStringOrUntyped() || type1.instanceOf(BasicType.DECIMAL) ||
+          type1 == BasicType.BOOLEAN) &&
       // keep: random:integer() = random:integer()
       // keep if no context is available: last() = last()
       !expr1.has(Flag.NDT) && (!expr1.has(Flag.CTX) || cc.qc.focus.value != null)
@@ -153,7 +153,7 @@ public abstract class Cmp extends Arr {
   private Expr optBoolean(final CmpOp op, final CompileContext cc) throws QueryException {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    if(st1.type == AtomType.BOOLEAN && st2.type == AtomType.BOOLEAN) {
+    if(st1.type == BasicType.BOOLEAN && st2.type == BasicType.BOOLEAN) {
       final boolean eq = op == CmpOp.EQ, ne = op == CmpOp.NE;
       if(expr2 instanceof Bln) {
         final boolean ok = expr2 == Bln.TRUE, success = ne ^ ok;
@@ -285,7 +285,7 @@ public abstract class Cmp extends Arr {
       }
     } else if(op.oneOf(CmpOp.EQ, CmpOp.GE, CmpOp.LE)) {
       final SeqType st2 = count.seqType();
-      if(st2.type.instanceOf(AtomType.INTEGER)) {
+      if(st2.type.instanceOf(BasicType.INTEGER)) {
         if(count instanceof final RangeSeq rs) {
           // count(A) = 3 to 5 → util:within(A, 3, 5)
           args.add(Itr.get(rs.min())).add(Itr.get(rs.max()));

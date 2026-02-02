@@ -34,7 +34,7 @@ import org.basex.util.options.*;
  */
 public final class FnLoadXQueryModule extends StandardFunc {
   /** The type of the value of the 'variables' and 'vendor-options' option. */
-  private static final MapType QNAME_MAP_TYPE = MapType.get(AtomType.QNAME, Types.ITEM_ZM);
+  private static final MapType QNAME_MAP_TYPE = MapType.get(BasicType.QNAME, Types.ITEM_ZM);
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {

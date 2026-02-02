@@ -1,8 +1,8 @@
 package org.basex.query.ann;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.value.type.AtomType.*;
-import static org.basex.query.value.type.AtomType.ITEM;
+import static org.basex.query.value.type.BasicType.*;
+import static org.basex.query.value.type.BasicType.ITEM;
 
 import org.basex.query.func.*;
 import org.basex.query.util.*;
@@ -177,7 +177,7 @@ public enum Annotation {
   _WS_ERROR("error(path,message)", params(STRING, STRING), WS_URI);
 
   /** Parameter types. */
-  public final AtomType[] params;
+  public final BasicType[] params;
   /** Name of function. */
   public final QNm name;
   /** Minimum and maximum number of arguments. */
@@ -202,7 +202,7 @@ public enum Annotation {
    * @param params parameter types
    * @param uri URI
    */
-  Annotation(final String desc, final AtomType[] params, final byte[] uri) {
+  Annotation(final String desc, final BasicType[] params, final byte[] uri) {
     this(desc, params, uri, true);
   }
 
@@ -213,7 +213,8 @@ public enum Annotation {
    * @param uri URI
    * @param single annotation must only occur once
    */
-  Annotation(final String string, final AtomType[] params, final byte[] uri, final boolean single) {
+  Annotation(final String string, final BasicType[] params, final byte[] uri,
+      final boolean single) {
     this.params = params;
     this.single = single;
 
@@ -237,7 +238,7 @@ public enum Annotation {
    * @param params parameter types
    * @return array
    */
-  private static AtomType[] params(final AtomType... params) {
+  private static BasicType[] params(final BasicType... params) {
     return params;
   }
 

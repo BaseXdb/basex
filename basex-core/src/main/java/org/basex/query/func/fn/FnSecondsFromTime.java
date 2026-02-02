@@ -16,6 +16,6 @@ public final class FnSecondsFromTime extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item value = arg(0).atomItem(qc, info);
-    return value.isEmpty() ? Empty.VALUE : Dec.get(toDate(value, AtomType.TIME, qc).seconds());
+    return value.isEmpty() ? Empty.VALUE : Dec.get(toDate(value, BasicType.TIME, qc).seconds());
   }
 }

@@ -160,7 +160,7 @@ public abstract class Preds extends Arr {
     }
 
     // positional tests: x[1] → x[pos: 1]
-    if(expr.seqType().type.instanceOf(AtomType.NUMERIC)) {
+    if(expr.seqType().type.instanceOf(BasicType.NUMERIC)) {
       final Expr ex = Pos.get(expr, CmpOp.EQ, info, cc, null);
       if(ex != null) expr = ex;
     }
