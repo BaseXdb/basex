@@ -101,7 +101,8 @@ public final class IOFile extends IO {
       return new URL(uri).toURI().getPath();
     } catch(final Exception ex) {
       Util.debug(ex);
-      return uri;
+      // workaround for URIs with invalid characters
+      return uri.replaceAll("^" + FILEPREF + '*', "/").replaceFirst("^/([A-Za-z]:)", "$1");
     }
   }
 
