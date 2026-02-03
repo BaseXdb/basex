@@ -113,6 +113,10 @@ public final class XMLToken {
   public static final byte[] XHTML_URI = token("http://www.w3.org/1999/xhtml");
   /** XML namespace. */
   public static final byte[] XML_URI = token("http://www.w3.org/XML/1998/namespace");
+  /** MathML namespace. */
+  public static final byte[] MATHML_URI = token("http://www.w3.org/1998/Math/MathML");
+  /** SVG namespace. */
+  public static final byte[] SVG_URI    = token("http://www.w3.org/2000/svg");
 
   /** Index for all HTML entities (lazy initialization). */
   private static TokenObjectMap<byte[]> entities;

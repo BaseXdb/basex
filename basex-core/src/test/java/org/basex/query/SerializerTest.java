@@ -175,6 +175,19 @@ public final class SerializerTest extends SandboxTest {
     }
     query(option + "<a>&#x90;</a>", "<a>&#x90;</a>");
     query(option + "<html/>", "<!DOCTYPE HTML><html></html>");
+    query("declare namespace xhtml = 'http://www.w3.org/1999/xhtml';\n"
+        + option + INDENT_ATTRIBUTES.arg("yes") + INDENT.arg("yes")
+        + "<html>\n"
+        + "  <xhtml:body xhtml:test='x' xmlns='http://www.w3.org/2000/svg'>\n"
+        + "     <svg/>\n"
+        + "  </xhtml:body>\n"
+        + "</html>",
+        "<!DOCTYPE HTML>\n"
+        + "<html>\n"
+        + "  <body xmlns:xhtml=\"http://www.w3.org/1999/xhtml\"\n"
+        + "        xmlns=\"http://www.w3.org/1999/xhtml\"\n"
+        + "        xhtml:test=\"x\"><svg xmlns=\"http://www.w3.org/2000/svg\"/></body>\n"
+        + "</html>");
   }
 
   /** Test: method=text. */

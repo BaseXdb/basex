@@ -15,7 +15,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class XHTMLSerializer extends MarkupSerializer {
+final class XHTMLSerializer extends XhtmlHtmlSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream
