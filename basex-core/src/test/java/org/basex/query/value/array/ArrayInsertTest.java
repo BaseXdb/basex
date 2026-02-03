@@ -33,7 +33,7 @@ public final class ArrayInsertTest extends ArrayTest {
 
       if(i % 1000 == 999) {
         for(int j = 0; j < size; j++) {
-          assertEquals(list.get(j).intValue(), ((Itr) array.memberAt(j)).itr());
+          assertEquals(list.get(j).intValue(), ((Itr) array.valueAt(j)).itr());
         }
       }
     }
@@ -52,10 +52,10 @@ public final class ArrayInsertTest extends ArrayTest {
     final Itr val = Itr.get(n);
     for(int i = 0; i <= n; i++) {
       final XQArray array2 = array.insertMember(i, val, job);
-      assertEquals(n, ((Itr) array2.memberAt(i)).itr());
+      assertEquals(n, ((Itr) array2.valueAt(i)).itr());
       assertEquals(n + 1L, array2.structSize());
       for(int j = 0; j < n; j++) {
-        assertEquals(j, ((Itr) array2.memberAt(j < i ? j : j + 1)).itr());
+        assertEquals(j, ((Itr) array2.valueAt(j < i ? j : j + 1)).itr());
       }
     }
   }

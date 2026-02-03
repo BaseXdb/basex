@@ -74,8 +74,8 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   @Override
-  public Item keyAt(final int index) {
-    return Str.get(fields().key(index + 1));
+  public Item keyAt(final long index) {
+    return Str.get(fields().key((int) index + 1));
   }
 
   /**
@@ -87,8 +87,8 @@ public final class XQRecordMap extends XQHashMap {
   }
 
   @Override
-  public Value valueAt(final int index) {
-    return values[index];
+  public Value valueAt(final long index) {
+    return values[(int) index];
   }
 
   @Override

@@ -30,7 +30,7 @@ public final class ItemArray extends XQArray {
   }
 
   @Override
-  public Value memberAt(final long index) {
+  public Value valueAt(final long index) {
     return members.itemAt(index);
   }
 

@@ -94,8 +94,8 @@ public final class CsvW3Converter extends CsvXQueryConverter {
             if(it.isEmpty()) throw CSV_COLUMNNAME_X.get(info, colIndex);
             colIndex = it;
           }
-          final Value value = row.getOrNull(colIndex, qc, info);
-          if(value != null) return value;
+          final long index = colIndex.itr(info) - 1;
+          if(index >= 0 && index < row.structSize()) return row.valueAt(index);
         }
       }
       return Str.EMPTY;

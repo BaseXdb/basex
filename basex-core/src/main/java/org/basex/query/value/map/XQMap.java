@@ -105,20 +105,6 @@ public abstract class XQMap extends XQStruct {
   public abstract Value getOrNull(Item key) throws QueryException;
 
   /**
-   * Gets a map key at the specified position.
-   * @param index map index (starting with 0, must be valid)
-   * @return key
-   */
-  public abstract Item keyAt(int index);
-
-  /**
-   * Gets a map value at the specified position.
-   * @param index map index (starting with 0, must be valid)
-   * @return value
-   */
-  public abstract Value valueAt(int index);
-
-  /**
    * Puts a value with the specified key into this map.
    * @param key key to insert
    * @param value value to insert

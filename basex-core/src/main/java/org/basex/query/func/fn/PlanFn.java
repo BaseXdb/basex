@@ -460,7 +460,7 @@ public abstract class PlanFn extends StandardFunc {
           ab.add(pe.apply(ch, node, plan, qc));
         }
         final XQArray array = ab.array();
-        map.put(name, array.structSize() == 1 ? array.memberAt(0) : array);
+        map.put(name, array.structSize() == 1 ? array.valueAt(0) : array);
       }
     }
     return map.map();

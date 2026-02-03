@@ -17,7 +17,7 @@ public final class ArrayHead extends ArrayFn {
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
     if(array == XQArray.empty()) throw QueryError.ARRAYEMPTY.get(info);
-    return array.memberAt(0);
+    return array.valueAt(0);
   }
 
   @Override

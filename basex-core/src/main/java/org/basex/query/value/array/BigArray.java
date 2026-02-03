@@ -50,7 +50,7 @@ public final class BigArray extends TreeArray {
   }
 
   @Override
-  public Value memberAt(final long index) {
+  public Value valueAt(final long index) {
     // index in one of the digits?
     final int ll = left.length;
     if(index < ll) return left[(int) index];

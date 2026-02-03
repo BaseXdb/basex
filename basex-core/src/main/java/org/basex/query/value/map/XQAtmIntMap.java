@@ -56,13 +56,13 @@ public final class XQAtmIntMap extends XQHashMap {
   }
 
   @Override
-  public Atm keyAt(final int index) {
-    return Atm.get(map.key(index + 1));
+  public Atm keyAt(final long index) {
+    return Atm.get(map.key((int) index + 1));
   }
 
   @Override
-  public Itr valueAt(final int index) {
-    return Itr.get(map.value(index + 1));
+  public Itr valueAt(final long index) {
+    return Itr.get(map.value((int) index + 1));
   }
 
   @Override

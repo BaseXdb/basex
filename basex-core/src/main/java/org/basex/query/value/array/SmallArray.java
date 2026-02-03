@@ -27,7 +27,7 @@ public final class SmallArray extends TreeArray {
   }
 
   @Override
-  public Value memberAt(final long index) {
+  public Value valueAt(final long index) {
     return members[(int) index];
   }
 

@@ -49,13 +49,13 @@ public final class XQStrValueMap extends XQHashMap {
   }
 
   @Override
-  public Str keyAt(final int index) {
-    return Str.get(map.key(index + 1));
+  public Str keyAt(final long index) {
+    return Str.get(map.key((int) index + 1));
   }
 
   @Override
-  public Value valueAt(final int index) {
-    return map.value(index + 1);
+  public Value valueAt(final long index) {
+    return map.value((int) index + 1);
   }
 
   @Override

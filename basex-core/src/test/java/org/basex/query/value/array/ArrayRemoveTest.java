@@ -38,7 +38,7 @@ public final class ArrayRemoveTest extends ArrayTest {
       }
       array1 = array1.appendMember(Itr.get(k), job);
       assertEquals(k + 1, array1.structSize());
-      assertEquals(k, ((Itr) array1.memberAt(k)).itr());
+      assertEquals(k, ((Itr) array1.valueAt(k)).itr());
     }
   }
 
@@ -210,7 +210,7 @@ public final class ArrayRemoveTest extends ArrayTest {
 
       if(i % 1000 == 999) {
         for(int j = 0; j < size; j++) {
-          assertEquals(((Itr) list.get(j)).itr(), ((Itr) array.memberAt(j)).itr());
+          assertEquals(((Itr) list.get(j)).itr(), ((Itr) array.valueAt(j)).itr());
         }
       }
     }

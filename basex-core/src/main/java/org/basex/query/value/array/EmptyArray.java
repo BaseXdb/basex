@@ -28,7 +28,7 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public Value memberAt(final long index) {
+  public Value valueAt(final long index) {
     throw Util.notExpected();
   }
 

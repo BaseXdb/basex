@@ -27,7 +27,7 @@ public final class SingletonArray extends XQArray {
   }
 
   @Override
-  public Value memberAt(final long index) {
+  public Value valueAt(final long index) {
     return member;
   }
 

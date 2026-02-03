@@ -45,12 +45,12 @@ public final class XQTrieMap extends XQMap {
   }
 
   @Override
-  public Item keyAt(final int index) {
-    return order != null ? order.keyAt(index) : ((TrieLeaf) root).key;
+  public Item keyAt(final long index) {
+    return order != null ? order.keyAt((int) index) : ((TrieLeaf) root).key;
   }
 
   @Override
-  public Value valueAt(final int index) {
+  public Value valueAt(final long index) {
     try {
       return getOrNull(keyAt(index));
     } catch(final QueryException ex) {

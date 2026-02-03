@@ -87,6 +87,20 @@ public abstract class XQStruct extends FItem {
   public abstract Iter itemsIter();
 
   /**
+   * Gets the key at the given position.
+   * @param index index position (starting with 0, must be valid)
+   * @return key
+   */
+  public abstract Item keyAt(long index);
+
+  /**
+   * Returns the value at the given position.
+   * @param index index position (starting with 0, must be valid)
+   * @return value
+   */
+  public abstract Value valueAt(long index);
+
+  /**
    * Returns the key for accessing a function value.
    * @param key key argument
    * @param qc query context

@@ -43,7 +43,7 @@ public class FnApply extends StandardFunc {
         // argument is a value: final types are known
         final int as = Math.max(0, (int) array.structSize());
         final SeqType[] ast = new SeqType[as];
-        for(int a = 0; a < as; a++) ast[a] = array.memberAt(a).seqType();
+        for(int a = 0; a < as; a++) ast[a] = array.valueAt(a).seqType();
         arg(0, arg -> refineFunc(arg, cc, ast));
       } else if(ft != null) {
         // argument will be of type array: assign generic array return type to all arguments

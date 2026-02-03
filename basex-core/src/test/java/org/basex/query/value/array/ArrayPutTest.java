@@ -27,7 +27,7 @@ public final class ArrayPutTest extends ArrayTest {
     for(int i = 0; i < n; i++) {
       final XQArray array2 = array1.putMember(i, Itr.get(-i), job);
       for(int j = 0; j < n; j++) {
-        assertEquals(i == j ? -j : j, ((Itr) array2.memberAt(j)).itr());
+        assertEquals(i == j ? -j : j, ((Itr) array2.valueAt(j)).itr());
       }
     }
   }

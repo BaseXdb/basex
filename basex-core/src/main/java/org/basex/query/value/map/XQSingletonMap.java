@@ -45,12 +45,12 @@ public final class XQSingletonMap extends XQMap {
   }
 
   @Override
-  public Item keyAt(final int index) {
+  public Item keyAt(final long index) {
     return k;
   }
 
   @Override
-  public Value valueAt(final int index) {
+  public Value valueAt(final long index) {
     return v;
   }
 

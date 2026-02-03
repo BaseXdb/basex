@@ -30,7 +30,7 @@ public final class ArrayMembers extends ArrayFn {
       }
       @Override
       public Item get(final long i) {
-        return record(array.memberAt(i));
+        return record(array.valueAt(i));
       }
     };
   }

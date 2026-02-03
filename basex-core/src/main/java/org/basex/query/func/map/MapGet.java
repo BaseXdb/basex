@@ -20,14 +20,10 @@ public final class MapGet extends MapFn {
     final XQMap map = toMap(arg(0), qc);
     final Item key = toAtomItem(arg(1), qc);
 
-    Value value;
-    if(defined(2)) {
-      value = map.getOrNull(key);
-      if(value == null) value = arg(2).value(qc);
-    } else {
-      value = map.get(key);
-    }
-    return value;
+    final Value value = map.getOrNull(key);
+    if(value != null) return value;
+    if(defined(2)) return arg(2).value(qc);
+    return Empty.VALUE;
   }
 
   @Override

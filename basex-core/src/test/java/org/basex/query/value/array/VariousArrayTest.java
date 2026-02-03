@@ -30,7 +30,7 @@ public final class VariousArrayTest extends ArrayTest {
     assertEquals(2 * n, array.structSize());
     for(long i = 0; i < 2 * n; i++) {
       final long diff = i - n, j = diff < 0 ? -(diff + 1) : diff;
-      assertEquals(j, ((Itr) array.memberAt(i)).itr());
+      assertEquals(j, ((Itr) array.valueAt(i)).itr());
     }
   }
 
@@ -44,14 +44,14 @@ public final class VariousArrayTest extends ArrayTest {
 
     for(int i = k; i < n; i++) {
       assertEquals(k, array.structSize());
-      assertEquals(i - k, ((Itr) array.memberAt(array.structSize() - 1)).itr());
+      assertEquals(i - k, ((Itr) array.valueAt(array.structSize() - 1)).itr());
       array = array.subArray(0, array.structSize() - 1, job);
       array = array.insertMember(0, Itr.get(i), job);
     }
 
     assertEquals(k, array.structSize());
     for(int i = 0; i < k; i++) {
-      assertEquals(n - k + i, ((Itr) array.memberAt(array.structSize() - 1)).itr());
+      assertEquals(n - k + i, ((Itr) array.valueAt(array.structSize() - 1)).itr());
       array = array.subArray(0, array.structSize() - 1, job);
       assertEquals(k - i - 1, array.structSize());
     }
@@ -70,14 +70,14 @@ public final class VariousArrayTest extends ArrayTest {
       assertEquals(i, array.structSize());
       final Itr val = Itr.get(i);
       array = array.insertMember(0, val, job).insertMember(0, val, job);
-      assertEquals(i, ((Itr) array.memberAt(0)).itr());
+      assertEquals(i, ((Itr) array.valueAt(0)).itr());
       array = array.subArray(1, array.structSize() - 1, job);
     }
 
     assertEquals(n, array.structSize());
 
     for(int i = n; --i >= 0;) {
-      assertEquals(i, ((Itr) array.memberAt(0)).itr());
+      assertEquals(i, ((Itr) array.valueAt(0)).itr());
       array = array.subArray(1, array.structSize() - 1, job);
       assertEquals(i, array.structSize());
     }

@@ -31,7 +31,7 @@ public final class ArraySplit extends ArrayFn {
       }
       @Override
       public Item get(final long i) {
-        return XQArray.get(array.memberAt(i));
+        return XQArray.get(array.valueAt(i));
       }
     };
   }

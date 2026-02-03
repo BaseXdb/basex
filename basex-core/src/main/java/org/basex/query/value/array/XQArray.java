@@ -66,13 +66,10 @@ public abstract class XQArray extends XQStruct {
     return size == 0 ? empty() : size == 1 ? get(members) : new ItemArray(members);
   }
 
-  /**
-   * Returns the value at the given position.
-   * The specified value must be lie within the valid bounds.
-   * @param index index position
-   * @return value
-   */
-  public abstract Value memberAt(long index);
+  @Override
+  public final Itr keyAt(final long index) {
+    return Itr.get(index + 1);
+  }
 
   @Override
   public Iter itemsIter() {
@@ -117,7 +114,7 @@ public abstract class XQArray extends XQStruct {
    */
   public final XQArray subArray(final long pos, final long length, final Job job) {
     return length == 0 ? empty() :
-           length == 1 ? get(memberAt(pos)) :
+           length == 1 ? get(valueAt(pos)) :
            length == structSize() ? this :
            subArr(pos, length, job);
   }
@@ -176,7 +173,7 @@ public abstract class XQArray extends XQStruct {
     job.checkStop();
     final long size = structSize();
     final ArrayBuilder ab = new ArrayBuilder(job, size);
-    for(long i = size - 1; i >= 0; i--) ab.add(memberAt(i));
+    for(long i = size - 1; i >= 0; i--) ab.add(valueAt(i));
     return ab.array(this);
   }
 
@@ -213,7 +210,7 @@ public abstract class XQArray extends XQStruct {
 
       @Override
       public Value next() {
-        return memberAt(index++);
+        return valueAt(index++);
       }
 
       @Override
@@ -228,7 +225,7 @@ public abstract class XQArray extends XQStruct {
 
       @Override
       public Value previous() {
-        return memberAt(--index);
+        return valueAt(--index);
       }
 
       @Override
@@ -272,49 +269,10 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    return get(key(args[0], qc, ii), qc, ii);
-  }
-
-  /**
-   * Gets a value from this array.
-   * @param key key to look for
-   * @param qc query context
-   * @param ii input info (can be {@code null})
-   * @return value or {@code null}
-   * @throws QueryException query exception
-   */
-  public final Value get(final Item key, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
-    final long i = index(key, qc, ii), size = structSize();
-    if(i > 0 && i <= size) return memberAt(i - 1);
+    final long i = ((Itr) Types.INTEGER_O.coerce(key(args[0], qc, ii), null, qc, null, ii)).itr();
+    final long size = structSize();
+    if(i > 0 && i <= size) return valueAt(i - 1);
     throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, i, size);
-  }
-
-  /**
-   * Gets a value from this array.
-   * @param key key to look for
-   * @param qc query context
-   * @param ii input info (can be {@code null})
-   * @return value or {@code null}
-   * @throws QueryException query exception
-   */
-  public final Value getOrNull(final Item key, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
-    final long i = index(key, qc, ii);
-    return i > 0 && i <= structSize() ? memberAt(i - 1) : null;
-  }
-
-  /**
-   * Returns the array index.
-   * @param key key to look for
-   * @param qc query context
-   * @param ii input info (can be {@code null})
-   * @return index
-   * @throws QueryException query exception
-   */
-  private static long index(final Item key, final QueryContext qc, final InputInfo ii)
-      throws QueryException {
-    return ((Itr) Types.INTEGER_O.coerce(key, null, qc, null, ii)).itr();
   }
 
   @Override
@@ -529,7 +487,7 @@ public abstract class XQArray extends XQStruct {
   public void toXml(final QueryPlan plan) {
     final ExprList list = new ExprList();
     final long size = structSize(), max = Math.min(size, 5);
-    for(int m = 0; m < max; m++) list.add(memberAt(m));
+    for(int m = 0; m < max; m++) list.add(valueAt(m));
     plan.add(plan.create(this, ENTRIES, size), list.finish());
   }
 

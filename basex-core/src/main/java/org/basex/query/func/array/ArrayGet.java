@@ -1,10 +1,11 @@
 package org.basex.query.func.array;
 
+import static org.basex.query.QueryError.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -17,16 +18,12 @@ public final class ArrayGet extends ArrayFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final XQArray array = toArray(arg(0), qc);
-    final Item position = toAtomItem(arg(1), qc);
+    final long position = toLong(arg(1), qc);
 
-    Value value;
-    if(defined(2)) {
-      value = array.getOrNull(position, qc, info);
-      if(value == null) value = arg(2).value(qc);
-    } else {
-      value = array.get(position, qc, info);
-    }
-    return value;
+    final long as = array.structSize();
+    if(position > 0 && position <= as) return array.valueAt(position - 1);
+    if(defined(2)) return arg(2).value(qc);
+    throw as == 0 ? ARRAYEMPTY.get(info) : ARRAYBOUNDS_X_X.get(info, position, as);
   }
 
   @Override
