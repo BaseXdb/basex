@@ -416,8 +416,8 @@ public final class RecordType extends MapType {
       final CompileContext cc) {
 
     final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.size());
-    for(final byte[] field : fields) {
-      if(remove == null || !Token.eq(remove, field)) map.put(field, fields.get(field));
+    for(final byte[] key : fields) {
+      if(remove == null || !Token.eq(remove, key)) map.put(key, fields.get(key));
     }
     if(put != null) map.put(put, new RecordField(seqType));
 
