@@ -215,7 +215,7 @@ public final class FuncType extends FType {
 
   @Override
   public String toString() {
-    final QueryString qs = new QueryString().token(anns).token(QueryText.FUNCTION);
+    final QueryString qs = new QueryString().token(anns).token(QueryText.FN);
     if(this == FUNCTION) qs.params(WILDCARD);
     else qs.params(argTypes).token(QueryText.AS).token(declType);
     return qs.toString();
