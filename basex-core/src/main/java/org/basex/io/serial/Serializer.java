@@ -456,7 +456,7 @@ public abstract class Serializer implements Closeable {
         // open element, serialize namespace declaration if it's new
         openElement(new QNm(name, nsUri));
         if(nsUri == null) nsUri = EMPTY;
-        namespace(nsPrefix, nsUri, false);
+        addNamespace(nsPrefix, nsUri);
 
         // database contains namespaces: add declarations
         if(nsExist) {
@@ -476,9 +476,9 @@ public abstract class Serializer implements Closeable {
           } while(p >= 0 && data.kind(p) == Data.ELEM);
 
           // reset namespace cache
-          emitNamespaces();
           nsSet.clear();
         }
+        emitNamespaces();
 
         // serialize attributes
         indentStack.push(indent);
