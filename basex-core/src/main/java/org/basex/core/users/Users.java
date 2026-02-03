@@ -76,7 +76,7 @@ public final class Users {
             }
           } else if(qname.eq(Q_INFO)) {
             if(info != null) Util.errln("%: <%/> occurs more than once.", file, qname);
-            else info = child.finish();
+            else info = child;
           } else {
             Util.errln("%: invalid element <%/>.", file, qname);
           }

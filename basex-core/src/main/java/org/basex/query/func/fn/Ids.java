@@ -100,7 +100,7 @@ abstract class Ids extends ContextFn {
         boolean found = false;
         for(final byte[] id : distinctTokens(attr.string())) {
           if((idref ? idSet.contains(id) : idSet.remove(id) != 0) && !found) {
-            results.add(idref ? attr.finish() : node.finish());
+            results.add(idref ? attr : node);
             found = true;
           }
         }

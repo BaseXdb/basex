@@ -40,7 +40,7 @@ public final class IterLastStep extends Step {
         XNode last = null;
         for(final XNode node : axis.iter(checkNode(qc))) {
           qc.checkStop();
-          if(test.matches(node)) last = node.finish();
+          if(test.matches(node)) last = node;
         }
         return last;
       }

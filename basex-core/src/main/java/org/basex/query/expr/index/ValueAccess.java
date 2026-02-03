@@ -145,7 +145,6 @@ public final class ValueAccess extends IndexAccess {
     if(iter.size() == 0) return BasicNodeIter.EMPTY;
 
     final int kind = type == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-    final DBNode tmp = new DBNode(data, 0, test == null ? kind : Data.ELEM);
 
     // test names of parents (index access or sequential scan)
     if(test != null) {
@@ -153,8 +152,8 @@ public final class ValueAccess extends IndexAccess {
         @Override
         public DBNode next() {
           while(iter.more()) {
-            tmp.pre(data.parent(iter.pre(), kind));
-            if(test.matches(tmp)) return tmp.finish();
+            final DBNode node = new DBNode(data, data.parent(iter.pre(), kind), Data.ELEM);
+            if(test.matches(node)) return node;
           }
           return null;
         }
@@ -166,11 +165,7 @@ public final class ValueAccess extends IndexAccess {
       return new DBNodeIter(data) {
         @Override
         public DBNode next() {
-          if(iter.more()) {
-            tmp.pre(iter.pre());
-            return tmp.finish();
-          }
-          return null;
+          return iter.more() ? new DBNode(data, iter.pre(), kind) : null;
         }
       };
     }
@@ -183,17 +178,15 @@ public final class ValueAccess extends IndexAccess {
       public DBNode next() {
         if(iter.more()) {
           final int pre = iter.pre();
-          tmp.pre(pre);
           list.add(pre);
-          return tmp.finish();
+          return new DBNode(data, pre, kind);
         }
         return null;
       }
       @Override
       public DBNode get(final long i) {
         while(i >= list.size() && iter.more()) list.add(iter.pre());
-        tmp.pre(list.get((int) i));
-        return tmp.finish();
+        return new DBNode(data, list.get((int) i), kind);
       }
       @Override
       public long size() {
@@ -250,7 +243,6 @@ public final class ValueAccess extends IndexAccess {
    */
   private DBNodeIter scanEmpty(final Data data) {
     return new DBNodeIter(data) {
-      final DBNode tmp = new DBNode(data, 0, Data.ELEM);
       final int sz = data.meta.size;
       int pre = -1;
 
@@ -258,8 +250,8 @@ public final class ValueAccess extends IndexAccess {
       public DBNode next() {
         while(++pre < sz) {
           if(data.kind(pre) == Data.ELEM && data.size(pre, Data.ELEM) == 1) {
-            tmp.pre(pre);
-            if(test == null || test.matches(tmp)) return tmp.finish();
+            final DBNode node = new DBNode(data, pre, Data.ELEM);
+            if(test == null || test.matches(node)) return node;
           }
         }
         return null;

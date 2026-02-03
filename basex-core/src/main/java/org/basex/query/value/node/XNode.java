@@ -173,7 +173,7 @@ public abstract class XNode extends Item {
         final Type tp = child.type;
         if((tp != PROCESSING_INSTRUCTION || options.get(PROCESSING_INSTRUCTIONS)) &&
             (tp != COMMENT || options.get(COMMENTS))) {
-          nl.add(tp != TEXT || nl.isEmpty() || nl.peek().type != NodeType.TEXT ? child.finish() :
+          nl.add(tp != TEXT || nl.isEmpty() || nl.peek().type != NodeType.TEXT ? child :
             new FTxt(Token.concat(nl.pop().string(), child.string())));
         }
       }
@@ -272,13 +272,6 @@ public abstract class XNode extends Item {
     new DataBuilder(data, job).build(this);
     return new DBNode(data);
   }
-
-  /**
-   * Returns a finalized node instance. This method is called when iterating through node results:
-   * If a single node instances is recycled, it needs to be duplicated in the final step.
-   * @return node
-   */
-  public abstract XNode finish();
 
   /**
    * Returns the name (optional prefix, local name) of an attribute, element or
@@ -475,8 +468,7 @@ public abstract class XNode extends Item {
   }
 
   /**
-   * Returns a light-weight ancestor-or-self axis iterator.
-   * Before nodes are added to a result, they must be finalized via {@link XNode#finish()}.
+   * Returns an ancestor-or-self axis iterator.
    * @param self include self node
    * @return iterator
    */
@@ -498,16 +490,14 @@ public abstract class XNode extends Item {
   }
 
   /**
-   * Returns a light-weight attribute axis iterator with {@link Iter#size()} and
+   * Returns an attribute axis iterator with {@link Iter#size()} and
    * {@link Iter#get(long)} implemented.
-   * Before nodes are added to a result, they must be finalized via {@link XNode#finish()}.
    * @return iterator
    */
   public abstract BasicNodeIter attributeIter();
 
   /**
-   * Returns a light-weight child axis iterator.
-   * Before nodes are added to a result, they must be finalized via {@link XNode#finish()}.
+   * Returns a child axis iterator.
    * @return iterator
    */
   public abstract BasicNodeIter childIter();
@@ -553,7 +543,7 @@ public abstract class XNode extends Item {
       public XNode next() {
         if(iter == null) {
           final ANodeList list = new ANodeList();
-          if(self) list.add(finish());
+          if(self) list.add(XNode.this);
           XNode node = XNode.this, root = node.parent();
           while(root != null) {
             final BasicNodeIter ir = root.childIter();
@@ -563,7 +553,7 @@ public abstract class XNode extends Item {
               }
             }
             for(final XNode nd : ir) {
-              list.add(nd.finish());
+              list.add(nd);
               addDescendants(nd.childIter(), list);
             }
             node = root;
@@ -577,8 +567,7 @@ public abstract class XNode extends Item {
   }
 
   /**
-   * Returns a light-weight following-sibling axis iterator.
-   * Before nodes are added to a result, they must be finalized via {@link XNode#finish()}.
+   * Returns a following-sibling axis iterator.
    * @param self include self node
    * @return iterator
    */
@@ -604,8 +593,7 @@ public abstract class XNode extends Item {
   }
 
   /**
-   * Returns a light-weight parent axis iterator.
-   * Before nodes are added to a result, they must be finalized via {@link XNode#finish()}.
+   * Returns a parent axis iterator.
    * @return iterator
    */
   public final BasicNodeIter parentIter() {
@@ -622,8 +610,7 @@ public abstract class XNode extends Item {
   }
 
   /**
-   * Returns a light-weight preceding axis iterator.
-   * Before nodes are added to a result, they must be finalized via {@link XNode#finish()}.
+   * Returns a preceding axis iterator.
    * @param self include self node
    * @return iterator
    */
@@ -635,17 +622,17 @@ public abstract class XNode extends Item {
       public XNode next() {
         if(iter == null) {
           final ANodeList list = new ANodeList();
-          if(self) list.add(finish());
+          if(self) list.add(XNode.this);
           XNode node = XNode.this, root = node.parent();
           while(root != null) {
             if(node.type != ATTRIBUTE) {
-              final ANodeList tmp = new ANodeList();
-              for(final XNode c : root.childIter()) {
-                if(c.is(node)) break;
-                tmp.add(c.finish());
-                addDescendants(c.childIter(), tmp);
+              final ANodeList lst = new ANodeList();
+              for(final XNode ch : root.childIter()) {
+                if(ch.is(node)) break;
+                lst.add(ch);
+                addDescendants(ch.childIter(), lst);
               }
-              for(int t = tmp.size() - 1; t >= 0; t--) list.add(tmp.get(t));
+              for(int t = lst.size() - 1; t >= 0; t--) list.add(lst.get(t));
             }
             node = root;
             root = root.parent();
@@ -658,8 +645,7 @@ public abstract class XNode extends Item {
   }
 
   /**
-   * Returns a light-weight preceding-sibling axis iterator.
-   * Before nodes are added to a result, they must be finalized via {@link XNode#finish()}.
+   * Returns a preceding-sibling axis iterator.
    * @param self include self node
    * @return iterator
    */
@@ -677,7 +663,7 @@ public abstract class XNode extends Item {
           list = new ANodeList();
           for(final XNode node : root.childIter()) {
             final boolean last = node.is(XNode.this);
-            if(!last || self) list.add(node.finish());
+            if(!last || self) list.add(node);
             if(last) break;
           }
           l = list.size();
@@ -711,7 +697,7 @@ public abstract class XNode extends Item {
    */
   private static void addDescendants(final BasicNodeIter children, final ANodeList nodes) {
     for(final XNode node : children) {
-      nodes.add(node.finish());
+      nodes.add(node);
       addDescendants(node.childIter(), nodes);
     }
   }

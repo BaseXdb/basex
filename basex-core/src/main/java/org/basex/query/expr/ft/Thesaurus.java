@@ -92,7 +92,7 @@ public final class Thesaurus {
     final ANodeList list = new ANodeList();
     for(final XNode element : desc ? node.descendantIter(false) : node.childIter()) {
       if(element.type == NodeType.ELEMENT && eq(element.qname().local(), name))
-        list.add(element.finish());
+        list.add(element);
     }
     return list;
   }

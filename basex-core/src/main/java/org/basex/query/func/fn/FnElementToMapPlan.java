@@ -27,9 +27,9 @@ public final class FnElementToMapPlan extends PlanFn {
     for(Item item; (item = iter.next()) != null;) {
       for(final XNode desc : toNode(item).descendantIter(true)) {
         if(desc.type == NodeType.ELEMENT) {
-          elemNames.computeIfAbsent(desc.qname(), ANodeList::new).add(desc.finish());
+          elemNames.computeIfAbsent(desc.qname(), ANodeList::new).add(desc);
           for(final XNode attr : children(NodeType.ATTRIBUTE, desc)) {
-            attrNames.computeIfAbsent(attr.qname(), ANodeList::new).add(attr.finish());
+            attrNames.computeIfAbsent(attr.qname(), ANodeList::new).add(attr);
           }
         }
       }

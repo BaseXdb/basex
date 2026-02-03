@@ -53,12 +53,11 @@ public class FnOutermost extends StandardFunc {
 
       if(outer) {
         // skip the subtree of the last added node
-        final DBNode dummy = new DBNode(data);
         for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
           final DBNode nd = (DBNode) list.get(next);
           final int pre = nd.pre();
-          dummy.pre(pre + data.size(pre, data.kind(pre)));
-          p = list.binarySearch(dummy, next + 1, len - next - 1);
+          final DBNode node = new DBNode(data, pre + data.size(pre, data.kind(pre)));
+          p = list.binarySearch(node, next + 1, len - next - 1);
           builder.add(nd);
         }
       } else {

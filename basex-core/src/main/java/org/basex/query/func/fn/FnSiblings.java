@@ -4,7 +4,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -30,8 +29,7 @@ public final class FnSiblings extends ContextFn {
       @Override
       public XNode next() throws QueryException {
         qc.checkStop();
-        final Item next = iter.next();
-        return next != null ? ((XNode) next).finish() : null;
+        return (XNode) iter.next();
       }
     };
   }

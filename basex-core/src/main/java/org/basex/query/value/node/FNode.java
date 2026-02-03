@@ -26,11 +26,6 @@ public abstract class FNode extends XNode {
   }
 
   @Override
-  public FNode finish() {
-    return this;
-  }
-
-  @Override
   public final boolean is(final XNode node) {
     return this == node;
   }

@@ -35,7 +35,7 @@ public final class IterStep extends Step {
       public XNode next() throws QueryException {
         for(final XNode node : iter) {
           qc.checkStop();
-          if(test.matches(node) && test(node, qc)) return node.finish();
+          if(test.matches(node) && test(node, qc)) return node;
         }
         return null;
       }

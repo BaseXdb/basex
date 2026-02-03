@@ -77,7 +77,7 @@ public final class PathCache {
    * @param res result
    */
   void update(final Value value, final Value res) {
-    context = value instanceof final DBNode dbnode ? dbnode.finish() : value;
+    context = value instanceof final DBNode dbnode ? dbnode : value;
     result = res;
   }
 

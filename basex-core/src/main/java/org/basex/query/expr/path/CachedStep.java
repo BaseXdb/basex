@@ -32,7 +32,7 @@ public final class CachedStep extends Step {
     // evaluate step
     final ANodeList list = new ANodeList();
     for(final XNode node : axis.iter(checkNode(qc))) {
-      if(test.matches(node)) list.add(node.finish());
+      if(test.matches(node)) list.add(node);
     }
 
     // evaluate predicates

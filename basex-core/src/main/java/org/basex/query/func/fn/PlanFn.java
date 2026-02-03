@@ -318,11 +318,11 @@ public abstract class PlanFn extends StandardFunc {
     for(final XNode node : nodes) {
       if(type == NodeType.ATTRIBUTE) {
         for(final XNode child : node.attributeIter()) {
-          if(!Token.eq(child.qname().uri(), QueryText.XSI_URI)) list.add(child.finish());
+          if(!Token.eq(child.qname().uri(), QueryText.XSI_URI)) list.add(child);
         }
       } else {
         for(final XNode child : node.childIter()) {
-          if(child.type == type) list.add(child.finish());
+          if(child.type == type) list.add(child);
         }
       }
     }

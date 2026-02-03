@@ -112,7 +112,7 @@ public final class User {
         patterns.put(nm, perm);
       } else if(qname.eq(Q_INFO)) {
         if(info != null) throw new BaseXException("%: <%/> occurs more than once.", file, qname);
-        info = child.finish();
+        info = child;
       } else {
         throw new BaseXException("%: invalid element <%/>.", file, qname);
       }
