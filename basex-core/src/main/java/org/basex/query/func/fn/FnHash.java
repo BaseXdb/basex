@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.security.*;
+import java.util.*;
 import java.util.zip.*;
 
 import org.basex.io.*;
@@ -39,7 +40,8 @@ public final class FnHash extends StandardFunc {
   private byte[] hash(final Item value, final String algorithm, final QueryContext qc)
       throws QueryException {
 
-    if("CRC-32".equals(algorithm)) {
+    final String alg = algorithm != null ? algorithm.trim().toUpperCase(Locale.ENGLISH) : "MD5";
+    if(alg.equals("CRC-32")) {
       final CRC32 crc = new CRC32();
       crc.update(toBytes(value));
       final byte[] result = new byte[4];
@@ -48,13 +50,13 @@ public final class FnHash extends StandardFunc {
       return result;
     }
 
-    if("BLAKE3".equals(algorithm)) {
+    if(alg.equals("BLAKE3")) {
       return new Blake3().digest(toBytes(value));
     }
 
     final MessageDigest md;
     try {
-      md = MessageDigest.getInstance(algorithm != null ? algorithm : "MD5");
+      md = MessageDigest.getInstance(alg);
     } catch(final NoSuchAlgorithmException ex) {
       Util.debug(ex);
       throw HASH_ALGORITHM_X.get(info, algorithm);
