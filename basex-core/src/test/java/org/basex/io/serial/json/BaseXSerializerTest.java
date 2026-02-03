@@ -36,7 +36,7 @@ public final class BaseXSerializerTest extends SandboxTest {
     serialize("exists(?)", "fn:exists#1");
     serialize("exists#1(?)", "fn:exists#1");
     serialize("true#0", "fn:true#0");
-    serialize("contains(?, 'x')", "fn($value) as xs:boolean { fn:contains#2($value , 'x') }");
+    serialize("contains(?, 'x')", "fn($value) as xs:boolean { fn:contains#2($value, 'x') }");
 
     // maps
     serialize("{ 'x': 'y' }", "{'x':'y'}");
