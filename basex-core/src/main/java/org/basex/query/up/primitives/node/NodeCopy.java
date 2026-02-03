@@ -63,7 +63,7 @@ abstract class NodeCopy extends NodeUpdate {
       if(k == Data.ATTR || k == Data.ELEM) {
         if(p > s && d.parent(p, k) >= s) break;
         final byte[][] qname = d.qname(p, k);
-        pool.add(new QNm(qname[0], qname[1]), ANode.type(k));
+        pool.add(new QNm(qname[0], qname[1]), XNode.type(k));
       }
     }
   }
@@ -77,7 +77,7 @@ abstract class NodeCopy extends NodeUpdate {
     final int ns = nl.size();
     if(ns == 0) return nl;
     final ANodeList s = new ANodeList(ns);
-    ANode n = nl.get(0);
+    XNode n = nl.get(0);
     for(int c = 0; c < ns;) {
       if(n.type == NodeType.TEXT) {
         final TokenBuilder tb = new TokenBuilder();

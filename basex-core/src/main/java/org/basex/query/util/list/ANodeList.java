@@ -18,7 +18,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ANodeList extends ObjectList<ANode, ANodeList> {
+public final class ANodeList extends ObjectList<XNode, ANodeList> {
   /**
    * Constructor.
    */
@@ -31,7 +31,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
    * @param capacity array capacity
    */
   public ANodeList(final long capacity) {
-    super(new ANode[Array.initialCapacity(capacity)]);
+    super(new XNode[Array.initialCapacity(capacity)]);
   }
 
   /**
@@ -48,11 +48,11 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
         return size;
       }
       @Override
-      public ANode next() {
+      public XNode next() {
         return pos < size ? list[pos++] : null;
       }
       @Override
-      public ANode get(final long i) {
+      public XNode get(final long i) {
         return list[(int) i];
       }
       @Override
@@ -72,13 +72,13 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
   }
 
   @Override
-  public boolean equals(final ANode node1, final ANode node2) {
+  public boolean equals(final XNode node1, final XNode node2) {
     return node1.is(node2);
   }
 
   @Override
-  protected ANode[] newArray(final int s) {
-    return new ANode[s];
+  protected XNode[] newArray(final int s) {
+    return new XNode[s];
   }
 
   @Override
@@ -91,7 +91,7 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
    * @param nodes nodes
    * @return the iterator
    */
-  public static BasicNodeIter iter(final ANode[] nodes) {
+  public static BasicNodeIter iter(final XNode[] nodes) {
     final int nl = nodes.length;
     return nl == 0 ? BasicNodeIter.EMPTY : new BasicNodeIter() {
       int pos;
@@ -101,11 +101,11 @@ public final class ANodeList extends ObjectList<ANode, ANodeList> {
         return nl;
       }
       @Override
-      public ANode next() {
+      public XNode next() {
         return pos < nl ? nodes[pos++] : null;
       }
       @Override
-      public ANode get(final long i) {
+      public XNode get(final long i) {
         return nodes[(int) i];
       }
       @Override

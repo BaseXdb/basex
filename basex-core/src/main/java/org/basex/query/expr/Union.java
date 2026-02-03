@@ -88,10 +88,10 @@ public final class Union extends Set {
   NodeIter iterate(final QueryContext qc) throws QueryException {
     return new SetIter(qc, iters(qc)) {
       @Override
-      public ANode next() throws QueryException {
+      public XNode next() throws QueryException {
         if(nodes == null) {
           final int il = iter.length;
-          nodes = new ANode[il];
+          nodes = new XNode[il];
           for(int i = 0; i < il; i++) next(i);
         }
 
@@ -108,7 +108,7 @@ public final class Union extends Set {
         }
         if(m == -1) return null;
 
-        final ANode node = nodes[m];
+        final XNode node = nodes[m];
         next(m);
         return node;
       }

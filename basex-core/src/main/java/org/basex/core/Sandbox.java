@@ -117,7 +117,7 @@ public abstract class Sandbox {
    * @param plan query plan (can be {@code null})
    */
   protected static void compare(final String query, final String result, final Object expected,
-      final ANode plan) {
+      final XNode plan) {
     final String res = normNL(result), exp = expected.toString();
     if(OUTPUT) {
       Util.errln(query.strip());
@@ -135,7 +135,7 @@ public abstract class Sandbox {
    * @param plan query plan (can be {@code null})
    * @return string
    */
-  protected static String serialize(final ANode plan) {
+  protected static String serialize(final XNode plan) {
     try {
       return plan != null ? "PLAN: " + plan.serialize(SerializerMode.INDENT.get()) : "";
     } catch(final QueryIOException ex) {

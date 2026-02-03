@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class DbPath extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    ANode node, parent = toNode(arg(0), qc);
+    XNode node, parent = toNode(arg(0), qc);
     do {
       node = parent;
       parent = node.parent();

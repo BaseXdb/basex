@@ -15,7 +15,7 @@ public class BXText extends BXChar implements Text {
    * Constructor.
    * @param node node reference
    */
-  BXText(final ANode node) {
+  BXText(final XNode node) {
     super(node);
   }
 

@@ -36,7 +36,7 @@ public final class FnPath extends ContextFn {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    ANode node = toNodeOrNull(context(qc), qc);
+    XNode node = toNodeOrNull(context(qc), qc);
     final PathOptions options = toOptions(arg(1), new PathOptions(), qc);
     if(node == null) return Empty.VALUE;
 
@@ -50,7 +50,7 @@ public final class FnPath extends ContextFn {
 
     boolean relative = false;
     while(true) {
-      final ANode parent = node.parent();
+      final XNode parent = node.parent();
       final NodeType type = (NodeType) node.type;
       if(parent == null) {
         if(type != NodeType.DOCUMENT_NODE) {
@@ -72,7 +72,7 @@ public final class FnPath extends ContextFn {
       // optional index
       if(indexes && type != NodeType.ATTRIBUTE) {
         int p = 1;
-        for(final ANode nd : node.precedingSiblingIter(false)) {
+        for(final XNode nd : node.precedingSiblingIter(false)) {
           qc.checkStop();
           if(nd.type == type && (type.oneOf(NodeType.COMMENT, NodeType.TEXT) ||
               nd.qname().eq(qname))) p++;
@@ -83,16 +83,16 @@ public final class FnPath extends ContextFn {
       node = parent;
 
       // root node: finalize traversal
-      if(origin instanceof final ANode nd && node.is(nd)) {
+      if(origin instanceof final XNode nd && node.is(nd)) {
         relative = true;
         break;
       }
     }
-    if(origin instanceof ANode && !relative) throw PATH_X.get(info, origin);
+    if(origin instanceof XNode && !relative) throw PATH_X.get(info, origin);
 
     // add all steps in reverse order; cache element paths
     for(int s = steps.size() - 1; s >= 0; --s) {
-      if(!(tb.isEmpty() && origin instanceof ANode)) tb.add('/');
+      if(!(tb.isEmpty() && origin instanceof XNode)) tb.add('/');
       tb.add(steps.get(s));
     }
     return Str.get(tb.isEmpty() ? Token.cpToken('/') : tb.finish());

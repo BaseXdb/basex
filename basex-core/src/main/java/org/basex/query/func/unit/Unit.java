@@ -259,7 +259,7 @@ final class Unit {
   private static FBuilder element(final Item item, final QNm name, final int count) {
     final FBuilder elem = FElem.build(name);
     if(item != null) {
-      if(item instanceof final ANode node) {
+      if(item instanceof final XNode node) {
         elem.add(node);
       } else {
         try {

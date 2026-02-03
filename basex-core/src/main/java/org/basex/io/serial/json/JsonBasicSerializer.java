@@ -42,13 +42,13 @@ public final class JsonBasicSerializer extends JsonSerializer {
   }
 
   @Override
-  protected void node(final ANode node) throws IOException {
+  protected void node(final XNode node) throws IOException {
     if(level > 0) indent();
 
     final BasicNodeIter iter = node.childIter();
     final Type type = node.type;
     if(type.oneOf(NodeType.DOCUMENT_NODE, NodeType.DOCUMENT_NODE_ELEMENT)) {
-      for(ANode child; (child = iter.next()) != null;) {
+      for(XNode child; (child = iter.next()) != null;) {
         node(child);
       }
     } else if(type == NodeType.ELEMENT) {
@@ -59,7 +59,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
       byte[] key = null;
       boolean escaped = false, escapedKey = false;
-      for(final ANode attr : node.attributeIter()) {
+      for(final XNode attr : node.attributeIter()) {
         final QNm qnm = attr.qname();
         final byte[] au = qnm.uri(), an = qnm.local(), av = attr.string();
         if(au.length != 0) {
@@ -92,7 +92,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
       if(eq(local, NULL)) {
         out.print(NULL);
-        for(ANode n; (n = iter.next()) != null;) {
+        for(XNode n; (n = iter.next()) != null;) {
           if(!n.type.oneOf(NodeType.COMMENT, NodeType.PROCESSING_INSTRUCTION))
             throw error("Element '%' must have no children.", local);
         }
@@ -212,7 +212,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
     printedKeys = new TokenSet();
     level++;
     boolean comma = false;
-    for(ANode child; (child = iter.next()) != null;) {
+    for(XNode child; (child = iter.next()) != null;) {
       final Type type = child.type;
       if(type == NodeType.ELEMENT) {
         if(comma) out.print(',');
@@ -237,7 +237,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    */
   private static byte[] value(final BasicNodeIter iter, final byte[] type) throws QueryIOException {
     TokenBuilder tb = null;
-    for(ANode child; (child = iter.next()) != null;) {
+    for(XNode child; (child = iter.next()) != null;) {
       final Type tp = child.type;
       if(tp == NodeType.TEXT) {
         if(tb == null) tb = new TokenBuilder();

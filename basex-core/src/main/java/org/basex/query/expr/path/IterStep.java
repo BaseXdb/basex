@@ -32,8 +32,8 @@ public final class IterStep extends Step {
     final BasicNodeIter iter = axis.iter(checkNode(qc));
     return new NodeIter() {
       @Override
-      public ANode next() throws QueryException {
-        for(final ANode node : iter) {
+      public XNode next() throws QueryException {
+        for(final XNode node : iter) {
           qc.checkStop();
           if(test.matches(node) && test(node, qc)) return node.finish();
         }
@@ -45,7 +45,7 @@ public final class IterStep extends Step {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    for(final ANode node : axis.iter(checkNode(qc))) {
+    for(final XNode node : axis.iter(checkNode(qc))) {
       qc.checkStop();
       if(test.matches(node) && test(node, qc)) return true;
     }

@@ -48,7 +48,7 @@ public final class UnionTest extends Test {
   }
 
   @Override
-  public boolean matches(final ANode node) {
+  public boolean matches(final XNode node) {
     for(final Test test : tests) {
       if(test.matches(node)) return true;
     }

@@ -176,8 +176,8 @@ public abstract class Inspect {
       if(contains(value, '<')) {
         // contains angle brackets: add as XML structure
         final MainOptions mopts = new MainOptions();
-        final ANode node = new DBNode(new XMLParser(new IOContent(value), mopts, true));
-        for(final ANode child : node.childIter()) {
+        final XNode node = new DBNode(new XMLParser(new IOContent(value), mopts, true));
+        for(final XNode child : node.childIter()) {
           elem.add(child.copy(mopts, null));
         }
       } else {

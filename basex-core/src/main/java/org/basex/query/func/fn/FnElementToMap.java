@@ -39,7 +39,7 @@ public final class FnElementToMap extends PlanFn {
     final Item element = arg(0).item(qc, info);
     if(element.isEmpty()) return Empty.VALUE;
 
-    final ANode elem = toElem(element, qc);
+    final XNode elem = toElem(element, qc);
     final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), qc);
 
     final Plan plan = new Plan();

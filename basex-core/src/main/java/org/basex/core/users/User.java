@@ -31,7 +31,7 @@ public final class User {
   /** Name. */
   private String name;
   /** Info node (can be {@code null}). */
-  private ANode info;
+  private XNode info;
 
   /**
    * Constructor.
@@ -80,13 +80,13 @@ public final class User {
    * @param file input file
    * @throws BaseXException database exception
    */
-  User(final ANode user, final IOFile file) throws BaseXException {
+  User(final XNode user, final IOFile file) throws BaseXException {
     name = string(attribute(user, Q_NAME, "Root"));
     passwords = new EnumMap<>(Algorithm.class);
     patterns = new LinkedHashMap<>();
     permission = attribute(name, user, Q_PERMISSION, Perm.values());
 
-    for(final ANode child : children(user)) {
+    for(final XNode child : children(user)) {
       final QNm qname = child.qname();
       if(qname.eq(Q_PASSWORD)) {
         final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
@@ -95,7 +95,7 @@ public final class User {
             "%: Algorithm % supplied more than once.", name, algorithm);
         passwords.put(algorithm, ec);
 
-        for(final ANode code : children(child)) {
+        for(final XNode code : children(child)) {
           final Code cd = value(name, code.qname().unique(), algorithm.codes);
           if(ec.containsKey(cd)) throw new BaseXException(
               "%, %: Code % supplied more than once.", name, algorithm, code);
@@ -286,7 +286,7 @@ public final class User {
    * Returns the info element.
    * @return info element (can be {@code null})
    */
-  public synchronized ANode info() {
+  public synchronized XNode info() {
     return info;
   }
 
@@ -294,7 +294,7 @@ public final class User {
    * Sets the info element.
    * @param elem info element
    */
-  public synchronized void info(final ANode elem) {
+  public synchronized void info(final XNode elem) {
     info = elem.hasChildren() || elem.hasAttributes() ? elem : null;
   }
 

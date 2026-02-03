@@ -70,7 +70,7 @@ public class AdaptiveSerializer extends OutputSerializer {
   }
 
   @Override
-  protected final void node(final ANode node) throws IOException {
+  protected final void node(final XNode node) throws IOException {
     final Type type = node.type;
     final XMLSerializer ser = xml();
     if(type == NodeType.ATTRIBUTE) ser.attribute(node.name(), node.string(), true);

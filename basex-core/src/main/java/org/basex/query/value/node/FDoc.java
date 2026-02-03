@@ -26,7 +26,7 @@ public final class FDoc extends FNode {
   /** Base URI. */
   private final byte[] uri;
   /** Children. */
-  private ANode[] children;
+  private XNode[] children;
 
   /**
    * Constructor.
@@ -72,7 +72,7 @@ public final class FDoc extends FNode {
    * @param ch children
    * @return self reference
    */
-  FDoc finish(final ANode[] ch) {
+  FDoc finish(final XNode[] ch) {
     children = ch;
     return this;
   }
@@ -104,7 +104,7 @@ public final class FDoc extends FNode {
     if(materialized(test, ii)) return this;
 
     final FBuilder doc = build(uri);
-    for(final ANode child : children) doc.add(child.materialize(test, ii, qc));
+    for(final XNode child : children) doc.add(child.materialize(test, ii, qc));
     return doc.finish();
   }
 

@@ -58,7 +58,7 @@ public final class Insert extends Update {
       final Type type = item.type;
       if(!(type instanceof NodeType)) throw (sibling ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
 
-      final ANode node = (ANode) item, parent = node.parent();
+      final XNode node = (XNode) item, parent = node.parent();
       if(sibling) {
         if(type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE))
           throw UPTRGTYP2_X.get(info, node);
@@ -73,7 +73,7 @@ public final class Insert extends Update {
       // no update primitive is created if node list is empty
       ANodeList list = builder.attributes;
       if(list != null) {
-        final ANode target = sibling ? parent : node;
+        final XNode target = sibling ? parent : node;
         if(target.type != NodeType.ELEMENT)
           throw (sibling ? UPATTELM_X : UPATTELM2_X).get(info, target);
 

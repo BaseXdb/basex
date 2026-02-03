@@ -32,13 +32,13 @@ public final class IterLastStep extends Step {
       boolean skip;
 
       @Override
-      public ANode next() throws QueryException {
+      public XNode next() throws QueryException {
         if(skip) return null;
         skip = true;
 
         // return last item
-        ANode last = null;
-        for(final ANode node : axis.iter(checkNode(qc))) {
+        XNode last = null;
+        for(final XNode node : axis.iter(checkNode(qc))) {
           qc.checkStop();
           if(test.matches(node)) last = node.finish();
         }

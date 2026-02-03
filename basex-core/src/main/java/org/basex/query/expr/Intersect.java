@@ -93,7 +93,7 @@ public final class Intersect extends Set {
       final ANodeBuilder tmp = new ANodeBuilder();
       iter = exprs[e].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
-        final ANode node = toNode(item);
+        final XNode node = toNode(item);
         if(nodes.contains(node)) tmp.add(node);
       }
       nodes = tmp;
@@ -105,9 +105,9 @@ public final class Intersect extends Set {
   NodeIter iterate(final QueryContext qc) throws QueryException {
     return new SetIter(qc, iters(qc)) {
       @Override
-      public ANode next() throws QueryException {
+      public XNode next() throws QueryException {
         final int irl = iter.length;
-        if(nodes == null) nodes = new ANode[irl];
+        if(nodes == null) nodes = new XNode[irl];
 
         for(int i = 0; i < irl; i++) {
           if(!next(i)) return null;

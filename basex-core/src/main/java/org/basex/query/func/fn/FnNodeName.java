@@ -19,7 +19,7 @@ import org.basex.util.*;
 public class FnNodeName extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNodeOrNull(context(qc), qc);
+    final XNode node = toNodeOrNull(context(qc), qc);
     if(node == null) return Empty.VALUE;
 
     final Type type = node.type;

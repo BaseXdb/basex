@@ -11,7 +11,7 @@ import org.basex.util.*;
  */
 public final class FnLocalName extends FnName {
   @Override
-  byte[] name(final ANode node) {
+  byte[] name(final XNode node) {
     return Token.local(node.name());
   }
 }

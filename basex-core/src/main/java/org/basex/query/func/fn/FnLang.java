@@ -25,12 +25,12 @@ public final class FnLang extends ContextFn {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     final byte[] lang = lc(toZeroToken(arg(0), qc));
-    ANode node = toNodeOrNull(arg(1), qc);
+    XNode node = toNodeOrNull(arg(1), qc);
     if(node == null) node = toNode(context(qc), qc);
 
-    for(ANode nd = node; nd != null; nd = nd.parent()) {
+    for(XNode nd = node; nd != null; nd = nd.parent()) {
       final BasicNodeIter atts = nd.attributeIter();
-      for(ANode at; (at = atts.next()) != null;) {
+      for(XNode at; (at = atts.next()) != null;) {
         if(eq(at.qname().string(), LANG)) {
           final byte[] ln = lc(normalize(at.string()));
           return startsWith(ln, lang) && (lang.length == ln.length || ln[lang.length] == '-');

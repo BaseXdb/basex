@@ -46,7 +46,7 @@ public final class CachedPath extends AxisPath {
       if(rt != null) {
         final Iter iter = rt.iter(qc);
         for(Item item; (item = iter.next()) != null;) {
-          if(root != null && !(item instanceof ANode))
+          if(root != null && !(item instanceof XNode))
             throw PATHNODE_X_X_X.get(info, steps[0], item.type, item);
           qf.value = item;
           iterate(0, list, qc);
@@ -73,11 +73,11 @@ public final class CachedPath extends AxisPath {
     // cast is safe (steps will always return a {@link NodeIter} instance)
     final NodeIter ni = (NodeIter) steps[step].iter(qc);
     if(step + 1 == steps.length) {
-      for(ANode node; (node = ni.next()) != null;) {
+      for(XNode node; (node = ni.next()) != null;) {
         list.add(node);
       }
     } else {
-      for(ANode node; (node = ni.next()) != null;) {
+      for(XNode node; (node = ni.next()) != null;) {
         qc.focus.value = node;
         iterate(step + 1, list, qc);
       }

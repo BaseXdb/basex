@@ -18,11 +18,11 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public abstract class BasicNodeIter extends NodeIter implements Iterable<ANode> {
+public abstract class BasicNodeIter extends NodeIter implements Iterable<XNode> {
   /** Empty iterator. */
   public static final BasicNodeIter EMPTY = new BasicNodeIter() {
     @Override
-    public ANode next() {
+    public XNode next() {
       return null;
     }
     @Override
@@ -40,22 +40,22 @@ public abstract class BasicNodeIter extends NodeIter implements Iterable<ANode> 
   };
 
   @Override
-  public abstract ANode next();
+  public abstract XNode next();
 
   @Override
-  public final Iterator<ANode> iterator() {
+  public final Iterator<XNode> iterator() {
     return new Iterator<>() {
-      private ANode node;
+      private XNode node;
 
       @Override
       public boolean hasNext() {
-        final ANode n = BasicNodeIter.this.next();
+        final XNode n = BasicNodeIter.this.next();
         node = n;
         return n != null;
       }
 
       @Override
-      public ANode next() {
+      public XNode next() {
         return node;
       }
 

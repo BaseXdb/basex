@@ -33,7 +33,7 @@ public enum NodeType implements Type {
   /** Text type. */
   TEXT("text", NODE, ID.TXT) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final InputInfo info) {
+    public XNode cast(final Object value, final QueryContext qc, final InputInfo info) {
       if(value instanceof final BXText text) return text.getNode();
       if(value instanceof final Text text) return new FTxt(text);
       return new FTxt(Token.token(value));
@@ -43,7 +43,7 @@ public enum NodeType implements Type {
   /** PI type. */
   PROCESSING_INSTRUCTION("processing-instruction", NODE, ID.PI) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
+    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
       if(value instanceof final BXPI pi) return pi.getNode();
       if(value instanceof final ProcessingInstruction pi) return new FPI(pi);
@@ -55,7 +55,7 @@ public enum NodeType implements Type {
   /** Element type. */
   ELEMENT("element", NODE, ID.ELM) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
+    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
       if(value instanceof final BXElem elem)
         return elem.getNode();
@@ -72,7 +72,7 @@ public enum NodeType implements Type {
   /** Document type. */
   DOCUMENT_NODE("document-node", NODE, ID.DOC) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
+    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
       if(value instanceof final BXDoc doc) return doc.getNode();
       try {
@@ -95,7 +95,7 @@ public enum NodeType implements Type {
   /** Document element type. */
   DOCUMENT_NODE_ELEMENT("document-node(element())", DOCUMENT_NODE, ID.DEL) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
+    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
       return DOCUMENT_NODE.cast(value, qc, info);
     }
@@ -104,7 +104,7 @@ public enum NodeType implements Type {
   /** Attribute type. */
   ATTRIBUTE("attribute", NODE, ID.ATT) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
+    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
       if(value instanceof final BXAttr attr) return attr.getNode();
       if(value instanceof final Attr attr) return new FAttr(attr);
@@ -116,7 +116,7 @@ public enum NodeType implements Type {
   /** Comment type. */
   COMMENT("comment", NODE, ID.COM) {
     @Override
-    public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
+    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
       if(value instanceof final BXComm comm) return comm.getNode();
       if(value instanceof final Comment comm) return new FComm(comm);
@@ -207,20 +207,20 @@ public enum NodeType implements Type {
   }
 
   @Override
-  public final ANode cast(final Item item, final QueryContext qc, final InputInfo info)
+  public final XNode cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    if(item.type == this) return (ANode) item;
+    if(item.type == this) return (XNode) item;
     throw typeError(item, this, info);
   }
 
   @Override
-  public ANode cast(final Object value, final QueryContext qc, final InputInfo info)
+  public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
     throw FUNCCAST_X_X.get(info, this, value);
   }
 
   @Override
-  public ANode read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+  public XNode read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
     return cast(in.readToken(), qc, null);
   }
 

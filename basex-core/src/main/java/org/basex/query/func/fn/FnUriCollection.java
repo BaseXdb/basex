@@ -47,6 +47,6 @@ public final class FnUriCollection extends FnCollection {
    * @return URI
    */
   private static Uri toUri(final Item item) {
-    return Uri.get(((ANode) item).baseURI(), false);
+    return Uri.get(((XNode) item).baseURI(), false);
   }
 }

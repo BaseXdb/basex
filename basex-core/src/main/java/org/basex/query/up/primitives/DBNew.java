@@ -168,7 +168,7 @@ public final class DBNew {
     options.set(i, null);
 
     // existing node: create data clip for copied instance
-    ANode node = input.node;
+    XNode node = input.node;
     if(node != null) {
       if(node.type != NodeType.DOCUMENT_NODE) node = FDoc.build(token(name)).add(node).finish();
       final MemData mdata = (MemData) node.copy(mopts, qc).data();

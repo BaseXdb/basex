@@ -77,9 +77,9 @@ public class FnOutermost extends StandardFunc {
     } else {
       // multiple documents and/or constructed fragments
       OUTER: for(int l = 0; l < len; l++) {
-        final ANode nd = list.get(l);
+        final XNode nd = list.get(l);
         final BasicNodeIter ax = outer ? nd.ancestorIter(false) : nd.descendantIter(false);
-        for(ANode a; (a = ax.next()) != null;) {
+        for(XNode a; (a = ax.next()) != null;) {
           qc.checkStop();
           if(list.contains(a)) continue OUTER;
         }

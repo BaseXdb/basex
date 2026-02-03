@@ -96,7 +96,7 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean matches(final ANode node) {
+  public boolean matches(final XNode node) {
     return node.type == type && (
       // namespace wildcard: only check local name
       local != null ? Token.eq(local, Token.local(node.name())) :

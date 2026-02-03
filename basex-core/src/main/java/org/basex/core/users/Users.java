@@ -32,7 +32,7 @@ public final class Users {
   /** Filename. */
   private final IOFile file;
   /** Info node (can be {@code null}). */
-  private ANode info;
+  private XNode info;
 
   /**
    * Constructor for global users.
@@ -54,12 +54,12 @@ public final class Users {
       final MainOptions options = new MainOptions(false);
       options.set(MainOptions.INTPARSE, true);
       options.set(MainOptions.STRIPWS, true);
-      final ANode doc = new DBNode(Parser.singleParser(file, options, ""));
-      final ANode root = children(doc, Q_USERS).next();
+      final XNode doc = new DBNode(Parser.singleParser(file, options, ""));
+      final XNode root = children(doc, Q_USERS).next();
       if(root == null) {
         Util.errln("%: No <%/> root element.", file, Q_USERS);
       } else {
-        for(final ANode child : children(root)) {
+        for(final XNode child : children(root)) {
           final QNm qname = child.qname();
           if(qname.eq(Q_USER)) {
             try {
@@ -216,7 +216,7 @@ public final class Users {
    * Returns the info element.
    * @return info element (can be {@code null})
    */
-  public synchronized ANode info() {
+  public synchronized XNode info() {
     return info;
   }
 
@@ -224,7 +224,7 @@ public final class Users {
    * Sets the info element.
    * @param elem info element
    */
-  public synchronized void info(final ANode elem) {
+  public synchronized void info(final XNode elem) {
     info = elem.hasChildren() || elem.hasAttributes() ? elem : null;
   }
 }

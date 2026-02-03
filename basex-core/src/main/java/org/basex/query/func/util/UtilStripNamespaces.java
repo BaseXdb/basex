@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
 public final class UtilStripNamespaces extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNode(arg(0), qc);
+    final XNode node = toNode(arg(0), qc);
     final Value names = arg(1).atomValue(qc, info);
 
     final TokenSet set = new TokenSet(names.size());

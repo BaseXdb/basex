@@ -14,7 +14,7 @@ final class BXCData extends BXText implements CDATASection {
    * Constructor.
    * @param node node reference
    */
-  BXCData(final ANode node) {
+  BXCData(final XNode node) {
     super(node);
   }
 

@@ -117,7 +117,7 @@ public abstract class Serializer implements Closeable {
    * @throws IOException I/O exception
    */
   public void serialize(final Item item) throws IOException {
-    if(item instanceof final ANode node) {
+    if(item instanceof final XNode node) {
       node(node);
     } else if(item instanceof final FItem fitem) {
       function(fitem);
@@ -164,7 +164,7 @@ public abstract class Serializer implements Closeable {
    * @param node node to be serialized
    * @throws IOException I/O exception
    */
-  protected void node(final ANode node) throws IOException {
+  protected void node(final XNode node) throws IOException {
     if(node instanceof final DBNode dbnode) {
       node(dbnode);
     } else {
@@ -255,7 +255,7 @@ public abstract class Serializer implements Closeable {
    * @return result of check
    */
   @SuppressWarnings("unused")
-  protected boolean skipElement(final ANode node) {
+  protected boolean skipElement(final XNode node) {
     return false;
   }
 
@@ -405,7 +405,7 @@ public abstract class Serializer implements Closeable {
       openDoc(data.text(pre++, true));
       int roots = 0;
       while(pre < size && !finished()) {
-        node((ANode) new DBNode(data, pre));
+        node((XNode) new DBNode(data, pre));
         final int k = data.kind(pre);
         if(canonical) {
           if(k == Data.ELEM && ++roots > 1) throw SERCANONROOTS_X.getIO(node);
@@ -521,7 +521,7 @@ public abstract class Serializer implements Closeable {
     } else if(type == NodeType.DOCUMENT_NODE) {
       openDoc(node.baseURI());
       int roots = 0;
-      for(final ANode nd : node.childIter()) {
+      for(final XNode nd : node.childIter()) {
         node(nd);
         if(canonical) {
           if(nd.type == NodeType.ELEMENT && ++roots > 1) throw SERCANONROOTS_X.getIO(node);
@@ -545,7 +545,7 @@ public abstract class Serializer implements Closeable {
       // serialize attributes
       final boolean i = indent;
       BasicNodeIter iter = node.attributeIter();
-      for(ANode nd; (nd = iter.next()) != null;) {
+      for(XNode nd; (nd = iter.next()) != null;) {
         final byte[] n = nd.name(), v = nd.string();
         addAttribute(n, v, canonical ? nsUri(prefix(n)) : null);
         if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
@@ -554,7 +554,7 @@ public abstract class Serializer implements Closeable {
 
       // serialize children
       iter = node.childIter();
-      for(ANode n; (n = iter.next()) != null;) {
+      for(XNode n; (n = iter.next()) != null;) {
         node(n);
       }
       closeElement();

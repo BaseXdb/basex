@@ -61,7 +61,7 @@ final class XMLParser extends CommandParser {
    * @throws QueryException query exception
    */
   private Command command(final Item root) throws IOException, QueryException {
-    final String e = ((ANode) root).qname().toJava().toString();
+    final String e = ((XNode) root).qname().toJava().toString();
     if(e.equals(ADD) && check(root, PATH + '?', '<' + INPUT))
       return new Add(value(root, PATH), xml(root));
     if(e.equals(ALTER_BACKUP) && check(root, NAME, NEWNAME))
@@ -297,7 +297,7 @@ final class XMLParser extends CommandParser {
     }
     // build error string
     final TokenBuilder syntax = new TokenBuilder();
-    final byte[] nm = ((ANode) root).qname().string();
+    final byte[] nm = ((XNode) root).qname().string();
     syntax.reset().add('<').add(nm);
     for(final byte[] m : mand) syntax.add(' ').add(m).add("=\"...\"");
     for(final byte[] o : opt) syntax.add(" (").add(o).add("=\"...\")");

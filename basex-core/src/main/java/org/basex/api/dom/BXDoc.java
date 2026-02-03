@@ -18,7 +18,7 @@ public final class BXDoc extends BXNode implements Document {
    * Constructor.
    * @param node node reference
    */
-  public BXDoc(final ANode node) {
+  public BXDoc(final XNode node) {
     super(node);
   }
 

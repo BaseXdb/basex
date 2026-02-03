@@ -20,7 +20,7 @@ public final class FnNamespaceUriForPrefix extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
-    final ANode element = toElem(arg(1), qc);
+    final XNode element = toElem(arg(1), qc);
 
     if(eq(value, XML)) return Uri.get(XML_URI, false);
     final Atts at = element.nsScope(sc());

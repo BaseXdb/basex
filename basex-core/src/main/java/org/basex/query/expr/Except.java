@@ -106,10 +106,10 @@ public final class Except extends Set {
   NodeIter iterate(final QueryContext qc) throws QueryException {
     return new SetIter(qc, iters(qc)) {
       @Override
-      public ANode next() throws QueryException {
+      public XNode next() throws QueryException {
         if(nodes == null) {
           final int il = iter.length;
-          nodes = new ANode[il];
+          nodes = new XNode[il];
           for(int i = 0; i < il; i++) next(i);
         }
 
@@ -126,7 +126,7 @@ public final class Except extends Set {
           }
           if(d > 0) next(i--);
         }
-        final ANode temp = nodes[0];
+        final XNode temp = nodes[0];
         next(0);
         return temp;
       }

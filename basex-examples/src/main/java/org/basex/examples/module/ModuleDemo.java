@@ -34,7 +34,7 @@ public class ModuleDemo extends QueryModule {
    * @param node input node
    * @return qname
    */
-  public QNm name(final ANode node) {
+  public QNm name(final XNode node) {
     return node.qname();
   }
 
@@ -61,7 +61,7 @@ public class ModuleDemo extends QueryModule {
     for(final Item item : value) {
       if(item instanceof AStr) {
         vb.add(item);
-      } else if(item instanceof final ANode node) {
+      } else if(item instanceof final XNode node) {
         vb.add(node.qname());
       }
     }

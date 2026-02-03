@@ -57,7 +57,7 @@ public abstract class Seq extends Value {
       throws QueryException {
 
     final Item first = itemAt(0);
-    if(first instanceof ANode) return true;
+    if(first instanceof XNode) return true;
     if(pos == 0 || !(first instanceof ANum)) throw testError(this, false, ii);
 
     for(final Item item : this) {

@@ -21,7 +21,7 @@ public final class FnResolveQName extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toTokenOrNull(arg(0), qc);
-    final ANode element = toElem(arg(1), qc);
+    final XNode element = toElem(arg(1), qc);
     if(value == null) return Empty.VALUE;
     if(!XMLToken.isQName(value)) throw valueError(BasicType.QNAME, value, info);
 

@@ -49,12 +49,12 @@ public final class Jobs {
       final MainOptions options = new MainOptions(false);
       options.set(MainOptions.INTPARSE, true);
       options.set(MainOptions.STRIPWS, true);
-      final ANode doc = new DBNode(Parser.singleParser(file, options, ""));
-      final ANode root = children(doc, Q_JOBS).next();
+      final XNode doc = new DBNode(Parser.singleParser(file, options, ""));
+      final XNode root = children(doc, Q_JOBS).next();
       if(root == null) {
         Util.errln(file + ": No '%' root element.", Q_JOBS);
       } else {
-        for(final ANode child : children(root)) {
+        for(final XNode child : children(root)) {
           final QNm qname = child.qname();
           if(qname.eq(Q_JOB)) {
             final JobOptions opts = options(child);
@@ -125,9 +125,9 @@ public final class Jobs {
    * @param job job element
    * @return jobs options, or {@code null} if an error occurred
    */
-  private JobOptions options(final ANode job) {
+  private JobOptions options(final XNode job) {
     final JobOptions opts = new JobOptions();
-    for(final ANode attr : job.attributeIter()) {
+    for(final XNode attr : job.attributeIter()) {
       try {
         opts.assign(string(attr.name()), string(attr.string()));
       } catch(final BaseXException ex) {

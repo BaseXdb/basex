@@ -43,7 +43,7 @@ public final class FTIndexAccess extends Simple {
     final FTIter iter = ftexpr.iter(qc);
     return new NodeIter() {
       @Override
-      public ANode next() throws QueryException {
+      public XNode next() throws QueryException {
         final FTNode item = iter.next();
         if(item != null) {
           // assign scoring

@@ -33,7 +33,7 @@ public class NodeTest extends Test {
   /** Generic node test. No other {@link NodeType#NODE} tests exist. */
   public static final NodeTest NODE = new NodeTest(NodeType.NODE) {
     @Override
-    public boolean matches(final ANode node) { return true; }
+    public boolean matches(final XNode node) { return true; }
     @Override
     public boolean instanceOf(final Test test) { return false; }
     @Override
@@ -42,7 +42,7 @@ public class NodeTest extends Test {
   /** Node test that always yields false. */
   public static final NodeTest FALSE = new NodeTest(NodeType.NODE) {
     @Override
-    public boolean matches(final ANode node) { return false; }
+    public boolean matches(final XNode node) { return false; }
     @Override
     public boolean instanceOf(final Test test) { return false; }
     @Override
@@ -87,7 +87,7 @@ public class NodeTest extends Test {
   }
 
   @Override
-  public boolean matches(final ANode node) {
+  public boolean matches(final XNode node) {
     return node.type == type;
   }
 

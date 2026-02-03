@@ -34,7 +34,7 @@ public final class NamePool {
    * Adds an entry to the pool and decreases its number of occurrence.
    * @param node node
    */
-  public void remove(final ANode node) {
+  public void remove(final XNode node) {
     final Type type = node.type;
     final boolean elem = type == NodeType.ELEMENT, attr = type == NodeType.ATTRIBUTE;
     if(elem || attr) {

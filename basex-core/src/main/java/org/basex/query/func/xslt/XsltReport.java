@@ -127,7 +127,7 @@ final class XsltReport {
    */
   private Value convert(final IOContent content, final boolean result) {
     final FBuilder doc = result ? FDoc.build() : null;
-    ANode node;
+    XNode node;
     try {
       node = new DBNode(content);
     } catch(final IOException ex) {
@@ -140,7 +140,7 @@ final class XsltReport {
       }
     }
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final ANode child : node.childIter()) {
+    for(final XNode child : node.childIter()) {
       vb.add(child.type == NodeType.TEXT ? Atm.get(child.string()) :
         result ? doc.add(child.finish()).finish() : child.finish());
     }

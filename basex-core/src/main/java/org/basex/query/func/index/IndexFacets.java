@@ -51,7 +51,7 @@ public final class IndexFacets extends IndexFn {
    * @return element
    */
   private static FBuilder tree(final Data data, final PathNode root, final QueryContext qc) {
-    final FBuilder elem = FElem.build(qc.shared.qName(ANode.type(root.kind).kind()));
+    final FBuilder elem = FElem.build(qc.shared.qName(XNode.type(root.kind).kind()));
     final boolean elm = root.kind == Data.ELEM;
     final Names names = elm ? data.elemNames : data.attrNames;
     if(root.kind == Data.ATTR || elm) elem.add(Q_NAME, names.key(root.name));

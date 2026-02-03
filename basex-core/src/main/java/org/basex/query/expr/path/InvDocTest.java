@@ -64,7 +64,7 @@ final class InvDocTest extends Test {
   }
 
   @Override
-  public boolean matches(final ANode node) {
+  public boolean matches(final XNode node) {
     // database node, ensure that the PRE value is contained in the target documents
     return node instanceof final DBNode db && data == db.data() &&
         pres.sortedIndexOf(db.pre()) >= 0;

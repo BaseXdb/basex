@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class FnBaseUri extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNodeOrNull(context(qc), qc);
+    final XNode node = toNodeOrNull(context(qc), qc);
     if(node != null) {
       final Uri uri = node.baseURI(sc().baseURI(), false, info);
       if(uri != null) return uri;

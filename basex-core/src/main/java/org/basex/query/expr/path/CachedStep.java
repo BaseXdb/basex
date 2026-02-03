@@ -31,7 +31,7 @@ public final class CachedStep extends Step {
   public Iter iter(final QueryContext qc) throws QueryException {
     // evaluate step
     final ANodeList list = new ANodeList();
-    for(final ANode node : axis.iter(checkNode(qc))) {
+    for(final XNode node : axis.iter(checkNode(qc))) {
       if(test.matches(node)) list.add(node.finish());
     }
 
@@ -44,7 +44,7 @@ public final class CachedStep extends Step {
         qf.size = ns;
         int c = 0;
         for(int n = 0; n < ns; n++) {
-          final ANode node = list.get(n);
+          final XNode node = list.get(n);
           qf.value = node;
           qf.pos = n + 1;
           if(expr.test(qc, info, qf.pos)) list.set(c++, node);

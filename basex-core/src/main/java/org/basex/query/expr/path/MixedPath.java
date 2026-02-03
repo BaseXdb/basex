@@ -53,13 +53,13 @@ public final class MixedPath extends Path {
         final ValueBuilder items = new ValueBuilder(qc);
         final Expr step = steps[s];
         for(Item item; (item = iter.next()) != null;) {
-          if(!(item instanceof ANode)) throw PATHNODE_X_X_X.get(info, step, item.type, item);
+          if(!(item instanceof XNode)) throw PATHNODE_X_X_X.get(info, step, item.type, item);
           qf.value = item;
           qf.pos++;
           // loop through all resulting items
           final Iter ir = step.iter(qc);
           for(Item it; (it = qc.next(ir)) != null;) {
-            if(it instanceof final ANode node) nodes.add(node);
+            if(it instanceof final XNode node) nodes.add(node);
             else items.add(it);
           }
         }

@@ -270,7 +270,7 @@ abstract class Set extends Arr {
     /** Iterator. */
     final Iter[] iter;
     /** Items. */
-    ANode[] nodes;
+    XNode[] nodes;
 
     /**
      * Constructor.

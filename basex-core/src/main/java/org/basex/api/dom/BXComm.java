@@ -14,7 +14,7 @@ public final class BXComm extends BXChar implements Comment {
    * Constructor.
    * @param node node reference
    */
-  BXComm(final ANode node) {
+  BXComm(final XNode node) {
     super(node);
   }
 }

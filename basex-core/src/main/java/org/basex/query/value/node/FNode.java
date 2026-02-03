@@ -13,7 +13,7 @@ import org.w3c.dom.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public abstract class FNode extends ANode {
+public abstract class FNode extends XNode {
   /** Parent node (can be {@code null}). */
   private FNode parent;
 
@@ -31,19 +31,19 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final boolean is(final ANode node) {
+  public final boolean is(final XNode node) {
     return this == node;
   }
 
   @Override
-  public final int compare(final ANode node) {
+  public final int compare(final XNode node) {
     // fragments: compare node IDs. otherwise, find LCA
     return this == node ? 0 : node instanceof FNode ? Integer.signum(id - node.id) :
       compare(this, node);
   }
 
   @Override
-  public final ANode parent() {
+  public final XNode parent() {
     return parent;
   }
 
@@ -77,11 +77,11 @@ public abstract class FNode extends ANode {
    * @param nodes nodes
    * @return string
    */
-  static byte[] string(final ANode[] nodes) {
+  static byte[] string(final XNode[] nodes) {
     if(nodes.length == 0) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
-    for(final ANode node : nodes) {
+    for(final XNode node : nodes) {
       if(node.type.oneOf(NodeType.ELEMENT, NodeType.TEXT)) tb.add(node.string());
     }
     return tb.finish();

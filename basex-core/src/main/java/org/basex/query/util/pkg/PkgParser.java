@@ -40,7 +40,7 @@ public final class PkgParser {
    * @throws QueryException query exception
    */
   public Pkg parse(final IO io) throws QueryException {
-    final ANode node;
+    final XNode node;
     try {
       // checks root node
       node = childElements(new DBNode(io)).next();
@@ -70,9 +70,9 @@ public final class PkgParser {
    * @param pkg package container
    * @throws QueryException query exception
    */
-  private void parseChildren(final ANode node, final Pkg pkg) throws QueryException {
+  private void parseChildren(final XNode node, final Pkg pkg) throws QueryException {
     final BasicNodeIter iter = childElements(node);
-    for(ANode next; (next = iter.next()) != null;) {
+    for(XNode next; (next = iter.next()) != null;) {
       final QNm name = next.qname();
       if(eqNS(E_DEPENDENCY, name)) pkg.dep.add(parseDependency(next));
       else if(eqNS(E_XQUERY, name)) pkg.comps.add(parseComp(next));
@@ -84,7 +84,7 @@ public final class PkgParser {
    * @param node node <dependency/> to be parsed
    * @return dependency container
    */
-  private static PkgDep parseDependency(final ANode node) {
+  private static PkgDep parseDependency(final XNode node) {
     final Function<QNm, String> attribute = name -> {
       final byte[] value = node.attribute(name);
       return value == null ? null : string(value);
@@ -105,10 +105,10 @@ public final class PkgParser {
    * @return component container
    * @throws QueryException query exception
    */
-  private PkgComponent parseComp(final ANode node) throws QueryException {
+  private PkgComponent parseComp(final XNode node) throws QueryException {
     final BasicNodeIter iter = childElements(node);
     final PkgComponent comp = new PkgComponent();
-    for(ANode next; (next = iter.next()) != null;) {
+    for(XNode next; (next = iter.next()) != null;) {
       final QNm name = next.qname();
       if(eqNS(A_NAMESPACE, name)) comp.uri = string(next.string());
       else if(eqNS(A_FILE, name)) comp.file = string(next.string());
@@ -127,14 +127,14 @@ public final class PkgParser {
    * @param node root node
    * @return child element iterator
    */
-  private static BasicNodeIter childElements(final ANode node) {
+  private static BasicNodeIter childElements(final XNode node) {
     return new BasicNodeIter() {
       final BasicNodeIter iter = node.childIter();
 
       @Override
-      public ANode next() {
+      public XNode next() {
         while(true) {
-          final ANode nd = iter.next();
+          final XNode nd = iter.next();
           if(nd == null || nd.type == NodeType.ELEMENT) return nd;
         }
       }

@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class DBNode extends ANode {
+public class DBNode extends XNode {
   /** Data reference. */
   private final Data data;
   /** Parent of the database instance  (can be {@code null}). */
@@ -200,12 +200,12 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final boolean is(final ANode node) {
+  public final boolean is(final XNode node) {
     return this == node || data == node.data() && pre == ((DBNode) node).pre;
   }
 
   @Override
-  public final int compare(final ANode node) {
+  public final int compare(final XNode node) {
     if(this == node) return 0;
     final Data ndata = node.data();
     return ndata != null ?
@@ -233,7 +233,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final ANode parent() {
+  public final XNode parent() {
     final int parent = data.parent(pre, kind());
     return parent == -1 ? root : finish().set(parent, data.kind(parent));
   }
@@ -287,7 +287,7 @@ public class DBNode extends ANode {
         return curr == last ? null : node.set(curr++, Data.ATTR);
       }
       @Override
-      public ANode get(final long i) {
+      public XNode get(final long i) {
         return node.set(pre + 1 + (int) i, Data.ATTR);
       }
       @Override
@@ -353,7 +353,7 @@ public class DBNode extends ANode {
             curr = pre + data.size(pre, kind());
             if(data.meta.ndocs > 1) {
               int p = pre;
-              for(final ANode nd : ancestorIter(false)) p = ((DBNode) nd).pre;
+              for(final XNode nd : ancestorIter(false)) p = ((DBNode) nd).pre;
               size = p + data.size(p, data.kind(p));
             } else {
               size = data.meta.size;
@@ -406,7 +406,7 @@ public class DBNode extends ANode {
     ID i = type.id();
     if(type == NodeType.DOCUMENT_NODE) {
       final BasicNodeIter iter = childIter();
-      final ANode n = iter.next();
+      final XNode n = iter.next();
       if(n != null && n.type == NodeType.ELEMENT && iter.next() == null) {
         i = NodeType.DOCUMENT_NODE_ELEMENT.id();
       }

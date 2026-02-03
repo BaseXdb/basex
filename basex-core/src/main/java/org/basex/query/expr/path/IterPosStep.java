@@ -41,7 +41,7 @@ public final class IterPosStep extends Step {
       boolean skip;
 
       @Override
-      public ANode next() throws QueryException {
+      public XNode next() throws QueryException {
         if(skip) return null;
         if(iter == null) {
           iter = axis.iter(checkNode(qc));
@@ -49,14 +49,14 @@ public final class IterPosStep extends Step {
             if(exprs[e] instanceof final CmpPos pos) cachedPos[e] = pos.positions(qc);
           }
         }
-        for(final ANode node : iter) {
+        for(final XNode node : iter) {
           qc.checkStop();
           if(test.matches(node) && preds(node)) return node.finish();
         }
         return null;
       }
 
-      private boolean preds(final ANode node) throws QueryException {
+      private boolean preds(final XNode node) throws QueryException {
         final QueryFocus qf = qc.focus;
         final Value qv = qf.value;
         qf.value = node;

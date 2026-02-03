@@ -18,7 +18,7 @@ import org.basex.query.value.seq.*;
 public final class FnTransitiveClosure extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ANode node = toNodeOrNull(arg(0), qc);
+    final XNode node = toNodeOrNull(arg(0), qc);
     final FItem step = toFunction(arg(1), 1, qc);
     if(node == null) return Empty.VALUE;
 
@@ -28,7 +28,7 @@ public final class FnTransitiveClosure extends StandardFunc {
       final ANodeBuilder output = new ANodeBuilder();
       for(final Item item : input) {
         for(final Item it : step.invoke(qc, info, item)) {
-          final ANode n = toNode(it);
+          final XNode n = toNode(it);
           if(!result.contains(n)) output.add(n);
         }
       }

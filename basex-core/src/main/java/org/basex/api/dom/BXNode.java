@@ -29,13 +29,13 @@ public abstract class BXNode implements Node {
     "#document", null, "#text", null, "#comment", null, "#cdata-section", "#document-fragment"
   };
   /** Node reference. */
-  final ANode nd;
+  final XNode nd;
 
   /**
    * Constructor.
    * @param nd node reference
    */
-  BXNode(final ANode nd) {
+  BXNode(final XNode nd) {
     this.nd = nd;
   }
 
@@ -44,7 +44,7 @@ public abstract class BXNode implements Node {
    * @param node input node
    * @return DOM node, or {@code null} if input is {@code null} as well
    */
-  public static BXNode get(final ANode node) {
+  public static BXNode get(final XNode node) {
     return node == null ? null : switch((NodeType) node.type) {
       case DOCUMENT_NODE -> new BXDoc(node);
       case ELEMENT -> new BXElem(node);
@@ -121,8 +121,8 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode getLastChild() {
-    ANode node = null;
-    for(final ANode n : nd.childIter()) node = n;
+    XNode node = null;
+    for(final XNode n : nd.childIter()) node = n;
     return node != null ? get(node) : null;
   }
 
@@ -158,8 +158,8 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXDoc getOwnerDocument() {
-    ANode n = nd;
-    for(ANode p; (p = n.parent()) != null;) {
+    XNode n = nd;
+    for(XNode p; (p = n.parent()) != null;) {
       n = p;
     }
     return n.type == NodeType.DOCUMENT_NODE ? (BXDoc) get(n) : null;
@@ -274,7 +274,7 @@ public abstract class BXNode implements Node {
   final BXNList getElements(final String name) {
     final ANodeList nb = new ANodeList();
     final byte[] nm = "*".equals(name) ? null : token(name);
-    for(final ANode n : nd.descendantIter(false)) {
+    for(final XNode n : nd.descendantIter(false)) {
       if(n.type == NodeType.ELEMENT && (nm == null || eq(nm, n.name()))) {
         nb.add(n.finish());
       }
@@ -289,7 +289,7 @@ public abstract class BXNode implements Node {
    */
   static ANodeList finish(final BasicNodeIter iter) {
     final ANodeList nl = new ANodeList();
-    for(final ANode n : iter) nl.add(n.finish());
+    for(final XNode n : iter) nl.add(n.finish());
     return nl;
   }
 
@@ -297,7 +297,7 @@ public abstract class BXNode implements Node {
    * Returns the internal node representation.
    * @return xquery node
    */
-  public final ANode getNode() {
+  public final XNode getNode() {
     return nd;
   }
 

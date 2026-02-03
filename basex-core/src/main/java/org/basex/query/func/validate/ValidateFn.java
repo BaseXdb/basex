@@ -141,7 +141,7 @@ abstract class ValidateFn extends StandardFunc {
   protected final IO read(final Item item, final SerializerOptions sopts)
       throws QueryException, IOException {
 
-    if(item instanceof final ANode node) {
+    if(item instanceof final XNode node) {
       // return node as main-memory string
       final IOContent io = new IOContent(item.serialize(sopts).finish());
       io.name(string(node.baseURI()));

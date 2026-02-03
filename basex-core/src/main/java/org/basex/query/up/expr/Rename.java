@@ -60,12 +60,12 @@ public final class Rename extends Update {
         } else {
           cname = new CPI(info, false, name, Empty.VALUE);
         }
-        newName = ((ANode) cname.item(qc, info)).qname();
+        newName = ((XNode) cname.item(qc, info)).qname();
         names.put(type, newName);
       }
 
       // check for namespace conflicts
-      final ANode target = (ANode) item;
+      final XNode target = (XNode) item;
       if(element || attribute) {
         final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
         if(element || newPrefix.length > 0) {

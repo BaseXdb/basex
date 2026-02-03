@@ -23,7 +23,7 @@ public final class XMLAccess {
    * @param node root node
    * @return iterator
    */
-  public static BasicNodeIter children(final ANode node) {
+  public static BasicNodeIter children(final XNode node) {
     return children(node, null);
   }
 
@@ -33,12 +33,12 @@ public final class XMLAccess {
    * @param name element name (can be {@code null})
    * @return iterator
    */
-  public static BasicNodeIter children(final ANode node, final QNm name) {
+  public static BasicNodeIter children(final XNode node, final QNm name) {
     final BasicNodeIter children = node.childIter();
     return new BasicNodeIter() {
       @Override
-      public ANode next() {
-        for(ANode child; (child = children.next()) != null;) {
+      public XNode next() {
+        for(XNode child; (child = children.next()) != null;) {
           if(child.type == NodeType.ELEMENT && (name == null || name.eq(child.qname())))
             return child;
         }
@@ -55,7 +55,7 @@ public final class XMLAccess {
    * @return value
    * @throws BaseXException database exception
    */
-  public static byte[] attribute(final ANode node, final QNm name, final String info)
+  public static byte[] attribute(final XNode node, final QNm name, final String info)
       throws BaseXException {
 
     final byte[] value = node.attribute(name);
@@ -73,7 +73,7 @@ public final class XMLAccess {
    * @return enum
    * @throws BaseXException database exception
    */
-  public static <E extends Enum<E>> E attribute(final String prefix, final ANode node,
+  public static <E extends Enum<E>> E attribute(final String prefix, final XNode node,
       final QNm name, final E[] values) throws BaseXException {
     return value(prefix, attribute(node, name, prefix), values);
   }

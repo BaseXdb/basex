@@ -23,7 +23,7 @@ import org.basex.util.*;
 public final class FnPut extends StandardFunc {
   @Override
   public Empty item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNode(arg(0), qc);
+    final XNode node = toNode(arg(0), qc);
     final byte[] source = toZeroToken(arg(1), qc);
     final SerializerOptions options = toSerializerOptions(arg(2), qc);
 

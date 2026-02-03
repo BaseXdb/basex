@@ -34,7 +34,7 @@ abstract class DbNew extends DbAccessFn {
   final NewInput toNewInput(final Item input, final String path) throws QueryException {
     final NewInput ni = new NewInput();
 
-    if(input instanceof final ANode node) {
+    if(input instanceof final XNode node) {
       if(Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
 
       // ensure that the final name is not empty

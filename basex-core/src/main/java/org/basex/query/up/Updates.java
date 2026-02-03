@@ -133,16 +133,16 @@ public final class Updates {
    * @return database node created from input fragment
    * @throws QueryException query exception
    */
-  public DBNode determineDataRef(final ANode target, final QueryContext qc) throws QueryException {
+  public DBNode determineDataRef(final XNode target, final QueryContext qc) throws QueryException {
     if(target instanceof final DBNode node) return node;
 
     // determine highest ancestor node
-    ANode tmp = target;
+    XNode tmp = target;
     final BasicNodeIter iter = target.ancestorIter(false);
-    for(ANode n; (n = iter.next()) != null;) {
+    for(XNode n; (n = iter.next()) != null;) {
       tmp = n;
     }
-    final ANode root = tmp;
+    final XNode root = tmp;
 
     // see if this ancestor has already been added to the pending update list
     // if data instance does not exist, create mapping between fragment ID and data reference
@@ -206,16 +206,16 @@ public final class Updates {
    * @param trgID ID of fragment for which we calculate the PRE value
    * @return PRE value
    */
-  private static int preSteps(final ANode node, final int trgID) {
+  private static int preSteps(final XNode node, final int trgID) {
     if(node.id == trgID) return 0;
 
     int s = 1;
-    for(final ANode nd : node.attributeIter()) {
+    for(final XNode nd : node.attributeIter()) {
       final int st = preSteps(nd, trgID);
       if(st == 0) return s;
       s += st;
     }
-    for(final ANode nd : node.childIter()) {
+    for(final XNode nd : node.childIter()) {
       // n.id <= trgID: rewritten to catch ID overflow
       if(trgID - nd.id < 0) break;
       s += preSteps(nd, trgID);

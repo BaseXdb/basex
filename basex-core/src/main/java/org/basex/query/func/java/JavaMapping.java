@@ -88,7 +88,7 @@ final class JavaMapping {
     new SimpleEntry(Uri.class, ANY_URI),
     new SimpleEntry(YMDur.class, YEAR_MONTH_DURATION),
     // node types
-    new SimpleEntry(ANode.class, NODE),
+    new SimpleEntry(XNode.class, NODE),
     new SimpleEntry(DBNode.class, NODE),
     new SimpleEntry(FAttr.class, ATTRIBUTE),
     new SimpleEntry(FComm.class, COMMENT),

@@ -51,7 +51,7 @@ final class DataFTBuilder {
    * @param node node to be added
    * @return added strings, or {@code null} if no full-text positions exist
    */
-  ArrayList<DataFTMarker> build(final ANode node) {
+  ArrayList<DataFTMarker> build(final XNode node) {
     // only database nodes can have full-text positions
     if(!(node instanceof final DBNode dbnode)) return null;
 

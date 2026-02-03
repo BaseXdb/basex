@@ -14,7 +14,7 @@ final class BXDocFrag extends BXNode implements DocumentFragment {
    * Constructor.
    * @param node node reference
    */
-  BXDocFrag(final ANode node) {
+  BXDocFrag(final XNode node) {
     super(node);
   }
 

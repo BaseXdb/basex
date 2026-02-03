@@ -22,7 +22,7 @@ public final class FnNodeTypeAnnotation extends FnSchemaType {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ANode node = toNode(arg(0), qc);
+    final XNode node = toNode(arg(0), qc);
     ARG_TYPE.coerce(node, null, qc, null, info);
     return annotate(qc, info, node.type == NodeType.ATTRIBUTE ? UNTYPED_ATOMIC : UNTYPED);
   }

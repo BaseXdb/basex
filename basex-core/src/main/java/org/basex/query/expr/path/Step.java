@@ -242,7 +242,7 @@ public abstract class Step extends Preds {
     if(type == NodeType.PROCESSING_INSTRUCTION) return null;
 
     final Names names = type == NodeType.ATTRIBUTE ? data.attrNames : data.elemNames;
-    final int kind = ANode.kind(test.type);
+    final int kind = XNode.kind(test.type);
     final ArrayList<PathNode> tmp = new ArrayList<>();
     final Predicate<Test> addNodes = t -> {
       int name = 0;
@@ -407,9 +407,9 @@ public abstract class Step extends Preds {
    * @return context
    * @throws QueryException query exception
    */
-  final ANode checkNode(final QueryContext qc) throws QueryException {
+  final XNode checkNode(final QueryContext qc) throws QueryException {
     final Value value = qc.focus.value;
-    if(value instanceof final ANode node) return node;
+    if(value instanceof final XNode node) return node;
     throw value == null ? QueryError.NOCTX_X.get(info, this) :
       QueryError.PATHNODE_X_X_X.get(info, this, value.type, value);
   }

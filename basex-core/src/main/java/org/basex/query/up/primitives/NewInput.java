@@ -14,7 +14,7 @@ public final class NewInput {
   /** Database path. */
   public String path;
   /** Node to be added ({@code null} if input reference exists). */
-  public ANode node;
+  public XNode node;
   /** Input to be added ({@code null} if node exists). */
   public IO io;
 

@@ -15,7 +15,7 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
    * Constructor.
    * @param node node reference
    */
-  BXPI(final ANode node) {
+  BXPI(final XNode node) {
     super(node);
   }
 

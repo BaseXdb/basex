@@ -15,13 +15,13 @@ import org.basex.util.*;
  */
 final class XdmNode extends XdmItem {
   /** Wrapped node. */
-  private final ANode node;
+  private final XNode node;
 
   /**
    * Constructor.
    * @param node node
    */
-  XdmNode(final ANode node) {
+  XdmNode(final XNode node) {
     this.node = node;
   }
 
@@ -51,7 +51,7 @@ final class XdmNode extends XdmItem {
   }
 
   @Override
-  public ANode internal() {
+  public XNode internal() {
     return node;
   }
 

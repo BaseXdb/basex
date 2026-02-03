@@ -15,7 +15,7 @@ public final class BXElem extends BXNode implements Element {
    * Constructor.
    * @param node node reference
    */
-  BXElem(final ANode node) {
+  BXElem(final XNode node) {
     super(node);
   }
 
@@ -42,7 +42,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public String getAttribute(final String name) {
-    final ANode n = attribute(name);
+    final XNode n = attribute(name);
     return n != null ? Token.string(n.string()) : "";
   }
 
@@ -152,9 +152,9 @@ public final class BXElem extends BXNode implements Element {
    * @param name attribute name
    * @return node or {@code null}
    */
-  private ANode attribute(final String name) {
+  private XNode attribute(final String name) {
     final byte[] nm = Token.token(name);
-    for(final ANode n : nd.attributeIter()) {
+    for(final XNode n : nd.attributeIter()) {
       if(Token.eq(nm, n.name())) return n.finish();
     }
     return null;

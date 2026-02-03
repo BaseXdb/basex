@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
+public final class ANodeBuilder extends ObjectList<XNode, ANodeBuilder> {
   /** Distinct document order. */
   private boolean ddo = true;
   /** Shared database (can be {@code null}). */
@@ -27,11 +27,11 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
    * Constructor.
    */
   public ANodeBuilder() {
-    super(new ANode[1]);
+    super(new XNode[1]);
   }
 
   @Override
-  public ANodeBuilder add(final ANode node) {
+  public ANodeBuilder add(final XNode node) {
     if(isEmpty()) {
       // empty list: assign initial database reference (can be null)
       data = node.data();
@@ -66,7 +66,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
     // check if compact sequence with single database instance can be created
     if(data != null) {
-      final ANode parent = list[0].parent();
+      final XNode parent = list[0].parent();
       if(parent == null || parent.data() == data) {
         final int[] pres = new int[sz];
         for(int l = 0; l < sz; l++) pres[l] = ((DBNode) list[l]).pre();
@@ -90,7 +90,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
 
       // remove duplicates
       int i = 1;
-      final ANode[] nodes = list;
+      final XNode[] nodes = list;
       for(int j = 1; j < sz; ++j) {
         while(j < sz && nodes[i - 1].is(nodes[j])) j++;
         if(j < sz) nodes[i++] = nodes[j];
@@ -109,7 +109,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   @Override
-  public boolean removeAll(final ANode node) {
+  public boolean removeAll(final XNode node) {
     if(data != null && ddo && node instanceof final DBNode dbnode) {
       final int p = binarySearch(dbnode, 0, size);
       if(p < 0) return false;
@@ -120,7 +120,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   @Override
-  public boolean contains(final ANode node) {
+  public boolean contains(final XNode node) {
     if(data != null && ddo) {
       return node instanceof final DBNode dbnode && binarySearch(dbnode, 0, size) > -1;
     }
@@ -128,7 +128,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   @Override
-  public ANode[] finish() {
+  public XNode[] finish() {
     ddo();
     return super.finish();
   }
@@ -144,7 +144,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   public int binarySearch(final DBNode node, final int start, final int length) {
     if(node.data() != data) return -start - 1;
     int l = start, r = start + length - 1;
-    final ANode[] nodes = list;
+    final XNode[] nodes = list;
     while(l <= r) {
       final int m = l + r >>> 1, mpre = ((DBNode) nodes[m]).pre(), npre = node.pre();
       if(mpre == npre) return m;
@@ -155,18 +155,18 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
   }
 
   @Override
-  public Iterator<ANode> iterator() {
+  public Iterator<XNode> iterator() {
     ddo();
     return super.iterator();
   }
 
   @Override
-  protected ANode[] newArray(final int s) {
-    return new ANode[s];
+  protected XNode[] newArray(final int s) {
+    return new XNode[s];
   }
 
   @Override
-  public boolean equals(final ANode node1, final ANode node2) {
+  public boolean equals(final XNode node1, final XNode node2) {
     return node1.is(node2);
   }
 
@@ -183,7 +183,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
    * @param e end position
    */
   private void sort(final int s, final int e) {
-    final ANode[] nodes = list;
+    final XNode[] nodes = list;
     if(e < 7) {
       for(int i = s; i < e + s; ++i) {
         for(int j = i; j > s && nodes[j - 1].compare(nodes[j]) > 0; j--) s(j, j - 1);
@@ -203,7 +203,7 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
       }
       m = m(l, m, n);
     }
-    final ANode v = nodes[m];
+    final XNode v = nodes[m];
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
@@ -251,8 +251,8 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
    * @return median
    */
   private int m(final int a, final int b, final int c) {
-    final ANode[] nodes = list;
-    final ANode nodeA = nodes[a], nodeB = nodes[b], nodeC = nodes[c];
+    final XNode[] nodes = list;
+    final XNode nodeA = nodes[a], nodeB = nodes[b], nodeC = nodes[c];
     return nodeA.compare(nodeB) < 0 ?
       nodeB.compare(nodeC) < 0 ? b : nodeA.compare(nodeC) < 0 ? c : a :
       nodeB.compare(nodeC) > 0 ? b : nodeA.compare(nodeC) > 0 ? c : a;
@@ -264,8 +264,8 @@ public final class ANodeBuilder extends ObjectList<ANode, ANodeBuilder> {
    * @param b second position
    */
   private void s(final int a, final int b) {
-    final ANode[] nodes = list;
-    final ANode tmp = nodes[a];
+    final XNode[] nodes = list;
+    final XNode tmp = nodes[a];
     nodes[a] = nodes[b];
     nodes[b] = tmp;
   }

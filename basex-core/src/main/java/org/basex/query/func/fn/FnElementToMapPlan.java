@@ -25,10 +25,10 @@ public final class FnElementToMapPlan extends PlanFn {
     final QNmMap<ANodeList> elemNames = new QNmMap<>();
     final QNmMap<ANodeList> attrNames = new QNmMap<>();
     for(Item item; (item = iter.next()) != null;) {
-      for(final ANode desc : toNode(item).descendantIter(true)) {
+      for(final XNode desc : toNode(item).descendantIter(true)) {
         if(desc.type == NodeType.ELEMENT) {
           elemNames.computeIfAbsent(desc.qname(), ANodeList::new).add(desc.finish());
-          for(final ANode attr : children(NodeType.ATTRIBUTE, desc)) {
+          for(final XNode attr : children(NodeType.ATTRIBUTE, desc)) {
             attrNames.computeIfAbsent(attr.qname(), ANodeList::new).add(attr.finish());
           }
         }

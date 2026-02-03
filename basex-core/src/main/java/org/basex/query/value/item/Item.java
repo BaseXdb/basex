@@ -253,7 +253,7 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link ANode}.
+   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link XNode}.
    */
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -262,7 +262,7 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link ANode}.
+   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link XNode}.
    */
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {

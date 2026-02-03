@@ -78,7 +78,7 @@ public final class Payload {
       body = FElem.build(Q_HTTP_MULTIPART).add(Q_BOUNDARY, boundary);
       final ANodeList parts = new ANodeList();
       extractParts(concat(DASHES, boundary), parts);
-      for(final ANode node : parts) body.add(node);
+      for(final XNode node : parts) body.add(node);
     } else {
       // single part response
       body = FElem.build(Q_HTTP_BODY);

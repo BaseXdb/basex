@@ -41,9 +41,9 @@ abstract class Ids extends ContextFn {
    */
   private Value ids(final QueryContext qc) throws QueryException {
     final TokenSet idSet = ids(arg(0).atomIter(qc, info), qc);
-    final ANode node = toNodeOrNull(arg(1), qc);
+    final XNode node = toNodeOrNull(arg(1), qc);
 
-    final ANode root = (node != null ? node : toNode(context(qc), qc)).root();
+    final XNode root = (node != null ? node : toNode(context(qc), qc)).root();
     if(root.type != NodeType.DOCUMENT_NODE) throw IDDOC.get(info);
 
     final ANodeBuilder results = new ANodeBuilder();
@@ -58,7 +58,7 @@ abstract class Ids extends ContextFn {
       final Iter iter = va.iter(qc);
       for(Item item; (item = iter.next()) != null;) {
         // check attribute name; check root if database has more than one document
-        final ANode attr = (ANode) item;
+        final XNode attr = (XNode) item;
         if(XMLToken.isId(attr.name(), idref) && (idref || idSet.remove(attr.string()) != 0) &&
             (data.meta.ndocs == 1 || attr.root().is(root))) {
           results.add(idref ? attr : attr.parent());
@@ -77,7 +77,7 @@ abstract class Ids extends ContextFn {
    * @param idref follow IDREF
    * @return result of check
    */
-  private boolean index(final ANode root, final boolean idref) {
+  private boolean index(final XNode root, final boolean idref) {
     // check if index exists
     final Data data = root.data();
     if(data == null || (idref ? !data.meta.tokenindex : !data.meta.attrindex)) return false;
@@ -92,9 +92,9 @@ abstract class Ids extends ContextFn {
    * @param results node cache
    * @param node current node
    */
-  private void add(final TokenSet idSet, final ANodeBuilder results, final ANode node) {
+  private void add(final TokenSet idSet, final ANodeBuilder results, final XNode node) {
     final boolean idref = idref();
-    for(final ANode attr : node.attributeIter()) {
+    for(final XNode attr : node.attributeIter()) {
       if(XMLToken.isId(attr.name(), idref)) {
         // ID/IDREF found
         boolean found = false;
@@ -106,7 +106,7 @@ abstract class Ids extends ContextFn {
         }
       }
     }
-    for(final ANode child : node.childIter()) {
+    for(final XNode child : node.childIter()) {
       add(idSet, results, child);
     }
   }

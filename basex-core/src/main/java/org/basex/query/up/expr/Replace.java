@@ -50,7 +50,7 @@ public final class Replace extends Update {
       if(!(type instanceof NodeType) || type == NodeType.DOCUMENT_NODE)
         throw UPTRGNODE_X.get(info, item);
 
-      final ANode targ = (ANode) item;
+      final XNode targ = (XNode) item;
       final Updates updates = qc.updates();
       final DBNode dbnode = updates.determineDataRef(targ, qc);
       checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
@@ -69,7 +69,7 @@ public final class Replace extends Update {
 
         updates.add(new ReplaceValue(dbnode.pre(), dbnode.data(), info, text), qc);
       } else {
-        final ANode parent = targ.parent();
+        final XNode parent = targ.parent();
         if(parent == null) throw UPNOPAR_X.get(info, targ);
 
         final ANodeList list;

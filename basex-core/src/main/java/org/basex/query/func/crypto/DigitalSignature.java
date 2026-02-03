@@ -97,8 +97,8 @@ final class DigitalSignature {
    * @return signed node
    * @throws QueryException query exception
    */
-  Item generate(final ANode node, final byte[] can, final byte[] dig, final byte[] sig,
-      final byte[] ns, final byte[] tp, final byte[] path, final ANode cert, final QueryContext qc)
+  Item generate(final XNode node, final byte[] can, final byte[] dig, final byte[] sig,
+      final byte[] ns, final byte[] tp, final byte[] path, final XNode cert, final QueryContext qc)
       throws QueryException {
 
     // checking input variables
@@ -266,7 +266,7 @@ final class DigitalSignature {
    * @return boolean result of validation
    * @throws QueryException query exception
    */
-  Bln validateSignature(final ANode node) throws QueryException {
+  Bln validateSignature(final XNode node) throws QueryException {
     try {
       final Document doc = toDOMNode(node);
       final DOMValidateContext valContext = new DOMValidateContext(new MyKeySelector(), doc);
@@ -292,7 +292,7 @@ final class DigitalSignature {
    * @throws IOException exception
    * @throws ParserConfigurationException exception
    */
-  private static Document toDOMNode(final ANode node) throws SAXException, IOException,
+  private static Document toDOMNode(final XNode node) throws SAXException, IOException,
   ParserConfigurationException {
 
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

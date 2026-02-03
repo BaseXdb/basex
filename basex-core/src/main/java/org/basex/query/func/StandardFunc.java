@@ -598,7 +598,7 @@ public abstract class StandardFunc extends Arr {
   protected final Item toNodeOrAtomItem(final Expr expr, final boolean empty, final QueryContext qc)
       throws QueryException {
     Item item = expr.item(qc, info);
-    if(!(item instanceof ANode)) {
+    if(!(item instanceof XNode)) {
       item = item.atomItem(qc, info);
       if(item.isEmpty()) {
         if(empty) return null;

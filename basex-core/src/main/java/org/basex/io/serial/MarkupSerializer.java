@@ -324,7 +324,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   protected abstract void doctype(QNm name) throws IOException;
 
   @Override
-  protected boolean skipElement(final ANode node) {
+  protected boolean skipElement(final XNode node) {
     if(node.type == NodeType.ELEMENT && eq(node.name(), META)) {
       if(node.attribute(new QNm(CHARSET)) != null) return true;
       final byte[] value = node.attribute(new QNm(HTTP_EQUIV));

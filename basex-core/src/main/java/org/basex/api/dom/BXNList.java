@@ -24,7 +24,7 @@ class BXNList implements NodeList {
 
   @Override
   public BXNode item(final int index) {
-    ANode n = null;
+    XNode n = null;
     if(index < nodes.size()) n = nodes.get(index);
     return n != null ? BXNode.get(n) : null;
   }

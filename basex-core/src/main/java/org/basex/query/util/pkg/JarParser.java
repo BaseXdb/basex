@@ -40,8 +40,8 @@ final class JarParser {
   public JarDesc parse(final IO io) throws QueryException {
     final JarDesc desc = new JarDesc();
     try {
-      final ANode node = new DBNode(io).childIter().next();
-      for(final ANode next : node.childIter()) {
+      final XNode node = new DBNode(io).childIter().next();
+      for(final XNode next : node.childIter()) {
         if(next.type != NodeType.ELEMENT) continue;
 
         final QNm name = next.qname();

@@ -15,7 +15,7 @@ import org.basex.util.*;
 public class FnName extends FnNodeName {
   @Override
   public final Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ANode node = toNodeOrNull(context(qc), qc);
+    final XNode node = toNodeOrNull(context(qc), qc);
     return node == null || empty(node.type) ? Str.EMPTY : Str.get(name(node));
   }
 
@@ -29,7 +29,7 @@ public class FnName extends FnNodeName {
    * @param node node
    * @return name
    */
-  byte[] name(final ANode node) {
+  byte[] name(final XNode node) {
     return node.name();
   }
 }

@@ -13,10 +13,10 @@ import org.basex.util.*;
  */
 public final class UserInfo extends UserFn {
   @Override
-  public ANode item(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public XNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final User user = toUser(arg(0), true, qc);
 
-    final ANode node = user != null ? user.info() : qc.context.users.info();
+    final XNode node = user != null ? user.info() : qc.context.users.info();
     return node != null ? node : FElem.build(Q_INFO).finish();
   }
 }

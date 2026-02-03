@@ -69,7 +69,7 @@ public final class Transform extends Copy {
         Value error = null;
         if(item == null) {
           error = Empty.VALUE;
-        } else if(!(item instanceof ANode)) {
+        } else if(!(item instanceof XNode)) {
           error = item;
         } else {
           final Item item2 = iter.next();
@@ -78,7 +78,7 @@ public final class Transform extends Copy {
         if(error != null) throw UPSINGLE_X_X.get(copy.info(), copy.var.name, error);
 
         // create main memory copy of node
-        item = ((ANode) item).copy(qc);
+        item = ((XNode) item).copy(qc);
         // add resulting node to variable
         qc.set(copy.var, item);
         updates.addData(item.data());

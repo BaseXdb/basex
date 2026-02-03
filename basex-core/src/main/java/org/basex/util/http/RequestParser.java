@@ -43,11 +43,11 @@ public final class RequestParser {
    * @return parsed request
    * @throws QueryException query exception
    */
-  public Request parse(final ANode request, final Value bodies) throws QueryException {
+  public Request parse(final XNode request, final Value bodies) throws QueryException {
     final Request hr = new Request();
 
     if(request != null) {
-      for(final ANode attr : request.attributeIter()) {
+      for(final XNode attr : request.attributeIter()) {
         final String key = string(attr.name());
         final RequestAttribute r = Enums.get(RequestAttribute.class, key);
         if(r == null) throw HC_REQ_X.get(info, "Unknown attribute: " + key);
@@ -56,7 +56,7 @@ public final class RequestParser {
       checkRequest(hr);
 
       // it is an error if content is set for HTTP methods that do not allow bodies
-      final ANode body = parseHeaders(request.childIter(), hr.headers);
+      final XNode body = parseHeaders(request.childIter(), hr.headers);
       if(body != null) {
         final QNm pl = body.qname();
         // single part request
@@ -80,8 +80,8 @@ public final class RequestParser {
    * @param element element
    * @param atts map for parsed attributes
    */
-  private static void parseAtts(final ANode element, final Map<String, String> atts) {
-    for(final ANode attr : element.attributeIter()) {
+  private static void parseAtts(final XNode element, final Map<String, String> atts) {
+    for(final XNode attr : element.attributeIter()) {
       atts.put(string(attr.name()), string(attr.string()));
     }
   }
@@ -92,14 +92,14 @@ public final class RequestParser {
    * @param headers map for parsed headers
    * @return next non-header element (or {@code null})
    */
-  private static ANode parseHeaders(final BasicNodeIter iter, final Map<String, String> headers) {
-    for(final ANode node : iter) {
+  private static XNode parseHeaders(final BasicNodeIter iter, final Map<String, String> headers) {
+    for(final XNode node : iter) {
       final QNm nm = node.qname();
       if(nm == null) continue;
       if(!nm.eq(Q_HTTP_HEADER)) return node;
 
       String name = "", value = "";
-      for(final ANode attr : node.attributeIter()) {
+      for(final XNode attr : node.attributeIter()) {
         final QNm qn = attr.qname();
         if(qn.equals(Q_NAME)) name = string(attr.string());
         else if(qn.equals(Q_VALUE)) value = string(attr.string());
@@ -117,7 +117,7 @@ public final class RequestParser {
    * @param payload payload
    * @throws QueryException query exception
    */
-  private void parseBody(final ANode body, final Value items, final Map<String, String> atts,
+  private void parseBody(final XNode body, final Value items, final Map<String, String> atts,
       final ItemList payload) throws QueryException {
 
     parseAtts(body, atts);
@@ -127,7 +127,7 @@ public final class RequestParser {
       // no linked resource for setting request content
       if(items.isEmpty()) {
         // payload is taken from children of <http:body/> element
-        for(final ANode node : body.childIter()) payload.add(node);
+        for(final XNode node : body.childIter()) payload.add(node);
       } else {
         // payload is taken from $bodies parameter
         for(final Item item : items) payload.add(item);
@@ -143,7 +143,7 @@ public final class RequestParser {
    * @param parts list for multipart parts
    * @throws QueryException query exception
    */
-  private void parseMultipart(final ANode multipart, final BasicIter<Item> bodies,
+  private void parseMultipart(final XNode multipart, final BasicIter<Item> bodies,
       final HashMap<String, String> atts, final ArrayList<Part> parts) throws QueryException {
 
     parseAtts(multipart, atts);
@@ -153,7 +153,7 @@ public final class RequestParser {
     final BasicNodeIter iter = multipart.childIter();
     while(true) {
       final Part part = new Part();
-      final ANode payload = parseHeaders(iter, part.headers);
+      final XNode payload = parseHeaders(iter, part.headers);
       if(payload == null) break;
       // content is set from <http:body/> children or from $bodies parameter
       final Item body = bodies.next();
@@ -209,7 +209,7 @@ public final class RequestParser {
    * @param bodyAtts body attributes
    * @throws QueryException query exception
    */
-  private void checkBody(final ANode body, final Map<String, String> bodyAtts)
+  private void checkBody(final XNode body, final Map<String, String> bodyAtts)
       throws QueryException {
 
     // @media-type is mandatory

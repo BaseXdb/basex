@@ -173,7 +173,7 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    */
   final int level(final Item header) throws QueryException {
-    if(header instanceof final ANode node) {
+    if(header instanceof final XNode node) {
       final byte[] value  = node.attribute(Q_LEVEL);
       if(value != null) {
         final int level = toInt(value);
@@ -192,7 +192,7 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    */
   final long timestamp(final Item header, final QueryContext qc) throws QueryException {
-    if(header instanceof final ANode node) {
+    if(header instanceof final XNode node) {
       final byte[] value  = node.attribute(Q_LAST_MODIFIED);
       try {
         if(value != null) return toMs(new Dtm(value, BasicType.DATE_TIME, info), qc);
@@ -211,7 +211,7 @@ public class ArchiveCreate extends ArchiveFn {
    * @throws QueryException query exception
    */
   final String encoding(final Item header) throws QueryException {
-    if(header instanceof final ANode node) {
+    if(header instanceof final XNode node) {
       final byte[] value = node.attribute(Q_ENCODING);
       if(value != null) return toEncodingOrNull(string(value), ARCHIVE_ENCODE1_X);
     }

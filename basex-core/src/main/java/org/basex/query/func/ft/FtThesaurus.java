@@ -17,11 +17,11 @@ public final class FtThesaurus extends FtAccessFn {
   /** Most recently used thesaurus. */
   private Thesaurus thesaurus;
   /** Most recently supplied root node. */
-  private ANode nd;
+  private XNode nd;
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final ANode node = toNode(arg(0), qc);
+    final XNode node = toNode(arg(0), qc);
     final byte[] term = toToken(arg(1), qc);
     final FtThesaurusOptions options = toOptions(arg(2), new FtThesaurusOptions(), qc);
 

@@ -62,7 +62,7 @@ public final class Client {
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public Value sendRequest(final byte[] href, final ANode request, final Value bodies)
+  public Value sendRequest(final byte[] href, final XNode request, final Value bodies)
       throws QueryException {
 
     final Request req = new RequestParser(info).parse(request, bodies);
@@ -330,7 +330,7 @@ public final class Client {
     try(Serializer ser = Serializer.get(out, sopts)) {
       for(final Item item : payload) {
         ser.serialize(atom && item.type instanceof NodeType ?
-          ((ANode) item).atomItem(null, null) : item);
+          ((XNode) item).atomItem(null, null) : item);
       }
     }
   }

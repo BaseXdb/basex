@@ -107,7 +107,7 @@ final class RESTPost {
         for(final Item item : qp.value()) {
           if(value != null) throw HTTPStatus.MULTIPLE_CONTEXTS.get();
           // create main memory instance of the specified node
-          value = DataBuilder.stripNamespace((ANode) item, REST_URI, ctx).serialize().toString();
+          value = DataBuilder.stripNamespace((XNode) item, REST_URI, ctx).serialize().toString();
         }
       }
       if(value != null) {

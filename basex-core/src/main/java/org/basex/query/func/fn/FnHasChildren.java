@@ -20,7 +20,7 @@ public final class FnHasChildren extends ContextFn {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    final ANode node = toNodeOrNull(context(qc), qc);
+    final XNode node = toNodeOrNull(context(qc), qc);
     return node != null && node.hasChildren();
   }
 }

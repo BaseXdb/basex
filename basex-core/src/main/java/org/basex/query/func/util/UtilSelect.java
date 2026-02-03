@@ -20,7 +20,7 @@ public final class UtilSelect extends ContextFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter keys = arg(0).iter(qc);
-    final ANode node = toNode(context(qc), qc);
+    final XNode node = toNode(context(qc), qc);
 
     final QNm name = node.qname();
     for(Item item; (item = qc.next(keys)) != null;) {

@@ -30,7 +30,7 @@ public final class SqlExecutePrepared extends SqlExecute {
     final Item params = arg(1).item(qc, info);
     final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
 
-    final ANode prms = params.isEmpty() ? null : toElem(params, qc);
+    final XNode prms = params.isEmpty() ? null : toElem(params, qc);
     if(prms != null && !prms.qname().eq(Q_PARAMETERS)) {
       throw UNKNOWNOPTION_X.get(info, prms.qname().local());
     }
@@ -60,13 +60,13 @@ public final class SqlExecutePrepared extends SqlExecute {
       throws QueryException {
 
     int i = 1;
-    for(ANode next; (next = params.next()) != null; i++) {
+    for(XNode next; (next = params.next()) != null; i++) {
       // Check name
       if(!next.qname().eq(Q_PARAMETER)) throw UNKNOWNOPTION_X.get(info, next.qname().local());
       final BasicNodeIter attrs = next.attributeIter();
       String type = null;
       boolean isNull = false;
-      for(ANode attr; (attr = attrs.next()) != null;) {
+      for(XNode attr; (attr = attrs.next()) != null;) {
         // attribute "type"
         if(eq(attr.name(), TYPE)) type = string(attr.string());
         // attribute "null"

@@ -98,7 +98,7 @@ public final class Constr {
 
     if(item instanceof FItem) throw CONSFUNC_X.get(info, item);
 
-    if(item instanceof final ANode node) {
+    if(item instanceof final XNode node) {
       // type: nodes
       final Type type = item.type;
       if(type == NodeType.TEXT) {
@@ -203,7 +203,7 @@ public final class Constr {
     if(attributes != null) {
       final int as = attributes.size();
       for(int a = 0; a < as; a++) {
-        final ANode attr = attributes.get(a);
+        final XNode attr = attributes.get(a);
         final QNm qnm = attr.qname();
         // skip attributes without prefixes or URIs
         if(!qnm.hasPrefix() || !qnm.hasURI()) continue;

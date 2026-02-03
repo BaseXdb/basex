@@ -84,9 +84,9 @@ public abstract class PlanFn extends StandardFunc {
      * @param nodes nodes
      * @return layout
      */
-    static PlanType get(final ANode... nodes) {
+    static PlanType get(final XNode... nodes) {
       PlanType type = BOOLEAN;
-      for(final ANode node : nodes) {
+      for(final XNode node : nodes) {
         final byte[] value = node.string();
         if(type == BOOLEAN) {
           if(Bln.parse(value) == null) type = NUMERIC;
@@ -176,7 +176,7 @@ public abstract class PlanFn extends StandardFunc {
      * @return value
      * @throws QueryException query exception
      */
-    Item apply(final ANode node, final ANode parent, final Plan plan, final QueryContext qc)
+    Item apply(final XNode node, final XNode parent, final Plan plan, final QueryContext qc)
         throws QueryException {
 
       final PlanEntry pe = valid(node) ? this : plan.entries.get(QNm.EMPTY);
@@ -195,7 +195,7 @@ public abstract class PlanFn extends StandardFunc {
      * @param node node
      * @return result of check
      */
-    private boolean valid(final ANode node) {
+    private boolean valid(final XNode node) {
       return switch(layout) {
         case EMPTY, EMPTY_PLUS ->
           children(NodeType.ELEMENT, node).isEmpty() && empty(children(NodeType.TEXT, node));
@@ -222,7 +222,7 @@ public abstract class PlanFn extends StandardFunc {
      * @return resulting value
      * @throws QueryException query exception
      */
-    private Item create(final ANode node, final ANode parent, final Plan plan,
+    private Item create(final XNode node, final XNode parent, final Plan plan,
         final QueryContext qc) throws QueryException {
 
       return switch(layout) {
@@ -261,7 +261,7 @@ public abstract class PlanFn extends StandardFunc {
    * @param plan plan
    * @return layout
    */
-  final PlanEntry entry(final ANode node, final Plan plan) {
+  final PlanEntry entry(final XNode node, final Plan plan) {
     PlanEntry pe = plan.entries.get(node.qname());
     if(pe == null) pe = plan.entries.get(QNm.EMPTY);
     return pe != null ? pe : entry(node);
@@ -272,7 +272,7 @@ public abstract class PlanFn extends StandardFunc {
    * @param nodes nodes
    * @return entry
    */
-  final PlanEntry entry(final ANode... nodes) {
+  final PlanEntry entry(final XNode... nodes) {
     final PlanEntry pe = new PlanEntry();
     final ANodeList attributes = children(NodeType.ATTRIBUTE, nodes);
     final ANodeList elements = children(NodeType.ELEMENT, nodes);
@@ -283,11 +283,11 @@ public abstract class PlanFn extends StandardFunc {
       pe.layout = attributes.isEmpty() ? PlanLayout.SIMPLE : PlanLayout.SIMPLE_PLUS;
       pe.type = PlanType.get(nodes);
     } else if(empty(texts)) {
-      if(equalNames(elements) && ((Checks<ANode>) node ->
+      if(equalNames(elements) && ((Checks<XNode>) node ->
           children(NodeType.ELEMENT, node).size() > 1).any(nodes)) {
         pe.layout = attributes.isEmpty() ? PlanLayout.LIST : PlanLayout.LIST_PLUS;
         pe.child = elements.get(0).qname();
-      } else if(((Checks<ANode>) PlanFn::differentNames).all(nodes)) {
+      } else if(((Checks<XNode>) PlanFn::differentNames).all(nodes)) {
         pe.layout = PlanLayout.RECORD;
       } else {
         pe.layout = PlanLayout.SEQUENCE;
@@ -304,7 +304,7 @@ public abstract class PlanFn extends StandardFunc {
    * @return result of check
    */
   static boolean empty(final ANodeList nodes) {
-    return ((Checks<ANode>) node -> Token.normalize(node.string()).length == 0).all(nodes);
+    return ((Checks<XNode>) node -> Token.normalize(node.string()).length == 0).all(nodes);
   }
 
   /**
@@ -313,15 +313,15 @@ public abstract class PlanFn extends StandardFunc {
    * @param nodes nodes
    * @return result of check
    */
-  static ANodeList children(final NodeType type, final ANode... nodes) {
+  static ANodeList children(final NodeType type, final XNode... nodes) {
     final ANodeList list = new ANodeList();
-    for(final ANode node : nodes) {
+    for(final XNode node : nodes) {
       if(type == NodeType.ATTRIBUTE) {
-        for(final ANode child : node.attributeIter()) {
+        for(final XNode child : node.attributeIter()) {
           if(!Token.eq(child.qname().uri(), QueryText.XSI_URI)) list.add(child.finish());
         }
       } else {
-        for(final ANode child : node.childIter()) {
+        for(final XNode child : node.childIter()) {
           if(child.type == type) list.add(child.finish());
         }
       }
@@ -334,9 +334,9 @@ public abstract class PlanFn extends StandardFunc {
    * @param node node
    * @return result of check
    */
-  private static boolean differentNames(final ANode node) {
+  private static boolean differentNames(final XNode node) {
     final QNmSet names = new QNmSet();
-    for(final ANode child : children(NodeType.ELEMENT, node)) {
+    for(final XNode child : children(NodeType.ELEMENT, node)) {
       if(child.type == NodeType.ELEMENT && !names.add(child.qname())) return false;
     }
     return !names.isEmpty();
@@ -349,7 +349,7 @@ public abstract class PlanFn extends StandardFunc {
    */
   private static boolean equalNames(final ANodeList nodes) {
     QNm name = null;
-    for(final ANode node : nodes) {
+    for(final XNode node : nodes) {
       if(node.type == NodeType.ELEMENT) {
         if(name == null) name = node.qname();
         else if(!name.eq(node.qname())) return false;
@@ -366,11 +366,11 @@ public abstract class PlanFn extends StandardFunc {
    * @return attributes
    * @throws QueryException query exception
    */
-  private MapBuilder attributes(final ANode node, final Plan plan, final QueryContext qc)
+  private MapBuilder attributes(final XNode node, final Plan plan, final QueryContext qc)
       throws QueryException {
     final ANodeList attributes = children(NodeType.ATTRIBUTE, node);
     final MapBuilder mb = new MapBuilder(attributes.size());
-    for(final ANode attr : attributes) {
+    for(final XNode attr : attributes) {
       final PlanEntry entry = plan.entries.get(attr.qname());
       final Str value = Str.get(attr.string());
       mb.put(nodeName(attr, node, plan, qc), entry != null ? entry.cast(value) : value);
@@ -386,7 +386,7 @@ public abstract class PlanFn extends StandardFunc {
    * @param qc query context
    * @return name
    */
-  static byte[] nodeName(final ANode node, final ANode parent, final Plan plan,
+  static byte[] nodeName(final XNode node, final XNode parent, final Plan plan,
       final QueryContext qc) {
     return nodeName(node.qname(), node.type == NodeType.ELEMENT, parent, plan, qc);
   }
@@ -400,7 +400,7 @@ public abstract class PlanFn extends StandardFunc {
    * @param qc query context
    * @return name
    */
-  static byte[] nodeName(final QNm qnm, final boolean element, final ANode parent,
+  static byte[] nodeName(final QNm qnm, final boolean element, final XNode parent,
       final Plan plan, final QueryContext qc) {
     final byte[] name = switch(plan.name) {
       case EQNAME ->
@@ -426,11 +426,11 @@ public abstract class PlanFn extends StandardFunc {
    * @return array
    * @throws QueryException query exception
    */
-  private XQArray list(final ANode node, final Plan plan, final QueryContext qc)
+  private XQArray list(final XNode node, final Plan plan, final QueryContext qc)
       throws QueryException {
     final ANodeList children = children(NodeType.ELEMENT, node);
     final ArrayBuilder ab = new ArrayBuilder(qc, children.size());
-    for(final ANode ch : children) {
+    for(final XNode ch : children) {
       ab.add(entry(ch, plan).apply(ch, null, plan, qc));
     }
     return ab.array();
@@ -444,11 +444,11 @@ public abstract class PlanFn extends StandardFunc {
    * @return array
    * @throws QueryException query exception
    */
-  private XQMap record(final ANode node, final Plan plan, final QueryContext qc)
+  private XQMap record(final XNode node, final Plan plan, final QueryContext qc)
       throws QueryException {
     final MapBuilder map = attributes(node, plan, qc);
     final TokenObjectMap<ANodeList> cache = new TokenObjectMap<>();
-    for(final ANode ch : children(NodeType.ELEMENT, node)) {
+    for(final XNode ch : children(NodeType.ELEMENT, node)) {
       cache.computeIfAbsent(nodeName(ch, node, plan, qc), ANodeList::new).add(ch);
     }
     for(final byte[] name : cache) {
@@ -456,7 +456,7 @@ public abstract class PlanFn extends StandardFunc {
       final PlanEntry pe = entry(children.get(0), plan);
       if(pe.layout != PlanLayout.DEEP_SKIP) {
         final ArrayBuilder ab = new ArrayBuilder(qc, children.size());
-        for(final ANode ch : children) {
+        for(final XNode ch : children) {
           ab.add(pe.apply(ch, node, plan, qc));
         }
         final XQArray array = ab.array();
@@ -476,14 +476,14 @@ public abstract class PlanFn extends StandardFunc {
    * @return array
    * @throws QueryException query exception
    */
-  private XQArray mixed(final ANode node, final ANode parent, final Plan plan,
+  private XQArray mixed(final XNode node, final XNode parent, final Plan plan,
       final QueryContext qc, final boolean ignoreEmpty) throws QueryException {
 
     final ArrayBuilder ab = new ArrayBuilder(qc);
-    for(final ANode attr : children(NodeType.ATTRIBUTE, node)) {
+    for(final XNode attr : children(NodeType.ATTRIBUTE, node)) {
       ab.add(new MapBuilder().put(nodeName(attr, node, plan, qc), attr.string()).map());
     }
-    for(final ANode child : node.childIter()) {
+    for(final XNode child : node.childIter()) {
       final Item item = switch((NodeType) child.type) {
         case COMMENT ->
           new MapBuilder().put(COMMENT, child.string()).map();
@@ -509,7 +509,7 @@ public abstract class PlanFn extends StandardFunc {
    * @return array
    * @throws QueryException query exception
    */
-  private static Str xml(final ANode node) throws QueryException {
+  private static Str xml(final XNode node) throws QueryException {
     try {
       return Str.get(node.serialize(new SerializerOptions()).finish());
     } catch(final QueryIOException ex) {

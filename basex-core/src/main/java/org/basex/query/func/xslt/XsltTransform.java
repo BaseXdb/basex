@@ -136,7 +136,7 @@ public class XsltTransform extends XsltFn {
    */
   private IO read(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = toNodeOrAtomItem(expr, false, qc);
-    if(item instanceof final ANode node) {
+    if(item instanceof final XNode node) {
       try {
         final Uri base = node.baseURI(sc().baseURI(), true, info);
         return new IOContent(item.serialize().finish(), string(base.string()));

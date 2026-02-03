@@ -109,7 +109,7 @@ public abstract class ParseExpr extends Expr {
     final Item item1 = iter.next();
     if(item1 == null) return false;
     // sequence starting with node?
-    if(item1 instanceof ANode) return true;
+    if(item1 instanceof XNode) return true;
     // single item?
     Item item2 = iter.next();
     if(item2 == null) return item1.test(qc, info, pos);
@@ -531,7 +531,7 @@ public abstract class ParseExpr extends Expr {
    * @return node
    * @throws QueryException query exception
    */
-  protected final ANode toNode(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final XNode toNode(final Expr expr, final QueryContext qc) throws QueryException {
     return toNode(expr.item(qc, info));
   }
 
@@ -542,7 +542,7 @@ public abstract class ParseExpr extends Expr {
    * @return node, or {@code null} if the expression yields an empty sequence
    * @throws QueryException query exception
    */
-  protected final ANode toNodeOrNull(final Expr expr, final QueryContext qc) throws QueryException {
+  protected final XNode toNodeOrNull(final Expr expr, final QueryContext qc) throws QueryException {
     final Item item = expr.item(qc, info);
     return item.isEmpty() ? null : toNode(item);
   }
@@ -553,8 +553,8 @@ public abstract class ParseExpr extends Expr {
    * @return node
    * @throws QueryException query exception
    */
-  protected final ANode toNode(final Item item) throws QueryException {
-    if(item instanceof final ANode node) return node;
+  protected final XNode toNode(final Item item) throws QueryException {
+    if(item instanceof final XNode node) return node;
     throw typeError(item, NODE, info);
   }
 
@@ -578,8 +578,8 @@ public abstract class ParseExpr extends Expr {
    * @return element
    * @throws QueryException query exception
    */
-  protected final ANode toElem(final Expr expr, final QueryContext qc) throws QueryException {
-    return (ANode) checkType(expr.item(qc, info), ELEMENT);
+  protected final XNode toElem(final Expr expr, final QueryContext qc) throws QueryException {
+    return (XNode) checkType(expr.item(qc, info), ELEMENT);
   }
 
   /**
@@ -591,9 +591,9 @@ public abstract class ParseExpr extends Expr {
    * @return element
    * @throws QueryException query exception
    */
-  protected final ANode toElem(final Expr expr, final QNm name, final QueryContext qc,
+  protected final XNode toElem(final Expr expr, final QNm name, final QueryContext qc,
       final QueryError error) throws QueryException {
-    final ANode node = toElem(expr, qc);
+    final XNode node = toElem(expr, qc);
     if(NameTest.get(name).matches(node)) return node;
     throw error.get(info, name.prefixId(), node.type, node);
   }

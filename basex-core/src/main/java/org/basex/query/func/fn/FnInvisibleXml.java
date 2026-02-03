@@ -64,7 +64,7 @@ public final class FnInvisibleXml extends StandardFunc {
 
       final String grmmr;
       try {
-        grmmr = grammar.isEmpty() ? Blitz.ixmlGrammar() : grammar instanceof ANode ?
+        grmmr = grammar.isEmpty() ? Blitz.ixmlGrammar() : grammar instanceof XNode ?
           grammar.serialize().toString() : Token.string(grammar.string(info));
       } catch(final QueryIOException ex) {
         throw ex.getCause();
@@ -73,7 +73,7 @@ public final class FnInvisibleXml extends StandardFunc {
       final de.bottlecaps.markup.blitz.Parser parser;
       final boolean fail = options.get(IxmlOptions.FAIL_ON_ERROR);
       try {
-        if(grammar instanceof ANode) {
+        if(grammar instanceof XNode) {
           parser = fail ? Blitz.generateFromXml(grmmr, Blitz.Option.FAIL_ON_ERROR) :
             Blitz.generateFromXml(grmmr);
         } else {

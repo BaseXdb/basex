@@ -28,9 +28,9 @@ public final class FElem extends FNode {
   /** Namespaces. */
   private Atts namespaces;
   /** Attributes. */
-  private ANode[] attributes;
+  private XNode[] attributes;
   /** Children. */
-  private ANode[] children;
+  private XNode[] children;
 
   /**
    * Constructor.
@@ -110,7 +110,7 @@ public final class FElem extends FNode {
    * @param ch children
    * @return self reference
    */
-  FElem finish(final Atts ns, final ANode[] at, final ANode[] ch) {
+  FElem finish(final Atts ns, final XNode[] at, final XNode[] ch) {
     namespaces = ns;
     attributes = at;
     children = ch;
@@ -204,8 +204,8 @@ public final class FElem extends FNode {
     final FBuilder elem = build(name);
     final int ns = namespaces.size();
     for(int n = 0; n < ns; n++) elem.addNS(namespaces.name(n), namespaces.value(n));
-    for(final ANode attribute : attributes) elem.add(attribute.materialize(test, ii, qc));
-    for(final ANode child : children) elem.add(child.materialize(test, ii, qc));
+    for(final XNode attribute : attributes) elem.add(attribute.materialize(test, ii, qc));
+    for(final XNode child : children) elem.add(child.materialize(test, ii, qc));
     return elem.finish();
   }
 
@@ -229,10 +229,10 @@ public final class FElem extends FNode {
     for(int n = 0; n < ns; n++) {
       tb.add(' ').add(new FNSpace(namespaces.name(n), namespaces.value(n)));
     }
-    for(final ANode attr : attributes) tb.add(' ').add(attr);
+    for(final XNode attr : attributes) tb.add(' ').add(attr);
     if(hasChildren()) {
       tb.add('>');
-      final ANode child = children[0];
+      final XNode child = children[0];
       if(child.type == NodeType.TEXT && children.length == 1) {
         tb.add(QueryString.toValue(child.string()));
       } else {

@@ -17,7 +17,7 @@ public enum Axis {
   /** Ancestor-or-self axis. */
   ANCESTOR_OR_SELF("ancestor-or-self", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.ancestorIter(true);
     }
   },
@@ -25,7 +25,7 @@ public enum Axis {
   /** Ancestor axis. */
   ANCESTOR("ancestor", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.ancestorIter(false);
     }
   },
@@ -33,7 +33,7 @@ public enum Axis {
   /** Attribute axis. */
   ATTRIBUTE("attribute", true) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.attributeIter();
     }
   },
@@ -41,7 +41,7 @@ public enum Axis {
   /** Child axis. */
   CHILD("child", true) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.childIter();
     }
   },
@@ -49,7 +49,7 @@ public enum Axis {
   /** Descendant-or-self axis. */
   DESCENDANT_OR_SELF("descendant-or-self", true) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.descendantIter(true);
     }
   },
@@ -57,7 +57,7 @@ public enum Axis {
   /** Descendant axis. */
   DESCENDANT("descendant", true) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.descendantIter(false);
     }
   },
@@ -65,7 +65,7 @@ public enum Axis {
   /** Following-sibling-or-self axis. */
   FOLLOWING_SIBLING_OR_SELF("following-sibling-or-self", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.followingSiblingIter(true);
     }
   },
@@ -73,7 +73,7 @@ public enum Axis {
   /** Following-sibling axis. */
   FOLLOWING_SIBLING("following-sibling", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.followingSiblingIter(false);
     }
   },
@@ -81,7 +81,7 @@ public enum Axis {
   /** Following axis. */
   FOLLOWING_OR_SELF("following-or-self", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.followingIter(true);
     }
   },
@@ -89,7 +89,7 @@ public enum Axis {
   /** Following axis. */
   FOLLOWING("following", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.followingIter(false);
     }
   },
@@ -97,7 +97,7 @@ public enum Axis {
   /** Parent axis. */
   PARENT("parent", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.parentIter();
     }
   },
@@ -105,7 +105,7 @@ public enum Axis {
   /** Preceding-sibling axis. */
   PRECEDING_SIBLING_OR_SELF("preceding-sibling-or-self", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.precedingSiblingIter(true);
     }
   },
@@ -113,7 +113,7 @@ public enum Axis {
   /** Preceding-sibling axis. */
   PRECEDING_SIBLING("preceding-sibling", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.precedingSiblingIter(false);
     }
   },
@@ -121,7 +121,7 @@ public enum Axis {
   /** Preceding axis. */
   PRECEDING_OR_SELF("preceding-or-self", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.precedingIter(true);
     }
   },
@@ -129,7 +129,7 @@ public enum Axis {
   /** Preceding axis. */
   PRECEDING("preceding", false) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.precedingIter(false);
     }
   },
@@ -137,7 +137,7 @@ public enum Axis {
   /** Step axis. */
   SELF("self", true) {
     @Override
-    BasicNodeIter iter(final ANode n) {
+    BasicNodeIter iter(final XNode n) {
       return n.selfIter();
     }
   };
@@ -162,7 +162,7 @@ public enum Axis {
    * @param n input node
    * @return node iterator
    */
-  abstract BasicNodeIter iter(ANode n);
+  abstract BasicNodeIter iter(XNode n);
 
   /**
    * Checks if this is one of the specified candidates.

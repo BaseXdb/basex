@@ -59,7 +59,7 @@ public final class DataBuilder {
    * @param node node
    * @throws QueryException query exception
    */
-  public void build(final ANode node) throws QueryException {
+  public void build(final XNode node) throws QueryException {
     build(new ANodeList().add(node));
   }
 
@@ -71,7 +71,7 @@ public final class DataBuilder {
   public void build(final ANodeList nodes) throws QueryException {
     data.meta.update();
     int next = data.meta.size;
-    for(final ANode node : nodes) next = addNode(node, next, -1);
+    for(final XNode node : nodes) next = addNode(node, next, -1);
 
     // see Builder#addElem
     limit(data.elemNames.size(), 0x8000, "distinct element names");
@@ -99,7 +99,7 @@ public final class DataBuilder {
    * @param par node parent
    * @return PRE value of next node
    */
-  private int addNode(final ANode node, final int pre, final int par) {
+  private int addNode(final XNode node, final int pre, final int par) {
     job.checkStop();
     return switch((NodeType) node.type) {
       case DOCUMENT_NODE -> addDoc(node, pre);
@@ -118,13 +118,13 @@ public final class DataBuilder {
    * @param pre PRE value
    * @return PRE value of next node
    */
-  private int addDoc(final ANode node, final int pre) {
+  private int addDoc(final XNode node, final int pre) {
     final int size = size(node, false);
     data.doc(size, node.baseURI());
     final int last = data.meta.size;
     data.insert(last);
     int next = pre + 1;
-    for(final ANode child : node.childIter()) next = addNode(child, next, pre);
+    for(final XNode child : node.childIter()) next = addNode(child, next, pre);
     if(size != next - pre) data.size(last, Data.DOC, next - pre);
     return next;
   }
@@ -136,7 +136,7 @@ public final class DataBuilder {
    * @param par parent reference
    * @return PRE value of next node
    */
-  private int addAttr(final ANode node, final int pre, final int par) {
+  private int addAttr(final XNode node, final int pre, final int par) {
     final int last = data.meta.size;
     final QNm qname = node.qname();
     final byte[] prefix = qname.prefix(), uri = qname.uri();
@@ -157,7 +157,7 @@ public final class DataBuilder {
    * @param par parent reference
    * @return PRE value of next node
    */
-  private int addText(final ANode node, final int pre, final int par) {
+  private int addText(final XNode node, final int pre, final int par) {
     // check full-text mode
     int dist = pre - par;
     final ArrayList<DataFTMarker> marks = ftbuilder != null ? ftbuilder.build(node) : null;
@@ -199,7 +199,7 @@ public final class DataBuilder {
    * @param par parent reference
    * @return PRE value of next node
    */
-  private int addPI(final ANode node, final int pre, final int par) {
+  private int addPI(final XNode node, final int pre, final int par) {
     final byte[] value = trim(concat(node.name(), cpToken(' '), node.string()));
     data.text(pre - par, value, Data.PI);
     data.insert(data.meta.size);
@@ -213,7 +213,7 @@ public final class DataBuilder {
    * @param par parent reference
    * @return PRE value of next node
    */
-  private int addComm(final ANode node, final int pre, final int par) {
+  private int addComm(final XNode node, final int pre, final int par) {
     data.text(pre - par, node.string(), Data.COMM);
     data.insert(data.meta.size);
     return pre + 1;
@@ -226,7 +226,7 @@ public final class DataBuilder {
    * @param par parent reference
    * @return PRE value of next node
    */
-  private int addElem(final ANode node, final int pre, final int par) {
+  private int addElem(final XNode node, final int pre, final int par) {
     final int last = data.meta.size;
 
     // add new namespaces
@@ -253,8 +253,8 @@ public final class DataBuilder {
 
     // add attributes and child nodes
     int cPre = pre + 1;
-    for(final ANode attr : node.attributeIter()) cPre = addAttr(attr, cPre, pre);
-    for(final ANode child : node.childIter()) cPre = addNode(child, cPre, pre);
+    for(final XNode attr : node.attributeIter()) cPre = addAttr(attr, cPre, pre);
+    for(final XNode child : node.childIter()) cPre = addNode(child, cPre, pre);
 
     // finalize namespace structure
     data.nspaces.close(last);
@@ -270,7 +270,7 @@ public final class DataBuilder {
    * @param att count attributes instead of elements
    * @return number of descendants + 1 or attribute size + 1
    */
-  private static int size(final ANode node, final boolean att) {
+  private static int size(final XNode node, final boolean att) {
     if(node instanceof final DBNode dbnode) {
       final Data data = dbnode.data();
       final int kind = node.kind();
@@ -282,7 +282,7 @@ public final class DataBuilder {
     final BasicNodeIter iter = node.attributeIter();
     while(iter.next() != null) ++size;
     if(!att) {
-      for(final ANode child : node.childIter()) size += size(child, false);
+      for(final XNode child : node.childIter()) size += size(child, false);
     }
     return size;
   }
@@ -295,7 +295,7 @@ public final class DataBuilder {
    * @return new node
    * @throws QueryException query exception
    */
-  public static ANode stripNamespace(final ANode node, final byte[] uri, final Context ctx)
+  public static XNode stripNamespace(final XNode node, final byte[] uri, final Context ctx)
       throws QueryException {
 
     if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) return node;
@@ -341,7 +341,7 @@ public final class DataBuilder {
    * @return new node
    * @throws QueryException query exception
    */
-  public static ANode stripNamespaces(final ANode node, final TokenSet prefixes, final Context ctx,
+  public static XNode stripNamespaces(final XNode node, final TokenSet prefixes, final Context ctx,
       final InputInfo info) throws QueryException {
 
     if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) return node;

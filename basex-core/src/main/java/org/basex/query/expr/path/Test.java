@@ -93,7 +93,7 @@ public abstract class Test extends ExprInfo {
    * @param node node to be checked
    * @return result of check
    */
-  public abstract boolean matches(ANode node);
+  public abstract boolean matches(XNode node);
 
   /**
    * Checks if the specified item matches the test.
@@ -101,7 +101,7 @@ public abstract class Test extends ExprInfo {
    * @return result of check
    */
   public final boolean matches(final Item item) {
-    return item instanceof final ANode node && matches(node);
+    return item instanceof final XNode node && matches(node);
   }
 
   /**
