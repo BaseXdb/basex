@@ -1,11 +1,9 @@
 package org.basex.query.func.bin;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -17,21 +15,11 @@ import org.basex.util.list.*;
  */
 public final class BinJoin extends StandardFunc {
   @Override
-  public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Expr values = arg(0);
-
-    final ByteList bl;
-    if(values instanceof final SingletonSeq ss && ss.singleItem()) {
-      final byte[] bytes = toBin(ss.itemAt(0)).binary(info);
-      final long bs = ss.size();
-      bl = new ByteList(bs * bytes.length);
-      for(int b = 0; b < bs; b++) bl.add(bytes);
-    } else {
-      bl = new ByteList();
-      final Iter iter = values.atomIter(qc, info);
-      for(Item item; (item = qc.next(iter)) != null;) {
-        bl.add(toBin(item).binary(info));
-      }
+  public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    final Iter iter = arg(0).atomIter(qc, info);
+    final ByteList bl = new ByteList(iter.size());
+    for(Item item; (item = qc.next(iter)) != null;) {
+      bl.add(toBin(item).binary(info));
     }
     return B64.get(bl.finish());
   }

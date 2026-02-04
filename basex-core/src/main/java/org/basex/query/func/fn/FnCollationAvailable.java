@@ -34,7 +34,7 @@ public final class FnCollationAvailable extends StandardFunc {
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
    final byte[] collation = toToken(arg(0), qc);
-    final Value usage = arg(1).value(qc);
+    final Value usage = arg(1).atomValue(qc, info);
 
     for(final Item use : usage) toEnum(use, Usage.class);
     try {

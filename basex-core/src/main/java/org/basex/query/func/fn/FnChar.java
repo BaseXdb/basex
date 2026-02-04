@@ -16,7 +16,7 @@ import org.basex.util.*;
 public final class FnChar extends StandardFunc {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = arg(0).item(qc, info);
+    final Item value = arg(0).atomItem(qc, info);
 
     if(value instanceof Itr) {
       // codepoint integer

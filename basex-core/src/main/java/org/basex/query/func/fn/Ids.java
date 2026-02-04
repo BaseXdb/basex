@@ -40,11 +40,18 @@ abstract class Ids extends ContextFn {
    * @throws QueryException query exception
    */
   private Value ids(final QueryContext qc) throws QueryException {
-    final TokenSet idSet = ids(arg(0).atomIter(qc, info), qc);
+    final Iter values = arg(0).atomIter(qc, info);
     final XNode node = toNodeOrNull(arg(1), qc);
 
     final XNode root = (node != null ? node : toNode(context(qc), qc)).root();
     if(root.type != NodeType.DOCUMENT_NODE) throw IDDOC.get(info);
+
+    final TokenSet idSet = new TokenSet();
+    for(Item ids; (ids = qc.next(values)) != null;) {
+      for(final byte[] id : distinctTokens(toToken(ids))) {
+        if(XMLToken.isNCName(id)) idSet.put(id);
+      }
+    }
 
     final ANodeBuilder results = new ANodeBuilder();
     final boolean idref = idref();
@@ -109,23 +116,6 @@ abstract class Ids extends ContextFn {
     for(final XNode child : node.childIter()) {
       add(idSet, results, child);
     }
-  }
-
-  /**
-   * Extracts and returns all unique IDs from the iterated strings.
-   * @param iter iterator
-   * @param qc query context
-   * @return ID set
-   * @throws QueryException query exception
-   */
-  private TokenSet ids(final Iter iter, final QueryContext qc) throws QueryException {
-    final TokenSet ts = new TokenSet();
-    for(Item ids; (ids = qc.next(iter)) != null;) {
-      for(final byte[] id : distinctTokens(toToken(ids))) {
-        if(XMLToken.isNCName(id)) ts.put(id);
-      }
-    }
-    return ts;
   }
 
   /**

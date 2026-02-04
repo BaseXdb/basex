@@ -116,7 +116,7 @@ public class FnSortBy extends StandardFunc {
       if(map.contains(KEY)) keys[m] = toFunction(map.get(KEY), 1, qc);
       collations[m] = toCollation(map.get(COLLATION), qc);
       if(map.contains(ORDER)) {
-        invert[m] = toEnum(map.get(ORDER).item(qc, info), Order.class) == Order.DESCENDING;
+        invert[m] = toEnum(map.get(ORDER).atomItem(qc, info), Order.class) == Order.DESCENDING;
       }
       m++;
     }

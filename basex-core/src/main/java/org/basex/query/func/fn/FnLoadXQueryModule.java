@@ -38,7 +38,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] modUri = toToken(arg(0).atomItem(qc, info));
+    final byte[] modUri = toToken(arg(0), qc);
     if(modUri.length == 0) throw MODULE_URI_EMPTY.get(info);
 
     final XQMap options = toEmptyMap(arg(1), qc);

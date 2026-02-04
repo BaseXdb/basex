@@ -54,7 +54,7 @@ public class FnSortWith extends StandardFunc {
     final Comparator<Value> comparator = (value1, value2) -> {
       try {
         for(final FItem cmp : cmps) {
-          final long diff = toLong(cmp.invoke(qc, info, value1, value2).item(qc, info));
+          final long diff = toLong(cmp.invoke(qc, info, value1, value2).atomItem(qc, info));
           if(diff != 0) return Long.signum(diff);
         }
         return 0;
