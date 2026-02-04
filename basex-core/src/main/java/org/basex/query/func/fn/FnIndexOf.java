@@ -5,11 +5,8 @@ import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.list.*;
 
 /**
  * Function implementation.
@@ -38,23 +35,6 @@ public final class FnIndexOf extends StandardFunc {
         return null;
       }
     };
-  }
-
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final Iter input = arg(0).atomIter(qc, info);
-    final Item search = toAtomItem(arg(1), qc);
-    final Collation collation = toCollation(arg(2), qc);
-
-    final IntList list = new IntList();
-    int c = 0;
-    for(Item item; (item = qc.next(input)) != null;) {
-      ++c;
-      if(item.comparable(search) && item.compare(search, collation, false, info) == 0) {
-        list.add(c);
-      }
-    }
-    return IntSeq.get(list.finish());
   }
 
   @Override
