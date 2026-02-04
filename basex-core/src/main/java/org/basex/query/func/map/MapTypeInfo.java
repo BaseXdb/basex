@@ -69,20 +69,4 @@ public final class MapTypeInfo {
     }
     return this;
   }
-
-  /**
-   * Attaches map information for the specified index.
-   * @param expr index expression
-   * @return map information
-   */
-  public MapTypeInfo index(final Expr expr) {
-    if(record != null && expr instanceof final Itr itr) {
-      index = (int) itr.itr();
-      final TokenObjectMap<RecordField> fields = record.fields();
-      if(index > 0 && index <= fields.size()) {
-        field = fields.value(index);
-      }
-    }
-    return this;
-  }
 }
