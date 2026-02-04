@@ -93,13 +93,19 @@ public abstract class XQArray extends XQStruct {
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc, structSize());
+    final ValueBuilder vb = new ValueBuilder(qc);
     for(final Value value : iterable()) vb.add(value.atomValue(qc, ii));
     return vb.value(BasicType.ANY_ATOMIC_TYPE);
   }
 
   @Override
-  public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return atomValue(qc, ii).item(qc, ii);
+  }
+
+  @Override
+  public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
+      throws QueryException {
     Expr ex = this;
     if(mode.oneOf(Simplify.NUMBER, Simplify.DATA)) ex = items(cc.qc);
     return cc.simplify(this, ex, mode);
@@ -178,7 +184,7 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  public void cache(final boolean lazy, final InputInfo ii) throws QueryException {
+  public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {
     for(final Value value : iterable()) value.cache(lazy, ii);
   }
 
@@ -273,11 +279,6 @@ public abstract class XQArray extends XQStruct {
     final long size = structSize();
     if(i > 0 && i <= size) return valueAt(i - 1);
     throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, i, size);
-  }
-
-  @Override
-  public final Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return atomValue(qc, ii).item(qc, ii);
   }
 
   @Override
@@ -479,7 +480,7 @@ public abstract class XQArray extends XQStruct {
   }
 
   @Override
-  public String description() {
+  public final String description() {
     return ARRAY;
   }
 

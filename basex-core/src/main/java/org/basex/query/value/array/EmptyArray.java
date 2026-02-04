@@ -3,8 +3,11 @@ package org.basex.query.value.array;
 import java.util.*;
 
 import org.basex.core.jobs.*;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -30,6 +33,16 @@ final class EmptyArray extends XQArray {
   @Override
   public Value valueAt(final long index) {
     throw Util.notExpected();
+  }
+
+  @Override
+  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Empty.VALUE;
+  }
+
+  @Override
+  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return Empty.VALUE;
   }
 
   @Override
