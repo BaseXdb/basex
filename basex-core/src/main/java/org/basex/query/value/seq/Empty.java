@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.collation.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -76,6 +77,12 @@ public final class Empty extends Item {
 
   @Override
   public byte[] string(final InputInfo ii) {
+    throw Util.notExpected();
+  }
+
+  @Override
+  public int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
     throw Util.notExpected();
   }
 

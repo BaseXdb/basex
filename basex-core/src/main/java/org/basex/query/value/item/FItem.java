@@ -31,14 +31,14 @@ public abstract class FItem extends Item implements XQFunction {
   }
 
   @Override
-  public final int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
-    throw FIATOMIZE_X.get(info(ii), this);
+  public final boolean atomicEqual(final Item item) {
+    throw Util.notExpected();
   }
 
   @Override
-  public final boolean atomicEqual(final Item item) {
-    return false;
+  public final int compare(final Item item, final Collation coll, final boolean transitive,
+      final InputInfo ii) throws QueryException {
+    throw Util.notExpected();
   }
 
   @Override

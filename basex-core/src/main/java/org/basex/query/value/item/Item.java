@@ -199,11 +199,8 @@ public abstract class Item extends Value {
    * @return difference
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public int compare(final Item item, final Collation coll, final boolean transitive,
-      final InputInfo ii) throws QueryException {
-    throw compareError(this, item, ii);
-  }
+  public abstract int compare(Item item, Collation coll, boolean transitive, InputInfo ii)
+      throws QueryException;
 
   /**
    * Returns an input stream.
