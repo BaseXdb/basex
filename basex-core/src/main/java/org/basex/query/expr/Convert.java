@@ -47,7 +47,7 @@ abstract class Convert extends Single {
     if(type instanceof ListType) {
       type = type.atomic();
       occ = Occ.ZERO_OR_MORE;
-    } else if(occ == Occ.ZERO_OR_ONE && est.oneOrMore() && !est.mayBeArray()) {
+    } else if(occ == Occ.ZERO_OR_ONE && est.oneOrMore() && !est.mayBeFunction()) {
       occ = Occ.EXACTLY_ONE;
     }
     return SeqType.get(type, occ);
@@ -60,7 +60,7 @@ abstract class Convert extends Single {
    */
   final Boolean castable(final SeqType castType) {
     final SeqType est = expr.seqType();
-    if(!est.mayBeArray()) {
+    if(!est.mayBeFunction()) {
       final long es = expr.size();
       if(es != -1 && (es < castType.occ.min || es > castType.occ.max)) return false;
 
@@ -80,7 +80,7 @@ abstract class Convert extends Single {
   final Expr simplify(final SeqType castType, final CompileContext cc) {
     final SeqType est = expr.seqType();
     Expr arg = null;
-    if(est.one() && !est.mayBeArray() && castType.type.instanceOf(BasicType.NUMERIC)) {
+    if(est.one() && !est.mayBeFunction() && castType.type.instanceOf(BasicType.NUMERIC)) {
       // xs:int(string(I))
       // xs:int(xs:double(I)) → xs:int(I)
       arg = FnNumber.simplify(expr, cc);

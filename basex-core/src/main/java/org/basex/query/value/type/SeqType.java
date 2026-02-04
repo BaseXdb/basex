@@ -455,31 +455,16 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNumber() {
-    return !zero() && (type.isNumber() || ANY_ATOMIC_TYPE.instanceOf(type));
+    return !zero() && (type.isNumber() || type == BasicType.ANY_ATOMIC_TYPE ||
+        type == BasicType.ITEM);
   }
 
   /**
-   * Tests if expressions of this type may yield arrays.
-   * @return result of check
-   */
-  public boolean mayBeArray() {
-    return !zero() && (type instanceof ArrayType || Types.ARRAY.instanceOf(type));
-  }
-
-  /**
-   * Tests if expressions of this type may yield maps.
-   * @return result of check
-   */
-  public boolean mayBeMap() {
-    return !zero() && (type instanceof MapType || Types.MAP.instanceOf(type));
-  }
-
-  /**
-   * Tests if expressions of this type may yield functions.
+   * Tests if expressions of this type may yield functions (including maps and arrays).
    * @return result of check
    */
   public boolean mayBeFunction() {
-    return !zero() && (type instanceof FType || type == BasicType.ITEM);
+    return !zero() && (type == BasicType.ITEM || type instanceof FType);
   }
 
   /**

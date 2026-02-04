@@ -102,7 +102,7 @@ public abstract class Expr extends ExprInfo {
     final SeqType st = seqType();
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return iter;
     long size = iter.size();
-    if(size != -1 && st.mayBeArray()) size = -1;
+    if(size != -1 && st.mayBeFunction()) size = -1;
     return new AtomIter(iter, qc, ii, size);
   }
 

@@ -852,22 +852,22 @@ public final class SeqTypeTest {
     assertFalse(DATE_TIME_STAMP_O.mayBeNumber());
     assertFalse(ERROR_O.mayBeNumber());
 
-    assertTrue(ITEM_O.mayBeArray());
-    assertTrue(FUNCTION_O.mayBeArray());
-    assertFalse(MAP_O.mayBeArray());
-    assertTrue(ARRAY_O.mayBeArray());
-    assertFalse(RECORD_O.mayBeArray());
-    assertFalse(ANY_ATOMIC_TYPE_O.mayBeArray());
-    assertFalse(NUMERIC_O.mayBeArray());
-    assertFalse(INTEGER_O.mayBeArray());
-    assertFalse(BYTE.seqType().mayBeArray());
-    assertFalse(STRING_O.mayBeArray());
-    assertFalse(NODE_O.mayBeArray());
-    assertFalse(ELEMENT_O.mayBeArray());
-    assertFalse(NMTOKENS_O.mayBeArray());
-    assertFalse(DATE_TIME_O.mayBeArray());
-    assertFalse(DATE_TIME_STAMP_O.mayBeArray());
-    assertFalse(ERROR_O.mayBeArray());
+    assertTrue(ITEM_O.mayBeFunction());
+    assertTrue(FUNCTION_O.mayBeFunction());
+    assertTrue(MAP_O.mayBeFunction());
+    assertTrue(ARRAY_O.mayBeFunction());
+    assertTrue(RECORD_O.mayBeFunction());
+    assertFalse(ANY_ATOMIC_TYPE_O.mayBeFunction());
+    assertFalse(NUMERIC_O.mayBeFunction());
+    assertFalse(INTEGER_O.mayBeFunction());
+    assertFalse(BYTE.seqType().mayBeFunction());
+    assertFalse(STRING_O.mayBeFunction());
+    assertFalse(NODE_O.mayBeFunction());
+    assertFalse(ELEMENT_O.mayBeFunction());
+    assertFalse(NMTOKENS_O.mayBeFunction());
+    assertFalse(DATE_TIME_O.mayBeFunction());
+    assertFalse(DATE_TIME_STAMP_O.mayBeFunction());
+    assertFalse(ERROR_O.mayBeFunction());
 
     assertTrue(ITEM_O.mayBeFunction());
     assertTrue(FUNCTION_O.mayBeFunction());

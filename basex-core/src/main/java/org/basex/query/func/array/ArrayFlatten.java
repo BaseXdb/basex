@@ -71,7 +71,7 @@ public final class ArrayFlatten extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
-    if(!st.mayBeArray()) return input;
+    if(!st.mayBeFunction()) return input;
     exprType.assign(type(st.type));
     return this;
   }

@@ -55,7 +55,7 @@ public final class Lookup extends Arr {
     final SeqType kt = keys.seqType();
     final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
     Occ occ = st.occ;
-    if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeArray()) {
+    if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeFunction()) {
       // key is wildcard, or expressions yield no single item
       occ = occ.union(Occ.ZERO_OR_MORE);
     } else if(map) {
@@ -75,7 +75,7 @@ public final class Lookup extends Arr {
   private Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0], keys = exprs[1];
     final long is = input.size();
-    final long ks = keys.seqType().mayBeArray() || keys.has(Flag.NDT) ? -1 : keys.size();
+    final long ks = keys.seqType().mayBeFunction() || keys.has(Flag.NDT) ? -1 : keys.size();
     if(ks == 0) return keys;
 
     final Type it = input.seqType().type;

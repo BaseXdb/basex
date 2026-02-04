@@ -50,7 +50,7 @@ public final class FnCodepointEqual extends StandardFunc {
     final SeqType st1 = value1.seqType(), st2 = value2.seqType();
     if(st1.zero()) return value1;
     if(st2.zero()) return value2;
-    if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray())
+    if(st1.oneOrMore() && !st1.mayBeFunction() && st2.oneOrMore() && !st2.mayBeFunction())
       exprType.assign(Occ.EXACTLY_ONE);
     return this;
   }

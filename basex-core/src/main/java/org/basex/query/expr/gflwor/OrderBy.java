@@ -135,7 +135,7 @@ public final class OrderBy extends Clause {
     if(keys.length == 1 && keys[0].coll == null && keys[0].least) {
       final Expr expr = keys[0].expr;
       // do not rewrite array keys (as they may contain sequences)
-      if(expr.seqType().mayBeArray()) return false;
+      if(expr.seqType().mayBeFunction()) return false;
       // for $i in 1 to 2 order by 1 return $i → for $i in 1 to 2 return $i
       if(expr instanceof Item) return true;
       // for $i in 1 to 2 order by $i return $i → for $i in sort(1 to 2) return $i

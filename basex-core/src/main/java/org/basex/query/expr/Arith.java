@@ -59,8 +59,8 @@ public class Arith extends Arr {
     final boolean numbers = type1.isNumberOrUntyped() && type2.isNumberOrUntyped();
 
     final Type type = calc.type(type1, type2);
-    final boolean noArray = !st1.mayBeArray() && !st2.mayBeArray();
-    final boolean oneOrMore = noArray && st1.oneOrMore() && st2.oneOrMore();
+    final boolean noArrays = !st1.mayBeFunction() && !st2.mayBeFunction();
+    final boolean oneOrMore = noArrays && st1.oneOrMore() && st2.oneOrMore();
     exprType.assign(type, oneOrMore ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
 
     Expr expr = emptyExpr();
@@ -72,7 +72,7 @@ public class Arith extends Arr {
     if(expr == this && Function.COUNT.is(expr1) && calc == Calc.ADD && Function.COUNT.is(expr2)) {
       expr = cc.function(Function.COUNT, info, List.get(cc, info, expr1.arg(0), expr2.arg(0)));
     }
-    if(expr == this && numbers && noArray && st1.one() && st2.one()) {
+    if(expr == this && numbers && noArrays && st1.one() && st2.one()) {
       // example: number($a) + 0 → number($a)
       final Expr ex = calc.optimize(expr1, expr2, info, cc);
       if(ex != null) {

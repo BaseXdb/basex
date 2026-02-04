@@ -47,7 +47,7 @@ public final class FnData extends ContextFn {
       }
       // ignore arrays: data((1 to 6) ! [ ., . ])
       if(type != null) {
-        exprType.assign(SeqType.get(type, st.occ), st.mayBeArray() ? -1 : input.size());
+        exprType.assign(SeqType.get(type, st.occ), st.mayBeFunction() ? -1 : input.size());
       }
     }
     return this;
@@ -70,7 +70,7 @@ public final class FnData extends ContextFn {
     } else if(mode == Simplify.COUNT) {
       // count(data($x)) → count($x)
       // do not simplify array input: count(data([ 1, 2, 3 ]))
-      if(!input.seqType().mayBeArray()) expr = input;
+      if(!input.seqType().mayBeFunction()) expr = input;
     } else if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // if(data($node)) → if($node/descendant::text())
       expr = simplifyEbv(input, cc, null);

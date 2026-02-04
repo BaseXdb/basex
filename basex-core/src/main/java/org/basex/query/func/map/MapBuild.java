@@ -71,7 +71,7 @@ public final class MapBuild extends MapMerge {
     final Expr input = arg(0), keys = arg(1);
     final SeqType st = input.seqType();
     final long size = input.size();
-    return keys.size() == 0 && (size == 1 && !st.mayBeArray() && st.type.atomic() != null ||
+    return keys.size() == 0 && (size == 1 && !st.mayBeFunction() && st.type.atomic() != null ||
         input instanceof RangeSeq) ? size : -1;
   }
 

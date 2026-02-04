@@ -29,7 +29,7 @@ public final class FnAvg extends FnSum {
     if(expr != null) return expr;
 
     final SeqType st = arg(0).seqType();
-    if(!st.mayBeArray()) exprType.assign(Calc.DIVIDE.type(st.type, st.type));
+    if(!st.mayBeFunction()) exprType.assign(Calc.DIVIDE.type(st.type, st.type));
 
     return this;
   }

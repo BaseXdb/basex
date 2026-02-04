@@ -302,7 +302,7 @@ public final class GroupBy extends Clause {
     if(specs.length == 1 && post.length == 0) {
       final GroupSpec spec = specs[0];
       final SeqType st = spec.expr.seqType();
-      if(spec.coll == null && spec.var.declType == null && st.one() && !st.mayBeArray()) {
+      if(spec.coll == null && spec.var.declType == null && st.one() && !st.mayBeFunction()) {
         return spec;
       }
     }

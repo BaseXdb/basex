@@ -108,7 +108,7 @@ public final class FnItemsAt extends StandardFunc {
     if(ast.zero()) return Empty.VALUE;
 
     Occ occ = ast.zeroOrOne() ? Occ.ZERO_OR_ONE : Occ.ZERO_OR_MORE;
-    if(at instanceof Item && !ast.mayBeArray()) {
+    if(at instanceof Item && !ast.mayBeFunction()) {
       // check for fractional or negative number
       final double d = toDouble(at, cc.qc) - 1;
       final long l = (long) d;

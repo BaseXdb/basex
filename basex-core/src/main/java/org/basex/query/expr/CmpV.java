@@ -55,7 +55,7 @@ public final class CmpV extends Cmp {
     if(expr == this) {
       // restrict type
       final SeqType st1 = exprs[0].seqType(), st2 = exprs[1].seqType();
-      if(st1.oneOrMore() && !st1.mayBeArray() && st2.oneOrMore() && !st2.mayBeArray()) {
+      if(st1.oneOrMore() && !st1.mayBeFunction() && st2.oneOrMore() && !st2.mayBeFunction()) {
         exprType.assign(Occ.EXACTLY_ONE);
       }
     }
@@ -121,7 +121,7 @@ public final class CmpV extends Cmp {
   public Expr invert() {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    return st1.one() && !st1.mayBeArray() && st2.one() && !st2.mayBeArray() ?
+    return st1.one() && !st1.mayBeFunction() && st2.one() && !st2.mayBeFunction() ?
       new CmpV(info, expr1, expr2, op.invert()) : null;
   }
 

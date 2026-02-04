@@ -52,7 +52,7 @@ public final class TypeCheck extends Single {
     cardinality = nst.instanceOf(st);
 
     // refine type check (ignore arrays as coerced result may have a different size)
-    if(!et.mayBeArray() || !type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+    if(!et.mayBeFunction() || !type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
       // occurrence indicator:
       //   exactly-one/one-or-more → exactly-one
       final Occ nocc = et.occ.intersect(st.occ);

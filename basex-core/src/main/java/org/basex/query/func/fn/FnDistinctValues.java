@@ -117,7 +117,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
         if(values instanceof Range || values instanceof RangeSeq) return values;
         // distinct-values($string) → $string
         // distinct-values($node) → data($node)
-        if(st.zeroOrOne() && !st.mayBeArray())
+        if(st.zeroOrOne() && !st.mayBeFunction())
           return type == st.type ? values : cc.function(DATA, info, exprs);
       }
       // assign atomic type of argument

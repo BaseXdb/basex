@@ -64,7 +64,7 @@ public final class CmpSR extends Single {
     expr = expr.simplifyFor(Simplify.STRING, cc);
 
     final SeqType st = expr.seqType();
-    single = st.zeroOrOne() && !st.mayBeArray();
+    single = st.zeroOrOne() && !st.mayBeFunction();
 
     return expr instanceof Value ? cc.preEval(this) : this;
   }

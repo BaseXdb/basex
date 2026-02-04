@@ -41,7 +41,7 @@ public final class Unary extends Single {
     final SeqType st = expr.seqType();
     final Type type = st.type.isUntyped() ? BasicType.DOUBLE :
       st.type.instanceOf(BasicType.INTEGER) ? BasicType.INTEGER : st.type;
-    final Occ occ = st.oneOrMore() && !st.mayBeArray() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
+    final Occ occ = st.oneOrMore() && !st.mayBeFunction() ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE;
     exprType.assign(type, occ);
 
     // --123 → 123

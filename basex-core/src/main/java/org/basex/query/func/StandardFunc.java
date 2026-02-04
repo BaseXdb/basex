@@ -142,7 +142,7 @@ public abstract class StandardFunc extends Arr {
     if(expr != null) {
       final SeqType st = expr.seqType();
       if(st.zero()) return expr instanceof Dummy ? Empty.VALUE : expr;
-      if(occ && st.oneOrMore() && !(atom && st.mayBeArray()) && exprType.seqType().zeroOrOne()) {
+      if(occ && st.oneOrMore() && !(atom && st.mayBeFunction()) && exprType.seqType().zeroOrOne()) {
         exprType.assign(Occ.EXACTLY_ONE);
       }
     }
