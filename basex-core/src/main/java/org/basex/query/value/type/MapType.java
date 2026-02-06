@@ -123,6 +123,7 @@ public class MapType extends FType {
   @Override
   public boolean instanceOf(final Type type) {
     if(this == type || type.oneOf(RECORD, MAP, FUNCTION, BasicType.ITEM)) return true;
+    if(type instanceof RecordType) return false;
     if(type instanceof final MapType mt) {
       return this != MAP && valueType.instanceOf(mt.valueType) && keyType.instanceOf(mt.keyType);
     }

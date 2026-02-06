@@ -37,6 +37,9 @@ public final class RecordTest extends SandboxTest {
         + "let $coord := local:coord(1, 2) "
         + "let $new := map:remove($coord, 'x') "
         + "return $new instance of local:coord", false);
+
+    query("map:entries({ 'a': 1 }) instance of record(a)", true);
+    query("map:entries({ 'x': 1 }) instance of record(a)", false);
   }
 
   /** Recursive records. */
