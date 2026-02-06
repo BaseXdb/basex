@@ -40,6 +40,15 @@ public final class RecordTest extends SandboxTest {
 
     query("map:entries({ 'a': 1 }) instance of record(a)", true);
     query("map:entries({ 'x': 1 }) instance of record(a)", false);
+    query("let $map := (\n"
+        + "  {'x':5, 'y':6}\n"
+        + "  => map:put(xs:NCName('x'), true())\n"
+        + "  => map:put(xs:NCName('y'), (false(), false()))\n"
+        + ")\n"
+        + "return (\n"
+        + "  $map instance of map(xs:NCName, xs:boolean+) or\n"
+        + "  $map instance of map(xs:string, xs:boolean+)\n"
+        + ")", true);
   }
 
   /** Recursive records. */

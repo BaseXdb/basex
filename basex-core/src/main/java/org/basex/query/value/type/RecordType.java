@@ -368,40 +368,65 @@ public final class RecordType extends MapType {
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 
-    if(!(type instanceof final RecordType rt)) return null;
-    final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
-    for(final byte[] key : fields) {
-      final RecordField f = fields.get(key);
-      if(rt.fields.contains(key)) {
-        // common field
-        final RecordField rtf = rt.fields.get(key);
-        final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
-        final Type ft = fst.type, rtft = rtfst.type;
-        final SeqType is;
-        if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2) {
-          final Pair pair = new Pair(rt1, rt2);
-          if(pairs.contains(pair)) return null;
-          final Type it = rt1.intersect(rt2, pair.addTo(pairs));
-          is = it == null ? null : SeqType.get(it, fst.occ.intersect(rtfst.occ));
+    if(type instanceof final RecordType rt) {
+      final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
+      for(final byte[] key : fields) {
+        final RecordField f = fields.get(key);
+        if(rt.fields.contains(key)) {
+          // common field
+          final RecordField rtf = rt.fields.get(key);
+          final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
+          final SeqType is = intersect(fst, rtfst, pairs);
+          if(is == null) return null;
+          map.put(key, new RecordField(is, f.optional && rtf.optional));
         } else {
-          is = fst.intersect(rtfst);
+          // field missing in type
+          if(!rt.extensible) return null;
+          map.put(key, new RecordField(f.seqType, f.optional));
         }
+      }
+      for(final byte[] key : rt.fields) {
+        if(!fields.contains(key)) {
+          // field missing in this RecordType
+          if(!extensible) return null;
+          final RecordField rtf = rt.fields.get(key);
+          map.put(key, new RecordField(rtf.seqType, rtf.optional));
+        }
+      }
+      return new RecordType(map, extensible && rt.extensible);
+    }
+    if(type instanceof final MapType mt) {
+      if(mt.keyType().intersect(BasicType.STRING) == null) return null;
+      final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
+      for(final byte[] key : fields) {
+        final RecordField f = fields.get(key);
+        final SeqType is = intersect(f.seqType(), mt.valueType(), pairs);
         if(is == null) return null;
-        map.put(key, new RecordField(is, f.optional && rtf.optional));
-      } else {
-        // field missing in type
-        if(!rt.extensible) return null;
-        map.put(key, new RecordField(f.seqType));
+        map.put(key, new RecordField(is, f.optional));
       }
+      return new RecordType(map, extensible);
     }
-    for(final byte[] key : rt.fields) {
-      if(!fields.contains(key)) {
-        // field missing in this RecordType
-        if(!extensible) return null;
-        map.put(key, new RecordField(rt.fields.get(key).seqType));
-      }
+    return null;
+  }
+
+  /**
+   * Returns the intersection between two sequence types, or {@code null}, if no such type exists.
+   * Uses <code>pairs</code> to keep track of pairs of RecordTypes being checked, in order to
+   * prevent infinite recursion.
+   * @param st1 first type
+   * @param st2 second type
+   * @param pairs pairs of RecordTypes that are currently being checked, or have been checked before
+   * @return intersection type or {@code null}
+   */
+  private static SeqType intersect(final SeqType st1, final SeqType st2, final Set<Pair> pairs) {
+    final Type t1 = st1.type, t2 = st2.type;
+    if(t1 instanceof final RecordType rt1 && t2 instanceof final RecordType rt2) {
+      final Pair pair = new Pair(rt1, rt2);
+      if(pairs.contains(pair)) return null;
+      final Type it = rt1.intersect(rt2, pair.addTo(pairs));
+      return it == null ? null : SeqType.get(it, st1.occ.intersect(st2.occ));
     }
-    return new RecordType(map, extensible && rt.extensible);
+    return st1.intersect(st2);
   }
 
   /**
