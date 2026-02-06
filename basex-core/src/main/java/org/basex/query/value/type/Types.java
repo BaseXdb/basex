@@ -236,9 +236,9 @@ public final class Types {
   public static final EnumType SCHEMA_TYPE_RECORD_VARIETY =
       EnumType.get("atomic", "list", "union", "empty", "simple", "element-only", "mixed");
 
-  /** The general record type. */
-  public static final RecordType RECORD = new RecordType(new TokenObjectMap<>(0), true);
-  /** Single record. */
+  /** The empty record type. */
+  public static final RecordType RECORD = new RecordType(new TokenObjectMap<>(0));
+  /** Single empty record. */
   public static final SeqType RECORD_O = RECORD.seqType();
 
   /** Indexed item types. */

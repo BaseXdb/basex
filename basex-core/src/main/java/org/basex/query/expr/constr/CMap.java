@@ -127,8 +127,7 @@ public final class CMap extends Arr {
     } else if(expr instanceof CRecord) {
       // { 'a': <a/> }
       final RecordType rt = (RecordType) expr.seqType().type;
-      final boolean extensible = rt.isExtensible();
-      if(extensible || rt.hasOptional()) return false;
+      if(rt.hasOptional()) return false;
       final TokenObjectMap<RecordField> fields = rt.fields();
       final int fs = fields.size();
       for(int f = 1; f <= fs; f++) list.add(Str.get(fields.key(f))).add(expr.arg(f - 1));

@@ -41,14 +41,12 @@ public final class MapRemove extends MapFn {
         // otherwise, derive new record type
         final RecordType rt = mti.record.copy(mti.key, null, null, cc);
         // return empty map if it will contain no entries
-        if(rt != null && rt.fields().isEmpty() && !rt.isExtensible()) return XQMap.empty();
+        if(rt != null && rt.fields().isEmpty()) return XQMap.empty();
         tp = rt;
       }
     } else if(mti.validKey) {
       // return input map if nothing changes: map:remove({ 'a': 1 }, 'b') → { 'a': 1 }
-      if(!mti.record.isExtensible()) return map;
-      // structure does not change: propagate record type
-      tp = mti.record;
+      return map;
     }
 
     if(tp == null && mti.mapType != null) {

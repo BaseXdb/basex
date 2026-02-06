@@ -37,7 +37,7 @@ public final class MapContains extends MapFn {
       if(mti.field != null) {
         if(!mti.field.isOptional()) return Bln.TRUE;
       } else if(mti.validKey) {
-        if(!mti.record.isExtensible()) return Bln.FALSE;
+        return Bln.FALSE;
       }
       if(mti.mapType != null) {
         // map:contains({ 1: 1 }, 'string') → false()

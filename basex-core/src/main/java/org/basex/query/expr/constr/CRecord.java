@@ -38,8 +38,7 @@ public final class CRecord extends Arr {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final RecordType rt = (RecordType) seqType().type;
-    final boolean extensible = rt.isExtensible();
-    if(extensible || rt.hasOptional()) {
+    if(rt.hasOptional()) {
       final MapBuilder mb = new MapBuilder(exprs.length);
       final TokenObjectMap<RecordField> fields = rt.fields();
       final int fs = fields.size();
@@ -51,11 +50,6 @@ public final class CRecord extends Arr {
           if(rf.isOptional() && rf.expr() == null) add = false;
         }
         if(add) mb.put(fields.key(f), value);
-      }
-      if(extensible) {
-        toMap(arg(fs), qc).forEach((k, v) -> {
-          if(!mb.contains(k)) mb.put(k, v);
-        });
       }
       return mb.map();
     }
@@ -70,7 +64,7 @@ public final class CRecord extends Arr {
   @Override
   public long structSize() {
     final RecordType rt = (RecordType) seqType().type;
-    return rt.isExtensible() || rt.hasOptional() ? -1 : exprs.length;
+    return rt.hasOptional() ? -1 : exprs.length;
   }
 
   @Override

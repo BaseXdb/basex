@@ -593,23 +593,20 @@ public final class XQuery4Test extends SandboxTest {
 
   /** Record tests. */
   @Test public void recordTest() {
-    query("{} instance of record(*)", true);
-    query("{} instance of record(x?, *)", true);
-    query("{} instance of record(x?, y?, *)", true);
-    query("{ 'x': 1 } instance of record(x, y?, *)", true);
-    query("{ 'y': 1 } instance of record(x?, y, *)", true);
+    query("{} instance of record()", true);
+    query("{} instance of record(x?)", true);
+    query("{} instance of record(x?, y?)", true);
+    query("{ 'x': 1 } instance of record(x, y?)", true);
+    query("{ 'y': 1 } instance of record(x?, y)", true);
     query("{ 'x': 1 } instance of record(x as xs:integer)", true);
-    query("{ 'x': 1 } instance of record(x as xs:integer, *)", true);
 
-    query("{} instance of record(x, *)", false);
-    query("{ 'x': 1 } instance of record(x?, y, *)", false);
-    query("{ 'y': 1 } instance of record(x, y?, *)", false);
+    query("{} instance of record(x)", false);
+    query("{ 'x': 1 } instance of record(x?, y)", false);
+    query("{ 'y': 1 } instance of record(x, y?)", false);
     query("{ 'x': 1 } instance of record(x as xs:string)", false);
-    query("{ 'x': 1 } instance of record(x as xs:string, *)", false);
     query("{ 'x': 1 } instance of record(x? as xs:string)", false);
-    query("{ 'x': 1 } instance of record(x? as xs:string, *)", false);
 
-    error("{} instance of record(*, x)", WRONGCHAR_X_X);
+    error("{} instance of record(*)", NOSTRNCN_X);
   }
 
   /** While clause. */

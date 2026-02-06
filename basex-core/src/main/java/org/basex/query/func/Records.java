@@ -16,36 +16,36 @@ import org.basex.util.hash.*;
  */
 public enum Records {
   /** Record definition. */
-  DIVIDED_DECIMALS("divided-decimals", false,
+  DIVIDED_DECIMALS("divided-decimals",
     field("quotient", Types.DECIMAL_O),
     field("remainder", Types.DECIMAL_O)
   ),
   /** Record definition. */
-  INFER_ENCODING("infer-encoding", false,
+  INFER_ENCODING("infer-encoding",
     field("encoding", Types.STRING_O, false),
     field("offset", Types.INTEGER_O, false)
   ),
   /** Record definition. */
-  LOAD_XQUERY_MODULE("load-xquery-module", false,
+  LOAD_XQUERY_MODULE("load-xquery-module",
     field("variables", MapType.get(BasicType.QNAME, Types.ITEM_ZO).seqType()),
     field("functions", MapType.get(BasicType.QNAME,
       MapType.get(BasicType.INTEGER, Types.FUNCTION_O).seqType()).seqType())),
   /** Record definition. */
-  MEMBER("member", false,
+  MEMBER("member",
     field("value", Types.ITEM_ZM)),
   /** Record definition. */
-  PARSED_CSV_STRUCTURE("parsed-csv-structure", false,
+  PARSED_CSV_STRUCTURE("parsed-csv-structure",
     field("columns", Types.STRING_ZM),
     field("column-index", MapType.get(BasicType.STRING, Types.INTEGER_O).seqType(Occ.ZERO_OR_ONE)),
     field("rows", ArrayType.get(Types.STRING_O).seqType(Occ.ZERO_OR_MORE)),
     field("get", FuncType.get(Types.STRING_O, Types.POSITIVE_INTEGER_O,
       ChoiceItemType.get(Types.POSITIVE_INTEGER_O, Types.STRING_O).seqType()).seqType())),
   /** Record definition. */
-  RANDOM_NUMBER_GENERATOR("random-number-generator", true),
+  RANDOM_NUMBER_GENERATOR("random-number-generator"),
   /** Record definition. */
-  SCHEMA_TYPE("schema-type", true),
+  SCHEMA_TYPE("schema-type"),
   /** Record definition. */
-  URI_STRUCTURE("uri-structure", true,
+  URI_STRUCTURE("uri-structure",
     field("uri", Types.STRING_ZO, true),
     field("scheme", Types.STRING_ZO, true),
     field("absolute", Types.BOOLEAN_ZO, true),
@@ -111,16 +111,15 @@ public enum Records {
   /**
    * Constructor.
    * @param name name of record
-   * @param extensible extensible flag
    * @param fields field declarations
    */
-  Records(final String name, final boolean extensible, final NamedRecordField... fields) {
+  Records(final String name, final NamedRecordField... fields) {
     final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.length);
     for(final NamedRecordField field : fields) {
       map.put(field.name, field.field);
     }
     final QNm qnm = new QNm(name + "-record", QueryText.FN_URI);
-    type = new RecordType(map, extensible, qnm, AnnList.EMPTY);
+    type = new RecordType(map, qnm, AnnList.EMPTY);
   }
 
   /**
