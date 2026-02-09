@@ -456,25 +456,13 @@ public class QueryParser extends InputParser {
         final ItemList items = new ItemList();
         if(wsConsume("(")) {
           do {
-            final Expr expr;
-            final boolean truee = wsConsume(TRUE);
-            if(truee || consume(FALSE)) {
-              wsCheck("(");
-              wsCheck(")");
-              expr = Bln.get(truee);
+            final Expr expr = literal(true, true);
+            if(expr instanceof final Item item) {
+              items.add(item);
             } else {
-              if(quote(current())) expr = Str.get(stringLiteral());
-              else if(!consume('#')) expr = numericLiteral(0, true);
-              else {
-                skipWs();
-                expr = eQName(null, QNAME_X);
-              }
-              if(!(expr instanceof Item)) {
-                if(Function.ERROR.is(expr)) expr.item(qc, ii);
-                throw error(ANNVALUE_X, currentAsString());
-              }
+              if(Function.ERROR.is(expr)) expr.item(qc, ii);
+              throw error(ANNVALUE_X, currentAsString());
             }
-            items.add((Item) expr);
           } while(wsConsume(","));
           wsCheck(")");
         }
@@ -2590,7 +2578,7 @@ public class QueryParser extends InputParser {
     if(expr == null) expr = mapConstructor();
     if(expr == null) expr = arrayConstructor();
     if(expr == null) expr = lookup(null);
-    if(expr == null) expr = literal();
+    if(expr == null) expr = literal(true, false);
     return expr;
   }
 
@@ -2607,7 +2595,7 @@ public class QueryParser extends InputParser {
     if(cp == '$') return varRef();
     if(cp == '.' && !digit(next())) return contextValue();
 
-    final Expr expr = literal();
+    final Expr expr = literal(false, false);
     return expr != null ? expr : Str.get(ncName(KEYSPEC_X, false));
   }
 
@@ -2738,13 +2726,24 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "Literal" rule.
+   * Parses the "Constant" and "Literal" rule.
+   * @param ngt parse negative numbers
+   * @param bln parse Booleans
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr literal() throws QueryException {
+  private Expr literal(final boolean ngt, final boolean bln) throws QueryException {
+    skipWs();
     if(quote(current())) return Str.get(stringLiteral());
-    if(!consume('#')) return numericLiteral(0, false);
+    if(bln) {
+      final boolean truee = consume(TRUE);
+      if(truee || consume(FALSE)) {
+        wsCheck("(");
+        wsCheck(")");
+        return Bln.get(truee);
+      }
+    }
+    if(!consume('#')) return numericLiteral(0, ngt);
     skipWs();
     return eQName(null, QNAME_X);
   }
