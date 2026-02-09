@@ -456,13 +456,9 @@ public class QueryParser extends InputParser {
         final ItemList items = new ItemList();
         if(wsConsume("(")) {
           do {
-            final Expr expr = literal(true, true);
-            if(expr instanceof final Item item) {
-              items.add(item);
-            } else {
-              if(Function.ERROR.is(expr)) expr.item(qc, ii);
-              throw error(ANNVALUE_X, currentAsString());
-            }
+            final Item item = literal(true, false);
+            if(item == null) throw error(ANNVALUE_X, currentAsString());
+            items.add(item);
           } while(wsConsume(","));
           wsCheck(")");
         }
@@ -2578,7 +2574,10 @@ public class QueryParser extends InputParser {
     if(expr == null) expr = mapConstructor();
     if(expr == null) expr = arrayConstructor();
     if(expr == null) expr = lookup(null);
-    if(expr == null) expr = literal(true, false);
+    if(expr == null) {
+      expr = literal(false, true);
+      if(expr == Dbl.NEGATIVE_ZERO) expr = FnError.get(RANGE_X.get(info(), token), Itr.ZERO);
+    }
     return expr;
   }
 
@@ -2709,16 +2708,13 @@ public class QueryParser extends InputParser {
     // named function reference
     final QNm name = eQName(null, null);
     if(name != null && wsConsumeWs("#")) {
-      final Expr num = numericLiteral(Integer.MAX_VALUE, false);
+      final Expr num = numericLiteral(Integer.MAX_VALUE, false, false);
       if(reserved(name)) {
         if(num != null) throw error(RESERVED_X, name.local());
-      } else {
-        if(Function.ERROR.is(num)) return num;
-        if(num instanceof final Itr itr) {
-          final int i = (int) itr.itr();
-          final InputInfo info = info();
-          return qc.functions.newRef(() -> Functions.item(name, i, false, info, qc));
-        }
+      } else if(num instanceof final Itr itr) {
+        final int i = (int) itr.itr();
+        final InputInfo info = info();
+        return qc.functions.newRef(() -> Functions.item(name, i, false, info, qc));
       }
     }
     pos = p;
@@ -2727,15 +2723,15 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Constant" and "Literal" rule.
-   * @param ngt parse negative numbers
-   * @param bln parse Booleans
+   * @param cnstnt parse additional constants; return error for an invalid range
+   * @param dummy return {@link Dbl#NEGATIVE_ZERO} for an invalid range
    * @return query expression or {@code null}
    * @throws QueryException query exception
    */
-  private Expr literal(final boolean ngt, final boolean bln) throws QueryException {
+  private Item literal(final boolean cnstnt, final boolean dummy) throws QueryException {
     skipWs();
     if(quote(current())) return Str.get(stringLiteral());
-    if(bln) {
+    if(cnstnt) {
       final boolean truee = consume(TRUE);
       if(truee || consume(FALSE)) {
         wsCheck("(");
@@ -2743,7 +2739,7 @@ public class QueryParser extends InputParser {
         return Bln.get(truee);
       }
     }
-    if(!consume('#')) return numericLiteral(0, ngt);
+    if(!consume('#')) return numericLiteral(0, cnstnt, dummy);
     skipWs();
     return eQName(null, QNAME_X);
   }
@@ -2754,10 +2750,12 @@ public class QueryParser extends InputParser {
    * Parses the "IntegerLiteral" rule.
    * @param max maximum value for integers (if 0, parse all numeric types)
    * @param mns parse minus character
+   * @param dummy return {@link Dbl#NEGATIVE_ZERO} for an invalid range
    * @return numeric literal or {@code null}
    * @throws QueryException query exception
    */
-  private Expr numericLiteral(final long max, final boolean mns) throws QueryException {
+  private Item numericLiteral(final long max, final boolean mns, final boolean dummy)
+      throws QueryException {
     final boolean negate = mns && consume('-');
     if(negate) skipWs();
 
@@ -2826,8 +2824,10 @@ public class QueryParser extends InputParser {
     // integer value
     if(token.isEmpty()) throw error(NUMBER_X, token);
     // out of range
-    if(l.compareTo(BigInteger.valueOf(max != 0 ? max : Long.MAX_VALUE)) > 0)
-      return FnError.get(RANGE_X.get(info(), token), Itr.ZERO);
+    if(l.compareTo(BigInteger.valueOf(max != 0 ? max : Long.MAX_VALUE)) > 0) {
+      if(dummy) return Dbl.NEGATIVE_ZERO;
+      throw RANGE_X.get(info(), token);
+    }
 
     return Itr.get(negate ? -l.longValue() : l.longValue());
   }
