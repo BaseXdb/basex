@@ -28,15 +28,27 @@ public final class RecordTest extends SandboxTest {
     query("{ 'x': () } instance of record(x)", true);
     query("{} instance of record(x)", false);
 
-    query("{ 'x': (), 'y': () } instance of record(x, *)", true);
+    query("{ 'x': (), 'y': () } instance of record(x, y?)", true);
     query("{ 'x': (), 'y': () } instance of record(x)", false);
-    query("{ 'x': (), 0: () } instance of record(x, *)", true);
+    query("{ 'x': (), 0: () } instance of record(x, y?)", false);
     query("{ 'x': (), 0: () } instance of record(x)", false);
 
     query("declare record local:coord(x, y); "
         + "let $coord := local:coord(1, 2) "
         + "let $new := map:remove($coord, 'x') "
         + "return $new instance of local:coord", false);
+
+    query("map:entries({ 'a': 1 }) instance of record(a)", true);
+    query("map:entries({ 'x': 1 }) instance of record(a)", false);
+    query("let $map := (\n"
+        + "  {'x':5, 'y':6}\n"
+        + "  => map:put(xs:NCName('x'), true())\n"
+        + "  => map:put(xs:NCName('y'), (false(), false()))\n"
+        + ")\n"
+        + "return (\n"
+        + "  $map instance of map(xs:NCName, xs:boolean+) or\n"
+        + "  $map instance of map(xs:string, xs:boolean+)\n"
+        + ")", true);
   }
 
   /** Recursive records. */
@@ -118,9 +130,9 @@ public final class RecordTest extends SandboxTest {
         + "cx:complex(3, 2), cx:complex(3)",
         "{\"r\":3,\"i\":2}\n{\"r\":3,\"i\":()}");
     query("declare namespace p = 'P'\n;"
-        + "declare record p:person(first as xs:string, last as xs:string, *);\n"
-        + "p:person('John', 'Smith', { 'last': 'Miller', 'middle': 'A.' })",
-        "{\"first\":\"John\",\"last\":\"Smith\",\"middle\":\"A.\"}");
+        + "declare record p:person(first as xs:string, last as xs:string);\n"
+        + "p:person('John', 'Smith')",
+        "{\"first\":\"John\",\"last\":\"Smith\"}");
     // recursive record type constructor function
     query("declare function local:f($x, $y) {local:list($x, $y)};\n"
         + "declare record local:list (value as item()*, next? as local:list);\n"
@@ -185,17 +197,6 @@ public final class RecordTest extends SandboxTest {
     check("declare record local:x(x); local:x(1) => map:remove(1)", "{\"x\":1}",
         empty(func));
 
-    check("declare record local:x(x, *); local:x(1) => map:remove('x')", "{}",
-        type(func, "record(*)"));
-    check("declare record local:x(x, *); local:x(1) => map:remove(<_>x</_>)", "{}",
-        type(func, "record(*)"));
-    check("declare record local:x(x, *); local:x(1) => map:remove('y')", "{\"x\":1}",
-        type(func, "local:x"));
-    check("declare record local:x(x, *); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
-        type(func, "local:x"));
-    check("declare record local:x(x, *); local:x(1) => map:remove(1)", "{\"x\":1}",
-        type(func, "local:x"));
-
     check("declare record local:x(x, y?); local:x(1) => map:remove('x')", "{}",
         type(func, "record(y?)"));
     check("declare record local:x(x, y?); local:x(1) => map:remove(<_>x</_>)", "{}",
@@ -226,17 +227,6 @@ public final class RecordTest extends SandboxTest {
 
     check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)", "{\"x\":<x/>}",
         type(RecordSet.class, "record(x)"));
-
-    check("declare record local:x(x, *); local:x(1) => map:put('x', 2)", "{\"x\":2}",
-        type(RecordSet.class, "local:x"));
-    check("declare record local:x(x, *); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
-        type(RecordSet.class, "local:x"));
-    check("declare record local:x(x, *); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
-        type(func, "local:x"));
-    check("declare record local:x(x, *); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
-        type(func, "local:x"));
-    check("declare record local:x(x, *); local:x(1) => map:put(0, 0)", "{\"x\":1,0:0}",
-        type(func, "local:x"));
 
     check("declare record local:x(x, y?); local:x(1) => map:put('x', 2)", "{\"x\":2}",
         type(func, "local:x"));
@@ -283,40 +273,45 @@ public final class RecordTest extends SandboxTest {
   /** Coercion of records. */
   @Test public void coercion() {
     query("let $m as record() := {} return $m", "{}");
-    query("let $m as record(*) := {} return $m", "{}");
-    query("let $m as record(a?) := {} return $m", "{}");
-    query("let $m as record(a?, *) := {} return $m", "{}");
+    query("let $m as record() := { 'a': 1 } return $m", "{}");
+    query("let $m as record() := { 0: 2 } return $m", "{}");
 
-    query("let $m as record(*) := { 'a': 1 } return $m", "{\"a\":1}");
     query("let $m as record(a) := { 'a': 1 } return $m", "{\"a\":1}");
-    query("let $m as record(a, b?) := { 'a': 1 } return $m", "{\"a\":1}");
-    query("let $m as record(a?, b) := { 'b': 2 } return $m", "{\"b\":2}");
-    query("let $m as record(a?, b?, *) := { 'c': 3 } return $m", "{\"c\":3}");
-    query("let $m as record(a, b?, *) := { 'a': 1 } return $m", "{\"a\":1}");
-    query("let $m as record(a?, b, *) := { 'b': 2 } return $m", "{\"b\":2}");
-    query("let $m as record(a, *) := { 'a': 1 } return $m", "{\"a\":1}");
+    query("let $m as record(a) := { 'a': 1, 'b': 2 } return $m", "{\"a\":1}");
+    query("let $m as record(a) := { 'a': 1, 0: 2 } return $m", "{\"a\":1}");
+    query("let $m as record(b) := { 'a': 1, 'b': 2 } return $m", "{\"b\":2}");
+    query("let $m as record(a) := map { xs:untypedAtomic('a'): 1 } return $m", "{\"a\":1}");
 
-    query("let $m as record(a, *) := { 'a': 1, 'b': 2 } return $m", "{\"a\":1,\"b\":2}");
+    query("let $m as record(a?) := {} return $m", "{}");
+    query("let $m as record(b?) := { 'a': 1 } return $m", "{}");
+    query("let $m as record(a?) := map { xs:untypedAtomic('c'): 3 } return $m", "{}");
+
+    query("let $m as record(a, b?) := { 'a': 1 } return $m", "{\"a\":1}");
+    query("let $m as record(a, b?) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1}");
+    query("let $m as record(a?, b) := { 'b': 2 } return $m", "{\"b\":2}");
+    query("let $m as record(b?, a) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1}");
+
     query("let $m as record(a, b) := { 'a': 1, 'b': 2 } return $m", "{\"a\":1,\"b\":2}");
     query("let $m as record(a, b) := { 'b': 2, 'a': 1 } return $m", "{\"a\":1,\"b\":2}");
-    query("let $m as record(a, b, *) := { 'b': 2, 'a': 1 } return $m", "{\"a\":1,\"b\":2}");
-    query("let $m as record(a, b?, *) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1,\"c\":3}");
-    query("let $m as record(b?, a, *) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1,\"c\":3}");
+    query("let $m as record(b, a) := { 'a': 1, 'x': 9, 'b': 2 } return $m", "{\"b\":2,\"a\":1}");
+    query("let $m as record(b, a) := { xs:untypedAtomic('a'): 1, 'b': 2 } return $m",
+        "{\"b\":2,\"a\":1}");
+
+    query("let $m as record(a?, b?) := { 'c': 3 } return $m", "{}");
+    query("let $m as record(a?, b?) := { 'b': 2, 'c': 3 } return $m", "{\"b\":2}");
+    query("let $m as record(a?, b?) := { 'a': 1, 'c': 3 } return $m", "{\"a\":1}");
+    query("let $m as record(b?, a?) := { 'a': 1, 'b': 2, 'x': 9 } return $m", "{\"b\":2,\"a\":1}");
+    query("let $m as record(a?, b?) := map { xs:untypedAtomic('c'): 3 } return $m", "{}");
+
+    query("fn($r as record(a)) { $r } ({ 'a': 1, 'b': 2 })", "{\"a\":1}");
 
     error("let $m as record(a) := {} return $m", INVTYPE_X);
-    error("let $m as record(a?, b) := {} return $m", INVTYPE_X);
-    error("let $m as record(a, b?) := {} return $m", INVTYPE_X);
-
-    error("let $m as record() := { 'a': 1 } return $m", INVTYPE_X);
     error("let $m as record(b) := { 'a': 1 } return $m", INVTYPE_X);
-    error("let $m as record(b?) := { 'a': 1 } return $m", INVTYPE_X);
-    error("let $m as record(b, *) := { 'a': 1 } return $m", INVTYPE_X);
-    error("let $m as record(a?, b?) := { 'c': 3 } return $m", INVTYPE_X);
-    error("let $m as record(a?, b) := { 'c': 3 } return $m", INVTYPE_X);
-    error("let $m as record(a, b?) := { 'c': 3 } return $m", INVTYPE_X);
-    error("let $m as record(c?, b) := { 'c': 3 } return $m", INVTYPE_X);
 
-    error("let $m as record(a) := { 'a': 1, 'b': 2 } return $m", INVTYPE_X);
-    error("let $m as record(b) := { 'a': 1, 'b': 2 } return $m", INVTYPE_X);
+    error("let $m as record(a?, b) := {} return $m", INVTYPE_X);
+    error("let $m as record(a?, b) := { 'c': 3 } return $m", INVTYPE_X);
+    error("let $m as record(a?, b) := { 'a': 1 } return $m", INVTYPE_X);
+    error("let $m as record(a, b?) := {} return $m", INVTYPE_X);
+    error("let $m as record(a, b?) := { 'c': 3 } return $m", INVTYPE_X);
   }
 }

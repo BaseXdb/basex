@@ -205,7 +205,7 @@ public abstract class XQMap extends XQStruct {
               !Token.eq(fields.key(f), key.string(null)) ||
               st != Types.ITEM_ZM && !st.instance(getOrNull(key))) return false;
           }
-          return keys.next() == null || rt.isExtensible();
+          return keys.next() == null;
         }
 
         for(int f = 1; f <= fs; f++) {
@@ -213,11 +213,9 @@ public abstract class XQMap extends XQStruct {
           final Value value = getOrNull(Str.get(fields.key(f)));
           if(value != null ? !rf.seqType().instance(value) : !rf.isOptional()) return false;
         }
-        if(!rt.isExtensible()) {
-          for(final Item key : keys()) {
-            if(!key.type.instanceOf(BasicType.STRING) || !fields.contains(key.string(null)))
-              return false;
-          }
+        for(final Item key : keys()) {
+          if(!key.type.instanceOf(BasicType.STRING) || !fields.contains(key.string(null)))
+            return false;
         }
         return true;
       }
@@ -331,16 +329,6 @@ public abstract class XQMap extends XQStruct {
       } else if(!rf.isOptional()) {
         throw typeError(this, rt, ii);
       }
-    }
-    // add remaining values
-    if(mb.size() < ms) {
-      if(!rt.isExtensible()) throw typeError(this, rt, ii);
-      forEach((key, value) -> {
-        if(!mb.contains(key)) {
-          qc.checkStop();
-          mb.put(key, value);
-        }
-      });
     }
 
     // assign record type to speed up future type checks

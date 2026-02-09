@@ -26,8 +26,6 @@ public final class RecordType extends MapType {
   /** Maximum size for generated record definitions. */
   public static final int MAX_GENERATED_SIZE = 32;
 
-  /** Extensible flag. */
-  private boolean extensible;
   /** Record fields. */
   private TokenObjectMap<RecordField> fields;
   /** Record type name (can be {@code null}). */
@@ -38,34 +36,21 @@ public final class RecordType extends MapType {
   private InputInfo info;
 
   /**
-   * Constructor for non-extensible record type.
+   * Constructor.
    * @param fields field declarations
    */
   public RecordType(final TokenObjectMap<RecordField> fields) {
-    this(fields, false);
+    this(fields, null, AnnList.EMPTY);
   }
 
   /**
    * Constructor.
    * @param fields field declarations
-   * @param extensible extensible flag
-   */
-  public RecordType(final TokenObjectMap<RecordField> fields, final boolean extensible) {
-    this(fields, extensible, null, AnnList.EMPTY);
-  }
-
-  /**
-   * Constructor.
-   * @param fields field declarations
-   * @param extensible extensible flag
    * @param name record type name (can be {@code null})
    * @param anns annotations
    */
-  public RecordType(final TokenObjectMap<RecordField> fields, final boolean extensible,
-      final QNm name, final AnnList anns) {
-    super(extensible ? BasicType.ANY_ATOMIC_TYPE : BasicType.STRING,
-        extensible ? Types.ITEM_ZM : unionType(fields));
-    this.extensible = extensible;
+  public RecordType(final TokenObjectMap<RecordField> fields, final QNm name, final AnnList anns) {
+    super(BasicType.STRING, unionType(fields));
     this.fields = fields;
     this.name = name;
     this.anns = anns;
@@ -81,7 +66,6 @@ public final class RecordType extends MapType {
     super(BasicType.ANY_ATOMIC_TYPE, Types.ITEM_ZM, false);
     this.name = name;
     this.info = info;
-    extensible = true;
     fields = new TokenObjectMap<>(0);
     anns = AnnList.EMPTY;
   }
@@ -120,14 +104,6 @@ public final class RecordType extends MapType {
    */
   public TokenObjectMap<RecordField> fields() {
     return fields;
-  }
-
-  /**
-   * Indicates if this record type is extensible.
-   * @return result of check
-   */
-  public boolean isExtensible() {
-    return extensible;
   }
 
   /**
@@ -193,7 +169,7 @@ public final class RecordType extends MapType {
   private boolean eq(final Type type, final Set<Pair> pairs, final boolean strict) {
     if(this == type) return true;
     if(!(type instanceof final RecordType rt)) return false;
-    if(extensible != rt.extensible || fields.size() != rt.fields.size()) return false;
+    if(fields.size() != rt.fields.size()) return false;
 
     final Predicate<byte[]> compareFields = key -> {
       final RecordField rf1 = fields.get(key), rf2 = rt.fields.get(key);
@@ -235,7 +211,7 @@ public final class RecordType extends MapType {
    * @return result of check
    */
   private boolean instanceOf(final Type type, final Set<Pair> pairs) {
-    if(this == type || type.oneOf(Types.RECORD, Types.MAP, Types.FUNCTION, BasicType.ITEM)) {
+    if(this == type || type.oneOf(Types.MAP, Types.FUNCTION, BasicType.ITEM)) {
       return true;
     }
     if(type instanceof final ChoiceItemType cit) {
@@ -245,11 +221,8 @@ public final class RecordType extends MapType {
       return false;
     }
     if(type instanceof final RecordType rt) {
-      if(!rt.extensible) {
-        if(extensible) return false;
-        for(final byte[] key : fields) {
-          if(!rt.fields.contains(key)) return false;
-        }
+      for(final byte[] key : fields) {
+        if(!rt.fields.contains(key)) return false;
       }
       for(final byte[] key : rt.fields) {
         final RecordField rtf = rt.fields.get(key);
@@ -272,7 +245,7 @@ public final class RecordType extends MapType {
               }
             }
           }
-        } else if(!rtf.optional || extensible && rtf.seqType() != Types.ITEM_ZM) {
+        } else if(!rtf.optional) {
           return false;
         }
       }
@@ -325,7 +298,7 @@ public final class RecordType extends MapType {
           if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2 &&
               !fst.zero() && !rtfst.zero()) {
             final Pair pair = new Pair(rt1, rt2);
-            if(pairs.contains(pair)) return Types.RECORD;
+            if(pairs.contains(pair)) return Types.MAP;
             union = SeqType.get(rt1.union(rt2, pair.addTo(pairs)), fst.occ.union(rtfst.occ));
           } else {
             union = fst.union(rtfst);
@@ -342,7 +315,7 @@ public final class RecordType extends MapType {
           map.put(key, new RecordField(rt.fields.get(key).seqType, true));
         }
       }
-      return new RecordType(map, extensible || rt.extensible);
+      return new RecordType(map);
     }
     return type instanceof final MapType mt ? mt.union(keyType(), valueType()) :
            type instanceof ArrayType ? Types.FUNCTION :
@@ -368,40 +341,62 @@ public final class RecordType extends MapType {
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
 
-    if(!(type instanceof final RecordType rt)) return null;
-    final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
-    for(final byte[] key : fields) {
-      final RecordField f = fields.get(key);
-      if(rt.fields.contains(key)) {
-        // common field
-        final RecordField rtf = rt.fields.get(key);
-        final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
-        final Type ft = fst.type, rtft = rtfst.type;
-        final SeqType is;
-        if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2) {
-          final Pair pair = new Pair(rt1, rt2);
-          if(pairs.contains(pair)) return null;
-          final Type it = rt1.intersect(rt2, pair.addTo(pairs));
-          is = it == null ? null : SeqType.get(it, fst.occ.intersect(rtfst.occ));
+    if(type instanceof final RecordType rt) {
+      final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
+      for(final byte[] key : fields) {
+        final RecordField f = fields.get(key);
+        if(rt.fields.contains(key)) {
+          // common field
+          final RecordField rtf = rt.fields.get(key);
+          final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
+          final SeqType is = intersect(fst, rtfst, pairs);
+          if(is == null) return null;
+          map.put(key, new RecordField(is, f.optional && rtf.optional));
         } else {
-          is = fst.intersect(rtfst);
+          // field missing in type
+          return null;
         }
+      }
+      for(final byte[] key : rt.fields) {
+        if(!fields.contains(key)) {
+          // field missing in this RecordType
+          return null;
+        }
+      }
+      return new RecordType(map);
+    }
+    if(type instanceof final MapType mt) {
+      if(mt.keyType().intersect(BasicType.STRING) == null) return null;
+      final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
+      for(final byte[] key : fields) {
+        final RecordField f = fields.get(key);
+        final SeqType is = intersect(f.seqType(), mt.valueType(), pairs);
         if(is == null) return null;
-        map.put(key, new RecordField(is, f.optional && rtf.optional));
-      } else {
-        // field missing in type
-        if(!rt.extensible) return null;
-        map.put(key, new RecordField(f.seqType));
+        map.put(key, new RecordField(is, f.optional));
       }
+      return new RecordType(map);
     }
-    for(final byte[] key : rt.fields) {
-      if(!fields.contains(key)) {
-        // field missing in this RecordType
-        if(!extensible) return null;
-        map.put(key, new RecordField(rt.fields.get(key).seqType));
-      }
+    return null;
+  }
+
+  /**
+   * Returns the intersection between two sequence types, or {@code null}, if no such type exists.
+   * Uses <code>pairs</code> to keep track of pairs of RecordTypes being checked, in order to
+   * prevent infinite recursion.
+   * @param st1 first type
+   * @param st2 second type
+   * @param pairs pairs of RecordTypes that are currently being checked, or have been checked before
+   * @return intersection type or {@code null}
+   */
+  private static SeqType intersect(final SeqType st1, final SeqType st2, final Set<Pair> pairs) {
+    final Type t1 = st1.type, t2 = st2.type;
+    if(t1 instanceof final RecordType rt1 && t2 instanceof final RecordType rt2) {
+      final Pair pair = new Pair(rt1, rt2);
+      if(pairs.contains(pair)) return null;
+      final Type it = rt1.intersect(rt2, pair.addTo(pairs));
+      return it == null ? null : SeqType.get(it, st1.occ.intersect(st2.occ));
     }
-    return new RecordType(map, extensible && rt.extensible);
+    return st1.intersect(st2);
   }
 
   /**
@@ -422,7 +417,7 @@ public final class RecordType extends MapType {
     if(put != null) map.put(put, new RecordField(seqType));
 
     return map.size() > MAX_GENERATED_SIZE ? null :
-      cc.qc.shared.record(new RecordType(map, extensible));
+      cc.qc.shared.record(new RecordType(map));
   }
 
   @Override
@@ -431,16 +426,13 @@ public final class RecordType extends MapType {
 
     final QueryString qs = new QueryString().token(RECORD).token('(');
     final TokenBuilder tb = new TokenBuilder();
-    if(this == Types.RECORD) {
-      tb.add('*');
-    } else {
+    if(this != Types.RECORD) {
       for(final byte[] key : fields) {
         if(!tb.isEmpty()) tb.add(", ");
         if(!tb.moreInfo()) break;
         tb.add(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key));
         if(fields.get(key).optional) tb.add('?');
       }
-      if(extensible) tb.add(", *");
     }
     return qs.token(tb.finish()).token(')').toString();
   }
@@ -457,7 +449,6 @@ public final class RecordType extends MapType {
     for(final QNm name : recordTypeRefs) {
       final RecordType ref = recordTypeRefs.get(name);
       final RecordType dec = ref.getDeclaration(declaredRecordTypes);
-      ref.extensible = dec.extensible;
       ref.fields = dec.fields;
       ref.info = null;
       ref.finalizeTypes(dec.keyType(), dec.valueType());

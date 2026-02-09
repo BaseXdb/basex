@@ -37,7 +37,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -993,15 +992,10 @@ public class QueryParser extends InputParser {
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck("(");
     final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
-    boolean extensible = false;
     if(!wsConsume(")")) {
       boolean exprRequired = false;
       do {
         skipWs();
-        if(!fields.isEmpty() && consume("*")) {
-          extensible = true;
-          break;
-        }
         final byte[] name = ncName(NONCNAME_X, false);
         final boolean optional = wsConsume("?");
         final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
@@ -1019,7 +1013,7 @@ public class QueryParser extends InputParser {
       } while(wsConsume(","));
       wsCheck(")");
     }
-    final RecordType rt = new RecordType(fields, extensible, qn, anns);
+    final RecordType rt = new RecordType(fields, qn, anns);
     declaredTypes.put(qn, rt.seqType());
     namedRecordTypes.put(qn, rt);
     if(!anns.contains(Annotation.PRIVATE)) {
@@ -1056,15 +1050,6 @@ public class QueryParser extends InputParser {
       final SeqType pst = optional ? fst.union(Occ.ZERO) : fst;
       final Expr init = initExpr == null && optional ? Empty.VALUE : initExpr;
       params.add(new QNm(key), pst, init, null);
-    }
-    if(rt.isExtensible()) {
-      byte[] key;
-      int i = -1;
-      do {
-        final String paramName = ++i == 0 ? "options" : "options" + i;
-        key = Token.token(paramName);
-      } while(fields.contains(key));
-      params.add(new QNm(key), Types.MAP_O, XQMap.empty(), null);
     }
     params.seqType(rt.seqType()).finish(qc, localVars);
 
@@ -3593,8 +3578,11 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Type functionTest(final AnnList anns, final Type type) throws QueryException {
-    // wildcard
-    if(wsConsume("*")) {
+    if(type == Types.RECORD) {
+      // empty record
+      if(wsConsume(")")) return type;
+    } else if(wsConsume("*")) {
+      // wildcard
       wsCheck(")");
       return type;
     }
@@ -3602,20 +3590,18 @@ public class QueryParser extends InputParser {
     // record
     if(type instanceof RecordType) {
       final TokenObjectMap<RecordField> fields = new TokenObjectMap<>();
-      boolean extensible = !consume(')');
-      if(extensible) {
+      if(!consume(')')) {
         do {
-          extensible = wsConsume("*");
-          if(extensible) break;
+          skipWs();
           final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X, false);
           final boolean optional = wsConsume("?");
           final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
           if(fields.contains(name)) throw error(DUPFIELD_X, name);
           fields.put(name, new RecordField(seqType, optional));
         } while(wsConsume(","));
-        wsCheck(")");
+        check(')');
       }
-      return qc.shared.record(new RecordType(fields, extensible));
+      return qc.shared.record(new RecordType(fields));
     }
     // map
     if(type instanceof MapType) {

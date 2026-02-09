@@ -46,10 +46,7 @@ public final class MapPut extends MapFn {
         tp = mti.record.copy(null, mti.key, vt.union(ft), cc);
       }
     } else if(mti.validKey) {
-      if(mti.record.isExtensible()) {
-        // structure does not change: propagate record type
-        tp = mti.record;
-      } else if(mti.key != null && mti.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
+      if(mti.key != null && mti.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
         // otherwise, derive new record type
         tp = mti.record.copy(null, mti.key, value.seqType(), cc);
       }

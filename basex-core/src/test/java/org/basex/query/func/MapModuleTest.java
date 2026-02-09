@@ -118,9 +118,9 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), true, root(func));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(Bln.class));
 
-    record = "declare record local:x(x as xs:integer, *);";
+    record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), true, root(Bln.class));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(func));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), false, root(Bln.class));
   }
 
   /** Test method. */
@@ -240,10 +240,10 @@ public final class MapModuleTest extends SandboxTest {
         type(func, "xs:integer?"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
 
-    record = "declare record local:x(x as xs:integer, *);";
+    record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0,
         type(RecordGet.class, "xs:integer"));
-    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", root(func));
+    check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
   }
 
   /** Test method. */
@@ -473,13 +473,13 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
         type(func, "record(x?, y)"));
 
-    record = "declare record local:x(x as xs:integer, *);";
+    record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", 1), "{\"x\":1}",
         type(RecordSet.class, "local:x"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "x", "y"), "{\"x\":\"y\"}",
-        type(RecordSet.class, "record(x, *)"));
+        type(RecordSet.class, "record(x)"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y", 2), "{\"x\":0,\"y\":2}",
-        type(func, "local:x"));
+        type(func, "record(x, y)"));
   }
 
   /** Test method. */
@@ -506,11 +506,11 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
         empty(func));
 
-    record = "declare record local:x(x as xs:integer, *);";
+    record = "declare record local:x(x as xs:integer);";
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), "{}",
-        type(func, "record(*)"));
+        empty(func));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "{\"x\":0}",
-        type(func, "local:x"));
+        empty(func));
 
     // GH-2438
     query("let $f := fn($map) { fold-left(map:keys($map), $map, map:remove#2) } " +
@@ -523,7 +523,7 @@ public final class MapModuleTest extends SandboxTest {
 
     query("{ (1 to 6) ! { .: . }[?* = 1] } =>" + func.args(), 1);
 
-    check("declare record local:coord(x, y, *); local:coord(1, 2) =>" + func.args(), 2, root(func));
+    check("declare record local:coord(x, y); local:coord(1, 2) =>" + func.args(), 2, root(func));
     check("declare record local:coord(x, y?); local:coord(1, 2) =>" + func.args(), 2, root(func));
     check("({}, <a/>/*) =>" + func.args(), 0, root(func));
 

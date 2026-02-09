@@ -322,7 +322,7 @@ public final class SeqTypeTest {
     RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
 
     assertTrue(RECORD_O.instanceOf(FUNCTION_O));
-    assertTrue(MAP_O.instanceOf(RECORD_O));
+    assertFalse(MAP_O.instanceOf(RECORD_O));
     assertTrue(RECORD_O.instanceOf(MAP_O));
     assertTrue(r1.instanceOf(r2));
     assertTrue(r2.instanceOf(r1));
@@ -498,25 +498,26 @@ public final class SeqTypeTest {
     final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
         fld2 = new TokenObjectMap<>(),
         fld3 = new TokenObjectMap<>(),
-        fld4 = new TokenObjectMap<>(),
         fld5 = new TokenObjectMap<>(),
         fld6 = new TokenObjectMap<>(),
         fld7 = new TokenObjectMap<>(),
         fld8 = new TokenObjectMap<>(),
         fld9 = new TokenObjectMap<>(),
-        fld10 = new TokenObjectMap<>();
+        fld10 = new TokenObjectMap<>(),
+        fld11 = new TokenObjectMap<>();
     fld1.put(Token.token("a"), new RecordField(INTEGER_O));
     fld2.put(Token.token("a"), new RecordField(STRING_O));
     fld3.put(Token.token("a"), new RecordField(ANY_ATOMIC_TYPE_O));
-    fld4.put(Token.token("a"), new RecordField(INTEGER_O));
     fld5.put(Token.token("a"), new RecordField(INTEGER_O, true));
     fld6.put(Token.token("b"), new RecordField(INTEGER_O, true));
     fld7.put(Token.token("a"), new RecordField(INTEGER_O, true));
     fld7.put(Token.token("b"), new RecordField(INTEGER_O, true));
-    fld10.put(Token.token("next"), new RecordField(RECORD_O, true));
+    fld10.put(Token.token("next"), new RecordField(MAP_O, true));
     fld10.put(Token.token("x"), new RecordField(ITEM_ZM));
     fld10.put(Token.token("y"), new RecordField(ITEM_ZM, true));
     fld10.put(Token.token("z"), new RecordField(ITEM_ZM, true));
+    fld11.put(Token.token("a"), new RecordField(STRING_O, true));
+    fld11.put(Token.token("b"), new RecordField(INTEGER_O, true));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
@@ -527,20 +528,20 @@ public final class SeqTypeTest {
       r2 = SeqType.get(new RecordType(fld2), EXACTLY_ONE),
       // record(a as xs:anyAtomicType)
       r3 = SeqType.get(new RecordType(fld3), EXACTLY_ONE),
-      // record(a as xs:integer, *)
-      r4 = SeqType.get(new RecordType(fld4, true), EXACTLY_ONE),
-      // record(a as xs:integer?, *)
-      r5 = SeqType.get(new RecordType(fld5, true), EXACTLY_ONE),
-      // record(b as xs:integer?, *)
-      r6 = SeqType.get(new RecordType(fld6, true), EXACTLY_ONE),
-      // record(b as xs:integer?, *)
-      r7 = SeqType.get(new RecordType(fld7, true), EXACTLY_ONE),
+      // record(a as xs:integer?)
+      r5 = SeqType.get(new RecordType(fld5), EXACTLY_ONE),
+      // record(b as xs:integer?)
+      r6 = SeqType.get(new RecordType(fld6), EXACTLY_ONE),
+      // record(a as xs:integer?, b as xs:integer?)
+      r7 = SeqType.get(new RecordType(fld7), EXACTLY_ONE),
       // r8 record(next? as r8, x, y)
       r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
-      // r9 record(next? as r8, x, z)
+      // r9 record(next? as r9, x, z)
       r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE),
-      // r10 record(next? as record(*), x, y, z)
-      r10 = SeqType.get(new RecordType(fld10), EXACTLY_ONE);
+      // record(next? as map(*), x, y?, z?)
+      r10 = SeqType.get(new RecordType(fld10), EXACTLY_ONE),
+      // record(a? as xs:string, b? as xs:integer)
+      r11 = SeqType.get(new RecordType(fld11), EXACTLY_ONE);
 
     fld8.put(Token.token("next"), new RecordField(r8, true));
     fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
@@ -560,17 +561,15 @@ public final class SeqTypeTest {
 
     combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
     combine(RECORD_O, MAP_O, MAP_O, op);
-    combine(RECORD_O, r1, RECORD_O, op);
+    combine(RECORD_O, r1, r5, op);
     combine(FUNCTION_O, r1, FUNCTION_O, op);
     combine(MAP_O, r1, MAP_O, op);
     combine(r1, r2, r3, op);
     combine(r1, r3, r3, op);
-    combine(r4, r1, r4, op);
+    combine(r1, r1, r1, op);
     combine(r5, r1, r5, op);
-    combine(r5, r4, r5, op);
-    combine(r1, r6, r6, op);
-    combine(r2, r6, r6, op);
-    combine(r4, r6, r7, op);
+    combine(r1, r6, r7, op);
+    combine(r2, r6, r11, op);
     combine(r5, r6, r7, op);
     combine(r8, r9, r10, op);
   }
@@ -761,20 +760,21 @@ public final class SeqTypeTest {
     final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
         fld2 = new TokenObjectMap<>(),
         fld3 = new TokenObjectMap<>(),
-        fld4 = new TokenObjectMap<>(),
         fld5 = new TokenObjectMap<>(),
         fld6 = new TokenObjectMap<>(),
         fld7 = new TokenObjectMap<>(),
         fld8 = new TokenObjectMap<>(),
-        fld9 = new TokenObjectMap<>();
+        fld9 = new TokenObjectMap<>(),
+        fld10 = new TokenObjectMap<>();
     fld1.put(Token.token("a"), new RecordField(INTEGER_O));
     fld2.put(Token.token("a"), new RecordField(STRING_O));
     fld3.put(Token.token("a"), new RecordField(ANY_ATOMIC_TYPE_O));
-    fld4.put(Token.token("a"), new RecordField(INTEGER_O));
     fld5.put(Token.token("a"), new RecordField(INTEGER_O, true));
     fld6.put(Token.token("b"), new RecordField(INTEGER_O, true));
     fld7.put(Token.token("a"), new RecordField(INTEGER_O));
-    fld7.put(Token.token("b"), new RecordField(INTEGER_O));
+    fld7.put(Token.token("b"), new RecordField(INTEGER_O, true));
+    fld10.put(Token.token("a"), new RecordField(INTEGER_O, true));
+    fld10.put(Token.token("b"), new RecordField(INTEGER_O, true));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
@@ -785,17 +785,13 @@ public final class SeqTypeTest {
       r2 = SeqType.get(new RecordType(fld2), EXACTLY_ONE),
       // record(a as xs:anyAtomicType)
       r3 = SeqType.get(new RecordType(fld3), EXACTLY_ONE),
-      // record(a as xs:integer, *)
-      r4 = SeqType.get(new RecordType(fld4, true), EXACTLY_ONE),
-      // record(a as xs:integer?, *)
-      r5 = SeqType.get(new RecordType(fld5, true), EXACTLY_ONE),
-      // record(b as xs:integer?, *)
-      r6 = SeqType.get(new RecordType(fld6, true), EXACTLY_ONE),
-      // record(b as xs:integer?, *)
-      r7 = SeqType.get(new RecordType(fld7, true), EXACTLY_ONE),
+      // record(a? as xs:integer)
+      r5 = SeqType.get(new RecordType(fld5), EXACTLY_ONE),
+      // record(b? as xs:integer)
+      r6 = SeqType.get(new RecordType(fld6), EXACTLY_ONE),
       // r8 record(next? as r8, x, y)
       r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
-      // r9 record(next? as r8, x, z)
+      // r9 record(next? as r9, x, z)
       r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE);
 
     fld8.put(Token.token("next"), new RecordField(r8, true));
@@ -816,18 +812,16 @@ public final class SeqTypeTest {
 
     combine(RECORD_O, FUNCTION_O, RECORD_O, op);
     combine(RECORD_O, MAP_O, RECORD_O, op);
-    combine(RECORD_O, r1, r1, op);
+    combine(RECORD_O, r1, null, op);
     combine(FUNCTION_O, r1, r1, op);
     combine(MAP_O, r1, r1, op);
     combine(r1, r2, null, op);
     combine(r1, r3, r1, op);
-    combine(r4, r1, r1, op);
+    combine(r1, r1, r1, op);
     combine(r5, r1, r1, op);
-    combine(r5, r4, r4, op);
-    combine(r1, r6, r1, op);
-    combine(r2, r6, r2, op);
-    combine(r4, r6, r7, op);
-    combine(r5, r6, r7, op);
+    combine(r1, r6, null, op);
+    combine(r2, r6, null, op);
+    combine(r5, r6, null, op);
     combine(r8, r9, null, op);
   }
 
@@ -851,23 +845,6 @@ public final class SeqTypeTest {
     assertFalse(DATE_TIME_O.mayBeNumber());
     assertFalse(DATE_TIME_STAMP_O.mayBeNumber());
     assertFalse(ERROR_O.mayBeNumber());
-
-    assertTrue(ITEM_O.mayBeFunction());
-    assertTrue(FUNCTION_O.mayBeFunction());
-    assertTrue(MAP_O.mayBeFunction());
-    assertTrue(ARRAY_O.mayBeFunction());
-    assertTrue(RECORD_O.mayBeFunction());
-    assertFalse(ANY_ATOMIC_TYPE_O.mayBeFunction());
-    assertFalse(NUMERIC_O.mayBeFunction());
-    assertFalse(INTEGER_O.mayBeFunction());
-    assertFalse(BYTE.seqType().mayBeFunction());
-    assertFalse(STRING_O.mayBeFunction());
-    assertFalse(NODE_O.mayBeFunction());
-    assertFalse(ELEMENT_O.mayBeFunction());
-    assertFalse(NMTOKENS_O.mayBeFunction());
-    assertFalse(DATE_TIME_O.mayBeFunction());
-    assertFalse(DATE_TIME_STAMP_O.mayBeFunction());
-    assertFalse(ERROR_O.mayBeFunction());
 
     assertTrue(ITEM_O.mayBeFunction());
     assertTrue(FUNCTION_O.mayBeFunction());

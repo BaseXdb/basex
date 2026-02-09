@@ -42,7 +42,7 @@ public final class MapGet extends MapFn {
       st = mti.field.seqType();
     } else if(mti.validKey) {
       // map:get({ 'a': 1 }, 'b') → ()
-      if(!mti.record.isExtensible()) notFound = true;
+      notFound = true;
     }
 
     if(mti.mapType != null) {
