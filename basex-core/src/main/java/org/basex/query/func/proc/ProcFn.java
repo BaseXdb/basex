@@ -59,7 +59,7 @@ abstract class ProcFn extends StandardFunc {
     final ProcResult result = new ProcResult();
     final Process proc;
     final ProcessBuilder pb = new ProcessBuilder(args.finish());
-    if(dir != null) pb.directory(toPath(dir).toFile());
+    if(dir != null) pb.directory(toPath(dir, qc).toFile());
     if(!env.isEmpty()) {
       pb.environment().clear();
       pb.environment().putAll(env);

@@ -1,12 +1,15 @@
 package org.basex.tests.bxapi;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 import javax.xml.namespace.*;
 
 import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.query.*;
+import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.format.*;
 import org.basex.query.value.*;
@@ -183,6 +186,25 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   public XQuery baseURI(final String base) {
     qp.sc.baseURI(base.equals("#UNDEFINED") ? null : base);
     return this;
+  }
+
+  /**
+   * Prepares a sandpit.
+   * @param source source directory ({@code null} if no files should be copied to the sandpit)
+   * @param target target directory
+   * @throws XQueryException exception
+   */
+  public void sandpit(final Path source, final Path target) {
+    try {
+      if(source != null) {
+        final Job job = new Job() { };
+        if(Files.exists(target)) FileDelete.delete(target, job);
+        FileCopy.relocate(source, target, true, job);
+      }
+      qp.qc.resources.sandpit(target);
+    } catch(final IOException ex) {
+      throw new XQueryException(new QueryException(ex));
+    }
   }
 
   /**

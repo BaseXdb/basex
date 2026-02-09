@@ -463,18 +463,21 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final Path toPath(final Expr expr, final QueryContext qc) throws QueryException {
-    return toPath(toString(expr, qc));
+    return toPath(toString(expr, qc), qc);
   }
 
   /**
    * Converts a path to a file path.
    * @param path path string
+   * @param qc query context
    * @return file path
    * @throws QueryException query exception
    */
-  protected final Path toPath(final String path) throws QueryException {
+  protected final Path toPath(final String path, final QueryContext qc) throws QueryException {
     try {
-      return path.startsWith(IO.FILEPREF) ? Paths.get(new URI(path)) : Paths.get(path);
+      final Path p = path.startsWith(IO.FILEPREF) ? Paths.get(new URI(path)) : Paths.get(path);
+      final Path cd = qc.resources.currentDir;
+      return cd != null ? cd.resolve(p) : p;
     } catch(final IllegalArgumentException | URISyntaxException ex) {
       Util.debug(ex);
       throw FILE_INVALID_PATH_X.get(info, path);

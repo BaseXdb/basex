@@ -38,6 +38,8 @@ final class QT3Env {
   final HashMap<QName, DecFormatOptions> decFormats;
   /** Static Base URI. */
   final String baseURI;
+  /** Sandpit flag. */
+  final boolean sandpit;
   /** Name. */
   final String name;
 
@@ -68,6 +70,7 @@ final class QT3Env {
     collations = al.isEmpty() ? null : al.get(0);
     final String uri = string(STATIC_BASE_URI, ctx, env);
     baseURI = uri;
+    sandpit = !list(ctx, env, SANDPIT).isEmpty();
 
     // collections
     collURI = XQuery.string("*:collection/@uri", env, ctx);

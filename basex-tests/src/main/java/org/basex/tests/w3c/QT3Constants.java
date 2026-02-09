@@ -28,6 +28,8 @@ interface QT3Constants {
   String STATIC_BASE_URI = "static-base-uri";
   /** QT3TS String. */
   String DECLARED = "declared";
+  /** QT3TS String. */
+  String SANDPIT = "sandpit";
 
   /** QT3TS String. */
   String FILE = "file";

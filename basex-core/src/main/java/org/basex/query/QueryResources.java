@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 import org.basex.build.*;
@@ -55,6 +56,9 @@ public final class QueryResources {
   private final Map<String, Value> functions = new HashMap<>();
   /** Input references. */
   private final ArrayList<InputStream> inputs = new ArrayList<>(1);
+
+  /** Current directory for file operations (can be {@null}). */
+  public Path currentDir;
 
   /**
    * Constructor.
@@ -402,6 +406,14 @@ public final class QueryResources {
   public void ftmaps(final HashMap<String, IO> sw, final HashMap<String, IO> th) {
     stop = sw;
     thes = th;
+  }
+
+  /**
+   * Assigns a sandpit directory.
+   * @param path path to assign
+   */
+  public void sandpit(final Path path) {
+    currentDir = path;
   }
 
   // PRIVATE METHODS ==============================================================================

@@ -1,7 +1,5 @@
 package org.basex.query.func.file;
 
-import java.nio.file.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 
@@ -13,7 +11,7 @@ import org.basex.query.value.*;
  */
 public final class FileCurrentDir extends FileFn {
   @Override
-  public Value eval(final QueryContext qc) {
-    return get(absolute(Paths.get(".")), true);
+  public Value eval(final QueryContext qc) throws QueryException {
+    return get(absolute(toPath(".", qc)), true);
   }
 }

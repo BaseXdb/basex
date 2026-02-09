@@ -3,6 +3,7 @@ package org.basex.query.func.file;
 import java.io.*;
 import java.nio.file.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -30,15 +31,15 @@ public final class FileDelete extends FileFn {
   /**
    * Recursively deletes a file path.
    * @param path path to be deleted
-   * @param qc query context
+   * @param job job
    * @throws IOException I/O exception
    */
-  private static void delete(final Path path, final QueryContext qc) throws IOException {
+  public static void delete(final Path path, final Job job) throws IOException {
     if(Files.isDirectory(path)) {
       try(DirectoryStream<Path> children = Files.newDirectoryStream(path)) {
         for(final Path child : children) {
-          qc.checkStop();
-          delete(child, qc);
+          job.checkStop();
+          delete(child, job);
         }
       }
     }

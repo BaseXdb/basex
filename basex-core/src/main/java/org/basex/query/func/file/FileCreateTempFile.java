@@ -37,7 +37,7 @@ public class FileCreateTempFile extends FileFn {
     final String prefix = toStringOrNull(arg(0), qc);
     final String suffix = toStringOrNull(arg(1), qc);
     final String dir = toStringOrNull(arg(2), qc);
-    final Path root = dir != null ? toPath(dir) : Paths.get(Prop.TEMPDIR);
+    final Path root = dir != null ? toPath(dir, qc) : Paths.get(Prop.TEMPDIR);
 
     if(Files.isRegularFile(root)) throw FILE_NO_DIR_X.get(info, root);
 

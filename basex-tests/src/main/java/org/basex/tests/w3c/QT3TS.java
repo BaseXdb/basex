@@ -5,6 +5,7 @@ import static org.basex.util.Prop.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.regex.*;
@@ -327,7 +328,7 @@ public final class QT3TS extends Main {
     returned.env = env;
 
     try {
-      environment(query, env);
+      environment(query, env, true);
       if(env != null) {
         // bind documents
         for(final HashMap<String, String> src : env.sources) {
@@ -435,13 +436,25 @@ public final class QT3TS extends Main {
     if(report != null) report.addTest(name, exp == null);
   }
 
+
   /**
    * Assigns the query environment.
    * @param query query
    * @param env environment
-   * @return query;
+   * @return query
    */
   private XQuery environment(final XQuery query, final QT3Env env) {
+    return environment(query, env, false);
+  }
+
+  /**
+   * Assigns the query environment.
+   * @param query query
+   * @param env environment
+   * @param init initializes the sandbox
+   * @return query
+   */
+  private XQuery environment(final XQuery query, final QT3Env env, final boolean init) {
     if(env != null) {
       // bind namespaces
       for(final HashMap<String, String> ns : env.namespaces) {
@@ -450,6 +463,12 @@ public final class QT3TS extends Main {
       // bind variables
       for(final HashMap<String, String> par : env.params) {
         query.variable(par.get(NNAME), new XQuery(par.get(SELECT), ctx).value());
+      }
+      // directory with test files
+      if(env.sandpit) {
+        final Path source = init ? Paths.get(baseURI.replaceAll("\\w+\\.xml$", "sandpit")) : null;
+        final Path target = Paths.get(Prop.TEMPDIR, "sandpit");
+        query.sandpit(source, target);
       }
     }
     return query;

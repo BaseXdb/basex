@@ -5,6 +5,7 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 import java.nio.file.*;
 
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.seq.*;
@@ -59,18 +60,18 @@ public class FileCopy extends FileFn {
    * @param src source path
    * @param trg target path
    * @param copy copy flag
-   * @param qc query context
+   * @param job job
    * @throws IOException I/O exception
    */
-  private static void relocate(final Path src, final Path trg, final boolean copy,
-      final QueryContext qc) throws IOException {
+  public static void relocate(final Path src, final Path trg, final boolean copy, final Job job)
+      throws IOException {
 
     if(Files.isDirectory(src)) {
       if(!Files.exists(trg)) Files.createDirectory(trg);
       try(DirectoryStream<Path> children = Files.newDirectoryStream(src)) {
-        qc.checkStop();
+        job.checkStop();
         for(final Path child : children) {
-          relocate(child, trg.resolve(child.getFileName()), copy, qc);
+          relocate(child, trg.resolve(child.getFileName()), copy, job);
         }
       }
       if(!copy) Files.delete(src);
