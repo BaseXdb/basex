@@ -62,9 +62,11 @@ public abstract class Serializer implements Closeable {
    * @param uri URI (can be {@code null})
    * @param value attribute value (can be {@code null})
    */
-  private record Att(byte[] name, byte[] value, byte[] uri) { }
-  /** Attribute/namespace collector. */
-  private final ArrayList<Att> attributes = new ArrayList<>();
+  protected record Att(byte[] name, byte[] value, byte[] uri) { }
+  /** Attribute collector. */
+  protected final ArrayList<Att> attributes = new ArrayList<>();
+  /** Namespace collector. */
+  protected final ArrayList<Att> namespaces = new ArrayList<>();
 
   /** Static context. */
   protected StaticContext sc;
@@ -271,12 +273,28 @@ public abstract class Serializer implements Closeable {
       throws IOException { }
 
   /**
+   * Returns the element name (may be overridden to modify names).
+   * @param name original name
+   * @return modified name
+   */
+  protected QNm elementName(final QNm name) {
+    return name;
+  }
+
+  /**
    * Starts an element.
    * @param name element name
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
   protected void startOpen(final QNm name) throws IOException { }
+
+  /**
+   * Adjusts namespaces before serializing namespaces and attributes.
+   * @param name original element name
+   */
+  @SuppressWarnings("unused")
+  protected void adjustNamespaces(final QNm name) { }
 
   /**
    * Finishes an opening element node.
@@ -358,8 +376,8 @@ public abstract class Serializer implements Closeable {
    * @param prefix prefix
    * @param uri URI
    */
-  private void addNamespace(final byte[] prefix, final byte[] uri) {
-    attributes.add(new Att(prefix, null, uri));
+  protected void addNamespace(final byte[] prefix, final byte[] uri) {
+    namespaces.add(new Att(prefix, null, uri));
   }
 
   /**
@@ -384,10 +402,10 @@ public abstract class Serializer implements Closeable {
    */
   private void emitNamespaces() throws IOException {
     if(canonical) {
-      attributes.sort((a, b) -> compare(a.name, b.name));
+      namespaces.sort((a, b) -> compare(a.name, b.name));
     }
-    for(final Att att : attributes) namespace(att.name, att.uri, false);
-    attributes.clear();
+    for(final Att att : namespaces) namespace(att.name, att.uri, false);
+    namespaces.clear();
   }
 
   /**
@@ -454,9 +472,10 @@ public abstract class Serializer implements Closeable {
           nsUri = data.nspaces.uri(data.uriId(pre, kind));
         }
         // open element, serialize namespace declaration if it's new
-        openElement(new QNm(name, nsUri));
+        final QNm originalName = new QNm(name, nsUri);
+        openElement(elementName(originalName));
         if(nsUri == null) nsUri = EMPTY;
-        namespace(nsPrefix, nsUri, false);
+        addNamespace(nsPrefix, nsUri);
 
         // database contains namespaces: add declarations
         if(nsExist) {
@@ -476,7 +495,6 @@ public abstract class Serializer implements Closeable {
           } while(p >= 0 && data.kind(p) == Data.ELEM);
 
           // reset namespace cache
-          emitNamespaces();
           nsSet.clear();
         }
 
@@ -488,6 +506,8 @@ public abstract class Serializer implements Closeable {
           addAttribute(n, v, canonical ? data.nspaces.uri(data.uriId(pre, Data.ATTR)) : null);
           if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
         }
+        adjustNamespaces(originalName);
+        emitNamespaces();
         emitAttributes();
         parentStack.push(par);
       }
@@ -531,7 +551,8 @@ public abstract class Serializer implements Closeable {
       closeDoc();
     } else if(skip == 0 || !skipElement(node)) {
       // serialize elements (code will never be called for attributes)
-      final QNm name = node.qname();
+      final QNm originalName = node.qname();
+      final QNm name = elementName(originalName);
       openElement(name);
 
       // serialize declared namespaces
@@ -540,7 +561,6 @@ public abstract class Serializer implements Closeable {
       for(int p = 0; p < ps; p++) addNamespace(nsp.name(p), nsp.value(p));
       // add new or updated namespace
       addNamespace(name.prefix(), name.uri());
-      emitNamespaces();
 
       // serialize attributes
       final boolean i = indent;
@@ -550,6 +570,8 @@ public abstract class Serializer implements Closeable {
         addAttribute(n, v, canonical ? nsUri(prefix(n)) : null);
         if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
       }
+      adjustNamespaces(originalName);
+      emitNamespaces();
       emitAttributes();
 
       // serialize children

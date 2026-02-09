@@ -3022,6 +3022,9 @@ public final class FnModuleTest extends SandboxTest {
     final String canonicalXml = " { 'method': 'xml', 'canonical': true() }";
     query(func.args(" <a xmlns:p='urn:test:x' p:z='1' a='2'/>", canonicalXml),
         "<a xmlns:p=\"urn:test:x\" a=\"2\" p:z=\"1\"></a>");
+    query(func.args(" parse-xml(`<q:a xmlns:p='urn:test:x' xmlns:q='urn:test:y' p:z='1' a='2'/>`)",
+        canonicalXml),
+        "<q:a xmlns:p=\"urn:test:x\" xmlns:q=\"urn:test:y\" a=\"2\" p:z=\"1\"></q:a>");
 
     final String canonicalJson = " {'method': 'json', 'canonical': true()}";
     query(func.args(" [0x7fff_ffff_ffff_ffff]", canonicalJson), "[9223372036854776000]");

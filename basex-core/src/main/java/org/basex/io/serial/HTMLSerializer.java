@@ -18,7 +18,7 @@ import org.basex.util.hash.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class HTMLSerializer extends MarkupSerializer {
+final class HTMLSerializer extends XhtmlHtmlSerializer {
   /** (X)HTML: elements with an empty content model. */
   static final TokenSet EMPTIES = new TokenSet("area", "base", "basefont", "br", "col", "embed",
       "frame", "hr", "img", "input", "isindex", "link", "meta", "param");
