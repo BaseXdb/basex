@@ -417,18 +417,6 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   }
 
   /**
-   * Sets the type of this closure that has been generated for a function literal.
-   * @param ft function type
-   */
-  void setSignature(final FuncType ft) {
-    anns = ft.anns;
-    final int pl = params.length;
-    for(int p = 0; p < pl; p++) params[p].declType = ft.argTypes[p];
-    final SeqType dt = ft.declType;
-    if(!dt.eq(Types.ITEM_ZM)) declType = dt;
-  }
-
-  /**
    * Assigns the updating flag.
    * @throws QueryException query exception
    */
