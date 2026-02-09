@@ -119,7 +119,8 @@ function dba:login-check(
       dba:accept($name, $page)
     }
   } catch user:* {
-    dba:reject($name, 'Please check your login data', $page)
+    dba:reject($name, 'Please check your login data', $page),
+    prof:sleep(500)
   }
 };
 
