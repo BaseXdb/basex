@@ -64,10 +64,12 @@ public final class SharedData {
    * @return QName
    */
   public QNm qName(final byte[] name, final byte[] uri) {
-    return qnames.computeIfAbsent(
-      uri != null ? Token.concat(name, Token.cpToken(' '), uri) : name,
-      () -> new QNm(name, uri)
-    );
+    synchronized(qnames) {
+      return qnames.computeIfAbsent(
+          uri != null ? Token.concat(name, Token.cpToken(' '), uri) : name,
+          () -> new QNm(name, uri)
+        );
+    }
   }
 
   /**
@@ -76,7 +78,9 @@ public final class SharedData {
    * @return shared token
    */
   public byte[] token(final byte[] token) {
-    return token.length == 0 ? Token.EMPTY : tokens.put(token);
+    synchronized (tokens) {
+      return token.length == 0 ? Token.EMPTY : tokens.put(token);
+    }
   }
 
   /**
@@ -85,12 +89,14 @@ public final class SharedData {
    * @return new or already registered record type
    */
   public RecordType record(final RecordType rt) {
-    final ArrayList<RecordType> types = recordTypes.computeIfAbsent(rt.fields().size(),
-        ArrayList::new);
-    for(final RecordType type : types) {
-      if(type.equals(rt)) return type;
+    synchronized(recordTypes) {
+      final ArrayList<RecordType> types = recordTypes.computeIfAbsent(rt.fields().size(),
+          ArrayList::new);
+      for(final RecordType type : types) {
+        if(type.equals(rt)) return type;
+      }
+      types.add(rt);
+      return rt;
     }
-    types.add(rt);
-    return rt;
   }
 }
