@@ -152,6 +152,26 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args(" (true#0, false#0)", " { 'parallel': 1000000000 }"), "true\nfalse");
     query(func.args(" (true#0, false#0)", " { 'parallel': <_>1</_> }"), "true\nfalse");
 
+    // MapMerge mutable instance variables
+    query("xquery:fork-join(\r\n"
+        + "  for $t in 1 to 100\r\n"
+        + "  return function() {\r\n"
+        + "    for $i in 1 to 10\r\n"
+        + "    let $v := map:build(\r\n"
+        + "      ($i, $i),\r\n"
+        + "      (),\r\n"
+        + "      (),\r\n"
+        + "      { 'duplicates': function($x, $y) { $x * $y } }\r\n"
+        + "    )($i)\r\n"
+        + "    return\r\n"
+        + "      if($v eq $i * $i) then\r\n"
+        + "        $v\r\n"
+        + "      else\r\n"
+        + "        error(xs:QName('err:FAIL'), `{$i}: expected {$i * $i}, but got {$v}`)\r\n"
+        + "  }\r\n"
+        + ")\r\n"
+        + "=> count()", 1000);
+
     // optimizations
     check(func.args(" ()"), "", empty());
     check(func.args(" false#0"), false, root(DynFuncCall.class));
