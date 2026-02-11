@@ -33,7 +33,7 @@ public final class MapBuild extends MapMerge {
       final Iter iter = (keys != null ? invoke(keys, args, qc) : item).atomIter(qc, info);
       for(Item key; (key = qc.next(iter)) != null;) {
         final Value old = builder.get(key);
-        final Value val = dups.merge(key, old, value != null ? invoke(value, args, qc) : item);
+        final Value val = dups.merge(key, old, value != null ? invoke(value, args, qc) : item, qc);
         if(val != null) builder.put(key, val);
       }
     }
