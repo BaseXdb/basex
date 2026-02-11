@@ -1875,6 +1875,17 @@ public final class FnModuleTest extends SandboxTest {
 
     check(func.args(" void(())", 0), "", empty(func));
     check(func.args(TRUNK.args(" (1, 2, 3, <_/>)"), 2), 2, empty(TRUNK));
+
+    // GH-2569
+    query("items-at('a', sort([ 1, 2 ], (), array:size#1))", "a");
+    query("""
+let $strings := ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')
+let $arrays as array(*)* := (array{1 to 2}, array{3 to 6}, array{7 to 9})
+let $arrays := sort($arrays, (), fn($seq){array:size($seq) * -1})
+let $largest := $arrays => head()
+return
+  for $idx in $largest?* return $strings[$idx]""",
+        "c\nd\ne\nf");
   }
 
   /** Test method. */

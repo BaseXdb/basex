@@ -107,58 +107,62 @@ public final class FnItemsAt extends StandardFunc {
     if(ist.zero()) return input;
     if(ast.zero()) return Empty.VALUE;
 
-    Occ occ = ast.zeroOrOne() ? Occ.ZERO_OR_ONE : Occ.ZERO_OR_MORE;
-    if(at instanceof Item && !ast.mayBeFunction()) {
-      // check for fractional or negative number
-      final double d = toDouble(at, cc.qc) - 1;
-      final long l = (long) d;
-      if(d != l || l < 0) return Empty.VALUE;
-      // single expression with static position
-      if(ist.zeroOrOne()) return l == 0 ? input : Empty.VALUE;
+    Occ occ = Occ.ZERO_OR_MORE;
+    if(!ast.mayBeFunction()) {
+      if(ast.zeroOrOne()) occ = Occ.ZERO_OR_ONE;
 
-      final long size = input.size();
-      if(size != -1) {
-        // items-at(E, last) → foot(E)
-        if(l + 1 == size) return cc.function(FOOT, info, input);
-        // items-at(E, too-large) → ()
-        if(l + 1 > size) return Empty.VALUE;
-        // items-at(reverse(E), pos) → items-at(E, size - pos)
-        if(REVERSE.is(input))
-          return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(size - l));
-        occ = Occ.EXACTLY_ONE;
-      }
-      if(l == 0) return cc.function(HEAD, info, input);
+      if(at instanceof Item) {
+        // check for fractional or negative number
+        final double d = toDouble(at, cc.qc) - 1;
+        final long l = (long) d;
+        if(d != l || l < 0) return Empty.VALUE;
+        // single expression with static position
+        if(ist.zeroOrOne()) return l == 0 ? input : Empty.VALUE;
 
-      // items-at(tail(E), pos) → items-at(E, pos + 1)
-      if(TAIL.is(input))
-        return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(l + 2));
-      // items-at(replicate(I, count), pos) → I
-      if(REPLICATE.is(input)) {
-        // static integer will always be greater than 1
-        final Expr[] args = input.args();
-        if(args[0].size() == 1 && args[1] instanceof final Itr itr) {
-          return l > itr.itr() ? Empty.VALUE : args[0];
+        final long size = input.size();
+        if(size != -1) {
+          // items-at(E, last) → foot(E)
+          if(l + 1 == size) return cc.function(FOOT, info, input);
+          // items-at(E, too-large) → ()
+          if(l + 1 > size) return Empty.VALUE;
+          // items-at(reverse(E), pos) → items-at(E, size - pos)
+          if(REVERSE.is(input))
+            return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(size - l));
+          occ = Occ.EXACTLY_ONE;
         }
-      }
-      // items-at(file:read-text-lines(E), pos) → file:read-text-lines(E, pos, 1)
-      if(_FILE_READ_TEXT_LINES.is(input))
-        return FileReadTextLines.opt(this, l, 1, cc);
+        if(l == 0) return cc.function(HEAD, info, input);
 
-      // items-at((I1, I2, I3), 2) → I2
-      // items-at((I, E), 2) → head(E)
-      // items-at((I, E1, E2), 3) → items-at((E1, E2), 2)
-      if(input instanceof List) {
-        final Expr[] args = input.args();
-        final int al = args.length;
-        for(int a = 0; a < al; a++) {
-          final boolean exact = a == l, one = args[a].seqType().one();
-          if(exact || !one && a > 0) {
-            if(exact && one) return args[a];
-            final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
-            return exact ? cc.function(HEAD, info, list) :
-              cc.function(ITEMS_AT, info, list, Itr.get(l - a + 1));
+        // items-at(tail(E), pos) → items-at(E, pos + 1)
+        if(TAIL.is(input))
+          return cc.function(ITEMS_AT, info, input.arg(0), Itr.get(l + 2));
+        // items-at(replicate(I, count), pos) → I
+        if(REPLICATE.is(input)) {
+          // static integer will always be greater than 1
+          final Expr[] args = input.args();
+          if(args[0].size() == 1 && args[1] instanceof final Itr itr) {
+            return l > itr.itr() ? Empty.VALUE : args[0];
           }
-          if(!one) break;
+        }
+        // items-at(file:read-text-lines(E), pos) → file:read-text-lines(E, pos, 1)
+        if(_FILE_READ_TEXT_LINES.is(input))
+          return FileReadTextLines.opt(this, l, 1, cc);
+
+        // items-at((I1, I2, I3), 2) → I2
+        // items-at((I, E), 2) → head(E)
+        // items-at((I, E1, E2), 3) → items-at((E1, E2), 2)
+        if(input instanceof List) {
+          final Expr[] args = input.args();
+          final int al = args.length;
+          for(int a = 0; a < al; a++) {
+            final boolean exact = a == l, one = args[a].seqType().one();
+            if(exact || !one && a > 0) {
+              if(exact && one) return args[a];
+              final Expr list = List.get(cc, info, Arrays.copyOfRange(args, a, al));
+              return exact ? cc.function(HEAD, info, list) :
+                cc.function(ITEMS_AT, info, list, Itr.get(l - a + 1));
+            }
+            if(!one) break;
+          }
         }
       }
     }
