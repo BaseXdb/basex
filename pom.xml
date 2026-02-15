@@ -410,6 +410,7 @@
           <configuration>
             <outputDirectory>${project.lib.directory}</outputDirectory>
             <includeScope>runtime</includeScope>
+            <excludeReactor>true</excludeReactor>
           </configuration>
           <executions>
             <execution>
