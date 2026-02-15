@@ -69,7 +69,7 @@ public class MapMerge extends MapFn {
       final XQMap map = toMap(current);
       for(final Item key : map.keys()) {
         final Value old = mb != null ? mb.get(key) : mp.getOrNull(key);
-        final Value val = dups.merge(key, old, map.get(key));
+        final Value val = dups.merge(key, old, map.get(key), qc);
         if(val != null) {
           if(mb != null) mb.put(key, val);
           else mp = mp.put(key, val);
@@ -143,7 +143,7 @@ public class MapMerge extends MapFn {
     if(md != null) return md;
     // function
     final Value duplicates = options.get(MergeOptions.DUPLICATES);
-    if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc), qc);
+    if(duplicates instanceof FItem) return new Invoke(toFunction(duplicates, 2, qc));
     // fixed option
     final String string = duplicates.isEmpty() ? dflt.toString() : toString(duplicates, qc);
     final Duplicates value = Enums.get(Duplicates.class, string);
@@ -152,7 +152,7 @@ public class MapMerge extends MapFn {
 
     return switch(value) {
       case REJECT -> new Reject();
-      case COMBINE -> new Combine(qc);
+      case COMBINE -> new Combine();
       case USE_FIRST -> new UseFirst();
       default -> new UseLast();
     };
@@ -178,7 +178,7 @@ public class MapMerge extends MapFn {
    */
   static final class UseFirst extends MapDuplicates {
     @Override
-    Value get(final Item key, final Value old, final Value value) {
+    Value get(final Item key, final Value old, final Value value, final QueryContext qc) {
       return null;
     }
   }
@@ -188,7 +188,7 @@ public class MapMerge extends MapFn {
    */
   static final class UseLast extends MapDuplicates {
     @Override
-    Value get(final Item key, final Value old, final Value value) {
+    Value get(final Item key, final Value old, final Value value, final QueryContext qc) {
       return value;
     }
   }
@@ -197,19 +197,8 @@ public class MapMerge extends MapFn {
    * Concatenate values.
    */
   static final class Combine extends MapDuplicates {
-    /** Query context. */
-    private final QueryContext qc;
-
-    /**
-     * Constructor.
-     * @param qc query context
-     */
-    Combine(final QueryContext qc) {
-      this.qc = qc;
-    }
-
     @Override
-    Value get(final Item key, final Value old, final Value value) {
+    Value get(final Item key, final Value old, final Value value, final QueryContext qc) {
       return old.append(value, qc);
     }
 
@@ -224,7 +213,8 @@ public class MapMerge extends MapFn {
    */
   final class Reject extends MapDuplicates {
     @Override
-    Value get(final Item key, final Value old, final Value value) throws QueryException {
+    Value get(final Item key, final Value old, final Value value, final QueryContext qc)
+        throws QueryException {
       throw MERGE_DUPLICATE_X.get(info, key);
     }
   }
@@ -235,25 +225,22 @@ public class MapMerge extends MapFn {
   final class Invoke extends MapDuplicates {
     /** Combiner function. */
     private final FItem function;
-    /** Query context. */
-    private final QueryContext qc;
     /** HOF arguments. */
-    private final HofArgs args;
+    private final ThreadLocal<HofArgs> args;
 
     /**
      * Constructor.
      * @param function combiner function
-     * @param qc query context
      */
-    Invoke(final FItem function, final QueryContext qc) {
+    Invoke(final FItem function) {
       this.function = function;
-      this.qc = qc;
-      args = new HofArgs(2);
+      args = ThreadLocal.withInitial(() -> new HofArgs(2));
     }
 
     @Override
-    Value get(final Item key, final Value old, final Value value) throws QueryException {
-      return function.invoke(qc, info, args.set(0, old).set(1, value).get());
+    Value get(final Item key, final Value old, final Value value, final QueryContext qc)
+        throws QueryException {
+      return function.invoke(qc, info, args.get().set(0, old).set(1, value).get());
     }
 
     @Override
