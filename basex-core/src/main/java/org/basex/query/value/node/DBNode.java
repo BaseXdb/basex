@@ -16,7 +16,6 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.Type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -374,20 +373,6 @@ public class DBNode extends XNode {
     if(type == NodeType.DOCUMENT_NODE) bl.add(baseURI()).add(0);
     else if(type == NodeType.ATTRIBUTE) bl.add(qname().uri()).add(0);
     return bl.finish();
-  }
-
-  @Override
-  public final ID typeId() {
-    // check if a document has a single element as child
-    ID i = type.id();
-    if(type == NodeType.DOCUMENT_NODE) {
-      final BasicNodeIter iter = childIter();
-      final XNode n = iter.next();
-      if(n != null && n.type == NodeType.ELEMENT && iter.next() == null) {
-        i = NodeType.DOCUMENT_NODE_ELEMENT.id();
-      }
-    }
-    return i;
   }
 
   @Override

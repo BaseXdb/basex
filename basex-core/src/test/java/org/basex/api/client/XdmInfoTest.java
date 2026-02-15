@@ -206,7 +206,7 @@ public final class XdmInfoTest extends SandboxTest {
     { "processing-instruction()", "processing-instruction { 'a' } { 'b' }", "<?a b?>" },
     { "element()", "<a/>", "<a/>" },
     { "document-node()", "document { 'a' }", "a", "" },
-    { "document-node(element())", "document { <a/> }", "<a/>", "" },
+    { },
     { "attribute()" },
     { "comment()", "comment { 'a' } ", "<!--a-->" },
     { }, { }, { }, { }, { }, { }, { }, { },

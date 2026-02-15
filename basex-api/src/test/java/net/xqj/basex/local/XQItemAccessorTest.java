@@ -382,14 +382,6 @@ public final class XQItemAccessorTest extends XQJBaseTest {
   }
 
   /**
-   * Tests document(element()).
-   * @throws XQException XQuery exception
-   */
-  @Test public void testDocumentElement() throws XQException {
-    nodeTest("document{<e>AAA</e>}", "<e>AAA</e>", XQITEMKIND_DOCUMENT_ELEMENT);
-  }
-
-  /**
    * Tests processing-instruction().
    * @throws XQException XQuery exception
    */

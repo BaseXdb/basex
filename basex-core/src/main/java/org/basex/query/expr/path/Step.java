@@ -312,8 +312,7 @@ public abstract class Step extends Preds {
       case CHILD, DESCENDANT, FOLLOWING, FOLLOWING_OR_SELF, FOLLOWING_SIBLING,
            FOLLOWING_SIBLING_OR_SELF, PRECEDING, PRECEDING_OR_SELF, PRECEDING_SIBLING,
            PRECEDING_SIBLING_OR_SELF ->
-        type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE_ELEMENT, NodeType.DOCUMENT_NODE,
-            NodeType.NAMESPACE_NODE);
+        type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE, NodeType.NAMESPACE_NODE);
       default ->
         false;
     };

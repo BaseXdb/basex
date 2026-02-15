@@ -28,10 +28,10 @@ import org.w3c.dom.Text;
  */
 public enum NodeType implements Type {
   /** Node type. */
-  NODE("node", BasicType.ITEM, ID.NOD),
+  NODE("node", ID.NOD),
 
   /** Text type. */
-  TEXT("text", NODE, ID.TXT) {
+  TEXT("text", ID.TXT) {
     @Override
     public XNode cast(final Object value, final QueryContext qc, final InputInfo info) {
       if(value instanceof final BXText text) return text.getNode();
@@ -41,7 +41,7 @@ public enum NodeType implements Type {
   },
 
   /** PI type. */
-  PROCESSING_INSTRUCTION("processing-instruction", NODE, ID.PI) {
+  PROCESSING_INSTRUCTION("processing-instruction", ID.PI) {
     @Override
     public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
@@ -53,7 +53,7 @@ public enum NodeType implements Type {
   },
 
   /** Element type. */
-  ELEMENT("element", NODE, ID.ELM) {
+  ELEMENT("element", ID.ELM) {
     @Override
     public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
         throws QueryException {
@@ -70,7 +70,7 @@ public enum NodeType implements Type {
   },
 
   /** Document type. */
-  DOCUMENT_NODE("document-node", NODE, ID.DOC) {
+  DOCUMENT_NODE("document-node", ID.DOC) {
     @Override
     public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
@@ -92,17 +92,8 @@ public enum NodeType implements Type {
     }
   },
 
-  /** Document element type. */
-  DOCUMENT_NODE_ELEMENT("document-node(element())", DOCUMENT_NODE, ID.DEL) {
-    @Override
-    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-      return DOCUMENT_NODE.cast(value, qc, info);
-    }
-  },
-
   /** Attribute type. */
-  ATTRIBUTE("attribute", NODE, ID.ATT) {
+  ATTRIBUTE("attribute", ID.ATT) {
     @Override
     public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
@@ -114,7 +105,7 @@ public enum NodeType implements Type {
   },
 
   /** Comment type. */
-  COMMENT("comment", NODE, ID.COM) {
+  COMMENT("comment", ID.COM) {
     @Override
     public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
@@ -126,13 +117,13 @@ public enum NodeType implements Type {
   },
 
   /** Namespace type. */
-  NAMESPACE_NODE("namespace-node", NODE, ID.NSP),
+  NAMESPACE_NODE("namespace-node", ID.NSP),
 
   /** Schema-element. */
-  SCHEMA_ELEMENT("schema-element", NODE, ID.SCE),
+  SCHEMA_ELEMENT("schema-element", ID.SCE),
 
   /** Schema-attribute. */
-  SCHEMA_ATTRIBUTE("schema-attribute", NODE, ID.SCA);
+  SCHEMA_ATTRIBUTE("schema-attribute", ID.SCA);
 
   /** Leaf node types. */
   public static final NodeType[] LEAF_TYPES = {
@@ -146,8 +137,6 @@ public enum NodeType implements Type {
   private final byte[] name;
   /** Kind. */
   private final byte[] kind;
-  /** Parent type. */
-  private final Type parent;
   /** Type ID . */
   private final ID id;
 
@@ -157,17 +146,14 @@ public enum NodeType implements Type {
   /**
    * Constructor.
    * @param name name
-   * @param parent parent type
    * @param id type ID
    */
-  NodeType(final String name, final Type parent, final ID id) {
+  NodeType(final String name, final ID id) {
     this.name = Token.token(name);
     kind = Token.token(name.replace("-node", ""));
-    this.parent = parent;
     this.id = id;
   }
 
-  // map hierarchy to pre/post values
   static {
     for(final NodeType type : values()) TYPES.put(type.name, type);
   }
@@ -188,12 +174,12 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean isUntyped() {
-    return this != PROCESSING_INSTRUCTION && this != COMMENT && this != NODE;
+    return !oneOf(PROCESSING_INSTRUCTION, COMMENT, NODE);
   }
 
   @Override
   public final boolean isNumberOrUntyped() {
-    return this != PROCESSING_INSTRUCTION && this != COMMENT && this != NODE;
+    return isUntyped();
   }
 
   @Override
@@ -254,9 +240,8 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return type == this || type == BasicType.ITEM ||
-        (type instanceof final ChoiceItemType cit ? cit.hasInstance(this) :
-          type instanceof NodeType && type == parent);
+    return type.oneOf(this, NODE, BasicType.ITEM) ||
+      type instanceof final ChoiceItemType cit && cit.hasInstance(this);
   }
 
   @Override
@@ -284,9 +269,7 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean refinable() {
-    // simplified; deliberately ignores the document-node(element()) subtype,
-    // as it is not relevant for database nodes
-    return this == NodeType.NODE;
+    return this == NODE;
   }
 
   @Override

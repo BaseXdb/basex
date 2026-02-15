@@ -10,7 +10,6 @@ import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
-import org.basex.query.value.type.Type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -111,13 +110,6 @@ public final class FDoc extends FNode {
   @Override
   public byte[] xdmInfo() {
     return new ByteList().add(typeId().asByte()).add(uri).add(0).finish();
-  }
-
-  @Override
-  public ID typeId() {
-    // check if a document has a single element as child
-    return (children.length == 1 && children[0].type == NodeType.ELEMENT ?
-      NodeType.DOCUMENT_NODE_ELEMENT : type).id();
   }
 
   @Override
