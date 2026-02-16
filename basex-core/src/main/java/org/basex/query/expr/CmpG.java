@@ -330,7 +330,7 @@ public class CmpG extends Cmp {
     if(val == null) return this;
 
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(val.seqType().type instanceof final NodeType nt && nt != NodeType.NODE &&
+    if(val.seqType().type instanceof final NodeType nt && nt.kind != Kind.NODE &&
         expr1 instanceof final ContextFn fn &&
         expr2 instanceof final Value value && op == CmpOp.EQ) {
       // skip functions that do not refer to the current context value

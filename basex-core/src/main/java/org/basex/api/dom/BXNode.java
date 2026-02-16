@@ -45,7 +45,7 @@ public abstract class BXNode implements Node {
    * @return DOM node, or {@code null} if input is {@code null} as well
    */
   public static BXNode get(final XNode node) {
-    return node == null ? null : switch((NodeType) node.type) {
+    return node == null ? null : switch(node.kind()) {
       case DOCUMENT -> new BXDoc(node);
       case ELEMENT -> new BXElem(node);
       case TEXT -> new BXText(node);
@@ -162,7 +162,7 @@ public abstract class BXNode implements Node {
     for(XNode p; (p = n.parent()) != null;) {
       n = p;
     }
-    return n.type == NodeType.DOCUMENT ? (BXDoc) get(n) : null;
+    return n.kind() == Kind.DOCUMENT ? (BXDoc) get(n) : null;
   }
 
   @Override
@@ -275,7 +275,7 @@ public abstract class BXNode implements Node {
     final ANodeList nb = new ANodeList();
     final byte[] nm = "*".equals(name) ? null : token(name);
     for(final XNode n : nd.descendantIter(false)) {
-      if(n.type == NodeType.ELEMENT && (nm == null || eq(nm, n.name()))) {
+      if(n.kind() == Kind.ELEMENT && (nm == null || eq(nm, n.name()))) {
         nb.add(n);
       }
     }

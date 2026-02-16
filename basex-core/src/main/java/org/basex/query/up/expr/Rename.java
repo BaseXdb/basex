@@ -46,8 +46,9 @@ public final class Rename extends Update {
 
     for(Item item; (item = iter.next()) != null;) {
       final Type type = item.type;
-      final boolean element = type == NodeType.ELEMENT, attribute = type == NodeType.ATTRIBUTE;
-      final boolean pi = type == NodeType.PROCESSING_INSTRUCTION;
+      final Kind kind = type instanceof final NodeType nt ? nt.kind : null;
+      final boolean element = kind == Kind.ELEMENT, attribute = kind == Kind.ATTRIBUTE;
+      final boolean pi = kind == Kind.PROCESSING_INSTRUCTION;
       if(!(element || attribute || pi)) throw UPWRTRGTYP_X.get(info, item);
 
       QNm newName = names.get(type);

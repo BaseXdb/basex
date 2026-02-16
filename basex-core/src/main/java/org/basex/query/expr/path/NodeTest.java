@@ -63,7 +63,7 @@ public class NodeTest extends Test {
    * @return kind test
    */
   public static NodeTest get(final NodeType type) {
-    return switch(type) {
+    return switch(type.kind) {
       case TEXT                   -> TEXT;
       case PROCESSING_INSTRUCTION -> PROCESSING_INSTRUCTION;
       case ELEMENT                -> ELEMENT;
@@ -88,7 +88,7 @@ public class NodeTest extends Test {
 
   @Override
   public boolean matches(final XNode node) {
-    return node.type == type;
+    return node.kind() == type.kind;
   }
 
   @Override

@@ -1,6 +1,6 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.value.type.NodeType.*;
+import static org.basex.query.value.type.Kind.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -22,8 +22,8 @@ public class FnNodeName extends ContextFn {
     final XNode node = toNodeOrNull(context(qc), qc);
     if(node == null) return Empty.VALUE;
 
-    final Type type = node.type;
-    return empty(type) || type == NAMESPACE && node.name().length == 0 ? Empty.VALUE :
+    final Kind kind = node.kind();
+    return empty(kind) || kind == NAMESPACE && node.name().length == 0 ? Empty.VALUE :
       node.qname();
   }
 
@@ -45,20 +45,21 @@ public class FnNodeName extends ContextFn {
 
     final SeqType st = node.seqType();
     if(st.type instanceof final NodeType nt) {
-      if(occ && st.oneOrMore() && nt.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION)) {
+      final Kind kind = nt.kind;
+      if(occ && st.oneOrMore() && kind.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION)) {
         exprType.assign(Occ.EXACTLY_ONE);
       }
-      return nt != NODE && empty(nt);
+      return kind != NODE && empty(kind);
     }
     return false;
   }
 
   /**
-   * Checks if a node with the specified type returns no result.
-   * @param type type
+   * Checks if a node with the specified kind returns no result.
+   * @param kind kind
    * @return result of check
    */
-  static boolean empty(final Type type) {
-    return !type.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION, NAMESPACE);
+  static boolean empty(final Kind kind) {
+    return !kind.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION, NAMESPACE);
   }
 }

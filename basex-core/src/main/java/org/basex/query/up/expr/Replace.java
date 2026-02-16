@@ -46,7 +46,7 @@ public final class Replace extends Update {
     FBuilder builder = null;
 
     for(Item item; (item = iter.next()) != null;) {
-      if(!(item instanceof final XNode targ) || targ.type == NodeType.DOCUMENT)
+      if(!(item instanceof final XNode targ) || targ.kind() == Kind.DOCUMENT)
         throw UPTRGNODE_X.get(info, item);
 
       final Updates updates = qc.updates();
@@ -55,7 +55,7 @@ public final class Replace extends Update {
 
       // replace node
       if(builder == null) builder = builder(arg(1), qc);
-      final Type type = item.type;
+      final Kind kind = targ.kind();
       if(value) {
         // replace value of node
         byte[] text = Token.EMPTY;
@@ -63,8 +63,8 @@ public final class Replace extends Update {
         else if(builder.attributes != null) text = builder.attributes.get(0).string();
 
         // check validity of future comments or PIs
-        if(type == NodeType.COMMENT) FComm.parse(text, info);
-        if(type == NodeType.PROCESSING_INSTRUCTION) FPI.parse(text, info);
+        if(kind == Kind.COMMENT) FComm.parse(text, info);
+        if(kind == Kind.PROCESSING_INSTRUCTION) FPI.parse(text, info);
 
         updates.add(new ReplaceValue(dbnode.pre(), dbnode.data(), info, text), qc);
       } else {
@@ -72,7 +72,7 @@ public final class Replace extends Update {
         if(parent == null) throw UPNOPAR_X.get(info, targ);
 
         final ANodeList list;
-        if(type == NodeType.ATTRIBUTE) {
+        if(kind == Kind.ATTRIBUTE) {
           // replace attribute node
           if(builder.children != null) throw UPWRATTR_X.get(info, builder.children.get(0));
           list = builder.attributes != null ? checkNS(builder.attributes, parent) : new ANodeList();

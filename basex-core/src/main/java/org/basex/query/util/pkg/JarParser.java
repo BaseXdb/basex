@@ -42,7 +42,7 @@ final class JarParser {
     try {
       final XNode node = new DBNode(io).childIter().next();
       for(final XNode next : node.childIter()) {
-        if(next.type != NodeType.ELEMENT) continue;
+        if(next.kind() != Kind.ELEMENT) continue;
 
         final QNm name = next.qname();
         // ignore namespace to improve compatibility

@@ -21,7 +21,7 @@ public final class FnSiblings extends ContextFn {
     if(node == null) return Empty.ITER;
 
     final XNode parent = node.parent();
-    if(node.type.oneOf(NodeType.ATTRIBUTE, NodeType.NAMESPACE) || parent == null)
+    if(node.kind().oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE) || parent == null)
       return node.iter();
 
     final Iter iter = parent.childIter();

@@ -71,10 +71,10 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   @Override
   protected final void node(final XNode node) throws IOException {
-    final Type type = node.type;
+    final Kind kind = node.kind();
     final XMLSerializer ser = xml();
-    if(type == NodeType.ATTRIBUTE) ser.attribute(node.name(), node.string(), true);
-    else if(type == NodeType.NAMESPACE) ser.namespace(node.name(), node.string(), true);
+    if(kind == Kind.ATTRIBUTE) ser.attribute(node.name(), node.string(), true);
+    else if(kind == Kind.NAMESPACE) ser.namespace(node.name(), node.string(), true);
     else ser.node(node);
     ser.out.flush();
     ser.reset();

@@ -328,7 +328,7 @@ public interface Type {
     final TokenList list = new TokenList();
     list.add(QueryText.ITEM).add(QueryText.FUNCTION).add(QueryText.FN);
     list.add(QueryText.MAP).add(QueryText.ARRAY);
-    for(final NodeType type : NodeType.values()) list.add(type.test());
+    for(final Kind kind : Kind.values()) list.add(kind.name);
     final byte[][] values = list.finish();
 
     Object similar = Levenshtein.similar(ln, values);

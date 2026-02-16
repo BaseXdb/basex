@@ -111,7 +111,7 @@ public final class UnionTest extends Test {
     final TokenBuilder tb = new TokenBuilder();
     char ch = '(';
     for(final Test test : tests) {
-      tb.add(ch).add(test.toString(full || test.type == NodeType.ATTRIBUTE));
+      tb.add(ch).add(test.toString(full || test.type.kind == Kind.ATTRIBUTE));
       ch = '|';
     }
     return tb.add(')').toString();

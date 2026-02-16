@@ -2,7 +2,7 @@ package org.basex.query.value.node;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.util.DeepEqualOptions.*;
-import static org.basex.query.value.type.NodeType.*;
+import static org.basex.query.value.type.Kind.*;
 
 import java.io.*;
 import java.util.*;
@@ -38,7 +38,8 @@ public abstract class XNode extends Item {
   static final QNm XML_BASE = new QNm(QueryText.BASE, QueryText.XML_URI);
   /** Node Types. */
   private static final NodeType[] TYPES = {
-    DOCUMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PROCESSING_INSTRUCTION
+    NodeType.DOCUMENT, NodeType.ELEMENT, NodeType.TEXT, NodeType.ATTRIBUTE,
+    NodeType.COMMENT, NodeType.PROCESSING_INSTRUCTION
   };
   /** Static node counter. */
   private static final AtomicInteger ID = new AtomicInteger();
@@ -110,13 +111,15 @@ public abstract class XNode extends Item {
 
   @Override
   public final boolean deepEqual(final Item item, final DeepEqual deep) throws QueryException {
-    final Type type1 = type, type2 = item.type;
-    if(type1 != type2) return false;
-    final XNode node1 = this, node2 = (XNode) item;
+    if(!(item instanceof final XNode node2)) return false;
+
+    final Kind kind1 = kind(), kind2 = node2.kind();
+    if(kind1 != kind2) return false;
+    final XNode node1 = this;
     if(node1.is(node2)) return true;
 
     QNm name1 = node1.qname(), name2 = node2.qname();
-    if(type1 == NAMESPACE) return name1.eq(name2) && Token.eq(node1.string(), node2.string());
+    if(kind1 == NAMESPACE) return name1.eq(name2) && Token.eq(node1.string(), node2.string());
 
     // compare names
     final DeepEqualOptions options = deep.options;
@@ -124,7 +127,7 @@ public abstract class XNode extends Item {
         options.get(NAMESPACE_PREFIXES) && !Token.eq(name1.prefix(), name2.prefix())
     )) return false;
     // compare values
-    if(type1.oneOf(TEXT, COMMENT, PROCESSING_INSTRUCTION, ATTRIBUTE) &&
+    if(kind1.oneOf(TEXT, COMMENT, PROCESSING_INSTRUCTION, ATTRIBUTE) &&
         !Token.eq(node1.string(), node2.string(), deep)) return false;
     // compare base URIs
     if(options.get(BASE_URI)) {
@@ -133,7 +136,7 @@ public abstract class XNode extends Item {
       final Uri uri2 = node2.baseURI(Uri.EMPTY, true, deep.info);
       if(!uri1.eq(uri2)) return false;
     }
-    if(type1 == ELEMENT) {
+    if(kind1 == ELEMENT) {
       // compare attributes
       final BasicNodeIter iter1 = node1.attributeIter();
       BasicNodeIter iter2 = node2.attributeIter();
@@ -162,7 +165,7 @@ public abstract class XNode extends Item {
         final Atts atts2 = deep.nested ? node2.namespaces() : node2.nsScope(null);
         if(!atts1.equals(atts2)) return false;
       }
-    } else if(type1 != DOCUMENT) {
+    } else if(kind1 != DOCUMENT) {
       return true;
     }
 
@@ -170,17 +173,17 @@ public abstract class XNode extends Item {
       final ANodeList nl = new ANodeList();
       for(final XNode child : node.childIter()) {
         if(deep.qc != null) deep.qc.checkStop();
-        final Type tp = child.type;
-        if((tp != PROCESSING_INSTRUCTION || options.get(PROCESSING_INSTRUCTIONS)) &&
-            (tp != COMMENT || options.get(COMMENTS))) {
-          nl.add(tp != TEXT || nl.isEmpty() || nl.peek().type != NodeType.TEXT ? child :
+        final Kind kind = child.kind();
+        if((kind != PROCESSING_INSTRUCTION || options.get(PROCESSING_INSTRUCTIONS)) &&
+            (kind != COMMENT || options.get(COMMENTS))) {
+          nl.add(kind != TEXT || nl.isEmpty() || nl.peek().kind() != TEXT ? child :
             new FTxt(Token.concat(nl.pop().string(), child.string())));
         }
       }
       if(options.get(WHITESPACE) != Whitespace.PRESERVE && !preserve()) {
         for(int n = nl.size() - 1; n >= 0; n--) {
           final XNode child = nl.get(n);
-          if(child.type == TEXT && Token.ws(child.string())) nl.remove(n);
+          if(child.kind() == TEXT && Token.ws(child.string())) nl.remove(n);
         }
       }
       return nl;
@@ -223,7 +226,7 @@ public abstract class XNode extends Item {
   private boolean preserve() {
     final QNm xs = new QNm(XMLToken.XML_SPACE, QueryText.XML_URI);
     for(XNode node = this; node != null; node = node.parent()) {
-      if(node.type == ELEMENT) {
+      if(node.kind() == ELEMENT) {
         final byte[] v = node.attribute(xs);
         if(v != null) return Token.eq(v, XMLToken.PRESERVE);
       }
@@ -238,7 +241,7 @@ public abstract class XNode extends Item {
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) {
-    return type.oneOf(PROCESSING_INSTRUCTION, COMMENT) ? Str.get(string()) : Atm.get(string());
+    return kind().oneOf(PROCESSING_INSTRUCTION, COMMENT) ? Str.get(string()) : Atm.get(string());
   }
 
   @Override
@@ -356,7 +359,7 @@ public abstract class XNode extends Item {
   public final Uri baseURI(final Uri base, final boolean empty, final InputInfo info)
       throws QueryException {
 
-    if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT) && parent() == null) {
+    if(!kind().oneOf(ELEMENT, DOCUMENT) && parent() == null) {
       return empty ? Uri.EMPTY : null;
     }
     Uri uri = Uri.EMPTY;
@@ -365,7 +368,7 @@ public abstract class XNode extends Item {
       final Uri bu = Uri.get(nd.baseURI(), false);
       if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
       uri = bu.resolve(uri, info);
-      if(nd.type == NodeType.DOCUMENT && nd instanceof DBNode) break;
+      if(nd.kind() == DOCUMENT && nd instanceof DBNode) break;
       nd = nd.parent();
     } while(!uri.isAbsolute() && nd != null);
     return nd == null || uri == Uri.EMPTY ? base.resolve(uri, info) : uri;
@@ -547,7 +550,7 @@ public abstract class XNode extends Item {
           XNode node = XNode.this, root = node.parent();
           while(root != null) {
             final BasicNodeIter ir = root.childIter();
-            if(node.type != ATTRIBUTE) {
+            if(node.kind() != ATTRIBUTE) {
               for(final XNode nd : ir) {
                 if(nd.is(node)) break;
               }
@@ -573,7 +576,7 @@ public abstract class XNode extends Item {
    */
   public BasicNodeIter followingSiblingIter(final boolean self) {
     final XNode root = parent();
-    if(root == null || type == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
+    if(root == null || kind() == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
 
     return new BasicNodeIter() {
       private final BasicNodeIter iter = root.childIter();
@@ -625,7 +628,7 @@ public abstract class XNode extends Item {
           if(self) list.add(XNode.this);
           XNode node = XNode.this, root = node.parent();
           while(root != null) {
-            if(node.type != ATTRIBUTE) {
+            if(node.kind() != ATTRIBUTE) {
               final ANodeList lst = new ANodeList();
               for(final XNode ch : root.childIter()) {
                 if(ch.is(node)) break;
@@ -651,7 +654,7 @@ public abstract class XNode extends Item {
    */
   public final BasicNodeIter precedingSiblingIter(final boolean self) {
     final XNode root = parent();
-    if(root == null || type == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
+    if(root == null || kind() == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
 
     return new BasicNodeIter() {
       private ANodeList list;
@@ -703,6 +706,14 @@ public abstract class XNode extends Item {
   }
 
   /**
+   * Returns the node kind.
+   * @return node kind
+   */
+  public Kind kind() {
+    return ((NodeType) type).kind;
+  }
+
+  /**
    * Returns the numeric database node kind.
    * @return node kind
    */
@@ -716,7 +727,7 @@ public abstract class XNode extends Item {
    * @return node kind, or {@code -1} if no corresponding database kind exists
    */
   public static int dbKind(final NodeType type) {
-    return switch(type) {
+    return switch(type.kind) {
       case DOCUMENT -> Data.DOC;
       case ELEMENT -> Data.ELEM;
       case TEXT -> Data.TEXT;

@@ -25,7 +25,8 @@ public final class NamePool {
    * @param type node type
    */
   public void add(final QNm name, final NodeType type) {
-    final boolean elem = type == NodeType.ELEMENT, attr = type == NodeType.ATTRIBUTE;
+    final Kind kind = type.kind;
+    final boolean elem = kind == Kind.ELEMENT, attr = kind == Kind.ATTRIBUTE;
     if(elem || attr) {
       final int i = index(name, attr);
       cache[i].add++;
@@ -37,8 +38,8 @@ public final class NamePool {
    * @param node node
    */
   public void remove(final XNode node) {
-    final Type type = node.type;
-    final boolean elem = type == NodeType.ELEMENT, attr = type == NodeType.ATTRIBUTE;
+    final Kind kind = node.kind();
+    final boolean elem = kind == Kind.ELEMENT, attr = kind == Kind.ATTRIBUTE;
     if(elem || attr) {
       final int i = index(node.qname(), attr);
       cache[i].del = true;

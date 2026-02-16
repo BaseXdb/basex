@@ -49,7 +49,7 @@ abstract class DbNew extends DbAccessFn {
         if(name.isEmpty()) throw DB_PATH_X.get(info, name);
       }
 
-      if(node.type == NodeType.ATTRIBUTE) throw UPDOCTYPE_X.get(info, node);
+      if(node.kind() == Kind.ATTRIBUTE) throw UPDOCTYPE_X.get(info, node);
       ni.node = node;
       ni.path = name;
       return ni;

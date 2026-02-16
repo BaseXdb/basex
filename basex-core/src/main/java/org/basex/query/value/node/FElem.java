@@ -233,7 +233,7 @@ public final class FElem extends FNode {
     if(hasChildren()) {
       tb.add('>');
       final XNode child = children[0];
-      if(child.type == NodeType.TEXT && children.length == 1) {
+      if(child.kind() == Kind.TEXT && children.length == 1) {
         tb.add(QueryString.toValue(child.string()));
       } else {
         tb.add(DOTS);

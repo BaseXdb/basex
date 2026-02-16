@@ -239,9 +239,9 @@ public abstract class Step extends Preds {
 
     // skip processing instructions
     final NodeType type = test.type;
-    if(type == NodeType.PROCESSING_INSTRUCTION) return null;
+    if(type.kind == Kind.PROCESSING_INSTRUCTION) return null;
 
-    final Names names = type == NodeType.ATTRIBUTE ? data.attrNames : data.elemNames;
+    final Names names = type.kind == Kind.ATTRIBUTE ? data.attrNames : data.elemNames;
     final int kind = XNode.dbKind(test.type);
     final ArrayList<PathNode> tmp = new ArrayList<>();
     final Predicate<Test> addNodes = t -> {
@@ -298,21 +298,21 @@ public abstract class Step extends Preds {
    * @return {@code true} if steps will never yield results
    */
   private boolean noMatches() {
-    final NodeType type = test.type;
-    if(type.oneOf(NodeType.NODE, NodeType.SCHEMA_ATTRIBUTE, NodeType.SCHEMA_ELEMENT)) return false;
+    final Kind kind = test.type.kind;
+    if(kind == Kind.NODE) return false;
 
     return switch(axis) {
       // attribute::element()
       case ATTRIBUTE ->
-        type != NodeType.ATTRIBUTE;
+        kind != Kind.ATTRIBUTE;
       // parent::comment()
       case ANCESTOR, PARENT ->
-        isLeaf(type);
+        isLeaf(test.type);
       // child::attribute()
       case CHILD, DESCENDANT, FOLLOWING, FOLLOWING_OR_SELF, FOLLOWING_SIBLING,
            FOLLOWING_SIBLING_OR_SELF, PRECEDING, PRECEDING_OR_SELF, PRECEDING_SIBLING,
            PRECEDING_SIBLING_OR_SELF ->
-        type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT, NodeType.NAMESPACE);
+        kind.oneOf(Kind.ATTRIBUTE, Kind.DOCUMENT, Kind.NAMESPACE);
       default ->
         false;
     };
@@ -327,15 +327,15 @@ public abstract class Step extends Preds {
     if(!(seqType.type instanceof final NodeType nt)) return false;
 
     // checks steps on document nodes
-    final NodeType type = test.type;
-    if(nt.instanceOf(NodeType.DOCUMENT) && switch(axis) {
+    final Kind kind = test.type.kind;
+    if(nt.kind == Kind.DOCUMENT && switch(axis) {
       case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
            PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
-        !type.oneOf(NodeType.NODE, NodeType.DOCUMENT);
+        !kind.oneOf(Kind.NODE, Kind.DOCUMENT);
       case CHILD, DESCENDANT ->
-        type.oneOf(NodeType.DOCUMENT, NodeType.ATTRIBUTE);
+        kind.oneOf(Kind.DOCUMENT, Kind.ATTRIBUTE);
       case DESCENDANT_OR_SELF ->
-        type == NodeType.ATTRIBUTE;
+        kind == Kind.ATTRIBUTE;
       default ->
         true;
     }) return true;
@@ -350,13 +350,13 @@ public abstract class Step extends Preds {
         isLeaf(nt);
       // $text/descendant-or-self::text(), ...
       case DESCENDANT_OR_SELF ->
-        isLeaf(nt) && type != NodeType.NODE && !type.instanceOf(nt);
+        isLeaf(nt) && kind != Kind.NODE && !test.type.instanceOf(nt);
       // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING, PRECEDING_SIBLING ->
-        nt == NodeType.ATTRIBUTE;
+        nt.kind == Kind.ATTRIBUTE;
       // $attribute/parent::document-node()
       case PARENT ->
-        nt == NodeType.ATTRIBUTE && type == NodeType.DOCUMENT;
+        nt.kind == Kind.ATTRIBUTE && kind == Kind.DOCUMENT;
       default ->
         false;
     };
@@ -419,8 +419,8 @@ public abstract class Step extends Preds {
    * @return result of check
    */
   private boolean isLeaf(final Type type) {
-    return type instanceof final NodeType nt && nt.oneOf(NodeType.ATTRIBUTE, NodeType.COMMENT,
-        NodeType.NAMESPACE, NodeType.PROCESSING_INSTRUCTION, NodeType.TEXT);
+    return type instanceof final NodeType nt && nt.kind.oneOf(Kind.ATTRIBUTE, Kind.COMMENT,
+      Kind.NAMESPACE, Kind.PROCESSING_INSTRUCTION, Kind.TEXT);
   }
 
 
@@ -458,7 +458,7 @@ public abstract class Step extends Preds {
         if(axis == ATTRIBUTE && type instanceof NameTest)
           return tb.add('@').add(type.toString(false));
         if(axis != CHILD) tb.add(axis).add("::");
-        return tb.add(type.toString(test.type == NodeType.ATTRIBUTE));
+        return tb.add(type.toString(test.type.kind == Kind.ATTRIBUTE));
       };
       if(test instanceof final UnionTest ut) {
         tb.add('(');

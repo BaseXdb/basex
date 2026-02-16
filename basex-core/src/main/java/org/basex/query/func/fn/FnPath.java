@@ -52,30 +52,32 @@ public final class FnPath extends ContextFn {
     while(true) {
       final XNode parent = node.parent();
       final NodeType type = (NodeType) node.type;
+      final Kind kind = type.kind;
       if(parent == null) {
-        if(type != NodeType.DOCUMENT) {
+        if(kind != Kind.DOCUMENT) {
           tb.add(name(Function.ROOT.definition().name, false, lexical, namespaces, qc)).add("()");
         }
         break;
       }
       // step: name/type
       final QNm qname = node.qname();
-      if(type == NodeType.ATTRIBUTE) {
+      if(kind == Kind.ATTRIBUTE) {
         tb.add('@').add(name(qname, true, lexical, namespaces, qc));
-      } else if(type == NodeType.ELEMENT) {
+      } else if(kind == Kind.ELEMENT) {
         tb.add(name(qname, false, lexical, namespaces, qc));
-      } else if(type == NodeType.PROCESSING_INSTRUCTION) {
+      } else if(kind == Kind.PROCESSING_INSTRUCTION) {
         tb.add(type.toString(Token.string(qname.local())));
-      } else if(type.oneOf(NodeType.COMMENT, NodeType.TEXT)) {
+      } else if(kind.oneOf(Kind.COMMENT, Kind.TEXT)) {
         tb.add(type.toString());
       }
       // optional index
-      if(indexes && type != NodeType.ATTRIBUTE) {
+      if(indexes && kind != Kind.ATTRIBUTE) {
         int p = 1;
         for(final XNode nd : node.precedingSiblingIter(false)) {
           qc.checkStop();
-          if(nd.type == type && (type.oneOf(NodeType.COMMENT, NodeType.TEXT) ||
-              nd.qname().eq(qname))) p++;
+          if(nd.kind() == kind && (kind.oneOf(Kind.COMMENT, Kind.TEXT) || nd.qname().eq(qname))) {
+            p++;
+          }
         }
         tb.add('[').addInt(p).add(']');
       }

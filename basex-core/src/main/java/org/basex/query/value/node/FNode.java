@@ -77,7 +77,7 @@ public abstract class FNode extends XNode {
 
     final TokenBuilder tb = new TokenBuilder();
     for(final XNode node : nodes) {
-      if(node.type.oneOf(NodeType.ELEMENT, NodeType.TEXT)) tb.add(node.string());
+      if(node.kind().oneOf(Kind.ELEMENT, Kind.TEXT)) tb.add(node.string());
     }
     return tb.finish();
   }

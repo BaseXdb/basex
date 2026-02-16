@@ -2322,10 +2322,10 @@ public class QueryParser extends InputParser {
 
       if(axis == null) {
         axis = Axis.CHILD;
-        final ExprInfo ei = simpleNodeTest(NodeType.ELEMENT, true);
+        final ExprInfo ei = simpleNodeTest(Kind.ELEMENT, true);
         if(ei == NodeTest.NAMESPACE_NODE) throw error(NSAXIS);
         if(ei instanceof final Test tst) {
-          if(tst.type == NodeType.ATTRIBUTE) axis = Axis.ATTRIBUTE;
+          if(tst.type.kind == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
           checkTest(tst, axis != Axis.ATTRIBUTE);
         }
         if(ei != null) list.add(ei);
@@ -2378,7 +2378,7 @@ public class QueryParser extends InputParser {
     final ArrayList<Test> tests = new ArrayList<>(1);
     final QueryPredicate<Expr> add = e -> {
       final boolean element = axis != Axis.ATTRIBUTE;
-      final ExprInfo ei = simpleNodeTest(element ? NodeType.ELEMENT : NodeType.ATTRIBUTE, true);
+      final ExprInfo ei = simpleNodeTest(element ? Kind.ELEMENT : Kind.ATTRIBUTE, true);
       if(ei == null) return false;
       if(ei instanceof final Test test) {
         checkTest(test, element);
@@ -2405,12 +2405,13 @@ public class QueryParser extends InputParser {
    * Parses the "SimpleNodeTest" rule.
    * Parses the "NameTest" rule.
    * Parses the "KindTest" rule.
-   * @param type node type (either {@link NodeType#ELEMENT} or {@link NodeType#ATTRIBUTE})
+   * @param kind node kind (either {@link Kind#ELEMENT} or {@link Kind#ATTRIBUTE})
    * @param all check all tests, or only names
    * @return node test, get() expression (if {@code all} is true), or {@code null}
    * @throws QueryException query exception
    */
-  private ExprInfo simpleNodeTest(final NodeType type, final boolean all) throws QueryException {
+  private ExprInfo simpleNodeTest(final Kind kind, final boolean all) throws QueryException {
+    final NodeType type = NodeType.get(kind);
     int p = pos;
     if(consume('*')) {
       p = pos;
@@ -2436,11 +2437,11 @@ public class QueryParser extends InputParser {
     if(name != null) {
       p = pos;
       if(all && wsConsumeWs("(")) {
-        NodeType nt = NodeType.get(name);
-        if(nt != null) {
+        final Kind kn = Kind.get(name);
+        if(kn != null) {
           // kind test
-          final Test test = kindTest(nt);
-          return test == null ? NodeTest.get(nt) : test;
+          final Test test = kindTest(kn);
+          return test != null ? test : NodeTest.get(NodeType.get(kn));
         }
         if(name.eq(new QNm(GET))) {
           // dynamic name test
@@ -2457,7 +2458,7 @@ public class QueryParser extends InputParser {
           scope = NameTest.Scope.URI;
         }
         // name test: prefix:name, name, Q{uri}name
-        qnames.add(name, type == NodeType.ELEMENT, ii);
+        qnames.add(name, kind == Kind.ELEMENT, ii);
         return new NameTest(name, scope, type, sc.elemNS);
       }
     }
@@ -3527,17 +3528,19 @@ public class QueryParser extends InputParser {
       type = FuncType.get(name);
       if(type != null) return functionTest(anns, type).seqType();
       // node type
-      type = NodeType.get(name);
-      if(type != null) {
-        // extended node type
-        if(!wsConsume(")")) st = SeqType.get(kindTest((NodeType) type));
+      final Kind kind = Kind.get(name);
+      if(kind != null) {
+        // node type
+        if(wsConsume(")")) type = NodeType.get(kind);
+        else st = SeqType.get(kindTest(kind));
       } else if(name.eq(BasicType.ITEM.qname())) {
         // item type
         type = BasicType.ITEM;
         wsCheck(")");
+      } else {
+        // no type found
+        throw error(WHICHTYPE_X, Type.similar(name));
       }
-      // no type found
-      if(type == null) throw error(WHICHTYPE_X, Type.similar(name));
     } else {
       // attach default element namespace
       if(!name.hasURI()) name.uri(sc.elemNS);
@@ -3633,14 +3636,14 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "KindTest" rule without the type name and the opening bracket.
-   * @param type type
+   * @param kind node kind
    * @return test or {@code null}
    * @throws QueryException query exception
    */
-  private Test kindTest(final NodeType type) throws QueryException {
-    final Test tp = switch(type) {
+  private Test kindTest(final Kind kind) throws QueryException {
+    final Test tp = switch(kind) {
       case DOCUMENT -> documentTest();
-      case ELEMENT, ATTRIBUTE -> elemAttrTest(type);
+      case ELEMENT, ATTRIBUTE -> elemAttrTest(kind);
       case PROCESSING_INSTRUCTION -> piTest();
       case SCHEMA_ELEMENT, SCHEMA_ATTRIBUTE -> schemaTest();
       default -> null;
@@ -3660,10 +3663,10 @@ public class QueryParser extends InputParser {
     if(element || schema) {
       wsCheck("(");
       skipWs();
-      test = element ? elemAttrTest(NodeType.ELEMENT) : schemaTest();
+      test = element ? elemAttrTest(Kind.ELEMENT) : schemaTest();
       wsCheck(")");
     } else {
-      test = Test.get(nameTestUnion(NodeType.ELEMENT));
+      test = Test.get(nameTestUnion(Kind.ELEMENT));
       if(test == null) return null;
     }
     return new DocTest(test != null ? test : NodeTest.ELEMENT);
@@ -3681,12 +3684,12 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "ElementTest" and "AttributeTest" rule without the leading keyword and brackets.
    * Parses the "TypeName" rule.
-   * @param type node type
+   * @param kind node kind
    * @return test or {@code null}
    * @throws QueryException query exception
    */
-  private Test elemAttrTest(final NodeType type) throws QueryException {
-    final ArrayList<Test> tests = nameTestUnion(type);
+  private Test elemAttrTest(final Kind kind) throws QueryException {
+    final ArrayList<Test> tests = nameTestUnion(kind);
     if(tests.isEmpty()) return null;
 
     if(wsConsumeWs(",")) {
@@ -3695,8 +3698,8 @@ public class QueryParser extends InputParser {
       if(ann == null) ann = BasicType.get(name, true);
       if(ann == null) throw error(TYPEUNDEF_X, BasicType.similar(name));
       // parse (and ignore) optional question mark
-      if(type == NodeType.ELEMENT) wsConsume("?");
-      if(!ann.oneOf(BasicType.ANY_TYPE, BasicType.UNTYPED) && (type == NodeType.ELEMENT ||
+      if(kind == Kind.ELEMENT) wsConsume("?");
+      if(!ann.oneOf(BasicType.ANY_TYPE, BasicType.UNTYPED) && (kind == Kind.ELEMENT ||
          !ann.oneOf(BasicType.ANY_SIMPLE_TYPE, BasicType.ANY_ATOMIC_TYPE,
              BasicType.UNTYPED_ATOMIC))) {
         throw error(STATIC_X, ann);
@@ -3782,7 +3785,7 @@ public class QueryParser extends InputParser {
 
     Catch[] catches = { };
     while(wsConsume(CATCH)) {
-      final ArrayList<Test> tests = nameTestUnion(NodeType.ELEMENT);
+      final ArrayList<Test> tests = nameTestUnion(Kind.ELEMENT);
       if(tests.isEmpty()) throw error(NOCATCH);
 
       final int s = localVars.openScope();
@@ -3803,17 +3806,17 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "NameTestUnion" rule.
-   * @param type node type
+   * @param kind node kind
    * @return name tests or {@code null}
    * @throws QueryException query exception
    */
-  private ArrayList<Test> nameTestUnion(final NodeType type) throws QueryException {
+  private ArrayList<Test> nameTestUnion(final Kind kind) throws QueryException {
     final ArrayList<Test> tests = new ArrayList<>();
     Test test;
     final int p = pos;
     do {
       skipWs();
-      test = (Test) simpleNodeTest(type, false);
+      test = (Test) simpleNodeTest(kind, false);
       if(test == null) break;
       tests.add(test);
     } while(wsConsume("|"));

@@ -46,12 +46,12 @@ public final class JsonBasicSerializer extends JsonSerializer {
     if(level > 0) indent();
 
     final BasicNodeIter iter = node.childIter();
-    final Type type = node.type;
-    if(type == NodeType.DOCUMENT) {
+    final Kind kind = node.kind();
+    if(kind == Kind.DOCUMENT) {
       for(XNode child; (child = iter.next()) != null;) {
         node(child);
       }
-    } else if(type == NodeType.ELEMENT) {
+    } else if(kind == Kind.ELEMENT) {
       final QNm name = node.qname();
       final byte[] local = name.local();
       if(!eq(name.uri(), QueryText.FN_URI))
@@ -93,7 +93,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
       if(eq(local, NULL)) {
         out.print(NULL);
         for(XNode n; (n = iter.next()) != null;) {
-          if(!n.type.oneOf(NodeType.COMMENT, NodeType.PROCESSING_INSTRUCTION))
+          if(!n.kind().oneOf(Kind.COMMENT, Kind.PROCESSING_INSTRUCTION))
             throw error("Element '%' must have no children.", local);
         }
       } else if(eq(local, BOOLEAN)) {
@@ -213,12 +213,12 @@ public final class JsonBasicSerializer extends JsonSerializer {
     level++;
     boolean comma = false;
     for(XNode child; (child = iter.next()) != null;) {
-      final Type type = child.type;
-      if(type == NodeType.ELEMENT) {
+      final Kind kind = child.kind();
+      if(kind == Kind.ELEMENT) {
         if(comma) out.print(',');
         node(child);
         comma = true;
-      } else if(type == NodeType.TEXT && !ws(child.string())) {
+      } else if(kind == Kind.TEXT && !ws(child.string())) {
         throw error("Element '%' must have no text nodes.", child.name());
       }
     }
@@ -238,11 +238,11 @@ public final class JsonBasicSerializer extends JsonSerializer {
   private static byte[] value(final BasicNodeIter iter, final byte[] type) throws QueryIOException {
     TokenBuilder tb = null;
     for(XNode child; (child = iter.next()) != null;) {
-      final Type tp = child.type;
-      if(tp == NodeType.TEXT) {
+      final Kind kind = child.kind();
+      if(kind == Kind.TEXT) {
         if(tb == null) tb = new TokenBuilder();
         tb.add(child.string());
-      } else if(tp == NodeType.ELEMENT) {
+      } else if(kind == Kind.ELEMENT) {
         throw error("Element '%' must have no child elements.", type);
       }
     }

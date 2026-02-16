@@ -59,12 +59,12 @@ public final class Insert extends Update {
         throw (sibling ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
 
       final XNode parent = node.parent();
-      final Type type = item.type;
+      final Kind kind = node.kind();
       if(sibling) {
-        if(type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT)) throw UPTRGTYP2_X.get(info, node);
+        if(kind.oneOf(Kind.ATTRIBUTE, Kind.DOCUMENT)) throw UPTRGTYP2_X.get(info, node);
         if(parent == null) throw UPPAREMPTY_X.get(info, node);
       } else {
-        if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT)) throw UPTRGTYP_X.get(info, node);
+        if(!kind.oneOf(Kind.ELEMENT, Kind.DOCUMENT)) throw UPTRGTYP_X.get(info, node);
       }
 
       if(builder == null) builder = builder(arg(1), qc);
@@ -74,7 +74,7 @@ public final class Insert extends Update {
       ANodeList list = builder.attributes;
       if(list != null) {
         final XNode target = sibling ? parent : node;
-        if(target.type != NodeType.ELEMENT)
+        if(target.kind() != Kind.ELEMENT)
           throw (sibling ? UPATTELM_X : UPATTELM2_X).get(info, target);
 
         final DBNode dbnode = updates.determineDataRef(target, qc);

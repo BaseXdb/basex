@@ -527,24 +527,24 @@ public abstract class Serializer implements Closeable {
    * @throws IOException I/O exception
    */
   private void node(final FNode node) throws IOException {
-    final Type type = node.type;
-    if(type == NodeType.COMMENT) {
+    final Kind kind = node.kind();
+    if(kind == Kind.COMMENT) {
       prepareComment(node.string());
-    } else if(type == NodeType.TEXT) {
+    } else if(kind == Kind.TEXT) {
       prepareText(node.string(), null);
-    } else if(type == NodeType.PROCESSING_INSTRUCTION) {
+    } else if(kind == Kind.PROCESSING_INSTRUCTION) {
       preparePi(node.name(), node.string());
-    } else if(type == NodeType.ATTRIBUTE) {
+    } else if(kind == Kind.ATTRIBUTE) {
       attribute(node.name(), node.string(), true);
-    } else if(type == NodeType.NAMESPACE) {
+    } else if(kind == Kind.NAMESPACE) {
       namespace(node.name(), node.string(), true);
-    } else if(type == NodeType.DOCUMENT) {
+    } else if(kind == Kind.DOCUMENT) {
       openDoc(node.baseURI());
       int roots = 0;
       for(final XNode nd : node.childIter()) {
         node(nd);
         if(canonical) {
-          if(nd.type == NodeType.ELEMENT && ++roots > 1) throw SERCANONROOTS_X.getIO(node);
+          if(nd.kind() == Kind.ELEMENT && ++roots > 1) throw SERCANONROOTS_X.getIO(node);
           indent = true;
         }
       }

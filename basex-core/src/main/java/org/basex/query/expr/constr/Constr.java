@@ -100,11 +100,11 @@ public final class Constr {
 
     if(item instanceof final XNode node) {
       // type: nodes
-      final Type type = item.type;
-      if(type == NodeType.TEXT) {
+      final Kind kind = node.kind();
+      if(kind == Kind.TEXT) {
         // type: text node
         text.add(node.string());
-      } else if(type == NodeType.ATTRIBUTE) {
+      } else if(kind == Kind.ATTRIBUTE) {
         // type: attribute node
 
         // check if attribute is specified after texts or child nodes
@@ -122,7 +122,7 @@ public final class Constr {
         builder.add(name, qc.shared.token(node.string()));
         // add new namespace
         if(name.hasURI()) info.sc().ns.add(name.prefix(), name.uri());
-      } else if(type == NodeType.NAMESPACE) {
+      } else if(kind == Kind.NAMESPACE) {
         // type: namespace node
 
         // no attribute allowed after texts or child nodes
@@ -141,7 +141,7 @@ public final class Constr {
           duplNS = name;
           return false;
         }
-      } else if(type == NodeType.DOCUMENT) {
+      } else if(kind == Kind.DOCUMENT) {
         // type: document node
 
         final BasicNodeIter iter = node.childIter();

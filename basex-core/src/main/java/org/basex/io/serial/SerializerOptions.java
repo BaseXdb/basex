@@ -243,7 +243,7 @@ public final class SerializerOptions extends Options {
       if(root != null) assign(root, info);
 
       for(final XNode child : root.childIter()) {
-        if(child.type != NodeType.ELEMENT) continue;
+        if(child.kind() != Kind.ELEMENT) continue;
         if(option(string(child.qname().local())) == USE_CHARACTER_MAPS) {
           set(USE_CHARACTER_MAPS, characterMap(child, info));
         }
@@ -291,7 +291,7 @@ public final class SerializerOptions extends Options {
 
     final TokenObjectMap<byte[]> map = new TokenObjectMap<>();
     for(final XNode child : elem.childIter()) {
-      if(child.type != NodeType.ELEMENT) continue;
+      if(child.kind() != Kind.ELEMENT) continue;
       final byte[] name = child.qname().local();
       if(eq(name, CHARACTER_MAP)) {
         byte[] key = null, val = null;
@@ -337,7 +337,7 @@ public final class SerializerOptions extends Options {
     final StringBuilder sb = new StringBuilder();
     // interpret options
     for(final XNode child : node.childIter()) {
-      if(child.type != NodeType.ELEMENT) continue;
+      if(child.kind() != Kind.ELEMENT) continue;
 
       // ignore elements in other namespace
       final QNm qname = child.qname();
@@ -400,7 +400,7 @@ public final class SerializerOptions extends Options {
    */
   private static boolean hasElements(final XNode node) {
     for(final XNode nd : node.childIter()) {
-      if(nd.type == NodeType.ELEMENT) return true;
+      if(nd.kind() == Kind.ELEMENT) return true;
     }
     return false;
   }

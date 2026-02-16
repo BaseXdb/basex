@@ -91,7 +91,7 @@ public final class Thesaurus {
   private static ANodeList elements(final XNode node, final byte[] name, final boolean desc) {
     final ANodeList list = new ANodeList();
     for(final XNode element : desc ? node.descendantIter(false) : node.childIter()) {
-      if(element.type == NodeType.ELEMENT && eq(element.qname().local(), name))
+      if(element.kind() == Kind.ELEMENT && eq(element.qname().local(), name))
         list.add(element);
     }
     return list;

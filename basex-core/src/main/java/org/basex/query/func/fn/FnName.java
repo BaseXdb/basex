@@ -16,7 +16,7 @@ public class FnName extends FnNodeName {
   @Override
   public final Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XNode node = toNodeOrNull(context(qc), qc);
-    return node == null || empty(node.type) ? Str.EMPTY : Str.get(name(node));
+    return node == null || empty(node.kind()) ? Str.EMPTY : Str.get(name(node));
   }
 
   @Override

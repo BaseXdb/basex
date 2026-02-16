@@ -135,7 +135,7 @@ public final class PkgParser {
       public XNode next() {
         while(true) {
           final XNode nd = iter.next();
-          if(nd == null || nd.type == NodeType.ELEMENT) return nd;
+          if(nd == null || nd.kind() == Kind.ELEMENT) return nd;
         }
       }
     };

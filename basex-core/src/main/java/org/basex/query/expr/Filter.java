@@ -73,7 +73,8 @@ public abstract class Filter extends AFilter {
 
       // rewrite filter with document nodes to path to possibly enable index rewritings
       // example: db:get('db')[.//text() = 'x'] → db:get('db')/.[.//text() = 'x']
-      if(root.seqType().type == NodeType.DOCUMENT && root.ddo()) {
+      if(root.seqType().type instanceof final NodeType nt && nt.kind == Kind.DOCUMENT &&
+          root.ddo()) {
         final Expr step = Step.self(cc, root, info, exprs);
         return cc.replaceWith(this, Path.get(cc, info, root, step));
       }

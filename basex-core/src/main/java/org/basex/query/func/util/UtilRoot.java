@@ -25,13 +25,13 @@ public final class UtilRoot extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Value nodes = arg(0).value(qc);
-    if(nodes.seqType().type == NodeType.DOCUMENT) return nodes;
+    if(nodes.seqType().type instanceof final NodeType nt && nt.kind == Kind.DOCUMENT) return nodes;
 
     final Iter iter = nodes.iter();
     final ANodeBuilder list = new ANodeBuilder();
     for(Item item; (item = qc.next(iter)) != null;) {
       final XNode root = item instanceof final XNode node ? node.root() : null;
-      if(root == null || root.type != NodeType.DOCUMENT) throw NODOC_X.get(info, nodes);
+      if(root == null || root.kind() != Kind.DOCUMENT) throw NODOC_X.get(info, nodes);
       list.add(root);
     }
     return list.value(this);

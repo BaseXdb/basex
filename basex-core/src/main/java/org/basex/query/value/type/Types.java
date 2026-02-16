@@ -246,7 +246,7 @@ public final class Types {
 
   static {
     for(final BasicType type : BasicType.values()) TYPES[type.index()] = type;
-    for(final NodeType type : NodeType.values()) TYPES[type.index()] = type;
+    for(final NodeType type : NodeType.TYPES.values()) TYPES[type.index()] = type;
     TYPES[Type.ID.FUN.asByte()] = FUNCTION;
     TYPES[Type.ID.MAP.asByte()] = MAP;
     TYPES[Type.ID.ARRAY.asByte()] = ARRAY;

@@ -39,7 +39,7 @@ public final class XMLAccess {
       @Override
       public XNode next() {
         for(XNode child; (child = children.next()) != null;) {
-          if(child.type == NodeType.ELEMENT && (name == null || name.eq(child.qname())))
+          if(child.kind() == Kind.ELEMENT && (name == null || name.eq(child.qname())))
             return child;
         }
         return null;

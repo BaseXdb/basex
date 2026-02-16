@@ -4,159 +4,65 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.regex.*;
 
-import org.basex.api.dom.*;
-import org.basex.build.*;
-import org.basex.build.xml.*;
-import org.basex.core.*;
-import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
-import org.w3c.dom.*;
-import org.w3c.dom.Text;
 
 /**
  * XDM node types.
  *
  * @author BaseX Team, BSD License
- * @author Leo Woerteler
+ * @author Christian Gruen
  */
-public enum NodeType implements Type {
-  /** Node type. */
-  NODE("node", ID.NOD),
-
-  /** Text type. */
-  TEXT("text", ID.TXT) {
-    @Override
-    public XNode cast(final Object value, final QueryContext qc, final InputInfo info) {
-      if(value instanceof final BXText text) return text.getNode();
-      if(value instanceof final Text text) return new FTxt(text);
-      return new FTxt(Token.token(value));
-    }
-  },
-
-  /** PI type. */
-  PROCESSING_INSTRUCTION("processing-instruction", ID.PI) {
-    @Override
-    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-      if(value instanceof final BXPI pi) return pi.getNode();
-      if(value instanceof final ProcessingInstruction pi) return new FPI(pi);
-      final Matcher m = matcher("<\\?(.*?) (.*)\\?>", value, info);
-      return new FPI(new QNm(m.group(1)), Token.token(m.group(2)));
-    }
-  },
-
-  /** Element type. */
-  ELEMENT("element", ID.ELM) {
-    @Override
-    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
-        throws QueryException {
-      if(value instanceof final BXElem elem)
-        return elem.getNode();
-      if(value instanceof final Element elem)
-        return FElem.build(elem, new TokenObjectMap<>()).finish();
-      try {
-        return new DBNode(new IOContent(Token.token(value))).childIter().next();
-      } catch(final IOException ex) {
-        throw NODEERR_X_X.get(info, this, ex);
-      }
-    }
-  },
-
-  /** Document type. */
-  DOCUMENT("document-node", ID.DOC) {
-    @Override
-    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-      if(value instanceof final BXDoc doc) return doc.getNode();
-      try {
-        if(value instanceof final Document doc) {
-          return new DBNode(MemBuilder.build(new DOMWrapper(doc, "", new MainOptions())));
-        }
-        if(value instanceof final DocumentFragment df) {
-          final String bu = df.getBaseURI();
-          return FDoc.build(bu != null ? bu : "", df).finish();
-        }
-        final byte[] token = Token.token(value);
-        return Token.startsWith(token, '<') ? new DBNode(new IOContent(token)) :
-          FDoc.build().add(token).finish();
-      } catch(final IOException ex) {
-        throw NODEERR_X_X.get(info, this, ex);
-      }
-    }
-  },
-
-  /** Attribute type. */
-  ATTRIBUTE("attribute", ID.ATT) {
-    @Override
-    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-      if(value instanceof final BXAttr attr) return attr.getNode();
-      if(value instanceof final Attr attr) return new FAttr(attr);
-      final Matcher m = matcher(" ?(.*?)=\"(.*)\"", value, info);
-      return new FAttr(new QNm(m.group(1)), Token.token(m.group(2)));
-    }
-  },
-
-  /** Comment type. */
-  COMMENT("comment", ID.COM) {
-    @Override
-    public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
-      throws QueryException {
-      if(value instanceof final BXComm comm) return comm.getNode();
-      if(value instanceof final Comment comm) return new FComm(comm);
-      final Matcher m = matcher("<!--(.*?)-->", value, info);
-      return new FComm(Token.token(m.group(1)));
-    }
-  },
-
-  /** Namespace type. */
-  NAMESPACE("namespace-node", ID.NSP),
-
-  /** Schema-element. */
-  SCHEMA_ELEMENT("schema-element", ID.SCE),
-
-  /** Schema-attribute. */
-  SCHEMA_ATTRIBUTE("schema-attribute", ID.SCA);
-
+public class NodeType implements Type {
   /** Cached types. */
-  private static final TokenObjectMap<NodeType> TYPES = new TokenObjectMap<>();
+  static final EnumMap<Kind, NodeType> TYPES = new EnumMap<>(Kind.class);
 
-  /** Name. */
-  private final byte[] name;
-  /** Type ID . */
-  private final ID id;
+  static {
+    for(final Kind kind : Kind.values()) TYPES.put(kind, new NodeType(kind));
+  }
+
+  /** Node type: node. */
+  public static final NodeType NODE = TYPES.get(Kind.NODE);
+  /** Node type: text. */
+  public static final NodeType TEXT = TYPES.get(Kind.TEXT);
+  /** Node type: processing instruction. */
+  public static final NodeType PROCESSING_INSTRUCTION = TYPES.get(Kind.PROCESSING_INSTRUCTION);
+  /** Node type: element. */
+  public static final NodeType ELEMENT = TYPES.get(Kind.ELEMENT);
+  /** Node type: document. */
+  public static final NodeType DOCUMENT = TYPES.get(Kind.DOCUMENT);
+  /** Node type: attribute. */
+  public static final NodeType ATTRIBUTE = TYPES.get(Kind.ATTRIBUTE);
+  /** Node type: comment. */
+  public static final NodeType COMMENT = TYPES.get(Kind.COMMENT);
+  /** Node type: namespace. */
+  public static final NodeType NAMESPACE = TYPES.get(Kind.NAMESPACE);
+
+  /** Node kind. */
+  public Kind kind;
 
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
 
   /**
    * Constructor.
-   * @param name name
-   * @param id type ID
+   * @param kind node kind
    */
-  NodeType(final String name, final ID id) {
-    this.name = Token.token(name);
-    this.id = id;
-  }
-
-  static {
-    for(final NodeType type : values()) TYPES.put(type.name, type);
+  public NodeType(final Kind kind) {
+    this.kind = kind;
   }
 
   /**
-   * Finds and returns the specified node type.
-   * @param qname name of type
-   * @return type or {@code null}
+   * Returns an instance for the specified kind.
+   * @param kind node kind
+   * @return type
    */
-  public static NodeType get(final QNm qname) {
-    return qname.uri().length == 0 ? TYPES.get(qname.local()) : null;
+  public static NodeType get(final Kind kind) {
+    return TYPES.get(kind);
   }
 
   @Override
@@ -166,7 +72,7 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean isUntyped() {
-    return !oneOf(PROCESSING_INSTRUCTION, COMMENT, NODE);
+    return !kind.oneOf(Kind.PROCESSING_INSTRUCTION, Kind.COMMENT, Kind.NODE);
   }
 
   @Override
@@ -194,7 +100,7 @@ public enum NodeType implements Type {
   @Override
   public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    throw FUNCCAST_X_X.get(info, this, value);
+    return kind.cast(value, info);
   }
 
   @Override
@@ -210,11 +116,11 @@ public enum NodeType implements Type {
   }
 
   /**
-   * Returns the node kind.
+   * Returns a node type description.
    * @return kind
    */
   public final String description() {
-    return Token.string(name).replace("-node", "");
+    return Token.string(kind.name).replace("-node", "");
   }
 
   /**
@@ -222,7 +128,7 @@ public enum NodeType implements Type {
    * @return type
    */
   public final byte[] test() {
-    return name;
+    return kind.name;
   }
 
   @Override
@@ -232,36 +138,50 @@ public enum NodeType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    return type.oneOf(this, NODE, BasicType.ITEM) ||
-      type instanceof final ChoiceItemType cit && cit.hasInstance(this);
+    if(type == this || type == BasicType.ITEM) return true;
+    if(type instanceof final NodeType nt) {
+      if(nt.kind == Kind.NODE) return true;
+      if(nt.kind != kind) return false;
+      return true;
+    }
+    if(type instanceof final ChoiceItemType cit) {
+      return cit.hasInstance(this);
+    }
+    return false;
   }
 
   @Override
   public final Type union(final Type type) {
-    return type == this ? this : type instanceof NodeType ? NODE :
-      type instanceof ChoiceItemType ? type.union(this) : BasicType.ITEM;
+    if(type instanceof final ChoiceItemType cit) return cit.union(this);
+    if(instanceOf(type)) return type;
+    if(type.instanceOf(this)) return this;
+    if(type instanceof NodeType) return NODE;
+    return BasicType.ITEM;
   }
 
   @Override
   public final Type intersect(final Type type) {
-    return type instanceof ChoiceItemType ? type.intersect(this) :
-      instanceOf(type) ? this : type.instanceOf(this) ? (NodeType) type : null;
+    if(type instanceof final ChoiceItemType cit) return cit.intersect(this);
+    if(instanceOf(type)) return this;
+    if(type.instanceOf(this)) return type;
+    return null;
   }
 
   @Override
   public final BasicType atomic() {
-    return oneOf(PROCESSING_INSTRUCTION, COMMENT) ? BasicType.STRING :
-      this == NODE ? BasicType.ANY_ATOMIC_TYPE : BasicType.UNTYPED_ATOMIC;
+    return kind == Kind.NODE ? BasicType.ANY_ATOMIC_TYPE :
+      kind == Kind.PROCESSING_INSTRUCTION || kind == Kind.COMMENT ? BasicType.STRING :
+      BasicType.UNTYPED_ATOMIC;
   }
 
   @Override
   public final ID id() {
-    return id;
+    return kind.id;
   }
 
   @Override
   public final boolean refinable() {
-    return this == NODE;
+    return kind == Kind.NODE;
   }
 
   @Override
@@ -270,27 +190,12 @@ public enum NodeType implements Type {
   }
 
   /**
-   * Creates a matcher for the specified pattern or raises an error.
-   * @param pattern pattern
-   * @param value value
-   * @param info input info (can be {@code null})
-   * @return matcher
-   * @throws QueryException query exception
-   */
-  final Matcher matcher(final String pattern, final Object value, final InputInfo info)
-      throws QueryException {
-    final Matcher m = Pattern.compile(pattern).matcher(Token.string(Token.token(value)));
-    if(m.find()) return m;
-    throw NODEERR_X_X.get(info, this, value);
-  }
-
-  /**
    * Returns a string representation with the specified argument.
    * @param arg argument
    * @return string representation
    */
   public final String toString(final String arg) {
-    return new TokenBuilder().add(name).add('(').add(arg).add(')').toString();
+    return new TokenBuilder().add(kind.name).add('(').add(arg).add(')').toString();
   }
 
   @Override

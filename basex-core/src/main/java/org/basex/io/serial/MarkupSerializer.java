@@ -325,7 +325,7 @@ abstract class MarkupSerializer extends StandardSerializer {
 
   @Override
   protected boolean skipElement(final XNode node) {
-    if(node.type == NodeType.ELEMENT && eq(node.name(), META)) {
+    if(node.kind() == Kind.ELEMENT && eq(node.name(), META)) {
       if(node.attribute(new QNm(CHARSET)) != null) return true;
       final byte[] value = node.attribute(new QNm(HTTP_EQUIV));
       if(value != null && eq(lc(trim(value)), lc(CONTENT_TYPE))) return true;

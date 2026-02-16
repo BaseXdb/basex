@@ -30,11 +30,11 @@ public final class DocTest extends Test {
 
   @Override
   public boolean matches(final XNode node) {
-    if(node.type != NodeType.DOCUMENT) return false;
+    if(node.kind() != Kind.DOCUMENT) return false;
     final BasicNodeIter iter = node.childIter();
     boolean found = false;
     for(final XNode n : iter) {
-      if(n.type.oneOf(NodeType.COMMENT, NodeType.PROCESSING_INSTRUCTION)) continue;
+      if(n.kind().oneOf(Kind.COMMENT, Kind.PROCESSING_INSTRUCTION)) continue;
       if(found || !child.matches(n)) return false;
       found = true;
     }

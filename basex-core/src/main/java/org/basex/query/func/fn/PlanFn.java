@@ -198,16 +198,16 @@ public abstract class PlanFn extends StandardFunc {
     private boolean valid(final XNode node) {
       return switch(layout) {
         case EMPTY, EMPTY_PLUS ->
-          children(NodeType.ELEMENT, node).isEmpty() && empty(children(NodeType.TEXT, node));
+          children(Kind.ELEMENT, node).isEmpty() && empty(children(Kind.TEXT, node));
         case SIMPLE, SIMPLE_PLUS ->
-          children(NodeType.ELEMENT, node).isEmpty();
+          children(Kind.ELEMENT, node).isEmpty();
         case LIST, LIST_PLUS -> {
-          final ANodeList children = children(NodeType.ELEMENT, node);
-          yield empty(children(NodeType.TEXT, node)) && equalNames(children) &&
+          final ANodeList children = children(Kind.ELEMENT, node);
+          yield empty(children(Kind.TEXT, node)) && equalNames(children) &&
             (children.isEmpty() || children.get(0).qname().eq(child));
         }
         case RECORD, SEQUENCE ->
-          empty(children(NodeType.TEXT, node));
+          empty(children(Kind.TEXT, node));
         default ->
           true;
       };
@@ -274,9 +274,9 @@ public abstract class PlanFn extends StandardFunc {
    */
   final PlanEntry entry(final XNode... nodes) {
     final PlanEntry pe = new PlanEntry();
-    final ANodeList attributes = children(NodeType.ATTRIBUTE, nodes);
-    final ANodeList elements = children(NodeType.ELEMENT, nodes);
-    final ANodeList texts = children(NodeType.TEXT, nodes);
+    final ANodeList attributes = children(Kind.ATTRIBUTE, nodes);
+    final ANodeList elements = children(Kind.ELEMENT, nodes);
+    final ANodeList texts = children(Kind.TEXT, nodes);
     if(elements.isEmpty() && texts.isEmpty()) {
       pe.layout = attributes.isEmpty() ? PlanLayout.EMPTY : PlanLayout.EMPTY_PLUS;
     } else if(elements.isEmpty()) {
@@ -284,7 +284,7 @@ public abstract class PlanFn extends StandardFunc {
       pe.type = PlanType.get(nodes);
     } else if(empty(texts)) {
       if(equalNames(elements) && ((Checks<XNode>) node ->
-          children(NodeType.ELEMENT, node).size() > 1).any(nodes)) {
+          children(Kind.ELEMENT, node).size() > 1).any(nodes)) {
         pe.layout = attributes.isEmpty() ? PlanLayout.LIST : PlanLayout.LIST_PLUS;
         pe.child = elements.get(0).qname();
       } else if(((Checks<XNode>) PlanFn::differentNames).all(nodes)) {
@@ -309,20 +309,20 @@ public abstract class PlanFn extends StandardFunc {
 
   /**
    * Returns the children of the specified type.
-   * @param type type to be found
+   * @param kind kind to be found
    * @param nodes nodes
    * @return result of check
    */
-  static ANodeList children(final NodeType type, final XNode... nodes) {
+  static ANodeList children(final Kind kind, final XNode... nodes) {
     final ANodeList list = new ANodeList();
     for(final XNode node : nodes) {
-      if(type == NodeType.ATTRIBUTE) {
+      if(kind == Kind.ATTRIBUTE) {
         for(final XNode child : node.attributeIter()) {
           if(!Token.eq(child.qname().uri(), QueryText.XSI_URI)) list.add(child);
         }
       } else {
         for(final XNode child : node.childIter()) {
-          if(child.type == type) list.add(child);
+          if(child.kind() == kind) list.add(child);
         }
       }
     }
@@ -336,8 +336,8 @@ public abstract class PlanFn extends StandardFunc {
    */
   private static boolean differentNames(final XNode node) {
     final QNmSet names = new QNmSet();
-    for(final XNode child : children(NodeType.ELEMENT, node)) {
-      if(child.type == NodeType.ELEMENT && !names.add(child.qname())) return false;
+    for(final XNode child : children(Kind.ELEMENT, node)) {
+      if(child.kind() == Kind.ELEMENT && !names.add(child.qname())) return false;
     }
     return !names.isEmpty();
   }
@@ -350,7 +350,7 @@ public abstract class PlanFn extends StandardFunc {
   private static boolean equalNames(final ANodeList nodes) {
     QNm name = null;
     for(final XNode node : nodes) {
-      if(node.type == NodeType.ELEMENT) {
+      if(node.kind() == Kind.ELEMENT) {
         if(name == null) name = node.qname();
         else if(!name.eq(node.qname())) return false;
       }
@@ -368,7 +368,7 @@ public abstract class PlanFn extends StandardFunc {
    */
   private MapBuilder attributes(final XNode node, final Plan plan, final QueryContext qc)
       throws QueryException {
-    final ANodeList attributes = children(NodeType.ATTRIBUTE, node);
+    final ANodeList attributes = children(Kind.ATTRIBUTE, node);
     final MapBuilder mb = new MapBuilder(attributes.size());
     for(final XNode attr : attributes) {
       final PlanEntry entry = plan.entries.get(attr.qname());
@@ -388,7 +388,7 @@ public abstract class PlanFn extends StandardFunc {
    */
   static byte[] nodeName(final XNode node, final XNode parent, final Plan plan,
       final QueryContext qc) {
-    return nodeName(node.qname(), node.type == NodeType.ELEMENT, parent, plan, qc);
+    return nodeName(node.qname(), node.kind() == Kind.ELEMENT, parent, plan, qc);
   }
 
   /**
@@ -428,7 +428,7 @@ public abstract class PlanFn extends StandardFunc {
    */
   private XQArray list(final XNode node, final Plan plan, final QueryContext qc)
       throws QueryException {
-    final ANodeList children = children(NodeType.ELEMENT, node);
+    final ANodeList children = children(Kind.ELEMENT, node);
     final ArrayBuilder ab = new ArrayBuilder(qc, children.size());
     for(final XNode ch : children) {
       ab.add(entry(ch, plan).apply(ch, null, plan, qc));
@@ -448,7 +448,7 @@ public abstract class PlanFn extends StandardFunc {
       throws QueryException {
     final MapBuilder map = attributes(node, plan, qc);
     final TokenObjectMap<ANodeList> cache = new TokenObjectMap<>();
-    for(final XNode ch : children(NodeType.ELEMENT, node)) {
+    for(final XNode ch : children(Kind.ELEMENT, node)) {
       cache.computeIfAbsent(nodeName(ch, node, plan, qc), ANodeList::new).add(ch);
     }
     for(final byte[] name : cache) {
@@ -480,11 +480,11 @@ public abstract class PlanFn extends StandardFunc {
       final QueryContext qc, final boolean ignoreEmpty) throws QueryException {
 
     final ArrayBuilder ab = new ArrayBuilder(qc);
-    for(final XNode attr : children(NodeType.ATTRIBUTE, node)) {
+    for(final XNode attr : children(Kind.ATTRIBUTE, node)) {
       ab.add(new MapBuilder().put(nodeName(attr, node, plan, qc), attr.string()).map());
     }
     for(final XNode child : node.childIter()) {
-      final Item item = switch((NodeType) child.type) {
+      final Item item = switch(child.kind()) {
         case COMMENT ->
           new MapBuilder().put(COMMENT, child.string()).map();
         case ELEMENT ->

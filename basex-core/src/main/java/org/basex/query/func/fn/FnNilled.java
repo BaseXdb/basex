@@ -18,7 +18,7 @@ public final class FnNilled extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XNode node = toNodeOrNull(context(qc), qc);
-    return node == null || node.type != NodeType.ELEMENT ? Empty.VALUE : Bln.FALSE;
+    return node == null || node.kind() != Kind.ELEMENT ? Empty.VALUE : Bln.FALSE;
   }
 
   @Override

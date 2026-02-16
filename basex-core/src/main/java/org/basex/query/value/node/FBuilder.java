@@ -67,7 +67,7 @@ public final class FBuilder {
    * @return self reference
    */
   public FBuilder add(final XNode node) {
-    final boolean attr = node.type == NodeType.ATTRIBUTE;
+    final boolean attr = node.kind() == Kind.ATTRIBUTE;
     ANodeList nodes = attr ? attributes : children;
     if(nodes == null) {
       nodes = new ANodeList();

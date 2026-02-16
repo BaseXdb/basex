@@ -126,9 +126,10 @@ public class DBNode extends XNode {
   public final long itr(final InputInfo ii) throws QueryException {
     // try to directly retrieve inlined numeric value from XML storage
     long l = Long.MIN_VALUE;
-    if(type.oneOf(NodeType.TEXT, NodeType.ATTRIBUTE)) {
-      l = data.textItr(pre, type == NodeType.TEXT);
-    } else if(type == NodeType.ELEMENT) {
+    final Kind kind = kind();
+    if(kind.oneOf(Kind.TEXT, Kind.ATTRIBUTE)) {
+      l = data.textItr(pre, kind == Kind.TEXT);
+    } else if(kind == Kind.ELEMENT) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
         l = data.textItr(pre + as, true);
@@ -141,9 +142,10 @@ public class DBNode extends XNode {
   public final double dbl(final InputInfo ii) throws QueryException {
     // try to directly retrieve inlined numeric value from XML storage
     double d = Double.NaN;
-    if(type.oneOf(NodeType.TEXT, NodeType.ATTRIBUTE)) {
-      d = data.textDbl(pre, type == NodeType.TEXT);
-    } else if(type == NodeType.ELEMENT) {
+    final Kind kind = kind();
+    if(kind.oneOf(Kind.TEXT, Kind.ATTRIBUTE)) {
+      d = data.textDbl(pre, kind == Kind.TEXT);
+    } else if(kind == Kind.ELEMENT) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
         d = data.textDbl(pre + as, true);
@@ -154,13 +156,13 @@ public class DBNode extends XNode {
 
   @Override
   public final byte[] name() {
-    return type.oneOf(NodeType.ELEMENT, NodeType.ATTRIBUTE, NodeType.PROCESSING_INSTRUCTION) ?
+    return kind().oneOf(Kind.ELEMENT, Kind.ATTRIBUTE, Kind.PROCESSING_INSTRUCTION) ?
       data.name(pre, dbKind((NodeType) type)) : null;
   }
 
   @Override
   public final QNm qname() {
-    if(type.oneOf(NodeType.ELEMENT, NodeType.ATTRIBUTE, NodeType.PROCESSING_INSTRUCTION)) {
+    if(kind().oneOf(Kind.ELEMENT, Kind.ATTRIBUTE, Kind.PROCESSING_INSTRUCTION)) {
       final byte[][] qname = data.qname(pre, dbKind());
       return new QNm(qname[0], qname[1]);
     }
@@ -169,12 +171,12 @@ public class DBNode extends XNode {
 
   @Override
   public final Atts namespaces() {
-    return type == NodeType.ELEMENT ? data.namespaces(pre) : null;
+    return kind() == Kind.ELEMENT ? data.namespaces(pre) : null;
   }
 
   @Override
   public final byte[] baseURI() {
-    if(type == NodeType.DOCUMENT) {
+    if(kind() == Kind.DOCUMENT) {
       final String base = Token.string(data.text(pre, true));
       if(data.inMemory()) {
         final String path = data.meta.original;
@@ -368,8 +370,9 @@ public class DBNode extends XNode {
   @Override
   public final byte[] xdmInfo() {
     final ByteList bl = new ByteList().add(typeId().asByte());
-    if(type == NodeType.DOCUMENT) bl.add(baseURI()).add(0);
-    else if(type == NodeType.ATTRIBUTE) bl.add(qname().uri()).add(0);
+    final Kind kind = kind();
+    if(kind == Kind.DOCUMENT) bl.add(baseURI()).add(0);
+    else if(kind == Kind.ATTRIBUTE) bl.add(qname().uri()).add(0);
     return bl.finish();
   }
 
@@ -391,7 +394,7 @@ public class DBNode extends XNode {
   @Override
   public void toString(final QueryString qs) {
     if(qs.error() || data.inMemory()) {
-      switch((NodeType) type) {
+      switch(kind()) {
         case ATTRIBUTE:
           qs.concat(name(), "=", QueryString.toQuoted(string()));
           break;

@@ -19,7 +19,7 @@ public final class FnDocumentUri extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final XNode node = toNodeOrNull(context(qc), qc);
-    if(node == null || node.type != NodeType.DOCUMENT) return Empty.VALUE;
+    if(node == null || node.kind() != Kind.DOCUMENT) return Empty.VALUE;
     // return empty sequence for documents constructed via parse-xml
     final Data data = node.data();
     if(data != null && data.meta.name.isEmpty()) return Empty.VALUE;
