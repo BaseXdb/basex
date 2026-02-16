@@ -414,8 +414,8 @@ public final class SeqType {
     if(oc == null) return null;
     if(test == null || st.test == null || test.equals(st.test))
       return get(tp, oc, test != null ? test : st.test);
-    final Test kn = test.intersect(st.test);
-    return kn == null ? null : get(tp, oc, kn);
+    final Test ts = test.intersect(st.test);
+    return ts == null ? null : get(tp, oc, ts);
   }
 
   /**

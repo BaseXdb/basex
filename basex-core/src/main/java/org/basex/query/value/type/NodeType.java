@@ -70,7 +70,7 @@ public enum NodeType implements Type {
   },
 
   /** Document type. */
-  DOCUMENT_NODE("document-node", ID.DOC) {
+  DOCUMENT("document-node", ID.DOC) {
     @Override
     public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
@@ -117,7 +117,7 @@ public enum NodeType implements Type {
   },
 
   /** Namespace type. */
-  NAMESPACE_NODE("namespace-node", ID.NSP),
+  NAMESPACE("namespace-node", ID.NSP),
 
   /** Schema-element. */
   SCHEMA_ELEMENT("schema-element", ID.SCE),
@@ -125,18 +125,11 @@ public enum NodeType implements Type {
   /** Schema-attribute. */
   SCHEMA_ATTRIBUTE("schema-attribute", ID.SCA);
 
-  /** Leaf node types. */
-  public static final NodeType[] LEAF_TYPES = {
-    ATTRIBUTE, COMMENT, NAMESPACE_NODE, PROCESSING_INSTRUCTION, TEXT
-  };
-
   /** Cached types. */
   private static final TokenObjectMap<NodeType> TYPES = new TokenObjectMap<>();
 
   /** Name. */
   private final byte[] name;
-  /** Kind. */
-  private final byte[] kind;
   /** Type ID . */
   private final ID id;
 
@@ -150,7 +143,6 @@ public enum NodeType implements Type {
    */
   NodeType(final String name, final ID id) {
     this.name = Token.token(name);
-    kind = Token.token(name.replace("-node", ""));
     this.id = id;
   }
 
@@ -221,8 +213,8 @@ public enum NodeType implements Type {
    * Returns the node kind.
    * @return kind
    */
-  public final byte[] kind() {
-    return kind;
+  public final String description() {
+    return Token.string(name).replace("-node", "");
   }
 
   /**

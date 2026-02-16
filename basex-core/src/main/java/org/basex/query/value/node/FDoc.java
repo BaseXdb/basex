@@ -32,7 +32,7 @@ public final class FDoc extends FNode {
    * @param uri base URI
    */
   private FDoc(final byte[] uri) {
-    super(NodeType.DOCUMENT_NODE);
+    super(NodeType.DOCUMENT);
     this.uri = uri;
   }
 

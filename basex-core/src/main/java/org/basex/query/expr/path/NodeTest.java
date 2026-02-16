@@ -13,7 +13,7 @@ import org.basex.util.*;
  */
 public class NodeTest extends Test {
   /** Generic document node test. */
-  public static final NodeTest DOCUMENT_NODE = new NodeTest(NodeType.DOCUMENT_NODE);
+  public static final NodeTest DOCUMENT_NODE = new NodeTest(NodeType.DOCUMENT);
   /** Generic element node test. */
   public static final NodeTest ELEMENT = new NodeTest(NodeType.ELEMENT) {
     @Override
@@ -29,7 +29,7 @@ public class NodeTest extends Test {
   /** Generic comment node test. No other {@link NodeType#COMMENT} tests exist. */
   public static final NodeTest COMMENT = new NodeTest(NodeType.COMMENT);
   /** Generic namespace node test. No other {@link NodeType#COMMENT} tests exist. */
-  public static final NodeTest NAMESPACE_NODE = new NodeTest(NodeType.NAMESPACE_NODE);
+  public static final NodeTest NAMESPACE_NODE = new NodeTest(NodeType.NAMESPACE);
   /** Generic node test. No other {@link NodeType#NODE} tests exist. */
   public static final NodeTest NODE = new NodeTest(NodeType.NODE) {
     @Override
@@ -67,11 +67,11 @@ public class NodeTest extends Test {
       case TEXT                   -> TEXT;
       case PROCESSING_INSTRUCTION -> PROCESSING_INSTRUCTION;
       case ELEMENT                -> ELEMENT;
-      case DOCUMENT_NODE          -> DOCUMENT_NODE;
+      case DOCUMENT               -> DOCUMENT_NODE;
       case ATTRIBUTE              -> ATTRIBUTE;
       case COMMENT                -> COMMENT;
       case NODE                   -> NODE;
-      case NAMESPACE_NODE         -> NAMESPACE_NODE;
+      case NAMESPACE              -> NAMESPACE_NODE;
       default                     -> throw Util.notExpected();
     };
   }

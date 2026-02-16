@@ -242,7 +242,7 @@ final class DigitalSignature {
 
       // actually sign the document
       xmlSig.sign(signContext);
-      signedNode = NodeType.DOCUMENT_NODE.cast(inputNode, qc, info);
+      signedNode = NodeType.DOCUMENT.cast(inputNode, qc, info);
     } catch(final XPathExpressionException ex) {
       throw CX_XPINV.get(info, ex);
     } catch(final SAXException | IOException | ParserConfigurationException ex) {

@@ -37,7 +37,8 @@ public final class IndexFacets extends IndexFn {
    * @return element
    */
   private static FBuilder flat(final Data data, final QueryContext qc) {
-    final FBuilder elem = FElem.build(qc.shared.qName(NodeType.DOCUMENT_NODE.kind()));
+    final QNm qnm = qc.shared.qName(Token.token(NodeType.DOCUMENT.description()));
+    final FBuilder elem = FElem.build(qnm);
     index(data.elemNames, Q_ELEMENT, elem);
     index(data.attrNames, Q_ATTRIBUTE, elem);
     return elem;
@@ -51,7 +52,8 @@ public final class IndexFacets extends IndexFn {
    * @return element
    */
   private static FBuilder tree(final Data data, final PathNode root, final QueryContext qc) {
-    final FBuilder elem = FElem.build(qc.shared.qName(XNode.type(root.kind).kind()));
+    final QNm qnm = qc.shared.qName(Token.token(XNode.type(root.kind).description()));
+    final FBuilder elem = FElem.build(qnm);
     final boolean elm = root.kind == Data.ELEM;
     final Names names = elm ? data.elemNames : data.attrNames;
     if(root.kind == Data.ATTR || elm) elem.add(Q_NAME, names.key(root.name));

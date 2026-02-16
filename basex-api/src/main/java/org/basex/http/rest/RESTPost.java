@@ -111,7 +111,7 @@ final class RESTPost {
         }
       }
       if(value != null) {
-        bindings.put(null, new SimpleEntry<>(value, NodeType.DOCUMENT_NODE.toString()));
+        bindings.put(null, new SimpleEntry<>(value, NodeType.DOCUMENT.toString()));
       }
 
       // command body

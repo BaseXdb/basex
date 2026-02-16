@@ -47,7 +47,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
     final BasicNodeIter iter = node.childIter();
     final Type type = node.type;
-    if(type.oneOf(NodeType.DOCUMENT_NODE)) {
+    if(type == NodeType.DOCUMENT) {
       for(XNode child; (child = iter.next()) != null;) {
         node(child);
       }

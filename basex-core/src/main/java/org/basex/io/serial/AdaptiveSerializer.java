@@ -74,7 +74,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     final Type type = node.type;
     final XMLSerializer ser = xml();
     if(type == NodeType.ATTRIBUTE) ser.attribute(node.name(), node.string(), true);
-    else if(type == NodeType.NAMESPACE_NODE) ser.namespace(node.name(), node.string(), true);
+    else if(type == NodeType.NAMESPACE) ser.namespace(node.name(), node.string(), true);
     else ser.node(node);
     ser.out.flush();
     ser.reset();

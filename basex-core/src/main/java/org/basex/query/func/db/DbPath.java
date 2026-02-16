@@ -23,6 +23,7 @@ public final class DbPath extends StandardFunc {
     } while(parent != null);
 
     final DBNode dbnode = toDBNode(node, false);
-    return dbnode.kind() == Data.DOC ? Str.get(dbnode.data().text(dbnode.pre(), true)) : Str.EMPTY;
+    return dbnode.dbKind() == Data.DOC ? Str.get(dbnode.data().text(dbnode.pre(), true)) :
+      Str.EMPTY;
   }
 }

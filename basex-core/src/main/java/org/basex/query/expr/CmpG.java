@@ -329,9 +329,9 @@ public class CmpG extends Cmp {
     final Value val = cc.qc.focus.value;
     if(val == null) return this;
 
-    final Type type = val.seqType().type;
     final Expr expr1 = exprs[0], expr2 = exprs[1];
-    if(type instanceof NodeType && type != NodeType.NODE && expr1 instanceof final ContextFn fn &&
+    if(val.seqType().type instanceof final NodeType nt && nt != NodeType.NODE &&
+        expr1 instanceof final ContextFn fn &&
         expr2 instanceof final Value value && op == CmpOp.EQ) {
       // skip functions that do not refer to the current context value
       if(fn.exprs.length > 0 && !(fn.exprs[0] instanceof ContextValue)) return this;
@@ -376,7 +376,7 @@ public class CmpG extends Cmp {
       if(scope != null) {
         final ExprList paths = new ExprList(2);
         for(final QNm qname : qnames) {
-          final Test test = new NameTest(qname, scope, (NodeType) type, sc().elemNS);
+          final Test test = new NameTest(qname, scope, nt, sc().elemNS);
           final Expr step = Step.self(cc, null, info, test);
           if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
         }

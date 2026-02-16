@@ -46,17 +46,16 @@ public final class Replace extends Update {
     FBuilder builder = null;
 
     for(Item item; (item = iter.next()) != null;) {
-      final Type type = item.type;
-      if(!(type instanceof NodeType) || type == NodeType.DOCUMENT_NODE)
+      if(!(item instanceof final XNode targ) || targ.type == NodeType.DOCUMENT)
         throw UPTRGNODE_X.get(info, item);
 
-      final XNode targ = (XNode) item;
       final Updates updates = qc.updates();
       final DBNode dbnode = updates.determineDataRef(targ, qc);
       checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
 
       // replace node
       if(builder == null) builder = builder(arg(1), qc);
+      final Type type = item.type;
       if(value) {
         // replace value of node
         byte[] text = Token.EMPTY;

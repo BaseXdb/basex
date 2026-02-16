@@ -395,7 +395,7 @@ public final class QueryResources {
       final QueryInput qi = new QueryInput(path, sc);
       items.add(new DBNode(create(qi, DOC_OPTIONS, context.user(), null, false), 0, Data.DOC));
     }
-    addCollection(items.value(NodeType.DOCUMENT_NODE), name);
+    addCollection(items.value(NodeType.DOCUMENT), name);
   }
 
   /**

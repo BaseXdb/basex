@@ -126,9 +126,8 @@ public class DBNode extends XNode {
   public final long itr(final InputInfo ii) throws QueryException {
     // try to directly retrieve inlined numeric value from XML storage
     long l = Long.MIN_VALUE;
-    final boolean text = type == NodeType.TEXT;
-    if(text || type == NodeType.ATTRIBUTE) {
-      l = data.textItr(pre, text);
+    if(type.oneOf(NodeType.TEXT, NodeType.ATTRIBUTE)) {
+      l = data.textItr(pre, type == NodeType.TEXT);
     } else if(type == NodeType.ELEMENT) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
@@ -142,9 +141,8 @@ public class DBNode extends XNode {
   public final double dbl(final InputInfo ii) throws QueryException {
     // try to directly retrieve inlined numeric value from XML storage
     double d = Double.NaN;
-    final boolean text = type == NodeType.TEXT;
-    if(text || type == NodeType.ATTRIBUTE) {
-      d = data.textDbl(pre, text);
+    if(type.oneOf(NodeType.TEXT, NodeType.ATTRIBUTE)) {
+      d = data.textDbl(pre, type == NodeType.TEXT);
     } else if(type == NodeType.ELEMENT) {
       final int as = data.attSize(pre, Data.ELEM);
       if(data.size(pre, Data.ELEM) - as == 1 && data.kind(pre + as) == Data.TEXT) {
@@ -157,13 +155,13 @@ public class DBNode extends XNode {
   @Override
   public final byte[] name() {
     return type.oneOf(NodeType.ELEMENT, NodeType.ATTRIBUTE, NodeType.PROCESSING_INSTRUCTION) ?
-      data.name(pre, kind((NodeType) type)) : null;
+      data.name(pre, dbKind((NodeType) type)) : null;
   }
 
   @Override
   public final QNm qname() {
     if(type.oneOf(NodeType.ELEMENT, NodeType.ATTRIBUTE, NodeType.PROCESSING_INSTRUCTION)) {
-      final byte[][] qname = data.qname(pre, kind());
+      final byte[][] qname = data.qname(pre, dbKind());
       return new QNm(qname[0], qname[1]);
     }
     return null;
@@ -176,7 +174,7 @@ public class DBNode extends XNode {
 
   @Override
   public final byte[] baseURI() {
-    if(type == NodeType.DOCUMENT_NODE) {
+    if(type == NodeType.DOCUMENT) {
       final String base = Token.string(data.text(pre, true));
       if(data.inMemory()) {
         final String path = data.meta.original;
@@ -218,7 +216,7 @@ public class DBNode extends XNode {
 
   @Override
   public final XNode parent() {
-    final int parent = data.parent(pre, kind());
+    final int parent = data.parent(pre, dbKind());
     return parent == -1 ? root : new DBNode(this, parent, data.kind(parent));
   }
 
@@ -230,20 +228,20 @@ public class DBNode extends XNode {
 
   @Override
   public final boolean hasChildren() {
-    final int kind = kind();
+    final int kind = dbKind();
     return data.attSize(pre, kind) != data.size(pre, kind);
   }
 
   @Override
   public final boolean hasAttributes() {
-    return data.attSize(pre, kind()) > 1;
+    return data.attSize(pre, dbKind()) > 1;
   }
 
   @Override
   public final BasicNodeIter ancestorIter(final boolean self) {
     if(root != null) return super.ancestorIter(self);
 
-    final int first = self ? pre : data.parent(pre, kind());
+    final int first = self ? pre : data.parent(pre, dbKind());
     return first == -1 ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
       int curr = first;
 
@@ -259,7 +257,7 @@ public class DBNode extends XNode {
 
   @Override
   public final BasicNodeIter attributeIter() {
-    final int kind = kind(), first = pre + 1, last = pre + data.attSize(pre, kind);
+    final int kind = dbKind(), first = pre + 1, last = pre + data.attSize(pre, kind);
     return first == last ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
       int curr = first;
 
@@ -280,7 +278,7 @@ public class DBNode extends XNode {
 
   @Override
   public final BasicNodeIter childIter() {
-    final int kind = kind();
+    final int kind = dbKind();
     final int first = pre + data.attSize(pre, kind), last = pre + data.size(pre, kind);
     return first == last ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
       int curr = first;
@@ -297,7 +295,7 @@ public class DBNode extends XNode {
 
   @Override
   public final BasicNodeIter descendantIter(final boolean self) {
-    final int kind = kind();
+    final int kind = dbKind();
     final int first = pre + (self ? 0 : data.attSize(pre, kind)), last = pre + data.size(pre, kind);
     return first == last ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
       int curr = first;
@@ -327,7 +325,7 @@ public class DBNode extends XNode {
           ++curr;
         } else {
           if(curr == -1) {
-            curr = pre + data.size(pre, kind());
+            curr = pre + data.size(pre, dbKind());
             if(data.meta.ndocs > 1) {
               int p = pre;
               for(final XNode nd : ancestorIter(false)) p = ((DBNode) nd).pre;
@@ -349,13 +347,13 @@ public class DBNode extends XNode {
 
   @Override
   public final BasicNodeIter followingSiblingIter(final boolean self) {
-    final int parent = data.parent(pre, kind());
+    final int parent = data.parent(pre, dbKind());
     if(parent == -1) return root != null ? super.followingSiblingIter(self) :
       self ? selfIter() : BasicNodeIter.EMPTY;
 
     return new DBNodeIter(data) {
       final int last = parent + data.size(parent, data.kind(parent));
-      int curr = pre + (self ? 0 : data.size(pre, kind()));
+      int curr = pre + (self ? 0 : data.size(pre, dbKind()));
 
       @Override
       public DBNode next() {
@@ -370,7 +368,7 @@ public class DBNode extends XNode {
   @Override
   public final byte[] xdmInfo() {
     final ByteList bl = new ByteList().add(typeId().asByte());
-    if(type == NodeType.DOCUMENT_NODE) bl.add(baseURI()).add(0);
+    if(type == NodeType.DOCUMENT) bl.add(baseURI()).add(0);
     else if(type == NodeType.ATTRIBUTE) bl.add(qname().uri()).add(0);
     return bl.finish();
   }
@@ -403,7 +401,7 @@ public class DBNode extends XNode {
         case ELEMENT:
           qs.concat("<", name(), hasChildren() || hasAttributes() ? DOTS : "", "/>");
           break;
-        case DOCUMENT_NODE:
+        case DOCUMENT:
           qs.token(DOCUMENT).brace(QueryString.toQuoted(baseURI()));
           break;
         case COMMENT:

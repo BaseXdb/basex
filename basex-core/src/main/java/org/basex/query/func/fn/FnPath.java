@@ -53,7 +53,7 @@ public final class FnPath extends ContextFn {
       final XNode parent = node.parent();
       final NodeType type = (NodeType) node.type;
       if(parent == null) {
-        if(type != NodeType.DOCUMENT_NODE) {
+        if(type != NodeType.DOCUMENT) {
           tb.add(name(Function.ROOT.definition().name, false, lexical, namespaces, qc)).add("()");
         }
         break;

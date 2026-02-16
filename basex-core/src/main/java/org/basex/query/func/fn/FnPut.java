@@ -27,8 +27,7 @@ public final class FnPut extends StandardFunc {
     final byte[] source = toZeroToken(arg(1), qc);
     final SerializerOptions options = toSerializerOptions(arg(2), qc);
 
-    if(!node.type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ELEMENT))
-      throw UPFOTYPE_X.get(info, arg(0));
+    if(!node.type.oneOf(NodeType.DOCUMENT, NodeType.ELEMENT)) throw UPFOTYPE_X.get(info, arg(0));
 
     final Uri uri = Uri.get(source);
     if(uri == Uri.EMPTY || !uri.isValid()) throw UPFOURI_X.get(info, source);

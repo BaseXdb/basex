@@ -23,7 +23,7 @@ public class FnNodeName extends ContextFn {
     if(node == null) return Empty.VALUE;
 
     final Type type = node.type;
-    return empty(type) || type == NAMESPACE_NODE && node.name().length == 0 ? Empty.VALUE :
+    return empty(type) || type == NAMESPACE && node.name().length == 0 ? Empty.VALUE :
       node.qname();
   }
 
@@ -44,11 +44,13 @@ public class FnNodeName extends ContextFn {
     if(node == null) return false;
 
     final SeqType st = node.seqType();
-    final Type type = st.type;
-    if(occ && st.oneOrMore() && type.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION)) {
-      exprType.assign(Occ.EXACTLY_ONE);
+    if(st.type instanceof final NodeType nt) {
+      if(occ && st.oneOrMore() && nt.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION)) {
+        exprType.assign(Occ.EXACTLY_ONE);
+      }
+      return nt != NODE && empty(nt);
     }
-    return type instanceof NodeType && type != NODE && empty(type);
+    return false;
   }
 
   /**
@@ -57,6 +59,6 @@ public class FnNodeName extends ContextFn {
    * @return result of check
    */
   static boolean empty(final Type type) {
-    return !type.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION, NAMESPACE_NODE);
+    return !type.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION, NAMESPACE);
   }
 }

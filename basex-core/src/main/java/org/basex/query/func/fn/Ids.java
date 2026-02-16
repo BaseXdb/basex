@@ -44,7 +44,7 @@ abstract class Ids extends ContextFn {
     final XNode node = toNodeOrNull(arg(1), qc);
 
     final XNode root = (node != null ? node : toNode(context(qc), qc)).root();
-    if(root.type != NodeType.DOCUMENT_NODE) throw IDDOC.get(info);
+    if(root.type != NodeType.DOCUMENT) throw IDDOC.get(info);
 
     final TokenSet idSet = new TokenSet();
     for(Item ids; (ids = qc.next(values)) != null;) {

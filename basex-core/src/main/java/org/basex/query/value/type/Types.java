@@ -164,11 +164,11 @@ public final class Types {
   /** One comment node. */
   public static final SeqType COMMENT_O = COMMENT.seqType();
   /** One document node. */
-  public static final SeqType DOCUMENT_NODE_O = DOCUMENT_NODE.seqType();
+  public static final SeqType DOCUMENT_NODE_O = DOCUMENT.seqType();
   /** Zero or one document node. */
-  public static final SeqType DOCUMENT_NODE_ZO = DOCUMENT_NODE.seqType(ZERO_OR_ONE);
+  public static final SeqType DOCUMENT_NODE_ZO = DOCUMENT.seqType(ZERO_OR_ONE);
   /** Zero or more document node. */
-  public static final SeqType DOCUMENT_NODE_ZM = DOCUMENT_NODE.seqType(ZERO_OR_MORE);
+  public static final SeqType DOCUMENT_NODE_ZM = DOCUMENT.seqType(ZERO_OR_MORE);
   /** One element node. */
   public static final SeqType ELEMENT_O = ELEMENT.seqType();
   /** Zero or one element node. */
@@ -176,7 +176,7 @@ public final class Types {
   /** Zero or more element nodes. */
   public static final SeqType ELEMENT_ZM = ELEMENT.seqType(ZERO_OR_MORE);
   /** Namespace node. */
-  public static final SeqType NAMESPACE_NODE_O = NAMESPACE_NODE.seqType();
+  public static final SeqType NAMESPACE_NODE_O = NAMESPACE.seqType();
   /** Processing instruction. */
   public static final SeqType PROCESSING_INSTRUCTION_O = PROCESSING_INSTRUCTION.seqType();
   /** Zero or one text node. */

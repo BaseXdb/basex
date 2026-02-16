@@ -88,7 +88,7 @@ public abstract class StandardSerializer extends OutputSerializer {
   protected void node(final XNode node) throws IOException {
     final Type type = node.type;
     if(type == NodeType.ATTRIBUTE) throw SERATTR_X.getIO(node);
-    if(type == NodeType.NAMESPACE_NODE) throw SERNS_X.getIO(node);
+    if(type == NodeType.NAMESPACE) throw SERNS_X.getIO(node);
     super.node(node);
   }
 

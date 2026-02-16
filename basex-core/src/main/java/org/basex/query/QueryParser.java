@@ -3639,7 +3639,7 @@ public class QueryParser extends InputParser {
    */
   private Test kindTest(final NodeType type) throws QueryException {
     final Test tp = switch(type) {
-      case DOCUMENT_NODE -> documentTest();
+      case DOCUMENT -> documentTest();
       case ELEMENT, ATTRIBUTE -> elemAttrTest(type);
       case PROCESSING_INSTRUCTION -> piTest();
       case SCHEMA_ELEMENT, SCHEMA_ATTRIBUTE -> schemaTest();

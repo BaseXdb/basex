@@ -25,9 +25,11 @@ public final class NamePool {
    * @param type node type
    */
   public void add(final QNm name, final NodeType type) {
-    if(type != NodeType.ATTRIBUTE && type != NodeType.ELEMENT) return;
-    final int i = index(name, type == NodeType.ATTRIBUTE);
-    cache[i].add++;
+    final boolean elem = type == NodeType.ELEMENT, attr = type == NodeType.ATTRIBUTE;
+    if(elem || attr) {
+      final int i = index(name, attr);
+      cache[i].add++;
+    }
   }
 
   /**

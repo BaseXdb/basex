@@ -140,8 +140,8 @@ public abstract class Step extends Preds {
     // choose stricter axis
     final Axis old = axis;
     final Type type = seqType().type;
-    if(axis == DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT_NODE) ||
-       axis == ANCESTOR_OR_SELF && type.oneOf(NodeType.LEAF_TYPES)) {
+    if(axis == DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT) ||
+       axis == ANCESTOR_OR_SELF && isLeaf(type)) {
       // descendant-or-self::document-node() → self::document-node()
       // ancestor-or-self::text() → self::text()
       axis = SELF;
@@ -242,7 +242,7 @@ public abstract class Step extends Preds {
     if(type == NodeType.PROCESSING_INSTRUCTION) return null;
 
     final Names names = type == NodeType.ATTRIBUTE ? data.attrNames : data.elemNames;
-    final int kind = XNode.kind(test.type);
+    final int kind = XNode.dbKind(test.type);
     final ArrayList<PathNode> tmp = new ArrayList<>();
     final Predicate<Test> addNodes = t -> {
       int name = 0;
@@ -307,12 +307,12 @@ public abstract class Step extends Preds {
         type != NodeType.ATTRIBUTE;
       // parent::comment()
       case ANCESTOR, PARENT ->
-        type.oneOf(NodeType.LEAF_TYPES);
+        isLeaf(type);
       // child::attribute()
       case CHILD, DESCENDANT, FOLLOWING, FOLLOWING_OR_SELF, FOLLOWING_SIBLING,
            FOLLOWING_SIBLING_OR_SELF, PRECEDING, PRECEDING_OR_SELF, PRECEDING_SIBLING,
            PRECEDING_SIBLING_OR_SELF ->
-        type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE, NodeType.NAMESPACE_NODE);
+        type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT, NodeType.NAMESPACE);
       default ->
         false;
     };
@@ -320,19 +320,20 @@ public abstract class Step extends Preds {
 
   /**
    * Checks if the step will never yield results.
-   * @param seqType type of incoming nodes
+   * @param seqType type of input nodes
    * @return {@code true} if steps will never yield results
    */
   final boolean empty(final SeqType seqType) {
+    if(!(seqType.type instanceof final NodeType nt)) return false;
+
     // checks steps on document nodes
-    final Type inputType = seqType.type;
     final NodeType type = test.type;
-    if(inputType.instanceOf(NodeType.DOCUMENT_NODE) && switch(axis) {
+    if(nt.instanceOf(NodeType.DOCUMENT) && switch(axis) {
       case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
            PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
-        !type.oneOf(NodeType.NODE, NodeType.DOCUMENT_NODE);
+        !type.oneOf(NodeType.NODE, NodeType.DOCUMENT);
       case CHILD, DESCENDANT ->
-        type.oneOf(NodeType.DOCUMENT_NODE, NodeType.ATTRIBUTE);
+        type.oneOf(NodeType.DOCUMENT, NodeType.ATTRIBUTE);
       case DESCENDANT_OR_SELF ->
         type == NodeType.ATTRIBUTE;
       default ->
@@ -346,17 +347,16 @@ public abstract class Step extends Preds {
         test.matches(seqType) == Boolean.FALSE;
       // $attribute/descendant::, $text/child::, $comment/attribute::, ...
       case DESCENDANT, CHILD, ATTRIBUTE ->
-        inputType.oneOf(NodeType.LEAF_TYPES);
+        isLeaf(nt);
       // $text/descendant-or-self::text(), ...
       case DESCENDANT_OR_SELF ->
-        inputType.oneOf(NodeType.LEAF_TYPES) && type != NodeType.NODE &&
-        !type.instanceOf(inputType);
+        isLeaf(nt) && type != NodeType.NODE && !type.instanceOf(nt);
       // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING, PRECEDING_SIBLING ->
-        inputType == NodeType.ATTRIBUTE;
+        nt == NodeType.ATTRIBUTE;
       // $attribute/parent::document-node()
       case PARENT ->
-        inputType == NodeType.ATTRIBUTE && type == NodeType.DOCUMENT_NODE;
+        nt == NodeType.ATTRIBUTE && type == NodeType.DOCUMENT;
       default ->
         false;
     };
@@ -375,8 +375,8 @@ public abstract class Step extends Preds {
     final Type prevType = seqType.type;
     return exprs.length == 0 && (
       axis == SELF ||
-      axis == DESCENDANT_OR_SELF && prevType.oneOf(NodeType.LEAF_TYPES) ||
-      axis == ANCESTOR_OR_SELF && prevType.instanceOf(NodeType.DOCUMENT_NODE)
+      axis == DESCENDANT_OR_SELF && isLeaf(prevType) ||
+      axis == ANCESTOR_OR_SELF && prevType.instanceOf(NodeType.DOCUMENT)
     ) && test.matches(seqType) == Boolean.TRUE;
   }
 
@@ -412,6 +412,17 @@ public abstract class Step extends Preds {
     throw value == null ? QueryError.NOCTX_X.get(info, this) :
       QueryError.PATHNODE_X_X_X.get(info, this, value.type, value);
   }
+
+  /**
+   * Checks if the specified type refers to a leaf node.
+   * @param type type
+   * @return result of check
+   */
+  private boolean isLeaf(final Type type) {
+    return type instanceof final NodeType nt && nt.oneOf(NodeType.ATTRIBUTE, NodeType.COMMENT,
+        NodeType.NAMESPACE, NodeType.PROCESSING_INSTRUCTION, NodeType.TEXT);
+  }
+
 
   @Override
   public boolean accept(final ASTVisitor visitor) {

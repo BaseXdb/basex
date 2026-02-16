@@ -48,7 +48,7 @@ final class RESTGet {
         input = values[0];
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
-        bindings.put(null, new SimpleEntry<>(values, NodeType.DOCUMENT_NODE.toString()));
+        bindings.put(null, new SimpleEntry<>(values, NodeType.DOCUMENT.toString()));
       } else if(!RESTCmd.assign(sopts, param, false) && !RESTCmd.assign(mopts, param, false)) {
         // assign database option, serialization parameter or external variable
         bindings.put(key, new SimpleEntry<>(values, null));

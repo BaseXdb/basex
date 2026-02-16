@@ -193,6 +193,6 @@ public class DBNodeSeq extends NativeSeq {
    */
   public static Value get(final IntList pres, final Data data, final boolean docs,
       final boolean all) {
-    return get(pres.toArray(), data, docs ? NodeType.DOCUMENT_NODE : null, all);
+    return get(pres.toArray(), data, docs ? NodeType.DOCUMENT : null, all);
   }
 }

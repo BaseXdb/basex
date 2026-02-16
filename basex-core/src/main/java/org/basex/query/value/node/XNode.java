@@ -38,7 +38,7 @@ public abstract class XNode extends Item {
   static final QNm XML_BASE = new QNm(QueryText.BASE, QueryText.XML_URI);
   /** Node Types. */
   private static final NodeType[] TYPES = {
-    DOCUMENT_NODE, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PROCESSING_INSTRUCTION
+    DOCUMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PROCESSING_INSTRUCTION
   };
   /** Static node counter. */
   private static final AtomicInteger ID = new AtomicInteger();
@@ -116,7 +116,7 @@ public abstract class XNode extends Item {
     if(node1.is(node2)) return true;
 
     QNm name1 = node1.qname(), name2 = node2.qname();
-    if(type1 == NAMESPACE_NODE) return name1.eq(name2) && Token.eq(node1.string(), node2.string());
+    if(type1 == NAMESPACE) return name1.eq(name2) && Token.eq(node1.string(), node2.string());
 
     // compare names
     final DeepEqualOptions options = deep.options;
@@ -162,7 +162,7 @@ public abstract class XNode extends Item {
         final Atts atts2 = deep.nested ? node2.namespaces() : node2.nsScope(null);
         if(!atts1.equals(atts2)) return false;
       }
-    } else if(type1 != DOCUMENT_NODE) {
+    } else if(type1 != DOCUMENT) {
       return true;
     }
 
@@ -356,7 +356,7 @@ public abstract class XNode extends Item {
   public final Uri baseURI(final Uri base, final boolean empty, final InputInfo info)
       throws QueryException {
 
-    if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE) && parent() == null) {
+    if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT) && parent() == null) {
       return empty ? Uri.EMPTY : null;
     }
     Uri uri = Uri.EMPTY;
@@ -365,7 +365,7 @@ public abstract class XNode extends Item {
       final Uri bu = Uri.get(nd.baseURI(), false);
       if(!bu.isValid()) throw INVURI_X.get(info, nd.baseURI());
       uri = bu.resolve(uri, info);
-      if(nd.type == NodeType.DOCUMENT_NODE && nd instanceof DBNode) break;
+      if(nd.type == NodeType.DOCUMENT && nd instanceof DBNode) break;
       nd = nd.parent();
     } while(!uri.isAbsolute() && nd != null);
     return nd == null || uri == Uri.EMPTY ? base.resolve(uri, info) : uri;
@@ -703,21 +703,21 @@ public abstract class XNode extends Item {
   }
 
   /**
-   * Returns a database kind for the specified node type.
+   * Returns the numeric database node kind.
    * @return node kind
    */
-  public int kind() {
-    return kind((NodeType) type);
+  public int dbKind() {
+    return dbKind((NodeType) type);
   }
 
   /**
-   * Returns a database kind for the specified node type.
+   * Returns the numeric database node kind for a node type.
    * @param type node type
    * @return node kind, or {@code -1} if no corresponding database kind exists
    */
-  public static int kind(final NodeType type) {
+  public static int dbKind(final NodeType type) {
     return switch(type) {
-      case DOCUMENT_NODE -> Data.DOC;
+      case DOCUMENT -> Data.DOC;
       case ELEMENT -> Data.ELEM;
       case TEXT -> Data.TEXT;
       case ATTRIBUTE -> Data.ATTR;

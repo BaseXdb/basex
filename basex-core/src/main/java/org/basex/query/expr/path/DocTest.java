@@ -19,7 +19,7 @@ public final class DocTest extends Test {
    * @param child child element test
    */
   public DocTest(final Test child) {
-    super(NodeType.DOCUMENT_NODE);
+    super(NodeType.DOCUMENT);
     this.child = child;
   }
 
@@ -30,7 +30,7 @@ public final class DocTest extends Test {
 
   @Override
   public boolean matches(final XNode node) {
-    if(node.type != NodeType.DOCUMENT_NODE) return false;
+    if(node.type != NodeType.DOCUMENT) return false;
     final BasicNodeIter iter = node.childIter();
     boolean found = false;
     for(final XNode n : iter) {

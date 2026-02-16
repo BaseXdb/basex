@@ -119,7 +119,7 @@ public abstract class FnHttpTest extends HTTPTest {
       final Value value = qp.value();
       checkResponse(value, 2, 200);
 
-      assertEquals(NodeType.DOCUMENT_NODE, value.itemAt(1).type);
+      assertEquals(NodeType.DOCUMENT, value.itemAt(1).type);
     }
 
     // GET2 - with override-media-type='text/plain'

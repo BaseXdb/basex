@@ -102,7 +102,7 @@ public final class DataBuilder {
   private int addNode(final XNode node, final int pre, final int par) {
     job.checkStop();
     return switch((NodeType) node.type) {
-      case DOCUMENT_NODE -> addDoc(node, pre);
+      case DOCUMENT -> addDoc(node, pre);
       case ELEMENT -> addElem(node, pre, par);
       case TEXT -> addText(node, pre, par);
       case ATTRIBUTE -> addAttr(node, pre, par);
@@ -273,7 +273,7 @@ public final class DataBuilder {
   private static int size(final XNode node, final boolean att) {
     if(node instanceof final DBNode dbnode) {
       final Data data = dbnode.data();
-      final int kind = node.kind();
+      final int kind = node.dbKind();
       final int pre = dbnode.pre();
       return att ? data.attSize(pre, kind) : data.size(pre, kind);
     }
@@ -298,7 +298,7 @@ public final class DataBuilder {
   public static XNode stripNamespace(final XNode node, final byte[] uri, final Context ctx)
       throws QueryException {
 
-    if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) return node;
+    if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT)) return node;
 
     final MemData data = new MemData(ctx.options);
     final DataBuilder db = new DataBuilder(data, null);
@@ -344,7 +344,7 @@ public final class DataBuilder {
   public static XNode stripNamespaces(final XNode node, final TokenSet prefixes, final Context ctx,
       final InputInfo info) throws QueryException {
 
-    if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) return node;
+    if(!node.type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT)) return node;
 
     final MemData data = new MemData(ctx.options);
     final DataBuilder db = new DataBuilder(data, null);

@@ -46,7 +46,7 @@ public abstract class BXNode implements Node {
    */
   public static BXNode get(final XNode node) {
     return node == null ? null : switch((NodeType) node.type) {
-      case DOCUMENT_NODE -> new BXDoc(node);
+      case DOCUMENT -> new BXDoc(node);
       case ELEMENT -> new BXElem(node);
       case TEXT -> new BXText(node);
       case COMMENT -> new BXComm(node);
@@ -72,7 +72,7 @@ public abstract class BXNode implements Node {
    * @return node kind
    */
   int kind() {
-    return nd.kind();
+    return nd.dbKind();
   }
 
   @Override
@@ -162,7 +162,7 @@ public abstract class BXNode implements Node {
     for(XNode p; (p = n.parent()) != null;) {
       n = p;
     }
-    return n.type == NodeType.DOCUMENT_NODE ? (BXDoc) get(n) : null;
+    return n.type == NodeType.DOCUMENT ? (BXDoc) get(n) : null;
   }
 
   @Override

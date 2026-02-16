@@ -122,7 +122,7 @@ public final class Constr {
         builder.add(name, qc.shared.token(node.string()));
         // add new namespace
         if(name.hasURI()) info.sc().ns.add(name.prefix(), name.uri());
-      } else if(type == NodeType.NAMESPACE_NODE) {
+      } else if(type == NodeType.NAMESPACE) {
         // type: namespace node
 
         // no attribute allowed after texts or child nodes
@@ -141,7 +141,7 @@ public final class Constr {
           duplNS = name;
           return false;
         }
-      } else if(type == NodeType.DOCUMENT_NODE) {
+      } else if(type == NodeType.DOCUMENT) {
         // type: document node
 
         final BasicNodeIter iter = node.childIter();

@@ -536,9 +536,9 @@ public abstract class Serializer implements Closeable {
       preparePi(node.name(), node.string());
     } else if(type == NodeType.ATTRIBUTE) {
       attribute(node.name(), node.string(), true);
-    } else if(type == NodeType.NAMESPACE_NODE) {
+    } else if(type == NodeType.NAMESPACE) {
       namespace(node.name(), node.string(), true);
-    } else if(type == NodeType.DOCUMENT_NODE) {
+    } else if(type == NodeType.DOCUMENT) {
       openDoc(node.baseURI());
       int roots = 0;
       for(final XNode nd : node.childIter()) {

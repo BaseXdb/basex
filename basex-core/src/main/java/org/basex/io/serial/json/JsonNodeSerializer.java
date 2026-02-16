@@ -67,7 +67,7 @@ public final class JsonNodeSerializer extends JsonSerializer {
   @Override
   protected void node(final XNode node) throws IOException {
     final Type type = node.type;
-    if(type == NodeType.DOCUMENT_NODE || custom) {
+    if(type == NodeType.DOCUMENT || custom) {
       super.node(node);
     } else if(level == 0 && type == NodeType.ELEMENT && eq(JSON, node.name())) {
       final boolean c = custom;

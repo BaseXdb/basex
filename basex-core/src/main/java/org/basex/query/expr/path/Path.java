@@ -358,7 +358,7 @@ public abstract class Path extends ParseExpr {
   private ArrayList<PathNode> pathNodes(final Expr rt, final boolean stats) {
     // ensure that path starts with document nodes
     final Data data = data();
-    return rt != null && rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) && data != null &&
+    return rt != null && rt.seqType().type.instanceOf(NodeType.DOCUMENT) && data != null &&
         data.meta.uptodate ? pathNodes(data.paths.root(), stats) : null;
   }
 
@@ -428,9 +428,7 @@ public abstract class Path extends ParseExpr {
     if(rt != null) {
       Expr prev = rt;
       for(final Expr step : steps) {
-        final SeqType seqType = prev.seqType();
-        if(seqType.type instanceof NodeType && step instanceof final Step stp &&
-            stp.empty(seqType)) return true;
+        if(step instanceof final Step stp && stp.empty(prev.seqType())) return true;
         prev = step;
       }
     }
@@ -449,7 +447,7 @@ public abstract class Path extends ParseExpr {
 
     final SeqType st = root.seqType();
     boolean atMostOne = st.zeroOrOne();
-    boolean sameDepth = atMostOne || st.type.instanceOf(NodeType.DOCUMENT_NODE);
+    boolean sameDepth = atMostOne || st.type.instanceOf(NodeType.DOCUMENT);
 
     for(final Expr expr : steps) {
       final Step step = (Step) expr;
@@ -539,7 +537,7 @@ public abstract class Path extends ParseExpr {
     // - path does not start with document nodes,
     // - no database instance is available, outdated, or
     // - if context does not contain all database nodes
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) ||
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT) ||
         data == null || !data.meta.uptodate || data.meta.ndocs != rt.size()) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
@@ -627,7 +625,7 @@ public abstract class Path extends ParseExpr {
     // - if index does not exist or is out-dated
     // - if several namespaces occur in the input
     final Data data = data();
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE) ||
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT) ||
         data == null || !data.meta.uptodate || data.defaultNs() == null) return this;
 
     final int sl = steps.length;
@@ -734,7 +732,7 @@ public abstract class Path extends ParseExpr {
    */
   private Expr index(final CompileContext cc, final Expr rt) throws QueryException {
     // skip optimization if path does not start with document nodes
-    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT_NODE)) return this;
+    if(rt == null || !rt.seqType().type.instanceOf(NodeType.DOCUMENT)) return this;
 
     // cache index access costs
     IndexInfo index = null;

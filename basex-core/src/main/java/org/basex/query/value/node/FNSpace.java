@@ -28,7 +28,7 @@ public final class FNSpace extends FNode {
    * @param value value
    */
   public FNSpace(final byte[] name, final byte[] value) {
-    super(NodeType.NAMESPACE_NODE);
+    super(NodeType.NAMESPACE);
     this.name = name;
     this.value = value;
   }

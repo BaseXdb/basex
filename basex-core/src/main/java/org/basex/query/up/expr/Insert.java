@@ -55,16 +55,16 @@ public final class Insert extends Update {
     FBuilder builder = null;
 
     for(Item item; (item = iter.next()) != null;) {
-      final Type type = item.type;
-      if(!(type instanceof NodeType)) throw (sibling ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
+      if(!(item instanceof final XNode node))
+        throw (sibling ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
 
-      final XNode node = (XNode) item, parent = node.parent();
+      final XNode parent = node.parent();
+      final Type type = item.type;
       if(sibling) {
-        if(type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT_NODE))
-          throw UPTRGTYP2_X.get(info, node);
+        if(type.oneOf(NodeType.ATTRIBUTE, NodeType.DOCUMENT)) throw UPTRGTYP2_X.get(info, node);
         if(parent == null) throw UPPAREMPTY_X.get(info, node);
-      } else if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT_NODE)) {
-        throw UPTRGTYP_X.get(info, node);
+      } else {
+        if(!type.oneOf(NodeType.ELEMENT, NodeType.DOCUMENT)) throw UPTRGTYP_X.get(info, node);
       }
 
       if(builder == null) builder = builder(arg(1), qc);

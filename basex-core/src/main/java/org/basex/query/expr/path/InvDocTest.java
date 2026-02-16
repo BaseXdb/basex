@@ -28,7 +28,7 @@ final class InvDocTest extends Test {
    * @param data data reference
    */
   private InvDocTest(final IntList pres, final Data data) {
-    super(NodeType.DOCUMENT_NODE);
+    super(NodeType.DOCUMENT);
     this.pres = pres;
     this.data = data;
   }
@@ -83,6 +83,6 @@ final class InvDocTest extends Test {
 
   @Override
   public String toString(final boolean full) {
-    return NodeType.DOCUMENT_NODE.toString("(: ids :)");
+    return NodeType.DOCUMENT.toString("(: ids :)");
   }
 }

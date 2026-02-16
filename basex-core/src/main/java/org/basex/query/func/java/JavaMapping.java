@@ -58,8 +58,8 @@ final class JavaMapping {
   private static final Entry[] NODES = {
     new SimpleEntry(Attr.class, ATTRIBUTE),
     new SimpleEntry(Comment.class, COMMENT),
-    new SimpleEntry(Document.class, DOCUMENT_NODE),
-    new SimpleEntry(DocumentFragment.class, DOCUMENT_NODE),
+    new SimpleEntry(Document.class, DOCUMENT),
+    new SimpleEntry(DocumentFragment.class, DOCUMENT),
     new SimpleEntry(Element.class, ELEMENT),
     new SimpleEntry(Node.class, NODE),
     new SimpleEntry(ProcessingInstruction.class, PROCESSING_INSTRUCTION),
@@ -92,10 +92,10 @@ final class JavaMapping {
     new SimpleEntry(DBNode.class, NODE),
     new SimpleEntry(FAttr.class, ATTRIBUTE),
     new SimpleEntry(FComm.class, COMMENT),
-    new SimpleEntry(FDoc.class, DOCUMENT_NODE),
+    new SimpleEntry(FDoc.class, DOCUMENT),
     new SimpleEntry(FElem.class, ELEMENT),
     new SimpleEntry(FNode.class, NODE),
-    new SimpleEntry(FNSpace.class, NAMESPACE_NODE),
+    new SimpleEntry(FNSpace.class, NAMESPACE),
     new SimpleEntry(FPI.class, PROCESSING_INSTRUCTION),
     new SimpleEntry(FTxt.class, TEXT),
     // function types
