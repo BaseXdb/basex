@@ -62,7 +62,7 @@ public class QueryParser extends InputParser {
   private static final TokenSet KEYWORDS = new TokenSet(
       ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE_NODE, NODE, SCHEMA_ATTRIBUTE,
       SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN, FUNCTION, GET, IF,
-      ITEM, MAP, RECORD, SWITCH, TYPE, TYPESWITCH);
+      ITEM, MAP, RECORD, SWITCH, TYPESWITCH);
 
   /** Query context. */
   public final QueryContext qc;
@@ -2447,13 +2447,6 @@ public class QueryParser extends InputParser {
           final Expr expr = single();
           wsCheck(")");
           return expr;
-        } else if(name.eq(new QNm(TYPE))) {
-          // type test
-          final SeqType st = sequenceType();
-          wsCheck(")");
-          nt = st.zero() ? null : st.type == BasicType.ITEM ? NodeType.NODE :
-            st.type instanceof final NodeType n ? n : null;
-          return nt == null ? NodeTest.FALSE : NodeTest.get(nt);
         }
       } else {
         pos = p;
