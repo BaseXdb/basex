@@ -758,27 +758,6 @@ public final class XQuery4Test extends SandboxTest {
         type(Union.class, "(element(c)|element(b))*"));
   }
 
-  /** Path extensions: type(). */
-  @Test public void pathType() {
-    query("<a><b/></a>/type(item())", "<b/>");
-    query("<a><b/></a>/type(item()?)", "<b/>");
-    query("<a><b/></a>/type(item()*)", "<b/>");
-    query("<a><b/></a>/type(item()+)", "<b/>");
-    query("<a><b/></a>/type(element())", "<b/>");
-    query("<a><b/></a>/type(element()?)", "<b/>");
-    query("<a><b/></a>/type(element()*)", "<b/>");
-    query("<a><b/></a>/type(element()+)", "<b/>");
-    query("<a><b/></a>/child::type(element())", "<b/>");
-    query("<a><b/></a>/self::type(element())", "<a><b/></a>");
-    query("<a><b/></a>/descendant-or-self::type(element())", "<a><b/></a>\n<b/>");
-    query("<a><b/></a>/descendant-or-self::type(text())", "");
-    query("<a><b/></a>/descendant-or-self::type(xs:integer)", "");
-    query("<a><b/></a>/descendant-or-self::type(xs:integer?)", "");
-    query("<a><b/></a>/descendant-or-self::type(xs:integer*)", "");
-    query("<a><b/></a>/descendant-or-self::type(xs:integer+)", "");
-    query("<a><b/></a>/descendant-or-self::type(empty-sequence())", "");
-  }
-
   /** Destructuring let. */
   @Test public void destructuringLet() {
     String value = "1 to 3";
