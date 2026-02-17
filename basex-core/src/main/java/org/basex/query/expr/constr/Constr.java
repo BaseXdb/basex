@@ -63,7 +63,7 @@ public final class Constr {
    * @throws QueryException query exception
    */
   public Constr add(final Expr... exprs) throws QueryException {
-    final NSContext ns = info.sc().ns;
+    final NSDynContext ns = qc.ns;
     final int size = ns.size();
     try {
       final QNmSet qnames = new QNmSet();
@@ -121,7 +121,7 @@ public final class Constr {
         // add attribute
         builder.add(name, qc.shared.token(node.string()));
         // add new namespace
-        if(name.hasURI()) info.sc().ns.add(name.prefix(), name.uri());
+        if(name.hasURI()) qc.ns.add(name.prefix(), name.uri());
       } else if(kind == Kind.NAMESPACE) {
         // type: namespace node
 
@@ -187,7 +187,8 @@ public final class Constr {
       if(defaultNS != -1) {
         if(nm.uri().length == 0) throw EMPTYNSCONS.get(info);
         final int scope = inscopeNS.get(EMPTY);
-        final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope) : info.sc().ns.uri(EMPTY);
+        final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope)
+                                            : qc.ns.resolve(EMPTY, info.sc());
         final byte[] uri = dynamicNs.value(defaultNS);
         if(scopeUri != null && scopeUri.length != 0 && !eq(scopeUri, uri)) {
           throw DUPLNSCONS_X.get(info, uri);

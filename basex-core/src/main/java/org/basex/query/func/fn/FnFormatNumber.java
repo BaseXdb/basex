@@ -43,7 +43,7 @@ public final class FnFormatNumber extends StandardFunc {
     // create formatter, based on decimal-format name
     DecFormatter df = null;
     try {
-      df = sc().decFormat(name != null ? QNm.parse(trim(token(name)), sc()) : QNm.EMPTY, info);
+      df = sc().decFormat(name != null ? QNm.parse(trim(token(name)), qc, sc()) : QNm.EMPTY, info);
     } catch(final QueryException ex) {
       Util.debug(ex);
     }

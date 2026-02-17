@@ -507,7 +507,7 @@ public class QueryParser extends InputParser {
     final byte[] prefix = ncName(NONAME_X, false);
     wsCheck("=");
     final byte[] uri = uriLiteral();
-    if(sc.ns.staticURI(prefix) != null) throw error(DUPLNSDECL_X, prefix);
+    if(sc.ns.resolveDeclared(prefix) != null) throw error(DUPLNSDECL_X, prefix);
     sc.ns.add(prefix, uri, info());
     namespaces.put(prefix, uri);
   }
@@ -718,7 +718,7 @@ public class QueryParser extends InputParser {
 
     // add non-default namespace
     if(prefix != EMPTY) {
-      final byte[] su = sc.ns.staticURI(prefix);
+      final byte[] su = sc.ns.resolveDeclared(prefix);
       if(su == null) {
         sc.ns.add(prefix, uri, info());
         namespaces.put(prefix, uri);
@@ -3068,7 +3068,7 @@ public class QueryParser extends InputParser {
     }
 
     // cache namespace information
-    final int size = sc.ns.size();
+    final int size = qc.ns.size();
     final byte[] nse = sc.elemNS;
     final int npos = qnames.size();
 
@@ -3160,7 +3160,7 @@ public class QueryParser extends InputParser {
             if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
             if(eq(uri, XML_URI)) throw error(BINDXMLURI_X_X, uri, XML);
             if(eq(uri, XMLNS_URI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
-            sc.ns.add(prefix, uri);
+            qc.ns.add(prefix, uri);
           } else {
             if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
             sc.elemNS = uri;
@@ -3206,7 +3206,7 @@ public class QueryParser extends InputParser {
       }
     }
 
-    sc.ns.size(size);
+    qc.ns.size(size);
     sc.elemNS = nse;
     return new CElem(info(), false, name, ns, cont.finish());
   }
@@ -4395,7 +4395,7 @@ public class QueryParser extends InputParser {
     if(ns == SKIPCHECK) return new QNm(nm);
 
     // create new EQName and set namespace
-    final QNm name = new QNm(nm, sc);
+    final QNm name = new QNm(nm, qc, sc);
     if(!name.hasURI()) {
       if(name.hasPrefix()) {
         pos = p;

@@ -110,7 +110,7 @@ public final class DeepEqualOptions extends Options {
     if(unordered == null) {
       unordered = new QNmSet();
       for(final byte[] name : distinctTokens(token(get(UNORDERED_ELEMENTS)))) {
-        unordered.add(QNm.parse(name, null, null, null));
+        unordered.add(QNm.parse(name, null, null, null, null));
       }
     }
     return unordered.contains(qname);

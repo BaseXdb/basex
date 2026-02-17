@@ -315,10 +315,10 @@ public abstract class XNode extends Item {
 
   /**
    * Returns a copy of the namespace hierarchy.
-   * @param sc static context (can be {@code null})
+   * @param qc query context (can be {@code null})
    * @return namespaces
    */
-  public final Atts nsScope(final StaticContext sc) {
+  public final Atts nsScope(final QueryContext qc) {
     final Atts ns = new Atts();
     for(XNode node = this; node != null; node = node.parent()) {
       final Atts nsp = node.namespaces();
@@ -329,7 +329,7 @@ public abstract class XNode extends Item {
         }
       }
     }
-    if(sc != null) sc.ns.inScope(ns);
+    if(qc != null) qc.ns.inScope(ns);
     return ns;
   }
 

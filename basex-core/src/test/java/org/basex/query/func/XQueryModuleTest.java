@@ -171,6 +171,18 @@ public final class XQueryModuleTest extends SandboxTest {
         + " }")
         + " => count()", 1000);
 
+    // dynamic namespace context
+    query(func.args(
+          " for $i in 1 to 100\r\n"
+        + " return function() {\r\n"
+        + "   (1 to $i)\r\n"
+        + "   ! <e xmlns:a='a' xmlns:b='b' xmlns:c='c' xmlns:d='d' xmlns:e='e'>{\r\n"
+        + "       ('a', 'b', 'c', 'd', 'e') ! fn:namespace-uri-for-prefix(., <e/>)\r\n"
+        + "     }</e>\r\n"
+        + "   => distinct-values()\r\n"
+        + " }")
+        + "=> distinct-values()", "a b c d e");
+
     // optimizations
     check(func.args(" ()"), "", empty());
     check(func.args(" false#0"), false, root(DynFuncCall.class));
