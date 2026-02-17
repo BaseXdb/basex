@@ -190,4 +190,21 @@ public enum Kind {
     }
     return false;
   }
+
+  /**
+   * Returns a node type description.
+   * @return kind
+   */
+  public String description() {
+    return Token.string(name).replace("-node", "");
+  }
+
+  /**
+   * Returns a string representation with the specified argument.
+   * @param arg argument
+   * @return string representation
+   */
+  public String toString(final String arg) {
+    return new TokenBuilder().add(name).add('(').add(arg).add(')').toString();
+  }
 }

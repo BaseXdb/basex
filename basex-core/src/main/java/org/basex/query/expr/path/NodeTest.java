@@ -12,26 +12,25 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class NodeTest extends Test {
-  /** Generic document node test. */
-  public static final NodeTest DOCUMENT_NODE = new NodeTest(NodeType.DOCUMENT);
-  /** Generic element node test. */
-  public static final NodeTest ELEMENT = new NodeTest(NodeType.ELEMENT) {
+  /** Generic document test. */
+  public static final NodeTest DOCUMENT = new NodeTest(Kind.DOCUMENT);
+  /** Generic element test. */
+  public static final NodeTest ELEMENT = new NodeTest(Kind.ELEMENT) {
     @Override
     public String toString(final boolean full) { return full ? type.toString() : "*"; }
   };
-  /** Generic attribute node test. */
-  public static final NodeTest ATTRIBUTE = new NodeTest(NodeType.ATTRIBUTE);
-  /** Generic PI node test. */
-  public static final NodeTest PROCESSING_INSTRUCTION =
-      new NodeTest(NodeType.PROCESSING_INSTRUCTION);
-  /** Generic text node test. No other {@link NodeType#TEXT} tests exist. */
-  public static final NodeTest TEXT = new NodeTest(NodeType.TEXT);
-  /** Generic comment node test. No other {@link NodeType#COMMENT} tests exist. */
-  public static final NodeTest COMMENT = new NodeTest(NodeType.COMMENT);
-  /** Generic namespace node test. No other {@link NodeType#COMMENT} tests exist. */
-  public static final NodeTest NAMESPACE_NODE = new NodeTest(NodeType.NAMESPACE);
-  /** Generic node test. No other {@link NodeType#NODE} tests exist. */
-  public static final NodeTest NODE = new NodeTest(NodeType.NODE) {
+  /** Generic attribute test. */
+  public static final NodeTest ATTRIBUTE = new NodeTest(Kind.ATTRIBUTE);
+  /** Generic PI test. */
+  public static final NodeTest PROCESSING_INSTRUCTION = new NodeTest(Kind.PROCESSING_INSTRUCTION);
+  /** Generic text test. No other {@link Kind#TEXT} tests exist. */
+  public static final NodeTest TEXT = new NodeTest(Kind.TEXT);
+  /** Generic comment test. No other {@link Kind#COMMENT} tests exist. */
+  public static final NodeTest COMMENT = new NodeTest(Kind.COMMENT);
+  /** Generic namespace test. No other {@link Kind#COMMENT} tests exist. */
+  public static final NodeTest NAMESPACE = new NodeTest(Kind.NAMESPACE);
+  /** Generic test. No other {@link Kind#NODE} tests exist. */
+  public static final NodeTest NODE = new NodeTest(Kind.NODE) {
     @Override
     public boolean matches(final XNode node) { return true; }
     @Override
@@ -39,8 +38,8 @@ public class NodeTest extends Test {
     @Override
     public Test intersect(final Test test) { return test; }
   };
-  /** Node test that always yields false. */
-  public static final NodeTest FALSE = new NodeTest(NodeType.NODE) {
+  /** Test that always returns false. */
+  public static final NodeTest FALSE = new NodeTest(Kind.NODE) {
     @Override
     public boolean matches(final XNode node) { return false; }
     @Override
@@ -51,27 +50,27 @@ public class NodeTest extends Test {
 
   /**
    * Constructor.
-   * @param type node type
+   * @param kind node kind
    */
-  NodeTest(final NodeType type) {
-    super(type);
+  private NodeTest(final Kind kind) {
+    super(NodeType.get(kind));
   }
 
   /**
    * Returns a test instance.
-   * @param type node type
-   * @return kind test
+   * @param kind node kind
+   * @return node test
    */
-  public static NodeTest get(final NodeType type) {
-    return switch(type.kind) {
+  public static NodeTest get(final Kind kind) {
+    return switch(kind) {
       case TEXT                   -> TEXT;
       case PROCESSING_INSTRUCTION -> PROCESSING_INSTRUCTION;
       case ELEMENT                -> ELEMENT;
-      case DOCUMENT               -> DOCUMENT_NODE;
+      case DOCUMENT               -> DOCUMENT;
       case ATTRIBUTE              -> ATTRIBUTE;
       case COMMENT                -> COMMENT;
       case NODE                   -> NODE;
-      case NAMESPACE              -> NAMESPACE_NODE;
+      case NAMESPACE              -> NAMESPACE;
       default                     -> throw Util.notExpected();
     };
   }

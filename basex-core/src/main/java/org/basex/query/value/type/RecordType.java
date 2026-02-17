@@ -282,8 +282,8 @@ public final class RecordType extends MapType {
   private Type union(final Type type, final Set<Pair> pairs) {
     if(type instanceof ChoiceItemType) return type.union(this);
     if(type == Types.MAP) return Types.MAP;
-    if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
+    if(instanceOf(type)) return type;
 
     if(type instanceof final RecordType rt) {
       final TokenObjectMap<RecordField> map = new TokenObjectMap<>();

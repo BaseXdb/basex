@@ -209,7 +209,8 @@ public final class SerializerOptions extends Options {
    * @throws QueryException query exception
    */
   public void assign(final Item item, final InputInfo info) throws QueryException {
-    if(!T_ROOT.matches(item)) throw ELMMAP_X_X_X.get(info, Q_ROOT.prefixId(XML), item.type, item);
+    if(!(item instanceof final XNode node) || !T_ROOT.matches(node))
+      throw ELMMAP_X_X_X.get(info, Q_ROOT.prefixId(XML), item.type, item);
     try {
       assign(toString((XNode) item, new QNmSet(), info));
     } catch(final BaseXException ex) {

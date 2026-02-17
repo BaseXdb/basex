@@ -9,7 +9,6 @@ import java.util.concurrent.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -28,8 +27,6 @@ public final class SeqType {
   public final Type type;
   /** Occurrence indicator. */
   public final Occ occ;
-  /** Node test (can be {@code null}). */
-  private final Test test;
   /** Array type (lazy instantiation). */
   private ArrayType arrayType;
   /** Map types (lazy instantiation). */
@@ -41,19 +38,8 @@ public final class SeqType {
    * @param occ occurrence
    */
   SeqType(final Type type, final Occ occ) {
-    this(type, occ, null);
-  }
-
-  /**
-   * Private constructor.
-   * @param type type
-   * @param occ occurrence indicator
-   * @param test node test (can be {@code null})
-   */
-  private SeqType(final Type type, final Occ occ, final Test test) {
     this.type = type;
     this.occ = occ;
-    this.test = test;
   }
 
   /**
@@ -64,27 +50,6 @@ public final class SeqType {
    */
   public static SeqType get(final Type type, final Occ occ) {
     return occ == ZERO ? Types.EMPTY_SEQUENCE_Z : type.seqType(occ);
-  }
-
-  /**
-   * Returns a sequence type with occurrence indicator {@link Occ#EXACTLY_ONE}.
-   * @param test node test
-   * @return sequence type
-   */
-  public static SeqType get(final Test test) {
-    return get(test.type, Occ.EXACTLY_ONE, test);
-  }
-
-  /**
-   * Returns a sequence type.
-   * @param type type
-   * @param occ occurrence indicator
-   * @param test node test (can be {@code null}; {@link NodeTest} is redundant and ignored)
-   * @return sequence type
-   */
-  public static SeqType get(final Type type, final Occ occ, final Test test) {
-    return occ == ZERO || test == null || test instanceof NodeTest ? get(type, occ) :
-      new SeqType(type, occ, test);
   }
 
   /**
@@ -112,7 +77,7 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType with(final Occ oc) {
-    return oc == occ ? this : get(type, oc, test);
+    return oc == occ ? this : get(type, oc);
   }
 
   /**
@@ -121,7 +86,7 @@ public final class SeqType {
    * @return sequence type
    */
   public SeqType union(final Occ oc) {
-    return oc == occ ? this : get(type, occ.union(oc), test);
+    return oc == occ ? this : get(type, occ.union(oc));
   }
 
   /**
@@ -147,7 +112,7 @@ public final class SeqType {
 
     // try shortcut (type of value may be specific enough)
     if(!(coerce && type instanceof FType || type instanceof ChoiceItemType)) {
-      if(value.type.instanceOf(type) && test == null) return true;
+      if(value.type.instanceOf(type)) return true;
     }
     // check single item
     if(size == 1) return instance((Item) value, coerce);
@@ -174,7 +139,7 @@ public final class SeqType {
     if(type instanceof final EnumType et) {
       return et.instance(item);
     }
-    return item.instanceOf(type, coerce) && (test == null || test.matches(item));
+    return item.instanceOf(type, coerce);
   }
 
   /**
@@ -381,8 +346,7 @@ public final class SeqType {
     // ignore general type of empty sequence
     final Type tp = st.zero() ? type : zero() ? st.type : type.union(st.type);
     final Occ oc = occ.union(st.occ);
-    final Test ts = st.zero() ? test : zero() ? st.test : Test.get(Arrays.asList(test, st.test));
-    return get(tp, oc, ts);
+    return get(tp, oc);
   }
 
   /**
@@ -412,10 +376,7 @@ public final class SeqType {
     if(tp == null) return null;
     final Occ oc = occ.intersect(st.occ);
     if(oc == null) return null;
-    if(test == null || st.test == null || test.equals(st.test))
-      return get(tp, oc, test != null ? test : st.test);
-    final Test ts = test.intersect(st.test);
-    return ts == null ? null : get(tp, oc, ts);
+    return get(tp, oc);
   }
 
   /**
@@ -479,24 +440,7 @@ public final class SeqType {
     if(!occ.instanceOf(st.occ)) return false;
     if(type instanceof final ChoiceItemType cit) return cit.instanceOf(st.with(EXACTLY_ONE));
     if(st.type instanceof final ChoiceItemType cit) return cit.hasInstance(with(EXACTLY_ONE));
-    return type.instanceOf(st.type) && testInstanceOf(st);
-  }
-
-  /**
-   * Checks if the node test is an instance of the node test of the specified sequence type.
-   * @param st sequence type to check
-   * @return result of check
-   */
-  public boolean testInstanceOf(final SeqType st) {
-    return st.test == null || test != null && test.instanceOf(st.test);
-  }
-
-  /**
-   * Returns the node test.
-   * @return node test
-   */
-  public Test test() {
-    return test;
+    return type.instanceOf(st.type);
   }
 
   /**
@@ -505,7 +449,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean eq(final SeqType st) {
-    return this == st || type.eq(st.type) && occ == st.occ && Objects.equals(test, st.test);
+    return this == st || type.eq(st.type) && occ == st.occ;
   }
 
   @Override
@@ -522,7 +466,6 @@ public final class SeqType {
    */
   @Override
   public int hashCode() {
-    if(test != null) throw Util.notExpected();
     return (type == null ? 0 : type.hashCode()) + (occ == null ? 0 : occ.hashCode());
   }
 
@@ -531,8 +474,7 @@ public final class SeqType {
    * @return string
    */
   public String typeString() {
-    return zero() ? QueryText.EMPTY_SEQUENCE + "()" : test != null ? test.toString() :
-      type.toString();
+    return zero() ? QueryText.EMPTY_SEQUENCE + "()" : type.toString();
   }
 
   @Override

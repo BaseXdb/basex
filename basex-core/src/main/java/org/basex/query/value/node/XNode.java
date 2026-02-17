@@ -97,6 +97,15 @@ public abstract class XNode extends Item {
   }
 
   @Override
+  public final boolean instanceOf(final Type tp, final boolean coerce) {
+    if(type.instanceOf(tp)) return true;
+    if(tp instanceof final NodeType nt && nt.test != null) {
+      return nt.test.matches(this);
+    }
+    return false;
+  }
+
+  @Override
   public final boolean comparable(final Item item) {
     return item.type.isStringOrUntyped();
   }

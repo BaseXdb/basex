@@ -85,7 +85,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ANALYZE_STRING(FnAnalyzeString::new, "analyze-string(value,pattern[,flags])",
       params(STRING_ZO, STRING_O, STRING_ZO),
-      SeqType.get(NameTest.get(FnAnalyzeString.Q_ANALYZE_STRING_RESULT)), flag(CNS)),
+      NodeType.get(NameTest.get(FnAnalyzeString.Q_ANALYZE_STRING_RESULT)).seqType(), flag(CNS)),
   /** XQuery function. */
   APPLY(FnApply::new, "apply(function,arguments)",
       params(FUNCTION_O, ARRAY_O), ITEM_ZM, flag(POS, CTX, NDT), FN_URI, Perm.ADMIN),
@@ -167,8 +167,8 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), STRING_O.arrayType().seqType(Occ.ZERO_OR_MORE)),
   /** XQuery function. */
   CSV_TO_XML(FnCsvToXml::new, "csv-to-xml(value[,options])",
-      params(STRING_ZO, MAP_ZO), SeqType.get(new DocTest(NodeTest.ELEMENT)).with(Occ.ZERO_OR_ONE),
-      flag(CNS)),
+      params(STRING_ZO, MAP_ZO),
+      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(Occ.ZERO_OR_ONE), flag(CNS)),
   /** XQuery function. */
   CURRENT_DATE(FnCurrentDate::new, "current-date()",
       params(), DATE_O, flag(NDT)),
@@ -365,7 +365,8 @@ public enum Function implements AFunction {
       params(TIME_ZO), INTEGER_ZO),
   /** XQuery function. */
   HTML_DOC(FnHtmlDoc::new, "html-doc(source[,options])",
-      params(STRING_ZO, MAP_ZO), SeqType.get(new DocTest(NodeTest.ELEMENT)).with(Occ.ZERO_OR_ONE),
+      params(STRING_ZO, MAP_ZO),
+      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(Occ.ZERO_OR_ONE),
       flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   ID(FnId::new, "id(values[,node])",
@@ -420,8 +421,8 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   JSON_TO_XML(FnJsonToXml::new, "json-to-xml(value[,options])",
-      params(STRING_ZO, MAP_ZO), SeqType.get(new DocTest(NodeTest.ELEMENT)).with(Occ.ZERO_OR_ONE),
-      flag(CNS)),
+      params(STRING_ZO, MAP_ZO),
+      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(Occ.ZERO_OR_ONE), flag(CNS)),
   /** XQuery function. */
   LANG(FnLang::new, "lang(language[,node])",
       params(STRING_ZO, NODE_ZO), BOOLEAN_O),
@@ -528,7 +529,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   PARSE_HTML(FnParseHtml::new, "parse-html(value[,options])",
       params(STRING_OR_BINARY_ZO, MAP_ZO),
-      SeqType.get(new DocTest(NodeTest.ELEMENT)).with(Occ.ZERO_OR_ONE)),
+      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
       params(STRING_ZO, INTEGER_ZO), INTEGER_ZO),
@@ -543,7 +544,8 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), Records.URI_STRUCTURE.get().seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value[,options])",
-      params(STRING_OR_BINARY_ZO, MAP_ZO), SeqType.get(new DocTest(NodeTest.ELEMENT)), flag(CNS)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO),
+      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(), flag(CNS)),
   /** XQuery function. */
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value[,options])",
       params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),

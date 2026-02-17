@@ -153,8 +153,8 @@ public final class FuncType extends FType {
   @Override
   public Type union(final Type type) {
     if(type instanceof ChoiceItemType) return type.union(this);
-    if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
+    if(instanceOf(type)) return type;
 
     final FuncType ft = type.funcType();
     if(ft == null) return BasicType.ITEM;

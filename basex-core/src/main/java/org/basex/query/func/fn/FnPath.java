@@ -66,7 +66,7 @@ public final class FnPath extends ContextFn {
       } else if(kind == Kind.ELEMENT) {
         tb.add(name(qname, false, lexical, namespaces, qc));
       } else if(kind == Kind.PROCESSING_INSTRUCTION) {
-        tb.add(type.toString(Token.string(qname.local())));
+        tb.add(kind.toString(Token.string(qname.local())));
       } else if(kind.oneOf(Kind.COMMENT, Kind.TEXT)) {
         tb.add(type.toString());
       }

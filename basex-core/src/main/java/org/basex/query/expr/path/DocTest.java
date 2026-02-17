@@ -63,6 +63,6 @@ public final class DocTest extends Test {
 
   @Override
   public String toString(final boolean full) {
-    return type.toString(child.toString());
+    return type.kind.toString(child.toString());
   }
 }

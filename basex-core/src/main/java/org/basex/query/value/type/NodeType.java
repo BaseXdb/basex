@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -17,12 +18,12 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class NodeType implements Type {
+public final class NodeType implements Type {
   /** Cached types. */
   static final EnumMap<Kind, NodeType> TYPES = new EnumMap<>(Kind.class);
 
   static {
-    for(final Kind kind : Kind.values()) TYPES.put(kind, new NodeType(kind));
+    for(final Kind kind : Kind.values()) TYPES.put(kind, new NodeType(kind, null));
   }
 
   /** Node type: node. */
@@ -43,7 +44,9 @@ public class NodeType implements Type {
   public static final NodeType NAMESPACE = TYPES.get(Kind.NAMESPACE);
 
   /** Node kind. */
-  public Kind kind;
+  public final Kind kind;
+  /** Node test. */
+  public final Test test;
 
   /** Sequence types (lazy instantiation). */
   private EnumMap<Occ, SeqType> seqTypes;
@@ -51,9 +54,11 @@ public class NodeType implements Type {
   /**
    * Constructor.
    * @param kind node kind
+   * @param test node test (can be {@code null})
    */
-  public NodeType(final Kind kind) {
+  private NodeType(final Kind kind, final Test test) {
     this.kind = kind;
+    this.test = test;
   }
 
   /**
@@ -65,18 +70,27 @@ public class NodeType implements Type {
     return TYPES.get(kind);
   }
 
+  /**
+   * Returns an instance for the specified test.
+   * @param test node test
+   * @return type
+   */
+  public static NodeType get(final Test test) {
+    return test instanceof NodeTest ? get(test.type.kind) : new NodeType(test.type.kind, test);
+  }
+
   @Override
-  public final boolean isNumber() {
+  public boolean isNumber() {
     return false;
   }
 
   @Override
-  public final boolean isUntyped() {
+  public boolean isUntyped() {
     return !kind.oneOf(Kind.PROCESSING_INSTRUCTION, Kind.COMMENT, Kind.NODE);
   }
 
   @Override
-  public final boolean isNumberOrUntyped() {
+  public boolean isNumberOrUntyped() {
     return isUntyped();
   }
 
@@ -86,12 +100,12 @@ public class NodeType implements Type {
   }
 
   @Override
-  public final boolean isSortable() {
+  public boolean isSortable() {
     return true;
   }
 
   @Override
-  public final XNode cast(final Item item, final QueryContext qc, final InputInfo info)
+  public XNode cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     if(item.type == this) return (XNode) item;
     throw typeError(item, this, info);
@@ -109,40 +123,30 @@ public class NodeType implements Type {
   }
 
   @Override
-  public final SeqType seqType(final Occ occ) {
+  public SeqType seqType(final Occ occ) {
     // cannot be instantiated statically due to circular dependencies
     if(seqTypes == null) seqTypes = new EnumMap<>(Occ.class);
     return seqTypes.computeIfAbsent(occ, o -> new SeqType(this, o));
   }
 
-  /**
-   * Returns a node type description.
-   * @return kind
-   */
-  public final String description() {
-    return Token.string(kind.name).replace("-node", "");
-  }
-
-  /**
-   * Returns the name of the node type.
-   * @return type
-   */
-  public final byte[] test() {
-    return kind.name;
+  @Override
+  public boolean eq(final Type type) {
+    if(this == type) return true;
+    if(type instanceof final NodeType nt) {
+      if(nt.kind != kind) return false;
+      if(test == null ? nt.test == null : test.equals(nt.test)) return true;
+    }
+    return false;
   }
 
   @Override
-  public final boolean eq(final Type type) {
-    return this == type;
-  }
-
-  @Override
-  public final boolean instanceOf(final Type type) {
+  public boolean instanceOf(final Type type) {
     if(type == this || type == BasicType.ITEM) return true;
     if(type instanceof final NodeType nt) {
       if(nt.kind == Kind.NODE) return true;
       if(nt.kind != kind) return false;
-      return true;
+      if(nt.test == null) return true;
+      return test != null && test.instanceOf(nt.test);
     }
     if(type instanceof final ChoiceItemType cit) {
       return cit.hasInstance(this);
@@ -151,36 +155,45 @@ public class NodeType implements Type {
   }
 
   @Override
-  public final Type union(final Type type) {
+  public Type union(final Type type) {
     if(type instanceof final ChoiceItemType cit) return cit.union(this);
-    if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
-    if(type instanceof NodeType) return NODE;
+    if(instanceOf(type)) return type;
+    if(type instanceof final NodeType nt) {
+      // at this stage, both test and nt.test are present
+      if(kind == nt.kind) return get(Test.get(Arrays.asList(test, nt.test)));
+      return NODE;
+    }
     return BasicType.ITEM;
   }
 
   @Override
-  public final Type intersect(final Type type) {
+  public Type intersect(final Type type) {
     if(type instanceof final ChoiceItemType cit) return cit.intersect(this);
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
+    if(type instanceof final NodeType nt && kind == nt.kind) {
+      // at this stage, both test and nt.test are present
+      final Test t = test.intersect(nt.test);
+      if(t != null) return get(t);
+    }
     return null;
   }
 
   @Override
-  public final BasicType atomic() {
+  public BasicType atomic() {
     return kind == Kind.NODE ? BasicType.ANY_ATOMIC_TYPE :
       kind == Kind.PROCESSING_INSTRUCTION || kind == Kind.COMMENT ? BasicType.STRING :
       BasicType.UNTYPED_ATOMIC;
   }
 
   @Override
-  public final ID id() {
+  public ID id() {
     return kind.id;
   }
 
   @Override
-  public final boolean refinable() {
+  public boolean refinable() {
     return kind == Kind.NODE;
   }
 
@@ -189,17 +202,8 @@ public class NodeType implements Type {
     return false;
   }
 
-  /**
-   * Returns a string representation with the specified argument.
-   * @param arg argument
-   * @return string representation
-   */
-  public final String toString(final String arg) {
-    return new TokenBuilder().add(kind.name).add('(').add(arg).add(')').toString();
-  }
-
   @Override
-  public final String toString() {
-    return toString("");
+  public String toString() {
+    return test != null ? test.toString() : kind.toString("");
   }
 }

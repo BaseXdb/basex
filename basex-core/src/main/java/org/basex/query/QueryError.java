@@ -1710,8 +1710,8 @@ public enum QueryError {
     } else {
       // add cardinality string
       desc.add(Strings.capitalize(est.occ.desc)).add(" expected");
-      // add expected type if type information other than cardinality differs from input
-      if(!(ist.type.instanceOf(est.type) && ist.testInstanceOf(est))) {
+      // add expected type if item type differs from input
+      if(!(ist.type.instanceOf(est.type))) {
         desc.add(" (").add(est).add(")");
       }
       // add number of results or type of input

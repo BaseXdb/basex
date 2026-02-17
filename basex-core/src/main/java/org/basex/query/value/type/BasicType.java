@@ -1057,8 +1057,8 @@ public enum BasicType implements Type {
     if(this == ERROR) return type;
     if(type == ERROR) return this;
     if(type instanceof ChoiceItemType || type instanceof EnumType) return type.union(this);
-    if(instanceOf(type)) return type;
     if(type.instanceOf(this)) return this;
+    if(instanceOf(type)) return type;
     if(type instanceof final BasicType bt) {
       final List<BasicType> ancestors = new ArrayList<>(8);
       for(BasicType p = bt; p != null; p = p.parent) ancestors.add(p);

@@ -29,8 +29,8 @@ import de.bottlecaps.markup.*;
  */
 public final class FnInvisibleXml extends StandardFunc {
   /** The function's argument type. */
-  public static final SeqType ARG_TYPE = ChoiceItemType.get(
-      Types.STRING_O, SeqType.get(NameTest.get(new QNm("ixml")))).seqType(Occ.ZERO_OR_ONE);
+  public static final SeqType ARG_TYPE = ChoiceItemType.get(Types.STRING_O,
+      NodeType.get(NameTest.get(new QNm("ixml"))).seqType()).seqType(Occ.ZERO_OR_ONE);
   /** The invisible XML parser generator. */
   private Generator generator;
 

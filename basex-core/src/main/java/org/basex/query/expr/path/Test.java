@@ -6,7 +6,6 @@ import java.util.List;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -96,18 +95,9 @@ public abstract class Test extends ExprInfo {
   public abstract boolean matches(XNode node);
 
   /**
-   * Checks if the specified item matches the test.
-   * @param item item to be checked
-   * @return result of check
-   */
-  public final boolean matches(final Item item) {
-    return item instanceof final XNode node && matches(node);
-  }
-
-  /**
    * Checks if the current test will match items of the specified type.
    * @param seqType type to be checked
-   * @return result of check (matches never, always, or {@code null} if unknown)
+   * @return {@link Boolean#TRUE}: always, {@link Boolean#FALSE}: never, {@code null}: unknown
    */
   public Boolean matches(@SuppressWarnings("unused") final SeqType seqType) {
     return null;

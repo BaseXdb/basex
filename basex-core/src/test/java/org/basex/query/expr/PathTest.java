@@ -321,8 +321,8 @@ public final class PathTest extends SandboxTest {
 
     check("<a/>/.[element()]", "", "//IterStep/@test = '*'");
     check("<a/>/.[*]", "", "//IterStep/@test = '*'");
-    check("<a/>/.[a]", "", "//IterStep/@test = '*'");
-    check("<a/>/.[element(a)]", "", "//IterStep/@test = '*'");
+    check("<a/>/.[a]", "", "//IterStep/@test = 'a'");
+    check("<a/>/.[element(a)]", "", "//IterStep/@test = 'a'");
   }
 
   /** Instance checks: document-node(...). */

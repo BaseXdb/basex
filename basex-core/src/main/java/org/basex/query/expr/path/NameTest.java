@@ -31,23 +31,34 @@ public final class NameTest extends Test {
   public byte[] local;
 
   /**
-   * Returns a name test.
-   * @param type node type (must be element, attribute, or processing instruction)
-   * @param qname node name
-   * @return test
-   */
-  public static NameTest get(final NodeType type, final QNm qname) {
-    final Scope scope = type.kind == Kind.PROCESSING_INSTRUCTION ? Scope.LOCAL : Scope.FULL;
-    return new NameTest(qname, scope, type, null);
-  }
-
-  /**
    * Returns a named element test.
    * @param qname node name
    * @return test
    */
   public static NameTest get(final QNm qname) {
-    return new NameTest(qname, Scope.FULL, NodeType.ELEMENT, null);
+    return get(qname, Kind.ELEMENT);
+  }
+
+  /**
+   * Returns a name test.
+   * @param qname node name
+   * @param kind node kind (must be element, attribute, or processing instruction)
+   * @return test
+   */
+  public static NameTest get(final QNm qname, final Kind kind) {
+    final Scope scope = kind == Kind.PROCESSING_INSTRUCTION ? Scope.LOCAL : Scope.FULL;
+    return new NameTest(qname, scope, kind, null);
+  }
+
+  /**
+   * Constructor.
+   * @param qname name
+   * @param scope scope
+   * @param kind node kind (must be element, attribute, or processing instruction)
+   * @param defaultNs default element namespace (used for optimizations, can be {@code null})
+   */
+  public NameTest(final QNm qname, final Scope scope, final Kind kind, final byte[] defaultNs) {
+    this(qname, scope, NodeType.get(kind), defaultNs);
   }
 
   /**
@@ -127,7 +138,7 @@ public final class NameTest extends Test {
     final Type tp = seqType.type;
     if(tp.intersect(type) == null) return Boolean.FALSE;
     if(tp instanceof final NodeType nt && nt.kind == type.kind &&
-        seqType.test() instanceof final NameTest name) {
+        nt.test instanceof final NameTest name) {
       if(name.scope == scope || name.scope == Scope.FULL) return matches(name.qname);
     }
     return null;
@@ -199,6 +210,6 @@ public final class NameTest extends Test {
       tb.add(l);
     }
     final String test = tb.toString();
-    return full || pi ? type.toString(test) : test;
+    return full || pi ? type.kind.toString(test) : test;
   }
 }

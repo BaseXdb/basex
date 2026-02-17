@@ -164,10 +164,12 @@ public abstract class Step extends Preds {
     // optimize predicates
     if(optimize(cc, this)) return cc.emptySeq(this);
     // adopt sequence type if it is more specific
-    final SeqType st = seqType();
-    if(st.type.instanceOf(test.type) && !st.type.eq(test.type)) {
-      test = st.test();
-      if(test == null) test = NodeTest.get((NodeType) st.type);
+    if(seqType().type instanceof final NodeType nt) {
+      if(nt.test != null) {
+        if(nt.test.instanceOf(test) && !nt.test.equals(test)) test = nt.test;
+      } else {
+        if(nt.instanceOf(test.type) && !nt.eq(test.type)) test = NodeTest.get(nt.kind);
+      }
     }
     // choose best implementation
     return copyType(get(info, axis, test, exprs));
@@ -199,8 +201,10 @@ public abstract class Step extends Preds {
    * @return sequence type
    */
   public static SeqType seqType(final Axis axis, final Test test, final Expr... preds) {
-    final Type type = axis == ATTRIBUTE ? NodeType.ATTRIBUTE : test.type;
-    final Occ occ = axis == SELF && test == NodeTest.NODE && preds.length == 0
+    final Occ occ = axis == ATTRIBUTE && test.matches(Types.ATTRIBUTE_ZM) == Boolean.FALSE
+      // no results: attribute::element()
+      ? Occ.ZERO :
+        axis == SELF && test == NodeTest.NODE && preds.length == 0
       // one result: self::node()
       ? Occ.EXACTLY_ONE :
         axis == SELF || axis == PARENT ||
@@ -209,8 +213,7 @@ public abstract class Step extends Preds {
       // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
       ? Occ.ZERO_OR_ONE
       : Occ.ZERO_OR_MORE;
-    final Test t = test instanceof NodeTest ? null : test;
-    return SeqType.get(type, occ, t);
+    return NodeType.get(test).seqType(occ);
   }
 
   @Override

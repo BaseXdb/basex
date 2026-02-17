@@ -196,12 +196,13 @@ public final class ChoiceItemType implements Type {
    */
   boolean hasInstance(final SeqType seqType) {
     if(!seqType.one()) throw Util.notExpected();
-    final Test test = seqType.test();
-    if(test instanceof final UnionTest ut) {
-      for(final Test t : ut.tests) {
-        if(!hasInstance(SeqType.get(t))) return false;
+    if(seqType.type instanceof final NodeType nt) {
+      if(nt.test instanceof final UnionTest ut) {
+        for(final Test t : ut.tests) {
+          if(!hasInstance(NodeType.get(t))) return false;
+        }
+        return true;
       }
-      return true;
     }
     for(final SeqType st : types) {
       if(seqType.instanceOf(st)) return true;

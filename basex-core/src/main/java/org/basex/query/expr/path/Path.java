@@ -666,7 +666,7 @@ public abstract class Path extends ParseExpr {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm qName = qNames.get(ts - t - 1);
         final Test test = qName == null ? NodeTest.ELEMENT :
-          new NameTest(qName, Scope.LOCAL, NodeType.ELEMENT, null);
+          new NameTest(qName, Scope.LOCAL, Kind.ELEMENT, null);
         stps[t] = Step.get(cc, root, curr.info(), CHILD, test, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
@@ -806,7 +806,7 @@ public abstract class Path extends ParseExpr {
     // invert steps that occur before index step, rewrite them to predicates
     final Expr indexStep = indexSteps.isEmpty() ? null : indexSteps.peek();
     final ExprList invSteps = new ExprList(), lastPreds = new ExprList();
-    if(rootTest != NodeTest.DOCUMENT_NODE || data == null || !data.meta.uptodate ||
+    if(rootTest != NodeTest.DOCUMENT || data == null || !data.meta.uptodate ||
         invertSteps(stepIndex)) {
       for(int s = stepIndex; s >= 0; s--) {
         final Axis axis = axisStep(s).axis.invert();
@@ -823,7 +823,7 @@ public abstract class Path extends ParseExpr {
             newPreds = new Expr[0];
           } else {
             // index use is enforced: ...::document-node()[db:node-id(.) = db:node-id(ROOT)]
-            newTest = NodeTest.DOCUMENT_NODE;
+            newTest = NodeTest.DOCUMENT;
             newPreds = new Expr[] { new CmpG(info, _DB_NODE_ID.get(info, new ContextValue(ii)),
               _DB_NODE_ID.get(info, rt), CmpOp.EQ) };
           }
@@ -836,7 +836,7 @@ public abstract class Path extends ParseExpr {
         }
         // skip step if it is always successful
         if(newAxis != ANCESTOR && newAxis != ANCESTOR_OR_SELF ||
-            newTest != NodeTest.NODE && newTest != NodeTest.DOCUMENT_NODE ||
+            newTest != NodeTest.NODE && newTest != NodeTest.DOCUMENT ||
             newPreds.length > 0) {
           final Expr expr = invSteps.isEmpty() ?
             indexStep != null ? indexStep : indexRoot : invSteps.peek();

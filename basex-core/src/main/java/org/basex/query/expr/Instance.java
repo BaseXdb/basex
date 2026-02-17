@@ -92,7 +92,6 @@ public final class Instance extends Single {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    // E[. instance of element(a)] → E[self::a]
     final Expr ex = mode.oneOf(Simplify.EBV, Simplify.PREDICATE) ? optPred(cc) : this;
     return cc.simplify(this, ex, mode);
   }
@@ -106,8 +105,9 @@ public final class Instance extends Single {
   private Expr optPred(final CompileContext cc) throws QueryException {
     if(expr instanceof ContextValue && expr.seqType().type instanceof NodeType &&
         seqType.type instanceof final NodeType nt) {
-      final Test test = seqType.test();
-      final Expr step = Step.self(cc, null, info, test != null ? test : NodeTest.get(nt));
+      // E[. instance of element(a)] → E[self::a]
+      final Test test = nt.test;
+      final Expr step = Step.self(cc, null, info, test != null ? test : NodeTest.get(nt.kind));
       return step != Empty.VALUE ? Path.get(cc, info, null, step) : Bln.FALSE;
     }
     return this;

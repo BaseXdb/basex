@@ -2323,7 +2323,7 @@ public class QueryParser extends InputParser {
       if(axis == null) {
         axis = Axis.CHILD;
         final ExprInfo ei = simpleNodeTest(Kind.ELEMENT, true);
-        if(ei == NodeTest.NAMESPACE_NODE) throw error(NSAXIS);
+        if(ei == NodeTest.NAMESPACE) throw error(NSAXIS);
         if(ei instanceof final Test tst) {
           if(tst.type.kind == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
           checkTest(tst, axis != Axis.ATTRIBUTE);
@@ -2411,23 +2411,22 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private ExprInfo simpleNodeTest(final Kind kind, final boolean all) throws QueryException {
-    final NodeType type = NodeType.get(kind);
     int p = pos;
     if(consume('*')) {
       p = pos;
       if(consume(':') && !consume('*')) {
         // name test: *:name
-        return new NameTest(new QNm(ncName(QNAME_X, true)), NameTest.Scope.LOCAL, type, sc.elemNS);
+        return new NameTest(new QNm(ncName(QNAME_X, true)), NameTest.Scope.LOCAL, kind, sc.elemNS);
       }
       // name test: *
       pos = p;
-      return NodeTest.get(type);
+      return NodeTest.get(kind);
     }
     if(consume("Q{")) {
       // name test: Q{uri}*
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
-        return new NameTest(new QNm(cpToken(':'), uri), NameTest.Scope.URI, type, sc.elemNS);
+        return new NameTest(new QNm(cpToken(':'), uri), NameTest.Scope.URI, kind, sc.elemNS);
       }
     }
     pos = p;
@@ -2440,8 +2439,7 @@ public class QueryParser extends InputParser {
         final Kind kn = Kind.get(name);
         if(kn != null) {
           // kind test
-          final Test test = kindTest(kn);
-          return test != null ? test : NodeTest.get(NodeType.get(kn));
+          return kindTest(kn);
         }
         if(name.eq(new QNm(GET))) {
           // dynamic name test
@@ -2459,7 +2457,7 @@ public class QueryParser extends InputParser {
         }
         // name test: prefix:name, name, Q{uri}name
         qnames.add(name, kind == Kind.ELEMENT, ii);
-        return new NameTest(name, scope, type, sc.elemNS);
+        return new NameTest(name, scope, kind, sc.elemNS);
       }
     }
     pos = p;
@@ -3531,8 +3529,7 @@ public class QueryParser extends InputParser {
       final Kind kind = Kind.get(name);
       if(kind != null) {
         // node type
-        if(wsConsume(")")) type = NodeType.get(kind);
-        else st = SeqType.get(kindTest(kind));
+        type = wsConsume(")") ? NodeType.get(kind) : NodeType.get(kindTest(kind));
       } else if(name.eq(BasicType.ITEM.qname())) {
         // item type
         type = BasicType.ITEM;
@@ -3637,7 +3634,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "KindTest" rule without the type name and the opening bracket.
    * @param kind node kind
-   * @return test or {@code null}
+   * @return test
    * @throws QueryException query exception
    */
   private Test kindTest(final Kind kind) throws QueryException {
@@ -3649,7 +3646,7 @@ public class QueryParser extends InputParser {
       default -> null;
     };
     wsCheck(")");
-    return tp;
+    return tp != null ? tp : NodeTest.get(kind);
   }
 
   /**
@@ -3724,7 +3721,7 @@ public class QueryParser extends InputParser {
     } else {
       return null;
     }
-    return NameTest.get(NodeType.PROCESSING_INSTRUCTION, new QNm(name));
+    return NameTest.get(new QNm(name), Kind.PROCESSING_INSTRUCTION);
   }
 
   /**

@@ -376,7 +376,7 @@ public class CmpG extends Cmp {
       if(scope != null) {
         final ExprList paths = new ExprList(2);
         for(final QNm qname : qnames) {
-          final Test test = new NameTest(qname, scope, nt, sc().elemNS);
+          final Test test = new NameTest(qname, scope, nt.kind, sc().elemNS);
           final Expr step = Step.self(cc, null, info, test);
           if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
         }

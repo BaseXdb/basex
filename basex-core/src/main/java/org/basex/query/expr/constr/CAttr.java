@@ -43,7 +43,7 @@ public final class CAttr extends CName {
     if(name instanceof Value) {
       final QNm nm = qname(false, cc.qc);
       name = nm;
-      exprType.assign(SeqType.get(NameTest.get(NodeType.ATTRIBUTE, nm)));
+      exprType.assign(NodeType.get(NameTest.get(nm, Kind.ATTRIBUTE)));
     }
     optValue(cc);
     return this;

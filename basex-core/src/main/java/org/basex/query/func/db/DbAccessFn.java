@@ -12,6 +12,7 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
@@ -120,7 +121,7 @@ abstract class DbAccessFn extends StandardFunc {
     final QNm qnm = qc.shared.qName(nm, sc().ns.uri(prefix(nm)));
 
     // return empty sequence if test will yield no results
-    final NameTest nt = new NameTest(qnm, NameTest.Scope.FULL, NodeType.ATTRIBUTE, sc().elemNS);
+    final NameTest nt = new NameTest(qnm, NameTest.Scope.FULL, Kind.ATTRIBUTE, sc().elemNS);
     if(nt.optimize(data) == null) return Empty.ITER;
 
     // wrap iterator with name test
@@ -129,7 +130,9 @@ abstract class DbAccessFn extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         Item item;
-        while((item = qc.next(iter)) != null && !nt.matches(item));
+        while((item = qc.next(iter)) != null) {
+          if(item instanceof final XNode node && nt.matches(node)) break;
+        }
         return item;
       }
     };
