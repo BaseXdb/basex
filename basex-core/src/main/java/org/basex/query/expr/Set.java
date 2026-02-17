@@ -153,7 +153,7 @@ abstract class Set extends Arr {
         for(final Test t : tests) {
           if(test == null || t.instanceOf(test)) {
             test = t;
-          } else if(!test.instanceOf(t)) {
+          } else if(test.intersect(t) == null) {
             return Empty.VALUE;
           }
         }

@@ -1407,6 +1407,17 @@ public final class RewritingsTest extends SandboxTest {
     check("<_><a/></_>/(a intersect * intersect node())", "<a/>",
         empty(Intersect.class), type(IterPath.class, "element(a)*"));
     check("<_><a/></_>/(a intersect b)", "", empty());
+
+    // GH-2599
+    query("let $in := <doc><b/></doc> return $in/(a, b) intersect $in/(b, c)", "<b/>");
+    query("let $in := <doc><b/></doc> return $in/(a, b) intersect $in/(c, b)", "<b/>");
+    query("let $in := <doc><b/></doc> return $in/(b, a) intersect $in/(b, c)", "<b/>");
+    query("let $in := <doc><b/></doc> return $in/(b, a) intersect $in/(c, b)", "<b/>");
+    query("let $in := <doc><b/></doc> return $in/(b, a) intersect $in/b", "<b/>");
+    query("let $in := <doc><b/></doc> return $in/b intersect $in/(b, c)", "<b/>");
+    query("let $in := <doc><b/></doc> return $in/a intersect $in/b", "");
+    query("let $in := <doc><b/></doc> return $in/(a, d) intersect $in/(b, c)", "");
+
     // except
     check("<_><a/></_>/(* except text())", "<a/>",
         empty(Except.class), type(IterPath.class, "element()*"));
