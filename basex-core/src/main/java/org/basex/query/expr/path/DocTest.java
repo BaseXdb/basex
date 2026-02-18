@@ -1,6 +1,5 @@
 package org.basex.query.expr.path;
 
-import org.basex.query.iter.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 
@@ -30,13 +29,13 @@ public final class DocTest extends Test {
 
   @Override
   public boolean matches(final XNode node) {
-    if(node.kind() != Kind.DOCUMENT) return false;
-    final BasicNodeIter iter = node.childIter();
     boolean found = false;
-    for(final XNode n : iter) {
-      if(n.kind().oneOf(Kind.COMMENT, Kind.PROCESSING_INSTRUCTION)) continue;
-      if(found || !child.matches(n)) return false;
-      found = true;
+    if(node.kind() == Kind.DOCUMENT) {
+      for(final XNode n : node.childIter()) {
+        if(n.kind().oneOf(Kind.COMMENT, Kind.PROCESSING_INSTRUCTION)) continue;
+        if(found || !child.matches(n)) return false;
+        found = true;
+      }
     }
     return found;
   }

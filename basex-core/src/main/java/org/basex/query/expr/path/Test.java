@@ -17,14 +17,14 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Test extends ExprInfo {
-  /** Node type. */
-  public final NodeType type;
+  /** Type. */
+  public final Type type;
 
   /**
    * Constructor.
-   * @param type node type
+   * @param type type
    */
-  Test(final NodeType type) {
+  Test(final Type type) {
     this.type = type;
   }
 

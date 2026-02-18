@@ -65,10 +65,10 @@ public final class NameTest extends Test {
    * Constructor.
    * @param qname name
    * @param scope scope
-   * @param type node type (must be element, attribute, or processing instruction)
+   * @param type type (must be element, attribute, or processing instruction)
    * @param defaultNs default element namespace (used for optimizations, can be {@code null})
    */
-  public NameTest(final QNm qname, final Scope scope, final NodeType type, final byte[] defaultNs) {
+  public NameTest(final QNm qname, final Scope scope, final Type type, final byte[] defaultNs) {
     super(type);
     this.qname = qname;
     this.scope = scope;
