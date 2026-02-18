@@ -199,7 +199,7 @@ public final class Constr {
     }
     for(int n = 0; n < dNs; n++) addNS(inscopeNS, dynamicNs.name(n), dynamicNs.value(n));
 
-    final ANodeList attributes = builder.attributes;
+    final GNodeList attributes = builder.attributes;
     if(attributes != null) {
       final int as = attributes.size();
       for(int a = 0; a < as; a++) {

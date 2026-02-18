@@ -24,9 +24,9 @@ public final class FBuilder {
   /** Namespaces (can be {@code null}). */
   public Atts namespaces;
  /** Attributes (can be {@code null}). */
-  public ANodeList attributes;
+  public GNodeList attributes;
   /** Children (can be {@code null}). */
-  public ANodeList children;
+  public GNodeList children;
 
   /**
    * Constructor.
@@ -68,9 +68,9 @@ public final class FBuilder {
    */
   public FBuilder add(final XNode node) {
     final boolean attr = node.kind() == Kind.ATTRIBUTE;
-    ANodeList nodes = attr ? attributes : children;
+    GNodeList nodes = attr ? attributes : children;
     if(nodes == null) {
-      nodes = new ANodeList();
+      nodes = new GNodeList();
       if(attr) attributes = nodes;
       else children = nodes;
     }

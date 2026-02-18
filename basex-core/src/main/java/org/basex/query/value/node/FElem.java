@@ -177,12 +177,12 @@ public final class FElem extends FNode {
 
   @Override
   public BasicNodeIter attributeIter() {
-    return ANodeList.iter(attributes);
+    return GNodeList.iter(attributes);
   }
 
   @Override
   public BasicNodeIter childIter() {
-    return ANodeList.iter(children);
+    return GNodeList.iter(children);
   }
 
   @Override

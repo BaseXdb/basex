@@ -71,7 +71,7 @@ public final class Insert extends Update {
       final Updates updates = qc.updates();
 
       // no update primitive is created if node list is empty
-      ANodeList list = builder.attributes;
+      GNodeList list = builder.attributes;
       if(list != null) {
         final XNode target = sibling ? parent : node;
         if(target.kind() != Kind.ELEMENT)

@@ -30,7 +30,7 @@ public final class CachedStep extends Step {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     // evaluate step
-    final ANodeList list = new ANodeList();
+    final GNodeList list = new GNodeList();
     for(final XNode node : axis.iter(checkNode(qc))) {
       if(test.matches(node)) list.add(node);
     }

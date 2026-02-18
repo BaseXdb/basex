@@ -178,8 +178,8 @@ public abstract class XNode extends Item {
       return true;
     }
 
-    final Function<XNode, ANodeList> children = node -> {
-      final ANodeList nl = new ANodeList();
+    final Function<XNode, GNodeList> children = node -> {
+      final GNodeList nl = new GNodeList();
       for(final XNode child : node.childIter()) {
         if(deep.qc != null) deep.qc.checkStop();
         final Kind kind = child.kind();
@@ -198,7 +198,7 @@ public abstract class XNode extends Item {
       return nl;
     };
 
-    final ANodeList list1 = children.apply(node1), list2 = children.apply(node2);
+    final GNodeList list1 = children.apply(node1), list2 = children.apply(node2);
     final int size1 = list1.size();
     if(size1 != list2.size()) return false;
     deep.nested = true;
@@ -406,7 +406,7 @@ public abstract class XNode extends Item {
    */
   static int compare(final XNode node1, final XNode node2) {
     // cache parents of first node
-    final ANodeList nl = new ANodeList();
+    final GNodeList nl = new GNodeList();
     for(XNode node = node1; node != null; node = node.parent()) {
       if(node == node2) return 1;
       nl.add(node);
@@ -554,7 +554,7 @@ public abstract class XNode extends Item {
       @Override
       public XNode next() {
         if(iter == null) {
-          final ANodeList list = new ANodeList();
+          final GNodeList list = new GNodeList();
           if(self) list.add(XNode.this);
           XNode node = XNode.this, root = node.parent();
           while(root != null) {
@@ -633,12 +633,12 @@ public abstract class XNode extends Item {
       @Override
       public XNode next() {
         if(iter == null) {
-          final ANodeList list = new ANodeList();
+          final GNodeList list = new GNodeList();
           if(self) list.add(XNode.this);
           XNode node = XNode.this, root = node.parent();
           while(root != null) {
             if(node.kind() != ATTRIBUTE) {
-              final ANodeList lst = new ANodeList();
+              final GNodeList lst = new GNodeList();
               for(final XNode ch : root.childIter()) {
                 if(ch.is(node)) break;
                 lst.add(ch);
@@ -666,13 +666,13 @@ public abstract class XNode extends Item {
     if(root == null || kind() == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
 
     return new BasicNodeIter() {
-      private ANodeList list;
+      private GNodeList list;
       private int l;
 
       @Override
       public XNode next() {
         if(list == null) {
-          list = new ANodeList();
+          list = new GNodeList();
           for(final XNode node : root.childIter()) {
             final boolean last = node.is(XNode.this);
             if(!last || self) list.add(node);
@@ -707,7 +707,7 @@ public abstract class XNode extends Item {
    * @param children child nodes
    * @param nodes node cache
    */
-  private static void addDescendants(final BasicNodeIter children, final ANodeList nodes) {
+  private static void addDescendants(final BasicNodeIter children, final GNodeList nodes) {
     for(final XNode node : children) {
       nodes.add(node);
       addDescendants(node.childIter(), nodes);

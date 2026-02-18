@@ -76,7 +76,7 @@ public final class Payload {
       // multipart response
       final byte[] boundary = boundary(type);
       body = FElem.build(Q_HTTP_MULTIPART).add(Q_BOUNDARY, boundary);
-      final ANodeList parts = new ANodeList();
+      final GNodeList parts = new GNodeList();
       extractParts(concat(DASHES, boundary), parts);
       for(final XNode node : parts) body.add(node);
     } else {
@@ -120,7 +120,7 @@ public final class Payload {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private void extractParts(final byte[] sep, final ANodeList parts)
+  private void extractParts(final byte[] sep, final GNodeList parts)
       throws IOException, QueryException {
 
     // RFC 1341: Preamble is to be ignored: read till 1st boundary
@@ -142,7 +142,7 @@ public final class Payload {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private boolean extractPart(final byte[] sep, final byte[] end, final ANodeList parts)
+  private boolean extractPart(final byte[] sep, final byte[] end, final GNodeList parts)
       throws IOException, QueryException {
 
     // check if last line is reached

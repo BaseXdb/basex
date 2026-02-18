@@ -22,14 +22,14 @@ public final class FnElementToMapPlan extends PlanFn {
     final Iter iter = arg(0).iter(qc);
 
     // collect element and attribute nodes
-    final QNmMap<ANodeList> elemNames = new QNmMap<>();
-    final QNmMap<ANodeList> attrNames = new QNmMap<>();
+    final QNmMap<GNodeList> elemNames = new QNmMap<>();
+    final QNmMap<GNodeList> attrNames = new QNmMap<>();
     for(Item item; (item = iter.next()) != null;) {
       for(final XNode desc : toNode(item).descendantIter(true)) {
         if(desc.kind() == Kind.ELEMENT) {
-          elemNames.computeIfAbsent(desc.qname(), ANodeList::new).add(desc);
+          elemNames.computeIfAbsent(desc.qname(), GNodeList::new).add(desc);
           for(final XNode attr : children(Kind.ATTRIBUTE, desc)) {
-            attrNames.computeIfAbsent(attr.qname(), ANodeList::new).add(attr);
+            attrNames.computeIfAbsent(attr.qname(), GNodeList::new).add(attr);
           }
         }
       }

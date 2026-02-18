@@ -38,7 +38,7 @@ public final class CDoc extends CNode {
     if(constr.errNS != null) throw DOCNS_X.get(info, constr.errNS);
     final Atts ns = doc.namespaces;
     if(ns != null) throw DOCNS_X.get(info, ns.name(0));
-    final ANodeList attributes = doc.attributes;
+    final GNodeList attributes = doc.attributes;
     if(attributes != null) throw DOCATTS_X.get(info, attributes.get(0).name());
 
     return doc.finish();

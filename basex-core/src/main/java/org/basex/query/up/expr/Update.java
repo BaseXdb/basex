@@ -41,7 +41,7 @@ abstract class Update extends Arr {
    * @return specified node list
    * @throws QueryException query exception
    */
-  final ANodeList checkNS(final ANodeList list, final XNode target) throws QueryException {
+  final GNodeList checkNS(final GNodeList list, final XNode target) throws QueryException {
     for(final XNode node : list) {
       final QNm name = node.qname();
       final byte[] prefix = name.prefix();

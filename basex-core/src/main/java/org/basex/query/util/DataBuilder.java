@@ -60,7 +60,7 @@ public final class DataBuilder {
    * @throws QueryException query exception
    */
   public void build(final XNode node) throws QueryException {
-    build(new ANodeList().add(node));
+    build(new GNodeList().add(node));
   }
 
   /**
@@ -68,7 +68,7 @@ public final class DataBuilder {
    * @param nodes node list
    * @throws QueryException query exception
    */
-  public void build(final ANodeList nodes) throws QueryException {
+  public void build(final GNodeList nodes) throws QueryException {
     data.meta.update();
     int next = data.meta.size;
     for(final XNode node : nodes) next = addNode(node, next, -1);

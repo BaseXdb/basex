@@ -22,14 +22,14 @@ public final class InsertBefore extends NodeCopy {
    * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence
    */
-  public InsertBefore(final int pre, final Data data, final InputInfo info, final ANodeList nodes) {
+  public InsertBefore(final int pre, final Data data, final InputInfo info, final GNodeList nodes) {
     super(UpdateType.INSERTBEFORE, pre, data, info, nodes);
   }
 
   @Override
   public void merge(final Update update) {
     final InsertBefore newOne = (InsertBefore) update;
-    final ANodeList newInsert = newOne.nodes;
+    final GNodeList newInsert = newOne.nodes;
     for(final XNode node : newInsert) nodes.add(node);
   }
 

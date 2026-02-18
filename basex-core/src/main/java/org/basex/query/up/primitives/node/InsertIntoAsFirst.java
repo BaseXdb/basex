@@ -23,13 +23,13 @@ public final class InsertIntoAsFirst extends NodeCopy {
    * @param nodes insertion sequence node list
    */
   public InsertIntoAsFirst(final int pre, final Data data, final InputInfo info,
-      final ANodeList nodes) {
+      final GNodeList nodes) {
     super(UpdateType.INSERTINTOFIRST, pre, data, info, nodes);
   }
 
   @Override
   public void merge(final Update update) {
-    final ANodeList newInsert = ((NodeCopy) update).nodes;
+    final GNodeList newInsert = ((NodeCopy) update).nodes;
     for(final XNode node : newInsert) nodes.add(node);
   }
 

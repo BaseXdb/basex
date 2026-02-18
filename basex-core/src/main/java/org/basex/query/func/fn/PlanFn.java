@@ -202,7 +202,7 @@ public abstract class PlanFn extends StandardFunc {
         case SIMPLE, SIMPLE_PLUS ->
           children(Kind.ELEMENT, node).isEmpty();
         case LIST, LIST_PLUS -> {
-          final ANodeList children = children(Kind.ELEMENT, node);
+          final GNodeList children = children(Kind.ELEMENT, node);
           yield empty(children(Kind.TEXT, node)) && equalNames(children) &&
             (children.isEmpty() || children.get(0).qname().eq(child));
         }
@@ -274,9 +274,9 @@ public abstract class PlanFn extends StandardFunc {
    */
   final PlanEntry entry(final XNode... nodes) {
     final PlanEntry pe = new PlanEntry();
-    final ANodeList attributes = children(Kind.ATTRIBUTE, nodes);
-    final ANodeList elements = children(Kind.ELEMENT, nodes);
-    final ANodeList texts = children(Kind.TEXT, nodes);
+    final GNodeList attributes = children(Kind.ATTRIBUTE, nodes);
+    final GNodeList elements = children(Kind.ELEMENT, nodes);
+    final GNodeList texts = children(Kind.TEXT, nodes);
     if(elements.isEmpty() && texts.isEmpty()) {
       pe.layout = attributes.isEmpty() ? PlanLayout.EMPTY : PlanLayout.EMPTY_PLUS;
     } else if(elements.isEmpty()) {
@@ -303,7 +303,7 @@ public abstract class PlanFn extends StandardFunc {
    * @param nodes node list
    * @return result of check
    */
-  static boolean empty(final ANodeList nodes) {
+  static boolean empty(final GNodeList nodes) {
     return ((Checks<XNode>) node -> Token.normalize(node.string()).length == 0).all(nodes);
   }
 
@@ -313,8 +313,8 @@ public abstract class PlanFn extends StandardFunc {
    * @param nodes nodes
    * @return result of check
    */
-  static ANodeList children(final Kind kind, final XNode... nodes) {
-    final ANodeList list = new ANodeList();
+  static GNodeList children(final Kind kind, final XNode... nodes) {
+    final GNodeList list = new GNodeList();
     for(final XNode node : nodes) {
       if(kind == Kind.ATTRIBUTE) {
         for(final XNode child : node.attributeIter()) {
@@ -347,7 +347,7 @@ public abstract class PlanFn extends StandardFunc {
    * @param nodes node list
    * @return result of check
    */
-  private static boolean equalNames(final ANodeList nodes) {
+  private static boolean equalNames(final GNodeList nodes) {
     QNm name = null;
     for(final XNode node : nodes) {
       if(node.kind() == Kind.ELEMENT) {
@@ -368,7 +368,7 @@ public abstract class PlanFn extends StandardFunc {
    */
   private MapBuilder attributes(final XNode node, final Plan plan, final QueryContext qc)
       throws QueryException {
-    final ANodeList attributes = children(Kind.ATTRIBUTE, node);
+    final GNodeList attributes = children(Kind.ATTRIBUTE, node);
     final MapBuilder mb = new MapBuilder(attributes.size());
     for(final XNode attr : attributes) {
       final PlanEntry entry = plan.entries.get(attr.qname());
@@ -428,7 +428,7 @@ public abstract class PlanFn extends StandardFunc {
    */
   private XQArray list(final XNode node, final Plan plan, final QueryContext qc)
       throws QueryException {
-    final ANodeList children = children(Kind.ELEMENT, node);
+    final GNodeList children = children(Kind.ELEMENT, node);
     final ArrayBuilder ab = new ArrayBuilder(qc, children.size());
     for(final XNode ch : children) {
       ab.add(entry(ch, plan).apply(ch, null, plan, qc));
@@ -447,12 +447,12 @@ public abstract class PlanFn extends StandardFunc {
   private XQMap record(final XNode node, final Plan plan, final QueryContext qc)
       throws QueryException {
     final MapBuilder map = attributes(node, plan, qc);
-    final TokenObjectMap<ANodeList> cache = new TokenObjectMap<>();
+    final TokenObjectMap<GNodeList> cache = new TokenObjectMap<>();
     for(final XNode ch : children(Kind.ELEMENT, node)) {
-      cache.computeIfAbsent(nodeName(ch, node, plan, qc), ANodeList::new).add(ch);
+      cache.computeIfAbsent(nodeName(ch, node, plan, qc), GNodeList::new).add(ch);
     }
     for(final byte[] name : cache) {
-      final ANodeList children = cache.get(name);
+      final GNodeList children = cache.get(name);
       final PlanEntry pe = entry(children.get(0), plan);
       if(pe.layout != PlanLayout.DEEP_SKIP) {
         final ArrayBuilder ab = new ArrayBuilder(qc, children.size());

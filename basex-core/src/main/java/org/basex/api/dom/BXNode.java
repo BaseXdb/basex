@@ -272,7 +272,7 @@ public abstract class BXNode implements Node {
    * @return nodes
    */
   final BXNList getElements(final String name) {
-    final ANodeList nb = new ANodeList();
+    final GNodeList nb = new GNodeList();
     final byte[] nm = "*".equals(name) ? null : token(name);
     for(final XNode n : nd.descendantIter(false)) {
       if(n.kind() == Kind.ELEMENT && (nm == null || eq(nm, n.name()))) {
@@ -287,8 +287,8 @@ public abstract class BXNode implements Node {
    * @param iter axis iterator
    * @return node cache
    */
-  static ANodeList finish(final BasicNodeIter iter) {
-    final ANodeList nl = new ANodeList();
+  static GNodeList finish(final BasicNodeIter iter) {
+    final GNodeList nl = new GNodeList();
     for(final XNode n : iter) nl.add(n);
     return nl;
   }

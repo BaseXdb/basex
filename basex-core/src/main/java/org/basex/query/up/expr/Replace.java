@@ -71,15 +71,15 @@ public final class Replace extends Update {
         final XNode parent = targ.parent();
         if(parent == null) throw UPNOPAR_X.get(info, targ);
 
-        final ANodeList list;
+        final GNodeList list;
         if(kind == Kind.ATTRIBUTE) {
           // replace attribute node
           if(builder.children != null) throw UPWRATTR_X.get(info, builder.children.get(0));
-          list = builder.attributes != null ? checkNS(builder.attributes, parent) : new ANodeList();
+          list = builder.attributes != null ? checkNS(builder.attributes, parent) : new GNodeList();
         } else {
           // replace non-attribute node
           if(builder.attributes != null) throw UPWRELM_X.get(info, targ);
-          list = builder.children != null ? builder.children : new ANodeList();
+          list = builder.children != null ? builder.children : new GNodeList();
         }
         // conforms to specification: insertion sequence may be empty
         updates.add(new ReplaceNode(dbnode.pre(), dbnode.data(), info, list), qc);

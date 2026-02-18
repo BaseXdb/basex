@@ -12,13 +12,13 @@ import org.w3c.dom.*;
  */
 class BXNList implements NodeList {
   /** XQuery node set. */
-  final ANodeList nodes;
+  final GNodeList nodes;
 
   /**
    * Constructor.
    * @param nodes nodes
    */
-  BXNList(final ANodeList nodes) {
+  BXNList(final GNodeList nodes) {
     this.nodes = nodes;
   }
 

@@ -88,8 +88,8 @@ public final class Thesaurus {
    * @param desc return children or descendants
    * @return resulting elements
    */
-  private static ANodeList elements(final XNode node, final byte[] name, final boolean desc) {
-    final ANodeList list = new ANodeList();
+  private static GNodeList elements(final XNode node, final byte[] name, final boolean desc) {
+    final GNodeList list = new GNodeList();
     for(final XNode element : desc ? node.descendantIter(false) : node.childIter()) {
       if(element.kind() == Kind.ELEMENT && eq(element.qname().local(), name))
         list.add(element);
@@ -104,7 +104,7 @@ public final class Thesaurus {
    * @return value or empty string
    */
   private static byte[] value(final XNode node, final byte[] name) {
-    final ANodeList elements = elements(node, name, false);
+    final GNodeList elements = elements(node, name, false);
     return elements.isEmpty() ? EMPTY : elements.peek().string();
   }
 }

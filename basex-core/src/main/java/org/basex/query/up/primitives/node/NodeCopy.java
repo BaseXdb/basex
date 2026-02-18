@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 abstract class NodeCopy extends NodeUpdate {
   /** Nodes to be inserted. */
-  ANodeList nodes;
+  GNodeList nodes;
   /** Insertion sequence data clip (will be populated by {@link #prepare}). */
   DataClip insseq;
 
@@ -32,7 +32,7 @@ abstract class NodeCopy extends NodeUpdate {
    * @param nodes node copy insertion sequence
    */
   NodeCopy(final UpdateType type, final int pre, final Data data, final InputInfo info,
-      final ANodeList nodes) {
+      final GNodeList nodes) {
     super(type, pre, data, info);
     this.nodes = nodes;
   }
@@ -41,7 +41,7 @@ abstract class NodeCopy extends NodeUpdate {
   public final void prepare(final MemData memData, final QueryContext qc) throws QueryException {
     // merge texts. after that, text nodes still need to be merged,
     // as two adjacent iterators may lead to two adjacent text nodes
-    final ANodeList list = mergeNodeCacheText(nodes);
+    final GNodeList list = mergeNodeCacheText(nodes);
     nodes = null;
     // build main memory representation of nodes to be copied
     final int start = memData.meta.size;
@@ -73,10 +73,10 @@ abstract class NodeCopy extends NodeUpdate {
    * @param nl iterator
    * @return iterator with merged text nodes
    */
-  private static ANodeList mergeNodeCacheText(final ANodeList nl) {
+  private static GNodeList mergeNodeCacheText(final GNodeList nl) {
     final int ns = nl.size();
     if(ns == 0) return nl;
-    final ANodeList s = new ANodeList(ns);
+    final GNodeList s = new GNodeList(ns);
     XNode n = nl.get(0);
     for(int c = 0; c < ns;) {
       if(n.kind() == Kind.TEXT) {

@@ -18,11 +18,11 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ANodeList extends ObjectList<XNode, ANodeList> {
+public final class GNodeList extends ObjectList<XNode, GNodeList> {
   /**
    * Constructor.
    */
-  public ANodeList() {
+  public GNodeList() {
     this(1);
   }
 
@@ -30,7 +30,7 @@ public final class ANodeList extends ObjectList<XNode, ANodeList> {
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public ANodeList(final long capacity) {
+  public GNodeList(final long capacity) {
     super(new XNode[Array.initialCapacity(capacity)]);
   }
 
@@ -66,7 +66,7 @@ public final class ANodeList extends ObjectList<XNode, ANodeList> {
    * Invalidates all entries that are not referenced in the list.
    * @return the iterator
    */
-  public ANodeList clean() {
+  public GNodeList clean() {
     Arrays.fill(list, size, list.length, null);
     return this;
   }
@@ -83,7 +83,7 @@ public final class ANodeList extends ObjectList<XNode, ANodeList> {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj == this || obj instanceof ANodeList && super.equals(obj);
+    return obj == this || obj instanceof GNodeList && super.equals(obj);
   }
 
   /**

@@ -83,7 +83,7 @@ public final class FDoc extends FNode {
 
   @Override
   public BasicNodeIter childIter() {
-    return ANodeList.iter(children);
+    return GNodeList.iter(children);
   }
 
   @Override
