@@ -5,8 +5,6 @@ import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 
-import java.util.*;
-
 import org.basex.util.hash.*;
 
 /**
@@ -140,7 +138,7 @@ public final class Types {
   public static final SeqType BASE64_BINARY_ZM = BASE64_BINARY.seqType(ZERO_OR_MORE);
 
   /** String or xs:hex-binary or xs:base64-binary. */
-  public static final ChoiceItemType STRING_OR_BINARY =
+  public static final Type STRING_OR_BINARY =
       ChoiceItemType.get(STRING_O, HEX_BINARY_O, BASE64_BINARY_O);
   /** Single string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_O = STRING_OR_BINARY.seqType();
@@ -188,10 +186,9 @@ public final class Types {
   public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
 
   /** Gregorian type. */
-  public static final SeqType GREGORIAN_ZO = new ChoiceItemType(Arrays.asList(
-      DATE_TIME.seqType(), DATE.seqType(), TIME.seqType(), G_YEAR.seqType(),
-      G_YEAR_MONTH.seqType(), G_MONTH.seqType(), G_MONTH_DAY.seqType(), G_DAY.seqType())).
-      seqType(ZERO_OR_ONE);
+  public static final SeqType GREGORIAN_ZO = ChoiceItemType.get(DATE_TIME.seqType(), DATE.seqType(),
+      TIME.seqType(), G_YEAR.seqType(), G_YEAR_MONTH.seqType(), G_MONTH.seqType(),
+      G_MONTH_DAY.seqType(), G_DAY.seqType()).seqType(ZERO_OR_ONE);
 
   // types that instantiate sequence types must be placed last to avoid circular dependencies
 

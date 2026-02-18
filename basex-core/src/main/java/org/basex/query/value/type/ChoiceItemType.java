@@ -30,14 +30,8 @@ public final class ChoiceItemType implements Type {
    * Constructor.
    * @param types alternative item types
    */
-  public ChoiceItemType(final List<SeqType> types) {
-    if(types.contains(Types.ERROR_O)) {
-      final ArrayList<SeqType> list = new ArrayList<>(types);
-      do { } while(list.remove(Types.ERROR_O));
-      this.types = list.isEmpty() ? types : list;
-    } else {
-      this.types = types;
-    }
+  private ChoiceItemType(final List<SeqType> types) {
+    this.types = types;
     Type tp = null;
     for(final SeqType st : this.types) {
       tp = tp == null ? st.type : tp.union(st.type);
@@ -46,12 +40,31 @@ public final class ChoiceItemType implements Type {
   }
 
   /**
+   * Creates a choice item type, removing error types if necessary. May return a single item type if
+   * only one type remains.
+   * @param types alternative item types (must not contain duplicates or ChoiceItemType instances)
+   * @return choice item type, or the single item type if the list contains only one type
+   */
+  public static Type get(final List<SeqType> types) {
+    List<SeqType> list;
+    if(!types.contains(Types.ERROR_O)) {
+      list = types;
+    } else if(types.size() == 1) {
+      return BasicType.ERROR;
+    } else {
+      list = new ArrayList<>(types);
+      list.remove(Types.ERROR_O);
+    }
+    return list.size() == 1 ? list.get(0).type : new ChoiceItemType(list);
+  }
+
+  /**
    * Creates a choice item type.
    * @param types alternative item types
    * @return choice item type
    */
-  public static ChoiceItemType get(final SeqType... types) {
-    return new ChoiceItemType(Arrays.asList(types));
+  public static Type get(final SeqType... types) {
+    return get(Arrays.asList(types));
   }
 
   @Override
@@ -122,16 +135,15 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public Type intersect(final Type type) {
-    final ArrayList<SeqType> list = new ArrayList<>();
+    final ArrayList<SeqType> list = new ArrayList<>(types.size());
     for(final SeqType st : types) {
       final Type tp = type.intersect(st.type);
-      if(tp != null) list.add(tp.seqType());
+      if(tp != null) {
+        final SeqType stp = tp.seqType();
+        if(!list.contains(stp)) list.add(stp);
+      }
     }
-    return switch(list.size()) {
-      case 0 -> null;
-      case 1 -> list.get(0).type;
-      default -> new ChoiceItemType(list);
-    };
+    return list.isEmpty() ? null : ChoiceItemType.get(list);
   }
 
   @Override
