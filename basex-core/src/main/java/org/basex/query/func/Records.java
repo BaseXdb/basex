@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
-import org.basex.query.*;
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -16,36 +17,46 @@ import org.basex.util.hash.*;
  */
 public enum Records {
   /** Record definition. */
-  DIVIDED_DECIMALS("divided-decimals",
+  DATETIME(FN_URI, "dateTime",
+    field("year", Types.INTEGER_O, true),
+    field("month", Types.INTEGER_O, true),
+    field("day", Types.INTEGER_O, true),
+    field("hours", Types.INTEGER_O, true),
+    field("minutes", Types.INTEGER_O, true),
+    field("seconds", Types.DECIMAL_O, true),
+    field("timezone", Types.DAY_TIME_DURATION_O, true)
+  ),
+  /** Record definition. */
+  DIVIDED_DECIMALS(FN_URI, "divided-decimals",
     field("quotient", Types.DECIMAL_O),
     field("remainder", Types.DECIMAL_O)
   ),
   /** Record definition. */
-  INFER_ENCODING("infer-encoding",
+  INFER_ENCODING(BIN_URI, "infer-encoding",
     field("encoding", Types.STRING_O, false),
     field("offset", Types.INTEGER_O, false)
   ),
   /** Record definition. */
-  LOAD_XQUERY_MODULE("load-xquery-module",
-    field("variables", MapType.get(BasicType.QNAME, Types.ITEM_ZO).seqType()),
+  LOAD_XQUERY_MODULE(FN_URI, "load-xquery-module",
+    field("variables", MapType.get(BasicType.QNAME, Types.ITEM_ZM).seqType()),
     field("functions", MapType.get(BasicType.QNAME,
       MapType.get(BasicType.INTEGER, Types.FUNCTION_O).seqType()).seqType())),
   /** Record definition. */
-  MEMBER("member",
+  MEMBER(ARRAY_URI, "member",
     field("value", Types.ITEM_ZM)),
   /** Record definition. */
-  PARSED_CSV_STRUCTURE("parsed-csv-structure",
+  PARSED_CSV_STRUCTURE(FN_URI, "parsed-csv-structure",
     field("columns", Types.STRING_ZM),
     field("column-index", MapType.get(BasicType.STRING, Types.INTEGER_O).seqType(Occ.ZERO_OR_ONE)),
     field("rows", ArrayType.get(Types.STRING_O).seqType(Occ.ZERO_OR_MORE)),
     field("get", FuncType.get(Types.STRING_O, Types.POSITIVE_INTEGER_O,
       ChoiceItemType.get(Types.POSITIVE_INTEGER_O, Types.STRING_O).seqType()).seqType())),
   /** Record definition. */
-  RANDOM_NUMBER_GENERATOR("random-number-generator"),
+  RANDOM_NUMBER_GENERATOR(FN_URI, "random-number-generator"),
   /** Record definition. */
-  SCHEMA_TYPE("schema-type"),
+  SCHEMA_TYPE(FN_URI, "schema-type"),
   /** Record definition. */
-  URI_STRUCTURE("uri-structure",
+  URI_STRUCTURE(FN_URI, "uri-structure",
     field("uri", Types.STRING_ZO, true),
     field("scheme", Types.STRING_ZO, true),
     field("absolute", Types.BOOLEAN_ZO, true),
@@ -110,15 +121,16 @@ public enum Records {
 
   /**
    * Constructor.
+   * @param namespace namespace of record
    * @param name name of record
    * @param fields field declarations
    */
-  Records(final String name, final NamedRecordField... fields) {
+  Records(final byte[] namespace, final String name, final NamedRecordField... fields) {
     final TokenObjectMap<RecordField> map = new TokenObjectMap<>(fields.length);
     for(final NamedRecordField field : fields) {
       map.put(field.name, field.field);
     }
-    final QNm qnm = new QNm(name + "-record", QueryText.FN_URI);
+    final QNm qnm = new QNm(name + "-record", namespace);
     type = new RecordType(map, qnm, AnnList.EMPTY);
   }
 

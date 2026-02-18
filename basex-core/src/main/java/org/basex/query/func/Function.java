@@ -772,6 +772,25 @@ public enum Function implements AFunction {
   ZERO_OR_ONE(FnZeroOrOne::new, "zero-or-one(input)",
       params(ITEM_ZM), ITEM_ZO),
 
+  // Predefined record constructor functions
+
+  /** XQuery function. */
+  DIVIDED_DECIMALS_RECORD(Records.DIVIDED_DECIMALS.get()),
+  /** XQuery function. */
+  INFER_ENCODING_RECORD(Records.INFER_ENCODING.get()),
+  /** XQuery function. */
+  LOAD_XQUERY_MODULE_RECORD(Records.LOAD_XQUERY_MODULE.get()),
+  /** XQuery function. */
+  MEMBER_RECORD(Records.MEMBER.get()),
+  /** XQuery function. */
+  PARSED_CSV_STRUCTURE_RECORD(Records.PARSED_CSV_STRUCTURE.get()),
+  /** XQuery function. */
+  RANDOM_NUMBER_GENERATOR_RECORD(Records.RANDOM_NUMBER_GENERATOR.get()),
+  /** XQuery function. */
+  SCHEMA_TYPE_RECORD(Records.SCHEMA_TYPE.get()),
+  /** XQuery function. */
+  URI_STRUCTURE_RECORD(Records.URI_STRUCTURE.get()),
+
   // Map Module
 
   /** XQuery function. */
@@ -2085,6 +2104,15 @@ public enum Function implements AFunction {
 
   /** Function definition. */
   private final FuncDefinition definition;
+
+  /**
+   * Constructs a function signature for a predefined record constructor from a RecordType.
+   * @param rt record type
+   */
+  Function(final RecordType rt) {
+    this(rt.constructor(), rt.constructorDesc(), rt.constructorParams(), rt.seqType(),
+        EnumSet.noneOf(Flag.class), rt.name().uri());
+  }
 
   /**
    * Constructs a function signature; calls
