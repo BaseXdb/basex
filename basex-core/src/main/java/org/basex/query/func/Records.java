@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.query.expr.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -30,8 +29,7 @@ public enum Records {
   /** Record definition. */
   DIVIDED_DECIMALS(FN_URI, "divided-decimals",
     field("quotient", Types.DECIMAL_O),
-    field("remainder", Types.DECIMAL_O),
-    field("precision", Types.INTEGER_ZO, true, Itr.ZERO)
+    field("remainder", Types.DECIMAL_O)
   ),
   /** Record definition. */
   INFER_ENCODING(BIN_URI, "infer-encoding",
@@ -166,18 +164,5 @@ public enum Records {
   private static NamedRecordField field(final String name, final SeqType type,
       final boolean optional) {
     return field(name, new RecordField(type, optional));
-  }
-
-  /**
-   * Returns a named record field.
-   * @param name name
-   * @param type type of record field
-   * @param optional optional flag
-   * @param defaultVal default value
-   * @return name/field pair
-   */
-  private static NamedRecordField field(final String name, final SeqType type,
-      final boolean optional, final Expr defaultVal) {
-    return field(name, new RecordField(type, optional, defaultVal));
   }
 }

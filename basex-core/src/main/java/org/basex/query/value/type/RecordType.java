@@ -497,11 +497,11 @@ public final class RecordType extends MapType {
     final int max = fields.size();
     final int min = minFields();
     for(int i = 1; i <= max; ++i) {
-      if(i > min) tb.add('[');
+      if(i == min + 1) tb.add('[');
       if(i > 1) tb.add(',');
       tb.add(fields.key(i));
     }
-    for(int i = min; i < max; i++) tb.add(']');
+    if(max > min) tb.add(']');
     return tb.add(')').toString();
   }
 
