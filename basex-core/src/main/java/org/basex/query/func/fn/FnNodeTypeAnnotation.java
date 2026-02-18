@@ -2,8 +2,6 @@ package org.basex.query.func.fn;
 
 import static org.basex.query.value.type.BasicType.*;
 
-import java.util.*;
-
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.node.*;
@@ -17,8 +15,8 @@ import org.basex.query.value.type.*;
  */
 public final class FnNodeTypeAnnotation extends FnSchemaType {
   /** The function's argument type. */
-  private static final SeqType ARG_TYPE = new ChoiceItemType(
-      Arrays.asList(Types.ELEMENT_O, Types.ATTRIBUTE_O)).seqType();
+  private static final SeqType ARG_TYPE =
+      ChoiceItemType.get(Types.ELEMENT_O, Types.ATTRIBUTE_O).seqType();
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {

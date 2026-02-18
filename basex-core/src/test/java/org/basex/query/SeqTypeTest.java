@@ -5,7 +5,6 @@ import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.Types.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.util.hash.*;
@@ -223,17 +222,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      c1 = SeqType.get(ChoiceItemType.get(DATE_O, STRING_O), EXACTLY_ONE),
       // (element() | xs:string)
-      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      c2 = SeqType.get(ChoiceItemType.get(ELEMENT_O, STRING_O), EXACTLY_ONE),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS_O, STRING_O), EXACTLY_ONE),
       // (array(*) | xs:string)
-      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      c4 = SeqType.get(ChoiceItemType.get(ARRAY_O, STRING_O), EXACTLY_ONE),
       // (map(*) | xs:string)
-      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      c5 = SeqType.get(ChoiceItemType.get(MAP_O, STRING_O), EXACTLY_ONE),
       // (function(*) | xs:string)
-      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+      c6 = SeqType.get(ChoiceItemType.get(FUNCTION_O, STRING_O), EXACTLY_ONE);
 
     assertTrue(c1.instanceOf(c1));
     assertFalse(c1.instanceOf(c2));
@@ -464,17 +463,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      c1 = SeqType.get(ChoiceItemType.get(DATE_O, STRING_O), EXACTLY_ONE),
       // (element() | xs:string)
-      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      c2 = SeqType.get(ChoiceItemType.get(ELEMENT_O, STRING_O), EXACTLY_ONE),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS_O, STRING_O), EXACTLY_ONE),
       // (array(*) | xs:string)
-      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      c4 = SeqType.get(ChoiceItemType.get(ARRAY_O, STRING_O), EXACTLY_ONE),
       // (map(*) | xs:string)
-      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      c5 = SeqType.get(ChoiceItemType.get(MAP_O, STRING_O), EXACTLY_ONE),
       // (function(*) | xs:string)
-      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+      c6 = SeqType.get(ChoiceItemType.get(FUNCTION_O, STRING_O), EXACTLY_ONE);
 
     combine(c1, op);
     combine(c1, DATE_O, ANY_ATOMIC_TYPE_O, op);
@@ -714,17 +713,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      c1 = SeqType.get(ChoiceItemType.get(DATE_O, STRING_O), EXACTLY_ONE),
       // (element() | xs:string)
-      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      c2 = SeqType.get(ChoiceItemType.get(ELEMENT_O, STRING_O), EXACTLY_ONE),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS_O, STRING_O), EXACTLY_ONE),
       // (array(*) | xs:string)
-      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      c4 = SeqType.get(ChoiceItemType.get(ARRAY_O, STRING_O), EXACTLY_ONE),
       // (map(*) | xs:string)
-      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      c5 = SeqType.get(ChoiceItemType.get(MAP_O, STRING_O), EXACTLY_ONE),
       // (function(*) | xs:string)
-      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+      c6 = SeqType.get(ChoiceItemType.get(FUNCTION_O, STRING_O), EXACTLY_ONE);
 
     combine(c1, op);
     combine(c1, DATE_O, DATE_O, op);
