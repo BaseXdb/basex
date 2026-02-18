@@ -719,7 +719,7 @@ public abstract class XNode extends Item {
    * @return node kind
    */
   public Kind kind() {
-    return ((NodeType) type).kind;
+    return type.kind();
   }
 
   /**
@@ -727,16 +727,16 @@ public abstract class XNode extends Item {
    * @return node kind
    */
   public int dbKind() {
-    return dbKind((NodeType) type);
+    return dbKind(kind());
   }
 
   /**
-   * Returns the numeric database node kind for a node type.
-   * @param type node type
+   * Returns the numeric database node kind for a node kind.
+   * @param kind node kind
    * @return node kind, or {@code -1} if no corresponding database kind exists
    */
-  public static int dbKind(final NodeType type) {
-    return switch(type.kind) {
+  public static int dbKind(final Kind kind) {
+    return switch(kind) {
       case DOCUMENT -> Data.DOC;
       case ELEMENT -> Data.ELEM;
       case TEXT -> Data.TEXT;

@@ -33,7 +33,7 @@ public class FnOutermost extends StandardFunc {
   final Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
     final Iter nodes = arg(0).iter(qc);
 
-    final ANodeBuilder list = new ANodeBuilder();
+    final GNodeBuilder list = new GNodeBuilder();
     for(Item item; (item = qc.next(nodes)) != null;) {
       list.add(toNode(item));
     }
@@ -44,7 +44,7 @@ public class FnOutermost extends StandardFunc {
     if(len < 2) return list.value(this).iter();
 
     // after this, the iterator is sorted and duplicate free
-    final ANodeBuilder builder = new ANodeBuilder();
+    final GNodeBuilder builder = new GNodeBuilder();
     final Data data = list.data();
     if(data != null) {
       // nodes are sorted, so ancestors always come before their descendants

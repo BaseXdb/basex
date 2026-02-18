@@ -62,7 +62,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns an array type for this sequence type and the specified key type.
+   * Returns a map type for this sequence type and the specified key type.
    * @param keyType key type
    * @return map type
    */
@@ -416,8 +416,8 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNumber() {
-    return !zero() && (type.isNumber() || type == BasicType.ANY_ATOMIC_TYPE ||
-        type == BasicType.ITEM);
+    return !zero() && (type.isNumber() || type == BasicType.ITEM ||
+        type == BasicType.ANY_ATOMIC_TYPE);
   }
 
   /**

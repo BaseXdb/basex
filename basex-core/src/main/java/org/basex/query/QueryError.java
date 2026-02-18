@@ -1693,7 +1693,7 @@ public enum QueryError {
       desc.add(" of type ").add(est).add(" expected, ");
       // try to find missing record entry:
       boolean missing = false;
-      if(est.type instanceof RecordType rt && expr instanceof XQMap map) {
+      if(est.type instanceof final RecordType rt && expr instanceof final XQMap map) {
         final TokenObjectMap<RecordField> fields = rt.fields();
         for(final byte[] key : fields) {
           try {

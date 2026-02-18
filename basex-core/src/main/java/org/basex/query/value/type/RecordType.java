@@ -119,14 +119,6 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Returns the name of the record.
-   * @return name (can be {@code null})
-   */
-  public QNm name() {
-    return name;
-  }
-
-  /**
    * Returns the annotations of this record type.
    * @return annotations
    */
@@ -418,6 +410,11 @@ public final class RecordType extends MapType {
 
     return map.size() > MAX_GENERATED_SIZE ? null :
       cc.qc.shared.record(new RecordType(map));
+  }
+
+  @Override
+  public QNm name() {
+    return name;
   }
 
   @Override

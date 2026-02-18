@@ -17,7 +17,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ANodeBuilder extends ObjectList<XNode, ANodeBuilder> {
+public final class GNodeBuilder extends ObjectList<XNode, GNodeBuilder> {
   /** Distinct document order. */
   private boolean ddo = true;
   /** Shared database (can be {@code null}). */
@@ -26,12 +26,12 @@ public final class ANodeBuilder extends ObjectList<XNode, ANodeBuilder> {
   /**
    * Constructor.
    */
-  public ANodeBuilder() {
+  public GNodeBuilder() {
     super(new XNode[1]);
   }
 
   @Override
-  public ANodeBuilder add(final XNode node) {
+  public GNodeBuilder add(final XNode node) {
     if(isEmpty()) {
       // empty list: assign initial database reference (can be null)
       data = node.data();
@@ -172,7 +172,7 @@ public final class ANodeBuilder extends ObjectList<XNode, ANodeBuilder> {
 
   @Override
   public boolean equals(final Object obj) {
-    return obj == this || obj instanceof ANodeBuilder && super.equals(obj);
+    return obj == this || obj instanceof GNodeBuilder && super.equals(obj);
   }
 
   // PRIVATE METHODS ==============================================================================

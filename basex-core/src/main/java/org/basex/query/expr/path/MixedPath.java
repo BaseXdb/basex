@@ -49,7 +49,7 @@ public final class MixedPath extends Path {
         qf.pos = 0;
 
         // loop through all input items; cache nodes and items
-        final ANodeBuilder nodes = new ANodeBuilder();
+        final GNodeBuilder nodes = new GNodeBuilder();
         final ValueBuilder items = new ValueBuilder(qc);
         final Expr step = steps[s];
         for(Item item; (item = iter.next()) != null;) {

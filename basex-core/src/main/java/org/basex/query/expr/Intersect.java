@@ -81,7 +81,7 @@ public final class Intersect extends Set {
 
   @Override
   Value nodes(final QueryContext qc) throws QueryException {
-    ANodeBuilder nodes = new ANodeBuilder();
+    GNodeBuilder nodes = new GNodeBuilder();
     Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       nodes.add(toNode(item));
@@ -90,7 +90,7 @@ public final class Intersect extends Set {
     final int el = exprs.length;
     for(int e = 1; e < el && !nodes.isEmpty(); ++e) {
       nodes.ddo();
-      final ANodeBuilder tmp = new ANodeBuilder();
+      final GNodeBuilder tmp = new GNodeBuilder();
       iter = exprs[e].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
         final XNode node = toNode(item);

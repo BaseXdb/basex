@@ -42,16 +42,15 @@ public final class Rename extends Update {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter iter = arg(0).iter(qc);
     final Item name = arg(1).atomItem(qc, info);
-    final IdentityHashMap<Type, QNm> names = new IdentityHashMap<>();
+    final EnumMap<Kind, QNm> names = new EnumMap<>(Kind.class);
 
     for(Item item; (item = iter.next()) != null;) {
-      final Type type = item.type;
-      final Kind kind = type instanceof final NodeType nt ? nt.kind : null;
+      final Kind kind = item.type.kind();
       final boolean element = kind == Kind.ELEMENT, attribute = kind == Kind.ATTRIBUTE;
       final boolean pi = kind == Kind.PROCESSING_INSTRUCTION;
       if(!(element || attribute || pi)) throw UPWRTRGTYP_X.get(info, item);
 
-      QNm newName = names.get(type);
+      QNm newName = names.get(kind);
       if(newName == null) {
         final CNode cname;
         if(element) {
@@ -62,7 +61,7 @@ public final class Rename extends Update {
           cname = new CPI(info, false, name, Empty.VALUE);
         }
         newName = ((XNode) cname.item(qc, info)).qname();
-        names.put(type, newName);
+        names.put(kind, newName);
       }
 
       // check for namespace conflicts

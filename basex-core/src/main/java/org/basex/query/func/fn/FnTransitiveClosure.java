@@ -22,10 +22,10 @@ public final class FnTransitiveClosure extends StandardFunc {
     final FItem step = toFunction(arg(1), 1, qc);
     if(node == null) return Empty.VALUE;
 
-    final ANodeBuilder result = new ANodeBuilder();
+    final GNodeBuilder result = new GNodeBuilder();
     Value input = node;
     while(true) {
-      final ANodeBuilder output = new ANodeBuilder();
+      final GNodeBuilder output = new GNodeBuilder();
       for(final Item item : input) {
         for(final Item it : step.invoke(qc, info, item)) {
           final XNode n = toNode(it);

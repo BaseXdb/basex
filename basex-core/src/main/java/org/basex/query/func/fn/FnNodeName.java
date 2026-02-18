@@ -45,7 +45,7 @@ public class FnNodeName extends ContextFn {
 
     final SeqType st = node.seqType();
     if(st.type instanceof final NodeType nt) {
-      final Kind kind = nt.kind;
+      final Kind kind = nt.kind();
       if(occ && st.oneOrMore() && kind.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION)) {
         exprType.assign(Occ.EXACTLY_ONE);
       }

@@ -221,13 +221,12 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
+  public String name() {
+    return "";
+  }
+
+  @Override
   public String toString() {
-    final QueryString qs = new QueryString().token('(');
-    int n = types.size();
-    for(final SeqType st : types) {
-      qs.token(st.toString());
-      if(--n != 0) qs.token('|');
-    }
-    return qs.token(')').toString();
+    return toString("|", (Object[]) types.toArray(SeqType[]::new));
   }
 }

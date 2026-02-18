@@ -96,10 +96,10 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Checks if the current test will match items of the specified type.
-   * @param seqType type to be checked
+   * @param tp type to be checked
    * @return {@link Boolean#TRUE}: always, {@link Boolean#FALSE}: never, {@code null}: unknown
    */
-  public Boolean matches(@SuppressWarnings("unused") final SeqType seqType) {
+  public Boolean matches(@SuppressWarnings("unused") final Type tp) {
     return null;
   }
 

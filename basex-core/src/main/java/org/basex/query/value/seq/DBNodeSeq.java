@@ -128,7 +128,7 @@ public class DBNodeSeq extends NativeSeq {
 
   @Override
   public boolean refineType() {
-    if(type instanceof NodeType nt && nt.kind == Kind.NODE) {
+    if(type.kind() == Kind.NODE) {
       for(final Item item : this) {
         if(!item.type.eq(type)) return false;
       }

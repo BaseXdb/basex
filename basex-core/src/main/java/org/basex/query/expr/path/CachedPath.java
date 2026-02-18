@@ -37,7 +37,7 @@ public final class CachedPath extends AxisPath {
 
   @Override
   protected Value nodes(final QueryContext qc) throws QueryException {
-    final ANodeBuilder list = new ANodeBuilder();
+    final GNodeBuilder list = new GNodeBuilder();
 
     final QueryFocus focus = qc.focus, qf = new QueryFocus();
     final Value rt = root != null ? root.value(qc) : focus.value;
@@ -67,7 +67,7 @@ public final class CachedPath extends AxisPath {
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void iterate(final int step, final ANodeBuilder list, final QueryContext qc)
+  private void iterate(final int step, final GNodeBuilder list, final QueryContext qc)
       throws QueryException {
 
     // cast is safe (steps will always return a {@link NodeIter} instance)

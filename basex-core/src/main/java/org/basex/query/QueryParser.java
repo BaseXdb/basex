@@ -60,9 +60,9 @@ public class QueryParser extends InputParser {
   private static final byte[] SKIPCHECK = {};
   /** Reserved keywords. */
   private static final TokenSet KEYWORDS = new TokenSet(
-      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE_NODE, NODE, SCHEMA_ATTRIBUTE,
-      SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN, FUNCTION, GET, IF,
-      ITEM, MAP, RECORD, SWITCH, TYPESWITCH);
+      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE_NODE, NODE,
+      SCHEMA_ATTRIBUTE, SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN,
+      FUNCTION, GET, IF, ITEM, MAP, RECORD, SWITCH, TYPESWITCH);
 
   /** Query context. */
   public final QueryContext qc;
@@ -2325,7 +2325,7 @@ public class QueryParser extends InputParser {
         final ExprInfo ei = simpleNodeTest(Kind.ELEMENT, true);
         if(ei == NodeTest.NAMESPACE) throw error(NSAXIS);
         if(ei instanceof final Test tst) {
-          if(tst.type.kind == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
+          if(tst.type.kind() == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
           checkTest(tst, axis != Axis.ATTRIBUTE);
         }
         if(ei != null) list.add(ei);
@@ -2441,11 +2441,14 @@ public class QueryParser extends InputParser {
           // kind test
           return kindTest(kn);
         }
-        if(name.eq(new QNm(GET))) {
-          // dynamic name test
-          final Expr expr = single();
-          wsCheck(")");
-          return expr;
+        if(!name.hasURI()) {
+          final byte[] local = name.local();
+          if(eq(local, token(GET))) {
+            // dynamic name test
+            final Expr expr = single();
+            wsCheck(")");
+            return expr;
+          }
         }
       } else {
         pos = p;
@@ -2721,14 +2724,15 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Item literal(final boolean cnstnt, final boolean dummy) throws QueryException {
+    final int p = pos;
     skipWs();
     if(quote(current())) return Str.get(stringLiteral());
     if(cnstnt) {
       final boolean truee = consume(TRUE);
       if(truee || consume(FALSE)) {
-        wsCheck("(");
-        wsCheck(")");
-        return Bln.get(truee);
+        if(wsConsume("(") && wsConsume(")")) return Bln.get(truee);
+        pos = p;
+        return null;
       }
     }
     if(!consume('#')) return numericLiteral(0, cnstnt, dummy);
@@ -3516,27 +3520,31 @@ public class QueryParser extends InputParser {
     skipWs();
     SeqType st = null;
     Type type;
+    boolean function = false;
     final QNm name = eQName(null, TYPEINVALID);
-    if(!name.hasURI() && eq(name.local(), token(ENUM))) {
+    final byte[] local = name.hasURI() ? null : name.local();
+    if(eq(local, token(ENUM))) {
       // enumeration
       if(!wsConsume("(")) throw error(WHICHCAST_X, BasicType.similar(name));
       type = enumerationType();
     } else if(wsConsume("(")) {
       // function type
       type = FuncType.get(name);
-      if(type != null) return functionTest(anns, type).seqType();
-      // node type
-      final Kind kind = Kind.get(name);
-      if(kind != null) {
-        // node type
-        type = wsConsume(")") ? NodeType.get(kind) : NodeType.get(kindTest(kind));
-      } else if(name.eq(BasicType.ITEM.qname())) {
-        // item type
-        type = BasicType.ITEM;
-        wsCheck(")");
+      if(type != null) {
+        st = functionTest(anns, type).seqType();
+        function = true;
       } else {
-        // no type found
-        throw error(WHICHTYPE_X, Type.similar(name));
+        // node type
+        final Kind kind = Kind.get(name);
+        if(kind != null) {
+          // node type
+          type = wsConsume(")") ? NodeType.get(kind) : NodeType.get(kindTest(kind));
+        } else {
+          if(eq(local, token(ITEM))) {
+            type = BasicType.ITEM;
+          }
+          wsCheck(")");
+        }
       }
     } else {
       // attach default element namespace
@@ -3556,10 +3564,16 @@ public class QueryParser extends InputParser {
         }
       }
     }
-    // annotations are not allowed for remaining types
-    if(!anns.isEmpty()) throw error(NOANN);
 
-    return st != null ? st : type.seqType();
+    // no type found?
+    if(st == null) {
+      if(type != null) st = type.seqType();
+      else throw error(WHICHTYPE_X, Type.similar(name));
+    }
+    // annotations are not allowed for remaining types
+    if(!(function || anns.isEmpty())) throw error(NOANN);
+
+    return st;
   }
 
   /**

@@ -6,12 +6,21 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Simple node kind test.
+ * Simple XML node test.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
 public class NodeTest extends Test {
+  /** Node test. */
+  public static final NodeTest NODE = new NodeTest(Kind.NODE) {
+    @Override
+    public boolean matches(final XNode node) { return true; }
+    @Override
+    public boolean instanceOf(final Test test) { return false; }
+    @Override
+    public Test intersect(final Test test) { return test; }
+  };
   /** Generic document test. */
   public static final NodeTest DOCUMENT = new NodeTest(Kind.DOCUMENT);
   /** Generic element test. */
@@ -29,15 +38,6 @@ public class NodeTest extends Test {
   public static final NodeTest COMMENT = new NodeTest(Kind.COMMENT);
   /** Generic namespace test. No other {@link Kind#COMMENT} tests exist. */
   public static final NodeTest NAMESPACE = new NodeTest(Kind.NAMESPACE);
-  /** Generic test. No other {@link Kind#NODE} tests exist. */
-  public static final NodeTest NODE = new NodeTest(Kind.NODE) {
-    @Override
-    public boolean matches(final XNode node) { return true; }
-    @Override
-    public boolean instanceOf(final Test test) { return false; }
-    @Override
-    public Test intersect(final Test test) { return test; }
-  };
   /** Test that always returns false. */
   public static final NodeTest FALSE = new NodeTest(Kind.NODE) {
     @Override
@@ -87,12 +87,11 @@ public class NodeTest extends Test {
 
   @Override
   public boolean matches(final XNode node) {
-    return node.kind() == type.kind;
+    return node.kind() == type.kind();
   }
 
   @Override
-  public Boolean matches(final SeqType seqType) {
-    final Type tp = seqType.type;
+  public Boolean matches(final Type tp) {
     if(tp.intersect(type) == null) return Boolean.FALSE;
     return tp.instanceOf(type) ? Boolean.TRUE : null;
   }

@@ -25,7 +25,7 @@ public final class NamePool {
    * @param type node type
    */
   public void add(final QNm name, final NodeType type) {
-    final Kind kind = type.kind;
+    final Kind kind = type.kind();
     final boolean elem = kind == Kind.ELEMENT, attr = kind == Kind.ATTRIBUTE;
     if(elem || attr) {
       final int i = index(name, attr);

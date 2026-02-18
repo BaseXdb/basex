@@ -74,7 +74,7 @@ public final class Union extends Set {
 
   @Override
   Value nodes(final QueryContext qc) throws QueryException {
-    final ANodeBuilder nodes = new ANodeBuilder();
+    final GNodeBuilder nodes = new GNodeBuilder();
     for(final Expr expr : exprs) {
       final Iter iter = expr.iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {

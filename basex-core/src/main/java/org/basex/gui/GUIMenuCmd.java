@@ -443,13 +443,13 @@ public enum GUIMenuCmd implements GUICommand {
       if(!insert.ok()) return;
 
       final StringList sl = insert.result;
-      final NodeType type = XNode.type(insert.kind);
+      final Kind kind = XNode.type(insert.kind).kind();
       final TokenBuilder item = new TokenBuilder();
-      item.add(type.kind.description()).add(" { ").add(quote(sl.get(0))).add(" }");
+      item.add(kind.description()).add(" { ").add(quote(sl.get(0))).add(" }");
 
-      if(type.kind.oneOf(Kind.ATTRIBUTE, Kind.PROCESSING_INSTRUCTION)) {
+      if(kind.oneOf(Kind.ATTRIBUTE, Kind.PROCESSING_INSTRUCTION)) {
         item.add(" { ").add(quote(sl.get(1))).add(" }");
-      } else if(type.kind == Kind.ELEMENT) {
+      } else if(kind == Kind.ELEMENT) {
         item.add(" { () }");
       }
 

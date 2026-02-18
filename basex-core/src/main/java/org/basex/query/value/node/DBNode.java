@@ -156,8 +156,9 @@ public class DBNode extends XNode {
 
   @Override
   public final byte[] name() {
-    return kind().oneOf(Kind.ELEMENT, Kind.ATTRIBUTE, Kind.PROCESSING_INSTRUCTION) ?
-      data.name(pre, dbKind((NodeType) type)) : null;
+    final Kind kind = kind();
+    return kind.oneOf(Kind.ELEMENT, Kind.ATTRIBUTE, Kind.PROCESSING_INSTRUCTION) ?
+      data.name(pre, dbKind(kind)) : null;
   }
 
   @Override
@@ -196,13 +197,14 @@ public class DBNode extends XNode {
   @Override
   public final int compare(final XNode node) {
     if(this == node) return 0;
-    final Data ndata = node.data();
-    return ndata != null ?
+    if(node instanceof final DBNode dbnode) {
       // comparison of database nodes: compare PRE values or database IDs
-      data == ndata ? Integer.signum(pre - ((DBNode) node).pre) :
-        Integer.signum(data.dbid - ndata.dbid) :
-      // comparison of database and fragment: find LCA
-      compare(this, node);
+      final Data ndata = dbnode.data();
+      return data == ndata ? Integer.signum(pre - dbnode.pre) :
+        Integer.signum(data.dbid - ndata.dbid);
+    }
+    // comparison of database and fragment: find LCA
+    return compare(this, node);
   }
 
   @Override

@@ -32,9 +32,11 @@ public abstract class FNode extends XNode {
 
   @Override
   public final int compare(final XNode node) {
-    // fragments: compare node IDs. otherwise, find LCA
-    return this == node ? 0 : node instanceof FNode ? Integer.signum(id - node.id) :
-      compare(this, node);
+    if(this == node) return 0;
+    // fragments: compare node IDs
+    if(node instanceof final FNode fnode) return Integer.signum(id - fnode.id);
+    // find LCA
+    return compare(this, node);
   }
 
   @Override

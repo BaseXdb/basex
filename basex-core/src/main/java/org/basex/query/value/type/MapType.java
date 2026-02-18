@@ -169,11 +169,6 @@ public class MapType extends FType {
   }
 
   @Override
-  public ID id() {
-    return ID.MAP;
-  }
-
-  @Override
   public final FuncType funcType() {
     return FuncType.get(valueType.union(Occ.ZERO), keyType.seqType());
   }
@@ -184,8 +179,17 @@ public class MapType extends FType {
   }
 
   @Override
+  public ID id() {
+    return ID.MAP;
+  }
+
+  @Override
+  public Object name() {
+    return QueryText.MAP;
+  }
+
+  @Override
   public String toString() {
-    final Object[] param = this == MAP ? WILDCARD : new Object[] { keyType, valueType};
-    return new QueryString().token(QueryText.MAP).params(param).toString();
+    return toString(", ", this == MAP ? WILDCARD : new Object[] { keyType, valueType });
   }
 }

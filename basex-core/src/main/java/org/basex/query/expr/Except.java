@@ -85,7 +85,7 @@ public final class Except extends Set {
 
   @Override
   Value nodes(final QueryContext qc) throws QueryException {
-    final ANodeBuilder nodes = new ANodeBuilder();
+    final GNodeBuilder nodes = new GNodeBuilder();
     Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       nodes.add(toNode(item));

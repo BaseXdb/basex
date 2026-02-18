@@ -161,7 +161,7 @@ public class AdaptiveSerializer extends OutputSerializer {
           printChar(',');
           if(indent) printChar(' ');
         }
-        more = false;
+        reset();
         serialize(value.itemAt(i));
       }
       if(vs != 1) printChar(')');
@@ -183,7 +183,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       for(final Item key : map.keys()) {
         if(c++ > 0) printChar(',');
         indent();
-        more = false;
+        reset();
         serialize(key);
         printChar(':');
         if(indent) printChar(' ');
@@ -196,7 +196,7 @@ public class AdaptiveSerializer extends OutputSerializer {
             printChar(',');
             if(indent) printChar(' ');
           }
-          more = false;
+          reset();
           serialize(item);
         }
         if(par) printChar(')');

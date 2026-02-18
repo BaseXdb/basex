@@ -58,11 +58,10 @@ public final class UnionTest extends Test {
   }
 
   @Override
-  public Boolean matches(final SeqType seqType) {
-    final Type tp = seqType.type;
+  public Boolean matches(final Type tp) {
     if(tp.intersect(type) == null) return Boolean.FALSE;
     for(final Test test : tests) {
-      final Boolean matches = test.matches(seqType);
+      final Boolean matches = test.matches(tp);
       if(matches != Boolean.FALSE) return matches;
     }
     return Boolean.FALSE;
@@ -113,7 +112,7 @@ public final class UnionTest extends Test {
     final TokenBuilder tb = new TokenBuilder();
     char ch = '(';
     for(final Test test : tests) {
-      tb.add(ch).add(test.toString(full || test.type.kind == Kind.ATTRIBUTE));
+      tb.add(ch).add(test.toString(full || test.type.kind() == Kind.ATTRIBUTE));
       ch = '|';
     }
     return tb.add(')').toString();

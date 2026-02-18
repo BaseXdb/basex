@@ -972,6 +972,17 @@ public enum BasicType implements Type {
   }
 
   /**
+   * Assign pre/post values to types.
+   * @param types child types
+   * @param pp pre/post array
+   */
+  private void assign(final EnumMap<BasicType, List<BasicType>> types, final byte[] pp) {
+    prePost = pp[0]++;
+    for(final BasicType type : types.getOrDefault(this, List.of())) type.assign(types, pp);
+    prePost |= pp[1]++ << 8;
+  }
+
+  /**
    * Finds and returns the specified type.
    * @param qname name of type
    * @param all accept all types (including those without parent type)
@@ -983,17 +994,6 @@ public enum BasicType implements Type {
       if(type != null && (all || type.parent != null)) return type;
     }
     return null;
-  }
-
-  /**
-   * Assign pre/post values to types.
-   * @param types child types
-   * @param pp pre/post array
-   */
-  private void assign(final EnumMap<BasicType, List<BasicType>> types, final byte[] pp) {
-    prePost = pp[0]++;
-    for(final BasicType type : types.getOrDefault(this, List.of())) type.assign(types, pp);
-    prePost |= pp[1]++ << 8;
   }
 
   @Override
@@ -1073,8 +1073,10 @@ public enum BasicType implements Type {
   public final Type intersect(final Type type) {
     if(this == ERROR) return type;
     if(type == ERROR) return this;
-    return type instanceof ChoiceItemType ? type.intersect(this) :
-      instanceOf(type) ? this : type.instanceOf(this) ? type : null;
+    if(type instanceof ChoiceItemType) return type.intersect(this);
+    if(instanceOf(type)) return this;
+    if(type.instanceOf(this)) return type;
+    return null;
   }
 
   @Override
@@ -1255,7 +1257,7 @@ public enum BasicType implements Type {
   public final String toString() {
     final TokenBuilder tb = new TokenBuilder();
     if(this == ITEM) {
-      tb.add(name).add("()");
+      tb.add(toString(null));
     } else {
       tb.add(XS_PREFIX).add(':').add(name);
     }

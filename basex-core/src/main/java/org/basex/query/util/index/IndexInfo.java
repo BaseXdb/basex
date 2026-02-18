@@ -76,7 +76,7 @@ public final class IndexInfo {
     if(last == null) return null;
 
     final Data data = db.data();
-    final Kind kind = last.test.type.kind;
+    final Kind kind = last.test.type.kind();
     if(kind == Kind.TEXT) {
       text = true;
     } else if(kind == Kind.ELEMENT) {

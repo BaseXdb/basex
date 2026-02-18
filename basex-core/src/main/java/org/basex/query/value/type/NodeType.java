@@ -44,7 +44,7 @@ public final class NodeType implements Type {
   public static final NodeType NAMESPACE = TYPES.get(Kind.NAMESPACE);
 
   /** Node kind. */
-  public final Kind kind;
+  private final Kind kind;
   /** Node test. */
   public final Test test;
 
@@ -76,7 +76,13 @@ public final class NodeType implements Type {
    * @return type
    */
   public static NodeType get(final Test test) {
-    return test instanceof NodeTest ? get(test.type.kind) : new NodeType(test.type.kind, test);
+    final Kind kind = test.type.kind();
+    return test instanceof NodeTest ? get(kind) : new NodeType(kind, test);
+  }
+
+  @Override
+  public Kind kind() {
+    return kind;
   }
 
   @Override
@@ -200,6 +206,11 @@ public final class NodeType implements Type {
   @Override
   public boolean nsSensitive() {
     return false;
+  }
+
+  @Override
+  public Object name() {
+    return kind;
   }
 
   @Override
