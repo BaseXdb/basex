@@ -9,10 +9,13 @@ import java.util.Set;
 import java.util.function.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -470,6 +473,83 @@ public final class RecordType extends MapType {
     if(rt == null) rt = Records.BUILT_IN.get(name);
     if(rt == null) throw TYPEUNKNOWN_X.get(info, BasicType.similar(name));
     return rt;
+  }
+
+  /**
+   * Returns constructor parameter types, one parameter per record field, in declaration order.
+   * @return parameter types
+   */
+  public SeqType[] constructorParams() {
+    final int size = fields.size();
+    final SeqType[] params = new SeqType[size];
+    for(int i = 0; i < size; ++i) params[i] = fields.value(i + 1).seqType();
+    return params;
+  }
+
+  /**
+   * Returns the signature string of the constructor function, e.g. {@code name(a,b[,c])}, for use
+   * when registering it.
+   * @return signature string
+   */
+  public String constructorDesc() {
+    if(name == null) throw Util.notExpected("only named record types have a constructor function");
+    final TokenBuilder tb = new TokenBuilder(name.local()).add('(');
+    final int max = fields.size();
+    final int min = minFields();
+    for(int i = 1; i <= max; ++i) {
+      if(i > min) tb.add('[');
+      if(i > 1) tb.add(',');
+      tb.add(fields.key(i));
+    }
+    for(int i = min; i < max; i++) tb.add(']');
+    return tb.add(')').toString();
+  }
+
+  /**
+   * Returns a constructor function for this record type.
+   * @return constructor function
+   */
+  public Supplier<? extends StandardFunc> constructor() {
+    return () -> new StandardFunc() {
+      @Override
+      public Expr opt(final CompileContext cc) throws QueryException {
+        return values(true, cc) ? cc.preEval(this) : this;
+      }
+
+      @Override
+      public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
+        final boolean opt = hasOptional();
+        final int fs = fields.size();
+        final Value[] values = opt ? null : new Value[fs];
+        final MapBuilder mb = opt ? new MapBuilder() : null;
+        final int el = exprs.length;
+        for(int i = 1; i <= fs; ++i) {
+          final RecordField rf = fields.value(i);
+          final Value value;
+          if(i <= el) {
+            value = arg(i - 1).value(qc);
+            final SeqType st = rf.seqType();
+            if(!st.instance(value)) throw typeError(value, st, ii);
+          } else {
+            final Expr expr = rf.expr();
+            value = expr == null ? null : expr.value(qc);
+          }
+          if(value != null) {
+            if (opt) mb.put(fields.key(i), value);
+            else values[i - 1] = value;
+          }
+        }
+        if(!opt) return new XQRecordMap(values, RecordType.this);
+        final XQMap map = mb.map();
+        map.type = RecordType.this;
+        return map;
+      }
+
+      @Override
+      public long structSize() {
+        return hasOptional() ? -1 : exprs.length;
+      }
+    };
   }
 
   /**

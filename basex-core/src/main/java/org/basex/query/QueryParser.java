@@ -271,13 +271,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void check(final MainModule main) throws QueryException {
-    // add record constructor functions for built-in record types
-    for(final RecordType rt : Records.BUILT_IN.values()) {
-      if(qc.functions.get(sc, rt.name(), rt.minFields()) == null) {
-        declareRecordConstructor(rt, info());
-      }
-    }
-
     // resolve function calls
     qc.functions.resolve();
     // resolve variable references

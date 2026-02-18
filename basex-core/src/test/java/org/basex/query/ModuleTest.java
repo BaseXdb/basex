@@ -216,10 +216,10 @@ public final class ModuleTest extends SandboxTest {
     // built-in record constructor visible in library module
     query("import module namespace r = 'r' at '" + r.path() + "';\n"
         + "r:f()",
-          "{\"quotient\":1,\"remainder\":2}\n"
-        + "{\"quotient\":3,\"remainder\":4}\n"
-        + "{\"quotient\":5,\"remainder\":6}\n"
-        + "{\"quotient\":7,\"remainder\":8}");
+          "{\"quotient\":1,\"remainder\":2,\"precision\":0}\n"
+        + "{\"quotient\":3,\"remainder\":4,\"precision\":0}\n"
+        + "{\"quotient\":5,\"remainder\":6,\"precision\":0}\n"
+        + "{\"quotient\":7,\"remainder\":8,\"precision\":0}");
 
     // private function reported as such
     error("import module namespace p = 'p' at '" + p.path() + "';\n"
