@@ -3761,27 +3761,29 @@ public class QueryParser extends InputParser {
     final ArrayList<SeqType> types = new ArrayList<>() {
       @Override
       public boolean add(final SeqType st) {
-        // collect alternative item type, combining consecutive EnumTypes into a single instance
+        if(contains(st)) return true;
+        // collect alternative item type, merging consecutive EnumTypes into a single instance
         if(!(st.type instanceof EnumType) || isEmpty()) return super.add(st);
         final int i = size() - 1;
         final Type tp = get(i).type;
         if(!(tp instanceof EnumType)) return super.add(st);
-        set(i, tp.union(st.type).seqType());
-        return true;
+        remove(i);
+        // re-add merged type (deduped via overridden add)
+        return add(tp.union(st.type).seqType());
       }
     };
 
     do {
       final SeqType st = itemType();
-      // collect alternative item type, combining nested ChoiceItemTypes into a single instance
-      if(st.type instanceof ChoiceItemType) {
-        types.addAll(((ChoiceItemType) st.type).types);
+      // collect alternative item type, flattening nested ChoiceItemTypes into a single instance
+      if(st.type instanceof ChoiceItemType ct) {
+        for(final SeqType s : ct.types) types.add(s);
       } else {
         types.add(st);
       }
     } while(wsConsume("|"));
     check(')');
-    return types.size() == 1 ? types.get(0) : new ChoiceItemType(types).seqType();
+    return ChoiceItemType.get(types).seqType();
   }
 
   /**
