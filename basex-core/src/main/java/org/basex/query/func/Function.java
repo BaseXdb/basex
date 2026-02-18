@@ -138,7 +138,7 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_ZO), BASE64_BINARY_O),
   /** XQuery function. */
   COLLECTION(FnCollection::new, "collection([source])",
-      params(STRING_ZO), DOCUMENT_NODE_ZM, flag(NDT)),
+      params(STRING_ZO), DOCUMENT_ZM, flag(NDT)),
   /** XQuery function. */
   COMPARE(FnCompare::new, "compare(value1,value2[,collation])",
       params(ANY_ATOMIC_TYPE_ZO, ANY_ATOMIC_TYPE_ZO, STRING_ZO), INTEGER_ZO),
@@ -216,7 +216,7 @@ public enum Function implements AFunction {
       params(DECIMAL_O, DECIMAL_O, INTEGER_ZO), Records.DIVIDED_DECIMALS.get().seqType()),
   /** XQuery function. */
   DOC(FnDoc::new, "doc(source[,options])",
-      params(STRING_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(NDT)),
+      params(STRING_ZO, MAP_ZO), DOCUMENT_ZO, flag(NDT)),
   /** XQuery function. */
   DOC_AVAILABLE(FnDocAvailable::new, "doc-available(source[,options])",
       params(STRING_ZO, MAP_ZO), BOOLEAN_O, flag(NDT)),
@@ -235,7 +235,7 @@ public enum Function implements AFunction {
       params(ELEMENT_ZO, MAP_ZO), ITEM_ZO.mapType(BasicType.STRING).seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
   ELEMENT_TO_MAP_PLAN(FnElementToMapPlan::new, "element-to-map-plan(input)",
-      params(ChoiceItemType.get(DOCUMENT_NODE_O, ELEMENT_O).seqType(Occ.ZERO_OR_MORE)),
+      params(ChoiceItemType.get(DOCUMENT_O, ELEMENT_O).seqType(Occ.ZERO_OR_MORE)),
       RECORD_O.mapType(BasicType.STRING).seqType()),
   /** XQuery function. */
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
@@ -407,7 +407,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   INVISIBLE_XML(FnInvisibleXml::new, "invisible-xml(grammar[,options])",
       params(FnInvisibleXml.ARG_TYPE, MAP_ZO),
-      FuncType.get(DOCUMENT_NODE_O, STRING_O).seqType(), flag(HOF)),
+      FuncType.get(DOCUMENT_O, STRING_O).seqType(), flag(HOF)),
   /** XQuery function. */
   IRI_TO_URI(FnIriToUri::new, "iri-to-uri(value)",
       params(STRING_ZO), STRING_O),
@@ -548,7 +548,7 @@ public enum Function implements AFunction {
       NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(), flag(CNS)),
   /** XQuery function. */
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value[,options])",
-      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, flag(CNS)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_ZO, flag(CNS)),
   /** XQuery function. */
   PARTIAL_APPLY(FnPartialApply::new, "partial-apply(function,arguments)",
       params(FUNCTION_O, MAP_O), FUNCTION_O),
@@ -1307,7 +1307,7 @@ public enum Function implements AFunction {
       params(ITEM_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_GET(DbGet::new, "get(database[,path])",
-      params(STRING_O, STRING_O), DOCUMENT_NODE_ZM, flag(NDT), DB_URI),
+      params(STRING_O, STRING_O), DOCUMENT_ZM, flag(NDT), DB_URI),
   /** XQuery function. */
   _DB_GET_BINARY(DbGetBinary::new, "get-binary(database[,path])",
       params(STRING_O, STRING_O), ITEM_O, flag(NDT), DB_URI),
@@ -1394,13 +1394,13 @@ public enum Function implements AFunction {
       params(STRING_O), BASE64_BINARY_O, flag(NDT), FETCH_URI, Perm.CREATE),
   /** XQuery function. */
   _FETCH_BINARY_DOC(FetchBinaryDoc::new, "binary-doc(value[,options])",
-      params(BINARY_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI),
+      params(BINARY_O, MAP_ZO), DOCUMENT_O, flag(NDT), FETCH_URI),
   /** XQuery function. */
   _FETCH_CONTENT_TYPE(FetchContentType::new, "content-type(source)",
       params(STRING_O), STRING_O, flag(NDT), FETCH_URI, Perm.CREATE),
   /** XQuery function. */
   _FETCH_DOC(FetchDoc::new, "doc(source[,options])",
-      params(STRING_O, MAP_ZO), DOCUMENT_NODE_O, flag(NDT), FETCH_URI, Perm.CREATE),
+      params(STRING_O, MAP_ZO), DOCUMENT_O, flag(NDT), FETCH_URI, Perm.CREATE),
   /** XQuery function. */
   _FETCH_TEXT(FetchText::new, "text(source[,encoding,fallback])",
       params(STRING_O, STRING_ZO, BOOLEAN_ZO), STRING_O, flag(NDT), FETCH_URI, Perm.CREATE),
@@ -1581,7 +1581,7 @@ public enum Function implements AFunction {
       params(STRING_O, MAP_ZO), ITEM_ZO, flag(NDT), HTML_URI, Perm.CREATE),
   /** XQuery function. */
   _HTML_PARSE(HtmlParse::new, "parse(value[,options])",
-      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_NODE_ZO, HTML_URI),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_ZO, HTML_URI),
   /** XQuery function. */
   _HTML_PARSER(HtmlParser::new, "parser()",
       params(), STRING_O, HTML_URI),
@@ -1605,7 +1605,7 @@ public enum Function implements AFunction {
       params(STRING_O), ELEMENT_ZM, flag(NDT), INDEX_URI),
   /** XQuery function. */
   _INDEX_FACETS(IndexFacets::new, "facets(database[,type])",
-      params(STRING_O, STRING_O), DOCUMENT_NODE_O, flag(NDT), INDEX_URI),
+      params(STRING_O, STRING_O), DOCUMENT_O, flag(NDT), INDEX_URI),
   /** XQuery function. */
   _INDEX_TEXTS(IndexTexts::new, "texts(database[,prefix,ascending])",
       params(STRING_O, STRING_O, BOOLEAN_O), ELEMENT_ZM, flag(NDT), INDEX_URI),
@@ -1967,7 +1967,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
-      params(NODE_ZM), DOCUMENT_NODE_ZM, UTIL_URI),
+      params(NODE_ZM), DOCUMENT_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_SELECT(UtilSelect::new, "select(keys[,node])",
       params(ANY_ATOMIC_TYPE_ZM, NODE_ZO), BOOLEAN_O, UTIL_URI),

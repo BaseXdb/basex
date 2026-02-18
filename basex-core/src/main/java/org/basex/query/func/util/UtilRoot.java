@@ -41,7 +41,7 @@ public final class UtilRoot extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Expr nodes = arg(0);
     final SeqType st = nodes.seqType();
-    if(st.instanceOf(Types.DOCUMENT_NODE_ZM)) return nodes;
+    if(st.instanceOf(Types.DOCUMENT_ZM)) return nodes;
 
     exprType.assign(st.zeroOrOne() ? st.occ : Occ.ZERO_OR_MORE).data(nodes);
     return this;

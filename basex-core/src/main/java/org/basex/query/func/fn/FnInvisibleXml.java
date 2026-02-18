@@ -109,7 +109,7 @@ public final class FnInvisibleXml extends StandardFunc {
      */
     private ParseInvisibleXml(final InputInfo info, final de.bottlecaps.markup.blitz.Parser parser,
         final Expr... args) {
-      super(info, Types.DOCUMENT_NODE_O, args);
+      super(info, Types.DOCUMENT_O, args);
       this.parser = parser;
     }
 
