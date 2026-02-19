@@ -148,7 +148,7 @@ public abstract class Formatter extends FormatUtil {
     if(calendar != null) {
       final QNm qnm;
       try {
-        qnm = QNm.parse(trim(calendar), info.sc());
+        qnm = QNm.parse(trim(calendar), null, info.sc());
       } catch(final QueryException ex) {
         Util.debug(ex);
         throw CALWHICH_X.get(info, calendar);

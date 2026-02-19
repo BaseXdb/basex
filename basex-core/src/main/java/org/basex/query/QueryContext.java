@@ -60,6 +60,8 @@ public final class QueryContext extends Job implements Closeable {
   public final Variables vars = new Variables();
   /** Functions. */
   public final StaticFuncs functions = new StaticFuncs();
+  /** Static and dynamic namespaces. */
+  public final NSDynContext ns;
   /** Query resources. */
   public final QueryResources resources;
   /** Parent query context. */
@@ -176,6 +178,7 @@ public final class QueryContext extends Job implements Closeable {
     this.context = context;
     this.parent = parent;
     this.info = info != null ? info : new QueryInfo(context);
+    ns = parent != null ? new NSDynContext(parent.ns) : new NSDynContext(null);
     resources = parent != null ? parent.resources : new QueryResources(this);
     ftPosData = parent != null ? parent.ftPosData : null;
     shared = parent != null ? parent.shared : new SharedData();
@@ -793,7 +796,7 @@ public final class QueryContext extends Job implements Closeable {
    * @throws QueryException query context
    */
   private static QNm qname(final String name, final StaticContext sc) throws QueryException {
-    return QNm.parse(token(Strings.startsWith(name, '$') ? name.substring(1) : name), sc);
+    return QNm.parse(token(Strings.startsWith(name, '$') ? name.substring(1) : name), null, sc);
   }
 
   /**

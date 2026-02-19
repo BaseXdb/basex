@@ -3030,6 +3030,22 @@ return
     query(func.args("<html/>", " { 'html-version': 5.0 }"), "&lt;html/&gt;");
     query(func.args("<html/>", " { 'html-version': 5.0000 }"), "&lt;html/&gt;");
 
+    query("declare namespace p = 'Q';\n"
+        + "declare option output:method 'text';\n"
+        + "<x xmlns:p='P'>{\n"
+        + "  let $params :=\n"
+        + "    <output:serialization-parameters>\n"
+        + "      <output:method value='xml'/>\n"
+        + "      <output:indent value='yes'/>\n"
+        + "      <output:cdata-section-elements value='p:y z'/>\n"
+        + "    </output:serialization-parameters>\n"
+        + "  return " + func.args(" <x><p:y>abc</p:y><z>def</z></x>", " $params") + "\n"
+        + "}</x>",
+          "<x>\n"
+        + "  <p:y xmlns:p=\"P\"><![CDATA[abc]]></p:y>\n"
+        + "  <z><![CDATA[def]]></z>\n"
+        + "</x>");
+
     final String canonicalXml = " { 'method': 'xml', 'canonical': true() }";
     query(func.args(" <a xmlns:p='urn:test:x' p:z='1' a='2'/>", canonicalXml),
         "<a xmlns:p=\"urn:test:x\" a=\"2\" p:z=\"1\"></a>");
