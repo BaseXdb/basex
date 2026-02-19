@@ -2318,7 +2318,7 @@ public class QueryParser extends InputParser {
         final ExprInfo ei = simpleNodeTest(Kind.ELEMENT, true);
         if(ei == NodeTest.NAMESPACE) throw error(NSAXIS);
         if(ei instanceof final Test tst) {
-          if(tst.type.kind() == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
+          if(tst.kind == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
           checkTest(tst, axis != Axis.ATTRIBUTE);
         }
         if(ei != null) list.add(ei);

@@ -76,7 +76,7 @@ public final class NodeType implements Type {
    * @return type
    */
   public static NodeType get(final Test test) {
-    final Kind kind = test.type.kind();
+    final Kind kind = test.kind;
     return test instanceof NodeTest ? get(kind) : new NodeType(kind, test);
   }
 

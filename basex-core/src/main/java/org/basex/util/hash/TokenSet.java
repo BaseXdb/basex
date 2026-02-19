@@ -212,6 +212,17 @@ public class TokenSet extends ASet implements Iterable<byte[]> {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if(this == obj) return true;
+    if(!(obj instanceof TokenSet ts)) return false;
+    if(size != ts.size) return false;
+    for(int k = 1; k <= size; k++) {
+      if(!Token.eq(keys[k], ts.keys[k])) return false;
+    }
+    return true;
+  }
+
+  @Override
   public String toString() {
     return toString(keys);
   }

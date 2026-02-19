@@ -22,21 +22,22 @@ public final class UnionTest extends Test {
    * @param tests tests
    */
   public UnionTest(final Test[] tests) {
-    super(unionType(tests));
+    super(unionKind(tests));
     this.tests = tests;
   }
 
   /**
-   * Calculate union type of tests.
+   * Calculate union kind of tests.
    * @param tests tests
-   * @return union type
+   * @return union kind
    */
-  private static NodeType unionType(final Test[] tests) {
-    Type type = tests[0].type;
+  private static Kind unionKind(final Test[] tests) {
+    Kind kind = tests[0].kind;
     for(int i = 1; i < tests.length; ++i) {
-      type = type.union(tests[i].type);
+      final Kind kn = tests[i].kind;
+      if(kn != kind) kind = Kind.NODE;
     }
-    return (NodeType) type;
+    return kind;
   }
 
   @Override
@@ -59,10 +60,9 @@ public final class UnionTest extends Test {
 
   @Override
   public Boolean matches(final Type tp) {
-    if(tp.intersect(type) == null) return Boolean.FALSE;
     for(final Test test : tests) {
-      final Boolean matches = test.matches(tp);
-      if(matches != Boolean.FALSE) return matches;
+      final Boolean m = test.matches(tp);
+      if(m != Boolean.FALSE) return m;
     }
     return Boolean.FALSE;
   }
@@ -112,7 +112,7 @@ public final class UnionTest extends Test {
     final TokenBuilder tb = new TokenBuilder();
     char ch = '(';
     for(final Test test : tests) {
-      tb.add(ch).add(test.toString(full || test.type.kind() == Kind.ATTRIBUTE));
+      tb.add(ch).add(test.toString(full || test.kind == Kind.ATTRIBUTE));
       ch = '|';
     }
     return tb.add(')').toString();

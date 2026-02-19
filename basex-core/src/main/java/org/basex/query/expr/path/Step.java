@@ -141,7 +141,7 @@ public abstract class Step extends Preds {
     final Axis old = axis;
     final Type type = seqType().type;
     if(axis == DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT) ||
-       axis == ANCESTOR_OR_SELF && isLeaf(type)) {
+       axis == ANCESTOR_OR_SELF && isLeaf(type.kind())) {
       // descendant-or-self::document-node() → self::document-node()
       // ancestor-or-self::text() → self::text()
       axis = SELF;
@@ -168,7 +168,8 @@ public abstract class Step extends Preds {
       if(nt.test != null) {
         if(nt.test.instanceOf(test) && !nt.test.equals(test)) test = nt.test;
       } else {
-        if(nt.instanceOf(test.type) && !nt.eq(test.type)) test = NodeTest.get(nt.kind());
+        final NodeType tt = NodeType.get(test);
+        if(nt.instanceOf(tt) && !nt.eq(tt)) test = NodeTest.get(nt.kind());
       }
     }
     // choose best implementation
@@ -180,7 +181,7 @@ public abstract class Step extends Preds {
     exprType.data(expr);
     if(!optimize && exprs.length != 0) {
       // reset type (discard refined type information derived from predicates)
-      exprType.assign(test.type.seqType(Occ.ZERO_OR_MORE));
+      exprType.assign(NodeType.get(test).seqType(Occ.ZERO_OR_MORE));
     } else if(expr != null && axis == SELF) {
       final Type type = expr.seqType().type;
       // node test: adopt type of context expression: <a/>/self::node()
@@ -241,7 +242,7 @@ public abstract class Step extends Preds {
        axis != DESCENDANT_OR_SELF) return null;
 
     // skip processing instructions
-    final Kind kind = test.type.kind();
+    final Kind kind = test.kind;
     if(kind == Kind.PROCESSING_INSTRUCTION) return null;
 
     final Names names = kind == Kind.ATTRIBUTE ? data.attrNames : data.elemNames;
@@ -301,7 +302,7 @@ public abstract class Step extends Preds {
    * @return {@code true} if steps will never yield results
    */
   private boolean noMatches() {
-    final Kind kind = test.type.kind();
+    final Kind kind = test.kind;
     if(kind == Kind.NODE) return false;
 
     return switch(axis) {
@@ -310,7 +311,7 @@ public abstract class Step extends Preds {
         kind != Kind.ATTRIBUTE;
       // parent::comment()
       case ANCESTOR, PARENT ->
-        isLeaf(test.type);
+        isLeaf(kind);
       // child::attribute()
       case CHILD, DESCENDANT, FOLLOWING, FOLLOWING_OR_SELF, FOLLOWING_SIBLING,
            FOLLOWING_SIBLING_OR_SELF, PRECEDING, PRECEDING_OR_SELF, PRECEDING_SIBLING,
@@ -330,7 +331,7 @@ public abstract class Step extends Preds {
     if(!(seqType.type instanceof final NodeType nt)) return false;
 
     // checks steps on document nodes
-    final Kind kind = test.type.kind(), nk = nt.kind();
+    final Kind kind = test.kind, nk = nt.kind();
     if(nk == Kind.DOCUMENT && switch(axis) {
       case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
            PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
@@ -350,10 +351,10 @@ public abstract class Step extends Preds {
         test.matches(nt) == Boolean.FALSE;
       // $attribute/descendant::, $text/child::, $comment/attribute::, ...
       case DESCENDANT, CHILD, ATTRIBUTE ->
-        isLeaf(nt);
+        isLeaf(nk);
       // $text/descendant-or-self::text(), ...
       case DESCENDANT_OR_SELF ->
-        isLeaf(nt) && kind != Kind.NODE && !test.type.instanceOf(nt);
+        isLeaf(nk) && kind != Kind.NODE && kind != nk;
       // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING, PRECEDING_SIBLING ->
         nk == Kind.ATTRIBUTE;
@@ -378,7 +379,7 @@ public abstract class Step extends Preds {
     final Type prevType = seqType.type;
     return exprs.length == 0 && (
       axis == SELF ||
-      axis == DESCENDANT_OR_SELF && isLeaf(prevType) ||
+      axis == DESCENDANT_OR_SELF && isLeaf(prevType.kind()) ||
       axis == ANCESTOR_OR_SELF && prevType.instanceOf(NodeType.DOCUMENT)
     ) && test.matches(prevType) == Boolean.TRUE;
   }
@@ -418,11 +419,11 @@ public abstract class Step extends Preds {
 
   /**
    * Checks if the specified type refers to a leaf node.
-   * @param type type
+   * @param kind kind (can be {@code null})
    * @return result of check
    */
-  private boolean isLeaf(final Type type) {
-    return type instanceof final NodeType nt && nt.kind().oneOf(Kind.ATTRIBUTE, Kind.COMMENT,
+  private boolean isLeaf(final Kind kind) {
+    return kind != null && kind.oneOf(Kind.ATTRIBUTE, Kind.COMMENT,
       Kind.NAMESPACE, Kind.PROCESSING_INSTRUCTION, Kind.TEXT);
   }
 
@@ -461,7 +462,7 @@ public abstract class Step extends Preds {
         if(axis == ATTRIBUTE && type instanceof NameTest)
           return tb.add('@').add(type.toString(false));
         if(axis != CHILD) tb.add(axis).add("::");
-        return tb.add(type.toString(test.type.kind() == Kind.ATTRIBUTE));
+        return tb.add(type.toString(test.kind == Kind.ATTRIBUTE));
       };
       if(test instanceof final UnionTest ut) {
         tb.add('(');

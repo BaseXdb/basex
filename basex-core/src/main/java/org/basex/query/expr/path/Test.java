@@ -17,15 +17,15 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Test extends ExprInfo {
-  /** Type. */
-  public final Type type;
+  /** Node kind. */
+  public final Kind kind;
 
   /**
    * Constructor.
-   * @param type type
+   * @param kind node kind
    */
-  Test(final Type type) {
-    this.type = type;
+  Test(final Kind kind) {
+    this.kind = kind;
   }
 
   /**
@@ -57,14 +57,12 @@ public abstract class Test extends ExprInfo {
    * @param list list
    */
   private static void merge(final Test test, final List<Test> list) {
-    final boolean ntest = test instanceof NameTest;
-    final boolean utest = ntest && ((NameTest) test).scope == NameTest.Scope.URI;
     final int ls = list.size();
     for(int l = 0; l < ls; l++) {
       final Test t = list.get(l);
       // skip URI-based comparisons (may not be assigned yet at parse time)
-      if(ntest && t instanceof final NameTest nt && (utest || nt.scope == NameTest.Scope.URI))
-        continue;
+      if(test instanceof NameTest ntest && t instanceof final NameTest nt && (
+          ntest.scope == NameTest.Scope.URI || nt.scope == NameTest.Scope.URI)) continue;
       // * union A
       if(test.instanceOf(t)) return;
       // A union * → *
@@ -115,7 +113,8 @@ public abstract class Test extends ExprInfo {
    * @return result of check
    */
   public boolean instanceOf(final Test test) {
-    return test instanceof final UnionTest ut ? ut.instance(this) : type.instanceOf(test.type);
+    return test instanceof final UnionTest ut ? ut.instance(this) :
+      test.kind == kind || test.kind == Kind.NODE;
   }
 
   /**
@@ -127,7 +126,7 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Returns a string representation of this test.
-   * @param full include node type
+   * @param full include node kind
    * @return string
    */
   public abstract String toString(boolean full);

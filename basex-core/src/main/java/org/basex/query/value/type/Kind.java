@@ -207,4 +207,9 @@ public enum Kind {
   public String toString(final String arg) {
     return new TokenBuilder().add(name).add('(').add(arg).add(')').toString();
   }
+
+  @Override
+  public String toString() {
+    return toString("");
+  }
 }

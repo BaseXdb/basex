@@ -17,6 +17,8 @@ public class NodeTest extends Test {
     @Override
     public boolean matches(final XNode node) { return true; }
     @Override
+    public Boolean matches(final Type tp) { return Boolean.TRUE; }
+    @Override
     public boolean instanceOf(final Test test) { return false; }
     @Override
     public Test intersect(final Test test) { return test; }
@@ -26,7 +28,7 @@ public class NodeTest extends Test {
   /** Generic element test. */
   public static final NodeTest ELEMENT = new NodeTest(Kind.ELEMENT) {
     @Override
-    public String toString(final boolean full) { return full ? type.toString() : "*"; }
+    public String toString(final boolean full) { return full ? kind.toString() : "*"; }
   };
   /** Generic attribute test. */
   public static final NodeTest ATTRIBUTE = new NodeTest(Kind.ATTRIBUTE);
@@ -53,7 +55,7 @@ public class NodeTest extends Test {
    * @param kind node kind
    */
   private NodeTest(final Kind kind) {
-    super(NodeType.get(kind));
+    super(kind);
   }
 
   /**
@@ -87,13 +89,15 @@ public class NodeTest extends Test {
 
   @Override
   public boolean matches(final XNode node) {
-    return node.kind() == type.kind();
+    return node.kind() == kind;
   }
 
   @Override
   public Boolean matches(final Type tp) {
-    if(tp.intersect(type) == null) return Boolean.FALSE;
-    return tp.instanceOf(type) ? Boolean.TRUE : null;
+    // (<who/>, text { 'knows' })/self::*)
+    if(tp.oneOf(BasicType.ITEM, NodeType.NODE)) return null;
+    // <yes/>/self::element()
+    return tp.kind() == kind;
   }
 
   @Override
@@ -103,13 +107,16 @@ public class NodeTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
-    if(test instanceof NodeTest)
-      return instanceOf(test) ? this : test.instanceOf(this) ? test : null;
-    if(test instanceof NameTest || test instanceof DocTest)
-      return test.instanceOf(this) ? test : null;
-    if(test instanceof UnionTest)
+    if(test instanceof NodeTest) {
+      // a intersect * → a
+      if(instanceOf(test)) return this;
+      if(test.instanceOf(this)) return test;
+    } else if(test instanceof UnionTest) {
       return test.intersect(this);
-    // InvDocTest
+    } else {
+      // a intersect element() → a
+      if(kind == test.kind || kind == Kind.NODE) return test;
+    }
     return null;
   }
 
@@ -120,6 +127,6 @@ public class NodeTest extends Test {
 
   @Override
   public String toString(final boolean full) {
-    return type.toString();
+    return kind.toString();
   }
 }

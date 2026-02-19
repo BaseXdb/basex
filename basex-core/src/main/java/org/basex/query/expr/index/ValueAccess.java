@@ -300,7 +300,7 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final ValueAccess va && type == va.type &&
-        Objects.equals(tokens, va.tokens) && expr.equals(obj) &&
+        Objects.equals(tokens, va.tokens) && expr.equals(va.expr) &&
         Objects.equals(test, va.test) && super.equals(obj);
   }
 

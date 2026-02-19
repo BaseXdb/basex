@@ -4,7 +4,7 @@ import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 
 /**
- * Document with child test.
+ * Document with single child test.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -18,7 +18,7 @@ public final class DocTest extends Test {
    * @param child child element test
    */
   public DocTest(final Test child) {
-    super(NodeType.DOCUMENT);
+    super(Kind.DOCUMENT);
     this.child = child;
   }
 
@@ -43,15 +43,10 @@ public final class DocTest extends Test {
   @Override
   public Test intersect(final Test test) {
     if(test instanceof final DocTest dt) {
-      if(child == null || dt.child == null || child.equals(dt.child))
-        return child != null ? this : test;
-      final Test tp = child.intersect(dt.child);
-      return tp == null ? null : new DocTest(tp);
+      if(equals(dt)) return this;
+    } else if(test instanceof NodeTest || test instanceof UnionTest) {
+      return test.intersect(this);
     }
-    if(test instanceof NodeTest) return type.instanceOf(test.type) ? this : null;
-    if(test instanceof UnionTest) return test.intersect(this);
-    if(test instanceof InvDocTest) return this;
-    // NameTest
     return null;
   }
 
@@ -62,6 +57,6 @@ public final class DocTest extends Test {
 
   @Override
   public String toString(final boolean full) {
-    return type.kind().toString(child.toString());
+    return kind.toString(child.toString());
   }
 }
