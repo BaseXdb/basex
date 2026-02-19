@@ -42,7 +42,7 @@ public final class FunctionArgsTest extends SandboxTest {
         if(t != 0) qu.append(", ");
         if(in) {
           // test arguments
-          if(fd.types[t].type == BasicType.STRING) {
+          if(fd.types[t].type == BasicType.STRING && t < 10) {
             qu.append((char) (48 + t));
           } else { // any type (skip test)
             qu.append("'").append((char) (65 + t)).append("'");

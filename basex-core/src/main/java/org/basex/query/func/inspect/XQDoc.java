@@ -106,7 +106,6 @@ final class XQDoc extends Inspect {
     // functions
     final FBuilder functions = element("functions");
     for(final StaticFunc sf : module.funcs) {
-      if(NSGlobal.reserved(sf.name.uri())) continue;
       final int al = sf.arity();
       final byte[] name = sf.funcName().string();
       final FuncType tp = sf.funcType();
