@@ -3751,32 +3751,12 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private SeqType choiceItemType() throws QueryException {
-    final ArrayList<SeqType> types = new ArrayList<>() {
-      @Override
-      public boolean add(final SeqType st) {
-        if(contains(st)) return true;
-        // collect alternative item type, merging consecutive EnumTypes into a single instance
-        if(!(st.type instanceof EnumType) || isEmpty()) return super.add(st);
-        final int i = size() - 1;
-        final Type tp = get(i).type;
-        if(!(tp instanceof EnumType)) return super.add(st);
-        remove(i);
-        // re-add merged type (deduped via overridden add)
-        return add(tp.union(st.type).seqType());
-      }
-    };
-
+    final ChoiceItemType.Builder builder = new ChoiceItemType.Builder();
     do {
-      final SeqType st = itemType();
-      // collect alternative item type, flattening nested ChoiceItemTypes into a single instance
-      if(st.type instanceof ChoiceItemType ct) {
-        for(final SeqType s : ct.types) types.add(s);
-      } else {
-        types.add(st);
-      }
+      builder.add(itemType());
     } while(wsConsume("|"));
     check(')');
-    return ChoiceItemType.get(types).seqType();
+    return builder.build().seqType();
   }
 
   /**
