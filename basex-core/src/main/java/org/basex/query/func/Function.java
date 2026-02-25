@@ -2110,8 +2110,7 @@ public enum Function implements AFunction {
    * @param rt record type
    */
   Function(final RecordType rt) {
-    this(rt.constructor(), rt.constructorDesc(), rt.constructorParams(), rt.seqType(),
-        EnumSet.noneOf(Flag.class), rt.name().uri());
+    this(RecordConstructor.definition(rt));
   }
 
   /**
@@ -2188,7 +2187,15 @@ public enum Function implements AFunction {
   Function(final Supplier<? extends StandardFunc> supplier, final String desc,
       final SeqType[] params, final SeqType seqType, final EnumSet<Flag> flags, final byte[] uri,
       final Perm perm) {
-    definition = new FuncDefinition(supplier, desc, params, seqType, flags, uri, perm);
+    this(new FuncDefinition(supplier, desc, params, seqType, flags, uri, perm));
+  }
+
+  /**
+   * Constructs a function signature.
+   * @param definition function definition
+   */
+  Function(final FuncDefinition definition) {
+    this.definition = definition;
   }
 
   @Override

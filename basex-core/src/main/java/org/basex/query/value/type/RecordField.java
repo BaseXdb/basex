@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.value.seq.*;
 
 /**
  * Record field definition.
@@ -15,11 +16,13 @@ import org.basex.query.expr.*;
  */
 public final class RecordField {
   /** Optional flag. */
-  final boolean optional;
+  private final boolean optional;
   /** Field type. */
-  final SeqType seqType;
+  private final SeqType seqType;
+  /** Indicates whether a constructor will always add this field to the resulting record. */
+  private final boolean alwaysAdded;
   /** Initializing expression (can be {@code null}). */
-  private final Expr expr;
+  private final Expr init;
 
   /**
    * Constructor for a mandatory field.
@@ -42,12 +45,13 @@ public final class RecordField {
    * Constructor.
    * @param seqType field type (can be {@code null})
    * @param optional optional flag
-   * @param expr initializing expression (can be {@code null})
+   * @param init initializing expression (can be {@code null})
    */
-  public RecordField(final SeqType seqType, final boolean optional, final Expr expr) {
-    this.seqType = seqType != null ? seqType : Types.ITEM_ZM;
+  public RecordField(final SeqType seqType, final boolean optional, final Expr init) {
+    this.seqType = seqType == null ? Types.ITEM_ZM : seqType;
     this.optional = optional;
-    this.expr = expr;
+    this.alwaysAdded = !optional || init != null;
+    this.init = alwaysAdded ? init : Empty.VALUE;
   }
 
   /**
@@ -59,11 +63,19 @@ public final class RecordField {
   }
 
   /**
+   * Indicates whether a constructor will always add this field to the resulting record.
+   * @return result of check
+   */
+  public boolean alwaysAdded() {
+    return alwaysAdded;
+  }
+
+  /**
    * Returns the initializing expression.
    * @return initializing expression (can be {@code null})
    */
-  public Expr expr() {
-    return expr;
+  public Expr init() {
+    return init;
   }
 
   /**
@@ -77,7 +89,7 @@ public final class RecordField {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final RecordField rf && optional == rf.optional &&
-        seqType.eq(rf.seqType) && Objects.equals(expr, rf.expr);
+        seqType.eq(rf.seqType) && Objects.equals(init, rf.init);
   }
 
   @Override

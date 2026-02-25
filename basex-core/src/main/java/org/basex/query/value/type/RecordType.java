@@ -5,17 +5,13 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.Set;
 import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -136,7 +132,7 @@ public final class RecordType extends MapType {
   public int minFields() {
     int min = 0;
     for(final RecordField rf : fields.values()) {
-      if(rf.optional || rf.expr() != null) return min;
+      if(rf.init() != null) return min;
       ++min;
     }
     return min;
@@ -168,7 +164,7 @@ public final class RecordType extends MapType {
 
     final Predicate<byte[]> compareFields = key -> {
       final RecordField rf1 = fields.get(key), rf2 = rt.fields.get(key);
-      if(rf1 == null || rf2 == null || rf1.optional != rf2.optional) return false;
+      if(rf1 == null || rf2 == null || rf1.isOptional() != rf2.isOptional()) return false;
       final SeqType st1 = rf1.seqType(), st2 = rf2.seqType();
       if(st1.occ != st2.occ) return false;
       final Type tp1 = st1.type, tp2 = st2.type;
@@ -223,7 +219,7 @@ public final class RecordType extends MapType {
         final RecordField rtf = rt.fields.get(key);
         if(fields.contains(key)) {
           final RecordField f = fields.get(key);
-          if(!rtf.optional && f.optional) return false;
+          if(!rtf.isOptional() && f.isOptional()) return false;
           final SeqType fst = f.seqType(), rtfst = rtf.seqType();
           if(fst != rtfst) {
             if(fst.zero()) {
@@ -240,7 +236,7 @@ public final class RecordType extends MapType {
               }
             }
           }
-        } else if(!rtf.optional) {
+        } else if(!rtf.isOptional()) {
           return false;
         }
       }
@@ -298,16 +294,16 @@ public final class RecordType extends MapType {
           } else {
             union = fst.union(rtfst);
           }
-          map.put(key, new RecordField(union, f.optional || rtf.optional));
+          map.put(key, new RecordField(union, f.isOptional() || rtf.isOptional()));
         } else {
           // field missing in type
-          map.put(key, new RecordField(f.seqType, true));
+          map.put(key, new RecordField(f.seqType(), true));
         }
       }
       for(final byte[] key : rt.fields) {
         if(!fields.contains(key)) {
           // field missing in this RecordType
-          map.put(key, new RecordField(rt.fields.get(key).seqType, true));
+          map.put(key, new RecordField(rt.fields.get(key).seqType(), true));
         }
       }
       return new RecordType(map);
@@ -346,7 +342,7 @@ public final class RecordType extends MapType {
           final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
           final SeqType is = intersect(fst, rtfst, pairs);
           if(is == null) return null;
-          map.put(key, new RecordField(is, f.optional && rtf.optional));
+          map.put(key, new RecordField(is, f.isOptional() && rtf.isOptional()));
         } else {
           // field missing in type
           return null;
@@ -367,7 +363,7 @@ public final class RecordType extends MapType {
         final RecordField f = fields.get(key);
         final SeqType is = intersect(f.seqType(), mt.valueType(), pairs);
         if(is == null) return null;
-        map.put(key, new RecordField(is, f.optional));
+        map.put(key, new RecordField(is, f.isOptional()));
       }
       return new RecordType(map);
     }
@@ -431,7 +427,7 @@ public final class RecordType extends MapType {
         if(!tb.isEmpty()) tb.add(", ");
         if(!tb.moreInfo()) break;
         tb.add(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key));
-        if(fields.get(key).optional) tb.add('?');
+        if(fields.get(key).isOptional()) tb.add('?');
       }
     }
     return qs.token(tb.finish()).token(')').toString();
@@ -470,83 +466,6 @@ public final class RecordType extends MapType {
     if(rt == null) rt = Records.BUILT_IN.get(name);
     if(rt == null) throw TYPEUNKNOWN_X.get(info, BasicType.similar(name));
     return rt;
-  }
-
-  /**
-   * Returns constructor parameter types, one parameter per record field, in declaration order.
-   * @return parameter types
-   */
-  public SeqType[] constructorParams() {
-    final int size = fields.size();
-    final SeqType[] params = new SeqType[size];
-    for(int i = 0; i < size; ++i) params[i] = fields.value(i + 1).seqType();
-    return params;
-  }
-
-  /**
-   * Returns the signature string of the constructor function, e.g. {@code name(a,b[,c])}, for use
-   * when registering it.
-   * @return signature string
-   */
-  public String constructorDesc() {
-    if(name == null) throw Util.notExpected("only named record types have a constructor function");
-    final TokenBuilder tb = new TokenBuilder(name.local()).add('(');
-    final int max = fields.size();
-    final int min = minFields();
-    for(int i = 1; i <= max; ++i) {
-      if(i == min + 1) tb.add('[');
-      if(i > 1) tb.add(',');
-      tb.add(fields.key(i));
-    }
-    if(max > min) tb.add(']');
-    return tb.add(')').toString();
-  }
-
-  /**
-   * Returns a constructor function for this record type.
-   * @return constructor function
-   */
-  public Supplier<? extends StandardFunc> constructor() {
-    return () -> new StandardFunc() {
-      @Override
-      public Expr opt(final CompileContext cc) throws QueryException {
-        return values(true, cc) ? cc.preEval(this) : this;
-      }
-
-      @Override
-      public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-        final boolean opt = hasOptional();
-        final int fs = fields.size();
-        final Value[] values = opt ? null : new Value[fs];
-        final MapBuilder mb = opt ? new MapBuilder() : null;
-        final int el = exprs.length;
-        for(int i = 1; i <= fs; ++i) {
-          final RecordField rf = fields.value(i);
-          final Value value;
-          if(i <= el) {
-            value = arg(i - 1).value(qc);
-            final SeqType st = rf.seqType();
-            if(!st.instance(value)) throw typeError(value, st, ii);
-          } else {
-            final Expr expr = rf.expr();
-            value = expr == null ? null : expr.value(qc);
-          }
-          if(value != null) {
-            if (opt) mb.put(fields.key(i), value);
-            else values[i - 1] = value;
-          }
-        }
-        if(!opt) return new XQRecordMap(values, RecordType.this);
-        final XQMap map = mb.map();
-        map.type = RecordType.this;
-        return map;
-      }
-
-      @Override
-      public long structSize() {
-        return hasOptional() ? -1 : exprs.length;
-      }
-    };
   }
 
   /**
