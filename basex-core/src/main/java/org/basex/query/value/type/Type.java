@@ -139,6 +139,18 @@ public interface Type {
     public boolean isExtended() {
       return extended;
     }
+
+    /**
+     * Checks if this is one of the specified IDs.
+     * @param ids IDs
+     * @return result of check
+     */
+    public boolean oneOf(final ID... ids) {
+      for(final ID id : ids) {
+        if(this == id) return true;
+      }
+      return false;
+    }
   }
 
   /**
