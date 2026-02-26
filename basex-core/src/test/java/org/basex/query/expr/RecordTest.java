@@ -126,7 +126,7 @@ public final class RecordTest extends SandboxTest {
         + "cx:complex(3, 2), cx:complex(3)",
         "{\"r\":3,\"i\":2}\n{\"r\":3}");
     query("declare namespace cx = 'CX';\n"
-        + "declare record cx:complex(r as xs:double, i? as xs:double := ());\n"
+        + "declare record cx:complex(r as xs:double, i? as xs:double? := ());\n"
         + "cx:complex(3, 2), cx:complex(3)",
         "{\"r\":3,\"i\":2}\n{\"r\":3,\"i\":()}");
     query("declare namespace p = 'P'\n;"
@@ -173,6 +173,13 @@ public final class RecordTest extends SandboxTest {
       local:f(42)
       """,
       DUPLFUNC_X);
+    // invalid initializer
+    error("""
+      declare namespace cx = 'CX';
+      declare record cx:complex(r as xs:double, i? as xs:double := ());
+      cx:complex(3, 2), cx:complex(3)
+      """,
+      INVTYPE_X);
   }
 
   /** Static typing. */

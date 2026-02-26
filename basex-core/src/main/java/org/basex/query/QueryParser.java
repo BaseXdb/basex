@@ -1009,24 +1009,20 @@ public class QueryParser extends InputParser {
   private void declareRecordConstructor(final RecordType rt, final InputInfo ii)
       throws QueryException {
 
-    final QNm name = rt.name();
     final TokenObjectMap<RecordField> fields = rt.fields();
     localVars.pushContext(false);
     final Params params = new Params();
     boolean defaults = false;
     for(final byte[] key : fields) {
       final RecordField rf = fields.get(key);
-      final boolean optional = rf.isOptional();
-      final Expr initExpr = rf.expr();
-      if(optional || initExpr != null) {
+      final Expr init = rf.init();
+      if(init != null) {
         defaults = true;
       } else if(defaults) {
         throw error(PARAMOPTIONAL_X, key);
       }
-      final SeqType fst = rf.seqType();
-      final SeqType pst = optional ? fst.union(Occ.ZERO) : fst;
-      final Expr init = initExpr == null && optional ? Empty.VALUE : initExpr;
-      params.add(new QNm(key), pst, init, null);
+      final SeqType st = rf.seqType();
+      params.add(new QNm(key), rf.isOptional() ? st.union(Occ.ZERO) : st, init, null);
     }
     params.seqType(rt.seqType()).finish(qc, localVars);
 
@@ -1035,10 +1031,10 @@ public class QueryParser extends InputParser {
     for(int i = 0; i < pv.length; ++i) {
       args[i] = new VarRef(null, pv[i]);
     }
-    final Expr expr = new CRecord(ii, rt, args);
+    final Expr expr = RecordConstructor.get(ii, rt, args);
     final String doc = docBuilder.toString();
     final VarScope vs = localVars.popContext();
-    final StaticFunc func = qc.functions.declare(sc, name, params, expr, rt.anns(), doc, vs,
+    final StaticFunc func = qc.functions.declare(sc, rt.name(), params, expr, rt.anns(), doc, vs,
         info());
     funcs.add(func);
   }
