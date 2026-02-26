@@ -121,6 +121,16 @@ public final class Types {
   public static final SeqType TIME_ZO = TIME.seqType(ZERO_OR_ONE);
   /** Zero or one duration. */
   public static final SeqType DURATION_ZO = DURATION.seqType(ZERO_OR_ONE);
+  /** One gYear. */
+  public static final SeqType G_YEAR_O = G_YEAR.seqType();
+  /** One gYearMonth. */
+  public static final SeqType G_YEAR_MONTH_O = G_YEAR_MONTH.seqType();
+  /** One gMonth. */
+  public static final SeqType G_MONTH_O = G_MONTH.seqType();
+  /** One gMonthDay. */
+  public static final SeqType G_MONTH_DAY_O = G_MONTH_DAY.seqType();
+  /** One gDay. */
+  public static final SeqType G_DAY_O = G_DAY.seqType();
 
   /** Single binary. */
   public static final SeqType BINARY_O = BINARY.seqType();

@@ -2751,6 +2751,67 @@ return
   }
 
   /** Test method. */
+  @Test public void partsOfDateTime() {
+    final Function func = PARTS_OF_DATETIME;
+    query(func.args(" ()"), "");
+    // examples from the spec
+    query(func.args(" xs:dateTime('1999-05-31T13:20:00-05:00')"),
+        "{\"year\":1999,\"month\":5,\"day\":31,\"hours\":13,\"minutes\":20,"
+      + "\"seconds\":0,\"timezone\":\"-PT5H\"}");
+    query(func.args(" xs:time('13:30:04.2678')"),
+        "{\"year\":(),\"month\":(),\"day\":(),\"hours\":13,\"minutes\":30,"
+      + "\"seconds\":4.2678,\"timezone\":()}");
+    query(func.args(" xs:gYearMonth('2007-05Z')"),
+        "{\"year\":2007,\"month\":5,\"day\":(),\"hours\":(),\"minutes\":(),"
+      + "\"seconds\":(),\"timezone\":\"PT0S\"}");
+    // xs:dateTime
+    query(func.args(" text{'2026-02-25T18:29:30.456+01:00'}"),
+        "{\"year\":2026,\"month\":2,\"day\":25,"
+      + "\"hours\":18,\"minutes\":29,\"seconds\":30.456,"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:date
+    query(func.args(" text{'2026-02-25+01:00'}"),
+        "{\"year\":2026,\"month\":2,\"day\":25,"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:time
+    query(func.args(" text{'18:29:30.456+01:00'}"),
+        "{\"year\":(),\"month\":(),\"day\":(),"
+      + "\"hours\":18,\"minutes\":29,\"seconds\":30.456,"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gYear
+    query(func.args(" text{'2026+01:00'}"),
+        "{\"year\":2026,\"month\":(),\"day\":(),"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gYearMonth
+    query(func.args(" text{'2026-02+01:00'}"),
+        "{\"year\":2026,\"month\":2,\"day\":(),"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gMonth
+    query(func.args(" text{'--02+01:00'}"),
+        "{\"year\":(),\"month\":2,\"day\":(),"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gMonthDay
+    query(func.args(" text{'--02-25+01:00'}"),
+        "{\"year\":(),\"month\":2,\"day\":25,"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gDay
+    query(func.args(" text{'---25+01:00'}"),
+        "{\"year\":(),\"month\":(),\"day\":25,"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+
+    error(func.args(" text{'not-a-date'}"), INVTYPE_X);
+    error(func.args(" text{'2026-02-30T18:29:30+01:00'}"), INVTYPE_X);
+    error(func.args(" text{'2026-02-25T18:29:30+15:00'}"), INVTYPE_X);
+    error(func.args(" text{'--13'}"), INVTYPE_X);
+  }
+
+  /** Test method. */
   @Test public void randomNumberGenerator() {
     final Function func = RANDOM_NUMBER_GENERATOR;
 

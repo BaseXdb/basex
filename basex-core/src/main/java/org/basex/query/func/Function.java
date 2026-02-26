@@ -556,6 +556,10 @@ public enum Function implements AFunction {
   PARTITION(FnPartition::new, "partition(input,split-when)",
       params(ITEM_ZM, FuncType.get(BOOLEAN_ZO, ITEM_ZM, ITEM_O, INTEGER_O).seqType()), ARRAY_ZM),
   /** XQuery function. */
+  PARTS_OF_DATETIME(FnPartsOfDateTime::new, "parts-of-dateTime(value)",
+      params(ChoiceItemType.get(DATE_TIME_O, DATE_O, TIME_O, G_YEAR_O, G_YEAR_MONTH_O, G_MONTH_O,
+          G_MONTH_DAY_O, G_DAY_O).seqType(Occ.ZERO_OR_ONE)), Records.DATETIME.get().seqType()),
+  /** XQuery function. */
   PATH(FnPath::new, "path([node,options])",
       params(NODE_ZO, MAP_ZO), STRING_ZO),
   /** XQuery function. */
