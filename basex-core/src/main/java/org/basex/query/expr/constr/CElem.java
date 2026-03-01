@@ -49,11 +49,11 @@ public final class CElem extends CName {
 
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
-    final int s = addNS();
+    final int s = addNS(cc.qc);
     try {
       return super.compile(cc);
     } finally {
-      sc().ns.size(s);
+      cc.qc.ns.size(s);
     }
   }
 
@@ -122,7 +122,7 @@ public final class CElem extends CName {
 
   @Override
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final int s = addNS();
+    final int s = addNS(qc);
     try {
       // create and check element name
       final QNm nm = qname(true, qc);
@@ -148,7 +148,7 @@ public final class CElem extends CName {
       // return optimized node
       return elem.finish();
     } finally {
-      sc().ns.size(s);
+      qc.ns.size(s);
     }
   }
 
@@ -160,10 +160,11 @@ public final class CElem extends CName {
 
   /**
    * Adds namespaces to the namespace stack.
+   * @param qc query context
    * @return old position in namespace stack
    */
-  private int addNS() {
-    final NSContext nsContext = sc().ns;
+  private int addNS(final QueryContext qc) {
+    final NSDynContext nsContext = qc.ns;
     final int size = nsContext.size(), ns = nspaces.size();
     for(int n = 0; n < ns; n++) nsContext.add(nspaces.name(n), nspaces.value(n));
     return size;

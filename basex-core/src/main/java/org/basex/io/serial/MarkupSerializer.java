@@ -466,7 +466,7 @@ abstract class MarkupSerializer extends StandardSerializer {
     final ArrayList<QNm> list = new ArrayList<>();
     for(final byte[] name : distinctTokens(token(sopts.get(option)))) {
       try {
-        list.add(QNm.parse(name, sc != null ? sc.elemNS : null, sc, null));
+        list.add(QNm.parse(name, sc != null ? sc.elemNS : null, qc, sc, null));
       } catch(final QueryException ex) {
         throw new QueryIOException(ex);
       }

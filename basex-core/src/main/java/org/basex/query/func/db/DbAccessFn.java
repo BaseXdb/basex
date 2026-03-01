@@ -118,7 +118,7 @@ abstract class DbAccessFn extends StandardFunc {
     if(nm == null) return ia.iter(qc);
 
     // parse and compile the name test
-    final QNm qnm = qc.shared.qName(nm, sc().ns.uri(prefix(nm)));
+    final QNm qnm = qc.shared.qName(nm, qc.ns.resolve(prefix(nm), sc()));
 
     // return empty sequence if test will yield no results
     final NameTest nt = new NameTest(qnm, NameTest.Scope.FULL, Kind.ATTRIBUTE, sc().elemNS);

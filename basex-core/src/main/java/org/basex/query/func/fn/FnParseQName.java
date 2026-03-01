@@ -22,7 +22,7 @@ public final class FnParseQName extends StandardFunc {
     final byte[] value = toTokenOrNull(arg(0), qc);
     if(value == null) return Empty.VALUE;
 
-    final QNm qnm = qc.shared.parseQName(value, true, sc());
+    final QNm qnm = qc.shared.parseQName(value, true, qc, sc());
     if(qnm == null) throw valueError(BasicType.QNAME, value, info);
     if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(info, qnm.prefix());
     return qnm;

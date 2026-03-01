@@ -68,6 +68,8 @@ public abstract class Serializer implements Closeable {
   /** Namespace collector. */
   protected final ArrayList<Att> namespaces = new ArrayList<>();
 
+  /** Dynamic context. */
+  protected QueryContext qc;
   /** Static context. */
   protected StaticContext sc;
   /** Indicates if at least one item was already serialized. */
@@ -148,6 +150,16 @@ public abstract class Serializer implements Closeable {
    * Resets the serializer (indentation, etc.).
    */
   public void reset() { }
+
+  /**
+   * Assigns the dynamic context.
+   * @param qctx query context
+   * @return self-reference
+   */
+  public Serializer qc(final QueryContext qctx) {
+    qc = qctx;
+    return this;
+  }
 
   /**
    * Assigns the static context.

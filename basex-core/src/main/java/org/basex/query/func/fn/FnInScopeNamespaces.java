@@ -19,7 +19,7 @@ import org.basex.util.hash.*;
 public final class FnInScopeNamespaces extends StandardFunc {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Atts atts = toElem(arg(0), qc).nsScope(sc()).add(Token.XML, XML_URI);
+    final Atts atts = toElem(arg(0), qc).nsScope(qc).add(Token.XML, XML_URI);
 
     final MapBuilder mb = new MapBuilder();
     final int as = atts.size();

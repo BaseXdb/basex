@@ -164,6 +164,7 @@ public abstract class StandardFunc extends Arr {
     try {
       final ArrayOutput ao = new ArrayOutput();
       try(Serializer ser = Serializer.get(ao, sopts)) {
+        ser.qc(qc).sc(info.sc());
         for(Item item; (item = qc.next(iter)) != null;) {
           ser.serialize(item);
         }

@@ -69,7 +69,7 @@ public final class Rename extends Update {
       if(element || attribute) {
         final byte[] newPrefix = newName.prefix(), newUri = newName.uri();
         if(element || newPrefix.length > 0) {
-          final Atts nspaces = target.nsScope(sc());
+          final Atts nspaces = target.nsScope(qc);
           final int ns = nspaces.size();
           for(int n = 0; n < ns; n++) {
             final byte[] prefix = nspaces.name(n), uri = nspaces.value(n);
