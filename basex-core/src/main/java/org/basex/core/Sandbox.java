@@ -279,7 +279,7 @@ public abstract class Sandbox {
       }
       // check syntax tree
       for(final String test : tests) {
-        final FNode doc = FDoc.build().add(plan).finish();
+        final FNode doc = FDoc.build().node(plan).finish();
         try(QueryProcessor qp2 = new QueryProcessor(test, context).context(doc)) {
           if(qp2.value() != Bln.TRUE) fail(Prop.NL + "QUERY: " + query + Prop.NL +
               "OPTIMIZED: " + qp.qc.main + Prop.NL + "TEST: " + test + Prop.NL + serialize(plan));

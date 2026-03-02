@@ -71,7 +71,7 @@ public class DbList extends DbAccessFn {
    */
   static FNode dir(final String path, final long mdate) {
     final String date = DateTime.format(new Date(mdate));
-    return FElem.build(Q_DIR).add(path).add(Q_MODIFIED_DATE, date).finish();
+    return FElem.build(Q_DIR).text(path).attr(Q_MODIFIED_DATE, date).finish();
   }
 
   /**
@@ -85,11 +85,11 @@ public class DbList extends DbAccessFn {
   static FNode resource(final String path, final long mdate, final long size,
       final ResourceType type) {
 
-    final FBuilder elem = FElem.build(Q_RESOURCE).add(path);
-    elem.add(Q_TYPE, type);
-    elem.add(Q_CONTENT_TYPE, type.contentType(path));
-    elem.add(Q_MODIFIED_DATE, DateTime.format(new Date(mdate)));
-    elem.add(Q_SIZE, size);
+    final FBuilder elem = FElem.build(Q_RESOURCE).text(path);
+    elem.attr(Q_TYPE, type);
+    elem.attr(Q_CONTENT_TYPE, type.contentType(path));
+    elem.attr(Q_MODIFIED_DATE, DateTime.format(new Date(mdate)));
+    elem.attr(Q_SIZE, size);
     return elem.finish();
   }
 }

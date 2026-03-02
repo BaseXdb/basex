@@ -127,23 +127,23 @@ public final class User {
    * @throws QueryException query exception
    */
   public synchronized FNode toXml(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FBuilder user = FElem.build(Q_USER).add(Q_NAME, name).add(Q_PERMISSION, permission);
+    final FBuilder user = FElem.build(Q_USER).attr(Q_NAME, name).attr(Q_PERMISSION, permission);
     passwords.forEach((key, value) -> {
-      final FBuilder pw = FElem.build(Q_PASSWORD).add(Q_ALGORITHM, key);
+      final FBuilder pw = FElem.build(Q_PASSWORD).attr(Q_ALGORITHM, key);
       value.forEach((k, v) -> {
-        if(!v.isEmpty()) pw.add(FElem.build(new QNm(k.toString())).add(v));
+        if(!v.isEmpty()) pw.node(FElem.build(new QNm(k.toString())).text(v));
       });
-      user.add(pw.finish());
+      user.node(pw.finish());
     });
-    patterns.forEach((key, value) -> user.add(FElem.build(Q_DATABASE).add(Q_PATTERN, key).
-        add(Q_PERMISSION, value).finish()));
+    patterns.forEach((key, value) -> user.node(FElem.build(Q_DATABASE).attr(Q_PATTERN, key).
+        attr(Q_PERMISSION, value).finish()));
     if(info != null) {
       if(qc != null) {
         // create copy of the info node if query context is available
-        user.add(info.materialize(n -> false, ii, qc));
+        user.node(info.materialize(n -> false, ii, qc));
       } else {
         // otherwise, referenced original info node and invalidate parent reference
-        user.add(info);
+        user.node(info);
         info.parent(null);
       }
     }

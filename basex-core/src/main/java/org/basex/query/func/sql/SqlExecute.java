@@ -84,7 +84,7 @@ public class SqlExecute extends SqlFn {
               return null;
             }
 
-            final FBuilder row = FElem.build(Q_ROW).declareNS();
+            final FBuilder row = FElem.build(Q_ROW).ns();
             for(int c = 1; c <= cols; c++) {
               // for each row add column values as children
               final String name = md.getColumnLabel(c);
@@ -93,25 +93,25 @@ public class SqlExecute extends SqlFn {
               if(value == null) continue;
 
               // element <sql:column name='...'>...</sql:column>
-              final FBuilder column = FElem.build(Q_COLUMN).add(Q_NAME, name);
+              final FBuilder column = FElem.build(Q_COLUMN).attr(Q_NAME, name);
               if(value instanceof final SQLXML sxml) {
                 // add XML value as child element
                 final String xml = sxml.getString();
                 try {
-                  column.add(new DBNode(new IOContent(xml)).childIter().next());
+                  column.node(new DBNode(new IOContent(xml)).childIter().next());
                 } catch(final IOException ex) {
                   // fallback: add string representation
                   Util.debug(ex);
-                  column.add(xml);
+                  column.text(xml);
                 }
               } else if(value instanceof final Clob clob) {
                 // add huge string from clob
-                column.add(clob.getSubString(1, (int) clob.length()));
+                column.text(clob.getSubString(1, (int) clob.length()));
               } else {
                 // add string representation of other values
-                column.add(value);
+                column.text(value);
               }
-              row.add(column);
+              row.node(column);
             }
             return row.finish();
           } catch(final SQLException ex) {

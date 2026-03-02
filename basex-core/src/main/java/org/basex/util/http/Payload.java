@@ -75,10 +75,10 @@ public final class Payload {
     if(type.isMultipart()) {
       // multipart response
       final byte[] boundary = boundary(type);
-      body = FElem.build(Q_HTTP_MULTIPART).add(Q_BOUNDARY, boundary);
+      body = FElem.build(Q_HTTP_MULTIPART).attr(Q_BOUNDARY, boundary);
       final GNodeList parts = new GNodeList();
       extractParts(concat(DASHES, boundary), parts);
-      for(final XNode node : parts) body.add(node);
+      for(final XNode node : parts) body.node(node);
     } else {
       // single part response
       body = FElem.build(Q_HTTP_BODY);
@@ -87,7 +87,7 @@ public final class Payload {
         payloads.add(parse(BufferInput.get(in).content(), type));
       }
     }
-    return body.add(Q_MEDIA_TYPE, type.type()).finish();
+    return body.attr(Q_MEDIA_TYPE, type.type()).finish();
   }
 
   /**
@@ -166,13 +166,13 @@ public final class Payload {
           base64 = value.equals(BASE64);
         }
         if(!value.isEmpty() && parts != null) {
-          parts.add(FElem.build(Q_HTTP_HEADER).add(Q_NAME, key).add(Q_VALUE, value).finish());
+          parts.add(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, key).attr(Q_VALUE, value).finish());
         }
       }
       l = readLine();
     }
     if(parts != null) {
-      parts.add(FElem.build(Q_HTTP_BODY).add(Q_MEDIA_TYPE, type).finish());
+      parts.add(FElem.build(Q_HTTP_BODY).attr(Q_MEDIA_TYPE, type).finish());
     }
 
     // extract payload

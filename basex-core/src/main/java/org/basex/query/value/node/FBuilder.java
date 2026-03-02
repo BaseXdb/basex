@@ -42,23 +42,12 @@ public final class FBuilder {
   }
 
   /**
-   * Finishes the node construction.
-   * @return constructed node
-   */
-  public FNode finish() {
-    final Atts ns = namespaces != null ? namespaces.optimize() : NO_NAMESPACES;
-    final XNode[] at = attributes != null ? attributes.finish() : NO_NODES;
-    final XNode[] ch = children != null ? children.finish() : NO_NODES;
-    return root instanceof final FElem felem ? felem.finish(ns, at, ch) : ((FDoc) root).finish(ch);
-  }
-
-  /**
    * Finalizes and adds a node.
    * @param builder builder
    * @return self reference
    */
-  public FBuilder add(final FBuilder builder) {
-    return add(builder.finish());
+  public FBuilder node(final FBuilder builder) {
+    return node(builder.finish());
   }
 
   /**
@@ -66,7 +55,7 @@ public final class FBuilder {
    * @param node node to be added
    * @return self reference
    */
-  public FBuilder add(final XNode node) {
+  public FBuilder node(final XNode node) {
     final boolean attr = node.kind() == Kind.ATTRIBUTE;
     GNodeList nodes = attr ? attributes : children;
     if(nodes == null) {
@@ -84,8 +73,8 @@ public final class FBuilder {
    * @param value value of text node (can be {@code null})
    * @return self reference
    */
-  public FBuilder add(final byte[] value) {
-    return value != null && value.length != 0 ? add(new FTxt(value)) : this;
+  public FBuilder text(final byte[] value) {
+    return value != null && value.length != 0 ? node(new FTxt(value)) : this;
   }
 
   /**
@@ -93,8 +82,8 @@ public final class FBuilder {
    * @param value value of text node (can be {@code null})
    * @return self reference
    */
-  public FBuilder add(final Object value) {
-    return value != null ? add(token(value.toString())) : this;
+  public FBuilder text(final Object value) {
+    return value != null ? text(token(value.toString())) : this;
   }
 
   /**
@@ -103,8 +92,8 @@ public final class FBuilder {
    * @param value attribute value (can be {@code null})
    * @return self reference
    */
-  public FBuilder add(final QNm name, final byte[] value) {
-    return value != null ? add(new FAttr(name, value)) : this;
+  public FBuilder attr(final QNm name, final byte[] value) {
+    return value != null ? node(new FAttr(name, value)) : this;
   }
 
   /**
@@ -113,8 +102,8 @@ public final class FBuilder {
    * @param value attribute value (can be {@code null})
    * @return self reference
    */
-  public FBuilder add(final QNm name, final Object value) {
-    return value != null ? add(name, token(value.toString())) : this;
+  public FBuilder attr(final QNm name, final Object value) {
+    return value != null ? attr(name, token(value.toString())) : this;
   }
 
   /**
@@ -123,7 +112,7 @@ public final class FBuilder {
    * @param uri URI
    * @return self reference
    */
-  public FBuilder addNS(final byte[] prefix, final byte[] uri) {
+  public FBuilder ns(final byte[] prefix, final byte[] uri) {
     if(namespaces == null) namespaces = new Atts();
     namespaces.add(prefix, uri);
     return this;
@@ -133,9 +122,9 @@ public final class FBuilder {
    * Adds a namespace declaration for the QName of this element.
    * @return self reference
    */
-  public FBuilder declareNS() {
+  public FBuilder ns() {
     final QNm name = root.qname();
-    return addNS(name.prefix(), name.uri());
+    return ns(name.prefix(), name.uri());
   }
 
   /**
@@ -144,5 +133,16 @@ public final class FBuilder {
    */
   public boolean isEmpty() {
     return attributes == null && children == null;
+  }
+
+  /**
+   * Finishes the node construction.
+   * @return constructed node
+   */
+  public FNode finish() {
+    final Atts ns = namespaces != null ? namespaces.optimize() : NO_NAMESPACES;
+    final XNode[] at = attributes != null ? attributes.finish() : NO_NODES;
+    final XNode[] ch = children != null ? children.finish() : NO_NODES;
+    return root instanceof final FElem felem ? felem.finish(ns, at, ch) : ((FDoc) root).finish(ch);
   }
 }

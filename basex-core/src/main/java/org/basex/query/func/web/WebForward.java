@@ -15,6 +15,6 @@ public final class WebForward extends WebFn {
   @Override
   public FNode item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String location = createUrl(qc);
-    return FElem.build(HTTPText.Q_REST_FORWARD).declareNS().add(location).finish();
+    return FElem.build(HTTPText.Q_REST_FORWARD).ns().text(location).finish();
   }
 }

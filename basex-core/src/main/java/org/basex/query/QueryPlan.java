@@ -42,7 +42,7 @@ public final class QueryPlan {
    * @param full include comprehensive information
    */
   public QueryPlan(final boolean compiled, final boolean updating, final boolean full) {
-    root = FElem.build(Q_QUERY_PLAN).add(Q_COMPILED, compiled).add(Q_UPDATING, updating);
+    root = FElem.build(Q_QUERY_PLAN).attr(Q_COMPILED, compiled).attr(Q_UPDATING, updating);
     nodes.add(root);
     this.full = full;
   }
@@ -72,13 +72,13 @@ public final class QueryPlan {
           if(ex != null) ex.toXml(this);
         }
       } else if(child instanceof byte[]) {
-        elem.add((byte[]) child);
+        elem.text((byte[]) child);
       } else {
-        elem.add(child);
+        elem.text(child);
       }
     }
 
-    plan.add(elem);
+    plan.node(elem);
     nodes.pop();
   }
 
@@ -133,7 +133,7 @@ public final class QueryPlan {
    * @param value value or {@code null}
    */
   public void addAttribute(final FBuilder elem, final Object name, final Object value) {
-    if(value != null) elem.add(new QNm(Util.inf(name)), Util.inf(value));
+    if(value != null) elem.attr(new QNm(Util.inf(name)), Util.inf(value));
   }
 
   /**

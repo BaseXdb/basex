@@ -16,8 +16,8 @@ public final class RepoList extends RepoFn {
   public Value value(final QueryContext qc) {
     final ValueBuilder vb  = new ValueBuilder(qc);
     for(final Pkg pkg : new RepoManager(qc.context).packages()) {
-      vb.add(FElem.build(Q_PACKAGE).add(Q_NAME, pkg.name()).
-          add(Q_VERSION, pkg.version()).add(Q_TYPE, pkg.type()).finish());
+      vb.add(FElem.build(Q_PACKAGE).attr(Q_NAME, pkg.name()).
+          attr(Q_VERSION, pkg.version()).attr(Q_TYPE, pkg.type()).finish());
     }
     return vb.value(this);
   }

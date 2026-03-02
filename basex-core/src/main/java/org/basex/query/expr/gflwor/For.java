@@ -230,8 +230,8 @@ public final class For extends ForLet {
   public void toXml(final QueryPlan plan) {
     final FBuilder elem = plan.attachVariable(plan.create(this), var, false);
     if(empty) plan.addAttribute(elem, EMPTYY, true);
-    if(pos != null) elem.add(plan.create(AT, pos));
-    if(score != null) elem.add(plan.create(SCORE, score));
+    if(pos != null) elem.node(plan.create(AT, pos));
+    if(score != null) elem.node(plan.create(SCORE, score));
     plan.add(elem, expr);
   }
 

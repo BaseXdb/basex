@@ -81,7 +81,7 @@ public enum Kind {
         }
         final byte[] token = Token.token(value);
         return Token.startsWith(token, '<') ? new DBNode(new IOContent(token)) :
-          FDoc.build().add(token).finish();
+          FDoc.build().text(token).finish();
       } catch(final IOException ex) {
         throw NODEERR_X_X.get(info, this, ex);
       }

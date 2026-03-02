@@ -100,56 +100,57 @@ public final class QT3TSReport {
     final String dquery = "replace(string(current-date()),'\\+.*','')";
     final String date = new XQuery(dquery).execute(ctx);
 
-    final FBuilder root = element("test-suite-result").declareNS();
+    final FBuilder root = element("test-suite-result").ns();
 
     // submission element
     final FBuilder submission = element("submission");
-    submission.add(new QNm("anonymous"), "false");
+    submission.attr(new QNm("anonymous"), "false");
 
     final FBuilder created = element("created");
-    created.add(new QNm("by"), Text.AUTHOR);
-    created.add(new QNm("email"), "cg@basex.org");
-    created.add(new QNm("organization"), Text.ORGANIZATION);
-    created.add(new QNm("on"), date);
-    submission.add(created);
+    created.attr(new QNm("by"), Text.AUTHOR);
+    created.attr(new QNm("email"), "cg@basex.org");
+    created.attr(new QNm("organization"), Text.ORGANIZATION);
+    created.attr(new QNm("on"), date);
+    submission.node(created);
 
     final FBuilder testRun = element("test-run");
-    testRun.add(new QNm("test-suite-version"), "CVS");
-    testRun.add(new QNm("date-run"), date);
-    submission.add(testRun);
+    testRun.attr(new QNm("test-suite-version"), "CVS");
+    testRun.attr(new QNm("date-run"), date);
+    submission.node(testRun);
 
-    submission.add(element("notes"));
+    submission.node(element("notes"));
 
     // product element
     final FBuilder product = element("product");
-    product.add(new QNm("vendor"), Text.ORGANIZATION);
-    product.add(new QNm("name"), Prop.NAME);
-    product.add(new QNm("version"), Prop.VERSION);
-    product.add(new QNm("released"), "true");
-    product.add(new QNm("open-source"), "true");
-    product.add(new QNm("language"), "XQ40");
+    product.attr(new QNm("vendor"), Text.ORGANIZATION);
+    product.attr(new QNm("name"), Prop.NAME);
+    product.attr(new QNm("version"), Prop.VERSION);
+    product.attr(new QNm("released"), "true");
+    product.attr(new QNm("open-source"), "true");
+    product.attr(new QNm("language"), "XQ40");
 
     // dependency element
     for(final String[] deps : DEPENDENCIES) {
       final FBuilder dependency = element("dependency");
-      dependency.add(new QNm("type"), deps[0]);
-      dependency.add(new QNm("value"), deps[1]);
-      dependency.add(new QNm("satisfied"), deps[2]);
-      product.add(dependency);
+      dependency.attr(new QNm("type"), deps[0]);
+      dependency.attr(new QNm("value"), deps[1]);
+      dependency.attr(new QNm("satisfied"), deps[2]);
+      product.node(dependency);
     }
-    root.add(product);
+    root.node(product);
 
     // test-set elements
     FBuilder ts = null;
     for(final String[] test : tests) {
       if(test.length == 1) {
-        if(ts != null) root.add(ts);
-        ts = element("test-set").add(new QNm("name"), test[0]);
+        if(ts != null) root.node(ts);
+        ts = element("test-set").attr(new QNm("name"), test[0]);
       } else {
-        ts.add(element("test-case").add(new QNm("name"), test[0]).add(new QNm("result"), test[1]));
+        ts.node(element("test-case").attr(new QNm("name"), test[0]).
+            attr(new QNm("result"), test[1]));
       }
     }
-    if(ts != null) root.add(ts);
+    if(ts != null) root.node(ts);
     return root.finish().serialize().finish();
   }
 

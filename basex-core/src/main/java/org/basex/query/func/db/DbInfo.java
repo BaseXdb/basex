@@ -40,12 +40,12 @@ public final class DbInfo extends DbAccessFn {
       final String col = cols[0].replaceAll("[ -:]", "").toLowerCase(Locale.ENGLISH);
       final FBuilder node = FElem.build(qc.shared.qName(Token.token(col)));
       if(Strings.startsWith(cols[0], ' ')) {
-        header.add(node.add(cols[1]));
+        header.node(node.text(cols[1]));
       } else {
-        if(header != null) root.add(header);
+        if(header != null) root.node(header);
         header = node;
       }
     }
-    return root.add(header).finish();
+    return root.node(header).finish();
   }
 }

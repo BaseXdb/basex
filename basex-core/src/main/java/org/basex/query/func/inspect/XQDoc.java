@@ -42,29 +42,29 @@ final class XQDoc extends Inspect {
   @Override
   public FNode parse(final IOContent content) throws QueryException {
     final AModule module = parseModule(content);
-    final FBuilder xqdoc = element("xqdoc").declareNS();
+    final FBuilder xqdoc = element("xqdoc").ns();
     final FBuilder control = element("control");
-    control.add(element("date").add(qc.dateTime().datm.string(info)));
-    control.add(element("version").add("1.1"));
-    xqdoc.add(control);
+    control.node(element("date").text(qc.dateTime().datm.string(info)));
+    control.node(element("version").text("1.1"));
+    xqdoc.node(control);
 
     final String type = module instanceof LibraryModule ? "library" : "main";
-    final FBuilder mod = element("module").add(Q_TYPE, type);
+    final FBuilder mod = element("module").attr(Q_TYPE, type);
     if(module instanceof LibraryModule) {
-      mod.add(element("uri").add(module.sc.module.uri()));
-      mod.add(element("name").add(content.name()));
+      mod.node(element("uri").text(module.sc.module.uri()));
+      mod.node(element("name").text(content.name()));
     } else {
-      mod.add(element("uri").add(content.name()));
+      mod.node(element("uri").text(content.name()));
     }
     comment(module, mod);
-    xqdoc.add(mod);
+    xqdoc.node(mod);
 
     // imports
     final FBuilder imports = element("imports");
     for(final byte[] uri : module.modules) {
-      imports.add(element("import").add(Q_TYPE, "library").add(element("uri").add(uri)));
+      imports.node(element("import").attr(Q_TYPE, "library").node(element("uri").text(uri)));
     }
-    xqdoc.add(imports);
+    xqdoc.node(imports);
 
     // namespaces
     final FBuilder namespaces = element("namespaces");
@@ -86,22 +86,22 @@ final class XQDoc extends Inspect {
     for(final StaticFunc sf : module.funcs) addNs.accept(sf.funcName(), sf);
     for(final byte[] prefix : nsCache) {
       final FBuilder namespace = element("namespace");
-      namespace.add(Q_PREFIX, prefix).add(Q_URI, nsCache.get(prefix));
-      namespaces.add(namespace);
+      namespace.attr(Q_PREFIX, prefix).attr(Q_URI, nsCache.get(prefix));
+      namespaces.node(namespace);
     }
-    xqdoc.add(namespaces);
+    xqdoc.node(namespaces);
 
     // variables
     final FBuilder variables = element("variables");
     for(final StaticVar sv : module.vars) {
       final FBuilder variable = element("variable");
-      variable.add(element("name").add(sv.name.string()));
+      variable.node(element("name").text(sv.name.string()));
       comment(sv, variable);
       annotations(sv.anns, variable);
       type(sv.seqType(), variable);
-      variables.add(variable);
+      variables.node(variable);
     }
-    xqdoc.add(variables);
+    xqdoc.node(variables);
 
     // functions
     final FBuilder functions = element("functions");
@@ -109,9 +109,9 @@ final class XQDoc extends Inspect {
       final int al = sf.arity();
       final byte[] name = sf.funcName().string();
       final FuncType tp = sf.funcType();
-      final FBuilder function = element("function").add(Q_ARITY, al);
+      final FBuilder function = element("function").attr(Q_ARITY, al);
       comment(sf, function);
-      function.add(element("name").add(name));
+      function.node(element("name").text(name));
       annotations(sf.anns, function);
 
       final QueryString qs = new QueryString();
@@ -124,27 +124,27 @@ final class XQDoc extends Inspect {
       qs.token(')').token(AS).token(tp.declType);
       if(sf.expr == null) qs.token(Q_EXTERNAL);
 
-      function.add(element("signature").add(qs));
+      function.node(element("signature").text(qs));
       if(al != 0) {
         final FBuilder fparameters = element("parameters");
         for(int a = 0; a < al; a++) {
           final FBuilder fparameter = element("parameter");
-          fparameter.add(element("name").add(sf.params[a].name.string()));
+          fparameter.node(element("name").text(sf.params[a].name.string()));
           type(tp.argTypes[a], fparameter);
-          fparameters.add(fparameter);
+          fparameters.node(fparameter);
         }
-        function.add(fparameters);
+        function.node(fparameters);
       }
       final FBuilder rtrn = element("return");
       type(sf.seqType(), rtrn);
-      functions.add(function.add(rtrn));
+      functions.node(function.node(rtrn));
     }
-    xqdoc.add(functions);
+    xqdoc.node(functions);
 
     // options
     final FBuilder options = element("options");
     options(module.options, options, false);
-    xqdoc.add(options);
+    xqdoc.node(options);
 
     return xqdoc.finish();
   }
@@ -156,7 +156,7 @@ final class XQDoc extends Inspect {
 
   @Override
   protected FBuilder element(final byte[] name) {
-    return eq(name, DOC_TAGS) ? element(string(name)) : element("custom").add(Q_TAG, name);
+    return eq(name, DOC_TAGS) ? element(string(name)) : element("custom").attr(Q_TAG, name);
   }
 
   /**
@@ -170,7 +170,7 @@ final class XQDoc extends Inspect {
     if(map != null) {
       final FBuilder comment = element("comment");
       comment(map, comment);
-      parent.add(comment);
+      parent.node(comment);
     }
   }
 
@@ -184,7 +184,7 @@ final class XQDoc extends Inspect {
     if(!anns.isEmpty()) {
       final FBuilder annotations = element("annotations");
       annotations(anns, annotations, false);
-      parent.add(annotations);
+      parent.node(annotations);
     }
   }
 
@@ -195,9 +195,9 @@ final class XQDoc extends Inspect {
    */
   private void type(final SeqType st, final FBuilder parent) {
     if(st == null) return;
-    final FBuilder type = element("type").add(st.typeString());
+    final FBuilder type = element("type").text(st.typeString());
     final String occ = st.occ.toString();
-    if(!occ.isEmpty()) type.add(Q_OCCURRENCE, occ);
-    parent.add(type);
+    if(!occ.isEmpty()) type.attr(Q_OCCURRENCE, occ);
+    parent.node(type);
   }
 }

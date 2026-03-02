@@ -45,7 +45,7 @@ public final class AdminLogs extends AdminFn {
     final ValueBuilder vb = new ValueBuilder(qc);
     for(final IOFile file : qc.context.log.files()) {
       final String date = file.name().replace(IO.LOGSUFFIX, "");
-      vb.add(FElem.build(Q_FILE).add(Q_SIZE, file.length()).add(date).finish());
+      vb.add(FElem.build(Q_FILE).attr(Q_SIZE, file.length()).text(date).finish());
     }
     return vb.value(this);
   }
@@ -105,11 +105,11 @@ public final class AdminLogs extends AdminFn {
             }
           }
           // add new element
-          final FBuilder elem = FElem.build(Q_ENTRY).add(entry.info);
+          final FBuilder elem = FElem.build(Q_ENTRY).text(entry.info);
           if(entry.address != null) {
-            elem.add(Q_TIME, entry.time).add(Q_ADDRESS, entry.address);
-            elem.add(Q_USER, entry.user).add(Q_TYPE, entry.type);
-            if(entry.ms != BigDecimal.ZERO) elem.add(Q_MS, entry.ms);
+            elem.attr(Q_TIME, entry.time).attr(Q_ADDRESS, entry.address);
+            elem.attr(Q_USER, entry.user).attr(Q_TYPE, entry.type);
+            if(entry.ms != BigDecimal.ZERO) elem.attr(Q_MS, entry.ms);
           }
           return elem.finish();
         }

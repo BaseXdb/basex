@@ -83,7 +83,7 @@ public abstract class IndexFn extends StandardFunc {
        * @return element
        */
       private FNode entry(final byte[] token) {
-        return FElem.build(Q_ENTRY).add(Q_COUNT, ei.count()).add(token).finish();
+        return FElem.build(Q_ENTRY).attr(Q_COUNT, ei.count()).text(token).finish();
       }
     };
   }

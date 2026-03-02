@@ -95,10 +95,10 @@ public final class Users {
       file.parent().md();
       final FBuilder root = FElem.build(Q_USERS);
       for(final User user : users.values()) {
-        root.add(user.toXml(null, null));
+        root.node(user.toXml(null, null));
       }
       if(info != null) {
-        root.add(info);
+        root.node(info);
         info.parent(null);
       }
       file.write(root.finish().serialize(SerializerMode.INDENT.get()).finish());

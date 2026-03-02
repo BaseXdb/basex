@@ -40,7 +40,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
     if(add) {
       openInner(Q_PAIR);
       name = shared.token(key);
-      curr.add(Q_NAME, name);
+      curr.attr(Q_NAME, name);
     }
   }
 
@@ -75,7 +75,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
 
   @Override
   void addValue(final byte[] type, final byte[] value) {
-    if(addValues.peek()) element(type).add(value != null ? shared.token(value) : null);
+    if(addValues.peek()) element(type).text(value != null ? shared.token(value) : null);
   }
 
   /**
@@ -107,7 +107,7 @@ public final class JsonAttsConverter extends JsonXmlConverter {
    */
   private void closeInner() {
     curr = stack.pop();
-    if(!stack.isEmpty()) curr = stack.peek().add(curr);
+    if(!stack.isEmpty()) curr = stack.peek().node(curr);
   }
 
   /**

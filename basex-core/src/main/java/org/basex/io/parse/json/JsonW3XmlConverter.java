@@ -68,9 +68,9 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
   void addValue(final byte[] type, final byte[] value) {
     if(addValues.peek()) {
       final byte[] val = value != null ? shared.token(value) : null;
-      final FBuilder elem = element(type).add(val);
-      if(escape && value != null && contains(val, '\\')) elem.add(Q_ESCAPED, TRUE);
-      if(curr != null) curr.add(elem);
+      final FBuilder elem = element(type).text(val);
+      if(escape && value != null && contains(val, '\\')) elem.attr(Q_ESCAPED, TRUE);
+      if(curr != null) curr.node(elem);
       else curr = elem;
     }
   }
@@ -81,7 +81,7 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
    */
   private void openOuter(final byte[] type) {
     curr = element(type);
-    if(stack.isEmpty()) curr.declareNS();
+    if(stack.isEmpty()) curr.ns();
     stack.push(curr);
   }
 
@@ -90,7 +90,7 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
    */
   private void closeOuter() {
     curr = stack.pop();
-    if(!stack.isEmpty()) curr = stack.peek().add(curr);
+    if(!stack.isEmpty()) curr = stack.peek().node(curr);
   }
 
   /**
@@ -101,8 +101,8 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
   private FBuilder element(final byte[] type) {
     final FBuilder elem = FElem.build(shared.qName(type, QueryText.FN_URI));
     if(name != null) {
-      elem.add(Q_KEY, name);
-      if(escape && contains(name, '\\')) elem.add(Q_ESCAPED_KEY, TRUE);
+      elem.attr(Q_KEY, name);
+      if(escape && contains(name, '\\')) elem.attr(Q_ESCAPED_KEY, TRUE);
       name = null;
     }
     return elem;

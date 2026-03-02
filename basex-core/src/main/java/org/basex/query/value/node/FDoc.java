@@ -103,7 +103,7 @@ public final class FDoc extends FNode {
     if(materialized(test, ii)) return this;
 
     final FBuilder doc = build(uri);
-    for(final XNode child : children) doc.add(child.materialize(test, ii, qc));
+    for(final XNode child : children) doc.node(child.materialize(test, ii, qc));
     return doc.finish();
   }
 

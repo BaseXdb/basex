@@ -33,7 +33,7 @@ final class JsonMLConverter extends JsonXmlConverter {
 
   @Override
   protected FNode finish() {
-    return doc.add(stack.pop()).finish();
+    return doc.node(stack.pop()).finish();
   }
 
   @Override
@@ -82,7 +82,7 @@ final class JsonMLConverter extends JsonXmlConverter {
     if(value == null) throw error("Missing element name");
 
     if(stack.isEmpty()) stack.push(value);
-    else stack.peek().add(value);
+    else stack.peek().node(value);
   }
 
   @Override
@@ -103,9 +103,9 @@ final class JsonMLConverter extends JsonXmlConverter {
     if(curr == null) {
       final FBuilder elem = stack.isEmpty() ? null : stack.peek();
       if(elem == null) curr = FElem.build(shared.qName(check(val)));
-      else elem.add(new FTxt(val));
+      else elem.node(new FTxt(val));
     } else if(name != null) {
-      curr.add(shared.qName(name), val);
+      curr.attr(shared.qName(name), val);
       name = null;
     } else {
       throw error("No value allowed at this stage");

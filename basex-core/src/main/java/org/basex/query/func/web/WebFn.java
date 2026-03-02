@@ -80,20 +80,20 @@ public abstract class WebFn extends StandardFunc {
       final HashMap<String, String> attributes) throws QueryException {
 
     // root element
-    final FBuilder rrest = FElem.build(HTTPText.Q_REST_RESPONSE).declareNS();
+    final FBuilder rrest = FElem.build(HTTPText.Q_REST_RESPONSE).ns();
 
     // HTTP response
-    final FBuilder hresp = FElem.build(HTTPText.Q_HTTP_RESPONSE).declareNS();
+    final FBuilder hresp = FElem.build(HTTPText.Q_HTTP_RESPONSE).ns();
     for(final Option<?> o : response) {
-      if(response.contains(o)) hresp.add(new QNm(o.name()), response.get(o));
+      if(response.contains(o)) hresp.attr(new QNm(o.name()), response.get(o));
     }
     headers.forEach((name, value) -> {
       if(!value.isEmpty()) {
-        hresp.add(FElem.build(HTTPText.Q_HTTP_HEADER).add(HTTPText.Q_NAME, name).
-            add(HTTPText.Q_VALUE, value));
+        hresp.node(FElem.build(HTTPText.Q_HTTP_HEADER).attr(HTTPText.Q_NAME, name).
+            attr(HTTPText.Q_VALUE, value));
       }
     });
-    rrest.add(hresp);
+    rrest.node(hresp);
 
     // serialization parameters
     if(attributes != null) {
@@ -101,14 +101,14 @@ public abstract class WebFn extends StandardFunc {
       for(final String entry : attributes.keySet())
         if(sopts.option(entry) == null) throw QueryError.UNKNOWNOPTION_X.get(info, entry);
 
-      final FBuilder param = FElem.build(SerializerOptions.Q_ROOT).declareNS();
+      final FBuilder param = FElem.build(SerializerOptions.Q_ROOT).ns();
       attributes.forEach((name, value) -> {
         if(!value.isEmpty()) {
           final QNm qnm = new QNm(QueryText.OUTPUT_PREFIX, name, QueryText.OUTPUT_URI);
-          param.add(FElem.build(qnm).add(HTTPText.Q_VALUE, value));
+          param.node(FElem.build(qnm).attr(HTTPText.Q_VALUE, value));
         }
       });
-      rrest.add(param);
+      rrest.node(param);
     }
     return rrest.finish();
   }

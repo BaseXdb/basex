@@ -47,11 +47,11 @@ final class CsvDirectConverter extends CsvConverter {
     final byte[] name = headers.get(col);
     final FBuilder elem;
     if(attributes) {
-      elem = FElem.build(Q_ENTRY).add(Q_NAME, name);
+      elem = FElem.build(Q_ENTRY).attr(Q_NAME, name);
     } else {
       elem = FElem.build(name != null ? shared.qName(name) : Q_ENTRY);
     }
-    record.add(elem.add(shared.token(value)));
+    record.node(elem.text(shared.token(value)));
   }
 
   @Override
@@ -63,13 +63,13 @@ final class CsvDirectConverter extends CsvConverter {
   @Override
   protected FNode finish(final InputInfo ii, final QueryContext qc) {
     finishRecord();
-    return doc.add(root).finish();
+    return doc.node(root).finish();
   }
 
   /**
    * Finishes a record.
    */
   private void finishRecord() {
-    if(record != null) root.add(record);
+    if(record != null) root.node(record);
   }
 }

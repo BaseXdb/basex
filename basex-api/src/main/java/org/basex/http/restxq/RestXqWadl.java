@@ -65,10 +65,10 @@ public final class RestXqWadl {
    */
   public synchronized FNode create(final HashMap<String, WebModule> modules) throws QueryException {
     // create root nodes
-    final FBuilder application = FElem.build(Q_APPLICATION).declareNS();
+    final FBuilder application = FElem.build(Q_APPLICATION).ns();
     final String base = request.getRequestURL().toString().replace(request.getRequestURI(),
         request.getContextPath());
-    final FBuilder resources = FElem.build(Q_RESOURCES).add(Q_BASE, base);
+    final FBuilder resources = FElem.build(Q_RESOURCES).attr(Q_BASE, base);
 
     // create children
     final TreeMap<String, FBuilder> map = new TreeMap<>();
@@ -81,7 +81,7 @@ public final class RestXqWadl {
         final String methods = func.methods.toString().replaceAll("[^A-Z ]", "");
 
         // create resource
-        final FBuilder resource = FElem.build(Q_RESOURCE).add(Q_PATH, path);
+        final FBuilder resource = FElem.build(Q_RESOURCE).attr(Q_PATH, path);
         map.put(path.replaceAll("^/*", "/") + ' ' + methods, resource);
 
         // add documentation for path variables
@@ -91,7 +91,7 @@ public final class RestXqWadl {
         }
 
         // create method, add function documentation
-        final FBuilder method = FElem.build(Q_METHOD).add(Q_NAME, methods);
+        final FBuilder method = FElem.build(Q_METHOD).attr(Q_NAME, methods);
         final TokenList descs = xqdoc != null ? xqdoc.get(Inspect.DOC_DESCRIPTION) : null;
         if(descs != null) {
           for(final byte[] desc : descs) addDoc(desc, method);
@@ -102,22 +102,22 @@ public final class RestXqWadl {
         for(final WebParam wp : func.queryParams) addParam(wp.name(), "query", rqst, xqdoc, func);
         for(final WebParam wp : func.formParams) addParam(wp.name(), "query", rqst, xqdoc, func);
         for(final WebParam wp : func.headerParams) addParam(wp.name(), "header", rqst, xqdoc, func);
-        method.add(rqst);
+        method.node(rqst);
 
         // create response
         final FBuilder response = FElem.build(Q_RESPONSE);
         final FBuilder representation = FElem.build(Q_REPRESENTATION);
-        representation.add(Q_MEDIA_TYPE, HTTPConnection.mediaType(func.sopts));
-        response.add(representation);
-        method.add(response);
+        representation.attr(Q_MEDIA_TYPE, HTTPConnection.mediaType(func.sopts));
+        response.node(representation);
+        method.node(response);
 
-        resource.add(method);
+        resource.node(method);
       }
     }
 
     // add resources in sorted order
-    for(final FBuilder elem : map.values()) resources.add(elem);
-    return application.add(resources).finish();
+    for(final FBuilder elem : map.values()) resources.node(elem);
+    return application.node(resources).finish();
   }
 
   /**
@@ -132,13 +132,13 @@ public final class RestXqWadl {
   private static void addParam(final String name, final String style, final FBuilder root,
       final TokenObjectMap<TokenList> xqdoc, final RestXqFunction func) throws QueryException {
 
-    final FBuilder param = FElem.build(Q_PARAM).add(Q_NAME, name).add(Q_STYLE, style);
+    final FBuilder param = FElem.build(Q_PARAM).attr(Q_NAME, name).attr(Q_STYLE, style);
     final QNm qnm = new QNm(name);
     for(final Var var : func.function.params) {
-      if(var.name.eq(qnm) && var.declType != null) param.add(Q_TYPE, var.declType);
+      if(var.name.eq(qnm) && var.declType != null) param.attr(Q_TYPE, var.declType);
     }
     addDoc(Inspect.doc(xqdoc, token(name)), param);
-    root.add(param);
+    root.node(param);
   }
 
   /**
@@ -149,9 +149,9 @@ public final class RestXqWadl {
    */
   private static void addDoc(final byte[] xqdoc, final FBuilder parent) throws QueryException {
     if(xqdoc == null) return;
-    final FBuilder doc = FElem.build(Q_DOC).addNS(EMPTY, token(XHTML_URL));
+    final FBuilder doc = FElem.build(Q_DOC).ns(EMPTY, token(XHTML_URL));
     Inspect.add(xqdoc, doc);
-    parent.add(doc);
+    parent.node(doc);
   }
 
   /**

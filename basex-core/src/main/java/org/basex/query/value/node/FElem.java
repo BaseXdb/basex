@@ -76,7 +76,7 @@ public final class FElem extends FNode {
       } else if(startsWith(nm, XMLNS_COLON)) {
         nspaces.add(local(nm), uri);
       } else {
-        builder.add(new FAttr(attr));
+        builder.node(new FAttr(attr));
       }
     }
 
@@ -203,9 +203,9 @@ public final class FElem extends FNode {
 
     final FBuilder elem = build(name);
     final int ns = namespaces.size();
-    for(int n = 0; n < ns; n++) elem.addNS(namespaces.name(n), namespaces.value(n));
-    for(final XNode attribute : attributes) elem.add(attribute.materialize(test, ii, qc));
-    for(final XNode child : children) elem.add(child.materialize(test, ii, qc));
+    for(int n = 0; n < ns; n++) elem.ns(namespaces.name(n), namespaces.value(n));
+    for(final XNode attribute : attributes) elem.node(attribute.materialize(test, ii, qc));
+    for(final XNode child : children) elem.node(child.materialize(test, ii, qc));
     return elem.finish();
   }
 

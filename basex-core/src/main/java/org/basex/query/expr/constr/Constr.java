@@ -72,7 +72,7 @@ public final class Constr {
         final Iter iter = expr.iter(qc);
         for(Item item; (item = qc.next(iter)) != null && add(item, qnames););
       }
-      builder.add(qc.shared.token(text.toArray()));
+      builder.text(qc.shared.token(text.toArray()));
       return this;
     } finally {
       ns.size(size);
@@ -119,7 +119,7 @@ public final class Constr {
           return false;
         }
         // add attribute
-        builder.add(name, qc.shared.token(node.string()));
+        builder.attr(name, qc.shared.token(node.string()));
         // add new namespace
         if(name.hasURI()) info.sc().ns.add(name.prefix(), name.uri());
       } else if(kind == Kind.NAMESPACE) {
@@ -135,7 +135,7 @@ public final class Constr {
         final byte[] name = node.name(), uri = node.string();
         final byte[] knownUri = builder.namespaces == null ? null : builder.namespaces.value(name);
         if(knownUri == null) {
-          builder.addNS(name, uri);
+          builder.ns(name, uri);
         } else if(!Token.eq(uri, knownUri)) {
           // duplicate namespace (ignore duplicates with same URI)
           duplNS = name;
@@ -150,9 +150,9 @@ public final class Constr {
         // type: element/comment/processing instruction node
 
         // add text node
-        builder.add(qc.shared.token(text.next()));
+        builder.text(qc.shared.token(text.next()));
         final boolean keep = !qc.context.options.get(MainOptions.COPYNODE);
-        builder.add(node.materialize(n -> keep, info, qc));
+        builder.node(node.materialize(n -> keep, info, qc));
       }
       more = false;
     } else {

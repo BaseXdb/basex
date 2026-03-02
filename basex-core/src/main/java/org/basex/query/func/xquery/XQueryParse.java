@@ -57,12 +57,12 @@ public final class XQueryParse extends StandardFunc {
 
       final FBuilder root;
       if(module instanceof MainModule) {
-        root = FElem.build(Q_MAIN_MODULE).add(Q_UPDATING, qctx.updating);
+        root = FElem.build(Q_MAIN_MODULE).attr(Q_UPDATING, qctx.updating);
       } else {
         final QNm name = module.sc.module;
-        root = FElem.build(Q_LIBRARY_MODULE).add(Q_PREFIX, name.string()).add(Q_URI, name.uri());
+        root = FElem.build(Q_LIBRARY_MODULE).attr(Q_PREFIX, name.string()).attr(Q_URI, name.uri());
       }
-      if(options.get(XQueryOptions.PLAN)) root.add(qctx.toXml(false));
+      if(options.get(XQueryOptions.PLAN)) root.node(qctx.toXml(false));
       return root.finish();
     } catch(final QueryException ex) {
       if(!options.get(XQueryOptions.PASS)) ex.info(info);

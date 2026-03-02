@@ -164,9 +164,9 @@ public final class Jobs {
     for(final QueryJobSpec spec : list) {
       final FBuilder elem = FElem.build(Q_JOB);
       for(final Option<?> option : spec.options) {
-        elem.add(new QNm(option.name()), spec.options.get(option));
+        elem.attr(new QNm(option.name()), spec.options.get(option));
       }
-      root.add(elem.add(spec.query));
+      root.node(elem.text(spec.query));
     }
     return root.finish();
   }
