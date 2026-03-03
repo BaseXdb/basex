@@ -91,7 +91,7 @@ public abstract class XNode extends Item {
       expr = Str.get(string());
     } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
       // data(<a>A</a>) → data(xs:untypedAtomic('A'))
-      expr = Atm.get(string());
+      expr = atomItem(cc.qc, null);
     }
     return cc.simplify(this, expr, mode);
   }
@@ -454,7 +454,7 @@ public abstract class XNode extends Item {
   public abstract void parent(FNode par);
 
   /**
-   * Indicates if the node has children.
+   * Indicates if the node has attributes.
    * @return result of test
    */
   public abstract boolean hasChildren();

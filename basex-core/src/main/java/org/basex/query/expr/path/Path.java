@@ -113,7 +113,7 @@ public abstract class Path extends ParseExpr {
 
     // examples: 'text', (a union b)
     if(step != null && (step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) || step.ddo())) {
-      return stps[0];
+      return step;
     }
     // example: (1 to 10)/<xml/>
     return new MixedPath(info, root, stps);
@@ -428,7 +428,8 @@ public abstract class Path extends ParseExpr {
     if(rt != null) {
       Expr prev = rt;
       for(final Expr step : steps) {
-        if(step instanceof final Step stp && stp.empty(prev.seqType())) return true;
+        final SeqType seqType = prev.seqType();
+        if(step instanceof final Step stp && stp.empty(seqType)) return true;
         prev = step;
       }
     }
@@ -580,9 +581,9 @@ public abstract class Path extends ParseExpr {
 
       final boolean desc = curr.axis == DESCENDANT;
       if(!desc && curr.axis != CHILD || !(curr.test instanceof final NameTest test)) return null;
-      if(test.local == null) return null;
+      if(test.name == null) return null;
 
-      final int name = data.elemNames.index(test.local);
+      final int name = data.elemNames.index(test.name);
       final ArrayList<PathNode> tmp = new ArrayList<>();
       for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {
@@ -878,9 +879,9 @@ public abstract class Path extends ParseExpr {
       if(step.axis != CHILD || s != i && step.exprs.length > 0 ||
           !(step.test instanceof final NameTest test)) return true;
       // only consider local name tests
-      if(test.local == null) return true;
+      if(test.name == null) return true;
       // only support unique paths with nodes on the correct level
-      final ArrayList<PathNode> pn = data().paths.desc(test.local);
+      final ArrayList<PathNode> pn = data().paths.desc(test.name);
       if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
     }
     return false;
@@ -1052,8 +1053,8 @@ public abstract class Path extends ParseExpr {
         Step.get(cc, prev, curr.info(), curr.axis, test, ExprList.concat(curr.exprs, nxt.exprs));
     }
 
-    // merge descendant-or-self::node()
-    if(curr.axis != DESCENDANT_OR_SELF || curr.test != NodeTest.NODE || curr.exprs.length > 0)
+    // merge descendant-or-self step
+    if(curr.axis != DESCENDANT_OR_SELF || curr.exprs.length > 0 || curr.test != NodeTest.NODE)
       return null;
 
     // examples:
@@ -1090,7 +1091,7 @@ public abstract class Path extends ParseExpr {
   }
 
   /**
-   * Returns a merged axis for a step preceded by descendant-or-self::node().
+   * Returns a merged axis for a step preceded by a descendant-or-self step.
    * @param expr step to test
    * @return axis or {@code null}
    */

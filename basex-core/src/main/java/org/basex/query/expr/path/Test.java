@@ -77,7 +77,7 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Optimizes the test.
-   * @param data data reference (can be {@code null})
+   * @param data data reference (can be {@code null}); used to test if the test may be successful
    * @return resulting test, or {@code null} if the test yields no results
    */
   @SuppressWarnings("unused")
@@ -93,11 +93,14 @@ public abstract class Test extends ExprInfo {
   public abstract boolean matches(XNode node);
 
   /**
-   * Checks if the current test will match items of the specified type.
-   * @param tp type to be checked
-   * @return {@link Boolean#TRUE}: always, {@link Boolean#FALSE}: never, {@code null}: unknown
+   * Checks whether the type of this test is a supertype of the specified type.
+   * The runtime type may be any of its subtypes.
+   * @param type type to check
+   * @return {@link Boolean#TRUE}  if the type subsumes the specified type;
+   *         {@link Boolean#FALSE} if it does not;
+   *         {@code null}          if the relationship is unknown
    */
-  public Boolean matches(@SuppressWarnings("unused") final Type tp) {
+  public Boolean subsumes(@SuppressWarnings("unused") final Type type) {
     return null;
   }
 
@@ -113,8 +116,13 @@ public abstract class Test extends ExprInfo {
    * @return result of check
    */
   public boolean instanceOf(final Test test) {
-    return test instanceof final UnionTest ut ? ut.instance(this) :
-      test.kind == kind || test.kind == Kind.NODE;
+    if(test instanceof final UnionTest ut) {
+      for(final Test t : ut.tests) {
+        if(instanceOf(t)) return true;
+      }
+      return false;
+    }
+    return test.kind == kind || test.kind == Kind.NODE;
   }
 
   /**
@@ -126,10 +134,10 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Returns a string representation of this test.
-   * @param full include node kind
+   * @param type include type information
    * @return string
    */
-  public abstract String toString(boolean full);
+  public abstract String toString(boolean type);
 
   @Override
   public void toXml(final QueryPlan plan) {

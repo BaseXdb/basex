@@ -192,31 +192,6 @@ public final class Var extends ExprInfo {
   }
 
   /**
-   * Checks if the type of the specified expression could be converted to the sequence type
-   * of this variable.
-   *
-   * Due to insufficient typing, the check will only be performed if:
-   * <ul>
-   *   <li> The variable type is an instance of the specified type.
-   *        This way, expressions with super types like item() will not be rejected.</li>
-   *   <li> The expression is to be promoted, and it is not of type node
-   *        (eg: function-declaration-016)</li>
-   * </ul>
-   *
-   * @param expr expression
-   * @throws QueryException query exception
-   */
-  public void checkType(final Expr expr) throws QueryException {
-    final SeqType et = expr.seqType(), vt = seqType();
-    if(declType == null || vt.type.instanceOf(et.type) ||
-        et.type.instanceOf(vt.type) && et.occ.instanceOf(vt.occ)) return;
-
-    if(!(et.type instanceof NodeType) && !et.promotable(vt)) {
-      throw vt.type.nsSensitive() ? NSSENS_X_X.get(info, et, vt) : typeError(expr, vt, name, info);
-    }
-  }
-
-  /**
    * Tries to adopt the given type check.
    * @param st type to check
    * @return {@code true} if the check could be adopted, {@code false} otherwise

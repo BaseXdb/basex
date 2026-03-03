@@ -90,7 +90,7 @@ public final class StructFilter extends AFilter {
   }
 
   @Override
-  protected Expr type(final Expr expr, final boolean optimize) {
+  protected Expr assignType(final Expr expr, final boolean optimize) {
     final Type type = root.seqType().type;
     if(type instanceof final ArrayType at) {
       exprType.assign(at);

@@ -269,7 +269,7 @@ abstract class Set extends Arr {
     private final QueryContext qc;
     /** Iterator. */
     final Iter[] iter;
-    /** Items. */
+    /** Nodes. */
     XNode[] nodes;
 
     /**

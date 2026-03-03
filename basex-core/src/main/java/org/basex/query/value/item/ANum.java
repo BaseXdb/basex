@@ -64,7 +64,7 @@ public abstract class ANum extends Item {
    * Returns a string representation of the value.
    * @return string value
    */
-  protected abstract byte[] string();
+  public abstract byte[] string();
 
   /**
    * Returns an integer (long) representation of the value.

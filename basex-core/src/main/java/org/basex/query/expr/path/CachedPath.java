@@ -1,7 +1,5 @@
 package org.basex.query.expr.path;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -46,8 +44,6 @@ public final class CachedPath extends AxisPath {
       if(rt != null) {
         final Iter iter = rt.iter(qc);
         for(Item item; (item = iter.next()) != null;) {
-          if(root != null && !(item instanceof XNode))
-            throw PATHNODE_X_X_X.get(info, steps[0], item.type, item);
           qf.value = item;
           iterate(0, list, qc);
         }

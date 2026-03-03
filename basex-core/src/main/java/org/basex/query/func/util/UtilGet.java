@@ -16,7 +16,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class UtilSelect extends ContextFn {
+public final class UtilGet extends ContextFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter keys = arg(0).iter(qc);

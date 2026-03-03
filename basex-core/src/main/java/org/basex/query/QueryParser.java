@@ -2348,7 +2348,7 @@ public class QueryParser extends InputParser {
         final int s = localVars.openScope();
         final Let lt = new Let(localVars.add(new Var(new QNm("names"), null, qc, ii)), (Expr) ei);
         exprs.add(new GFLWOR(ii, lt, new CachedStep(info(), axis, NodeTest.ELEMENT,
-            Function._UTIL_SELECT.get(ii, new VarRef(ii, lt.var)))));
+            Function._UTIL_GET.get(ii, new VarRef(ii, lt.var)))));
         localVars.closeScope(s);
       }
     }

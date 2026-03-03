@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QNm extends Item {
-  /** QName: empty (invalid). */
+  /** QName: empty (invalid, used as internal placeholder). */
   public static final QNm EMPTY = new QNm(Token.EMPTY);
   /** EQName syntax. */
   private static final Pattern EQNAME = Pattern.compile("^Q\\{([^{}]*)\\}(.+)$");

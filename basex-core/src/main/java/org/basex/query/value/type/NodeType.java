@@ -45,7 +45,7 @@ public final class NodeType implements Type {
 
   /** Node kind. */
   private final Kind kind;
-  /** Node test. */
+  /** Node test (can be {@code null}). */
   public final Test test;
 
   /** Sequence types (lazy instantiation). */
@@ -92,7 +92,7 @@ public final class NodeType implements Type {
 
   @Override
   public boolean isUntyped() {
-    return !kind.oneOf(Kind.PROCESSING_INSTRUCTION, Kind.COMMENT, Kind.NODE);
+    return kind.oneOf(Kind.ELEMENT, Kind.ATTRIBUTE, Kind.TEXT, Kind.DOCUMENT);
   }
 
   @Override
@@ -107,7 +107,7 @@ public final class NodeType implements Type {
 
   @Override
   public boolean isSortable() {
-    return true;
+    return isStringOrUntyped();
   }
 
   @Override

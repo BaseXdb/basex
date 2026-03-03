@@ -190,22 +190,21 @@ final class RestXqResponse extends WebResponse {
           message = msg != null ? string(msg) : null;
         }
 
-        for(final XNode c : node.childIter()) {
+        for(final XNode child : node.childIter()) {
           // process http:header elements
-          if(T_HTTP_HEADER.matches(c)) {
-            final byte[] nam = c.attribute(Q_NAME);
-            final byte[] val = c.attribute(Q_VALUE);
-            if(nam != null && val != null) {
-              final String key = string(nam), value = string(val);
-              if(key.equalsIgnoreCase(HTTPText.CONTENT_TYPE)) {
-                cType = value;
+          if(T_HTTP_HEADER.matches(child)) {
+            final byte[] name = child.attribute(Q_NAME), value = child.attribute(Q_VALUE);
+            if(name != null && value != null) {
+              final String n = string(name), v = string(value);
+              if(n.equalsIgnoreCase(HTTPText.CONTENT_TYPE)) {
+                cType = v;
               } else {
-                conn.response.setHeader(key, key.equalsIgnoreCase(HTTPText.LOCATION) ?
-                  conn.resolve(value) : value);
+                conn.response.setHeader(n, n.equalsIgnoreCase(HTTPText.LOCATION) ?
+                  conn.resolve(v) : v);
               }
             }
           } else {
-            throw func.error(UNEXP_NODE_X, c);
+            throw func.error(UNEXP_NODE_X, child);
           }
         }
       } else if(T_OUTPUT_SERIAL.matches(node)) {

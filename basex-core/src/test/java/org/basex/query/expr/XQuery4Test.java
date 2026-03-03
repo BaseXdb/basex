@@ -738,8 +738,8 @@ public final class XQuery4Test extends SandboxTest {
     check("<a><b/></a>/get(#c)", "", type(IterStep.class, "element(c)*"));
     check("<a><b/></a>/get(())", "", empty());
 
-    check("<a><b/></a>/get((#b, 1))", "<b/>", exists(_UTIL_SELECT));
-    check("<a><b/></a>/get((#c, 1))", "", exists(_UTIL_SELECT));
+    check("<a><b/></a>/get((#b, 1))", "<b/>", exists(_UTIL_GET));
+    check("<a><b/></a>/get((#c, 1))", "", exists(_UTIL_GET));
 
     check("<a><b/><c/></a>/get((#c, #b))", "<b/>\n<c/>",
         type(IterStep.class, "(element(c)|element(b))*"));

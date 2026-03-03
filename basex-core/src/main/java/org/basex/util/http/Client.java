@@ -27,7 +27,6 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
 
@@ -329,8 +328,8 @@ public final class Client {
     // serialize payload
     try(Serializer ser = Serializer.get(out, sopts)) {
       for(final Item item : payload) {
-        ser.serialize(atom && item.type instanceof NodeType ?
-          ((XNode) item).atomItem(null, null) : item);
+        ser.serialize(atom && item instanceof final XNode xnode ?
+          xnode.atomItem(null, null) : item);
       }
     }
   }

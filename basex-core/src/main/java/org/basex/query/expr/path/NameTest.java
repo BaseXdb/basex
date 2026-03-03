@@ -25,17 +25,17 @@ public final class NameTest extends Test {
   /** Test scope. */
   public final Scope scope;
   /** Default element namespace. */
-  public final byte[] defaultNs;
+  public final byte[] ns;
 
   /** Local name; assigned if URI can be ignored at runtime. */
-  public byte[] local;
+  public byte[] name;
 
   /**
    * Returns a named element test.
    * @param qname node name
    * @return test
    */
-  public static NameTest get(final QNm qname) {
+  public static Test get(final QNm qname) {
     return get(qname, Kind.ELEMENT);
   }
 
@@ -45,7 +45,7 @@ public final class NameTest extends Test {
    * @param kind node kind (must be element, attribute, or processing instruction)
    * @return test
    */
-  public static NameTest get(final QNm qname, final Kind kind) {
+  public static Test get(final QNm qname, final Kind kind) {
     final Scope scope = kind == Kind.PROCESSING_INSTRUCTION ? Scope.LOCAL : Scope.FULL;
     return new NameTest(qname, scope, kind, null);
   }
@@ -55,14 +55,14 @@ public final class NameTest extends Test {
    * @param qname name
    * @param scope scope
    * @param kind node kind (must be element, attribute, or processing instruction)
-   * @param defaultNs default element namespace (used for optimizations, can be {@code null})
+   * @param ns default element namespace (used for optimizations, can be {@code null})
    */
-  public NameTest(final QNm qname, final Scope scope, final Kind kind, final byte[] defaultNs) {
+  public NameTest(final QNm qname, final Scope scope, final Kind kind, final byte[] ns) {
     super(kind);
     this.qname = qname;
     this.scope = scope;
-    this.defaultNs = defaultNs != null ? defaultNs : Token.EMPTY;
-    if(scope == Scope.LOCAL) local = qname.local();
+    this.ns = ns != null ? ns : Token.EMPTY;
+    if(scope == Scope.LOCAL) name = qname.local();
   }
 
   @Override
@@ -77,14 +77,14 @@ public final class NameTest extends Test {
     // check if test may yield results
     if(scope == Scope.FULL && !qname.hasURI()) {
       // element and db default namespaces are different: no results
-      if(kind != Kind.ATTRIBUTE && !Token.eq(dataNs, defaultNs)) return null;
+      if(kind != Kind.ATTRIBUTE && !Token.eq(dataNs, ns)) return null;
       // namespace is irrelevant/identical: only check local name
-      local = qname.local();
+      name = qname.local();
     }
 
     // check if local element/attribute names occur in database
-    if(kind != Kind.PROCESSING_INSTRUCTION && local != null &&
-      !(kind == Kind.ELEMENT ? data.elemNames : data.attrNames).contains(local)) {
+    if(kind != Kind.PROCESSING_INSTRUCTION && name != null &&
+      !(kind == Kind.ELEMENT ? data.elemNames : data.attrNames).contains(name)) {
       return null;
     }
     return this;
@@ -99,7 +99,7 @@ public final class NameTest extends Test {
   public boolean matches(final XNode node) {
     return kind == node.kind() && (
       // namespace wildcard: only check local name
-      local != null ? Token.eq(local, Token.local(node.name())) :
+      name != null ? Token.eq(name, Token.local(node.name())) :
       // name wildcard: only check namespace
       scope == Scope.URI ? Token.eq(qname.uri(), node.qname().uri()) :
       // check attributes, or check everything
@@ -115,22 +115,22 @@ public final class NameTest extends Test {
   public boolean matches(final QNm qName) {
     return
       // namespace wildcard: only check local name
-      local != null ? Token.eq(local, qName.local()) :
+      name != null ? Token.eq(name, qName.local()) :
       // name wildcard: only check namespace
       scope == Scope.URI ? Token.eq(qname.uri(), qName.uri()) :
-      // check attributes, or check everything
+      // check everything
       qname.eq(qName);
   }
 
   @Override
-  public Boolean matches(final Type tp) {
+  public Boolean subsumes(final Type type) {
     // (<who/>, text { 'knows' })/self::abc)
-    if(tp.oneOf(BasicType.ITEM, NodeType.NODE)) return null;
+    if(type.oneOf(BasicType.ITEM, NodeType.NODE)) return null;
     // <no/>/self::text()
-    if(tp.kind() != kind) return Boolean.FALSE;
+    if(type.kind() != kind) return Boolean.FALSE;
     // <yes/>/self::yes
-    if(tp instanceof final NodeType nt && nt.test instanceof final NameTest name) {
-      if(name.scope == scope || name.scope == Scope.FULL) return matches(name.qname);
+    if(type instanceof final NodeType nt && nt.test instanceof final NameTest t) {
+      if(t.scope == scope || t.scope == Scope.FULL) return matches(t.qname);
     }
     // (<who/>, <knows/>)/self::abc)
     return null;
@@ -138,6 +138,7 @@ public final class NameTest extends Test {
 
   @Override
   public boolean instanceOf(final Test test) {
+    if(this == test) return true;
     if(test instanceof final NameTest nt) {
       return kind == nt.kind && switch(nt.scope) {
         case LOCAL -> (scope == Scope.LOCAL || scope == Scope.FULL) &&
@@ -152,6 +153,7 @@ public final class NameTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
+    if(test == this) return this;
     if(test instanceof final NameTest nt) {
       if(kind == nt.kind) {
         if(scope == nt.scope || scope == Scope.FULL) {
@@ -160,7 +162,7 @@ public final class NameTest extends Test {
           if(nt.matches(qname)) return this;
         } else if(nt.scope == Scope.URI) {
           // *:local1 = Q{uri2}* → Q{uri2}local1
-          return new NameTest(new QNm(local, nt.qname.uri()), Scope.FULL, kind, defaultNs);
+          return new NameTest(new QNm(name, nt.qname.uri()), Scope.FULL, kind, ns);
         } else {
           // *:local1 = Q{uri2}local2, Q{uri1}* = Q{uri2}local2, Q{uri1}* = *:local2
           return test.intersect(this);
@@ -179,14 +181,14 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public String toString(final boolean full) {
+  public String toString(final boolean type) {
     final boolean pi = kind == Kind.PROCESSING_INSTRUCTION;
     final TokenBuilder tb = new TokenBuilder();
 
     // add URI part
     final byte[] p = qname.prefix(), u = qname.uri(), l = qname.local();
     if(scope == Scope.LOCAL && !pi) {
-      if(!(full && kind == Kind.ATTRIBUTE)) tb.add("*:");
+      if(!(type && kind == Kind.ATTRIBUTE)) tb.add("*:");
     } else if(p.length > 0) {
       tb.add(p).add(':');
     } else if(u.length != 0) {
@@ -199,6 +201,6 @@ public final class NameTest extends Test {
       tb.add(l);
     }
     final String test = tb.toString();
-    return full || pi ? kind.toString(test) : test;
+    return type || pi ? kind.toString(test) : test;
   }
 }

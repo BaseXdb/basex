@@ -866,7 +866,7 @@ public enum QueryError {
   /** Error code. */
   VAREMPTY_X(XPDY, 2, "No value assigned to %."),
   /** Error code. */
-  NODOC_X(XPDY, 50, "Value has no document node: %."),
+  NODOC_X(XPDY, 50, "Input has no root node: %."),
   /** Error code. */
   NOTREAT_X_X_X(XPDY, 50, "Cannot treat % as %: %."),
   /** Error code. */

@@ -17,7 +17,7 @@ public class NodeTest extends Test {
     @Override
     public boolean matches(final XNode node) { return true; }
     @Override
-    public Boolean matches(final Type tp) { return Boolean.TRUE; }
+    public Boolean subsumes(final Type type) { return Boolean.TRUE; }
     @Override
     public boolean instanceOf(final Test test) { return false; }
     @Override
@@ -28,27 +28,18 @@ public class NodeTest extends Test {
   /** Generic element test. */
   public static final NodeTest ELEMENT = new NodeTest(Kind.ELEMENT) {
     @Override
-    public String toString(final boolean full) { return full ? kind.toString() : "*"; }
+    public String toString(final boolean type) { return type ? kind.toString() : "*"; }
   };
   /** Generic attribute test. */
   public static final NodeTest ATTRIBUTE = new NodeTest(Kind.ATTRIBUTE);
   /** Generic PI test. */
   public static final NodeTest PROCESSING_INSTRUCTION = new NodeTest(Kind.PROCESSING_INSTRUCTION);
-  /** Generic text test. No other {@link Kind#TEXT} tests exist. */
+  /** Generic text test. */
   public static final NodeTest TEXT = new NodeTest(Kind.TEXT);
-  /** Generic comment test. No other {@link Kind#COMMENT} tests exist. */
+  /** Generic comment test. */
   public static final NodeTest COMMENT = new NodeTest(Kind.COMMENT);
-  /** Generic namespace test. No other {@link Kind#COMMENT} tests exist. */
+  /** Generic namespace test. */
   public static final NodeTest NAMESPACE = new NodeTest(Kind.NAMESPACE);
-  /** Test that always returns false. */
-  public static final NodeTest FALSE = new NodeTest(Kind.NODE) {
-    @Override
-    public boolean matches(final XNode node) { return false; }
-    @Override
-    public boolean instanceOf(final Test test) { return false; }
-    @Override
-    public Test intersect(final Test test) { return null; }
-  };
 
   /**
    * Constructor.
@@ -65,13 +56,13 @@ public class NodeTest extends Test {
    */
   public static NodeTest get(final Kind kind) {
     return switch(kind) {
-      case TEXT                   -> TEXT;
-      case PROCESSING_INSTRUCTION -> PROCESSING_INSTRUCTION;
-      case ELEMENT                -> ELEMENT;
-      case DOCUMENT               -> DOCUMENT;
-      case ATTRIBUTE              -> ATTRIBUTE;
-      case COMMENT                -> COMMENT;
       case NODE                   -> NODE;
+      case DOCUMENT               -> DOCUMENT;
+      case ELEMENT                -> ELEMENT;
+      case ATTRIBUTE              -> ATTRIBUTE;
+      case PROCESSING_INSTRUCTION -> PROCESSING_INSTRUCTION;
+      case TEXT                   -> TEXT;
+      case COMMENT                -> COMMENT;
       case NAMESPACE              -> NAMESPACE;
       default                     -> throw Util.notExpected();
     };
@@ -84,7 +75,7 @@ public class NodeTest extends Test {
 
   @Override
   public Test optimize(final Data data) {
-    return this == FALSE ? null : this;
+    return this;
   }
 
   @Override
@@ -93,15 +84,16 @@ public class NodeTest extends Test {
   }
 
   @Override
-  public Boolean matches(final Type tp) {
+  public Boolean subsumes(final Type type) {
     // (<who/>, text { 'knows' })/self::*)
-    if(tp.oneOf(BasicType.ITEM, NodeType.NODE)) return null;
+    if(type.oneOf(BasicType.ITEM, NodeType.NODE)) return null;
     // <yes/>/self::element()
-    return tp.kind() == kind;
+    return type.kind() == kind;
   }
 
   @Override
   public boolean instanceOf(final Test test) {
+    if(this == test) return true;
     return (test instanceof NodeTest || test instanceof UnionTest) && super.instanceOf(test);
   }
 
@@ -126,7 +118,7 @@ public class NodeTest extends Test {
   }
 
   @Override
-  public String toString(final boolean full) {
+  public String toString(final boolean type) {
     return kind.toString();
   }
 }

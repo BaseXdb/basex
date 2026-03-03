@@ -8,7 +8,6 @@ import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -27,11 +26,10 @@ public final class UtilRoot extends StandardFunc {
     final Value nodes = arg(0).value(qc);
     if(nodes.seqType().type.kind() == Kind.DOCUMENT) return nodes;
 
-    final Iter iter = nodes.iter();
     final GNodeBuilder list = new GNodeBuilder();
-    for(Item item; (item = qc.next(iter)) != null;) {
-      final XNode root = item instanceof final XNode node ? node.root() : null;
-      if(root == null || root.kind() != Kind.DOCUMENT) throw NODOC_X.get(info, nodes);
+    for(final Item item : nodes) {
+      final XNode root = root(item);
+      if(root == null) throw NODOC_X.get(info, nodes);
       list.add(root);
     }
     return list.value(this);
@@ -41,10 +39,30 @@ public final class UtilRoot extends StandardFunc {
   protected Expr opt(final CompileContext cc) {
     final Expr nodes = arg(0);
     final SeqType st = nodes.seqType();
-    if(st.instanceOf(Types.DOCUMENT_ZM)) return nodes;
+    final Type type = st.type;
+    if(type.instanceOf(NodeType.DOCUMENT)) return nodes;
 
-    exprType.assign(st.zeroOrOne() ? st.occ : Occ.ZERO_OR_MORE).data(nodes);
+    Type tp = null;
+    if(type.instanceOf(NodeType.NODE)) {
+      tp = NodeType.DOCUMENT;
+    }
+    if(tp != null) {
+      exprType.assign(tp, st.zeroOrOne() ? st.occ : Occ.ZERO_OR_MORE).data(nodes);
+    }
     return this;
+  }
+
+  /**
+   * Returns the root of the specified node.
+   * @param item node item
+   * @return root
+   */
+  private XNode root(final Item item) {
+    if(item instanceof final XNode node) {
+      final XNode root = node.root();
+      if(root.kind() == Kind.DOCUMENT) return root;
+    }
+    return null;
   }
 
   /**

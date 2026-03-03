@@ -267,7 +267,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
     return this;
   }
@@ -309,7 +309,7 @@ public abstract class Item extends Value {
 
   @Override
   public final boolean ddo() {
-    return type instanceof NodeType;
+    return true;
   }
 
   /**

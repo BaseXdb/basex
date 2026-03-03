@@ -105,6 +105,8 @@ public final class SeqType {
    * @return result of check
    */
   private boolean instance(final Value value, final boolean coerce) {
+    if(eq(value.seqType())) return true;
+
     // check cardinality
     final long size = value.size();
     if(!occ.check(size)) return false;
@@ -416,8 +418,8 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNumber() {
-    return !zero() && (type.isNumber() || type == BasicType.ITEM ||
-        type == BasicType.ANY_ATOMIC_TYPE);
+    if(zero()) return false;
+    return type.isNumber() || type == BasicType.ITEM || type == BasicType.ANY_ATOMIC_TYPE;
   }
 
   /**
@@ -425,7 +427,8 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeFunction() {
-    return !zero() && (type == BasicType.ITEM || type instanceof FType);
+    if(zero()) return false;
+    return type == BasicType.ITEM || type instanceof FType;
   }
 
   /**

@@ -24,14 +24,7 @@ public final class FnSiblings extends ContextFn {
     if(node.kind().oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE) || parent == null)
       return node.iter();
 
-    final Iter iter = parent.childIter();
-    return new NodeIter() {
-      @Override
-      public XNode next() throws QueryException {
-        qc.checkStop();
-        return (XNode) iter.next();
-      }
-    };
+    return parent.childIter();
   }
 
   @Override

@@ -324,8 +324,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean ddo() {
-    final SeqType st = seqType();
-    return st.zeroOrOne() && st.type instanceof NodeType;
+    return seqType().zeroOrOne();
   }
 
   /**

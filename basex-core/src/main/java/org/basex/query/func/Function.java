@@ -1983,6 +1983,9 @@ public enum Function implements AFunction {
   _UTIL_COUNT_WITHIN(UtilCountWithin::new, "count-within(input,min[,max])",
       params(ITEM_ZM, INTEGER_O, INTEGER_O), BOOLEAN_O, UTIL_URI),
   /** XQuery function. */
+  _UTIL_GET(UtilGet::new, "get(keys[,node])",
+      params(ANY_ATOMIC_TYPE_ZM, NODE_ZO), BOOLEAN_O, UTIL_URI),
+  /** XQuery function. */
   _UTIL_IF(UtilIf::new, "if(condition,then[,else])",
       params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
@@ -1991,9 +1994,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
       params(NODE_ZM), DOCUMENT_ZM, UTIL_URI),
-  /** XQuery function. */
-  _UTIL_SELECT(UtilSelect::new, "select(keys[,node])",
-      params(ANY_ATOMIC_TYPE_ZM, NODE_ZO), BOOLEAN_O, UTIL_URI),
   /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),

@@ -73,7 +73,7 @@ public class MapType extends FType {
    * @param kt key type
    * @param vt value type
    */
-  public void finalizeTypes(final Type kt, final SeqType vt) {
+  public final void finalizeTypes(final Type kt, final SeqType vt) {
     if(isFinal) throw Util.notExpected();
     keyType = kt;
     valueType = vt;
@@ -84,7 +84,7 @@ public class MapType extends FType {
    * Getter for the key type.
    * @return key type
    */
-  public Type keyType() {
+  public final Type keyType() {
     return keyType;
   }
 
@@ -92,7 +92,7 @@ public class MapType extends FType {
    * Getter for the value type.
    * @return value type
    */
-  public SeqType valueType() {
+  public final SeqType valueType() {
     return valueType;
   }
 

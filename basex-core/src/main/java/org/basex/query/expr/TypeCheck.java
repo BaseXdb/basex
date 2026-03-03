@@ -63,8 +63,8 @@ public final class TypeCheck extends Single {
       //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
       if(cardinality) st = nst;
       // adopt result size and data reference from input expression
-      exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).
-        data(type instanceof NodeType ? expr : null);
+      final Expr dataExpr = type instanceof NodeType ? expr : null;
+      exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).data(dataExpr);
     }
 
     // remove redundant type check

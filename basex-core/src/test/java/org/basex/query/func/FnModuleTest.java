@@ -16,7 +16,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.func.prof.ProfType.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -3352,8 +3351,7 @@ return
     check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(func));
     check("for $s in ('a', 'b') return $s[" + func.args() + ']', "a\nb", empty(func));
     check("for $s in ('a', 'b') return $s[" + func.args() + " = 'a']", "a", empty(func));
-    check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "",
-        empty(func), exists(SingleIterPath.class), root(DualIterMap.class));
+    check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "", empty(func));
 
     check(func.args(" 'x' || " + wrap("x")), "xx", empty(func));
     check("('x' || " + wrap("x") + ") => " + func.args(), "xx", empty(func));

@@ -55,7 +55,7 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
     }
 
     final Type type = nodes.seqType().type;
-    if(type instanceof NodeType) {
+    if(type.instanceOf(NodeType.NODE)) {
       // distinct-ordered-nodes(replicate(*, 2)) → distinct-ordered-nodes(*)
       if(REPLICATE.is(nodes) && ((FnReplicate) nodes).singleEval(false))
         return nodes.arg(0);

@@ -112,13 +112,13 @@ public interface WebText {
   QNm Q_MEDIA_TYPE = new QNm("mediaType");
 
   /** Serializer node test. */
-  NameTest T_OUTPUT_SERIAL = SerializerOptions.T_ROOT;
+  Test T_OUTPUT_SERIAL = SerializerOptions.T_ROOT;
   /** HTTP Response test. */
-  NameTest T_HTTP_RESPONSE = NameTest.get(new QNm("response", HTTP_URI));
+  Test T_HTTP_RESPONSE = NameTest.get(new QNm("response", HTTP_URI));
   /** RESTXQ Response test. */
-  NameTest T_REST_RESPONSE = NameTest.get(new QNm("response", REST_URI));
+  Test T_REST_RESPONSE = NameTest.get(new QNm("response", REST_URI));
   /** RESTXQ Forward test. */
-  NameTest T_REST_FORWARD = NameTest.get(new QNm("forward", REST_URI));
+  Test T_REST_FORWARD = NameTest.get(new QNm("forward", REST_URI));
   /** HTTP Header test. */
-  NameTest T_HTTP_HEADER = NameTest.get(new QNm("header", HTTP_URI));
+  Test T_HTTP_HEADER = NameTest.get(new QNm("header", HTTP_URI));
 }
