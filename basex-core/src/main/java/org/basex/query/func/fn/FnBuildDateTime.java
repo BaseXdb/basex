@@ -48,13 +48,6 @@ public class FnBuildDateTime extends DateTimeFn {
   /** Mask value: seconds. */
   private static final int S  = 32;
 
-  /** ANum to long converter. */
-  private static final QueryFunction<ANum, Long> ANUM_TO_LONG = (ANum n) -> n.itr();
-  /** ANum to BigDecimal converter. */
-  private static final QueryFunction<ANum, BigDecimal> ANUM_TO_BIG_DECIMAL =
-      (ANum n) -> n.dec(null);
-  /** DTDur identity function. */
-  private static final QueryFunction<DTDur, DTDur> DTDUR_IDENTITY = (DTDur d) -> d;
   /** Constant for 60, used in time validation. */
   private static final BigDecimal BD_60 = BigDecimal.valueOf(60);
 
@@ -64,13 +57,13 @@ public class FnBuildDateTime extends DateTimeFn {
     if(value.isEmpty()) return Empty.VALUE;
     final XQMap map = (XQMap) definition.types[0].coerce(value, definition.params[0], qc, null, ii);
 
-    final Long       year    = get(map, YEAR,     ANUM_TO_LONG);
-    final Long       month   = get(map, MONTH,    ANUM_TO_LONG);
-    final Long       day     = get(map, DAY,      ANUM_TO_LONG);
-    final Long       hours   = get(map, HOURS,    ANUM_TO_LONG);
-    final Long       minutes = get(map, MINUTES,  ANUM_TO_LONG);
-    final BigDecimal seconds = get(map, SECONDS,  ANUM_TO_BIG_DECIMAL);
-    final DTDur      tz      = get(map, TIMEZONE, DTDUR_IDENTITY);
+    final Long       year    = getLong(map, YEAR);
+    final Long       month   = getLong(map, MONTH);
+    final Long       day     = getLong(map, DAY);
+    final Long       hours   = getLong(map, HOURS);
+    final Long       minutes = getLong(map, MINUTES);
+    final BigDecimal seconds = getDecimal(map, SECONDS);
+    final DTDur      tz      = getDuration(map, TIMEZONE);
 
     checkTz(tz, ii);
     final int mask =
@@ -121,23 +114,60 @@ public class FnBuildDateTime extends DateTimeFn {
   }
 
   /**
-   * Extracts a component from the map, applies the converter, and returns the result.
-   * @param <T> the type of the raw value in the map (e.g., ANum, DTDur)
-   * @param <U> the type of the converted value (e.g., Long, BigDecimal, DTDur)
-   * @param map the input map, an instance of {@code fn:dateTime-record}
-   * @param key the key to extract
-   * @param converter a function to convert the raw value to the desired type
-   * @return the converted value, or null if the key is absent or the value is empty
-   * @throws QueryException if the value is present but invalid according to the converter
+   * Retrieves an item from the map for the specified key, returning {@code null} if the key is not
+   * present or if the value is empty.
+   * @param map the map to retrieve the item from
+   * @param key the key to look up in the map
+   * @return the item associated with the key, or {@code null} if the key is not present or if the
+   *         value is empty
+   * @throws QueryException if an error occurs while retrieving the item from the map
    */
-  private static <T, U> U get(final XQMap map, final Str key, final QueryFunction<T, U> converter)
-      throws QueryException {
-
+  private static Item getItem(final XQMap map, final Str key) throws QueryException {
     final Value v = map.getOrNull(key);
-    if(v == null || v.isEmpty()) return null;
-    @SuppressWarnings("unchecked")
-    final T item = (T) v.itemAt(0);
-    return converter.apply(item);
+    return v == null || v.isEmpty() ? null : v.itemAt(0);
+  }
+
+  /**
+   * Retrieves a long value from the map for the specified key, returning {@code null} if the key is
+   * not present or if the value is empty.
+   * @param map the map to retrieve the long value from
+   * @param key the key to look up in the map
+   * @return the long value associated with the key, or {@code null} if the key is not present or if
+   *         the value is empty
+   * @throws QueryException if an error occurs while retrieving the long value from the map
+   */
+  private static Long getLong(final XQMap map, final Str key) throws QueryException {
+    final Item item = getItem(map, key);
+    return item == null ? null : ((ANum) item).itr();
+  }
+
+  /**
+   * Retrieves a BigDecimal value from the map for the specified key, returning {@code null} if the
+   * key is not present or if the value is empty.
+   * @param map the map to retrieve the BigDecimal value from
+   * @param key the key to look up in the map
+   * @return the BigDecimal value associated with the key, or {@code null} if the key is not present
+   *         or if the value is empty
+   * @throws QueryException if an error occurs while retrieving the BigDecimal value from the map
+   */
+  private static BigDecimal getDecimal(final XQMap map, final Str key)
+      throws QueryException {
+    final Item item = getItem(map, key);
+    return item == null ? null : item.dec(null);
+  }
+
+  /**
+   * Retrieves a DTDur value from the map for the specified key, returning {@code null} if the key
+   * is not present or if the value is empty.
+   * @param map the map to retrieve the DTDur value from
+   * @param key the key to look up in the map
+   * @return the DTDur value associated with the key, or {@code null} if the key is not present or
+   *         if the value is empty
+   * @throws QueryException if an error occurs while retrieving the DTDur value from the map
+   */
+  private static DTDur getDuration(final XQMap map, final Str key) throws QueryException {
+    final Item item = getItem(map, key);
+    return item == null ? null : (DTDur) item;
   }
 
   /**
