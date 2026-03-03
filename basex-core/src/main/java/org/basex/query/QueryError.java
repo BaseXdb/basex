@@ -639,6 +639,10 @@ public enum QueryError {
   ZONESEC_X(FODT, 3, "No seconds allowed in timezone: %."),
   /** Error code. */
   PLACE_X(FODT, 4, "Unknown place: %."),
+  /** Error code. */
+  INVDATETIMEFIELDS_X(FODT, 5, "Invalid combination of date/time fields: %"),
+  /** Error code. */
+  INVDATETIMEVALUE_X_X(FODT, 6, "Invalid component of date/time value: '%': %."),
 
   /** Error code. */
   FUNERR1(FOER, 0, "Halted on error()."),

@@ -367,6 +367,79 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void buildDateTime() {
+    final Function func = BUILD_DATETIME;
+    query(func.args(" ()"), "");
+    // examples from the spec
+    query(func.args(" { \"year\": 1999, \"month\": 5, \"day\": 31,"
+        + " \"hours\": 13, \"minutes\": 20, \"seconds\": 0,"
+        + " \"timezone\": xs:dayTimeDuration('-PT5H') }"),
+        "1999-05-31T13:20:00-05:00");
+    query(func.args(" {\"hours\": 13, \"minutes\": 30, \"seconds\": 4.2678}"),
+        "13:30:04.2678");
+    query(func.args(" { \"year\": 2007, \"month\": 5,"
+        + " \"timezone\": xs:dayTimeDuration('PT0S') }"),
+        "2007-05Z");
+    // xs:dateTime
+    query(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 3,"
+        + " \"hours\": 14, \"minutes\": 41, \"seconds\": 56.789,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "2026-03-03T14:41:56.789+01:00");
+    // xs:date
+    query(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "2026-03-03+01:00");
+    query(func.args(" {\"year\": -1, \"month\": 1, \"day\": 1}"),
+        "-0001-01-01");
+    // xs:time
+    query(func.args(" {\"hours\": 14, \"minutes\": 41, \"seconds\": 56.789,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "14:41:56.789+01:00");
+    // xs:gYear
+    query(func.args(" {\"year\": 2026,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "2026+01:00");
+    // xs:gYearMonth
+    query(func.args(" {\"year\": 2026, \"month\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "2026-03+01:00");
+    // xs:gMonth
+    query(func.args(" {\"month\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "--03+01:00");
+    // xs:gMonthDay
+    query(func.args(" {\"month\": 3, \"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "--03-03+01:00");
+    // xs:gDay
+    query(func.args(" {\"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "---03+01:00");
+
+    // empty map
+    error(func.args(" {}"), INVDATETIMEFIELDS_X);
+    // invalid field set (year+day without month)
+    error(func.args(" {\"year\": 2026, \"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEFIELDS_X);
+    // invalid field set (hours+minutes without seconds)
+    error(func.args(" {\"hours\": 14, \"minutes\": 41,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEFIELDS_X);
+    // out of range component (minutes)
+    error(func.args(" {\"hours\": 14, \"minutes\": 60, \"seconds\": 0,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEVALUE_X_X);
+    // invalid year (0)
+    error(func.args(" {\"year\": 0}"), INVDATETIMEVALUE_X_X);
+    // invalid date (March 0)
+    error(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 0,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEVALUE_X_X);
+    // invalid date (February 29, 2026)
+    error(func.args(" {\"year\": 2026, \"month\": 2, \"day\": 29}"), INVDATETIMEVALUE_X_X);
+    // invalid timezone (+15:00)
+    error(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT15H') }"), INVDATETIMEVALUE_X_X);
+  }
+
+  /** Test method. */
   @Test public void charr() {
     final Function func = CHAR;
 
