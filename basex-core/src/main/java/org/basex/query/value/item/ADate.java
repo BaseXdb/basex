@@ -23,9 +23,9 @@ import org.basex.util.*;
  */
 public abstract class ADate extends ADateDur {
   /** Maximum value for computations on year value based on long range. */
-  static final long MAX_YEAR = (long) (Long.MAX_VALUE / 365.2425) - 2;
+  public static final long MAX_YEAR = (long) (Long.MAX_VALUE / 365.2425) - 2;
   /** Minimum year value. */
-  static final long MIN_YEAR = -MAX_YEAR;
+  public static final long MIN_YEAR = -MAX_YEAR;
   /** Constant for counting negative years (divisible by 400). */
   private static final long ADD_NEG = (MAX_YEAR / 400 + 1) * 400;
 
@@ -36,7 +36,7 @@ public abstract class ADate extends ADateDur {
   /** Date pattern. */
   static final String ZONE = "(([-+])" + DD + ':' + DD + "|Z)?";
   /** Day per months. */
-  static final byte[] DAYS = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  public static final byte[] DAYS = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
   /** Date pattern. */
   public static final Pattern DATE = Pattern.compile(YEAR + '-' + DD + '-' + DD + ZONE);

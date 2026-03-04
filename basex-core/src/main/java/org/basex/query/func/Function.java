@@ -109,6 +109,10 @@ public enum Function implements AFunction {
   BOOLEAN(FnBoolean::new, "boolean(input)",
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
+  BUILD_DATETIME(FnBuildDateTime::new, "build-dateTime(value)",
+      params(Records.DATETIME.get().seqType()), ChoiceItemType.get(DATE_TIME_O, DATE_O, TIME_O,
+          G_YEAR_O, G_YEAR_MONTH_O, G_MONTH_O, G_MONTH_DAY_O, G_DAY_O).seqType(Occ.ZERO_OR_ONE)),
+  /** XQuery function. */
   BUILD_URI(FnBuildUri::new, "build-uri(parts[,options])",
       params(Records.URI_STRUCTURE.get().seqType(), MAP_ZO), STRING_O),
   /** XQuery function. */
