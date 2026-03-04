@@ -134,8 +134,8 @@ public enum Function implements AFunction {
   COLLATION(FnCollation::new, "collation(options)",
       params(MAP_O), STRING_O),
   /** XQuery function. */
-  COLLATION_AVAILALBE(FnCollationAvailable::new, "collation-available(collation[,usage])",
-      params(STRING_O, STRING_ZM), BOOLEAN_O),
+  COLLATION_AVAILALBE(FnCollationAvailable::new, "collation-available(collation)",
+      params(STRING_O), BOOLEAN_O),
   /** XQuery function. */
   COLLATION_KEY(FnCollationKey::new, "collation-key(value[,collation])",
       params(STRING_O, STRING_ZO), BASE64_BINARY_O),
