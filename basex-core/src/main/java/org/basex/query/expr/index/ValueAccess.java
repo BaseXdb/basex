@@ -112,7 +112,7 @@ public final class ValueAccess extends IndexAccess {
     // multiple search terms: collect results, return result iterator
     final GNodeBuilder nodes = new GNodeBuilder();
     for(final byte[] token : cache) {
-      for(final XNode node : iter(token, data)) {
+      for(final GNode node : iter(token, data)) {
         qc.checkStop();
         nodes.add(node);
       }

@@ -49,7 +49,7 @@ public class FnNodeName extends ContextFn {
       if(occ && st.oneOrMore() && kind.oneOf(ELEMENT, ATTRIBUTE, PROCESSING_INSTRUCTION)) {
         exprType.assign(Occ.EXACTLY_ONE);
       }
-      return kind != NODE && empty(kind);
+      return !kind.oneOf(NODE, GNODE) && empty(kind);
     }
     return false;
   }

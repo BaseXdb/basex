@@ -45,9 +45,9 @@ public final class CmpN extends Cmp {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XNode n1 = toNodeOrNull(exprs[0], qc);
+    final GNode n1 = toGNodeOrNull(exprs[0], qc);
     if(n1 == null) return Empty.VALUE;
-    final XNode n2 = toNodeOrNull(exprs[1], qc);
+    final GNode n2 = toGNodeOrNull(exprs[1], qc);
     if(n2 == null) return Empty.VALUE;
     return Bln.get(op.eval(n1, n2));
   }
@@ -55,9 +55,9 @@ public final class CmpN extends Cmp {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    final XNode n1 = toNodeOrNull(exprs[0], qc);
+    final GNode n1 = toGNodeOrNull(exprs[0], qc);
     if(n1 == null) return false;
-    final XNode n2 = toNodeOrNull(exprs[1], qc);
+    final GNode n2 = toGNodeOrNull(exprs[1], qc);
     if(n2 == null) return false;
     return op.eval(n1, n2);
   }

@@ -137,12 +137,12 @@ public final class Updates {
     if(target instanceof final DBNode node) return node;
 
     // determine highest ancestor node
-    XNode tmp = target;
+    GNode tmp = target;
     final BasicNodeIter iter = target.ancestorIter(false);
-    for(XNode n; (n = iter.next()) != null;) {
+    for(GNode n; (n = iter.next()) != null;) {
       tmp = n;
     }
-    final XNode root = tmp;
+    final XNode root = (XNode) tmp;
 
     // see if this ancestor has already been added to the pending update list
     // if data instance does not exist, create mapping between fragment ID and data reference
@@ -200,9 +200,9 @@ public final class Updates {
   }
 
   /**
-   * Recursively determines the PRE value for a given fragment node within the
-   * corresponding data reference.
-   * @param node current
+   * Recursively determines the PRE value for a given fragment node within the corresponding data
+   * reference.
+   * @param node current node
    * @param trgID ID of fragment for which we calculate the PRE value
    * @return PRE value
    */
@@ -210,15 +210,16 @@ public final class Updates {
     if(node.id == trgID) return 0;
 
     int s = 1;
-    for(final XNode nd : node.attributeIter()) {
-      final int st = preSteps(nd, trgID);
+    for(final GNode nd : node.attributeIter()) {
+      final int st = preSteps((XNode) nd, trgID);
       if(st == 0) return s;
       s += st;
     }
-    for(final XNode nd : node.childIter()) {
+    for(final GNode nd : node.childIter()) {
       // n.id <= trgID: rewritten to catch ID overflow
-      if(trgID - nd.id < 0) break;
-      s += preSteps(nd, trgID);
+      final XNode xnode = (XNode) nd;
+      if(trgID - xnode.id < 0) break;
+      s += preSteps(xnode, trgID);
     }
     return s;
   }

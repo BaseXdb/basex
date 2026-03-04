@@ -105,7 +105,7 @@ public class CmpG extends Cmp {
       }
 
       // choose best implementation
-      if(st1.zeroOrOne() && !st1.mayBeFunction() && st2.zeroOrOne() && !st2.mayBeFunction()) {
+      if(st1.zeroOrOne() && !st1.mayBeWrapped() && st2.zeroOrOne() && !st2.mayBeWrapped()) {
         // simple comparisons
         if(!(this instanceof CmpSimpleG)) expr = copyType(new CmpSimpleG(expr1, expr2, op, info));
       } else if(op == CmpOp.EQ && sc().collation == null && !st2.zeroOrOne() && (
@@ -242,7 +242,7 @@ public class CmpG extends Cmp {
   public final CmpG invert() {
     final Expr expr1 = exprs[0], expr2 = exprs[1];
     final SeqType st1 = expr1.seqType(), st2 = expr2.seqType();
-    return st1.one() && !st1.mayBeFunction() && st2.one() && !st2.mayBeFunction() ?
+    return st1.one() && !st1.mayBeWrapped() && st2.one() && !st2.mayBeWrapped() ?
       new CmpG(info, expr1, expr2, op.invert()) : null;
   }
 
@@ -376,7 +376,7 @@ public class CmpG extends Cmp {
       if(scope != null) {
         final ExprList paths = new ExprList(2);
         for(final QNm qname : qnames) {
-          final Test test = new NameTest(qname, scope, nt.kind(), sc().elemNS);
+          final Test test = Test.get(nt.kind(), qname, scope, sc().elemNS);
           final Expr step = Step.self(cc, null, info, test);
           if(step != Empty.VALUE) paths.add(Path.get(cc, info, null, step));
         }

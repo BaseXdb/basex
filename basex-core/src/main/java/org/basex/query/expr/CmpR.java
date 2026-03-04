@@ -120,7 +120,7 @@ public final class CmpR extends Single {
     expr = expr.simplifyFor(Simplify.NUMBER, cc);
 
     final SeqType st = expr.seqType();
-    single = st.zeroOrOne() && !st.mayBeFunction();
+    single = st.zeroOrOne() && !st.mayBeWrapped();
 
     // position() = .1e0 → false()
     if(Function.POSITION.is(expr)) {

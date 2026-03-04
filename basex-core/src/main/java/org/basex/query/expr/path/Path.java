@@ -84,11 +84,11 @@ public abstract class Path extends ParseExpr {
       Expr expr = step;
       if(expr instanceof ContextValue) {
         // rewrite context value reference to self step
-        expr = Step.get(expr.info(info), SELF, NodeTest.NODE);
+        expr = Step.get(expr.info(info), SELF, NodeTest.GNODE);
       } else if(expr instanceof final Filter filter) {
         // rewrite filter expression to self step with predicates
         if(filter.root instanceof ContextValue) {
-          expr = Step.get(filter.info(), SELF, NodeTest.NODE, filter.exprs);
+          expr = Step.get(filter.info(), SELF, NodeTest.GNODE, filter.exprs);
         }
       }
       tmp.add(expr);
@@ -339,7 +339,7 @@ public abstract class Path extends ParseExpr {
     // self step was removed: ensure that result will be in distinct document order
     if(removed && (list.isEmpty() || !(list.get(0).seqType().type instanceof NodeType))) {
       if(root == null) root = ContextValue.get(cc, info);
-      if(!root.ddo()) {
+      if(!root.ddo() && !root.seqType().mayBeWrapped()) {
         root = cc.replaceWith(root, cc.function(Function.DISTINCT_ORDERED_NODES, info, root));
       }
     }
@@ -429,7 +429,8 @@ public abstract class Path extends ParseExpr {
       Expr prev = rt;
       for(final Expr step : steps) {
         final SeqType seqType = prev.seqType();
-        if(step instanceof final Step stp && stp.empty(seqType)) return true;
+        if(seqType.type instanceof NodeType && step instanceof final Step stp &&
+            stp.empty(seqType)) return true;
         prev = step;
       }
     }
@@ -666,8 +667,7 @@ public abstract class Path extends ParseExpr {
       for(int t = 0; t < ts; t++) {
         final Expr[] preds = t == ts - 1 ? ((Preds) steps[s]).exprs : new Expr[0];
         final QNm qName = qNames.get(ts - t - 1);
-        final Test test = qName == null ? NodeTest.ELEMENT :
-          new NameTest(qName, Scope.LOCAL, Kind.ELEMENT, null);
+        final Test test = Test.get(Kind.ELEMENT, qName, Scope.LOCAL, null);
         stps[t] = Step.get(cc, root, curr.info(), CHILD, test, preds);
       }
       while(++s < sl) stps[ts++] = steps[s];
@@ -1054,8 +1054,8 @@ public abstract class Path extends ParseExpr {
     }
 
     // merge descendant-or-self step
-    if(curr.axis != DESCENDANT_OR_SELF || curr.exprs.length > 0 || curr.test != NodeTest.NODE)
-      return null;
+    if(curr.axis != DESCENDANT_OR_SELF || curr.exprs.length > 0 ||
+        !curr.test.kind.oneOf(Kind.NODE, Kind.JNODE, Kind.GNODE)) return null;
 
     // examples:
     // - descendant-or-self::node()/* → descendant::*

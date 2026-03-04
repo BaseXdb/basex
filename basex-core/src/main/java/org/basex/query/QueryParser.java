@@ -11,6 +11,7 @@ import static org.basex.util.ft.FTFlag.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -60,7 +61,7 @@ public class QueryParser extends InputParser {
   private static final byte[] SKIPCHECK = {};
   /** Reserved keywords. */
   private static final TokenSet KEYWORDS = new TokenSet(
-      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, NAMESPACE_NODE, NODE,
+      ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, GNODE, JNODE, NAMESPACE_NODE, NODE,
       SCHEMA_ATTRIBUTE, SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN,
       FUNCTION, GET, IF, ITEM, MAP, RECORD, SWITCH, TYPESWITCH);
 
@@ -2185,7 +2186,7 @@ public class QueryParser extends InputParser {
       if(consume('/')) {
         // two slashes: absolute descendant path
         checkAxis(Axis.DESCENDANT);
-        add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.NODE));
+        add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.GNODE));
         mark();
         expr = step(true);
       } else {
@@ -2221,7 +2222,7 @@ public class QueryParser extends InputParser {
     while(true) {
       if(consume('/')) {
         if(consume('/')) {
-          add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.NODE));
+          add(el, new CachedStep(info(), Axis.DESCENDANT_OR_SELF, NodeTest.GNODE));
           checkAxis(Axis.DESCENDANT);
         } else {
           checkAxis(Axis.CHILD);
@@ -2285,7 +2286,7 @@ public class QueryParser extends InputParser {
     ArrayList<ExprInfo> list = new ArrayList<>();
     if(wsConsume("..")) {
       axis = Axis.PARENT;
-      list.add(NodeTest.NODE);
+      list.add(NodeTest.GNODE);
       checkTest(list.get(0), true);
     } else if(consume('@')) {
       axis = Axis.ATTRIBUTE;
@@ -2333,22 +2334,29 @@ public class QueryParser extends InputParser {
       checkPred(false);
     }
 
-    final int ls = list.size();
-    if(ls == 1 && list.get(0) instanceof final Test test) {
-      return new CachedStep(info(), axis, test, preds.finish());
+    // all tests are node tests
+    if(((Checks<ExprInfo>) t -> t instanceof Test).all(list)) {
+      final ArrayList<Test> tests = new ArrayList<>(list.size());
+      for(final ExprInfo ei : list) tests.add((Test) ei);
+      return new CachedStep(info(), axis, Test.get(tests), preds.finish());
     }
 
+    // tests include get() pseudo-function
     final InputInfo ii = info();
-    final ExprList exprs = new ExprList(ls);
-    for(int l = 0; l < ls; l++) {
-      final ExprInfo ei = list.get(l);
+    final ExprList exprs = new ExprList(list.size());
+    for(final ExprInfo ei : list) {
       if(ei instanceof final Test test) {
-        exprs.add(new CachedStep(info(), axis, test));
+        // axis:test
+        exprs.add(Path.get(ii, null, new CachedStep(info(), axis, test)));
       } else {
+        // let $names := (expr) return axis:test[util:get-nodes($names)]
         final int s = localVars.openScope();
-        final Let lt = new Let(localVars.add(new Var(new QNm("names"), null, qc, ii)), (Expr) ei);
-        exprs.add(new GFLWOR(ii, lt, new CachedStep(info(), axis, NodeTest.ELEMENT,
-            Function._UTIL_GET.get(ii, new VarRef(ii, lt.var)))));
+        final Let lt = new Let(localVars.add(new Var(new QNm("get"), null, qc, ii)), (Expr) ei);
+        final Test test = Test.get(null, null, NameTest.Scope.ALL, null);
+        final Step step = new CachedStep(info(), axis, test,
+            Function._UTIL_GET.get(ii, new VarRef(ii, lt.var)));
+        final Expr rtrn = Path.get(ii, null, step);
+        exprs.add(new GFLWOR(ii, lt, rtrn));
         localVars.closeScope(s);
       }
     }
@@ -2394,62 +2402,68 @@ public class QueryParser extends InputParser {
    * Parses the "SimpleNodeTest" rule.
    * Parses the "NameTest" rule.
    * Parses the "KindTest" rule.
-   * @param kind node kind (either {@link Kind#ELEMENT} or {@link Kind#ATTRIBUTE})
+   * @param kind node kind ({@link Kind#ELEMENT}, {@link Kind#ATTRIBUTE}, or
+   *   {@code null} for catch clause))
    * @param all check all tests, or only names
    * @return node test, get() expression (if {@code all} is true), or {@code null}
    * @throws QueryException query exception
    */
   private ExprInfo simpleNodeTest(final Kind kind, final boolean all) throws QueryException {
+    final BiFunction<QNm, NameTest.Scope, Test> nameTest = (qnm, scope) -> {
+      return Test.get(all && kind == Kind.ELEMENT ? null : kind, qnm, scope, sc.elemNS);
+    };
     int p = pos;
     if(consume('*')) {
       p = pos;
       if(consume(':') && !consume('*')) {
         // name test: *:name
-        return new NameTest(new QNm(ncName(QNAME_X, true)), NameTest.Scope.LOCAL, kind, sc.elemNS);
+        return nameTest.apply(new QNm(ncName(QNAME_X, true)), NameTest.Scope.LOCAL);
       }
       // name test: *
       pos = p;
-      return NodeTest.get(kind);
+      return nameTest.apply(null, NameTest.Scope.ALL);
     }
     if(consume("Q{")) {
       // name test: Q{uri}*
       final byte[] uri = bracedURILiteral();
       if(consume('*')) {
-        return new NameTest(new QNm(cpToken(':'), uri), NameTest.Scope.URI, kind, sc.elemNS);
+        return nameTest.apply(new QNm(cpToken(':'), uri), NameTest.Scope.URI);
       }
     }
     pos = p;
 
     final InputInfo ii = info();
+    final boolean eqName = consume("Q{");
+    pos = p;
     QNm name = eQName(SKIPCHECK, null);
     if(name != null) {
       p = pos;
       if(all && wsConsumeWs("(")) {
         final Kind kn = Kind.get(name);
-        if(kn != null) {
-          // kind test
+        if(kn == Kind.JNODE) {
+          return jnodeTest();
+        } else if(kn != null) {
           return kindTest(kn);
-        }
-        if(!name.hasURI()) {
-          final byte[] local = name.local();
-          if(eq(local, token(GET))) {
-            // dynamic name test
-            final Expr expr = single();
-            wsCheck(")");
-            return expr;
-          }
+        } else if(!name.hasURI() && eq(name.local(), token(GET))) {
+          // dynamic name test
+          final Expr expr = single();
+          wsCheck(")");
+          return expr;
         }
       } else {
-        pos = p;
         NameTest.Scope scope = NameTest.Scope.FULL;
-        if(!name.hasPrefix() && consume(":*")) {
-          // name test: prefix:*
-          name = new QNm(concat(name.string(), cpToken(':')));
-          scope = NameTest.Scope.URI;
+        if(!name.hasPrefix()) {
+          if(consume(":*")) {
+            // name test: prefix:*
+            name = new QNm(concat(name.string(), cpToken(':')));
+            scope = NameTest.Scope.URI;
+          } else if(!eqName) {
+            scope = NameTest.Scope.FLEXIBLE;
+          }
         }
         // name test: prefix:name, name, Q{uri}name
         qnames.add(name, kind == Kind.ELEMENT, ii);
-        return new NameTest(name, scope, kind, sc.elemNS);
+        return nameTest.apply(name, scope);
       }
     }
     pos = p;
@@ -3523,15 +3537,13 @@ public class QueryParser extends InputParser {
         st = functionTest(anns, type).seqType();
         function = true;
       } else {
-        // node type
         final Kind kind = Kind.get(name);
-        if(kind != null) {
-          // node type
+        if(kind == Kind.JNODE) {
+          type = NodeType.get(jnodeTest());
+        } else if(kind != null) {
           type = wsConsume(")") ? NodeType.get(kind) : NodeType.get(kindTest(kind));
-        } else {
-          if(eq(local, token(ITEM))) {
-            type = BasicType.ITEM;
-          }
+        } else if(eq(local, token(ITEM))) {
+          type = BasicType.ITEM;
           wsCheck(")");
         }
       }
@@ -3566,7 +3578,39 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "FunctionTest" rule.
+   * Parses the "JNodeType" rule without the opening bracket.
+   * @return type
+   * @throws QueryException query exception
+   */
+  private Test jnodeTest() throws QueryException {
+    SeqType st = null;
+    Item key = null;
+    if(!wsConsume(")")) {
+      if(wsConsume("(") && wsConsume(")")) {
+        key = Empty.VALUE;
+      } else {
+        final Expr expr = literal(true, false);
+        if(expr instanceof final Item item) {
+          key = item;
+        } else if(expr != null) {
+          // error
+          expr.item(qc, info());
+        }
+      }
+      if(key == null) {
+        final byte[] ncname = ncName(null, false);
+        if(ncname.length != 0) key = Str.get(ncname);
+      }
+      if((key != null || wsConsume("*")) && wsConsume(",")) {
+        if(!wsConsume("*")) st = sequenceType();
+      }
+      wsCheck(")");
+    }
+    return JNodeTest.get(key, st);
+  }
+
+  /**
+   * Parses the "FunctionType" rule.
    * @param anns annotations
    * @param type function type
    * @return resulting type
@@ -3684,7 +3728,7 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "ElementTest" and "AttributeTest" rule without the leading keyword and brackets.
    * Parses the "TypeName" rule.
-   * @param kind node kind
+   * @param kind node kind ({@link Kind#ELEMENT} or {@link Kind#ATTRIBUTE})
    * @return test or {@code null}
    * @throws QueryException query exception
    */
@@ -3767,7 +3811,7 @@ public class QueryParser extends InputParser {
 
     Catch[] catches = { };
     while(wsConsume(CATCH)) {
-      final ArrayList<Test> tests = nameTestUnion(Kind.ELEMENT);
+      final ArrayList<Test> tests = nameTestUnion(null);
       if(tests.isEmpty()) throw error(NOCATCH);
 
       final int s = localVars.openScope();
@@ -3788,7 +3832,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "NameTestUnion" rule.
-   * @param kind node kind
+   * @param kind node kind ({@link Kind#ELEMENT} {@link Kind#ATTRIBUTE}, or {@code null}))
    * @return name tests or {@code null}
    * @throws QueryException query exception
    */

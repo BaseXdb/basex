@@ -5,6 +5,7 @@ import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 
+import org.basex.query.value.seq.*;
 import org.basex.util.hash.*;
 
 /**
@@ -192,6 +193,13 @@ public final class Types {
   /** Zero or more text nodes. */
   public static final SeqType TEXT_ZM = TEXT.seqType(ZERO_OR_MORE);
 
+  /** Zero or one GNode. */
+  public static final SeqType GNODE_ZO = GNODE.seqType(ZERO_OR_ONE);
+  /** Zero or more GNodes. */
+  public static final SeqType GNODE_ZM = GNODE.seqType(ZERO_OR_MORE);
+  /** One or more GNodes. */
+  public static final SeqType GNODE_OM = GNODE.seqType(ONE_OR_MORE);
+
   /** Single NMTOKENS. */
   public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
 
@@ -240,6 +248,23 @@ public final class Types {
   public static final SeqType ARRAY_ZO = ARRAY.seqType(ZERO_OR_ONE);
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
+
+  /** Map or array. */
+  public static final Type MAP_OR_ARRAY = ChoiceItemType.get(MAP_O, ARRAY_O);
+  /** Single map or array. */
+  public static final SeqType MAP_OR_ARRAY_O = MAP_OR_ARRAY.seqType();
+  /** Zero or more maps or arrays. */
+  public static final SeqType MAP_OR_ARRAY_ZM = MAP_OR_ARRAY.seqType(Occ.ZERO_OR_MORE);
+
+  /** Single JNode. */
+  public static final SeqType JNODE_O = JNODE.seqType();
+  /** Zero or one JNode. */
+  public static final SeqType JNODE_ZO = JNODE.seqType(ZERO_OR_ONE);
+  /** Zero or more JNodes. */
+  public static final SeqType JNODE_ZM = JNODE.seqType(ZERO_OR_MORE);
+
+  /** Root JNode. */
+  public static final NodeType JNODE_ROOT = NodeType.get(Empty.VALUE, MAP_OR_ARRAY_O);
 
   /** Type of fn:schema-type-record member 'variety'. */
   public static final EnumType SCHEMA_TYPE_RECORD_VARIETY =

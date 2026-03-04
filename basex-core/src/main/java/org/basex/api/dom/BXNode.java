@@ -42,18 +42,18 @@ public abstract class BXNode implements Node {
   /**
    * Creates a new DOM node instance for the input node.
    * @param node input node
-   * @return DOM node, or {@code null} if input is {@code null} as well
+   * @return DOM node, or {@code null} if input is no XML node
    */
-  public static BXNode get(final XNode node) {
-    return node == null ? null : switch(node.kind()) {
-      case DOCUMENT -> new BXDoc(node);
-      case ELEMENT -> new BXElem(node);
-      case TEXT -> new BXText(node);
-      case COMMENT -> new BXComm(node);
-      case PROCESSING_INSTRUCTION -> new BXPI(node);
-      case ATTRIBUTE -> new BXAttr(new FAttr(node.qname(), node.string()));
+  public static BXNode get(final GNode node) {
+    return node instanceof final XNode xnode ? switch(node.kind()) {
+      case DOCUMENT -> new BXDoc(xnode);
+      case ELEMENT -> new BXElem(xnode);
+      case TEXT -> new BXText(xnode);
+      case COMMENT -> new BXComm(xnode);
+      case PROCESSING_INSTRUCTION -> new BXPI(xnode);
+      case ATTRIBUTE -> new BXAttr(new FAttr(xnode.qname(), xnode.string()));
       default -> null;
-    };
+    } : null;
   }
 
   @Override
@@ -121,8 +121,8 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode getLastChild() {
-    XNode node = null;
-    for(final XNode n : nd.childIter()) node = n;
+    GNode node = null;
+    for(final GNode n : nd.childIter()) node = n;
     return node != null ? get(node) : null;
   }
 
@@ -274,7 +274,7 @@ public abstract class BXNode implements Node {
   final BXNList getElements(final String name) {
     final GNodeList list = new GNodeList();
     final byte[] nm = "*".equals(name) ? null : token(name);
-    for(final XNode n : nd.descendantIter(false)) {
+    for(final GNode n : nd.descendantIter(false)) {
       if(n.kind() == Kind.ELEMENT && (nm == null || eq(nm, n.name()))) {
         list.add(n);
       }
@@ -289,7 +289,7 @@ public abstract class BXNode implements Node {
    */
   static GNodeList finish(final BasicNodeIter iter) {
     final GNodeList list = new GNodeList();
-    for(final XNode n : iter) list.add(n);
+    for(final GNode n : iter) list.add(n);
     return list;
   }
 

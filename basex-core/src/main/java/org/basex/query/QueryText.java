@@ -79,6 +79,7 @@ public interface QueryText {
   /** Parser token. */ String FUNCTION = "function";
   /** Parser token. */ String FUZZY = "fuzzy";
   /** Parser token. */ String GET = "get";
+  /** Parser token. */ String GNODE = "gnode";
   /** Parser token. */ String GREATEST = "greatest";
   /** Parser token. */ String GROUP = "group";
   /** Parser token. */ String IDIV = "idiv";
@@ -93,6 +94,7 @@ public interface QueryText {
   /** Parser token. */ String INTO = "into";
   /** Parser token. */ String INVOKE = "invoke";
   /** Parser token. */ String ITEM = "item";
+  /** Parser token. */ String JNODE = "jnode";
   /** Parser token. */ String KEY = "key";
   /** Parser token. */ String LANGUAGE = "language";
   /** Parser token. */ String LAST = "last";
@@ -398,6 +400,8 @@ public interface QueryText {
   /** Optimization info. */ String OPTOPEN_X = "open database \"%\"";
 
   // MISCELLANEOUS ================================================================================
+
+  /** JTree. */ byte[] JTREE = token("jtree");
 
   /** Base token. */ byte[] BASE = token("base");
   /** Status token. */ byte[] STATUS = token("status");

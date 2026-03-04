@@ -122,7 +122,7 @@ public final class For extends ForLet {
   public For optimize(final CompileContext cc) throws QueryException {
     // for $a as xs:integer in $array → for $a as xs:integer in data($array)
     final SeqType dt = var.declType;
-    if(dt != null && dt.instanceOf(Types.ANY_ATOMIC_TYPE_ZM) && expr.seqType().mayBeFunction()) {
+    if(dt != null && dt.instanceOf(Types.ANY_ATOMIC_TYPE_ZM) && expr.seqType().mayBeWrapped()) {
       expr = cc.function(DATA, info, expr);
     }
 

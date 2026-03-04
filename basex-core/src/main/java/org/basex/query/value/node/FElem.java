@@ -8,6 +8,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -28,9 +29,9 @@ public final class FElem extends FNode {
   /** Namespaces. */
   private Atts namespaces;
   /** Attributes. */
-  private XNode[] attributes;
+  private GNode[] attributes;
   /** Children. */
-  private XNode[] children;
+  private GNode[] children;
 
   /**
    * Constructor.
@@ -110,7 +111,7 @@ public final class FElem extends FNode {
    * @param ch children
    * @return self reference
    */
-  FElem finish(final Atts ns, final XNode[] at, final XNode[] ch) {
+  FElem finish(final Atts ns, final GNode[] at, final GNode[] ch) {
     namespaces = ns;
     attributes = at;
     children = ch;
@@ -181,7 +182,7 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public BasicNodeIter childIter() {
+  public BasicNodeIter childIter(final Test test, final boolean descendant) {
     return GNodeList.iter(children);
   }
 
@@ -204,8 +205,8 @@ public final class FElem extends FNode {
     final FBuilder elem = build(name);
     final int ns = namespaces.size();
     for(int n = 0; n < ns; n++) elem.ns(namespaces.name(n), namespaces.value(n));
-    for(final XNode attribute : attributes) elem.node(attribute.materialize(test, ii, qc));
-    for(final XNode child : children) elem.node(child.materialize(test, ii, qc));
+    for(final GNode attribute : attributes) elem.node((GNode) attribute.materialize(test, ii, qc));
+    for(final GNode child : children) elem.node((GNode) child.materialize(test, ii, qc));
     return elem.finish();
   }
 
@@ -229,10 +230,10 @@ public final class FElem extends FNode {
     for(int n = 0; n < ns; n++) {
       tb.add(' ').add(new FNSpace(namespaces.name(n), namespaces.value(n)));
     }
-    for(final XNode attr : attributes) tb.add(' ').add(attr);
+    for(final GNode attr : attributes) tb.add(' ').add(attr);
     if(hasChildren()) {
       tb.add('>');
-      final XNode child = children[0];
+      final GNode child = children[0];
       if(child.kind() == Kind.TEXT && children.length == 1) {
         tb.add(QueryString.toValue(child.string()));
       } else {

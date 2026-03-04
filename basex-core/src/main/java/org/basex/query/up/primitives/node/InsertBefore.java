@@ -30,7 +30,7 @@ public final class InsertBefore extends NodeCopy {
   public void merge(final Update update) {
     final InsertBefore newOne = (InsertBefore) update;
     final GNodeList newInsert = newOne.nodes;
-    for(final XNode node : newInsert) nodes.add(node);
+    for(final GNode node : newInsert) nodes.add(node);
   }
 
   @Override

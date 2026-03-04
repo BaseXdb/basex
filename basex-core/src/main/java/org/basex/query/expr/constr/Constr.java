@@ -203,7 +203,7 @@ public final class Constr {
     if(attributes != null) {
       final int as = attributes.size();
       for(int a = 0; a < as; a++) {
-        final XNode attr = attributes.get(a);
+        final GNode attr = attributes.get(a);
         final QNm qnm = attr.qname();
         // skip attributes without prefixes or URIs
         if(!qnm.hasPrefix() || !qnm.hasURI()) continue;

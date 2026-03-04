@@ -13,7 +13,6 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -131,7 +130,6 @@ public final class ServerQuery extends Job {
       try(Serializer ser = Serializer.get(po, sopts)) {
         for(Item item; (item = qc.next(iter)) != null;) {
           if(iterative) {
-            if(item.type instanceof EnumType) item = Str.get(item.string(null));
             if(full) po.write(item.xdmInfo());
             else po.write(item.typeId().asByte());
             ser.reset();

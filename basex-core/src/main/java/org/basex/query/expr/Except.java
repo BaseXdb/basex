@@ -88,7 +88,7 @@ public final class Except extends Set {
     final GNodeBuilder nodes = new GNodeBuilder();
     Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      nodes.add(toNode(item));
+      nodes.add(toGNode(item));
     }
     nodes.ddo();
 
@@ -96,7 +96,7 @@ public final class Except extends Set {
     for(int e = 1; e < el && !nodes.isEmpty(); e++) {
       iter = exprs[e].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
-        nodes.removeAll(toNode(item));
+        nodes.removeAll(toGNode(item));
       }
     }
     return nodes.value(this);
@@ -106,10 +106,10 @@ public final class Except extends Set {
   NodeIter iterate(final QueryContext qc) throws QueryException {
     return new SetIter(qc, iters(qc)) {
       @Override
-      public XNode next() throws QueryException {
+      public GNode next() throws QueryException {
         if(nodes == null) {
           final int il = iter.length;
-          nodes = new XNode[il];
+          nodes = new GNode[il];
           for(int i = 0; i < il; i++) next(i);
         }
 
@@ -126,7 +126,7 @@ public final class Except extends Set {
           }
           if(d > 0) next(i--);
         }
-        final XNode temp = nodes[0];
+        final GNode temp = nodes[0];
         next(0);
         return temp;
       }

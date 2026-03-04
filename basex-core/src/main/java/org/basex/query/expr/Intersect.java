@@ -38,7 +38,7 @@ public final class Intersect extends Set {
     flatten(cc);
 
     // determine type
-    SeqType st = Types.NODE_ZM;
+    SeqType st = Types.GNODE_ZM;
     for(final Expr expr : exprs) {
       final SeqType st2 = expr.seqType();
       if(!st2.zero()) {
@@ -84,7 +84,7 @@ public final class Intersect extends Set {
     GNodeBuilder nodes = new GNodeBuilder();
     Iter iter = exprs[0].iter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
-      nodes.add(toNode(item));
+      nodes.add(toGNode(item));
     }
 
     final int el = exprs.length;
@@ -93,7 +93,7 @@ public final class Intersect extends Set {
       final GNodeBuilder tmp = new GNodeBuilder();
       iter = exprs[e].iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
-        final XNode node = toNode(item);
+        final GNode node = toGNode(item);
         if(nodes.contains(node)) tmp.add(node);
       }
       nodes = tmp;
@@ -105,9 +105,9 @@ public final class Intersect extends Set {
   NodeIter iterate(final QueryContext qc) throws QueryException {
     return new SetIter(qc, iters(qc)) {
       @Override
-      public XNode next() throws QueryException {
+      public GNode next() throws QueryException {
         final int irl = iter.length;
-        if(nodes == null) nodes = new XNode[irl];
+        if(nodes == null) nodes = new GNode[irl];
 
         for(int i = 0; i < irl; i++) {
           if(!next(i)) return null;

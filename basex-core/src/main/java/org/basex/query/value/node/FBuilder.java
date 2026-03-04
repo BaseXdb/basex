@@ -55,7 +55,7 @@ public final class FBuilder {
    * @param node node to be added
    * @return self reference
    */
-  public FBuilder node(final XNode node) {
+  public FBuilder node(final GNode node) {
     final boolean attr = node.kind() == Kind.ATTRIBUTE;
     GNodeList nodes = attr ? attributes : children;
     if(nodes == null) {
@@ -64,7 +64,7 @@ public final class FBuilder {
       else children = nodes;
     }
     nodes.add(node);
-    node.parent(root);
+    ((XNode) node).parent(root);
     return this;
   }
 
@@ -141,8 +141,8 @@ public final class FBuilder {
    */
   public FNode finish() {
     final Atts ns = namespaces != null ? namespaces.optimize() : NO_NAMESPACES;
-    final XNode[] at = attributes != null ? attributes.finish() : NO_NODES;
-    final XNode[] ch = children != null ? children.finish() : NO_NODES;
+    final GNode[] at = attributes != null ? attributes.finish() : NO_NODES;
+    final GNode[] ch = children != null ? children.finish() : NO_NODES;
     return root instanceof final FElem felem ? felem.finish(ns, at, ch) : ((FDoc) root).finish(ch);
   }
 }

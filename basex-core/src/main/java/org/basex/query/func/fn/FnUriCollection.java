@@ -32,6 +32,10 @@ public final class FnUriCollection extends FnCollection {
       public long size() {
         return size;
       }
+
+      private static Uri toUri(final Item item) {
+        return Uri.get(((XNode) item).baseURI(), false);
+      }
     };
   }
 
@@ -39,14 +43,5 @@ public final class FnUriCollection extends FnCollection {
   public Value value(final QueryContext qc) throws QueryException {
     // overwrite implementation of superclass
     return iter(qc).value(qc, this);
-  }
-
-  /**
-   * Returns the URI of the collection node.
-   * @param item node item
-   * @return URI
-   */
-  private static Uri toUri(final Item item) {
-    return Uri.get(((XNode) item).baseURI(), false);
   }
 }

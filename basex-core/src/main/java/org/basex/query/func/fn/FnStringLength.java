@@ -30,7 +30,7 @@ public final class FnStringLength extends ContextFn {
     if(STRING.is(value)) {
       final Expr v = ((FnString) value).contextAccess() ? cc.qc.focus.value : value.arg(0);
       // string-length(string(E)) → string-length(E)
-      if(v != null && !v.seqType().mayBeFunction()) {
+      if(v != null && !v.seqType().mayBeWrapped()) {
         return cc.function(STRING_LENGTH, info, value.args());
       }
     }

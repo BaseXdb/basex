@@ -5,7 +5,6 @@ import static org.basex.query.util.DeepEqualOptions.*;
 import static org.basex.query.value.type.Kind.*;
 
 import java.io.*;
-import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
@@ -33,7 +32,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public abstract class XNode extends Item {
+public abstract class XNode extends GNode {
   /** QName: xml:base. */
   static final QNm XML_BASE = new QNm(QueryText.BASE, QueryText.XML_URI);
   /** Node Types. */
@@ -76,12 +75,6 @@ public abstract class XNode extends Item {
     return string();
   }
 
-  /**
-   * Returns the string value.
-   * @return string value
-   */
-  public abstract byte[] string();
-
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
@@ -94,15 +87,6 @@ public abstract class XNode extends Item {
       expr = atomItem(cc.qc, null);
     }
     return cc.simplify(this, expr, mode);
-  }
-
-  @Override
-  public final boolean instanceOf(final Type tp, final boolean coerce) {
-    if(type.instanceOf(tp)) return true;
-    if(tp instanceof final NodeType nt && nt.test != null) {
-      return nt.test.matches(this);
-    }
-    return false;
   }
 
   @Override
@@ -151,9 +135,9 @@ public abstract class XNode extends Item {
       BasicNodeIter iter2 = node2.attributeIter();
       if(iter1.size() != iter2.size()) return false;
 
-      for(XNode attr1; (attr1 = iter1.next()) != null;) {
+      for(GNode attr1; (attr1 = iter1.next()) != null;) {
         name1 = attr1.qname();
-        for(XNode attr2;;) {
+        for(GNode attr2;;) {
           attr2 = iter2.next();
           if(attr2 == null) return false;
           name2 = attr2.qname();
@@ -180,7 +164,7 @@ public abstract class XNode extends Item {
 
     final Function<XNode, GNodeList> children = node -> {
       final GNodeList nl = new GNodeList();
-      for(final XNode child : node.childIter()) {
+      for(final GNode child : node.childIter()) {
         if(deep.qc != null) deep.qc.checkStop();
         final Kind kind = child.kind();
         if((kind != PROCESSING_INSTRUCTION || options.get(PROCESSING_INSTRUCTIONS)) &&
@@ -191,7 +175,7 @@ public abstract class XNode extends Item {
       }
       if(options.get(WHITESPACE) != Whitespace.PRESERVE && !preserve()) {
         for(int n = nl.size() - 1; n >= 0; n--) {
-          final XNode child = nl.get(n);
+          final GNode child = nl.get(n);
           if(child.kind() == TEXT && Token.ws(child.string())) nl.remove(n);
         }
       }
@@ -207,7 +191,7 @@ public abstract class XNode extends Item {
     if(name1 == null || !options.unordered(name1)) {
       for(final NodeIter iter1 = list1.iter(), iter2 = list2.iter();;) {
         if(deep.qc != null) deep.qc.checkStop();
-        final XNode child1 = iter1.next();
+        final GNode child1 = iter1.next();
         if(child1 == null) return true;
         if(!deep.equal(child1, iter2.next())) return false;
       }
@@ -285,21 +269,12 @@ public abstract class XNode extends Item {
     return new DBNode(data);
   }
 
-  /**
-   * Returns the name (optional prefix, local name) of an attribute, element or
-   * processing instruction. This function is possibly evaluated faster than {@link #qname()},
-   * as no {@link QNm} instance may need to be created.
-   * @return name, or {@code null} if node has no name
-   */
+  @Override
   public byte[] name() {
     return null;
   }
 
-  /**
-   * Returns the QName (optional prefix, local name) of an attribute, element or
-   * processing instruction.
-   * @return name, or {@code null} if node has no QName
-   */
+  @Override
   public QNm qname() {
     return null;
   }
@@ -384,21 +359,6 @@ public abstract class XNode extends Item {
   }
 
   /**
-   * Checks if two nodes are identical.
-   * @param node node to be compared
-   * @return result of check
-   */
-  public abstract boolean is(XNode node);
-
-  /**
-   * Checks the document order of two nodes.
-   * @param node node to be compared
-   * @return {@code 0} if the nodes are identical, or {@code 1}/{@code -1}
-   * if the node appears after/before the argument
-   */
-  public abstract int compare(XNode node);
-
-  /**
    * Compares two nodes for their unique order.
    * @param node1 first node
    * @param node2 node to be compared
@@ -412,16 +372,16 @@ public abstract class XNode extends Item {
       nl.add(node);
     }
     // find the lowest common ancestor
-    XNode c2 = node2;
+    GNode c2 = node2;
     LOOP:
-    for(XNode node = node2; (node = node.parent()) != null;) {
+    for(GNode node = node2; (node = node.parent()) != null;) {
       final int is = nl.size();
       for(int i = 1; i < is; i++) {
         if(node == node1) return -1;
         if(!nl.get(i).is(node)) continue;
         // check which node appears as first LCA child
-        final XNode c1 = nl.get(i - 1);
-        for(final XNode c : node.childIter()) {
+        final GNode c1 = nl.get(i - 1);
+        for(final GNode c : node.childIter()) {
           if(c.is(c1)) return -1;
           if(c.is(c2)) return 1;
         }
@@ -432,19 +392,13 @@ public abstract class XNode extends Item {
     return Integer.signum(node1.id - node2.id);
   }
 
-  /**
-   * Returns the root of a node (the topmost ancestor without parent node).
-   * @return root node
-   */
+  @Override
   public final XNode root() {
     final XNode p = parent();
     return p == null ? this : p.root();
   }
 
-  /**
-   * Returns the parent node.
-   * @return parent node or {@code null}
-   */
+  @Override
   public abstract XNode parent();
 
   /**
@@ -452,12 +406,6 @@ public abstract class XNode extends Item {
    * @param par parent node
    */
   public abstract void parent(FNode par);
-
-  /**
-   * Indicates if the node has attributes.
-   * @return result of test
-   */
-  public abstract boolean hasChildren();
 
   /**
    * Indicates if the node has attributes.
@@ -473,253 +421,10 @@ public abstract class XNode extends Item {
   public final byte[] attribute(final QNm name) {
     final BasicNodeIter iter = attributeIter();
     while(true) {
-      final XNode node = iter.next();
+      final GNode node = iter.next();
       if(node == null) return null;
       if(node.qname().eq(name)) return node.string();
     }
-  }
-
-  /**
-   * Returns an ancestor-or-self axis iterator.
-   * @param self include self node
-   * @return iterator
-   */
-  public BasicNodeIter ancestorIter(final boolean self) {
-    return new BasicNodeIter() {
-      private XNode node = XNode.this;
-      private boolean slf = self;
-
-      @Override
-      public XNode next() {
-        if(slf) {
-          slf = false;
-        } else {
-          node = node.parent();
-        }
-        return node;
-      }
-    };
-  }
-
-  /**
-   * Returns an attribute axis iterator with {@link Iter#size()} and
-   * {@link Iter#get(long)} implemented.
-   * @return iterator
-   */
-  public abstract BasicNodeIter attributeIter();
-
-  /**
-   * Returns a child axis iterator.
-   * @return iterator
-   */
-  public abstract BasicNodeIter childIter();
-
-  /**
-   * Returns an iterator for all descendant nodes.
-   * @param self include self node
-   * @return node iterator
-   */
-  public BasicNodeIter descendantIter(final boolean self) {
-    return new BasicNodeIter() {
-      private final Stack<BasicNodeIter> iters = new Stack<>();
-      private XNode last;
-
-      @Override
-      public XNode next() {
-        final BasicNodeIter ir = last != null ? last.childIter() : self ? selfIter() : childIter();
-        last = ir.next();
-        if(last == null) {
-          while(!iters.isEmpty()) {
-            last = iters.peek().next();
-            if(last != null) break;
-            iters.pop();
-          }
-        } else {
-          iters.add(ir);
-        }
-        return last;
-      }
-    };
-  }
-
-  /**
-   * Returns an iterator for all descendant nodes.
-   * @param self include self node
-   * @return node iterator
-   */
-  public BasicNodeIter followingIter(final boolean self) {
-    return new BasicNodeIter() {
-      private BasicNodeIter iter;
-
-      @Override
-      public XNode next() {
-        if(iter == null) {
-          final GNodeList list = new GNodeList();
-          if(self) list.add(XNode.this);
-          XNode node = XNode.this, root = node.parent();
-          while(root != null) {
-            final BasicNodeIter ir = root.childIter();
-            if(node.kind() != ATTRIBUTE) {
-              for(final XNode nd : ir) {
-                if(nd.is(node)) break;
-              }
-            }
-            for(final XNode nd : ir) {
-              list.add(nd);
-              addDescendants(nd.childIter(), list);
-            }
-            node = root;
-            root = root.parent();
-          }
-          iter = list.iter();
-        }
-        return iter.next();
-      }
-    };
-  }
-
-  /**
-   * Returns a following-sibling axis iterator.
-   * @param self include self node
-   * @return iterator
-   */
-  public BasicNodeIter followingSiblingIter(final boolean self) {
-    final XNode root = parent();
-    if(root == null || kind() == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
-
-    return new BasicNodeIter() {
-      private final BasicNodeIter iter = root.childIter();
-      private boolean found;
-
-      @Override
-      public XNode next() {
-        for(XNode n; !found && (n = iter.next()) != null;) {
-          if(n.is(XNode.this)) {
-            found = true;
-            if(self) return n;
-          }
-        }
-        return iter.next();
-      }
-    };
-  }
-
-  /**
-   * Returns a parent axis iterator.
-   * @return iterator
-   */
-  public final BasicNodeIter parentIter() {
-    return new BasicNodeIter() {
-      private boolean called;
-
-      @Override
-      public XNode next() {
-        if(called) return null;
-        called = true;
-        return parent();
-      }
-    };
-  }
-
-  /**
-   * Returns a preceding axis iterator.
-   * @param self include self node
-   * @return iterator
-   */
-  public BasicNodeIter precedingIter(final boolean self) {
-    return new BasicNodeIter() {
-      private BasicNodeIter iter;
-
-      @Override
-      public XNode next() {
-        if(iter == null) {
-          final GNodeList list = new GNodeList();
-          if(self) list.add(XNode.this);
-          XNode node = XNode.this, root = node.parent();
-          while(root != null) {
-            if(node.kind() != ATTRIBUTE) {
-              final GNodeList lst = new GNodeList();
-              for(final XNode ch : root.childIter()) {
-                if(ch.is(node)) break;
-                lst.add(ch);
-                addDescendants(ch.childIter(), lst);
-              }
-              for(int t = lst.size() - 1; t >= 0; t--) list.add(lst.get(t));
-            }
-            node = root;
-            root = root.parent();
-          }
-          iter = list.iter();
-        }
-        return iter.next();
-      }
-    };
-  }
-
-  /**
-   * Returns a preceding-sibling axis iterator.
-   * @param self include self node
-   * @return iterator
-   */
-  public final BasicNodeIter precedingSiblingIter(final boolean self) {
-    final XNode root = parent();
-    if(root == null || kind() == ATTRIBUTE) return self ? selfIter() : BasicNodeIter.EMPTY;
-
-    return new BasicNodeIter() {
-      private GNodeList list;
-      private int l;
-
-      @Override
-      public XNode next() {
-        if(list == null) {
-          list = new GNodeList();
-          for(final XNode node : root.childIter()) {
-            final boolean last = node.is(XNode.this);
-            if(!last || self) list.add(node);
-            if(last) break;
-          }
-          l = list.size();
-        }
-        return l > 0 ? list.get(--l) : null;
-      }
-    };
-  }
-
-  /**
-   * Returns a self axis iterator.
-   * @return iterator
-   */
-  public final BasicNodeIter selfIter() {
-    return new BasicNodeIter() {
-      private boolean called;
-
-      @Override
-      public XNode next() {
-        if(called) return null;
-        called = true;
-        return XNode.this;
-      }
-    };
-  }
-
-  /**
-   * Adds nodes of a child iterator and its descendants.
-   * @param children child nodes
-   * @param nodes node cache
-   */
-  private static void addDescendants(final BasicNodeIter children, final GNodeList nodes) {
-    for(final XNode node : children) {
-      nodes.add(node);
-      addDescendants(node.childIter(), nodes);
-    }
-  }
-
-  /**
-   * Returns the node kind.
-   * @return node kind
-   */
-  public Kind kind() {
-    return type.kind();
   }
 
   /**

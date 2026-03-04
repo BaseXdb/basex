@@ -20,11 +20,11 @@ public final class UtilGet extends ContextFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Iter keys = arg(0).iter(qc);
-    final XNode node = toNode(context(qc), qc);
+    final GNode node = toGNode(context(qc).item(qc, info));
 
-    final QNm name = node.qname();
     for(Item item; (item = qc.next(keys)) != null;) {
-      if(item.atomicEqual(name)) return Bln.TRUE;
+      final Item key = node instanceof final JNode jnode ? jnode.key : node.qname();
+      if(key != null && item.atomicEqual(key)) return Bln.TRUE;
     }
     return Bln.FALSE;
   }

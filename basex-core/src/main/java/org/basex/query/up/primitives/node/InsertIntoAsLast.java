@@ -30,7 +30,7 @@ public final class InsertIntoAsLast extends NodeCopy {
   @Override
   public void merge(final Update update) {
     final GNodeList newInsert = ((NodeCopy) update).nodes;
-    for(final XNode node : newInsert) nodes.add(node);
+    for(final GNode node : newInsert) nodes.add(node);
   }
 
   @Override

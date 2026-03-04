@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
@@ -26,6 +27,10 @@ public final class NodeType implements Type {
     for(final Kind kind : Kind.values()) TYPES.put(kind, new NodeType(kind, null));
   }
 
+  /** Node type: GNode. */
+  public static final NodeType GNODE = TYPES.get(Kind.GNODE);
+  /** Node type: JNode. */
+  public static final NodeType JNODE = TYPES.get(Kind.JNODE);
   /** Node type: node. */
   public static final NodeType NODE = TYPES.get(Kind.NODE);
   /** Node type: text. */
@@ -80,6 +85,16 @@ public final class NodeType implements Type {
     return test instanceof NodeTest ? get(kind) : new NodeType(kind, test);
   }
 
+  /**
+   * Returns a JNode type for the specified key and value type.
+   * @param key key ({@code null} for wildcard), {@link Empty#VALUE for root node})
+   * @param valueType value type (can be {@code null})
+   * @return JNode type
+   */
+  public static NodeType get(final Item key, final SeqType valueType) {
+    return get(JNodeTest.get(key, valueType));
+  }
+
   @Override
   public Kind kind() {
     return kind;
@@ -102,7 +117,7 @@ public final class NodeType implements Type {
 
   @Override
   public boolean isStringOrUntyped() {
-    return true;
+    return !kind.oneOf(Kind.GNODE, Kind.JNODE);
   }
 
   @Override
@@ -111,20 +126,20 @@ public final class NodeType implements Type {
   }
 
   @Override
-  public XNode cast(final Item item, final QueryContext qc, final InputInfo info)
+  public GNode cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    if(item.type == this) return (XNode) item;
+    if(item.type == this) return (GNode) item;
     throw typeError(item, this, info);
   }
 
   @Override
-  public XNode cast(final Object value, final QueryContext qc, final InputInfo info)
+  public GNode cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
     return kind.cast(value, info);
   }
 
   @Override
-  public XNode read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
+  public GNode read(final DataInput in, final QueryContext qc) throws IOException, QueryException {
     return cast(in.readToken(), qc, null);
   }
 
@@ -147,12 +162,10 @@ public final class NodeType implements Type {
 
   @Override
   public boolean instanceOf(final Type type) {
-    if(type == this || type == BasicType.ITEM) return true;
+    if(type == this || type == BasicType.ITEM || type == GNODE) return true;
     if(type instanceof final NodeType nt) {
-      if(nt.kind == Kind.NODE) return true;
-      if(nt.kind != kind) return false;
-      if(nt.test == null) return true;
-      return test != null && test.instanceOf(nt.test);
+      if(nt.kind != kind) return kind.instanceOf(nt.kind);
+      return nt.test == null || test != null && test.instanceOf(nt.test);
     }
     if(type instanceof final ChoiceItemType cit) {
       return cit.hasInstance(this);
@@ -166,9 +179,8 @@ public final class NodeType implements Type {
     if(type.instanceOf(this)) return this;
     if(instanceOf(type)) return type;
     if(type instanceof final NodeType nt) {
-      // at this stage, both test and nt.test are present
-      if(kind == nt.kind) return get(Test.get(Arrays.asList(test, nt.test)));
-      return NODE;
+      if(nt.kind != kind) return get(kind.union(nt.kind));
+      return get(Test.get(Arrays.asList(test, nt.test)));
     }
     return BasicType.ITEM;
   }
@@ -179,7 +191,6 @@ public final class NodeType implements Type {
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
     if(type instanceof final NodeType nt && kind == nt.kind) {
-      // at this stage, both test and nt.test are present
       final Test t = test.intersect(nt.test);
       if(t != null) return get(t);
     }
@@ -188,7 +199,8 @@ public final class NodeType implements Type {
 
   @Override
   public BasicType atomic() {
-    return kind == Kind.NODE ? BasicType.ANY_ATOMIC_TYPE :
+    return kind.oneOf(Kind.GNODE, Kind.JNODE) ? null :
+      kind == Kind.NODE ? BasicType.ANY_ATOMIC_TYPE :
       kind == Kind.PROCESSING_INSTRUCTION || kind == Kind.COMMENT ? BasicType.STRING :
       BasicType.UNTYPED_ATOMIC;
   }

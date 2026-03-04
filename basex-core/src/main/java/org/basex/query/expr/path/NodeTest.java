@@ -12,16 +12,26 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class NodeTest extends Test {
-  /** Node test. */
-  public static final NodeTest NODE = new NodeTest(Kind.NODE) {
+  /** GNode test. */
+  public static final NodeTest GNODE = new NodeTest(Kind.GNODE) {
     @Override
-    public boolean matches(final XNode node) { return true; }
+    public boolean matches(final GNode node) { return true; }
     @Override
     public Boolean subsumes(final Type type) { return Boolean.TRUE; }
     @Override
-    public boolean instanceOf(final Test test) { return false; }
+    public boolean instanceOf(final Test test) { return test == this; }
     @Override
     public Test intersect(final Test test) { return test; }
+  };
+  /** JNode test. */
+  public static final NodeTest JNODE = new NodeTest(Kind.JNODE) {
+    @Override
+    public boolean matches(final GNode node) { return node.kind() == Kind.JNODE; }
+  };
+  /** XNode test. */
+  public static final NodeTest NODE = new NodeTest(Kind.NODE) {
+    @Override
+    public boolean matches(final GNode node) { return node.kind() != Kind.JNODE; }
   };
   /** Generic document test. */
   public static final NodeTest DOCUMENT = new NodeTest(Kind.DOCUMENT);
@@ -56,6 +66,8 @@ public class NodeTest extends Test {
    */
   public static NodeTest get(final Kind kind) {
     return switch(kind) {
+      case GNODE                  -> GNODE;
+      case JNODE                  -> JNODE;
       case NODE                   -> NODE;
       case DOCUMENT               -> DOCUMENT;
       case ELEMENT                -> ELEMENT;
@@ -74,21 +86,34 @@ public class NodeTest extends Test {
   }
 
   @Override
-  public Test optimize(final Data data) {
+  public Test optimize(final Kind kn, final Data data) {
+    if(kind == Kind.GNODE && kn != null && kn != kind) {
+      return get(kn == Kind.JNODE  ? Kind.JNODE : Kind.NODE);
+    }
     return this;
   }
 
   @Override
-  public boolean matches(final XNode node) {
+  public boolean matches(final GNode node) {
     return node.kind() == kind;
   }
 
   @Override
   public Boolean subsumes(final Type type) {
-    // (<who/>, text { 'knows' })/self::*)
-    if(type.oneOf(BasicType.ITEM, NodeType.NODE)) return null;
-    // <yes/>/self::element()
-    return type.kind() == kind;
+    // <yes/>/self::gnode();
+    if(kind == Kind.GNODE) return Boolean.TRUE;
+    // (<who/>, [ 'knows' ])/self::node()
+    final Kind kn = type.kind();
+    if(kn == null) return null;
+    // <yes/>/self::yes, [ 'yes' ]/self::jnode()
+    if(kn == kind) return Boolean.TRUE;
+    // <no/>/self::jnode()
+    if(kind == Kind.JNODE) return kn != Kind.GNODE ? Boolean.FALSE : null;
+    // [ 'no' ]/self::node(), <yes/>/self::node()
+    if(kind == Kind.NODE)
+      return kn == Kind.JNODE ? Boolean.FALSE : kn != Kind.GNODE ? Boolean.TRUE : null;
+    // <no/>/self::text()
+    return !kn.oneOf(Kind.NODE, Kind.GNODE) ? Boolean.FALSE : null;
   }
 
   @Override
@@ -100,14 +125,15 @@ public class NodeTest extends Test {
   @Override
   public Test intersect(final Test test) {
     if(test instanceof NodeTest) {
-      // a intersect * → a
+      // a intersect * ? a
       if(instanceOf(test)) return this;
       if(test.instanceOf(this)) return test;
     } else if(test instanceof UnionTest) {
       return test.intersect(this);
     } else {
-      // a intersect element() → a
-      if(kind == test.kind || kind == Kind.NODE) return test;
+      // a intersect element() ? a
+      if(kind == test.kind || kind == Kind.GNODE) return test;
+      if(kind == Kind.NODE && test.kind != Kind.JNODE) return test;
     }
     return null;
   }

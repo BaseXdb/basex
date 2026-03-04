@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -25,7 +26,7 @@ public final class FnPath extends ContextFn {
   /** Path options. */
   public static class PathOptions extends Options {
     /** Option. */
-    public static final ValueOption ORIGIN = new ValueOption("origin", Types.NODE_ZO);
+    public static final ValueOption ORIGIN = new ValueOption("origin", Types.GNODE_ZO);
     /** Option. */
     public static final BooleanOption LEXICAL = new BooleanOption("lexical", false);
     /** Option. */
@@ -36,7 +37,7 @@ public final class FnPath extends ContextFn {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    XNode node = toNodeOrNull(context(qc), qc);
+    GNode node = toGNodeOrNull(context(qc), qc);
     final PathOptions options = toOptions(arg(1), new PathOptions(), qc);
     if(node == null) return Empty.VALUE;
 
@@ -50,11 +51,11 @@ public final class FnPath extends ContextFn {
 
     boolean relative = false;
     while(true) {
-      final XNode parent = node.parent();
-      final NodeType type = (NodeType) node.type;
-      final Kind kind = type.kind();
+      final GNode parent = node.parent();
+      final Type type = node.type;
+      final Kind kind = type instanceof final NodeType nt ? nt.kind() : null;
       if(parent == null) {
-        if(kind != Kind.DOCUMENT) {
+        if(!kind.oneOf(Kind.DOCUMENT, Kind.JNODE)) {
           tb.add(name(Function.ROOT.definition().name, false, lexical, namespaces, qc)).add("()");
         }
         break;
@@ -69,13 +70,37 @@ public final class FnPath extends ContextFn {
         tb.add(kind.toString(Token.string(qname.local())));
       } else if(kind.oneOf(Kind.COMMENT, Kind.TEXT)) {
         tb.add(type.toString());
+      } else if(parent instanceof final JNode jparent) {
+        final JNode jnode = (JNode) node;
+        final Item key = jnode.key;
+        byte[] get = null;
+        final byte[] string = key.string(info);
+        if(jparent.value instanceof XQArray) {
+          tb.add("*[").add(key).add("]");
+        } else if(key instanceof AStr || key instanceof Atm || key instanceof Uri) {
+          if(XMLToken.isNCName(string)) {
+            tb.add(string);
+          } else {
+            get = QueryString.toQuoted(string);
+          }
+        } else if(key instanceof ANum) {
+          get = string;
+        } else if(key instanceof final QNm qnm) {
+          tb.add(qnm.eqName());
+        } else if(key instanceof Bln) {
+          get = Token.concat(string, "()");
+        } else {
+          get = Token.concat(key.type.toString(), '(', QueryString.toQuoted(string), ')');
+        }
+        if(get != null) tb.add("get(").add(get).add(')');
       }
       // optional index
-      if(indexes && kind != Kind.ATTRIBUTE) {
+      if(indexes && !kind.oneOf(Kind.ATTRIBUTE, Kind.JNODE)) {
         int p = 1;
-        for(final XNode nd : node.precedingSiblingIter(false)) {
+        for(final GNode nd : node.precedingSiblingIter(false)) {
           qc.checkStop();
-          if(nd.kind() == kind && (kind.oneOf(Kind.COMMENT, Kind.TEXT) || nd.qname().eq(qname))) {
+          final QNm qnm = nd.qname();
+          if(nd.kind() == kind && (qnm == null || nd.qname().eq(qname))) {
             p++;
           }
         }
@@ -85,16 +110,16 @@ public final class FnPath extends ContextFn {
       node = parent;
 
       // root node: finalize traversal
-      if(origin instanceof final XNode nd && node.is(nd)) {
+      if(origin instanceof final GNode nd && node.is(nd)) {
         relative = true;
         break;
       }
     }
-    if(origin instanceof XNode && !relative) throw PATH_X.get(info, origin);
+    if(origin instanceof GNode && !relative) throw PATH_X.get(info, origin);
 
     // add all steps in reverse order; cache element paths
     for(int s = steps.size() - 1; s >= 0; --s) {
-      if(!(tb.isEmpty() && origin instanceof XNode)) tb.add('/');
+      if(!(tb.isEmpty() && origin instanceof GNode)) tb.add('/');
       tb.add(steps.get(s));
     }
     return Str.get(tb.isEmpty() ? Token.cpToken('/') : tb.finish());

@@ -38,6 +38,8 @@ public interface Type {
     /** namespace-node().         */ NSP(16),
     /** schema-element().         */ SCE(17),
     /** schema-attribute().       */ SCA(18),
+    /** jnode().                  */ JND(19),
+    /** gnode().                  */ GND(20),
 
     // basic types
     /** choice item type.         */ CIT(29),

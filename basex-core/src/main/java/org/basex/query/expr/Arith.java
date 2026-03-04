@@ -59,7 +59,7 @@ public class Arith extends Arr {
     final boolean numbers = type1.isNumberOrUntyped() && type2.isNumberOrUntyped();
 
     final Type type = calc.type(type1, type2);
-    final boolean noArrays = !st1.mayBeFunction() && !st2.mayBeFunction();
+    final boolean noArrays = !st1.mayBeWrapped() && !st2.mayBeWrapped();
     final boolean oneOrMore = noArrays && st1.oneOrMore() && st2.oneOrMore();
     exprType.assign(type, oneOrMore ? Occ.EXACTLY_ONE : Occ.ZERO_OR_ONE);
 

@@ -28,10 +28,10 @@ public final class DocTest extends Test {
   }
 
   @Override
-  public boolean matches(final XNode node) {
+  public boolean matches(final GNode node) {
     boolean found = false;
     if(node.kind() == Kind.DOCUMENT) {
-      for(final XNode n : node.childIter()) {
+      for(final GNode n : node.childIter()) {
         if(n.kind().oneOf(Kind.COMMENT, Kind.PROCESSING_INSTRUCTION)) continue;
         if(found || !child.matches(n)) return false;
         found = true;

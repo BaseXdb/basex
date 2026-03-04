@@ -235,7 +235,7 @@ public final class SerializerOptions extends Options {
       if(!uri.isValid()) throw INVURI_X.get(info, value);
       if(!uri.isAbsolute()) uri = info.sc().baseURI().resolve(uri, info);
       final IO io = IO.get(string(uri.string()));
-      final XNode root;
+      final GNode root;
       try {
         root = new DBNode(io).childIter().next();
       } catch(final IOException ex) {
@@ -243,7 +243,7 @@ public final class SerializerOptions extends Options {
       }
       if(root != null) assign(root, info);
 
-      for(final XNode child : root.childIter()) {
+      for(final GNode child : root.childIter()) {
         if(child.kind() != Kind.ELEMENT) continue;
         if(option(string(child.qname().local())) == USE_CHARACTER_MAPS) {
           set(USE_CHARACTER_MAPS, characterMap(child, info));
@@ -285,18 +285,18 @@ public final class SerializerOptions extends Options {
    * @return character map or {@code null} if map is invalid
    * @throws QueryException query exception
    */
-  public static String characterMap(final XNode elem, final InputInfo info) throws QueryException {
+  public static String characterMap(final GNode elem, final InputInfo info) throws QueryException {
     final Supplier<QueryException> error = () -> SERDOC_X.get(info,
         Util.info("Serialization parameter '%' is invalid.", USE_CHARACTER_MAPS.name()));
     if(elem.attributeIter().next() != null) throw error.get();
 
     final TokenObjectMap<byte[]> map = new TokenObjectMap<>();
-    for(final XNode child : elem.childIter()) {
+    for(final GNode child : elem.childIter()) {
       if(child.kind() != Kind.ELEMENT) continue;
       final byte[] name = child.qname().local();
       if(eq(name, CHARACTER_MAP)) {
         byte[] key = null, val = null;
-        for(final XNode attr : child.attributeIter()) {
+        for(final GNode attr : child.attributeIter()) {
           final byte[] att = attr.name();
           if(eq(att, CHARACTER)) key = attr.string();
           else if(eq(att, MAP_STRING)) val = attr.string();
@@ -329,15 +329,15 @@ public final class SerializerOptions extends Options {
    * @return string
    * @throws QueryException query exception
    */
-  private String toString(final XNode node, final QNmSet cache, final InputInfo info)
+  private String toString(final GNode node, final QNmSet cache, final InputInfo info)
       throws QueryException {
 
-    final XNode att = node.attributeIter().next();
+    final GNode att = node.attributeIter().next();
     if(att != null) throw SERDOC_X.get(info, Util.info("Invalid attribute: '%'", att.name()));
 
     final StringBuilder sb = new StringBuilder();
     // interpret options
-    for(final XNode child : node.childIter()) {
+    for(final GNode child : node.childIter()) {
       if(child.kind() != Kind.ELEMENT) continue;
 
       // ignore elements in other namespace
@@ -357,7 +357,7 @@ public final class SerializerOptions extends Options {
       } else if(hasElements(child)) {
         value = toString(child, cache, info);
       } else {
-        for(final XNode attr : child.attributeIter()) {
+        for(final GNode attr : child.attributeIter()) {
           if(attr.qname().eq(Q_VALUE)) {
             value = string(attr.string());
             if(option == CDATA_SECTION_ELEMENTS) value = cdataSectionElements(child, value);
@@ -378,7 +378,7 @@ public final class SerializerOptions extends Options {
    * @param value value
    * @return name with resolved QNames
    */
-  private static String cdataSectionElements(final XNode elem, final String value) {
+  private static String cdataSectionElements(final GNode elem, final String value) {
     if(!Strings.contains(value, ':')) return value;
 
     final TokenBuilder tb = new TokenBuilder();
@@ -386,7 +386,7 @@ public final class SerializerOptions extends Options {
       byte[] qname = name;
       final int i = indexOf(name, ':');
       if(i != -1) {
-        final byte[] uri = elem.nsScope(null).value(substring(name, 0, i));
+        final byte[] uri = ((XNode) elem).nsScope(null).value(substring(name, 0, i));
         if(uri != null) qname = QNm.eqName(uri, substring(name, i + 1));
       }
       tb.add(qname).add(' ');
@@ -399,8 +399,8 @@ public final class SerializerOptions extends Options {
    * @param node node
    * @return result of check
    */
-  private static boolean hasElements(final XNode node) {
-    for(final XNode nd : node.childIter()) {
+  private static boolean hasElements(final GNode node) {
+    for(final GNode nd : node.childIter()) {
       if(nd.kind() == Kind.ELEMENT) return true;
     }
     return false;

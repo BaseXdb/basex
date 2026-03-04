@@ -210,7 +210,7 @@ public enum Function implements AFunction {
       params(), LANGUAGE_O),
   /** XQuery function. */
   DISTINCT_ORDERED_NODES(FnDistinctOrderedNodes::new, "distinct-ordered-nodes(nodes)",
-      params(NODE_ZM), NODE_ZM),
+      params(GNODE_ZM), GNODE_ZM),
   /** XQuery function. */
   DISTINCT_VALUES(FnDistinctValues::new, "distinct-values(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
@@ -340,13 +340,13 @@ public enum Function implements AFunction {
       params(ITEM_O, FuncType.get(ITEM_ZO, ITEM_O, INTEGER_O).seqType()), ITEM_ZM),
   /** XQuery function. */
   GENERATE_ID(FnGenerateId::new, "generate-id([node])",
-      params(NODE_ZO), STRING_O),
+      params(GNODE_ZO), STRING_O),
   /** XQuery function. */
   GRAPHEMES(FnGraphemes::new, "graphemes(value[,options])",
       params(STRING_ZO, MAP_ZO), STRING_ZM),
   /** XQuery function. */
   HAS_CHILDREN(FnHasChildren::new, "has-children([node])",
-      params(NODE_ZM), BOOLEAN_O),
+      params(GNODE_ZO), BOOLEAN_O),
   /** XQuery function. */
   HASH(FnHash::new, "hash(value[,algorithm,options])",
       params(STRING_OR_BINARY_ZO, STRING_ZO, MAP_ZO), HEX_BINARY_O),
@@ -397,7 +397,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, PREDICATE_O), INTEGER_ZM),
   /** XQuery function. */
   INNERMOST(FnInnermost::new, "innermost(nodes)",
-      params(NODE_ZM), NODE_ZM),
+      params(GNODE_ZM), GNODE_ZM),
   /** XQuery function. */
   INSERT_BEFORE(FnInsertBefore::new, "insert-before(input,position,insert)",
       params(ITEM_ZM, INTEGER_O, ITEM_ZM), ITEM_ZM),
@@ -420,12 +420,24 @@ public enum Function implements AFunction {
   ITEMS_AT(FnItemsAt::new, "items-at(input,at[,sorted])",
       params(ITEM_ZM, NUMERIC_ZM, BOOLEAN_ZO), ITEM_ZM),
   /** XQuery function. */
+  JKEY(FnJkey::new, "jkey([input])",
+      params(JNODE_ZO), ANY_ATOMIC_TYPE_ZO),
+  /** XQuery function. */
+  JPOSITION(FnJposition::new, "jposition([input])",
+      params(JNODE_ZO), INTEGER_ZO),
+  /** XQuery function. */
   JSON_DOC(FnJsonDoc::new, "json-doc(source[,options])",
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   JSON_TO_XML(FnJsonToXml::new, "json-to-xml(value[,options])",
       params(STRING_ZO, MAP_ZO),
       NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(Occ.ZERO_OR_ONE), flag(CNS)),
+  /** XQuery function. */
+  JTREE(FnJtree::new, "jtree(input)",
+      params(MAP_OR_ARRAY_O), JNODE_ROOT.seqType()),
+  /** XQuery function. */
+  JVALUE(FnJvalue::new, "jvalue([input])",
+      params(JNODE_ZO), ITEM_ZM),
   /** XQuery function. */
   LANG(FnLang::new, "lang(language[,node])",
       params(STRING_ZO, NODE_ZO), BOOLEAN_O),
@@ -521,7 +533,7 @@ public enum Function implements AFunction {
       params(STRING_O), FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_ZM).seqType()),
   /** XQuery function. */
   OUTERMOST(FnOutermost::new, "outermost(nodes)",
-      params(NODE_ZM), NODE_ZM),
+      params(GNODE_ZM), GNODE_ZM),
   /** XQuery function. */
   PARSE_CSV(FnParseCsv::new, "parse-csv(value[,options])",
       params(STRING_OR_BINARY_ZO, MAP_ZO),
@@ -563,7 +575,7 @@ public enum Function implements AFunction {
       params(GREGORIAN_ZO), Records.DATETIME.get().seqType()),
   /** XQuery function. */
   PATH(FnPath::new, "path([node,options])",
-      params(NODE_ZO, MAP_ZO), STRING_ZO),
+      params(GNODE_ZO, MAP_ZO), STRING_ZO),
   /** XQuery function. */
   POSITION(FnPosition::new, "position()",
       params(), INTEGER_O, flag(POS, CTX)),
@@ -599,7 +611,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   ROOT(FnRoot::new, "root([node])",
-      params(NODE_ZO), NODE_ZO),
+      params(GNODE_ZO), GNODE_ZO),
   /** XQuery function. */
   ROUND(FnRound::new, "round(value[,precision,mode])",
       params(NUMERIC_ZO, INTEGER_ZO, STRING_ZO), NUMERIC_ZO),
@@ -637,7 +649,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZO), STRING_O),
   /** XQuery function. */
   SIBLINGS(FnSiblings::new, "siblings([node])",
-      params(NODE_ZO), NODE_ZO),
+      params(GNODE_ZO), GNODE_ZM),
   /** XQuery function. */
   SLICE(FnSlice::new, "slice(input[,start,end,step])",
       params(ITEM_ZM, INTEGER_ZO, INTEGER_ZO, INTEGER_ZO), ITEM_ZM),
@@ -718,7 +730,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, STRING_ZO), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   TRANSITIVE_CLOSURE(FnTransitiveClosure::new, "transitive-closure(node,step)",
-      params(NODE_ZO, FUNCTION_O), NODE_ZM),
+      params(GNODE_ZO, FUNCTION_O), GNODE_ZM),
   /** XQuery function. */
   TRANSLATE(FnTranslate::new, "translate(value,replace,with)",
       params(STRING_ZO, STRING_O, STRING_O), STRING_O),
@@ -1645,7 +1657,7 @@ public enum Function implements AFunction {
       params(), ELEMENT_O, flag(NDT), INSPECT_URI, Perm.CREATE),
   /** XQuery function. */
   _INSPECT_FUNCTION(InspectFunction::new, "function(function)",
-      params(STRING_O), ELEMENT_O, flag(NDT), INSPECT_URI),
+      params(FUNCTION_O), ELEMENT_O, flag(NDT), INSPECT_URI),
   /** XQuery function. */
   _INSPECT_FUNCTIONS(InspectFunctions::new, "functions([source])",
       params(STRING_O), FUNCTION_ZM, flag(POS, CTX, CNS, NDT, HOF), INSPECT_URI, Perm.ADMIN),
@@ -1995,7 +2007,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
-      params(NODE_ZM), DOCUMENT_ZM, UTIL_URI),
+      params(GNODE_ZM), GNODE_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),

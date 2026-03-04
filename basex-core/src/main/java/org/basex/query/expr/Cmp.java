@@ -324,7 +324,7 @@ public abstract class Cmp extends Arr {
       final Expr arg1 = args.length > 0 ? args[0] : cc.qc.focus.value;
       if(arg1 != null) {
         final SeqType st1 = arg1.seqType();
-        if(st1.zero() || st1.one() && !st1.mayBeFunction()) {
+        if(st1.zero() || st1.one() && !st1.mayBeWrapped()) {
           return Bln.get(counts == COUNT_TRUE);
         }
       }

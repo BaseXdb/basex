@@ -52,7 +52,7 @@ public final class TypeCheck extends Single {
     cardinality = nst.instanceOf(st);
 
     // refine type check (ignore arrays as coerced result may have a different size)
-    if(!et.mayBeFunction() || !type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+    if(!et.mayBeWrapped() || !type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
       // occurrence indicator:
       //   exactly-one/one-or-more → exactly-one
       final Occ nocc = et.occ.intersect(st.occ);
@@ -63,7 +63,7 @@ public final class TypeCheck extends Single {
       //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
       if(cardinality) st = nst;
       // adopt result size and data reference from input expression
-      final Expr dataExpr = type instanceof NodeType ? expr : null;
+      final Expr dataExpr = type.instanceOf(NodeType.NODE) ? expr : null;
       exprType.assign(st, nocc, et.occ == st.occ ? expr.size() : -1).data(dataExpr);
     }
 

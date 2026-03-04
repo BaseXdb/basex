@@ -1,6 +1,7 @@
 package org.basex.query.value.node;
 
 import org.basex.api.dom.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -26,17 +27,19 @@ public abstract class FNode extends XNode {
   }
 
   @Override
-  public final boolean is(final XNode node) {
+  public final boolean is(final GNode node) {
     return this == node;
   }
 
   @Override
-  public final int compare(final XNode node) {
+  public final int compare(final GNode node) {
     if(this == node) return 0;
     // fragments: compare node IDs
     if(node instanceof final FNode fnode) return Integer.signum(id - fnode.id);
     // find LCA
-    return compare(this, node);
+    if(node instanceof final DBNode dbnode) return compare(this, dbnode);
+    // comparison with JNode
+    return -1;
   }
 
   @Override
@@ -55,7 +58,7 @@ public abstract class FNode extends XNode {
   }
 
   @Override
-  public BasicNodeIter childIter() {
+  public BasicNodeIter childIter(final Test test, final boolean descendant) {
     return BasicNodeIter.EMPTY;
   }
 
@@ -74,11 +77,11 @@ public abstract class FNode extends XNode {
    * @param nodes nodes
    * @return string
    */
-  static byte[] string(final XNode[] nodes) {
+  static byte[] string(final GNode[] nodes) {
     if(nodes.length == 0) return Token.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
-    for(final XNode node : nodes) {
+    for(final GNode node : nodes) {
       if(node.kind().oneOf(Kind.ELEMENT, Kind.TEXT)) tb.add(node.string());
     }
     return tb.finish();

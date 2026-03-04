@@ -13,6 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
@@ -278,6 +279,8 @@ public final class SeqType {
       if(type instanceof final FuncType ft) {
         return fitem.coerceTo(type == Types.FUNCTION ? item.funcType() : ft, qc, cc, info);
       }
+    } else if(item instanceof final JNode jnode) {
+      return coerce(jnode.value.unwrappedItem(qc, info), name, qc, cc, info);
     }
     return instance(item, false) ? item : null;
   }
@@ -423,12 +426,15 @@ public final class SeqType {
   }
 
   /**
-   * Tests if expressions of this type may yield functions (including maps and arrays).
+   * Tests if contents may be wrapped in a data structure. This includes JNodes,
+   * maps, arrays and function items.
    * @return result of check
    */
-  public boolean mayBeFunction() {
+  public boolean mayBeWrapped() {
     if(zero()) return false;
-    return type == BasicType.ITEM || type instanceof FType;
+    final Kind kind = type.kind();
+    return type == BasicType.ITEM || kind == Kind.GNODE || kind == Kind.JNODE ||
+        type instanceof FType;
   }
 
   /**

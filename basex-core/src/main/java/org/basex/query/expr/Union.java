@@ -40,7 +40,7 @@ public final class Union extends Set {
 
     // determine type
     SeqType st = SeqType.union(exprs, false);
-    if(st == null) st = Types.NODE_ZM;
+    if(st == null) st = Types.GNODE_ZM;
     if(!(st.type instanceof NodeType)) return null;
 
     exprType.assign(st.union(Occ.ONE_OR_MORE)).data(exprs);
@@ -78,7 +78,7 @@ public final class Union extends Set {
     for(final Expr expr : exprs) {
       final Iter iter = expr.iter(qc);
       for(Item item; (item = qc.next(iter)) != null;) {
-        nodes.add(toNode(item));
+        nodes.add(toGNode(item));
       }
     }
     return nodes.value(this);
@@ -88,10 +88,10 @@ public final class Union extends Set {
   NodeIter iterate(final QueryContext qc) throws QueryException {
     return new SetIter(qc, iters(qc)) {
       @Override
-      public XNode next() throws QueryException {
+      public GNode next() throws QueryException {
         if(nodes == null) {
           final int il = iter.length;
-          nodes = new XNode[il];
+          nodes = new GNode[il];
           for(int i = 0; i < il; i++) next(i);
         }
 
@@ -108,7 +108,7 @@ public final class Union extends Set {
         }
         if(m == -1) return null;
 
-        final XNode node = nodes[m];
+        final GNode node = nodes[m];
         next(m);
         return node;
       }
@@ -121,7 +121,7 @@ public final class Union extends Set {
     for(final Expr expr : exprs) {
       final Item item = expr.iter(qc).next();
       if(item != null) {
-        toNode(item);
+        toGNode(item);
         return true;
       }
     }
@@ -134,7 +134,7 @@ public final class Union extends Set {
     if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       for(final Expr ex : exprs) {
         // boolean(a union <a/>) → boolean(true())
-        if(ex.seqType().instanceOf(Types.NODE_OM) && !expr.has(Flag.NDT)) expr = Bln.TRUE;
+        if(ex.seqType().instanceOf(Types.GNODE_OM) && !expr.has(Flag.NDT)) expr = Bln.TRUE;
       }
     }
     return cc.simplify(this, expr, mode);

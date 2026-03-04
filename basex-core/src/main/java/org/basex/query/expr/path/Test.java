@@ -6,6 +6,8 @@ import java.util.List;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.NameTest.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -26,6 +28,29 @@ public abstract class Test extends ExprInfo {
    */
   Test(final Kind kind) {
     this.kind = kind;
+  }
+
+  /**
+   * Creates a new test.
+   * @param kind node kind (can be {@code null})
+   * @param qname node name (can be {@code null})
+   * @param scope scope (can be {@code null})
+   * @param ns default element namespace (used for optimizations, can be {@code null})
+   * @return test
+   */
+  public static Test get(final Kind kind, final QNm qname, final Scope scope, final byte[] ns) {
+    final QNm n = qname != null ? qname : QNm.EMPTY;
+    final Kind k = kind != null ? kind : Kind.GNODE;
+    final Scope s = scope == Scope.FLEXIBLE && k.instanceOf(Kind.NODE) ? Scope.FULL :
+      scope != null ? scope : k == Kind.PROCESSING_INSTRUCTION ? Scope.LOCAL : Scope.FULL;
+
+    if(k != Kind.GNODE) {
+      // element(*), attribute(*), jnode(*)
+      if(s == Scope.ALL || n == QNm.EMPTY) return NodeTest.get(k);
+      // jnode(a)
+      if(s == Scope.FLEXIBLE && k == Kind.JNODE) return JNodeTest.get(Str.get(n.string()), null);
+    }
+    return new NameTest(n, s, k, ns);
   }
 
   /**
@@ -77,11 +102,12 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Optimizes the test.
+   * @param kn kind of step input
    * @param data data reference (can be {@code null}); used to test if the test may be successful
    * @return resulting test, or {@code null} if the test yields no results
    */
   @SuppressWarnings("unused")
-  public Test optimize(final Data data) {
+  public Test optimize(final Kind kn, final Data data) {
     return this;
   }
 
@@ -90,7 +116,7 @@ public abstract class Test extends ExprInfo {
    * @param node node to be checked
    * @return result of check
    */
-  public abstract boolean matches(XNode node);
+  public abstract boolean matches(GNode node);
 
   /**
    * Checks whether the type of this test is a supertype of the specified type.

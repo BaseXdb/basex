@@ -11,9 +11,11 @@ import org.basex.index.path.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.Function;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -121,6 +123,36 @@ public abstract class Step extends Preds {
     this.test = test;
   }
 
+  /**
+   * Returns an axis iterator.
+   * @param qc query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  final BasicNodeIter iterator(final QueryContext qc) throws QueryException {
+    final Value value = qc.focus.value;
+    GNode gnode;
+    if(value instanceof final GNode node) {
+      gnode = node;
+    } else if(value instanceof final XQStruct struct) {
+      gnode = new JNode(struct);
+    } else {
+      throw value == null ? QueryError.NOCTX_X.get(info, this) :
+        QueryError.PATHNODE_X_X_X.get(info, this, value.type, value);
+    }
+    final BasicNodeIter iter = axis.iter(gnode, test);
+    return new BasicNodeIter() {
+      @Override
+      public GNode next() {
+        for(GNode node; (node = iter.next()) != null;) {
+          qc.checkStop();
+          if(test.matches(node)) return node;
+        }
+        return null;
+      }
+    };
+  }
+
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     return optimize(null, cc);
@@ -135,17 +167,19 @@ public abstract class Step extends Preds {
    */
   final Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     // updates the static type
-    final Expr rt = assignType(root != null ? root : cc.qc.focus.value, true);
+    final Expr rt = assignType(root != null ? root : cc.qc.focus.value);
+    Type rtype = rt != null ? rt.seqType().type : NodeType.GNODE;
+    if(rtype.instanceOf(Types.MAP_OR_ARRAY)) rtype = NodeType.JNODE;
 
     // choose stricter axis
     final Axis old = axis;
     final Type type = seqType().type;
     if(old == DESCENDANT_OR_SELF && type.instanceOf(NodeType.DOCUMENT) ||
-        old == ANCESTOR_OR_SELF && isLeaf(type.kind())) {
+       old == ANCESTOR_OR_SELF && isLeaf(type.kind())) {
       // descendant-or-self::document-node() → self::document-node()
       // ancestor-or-self::text() → self::text()
       axis = SELF;
-    } else if(rt != null && rt.seqType().type.intersect(type) == null) {
+    } else if(rtype.seqType().type.intersect(type) == null) {
       // root()/descendant-or-self::x → root()/descendant::x
       if(old == DESCENDANT_OR_SELF) axis = DESCENDANT;
       // $text/ancestor-or-self::x → $text/ancestor::x
@@ -154,9 +188,10 @@ public abstract class Step extends Preds {
     if(axis != old) cc.info(QueryText.OPTREWRITE_X_X, old, this);
 
     // optimize test; check if it will never accept results
-    final Test t = test.optimize(data());
+    final Test t = test.optimize(rtype.kind(), data());
     if(t != null && t != test) {
       test = t;
+      exprType.assign(NodeType.get(t));
     }
     if(t == null || noMatches()) {
       cc.info(QueryText.OPTSTEP_X, this);
@@ -180,20 +215,18 @@ public abstract class Step extends Preds {
   }
 
   @Override
-  public final Expr assignType(final Expr expr, final boolean optimize) {
-    exprType.data(expr);
-    if(!optimize && exprs.length != 0) {
-      // reset type (discard refined type information derived from predicates)
-      exprType.assign(NodeType.get(test).seqType(Occ.ZERO_OR_MORE));
-    } else if(expr != null && axis == SELF) {
-      final Type type = expr.seqType().type;
-      // node test: adopt type of context expression: <a/>/self::node()
-      if(test == NodeTest.NODE) exprType.assign(type);
+  public final Expr assignType(final Expr expr) {
+    final Type type = expr != null ? expr.seqType().type : NodeType.GNODE;
+    test = test.optimize(type.kind(), null);
+
+    SeqType st = seqType(axis, test, exprs);
+    if(expr != null && axis == SELF) {
+      // node test: adopt type of context expression: <a/>/self::gnode()
+      if(test.kind == Kind.GNODE) st = type.seqType(st.occ);
       // no predicates: step will yield single result: $elements/self::element()
-      if(exprs.length == 0 && test.subsumes(type) == Boolean.TRUE) {
-        exprType.assign(Occ.EXACTLY_ONE);
-      }
+      if(exprs.length == 0 && test.subsumes(type) == Boolean.TRUE) st = st.with(Occ.EXACTLY_ONE);
     }
+    exprType.assign(st).data(expr);
     return expr;
   }
 
@@ -204,7 +237,7 @@ public abstract class Step extends Preds {
    * @param preds predicates
    * @return sequence type
    */
-  public static SeqType seqType(final Axis axis, final Test test, final Expr... preds) {
+  private static SeqType seqType(final Axis axis, final Test test, final Expr... preds) {
     final Occ occ = axis == ATTRIBUTE && test.subsumes(NodeType.ATTRIBUTE) == Boolean.FALSE
       // no results: attribute::element()
       ? Occ.ZERO :
@@ -245,7 +278,7 @@ public abstract class Step extends Preds {
 
     // skip processing instructions
     final Kind kind = test.kind;
-    if(kind == Kind.PROCESSING_INSTRUCTION) return null;
+    if(kind.oneOf(Kind.GNODE, Kind.PROCESSING_INSTRUCTION)) return null;
 
     final Names names = kind == Kind.ATTRIBUTE ? data.attrNames : data.elemNames;
     final int kn = XNode.dbKind(kind);
@@ -305,7 +338,7 @@ public abstract class Step extends Preds {
    */
   private boolean noMatches() {
     final Kind kind = test.kind;
-    if(kind == Kind.NODE) return false;
+    if(kind.oneOf(Kind.GNODE, Kind.NODE)) return false;
 
     return switch(axis) {
       // attribute::element()
@@ -337,7 +370,7 @@ public abstract class Step extends Preds {
     if(nk == Kind.DOCUMENT && switch(axis) {
       case SELF, ANCESTOR_OR_SELF, FOLLOWING_OR_SELF, FOLLOWING_SIBLING_OR_SELF,
            PRECEDING_OR_SELF, PRECEDING_SIBLING_OR_SELF ->
-        !kind.oneOf(Kind.NODE, Kind.DOCUMENT);
+        !kind.oneOf(Kind.GNODE, Kind.NODE, Kind.DOCUMENT);
       case CHILD, DESCENDANT ->
         kind.oneOf(Kind.DOCUMENT, Kind.ATTRIBUTE);
       case DESCENDANT_OR_SELF ->
@@ -356,7 +389,7 @@ public abstract class Step extends Preds {
         isLeaf(nk);
       // $text/descendant-or-self::text(), ...
       case DESCENDANT_OR_SELF ->
-        isLeaf(nk) && kind != Kind.NODE && kind != nk;
+        isLeaf(nk) && !kind.oneOf(Kind.GNODE, Kind.NODE) && !kind.instanceOf(nk);
       // $attribute/following-sibling::, $attribute/preceding-sibling::
       case FOLLOWING_SIBLING, PRECEDING_SIBLING ->
         nk == Kind.ATTRIBUTE;
@@ -407,19 +440,6 @@ public abstract class Step extends Preds {
   }
 
   /**
-   * Throws an exception if the context value is not a node.
-   * @param qc query context
-   * @return context
-   * @throws QueryException query exception
-   */
-  final XNode checkNode(final QueryContext qc) throws QueryException {
-    final Value value = qc.focus.value;
-    if(value instanceof final XNode node) return node;
-    throw value == null ? QueryError.NOCTX_X.get(info, this) :
-      QueryError.PATHNODE_X_X_X.get(info, this, value.type, value);
-  }
-
-  /**
    * Checks if the specified type refers to a leaf node.
    * @param kind kind (can be {@code null})
    * @return result of check
@@ -460,10 +480,12 @@ public abstract class Step extends Preds {
     }
     if(tb.isEmpty()) {
       final java.util.function.Function<Test, TokenBuilder> add = t -> {
-        if(axis == ATTRIBUTE && t instanceof NameTest)
-          return tb.add('@').add(t.toString(false));
+        if(axis == ATTRIBUTE) {
+          if(t instanceof NodeTest) return tb.add('@').add('*');
+          if(t instanceof final NameTest nt) return tb.add('@').add(nt.nameString());
+        }
         if(axis != CHILD) tb.add(axis).add("::");
-        return tb.add(t.toString(test.kind == Kind.ATTRIBUTE));
+        return tb.add(t.toString(false));
       };
       if(test instanceof final UnionTest ut) {
         tb.add('(');

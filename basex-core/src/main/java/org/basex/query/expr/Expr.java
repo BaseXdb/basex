@@ -102,7 +102,7 @@ public abstract class Expr extends ExprInfo {
     final SeqType st = seqType();
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return iter;
     long size = iter.size();
-    if(size != -1 && st.mayBeFunction()) size = -1;
+    if(size != -1 && st.mayBeWrapped()) size = -1;
     return new AtomIter(iter, qc, ii, size);
   }
 
@@ -128,6 +128,16 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract Value atomValue(QueryContext qc, InputInfo ii) throws QueryException;
+
+  /**
+   * Evaluates the expression and returns the unwrapped item.
+   * @param qc query context
+   * @param ii input info (can be {@code null}; required for those {@link Value} instances
+   *   that have no input info)
+   * @return item
+   * @throws QueryException query exception
+   */
+  public abstract Item unwrappedItem(QueryContext qc, InputInfo ii) throws QueryException;
 
   /**
    * Computes the effective boolean value for this expression.

@@ -179,7 +179,7 @@ public abstract class Filter extends AFilter {
   }
 
   @Override
-  protected final Expr assignType(final Expr expr, final boolean optimize) {
+  protected final Expr assignType(final Expr expr) {
     exprType.assign(root.seqType().union(Occ.ZERO)).data(root);
     return root;
   }

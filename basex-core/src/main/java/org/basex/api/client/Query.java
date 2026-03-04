@@ -115,7 +115,7 @@ public abstract class Query implements Closeable {
    * @param full retrieve full type information
    * @throws IOException I/O exception
    */
-  void cache(final InputStream input, final boolean full) throws IOException {
+  final void cache(final InputStream input, final boolean full) throws IOException {
     cache = new TokenList();
     types = new ByteList();
     final ByteList bl = new ByteList();

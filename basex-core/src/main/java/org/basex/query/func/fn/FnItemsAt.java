@@ -108,7 +108,7 @@ public final class FnItemsAt extends StandardFunc {
     if(ast.zero()) return Empty.VALUE;
 
     Occ occ = Occ.ZERO_OR_MORE;
-    if(!ast.mayBeFunction()) {
+    if(!ast.mayBeWrapped()) {
       if(ast.zeroOrOne()) occ = Occ.ZERO_OR_ONE;
 
       if(at instanceof Item) {

@@ -11,10 +11,10 @@ import org.basex.query.value.node.*;
  */
 public abstract class NodeIter extends Iter {
   @Override
-  public abstract XNode next() throws QueryException;
+  public abstract GNode next() throws QueryException;
 
   @Override
-  public XNode get(final long i) {
+  public GNode get(final long i) {
     return null;
   }
 

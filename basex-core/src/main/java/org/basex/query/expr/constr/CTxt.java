@@ -42,7 +42,7 @@ public final class CTxt extends CNode {
     final SeqType st = expr.seqType();
     if(st.zero()) return cc.replaceWith(this, expr);
 
-    final boolean atom = !st.mayBeFunction();
+    final boolean atom = !st.mayBeWrapped();
     if(st.oneOrMore() && atom) exprType.assign(Occ.EXACTLY_ONE);
     return this;
   }

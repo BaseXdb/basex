@@ -28,7 +28,7 @@ public final class UtilRoot extends StandardFunc {
 
     final GNodeBuilder list = new GNodeBuilder();
     for(final Item item : nodes) {
-      final XNode root = root(item);
+      final GNode root = root(item);
       if(root == null) throw NODOC_X.get(info, nodes);
       list.add(root);
     }
@@ -45,6 +45,8 @@ public final class UtilRoot extends StandardFunc {
     Type tp = null;
     if(type.instanceOf(NodeType.NODE)) {
       tp = NodeType.DOCUMENT;
+    } else if(type.instanceOf(NodeType.JNODE)) {
+      tp = Types.JNODE_ROOT;
     }
     if(tp != null) {
       exprType.assign(tp, st.zeroOrOne() ? st.occ : Occ.ZERO_OR_MORE).data(nodes);
@@ -57,10 +59,10 @@ public final class UtilRoot extends StandardFunc {
    * @param item node item
    * @return root
    */
-  private XNode root(final Item item) {
-    if(item instanceof final XNode node) {
-      final XNode root = node.root();
-      if(root.kind() == Kind.DOCUMENT) return root;
+  private GNode root(final Item item) {
+    if(item instanceof final GNode gnode) {
+      final GNode root = gnode.root();
+      if(root.kind().oneOf(Kind.DOCUMENT, Kind.JNODE)) return root;
     }
     return null;
   }

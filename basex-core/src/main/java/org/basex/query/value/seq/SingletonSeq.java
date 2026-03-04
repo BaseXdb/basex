@@ -72,6 +72,11 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
+  public Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return get(value.unwrappedItem(qc, ii), size).item(qc, ii);
+  }
+
+  @Override
   protected Value subSeq(final long pos, final long length, final Job job) {
     return singleItem() ? get(value, length) : super.subSeq(pos, length, job);
   }
@@ -101,9 +106,13 @@ public final class SingletonSeq extends Seq {
     Expr expr = this;
     if(mode == Simplify.DISTINCT || mode == Simplify.PREDICATE && type.isNumber()) {
       expr = value;
-    } else if(type instanceof NodeType && mode.oneOf(Simplify.DATA, Simplify.NUMBER,
-        Simplify.STRING)) {
+    } else if(mode == Simplify.STRING && type.instanceOf(NodeType.NODE)) {
       expr = get((Value) value.simplifyFor(mode, cc), count());
+    } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
+      final Type at = type.atomic();
+      if(at != null && at != type) {
+        expr = get((Value) value.simplifyFor(mode, cc), count());
+      }
     }
     return cc.simplify(this, expr, mode);
   }

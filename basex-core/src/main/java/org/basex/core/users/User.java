@@ -86,7 +86,8 @@ public final class User {
     patterns = new LinkedHashMap<>();
     permission = attribute(name, user, Q_PERMISSION, Perm.values());
 
-    for(final XNode child : children(user)) {
+    for(final GNode gchild : children(user)) {
+      final XNode child = (XNode) gchild;
       final QNm qname = child.qname();
       if(qname.eq(Q_PASSWORD)) {
         final EnumMap<Code, String> ec = new EnumMap<>(Code.class);
@@ -95,7 +96,7 @@ public final class User {
             "%: Algorithm % supplied more than once.", name, algorithm);
         passwords.put(algorithm, ec);
 
-        for(final XNode code : children(child)) {
+        for(final GNode code : children(child)) {
           final Code cd = value(name, code.qname().unique(), algorithm.codes);
           if(ec.containsKey(cd)) throw new BaseXException(
               "%, %: Code % supplied more than once.", name, algorithm, code);

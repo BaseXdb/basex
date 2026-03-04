@@ -7,6 +7,7 @@ import java.util.function.*;
 
 import org.basex.data.*;
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.type.*;
@@ -25,7 +26,7 @@ public final class FDoc extends FNode {
   /** Base URI. */
   private final byte[] uri;
   /** Children. */
-  private XNode[] children;
+  private GNode[] children;
 
   /**
    * Constructor.
@@ -71,7 +72,7 @@ public final class FDoc extends FNode {
    * @param ch children
    * @return self reference
    */
-  FDoc finish(final XNode[] ch) {
+  FDoc finish(final GNode[] ch) {
     children = ch;
     return this;
   }
@@ -82,7 +83,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public BasicNodeIter childIter() {
+  public BasicNodeIter childIter(final Test test, final boolean descendant) {
     return GNodeList.iter(children);
   }
 
@@ -103,7 +104,7 @@ public final class FDoc extends FNode {
     if(materialized(test, ii)) return this;
 
     final FBuilder doc = build(uri);
-    for(final XNode child : children) doc.node(child.materialize(test, ii, qc));
+    for(final GNode child : children) doc.node((GNode) child.materialize(test, ii, qc));
     return doc.finish();
   }
 

@@ -158,6 +158,11 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
+  public Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return item(qc, ii);
+  }
+
+  @Override
   public boolean materialized(final Predicate<Data> test, final InputInfo ii) {
     return true;
   }

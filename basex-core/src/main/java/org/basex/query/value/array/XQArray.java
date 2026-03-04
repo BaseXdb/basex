@@ -106,9 +106,12 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
-    Expr ex = this;
-    if(mode.oneOf(Simplify.NUMBER, Simplify.DATA)) ex = items(cc.qc);
-    return cc.simplify(this, ex, mode);
+    Expr expr = this;
+    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
+      final Type at = type.atomic();
+      if(at != null && at != type) expr = atomValue(cc.qc, null);
+    }
+    return cc.simplify(this, expr, mode);
   }
 
   /**

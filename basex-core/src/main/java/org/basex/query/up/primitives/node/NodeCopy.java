@@ -77,7 +77,7 @@ abstract class NodeCopy extends NodeUpdate {
     final int ns = nl.size();
     if(ns == 0) return nl;
     final GNodeList s = new GNodeList(ns);
-    XNode n = nl.get(0);
+    GNode n = nl.get(0);
     for(int c = 0; c < ns;) {
       if(n.kind() == Kind.TEXT) {
         final TokenBuilder tb = new TokenBuilder();

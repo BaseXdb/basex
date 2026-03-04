@@ -60,13 +60,13 @@ public final class SqlExecutePrepared extends SqlExecute {
       throws QueryException {
 
     int i = 1;
-    for(XNode next; (next = params.next()) != null; i++) {
+    for(GNode next; (next = params.next()) != null; i++) {
       // Check name
       if(!next.qname().eq(Q_PARAMETER)) throw UNKNOWNOPTION_X.get(info, next.qname().local());
       final BasicNodeIter attrs = next.attributeIter();
       String type = null;
       boolean isNull = false;
-      for(XNode attr; (attr = attrs.next()) != null;) {
+      for(GNode attr; (attr = attrs.next()) != null;) {
         // attribute "type"
         if(eq(attr.name(), TYPE)) type = string(attr.string());
         // attribute "null"

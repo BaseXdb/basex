@@ -177,8 +177,8 @@ public abstract class Inspect {
         // contains angle brackets: add as XML structure
         final MainOptions mopts = new MainOptions();
         final XNode node = new DBNode(new XMLParser(new IOContent(value), mopts, true));
-        for(final XNode child : node.childIter()) {
-          elem.node(child.copy(mopts, null));
+        for(final GNode child : node.childIter()) {
+          elem.node(((XNode) child).copy(mopts, null));
         }
       } else {
         // add as single text node

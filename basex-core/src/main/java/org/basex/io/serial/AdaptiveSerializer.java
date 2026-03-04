@@ -13,6 +13,7 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -67,6 +68,27 @@ public class AdaptiveSerializer extends OutputSerializer {
   public final void serialize(final Item item) throws IOException {
     separate();
     super.serialize(item);
+  }
+
+  @Override
+  protected void jnode(final JNode jnode) throws IOException {
+    reset();
+    printChars(QueryText.JTREE);
+    printChar('(');
+    if(jnode.key != Empty.VALUE) {
+      serialize(jnode.key);
+      printChar(':');
+      reset();
+    }
+    int cc = 0;
+    if(jnode.value.size() > 1) printChar('(');
+    for(final Item item : jnode.value) {
+      if(cc++ > 0) printChar(',');
+      reset();
+      serialize(item);
+    }
+    if(jnode.value.size() > 1) printChar(')');
+    printChar(')');
   }
 
   @Override

@@ -11,6 +11,7 @@ import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.expr.path.*;
 import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
@@ -190,12 +191,12 @@ public class DBNode extends XNode {
   }
 
   @Override
-  public final boolean is(final XNode node) {
+  public final boolean is(final GNode node) {
     return this == node || data == node.data() && pre == ((DBNode) node).pre;
   }
 
   @Override
-  public final int compare(final XNode node) {
+  public final int compare(final GNode node) {
     if(this == node) return 0;
     if(node instanceof final DBNode dbnode) {
       // comparison of database nodes: compare PRE values or database IDs
@@ -204,7 +205,11 @@ public class DBNode extends XNode {
         Integer.signum(data.dbid - ndata.dbid);
     }
     // comparison of database and fragment: find LCA
-    return compare(this, node);
+    if(node instanceof final XNode xnode) {
+      return compare(this, xnode);
+    }
+    // comparison with JNode
+    return -1;
   }
 
   @Override
@@ -281,7 +286,7 @@ public class DBNode extends XNode {
   }
 
   @Override
-  public final BasicNodeIter childIter() {
+  public final BasicNodeIter childIter(final Test test, final boolean descendant) {
     final int kind = dbKind();
     final int first = pre + data.attSize(pre, kind), last = pre + data.size(pre, kind);
     return first == last ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
@@ -298,7 +303,7 @@ public class DBNode extends XNode {
   }
 
   @Override
-  public final BasicNodeIter descendantIter(final boolean self) {
+  public final BasicNodeIter descendantIter(final boolean self, final Test test) {
     final int kind = dbKind();
     final int first = pre + (self ? 0 : data.attSize(pre, kind)), last = pre + data.size(pre, kind);
     return first == last ? BasicNodeIter.EMPTY : new DBNodeIter(data) {
@@ -332,7 +337,7 @@ public class DBNode extends XNode {
             curr = pre + data.size(pre, dbKind());
             if(data.meta.ndocs > 1) {
               int p = pre;
-              for(final XNode nd : ancestorIter(false)) p = ((DBNode) nd).pre;
+              for(final GNode nd : ancestorIter(false)) p = ((DBNode) nd).pre;
               size = p + data.size(p, data.kind(p));
             } else {
               size = data.meta.size;

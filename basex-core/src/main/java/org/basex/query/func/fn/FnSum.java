@@ -42,7 +42,7 @@ public class FnSum extends NumericFn {
     if(zero == Empty.UNDEFINED) {
       // no default value
       if(st.zero()) return cc.voidAndReturn(values, Itr.ZERO, info);
-      if(!st.mayBeFunction()) {
+      if(!st.mayBeWrapped()) {
         final SeqType ost = optType(values);
         if(ost != null) exprType.assign(ost);
       }
@@ -50,7 +50,7 @@ public class FnSum extends NumericFn {
       if(zero == Empty.VALUE || stZero.instanceOf(Types.ANY_ATOMIC_TYPE_ZO)) {
         return cc.voidAndReturn(values, zero, info);
       }
-    } else if(!st.mayBeFunction() && !stZero.mayBeFunction()) {
+    } else if(!st.mayBeWrapped() && !stZero.mayBeWrapped()) {
       if(st.oneOrMore()) return cc.function(Function.SUM, info, values);
       final SeqType ost = optType(values), zst = optType(zero);
       final Type type = ost != null && zst != null ? ost.type.union(zst.type) : ANY_ATOMIC_TYPE;

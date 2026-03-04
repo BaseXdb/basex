@@ -29,7 +29,7 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
     }
 
     final GNodeBuilder nb = new GNodeBuilder();
-    for(Item item; (item = qc.next(nodes)) != null;) nb.add(toNode(item));
+    for(Item item; (item = qc.next(nodes)) != null;) nb.add(toGNode(item));
     return nb.value(this);
   }
 
@@ -38,7 +38,7 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
       throws QueryException {
     final Item item = arg(0).iter(qc).next();
     if(item == null) return false;
-    toNode(item);
+    toGNode(item);
     return true;
   }
 
@@ -55,7 +55,7 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
     }
 
     final Type type = nodes.seqType().type;
-    if(type.instanceOf(NodeType.NODE)) {
+    if(type.instanceOf(NodeType.GNODE)) {
       // distinct-ordered-nodes(replicate(*, 2)) → distinct-ordered-nodes(*)
       if(REPLICATE.is(nodes) && ((FnReplicate) nodes).singleEval(false))
         return nodes.arg(0);

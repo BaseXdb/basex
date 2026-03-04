@@ -42,7 +42,7 @@ abstract class Update extends Arr {
    * @throws QueryException query exception
    */
   final GNodeList checkNS(final GNodeList list, final XNode target) throws QueryException {
-    for(final XNode node : list) {
+    for(final GNode node : list) {
       final QNm name = node.qname();
       final byte[] prefix = name.prefix();
       // attributes without prefix have no namespace
