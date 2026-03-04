@@ -346,15 +346,16 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Converts an item to a date.
-   * @param item item
+   * Evaluates an expression to a date.
+   * @param expr expression
    * @param qc query context
-   * @return date
+   * @return date or {@code null}
    * @throws QueryException query exception
    */
-  protected final ADate toGregorian(final Item item, final QueryContext qc)
+  protected final ADate toGregorianOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
-    return (ADate) Types.GREGORIAN_ZO.coerce(item, null, qc, null, info);
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? null : (ADate) Types.GREGORIAN_ZO.coerce(item, null, qc, null, info);
   }
 
   /**

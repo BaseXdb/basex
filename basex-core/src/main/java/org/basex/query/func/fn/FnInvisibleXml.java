@@ -119,7 +119,7 @@ public final class FnInvisibleXml extends StandardFunc {
       try {
         return new DBNode(IO.get(parser.parse(input)));
       } catch(final BlitzParseException ex) {
-        throw IXML_INP_X_X_X.get(ii, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
+        throw IXML_INP_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
       } catch(final BlitzException | IOException ex) {
         throw IXML_RESULT_X.get(info, ex);
       }

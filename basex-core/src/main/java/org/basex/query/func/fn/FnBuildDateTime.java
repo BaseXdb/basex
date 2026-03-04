@@ -6,6 +6,7 @@ import static org.basex.query.value.type.BasicType.*;
 import java.math.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -53,10 +54,10 @@ public class FnBuildDateTime extends DateTimeFn {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = arg(0).item(qc, ii);
+    final Item value = arg(0).item(qc, info);
     if(value.isEmpty()) return Empty.VALUE;
-    final XQMap map = (XQMap) definition.types[0].coerce(value, definition.params[0], qc, null, ii);
 
+    final XQMap map = toRecord(value, Records.DATETIME.get(), qc);
     final Long       year    = getLong(map, YEAR);
     final Long       month   = getLong(map, MONTH);
     final Long       day     = getLong(map, DAY);
@@ -64,8 +65,8 @@ public class FnBuildDateTime extends DateTimeFn {
     final Long       minutes = getLong(map, MINUTES);
     final BigDecimal seconds = getDecimal(map, SECONDS);
     final DTDur      tz      = getDuration(map, TIMEZONE);
+    checkTz(tz, info);
 
-    checkTz(tz, ii);
     final int mask =
         (year    != null ? Y  : 0) |
         (month   != null ? MO : 0) |
@@ -73,44 +74,45 @@ public class FnBuildDateTime extends DateTimeFn {
         (hours   != null ? H  : 0) |
         (minutes != null ? MI : 0) |
         (seconds != null ? S  : 0);
-    return switch(mask) {
+
+    final BasicType type = switch(mask) {
       case Y | MO | D | H | MI | S -> {
-        checkDate(year, month, day, ii);
-        checkTime(hours, minutes, seconds, ii);
-        final BasicType type = tz != null ? DATE_TIME_STAMP : DATE_TIME;
-        yield Dtm.buildUnchecked(type, year, month, day, hours, minutes, seconds, tz, ii);
+        checkDate(year, month, day, info);
+        checkTime(hours, minutes, seconds, info);
+        yield tz != null ? DATE_TIME_STAMP : DATE_TIME;
       }
       case Y | MO | D -> {
-        checkDate(year, month, day, ii);
-        yield Dtm.buildUnchecked(DATE, year, month, day, null, null, null, tz, ii);
+        checkDate(year, month, day, info);
+        yield DATE;
       }
       case Y -> {
-        checkYear(year, ii);
-        yield Dtm.buildUnchecked(G_YEAR, year, null, null, null, null, null, tz, ii);
+        checkYear(year, info);
+        yield G_YEAR;
       }
       case Y | MO -> {
-        checkYear(year, ii);
-        checkMonth(month, ii);
-        yield Dtm.buildUnchecked(G_YEAR_MONTH, year, month, null, null, null, null, tz, ii);
+        checkYear(year, info);
+        checkMonth(month, info);
+        yield G_YEAR_MONTH;
       }
       case MO -> {
-        checkMonth(month, ii);
-        yield Dtm.buildUnchecked(G_MONTH, null, month, null, null, null, null, tz, ii);
+        checkMonth(month, info);
+        yield G_MONTH;
       }
       case MO | D -> {
-        checkMonthDay(month, day, ii);
-        yield Dtm.buildUnchecked(G_MONTH_DAY, null, month, day, null, null, null, tz, ii);
+        checkMonthDay(month, day, info);
+        yield G_MONTH_DAY;
       }
       case D -> {
-        checkDayOnly(day, ii);
-        yield Dtm.buildUnchecked(G_DAY, null, null, day, null, null, null, tz, ii);
+        checkDayOnly(day, info);
+        yield G_DAY;
       }
       case H | MI | S -> {
-        checkTime(hours, minutes, seconds, ii);
-        yield Dtm.buildUnchecked(TIME, null, null, null, hours, minutes, seconds, tz, ii);
+        checkTime(hours, minutes, seconds, info);
+        yield TIME;
       }
-      default -> throw INVDATETIMEFIELDS_X.get(ii, map);
+      default -> throw INVDATETIMEFIELDS_X.get(info, map);
     };
+    return Dtm.buildUnchecked(type, year, month, day, hours, minutes, seconds, tz, info);
   }
 
   /**
@@ -150,8 +152,7 @@ public class FnBuildDateTime extends DateTimeFn {
    *         or if the value is empty
    * @throws QueryException if an error occurs while retrieving the BigDecimal value from the map
    */
-  private static BigDecimal getDecimal(final XQMap map, final Str key)
-      throws QueryException {
+  private static BigDecimal getDecimal(final XQMap map, final Str key) throws QueryException {
     final Item item = getItem(map, key);
     return item == null ? null : item.dec(null);
   }

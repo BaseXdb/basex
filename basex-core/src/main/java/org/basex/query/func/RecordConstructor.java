@@ -95,7 +95,7 @@ public class RecordConstructor extends StandardFunc {
       final Value value = f < exprs.length ? exprs[f].value(qc) : rf.init().value(qc);
       values[f] = rf.seqType().coerce(value, names[f], qc, null, ii);
     }
-    return new XQRecordMap(values, recordType);
+    return new XQRecordMap(recordType, values);
   }
 
   /**

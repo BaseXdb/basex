@@ -8,7 +8,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
-import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -18,26 +17,18 @@ import org.basex.util.*;
  * @author Gunther Rademacher
  */
 public class FnPartsOfDateTime extends DateTimeFn {
-  /** Return type. */
-  private static final RecordType RETURN_TYPE = Records.DATETIME.get();
-
-  static {
-    if(RETURN_TYPE.fields().size() != 7) throw Util.notExpected();
-  }
-
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = arg(0).atomItem(qc, ii);
-    if(value.isEmpty()) return Empty.VALUE;
-    final Value coerced = definition.types[0].coerce(value, definition.params[0], qc, null, ii);
-    final ADate date = toDate(value, (BasicType) coerced.type, qc);
+    final ADate value = toGregorianOrNull(arg(0), qc);
+    if(value == null) return Empty.VALUE;
+
     final long
-        y  = date.yea(),
-        mo = date.mon(),
-        d  = date.day(),
-        h  = date.hour(),
-        mi = date.minute();
-    final BigDecimal s = date.sec();
+        y  = value.yea(),
+        mo = value.mon(),
+        d  = value.day(),
+        h  = value.hour(),
+        mi = value.minute();
+    final BigDecimal s = value.sec();
     final Value[] values = {
       y  != Long.MAX_VALUE ? Itr.get(y)  : Empty.VALUE,
       mo >  0              ? Itr.get(mo) : Empty.VALUE,
@@ -45,8 +36,8 @@ public class FnPartsOfDateTime extends DateTimeFn {
       h  >= 0              ? Itr.get(h)  : Empty.VALUE,
       mi >= 0              ? Itr.get(mi) : Empty.VALUE,
       s  != null           ? Dec.get(s)  : Empty.VALUE,
-      date.hasTz()         ? zon(date)   : Empty.VALUE
+      value.hasTz()        ? zon(value)   : Empty.VALUE
     };
-    return new XQRecordMap(values, RETURN_TYPE);
+    return new XQRecordMap(Records.DATETIME.get(), values);
   }
 }

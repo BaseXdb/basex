@@ -72,17 +72,17 @@ public final class FnLoadXQueryModule extends StandardFunc {
         }
       }
       if(locs.isEmpty()) throw MODULE_NOT_FOUND_X.get(info, modUri);
-      for(final String loc : locs) srcs.add(ii.sc().resolve(loc, ii.path()));
+      for(final String loc : locs) srcs.add(info.sc().resolve(loc, info.path()));
     }
 
     final QNmMap<Value> bindings = new QNmMap<>();
     if(opt.contains(VARIABLES)) {
-      final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(QNAME_MAP_TYPE, qc, null, ii);
+      final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(QNAME_MAP_TYPE, qc, null, info);
       vars.forEach((key, value) -> bindings.put((QNm) key, value));
     }
 
     if(opt.contains(VENDOR_OPTIONS)) {
-      ((XQMap) opt.get(VENDOR_OPTIONS)).coerceTo(QNAME_MAP_TYPE, qc, null, ii);
+      ((XQMap) opt.get(VENDOR_OPTIONS)).coerceTo(QNAME_MAP_TYPE, qc, null, info);
     }
 
     if(opt.contains(XQUERY_VERSION)) {

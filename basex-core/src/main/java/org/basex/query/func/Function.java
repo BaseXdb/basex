@@ -110,8 +110,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
   BUILD_DATETIME(FnBuildDateTime::new, "build-dateTime(value)",
-      params(Records.DATETIME.get().seqType()), ChoiceItemType.get(DATE_TIME_O, DATE_O, TIME_O,
-          G_YEAR_O, G_YEAR_MONTH_O, G_MONTH_O, G_MONTH_DAY_O, G_DAY_O).seqType(Occ.ZERO_OR_ONE)),
+      params(Records.DATETIME.get().seqType()), GREGORIAN_ZO),
   /** XQuery function. */
   BUILD_URI(FnBuildUri::new, "build-uri(parts[,options])",
       params(Records.URI_STRUCTURE.get().seqType(), MAP_ZO), STRING_O),
@@ -561,8 +560,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, FuncType.get(BOOLEAN_ZO, ITEM_ZM, ITEM_O, INTEGER_O).seqType()), ARRAY_ZM),
   /** XQuery function. */
   PARTS_OF_DATETIME(FnPartsOfDateTime::new, "parts-of-dateTime(value)",
-      params(ChoiceItemType.get(DATE_TIME_O, DATE_O, TIME_O, G_YEAR_O, G_YEAR_MONTH_O, G_MONTH_O,
-          G_MONTH_DAY_O, G_DAY_O).seqType(Occ.ZERO_OR_ONE)), Records.DATETIME.get().seqType()),
+      params(GREGORIAN_ZO), Records.DATETIME.get().seqType()),
   /** XQuery function. */
   PATH(FnPath::new, "path([node,options])",
       params(NODE_ZO, MAP_ZO), STRING_ZO),

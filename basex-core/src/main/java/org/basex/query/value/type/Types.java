@@ -196,9 +196,11 @@ public final class Types {
   public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
 
   /** Gregorian type. */
-  public static final SeqType GREGORIAN_ZO = ChoiceItemType.get(DATE_TIME.seqType(), DATE.seqType(),
+  public static final Type GREGORIAN = ChoiceItemType.get(DATE_TIME.seqType(), DATE.seqType(),
       TIME.seqType(), G_YEAR.seqType(), G_YEAR_MONTH.seqType(), G_MONTH.seqType(),
-      G_MONTH_DAY.seqType(), G_DAY.seqType()).seqType(ZERO_OR_ONE);
+      G_MONTH_DAY.seqType(), G_DAY.seqType());
+  /** Zero or one Gregorian. */
+  public static final SeqType GREGORIAN_ZO = GREGORIAN.seqType(ZERO_OR_ONE);
 
   // types that instantiate sequence types must be placed last to avoid circular dependencies
 

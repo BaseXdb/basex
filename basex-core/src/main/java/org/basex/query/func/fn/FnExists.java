@@ -16,7 +16,7 @@ public final class FnExists extends FnEmpty {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    return !super.test(qc, ii, pos);
+    return !super.test(qc, info, pos);
   }
 
   @Override
