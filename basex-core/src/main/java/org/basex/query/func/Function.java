@@ -1947,6 +1947,10 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _UPDATE_OUTPUT(UpdateOutput::new, "output(input)",
       params(ITEM_ZM), EMPTY_SEQUENCE_Z, flag(UPD), UPDATE_URI),
+  /** XQuery function. */
+  _UPDATE_REPLACE(UpdateReplace::new, "replace(input,target,data)",
+      params(NODE_O, FuncType.get(GNODE_ZM, NODE_O).seqType(),
+      FuncType.get(ITEM_ZM, NODE_O).seqType()), NODE_O, flag(NDT), UPDATE_URI),
 
   // User Module
 
