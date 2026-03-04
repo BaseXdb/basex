@@ -793,6 +793,8 @@ public enum Function implements AFunction {
   // Predefined record constructor functions
 
   /** XQuery function. */
+  DATETIME_RECORD(Records.DATETIME.get()),
+  /** XQuery function. */
   DIVIDED_DECIMALS_RECORD(Records.DIVIDED_DECIMALS.get()),
   /** XQuery function. */
   INFER_ENCODING_RECORD(Records.INFER_ENCODING.get()),
