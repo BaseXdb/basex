@@ -72,7 +72,10 @@ final class TrieBranch extends TrieNode {
     }
     final TrieNode[] ks = kids.clone();
     ks[k] = nsub;
-    return new TrieBranch(ks, nu, size - 1);
+    TrieBranch res = new TrieBranch(ks, nu, size - 1);
+    return (res.size == 1)
+            ? res.kids[0]
+            : res;
   }
 
   @Override
