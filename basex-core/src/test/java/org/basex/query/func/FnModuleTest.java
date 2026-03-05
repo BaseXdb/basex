@@ -414,6 +414,7 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" {\"day\": 3,"
         + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
         "---03+01:00");
+    query(func.args(" dateTime-record(day:=4)"), "---04");
 
     // empty map
     error(func.args(" {}"), INVDATETIMEFIELDS_X);
