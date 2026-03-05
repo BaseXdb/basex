@@ -61,11 +61,6 @@ public abstract class XNode extends GNode {
   }
 
   @Override
-  public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
-    return true;
-  }
-
-  @Override
   public final boolean bool(final InputInfo ii) {
     return true;
   }

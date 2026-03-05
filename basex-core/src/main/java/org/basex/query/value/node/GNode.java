@@ -46,6 +46,11 @@ public abstract class GNode extends Item {
     return false;
   }
 
+  @Override
+  public final boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
+    return true;
+  }
+
   /**
    * Checks if two nodes are identical.
    * @param node node to be compared

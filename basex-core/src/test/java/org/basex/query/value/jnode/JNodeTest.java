@@ -377,4 +377,14 @@ public final class JNodeTest extends SandboxTest {
     query(jtree + "//b/preceding::* => count()", 4);
     query(jtree + "//a/preceding::* => count()", 0);
  }
+
+  /** EBV. */
+  @Test public void ebv() {
+    query("boolean([] => jtree())", true);
+    query("boolean({} => jtree())", true);
+    query("boolean({ 0: 0, false(): false() } => jtree())", true);
+
+    query("if({} => jtree()) { 1 }", 1);
+    query("if({ 0: 0, false(): false() } => jtree()) { 1 }", 1);
+  }
 }
