@@ -135,7 +135,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
   protected final QNm checkVariable(final QNm name, final boolean[] declared)
       throws QueryException {
 
-    if(name.hasPrefix()) name.uri(function.sc.ns.uri(name.prefix()));
+    if(name.hasPrefix()) name.uri(function.sc.ns.resolveStatic(name.prefix()));
     int p = -1;
     final Var[] params = function.params;
     final int pl = params.length;

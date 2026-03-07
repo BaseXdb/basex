@@ -900,7 +900,7 @@ public enum BasicType implements Type {
       if(type != STRING && !type.isUntyped()) throw typeError(item, this, info);
       final byte[] name = trim(item.string(info));
       if(XMLToken.isQName(name)) {
-        final QNm qnm = qc.shared.qName(name, info.sc().ns.uri(prefix(name)));
+        final QNm qnm = qc.shared.qName(name, qc.ns.resolve(prefix(name), info.sc()));
         if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(info, qnm.prefix());
         return qnm;
       }

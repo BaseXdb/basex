@@ -63,7 +63,7 @@ abstract class CName extends CNode {
     if(!type.isStringOrUntyped() || type == BasicType.ANY_URI)
       throw STRQNM_X_X.get(info, item.seqType(), item);
 
-    final QNm qnm = qc.shared.parseQName(item.string(info), elem, sc());
+    final QNm qnm = qc.shared.parseQName(item.string(info), elem, qc, sc());
     if(qnm != null) return qnm;
 
     throw INVQNAME_X.get(info, item);
