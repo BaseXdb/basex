@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -31,15 +30,11 @@ public final class FnTypeOf extends ContextFn {
 
     final TokenSet types = new TokenSet();
     for(final Value item : value) {
-      String type = null;
-      if(item instanceof final JNode jnode) {
-        type = new TokenBuilder().add(QueryText.JNODE).add('(').add(toString(jnode.value)).
-            add(')').toString();
-      } else {
-        type = item.type.toString();
-        if(item.type instanceof FType) {
-          type = type.replaceAll("\\(.*", "(*)").replace("record", "map");
-        }
+      String type = item.type.toString();
+      if(item.type instanceof FType) {
+        type = type.replaceAll("\\(.*", "(*)").replace("record", "map");
+      } else if(item.type.instanceOf(NodeType.JNODE)) {
+        type = type.replaceAll("\\(.*", "()");
       }
       types.add(type);
     }
