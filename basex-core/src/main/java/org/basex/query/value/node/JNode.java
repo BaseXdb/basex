@@ -156,13 +156,13 @@ public final class JNode extends GNode {
     long i = index;
     if(i != -1) return i;
     if(parent.value instanceof final XQMap map) {
-      i = 1;
+      i = 0;
       for(final Item k : map.keys()) {
         if(JNodeTest.equals(k, key)) break;
         i++;
       }
     } else {
-      i = ((Itr) key).itr();
+      i = ((Itr) key).itr() - 1;
     }
     index = i;
     return i;
@@ -172,6 +172,15 @@ public final class JNode extends GNode {
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
     throw Util.notExpected();
+  }
+
+  @Override
+  public byte[] id() {
+    final TokenBuilder tb = new TokenBuilder(Token.ID);
+    for(JNode n = this; n != null; n = n.parent) {
+      tb.addLong(n.parent != null ? n.index() + 1 : n.hashCode()).add('j');
+    }
+    return tb.removeLast().finish();
   }
 
   @Override
@@ -213,7 +222,7 @@ public final class JNode extends GNode {
           if(struct instanceof final XQMap map) {
             try {
               c = map.getOrNull(s);
-            } catch(QueryException ex) {
+            } catch(final QueryException ex) {
               throw Util.notExpected(ex);
             }
           } else {

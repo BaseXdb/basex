@@ -72,6 +72,11 @@ public abstract class FNode extends XNode {
     return false;
   }
 
+  @Override
+  public final byte[] id() {
+    return Token.concat(Token.ID, id);
+  }
+
   /**
    * Returns the string value for the specified nodes.
    * @param nodes nodes

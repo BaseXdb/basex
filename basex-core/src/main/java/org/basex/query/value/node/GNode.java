@@ -67,6 +67,12 @@ public abstract class GNode extends Item {
   public abstract int compare(GNode node);
 
   /**
+   * Returns a node ID.
+   * @return ID
+   */
+  public abstract byte[] id();
+
+  /**
    * Returns the root of a node (the topmost ancestor without parent node).
    * @return root node
    */

@@ -119,6 +119,11 @@ public class DBNode extends XNode {
   }
 
   @Override
+  public final byte[] id() {
+    return Token.concat(Token.ID, data().dbid, 'd', pre());
+  }
+
+  @Override
   public final byte[] string() {
     return data.atom(pre);
   }

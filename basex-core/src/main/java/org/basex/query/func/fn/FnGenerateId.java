@@ -15,16 +15,6 @@ public final class FnGenerateId extends ContextFn {
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final GNode node = toGNodeOrNull(context(qc), qc);
-    if(node == null) return Str.EMPTY;
-
-    final TokenBuilder tb = new TokenBuilder(Token.ID);
-    if(node instanceof final DBNode dbnode) {
-      tb.addInt(dbnode.data().dbid).add('d').addInt(dbnode.pre());
-    } else if(node instanceof final FNode fnode) {
-      tb.addInt(fnode.id);
-    } else {
-      tb.add('j').addInt(node.hashCode());
-    }
-    return Str.get(tb.finish());
+    return node != null ? Str.get(node.id()) : Str.EMPTY;
   }
 }
