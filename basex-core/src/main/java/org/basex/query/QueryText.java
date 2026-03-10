@@ -69,6 +69,7 @@ public interface QueryText {
   /** Parser token. */ String FALSE = "false";
   /** Parser token. */ String FINALLY = "finally";
   /** Parser token. */ String FIRST = "first";
+  /** Parser token. */ String FIXED = "fixed";
   /** Parser token. */ String FN = "fn";
   /** Parser token. */ String FOR = "for";
   /** Parser token. */ String FROM = "from";

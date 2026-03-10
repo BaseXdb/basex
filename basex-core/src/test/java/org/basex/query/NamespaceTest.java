@@ -848,6 +848,46 @@ public final class NamespaceTest extends SandboxTest {
     query("db:get('db')/*:B", "<b:B xmlns:b=\"b\"/>");
   }
 
+  /** Tests fixed default element namespaces. */
+  @Test public void fixed() {
+    // non-fixed: constructor xmlns="" changes the default namespace seen by enclosed expressions
+    query("declare default element namespace 'foo';" +
+        "<a xmlns=''>{ element b {} }</a>",
+        "<a><b/></a>");
+    // fixed: constructor xmlns="" does not change the default namespace of enclosed expressions
+    query("declare fixed default element namespace 'foo';" +
+        "<a xmlns=''>{ element b {} }</a>",
+        "<a><b xmlns=\"foo\"/></a>");
+    // fixed does not affect direct element constructors themselves
+    query("declare fixed default element namespace 'foo';" +
+        "<a xmlns=''><b/></a>",
+        "<a><b/></a>");
+    // direct constructor in enclosed expression still uses constructor namespace, not fixed default
+    query("declare fixed default element namespace 'foo';" +
+        "<a xmlns=''>{ <b/> }</a>",
+        "<a><b/></a>");
+    // computed constructor uses fixed default; nested direct constructor uses constructor namespace
+    query("declare fixed default element namespace 'foo';" +
+        "<a xmlns=''>{ element c { <d/> } }</a>",
+        "<a><c xmlns=\"foo\"><d xmlns=\"\"/></c></a>");
+    // non-fixed version: both computed and direct constructors end up in no namespace
+    query("declare default element namespace 'foo';" +
+        "<a xmlns=''>{ element c { <d/> } }</a>",
+        "<a><c><d/></c></a>");
+    // prefixed names are unaffected
+    query("declare fixed default element namespace 'foo';" +
+        "declare namespace p = 'bar';" +
+        "<a xmlns=''>{ element p:b {} }</a>",
+        "<a><p:b xmlns:p=\"bar\"/></a>");
+    // restoration after leaving direct constructor scope
+    query("declare fixed default element namespace 'foo';" +
+        "(<a xmlns=''>{ element b {} }</a>, element c {})",
+        "<a><b xmlns=\"foo\"/></a>\n<c xmlns=\"foo\"/>");
+
+    error("import schema fixed default element namespace 'http://www.w3.org/2003/05/soap-envelope' "
+        + "at 'http://www.w3.org/2003/05/soap-envelope/'; 42", IMPLSCHEMA);
+  }
+
   /**
    * Creates the specified test databases.
    * @param db database numbers
