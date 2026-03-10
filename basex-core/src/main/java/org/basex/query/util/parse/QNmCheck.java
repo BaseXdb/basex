@@ -36,17 +36,17 @@ final class QNmCheck {
    * Assigns the namespace URI that is currently in scope.
    * @param parser query parser
    * @param check check if prefix URI was assigned
+   * @param elemNS default element namespace
    * @return true if URI has a URI
    * @throws QueryException query exception
    */
-  boolean assign(final QueryParser parser, final boolean check) throws QueryException {
-    if(name.hasURI()) return true;
-
+  boolean assign(final QueryParser parser, final boolean check, final byte[] elemNS)
+      throws QueryException {
     if(name.hasPrefix()) {
       name.uri(parser.sc.ns.uri(name.prefix()));
       if(check && !name.hasURI()) throw parser.error(NOURI_X, info, name.prefix());
     } else if(nsElem) {
-      name.uri(parser.sc.elemNS);
+      name.uri(elemNS);
     }
     return name.hasURI();
   }

@@ -261,7 +261,7 @@ public class QueryParser extends InputParser {
     }
 
     // completes the parsing step
-    qnames.assignURI(this, 0);
+    qnames.assignURI(this, 0, sc.elemNS);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
   }
@@ -329,8 +329,10 @@ public class QueryParser extends InputParser {
     while(true) {
       final int p = pos;
       if(wsConsumeWs(DECLARE)) {
-        if(wsConsumeWs(DEFAULT)) {
-          if(!defaultNamespaceDecl() && !defaultCollationDecl() && !emptyOrderDecl() &&
+        if(wsConsumeWs(FIXED)) {
+          if(!wsConsumeWs(DEFAULT) || !defaultNamespaceDecl(true)) throw error(DECLINCOMPLETE);
+        } else if(wsConsumeWs(DEFAULT)) {
+          if(!defaultNamespaceDecl(false) && !defaultCollationDecl() && !emptyOrderDecl() &&
              !decimalFormatDecl(true)) throw error(DECLINCOMPLETE);
         } else if(wsConsumeWs(BOUNDARY_SPACE)) {
           boundarySpaceDecl();
@@ -529,10 +531,11 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "DefaultNamespaceDecl" rule.
+   * @param fixed fixed default namespace flag
    * @return true if declaration was found
    * @throws QueryException query exception
    */
-  private boolean defaultNamespaceDecl() throws QueryException {
+  private boolean defaultNamespaceDecl(final boolean fixed) throws QueryException {
     final boolean elem = wsConsumeWs(ELEMENT);
     if(!elem && !wsConsumeWs(FUNCTION)) return false;
     wsCheck(NAMESPACE);
@@ -542,7 +545,9 @@ public class QueryParser extends InputParser {
 
     if(elem) {
       if(!decl.add(ELEMENT)) throw error(DUPLNS);
+      sc.elemNsFixed = fixed;
       sc.elemNS = uri.length == 0 ? null : uri;
+      sc.dirNS = sc.elemNS;
     } else {
       if(!decl.add(FUNCTION)) throw error(DUPLNS);
       sc.funcNS = uri;
@@ -682,9 +687,13 @@ public class QueryParser extends InputParser {
       prefix = ncName(NONAME_X, false);
       if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
       wsCheck("=");
-    } else if(wsConsumeWs(DEFAULT)) {
-      wsCheck(ELEMENT);
-      wsCheck(NAMESPACE);
+    } else {
+      final boolean fixed = wsConsumeWs(FIXED);
+      if(fixed || wsConsumeWs(DEFAULT)) {
+        if(fixed) wsCheck(DEFAULT);
+        wsCheck(ELEMENT);
+        wsCheck(NAMESPACE);
+      }
     }
     final byte[] uri = uriLiteral();
     if(prefix != null && uri.length == 0) throw error(NSEMPTY);
@@ -2080,7 +2089,7 @@ public class QueryParser extends InputParser {
 
     if(consume(TYPE)) {
       final InputInfo ii = info();
-      qnames.add(eQName(SKIPCHECK, QNAME_X), ii);
+      qnames.add(eQName(SKIPCHECK, QNAME_X), sc, ii);
     }
     consume(STRICT);
     consume(LAX);
@@ -2462,7 +2471,7 @@ public class QueryParser extends InputParser {
           }
         }
         // name test: prefix:name, name, Q{uri}name
-        qnames.add(name, kind == Kind.ELEMENT, ii);
+        if(kind == Kind.ELEMENT) qnames.add(name,  sc, ii); else qnames.add(name, false, ii);
         return nameTest.apply(name, scope);
       }
     }
@@ -3077,10 +3086,11 @@ public class QueryParser extends InputParser {
     // cache namespace information
     final int size = sc.ns.size();
     final byte[] nse = sc.elemNS;
+    final byte[] nsd = sc.dirNS;
     final int npos = qnames.size();
 
     final QNm name = new QNm(qnm);
-    qnames.add(name, ii);
+    qnames.add(name, true, ii);
 
     final Atts ns = new Atts();
     final ExprList cont = new ExprList();
@@ -3170,7 +3180,8 @@ public class QueryParser extends InputParser {
             sc.ns.add(prefix, uri);
           } else {
             if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
-            sc.elemNS = uri;
+            sc.dirNS = uri;
+            if(!sc.elemNsFixed) sc.elemNS = sc.dirNS;
           }
           if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
           ns.add(prefix, uri);
@@ -3201,7 +3212,7 @@ public class QueryParser extends InputParser {
       if(!eq(name.string(), close)) throw error(TAGWRONG_X_X, name.string(), close);
     }
 
-    qnames.assignURI(this, npos);
+    qnames.assignURI(this, npos, sc.dirNS);
 
     // check for duplicate attribute names
     if(atts != null) {
@@ -3215,6 +3226,7 @@ public class QueryParser extends InputParser {
 
     sc.ns.size(size);
     sc.elemNS = nse;
+    sc.dirNS = nsd;
     return new CElem(info(), false, name, ns, cont.finish());
   }
 
@@ -3356,7 +3368,7 @@ public class QueryParser extends InputParser {
   private Expr compElement() throws QueryException {
     final Expr name = compName(NOELEMNAME, true);
     if(name == null) return null;
-    if(name instanceof final QNm qnm) qnames.add(qnm, info());
+    if(name instanceof final QNm qnm) qnames.add(qnm, sc, info());
     skipWs();
     return current('{') ? new CElem(info(), true, name, new Atts(), enclosedExpr()) : null;
   }

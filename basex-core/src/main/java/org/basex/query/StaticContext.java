@@ -36,8 +36,12 @@ public final class StaticContext {
 
   /** Default collation (default collection ({@link QueryText#COLLATION_URI}): {@code null}). */
   public Collation collation;
+  /** Default element/type namespace fixed flag. */
+  public boolean elemNsFixed;
   /** Default element/type namespace. */
   public byte[] elemNS;
+  /** Direct element constructor default element/type namespace (differs from above if "fixed"). */
+  public byte[] dirNS;
   /** Default function namespace. */
   public byte[] funcNS;
   /** Name of module (not assigned for main module). */
@@ -90,6 +94,7 @@ public final class StaticContext {
   void namespace(final String prefix, final String uri) throws QueryException {
     if(prefix.isEmpty()) {
       elemNS = uri.isEmpty() ? null : token(uri);
+      dirNS = elemNS;
     } else if(uri.isEmpty()) {
       ns.delete(token(prefix));
     } else {

@@ -17,12 +17,16 @@ public final class QNmCache {
   private final ArrayList<QNmCheck> names = new ArrayList<>();
 
   /**
-   * Adds a QName to the cache.
+   * Adds a element QName to the cache, unless it already has a namespace URI or it can be
+   * immediately assigned the fixed default namespace URI. This method is not called for
+   * direct element constructors, as their namespace may need to be resolved later.
    * @param name QName
+   * @param sc static context
    * @param info input info (can be {@code null})
    */
-  public void add(final QNm name, final InputInfo info) {
-    add(name, true, info);
+  public void add(final QNm name, final StaticContext sc, final InputInfo info) {
+    if(sc.elemNsFixed && !name.hasPrefix() && !name.hasURI()) name.uri(sc.elemNS);
+    else add(name, true, info);
   }
 
   /**
@@ -32,23 +36,25 @@ public final class QNmCache {
    * @param info input info (can be {@code null})
    */
   public void add(final QNm name, final boolean nsElem, final InputInfo info) {
-    names.add(new QNmCheck(name, nsElem, info));
+    if(!name.hasURI()) names.add(new QNmCheck(name, nsElem, info));
   }
 
   /**
    * Finalizes the QNames by assigning namespace URIs.
    * @param qp query parser
    * @param npos first entry to be checked
+   * @param elemNS default element namespace
    * @throws QueryException query exception
    */
-  public void assignURI(final QueryParser qp, final int npos) throws QueryException {
-    for(int i = npos; i < names.size(); i++) {
-      if(names.get(i).assign(qp, npos == 0)) names.remove(i--);
+  public void assignURI(final QueryParser qp, final int npos, final byte[] elemNS)
+      throws QueryException {
+    for(int i = names.size() - 1; i >= npos; --i) {
+      if(names.get(i).assign(qp, npos == 0, elemNS)) names.remove(i);
     }
   }
 
   /**
-   * Returns the number of caches QNames.
+   * Returns the number of cached QNames.
    * @return number
    */
   public int size() {
