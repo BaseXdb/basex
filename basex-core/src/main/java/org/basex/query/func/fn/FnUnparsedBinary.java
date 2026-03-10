@@ -28,6 +28,11 @@ public final class FnUnparsedBinary extends ParseFn {
   }
 
   @Override
+  public QueryError error() {
+    return QueryError.RESINPUT_X;
+  }
+
+  @Override
   protected Options options(final QueryContext qc) {
     return new Options();
   }

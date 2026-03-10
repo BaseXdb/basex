@@ -217,7 +217,7 @@ public final class Strings {
 
   /**
    * Returns a unified representation of the specified encoding.
-   * @param encoding input encoding
+   * @param encoding input encoding (can be {@code null})
    * @param dflt return default values if supplied encoding is {@code null} or ambiguous
    * @return encoding or {@code null}
    */

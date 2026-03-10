@@ -77,15 +77,16 @@ public final class HtmlParser extends XMLParser {
       final StringWriter sw = new StringWriter();
       final XMLReader reader = parser.reader(hopts, sw);
 
-      // define input
+      // check encoding, define input
+      final String encoding = Strings.normEncoding(hopts.get(ENCODING), false);
+      if(encoding != null) {
+        final String error = Strings.checkEncoding(encoding);
+        if(error != null) throw INVALIDOPTION_X.getIO(error);
+      }
       try(InputStream in = io.inputStream()) {
         final InputSource is = new InputSource(in);
-        final String enc = io.encoding() != null ? io.encoding() : hopts.get(ENCODING);
-        if(enc != null) {
-          final String error = Strings.checkEncoding(enc);
-          if(error != null) throw INVALIDOPTION_X.getIO("Unknown encoding: " + error + '.');
-          is.setEncoding(Strings.normEncoding(enc, false));
-        }
+        final String enc = io.encoding() != null ? io.encoding() : encoding;
+        if(enc != null) is.setEncoding(enc);
         reader.parse(is);
       }
       return new IOContent(token(sw.toString()), io.name());

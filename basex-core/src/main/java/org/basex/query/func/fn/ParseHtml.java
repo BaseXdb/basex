@@ -57,7 +57,7 @@ public abstract class ParseHtml extends ParseFn {
     try {
       return new DBNode(new HtmlParser(io, prsr, new MainOptions(), options));
     } catch(final IOException ex) {
-      throw error().get(info, ex);
+      throw exception(ex);
     }
   }
 
