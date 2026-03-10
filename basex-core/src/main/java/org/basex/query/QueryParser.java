@@ -95,7 +95,7 @@ public class QueryParser extends InputParser {
   /** Output declarations. */
   private final HashMap<String, Object> sparams = new HashMap<>();
   /** QName cache. */
-  private final QNmCache qnames = new QNmCache();
+  private final QNmResolver qnames = new QNmResolver();
   /** Local variable. */
   private final LocalVars localVars = new LocalVars(this);
 
@@ -261,7 +261,7 @@ public class QueryParser extends InputParser {
     }
 
     // completes the parsing step
-    qnames.assignURI(this, 0, sc.elemNS);
+    qnames.resolve(this, 0, sc.elemNS);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
   }
@@ -3212,7 +3212,7 @@ public class QueryParser extends InputParser {
       if(!eq(name.string(), close)) throw error(TAGWRONG_X_X, name.string(), close);
     }
 
-    qnames.assignURI(this, npos, sc.dirNS);
+    qnames.resolve(this, npos, sc.dirNS);
 
     // check for duplicate attribute names
     if(atts != null) {
