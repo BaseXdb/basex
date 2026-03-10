@@ -18,7 +18,7 @@ public final class CsvRoundtripTest extends SandboxTest {
     final Function func = _CSV_PARSE;
     roundtrip(func, "1,2,3,4|11,12,13,14", "'select-columns': (1, 4, 17), 'row-"
         + "delimiter': '|'", "<csv><record><entry>1</entry><entry>4</entry><entry/></record><record"
-            + "><entry>11</entry><entry>14</entry><entry/></record></csv>");
+        + "><entry>11</entry><entry>14</entry><entry/></record></csv>");
     roundtrip(func, "a,b,c,d|1,2,3,4|11,12,13,14", "'format': 'attributes', 'header': true(), 'sele"
         + "ct-columns': (1, 4, 2), 'row-delimiter': '|'", "<csv><record><entry name=\"a\">1</entry>"
         + "<entry name=\"d\">4</entry><entry name=\"b\">2</entry></record><record><entry name=\"a\""
@@ -90,165 +90,142 @@ public final class CsvRoundtripTest extends SandboxTest {
   /** Test method. */
   @Test public void parseCsv() {
     final Function func = PARSE_CSV;
-    roundtrip(func, "", "", "{\"columns\":(),\"column-index\":{},\"rows\":(),\"get\":(anonymous-fun"
-        + "ction)#2}");
-    roundtrip(func, "one", "", "{\"columns\":(),\"column-index\":{},\"rows\":[\"one\"],\"get\":(ano"
-        + "nymous-function)#2}");
-    roundtrip(func, "one,two", "", "{\"columns\":(),\"column-index\":{},\"rows\":[\"one\",\"two\"],"
-        + "\"get\":(anonymous-function)#2}");
+    roundtrip(func, "", "", "{\"columns\":(),\"column-index\":{},\"rows\":()}");
+    roundtrip(func, "one", "", "{\"columns\":(),\"column-index\":{},\"rows\":[\"one\"]}");
+    roundtrip(func, "one,two", "", "{\"columns\":(),\"column-index\":{},\"rows\":[\"one\","
+        + "\"two\"]}");
     roundtrip(func, "one,two&#xA;three,four", "", "{\"columns\":(),\"column-index\":{},\"rows\":(["
-        + "\"one\",\"two\"],[\"three\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "\"one\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "one,two&#xA;three,four&#xA;", "", "{\"columns\":(),\"column-index\":{},\"rows"
-        + "\":([\"one\",\"two\"],[\"three\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "\":([\"one\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "one,two&#xA;three,four,five", "", "{\"columns\":(),\"column-index\":{},\"rows"
-        + "\":([\"one\",\"two\"],[\"three\",\"four\",\"five\"]),\"get\":(anonymous-function)#2}");
+        + "\":([\"one\",\"two\"],[\"three\",\"four\",\"five\"])}");
     roundtrip(func, "one,two&#xA;&#xA;three,four", "", "{\"columns\":(),\"column-index\":{},\"rows"
-        + "\":([\"one\",\"two\"],[],[\"three\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "\":([\"one\",\"two\"],[],[\"three\",\"four\"])}");
     roundtrip(func, "one,two&#xA;\"three,four\",five", "", "{\"columns\":(),\"column-index\":{},\"r"
-        + "ows\":([\"one\",\"two\"],[\"three,four\",\"five\"]),\"get\":(anonymous-function)#2}");
+        + "ows\":([\"one\",\"two\"],[\"three,four\",\"five\"])}");
     roundtrip(func, "one,two&#xA;\"three,\"\"four\"\"\",five", "", "{\"columns\":(),\"column-index"
-        + "\":{},\"rows\":([\"one\",\"two\"],[\"three,\"\"four\"\"\",\"five\"]),\"get\":(anonymous"
-        + "-function)#2}");
+        + "\":{},\"rows\":([\"one\",\"two\"],[\"three,\"\"four\"\"\",\"five\"])}");
     roundtrip(func, "one,&#xA;,four&#xA;,&#xA;,,,", "", "{\"columns\":(),\"column-index\":{},\"rows"
-        + "\":([\"one\",\"\"],[\"\",\"four\"],[\"\",\"\"],[\"\",\"\",\"\",\"\"]),\"get\":(anonymous"
-        + "-function)#2}");
+        + "\":([\"one\",\"\"],[\"\",\"four\"],[\"\",\"\"],[\"\",\"\",\"\",\"\"])}");
     roundtrip(func, "one,\"\"&#xA;\"\",\"four\"", "", "{\"columns\":(),\"column-index\":{},\"rows\""
-        + ":([\"one\",\"\"],[\"\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + ":([\"one\",\"\"],[\"\",\"four\"])}");
     roundtrip(func, "one,\"[&#xA;]\"&#xA;\"\",\"four\"", "", "{\"columns\":(),\"column-index\":{},"
-        + "\"rows\":([\"one\",\"[&#xA;]\"],[\"\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "\"rows\":([\"one\",\"[&#xA;]\"],[\"\",\"four\"])}");
     roundtrip(func, "one;two&#xA;three;four", "'field-delimiter': ';'", "{\"columns\":(),\"column-i"
-        + "ndex\":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"]),\"get\":(anonymous-function)"
-        + "#2}");
+        + "ndex\":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "one,two|three,four", "'row-delimiter': '|'", "{\"columns\":(),\"column-index\""
-        + ":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + ":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "one.two|three.four", "'row-delimiter': '|', 'field-delimiter': '.'", "{\"colum"
-        + "ns\":(),\"column-index\":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"]),\"get\":(a"
-        + "nonymous-function)#2}");
+        + "ns\":(),\"column-index\":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "one,'two,2'|three,'four,4'", "'row-delimiter': '|', 'quote-character': ''''",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"one\",\"two,2\"],[\"three\",\"four,4\"]),"
-        + "\"get\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"one\",\"two,2\"],[\"three\","
+        + "\"four,4\"])}");
     roundtrip(func, "one,'two,''2'''|three,'four,''4'''", "'row-delimiter': '|', 'quote-character':"
         + " ''''", "{\"columns\":(),\"column-index\":{},\"rows\":([\"one\",\"two,'2'\"],[\"three\","
-        + "\"four,'4'\"]),\"get\":(anonymous-function)#2}");
+        + "\"four,'4'\"])}");
     roundtrip(func, "one ,two | three, four", "'row-delimiter': '|'", "{\"columns\":(),\"column-ind"
-        + "ex\":{},\"rows\":([\"one \",\"two \"],[\" three\",\" four\"]),\"get\":(anonymous-functio"
-        + "n)#2}");
+        + "ex\":{},\"rows\":([\"one \",\"two \"],[\" three\",\" four\"])}");
     roundtrip(func, "one ,two | three, four", "'row-delimiter': '|', 'trim-whitespace': false()", ""
         + "{\"columns\":(),\"column-index\":{},\"rows\":([\"one \",\"two \"],[\" three\",\" four\"]"
-        + "),\"get\":(anonymous-function)#2}");
+        + ")}");
     roundtrip(func, "one ,two | three, twenty  four ", "'row-delimiter': '|', 'trim-whitespace': tr"
         + "ue()", "{\"columns\":(),\"column-index\":{},\"rows\":([\"one\",\"two\"],[\"three\",\"twe"
-        + "nty  four\"]),\"get\":(anonymous-function)#2}");
-    roundtrip(func, "&#xA;", "", "{\"columns\":(),\"column-index\":{},\"rows\":[],\"get\":(anonymou"
-        + "s-function)#2}");
-    roundtrip(func, "&#xA; ", "", "{\"columns\":(),\"column-index\":{},\"rows\":([],[\" \"]),\"get"
-        + "\":(anonymous-function)#2}");
+        + "nty  four\"])}");
+    roundtrip(func, "&#xA;", "", "{\"columns\":(),\"column-index\":{},\"rows\":[]}");
+    roundtrip(func, "&#xA; ", "", "{\"columns\":(),\"column-index\":{},\"rows\":([],[\" \"])}");
     roundtrip(func, "&#xA; ", "'trim-whitespace': true()", "{\"columns\":(),\"column-index\":{},\"r"
-        + "ows\":[],\"get\":(anonymous-function)#2}");
+        + "ows\":[]}");
     roundtrip(func, "&#xA;&#xA;", "'trim-whitespace': true()", "{\"columns\":(),\"column-index\":{}"
-        + ",\"rows\":([],[]),\"get\":(anonymous-function)#2}");
+        + ",\"rows\":([],[])}");
     roundtrip(func, "&#xA;&#xA;&#xA;", "'trim-whitespace': true()", "{\"columns\":(),\"column-index"
-        + "\":{},\"rows\":([],[],[]),\"get\":(anonymous-function)#2}");
+        + "\":{},\"rows\":([],[],[])}");
     roundtrip(func, "left,right|one,two|three,four", "'row-delimiter': '|', 'header': true()", "{\""
         + "columns\":(\"left\",\"right\"),\"column-index\":{\"left\":1,\"right\":2},\"rows\":([\"on"
-        + "e\",\"two\"],[\"three\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "e\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "one,two|three,four", "'row-delimiter': '|', 'header': ('left', 'right')", "{\""
         + "columns\":(\"left\",\"right\"),\"column-index\":{\"left\":1,\"right\":2},\"rows\":([\"on"
-        + "e\",\"two\"],[\"three\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "e\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "one,two|three,four", "'row-delimiter': '|', 'header': false()", "{\"columns\":"
-        + "(),\"column-index\":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"]),\"get\":(anonym"
-        + "ous-function)#2}");
+        + "(),\"column-index\":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "one,two|three,four", "'row-delimiter': '|', 'header': 'left'", "{\"columns\":"
         + "\"left\",\"column-index\":{\"left\":1},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"])"
-        + ",\"get\":(anonymous-function)#2}");
+        + "}");
     roundtrip(func, "one,two|three,four", "'row-delimiter': '|', 'header': ('', 'right')", "{\"colu"
         + "mns\":(\"\",\"right\"),\"column-index\":{\"right\":2},\"rows\":([\"one\",\"two\"],[\"thr"
-        + "ee\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "ee\",\"four\"])}");
     roundtrip(func, "left,left|one,two|three,four", "'row-delimiter': '|', 'header': true()", "{\"c"
         + "olumns\":(\"left\",\"left\"),\"column-index\":{\"left\":1},\"rows\":([\"one\",\"two\"],["
-        + "\"three\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "\"three\",\"four\"])}");
     roundtrip(func, ",right|one,two|three,four", "'row-delimiter': '|', 'header': true()", "{\"colu"
         + "mns\":(\"\",\"right\"),\"column-index\":{\"right\":2},\"rows\":([\"one\",\"two\"],[\"thr"
-        + "ee\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "ee\",\"four\"])}");
     roundtrip(func, ",|one,two|three,four", "'row-delimiter': '|', 'header': true()", "{\"columns\""
-        + ":(\"\",\"\"),\"column-index\":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"]),\"get"
-        + "\":(anonymous-function)#2}");
+        + ":(\"\",\"\"),\"column-index\":{},\"rows\":([\"one\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "left,right", "'row-delimiter': '|', 'header': true()", "{\"columns\":(\"left\""
-        + ",\"right\"),\"column-index\":{\"left\":1,\"right\":2},\"rows\":(),\"get\":(anonymous-fun"
-        + "ction)#2}");
+        + ",\"right\"),\"column-index\":{\"left\":1,\"right\":2},\"rows\":()}");
     roundtrip(func, "1,2,3,4,5,6,7,8,9,10|11,12,13,14,15,16,17,18,19,20", "'row-delimiter': '|', 's"
         + "elect-columns': (1 to 4)", "{\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"2\","
-            + "\"3\",\"4\"],[\"11\",\"12\",\"13\",\"14\"]),\"get\":(anonymous-function)#2}");
+        + "\"3\",\"4\"],[\"11\",\"12\",\"13\",\"14\"])}");
     roundtrip(func, "a,b,c,d,e,f,g,h,i|1,2,3,4,5,6,7,8,9,10|11,12,13,14,15,16,17,18,19,20", "'row-d"
         + "elimiter': '|', 'select-columns': (1 to 4), 'header': true()", "{\"columns\":(\"a\",\"b"
         + "\",\"c\",\"d\"),\"column-index\":{\"a\":1,\"b\":2,\"c\":3,\"d\":4},\"rows\":([\"1\",\"2"
-        + "\",\"3\",\"4\"],[\"11\",\"12\",\"13\",\"14\"]),\"get\":(anonymous-function)#2}");
+        + "\",\"3\",\"4\"],[\"11\",\"12\",\"13\",\"14\"])}");
     roundtrip(func, "1,2,3,4|11,12,13,14,15,16,17,18,19,20", "'row-delimiter': '|', 'trim-rows': tr"
         + "ue()", "{\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"2\",\"3\",\"4\"],[\"11\","
-            + "\"12\",\"13\",\"14\"]),\"get\":(anonymous-function)#2}");
+        + "\"12\",\"13\",\"14\"])}");
     roundtrip(func, "a,b,c,d|1,2,3,4,5,6,7,8,9,10|11,12,13,14,15,16,17,18,19,20", "'row-delimiter':"
         + " '|', 'trim-rows': true(), 'header': true()", "{\"columns\":(\"a\",\"b\",\"c\",\"d\"),\""
         + "column-index\":{\"a\":1,\"b\":2,\"c\":3,\"d\":4},\"rows\":([\"1\",\"2\",\"3\",\"4\"],[\""
-        + "11\",\"12\",\"13\",\"14\"]),\"get\":(anonymous-function)#2}");
+        + "11\",\"12\",\"13\",\"14\"])}");
     roundtrip(func, "1,2,3,4|11,12,13,14,15,16", "'row-delimiter': '|', 'trim-rows': false(), 'head"
         + "er': false()", "{\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"2\",\"3\",\"4\"],"
-        + "[\"11\",\"12\",\"13\",\"14\",\"15\",\"16\"]),\"get\":(anonymous-function)#2}");
+        + "[\"11\",\"12\",\"13\",\"14\",\"15\",\"16\"])}");
     roundtrip(func, "1,2,3,4,5,6|14,15,16", "'row-delimiter': '|', 'select-columns': (1 to 4)", "{"
         + "\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"2\",\"3\",\"4\"],[\"14\",\"15\",\""
-        + "16\",\"\"]),\"get\":(anonymous-function)#2}");
+        + "16\",\"\"])}");
     roundtrip(func, "1,2,3,4,5,6|14,15,16", "'row-delimiter': '|', 'trim-rows': true()", "{\"column"
         + "s\":(),\"column-index\":{},\"rows\":([\"1\",\"2\",\"3\",\"4\",\"5\",\"6\"],[\"14\",\"15"
-        + "\",\"16\",\"\",\"\",\"\"]),\"get\":(anonymous-function)#2}");
+        + "\",\"16\",\"\",\"\",\"\"])}");
     roundtrip(func, "a,b,c,d,e|1,2,3|14,15,16", "'row-delimiter': '|', 'trim-rows': true(), 'header"
         + "': true()", "{\"columns\":(\"a\",\"b\",\"c\",\"d\",\"e\"),\"column-index\":{\"a\":1,\"b"
         + "\":2,\"c\":3,\"d\":4,\"e\":5},\"rows\":([\"1\",\"2\",\"3\",\"\",\"\"],[\"14\",\"15\",\"1"
-        + "6\",\"\",\"\"]),\"get\":(anonymous-function)#2}");
+        + "6\",\"\",\"\"])}");
     roundtrip(func, "1,2,3,4|11,12,13,14", "'select-columns': (4, 3, 2, 1), 'row-delimiter': '|'",
         "{\"columns\":(),\"column-index\":{},\"rows\":([\"4\",\"3\",\"2\",\"1\"],[\"14\",\"13\",\"1"
-        + "2\",\"11\"]),\"get\":(anonymous-function)#2}");
+        + "2\",\"11\"])}");
     roundtrip(func, "1,2,3,4|11,12,13,14", "'select-columns': (1, 4), 'row-delimiter': '|'", "{\"co"
-        + "lumns\":(),\"column-index\":{},\"rows\":([\"1\",\"4\"],[\"11\",\"14\"]),\"get\":(anonymo"
-        + "us-function)#2}");
+        + "lumns\":(),\"column-index\":{},\"rows\":([\"1\",\"4\"],[\"11\",\"14\"])}");
     roundtrip(func, "1,2,3,4|11,12,13,14", "'select-columns': (1, 4, 17), 'row-delimiter': '|'", "{"
-        + "\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"4\",\"\"],[\"11\",\"14\",\"\"]),\""
-        + "get\":(anonymous-function)#2}");
+        + "\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"4\",\"\"],[\"11\",\"14\",\"\"])}");
     roundtrip(func, "1,2,3,4|11,12,13,14", "'select-columns': (1, 17, 4), 'row-delimiter': '|'", "{"
-        + "\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"\",\"4\"],[\"11\",\"\",\"14\"]),\""
-        + "get\":(anonymous-function)#2}");
+        + "\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"\",\"4\"],[\"11\",\"\",\"14\"])}");
     roundtrip(func, "1,2,3,4|11,12,13,14,15", "'select-columns': (1, 4, 5), 'row-delimiter': '|'",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"4\",\"\"],[\"11\",\"14\",\"15\"]),"
-        + "\"get\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"1\",\"4\",\"\"],[\"11\",\"14\","
+        + "\"15\"])}");
     roundtrip(func, "first,second,third,fourth|1,2,3,4|11,12,13,14", "'select-columns': (1, 4, 3), "
         + "'header': true(), 'row-delimiter': '|'", "{\"columns\":(\"first\",\"fourth\",\"third\"),"
         + "\"column-index\":{\"first\":1,\"fourth\":2,\"third\":3},\"rows\":([\"1\",\"4\",\"3\"],["
-        + "\"11\",\"14\",\"13\"]),\"get\":(anonymous-function)#2}");
+        + "\"11\",\"14\",\"13\"])}");
     roundtrip(func, "a,b,c,d,e,f|p,q,r,s,t,u", "'row-delimiter': '|', 'select-columns': (1 to 3)",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"a\",\"b\",\"c\"],[\"p\",\"q\",\"r\"]),\"g"
-        + "et\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"a\",\"b\",\"c\"],[\"p\",\"q\",\"r\"])}");
     roundtrip(func, "a,b,c,d,e,f|p,q,r,s,t,u", "'row-delimiter': '|', 'select-columns': (2 to 4)",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"b\",\"c\",\"d\"],[\"q\",\"r\",\"s\"]),\"g"
-        + "et\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"b\",\"c\",\"d\"],[\"q\",\"r\",\"s\"])}");
     roundtrip(func, "a,b,c,d,e,f|p,q,r,s,t,u", "'row-delimiter': '|', 'select-columns': (4, 3, 2)",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"b\"],[\"s\",\"r\",\"q\"]),\"g"
-        + "et\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"b\"],[\"s\",\"r\",\"q\"])}");
     roundtrip(func, "a,b,c,d,e,f|p,q,r,s,t,u", "'row-delimiter': '|', 'select-columns': (4, 3, 1)",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"]),\"g"
-        + "et\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"])}");
     roundtrip(func, "a,b,c,d,e,f|p,q,r,s,t,u", "'row-delimiter': '|', 'select-columns': (4, 3, 1)",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"]),\"g"
-        + "et\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"])}");
     roundtrip(func, "a,b,c,d,e,f|p,q,r,s,t,u", "'row-delimiter': '|', 'select-columns': (4, 3, 1)",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"]),\"g"
-        + "et\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"])}");
     roundtrip(func, "a,b,c,d,e,f|p,q,r,s,t,u", "'row-delimiter': '|', 'select-columns': (4, 3, 1)",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"]),\""
-        + "get\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"])}");
     roundtrip(func, "left,right|one,two|three,four", "'row-delimiter': '|', 'header': true()", "{\""
         + "columns\":(\"left\",\"right\"),\"column-index\":{\"left\":1,\"right\":2},\"rows\":([\"on"
-        + "e\",\"two\"],[\"three\",\"four\"]),\"get\":(anonymous-function)#2}");
+        + "e\",\"two\"],[\"three\",\"four\"])}");
     roundtrip(func, "a,b,c,d,e,f|p,q,r,s,t,u", "'row-delimiter': '|', 'select-columns': (4, 3, 1)",
-        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"]),\"g"
-        + "et\":(anonymous-function)#2}");
+        "{\"columns\":(),\"column-index\":{},\"rows\":([\"d\",\"c\",\"a\"],[\"s\",\"r\",\"p\"])}");
   }
 
   /** Test method. */
@@ -437,8 +414,8 @@ public final class CsvRoundtripTest extends SandboxTest {
     // parsing
     final String adaptive = "declare option output:method 'adaptive'; ";
     final String parseQuery = adaptive + function.args(input, " { " + options + " }");
-    final String result = query(parseQuery);
-    compare(parseQuery, result, expected, null);
+    final String parseResult = query(parseQuery).replaceAll(",\"get\":.*?\\}", "");
+    compare(parseQuery, parseResult, expected, null);
 
     // serialization: add target format to options
     final StringBuilder format = new StringBuilder();
@@ -449,13 +426,13 @@ public final class CsvRoundtripTest extends SandboxTest {
         function == CSV_TO_XML ? CsvFormat.W3_XML : CsvFormat.W3).append("'");
     }
     final String serializeQuery = _CSV_SERIALIZE.args(
-      result.startsWith("<") ? ' ' + result :
-      result.startsWith("[") ? " (" + result.replace('\n', ',') + ")" :
-      result.startsWith("{") ? " " + result.replace(",\"get\":(anonymous-function)#2", "") :
-      result.isEmpty() ? " ()" : " " + result, " { " + options + format + " }");
-    final String serialization = query(serializeQuery);
+      parseResult.startsWith("<") ? ' ' + parseResult :
+      parseResult.startsWith("[") ? " (" + parseResult.replace('\n', ',') + ")" :
+      parseResult.isEmpty() ? " ()" : " " + parseResult, " { " + options + format + " }");
+    final String serialize = query(serializeQuery);
     final String roundtripQuery = adaptive +
-        function.args(" \"" + serialization.replace("\"", "\"\"") + "\"", " { " + options + " }");
-    compare(roundtripQuery, query(roundtripQuery), expected, null);
+        function.args(" \"" + serialize.replace("\"", "\"\"") + "\"", " { " + options + " }");
+    final String roundtripResult = query(roundtripQuery).replaceAll(",\"get\":.*?\\}", "");
+    compare(roundtripQuery, roundtripResult, expected, null);
   }
 }

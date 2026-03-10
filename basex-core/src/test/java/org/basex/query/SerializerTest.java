@@ -271,7 +271,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "xs:dayTimeDuration('P1D')", "xs:duration(\"P1D\")");
     query(option + "<xml><a>B</a></xml>", "<xml><a>B</a></xml>");
     query(option + "true#0", "fn:true#0");
-    query(option + "fn() {}", "(anonymous-function)#0");
+    query(option + "fn() {}", "fn() as empty-sequence() { () }");
     query(option + "xs:float(1)", "xs:float(\"1\")");
 
     query(option + "[]", "[]");
@@ -290,7 +290,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "[ xs:dayTimeDuration('P1D') ]", "[xs:duration(\"P1D\")]");
     query(option + "[ <xml><a>B</a></xml> ]", "[<xml><a>B</a></xml>]");
     query(option + "[ true#0 ]", "[fn:true#0]");
-    query(option + "[ fn() {} ]", "[(anonymous-function)#0]");
+    query(option + "[ fn() {} ]", "[fn() as empty-sequence() { () }]");
     query(option + "[ xs:float(1) ]", "[xs:float(\"1\")]");
 
     query(option + "{ 1: (), 2: 3, 4: (5, 6) }", "{1:(),2:3,4:(5,6)}");
