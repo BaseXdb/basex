@@ -26,7 +26,7 @@ public class FnTrace extends StandardFunc {
       qc.trace(label, input::toErrorString);
     } else {
       for(final Item item : input) {
-        final Supplier<String> message = item instanceof FItem ? input::toErrorString : () -> {
+        final Supplier<String> message = item instanceof FItem ? item::toErrorString : () -> {
           try {
             return item.serialize(SerializerMode.DEBUG.get()).toString();
           } catch(final QueryIOException ex) {
