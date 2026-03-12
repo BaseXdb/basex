@@ -57,8 +57,8 @@ public final class NewlineInput extends TextInput {
   }
 
   @Override
-  public NewlineInput validate(final boolean flag) {
-    super.validate(flag);
+  public NewlineInput fallback(final boolean flag) {
+    super.fallback(flag);
     return this;
   }
 

@@ -56,14 +56,14 @@ public abstract class ConvertFn extends StandardFunc {
    * Converts the specified input to a string in the specified encoding.
    * @param is input stream
    * @param encoding encoding (can be {@code null})
-   * @param validate validate string
+   * @param fallback return Unicode replacement character to invalid characters
    * @return resulting value
    * @throws IOException I/O exception
    */
-  public static byte[] toString(final InputStream is, final String encoding, final boolean validate)
+  public static byte[] toString(final InputStream is, final String encoding, final boolean fallback)
       throws IOException {
     try(TextInput ti = new TextInput(is, encoding)) {
-      return ti.validate(validate).content();
+      return ti.fallback(fallback).content();
     }
   }
 }

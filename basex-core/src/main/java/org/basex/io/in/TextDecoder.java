@@ -21,8 +21,8 @@ import org.basex.util.*;
 abstract class TextDecoder {
   /** Encoding. */
   final String encoding;
-  /** Indicates if input must be valid. */
-  boolean validate;
+  /** Replace invalid input with Unicode replacement character. */
+  boolean fallback = true;
 
   /**
    * Constructor.
@@ -91,17 +91,16 @@ abstract class TextDecoder {
    * @throws IOException I/O exception
    */
   final int invalid(final boolean incomplete, final byte... bytes) throws IOException {
-    if(validate) {
-      final TokenBuilder tb = new TokenBuilder();
-      final IntUnaryOperator toHex = c -> c + (c > 9 ? '7' : '0');
-      for(final int b : bytes) {
-        if(!tb.isEmpty()) tb.add(", ");
-        tb.add(toHex.applyAsInt(b >> 4 & 0x0F)).add(toHex.applyAsInt(b & 0x0F));
-      }
-      if(incomplete) tb.add(", ??");
-      throw new DecodingException("Invalid " + encoding + " character encoding: " + tb);
+    if(fallback) return Token.REPLACEMENT;
+
+    final TokenBuilder tb = new TokenBuilder();
+    final IntUnaryOperator toHex = c -> c + (c > 9 ? '7' : '0');
+    for(final int b : bytes) {
+      if(!tb.isEmpty()) tb.add(", ");
+      tb.add(toHex.applyAsInt(b >> 4 & 0x0F)).add(toHex.applyAsInt(b & 0x0F));
     }
-    return Token.REPLACEMENT;
+    if(incomplete) tb.add(", ??");
+    throw new DecodingException("Invalid " + encoding + " character encoding: " + tb);
   }
 
   /** UTF8 Decoder. */

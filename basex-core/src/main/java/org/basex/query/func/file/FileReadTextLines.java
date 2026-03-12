@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FileReadTextLines extends FileFn {
+public final class FileReadTextLines extends FileReadFn {
   @Override
   public Iter iter(final QueryContext qc) {
     return new Iter() {
@@ -75,14 +75,10 @@ public final class FileReadTextLines extends FileFn {
    */
   private NewlineInput input(final QueryContext qc) throws IOException, QueryException {
     final Path path = toPath(arg(0), qc);
-    final String encoding = toEncodingOrNull(arg(1), FILE_UNKNOWN_ENCODING_X, qc);
-    final boolean fallback = toBooleanOrFalse(arg(2), qc);
-
-    if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
-    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
-    if(!Files.isReadable(path)) throw FILE_ACCESS_X.get(info, path.toAbsolutePath());
-
-    return new NewlineInput(new IOFile(path), encoding).validate(!fallback);
+    final ParseOptions options = options(path, qc);
+    final String encoding = options.get(ParseOptions.ENCODING);
+    final boolean fallback = options.get(ParseOptions.FALLBACK);
+    return new NewlineInput(new IOFile(path), encoding).fallback(fallback);
   }
 
   /**

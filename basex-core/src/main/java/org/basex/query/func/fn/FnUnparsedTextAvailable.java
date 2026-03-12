@@ -28,6 +28,8 @@ public class FnUnparsedTextAvailable extends ParseFn {
     public static final BooleanOption NORMALIZE_NEWLINES = CommonOptions.NORMALIZE_NEWLINES;
     /** Encoding option. */
     public static final StringOption ENCODING = CommonOptions.ENCODING;
+    /** Fallback option. */
+    public static final BooleanOption FALLBACK = CommonOptions.FALLBACK;
   }
 
   @Override

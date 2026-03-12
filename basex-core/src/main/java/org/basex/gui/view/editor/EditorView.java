@@ -649,7 +649,7 @@ public final class EditorView extends View {
   private byte[] read(final IOFile file) throws IOException {
     try {
       // try to open as validated UTF-8 document
-      return new NewlineInput(file).validate(true).content();
+      return new NewlineInput(file).fallback(false).content();
     } catch(final InputException ex) {
       // error...
       Util.debug(ex);
