@@ -59,7 +59,7 @@ public final class FnInvisibleXml extends StandardFunc {
      * @throws QueryException query exception
      */
     public FuncItem generate(final QueryContext qc) throws QueryException {
-      final Item grammar = (Item) ARG_TYPE.coerce(arg(0).value(qc), null, qc, null, info);
+      final Item grammar = (Item) ARG_TYPE.coerce(arg(0).value(qc), qc, info);
       final IxmlOptions options = toOptions(arg(1), new IxmlOptions(), qc);
 
       final String grmmr;

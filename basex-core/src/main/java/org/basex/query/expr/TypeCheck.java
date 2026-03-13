@@ -110,7 +110,7 @@ public final class TypeCheck extends Single {
       return value;
     }
     // ignore type of result returned by tail call function
-    return qc.tcFunc != null ? value : st.coerce(value, null, qc, null, info);
+    return qc.tcFunc != null ? value : st.coerce(value, qc, info);
   }
 
   @Override

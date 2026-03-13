@@ -77,12 +77,12 @@ public final class FnLoadXQueryModule extends StandardFunc {
 
     final QNmMap<Value> bindings = new QNmMap<>();
     if(opt.contains(VARIABLES)) {
-      final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(QNAME_MAP_TYPE, qc, null, info);
+      final XQMap vars = ((XQMap) opt.get(VARIABLES)).coerceTo(QNAME_MAP_TYPE, qc, info, null);
       vars.forEach((key, value) -> bindings.put((QNm) key, value));
     }
 
     if(opt.contains(VENDOR_OPTIONS)) {
-      ((XQMap) opt.get(VENDOR_OPTIONS)).coerceTo(QNAME_MAP_TYPE, qc, null, info);
+      ((XQMap) opt.get(VENDOR_OPTIONS)).coerceTo(QNAME_MAP_TYPE, qc, info, null);
     }
 
     if(opt.contains(XQUERY_VERSION)) {

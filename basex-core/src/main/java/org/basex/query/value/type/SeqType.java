@@ -205,15 +205,28 @@ public final class SeqType {
   /**
    * Converts the specified value to this type.
    * @param value value to promote
-   * @param name variable name (used for error message, can be {@code null})
    * @param qc query context
-   * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
-  public Value coerce(final Value value, final QNm name, final QueryContext qc,
-      final CompileContext cc, final InputInfo info) throws QueryException {
+  public Value coerce(final Value value, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    return coerce(value, qc, info, null, null);
+  }
+
+  /**
+   * Converts the specified value to this type.
+   * @param value value to promote
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @param name variable name (used for error message, can be {@code null})
+   * @param cc compilation context ({@code null} during runtime)
+   * @return converted value
+   * @throws QueryException if the conversion was not possible
+   */
+  public Value coerce(final Value value, final QueryContext qc, final InputInfo info,
+      final QNm name, final CompileContext cc) throws QueryException {
 
     // instance check
     final SeqType[] at = type instanceof final FuncType ft ? ft.argTypes : null;
@@ -271,10 +284,10 @@ public final class SeqType {
     }
     if(item instanceof final FItem fitem) {
       if(item instanceof final XQArray array) {
-        if(type instanceof final ArrayType at) return array.coerceTo(at, qc, cc, info);
+        if(type instanceof final ArrayType at) return array.coerceTo(at, qc, info, cc);
       } else if(item instanceof final XQMap map) {
-        if(type instanceof final RecordType rt) return map.coerceTo(rt, qc, cc, info);
-        if(type instanceof final MapType mt) return map.coerceTo(mt, qc, cc, info);
+        if(type instanceof final RecordType rt) return map.coerceTo(rt, qc, info, cc);
+        if(type instanceof final MapType mt) return map.coerceTo(mt, qc, info, cc);
       }
       if(type instanceof final FuncType ft) {
         return fitem.coerceTo(type == Types.FUNCTION ? item.funcType() : ft, qc, cc, info);

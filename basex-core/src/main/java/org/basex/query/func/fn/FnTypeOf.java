@@ -32,7 +32,7 @@ public final class FnTypeOf extends ContextFn {
     for(final Value item : value) {
       String type = item.type.toString();
       if(item.type instanceof FType) {
-        type = type.replaceAll("\\(.*", "(*)").replace("record", "map");
+        type = type.replaceAll("\\(.*", "(*)").replaceAll("^record\\(", "map(");
       } else if(item.type.instanceOf(NodeType.JNODE)) {
         type = type.replaceAll("\\(.*", "()");
       }

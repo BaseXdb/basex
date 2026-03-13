@@ -284,21 +284,21 @@ public abstract class XQMap extends XQStruct {
    * Converts this map to the given map type.
    * @param mt map type
    * @param qc query context
-   * @param cc compilation context ({@code null} during runtime)
    * @param ii input info (can be {@code null})
+   * @param cc compilation context ({@code null} during runtime)
    * @return coerced map
    * @throws QueryException query exception
    */
-  public final XQMap coerceTo(final MapType mt, final QueryContext qc, final CompileContext cc,
-      final InputInfo ii) throws QueryException {
+  public final XQMap coerceTo(final MapType mt, final QueryContext qc, final InputInfo ii,
+      final CompileContext cc) throws QueryException {
 
     final SeqType kt = mt.keyType().seqType(), vt = mt.valueType();
     final MapBuilder mb = new MapBuilder(structSize());
     forEach((key, value) -> {
       qc.checkStop();
-      final Item k = (Item) kt.coerce(key, null, qc, cc, ii);
+      final Item k = (Item) kt.coerce(key, qc, ii, null, cc);
       if(mb.contains(k)) throw typeError(this, mt, ii);
-      mb.put(k, vt.coerce(value, null, qc, cc, ii));
+      mb.put(k, vt.coerce(value, qc, ii, null, cc));
     });
     return mb.map();
   }
@@ -307,13 +307,13 @@ public abstract class XQMap extends XQStruct {
    * Converts this map to the given record type.
    * @param rt record type
    * @param qc query context
-   * @param cc compilation context ({@code null} during runtime)
    * @param ii input info (can be {@code null})
+   * @param cc compilation context ({@code null} during runtime)
    * @return coerced map
    * @throws QueryException query exception
    */
-  public final XQMap coerceTo(final RecordType rt, final QueryContext qc, final CompileContext cc,
-      final InputInfo ii) throws QueryException {
+  public final XQMap coerceTo(final RecordType rt, final QueryContext qc, final InputInfo ii,
+      final CompileContext cc) throws QueryException {
 
     final long ms = structSize();
     final MapBuilder mb = new MapBuilder(ms);
@@ -325,7 +325,7 @@ public abstract class XQMap extends XQStruct {
       final RecordField rf = fields.value(f);
       final Value value = getOrNull(Str.get(key));
       if(value != null) {
-        mb.put(key, rf.seqType().coerce(value, null, qc, cc, ii));
+        mb.put(key, rf.seqType().coerce(value, qc, ii, null, cc));
       } else if(!rf.isOptional()) {
         throw typeError(this, rt, ii);
       }

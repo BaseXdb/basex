@@ -767,7 +767,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final XQMap toRecord(final Item item, final RecordType type, final QueryContext qc)
       throws QueryException {
-    return (XQMap) type.seqType().coerce(item, null, qc, null, info);
+    return (XQMap) type.seqType().coerce(item, qc, info);
   }
 
   /**

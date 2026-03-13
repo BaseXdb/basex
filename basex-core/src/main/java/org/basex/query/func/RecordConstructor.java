@@ -93,7 +93,7 @@ public class RecordConstructor extends StandardFunc {
     for(int f = 0; f < fs; ++f) {
       final RecordField rf = fields.value(f + 1);
       final Value value = f < exprs.length ? exprs[f].value(qc) : rf.init().value(qc);
-      values[f] = rf.seqType().coerce(value, names[f], qc, null, ii);
+      values[f] = rf.seqType().coerce(value, qc, ii, names[f], null);
     }
     return new XQRecordMap(recordType, values);
   }
@@ -113,7 +113,7 @@ public class RecordConstructor extends StandardFunc {
       final RecordField rf = fields.value(f + 1);
       final Value value = f < exprs.length ? exprs[f].value(qc) : rf.init().value(qc);
       if(!value.isEmpty() || rf.alwaysAdded()) {
-        mb.put(fields.key(f + 1), rf.seqType().coerce(value, names[f], qc, null, ii));
+        mb.put(fields.key(f + 1), rf.seqType().coerce(value, qc, ii, names[f], null));
       }
     }
     final XQMap map = mb.map();

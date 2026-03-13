@@ -29,7 +29,7 @@ public class FnPartialApply extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final FItem function = toFunction(arg(0), qc);
-    final XQMap arguments = toMap(ARGS_TYPE.coerce(arg(1).value(qc), ARGS_NAME, qc, null, info),
+    final XQMap arguments = toMap(ARGS_TYPE.coerce(arg(1).value(qc), qc, info, ARGS_NAME, null),
         qc);
     final int arity = function.arity();
     if(arity == 0 || arguments == XQMap.empty()) return function;
@@ -42,8 +42,8 @@ public class FnPartialApply extends StandardFunc {
       final long index = toLong(key);
       if(index <= arity) {
         final int i = (int) index - 1;
-        funcArgs[i] = ft.argTypes[i].coerce(arguments.get(key), function.paramName(i), qc, null,
-            info);
+        funcArgs[i] = ft.argTypes[i].coerce(arguments.get(key), qc, info, function.paramName(i),
+            null);
         --placeholders;
       }
     }

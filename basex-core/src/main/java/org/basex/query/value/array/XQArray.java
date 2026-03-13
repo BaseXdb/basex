@@ -278,7 +278,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    final long i = ((Itr) Types.INTEGER_O.coerce(key(args[0], qc, ii), null, qc, null, ii)).itr();
+    final long i = ((Itr) Types.INTEGER_O.coerce(key(args[0], qc, ii), qc, ii)).itr();
     final long size = structSize();
     if(i > 0 && i <= size) return valueAt(i - 1);
     throw (size == 0 ? ARRAYEMPTY : ARRAYBOUNDS_X_X).get(ii, i, size);
@@ -365,18 +365,18 @@ public abstract class XQArray extends XQStruct {
    * Converts this array to the given array type.
    * @param at array type
    * @param qc query context
-   * @param cc compilation context ({@code null} during runtime)
    * @param ii input info (can be {@code null})
+   * @param cc compilation context ({@code null} during runtime)
    * @return coerced array
    * @throws QueryException query exception
    */
-  public final XQArray coerceTo(final ArrayType at, final QueryContext qc, final CompileContext cc,
-      final InputInfo ii) throws QueryException {
+  public final XQArray coerceTo(final ArrayType at, final QueryContext qc, final InputInfo ii,
+      final CompileContext cc) throws QueryException {
 
     final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
     for(final Value value : iterable()) {
       qc.checkStop();
-      ab.add(at.valueType().coerce(value, null, qc, cc, ii));
+      ab.add(at.valueType().coerce(value, qc, ii, null, cc));
     }
     return ab.array(at);
   }

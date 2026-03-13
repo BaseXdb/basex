@@ -33,8 +33,8 @@ public enum Records {
   ),
   /** Record definition. */
   INFER_ENCODING(BIN_URI, "infer-encoding",
-    field("encoding", Types.STRING_O, false),
-    field("offset", Types.INTEGER_O, false)
+    field("encoding", Types.STRING_O),
+    field("offset", Types.INTEGER_O)
   ),
   /** Record definition. */
   LOAD_XQUERY_MODULE(FN_URI, "load-xquery-module",

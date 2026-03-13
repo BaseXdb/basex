@@ -78,7 +78,7 @@ public abstract class StaticScope extends ExprInfo implements Scope {
       final int fp = vs.enter(qc);
       try {
         final Value val = expr.value(qc);
-        value = declType != null ? declType.coerce(val, name, qc, null, info) : val;
+        value = declType != null ? declType.coerce(val, qc, info, name, null) : val;
       } finally {
         vs.exit(fp, qc);
       }

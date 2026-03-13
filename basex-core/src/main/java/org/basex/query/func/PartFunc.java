@@ -92,7 +92,7 @@ public final class PartFunc extends Arr {
         params[placeholderPerm == null ? p : placeholderPerm[p]] = param;
         ++p;
       } else {
-        args[e] = at.coerce(expr.value(qc), null, qc, null, ii);
+        args[e] = at.coerce(expr.value(qc), qc, info);
       }
     }
     final AnnList anns = func.annotations();

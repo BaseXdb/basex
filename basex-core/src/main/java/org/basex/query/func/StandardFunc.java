@@ -355,7 +355,7 @@ public abstract class StandardFunc extends Arr {
   protected final ADate toGregorianOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
     final Item item = expr.atomItem(qc, info);
-    return item.isEmpty() ? null : (ADate) Types.GREGORIAN_ZO.coerce(item, null, qc, null, info);
+    return item.isEmpty() ? null : (ADate) Types.GREGORIAN_ZO.coerce(item, qc, info);
   }
 
   /**
@@ -861,7 +861,9 @@ public abstract class StandardFunc extends Arr {
    */
   protected final boolean functionOption(final int i) {
     if(!(arg(i) instanceof final Value value)) return true;
-    if(value instanceof final XQMap map) {
+
+    final Value v = value instanceof final JNode jnode ? jnode.value : value;
+    if(v instanceof final XQMap map) {
       for(final Item key : map.keys()) {
         try {
           if(map.get(key) instanceof FItem) return true;
