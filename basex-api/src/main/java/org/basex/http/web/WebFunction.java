@@ -170,7 +170,7 @@ public abstract class WebFunction implements Comparable<WebFunction> {
       if(var.name.eq(name)) {
         // casts and binds the value
         final SeqType st = var.declaredType();
-        args[p] = value.seqType().instanceOf(st) ? value : st.cast(value, false, qc, null);
+        args[p] = value.seqType().instanceOf(st) ? value : st.coerce(value, null, qc, null, null);
         if(args[p] == null) throw error(ARG_TYPE_X_X_X, input, st, value);
         break;
       }
