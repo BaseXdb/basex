@@ -20,7 +20,6 @@ public final class ArrayJoin extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr arrays = arg(0);
-    final Item separator = arg(1).item(qc, info);
 
     // if possible, retrieve single item
     if(arrays.seqType().zeroOrOne()) {
@@ -31,24 +30,18 @@ public final class ArrayJoin extends ArrayFn {
     Item item = iter.next();
     if(item == null) return XQArray.empty();
 
-    final ValueList sep = new ValueList();
-    if(!separator.isEmpty()) {
-      for(final Value value : toArray(separator).iterable()) sep.add(value);
-    }
-
     final ArrayBuilder ab = new ArrayBuilder(qc);
-    for(final Value value : toArray(item).iterable()) ab.add(value);
-    while((item = qc.next(iter)) != null) {
-      for(final Value value : sep) ab.add(value);
+    do {
       for(final Value value : toArray(item).iterable()) ab.add(value);
-    }
+    } while((item = qc.next(iter)) != null);
+
     return ab.array(this);
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr arrays = arg(0), separator = arg(1);
-    final SeqType ast = arrays.seqType(), sst = separator.seqType();
+    final Expr arrays = arg(0);
+    final SeqType ast = arrays.seqType();
 
     if(ast.type instanceof ArrayType) {
       // remove empty entries
@@ -64,9 +57,7 @@ public final class ArrayJoin extends ArrayFn {
       final SeqType st = arg(0).seqType();
       if(st.one()) return arg(0);
 
-      final Type type = sst.type instanceof ArrayType ? st.type.union(sst.type) :
-        sst.zero() ? st.type : null;
-      if(type != null) exprType.assign(type);
+      exprType.assign(st.type);
     }
     return this;
   }

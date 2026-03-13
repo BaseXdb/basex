@@ -917,8 +917,8 @@ public enum Function implements AFunction {
   _ARRAY_INSERT_BEFORE(ArrayInsertBefore::new, "insert-before(array,position,member)",
       params(ARRAY_O, INTEGER_O, ITEM_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
-  _ARRAY_JOIN(ArrayJoin::new, "join(arrays[,separator])",
-      params(ARRAY_ZM, ARRAY_ZO), ARRAY_O, ARRAY_URI),
+  _ARRAY_JOIN(ArrayJoin::new, "join(arrays)",
+      params(ARRAY_ZM), ARRAY_O, ARRAY_URI),
   /** XQuery function. */
   _ARRAY_MEMBERS(ArrayMembers::new, "members(array)",
       params(ARRAY_O), Records.MEMBER.get().seqType(Occ.ZERO_OR_MORE), ARRAY_URI),
