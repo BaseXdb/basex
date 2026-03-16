@@ -3,7 +3,6 @@ package org.basex.query.up.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -51,7 +50,7 @@ public final class Replace extends Update {
 
       final Updates updates = qc.updates();
       final DBNode dbnode = updates.determineDataRef(targ, qc);
-      checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
+      checkWrite(dbnode, qc);
 
       // replace node
       if(builder == null) builder = builder(arg(1), qc);

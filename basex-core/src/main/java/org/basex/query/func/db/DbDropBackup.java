@@ -2,7 +2,6 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.*;
 import org.basex.query.up.primitives.name.*;
@@ -22,7 +21,7 @@ public final class DbDropBackup extends BackupFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final String name = toBackup(arg(0), qc);
 
-    checkPerm(qc, Perm.CREATE, name);
+    checkCreate(name, qc);
     final StringList backups = qc.context.databases.backups(name);
     if(backups.isEmpty()) throw DB_NOBACKUP_X.get(info, name);
 

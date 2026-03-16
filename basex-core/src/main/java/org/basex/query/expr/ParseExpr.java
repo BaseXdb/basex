@@ -263,7 +263,7 @@ public abstract class ParseExpr extends Expr {
    * If negative, an exception is thrown.
    * @param qc query context
    * @param perm permission
-   * @param name name of resource
+   * @param name name of database
    * @throws QueryException query exception
    */
   protected void checkPerm(final QueryContext qc, final Perm perm, final String name)

@@ -3,6 +3,7 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -94,6 +95,16 @@ abstract class DbAccessFn extends StandardFunc {
    */
   protected final String toName(final Expr expr, final QueryContext qc) throws QueryException {
     return toName(expr, false, DB_NAME_X, qc);
+  }
+
+  /**
+   * Checks create permissions.
+   * @param name database node
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  protected final void checkCreate(final String name, final QueryContext qc) throws QueryException {
+    checkPerm(qc, Perm.CREATE, name);
   }
 
   @Override

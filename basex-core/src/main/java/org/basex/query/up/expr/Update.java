@@ -3,6 +3,7 @@ package org.basex.query.up.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.constr.*;
@@ -67,5 +68,16 @@ abstract class Update extends Arr {
     if(constr.errAtt != null) throw UPNOATTRPER_X.get(info, constr.errAtt);
     if(constr.duplAtt != null) throw UPATTDUPL_X.get(info, constr.duplAtt);
     return builder;
+  }
+
+  /**
+   * Checks update permissions.
+   * @param dbnode database node
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  final void checkWrite(final DBNode dbnode, final QueryContext qc) throws QueryException {
+    final String name = dbnode.data().meta.name;
+    if(!name.isEmpty()) checkPerm(qc, Perm.WRITE, name);
   }
 }

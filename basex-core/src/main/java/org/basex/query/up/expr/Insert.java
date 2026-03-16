@@ -2,7 +2,6 @@ package org.basex.query.up.expr;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -78,7 +77,7 @@ public final class Insert extends Update {
           throw (sibling ? UPATTELM_X : UPATTELM2_X).get(info, target);
 
         final DBNode dbnode = updates.determineDataRef(target, qc);
-        checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
+        checkWrite(dbnode, qc);
         final NodeUpdate up = new InsertAttribute(dbnode.pre(), dbnode.data(), info,
             checkNS(list, target));
         updates.add(up, qc);
@@ -88,7 +87,7 @@ public final class Insert extends Update {
       list = builder.children;
       if(list != null) {
         final DBNode dbnode = updates.determineDataRef(node, qc);
-        checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
+        checkWrite(dbnode, qc);
         final NodeUpdate up = switch(mode) {
           case BEFORE -> new InsertBefore(dbnode.pre(), dbnode.data(), info, list);
           case AFTER -> new InsertAfter(dbnode.pre(), dbnode.data(), info, list);
