@@ -145,14 +145,12 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    Value v = this;
-    if(!type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
-      final ValueBuilder vb = new ValueBuilder(qc, size);
-      for(final Item item : this) vb.add(item.unwrappedItem(qc, ii));
-      v = vb.value(this);
-    }
-    return v.item(qc, ii);
+  public Value unwrappedValue(final QueryContext qc) {
+    if(type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return this;
+
+    final ValueBuilder vb = new ValueBuilder(qc, size);
+    for(final Item item : this) vb.add(item.unwrappedValue(qc));
+    return vb.value(this);
   }
 
   @Override

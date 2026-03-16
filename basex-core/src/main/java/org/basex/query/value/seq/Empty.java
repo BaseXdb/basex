@@ -112,6 +112,11 @@ public final class Empty extends Item {
   }
 
   @Override
+  public Iter unwrappedIter(final QueryContext qc) {
+    return ITER;
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return obj instanceof Empty;
   }

@@ -82,8 +82,17 @@ public abstract class Item extends Value {
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   * Overwritten by {@link JNode}.
+   */
   @Override
-  public Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Iter unwrappedIter(final QueryContext qc) throws QueryException {
+    return iter();
+  }
+
+  @Override
+  public Value unwrappedValue(final QueryContext qc) {
     return this;
   }
 
@@ -255,7 +264,7 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link XNode}.
+   * Overwritten by {@link XQArray}, {@link XQMap}, {@link FuncItem} and {@link XNode}.
    */
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -264,7 +273,7 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link XNode}.
+   * Overwritten by {@link XQArray}, {@link XQMap}, {@link FuncItem} and {@link XNode}.
    */
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {

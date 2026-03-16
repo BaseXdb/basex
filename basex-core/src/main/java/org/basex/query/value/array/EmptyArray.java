@@ -36,12 +36,12 @@ final class EmptyArray extends XQArray {
   }
 
   @Override
-  public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Value atomValue(final QueryContext qc, final InputInfo ii) {
     return Empty.VALUE;
   }
 
   @Override
-  public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+  public Item atomItem(final QueryContext qc, final InputInfo ii) {
     return Empty.VALUE;
   }
 

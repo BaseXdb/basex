@@ -6,7 +6,7 @@ import java.nio.file.*;
 
 import org.basex.core.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.options.*;
 
@@ -33,7 +33,7 @@ abstract class FileReadFn extends FileFn {
    * @throws QueryException query exception
    */
   final ParseOptions options(final Path path, final QueryContext qc) throws QueryException {
-    final Expr arg1 = arg(1), arg2 = arg(2);
+    final Item arg1 = arg(1).unwrappedItem(qc, info);
 
     final ParseOptions po = new ParseOptions();
     if(arg1 instanceof final XQMap map) {
@@ -43,7 +43,7 @@ abstract class FileReadFn extends FileFn {
     }
     toEncodingOrNull(po.get(ParseOptions.ENCODING), FILE_UNKNOWN_ENCODING_X);
 
-    final boolean fallback = toBooleanOrFalse(arg2, qc);
+    final boolean fallback = toBooleanOrFalse(arg(2), qc);
     if(fallback) po.set(ParseOptions.FALLBACK, true);
 
     if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());

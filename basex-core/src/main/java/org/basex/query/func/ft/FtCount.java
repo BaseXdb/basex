@@ -17,7 +17,7 @@ public final class FtCount extends FtAccessFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final FTPosData tmp = qc.ftPosData;
     qc.ftPosData = new FTPosData();
-    final Iter nodes = arg(0).iter(qc);
+    final Iter nodes = arg(0).unwrappedIter(qc);
     for(Item item; (item = qc.next(nodes)) != null;) {
       toDBNode(item, true);
     }

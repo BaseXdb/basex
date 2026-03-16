@@ -103,7 +103,7 @@ public class FnSortBy extends StandardFunc {
    * @throws QueryException query exception
    */
   protected Integer[] index(final Value[] values, final QueryContext qc) throws QueryException {
-    Value maps = arg(1).value(qc);
+    Value maps = arg(1).unwrappedValue(qc);
     if(maps.isEmpty()) maps = XQMap.empty();
 
     final int ms = (int) maps.size();

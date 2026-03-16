@@ -39,7 +39,7 @@ public final class Rename extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = arg(0).iter(qc);
+    final Iter iter = arg(0).unwrappedIter(qc);
     final Item name = arg(1).atomItem(qc, info);
     final EnumMap<Kind, QNm> names = new EnumMap<>(Kind.class);
 

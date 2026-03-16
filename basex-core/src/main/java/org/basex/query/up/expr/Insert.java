@@ -49,7 +49,7 @@ public final class Insert extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = arg(0).iter(qc);
+    final Iter iter = arg(0).unwrappedIter(qc);
     final boolean sibling = mode == Mode.BEFORE || mode == Mode.AFTER;
     FBuilder builder = null;
 

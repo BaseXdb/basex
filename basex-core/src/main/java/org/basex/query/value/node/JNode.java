@@ -92,8 +92,13 @@ public final class JNode extends GNode {
   }
 
   @Override
-  public Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return value.unwrappedItem(qc, ii).item(qc, ii);
+  public Iter unwrappedIter(final QueryContext qc) throws QueryException {
+    return unwrappedValue(qc).iter();
+  }
+
+  @Override
+  public Value unwrappedValue(final QueryContext qc) {
+    return value.unwrappedValue(qc);
   }
 
   @Override

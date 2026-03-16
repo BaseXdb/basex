@@ -72,8 +72,8 @@ public final class SingletonSeq extends Seq {
   }
 
   @Override
-  public Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return get(value.unwrappedItem(qc, ii), size).item(qc, ii);
+  public Value unwrappedValue(final QueryContext qc) {
+    return get(value.unwrappedValue(qc), size);
   }
 
   @Override

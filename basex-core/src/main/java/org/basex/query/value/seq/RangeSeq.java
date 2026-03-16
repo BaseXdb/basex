@@ -158,8 +158,8 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return item(qc, ii);
+  public Value unwrappedValue(final QueryContext qc) {
+    return this;
   }
 
   @Override

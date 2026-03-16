@@ -19,7 +19,7 @@ import org.basex.util.*;
 public final class FnElementToMapPlan extends PlanFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = arg(0).iter(qc);
+    final Iter iter = arg(0).unwrappedIter(qc);
 
     // collect element and attribute nodes
     final QNmMap<GNodeList> elemNames = new QNmMap<>();

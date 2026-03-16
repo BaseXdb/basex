@@ -64,7 +64,7 @@ public final class Transform extends Copy {
 
     try {
       for(final Let copy : copies) {
-        final Iter iter = copy.expr.iter(qc);
+        final Iter iter = copy.expr.unwrappedIter(qc);
         Item item = iter.next();
         Value error = null;
         if(item == null) {

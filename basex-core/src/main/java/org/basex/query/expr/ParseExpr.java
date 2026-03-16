@@ -100,8 +100,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return value(qc).unwrappedItem(qc, info);
+  public final Value unwrappedValue(final QueryContext qc) throws QueryException {
+    return value(qc).unwrappedValue(qc);
   }
 
   @Override

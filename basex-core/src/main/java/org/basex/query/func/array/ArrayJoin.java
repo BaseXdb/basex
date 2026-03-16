@@ -21,18 +21,24 @@ public final class ArrayJoin extends ArrayFn {
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr arrays = arg(0);
 
-    // if possible, retrieve single item
-    if(arrays.seqType().zeroOrOne()) {
+    // create single-member array
+    final SeqType st = arrays.seqType();
+    if(st.type instanceof ArrayType && st.zeroOrOne()) {
       final Item item = arrays.item(qc, info);
       return item.isEmpty() ? XQArray.empty() : toArray(item);
     }
-    final Iter iter = arrays.iter(qc);
+
+    // empty array
+    final Iter iter = arrays.unwrappedIter(qc);
     Item item = iter.next();
     if(item == null) return XQArray.empty();
 
+    // iterative array building
     final ArrayBuilder ab = new ArrayBuilder(qc);
     do {
-      for(final Value value : toArray(item).iterable()) ab.add(value);
+      for(final Value value : toArray(item).iterable()) {
+        ab.add(value);
+      }
     } while((item = qc.next(iter)) != null);
 
     return ab.array(this);

@@ -127,21 +127,37 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    if(body().size() == 1) return eval(qc);
-
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : body().value(qc)) {
-      vb.add(eval(item, qc));
-    }
-    return vb.value(this);
+    return body() instanceof final FItem func ? eval(func, qc) : iterate(qc).value(qc, this);
   }
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    if(body().size() == 1) return eval(qc).iter();
+    return body() instanceof final FItem func ? eval(func, qc).iter() : iterate(qc);
+  }
 
+  /**
+   * Evaluates a single function item.
+   * @param func function item
+   * @param qc query context
+   * @return value
+   * @throws QueryException query exception
+   */
+  private Value eval(final FItem func, final QueryContext qc) throws QueryException {
+    checkUp(func, updating);
+    final int nargs = exprs.length - 1, arity = func.arity();
+    if(nargs != arity) throw arityError(func, nargs, arity, false, info);
+    return evalFunc(func, qc);
+  }
+
+  /**
+   * Evaluates multiple function items.
+   * @param qc query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter iterate(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter iter = body().iter(qc);
+      final Iter iter = body().unwrappedIter(qc);
       Iter value;
 
       @Override
@@ -150,7 +166,8 @@ public final class DynFuncCall extends FuncCall {
           if(value == null) {
             final Item item = iter.next();
             if(item == null) return null;
-            value = eval(item, qc).iter();
+            if(item instanceof final FItem fi) value = eval(fi, qc).iter();
+            else throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
           }
           final Item item = value.next();
           if(item != null) return item;
@@ -158,32 +175,6 @@ public final class DynFuncCall extends FuncCall {
         }
       }
     };
-  }
-
-  /**
-   * Evaluates a single function item.
-   * @param qc query context
-   * @return the function
-   * @throws QueryException query exception
-   */
-  private Value eval(final QueryContext qc) throws QueryException {
-    return eval(body().item(qc, info), qc);
-  }
-
-  /**
-   * Evaluates a function item.
-   * @param item function to be evaluated
-   * @param qc query context
-   * @return the function
-   * @throws QueryException query exception
-   */
-  Value eval(final Item item, final QueryContext qc) throws QueryException {
-    if(!(item instanceof final FItem func)) throw INVFUNCITEM_X_X.get(info, item.seqType(), item);
-
-    checkUp(func, updating);
-    final int nargs = exprs.length - 1, arity = func.arity();
-    if(nargs != arity) throw arityError(func, nargs, arity, false, info);
-    return evalFunc(func, qc);
   }
 
   @Override

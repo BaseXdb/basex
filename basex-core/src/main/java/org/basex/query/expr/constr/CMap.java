@@ -157,7 +157,7 @@ public final class CMap extends Arr {
       if(exprs[e + 1] != Empty.UNDEFINED) {
         add.accept(toAtomItem(exprs[e], qc), exprs[e + 1].value(qc));
       } else {
-        final Iter iter = exprs[e].iter(qc);
+        final Iter iter = exprs[e].unwrappedIter(qc);
         for(Item item; (item = iter.next()) != null;) {
           toMap(item).forEach(add);
         }

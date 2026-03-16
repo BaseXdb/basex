@@ -283,14 +283,14 @@ public final class SeqType {
       return vb.value();
     }
     if(item instanceof final FItem fitem) {
-      if(item instanceof final XQArray array) {
+      if(fitem instanceof final XQArray array) {
         if(type instanceof final ArrayType at) return array.coerceTo(at, qc, info, cc);
-      } else if(item instanceof final XQMap map) {
+      } else if(fitem instanceof final XQMap map) {
         if(type instanceof final RecordType rt) return map.coerceTo(rt, qc, info, cc);
         if(type instanceof final MapType mt) return map.coerceTo(mt, qc, info, cc);
       }
       if(type instanceof final FuncType ft) {
-        return fitem.coerceTo(type == Types.FUNCTION ? item.funcType() : ft, qc, cc, info);
+        return fitem.coerceTo(type == Types.FUNCTION ? fitem.funcType() : ft, qc, cc, info);
       }
     } else if(item instanceof final JNode jnode) {
       return coerce(jnode.value.unwrappedItem(qc, info), name, qc, cc, info);
