@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.query.value.type.BasicType.*;
+import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.Types.*;
@@ -283,17 +284,19 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(ChoiceItemType.get(DATE_O, STRING_O), EXACTLY_ONE),
+      c1 = SeqType.get(ChoiceItemType.get(DATE, STRING), EXACTLY_ONE),
       // (element() | xs:string)
-      c2 = SeqType.get(ChoiceItemType.get(ELEMENT_O, STRING_O), EXACTLY_ONE),
+      c2 = SeqType.get(ChoiceItemType.get(ELEMENT, STRING), EXACTLY_ONE),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS_O, STRING_O), EXACTLY_ONE),
+      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS, STRING), EXACTLY_ONE),
       // (array(*) | xs:string)
-      c4 = SeqType.get(ChoiceItemType.get(ARRAY_O, STRING_O), EXACTLY_ONE),
+      c4 = SeqType.get(ChoiceItemType.get(ARRAY, STRING), EXACTLY_ONE),
       // (map(*) | xs:string)
-      c5 = SeqType.get(ChoiceItemType.get(MAP_O, STRING_O), EXACTLY_ONE),
+      c5 = SeqType.get(ChoiceItemType.get(MAP, STRING), EXACTLY_ONE),
       // (function(*) | xs:string)
-      c6 = SeqType.get(ChoiceItemType.get(FUNCTION_O, STRING_O), EXACTLY_ONE);
+      c6 = SeqType.get(ChoiceItemType.get(FUNCTION, STRING), EXACTLY_ONE),
+      // (node() | jnode())
+      c7 = SeqType.get(ChoiceItemType.get(NODE, JNODE), EXACTLY_ONE);
 
     assertTrue(c1.instanceOf(c1));
     assertFalse(c1.instanceOf(c2));
@@ -355,6 +358,14 @@ public final class SeqTypeTest {
     assertTrue(FUNCTION_O.instanceOf(c6));
     assertFalse(c6.instanceOf(STRING_O));
     assertTrue(STRING_O.instanceOf(c6));
+    assertTrue(Types.NUMERIC_EXPANSION.seqType().instanceOf(NUMERIC_O));
+    assertTrue(NUMERIC_O.instanceOf(Types.NUMERIC_EXPANSION.seqType()));
+    assertTrue(Types.ANY_ATOMIC_TYPE_EXPANSION.seqType().instanceOf(ANY_ATOMIC_TYPE_O));
+    assertTrue(ANY_ATOMIC_TYPE_O.instanceOf(Types.ANY_ATOMIC_TYPE_EXPANSION.seqType()));
+    assertTrue(Types.ITEM_EXPANSION.seqType().instanceOf(ITEM_O));
+    assertTrue(ITEM_O.instanceOf(Types.ITEM_EXPANSION.seqType()));
+    assertTrue(c7.instanceOf(GNODE_O));
+    assertTrue(GNODE_O.instanceOf(c7));
 
     final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(), fld2 = new TokenObjectMap<>();
     final QNm r1Name = new QNm(Token.token("r1")), r2Name = new QNm(Token.token("r2"));
@@ -550,17 +561,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(ChoiceItemType.get(DATE_O, STRING_O), EXACTLY_ONE),
+      c1 = SeqType.get(ChoiceItemType.get(DATE, STRING), EXACTLY_ONE),
       // (element() | xs:string)
-      c2 = SeqType.get(ChoiceItemType.get(ELEMENT_O, STRING_O), EXACTLY_ONE),
+      c2 = SeqType.get(ChoiceItemType.get(ELEMENT, STRING), EXACTLY_ONE),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS_O, STRING_O), EXACTLY_ONE),
+      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS, STRING), EXACTLY_ONE),
       // (array(*) | xs:string)
-      c4 = SeqType.get(ChoiceItemType.get(ARRAY_O, STRING_O), EXACTLY_ONE),
+      c4 = SeqType.get(ChoiceItemType.get(ARRAY, STRING), EXACTLY_ONE),
       // (map(*) | xs:string)
-      c5 = SeqType.get(ChoiceItemType.get(MAP_O, STRING_O), EXACTLY_ONE),
+      c5 = SeqType.get(ChoiceItemType.get(MAP, STRING), EXACTLY_ONE),
       // (function(*) | xs:string)
-      c6 = SeqType.get(ChoiceItemType.get(FUNCTION_O, STRING_O), EXACTLY_ONE);
+      c6 = SeqType.get(ChoiceItemType.get(FUNCTION, STRING), EXACTLY_ONE);
 
     combine(c1, op);
     combine(c1, DATE_O, ANY_ATOMIC_TYPE_O, op);
@@ -831,17 +842,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(ChoiceItemType.get(DATE_O, STRING_O), EXACTLY_ONE),
+      c1 = SeqType.get(ChoiceItemType.get(DATE, STRING), EXACTLY_ONE),
       // (element() | xs:string)
-      c2 = SeqType.get(ChoiceItemType.get(ELEMENT_O, STRING_O), EXACTLY_ONE),
+      c2 = SeqType.get(ChoiceItemType.get(ELEMENT, STRING), EXACTLY_ONE),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS_O, STRING_O), EXACTLY_ONE),
+      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS, STRING), EXACTLY_ONE),
       // (array(*) | xs:string)
-      c4 = SeqType.get(ChoiceItemType.get(ARRAY_O, STRING_O), EXACTLY_ONE),
+      c4 = SeqType.get(ChoiceItemType.get(ARRAY, STRING), EXACTLY_ONE),
       // (map(*) | xs:string)
-      c5 = SeqType.get(ChoiceItemType.get(MAP_O, STRING_O), EXACTLY_ONE),
+      c5 = SeqType.get(ChoiceItemType.get(MAP, STRING), EXACTLY_ONE),
       // (function(*) | xs:string)
-      c6 = SeqType.get(ChoiceItemType.get(FUNCTION_O, STRING_O), EXACTLY_ONE);
+      c6 = SeqType.get(ChoiceItemType.get(FUNCTION, STRING), EXACTLY_ONE);
 
     combine(c1, op);
     combine(c1, DATE_O, DATE_O, op);

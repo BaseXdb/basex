@@ -3805,7 +3805,7 @@ public class QueryParser extends InputParser {
   private SeqType choiceItemType() throws QueryException {
     final ChoiceItemType.Builder builder = new ChoiceItemType.Builder();
     do {
-      builder.add(itemType());
+      builder.add(itemType().type);
     } while(wsConsume("|"));
     check(')');
     return builder.build().seqType();

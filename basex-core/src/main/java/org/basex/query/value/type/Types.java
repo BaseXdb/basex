@@ -149,8 +149,7 @@ public final class Types {
   public static final SeqType BASE64_BINARY_ZM = BASE64_BINARY.seqType(ZERO_OR_MORE);
 
   /** String or xs:hex-binary or xs:base64-binary. */
-  public static final Type STRING_OR_BINARY =
-      ChoiceItemType.get(STRING_O, HEX_BINARY_O, BASE64_BINARY_O);
+  public static final Type STRING_OR_BINARY = ChoiceItemType.get(STRING, HEX_BINARY, BASE64_BINARY);
   /** Single string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_O = STRING_OR_BINARY.seqType();
   /** Zero or one string or xs:hex-binary or xs:base64-binary. */
@@ -188,6 +187,8 @@ public final class Types {
   public static final SeqType NAMESPACE_O = NAMESPACE.seqType();
   /** Processing instruction. */
   public static final SeqType PROCESSING_INSTRUCTION_O = PROCESSING_INSTRUCTION.seqType();
+  /** One text node. */
+  public static final SeqType TEXT_O = TEXT.seqType();
   /** Zero or one text node. */
   public static final SeqType TEXT_ZO = TEXT.seqType(ZERO_OR_ONE);
   /** Zero or more text nodes. */
@@ -204,9 +205,8 @@ public final class Types {
   public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
 
   /** Gregorian type. */
-  public static final Type GREGORIAN = ChoiceItemType.get(DATE_TIME.seqType(), DATE.seqType(),
-      TIME.seqType(), G_YEAR.seqType(), G_YEAR_MONTH.seqType(), G_MONTH.seqType(),
-      G_MONTH_DAY.seqType(), G_DAY.seqType());
+  public static final Type GREGORIAN = ChoiceItemType.get(DATE_TIME, DATE, TIME,
+      G_YEAR, G_YEAR_MONTH, G_MONTH, G_MONTH_DAY, G_DAY);
   /** Zero or one Gregorian. */
   public static final SeqType GREGORIAN_ZO = GREGORIAN.seqType(ZERO_OR_ONE);
 
@@ -250,7 +250,7 @@ public final class Types {
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
 
   /** Map or array. */
-  public static final Type MAP_OR_ARRAY = ChoiceItemType.get(MAP_O, ARRAY_O);
+  public static final Type MAP_OR_ARRAY = ChoiceItemType.get(MAP, ARRAY);
   /** Single map or array. */
   public static final SeqType MAP_OR_ARRAY_O = MAP_OR_ARRAY.seqType();
   /** Zero or more maps or arrays. */
@@ -274,6 +274,27 @@ public final class Types {
   public static final RecordType RECORD = new RecordType(new TokenObjectMap<>(0));
   /** Single empty record. */
   public static final SeqType RECORD_O = RECORD.seqType();
+
+  /** Expansion of xs:numeric for comparison with choice item types. */
+  public static final Type NUMERIC_EXPANSION = ChoiceItemType.get(DOUBLE, FLOAT, DECIMAL);
+  /** Expansion of xs:anyAtomicType for comparison with choice item types. */
+  public static final Type ANY_ATOMIC_TYPE_EXPANSION = ChoiceItemType.get(ANY_URI, BASE64_BINARY,
+      BOOLEAN, DATE, DATE_TIME, DECIMAL, DOUBLE, DURATION, FLOAT, G_DAY, G_MONTH, G_MONTH_DAY,
+      G_YEAR, G_YEAR_MONTH, HEX_BINARY, NOTATION, QNAME, STRING, TIME, UNTYPED_ATOMIC);
+  /** Expansion of node() for comparison with choice item types. */
+  public static final Type NODE_EXPANSION = ChoiceItemType.get(DOCUMENT, ELEMENT, ATTRIBUTE, TEXT,
+      COMMENT, PROCESSING_INSTRUCTION, NAMESPACE);
+  /** Single expansion of node() for comparison with choice item types. */
+  public static final SeqType NODE_EXPANSION_O = NODE_EXPANSION.seqType();
+  /** Expansion of gnode() for comparison with choice item types. */
+  public static final Type GNODE_EXPANSION = ChoiceItemType.get(NODE_EXPANSION, JNODE);
+  /** Single expansion of gnode() for comparison with choice item types. */
+  public static final SeqType GNODE_EXPANSION_O = GNODE_EXPANSION.seqType();
+  /** Expansion of item() for comparison with choice item types. */
+  public static final Type ITEM_EXPANSION = ChoiceItemType.get(GNODE_EXPANSION,
+      ANY_ATOMIC_TYPE_EXPANSION, FUNCTION);
+  /** Single expansion of item() for comparison with choice item types. */
+  public static final SeqType ITEM_EXPANSION_O = ITEM_EXPANSION.seqType();
 
   /** Indexed item types. */
   private static final Type[] TYPES = new Type[Type.ID.LAST.asByte()];

@@ -206,8 +206,8 @@ public final class RecordType extends MapType {
       return true;
     }
     if(type instanceof final ChoiceItemType cit) {
-      for(final SeqType st : cit.types) {
-        if(instanceOf(st.type, pairs)) return true;
+      for(final Type tp : cit.types) {
+        if(instanceOf(tp, pairs)) return true;
       }
       return false;
     }

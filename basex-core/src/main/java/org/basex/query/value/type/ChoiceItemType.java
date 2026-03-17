@@ -4,9 +4,8 @@ import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
-import org.basex.io.in.DataInput;
+import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -19,7 +18,7 @@ import org.basex.util.*;
  */
 public final class ChoiceItemType implements Type {
   /** Alternative item types. */
-  public final List<SeqType> types;
+  public final List<Type> types;
   /** Common ancestor type. */
   private final Type union;
 
@@ -30,13 +29,13 @@ public final class ChoiceItemType implements Type {
    * Constructor.
    * @param types alternative item types
    */
-  private ChoiceItemType(final List<SeqType> types) {
+  private ChoiceItemType(final List<Type> types) {
     this.types = types;
-    Type tp = null;
-    for(final SeqType st : this.types) {
-      tp = tp == null ? st.type : tp.union(st.type);
+    Type ut = null;
+    for(final Type tp : this.types) {
+      ut = ut == null ? tp : ut.union(tp);
     }
-    union = tp;
+    union = ut;
   }
 
   /**
@@ -44,17 +43,17 @@ public final class ChoiceItemType implements Type {
    * @param types alternative item types
    * @return choice item type
    */
-  public static Type get(final SeqType... types) {
+  public static Type get(final Type... types) {
     final Builder builder = new Builder();
-    for(final SeqType st : types) builder.add(st);
+    for(final Type tp : types) builder.add(tp);
     return builder.build();
   }
 
   @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    for(final SeqType st : types) {
-      final Value val = st.cast(item, false, qc, info);
+    for(final Type tp : types) {
+      final Value val = tp.seqType().cast(item, false, qc, info);
       if(val != null) return val;
     }
     throw FUNCCAST_X_X_X.get(info, item.type, this, item);
@@ -63,9 +62,9 @@ public final class ChoiceItemType implements Type {
   @Override
   public Value cast(final Object value, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    for(final SeqType st : types) {
+    for(final Type tp : types) {
       try {
-        return st.type.cast(value, qc, info);
+        return tp.cast(value, qc, info);
       } catch(final QueryException ex) {
         Util.debug(ex);
       }
@@ -90,25 +89,48 @@ public final class ChoiceItemType implements Type {
     return this == type || type instanceof final ChoiceItemType cit && types.equals(cit.types);
   }
 
-  /**
-   * Checks if this choice item type is an instance of the specified sequence type.
-   * @param seqType sequence type to check
-   * @return result of check
-   */
-  public boolean instanceOf(final SeqType seqType) {
-    if(!seqType.one()) throw Util.notExpected();
-    for(final SeqType st : types) {
-      if(!st.instanceOf(seqType)) return false;
+  @Override
+  public boolean instanceOf(final Type type) {
+    final Type norm = expand(type);
+    if(norm instanceof final ChoiceItemType ct) {
+      for(final Type tp : types) {
+        if(!ct.hasInstance(tp)) return false;
+      }
+    } else {
+      for(final Type tp : types) {
+        if(!tp.instanceOf(norm)) return false;
+      }
     }
     return true;
   }
 
-  @Override
-  public boolean instanceOf(final Type type) {
-    for(final SeqType st : types) {
-      if(!st.type.instanceOf(type)) return false;
+  /**
+   * Checks if this choice type is a supertype of the given type.
+   * @param type type to be checked
+   * @return result of check
+   */
+  boolean hasInstance(final Type type) {
+    final Type norm = expand(type);
+    if(norm instanceof final ChoiceItemType ct) return ct.instanceOf(this);
+    for(final Type tp : types) {
+      if(norm.instanceOf(tp)) return true;
     }
-    return true;
+    return false;
+  }
+
+  /**
+   * Expand the given type for comparison with choice item types, if necessary, as specified in the
+   * subtyping rules for choice item types.
+   * @param type type to expand
+   * @return expanded type
+   */
+  private static Type expand(final Type type) {
+    if(type == BasicType.NUMERIC) return Types.NUMERIC_EXPANSION;
+    if(type == BasicType.ANY_ATOMIC_TYPE) return Types.ANY_ATOMIC_TYPE_EXPANSION;
+    if(type == BasicType.ITEM) return Types.ITEM_EXPANSION;
+    if(type == NodeType.NODE) return Types.NODE_EXPANSION;
+    if(type == NodeType.GNODE) return Types.GNODE_EXPANSION;
+    return type;
   }
 
   @Override
@@ -119,9 +141,9 @@ public final class ChoiceItemType implements Type {
   @Override
   public Type intersect(final Type type) {
     final Builder builder = new Builder();
-    for(final SeqType st : types) {
-      final Type tp = type.intersect(st.type);
-      if(tp != null) builder.add(tp.seqType());
+    for(final Type tp : types) {
+      final Type is = type.intersect(tp);
+      if(is != null) builder.add(is);
     }
     return builder.types.isEmpty() ? null : builder.build();
   }
@@ -133,7 +155,7 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean isUntyped() {
-    return union.isNumberOrUntyped();
+    return union.isUntyped();
   }
 
   @Override
@@ -163,41 +185,8 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public boolean nsSensitive() {
-    for(final SeqType st : types) {
-      if(st.type.nsSensitive()) return true;
-    }
-    return false;
-  }
-
-  /**
-   * Checks if the given type is an instance of this type.
-   * @param type type to be checked
-   * @return result of check
-   */
-  boolean hasInstance(final Type type) {
-    for(final SeqType st : types) {
-      if(type.instanceOf(st.type)) return true;
-    }
-    return false;
-  }
-
-  /**
-   * Checks if the given sequence type is an instance of this type.
-   * @param seqType sequence type to be checked
-   * @return result of check
-   */
-  boolean hasInstance(final SeqType seqType) {
-    if(!seqType.one()) throw Util.notExpected();
-    if(seqType.type instanceof final NodeType nt) {
-      if(nt.test instanceof final UnionTest ut) {
-        for(final Test t : ut.tests) {
-          if(!hasInstance(NodeType.get(t))) return false;
-        }
-        return true;
-      }
-    }
-    for(final SeqType st : types) {
-      if(seqType.instanceOf(st)) return true;
+    for(final Type tp : types) {
+      if(tp.nsSensitive()) return true;
     }
     return false;
   }
@@ -219,7 +208,7 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public String toString() {
-    return toString("|", (Object[]) types.toArray(SeqType[]::new));
+    return toString("|", (Object[]) types.toArray(Type[]::new));
   }
 
   /**
@@ -229,66 +218,66 @@ public final class ChoiceItemType implements Type {
    */
   public static final class Builder {
     /** Alternative item types. */
-    private final ArrayList<SeqType> types = new ArrayList<>();
+    private final ArrayList<Type> types = new ArrayList<>();
 
     /**
      * Builds and returns the resulting choice item type.
      * @return choice item type, or the single item type if the list contains only one type
      */
     public Type build() {
-      if(types.size() != 1) types.remove(Types.ERROR_O);
+      if(types.size() != 1) types.remove(BasicType.ERROR);
       return switch(types.size()) {
         case 0 -> throw Util.notExpected();
-        case 1 -> types.get(0).type;
+        case 1 -> types.get(0);
         default -> new ChoiceItemType(types);
       };
     }
 
     /**
-     * Adds the specified sequence type to this builder, merging enum types only if consecutive, and
-     * merging document, element, attribute, and pi types anywhere in the list, ignoring duplicates,
-     * and flattening nested ChoiceItemTypes.
-     * @param st sequence type to be added
+     * Adds the specified type to this builder, merging enum types only if consecutive, and merging
+     * document, element, attribute, and pi types anywhere in the list, ignoring duplicates, and
+     * flattening nested ChoiceItemTypes.
+     * @param type type to be added
      * @return this builder
      */
-    public Builder add(final SeqType st) {
+    public Builder add(final Type type) {
       // flatten nested ChoiceItemTypes
-      if(st.type instanceof ChoiceItemType ct) {
-        for(final SeqType s : ct.types) add(s);
+      if(type instanceof final ChoiceItemType ct) {
+        for(final Type tp : ct.types) add(tp);
         return this;
       }
       // ignore duplicates
-      if(types.contains(st)) return this;
+      if(types.contains(type)) return this;
       // non-mergeable types or first entry
-      final Type.ID id = st.type.id();
+      final Type.ID id = type.id();
       if(types.isEmpty()
           || !id.oneOf(Type.ID.ENM, Type.ID.DOC, Type.ID.ELM, Type.ID.ATT, Type.ID.PI)) {
-        types.add(st);
+        types.add(type);
         return this;
       }
       // enums: merge consecutive entries only, to preserve position of alternatives
       if(id == Type.ID.ENM) {
         final int last = types.size() - 1;
-        final Type tp = types.get(last).type;
+        final Type tp = types.get(last);
         if(tp.id() == Type.ID.ENM) {
           // remove and re-add, for duplicate removal
           types.remove(last);
-          return add(tp.union(st.type).seqType());
+          return add(tp.union(type));
         }
-     // not consecutive: add as-is
-        types.add(st);
+        // not consecutive: add as-is
+        types.add(type);
         return this;
       }
       // nodes (DOC/ELM/ATT/PI): merge with existing alternative of same kind anywhere, in-place
       for(int i = 0; i < types.size(); i++) {
-        final SeqType existing = types.get(i);
-        if(existing.type.id() == id) {
-          types.set(i, existing.type.union(st.type).seqType());
+        final Type existing = types.get(i);
+        if(existing.id() == id) {
+          types.set(i, existing.union(type));
           return this;
         }
       }
       // no existing node kind found
-      types.add(st);
+      types.add(type);
       return this;
     }
   }
