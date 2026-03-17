@@ -121,7 +121,8 @@ public final class CsvW3Converter extends CsvXQueryConverter {
         final QueryContext qc, final InputInfo ii) {
       final VarScope vs = new VarScope();
       final SeqType rowType = POSITIVE_INTEGER_O;
-      final SeqType colType = ChoiceItemType.get(STRING_O, POSITIVE_INTEGER_O).seqType();
+      final SeqType colType = ChoiceItemType.get(BasicType.STRING,
+          BasicType.POSITIVE_INTEGER).seqType();
       final Var row = vs.addNew(new QNm("row"), rowType, qc, ii);
       final Var col = vs.addNew(new QNm("column"), colType, qc, ii);
       final Get get = new Get(ii, rows, columnIndex, new VarRef(ii, row), new VarRef(ii, col));

@@ -134,8 +134,8 @@ public final class SeqType {
    */
   public boolean instance(final Item item, final boolean coerce) {
     if(type instanceof final ChoiceItemType cit) {
-      for(final SeqType tp : cit.types) {
-        if(tp.instance(item, coerce)) return true;
+      for(final Type tp : cit.types) {
+        if(tp.seqType().instance(item, coerce)) return true;
       }
       return false;
     }
@@ -260,9 +260,9 @@ public final class SeqType {
       final CompileContext cc, final InputInfo info) throws QueryException {
 
     if(type instanceof final ChoiceItemType cit) {
-      for(final SeqType st : cit.types) {
+      for(final Type tp : cit.types) {
         try {
-          final Value value = st.coerce(item, name, qc, cc, info);
+          final Value value = tp.seqType().coerce(item, name, qc, cc, info);
           if(value != null) return value;
         } catch(final QueryException ex) {
           Util.debug(ex);
@@ -460,9 +460,8 @@ public final class SeqType {
     // empty sequence: only check cardinality
     if(zero()) return !st.oneOrMore();
     if(!occ.instanceOf(st.occ)) return false;
-    if(type instanceof final ChoiceItemType cit) return cit.instanceOf(st.with(EXACTLY_ONE));
-    if(st.type instanceof final ChoiceItemType cit) return cit.hasInstance(with(EXACTLY_ONE));
-    return type.instanceOf(st.type);
+    return st.type instanceof final ChoiceItemType cit ? cit.hasInstance(type)
+                                                       : type.instanceOf(st.type);
   }
 
   /**

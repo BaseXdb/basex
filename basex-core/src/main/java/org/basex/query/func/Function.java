@@ -238,7 +238,7 @@ public enum Function implements AFunction {
       params(ELEMENT_ZO, MAP_ZO), ITEM_ZO.mapType(BasicType.STRING).seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
   ELEMENT_TO_MAP_PLAN(FnElementToMapPlan::new, "element-to-map-plan(input)",
-      params(ChoiceItemType.get(DOCUMENT_O, ELEMENT_O).seqType(Occ.ZERO_OR_MORE)),
+      params(ChoiceItemType.get(NodeType.DOCUMENT, NodeType.ELEMENT).seqType(Occ.ZERO_OR_MORE)),
       RECORD_O.mapType(BasicType.STRING).seqType()),
   /** XQuery function. */
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
@@ -385,7 +385,7 @@ public enum Function implements AFunction {
   /** XQuery function. */
   IN_SCOPE_NAMESPACES(FnInScopeNamespaces::new, "in-scope-namespaces(element)",
       params(ELEMENT_O),
-      ANY_URI_O.mapType(ChoiceItemType.get(NCNAME_O, EnumType.get("").seqType())).seqType()),
+      ANY_URI_O.mapType(ChoiceItemType.get(BasicType.NCNAME, EnumType.get(""))).seqType()),
   /** XQuery function. */
   IN_SCOPE_PREFIXES(FnInScopePrefixes::new, "in-scope-prefixes(element)",
       params(ELEMENT_O), STRING_ZM),
@@ -511,7 +511,7 @@ public enum Function implements AFunction {
       params(NODE_ZO), QNAME_ZO),
   /** XQuery function. */
   NODE_TYPE_ANNOTATION(FnNodeTypeAnnotation::new, "node-type-annotation(node)",
-      params(ChoiceItemType.get(ELEMENT_O, ATTRIBUTE_O).seqType()),
+      params(ChoiceItemType.get(NodeType.ELEMENT, NodeType.ATTRIBUTE).seqType()),
       Records.SCHEMA_TYPE.get().seqType()),
   /** XQuery function. */
   NORMALIZE_SPACE(FnNormalizeSpace::new, "normalize-space([value])",

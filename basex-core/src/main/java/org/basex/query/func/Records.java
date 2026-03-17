@@ -50,7 +50,7 @@ public enum Records {
     field("column-index", MapType.get(BasicType.STRING, Types.INTEGER_O).seqType(Occ.ZERO_OR_ONE)),
     field("rows", ArrayType.get(Types.STRING_O).seqType(Occ.ZERO_OR_MORE)),
     field("get", FuncType.get(Types.STRING_O, Types.POSITIVE_INTEGER_O,
-      ChoiceItemType.get(Types.POSITIVE_INTEGER_O, Types.STRING_O).seqType()).seqType())),
+      ChoiceItemType.get(BasicType.POSITIVE_INTEGER, BasicType.STRING).seqType()).seqType())),
   /** Record definition. */
   RANDOM_NUMBER_GENERATOR(FN_URI, "random-number-generator"),
   /** Record definition. */
