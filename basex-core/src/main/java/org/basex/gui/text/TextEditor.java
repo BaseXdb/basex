@@ -893,19 +893,26 @@ public final class TextEditor {
   }
 
   /**
-   * Checks if an opening element can automatically be closed.
+   * Tries to close an opening tag.
    * @param sb string builder
    */
   private void closeElem(final StringBuilder sb) {
     final int p = pos;
+    int n = -1;
     while(pos() > 0) {
       final int cp = prev();
-      if(!XMLToken.isNCChar(cp) && cp != ':') {
-        if(cp == '<' && pos < p - 1) {
+      if(cp == '<') {
+        if(n != -1) {
           // add closing element
           next();
-          sb.append("</").append(string(text, pos, p - pos)).append('>');
+          sb.append("</").append(string(text, pos, n - pos)).append('>');
         }
+        break;
+      } else if(XMLToken.isNCChar(cp) || cp == ':') {
+        if(n == -1 && cp != ':') n = pos + 1;
+      } else if(cp != '>' && !(cp == '/' && pos + 1 == p)) {
+        n = -1;
+      } else {
         break;
       }
     }
@@ -923,7 +930,7 @@ public final class TextEditor {
       endSelection();
 
       if(gui.gopts.get(GUIOptions.AUTO)) {
-        if(curr == prev && (curr == '"' || curr == '\'')) {
+        if(curr == prev && (curr == '"' || curr == '\'' || curr == '`')) {
           // remove closing quote
           start++;
         } else {
