@@ -55,11 +55,9 @@ public final class Users {
       options.set(MainOptions.INTPARSE, true);
       options.set(MainOptions.STRIPWS, true);
       final XNode doc = new DBNode(Parser.singleParser(file, options, ""));
-      final XNode root = children(doc, Q_USERS).next();
-      if(root == null) {
-        Util.errln("%: No <%/> root element.", file, Q_USERS);
-      } else {
-        for(final XNode child : children(root)) {
+      if(children(doc, Q_USERS).next() instanceof final XNode root) {
+        for(final GNode gchild : children(root)) {
+          final XNode child = (XNode) gchild;
           final QNm qname = child.qname();
           if(qname.eq(Q_USER)) {
             try {
@@ -81,6 +79,8 @@ public final class Users {
             Util.errln("%: invalid element <%/>.", file, qname);
           }
         }
+      } else {
+        Util.errln("%: No <%/> root element.", file, Q_USERS);
       }
     } catch(final IOException ex) {
       Util.errln(ex);
@@ -95,10 +95,10 @@ public final class Users {
       file.parent().md();
       final FBuilder root = FElem.build(Q_USERS);
       for(final User user : users.values()) {
-        root.add(user.toXml(null, null));
+        root.node(user.toXml(null, null));
       }
       if(info != null) {
-        root.add(info);
+        root.node(info);
         info.parent(null);
       }
       file.write(root.finish().serialize(SerializerMode.INDENT.get()).finish());

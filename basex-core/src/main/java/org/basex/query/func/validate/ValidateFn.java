@@ -91,12 +91,12 @@ abstract class ValidateFn extends StandardFunc {
     final Checks<ErrorInfo> warnings = ei -> ei.level == Level.WARNING;
 
     final FBuilder report = FElem.build(Q_REPORT);
-    report.add(FElem.build(Q_STATUS).add(warnings.all(errors) ? VALID : INVALID));
+    report.node(FElem.build(Q_STATUS).text(warnings.all(errors) ? VALID : INVALID));
     for(final ErrorInfo ei : errors) {
-      final FBuilder error = FElem.build(Q_MESSAGE).add(Q_LEVEL, ei.level);
-      if(ei.line != Integer.MIN_VALUE) error.add(Q_LINE, ei.line);
-      if(ei.column != Integer.MIN_VALUE) error.add(Q_COLUMN, ei.column);
-      report.add(error.add(Q_URL, ei.url).add(ei.message));
+      final FBuilder error = FElem.build(Q_MESSAGE).attr(Q_LEVEL, ei.level);
+      if(ei.line != Integer.MIN_VALUE) error.attr(Q_LINE, ei.line);
+      if(ei.column != Integer.MIN_VALUE) error.attr(Q_COLUMN, ei.column);
+      report.node(error.attr(Q_URL, ei.url).text(ei.message));
     }
     return report.finish();
   }

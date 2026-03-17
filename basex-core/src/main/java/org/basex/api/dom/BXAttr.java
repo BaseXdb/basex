@@ -99,7 +99,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public BXNList getChildNodes() {
-    return new BXNList(new ANodeList().add(text()));
+    return new BXNList(new GNodeList().add(text()));
   }
 
   /**

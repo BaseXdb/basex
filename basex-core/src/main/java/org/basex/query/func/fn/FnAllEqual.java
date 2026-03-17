@@ -22,7 +22,7 @@ import org.basex.util.*;
 public final class FnAllEqual extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, ii, 0));
+    return Bln.get(test(qc, info, 0));
   }
 
   @Override
@@ -47,7 +47,7 @@ public final class FnAllEqual extends StandardFunc {
     if(!defined(1)) {
       final SeqType st = values.seqType();
       final BasicType type = st.type.atomic();
-      if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeFunction())
+      if(st.zero() || st.zeroOrOne() && type != null && !st.mayBeWrapped())
         return cc.voidAndReturn(values, Bln.TRUE, info);
 
       // all-equal(1 to 10) → false

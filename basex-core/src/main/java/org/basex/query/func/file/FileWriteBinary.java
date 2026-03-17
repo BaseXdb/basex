@@ -18,7 +18,7 @@ import org.basex.query.value.seq.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public class FileWriteBinary extends FileFn {
+public class FileWriteBinary extends FileWriteFn {
   @Override
   public Value eval(final QueryContext qc) throws IOException, QueryException {
     write(false, qc);

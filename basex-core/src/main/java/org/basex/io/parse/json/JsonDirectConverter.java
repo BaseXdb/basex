@@ -106,8 +106,8 @@ public final class JsonDirectConverter extends JsonXmlConverter {
   void addValue(final byte[] type, final byte[] value) {
     if(addValues.peek()) {
       final byte[] val = value != null ? shared.token(value) : null;
-      final FBuilder elem = element(type).add(val);
-      if(curr != null) curr.add(elem);
+      final FBuilder elem = element(type).text(val);
+      if(curr != null) curr.node(elem);
       else curr = elem;
     }
   }
@@ -126,7 +126,7 @@ public final class JsonDirectConverter extends JsonXmlConverter {
    */
   private void closeOuter() {
     curr = stack.pop();
-    if(!stack.isEmpty()) curr = stack.peek().add(curr);
+    if(!stack.isEmpty()) curr = stack.peek().node(curr);
   }
 
   /**

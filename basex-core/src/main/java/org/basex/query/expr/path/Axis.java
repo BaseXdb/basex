@@ -17,128 +17,128 @@ public enum Axis {
   /** Ancestor-or-self axis. */
   ANCESTOR_OR_SELF("ancestor-or-self", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.ancestorIter(true);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.ancestorIter(true);
     }
   },
 
   /** Ancestor axis. */
   ANCESTOR("ancestor", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.ancestorIter(false);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.ancestorIter(false);
     }
   },
 
   /** Attribute axis. */
   ATTRIBUTE("attribute", true) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.attributeIter();
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.attributeIter();
     }
   },
 
   /** Child axis. */
   CHILD("child", true) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.childIter();
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.childIter(test, false);
     }
   },
 
   /** Descendant-or-self axis. */
   DESCENDANT_OR_SELF("descendant-or-self", true) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.descendantIter(true);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.descendantIter(true, test);
     }
   },
 
   /** Descendant axis. */
   DESCENDANT("descendant", true) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.descendantIter(false);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.descendantIter(false, test);
     }
   },
 
   /** Following-sibling-or-self axis. */
   FOLLOWING_SIBLING_OR_SELF("following-sibling-or-self", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.followingSiblingIter(true);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.followingSiblingIter(true);
     }
   },
 
   /** Following-sibling axis. */
   FOLLOWING_SIBLING("following-sibling", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.followingSiblingIter(false);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.followingSiblingIter(false);
     }
   },
 
   /** Following axis. */
   FOLLOWING_OR_SELF("following-or-self", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.followingIter(true);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.followingIter(true);
     }
   },
 
   /** Following axis. */
   FOLLOWING("following", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.followingIter(false);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.followingIter(false);
     }
   },
 
   /** Parent axis. */
   PARENT("parent", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.parentIter();
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.parentIter();
     }
   },
 
   /** Preceding-sibling axis. */
   PRECEDING_SIBLING_OR_SELF("preceding-sibling-or-self", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.precedingSiblingIter(true);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.precedingSiblingIter(true);
     }
   },
 
   /** Preceding-sibling axis. */
   PRECEDING_SIBLING("preceding-sibling", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.precedingSiblingIter(false);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.precedingSiblingIter(false);
     }
   },
 
   /** Preceding axis. */
   PRECEDING_OR_SELF("preceding-or-self", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.precedingIter(true);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.precedingIter(true);
     }
   },
 
   /** Preceding axis. */
   PRECEDING("preceding", false) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.precedingIter(false);
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.precedingIter(false);
     }
   },
 
   /** Step axis. */
   SELF("self", true) {
     @Override
-    BasicNodeIter iter(final XNode n) {
-      return n.selfIter();
+    BasicNodeIter iter(final GNode node, final Test test) {
+      return node.selfIter();
     }
   };
 
@@ -159,10 +159,11 @@ public enum Axis {
 
   /**
    * Returns a node iterator.
-   * @param n input node
+   * @param node input node
+   * @param test step
    * @return node iterator
    */
-  abstract BasicNodeIter iter(XNode n);
+  abstract BasicNodeIter iter(GNode node, Test test);
 
   /**
    * Checks if this is one of the specified candidates.

@@ -738,8 +738,8 @@ public final class XQuery4Test extends SandboxTest {
     check("<a><b/></a>/get(#c)", "", type(IterStep.class, "element(c)*"));
     check("<a><b/></a>/get(())", "", empty());
 
-    check("<a><b/></a>/get((#b, 1))", "<b/>", exists(_UTIL_SELECT));
-    check("<a><b/></a>/get((#c, 1))", "", exists(_UTIL_SELECT));
+    check("<a><b/></a>/get((#b, 1))", "<b/>", exists(_UTIL_GET));
+    check("<a><b/></a>/get((#c, 1))", "", exists(_UTIL_GET));
 
     check("<a><b/><c/></a>/get((#c, #b))", "<b/>\n<c/>",
         type(IterStep.class, "(element(c)|element(b))*"));
@@ -747,15 +747,15 @@ public final class XQuery4Test extends SandboxTest {
         type(IterStep.class, "(element(c)|element(b))*"));
 
     check("<a><b/><c/></a>/(c | get(#b))", "<b/>\n<c/>",
-        type(Union.class, "(element(c)|element(b))*"));
+        type(IterStep.class, "(element(c)|element(b))*"));
     check("<a><b/><c/></a>/(get(#c) | b)", "<b/>\n<c/>",
-        type(Union.class, "(element(c)|element(b))*"));
+        type(IterStep.class, "(element(c)|element(b))*"));
     check("<a><b/><c/></a>/(get(xs:QName('c')))", "<c/>",
         type(IterStep.class, "element(c)*"));
     check("<a><b/><c/></a>/(get(xs:QName(<?_ c?>)))", "<c/>",
         exists(CmpSimpleG.class), exists(NODE_NAME));
     check("let $name := #b return <a><b/><c/></a>/(c | get($name))", "<b/>\n<c/>",
-        type(Union.class, "(element(c)|element(b))*"));
+        type(IterStep.class, "(element(c)|element(b))*"));
   }
 
   /** Destructuring let. */

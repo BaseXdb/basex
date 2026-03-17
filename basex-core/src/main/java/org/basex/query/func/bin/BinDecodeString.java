@@ -36,7 +36,7 @@ public final class BinDecodeString extends BinFn {
     }
 
     try {
-      return Str.get(ConvertFn.toString(new ArrayInput(bytes), encoding, true));
+      return Str.get(ConvertFn.toString(new ArrayInput(bytes), encoding, false));
     } catch(final IOException ex) {
       throw BIN_CE_X.get(info, ex);
     }

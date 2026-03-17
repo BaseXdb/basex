@@ -1,6 +1,7 @@
 package org.basex.query.value.type;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.query.*;
@@ -37,12 +38,13 @@ public interface Type {
     /** namespace-node().         */ NSP(16),
     /** schema-element().         */ SCE(17),
     /** schema-attribute().       */ SCA(18),
+    /** jnode().                  */ JND(19),
+    /** gnode().                  */ GND(20),
 
-    // item type
+    // basic types
     /** choice item type.         */ CIT(29),
     /** item().                   */ ITEM(32),
 
-    // basic types
     /** xs:untyped.               */ UTY(33),
     /** xs:anyType.               */ ATY(34),
     /** xs:anySimpleType.         */ AST(35),
@@ -138,6 +140,18 @@ public interface Type {
      */
     public boolean isExtended() {
       return extended;
+    }
+
+    /**
+     * Checks if this is one of the specified IDs.
+     * @param ids IDs
+     * @return result of check
+     */
+    public boolean oneOf(final ID... ids) {
+      for(final ID id : ids) {
+        if(this == id) return true;
+      }
+      return false;
     }
   }
 
@@ -341,6 +355,31 @@ public interface Type {
       }
     }
     return QueryError.similar(qname.prefixId(Token.XML), similar);
+  }
+
+  /**
+   * Returns the node kind.
+   * @return node kind or {@code null})
+   */
+  default Kind kind() {
+    return null;
+  }
+
+  /**
+   * Returns the name of the type.
+   * @return name
+   */
+  Object name();
+
+  /**
+   * Returns a string representation with the specified parameters.
+   * @param separator separator (can be {@code null})
+   * @param params parameters
+   * @return string representation
+   */
+  default String toString(final String separator, final Object... params) {
+    final String name = name().toString().toLowerCase(Locale.ENGLISH).replace('_', '-');
+    return new QueryString().token(name).tokens(params, separator, true).toString();
   }
 
   @Override

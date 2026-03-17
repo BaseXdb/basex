@@ -23,7 +23,7 @@ import org.basex.util.list.*;
 public class DbNodeId extends StandardFunc {
   @Override
   public final Iter iter(final QueryContext qc) throws QueryException {
-    final Iter nodes = arg(0).iter(qc);
+    final Iter nodes = arg(0).unwrappedIter(qc);
     final long size = nodes.size();
 
     return new Iter() {

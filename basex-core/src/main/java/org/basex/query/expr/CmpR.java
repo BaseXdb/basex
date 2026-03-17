@@ -120,7 +120,7 @@ public final class CmpR extends Single {
     expr = expr.simplifyFor(Simplify.NUMBER, cc);
 
     final SeqType st = expr.seqType();
-    single = st.zeroOrOne() && !st.mayBeFunction();
+    single = st.zeroOrOne() && !st.mayBeWrapped();
 
     // position() = .1e0 → false()
     if(Function.POSITION.is(expr)) {
@@ -257,7 +257,7 @@ public final class CmpR extends Single {
         step = path.step(st);
         if(step.axis != Axis.ATTRIBUTE || step.exprs.length > 0) return null;
       }
-      if(!(step.test instanceof final NameTest nt) || nt.local == null) return null;
+      if(!(step.test instanceof final NameTest nt) || nt.name == null) return null;
       test = nt;
     }
 

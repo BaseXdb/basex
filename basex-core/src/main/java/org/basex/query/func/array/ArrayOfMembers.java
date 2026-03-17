@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class ArrayOfMembers extends ArrayFn {
   @Override
   public XQArray item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter input = arg(0).iter(qc);
+    final Iter input = arg(0).unwrappedIter(qc);
 
     final ArrayBuilder ab = new ArrayBuilder(qc, input.size());
     for(Item item; (item = qc.next(input)) != null;) {

@@ -7,7 +7,6 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -28,7 +27,7 @@ final class InvDocTest extends Test {
    * @param data data reference
    */
   private InvDocTest(final IntList pres, final Data data) {
-    super(NodeType.DOCUMENT);
+    super(Kind.DOCUMENT);
     this.pres = pres;
     this.data = data;
   }
@@ -64,7 +63,7 @@ final class InvDocTest extends Test {
   }
 
   @Override
-  public boolean matches(final XNode node) {
+  public boolean matches(final GNode node) {
     // database node, ensure that the PRE value is contained in the target documents
     return node instanceof final DBNode db && data == db.data() &&
         pres.sortedIndexOf(db.pre()) >= 0;
@@ -72,7 +71,12 @@ final class InvDocTest extends Test {
 
   @Override
   public Test intersect(final Test test) {
-    throw Util.notExpected(this);
+    if(test instanceof final InvDocTest dt) {
+      if(equals(dt)) return this;
+    } else if(test instanceof NodeTest || test instanceof UnionTest) {
+      return test.intersect(this);
+    }
+    return null;
   }
 
   @Override
@@ -82,7 +86,7 @@ final class InvDocTest extends Test {
   }
 
   @Override
-  public String toString(final boolean full) {
+  public String toString(final boolean type) {
     return Kind.DOCUMENT.toString("(: ids :)");
   }
 }

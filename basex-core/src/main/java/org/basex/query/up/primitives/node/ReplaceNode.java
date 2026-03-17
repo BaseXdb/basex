@@ -24,7 +24,7 @@ public final class ReplaceNode extends NodeCopy {
    * @param info input info (can be {@code null})
    * @param nodes node copy insertion sequence
    */
-  public ReplaceNode(final int pre, final Data data, final InputInfo info, final ANodeList nodes) {
+  public ReplaceNode(final int pre, final Data data, final InputInfo info, final GNodeList nodes) {
     super(UpdateType.REPLACENODE, pre, data, info, nodes);
   }
 

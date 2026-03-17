@@ -16,10 +16,10 @@ import org.basex.util.*;
 public final class FnSecondsFromDateTime extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
-    if(value.isEmpty()) return Empty.VALUE;
+    final ADate value = toGregorianOrNull(arg(0), qc);
+    if(value == null) return Empty.VALUE;
 
-    final BigDecimal comp = toGregorian(value, qc).sec();
+    final BigDecimal comp = value.sec();
     return comp == null ? Empty.VALUE : Dec.get(comp);
   }
 }

@@ -94,7 +94,7 @@ public abstract class ContextFn extends StandardFunc {
   public final Expr simplifyEbv(final Expr expr, final CompileContext cc,
       final QuerySupplier<Expr> pred) throws QueryException {
     final SeqType st = expr.seqType();
-    if(st.instanceOf(Types.ELEMENT_O) || st.instanceOf(Types.DOCUMENT_NODE_O)) {
+    if(st.instanceOf(Types.ELEMENT_O) || st.instanceOf(Types.DOCUMENT_O)) {
       final Expr[] preds = pred != null ? new Expr[] { pred.get() } : new Expr[0];
       final Expr step = Step.get(cc, expr, info, Axis.DESCENDANT, NodeTest.TEXT, preds);
       return Path.get(cc, info, expr, step);

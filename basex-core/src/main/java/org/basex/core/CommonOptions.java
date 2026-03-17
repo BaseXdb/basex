@@ -42,4 +42,6 @@ public interface CommonOptions {
   StringOption ENCODING = new StringOption("encoding");
   /** Normalize newlines. */
   BooleanOption NORMALIZE_NEWLINES = new BooleanOption("normalize-newlines");
+  /** Fallback. */
+  BooleanOption FALLBACK = new BooleanOption("fallback", false);
 }

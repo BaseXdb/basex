@@ -97,10 +97,10 @@ abstract class JsonXmlConverter extends JsonConverter {
       }
       final int tl = types.length;
       for(int t = 0; t < tl; t++) {
-        if(types[t] != null) curr.add(shared.qName(ATTRS[t]), shared.token(types[t].finish()));
+        if(types[t] != null) curr.attr(shared.qName(ATTRS[t]), shared.token(types[t].finish()));
       }
     }
-    return doc.add(curr).finish();
+    return doc.node(curr).finish();
   }
 
   @Override
@@ -177,7 +177,7 @@ abstract class JsonXmlConverter extends JsonConverter {
    * @param type type
    */
   private void addType(final FBuilder elem, final byte[] type) {
-    if(strings || type != STRING) elem.add(shared.qName(TYPE), type);
+    if(strings || type != STRING) elem.attr(shared.qName(TYPE), type);
   }
 
   /**

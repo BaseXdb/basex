@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.java.*;
+import org.basex.query.util.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
@@ -330,6 +331,11 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
     @Override
     public Expr compile(final CompileContext cc) throws QueryException {
       return expr.compile(cc);
+    }
+
+    @Override
+    public boolean accept(final ASTVisitor visitor) {
+      return expr != null && super.accept(visitor);
     }
 
     @Override

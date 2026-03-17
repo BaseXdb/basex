@@ -26,7 +26,7 @@ public final class IndexFacets extends IndexFn {
     final Data data = toData(qc);
     final String type = toZeroString(arg(1), qc);
 
-    return FDoc.build().add(type.equals(FLAT) ? flat(data, qc) :
+    return FDoc.build().node(type.equals(FLAT) ? flat(data, qc) :
       tree(data, data.paths.root().get(0), qc)).finish();
   }
 
@@ -52,13 +52,13 @@ public final class IndexFacets extends IndexFn {
    * @return element
    */
   private static FBuilder tree(final Data data, final PathNode root, final QueryContext qc) {
-    final QNm qnm = qc.shared.qName(Token.token(XNode.type(root.kind).kind.description()));
+    final QNm qnm = qc.shared.qName(Token.token(XNode.type(root.kind).kind().description()));
     final FBuilder elem = FElem.build(qnm);
     final boolean elm = root.kind == Data.ELEM;
     final Names names = elm ? data.elemNames : data.attrNames;
-    if(root.kind == Data.ATTR || elm) elem.add(Q_NAME, names.key(root.name));
+    if(root.kind == Data.ATTR || elm) elem.attr(Q_NAME, names.key(root.name));
     stats(root.stats, elem);
-    for(final PathNode pn : root.children) elem.add(tree(data, pn, qc));
+    for(final PathNode pn : root.children) elem.node(tree(data, pn, qc));
     return elem;
   }
 
@@ -71,9 +71,9 @@ public final class IndexFacets extends IndexFn {
   private static void index(final Names names, final QNm name, final FBuilder root) {
     final int ns = names.size();
     for(int n = 1; n <= ns; n++) {
-      final FBuilder sub = FElem.build(name).add(Q_NAME, names.key(n));
+      final FBuilder sub = FElem.build(name).attr(Q_NAME, names.key(n));
       stats(names.stats(n), sub);
-      root.add(sub);
+      root.node(sub);
     }
   }
 
@@ -84,12 +84,12 @@ public final class IndexFacets extends IndexFn {
    */
   private static void stats(final Stats stats, final FBuilder elem) {
     final int type = stats.type;
-    if(!isNone(type)) elem.add(Q_TYPE, StatsType.toString(type));
-    elem.add(Q_COUNT, stats.count);
+    if(!isNone(type)) elem.attr(Q_TYPE, StatsType.toString(type));
+    elem.attr(Q_COUNT, stats.count);
     if(isInteger(type) || isDouble(type)) {
       final int mn = (int) stats.min, mx = (int) stats.max;
-      elem.add(Q_MIN, mn == stats.min ? mn : stats.min);
-      elem.add(Q_MAX, mx == stats.max ? mx : stats.max);
+      elem.attr(Q_MIN, mn == stats.min ? mn : stats.min);
+      elem.attr(Q_MAX, mx == stats.max ? mx : stats.max);
     }
     if(isCategory(type)) {
       final TokenIntMap map = stats.values;
@@ -101,7 +101,7 @@ public final class IndexFacets extends IndexFn {
       }
       for(final int o : list.createOrder(false)) {
         final byte[] value = values.get(o);
-        elem.add(FElem.build(Q_ENTRY).add(Q_COUNT, map.get(value)).add(value));
+        elem.node(FElem.build(Q_ENTRY).attr(Q_COUNT, map.get(value)).text(value));
       }
     }
   }

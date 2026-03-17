@@ -5,8 +5,7 @@ import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 
-import java.util.*;
-
+import org.basex.query.value.seq.*;
 import org.basex.util.hash.*;
 
 /**
@@ -123,6 +122,16 @@ public final class Types {
   public static final SeqType TIME_ZO = TIME.seqType(ZERO_OR_ONE);
   /** Zero or one duration. */
   public static final SeqType DURATION_ZO = DURATION.seqType(ZERO_OR_ONE);
+  /** One gYear. */
+  public static final SeqType G_YEAR_O = G_YEAR.seqType();
+  /** One gYearMonth. */
+  public static final SeqType G_YEAR_MONTH_O = G_YEAR_MONTH.seqType();
+  /** One gMonth. */
+  public static final SeqType G_MONTH_O = G_MONTH.seqType();
+  /** One gMonthDay. */
+  public static final SeqType G_MONTH_DAY_O = G_MONTH_DAY.seqType();
+  /** One gDay. */
+  public static final SeqType G_DAY_O = G_DAY.seqType();
 
   /** Single binary. */
   public static final SeqType BINARY_O = BINARY.seqType();
@@ -140,7 +149,7 @@ public final class Types {
   public static final SeqType BASE64_BINARY_ZM = BASE64_BINARY.seqType(ZERO_OR_MORE);
 
   /** String or xs:hex-binary or xs:base64-binary. */
-  public static final ChoiceItemType STRING_OR_BINARY =
+  public static final Type STRING_OR_BINARY =
       ChoiceItemType.get(STRING_O, HEX_BINARY_O, BASE64_BINARY_O);
   /** Single string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_O = STRING_OR_BINARY.seqType();
@@ -164,11 +173,11 @@ public final class Types {
   /** One comment node. */
   public static final SeqType COMMENT_O = COMMENT.seqType();
   /** One document node. */
-  public static final SeqType DOCUMENT_NODE_O = DOCUMENT.seqType();
+  public static final SeqType DOCUMENT_O = DOCUMENT.seqType();
   /** Zero or one document node. */
-  public static final SeqType DOCUMENT_NODE_ZO = DOCUMENT.seqType(ZERO_OR_ONE);
-  /** Zero or more document node. */
-  public static final SeqType DOCUMENT_NODE_ZM = DOCUMENT.seqType(ZERO_OR_MORE);
+  public static final SeqType DOCUMENT_ZO = DOCUMENT.seqType(ZERO_OR_ONE);
+  /** Zero or more document nodes. */
+  public static final SeqType DOCUMENT_ZM = DOCUMENT.seqType(ZERO_OR_MORE);
   /** One element node. */
   public static final SeqType ELEMENT_O = ELEMENT.seqType();
   /** Zero or one element node. */
@@ -176,7 +185,7 @@ public final class Types {
   /** Zero or more element nodes. */
   public static final SeqType ELEMENT_ZM = ELEMENT.seqType(ZERO_OR_MORE);
   /** Namespace node. */
-  public static final SeqType NAMESPACE_NODE_O = NAMESPACE.seqType();
+  public static final SeqType NAMESPACE_O = NAMESPACE.seqType();
   /** Processing instruction. */
   public static final SeqType PROCESSING_INSTRUCTION_O = PROCESSING_INSTRUCTION.seqType();
   /** Zero or one text node. */
@@ -184,14 +193,22 @@ public final class Types {
   /** Zero or more text nodes. */
   public static final SeqType TEXT_ZM = TEXT.seqType(ZERO_OR_MORE);
 
+  /** Zero or one GNode. */
+  public static final SeqType GNODE_ZO = GNODE.seqType(ZERO_OR_ONE);
+  /** Zero or more GNodes. */
+  public static final SeqType GNODE_ZM = GNODE.seqType(ZERO_OR_MORE);
+  /** One or more GNodes. */
+  public static final SeqType GNODE_OM = GNODE.seqType(ONE_OR_MORE);
+
   /** Single NMTOKENS. */
   public static final SeqType NMTOKENS_O = NMTOKENS.seqType();
 
   /** Gregorian type. */
-  public static final SeqType GREGORIAN_ZO = new ChoiceItemType(Arrays.asList(
-      DATE_TIME.seqType(), DATE.seqType(), TIME.seqType(), G_YEAR.seqType(),
-      G_YEAR_MONTH.seqType(), G_MONTH.seqType(), G_MONTH_DAY.seqType(), G_DAY.seqType())).
-      seqType(ZERO_OR_ONE);
+  public static final Type GREGORIAN = ChoiceItemType.get(DATE_TIME.seqType(), DATE.seqType(),
+      TIME.seqType(), G_YEAR.seqType(), G_YEAR_MONTH.seqType(), G_MONTH.seqType(),
+      G_MONTH_DAY.seqType(), G_DAY.seqType());
+  /** Zero or one Gregorian. */
+  public static final SeqType GREGORIAN_ZO = GREGORIAN.seqType(ZERO_OR_ONE);
 
   // types that instantiate sequence types must be placed last to avoid circular dependencies
 
@@ -231,6 +248,23 @@ public final class Types {
   public static final SeqType ARRAY_ZO = ARRAY.seqType(ZERO_OR_ONE);
   /** Zero or more arrays. */
   public static final SeqType ARRAY_ZM = ARRAY.seqType(ZERO_OR_MORE);
+
+  /** Map or array. */
+  public static final Type MAP_OR_ARRAY = ChoiceItemType.get(MAP_O, ARRAY_O);
+  /** Single map or array. */
+  public static final SeqType MAP_OR_ARRAY_O = MAP_OR_ARRAY.seqType();
+  /** Zero or more maps or arrays. */
+  public static final SeqType MAP_OR_ARRAY_ZM = MAP_OR_ARRAY.seqType(Occ.ZERO_OR_MORE);
+
+  /** Single JNode. */
+  public static final SeqType JNODE_O = JNODE.seqType();
+  /** Zero or one JNode. */
+  public static final SeqType JNODE_ZO = JNODE.seqType(ZERO_OR_ONE);
+  /** Zero or more JNodes. */
+  public static final SeqType JNODE_ZM = JNODE.seqType(ZERO_OR_MORE);
+
+  /** Root JNode. */
+  public static final NodeType JNODE_ROOT = NodeType.get(Empty.VALUE, MAP_OR_ARRAY_O);
 
   /** Type of fn:schema-type-record member 'variety'. */
   public static final EnumType SCHEMA_TYPE_RECORD_VARIETY =

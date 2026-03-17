@@ -26,11 +26,17 @@ import org.w3c.dom.Text;
  * @author Christian Gruen
  */
 public enum Kind {
+  /** GNode. */
+  GNODE("gnode", null, ID.GND),
+
+  /** JNode. */
+  JNODE("jnode", GNODE, ID.JND),
+
   /** Node. */
-  NODE("node", ID.NOD),
+  NODE("node", GNODE, ID.NOD),
 
   /** Text. */
-  TEXT("text", ID.TXT) {
+  TEXT("text", NODE, ID.TXT) {
     @Override
     public XNode cast(final Object value, final InputInfo info) {
       if(value instanceof final BXText text) return text.getNode();
@@ -40,7 +46,7 @@ public enum Kind {
   },
 
   /** Processing instruction. */
-  PROCESSING_INSTRUCTION("processing-instruction", ID.PI) {
+  PROCESSING_INSTRUCTION("processing-instruction", NODE, ID.PI) {
     @Override
     public XNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXPI pi) return pi.getNode();
@@ -51,9 +57,9 @@ public enum Kind {
   },
 
   /** Element. */
-  ELEMENT("element", ID.ELM) {
+  ELEMENT("element", NODE, ID.ELM) {
     @Override
-    public XNode cast(final Object value, final InputInfo info) throws QueryException {
+    public GNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXElem elem)
         return elem.getNode();
       if(value instanceof final Element elem)
@@ -67,7 +73,7 @@ public enum Kind {
   },
 
   /** Document. */
-  DOCUMENT("document-node", ID.DOC) {
+  DOCUMENT("document-node", NODE, ID.DOC) {
     @Override
     public XNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXDoc doc) return doc.getNode();
@@ -81,7 +87,7 @@ public enum Kind {
         }
         final byte[] token = Token.token(value);
         return Token.startsWith(token, '<') ? new DBNode(new IOContent(token)) :
-          FDoc.build().add(token).finish();
+          FDoc.build().text(token).finish();
       } catch(final IOException ex) {
         throw NODEERR_X_X.get(info, this, ex);
       }
@@ -89,7 +95,7 @@ public enum Kind {
   },
 
   /** Attribute. */
-  ATTRIBUTE("attribute", ID.ATT) {
+  ATTRIBUTE("attribute", NODE, ID.ATT) {
     @Override
     public XNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXAttr attr) return attr.getNode();
@@ -100,7 +106,7 @@ public enum Kind {
   },
 
   /** Comment. */
-  COMMENT("comment", ID.COM) {
+  COMMENT("comment", NODE, ID.COM) {
     @Override
     public XNode cast(final Object value, final InputInfo info) throws QueryException {
       if(value instanceof final BXComm comm) return comm.getNode();
@@ -111,26 +117,30 @@ public enum Kind {
   },
 
   /** Namespace. */
-  NAMESPACE("namespace-node", ID.NSP),
+  NAMESPACE("namespace-node", NODE, ID.NSP),
 
   /** Schema-element. */
-  SCHEMA_ELEMENT("schema-element", ID.SCE),
+  SCHEMA_ELEMENT("schema-element", NODE, ID.SCE),
 
   /** Schema-attribute. */
-  SCHEMA_ATTRIBUTE("schema-attribute", ID.SCA);
+  SCHEMA_ATTRIBUTE("schema-attribute", NODE, ID.SCA);
 
   /** Name. */
   final byte[] name;
+  /** Parent kind (can be {@code null}). */
+  final Kind parent;
   /** Type ID . */
   final ID id;
 
   /**
    * Constructor.
    * @param name name
+   * @param parent parent kind (can be {@code null})
    * @param id type ID
    */
-  Kind(final String name, final ID id) {
+  Kind(final String name, final Kind parent, final ID id) {
     this.name = Token.token(name);
+    this.parent = parent;
     this.id = id;
   }
 
@@ -160,7 +170,7 @@ public enum Kind {
    * @return cast value
    * @throws QueryException query exception
    */
-  XNode cast(final Object value, final InputInfo info) throws QueryException {
+  GNode cast(final Object value, final InputInfo info) throws QueryException {
     throw FUNCCAST_X_X.get(info, this, value);
   }
 
@@ -177,6 +187,42 @@ public enum Kind {
     final Matcher m = Pattern.compile(pattern).matcher(Token.string(Token.token(value)));
     if(m.find()) return m;
     throw NODEERR_X_X.get(info, this, value);
+  }
+
+  /**
+   * Checks if this is an instance of the specified kind.
+   * @param kind kind to check
+   * @return result of check
+   */
+  public final boolean instanceOf(final Kind kind) {
+    for(Kind k = this; k != null; k = k.parent) {
+      if(k == kind) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Computes the union between this kind and the given one, i.e. the least common ancestor
+   * of both kinds in the hierarchy.
+   * @param kind other kind
+   * @return union kind
+   */
+  public final Kind union(final Kind kind) {
+    if(kind.instanceOf(this)) return this;
+    if(parent != null) return parent.union(kind);
+    return GNODE;
+  }
+
+  /**
+   * Computes the intersection between this kind and the given one, i.e. the least specific kind
+   * that is subkind of both kinds. If no such type exists, {@code null} is returned.
+   * @param kind other kind
+   * @return intersection type or {@code null}
+   */
+  public final Kind intersect(final Kind kind) {
+    if(instanceOf(kind)) return this;
+    if(kind.instanceOf(this)) return kind;
+    return null;
   }
 
   /**
@@ -206,5 +252,10 @@ public enum Kind {
    */
   public String toString(final String arg) {
     return new TokenBuilder().add(name).add('(').add(arg).add(')').toString();
+  }
+
+  @Override
+  public String toString() {
+    return toString("");
   }
 }

@@ -62,8 +62,8 @@ public class CsvW3XmlConverter extends CsvConverter {
 
     final FBuilder elem = FElem.build(Q_FN_FIELD);
     final byte[] name = headers.get(col);
-    if(name != null && name.length > 0) elem.add(Q_COLUMN, name);
-    record.add(elem.add(shared.token(value)));
+    if(name != null && name.length > 0) elem.attr(Q_COLUMN, name);
+    record.node(elem.text(shared.token(value)));
   }
 
   @Override
@@ -78,16 +78,16 @@ public class CsvW3XmlConverter extends CsvConverter {
     final FBuilder root = FElem.build(Q_FN_CSV);
     if(!headers.isEmpty()) {
       final FBuilder columns = FElem.build(Q_FN_COLUMNS);
-      for(final byte[] h : headers) columns.add(FElem.build(Q_FN_COLUMN).add(h));
-      root.add(columns);
+      for(final byte[] h : headers) columns.node(FElem.build(Q_FN_COLUMN).text(h));
+      root.node(columns);
     }
-    return doc.add(root.add(rows)).finish();
+    return doc.node(root.node(rows)).finish();
   }
 
   /**
    * Finishes a record.
    */
   private void finishRecord() {
-    if(record != null) rows.add(record);
+    if(record != null) rows.node(record);
   }
 }

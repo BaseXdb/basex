@@ -37,12 +37,23 @@ public abstract class ParseFn extends StandardFunc {
   }
 
   /**
-   * Returns a format-specific error code for invalid input.
+   * Returns a parser-specific exception.
+   * @param ex original exception
+   * @return embedded or new exception
+   */
+  final QueryException exception(final IOException ex) {
+    if(ex instanceof final QueryIOException qio) {
+      final QueryException qe = qio.getCause();
+      if(qe.error() == QueryError.INVALIDOPTION_X) return qe;
+    }
+    return error().get(info, ex);
+  }
+
+  /**
+   * Returns a parser-specific error.
    * @return error code
    */
-  QueryError error() {
-    return null;
-  }
+  abstract QueryError error();
 
   /**
    * Returns parse options.
@@ -68,11 +79,11 @@ public abstract class ParseFn extends StandardFunc {
 
     final IO io = new IOContent(toBytes(value));
     try(TextInput ti = nl() ? new NewlineInput(io) : new TextInput(io)) {
-      return parse(ti.validate(true), options(qc), qc);
+      return parse(ti.fallback(false), options(qc), qc);
     } catch(final DecodingException ex) {
       throw RECDECODING_X.get(info, ex);
     } catch(final IOException ex) {
-      throw error().get(info, ex);
+      throw exception(ex);
     }
   }
 
@@ -95,6 +106,7 @@ public abstract class ParseFn extends StandardFunc {
     final Options options = options(qc);
     final String enc = toEncodingOrNull(options.get(CommonOptions.ENCODING), RESENCODING_X);
     final String encoding = enc != null ? enc : testResources != null ? testResources[1] : null;
+    final boolean fallback = Boolean.TRUE.equals(options.get((Option<?>) CommonOptions.FALLBACK));
 
     // newline normalization
     Boolean normalize = options.get(CommonOptions.NORMALIZE_NEWLINES);
@@ -107,11 +119,11 @@ public abstract class ParseFn extends StandardFunc {
     // parse text
     try(InputStream is = io.inputStream(); TextInput ti =
         normalize ? new NewlineInput(io, encoding) : new TextInput(io, encoding)) {
-      return parse(ti.validate(true), options, qc);
+      return parse(ti.fallback(fallback), options, qc);
     } catch(final DecodingException ex) {
       throw RECDECODING_X.get(info, ex);
     } catch(final InputException ex) {
-      throw error().get(info, ex);
+      throw exception(ex);
     } catch(final IOException ex) {
       Util.debug(ex);
       throw RESWHICH_X.get(info, io);

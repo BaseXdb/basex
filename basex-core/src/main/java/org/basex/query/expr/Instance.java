@@ -107,7 +107,7 @@ public final class Instance extends Single {
         seqType.type instanceof final NodeType nt) {
       // E[. instance of element(a)] → E[self::a]
       final Test test = nt.test;
-      final Expr step = Step.self(cc, null, info, test != null ? test : NodeTest.get(nt.kind));
+      final Expr step = Step.self(cc, null, info, test != null ? test : NodeTest.get(nt.kind()));
       return step != Empty.VALUE ? Path.get(cc, info, null, step) : Bln.FALSE;
     }
     return this;

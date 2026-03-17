@@ -20,7 +20,7 @@ import org.basex.util.*;
 public final class FnDeepEqual extends StandardFunc {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, ii, 0));
+    return Bln.get(test(qc, info, 0));
   }
 
   @Override
@@ -51,7 +51,7 @@ public final class FnDeepEqual extends StandardFunc {
     final Expr input1 = arg(0), input2 = arg(1);
     if(!defined(2)) {
       // do not compare identical arguments
-      if(!input1.seqType().mayBeFunction() && !input2.seqType().mayBeFunction() &&
+      if(!input1.seqType().mayBeWrapped() && !input2.seqType().mayBeWrapped() &&
           input1.equals(input2) && !input1.has(Flag.NDT)) return Bln.TRUE;
       // reject arguments of different size
       final long size1 = input1.size(), size2 = input2.size();

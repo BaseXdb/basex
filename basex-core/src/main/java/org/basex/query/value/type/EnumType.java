@@ -10,6 +10,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * XQuery enum type.
@@ -198,13 +199,14 @@ public final class EnumType implements Type {
   }
 
   @Override
+  public String name() {
+    return QueryText.ENUM;
+  }
+
+  @Override
   public String toString() {
-    final QueryString qs = new QueryString().token("enum(");
-    int i = 0;
-    for(final byte[] value : values) {
-      if(i++ != 0) qs.token(',').token(' ');
-      qs.quoted(value);
-    }
-    return qs.token(')').toString();
+    final TokenList list = new TokenList();
+    for(final byte[] v : values) list.add(QueryString.toQuoted(v));
+    return toString(", ", (Object[]) list.finish());
   }
 }

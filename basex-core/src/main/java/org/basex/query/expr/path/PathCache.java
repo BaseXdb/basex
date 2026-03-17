@@ -42,8 +42,8 @@ public final class PathCache {
       update(value, null);
       final Expr root = path.root;
       if(root instanceof UtilRoot && root.arg(0) instanceof ContextValue &&
-          context instanceof XNode) {
-        test = v -> v instanceof final XNode n && n.root().equals(((XNode) context).root());
+          context instanceof final XNode xnode) {
+        test = v -> v instanceof final XNode n && n.root().equals(xnode.root());
       } else if(root != null && !root.has(Flag.CTX)) {
         test = v -> true;
       } else if(!(value instanceof DBNode)) {

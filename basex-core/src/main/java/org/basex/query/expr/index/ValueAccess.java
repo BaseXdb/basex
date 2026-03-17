@@ -110,9 +110,9 @@ public final class ValueAccess extends IndexAccess {
     if(c == 1) return iter(cache.key(1), data);
 
     // multiple search terms: collect results, return result iterator
-    final ANodeBuilder nodes = new ANodeBuilder();
+    final GNodeBuilder nodes = new GNodeBuilder();
     for(final byte[] token : cache) {
-      for(final XNode node : iter(token, data)) {
+      for(final GNode node : iter(token, data)) {
         qc.checkStop();
         nodes.add(node);
       }
@@ -300,7 +300,7 @@ public final class ValueAccess extends IndexAccess {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final ValueAccess va && type == va.type &&
-        Objects.equals(tokens, va.tokens) && expr.equals(obj) &&
+        Objects.equals(tokens, va.tokens) && expr.equals(va.expr) &&
         Objects.equals(test, va.test) && super.equals(obj);
   }
 

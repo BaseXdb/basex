@@ -49,10 +49,10 @@ final class RESTRetrieve extends RESTCmd {
       final FBuilder root;
       final Command cmd;
       if(db) {
-        root = FElem.build(RESTText.Q_DATABASES).declareNS();
+        root = FElem.build(RESTText.Q_DATABASES).ns();
         cmd = new List();
       } else {
-        root = FElem.build(RESTText.Q_DATABASE).declareNS().add(RESTText.Q_NAME, database);
+        root = FElem.build(RESTText.Q_DATABASE).ns().attr(RESTText.Q_NAME, database);
         cmd = new Dir(path);
       }
       final Table table = new Table(run(cmd));
@@ -62,9 +62,9 @@ final class RESTRetrieve extends RESTCmd {
           dir ? RESTText.Q_DIR : RESTText.Q_RESOURCE);
         if(!dir) {
           final int ll = list.size() - (db ? 1 : 0);
-          for(int l = 1; l < ll; l++) elem.add(new QNm(lc(table.header.get(l))), list.get(l));
+          for(int l = 1; l < ll; l++) elem.attr(new QNm(lc(table.header.get(l))), list.get(l));
         }
-        root.add(elem.add(list.get(0)));
+        root.node(elem.text(list.get(0)));
       }
 
       conn.initResponse();

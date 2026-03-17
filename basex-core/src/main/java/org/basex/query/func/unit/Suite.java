@@ -57,6 +57,6 @@ public final class Suite {
       skipped += unit.skipped;
       tests += unit.tests;
     }
-    return suites.add(Q_TIME, Unit.time(perf)).finish();
+    return suites.attr(Q_TIME, Unit.time(perf)).finish();
   }
 }

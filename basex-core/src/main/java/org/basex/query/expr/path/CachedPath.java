@@ -1,7 +1,5 @@
 package org.basex.query.expr.path;
 
-import static org.basex.query.QueryError.*;
-
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -37,7 +35,7 @@ public final class CachedPath extends AxisPath {
 
   @Override
   protected Value nodes(final QueryContext qc) throws QueryException {
-    final ANodeBuilder list = new ANodeBuilder();
+    final GNodeBuilder list = new GNodeBuilder();
 
     final QueryFocus focus = qc.focus, qf = new QueryFocus();
     final Value rt = root != null ? root.value(qc) : focus.value;
@@ -46,8 +44,6 @@ public final class CachedPath extends AxisPath {
       if(rt != null) {
         final Iter iter = rt.iter(qc);
         for(Item item; (item = iter.next()) != null;) {
-          if(root != null && !(item instanceof XNode))
-            throw PATHNODE_X_X_X.get(info, steps[0], item.type, item);
           qf.value = item;
           iterate(0, list, qc);
         }
@@ -67,17 +63,17 @@ public final class CachedPath extends AxisPath {
    * @param qc query context
    * @throws QueryException query exception
    */
-  private void iterate(final int step, final ANodeBuilder list, final QueryContext qc)
+  private void iterate(final int step, final GNodeBuilder list, final QueryContext qc)
       throws QueryException {
 
     // cast is safe (steps will always return a {@link NodeIter} instance)
     final NodeIter ni = (NodeIter) steps[step].iter(qc);
     if(step + 1 == steps.length) {
-      for(XNode node; (node = ni.next()) != null;) {
+      for(GNode node; (node = ni.next()) != null;) {
         list.add(node);
       }
     } else {
-      for(XNode node; (node = ni.next()) != null;) {
+      for(GNode node; (node = ni.next()) != null;) {
         qc.focus.value = node;
         iterate(step + 1, list, qc);
       }

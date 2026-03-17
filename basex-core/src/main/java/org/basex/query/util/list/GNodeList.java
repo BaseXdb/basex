@@ -18,11 +18,11 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ANodeList extends ObjectList<XNode, ANodeList> {
+public final class GNodeList extends ObjectList<GNode, GNodeList> {
   /**
    * Constructor.
    */
-  public ANodeList() {
+  public GNodeList() {
     this(1);
   }
 
@@ -30,8 +30,8 @@ public final class ANodeList extends ObjectList<XNode, ANodeList> {
    * Constructor with initial capacity.
    * @param capacity array capacity
    */
-  public ANodeList(final long capacity) {
-    super(new XNode[Array.initialCapacity(capacity)]);
+  public GNodeList(final long capacity) {
+    super(new GNode[Array.initialCapacity(capacity)]);
   }
 
   /**
@@ -48,16 +48,16 @@ public final class ANodeList extends ObjectList<XNode, ANodeList> {
         return size;
       }
       @Override
-      public XNode next() {
+      public GNode next() {
         return pos < size ? list[pos++] : null;
       }
       @Override
-      public XNode get(final long i) {
+      public GNode get(final long i) {
         return list[(int) i];
       }
       @Override
       public Value value(final QueryContext qc, final Expr expr) {
-        return ItemSeq.get(list, size, NodeType.NODE.refine(expr));
+        return ItemSeq.get(list, size, NodeType.GNODE.refine(expr));
       }
     };
   }
@@ -66,24 +66,24 @@ public final class ANodeList extends ObjectList<XNode, ANodeList> {
    * Invalidates all entries that are not referenced in the list.
    * @return the iterator
    */
-  public ANodeList clean() {
+  public GNodeList clean() {
     Arrays.fill(list, size, list.length, null);
     return this;
   }
 
   @Override
-  public boolean equals(final XNode node1, final XNode node2) {
+  public boolean equals(final GNode node1, final GNode node2) {
     return node1.is(node2);
   }
 
   @Override
-  protected XNode[] newArray(final int s) {
-    return new XNode[s];
+  protected GNode[] newArray(final int s) {
+    return new GNode[s];
   }
 
   @Override
   public boolean equals(final Object obj) {
-    return obj == this || obj instanceof ANodeList && super.equals(obj);
+    return obj == this || obj instanceof GNodeList && super.equals(obj);
   }
 
   /**
@@ -91,7 +91,7 @@ public final class ANodeList extends ObjectList<XNode, ANodeList> {
    * @param nodes nodes
    * @return the iterator
    */
-  public static BasicNodeIter iter(final XNode[] nodes) {
+  public static BasicNodeIter iter(final GNode[] nodes) {
     final int nl = nodes.length;
     return nl == 0 ? BasicNodeIter.EMPTY : new BasicNodeIter() {
       int pos;
@@ -101,16 +101,16 @@ public final class ANodeList extends ObjectList<XNode, ANodeList> {
         return nl;
       }
       @Override
-      public XNode next() {
+      public GNode next() {
         return pos < nl ? nodes[pos++] : null;
       }
       @Override
-      public XNode get(final long i) {
+      public GNode get(final long i) {
         return nodes[(int) i];
       }
       @Override
       public Value value(final QueryContext qc, final Expr expr) {
-        return ItemSeq.get(nodes, nl, NodeType.NODE.refine(expr));
+        return ItemSeq.get(nodes, nl, NodeType.GNODE.refine(expr));
       }
     };
   }

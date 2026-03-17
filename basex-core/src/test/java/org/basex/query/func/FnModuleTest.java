@@ -16,7 +16,6 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.expr.constr.*;
 import org.basex.query.expr.gflwor.*;
-import org.basex.query.expr.path.*;
 import org.basex.query.func.prof.ProfType.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -364,6 +363,80 @@ public final class FnModuleTest extends SandboxTest {
 
     // optimize ebv
     check("([], [])[. instance of xs:int][" + func.args(" .") + "]", "", empty(EXISTS));
+  }
+
+  /** Test method. */
+  @Test public void buildDateTime() {
+    final Function func = BUILD_DATETIME;
+    query(func.args(" ()"), "");
+    // examples from the spec
+    query(func.args(" { \"year\": 1999, \"month\": 5, \"day\": 31,"
+        + " \"hours\": 13, \"minutes\": 20, \"seconds\": 0,"
+        + " \"timezone\": xs:dayTimeDuration('-PT5H') }"),
+        "1999-05-31T13:20:00-05:00");
+    query(func.args(" {\"hours\": 13, \"minutes\": 30, \"seconds\": 4.2678}"),
+        "13:30:04.2678");
+    query(func.args(" { \"year\": 2007, \"month\": 5,"
+        + " \"timezone\": xs:dayTimeDuration('PT0S') }"),
+        "2007-05Z");
+    // xs:dateTime
+    query(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 3,"
+        + " \"hours\": 14, \"minutes\": 41, \"seconds\": 56.789,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "2026-03-03T14:41:56.789+01:00");
+    // xs:date
+    query(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "2026-03-03+01:00");
+    query(func.args(" {\"year\": -1, \"month\": 1, \"day\": 1}"),
+        "-0001-01-01");
+    // xs:time
+    query(func.args(" {\"hours\": 14, \"minutes\": 41, \"seconds\": 56.789,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "14:41:56.789+01:00");
+    // xs:gYear
+    query(func.args(" {\"year\": 2026,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "2026+01:00");
+    // xs:gYearMonth
+    query(func.args(" {\"year\": 2026, \"month\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "2026-03+01:00");
+    // xs:gMonth
+    query(func.args(" {\"month\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "--03+01:00");
+    // xs:gMonthDay
+    query(func.args(" {\"month\": 3, \"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "--03-03+01:00");
+    // xs:gDay
+    query(func.args(" {\"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
+        "---03+01:00");
+    query(func.args(" dateTime-record(day:=4)"), "---04");
+
+    // empty map
+    error(func.args(" {}"), INVDATETIMEFIELDS_X);
+    // invalid field set (year+day without month)
+    error(func.args(" {\"year\": 2026, \"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEFIELDS_X);
+    // invalid field set (hours+minutes without seconds)
+    error(func.args(" {\"hours\": 14, \"minutes\": 41,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEFIELDS_X);
+    // out of range component (minutes)
+    error(func.args(" {\"hours\": 14, \"minutes\": 60, \"seconds\": 0,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEVALUE_X_X);
+    // invalid year (0)
+    error(func.args(" {\"year\": 0}"), INVDATETIMEVALUE_X_X);
+    // invalid date (March 0)
+    error(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 0,"
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEVALUE_X_X);
+    // invalid date (February 29, 2026)
+    error(func.args(" {\"year\": 2026, \"month\": 2, \"day\": 29}"), INVDATETIMEVALUE_X_X);
+    // invalid timezone (+15:00)
+    error(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 3,"
+        + " \"timezone\": xs:dayTimeDuration('PT15H') }"), INVDATETIMEVALUE_X_X);
   }
 
   /** Test method. */
@@ -2751,6 +2824,67 @@ return
   }
 
   /** Test method. */
+  @Test public void partsOfDateTime() {
+    final Function func = PARTS_OF_DATETIME;
+    query(func.args(" ()"), "");
+    // examples from the spec
+    query(func.args(" xs:dateTime('1999-05-31T13:20:00-05:00')"),
+        "{\"year\":1999,\"month\":5,\"day\":31,\"hours\":13,\"minutes\":20,"
+      + "\"seconds\":0,\"timezone\":\"-PT5H\"}");
+    query(func.args(" xs:time('13:30:04.2678')"),
+        "{\"year\":(),\"month\":(),\"day\":(),\"hours\":13,\"minutes\":30,"
+      + "\"seconds\":4.2678,\"timezone\":()}");
+    query(func.args(" xs:gYearMonth('2007-05Z')"),
+        "{\"year\":2007,\"month\":5,\"day\":(),\"hours\":(),\"minutes\":(),"
+      + "\"seconds\":(),\"timezone\":\"PT0S\"}");
+    // xs:dateTime
+    query(func.args(" text{'2026-02-25T18:29:30.456+01:00'}"),
+        "{\"year\":2026,\"month\":2,\"day\":25,"
+      + "\"hours\":18,\"minutes\":29,\"seconds\":30.456,"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:date
+    query(func.args(" text{'2026-02-25+01:00'}"),
+        "{\"year\":2026,\"month\":2,\"day\":25,"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:time
+    query(func.args(" text{'18:29:30.456+01:00'}"),
+        "{\"year\":(),\"month\":(),\"day\":(),"
+      + "\"hours\":18,\"minutes\":29,\"seconds\":30.456,"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gYear
+    query(func.args(" text{'2026+01:00'}"),
+        "{\"year\":2026,\"month\":(),\"day\":(),"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gYearMonth
+    query(func.args(" text{'2026-02+01:00'}"),
+        "{\"year\":2026,\"month\":2,\"day\":(),"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gMonth
+    query(func.args(" text{'--02+01:00'}"),
+        "{\"year\":(),\"month\":2,\"day\":(),"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gMonthDay
+    query(func.args(" text{'--02-25+01:00'}"),
+        "{\"year\":(),\"month\":2,\"day\":25,"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+    // xs:gDay
+    query(func.args(" text{'---25+01:00'}"),
+        "{\"year\":(),\"month\":(),\"day\":25,"
+      + "\"hours\":(),\"minutes\":(),\"seconds\":(),"
+      + "\"timezone\":\"PT1H\"}");
+
+    error(func.args(" text{'not-a-date'}"), INVTYPE_X);
+    error(func.args(" text{'2026-02-30T18:29:30+01:00'}"), INVTYPE_X);
+    error(func.args(" text{'2026-02-25T18:29:30+15:00'}"), INVTYPE_X);
+    error(func.args(" text{'--13'}"), INVTYPE_X);
+  }
+
+  /** Test method. */
   @Test public void randomNumberGenerator() {
     final Function func = RANDOM_NUMBER_GENERATOR;
 
@@ -3307,8 +3441,7 @@ return
     check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(func));
     check("for $s in ('a', 'b') return $s[" + func.args() + ']', "a\nb", empty(func));
     check("for $s in ('a', 'b') return $s[" + func.args() + " = 'a']", "a", empty(func));
-    check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "",
-        empty(func), exists(SingleIterPath.class), root(DualIterMap.class));
+    check("for $s in (<a/>, <b/>) return $s[" + func.args() + ']', "", empty(func));
 
     check(func.args(" 'x' || " + wrap("x")), "xx", empty(func));
     check("('x' || " + wrap("x") + ") => " + func.args(), "xx", empty(func));

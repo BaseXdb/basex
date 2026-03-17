@@ -82,6 +82,20 @@ public abstract class Item extends Value {
     return this;
   }
 
+  /**
+   * {@inheritDoc}
+   * Overwritten by {@link JNode}.
+   */
+  @Override
+  public Iter unwrappedIter(final QueryContext qc) throws QueryException {
+    return iter();
+  }
+
+  @Override
+  public Value unwrappedValue(final QueryContext qc) {
+    return this;
+  }
+
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
@@ -250,7 +264,7 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link XNode}.
+   * Overwritten by {@link XQArray}, {@link XQMap}, {@link FuncItem} and {@link XNode}.
    */
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -259,7 +273,7 @@ public abstract class Item extends Value {
 
   /**
    * {@inheritDoc}
-   * Overwritten by {@link XQArray}, {@link FuncItem} and {@link XNode}.
+   * Overwritten by {@link XQArray}, {@link XQMap}, {@link FuncItem} and {@link XNode}.
    */
   @Override
   public Item atomItem(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -267,7 +281,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Item materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
+  public Value materialize(final Predicate<Data> test, final InputInfo ii, final QueryContext qc)
       throws QueryException {
     return this;
   }
@@ -309,7 +323,7 @@ public abstract class Item extends Value {
 
   @Override
   public final boolean ddo() {
-    return type instanceof NodeType;
+    return true;
   }
 
   /**

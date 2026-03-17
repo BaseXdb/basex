@@ -17,21 +17,12 @@ import org.basex.query.value.type.*;
 public final class FnSiblings extends ContextFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
-    final XNode node = toNodeOrNull(context(qc), qc);
+    final GNode node = toGNodeOrNull(context(qc), qc);
     if(node == null) return Empty.ITER;
 
-    final XNode parent = node.parent();
-    if(node.kind().oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE) || parent == null)
-      return node.iter();
-
-    final Iter iter = parent.childIter();
-    return new NodeIter() {
-      @Override
-      public XNode next() throws QueryException {
-        qc.checkStop();
-        return (XNode) iter.next();
-      }
-    };
+    final GNode parent = node.parent();
+    return parent == null || node.kind().oneOf(Kind.ATTRIBUTE, Kind.NAMESPACE) ? node.iter() :
+      parent.childIter();
   }
 
   @Override

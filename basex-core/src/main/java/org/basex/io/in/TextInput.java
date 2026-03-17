@@ -19,8 +19,8 @@ import org.basex.util.*;
 public class TextInput extends BufferInput {
   /** Decoder. */
   private TextDecoder decoder;
-  /** Indicates if the input is to be checked for valid XML 1.0.5 characters. */
-  private boolean validate;
+  /** Replace invalid input with Unicode replacement character. */
+  private boolean fallback = true;
 
   /**
    * Constructor.
@@ -105,9 +105,9 @@ public class TextInput extends BufferInput {
    * @param flag flag to be set
    * @return self reference
    */
-  public TextInput validate(final boolean flag) {
-    validate = flag;
-    decoder.validate = flag;
+  public TextInput fallback(final boolean flag) {
+    fallback = flag;
+    decoder.fallback = flag;
     return this;
   }
 
@@ -122,7 +122,7 @@ public class TextInput extends BufferInput {
       final String enc = normEncoding(encoding, false);
       decoder = TextDecoder.get(enc != UTF16 ? enc :
         decoder.encoding.equals(UTF16LE) ? UTF16LE : UTF16BE);
-      decoder.validate = validate;
+      decoder.fallback = fallback;
     }
     return this;
   }
@@ -144,8 +144,8 @@ public class TextInput extends BufferInput {
   public int read() throws IOException {
     final int cp = decoder.read(this);
     if(cp != -1 && !XMLToken.valid(cp)) {
-      if(validate) throw new InputException(cp);
-      return Token.REPLACEMENT;
+      if(fallback) return Token.REPLACEMENT;
+      throw new InputException(cp);
     }
     return cp;
   }

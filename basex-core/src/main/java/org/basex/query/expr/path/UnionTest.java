@@ -21,36 +21,39 @@ public final class UnionTest extends Test {
    * Constructor.
    * @param tests tests
    */
-  public UnionTest(final Test[] tests) {
-    super(unionType(tests));
+  public UnionTest(final Test... tests) {
+    super(unionKind(tests));
     this.tests = tests;
   }
 
   /**
-   * Calculate union type of tests.
-   * @param tests tests
-   * @return union type
+   * Computes the supertype of the specified tests.
+   * @param tests one or more tests
+   * @return union kind
    */
-  private static NodeType unionType(final Test[] tests) {
-    Type type = tests[0].type;
-    for(int i = 1; i < tests.length; ++i) {
-      type = type.union(tests[i].type);
+  private static Kind unionKind(final Test[] tests) {
+    Kind kind = tests[0].kind;
+    for(int i = 1; i < tests.length && kind != Kind.GNODE; ++i) {
+      final Kind kn = tests[i].kind;
+      if(kn != kind) {
+        kind = kn == Kind.JNODE || kind == Kind.JNODE ? Kind.GNODE : Kind.NODE;
+      }
     }
-    return (NodeType) type;
+    return kind;
   }
 
   @Override
-  public Test optimize(final Data data) {
-    final ArrayList<Test> list = new ArrayList<>();
+  public Test optimize(final Kind kn, final Data data) {
+    final ArrayList<Test> list = new ArrayList<>(tests.length);
     for(final Test test : tests) {
-      final Test t = test.optimize(data);
+      final Test t = test.optimize(kn, data);
       if(t != null) list.add(t);
     }
-    return tests.length != list.size() ? get(list) : this;
+    return get(list);
   }
 
   @Override
-  public boolean matches(final XNode node) {
+  public boolean matches(final GNode node) {
     for(final Test test : tests) {
       if(test.matches(node)) return true;
     }
@@ -58,12 +61,10 @@ public final class UnionTest extends Test {
   }
 
   @Override
-  public Boolean matches(final SeqType seqType) {
-    final Type tp = seqType.type;
-    if(tp.intersect(type) == null) return Boolean.FALSE;
+  public Boolean subsumes(final Type type) {
     for(final Test test : tests) {
-      final Boolean matches = test.matches(seqType);
-      if(matches != Boolean.FALSE) return matches;
+      final Boolean b = test.subsumes(type);
+      if(b != Boolean.FALSE) return b;
     }
     return Boolean.FALSE;
   }
@@ -75,26 +76,21 @@ public final class UnionTest extends Test {
 
   @Override
   public boolean instanceOf(final Test test) {
+    if(this == test) return true;
+    final UnionTest ut = test instanceof final UnionTest t ? t : null;
     for(final Test t : tests) {
-      if(!t.instanceOf(test)) return false;
+      if(ut != null) {
+        if(!((Checks<Test>) ts -> t.instanceOf(ts)).any(ut.tests)) return false;
+      } else {
+        if(!t.instanceOf(test)) return false;
+      }
     }
     return true;
   }
 
-  /**
-   * Checks if the specified test is an instance of this test.
-   * @param test test to be checked
-   * @return result of check
-   */
-  boolean instance(final Test test) {
-    for(final Test t : tests) {
-      if(test.instanceOf(t)) return true;
-    }
-    return false;
-  }
-
   @Override
   public Test intersect(final Test test) {
+    if(this == test) return this;
     final ArrayList<Test> list = new ArrayList<>(tests.length);
     for(final Test t : tests) {
       final Test t2 = t.intersect(test);
@@ -109,13 +105,12 @@ public final class UnionTest extends Test {
   }
 
   @Override
-  public String toString(final boolean full) {
+  public String toString(final boolean type) {
     final TokenBuilder tb = new TokenBuilder();
-    char ch = '(';
     for(final Test test : tests) {
-      tb.add(ch).add(test.toString(full || test.type.kind == Kind.ATTRIBUTE));
-      ch = '|';
+      if(!tb.isEmpty()) tb.add('|');
+      tb.add(test.toString(type));
     }
-    return tb.add(')').toString();
+    return type ? "(" + tb + ")" : tb.toString();
   }
 }

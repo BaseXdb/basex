@@ -12,19 +12,19 @@ import org.w3c.dom.*;
  */
 class BXNList implements NodeList {
   /** XQuery node set. */
-  final ANodeList nodes;
+  final GNodeList nodes;
 
   /**
    * Constructor.
    * @param nodes nodes
    */
-  BXNList(final ANodeList nodes) {
+  BXNList(final GNodeList nodes) {
     this.nodes = nodes;
   }
 
   @Override
   public BXNode item(final int index) {
-    XNode n = null;
+    GNode n = null;
     if(index < nodes.size()) n = nodes.get(index);
     return n != null ? BXNode.get(n) : null;
   }

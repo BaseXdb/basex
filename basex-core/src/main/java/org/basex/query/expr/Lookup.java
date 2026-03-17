@@ -10,6 +10,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -55,7 +56,7 @@ public final class Lookup extends Arr {
     final SeqType kt = keys.seqType();
     final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
     Occ occ = st.occ;
-    if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeFunction()) {
+    if(inputs.size() != 1 || keys == WILDCARD || !kt.one() || kt.mayBeWrapped()) {
       // key is wildcard, or expressions yield no single item
       occ = occ.union(Occ.ZERO_OR_MORE);
     } else if(map) {
@@ -75,7 +76,7 @@ public final class Lookup extends Arr {
   private Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = exprs[0], keys = exprs[1];
     final long is = input.size();
-    final long ks = keys.seqType().mayBeFunction() || keys.has(Flag.NDT) ? -1 : keys.size();
+    final long ks = keys.seqType().mayBeWrapped() || keys.has(Flag.NDT) ? -1 : keys.size();
     if(ks == 0) return keys;
 
     final Type it = input.seqType().type;
@@ -136,16 +137,6 @@ public final class Lookup extends Arr {
     };
   }
 
-  @Override
-  public Value value(final QueryContext qc) throws QueryException {
-    final ValueBuilder vb = new ValueBuilder(qc);
-    final Iter iter = exprs[0].iter(qc);
-    for(Item item; (item = qc.next(iter)) != null;) {
-      vb.add(valueFor(item, qc));
-    }
-    return vb.value(this);
-  }
-
   /**
    * Returns the looked up values for the specified input.
    * @param item input item
@@ -154,7 +145,9 @@ public final class Lookup extends Arr {
    * @throws QueryException query exception
    */
   private Value valueFor(final Item item, final QueryContext qc) throws QueryException {
-    if(!(item instanceof final XQStruct struct)) throw LOOKUP_X.get(info, item);
+    Item it = item;
+    if(it instanceof final JNode jnode) it = jnode.value.item(qc, info);
+    if(!(it instanceof final XQStruct struct)) throw LOOKUP_X.get(info, it);
     final Expr keys = exprs[1];
 
     // wildcard: add all values

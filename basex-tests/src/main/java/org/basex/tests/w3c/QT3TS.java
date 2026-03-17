@@ -39,6 +39,8 @@ import org.basex.util.options.Options.*;
 public final class QT3TS extends Main {
   /** EQName pattern. */
   private static final Pattern BIND = Pattern.compile("^Q\\{(.*?)\\}(.+)$");
+  /** Sandbox for databases. */
+  private static final IOFile SANDPIT = new IOFile(Prop.TEMPDIR, "qt");
 
   /** Path to the test suite (ignored if {@code null}). */
   private String basePath;
@@ -113,8 +115,8 @@ public final class QT3TS extends Main {
    * @throws Exception exception
    */
   private void run() throws Exception {
-    final IOFile sandbox = new IOFile(TEMPDIR, "tests");
-    ctx.soptions.set(StaticOptions.DBPATH, sandbox + "/data");
+    SANDPIT.md();
+    ctx.soptions.set(StaticOptions.DBPATH, SANDPIT + "data");
     parseArgs();
 
     final Performance perf = new Performance();
@@ -180,7 +182,7 @@ public final class QT3TS extends Main {
     }
 
     ctx.close();
-    sandbox.delete();
+    SANDPIT.delete();
   }
 
   /**
@@ -467,8 +469,7 @@ public final class QT3TS extends Main {
       // directory with test files
       if(env.sandpit) {
         final Path source = init ? Paths.get(baseURI.replaceAll("\\w+\\.xml$", "sandpit")) : null;
-        final Path target = Paths.get(Prop.TEMPDIR, "sandpit");
-        query.sandpit(source, target);
+        query.sandpit(source, SANDPIT);
       }
     }
     return query;

@@ -21,6 +21,23 @@ public final class XQueryException extends RuntimeException {
   }
 
   /**
+   * Constructor.
+   * @param ex exception
+   */
+  public XQueryException(final Exception ex) {
+    super(new QueryException(ex));
+    Util.debug(ex);
+  }
+
+  /**
+   * Constructor.
+   * @param msg message
+   */
+  public XQueryException(final String msg) {
+    super(new QueryException(msg));
+  }
+
+  /**
    * Returns the causing query exception.
    * @return query exception
    */

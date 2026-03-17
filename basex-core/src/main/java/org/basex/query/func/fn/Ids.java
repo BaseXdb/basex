@@ -53,7 +53,7 @@ abstract class Ids extends ContextFn {
       }
     }
 
-    final ANodeBuilder results = new ANodeBuilder();
+    final GNodeBuilder results = new GNodeBuilder();
     final boolean idref = idref();
     if(index(root, idref)) {
       // create index iterator
@@ -99,9 +99,9 @@ abstract class Ids extends ContextFn {
    * @param results node cache
    * @param node current node
    */
-  private void add(final TokenSet idSet, final ANodeBuilder results, final XNode node) {
+  private void add(final TokenSet idSet, final GNodeBuilder results, final GNode node) {
     final boolean idref = idref();
-    for(final XNode attr : node.attributeIter()) {
+    for(final GNode attr : node.attributeIter()) {
       if(XMLToken.isId(attr.name(), idref)) {
         // ID/IDREF found
         boolean found = false;
@@ -113,7 +113,7 @@ abstract class Ids extends ContextFn {
         }
       }
     }
-    for(final XNode child : node.childIter()) {
+    for(final GNode child : node.childIter()) {
       add(idSet, results, child);
     }
   }

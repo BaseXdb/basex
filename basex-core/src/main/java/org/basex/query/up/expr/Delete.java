@@ -3,7 +3,6 @@ package org.basex.query.up.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
-import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -34,14 +33,14 @@ public final class Delete extends Update {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = arg(0).iter(qc);
+    final Iter iter = arg(0).unwrappedIter(qc);
     for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof final XNode node)) throw UPTRGDELEMPT_X.get(info, item);
       // nodes without parents are ignored
       if(node.parent() == null) continue;
       final Updates updates = qc.updates();
       final DBNode dbnode = updates.determineDataRef(node, qc);
-      checkPerm(qc, Perm.WRITE, dbnode.data().meta.name);
+      checkWrite(dbnode, qc);
       updates.add(new DeleteNode(dbnode.pre(), dbnode.data(), info), qc);
     }
     return Empty.VALUE;

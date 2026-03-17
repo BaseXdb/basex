@@ -47,20 +47,20 @@ public final class JobListDetails extends StandardFunc {
           ? jr.time / 1000000 : -1;
 
       final FBuilder elem = FElem.build(Q_JOB);
-      elem.add(Q_ID, key);
-      elem.add(Q_TYPE, jc.type());
-      elem.add(Q_STATE, job.state.name().toLowerCase(Locale.ENGLISH));
-      elem.add(Q_USER, jc.context.clientName());
-      if(ms >= 0) elem.add(Q_DURATION, DTDur.get(ms).string(info));
+      elem.attr(Q_ID, key);
+      elem.attr(Q_TYPE, jc.type());
+      elem.attr(Q_STATE, job.state.name().toLowerCase(Locale.ENGLISH));
+      elem.attr(Q_USER, jc.context.clientName());
+      if(ms >= 0) elem.attr(Q_DURATION, DTDur.get(ms).string(info));
       if(jt != null) {
-        elem.add(Q_START, dateTime(jt.start));
-        if(jt.end != Long.MAX_VALUE) elem.add(Q_END, dateTime(jt.end));
-        if(jt.interval != 0) elem.add(Q_INTERVAL, DTDur.get(jt.interval).string(info));
+        elem.attr(Q_START, dateTime(jt.start));
+        if(jt.end != Long.MAX_VALUE) elem.attr(Q_END, dateTime(jt.end));
+        if(jt.interval != 0) elem.attr(Q_INTERVAL, DTDur.get(jt.interval).string(info));
       }
-      elem.add(Q_READS, jc.locks.reads);
-      elem.add(Q_WRITES, jc.locks.writes);
-      elem.add(Q_TIME, dateTime(jc.time));
-      elem.add(Token.chop(Token.normalize(Token.token(jc)), max));
+      elem.attr(Q_READS, jc.locks.reads);
+      elem.attr(Q_WRITES, jc.locks.writes);
+      elem.attr(Q_TIME, dateTime(jc.time));
+      elem.text(Token.chop(Token.normalize(Token.token(jc)), max));
       vb.add(elem.finish());
     }
     return vb.value(this);

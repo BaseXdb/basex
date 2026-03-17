@@ -129,8 +129,12 @@ public final class ArrayType extends FType {
   }
 
   @Override
+  public String name() {
+    return QueryText.ARRAY;
+  }
+
+  @Override
   public String toString() {
-    final Object[] param = this == ARRAY ? WILDCARD : new Object[] { valueType };
-    return new QueryString().token(QueryText.ARRAY).params(param).toString();
+    return toString(", ", this == ARRAY ? WILDCARD : new Object[] { valueType });
   }
 }

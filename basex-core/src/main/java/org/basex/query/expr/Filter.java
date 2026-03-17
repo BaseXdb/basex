@@ -65,7 +65,7 @@ public abstract class Filter extends AFilter {
     // no positional access...
     if(!mayBePositional()) {
       // convert to axis path: .[text()] → self::node()[text()]
-      if(root instanceof ContextValue && root.ddo()) {
+      if(root instanceof ContextValue && root.seqType().type instanceof NodeType && root.ddo()) {
         return Path.get(cc, info, null, Step.self(cc, root, info, exprs));
       }
       // convert to axis path: (//x)[text() = 'a'] → //x[text() = 'a']
@@ -73,8 +73,7 @@ public abstract class Filter extends AFilter {
 
       // rewrite filter with document nodes to path to possibly enable index rewritings
       // example: db:get('db')[.//text() = 'x'] → db:get('db')/.[.//text() = 'x']
-      if(root.seqType().type instanceof final NodeType nt && nt.kind == Kind.DOCUMENT &&
-          root.ddo()) {
+      if(root.seqType().type.kind() == Kind.DOCUMENT && root.ddo()) {
         final Expr step = Step.self(cc, root, info, exprs);
         return cc.replaceWith(this, Path.get(cc, info, root, step));
       }
@@ -180,7 +179,7 @@ public abstract class Filter extends AFilter {
   }
 
   @Override
-  protected final Expr type(final Expr expr, final boolean optimize) {
+  protected final Expr assignType(final Expr expr) {
     exprType.assign(root.seqType().union(Occ.ZERO)).data(root);
     return root;
   }

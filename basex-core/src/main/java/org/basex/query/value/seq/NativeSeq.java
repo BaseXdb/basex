@@ -31,6 +31,11 @@ abstract class NativeSeq extends Seq {
   }
 
   @Override
+  public final Value unwrappedValue(final QueryContext qc) {
+    return this;
+  }
+
+  @Override
   public boolean refineType() {
     return true;
   }

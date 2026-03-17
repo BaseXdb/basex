@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnRoot extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final XNode node = toNodeOrNull(context(qc), qc);
+    final GNode node = toGNodeOrNull(context(qc), qc);
     return node == null ? Empty.VALUE : node.root();
   }
 
@@ -28,7 +28,7 @@ public final class FnRoot extends ContextFn {
     final Expr expr;
     if(defined(0)) {
       expr = arg(0);
-      if(expr.seqType().instanceOf(Types.DOCUMENT_NODE_ZO)) return expr;
+      if(expr.seqType().instanceOf(Types.DOCUMENT_ZO)) return expr;
     } else {
       expr = value;
     }

@@ -24,8 +24,8 @@ public final class StrLazy extends AStr implements Lazy {
   private final String encoding;
   /** Error message. */
   private final QueryError error;
-  /** Validation flag. */
-  private final boolean validate;
+  /** Replace invalid input with Unicode replacement character. */
+  private final boolean fallback;
   /** Caching flag. */
   private boolean cache;
 
@@ -34,14 +34,14 @@ public final class StrLazy extends AStr implements Lazy {
    * @param input input
    * @param encoding encoding (can be {@code null})
    * @param error error message to be thrown
-   * @param validate validate flag
+   * @param fallback fallback flag
    */
   public StrLazy(final IO input, final String encoding, final QueryError error,
-      final boolean validate) {
+      final boolean fallback) {
     this.input = input;
     this.encoding = encoding;
     this.error = error;
-    this.validate = validate;
+    this.fallback = fallback;
   }
 
   @Override
@@ -95,7 +95,7 @@ public final class StrLazy extends AStr implements Lazy {
    */
   private TextInput get(final InputInfo info) throws QueryException {
     try {
-      return new NewlineInput(input, encoding).validate(validate);
+      return new NewlineInput(input, encoding).fallback(fallback);
     } catch(final IOException ex) {
       throw error.get(info, ex);
     }
@@ -125,7 +125,7 @@ public final class StrLazy extends AStr implements Lazy {
     if(this == obj) return true;
     if(obj instanceof final StrLazy str) {
       if(input.eq(str.input) && Objects.equals(encoding, str.encoding) && error == str.error &&
-          validate == str.validate) return true;
+          fallback == str.fallback) return true;
     }
     // items may be different, but result may be equal...
     return super.equals(obj);

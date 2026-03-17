@@ -122,7 +122,7 @@ public final class For extends ForLet {
   public For optimize(final CompileContext cc) throws QueryException {
     // for $a as xs:integer in $array → for $a as xs:integer in data($array)
     final SeqType dt = var.declType;
-    if(dt != null && dt.instanceOf(Types.ANY_ATOMIC_TYPE_ZM) && expr.seqType().mayBeFunction()) {
+    if(dt != null && dt.instanceOf(Types.ANY_ATOMIC_TYPE_ZM) && expr.seqType().mayBeWrapped()) {
       expr = cc.function(DATA, info, expr);
     }
 
@@ -230,8 +230,8 @@ public final class For extends ForLet {
   public void toXml(final QueryPlan plan) {
     final FBuilder elem = plan.attachVariable(plan.create(this), var, false);
     if(empty) plan.addAttribute(elem, EMPTYY, true);
-    if(pos != null) elem.add(plan.create(AT, pos));
-    if(score != null) elem.add(plan.create(SCORE, score));
+    if(pos != null) elem.node(plan.create(AT, pos));
+    if(score != null) elem.node(plan.create(SCORE, score));
     plan.add(elem, expr);
   }
 

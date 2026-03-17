@@ -34,7 +34,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public String getBaseURI() {
-    throw new XQueryException(new QueryException("Item must be a node: " + this));
+    throw new XQueryException("Item must be a node: " + this);
   }
 
   /**
@@ -42,7 +42,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public QName getName() {
-    throw new XQueryException(new QueryException("Item must be a node: " + this));
+    throw new XQueryException("Item must be a node: " + this);
   }
 
   /**
@@ -50,8 +50,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public boolean getBoolean() {
-    throw new XQueryException(new QueryException(
-        "Value has no boolean representation: " + this));
+    throw new XQueryException("Value has no boolean representation: " + this);
   }
 
   /**
@@ -63,8 +62,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
       return Long.parseLong(getString());
     } catch(final NumberFormatException ex) {
       Util.debug(ex);
-      throw new XQueryException(new QueryException(
-          "Value has no integer representation: " + this));
+      throw new XQueryException("Value has no integer representation: " + this);
     }
   }
 
@@ -73,8 +71,7 @@ public abstract class XdmValue implements Iterable<XdmItem> {
    * @return node name
    */
   public String getString() {
-    throw new XQueryException(new QueryException(
-        "Value has no string representation: " + this));
+    throw new XQueryException("Value has no string representation: " + this);
   }
 
   /**

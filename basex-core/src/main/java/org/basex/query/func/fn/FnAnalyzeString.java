@@ -42,7 +42,7 @@ public final class FnAnalyzeString extends RegExFn {
 
     final RegExpr regExpr = regExpr(pattern, flags);
     final Matcher matcher = regExpr.pattern.matcher(value);
-    final FBuilder root = FElem.build(Q_ANALYZE_STRING_RESULT).declareNS();
+    final FBuilder root = FElem.build(Q_ANALYZE_STRING_RESULT).ns();
     int start = 0;
     while(matcher.find()) {
       if(start != matcher.start()) nonmatch(value.substring(start, matcher.start()), root);
@@ -66,7 +66,7 @@ public final class FnAnalyzeString extends RegExFn {
       final int group, final RegExpr regExpr) {
 
     final FBuilder node = FElem.build(group == 0 ? Q_MATCH : Q_MGROUP);
-    if(group > 0) node.add(Q_NR, group);
+    if(group > 0) node.attr(Q_NR, group);
 
     final int start = matcher.start(group), end = matcher.end(group), gc = matcher.groupCount();
     int[] pos = { group + 1, start }; // group and position in string
@@ -74,12 +74,12 @@ public final class FnAnalyzeString extends RegExFn {
         && (matcher.start(pos[0]) < end || regExpr.getParentGroups()[pos[0] - 1] == group)) {
       final int st = matcher.start(pos[0]);
       if(st >= 0 && !regExpr.getAssertionFlags()[pos[0] - 1]) { // group matched
-        if(pos[1] < st) node.add(string.substring(pos[1], st));
+        if(pos[1] < st) node.text(string.substring(pos[1], st));
         pos = match(matcher, string, node, pos[0], regExpr);
       } else pos[0]++; // skip it
     }
     if(pos[1] < end) {
-      node.add(string.substring(pos[1], end));
+      node.text(string.substring(pos[1], end));
       pos[1] = end;
     }
     if(group == 0) {
@@ -87,14 +87,14 @@ public final class FnAnalyzeString extends RegExFn {
       for(int g = 1; g <= assertionFlags.length; ++g) {
         if(assertionFlags[g - 1] && matcher.start(g) >= 0) {
           final FBuilder lg = FElem.build(Q_LGROUP);
-          lg.add(Q_NR, g);
-          lg.add(Q_VALUE, string.substring(matcher.start(g), matcher.end(g)));
-          lg.add(Q_POSITION, matcher.start(g) + 1);
-          node.add(lg);
+          lg.attr(Q_NR, g);
+          lg.attr(Q_VALUE, string.substring(matcher.start(g), matcher.end(g)));
+          lg.attr(Q_POSITION, matcher.start(g) + 1);
+          node.node(lg);
         }
       }
     }
-    parent.add(node);
+    parent.node(node);
     return pos;
   }
 
@@ -104,6 +104,6 @@ public final class FnAnalyzeString extends RegExFn {
    * @param parent root node
    */
   private static void nonmatch(final String text, final FBuilder parent) {
-    parent.add(FElem.build(Q_NON_MATCH).add(text));
+    parent.node(FElem.build(Q_NON_MATCH).text(text));
   }
 }

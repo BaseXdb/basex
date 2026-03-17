@@ -1,6 +1,5 @@
 package org.basex.query.func.fn;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -33,9 +32,9 @@ public class FnOutermost extends StandardFunc {
   final Iter iter(final boolean outer, final QueryContext qc) throws QueryException {
     final Iter nodes = arg(0).iter(qc);
 
-    final ANodeBuilder list = new ANodeBuilder();
+    final GNodeBuilder list = new GNodeBuilder();
     for(Item item; (item = qc.next(nodes)) != null;) {
-      list.add(toNode(item));
+      list.add(toGNode(item));
     }
     list.ddo();
 
@@ -44,46 +43,15 @@ public class FnOutermost extends StandardFunc {
     if(len < 2) return list.value(this).iter();
 
     // after this, the iterator is sorted and duplicate free
-    final ANodeBuilder builder = new ANodeBuilder();
-    final Data data = list.data();
-    if(data != null) {
-      // nodes are sorted, so ancestors always come before their descendants
-      // the first/last node is thus always included in the output
-      final DBNode fst = (DBNode) list.get(outer ? 0 : len - 1);
-
-      if(outer) {
-        // skip the subtree of the last added node
-        for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
-          final DBNode nd = (DBNode) list.get(next);
-          final int pre = nd.pre();
-          final DBNode node = new DBNode(data, pre + data.size(pre, data.kind(pre)));
-          p = list.binarySearch(node, next + 1, len - next - 1);
-          builder.add(nd);
-        }
-      } else {
-        // skip ancestors of the last added node
-        builder.add(fst);
-        int before = fst.pre();
-        for(int l = len - 1; l-- != 0;) {
-          final DBNode nd = (DBNode) list.get(l);
-          final int pre = nd.pre();
-          if(pre + data.size(pre, data.kind(pre)) <= before) {
-            builder.add(nd);
-            before = pre;
-          }
-        }
+    final GNodeBuilder builder = new GNodeBuilder();
+    OUTER: for(int l = 0; l < len; l++) {
+      final GNode node = list.get(l);
+      final BasicNodeIter iter = outer ? node.ancestorIter(false) : node.descendantIter(false);
+      for(GNode nd; (nd = iter.next()) != null;) {
+        qc.checkStop();
+        if(list.contains(nd)) continue OUTER;
       }
-    } else {
-      // multiple documents and/or constructed fragments
-      OUTER: for(int l = 0; l < len; l++) {
-        final XNode nd = list.get(l);
-        final BasicNodeIter ax = outer ? nd.ancestorIter(false) : nd.descendantIter(false);
-        for(XNode a; (a = ax.next()) != null;) {
-          qc.checkStop();
-          if(list.contains(a)) continue OUTER;
-        }
-        builder.add(nd);
-      }
+      builder.add(node);
     }
     return builder.value(this).iter();
   }

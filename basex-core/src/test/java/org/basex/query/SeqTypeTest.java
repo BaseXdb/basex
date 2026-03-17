@@ -1,19 +1,20 @@
 package org.basex.query;
 
 import static org.basex.query.value.type.BasicType.*;
+import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.Types.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.*;
 import java.util.function.*;
 
+import org.basex.query.expr.path.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the {@link SeqType} class.
@@ -26,6 +27,26 @@ public final class SeqTypeTest {
   private static final Occ[] OCCS = { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_MORE, ONE_OR_MORE };
   /** Error type. */
   private static final SeqType ERROR_O = ERROR.seqType();
+
+  /** Type gnode(). */
+  private static final SeqType GNODE_O = GNODE.seqType();
+  /** Type element(x). */
+  private static final SeqType ELEMENT_X_O = NodeType.get(NameTest.get(new QNm("X"))).seqType();
+  /** Type element(y). */
+  private static final SeqType ELEMENT_Y_O = NodeType.get(NameTest.get(new QNm("Y"))).seqType();
+  /** Type jnode(). */
+  private static final SeqType JNODE_XX_O = NodeType.get(JNodeTest.get(null, null)).seqType();
+  /** Type jnode(*, xs:integer). */
+  private static final SeqType JNODE_XI_O = NodeType.get(JNodeTest.get(null, INTEGER_O)).seqType();
+  /** Type jnode("V"). */
+  private static final SeqType JNODE_VX_O = NodeType.get(JNodeTest.get(Str.get("V"),
+      null)).seqType();
+  /** Type jnode("V", xs:integer). */
+  private static final SeqType JNODE_VI_O = NodeType.get(JNodeTest.get(Str.get("V"),
+      INTEGER_O)).seqType();
+  /** Type jnode("W", xs:string). */
+  private static final SeqType JNODE_WS_O = NodeType.get(JNodeTest.get(Str.get("W"),
+      STRING_O)).seqType();
 
   /** Tests for {@link Occ#intersect(Occ)}. */
   @Test public void occIntersect() {
@@ -196,13 +217,52 @@ public final class SeqTypeTest {
     assertFalse(a.instanceOf(ArrayType.get(BOOLEAN_O)));
 
     // nodes
+
+    assertTrue(JNODE_O.instanceOf(GNODE_O));
+    assertTrue(NODE_O.instanceOf(GNODE_O));
+    assertTrue(ELEMENT_O.instanceOf(ITEM_O));
+    assertTrue(ELEMENT_O.instanceOf(ELEMENT_O));
     assertTrue(ATTRIBUTE_O.instanceOf(NODE_O));
     assertTrue(ATTRIBUTE_O.instanceOf(ATTRIBUTE_O));
+    assertTrue(ELEMENT_X_O.instanceOf(NODE_O));
+    assertTrue(ELEMENT_X_O.instanceOf(ELEMENT_O));
+    assertTrue(ELEMENT_X_O.instanceOf(ELEMENT_X_O));
+
+    assertFalse(GNODE_O.instanceOf(JNODE_O));
+    assertFalse(GNODE_O.instanceOf(NODE_O));
+    assertFalse(ITEM_O.instanceOf(ELEMENT_O));
+    assertFalse(JNODE_O.instanceOf(NODE_O));
+    assertFalse(JNODE_O.instanceOf(ELEMENT_O));
+    assertFalse(NODE_O.instanceOf(ELEMENT_O));
+    assertFalse(NODE_O.instanceOf(JNODE_O));
     assertFalse(ATTRIBUTE_O.instanceOf(ELEMENT_O));
     assertFalse(ELEMENT_O.instanceOf(f));
-    assertFalse(NODE_O.instanceOf(ELEMENT_O));
-    assertFalse(ITEM_O.instanceOf(ELEMENT_O));
-    assertTrue(ELEMENT_O.instanceOf(ITEM_O));
+    assertFalse(ELEMENT_O.instanceOf(JNODE_O));
+    assertFalse(ELEMENT_X_O.instanceOf(ATTRIBUTE_O));
+    assertFalse(ELEMENT_X_O.instanceOf(ELEMENT_Y_O));
+
+    assertTrue(JNODE_XX_O.instanceOf(JNODE_XX_O));
+    assertFalse(JNODE_XX_O.instanceOf(JNODE_XI_O));
+    assertFalse(JNODE_XX_O.instanceOf(JNODE_VX_O));
+    assertFalse(JNODE_XX_O.instanceOf(JNODE_VI_O));
+
+    assertTrue(JNODE_XI_O.instanceOf(JNODE_XX_O));
+    assertTrue(JNODE_XI_O.instanceOf(JNODE_XI_O));
+    assertFalse(JNODE_XI_O.instanceOf(JNODE_VX_O));
+    assertFalse(JNODE_XI_O.instanceOf(JNODE_VI_O));
+
+    assertTrue(JNODE_VX_O.instanceOf(JNODE_XX_O));
+    assertFalse(JNODE_VX_O.instanceOf(JNODE_XI_O));
+    assertTrue(JNODE_VX_O.instanceOf(JNODE_VX_O));
+    assertFalse(JNODE_VX_O.instanceOf(JNODE_VI_O));
+
+    assertTrue(JNODE_VI_O.instanceOf(JNODE_XX_O));
+    assertTrue(JNODE_VI_O.instanceOf(JNODE_XI_O));
+    assertTrue(JNODE_VI_O.instanceOf(JNODE_VX_O));
+    assertTrue(JNODE_VI_O.instanceOf(JNODE_VI_O));
+
+    assertFalse(JNODE_VI_O.instanceOf(JNODE_WS_O));
+    assertFalse(JNODE_WS_O.instanceOf(JNODE_VI_O));
 
     // enums
     final SeqType
@@ -223,17 +283,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      c1 = SeqType.get(ChoiceItemType.get(DATE_O, STRING_O), EXACTLY_ONE),
       // (element() | xs:string)
-      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      c2 = SeqType.get(ChoiceItemType.get(ELEMENT_O, STRING_O), EXACTLY_ONE),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS_O, STRING_O), EXACTLY_ONE),
       // (array(*) | xs:string)
-      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      c4 = SeqType.get(ChoiceItemType.get(ARRAY_O, STRING_O), EXACTLY_ONE),
       // (map(*) | xs:string)
-      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      c5 = SeqType.get(ChoiceItemType.get(MAP_O, STRING_O), EXACTLY_ONE),
       // (function(*) | xs:string)
-      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+      c6 = SeqType.get(ChoiceItemType.get(FUNCTION_O, STRING_O), EXACTLY_ONE);
 
     assertTrue(c1.instanceOf(c1));
     assertFalse(c1.instanceOf(c2));
@@ -296,10 +356,8 @@ public final class SeqTypeTest {
     assertFalse(c6.instanceOf(STRING_O));
     assertTrue(STRING_O.instanceOf(c6));
 
-    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
-        fld2 = new TokenObjectMap<>();
-    final QNm r1Name = new QNm(Token.token("r1")),
-      r2Name = new QNm(Token.token("r2"));
+    final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(), fld2 = new TokenObjectMap<>();
+    final QNm r1Name = new QNm(Token.token("r1")), r2Name = new QNm(Token.token("r2"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // r1 record(next? as r1, x)
@@ -357,10 +415,38 @@ public final class SeqTypeTest {
     combine(DATE_TIME_O, DATE_TIME_STAMP_O, DATE_TIME_O, op);
     combine(ERROR_O, POSITIVE_INTEGER_O, POSITIVE_INTEGER_O, op);
 
-    combine(ATTRIBUTE_O, ELEMENT_O, NODE_O, op);
-    combine(NODE_O, ELEMENT_O, NODE_O, op);
-    combine(ELEMENT_O, ELEMENT_O, ELEMENT_O, op);
     combine(ELEMENT_O, STRING_O, ITEM_O, op);
+    combine(JNODE_O, GNODE_O, GNODE_O, op);
+    combine(NODE_O, GNODE_O, GNODE_O, op);
+    combine(ELEMENT_O, ITEM_O, ITEM_O, op);
+    combine(ELEMENT_O, ELEMENT_O, ELEMENT_O, op);
+    combine(ATTRIBUTE_O, NODE_O, NODE_O, op);
+    combine(ATTRIBUTE_O, ATTRIBUTE_O, ATTRIBUTE_O, op);
+    combine(ELEMENT_X_O, NODE_O, NODE_O, op);
+    combine(ELEMENT_X_O, ELEMENT_O, ELEMENT_O, op);
+    combine(ELEMENT_X_O, ELEMENT_X_O, ELEMENT_X_O, op);
+
+    combine(GNODE_O, JNODE_O, GNODE_O, op);
+    combine(GNODE_O, NODE_O, GNODE_O, op);
+    combine(ITEM_O, ELEMENT_O, ITEM_O, op);
+    combine(JNODE_O, NODE_O, GNODE_O, op);
+    combine(JNODE_O, ELEMENT_O, GNODE_O, op);
+    combine(NODE_O, ELEMENT_O, NODE_O, op);
+    combine(NODE_O, JNODE_O, GNODE_O, op);
+    combine(ATTRIBUTE_O, ELEMENT_O, NODE_O, op);
+    combine(ELEMENT_O, JNODE_O, GNODE_O, op);
+    combine(ELEMENT_X_O, ATTRIBUTE_O, NODE_O, op);
+
+    combine(JNODE_XX_O, JNODE_XX_O, JNODE_XX_O, op);
+    combine(JNODE_XX_O, JNODE_XI_O, JNODE_XX_O, op);
+    combine(JNODE_XX_O, JNODE_VX_O, JNODE_XX_O, op);
+    combine(JNODE_XX_O, JNODE_VI_O, JNODE_XX_O, op);
+    //combine(JNODE_VX_O, JNODE_XI_O, JNODE_XX_O, op); union test
+    combine(JNODE_VX_O, JNODE_VX_O, JNODE_VX_O, op);
+    combine(JNODE_VX_O, JNODE_VI_O, JNODE_VX_O, op);
+    combine(JNODE_XI_O, JNODE_XI_O, JNODE_XI_O, op);
+    combine(JNODE_XI_O, JNODE_VI_O, JNODE_XI_O, op);
+    combine(JNODE_VI_O, JNODE_VI_O, JNODE_VI_O, op);
 
     combine(MAP_O, ITEM_O, ITEM_O, op);
     combine(MAP_O, FUNCTION_O, FUNCTION_O, op);
@@ -464,17 +550,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      c1 = SeqType.get(ChoiceItemType.get(DATE_O, STRING_O), EXACTLY_ONE),
       // (element() | xs:string)
-      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      c2 = SeqType.get(ChoiceItemType.get(ELEMENT_O, STRING_O), EXACTLY_ONE),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS_O, STRING_O), EXACTLY_ONE),
       // (array(*) | xs:string)
-      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      c4 = SeqType.get(ChoiceItemType.get(ARRAY_O, STRING_O), EXACTLY_ONE),
       // (map(*) | xs:string)
-      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      c5 = SeqType.get(ChoiceItemType.get(MAP_O, STRING_O), EXACTLY_ONE),
       // (function(*) | xs:string)
-      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+      c6 = SeqType.get(ChoiceItemType.get(FUNCTION_O, STRING_O), EXACTLY_ONE);
 
     combine(c1, op);
     combine(c1, DATE_O, ANY_ATOMIC_TYPE_O, op);
@@ -598,9 +684,40 @@ public final class SeqTypeTest {
     combine(DATE_TIME_STAMP_O, DATE_TIME_O, DATE_TIME_STAMP_O, op);
 
     combine(EMPTY_SEQUENCE_Z, ITEM_O, null, op);
-    combine(ATTRIBUTE_O, ATTRIBUTE_O, ATTRIBUTE_O, op);
+
+    combine(JNODE_O, GNODE_O, JNODE_O, op);
+    combine(NODE_O, GNODE_O, NODE_O, op);
+    combine(ELEMENT_O, ITEM_O, ELEMENT_O, op);
+    combine(ELEMENT_O, ELEMENT_O, ELEMENT_O, op);
     combine(ATTRIBUTE_O, NODE_O, ATTRIBUTE_O, op);
+    combine(ATTRIBUTE_O, ATTRIBUTE_O, ATTRIBUTE_O, op);
+    combine(ELEMENT_X_O, NODE_O, ELEMENT_X_O, op);
+    combine(ELEMENT_X_O, ELEMENT_O, ELEMENT_X_O, op);
+    combine(ELEMENT_X_O, ELEMENT_X_O, ELEMENT_X_O, op);
+
+    combine(ELEMENT_O, STRING_O, null, op);
+    combine(GNODE_O, JNODE_O, JNODE_O, op);
+    combine(GNODE_O, NODE_O, NODE_O, op);
+    combine(ITEM_O, ELEMENT_O, ELEMENT_O, op);
+    combine(JNODE_O, NODE_O, null, op);
+    combine(JNODE_O, ELEMENT_O, null, op);
+    combine(NODE_O, ELEMENT_O, ELEMENT_O, op);
+    combine(NODE_O, JNODE_O, null, op);
     combine(ATTRIBUTE_O, ELEMENT_O, null, op);
+    combine(ELEMENT_O, JNODE_O, null, op);
+    combine(ELEMENT_X_O, ATTRIBUTE_O, null, op);
+
+    combine(JNODE_XX_O, JNODE_XX_O, JNODE_XX_O, op);
+    combine(JNODE_XX_O, JNODE_XI_O, JNODE_XI_O, op);
+    combine(JNODE_XX_O, JNODE_VX_O, JNODE_VX_O, op);
+    combine(JNODE_XX_O, JNODE_VI_O, JNODE_VI_O, op);
+    combine(JNODE_XI_O, JNODE_XI_O, JNODE_XI_O, op);
+    combine(JNODE_XI_O, JNODE_VX_O, JNODE_VI_O, op);
+    combine(JNODE_XI_O, JNODE_VI_O, JNODE_VI_O, op);
+    combine(JNODE_VX_O, JNODE_VX_O, JNODE_VX_O, op);
+    combine(JNODE_VX_O, JNODE_VI_O, JNODE_VI_O, op);
+    combine(JNODE_VI_O, JNODE_VI_O, JNODE_VI_O, op);
+    combine(JNODE_VI_O, JNODE_WS_O, null, op);
 
     combine(MAP_O, ITEM_O, MAP_O, op);
     combine(MAP_O, FUNCTION_O, MAP_O, op);
@@ -714,17 +831,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(new ChoiceItemType(Arrays.asList(DATE_O, STRING_O)), EXACTLY_ONE),
+      c1 = SeqType.get(ChoiceItemType.get(DATE_O, STRING_O), EXACTLY_ONE),
       // (element() | xs:string)
-      c2 = SeqType.get(new ChoiceItemType(Arrays.asList(ELEMENT_O, STRING_O)), EXACTLY_ONE),
+      c2 = SeqType.get(ChoiceItemType.get(ELEMENT_O, STRING_O), EXACTLY_ONE),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(new ChoiceItemType(Arrays.asList(NMTOKENS_O, STRING_O)), EXACTLY_ONE),
+      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS_O, STRING_O), EXACTLY_ONE),
       // (array(*) | xs:string)
-      c4 = SeqType.get(new ChoiceItemType(Arrays.asList(ARRAY_O, STRING_O)), EXACTLY_ONE),
+      c4 = SeqType.get(ChoiceItemType.get(ARRAY_O, STRING_O), EXACTLY_ONE),
       // (map(*) | xs:string)
-      c5 = SeqType.get(new ChoiceItemType(Arrays.asList(MAP_O, STRING_O)), EXACTLY_ONE),
+      c5 = SeqType.get(ChoiceItemType.get(MAP_O, STRING_O), EXACTLY_ONE),
       // (function(*) | xs:string)
-      c6 = SeqType.get(new ChoiceItemType(Arrays.asList(FUNCTION_O, STRING_O)), EXACTLY_ONE);
+      c6 = SeqType.get(ChoiceItemType.get(FUNCTION_O, STRING_O), EXACTLY_ONE);
 
     combine(c1, op);
     combine(c1, DATE_O, DATE_O, op);
@@ -846,22 +963,22 @@ public final class SeqTypeTest {
     assertFalse(DATE_TIME_STAMP_O.mayBeNumber());
     assertFalse(ERROR_O.mayBeNumber());
 
-    assertTrue(ITEM_O.mayBeFunction());
-    assertTrue(FUNCTION_O.mayBeFunction());
-    assertTrue(MAP_O.mayBeFunction());
-    assertTrue(ARRAY_O.mayBeFunction());
-    assertTrue(RECORD_O.mayBeFunction());
-    assertFalse(ANY_ATOMIC_TYPE_O.mayBeFunction());
-    assertFalse(NUMERIC_O.mayBeFunction());
-    assertFalse(INTEGER_O.mayBeFunction());
-    assertFalse(BYTE.seqType().mayBeFunction());
-    assertFalse(STRING_O.mayBeFunction());
-    assertFalse(NODE_O.mayBeFunction());
-    assertFalse(ELEMENT_O.mayBeFunction());
-    assertFalse(NMTOKENS_O.mayBeFunction());
-    assertFalse(DATE_TIME_O.mayBeFunction());
-    assertFalse(DATE_TIME_STAMP_O.mayBeFunction());
-    assertFalse(ERROR_O.mayBeFunction());
+    assertTrue(ITEM_O.mayBeWrapped());
+    assertTrue(FUNCTION_O.mayBeWrapped());
+    assertTrue(MAP_O.mayBeWrapped());
+    assertTrue(ARRAY_O.mayBeWrapped());
+    assertTrue(RECORD_O.mayBeWrapped());
+    assertFalse(ANY_ATOMIC_TYPE_O.mayBeWrapped());
+    assertFalse(NUMERIC_O.mayBeWrapped());
+    assertFalse(INTEGER_O.mayBeWrapped());
+    assertFalse(BYTE.seqType().mayBeWrapped());
+    assertFalse(STRING_O.mayBeWrapped());
+    assertFalse(NODE_O.mayBeWrapped());
+    assertFalse(ELEMENT_O.mayBeWrapped());
+    assertFalse(NMTOKENS_O.mayBeWrapped());
+    assertFalse(DATE_TIME_O.mayBeWrapped());
+    assertFalse(DATE_TIME_STAMP_O.mayBeWrapped());
+    assertFalse(ERROR_O.mayBeWrapped());
   }
 
   /**

@@ -5,7 +5,6 @@ import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
-import java.util.Set;
 import java.util.function.*;
 
 import org.basex.query.*;
@@ -119,14 +118,6 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Returns the name of the record.
-   * @return name (can be {@code null})
-   */
-  public QNm name() {
-    return name;
-  }
-
-  /**
    * Returns the annotations of this record type.
    * @return annotations
    */
@@ -141,7 +132,7 @@ public final class RecordType extends MapType {
   public int minFields() {
     int min = 0;
     for(final RecordField rf : fields.values()) {
-      if(rf.optional || rf.expr() != null) return min;
+      if(rf.init() != null) return min;
       ++min;
     }
     return min;
@@ -173,7 +164,7 @@ public final class RecordType extends MapType {
 
     final Predicate<byte[]> compareFields = key -> {
       final RecordField rf1 = fields.get(key), rf2 = rt.fields.get(key);
-      if(rf1 == null || rf2 == null || rf1.optional != rf2.optional) return false;
+      if(rf1 == null || rf2 == null || rf1.isOptional() != rf2.isOptional()) return false;
       final SeqType st1 = rf1.seqType(), st2 = rf2.seqType();
       if(st1.occ != st2.occ) return false;
       final Type tp1 = st1.type, tp2 = st2.type;
@@ -228,7 +219,7 @@ public final class RecordType extends MapType {
         final RecordField rtf = rt.fields.get(key);
         if(fields.contains(key)) {
           final RecordField f = fields.get(key);
-          if(!rtf.optional && f.optional) return false;
+          if(!rtf.isOptional() && f.isOptional()) return false;
           final SeqType fst = f.seqType(), rtfst = rtf.seqType();
           if(fst != rtfst) {
             if(fst.zero()) {
@@ -245,7 +236,7 @@ public final class RecordType extends MapType {
               }
             }
           }
-        } else if(!rtf.optional) {
+        } else if(!rtf.isOptional()) {
           return false;
         }
       }
@@ -303,16 +294,16 @@ public final class RecordType extends MapType {
           } else {
             union = fst.union(rtfst);
           }
-          map.put(key, new RecordField(union, f.optional || rtf.optional));
+          map.put(key, new RecordField(union, f.isOptional() || rtf.isOptional()));
         } else {
           // field missing in type
-          map.put(key, new RecordField(f.seqType, true));
+          map.put(key, new RecordField(f.seqType(), true));
         }
       }
       for(final byte[] key : rt.fields) {
         if(!fields.contains(key)) {
           // field missing in this RecordType
-          map.put(key, new RecordField(rt.fields.get(key).seqType, true));
+          map.put(key, new RecordField(rt.fields.get(key).seqType(), true));
         }
       }
       return new RecordType(map);
@@ -351,7 +342,7 @@ public final class RecordType extends MapType {
           final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
           final SeqType is = intersect(fst, rtfst, pairs);
           if(is == null) return null;
-          map.put(key, new RecordField(is, f.optional && rtf.optional));
+          map.put(key, new RecordField(is, f.isOptional() && rtf.isOptional()));
         } else {
           // field missing in type
           return null;
@@ -372,7 +363,7 @@ public final class RecordType extends MapType {
         final RecordField f = fields.get(key);
         final SeqType is = intersect(f.seqType(), mt.valueType(), pairs);
         if(is == null) return null;
-        map.put(key, new RecordField(is, f.optional));
+        map.put(key, new RecordField(is, f.isOptional()));
       }
       return new RecordType(map);
     }
@@ -421,6 +412,11 @@ public final class RecordType extends MapType {
   }
 
   @Override
+  public QNm name() {
+    return name;
+  }
+
+  @Override
   public String toString() {
     if(name != null) return Token.string(name.prefixString());
 
@@ -431,7 +427,7 @@ public final class RecordType extends MapType {
         if(!tb.isEmpty()) tb.add(", ");
         if(!tb.moreInfo()) break;
         tb.add(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key));
-        if(fields.get(key).optional) tb.add('?');
+        if(fields.get(key).isOptional()) tb.add('?');
       }
     }
     return qs.token(tb.finish()).token(')').toString();

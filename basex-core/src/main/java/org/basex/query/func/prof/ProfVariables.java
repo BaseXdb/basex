@@ -5,8 +5,8 @@ import static org.basex.query.func.Function.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.var.*;
@@ -21,12 +21,12 @@ import org.basex.util.*;
 public final class ProfVariables extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = arg(0).iter(qc);
+    final Value bindings = arg(0).unwrappedValue(qc);
     final String label = toStringOrNull(arg(1), qc);
 
     final StringBuilder sb = new StringBuilder();
-    for(Item item; (item = iter.next()) != null;) {
-      toMap(item).forEach((key, value) -> {
+    for(final Item binding : bindings) {
+      toMap(binding).forEach((key, value) -> {
         if(value != Empty.UNDEFINED) {
           sb.append(Prop.NL).append("  ").append(key.toJava()).append(" := ").append(value);
         }

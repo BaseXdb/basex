@@ -38,15 +38,15 @@ public final class DbListDetails extends DbList {
           // count number of binary files
           final int binaries = meta.dir(ResourceType.BINARY).descendants().size();
           final int values = meta.dir(ResourceType.VALUE).descendants().size();
-          database.add(Q_RESOURCES, meta.ndocs + binaries + values);
-          database.add(Q_MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
-          database.add(Q_SIZE, meta.dbSize());
-          if(qc.user.has(Perm.CREATE, name)) database.add(Q_PATH, meta.original);
+          database.attr(Q_RESOURCES, meta.ndocs + binaries + values);
+          database.attr(Q_MODIFIED_DATE, DateTime.format(new Date(meta.dbTime())));
+          database.attr(Q_SIZE, meta.dbSize());
+          if(qc.user.has(Perm.CREATE, name)) database.attr(Q_PATH, meta.original);
         } catch(final IOException ex) {
           // invalid database will be ignored
           Util.debug(ex);
         }
-        return database.add(name).finish();
+        return database.text(name).finish();
       }
     };
   }

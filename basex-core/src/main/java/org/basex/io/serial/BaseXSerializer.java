@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -68,5 +69,13 @@ public final class BaseXSerializer extends AdaptiveSerializer {
     ++nested;
     super.map(item);
     --nested;
+  }
+
+  @Override
+  protected void jnode(final JNode jnode) throws IOException {
+    reset();
+    for(final Item item : jnode.value) {
+      serialize(item);
+    }
   }
 }

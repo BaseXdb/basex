@@ -70,6 +70,9 @@ final class TrieBranch extends TrieNode {
     } else {
       nu = used;
     }
+    // single leaf remains
+    if(size == 2) return nsub;
+    // create new array, replace child
     final TrieNode[] ks = kids.clone();
     ks[k] = nsub;
     return new TrieBranch(ks, nu, size - 1);

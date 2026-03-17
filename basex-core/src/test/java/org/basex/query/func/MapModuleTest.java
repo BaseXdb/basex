@@ -515,6 +515,10 @@ public final class MapModuleTest extends SandboxTest {
     // GH-2438
     query("let $f := fn($map) { fold-left(map:keys($map), $map, map:remove#2) } " +
         "return $f({ 'a': () })", "{}");
+    // GH-2615
+    query("{ 'aa': 1, 'bb': 2, 'cc': 3 } => map:remove('aa') => map:remove('bb')", "{\"cc\":3}");
+    query("{ 'aa': 1, 'bb': 2, 'cc': 3 } => map:remove('aa') => map:remove('cc')", "{\"bb\":2}");
+    query("{ 'aa': 1, 'bb': 2, 'cc': 3 } => map:remove('bb') => map:remove('cc')", "{\"aa\":1}");
   }
 
   /** Test method. */

@@ -69,6 +69,7 @@ public interface QueryText {
   /** Parser token. */ String FALSE = "false";
   /** Parser token. */ String FINALLY = "finally";
   /** Parser token. */ String FIRST = "first";
+  /** Parser token. */ String FIXED = "fixed";
   /** Parser token. */ String FN = "fn";
   /** Parser token. */ String FOR = "for";
   /** Parser token. */ String FROM = "from";
@@ -79,6 +80,7 @@ public interface QueryText {
   /** Parser token. */ String FUNCTION = "function";
   /** Parser token. */ String FUZZY = "fuzzy";
   /** Parser token. */ String GET = "get";
+  /** Parser token. */ String GNODE = "gnode";
   /** Parser token. */ String GREATEST = "greatest";
   /** Parser token. */ String GROUP = "group";
   /** Parser token. */ String IDIV = "idiv";
@@ -93,6 +95,7 @@ public interface QueryText {
   /** Parser token. */ String INTO = "into";
   /** Parser token. */ String INVOKE = "invoke";
   /** Parser token. */ String ITEM = "item";
+  /** Parser token. */ String JNODE = "jnode";
   /** Parser token. */ String KEY = "key";
   /** Parser token. */ String LANGUAGE = "language";
   /** Parser token. */ String LAST = "last";
@@ -346,7 +349,7 @@ public interface QueryText {
   /** Query Info. */ String DIR = "dir";
   /** Query Info. */ String PRE = "pre";
   /** Query Info. */ String SIZE = "size";
-  /** Query Info. */ String STRUCT_SIZE = "structSize";
+  /** Query Info. */ String STRUCT_SIZE = "struct-size";
   /** Query Info. */ String AXIS = "axis";
   /** Query Info. */ String TEST = "test";
   /** Query Info. */ String MIN = "min";
@@ -398,6 +401,8 @@ public interface QueryText {
   /** Optimization info. */ String OPTOPEN_X = "open database \"%\"";
 
   // MISCELLANEOUS ================================================================================
+
+  /** JTree. */ byte[] JTREE = token("jtree");
 
   /** Base token. */ byte[] BASE = token("base");
   /** Status token. */ byte[] STATUS = token("status");

@@ -17,29 +17,37 @@ public final class FnTypeOf extends ContextFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Value value = arg(0).value(qc);
+    return Str.get(toString(value));
+  }
+
+  /**
+   * Returns a string representation of the type.
+   * @param value value
+   * @return string representation
+   */
+  private String toString(final Value value) {
+    if(value.isEmpty()) return value.seqType().toString();
 
     final TokenSet types = new TokenSet();
     for(final Value item : value) {
       String type = item.type.toString();
       if(item.type instanceof FType) {
-        type = type.replaceAll("\\(.*", "(*)").replace("record", "map");
+        type = type.replaceAll("\\(.*", "(*)").replaceAll("^record\\(", "map(");
+      } else if(item.type.instanceOf(NodeType.JNODE)) {
+        type = type.replaceAll("\\(.*", "()");
       }
       types.add(type);
     }
-    final int ts = types.size();
 
     final TokenBuilder tb = new TokenBuilder();
-    if(ts == 0) {
-      tb.add(value.seqType().toString());
-    } else {
-      if(ts > 1) tb.add('(');
-      for(final byte[] type : types) {
-        if(tb.size() > 1) tb.add('|');
-        tb.add(type);
-      }
-      if(ts > 1) tb.add(')');
-      if(value.size() > 1) tb.add('+');
+    final boolean seq = types.size() > 1;
+    if(seq) tb.add('(');
+    for(final byte[] type : types) {
+      if(tb.size() > 1) tb.add('|');
+      tb.add(type);
     }
-    return Str.get(tb.finish());
+    if(seq) tb.add(')');
+    if(value.size() > 1) tb.add('+');
+    return tb.toString();
   }
 }

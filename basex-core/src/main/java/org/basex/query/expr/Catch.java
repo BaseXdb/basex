@@ -116,14 +116,17 @@ public final class Catch extends Single {
    * @return if catch clause contains relevant tests
    */
   boolean simplify(final ArrayList<Test> list, final CompileContext cc) {
+    final Checks<Test> wildcard = t -> t instanceof final NameTest nt &&
+        nt.scope == NameTest.Scope.ALL;
+
     // check if all errors are already caught
-    if(list.contains(NodeTest.ELEMENT)) {
+    if(wildcard.any(list)) {
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
       return false;
     }
 
     // drop remaining tests in favor or wildcard test
-    if(tests.contains(NodeTest.ELEMENT) && tests.size() != 1) {
+    if(wildcard.any(tests) && tests.size() != 1) {
       tests.clear();
       tests.add(NodeTest.ELEMENT);
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
@@ -159,7 +162,7 @@ public final class Catch extends Single {
   boolean matches(final QueryException ex) {
     final QNm name = ex.qname();
     for(final Test test : tests) {
-      if(test instanceof NodeTest || ((NameTest) test).matches(name)) return true;
+      if(test instanceof NameTest nt && nt.matches(name)) return true;
     }
     return false;
   }

@@ -106,17 +106,12 @@ public class DBNodeSeq extends NativeSeq {
       throws QueryException {
 
     Expr expr = this;
-    if(mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING)) {
-      if(mode == Simplify.STRING) {
-        final TokenList list = new TokenList(size);
-        for(int i = 0; i < size; i++) list.add(data.atom(pres[i]));
-        expr = StrSeq.get(list);
-      } else {
-        final int sz = (int) size;
-        final Item[] items = new Item[sz];
-        for(int i = 0; i < size; i++) items[i] = Atm.get(data.atom(pres[i]));
-        expr = ItemSeq.get(items, sz, BasicType.UNTYPED_ATOMIC);
-      }
+    if(mode == Simplify.STRING) {
+      final TokenList list = new TokenList(size);
+      for(final Item item : this) list.add(item.string(null));
+      expr = StrSeq.get(list);
+    } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
+      expr = atomValue(cc.qc, null);
     }
     return cc.simplify(this, expr, mode);
   }
@@ -128,7 +123,7 @@ public class DBNodeSeq extends NativeSeq {
 
   @Override
   public boolean refineType() {
-    if(type instanceof NodeType nt && nt.kind == Kind.NODE) {
+    if(type.kind() == Kind.NODE) {
       for(final Item item : this) {
         if(!item.type.eq(type)) return false;
       }

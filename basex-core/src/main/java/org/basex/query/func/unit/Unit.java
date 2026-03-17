@@ -68,7 +68,7 @@ final class Unit {
    * @throws IOException query exception
    */
   public void test(final FBuilder suites) throws IOException {
-    final FBuilder suite = FElem.build(Q_TESTSUITE).add(Q_NAME, file.url());
+    final FBuilder suite = FElem.build(Q_TESTSUITE).attr(Q_NAME, file.url());
     final ArrayList<StaticFunc> beforeModule = new ArrayList<>(0);
     final ArrayList<StaticFunc> afterModule = new ArrayList<>(0);
     final ArrayList<StaticFunc> before = new ArrayList<>(0);
@@ -130,7 +130,7 @@ final class Unit {
           throw BASEX_ANN2_X_X.get(ann.info, ann, arity(arguments(vs), new IntList().add(0)));
         }
 
-        final FBuilder testcase = FElem.build(Q_TESTCASE).add(Q_NAME, sf.name.local());
+        final FBuilder testcase = FElem.build(Q_TESTCASE).attr(Q_NAME, sf.name.local());
         tests++;
 
         final Performance perf2 = new Performance();
@@ -154,8 +154,8 @@ final class Unit {
 
             if(code != null) {
               failures++;
-              testcase.add(FElem.build(Q_FAILURE).add(FElem.build(Q_EXPECTED).
-                  add(code.prefixId())));
+              testcase.node(FElem.build(Q_FAILURE).node(FElem.build(Q_EXPECTED).
+                  text(code.prefixId())));
             }
           } catch(final QueryException ex) {
             addError(ex, testcase, code);
@@ -163,10 +163,10 @@ final class Unit {
         } else {
           // skip test
           final Value ignored = ignore.value();
-          testcase.add(Q_SKIPPED, ignored.isEmpty() ? EMPTY : ignored.itemAt(0).string(null));
+          testcase.attr(Q_SKIPPED, ignored.isEmpty() ? EMPTY : ignored.itemAt(0).string(null));
           skipped++;
         }
-        suite.add(testcase.add(Q_TIME, time(perf2)));
+        suite.node(testcase.attr(Q_TIME, time(perf2)));
       }
 
       // run finalizing tests
@@ -177,16 +177,16 @@ final class Unit {
         addError(ex, suite, null);
       } else {
         // handle errors caused by initializing or finalizing unit functions
-        final FBuilder init = FElem.build(Q_TESTINIT).add(Q_NAME, current.name.local()).
-            add(Q_TIME, time(perf));
+        final FBuilder init = FElem.build(Q_TESTINIT).attr(Q_NAME, current.name.local()).
+            attr(Q_TIME, time(perf));
         addError(ex, init, null);
-        suite.add(init);
+        suite.node(init);
       }
     }
 
     if(!suite.isEmpty()) {
-      suites.add(suite.add(Q_TIME, time(perf)).add(Q_TESTS, tests).add(Q_FAILURES, failures).
-        add(Q_ERRORS, errors).add(Q_SKIPPED, skipped));
+      suites.node(suite.attr(Q_TIME, time(perf)).attr(Q_TESTS, tests).attr(Q_FAILURES, failures).
+        attr(Q_ERRORS, errors).attr(Q_SKIPPED, skipped));
     }
   }
 
@@ -224,28 +224,28 @@ final class Unit {
         errors++;
         error = FElem.build(Q_ERROR);
       }
-      error.add(Q_LINE, ex.line()).add(Q_COLUMN, ex.column());
+      error.attr(Q_LINE, ex.line()).attr(Q_COLUMN, ex.column());
       final String url = IO.get(ex.path()).url();
-      if(!file.url().equals(url)) error.add(Q_URI, url);
+      if(!file.url().equals(url)) error.attr(Q_URI, url);
 
       if(ex instanceof final UnitException ue) {
         // unit exception: add expected and returned values
-        error.add(element(ue.returned, Q_RETURNED, ue.count));
-        error.add(element(ue.expected, Q_EXPECTED, ue.count));
+        error.node(element(ue.returned, Q_RETURNED, ue.count));
+        error.node(element(ue.expected, Q_EXPECTED, ue.count));
       } else if(!fail) {
         // exception other than failure: add type
-        error.add(Q_TYPE, ex.qname().prefixId(QueryText.ERROR_URI));
+        error.attr(Q_TYPE, ex.qname().prefixId(QueryText.ERROR_URI));
       }
 
       // add info
       final Value value = ex.value();
       if(value != null && value.size() == 1) {
-        error.add(element((Item) value, Q_INFO, -1));
+        error.node(element((Item) value, Q_INFO, -1));
       } else {
         // otherwise, add error message
-        error.add(FElem.build(Q_INFO).add(ex.getLocalizedMessage()));
+        error.node(FElem.build(Q_INFO).text(ex.getLocalizedMessage()));
       }
-      testcase.add(error);
+      testcase.node(error);
     }
   }
 
@@ -260,16 +260,16 @@ final class Unit {
     final FBuilder elem = FElem.build(name);
     if(item != null) {
       if(item instanceof final XNode node) {
-        elem.add(node);
+        elem.node(node);
       } else {
         try {
-          elem.add(item.string(null));
+          elem.text(item.string(null));
         } catch(final QueryException ex) {
           Util.debug(ex);
-          elem.add(item);
+          elem.text(item);
         }
       }
-      if(count != -1) elem.add(Q_ITEM, count).add(Q_TYPE, item.type);
+      if(count != -1) elem.attr(Q_ITEM, count).attr(Q_TYPE, item.type);
     }
     return elem;
   }

@@ -15,17 +15,14 @@ import org.basex.query.value.item.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class FileReadText extends FileFn {
+public final class FileReadText extends FileReadFn {
   @Override
   public Value eval(final QueryContext qc) throws QueryException {
     final Path path = toPath(arg(0), qc);
-    final String encoding = toEncodingOrNull(arg(1), FILE_UNKNOWN_ENCODING_X, qc);
-    final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
-    if(!Files.exists(path)) throw FILE_NOT_FOUND_X.get(info, path.toAbsolutePath());
-    if(Files.isDirectory(path)) throw FILE_IS_DIR_X.get(info, path.toAbsolutePath());
-    if(!Files.isReadable(path)) throw FILE_ACCESS_X.get(info, path.toAbsolutePath());
-
-    return new StrLazy(new IOFile(path), encoding, FILE_IO_ERROR_X, !fallback);
+    final ParseOptions options = options(path, qc);
+    final String encoding = options.get(ParseOptions.ENCODING);
+    final boolean fallback = options.get(ParseOptions.FALLBACK);
+    return new StrLazy(new IOFile(path), encoding, FILE_IO_ERROR_X, fallback);
   }
 }

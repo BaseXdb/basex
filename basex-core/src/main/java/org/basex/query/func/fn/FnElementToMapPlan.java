@@ -19,17 +19,17 @@ import org.basex.util.*;
 public final class FnElementToMapPlan extends PlanFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Iter iter = arg(0).iter(qc);
+    final Iter iter = arg(0).unwrappedIter(qc);
 
     // collect element and attribute nodes
-    final QNmMap<ANodeList> elemNames = new QNmMap<>();
-    final QNmMap<ANodeList> attrNames = new QNmMap<>();
+    final QNmMap<GNodeList> elemNames = new QNmMap<>();
+    final QNmMap<GNodeList> attrNames = new QNmMap<>();
     for(Item item; (item = iter.next()) != null;) {
-      for(final XNode desc : toNode(item).descendantIter(true)) {
+      for(final GNode desc : toNode(item).descendantIter(true)) {
         if(desc.kind() == Kind.ELEMENT) {
-          elemNames.computeIfAbsent(desc.qname(), ANodeList::new).add(desc);
-          for(final XNode attr : children(Kind.ATTRIBUTE, desc)) {
-            attrNames.computeIfAbsent(attr.qname(), ANodeList::new).add(attr);
+          elemNames.computeIfAbsent(desc.qname(), GNodeList::new).add(desc);
+          for(final GNode attr : children(Kind.ATTRIBUTE, desc)) {
+            attrNames.computeIfAbsent(attr.qname(), GNodeList::new).add(attr);
           }
         }
       }

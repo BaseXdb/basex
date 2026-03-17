@@ -38,7 +38,7 @@ public abstract class Preds extends Arr {
   @Override
   public Expr compile(final CompileContext cc) throws QueryException {
     // called at an early stage as it affects the optimization of predicates
-    final Expr root = type(cc.qc.focus.value, false);
+    final Expr root = assignType(cc.qc.focus.value);
     final int el = exprs.length;
     final boolean value = this instanceof StructFilter;
     if(el != 0) cc.get(value ? null : this, !value, () -> {
@@ -57,11 +57,10 @@ public abstract class Preds extends Arr {
 
   /**
    * Assigns the expression type.
-   * @param expr root expression (can be {@code null})
-   * @param optimize compilation/optimization
+   * @param expr root expression available by the caller (can be {@code null})
    * @return actual root expression (can be {@code null})
    */
-  protected abstract Expr type(Expr expr, boolean optimize);
+  protected abstract Expr assignType(Expr expr);
 
   /**
    * Checks if the specified item matches the predicates.
@@ -71,7 +70,6 @@ public abstract class Preds extends Arr {
    * @throws QueryException query exception
    */
   protected final boolean test(final Item item, final QueryContext qc) throws QueryException {
-    // set context value and position
     final QueryFocus qf = qc.focus;
     final Value qv = qf.value;
     qf.value = item;
@@ -152,7 +150,7 @@ public abstract class Preds extends Arr {
         if(test != null) {
           cc.info(OPTMERGE_X, predStep);
           rootStep.test = test;
-          rootStep.exprType.assign(Step.seqType(rootStep.axis, rootStep.test, rootStep.exprs));
+          rootStep.assignType(null);
           list.add(predStep.exprs);
           expr = Bln.TRUE;
         }

@@ -14,13 +14,13 @@ import org.basex.util.*;
 public final class FnHasChildren extends ContextFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, ii, 0));
+    return Bln.get(test(qc, info, 0));
   }
 
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    final XNode node = toNodeOrNull(context(qc), qc);
+    final GNode node = toGNodeOrNull(context(qc), qc);
     return node != null && node.hasChildren();
   }
 }

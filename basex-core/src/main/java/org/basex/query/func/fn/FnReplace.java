@@ -22,7 +22,7 @@ public final class FnReplace extends RegExFn {
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
-    final Item replacement = arg(2).item(qc, info);
+    final Item replacement = arg(2).unwrappedItem(qc, info);
     final byte[] flags = toZeroToken(arg(3), qc);
 
     final boolean func = replacement instanceof FItem;

@@ -18,7 +18,7 @@ import org.basex.util.*;
 public final class FnLang extends ContextFn {
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return Bln.get(test(qc, ii, 0));
+    return Bln.get(test(qc, info, 0));
   }
 
   @Override
@@ -30,7 +30,7 @@ public final class FnLang extends ContextFn {
 
     for(XNode nd = node; nd != null; nd = nd.parent()) {
       final BasicNodeIter atts = nd.attributeIter();
-      for(XNode at; (at = atts.next()) != null;) {
+      for(GNode at; (at = atts.next()) != null;) {
         if(eq(at.qname().string(), LANG)) {
           final byte[] ln = lc(normalize(at.string()));
           return startsWith(ln, lang) && (lang.length == ln.length || ln[lang.length] == '-');

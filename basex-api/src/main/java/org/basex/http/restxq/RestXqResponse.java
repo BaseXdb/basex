@@ -91,10 +91,10 @@ final class RestXqResponse extends WebResponse {
 
       // handle special cases
       if(item != null && item.type == NodeType.ELEMENT) {
-        final XNode node = (XNode) item;
+        final GNode node = (XNode) item;
         if(T_REST_FORWARD.matches(node)) {
           // server-side forwarding
-          final XNode ch = node.childIter().next();
+          final GNode ch = node.childIter().next();
           if(ch == null || ch.type != NodeType.TEXT) throw func.error(NO_VALUE_X, node.name());
           forward = string(ch.string()).trim();
           item = iter.next();
@@ -165,21 +165,21 @@ final class RestXqResponse extends WebResponse {
    * @return serialization parameters
    * @throws QueryException query exception (including unexpected ones)
    */
-  private SerializerOptions build(final XNode response) throws QueryException {
+  private SerializerOptions build(final GNode response) throws QueryException {
     // don't allow attributes
     final BasicNodeIter atts = response.attributeIter();
-    final XNode attr = atts.next();
+    final GNode attr = atts.next();
     if(attr != null) throw func.error(UNEXP_NODE_X, attr);
 
     // parse response and serialization parameters
     final SerializerOptions sopts = func.sopts;
     String cType = null;
-    for(final XNode node : response.childIter()) {
+    for(final GNode node : response.childIter()) {
       // process http:response element
       if(T_HTTP_RESPONSE.matches(node)) {
         // check status and reason
         byte[] sta = null, msg = null;
-        for(final XNode a : node.attributeIter()) {
+        for(final GNode a : node.attributeIter()) {
           final QNm qnm = a.qname();
           if(qnm.eq(Q_STATUS)) sta = a.string();
           else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)) msg = a.string();
@@ -190,22 +190,22 @@ final class RestXqResponse extends WebResponse {
           message = msg != null ? string(msg) : null;
         }
 
-        for(final XNode c : node.childIter()) {
+        for(final GNode gchild : node.childIter()) {
+          final XNode child = (XNode) gchild;
           // process http:header elements
-          if(T_HTTP_HEADER.matches(c)) {
-            final byte[] nam = c.attribute(Q_NAME);
-            final byte[] val = c.attribute(Q_VALUE);
-            if(nam != null && val != null) {
-              final String key = string(nam), value = string(val);
-              if(key.equalsIgnoreCase(HTTPText.CONTENT_TYPE)) {
-                cType = value;
+          if(T_HTTP_HEADER.matches(child)) {
+            final byte[] name = child.attribute(Q_NAME), value = child.attribute(Q_VALUE);
+            if(name != null && value != null) {
+              final String n = string(name), v = string(value);
+              if(n.equalsIgnoreCase(HTTPText.CONTENT_TYPE)) {
+                cType = v;
               } else {
-                conn.response.setHeader(key, key.equalsIgnoreCase(HTTPText.LOCATION) ?
-                  conn.resolve(value) : value);
+                conn.response.setHeader(n, n.equalsIgnoreCase(HTTPText.LOCATION) ?
+                  conn.resolve(v) : v);
               }
             }
           } else {
-            throw func.error(UNEXP_NODE_X, c);
+            throw func.error(UNEXP_NODE_X, child);
           }
         }
       } else if(T_OUTPUT_SERIAL.matches(node)) {

@@ -13,6 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
@@ -62,7 +63,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns an array type for this sequence type and the specified key type.
+   * Returns a map type for this sequence type and the specified key type.
    * @param keyType key type
    * @return map type
    */
@@ -105,6 +106,8 @@ public final class SeqType {
    * @return result of check
    */
   private boolean instance(final Value value, final boolean coerce) {
+    if(eq(value.seqType())) return true;
+
     // check cardinality
     final long size = value.size();
     if(!occ.check(size)) return false;
@@ -202,15 +205,28 @@ public final class SeqType {
   /**
    * Converts the specified value to this type.
    * @param value value to promote
-   * @param name variable name (used for error message, can be {@code null})
    * @param qc query context
-   * @param cc compilation context ({@code null} during runtime)
    * @param info input info (can be {@code null})
    * @return converted value
    * @throws QueryException if the conversion was not possible
    */
-  public Value coerce(final Value value, final QNm name, final QueryContext qc,
-      final CompileContext cc, final InputInfo info) throws QueryException {
+  public Value coerce(final Value value, final QueryContext qc, final InputInfo info)
+      throws QueryException {
+    return coerce(value, qc, info, null, null);
+  }
+
+  /**
+   * Converts the specified value to this type.
+   * @param value value to promote
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @param name variable name (used for error message, can be {@code null})
+   * @param cc compilation context ({@code null} during runtime)
+   * @return converted value
+   * @throws QueryException if the conversion was not possible
+   */
+  public Value coerce(final Value value, final QueryContext qc, final InputInfo info,
+      final QNm name, final CompileContext cc) throws QueryException {
 
     // instance check
     final SeqType[] at = type instanceof final FuncType ft ? ft.argTypes : null;
@@ -267,15 +283,17 @@ public final class SeqType {
       return vb.value();
     }
     if(item instanceof final FItem fitem) {
-      if(item instanceof final XQArray array) {
-        if(type instanceof final ArrayType at) return array.coerceTo(at, qc, cc, info);
-      } else if(item instanceof final XQMap map) {
-        if(type instanceof final RecordType rt) return map.coerceTo(rt, qc, cc, info);
-        if(type instanceof final MapType mt) return map.coerceTo(mt, qc, cc, info);
+      if(fitem instanceof final XQArray array) {
+        if(type instanceof final ArrayType at) return array.coerceTo(at, qc, info, cc);
+      } else if(fitem instanceof final XQMap map) {
+        if(type instanceof final RecordType rt) return map.coerceTo(rt, qc, info, cc);
+        if(type instanceof final MapType mt) return map.coerceTo(mt, qc, info, cc);
       }
       if(type instanceof final FuncType ft) {
-        return fitem.coerceTo(type == Types.FUNCTION ? item.funcType() : ft, qc, cc, info);
+        return fitem.coerceTo(type == Types.FUNCTION ? fitem.funcType() : ft, qc, cc, info);
       }
+    } else if(item instanceof final JNode jnode) {
+      return coerce(jnode.value.unwrappedItem(qc, info), name, qc, cc, info);
     }
     return instance(item, false) ? item : null;
   }
@@ -416,16 +434,20 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNumber() {
-    return !zero() && (type.isNumber() || type == BasicType.ANY_ATOMIC_TYPE ||
-        type == BasicType.ITEM);
+    if(zero()) return false;
+    return type.isNumber() || type == BasicType.ITEM || type == BasicType.ANY_ATOMIC_TYPE;
   }
 
   /**
-   * Tests if expressions of this type may yield functions (including maps and arrays).
+   * Tests if contents may be wrapped in a data structure. This includes JNodes,
+   * maps, arrays and function items.
    * @return result of check
    */
-  public boolean mayBeFunction() {
-    return !zero() && (type == BasicType.ITEM || type instanceof FType);
+  public boolean mayBeWrapped() {
+    if(zero()) return false;
+    final Kind kind = type.kind();
+    return type == BasicType.ITEM || kind == Kind.GNODE || kind == Kind.JNODE ||
+        type instanceof FType;
   }
 
   /**

@@ -180,9 +180,9 @@ public final class Condition extends Single {
   @Override
   public void toXml(final QueryPlan plan) {
     final FBuilder elem = plan.create(start ? START : END, item);
-    if(pos  != null) elem.add(plan.create(AT, pos));
-    if(prev != null) elem.add(plan.create(PREVIOUS, prev));
-    if(next != null) elem.add(plan.create(NEXT, next));
+    if(pos  != null) elem.node(plan.create(AT, pos));
+    if(prev != null) elem.node(plan.create(PREVIOUS, prev));
+    if(next != null) elem.node(plan.create(NEXT, next));
     plan.add(elem, expr);
   }
   @Override

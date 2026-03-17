@@ -106,7 +106,7 @@ public abstract class CNode extends Arr {
 
   @Override
   public final String description() {
-    return Strings.concat(((NodeType) seqType().type).kind.description(), " constructor");
+    return Strings.concat(seqType().type.kind().description(), " constructor");
   }
 
   /**

@@ -102,7 +102,7 @@ public abstract class Expr extends ExprInfo {
     final SeqType st = seqType();
     if(st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return iter;
     long size = iter.size();
-    if(size != -1 && st.mayBeFunction()) size = -1;
+    if(size != -1 && st.mayBeWrapped()) size = -1;
     return new AtomIter(iter, qc, ii, size);
   }
 
@@ -128,6 +128,59 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public abstract Value atomValue(QueryContext qc, InputInfo ii) throws QueryException;
+
+  /**
+   * Evaluates the expression and returns an iterator on the resulting, unwrapped items.
+   * @param qc query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  public Iter unwrappedIter(final QueryContext qc) throws QueryException {
+    final Iter iter = iter(qc);
+    if(!seqType().mayBeWrapped()) return iter;
+
+    return new Iter() {
+      private Iter unwrapped;
+
+      @Override
+      public Item next() throws QueryException {
+        while(true) {
+          if(unwrapped == null) {
+            final Item item = iter.next();
+            if(item == null) return null;
+            if(item instanceof final JNode jnode) {
+              unwrapped = jnode.value.unwrappedIter(qc);
+            } else {
+              return item;
+            }
+          }
+          final Item item = unwrapped.next();
+          if(item != null) return item;
+          unwrapped = null;
+        }
+      }
+    };
+  }
+
+  /**
+   * Evaluates the expression and returns the unwrapped items.
+   * @param qc query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  public abstract Value unwrappedValue(QueryContext qc) throws QueryException;
+
+  /**
+   * Evaluates the expression and returns the unwrapped item.
+   * @param qc query context
+   * @param ii input info (can be {@code null}; required for those {@link Value} instances
+   *   that have no input info)
+   * @return item
+   * @throws QueryException query exception
+   */
+  public final Item unwrappedItem(final QueryContext qc, final InputInfo ii) throws QueryException {
+    return unwrappedValue(qc).item(qc, ii);
+  }
 
   /**
    * Computes the effective boolean value for this expression.
@@ -324,8 +377,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean ddo() {
-    final SeqType st = seqType();
-    return st.zeroOrOne() && st.type instanceof NodeType;
+    return seqType().zeroOrOne();
   }
 
   /**

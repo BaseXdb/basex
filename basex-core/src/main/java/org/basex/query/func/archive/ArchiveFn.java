@@ -37,7 +37,7 @@ abstract class ArchiveFn extends StandardFunc {
     if(encoding == Strings.UTF8 && !enforce) return value;
     try {
       final boolean validate = qc.context.options.get(MainOptions.CHECKSTRINGS);
-      return ConvertFn.toString(new ArrayInput(value), encoding, validate);
+      return ConvertFn.toString(new ArrayInput(value), encoding, !validate);
     } catch(final IOException ex) {
       throw ARCHIVE_ENCODE2_X.get(info, ex);
     }
@@ -52,7 +52,7 @@ abstract class ArchiveFn extends StandardFunc {
    */
   final HashSet<String> toEntries(final Expr expr, final QueryContext qc) throws QueryException {
     final HashSet<String> entries = new LinkedHashSet<>();
-    final Iter names = expr.iter(qc);
+    final Iter names = expr.unwrappedIter(qc);
     for(Item item; (item = qc.next(names)) != null;) {
       entries.add(toString(item, qc));
     }

@@ -39,10 +39,10 @@ final class PlainDoc extends Inspect {
    */
   FNode context() throws QueryException {
     final FBuilder root = element("context");
-    for(final StaticVar sv : qc.vars) root.add(variable(sv));
+    for(final StaticVar sv : qc.vars) root.node(variable(sv));
     for(final StaticFunc sf : qc.functions) {
       if(!NSGlobal.reserved(sf.name.uri())) {
-        root.add(function(sf.name, sf, sf.funcType(), sf.anns));
+        root.node(function(sf.name, sf, sf.funcType(), sf.anns));
       }
     }
     return root.finish();
@@ -54,16 +54,14 @@ final class PlainDoc extends Inspect {
     final FBuilder root = element("module");
     if(module instanceof LibraryModule) {
       final QNm name = module.sc.module;
-      root.add(Q_PREFIX, name.string()).add(Q_URI, name.uri());
+      root.attr(Q_PREFIX, name.string()).attr(Q_URI, name.uri());
     }
 
     final TokenObjectMap<TokenList> doc = module.doc();
     if(doc != null) comment(doc, root);
-    for(final StaticVar sv : module.vars) root.add(variable(sv));
+    for(final StaticVar sv : module.vars) root.node(variable(sv));
     for(final StaticFunc sf : module.funcs) {
-      if(!NSGlobal.reserved(sf.name.uri())) {
-        root.add(function(sf.name, sf, sf.funcType(), sf.anns));
-      }
+      root.node(function(sf.name, sf, sf.funcType(), sf.anns));
     }
     options(module.options, root, true);
     return root.finish();
@@ -78,10 +76,10 @@ final class PlainDoc extends Inspect {
   private FNode variable(final StaticVar sv) throws QueryException {
     final FBuilder variable = element("variable");
     final byte[] name = sv.name.string(), uri = sv.name.uri();
-    variable.add(Q_NAME, name);
-    if(uri.length != 0) variable.add(Q_URI, uri);
+    variable.attr(Q_NAME, name);
+    if(uri.length != 0) variable.attr(Q_URI, uri);
     type(sv.seqType(), variable);
-    variable.add(Q_EXTERNAL, sv.external);
+    variable.attr(Q_EXTERNAL, sv.external);
 
     comment(sv, variable);
     annotations(sv.anns, variable, true);
@@ -102,10 +100,10 @@ final class PlainDoc extends Inspect {
 
     final FBuilder function = element("function");
     if(fname != null) {
-      function.add(Q_NAME, fname.string());
-      if(fname.uri().length != 0) function.add(Q_URI, fname.uri());
+      function.attr(Q_NAME, fname.string());
+      if(fname.uri().length != 0) function.attr(Q_URI, fname.uri());
     }
-    function.add(Q_EXTERNAL, sf != null && sf.expr == null);
+    function.attr(Q_EXTERNAL, sf != null && sf.expr == null);
 
     final TokenObjectMap<TokenList> doc = sf != null ? sf.doc() : null;
     final int al = ft.argTypes.length;
@@ -119,13 +117,13 @@ final class PlainDoc extends Inspect {
       final FBuilder argument = element("argument");
       if(names != null) {
         final byte[] name = names[a].string(), uri = names[a].uri(), pdoc = doc(doc, name);
-        argument.add(Q_NAME, name);
-        if(uri.length != 0) argument.add(Q_URI, uri);
+        argument.attr(Q_NAME, name);
+        if(uri.length != 0) argument.attr(Q_URI, uri);
 
         if(pdoc != null) add(pdoc, argument);
       }
       type(ft.argTypes[a], argument);
-      function.add(argument);
+      function.node(argument);
     }
 
     annotations(anns, function, true);
@@ -135,9 +133,9 @@ final class PlainDoc extends Inspect {
         if(eq(key, DOC_PARAM, DOC_RETURN)) continue;
         for(final byte[] value : doc.get(key)) {
           final FBuilder elem = eq(key, DOC_TAGS) ? element(string(key)) :
-            element("tag").add(Q_NAME, key);
+            element("tag").attr(Q_NAME, key);
           add(value, elem);
-          function.add(elem);
+          function.node(elem);
         }
       }
     }
@@ -148,7 +146,7 @@ final class PlainDoc extends Inspect {
     if(returns != null) {
       for(final byte[] value : returns) add(value, rtrn);
     }
-    return function.add(rtrn).finish();
+    return function.node(rtrn).finish();
   }
 
   @Override
@@ -180,9 +178,9 @@ final class PlainDoc extends Inspect {
    */
   private static void type(final SeqType st, final FBuilder elem) {
     if(st != null) {
-      elem.add(Q_TYPE, st.typeString());
+      elem.attr(Q_TYPE, st.typeString());
       final String occ = st.occ.toString();
-      if(!occ.isEmpty()) elem.add(Q_OCCURRENCE, occ);
+      if(!occ.isEmpty()) elem.attr(Q_OCCURRENCE, occ);
     }
   }
 }

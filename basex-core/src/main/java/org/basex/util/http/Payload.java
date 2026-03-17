@@ -75,10 +75,10 @@ public final class Payload {
     if(type.isMultipart()) {
       // multipart response
       final byte[] boundary = boundary(type);
-      body = FElem.build(Q_HTTP_MULTIPART).add(Q_BOUNDARY, boundary);
-      final ANodeList parts = new ANodeList();
+      body = FElem.build(Q_HTTP_MULTIPART).attr(Q_BOUNDARY, boundary);
+      final GNodeList parts = new GNodeList();
       extractParts(concat(DASHES, boundary), parts);
-      for(final XNode node : parts) body.add(node);
+      for(final GNode node : parts) body.node(node);
     } else {
       // single part response
       body = FElem.build(Q_HTTP_BODY);
@@ -87,7 +87,7 @@ public final class Payload {
         payloads.add(parse(BufferInput.get(in).content(), type));
       }
     }
-    return body.add(Q_MEDIA_TYPE, type.type()).finish();
+    return body.attr(Q_MEDIA_TYPE, type.type()).finish();
   }
 
   /**
@@ -120,7 +120,7 @@ public final class Payload {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private void extractParts(final byte[] sep, final ANodeList parts)
+  private void extractParts(final byte[] sep, final GNodeList parts)
       throws IOException, QueryException {
 
     // RFC 1341: Preamble is to be ignored: read till 1st boundary
@@ -142,7 +142,7 @@ public final class Payload {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private boolean extractPart(final byte[] sep, final byte[] end, final ANodeList parts)
+  private boolean extractPart(final byte[] sep, final byte[] end, final GNodeList parts)
       throws IOException, QueryException {
 
     // check if last line is reached
@@ -166,13 +166,13 @@ public final class Payload {
           base64 = value.equals(BASE64);
         }
         if(!value.isEmpty() && parts != null) {
-          parts.add(FElem.build(Q_HTTP_HEADER).add(Q_NAME, key).add(Q_VALUE, value).finish());
+          parts.add(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, key).attr(Q_VALUE, value).finish());
         }
       }
       l = readLine();
     }
     if(parts != null) {
-      parts.add(FElem.build(Q_HTTP_BODY).add(Q_MEDIA_TYPE, type).finish());
+      parts.add(FElem.build(Q_HTTP_BODY).attr(Q_MEDIA_TYPE, type).finish());
     }
 
     // extract payload

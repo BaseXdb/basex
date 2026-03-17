@@ -43,7 +43,7 @@ public final class PkgParser {
     final XNode node;
     try {
       // checks root node
-      node = childElements(new DBNode(io)).next();
+      node = (XNode) childElements(new DBNode(io)).next();
       if(!eqNS(E_PACKAGE, node.qname()))
         throw REPO_DESCRIPTOR_X.get(info, Util.info(WHICHELEM, node.qname()));
     } catch(final IOException ex) {
@@ -70,12 +70,12 @@ public final class PkgParser {
    * @param pkg package container
    * @throws QueryException query exception
    */
-  private void parseChildren(final XNode node, final Pkg pkg) throws QueryException {
-    final BasicNodeIter iter = childElements(node);
-    for(XNode next; (next = iter.next()) != null;) {
-      final QNm name = next.qname();
-      if(eqNS(E_DEPENDENCY, name)) pkg.dep.add(parseDependency(next));
-      else if(eqNS(E_XQUERY, name)) pkg.comps.add(parseComp(next));
+  private void parseChildren(final GNode node, final Pkg pkg) throws QueryException {
+    for(final GNode gchild : childElements(node)) {
+      final XNode child = (XNode) gchild;
+      final QNm name = child.qname();
+      if(eqNS(E_DEPENDENCY, name)) pkg.dep.add(parseDependency(child));
+      else if(eqNS(E_XQUERY, name)) pkg.comps.add(parseComp(child));
     }
   }
 
@@ -106,12 +106,11 @@ public final class PkgParser {
    * @throws QueryException query exception
    */
   private PkgComponent parseComp(final XNode node) throws QueryException {
-    final BasicNodeIter iter = childElements(node);
     final PkgComponent comp = new PkgComponent();
-    for(XNode next; (next = iter.next()) != null;) {
-      final QNm name = next.qname();
-      if(eqNS(A_NAMESPACE, name)) comp.uri = string(next.string());
-      else if(eqNS(A_FILE, name)) comp.file = string(next.string());
+    for(final GNode child : childElements(node)) {
+      final QNm name = child.qname();
+      if(eqNS(A_NAMESPACE, name)) comp.uri = string(child.string());
+      else if(eqNS(A_FILE, name)) comp.file = string(child.string());
       else throw REPO_DESCRIPTOR_X.get(info, Util.info(WHICHELEM, name));
     }
 
@@ -127,14 +126,14 @@ public final class PkgParser {
    * @param node root node
    * @return child element iterator
    */
-  private static BasicNodeIter childElements(final XNode node) {
+  private static BasicNodeIter childElements(final GNode node) {
     return new BasicNodeIter() {
       final BasicNodeIter iter = node.childIter();
 
       @Override
-      public XNode next() {
+      public GNode next() {
         while(true) {
-          final XNode nd = iter.next();
+          final GNode nd = iter.next();
           if(nd == null || nd.kind() == Kind.ELEMENT) return nd;
         }
       }

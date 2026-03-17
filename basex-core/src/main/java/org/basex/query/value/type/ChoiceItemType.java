@@ -30,14 +30,8 @@ public final class ChoiceItemType implements Type {
    * Constructor.
    * @param types alternative item types
    */
-  public ChoiceItemType(final List<SeqType> types) {
-    if(types.contains(Types.ERROR_O)) {
-      final ArrayList<SeqType> list = new ArrayList<>(types);
-      do { } while(list.remove(Types.ERROR_O));
-      this.types = list.isEmpty() ? types : list;
-    } else {
-      this.types = types;
-    }
+  private ChoiceItemType(final List<SeqType> types) {
+    this.types = types;
     Type tp = null;
     for(final SeqType st : this.types) {
       tp = tp == null ? st.type : tp.union(st.type);
@@ -50,8 +44,10 @@ public final class ChoiceItemType implements Type {
    * @param types alternative item types
    * @return choice item type
    */
-  public static ChoiceItemType get(final SeqType... types) {
-    return new ChoiceItemType(Arrays.asList(types));
+  public static Type get(final SeqType... types) {
+    final Builder builder = new Builder();
+    for(final SeqType st : types) builder.add(st);
+    return builder.build();
   }
 
   @Override
@@ -122,16 +118,12 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public Type intersect(final Type type) {
-    final ArrayList<SeqType> list = new ArrayList<>();
+    final Builder builder = new Builder();
     for(final SeqType st : types) {
       final Type tp = type.intersect(st.type);
-      if(tp != null) list.add(tp.seqType());
+      if(tp != null) builder.add(tp.seqType());
     }
-    return switch(list.size()) {
-      case 0 -> null;
-      case 1 -> list.get(0).type;
-      default -> new ChoiceItemType(list);
-    };
+    return builder.types.isEmpty() ? null : builder.build();
   }
 
   @Override
@@ -221,13 +213,83 @@ public final class ChoiceItemType implements Type {
   }
 
   @Override
+  public String name() {
+    return "";
+  }
+
+  @Override
   public String toString() {
-    final QueryString qs = new QueryString().token('(');
-    int n = types.size();
-    for(final SeqType st : types) {
-      qs.token(st.toString());
-      if(--n != 0) qs.token('|');
+    return toString("|", (Object[]) types.toArray(SeqType[]::new));
+  }
+
+  /**
+   * Builder for choice item types, removing error types if necessary. May create a single item type
+   * if only one type remains. Also merges consecutive enums, as well as any node types of the same
+   * kind by replacing with the union, and flattens nested ChoiceItemTypes.
+   */
+  public static final class Builder {
+    /** Alternative item types. */
+    private final ArrayList<SeqType> types = new ArrayList<>();
+
+    /**
+     * Builds and returns the resulting choice item type.
+     * @return choice item type, or the single item type if the list contains only one type
+     */
+    public Type build() {
+      if(types.size() != 1) types.remove(Types.ERROR_O);
+      return switch(types.size()) {
+        case 0 -> throw Util.notExpected();
+        case 1 -> types.get(0).type;
+        default -> new ChoiceItemType(types);
+      };
     }
-    return qs.token(')').toString();
+
+    /**
+     * Adds the specified sequence type to this builder, merging enum types only if consecutive, and
+     * merging document, element, attribute, and pi types anywhere in the list, ignoring duplicates,
+     * and flattening nested ChoiceItemTypes.
+     * @param st sequence type to be added
+     * @return this builder
+     */
+    public Builder add(final SeqType st) {
+      // flatten nested ChoiceItemTypes
+      if(st.type instanceof ChoiceItemType ct) {
+        for(final SeqType s : ct.types) add(s);
+        return this;
+      }
+      // ignore duplicates
+      if(types.contains(st)) return this;
+      // non-mergeable types or first entry
+      final Type.ID id = st.type.id();
+      if(types.isEmpty()
+          || !id.oneOf(Type.ID.ENM, Type.ID.DOC, Type.ID.ELM, Type.ID.ATT, Type.ID.PI)) {
+        types.add(st);
+        return this;
+      }
+      // enums: merge consecutive entries only, to preserve position of alternatives
+      if(id == Type.ID.ENM) {
+        final int last = types.size() - 1;
+        final Type tp = types.get(last).type;
+        if(tp.id() == Type.ID.ENM) {
+          // remove and re-add, for duplicate removal
+          types.remove(last);
+          return add(tp.union(st.type).seqType());
+        }
+     // not consecutive: add as-is
+        types.add(st);
+        return this;
+      }
+      // nodes (DOC/ELM/ATT/PI): merge with existing alternative of same kind anywhere, in-place
+      for(int i = 0; i < types.size(); i++) {
+        final SeqType existing = types.get(i);
+        if(existing.type.id() == id) {
+          types.set(i, existing.type.union(st.type).seqType());
+          return this;
+        }
+      }
+      // no existing node kind found
+      types.add(st);
+      return this;
+    }
   }
 }

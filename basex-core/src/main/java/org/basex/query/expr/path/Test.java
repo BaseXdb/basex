@@ -6,6 +6,8 @@ import java.util.List;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.expr.path.NameTest.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -17,15 +19,38 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class Test extends ExprInfo {
-  /** Node type. */
-  public final NodeType type;
+  /** Node kind. */
+  public final Kind kind;
 
   /**
    * Constructor.
-   * @param type node type
+   * @param kind node kind
    */
-  Test(final NodeType type) {
-    this.type = type;
+  Test(final Kind kind) {
+    this.kind = kind;
+  }
+
+  /**
+   * Creates a new test.
+   * @param kind node kind (can be {@code null})
+   * @param qname node name (can be {@code null})
+   * @param scope scope (can be {@code null})
+   * @param ns default element namespace (used for optimizations, can be {@code null})
+   * @return test
+   */
+  public static Test get(final Kind kind, final QNm qname, final Scope scope, final byte[] ns) {
+    final QNm n = qname != null ? qname : QNm.EMPTY;
+    final Kind k = kind != null ? kind : Kind.GNODE;
+    final Scope s = scope == Scope.FLEXIBLE && k.instanceOf(Kind.NODE) ? Scope.FULL :
+      scope != null ? scope : k == Kind.PROCESSING_INSTRUCTION ? Scope.LOCAL : Scope.FULL;
+
+    if(k != Kind.GNODE) {
+      // element(*), attribute(*), jnode(*)
+      if(s == Scope.ALL || n == QNm.EMPTY) return NodeTest.get(k);
+      // jnode(a)
+      if(s == Scope.FLEXIBLE && k == Kind.JNODE) return JNodeTest.get(Str.get(n.string()), null);
+    }
+    return new NameTest(n, s, k, ns);
   }
 
   /**
@@ -57,14 +82,12 @@ public abstract class Test extends ExprInfo {
    * @param list list
    */
   private static void merge(final Test test, final List<Test> list) {
-    final boolean ntest = test instanceof NameTest;
-    final boolean utest = ntest && ((NameTest) test).scope == NameTest.Scope.URI;
     final int ls = list.size();
     for(int l = 0; l < ls; l++) {
       final Test t = list.get(l);
       // skip URI-based comparisons (may not be assigned yet at parse time)
-      if(ntest && t instanceof final NameTest nt && (utest || nt.scope == NameTest.Scope.URI))
-        continue;
+      if(test instanceof NameTest ntest && t instanceof final NameTest nt && (
+          ntest.scope == NameTest.Scope.URI || nt.scope == NameTest.Scope.URI)) continue;
       // * union A
       if(test.instanceOf(t)) return;
       // A union * → *
@@ -79,11 +102,12 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Optimizes the test.
-   * @param data data reference (can be {@code null})
+   * @param kn kind of step input
+   * @param data data reference (can be {@code null}); used to test if the test may be successful
    * @return resulting test, or {@code null} if the test yields no results
    */
   @SuppressWarnings("unused")
-  public Test optimize(final Data data) {
+  public Test optimize(final Kind kn, final Data data) {
     return this;
   }
 
@@ -92,14 +116,17 @@ public abstract class Test extends ExprInfo {
    * @param node node to be checked
    * @return result of check
    */
-  public abstract boolean matches(XNode node);
+  public abstract boolean matches(GNode node);
 
   /**
-   * Checks if the current test will match items of the specified type.
-   * @param seqType type to be checked
-   * @return {@link Boolean#TRUE}: always, {@link Boolean#FALSE}: never, {@code null}: unknown
+   * Checks whether the type of this test is a supertype of the specified type.
+   * The runtime type may be any of its subtypes.
+   * @param type type to check
+   * @return {@link Boolean#TRUE}  if the type subsumes the specified type;
+   *         {@link Boolean#FALSE} if it does not;
+   *         {@code null}          if the relationship is unknown
    */
-  public Boolean matches(@SuppressWarnings("unused") final SeqType seqType) {
+  public Boolean subsumes(@SuppressWarnings("unused") final Type type) {
     return null;
   }
 
@@ -115,7 +142,13 @@ public abstract class Test extends ExprInfo {
    * @return result of check
    */
   public boolean instanceOf(final Test test) {
-    return test instanceof final UnionTest ut ? ut.instance(this) : type.instanceOf(test.type);
+    if(test instanceof final UnionTest ut) {
+      for(final Test t : ut.tests) {
+        if(instanceOf(t)) return true;
+      }
+      return false;
+    }
+    return test.kind == kind || test.kind == Kind.NODE;
   }
 
   /**
@@ -127,10 +160,10 @@ public abstract class Test extends ExprInfo {
 
   /**
    * Returns a string representation of this test.
-   * @param full include node type
+   * @param type include type information
    * @return string
    */
-  public abstract String toString(boolean full);
+  public abstract String toString(boolean type);
 
   @Override
   public void toXml(final QueryPlan plan) {

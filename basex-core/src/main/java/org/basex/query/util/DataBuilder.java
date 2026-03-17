@@ -60,7 +60,7 @@ public final class DataBuilder {
    * @throws QueryException query exception
    */
   public void build(final XNode node) throws QueryException {
-    build(new ANodeList().add(node));
+    build(new GNodeList().add(node));
   }
 
   /**
@@ -68,10 +68,10 @@ public final class DataBuilder {
    * @param nodes node list
    * @throws QueryException query exception
    */
-  public void build(final ANodeList nodes) throws QueryException {
+  public void build(final GNodeList nodes) throws QueryException {
     data.meta.update();
     int next = data.meta.size;
-    for(final XNode node : nodes) next = addNode(node, next, -1);
+    for(final GNode node : nodes) next = addNode((XNode) node, next, -1);
 
     // see Builder#addElem
     limit(data.elemNames.size(), 0x8000, "distinct element names");
@@ -124,7 +124,7 @@ public final class DataBuilder {
     final int last = data.meta.size;
     data.insert(last);
     int next = pre + 1;
-    for(final XNode child : node.childIter()) next = addNode(child, next, pre);
+    for(final GNode child : node.childIter()) next = addNode((XNode) child, next, pre);
     if(size != next - pre) data.size(last, Data.DOC, next - pre);
     return next;
   }
@@ -253,8 +253,8 @@ public final class DataBuilder {
 
     // add attributes and child nodes
     int cPre = pre + 1;
-    for(final XNode attr : node.attributeIter()) cPre = addAttr(attr, cPre, pre);
-    for(final XNode child : node.childIter()) cPre = addNode(child, cPre, pre);
+    for(final GNode attr : node.attributeIter()) cPre = addAttr((XNode) attr, cPre, pre);
+    for(final GNode child : node.childIter()) cPre = addNode((XNode) child, cPre, pre);
 
     // finalize namespace structure
     data.nspaces.close(last);
@@ -282,7 +282,7 @@ public final class DataBuilder {
     final BasicNodeIter iter = node.attributeIter();
     while(iter.next() != null) ++size;
     if(!att) {
-      for(final XNode child : node.childIter()) size += size(child, false);
+      for(final GNode child : node.childIter()) size += size((XNode) child, false);
     }
     return size;
   }

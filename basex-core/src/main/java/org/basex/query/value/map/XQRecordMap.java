@@ -21,10 +21,10 @@ public final class XQRecordMap extends XQHashMap {
 
   /**
    * Constructor.
-   * @param values values
    * @param type record type
+   * @param values values
    */
-  public XQRecordMap(final Value[] values, final Type type) {
+  public XQRecordMap(final Type type, final Value... values) {
     super(type);
     this.values = values;
   }
@@ -54,7 +54,7 @@ public final class XQRecordMap extends XQHashMap {
     if(value.seqType().instanceOf(fields().value(index + 1).seqType())) {
       final Value[] copy = values.clone();
       copy[index] = value;
-      return new XQRecordMap(copy, type);
+      return new XQRecordMap(type, copy);
     }
     return super.putAt(index, value);
   }

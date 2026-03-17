@@ -18,7 +18,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.lib.directory>lib</project.lib.directory>
-    <jettyVersion>12.1.6</jettyVersion>
+    <jettyVersion>12.1.7</jettyVersion>
     <junit.version>6.0.3</junit.version>
   </properties>
 
@@ -368,7 +368,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.5.4</version>
+          <version>3.5.5</version>
           <inherited>true</inherited>
         </plugin>
 
@@ -410,7 +410,6 @@
           <configuration>
             <outputDirectory>${project.lib.directory}</outputDirectory>
             <includeScope>runtime</includeScope>
-            <excludeReactor>true</excludeReactor>
           </configuration>
           <executions>
             <execution>

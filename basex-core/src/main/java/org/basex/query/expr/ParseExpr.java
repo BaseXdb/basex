@@ -100,6 +100,11 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
+  public final Value unwrappedValue(final QueryContext qc) throws QueryException {
+    return value(qc).unwrappedValue(qc);
+  }
+
+  @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
     // single item
@@ -109,7 +114,7 @@ public abstract class ParseExpr extends Expr {
     final Item item1 = iter.next();
     if(item1 == null) return false;
     // sequence starting with node?
-    if(item1 instanceof XNode) return true;
+    if(item1 instanceof GNode) return true;
     // single item?
     Item item2 = iter.next();
     if(item2 == null) return item1.test(qc, info, pos);
@@ -258,7 +263,7 @@ public abstract class ParseExpr extends Expr {
    * If negative, an exception is thrown.
    * @param qc query context
    * @param perm permission
-   * @param name name of resource
+   * @param name name of database
    * @throws QueryException query exception
    */
   protected void checkPerm(final QueryContext qc, final Perm perm, final String name)
@@ -525,6 +530,45 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Evaluates an expression to a GNode.
+   * @param expr expression
+   * @param qc query context
+   * @return GNode, or {@code null} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  protected final GNode toGNodeOrNull(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    final Item item = expr.item(qc, info);
+    return item.isEmpty() ? null : toGNode(item);
+  }
+
+  /**
+   * Converts an item to a GNode.
+   * @param item item to be converted
+   * @return GNode
+   * @throws QueryException query exception
+   */
+  protected final GNode toGNode(final Item item) throws QueryException {
+    if(item instanceof final GNode node) return node;
+    throw typeError(item, GNODE, info);
+  }
+
+  /**
+   * Evaluates an expression to a JNode.
+   * @param expr expression
+   * @param qc query context
+   * @return JNode, or {@code null} if the expression yields an empty sequence
+   * @throws QueryException query exception
+   */
+  protected final JNode toJNodeOrNull(final Expr expr, final QueryContext qc)
+      throws QueryException {
+    final Item item = expr.item(qc, info);
+    if(item.isEmpty()) return null;
+    if(item instanceof final JNode node) return node;
+    throw typeError(item, GNODE, info);
+  }
+
+  /**
    * Converts an item to a node.
    * @param expr expression
    * @param qc query context
@@ -532,7 +576,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XNode toNode(final Expr expr, final QueryContext qc) throws QueryException {
-    return toNode(expr.item(qc, info));
+    return toNode(expr.unwrappedItem(qc, info));
   }
 
   /**
@@ -543,7 +587,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XNode toNodeOrNull(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.item(qc, info);
+    final Item item = expr.unwrappedItem(qc, info);
     return item.isEmpty() ? null : toNode(item);
   }
 
@@ -579,7 +623,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XNode toElem(final Expr expr, final QueryContext qc) throws QueryException {
-    return (XNode) checkType(expr.item(qc, info), ELEMENT);
+    return (XNode) checkType(expr.unwrappedItem(qc, info), ELEMENT);
   }
 
   /**
@@ -688,7 +732,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final FItem toFunction(final Expr expr, final QueryContext qc) throws QueryException {
-    return (FItem) checkType(expr.item(qc, info), Types.FUNCTION);
+    return (FItem) checkType(expr.unwrappedItem(qc, info), Types.FUNCTION);
   }
 
   /**
@@ -699,7 +743,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XQMap toMap(final Expr expr, final QueryContext qc) throws QueryException {
-    return toMap(expr.item(qc, info));
+    return toMap(expr.unwrappedItem(qc, info));
   }
 
   /**
@@ -723,7 +767,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final XQMap toRecord(final Item item, final RecordType type, final QueryContext qc)
       throws QueryException {
-    return (XQMap) type.seqType().coerce(item, null, qc, null, info);
+    return (XQMap) type.seqType().coerce(item, qc, info);
   }
 
   /**
@@ -749,7 +793,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final XQArray toArray(final Expr expr, final QueryContext qc) throws QueryException {
-    return toArray(expr.item(qc, info));
+    return toArray(expr.unwrappedItem(qc, info));
   }
 
   /**

@@ -8,6 +8,7 @@ import javax.xml.namespace.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.file.*;
 import org.basex.query.iter.*;
@@ -190,20 +191,21 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
 
   /**
    * Prepares a sandpit.
-   * @param source source directory ({@code null} if no files should be copied to the sandpit)
-   * @param target target directory
+   * @param source source directory ({@code null} if no files should be copied)
+   * @param dir sandpit directory
    * @throws XQueryException exception
    */
-  public void sandpit(final Path source, final Path target) {
+  public void sandpit(final Path source, final IOFile dir) {
     try {
+      final Path target = Paths.get(dir.path(), "sandpit");
       if(source != null) {
         final Job job = new Job() { };
         if(Files.exists(target)) FileDelete.delete(target, job);
-        FileCopy.relocate(source, target, true, job);
+        FileCopy.relocate(source, target, true, new Job() { });
       }
       qp.qc.resources.sandpit(target);
     } catch(final IOException ex) {
-      throw new XQueryException(new QueryException(ex));
+      throw new XQueryException(ex);
     }
   }
 

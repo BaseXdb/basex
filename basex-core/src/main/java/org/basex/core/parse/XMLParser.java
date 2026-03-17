@@ -46,7 +46,7 @@ final class XMLParser extends CommandParser {
         }
       }
       try(QueryProcessor qp = new QueryProcessor(query, ctx).context(node)) {
-        for(final Item ia : qp.value()) cmds.add(command(ia).baseURI(path));
+        for(final Item item : qp.value()) cmds.add(command((XNode) item).baseURI(path));
       }
     } catch(final IOException ex) {
       throw error(Text.STOPPED_AT + '%', ex);
@@ -60,8 +60,8 @@ final class XMLParser extends CommandParser {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private Command command(final Item root) throws IOException, QueryException {
-    final String e = ((XNode) root).qname().toJava().toString();
+  private Command command(final XNode root) throws IOException, QueryException {
+    final String e = root.qname().toJava().toString();
     if(e.equals(ADD) && check(root, PATH + '?', '<' + INPUT))
       return new Add(value(root, PATH), xml(root));
     if(e.equals(ALTER_BACKUP) && check(root, NAME, NEWNAME))
@@ -251,7 +251,7 @@ final class XMLParser extends CommandParser {
    * @return success flag
    * @throws QueryException query exception
    */
-  private boolean check(final Item root, final String... checks) throws QueryException {
+  private boolean check(final XNode root, final String... checks) throws QueryException {
     // prepare validating query
     final TokenList mand = new TokenList(), opt = new TokenList();
     String t = null;
@@ -297,7 +297,7 @@ final class XMLParser extends CommandParser {
     }
     // build error string
     final TokenBuilder syntax = new TokenBuilder();
-    final byte[] nm = ((XNode) root).qname().string();
+    final byte[] nm = root.qname().string();
     syntax.reset().add('<').add(nm);
     for(final byte[] m : mand) syntax.add(' ').add(m).add("=\"...\"");
     for(final byte[] o : opt) syntax.add(" (").add(o).add("=\"...\")");

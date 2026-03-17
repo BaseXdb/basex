@@ -59,7 +59,7 @@ public final class FnInvisibleXml extends StandardFunc {
      * @throws QueryException query exception
      */
     public FuncItem generate(final QueryContext qc) throws QueryException {
-      final Item grammar = (Item) ARG_TYPE.coerce(arg(0).value(qc), null, qc, null, info);
+      final Item grammar = (Item) ARG_TYPE.coerce(arg(0).value(qc), qc, info);
       final IxmlOptions options = toOptions(arg(1), new IxmlOptions(), qc);
 
       final String grmmr;
@@ -109,7 +109,7 @@ public final class FnInvisibleXml extends StandardFunc {
      */
     private ParseInvisibleXml(final InputInfo info, final de.bottlecaps.markup.blitz.Parser parser,
         final Expr... args) {
-      super(info, Types.DOCUMENT_NODE_O, args);
+      super(info, Types.DOCUMENT_O, args);
       this.parser = parser;
     }
 
@@ -119,7 +119,7 @@ public final class FnInvisibleXml extends StandardFunc {
       try {
         return new DBNode(IO.get(parser.parse(input)));
       } catch(final BlitzParseException ex) {
-        throw IXML_INP_X_X_X.get(ii, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
+        throw IXML_INP_X_X_X.get(info, ex.getOffendingToken(), ex.getLine(), ex.getColumn());
       } catch(final BlitzException | IOException ex) {
         throw IXML_RESULT_X.get(info, ex);
       }

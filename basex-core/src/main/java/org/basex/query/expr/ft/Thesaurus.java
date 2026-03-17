@@ -47,7 +47,7 @@ public final class Thesaurus {
    * @param root thesaurus root node
    */
   public Thesaurus(final XNode root) {
-    for(final XNode entry : elements(root, ENTRY, true)) build(entry);
+    for(final GNode entry : elements(root, ENTRY, true)) build(entry);
   }
 
   /**
@@ -63,14 +63,14 @@ public final class Thesaurus {
    * Populates the thesaurus.
    * @param entry thesaurus entry
    */
-  private void build(final XNode entry) {
-    final Function<XNode, ThesEntry> find = node -> {
+  private void build(final GNode entry) {
+    final Function<GNode, ThesEntry> find = node -> {
       final byte[] term = value(node, TERM);
       return entries.computeIfAbsent(term, () -> new ThesEntry(term));
     };
 
     final ThesEntry term = find.apply(entry);
-    for(final XNode synonym : elements(entry, SYNONYM, false)) {
+    for(final GNode synonym : elements(entry, SYNONYM, false)) {
       final ThesEntry syn = find.apply(synonym);
       final byte[] value = value(synonym, RELATIONSHIP);
       term.add(syn, value);
@@ -88,9 +88,9 @@ public final class Thesaurus {
    * @param desc return children or descendants
    * @return resulting elements
    */
-  private static ANodeList elements(final XNode node, final byte[] name, final boolean desc) {
-    final ANodeList list = new ANodeList();
-    for(final XNode element : desc ? node.descendantIter(false) : node.childIter()) {
+  private static GNodeList elements(final GNode node, final byte[] name, final boolean desc) {
+    final GNodeList list = new GNodeList();
+    for(final GNode element : desc ? node.descendantIter(false) : node.childIter()) {
       if(element.kind() == Kind.ELEMENT && eq(element.qname().local(), name))
         list.add(element);
     }
@@ -103,8 +103,8 @@ public final class Thesaurus {
    * @param name name of child element
    * @return value or empty string
    */
-  private static byte[] value(final XNode node, final byte[] name) {
-    final ANodeList elements = elements(node, name, false);
+  private static byte[] value(final GNode node, final byte[] name) {
+    final GNodeList elements = elements(node, name, false);
     return elements.isEmpty() ? EMPTY : elements.peek().string();
   }
 }

@@ -121,7 +121,9 @@ public abstract class Serializer implements Closeable {
    * @throws IOException I/O exception
    */
   public void serialize(final Item item) throws IOException {
-    if(item instanceof final XNode node) {
+    if(item instanceof final JNode node) {
+      jnode(node);
+    } else if(item instanceof final XNode node) {
       node(node);
     } else if(item instanceof final FItem fitem) {
       function(fitem);
@@ -172,6 +174,15 @@ public abstract class Serializer implements Closeable {
   }
 
   // PROTECTED METHODS ============================================================================
+
+  /**
+   * Serializes the specified JNode.
+   * @param jnode JNode to be serialized
+   * @throws IOException I/O exception
+   */
+  protected void jnode(final JNode jnode) throws IOException {
+    for(final Item item : jnode.value) serialize(item);
+  }
 
   /**
    * Serializes the specified node.
@@ -553,8 +564,8 @@ public abstract class Serializer implements Closeable {
     } else if(kind == Kind.DOCUMENT) {
       openDoc(node.baseURI());
       int roots = 0;
-      for(final XNode nd : node.childIter()) {
-        node(nd);
+      for(final GNode nd : node.childIter()) {
+        node((XNode) nd);
         if(canonical) {
           if(nd.kind() == Kind.ELEMENT && ++roots > 1) throw SERCANONROOTS_X.getIO(node);
           indent = true;
@@ -577,7 +588,7 @@ public abstract class Serializer implements Closeable {
       // serialize attributes
       final boolean i = indent;
       BasicNodeIter iter = node.attributeIter();
-      for(XNode nd; (nd = iter.next()) != null;) {
+      for(GNode nd; (nd = iter.next()) != null;) {
         final byte[] n = nd.name(), v = nd.string();
         addAttribute(n, v, canonical ? nsUri(prefix(n)) : null);
         if(eq(n, XML_SPACE) && indent) indent = !eq(v, PRESERVE);
@@ -588,8 +599,8 @@ public abstract class Serializer implements Closeable {
 
       // serialize children
       iter = node.childIter();
-      for(XNode n; (n = iter.next()) != null;) {
-        node(n);
+      for(GNode n; (n = iter.next()) != null;) {
+        node((XNode) n);
       }
       closeElement();
       indent = i;

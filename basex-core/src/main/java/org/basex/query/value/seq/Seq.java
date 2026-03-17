@@ -57,7 +57,7 @@ public abstract class Seq extends Value {
       throws QueryException {
 
     final Item first = itemAt(0);
-    if(first instanceof XNode) return true;
+    if(first instanceof GNode) return true;
     if(pos == 0 || !(first instanceof ANum)) throw testError(this, false, ii);
 
     for(final Item item : this) {
@@ -137,23 +137,33 @@ public abstract class Seq extends Value {
 
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
+    if(type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return this;
+
     final ValueBuilder vb = new ValueBuilder(qc, size);
     for(final Item item : this) vb.add(item.atomValue(qc, ii));
     return vb.value(BasicType.ANY_ATOMIC_TYPE);
   }
 
   @Override
+  public Value unwrappedValue(final QueryContext qc) {
+    if(type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) return this;
+
+    final ValueBuilder vb = new ValueBuilder(qc, size);
+    for(final Item item : this) vb.add(item.unwrappedValue(qc));
+    return vb.value(this);
+  }
+
+  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
-    if(type instanceof NodeType && mode.oneOf(Simplify.DATA, Simplify.NUMBER, Simplify.STRING)) {
-      if(mode == Simplify.STRING) {
-        final TokenList list = new TokenList(size);
-        for(int i = 0; i < size; i++) list.add(itemAt(i).string(null));
-        expr = StrSeq.get(list);
-      } else {
-        final Item[] items = new Item[(int) size];
-        for(int i = 0; i < size; i++) items[i] = Atm.get(itemAt(i).string(null));
-        expr = ItemSeq.get(items, (int) size, BasicType.UNTYPED_ATOMIC);
+    if(mode == Simplify.STRING && type.instanceOf(NodeType.NODE)) {
+      final TokenList list = new TokenList(size);
+      for(final Item item : atomValue(cc.qc, null)) list.add(item.string(null));
+      expr = StrSeq.get(list);
+    } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
+      final Type at = type.atomic();
+      if(at != null && at != type) {
+        expr = atomValue(cc.qc, null);
       }
     }
     return cc.simplify(this, expr, mode);

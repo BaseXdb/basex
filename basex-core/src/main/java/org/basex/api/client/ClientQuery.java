@@ -71,7 +71,7 @@ public class ClientQuery extends Query {
         final TokenBuilder tb = new TokenBuilder();
         for(final Item item : val) {
           if(!tb.isEmpty()) tb.addByte((byte) 1);
-          if(item instanceof XNode) {
+          if(item instanceof GNode) {
             tb.add(item.serialize().finish());
           } else {
             tb.add(item.string(null));

@@ -25,8 +25,8 @@ public class ModuleDemo extends QueryModule {
    */
   public FNode create() {
     FBuilder doc = FDoc.build();
-    FBuilder elem = FElem.build(new QNm("root")).add(new QNm("attr"), "value");
-    return doc.add(elem).finish();
+    FBuilder elem = FElem.build(new QNm("root")).attr(new QNm("attr"), "value");
+    return doc.node(elem).finish();
   }
 
   /**

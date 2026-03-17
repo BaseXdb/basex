@@ -33,7 +33,7 @@ abstract class Set extends Arr {
    * @param exprs expressions
    */
   Set(final InputInfo info, final Expr[] exprs) {
-    super(info, Types.NODE_ZM, exprs);
+    super(info, Types.GNODE_ZM, exprs);
   }
 
   @Override
@@ -269,8 +269,8 @@ abstract class Set extends Arr {
     private final QueryContext qc;
     /** Iterator. */
     final Iter[] iter;
-    /** Items. */
-    XNode[] nodes;
+    /** Nodes. */
+    GNode[] nodes;
 
     /**
      * Constructor.
@@ -294,7 +294,7 @@ abstract class Set extends Arr {
         nodes[i] = null;
         return false;
       }
-      nodes[i] = toNode(item);
+      nodes[i] = toGNode(item);
       return true;
     }
   }

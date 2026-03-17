@@ -76,7 +76,7 @@ public final class IndexInfo {
     if(last == null) return null;
 
     final Data data = db.data();
-    final Kind kind = last.test.type.kind;
+    final Kind kind = last.test.kind;
     if(kind == Kind.TEXT) {
       text = true;
     } else if(kind == Kind.ELEMENT) {
@@ -86,9 +86,9 @@ public final class IndexInfo {
           !(last.test instanceof NameTest)) return null;
 
       test = (NameTest) last.test;
-      if(test.local == null) return null;
+      if(test.name == null) return null;
 
-      final Stats stats = data.elemNames.stats(data.elemNames.index(test.local));
+      final Stats stats = data.elemNames.stats(data.elemNames.index(test.name));
       if(stats == null || !stats.isLeaf()) return null;
       text = true;
     } else if(kind == Kind.ATTRIBUTE) {

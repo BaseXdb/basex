@@ -53,15 +53,15 @@ public final class Response {
 
     // construct <http:response/>
     final int status = response.statusCode();
-    final FBuilder root = FElem.build(Q_HTTP_RESPONSE).declareNS();
-    root.add(Q_STATUS, status).add(Q_MESSAGE, IOUrl.reason(status));
+    final FBuilder root = FElem.build(Q_HTTP_RESPONSE).ns();
+    root.attr(Q_STATUS, status).attr(Q_MESSAGE, IOUrl.reason(status));
 
     // add headers
     for(final Entry<String, List<String>> entry : response.headers().map().entrySet()) {
       final String name = entry.getKey();
       if(name != null) {
         for(final String value : entry.getValue()) {
-          root.add(FElem.build(Q_HTTP_HEADER).add(Q_NAME, name).add(Q_VALUE, value));
+          root.node(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, name).attr(Q_VALUE, value));
         }
       }
     }
@@ -75,7 +75,7 @@ public final class Response {
       final String encoding = headers.firstValue(CONTENT_ENCODING).orElse("");
 
       final Payload payload = new Payload(is, body, info, options);
-      root.add(payload.parse(type, encoding));
+      root.node(payload.parse(type, encoding));
       if(body) items.add(payload.value());
     }
 

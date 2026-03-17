@@ -50,11 +50,8 @@ public final class Jobs {
       options.set(MainOptions.INTPARSE, true);
       options.set(MainOptions.STRIPWS, true);
       final XNode doc = new DBNode(Parser.singleParser(file, options, ""));
-      final XNode root = children(doc, Q_JOBS).next();
-      if(root == null) {
-        Util.errln(file + ": No '%' root element.", Q_JOBS);
-      } else {
-        for(final XNode child : children(root)) {
+      if(children(doc, Q_JOBS).next() instanceof XNode root) {
+        for(final GNode child : children(root)) {
           final QNm qname = child.qname();
           if(qname.eq(Q_JOB)) {
             final JobOptions opts = options(child);
@@ -65,6 +62,8 @@ public final class Jobs {
             Util.errln(file + ": invalid element: %.", qname);
           }
         }
+      } else {
+        Util.errln(file + ": No '%' root element.", Q_JOBS);
       }
     }
   }
@@ -125,9 +124,9 @@ public final class Jobs {
    * @param job job element
    * @return jobs options, or {@code null} if an error occurred
    */
-  private JobOptions options(final XNode job) {
+  private JobOptions options(final GNode job) {
     final JobOptions opts = new JobOptions();
-    for(final XNode attr : job.attributeIter()) {
+    for(final GNode attr : job.attributeIter()) {
       try {
         opts.assign(string(attr.name()), string(attr.string()));
       } catch(final BaseXException ex) {
@@ -164,9 +163,9 @@ public final class Jobs {
     for(final QueryJobSpec spec : list) {
       final FBuilder elem = FElem.build(Q_JOB);
       for(final Option<?> option : spec.options) {
-        elem.add(new QNm(option.name()), spec.options.get(option));
+        elem.attr(new QNm(option.name()), spec.options.get(option));
       }
-      root.add(elem.add(spec.query));
+      root.node(elem.text(spec.query));
     }
     return root.finish();
   }

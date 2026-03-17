@@ -102,6 +102,9 @@ public abstract class Value extends Expr implements Iterable<Item> {
     return this;
   }
 
+  @Override
+  public abstract Value unwrappedValue(QueryContext qc);
+
   /**
    * Returns a subsequence with the given start and length.
    * The following properties must hold:

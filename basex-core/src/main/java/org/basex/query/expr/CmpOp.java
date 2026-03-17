@@ -21,7 +21,7 @@ public enum CmpOp {
     }
 
     @Override
-    public boolean eval(final XNode node1, final XNode node2) {
+    public boolean eval(final GNode node1, final GNode node2) {
       return node1.compare(node2) <= 0;
     }
 
@@ -44,7 +44,7 @@ public enum CmpOp {
     }
 
     @Override
-    public boolean eval(final XNode node1, final XNode node2) {
+    public boolean eval(final GNode node1, final GNode node2) {
       return node1.compare(node2) < 0;
     }
 
@@ -67,7 +67,7 @@ public enum CmpOp {
     }
 
     @Override
-    public boolean eval(final XNode node1, final XNode node2) {
+    public boolean eval(final GNode node1, final GNode node2) {
       return node1.compare(node2) >= 0;
     }
 
@@ -90,7 +90,7 @@ public enum CmpOp {
     }
 
     @Override
-    public boolean eval(final XNode node1, final XNode node2) {
+    public boolean eval(final GNode node1, final GNode node2) {
       return node1.compare(node2) > 0;
     }
 
@@ -113,7 +113,7 @@ public enum CmpOp {
     }
 
     @Override
-    public boolean eval(final XNode node1, final XNode node2) {
+    public boolean eval(final GNode node1, final GNode node2) {
       return node1.is(node2);
     }
 
@@ -136,7 +136,7 @@ public enum CmpOp {
     }
 
     @Override
-    public boolean eval(final XNode node1, final XNode node2) {
+    public boolean eval(final GNode node1, final GNode node2) {
       return !node1.is(node2);
     }
 
@@ -182,7 +182,7 @@ public enum CmpOp {
    * @param node2 second node
    * @return result of comparison
    */
-  public abstract boolean eval(XNode node1, XNode node2);
+  public abstract boolean eval(GNode node1, GNode node2);
 
   /**
    * Swaps the comparator.

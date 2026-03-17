@@ -639,6 +639,10 @@ public enum QueryError {
   ZONESEC_X(FODT, 3, "No seconds allowed in timezone: %."),
   /** Error code. */
   PLACE_X(FODT, 4, "Unknown place: %."),
+  /** Error code. */
+  INVDATETIMEFIELDS_X(FODT, 5, "Invalid combination of date/time fields: %"),
+  /** Error code. */
+  INVDATETIMEVALUE_X_X(FODT, 6, "Invalid component of date/time value: '%': %."),
 
   /** Error code. */
   FUNERR1(FOER, 0, "Halted on error()."),
@@ -866,7 +870,7 @@ public enum QueryError {
   /** Error code. */
   VAREMPTY_X(XPDY, 2, "No value assigned to %."),
   /** Error code. */
-  NODOC_X(XPDY, 50, "Value has no document node: %."),
+  NODOC_X(XPDY, 50, "Input has no root node: %."),
   /** Error code. */
   NOTREAT_X_X_X(XPDY, 50, "Cannot treat % as %: %."),
   /** Error code. */
@@ -1693,7 +1697,7 @@ public enum QueryError {
       desc.add(" of type ").add(est).add(" expected, ");
       // try to find missing record entry:
       boolean missing = false;
-      if(est.type instanceof RecordType rt && expr instanceof XQMap map) {
+      if(est.type instanceof final RecordType rt && expr instanceof final XQMap map) {
         final TokenObjectMap<RecordField> fields = rt.fields();
         for(final byte[] key : fields) {
           try {

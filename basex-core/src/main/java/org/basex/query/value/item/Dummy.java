@@ -121,6 +121,11 @@ public final class Dummy extends Value {
   }
 
   @Override
+  public Item unwrappedValue(final QueryContext qc) {
+    throw Util.notExpected();
+  }
+
+  @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos) {
     throw Util.notExpected();
   }

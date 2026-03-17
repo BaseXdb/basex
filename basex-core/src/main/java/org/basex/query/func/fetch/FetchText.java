@@ -20,6 +20,6 @@ public final class FetchText extends FetchDoc {
     final String encoding = toEncodingOrNull(arg(1), FETCH_ENCODING_X, qc);
     final boolean fallback = toBooleanOrFalse(arg(2), qc);
 
-    return new StrLazy(source, encoding, FETCH_OPEN_X, !fallback);
+    return new StrLazy(source, encoding, FETCH_OPEN_X, fallback);
   }
 }

@@ -83,7 +83,7 @@ public final class CMap extends Arr {
         args.add(value);
       }
       final RecordType rt = cc.qc.shared.record(new RecordType(fields));
-      return new CRecord(info, rt, args.finish()).optimize(cc);
+      return RecordConstructor.get(info, rt, args.finish()).optimize(cc);
     }
 
     // determine static types
@@ -124,7 +124,7 @@ public final class CMap extends Arr {
     } else if(expr instanceof CMap) {
       // { 1: <a/> }
       list.add(expr.args());
-    } else if(expr instanceof CRecord) {
+    } else if(expr instanceof RecordConstructor) {
       // { 'a': <a/> }
       final RecordType rt = (RecordType) expr.seqType().type;
       if(rt.hasOptional()) return false;
@@ -157,7 +157,7 @@ public final class CMap extends Arr {
       if(exprs[e + 1] != Empty.UNDEFINED) {
         add.accept(toAtomItem(exprs[e], qc), exprs[e + 1].value(qc));
       } else {
-        final Iter iter = exprs[e].iter(qc);
+        final Iter iter = exprs[e].unwrappedIter(qc);
         for(Item item; (item = iter.next()) != null;) {
           toMap(item).forEach(add);
         }

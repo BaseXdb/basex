@@ -14,10 +14,10 @@ import org.basex.util.*;
 public final class FnHoursFromDateTime extends DateTimeFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item value = arg(0).atomItem(qc, info);
-    if(value.isEmpty()) return Empty.VALUE;
+    final ADate value = toGregorianOrNull(arg(0), qc);
+    if(value == null) return Empty.VALUE;
 
-    final long comp = toGregorian(value, qc).hour();
+    final long comp = value.hour();
     return comp == -1 ? Empty.VALUE : Itr.get(comp);
   }
 }

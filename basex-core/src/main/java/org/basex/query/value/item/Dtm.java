@@ -92,6 +92,14 @@ public final class Dtm extends ADate {
     }
   }
 
+  /**
+   * Constructor.
+   * @param type item type
+   */
+  private Dtm(final Type type) {
+    super(type);
+  }
+
   @Override
   public Dtm timeZone(final DTDur dur, final boolean undefined, final InputInfo info)
       throws QueryException {
@@ -116,5 +124,58 @@ public final class Dtm extends ADate {
   @Override
   public boolean comparable(final Item item) {
     return item instanceof Dtm;
+  }
+
+  /**
+   * Constructs a Gregorian value from the supplied component values.
+   *
+   * <p>This method assumes that all component combinations and value ranges
+   * have already been validated by the caller. In particular, it does not
+   * verify:</p>
+   * <ul>
+   *   <li>that the combination of components matches the target type,</li>
+   *   <li>that the component values are within their lexical or calendar ranges,</li>
+   *   <li>that a timezone is present when required (e.g., for {@code xs:dateTimeStamp}).</li>
+   * </ul>
+   *
+   * <p>Components must be supplied in their lexical representation:
+   * month 1–12, day 1–31, hours 0–23, minutes 0–59, seconds in [0–60).
+   * For BC years, pass a negative year (not 0). Undefined components must
+   * be {@code null}.</p>
+   *
+   * <p>This method is intended as a low-level construction helper for
+   * {@link org.basex.query.func.fn.FnBuildDateTime}, which performs all
+   * required validation and determines the appropriate target type.</p>
+   *
+   * @param targetType target type
+   * @param year year (can be {@code null})
+   * @param month month (1–12, can be {@code null})
+   * @param day day (1–31, can be {@code null})
+   * @param hours hours (0–23, can be {@code null})
+   * @param minutes minutes (0–59, can be {@code null})
+   * @param seconds seconds ([0–60), can be {@code null})
+   * @param zone timezone (can be {@code null})
+   * @param info input info (can be {@code null})
+   * @return constructed date/time item
+   * @throws QueryException query exception
+   */
+  public static ADate buildUnchecked(final BasicType targetType,
+      final Long year, final Long month, final Long day,
+      final Long hours, final Long minutes, final BigDecimal seconds,
+      final DTDur zone, final InputInfo info) throws QueryException {
+    final Dtm base = new Dtm(targetType);
+    base.year    = year    == null ? Long.MAX_VALUE : year < 0 ? year + 1 : year;
+    base.month   = month   == null ? -1             : (byte) (month - 1);
+    base.day     = day     == null ? -1             : (byte) (day - 1);
+    base.hour    = hours   == null ? -1             : hours.byteValue();
+    base.minute  = minutes == null ? -1             : minutes.byteValue();
+    base.seconds = seconds;
+    base.tz(zone, zone == null, info);
+    return switch(targetType) {
+      case DATE_TIME, DATE_TIME_STAMP -> base;
+      case DATE                       -> new Dat(base);
+      case TIME                       -> new Tim(base);
+      default                         -> new GDt(base, targetType);
+    };
   }
 }

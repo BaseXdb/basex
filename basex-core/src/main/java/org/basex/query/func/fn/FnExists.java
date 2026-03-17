@@ -16,16 +16,16 @@ public final class FnExists extends FnEmpty {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    return !super.test(qc, ii, pos);
+    return !super.test(qc, info, pos);
   }
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     Expr expr = this;
     final Expr input = arg(0);
-    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE) && input.seqType().type instanceof NodeType) {
+    if(mode.oneOf(Simplify.EBV, Simplify.PREDICATE)) {
       // if(exists($nodes)) → if($nodes)
-      expr = input;
+      if(input.seqType().type instanceof NodeType) expr = input;
     }
     return cc.simplify(this, expr, mode);
   }

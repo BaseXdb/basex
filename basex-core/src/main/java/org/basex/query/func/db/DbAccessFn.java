@@ -3,6 +3,7 @@ package org.basex.query.func.db;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.users.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -96,6 +97,16 @@ abstract class DbAccessFn extends StandardFunc {
     return toName(expr, false, DB_NAME_X, qc);
   }
 
+  /**
+   * Checks create permissions.
+   * @param name database node
+   * @param qc query context
+   * @throws QueryException query exception
+   */
+  protected final void checkCreate(final String name, final QueryContext qc) throws QueryException {
+    checkPerm(qc, Perm.CREATE, name);
+  }
+
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return dataLock(arg(0), false, visitor) && super.accept(visitor);
@@ -121,8 +132,8 @@ abstract class DbAccessFn extends StandardFunc {
     final QNm qnm = qc.shared.qName(nm, qc.ns.resolve(prefix(nm), sc()));
 
     // return empty sequence if test will yield no results
-    final NameTest nt = new NameTest(qnm, NameTest.Scope.FULL, Kind.ATTRIBUTE, sc().elemNS);
-    if(nt.optimize(data) == null) return Empty.ITER;
+    final Test t = Test.get(Kind.ATTRIBUTE, qnm, NameTest.Scope.FULL, sc().elemNS);
+    if(t.optimize(Kind.ATTRIBUTE, data) == null) return Empty.ITER;
 
     // wrap iterator with name test
     final Iter iter = ia.iter(qc);
@@ -131,7 +142,7 @@ abstract class DbAccessFn extends StandardFunc {
       public Item next() throws QueryException {
         Item item;
         while((item = qc.next(iter)) != null) {
-          if(item instanceof final XNode node && nt.matches(node)) break;
+          if(item instanceof final XNode node && t.matches(node)) break;
         }
         return item;
       }

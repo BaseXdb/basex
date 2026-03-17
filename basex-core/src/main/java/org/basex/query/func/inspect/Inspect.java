@@ -105,7 +105,7 @@ public abstract class Inspect {
       for(final byte[] value : tags.get(tag)) {
         final FBuilder elem = element(tag);
         add(value, elem);
-        parent.add(elem);
+        parent.node(elem);
       }
     }
   }
@@ -123,14 +123,14 @@ public abstract class Inspect {
     for(final Ann ann : anns) {
       final FBuilder annotation = element("annotation");
       final QNm name = ann.name();
-      annotation.add(Q_NAME, NSGlobal.prefix(name.uri()).length == 0 ? name.string() :
+      annotation.attr(Q_NAME, NSGlobal.prefix(name.uri()).length == 0 ? name.string() :
         name.prefixId(XQ_URI));
-      if(uri) annotation.add(Q_URI, name.uri());
+      if(uri) annotation.attr(Q_URI, name.uri());
 
       for(final Item arg : ann.value()) {
-        annotation.add(element("literal").add(Q_TYPE, arg.type).add(arg.string(null)));
+        annotation.node(element("literal").attr(Q_TYPE, arg.type).text(arg.string(null)));
       }
-      parent.add(annotation);
+      parent.node(annotation);
     }
   }
 
@@ -143,11 +143,11 @@ public abstract class Inspect {
   final void options(final QNmMap<String> options, final FBuilder parent, final boolean uri) {
     for(final QNm name : options) {
       final FBuilder option = element("option");
-      option.add(Q_NAME, NSGlobal.prefix(name.uri()).length == 0 ? name.string() :
+      option.attr(Q_NAME, NSGlobal.prefix(name.uri()).length == 0 ? name.string() :
         name.prefixId(XQ_URI));
-      if(uri) option.add(Q_URI, name.uri());
-      option.add(element("literal").add(Q_TYPE, Types.STRING_O).add(options.get(name)));
-      parent.add(option);
+      if(uri) option.attr(Q_URI, name.uri());
+      option.node(element("literal").attr(Q_TYPE, Types.STRING_O).text(options.get(name)));
+      parent.node(option);
     }
   }
 
@@ -177,17 +177,17 @@ public abstract class Inspect {
         // contains angle brackets: add as XML structure
         final MainOptions mopts = new MainOptions();
         final XNode node = new DBNode(new XMLParser(new IOContent(value), mopts, true));
-        for(final XNode child : node.childIter()) {
-          elem.add(child.copy(mopts, null));
+        for(final GNode child : node.childIter()) {
+          elem.node(((XNode) child).copy(mopts, null));
         }
       } else {
         // add as single text node
-        elem.add(new FTxt(value));
+        elem.node(new FTxt(value));
       }
     } catch(final IOException ex) {
       // fallback: add string representation
       Util.debug(ex);
-      elem.add(value);
+      elem.text(value);
     }
   }
 

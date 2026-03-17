@@ -2,7 +2,6 @@ package org.basex.query.func.db;
 
 import static org.basex.query.QueryError.*;
 
-import org.basex.core.users.*;
 import org.basex.query.*;
 import org.basex.query.up.primitives.name.*;
 import org.basex.query.util.*;
@@ -34,7 +33,7 @@ public class DbCopy extends DbAccessFn {
     if(name.equals(newname)) throw DB_CONFLICT4_X.get(info, name, newname);
 
     // source database does not exist
-    checkPerm(qc, Perm.CREATE, name);
+    checkCreate(name, qc);
     if(!qc.context.soptions.dbExists(name)) throw DB_GET1_X.get(info, name);
 
     qc.updates().add(keep ? new DBCopy(name, newname, qc, info) :

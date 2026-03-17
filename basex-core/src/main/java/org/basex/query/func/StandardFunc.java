@@ -142,7 +142,7 @@ public abstract class StandardFunc extends Arr {
     if(expr != null) {
       final SeqType st = expr.seqType();
       if(st.zero()) return expr instanceof Dummy ? Empty.VALUE : expr;
-      if(occ && st.oneOrMore() && !(atom && st.mayBeFunction()) && exprType.seqType().zeroOrOne()) {
+      if(occ && st.oneOrMore() && !(atom && st.mayBeWrapped()) && exprType.seqType().zeroOrOne()) {
         exprType.assign(Occ.EXACTLY_ONE);
       }
     }
@@ -347,15 +347,16 @@ public abstract class StandardFunc extends Arr {
   }
 
   /**
-   * Converts an item to a date.
-   * @param item item
+   * Evaluates an expression to a date.
+   * @param expr expression
    * @param qc query context
-   * @return date
+   * @return date or {@code null}
    * @throws QueryException query exception
    */
-  protected final ADate toGregorian(final Item item, final QueryContext qc)
+  protected final ADate toGregorianOrNull(final Expr expr, final QueryContext qc)
       throws QueryException {
-    return (ADate) Types.GREGORIAN_ZO.coerce(item, null, qc, null, info);
+    final Item item = expr.atomItem(qc, info);
+    return item.isEmpty() ? null : (ADate) Types.GREGORIAN_ZO.coerce(item, qc, info);
   }
 
   /**
@@ -416,7 +417,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   protected final XQMap toEmptyMap(final Expr expr, final QueryContext qc) throws QueryException {
-    final Item item = expr.item(qc, info);
+    final Item item = expr.unwrappedItem(qc, info);
     return item.isEmpty() ? XQMap.empty() : toMap(item);
   }
 
@@ -601,7 +602,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final Item toNodeOrAtomItem(final Expr expr, final boolean empty, final QueryContext qc)
       throws QueryException {
-    Item item = expr.item(qc, info);
+    Item item = expr.unwrappedItem(qc, info);
     if(!(item instanceof XNode)) {
       item = item.atomItem(qc, info);
       if(item.isEmpty()) {
@@ -626,7 +627,7 @@ public abstract class StandardFunc extends Arr {
     final SerializerOptions options = new SerializerOptions();
     options.set(SerializerOptions.METHOD, SerialMethod.XML);
 
-    final Item item = expr.item(qc, info);
+    final Item item = expr.unwrappedItem(qc, info);
     if(item instanceof final XQMap map) {
       options.assign(map, info);
     } else if(!item.isEmpty()) {
@@ -741,7 +742,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final FItem toFunctionOrNull(final Expr expr, final int nargs, final QueryContext qc)
       throws QueryException {
-    final Item item = expr.item(qc, info);
+    final Item item = expr.unwrappedItem(qc, info);
     return item.isEmpty() ? null : checkArity(toFunction(item, qc), nargs, false);
   }
 
@@ -861,7 +862,9 @@ public abstract class StandardFunc extends Arr {
    */
   protected final boolean functionOption(final int i) {
     if(!(arg(i) instanceof final Value value)) return true;
-    if(value instanceof final XQMap map) {
+
+    final Value v = value instanceof final JNode jnode ? jnode.value : value;
+    if(v instanceof final XQMap map) {
       for(final Item key : map.keys()) {
         try {
           if(map.get(key) instanceof FItem) return true;

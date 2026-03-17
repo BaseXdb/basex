@@ -135,7 +135,7 @@ public class ArchiveCreate extends ArchiveFn {
    */
   final Map<String, Entry<Item, Item>> toFiles(final Expr entries, final Expr contents,
       final QueryContext qc) throws QueryException {
-    final Iter entrs = entries.iter(qc), cntnts = contents.iter(qc);
+    final Iter entrs = entries.unwrappedIter(qc), cntnts = contents.unwrappedIter(qc);
     final Map<String, Entry<Item, Item>> files = new LinkedHashMap<>();
     int e = 0, c = 0;
     while(true) {

@@ -13,6 +13,7 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -70,6 +71,27 @@ public class AdaptiveSerializer extends OutputSerializer {
   }
 
   @Override
+  protected void jnode(final JNode jnode) throws IOException {
+    reset();
+    printChars(QueryText.JTREE);
+    printChar('(');
+    if(jnode.key != Empty.VALUE) {
+      serialize(jnode.key);
+      printChar(':');
+      reset();
+    }
+    int cc = 0;
+    if(jnode.value.size() > 1) printChar('(');
+    for(final Item item : jnode.value) {
+      if(cc++ > 0) printChar(',');
+      reset();
+      serialize(item);
+    }
+    if(jnode.value.size() > 1) printChar(')');
+    printChar(')');
+  }
+
+  @Override
   protected final void node(final XNode node) throws IOException {
     final Kind kind = node.kind();
     final XMLSerializer ser = xml();
@@ -123,15 +145,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     } else if(item instanceof final XQMap map) {
       map(map);
     } else {
-      if(this instanceof BaseXSerializer) {
-        printChars(Token.token(item.toErrorString()));
-      } else {
-        final QNm fn = item.funcName();
-        if(fn == null) printChars(Token.token("(anonymous-function)"));
-        else printChars(fn.prefixId());
-        printChar('#');
-        printChars(Token.token(item.arity()));
-      }
+      printChars(Token.token(item.toErrorString()));
     }
   }
 
@@ -161,7 +175,7 @@ public class AdaptiveSerializer extends OutputSerializer {
           printChar(',');
           if(indent) printChar(' ');
         }
-        more = false;
+        reset();
         serialize(value.itemAt(i));
       }
       if(vs != 1) printChar(')');
@@ -183,7 +197,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       for(final Item key : map.keys()) {
         if(c++ > 0) printChar(',');
         indent();
-        more = false;
+        reset();
         serialize(key);
         printChar(':');
         if(indent) printChar(' ');
@@ -196,7 +210,7 @@ public class AdaptiveSerializer extends OutputSerializer {
             printChar(',');
             if(indent) printChar(' ');
           }
-          more = false;
+          reset();
           serialize(item);
         }
         if(par) printChar(')');

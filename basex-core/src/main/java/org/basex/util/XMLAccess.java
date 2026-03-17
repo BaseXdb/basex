@@ -37,8 +37,8 @@ public final class XMLAccess {
     final BasicNodeIter children = node.childIter();
     return new BasicNodeIter() {
       @Override
-      public XNode next() {
-        for(XNode child; (child = children.next()) != null;) {
+      public GNode next() {
+        for(GNode child; (child = children.next()) != null;) {
           if(child.kind() == Kind.ELEMENT && (name == null || name.eq(child.qname())))
             return child;
         }

@@ -48,8 +48,8 @@ public final class JsonBasicSerializer extends JsonSerializer {
     final BasicNodeIter iter = node.childIter();
     final Kind kind = node.kind();
     if(kind == Kind.DOCUMENT) {
-      for(XNode child; (child = iter.next()) != null;) {
-        node(child);
+      for(GNode child; (child = iter.next()) != null;) {
+        node((XNode) child);
       }
     } else if(kind == Kind.ELEMENT) {
       final QNm name = node.qname();
@@ -59,7 +59,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
       byte[] key = null;
       boolean escaped = false, escapedKey = false;
-      for(final XNode attr : node.attributeIter()) {
+      for(final GNode attr : node.attributeIter()) {
         final QNm qnm = attr.qname();
         final byte[] au = qnm.uri(), an = qnm.local(), av = attr.string();
         if(au.length != 0) {
@@ -92,7 +92,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
 
       if(eq(local, NULL)) {
         out.print(NULL);
-        for(XNode n; (n = iter.next()) != null;) {
+        for(GNode n; (n = iter.next()) != null;) {
           if(!n.kind().oneOf(Kind.COMMENT, Kind.PROCESSING_INSTRUCTION))
             throw error("Element '%' must have no children.", local);
         }
@@ -212,11 +212,11 @@ public final class JsonBasicSerializer extends JsonSerializer {
     printedKeys = new TokenSet();
     level++;
     boolean comma = false;
-    for(XNode child; (child = iter.next()) != null;) {
+    for(GNode child; (child = iter.next()) != null;) {
       final Kind kind = child.kind();
       if(kind == Kind.ELEMENT) {
         if(comma) out.print(',');
-        node(child);
+        node((XNode) child);
         comma = true;
       } else if(kind == Kind.TEXT && !ws(child.string())) {
         throw error("Element '%' must have no text nodes.", child.name());
@@ -237,7 +237,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
    */
   private static byte[] value(final BasicNodeIter iter, final byte[] type) throws QueryIOException {
     TokenBuilder tb = null;
-    for(XNode child; (child = iter.next()) != null;) {
+    for(GNode child; (child = iter.next()) != null;) {
       final Kind kind = child.kind();
       if(kind == Kind.TEXT) {
         if(tb == null) tb = new TokenBuilder();

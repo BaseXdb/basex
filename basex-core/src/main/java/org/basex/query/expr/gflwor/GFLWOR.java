@@ -278,9 +278,8 @@ public final class GFLWOR extends ParseExpr {
    * Removes unused variables or simplifies their expressions.
    * @param cc compilation context
    * @return change flag
-   * @throws QueryException query exception
    */
-  private boolean unusedVars(final CompileContext cc) throws QueryException {
+  private boolean unusedVars(final CompileContext cc) {
     boolean changed = false;
     final ListIterator<Clause> iter = clauses.listIterator();
     while(iter.hasNext()) iter.next();
@@ -293,8 +292,6 @@ public final class GFLWOR extends ParseExpr {
         // completely remove 'let' clause
         if(count(lt.var, pos + 1) == VarUsage.NEVER && !lt.has(Flag.NDT)) {
           cc.info(QueryText.OPTVAR_X, lt.var);
-          // check type before removing variable (see {@link FuncType})
-          lt.var.checkType(lt.expr);
           iter.remove();
           changed = true;
         }
