@@ -30,13 +30,17 @@ public final class FnTypeOf extends ContextFn {
 
     final TokenSet types = new TokenSet();
     for(final Value item : value) {
-      String type = item.type.toString();
-      if(item.type instanceof FType) {
-        type = type.replaceAll("\\(.*", "(*)").replaceAll("^record\\(", "map(");
-      } else if(item.type.instanceOf(NodeType.JNODE)) {
-        type = type.replaceAll("\\(.*", "()");
+      Type type = item.type;
+      if(type instanceof MapType) {
+        type = Types.MAP;
+      } else if(type instanceof ArrayType) {
+        type = Types.ARRAY;
+      } else if(type instanceof FType) {
+        type = Types.FUNCTION;
+      } else if(type.kind() == Kind.JNODE) {
+        type = NodeType.JNODE;
       }
-      types.add(type);
+      types.add(type.toString());
     }
 
     final TokenBuilder tb = new TokenBuilder();
