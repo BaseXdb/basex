@@ -829,7 +829,7 @@ public final class TextEditor {
           move = 1;
         }
         close();
-      } else if(ch == '"' || ch == '\'') {
+      } else if(ch == '"' || ch == '\'' || ch == '`') {
         // quote: ignore if it equals next character
         if(ch == curr) sb.setLength(0);
         // add second quote
