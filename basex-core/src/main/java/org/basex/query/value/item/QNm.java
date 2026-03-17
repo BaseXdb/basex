@@ -110,7 +110,19 @@ public final class QNm extends Item {
    */
   public QNm(final byte[] name, final StaticContext sc) {
     this(name);
-    uri(sc.ns.uri(prefix()));
+    uri(sc.ns.resolveStatic(prefix()));
+  }
+
+  /**
+   * Constructor, binding a statically or dynamically known namespace.
+   * If no namespace is found, the namespace URI is set to {@code null}.
+   * @param name name (possibly prefixed)
+   * @param qc query context
+   * @param sc static context
+   */
+  public QNm(final byte[] name, final QueryContext qc, final StaticContext sc) {
+    this(name);
+    uri(qc.ns.resolve(prefix(), sc));
   }
 
   /**
@@ -202,7 +214,7 @@ public final class QNm extends Item {
     } else if(item.type.isUntyped() && sc != null) {
       final byte[] nm = trim(item.string(ii));
       if(!XMLToken.isQName(nm)) throw FUNCCAST_X_X_X.get(ii, item.type, type, item);
-      qnm = new QNm(nm, sc);
+      qnm = new QNm(nm, sc); // TODO: dynamic namespaces are needed here!
       if(!qnm.hasURI() && qnm.hasPrefix()) throw NSDECL_X.get(ii, qnm.prefix());
     } else {
       throw compareError(this, item, ii);
@@ -328,25 +340,28 @@ public final class QNm extends Item {
   /**
    * Converts a value to a QName.
    * @param value value to parse
+   * @param qc query context (can be {@code null})
    * @param sc static context (can be {@code null})
    * @return QName
    * @throws QueryException query exception
    */
-  public static QNm parse(final byte[] value, final StaticContext sc) throws QueryException {
-    return parse(value, null, sc, null);
+  public static QNm parse(final byte[] value, final QueryContext qc, final StaticContext sc)
+      throws QueryException {
+    return parse(value, null, qc, sc, null);
   }
 
   /**
    * Converts a value to a QName.
    * @param value value to parse
    * @param dflt default namespace (can be {@code null})
+   * @param qc query context (can be {@code null})
    * @param sc static context (can be {@code null})
    * @param info input info (can be {@code null})
    * @return QName
    * @throws QueryException query exception
    */
-  public static QNm parse(final byte[] value, final byte[] dflt, final StaticContext sc,
-      final InputInfo info) throws QueryException {
+  public static QNm parse(final byte[] value, final byte[] dflt, final QueryContext qc,
+      final StaticContext sc, final InputInfo info) throws QueryException {
 
     final byte[][] parsed = parseExpanded(value, false);
     if(parsed != null) return new QNm(parsed[0], parsed[1]);
@@ -357,7 +372,8 @@ public final class QNm extends Item {
       uri = dflt;
     } else {
       final byte[] prefix = substring(value, 0, i);
-      if(sc != null) uri = sc.ns.uri(prefix);
+      if(qc != null) uri = qc.ns.resolve(prefix, sc);
+      else if(sc != null) uri = sc.ns.resolveStatic(prefix);
       if(uri == null) throw NOURI_X.get(info, prefix);
     }
     if(XMLToken.isQName(value)) return new QNm(value, uri);

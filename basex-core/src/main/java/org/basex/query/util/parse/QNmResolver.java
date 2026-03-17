@@ -61,7 +61,7 @@ public final class QNmResolver {
     for(int i = entries.size() - 1; i >= npos; --i) {
       final Entry entry = entries.get(i);
       if(entry.name.hasPrefix()) {
-        entry.name.uri(qp.sc.ns.uri(entry.name.prefix()));
+        entry.name.uri(qp.qc.ns.resolve(entry.name.prefix(), qp.sc));
         if(npos == 0 && !entry.name.hasURI())
           throw qp.error(NOURI_X, entry.info, entry.name.prefix());
       } else if(entry.nsElem) {

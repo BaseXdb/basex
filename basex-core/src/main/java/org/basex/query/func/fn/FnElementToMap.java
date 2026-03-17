@@ -55,7 +55,7 @@ public final class FnElementToMap extends PlanFn {
         if(Token.eq(token, Token.cpToken('*'))) {
           name = QNm.EMPTY;
         } else {
-          name = qc.shared.parseQName(attr ? Token.substring(token, 1) : token, true, sc());
+          name = qc.shared.parseQName(attr ? Token.substring(token, 1) : token, true, qc, sc());
         }
         if(name != null) {
           final PlanEntry pe = new PlanEntry();
@@ -67,7 +67,7 @@ public final class FnElementToMap extends PlanFn {
           if(!type.isEmpty()) pe.type = Enums.get(PlanType.class, toString(type, qc));
           final Value child = map.get(CHILD);
           if(!child.isEmpty()) {
-            final QNm qnm = qc.shared.parseQName(toToken(child, qc), true, sc());
+            final QNm qnm = qc.shared.parseQName(toToken(child, qc), true, qc, sc());
             if(qnm != null) pe.child = qnm;
           }
           plan.entries.put(name, pe);

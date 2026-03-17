@@ -33,15 +33,17 @@ public final class SharedData {
    * Parses and returns a shared QName.
    * @param token QName token
    * @param elem always resolve URI
+   * @param qc query context
    * @param sc static context
    * @return QName, or {@code null} if QName cannot be parsed
-   * @see QNm#parse(byte[], byte[], StaticContext, InputInfo)
+   * @see QNm#parse(byte[], byte[], QueryContext, StaticContext, InputInfo)
    */
-  public QNm parseQName(final byte[] token, final boolean elem, final StaticContext sc) {
+  public QNm parseQName(final byte[] token, final boolean elem, final QueryContext qc,
+      final StaticContext sc) {
     final byte[] name = Token.trim(token);
     if(XMLToken.isQName(name)) {
       final byte[] prefix = Token.prefix(name);
-      final byte[] uri = prefix.length != 0 || elem ? sc.ns.uri(prefix) : null;
+      final byte[] uri = prefix.length != 0 || elem ? qc.ns.resolve(prefix, sc) : null;
       return qName(name, uri);
     }
     final byte[][] parsed = QNm.parseExpanded(name, false);

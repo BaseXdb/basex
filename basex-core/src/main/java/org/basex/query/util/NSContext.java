@@ -16,8 +16,6 @@ import org.basex.util.*;
 public final class NSContext {
   /** Static namespaces, containing prefixes and URIs. */
   public final Atts list = new Atts();
-  /** Dynamically added namespaces. */
-  private Atts stack;
 
   /**
    * Validates and adds the specified namespace at parsing time.
@@ -53,7 +51,7 @@ public final class NSContext {
    * @param prefix prefix of the namespace
    * @return URI or {@code null}
    */
-  public byte[] staticURI(final byte[] prefix) {
+  public byte[] resolveDeclared(final byte[] prefix) {
     for(int s = list.size() - 1; s >= 0; s--) {
       if(eq(list.name(s), prefix)) return list.value(s);
     }
@@ -61,65 +59,13 @@ public final class NSContext {
   }
 
   /**
-   * Returns the namespace URI for the specified prefix if it is either found in the dynamic,
-   * static or predefined namespaces.
+   * Returns the namespace URI for the specified prefix if it is either found in the static or
+   * predefined namespaces.
    * @param prefix prefix of the namespace
    * @return namespace URI or {@code null}
    */
-  public byte[] uri(final byte[] prefix) {
-    if(stack != null) {
-      for(int s = stack.size() - 1; s >= 0; s--) {
-        if(eq(stack.name(s), prefix)) return stack.value(s);
-      }
-    }
-    final byte[] u = staticURI(prefix);
+  public byte[] resolveStatic(final byte[] prefix) {
+    final byte[] u = resolveDeclared(prefix);
     return u == null ? prefix.length == 0 ? null : NSGlobal.uri(prefix) : u.length == 0 ? null : u;
-  }
-
-  /**
-   * Returns the number of dynamic namespaces.
-   * @return namespaces
-   */
-  public int size() {
-    return stack().size();
-  }
-
-  /**
-   * Sets the number of dynamic namespaces.
-   * @param size number of namespaces
-   */
-  public void size(final int size) {
-    stack().size(size);
-  }
-
-  /**
-   * Adds a namespace to the namespace stack.
-   * @param prefix namespace prefix
-   * @param uri namespace URI
-   */
-  public void add(final byte[] prefix, final byte[] uri) {
-    stack().add(prefix, uri);
-  }
-
-  /**
-   * Adds the namespaces that are currently in scope.
-   * @param atts namespaces
-   */
-  public void inScope(final Atts atts) {
-    if(stack != null) {
-      for(int s = stack.size() - 1; s >= 0; s--) {
-        final byte[] nm = stack.name(s);
-        if(!atts.contains(nm)) atts.add(nm, stack.value(s));
-      }
-    }
-  }
-
-  /**
-   * Returns the namespace stack.
-   * @return stack
-   */
-  private Atts stack() {
-    if(stack == null) stack = new Atts();
-    return stack;
   }
 }
