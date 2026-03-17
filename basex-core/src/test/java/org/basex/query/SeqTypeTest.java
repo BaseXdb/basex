@@ -142,9 +142,9 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // r1 record(next? as r1, x)
-      r1 = SeqType.get(new RecordType(r1Name, ii), EXACTLY_ONE),
+      r1 = new RecordType(r1Name, ii).seqType(),
       // r2 record(next? as r2, x)
-      r2 = SeqType.get(new RecordType(r2Name, ii), EXACTLY_ONE);
+      r2 = new RecordType(r2Name, ii).seqType();
 
     fld1.put(Token.token("next"), new RecordField(r1, true));
     fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
@@ -268,11 +268,11 @@ public final class SeqTypeTest {
     // enums
     final SeqType
       // enum('a')
-      e1 = SeqType.get(new EnumType(new TokenSet("a")), EXACTLY_ONE),
+      e1 = new EnumType(new TokenSet("a")).seqType(),
       // enum('b')
-      e2 = SeqType.get(new EnumType(new TokenSet("b")), EXACTLY_ONE),
+      e2 = new EnumType(new TokenSet("b")).seqType(),
       // enum('a', 'b')
-      e3 = SeqType.get(new EnumType(new TokenSet("a", "b")), EXACTLY_ONE);
+      e3 = new EnumType(new TokenSet("a", "b")).seqType();
     assertTrue(e1.instanceOf(e3));
     assertFalse(e1.instanceOf(e2));
     assertFalse(e3.instanceOf(e1));
@@ -284,19 +284,19 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(ChoiceItemType.get(DATE, STRING), EXACTLY_ONE),
+      c1 = ChoiceItemType.get(DATE, STRING).seqType(),
       // (element() | xs:string)
-      c2 = SeqType.get(ChoiceItemType.get(ELEMENT, STRING), EXACTLY_ONE),
+      c2 = ChoiceItemType.get(ELEMENT, STRING).seqType(),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS, STRING), EXACTLY_ONE),
+      c3 = ChoiceItemType.get(NMTOKENS, STRING).seqType(),
       // (array(*) | xs:string)
-      c4 = SeqType.get(ChoiceItemType.get(ARRAY, STRING), EXACTLY_ONE),
+      c4 = ChoiceItemType.get(ARRAY, STRING).seqType(),
       // (map(*) | xs:string)
-      c5 = SeqType.get(ChoiceItemType.get(MAP, STRING), EXACTLY_ONE),
+      c5 = ChoiceItemType.get(MAP, STRING).seqType(),
       // (function(*) | xs:string)
-      c6 = SeqType.get(ChoiceItemType.get(FUNCTION, STRING), EXACTLY_ONE),
+      c6 = ChoiceItemType.get(FUNCTION, STRING).seqType(),
       // (node() | jnode())
-      c7 = SeqType.get(ChoiceItemType.get(NODE, JNODE), EXACTLY_ONE);
+      c7 = ChoiceItemType.get(NODE, JNODE).seqType();
 
     assertTrue(c1.instanceOf(c1));
     assertFalse(c1.instanceOf(c2));
@@ -372,9 +372,9 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // r1 record(next? as r1, x)
-      r1 = SeqType.get(new RecordType(r1Name, ii), EXACTLY_ONE),
+      r1 = new RecordType(r1Name, ii).seqType(),
       // r2 record(next? as r2, x)
-      r2 = SeqType.get(new RecordType(r2Name, ii), EXACTLY_ONE);
+      r2 = new RecordType(r2Name, ii).seqType();
 
     fld1.put(Token.token("next"), new RecordField(r1, true));
     fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
@@ -546,11 +546,11 @@ public final class SeqTypeTest {
     // enums
     final SeqType
       // enum('a')
-      e1 = SeqType.get(new EnumType(new TokenSet("a")), EXACTLY_ONE),
+      e1 = new EnumType(new TokenSet("a")).seqType(),
       // enum('b')
-      e2 = SeqType.get(new EnumType(new TokenSet("b")), EXACTLY_ONE),
+      e2 = new EnumType(new TokenSet("b")).seqType(),
       // enum('a', 'b')
-      e3 = SeqType.get(new EnumType(new TokenSet("a", "b")), EXACTLY_ONE);
+      e3 = new EnumType(new TokenSet("a", "b")).seqType();
 
     combine(e1, e2, e3, op);
     combine(e1, e3, e3, op);
@@ -561,17 +561,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(ChoiceItemType.get(DATE, STRING), EXACTLY_ONE),
+      c1 = ChoiceItemType.get(DATE, STRING).seqType(),
       // (element() | xs:string)
-      c2 = SeqType.get(ChoiceItemType.get(ELEMENT, STRING), EXACTLY_ONE),
+      c2 = ChoiceItemType.get(ELEMENT, STRING).seqType(),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS, STRING), EXACTLY_ONE),
+      c3 = ChoiceItemType.get(NMTOKENS, STRING).seqType(),
       // (array(*) | xs:string)
-      c4 = SeqType.get(ChoiceItemType.get(ARRAY, STRING), EXACTLY_ONE),
+      c4 = ChoiceItemType.get(ARRAY, STRING).seqType(),
       // (map(*) | xs:string)
-      c5 = SeqType.get(ChoiceItemType.get(MAP, STRING), EXACTLY_ONE),
+      c5 = ChoiceItemType.get(MAP, STRING).seqType(),
       // (function(*) | xs:string)
-      c6 = SeqType.get(ChoiceItemType.get(FUNCTION, STRING), EXACTLY_ONE);
+      c6 = ChoiceItemType.get(FUNCTION, STRING).seqType();
 
     combine(c1, op);
     combine(c1, DATE_O, ANY_ATOMIC_TYPE_O, op);
@@ -620,25 +620,25 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = SeqType.get(new RecordType(fld1), EXACTLY_ONE),
+      r1 = new RecordType(fld1).seqType(),
       // record(a as xs:string)
-      r2 = SeqType.get(new RecordType(fld2), EXACTLY_ONE),
+      r2 = new RecordType(fld2).seqType(),
       // record(a as xs:anyAtomicType)
-      r3 = SeqType.get(new RecordType(fld3), EXACTLY_ONE),
+      r3 = new RecordType(fld3).seqType(),
       // record(a as xs:integer?)
-      r5 = SeqType.get(new RecordType(fld5), EXACTLY_ONE),
+      r5 = new RecordType(fld5).seqType(),
       // record(b as xs:integer?)
-      r6 = SeqType.get(new RecordType(fld6), EXACTLY_ONE),
+      r6 = new RecordType(fld6).seqType(),
       // record(a as xs:integer?, b as xs:integer?)
-      r7 = SeqType.get(new RecordType(fld7), EXACTLY_ONE),
+      r7 = new RecordType(fld7).seqType(),
       // r8 record(next? as r8, x, y)
-      r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
+      r8 = new RecordType(r8Name, ii).seqType(),
       // r9 record(next? as r9, x, z)
-      r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE),
+      r9 = new RecordType(r9Name, ii).seqType(),
       // record(next? as map(*), x, y?, z?)
-      r10 = SeqType.get(new RecordType(fld10), EXACTLY_ONE),
+      r10 = new RecordType(fld10).seqType(),
       // record(a? as xs:string, b? as xs:integer)
-      r11 = SeqType.get(new RecordType(fld11), EXACTLY_ONE);
+      r11 = new RecordType(fld11).seqType();
 
     fld8.put(Token.token("next"), new RecordField(r8, true));
     fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
@@ -827,11 +827,11 @@ public final class SeqTypeTest {
     // enums
     final SeqType
       // enum('a')
-      e1 = SeqType.get(new EnumType(new TokenSet("a")), EXACTLY_ONE),
+      e1 = new EnumType(new TokenSet("a")).seqType(),
       // enum('b')
-      e2 = SeqType.get(new EnumType(new TokenSet("b")), EXACTLY_ONE),
+      e2 = new EnumType(new TokenSet("b")).seqType(),
       // enum('a', 'b')
-      e3 = SeqType.get(new EnumType(new TokenSet("a", "b")), EXACTLY_ONE);
+      e3 = new EnumType(new TokenSet("a", "b")).seqType();
 
     combine(e1, e2, null, op);
     combine(e1, e3, e1, op);
@@ -842,17 +842,17 @@ public final class SeqTypeTest {
 
     final SeqType
       // (xs:date | xs:string)
-      c1 = SeqType.get(ChoiceItemType.get(DATE, STRING), EXACTLY_ONE),
+      c1 = ChoiceItemType.get(DATE, STRING).seqType(),
       // (element() | xs:string)
-      c2 = SeqType.get(ChoiceItemType.get(ELEMENT, STRING), EXACTLY_ONE),
+      c2 = ChoiceItemType.get(ELEMENT, STRING).seqType(),
       // (xs:NMTOKENS | xs:string)
-      c3 = SeqType.get(ChoiceItemType.get(NMTOKENS, STRING), EXACTLY_ONE),
+      c3 = ChoiceItemType.get(NMTOKENS, STRING).seqType(),
       // (array(*) | xs:string)
-      c4 = SeqType.get(ChoiceItemType.get(ARRAY, STRING), EXACTLY_ONE),
+      c4 = ChoiceItemType.get(ARRAY, STRING).seqType(),
       // (map(*) | xs:string)
-      c5 = SeqType.get(ChoiceItemType.get(MAP, STRING), EXACTLY_ONE),
+      c5 = ChoiceItemType.get(MAP, STRING).seqType(),
       // (function(*) | xs:string)
-      c6 = SeqType.get(ChoiceItemType.get(FUNCTION, STRING), EXACTLY_ONE);
+      c6 = ChoiceItemType.get(FUNCTION, STRING).seqType();
 
     combine(c1, op);
     combine(c1, DATE_O, DATE_O, op);
@@ -908,19 +908,19 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = SeqType.get(new RecordType(fld1), EXACTLY_ONE),
+      r1 = new RecordType(fld1).seqType(),
       // record(a as xs:string)
-      r2 = SeqType.get(new RecordType(fld2), EXACTLY_ONE),
+      r2 = new RecordType(fld2).seqType(),
       // record(a as xs:anyAtomicType)
-      r3 = SeqType.get(new RecordType(fld3), EXACTLY_ONE),
+      r3 = new RecordType(fld3).seqType(),
       // record(a? as xs:integer)
-      r5 = SeqType.get(new RecordType(fld5), EXACTLY_ONE),
+      r5 = new RecordType(fld5).seqType(),
       // record(b? as xs:integer)
-      r6 = SeqType.get(new RecordType(fld6), EXACTLY_ONE),
+      r6 = new RecordType(fld6).seqType(),
       // r8 record(next? as r8, x, y)
-      r8 = SeqType.get(new RecordType(r8Name, ii), EXACTLY_ONE),
+      r8 = new RecordType(r8Name, ii).seqType(),
       // r9 record(next? as r9, x, z)
-      r9 = SeqType.get(new RecordType(r9Name, ii), EXACTLY_ONE);
+      r9 = new RecordType(r9Name, ii).seqType();
 
     fld8.put(Token.token("next"), new RecordField(r8, true));
     fld8.put(Token.token("x"), new RecordField(ITEM_ZM));

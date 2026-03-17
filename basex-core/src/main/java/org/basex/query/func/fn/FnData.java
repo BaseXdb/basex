@@ -47,7 +47,7 @@ public final class FnData extends ContextFn {
       }
       // ignore arrays: data((1 to 6) ! [ ., . ])
       if(type != null) {
-        exprType.assign(SeqType.get(type, st.occ), st.mayBeWrapped() ? -1 : input.size());
+        exprType.assign(type.seqType(st.occ), st.mayBeWrapped() ? -1 : input.size());
       }
     }
     return this;

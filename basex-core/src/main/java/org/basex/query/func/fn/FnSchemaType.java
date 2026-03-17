@@ -147,7 +147,8 @@ public class FnSchemaType extends StandardFunc {
      * @return the function item
      */
     public static FuncItem funcItem(final InputInfo info, final BasicType... types) {
-      final SeqType st = Records.SCHEMA_TYPE.get().seqType(Occ.get(types.length, types.length));
+      final SeqType st = SeqType.get(Records.SCHEMA_TYPE.get(),
+          Occ.get(types.length, types.length));
       return new FuncItem(info, new TypeAnnotation(st, info, types), new Var[] { },
           AnnList.EMPTY, FuncType.get(st), 0, null);
     }

@@ -307,7 +307,7 @@ public final class Functions {
 
     final Expr[] prepared = prepareArgs(fb, CAST_PARAM, 0, 1, name.string());
     return new Cast(fb.info, prepared.length != 0 ? prepared[0] :
-      new ContextValue(fb.info), SeqType.get(type, Occ.ZERO_OR_ONE));
+      new ContextValue(fb.info), type.seqType(Occ.ZERO_OR_ONE));
   }
 
   /**

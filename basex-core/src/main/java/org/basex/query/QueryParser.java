@@ -3493,7 +3493,7 @@ public class QueryParser extends InputParser {
     }
     if(type.atomic() == null) throw error(INVALIDCAST_X, type);
     skipWs();
-    return SeqType.get(type, consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);
+    return type.seqType(consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);
   }
 
   /**

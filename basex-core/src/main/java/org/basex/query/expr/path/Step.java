@@ -250,7 +250,7 @@ public abstract class Step extends Preds {
       // zero or one result: self::X, parent::X, attribute::Q{uri}local, ...[position() = n]
       ? Occ.ZERO_OR_ONE
       : Occ.ZERO_OR_MORE;
-    return NodeType.get(test).seqType(occ);
+    return SeqType.get(NodeType.get(test), occ);
   }
 
   @Override
