@@ -1706,8 +1706,9 @@ public enum QueryError {
             // not expected (the exception is only caused by atomizing the key)
             throw Util.notExpected(ex);
           }
-          desc.add(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key)).add(" missing");
+          desc.add(QueryString.toQuoted(key)).add(" missing");
           missing = true;
+          break;
         }
       }
       if(!missing) desc.add(ist).add(" found");
