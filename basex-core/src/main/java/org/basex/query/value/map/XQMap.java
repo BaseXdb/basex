@@ -105,6 +105,20 @@ public abstract class XQMap extends XQStruct {
   public abstract Value getOrNull(Item key) throws QueryException;
 
   /**
+   * Gets a value from this map.
+   * @param key atomic key to look for
+   * @return value if found, {@code null} otherwise
+   */
+  public final Value value(final Item key) {
+    try {
+      return getOrNull(key);
+    } catch(QueryException ex) {
+      // the exception is only caused by atomizing the key
+      throw Util.notExpected(ex);
+    }
+  }
+
+  /**
    * Puts a value with the specified key into this map.
    * @param key key to insert
    * @param value value to insert
@@ -468,19 +482,15 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final void toXml(final QueryPlan plan) {
-    try {
-      final long size = structSize();
-      final Value keys = keys();
-      final ExprList list = new ExprList();
-      final long max = Math.min(size, 5);
-      for(long i = 0; i < max; i++) {
-        final Item key = keys.itemAt(i);
-        list.add(key).add(get(key));
-      }
-      plan.add(plan.create(this, ENTRIES, size));
-    } catch(final QueryException ex) {
-      throw Util.notExpected(ex);
+    final long size = structSize();
+    final Value keys = keys();
+    final ExprList list = new ExprList();
+    final long max = Math.min(size, 5);
+    for(long i = 0; i < max; i++) {
+      final Item key = keys.itemAt(i);
+      list.add(key).add(value(key));
     }
+    plan.add(plan.create(this, ENTRIES, size));
   }
 
   @Override
@@ -489,14 +499,10 @@ public abstract class XQMap extends XQStruct {
       qs.token("{}");
     } else {
       final TokenBuilder tb = new TokenBuilder();
-      try {
-        for(final Item key : keys()) {
-          if(!tb.moreInfo()) break;
-          final Value value = get(key);
-          tb.add(key).add(MAPASG).add(qs.error() ? value.toErrorString() : value).add(SEP);
-        }
-      } catch(final QueryException ex) {
-        throw Util.notExpected(ex);
+      for(final Item key : keys()) {
+        if(!tb.moreInfo()) break;
+        final Value value = value(key);
+        tb.add(key).add(MAPASG).add(qs.error() ? value.toErrorString() : value).add(SEP);
       }
       qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");
     }

@@ -193,30 +193,26 @@ public class AdaptiveSerializer extends OutputSerializer {
     printChar('{');
     int c = 0;
     ++level;
-    try {
-      for(final Item key : map.keys()) {
-        if(c++ > 0) printChar(',');
-        indent();
-        reset();
-        serialize(key);
-        printChar(':');
-        if(indent) printChar(' ');
-        final Value value = map.get(key);
-        final boolean par = value.size() != 1;
-        if(par) printChar('(');
-        int cc = 0;
-        for(final Item item : value) {
-          if(cc++ > 0) {
-            printChar(',');
-            if(indent) printChar(' ');
-          }
-          reset();
-          serialize(item);
+    for(final Item key : map.keys()) {
+      if(c++ > 0) printChar(',');
+      indent();
+      reset();
+      serialize(key);
+      printChar(':');
+      if(indent) printChar(' ');
+      final Value value = map.value(key);
+      final boolean par = value.size() != 1;
+      if(par) printChar('(');
+      int cc = 0;
+      for(final Item item : value) {
+        if(cc++ > 0) {
+          printChar(',');
+          if(indent) printChar(' ');
         }
-        if(par) printChar(')');
+        reset();
+        serialize(item);
       }
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
+      if(par) printChar(')');
     }
     --level;
     if(c > 0) indent();

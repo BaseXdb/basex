@@ -225,11 +225,7 @@ public final class JNode extends GNode {
           Value c = null;
           long i = -1;
           if(struct instanceof final XQMap map) {
-            try {
-              c = map.getOrNull(s);
-            } catch(final QueryException ex) {
-              throw Util.notExpected(ex);
-            }
+            c = map.value(s);
           } else {
             final long as = struct.structSize();
             i = s instanceof final Itr itr ? itr.itr() - 1 : -1;

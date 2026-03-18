@@ -42,16 +42,14 @@ public final class CsvXQuerySerializer extends CsvSerializer {
     try {
       // print header
       if(header) {
-        if(!map.contains(CsvXQueryConverter.NAMES))
-          throw CSV_SERIALIZE_X.getIO("Map has no 'names' key");
-        record(map.get(CsvXQueryConverter.NAMES), tl);
+        final Value names = map.getOrNull(CsvXQueryConverter.NAMES);
+        if(names == null) throw CSV_SERIALIZE_X.getIO("Map has no 'names' key");
+        record(names, tl);
       }
       // print records
-      if(!map.contains(CsvXQueryConverter.RECORDS))
-        throw CSV_SERIALIZE_X.getIO("Map has no 'records' key");
-      for(final Item record : map.get(CsvXQueryConverter.RECORDS)) {
-        record(record, tl);
-      }
+      final Value records = map.getOrNull(CsvXQueryConverter.RECORDS);
+      if(records == null) throw CSV_SERIALIZE_X.getIO("Map has no 'records' key");
+      for(final Item record : records) record(record, tl);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

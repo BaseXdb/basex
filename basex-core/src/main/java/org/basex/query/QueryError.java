@@ -1700,12 +1700,7 @@ public enum QueryError {
       if(est.type instanceof final RecordType rt && expr instanceof final XQMap map) {
         final TokenObjectMap<RecordField> fields = rt.fields();
         for(final byte[] key : fields) {
-          try {
-            if(map.contains(Str.get(key)) || fields.get(key).isOptional()) continue;
-          } catch(QueryException ex) {
-            // not expected (the exception is only caused by atomizing the key)
-            throw Util.notExpected(ex);
-          }
+          if(map.value(Str.get(key)) != null || fields.get(key).isOptional()) continue;
           desc.add(QueryString.toQuoted(key)).add(" missing");
           missing = true;
           break;

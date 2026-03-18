@@ -6,7 +6,6 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
 
 /**
  * Hash array mapped trie implementation.
@@ -51,11 +50,7 @@ public final class XQTrieMap extends XQMap {
 
   @Override
   public Value valueAt(final long index) {
-    try {
-      return getOrNull(keyAt(index));
-    } catch(final QueryException ex) {
-      throw Util.notExpected(ex);
-    }
+    return value(keyAt(index));
   }
 
   @Override
