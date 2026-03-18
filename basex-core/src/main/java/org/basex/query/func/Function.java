@@ -110,7 +110,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM), BOOLEAN_O),
   /** XQuery function. */
   BUILD_DATETIME(FnBuildDateTime::new, "build-dateTime(value)",
-      params(Records.DATETIME.get().seqType()), GREGORIAN_ZO),
+      params(Records.DATETIME.get().seqType(Occ.ZERO_OR_ONE)), GREGORIAN_ZO),
   /** XQuery function. */
   BUILD_URI(FnBuildUri::new, "build-uri(parts[,options])",
       params(Records.URI_STRUCTURE.get().seqType(), MAP_ZO), STRING_O),
@@ -572,7 +572,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, FuncType.get(BOOLEAN_ZO, ITEM_ZM, ITEM_O, INTEGER_O).seqType()), ARRAY_ZM),
   /** XQuery function. */
   PARTS_OF_DATETIME(FnPartsOfDateTime::new, "parts-of-dateTime(value)",
-      params(GREGORIAN_ZO), Records.DATETIME.get().seqType()),
+      params(GREGORIAN_ZO), Records.DATETIME.get().seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
   PATH(FnPath::new, "path([node,options])",
       params(GNODE_ZO, MAP_ZO), STRING_ZO),
