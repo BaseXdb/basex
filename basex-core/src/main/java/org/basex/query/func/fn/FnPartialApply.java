@@ -38,11 +38,11 @@ public class FnPartialApply extends StandardFunc {
     final Expr[] funcArgs = new Expr[arity];
     Arrays.fill(funcArgs, Empty.UNDEFINED);
     int placeholders = arity;
-    for(final Item key : arguments.keys()) {
-      final long index = toLong(key);
+    for(final XQMap.Entry arg : arguments.entries()) {
+      final long index = toLong(arg.key());
       if(index <= arity) {
         final int i = (int) index - 1;
-        funcArgs[i] = ft.argTypes[i].coerce(arguments.get(key), qc, info, function.paramName(i),
+        funcArgs[i] = ft.argTypes[i].coerce(arg.value(), qc, info, function.paramName(i),
             null);
         --placeholders;
       }

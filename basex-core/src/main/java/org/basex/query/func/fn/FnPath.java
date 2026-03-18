@@ -154,9 +154,9 @@ public final class FnPath extends ContextFn {
       final XQMap namespaces, final QueryContext qc) throws QueryException {
 
     if(lexical) return qnm.string();
-    for(final Item prefix : namespaces.keys()) {
-      if(Token.eq(qnm.uri(), toToken(namespaces.get(prefix), qc))) {
-        return new QNm(toToken(prefix), qnm.local(), qnm.uri()).string();
+    for(final XQMap.Entry ns : namespaces.entries()) {
+      if(Token.eq(qnm.uri(), toToken(ns.value(), qc))) {
+        return new QNm(toToken(ns.key()), qnm.local(), qnm.uri()).string();
       }
     }
     return attr ? qnm.unique() : qnm.eqName();

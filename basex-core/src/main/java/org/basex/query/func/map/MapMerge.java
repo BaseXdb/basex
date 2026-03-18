@@ -11,6 +11,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.map.XQMap.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.options.*;
@@ -66,10 +67,10 @@ public class MapMerge extends MapFn {
     if(mb != null) mp.forEach(mb::put);
 
     while(current != null) {
-      final XQMap map = toMap(current);
-      for(final Item key : map.keys()) {
+      for(final Entry entry : toMap(current).entries()) {
+        final Item key = entry.key();
         final Value old = mb != null ? mb.get(key) : mp.getOrNull(key);
-        final Value val = dups.merge(key, old, map.get(key), qc);
+        final Value val = dups.merge(key, old, entry.value(), qc);
         if(val != null) {
           if(mb != null) mb.put(key, val);
           else mp = mp.put(key, val);

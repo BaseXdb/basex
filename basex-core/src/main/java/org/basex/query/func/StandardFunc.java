@@ -865,8 +865,8 @@ public abstract class StandardFunc extends Arr {
 
     final Value v = value instanceof final JNode jnode ? jnode.value : value;
     if(v instanceof final XQMap map) {
-      for(final Item key : map.keys()) {
-        if(map.value(key) instanceof FItem) return true;
+      for(final XQMap.Entry entry : map.entries()) {
+        if(entry.value() instanceof FItem) return true;
       }
     }
     return false;

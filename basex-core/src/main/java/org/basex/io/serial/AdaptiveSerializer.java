@@ -193,14 +193,14 @@ public class AdaptiveSerializer extends OutputSerializer {
     printChar('{');
     int c = 0;
     ++level;
-    for(final Item key : map.keys()) {
+    for(final XQMap.Entry entry : map.entries()) {
       if(c++ > 0) printChar(',');
       indent();
       reset();
-      serialize(key);
+      serialize(entry.key());
       printChar(':');
       if(indent) printChar(' ');
-      final Value value = map.value(key);
+      final Value value = entry.value();
       final boolean par = value.size() != 1;
       if(par) printChar('(');
       int cc = 0;

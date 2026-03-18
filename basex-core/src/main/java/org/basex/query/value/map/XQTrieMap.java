@@ -101,15 +101,15 @@ public final class XQTrieMap extends XQMap {
 
   @Override
   public void forEach(final QueryBiConsumer<Item, Value> func) throws QueryException {
-    for(final Item key : keys()) {
-      func.accept(key, get(key));
+    for(final Entry entry : entries()) {
+      func.accept(entry.key(), entry.value());
     }
   }
 
   @Override
   public boolean test(final QueryBiPredicate<Item, Value> func) throws QueryException {
-    for(final Item key : keys()) {
-      if(!func.test(key, get(key))) return false;
+    for(final Entry entry : entries()) {
+      if(!func.test(entry.key(), entry.value())) return false;
     }
     return true;
   }

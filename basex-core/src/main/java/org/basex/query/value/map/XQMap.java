@@ -15,7 +15,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -31,6 +30,13 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 public abstract class XQMap extends XQStruct {
+  /**
+   * Single map entry. Instances of this record are returned by {@link #entries()}.
+   * @param key key
+   * @param value value
+   */
+  public record Entry(Item key, Value value) { };
+
   /**
    * Constructor.
    * @param type map type
@@ -60,9 +66,9 @@ public abstract class XQMap extends XQStruct {
   @Override
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeNum((int) structSize());
-    for(final Item key : keys()) {
-      Stores.write(out, key);
-      Stores.write(out, get(key));
+    for(final Entry entry : entries()) {
+      Stores.write(out, entry.key());
+      Stores.write(out, entry.value());
     }
   }
 
@@ -116,6 +122,27 @@ public abstract class XQMap extends XQStruct {
       // the exception is only caused by atomizing the key
       throw Util.notExpected(ex);
     }
+  }
+
+  /**
+   * Returns an iterator for all entries in this map.
+   * @return iterator
+   */
+  public final Iterable<Entry> entries() {
+    return () -> new Iterator<>() {
+      private long i;
+
+      @Override
+      public boolean hasNext() {
+        return i < structSize();
+      }
+
+      @Override
+      public Entry next() {
+        final long c = i++;
+        return new Entry(keyAt(c), valueAt(c));
+      }
+    };
   }
 
   /**
@@ -277,7 +304,7 @@ public abstract class XQMap extends XQStruct {
       };
     }
 
-    final BasicIter<Item> keys = keys().iter();
+    final Iterator<Entry> entries = entries().iterator();
     return new Iter() {
       Iter iter = Empty.ITER;
 
@@ -286,9 +313,8 @@ public abstract class XQMap extends XQStruct {
         while(true) {
           final Item item = iter.next();
           if(item != null) return item;
-          final Item key = keys.next();
-          if(key == null) return null;
-          iter = XQMap.this.get(key).iter();
+          if(!entries.hasNext()) return null;
+          iter = entries.next().value().iter();
         }
       }
     };
@@ -354,9 +380,9 @@ public abstract class XQMap extends XQStruct {
   @Override
   public boolean refineType() throws QueryException {
     Type refined = null;
-    for(final Item key : keys()) {
-      final Value value = get(key);
-      final MapType mt = MapType.get(key.type, value.seqType());
+    for(final Entry entry : entries()) {
+      final Value value = entry.value();
+      final MapType mt = MapType.get(entry.key().type, value.seqType());
       refined = refined == null ? mt : refined.union(mt);
       if(refined.eq(type)) return true;
     }
@@ -445,15 +471,15 @@ public abstract class XQMap extends XQStruct {
     final IntConsumer addWS = lvl -> {
       for(int l = 0; l < lvl; l++) tb.add("  ");
     };
-    for(final Item key : keys()) {
+    for(final Entry entry : entries()) {
       if(c++ > 0) tb.add(',');
       if(indent) {
         tb.add('\n');
         addWS.accept(level + 1);
       }
-      tb.add(key).add(':');
+      tb.add(entry.key()).add(':');
       if(indent) tb.add(' ');
-      final Value value = get(key);
+      final Value value = entry.value();
       final boolean par = value.size() != 1;
       if(par) tb.add('(');
       int cc = 0;
@@ -482,15 +508,7 @@ public abstract class XQMap extends XQStruct {
 
   @Override
   public final void toXml(final QueryPlan plan) {
-    final long size = structSize();
-    final Value keys = keys();
-    final ExprList list = new ExprList();
-    final long max = Math.min(size, 5);
-    for(long i = 0; i < max; i++) {
-      final Item key = keys.itemAt(i);
-      list.add(key).add(value(key));
-    }
-    plan.add(plan.create(this, ENTRIES, size));
+    plan.add(plan.create(this, ENTRIES, structSize()));
   }
 
   @Override
@@ -499,10 +517,10 @@ public abstract class XQMap extends XQStruct {
       qs.token("{}");
     } else {
       final TokenBuilder tb = new TokenBuilder();
-      for(final Item key : keys()) {
+      for(final Entry entry : entries()) {
         if(!tb.moreInfo()) break;
-        final Value value = value(key);
-        tb.add(key).add(MAPASG).add(qs.error() ? value.toErrorString() : value).add(SEP);
+        final Value value = entry.value();
+        tb.add(entry.key).add(MAPASG).add(qs.error() ? value.toErrorString() : value).add(SEP);
       }
       qs.braced("{ ", tb.toString().replaceAll(", $", ""), " }");
     }
