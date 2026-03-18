@@ -56,6 +56,18 @@ public final class FuncItemTest extends SandboxTest {
     );
   }
 
+  /** Checks that partial functions can use default parameters with context value. */
+  @Test public void partAppContextDefault() {
+    query("declare function f($a, $b:= .) { $a + $b }; 1!f(?)(2)", 3);
+    query("declare function f($a, $b:= 3 + .) { $a + $b }; 1!f(?)(2)", 6);
+    query("declare function f($a, $b:= <a>3</a>/. + .) { $a + $b }; 1!f(?)(2)", 6);
+    query("declare function f($a, $b:= .) { $a + $b }; let $v := 1!f(?) return 2!$v(3)", 4);
+
+    error("declare function f($a, $b:= .) { $a + $b }; f(?)(2)", NOCTX_X);
+    error("declare function f() {.}; 1!f() ", NOCTX_X);
+    error("declare function g($x := .) { $x }; let $f := fn() { g() } return 1!$f()", NOCTX_X);
+  }
+
   /** Checks that the Y combinator is pre-compiled. */
   @Test public void yCombinatorTest() {
     check("function($f) {" +
