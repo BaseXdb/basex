@@ -29,7 +29,7 @@ public class ArraySortBy extends FnSortBy {
     if(as == 0) return array;
 
     final ValueList list = new ValueList(as);
-    for(final Value member : array.iterable()) list.add(member);
+    for(final Value member : array.members()) list.add(member);
     final Value[] values = list.finish();
     final Integer[] index = index(values, qc);
     if(sorted(index)) return array;

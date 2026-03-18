@@ -29,7 +29,7 @@ public final class ArraySortWith extends FnSortWith {
     final long as = array.structSize();
 
     final ValueList values = new ValueList(Seq.initialCapacity(as));
-    for(final Value member : array.iterable()) values.add(member);
+    for(final Value member : array.members()) values.add(member);
     sort(values, qc);
 
     final ArrayBuilder ab = new ArrayBuilder(qc, as);

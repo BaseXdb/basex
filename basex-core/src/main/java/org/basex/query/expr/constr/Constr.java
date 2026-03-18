@@ -88,7 +88,7 @@ public final class Constr {
    */
   private boolean add(final Item item, final QNmSet qnames) throws QueryException {
     if(item instanceof final XQArray array) {
-      for(final Value value : array.iterable()) {
+      for(final Value value : array.members()) {
         for(final Item it : value) {
           if(!add(it, qnames)) return false;
         }

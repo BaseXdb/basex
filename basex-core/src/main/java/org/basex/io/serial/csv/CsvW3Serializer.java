@@ -50,7 +50,7 @@ public final class CsvW3Serializer extends CsvSerializer {
       // print rows
       final Value rows = map.getOrNull(CsvConverter.ROWS);
       if(rows == null) throw CSV_SERIALIZE_X.getIO("Map has no 'rows' key");
-      for(final Item record : rows) row(((XQArray) record).iterable(), tl);
+      for(final Item record : rows) row(((XQArray) record).members(), tl);
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }

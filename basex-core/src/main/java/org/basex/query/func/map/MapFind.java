@@ -50,7 +50,7 @@ public final class MapFind extends MapFn {
         if(!value.isEmpty()) builder.add(value);
         map.forEach((k, val) -> find(val.iter(), key, builder, qc));
       } else if(item instanceof final XQArray array) {
-        for(final Value value : array.iterable()) {
+        for(final Value value : array.members()) {
           find(value.iter(), key, builder, qc);
         }
       }

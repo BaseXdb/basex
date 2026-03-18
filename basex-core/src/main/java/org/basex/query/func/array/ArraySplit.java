@@ -23,7 +23,7 @@ public final class ArraySplit extends ArrayFn {
     final XQArray array = toArray(arg(0), qc);
 
     return new BasicIter<>(array.structSize()) {
-      final Iterator<Value> values = array.iterable().iterator();
+      final Iterator<Value> values = array.members().iterator();
 
       @Override
       public XQArray next() {

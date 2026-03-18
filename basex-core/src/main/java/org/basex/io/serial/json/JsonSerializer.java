@@ -133,7 +133,7 @@ public abstract class JsonSerializer extends StandardSerializer {
         out.print('[');
 
         boolean s = false;
-        for(final Value value : array.iterable()) {
+        for(final Value value : array.members()) {
           if(s) out.print(',');
           indent();
           serialize(value);

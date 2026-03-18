@@ -24,7 +24,7 @@ public final class ArrayIndexWhere extends ArrayFn {
 
     final HofArgs args = new HofArgs(2, predicate);
     final IntList list = new IntList();
-    for(final Value value : array.iterable()) {
+    for(final Value value : array.members()) {
       if(test(predicate, args.set(0, value).inc(), qc)) list.add(args.pos());
     }
     return IntSeq.get(list.finish());

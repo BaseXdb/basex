@@ -36,7 +36,7 @@ public final class ArrayJoin extends ArrayFn {
     // iterative array building
     final ArrayBuilder ab = new ArrayBuilder(qc);
     do {
-      for(final Value value : toArray(item).iterable()) {
+      for(final Value value : toArray(item).members()) {
         ab.add(value);
       }
     } while((item = qc.next(iter)) != null);

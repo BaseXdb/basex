@@ -27,7 +27,7 @@ public class FnApply extends StandardFunc {
     final XQArray arguments = toArray(arg(1), qc);
 
     final ValueList args = new ValueList(arguments.structSize());
-    for(final Value arg : arguments.iterable()) args.add(arg);
+    for(final Value arg : arguments.members()) args.add(arg);
     return apply(function, args, qc);
   }
 

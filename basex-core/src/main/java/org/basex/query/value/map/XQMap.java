@@ -125,8 +125,8 @@ public abstract class XQMap extends XQStruct {
   }
 
   /**
-   * Returns an iterator for all entries in this map.
-   * @return iterator
+   * Returns an iterable instance for all entries of this map.
+   * @return iterable
    */
   public final Iterable<Entry> entries() {
     return () -> new Iterator<>() {

@@ -23,7 +23,7 @@ public final class ArrayForEach extends ArrayFn {
 
     final HofArgs args = new HofArgs(2, action);
     final ArrayBuilder ab = new ArrayBuilder(qc, array.structSize());
-    for(final Value value : array.iterable()) {
+    for(final Value value : array.members()) {
       ab.add(invoke(action, args.set(0, value).inc(), qc));
     }
     return ab.array(this);

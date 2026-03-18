@@ -432,7 +432,7 @@ public class Options implements Iterable<Option<?>> {
         });
       } else if(item instanceof final XQArray array) {
         // workaround for array options
-        for(final Value member : array.iterable()) {
+        for(final Value member : array.members()) {
           if(!tb.isEmpty()) tb.add(' ');
           tb.add(serialize(member, info));
         }

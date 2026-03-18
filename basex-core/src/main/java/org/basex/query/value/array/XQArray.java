@@ -94,7 +94,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Value value : iterable()) vb.add(value.atomValue(qc, ii));
+    for(final Value value : members()) vb.add(value.atomValue(qc, ii));
     return vb.value(BasicType.ANY_ATOMIC_TYPE);
   }
 
@@ -188,17 +188,17 @@ public abstract class XQArray extends XQStruct {
 
   @Override
   public final void cache(final boolean lazy, final InputInfo ii) throws QueryException {
-    for(final Value value : iterable()) value.cache(lazy, ii);
+    for(final Value value : members()) value.cache(lazy, ii);
   }
 
   @Override
   public final void write(final DataOutput out) throws IOException, QueryException {
     out.writeLong(structSize());
-    for(final Value value : iterable()) Stores.write(out, value);
+    for(final Value value : members()) Stores.write(out, value);
   }
 
   /**
-   * Iterator over the values of this array.
+   * Returns an iterator over the values of this array.
    * @param start starting position
    *   (i.e. the position initially returned by {@link ListIterator#nextIndex()})
    * @return array over the array values
@@ -254,16 +254,12 @@ public abstract class XQArray extends XQStruct {
     };
   }
 
-  /** Iterable over the values of this array. */
-  private Iterable<Value> iterable;
-
   /**
-   * Iterator over the values of this array.
-   * @return array over the array values
+   * Returns an iterable instance for all members of this array.
+   * @return iterable
    */
-  public final Iterable<Value> iterable() {
-    if(iterable == null) iterable = () -> iterator(0);
-    return iterable;
+  public final Iterable<Value> members() {
+    return () -> iterator(0);
   }
 
   /**
@@ -290,7 +286,7 @@ public abstract class XQArray extends XQStruct {
 
     tb.add('[');
     int c = 0;
-    for(final Value value : iterable()) {
+    for(final Value value : members()) {
       if(c++ > 0) {
         tb.add(',');
         if(indent) tb.add(' ');
@@ -320,7 +316,7 @@ public abstract class XQArray extends XQStruct {
     if(materialized(test, ii)) return this;
 
     final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
-    for(final Value value : iterable()) {
+    for(final Value value : members()) {
       qc.checkStop();
       ab.add(value.materialize(test, ii, qc));
     }
@@ -331,7 +327,7 @@ public abstract class XQArray extends XQStruct {
   public final boolean materialized(final Predicate<Data> test, final InputInfo ii)
       throws QueryException {
     if(!funcType().declType.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
-      for(final Value value : iterable()) {
+      for(final Value value : members()) {
         if(!value.materialized(test, ii)) return false;
       }
     }
@@ -354,7 +350,7 @@ public abstract class XQArray extends XQStruct {
     }
     if(!mt.eq(Types.ITEM_ZM)) {
       // check types of values
-      for(final Value value : iterable()) {
+      for(final Value value : members()) {
         if(!mt.instance(value)) return false;
       }
     }
@@ -374,7 +370,7 @@ public abstract class XQArray extends XQStruct {
       final CompileContext cc) throws QueryException {
 
     final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
-    for(final Value value : iterable()) {
+    for(final Value value : members()) {
       qc.checkStop();
       ab.add(at.valueType().coerce(value, qc, ii, null, cc));
     }
@@ -384,7 +380,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   public final boolean refineType() {
     Type refined = null;
-    for(final Value value : iterable()) {
+    for(final Value value : members()) {
       final ArrayType at = ArrayType.get(value.seqType());
       refined = refined == null ? at : refined.union(at);
       if(refined.eq(type)) return true;
@@ -411,7 +407,7 @@ public abstract class XQArray extends XQStruct {
   @Override
   protected final XQArray rebuild(final Job job) throws QueryException {
     final ArrayBuilder ab = new ArrayBuilder(job, structSize());
-    for(final Value value : iterable()) ab.add(value.shrink(job));
+    for(final Value value : members()) ab.add(value.shrink(job));
     return ab.array(this);
   }
 
@@ -422,7 +418,7 @@ public abstract class XQArray extends XQStruct {
     SeqType dt = funcType().declType;
     if(sz > 0 && dt.type == BasicType.ITEM) {
       dt = null;
-      for(final Value value : iterable()) {
+      for(final Value value : members()) {
         final SeqType st = value.seqType();
         dt = dt == null ? st : dt.union(st);
       }
@@ -432,53 +428,53 @@ public abstract class XQArray extends XQStruct {
       final Type tp = dt.type;
       if(tp == BasicType.BOOLEAN) {
         final BoolList list = new BoolList(sz);
-        for(final Value value : iterable()) list.add(((Bln) value).bool(null));
+        for(final Value value : members()) list.add(((Bln) value).bool(null));
         return list.finish();
       }
       if(tp == BasicType.BYTE) {
         final ByteList list = new ByteList(sz);
-        for(final Value value : iterable()) list.add((byte) ((Itr) value).itr());
+        for(final Value value : members()) list.add((byte) ((Itr) value).itr());
         return list.finish();
       }
       if(tp.oneOf(BasicType.SHORT, BasicType.UNSIGNED_BYTE)) {
         final ShortList list = new ShortList(sz);
-        for(final Value value : iterable()) list.add((short) ((Itr) value).itr());
+        for(final Value value : members()) list.add((short) ((Itr) value).itr());
         return list.finish();
       }
       if(tp == BasicType.UNSIGNED_SHORT) {
         final char[] chars = new char[sz];
         int c = 0;
-        for(final Value value : iterable()) chars[c++] = (char) ((Itr) value).itr();
+        for(final Value value : members()) chars[c++] = (char) ((Itr) value).itr();
         return chars;
       }
       if(tp == BasicType.INT) {
         final IntList list = new IntList(sz);
-        for(final Value value : iterable()) list.add((int) ((Itr) value).itr());
+        for(final Value value : members()) list.add((int) ((Itr) value).itr());
         return list.finish();
       }
       if(tp.instanceOf(BasicType.INTEGER) && tp != BasicType.UNSIGNED_LONG) {
         final LongList list = new LongList(sz);
-        for(final Value value : iterable()) list.add(((Itr) value).itr());
+        for(final Value value : members()) list.add(((Itr) value).itr());
         return list.finish();
       }
       if(tp == BasicType.FLOAT) {
         final FloatList list = new FloatList(sz);
-        for(final Value value : iterable()) list.add(((Flt) value).flt());
+        for(final Value value : members()) list.add(((Flt) value).flt());
         return list.finish();
       }
       if(tp == BasicType.DOUBLE) {
         final DoubleList list = new DoubleList(sz);
-        for(final Value value : iterable()) list.add(((Dbl) value).dbl());
+        for(final Value value : members()) list.add(((Dbl) value).dbl());
         return list.finish();
       }
       if(tp.instanceOf(BasicType.STRING)) {
         final StringList list = new StringList(sz);
-        for(final Value value : iterable()) list.add((String) value.toJava());
+        for(final Value value : members()) list.add((String) value.toJava());
         return list.finish();
       }
     }
     final ArrayList<Object> list = new ArrayList<>(sz);
-    for(final Value value : iterable()) list.add(value.toJava());
+    for(final Value value : members()) list.add(value.toJava());
     return list.toArray();
   }
 
@@ -501,7 +497,7 @@ public abstract class XQArray extends XQStruct {
       qs.token("[]");
     } else {
       final TokenBuilder tb = new TokenBuilder();
-      for(final Value value : iterable()) {
+      for(final Value value : members()) {
         if(!tb.moreInfo()) break;
         tb.add(tb.isEmpty() ? " " : ", ");
         final long vs = value.size();

@@ -165,7 +165,7 @@ public class AdaptiveSerializer extends OutputSerializer {
   protected void array(final XQArray array) throws IOException {
     printChar('[');
     int c = 0;
-    for(final Value value : array.iterable()) {
+    for(final Value value : array.members()) {
       if(c++ > 0) printChar(',');
       if(indent) printChar(' ');
       final long vs = value.size();

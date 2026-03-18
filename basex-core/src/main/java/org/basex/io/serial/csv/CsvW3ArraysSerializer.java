@@ -36,7 +36,7 @@ public final class CsvW3ArraysSerializer extends CsvSerializer {
       throw CSV_SERIALIZE_X_X.getIO("Array expected, found " + item.seqType(), item);
     final TokenList tl = new TokenList();
     try {
-      for(final Value value : array.iterable()) {
+      for(final Value value : array.members()) {
         if(value.size() != 1) throw CSV_SERIALIZE_X_X.getIO(
             "Item expected, found " + value.seqType(), value);
         tl.add(((Item) value).string(null));

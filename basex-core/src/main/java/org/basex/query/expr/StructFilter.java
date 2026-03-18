@@ -62,7 +62,7 @@ public final class StructFilter extends AFilter {
         // arrays
         if(item instanceof XQArray) {
           final ArrayBuilder ab = new ArrayBuilder(qc);
-          for(final Value value : ((XQArray) item).iterable()) {
+          for(final Value value : ((XQArray) item).members()) {
             qc.checkStop();
             qf.value = value;
             qf.pos = a.incrementAndGet();

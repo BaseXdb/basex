@@ -86,7 +86,7 @@ public final class VariousArrayTest extends ArrayTest {
   }
 
   /**
-   * Test for {@link XQArray#iterable()}.
+   * Test for {@link XQArray#members()}.
    */
   @Test public void iteratorTest() {
     final int n = 1_000;
