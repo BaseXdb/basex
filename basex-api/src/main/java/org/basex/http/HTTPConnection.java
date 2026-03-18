@@ -426,11 +426,11 @@ public final class HTTPConnection implements ClientInfo {
       final Enumeration<String> names = request.getAttributeNames();
       while(names.hasMoreElements()) {
         final String name = names.nextElement();
-        map.put(name, request.getAttribute(name));
+        map.put(name, getAttribute(request, name));
       }
-    } catch(final IllegalStateException ex) {
-      // Tomcat
-      // - https://github.com/spring-projects/spring-boot/issues/36763
+    } catch(final NullPointerException | IllegalStateException ex) {
+      // Tomcat: https://github.com/spring-projects/spring-boot/issues/36763
+      // Jetty 12.1: org.eclipse.jetty.ee11.servlet.ServletApiRequest.getAttribute (line 915)
       Util.debug(ex);
     }
     return map;
@@ -446,9 +446,9 @@ public final class HTTPConnection implements ClientInfo {
     if(request != null) {
       try {
         return request.getAttribute(name);
-      } catch(final IllegalStateException ex) {
-        // Tomcat
-        // - https://github.com/spring-projects/spring-boot/issues/36763
+      } catch(final NullPointerException | IllegalStateException ex) {
+        // Tomcat: https://github.com/spring-projects/spring-boot/issues/36763
+        // Jetty 12.1: org.eclipse.jetty.ee11.servlet.ServletApiRequest.getAttribute (line 915)
         Util.debug(ex);
       }
     }
