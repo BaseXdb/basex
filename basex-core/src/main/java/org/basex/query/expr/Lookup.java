@@ -119,46 +119,35 @@ public final class Lookup extends Arr {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     return new Iter() {
-      final Iter iter = exprs[0].iter(qc);
-      Iter ir;
+      final Iter lhs = exprs[0].iter(qc);
+      Iter rhs;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          if(ir != null) {
-            final Item item = qc.next(ir);
+          if(rhs != null) {
+            final Item item = qc.next(rhs);
             if(item != null) return item;
           }
-          final Item item = qc.next(iter);
+          final Item item = qc.next(lhs);
           if(item == null) return null;
-          ir = valueFor(item, qc).iter();
+          rhs = valueIter(item);
         }
       }
+
+      private Iter valueIter(final Item item) throws QueryException {
+        final ValueBuilder vb = new ValueBuilder(qc);
+        final Iter keyIter = exprs[1].atomIter(qc, info);
+        for(Item key; (key = keyIter.next()) != null;) {
+          final Value items = item instanceof final JNode jnode ? jnode.value.item(qc, info) : item;
+          for(final Item it : items) {
+            if(!(it instanceof final XQStruct struct)) throw LOOKUP_X.get(info, it);
+            vb.add(key == WILDCARD ? struct.items(qc) : struct.invoke(qc, info, key));
+          }
+        }
+        return vb.value().iter();
+      }
     };
-  }
-
-  /**
-   * Returns the looked up values for the specified input.
-   * @param item input item
-   * @param qc query context
-   * @return supplied value builder
-   * @throws QueryException query exception
-   */
-  private Value valueFor(final Item item, final QueryContext qc) throws QueryException {
-    Item it = item;
-    if(it instanceof final JNode jnode) it = jnode.value.item(qc, info);
-    if(!(it instanceof final XQStruct struct)) throw LOOKUP_X.get(info, it);
-    final Expr keys = exprs[1];
-
-    // wildcard: add all values
-    if(keys == WILDCARD) return struct.items(qc);
-
-    final ValueBuilder vb = new ValueBuilder(qc);
-    final Iter ir = keys.atomIter(qc, info);
-    for(Item key; (key = ir.next()) != null;) {
-      vb.add(struct.invoke(qc, info, key));
-    }
-    return vb.value(this);
   }
 
   @Override
