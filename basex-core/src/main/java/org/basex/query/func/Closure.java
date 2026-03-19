@@ -86,7 +86,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     this.params = params;
     this.anns = anns;
     this.vs = vs;
-    this.global = global == null ? Collections.emptyMap() : global;
+    this.global = global == null ? new HashMap<>() : new HashMap<>(global);
     this.declType = declType == null || declType.eq(Types.ITEM_ZM) ? null : declType;
     this.name = name;
   }
@@ -128,6 +128,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     compiled = true;
 
     checkUpdating();
+    captureContextIfNeeded(cc);
 
     // compile closure
     for(final Entry<Var, Expr> entry : global.entrySet()) {
@@ -145,6 +146,20 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     expr.markTailCalls(cc);
 
     return optimize(cc);
+  }
+
+  /**
+   * Captures the context value if this closure wraps a static function call whose omitted default
+   * arguments depend on the context. This can happen for partial function applications.
+   * @param cc compile context
+   * @throws QueryException query exception
+   */
+  private void captureContextIfNeeded(final CompileContext cc) throws QueryException {
+    if(!(expr instanceof StaticFuncCall sfc)) return;
+    final Var var = new Var(new QNm("ctx"), Types.ITEM_ZM, cc.qc, info);
+    final VarRef ref = new VarRef(info, var);
+    final InlineContext ic = new InlineContext(null, ref, cc);
+    if(ic.inlineOrNull(sfc) != null) global.put(vs.add(var), new ContextValue(info));
   }
 
   @Override
