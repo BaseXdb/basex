@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.AbstractMap.*;
 
 import org.basex.io.*;
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -24,9 +23,16 @@ import org.basex.util.list.*;
 public final class ArchiveCreateFrom extends ArchiveCreate {
   @Override
   public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ArrayOutput ao = new ArrayOutput();
-    create(ao, qc);
-    return B64.get(ao.finish());
+    try {
+      final IOFile tmp = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
+      qc.resources.index(TempFiles.class).add(tmp);
+      try(FileOutputStream fos = tmp.outputStream()) {
+        create(fos, qc);
+      }
+      return new B64Lazy(tmp, ARCHIVE_ERROR_X);
+    } catch(final IOException ex) {
+      throw ARCHIVE_ERROR_X.get(info, ex);
+    }
   }
 
   @Override
