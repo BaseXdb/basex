@@ -2,8 +2,12 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.*;
 
 import org.basex.*;
+import org.basex.io.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
@@ -94,6 +98,22 @@ public final class ArchiveModuleTest extends SandboxTest {
 
     query("parse-xml(" + _ARCHIVE_EXTRACT_TEXT.args(func.args(DIR, " {}"),
         "input.xml") + ") instance of document-node()", true);
+
+    // standalone use returns B64Lazy backed by a temp file; verify it is deleted after query close
+    final File tmpDir = new File(Prop.TEMPDIR);
+    final int tmpsBefore = tmpDir.listFiles(
+        f -> f.getName().startsWith(Prop.NAME + '-') && f.getName().endsWith(IO.TMPSUFFIX)).length;
+    countEntries(func.args(DIR), 5);
+    assertEquals(tmpsBefore, tmpDir.listFiles(
+        f -> f.getName().startsWith(Prop.NAME + '-') && f.getName().endsWith(IO.TMPSUFFIX)).length);
+
+    // write directly to file (streaming path, no temp file and no in-memory accumulation)
+    final String tmp = Prop.TEMPDIR + NAME + "createFrom";
+    query(_FILE_WRITE_BINARY.args(tmp, func.args(DIR)));
+    countEntries(tmp, 5);
+    query("parse-xml(" + _ARCHIVE_EXTRACT_TEXT.args(tmp, "input.xml") +
+        ") instance of document-node()", true);
+    query(_FILE_DELETE.args(tmp));
 
     // errors
     error(func.args("UNUNUNKNOWN"), FILE_NO_DIR_X);
