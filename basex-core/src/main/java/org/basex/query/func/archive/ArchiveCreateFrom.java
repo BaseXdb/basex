@@ -23,13 +23,9 @@ import org.basex.util.list.*;
 public final class ArchiveCreateFrom extends ArchiveCreate {
   @Override
   public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    try {
-      final IOFile tmp = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
-      qc.resources.index(TempFiles.class).add(tmp);
-      try(FileOutputStream fos = tmp.outputStream()) {
-        create(fos, qc);
-      }
-      return new B64Lazy(tmp, ARCHIVE_ERROR_X);
+    try(SpillOutput so = new SpillOutput(qc)) {
+      create(so, qc);
+      return so.result(ARCHIVE_ERROR_X);
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }

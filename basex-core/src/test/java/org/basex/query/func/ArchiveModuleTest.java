@@ -99,7 +99,7 @@ public final class ArchiveModuleTest extends SandboxTest {
     query("parse-xml(" + _ARCHIVE_EXTRACT_TEXT.args(func.args(DIR, " {}"),
         "input.xml") + ") instance of document-node()", true);
 
-    // standalone use returns B64Lazy backed by a temp file; verify it is deleted after query close
+    // standalone use: verify no temp files remain after query context closes
     final File tmpDir = new File(Prop.TEMPDIR);
     final int tmpsBefore = tmpDir.listFiles(
         f -> f.getName().startsWith(Prop.NAME + '-') && f.getName().endsWith(IO.TMPSUFFIX)).length;
