@@ -10,7 +10,6 @@ import java.util.AbstractMap.*;
 import java.util.Map.*;
 import java.util.zip.*;
 
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -29,9 +28,12 @@ import org.basex.util.*;
 public class ArchiveCreate extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final ArrayOutput ao = new ArrayOutput();
-    create(ao, qc);
-    return B64.get(ao.finish());
+    try(SpillOutput so = new SpillOutput(qc)) {
+      create(so, qc);
+      return so.result(ARCHIVE_ERROR_X);
+    } catch(final IOException ex) {
+      throw ARCHIVE_ERROR_X.get(info, ex);
+    }
   }
 
   /**
