@@ -59,7 +59,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Atm read(final DataInput in, final QueryContext qc) throws IOException {
-      return Atm.get(in.readToken());
+      return Atm.get(qc.shared.token(in.readToken()));
     }
   },
 
@@ -77,7 +77,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken());
+      return Str.get(qc.shared.token(in.readToken()));
     }
   },
 
@@ -98,7 +98,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken(), this);
+      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -116,7 +116,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken(), this);
+      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -136,7 +136,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken(), this);
+      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -156,7 +156,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken(), this);
+      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -176,7 +176,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken(), this);
+      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -194,7 +194,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken(), this);
+      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -212,7 +212,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken(), this);
+      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -230,7 +230,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken(), this);
+      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -248,7 +248,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Str read(final DataInput in, final QueryContext qc) throws IOException {
-      return Str.get(in.readToken(), this);
+      return Str.get(qc.shared.token(in.readToken()), this);
     }
   },
 
@@ -887,7 +887,7 @@ public enum BasicType implements Type {
     }
     @Override
     public Uri read(final DataInput in, final QueryContext qc) throws IOException {
-      return Uri.get(in.readToken());
+      return Uri.get(qc.shared.token(in.readToken()));
     }
   },
 
@@ -913,7 +913,8 @@ public enum BasicType implements Type {
     }
     @Override
     public QNm read(final DataInput in, final QueryContext qc) throws IOException {
-      return new QNm(in.readToken(), in.readBool() ? in.readToken() : null);
+      return new QNm(qc.shared.token(in.readToken()),
+          in.readBool() ? qc.shared.token(in.readToken()) : null);
     }
   },
 

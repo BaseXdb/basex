@@ -47,7 +47,7 @@ public final class StrSeq extends NativeSeq {
       throws IOException {
     final int size = in.readNum();
     final byte[][] values = new byte[size][];
-    for(int s = 0; s < size; s++) values[s] = in.readToken();
+    for(int s = 0; s < size; s++) values[s] = qc.shared.token(in.readToken());
     return get(values, type);
   }
 
