@@ -78,9 +78,17 @@ final class SpillOutput extends OutputStream {
         Arrays.copyOf(buffer, bufSize));
   }
 
+  /**
+   * Closes the disk output stream if one was opened. {@code tmpFile} is intentionally
+   * not nulled here because {@link #result} is called after {@code close} and still
+   * needs it to determine whether data was spilled.
+   */
   @Override
   public void close() throws IOException {
-    if(disk != null) disk.close();
+    if(disk != null) {
+      disk.close();
+      disk = null;
+    }
   }
 
   /**
