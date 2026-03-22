@@ -134,7 +134,6 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH2, PATH2));
     query(_FILE_SIZE.args(PATH1), 1);
     query(_FILE_SIZE.args(PATH2), 1);
-    error(func.args(PATH1, PATH3), FILE_NO_DIR_X);
   }
 
   /** Test method. */
@@ -321,7 +320,6 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH2, PATH1));
     query(func.args(PATH1, PATH1));
     query(func.args(PATH + "../" + NAME + '/' + NAME, PATH1));
-    error(func.args(PATH1, PATH4), FILE_NO_DIR_X);
     query(_FILE_SIZE.args(PATH1), 1);
     query(_FILE_EXISTS.args(PATH2), false);
   }

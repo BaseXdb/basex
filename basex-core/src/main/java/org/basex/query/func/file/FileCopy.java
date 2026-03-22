@@ -43,10 +43,7 @@ public class FileCopy extends FileFn {
       trg = trg.resolve(src.getFileName());
       if(!Files.isDirectory(src) && Files.isDirectory(trg))
         throw FILE_IS_DIR_X.get(info, trg.toAbsolutePath());
-    } else if(!Files.exists(trg)) {
-      // target does not exist: ensure that parent exists
-      if(!Files.isDirectory(trg.getParent())) throw FILE_NO_DIR_X.get(info, trg.toAbsolutePath());
-    } else if(Files.isDirectory(src)) {
+    } else if(Files.exists(trg) && Files.isDirectory(src)) {
       // if target is file, source cannot be a directory
       throw FILE_IS_DIR_X.get(info, src.toAbsolutePath());
     }
@@ -75,10 +72,13 @@ public class FileCopy extends FileFn {
         }
       }
       if(!copy) Files.delete(src);
-    } else if(copy) {
-      Files.copy(src, trg, StandardCopyOption.REPLACE_EXISTING);
     } else {
-      Files.move(src, trg, StandardCopyOption.REPLACE_EXISTING);
+      if(!Files.exists(trg.getParent())) Files.createDirectories(trg.getParent());
+      if(copy) {
+        Files.copy(src, trg, StandardCopyOption.REPLACE_EXISTING);
+      } else {
+        Files.move(src, trg, StandardCopyOption.REPLACE_EXISTING);
+      }
     }
   }
 }
