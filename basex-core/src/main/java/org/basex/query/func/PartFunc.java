@@ -9,6 +9,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -37,7 +38,7 @@ public final class PartFunc extends Arr {
    */
   public PartFunc(final InputInfo info, final Expr[] exprs, final int placeholders,
       final int[] placeholderPerm) {
-    super(info, Types.FUNCTION_O, exprs);
+    super(info, Types.FUNCTION_ZM, exprs);
     this.placeholders = placeholders;
     this.placeholderPerm = placeholderPerm;
   }
@@ -55,25 +56,39 @@ public final class PartFunc extends Arr {
     if(values(false, cc)) return cc.preEval(this);
 
     final Expr func = body();
-    final FuncType ft = func.funcType();
-    if(ft != null && ft != Types.FUNCTION) {
-      final int nargs = exprs.length - 1, arity = ft.argTypes.length;
-      if(nargs != arity) throw arityError(func, nargs, arity, false, info);
+    if(func.size() == 1) {
+      final FuncType ft = func.funcType();
+      if(ft != null && ft != Types.FUNCTION) {
+        final int nargs = exprs.length - 1, arity = ft.argTypes.length;
+        if(nargs != arity) throw arityError(func, nargs, arity, false, info);
 
-      final SeqType[] args = new SeqType[placeholders];
-      for(int a = 0, e = 0; e < nargs; e++) if(placeholder(exprs[e])) {
-        args[placeholderPerm == null ? a : placeholderPerm[a]] = ft.argTypes[e];
-        ++a;
+        final SeqType[] args = new SeqType[placeholders];
+        for(int a = 0, e = 0; e < nargs; e++) if(placeholder(exprs[e])) {
+          args[placeholderPerm == null ? a : placeholderPerm[a]] = ft.argTypes[e];
+          ++a;
+        }
+        exprType.assign(FuncType.get(ft.declType, args).seqType());
       }
-      exprType.assign(FuncType.get(ft.declType, args).seqType());
     }
     return this;
   }
 
   @Override
-  public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final FItem func = toFunction(body(), qc);
+  public Value value(final QueryContext qc) throws QueryException {
+    final ValueBuilder vb = new ValueBuilder(qc);
+    for(final Item item : body().value(qc)) vb.add(funcItem(toFunction(item, qc), qc));
+    return vb.value(this);
+  }
 
+  /**
+   * Creates a function item over a dynamic function call to the given function item, with the
+   * arguments constructed from the parameters and expressions of this partially applied function.
+   * @param func function item to be called
+   * @param qc query context
+   * @return new function item
+   * @throws QueryException query exception
+   */
+  private FuncItem funcItem(final FItem func, final QueryContext qc) throws QueryException {
     final int el = exprs.length - 1;
     final int nargs = el, arity = func.arity();
     if(nargs != arity) throw arityError(func, nargs, arity, false, info);
