@@ -10,11 +10,21 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
- * An output stream that buffers data in memory up to a threshold derived from
- * available heap, then spills transparently to a temporary file.
- * The threshold uses the same formula as {@code Add#cache}: half of
- * {@code (maxMemory - freeMemory)}, capped at the maximum array size.
- *
+ * Spill output stream.
+ * 
+ * This class provides an output stream that buffers data in memory, then spills transparently to a
+ * temporary file if the data exceeds the threshold. The threshold uses the same formula as
+ * {@code Add#cache}: half of {@code (maxMemory - freeMemory)}, capped at the maximum array size.
+ * The result can be retrieved as a binary item via the {@link #result} method, which returns a lazy
+ * reference to the temporary file if data was spilled, or an in-memory binary item otherwise. The
+ * temporary file is registered with the query context's resources for automatic deletion when the
+ * query finishes.
+ * 
+ * This class is used by {@link ArchiveCreateFrom} and {@link ArchiveCreate}. When creating small
+ * archives data is kept in memory so unnecessary disk I/O and temp file management is avoided. When
+ * creating large archives, the threshold-based spill mechanism avoids excessive memory usage and
+ * potential errors due to out of memory conditions or exceding the maximum array size.
+ * 
  * @author BaseX Team, BSD License
  */
 final class SpillOutput extends OutputStream {
@@ -80,7 +90,7 @@ final class SpillOutput extends OutputStream {
 
   /**
    * Closes the disk output stream if one was opened. {@code tmpFile} is intentionally
-   * not nulled here because {@link #result} is called after {@code close} and still
+   * not nulled here because {@link #result} may be called after {@code close} and still
    * needs it to determine whether data was spilled.
    */
   @Override
