@@ -51,6 +51,16 @@ final class SpillOutput extends OutputStream {
     threshold = Math.min((rt.maxMemory() - rt.freeMemory()) / 2, Array.MAX_SIZE);
   }
 
+  /**
+   * Constructor with an explicit spill threshold (used for testing).
+   * @param qc query context
+   * @param threshold spill threshold in bytes
+   */
+  SpillOutput(final QueryContext qc, final long threshold) {
+    this.qc = qc;
+    this.threshold = threshold;
+  }
+
   @Override
   public void write(final int b) throws IOException {
     if(disk == null && bufSize + 1 > threshold) spill();
