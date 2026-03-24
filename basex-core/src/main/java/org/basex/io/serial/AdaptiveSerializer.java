@@ -72,20 +72,24 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   @Override
   protected void jnode(final JNode jnode) throws IOException {
-    reset();
-    printChars(QueryText.JTREE);
-    printChar('(');
     if(jnode.key != Empty.VALUE) {
-      serialize(jnode.key);
+      printChars(Token.token(QueryText.JNODE));
+      printChar('(');
+      super.serialize(jnode.key);
       printChar(':');
-      reset();
+      if(indent) printChar(' ');
+    } else {
+      printChars(QueryText.JTREE);
+      printChar('(');
     }
     int cc = 0;
     if(jnode.value.size() > 1) printChar('(');
     for(final Item item : jnode.value) {
-      if(cc++ > 0) printChar(',');
-      reset();
-      serialize(item);
+      if(cc++ > 0) {
+        printChar(',');
+        if(indent) printChar(' ');
+      }
+      super.serialize(item);
     }
     if(jnode.value.size() > 1) printChar(')');
     printChar(')');
@@ -175,8 +179,7 @@ public class AdaptiveSerializer extends OutputSerializer {
           printChar(',');
           if(indent) printChar(' ');
         }
-        reset();
-        serialize(value.itemAt(i));
+        super.serialize(value.itemAt(i));
       }
       if(vs != 1) printChar(')');
     }
@@ -196,8 +199,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     for(final XQMap.Entry entry : map.entries()) {
       if(c++ > 0) printChar(',');
       indent();
-      reset();
-      serialize(entry.key());
+      super.serialize(entry.key());
       printChar(':');
       if(indent) printChar(' ');
       final Value value = entry.value();
@@ -209,8 +211,7 @@ public class AdaptiveSerializer extends OutputSerializer {
           printChar(',');
           if(indent) printChar(' ');
         }
-        reset();
-        serialize(item);
+        super.serialize(item);
       }
       if(par) printChar(')');
     }
