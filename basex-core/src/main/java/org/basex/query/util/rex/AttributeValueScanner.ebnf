@@ -1,0 +1,219 @@
+                                                            <?basex
+                                                            package org.basex.query.util.rex;
+
+                                                            /**
+                                                             * Scanner for attribute values in direct element constructors.
+                                                             *
+                                                             * @author BaseX Team, BSD License
+                                                             * @author Gunther Rademacher
+                                                             */
+                                                            @SuppressWarnings("all")
+                                                            public class AttributeValueScanner
+                                                            {
+                                                              /**
+                                                               * Creates a new parser for the given input.
+                                                               * @param input the input to be parsed 
+                                                               */
+                                                              public AttributeValueScanner(final int[] input) {
+                                                                initialize(new CharSequence(input));
+                                                              }
+                                                              
+                                                              /**
+                                                                * Returns the length of the attribute value starting at the given
+                                                                * position, or -1 if there is no valid attribute value at that
+                                                                * position.
+                                                                * @param pos the position to check for an attribute value
+                                                                */
+                                                              public int length(final int pos) {
+                                                                reset(0, pos, pos);
+                                                                try {
+                                                                  parse_DirAttributeValue();
+                                                                  return e0 - pos;
+                                                                } catch (final ParseException e) {
+                                                                  return -1;
+                                                                }
+                                                              }
+                                                            ?>
+DirAttributeValue
+         ::= '"' ( EscapeQuot | QuotAttrValueContent )* '"'
+           | "'" ( EscapeApos | AposAttrValueContent )* "'"
+EscapeQuot
+         ::= '""'
+EscapeApos
+         ::= "''"
+QuotAttrValueContent
+         ::= QuotAttrContentChar
+           | CommonContent
+CommonContent
+         ::= '{{'
+           | '}}'
+           | EnclosedExpr
+AposAttrValueContent
+         ::= AposAttrContentChar
+           | CommonContent
+DirElemContent
+         ::= DirectConstructor
+           | CDataSection
+           | CommonContent
+           | ElementContentChar
+EnclosedExpr
+         ::= '{' EnclosedExprContent* '}'
+EnclosedExprContent
+         ::= Comment
+           | StringLiteral
+           | StringConstructor
+           | StringTemplate
+           | Pragma
+           | DirectConstructor
+           | EnclosedExpr
+           | '<'^GeneralComp
+           | OtherEnclosedExprContent
+Comment  ::= '(:' ( CommentContents | Comment )* ':)'
+StringLiteral
+         ::= AposStringLiteral
+           | QuotStringLiteral
+StringConstructor
+         ::= '``[' StringConstructorContent ']``'
+StringConstructorContent
+         ::= StringConstructorChars ( StringInterpolation StringConstructorChars )*
+StringInterpolation
+         ::= '`' EnclosedExpr '`'
+StringTemplate
+         ::= '`' ( StringTemplateFixedPart | StringTemplateVariablePart )* '`'
+StringTemplateVariablePart
+         ::= EnclosedExpr
+Pragma   ::= '(#' PragmaContents '#)'
+DirectConstructor
+         ::= DirElemConstructor
+           | DirCommentConstructor
+           | DirPIConstructor
+DirElemConstructor
+         ::= '<'^DirElemConstructor QName DirAttributeList ( '/>' | '>' DirElemContent* '</' QName S? '>' )
+DirAttributeList
+         ::= ( S ( QName S? '=' S? DirAttributeValue )? )*
+CDataSection
+         ::= '<![CDATA[' CDataSectionContents ']]>'
+DirCommentConstructor
+         ::= '<!--' DirCommentContents '-->'
+DirPIConstructor
+         ::= '<?' DirPIContents '?>'
+
+<?TOKENS?>            
+
+CommentContents
+         ::= ( Char+ - ( Char* ( '(:' | ':)' ) Char* ) ) - ( Char* '(' ) & ':'
+           | Char+ - ( Char* ( '(:' | ':)' ) Char* ) & '('
+AposStringLiteral
+         ::= "'" ( EscapeApos | [^'] )* "'"
+EscapeApos
+         ::= "''"
+QuotStringLiteral
+         ::= '"' ( EscapeQuot | [^"] )* '"'
+EscapeQuot
+         ::= '""'
+StringTemplateFixedPart
+         ::= ( Char - ( '{' | '}' | '`' ) | '{{' | '}}' | '``' )+
+StringConstructorChars
+         ::= Char* - ( Char* ( '`{' | ']``' ) Char* ) & ( '`{' | ']`' )
+PragmaContents
+         ::= Char* - ( Char* '#)' Char* ) & '#'
+QuotAttrContentChar
+         ::= Char - ["{}<]
+AposAttrContentChar
+         ::= Char - ['{}<]
+ElementContentChar
+         ::= Char - [{}<]
+CDataSectionContents
+         ::= Char* - ( Char* ']]>' Char* ) & ']]'
+DirCommentContents
+         ::= ( Char - '-' | '-' ( Char - '-' ) )*
+DirPIContents
+         ::= Char* - ( Char* '?>' Char* ) & '?'
+QName    ::= PrefixedName
+           | UnprefixedName
+PrefixedName
+         ::= Prefix ':' LocalPart
+Prefix   ::= NCName
+LocalPart
+         ::= NCName
+UnprefixedName
+         ::= LocalPart
+NCName   ::= Name - ( Char* ':' Char* )
+Name     ::= NameStartChar NameChar*
+NameStartChar
+         ::= ':'
+           | [A-Z]
+           | '_'
+           | [a-z]
+           | [#xC0-#xD6]
+           | [#xD8-#xF6]
+           | [#xF8-#x2FF]
+           | [#x370-#x37D]
+           | [#x37F-#x1FFF]
+           | [#x200C-#x200D]
+           | [#x2070-#x218F]
+           | [#x2C00-#x2FEF]
+           | [#x3001-#xD7FF]
+           | [#xF900-#xFDCF]
+           | [#xFDF0-#xFFFD]
+           | [#x10000-#xEFFFF]
+NameChar ::= NameStartChar
+           | '-'
+           | '.'
+           | [0-9]
+           | #xB7
+           | [#x0300-#x036F]
+           | [#x203F-#x2040]
+Char     ::= #x9
+           | #xA
+           | #xD
+           | [#x20-#xD7FF]
+           | [#xE000-#xFFFD]
+           | [#x10000-#x10FFFF]
+S        ::= ( #x20 | #x9 | #xD | #xA )+
+OtherEnclosedExprContent
+         ::= ( Char* '(' ) - ( Char* ( ["'`{}<] | '(#' | '(:' | '<!--' | '<?' ) Char* ) & [^#:]
+           | ( Char* [^("'`{}<?] ) - ( Char* ( ["'`{}<] | '(#' | '(:' | '<!--' | '<?' ) Char* ) & Char 
+GeneralCompDelimiter
+         ::= [^?]
+DirElemConstructorDelimiter
+         ::= QName ( S QName S? '=' | S? [/>] )
+GeneralCompDelimiter
+          \\ '<'^GeneralComp
+DirElemConstructorDelimiter
+          \\ '<'^DirElemConstructor
+Char      \\ '(#' '(:'
+
+<?ENCORE?>
+                                                            <?basex
+                                                              private record CharSequence(int[] input) {
+                                                                public int length() {
+                                                                  return input.length;
+                                                                }
+
+                                                                public int charAt(int index) {
+                                                                  return input[index];
+                                                                }
+
+                                                                public CharSequence subSequence(int start, int end) {
+                                                                  throw new UnsupportedOperationException();
+                                                                }
+                                                              }
+
+                                                              /* Testing code
+                                                              public static void main(String[] args) {
+                                                                final String input = args[0];
+                                                                System.out.println(input);
+                                                                final AttributeValueScanner parser
+                                                                  = new AttributeValueScanner(input.codePoints().toArray());
+                                                                for(int i = 0; i < input.length(); i++) {
+                                                                  final int size = parser.size(i);
+                                                                  if (size > 0) {
+                                                                    System.out.println(i + " to " + (i + size) + ": " + input.substring(i, i + size));
+                                                                  }
+                                                                }
+                                                              }
+                                                              */
+                                                            }
+                                                            ?>
+// End

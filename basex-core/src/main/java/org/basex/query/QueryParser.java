@@ -36,6 +36,7 @@ import org.basex.query.util.format.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
+import org.basex.query.util.rex.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -110,6 +111,8 @@ public class QueryParser extends InputParser {
   private QueryError alter;
   /** Alternative position. */
   private int alterPos;
+  /** Attribute value scanner. */
+  private AttributeValueScanner attributeValueScanner;
 
   /**
    * Constructor.
@@ -3098,102 +3101,121 @@ public class QueryParser extends InputParser {
     // parse attributes
     boolean xmlDecl = false; // xml prefix explicitly declared?
     ArrayList<QNm> atts = null;
-    while(true) {
-      final byte[] atn = qName(null);
-      if(atn.length == 0) break;
 
-      final ExprList attv = new ExprList();
-      consumeWS();
-      if(root) {
-        if(!consume('=')) return null;
-      } else {
-        check('=');
-      }
-      consumeWS();
-      final int delim = consume();
-      if(!quote(delim)) throw error(NOQUOTE_X, found());
-      final TokenBuilder tb = new TokenBuilder();
-
-      boolean simple = true;
+    // remember start of attribute list
+    final int attrPos = pos;
+    for(int pass = 0; pass < 2; pass++) {
+      final boolean processXmlns = pass == 0;
+      pos = attrPos;
       while(true) {
-        while(!consume(delim)) {
-          cp = current();
-          switch(cp) {
-            case '{':
-              if(next() == '{') {
-                tb.add(consume());
-                consume();
-              } else {
-                final byte[] text = tb.next();
-                if(text.length == 0) {
-                  add(attv, enclosedExpr());
-                  simple = false;
-                } else {
-                  add(attv, Str.get(text));
-                }
-              }
-              break;
-            case '}':
-              consume();
-              check('}');
-              tb.add('}');
-              break;
-            case '<':
-            case 0:
-              throw error(NOQUOTE_X, found());
-            case '\n':
-            case '\t':
-              tb.add(' ');
-              consume();
-              break;
-            case '\r':
-              if(next() != '\n') tb.add(' ');
-              consume();
-              break;
-            default:
-              entity(tb);
-              break;
-          }
-        }
-        if(!consume(delim)) break;
-        tb.add(delim);
-      }
-
-      if(!tb.isEmpty()) add(attv, Str.get(tb.finish()));
-
-      // parse namespace declarations
-      final boolean pr = startsWith(atn, XMLNS_COLON);
-      if(pr || eq(atn, XMLNS)) {
-        if(!simple) throw error(NSCONS);
-        final byte[] prefix = pr ? local(atn) : EMPTY;
-        final byte[] uri = attv.isEmpty() ? EMPTY : ((Str) attv.get(0)).string();
-        if(eq(prefix, XML) && eq(uri, XML_URI)) {
-          if(xmlDecl) throw error(DUPLNSDEF_X, XML);
-          xmlDecl = true;
+        final byte[] atn = qName(null);
+        if(atn.length == 0) break;
+        consumeWS();
+        if(root) {
+          if(!consume('=')) return null;
         } else {
-          if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
-          if(pr) {
-            if(uri.length == 0) throw error(NSEMPTYURI);
-            if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
-            if(eq(uri, XML_URI)) throw error(BINDXMLURI_X_X, uri, XML);
-            if(eq(uri, XMLNS_URI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
-            qc.ns.add(prefix, uri);
-          } else {
-            if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
-            sc.dirNS = uri;
-            if(!sc.elemNsFixed) sc.elemNS = sc.dirNS;
-          }
-          if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
-          ns.add(prefix, uri);
+          check('=');
         }
-      } else {
-        final QNm attn = new QNm(atn);
-        if(atts == null) atts = new ArrayList<>(1);
-        atts.add(attn);
-        qnames.add(attn, false, info());
-        add(cont, new CAttr(info(), false, attn, attv.finish()));
+        consumeWS();
+
+        final int len = attributeValueScanner().length(pos);
+        final boolean hasXmlnsPrefix = startsWith(atn, XMLNS_COLON);
+        final boolean isXmlns = hasXmlnsPrefix || eq(atn, XMLNS);
+        if(processXmlns != isXmlns) {
+          if(len >= 0) {
+            pos += len;
+            consumeWS();
+            continue;
+          }
+          Util.debugln("Failed to detect attribute value length: "
+              + new String(input, pos, Math.min(20, input.length - pos)) + "...");
+        }
+
+        final ExprList attv = new ExprList();
+        final int delim = consume();
+        if(!quote(delim)) throw error(NOQUOTE_X, found());
+        final TokenBuilder tb = new TokenBuilder();
+
+        boolean simple = true;
+        while(true) {
+          while(!consume(delim)) {
+            cp = current();
+            switch(cp) {
+              case '{':
+                if(next() == '{') {
+                  tb.add(consume());
+                  consume();
+                } else {
+                  final byte[] text = tb.next();
+                  if(text.length == 0) {
+                    add(attv, enclosedExpr());
+                    simple = false;
+                  } else {
+                    add(attv, Str.get(text));
+                  }
+                }
+                break;
+              case '}':
+                consume();
+                check('}');
+                tb.add('}');
+                break;
+              case '<':
+              case 0:
+                throw error(NOQUOTE_X, found());
+              case '\n':
+              case '\t':
+                tb.add(' ');
+                consume();
+                break;
+              case '\r':
+                if(next() != '\n') tb.add(' ');
+                consume();
+                break;
+              default:
+                entity(tb);
+                break;
+            }
+          }
+          if(!consume(delim)) break;
+          tb.add(delim);
+        }
+
+        if(!tb.isEmpty()) add(attv, Str.get(tb.finish()));
+
+        // parse namespace declarations
+        if(isXmlns) {
+          if(!simple) throw error(NSCONS);
+          final byte[] prefix = hasXmlnsPrefix ? local(atn) : EMPTY;
+          final byte[] uri = attv.isEmpty() ? EMPTY : ((Str) attv.get(0)).string();
+          if(eq(prefix, XML) && eq(uri, XML_URI)) {
+            if(xmlDecl) throw error(DUPLNSDEF_X, XML);
+            xmlDecl = true;
+          } else {
+            if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
+            if(hasXmlnsPrefix) {
+              if(uri.length == 0) throw error(NSEMPTYURI);
+              if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
+              if(eq(uri, XML_URI)) throw error(BINDXMLURI_X_X, uri, XML);
+              if(eq(uri, XMLNS_URI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
+              qc.ns.add(prefix, uri);
+            } else {
+              if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
+              sc.dirNS = uri;
+              if(!sc.elemNsFixed) sc.elemNS = sc.dirNS;
+            }
+            if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
+            ns.add(prefix, uri);
+          }
+        } else {
+          final QNm attn = new QNm(atn);
+          if(atts == null) atts = new ArrayList<>(1);
+          atts.add(attn);
+          qnames.add(attn, false, info());
+          add(cont, new CAttr(info(), false, attn, attv.finish()));
+        }
+        if(!consumeWS()) break;
       }
-      if(!consumeWS()) break;
     }
 
     if(consume('/')) {
@@ -3228,6 +3250,15 @@ public class QueryParser extends InputParser {
     sc.elemNS = nse;
     sc.dirNS = nsd;
     return new CElem(info(), false, name, ns, cont.finish());
+  }
+
+  /**
+   * Returns the attribute value scanner.
+   * @return attribute value scanner
+   */
+  private AttributeValueScanner attributeValueScanner() {
+    if(attributeValueScanner == null) attributeValueScanner = new AttributeValueScanner(input);
+    return attributeValueScanner;
   }
 
   /**
