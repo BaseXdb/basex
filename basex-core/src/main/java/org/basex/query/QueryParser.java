@@ -95,8 +95,6 @@ public class QueryParser extends InputParser {
   private final HashSet<String> decl = new HashSet<>();
   /** Output declarations. */
   private final HashMap<String, Object> sparams = new HashMap<>();
-  /** QName cache. */
-  private final QNmResolver qnames = new QNmResolver();
   /** Local variable. */
   private final LocalVars localVars = new LocalVars(this);
 
@@ -264,7 +262,6 @@ public class QueryParser extends InputParser {
     }
 
     // completes the parsing step
-    qnames.resolve(this, 0, sc.elemNS);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
   }
@@ -2090,10 +2087,7 @@ public class QueryParser extends InputParser {
     final int p = pos;
     if(!wsConsumeWs(VALIDATE)) return;
 
-    if(consume(TYPE)) {
-      final InputInfo ii = info();
-      qnames.add(eQName(SKIPCHECK, QNAME_X), sc, ii);
-    }
+    if(consume(TYPE)) eQName(sc.elemNS, QNAME_X);
     consume(STRICT);
     consume(LAX);
     skipWs();
@@ -2474,7 +2468,7 @@ public class QueryParser extends InputParser {
           }
         }
         // name test: prefix:name, name, Q{uri}name
-        if(kind == Kind.ELEMENT) qnames.add(name,  sc, ii); else qnames.add(name, false, ii);
+        resolveQNm(name, kind == Kind.ELEMENT ? sc.elemNS : null, ii);
         return nameTest.apply(name, scope);
       }
     }
@@ -3090,10 +3084,6 @@ public class QueryParser extends InputParser {
     final int size = qc.ns.size();
     final byte[] nse = sc.elemNS;
     final byte[] nsd = sc.dirNS;
-    final int npos = qnames.size();
-
-    final QNm name = new QNm(qnm);
-    qnames.add(name, true, ii);
 
     final Atts ns = new Atts();
     final ExprList cont = new ExprList();
@@ -3211,12 +3201,15 @@ public class QueryParser extends InputParser {
           final QNm attn = new QNm(atn);
           if(atts == null) atts = new ArrayList<>(1);
           atts.add(attn);
-          qnames.add(attn, false, info());
+          resolveQNm(attn, null, info());
           add(cont, new CAttr(info(), false, attn, attv.finish()));
         }
         if(!consumeWS()) break;
       }
     }
+
+    final QNm name = new QNm(qnm);
+    resolveQNm(name, sc.dirNS, ii);
 
     if(consume('/')) {
       check('>');
@@ -3233,8 +3226,6 @@ public class QueryParser extends InputParser {
       check('>');
       if(!eq(name.string(), close)) throw error(TAGWRONG_X_X, name.string(), close);
     }
-
-    qnames.resolve(this, npos, sc.dirNS);
 
     // check for duplicate attribute names
     if(atts != null) {
@@ -3397,9 +3388,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compElement() throws QueryException {
-    final Expr name = compName(NOELEMNAME, true);
+    final Expr name = compName(NOELEMNAME, true, sc.elemNS);
     if(name == null) return null;
-    if(name instanceof final QNm qnm) qnames.add(qnm, sc, info());
     skipWs();
     return current('{') ? new CElem(info(), true, name, new Atts(), enclosedExpr()) : null;
   }
@@ -3410,9 +3400,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compAttribute() throws QueryException {
-    final Expr name = compName(NOATTNAME, true);
+    final Expr name = compName(NOATTNAME, true, null);
     if(name == null) return null;
-    if(name instanceof final QNm qnm) qnames.add(qnm, false, info());
     skipWs();
     return current('{') ? new CAttr(info(), true, name, enclosedExpr()) : null;
   }
@@ -3423,7 +3412,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compNamespace() throws QueryException {
-    final Expr name = compName(NONSNAME, false);
+    final Expr name = compName(NONSNAME, false, null);
     if(name == null) return null;
     skipWs();
     return current('{') ? new CNSpace(info(), true, name, enclosedExpr()) : null;
@@ -3435,7 +3424,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compPI() throws QueryException {
-    final Expr name = compName(NOPINAME, false);
+    final Expr name = compName(NOPINAME, false, null);
     if(name == null) return null;
     skipWs();
     return current('{') ? new CPI(info(), true, name, enclosedExpr()) : null;
@@ -3445,10 +3434,12 @@ public class QueryParser extends InputParser {
    * Parses a computed name.
    * @param error error message
    * @param qname QName or NCName
+   * @param ns default namespace (can be {@code null})
    * @return name or {@code null}
    * @throws QueryException query exception
    */
-  private Expr compName(final QueryError error, final boolean qname) throws QueryException {
+  private Expr compName(final QueryError error, final boolean qname, final byte[] ns)
+      throws QueryException {
     // parse name enclosed in curly braces
     if(consume("{")) {
       final Expr name = check(expr(), error);
@@ -3458,7 +3449,7 @@ public class QueryParser extends InputParser {
     // parse literal name
     consume("#");
     skipWs();
-    if(qname) return eQName(SKIPCHECK, null);
+    if(qname) return eQName(ns, null);
 
     // parse name enclosed in quotes
     final byte[] string = ncName(null, false);
@@ -4826,5 +4817,22 @@ public class QueryParser extends InputParser {
   @Override
   public final InputInfo info() {
     return new InputInfo(this, sc);
+  }
+
+  /**
+   * Finalizes the given QName by assigning a namespace URI.
+   * @param name QName to be resolved
+   * @param elemNS default element namespace (may be {@code null}, when resolving attribute names)
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  private void resolveQNm(final QNm name, final byte[] elemNS, final InputInfo info)
+      throws QueryException {
+    if(name.hasPrefix()) {
+      name.uri(qc.ns.resolve(name.prefix(), sc));
+      if(!name.hasURI()) throw error(NOURI_X, info, name.prefix());
+    } else if(elemNS != null) {
+      name.uri(elemNS);
+    }
   }
 }
