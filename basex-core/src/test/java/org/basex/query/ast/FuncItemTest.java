@@ -68,6 +68,18 @@ public final class FuncItemTest extends SandboxTest {
     error("declare function g($x := .) { $x }; let $f := fn() { g() } return 1!$f()", NOCTX_X);
   }
 
+  /** Checks that partial application supports function sequences. */
+  @Test public void partAppSequence() {
+    query("let $f := ()(12, ?) return $f(5)", "");
+    query("let $f := (op('+'), 42, op('-'))[. instance of fn(*)](12, ?) return $f(5)", "17\n7");
+    query("declare function a($x, $y as xs:integer) {$y};\n"
+        + "declare function b($y, $z as xs:decimal) {$z};\n"
+        + "(((a#2, b#2)((), ?)(text{'3'}))) =!> type-of()\n",
+        "xs:integer\nxs:decimal");
+
+    error("let $f := (op('+'), 42, op('-'))(12, ?) return $f(5)", INVTYPE_X);
+  }
+
   /** Checks that the Y combinator is pre-compiled. */
   @Test public void yCombinatorTest() {
     check("function($f) {" +
