@@ -11,7 +11,6 @@ import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
-import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -21,16 +20,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ArchiveCreateFrom extends ArchiveCreate {
-  @Override
-  public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    try(SpillOutput so = new SpillOutput(qc)) {
-      create(so, qc);
-      return so.result(ARCHIVE_ERROR_X);
-    } catch(final IOException ex) {
-      throw ARCHIVE_ERROR_X.get(info, ex);
-    }
-  }
-
   @Override
   public void create(final OutputStream os, final QueryContext qc) throws QueryException {
     final IOFile root = new IOFile(toPath(arg(0), qc));

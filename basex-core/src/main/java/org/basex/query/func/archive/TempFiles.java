@@ -7,12 +7,13 @@ import org.basex.query.*;
 
 /**
  * Temporary files created during query evaluation.
- * 
+ *
  * Temporary files that are created during query evaluation and registered in this class will be
  * deleted when the query context is closed, ensuring that no temporary files are left behind after
  * the query execution.
  *
  * @author BaseX Team, BSD License
+ * @author Vincent Lizzi
  */
 public final class TempFiles implements QueryResource {
   /** List of temporary files. */

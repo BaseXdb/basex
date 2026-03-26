@@ -11,44 +11,40 @@ import org.basex.util.*;
 
 /**
  * Spill output stream.
- * 
+ *
  * This class provides an output stream that buffers data in memory, then spills transparently to a
- * temporary file if the data exceeds the threshold. The threshold uses the same formula as
- * {@code Add#cache}: half of {@code (maxMemory - freeMemory)}, capped at the maximum array size.
- * The result can be retrieved as a binary item via the {@link #result} method, which returns a lazy
+ * temporary file if the data exceeds the maximum array size or a given threshold.
+ * The result can be retrieved as a binary item via the {@link #finish} method, which returns a lazy
  * reference to the temporary file if data was spilled, or an in-memory binary item otherwise. The
  * temporary file is registered with the query context's resources for automatic deletion when the
  * query finishes.
- * 
- * This class is used by {@link ArchiveCreateFrom} and {@link ArchiveCreate}. When creating small
- * archives data is kept in memory so unnecessary disk I/O and temp file management is avoided. When
- * creating large archives, the threshold-based spill mechanism avoids excessive memory usage and
- * potential errors due to out of memory conditions or exceding the maximum array size.
- * 
+ *
+ * This class is used by {@link ArchiveCreateFrom} and {@link ArchiveCreate}.
+ *
  * @author BaseX Team, BSD License
+ * @author Vincent Lizzi
  */
 final class SpillOutput extends OutputStream {
+  /** Query context for registering the temporary file on spill. */
+  private final QueryContext qc;
+  /** Threshold in bytes before spilling to disk. */
+  private final int threshold;
+
   /** In-memory buffer. */
   private byte[] buffer = new byte[Array.INITIAL_CAPACITY];
   /** Number of bytes written to the in-memory buffer. */
   private int bufSize;
-  /** Disk output stream (null before spilling). */
-  private FileOutputStream disk;
-  /** Temporary file (null before spilling). */
+  /** Disk output stream ({@code null} before spilling). */
+  private FileOutputStream tmpOutput;
+  /** Temporary file ({@code null} before spilling). */
   private IOFile tmpFile;
-  /** Threshold in bytes before spilling to disk. */
-  private final long threshold;
-  /** Query context for registering the temporary file on spill. */
-  private final QueryContext qc;
 
   /**
-   * Constructor. Computes the spill threshold from current heap availability.
+   * Constructor.
    * @param qc query context
    */
   SpillOutput(final QueryContext qc) {
-    this.qc = qc;
-    final Runtime rt = Runtime.getRuntime();
-    threshold = Math.min((rt.maxMemory() - rt.freeMemory()) / 2, Array.MAX_SIZE);
+    this(qc, Array.MAX_SIZE);
   }
 
   /**
@@ -56,31 +52,34 @@ final class SpillOutput extends OutputStream {
    * @param qc query context
    * @param threshold spill threshold in bytes
    */
-  SpillOutput(final QueryContext qc, final long threshold) {
+  SpillOutput(final QueryContext qc, final int threshold) {
     this.qc = qc;
     this.threshold = threshold;
   }
 
   @Override
   public void write(final int b) throws IOException {
-    if(disk == null && bufSize + 1 > threshold) spill();
-    if(disk != null) {
-      disk.write(b);
+    if(tmpOutput == null && bufSize == threshold) spill();
+    if(tmpOutput != null) {
+      tmpOutput.write(b);
     } else {
-      if(bufSize == buffer.length) buffer = Arrays.copyOf(buffer, Array.newCapacity(bufSize));
+      if(bufSize == buffer.length) {
+        buffer = Arrays.copyOf(buffer, Array.newCapacity(bufSize));
+      }
       buffer[bufSize++] = (byte) b;
     }
   }
 
   @Override
   public void write(final byte[] b, final int off, final int len) throws IOException {
-    if(disk == null && (long) bufSize + len > threshold) spill();
-    if(disk != null) {
-      disk.write(b, off, len);
+    if(tmpOutput == null && (long) bufSize + len > threshold) spill();
+    if(tmpOutput != null) {
+      tmpOutput.write(b, off, len);
     } else {
       final int newSize = bufSize + len;
-      if(newSize > buffer.length)
+      if(newSize > buffer.length) {
         buffer = Arrays.copyOf(buffer, Math.max(Array.newCapacity(buffer.length), newSize));
+      }
       System.arraycopy(b, off, buffer, bufSize, len);
       bufSize = newSize;
     }
@@ -92,22 +91,22 @@ final class SpillOutput extends OutputStream {
    * @param error error to raise if the temporary file cannot be read
    * @return binary item
    */
-  B64 result(final QueryError error) {
+  B64 finish(final QueryError error) {
     if(tmpFile != null) return new B64Lazy(tmpFile, error);
     return B64.get(bufSize == 0 ? Token.EMPTY : bufSize == buffer.length ? buffer :
-        Arrays.copyOf(buffer, bufSize));
+      Arrays.copyOf(buffer, bufSize));
   }
 
   /**
    * Closes the disk output stream if one was opened. {@code tmpFile} is intentionally
-   * not nulled here because {@link #result} may be called after {@code close} and still
+   * not nulled here because {@link #finish} may be called after {@code close} and still
    * needs it to determine whether data was spilled.
    */
   @Override
   public void close() throws IOException {
-    if(disk != null) {
-      disk.close();
-      disk = null;
+    if(tmpOutput != null) {
+      tmpOutput.close();
+      tmpOutput = null;
     }
   }
 
@@ -119,8 +118,8 @@ final class SpillOutput extends OutputStream {
   private void spill() throws IOException {
     tmpFile = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
     qc.resources.index(TempFiles.class).add(tmpFile);
-    disk = tmpFile.outputStream();
-    disk.write(buffer, 0, bufSize);
+    tmpOutput = tmpFile.outputStream();
+    tmpOutput.write(buffer, 0, bufSize);
     buffer = null;
   }
 }

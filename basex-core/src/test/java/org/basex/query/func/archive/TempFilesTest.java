@@ -11,6 +11,7 @@ import org.junit.jupiter.api.*;
  * Tests for {@link TempFiles}.
  *
  * @author BaseX Team, BSD License
+ * @author Vincent Lizzi
  */
 public final class TempFilesTest {
   /**

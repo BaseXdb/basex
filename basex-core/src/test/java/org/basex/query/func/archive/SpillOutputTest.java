@@ -15,18 +15,20 @@ import org.junit.jupiter.api.*;
  * Tests for {@link SpillOutput}.
  *
  * @author BaseX Team, BSD License
+ * @author Vincent Lizzi
  */
 public final class SpillOutputTest extends SandboxTest {
   /**
    * Small data stays in memory: result is an in-memory binary item, content is correct.
    * @throws IOException I/O exception
+   * @throws QueryException query exception
    */
   @Test public void inMemoryPath() throws IOException, QueryException {
     final byte[] data = { 1, 2, 3 };
     try(QueryContext qc = new QueryContext(context);
         SpillOutput so = new SpillOutput(qc, 1024)) {
       so.write(data);
-      final B64 result = so.result(QueryError.ARCHIVE_ERROR_X);
+      final B64 result = so.finish(QueryError.ARCHIVE_ERROR_X);
       assertFalse(result instanceof B64Lazy, "expected in-memory item");
       assertArrayEquals(data, result.binary(null));
     }
@@ -42,7 +44,7 @@ public final class SpillOutputTest extends SandboxTest {
     try(QueryContext qc = new QueryContext(context);
         SpillOutput so = new SpillOutput(qc, 3)) {
       so.write(data);
-      final B64 result = so.result(QueryError.ARCHIVE_ERROR_X);
+      final B64 result = so.finish(QueryError.ARCHIVE_ERROR_X);
       assertTrue(result instanceof B64Lazy, "expected lazy (spilled) item");
       assertArrayEquals(data, result.binary(null));
     }
@@ -59,7 +61,7 @@ public final class SpillOutputTest extends SandboxTest {
     try(QueryContext qc = new QueryContext(context)) {
       try(SpillOutput so = new SpillOutput(qc, 0)) {
         so.write(new byte[] { 1, 2, 3 });
-        so.result(QueryError.ARCHIVE_ERROR_X);
+        so.finish(QueryError.ARCHIVE_ERROR_X);
       }
       assertEquals(before + 1, countTempFiles(tmpDir), "temp file should exist while qc is open");
     }
@@ -72,10 +74,11 @@ public final class SpillOutputTest extends SandboxTest {
    */
   @Test public void closeIsIdempotent() throws IOException {
     try(QueryContext qc = new QueryContext(context)) {
-      final SpillOutput so = new SpillOutput(qc, 0);
-      so.write(new byte[] { 1 });
-      so.close();
-      assertDoesNotThrow(so::close);
+      try(SpillOutput so = new SpillOutput(qc, 0)) {
+        so.write(new byte[] { 1 });
+        so.close();
+        assertDoesNotThrow(so::close);
+      }
     }
   }
 

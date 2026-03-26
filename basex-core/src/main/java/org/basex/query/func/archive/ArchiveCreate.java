@@ -30,7 +30,7 @@ public class ArchiveCreate extends ArchiveFn {
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     try(SpillOutput so = new SpillOutput(qc)) {
       create(so, qc);
-      return so.result(ARCHIVE_ERROR_X);
+      return so.finish(ARCHIVE_ERROR_X);
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }
