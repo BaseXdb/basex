@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.AbstractMap.*;
 
 import org.basex.io.*;
-import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -24,6 +23,16 @@ import org.basex.util.list.*;
 public final class ArchiveCreateFrom extends ArchiveCreate {
   @Override
   public B64 item(final QueryContext qc, final InputInfo ii) throws QueryException {
+    try(SpillOutput so = new SpillOutput(qc)) {
+      create(so, qc);
+      return so.result(ARCHIVE_ERROR_X);
+    } catch(final IOException ex) {
+      throw ARCHIVE_ERROR_X.get(info, ex);
+    }
+  }
+
+  @Override
+  public void create(final OutputStream os, final QueryContext qc) throws QueryException {
     final IOFile root = new IOFile(toPath(arg(0), qc));
     final CreateFromOptions options = toOptions(arg(1), new CreateFromOptions(), qc);
     Value entries = arg(2).value(qc);
@@ -47,20 +56,18 @@ public final class ArchiveCreateFrom extends ArchiveCreate {
     final int level = level(options);
     final String format = options.get(CreateOptions.FORMAT).toLowerCase(Locale.ENGLISH);
     final String dir = rootDir && root.parent() != null ? root.name() + '/' : "";
-    final ArrayOutput ao = new ArrayOutput();
-    try(ArchiveOut out = ArchiveOut.get(format, info, ao)) {
+    try(ArchiveOut out = ArchiveOut.get(format, info, os)) {
       out.level(level);
       try {
         for(final Item item : entries) {
           final IOFile file = new IOFile(root, toString(item, qc));
           if(!file.exists()) throw FILE_NOT_FOUND_X.get(info, file);
           if(file.isDir()) throw FILE_IS_DIR_X.get(info, file);
-          add(new SimpleEntry<>(item, B64.get(file.read())), out, level, dir, qc);
+          add(new SimpleEntry<>(item, new B64Lazy(file, FILE_NOT_FOUND_X)), out, level, dir, qc);
         }
       } catch(final IOException ex) {
         throw ARCHIVE_ERROR_X.get(info, ex);
       }
     }
-    return B64.get(ao.finish());
   }
 }
