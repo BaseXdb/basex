@@ -2459,6 +2459,7 @@ public class QueryParser extends InputParser {
       } else {
         NameTest.Scope scope = NameTest.Scope.FULL;
         if(!name.hasPrefix()) {
+          pos = p;
           if(consume(":*")) {
             // name test: prefix:*
             name = new QNm(concat(name.string(), cpToken(':')));
