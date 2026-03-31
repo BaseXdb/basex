@@ -46,9 +46,9 @@ public class FileWriteBinary extends FileWriteFn {
     } else {
       // write full file
       try(BufferOutput out = BufferOutput.get(new FileOutputStream(path.toFile(), append))) {
-        if(arg(1).getClass() == ArchiveCreate.class) {
-          // optimization: stream archive to disk (no support for ArchiveCreateFrom)
-          ((ArchiveCreate) arg(1)).create(out, qc);
+        if(arg(1) instanceof final ArchiveCreate ac) {
+          // optimization: stream archive to disk
+          ac.create(out, qc);
         } else {
           IO.write(toBin(arg(1), qc).input(info), out);
         }

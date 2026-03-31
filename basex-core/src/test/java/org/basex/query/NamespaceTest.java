@@ -719,6 +719,48 @@ public final class NamespaceTest extends SandboxTest {
   }
 
   /**
+   * Tests with default element namespace set to ##any.
+   */
+  @Test public void defaultElementNamespaceAny() {
+    final String defAny = "declare default element namespace '##any';\n";
+
+    // element-axis NameTest => *:a
+    query(defAny + "<a/>/self::a", "<a/>");
+    query(defAny + "element Q{a}a {}/self::a", "<a xmlns=\"a\"/>");
+    query(defAny + "element Q{a}a {}/self::Q{}a", "");
+    query(defAny + "<r xmlns:x='X' xmlns:y='Y'><a/><x:a/><y:a/></r>/a",
+        "<a/>\n<x:a xmlns:x=\"X\"/>\n<y:a xmlns:y=\"Y\"/>");
+    query(defAny + "<r xmlns:x='X'><x:a/></r>/*[self::a]", "<x:a xmlns:x=\"X\"/>");
+
+    // attributes are unaffected
+    query(defAny + "count(<e xmlns:x='X' a='' x:a=''/>/@a)", 1);
+    query(defAny + "count(<e xmlns:x='X' a='' x:a=''/>/@*)", 2);
+
+    // element(...) node tests
+    query(defAny + "<a/> instance of element(a)", true);
+    query(defAny + "<a xmlns='X'/> instance of element(a)", true);
+    query(defAny + "<a/> instance of element(Q{}a)", true);
+    query(defAny + "element Q{X}a {} instance of element(Q{}a)", false);
+    query(defAny + "document { element Q{X}a {} } instance of document-node(element(a))", true);
+
+    // unprefixed type names => xs:*
+    query(defAny + "42 instance of integer", true);
+    query(defAny + "'42' cast as integer", 42);
+
+    // other contexts fall back to no namespace
+    query(defAny + "namespace-uri(element a {})", "");
+    query(defAny + "<r xmlns:x='X'><a/><x:a/></r>/Q{}a", "<a/>");
+
+    // with fixed + ##any, constructor xmlns must not suppress ##any behavior
+    query("declare fixed default element namespace '##any'; " +
+        "<a xmlns='u'><b/>{ <u:c xmlns:u='u'/>/self::c }</a>",
+        "<a xmlns=\"u\"><b/><u:c xmlns:u=\"u\"/></a>");
+
+    // ##any in xmlns context
+    error("<a xmlns='##any'/>", INVURI_X);
+  }
+
+  /**
    * Test query.
    * Detects malformed namespace hierarchy.
    */
