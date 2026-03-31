@@ -64,7 +64,7 @@ public final class QNmResolver {
         entry.name.uri(qp.qc.ns.resolve(entry.name.prefix(), qp.sc));
         if(npos == 0 && !entry.name.hasURI())
           throw qp.error(NOURI_X, entry.info, entry.name.prefix());
-      } else if(entry.nsElem) {
+      } else if(entry.nsElem && !Token.eq(elemNS, QueryText.ANY_URI)) {
         entry.name.uri(elemNS);
       }
       if(entry.name.hasURI()) entries.remove(i);

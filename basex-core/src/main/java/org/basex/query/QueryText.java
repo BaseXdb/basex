@@ -340,6 +340,8 @@ public interface QueryText {
   /** BaseX URI. */ byte[] XQUERY_URI = token(BXMODULES_URL + "xquery");
   /** BaseX URI. */ byte[] XSLT_URI = token(BXMODULES_URL + "xslt");
 
+  /** "Any" URI. */ byte[] ANY_URI = token("##any");
+
   // QUERY PLAN ===================================================================================
 
   /** Query Info. */ String OP = "op";
