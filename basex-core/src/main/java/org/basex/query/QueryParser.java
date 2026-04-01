@@ -546,7 +546,8 @@ public class QueryParser extends InputParser {
     if(elem) {
       if(!decl.add(ELEMENT)) throw error(DUPLNS);
       sc.elemNsFixed = fixed;
-      sc.elemNS = uri.length == 0 ? null : uri;
+      sc.elemNsAny = Token.eq(uri, QueryText.ANY_URI);
+      sc.elemNS = sc.elemNsAny || uri.length == 0 ? null : uri;
       sc.dirNS = sc.elemNS;
     } else {
       if(!decl.add(FUNCTION)) throw error(DUPLNS);
@@ -952,7 +953,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void typeDecl(final AnnList anns) throws QueryException {
-    final QNm qn = eQName(sc.elemNS, TYPENAME);
+    final QNm qn = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPENAME);
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck(AS);
@@ -2465,8 +2466,8 @@ public class QueryParser extends InputParser {
             name = new QNm(concat(name.string(), cpToken(':')));
             scope = NameTest.Scope.URI;
           } else if(!eqName) {
-            scope = kind == Kind.ELEMENT && eq(sc.elemNS, ANY_URI) ? NameTest.Scope.LOCAL
-                                                                   : NameTest.Scope.FLEXIBLE;
+            scope = kind == Kind.ELEMENT && sc.elemNsAny ? NameTest.Scope.LOCAL
+                                                         : NameTest.Scope.FLEXIBLE;
           }
         }
         // name test: prefix:name, name, Q{uri}name
@@ -3475,7 +3476,7 @@ public class QueryParser extends InputParser {
     if(wsConsume("(")) {
       type = choiceItemType().type;
     } else {
-      final QNm name = eQName(eq(sc.elemNS, ANY_URI) ? XS_URI : sc.elemNS, TYPEINVALID);
+      final QNm name = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPEINVALID);
       if(!name.hasURI() && eq(name.local(), token(ENUM))) {
         if(!wsConsume("(")) throw error(WHICHCAST_X, BasicType.similar(name));
         type = enumerationType();
@@ -3565,7 +3566,7 @@ public class QueryParser extends InputParser {
       }
     } else {
       // attach default element namespace, or schema namespace if default element namespace is ##any
-      if(!name.hasURI()) name.uri(eq(sc.elemNS, ANY_URI) ? XS_URI : sc.elemNS);
+      if(!name.hasURI()) name.uri(sc.elemNsAny ? XS_URI : sc.elemNS);
       // basic type
       type = BasicType.get(name, false);
       // declared type
