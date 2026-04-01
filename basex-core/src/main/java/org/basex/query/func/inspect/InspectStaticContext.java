@@ -52,7 +52,8 @@ public final class InspectStaticContext extends StandardFunc {
         yield mb.map();
       }
       case ELEMENT_NAMESPACE ->
-      sctx.elemNsAny ? Uri.get(ANY_URI) : sctx.elemNS == null ? Empty.VALUE : Uri.get(sctx.elemNS);
+          sctx.elemNsAny ? Uri.get(ANY_URI)
+                         : sctx.elemNS == null ? Empty.VALUE : Uri.get(sctx.elemNS);
       case FUNCTION_NAMESPACE ->
         sctx.funcNS == null ? Str.get(FN_URI) : Uri.get(sctx.funcNS);
       case COLLATION ->
