@@ -36,6 +36,7 @@ import org.basex.query.util.format.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.util.parse.*;
+import org.basex.query.util.rex.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -94,8 +95,6 @@ public class QueryParser extends InputParser {
   private final HashSet<String> decl = new HashSet<>();
   /** Output declarations. */
   private final HashMap<String, Object> sparams = new HashMap<>();
-  /** QName cache. */
-  private final QNmResolver qnames = new QNmResolver();
   /** Local variable. */
   private final LocalVars localVars = new LocalVars(this);
 
@@ -110,6 +109,8 @@ public class QueryParser extends InputParser {
   private QueryError alter;
   /** Alternative position. */
   private int alterPos;
+  /** Attribute value scanner. */
+  private AttributeValueScanner attributeValueScanner;
 
   /**
    * Constructor.
@@ -261,7 +262,6 @@ public class QueryParser extends InputParser {
     }
 
     // completes the parsing step
-    qnames.resolve(this, 0, sc.elemNS);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
   }
@@ -2084,10 +2084,7 @@ public class QueryParser extends InputParser {
     final int p = pos;
     if(!wsConsumeWs(VALIDATE)) return;
 
-    if(consume(TYPE)) {
-      final InputInfo ii = info();
-      qnames.add(eQName(SKIPCHECK, QNAME_X), sc, ii);
-    }
+    if(consume(TYPE)) eQName(eq(sc.elemNS, ANY_URI) ? XS_URI : sc.elemNS, QNAME_X);
     consume(STRICT);
     consume(LAX);
     skipWs();
@@ -2470,7 +2467,7 @@ public class QueryParser extends InputParser {
           }
         }
         // name test: prefix:name, name, Q{uri}name
-        if(kind == Kind.ELEMENT) qnames.add(name,  sc, ii); else qnames.add(name, false, ii);
+        resolveQNm(name, kind == Kind.ELEMENT ? sc.elemNS : null, ii);
         return nameTest.apply(name, scope);
       }
     }
@@ -3091,10 +3088,6 @@ public class QueryParser extends InputParser {
     final int size = qc.ns.size();
     final byte[] nse = sc.elemNS;
     final byte[] nsd = sc.dirNS;
-    final int npos = qnames.size();
-
-    final QNm name = new QNm(qnm);
-    qnames.add(name, true, ii);
 
     final Atts ns = new Atts();
     final ExprList cont = new ExprList();
@@ -3102,103 +3095,125 @@ public class QueryParser extends InputParser {
     // parse attributes
     boolean xmlDecl = false; // xml prefix explicitly declared?
     ArrayList<QNm> atts = null;
-    while(true) {
-      final byte[] atn = qName(null);
-      if(atn.length == 0) break;
 
-      final ExprList attv = new ExprList();
-      consumeWS();
-      if(root) {
-        if(!consume('=')) return null;
-      } else {
-        check('=');
-      }
-      consumeWS();
-      final int delim = consume();
-      if(!quote(delim)) throw error(NOQUOTE_X, found());
-      final TokenBuilder tb = new TokenBuilder();
-
-      boolean simple = true;
+    // remember start of attribute list
+    final int attrPos = pos;
+    for(int pass = 0; pass < 2; pass++) {
+      final boolean processXmlns = pass == 0;
+      pos = attrPos;
       while(true) {
-        while(!consume(delim)) {
-          cp = current();
-          switch(cp) {
-            case '{':
-              if(next() == '{') {
-                tb.add(consume());
-                consume();
-              } else {
-                final byte[] text = tb.next();
-                if(text.length == 0) {
-                  add(attv, enclosedExpr());
-                  simple = false;
-                } else {
-                  add(attv, Str.get(text));
-                }
-              }
-              break;
-            case '}':
-              consume();
-              check('}');
-              tb.add('}');
-              break;
-            case '<':
-            case 0:
-              throw error(NOQUOTE_X, found());
-            case '\n':
-            case '\t':
-              tb.add(' ');
-              consume();
-              break;
-            case '\r':
-              if(next() != '\n') tb.add(' ');
-              consume();
-              break;
-            default:
-              entity(tb);
-              break;
-          }
-        }
-        if(!consume(delim)) break;
-        tb.add(delim);
-      }
-
-      if(!tb.isEmpty()) add(attv, Str.get(tb.finish()));
-
-      // parse namespace declarations
-      final boolean pr = startsWith(atn, XMLNS_COLON);
-      if(pr || eq(atn, XMLNS)) {
-        if(!simple) throw error(NSCONS);
-        final byte[] prefix = pr ? local(atn) : EMPTY;
-        final byte[] uri = attv.isEmpty() ? EMPTY : ((Str) attv.get(0)).string();
-        if(eq(prefix, XML) && eq(uri, XML_URI)) {
-          if(xmlDecl) throw error(DUPLNSDEF_X, XML);
-          xmlDecl = true;
+        final byte[] atn = qName(null);
+        if(atn.length == 0) break;
+        consumeWS();
+        if(root) {
+          if(!consume('=')) return null;
         } else {
-          if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
-          if(pr) {
-            if(uri.length == 0) throw error(NSEMPTYURI);
-            if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
-            if(eq(uri, XML_URI)) throw error(BINDXMLURI_X_X, uri, XML);
-            if(eq(uri, XMLNS_URI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
-            qc.ns.add(prefix, uri);
-          } else {
-            if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
-            sc.dirNS = uri;
-            if(!sc.elemNsFixed) sc.elemNS = sc.dirNS;
-          }
-          if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
-          ns.add(prefix, uri);
+          check('=');
         }
-      } else {
-        final QNm attn = new QNm(atn);
-        if(atts == null) atts = new ArrayList<>(1);
-        atts.add(attn);
-        qnames.add(attn, false, info());
-        add(cont, new CAttr(info(), false, attn, attv.finish()));
+        consumeWS();
+
+        final int len = attributeValueScanner().length(pos);
+        final boolean hasXmlnsPrefix = startsWith(atn, XMLNS_COLON);
+        final boolean isXmlns = hasXmlnsPrefix || eq(atn, XMLNS);
+        if(processXmlns != isXmlns) {
+          if(len >= 0) {
+            pos += len;
+            consumeWS();
+            continue;
+          }
+          Util.debugln("Failed to detect attribute value length: "
+              + new String(input, pos, Math.min(20, input.length - pos)) + "...");
+        }
+
+        final ExprList attv = new ExprList();
+        final int delim = consume();
+        if(!quote(delim)) throw error(NOQUOTE_X, found());
+        final TokenBuilder tb = new TokenBuilder();
+
+        boolean simple = true;
+        while(true) {
+          while(!consume(delim)) {
+            cp = current();
+            switch(cp) {
+              case '{':
+                if(next() == '{') {
+                  tb.add(consume());
+                  consume();
+                } else {
+                  final byte[] text = tb.next();
+                  if(text.length == 0) {
+                    add(attv, enclosedExpr());
+                    simple = false;
+                  } else {
+                    add(attv, Str.get(text));
+                  }
+                }
+                break;
+              case '}':
+                consume();
+                check('}');
+                tb.add('}');
+                break;
+              case '<':
+              case 0:
+                throw error(NOQUOTE_X, found());
+              case '\n':
+              case '\t':
+                tb.add(' ');
+                consume();
+                break;
+              case '\r':
+                if(next() != '\n') tb.add(' ');
+                consume();
+                break;
+              default:
+                entity(tb);
+                break;
+            }
+          }
+          if(!consume(delim)) break;
+          tb.add(delim);
+        }
+
+        if(!tb.isEmpty()) add(attv, Str.get(tb.finish()));
+
+        // parse namespace declarations
+        if(isXmlns) {
+          if(!simple) throw error(NSCONS);
+          final byte[] prefix = hasXmlnsPrefix ? local(atn) : EMPTY;
+          final byte[] uri = attv.isEmpty() ? EMPTY : ((Str) attv.get(0)).string();
+          if(eq(prefix, XML) && eq(uri, XML_URI)) {
+            if(xmlDecl) throw error(DUPLNSDEF_X, XML);
+            xmlDecl = true;
+          } else {
+            if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
+            if(hasXmlnsPrefix) {
+              if(uri.length == 0) throw error(NSEMPTYURI);
+              if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
+              if(eq(uri, XML_URI)) throw error(BINDXMLURI_X_X, uri, XML);
+              if(eq(uri, XMLNS_URI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
+              qc.ns.add(prefix, uri);
+            } else {
+              if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
+              sc.dirNS = uri;
+              if(!sc.elemNsFixed) sc.elemNS = sc.dirNS;
+            }
+            if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
+            ns.add(prefix, uri);
+          }
+        } else {
+          final QNm attn = new QNm(atn);
+          if(atts == null) atts = new ArrayList<>(1);
+          atts.add(attn);
+          resolveQNm(attn, null, info());
+          add(cont, new CAttr(info(), false, attn, attv.finish()));
+        }
+        if(!consumeWS()) break;
       }
-      if(!consumeWS()) break;
     }
+
+    final QNm name = new QNm(qnm);
+    resolveQNm(name, sc.dirNS, ii);
 
     if(consume('/')) {
       check('>');
@@ -3216,8 +3231,6 @@ public class QueryParser extends InputParser {
       if(!eq(name.string(), close)) throw error(TAGWRONG_X_X, name.string(), close);
     }
 
-    qnames.resolve(this, npos, sc.dirNS);
-
     // check for duplicate attribute names
     if(atts != null) {
       final int as = atts.size();
@@ -3232,6 +3245,15 @@ public class QueryParser extends InputParser {
     sc.elemNS = nse;
     sc.dirNS = nsd;
     return new CElem(info(), false, name, ns, cont.finish());
+  }
+
+  /**
+   * Returns the attribute value scanner.
+   * @return attribute value scanner
+   */
+  private AttributeValueScanner attributeValueScanner() {
+    if(attributeValueScanner == null) attributeValueScanner = new AttributeValueScanner(input);
+    return attributeValueScanner;
   }
 
   /**
@@ -3370,9 +3392,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compElement() throws QueryException {
-    final Expr name = compName(NOELEMNAME, true);
+    final Expr name = compName(NOELEMNAME, true, eq(sc.elemNS, ANY_URI) ? null : sc.elemNS);
     if(name == null) return null;
-    if(name instanceof final QNm qnm) qnames.add(qnm, sc, info());
     skipWs();
     return current('{') ? new CElem(info(), true, name, new Atts(), enclosedExpr()) : null;
   }
@@ -3383,9 +3404,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compAttribute() throws QueryException {
-    final Expr name = compName(NOATTNAME, true);
+    final Expr name = compName(NOATTNAME, true, null);
     if(name == null) return null;
-    if(name instanceof final QNm qnm) qnames.add(qnm, false, info());
     skipWs();
     return current('{') ? new CAttr(info(), true, name, enclosedExpr()) : null;
   }
@@ -3396,7 +3416,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compNamespace() throws QueryException {
-    final Expr name = compName(NONSNAME, false);
+    final Expr name = compName(NONSNAME, false, null);
     if(name == null) return null;
     skipWs();
     return current('{') ? new CNSpace(info(), true, name, enclosedExpr()) : null;
@@ -3408,7 +3428,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compPI() throws QueryException {
-    final Expr name = compName(NOPINAME, false);
+    final Expr name = compName(NOPINAME, false, null);
     if(name == null) return null;
     skipWs();
     return current('{') ? new CPI(info(), true, name, enclosedExpr()) : null;
@@ -3418,10 +3438,12 @@ public class QueryParser extends InputParser {
    * Parses a computed name.
    * @param error error message
    * @param qname QName or NCName
+   * @param ns default namespace (can be {@code null})
    * @return name or {@code null}
    * @throws QueryException query exception
    */
-  private Expr compName(final QueryError error, final boolean qname) throws QueryException {
+  private Expr compName(final QueryError error, final boolean qname, final byte[] ns)
+      throws QueryException {
     // parse name enclosed in curly braces
     if(consume("{")) {
       final Expr name = check(expr(), error);
@@ -3431,7 +3453,7 @@ public class QueryParser extends InputParser {
     // parse literal name
     consume("#");
     skipWs();
-    if(qname) return eQName(SKIPCHECK, null);
+    if(qname) return eQName(ns, null);
 
     // parse name enclosed in quotes
     final byte[] string = ncName(null, false);
@@ -4799,5 +4821,22 @@ public class QueryParser extends InputParser {
   @Override
   public final InputInfo info() {
     return new InputInfo(this, sc);
+  }
+
+  /**
+   * Finalizes the given QName by assigning a namespace URI.
+   * @param name QName to be resolved
+   * @param elemNS default element namespace (may be {@code null}, when resolving attribute names)
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  private void resolveQNm(final QNm name, final byte[] elemNS, final InputInfo info)
+      throws QueryException {
+    if(name.hasPrefix()) {
+      name.uri(qc.ns.resolve(name.prefix(), sc));
+      if(!name.hasURI()) throw error(NOURI_X, info, name.prefix());
+    } else if(elemNS != null && !Token.eq(elemNS, QueryText.ANY_URI)) {
+      name.uri(elemNS);
+    }
   }
 }

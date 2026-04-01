@@ -89,6 +89,23 @@ public final class NamespaceTest extends SandboxTest {
 
     query("declare namespace p = 'A'; <p:l>{ namespace p { 'B' } }</p:l> => in-scope-prefixes()",
         "p_1\np\nxml");
+
+    query("<e xmlns='E'/> -> namespace-uri()", "E");
+    query("<a:e xmlns:a='A'/> -> namespace-uri()", "A");
+    query("<e a='{<e b:a='42' xmlns:b='N'/>/@a:a}' xmlns:a='N'/>/@a -> data()", 42);
+    query("<e a='{<x a:b='42' xmlns:a='A'/>/@Q{A}b}'/>/@a -> data()", 42);
+    query("<e a='{<f xmlns='N'/> -> namespace-uri()}'/>/@a -> data()", "N");
+    query("<e a:a='42' xmlns:a='A'/>/@*:a -> namespace-uri()", "A");
+    query("<e a='{f:identity(42)}' xmlns:f='http://www.w3.org/2005/xpath-functions'/>/@a -> data()",
+        42);
+    query("<e a='{let $x:v := 42 return $y:v}' xmlns:x='N' xmlns:y='N'/>/@a -> data()", 42);
+    query(
+        "<e a='{0 cast as type:byte}' xmlns:type='http://www.w3.org/2001/XMLSchema'/>/@a -> data()",
+        0);
+
+    error("<e a='{f:identity(42)}'/>", NOURI_X);
+    error("<e xmlns:a='A' xmlns:a='B'/>", DUPLNSDEF_X);
+    error("<e xmlns:xml='X'/>", BINDXML_X);
   }
 
   /** Simple tests. */
