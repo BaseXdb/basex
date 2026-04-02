@@ -20,16 +20,18 @@ public final class FileDelete extends FileFn {
     final Path path = toPath(arg(0), qc);
     final boolean recursive = toBooleanOrFalse(arg(1), qc);
 
-    if(recursive) {
-      delete(path, qc);
-    } else {
-      Files.delete(path);
+    if(Files.exists(path)) {
+      if(recursive) {
+        delete(path, qc);
+      } else {
+        Files.delete(path);
+      }
     }
     return Empty.VALUE;
   }
 
   /**
-   * Recursively deletes a file path.
+   * Deletes a path recursively.
    * @param path path to be deleted
    * @param job job
    * @throws IOException I/O exception

@@ -202,7 +202,9 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_CREATE_DIR.args(PATH3));
     query(_FILE_WRITE.args(PATH4, " ()"));
     query(func.args(PATH1, true));
-    error(func.args(PATH1), FILE_NOT_FOUND_X);
+    // raise no error if file does not exist
+    query(func.args(PATH1, true));
+    query(func.args(PATH1));
   }
 
   /** Test method. */
