@@ -77,7 +77,14 @@ public class FileCopy extends FileFn {
       if(copy) {
         Files.copy(src, trg, StandardCopyOption.REPLACE_EXISTING);
       } else {
-        Files.move(src, trg, StandardCopyOption.REPLACE_EXISTING);
+        // Windows: preserve capitalization of the target path
+        if(src.getFileName().toString().equalsIgnoreCase(trg.getFileName().toString())) {
+          Path temp = Files.createTempFile(src.getParent(), null, null);
+          Files.move(src, temp, StandardCopyOption.REPLACE_EXISTING);
+          Files.move(temp, trg);
+        } else {
+          Files.move(src, trg, StandardCopyOption.REPLACE_EXISTING);
+        }
       }
     }
   }
