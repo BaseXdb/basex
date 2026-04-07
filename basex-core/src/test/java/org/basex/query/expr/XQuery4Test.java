@@ -713,6 +713,9 @@ public final class XQuery4Test extends SandboxTest {
     check("{ 0: 0, { 1: 1 } } => map:size()", 2, root(Itr.class));
     check("{ 0: 0, (1 to 6) ! { .: . } } => map:size()", 7, root(_MAP_SIZE));
 
+    query("{ 'a': 'b' }/. ! { . }", "{\"a\":\"b\"}");
+    query("{ 'a': 'b' }/a ! { . }", "{\"a\":\"b\"}");
+
     check("{ 1: 1, <a/>[. = 'b'] }", "{1:1}",
         root(CMap.class), type(CMap.class, "map(*)"));
     check("{ 1: <a/>[. = 'b'], 2: 1 }", "{1:(),2:1}",

@@ -4,7 +4,6 @@ import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -123,7 +122,7 @@ public final class NameTest extends Test {
     if(node instanceof final JNode jnode) {
       // JNodes
       if(scope == Scope.ALL) return true;
-      if(jnode.key == Empty.VALUE) return false;
+      if(jnode.isRoot()) return false;
       if(scope == Scope.FLEXIBLE) {
         try {
           return Token.eq(qname.string(), jnode.key.string(null));

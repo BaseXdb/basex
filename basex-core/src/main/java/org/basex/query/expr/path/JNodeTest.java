@@ -82,8 +82,7 @@ public final class JNodeTest extends Test {
   @Override
   public boolean matches(final GNode node) {
     if(node instanceof final JNode jnode) {
-      final Item k1 = key, k2 = jnode.key;
-      return (k1 == null || (k1 == Empty.VALUE ? k2 == Empty.VALUE : equals(k1, k2))) &&
+      return (key == null || (key == Empty.VALUE ? jnode.isRoot() : equals(key, jnode.key))) &&
           valueType.instance(jnode.value);
     }
     return false;
