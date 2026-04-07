@@ -847,10 +847,6 @@ public enum Function implements AFunction {
   _MAP_KEYS(MapKeys::new, "keys(map)",
       params(MAP_O), ANY_ATOMIC_TYPE_ZM, MAP_URI),
   /** XQuery function. */
-  _MAP_KEYS_WHERE(MapKeysWhere::new, "keys-where(map,predicate)",
-      params(MAP_O, FuncType.get(BOOLEAN_ZO, ANY_ATOMIC_TYPE_O, ITEM_ZM).seqType()),
-      ANY_ATOMIC_TYPE_ZM, MAP_URI),
-  /** XQuery function. */
   _MAP_MERGE(MapMerge::new, "merge(maps[,options])",
       params(MAP_ZM, MAP_ZO), MAP_O, MAP_URI),
   /** XQuery function. */

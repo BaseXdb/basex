@@ -269,17 +269,6 @@ public final class MapModuleTest extends SandboxTest {
   }
 
   /** Test method. */
-  @Test public void keysWhere() {
-    final Function func = _MAP_KEYS_WHERE;
-    query(func.args(" map:merge((1 to 9) ! map:entry(., string()))",
-        " fn($k, $v) { $v < '2' }"), 1);
-    query(func.args(" map:build(1 to 9, value := string#1)",
-        " fn($k, $v) { $v < '2' }"), 1);
-    query(func.args(" map:build(1 to 9, value := string#1)",
-        " fn($k, $v) { $k < 2 }"), 1);
-  }
-
-  /** Test method. */
   @Test public void merge() {
     // no entry
     final Function func = _MAP_MERGE;
