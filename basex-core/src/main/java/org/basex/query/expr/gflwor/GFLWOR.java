@@ -1038,12 +1038,12 @@ public final class GFLWOR extends ParseExpr {
   }
 
   /**
-   * Checks if this FLWOR expression has only 'for', 'let', 'where', and 'while' clauses.
+   * Checks if this FLWOR expression has only 'for', 'let', and 'where' clauses.
    * @return result of check
    */
   private boolean isFLW() {
     return ((Checks<Clause>) clause -> clause instanceof For || clause instanceof Let ||
-        clause instanceof Where || clause instanceof While).all(clauses);
+        clause instanceof Where).all(clauses);
   }
 
   @Override
