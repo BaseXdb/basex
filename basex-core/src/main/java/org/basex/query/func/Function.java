@@ -239,7 +239,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ELEMENT_TO_MAP_PLAN(FnElementToMapPlan::new, "element-to-map-plan(input)",
       params(ChoiceItemType.get(NodeType.DOCUMENT, NodeType.ELEMENT).seqType(Occ.ZERO_OR_MORE)),
-      RECORD_O.mapType(BasicType.STRING).seqType()),
+      ChoiceItemType.get(Records.ELEMENT_CONVERSION_PLAN.get(),
+          Records.ATTRIBUTE_CONVERSION_PLAN.get()).seqType().mapType(BasicType.STRING).seqType()),
   /** XQuery function. */
   ELEMENT_WITH_ID(FnElementWithId::new, "element-with-id(values[,node])",
       params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
@@ -793,9 +794,13 @@ public enum Function implements AFunction {
   // Predefined record constructor functions
 
   /** XQuery function. */
+  ATTRIBUTE_CONVERSION_PLAN_RECORD(Records.ATTRIBUTE_CONVERSION_PLAN.get()),
+  /** XQuery function. */
   DATETIME_RECORD(Records.DATETIME.get()),
   /** XQuery function. */
   DIVIDED_DECIMALS_RECORD(Records.DIVIDED_DECIMALS.get()),
+  /** XQuery function. */
+  ELEMENT_CONVERSION_PLAN_RECORD(Records.ELEMENT_CONVERSION_PLAN.get()),
   /** XQuery function. */
   INFER_ENCODING_RECORD(Records.INFER_ENCODING.get()),
   /** XQuery function. */
