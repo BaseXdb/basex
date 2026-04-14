@@ -46,6 +46,8 @@ public final class Token {
   public static final byte[] NAN = token("NaN");
   /** Token 'INF'. */
   public static final byte[] POSITIVE_INF = token("INF");
+  /** Token '+INF'. */
+  public static final byte[] POSITIVE_INF_PLUS = token("+INF");
   /** Token '-INF'. */
   public static final byte[] NEGATIVE_INF = token("-INF");
   /** Token 'Infinity'. */
