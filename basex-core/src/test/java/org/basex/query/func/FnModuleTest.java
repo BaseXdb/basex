@@ -415,6 +415,8 @@ public final class FnModuleTest extends SandboxTest {
         + " \"timezone\": xs:dayTimeDuration('PT1H') }"),
         "---03+01:00");
     query(func.args(" dateTime-record(day:=4)"), "---04");
+    // year 0
+    query(func.args(" {\"year\": 0, \"month\": 1, \"day\": 1}"), "0000-01-01");
 
     // empty map
     error(func.args(" {}"), INVDATETIMEFIELDS_X);
@@ -427,8 +429,6 @@ public final class FnModuleTest extends SandboxTest {
     // out of range component (minutes)
     error(func.args(" {\"hours\": 14, \"minutes\": 60, \"seconds\": 0,"
         + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEVALUE_X_X);
-    // invalid year (0)
-    error(func.args(" {\"year\": 0}"), INVDATETIMEVALUE_X_X);
     // invalid date (March 0)
     error(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 0,"
         + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEVALUE_X_X);
