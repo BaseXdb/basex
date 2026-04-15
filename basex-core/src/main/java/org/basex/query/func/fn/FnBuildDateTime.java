@@ -175,10 +175,10 @@ public class FnBuildDateTime extends DateTimeFn {
    * Checks the year component for validity.
    * @param year the year to check
    * @param info input info for error reporting
-   * @throws QueryException if the year is out of range or zero
+   * @throws QueryException if the year is out of range
    */
   private static void checkYear(final long year, final InputInfo info) throws QueryException {
-    if(year <= ADate.MIN_YEAR || year > ADate.MAX_YEAR || year == 0)
+    if(year <= ADate.MIN_YEAR || year > ADate.MAX_YEAR)
       throw INVDATETIMEVALUE_X_X.get(info, YEAR, year);
   }
 
@@ -233,7 +233,7 @@ public class FnBuildDateTime extends DateTimeFn {
     checkYear(year, info);
     checkMonth(month, info);
     checkDayOnly(day, info);
-    final int dom = ADate.daysOfMonth(year < 0 ? year + 1 : year, (int) month - 1);
+    final int dom = ADate.daysOfMonth(year, (int) month - 1);
     if(day > dom) throw INVDATETIMEVALUE_X_X.get(info, DAY, day);
   }
 

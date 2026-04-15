@@ -140,7 +140,7 @@ public final class Dtm extends ADate {
    *
    * <p>Components must be supplied in their lexical representation:
    * month 1–12, day 1–31, hours 0–23, minutes 0–59, seconds in [0–60).
-   * For BC years, pass a negative year (not 0). Undefined components must
+   * For BC years, pass a negative year or 0 (for year 0). Undefined components must
    * be {@code null}.</p>
    *
    * <p>This method is intended as a low-level construction helper for
@@ -164,7 +164,7 @@ public final class Dtm extends ADate {
       final Long hours, final Long minutes, final BigDecimal seconds,
       final DTDur zone, final InputInfo info) throws QueryException {
     final Dtm base = new Dtm(targetType);
-    base.year    = year    == null ? Long.MAX_VALUE : year < 0 ? year + 1 : year;
+    base.year    = year    == null ? Long.MAX_VALUE : year;
     base.month   = month   == null ? -1             : (byte) (month - 1);
     base.day     = day     == null ? -1             : (byte) (day - 1);
     base.hour    = hours   == null ? -1             : hours.byteValue();

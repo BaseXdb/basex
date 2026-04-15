@@ -25,6 +25,7 @@ public final class SimpleTest extends QueryTest {
       { "Float 6", "xs:float('-infinity')" },
       { "Float 7", booleans(true), "xs:float('-INF') < 0" },
       { "Float 8", "xs:float('-inf')" },
+      { "Float 9", booleans(true), "xs:float('+INF') > 0" },
 
       { "Double 1", "xs:double('Infinity')" },
       { "Double 2", "xs:double('infinity')" },
@@ -34,6 +35,7 @@ public final class SimpleTest extends QueryTest {
       { "Double 6", "xs:double('-infinity')" },
       { "Double 7", booleans(true), "xs:double('-INF') < 0" },
       { "Double 8", "xs:double('-inf')" },
+      { "Double 9", booleans(true), "xs:double('+INF') > 0" },
 
       { "UnsignedLong 1", booleans(false), "xs:unsignedLong('3') eq 3.1"},
       { "UnsignedLong 2", booleans(false), "3.1 eq xs:unsignedLong('3')"},

@@ -65,8 +65,6 @@ public final class GDt extends ADate {
 
     if(i < 2) {
       year = toLong(mt.group(1), false, info);
-      // +1 is added to BC values to simplify computations
-      if(year < 0) year++;
       if(year < MIN_YEAR || year >= MAX_YEAR) throw DATERANGE_X_X.get(info, type, date);
     }
     if(i > 0 && i < 4) {
@@ -105,7 +103,7 @@ public final class GDt extends ADate {
     if(year == Long.MAX_VALUE) {
       tb.add('-');
     } else {
-      if(year <= 0) tb.add('-');
+      if(year < 0) tb.add('-');
       prefix(tb, Math.abs(yea()), 4);
     }
     if(month >= 0 || day >= 0) tb.add('-');
