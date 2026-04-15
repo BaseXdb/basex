@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.*;
+
 /**
  * This class contains methods for performance measurements.
  *
@@ -85,7 +87,8 @@ public final class Performance {
    * @return formatted time in milliseconds with 2 decimal places
    */
   public static String formatNano(final long nano, final int runs) {
-    return nanoToMilli(nano, runs) + " ms" + (runs > 1 ? " (avg)" : "");
+    final String ms = String.format(Locale.ENGLISH, "%.2f", nanoToMilli(nano, runs));
+    return ms + " ms" + (runs > 1 ? " (avg)" : "");
   }
 
   /**
