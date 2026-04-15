@@ -80,6 +80,14 @@ public final class JNode extends GNode {
     this.position = position;
   }
 
+  /**
+   * Indicates if this is a root node.
+   * @return result of check
+   */
+  public boolean isRoot() {
+    return key == Empty.VALUE;
+  }
+
   @Override
   public Value atomValue(final QueryContext qc, final InputInfo ii) throws QueryException {
     return value.atomValue(qc, ii);
@@ -335,7 +343,7 @@ public final class JNode extends GNode {
   @Override
   public void toString(final QueryString qs) {
     qs.token(QueryText.JTREE);
-    if(key == Empty.VALUE) {
+    if(isRoot()) {
       qs.paren(value);
     } else {
       qs.token('(').token(key).token(':').token(value).token(')');

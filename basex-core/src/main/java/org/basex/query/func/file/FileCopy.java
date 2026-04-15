@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.io.*;
 import java.nio.file.*;
+import java.util.*;
 
 import org.basex.core.jobs.*;
 import org.basex.query.*;
@@ -77,7 +78,14 @@ public class FileCopy extends FileFn {
       if(copy) {
         Files.copy(src, trg, StandardCopyOption.REPLACE_EXISTING);
       } else {
-        Files.move(src, trg, StandardCopyOption.REPLACE_EXISTING);
+        // Windows: preserve capitalization of target path
+        Path path = src;
+        final String s = src.getFileName().toString(), t = trg.getFileName().toString();
+        if(!s.equals(t) && s.equalsIgnoreCase(t)) {
+          path = src.resolveSibling(UUID.randomUUID().toString());
+          Files.move(src, path);
+        }
+        Files.move(path, trg, StandardCopyOption.REPLACE_EXISTING);
       }
     }
   }

@@ -32,7 +32,7 @@ public final class TokenBuilder {
   public static final int ULINE = PRIVATE_END - 4;
 
   /** Limit for info strings. */
-  private static final int LIMIT = 128;
+  private static final int LIMIT = 256;
   /** Byte array, storing all characters as UTF8. */
   private byte[] chars;
   /** Current token size. */

@@ -13,6 +13,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -157,9 +158,19 @@ public final class CMap extends Arr {
       if(exprs[e + 1] != Empty.UNDEFINED) {
         add.accept(toAtomItem(exprs[e], qc), exprs[e + 1].value(qc));
       } else {
-        final Iter iter = exprs[e].unwrappedIter(qc);
+        final Iter iter = exprs[e].iter(qc);
         for(Item item; (item = iter.next()) != null;) {
-          toMap(item).forEach(add);
+          Item it;
+          if(item instanceof final JNode jnode) {
+            if(jnode.isRoot()) {
+              it = (Item) jnode.value;
+            } else {
+              it = XQMap.get(jnode.key, jnode.value);
+            }
+          } else {
+            it = item;
+          }
+          toMap(it).forEach(add);
         }
       }
     }

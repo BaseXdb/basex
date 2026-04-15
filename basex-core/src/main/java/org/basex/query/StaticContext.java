@@ -38,6 +38,8 @@ public final class StaticContext {
   public Collation collation;
   /** Default element/type namespace fixed flag. */
   public boolean elemNsFixed;
+  /** Default element/type namespace ##any flag. */
+  public boolean elemNsAny;
   /** Default element/type namespace. */
   public byte[] elemNS;
   /** Direct element constructor default element/type namespace (differs from above if "fixed"). */
@@ -92,13 +94,16 @@ public final class StaticContext {
    * @throws QueryException query exception
    */
   void namespace(final String prefix, final String uri) throws QueryException {
-    if(prefix.isEmpty()) {
-      elemNS = uri.isEmpty() ? null : token(uri);
+    final byte[] prefix1 = token(prefix);
+    final byte[] u = token(uri);
+    if(prefix1.length == 0) {
+      elemNsAny = Token.eq(u, QueryText.ANY_URI);
+      elemNS = elemNsAny || u.length == 0 ? null : u;
       dirNS = elemNS;
-    } else if(uri.isEmpty()) {
-      ns.delete(token(prefix));
+    } else if(u.length == 0) {
+      ns.delete(prefix1);
     } else {
-      ns.add(token(prefix), token(uri), null);
+      ns.add(prefix1, u, null);
     }
   }
 

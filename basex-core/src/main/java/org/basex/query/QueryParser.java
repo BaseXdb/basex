@@ -539,14 +539,15 @@ public class QueryParser extends InputParser {
     final boolean elem = wsConsumeWs(ELEMENT);
     if(!elem && !wsConsumeWs(FUNCTION)) return false;
     wsCheck(NAMESPACE);
-    final byte[] uri = uriLiteral();
+    final byte[] uri = elem ? uriLiteral(ANY_URI) : uriLiteral();
     if(eq(XML_URI, uri)) throw error(BINDXMLURI_X_X, uri, XML);
     if(eq(XMLNS_URI, uri)) throw error(BINDXMLURI_X_X, uri, XMLNS);
 
     if(elem) {
       if(!decl.add(ELEMENT)) throw error(DUPLNS);
       sc.elemNsFixed = fixed;
-      sc.elemNS = uri.length == 0 ? null : uri;
+      sc.elemNsAny = Token.eq(uri, QueryText.ANY_URI);
+      sc.elemNS = sc.elemNsAny || uri.length == 0 ? null : uri;
       sc.dirNS = sc.elemNS;
     } else {
       if(!decl.add(FUNCTION)) throw error(DUPLNS);
@@ -697,7 +698,6 @@ public class QueryParser extends InputParser {
     }
     final byte[] uri = uriLiteral();
     if(prefix != null && uri.length == 0) throw error(NSEMPTY);
-    if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
     addLocations(new TokenList());
     throw error(IMPLSCHEMA);
   }
@@ -715,7 +715,6 @@ public class QueryParser extends InputParser {
 
     final byte[] uri = uriLiteral();
     if(uri.length == 0) throw error(NSMODURI);
-    if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
     if(sc.imports.contains(token(uri))) throw error(DUPLMODULE_X, uri);
     sc.imports.add(uri);
 
@@ -754,8 +753,7 @@ public class QueryParser extends InputParser {
     if(add) {
       do {
         final byte[] uri = uriLiteral();
-        if(!Uri.get(uri).isValid() || IO.get(string(uri)) instanceof IOContent)
-          throw error(INVURI_X, uri);
+        if(IO.get(string(uri)) instanceof IOContent) throw error(INVURI_X, uri);
         list.add(uri);
       } while(wsConsume(","));
     }
@@ -955,7 +953,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void typeDecl(final AnnList anns) throws QueryException {
-    final QNm qn = eQName(sc.elemNS, TYPENAME);
+    final QNm qn = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPENAME);
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck(AS);
@@ -2459,12 +2457,14 @@ public class QueryParser extends InputParser {
       } else {
         NameTest.Scope scope = NameTest.Scope.FULL;
         if(!name.hasPrefix()) {
+          pos = p;
           if(consume(":*")) {
             // name test: prefix:*
             name = new QNm(concat(name.string(), cpToken(':')));
             scope = NameTest.Scope.URI;
           } else if(!eqName) {
-            scope = NameTest.Scope.FLEXIBLE;
+            scope = kind == Kind.ELEMENT && sc.elemNsAny ? NameTest.Scope.LOCAL
+                                                         : NameTest.Scope.FLEXIBLE;
           }
         }
         // name test: prefix:name, name, Q{uri}name
@@ -2875,11 +2875,15 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "URILiteral" rule.
+   * @param special tokens that are allowed though not valid URI literals
    * @return query expression
    * @throws QueryException query exception
    */
-  private byte[] uriLiteral() throws QueryException {
-    return normalize(stringLiteral());
+  private byte[] uriLiteral(final byte[]... special) throws QueryException {
+    final byte[] uri = normalize(stringLiteral());
+    for(final byte[] sp : special) if(eq(uri, sp)) return uri;
+    if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
+    return uri;
   }
 
   /**
@@ -2895,6 +2899,7 @@ public class QueryParser extends InputParser {
       entity(token);
     }
     final byte[] ns = normalize(token.toArray());
+    if(!Uri.get(ns).isValid()) throw error(INVURI_X, ns);
     if(eq(ns, XMLNS_URI)) {
       pos = p;
       throw error(ILLEGALEQNAME_X, ns);
@@ -3493,7 +3498,7 @@ public class QueryParser extends InputParser {
     if(wsConsume("(")) {
       type = choiceItemType().type;
     } else {
-      final QNm name = eQName(sc.elemNS, TYPEINVALID);
+      final QNm name = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPEINVALID);
       if(!name.hasURI() && eq(name.local(), token(ENUM))) {
         if(!wsConsume("(")) throw error(WHICHCAST_X, BasicType.similar(name));
         type = enumerationType();
@@ -3582,8 +3587,8 @@ public class QueryParser extends InputParser {
         }
       }
     } else {
-      // attach default element namespace
-      if(!name.hasURI()) name.uri(sc.elemNS);
+      // attach default element namespace, or schema namespace if default element namespace is ##any
+      if(!name.hasURI()) name.uri(sc.elemNsAny ? XS_URI : sc.elemNS);
       // basic type
       type = BasicType.get(name, false);
       // declared type

@@ -156,7 +156,7 @@ public final class Dbl extends ANum {
 
     final byte[] v = Token.trim(value);
     if(Token.eq(v, Token.NAN)) return Double.NaN;
-    if(Token.eq(v, Token.POSITIVE_INF)) return Double.POSITIVE_INFINITY;
+    if(Token.eq(v, Token.POSITIVE_INF, Token.POSITIVE_INF_PLUS)) return Double.POSITIVE_INFINITY;
     if(Token.eq(v, Token.NEGATIVE_INF)) return Double.NEGATIVE_INFINITY;
     throw BasicType.DOUBLE.castError(value, info);
   }

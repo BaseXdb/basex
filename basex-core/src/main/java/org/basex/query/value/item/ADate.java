@@ -32,7 +32,7 @@ public abstract class ADate extends ADateDur {
   /** Pattern for two digits. */
   static final String DD = "(\\d{2})";
   /** Year pattern. */
-  static final String YEAR = "(-?(000[1-9]|00[1-9]\\d|0[1-9]\\d{2}|[1-9]\\d{3,}))";
+  static final String YEAR = "(-?([1-9]\\d{3,}|0\\d{3}))";
   /** Date pattern. */
   static final String ZONE = "(([-+])" + DD + ':' + DD + "|Z)?";
   /** Day per months. */
@@ -47,7 +47,7 @@ public abstract class ADate extends ADateDur {
   /** Year.
    * <ul>
    *   <li> 1 - {@code Long#MAX_VALUE}-1: AD</li>
-   *   <li> 0 - {@link Long#MIN_VALUE}: BC, +1 added</li>
+   *   <li> 0 - {@link Long#MIN_VALUE}: BC</li>
    *   <li> {@link Long#MAX_VALUE}: undefined</li>
    * </ul> */
   long year = Long.MAX_VALUE;
@@ -110,8 +110,6 @@ public abstract class ADate extends ADateDur {
     final Matcher mt = DATE.matcher(Token.string(date).trim());
     if(!mt.matches()) throw dateError(date, exp, info);
     year = toLong(mt.group(1), false, info);
-    // +1 is added to BC values to simplify computations
-    if(year < 0) year++;
     month = (byte) (Strings.toInt(mt.group(3)) - 1);
     day = (byte) (Strings.toInt(mt.group(4)) - 1);
 
@@ -282,7 +280,7 @@ public abstract class ADate extends ADateDur {
 
   @Override
   public final long yea() {
-    return year > 0 ? year : year - 1;
+    return year;
   }
 
   @Override
@@ -339,7 +337,7 @@ public abstract class ADate extends ADateDur {
     final TokenBuilder tb = new TokenBuilder();
     final boolean ymd = year != Long.MAX_VALUE;
     if(ymd) {
-      if(year <= 0) tb.add('-');
+      if(year < 0) tb.add('-');
       prefix(tb, Math.abs(yea()), 4);
       tb.add('-');
       prefix(tb, mon(), 2);
@@ -427,7 +425,7 @@ public abstract class ADate extends ADateDur {
   @Override
   public final XMLGregorianCalendar toJava() {
     return DF.newXMLGregorianCalendar(
-      year == Long.MAX_VALUE ? null : BigInteger.valueOf(year > 0 ? year : year - 1),
+      year == Long.MAX_VALUE ? null : BigInteger.valueOf(year),
       month >= 0 ? month + 1 : Integer.MIN_VALUE,
       day >= 0 ? day + 1 : Integer.MIN_VALUE,
       hour >= 0 ? hour : Integer.MIN_VALUE,

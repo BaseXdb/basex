@@ -17,6 +17,9 @@ import org.basex.util.hash.*;
  */
 public enum Records {
   /** Record definition. */
+  ATTRIBUTE_CONVERSION_PLAN(FN_URI, "attribute-conversion-plan",
+      field("type", EnumType.get("numeric", "boolean", "string", "skip").seqType())),
+  /** Record definition. */
   DATETIME(FN_URI, "dateTime",
     field("year", Types.INTEGER_O, true),
     field("month", Types.INTEGER_O, true),
@@ -31,6 +34,12 @@ public enum Records {
     field("quotient", Types.DECIMAL_O),
     field("remainder", Types.DECIMAL_O)
   ),
+  /** Record definition. */
+  ELEMENT_CONVERSION_PLAN(FN_URI, "element-conversion-plan",
+    field("layout", EnumType.get("empty", "empty-plus", "simple", "simple-plus", "list",
+        "list-plus", "record", "sequence", "mixed", "xml", "error", "deep-skip").seqType()),
+    field("child", Types.STRING_ZO, true),
+    field("type", EnumType.get("numeric", "boolean", "string").seqType(), true)),
   /** Record definition. */
   INFER_ENCODING(BIN_URI, "infer-encoding",
     field("encoding", Types.STRING_O),

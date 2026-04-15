@@ -4,5 +4,6 @@
 *.DS_Store
 *.swp
 *.out
+.claude/
 .idea/
 /target
