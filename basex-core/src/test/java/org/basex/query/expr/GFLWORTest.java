@@ -523,4 +523,14 @@ public final class GFLWORTest extends SandboxTest {
         "1\n2", exists(Pipeline.class));
     check("let $a := <a/>[text()] while $a return $a", "", root(IterFilter.class));
   }
+
+  /** Do not flatten nested FLWOR expressions with while clauses. */
+  @Test public void gh2634() {
+    query("for $max in (1 to 10) return (for $a in 0 to $max while $a < 1 return $a)",
+        "0\n0\n0\n0\n0\n0\n0\n0\n0\n0");
+    query("for $x in (1, 2) return (for $a in (1, 2, 3) while $a < 3 return $a)",
+        "1\n2\n1\n2");
+    query("for $x in (1, 2) for $y in (for $a in (1, 2, 3) while $a < 3 return $a) return ($x, $y)",
+        "1\n1\n1\n2\n2\n1\n2\n2");
+  }
 }
