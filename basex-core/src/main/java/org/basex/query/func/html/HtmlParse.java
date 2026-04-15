@@ -23,7 +23,7 @@ public class HtmlParse extends ParseHtml {
 
   @Override
   protected final Parser parser() {
-    return Parser.DEFAULT;
+    return Parser.PARSER;
   }
 
   /**

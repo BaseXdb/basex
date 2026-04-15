@@ -656,14 +656,15 @@ public abstract class Serializer implements Closeable {
   /**
    * Serializes the specified value.
    * @param value value
+   * @param quote quote strings
+   * @param xml serialize as XML string value
    * @param chop chop large tokens
-   * @param quote character for quoting the value; ignored if {@code 0}
    * @return value
    */
-  public static byte[] value(final byte[] value, final char quote, final boolean chop) {
-    final boolean quoting = quote != 0;
+  public static byte[] value(final byte[] value, final boolean quote, final boolean xml,
+      final boolean chop) {
     final TokenBuilder tb = new TokenBuilder();
-    if(quoting) tb.add(quote);
+    if(quote) tb.add('"');
 
     int c = 0;
     for(final TokenParser tp = new TokenParser(value); tp.more(); c++) {
@@ -675,11 +676,12 @@ public abstract class Serializer implements Closeable {
       if(cp == '&') tb.add(E_AMP);
       else if(cp == '\r') tb.add(E_CR);
       else if(cp == '\n') tb.add(E_NL);
-      else if(cp == quote) tb.add(quote).add(quote);
+      else if(xml && cp == '<') tb.add(E_LT);
+      else if(quote && cp == '"') tb.add('"').add('"');
       else tb.add(cp);
     }
 
-    if(quoting) tb.add(quote);
+    if(quote) tb.add('"');
     return tb.finish();
   }
 }

@@ -4,12 +4,14 @@ import static org.basex.build.html.HtmlOptions.*;
 import static org.basex.build.html.HtmlOptions.NOCDATA;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.XMLToken.*;
 
 import java.io.*;
 
 import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -70,8 +72,14 @@ public final class HtmlParser extends XMLParser {
    */
   private static IO toXml(final IO io, final Parser parser, final HtmlOptions hopts)
       throws IOException {
-    // parser unavailable: fall back to XML
-    if(parser == null) return io;
+
+    // parser unavailable: wrap contents as text
+    if(parser == null) {
+      final TokenBuilder xml = new TokenBuilder().add(ELEM_O).add(HTML).add(ELEM_C).add(
+          Serializer.value(io.read(), false, true, false)).add(ELEM_OS).add(HTML).add(ELEM_C);
+      return new IOContent(xml.finish(), io.name());
+    }
+
     try {
       // define output
       final StringWriter sw = new StringWriter();
@@ -273,10 +281,11 @@ public final class HtmlParser extends XMLParser {
     };
 
     /** The default parser: TAGSOUP if available, NU if available, {@code null} otherwise. */
-    public static final Parser DEFAULT;
+    public static final Parser PARSER;
+
     static {
       final HtmlOptions opts = new HtmlOptions();
-      DEFAULT = TAGSOUP.available(opts) ? TAGSOUP : NU.available(opts) ? NU : null;
+      PARSER = TAGSOUP.available(opts) ? TAGSOUP : NU.available(opts) ? NU : null;
     }
 
     /** String representation. */
@@ -343,7 +352,7 @@ public final class HtmlParser extends XMLParser {
      * @return parser (can be {@code null})
      */
     public static Parser of(final HtmlOptions options) {
-      return of(options, Parser.DEFAULT);
+      return of(options, Parser.PARSER);
     }
 
     /**

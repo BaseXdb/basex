@@ -126,7 +126,8 @@ public class AdaptiveSerializer extends OutputSerializer {
         printChars(basex ? item.string(null) : ((QNm) item).unique());
       } else {
         final boolean simple = type == BOOLEAN || type.instanceOf(DECIMAL);
-        final byte[] value = simple ? Token.token(item) : value(item.string(null), '"', false);
+        final byte[] value = simple ? Token.token(item) :
+          value(item.string(null), true, false, false);
         if(basex || simple || type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI)) {
           printChars(value);
         } else {

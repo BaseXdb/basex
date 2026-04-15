@@ -15,7 +15,7 @@ import org.basex.util.*;
 public final class HtmlParser extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) {
-    final Parser parser = Parser.DEFAULT;
+    final Parser parser = Parser.PARSER;
     return Str.get(parser != null ? parser.toString() : "");
   }
 }
