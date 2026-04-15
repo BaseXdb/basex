@@ -120,7 +120,7 @@ public final class JsonModuleTest extends SandboxTest {
     query(func.args("0E1", options), 0);
     query(func.args("0E-1", options), 0);
     query(func.args("0E+1", options), 0);
-    query(func.args("-0E+1", options), "0");
+    query(func.args("-0E+1", options), "-0");
     query(func.args("0E00", options), 0);
     query(func.args("123e-123", options), "1.23e-121");
     query(func.args("123.4e-123", options), "1.234e-121");

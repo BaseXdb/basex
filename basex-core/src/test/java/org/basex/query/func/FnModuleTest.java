@@ -3189,6 +3189,8 @@ return
 
     final String canonicalJson = " {'method': 'json', 'canonical': true()}";
     query(func.args(" [0x7fff_ffff_ffff_ffff]", canonicalJson), "[9223372036854776000]");
+    query(func.args(" [xs:double('-0')]", " {'method': 'json'}"), "[-0]");
+    query(func.args(" [xs:double('-0')]", canonicalJson), "[0]");
 
     // The tests below were adapted from Apache 2.0–licensed code from project
     // erdtman/java-json-canonicalization at https://github.com/erdtman/java-json-canonicalization
@@ -3436,6 +3438,8 @@ return
     query(func.args("A"), "A");
     query(func.args(wrap("A")), "A");
     query("(" + wrap("A") + ", 1, 'X') ! " + func.args(), "A\n1\nX");
+    query(func.args(" xs:float('-0')"), "-0");
+    query(func.args(" xs:double('-0')"), "-0");
 
     check("for $s in ('a', 'b') return " + func.args(" $s"), "a\nb", empty(func));
     check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(func));

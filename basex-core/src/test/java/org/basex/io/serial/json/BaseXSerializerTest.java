@@ -22,6 +22,7 @@ public final class BaseXSerializerTest extends SandboxTest {
     serialize("()", "");
     serialize("1", "1");
     serialize("1, 2", "1\n2");
+    serialize("xs:double('-0'), xs:float('-0')", "-0\n-0");
 
     // nodes
     serialize("<x/>", "<x/>");

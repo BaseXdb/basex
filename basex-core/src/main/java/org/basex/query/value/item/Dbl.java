@@ -168,7 +168,7 @@ public final class Dbl extends ANum {
    */
   public static byte[] string(final double value) {
     // handle known edge cases
-    if(value == 0) return Token.token(0);
+    if(value == 0) return 1 / value > 0 ? Token.token(0) : Token.NEGATIVE_ZERO;
     if(value == Double.MIN_VALUE) return Token.token("5e-324");
     if(value == -Double.MIN_VALUE) return Token.token("-5e-324");
     if(value == 1e23) return Token.token("1e+23");
