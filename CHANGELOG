@@ -1,3 +1,26 @@
+VERSION 12.3 (April 16, 2025) ------------------------------------------
+
+ XQUERY 4.0
+ - JNodes: XPath traversal in map/array structures
+ - Improved string representation of function items
+ - XML, JSON: canonical serialization
+ - Namespace declarations: support for 'fixed' and '##any'
+
+ XQUERY
+ - HTML Parsing without parser: wrap HTML contents as string value
+ - file:delete: raise no error if target does not exist
+ - file:copy: Preserve capitalization of target path
+
+ GUI
+ - Support for FlatLaf Look and Feels
+ - Editor: Improved closing of tags
+
+ FIXES, PERFORMANCE
+ - xquery:fork-join was fixed
+ - info/debugging strings: increased output length
+ - numerous tweaks to take advantage of recent JVMs
+ - fn:path: caching of repeatedly accessed steps
+
 VERSION 12.2 (January 20, 2025) ----------------------------------------
 
  XQUERY 4.0
