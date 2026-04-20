@@ -187,7 +187,7 @@ public final class HTTPConnection implements ClientInfo {
    */
   public void error(final int code, final String info) throws IOException {
     log(code, info);
-    status(code, null, info);
+    status(code, info);
   }
 
   /**
@@ -304,19 +304,17 @@ public final class HTTPConnection implements ClientInfo {
       response.getOutputStream().write(token(info));
     } catch(final IllegalStateException e) {
       // too late (response has already been committed)
-      logError(code, null, info, e);
+      logError(code, info, e);
     }
   }
 
   /**
    * Sets a status and sends an info message.
    * @param code status code
-   * @param message status message (can be {@code null})
    * @param body message for response body (can be {@code null})
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("deprecation")
-  public void status(final int code, final String message, final String body) throws IOException {
+  public void status(final int code, final String body) throws IOException {
     try {
       response.resetBuffer();
       if(code == SC_UNAUTHORIZED && !response.containsHeader(WWW_AUTHENTICATE)) {
@@ -330,21 +328,13 @@ public final class HTTPConnection implements ClientInfo {
         response.setHeader(WWW_AUTHENTICATE, header.toString());
       }
 
-      final int c = code < 0 || code > 999 ? 500 : code;
-      if(message == null) {
-        response.setStatus(c);
-      } else {
-        // do not allow Jetty to create a custom error html page
-        // control characters and non-ASCII codes will be removed (GH-1632)
-        response.setStatus(c, message.replaceAll("[^\\x20-\\x7F]", "?"));
-      }
-
+      response.setStatus(code < 0 || code > 999 ? 500 : code);
       if(body != null) {
         response.setContentType(MediaType.TEXT_PLAIN + "; " + CHARSET + '=' + Strings.UTF8);
         response.getOutputStream().write(new TokenBuilder(token(body)).normalize().finish());
       }
     } catch(final IllegalStateException | IllegalArgumentException ex) {
-      logError(code, message, body, ex);
+      logError(code, body, ex);
     }
   }
 
@@ -589,17 +579,13 @@ public final class HTTPConnection implements ClientInfo {
   /**
    * Sets a status and sends an info message.
    * @param code status code
-   * @param message status message (can be {@code null})
    * @param info detailed information (can be {@code null})
    * @param ex exception
    */
-  private void logError(final int code, final String message, final String info,
-      final Exception ex) {
-
+  private void logError(final int code, final String info, final Exception ex) {
     final StringBuilder sb = new StringBuilder();
     sb.append("Code: ").append(code);
     if(info != null) sb.append(", Info: ").append(info);
-    if(message != null) sb.append(", Message: ").append(message);
     sb.append(", Error: ").append(Util.message(ex));
     log(SC_INTERNAL_SERVER_ERROR, sb.toString());
   }

@@ -37,8 +37,6 @@ final class RestXqResponse extends WebResponse {
   private boolean registered;
   /** Function. */
   private RestXqFunction func;
-  /** Status message. */
-  private String message;
   /** Status code. */
   private Integer status;
   /** Forwarding. */
@@ -116,13 +114,12 @@ final class RestXqResponse extends WebResponse {
       if(status != null) {
         final int s = status;
         final StringBuilder msg = new StringBuilder();
-        if(message != null) msg.append(message);
         if(s == 302) {
           if(!msg.isEmpty()) msg.append("; ");
           msg.append(HTTPText.LOCATION + ": ").append(conn.response.getHeader(HTTPText.LOCATION));
         }
         conn.log(s, msg.toString());
-        conn.status(s, message, null);
+        conn.status(s, null);
       }
 
       // serialize result
@@ -178,17 +175,14 @@ final class RestXqResponse extends WebResponse {
       // process http:response element
       if(T_HTTP_RESPONSE.matches(node)) {
         // check status and reason
-        byte[] sta = null, msg = null;
+        byte[] sta = null;
         for(final GNode a : node.attributeIter()) {
           final QNm qnm = a.qname();
           if(qnm.eq(Q_STATUS)) sta = a.string();
-          else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)) msg = a.string();
+          else if(qnm.eq(Q_REASON) || qnm.eq(Q_MESSAGE)); // ignored
           else throw func.error(UNEXP_NODE_X, a);
         }
-        if(sta != null) {
-          status = toInt(sta);
-          message = msg != null ? string(msg) : null;
-        }
+        if(sta != null) status = toInt(sta);
 
         for(final GNode gchild : node.childIter()) {
           final XNode child = (XNode) gchild;
