@@ -45,7 +45,7 @@ final class XQueryTask extends RecursiveTask<Value> {
     final int size = end - start;
     if(size == 1) {
       // perform the work
-      try(QueryContext qc = new QueryContext(tc.qc)) {
+      try(QueryContext qc = new QueryContext(tc.qc, tc.qc.ns)) {
         return tc.funcs.get(start).invoke(qc, tc.info);
       } catch(final QueryException ex) {
         if(tc.errors) {

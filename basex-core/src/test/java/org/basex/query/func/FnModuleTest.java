@@ -2003,6 +2003,13 @@ return
     query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare variable $x:x := 1;', "
         + "'xquery-version': 4.0 }") + "?variables?#Q{x}x", 1);
 
+    // GH-2640
+    error("<e xmlns:p='p'>{\n"
+        + "  load-xquery-module(\"m\", {\n"
+        + "    'content': ``[module namespace m='m'; declare function m:f() {<p:x/>};]``\n"
+        + "  })?functions?#Q{m}f?0()\n"
+        + "}</e>", MODULE_STATIC_ERROR_X_X);
+
     error(func.args(""), MODULE_URI_EMPTY);
     error(func.args("x"), MODULE_NOT_FOUND_X);
     error(func.args("x", " { 'content': '%@?$' }"), MODULE_STATIC_ERROR_X_X);

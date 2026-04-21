@@ -153,9 +153,10 @@ public final class QueryContext extends Job implements Closeable {
   /**
    * Constructor.
    * @param parent parent context
+   * @param nsContext inherited namespace context (can be {@code null})
    */
-  public QueryContext(final QueryContext parent) {
-    this(parent.context, parent, parent.info);
+  public QueryContext(final QueryContext parent, final NSDynContext nsContext) {
+    this(parent.context, parent, nsContext, parent.info);
     parent.pushJob(this);
     updates = parent.updates;
   }
@@ -165,20 +166,22 @@ public final class QueryContext extends Job implements Closeable {
    * @param context database context
    */
   public QueryContext(final Context context) {
-    this(context, null, null);
+    this(context, null, null, null);
   }
 
   /**
    * Constructor.
    * @param context database context
    * @param parent parent context (can be {@code null})
+   * @param nsContext inherited namespace context (can be {@code null})
    * @param info query info (can be {@code null})
    */
-  public QueryContext(final Context context, final QueryContext parent, final QueryInfo info) {
+  public QueryContext(final Context context, final QueryContext parent,
+      final NSDynContext nsContext, final QueryInfo info) {
     this.context = context;
     this.parent = parent;
     this.info = info != null ? info : new QueryInfo(context);
-    ns = parent != null ? new NSDynContext(parent.ns) : new NSDynContext(null);
+    ns = new NSDynContext(nsContext);
     resources = parent != null ? parent.resources : new QueryResources(this);
     ftPosData = parent != null ? parent.ftPosData : null;
     shared = parent != null ? parent.shared : new SharedData();
