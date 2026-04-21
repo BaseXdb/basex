@@ -56,7 +56,7 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
 
     final byte[] modUri = Token.eq(name.uri(), FN_URI) ? FN_URI : QNm.uri(sc.module);
     final StaticFunc sf = new StaticFunc(name, params, expr, anns, vs, info, doc);
-    if(get(sc, name, sf.min, sf.arity()) != null) throw DUPLFUNC_X.get(info, name);
+    if(get(sc, name, sf.min, sf.arity(), false) != null) throw DUPLFUNC_X.get(info, name);
     funcsByModule.computeIfAbsent(modUri, QNmMap::new).computeIfAbsent(name, ArrayList::new).
         add(sf);
     return sf;
@@ -76,14 +76,16 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   /**
    * Assigns a function to a static function call.
    * @param call name function name
+   * @param useDynamicContext {@code true} if function lookup should include the dynamic context
    * @param qc query context
    * @throws QueryException query exception
    */
-  void setFunc(final StaticFuncCall call, final QueryContext qc) throws QueryException {
+  void setFunc(final StaticFuncCall call, final boolean useDynamicContext, final QueryContext qc)
+      throws QueryException {
     final InputInfo info = call.info();
     final QNm name = call.name;
     final int arity = call.arity();
-    final StaticFunc func = get(info.sc(), name, arity);
+    final StaticFunc func = get(info.sc(), name, arity, useDynamicContext);
     if(func != null) {
       if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
       call.setFunc(func);
@@ -128,10 +130,12 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * @param sc static context
    * @param qname function name
    * @param arity function arity
+   * @param useDynamicContext {@code true} if function lookup should include the dynamic context
    * @return function if found, {@code null} otherwise
    */
-  public StaticFunc get(final StaticContext sc, final QNm qname, final int arity) {
-    return get(sc, qname, arity, arity);
+  public StaticFunc get(final StaticContext sc, final QNm qname, final int arity,
+      final boolean useDynamicContext) {
+    return get(sc, qname, arity, arity, useDynamicContext);
   }
 
   /**
@@ -140,13 +144,15 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * @param qname function name
    * @param min minimum function arity
    * @param max maximum function arity
+   * @param useDynamicContext {@code true} if function lookup should include the dynamic context
    * @return function if found, {@code null} otherwise
    */
-  private StaticFunc get(final StaticContext sc, final QNm qname, final int min, final int max) {
+  private StaticFunc get(final StaticContext sc, final QNm qname, final int min, final int max,
+      final boolean useDynamicContext) {
     final byte[] funcUri = qname.uri();
     final byte[] modUri = Token.eq(funcUri, FN_URI) ? FN_URI : QNm.uri(sc.module);
     StaticFunc func = get(modUri, qname, min, max);
-    if(func == null && sc.imports.contains(funcUri)) {
+    if(func == null && (useDynamicContext || sc.imports.contains(funcUri))) {
       func = get(funcUri, qname, min, max);
       if(func != null && func.anns.contains(Annotation.PRIVATE)) func = null;
     }

@@ -179,7 +179,7 @@ public final class Functions {
     }
 
     // user-defined function
-    final StaticFunc sf = qc.functions.get(info.sc(), name, arity);
+    final StaticFunc sf = qc.functions.get(info.sc(), name, arity, runtime);
     if(sf != null) {
       final Expr func = item(sf, fb, qc);
       if(sf.updating) qc.updating();
@@ -215,7 +215,7 @@ public final class Functions {
       final QueryContext qc) {
 
     final StaticContext sc = info.sc();
-    if(name.hasURI() || qc.functions.get(sc, name, arity) != null) return name;
+    if(name.hasURI() || qc.functions.get(sc, name, arity, false) != null) return name;
     return new QNm(name.local(), sc.funcNS != null ? sc.funcNS : FN_URI);
   }
 
@@ -326,7 +326,7 @@ public final class Functions {
     }
 
     final StaticFuncCall call = new StaticFuncCall(name, fb.args(), fb.keywords, fb.info);
-    qc.functions.setFunc(call, qc);
+    qc.functions.setFunc(call, fb.runtime, qc);
     return call;
   }
 

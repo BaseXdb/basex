@@ -243,10 +243,10 @@ public final class ModuleTest extends SandboxTest {
         + "};\n"
         + "declare variable $c:hello := 'can you see me now';");
 
-    // function is not visible to fn:function-lookup (not in dynamically known function definitions)
+    // function is visible to fn:function-lookup even when not in static context
     query("import module namespace b = 'b'  at '" + b.path() + "';\n"
-        + "fn:function-lookup(#Q{c}hello, 0)", "");
-    // function is still visible to inspect:functions
+        + "fn:function-lookup(#Q{c}hello, 0)()", "can you see me now");
+    // function is visible to inspect:functions
     query("import module namespace b  = 'b'  at '" + b.path() + "';\n"
         + "inspect:functions()", "Q{c}hello#0");
 
@@ -259,5 +259,21 @@ public final class ModuleTest extends SandboxTest {
     error("import module namespace b = 'b'  at '" + b.path() + "';\n"
         + "declare namespace c = 'c';\n"
         + "$c:hello", QueryError.INVISIBLEVAR_X);
+  }
+
+  /** Tests fn:function-lookup from within a library module for a module imported elsewhere. */
+  @Test public void gh2641() {
+    final IOFile sandbox = sandbox();
+    final IOFile a = new IOFile(sandbox, "a.xqm");
+    final IOFile b = new IOFile(sandbox, "b.xqm");
+    write(a, "module namespace a = 'A';\n"
+        + "declare function a:lookup() {\n"
+        + "  function-lookup(QName('B', 'test'), 0)\n"
+        + "};");
+    write(b, "module namespace b = 'B';\n"
+        + "declare function b:test() {};");
+    query("import module namespace a = 'A' at '" + a.path() + "';\n"
+        + "import module namespace b = 'B' at '" + b.path() + "';\n"
+        + "exists(a:lookup())", true);
   }
 }
