@@ -775,7 +775,7 @@ public enum QueryError {
   PARSE_URI_X(FOUR, 1, "Invalid IPv6/IPvFuture authority: %."),
 
   /** Error code. */
-  RESWHICH_X(FOUT, 1170, "Resource '%' cannot be retrieved."),
+  RESWHICH_X(FOUT, 1170, "Resource cannot be retrieved: %."),
   /** Error code. */
   RESFRAG_X(FOUT, 1170, "URI contains a fragment identifier: %."),
   /** Error code. */

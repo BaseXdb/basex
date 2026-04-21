@@ -125,8 +125,7 @@ public abstract class ParseFn extends StandardFunc {
     } catch(final InputException ex) {
       throw exception(ex);
     } catch(final IOException ex) {
-      Util.debug(ex);
-      throw RESWHICH_X.get(info, io);
+      throw RESWHICH_X.get(info, io + " (" + Util.info(ex) + ')');
     }
   }
 
