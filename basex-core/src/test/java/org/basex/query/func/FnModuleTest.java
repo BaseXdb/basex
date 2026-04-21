@@ -2003,6 +2003,13 @@ return
     query(func.args("x", " { 'content': 'module namespace x=\"x\";\ndeclare variable $x:x := 1;', "
         + "'xquery-version': 4.0 }") + "?variables?#Q{x}x", 1);
 
+    // GH-2640
+    error("<e xmlns:p='p'>{\n"
+        + "  load-xquery-module(\"m\", {\n"
+        + "    'content': ``[module namespace m='m'; declare function m:f() {<p:x/>};]``\n"
+        + "  })?functions?#Q{m}f?0()\n"
+        + "}</e>", MODULE_STATIC_ERROR_X_X);
+
     error(func.args(""), MODULE_URI_EMPTY);
     error(func.args("x"), MODULE_NOT_FOUND_X);
     error(func.args("x", " { 'content': '%@?$' }"), MODULE_STATIC_ERROR_X_X);
@@ -3189,6 +3196,8 @@ return
 
     final String canonicalJson = " {'method': 'json', 'canonical': true()}";
     query(func.args(" [0x7fff_ffff_ffff_ffff]", canonicalJson), "[9223372036854776000]");
+    query(func.args(" [xs:double('-0')]", " {'method': 'json'}"), "[-0]");
+    query(func.args(" [xs:double('-0')]", canonicalJson), "[0]");
 
     // The tests below were adapted from Apache 2.0–licensed code from project
     // erdtman/java-json-canonicalization at https://github.com/erdtman/java-json-canonicalization
@@ -3436,6 +3445,8 @@ return
     query(func.args("A"), "A");
     query(func.args(wrap("A")), "A");
     query("(" + wrap("A") + ", 1, 'X') ! " + func.args(), "A\n1\nX");
+    query(func.args(" xs:float('-0')"), "-0");
+    query(func.args(" xs:double('-0')"), "-0");
 
     check("for $s in ('a', 'b') return " + func.args(" $s"), "a\nb", empty(func));
     check("for $s in (<a/>, <b/>) return " + func.args(" $s"), "\n", exists(func));

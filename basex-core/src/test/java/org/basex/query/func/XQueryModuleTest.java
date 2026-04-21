@@ -36,6 +36,17 @@ public final class XQueryModuleTest extends SandboxTest {
     // GH-2332
     query("try {" + func.args("declare function local:f() { local:f() }; local:f()") +
         "} catch xquery:error { 'STOP' }", "STOP");
+
+    // GH-2640
+    query("element e { attribute { QName('', 'a') } {}, " + func.args("true()") + " }",
+        "<e a=\"\">true</e>");
+    query("<e xmlns:p='p'\n"
+        + "   p:a='{\n"
+        + "     map:keys(in-scope-namespaces(<x/>))\n"
+        + "   }'\n"
+        + "   p:b='{xquery:eval('\n"
+        + "     map:keys(in-scope-namespaces(<x/>))\n"
+        + "   ')}'/>", "<e xmlns:p=\"p\" p:a=\"p xml\" p:b=\"xml\"/>");
   }
 
   /** Test method. */
@@ -182,6 +193,15 @@ public final class XQueryModuleTest extends SandboxTest {
         + "   => distinct-values()\r\n"
         + " }")
         + "=> distinct-values()", "a b c d e");
+
+    // GH-2640: fork-join inherits parent dynamic namespace context
+    query("<e xmlns:p='p'\n"
+        + "   p:a='{\n"
+        + "     " + func.args(" \n"
+        + "       (1 to 100) ! fn() {map:keys(in-scope-namespaces(<x/>))}\n"
+        + "     ") + "[. = 'p'] => count()\n"
+        + "   }'\n"
+        + "/>", "<e xmlns:p=\"p\" p:a=\"100\"/>");
 
     // optimizations
     check(func.args(" ()"), "", empty());

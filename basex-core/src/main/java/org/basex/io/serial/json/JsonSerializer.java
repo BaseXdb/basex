@@ -178,7 +178,8 @@ public abstract class JsonSerializer extends StandardSerializer {
       if(type.oneOf(BasicType.DOUBLE, BasicType.FLOAT) || canonical && type.isNumber()) {
         final double d = item.dbl(null);
         if(Double.isFinite(d)) {
-          out.print(Dbl.string(d));
+          final byte[] s = Dbl.string(d);
+          out.print(canonical && s == NEGATIVE_ZERO ? token(0) : s);
         } else {
           if(canonical) throw SERNUMBER_X.getIO(d);
           out.print(d == Double.POSITIVE_INFINITY ? JsonConstants.INF :

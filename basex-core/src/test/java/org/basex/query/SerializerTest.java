@@ -262,6 +262,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "1234567890e0", "1.23456789e9");
     query(option + "xs:double('NaN')", "NaN");
     query(option + "xs:double('INF')", "INF");
+    query(option + "xs:double('-0')", "-0.0e0");
     query(option + "xs:byte(1)", 1);
     query(option + "false()", "false()");
     query(option + "'A'", "\"A\"");
@@ -273,6 +274,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "true#0", "fn:true#0");
     query(option + "fn() {}", "fn() as empty-sequence() { () }");
     query(option + "xs:float(1)", "xs:float(\"1\")");
+    query(option + "xs:float('-0')", "xs:float(\"-0\")");
 
     query(option + "[]", "[]");
     query(option + "[ 1 ]", "[1]");
@@ -281,6 +283,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "[ 1234567890e0 ]", "[1.23456789e9]");
     query(option + "[ xs:double('NaN') ]", "[NaN]");
     query(option + "[ xs:double('INF') ]", "[INF]");
+    query(option + "[ xs:double('-0') ]", "[-0.0e0]");
     query(option + "[ xs:byte(1) ]", "[1]");
     query(option + "[ false() ]", "[false()]");
     query(option + "[ 'A' ]", "[\"A\"]");
@@ -292,6 +295,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "[ true#0 ]", "[fn:true#0]");
     query(option + "[ fn() {} ]", "[fn() as empty-sequence() { () }]");
     query(option + "[ xs:float(1) ]", "[xs:float(\"1\")]");
+    query(option + "[ xs:float('-0')]", "[xs:float(\"-0\")]");
 
     query(option + "{ 1: (), 2: 3, 4: (5, 6) }", "{1:(),2:3,4:(5,6)}");
   }
@@ -305,6 +309,7 @@ public final class SerializerTest extends SandboxTest {
     query("1234567890e0", 1234567890);
     query("xs:double('NaN')", "NaN");
     query("xs:double('INF')", "INF");
+    query("xs:double('-0')", "-0");
     query("xs:byte(1)", 1);
     query("false()", "false");
     query("'A'", "A");
@@ -316,6 +321,7 @@ public final class SerializerTest extends SandboxTest {
     query("true#0", "fn:true#0");
     query("fn() {}", "fn() as empty-sequence() { () }");
     query("xs:float(1)", 1);
+    query("xs:float('-0')", "-0");
 
     query("[]", "[]");
     query("[ 1 ]", "[1]");
