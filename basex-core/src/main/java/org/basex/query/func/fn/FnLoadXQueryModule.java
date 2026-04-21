@@ -91,7 +91,7 @@ public final class FnLoadXQueryModule extends StandardFunc {
       if(!isSupported(version)) throw MODULE_XQUERY_VERSION_X.get(info, version);
     }
 
-    final QueryContext mqc = new QueryContext(qc);
+    final QueryContext mqc = new QueryContext(qc, null);
     for(final byte[] uri : qc.modDeclared) mqc.modDeclared.put(uri, qc.modDeclared.get(uri));
     int nParsed = 0;
     final Value ctx = opt.get(CONTEXT_ITEM);
