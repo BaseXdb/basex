@@ -896,6 +896,15 @@ public final class NamespaceTest extends SandboxTest {
     query("db:get('db')/*:B", "<b:B xmlns:b=\"b\"/>");
   }
 
+  /** Wildcard name test with xml namespace on database content (GH-2642). */
+  @Test public void gh2642() {
+    final String doc = "<x xml:a=''><xml:a/></x>";
+    execute(new CreateDB("db", doc));
+    query("/x[@xml:a]", doc);
+    query("/x[@*:a]", doc);
+    query("/x[*:a]", doc);
+  }
+
   /** Tests fixed default element namespaces. */
   @Test public void fixed() {
     // non-fixed: constructor xmlns="" changes the default namespace seen by enclosed expressions

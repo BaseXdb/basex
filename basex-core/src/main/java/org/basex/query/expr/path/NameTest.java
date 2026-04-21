@@ -1,5 +1,6 @@
 package org.basex.query.expr.path;
 
+import org.basex.index.name.*;
 import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -103,9 +104,9 @@ public final class NameTest extends Test {
     }
 
     // check if local element/attribute names occur in database
-    if(!kind.oneOf(Kind.GNODE, Kind.PROCESSING_INSTRUCTION) && name != null &&
-        !(kind == Kind.ELEMENT ? data.elemNames : data.attrNames).contains(name)) {
-      return null;
+    if(!kind.oneOf(Kind.GNODE, Kind.PROCESSING_INSTRUCTION) && name != null) {
+      final Names names = kind == Kind.ELEMENT ? data.elemNames : data.attrNames;
+      if(!names.contains(name) && !names.contains(Token.concat(Token.XML, ':', name))) return null;
     }
     return this;
   }
