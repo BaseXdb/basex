@@ -27,6 +27,8 @@ public final class JsonSerializerTest extends SandboxTest {
     final JsonFormat format = JsonFormat.DIRECT;
     serialize("'x'", "'x'", format);
     serialize("1", "1", format);
+    serialize("xs:double('-0')", "-0", format);
+    serialize("xs:float('-0')", "-0", format);
     serialize("true()", "true", format);
     serialize("<_/>", "'<_\\/>'", format);
 
@@ -64,6 +66,8 @@ public final class JsonSerializerTest extends SandboxTest {
     final JsonFormat format = JsonFormat.ATTRIBUTES;
     serialize("'x'", "'x'", format);
     serialize("1", "1", format);
+    serialize("xs:double('-0')", "-0", format);
+    serialize("xs:float('-0')", "-0", format);
     serialize("true()", "true", format);
     serialize("<_/>", "'<_\\/>'", format);
 
@@ -116,6 +120,8 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("{ 'A': false() }", "{'A':false}", format);
     serialize("{ true(): false() }", "{'true':false}", format);
     serialize("{ 1: 'E' }", "{'1':'E'}", format);
+    serialize("{ 0: xs:double('-0') }", "{'0':-0}", format);
+    serialize("{ 0: xs:float('-0') }", "{'0':-0}", format);
 
     serialize("{ 'A': 1 div 0.0e0 }", "{'A':1e9999}", format);
     serialize("{ 'A': -1 div 0.0e0 }", "{'A':-1e9999}", format);
@@ -129,6 +135,8 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("[ 2 ]", "[2]", format);
     serialize("[ 2, 3 ]", "[2,3]", format);
     serialize("[ 2, (), 4 ]", "[2,null,4]", format);
+    serialize("[ xs:double('-0') ]", "[-0]", format);
+    serialize("[ xs:float('-0') ]", "[-0]", format);
 
     error("[ (1, 2) ]", format, SERJSONSEQ);
 
@@ -146,7 +154,8 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("1", "1", format);
 
     serialize("0.0e0", "0", format);
-    serialize("-0.0e0", "0", format);
+    serialize("-0.0e0", "-0", format);
+    serialize("xs:float('-0')", "-0", format);
     serialize("1e-6", "0.000001", format);
     serialize("1e-7", "1e-7", format);
     serialize("1e20", "100000000000000000000", format);
