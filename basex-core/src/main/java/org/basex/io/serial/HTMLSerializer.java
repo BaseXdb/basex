@@ -176,7 +176,6 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
       sep = false;
       super.finishClose();
     }
-    if(SCRIPTS.contains(lc(elem.local()))) script++;
   }
 
   @Override
