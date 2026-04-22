@@ -358,6 +358,12 @@ public final class SerializerTest extends SandboxTest {
     contains(option + "<html><style/><body><script>&amp;&amp;</script></body></html>", ">&&<");
   }
 
+  /** HTML Serialization: restore escaping following empty script tags. */
+  @Test public void gh2645() {
+    final String option = METHOD.arg("html");
+    contains(option + "<html><script/><body>&amp;&amp;</body></html>", ">&amp;&amp;<");
+  }
+
   /** HTML5 indentation. */
   @Test public void indentHTML5() {
     final String option = METHOD.arg("html") + INDENT.arg("on");
