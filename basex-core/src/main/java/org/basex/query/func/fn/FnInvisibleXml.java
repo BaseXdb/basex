@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.io.*;
 import org.basex.query.*;
@@ -28,6 +27,9 @@ import de.bottlecaps.markup.*;
  * @author Gunther Rademacher
  */
 public final class FnInvisibleXml extends StandardFunc {
+  /** Required class names. */
+  private static final String[] CLASSES = { "de.bottlecaps.markup.Blitz",
+      "de.bottlecaps.markup.BlitzException", "de.bottlecaps.markup.BlitzParseException"};
   /** The function's argument type. */
   public static final SeqType ARG_TYPE = ChoiceItemType.get(BasicType.STRING,
       NodeType.get(NameTest.get(new QNm("ixml")))).seqType(Occ.ZERO_OR_ONE);
@@ -37,8 +39,7 @@ public final class FnInvisibleXml extends StandardFunc {
   @Override
   public FuncItem item(final QueryContext qc, final InputInfo ii) throws QueryException {
     if(generator == null) {
-      for(final String className : Arrays.asList("de.bottlecaps.markup.Blitz",
-          "de.bottlecaps.markup.BlitzException", "de.bottlecaps.markup.BlitzParseException")) {
+      for(final String className : CLASSES) {
         if(!Reflect.available(className)) {
           throw BASEX_CLASSPATH_X_X.get(info, definition.name, className);
         }
@@ -46,6 +47,17 @@ public final class FnInvisibleXml extends StandardFunc {
       generator = new Generator();
     }
     return generator.generate(qc);
+  }
+
+  /**
+   * Checks if Invisible XML support is available.
+   * @return result of check
+   */
+  public static boolean available() {
+    for(final String className : CLASSES) {
+      if(!Reflect.available(className)) return false;
+    }
+    return true;
   }
 
   /**

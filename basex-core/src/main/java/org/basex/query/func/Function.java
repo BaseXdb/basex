@@ -709,6 +709,9 @@ public enum Function implements AFunction {
   SUM(FnSum::new, "sum(values[,zero])",
       params(ANY_ATOMIC_TYPE_ZM, ANY_ATOMIC_TYPE_ZO), ANY_ATOMIC_TYPE_ZO),
   /** XQuery function. */
+  SYSTEM_PROPERTIES(FnSystemProperties::new, "system-properties()", params(),
+      MapType.get(BasicType.QNAME, ANY_ATOMIC_TYPE_O).seqType()),
+  /** XQuery function. */
   TAIL(FnTail::new, "tail(input)",
       params(ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
