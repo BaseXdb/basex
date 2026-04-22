@@ -9,6 +9,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -90,7 +91,7 @@ public class FnSchemaType extends StandardFunc {
             constructor = !type.oneOf(QNAME, NOTATION);
         }
       } else {
-        throw Util.notExpected();
+        return Empty.VALUE;
       }
       final MapBuilder mb = new MapBuilder();
       mb.put("name", name);

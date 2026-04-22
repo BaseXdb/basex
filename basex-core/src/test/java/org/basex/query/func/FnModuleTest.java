@@ -3142,6 +3142,8 @@ return
   @Test public void schemaType() {
     final Function func = SCHEMA_TYPE;
 
+    query(" declare type t as xs:integer; " + func.args(" #t"), "");
+    query(func.args(" #fn:schema-type-record"), "");
     query(func.args(" #xs:integer") + " ? name", "#integer");
     query(func.args(" #xs:long") + " ? primitive-type() ? name", "#decimal");
     query(func.args(" #xs:positiveInteger") + " ? base-type() ? name", "#nonNegativeInteger");
