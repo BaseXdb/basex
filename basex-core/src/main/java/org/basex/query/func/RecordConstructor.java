@@ -87,7 +87,8 @@ public class RecordConstructor extends StandardFunc {
 
   @Override
   public boolean equals(final Object obj) {
-    return this == obj || obj instanceof final RecordConstructor rc && recordType.eq(rc.recordType);
+    return this == obj || obj instanceof final RecordConstructor rc &&
+        recordType.eq(rc.recordType) && Array.equals(exprs, rc.exprs);
   }
 
   @Override

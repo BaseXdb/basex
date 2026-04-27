@@ -335,6 +335,7 @@ public final class RecordTest extends SandboxTest {
     // small record (compile-time evaluation)
     constr = "{ 'AA': 0, 'AB': 1 }";
     check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(SingletonSeq.class));
+    check("(" + constr + ", { 'AA': 0, 'AB': 2 })?AA", "0\n0", empty(SingletonSeq.class));
     // big record (compile-time evaluation)
     constr =
         "{ 'AA': 0, 'AB': 0, 'AC': 0, 'AD': 0, 'AE': 0, 'AF': 0, 'AG': 0, 'AH': 0, 'AI': 0, "
@@ -355,6 +356,7 @@ public final class RecordTest extends SandboxTest {
     // small record (runtime evaluation)
     constr = "{ 'AA': 0, 'AB': <a/> }";
     check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(REPLICATE));
+    check("(" + constr + ", { 'AA': 0, 'AB': <b/> })?AA", "0\n0", empty(REPLICATE));
     // big record (runtime evaluation)
     constr =
         "{ 'AA': 0, 'AB': 0, 'AC': 0, 'AD': 0, 'AE': 0, 'AF': 0, 'AG': 0, 'AH': 0, 'AI': 0, "
