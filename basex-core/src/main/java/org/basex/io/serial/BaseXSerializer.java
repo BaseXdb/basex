@@ -10,7 +10,6 @@ import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
-import org.basex.query.value.type.*;
 
 /**
  * This class serializes items in a project-specific mode.
@@ -21,6 +20,8 @@ import org.basex.query.value.type.*;
 public final class BaseXSerializer extends AdaptiveSerializer {
   /** Binary. */
   private final boolean binary;
+  /** Level counter. */
+  private int nested;
 
   /**
    * Constructor, specifying serialization options.
@@ -35,33 +36,38 @@ public final class BaseXSerializer extends AdaptiveSerializer {
 
   @Override
   protected void atomic(final Item item) throws IOException {
-    final Type type = item.type;
-    try {
-      if(type == DOUBLE) {
-        printChars(Dbl.string(item.dbl(null)));
-      } else if(type == QNAME) {
-        printChar('#');
-        printChars(item.string(null));
-      } else if(depth == 0) {
+    if(nested == 0) {
+      try {
         if(binary && item instanceof Bin) {
           try(BufferInput bi = item.input(null)) {
             for(int b; (b = bi.read()) != -1;) out.write(b);
           }
+        } else if(item.type == QNAME) {
+          printChar('#');
+          printChars(((QNm) item).prefixId());
         } else {
           printChars(item.string(null));
         }
-      } else {
-        super.atomic(item);
+      } catch(final QueryException ex) {
+        throw new QueryIOException(ex);
       }
-    } catch(final QueryException ex) {
-      throw new QueryIOException(ex);
+    } else {
+      super.atomic(item);
     }
   }
 
   @Override
-  protected Type constructor(final Type type) {
-    // project mode never wraps atomic values in a type constructor
-    return null;
+  protected void array(final XQArray item) throws IOException {
+    ++nested;
+    super.array(item);
+    --nested;
+  }
+
+  @Override
+  protected void map(final XQMap item) throws IOException {
+    ++nested;
+    super.map(item);
+    --nested;
   }
 
   @Override

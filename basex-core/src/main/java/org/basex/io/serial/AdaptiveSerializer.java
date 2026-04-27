@@ -4,7 +4,6 @@ import static org.basex.io.serial.SerializerOptions.*;
 import static org.basex.query.value.type.BasicType.*;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.io.out.PrintOutput.*;
 import org.basex.query.*;
@@ -27,8 +26,6 @@ public class AdaptiveSerializer extends OutputSerializer {
   private final OutputStream os;
   /** XML serializer (lazy instantiation). */
   private XMLSerializer xml;
-  /** Nesting depth (0 = top level). */
-  protected int depth;
 
   /**
    * Constructor, specifying serialization options.
@@ -110,29 +107,22 @@ public class AdaptiveSerializer extends OutputSerializer {
   @Override
   protected void atomic(final Item item) throws IOException {
     final Type type = item.type;
+    final boolean basex = this instanceof BaseXSerializer;
     try {
-      if(type == DOUBLE) {
-        final double d = item.dbl(null);
-        if(!Double.isFinite(d)) {
-          printChars(item.string(null));
-        } else {
-          synchronized(Token.AD) {
-            printChars(Token.token(Token.AD.format(d).toLowerCase(Locale.ENGLISH)));
-          }
-        }
-      } else if(type == QNAME) {
+      if(type == QNAME) {
+        final QNm qnm = (QNm) item;
         printChar('#');
-        printChars(((QNm) item).unique());
+        printChars(basex ? qnm.prefixId() : qnm.unique());
+      } else if(type.instanceOf(NUMERIC) || type == BOOLEAN) {
+        printChars(Token.token(item));
       } else {
-        final boolean simple = type == BOOLEAN || type.instanceOf(DECIMAL);
-        final byte[] value = simple ? Token.token(item) :
-          value(item.string(null), true, false, false);
-        final Type tp = simple ? null : constructor(type);
+        final Type tp = basex || type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI) ?
+          null : type.instanceOf(DURATION) ? DURATION : type;
         if(tp != null) {
           printChars(Token.token(tp));
           printChar('(');
         }
-        printChars(value);
+        printChars(value(item.string(null), true, false, false));
         if(tp != null) {
           printChar(')');
         }
@@ -140,17 +130,6 @@ public class AdaptiveSerializer extends OutputSerializer {
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
-  }
-
-  /**
-   * Returns the type whose name wraps an atomic value in a constructor function
-   * (for example {@code xs:date} in {@code xs:date("…")}).
-   * @param type atomic type
-   * @return constructor type, or {@code null} if the value is serialized without a wrapper
-   */
-  protected Type constructor(final Type type) {
-    return type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI) ? null :
-      type.instanceOf(DURATION) ? DURATION : type;
   }
 
   @Override
@@ -179,7 +158,6 @@ public class AdaptiveSerializer extends OutputSerializer {
    */
   protected void array(final XQArray array) throws IOException {
     printChar('[');
-    ++depth;
     int c = 0;
     for(final Value value : array.members()) {
       if(c++ > 0) printChar(',');
@@ -196,7 +174,6 @@ public class AdaptiveSerializer extends OutputSerializer {
       if(vs != 1) printChar(')');
     }
     if(c > 0 && indent) printChar(' ');
-    --depth;
     printChar(']');
   }
 
@@ -209,7 +186,6 @@ public class AdaptiveSerializer extends OutputSerializer {
     printChar('{');
     int c = 0;
     ++level;
-    ++depth;
     for(final XQMap.Entry entry : map.entries()) {
       if(c++ > 0) printChar(',');
       indent();
@@ -230,7 +206,6 @@ public class AdaptiveSerializer extends OutputSerializer {
       if(par) printChar(')');
     }
     --level;
-    --depth;
     if(c > 0) indent();
     printChar('}');
   }
