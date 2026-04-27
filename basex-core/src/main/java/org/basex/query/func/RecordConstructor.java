@@ -20,12 +20,10 @@ import org.basex.util.hash.*;
 public class RecordConstructor extends StandardFunc {
   /** Record type. */
   private final RecordType recordType;
-  /** The size of a structure resulting from this constructor. */
-  private final long structSize;
-  /** The map builder function. */
-  private final QueryBiFunction<QueryContext, InputInfo, XQMap> builder;
   /** Field names. */
   private final QNm[] names;
+  /** Created compact record map. */
+  private final boolean compact;
 
   /**
    * Constructor.
@@ -36,18 +34,12 @@ public class RecordConstructor extends StandardFunc {
     final TokenObjectMap<RecordField> fields = recordType.fields();
     final int fs = fields.size();
     names = new QNm[fs];
-    boolean complete = true;
-    for(int i = 1; i <= fs; ++i) {
-      names[i - 1] = new QNm(fields.key(i));
-      complete = complete && fields.value(i).alwaysAdded();
+    boolean c = true;
+    for(int f = 1; f <= fs; ++f) {
+      names[f - 1] = new QNm(fields.key(f));
+      c = c && fields.value(f).alwaysAdded();
     }
-    if(complete) {
-      builder = this::recordMap;
-      structSize = fs;
-    } else {
-      builder = this::map;
-      structSize = -1;
-    }
+    compact = c;
   }
 
   /**
@@ -58,67 +50,60 @@ public class RecordConstructor extends StandardFunc {
    * @return constructor function
    */
   public static RecordConstructor get(final InputInfo ii, final RecordType rt, final Expr[] args) {
-    RecordConstructor constructor = new RecordConstructor(rt);
-    constructor.init(ii, definition(rt), args);
-    return constructor;
-  }
-
-  @Override
-  public Expr opt(final CompileContext cc) throws QueryException {
-    return values(true, cc) ? cc.preEval(this) : this;
+    final RecordConstructor rc = new RecordConstructor(rt);
+    rc.init(ii, definition(rt), args);
+    return rc;
   }
 
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    return builder.apply(qc, ii);
-  }
-
-  @Override
-  public long structSize() {
-    return structSize;
-  }
-
-  /**
-   * Creates a compact record map. This is more efficient than the regular map implementation, but
-   * only possible if all fields of the type are present.
-   * @param qc query context
-   * @param ii input info
-   * @return record map
-   * @throws QueryException query exception
-   */
-  private XQRecordMap recordMap(final QueryContext qc, final InputInfo ii) throws QueryException {
     final TokenObjectMap<RecordField> fields = recordType.fields();
-    final int fs = fields.size();
+    final int fs = fields.size(), el = exprs.length;
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; ++f) {
       final RecordField rf = fields.value(f + 1);
-      final Value value = f < exprs.length ? exprs[f].value(qc) : rf.init().value(qc);
-      values[f] = rf.seqType().coerce(value, qc, ii, names[f], null);
+      final Value value = f < el ? exprs[f].value(qc) : rf.init().value(qc);
+      if(!value.isEmpty() || rf.alwaysAdded()) {
+        values[f] = rf.seqType().coerce(value, qc, ii, names[f], null);
+      }
     }
-    return new XQRecordMap(recordType, values);
-  }
+    // create compact record map if all fields of the type are present
+    if(compact) return new XQRecordMap(recordType, values);
 
-  /**
-   * Creates a regular map. This is used if some fields of the record type may be absent.
-   * @param qc query context
-   * @param ii input info
-   * @return map
-   * @throws QueryException query exception
-   */
-  private XQMap map(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final TokenObjectMap<RecordField> fields = recordType.fields();
-    final int fs = fields.size();
+    // create regular map otherwise
     final MapBuilder mb = new MapBuilder(fs);
     for(int f = 0; f < fs; ++f) {
-      final RecordField rf = fields.value(f + 1);
-      final Value value = f < exprs.length ? exprs[f].value(qc) : rf.init().value(qc);
-      if(!value.isEmpty() || rf.alwaysAdded()) {
-        mb.put(fields.key(f + 1), rf.seqType().coerce(value, qc, ii, names[f], null));
-      }
+      if(values[f] != null) mb.put(fields.key(f + 1), values[f]);
     }
     final XQMap map = mb.map();
     map.type = recordType;
     return map;
+  }
+
+  @Override
+  public long structSize() {
+    return compact ? recordType.fields().size() : -1;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    return this == obj || obj instanceof final RecordConstructor rc && recordType.eq(rc.recordType);
+  }
+
+  @Override
+  public void toString(final QueryString qs) {
+    if(recordType.name() != null) {
+      super.toString(qs);
+    } else {
+      qs.token("{ ");
+      final TokenObjectMap<RecordField> fields = recordType.fields();
+      int f = 0;
+      for(final Expr expr : exprs) {
+        if(++f > 1) qs.token(',');
+        qs.quoted(fields.key(f)).token(':').token(expr);
+      }
+      qs.token(" }");
+    }
   }
 
   /**
@@ -147,7 +132,7 @@ public class RecordConstructor extends StandardFunc {
       params[i] = f.isOptional() ? st.union(Occ.ZERO) : st;
     }
 
-    Supplier<RecordConstructor> supplier = () -> new RecordConstructor(rt);
+    final Supplier<RecordConstructor> supplier = () -> new RecordConstructor(rt);
     return new FuncDefinition(supplier, description, params, rt.seqType(),
         EnumSet.noneOf(Flag.class), rt.name() == null ? Token.EMPTY : rt.name().uri(), Perm.NONE);
   }

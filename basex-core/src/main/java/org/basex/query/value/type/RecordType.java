@@ -22,7 +22,7 @@ import org.basex.util.hash.*;
  * @author Gunther Rademacher
  */
 public final class RecordType extends MapType {
-  /** Maximum size for generated record definitions. */
+  /** Maximum number of entries in generated records. */
   public static final int MAX_GENERATED_SIZE = 32;
 
   /** Record fields. */

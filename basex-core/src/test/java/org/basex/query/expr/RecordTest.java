@@ -7,6 +7,7 @@ import org.basex.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -320,5 +321,56 @@ public final class RecordTest extends SandboxTest {
     error("let $m as record(a?, b) := { 'a': 1 } return $m", INVTYPE_X);
     error("let $m as record(a, b?) := {} return $m", INVTYPE_X);
     error("let $m as record(a, b?) := { 'c': 3 } return $m", INVTYPE_X);
+  }
+
+  /** Equality of map/record constructors. */
+  @Test public void equal() {
+    // empty record
+    String constr = "{}";
+    check("(" + constr + ", " + constr + ")", "{}\n{}", exists(SingletonSeq.class));
+
+    // single-entry record (compile-time evaluation)
+    constr = "{ 'AA': 0 }";
+    check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(SingletonSeq.class));
+    // small record (compile-time evaluation)
+    constr = "{ 'AA': 0, 'AB': 1 }";
+    check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(SingletonSeq.class));
+    // big record (compile-time evaluation)
+    constr =
+        "{ 'AA': 0, 'AB': 0, 'AC': 0, 'AD': 0, 'AE': 0, 'AF': 0, 'AG': 0, 'AH': 0, 'AI': 0, "
+        + "'AJ': 0, 'AK': 0, 'AL': 0, 'AM': 0, 'AN': 0, 'AO': 0, 'AP': 0, 'AQ': 0, 'AR': 0, "
+        + "'AS': 0, 'AT': 0, 'AU': 0, 'AV': 0, 'AW': 0, 'AX': 0, 'AY': 0, 'AZ': 0 }";
+    check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(SingletonSeq.class));
+    // map (compile-time evaluation)
+    constr =
+        "{ 'AA': 0, 'AB': 0, 'AC': 0, 'AD': 0, 'AE': 0, 'AF': 0, 'AG': 0, 'AH': 0, 'AI': 0, "
+        + "'AJ': 0, 'AK': 0, 'AL': 0, 'AM': 0, 'AN': 0, 'AO': 0, 'AP': 0, 'AQ': 0, 'AR': 0, "
+        + "'AS': 0, 'AT': 0, 'AU': 0, 'AV': 0, 'AW': 0, 'AX': 0, 'AY': 0, 'AZ': 0, "
+        + "'BA': 0, 'BB': 0, 'BC': 0, 'BD': 0, 'BE': 0, 'BF': 0, 'BG': 0 }";
+    check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(SingletonSeq.class));
+
+    // single-entry record (runtime evaluation)
+    constr = "{ 'AA': <a/> }";
+    check("(" + constr + ", " + constr + ")?AA", "<a/>\n<a/>", exists(REPLICATE));
+    // small record (runtime evaluation)
+    constr = "{ 'AA': 0, 'AB': <a/> }";
+    check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(REPLICATE));
+    // big record (runtime evaluation)
+    constr =
+        "{ 'AA': 0, 'AB': 0, 'AC': 0, 'AD': 0, 'AE': 0, 'AF': 0, 'AG': 0, 'AH': 0, 'AI': 0, "
+        + "'AJ': 0, 'AK': 0, 'AL': 0, 'AM': 0, 'AN': 0, 'AO': 0, 'AP': 0, 'AQ': 0, 'AR': 0, "
+        + "'AS': 0, 'AT': 0, 'AU': 0, 'AV': 0, 'AW': 0, 'AX': 0, 'AY': 0, 'AZ': <a/> }";
+    check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(REPLICATE));
+    // map (runtime evaluation)
+    constr =
+        "{ 'AA': 0, 'AB': 0, 'AC': 0, 'AD': 0, 'AE': 0, 'AF': 0, 'AG': 0, 'AH': 0, 'AI': 0, "
+        + "'AJ': 0, 'AK': 0, 'AL': 0, 'AM': 0, 'AN': 0, 'AO': 0, 'AP': 0, 'AQ': 0, 'AR': 0, "
+        + "'AS': 0, 'AT': 0, 'AU': 0, 'AV': 0, 'AW': 0, 'AX': 0, 'AY': 0, 'AZ': 0, "
+        + "'BA': 0, 'BB': 0, 'BC': 0, 'BD': 0, 'BE': 0, 'BF': 0, 'BG': <a/> }";
+    check("(" + constr + ", " + constr + ")?AA", "0\n0", exists(REPLICATE));
+
+    // named record (runtime evaluation)
+    check("declare record local:r(AA, AB); (local:r(0, <a/>), local:r(0, <a/>))?AA",
+        "0\n0", exists(REPLICATE));
   }
 }
