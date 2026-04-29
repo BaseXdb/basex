@@ -92,8 +92,6 @@ public abstract class Docs extends DynamicFn {
     final Predicate<BooleanOption> bool = o -> options.get(o) == Boolean.TRUE;
     final boolean dtd = bool.test(CommonOptions.DTD) || bool.test(MainOptions.DTD);
     final boolean xinclude = bool.test(CommonOptions.XINCLUDE) || bool.test(MainOptions.XINCLUDE);
-    if(dtd || xinclude) checkPerm(qc, Perm.CREATE);
-
     final boolean intparse = fragment || bool.test(CommonOptions.INTPARSE) ||
         bool.test(MainOptions.INTPARSE);
     final boolean dtdVal = bool.test(CommonOptions.DTD_VALIDATION) ||
@@ -102,6 +100,10 @@ public abstract class Docs extends DynamicFn {
     if(xsdVal == null) xsdVal = options.get(CommonOptions.XSD_VALIDATION);
     final boolean skip = CommonOptions.SKIP.equals(xsdVal);
     final boolean strict = CommonOptions.STRICT.equals(xsdVal);
+    final boolean xsiLocation = !skip &&
+        (bool.test(CommonOptions.USE_XSI_SCHEMA_LOCATION) || bool.test(MainOptions.XSILOCATION));
+    if(dtd || xinclude || dtdVal || xsiLocation) checkPerm(qc, Perm.CREATE);
+
     if(intparse) {
       if(dtdVal) throw NODTDVALIDATION.get(info);
       if(!skip) throw NOXSDVALIDATION_X.get(info, xsdVal);

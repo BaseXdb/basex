@@ -68,7 +68,8 @@ public final class XmlParser {
     final boolean xsiLocation = options.get(MainOptions.XSILOCATION);
     final SAXParserFactory f = SAXParserFactory.newDefaultInstance();
     // setting these options to false will ignore external entities, rather than rejecting them
-    f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", dtd);
+    f.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",
+        dtd || dtdValidation);
     f.setFeature("http://xml.org/sax/features/external-general-entities", dtd);
     f.setFeature("http://xml.org/sax/features/external-parameter-entities", dtd);
     f.setFeature("http://xml.org/sax/features/validation", dtdValidation);

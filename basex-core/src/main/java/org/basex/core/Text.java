@@ -562,6 +562,8 @@ public interface Text {
   String NODES_PARSED_X_X = " \"%\" (" + lang("nodes_parsed_%") + ')';
   /** Scanner position. */
   String SCANPOS_X_X = "\"%\" (" + lang("line") + " %)";
+  /** External resource access blocked. */
+  String EXTACCESS_BLOCKED_X = "External resources not available, call is untrusted: %.";
 
   /** Finish database creation. */
   String FINISHING_D = lang("finishing") + DOTS;

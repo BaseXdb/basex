@@ -74,12 +74,16 @@ public class FnParseXmlFragment extends Docs {
     final IO io = new IOContent(toBytes(value), baseURI, encoding);
 
     final MainOptions mopts = new MainOptions(options);
+    final Boolean trusted = options.get(CommonOptions.TRUSTED);
+    mopts.trusted = trusted != null ? trusted : qc.context.options.get(MainOptions.FNXMLTRUSTED);
     mopts.setResolver(qc.context.options);
     try {
       final boolean ip = fragment || mopts.get(MainOptions.INTPARSE);
       return new DBNode(ip ? new XMLParser(io, mopts, fragment) : Parser.xmlParser(io, mopts));
     } catch(final IOException ex) {
       final Throwable th = ex.getCause();
+      if(th instanceof TrustedViolationException)
+        throw EXTERNALRESOURCE_X.get(info, th.getMessage());
       final QueryException qe = !(th instanceof ValidationException) ? SAXERR_X.get(info, ex) :
         mopts.get(MainOptions.DTDVALIDATION) ? DTDVALIDATIONERR_X.get(info, ex) :
           XSDVALIDATIONERR_X.get(info, ex);
