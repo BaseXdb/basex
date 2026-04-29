@@ -40,9 +40,18 @@ public class FileCopy extends FileFn {
     Path trg = absolute(toPath(arg(1), qc));
 
     // ignore operations on identical, canonical source and target path
-    if(src.equals(trg)) return;
+    if(src.toString().equals(trg.toString())) return;
 
     if(Files.isDirectory(trg)) {
+      if(src.equals(trg)) {
+        // case-insensitive file system: rename directory to different capitalization
+        if(!copy) {
+          final Path tmp = src.resolveSibling(UUID.randomUUID().toString());
+          Files.move(src, tmp);
+          Files.move(tmp, trg);
+        }
+        return;
+      }
       // target is a directory: attach file name
       trg = trg.resolve(src.getFileName());
       if(!Files.isDirectory(src) && Files.isDirectory(trg))

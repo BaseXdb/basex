@@ -338,6 +338,15 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH1, PATH1));
     query(_FILE_EXISTS.args(PATH1), true);
     query(_FILE_DELETE.args(PATH1));
+
+    // rename directory to different capitalization (GH-2652)
+    final String upper = PATH + "X", lower = PATH + "x";
+    query(_FILE_CREATE_DIR.args(upper));
+    query(func.args(upper, lower));
+    final File[] matches = new File(PATH).listFiles(f -> f.getName().equalsIgnoreCase("x"));
+    assertEquals(1, matches.length);
+    assertEquals("x", matches[0].getName());
+    query(_FILE_DELETE.args(lower));
   }
 
   /** Test method. */
