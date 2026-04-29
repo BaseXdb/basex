@@ -885,7 +885,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final boolean equals(final Object obj) {
+  public boolean equals(final Object obj) {
     return this == obj || obj instanceof final StandardFunc sf && definition == sf.definition &&
         super.equals(obj);
   }
@@ -917,7 +917,7 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final void toString(final QueryString qs) {
+  public void toString(final QueryString qs) {
     final byte[] name = definition.name.prefixId(FN_URI);
     final int undefined = undefined();
     if(undefined == 0) {

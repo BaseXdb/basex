@@ -67,7 +67,7 @@ public final class CMap extends Arr {
     }
 
     // not too large, only strings as keys? replace with record constructor
-    boolean record = el <= RecordType.MAX_GENERATED_SIZE;
+    boolean record = el / 2 <= RecordType.MAX_GENERATED_SIZE;
     for(int e = 0; e < el && record; e += 2) {
       if(nested(e) || !(exprs[e] instanceof AStr && exprs[e].seqType().eq(Types.STRING_O))) {
         record = false;
