@@ -134,6 +134,13 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH2, PATH2));
     query(_FILE_SIZE.args(PATH1), 1);
     query(_FILE_SIZE.args(PATH2), 1);
+
+    // same source and target directory (GH-2652)
+    query(_FILE_DELETE.args(PATH1));
+    query(_FILE_CREATE_DIR.args(PATH1));
+    query(func.args(PATH1, PATH1));
+    query(_FILE_EXISTS.args(PATH1), true);
+    query(_FILE_DELETE.args(PATH1));
   }
 
   /** Test method. */
@@ -324,6 +331,13 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH + "../" + NAME + '/' + NAME, PATH1));
     query(_FILE_SIZE.args(PATH1), 1);
     query(_FILE_EXISTS.args(PATH2), false);
+
+    // same source and target directory (GH-2652)
+    query(_FILE_DELETE.args(PATH1));
+    query(_FILE_CREATE_DIR.args(PATH1));
+    query(func.args(PATH1, PATH1));
+    query(_FILE_EXISTS.args(PATH1), true);
+    query(_FILE_DELETE.args(PATH1));
   }
 
   /** Test method. */

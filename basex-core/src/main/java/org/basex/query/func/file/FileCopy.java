@@ -39,6 +39,9 @@ public class FileCopy extends FileFn {
     final Path src = absolute(source);
     Path trg = absolute(toPath(arg(1), qc));
 
+    // ignore operations on identical, canonical source and target path
+    if(src.equals(trg)) return;
+
     if(Files.isDirectory(trg)) {
       // target is a directory: attach file name
       trg = trg.resolve(src.getFileName());
@@ -49,7 +52,6 @@ public class FileCopy extends FileFn {
       throw FILE_IS_DIR_X.get(info, src.toAbsolutePath());
     }
 
-    // ignore operations on identical, canonical source and target path
     relocate(src, trg, copy, qc);
   }
 
