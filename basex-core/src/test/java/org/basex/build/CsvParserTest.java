@@ -138,4 +138,26 @@ public final class CsvParserTest extends SandboxTest {
     execute(new CreateDB(NAME, FILE));
     assertEquals("true", query("exists(//entry[@name = 'Name'])"));
   }
+
+  /**
+   * CSV Parsing: empty lines #2653.
+   */
+  @Test public void gh2653() {
+    write(new IOFile(TEMP), "");
+    execute(new CreateDB(NAME, TEMP));
+    query(".", "<csv/>");
+
+    write(new IOFile(TEMP), "\n");
+    execute(new CreateDB(NAME, TEMP));
+    query(".", "<csv><record/></csv>");
+
+    write(new IOFile(TEMP), "\n\n");
+    execute(new CreateDB(NAME, TEMP));
+    query(".", "<csv><record/><record/></csv>");
+
+    write(new IOFile(TEMP), "X\n\nY\n");
+    execute(new CreateDB(NAME, TEMP));
+    query(".", "<csv><record><entry>X</entry></record><record/><record><entry>Y</entry></record></c"
+        + "sv>");
+  }
 }
