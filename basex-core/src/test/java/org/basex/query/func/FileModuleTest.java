@@ -141,6 +141,11 @@ public final class FileModuleTest extends SandboxTest {
     query(func.args(PATH1, PATH1));
     query(_FILE_EXISTS.args(PATH1), true);
     query(_FILE_DELETE.args(PATH1));
+
+    // reject targets located inside the source directory
+    query(_FILE_CREATE_DIR.args(PATH3));
+    error(func.args(PATH1, PATH3), FILE_CYCLIC_X_X);
+    error(func.args(PATH1, PATH1 + "/new"), FILE_CYCLIC_X_X);
   }
 
   /** Test method. */
@@ -347,6 +352,11 @@ public final class FileModuleTest extends SandboxTest {
     assertEquals(1, matches.length);
     assertEquals("x", matches[0].getName());
     query(_FILE_DELETE.args(lower));
+
+    // reject targets located inside the source directory
+    query(_FILE_CREATE_DIR.args(PATH3));
+    error(func.args(PATH1, PATH3), FILE_CYCLIC_X_X);
+    error(func.args(PATH1, PATH1 + "/new"), FILE_CYCLIC_X_X);
   }
 
   /** Test method. */

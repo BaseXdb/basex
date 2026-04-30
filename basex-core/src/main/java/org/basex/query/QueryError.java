@@ -273,6 +273,8 @@ public enum QueryError {
   /** Error code. */
   FILE_IS_DIR2_X(FILE, "is-dir", "'%' is a non-empty directory."),
   /** Error code. */
+  FILE_CYCLIC_X_X(FILE, "cyclic", "Target '%' is located inside source '%'."),
+  /** Error code. */
   FILE_IS_RELATIVE_X(FILE, "is-relative", "Base directory is relative: '%'."),
   /** Error code. */
   FILE_UNKNOWN_ENCODING_X(FILE, "unknown-encoding", "%"),
