@@ -36,6 +36,8 @@ public final class CsvModuleTest extends SandboxTest {
     parse(" '\"X\",Y'", "", "...<entry>X</entry><entry>Y</entry>");
 
     parse("X;Y", "'separator': ';'", "...<entry>X</entry><entry>Y</entry>");
+    parse("X\tY", "'separator': '\t'", "...<entry>X</entry><entry>Y</entry>");
+    parse("X\tY", "'separator': '\\t'", "...<entry>X</entry><entry>Y</entry>");
     parse("X,Y", "", "...<entry>X</entry><entry>Y</entry>");
 
     final String header = "'header': true()", skipEmpty = "'skip-empty': true()";
@@ -176,6 +178,8 @@ public final class CsvModuleTest extends SandboxTest {
     serial("<csv><record><entry>A</entry></record></csv>", "'header': 'yes'", "entry\nA\n");
     serial("<csv><record><entry>A</entry><entry>B</entry></record></csv>", "", "A,B\n");
     serial("<csv><record><_>A</_><_>B</_></record></csv>", "'separator': ';'", "A;B\n");
+    serial("<csv><record><_>A</_><_>B</_></record></csv>", "'separator': '\t'", "A\tB\n");
+    serial("<csv><record><_>A</_><_>B</_></record></csv>", "'separator': '\\t'", "A\tB\n");
     serial("<csv><record><_>A</_><_/><_>B</_></record></csv>", "", "A,,B\n");
     serial("<csv><record><_>A</_><_><X>X</X></_></record></csv>", "", "A\n");
 

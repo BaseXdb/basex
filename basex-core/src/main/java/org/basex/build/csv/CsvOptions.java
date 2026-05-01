@@ -118,7 +118,7 @@ public class CsvOptions extends Options {
 
   /**
    * Returns the separator character or {@code -1} if character is invalid.
-   * @return separator
+   * @return field delimiter
    */
   public int fieldDelimiter() {
     String sep = get(FIELD_DELIMITER);
@@ -132,7 +132,7 @@ public class CsvOptions extends Options {
 
   /**
    * Returns the row delimiter character or {@code -1} if character is invalid.
-   * @return separator
+   * @return row delimiter
    */
   public int rowDelimiter() {
     return checkCodepoint(get(ROW_DELIMITER));
@@ -140,23 +140,32 @@ public class CsvOptions extends Options {
 
   /**
    * Returns the quote character or {@code -1} if character is invalid.
-   * @return separator
+   * @return quote character
    */
   public int quoteCharacter() {
     return checkCodepoint(get(QUOTE_CHARACTER));
   }
 
   /**
-   * Validates a single code point passed as a string.
-   * @param single single character string
-   * @return code point or {@code -1}
+   * Validates a single codepoint passed as a string.
+   * @param string string to be checked
+   * @return codepoint or {@code -1}
    */
-  private static int checkCodepoint(final String single) {
-    if(single.codePointCount(0, single.length()) == 1) {
-      final int cp = single.codePointAt(0);
-      if(XMLToken.valid(cp)) return cp;
-    }
-    return -1;
+  private static int checkCodepoint(final String string) {
+    return switch(string) {
+      case "\\b" -> '\b';
+      case "\\f" -> '\f';
+      case "\\n" -> '\n';
+      case "\\r" -> '\r';
+      case "\\t" -> '\t';
+      default -> {
+        if(string.codePointCount(0, string.length()) == 1) {
+          final int cp = string.codePointAt(0);
+          if(XMLToken.valid(cp)) yield cp;
+        }
+        yield -1;
+      }
+    };
   }
 
   /**
