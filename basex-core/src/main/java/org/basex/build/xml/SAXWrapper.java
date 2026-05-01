@@ -54,7 +54,17 @@ public final class SAXWrapper extends SingleParser {
       if(reader == null) {
         reader = XmlParser.reader(options);
       }
-      if(reader.getEntityResolver() == null) {
+      final boolean trusted = options.trusted;
+      final boolean dtd = options.get(MainOptions.DTD);
+      final boolean dtdValidation = options.get(MainOptions.DTDVALIDATION);
+      if(!trusted && options.get(MainOptions.XINCLUDE))
+        throw new TrustedViolationException("xinclude");
+      if(!trusted && (dtd || dtdValidation)) {
+        // Block all external resource access: raises FODC0016 via TrustedViolationException
+        reader.setEntityResolver((pubId, sysId) -> {
+          throw new TrustedViolationException(sysId != null ? sysId : pubId != null ? pubId : "");
+        });
+      } else if(reader.getEntityResolver() == null) {
         final EntityResolver er = options.resolver().entityResolver();
         if(er != null) reader.setEntityResolver(er);
       }
@@ -73,6 +83,8 @@ public final class SAXWrapper extends SingleParser {
       final String msg = Util.info(SCANPOS_X_X, source.path(), spex.getLineNumber(),
           spex.getColumnNumber()) + COLS + Util.message(spex);
       throw new IOException(msg, ex);
+    } catch(final TrustedViolationException ex) {
+      throw new IOException(Util.info(EXTACCESS_BLOCKED_X, ex.getMessage()), ex);
     } catch(final JobException ex) {
       throw ex;
     } catch(final Exception ex) {

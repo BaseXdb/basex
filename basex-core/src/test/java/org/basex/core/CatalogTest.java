@@ -104,7 +104,7 @@ public final class CatalogTest extends SandboxTest {
     final Function func = DOC;
 
     set(MainOptions.CATALOG, CATALOG);
-    query(func.args("http://doc.xml", " { 'dtd': true() }"), "<doc>X</doc>");
+    query(func.args("http://doc.xml", " { 'dtd': true(), 'trusted': true() }"), "<doc>X</doc>");
     query(func.args("http://doc.xml", " { 'dtd': false() }"), "<doc/>");
   }
 
@@ -114,7 +114,7 @@ public final class CatalogTest extends SandboxTest {
 
     set(MainOptions.CATALOG, CATALOG);
     query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
-        " { 'dtd': true() }"), "<doc>X</doc>");
+        " { 'dtd': true(), 'trusted': true() }"), "<doc>X</doc>");
     query(func.args("<!DOCTYPE xml SYSTEM 'http://dtd.dtd'><doc>&amp;x;</doc>",
         " { 'dtd': 'no' }"), "<doc/>");
   }

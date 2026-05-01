@@ -70,6 +70,8 @@ public final class MainOptions extends Options {
       CommonOptions.SKIP);
   /** Flag for handling xsi:schemaLocation and xsi:noNamespaceSchemaLocation attributes. */
   public static final BooleanOption XSILOCATION = new BooleanOption("XSILOCATION", true);
+  /** Default value for the fn-level XML parser 'trusted' option (fn:doc, fn:parse-xml, etc.). */
+  public static final BooleanOption FNXMLTRUSTED = new BooleanOption("FNXMLTRUSTED", true);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", false);
   /** Path to XML Catalog files. */
@@ -189,6 +191,9 @@ public final class MainOptions extends Options {
 
   // Other
 
+  /** Whether external resources may be accessed. Derived from context, not user-configurable. */
+  public boolean trusted = true;
+
   /** Indexing options. */
   public static final Option<?>[] INDEXING = { MAXCATS, MAXLEN, SPLITSIZE, LANGUAGE, STOPWORDS,
     TEXTINDEX, ATTRINDEX, TOKENINDEX, FTINDEX, TEXTINCLUDE, ATTRINCLUDE, TOKENINCLUDE, FTINCLUDE,
@@ -203,7 +208,7 @@ public final class MainOptions extends Options {
     XMLPARSINGMAP.put(CommonOptions.DTD, DTD);
     XMLPARSINGMAP.put(CommonOptions.DTD_VALIDATION, DTDVALIDATION);
     XMLPARSINGMAP.put(CommonOptions.XSD_VALIDATION, XSDVALIDATION);
-    XMLPARSINGMAP.put(CommonOptions.XSI_SCHEMA_LOCATION, XSILOCATION);
+    XMLPARSINGMAP.put(CommonOptions.USE_XSI_SCHEMA_LOCATION, XSILOCATION);
     XMLPARSINGMAP.put(CommonOptions.XINCLUDE, XINCLUDE);
     XMLPARSINGMAP.put(CommonOptions.CATALOG, CATALOG);
   }

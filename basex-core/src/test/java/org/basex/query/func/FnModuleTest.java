@@ -878,14 +878,39 @@ public final class FnModuleTest extends SandboxTest {
     final String doc2 = write.apply("doc2.xml",
         "<root2 xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
         + "xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
-    query(func.args(doc1, " { 'xsd-validation': 'strict', 'xsi-schema-location': true() }"),
+    query(func.args(doc1, " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(),"
+        + " 'trusted': true() }"),
         "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
         + "xsi:noNamespaceSchemaLocation=\"schema.xsd\"/>");
+    error(func.args(doc1, " { 'xsd-validation': 'strict', 'use-xsi-schema-location': false(),"
+        + " 'trusted': true() }"), IOERR_X);
+    error(func.args(doc2, " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(),"
+        + " 'trusted': true() }"), XSDVALIDATIONERR_X);
+    error(func.args(doc1, " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(),"
+        + " 'trusted': false()  }"),
+        EXTERNALRESOURCE_X);
+    error("xquery:eval(``[" + func.args(doc2, " { 'xsd-validation': 'strict', 'use-xsi-schema-locat"
+        + "ion': true(), 'trusted': true() }") + "]``, (), {'permission': 'write'})",
+        XQUERY_PERM_X);
 
-    error(func.args(doc1, " { 'xsd-validation': 'strict', 'xsi-schema-location': false() }"),
-        IOERR_X);
-    error(func.args(doc2, " { 'xsd-validation': 'strict', 'xsi-schema-location': true() }"),
-        XSDVALIDATIONERR_X);
+    final String docWithExtDtd = write.apply("ext-dtd.xml",
+        "<!DOCTYPE root SYSTEM 'validate.dtd'><root/>");
+    write.apply("validate.dtd", "<!ELEMENT root (#PCDATA)>");
+    query(func.args(docWithExtDtd, " { 'dtd-validation': 'yes', 'trusted': true() }"), "<root/>");
+    error(func.args(docWithExtDtd, " { 'dtd-validation': 'yes', 'trusted': false() }"),
+        EXTERNALRESOURCE_X);
+    error("xquery:eval(``[" + func.args(docWithExtDtd, " { 'dtd-validation': 'yes', 'trusted': true"
+        + "() }") + "]``, (), {'permission': 'read'})", XQUERY_PERM_X);
+
+    final String xincDoc = write.apply("xinclude.xml",
+        "<?xml version='1.0'?>"
+        + "<root xmlns:xi='http://www.w3.org/2001/XInclude'>"
+        + "<xi:include href='doc1.xml'/></root>");
+    query("exists(" + func.args(xincDoc, " { 'xinclude': true(), 'trusted': true() }")
+        + "/root/root)", true);
+    error(func.args(xincDoc, " { 'xinclude': true(), 'trusted': false() }"), EXTERNALRESOURCE_X);
+    error("xquery:eval(``[exists(" + func.args(xincDoc, " { 'xinclude': true(), 'trusted': true() }"
+        ) + "/root/root)" + "]``, (), {'permission': 'none'})", XQUERY_PERM_X);
   }
 
   /** Test method. */
@@ -896,6 +921,12 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args("/"), false);
     query(func.args("/a/b/c/d/e"), false);
     query(func.args(DOC, " {}"), true);
+    query(func.args(DOC, " { 'xinclude': true(), 'trusted': true() }"), true);
+    query(func.args(DOC, " { 'xinclude': true(), 'trusted': false() }"), false);
+    query(func.args(DOC, " { 'use-xsi-schema-location': true(), 'trusted': true() }"), true);
+    query(func.args(DOC, " { 'use-xsi-schema-location': true(), 'trusted': false() }"), true);
+    query(func.args(DOC, " { 'use-xsi-schema-location': true(), 'trusted': false(), "
+        + "'xsd-validation': 'strict' }"), false);
   }
 
   /**
@@ -2727,32 +2758,49 @@ return
         + "<!ELEMENT a (#PCDATA | b)*>"
         + "<!ELEMENT b EMPTY>"
         + "<!ENTITY e SYSTEM '" + path + "'>]>";
-    query(func.args(dtd + "<a>&amp;e;</a>"), "<a><b/></a>");
+    error(func.args(dtd + "<a>&amp;e;</a>", " { 'trusted': false() }"), EXTERNALRESOURCE_X);
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'trusted': true() }"), "<a><b/></a>");
     query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': 'no' }"), "<a/>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': 'yes' }"), "<a><b/></a>");
-    query(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd': 'yes' }"), "<b><b/></b>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd': 'yes', 'trusted': true() }"), "<a><b/></a>");
+    query(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd': 'yes', 'trusted': true() }"), "<b><b/></b>");
     query(func.args(dtd + "<a><b/></a>", " { 'dtd-validation': 'yes' }"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'no' }"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes' }"), "<a><b/></a>");
-    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes', 'dtd': 'yes' }"),
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'no', 'trusted': true() }"),
         "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes', 'trusted': true() }"),
+        "<a><b/></a>");
+    query(func.args(dtd + "<a>&amp;e;</a>", " { 'dtd-validation': 'yes', 'dtd': 'yes', 'trusted': "
+        + "true() }"), "<a><b/></a>");
+    error(func.args("<!DOCTYPE root SYSTEM 'src/test/resources/validate.dtd'><root/>",
+        " { 'dtd-validation': 'yes', 'trusted': false() }"), EXTERNALRESOURCE_X);
+    query(func.args("<!DOCTYPE root SYSTEM 'src/test/resources/validate.dtd'><root/>",
+        " { 'dtd-validation': 'yes', 'trusted': true() }"), "<root/>");
     query(func.args("<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
-        " { 'xsd-validation': 'strict' }"),
+        " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(), 'trusted': true() }"),
         "<root xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
         + "xsi:noNamespaceSchemaLocation=\"src/test/resources/validate.xsd\"/>");
 
     query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
         + "'/></a>", " { 'xinclude': 'no' }"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
         + "<xi:include href=\"" + path + "\"/></a>");
+    error(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
+        + "'/></a>", " { 'xinclude': true(), 'trusted': false() }"), EXTERNALRESOURCE_X);
     query(func.args("<a xmlns:xi='http://www.w3.org/2001/XInclude'><xi:include href='" + path
-        + "'/></a>", " { 'xinclude': 'yes' }"), "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
+        + "'/></a>", " { 'xinclude': true(), 'trusted': true() }"),
+        "<a xmlns:xi=\"http://www.w3.org/2001/XInclude\">"
         + "<b xml:base=\"src/test/resources/parse-xml.entity\"/></a>");
 
-    error(func.args(dtd + "<b>&amp;e;</b>", " { 'dtd-validation': 'yes' }"), DTDVALIDATIONERR_X);
+    error(func.args("<root xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
+        + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
+        " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(), 'trusted': false() }"),
+        EXTERNALRESOURCE_X);
+
+    error(func.args(dtd + "<b>&amp;e;</b>",
+        " { 'dtd-validation': 'yes', 'trusted': true() }"), DTDVALIDATIONERR_X);
     error(func.args("<a xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
         + "xsi:noNamespaceSchemaLocation='src/test/resources/validate.xsd'/>",
-        " { 'xsd-validation': 'strict' }"), XSDVALIDATIONERR_X);
+        " { 'xsd-validation': 'strict', 'use-xsi-schema-location': true(),"
+        + " 'trusted': true() }"), XSDVALIDATIONERR_X);
     error(func.args("<a/>", " { 'catalog': 'catalog.xml' }"), INVALIDOPTION_X);
   }
 
