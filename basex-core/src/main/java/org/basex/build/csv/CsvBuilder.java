@@ -25,6 +25,8 @@ final class CsvBuilder extends CsvConverter {
   private final Builder builder;
   /** Current line. */
   private int line;
+  /** Record element is open. */
+  private boolean elemOpen;
 
   /**
    * Constructor.
@@ -42,6 +44,7 @@ final class CsvBuilder extends CsvConverter {
   public void record() throws IOException {
     finishRecord();
     builder.openElem(Q_RECORD.string(), atts, nsp);
+    elemOpen = true;
     col = -1;
     line++;
   }
@@ -98,6 +101,9 @@ final class CsvBuilder extends CsvConverter {
    * @throws IOException I/O exception
    */
   private void finishRecord() throws IOException {
-    if(col >= 0) builder.closeElem();
+    if(elemOpen) {
+      builder.closeElem();
+      elemOpen = false;
+    }
   }
 }
