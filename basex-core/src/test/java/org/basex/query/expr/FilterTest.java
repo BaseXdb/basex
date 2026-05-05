@@ -282,14 +282,48 @@ public final class FilterTest extends SandboxTest {
   /** Variable predicates. */
   @Test public void variablePreds() {
     // empty sequence
-    query("for $i in (1, 'a', 2) return <a b='{ $i }'/>[$i]", "<a b=\"1\"/>\n<a b=\"a\"/>");
-    query("for $i in (1, 'a', 2) return <a b='{ $i }'/>"
+    check("for $i in (1, 'a', 2) return <a b='{ $i }'/>[$i]",
+        "<a b=\"1\"/>\n<a b=\"a\"/>",
+        exists(HoistedFilter.class));
+    check("for $i in (1, 'a', 2) return <a b='{ $i }'/>"
         + "[<b c='{" + _RANDOM_INTEGER.args() + " }'/>][$i]",
-        "<a b=\"1\"/>\n<a b=\"a\"/>");
-    query("for $i in (1, 'a', 2) return "
+        "<a b=\"1\"/>\n<a b=\"a\"/>",
+        exists(CachedFilter.class));
+    check("for $i in (1, 'a', 2) return "
         + "<a b='{ $i }'/>[<a b='{" + _RANDOM_INTEGER.args() + " }'/>]"
             + "[<b c='{" + _RANDOM_INTEGER.args() + " }'/>][$i]",
-        "<a b=\"1\"/>\n<a b=\"a\"/>");
+        "<a b=\"1\"/>\n<a b=\"a\"/>",
+        exists(CachedFilter.class));
+  }
+
+  /** Hoisted filter: loop-invariant predicates evaluated once per filter call. */
+  @Test public void hoistedFilter() {
+    // single predicate, mixed type
+    check("for $i in (1, 'x', 2, '') return ('a', 'b', 'c')[$i]",
+        "a\na\nb\nc\nb",
+        exists(HoistedFilter.class));
+    check("for $i in (1, <a/>) return ('a', 'b')[$i]",
+        "a\na\nb",
+        exists(HoistedFilter.class));
+    // single predicate, mixed type, out-of-range values
+    check("for $i in (-1, 0, 1.5, 4, 'x') return ('a', 'b')[$i]",
+        "a\nb",
+        exists(HoistedFilter.class));
+    // empty predicate value at runtime
+    check("for $i in (1, 'a', 2) return ('A', 'B', 'C')[if(string($i) = 'a') then () else $i]",
+        "A\nB",
+        exists(HoistedFilter.class));
+    // multiple predicates
+    check("for $i in (1, 'x'), $j in (1, 'y') return ('a', 'b', 'c')[$i][$j]",
+        "a\na\na\na\nb\nc",
+        exists(HoistedFilter.class));
+    check("for $i in (1, 'x'), $j in (4, 'y') return ('a', 'b')[$i][$j]",
+        "a\na\nb",
+        exists(HoistedFilter.class));
+    // predicate yielding a sequence
+    check("for $i in 1 to 2 return ('a', 'b', 'c')[<a/>, $i]",
+        "a\nb\nc\na\nb\nc",
+        exists(HoistedFilter.class));
   }
 
   /** Positional access, rewritings. */

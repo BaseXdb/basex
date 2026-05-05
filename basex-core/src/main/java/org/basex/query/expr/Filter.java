@@ -103,6 +103,12 @@ public abstract class Filter extends AFilter {
       return copyType(new IterFilter(info, root, exprs));
     }
 
+    // rewrite loop-invariant predicates
+    // example: for $i in (1, 'a') return $seq[$i]
+    if(((Checks<Expr>) expr -> expr.isSimple()).all(exprs)) {
+      return copyType(new HoistedFilter(info, root, exprs));
+    }
+
     // rewrite positional predicates
     Expr expr = root;
     boolean opt = false;
@@ -174,8 +180,10 @@ public abstract class Filter extends AFilter {
       }
     }
     // return optimized or filter expression
-    return opt ? cc.replaceWith(this, add.apply(expr)) :
-      copyType(new CachedFilter(info, root, exprs));
+    if(opt) return cc.replaceWith(this, add.apply(expr));
+
+    // return fallback expression
+    return copyType(new CachedFilter(info, root, exprs));
   }
 
   @Override
