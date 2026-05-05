@@ -48,16 +48,16 @@ public final class MapBuild extends MapMerge {
     final SeqType st = input.seqType(), s1t = st.with(Occ.EXACTLY_ONE);
     if(st.zero()) return cc.voidAndReturn(input, XQMap.empty(), info);
 
-    final boolean noKey = keys.size() == 0, fiKey = keys instanceof FuncItem;
-    Type kt = noKey || fiKey ? s1t.type : BasicType.ITEM;
+    final boolean fiKey = keys instanceof FuncItem || keys instanceof Closure;
+    Type kt = fiKey || keys.size() == 0 ? s1t.type : BasicType.ITEM;
     if(fiKey) {
       arg(1, arg -> refineFunc(arg, cc, s1t));
       kt = arg(1).funcType().declType.type;
     }
     kt = kt.atomic();
 
-    final boolean noValue = value.size() == 0, fiValue = value instanceof FuncItem;
-    SeqType vt = noValue || fiValue ? s1t : Types.ITEM_ZM;
+    final boolean fiValue = value instanceof FuncItem || value instanceof Closure;
+    SeqType vt = fiValue || value.size() == 0 ? s1t : Types.ITEM_ZM;
     if(fiValue) {
       arg(2, arg -> refineFunc(arg, cc, s1t));
       vt = arg(2).funcType().declType;

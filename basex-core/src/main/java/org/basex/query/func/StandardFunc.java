@@ -292,7 +292,8 @@ public abstract class StandardFunc extends Arr {
    */
   public static Expr refineFunc(final Expr expr, final CompileContext cc, final SeqType... argTypes)
       throws QueryException {
-    return expr instanceof final FuncItem fi ? fi.refine(argTypes, cc) : expr;
+    return expr instanceof final FuncItem fi ? fi.refine(argTypes, cc) :
+           expr instanceof final Closure cl ? cl.refine(argTypes, cc) : expr;
   }
 
   /**

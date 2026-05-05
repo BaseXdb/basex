@@ -50,10 +50,11 @@ public final class FnPartition extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr input = arg(0);
+    final Expr input = arg(0), splitWhen = arg(1);
     final SeqType st = input.seqType();
     if(st.zero()) return input;
-    if(st.one() && arg(1) instanceof FuncItem) {
+    if(st.one() && splitWhen.funcType() != null) {
+      // partition(1, fn() { 'whatever' }) → util:array-member(1)
       return cc.function(_UTIL_ARRAY_MEMBER, info, input);
     }
 

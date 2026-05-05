@@ -39,7 +39,7 @@ public final class FnGenerate extends StandardFunc {
     SeqType st = init.seqType();
     if(st.zero()) return init;
 
-    if(step instanceof FuncItem && st.one()) {
+    if((step instanceof FuncItem || step instanceof Closure) && st.one()) {
       SeqType ost;
       do {
         final SeqType[] types = { st, Types.INTEGER_O };

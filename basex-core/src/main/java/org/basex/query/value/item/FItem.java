@@ -76,12 +76,14 @@ public abstract class FItem extends Item implements XQFunction {
   public FItem coerceTo(final FuncType ft, final QueryContext qc, final CompileContext cc,
       final InputInfo ii) throws QueryException {
 
-    final InputInfo info = info(ii);
     final SeqType[] argTypes = ft.argTypes;
+    if(argTypes == null) return this;
+
+    final InputInfo info = info(ii);
     final int arity = arity(), nargs = argTypes.length;
     if(nargs < arity) throw arityError(this, arity, nargs, false, info);
 
-    // optimize: continue with coercion if current type is only an instance of new type
+    // optimize: skip coercion if current type equals new type
     if(type.eq(ft)) return this;
 
     // create new compilation context and variable scope
@@ -106,7 +108,7 @@ public abstract class FItem extends Item implements XQFunction {
       // add type check if return types differ
       final SeqType dt = ft.declType;
       FuncType tp = funcType();
-      if(!tp.declType.instanceOf(dt)) {
+      if(!body.seqType().instanceOf(dt)) {
         body = new TypeCheck(info, body, dt);
         if(cc != null) body = body.optimize(cc);
       }

@@ -971,6 +971,11 @@ public final class FnModuleTest extends SandboxTest {
         " fn($x, $p) { $p = 1 }") + ')', 2);
     error("head(" + func.args(" (1, 2)", " fn($s as xs:integer) { $s[2], 1 }",
         " fn($x, $p) { $p = 1 }") + ')', INVTYPE_X);
+
+    // closure
+    check("for $a in (1 to 2)[. > 0] return " +
+        func.args(" $a", " fn($x) { (1 to 100)[$x + $a] }", " fn($x) { $x ge 5 }"),
+        "5\n6", exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
   }
 
   /** Test method. */
@@ -1170,6 +1175,11 @@ public final class FnModuleTest extends SandboxTest {
         "}"), 1,
         type(func, "xs:decimal"));
 
+    // closure
+    check("for $a in (1 to 2)[. > 0] return " +
+        func.args(" 1 to 6", 0, " fn($_, $b) { (1 to 100)[$a + $b] }"),
+        "7\n8", exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
+
     // type inference
     inline(true);
     check(func.args(" (1, 2)[. = 1]", " ()", " function($r, $a) { $r, $a }"), 1,
@@ -1223,6 +1233,11 @@ public final class FnModuleTest extends SandboxTest {
     // should not be unrolled
     check(func.args(" 0 to 5", 10, " function($a, $b) { $a + $b }"), 25,
         exists(func));
+
+    // closure
+    check("for $a in (1 to 2)[. > 0] return " +
+        func.args(" 1 to 6", 0, " fn($_, $b) { (1 to 100)[$a + $b] }"),
+        "6\n12", exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
 
     // should be unrolled and evaluated at compile time
     unroll(true);
@@ -1499,6 +1514,12 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(init, step) + "=>" + DISTINCT_VALUES.args(), init);
     query("'" + init + "' = " + func.args(init, step), true);
     query("'x'[. = " + func.args(init, step) + ']', "x");
+
+    // closure
+    check("for $a in (1 to 2)[. > 0] return subsequence(" +
+        func.args(1, " fn($x) { (1 to 100)[$a + $x] }") + ", 1, 5)",
+        "1\n2\n3\n4\n5\n1\n3\n5\n7\n9",
+        exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
   }
 
   /** Test method. */
@@ -3399,6 +3420,12 @@ return
     check(func.args(" ()"), "", empty());
     check(func.args(1), 1, empty(func));
 
+    // closure
+    check("for $a in (1 to 2)[. > 0] return " +
+        func.args(" 1 to 6", " ()", " fn($x) { (1 to 100)[$a + $x] }"),
+        "1\n2\n3\n4\n5\n6\n1\n2\n3\n4\n5\n6",
+        exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
+
     check(func.args(" 1 to 100000000") + "[1]", 1, empty(func));
     check(func.args(" reverse(1 to 100000000)") + "[1]", 1, empty(func));
     check(func.args(" (1 to 100000000) ! 1") + "[1]", 1, empty(func));
@@ -3856,6 +3883,12 @@ return
     final Function func = TAKE_WHILE;
 
     query(func.args(" <x><a/><a/><c/></x>/*", " fn($n) { boolean($n/self::a) }"), "<a/>\n<a/>");
+
+    // closure
+    check("for $a in (1 to 2)[. > 0] return " +
+        func.args(" 1 to 6", " fn($x) { exists((1 to 100)[$a + $x]) }"),
+        "1\n2\n3\n4\n5\n6\n1\n2\n3\n4\n5\n6",
+        exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
   }
 
   /** Test method. */
@@ -4080,6 +4113,11 @@ return
         " fn($s as xs:integer+) { $s[2], $s[1] }") + ')', 2);
     error("head(" + func.args(" (1, 2)", " fn($x, $p) { $p < 2 }",
         " fn($s as xs:integer) { $s[2], 1 }") + ')', INVTYPE_X);
+
+    // closure
+    check("for $a in (1 to 2)[. > 0] return " +
+        func.args(" $a", " fn($x) { $x < 5 }", " fn($x) { (1 to 100)[$x + $a] }"),
+        "5\n6", exists(ITEMS_AT), empty(HoistedFilter.class), empty(CachedFilter.class));
   }
 
   /** Test method. */

@@ -111,8 +111,8 @@ public final class FuncType extends FType {
   @Override
   public FItem cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
-    if(!(item instanceof final FItem func)) throw typeError(item, this, info);
-    return this == FUNCTION ? func : func.coerceTo(this, qc, null, info);
+    if(item instanceof final FItem func) return func.coerceTo(this, qc, null, info);
+    throw typeError(item, this, info);
   }
 
   @Override

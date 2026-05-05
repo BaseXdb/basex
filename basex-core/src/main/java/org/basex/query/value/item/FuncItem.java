@@ -10,6 +10,7 @@ import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.gflwor.*;
+import org.basex.query.func.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -309,6 +310,7 @@ public final class FuncItem extends FItem implements Scope {
    * @param cc compilation context
    * @return original or refined function item
    * @throws QueryException query context
+   * @see Closure#refine(SeqType[], CompileContext)
    */
   public FuncItem refine(final SeqType[] argTypes, final CompileContext cc) throws QueryException {
     // skip refinement if function has too many parameters

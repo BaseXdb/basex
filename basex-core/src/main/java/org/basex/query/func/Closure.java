@@ -232,6 +232,36 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     return all;
   }
 
+  /**
+   * Returns a copy of this closure with refined parameter types.
+   * @param argTypes argument types
+   * @param cc compilation context
+   * @return original or refined closure
+   * @throws QueryException query exception
+   * @see FuncItem#refine(SeqType[], CompileContext)
+   */
+  public Expr refine(final SeqType[] argTypes, final CompileContext cc) throws QueryException {
+    // skip refinement if function has too many parameters
+    final int arity = arity();
+    if(argTypes.length < arity) return this;
+
+    // skip if no parameter type can be narrowed
+    boolean narrow = false;
+    for(int a = 0; a < arity; a++) {
+      final SeqType at = argTypes[a], pt = params[a].seqType();
+      if(at.instanceOf(pt) && !at.eq(pt)) {
+        narrow = true;
+        break;
+      }
+    }
+    if(!narrow) return this;
+
+    // clone the closure, narrow the cloned params, re-compile the body
+    final Closure copy = (Closure) copy(cc, new IntObjectMap<>());
+    for(int a = 0; a < arity; a++) copy.params[a].refineType(argTypes[a], cc);
+    return copy.optimize(cc);
+  }
+
   @Override
   public Expr inline(final InlineContext ic) throws QueryException {
     boolean changed = false;

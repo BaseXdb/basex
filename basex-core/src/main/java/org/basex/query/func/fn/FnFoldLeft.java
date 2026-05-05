@@ -108,13 +108,12 @@ public class FnFoldLeft extends StandardFunc {
     if(array ? input == XQArray.empty() : ist.zero()) return init;
 
     final SeqType zst = init.seqType();
-    if(action instanceof final FuncItem fiAction) {
-      if(exitOrAction == null) {
-        final Object fold = fiAction.fold(input, init, left, array, cc);
-        if(fold instanceof final Expr expr) return expr;
-        if(fold instanceof final FuncItem[] fi) exitOrAction = fi;
-      }
-
+    if(action instanceof final FuncItem fiAction && exitOrAction == null) {
+      final Object fold = fiAction.fold(input, init, left, array, cc);
+      if(fold instanceof final Expr expr) return expr;
+      if(fold instanceof final FuncItem[] fi) exitOrAction = fi;
+    }
+    if(action instanceof FuncItem || action instanceof Closure) {
       final SeqType i1t = array ? ist.type instanceof final ArrayType at ? at.valueType() :
         Types.ITEM_O : ist.with(Occ.EXACTLY_ONE);
       SeqType st = zst, ost;
