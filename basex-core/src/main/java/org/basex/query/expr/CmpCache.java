@@ -6,7 +6,10 @@ import org.basex.query.value.*;
 import org.basex.util.*;
 
 /**
- * Cached items.
+ * Hash cache for {@link CmpHashG} general comparisons. Items of the right-hand operand are added
+ * to a hash set on demand and reused across consecutive evaluations of the same expression.
+ * Caching is dismissed if the operand changes and the previous cache turned out to be unused —
+ * neither a hit was found nor was the right-hand operand fully consumed.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -14,14 +17,14 @@ import org.basex.util.*;
 public final class CmpCache {
   /** Input info (can be {@code null}). */
   private final InputInfo info;
-  /** Cached items. */
+  /** Hash set with items of the right-hand operand; {@code null} if caching has been dismissed. */
   HashItemSet set;
-  /** Cached value (right-hand operand). */
-  private Value value;
-  /** Lazy iterator (right-hand operand). */
+  /** Right-hand operand currently being cached (compared by identity). */
+  Value value;
+  /** Lazy iterator over the right-hand operand; {@code null} once exhausted. */
   Iter iter;
-  /** Cache hits. */
-  int hits = Integer.MAX_VALUE;
+  /** Indicates if at least one cache hit occurred since the last (re-)initialization. */
+  boolean hit;
 
   /**
    * Constructor.
@@ -33,35 +36,36 @@ public final class CmpCache {
   }
 
   /**
-   * Checks if caching is enabled. Assigns values required for caching.
-   * @param val value
-   * @param ir iterator
-   * @return result of check
+   * Activates the cache for the given right-hand operand. Re-initializes the hash set if the
+   * operand has changed since the previous call; dismisses the cache permanently if the previous
+   * cache had no hits and the right-hand operand was not fully consumed (no reuse benefit).
+   * @param val right-hand operand value
+   * @param ir right-hand operand iterator
+   * @return {@code true} if the cache is active, {@code false} if the caller should fall back to
+   *   a non-cached comparison
    */
   boolean active(final Value val, final Iter ir) {
     // check if caching was dismissed
     if(set == null) return false;
 
-    // check if this is the first call, or if the value to be cached has changed
+    // operand changed: dismiss only if cache was unused (no hits AND not fully built)
     if(value != val) {
-      // no cache hits: dismiss caching
-      if(hits < 1) {
+      if(!hit && iter != null) {
         set = null;
         value = null;
         iter = null;
         return false;
       }
-      // create new cache
       init();
       value = val;
       iter = ir;
-      hits = 0;
+      hit = false;
     }
     return true;
   }
 
   /**
-   * Initializes the hash item set.
+   * Creates a fresh empty hash set.
    */
   private void init() {
     set = new HashItemSet(ItemSet.Mode.EQUAL, info);
