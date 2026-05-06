@@ -98,11 +98,6 @@ public final class Uln extends ANum {
   }
 
   @Override
-  public int hashCode() {
-    return value.bitLength() < 32 ? value.intValue() : super.hashCode();
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final Uln uln && value.compareTo(uln.value) == 0;
   }

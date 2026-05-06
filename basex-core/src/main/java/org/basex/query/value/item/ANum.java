@@ -189,12 +189,16 @@ public abstract class ANum extends Item {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     // equal values for different numeric types must return identical hash values!
-    final long l = itr();
-    final float f = flt();
-    // extract fractional part from a finite float; distribute bits to improve hashing
-    int h = Float.floatToRawIntBits(f - l) ^ Long.hashCode(l);
+    // 0.0 and -0.0 must yield the same hash
+    final double d = dbl() + 0.0;
+    final int i = (int) d;
+    // fast path: value fits in int
+    if(d == i) return i;
+    // general path: distribute bits to improve hashing
+    final long bits = Double.doubleToLongBits(d);
+    int h = (int) (bits ^ (bits >>> 32));
     h ^= h >>> 20 ^ h >>> 12;
     return h ^ h >>> 7 ^ h >>> 4;
   }

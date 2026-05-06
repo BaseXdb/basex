@@ -166,13 +166,6 @@ public final class Itr extends ANum {
   }
 
   @Override
-  public int hashCode() {
-    final long v = value;
-    final int i = (int) v;
-    return v == i ? i : super.hashCode();
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final Itr itr && type == itr.type && value == itr.value;
   }

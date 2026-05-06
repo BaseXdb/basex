@@ -130,13 +130,6 @@ public final class Dbl extends ANum {
   }
 
   @Override
-  public int hashCode() {
-    final double v = value;
-    final int i = (int) v;
-    return v != i && Double.isFinite(v) ? super.hashCode() : i;
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final Dbl dbl && Double.compare(value, dbl.value) == 0;
   }

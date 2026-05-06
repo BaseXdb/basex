@@ -173,15 +173,6 @@ public final class Dec extends ANum {
   }
 
   @Override
-  public int hashCode() {
-    if(value.stripTrailingZeros().scale() <= 0) {
-      final BigInteger bi = value.toBigInteger();
-      if(bi.bitLength() < 32) return bi.intValue();
-    }
-    return super.hashCode();
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final Dec dec && value.compareTo(dec.value) == 0;
   }
