@@ -12,7 +12,7 @@
   </parent>
 
   <properties>
-    <jettyVersion>12.1.8</jettyVersion>
+    <jettyVersion>12.1.9</jettyVersion>
   </properties>
 
   <name>BaseX API</name>
