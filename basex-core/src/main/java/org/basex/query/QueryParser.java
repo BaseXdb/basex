@@ -2495,13 +2495,6 @@ public class QueryParser extends InputParser {
             wsCheck("]");
           } while(wsConsume("["));
           expr = new CachedFilter(info(), expr, el.finish());
-        } else if(consume("?[")) {
-          final ExprList el = new ExprList();
-          do {
-            add(el, expr());
-            wsCheck("]");
-          } while(wsConsume("?["));
-          expr = new StructFilter(info(), expr, el.finish());
         } else if(consume("=?>")) {
           expr = methodCall(expr);
         } else if(current('(')) {
