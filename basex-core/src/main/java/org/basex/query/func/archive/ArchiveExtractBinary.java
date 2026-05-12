@@ -52,7 +52,7 @@ public class ArchiveExtractBinary extends ArchiveFn {
           }
         }
       } else {
-        try(ZipFile zip = new ZipFile(archive.toString())) {
+        try(ZipFile zip = new ZipFile(new File(archive.toString()), ZIPIn.CP437)) {
           for(final String entry : entries) {
             final ZipEntry ze = zip.getEntry(entry);
             if(ze == null || ze.isDirectory()) continue;

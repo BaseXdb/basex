@@ -3,6 +3,7 @@ package org.basex.build;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.nio.charset.*;
 import java.util.*;
 import java.util.regex.*;
 import java.util.zip.*;
@@ -122,16 +123,13 @@ public final class DirParser extends Parser {
         }
       } else {
         // process ZIP archive
-        try(ZipInputStream is = new ZipInputStream(in)) {
+        try(ZipInputStream is = new ZipInputStream(in, Charset.forName("CP437"))) {
           for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
             if(ze.isDirectory()) continue;
             source = newStream(is, ze.getName(), input);
             source.length(ze.getSize());
             parseResource(builder);
           }
-        } catch(final IllegalArgumentException ex) {
-          // GH-1351: catch invalid archive encodings
-          throw new IOException(ex);
         }
       }
     } else {

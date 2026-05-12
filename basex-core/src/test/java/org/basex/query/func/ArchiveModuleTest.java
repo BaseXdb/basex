@@ -22,6 +22,16 @@ public final class ArchiveModuleTest extends SandboxTest {
   private static final String ZIP = "src/test/resources/xml.zip";
   /** Test GZIP file. */
   private static final String GZIP = "src/test/resources/xml.gz";
+  /** Test ZIP: legacy CP437-encoded entry name, UTF-8 flag (bit 11) not set. */
+  private static final String ZIP_CP437 = "src/test/resources/cp437.zip";
+  /** Test ZIP: UTF-8-encoded entry name, UTF-8 flag set (modern, spec-conformant). */
+  private static final String ZIP_UTF8 = "src/test/resources/utf8.zip";
+  /** Test ZIP: ASCII-only entry name, UTF-8 flag not set. */
+  private static final String ZIP_ASCII = "src/test/resources/ascii.zip";
+  /** Test ZIP: Shift_JIS-encoded entry name, UTF-8 flag not set (non-CP437 codepage). */
+  private static final String ZIP_SJIS = "src/test/resources/shiftjis.zip";
+  /** Test ZIP: UTF-8-encoded entry name but UTF-8 flag not set (non-conformant). */
+  private static final String ZIP_UTF8_NO_FLAG = "src/test/resources/utf8_no_bit11.zip";
   /** Test file. */
   private static final String DIR = "src/test/resources/dir";
 
@@ -202,6 +212,32 @@ public final class ArchiveModuleTest extends SandboxTest {
     query("empty(" + func.args(GZIP, "xyz") + ")", true);
     query("let $archive := " + _FILE_READ_BINARY.args(GZIP) +
         "return empty(" + func.args(" $archive", "xzy") + ")", true);
+
+    // legacy ZIP with CP437-encoded entry name (UTF-8 flag not set)
+    query(_ARCHIVE_ENTRIES.args(ZIP_CP437) + "/text() = 'Prüfung.txt'", true);
+    query(COUNT.args(func.args(ZIP_CP437)), 2);
+    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_CP437, "Prüfung.txt")),
+        "hello umlaut");
+
+    // entry-name decoding across all bit-11/encoding combinations:
+    // 1. UTF-8 flag set, UTF-8 (spec-conformant): decoded as UTF-8
+    query(_ARCHIVE_ENTRIES.args(ZIP_UTF8) + "/text() = 'Prüfung.txt'", true);
+    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_UTF8, "Prüfung.txt")),
+        "hello utf8");
+    // 2. UTF-8 flag not set, ASCII: decoded as CP437 (= ASCII)
+    query(_ARCHIVE_ENTRIES.args(ZIP_ASCII) + "/text() = 'plain.txt'", true);
+    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_ASCII, "plain.txt")),
+        "hello ascii");
+    // 3. UTF-8 flag not set, Shift_JIS: CP437 fallback yields mojibake but stays readable
+    //    Japanese "日本.txt" in Shift_JIS (93 FA 96 7B) decodes via CP437 to "ô·û{.txt"
+    query(_ARCHIVE_ENTRIES.args(ZIP_SJIS) + "/text() = 'ô·û{.txt'", true);
+    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_SJIS, "ô·û{.txt")),
+        "hello sjis");
+    // 4. UTF-8 flag not set but bytes are actually UTF-8 (Linux zip mis-flag): mojibake
+    //    UTF-8 bytes C3 BC for 'ü' decode via CP437 to "├╝" -> "Pr├╝fung.txt"
+    query(_ARCHIVE_ENTRIES.args(ZIP_UTF8_NO_FLAG) + "/text() = 'Pr├╝fung.txt'", true);
+    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_UTF8_NO_FLAG, "Pr├╝fung.txt")),
+        "hello mojibake");
   }
 
   /** Test method. */

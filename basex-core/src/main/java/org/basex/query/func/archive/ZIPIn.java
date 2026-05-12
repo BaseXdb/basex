@@ -2,6 +2,7 @@ package org.basex.query.func.archive;
 
 import static org.basex.query.func.archive.ArchiveText.*;
 import java.io.*;
+import java.nio.charset.*;
 import java.util.zip.*;
 
 import org.basex.util.*;
@@ -13,6 +14,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class ZIPIn extends ArchiveIn {
+  /** Fallback charset for entry names without the UTF-8 flag (bit 11). */
+  static final Charset CP437 = Charset.forName("CP437");
+
   /** ZIP input stream. */
   private final ZipInputStream zis;
   /** Current entry. */
@@ -23,7 +27,7 @@ final class ZIPIn extends ArchiveIn {
    * @param is input stream
    */
   ZIPIn(final InputStream is) {
-    zis = new ZipInputStream(is);
+    zis = new ZipInputStream(is, CP437);
   }
 
   @Override
