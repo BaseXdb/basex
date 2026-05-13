@@ -11,7 +11,6 @@ import static org.basex.util.ft.FTFlag.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.regex.*;
 
 import org.basex.core.*;
@@ -461,26 +460,35 @@ public class QueryParser extends InputParser {
 
         // check if annotation is a pre-defined one
         final Annotation def = Annotation.get(name);
+        final java.util.function.Function<Object, Object> ai = n -> concat(cpToken('%'), n);
         if(def == null) {
           // reject unknown annotations with pre-defined namespaces, ignore others
           final byte[] uri = name.uri();
           if(NSGlobal.prefix(uri).length != 0 && !eq(uri, LOCAL_URI, ERROR_URI)) {
-            throw error(NSGlobal.reserved(uri) ? ANNWHICH_X_X : BASEX_ANNOTATION1_X_X,
-                ii, "%", name.string());
+            Object hint = name.string();
+            final Annotation similar = Annotation.similar(name);
+            if(similar != null) {
+              hint = QueryError.similar(hint, ai.apply(name.hasPrefix() ?
+                concat(name.prefix(), cpToken(':'), similar.name.local()) : similar.name.local()));
+            }
+            throw error(NSGlobal.reserved(uri) ? ANNRESERVED_X : BASEX_ANN1_X, ii, ai.apply(hint));
           }
           ann = new Ann(ii, name, items.value());
         } else {
-          if(def.single && anns.contains(def)) throw error(BASEX_ANN3_X_X, ii, "%", def.name());
+          if(def.single && anns.contains(def)) {
+            throw error(BASEX_ANN3_X, ii, ai.apply(name.string()));
+          }
           final int is = items.size();
           final IntList arities = Functions.checkArity(is, def.minMax[0], def.minMax[1]);
-          if(arities != null) throw error(BASEX_ANN2_X_X, ii, def, arity(arguments(is), arities));
-
+          if(arities != null) {
+            throw error(BASEX_ANN2_X_X, ii, ai.apply(def), arity(arguments(is), arities));
+          }
           final int al = def.params.length;
           for(int i = 0; i < is; i++) {
             final BasicType type = def.params[Math.min(al - 1, i)];
             final Item item = items.get(i);
             if(!item.type.instanceOf(type)) {
-              throw error(BASEX_ANN_X_X_X, ii, def, type, item.seqType());
+              throw error(BASEX_ANN_X_X_X, ii, ai.apply(def), type, item.seqType());
             }
           }
           ann = new Ann(ii, def, items.value());
@@ -2416,7 +2424,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private ExprInfo simpleNodeTest(final Kind kind, final boolean all) throws QueryException {
-    final BiFunction<QNm, NameTest.Scope, Test> nameTest = (qnm, scope) -> {
+    final java.util.function.BiFunction<QNm, NameTest.Scope, Test> nameTest = (qnm, scope) -> {
       return Test.get(all && kind == Kind.ELEMENT ? null : kind, qnm, scope, sc.elemNS);
     };
     int p = pos;

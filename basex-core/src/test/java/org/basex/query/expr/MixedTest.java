@@ -548,6 +548,19 @@ public final class MixedTest extends SandboxTest {
     unknownName("let $l1 := 1 let $l2 := 2 return $l", VARUNDEF_X, "$l2");
   }
 
+  /** Unknown annotation: hint to similar annotation name. */
+  @Test public void unknownAnnotation() {
+    // XQuery namespace (reserved): "private" is the spec annotation
+    unknownName("declare %privte function local:f() { 1 }; local:f()",
+        ANNRESERVED_X, "%private");
+    // BaseX namespace: "lazy" is a valid annotation
+    unknownName("declare %basex:lasy function local:f() { 1 }; local:f()",
+        BASEX_ANN1_X, "%basex:lazy");
+    // prefix fallback for short input
+    unknownName("declare %output:inden('yes') function local:f() { 1 }; local:f()",
+        BASEX_ANN1_X, "%output:indent");
+  }
+
   /** Unknown atomic type: hint to similar type name. */
   @Test public void unknownType() {
     // Levenshtein match for typo

@@ -48,13 +48,13 @@ public final class AnnotationsTest extends SandboxTest {
   /** Parsing errors and conflicts. */
   @Test public void unknown() {
     // ignore prefixes with no annotation definitions
-    error("declare %db:xx function local:x() { 1 }; 1", BASEX_ANNOTATION1_X_X);
+    error("declare %db:xx function local:x() { 1 }; 1", BASEX_ANN1_X);
     // check unit annotations
-    error("declare %unit:xyz function local:x() { 1 }; 1", BASEX_ANNOTATION1_X_X);
+    error("declare %unit:xyz function local:x() { 1 }; 1", BASEX_ANN1_X);
     // check restxq annotations
-    error("declare %rest:xx function local:x() { 1 }; 1", BASEX_ANNOTATION1_X_X);
+    error("declare %rest:xx function local:x() { 1 }; 1", BASEX_ANN1_X);
     // check output annotations
-    error("declare %output:xx function local:x() { 1 }; 1", BASEX_ANNOTATION1_X_X);
+    error("declare %output:xx function local:x() { 1 }; 1", BASEX_ANN1_X);
     error("declare %output:method function local:x() { 1 }; 1", BASEX_ANN2_X_X);
     error("declare %output:method(1) function local:x() { 1 }; 1", BASEX_ANN_X_X_X);
   }

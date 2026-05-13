@@ -23,11 +23,11 @@ public enum QueryError {
   // BaseX errors
 
   /** Error code. */
-  BASEX_ANNOTATION1_X_X(BASEX, "annotation", "Annotation %% is unknown."),
+  BASEX_ANN1_X(BASEX, "annotation", "Unknown annotation: %."),
   /** Error code. */
   BASEX_ANN2_X_X(BASEX, "annotation", "%: %."),
   /** Error code. */
-  BASEX_ANN3_X_X(BASEX, "annotation", "Annotation %% is declared twice."),
+  BASEX_ANN3_X(BASEX, "annotation", "Annotation % is declared twice."),
   /** Error code. */
   BASEX_ANN_X_X_X(BASEX, "annotation", "%: % expected, % found."),
   /** Error code. */
@@ -1233,11 +1233,11 @@ public enum QueryError {
   /** Error code. */
   ATTDUPL_X(XQST, 40, "Duplicate attribute name: %."),
   /** Error code. */
-  FNRESERVED_X(XQST, 45, "Function '%' is in reserved namespace."),
+  FNRESERVED_X(XQST, 45, "Function is in reserved namespace: %."),
   /** Error code. */
-  ANNWHICH_X_X(XQST, 45, "Annotation %% is in reserved namespace."),
+  ANNRESERVED_X(XQST, 45, "Annotation is in reserved namespace: %."),
   /** Error code. */
-  TYPERESERVED_X(XQST, 45, "Type % is in reserved namespace."),
+  TYPERESERVED_X(XQST, 45, "Type is in reserved namespace: %."),
   /** Error code. */
   INVURI_X(XQST, 46, "Invalid URI: %."),
   /** Error code. */

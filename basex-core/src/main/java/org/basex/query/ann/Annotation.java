@@ -10,6 +10,7 @@ import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
+import org.basex.util.similarity.*;
 
 /**
  * Definitions of all built-in XQuery annotations.
@@ -231,6 +232,17 @@ public enum Annotation {
    */
   public static Annotation get(final QNm name) {
     return MAP.get(name);
+  }
+
+  /**
+   * Returns the annotation with the most similar name in the same namespace, or {@code null}
+   * if no similar annotation is found.
+   * @param name annotation name
+   * @return similar annotation, or {@code null}
+   */
+  public static Annotation similar(final QNm name) {
+    return Levenshtein.similarOrPrefix(name.local(), values(),
+        ann -> Token.eq(name.uri(), ann.name.uri()) ? ann.name.local() : null);
   }
 
   /**
