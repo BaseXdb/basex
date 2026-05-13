@@ -76,16 +76,16 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
   /**
    * Assigns a function to a static function call.
    * @param call name function name
-   * @param useDynamicContext {@code true} if function lookup should include the dynamic context
+   * @param dynamic {@code true} if function lookup should include the dynamic context
    * @param qc query context
    * @throws QueryException query exception
    */
-  void setFunc(final StaticFuncCall call, final boolean useDynamicContext, final QueryContext qc)
+  void setFunc(final StaticFuncCall call, final boolean dynamic, final QueryContext qc)
       throws QueryException {
     final InputInfo info = call.info();
     final QNm name = call.name;
     final int arity = call.arity();
-    final StaticFunc func = get(info.sc(), name, arity, useDynamicContext);
+    final StaticFunc func = get(info.sc(), name, arity, dynamic);
     if(func != null) {
       if(func.expr == null) throw FUNCNOIMPL_X.get(func.info, func.name.prefixString());
       call.setFunc(func);
@@ -130,12 +130,22 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * @param sc static context
    * @param qname function name
    * @param arity function arity
-   * @param useDynamicContext {@code true} if function lookup should include the dynamic context
+   * @param dynamic {@code true} if function lookup should include the dynamic context
    * @return function if found, {@code null} otherwise
    */
   public StaticFunc get(final StaticContext sc, final QNm qname, final int arity,
-      final boolean useDynamicContext) {
-    return get(sc, qname, arity, arity, useDynamicContext);
+      final boolean dynamic) {
+    return get(sc, qname, arity, arity, dynamic);
+  }
+
+  /**
+   * Indicates if a visible function with the given name exists at any arity.
+   * @param sc static context
+   * @param qname function name
+   * @return {@code true} if a matching function exists
+   */
+  public boolean exists(final StaticContext sc, final QNm qname) {
+    return get(sc, qname, 0, Integer.MAX_VALUE, false) != null;
   }
 
   /**
@@ -144,15 +154,15 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * @param qname function name
    * @param min minimum function arity
    * @param max maximum function arity
-   * @param useDynamicContext {@code true} if function lookup should include the dynamic context
+   * @param dynamic {@code true} if function lookup should include the dynamic context
    * @return function if found, {@code null} otherwise
    */
   private StaticFunc get(final StaticContext sc, final QNm qname, final int min, final int max,
-      final boolean useDynamicContext) {
+      final boolean dynamic) {
     final byte[] funcUri = qname.uri();
     final byte[] modUri = Token.eq(funcUri, FN_URI) ? FN_URI : QNm.uri(sc.module);
     StaticFunc func = get(modUri, qname, min, max);
-    if(func == null && (useDynamicContext || sc.imports.contains(funcUri))) {
+    if(func == null && (dynamic || sc.imports.contains(funcUri))) {
       func = get(funcUri, qname, min, max);
       if(func != null && func.anns.contains(Annotation.PRIVATE)) func = null;
     }
@@ -244,23 +254,32 @@ public final class StaticFuncs extends ExprInfo implements Iterable<StaticFunc> 
    * @return exception
    */
   QueryException similarError(final QNm qname, final InputInfo info) {
-    // check local functions
-    final QNmSet names = new QNmSet();
-    if(info != null) {
+    final byte[] local = Token.lc(qname.local()), uri = qname.uri();
+    // built-in function in the same URI (Levenshtein with prefix fallback)
+    QNm similar = Levenshtein.similarOrPrefix(qname.local(), Functions.BUILT_IN.keys(),
+        o -> Token.eq(uri, o.uri()) ? o.local() : null);
+    // fall back to visible local user-defined function
+    if(similar == null && info != null) {
+      final QNmSet names = new QNmSet();
       for(final StaticFunc func : this) {
         if(func.expr != null && (!func.anns.contains(Annotation.PRIVATE)
             || Token.eq(QNm.uri(info.sc().module), QNm.uri(func.sc.module)))) {
           names.add(func.name);
         }
       }
+      similar = Levenshtein.similarOrPrefix(qname.local(), names.keys(), QNm::local);
     }
-    final QNm similar = (QNm) Levenshtein.similar(qname.local(), names.keys(),
-        o -> ((QNm) o).local());
-
-    // return error for local or global function
-    return WHICHFUNC_X.get(info, similar != null ?
-      similar(qname.prefixString(), similar.prefixString()) :
-      Functions.similar(qname));
+    // fall back to identical local name in a different URI (namespace hint)
+    if(similar == null) {
+      for(final QNm qnm : Functions.BUILT_IN) {
+        if(Token.eq(Token.lc(qnm.local()), local)) {
+          similar = qnm;
+          break;
+        }
+      }
+    }
+    return WHICHFUNC_X.get(info, similar(qname.prefixString(FN_URI),
+        similar != null ? similar.prefixString(FN_URI) : null));
   }
 
   @Override

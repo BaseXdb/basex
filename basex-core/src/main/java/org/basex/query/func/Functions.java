@@ -216,7 +216,8 @@ public final class Functions {
 
     final StaticContext sc = info.sc();
     if(name.hasURI() || qc.functions.get(sc, name, arity, false) != null) return name;
-    return new QNm(name.local(), sc.funcNS != null ? sc.funcNS : FN_URI);
+    final QNm dflt = new QNm(name.local(), sc.funcNS != null ? sc.funcNS : FN_URI);
+    return builtIn(dflt) == null && qc.functions.exists(sc, name) ? name : dflt;
   }
 
   /**
@@ -245,30 +246,6 @@ public final class Functions {
   }
 
   /**
-   * Returns an info message for a similar function.
-   * @param qname name of type
-   * @return info string
-   */
-  static String similar(final QNm qname) {
-    // find similar function in several attempts
-    final byte[] local = lc(qname.local()), uri = qname.uri();
-
-    // find functions with identical URIs and similar local names
-    Object similar = Levenshtein.similar(qname.local(), BUILT_IN.keys(),
-        o -> eq(uri, ((QNm) o).uri()) ? ((QNm) o).local() : null);
-    // find functions with identical local names
-    for(final QNm qnm : BUILT_IN) {
-      if(similar == null && eq(lc(qnm.local()), local)) similar = qnm;
-    }
-    // find functions with identical URIs and local names that start with the specified name
-    for(final QNm qnm : BUILT_IN) {
-      if(similar == null && eq(uri, qnm.uri()) && startsWith(lc(qnm.local()), local)) similar = qnm;
-    }
-    return QueryError.similar(qname.prefixString(),
-        similar != null ? ((QNm) similar).prefixString() : null);
-  }
-
-  /**
    * Incorporates keywords in the argument list.
    * @param fb function arguments
    * @param names parameter names
@@ -284,7 +261,11 @@ public final class Functions {
     for(final QNm qnm : fb.keywords) {
       int n = nl;
       while(--n >= 0 && !qnm.eq(names[n]));
-      if(n == -1) throw PARAMUNKNOWN_X_X.get(fb.info, function, qnm.prefixString());
+      if(n == -1) {
+        final QNm similar = Levenshtein.similarOrPrefix(qnm.local(), names, QNm::local);
+        throw PARAMUNKNOWN_X_X.get(fb.info, function, QueryError.similar(qnm.prefixString(),
+            similar != null ? similar.prefixString() : null));
+      }
       if(list.get(n) != null) throw PARAMTWICE_X_X.get(fb.info, function, qnm.prefixString());
       list.set(n, fb.keywords.get(qnm));
     }

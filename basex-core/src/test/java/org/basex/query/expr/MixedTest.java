@@ -2,12 +2,14 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
 
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.func.prof.ProfType.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
@@ -502,6 +504,76 @@ public final class MixedTest extends SandboxTest {
     test("array { ('x', 1 to 3) => remove(1) }",
         new TypeInfo(ItemArray.class, "array(xs:anyAtomicType)", 3),
         new TypeInfo(ItemArray.class, "array(xs:integer)", 3));
+  }
+
+  /** Unknown keyword parameter: hint to similar parameter name. */
+  @Test public void unknownKeyword() {
+    // Levenshtein match for typo
+    unknownName("declare function local:x($alpha) { }; local:x(alph := 0)",
+        PARAMUNKNOWN_X_X, "alpha");
+    // prefix fallback for short input that is too far in Levenshtein distance
+    unknownName("declare function local:c($langitude, $longitude) { };"
+        + " local:c(lang := 1, longitude := 2)", PARAMUNKNOWN_X_X, "langitude");
+  }
+
+  /** Unknown built-in function: hint to similar function name. */
+  @Test public void unknownFunction() {
+    // Levenshtein match for typo (unprefixed call, hint without fn: prefix)
+    unknownName("coun()", WHICHFUNC_X, "count");
+    // prefix fallback for short input that is too far in Levenshtein distance
+    unknownName("all()", WHICHFUNC_X, "all-");
+    // prefix fallback for user-defined function (local: prefix is preserved)
+    unknownName("declare function local:abcde($john) { }; local:a()",
+        WHICHFUNC_X, "local:abcde");
+    // built-in match preferred over user-defined when both exist
+    unknownName("declare function local:subsequence-after() { };"
+        + " subsequenc(1, 2, 3)", WHICHFUNC_X, "subsequence");
+  }
+
+  /** Unprefixed call of a user-defined function with wrong arity reports an arity mismatch. */
+  @Test public void wrongArityNoNamespace() {
+    error("declare function abc($j) { }; abc()", INVNARGS_X_X);
+  }
+
+  /** Unprefixed call of a built-in must still resolve when a same-named user function exists. */
+  @Test public void shadowedBuiltin() {
+    query("declare function abs($x as xs:integer, $y as xs:integer) as xs:integer"
+        + " { $x + $y }; abs(-5)", 5);
+  }
+
+  /** Unknown variable: hint to similar variable name. */
+  @Test public void unknownVariable() {
+    unknownName("for $letter in 1 to 5 return $lette", VARUNDEF_X, "$letter");
+    // innermost binding wins on Levenshtein ties
+    unknownName("let $l1 := 1 let $l2 := 2 return $l", VARUNDEF_X, "$l2");
+  }
+
+  /** Unknown atomic type: hint to similar type name. */
+  @Test public void unknownType() {
+    // Levenshtein match for typo
+    unknownName("'a' cast as xs:strin", WHICHCAST_X, "xs:string");
+    // prefix fallback for short input that is too far in Levenshtein distance
+    unknownName("'a' cast as xs:integ", WHICHCAST_X, "xs:integer");
+  }
+
+  /**
+   * Checks that the error message includes a similar-name hint.
+   * @param query query that should fail
+   * @param code expected error code
+   * @param similar expected leading substring of the "maybe: ..." hint
+   */
+  private static void unknownName(final String query, final QueryError code,
+      final String similar) {
+    try {
+      eval(query);
+      fail("Query did not fail.");
+    } catch(final QueryException ex) {
+      assertSame(code, ex.error(), ex.getLocalizedMessage());
+      final String msg = ex.getLocalizedMessage();
+      assertTrue(msg.contains("(maybe: " + similar), msg);
+    } catch(final Exception ex) {
+      fail(ex);
+    }
   }
 
   /**

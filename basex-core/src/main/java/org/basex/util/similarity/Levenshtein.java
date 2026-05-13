@@ -46,28 +46,30 @@ public final class Levenshtein {
 
   /**
    * Returns the most similar entry.
+   * @param <T> element type
    * @param token input token
    * @param objects objects to be compared
    * @return most similar entry or {@code null}
    */
-  public static Object similar(final byte[] token, final Object[] objects) {
+  public static <T> T similar(final byte[] token, final T[] objects) {
     return similar(token, objects, Function.identity());
   }
 
   /**
    * Returns the most similar entry.
+   * @param <T> element type
    * @param token input token
    * @param objects objects to be compared
    * @param prepare function for preparing the object to be compared for the comparison
    * @return most similar entry or {@code null}
    */
-  public static Object similar(final byte[] token, final Object[] objects,
-      final Function<Object, Object> prepare) {
+  public static <T> T similar(final byte[] token, final T[] objects,
+      final Function<? super T, ?> prepare) {
 
-    Object similar = null;
+    T similar = null;
     int err = Integer.MAX_VALUE;
     final Levenshtein ls = new Levenshtein();
-    for(final Object obj : objects) {
+    for(final T obj : objects) {
       final byte[] compare = token(prepare.apply(obj));
       if(compare != null) {
         final int d = ls.distance(token, compare, 0);
@@ -78,6 +80,40 @@ public final class Levenshtein {
       }
     }
     return err != Integer.MAX_VALUE ? similar : null;
+  }
+
+  /**
+   * Returns the most similar entry; falls back to the first entry whose prepared name starts
+   * with the input if no similar entry is found.
+   * @param <T> element type
+   * @param token input token
+   * @param objects objects to be compared
+   * @return most similar or prefix-matching entry, or {@code null}
+   */
+  public static <T> T similarOrPrefix(final byte[] token, final T[] objects) {
+    return similarOrPrefix(token, objects, Function.identity());
+  }
+
+  /**
+   * Returns the most similar entry; falls back to the first entry whose prepared name starts
+   * with the input if no similar entry is found.
+   * @param <T> element type
+   * @param token input token
+   * @param objects objects to be compared
+   * @param prepare function for preparing the object to be compared for the comparison
+   * @return most similar or prefix-matching entry, or {@code null}
+   */
+  public static <T> T similarOrPrefix(final byte[] token, final T[] objects,
+      final Function<? super T, ?> prepare) {
+
+    final T similar = similar(token, objects, prepare);
+    if(similar != null) return similar;
+    final byte[] lc = lc(token);
+    for(final T obj : objects) {
+      final byte[] compare = token(prepare.apply(obj));
+      if(compare != null && startsWith(lc(compare), lc)) return obj;
+    }
+    return null;
   }
 
   /**

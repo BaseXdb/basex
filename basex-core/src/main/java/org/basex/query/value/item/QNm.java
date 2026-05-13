@@ -302,6 +302,16 @@ public final class QNm extends Item {
   }
 
   /**
+   * Returns the local name if the namespace matches the supplied default URI; otherwise behaves
+   * like {@link #prefixString()}.
+   * @param ns default URI (can be {@code null})
+   * @return QName as token
+   */
+  public byte[] prefixString(final byte[] ns) {
+    return ns != null && Token.eq(uri(), ns) ? local() : prefixString();
+  }
+
+  /**
    * Returns a representation as variable.
    * @return representation as variable
    */

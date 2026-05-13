@@ -90,7 +90,28 @@ public final class LocalVars {
     // local variable
     final VarRef ref = resolveLocal(name, info);
     if(ref != null) return ref;
-    return parser.qc.vars.newRef(name, info, parser.sc.imports);
+    // skip the in-scope snapshot when the static variable is already declared
+    final Variables vr = parser.qc.vars;
+    return vr.newRef(name, info, parser.sc.imports, vr.declared(name) ? null : inScopeNames());
+  }
+
+  /**
+   * Returns the names of all local variables currently in scope, or {@code null} if none.
+   * Innermost bindings come first, so they are preferred when several candidates have the same
+   * Levenshtein distance to an unresolved reference.
+   * @return variable names or {@code null}
+   */
+  private QNm[] inScopeNames() {
+    int n = 0;
+    for(final VarContext vc : vars) n += vc.stack.size();
+    if(n == 0) return null;
+    final QNm[] names = new QNm[n];
+    int i = 0;
+    for(int v = vars.size() - 1; v >= 0; v--) {
+      final VarStack stack = vars.get(v).stack;
+      for(int s = stack.size() - 1; s >= 0; s--) names[i++] = stack.get(s).name;
+    }
+    return names;
   }
 
   /**

@@ -1060,7 +1060,7 @@ public enum QueryError {
   /** Error code. */
   PARAMTWICE_X_X(XPST, 17, "%: Multiple arguments supplied for parameter %."),
   /** Error code. */
-  PARAMUNKNOWN_X_X(XPST, 17, "%: Parameter % does not exist."),
+  PARAMUNKNOWN_X_X(XPST, 17, "%: Unknown parameter: %."),
   /** Error code. */
   ABSTRACTFUNC_X(XPST, 17, "No function exists for abstract type: %."),
   /** Error code. */
@@ -1853,7 +1853,7 @@ public enum QueryError {
    * @return info message
    */
   public static String similar(final Object string, final Object similar) {
-    return similar == null ? Util.info(string) : Util.info("% (similar: %)", string, similar);
+    return similar == null ? Util.info(string) : Util.info("% (maybe: %)", string, similar);
   }
 
   /**

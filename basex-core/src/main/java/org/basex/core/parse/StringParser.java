@@ -370,8 +370,7 @@ final class StringParser extends CommandParser {
     // include similar command in error message
     if(token.matches("^\\w+$")) {
       final byte[] name = uc(token(token));
-      final Object similar = Levenshtein.similar(name, startWith(complete, null),
-          cmd -> ((Enum<?>) cmd).name());
+      final Enum<?> similar = Levenshtein.similar(name, startWith(complete, null), Enum::name);
       if(similar != null) throw error(alt, UNKNOWN_SIMILAR_X_X, name, similar);
     }
 

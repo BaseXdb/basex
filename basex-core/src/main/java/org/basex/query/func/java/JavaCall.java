@@ -461,8 +461,8 @@ public abstract class JavaCall extends Arr {
 
     // find similar field/method names
     final byte[] nm = token(name);
-    final Object similar = Levenshtein.similar(nm, names);
-    if(similar != null && eq(nm, (byte[]) similar)) {
+    final byte[] similar = Levenshtein.similar(nm, names);
+    if(similar != null && eq(nm, similar)) {
       // if name is equal, no function was chosen via exact type matching
       final StringJoiner sj = new StringJoiner(", ", "(", ")");
       for(final String type : types) sj.add(className(type));

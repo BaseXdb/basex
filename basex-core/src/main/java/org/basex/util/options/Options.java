@@ -478,7 +478,7 @@ public class Options implements Iterable<Option<?>> {
    * @return error string
    */
   public static String similar(final Object option, final Map<String, Option<?>> options) {
-    final Object similar = Levenshtein.similar(token(option),
+    final String similar = Levenshtein.similar(token(option),
         options.keySet().toArray(String[]::new));
     return similar != null ? Util.info(Text.UNKNOWN_OPT_SIMILAR_X_X, option, similar) :
       unknown(option);

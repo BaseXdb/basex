@@ -13,6 +13,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.similarity.*;
 
 /**
  * Container of global variables of a query.
@@ -25,8 +26,9 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * An unresolved variable reference.
    * @param ref reference
    * @param hasImport whether there was an import statement for the ref's URI
+   * @param localNames local variables in scope at reference time (can be {@code null})
    */
-  private record UnresolvedRef(StaticVarRef ref, boolean hasImport) { }
+  private record UnresolvedRef(StaticVarRef ref, boolean hasImport, QNm[] localNames) { }
   /** All unresolved variable references. */
   private final ArrayList<UnresolvedRef> unresolvedRefs = new ArrayList<>();
   /** The variables by declaring module. */
@@ -94,7 +96,8 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
         // try to resolve the reference from a module
         final byte[] refUri = ref.name.uri();
         var = get(ref.name, refUri);
-        if(var == null) throw VARUNDEF_X.get(ref.info(), ref);
+        if(var == null) throw VARUNDEF_X.get(ref.info(),
+            QueryError.similar(ref, similarName(ref.name, ur.localNames)));
         if(!Token.eq(modUri, refUri) && !ur.hasImport) {
           throw INVISIBLEVAR_X.get(ref.info(), ref.name);
         }
@@ -122,13 +125,43 @@ public final class Variables extends ExprInfo implements Iterable<StaticVar> {
    * @param name variable name
    * @param info input info
    * @param imports URIs of imported modules
+   * @param localNames local variables in scope at reference time ({@code null} if not required)
    * @return reference
    */
-  public StaticVarRef newRef(final QNm name, final InputInfo info, final TokenSet imports) {
+  public StaticVarRef newRef(final QNm name, final InputInfo info, final TokenSet imports,
+      final QNm[] localNames) {
     if(info == null) throw Util.notExpected();
     final StaticVarRef ref = new StaticVarRef(info, name);
-    unresolvedRefs.add(new UnresolvedRef(ref, imports.contains(name.uri())));
+    unresolvedRefs.add(new UnresolvedRef(ref, imports.contains(name.uri()), localNames));
     return ref;
+  }
+
+  /**
+   * Indicates if a static variable with the given name has already been declared.
+   * @param name variable name
+   * @return result of check
+   */
+  public boolean declared(final QNm name) {
+    for(final QNmMap<StaticVar> vars : varsByModule.values()) {
+      if(vars.contains(name)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns a formatted "$name" hint for the variable name most similar to the supplied reference,
+   * or {@code null} if no similar name is found among the in-scope and declared variables.
+   * @param name unresolved variable name
+   * @param localNames local variables in scope at reference time ({@code null} if not required)
+   * @return formatted hint or {@code null}
+   */
+  private String similarName(final QNm name, final QNm[] localNames) {
+    final ArrayList<QNm> candidates = new ArrayList<>();
+    if(localNames != null) Collections.addAll(candidates, localNames);
+    for(final StaticVar sv : this) candidates.add(sv.name);
+    final QNm similar = Levenshtein.similarOrPrefix(name.local(),
+        candidates.toArray(QNm[]::new), QNm::local);
+    return similar != null ? Util.info("$%", similar.prefixString()) : null;
   }
 
   /**

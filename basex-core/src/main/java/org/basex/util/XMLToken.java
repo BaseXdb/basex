@@ -455,7 +455,7 @@ public final class XMLToken {
    * @param key key
    * @return most similar entity or {@code null}
    */
-  public static Object similarEntity(final byte[] key) {
+  public static byte[] similarEntity(final byte[] key) {
     final TokenObjectMap<byte[]> map = entities();
     final TokenList list = new TokenList(map.size());
     for(final byte[] entity : map) list.add(entity);

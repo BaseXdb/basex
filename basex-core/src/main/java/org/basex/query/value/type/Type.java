@@ -337,23 +337,11 @@ public interface Type {
    * @return info string
    */
   static String similar(final QNm qname) {
-    final byte[] ln = Token.lc(qname.local());
-
     final TokenList list = new TokenList();
     list.add(QueryText.ITEM).add(QueryText.FUNCTION).add(QueryText.FN);
     list.add(QueryText.MAP).add(QueryText.ARRAY);
     for(final Kind kind : Kind.values()) list.add(kind.name);
-    final byte[][] values = list.finish();
-
-    Object similar = Levenshtein.similar(ln, values);
-    if(similar == null) {
-      for(final byte[] value : values) {
-        if(Token.startsWith(value, ln)) {
-          similar = value;
-          break;
-        }
-      }
-    }
+    final byte[] similar = Levenshtein.similarOrPrefix(qname.local(), list.finish());
     return QueryError.similar(qname.prefixId(Token.XML), similar);
   }
 

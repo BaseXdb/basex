@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
-import java.util.function.*;
 import java.util.regex.*;
 
 import javax.xml.namespace.*;
@@ -1228,19 +1227,8 @@ public enum BasicType implements Type {
    * @return info string
    */
   public static String similar(final QNm qname) {
-    final byte[] ln = lc(qname.local());
-
-    final Function<BasicType, byte[]> local = tp -> tp.parent != null ? tp.qname().local() : null;
-    Object similar = Levenshtein.similar(ln, values(), value -> local.apply((BasicType) value));
-    if(similar == null) {
-      for(final BasicType value : values()) {
-        final byte[] lc = local.apply(value);
-        if(lc != null && startsWith(lc, ln)) {
-          similar = value;
-          break;
-        }
-      }
-    }
+    final BasicType similar = Levenshtein.similarOrPrefix(qname.local(), values(),
+        value -> value.parent != null ? value.qname().local() : null);
     return QueryError.similar(qname.prefixId(XML), similar);
   }
 
