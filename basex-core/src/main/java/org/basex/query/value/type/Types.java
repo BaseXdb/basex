@@ -157,6 +157,19 @@ public final class Types {
   /** Zero or more string or xs:hex-binary or xs:base64-binary. */
   public static final SeqType STRING_OR_BINARY_ZM = STRING_OR_BINARY.seqType(ZERO_OR_MORE);
 
+  /** Node, string, or binary item (used by db:put). */
+  public static final Type NODE_OR_STRING_OR_BINARY = ChoiceItemType.get(NODE, STRING_OR_BINARY);
+  /** Single node, string, or binary item. */
+  public static final SeqType NODE_OR_STRING_OR_BINARY_O = NODE_OR_STRING_OR_BINARY.seqType();
+
+  /** Resource type enum, used by db:add and db:create as a per-path override. */
+  public static final EnumType DB_RESOURCE_TYPE = EnumType.get("xml", "binary", "value");
+  /** Database path: a string, or a single-entry map binding the path to a resource type. */
+  public static final Type DB_PATH_SPEC = ChoiceItemType.get(STRING,
+      MapType.get(STRING, DB_RESOURCE_TYPE.seqType()));
+  /** Zero or more database path specs. */
+  public static final SeqType DB_PATH_SPEC_ZM = DB_PATH_SPEC.seqType(ZERO_OR_MORE);
+
   /** Single node. */
   public static final SeqType NODE_O = NODE.seqType();
   /** Zero or one nodes. */

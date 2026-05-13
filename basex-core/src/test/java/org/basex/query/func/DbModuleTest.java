@@ -143,6 +143,67 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_ADD.args(NAME, " document { <x xmlns:a='a' a:y='' /> }", "x"));
   }
 
+  /** Test method: adding mixed XML, binary, and value resources. */
+  @Test public void add2() {
+    final Function func = _DB_ADD;
+
+    // type dispatch: binary literal becomes a binary resource
+    query(func.args(NAME, " xs:hexBinary('41')", "bin1"));
+    query(_DB_GET_BINARY.args(NAME, "bin1"), "A");
+
+    // type dispatch: map is stored as a value resource
+    query(func.args(NAME, " { 'a': 1 }", "val1"));
+    query(_DB_GET_VALUE.args(NAME, "val1") + "?a", 1);
+
+    // explicit override: string stored as a value resource
+    query(func.args(NAME, "Hello", " { 'val2': 'value' }"));
+    query(_DB_GET_VALUE.args(NAME, "val2"), "Hello");
+
+    // multi-input: XML node + binary literal + value in a single call
+    query(func.args(NAME,
+        " (<doc/>, xs:hexBinary('42'), { 'k': 'v' })",
+        " ('multi.xml', 'multi.bin', 'multi.val')"));
+    query(_DB_GET.args(NAME, "multi.xml") + "/root()", "<doc/>");
+    query(_DB_GET_BINARY.args(NAME, "multi.bin"), "B");
+    query(_DB_GET_VALUE.args(NAME, "multi.val") + "?k", "v");
+
+    // duplicate XML paths in one call: allowed (db:add semantics)
+    query(func.args(NAME, " (<a/>, <a/>)", " ('dup.xml', 'dup.xml')"));
+    query("count(" + _DB_GET.args(NAME, "dup.xml") + ")", 2);
+
+    // duplicate binary path within one call: conflict
+    error(func.args(NAME,
+        " (xs:hexBinary('41'), xs:hexBinary('42'))",
+        " ('clash.bin', 'clash.bin')"), DB_CONFLICT5_X);
+    // duplicate value path within one call: conflict
+    error(func.args(NAME, " (1, 2)", " ('clash.val', 'clash.val')"), DB_CONFLICT5_X);
+
+    // existing binary resource: second db:add against same path is rejected
+    query(func.args(NAME, " xs:hexBinary('41')", "exists.bin"));
+    error(func.args(NAME, " xs:hexBinary('42')", "exists.bin"), DB_CONFLICT5_X);
+    // existing value resource: same
+    query(func.args(NAME, " 1", "exists.val"));
+    error(func.args(NAME, " 2", "exists.val"), DB_CONFLICT5_X);
+
+    // empty inputs: no-op
+    query(func.args(NAME, " ()"));
+
+    // error: count mismatch between inputs and paths
+    error(func.args(NAME, " (<a/>, <b/>)", "only-one.xml"), DB_ARGS_X_X);
+
+    // error: type 'binary' with a non-binary, non-string input
+    error(func.args(NAME, " xs:date('2026-05-13')", " { 'x.bin': 'binary' }"), STRBIN_X_X);
+    // error: type 'xml' with a binary literal
+    error(func.args(NAME, " xs:hexBinary('41')", " { 'x.xml': 'xml' }"), STRNOD_X_X);
+    // error: empty path for binary
+    error(func.args(NAME, " xs:hexBinary('41')", " { '': 'binary' }"), DB_PATH_X);
+    // error: empty path for value
+    error(func.args(NAME, " 1", " { '': 'value' }"), DB_PATH_X);
+
+    // error: input pointing to a directory
+    error(func.args(NAME, " <doc/>", " { 'x.bin': 'binary' }"), WHICHRES_X);
+  }
+
   /** Test method. */
   @Test public void alter() {
     // close database in global context
@@ -235,7 +296,7 @@ public final class DbModuleTest extends SandboxTest {
   @Test public void contentType() {
     final Function func = _DB_CONTENT_TYPE;
     query(_DB_ADD.args(NAME, " <a/>", "xml"));
-    query(_DB_PUT_BINARY.args(NAME, "bla", "binary"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('626C61')", "binary"));
     query(func.args(NAME, "xml"), MediaType.APPLICATION_XML.toString());
     query(func.args(NAME, "binary"), MediaType.APPLICATION_OCTET_STREAM.toString());
     error(func.args(NAME, "test"), WHICHRES_X);
@@ -400,6 +461,81 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_DROP.args(dbName));
   }
 
+  /** Test method: creating a database with mixed XML, binary, and value resources. */
+  @Test public void create3() {
+    final Function func = _DB_CREATE;
+    execute(new Close());
+
+    // type dispatch: binary literal becomes a binary resource
+    query(func.args(NAME, " xs:hexBinary('41')", "bin"));
+    query(_DB_GET_BINARY.args(NAME, "bin"), "A");
+
+    // type dispatch: maps are stored as values
+    query(func.args(NAME, " { 'a': 1 }", "data"));
+    query(_DB_GET_VALUE.args(NAME, "data") + "?a", 1);
+
+    // type dispatch: integers are stored as values
+    query(func.args(NAME, " 42", "answer"));
+    query(_DB_GET_VALUE.args(NAME, "answer"), 42);
+
+    // explicit override: string stored as a value resource (db:put-value semantics)
+    query(func.args(NAME, "Hallo Welt", " { 'note.txt': 'value' }"));
+    query(_DB_GET_VALUE.args(NAME, "note.txt"), "Hallo Welt");
+
+    // explicit override: xs:anyURI stored as a value resource
+    query(func.args(NAME, " xs:anyURI('http://example.org/')", " { 'uri': 'value' }"));
+    query(_DB_GET_VALUE.args(NAME, "uri"), "http://example.org/");
+
+    // explicit override: file path read as binary
+    query(func.args(NAME, XML, " { 'a.bin': 'binary' }"));
+    query("string-length(" + _DB_GET_BINARY.args(NAME, "a.bin") + ") > 0", true);
+
+    // explicit override: type 'xml' on a string is identical to default behaviour
+    query(func.args(NAME, XML, " { 'a.xml': 'xml' }"));
+    query("count(" + _DB_GET.args(NAME, "a.xml") + "/html)", 1);
+
+    // explicit override: node stored as a value resource (XDM value, not XML)
+    query(func.args(NAME, " <node/>", " { 'node.xdm': 'value' }"));
+    query(_DB_GET_VALUE.args(NAME, "node.xdm"), "<node/>");
+
+    // mixed inputs: XML node + binary literal in one call
+    query(func.args(NAME, " (<doc/>, xs:hexBinary('42'))", " ('doc.xml', 'b')"));
+    query(_DB_GET.args(NAME, "doc.xml") + "/root()", "<doc/>");
+    query(_DB_GET_BINARY.args(NAME, "b"), "B");
+
+    // mixed inputs in a single call: XML, binary literal, value, IO ref as binary
+    query(func.args(NAME,
+        " (<doc/>, xs:hexBinary('42'), { 'k': 'v' }, '" + XML + "')",
+        " ('doc.xml', 'b', { 'data': 'value' }, { 'page.html': 'binary' })"));
+    query(_DB_GET.args(NAME, "doc.xml") + "/root()", "<doc/>");
+    query(_DB_GET_BINARY.args(NAME, "b"), "B");
+    query(_DB_GET_VALUE.args(NAME, "data") + "?k", "v");
+    query("string-length(" + _DB_GET_BINARY.args(NAME, "page.html") + ") > 0", true);
+
+    // error: more than one entry in the metadata map
+    error(func.args(NAME, "x", " { 'a.txt': 'value', 'b': 'value' }"), DB_PATH_X);
+    // error: empty path in the metadata map
+    error(func.args(NAME, "x", " { '': 'value' }"), DB_PATH_X);
+    // error: unknown resource type
+    error(func.args(NAME, "x", " { 'a': 'unknown' }"), EXP_FOUND_X_X);
+    // error: type 'binary' with a non-binary, non-string input
+    error(func.args(NAME, " xs:date('2026-05-13')", " { 'a': 'binary' }"), STRBIN_X_X);
+    // error: type 'xml' with a binary literal
+    error(func.args(NAME, " xs:hexBinary('41')", " { 'a': 'xml' }"), STRNOD_X_X);
+    // error: duplicate binary path within a single call
+    error(func.args(NAME,
+        " (xs:hexBinary('41'), xs:hexBinary('42'))",
+        " ('clash', 'clash')"), DB_CONFLICT5_X);
+    // error: duplicate value path within a single call
+    error(func.args(NAME, " (1, 2)", " ('clash', 'clash')"), DB_CONFLICT5_X);
+
+    // error: input pointing to a directory
+    error(func.args(NAME, " <doc/>", " { 'x.bin': 'binary' }"), WHICHRES_X);
+
+    // eventually drop database
+    query(_DB_DROP.args(NAME));
+  }
+
   /** Test method. */
   @Test public void createBackup() {
     final Function func = _DB_CREATE_BACKUP;
@@ -438,7 +574,7 @@ public final class DbModuleTest extends SandboxTest {
   @Test public void dir() {
     final Function func = _DB_DIR;
     query(_DB_ADD.args(NAME, " <a/>", "xml/doc.xml"));
-    query(_DB_PUT_BINARY.args(NAME, "bla", "binary/binary.data"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('626C61')", "binary/binary.data"));
     query(_DB_PUT_VALUE.args(NAME, " 1 to 5", "value/value.data"));
 
     String call = func.args(NAME, "xml");
@@ -511,7 +647,7 @@ public final class DbModuleTest extends SandboxTest {
   @Test public void exists() {
     final Function func = _DB_EXISTS;
     query(_DB_ADD.args(NAME, " <a/>", "x/xml"));
-    query(_DB_PUT_BINARY.args(NAME, "bla", "x/binary"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('626C61')", "x/binary"));
     // checks if the specified resources exist (false expected for directories)
     query(func.args(NAME), true);
     query(func.args(NAME, "x/xml"), true);
@@ -574,7 +710,8 @@ public final class DbModuleTest extends SandboxTest {
     query("xs:hexBinary(" + func.args(NAME, "path") + ')', "A");
     query(_DB_DELETE.args(NAME, "path"));
 
-    query("(0 to 5) !" + put.args(NAME, " .", " 'path' || ."), "");
+    query("(0 to 5) !" + put.args(NAME, " convert:string-to-base64(string(.))",
+        " 'path' || ."), "");
     query("(0 to 5) !" + func.args(NAME, " 'path' || ."), "0\n1\n2\n3\n4\n5");
     query(func.args(NAME) + " => map:keys() => count()", 6);
 
@@ -631,7 +768,7 @@ public final class DbModuleTest extends SandboxTest {
     contains(func.args(NAME, "test/"), "test/docs");
     contains(func.args(NAME, "test/docs/input.xml"), "input.xml");
 
-    query(_DB_PUT_BINARY.args(NAME, "b", "bin/b"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('62')", "bin/b"));
     query(func.args(NAME, "bin/"), "bin/b");
     query(func.args(NAME, "bin/b"), "bin/b");
 
@@ -652,7 +789,7 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args() + "/@resources/string()", 1);
 
     query(_DB_ADD.args(NAME, " <a/>", "xml/xml.xml"));
-    query(_DB_PUT_BINARY.args(NAME, "bla", "binary/binary.data"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('626C61')", "binary/binary.data"));
     query(_DB_PUT_VALUE.args(NAME, " 1 to 5", "value/value.data"));
 
     String call = func.args(NAME, "xml/");
@@ -881,7 +1018,7 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_GET.args(NAME, "10.xml"), "<y/>");
     query(func.args(NAME, "<z/>", "10.xml", " { 'replace': false() }"));
     query(_DB_GET.args(NAME, "10.xml"), "<y/>");
-    query(_DB_PUT_BINARY.args(NAME, "xxx", "10.xml"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('787878')", "10.xml"));
     query(func.args(NAME, "<z/>", "10.xml", " { 'replace': false() }"));
     query(_DB_GET.args(NAME, "10.xml"), "");
   }
@@ -889,26 +1026,35 @@ public final class DbModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void putBinary() {
     final Function func = _DB_PUT_BINARY;
-    query(func.args(NAME, "xs:hexBinary('41')", "binary1"));
-    query(func.args(NAME, "b", "binary2"));
+    // binary item: stored verbatim
+    query(func.args(NAME, " xs:hexBinary('41')", "binary1"));
+    query(_DB_GET_BINARY.args(NAME, "binary1"), "A");
+    query(func.args(NAME, " xs:hexBinary('62')", "binary2"));
     query(_DB_GET_BINARY.args(NAME, "binary2"), "b");
-    query(func.args(NAME, 123, "binary3"));
-    query(_DB_GET_BINARY.args(NAME, "binary3"), 123);
 
-    // GH-2462: replace existing resource
+    // string input: interpreted as URI of an existing file
+    error(func.args(NAME, "no-such-file.bin", "errPath"), WHICHRES_X);
+    // non-string/non-binary atomic inputs rejected
+    error(func.args(NAME, 123, "errType"), STRBIN_X_X);
+
+    // GH-2462: replace existing XML resource (hex of '<xml/>')
     query(_DB_PUT.args(NAME, "<xml/>", "mixed"));
-    query(func.args(NAME, "<xml/>", "mixed"));
+    query(func.args(NAME, " xs:hexBinary('3C786D6C2F3E')", "mixed"));
     query(_DB_GET_BINARY.args(NAME, "mixed"), "<xml/>");
     query(_DB_GET.args(NAME, "mixed"), "");
 
-    // GH-2459
-    query(func.args(NAME, "<blu/>", "mixed", " { 'replace': true() }"));
+    // GH-2459: replace option (hex of '<blu/>' and '<bla/>')
+    query(func.args(NAME, " xs:hexBinary('3C626C752F3E')", "mixed",
+        " { 'replace': true() }"));
     query(_DB_GET_BINARY.args(NAME, "mixed"), "<blu/>");
-    query(func.args(NAME, "<bla/>", "mixed", " { 'replace': false() }"));
+    query(func.args(NAME, " xs:hexBinary('3C626C612F3E')", "mixed",
+        " { 'replace': false() }"));
     query(_DB_GET_BINARY.args(NAME, "mixed"), "<blu/>");
     query(_DB_GET.args(NAME, "mixed"), "");
 
-    error(func.args(NAME, "bin/x", "x") + ", " + func.args(NAME, "bin//x", "x"), DB_CONFLICT5_X);
+    // two puts to the same effective path within one query
+    error(func.args(NAME, " xs:hexBinary('01')", "x") + ", " +
+        func.args(NAME, " xs:hexBinary('02')", "x"), DB_CONFLICT5_X);
   }
 
   /** Test method. */
@@ -964,7 +1110,7 @@ public final class DbModuleTest extends SandboxTest {
     query("count(" + COLLECTION.args(NAME + "/x/newtest") + ")", XMLFILES);
 
     // rename binary file
-    query(_DB_PUT_BINARY.args(NAME, "", "file1"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('')", "file1"));
     query(func.args(NAME, "file1", "file2"));
     query(_DB_GET_BINARY.args(NAME, "file2"));
     error(_DB_GET_BINARY.args(NAME, "file1"), WHICHRES_X);
@@ -976,8 +1122,8 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_GET_BINARY.args(NAME, "dir2/file3"));
     error(_DB_GET_BINARY.args(NAME, "dir1"), WHICHRES_X);
 
-    query(_DB_PUT_BINARY.args(NAME, "", "file4"));
-    query(_DB_PUT_BINARY.args(NAME, "", "dir3/file5"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('')", "file4"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('')", "dir3/file5"));
 
     error(func.args(NAME, "dir2", "file4"), DB_PATH_X);
     error(func.args(NAME, "file4", "dir2"), DB_PATH_X);
@@ -1069,7 +1215,7 @@ public final class DbModuleTest extends SandboxTest {
   @Test public void type() {
     final Function func = _DB_TYPE;
     query(_DB_ADD.args(NAME, " <a/>", "xml.xml"));
-    query(_DB_PUT_BINARY.args(NAME, "bla", "bla.bin"));
+    query(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('626C61')", "bla.bin"));
     query(func.args(NAME, "xml.xml"), "xml");
     query(func.args(NAME, "bla.bin"), "binary");
   }

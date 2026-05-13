@@ -148,8 +148,7 @@ public class MapMerge extends MapFn {
     // fixed option
     final String string = duplicates.isEmpty() ? dflt.toString() : toString(duplicates, qc);
     final Duplicates value = Enums.get(Duplicates.class, string);
-    if(value == null) throw typeError(duplicates,
-        EnumType.get(Duplicates.values()), info);
+    if(value == null) throw typeError(duplicates, EnumType.get(Duplicates.values()), info);
 
     return switch(value) {
       case REJECT -> new Reject();

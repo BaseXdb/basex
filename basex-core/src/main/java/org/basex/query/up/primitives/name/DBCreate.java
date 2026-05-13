@@ -64,7 +64,7 @@ public final class DBCreate extends NameUpdate {
       if(clip != null) {
         data.startUpdate(options);
         try {
-          newDocs.addTo(data);
+          newDocs.addTo(data, false);
           Optimize.optimize(data, null);
         } finally {
           data.finishUpdate(options);

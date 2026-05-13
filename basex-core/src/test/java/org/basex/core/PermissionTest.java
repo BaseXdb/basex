@@ -67,7 +67,7 @@ public final class PermissionTest extends SandboxTest {
       testSession = createClient(NAME, NAME);
 
       ok(new CreateDB(NAME, "<xml/>"), adminSession);
-      ok(new XQuery(_DB_PUT_BINARY.args(NAME, "b", "binary")), adminSession);
+      ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('62')", "binary")), adminSession);
       ok(new XQuery(_DB_PUT_VALUE.args(NAME, "v", "value")), adminSession);
       ok(new XQuery(_FILE_WRITE.args(sandbox() + "file", "file")), adminSession);
       ok(new Close(), adminSession);
@@ -352,7 +352,7 @@ public final class PermissionTest extends SandboxTest {
 
     ok(new XQuery(_DB_ADD.args(NAME, "<a/>", "a.xml")), testSession);
     ok(new XQuery(_DB_PUT.args(NAME, "<a/>", "a.xml")), testSession);
-    ok(new XQuery(_DB_PUT_BINARY.args(NAME, "b", "binary")), testSession);
+    ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('62')", "binary")), testSession);
     ok(new XQuery(_DB_PUT_VALUE.args(NAME, "v", "value")), testSession);
     ok(new XQuery(_DB_RENAME.args(NAME, "a.xml", "b.xml")), testSession);
     ok(new XQuery(_DB_DELETE.args(NAME, "b.xml")), testSession);
@@ -439,7 +439,7 @@ public final class PermissionTest extends SandboxTest {
 
     ok(new XQuery(_DB_ADD.args(NAME, "<a/>", "a.xml")), testSession);
     ok(new XQuery(_DB_PUT.args(NAME, "<a/>", "a.xml")), testSession);
-    ok(new XQuery(_DB_PUT_BINARY.args(NAME, "b", "binary")), testSession);
+    ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('62')", "binary")), testSession);
     ok(new XQuery(_DB_PUT_VALUE.args(NAME, "v", "value")), testSession);
     ok(new XQuery(_DB_RENAME.args(NAME, "a.xml", "b.xml")), testSession);
     ok(new XQuery(_DB_DELETE.args(NAME, "b.xml")), testSession);
@@ -527,7 +527,7 @@ public final class PermissionTest extends SandboxTest {
 
     ok(new XQuery(_DB_ADD.args(NAME, "<a/>", "a.xml")), testSession);
     ok(new XQuery(_DB_PUT.args(NAME, "<a/>", "a.xml")), testSession);
-    ok(new XQuery(_DB_PUT_BINARY.args(NAME, "b", "binary")), testSession);
+    ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('62')", "binary")), testSession);
     ok(new XQuery(_DB_PUT_VALUE.args(NAME, "v", "value")), testSession);
     ok(new XQuery(_DB_RENAME.args(NAME, "a.xml", "b.xml")), testSession);
     ok(new XQuery(_DB_DELETE.args(NAME, "b.xml")), testSession);

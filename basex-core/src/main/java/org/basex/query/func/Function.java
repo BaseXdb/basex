@@ -1298,8 +1298,8 @@ public enum Function implements AFunction {
   // Database Module
 
   /** XQuery function. */
-  _DB_ADD(DbAdd::new, "add(database,input[,path,options])",
-      params(STRING_O, ITEM_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+  _DB_ADD(DbAdd::new, "add(database,inputs[,paths,options])",
+      params(STRING_O, ITEM_ZM, DB_PATH_SPEC_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_ALTER(DbAlter::new, "alter(database,new-name)",
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1323,7 +1323,7 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_O), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_CREATE(DbCreate::new, "create(name[,inputs,paths,options])",
-      params(STRING_O, ITEM_ZM, STRING_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      params(STRING_O, ITEM_ZM, DB_PATH_SPEC_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_CREATE_BACKUP(DbCreateBackup::new, "create-backup(database[,options])",
       params(STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
@@ -1401,10 +1401,11 @@ public enum Function implements AFunction {
       params(STRING_O), MAP_O, DB_URI),
   /** XQuery function. */
   _DB_PUT(DbPut::new, "put(database,input,path[,options])",
-      params(STRING_O, ITEM_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      params(STRING_O, NODE_OR_STRING_OR_BINARY_O, STRING_O, MAP_ZO),
+      EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_PUT_BINARY(DbPutBinary::new, "put-binary(database,input,path[,options])",
-      params(STRING_O, STRING_O, ITEM_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
+      params(STRING_O, STRING_OR_BINARY_O, STRING_O, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),
   /** XQuery function. */
   _DB_PUT_VALUE(DbPutValue::new, "put-value(database,input,path[,options])",
       params(STRING_O, ITEM_ZM, ITEM_ZM, MAP_ZO), EMPTY_SEQUENCE_Z, flag(UPD), DB_URI),

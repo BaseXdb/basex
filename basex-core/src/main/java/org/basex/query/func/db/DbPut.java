@@ -44,7 +44,7 @@ public final class DbPut extends DbNew {
         // store XML document: replace existing document or add new one
         final NewInput ni = toNewInput(input, path);
         final Update update = docs.isEmpty() ?
-          new DBAdd(data, ni, options, true, qc, info) :
+          new DBAdd(data, options, true, qc, info, ni) :
           new ReplaceDoc(docs.get(d++), data, ni, options, qc, info);
         updates.add(update, qc);
 

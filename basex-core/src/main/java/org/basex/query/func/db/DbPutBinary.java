@@ -25,13 +25,17 @@ public class DbPutBinary extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Data data = toData(qc);
-    final Item input = toNodeOrAtomItem(arg(1), false, qc);
+    final Item input = arg(1).item(qc, info);
     final String path = toDbPath(arg(2), qc);
-    return put(data, path, new DBPutBinary(data, input, path, info), qc);
+    if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
+    if(path.isEmpty()) throw DB_PATH_X.get(info, path);
+    final Object source = toBinarySource(input);
+    return put(data, path, new DBPutBinary(data, source, path, info), qc);
   }
 
   /**
-   * Performs a put operation.
+   * Performs a put operation. The caller is expected to validate the database state
+   * and the target path beforehand.
    * @param data data reference
    * @param path target path
    * @param up update to perform
@@ -43,9 +47,6 @@ public class DbPutBinary extends DbNew {
       throws QueryException {
 
     final HashMap<String, String> options = toOptions(arg(3), qc);
-    if(data.inMemory()) throw DB_MAINMEM_X.get(info, data.meta.name);
-    if(path.isEmpty()) throw DB_PATH_X.get(info, path);
-
     final IntList docs = data.resources.docs(path);
     if(put(docs, data, path, options)) {
       // delete XML resources

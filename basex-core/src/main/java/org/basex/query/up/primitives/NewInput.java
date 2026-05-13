@@ -1,6 +1,8 @@
 package org.basex.query.up.primitives;
 
+import org.basex.index.resource.*;
 import org.basex.io.*;
+import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
 
@@ -13,14 +15,22 @@ import org.basex.util.*;
 public final class NewInput {
   /** Database path. */
   public String path;
-  /** Node to be added ({@code null} if input reference exists). */
+  /** Resource type (defaults to XML). */
+  public ResourceType type = ResourceType.XML;
+  /** Node to be added (only for XML resources). */
   public XNode node;
-  /** Input to be added ({@code null} if node exists). */
+  /** IO reference to be added ({@code null} for in-memory inputs). */
   public IO io;
+  /** XDM value to be stored (for binary or value resources). */
+  public Value value;
 
   @Override
   public String toString() {
-    return Util.className(this) + '[' + "path: \"" + path + "\", " +
-        (node != null ? "node" : "io: " + io) + ']';
+    final StringBuilder sb = new StringBuilder(Util.className(this));
+    sb.append("[path: \"").append(path).append("\", type: ").append(type).append(", ");
+    if(node != null) sb.append("node");
+    else if(io != null) sb.append("io: ").append(io);
+    else sb.append("value");
+    return sb.append(']').toString();
   }
 }

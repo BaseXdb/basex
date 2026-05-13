@@ -3,12 +3,14 @@ package org.basex.query.expr;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.NodeType.*;
+import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.concurrent.*;
 
 import org.basex.core.users.*;
 import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.path.*;
@@ -697,6 +699,25 @@ public abstract class ParseExpr extends Expr {
     if(item.type.isStringOrUntyped()) return item.string(info);
     if(item instanceof final Bin bin) return bin.binary(info);
     throw STRBIN_X_X.get(info, item.seqType(), item);
+  }
+
+  /**
+   * Extracts a binary source from the supplied item:
+   * <ul>
+   *   <li>binary items ({@code xs:base64Binary}, {@code xs:hexBinary}) are returned verbatim,</li>
+   *   <li>string-typed/untyped atomic items are interpreted as URIs pointing to a file.</li>
+   * </ul>
+   * @param input input item
+   * @return binary source (a {@link Bin} or an {@link IO} reference)
+   * @throws QueryException query exception
+   */
+  protected final Object toBinarySource(final Item input) throws QueryException {
+    if(input instanceof Bin) return input;
+    if(!input.type.isStringOrUntyped()) throw STRBIN_X_X.get(info, input.type, input);
+    final String string = string(input.string(info));
+    final IO io = IO.get(string);
+    if(!io.exists() || io.isDir()) throw WHICHRES_X.get(info, string);
+    return io;
   }
 
   /**

@@ -160,7 +160,7 @@ public class CommandTest extends SandboxTest {
     no(new Get(FN));
     // GH-2459
     try {
-      ok(new XQuery(_DB_PUT_BINARY.args(NAME, "A", FN)));
+      ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", FN)));
       ok(new Set(MainOptions.REPLACE, false));
       ok(new BinaryPut(FN, FILE));
       ok(new XQuery(_DB_GET_BINARY.args(NAME, FN)));
@@ -515,7 +515,7 @@ public class CommandTest extends SandboxTest {
     no(new Put("..", "<a/>"));
     no(new Put("/", "<a/>"));
     // create and replace binary file
-    ok(new XQuery(_DB_PUT_BINARY.args(NAME, "DATA", "path")));
+    ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('44415441')", "path")));
     ok(new Put("path", "<b/>"));
     assertFalse(ok(new XQuery(_DB_GET.args(NAME))).isEmpty());
     ok(new XQuery(_DB_GET_BINARY.args(NAME, "path")));
@@ -524,7 +524,7 @@ public class CommandTest extends SandboxTest {
     assertEquals("1", ok(new XQuery(count)));
     // GH-2459
     try {
-      ok(new XQuery(_DB_PUT_BINARY.args(NAME, "A", FN)));
+      ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('41')", FN)));
       ok(new Set(MainOptions.REPLACE, false));
       ok(new Put(FN, FILE));
       ok(new XQuery(_DB_GET_BINARY.args(NAME, FN)));
