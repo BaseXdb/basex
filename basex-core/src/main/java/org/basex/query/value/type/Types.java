@@ -164,6 +164,9 @@ public final class Types {
 
   /** Resource type enum, used by db:add and db:create as a per-path override. */
   public static final EnumType DB_RESOURCE_TYPE = EnumType.get("xml", "binary", "value");
+  /** Runtime option enum, used by prof:runtime. */
+  public static final EnumType PROF_RUNTIME_OPTION =
+      EnumType.get("used", "total", "max", "processors");
   /** Database path: a string, or a single-entry map binding the path to a resource type. */
   public static final Type DB_PATH_SPEC = ChoiceItemType.get(STRING,
       MapType.get(STRING, DB_RESOURCE_TYPE.seqType()));

@@ -41,13 +41,13 @@ public class SqlExecute extends SqlFn {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final Connection conn = connection(qc);
-    final String query = toString(arg(1), qc);
+    final String statement = toString(arg(1), qc);
     final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
 
     try {
       final Statement stmt = conn.createStatement();
       stmt.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
-      return iter(stmt, true, stmt.execute(query));
+      return iter(stmt, true, stmt.execute(statement));
     } catch(final SQLTimeoutException ex) {
       throw SQL_TIMEOUT_X.get(info, ex);
     } catch(final SQLException ex) {

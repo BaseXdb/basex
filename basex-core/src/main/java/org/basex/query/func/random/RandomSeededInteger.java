@@ -19,15 +19,15 @@ public final class RandomSeededInteger extends StandardFunc {
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
     final long seed = toLong(arg(0), qc);
-    final long num = toLong(arg(1), qc);
+    final long count = toLong(arg(1), qc);
     final Long max = toLongOrNull(arg(2), qc);
-    if(num < 0) throw RANGE_NEGATIVE_X.get(info, num);
+    if(count < 0) throw RANGE_NEGATIVE_X.get(info, count);
     if(max != null && (max < 1 || max > Integer.MAX_VALUE)) throw RANDOM_BOUNDS_X.get(info, max);
 
     return new Iter() {
       final Random r = new Random(seed);
       final int mx = (int) (max != null ? (long) max : 0);
-      long c = num;
+      long c = count;
 
       @Override
       public Item next() {

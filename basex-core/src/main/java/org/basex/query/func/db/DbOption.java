@@ -15,10 +15,10 @@ import org.basex.util.*;
 public final class DbOption extends DbOptionMap {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] name = toToken(arg(0), qc);
+    final byte[] key = toToken(arg(0), qc);
 
-    final Object value = qc.context.option(Token.string(name));
-    if(value == null) throw DB_OPTION_X.get(info, name);
+    final Object value = qc.context.option(Token.string(key));
+    if(value == null) throw DB_OPTION_X.get(info, key);
     return item(value);
   }
 }

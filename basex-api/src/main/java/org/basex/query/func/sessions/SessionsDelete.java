@@ -16,9 +16,9 @@ public final class SessionsDelete extends SessionsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ASession session = session(qc);
-    final String name = toString(arg(1), qc);
+    final String key = toString(arg(1), qc);
 
-    session.delete(name);
+    session.delete(key);
     return Empty.VALUE;
   }
 }

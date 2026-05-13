@@ -17,10 +17,10 @@ public final class SessionsSet extends SessionsFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final ASession session = session(qc);
-    final String name = toString(arg(1), qc);
+    final String key = toString(arg(1), qc);
     final Value value = arg(2).value(qc);
 
-    session.set(name, value.materialize(n -> false, info, qc));
+    session.set(key, value.materialize(n -> false, info, qc));
     return Empty.VALUE;
   }
 }

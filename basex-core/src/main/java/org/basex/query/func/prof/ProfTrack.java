@@ -44,10 +44,10 @@ public final class ProfTrack extends StandardFunc {
       perf = new Performance();
     }
     // include resulting value
-    Value value = null;
+    Value input = null;
     if(options.get(TrackOptions.VALUE)) {
       // retrieve and assign value
-      value = arg(0).value(qc);
+      input = arg(0).value(qc);
     } else {
       // iterate through results; skip iteration if iterator is based on a value
       final Iter iter = arg(0).iter(qc);
@@ -69,7 +69,7 @@ public final class ProfTrack extends StandardFunc {
       mb.put(TrackOptions.MEMORY.name(), Itr.get(Math.max(0, Performance.memory() - min)));
     }
     // evaluated value
-    if(value != null) mb.put(TrackOptions.VALUE.name(), value);
+    if(input != null) mb.put(TrackOptions.VALUE.name(), input);
     return mb.map();
   }
 }

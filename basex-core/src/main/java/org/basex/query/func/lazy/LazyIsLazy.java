@@ -20,6 +20,7 @@ public final class LazyIsLazy extends StandardFunc {
   @Override
   public boolean test(final QueryContext qc, final InputInfo ii, final long pos)
       throws QueryException {
-    return toAtomItem(arg(0), qc) instanceof Lazy;
+    final Item value = toAtomItem(arg(0), qc);
+    return value instanceof Lazy;
   }
 }

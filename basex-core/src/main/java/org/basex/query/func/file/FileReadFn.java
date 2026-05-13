@@ -33,13 +33,13 @@ abstract class FileReadFn extends FileFn {
    * @throws QueryException query exception
    */
   final ParseOptions options(final Path path, final QueryContext qc) throws QueryException {
-    final Item arg1 = arg(1).unwrappedItem(qc, info);
+    final Item options = arg(1).unwrappedItem(qc, info);
 
     final ParseOptions po = new ParseOptions();
-    if(arg1 instanceof final XQMap map) {
+    if(options instanceof final XQMap map) {
       toOptions(map, po, qc);
     } else {
-      po.set(ParseOptions.ENCODING, toStringOrNull(arg1, qc));
+      po.set(ParseOptions.ENCODING, toStringOrNull(options, qc));
     }
     toEncodingOrNull(po.get(ParseOptions.ENCODING), FILE_UNKNOWN_ENCODING_X);
 

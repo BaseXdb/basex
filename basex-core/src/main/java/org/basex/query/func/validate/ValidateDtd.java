@@ -32,8 +32,8 @@ public class ValidateDtd extends ValidateFn {
           throws IOException, ParserConfigurationException, SAXException, QueryException {
 
         final Item input = toNodeOrAtomItem(arg(0), false, qc);
-        final String schema = toStringOrNull(arg(1), qc);
-        final IO schm = schema != null ? toIO(schema, true) : null;
+        final String dtd = toStringOrNull(arg(1), qc);
+        final IO schm = dtd != null ? toIO(dtd, true) : null;
 
         // integrate doctype declaration via serialization parameters
         SerializerOptions sp = null;

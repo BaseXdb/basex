@@ -18,10 +18,10 @@ import org.basex.query.value.seq.*;
 public final class FileCreateDir extends FileFn {
   @Override
   public Value eval(final QueryContext qc) throws QueryException, IOException {
-    final Path path = absolute(toPath(arg(0), qc));
+    final Path dir = absolute(toPath(arg(0), qc));
 
     // find the lowest existing path
-    for(Path p = path; p != null;) {
+    for(Path p = dir; p != null;) {
       if(Files.exists(p)) {
         if(Files.isRegularFile(p)) throw FILE_EXISTS_X.get(info, p);
         break;
@@ -29,7 +29,7 @@ public final class FileCreateDir extends FileFn {
       p = p.getParent();
     }
 
-    Files.createDirectories(path);
+    Files.createDirectories(dir);
     return Empty.VALUE;
   }
 }

@@ -14,10 +14,10 @@ import org.basex.query.value.*;
 public final class LazyCache extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Value value = arg(0).value(qc);
+    final Value input = arg(0).value(qc);
     final boolean lazy = toBooleanOrFalse(arg(1), qc);
-    value.cache(lazy, info);
-    return value;
+    input.cache(lazy, info);
+    return input;
   }
 
   @Override

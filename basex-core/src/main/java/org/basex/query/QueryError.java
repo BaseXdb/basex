@@ -357,9 +357,6 @@ public enum QueryError {
 
   // Profiling Module
 
-  /** Error code. */
-  PROF_OPTION_X(PROF, "option", "Unknown option: %."),
-
   // Random Module
 
   /** Error code. */

@@ -18,11 +18,11 @@ import org.basex.util.*;
 public final class DbCreate extends DbNew {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final String name = toName(arg(0), qc);
-    checkCreate(name, qc);
+    final String database = toName(arg(0), qc);
+    checkCreate(database, qc);
     final NewInput[] inputs = toInputs(qc);
     final HashMap<String, String> options = toOptions(arg(3), qc);
-    qc.updates().add(new DBCreate(name, inputs, options, qc, info), qc);
+    qc.updates().add(new DBCreate(database, inputs, options, qc, info), qc);
     return Empty.VALUE;
   }
 }

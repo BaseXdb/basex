@@ -42,7 +42,7 @@ public final class ProfModuleTest extends SandboxTest {
     query(func.args("total") + " instance of xs:integer", true);
     query(func.args("max") + " instance of xs:integer", true);
     query(func.args("processors") + " instance of xs:integer", true);
-    error(func.args("x"), QueryError.PROF_OPTION_X);
+    error(func.args("x"), QueryError.EXP_FOUND_X_X);
   }
 
   /** Test method. */

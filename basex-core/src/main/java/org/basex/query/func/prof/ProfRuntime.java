@@ -1,10 +1,9 @@
 package org.basex.query.func.prof;
 
-import static org.basex.query.QueryError.*;
+import java.util.function.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -16,20 +15,51 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ProfRuntime extends StandardFunc {
+  /** Runtime option. */
+  public enum RuntimeOption {
+    /** Used memory.          */ USED(rt -> rt.totalMemory() - rt.freeMemory()),
+    /** Total memory.         */ TOTAL(Runtime::totalMemory),
+    /** Maximum memory.       */ MAX(Runtime::maxMemory),
+    /** Available processors. */ PROCESSORS(Runtime::availableProcessors);
+
+    /** Value supplier. */
+    private final ToLongFunction<Runtime> fn;
+
+    /**
+     * Constructor.
+     * @param fn value supplier
+     */
+    RuntimeOption(final ToLongFunction<Runtime> fn) {
+      this.fn = fn;
+    }
+
+    /**
+     * Returns the current value of this option.
+     * @param rt runtime
+     * @return value
+     */
+    public long apply(final Runtime rt) {
+      return fn.applyAsLong(rt);
+    }
+
+    @Override
+    public String toString() {
+      return Enums.string(this);
+    }
+  }
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final byte[] name = toTokenOrNull(arg(0), qc);
+    final Item option = arg(0).atomItem(qc, info);
     final Runtime rt = Runtime.getRuntime();
 
-    final MapBuilder map = new MapBuilder();
-    map.put("used", Itr.get(rt.totalMemory() - rt.freeMemory()));
-    map.put("total", Itr.get(rt.totalMemory()));
-    map.put("max", Itr.get(rt.maxMemory()));
-    map.put("processors", Itr.get(rt.availableProcessors()));
-    if(name == null) return map.map();
-
-    final Value value = map.get(Str.get(name));
-    if(value != null) return (Item) value;
-    throw PROF_OPTION_X.get(info, name);
+    if(option.isEmpty()) {
+      final MapBuilder map = new MapBuilder();
+      for(final RuntimeOption opt : RuntimeOption.values()) {
+        map.put(opt.toString(), Itr.get(opt.apply(rt)));
+      }
+      return map.map();
+    }
+    return Itr.get(toEnum(option, RuntimeOption.class).apply(rt));
   }
 }

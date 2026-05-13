@@ -18,12 +18,12 @@ import org.basex.util.*;
 public final class WebError extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final long code = toLong(arg(0), qc);
+    final long status = toLong(arg(0), qc);
     final String message = toString(arg(1), qc);
-    if(code <= 0 || code > 999) throw WEB_STATUS_X.get(info, code);
+    if(status <= 0 || status > 999) throw WEB_STATUS_X.get(info, status);
 
-    final QNm qname = new QNm(Token.concat(STATUS, code), REST_URI);
-    throw new QueryException(info, qname, message).value(Itr.get(code));
+    final QNm qname = new QNm(Token.concat(STATUS, status), REST_URI);
+    throw new QueryException(info, qname, message).value(Itr.get(status));
   }
 
   @Override

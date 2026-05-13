@@ -70,7 +70,7 @@ public final class ASession {
 
   /**
    * Returns the value of a session attribute.
-   * @param key key to be requested
+   * @param key attribute key
    * @param qc query context
    * @param info input info
    * @return value, or {@code null} if attribute does not exist
@@ -84,16 +84,16 @@ public final class ASession {
 
   /**
    * Updates a session attribute.
-   * @param name name of the attribute
+   * @param key attribute key
    * @param value value to be stored
    */
-  public void set(final String name, final Value value) {
-    session.setAttribute(name, value);
+  public void set(final String key, final Value value) {
+    session.setAttribute(key, value);
   }
 
   /**
    * Removes a session attribute.
-   * @param key key of the attribute
+   * @param key attribute key
    */
   public void delete(final String key) {
     session.removeAttribute(key);

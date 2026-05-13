@@ -23,7 +23,7 @@ public final class InspectStaticContext extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final Item func = arg(0).item(qc, info);
-    final String name = toString(arg(1), qc);
+    final String key = toString(arg(1), qc);
     final StaticContext sctx;
     if(func.isEmpty()) {
       sctx = sc();
@@ -33,7 +33,7 @@ public final class InspectStaticContext extends StandardFunc {
       throw INVFUNCITEM_X_X.get(info, func.type, func);
     }
 
-    return switch(name) {
+    return switch(key) {
       case BASE_URI ->
         sctx.baseURI();
       case NAMESPACES -> {
@@ -46,8 +46,8 @@ public final class InspectStaticContext extends StandardFunc {
         nsp = NSGlobal.NS;
         ns = nsp.size();
         for(int n = 0; n < ns; n++) {
-          final Str key = Str.get(nsp.name(n));
-          if(!mb.contains(key)) mb.put(key, Str.get(nsp.value(n)));
+          final Str nsKey = Str.get(nsp.name(n));
+          if(!mb.contains(nsKey)) mb.put(nsKey, Str.get(nsp.value(n)));
         }
         yield mb.map();
       }
@@ -83,7 +83,7 @@ public final class InspectStaticContext extends StandardFunc {
         yield mb.map();
       }
       default ->
-        throw INSPECT_UNKNOWN_X.get(info, name);
+        throw INSPECT_UNKNOWN_X.get(info, key);
     };
   }
 }

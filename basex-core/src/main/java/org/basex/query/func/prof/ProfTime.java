@@ -42,10 +42,10 @@ public class ProfTime extends StandardFunc {
    */
   final Value evaluate(final QueryContext qc, final boolean time, final LongSupplier measure)
       throws QueryException {
-    final Value value = arg(0).value(qc);
+    final Value input = arg(0).value(qc);
     final String label = toStringOrNull(arg(1), qc);
     final boolean avg = toBooleanOrFalse(arg(2), qc);
     qc.profiler.evaluate(measure.getAsLong(), label, time, avg);
-    return value;
+    return input;
   }
 }

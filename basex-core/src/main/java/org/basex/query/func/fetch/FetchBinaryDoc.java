@@ -14,7 +14,7 @@ import org.basex.util.*;
 public final class FetchBinaryDoc extends FetchDoc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Bin value = toBin(arg(0), qc);
-    return fetch(new IOContent(value.binary(info)), qc);
+    final Bin source = toBin(arg(0), qc);
+    return fetch(new IOContent(source.binary(info)), qc);
   }
 }

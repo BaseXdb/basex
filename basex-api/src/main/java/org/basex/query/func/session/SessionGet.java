@@ -14,9 +14,9 @@ public final class SessionGet extends SessionFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final ASession session = session(qc, false);
-    final String name = toString(arg(0), qc);
+    final String key = toString(arg(0), qc);
 
-    final Value value = session != null ? session.get(name, qc, info) : null;
+    final Value value = session != null ? session.get(key, qc, info) : null;
     return value != null ? value : defined(1) ? arg(1).value(qc) : Empty.VALUE;
   }
 }
