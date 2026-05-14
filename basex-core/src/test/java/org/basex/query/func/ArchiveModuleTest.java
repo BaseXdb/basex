@@ -228,15 +228,17 @@ public final class ArchiveModuleTest extends SandboxTest {
     query(_ARCHIVE_ENTRIES.args(ZIP_ASCII) + "/text() = 'plain.txt'", true);
     query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_ASCII, "plain.txt")),
         "hello ascii");
-    // 3. UTF-8 flag not set, Shift_JIS: CP437 fallback yields mojibake but stays readable
-    //    Japanese "日本.txt" in Shift_JIS (93 FA 96 7B) decodes via CP437 to "ô·û{.txt"
+    // 3. UTF-8 flag not set, Shift_JIS: CP437 fallback yields mojibake but stays readable;
+    //    also a negative control for the mojibake heuristic. Shift_JIS bytes 93 FA 96 7B
+    //    are not valid UTF-8, so Strings.fixCp437Mojibake leaves the CP437 decoding alone
     query(_ARCHIVE_ENTRIES.args(ZIP_SJIS) + "/text() = 'ô·û{.txt'", true);
     query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_SJIS, "ô·û{.txt")),
         "hello sjis");
-    // 4. UTF-8 flag not set but bytes are actually UTF-8 (Linux zip mis-flag): mojibake
-    //    UTF-8 bytes C3 BC for 'ü' decode via CP437 to "├╝" -> "Pr├╝fung.txt"
-    query(_ARCHIVE_ENTRIES.args(ZIP_UTF8_NO_FLAG) + "/text() = 'Pr├╝fung.txt'", true);
-    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_UTF8_NO_FLAG, "Pr├╝fung.txt")),
+    // 4. UTF-8 flag not set but bytes are actually UTF-8 (Linux zip mis-flag): the CP437
+    //    fallback would yield mojibake "Pr├╝fung.txt"; Strings.fixCp437Mojibake recovers
+    //    the intended UTF-8 name via the CP437→UTF-8 round-trip heuristic
+    query(_ARCHIVE_ENTRIES.args(ZIP_UTF8_NO_FLAG) + "/text() = 'Prüfung.txt'", true);
+    query(_CONVERT_BINARY_TO_STRING.args(" " + func.args(ZIP_UTF8_NO_FLAG, "Prüfung.txt")),
         "hello mojibake");
   }
 

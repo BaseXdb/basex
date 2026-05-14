@@ -163,8 +163,7 @@ public final class Token {
     final int sl = string.length();
     return sl == 0 ? EMPTY :
       sl == 1 || sl == 2 && Character.isHighSurrogate(string.charAt(0)) ?
-        cpToken(string.codePointAt(0)) :
-      string.getBytes(StandardCharsets.UTF_8);
+        cpToken(string.codePointAt(0)) : string.getBytes(StandardCharsets.UTF_8);
   }
 
   /**

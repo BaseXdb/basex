@@ -70,4 +70,37 @@ public final class StringsTest {
 
     assertEquals("a/b/c", Strings.uri2path("a:b:c"));
   }
+
+  /** Test. */
+  @Test public void canonical() {
+    // pure ASCII passes through unchanged
+    assertEquals("", Strings.canonical(""));
+    assertEquals("hello.txt", Strings.canonical("hello.txt"));
+
+    // CP437→UTF-8 mojibake fix: 1-byte (ü), 2-byte (€), 3-byte (日), 4-byte (𝄞)
+    assertEquals("Prüfung.txt", Strings.canonical("Pr├╝fung.txt"));
+    assertEquals("€", Strings.canonical("Γé¼"));
+    assertEquals("日", Strings.canonical("µùÑ"));
+    assertEquals("𝄞", Strings.canonical("≡¥ä₧"));
+
+    // genuine CP437 stays unchanged (0x81 / 'ü' is a UTF-8 continuation byte → invalid)
+    assertEquals("Prüfung.txt", Strings.canonical("Prüfung.txt"));
+    // Shift_JIS "日本.txt" (93 FA 96 7B) decoded via CP437 is not valid UTF-8 either
+    assertEquals("ô·û{.txt", Strings.canonical("ô·û{.txt"));
+
+    // NFD composes to NFC ('e' + U+0301 → 'é')
+    assertEquals("Café.txt", Strings.canonical("Cafe\u0301.txt"));
+
+    // combined mojibake + NFD→NFC: bytes 43 61 66 65 CC 81 2E 74 78 74 (UTF-8 of NFD
+    // "Café.txt") read as CP437 yield "Cafe╠ü.txt"; canonical recovers UTF-8 then NFC
+    assertEquals("Café.txt", Strings.canonical("Cafe╠ü.txt"));
+
+    // path stays a path; mojibake is fixed within each segment
+    assertEquals("dir/Prüfung.txt", Strings.canonical("dir/Pr├╝fung.txt"));
+
+    // known heuristic limitation: a CP437 string whose bytes happen to form valid UTF-8
+    // is false-positively "fixed" (C3 A9 in CP437 = "├⌐", as UTF-8 = "é"); extremely
+    // rare in real filenames, inherent to the round-trip approach
+    assertEquals("é", Strings.canonical("├⌐"));
+  }
 }

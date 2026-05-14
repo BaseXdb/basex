@@ -3,7 +3,6 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
-import java.text.*;
 import java.text.Normalizer.Form;
 
 import org.basex.query.*;
@@ -34,7 +33,7 @@ public final class FnNormalizeUnicode extends StandardFunc {
         throw NORMUNI_X.get(info, form);
       }
     }
-    return value.ascii(info) ? value :
-      Str.get(Normalizer.normalize(string(value.string(info)), frm));
+    final byte[] bytes = value.string(info), normalized = Token.normalize(bytes, frm);
+    return normalized == bytes ? value : Str.get(normalized);
   }
 }

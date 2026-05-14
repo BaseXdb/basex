@@ -3,6 +3,7 @@ package org.basex.util;
 import java.net.*;
 import java.nio.charset.*;
 import java.security.*;
+import java.text.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -17,6 +18,8 @@ import org.basex.util.similarity.*;
  * @author Christian Gruen
  */
 public final class Strings {
+  /** CP437 charset. */
+  public static final Charset CP437 = Charset.forName("CP437");
   /** UTF8 encoding string. */
   public static final String UTF8 = "UTF-8";
   /** UTF16 encoding string. */
@@ -379,5 +382,20 @@ public final class Strings {
     // remove heading slash
     if(startsWith(path, '/')) path = path.substring(1);
     return path;
+  }
+
+  /**
+   * Canonicalizes a string: heuristic CP437/UTF-8 mojibake fix followed by Unicode normalization.
+   * @param string raw string
+   * @return canonical string
+   */
+  public static String canonical(final String string) {
+    final byte[] bytes = string.getBytes(CP437);
+    String fixed = string;
+    if(string.equals(new String(bytes, CP437))) {
+      final String decoded = Token.string(bytes);
+      if(!contains(decoded, '\uFFFD')) fixed = decoded;
+    }
+    return Normalizer.normalize(fixed, Normalizer.Form.NFC);
   }
 }

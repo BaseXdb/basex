@@ -46,11 +46,12 @@ public final class ArchiveExtractTo extends ArchiveFn {
           }
         }
       } else {
-        try(ZipFile zip = new ZipFile(new File(archive.toString()), ZIPIn.CP437)) {
+        try(ZipFile zip = new ZipFile(new File(archive.toString()), Strings.CP437)) {
           for(final String entry : entries) {
-            final ZipEntry ze = zip.getEntry(entry);
+            final ZipEntry ze = ZIPIn.lookup(zip, entry);
             if(ze == null) continue;
-            final Path file = path.resolve(ze.getName());
+            // use the lookup key for the output path (ze.getName() may still carry mojibake)
+            final Path file = path.resolve(entry);
             if(ze.isDirectory()) {
               Files.createDirectories(file);
             } else {
