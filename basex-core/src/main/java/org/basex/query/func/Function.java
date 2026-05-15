@@ -466,6 +466,10 @@ public enum Function implements AFunction {
   MATCHES(FnMatches::new, "matches(value,pattern[,flags])",
       params(STRING_ZO, STRING_O, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */
+  MATCHING_SEGMENTS(FnMatchingSegments::new, "matching-segments(value,pattern[,flags])",
+      params(STRING_ZO, STRING_O, STRING_ZO),
+      Records.MATCHING_SEGMENT.get().seqType(Occ.ZERO_OR_MORE)),
+  /** XQuery function. */
   MAX(FnMax::new, "max(values[,collation])",
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZO),
   /** XQuery function. */

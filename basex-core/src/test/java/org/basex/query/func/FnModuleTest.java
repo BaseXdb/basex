@@ -2230,6 +2230,68 @@ return
   }
 
   /** Test method. */
+  @Test public void matchingSegments() {
+    final Function func = MATCHING_SEGMENTS;
+
+    // empty sequence input → empty sequence
+    query(func.args(" ()", "x"), "");
+
+    // example 1: word matches, no groups
+    final String ex1 = func.args("The cat sat on the mat.", "\\w+");
+    query("count(" + ex1 + ')', 6);
+    query(ex1 + "[1]?substring", "The");
+    query(ex1 + "[1]?position", 1);
+    query(ex1 + "[1]?groups => map:size()", 0);
+    query(ex1 + "[6]?substring", "mat");
+    query(ex1 + "[6]?position", 20);
+
+    // example 2: single match, three captured groups
+    final String ex2 = func.args("08-12-03", "^(\\d+)\\-(\\d+)\\-(\\d+)$");
+    query("count(" + ex2 + ')', 1);
+    query(ex2 + "?substring", "08-12-03");
+    query(ex2 + "?position", 1);
+    query(ex2 + "?groups?1?group", "08");
+    query(ex2 + "?groups?1?position", 1);
+    query(ex2 + "?groups?2?group", 12);
+    query(ex2 + "?groups?2?position", 4);
+    query(ex2 + "?groups?3?group", "03");
+    query(ex2 + "?groups?3?position", 7);
+
+    // example 3: multiple matches with groups
+    final String ex3 = func.args("A1,C15,,D24, X50,", "([A-Z])([0-9]+)");
+    query("count(" + ex3 + ')', 4);
+    query(ex3 + "[2]?substring", "C15");
+    query(ex3 + "[2]?position", 4);
+    query(ex3 + "[2]?groups?1?group", "C");
+    query(ex3 + "[2]?groups?2?group", 15);
+    query(ex3 + "[2]?groups?2?position", 5);
+    query(ex3 + "[4]?substring", "X50");
+    query(ex3 + "[4]?position", 14);
+
+    // example 4: lookahead with captured group outside the matching segment
+    final String ex4 = func.args("Chapter 5", "(Chapter|Appendix)(?=\\s+([0-9]+))");
+    query(ex4 + "?substring", "Chapter");
+    query(ex4 + "?groups?1?group", "Chapter");
+    query(ex4 + "?groups?2?group", 5);
+    query(ex4 + "?groups?2?position", 9);
+
+    // example 5: zero-length matches via lookahead
+    final String ex5 = func.args("There we go", "\\b(?=(\\w+))");
+    query("count(" + ex5 + ')', 3);
+    query(ex5 + "[1]?substring", "");
+    query(ex5 + "[1]?position", 1);
+    query(ex5 + "[1]?groups?1?group", "There");
+    query(ex5 + "[2]?position", 7);
+    query(ex5 + "[2]?groups?1?group", "we");
+    query(ex5 + "[3]?position", 10);
+    query(ex5 + "[3]?groups?1?group", "go");
+
+    // errors
+    error(func.args("a", "+"), REGINVALID_X);
+    error(func.args("a", "x", "X"), REGFLAG_X);
+  }
+
+  /** Test method. */
   @Test public void message() {
     final Function func = MESSAGE;
     query(func.args("a"), "");

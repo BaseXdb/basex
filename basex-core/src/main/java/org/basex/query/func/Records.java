@@ -51,6 +51,15 @@ public enum Records {
     field("functions", MapType.get(BasicType.QNAME,
       MapType.get(BasicType.INTEGER, Types.FUNCTION_O).seqType()).seqType())),
   /** Record definition. */
+  MATCHING_GROUP(FN_URI, "matching-group",
+    field("group", Types.STRING_O),
+    field("position", Types.INTEGER_O)),
+  /** Record definition. */
+  MATCHING_SEGMENT(FN_URI, "matching-segment",
+    field("substring", Types.STRING_O),
+    field("position", Types.INTEGER_O),
+    field("groups", MapType.get(BasicType.INTEGER, MATCHING_GROUP.get().seqType()).seqType())),
+  /** Record definition. */
   MEMBER(ARRAY_URI, "member",
     field("value", Types.ITEM_ZM)),
   /** Record definition. */
