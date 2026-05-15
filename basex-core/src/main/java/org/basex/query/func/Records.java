@@ -21,13 +21,13 @@ public enum Records {
       field("type", EnumType.get("numeric", "boolean", "string", "skip").seqType())),
   /** Record definition. */
   DATETIME(FN_URI, "dateTime",
-    field("year", Types.INTEGER_O, true),
-    field("month", Types.INTEGER_O, true),
-    field("day", Types.INTEGER_O, true),
-    field("hours", Types.INTEGER_O, true),
-    field("minutes", Types.INTEGER_O, true),
-    field("seconds", Types.DECIMAL_O, true),
-    field("timezone", Types.DAY_TIME_DURATION_O, true)
+    field("year", Types.INTEGER_ZO, true),
+    field("month", Types.INTEGER_ZO, true),
+    field("day", Types.INTEGER_ZO, true),
+    field("hours", Types.INTEGER_ZO, true),
+    field("minutes", Types.INTEGER_ZO, true),
+    field("seconds", Types.DECIMAL_ZO, true),
+    field("timezone", Types.DAY_TIME_DURATION_ZO, true)
   ),
   /** Record definition. */
   DIVIDED_DECIMALS(FN_URI, "divided-decimals",

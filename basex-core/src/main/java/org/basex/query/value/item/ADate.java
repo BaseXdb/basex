@@ -163,7 +163,9 @@ public abstract class ADate extends ADateDur {
     } else {
       final int th = Strings.toInt(matcher.group(pos + 2));
       final int tm = Strings.toInt(matcher.group(pos + 3));
-      if(th > 14 || tm > 59 || th == 14 && tm != 0) throw INVALIDZONE_X.get(info, value);
+      if(th > 14 || tm > 59 || th == 14 && tm != 0) {
+        throw INVALIDVALUE_X_X.get(info, "timezone", value);
+      }
       final int mn = th * 60 + tm;
       tz = (short) ("-".equals(matcher.group(pos + 1)) ? -mn : mn);
     }
@@ -269,7 +271,7 @@ public abstract class ADate extends ADateDur {
       } else {
         t = (short) (dur.minute() + dur.hour() * 60);
         if(dur.seconds().signum() != 0) throw ZONESEC_X.get(info, dur);
-        if(Math.abs(t) > 60 * 14 || dur.day() != 0) throw INVALZONE_X.get(info, dur);
+        if(Math.abs(t) > 60 * 14 || dur.day() != 0) throw INVALIDZONE_X.get(info, dur);
       }
 
       // change time if two competing time zones exist

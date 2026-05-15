@@ -115,23 +115,27 @@ public class FnBuildDateTime extends DateTimeFn {
   }
 
   /**
-   * Retrieves an integer.
-   * @param map input map
-   * @param key key to look up
-   * @return result or {@code null}
-   * @throws QueryException query exception
+   * Retrieves a long value from the map for the specified key, returning {@code null} if the key is
+   * not present or if the value is empty.
+   * @param map the map to retrieve the long value from
+   * @param key the key to look up in the map
+   * @return the long value associated with the key, or {@code null} if the key is not present or if
+   *         the value is empty
+   * @throws QueryException if an error occurs while retrieving the long value from the map
    */
   private static Long itr(final XQMap map, final Str key) throws QueryException {
     final Item item = (Item) map.get(key);
-    return item.isEmpty() ? null : item.itr(null);
+    return item.isEmpty() ? null : ((ANum) item).itr();
   }
 
   /**
-   * Retrieves a decimal.
-   * @param map input map
-   * @param key key to look up
-   * @return result or {@code null}
-   * @throws QueryException query exception
+   * Retrieves a BigDecimal value from the map for the specified key, returning {@code null} if the
+   * key is not present or if the value is empty.
+   * @param map the map to retrieve the BigDecimal value from
+   * @param key the key to look up in the map
+   * @return the BigDecimal value associated with the key, or {@code null} if the key is not present
+   *         or if the value is empty
+   * @throws QueryException if an error occurs while retrieving the BigDecimal value from the map
    */
   private static BigDecimal dec(final XQMap map, final Str key) throws QueryException {
     final Item item = (Item) map.get(key);
@@ -139,11 +143,13 @@ public class FnBuildDateTime extends DateTimeFn {
   }
 
   /**
-   * Retrieves a duration.
-   * @param map input map
-   * @param key key to look up
-   * @return result or {@code null}
-   * @throws QueryException query exception
+   * Retrieves a DTDur value from the map for the specified key, returning {@code null} if the key
+   * is not present or if the value is empty.
+   * @param map the map to retrieve the DTDur value from
+   * @param key the key to look up in the map
+   * @return the DTDur value associated with the key, or {@code null} if the key is not present or
+   *         if the value is empty
+   * @throws QueryException if an error occurs while retrieving the DTDur value from the map
    */
   private static DTDur dur(final XQMap map, final Str key) throws QueryException {
     final Item item = (Item) map.get(key);
@@ -152,9 +158,9 @@ public class FnBuildDateTime extends DateTimeFn {
 
   /**
    * Checks the year component for validity.
-   * @param year year
-   * @param info input info
-   * @throws QueryException query exception
+   * @param year the year to check
+   * @param info input info for error reporting
+   * @throws QueryException if the year is out of range
    */
   private static void checkYear(final long year, final InputInfo info) throws QueryException {
     if(year <= ADate.MIN_YEAR || year > ADate.MAX_YEAR)
@@ -173,9 +179,9 @@ public class FnBuildDateTime extends DateTimeFn {
 
   /**
    * Checks the day component for validity, without considering month/year context.
-   * @param day day
-   * @param info input info
-   * @throws QueryException query exception
+   * @param day the day to check
+   * @param info input info for error reporting
+   * @throws QueryException if the day is out of range (not between 1 and 31)
    */
   private static void checkDayOnly(final long day, final InputInfo info) throws QueryException {
     if(day < 1 || day > 31)  throw INVALIDVALUE_X_X.get(info, DAY, day);
@@ -184,10 +190,11 @@ public class FnBuildDateTime extends DateTimeFn {
   /**
    * Checks the month and day components for validity in the context of a month (but without year
    * context).
-   * @param month month
-   * @param day day
-   * @param info input info
-   * @throws QueryException query exception
+   * @param month the month to check
+   * @param day the day to check
+   * @param info input info for error reporting
+   * @throws QueryException if the month is out of range or if the day is out of range for the given
+   *           month, allowing February 29
    */
   private static void checkMonthDay(final long month, final long day, final InputInfo info)
       throws QueryException {
@@ -199,11 +206,12 @@ public class FnBuildDateTime extends DateTimeFn {
 
   /**
    * Checks the year, month, and day components for validity in the context of a complete date.
-   * @param year year
-   * @param month month
-   * @param day day
-   * @param info input info
-   * @throws QueryException query exception
+   * @param year the year to check
+   * @param month the month to check
+   * @param day the day to check
+   * @param info input info for error reporting
+   * @throws QueryException if the year, month, or day is out of range, or if the day is out of
+   *           range for the given month and year
    */
   private static void checkDate(final long year, final long month, final long day,
       final InputInfo info) throws QueryException {
@@ -217,11 +225,12 @@ public class FnBuildDateTime extends DateTimeFn {
   /**
    * Checks the hours, minutes, and seconds components for validity in the context of a complete
    * time.
-   * @param hours hours
-   * @param minutes minutes
-   * @param seconds seconds
-   * @param info input info
-   * @throws QueryException query exception
+   * @param hours the hours to check
+   * @param minutes the minutes to check
+   * @param seconds the seconds to check
+   * @param info input info for error reporting
+   * @throws QueryException if the hours, minutes, or seconds are out of range (hours not between 0
+   *           and 23, minutes not between 0 and 59, seconds not between 0 and 60)
    */
   private static void checkTime(final long hours, final long minutes, final BigDecimal seconds,
       final InputInfo info) throws QueryException {
@@ -233,9 +242,10 @@ public class FnBuildDateTime extends DateTimeFn {
 
   /**
    * Checks the timezone component for validity.
-   * @param tz timezone
-   * @param info input info
-   * @throws QueryException query exception
+   * @param tz the timezone to check
+   * @param info input info for error reporting
+   * @throws QueryException if the timezone is out of range (not between -14:00 and +14:00, or if it
+   *           has non-zero day or second components)
    */
   private static void checkTz(final DTDur tz, final InputInfo info) throws QueryException {
     if(tz != null && (tz.day() != 0 || tz.seconds().signum() != 0

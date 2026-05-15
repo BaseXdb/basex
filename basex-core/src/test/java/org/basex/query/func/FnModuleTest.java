@@ -429,15 +429,15 @@ public final class FnModuleTest extends SandboxTest {
         + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEFIELDS_X);
     // out of range component (minutes)
     error(func.args(" {\"hours\": 14, \"minutes\": 60, \"seconds\": 0,"
-        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEVALUE_X_X);
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVALIDVALUE_X_X);
     // invalid date (March 0)
     error(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 0,"
-        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVDATETIMEVALUE_X_X);
+        + " \"timezone\": xs:dayTimeDuration('PT1H') }"), INVALIDVALUE_X_X);
     // invalid date (February 29, 2026)
-    error(func.args(" {\"year\": 2026, \"month\": 2, \"day\": 29}"), INVDATETIMEVALUE_X_X);
+    error(func.args(" {\"year\": 2026, \"month\": 2, \"day\": 29}"), INVALIDVALUE_X_X);
     // invalid timezone (+15:00)
     error(func.args(" {\"year\": 2026, \"month\": 3, \"day\": 3,"
-        + " \"timezone\": xs:dayTimeDuration('PT15H') }"), INVDATETIMEVALUE_X_X);
+        + " \"timezone\": xs:dayTimeDuration('PT15H') }"), INVALIDZONE_X);
   }
 
   /** Test method. */

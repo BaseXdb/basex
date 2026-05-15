@@ -36,7 +36,7 @@ public class FnPartsOfDateTime extends DateTimeFn {
       h  >= 0              ? Itr.get(h)  : Empty.VALUE,
       mi >= 0              ? Itr.get(mi) : Empty.VALUE,
       s  != null           ? Dec.get(s)  : Empty.VALUE,
-      value.hasTz()        ? zon(value)   : Empty.VALUE
+      value.hasTz()        ? zon(value)  : Empty.VALUE
     };
     return new XQRecordMap(Records.DATETIME.get(), values);
   }

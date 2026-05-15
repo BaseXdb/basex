@@ -633,15 +633,13 @@ public enum QueryError {
   /** Error code. */
   DATEZERO_X_X(FODT, 2, "Invalid % calculation: %."),
   /** Error code. */
-  INVALZONE_X(FODT, 3, "Timezone out of range (-14:00 to +14:00): %."),
+  INVALIDZONE_X(FODT, 3, "Timezone out of range (-14:00 to +14:00): %."),
   /** Error code. */
   ZONESEC_X(FODT, 3, "No seconds allowed in timezone: %."),
   /** Error code. */
   PLACE_X(FODT, 4, "Unknown place: %."),
   /** Error code. */
   INVDATETIMEFIELDS_X(FODT, 5, "Invalid combination of date/time fields: %"),
-  /** Error code. */
-  INVDATETIMEVALUE_X_X(FODT, 6, "Invalid component of date/time value: '%': %."),
 
   /** Error code. */
   FUNERR1(FOER, 0, "Halted on error()."),
@@ -705,7 +703,7 @@ public enum QueryError {
   PATH_X(FOPA, 1, "Node is not contained in path: %."),
 
   /** Error code. */
-  INVALIDZONE_X(FORG, 1, "Invalid timezone: %."),
+  INVALIDVALUE_X_X(FORG, 1, "Invalid % value: %."),
   /** Error code. */
   MISSINGZONE_X(FORG, 1, "xs:dateTimeStamp value must have a timezone: %."),
   /** Error code. */
