@@ -5,6 +5,8 @@ import static org.basex.query.func.Function.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.*;
+import java.nio.*;
+import java.util.zip.*;
 
 import org.basex.*;
 import org.basex.io.*;
@@ -311,16 +313,38 @@ public final class ArchiveModuleTest extends SandboxTest {
     // write non-existing entry
     query(func.args(tmp, ZIP, "xyz"));
     query(func.args(tmp, GZIP, "xyz"));
+
+    // last-modified is preserved on the extracted file
+    final String mtime = "2024-06-01T12:00:00Z";
+    final String src = Prop.TEMPDIR + NAME + "extractTo_mtime.zip";
+    final String dst = Prop.TEMPDIR + NAME + "extractTo_mtime";
+    query(_ARCHIVE_WRITE.args(src,
+        " <archive:entry last-modified='" + mtime + "'>doc</archive:entry>", "DOC"));
+    query(func.args(dst, src));
+    query(_FILE_LAST_MODIFIED.args(dst + "/doc"), mtime);
+    query(_FILE_DELETE.args(src));
+    query(_FILE_DELETE.args(dst, true));
   }
 
   /** Test method. */
   @Test public void options() {
     final Function func = _ARCHIVE_OPTIONS;
-    // read entries
+    // format
     query(func.args(ZIP) + "?format", "zip");
     query(func.args(_FILE_READ_BINARY.args(ZIP)) + "?format", "zip");
+    query(func.args(GZIP) + "?format", "gzip");
+    query(func.args(_FILE_READ_BINARY.args(GZIP)) + "?format", "gzip");
+    // algorithm: DEFLATE (default for the test fixtures)
+    query(func.args(ZIP) + "?algorithm", "deflate");
+    query(func.args(_FILE_READ_BINARY.args(ZIP)) + "?algorithm", "deflate");
     query(func.args(GZIP) + "?algorithm", "deflate");
     query(func.args(_FILE_READ_BINARY.args(GZIP)) + "?algorithm", "deflate");
+    // algorithm: STORED via freshly created archive (exercises the non-default branch
+    // and verifies round-trip through ZipOutputStream's STORED path)
+    query(func.args(_ARCHIVE_CREATE.args("X", "X", " { 'algorithm': 'stored' }")) + "?algorithm",
+        "stored");
+    // map structure: both keys populated for a regular archive
+    query("map:size(" + func.args(ZIP) + ')', 2);
   }
 
   /** Test method. */
@@ -382,12 +406,115 @@ public final class ArchiveModuleTest extends SandboxTest {
   /** Test method. */
   @Test public void write() {
     final Function func = _ARCHIVE_WRITE;
-
     final String tmp = Prop.TEMPDIR + NAME + "write";
+
+    // string content
     query(func.args(tmp, "file", "123"));
     query(_ARCHIVE_EXTRACT_TEXT.args(tmp), 123);
+    // empty array == skip entry
     query(func.args(tmp, "file", " []"));
     query(_ARCHIVE_EXTRACT_BINARY.args(tmp), "");
+    // binary content round-trip
+    query(func.args(tmp, "blob", " xs:hexBinary('414243')"));
+    query(_CONVERT_BINARY_TO_STRING.args(" " + _ARCHIVE_EXTRACT_BINARY.args(tmp, "blob")), "ABC");
+    // archive:entry header preserves last-modified attribute
+    final String lastModified = "2024-06-01T12:00:00Z";
+    query(func.args(tmp,
+        " <archive:entry last-modified='" + lastModified + "'>doc</archive:entry>", "DOC"));
+    query(_ARCHIVE_ENTRIES.args(tmp) + " ! data(@last-modified)", lastModified);
+    // options: STORED algorithm round-trips
+    query(func.args(tmp, "x", "data", " { 'algorithm': 'stored' }"));
+    query(_ARCHIVE_OPTIONS.args(tmp) + "?algorithm", "stored");
+    // options: GZIP format round-trips
+    query(func.args(tmp, "x", "y", " { 'format': 'gzip' }"));
+    query(_ARCHIVE_OPTIONS.args(tmp) + "?format", "gzip");
+
+    // shared validation pipeline with archive:create (sanity checks on routing)
+    error(func.args(tmp, " ('a', 'b')", "X"), ARCHIVE_NUMBER_X_X);
+    error(func.args(tmp, " <archive:entry/>", ""), ARCHIVE_NAME);
+
+    query(_FILE_DELETE.args(tmp));
+  }
+
+  /**
+   * Verifies that {@code archive:extract-to} sanitizes path-traversal entries instead of
+   * writing outside the target directory. {@code "../foo"} is re-anchored as {@code "foo"}
+   * under the target; intermediate {@code "."}/{@code ".."} components are dropped while
+   * legitimate subdirectory structure is preserved.
+   */
+  @Test public void extractToZipSlip() {
+    final IOFile safe = new IOFile(Prop.TEMPDIR + NAME + "_safe");
+    final IOFile outside = new IOFile(Prop.TEMPDIR + NAME + "_escapee.txt");
+    try {
+      // leading "..": stripped, file lands inside target — outside path is not touched
+      query(_ARCHIVE_EXTRACT_TO.args(safe.path(),
+          " " + _ARCHIVE_CREATE.args("../" + NAME + "_escapee.txt", "pwn")));
+      assertFalse(outside.exists(), "zip-slip wrote outside target dir: " + outside);
+      query(_FILE_READ_TEXT.args(safe.path() + "/" + NAME + "_escapee.txt"), "pwn");
+
+      // "..": stripped, remaining subdir structure preserved
+      query(_ARCHIVE_EXTRACT_TO.args(safe.path(),
+          " " + _ARCHIVE_CREATE.args("../deep/sub/x.txt", "deep")));
+      query(_FILE_READ_TEXT.args(safe.path() + "/deep/sub/x.txt"), "deep");
+
+      // legitimate subdirectory extraction still works
+      query(_ARCHIVE_EXTRACT_TO.args(safe.path(),
+          " " + _ARCHIVE_CREATE.args("a/b/c.txt", "ok")));
+      query(_FILE_READ_TEXT.args(safe.path() + "/a/b/c.txt"), "ok");
+    } finally {
+      safe.delete();
+      outside.delete();
+    }
+  }
+
+  /**
+   * Tests handling of ZIPs whose local headers set the data-descriptor flag (general purpose
+   * bit 3) on STORED entries. {@link java.util.zip.ZipInputStream} rejects such layouts
+   * with "only DEFLATED entries can have EXT descriptor"; {@link java.util.zip.ZipFile}
+   * reads sizes from the central directory and accepts them. Verifies that local-file paths
+   * use the tolerant {@code ZipFile}-based code path; eagerly-materialized binary inputs
+   * remain subject to the streaming reader's strictness.
+   * @throws IOException test setup failure
+   */
+  @Test public void storedWithDataDescriptor() throws IOException {
+    final IOFile zip = new IOFile(Prop.TEMPDIR + NAME + "_stored_dd.zip");
+    final IOFile dir = new IOFile(Prop.TEMPDIR + NAME + "_stored_dd_dir");
+    final IOFile copy = new IOFile(Prop.TEMPDIR + NAME + "_stored_dd_refresh.zip");
+    try {
+      zip.write(storedWithDescriptorZip());
+      final String path = zip.path();
+
+      // read-side operations: local-file path uses ZipFile (tolerant)
+      query(_ARCHIVE_ENTRIES.args(path) + "/text()", "x");
+      query(_ARCHIVE_OPTIONS.args(path) + "?format", "zip");
+      query(_ARCHIVE_EXTRACT_TEXT.args(path, "x"), "hello");
+      query(_CONVERT_BINARY_TO_STRING.args(" " + _ARCHIVE_EXTRACT_BINARY.args(path, "x")),
+          "hello");
+
+      // extract-to: writes to the filesystem
+      query(_ARCHIVE_EXTRACT_TO.args(dir.path(), path));
+      query(_FILE_READ_TEXT.args(dir.path() + "/x"), "hello");
+
+      // write-side operations producing fresh archives
+      query(COUNT.args(_ARCHIVE_ENTRIES.args(_ARCHIVE_DELETE.args(path, "x"))), 0);
+      query(COUNT.args(_ARCHIVE_ENTRIES.args(_ARCHIVE_UPDATE.args(path, "y", "world"))), 2);
+
+      // refresh: in-place modification via java.nio.file zipfs (also central-directory-based)
+      copy.write(storedWithDescriptorZip());
+      query(_ARCHIVE_REFRESH.args(copy.path(), "x", "world"));
+      query(_ARCHIVE_EXTRACT_TEXT.args(copy.path(), "x"), "world");
+
+      // eager binary input bypasses the localZip detour and takes the streaming
+      // path — still rejected by ZipInputStream (file:read-binary's 3-arg form returns
+      // an eager B64 instead of a B64Lazy with a local-file backing)
+      final String p = "'" + path + "'";
+      error(_ARCHIVE_ENTRIES.args(
+          " file:read-binary(" + p + ", 0, file:size(" + p + "))"), ARCHIVE_ERROR_X);
+    } finally {
+      zip.delete();
+      dir.delete();
+      copy.delete();
+    }
   }
 
   /**
@@ -397,5 +524,85 @@ public final class ArchiveModuleTest extends SandboxTest {
    */
   private static void countEntries(final String archive, final int exp) {
     query(COUNT.args(_ARCHIVE_ENTRIES.args(archive)), exp);
+  }
+
+  /**
+   * Builds a minimal ZIP with one STORED entry whose general-purpose bit 3 (data descriptor)
+   * is set in the local header — CRC and sizes are placed in a trailing descriptor record
+   * instead of the local header. This is a layout some real-world ZIP creators emit and that
+   * {@link java.util.zip.ZipFile} accepts (reading the central directory) but
+   * {@link java.util.zip.ZipInputStream} rejects ("only DEFLATED entries can have EXT
+   * descriptor").
+   * @return ZIP bytes
+   */
+  private static byte[] storedWithDescriptorZip() {
+    final byte[] data = Token.token("hello"), name = Token.token("x");
+    final CRC32 crc = new CRC32();
+    crc.update(data);
+    final int crc32 = (int) crc.getValue(), size = data.length;
+
+    final ByteBuffer buf = ByteBuffer.allocate(256).order(ByteOrder.LITTLE_ENDIAN);
+
+    // local file header
+    buf.putInt(0x04034b50);                // signature
+    buf.putShort((short) 10);              // version needed
+    buf.putShort((short) 0x0008);          // GP flags: bit 3 (data descriptor)
+    buf.putShort((short) 0);               // method: STORED
+    buf.putShort((short) 0);               // mod time
+    buf.putShort((short) 0x0021);          // mod date (1980-01-01)
+    buf.putInt(0);                         // CRC (zero in local header)
+    buf.putInt(0);                         // compressed size (zero in local header)
+    buf.putInt(0);                         // uncompressed size (zero in local header)
+    buf.putShort((short) name.length);
+    buf.putShort((short) 0);               // extra length
+    buf.put(name);
+
+    // entry body
+    buf.put(data);
+
+    // data descriptor (with optional signature)
+    buf.putInt(0x08074b50);
+    buf.putInt(crc32);
+    buf.putInt(size);                      // compressed size
+    buf.putInt(size);                      // uncompressed size
+
+    final int cdOffset = buf.position();
+
+    // central directory file header
+    buf.putInt(0x02014b50);                // signature
+    buf.putShort((short) 10);              // version made by
+    buf.putShort((short) 10);              // version needed
+    buf.putShort((short) 0x0008);          // GP flags
+    buf.putShort((short) 0);               // method: STORED
+    buf.putShort((short) 0);               // mod time
+    buf.putShort((short) 0x0021);          // mod date
+    buf.putInt(crc32);
+    buf.putInt(size);
+    buf.putInt(size);
+    buf.putShort((short) name.length);
+    buf.putShort((short) 0);               // extra
+    buf.putShort((short) 0);               // comment
+    buf.putShort((short) 0);               // disk number
+    buf.putShort((short) 0);               // internal attrs
+    buf.putInt(0);                         // external attrs
+    buf.putInt(0);                         // local header offset
+    buf.put(name);
+
+    final int cdSize = buf.position() - cdOffset;
+
+    // end of central directory
+    buf.putInt(0x06054b50);
+    buf.putShort((short) 0);               // disk
+    buf.putShort((short) 0);               // cd disk
+    buf.putShort((short) 1);               // entries on disk
+    buf.putShort((short) 1);               // total entries
+    buf.putInt(cdSize);
+    buf.putInt(cdOffset);
+    buf.putShort((short) 0);               // comment length
+
+    final byte[] out = new byte[buf.position()];
+    buf.flip();
+    buf.get(out);
+    return out;
   }
 }

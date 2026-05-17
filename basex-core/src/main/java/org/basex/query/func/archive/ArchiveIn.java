@@ -5,18 +5,19 @@ import static org.basex.query.QueryError.*;
 import java.io.*;
 import java.util.zip.*;
 
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
 /**
- * Archive reader.
+ * Archive reader. Behaves as an {@link InputStream} over the body of the current entry —
+ * reads return {@code -1} at the end of an entry; calling {@link #more()} advances to the
+ * next entry (skipping any remaining body bytes).
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class ArchiveIn implements Closeable {
+abstract class ArchiveIn extends InputStream {
   /**
    * Returns a new instance of an archive reader.
    * @param bi buffer input
@@ -53,25 +54,6 @@ abstract class ArchiveIn implements Closeable {
    * @return name
    */
   public abstract String format();
-
-  /**
-   * Reads data from the archive.
-   * @param d data buffer
-   * @return number of read bytes
-   * @throws IOException I/O exception
-   */
-  public abstract int read(byte[] d) throws IOException;
-
-  /**
-   * Writes the next entry to the specified output stream.
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
-  final void write(final OutputStream out) throws IOException {
-    // keep streams open
-    final byte[] data = new byte[IO.BLOCKSIZE];
-    for(int c; (c = read(data)) != -1;) out.write(data, 0, c);
-  }
 
   @Override
   public abstract void close();

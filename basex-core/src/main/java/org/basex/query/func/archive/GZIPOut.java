@@ -33,12 +33,17 @@ final class GZIPOut extends ArchiveOut {
 
   @Override
   public void write(final ArchiveIn in) throws IOException {
-    write(in, zos);
+    in.transferTo(zos);
   }
 
   @Override
   public void write(final ZipEntry entry, final byte[] value) throws IOException {
     zos.write(value);
+  }
+
+  @Override
+  public void write(final ZipEntry entry, final InputStream is) throws IOException {
+    is.transferTo(zos);
   }
 
   @Override

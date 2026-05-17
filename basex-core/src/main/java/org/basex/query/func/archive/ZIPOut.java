@@ -38,19 +38,24 @@ final class ZIPOut extends ArchiveOut {
 
   @Override
   public void write(final ArchiveIn in) throws IOException {
-    final ZipEntry zi = in.entry(), zo = new ZipEntry(zi.getName());
-    zo.setTime(zi.getTime());
-    zo.setComment(zi.getComment());
+    write(in.entry(), in);
+  }
 
-    if(zi.getMethod() == ZipEntry.STORED) {
+  @Override
+  public void write(final ZipEntry entry, final InputStream is) throws IOException {
+    final ZipEntry zo = new ZipEntry(entry.getName());
+    zo.setTime(entry.getTime());
+    zo.setComment(entry.getComment());
+
+    if(entry.getMethod() == ZipEntry.STORED) {
       stored = true;
       final ArrayOutput out = new ArrayOutput();
-      write(in, out);
+      is.transferTo(out);
       write(zo, out.finish());
     } else {
       level(-1);
       zos.putNextEntry(zo);
-      write(in, zos);
+      is.transferTo(zos);
       zos.closeEntry();
     }
   }

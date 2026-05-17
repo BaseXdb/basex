@@ -40,8 +40,13 @@ final class GZIPIn extends ArchiveIn {
   }
 
   @Override
-  public int read(final byte[] d) throws IOException {
-    return zis.read(d);
+  public int read() throws IOException {
+    return zis.read();
+  }
+
+  @Override
+  public int read(final byte[] d, final int off, final int len) throws IOException {
+    return zis.read(d, off, len);
   }
 
   @Override

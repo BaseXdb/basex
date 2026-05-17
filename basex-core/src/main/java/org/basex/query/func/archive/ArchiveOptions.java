@@ -21,28 +21,37 @@ import org.basex.util.*;
 public final class ArchiveOptions extends ArchiveFn {
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Bin archive = toArchive(arg(0), qc);
-    final String format;
+    String format = null;
     int level = -1;
-
-    try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
-      format = in.format();
-      while(in.more()) {
-        final ZipEntry ze = in.entry();
-        if(ze.isDirectory()) continue;
-        level = ze.getMethod();
-        break;
+    try {
+      final Object archive = toInput(arg(0), qc);
+      if(archive instanceof final Bin bin) {
+        try(BufferInput bi = bin.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
+          format = in.format();
+          while(in.more()) {
+            final ZipEntry ze = in.entry();
+            if(ze.isDirectory()) continue;
+            level = ze.getMethod();
+            break;
+          }
+        }
+      } else {
+        format = ZIP;
+        try(ZipFile zip = new ZipFile(new File(archive.toString()), Strings.CP437)) {
+          for(final ZipEntry ze : entries(zip, null)) {
+            if(ze.isDirectory()) continue;
+            level = ze.getMethod();
+            break;
+          }
+        }
       }
     } catch(final IOException ex) {
       throw ARCHIVE_ERROR_X.get(info, ex);
     }
-
-    // create result element
     final MapBuilder mb = new MapBuilder();
     if(format != null) mb.put(CreateOptions.FORMAT.name(), format);
     if(level >= 0) mb.put(CreateOptions.ALGORITHM.name(),
         level == 8 ? DEFLATE : level == 0 ? STORED : UNKNOWN);
-
     return mb.map();
   }
 }

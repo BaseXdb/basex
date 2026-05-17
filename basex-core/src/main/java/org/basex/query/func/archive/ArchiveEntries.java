@@ -1,12 +1,9 @@
 package org.basex.query.func.archive;
 
-import static org.basex.query.QueryError.*;
 import static org.basex.query.func.archive.ArchiveText.*;
 
-import java.io.*;
 import java.util.zip.*;
 
-import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -21,26 +18,26 @@ import org.basex.query.value.node.*;
 public final class ArchiveEntries extends ArchiveFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Bin archive = toArchive(arg(0), qc);
-
     final ValueBuilder vb = new ValueBuilder(qc);
-    try(BufferInput bi = archive.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
-      while(in.more()) {
-        final ZipEntry ze = in.entry();
-        if(ze.isDirectory()) continue;
+    forEachEntry(arg(0), qc, null, (entry, body) -> {
+      if(!entry.isDirectory()) vb.add(entry(entry));
+    });
+    return vb.value(this);
+  }
 
-        final FBuilder elem = FElem.build(Q_ENTRY).ns();
-        long size = ze.getSize();
-        if(size != -1) elem.attr(Q_SIZE, size);
-        size = ze.getTime();
-        if(size != -1) elem.attr(Q_LAST_MODIFIED, Dtm.get(size).string(info));
-        size = ze.getCompressedSize();
-        if(size != -1) elem.attr(Q_COMPRESSED_SIZE, size);
-        vb.add(elem.text(ze.getName()).finish());
-      }
-      return vb.value(this);
-    } catch(final IOException ex) {
-      throw ARCHIVE_ERROR_X.get(info, ex);
-    }
+  /**
+   * Builds an entry element with size, timestamp and compressed-size metadata.
+   * @param ze ZIP entry (canonical name)
+   * @return entry element
+   */
+  private FNode entry(final ZipEntry ze) {
+    final FBuilder elem = FElem.build(Q_ENTRY).ns();
+    long value = ze.getSize();
+    if(value != -1) elem.attr(Q_SIZE, value);
+    value = ze.getTime();
+    if(value != -1) elem.attr(Q_LAST_MODIFIED, Dtm.get(value).string(info));
+    value = ze.getCompressedSize();
+    if(value != -1) elem.attr(Q_COMPRESSED_SIZE, value);
+    return elem.text(ze.getName()).finish();
   }
 }

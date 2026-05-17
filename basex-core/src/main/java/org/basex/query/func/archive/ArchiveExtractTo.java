@@ -1,14 +1,11 @@
 package org.basex.query.func.archive;
 
-import static org.basex.query.QueryError.*;
-
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
-import java.util.zip.*;
 
 import org.basex.io.*;
-import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -24,46 +21,34 @@ import org.basex.util.*;
 public final class ArchiveExtractTo extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Path path = toPath(arg(0), qc);
+    final Path path = toPath(arg(0), qc).toAbsolutePath().normalize();
     final HashSet<String> entries = toEntries(arg(2), qc);
-    try {
-      final Object archive = toInput(arg(1), qc, entries != null);
-      if(archive instanceof final Bin bin) {
-        try(BufferInput bi = bin.input(info); ArchiveIn in = ArchiveIn.get(bi, info)) {
-          while(in.more() && (entries == null || !entries.isEmpty())) {
-            final ZipEntry ze = in.entry();
-            final String name = ze.getName();
-            if(entries != null && !entries.remove(name)) continue;
-            final Path file = path.resolve(name);
-            if(ze.isDirectory()) {
-              Files.createDirectories(file);
-            } else {
-              Files.createDirectories(file.getParent());
-              try(BufferOutput out = new BufferOutput(new IOFile(file))) {
-                in.write(out);
-              }
-            }
-          }
-        }
+
+    forEachEntry(arg(1), qc, entries, (entry, body) -> {
+      // re-anchor the entry path under base, silently dropping "." and ".." components
+      // so traversing entries like "../foo" extract as "foo" under base. Absolute roots
+      // ("/abs/path") drop out because Path iteration excludes the root component.
+      Path file = path;
+      for(final Path part : Paths.get(entry.getName()).normalize()) {
+        final String p = part.toString();
+        if(!p.equals("..") && !p.equals(".")) file = file.resolve(part);
+      }
+      // entry name produced no usable components (e.g., "" or "..") — skip
+      if(file.equals(path)) return;
+
+      if(entry.isDirectory()) {
+        Files.createDirectories(file);
       } else {
-        try(ZipFile zip = new ZipFile(new File(archive.toString()), Strings.CP437)) {
-          for(final String entry : entries) {
-            final ZipEntry ze = ZIPIn.lookup(zip, entry);
-            if(ze == null) continue;
-            // use the lookup key for the output path (ze.getName() may still carry mojibake)
-            final Path file = path.resolve(entry);
-            if(ze.isDirectory()) {
-              Files.createDirectories(file);
-            } else {
-              Files.createDirectories(file.getParent());
-              IO.write(zip.getInputStream(ze), new IOFile(file).outputStream());
-            }
-          }
+        Files.createDirectories(file.getParent());
+        try(BufferOutput out = new BufferOutput(new IOFile(file));
+            InputStream is = body.get()) {
+          is.transferTo(out);
         }
       }
-    } catch(final IOException ex) {
-      throw ARCHIVE_ERROR_X.get(info, ex);
-    }
+      // preserve the entry's modification time on the extracted file/directory
+      final long time = entry.getTime();
+      if(time >= 0) Files.setLastModifiedTime(file, FileTime.fromMillis(time));
+    });
     return Empty.VALUE;
   }
 }

@@ -52,6 +52,15 @@ public final class B64Lazy extends B64 implements Lazy {
     }
   }
 
+  /**
+   * Returns the input reference.
+   * @return input
+   */
+  public IO input() {
+    return input;
+  }
+
+
   @Override
   public void cache(final  boolean lazy, final InputInfo ii) throws QueryException {
     if(lazy) cache = true;
