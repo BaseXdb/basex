@@ -36,6 +36,36 @@ public final class ArrayOutput extends PrintOutput {
   }
 
   @Override
+  public void write(final byte[] b, final int off, final int len) {
+    final int s = (int) size;
+    final int free = (int) Math.min(len, max - s);
+    if(free <= 0) return;
+
+    byte[] bffr = buffer;
+    final int needed = Array.checkCapacity((long) s + free);
+    if(needed > bffr.length) {
+      bffr = Arrays.copyOf(bffr, Math.max(Array.newCapacity(bffr.length), needed));
+    }
+    System.arraycopy(b, off, bffr, s, free);
+    buffer = bffr;
+    size = s + free;
+  }
+
+  @Override
+  public void print(final byte[] token) {
+    final int tl = token.length;
+    if(tl == 0) return;
+    long ll = lineLength;
+    for(int i = 0; i < tl; i++) {
+      final byte b = token[i];
+      if(b == '\n') ll = 0;
+      else if((b & 0xC0) != 0x80) ++ll;
+    }
+    lineLength = ll;
+    write(token, 0, tl);
+  }
+
+  @Override
   public void flush() {
   }
 

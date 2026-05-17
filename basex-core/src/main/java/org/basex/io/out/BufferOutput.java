@@ -65,9 +65,23 @@ public final class BufferOutput extends OutputStream {
   }
 
   @Override
+  public void write(final byte[] b, final int off, final int len) throws IOException {
+    if(len >= bufsize) {
+      flush();
+      out.write(b, off, len);
+    } else {
+      if(pos + len > bufsize) flush();
+      System.arraycopy(b, off, buffer, pos, len);
+      pos += len;
+    }
+  }
+
+  @Override
   public void flush() throws IOException {
-    out.write(buffer, 0, pos);
-    pos = 0;
+    if(pos > 0) {
+      out.write(buffer, 0, pos);
+      pos = 0;
+    }
   }
 
   @Override

@@ -1,9 +1,9 @@
 package org.basex.query.func.archive;
 
 import java.io.*;
-import java.util.*;
 
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryError;
 import org.basex.query.value.item.*;
@@ -30,14 +30,12 @@ final class SpillOutput extends OutputStream {
   /** Threshold in bytes before spilling to disk. */
   private final int threshold;
 
-  /** In-memory buffer. */
-  private byte[] buffer = new byte[Array.INITIAL_CAPACITY];
-  /** Number of bytes written to the in-memory buffer. */
-  private int bufSize;
+  /** In-memory buffer ({@code null} after spilling). */
+  private ArrayOutput array = new ArrayOutput();
   /** Disk output stream ({@code null} before spilling). */
-  private FileOutputStream tmpOutput;
+  private OutputStream file;
   /** Temporary file ({@code null} before spilling). */
-  private IOFile tmpFile;
+  private IOFile io;
 
   /**
    * Constructor.
@@ -59,54 +57,42 @@ final class SpillOutput extends OutputStream {
 
   @Override
   public void write(final int b) throws IOException {
-    if(tmpOutput == null && bufSize == threshold) spill();
-    if(tmpOutput != null) {
-      tmpOutput.write(b);
-    } else {
-      if(bufSize == buffer.length) {
-        buffer = Arrays.copyOf(buffer, Array.newCapacity(bufSize));
-      }
-      buffer[bufSize++] = (byte) b;
-    }
+    if(file == null && array.size() == threshold) spill();
+    if(file != null) file.write(b);
+    else array.write(b);
   }
 
   @Override
   public void write(final byte[] b, final int off, final int len) throws IOException {
-    if(tmpOutput == null && (long) bufSize + len > threshold) spill();
-    if(tmpOutput != null) {
-      tmpOutput.write(b, off, len);
-    } else {
-      final int newSize = bufSize + len;
-      if(newSize > buffer.length) {
-        buffer = Arrays.copyOf(buffer, Math.max(Array.newCapacity(buffer.length), newSize));
-      }
-      System.arraycopy(b, off, buffer, bufSize, len);
-      bufSize = newSize;
-    }
+    if(file == null && array.size() + len > threshold) spill();
+    if(file != null) file.write(b, off, len);
+    else array.write(b, off, len);
   }
 
   /**
    * Returns the result as a binary item: a lazy reference to the temporary file
    * if data was spilled, or an in-memory binary item otherwise.
+   * Any buffered disk output is flushed first so that callers may read the temporary file
+   * even if the stream has not yet been closed.
    * @param error error to raise if the temporary file cannot be read
    * @return binary item
+   * @throws IOException I/O exception
    */
-  B64 finish(final QueryError error) {
-    if(tmpFile != null) return new B64Lazy(tmpFile, error);
-    return B64.get(bufSize == 0 ? Token.EMPTY : bufSize == buffer.length ? buffer :
-      Arrays.copyOf(buffer, bufSize));
+  B64 finish(final QueryError error) throws IOException {
+    if(file != null) file.flush();
+    return io != null ? new B64Lazy(io, error) : B64.get(array.finish());
   }
 
   /**
-   * Closes the disk output stream if one was opened. {@code tmpFile} is intentionally
-   * not nulled here because {@link #finish} may be called after {@code close} and still
-   * needs it to determine whether data was spilled.
+   * Closes the disk output stream if one was opened. The in-memory buffer and the
+   * temporary file reference are intentionally preserved so that {@link #finish} can
+   * still be called after {@code close}.
    */
   @Override
   public void close() throws IOException {
-    if(tmpOutput != null) {
-      tmpOutput.close();
-      tmpOutput = null;
+    if(file != null) {
+      file.close();
+      file = null;
     }
   }
 
@@ -116,10 +102,10 @@ final class SpillOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   private void spill() throws IOException {
-    tmpFile = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
-    qc.resources.index(TempFiles.class).add(tmpFile);
-    tmpOutput = tmpFile.outputStream();
-    tmpOutput.write(buffer, 0, bufSize);
-    buffer = null;
+    io = new IOFile(File.createTempFile(Prop.NAME + '-', IO.TMPSUFFIX));
+    qc.resources.index(TempFiles.class).add(io);
+    file = new BufferOutput(io);
+    file.write(array.buffer(), 0, (int) array.size());
+    array = null;
   }
 }
