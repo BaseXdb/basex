@@ -473,24 +473,24 @@ public final class HTTPConnection implements ClientInfo {
    * @return normalized path
    */
   private static String normalize(final String path) {
-    final TokenBuilder tmp = new TokenBuilder();
+    final StringBuilder result = new StringBuilder();
     if(path != null) {
-      final TokenBuilder tb = new TokenBuilder();
+      final StringBuilder segment = new StringBuilder();
       final int pl = path.length();
       for(int p = 0; p < pl; p++) {
         final char ch = path.charAt(p);
         if(ch == '/') {
-          if(tb.isEmpty()) continue;
-          tmp.add('/').add(tb.toArray());
-          tb.reset();
+          if(segment.isEmpty()) continue;
+          result.append('/').append(segment);
+          segment.setLength(0);
         } else {
-          tb.add(ch);
+          segment.append(ch);
         }
       }
-      if(!tb.isEmpty()) tmp.add('/').add(tb.finish());
+      if(!segment.isEmpty()) result.append('/').append(segment);
     }
-    if(tmp.isEmpty()) tmp.add('/');
-    return tmp.toString();
+    if(result.isEmpty()) result.append('/');
+    return result.toString();
   }
 
   /**

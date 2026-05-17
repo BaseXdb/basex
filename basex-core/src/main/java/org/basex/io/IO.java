@@ -368,7 +368,7 @@ public abstract class IO {
    */
   public static void write(final InputStream in, final OutputStream out) throws IOException {
     try(BufferInput bi = BufferInput.get(in); BufferOutput bo = BufferOutput.get(out)) {
-      for(int c; (c = bi.read()) != -1;) bo.write(c);
+      in.transferTo(out);
     }
   }
 

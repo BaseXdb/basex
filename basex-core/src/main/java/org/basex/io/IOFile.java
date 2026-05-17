@@ -8,7 +8,6 @@ import java.util.regex.*;
 
 import javax.xml.transform.stream.*;
 
-import org.basex.io.out.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.xml.sax.*;
@@ -293,12 +292,12 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Writes the specified input. The specified input stream is eventually closed.
+   * Writes the specified input. The input stream is not closed; the caller is responsible.
    * @param is input stream
    * @throws IOException I/O exception
    */
   public void write(final InputStream is) throws IOException {
-    write(is, new BufferOutput(this));
+    Files.copy(is, toPath(), StandardCopyOption.REPLACE_EXISTING);
   }
 
   /**
@@ -354,15 +353,15 @@ public final class IOFile extends IO {
   @Override
   public String url() {
     final String path = Strings.startsWith(pth, '/') ? pth.substring(1) : pth;
-    final TokenBuilder tb = new TokenBuilder().add(FILEPREF).add("//");
+    final StringBuilder sb = new StringBuilder().append(FILEPREF).append("//");
     final int pl = path.length();
     for(int p = 0; p < pl; p++) {
       // replace spaces with %20
       final char ch = path.charAt(p);
-      if(ch == ' ') tb.add("%20");
-      else tb.add(ch);
+      if(ch == ' ') sb.append("%20");
+      else sb.append(ch);
     }
-    return tb.toString();
+    return sb.toString();
   }
 
   /**
@@ -526,38 +525,38 @@ public final class IOFile extends IO {
   private static String normalize(final String path, final boolean directory) {
     final StringList sl = new StringList();
     final int l = path.length();
-    final TokenBuilder tb = new TokenBuilder(l);
+    final StringBuilder sb = new StringBuilder(l);
     for(int i = 0; i < l; ++i) {
       final char ch = path.charAt(i);
-      if(ch == '\\' || ch == '/') add(tb, sl);
-      else tb.add(ch);
+      if(ch == '\\' || ch == '/') add(sb, sl);
+      else sb.append(ch);
     }
-    add(tb, sl);
-    if(path.startsWith("\\\\") || path.startsWith("//")) tb.add("//");
+    add(sb, sl);
+    if(path.startsWith("\\\\") || path.startsWith("//")) sb.append("//");
     final int size = sl.size();
     for(int s = 0; s < size; ++s) {
-      if(s != 0 || Strings.startsWith(path, '/')) tb.add('/');
-      tb.add(sl.get(s));
+      if(s != 0 || Strings.startsWith(path, '/')) sb.append('/');
+      sb.append(sl.get(s));
     }
 
     // add slash if original file ends with a slash, or if path is a Windows root directory
     boolean dir = directory;
-    if(!dir && Prop.WIN && tb.size() == 2) {
-      final int c = Character.toLowerCase(tb.get(0));
-      dir = c >= 'a' && c <= 'z' && tb.get(1) == ':';
+    if(!dir && Prop.WIN && sb.length() == 2) {
+      final char c = Character.toLowerCase(sb.charAt(0));
+      dir = c >= 'a' && c <= 'z' && sb.charAt(1) == ':';
     }
-    if(dir) tb.add('/');
+    if(dir) sb.append('/');
 
-    return tb.toString();
+    return sb.toString();
   }
 
   /**
    * Adds a directory/file to the path list.
-   * @param tb entry to be added
+   * @param sb entry to be added
    * @param sl string list
    */
-  private static void add(final TokenBuilder tb, final StringList sl) {
-    String s = tb.toString();
+  private static void add(final StringBuilder sb, final StringList sl) {
+    String s = sb.toString();
     // switch first Windows letter to upper case
     if(s.length() > 1 && s.charAt(1) == ':' && sl.isEmpty()) {
       s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
@@ -569,6 +568,6 @@ public final class IOFile extends IO {
       // skip self and empty steps
       sl.add(s);
     }
-    tb.reset();
+    sb.setLength(0);
   }
 }

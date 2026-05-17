@@ -32,6 +32,14 @@ public final class IOTest {
     assertTrue(url.endsWith("X%20Y"));
   }
 
+  /** Path normalization must preserve non-BMP characters (surrogate pairs). */
+  @Test public void surrogatePairPath() {
+    final IOFile io = new IOFile("/x/🐾.txt");
+    assertEquals("🐾.txt", io.name());
+    assertTrue(io.path().endsWith("/x/🐾.txt"), "path: " + io.path());
+    assertTrue(io.url().endsWith("/x/🐾.txt"), "url: " + io.url());
+  }
+
   /** URL construction. */
   @Test public void ioURL() {
     assertEquals("http:/"                   , new IOUrl("http:/").toString());

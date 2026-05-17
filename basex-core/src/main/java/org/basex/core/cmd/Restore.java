@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.*;
+import java.util.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
@@ -76,19 +77,17 @@ public final class Restore extends ABackup {
     DropDB.drop(db, sopts);
     // unzip backup
     final IOFile dbPath = sopts.dbPath(), file = new IOFile(dbPath, backup + IO.ZIPSUFFIX);
-    if(cmd != null) {
-      try(ZipFile zip = new ZipFile(file.file())) {
-        cmd.total = zip.size();
-      }
-    }
-    try(InputStream is = file.inputStream(); ZipInputStream in = new ZipInputStream(is)) {
-      for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
+    try(ZipFile zip = new ZipFile(file.file())) {
+      if(cmd != null) cmd.total = zip.size();
+      final Enumeration<? extends ZipEntry> enm = zip.entries();
+      while(enm.hasMoreElements()) {
+        final ZipEntry ze = enm.nextElement();
         final IOFile trg = new IOFile(dbPath, ze.getName());
         if(ze.isDirectory()) {
           trg.md();
         } else {
           trg.parent().md();
-          trg.write(in);
+          trg.write(zip.getInputStream(ze));
         }
         if(cmd != null) cmd.curr++;
       }
