@@ -541,7 +541,7 @@ public abstract class StandardFunc extends Arr {
    */
   protected final IOContent toContent(final String source, final QueryContext qc)
       throws QueryException {
-    checkPerm(qc, Perm.ADMIN);
+    checkPerm(qc, Perm.CREATE);
     final IO io = toIO(source, false);
     try {
       return new IOContent(io.readString(), io.url());

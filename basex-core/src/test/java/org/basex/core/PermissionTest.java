@@ -70,6 +70,7 @@ public final class PermissionTest extends SandboxTest {
       ok(new XQuery(_DB_PUT_BINARY.args(NAME, " xs:hexBinary('62')", "binary")), adminSession);
       ok(new XQuery(_DB_PUT_VALUE.args(NAME, "v", "value")), adminSession);
       ok(new XQuery(_FILE_WRITE.args(sandbox() + "file", "file")), adminSession);
+      ok(new XQuery(_FILE_WRITE_TEXT.args(sandbox() + "doc.xml", "<x/>")), adminSession);
       ok(new Close(), adminSession);
     } catch(final Exception ex) {
       fail(Util.message(ex));
@@ -128,6 +129,9 @@ public final class PermissionTest extends SandboxTest {
     // XQuery
     ok(new XQuery("1"), testSession);
     ok(new XQuery("delete node <a/>"), testSession);
+    // higher-order standard functions: no permission required
+    ok(new XQuery("fn:apply(fn($x) { $x + 1 }, [1])"), testSession);
+    ok(new XQuery("fn:function-lookup(xs:QName('fn:abs'), 1)(-1)"), testSession);
     no(new XQuery("for $n in " + _DB_GET.args(NAME) + "//xml return delete node $n"), testSession);
 
     no(new XQuery(_DB_OPTIMIZE.args(NAME)), testSession);
@@ -183,6 +187,11 @@ public final class PermissionTest extends SandboxTest {
     no(new XQuery(_FILE_READ_BINARY.args(sandbox() + "file")), testSession);
     no(new XQuery(_FILE_WRITE.args(sandbox() + "file2", "file2")), testSession);
     no(new XQuery(_FILE_DELETE.args(sandbox() + "file2")), testSession);
+
+    // fn:doc, fn:doc-available, fn:collection: external resources require CREATE permission
+    no(new XQuery(DOC.args(sandbox() + "doc.xml")), testSession);
+    no(new XQuery(DOC_AVAILABLE.args(sandbox() + "doc.xml")), testSession);
+    no(new XQuery(COLLECTION.args(sandbox() + "doc.xml")), testSession);
   }
 
   /** Tests all commands where read permission is needed. */
@@ -281,6 +290,11 @@ public final class PermissionTest extends SandboxTest {
     no(new XQuery(_FILE_READ_BINARY.args(sandbox() + "file")), testSession);
     no(new XQuery(_FILE_WRITE.args(sandbox() + "file2", "file2")), testSession);
     no(new XQuery(_FILE_DELETE.args(sandbox() + "file2")), testSession);
+
+    // fn:doc, fn:doc-available, fn:collection: external resources require CREATE permission
+    no(new XQuery(DOC.args(sandbox() + "doc.xml")), testSession);
+    no(new XQuery(DOC_AVAILABLE.args(sandbox() + "doc.xml")), testSession);
+    no(new XQuery(COLLECTION.args(sandbox() + "doc.xml")), testSession);
   }
 
   /** Tests all commands where write permission is needed. */
@@ -378,6 +392,11 @@ public final class PermissionTest extends SandboxTest {
     no(new XQuery(_FILE_READ_BINARY.args(sandbox() + "file")), testSession);
     no(new XQuery(_FILE_WRITE.args(sandbox() + "file2", "file2")), testSession);
     no(new XQuery(_FILE_DELETE.args(sandbox() + "file2")), testSession);
+
+    // fn:doc, fn:doc-available, fn:collection: external resources require CREATE permission
+    no(new XQuery(DOC.args(sandbox() + "doc.xml")), testSession);
+    no(new XQuery(DOC_AVAILABLE.args(sandbox() + "doc.xml")), testSession);
+    no(new XQuery(COLLECTION.args(sandbox() + "doc.xml")), testSession);
   }
 
   /** Tests all commands where create permission is needed. */
@@ -465,6 +484,14 @@ public final class PermissionTest extends SandboxTest {
     ok(new XQuery(_FILE_READ_BINARY.args(sandbox() + "file")), testSession);
     no(new XQuery(_FILE_WRITE.args(sandbox() + "file2", "file2")), testSession);
     no(new XQuery(_FILE_DELETE.args(sandbox() + "file2")), testSession);
+
+    // fn:doc, fn:doc-available: external resources accessible with CREATE permission
+    ok(new XQuery(DOC.args(sandbox() + "doc.xml")), testSession);
+    ok(new XQuery(DOC_AVAILABLE.args(sandbox() + "doc.xml")), testSession);
+
+    // xquery:parse and xquery:eval: load from URI now permitted with CREATE
+    ok(new XQuery(_XQUERY_PARSE.args(" xs:anyURI('" + sandbox() + "doc.xml')")), testSession);
+    ok(new XQuery(_XQUERY_EVAL.args(" xs:anyURI('" + sandbox() + "doc.xml')")), testSession);
   }
 
   /** Tests all commands where admin permission is needed. */
@@ -553,6 +580,36 @@ public final class PermissionTest extends SandboxTest {
     ok(new XQuery(_FILE_READ_BINARY.args(sandbox() + "file")), testSession);
     ok(new XQuery(_FILE_WRITE.args(sandbox() + "file2", "file2")), testSession);
     ok(new XQuery(_FILE_DELETE.args(sandbox() + "file2")), testSession);
+
+    // xquery:eval from URI: admin may load external code
+    ok(new XQuery(_XQUERY_EVAL.args(" xs:anyURI('" + sandbox() + "doc.xml')")), testSession);
+  }
+
+  /** Tests the XQUERY_NOPERM_X error raised by xquery:eval. */
+  @Test public void xqueryNoPerm() {
+    // CREATE user cannot raise the inner query's permission to admin
+    ok(new Grant("create", NAME), adminSession);
+    error(new XQuery(_XQUERY_EVAL.args("1", " ()", " { 'permission': 'admin' }")),
+        testSession, "[xquery:permission]", "admin");
+    // READ user cannot raise the inner query's permission to create
+    ok(new Grant("read", NAME), adminSession);
+    error(new XQuery(_XQUERY_EVAL.args("1", " ()", " { 'permission': 'create' }")),
+        testSession, "[xquery:permission]", "create");
+  }
+
+  /** Tests the permission error raised when accessing external resources. */
+  @Test public void permRequired() {
+    // fn:collection bypasses the DTD-related permission check in Docs.check
+    // and reaches QueryResources.create, which raises BASEX_PERMISSION_X_X
+
+    // READ user: missing CREATE for an external file
+    ok(new Grant("read", NAME), adminSession);
+    error(new XQuery(COLLECTION.args(sandbox() + "doc.xml")), testSession,
+        "[basex:permission]", "create");
+    // NONE user: same code; CREATE is still the missing permission for files
+    ok(new Grant("none", NAME), adminSession);
+    error(new XQuery(COLLECTION.args(sandbox() + "doc.xml")), testSession,
+        "[basex:permission]", "create");
   }
 
   /** Drops users. */
@@ -575,6 +632,24 @@ public final class PermissionTest extends SandboxTest {
       s.execute(cmd);
     } catch(final IOException ex) {
       fail(Util.message(ex));
+    }
+  }
+
+  /**
+   * Assumes that the command fails and that the error message contains all given markers.
+   * @param cmd command reference
+   * @param s session
+   * @param markers substrings expected in the error message
+   */
+  private static void error(final Command cmd, final Session s, final String... markers) {
+    try {
+      s.execute(cmd);
+      fail("\"" + cmd + "\" was supposed to fail.");
+    } catch(final IOException ex) {
+      final String msg = ex.getMessage();
+      for(final String marker : markers) {
+        assertTrue(msg.contains(marker), "Expected '" + marker + "' in: " + msg);
+      }
     }
   }
 

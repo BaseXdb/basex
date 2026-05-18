@@ -214,14 +214,14 @@ public final class SimpleTest extends QueryTest {
         + " case xs:int return 3"
         + " case xs:long return 4"
         + " case xs:decimal | xs:integer return 5"
-        + " default return 6\r\n"
+        + " default return 6"
         + ")" },
       { "Typeswitch 5", integers(1, 1),
           "(0, xs:byte(0)) ! "
           + "(typeswitch (.)"
           + " case xs:integer return 1"
           + " case xs:byte return 2"
-          + " default return 3\r\n"
+          + " default return 3"
           + ")" },
 
       { "FunctionContext 0", "declare function local:x() { /x }; local:x()" },

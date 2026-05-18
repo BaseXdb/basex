@@ -253,7 +253,7 @@ public abstract class ParseExpr extends Expr {
   /**
    * Checks if the current user has the given permissions. If negative, an exception is thrown.
    * @param qc query context
-   * @param perm permission
+   * @param perm minimum permission required
    * @throws QueryException query exception
    */
   protected void checkPerm(final QueryContext qc, final Perm perm) throws QueryException {
@@ -264,7 +264,7 @@ public abstract class ParseExpr extends Expr {
    * Checks if the current user has the given permissions for the specified database.
    * If negative, an exception is thrown.
    * @param qc query context
-   * @param perm permission
+   * @param perm minimum permission required
    * @param name name of database
    * @throws QueryException query exception
    */

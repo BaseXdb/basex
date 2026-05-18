@@ -489,10 +489,11 @@ public final class QueryResources {
       final InputInfo info, final boolean single) throws QueryException {
 
     // check user permissions
-    if(!user.has(Perm.READ)) throw XQUERY_PERMREQUIRED_X.get(info, Perm.READ);
+    final IO io = input.io;
+    final Perm perm = io instanceof IOFile || io instanceof IOUrl ? Perm.CREATE : Perm.READ;
+    if(!user.has(perm)) throw BASEX_PERMISSION_X_X.get(info, perm, input.original);
 
     // check if input points to a single file
-    final IO io = input.io;
     if(!io.exists()) throw WHICHRES_X.get(info, io.path());
     if(single && io instanceof IOFile && io.isDir()) throw RESDIR_X.get(info, io.path());
 

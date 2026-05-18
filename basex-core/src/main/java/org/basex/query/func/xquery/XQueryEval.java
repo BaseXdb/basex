@@ -72,7 +72,7 @@ public class XQueryEval extends StandardFunc {
     toOptions(arg(2), options, qc);
 
     final Perm perm = Enums.get(Perm.class, options.get(XQueryOptions.PERMISSION).toString());
-    if(!user.has(perm)) throw XQUERY_PERMREQUIRED_X.get(info, perm);
+    if(!user.has(perm)) throw XQUERY_NOPERM_X.get(info, perm);
 
     Timer to = null;
     try(QueryContext qctx = new QueryContext(qc, null)) {

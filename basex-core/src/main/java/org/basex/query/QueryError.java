@@ -501,7 +501,7 @@ public enum QueryError {
   /** Error code. */
   XQUERY_PERM_X(ErrType.XQUERY, "permission", "%"),
   /** Error code. */
-  XQUERY_PERMREQUIRED_X(ErrType.XQUERY, "permission", "% permission required."),
+  XQUERY_NOPERM_X(ErrType.XQUERY, "permission", "No % permission."),
   /** Error code. */
   XQUERY_TIMEOUT(ErrType.XQUERY, "timeout", "The timeout was exceeded."),
   /** Error code. */

@@ -88,7 +88,7 @@ public enum Function implements AFunction {
       NodeType.get(NameTest.get(FnAnalyzeString.Q_ANALYZE_STRING_RESULT)).seqType(), flag(CNS)),
   /** XQuery function. */
   APPLY(FnApply::new, "apply(function,arguments)",
-      params(FUNCTION_O, ARRAY_O), ITEM_ZM, flag(POS, CTX, NDT), FN_URI, Perm.ADMIN),
+      params(FUNCTION_O, ARRAY_O), ITEM_ZM, flag(POS, CTX, NDT)),
   /** XQuery function. */
   ATOMIC_EQUAL(FnAtomicEqual::new, "atomic-equal(value1,value2)",
       params(ANY_ATOMIC_TYPE_O, ANY_ATOMIC_TYPE_O), BOOLEAN_O),
@@ -332,7 +332,7 @@ public enum Function implements AFunction {
       params(FUNCTION_O), STRING_O),
   /** XQuery function. */
   FUNCTION_LOOKUP(FnFunctionLookup::new, "function-lookup(name,arity)",
-      params(QNAME_O, INTEGER_O), FUNCTION_ZO, flag(POS, CTX, CNS, NDT, HOF), FN_URI, Perm.ADMIN),
+      params(QNAME_O, INTEGER_O), FUNCTION_ZO, flag(POS, CTX, CNS, NDT, HOF)),
   /** XQuery function. */
   FUNCTION_NAME(FnFunctionName::new, "function-name(function)",
       params(FUNCTION_O), QNAME_ZO),

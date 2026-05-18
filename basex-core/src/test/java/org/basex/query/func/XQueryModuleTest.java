@@ -24,7 +24,7 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args("1"), 1);
     query(func.args("1 + 2"), 3);
     error(func.args("1+"), CALCEXPR);
-    error("declare variable $a:=1;" + func.args("$a"), VARUNDEF_X);
+    error("declare variable $a := 1;" + func.args("$a"), VARUNDEF_X);
     error("for $a in (1, 2) return" + func.args("$a"), VARUNDEF_X);
 
     // check updating expressions
@@ -40,21 +40,22 @@ public final class XQueryModuleTest extends SandboxTest {
     // GH-2640
     query("element e { attribute { QName('', 'a') } {}, " + func.args("true()") + " }",
         "<e a=\"\">true</e>");
-    query("<e xmlns:p='p'\n"
-        + "   p:a='{\n"
-        + "     map:keys(in-scope-namespaces(<x/>))\n"
-        + "   }'\n"
-        + "   p:b='{xquery:eval('\n"
-        + "     map:keys(in-scope-namespaces(<x/>))\n"
-        + "   ')}'/>", "<e xmlns:p=\"p\" p:a=\"p xml\" p:b=\"xml\"/>");
+    query("""
+<e xmlns:p='p'
+   p:a='{
+     map:keys(in-scope-namespaces(<x/>))
+   }'
+   p:b='{xquery:eval('
+     map:keys(in-scope-namespaces(<x/>))
+   ')}'/>""", "<e xmlns:p=\"p\" p:a=\"p xml\" p:b=\"xml\"/>");
   }
 
   /** Test method. */
   @Test public void evalBaseUri() {
     final Function func = _XQUERY_EVAL;
     // queries
-    query(func.args("static-base-uri()", " {}",
-      " { 'base-uri': 'http://x.x/' }"), "http://x.x/");
+    query(func.args("static-base-uri()", " {}", " { 'base-uri': 'http://x.x/' }"),
+        "http://x.x/");
   }
 
   /** Test method. */
@@ -62,32 +63,32 @@ public final class XQueryModuleTest extends SandboxTest {
     final Function func = _XQUERY_EVAL;
     // queries
     query(_DB_CREATE.args(NAME));
-    error(func.args(DOC.args(NAME).trim(), " {}",
-      " { 'permission': 'none' }"), XQUERY_PERM_X);
-    error(func.args(_DB_GET.args(NAME).trim(), " {}",
-      " { 'permission': 'none' }"), XQUERY_PERM_X);
-    error(func.args(_FILE_EXISTS.args("x").trim(), " {}",
-      " { 'permission': 'none' }"), XQUERY_PERM_X);
+    error(func.args(DOC.args(NAME).trim(), " {}", " { 'permission': 'none' }"),
+        XQUERY_PERM_X);
+    error(func.args(_DB_GET.args(NAME).trim(), " {}", " { 'permission': 'none' }"),
+        XQUERY_PERM_X);
+    error(func.args(_FILE_EXISTS.args("x").trim(), " {}", " { 'permission': 'none' }"),
+        XQUERY_PERM_X);
   }
 
   /** Test method. */
   @Test public void evalMemory() {
     final Function func = _XQUERY_EVAL;
     // queries
-    error(func.args("(1 to 10000000000000) ! <a/>", " {}",
-        " { 'memory': 10 }"), XQUERY_MEMORY);
+    error(func.args("(1 to 10000000000000) ! <a/>", " {}", " { 'memory': 10 }"),
+        XQUERY_MEMORY);
   }
 
   /** Test method. */
   @Test public void evalTimeout() {
     final Function func = _XQUERY_EVAL;
     // queries
-    query("try { " + func.args("(1 to 10000000000000)[. = 0]", " {}",
-        " { 'timeout': 1 }") + " } catch * { () }", "");
-    error(func.args("(1 to 10000000000000)[. = 0]", " {}",
-        " { 'timeout': 1 }"), XQUERY_TIMEOUT);
-    error(func.args("(1 to 10000000000000)[. = 0]", " {}",
-        " { 'timeout': .1 }"), XQUERY_TIMEOUT);
+    query("try { " + func.args("(1 to 10000000000000)[. = 0]", " {}", " { 'timeout': 1 }") +
+        " } catch * { () }", "");
+    error(func.args("(1 to 10000000000000)[. = 0]", " {}", " { 'timeout': 1 }"),
+        XQUERY_TIMEOUT);
+    error(func.args("(1 to 10000000000000)[. = 0]", " {}", " { 'timeout': .1 }"),
+        XQUERY_TIMEOUT);
   }
 
   /** Test method. */
@@ -151,8 +152,8 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args(" true#0[" + wrap(1) + " = '']"), "");
 
     // run slow and fast query and check that results are returned in the correct order
-    query(func.args(" (function() { (1 to 10000000)[.=1] }, true#0)"), "1\ntrue");
-    query(func.args(" (true#0, function() { (1 to 10000000)[.=1] })"), "true\n1");
+    query(func.args(" (function() { (1 to 10000000)[. = 1] }, true#0)"), "1\ntrue");
+    query(func.args(" (true#0, function() { (1 to 10000000)[. = 1] })"), "true\n1");
     query(func.args(" ()"), "");
 
     // options
@@ -164,44 +165,35 @@ public final class XQueryModuleTest extends SandboxTest {
     query(func.args(" (true#0, false#0)", " { 'parallel': <_>1</_> }"), "true\nfalse");
 
     // MapMerge mutable instance variables
-    query(func.args(
-          " for $t in 1 to 100\n"
-        + " return function() {\n"
-        + "   for $i in 1 to 10\n"
-        + "   let $v := map:build(\n"
-        + "     ($i, $i),\n"
-        + "     (),\n"
-        + "     (),\n"
-        + "     { 'duplicates': function($x, $y) { $x * $y } }\n"
-        + "   )($i)\n"
-        + "   return\n"
-        + "     if($v eq $i * $i) then\n"
-        + "       $v\n"
-        + "     else\n"
-        + "       error(xs:QName('err:FAIL'), `{$i}: expected {$i * $i}, but got {$v}`)\n"
-        + " }")
-        + " => count()", 1000);
-
+    query("""
+xquery:fork-join(
+  for $t in 1 to 100
+  return fn() {
+    for $i in 1 to 10
+    return map:build(($i, $i), (), (), { 'duplicates': op('*') })($i)
+  }
+) => count()
+        """, 1000);
     // dynamic namespace context
-    query(func.args(
-          " for $i in 1 to 100\r\n"
-        + " return function() {\r\n"
-        + "   (1 to $i)\r\n"
-        + "   ! <e xmlns:a='a' xmlns:b='b' xmlns:c='c' xmlns:d='d' xmlns:e='e'>{\r\n"
-        + "       ('a', 'b', 'c', 'd', 'e') ! fn:namespace-uri-for-prefix(., <e/>)\r\n"
-        + "     }</e>\r\n"
-        + "   => distinct-values()\r\n"
-        + " }")
-        + "=> distinct-values()", "a b c d e");
-
+    query("""
+(for $i in 1 to 100
+ return fn() {
+   (1 to $i)
+   ! <e xmlns:a='a' xmlns:b='b' xmlns:c='c' xmlns:d='d' xmlns:e='e'>{
+     ('a', 'b', 'c', 'd', 'e') ! fn:namespace-uri-for-prefix(., <e/>)
+   }</e>
+   => distinct-values()
+ }()
+) => distinct-values()
+        """, "a b c d e");
     // GH-2640: fork-join inherits parent dynamic namespace context
-    query("<e xmlns:p='p'\n"
-        + "   p:a='{\n"
-        + "     " + func.args(" \n"
-        + "       (1 to 100) ! fn() {map:keys(in-scope-namespaces(<x/>))}\n"
-        + "     ") + "[. = 'p'] => count()\n"
-        + "   }'\n"
-        + "/>", "<e xmlns:p=\"p\" p:a=\"100\"/>");
+    query("""
+<e xmlns:p='p' p:a='{
+  xquery:fork-join(
+   (1 to 100) ! fn() { map:keys(in-scope-namespaces(<x/>)) }
+ )[. = 'p'] => count()
+}'/>
+        """, "<e xmlns:p=\"p\" p:a=\"100\"/>");
 
     // optimizations
     check(func.args(" ()"), "", empty());
