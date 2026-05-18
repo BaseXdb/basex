@@ -597,6 +597,17 @@ public final class PermissionTest extends SandboxTest {
         testSession, "[xquery:permission]", "create");
   }
 
+  /** Tests that a nested xquery:eval inherits the outer permission restriction. */
+  @Test public void xqueryNestedPerm() {
+    // outer eval restricts permissions to READ; inner eval must inherit this
+    // and reject unparsed-text (function-level CREATE permission).
+    ok(new Grant("admin", NAME), adminSession);
+    error(new XQuery(_XQUERY_EVAL.args(
+        "xquery:eval(`unparsed-text('x.xq')`)",
+        " ()", " { 'permission': 'read' }")),
+        testSession, "[xquery:permission]", "create");
+  }
+
   /** Tests the permission error raised when accessing external resources. */
   @Test public void permRequired() {
     // fn:collection bypasses the DTD-related permission check in Docs.check

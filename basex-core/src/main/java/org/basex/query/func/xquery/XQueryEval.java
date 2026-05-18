@@ -67,7 +67,7 @@ public class XQueryEval extends StandardFunc {
     // bind variables and context value, parse options
     final HashMap<String, Value> bindings = toBindings(arg(1), qc);
     final XQueryOptions options = new XQueryOptions();
-    final User user = qc.context.user();
+    final User user = qc.user;
     options.put(XQueryOptions.PERMISSION, user.permission(""));
     toOptions(arg(2), options, qc);
 
