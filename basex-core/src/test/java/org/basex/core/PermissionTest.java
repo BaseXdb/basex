@@ -600,15 +600,19 @@ public final class PermissionTest extends SandboxTest {
   /** Tests the permission error raised when accessing external resources. */
   @Test public void permRequired() {
     // fn:collection bypasses the DTD-related permission check in Docs.check
-    // and reaches QueryResources.create, which raises BASEX_PERMISSION_X_X
+    // and reaches QueryResources.create, which raises BASEX_PERMISSION_X_X.
+    // Use a file:// URL so the path is not parsed as a database reference
+    // (the first path segment of an absolute UNIX path would otherwise be
+    // interpreted as the database name).
+    final String url = sandbox().url() + "doc.xml";
 
     // READ user: missing CREATE for an external file
     ok(new Grant("read", NAME), adminSession);
-    error(new XQuery(COLLECTION.args(sandbox() + "doc.xml")), testSession,
+    error(new XQuery(COLLECTION.args(url)), testSession,
         "[basex:permission]", "create");
     // NONE user: same code; CREATE is still the missing permission for files
     ok(new Grant("none", NAME), adminSession);
-    error(new XQuery(COLLECTION.args(sandbox() + "doc.xml")), testSession,
+    error(new XQuery(COLLECTION.args(url)), testSession,
         "[basex:permission]", "create");
   }
 
