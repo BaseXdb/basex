@@ -95,7 +95,9 @@ public final class WsFunction extends WebFunction {
         Str.get((String) msg));
 
     for(final WebParam param : headerParams) {
-      bind(param.var(), args, values.get(param.name()), qc, "Value of '" + param.name() + "'");
+      final Value v = values.get(param.name());
+      bind(param.var(), args, v == null || v.isEmpty() ? param.value() : v, qc,
+          "Value of '" + param.name() + "'");
     }
     if(message != null) {
       bind(message.var(), args, values.get(message.name()), qc, "Message");
