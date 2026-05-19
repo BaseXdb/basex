@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.name.*;
 import org.basex.index.query.*;
 import org.basex.index.stats.*;
 import org.basex.query.*;
@@ -18,6 +19,7 @@ import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class contains methods for storing information on new index expressions.
@@ -138,22 +140,45 @@ public final class IndexInfo {
       // loop through all items
       final Iter iter = search.iter(cc.qc);
       final TokenIntMap cache = new TokenIntMap();
+      Stats stats = null;
       for(Item item; (item = cc.qc.next(iter)) != null;) {
-        // only strings and untyped items are supported
-        if(!item.type.isStringOrUntyped()) return false;
-        // do not use text/attribute index if string is empty or too long
-        byte[] token = item.string(info);
-        if(trim) token = Token.trim(token);
-        final int sl = token.length;
-        if(type != IndexType.TOKEN && (sl == 0 || data != null && sl > data.meta.maxlen))
+        final TokenList tokens = new TokenList();
+        if(item.type.isStringOrUntyped()) {
+          // string: exact search
+          tokens.add(item.string(info));
+        } else if(item.type.instanceOf(BasicType.INTEGER)) {
+          // integers: search indexed lexical forms (for non-canonical values like '+5')
+          if(stats == null) {
+            stats = intStats(data);
+            if(stats == null) return false;
+          }
+          final long value = Token.toLong(item.string(info));
+          for(final byte[] stored : stats.values) {
+            if(Token.toLong(stored) == value) tokens.add(stored);
+          }
+        } else {
           return false;
+        }
 
-        // only cache distinct tokens that have not been requested before
-        if(!cache.contains(token)) {
-          final IndexCosts ic = costs(data, new StringToken(type, token));
-          if(ic == null) return false;
-          cache.put(token, ic.results());
-          costs = IndexCosts.add(costs, ic);
+        if(tokens.isEmpty()) {
+          // no matches: zero cost
+          costs = IndexCosts.add(costs, IndexCosts.ZERO);
+        } else {
+          for(byte[] token : tokens) {
+            // do not use text/attribute index if string is empty or too long
+            if(trim) token = Token.trim(token);
+            final int sl = token.length;
+            if(type != IndexType.TOKEN && (sl == 0 || data != null && sl > data.meta.maxlen))
+              return false;
+
+            // only cache distinct tokens that have not been requested before
+            if(!cache.contains(token)) {
+              final IndexCosts ic = costs(data, new StringToken(type, token));
+              if(ic == null) return false;
+              cache.put(token, ic.results());
+              costs = IndexCosts.add(costs, ic);
+            }
+          }
         }
       }
 
@@ -223,6 +248,20 @@ public final class IndexInfo {
    */
   public static IndexCosts costs(final Data data, final IndexSearch search) {
     return data != null ? data.costs(search) : IndexCosts.ENFORCE_STATIC;
+  }
+
+  /**
+   * Retrieves the statistics of the targeted element or attribute name.
+   * @param data data reference (can be {@code null})
+   * @return statistics, or {@code null} if not available
+   */
+  private Stats intStats(final Data data) {
+    if(data == null || !data.meta.uptodate || !data.nspaces.isEmpty()) return null;
+    if(!(pred.qname().test instanceof final NameTest nt) || nt.name == null) return null;
+    final Names names = text ? data.elemNames : data.attrNames;
+    final Stats stats = names.stats(names.index(nt.qname.local()));
+    return stats == null || !StatsType.isCategory(stats.type) || !StatsType.isInteger(stats.type)
+        ? null : stats;
   }
 
   /**

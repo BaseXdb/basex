@@ -354,6 +354,44 @@ public final class IndexOptimizeTest extends SandboxTest {
     check("//*[b = 'B']", doc, empty(ValueAccess.class));
   }
 
+  /** Index access for integer comparisons (issue #2069). */
+  @Test public void gh2069() {
+    // attribute and text values are integers: rewrite equality comparisons for index access
+    execute(new CreateDB(NAME, "<x><a n='10'>100</a><a n='20'>200</a><a n='30'>300</a></x>"));
+    indexCheck("//a[@n = 20]", "<a n=\"20\">200</a>");
+    indexCheck("//a[text() = 200]", "<a n=\"20\">200</a>");
+    indexCheck("//a[@n = (10, 30)]", "<a n=\"10\">100</a>\n<a n=\"30\">300</a>");
+
+    // mixed integer/double values: no integer rewrite (statistics report double)
+    execute(new CreateDB(NAME, "<x><a n='10.5'/><a n='20'/></x>"));
+    check("//a[@n = 20]", "<a n=\"20\"/>", empty(ValueAccess.class));
+
+    // non-canonical integer lexical form: '005' parses as xs:integer 5,
+    // so XQuery should return the element; the index lookup of token "5", however,
+    // does not match "005" → demonstrates a correctness gap of the integer rewrite
+    execute(new CreateDB(NAME, "<x><a n='005'/></x>"));
+    check("//a[@n = 5]", "<a n=\"005\"/>", exists(ValueAccess.class));
+
+    // namespace declarations on the database: statistics are not consulted, no integer rewrite
+    execute(new CreateDB(NAME, "<x xmlns:ns='u'><a n='5'/></x>"));
+    check("count(//a[@n = 5])", "1", empty(ValueAccess.class));
+
+    // wildcard attribute test: no NameTest name available, no integer rewrite
+    execute(new CreateDB(NAME, "<x><a n='5'/></x>"));
+    check("count(//*[@* = 5])", "1", empty(ValueAccess.class));
+
+    // access closed database
+    execute(new Close());
+    check("db:get('" + NAME + "')//a[@n = 5]", "<a n=\"5\"/>", exists(ValueAccess.class));
+
+    // integer value not present in the indexed lexical forms: statically known to be empty
+    execute(new CreateDB(NAME, "<x><a n='10'/><a n='20'/></x>"));
+    check("//a[@n = 999]", "", empty());
+
+    // sequence in which no item matches: same code path, must not throw
+    check("//a[@n = (997, 999)]", "", empty());
+  }
+
   /**
    * Creates a test database.
    */
