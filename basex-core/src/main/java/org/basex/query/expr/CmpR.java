@@ -198,13 +198,21 @@ public final class CmpR extends Single {
 
   @Override
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
-    // accept only location path, string and equality expressions
     final Data data = ii.db.data();
     // sequential main memory scan is usually faster than range index access
     if(data == null ? !ii.enforce() : data.inMemory()) return false;
 
     final IndexType type = ii.type(expr, null);
     if(type == null) return false;
+
+    // try the value index first: when the targeted node has integer-category statistics,
+    // the double range can be projected losslessly onto a long range and looked up exactly
+    final long lmin = (long) Math.ceil(min), lmax = (long) Math.floor(max);
+    if(lmin <= lmax) {
+      final IndexCosts costs = ii.costs;
+      if(ii.create(lmin, lmax, info)) return true;
+      ii.costs = costs;
+    }
 
     final Stats key = key(ii, type);
     if(key == null) return false;
@@ -231,8 +239,8 @@ public final class CmpR extends Single {
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add('[').add(min).add(',').add(max).add(']');
-    ii.create(new RangeAccess(info, nr, ii.db), true, Util.info(OPTINDEX_X_X, "range", tb), info);
-    return true;
+    return ii.create(new RangeAccess(info, nr, ii.db), true,
+        Util.info(OPTINDEX_X_X, "range", tb), info);
   }
 
   /**

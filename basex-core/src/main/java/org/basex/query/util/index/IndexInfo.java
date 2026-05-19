@@ -2,6 +2,9 @@ package org.basex.query.util.index;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.concurrent.atomic.*;
+import java.util.function.*;
+
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
@@ -12,14 +15,12 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.index.*;
 import org.basex.query.expr.path.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.*;
 
 /**
  * This class contains methods for storing information on new index expressions.
@@ -121,7 +122,7 @@ public final class IndexInfo {
    * Tries to rewrite the specified input for index access.
    * @param search expression to find (can be {@code null})
    * @param type index type (can be {@code null})
-   * @param trim normalize second string
+   * @param trim trim whitespace in the input
    * @param info input info (can be {@code null})
    * @return success flag
    * @throws QueryException query exception
@@ -129,93 +130,133 @@ public final class IndexInfo {
   public boolean create(final Expr search, final IndexType type, final boolean trim,
       final InputInfo info) throws QueryException {
 
-    // no index or no search value: no optimization
-    if(type == null || search == null) return false;
-
     final Data data = db.data();
-    if(data == null && !enforce()) return false;
+    if(type == null || search == null || data == null && !enforce()) return false;
 
-    final ValueAccess va;
-    if(search instanceof Value) {
-      // loop through all items
-      final Iter iter = search.iter(cc.qc);
-      final TokenIntMap cache = new TokenIntMap();
+    if(search instanceof final Value value) {
+      // loop through all items; collect tokens, accumulate costs, and track the result size.
+      // prerequisites for an exact size estimate:
+      // - index access is not followed by a name test,
+      // - no token index is used, or only one token is looked up
+      final TokenSet tokens = new TokenSet();
+      final AtomicInteger size = new AtomicInteger(test == null ? 0 : -1);
+      final Predicate<byte[]> add = token -> {
+        // do not use text/attribute index if string is empty or too long
+        final int tl = token.length;
+        return (type == IndexType.TOKEN || tl > 0 && (data == null || tl <= data.meta.maxlen)) &&
+            addToken(token, type, data, tokens, size);
+      };
+
       Stats stats = null;
-      for(Item item; (item = cc.qc.next(iter)) != null;) {
-        final TokenList tokens = new TokenList();
+      for(final Item item : value) {
         if(item.type.isStringOrUntyped()) {
           // string: exact search
-          tokens.add(item.string(info));
+          final byte[] token = item.string(info);
+          if(!add.test(trim ? Token.trim(token) : token)) return false;
         } else if(item.type.instanceOf(BasicType.INTEGER)) {
           // integers: search indexed lexical forms (for non-canonical values like '+5')
           if(stats == null) {
             stats = intStats(data);
             if(stats == null) return false;
           }
-          final long value = Token.toLong(item.string(info));
+          final long v = Token.toLong(item.string(info));
           for(final byte[] stored : stats.values) {
-            if(Token.toLong(stored) == value) tokens.add(stored);
+            if(Token.toLong(stored) == v && !add.test(stored)) return false;
           }
         } else {
           return false;
         }
-
-        if(tokens.isEmpty()) {
-          // no matches: zero cost
-          costs = IndexCosts.add(costs, IndexCosts.ZERO);
-        } else {
-          for(byte[] token : tokens) {
-            // do not use text/attribute index if string is empty or too long
-            if(trim) token = Token.trim(token);
-            final int sl = token.length;
-            if(type != IndexType.TOKEN && (sl == 0 || data != null && sl > data.meta.maxlen))
-              return false;
-
-            // only cache distinct tokens that have not been requested before
-            if(!cache.contains(token)) {
-              final IndexCosts ic = costs(data, new StringToken(type, token));
-              if(ic == null) return false;
-              cache.put(token, ic.results());
-              costs = IndexCosts.add(costs, ic);
-            }
-          }
-        }
       }
-
-      // ignore expressions that yield no results.
-      // count number of results. prerequisites:
-      // - index access is not followed by a name test,
-      // - no token index is used, or only one token is looked up
-      final TokenSet tokens = new TokenSet();
-      int size = test == null ? 0 : -1;
-      for(final byte[] token : cache) {
-        final int count = cache.get(token);
-        if(count != 0) tokens.add(token);
-        if(size >= 0) {
-          size = count < 0 || type == IndexType.TOKEN && tokens.size() > 1 ? -1 : size + count;
-        }
-      }
-
-      // create expression for index access
-      va = new ValueAccess(info, tokens, type, test, db);
-      va.exprType.assign(va.seqType(), size);
-    } else {
-      /* index access is not possible if returned type is not a string or untyped; if
-       * expression depends on context; or if it is nondeterministic. examples:
-       * - for $x in ('a', 1) return //*[text() = $x]
-       * - //*[text() = .]
-       * - //*[text() = (if(random:double() < .5) then 'X' else 'Y')] */
-      if(!search.seqType().type.isStringOrUntyped() || search.has(Flag.CTX, Flag.NDT))
-        return false;
-
-      // estimate costs for dynamic query terms
-      costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
-        IndexCosts.get(Math.max(1, data.meta.size / 10));
-      va = new ValueAccess(info, search, type, test, db);
+      valueAccess(tokens, size, type, info, search);
+      return true;
     }
 
-    create(va, false, Util.info(OPTINDEX_X_X, type, search), info);
+    /* index access is not possible if returned type is not a string or untyped; if
+     * expression depends on context; or if it is nondeterministic. examples:
+     * - for $x in ('a', 1) return //*[text() = $x]
+     * - //*[text() = .]
+     * - //*[text() = (if(random:double() < .5) then 'X' else 'Y')] */
+    if(!search.seqType().type.isStringOrUntyped() || search.has(Flag.CTX, Flag.NDT))
+      return false;
+
+    // estimate costs for dynamic query terms
+    costs = enforce() ? IndexCosts.ENFORCE_DYNAMIC :
+      IndexCosts.get(Math.max(1, data.meta.size / 10));
+    final ValueAccess va = new ValueAccess(info, search, type, test, db);
+    return create(va, false, Util.info(OPTINDEX_X_X, type, search), info);
+  }
+
+  /**
+   * Tries to rewrite an integer range comparison for index access.
+   * The lookup is performed against the indexed lexical forms of an integer-category
+   * value index, restricted to entries whose long-value lies in {@code [min..max]}.
+   * @param min minimum value (inclusive)
+   * @param max maximum value (inclusive)
+   * @param info input info (can be {@code null})
+   * @return success flag
+   * @throws QueryException query exception
+   */
+  public boolean create(final long min, final long max, final InputInfo info)
+      throws QueryException {
+
+    final Data data = db.data();
+    final Stats stats = intStats(data);
+    if(stats == null) return false;
+
+    // collect indexed lexical forms whose long-value lies in [min..max]
+    final IndexType type = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
+    final TokenSet tokens = new TokenSet();
+    final AtomicInteger size = new AtomicInteger(test == null ? 0 : -1);
+    for(final byte[] token : stats.values) {
+      final long v = Token.toLong(token);
+      if(v < min || v > max) continue;
+      if(!addToken(token, type, data, tokens, size)) return false;
+    }
+    final TokenBuilder tb = new TokenBuilder().add('[').addLong(min).add(',').addLong(max).add(']');
+    return valueAccess(tokens, size, type, info, tb);
+  }
+
+  /**
+   * Looks up the costs for the supplied token, adds it to the token set if not
+   * already present, accumulates the costs, and updates the result-size estimate.
+   * @param token token to look up
+   * @param type index type
+   * @param data data reference (can be {@code null})
+   * @param tokens token set
+   * @param size current size estimate
+   * @return false if the lookup failed
+   */
+  private boolean addToken(final byte[] token, final IndexType type, final Data data,
+      final TokenSet tokens, final AtomicInteger size) {
+    if(!tokens.add(token)) return true;
+    final IndexCosts ic = costs(data, new StringToken(type, token));
+    if(ic == null) return false;
+    costs = IndexCosts.add(costs, ic);
+    final int r = ic.results(), s = size.get();
+    if(s >= 0) size.set(r < 0 || s > 0 && type == IndexType.TOKEN && r > 0 ? -1 : s + r);
     return true;
+  }
+
+  /**
+   * Builds a value-index access from already-collected lexical-form tokens and registers
+   * the rewriting with this index info.
+   * @param tokens distinct tokens to be looked up
+   * @param size expected result size ({@code -1} if unknown)
+   * @param type index type
+   * @param info input info (can be {@code null})
+   * @param opt optimization info displayed in the query plan
+   * @return true
+   * @throws QueryException query exception
+   */
+  private boolean valueAccess(final TokenSet tokens, final AtomicInteger size, final IndexType type,
+      final InputInfo info, final Object opt) throws QueryException {
+
+    // no matches: zero cost
+    if(tokens.isEmpty()) costs = IndexCosts.add(costs, IndexCosts.ZERO);
+
+    final ValueAccess va = new ValueAccess(info, tokens, type, test, db);
+    va.exprType.assign(va.seqType(), size.get());
+    return create(va, false, Util.info(OPTINDEX_X_X, type, opt), info);
   }
 
   /**
@@ -224,9 +265,10 @@ public final class IndexInfo {
    * @param parent add parent step
    * @param opt optimization info
    * @param info input info (can be {@code null})
+   * @return true
    * @throws QueryException query exception
    */
-  public void create(final ParseExpr root, final boolean parent, final String opt,
+  public boolean create(final ParseExpr root, final boolean parent, final String opt,
       final InputInfo info) throws QueryException {
 
     final Expr rt;
@@ -238,11 +280,12 @@ public final class IndexInfo {
     }
     expr = pred.invert(rt);
     optInfo = opt;
+    return true;
   }
 
   /**
    * Computes costs if the specified data reference exists.
-   * @param data data reference
+   * @param data data reference (can be {@code null})
    * @param search index search definition
    * @return costs, or {@code null} if index access is not possible
    */

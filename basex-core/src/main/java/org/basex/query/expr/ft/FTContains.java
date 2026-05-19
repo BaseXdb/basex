@@ -123,10 +123,8 @@ public final class FTContains extends Single {
     // check if index can be utilized
     final IndexType type = ii.type(expr, IndexType.FULLTEXT);
     if(type == null || !ftexpr.indexAccessible(ii)) return false;
-
-    ii.create(new FTIndexAccess(info, ftexpr, ii.db), true,
+    return ii.create(new FTIndexAccess(info, ftexpr, ii.db), true,
         Util.info(OPTINDEX_X_X, "full-text", ftexpr), info);
-    return true;
   }
 
   @Override

@@ -390,6 +390,28 @@ public final class IndexOptimizeTest extends SandboxTest {
 
     // sequence in which no item matches: same code path, must not throw
     check("//a[@n = (997, 999)]", "", empty());
+
+    // integer range expressions are rewritten via CmpIR + value index
+    execute(new CreateDB(NAME, "<x><a n='10'/><a n='20'/><a n='30'/></x>"));
+    // `to` range with matches in [min..max]
+    check("//a[@n = 10 to 25]", "<a n=\"10\"/>\n<a n=\"20\"/>", exists(ValueAccess.class));
+    // ascending sequence (step 1) collapses to a RangeSeq → CmpIR; no matches → empty
+    check("//a[@n = (998, 999)]", "", empty());
+
+    // CmpR on untyped operand: integer-category statistics allow value-index rewriting
+    check("//a[@n >= 25]", "<a n=\"30\"/>", exists(ValueAccess.class));
+    check("//a[@n > 25 and @n < 35]", "<a n=\"30\"/>", exists(ValueAccess.class));
+    check("//a[@n >= 100]", "", empty());
+
+    // edge case: stats become DOUBLE (INF parses as Double.POSITIVE_INFINITY) → no integer
+    // rewriting, falls back to sequential evaluation, semantics preserved
+    execute(new CreateDB(NAME, "<x><a n='INF'/></x>"));
+    check("//a[@n >= 25]", "<a n=\"INF\"/>", empty(ValueAccess.class));
+
+    // edge case: stats become STRING (NaN parses as Double.NaN → fallback STRING) → no
+    // integer rewriting; NaN is never >= 25 in XQuery semantics
+    execute(new CreateDB(NAME, "<x><a n='NaN'/></x>"));
+    check("//a[@n >= 25]", "", empty(ValueAccess.class));
   }
 
   /**

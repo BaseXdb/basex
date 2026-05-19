@@ -8,6 +8,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
+import org.basex.query.util.index.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -180,6 +181,11 @@ public final class CmpIR extends Single {
     newMin = or ? Math.min(min, newMin) : Math.max(min, newMin);
     newMax = or ? Math.max(max, newMax) : Math.min(max, newMax);
     return get(cc, info, expr, newMin, newMax);
+  }
+
+  @Override
+  public boolean indexAccessible(final IndexInfo ii) throws QueryException {
+    return ii.type(expr, null) != null && ii.create(min, max, info);
   }
 
   @Override
