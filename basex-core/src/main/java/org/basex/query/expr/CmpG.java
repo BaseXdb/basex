@@ -399,7 +399,7 @@ public class CmpG extends Cmp {
       expr1 = expr1.arg(0);
       type = IndexType.TOKEN;
     }
-    return ii.create(exprs[1], ii.type(expr1, type), false, info);
+    return ii.create(exprs[1], ii.type(expr1, type), info);
   }
 
   @Override

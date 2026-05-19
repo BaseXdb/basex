@@ -120,6 +120,7 @@ public final class IndexOptimizeTest extends SandboxTest {
     indexCheck("data(//@*[contains-token(., 'id1')])", "id1 id2");
     indexCheck("for $s in ('id2', 'id3') return data(//*[contains-token(@idref, $s)])", 1);
     indexCheck("for $s in ('id2', 'id3') return data(//@*[contains-token(., $s)])", "id1 id2");
+    indexCheck("for $s in ('   id1  ') return data(//*[contains-token(@idref, $s)])", 1);
   }
 
   /** Checks full-text requests. */

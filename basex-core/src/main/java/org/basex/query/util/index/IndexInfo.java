@@ -122,13 +122,12 @@ public final class IndexInfo {
    * Tries to rewrite the specified input for index access.
    * @param search expression to find (can be {@code null})
    * @param type index type (can be {@code null})
-   * @param trim trim whitespace in the input
    * @param info input info (can be {@code null})
    * @return success flag
    * @throws QueryException query exception
    */
-  public boolean create(final Expr search, final IndexType type, final boolean trim,
-      final InputInfo info) throws QueryException {
+  public boolean create(final Expr search, final IndexType type, final InputInfo info)
+      throws QueryException {
 
     final Data data = db.data();
     if(type == null || search == null || data == null && !enforce()) return false;
@@ -151,8 +150,7 @@ public final class IndexInfo {
       for(final Item item : value) {
         if(item.type.isStringOrUntyped()) {
           // string: exact search
-          final byte[] token = item.string(info);
-          if(!add.test(trim ? Token.trim(token) : token)) return false;
+          if(!add.test(item.string(info))) return false;
         } else if(item.type.instanceOf(BasicType.INTEGER)) {
           // integers: search indexed lexical forms (for non-canonical values like '+5')
           if(stats == null) {

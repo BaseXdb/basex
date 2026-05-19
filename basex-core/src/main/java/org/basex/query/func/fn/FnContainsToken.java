@@ -44,7 +44,9 @@ public final class FnContainsToken extends StandardFunc {
   public boolean indexAccessible(final IndexInfo ii) throws QueryException {
     // support limited to default collation
     final Expr value = arg(0), token = arg(1);
-    return !defined(2) && token.seqType().zeroOrOne() &&
-      ii.create(token, ii.type(value, IndexType.TOKEN), true, info);
+    if(defined(2) || !token.seqType().zeroOrOne()) return false;
+    // the runtime trims the lookup token; the same must happen for index access
+    final Expr expr = ii.cc.function(Function.NORMALIZE_SPACE, info, token);
+    return ii.create(expr, ii.type(value, IndexType.TOKEN), info);
   }
 }
