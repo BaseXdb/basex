@@ -54,7 +54,7 @@ public final class SAXWrapper extends SingleParser {
       if(reader == null) {
         reader = XmlParser.reader(options);
       }
-      final boolean trusted = options.trusted;
+      final boolean trusted = options.isTrusted();
       final boolean dtd = options.get(MainOptions.DTD);
       final boolean dtdValidation = options.get(MainOptions.DTDVALIDATION);
       if(!trusted && options.get(MainOptions.XINCLUDE))

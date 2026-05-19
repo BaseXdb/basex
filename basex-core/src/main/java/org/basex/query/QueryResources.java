@@ -34,11 +34,7 @@ public final class QueryResources {
   /** Default options. */
   public static final DocOptions DOC_OPTIONS = new DocOptions();
   /** Default options for creating new documents (trusted=false: fn-level default). */
-  private static final MainOptions MAIN_OPTIONS;
-  static {
-    MAIN_OPTIONS = new MainOptions(DOC_OPTIONS);
-    MAIN_OPTIONS.trusted = false;
-  }
+  private static final MainOptions MAIN_OPTIONS = new MainOptions(DOC_OPTIONS, null);
 
   /** Database context. */
   private final Context context;
@@ -508,10 +504,7 @@ public final class QueryResources {
           && !mopts.get(MainOptions.FNXMLTRUSTED)) {
         options = MAIN_OPTIONS;
       } else {
-        options = new MainOptions(docOpts);
-        final Boolean trusted = docOpts.get(DocOptions.TRUSTED);
-        options.trusted = trusted != null ? trusted : mopts.get(MainOptions.FNXMLTRUSTED);
-        options.setResolver(mopts);
+        options = new MainOptions(docOpts, mopts);
       }
     } else {
       docOpts.checkDbAccess(info);
