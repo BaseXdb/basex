@@ -256,11 +256,12 @@ public final class IOUrl extends IO {
    * @return path
    */
   private static String normalize(final String string) {
-    int i = string.indexOf("://") + 3;
-    if(i == 2) return string;
+    final String input = toAscii(string);
+    int i = input.indexOf("://") + 3;
+    if(i == 2) return input;
 
-    final String scheme = string.substring(0, i);
-    String path = string.substring(i), query = "", anchor = "";
+    final String scheme = input.substring(0, i);
+    String path = input.substring(i), query = "", anchor = "";
     i = path.indexOf('#');
     if(i != -1) {
       anchor = path.substring(i);
@@ -283,5 +284,54 @@ public final class IOUrl extends IO {
       }
     }
     return scheme + String.join("/", segments.finish()) + query + anchor;
+  }
+
+  /**
+   * Converts the host of a URL to ASCII (Punycode) if it contains non-ASCII
+   * characters (Internationalized Domain Names). Other components are left untouched.
+   * @param url URL string
+   * @return URL with ASCII-encoded host
+   */
+  public static String toAscii(final String url) {
+    final int i = url.indexOf("://") + 3;
+    if(i == 2) return url;
+    // find end of authority (first '/', '?' or '#' after the scheme)
+    int j = url.length();
+    for(int k = i; k < j; k++) {
+      final char ch = url.charAt(k);
+      if(ch == '/' || ch == '?' || ch == '#') {
+        j = k;
+        break;
+      }
+    }
+    final String authority = url.substring(i, j);
+    for(int c = 0; c < authority.length(); c++) {
+      if(authority.charAt(c) > 127) {
+        return url.substring(0, i) + asciiAuthority(authority) + url.substring(j);
+      }
+    }
+    return url;
+  }
+
+  /**
+   * Returns the authority with the host part converted to ASCII (Punycode).
+   * @param authority authority string ({@code [userinfo@]host[:port]})
+   * @return ASCII-encoded authority, or the original string if encoding fails
+   */
+  private static String asciiAuthority(final String authority) {
+    final int at = authority.indexOf('@');
+    final String userInfo = at < 0 ? "" : authority.substring(0, at + 1);
+    final String hostPort = at < 0 ? authority : authority.substring(at + 1);
+    // skip IPv6 brackets when searching for the port colon
+    final int bracket = hostPort.lastIndexOf(']');
+    final int colon = hostPort.indexOf(':', Math.max(0, bracket));
+    final String host = colon < 0 ? hostPort : hostPort.substring(0, colon);
+    final String port = colon < 0 ? "" : hostPort.substring(colon);
+    try {
+      return userInfo + IDN.toASCII(host) + port;
+    } catch(final IllegalArgumentException ex) {
+      Util.debug(ex);
+      return authority;
+    }
   }
 }

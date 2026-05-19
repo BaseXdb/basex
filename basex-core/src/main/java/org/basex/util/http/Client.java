@@ -109,7 +109,7 @@ public final class Client {
     final String uri = href.length == 0 ? request.attribute(HREF) : Token.string(href);
     if(uri == null || uri.isEmpty()) throw HC_URL.get(info);
     try {
-      return new URI(uri);
+      return new URI(IOUrl.toAscii(uri));
     } catch(final URISyntaxException ex) {
       Util.debug(ex);
       throw HC_URI_X.get(info, uri);
