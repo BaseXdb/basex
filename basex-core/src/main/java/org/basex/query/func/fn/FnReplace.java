@@ -7,8 +7,10 @@ import java.util.regex.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
+import org.basex.query.util.regex.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -18,6 +20,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnReplace extends RegExFn {
+  /** Type of the replacement argument. */
+  public static final SeqType REPLACEMENT_TYPE =
+      ChoiceItemType.get(BasicType.STRING, FuncType.get(Types.ITEM_ZO,
+          Types.UNTYPED_ATOMIC_O, Types.UNTYPED_ATOMIC_ZM)).seqType(Occ.ZERO_OR_ONE);
+
   @Override
   public Str item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final byte[] value = toZeroToken(arg(0), qc);
@@ -34,7 +41,7 @@ public final class FnReplace extends RegExFn {
       final int sp = patternChar(pattern), rp = func ? -1 : patternChar(replace);
       if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
     }
-    final RegExpr regExpr = regExpr(pattern, flags);
+    final RegExpr regExpr = regExpr(pattern, flags, qc);
     final Matcher matcher = regExpr.pattern.matcher(string(value));
 
     if(func) {

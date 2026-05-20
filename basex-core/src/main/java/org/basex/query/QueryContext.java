@@ -26,6 +26,7 @@ import org.basex.io.serial.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
+import org.basex.query.util.regex.*;
 import org.basex.query.func.java.*;
 import org.basex.query.iter.*;
 import org.basex.query.scope.*;
@@ -101,6 +102,8 @@ public final class QueryContext extends Job implements Closeable {
   /** Scoring flag. */
   public boolean scoring;
 
+  /** Compiled regular expression cache (shared with parent context). */
+  public final TokenObjectMap<RegExpr> regexPatterns;
   /** Available collations. */
   public TokenObjectMap<Collation> collations;
   /** Profiling results. */
@@ -185,6 +188,7 @@ public final class QueryContext extends Job implements Closeable {
     resources = parent != null ? parent.resources : new QueryResources(this);
     ftPosData = parent != null ? parent.ftPosData : null;
     shared = parent != null ? parent.shared : new SharedData();
+    regexPatterns = parent != null ? parent.regexPatterns : new TokenObjectMap<>();
     user = context.user();
   }
 

@@ -7,6 +7,7 @@ import java.util.regex.*;
 import java.util.stream.*;
 
 import org.basex.*;
+import org.basex.query.util.regex.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
@@ -26,7 +27,7 @@ public final class RegexTest extends SandboxTest {
   @ParameterizedTest
   @MethodSource
   public void testParentGroups(final String regex, final int[] parentGroups) {
-    final int[] actualGroups = RegExFn.GroupScanner.groupInfo(regex).parentGroups;
+    final int[] actualGroups = RegExpr.GroupScanner.groupInfo(regex).parentGroups;
     assertArrayEquals(parentGroups, actualGroups,
         () -> "Unexpected result: " + Arrays.toString(actualGroups));
     assertEquals(Pattern.compile(regex).matcher("").groupCount(), parentGroups.length);

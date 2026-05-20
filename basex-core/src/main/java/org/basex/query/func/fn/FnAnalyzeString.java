@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.util.regex.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
@@ -40,7 +41,7 @@ public final class FnAnalyzeString extends RegExFn {
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);
 
-    final RegExpr regExpr = regExpr(pattern, flags);
+    final RegExpr regExpr = regExpr(pattern, flags, qc);
     final Matcher matcher = regExpr.pattern.matcher(value);
     final FBuilder root = FElem.build(Q_ANALYZE_STRING_RESULT).ns();
     int start = 0;

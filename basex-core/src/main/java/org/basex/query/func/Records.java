@@ -2,6 +2,8 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
+import org.basex.query.expr.path.*;
+import org.basex.query.func.fn.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
@@ -18,7 +20,9 @@ import org.basex.util.hash.*;
 public enum Records {
   /** Record definition. */
   ATTRIBUTE_CONVERSION_PLAN(FN_URI, "attribute-conversion-plan",
-      field("type", EnumType.get("numeric", "boolean", "string", "skip").seqType())),
+    field("type", EnumType.get("numeric", "boolean", "string", "skip").seqType())),
+  /** Record definition. */
+  COMPILED_REGEX(FN_URI, "compiled-regex"),
   /** Record definition. */
   DATETIME(FN_URI, "dateTime",
     field("year", Types.INTEGER_ZO, true),
@@ -100,7 +104,7 @@ public enum Records {
       BUILT_IN.put(record.get().name(), record.get());
     }
 
-    // recursive definitions
+    // definitions requiring (possibly recursive) forward references
     final RecordType rng = RANDOM_NUMBER_GENERATOR.get();
     rng.add("number", false, Types.DOUBLE_O).
         add("next", false, FuncType.get(rng.seqType()).seqType()).
@@ -117,6 +121,20 @@ public enum Records {
         add("matches", true, FuncType.get(Types.BOOLEAN_O, Types.ANY_ATOMIC_TYPE_O).seqType()).
         add("constructor", true, FuncType.get(Types.ANY_ATOMIC_TYPE_ZM,
             Types.ANY_ATOMIC_TYPE_ZO).seqType());
+
+    final RecordType crx = COMPILED_REGEX.get();
+    crx.add("pattern", false, Types.STRING_O).
+        add("flags", false, Types.STRING_O).
+        add("matches", false, FuncType.get(Types.BOOLEAN_O, Types.STRING_O).seqType()).
+        add("tokenize", false, FuncType.get(Types.STRING_ZM, Types.STRING_O).seqType()).
+        add("replace", false, FuncType.get(Types.STRING_O, Types.STRING_O, ChoiceItemType.get(
+            BasicType.STRING, FuncType.get(Types.ITEM_ZO, Types.UNTYPED_ATOMIC_O,
+                Types.UNTYPED_ATOMIC_ZM)).seqType(Occ.ZERO_OR_ONE)).seqType()).
+        add("analyze-string", false, FuncType.get(
+            NodeType.get(NameTest.get(FnAnalyzeString.Q_ANALYZE_STRING_RESULT)).seqType(),
+            Types.STRING_O).seqType()).
+        add("matching-segments", false, FuncType.get(
+            MATCHING_SEGMENT.get().seqType(Occ.ZERO_OR_MORE), Types.STRING_O).seqType());
   }
 
   /** Record type. */
