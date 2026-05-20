@@ -1495,8 +1495,8 @@ public enum Function implements AFunction {
   _FILE_DELETE(FileDelete::new, "delete(path[,recursive])",
       params(STRING_O, BOOLEAN_ZO), EMPTY_SEQUENCE_Z, flag(NDT), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
-  _FILE_DESCENDANTS(FileDescendants::new, "descendants(dir)",
-      params(STRING_O), STRING_ZM, flag(NDT), FILE_URI, Perm.ADMIN),
+  _FILE_DESCENDANTS(FileDescendants::new, "descendants(dir[,options])",
+      params(STRING_O, MAP_ZO), STRING_ZM, flag(NDT, HOF), FILE_URI, Perm.ADMIN),
   /** XQuery function. */
   _FILE_DIR_SEPARATOR(FileDirSeparator::new, "dir-separator()",
       params(), STRING_O, FILE_URI),

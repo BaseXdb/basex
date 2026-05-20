@@ -228,6 +228,47 @@ public final class FileModuleTest extends SandboxTest {
     error(func.args(PATH3), FILE_NO_DIR_X);
     error(func.args(PATH3 + NAME), FILE_NOT_FOUND_X);
     contains(func.args(PATH1), "x");
+
+    // build a fresh tree for option-based tests: PATH1/x/y/file.txt
+    query(_FILE_DELETE.args(PATH3));
+    query(_FILE_CREATE_DIR.args(PATH4));
+    query(_FILE_WRITE.args(PATH4 + "/file.txt", "abcd"));
+
+    // default: three entries (x/, x/y/, x/y/file.txt)
+    query("count(" + func.args(PATH1) + ")", 3);
+
+    // filter: include only the .txt file
+    final String filterTxt = " { 'filter': fn($p) { ends-with($p, '.txt') } }";
+    query("count(" + func.args(PATH1, filterTxt) + ")", 1);
+    contains(func.args(PATH1, filterTxt), "file.txt");
+
+    // recurse: prune the 'x' subtree -> only x/ itself is returned
+    final String prune = " { 'recurse': fn($d) "
+        + "{ not(ends-with($d, 'x' || file:dir-separator())) } }";
+    query("count(" + func.args(PATH1, prune) + ")", 1);
+
+    // combined: prune ahead of filter -> empty result
+    final String both = " { 'filter': fn($p) { ends-with($p, '.txt') }, "
+        + "'recurse': fn($d) { not(ends-with($d, 'x' || file:dir-separator())) } }";
+    query("count(" + func.args(PATH1, both) + ")", 0);
+
+    // empty options map: equivalent to no options
+    query("count(" + func.args(PATH1, " {}") + ")", 3);
+
+    // empty sequence as predicate result: treated as false
+    query("count(" + func.args(PATH1, " { 'filter': fn($p) { () } }") + ")", 0);
+    query("count(" + func.args(PATH1, " { 'recurse': fn($d) { () } }") + ")", 1);
+
+    // depth: limit the number of subdirectory levels that are traversed
+    query("count(" + func.args(PATH1, " { 'depth': 0 }") + ")", 1);
+    query("count(" + func.args(PATH1, " { 'depth': 1 }") + ")", 2);
+    query("count(" + func.args(PATH1, " { 'depth': 2 }") + ")", 3);
+    // depth combined with filter: the .txt file lies below the depth limit
+    query("count(" + func.args(PATH1,
+        " { 'depth': 1, 'filter': fn($p) { ends-with($p, '.txt') } }") + ")", 0);
+
+    // unknown option
+    error(func.args(PATH1, " { 'unknown': true() }"), INVALIDOPTION_X);
   }
 
   /** Test method. */
