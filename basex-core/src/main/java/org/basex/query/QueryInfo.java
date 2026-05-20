@@ -18,9 +18,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QueryInfo {
-  /** Maximum size for compilation and evaluation output. */
+  /** Maximum byte size for compilation and evaluation output. */
   private static final int MAX = 1 << 20;
-  /** Maximum size for compilation and evaluation output per line. */
+  /** Maximum byte size for compilation and evaluation output per line. */
   private static final int MAX_LINE = 1 << 14;
 
   /** Parsing time (nanoseconds). */

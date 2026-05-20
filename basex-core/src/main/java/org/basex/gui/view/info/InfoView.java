@@ -403,7 +403,7 @@ public final class InfoView extends View implements LinkListener, QueryTracer {
 
   @Override
   public boolean moreTraces(final int count) {
-    return clear || count <= 10_000 && all.length <= 1_000_000;
+    return clear || count <= 50_000 && all.length <= 10_000_000;
   }
 
   /**
