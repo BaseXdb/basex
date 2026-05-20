@@ -4,7 +4,8 @@ import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 
 /**
- * Encapsulation of higher-order functions arguments.
+ * Reusable argument buffer for a higher-order function invocation,
+ * with optional positional parameter.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -18,8 +19,8 @@ public final class HofArgs {
   private int pos;
 
   /**
-   * Constructor.
-   * @param arity function arity
+   * Creates a buffer with {@code arity} slots and no positional parameter.
+   * @param arity number of argument slots
    */
   public HofArgs(final int arity) {
     args = new Value[arity];
@@ -27,10 +28,10 @@ public final class HofArgs {
   }
 
   /**
-   * Constructor.
-   * @param arity function arity
-   * @param items higher-order functions that may contain positional parameters
-   *   (can contain {@code null} references)
+   * Creates a buffer sized for the supplied callbacks. If any callback has
+   * {@code arity}, the last slot is reserved as positional parameter.
+   * @param arity maximum callback arity
+   * @param items callback functions (can contain {@code null} references)
    */
   public HofArgs(final int arity, final FItem... items) {
     Boolean p = null;
@@ -44,15 +45,6 @@ public final class HofArgs {
     }
     args = new Value[p == Boolean.FALSE ? arity - 1 : arity];
     posParam = p == Boolean.FALSE ? -1 : arity - 1;
-  }
-
-  /**
-   * Constructor.
-   * @param args arguments
-   */
-  public HofArgs(final Value... args) {
-    this.args = args;
-    posParam = -1;
   }
 
   /**

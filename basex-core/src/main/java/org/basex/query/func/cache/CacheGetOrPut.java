@@ -20,7 +20,7 @@ public final class CacheGetOrPut extends CacheFn {
 
     Value value = caches(qc).get(key, name);
     if(value == null) {
-      value = invoke(put, new HofArgs(), qc);
+      value = invoke(put, new HofArgs(0), qc);
       cache(key, value, name, qc);
     }
     return value;
