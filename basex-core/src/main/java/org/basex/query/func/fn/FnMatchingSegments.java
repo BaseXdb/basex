@@ -26,7 +26,7 @@ public final class FnMatchingSegments extends RegExFn {
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);
 
-    final Matcher matcher = pattern(pattern, flags).matcher(value);
+    final Matcher matcher = pattern(pattern, flags, qc).matcher(value);
     final ValueBuilder vb = new ValueBuilder(qc);
     while(matcher.find()) {
       final MapBuilder groups = new MapBuilder();

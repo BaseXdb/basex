@@ -600,8 +600,11 @@ public enum Function implements AFunction {
   REMOVE(FnRemove::new, "remove(input,positions)",
       params(ITEM_ZM, INTEGER_ZM), ITEM_ZM),
   /** XQuery function. */
+  REGEX(FnRegex::new, "regex(pattern[,flags])",
+      params(STRING_O, STRING_ZO), Records.COMPILED_REGEX.get().seqType()),
+  /** XQuery function. */
   REPLACE(FnReplace::new, "replace(value,pattern[,replacement,flags])",
-      params(STRING_ZO, STRING_O, ITEM_ZO, STRING_ZO), STRING_O),
+      params(STRING_ZO, STRING_O, FnReplace.REPLACEMENT_TYPE, STRING_ZO), STRING_O),
   /** XQuery function. */
   REPLICATE(FnReplicate::new, "replicate(input,count[,multiple])",
       params(ITEM_ZM, INTEGER_O, BOOLEAN_ZO), ITEM_ZM),
@@ -803,6 +806,8 @@ public enum Function implements AFunction {
   /** XQuery function. */
   ATTRIBUTE_CONVERSION_PLAN_RECORD(Records.ATTRIBUTE_CONVERSION_PLAN.get()),
   /** XQuery function. */
+  COMPILED_REGEX_RECORD(Records.COMPILED_REGEX.get()),
+  /** XQuery function. */
   DATETIME_RECORD(Records.DATETIME.get()),
   /** XQuery function. */
   DIVIDED_DECIMALS_RECORD(Records.DIVIDED_DECIMALS.get()),
@@ -812,6 +817,10 @@ public enum Function implements AFunction {
   INFER_ENCODING_RECORD(Records.INFER_ENCODING.get()),
   /** XQuery function. */
   LOAD_XQUERY_MODULE_RECORD(Records.LOAD_XQUERY_MODULE.get()),
+  /** XQuery function. */
+  MATCHING_GROUP_RECORD(Records.MATCHING_GROUP.get()),
+  /** XQuery function. */
+  MATCHING_SEGMENT_RECORD(Records.MATCHING_SEGMENT.get()),
   /** XQuery function. */
   MEMBER_RECORD(Records.MEMBER.get()),
   /** XQuery function. */

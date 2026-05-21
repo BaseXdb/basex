@@ -2,9 +2,11 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.basex.*;
 import org.basex.query.func.*;
+import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -374,5 +376,17 @@ public final class RecordTest extends SandboxTest {
     // named record (runtime evaluation)
     check("declare record local:r(AA, AB); (local:r(0, <a/>), local:r(0, <a/>))?AA",
         "0\n0", exists(REPLICATE));
+  }
+
+  /** Checks that every built-in record type has a constructor function in {@link Function}. */
+  @Test public void builtInRecordsHaveConstructors() {
+    final QNmSet funcNames = new QNmSet();
+    for(final Function f : Function.values()) {
+      funcNames.add(f.definition().name);
+    }
+    for(final Records record : Records.values()) {
+      assertTrue(funcNames.contains(record.get().name()),
+          "Missing constructor function for " + record);
+    }
   }
 }

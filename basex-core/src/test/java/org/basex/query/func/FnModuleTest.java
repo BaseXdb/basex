@@ -3067,6 +3067,48 @@ return
   }
 
   /** Test method. */
+  @Test public void regex() {
+    final Function func = REGEX;
+
+    query(func.args("abc") + "?pattern", "abc");
+    query(func.args("abc") + "?flags", "");
+    query(func.args("abc", "i") + "?flags", "i");
+    query(func.args("a") + " instance of fn:compiled-regex-record", true);
+    query(func.args("^a.*a+$") + "?matches('alpha')", true);
+    query(func.args("^a.*a+$") + "?matches('beta')", false);
+    query(func.args("kiki", "i") + "?matches('Kikikerikih!!')", true);
+    query(func.args("kiki", "i") + "?matches('Kikeriki!')", false);
+    query(func.args(",") + "?tokenize('a,b,c')", "a\nb\nc");
+    query(func.args("\\s+") + "?tokenize('hello world')", "hello\nworld");
+    query(func.args("[0-9]+") + "?replace('abc123def', '0')", "abc0def");
+    query(func.args("[aeiou]", "i") + "?replace('Hello World', '*')", "H*ll* W*rld");
+    query(func.args("[0-9]+") + "?analyze-string('abc123') => node-name() => expanded-QName()",
+        "Q{http://www.w3.org/2005/xpath-functions}analyze-string-result");
+    query(func.args("[0-9]+") + "?analyze-string('abc123def')//fn:match/text()", "123");
+    query(func.args("[0-9]+") + "?analyze-string('abc123def')//fn:non-match/text()", "abc\ndef");
+
+    // spec examples
+    query("let $r := " + func.args("^a.*a+$") +
+        " return ('alpha','beta','gamma','delta')[$r?matches(.)]", "alpha");
+    query("let $r := " + func.args("kiki", "i") +
+        " return some $k in ('Kikeriki!','Kikikerikih!!') satisfies $r?matches($k)", true);
+    query("let $r := " + func.args("[0-9]+") +
+        " return ('Chapter 1','Chapter 2','Chapter 3','Appendix 12')" +
+        "!$r?replace(., fn($k,$g) { number($k) + 1 })",
+        "Chapter 2\nChapter 3\nChapter 4\nAppendix 13");
+    final String ms = func.args("([A-Z])([0-9]+)") + "?matching-segments('A1,C15,,D24, X50,')";
+    query("count(" + ms + ')', 4);
+    query(ms + "[2]?substring", "C15");
+    query(ms + "[2]?position", 4);
+    query(ms + "[2]?groups?1?group", "C");
+    query(ms + "[2]?groups?2?group", 15);
+    query(ms + "[2]?groups?2?position", 5);
+
+    error(func.args("+"), REGINVALID_X);
+    error(func.args("x", "X"), REGFLAG_X);
+  }
+
+  /** Test method. */
   @Test public void replace() {
     final Function func = REPLACE;
 
