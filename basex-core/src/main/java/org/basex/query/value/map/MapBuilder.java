@@ -18,6 +18,8 @@ import org.basex.util.hash.*;
 public final class MapBuilder {
   /** Initial capacity. */
   private final long capacity;
+  /** Record type (can be {@code null}). */
+  private RecordType type;
   /** Current map implementation. */
   private XQHashMap map;
 
@@ -34,6 +36,16 @@ public final class MapBuilder {
    */
   public MapBuilder(final long capacity) {
     this.capacity = capacity;
+  }
+
+  /**
+   * Assigns a record type.
+   * @param rt record type to be assigned
+   * @return self reference
+   */
+  public MapBuilder type(final RecordType rt) {
+    type = rt;
+    return this;
   }
 
   /**
@@ -159,8 +171,10 @@ public final class MapBuilder {
    * @return map
    */
   public XQMap map() {
-    return map == null ? XQMap.empty() : map.structSize() == 1 ?
-      XQMap.get(map.keyAt(0), map.valueAt(0)) : map;
+    if(map == null) return XQMap.empty();
+    final XQMap m = map.structSize() == 1 ? XQMap.get(map.keyAt(0), map.valueAt(0)) : map;
+    if(type != null) m.type = type;
+    return m;
   }
 
   /**

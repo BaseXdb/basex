@@ -71,13 +71,11 @@ public class RecordConstructor extends StandardFunc {
     if(compact) return new XQRecordMap(recordType, values);
 
     // create regular map otherwise
-    final MapBuilder mb = new MapBuilder(fs);
+    final MapBuilder mb = new MapBuilder(fs).type(recordType);
     for(int f = 0; f < fs; ++f) {
       if(values[f] != null) mb.put(fields.key(f + 1), values[f]);
     }
-    final XQMap map = mb.map();
-    map.type = recordType;
-    return map;
+    return mb.map();
   }
 
   @Override

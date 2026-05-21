@@ -1,6 +1,7 @@
 package org.basex.query.func.fn;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
@@ -36,7 +37,7 @@ public final class FnElementToMapPlan extends PlanFn {
     }
 
     // check structure and types
-    final MapBuilder map = new MapBuilder();
+    final MapBuilder ecm = new MapBuilder().type(Records.ELEMENT_CONVERSION_PLAN.get());
     for(final QNm name : elemNames) {
       final PlanEntry pe = entry(elemNames.get(name).finish());
       final MapBuilder mb = new MapBuilder();
@@ -47,14 +48,16 @@ public final class FnElementToMapPlan extends PlanFn {
       if(pe.child != null) {
         mb.put(CHILD, pe.child.uri().length != 0 ? pe.child.eqName() : pe.child.local());
       }
-      map.put(name.unique(), mb.map());
+      ecm.put(name.unique(), mb.map());
     }
     for(final QNm attr : attrNames) {
       final PlanType pt = PlanType.get(attrNames.get(attr).finish());
       if(pt != null && pt != PlanType.STRING) {
-        map.put(Strings.concat('@', attr.unique()), XQMap.get(TYPE, Str.get(pt.toString())));
+        final XQMap acm = new XQRecordMap(Records.ATTRIBUTE_CONVERSION_PLAN.get(),
+            Str.get(pt.toString()));
+        ecm.put(Strings.concat('@', attr.unique()), acm);
       }
     }
-    return map.map();
+    return ecm.map();
   }
 }

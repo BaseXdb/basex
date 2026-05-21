@@ -93,7 +93,7 @@ public class FnSchemaType extends StandardFunc {
       } else {
         return Empty.VALUE;
       }
-      final MapBuilder mb = new MapBuilder();
+      final MapBuilder mb = new MapBuilder().type(Records.SCHEMA_TYPE.get());
       mb.put("name", name);
       mb.put("is-simple", Bln.get(!type.oneOf(ANY_TYPE, UNTYPED)));
       mb.put("base-type", baseType == null ? TypeAnnotation.funcItem(info)

@@ -25,19 +25,14 @@ public final class FnRegex extends RegExFn {
 
     // validate pattern and pre-warm cache
     regExpr(pattern, flags, qc);
-    final Str pat = Str.get(pattern);
-    final Str flg = Str.get(flags);
-    final XQMap map = new MapBuilder().
-        put("pattern", pat).
-        put("flags", flg).
-        put("matches", unaryStringFunc(MATCHES, qc, pat, flg)).
-        put("tokenize", unaryStringFunc(TOKENIZE, qc, pat, flg)).
-        put("replace", replaceFunc(qc, pat, flg)).
-        put("analyze-string", unaryStringFunc(ANALYZE_STRING, qc, pat, flg)).
-        put("matching-segments", unaryStringFunc(MATCHING_SEGMENTS, qc, pat, flg)).
-        map();
-    map.type = Records.COMPILED_REGEX.get();
-    return map;
+    final Str pttrn = Str.get(pattern);
+    final Str flgs = Str.get(flags);
+    return new XQRecordMap(Records.COMPILED_REGEX.get(), pttrn, flgs,
+        valueFunc(MATCHES, qc, pttrn, flgs),
+        valueFunc(TOKENIZE, qc, pttrn, flgs),
+        valueReplacementFunc(qc, pttrn, flgs),
+        valueFunc(ANALYZE_STRING, qc, pttrn, flgs),
+        valueFunc(MATCHING_SEGMENTS, qc, pttrn, flgs));
   }
 
   /**
@@ -49,15 +44,14 @@ public final class FnRegex extends RegExFn {
    * @param flg flags
    * @return function item
    */
-  private FuncItem unaryStringFunc(final Function fn, final QueryContext qc,
+  private FuncItem valueFunc(final Function fn, final QueryContext qc,
       final Str pat, final Str flg) {
     final FuncDefinition def = fn.definition();
-    final Var s = new Var(new QNm("s"), null, qc, info, 0, null);
-    final Var[] params = { s };
+    final Var v = new Var(new QNm("value"), null, qc, info, 0, null);
+    final Var[] params = { v };
     return new FuncItem(info,
-        fn.get(info, new VarRef(info, s), pat, flg),
-        params, AnnList.EMPTY,
-        FuncType.get(def.seqType, Types.STRING_O),
+        fn.get(info, new VarRef(info, v), pat, flg), params,
+        AnnList.EMPTY, FuncType.get(def.seqType, Types.STRING_O),
         params.length, def.name);
   }
 
@@ -65,19 +59,18 @@ public final class FnRegex extends RegExFn {
    * Creates a function item for {@code fn:replace}, taking string and replacement inputs, closing
    * over the compiled pattern and flags.
    * @param qc query context
-   * @param pat pattern
+   * @param pattern pattern
    * @param flg flags
    * @return function item
    */
-  private FuncItem replaceFunc(final QueryContext qc, final Str pat, final Str flg) {
+  private FuncItem valueReplacementFunc(final QueryContext qc, final Str pattern, final Str flg) {
     final FuncDefinition def = REPLACE.definition();
-    final Var s = new Var(new QNm("s"), null, qc, info, 0, null);
-    final Var rep = new Var(new QNm("replacement"), null, qc, info, 1, null);
-    final Var[] params = { s, rep };
+    final Var v = new Var(new QNm("value"), null, qc, info, 0, null);
+    final Var r = new Var(new QNm("replacement"), null, qc, info, 1, null);
+    final Var[] params = { v, r };
     return new FuncItem(info,
-        REPLACE.get(info, new VarRef(info, s), pat, new VarRef(info, rep), flg),
-        params, AnnList.EMPTY,
-        FuncType.get(def.seqType, Types.STRING_O, FnReplace.REPLACEMENT_TYPE),
+        REPLACE.get(info, new VarRef(info, v), pattern, new VarRef(info, r), flg), params,
+        AnnList.EMPTY, FuncType.get(def.seqType, Types.STRING_O, FnReplace.REPLACEMENT_TYPE),
         params.length, def.name);
   }
 }

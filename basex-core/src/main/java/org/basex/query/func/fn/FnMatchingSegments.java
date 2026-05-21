@@ -1,10 +1,9 @@
 package org.basex.query.func.fn;
 
-import static org.basex.util.Token.*;
-
 import java.util.regex.*;
 
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -19,12 +18,10 @@ import org.basex.query.value.seq.*;
 public final class FnMatchingSegments extends RegExFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final Item input = arg(0).atomItem(qc, info);
-    if(input.isEmpty()) return Empty.VALUE;
-
-    final String value = string(input.string(info));
+    final String value = toStringOrNull(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);
+    if(value == null) return Empty.VALUE;
 
     final Matcher matcher = pattern(pattern, flags, qc).matcher(value);
     final ValueBuilder vb = new ValueBuilder(qc);
@@ -32,19 +29,12 @@ public final class FnMatchingSegments extends RegExFn {
       final MapBuilder groups = new MapBuilder();
       final int gc = matcher.groupCount();
       for(int g = 1; g <= gc; g++) {
-        final int start = matcher.start(g);
-        if(start >= 0) {
-          final MapBuilder group = new MapBuilder();
-          group.put("group", matcher.group(g));
-          group.put("position", Itr.get(start + 1));
-          groups.put(Itr.get(g), group.map());
-        }
+        final int s = matcher.start(g);
+        if(s >= 0) groups.put(Itr.get(g), new XQRecordMap(Records.MATCHING_GROUP.get(),
+            Str.get(matcher.group(g)), Itr.get(s + 1)));
       }
-      final MapBuilder segment = new MapBuilder();
-      segment.put("substring", matcher.group());
-      segment.put("position", Itr.get(matcher.start() + 1));
-      segment.put("groups", groups.map());
-      vb.add(segment.map());
+      vb.add(new XQRecordMap(Records.MATCHING_SEGMENT.get(),
+          Str.get(matcher.group()), Itr.get(matcher.start() + 1), groups.map()));
     }
     return vb.value();
   }

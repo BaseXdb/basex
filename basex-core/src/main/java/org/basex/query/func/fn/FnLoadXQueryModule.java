@@ -164,10 +164,8 @@ public final class FnLoadXQueryModule extends StandardFunc {
       }
     }
 
-    final MapBuilder result = new MapBuilder();
-    result.put("variables", variables.map());
-    result.put("functions", functions.map());
-    final XQMap map = result.map();
+    final XQMap map = new XQRecordMap(Records.LOAD_XQUERY_MODULE.get(),
+        variables.map(), functions.map());
     if(modCache != null) modCache.put(cacheKey, map);
     return map;
   }

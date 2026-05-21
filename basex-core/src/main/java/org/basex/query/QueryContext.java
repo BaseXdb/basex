@@ -103,7 +103,7 @@ public final class QueryContext extends Job implements Closeable {
   public boolean scoring;
 
   /** Compiled regular expression cache (shared with parent context). */
-  public final TokenObjectMap<RegExpr> regexPatterns;
+  public final TokenObjectMap<RegExpr> regex;
   /** Available collations. */
   public TokenObjectMap<Collation> collations;
   /** Profiling results. */
@@ -188,7 +188,7 @@ public final class QueryContext extends Job implements Closeable {
     resources = parent != null ? parent.resources : new QueryResources(this);
     ftPosData = parent != null ? parent.ftPosData : null;
     shared = parent != null ? parent.shared : new SharedData();
-    regexPatterns = parent != null ? parent.regexPatterns : new TokenObjectMap<>();
+    regex = parent != null ? parent.regex : new TokenObjectMap<>();
     user = context.user();
   }
 

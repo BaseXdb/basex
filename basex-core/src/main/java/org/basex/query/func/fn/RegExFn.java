@@ -48,11 +48,11 @@ public abstract class RegExFn extends StandardFunc {
       throws QueryException {
 
     final byte[] key = Token.concat(pattern, '\b', flags);
-    synchronized(qc.regexPatterns) {
-      RegExpr regExpr = qc.regexPatterns.get(key);
+    synchronized(qc.regex) {
+      RegExpr regExpr = qc.regex.get(key);
       if(regExpr == null) {
         regExpr = parse(pattern, flags);
-        qc.regexPatterns.put(key, regExpr);
+        qc.regex.put(key, regExpr);
       }
       return regExpr;
     }
@@ -98,13 +98,10 @@ public abstract class RegExFn extends StandardFunc {
       if(java || (flags & LITERAL) != 0) {
         pattern = Pattern.compile(string(regex), flags);
       } else {
-        final RegExParser parser = new RegExParser(regex, strip, comments, (flags & DOTALL) != 0,
-            (flags & MULTILINE) != 0);
-        final String string = parser.parse().toString();
-
-        pattern = Pattern.compile(string, flags);
+        final RegExParser parser = new RegExParser(regex, strip, comments,
+            (flags & DOTALL) != 0, (flags & MULTILINE) != 0);
+        pattern = Pattern.compile(parser.parse().toString(), flags);
       }
-
       return new RegExpr(pattern);
     } catch(final PatternSyntaxException | ParseException | TokenMgrError ex) {
       Util.debug(ex);

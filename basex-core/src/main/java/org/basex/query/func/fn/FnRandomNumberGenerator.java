@@ -38,7 +38,7 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     final LongUnaryOperator number = l -> l * 0x5DEECE66DL + 0xBL & (1L << 48) - 1;
     final long i1 = number.applyAsLong(seed.isEmpty() ? qc.dateTime().nano : seed.hashCode());
     final long i2 = number.applyAsLong(i1);
-    return new MapBuilder().
+    return new MapBuilder().type(Records.RANDOM_NUMBER_GENERATOR.get()).
       // derived from Java's random class
       put(NUMBER, Dbl.get(((i1 >>> 22 << 27) + (i2 >>> 21)) / (double) (1L << 53))).
       put(NEXT, FuncType.get(Records.RANDOM_NUMBER_GENERATOR.get().seqType()).

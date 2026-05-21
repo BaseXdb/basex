@@ -29,10 +29,6 @@ public final class FnDivideDecimals extends StandardFunc {
         Math.min(1 << 20, toLong(precision)));
     final BigDecimal quotient = value.divide(divisor, scale, RoundingMode.DOWN);
     final BigDecimal remainder = value.subtract(quotient.multiply(divisor));
-
-    final MapBuilder map = new MapBuilder();
-    map.put("quotient", Dec.get(quotient));
-    map.put("remainder", Dec.get(remainder));
-    return map.map();
+    return new XQRecordMap(Records.DIVIDED_DECIMALS.get(), Dec.get(quotient), Dec.get(remainder));
   }
 }

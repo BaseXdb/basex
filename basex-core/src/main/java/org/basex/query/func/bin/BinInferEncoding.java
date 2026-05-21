@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.util.*;
@@ -24,10 +25,7 @@ public final class BinInferEncoding extends BinFn {
 
     try(TextInput ti = new TextInput(value.input(info), encoding)) {
       final String enc = ti.encoding();
-      final MapBuilder map = new MapBuilder();
-      map.put("encoding", Str.get(enc));
-      map.put("offset", Itr.get(ti.position()));
-      return map.map();
+      return new XQRecordMap(Records.INFER_ENCODING.get(), Str.get(enc), Itr.get(ti.position()));
     } catch(final IOException ex) {
       throw BIN_CE_X.get(info, ex);
     }

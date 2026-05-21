@@ -173,7 +173,7 @@ public class FnParseUri extends StandardFunc {
     }
     filepath = XMLToken.decodeUri(filepath);
 
-    final MapBuilder mb = new MapBuilder();
+    final MapBuilder mb = new MapBuilder().type(Records.URI_STRUCTURE.get());
     add(mb, URI, value);
     add(mb, SCHEME, scheme);
     if(absolute) add(mb, ABSOLUTE, Bln.TRUE);
