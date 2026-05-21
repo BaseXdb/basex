@@ -113,14 +113,19 @@ public final class Locking {
     if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).lock();
 
     synchronized(globalLock) {
-      // local write locks: wait for completion of global readers
-      if(writes.local()) {
+      final boolean localWrite = writes.local(), globalRead = reads.global();
+      if(localWrite && globalRead) {
+        // job is both local writer and global reader
+        while(localWriters > 0 || globalReaders > 0) globalLock.wait();
+        localWriters++;
+        globalReaders++;
+      } else if(localWrite) {
+        // local write lock: wait for completion of global readers
         while(globalReaders > 0) globalLock.wait();
         localWriters++;
-      }
-      // global read lock: wait for completion of local writers (excluding the current job)
-      if(reads.global()) {
-        while(localWriters > 1 || localWriters == 1 && !writes.local()) globalLock.wait();
+      } else if(globalRead) {
+        // global read lock: wait for completion of local writers
+        while(localWriters > 0) globalLock.wait();
         globalReaders++;
       }
     }

@@ -51,6 +51,32 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
+   * Several jobs that hold a global read lock and a local write lock at the same time must not
+   * deadlock when a pure local writer runs concurrently.
+   * @throws InterruptedException Got interrupted.
+   */
+  @RepeatedTest(REPEAT)
+  public void globalReadLocalWriteDeadlockTest() throws InterruptedException {
+    // pure local writer; held until released explicitly
+    final CountDownLatch held = new CountDownLatch(1);
+    final LockTester writer = new LockTester(null, NONE, new String[] { "w" }, held);
+    // two jobs with global read and local write locks; release themselves after acquiring
+    final CountDownLatch done = new CountDownLatch(2);
+    final LockTester gw1 = new LockTester(null, null, new String[] { "a" }, done, false);
+    final LockTester gw2 = new LockTester(null, null, new String[] { "b" }, done, false);
+
+    writer.start();
+    assertTrue(held.await(WAIT, TimeUnit.MILLISECONDS), "Writer should acquire lock.");
+    gw1.start();
+    gw2.start();
+    // give both jobs time to enter the global-read/local-write monitor
+    Thread.sleep(WAIT);
+    writer.release();
+    assertTrue(done.await(5000, TimeUnit.MILLISECONDS),
+      "Both jobs should be able to acquire their locks (deadlock otherwise).");
+  }
+
+  /**
    * Test for concurrent writes.
    * @throws InterruptedException Got interrupted.
    */
@@ -540,6 +566,8 @@ public final class LockingTest extends SandboxTest {
     private final CountDownLatch countDown;
     /** Array of objects to put read locks onto (can be {@code null}). */
     private final Locks locks = new Locks();
+    /** Flag indicating to keep the locks until being notified to release them. */
+    private final boolean hold;
     /** Flag indicating to release locks after being notified. */
     private volatile boolean requestRelease;
 
@@ -552,9 +580,23 @@ public final class LockingTest extends SandboxTest {
      */
     LockTester(final CountDownLatch await, final String[] reads, final String[] writes,
         final CountDownLatch countDown) {
+      this(await, reads, writes, countDown, true);
+    }
+
+    /**
+     * Setup locking thread. Call {@code start} to lock, notify the thread to unlock.
+     * @param await latch to await (can be {@code null})
+     * @param reads strings to put read lock on (can be {@code null})
+     * @param writes strings to put write lock on (can be {@code null})
+     * @param countDown latch to count down after receiving locks
+     * @param hold keep locks until released explicitly ({@code true}) or release immediately
+     */
+    LockTester(final CountDownLatch await, final String[] reads, final String[] writes,
+        final CountDownLatch countDown, final boolean hold) {
 
       this.await = await;
       this.countDown = countDown;
+      this.hold = hold;
       if(reads == null) {
         locks.reads.addGlobal();
       } else {
@@ -587,8 +629,10 @@ public final class LockingTest extends SandboxTest {
         if(countDown != null) countDown.countDown();
 
         // wait until we're asked to release the lock
-        synchronized(this) {
-          while(!requestRelease) wait();
+        if(hold) {
+          synchronized(this) {
+            while(!requestRelease) wait();
+          }
         }
 
         locking.release();
