@@ -36,9 +36,7 @@ public final class CsvW3Serializer extends CsvSerializer {
   public void serialize(final Item item) throws IOException {
     if(sep && level == 0) out.print(' ');
 
-    if(!(item instanceof final XQMap map))
-      throw CSV_SERIALIZE_X_X.getIO("Top level must be a map, found " + item.type, item);
-
+    if(!(item instanceof final XQMap map)) throw typeError("Top-level map", item);
     final TokenList tl = new TokenList();
     try {
       // print header
@@ -50,7 +48,10 @@ public final class CsvW3Serializer extends CsvSerializer {
       // print rows
       final Value rows = map.getOrNull(CsvConverter.ROWS);
       if(rows == null) throw CSV_SERIALIZE_X.getIO("Map has no 'rows' key");
-      for(final Item record : rows) row(((XQArray) record).members(), tl);
+      for(final Item record : rows) {
+        if(!(record instanceof final XQArray array)) throw typeError("Array", record);
+        row(array.members(), tl);
+      }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
@@ -67,10 +68,19 @@ public final class CsvW3Serializer extends CsvSerializer {
   private void row(final Iterable<? extends Value> line, final TokenList tl)
       throws QueryException, IOException {
     for(final Value value : line) {
-      if(value.size() != 1) throw CSV_SERIALIZE_X_X.getIO(
-          "Item expected, found " + value.seqType(), value);
-      tl.add(((Item) value).string(null));
+      if(!(value instanceof final Item item) || item.size() != 1) throw typeError("Item", value);
+      tl.add(item.string(null));
     }
     record(tl);
+  }
+
+  /**
+   * Returns a type error.
+   * @param expected expected type
+   * @param found found value
+   * @return error
+   */
+  private static QueryIOException typeError(final String expected, final Value found) {
+    return CSV_SERIALIZE_X_X.getIO(expected + " expected, " + found.seqType() + " found ", found);
   }
 }
