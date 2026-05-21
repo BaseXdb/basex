@@ -79,14 +79,23 @@ public abstract class Job {
   public final <J extends Job> J pushJob(final J job) {
     children.add(job);
     job.jobContext(jc);
+    if(stopped) job.state(state);
     return job;
   }
 
   /**
-   * Pops the last job.
+   * Pops the last child job (LIFO).
    */
   public final synchronized void popJob() {
     children.remove(children.size() - 1);
+  }
+
+  /**
+   * Removes the specified child job. Used when children are closed concurrently in arbitrary order.
+   * @param job child job to remove
+   */
+  public final void popJob(final Job job) {
+    children.remove(job);
   }
 
   /**
@@ -130,12 +139,11 @@ public abstract class Job {
    * @param js new state
    */
   public final void state(final JobState js) {
-    for(final Job job : children) job.state(js);
     state = js;
-    if(js == JobState.STOPPED || js == JobState.TIMEOUT || js == JobState.MEMORY) {
-      stopped = true;
-      stopTimeout();
-    }
+    final boolean stop = js == JobState.STOPPED || js == JobState.TIMEOUT || js == JobState.MEMORY;
+    if(stop) stopped = true;
+    for(final Job job : children) job.state(js);
+    if(stop) stopTimeout();
   }
 
   /**

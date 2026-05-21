@@ -563,7 +563,7 @@ public final class QueryContext extends Job implements Closeable {
     } else {
       // otherwise, adopt update reference (may have been initialized by sub query)
       parent.updates = updates;
-      parent.popJob();
+      parent.popJob(this);
     }
     options.close();
 

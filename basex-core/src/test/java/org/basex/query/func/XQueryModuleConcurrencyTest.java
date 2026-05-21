@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.func.Function.*;
 
 import org.basex.*;
+import org.basex.util.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -23,10 +24,10 @@ public final class XQueryModuleConcurrencyTest extends SandboxTest {
         " <root>{ (1 to " + docs + ") ! <e>{.}</e> }</root>", "doc.xml"));
     try {
       query("""
-          xquery:fork-join(
-            for $i in 1 to %d
-            return fn() { xs:integer(db:get('%s')/root/e[$i]) }
-          ) => sum()
+xquery:fork-join(
+  for $i in 1 to %d
+  return fn() { xs:integer(db:get('%s')/root/e[$i]) }
+) => sum()
           """.formatted(docs, NAME), docs * (docs + 1) / 2);
     } finally {
       query(_DB_DROP.args(NAME));
@@ -39,15 +40,33 @@ public final class XQueryModuleConcurrencyTest extends SandboxTest {
    */
   @Test @Timeout(60) public void nestedForkJoin() {
     query("""
-        xquery:fork-join(
-          for $i in 1 to 20
-          return fn() {
-            xquery:fork-join(
-              for $j in 1 to 20
-              return fn() { $i * $j }
-            ) => sum()
-          }
-        ) => sum()
+xquery:fork-join(
+  for $i in 1 to 20
+  return fn() {
+    xquery:fork-join(
+      for $j in 1 to 20
+      return fn() { $i * $j }
+    ) => sum()
+  }
+) => sum()
         """, 44100);
+  }
+
+  /**
+   * Stops a long-running fork-join job and checks that the cancellation reaches all branches so
+   * the job terminates promptly (otherwise job:wait would block until the timeout).
+   */
+  @Disabled("timing-dependent")
+  @Test @Timeout(30) public void stopForkJoin() {
+    final String slow = "xquery:fork-join((1 to 64) ! fn() { (1 to 10000000000)[. = 1] })";
+    final String id = query(_JOB_EVAL.args(slow));
+    // wait until the fork-join job is running
+    while(context.jobs.active.get(id) == null) Performance.sleep(1);
+    // cancel all branches, including those that start after the stop
+    query(_JOB_REMOVE.args(id));
+    query(_JOB_WAIT.args(id));
+    query(_JOB_FINISHED.args(id), true);
+    // ensure that the processor remains responsive
+    query("1 + 1", 2);
   }
 }
