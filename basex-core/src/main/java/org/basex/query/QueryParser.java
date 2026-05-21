@@ -1469,33 +1469,44 @@ public class QueryParser extends InputParser {
       if(fr != null) {
         clauses.add(new For(fr, at, score, expr, empty));
       } else if(member != null) {
-        // for member $m in EXPR → for $m in array:split(EXPR) let $m := array:items($a)
+        // for member $m in EXPR → for $a in EXPR ! array:split(.) let $m := array:items($a)
         final Var split = new Var(member.name, null, qc, ii);
         localVars.add(split, member);
-        clauses.add(new For(split, at, score, Function._ARRAY_SPLIT.get(ii, expr), false));
+        clauses.add(new For(split, at, score, forEach(Function._ARRAY_SPLIT, expr, ii), false));
         clauses.add(new Let(member, Function._ARRAY_ITEMS.get(ii, new VarRef(ii, split))));
       } else if(value == null) {
         // for key $k in EXPR
-        // → for $k in map:keys(EXPR)
+        // → for $k in EXPR ! map:keys(.)
         localVars.add(key);
-        clauses.add(new For(key, at, score, Function._MAP_KEYS.get(ii, expr), false));
+        clauses.add(new For(key, at, score, forEach(Function._MAP_KEYS, expr, ii), false));
       } else if(key == null) {
-        // for value in EXPR
-        // → for $v in map:entries(EXPR) let $v := map:items($v)
+        // for value $v in EXPR
+        // → for $e in EXPR ! map:entries(.) let $v := map:items($e)
         final Var entries = new Var(value.name, null, qc, ii);
         localVars.add(entries, value);
-        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(ii, expr), false));
+        clauses.add(new For(entries, at, score, forEach(Function._MAP_ENTRIES, expr, ii), false));
         clauses.add(new Let(value, Function._MAP_ITEMS.get(ii, new VarRef(ii, entries))));
       } else {
         // for key $k value $v in EXPR
-        // → for $v in map:entries(EXPR) let $k := map:keys($v) let $v := map:items($v)
+        // → for $e in EXPR ! map:entries(.) let $k := map:keys($e) let $v := map:items($e)
         final Var entries = localVars.add(new Var(value.name, null, qc, ii));
         localVars.add(entries, key, value);
-        clauses.add(new For(entries, at, score, Function._MAP_ENTRIES.get(ii, expr), false));
+        clauses.add(new For(entries, at, score, forEach(Function._MAP_ENTRIES, expr, ii), false));
         clauses.add(new Let(key, Function._MAP_KEYS.get(ii, new VarRef(ii, entries))));
         clauses.add(new Let(value, Function._MAP_ITEMS.get(ii, new VarRef(ii, entries))));
       }
     } while(wsConsumeWs(","));
+  }
+
+  /**
+   * Iteration over multiple arrays/maps.
+   * @param func function to apply
+   * @param expr expression
+   * @param ii input info
+   * @return map expression
+   */
+  private static Expr forEach(final Function func, final Expr expr, final InputInfo ii) {
+    return new CachedMap(ii, expr, func.get(ii, new ContextValue(ii)));
   }
 
   /**

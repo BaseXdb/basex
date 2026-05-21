@@ -164,6 +164,15 @@ public final class XQuery4Test extends SandboxTest {
     query("for value $v in { 2: 3 } return $v", 3);
     query("for key $k value $v in { 2: 3 } return $k * $v", 6);
 
+    // iterate over a sequence of zero or more maps
+    query("for key $k value $v in () return $k * $v", "");
+    query("for key $k in ({ 2: 3 }, { 4: 5 }) return $k", "2\n4");
+    query("for value $v in ({ 2: 3 }, { 4: 5 }) return $v", "3\n5");
+    query("for key $k value $v in ({ 2: 3 }, { 4: 5 }) return $k * $v", "6\n20");
+    query("for key $k value $v in ({ 2: 3 }, {}, { 4: 5 }) return $k * $v", "6\n20");
+    // positional variable is numbered across the whole sequence
+    query("for key $k at $p in ({ 2: 3 }, { 4: 5 }) return $p", "1\n2");
+
     error("for key $k allowing empty in 1 return ()", WRONGCHAR_X_X);
     error("for value $v allowing empty in 1 return ()", WRONGCHAR_X_X);
     error("for key $k value $v allowing empty in 1 return ()", WRONGCHAR_X_X);
@@ -182,6 +191,14 @@ public final class XQuery4Test extends SandboxTest {
 
     check("for member $m in [ (3, 2), 1, () ] return sum($m)", "5\n1\n0", empty(_ARRAY_ITEMS));
     check("for member $m in [ (3, 2), 1, () ] return count($m)", "2\n1\n0", exists(_ARRAY_ITEMS));
+
+    // iterate over a sequence of zero or more arrays
+    query("for member $m in () return $m", "");
+    query("for member $m in ([ 1, 2 ], [ 3, 4 ]) return $m", "1\n2\n3\n4");
+    query("for member $m in ([], [ 1 ], []) return $m", 1);
+    query("for member $m in ([ (3, 2), 1 ], [ () ]) return count($m)", "2\n1\n0");
+    // positional variable is numbered across the whole sequence
+    query("for member $m at $p in ([ 1 ], [ 2, 3 ]) return $p", "1\n2\n3");
 
     error("for member $m allowing empty in 1 return $m", WRONGCHAR_X_X);
   }
