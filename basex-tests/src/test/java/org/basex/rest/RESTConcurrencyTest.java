@@ -10,6 +10,7 @@ import java.net.http.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.*;
 import java.time.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Dimitar Popov
  */
+@Timeout(60)
 public final class RESTConcurrencyTest extends SandboxTest {
   /** HTTP server. */
   private static BaseXHTTP http;
@@ -47,7 +49,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
    */
   @BeforeEach public void setUp() throws Exception {
     final StringList sl = new StringList("-p" + DB_PORT, "-h" + HTTP_PORT, "-s" + STOP_PORT,
-        "-U" + ADMIN, "-P" + NAME, "-z");
+        "-c", "password " + NAME, "-U" + ADMIN, "-z", "-q");
     http = new BaseXHTTP(sl.finish());
     try(ClientSession cs = createClient()) {
       cs.execute(new CreateDB(NAME));
@@ -91,6 +93,7 @@ public final class RESTConcurrencyTest extends SandboxTest {
     } finally {
       slowAction.stop = true;
       slow.get();
+      exec.shutdownNow();
     }
   }
 
@@ -105,39 +108,32 @@ public final class RESTConcurrencyTest extends SandboxTest {
    * </ol>
    * @throws Exception error during request execution
    */
-  @Test @Disabled("Query cannot be stopped") public void testReaderWriter() throws Exception {
-    final String readerQuery = "?query=(1%20to%20100000000000000)%5b.=0%5d";
-    final String writerQuery = "/test.xml";
+  @Test public void testReaderWriter() throws Exception {
+    // the reader holds a read lock on the database for a bounded time and then terminates,
+    // so the writer is blocked only until the reader releases the lock (no forced stop needed)
+    final String readerQuery = "?query=" + URLEncoder.encode(
+        "db:get('" + NAME + "'), prof:sleep(2500)", StandardCharsets.UTF_8);
     final byte[] content = Token.token("<a/>");
 
     final Get readerAction = new Get(readerQuery);
-    final Put writerAction = new Put(writerQuery, content);
+    final Put writerAction = new Put("/test.xml", content);
 
     final ExecutorService exec = Executors.newFixedThreadPool(2);
-
-    // start reader
-    exec.submit(readerAction);
-    Performance.sleep(TIMEOUT); // delay in order to be sure that the reader has started
-    // start writer
-    Future<HTTPResponse> writer = exec.submit(writerAction);
-
     try {
-      final HTTPResponse result = writer.get(TIMEOUT, TimeUnit.MILLISECONDS);
-      if(result.status >= 200 && result.status < 300)
-        fail("Database modified while a reader is running");
-      throw new Exception(result.toString());
-    } catch(final TimeoutException ex) {
-      // writer is blocked by the reader: stop it
-      Util.errln(ex);
-      writerAction.stop = true;
+      // start the reader and wait until it is running and holds the read lock
+      final Future<HTTPResponse> reader = exec.submit(readerAction);
+      Performance.sleep(800);
+
+      // the writer must not modify the database while the reader holds the read lock
+      final Future<HTTPResponse> writer = exec.submit(writerAction);
+      assertThrows(TimeoutException.class, () -> writer.get(1000, TimeUnit.MILLISECONDS));
+
+      // as soon as the reader releases the lock, the writer succeeds
+      assertEquals(201, writer.get().status);
+      assertEquals(200, reader.get().status);
+    } finally {
+      exec.shutdownNow();
     }
-
-    // stop reader
-    readerAction.stop = true;
-
-    // start the writer again
-    writer = exec.submit(writerAction);
-    assertEquals(201, writer.get().status);
   }
 
   /**
@@ -167,8 +163,12 @@ public final class RESTConcurrencyTest extends SandboxTest {
     }
 
     // check if all have finished successfully
-    for(final Future<HTTPResponse> task : tasks) {
-      assertEquals(200, task.get(TIMEOUT, TimeUnit.MILLISECONDS).status);
+    try {
+      for(final Future<HTTPResponse> task : tasks) {
+        assertEquals(200, task.get(TIMEOUT, TimeUnit.MILLISECONDS).status);
+      }
+    } finally {
+      exec.shutdownNow();
     }
   }
 

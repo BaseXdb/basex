@@ -11,6 +11,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@Timeout(300)
 public final class ServerMemTest extends SandboxTest {
   /** Query to be run. */
   private static final String QUERY = "(for $i in 1 to 50000 order by $i return $i)[1]";
@@ -39,39 +40,19 @@ public final class ServerMemTest extends SandboxTest {
    * @throws Exception exception
    */
   private void run(final int clients) throws Exception {
-    //run server instance
+    // run server instance
     server = createServer();
-    // run clients
-    final Client[] cl = new Client[clients];
-    for(int i = 0; i < clients; ++i) cl[i] = new Client();
-    for(final Client c : cl) c.start();
-    for(final Client c : cl) c.join();
-    // stop server
-    stopServer(server);
-  }
-
-  /** Single client. */
-  static final class Client extends Thread {
-    /** Client session. */
-    private final ClientSession session;
-
-    /**
-     * Default constructor.
-     * @throws Exception exception
-     */
-    Client() throws Exception {
-      session = createClient();
-    }
-
-    @Override
-    public void run() {
-      try {
-        // Perform query
-        session.execute("XQUERY " + QUERY);
-        session.close();
-      } catch(final Exception ex) {
-        ex.printStackTrace();
-      }
+    try {
+      // run clients, each executing one memory-intensive query
+      parallel(clients, () -> {
+        try(ClientSession session = createClient()) {
+          session.execute("XQUERY " + QUERY);
+        }
+        return null;
+      });
+    } finally {
+      // stop server
+      stopServer(server);
     }
   }
 }

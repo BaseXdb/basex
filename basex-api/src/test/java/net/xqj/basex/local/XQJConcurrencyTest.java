@@ -21,6 +21,7 @@ import net.xqj.basex.*;
  *
  * @author Charles Foster
  */
+@Timeout(300)
 public final class XQJConcurrencyTest extends XQJBaseTest {
   /** Number of threads used when executing read only queries. */
   private static final int CONCURRENT_READ_THREADS = 256;

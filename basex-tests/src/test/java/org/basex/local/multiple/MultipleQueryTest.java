@@ -6,6 +6,7 @@ import org.basex.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * This class performs local stress tests with a specified number of threads and queries.
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@Timeout(600)
 public final class MultipleQueryTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/factbook.zip";
@@ -23,8 +25,6 @@ public final class MultipleQueryTest extends SandboxTest {
 
   /** Random number generator. */
   static final Random RND = new Random(123);
-  /** Result counter. */
-  static int counter;
 
   /**
    * Runs the test.
@@ -65,38 +65,17 @@ public final class MultipleQueryTest extends SandboxTest {
    * @throws Exception exception
    */
   private static void run(final int clients, final int runs) throws Exception {
-    // Create test database
+    // create test database
     execute(new CreateDB(NAME, INPUT));
-
-    // Start clients
-    final Client[] cl = new Client[clients];
-    for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
-    for(final Client c : cl) c.start();
-    for(final Client c : cl) c.join();
-    // Drop database
-    execute(new DropDB(NAME));
-  }
-
-  /** Single client. */
-  static class Client extends Thread {
-    /** Number of runs. */
-    private final int runs;
-
-    /**
-     * Constructor.
-     * @param runs number of runs
-     */
-    Client(final int runs) {
-      this.runs = runs;
-    }
-
-    @Override
-    public void run() {
-      for(int r = 0; r < runs; ++r) {
+    // run clients, each retrieving the nth text of the database
+    parallel(clients, () -> {
+      for(int r = 0; r < runs; r++) {
         Performance.sleep((long) (50 * RND.nextDouble()));
-        // Return nth text of the database
         query(Util.info(QUERY, RND.nextInt() % MAX + 1));
       }
-    }
+      return null;
+    });
+    // drop database
+    execute(new DropDB(NAME));
   }
 }

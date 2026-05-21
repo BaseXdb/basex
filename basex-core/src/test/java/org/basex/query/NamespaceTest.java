@@ -14,7 +14,6 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.query.value.node.*;
-import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -788,7 +787,6 @@ public final class NamespaceTest extends SandboxTest {
    * Test query.
    * Detects malformed namespace hierarchy.
    */
-  @Test @Disabled
   public void xuty0004() {
     final String query = "declare variable $input-context external;" +
         "let $source as node()* := (" +
@@ -815,7 +813,6 @@ public final class NamespaceTest extends SandboxTest {
    * inserted <new/> tag. If the result is non-empty we may have a problem -
    * being not able to propagate the no-inherit flag to our table.
    */
-  @Test @Disabled
   public void copyPreserveNoInheritPersistent() {
     query("declare copy-namespaces preserve, no-inherit;" +
         "declare namespace my = 'ns';" +

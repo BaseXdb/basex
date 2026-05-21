@@ -54,40 +54,39 @@ public final class DbModuleServerTest extends SandboxTest {
    * Tests client/server functionality of database functions.
    * @throws IOException I/O exception
    */
-  @Test public void clientServer() throws IOException {
-    final ClientSession c1 = createClient();
-    final ClientSession c2 = createClient();
-
-    c1.execute(new XQuery(_DB_CREATE.args(NAME)));
-    c2.execute(new XQuery(_DB_CREATE.args(NAME)));
-    assertEquals("true", c1.execute(new XQuery(_DB_EXISTS.args(NAME))));
+  @Test @Timeout(60) public void clientServer() throws IOException {
+    try(ClientSession c1 = createClient(); ClientSession c2 = createClient()) {
+      c1.execute(new XQuery(_DB_CREATE.args(NAME)));
+      c2.execute(new XQuery(_DB_CREATE.args(NAME)));
+      assertEquals("true", c1.execute(new XQuery(_DB_EXISTS.args(NAME))));
+    }
   }
 
   /**
    * Tests client/server functionality of database functions.
    * @throws Exception exception
    */
-  @Test public void concurrentClients() throws Exception {
-    final ClientSession check = createClient();
+  @Test @Timeout(60) public void concurrentClients() throws Exception {
+    try(ClientSession check = createClient()) {
+      // same DB name, which is 2 x NUM times
+      runClients(new XQuery(_DB_CREATE.args(NAME)));
+      assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
+      runClients(new XQuery(_DB_CREATE.args(NAME)));
+      assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
-    // same DB name, which is 2 x NUM times
-    runClients(new XQuery(_DB_CREATE.args(NAME)));
-    assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
-    runClients(new XQuery(_DB_CREATE.args(NAME)));
-    assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
+      // same DB name and files
+      runClients(new XQuery(_DB_CREATE.args(NAME, FILE, "in/")));
+      assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
 
-    // same DB name and files
-    runClients(new XQuery(_DB_CREATE.args(NAME, FILE, "in/")));
-    assertEquals("true", check.execute(new XQuery(_DB_EXISTS.args(NAME))));
+      // create
+      runClients(new XQuery(_DB_DROP.args(NAME) + ',' + _DB_CREATE.args(NAME, FILE, "in/")));
 
-    // create
-    runClients(new XQuery(_DB_DROP.args(NAME) + ',' + _DB_CREATE.args(NAME, FILE, "in/")));
+      // add, create
+      runClients(new XQuery(_DB_ADD.args(NAME, " <X/>", "x.xml") + ',' + _DB_DROP.args(NAME) + ',' +
+        _DB_CREATE.args(NAME, FILE)));
 
-    // add, create
-    runClients(new XQuery(_DB_ADD.args(NAME, " <X/>", "x.xml") + ',' + _DB_DROP.args(NAME) + ',' +
-      _DB_CREATE.args(NAME, FILE)));
-
-    check.execute(new DropDB(NAME));
+      check.execute(new DropDB(NAME));
+    }
   }
 
   /**

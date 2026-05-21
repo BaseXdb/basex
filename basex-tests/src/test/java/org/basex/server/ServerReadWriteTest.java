@@ -1,5 +1,8 @@
 package org.basex.server;
 
+import java.util.*;
+import java.util.concurrent.*;
+
 import org.basex.*;
 import org.basex.api.client.*;
 import org.junit.jupiter.api.*;
@@ -10,11 +13,10 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@Timeout(600)
 public final class ServerReadWriteTest extends SandboxTest {
   /** Server reference. */
   BaseXServer server;
-  /** Result counter. */
-  int counter;
 
   /**
    * Runs the test.
@@ -57,55 +59,33 @@ public final class ServerReadWriteTest extends SandboxTest {
   private void run(final int clients, final int runs) throws Exception {
     // run server instance
     server = createServer();
-    // create test database
-    try(ClientSession cs = createClient()) {
-      cs.execute("CREATE DB test <test/>");
-      // run clients
-      final Client[] cl = new Client[clients];
-      for(int i = 0; i < clients; ++i) cl[i] = new Client(runs, i % 2 == 0);
-      for(final Client c : cl) c.start();
-      for(final Client c : cl) c.join();
-      // drop database and stop server
-      cs.execute("DROP DB test");
-    }
-    stopServer(server);
-  }
-
-  /** Single client. */
-  static final class Client extends Thread {
-    /** Client session. */
-    private final ClientSession session;
-    /** Number of runs. */
-    private final int runs;
-    /** Read flag. */
-    private final boolean read;
-
-    /**
-     * Constructor.
-     * @param runs number of runs
-     * @param read read flag
-     * @throws Exception exception
-     */
-    Client(final int runs, final boolean read) throws Exception {
-      this.runs = runs;
-      this.read = read;
-      session = createClient();
-      session.execute("SET AUTOFLUSH false");
-    }
-
-    @Override
-    public void run() {
-      try {
-        // Perform some queries
-        for(int r = 0; r < runs; ++r) {
-          final String query = read ? "count(db:get('test'))" :
-            "db:add('test', <a/>, 'test.xml', { 'intparse': true() })";
-          session.execute("XQUERY " + query);
+    try {
+      // create test database
+      try(ClientSession cs = createClient()) {
+        cs.execute("CREATE DB test <test/>");
+        // run clients; even clients read, odd clients write
+        final ArrayList<Callable<?>> tasks = new ArrayList<>(clients);
+        for(int i = 0; i < clients; i++) {
+          final boolean read = i % 2 == 0;
+          tasks.add(() -> {
+            try(ClientSession session = createClient()) {
+              session.execute("SET AUTOFLUSH false");
+              for(int r = 0; r < runs; r++) {
+                final String query = read ? "count(db:get('test'))" :
+                  "db:add('test', <a/>, 'test.xml', { 'intparse': true() })";
+                session.execute("XQUERY " + query);
+              }
+            }
+            return null;
+          });
         }
-        session.close();
-      } catch(final Exception ex) {
-        ex.printStackTrace();
+        parallel(tasks);
+        // drop database
+        cs.execute("DROP DB test");
       }
+    } finally {
+      // stop server
+      stopServer(server);
     }
   }
 }

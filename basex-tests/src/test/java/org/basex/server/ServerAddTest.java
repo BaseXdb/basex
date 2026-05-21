@@ -12,14 +12,13 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@Timeout(600)
 public final class ServerAddTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/input.xml";
 
   /** Server reference. */
   BaseXServer server;
-  /** Result counter. */
-  int counter;
 
   /**
    * Runs the test.
@@ -62,48 +61,26 @@ public final class ServerAddTest extends SandboxTest {
   private void run(final int clients, final int runs) throws Exception {
     // run server instance
     server = createServer();
-    // create test database
-    try(ClientSession cs = createClient()) {
-      cs.execute("CREATE DB " + NAME + ' ' + INPUT);
-      // run clients
-      final Client[] cl = new Client[clients];
-      for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
-      for(final Client c : cl) c.start();
-      for(final Client c : cl) c.join();
-      // drop database and stop server
-      cs.execute("DROP DB test");
-    }
-    stopServer(server);
-  }
-
-  /** Single client. */
-  static final class Client extends Thread {
-    /** Client session. */
-    private final ClientSession session;
-    /** Number of runs. */
-    private final int runs;
-
-    /**
-     * Constructor.
-     * @param runs number of runs
-     * @throws Exception exception
-     */
-    Client(final int runs) throws Exception {
-      this.runs = runs;
-      session = createClient();
-    }
-
-    @Override
-    public void run() {
-      try {
-        session.execute("SET " + MainOptions.AUTOFLUSH.name() + " false");
-        session.execute("SET " + MainOptions.INTPARSE.name() + " true");
-        session.execute("OPEN " + NAME);
-        for(int r = 0; r < runs; ++r) session.execute("ADD " + INPUT);
-        session.close();
-      } catch(final Exception ex) {
-        ex.printStackTrace();
+    try {
+      // create test database
+      try(ClientSession cs = createClient()) {
+        cs.execute("CREATE DB " + NAME + ' ' + INPUT);
+        // run clients, each adding the input document repeatedly
+        parallel(clients, () -> {
+          try(ClientSession session = createClient()) {
+            session.execute("SET " + MainOptions.AUTOFLUSH.name() + " false");
+            session.execute("SET " + MainOptions.INTPARSE.name() + " true");
+            session.execute("OPEN " + NAME);
+            for(int r = 0; r < runs; r++) session.execute("ADD " + INPUT);
+          }
+          return null;
+        });
+        // drop database
+        cs.execute("DROP DB " + NAME);
       }
+    } finally {
+      // stop server
+      stopServer(server);
     }
   }
 }

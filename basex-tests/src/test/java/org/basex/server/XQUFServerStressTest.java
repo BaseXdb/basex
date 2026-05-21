@@ -5,6 +5,7 @@ import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * Testing concurrent XQUF statements on a single database.
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Lukas Kircher
  */
+@Timeout(300)
 public final class XQUFServerStressTest extends SandboxTest {
   /**
    * Runs the test.
@@ -54,16 +56,19 @@ public final class XQUFServerStressTest extends SandboxTest {
   private void run(final int clients, final int runs) throws Exception {
     // run server instance
     final BaseXServer server = createServer();
-    insert(clients, runs);
-    delete(clients, runs);
-    try(ClientSession cs = createClient()) {
-      cs.execute(new DropDB(NAME));
+    try {
+      insert(clients, runs);
+      delete(clients, runs);
+      try(ClientSession cs = createClient()) {
+        cs.execute(new DropDB(NAME));
+      }
+    } finally {
+      stopServer(server);
     }
-    stopServer(server);
   }
 
   /**
-   * Performs the query.
+   * Performs concurrent insert operations.
    * @param clients number of clients
    * @param runs number of runs
    * @throws Exception exception
@@ -76,7 +81,7 @@ public final class XQUFServerStressTest extends SandboxTest {
   }
 
   /**
-   * Performs the query.
+   * Performs concurrent delete operations.
    * @param clients number of clients
    * @param runs number of runs
    * @throws Exception exception
@@ -94,49 +99,19 @@ public final class XQUFServerStressTest extends SandboxTest {
   /**
    * Starts concurrent client operations.
    * @param query test query
-   * @param clt number of clients
+   * @param clients number of clients
    * @param runs number of runs
    * @throws Exception exception
    */
-  private static void run(final String query, final int clt, final int runs) throws Exception {
-    final Client[] cl = new Client[clt];
-    for(int i = 0; i < clt; ++i) cl[i] = new Client(query, runs);
-    for(final Client c : cl) c.start();
-    for(final Client c : cl) c.join();
-  }
-
-  /** Single client. */
-  static final class Client extends Thread {
-    /** Client session. */
-    private final ClientSession session;
-    /** Query to be executed by this client. */
-    final String query;
-    /** Number of runs. */
-    private final int runs;
-
-    /**
-     * Default constructor.
-     * @param query query string
-     * @param runs number of runs
-     * @throws Exception exception
-     */
-    Client(final String query, final int runs) throws Exception {
-      session = createClient();
-      this.query = query;
-      this.runs = runs;
-    }
-
-    @Override
-    public void run() {
-      try {
-        for(int i = 0; i < runs; ++i) {
+  private static void run(final String query, final int clients, final int runs) throws Exception {
+    parallel(clients, () -> {
+      try(ClientSession session = createClient()) {
+        for(int i = 0; i < runs; i++) {
           Performance.sleep(100);
           session.execute("XQUERY " + query);
         }
-        session.close();
-      } catch(final Exception ex) {
-        ex.printStackTrace();
       }
-    }
+      return null;
+    });
   }
- }
+}

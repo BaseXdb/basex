@@ -609,6 +609,34 @@ public abstract class Sandbox {
     return " data(attribute _ { '" + value + "' })";
   }
 
+  /**
+   * Runs a task concurrently in the specified number of threads and waits for all to finish.
+   * The first error raised in any thread is propagated to the caller.
+   * @param count number of parallel threads
+   * @param task task to run in each thread
+   * @throws Exception exception raised in a worker thread, or interruption
+   */
+  protected static void parallel(final int count, final Callable<?> task) throws Exception {
+    parallel(Collections.nCopies(count, task));
+  }
+
+  /**
+   * Runs tasks concurrently (one thread per task) and waits for all to finish.
+   * The first error raised in any thread is propagated to the caller.
+   * @param tasks tasks to run in parallel
+   * @throws Exception exception raised in a worker thread, or interruption
+   */
+  protected static void parallel(final List<? extends Callable<?>> tasks) throws Exception {
+    final ExecutorService pool = Executors.newFixedThreadPool(Math.max(1, tasks.size()));
+    try {
+      final ArrayList<Future<?>> futures = new ArrayList<>(tasks.size());
+      for(final Callable<?> task : tasks) futures.add(pool.submit(task));
+      for(final Future<?> future : futures) future.get();
+    } finally {
+      pool.shutdown();
+    }
+  }
+
   /** Client. */
   public static final class SandboxClient extends Thread {
     /** Start signal. */
@@ -641,10 +669,9 @@ public abstract class Sandbox {
 
     @Override
     public void run() {
-      try {
+      try(ClientSession cs = session) {
         if(startSignal != null) startSignal.await();
-        session.execute(cmd);
-        session.close();
+        cs.execute(cmd);
       } catch(final Throwable ex) {
         error = "\n" + cmd + '\n' + ex;
       } finally {

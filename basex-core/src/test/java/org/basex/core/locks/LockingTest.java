@@ -15,6 +15,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team, BSD License
  * @author Jens Erat
  */
+@Timeout(30)
 public final class LockingTest extends SandboxTest {
   /** How often should tests be repeated? */
   private static final int REPEAT = 1;

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
+@Timeout(120)
 public final class SharedDataTest extends SandboxTest {
   /** Number of test iterations. */
   private static final int N = 100;

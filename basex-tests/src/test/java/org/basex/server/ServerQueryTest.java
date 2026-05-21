@@ -14,6 +14,7 @@ import org.junit.jupiter.api.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@Timeout(600)
 public final class ServerQueryTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/factbook.zip";
@@ -26,8 +27,6 @@ public final class ServerQueryTest extends SandboxTest {
   static final Random RND = new Random();
   /** Server reference. */
   BaseXServer server;
-  /** Result counter. */
-  int counter;
 
   /**
    * Runs the test.
@@ -70,50 +69,26 @@ public final class ServerQueryTest extends SandboxTest {
   private void run(final int clients, final int runs) throws Exception {
     // run server instance
     server = createServer();
-    // create test database
-    try(ClientSession cs = createClient()) {
-      cs.execute("CREATE DB test " + INPUT);
-      // run clients
-      final Client[] cl = new Client[clients];
-      for(int i = 0; i < clients; ++i) cl[i] = new Client(runs);
-      for(final Client c : cl) c.start();
-      for(final Client c : cl) c.join();
-      // drop database and stop server
-      cs.execute("DROP DB test");
-    }
-    stopServer(server);
-  }
-
-  /** Single client. */
-  static final class Client extends Thread {
-    /** Client session. */
-    private final ClientSession session;
-    /** Number of runs. */
-    private final int runs;
-
-    /**
-     * Constructor.
-     * @param runs number of runs
-     * @throws Exception exception
-     */
-    Client(final int runs) throws Exception {
-      this.runs = runs;
-      session = createClient();
-    }
-
-    @Override
-    public void run() {
-      try {
-        // Perform some queries
-        for(int r = 0; r < runs; ++r) {
-          Performance.sleep((long) (50 * RND.nextDouble()));
-          // Return nth text of the database
-          session.execute("XQUERY " + Util.info(QUERY, RND.nextInt() % MAX + 1));
-        }
-        session.close();
-      } catch(final Exception ex) {
-        ex.printStackTrace();
+    try {
+      // create test database
+      try(ClientSession cs = createClient()) {
+        cs.execute("CREATE DB test " + INPUT);
+        // run clients, each retrieving the nth text of the database
+        parallel(clients, () -> {
+          try(ClientSession session = createClient()) {
+            for(int r = 0; r < runs; r++) {
+              Performance.sleep((long) (50 * RND.nextDouble()));
+              session.execute("XQUERY " + Util.info(QUERY, RND.nextInt() % MAX + 1));
+            }
+          }
+          return null;
+        });
+        // drop database
+        cs.execute("DROP DB test");
       }
+    } finally {
+      // stop server
+      stopServer(server);
     }
   }
 }

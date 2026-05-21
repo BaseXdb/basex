@@ -4,6 +4,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * This class performs local stress tests with a specified number of threads and queries.
@@ -11,12 +12,10 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@Timeout(600)
 public final class MultipleAddTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/input.xml";
-
-  /** Result counter. */
-  static int counter;
 
   /**
    * Runs the test.
@@ -57,50 +56,22 @@ public final class MultipleAddTest extends SandboxTest {
    * @throws Exception exception
    */
   private static void run(final int clients, final int runs) throws Exception {
-    // Create test database
+    // create test database
     execute(new CreateDB(NAME));
-    // Start clients
-    final Client[] cl = new Client[clients];
-    for(int i = 0; i < clients; ++i) cl[i] = new Client(context, runs);
-    for(final Client c : cl) c.start();
-    for(final Client c : cl) c.join();
-    // Drop database
-    execute(new DropDB(NAME));
-  }
-
-  /** Single client. */
-  static class Client extends Thread {
-    /** Client context. */
-    private final Context ctx;
-    /** Number of runs. */
-    private final int runs;
-
-    /**
-     * Constructor.
-     * @param ctx database context
-     * @param runs number of runs
-     */
-    Client(final Context ctx, final int runs) {
-      this.runs = runs;
-      this.ctx = new Context(ctx);
-    }
-
-    @Override
-    public void run() {
+    // run clients, each with its own context, adding the input document repeatedly
+    parallel(clients, () -> {
+      final Context ctx = new Context(context);
+      new Set(MainOptions.AUTOFLUSH, false).execute(ctx);
+      new Set(MainOptions.INTPARSE, true).execute(ctx);
+      new Open(NAME).execute(ctx);
       try {
-        new Set(MainOptions.AUTOFLUSH, false).execute(ctx);
-        new Set(MainOptions.INTPARSE, true).execute(ctx);
-        new Open(NAME).execute(ctx);
-        try {
-          for(int r = 0; r < runs; ++r) {
-            new Add("", INPUT).execute(ctx);
-          }
-        } finally {
-          new Close().execute(ctx);
-        }
-      } catch(final BaseXException ex) {
-        ex.printStackTrace();
+        for(int r = 0; r < runs; r++) new Add("", INPUT).execute(ctx);
+      } finally {
+        new Close().execute(ctx);
       }
-    }
+      return null;
+    });
+    // drop database
+    execute(new DropDB(NAME));
   }
 }

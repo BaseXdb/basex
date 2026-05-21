@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Jens Erat
  */
+@Timeout(60)
 public final class ServerLockingTest extends SandboxTest {
   /** Maximum sleep time in ms. */
   private static final long SLEEP = 250;

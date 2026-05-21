@@ -312,12 +312,6 @@ public final class DataAccessTest {
     assertContent(pos, CINT1_BIN);
   }
 
-  /** Test method for {@link DataAccess#free(long, int)}. */
-  @Disabled
-  @Test public void testFree() {
-    fail("Not yet implemented");
-  }
-
   /**
    * Check that the test file {@link #file} has the specified unsigned bytes at
    * the specified position.

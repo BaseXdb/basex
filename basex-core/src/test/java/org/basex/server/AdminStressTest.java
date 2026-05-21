@@ -42,7 +42,7 @@ public final class AdminStressTest extends SandboxTest {
    * Test simultaneous client sessions.
    * @throws Exception exception
    */
-  @Test public void createAndListSessions() throws Exception {
+  @Test @Timeout(60) public void createAndListSessions() throws Exception {
     final CountDownLatch start = new CountDownLatch(1);
     final CountDownLatch stop = new CountDownLatch(NUM);
     final SandboxClient[] clients = new SandboxClient[NUM];

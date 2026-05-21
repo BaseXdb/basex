@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.basex.*;
 import org.basex.core.cmd.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 /**
  * This class checks the execution order of non-locking queries.
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
+@Timeout(60)
 public final class NonLockingTest extends SandboxTest {
   /** Query for returning all jobs except for the current one. */
   private static final String LIST_JOBS = _JOB_LIST.args() + '[' + _JOB_CURRENT.args() + "!= .]";

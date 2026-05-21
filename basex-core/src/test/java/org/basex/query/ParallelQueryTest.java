@@ -2,8 +2,6 @@ package org.basex.query;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.*;
-
 import org.basex.*;
 import org.junit.jupiter.api.*;
 
@@ -16,37 +14,18 @@ import org.junit.jupiter.api.*;
 public final class ParallelQueryTest extends SandboxTest {
   /** Query. */
   private static final String QUERY = "count((for $i in 1 to 50000 return <a><b/></a>)/b)";
-  /** Error. */
-  private Throwable error;
-  /** Reference result. */
-  private String result;
+  /** Number of parallel queries. */
+  private static final int THREADS = 10;
 
   /**
-   * Test.
-   * @throws Throwable throwable
+   * Runs the same query in parallel and compares all results to a reference result.
+   * @throws Exception exception
    */
-  @Test public void test() throws Throwable {
-    // generate reference result
-    result = query(QUERY);
-    // generate results to be compared
-    final ArrayList<Query> queries = new ArrayList<>();
-    for(int i = 0; i < 10; i++) queries.add(new Query());
-    for(final Query q : queries) q.start();
-    for(final Query q : queries) q.join();
-    if(error != null) throw error;
-  }
-
-  /**
-   * Query instance.
-   */
-  private final class Query extends Thread {
-    @Override
-    public void run() {
-      try {
-        assertEquals(result, query(QUERY));
-      } catch(final Throwable th) {
-        error = th;
-      }
-    }
+  @Test @Timeout(60) public void test() throws Exception {
+    final String expected = query(QUERY);
+    parallel(THREADS, () -> {
+      assertEquals(expected, query(QUERY));
+      return null;
+    });
   }
 }
