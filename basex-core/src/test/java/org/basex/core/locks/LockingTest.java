@@ -77,6 +77,33 @@ public final class LockingTest extends SandboxTest {
   }
 
   /**
+   * Non-locking jobs (no read or write locks) must not consume the budget of concurrent locking
+   * jobs limited by {@link StaticOptions#PARALLEL}.
+   * @throws InterruptedException Got interrupted.
+   */
+  @RepeatedTest(REPEAT)
+  public void parallelBudgetTest() throws InterruptedException {
+    // occupy all parallel slots with held non-locking jobs
+    final int parallel = context.soptions.get(StaticOptions.PARALLEL);
+    final CountDownLatch held = new CountDownLatch(parallel);
+    final LockTester[] idle = new LockTester[parallel];
+    for(int i = 0; i < parallel; i++) {
+      idle[i] = new LockTester(null, NONE, NONE, held);
+      idle[i].start();
+    }
+    assertTrue(held.await(WAIT * parallel, TimeUnit.MILLISECONDS),
+      "Non-locking jobs should start.");
+
+    // an unrelated locking job must still be able to acquire its lock
+    final CountDownLatch test = new CountDownLatch(1);
+    final LockTester locker = new LockTester(null, objects, NONE, test, false);
+    locker.start();
+    final boolean acquired = test.await(WAIT, TimeUnit.MILLISECONDS);
+    for(final LockTester job : idle) job.release();
+    assertTrue(acquired, "Locking job must not be blocked by non-locking jobs.");
+  }
+
+  /**
    * Test for concurrent writes.
    * @throws InterruptedException Got interrupted.
    */

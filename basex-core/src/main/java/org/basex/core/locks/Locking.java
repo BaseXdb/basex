@@ -104,10 +104,10 @@ public final class Locking {
     if(locked.containsKey(id)) throw new IllegalMonitorStateException("Thread holds locks: " + id);
     locked.put(id, locks);
 
-    // queue job if the job limit has been reached
+    // queue job if the job limit has been reached (only locking jobs count towards the limit)
     final LockList reads = locks.reads, writes = locks.writes;
     final boolean write = writes.locking(), read = reads.locking(), lock = read || write;
-    queue.acquire(id, read, write);
+    if(lock) queue.acquire(id, read, write);
 
     // apply exclusive lock (global write), or shared lock otherwise
     if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).lock();
@@ -174,8 +174,8 @@ public final class Locking {
     // release exclusive lock (global write), or shared lock otherwise
     if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).unlock();
 
-    // allow next queued job to resume
-    queue.release();
+    // allow next queued job to resume (non-locking jobs were never counted)
+    if(lock) queue.release();
   }
 
   /**
