@@ -53,7 +53,7 @@ public abstract class AStr extends Item {
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean ascii(final InputInfo info) throws QueryException {
+  public final boolean ascii(final InputInfo info) throws QueryException {
     int[] off = offsets;
     if(off == null) {
       off = Token.cpOffsets(string(info));
@@ -69,7 +69,7 @@ public abstract class AStr extends Item {
    * @return result of check
    * @throws QueryException query exception
    */
-  public int length(final InputInfo info) throws QueryException {
+  public final int length(final InputInfo info) throws QueryException {
     return ascii(info) ? string(info).length : offsets.length;
   }
 
@@ -79,7 +79,7 @@ public abstract class AStr extends Item {
    * @return result of check
    * @throws QueryException query exception
    */
-  public byte[][] characters(final InputInfo info) throws QueryException {
+  public final byte[][] characters(final InputInfo info) throws QueryException {
     final TokenList list = new TokenList(length(info));
     Token.forEachCp(string(info), cp -> list.add(Token.cpToken(cp)));
     return list.finish();
@@ -91,7 +91,7 @@ public abstract class AStr extends Item {
    * @return codepoints
    * @throws QueryException query exception
    */
-  public int[] codepoints(final InputInfo info) throws QueryException {
+  public final int[] codepoints(final InputInfo info) throws QueryException {
     final IntList list = new IntList(length(info));
     Token.forEachCp(string(info), list::add);
     return list.finish();
@@ -105,7 +105,7 @@ public abstract class AStr extends Item {
    * @return substring
    * @throws QueryException query exception
    */
-  public AStr substring(final InputInfo info, final int start, final int end)
+  public final AStr substring(final InputInfo info, final int start, final int end)
       throws QueryException {
     if(start == 0 && end == length(info)) return this;
 

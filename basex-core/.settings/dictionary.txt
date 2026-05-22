@@ -386,3 +386,9 @@ subtypes
 grün
 dba
 refactoring
+ngram
+ngrams
+sørensen
+transliteration
+fuzzywuzzy
+thefuzz

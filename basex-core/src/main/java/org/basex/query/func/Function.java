@@ -1929,8 +1929,20 @@ public enum Function implements AFunction {
   _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(value1,value2)",
       params(STRING_O, STRING_O), DOUBLE_O, STRING_URI),
   /** XQuery function. */
+  _STRING_NGRAM_SIMILARITY(StringNgramSimilarity::new, "ngram-similarity(value1,value2[,n])",
+      params(STRING_O, STRING_O, INTEGER_O), DOUBLE_O, STRING_URI),
+  /** XQuery function. */
+  _STRING_NGRAMS(StringNgrams::new, "ngrams(value[,n])",
+      params(STRING_O, INTEGER_O), STRING_ZM, STRING_URI),
+  /** XQuery function. */
   _STRING_SOUNDEX(StringSoundex::new, "soundex(value)",
       params(STRING_O), STRING_O, STRING_URI),
+  /** XQuery function. */
+  _STRING_TOKEN_SET_RATIO(StringTokenSetRatio::new, "token-set-ratio(value1,value2)",
+      params(STRING_O, STRING_O), DOUBLE_O, STRING_URI),
+  /** XQuery function. */
+  _STRING_TOKEN_SORT_RATIO(StringTokenSortRatio::new, "token-sort-ratio(value1,value2)",
+      params(STRING_O, STRING_O), DOUBLE_O, STRING_URI),
 
   // Unit Module
 

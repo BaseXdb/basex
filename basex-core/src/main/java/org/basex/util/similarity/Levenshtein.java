@@ -15,8 +15,10 @@ import java.util.function.*;
  * @author Christian Gruen
  */
 public final class Levenshtein {
+  /** Maximum size for compared strings. */
+  public static final int MAX_LENGTH = 10000;
   /** Size of matrix (and maximum supported length for comparing tokens). */
-  private static final int MAX_LENGTH = 128;
+  private static final int SIZE = 128;
 
   /** Default number of allowed errors; dynamic calculation if value is 0. */
   private final int maxErrors;
@@ -36,7 +38,7 @@ public final class Levenshtein {
    */
   public Levenshtein(final int maxErrors) {
     this.maxErrors = maxErrors;
-    matrix = new byte[MAX_LENGTH + 2][MAX_LENGTH + 2];
+    matrix = new byte[SIZE + 2][SIZE + 2];
     final int ml = matrix.length;
     for(int m = 0; m < ml; ++m) {
       matrix[0][m] = (byte) m;
@@ -151,7 +153,7 @@ public final class Levenshtein {
 
     // use exact search for too short and too long values
     final int dlen = Math.abs(cl - tl);
-    if(max == 0 && (tl < 4 || cl < 4) || tl > MAX_LENGTH || cl > MAX_LENGTH) {
+    if(max == 0 && (tl < 4 || cl < 4) || tl > SIZE || cl > SIZE) {
       return dlen == 0 && Arrays.equals(tkn, cmp) ? 0 : Integer.MAX_VALUE;
     }
 
@@ -180,7 +182,7 @@ public final class Levenshtein {
   }
 
   /**
-   * Normalizes a token and returns a codepoint array.
+   * Normalizes a token and returns a codepoints array.
    * @param token token
    * @return normalized token
    */

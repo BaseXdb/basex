@@ -175,6 +175,102 @@ public final class StringModuleTest extends SandboxTest {
     error(func.args(" string-join(replicate('x', 10001))", "x"), STRING_BOUNDS_X);
   }
 
+  /** Test method. */
+  @Test public void ngramSimilarity() {
+    final Function func = _STRING_NGRAM_SIMILARITY;
+    // default n-gram length (2)
+    query(func.args("", ""), 1);
+    query(func.args("abc", "abc"), 1);
+    query(func.args("abc", ""), 0);
+    query(func.args("", "abc"), 0);
+    query(func.args("abc", "xyz"), 0);
+    query(func.args("night", "nacht"), 0.25);
+    // set semantics: repeated n-grams are collapsed
+    query(func.args("aaa", "aa"), 1);
+
+    // explicit n-gram length
+    query(func.args("abcd", "abcd", 1), 1);
+    query(func.args("abc", "abc", 3), 1);
+    query(func.args("abc", "abd", 3), 0);
+    // strings shorter than n are treated as a single n-gram
+    query(func.args("ab", "ab", 5), 1);
+    query(func.args("ab", "cd", 5), 0);
+
+    error(func.args("a", "b", 0), STRING_NGRAM_X);
+    error(func.args("a", "b", -1), STRING_NGRAM_X);
+  }
+
+  /** Test method. */
+  @Test public void ngrams() {
+    final Function func = _STRING_NGRAMS;
+    // default n-gram length (2)
+    query("string-join(" + func.args("abc") + ", '|')", "ab|bc");
+    query("string-join(" + func.args("a") + ", '|')", "a");
+    query("string-join(" + func.args("") + ", '|')", "");
+    query("count(" + func.args("hello") + ")", 4);
+    // n-grams are returned in order, including duplicates
+    query("string-join(" + func.args("aaa") + ", '|')", "aa|aa");
+
+    // explicit n-gram length
+    query("string-join(" + func.args("abc", 1) + ", '|')", "a|b|c");
+    query("string-join(" + func.args("abcd", 3) + ", '|')", "abc|bcd");
+    // strings shorter than n yield a single n-gram with the whole string
+    query("string-join(" + func.args("ab", 5) + ", '|')", "ab");
+    query("count(" + func.args("", 5) + ")", 0);
+
+    // invariant: ngram-similarity is the Sørensen-Dice coefficient over the distinct n-grams
+    query("let $a := 'night', $b := 'nacht', $n := 2 "
+        + "let $g1 := distinct-values(" + func.args(" $a", " $n") + ") "
+        + "let $g2 := distinct-values(" + func.args(" $b", " $n") + ") "
+        + "return 2e0 * count($g1[. = $g2]) div (count($g1) + count($g2)) = "
+        + _STRING_NGRAM_SIMILARITY.args(" $a", " $b", " $n"), true);
+
+    // codepoint-safe: characters outside the BMP are not split into surrogate halves
+    query("let $s := codepoints-to-string((120094, 120095, 120096)) "
+        + "let $grams := " + func.args(" $s", 2)
+        + "return count($grams) = 2 and every($grams, fn { string-length() = 2 })", true);
+
+    error(func.args("a", 0), STRING_NGRAM_X);
+    error(func.args("a", -1), STRING_NGRAM_X);
+  }
+
+  /** Test method. */
+  @Test public void tokenSetRatio() {
+    final Function func = _STRING_TOKEN_SET_RATIO;
+    query(func.args("", ""), 1);
+    query(func.args("abc", ""), 0);
+    query(func.args("abc", "abc"), 1);
+    query(func.args("abc", "xyz"), 0);
+    // order-independent
+    query(func.args("hello world", "world hello"), 1);
+    // tokens of one string are a subset of the other
+    query(func.args("Fortuny y Marsal", "Fortuny Marsal"), 1);
+    query(func.args("a b c", "c a"), 1);
+    // whitespace is collapsed: repeated/trailing spaces, tabs and newlines
+    query(func.args("a   b  ", "b a"), 1);
+    query(func.args("a\tb\nc", "a b"), 1);
+
+    error(func.args(" string-join(replicate('x', 10001))", "x"), STRING_BOUNDS_X);
+  }
+
+  /** Test method. */
+  @Test public void tokenSortRatio() {
+    final Function func = _STRING_TOKEN_SORT_RATIO;
+    query(func.args("", ""), 1);
+    query(func.args("abc", "abc"), 1);
+    // order-independent
+    query(func.args("hello world", "world hello"), 1);
+    query(func.args("a b c", "c b a"), 1);
+    // partial overlap
+    query(func.args("a b c", "a b"), 0.6);
+    query(func.args("abc", "xyz"), 0);
+    // whitespace is collapsed: repeated/trailing spaces, tabs and newlines
+    query(func.args("a   b  ", "b a"), 1);
+    query(func.args("a\tb\nc", "c b a"), 1);
+
+    error(func.args(" string-join(replicate('x', 10001))", "x"), STRING_BOUNDS_X);
+  }
+
   /** Tests, adopted from Apache Commons project (SoundexTest.java). */
   @Test public void soundex() {
     final Function func = _STRING_SOUNDEX;

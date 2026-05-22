@@ -428,6 +428,8 @@ public enum QueryError {
   STRING_FORMAT_X_X(STRING, "format", "%: %."),
   /** Error code. */
   STRING_BOUNDS_X(STRING, "bounds", "String exceeds maximum supported length of % characters."),
+  /** Error code. */
+  STRING_NGRAM_X(STRING, "ngram", "N-gram length must be positive: %."),
 
   // Unit Module
 

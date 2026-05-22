@@ -1,12 +1,12 @@
 package org.basex.query.func.string;
 
 import static org.basex.query.QueryError.*;
-import static org.basex.util.similarity.Levenshtein.*;
 
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
+import org.basex.util.similarity.*;
 
 /**
  * Function implementation.
@@ -14,14 +14,14 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class StringLevenshtein extends StandardFunc {
+public final class StringNgramSimilarity extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final AStr value1 = toStr(arg(0), qc), value2 = toStr(arg(1), qc);
+    final long n = defined(2) ? Math.min(Integer.MAX_VALUE, toLong(arg(2), qc)) : 2;
+    if(n < 1) throw STRING_NGRAM_X.get(info, n);
 
     final int[] cps1 = value1.codepoints(info), cps2 = value2.codepoints(info);
-    final int cl1 = cps1.length, cl2 = cps2.length;
-    if(cl1 > MAX_LENGTH || cl2 > MAX_LENGTH) throw STRING_BOUNDS_X.get(info, MAX_LENGTH);
-    return Dbl.get(distance(cps1, cps2));
+    return Dbl.get(NGram.similarity(cps1, cps2, (int) n));
   }
 }
