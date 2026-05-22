@@ -1107,6 +1107,9 @@ public enum Function implements AFunction {
   _BIN_BIN(BinBin::new, "bin(value)",
       params(STRING_ZO), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
+  _BIN_COUNT_BITS_SET(BinCountBitsSets::new, "count-bits-set(value)",
+      params(BINARY_ZO), INTEGER_ZO, BIN_URI),
+  /** XQuery function. */
   _BIN_DECODE_STRING(BinDecodeString::new, "decode-string(value[,encoding,offset,size])",
       params(BINARY_ZO, STRING_ZO, INTEGER_ZO, INTEGER_ZO), STRING_ZO, BIN_URI),
   /** XQuery function. */
@@ -1127,6 +1130,9 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _BIN_INSERT_BEFORE(BinInsertBefore::new, "insert-before(value,offset,extra)",
       params(BINARY_ZO, INTEGER_O, BINARY_ZO), BASE64_BINARY_ZO, BIN_URI),
+  /** XQuery function. */
+  _BIN_IS_BIT_SET(BinIsBitSet::new, "is-bit-set(value,index)",
+      params(BINARY_ZO, INTEGER_O), BOOLEAN_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_JOIN(BinJoin::new, "join(values)",
       params(BINARY_ZM), BASE64_BINARY_O, BIN_URI),
@@ -1160,6 +1166,12 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _BIN_PART(BinPart::new, "part(value,offset[,size])",
       params(BINARY_ZO, INTEGER_O, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
+  /** XQuery function. */
+  _BIN_ROTATE(BinRotate::new, "rotate(value,by)",
+      params(BINARY_ZO, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),
+  /** XQuery function. */
+  _BIN_SET_BITS(BinSetBits::new, "set-bits(value,indices,set)",
+      params(BINARY_ZO, INTEGER_ZM, BOOLEAN_O), BASE64_BINARY_ZO, BIN_URI),
   /** XQuery function. */
   _BIN_SHIFT(BinShift::new, "shift(value,by)",
       params(BINARY_ZO, INTEGER_O), BASE64_BINARY_ZO, BIN_URI),

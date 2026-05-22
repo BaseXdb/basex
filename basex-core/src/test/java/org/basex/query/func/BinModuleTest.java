@@ -48,6 +48,20 @@ public final class BinModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void countBitsSet() {
+    final Function func = _BIN_COUNT_BITS_SET;
+    // successful queries
+    query(func.args(" ()"),           "");
+    query(func.args(hex("")),         0);
+    query(func.args(hex("00")),       0);
+    query(func.args(hex("FF")),       8);
+    query(func.args(hex("8081")),     3);
+    query(func.args(hex("FFFFFFFF")), 32);
+    // Hamming distance
+    query(func.args(_BIN_XOR.args(hex("1234"), hex("1235"))), 1);
+  }
+
+  /** Test method. */
   @Test public void decodeString() {
     final Function func = _BIN_DECODE_STRING;
     // successful queries
@@ -199,6 +213,23 @@ public final class BinModuleTest extends SandboxTest {
     // errors
     error(func.args(hex(""), -1, " ()"), BIN_IOOR_X_X);
     error(func.args(hex(""),  1, " ()"), BIN_IOOR_X_X);
+  }
+
+  /** Test method. */
+  @Test public void isBitSet() {
+    final Function func = _BIN_IS_BIT_SET;
+    // successful queries
+    query(func.args(" ()", 0),       "");
+    query(func.args(hex("80"), 0),   true);
+    query(func.args(hex("80"), 7),   false);
+    query(func.args(hex("01"), 0),   false);
+    query(func.args(hex("01"), 7),   true);
+    query(func.args(hex("00FF"), 7), false);
+    query(func.args(hex("00FF"), 8), true);
+    // errors
+    error(func.args(hex("80"), -1), BIN_IOOR_X_X);
+    error(func.args(hex("80"), 8),  BIN_IOOR_X_X);
+    error(func.args(hex(""), 0),    BIN_IOOR_X_X);
   }
 
   /** Test method. */
@@ -368,6 +399,45 @@ public final class BinModuleTest extends SandboxTest {
     error(func.args(hex("FF"), 0, -1), BIN_NS_X);
     error(func.args(hex("FF"), 2),     BIN_IOOR_X_X);
     error(func.args(hex("FF"), 0, 2),  BIN_IOOR_X_X);
+  }
+
+  /** Test method. */
+  @Test public void rotate() {
+    final Function func = _BIN_ROTATE;
+    // successful queries
+    hexQuery(func.args(" ()", 1),       "");
+    hexQuery(func.args(hex(""), 1),     "");
+    hexQuery(func.args(hex("81"), 0),   "81");
+    hexQuery(func.args(hex("81"), 1),   "03");
+    hexQuery(func.args(hex("81"), -1),  "C0");
+    hexQuery(func.args(hex("81"), 8),   "81");
+    hexQuery(func.args(hex("81"), 9),   "03");
+    hexQuery(func.args(hex("0001"), 1), "0002");
+    hexQuery(func.args(hex("8000"), 1), "0001");
+    hexQuery(func.args(hex("12345678"), 4), "23456781");
+  }
+
+  /** Test method. */
+  @Test public void setBits() {
+    final Function func = _BIN_SET_BITS;
+    // successful queries
+    hexQuery(func.args(" ()", 0, " true()"),               "");
+    hexQuery(func.args(hex("00"), 0, " true()"),           "80");
+    hexQuery(func.args(hex("00"), 7, " true()"),           "01");
+    hexQuery(func.args(hex("80"), 0, " true()"),           "80");
+    hexQuery(func.args(hex("0000"), 8, " true()"),         "0080");
+    hexQuery(func.args(hex("FF"), 0, " false()"),          "7F");
+    // multiple, empty, duplicate indices
+    hexQuery(func.args(hex("00"), " ()", " true()"),       "00");
+    hexQuery(func.args(hex("00"), " (0, 7)", " true()"),   "81");
+    hexQuery(func.args(hex("00"), " (0, 0)", " true()"),   "80");
+    hexQuery(func.args(hex("0000"), " (0, 8)", " true()"), "8080");
+    hexQuery(func.args(hex("FF"), " (0, 7)", " false()"),  "7E");
+    // errors
+    error(func.args(hex("00"), -1, " true()"),        BIN_IOOR_X_X);
+    error(func.args(hex("00"), 8, " true()"),         BIN_IOOR_X_X);
+    error(func.args(hex("00"), " (0, 8)", " true()"), BIN_IOOR_X_X);
+    error(func.args(hex(""), 0, " true()"),           BIN_IOOR_X_X);
   }
 
   /** Test method. */
