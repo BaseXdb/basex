@@ -10,7 +10,7 @@ public final class Wildcard extends RegExp {
   /** Instance for the dot matching all characters. */
   private static final Wildcard ALL = new Wildcard(true);
   /** Instance for the dot matching everything except new-lines. */
-  private static final Wildcard NOLF  = new Wildcard(true);
+  private static final Wildcard NOLF = new Wildcard(false);
 
   /** If the {@code \n} character is matched. */
   private final boolean nl;

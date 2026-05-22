@@ -2223,6 +2223,29 @@ return
     query(func.args("babadad", "^((.)?a\\2)+$"), true);
     query(func.args("x", "(a)|\\1"), true);
 
+    // '.' matches any character except LF (#xA) and CR (#xD); with 's' it matches all
+    query(func.args(" codepoints-to-string(10)", "."), false);
+    query(func.args(" codepoints-to-string(13)", "."), false);
+    query(func.args(" codepoints-to-string(133)", "."), true);
+    query(func.args(" codepoints-to-string(8232)", "."), true);
+    query(func.args(" codepoints-to-string(8233)", "."), true);
+    query(func.args(" codepoints-to-string(10)", ".", "s"), true);
+
+    // \w matches all but punctuation, separators and "other" (symbols like $ and + are word chars)
+    query(func.args("$", "\\w"), true);
+    query(func.args("+", "\\w"), true);
+    query(func.args(".", "\\w"), false);
+    query(func.args(".", "\\W"), true);
+
+    // \i and \c: XML NameStartChar and NameChar
+    query(func.args("A", "^\\i$"), true);
+    query(func.args(":", "^\\i$"), true);
+    query(func.args("5", "^\\i$"), false);
+    query(func.args("5", "^\\c$"), true);
+    query(func.args("-", "^\\c$"), true);
+    query(func.args("a-b.c", "^\\i\\c*$"), true);
+    query(func.args("1abc", "^\\i\\c*$"), false);
+
     error(func.args("a", "+"), REGINVALID_X);
     error(func.args("a", "+", "j"), REGINVALID_X);
     error(func.args("a", "[a-\\\\]"), REGINVALID_X);
