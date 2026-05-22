@@ -22,14 +22,12 @@ public final class WordBoundary extends RegExp {
   private WordBoundary(final boolean positive, final boolean multi) {
     final String eos = LineBorder.eos(multi);
     if(positive) {
-      img = "(?:(?<=["      + Escape.WORD     + "])(?:(?=[" + Escape.NOT_WORD + "])|" + eos + ")"
-          +   "|(?<=(?:^|[" + Escape.NOT_WORD + "]))(?=["   + Escape.WORD     + "])"
-          + ")";
+      img = "(?:(?<="      + Escape.WORD     + ")(?:(?=" + Escape.NOT_WORD + ")|" + eos + ")"
+          +   "|(?<=(?:^|" + Escape.NOT_WORD + "))(?="   + Escape.WORD     + "))";
     } else {
-      img = "(?:(?<=["      + Escape.WORD     + "])(?=["     + Escape.WORD     + "])"
-          +   "|(?<=(?:^|[" + Escape.NOT_WORD + "]))(?:(?=[" + Escape.NOT_WORD + "])|" + eos + ")"
-          +   "|^" + eos
-          + ")";
+      img = "(?:(?<="      + Escape.WORD     + ")(?="     + Escape.WORD     + ")"
+          +   "|(?<=(?:^|" + Escape.NOT_WORD + "))(?:(?=" + Escape.NOT_WORD + ")|" + eos + ")"
+          +   "|^" + eos + ")";
     }
   }
 
