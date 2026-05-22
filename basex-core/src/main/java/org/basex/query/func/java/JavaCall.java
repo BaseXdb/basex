@@ -307,6 +307,7 @@ public abstract class JavaCall extends Arr {
         } else if(object instanceof Map) {
           final MapBuilder mb = new MapBuilder();
           for(final Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
+            qc.checkStop();
             final Item key = toValue(entry.getKey(), qc, info, wrap).item(qc, info);
             final Value value = toValue(entry.getValue(), qc, info, wrap);
             mb.put(key, value);

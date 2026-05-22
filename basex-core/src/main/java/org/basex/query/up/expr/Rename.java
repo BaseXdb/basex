@@ -43,7 +43,7 @@ public final class Rename extends Update {
     final Item name = arg(1).atomItem(qc, info);
     final EnumMap<Kind, QNm> names = new EnumMap<>(Kind.class);
 
-    for(Item item; (item = iter.next()) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       final Kind kind = item.type.kind();
       final boolean element = kind == Kind.ELEMENT, attribute = kind == Kind.ATTRIBUTE;
       final boolean pi = kind == Kind.PROCESSING_INSTRUCTION;

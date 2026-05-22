@@ -179,7 +179,6 @@ public abstract class XQArray extends XQStruct {
    * @return new array
    */
   public XQArray reverseArray(final Job job) {
-    job.checkStop();
     final long size = structSize();
     final ArrayBuilder ab = new ArrayBuilder(job, size);
     for(long i = size - 1; i >= 0; i--) ab.add(valueAt(i));
@@ -316,10 +315,7 @@ public abstract class XQArray extends XQStruct {
     if(materialized(test, ii)) return this;
 
     final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
-    for(final Value value : members()) {
-      qc.checkStop();
-      ab.add(value.materialize(test, ii, qc));
-    }
+    for(final Value value : members()) ab.add(value.materialize(test, ii, qc));
     return ab.array(this);
   }
 
@@ -370,10 +366,7 @@ public abstract class XQArray extends XQStruct {
       final CompileContext cc) throws QueryException {
 
     final ArrayBuilder ab = new ArrayBuilder(qc, structSize());
-    for(final Value value : members()) {
-      qc.checkStop();
-      ab.add(at.valueType().coerce(value, qc, ii, null, cc));
-    }
+    for(final Value value : members()) ab.add(at.valueType().coerce(value, qc, ii, null, cc));
     return ab.array(at);
   }
 

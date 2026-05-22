@@ -120,6 +120,7 @@ public final class DeepEqual {
         }
       }
       for(Item item2; (item2 = iter2.next()) != null;) {
+        if(qc != null) qc.checkStop();
         size2++;
         if(equal(item1, item2)) continue OUTER;
         items2.add(item2);

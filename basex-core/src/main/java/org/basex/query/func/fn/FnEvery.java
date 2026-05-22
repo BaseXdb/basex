@@ -31,7 +31,7 @@ public class FnEvery extends StandardFunc {
 
     final HofArgs args = predicate != null ? new HofArgs(2, predicate) : null;
     final boolean some = some();
-    for(Item item; (item = input.next()) != null;) {
+    for(Item item; (item = qc.next(input)) != null;) {
       final boolean test = predicate == null ? item.test(qc, info, 0) :
         invoke(predicate, args.set(0, item).inc(), qc).test(qc, info, 0);
       if(test == some) return some;

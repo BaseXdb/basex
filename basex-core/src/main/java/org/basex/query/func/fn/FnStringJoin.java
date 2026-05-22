@@ -45,7 +45,7 @@ public final class FnStringJoin extends StandardFunc {
     final boolean separator = toZeroToken(arg(1), qc).length > 0;
 
     boolean more = false;
-    for(Item item; (item = values.next()) != null;) {
+    for(Item item; (item = qc.next(values)) != null;) {
       if(more && separator || item.string(info).length > 0) return true;
       more = true;
     }

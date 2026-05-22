@@ -63,7 +63,7 @@ abstract class Ids extends ContextFn {
 
       // collect and return index results, filtered by ID/IDREF attributes
       final Iter iter = va.iter(qc);
-      for(Item item; (item = iter.next()) != null;) {
+      for(Item item; (item = qc.next(iter)) != null;) {
         // check attribute name; check root if database has more than one document
         final XNode attr = (XNode) item;
         if(XMLToken.isId(attr.name(), idref) && (idref || idSet.remove(attr.string()) != 0) &&

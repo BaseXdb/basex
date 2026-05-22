@@ -96,13 +96,7 @@ public final class TreeSeqBuilder extends SeqBuilder {
 
   @Override
   protected SeqBuilder addSequence(final Value value, final Job job) {
-    if(!(value instanceof final BigSeq big)) {
-      for(final Item item : value) {
-        job.checkStop();
-        add(item);
-      }
-      return this;
-    }
+    if(!(value instanceof final BigSeq big)) return super.addSequence(value, job);
 
     final Item[] ls = big.left, rs = big.right;
     final FingerTree<Item, Item> midTree = big.middle;

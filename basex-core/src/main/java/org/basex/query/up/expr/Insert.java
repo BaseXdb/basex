@@ -53,7 +53,7 @@ public final class Insert extends Update {
     final boolean sibling = mode == Mode.BEFORE || mode == Mode.AFTER;
     FBuilder builder = null;
 
-    for(Item item; (item = iter.next()) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof final XNode node))
         throw (sibling ? UPTRGTYP2_X : UPTRGTYP_X).get(info, item);
 

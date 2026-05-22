@@ -159,7 +159,7 @@ public final class CMap extends Arr {
         add.accept(toAtomItem(exprs[e], qc), exprs[e + 1].value(qc));
       } else {
         final Iter iter = exprs[e].iter(qc);
-        for(Item item; (item = iter.next()) != null;) {
+        for(Item item; (item = qc.next(iter)) != null;) {
           Item it;
           if(item instanceof final JNode jnode) {
             if(jnode.isRoot()) {

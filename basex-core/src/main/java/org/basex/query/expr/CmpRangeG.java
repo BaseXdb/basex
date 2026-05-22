@@ -32,7 +32,7 @@ public final class CmpRangeG extends CmpG {
     final RangeSeq rs = (RangeSeq) exprs[1].value(qc);
     final long min = rs.min(), max = rs.max();
     final Iter iter = exprs[0].atomIter(qc, info);
-    for(Item item; (item = iter.next()) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       final double value = item.dbl(info);
       if(value >= min && value <= max && value == (long) value) return true;
     }

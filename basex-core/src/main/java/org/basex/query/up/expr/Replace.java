@@ -44,7 +44,7 @@ public final class Replace extends Update {
     final Iter iter = arg(0).unwrappedIter(qc);
     FBuilder builder = null;
 
-    for(Item item; (item = iter.next()) != null;) {
+    for(Item item; (item = qc.next(iter)) != null;) {
       if(!(item instanceof final XNode targ) || targ.kind() == Kind.DOCUMENT)
         throw UPTRGNODE_X.get(info, item);
 

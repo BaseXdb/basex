@@ -46,8 +46,8 @@ public final class ArrayBuilder {
    * @return reference to this builder for convenience
    */
   public ArrayBuilder add(final Value value) {
+    job.checkStop();
     if(builder == null) {
-      job.checkStop();
       final Value sngl = single;
       if(sngl == null) {
         single = value;

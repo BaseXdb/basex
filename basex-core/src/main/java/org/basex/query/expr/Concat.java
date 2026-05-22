@@ -31,7 +31,7 @@ public final class Concat extends Arr {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr expr : exprs) {
       final Iter iter = expr.atomIter(qc, info);
-      for(Item item; (item = iter.next()) != null;) {
+      for(Item item; (item = qc.next(iter)) != null;) {
         tb.add(item.string(info));
       }
     }
@@ -43,7 +43,7 @@ public final class Concat extends Arr {
       throws QueryException {
     for(final Expr expr : exprs) {
       final Iter iter = expr.atomIter(qc, info);
-      for(Item item; (item = iter.next()) != null;) {
+      for(Item item; (item = qc.next(iter)) != null;) {
         if(item.string(info).length > 0) return true;
       }
     }
