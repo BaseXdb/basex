@@ -31,6 +31,8 @@ public abstract class JsonConverter extends Job {
   protected QueryFunction<byte[], Item> numberParser;
   /** Null value. */
   protected Value nullValue = Empty.VALUE;
+  /** Input info. */
+  protected InputInfo info;
   /** Interruptible job. */
   protected Job job;
 
@@ -110,6 +112,7 @@ public abstract class JsonConverter extends Job {
   public final Value convert(final TextInput input, final String uri, final InputInfo ii,
       final Job jb) throws QueryException, IOException {
     job = jb;
+    info = ii;
     init(uri);
     new JsonParser(input, jopts, this).parse(ii);
     return finish();

@@ -2,6 +2,7 @@ package org.basex.io.parse.json;
 
 import static org.basex.query.QueryError.*;
 
+import java.math.*;
 import java.util.*;
 
 import org.basex.build.json.*;
@@ -34,12 +35,19 @@ import org.basex.util.*;
  * @author Leo Woerteler
  */
 public final class JsonW3Converter extends JsonConverter {
+  /** Maximum long value as BigDecimal. */
+  private static final BigDecimal MAX_LONG_BD = BigDecimal.valueOf(Long.MAX_VALUE);
+  /** Minimum long value as BigDecimal. */
+  private static final BigDecimal MIN_LONG_BD = BigDecimal.valueOf(Long.MIN_VALUE);
+
   /** Stack for intermediate values. */
   private final Stack<Value> stack = new Stack<>();
   /** Stack for intermediate arrays. */
   private final Stack<ArrayBuilder> arrays = new Stack<>();
   /** Stack for intermediate maps. */
   private final Stack<MapBuilder> maps = new Stack<>();
+  /** Number format. */
+  private JsonNumberFormat fmt;
 
   /**
    * Constructor.
@@ -48,6 +56,7 @@ public final class JsonW3Converter extends JsonConverter {
    */
   JsonW3Converter(final JsonParserOptions opts) throws QueryException {
     super(opts);
+    fmt = jopts.get(JsonParserOptions.NUMBER_FORMAT);
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
     if(dupl == JsonDuplicates.RETAIN) {
       throw OPTION_JSON_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl);
@@ -106,8 +115,38 @@ public final class JsonW3Converter extends JsonConverter {
   }
 
   @Override
-  public void numberLit(final byte[] value) throws QueryException {
-    stack.push(numberParser != null ? numberParser.apply(value) : Dbl.get(Dbl.parse(value, null)));
+  public void numberLit(final byte[] string) throws QueryException {
+    Value value = null;
+    if(fmt != JsonNumberFormat.DOUBLE) {
+      final BigDecimal bd = Dec.parse(string, null, false);
+      if(bd != null) {
+        value = decimalOrInteger(bd);
+      } else if(fmt == JsonNumberFormat.DECIMAL) {
+        try {
+          value = decimalOrInteger(new BigDecimal(Dbl.parse(string, null)));
+        } catch(final NumberFormatException ex) {
+          Util.debug(ex);
+          throw FUNCCAST_X_X.get(info, "xs:decimal", string);
+        }
+      }
+    }
+    if(value == null) value = Dbl.get(Dbl.parse(string, null));
+    stack.push(value);
+  }
+
+  /**
+   * Converts a decimal to an integer if possible.
+   * @param bd decimal value
+   * @return integer or decimal item
+   */
+  private static Item decimalOrInteger(final BigDecimal bd) {
+    final BigDecimal normalized = bd.stripTrailingZeros();
+    if(normalized.scale() <= 0 &&
+        normalized.compareTo(MIN_LONG_BD) >= 0 &&
+        normalized.compareTo(MAX_LONG_BD) <= 0) {
+      return Itr.get(normalized.longValue());
+    }
+    return Dec.get(bd);
   }
 
   @Override
