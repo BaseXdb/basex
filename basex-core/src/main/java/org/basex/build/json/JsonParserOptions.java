@@ -19,8 +19,11 @@ public final class JsonParserOptions extends JsonOptions {
   public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
   /** Option: fallback function (parse-json, json-to-xml). */
   public static final ValueOption FALLBACK = new ValueOption("fallback", FUNCTION_ZO);
-  /** Option: number-parser function (parse-json, json-to-xml). */
+  /** Option: number-parser function (json-to-xml). */
   public static final ValueOption NUMBER_PARSER = new ValueOption("number-parser", FUNCTION_ZO);
+  /** Option: number format (parse-json). */
+  public static final EnumOption<JsonNumberFormat> NUMBER_FORMAT =
+      new EnumOption<>("number-format", JsonNumberFormat.DOUBLE);
   /** Option: handle duplicates (parse-json, json-to-xml). */
   public static final EnumOption<JsonDuplicates> DUPLICATES =
       new EnumOption<>("duplicates", JsonDuplicates.class);
@@ -30,6 +33,18 @@ public final class JsonParserOptions extends JsonOptions {
   public static final BooleanOption VALIDATE = new BooleanOption("validate");
   /** Option: encoding (custom). */
   public static final StringOption ENCODING = CommonOptions.ENCODING;
+
+  /** Number format. */
+  public enum JsonNumberFormat {
+    /** Double.   */ DOUBLE,
+    /** Decimal.  */ DECIMAL,
+    /** Adaptive. */ ADAPTIVE;
+
+    @Override
+    public String toString() {
+      return Enums.string(this);
+    }
+  }
 
   /** Duplicate handling. */
   public enum JsonDuplicates {

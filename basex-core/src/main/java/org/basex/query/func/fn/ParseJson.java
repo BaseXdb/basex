@@ -6,6 +6,7 @@ import java.io.*;
 
 import org.basex.build.json.*;
 import org.basex.build.json.JsonOptions.*;
+import org.basex.build.json.JsonParserOptions.*;
 import org.basex.io.in.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
@@ -66,8 +67,15 @@ public abstract class ParseJson extends ParseFn {
     }
     final Value numberParser = options.get(JsonParserOptions.NUMBER_PARSER);
     if(!numberParser.isEmpty()) {
+      if(jf == JsonFormat.W3 || jf == JsonFormat.XQUERY) {
+        throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.NUMBER_PARSER));
+      }
       final FItem np = toFunction(numberParser, 1, qc);
       converter.numberParser(s -> np.invoke(qc, info, Atm.get(s)).item(qc, info));
+    }
+    final JsonNumberFormat fmt = options.get(JsonParserOptions.NUMBER_FORMAT);
+    if(fmt != JsonNumberFormat.DOUBLE && jf != JsonFormat.W3 && jf != JsonFormat.XQUERY) {
+      throw INVALIDOPTION_X.get(info, Options.unknown(JsonParserOptions.NUMBER_FORMAT));
     }
     final Value nll = options.get(JsonParserOptions.NULL);
     if(nll != Empty.VALUE && jf != JsonFormat.W3 && jf != JsonFormat.XQUERY) {
