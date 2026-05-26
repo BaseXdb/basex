@@ -593,7 +593,7 @@ public final class FileModuleTest extends SandboxTest {
 
     // GH-2674: read and write same file: content is read before file is truncated
     query(func.args(PATH1, "hello"));
-    query(func.args(PATH1, _LAZY_CACHE.args(_FILE_READ_TEXT_LINES.args(PATH1))));
-    query(_FILE_READ_TEXT_LINES.args(PATH1), "hello");
+    query(func.args(PATH1, " ('x', " + _LAZY_CACHE.args(_FILE_READ_TEXT_LINES.args(PATH1)) + ")"));
+    query(_FILE_READ_TEXT_LINES.args(PATH1), "x\nhello");
   }
 }

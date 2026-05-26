@@ -37,13 +37,13 @@ public class FileWriteBinary extends FileWriteFn {
     final Path path = toTarget(arg(0), qc);
     final Long offset = toLongOrNull(arg(2), qc);
     if(offset != null) {
-      final byte[] content = toBin(arg(1), qc).binary(info);
       // write file chunk
+      final byte[] value = toBin(arg(1), qc).binary(info);
       try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
         final long length = raf.length();
         if(offset < 0 || offset > length) throw FILE_OUT_OF_RANGE_X_X.get(info, offset, length);
         raf.seek(offset);
-        raf.write(content);
+        raf.write(value);
       }
     } else if(arg(1) instanceof final ArchiveCreate ac) {
       // optimization: stream archive to disk
@@ -51,9 +51,10 @@ public class FileWriteBinary extends FileWriteFn {
         ac.create(out, qc);
       }
     } else {
-      final Bin content = toBin(arg(1), qc);
-      try(BufferOutput out = BufferOutput.get(new FileOutputStream(path.toFile(), append))) {
-        IO.write(content.input(info), out);
+      // default case: no archive, no offset
+      final Bin value = toBin(arg(1), qc);
+      try(FileOutputStream out = new FileOutputStream(path.toFile(), append)) {
+        IO.write(value.input(info), out);
       }
     }
   }

@@ -11,7 +11,7 @@ import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
-import org.basex.query.iter.*;
+import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -37,33 +37,32 @@ abstract class FileWriteFn extends FileFn {
       throws QueryException, IOException {
 
     final Path path = toTarget(arg(0), qc);
+    final Value value = arg(1).atomValue(qc, info);
     final String encoding = toEncodingOrNull(arg(2), FILE_UNKNOWN_ENCODING_X, qc);
-    final Charset cs = encoding == null || encoding == Strings.UTF8 ? null :
+    final Charset cs = encoding == null || encoding == Strings.UTF8 ? StandardCharsets.UTF_8 :
       Charset.forName(encoding);
 
-    if(lines) {
-      final byte[] nl = cs == null ? token(Prop.NL) : Prop.NL.getBytes(cs);
-      final Iter values = arg(1).atomIter(qc, info);
-      try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
-        for(Item item; (item = qc.next(values)) != null;) {
+    try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
+      if(lines) {
+        final byte[] nl = cs == StandardCharsets.UTF_8 ? token(Prop.NL) : Prop.NL.getBytes(cs);
+        for(final Item item : value) {
+          qc.checkStop();
           if(!item.type.isStringOrUntyped()) throw typeError(item, BasicType.STRING, info);
 
           final byte[] token = item.string(info);
-          out.write(cs == null ? token : string(token).getBytes(cs));
+          out.write(cs == StandardCharsets.UTF_8 ? token : string(token).getBytes(cs));
           out.write(nl);
         }
-      }
-    } else {
-      // workaround to preserve streamable string items
-      Item value = toAtomItem(arg(1), qc);
-      if(!(value instanceof AStr)) value = Str.get(toToken(value));
-      try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
-        if(cs == null) {
-          try(TextInput in = value.stringInput(info)) {
+      } else {
+        // workaround to preserve streamable string items
+        Item item = value.item(qc, info);
+        if(!(item instanceof AStr)) item = Str.get(toToken(item));
+        if(cs == StandardCharsets.UTF_8) {
+          try(TextInput in = item.stringInput(info)) {
             for(int cp; (cp = in.read()) != -1;) out.print(cp);
           }
         } else {
-          out.write(string(value.string(info)).getBytes(cs));
+          out.write(string(item.string(info)).getBytes(cs));
         }
       }
     }
