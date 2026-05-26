@@ -1988,6 +1988,11 @@ return
     final Function func = JSON_DOC;
     query(func.args("src/test/resources/example.json") + "('address')('state')", "NY");
     query(func.args("src/test/resources/example.json") + "?address?state", "NY");
+    query(func.args("src/test/resources/example.json", " { 'number-format': 'adaptive' }")
+        + "//postalCode/data() => type-of()", "xs:integer");
+
+    error(func.args("src/test/resources/example.json", " { 'number-parser': xs:decimal#1 }"),
+        INVALIDOPTION_X);
   }
 
   /** Test method. */
@@ -2805,6 +2810,27 @@ return
         "a[\\b]b\uD801\uDC02c[\\uD803]d[\\uDC04]e[\\uD805][\\uD806]");
     query("try {" + func.args("nvll") + "} catch * { $err:description }",
         "(1:1): Unexpected JSON value: 'nvll'.");
+
+    query(func.args("1") + " => type-of()", "xs:double");
+    query(func.args("1", " { 'number-format': 'double' }") + " => type-of()", "xs:double");
+    query(func.args("1e6", " { 'number-format': 'double' }") + " => type-of()", "xs:double");
+
+    query(func.args("1", " { 'number-format': 'decimal' }") + " => type-of()", "xs:integer");
+    query(func.args("-5", " { 'number-format': 'decimal' }") + " => type-of()", "xs:integer");
+    query(func.args("2.0", " { 'number-format': 'decimal' }") + " => type-of()", "xs:integer");
+    query(func.args("1.5", " { 'number-format': 'decimal' }") + " => type-of()", "xs:decimal");
+    query(func.args("1e6", " { 'number-format': 'decimal' }") + " => type-of()", "xs:integer");
+    query(func.args("1.5e0", " { 'number-format': 'decimal' }") + " => type-of()", "xs:decimal");
+    query(func.args("99999999999999999999", " { 'number-format': 'decimal' }")
+        + " => type-of()", "xs:decimal");
+
+    query(func.args("1", " { 'number-format': 'adaptive' }") + " => type-of()", "xs:integer");
+    query(func.args("2.0", " { 'number-format': 'adaptive' }") + " => type-of()", "xs:integer");
+    query(func.args("1.5", " { 'number-format': 'adaptive' }") + " => type-of()", "xs:decimal");
+    query(func.args("1e6", " { 'number-format': 'adaptive' }") + " => type-of()", "xs:double");
+
+    error(func.args("1", " { 'number-parser': xs:decimal#1 }"), INVALIDOPTION_X);
+    error(func.args("1e9999", " { 'number-format': 'decimal' }"), FUNCCAST_X_X);
   }
 
   /** Test method. */
