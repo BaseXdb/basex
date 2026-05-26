@@ -5,7 +5,7 @@ import static org.basex.query.func.Function.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 /**
  * This class tests the functions of the XQuery Module.
@@ -212,6 +212,127 @@ xquery:fork-join(
     error(func.args(" (123, 123)"), INVTYPE_X);
     error(func.args(" error#0"), FUNERR1);
     error(func.args(" replicate(error#0, 100)"), FUNERR1);
+  }
+
+  /** Test method. */
+  @Test public void forkJoinReport() {
+    final Function func = _XQUERY_FORK_JOIN;
+    final String report = " { 'report': true() }";
+    // successful results are wrapped in records
+    query(func.args(" (true#0, false#0)", report) + " ! ?value", "true\nfalse");
+    // errors are captured, not raised (single function: option bypasses the direct-call rewrite)
+    query("exists(" + func.args(" error#0", report) + "?error)", true);
+    query(func.args(" error#0", report) + "?error?code => local-name-from-QName()", "FOER0000");
+    // mixed outcomes: count successes and failures (key existence)
+    query("let $r := " + func.args(" (true#0, error#0, false#0)", report) +
+        " return (count($r[exists(?value)]), count($r[exists(?error)]))", "2\n1");
+    // the reported error is the canonical catch map ($err:map), with no self-referential 'map' key
+    query("let $a := " + func.args(" fn() { 1 div 0 }", report) + "?error" +
+        " let $b := try { 1 div 0 } catch * { $err:map }" +
+        " return (deep-equal(sort(map:keys($a)), sort(map:keys($b))), " +
+        "not(map:contains($a, 'map')))",
+        "true\ntrue");
+    // report overrides the 'results' and 'errors' options
+    query(func.args(" (true#0, error#0)", " { 'report': true(), 'results': false() }") +
+        " => count()", 2);
+  }
+
+  /** Test method. */
+  @Test @Timeout(60) public void forkJoinTimeout() {
+    final Function func = _XQUERY_FORK_JOIN;
+    // long-running branches are cancelled once the timeout is exceeded
+    error(func.args(" (1 to 4) ! fn() { prof:sleep(30000) }", " { 'timeout': 0.1 }"),
+        XQUERY_TIMEOUT);
+    // a timeout that is not reached returns the results
+    query(func.args(" (fn() { 1 }, fn() { 2 })", " { 'timeout': 60 }") + " => count()", 2);
+    // a non-positive timeout is treated as "no timeout"
+    query(func.args(" (fn() { 1 }, fn() { 2 })", " { 'timeout': -1 }") + " => count()", 2);
+  }
+
+  /** Test method. */
+  @Test public void forEach() {
+    final Function func = _XQUERY_FOR_EACH;
+    // apply the action to each item in parallel, results in input order
+    query(func.args(" 1 to 5", " fn($n) { $n * $n }"), "1\n4\n9\n16\n25");
+    query(func.args(" ()", " fn($n) { $n }"), "");
+    query(func.args(" 1 to 100", " data#1") + " => sum()", 5050);
+    // positional parameter
+    query(func.args(" ('a', 'b', 'c')", " fn($v, $p) { $p || $v }"), "1a\n2b\n3c");
+    // an action without parameters is run once per item
+    query(func.args(" (1, 2, 3)", " fn() { 'x' }"), "x\nx\nx");
+    // results of varying size are concatenated in input order
+    query(func.args(" (1, 2, 3)", " fn($n) { 1 to $n }"), "1\n1\n2\n1\n2\n3");
+    // options
+    query(func.args(" 1 to 3", " fn($n) { $n }", " { 'results': false() }"), "");
+    query("count(" + func.args(" 1 to 100", " fn($n) { (1, 2) }", " { 'parallel': 4 }") + ')', 200);
+    query(func.args(" (1, 2)", " fn($n) { error() }", " { 'errors': false() }"), "");
+    // report mode
+    query(func.args(" (1, 2)", " fn($n) { $n }", " { 'report': true() }") + " ! ?value", "1\n2");
+    query("exists(" + func.args(" 1", " fn($n) { error() }", " { 'report': true() }") + "?error)",
+        true);
+    // optimizations
+    check(func.args(" ()", " fn($n) { $n }"), "", empty());
+    // errors
+    error(func.args(" 1", " fn($a, $b, $c) { $a }"), INVARITY_X_X);
+    error(func.args(" 1", " 123"), INVTYPE_X);
+    error(func.args(" (1, 2)", " fn($n) { error() }"), FUNERR1);
+    error(func.args(" 1", " %updating fn($n) { delete node <a/> }"), FUNCUP_X);
+  }
+
+  /** Test method. */
+  @Test @Timeout(60) public void forkAny() {
+    final Function func = _XQUERY_FORK_ANY;
+    // single function and empty input
+    query(func.args(" true#0"), true);
+    query(func.args(" ()"), "");
+    // the first function to finish successfully wins
+    query(func.args(" (fn() { prof:sleep(30000), 1 }, fn() { 2 })"), 2);
+    // a failing branch is ignored if another one succeeds
+    query(func.args(" (error#0, fn() { 42 })"), 42);
+    // a successful empty sequence is a valid winner
+    query(func.args(" (error#0, fn() { () })"), "");
+    // all branches fail: an error is raised
+    error(func.args(" (error#0, error#0)"), FUNERR1);
+    // long-running branches are cancelled once the timeout is exceeded
+    error(func.args(" (1 to 4) ! fn() { prof:sleep(30000) }", " { 'timeout': 0.1 }"),
+        XQUERY_TIMEOUT);
+    // a single function with a timeout is cancelled, too (no direct-invoke shortcut)
+    error(func.args(" fn() { prof:sleep(30000) }", " { 'timeout': 0.1 }"), XQUERY_TIMEOUT);
+    // errors
+    error(func.args(" error#0"), FUNERR1);
+    error(func.args(" count#1"), INVARITY_X_X);
+    error(func.args(" 123"), INVTYPE_X);
+    error(func.args(" (%updating fn() { delete node <a/> }, true#0)"), FUNCUP_X);
+  }
+
+  /** Test method. */
+  @Test @Timeout(60) public void reduce() {
+    final Function func = _XQUERY_REDUCE;
+    // parallel sum
+    query(func.args(" 1 to 100", " 0", " op('+')", " op('+')"), 5050);
+    query(func.args(" 1 to 1000", " 0", " op('+')", " op('+')", " { 'parallel': 8 }"), 500500);
+    // empty input returns the seed
+    query(func.args(" ()", " 42", " op('+')", " op('+')"), 42);
+    // single item: the action is applied once to the seed
+    query(func.args(" 5", " 0", " op('+')", " op('+')"), 5);
+    // a dedicated single-threaded pool yields the same result
+    query(func.args(" 1 to 100", " 0", " op('+')", " op('+')", " { 'parallel': 1 }"), 5050);
+    // associative string concatenation
+    query(func.args(" 1 to 5", " ''", " fn($a, $b) { $a || $b }", " fn($a, $b) { $a || $b }"),
+        12345);
+    // accumulating a sequence, with the empty sequence as identity
+    query(func.args(" 1 to 5", " ()", " fn($a, $b) { ($a, $b) }", " fn($a, $b) { ($a, $b) }"),
+        "1\n2\n3\n4\n5");
+    // count (per-chunk count, combined by addition)
+    query(func.args(" 1 to 1000", " 0", " fn($a, $b) { $a + 1 }", " op('+')"), 1000);
+    // errors
+    error(func.args(" 1 to 10", " 0", " fn($a, $b) { error() }", " op('+')"), FUNERR1);
+    error(func.args(" 1 to 4", " 0", " op('+')", " fn($a, $b, $c) { $a }"), INVARITY_X_X);
+    error(func.args(" 1 to 4", " 0", " %updating fn($a, $b) { delete node <a/> }", " op('+')"),
+        FUNCUP_X);
+    // long-running aggregation is cancelled once the timeout is exceeded
+    error(func.args(" 1 to 4", " 0", " fn($a, $b) { prof:sleep(30000) }", " op('+')",
+        " { 'timeout': 0.1 }"), XQUERY_TIMEOUT);
   }
 
   /** Test method. */

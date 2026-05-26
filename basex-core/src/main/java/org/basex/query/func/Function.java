@@ -2139,11 +2139,21 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_O, MAP_ZO, MAP_ZO), EMPTY_SEQUENCE_Z,
       flag(UPD), XQUERY_URI),
   /** XQuery function. */
+  _XQUERY_FOR_EACH(XQueryForEach::new, "for-each(input,action[,options])",
+      params(ITEM_ZM, FUNCTION_O, MAP_ZO), ITEM_ZM, flag(), XQUERY_URI, Perm.ADMIN),
+  /** XQuery function. */
+  _XQUERY_FORK_ANY(XQueryForkAny::new, "fork-any(functions[,options])",
+      params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(NDT), XQUERY_URI, Perm.ADMIN),
+  /** XQuery function. */
   _XQUERY_FORK_JOIN(XQueryForkJoin::new, "fork-join(functions[,options])",
       params(FUNCTION_ZM, MAP_ZO), ITEM_ZM, flag(), XQUERY_URI, Perm.ADMIN),
   /** XQuery function. */
   _XQUERY_PARSE(XQueryParse::new, "parse(query[,options])",
       params(ANY_ATOMIC_TYPE_O, MAP_ZO), NODE_O, flag(NDT), XQUERY_URI, Perm.CREATE),
+  /** XQuery function. */
+  _XQUERY_REDUCE(XQueryReduce::new, "reduce(input,init,action,combine[,options])",
+      params(ITEM_ZM, ITEM_ZM, FUNCTION_O, FUNCTION_O, MAP_ZO), ITEM_ZM,
+      flag(), XQUERY_URI, Perm.ADMIN),
 
   // XSLT Module
 

@@ -330,12 +330,13 @@ public class QueryException extends Exception {
   }
 
   /**
-   * Returns a map with values for this exception.
+   * Returns a map with values for this exception. This is the same map that a try/catch clause
+   * exposes as {@code $err:map} (the last entry of the value list).
    * @return values
    * @throws QueryException query exception
    */
   public XQMap map() throws QueryException {
-    return map(values());
+    return (XQMap) values().peek();
   }
 
   /**

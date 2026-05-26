@@ -99,7 +99,7 @@ public class XQueryEval extends StandardFunc {
       // timeout
       final long ms = ((ANum) options.get(XQueryOptions.TIMEOUT)).dec(info).
           multiply(BigDecimal.valueOf(1000)).longValue();
-      if(ms != 0) {
+      if(ms > 0) {
         if(to == null) to = new Timer(true);
         to.schedule(new TimerTask() {
           @Override
