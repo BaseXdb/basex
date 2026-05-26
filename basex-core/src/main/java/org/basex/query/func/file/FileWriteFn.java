@@ -41,10 +41,10 @@ abstract class FileWriteFn extends FileFn {
     final Charset cs = encoding == null || encoding == Strings.UTF8 ? null :
       Charset.forName(encoding);
 
-    try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
-      if(lines) {
-        final byte[] nl = cs == null ? token(Prop.NL) : Prop.NL.getBytes(cs);
-        final Iter values = arg(1).atomIter(qc, info);
+    if(lines) {
+      final byte[] nl = cs == null ? token(Prop.NL) : Prop.NL.getBytes(cs);
+      final Iter values = arg(1).atomIter(qc, info);
+      try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
         for(Item item; (item = qc.next(values)) != null;) {
           if(!item.type.isStringOrUntyped()) throw typeError(item, BasicType.STRING, info);
 
@@ -52,10 +52,12 @@ abstract class FileWriteFn extends FileFn {
           out.write(cs == null ? token : string(token).getBytes(cs));
           out.write(nl);
         }
-      } else {
-        // workaround to preserve streamable string items
-        Item value = toAtomItem(arg(1), qc);
-        if(!(value instanceof AStr)) value = Str.get(toToken(value));
+      }
+    } else {
+      // workaround to preserve streamable string items
+      Item value = toAtomItem(arg(1), qc);
+      if(!(value instanceof AStr)) value = Str.get(toToken(value));
+      try(PrintOutput out = PrintOutput.get(new FileOutputStream(path.toFile(), append))) {
         if(cs == null) {
           try(TextInput in = value.stringInput(info)) {
             for(int cp; (cp = in.read()) != -1;) out.print(cp);

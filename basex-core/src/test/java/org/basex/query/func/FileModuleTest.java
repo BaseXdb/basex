@@ -549,6 +549,11 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_READ_TEXT.args(PATH1), "0");
     query(func.args(PATH1, bin, 1));
     query(_FILE_READ_TEXT.args(PATH1), "00");
+
+    // GH-2674: read and write same file: content is read before file is truncated
+    query(func.args(PATH1, bin));
+    query(func.args(PATH1, _LAZY_CACHE.args(_FILE_READ_BINARY.args(PATH1))));
+    query(_FILE_READ_TEXT.args(PATH1), "0");
   }
 
   /** Test method. */
@@ -567,6 +572,11 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_READ_TEXT.args(PATH1), "\u00b0");
     query(func.args(PATH2, _FILE_READ_TEXT.args(PATH1)));
     query(_FILE_READ_TEXT.args(PATH2), "\u00b0");
+
+    // GH-2674: read and write same file: content is read before file is truncated
+    query(func.args(PATH1, "hello"));
+    query(func.args(PATH1, _LAZY_CACHE.args(_FILE_READ_TEXT.args(PATH1))));
+    query(_FILE_READ_TEXT.args(PATH1), "hello");
   }
 
   /** Test method. */
@@ -580,5 +590,10 @@ public final class FileModuleTest extends SandboxTest {
     query(_FILE_SIZE.args(PATH1), 1 + Prop.NL.length());
     query(func.args(PATH1, "\u00fc", "US-ASCII"));
     query(_FILE_READ_TEXT_LINES.args(PATH1), "?");
+
+    // GH-2674: read and write same file: content is read before file is truncated
+    query(func.args(PATH1, "hello"));
+    query(func.args(PATH1, _LAZY_CACHE.args(_FILE_READ_TEXT_LINES.args(PATH1))));
+    query(_FILE_READ_TEXT_LINES.args(PATH1), "hello");
   }
 }

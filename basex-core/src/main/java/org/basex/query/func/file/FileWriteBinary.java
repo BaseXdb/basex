@@ -10,6 +10,7 @@ import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.func.archive.*;
 import org.basex.query.value.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 
 /**
@@ -36,22 +37,23 @@ public class FileWriteBinary extends FileWriteFn {
     final Path path = toTarget(arg(0), qc);
     final Long offset = toLongOrNull(arg(2), qc);
     if(offset != null) {
+      final byte[] content = toBin(arg(1), qc).binary(info);
       // write file chunk
       try(RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
         final long length = raf.length();
         if(offset < 0 || offset > length) throw FILE_OUT_OF_RANGE_X_X.get(info, offset, length);
         raf.seek(offset);
-        raf.write(toBin(arg(1), qc).binary(info));
+        raf.write(content);
+      }
+    } else if(arg(1) instanceof final ArchiveCreate ac) {
+      // optimization: stream archive to disk
+      try(BufferOutput out = BufferOutput.get(new FileOutputStream(path.toFile(), append))) {
+        ac.create(out, qc);
       }
     } else {
-      // write full file
+      final Bin content = toBin(arg(1), qc);
       try(BufferOutput out = BufferOutput.get(new FileOutputStream(path.toFile(), append))) {
-        if(arg(1) instanceof final ArchiveCreate ac) {
-          // optimization: stream archive to disk
-          ac.create(out, qc);
-        } else {
-          IO.write(toBin(arg(1), qc).input(info), out);
-        }
+        IO.write(content.input(info), out);
       }
     }
   }
