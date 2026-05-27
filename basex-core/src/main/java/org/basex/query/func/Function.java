@@ -627,14 +627,6 @@ public enum Function implements AFunction {
   ROUND_HALF_TO_EVEN(FnRoundHalfToEven::new, "round-half-to-even(value[,precision])",
       params(NUMERIC_ZO, INTEGER_ZO), NUMERIC_ZO),
   /** XQuery function. */
-  SCAN_LEFT(FnScanLeft::new, "scan-left(input,init,action)",
-      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_ZM, ITEM_O, INTEGER_O).seqType()),
-      ARRAY_ZM),
-  /** XQuery function. */
-  SCAN_RIGHT(FnScanRight::new, "scan-right(input,init,action)",
-      params(ITEM_ZM, ITEM_ZM, FuncType.get(ITEM_ZM, ITEM_O, ITEM_ZM, INTEGER_O).seqType()),
-      ARRAY_ZM),
-  /** XQuery function. */
   SCHEMA_TYPE(FnSchemaType::new, "schema-type(name)",
       params(QNAME_O), Records.SCHEMA_TYPE.get().seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
