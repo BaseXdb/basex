@@ -6,6 +6,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.users.*;
 import org.basex.io.out.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.jupiter.api.*;
 
@@ -26,7 +27,7 @@ public final class BaseXClientTest extends BaseXTest {
    * @throws IOException I/O exception
    */
   @Test public void port() throws IOException {
-    equals("1", new String[] { "-p9898", "-q1" }, new String[] { "-p9898" });
+    equals("1" + Prop.NL, new String[] { "-p9898", "-q1" }, new String[] { "-p9898" });
   }
 
   /**
@@ -49,7 +50,7 @@ public final class BaseXClientTest extends BaseXTest {
    */
   @Test public void user() throws IOException {
     run("-cEXIT", "-cDROP USER " + NAME);
-    equals("5", new String[] { "-U" + NAME, "-P" + NAME, "-q5" },
+    equals("5" + Prop.NL, new String[] { "-U" + NAME, "-P" + NAME, "-q5" },
         new String[] { "-cCREATE USER " + NAME + ' ' + NAME });
     run("-cEXIT", "-cDROP USER " + NAME);
   }

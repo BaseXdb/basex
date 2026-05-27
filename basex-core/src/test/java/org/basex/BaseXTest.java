@@ -33,22 +33,23 @@ public abstract class BaseXTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public void bind() throws IOException {
-    equals("1", "-ba=1", "-qdeclare variable $a external; $a");
-    equals("2", "-ba=1", "-bb=1",
+    equals("1" + Prop.NL, "-ba=1", "-qdeclare variable $a external; $a");
+    equals("2" + Prop.NL, "-ba=1", "-bb=1",
         "-qdeclare variable $a external; declare variable $b external; $a + $b");
-    equals("3", "-ba=1", "-bb=2",
+    equals("3" + Prop.NL, "-ba=1", "-bb=2",
         "-qdeclare variable $a external; declare variable $b external; $a + $b");
 
     INPUT.write("declare variable $a external; $a");
-    equals("4", "-ba=4", INPUT.toString());
-    equals("5,6;7'", "-ba=5,6;7'", "-qdeclare variable $a external; $a");
+    equals("4" + Prop.NL, "-ba=4", INPUT.toString());
+    equals("5,6;7'" + Prop.NL, "-ba=5,6;7'", "-qdeclare variable $a external; $a");
 
     // bind variables with namespaces
-    equals("8", "-bQ{}a=8", "-qdeclare variable $a external; $a");
-    equals("9", "-bQ{URI}a=9", "-qdeclare namespace a='URI'; declare variable $a:a external; $a:a");
+    equals("8" + Prop.NL, "-bQ{}a=8", "-qdeclare variable $a external; $a");
+    equals("9" + Prop.NL, "-bQ{URI}a=9",
+        "-qdeclare namespace a='URI'; declare variable $a:a external; $a:a");
 
     // check if parameters are evaluated in given order
-    equals("12", "-ba=1", "-qdeclare variable $a external; $a",
+    equals("1" + Prop.NL + "2" + Prop.NL, "-ba=1", "-qdeclare variable $a external; $a",
         "-ba=2", "-qdeclare variable $a external; $a");
   }
 
@@ -74,8 +75,8 @@ public abstract class BaseXTest extends SandboxTest {
   @Test public void input() throws IOException {
     final String in = "<X/>";
     INPUT.write(in);
-    equals(in, "-i" + INPUT, "-q.");
-    equals(in, "-i" + in, "-q.");
+    equals(in + Prop.NL, "-i" + INPUT, "-q.");
+    equals(in + Prop.NL, "-i" + in, "-q.");
   }
 
   /**
@@ -83,8 +84,8 @@ public abstract class BaseXTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public void command() throws IOException {
-    equals("1", "-cXQUERY 1");
-    equals("\t", "-cXQUERY '&#x9;'");
+    equals("1" + Prop.NL, "-cXQUERY 1");
+    equals("\t" + Prop.NL, "-cXQUERY '&#x9;'");
   }
 
   /**
@@ -99,7 +100,7 @@ public abstract class BaseXTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public void commands() throws IOException {
-    equals("12", "-c XQUERY 1", "-c XQUERY 2");
+    equals("1" + Prop.NL + "2" + Prop.NL, "-c XQUERY 1", "-c XQUERY 2");
   }
 
   /**
@@ -108,7 +109,7 @@ public abstract class BaseXTest extends SandboxTest {
    */
   @Test public void commandFile() throws IOException {
     INPUT.write("xquery 1" + Prop.NL + "xquery 2" + Prop.NL);
-    equals("12", "-C" + INPUT.path());
+    equals("1" + Prop.NL + "2" + Prop.NL, "-C" + INPUT.path());
   }
 
   /**
@@ -116,7 +117,7 @@ public abstract class BaseXTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public void query() throws IOException {
-    equals("3", "-q1+2");
+    equals("3" + Prop.NL, "-q1+2");
   }
 
   /**
@@ -125,7 +126,7 @@ public abstract class BaseXTest extends SandboxTest {
    */
   @Test public void queryFile() throws IOException {
     INPUT.write("1");
-    equals("1", "-Q", INPUT.path());
+    equals("1" + Prop.NL, "-Q", INPUT.path());
   }
 
   /**
@@ -140,7 +141,7 @@ public abstract class BaseXTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public void runs() throws IOException {
-    equals("1", "-r2", "-q1");
+    equals("1" + Prop.NL, "-r2", "-q1");
   }
 
   /**
@@ -155,9 +156,10 @@ public abstract class BaseXTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test public void serial() throws IOException {
-    equals("1", "-smethod=text", "-q<a>1</a>");
+    equals("1" + Prop.NL, "-smethod=text", "-q<a>1</a>");
     // check if parameters are evaluated in given order
-    equals("1<x>1</x>", "-smethod=text", "-q<x>1</x>", "-smethod=xml", "-q<x>1</x>");
+    equals("1" + Prop.NL + "<x>1</x>" + Prop.NL,
+        "-smethod=text", "-q<x>1</x>", "-smethod=xml", "-q<x>1</x>");
   }
 
   /**
@@ -176,7 +178,7 @@ public abstract class BaseXTest extends SandboxTest {
   @Test public void stripws() throws IOException {
     final String in = "<a> </a>";
     INPUT.write(in);
-    equals("<a/>", "-w", "-i" + INPUT, "-q.");
+    equals("<a/>" + Prop.NL, "-w", "-i" + INPUT, "-q.");
   }
 
   /**
@@ -188,12 +190,12 @@ public abstract class BaseXTest extends SandboxTest {
     equals("", "-Oserialize=no", "-q1");
     equals("", "-Oserialize=0", "-q1");
 
-    equals("1", "-Oserialize=true", "-q1");
-    equals("1", "-Oserialize=yes", "-q1");
-    equals("1", "-Oserialize=1", "-q1");
+    equals("1" + Prop.NL, "-Oserialize=true", "-q1");
+    equals("1" + Prop.NL, "-Oserialize=yes", "-q1");
+    equals("1" + Prop.NL, "-Oserialize=1", "-q1");
 
     equals("", "-Oserialize=", "-q1");
-    equals("1", "-Oserialize=", "-Oserialize=", "-q1");
+    equals("1" + Prop.NL, "-Oserialize=", "-Oserialize=", "-q1");
   }
 
   /**

@@ -12,6 +12,7 @@ import org.basex.api.client.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.*;
 import org.basex.io.*;
+import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -27,8 +28,10 @@ public abstract class CLI extends Main {
 
   /** Cached initial commands. */
   protected final ArrayList<Entry<String, String>> commands = new ArrayList<>();
-  /** Output file for queries. */
-  protected OutputStream out = System.out;
+  /** Output stream. */
+  protected PrintOutput out = PrintOutput.get(System.out);
+  /** Output is written to a file. */
+  protected boolean fileOutput;
   /** Verbose mode. */
   protected boolean verbose;
 
@@ -91,7 +94,11 @@ public abstract class CLI extends Main {
    */
   protected final void execute(final Command cmd, final boolean info) throws IOException {
     final Session ss = session();
+    final long size = out.size();
     ss.execute(cmd);
+    // non-empty query result, no file output, no query info: attach newline
+    if(cmd instanceof AQuery && out.size() != size && !fileOutput && !info) out.print(Prop.NL);
+    out.flush();
     if(info) Util.print(ss.info());
   }
 

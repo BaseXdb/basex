@@ -97,9 +97,9 @@ public class BaseX extends CLI {
             execute(new Set(MainOptions.BINDINGS, value), false);
             break;
           case 'o':
-            if(out != System.out) out.close();
+            quit();
             out = new PrintOutput(new IOFile(value));
-            session().setOutputStream(out);
+            fileOutput = true;
             break;
           case 'O': {
             final String[] kv = value.split("=", 2);
@@ -203,8 +203,8 @@ public class BaseX extends CLI {
    * @throws IOException I/O exception
    */
   private void quit() throws IOException {
-    if(out == System.out || out == System.err) out.flush();
-    else out.close();
+    if(fileOutput) out.close();
+    else out.flush();
   }
 
   @Override
