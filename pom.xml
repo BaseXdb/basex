@@ -222,16 +222,12 @@
 
   <profiles>
     <profile>
-      <id>ossrh</id>
+      <id>central</id>
       <distributionManagement>
         <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+          <id>basex-publish</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </snapshotRepository>
-        <repository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
       </distributionManagement>
       <build>
         <plugins>
@@ -268,6 +264,7 @@
                   <goal>sign</goal>
                 </goals>
                 <configuration>
+                  <keyname>cg@basex.org</keyname>
                   <!-- This is necessary for gpg to not try to use the pinentry programs -->
                   <gpgArguments>
                     <arg>--pinentry-mode</arg>
@@ -293,6 +290,18 @@
                 </goals>
               </execution>
             </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.10.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>basex-publish</publishingServerId>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -397,7 +406,7 @@
           <version>3.3.1</version>
           <configuration>
             <tagNameFormat>@{project.version}</tagNameFormat>
-            <releaseProfiles>ossrh</releaseProfiles>
+            <releaseProfiles>central</releaseProfiles>
             <scmCommentPrefix>Release: </scmCommentPrefix>
           </configuration>
         </plugin>
@@ -463,18 +472,6 @@
             <linkXRef>false</linkXRef>
             <consoleOutput>true</consoleOutput>
             <violationSeverity>warning</violationSeverity>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.7.0</version>
-          <extensions>true</extensions>
-          <configuration>
-            <serverId>ossrh</serverId>
-            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-            <autoReleaseAfterClose>true</autoReleaseAfterClose>
           </configuration>
         </plugin>
 
