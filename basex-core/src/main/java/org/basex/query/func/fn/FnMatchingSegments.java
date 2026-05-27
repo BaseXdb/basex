@@ -7,7 +7,6 @@ import org.basex.query.func.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
-import org.basex.query.value.seq.*;
 
 /**
  * Function implementation.
@@ -18,10 +17,9 @@ import org.basex.query.value.seq.*;
 public final class FnMatchingSegments extends RegExFn {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    final String value = toStringOrNull(arg(0), qc);
+    final String value = toZeroString(arg(0), qc);
     final byte[] pattern = toToken(arg(1), qc);
     final byte[] flags = toZeroToken(arg(2), qc);
-    if(value == null) return Empty.VALUE;
 
     final Matcher matcher = pattern(pattern, flags, qc).matcher(value);
     final ValueBuilder vb = new ValueBuilder(qc);
