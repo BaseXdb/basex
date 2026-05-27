@@ -926,8 +926,9 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final AnnList anns) throws QueryException {
     final InputInfo ii = info();
+    final int p = pos;
     final QNm name = eQName(sc.funcNS, FUNCNAME);
-    if(reserved(name)) throw error(RESERVED_X, name.local());
+    if(reserved(name, p)) throw error(RESERVED_X, name.local());
 
     wsCheck("(");
     if(!anns.contains(Annotation.PRIVATE)) {
@@ -949,9 +950,11 @@ public class QueryParser extends InputParser {
   /**
    * Checks if the specified name equals a reserved keyword.
    * @param name name
+   * @param p position of the first character of the name
    * @return result of check
    */
-  private static boolean reserved(final QNm name) {
+  private boolean reserved(final QNm name, final int p) {
+    if(p + 1 < input.length && input[p] == 'Q' && input[p + 1] == '{') return false;
     return !name.hasPrefix() && KEYWORDS.contains(name.string());
   }
 
@@ -2023,8 +2026,9 @@ public class QueryParser extends InputParser {
           if(ex == null) ex = arrayConstructor();
           if(ex == null) ex = functionItem();
           if(ex == null) {
+            final int p = pos;
             name = eQName(null, ARROWSPEC_X);
-            if(reserved(name)) throw error(RESERVED_X, name.local());
+            if(reserved(name, p)) throw error(RESERVED_X, name.local());
           }
         }
         final InputInfo ii = info();
@@ -2717,7 +2721,7 @@ public class QueryParser extends InputParser {
     final QNm name = eQName(null, null);
     if(name != null && wsConsumeWs("#")) {
       final Expr num = numericLiteral(Integer.MAX_VALUE, false, false);
-      if(reserved(name)) {
+      if(reserved(name, p)) {
         if(num != null) throw error(RESERVED_X, name.local());
       } else if(num instanceof final Itr itr) {
         final int i = (int) itr.itr();
@@ -2972,7 +2976,7 @@ public class QueryParser extends InputParser {
   private Expr functionCall() throws QueryException {
     final int p = pos;
     final QNm name = eQName(null, null);
-    if(name != null && !reserved(name)) {
+    if(name != null && !reserved(name, p)) {
       skipWs();
       if(current('(')) {
         final FuncBuilder fb = argumentList(true, null);

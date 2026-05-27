@@ -322,6 +322,15 @@ public final class SimpleTest extends QueryTest {
       { "Arith 4", strings("P6M"), "string(xs:yearMonthDuration('P1Y') * <_>.5</_>)" },
       { "Arith 5", strings("P2Y"), "string(xs:yearMonthDuration('P1Y') div .5)" },
       { "Arith 6", strings("P2Y"), "string(xs:yearMonthDuration('P1Y') div <_>.5</_>)" },
+
+      { "URIQualifiedName 1", strings("abc"), "declare function local:text($t) {$t}; "
+          + "Q{http://www.w3.org/2005/xquery-local-functions}text#1('abc')"},
+      { "URIQualifiedName 2", strings("abc"), "declare function Q{http://www.w3.org/2005/xquery-loc"
+          + "al-functions}text($t) {$t}; local:text('abc')"},
+      { "URIQualifiedName 3", strings("abc"), "declare function local:text($t) {$t}; "
+          + "Q{http://www.w3.org/2005/xquery-local-functions}text('abc')"},
+      { "URIQualifiedName 4", strings("abc"), "declare function local:text($t) {$t}; "
+          + "'abc' => Q{http://www.w3.org/2005/xquery-local-functions}text()"},
     };
   }
 }
