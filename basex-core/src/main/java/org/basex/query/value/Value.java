@@ -128,7 +128,7 @@ public abstract class Value extends Expr implements Iterable<Item> {
   /**
    * Returns a subsequence with the given start and length.
    * @param pos position of first item (>= 0)
-   * @param length number of items (1 < length < size())
+   * @param length number of items (1 &lt; length &lt; size())
    * @param job interruptible job
    * @return new subsequence
    */
