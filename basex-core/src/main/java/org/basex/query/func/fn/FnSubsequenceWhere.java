@@ -51,7 +51,7 @@ public final class FnSubsequenceWhere extends StandardFunc {
     if(from) arg(1, arg -> refineFunc(arg, cc, types));
     if(to) arg(2, arg -> refineFunc(arg, cc, types));
 
-    exprType.assign(ist);
+    exprType.assign(from && !arg(1).seqType().zero() ? ist.union(Occ.ZERO) : ist).data(input);
     return this;
   }
 }

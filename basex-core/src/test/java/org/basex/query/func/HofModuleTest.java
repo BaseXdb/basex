@@ -30,6 +30,8 @@ public final class HofModuleTest extends SandboxTest {
     query(func.args(" 1 to 1000", " function($x) { -$x }, 0"), "");
     query(func.args(" ()", " function($x) { -$x }", 5), "");
     query(func.args(" 1 to 1000", " function($x) { -$x }", 5), "1\n2\n3\n4\n5");
+    // a non-empty input may still yield an empty result (k < 1): the type must allow zero
+    query("empty(" + func.args(" (1, (2 to 1000)[. > 0])", " function($x) { -$x }", 0) + ")", true);
   }
 
   /** Test method. */
@@ -38,5 +40,20 @@ public final class HofModuleTest extends SandboxTest {
     query(func.args(" 1 to 1000", " function($x, $y) { $x > $y }", 0), "");
     query(func.args(" ()", " function($x, $y) { $x > $y }", 5), "");
     query(func.args(" 1 to 5", " function($x, $y) { $x > $y }", 5), "1\n2\n3\n4\n5");
+    // a non-empty input may still yield an empty result (k < 1): the type must allow zero
+    query("empty(" + func.args(" (1, (2 to 1000)[. > 0])",
+        " function($x, $y) { $x > $y }", 0) + ")", true);
+  }
+
+  /** Test method. */
+  @Test public void scanLeft() {
+    final Function func = _HOF_SCAN_LEFT;
+    query(func.args(" 1 to 3", 0, " function($a, $b) { $a + $b }"), "0\n1\n3\n6");
+    query(func.args(" ()", 5, " function($a, $b) { $a + $b }"), 5);
+    // a statically-empty (non-literal) input is optimized away, side-effects preserved
+    check(func.args(" void(<a/>)", 5, " function($a, $b) { $a + $b }"), 5, empty(func));
+    // result type derives from $zero and $action, not from the input
+    query(func.args(" (1 to 3)[. > 0]", "x", " function($a, $b) { $a }")
+        + " instance of xs:string+", true);
   }
 }

@@ -35,7 +35,7 @@ public final class FnRemove extends StandardFunc {
       }
       @Override
       public Item get(final long i) throws QueryException {
-        return input.get(i + 1 < p ? i : i + 1);
+        return input.get(i < p ? i : i + 1);
       }
       @Override
       public long size() {

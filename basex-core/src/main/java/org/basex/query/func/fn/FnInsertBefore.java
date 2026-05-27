@@ -6,7 +6,6 @@ import org.basex.query.func.*;
 import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 
 /**
@@ -69,8 +68,8 @@ public final class FnInsertBefore extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0), pos = arg(1), insert = arg(2);
-    if(input == Empty.VALUE) return insert;
-    if(insert == Empty.VALUE) return input;
+    if(input.seqType().zero()) return cc.voidAndReturn(input, insert, info);
+    if(insert.seqType().zero()) return cc.voidAndReturn(insert, input, info);
 
     final SeqType st = input.seqType(), stInsert = insert.seqType();
     final long size = input.size(), sizeInsert = insert.size();

@@ -9,6 +9,7 @@ import org.basex.query.iter.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -50,6 +51,8 @@ public final class HofTopKBy extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr input = arg(0);
-    return input.seqType().zero() ? input : adoptType(input);
+    if(input.seqType().zero()) return input;
+    exprType.assign(input.seqType().union(Occ.ZERO)).data(input);
+    return this;
   }
 }

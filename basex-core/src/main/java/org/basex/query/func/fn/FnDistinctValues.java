@@ -100,9 +100,11 @@ public final class FnDistinctValues extends FnDuplicateValues {
     // X => sort() => distinct-values() → X => distinct-values() => sort()
     if(SORT.is(values) && (values.args().length == 1 ||
         values.arg(0).seqType().type.instanceOf(BasicType.ANY_ATOMIC_TYPE))) {
-      final ExprList list = new ExprList().add(values.args());
-      list.set(0, cc.function(DISTINCT_VALUES, info, values.arg(0)));
-      return cc.function(SORT, info, list.finish());
+      final ExprList sortArgs = new ExprList().add(values.args());
+      final ExprList dvArgs = new ExprList().add(values.arg(0));
+      if(defined(1)) dvArgs.add(arg(1));
+      sortArgs.set(0, cc.function(DISTINCT_VALUES, info, dvArgs.finish()));
+      return cc.function(SORT, info, sortArgs.finish());
     }
     // distinct-values(distinct-values($data)) → distinct-values($data)
     if(DISTINCT_VALUES.is(values) && arg(1).equals(values.arg(1))) return values;

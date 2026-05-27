@@ -49,10 +49,10 @@ public class FnEvery extends StandardFunc {
     final int arity = pred ? arity(predicate) : 1;
     if(arity == -1) return this;
 
-    // FLWOR: for $item at $pos in INPUT return PREDICATE($item, $pos)  (or: boolean($item))
+    // FLWOR: for $item at $pos in INPUT return boolean(PREDICATE($item, $pos))
     final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
-    final Expr rtrn = pred ? flwor.function(this, 1, false) :
-      cc.function(Function.BOOLEAN, info, flwor.refs());
+    final Expr[] args = pred ? new Expr[] { flwor.function(this, 1, false) } : flwor.refs();
+    final Expr rtrn = cc.function(Function.BOOLEAN, info, args);
     final Expr expr = flwor.finish(input, null, rtrn);
 
     // some : FLWOR = true()

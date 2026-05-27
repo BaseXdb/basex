@@ -46,7 +46,7 @@ public final class FnMatches extends RegExFn {
         for(final byte b : str.string()) {
           if(contains(REGEX_CHARS, b)) return this;
         }
-        return cc.function(CONTAINS, info, args());
+        if(sc().collation == null) return cc.function(CONTAINS, info, args());
       }
     }
     return this;

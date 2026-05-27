@@ -45,11 +45,9 @@ public final class FnSort extends FnSortBy {
       } else if(input instanceof Value) {
         final Value value = quickValue((Value) input);
         if(value != null) return value;
-      } else if(REVERSE.is(input) || SORT.is(input)) {
-        // sort(reverse(EXPR)) → sort(EXPR)
-        final Expr[] args = exprs.clone();
-        args[0] = args[0].arg(0);
-        return cc.function(SORT, info, args);
+      } else if(SORT.is(input) && input.args().length == 1) {
+        // sort(sort(EXPR)) → sort(EXPR)
+        return cc.function(SORT, info, input.arg(0));
       } else if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
         // sort(replicate(10, 5)) → replicate(10, 5)
         final SeqType rst = input.arg(0).seqType();

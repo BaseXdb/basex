@@ -57,10 +57,8 @@ public final class FnDistinctOrderedNodes extends StandardFunc {
     final Type type = nodes.seqType().type;
     if(type.instanceOf(NodeType.GNODE)) {
       // distinct-ordered-nodes(replicate(*, 2)) → distinct-ordered-nodes(*)
-      if(REPLICATE.is(nodes) && ((FnReplicate) nodes).singleEval(false))
-        return nodes.arg(0);
-      // distinct-ordered-nodes(reverse(*)) → distinct-ordered-nodes(*)
-      if(REVERSE.is(nodes) || SORT.is(nodes))
+      if(REVERSE.is(nodes) || SORT.is(nodes) ||
+          REPLICATE.is(nodes) && ((FnReplicate) nodes).singleEval(false))
         return cc.function(DISTINCT_ORDERED_NODES, info, nodes.arg(0));
       // distinct-ordered-nodes(/a/b/c) → /a/b/c
       if(nodes.ddo())

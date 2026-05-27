@@ -330,6 +330,12 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args(" true#0"), FIATOMIZE_X);
     error(func.args(REPLICATE.args(" true#0", 2)), FIATOMIZE_X);
     error(func.args(" (1 to 999999) ! true#0"), FIATOMIZE_X);
+
+    // average of durations: result has the duration type, not xs:decimal
+    check(func.args(" (xs:dayTimeDuration('PT1H'), xs:dayTimeDuration('PT3H'))"
+        + "[. ne xs:dayTimeDuration('PT0S')]"), "PT2H", type(func, "xs:dayTimeDuration?"));
+    check(func.args(" (xs:yearMonthDuration('P1Y'), xs:yearMonthDuration('P3Y'))"
+        + "[. ne xs:yearMonthDuration('P0M')]"), "P2Y", type(func, "xs:yearMonthDuration?"));
   }
 
   /**
@@ -797,6 +803,9 @@ public final class FnModuleTest extends SandboxTest {
         empty(REPLICATE));
     check(func.args(REPLICATE.args(" <a/>", 2, true)), "<a/>\n<a/>",
         exists(REPLICATE));
+    // replicate of an out-of-order sequence must still be normalized to document order
+    check(func.args(REPLICATE.args(" reverse(<a><b/></a> ! (., *))", 2)),
+        "<a><b/></a>\n<b/>", empty(REPLICATE));
 
     check("(<a><b/></a> ! (., *)) => reverse() => " + func.args(),
         "<a><b/></a>\n<b/>", empty(REVERSE));
@@ -833,6 +842,10 @@ public final class FnModuleTest extends SandboxTest {
         "A", exists(SORT.className() + "/" + DISTINCT_VALUES.className()));
     check(func.args(" sort((string(<_>X</_>), 1), (), string#1)"),
         "1\nX", empty(DISTINCT_VALUES));
+    // swapping distinct-values and sort must preserve the collation
+    check(func.args(" sort((<a>A</a>, <b>a</b>)[data()])",
+        "http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive"), "A",
+        exists(SORT.className() + "/" + DISTINCT_VALUES.className()));
 
     // single value: replace with data
     check(func.args(wrap("A")), "A", root(DATA));
@@ -1108,6 +1121,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 1 to 6", " op('=')"), true);
     query(func.args(" 2 to 7", " op('=')"), false);
     query(func.args(" reverse(1 to 9)", " op('=')"), false);
+
+    // an empty predicate result is treated as false
+    query(func.args(" (1, 2)", " fn($x, $p) { if($x eq 1) then () else true() }"), false);
+    query(func.args(" (1, 2, 3)", " fn($x, $p) { () }"), false);
+    query(func.args(" (1, 2, 3)", " fn($x, $p) { true() }"), true);
 
     final String lookup = "function-lookup(xs:QName(<?_ fn:every?>), 2)";
     query(lookup + "(1 to 9, boolean#1)", true);
@@ -1757,6 +1775,10 @@ public final class FnModuleTest extends SandboxTest {
     query("count(" + func.args(" 1 to 100000000", 3, " ()") + ')', 100000000);
     query("count(" + func.args(" 1 to 100000000", 4, " 1 to 100000000") + ')', 200000000);
 
+    // a statically-empty (non-literal) operand is optimized away, side-effects preserved
+    check(func.args(" void(<a/>)", wrap(2), " (7, 8)"), "7\n8", empty(func));
+    check(func.args(" (7, 8)", wrap(2), " void(<a/>)"), "7\n8", empty(func));
+
     query("head(" + func.args(" 1 to 100000000", wrap(4), " 1 to 100000000") + ')', 1);
     query("subsequence(" + func.args(" 1 to 100000000", wrap(2), " 1 to 100000000") + ", 1, 3)",
         "1\n1\n2");
@@ -2210,6 +2232,11 @@ return
     check(func.args(wrap("nop"), 'o'), true, root(CONTAINS));
     check(func.args(wrap("nöp"), 'ö'), true, root(CONTAINS));
     check(func.args(wrap("nop"), '.'), true, root(func));
+
+    // codepoint-based: do not fold to fn:contains under a non-codepoint default collation
+    check("declare default collation "
+        + "'http://www.w3.org/2005/xpath-functions/collation/html-ascii-case-insensitive'; "
+        + func.args(wrap("ABC"), "abc"), false, root(func));
 
     query(func.args("nop", wrap("o")), true);
     query(func.args("nöp", wrap("ö")), true);
@@ -3074,6 +3101,13 @@ return
     query(func.args(" tokenize(<_>X Y</_>)", 1), "Y");
     query(func.args(" tokenize(<_>X Y Z</_>)", 1), "Y\nZ");
 
+    // random access into a single-position removal exercises the positional get();
+    // the !-map yields a non-value iterator with a known size, the wrap defeats pre-evaluation
+    final String seq = " (" + wrap(9) + ", 1, 2, 3, 4) ! string()";
+    query("reverse(" + func.args(seq, 2) + ")", "4\n3\n2\n9");
+    query("subsequence(" + func.args(seq, 2) + ", 2, 2)", "2\n3");
+    query("items-at(" + func.args(seq, 2) + ", 4)", 4);
+
     // static rewrites, dynamic position
     query(func.args(" ()", wrap(1)), "");
     query(func.args("A", wrap(1)), "");
@@ -3543,6 +3577,10 @@ return
     query(func.args(" 2 to 7", " op('=')"), false);
     query(func.args(" reverse(1 to 9)", " op('=')"), true);
 
+    // an empty predicate result is treated as false (no match)
+    query(func.args(" (1, 2)", " fn($x, $p) { if($x eq 2) then true() else () }"), true);
+    query(func.args(" (1, 2)", " fn($x, $p) { () }"), false);
+
     final String lookup = "function-lookup(xs:QName(<?_ fn:some?>), 2)";
     query(lookup + "(1 to 9, boolean#1)", true);
     query(lookup + "(1 to 9, not#1)", false);
@@ -3569,6 +3607,10 @@ return
     query("for $i in (10000, 10001) return " + func.args(" reverse(1 to $i)") + "[1]", "1\n1");
     query("for $i in (10000, 10001) return " + func.args(func.args(" reverse(1 to $i)")) + "[1]");
     query("for $i in (1, 2) return " + func.args(func.args(" (1, $i)")) + "[1]", "1\n1");
+
+    // sort is stable: an inner sort key orders value-equal items and must not be dropped
+    query("sort(sort((1, 1.0)[. ge 0], (), fn($x) { if($x instance of xs:integer) then 2 else 1 }))"
+        + " ! (if(. instance of xs:integer) then 'i' else 'd')", "d\ni");
 
     check(func.args(" ()"), "", empty());
     check(func.args(1), 1, empty(func));
@@ -3848,6 +3890,25 @@ return
 
     // GH-2315
     check("(1 to 6) ! " + func.args(" <a/>/*", " .", 1), "", root(_UTIL_RANGE));
+  }
+
+  /** Test method. */
+  @Test public void subsequenceWhere() {
+    final Function func = SUBSEQUENCE_WHERE;
+
+    check(func.args(" ()", " function($x, $p) { true() }"), "", empty());
+    query(func.args(" 1 to 5", " ()", " ()"), "1\n2\n3\n4\n5");
+    query(func.args(" 1 to 5", " function($x, $p) { $x ge 3 }"), "3\n4\n5");
+    query(func.args(" 1 to 9", " function($x, $p) { $x ge 3 }", " function($x, $p) { $x ge 6 }"),
+        "3\n4\n5\n6");
+    query(func.args(" 1 to 9", " ()", " function($x, $p) { $x ge 3 }"), "1\n2\n3");
+
+    // a 'from' predicate may never match: the result can be empty for a non-empty input
+    check("empty(" + func.args(" (1, (2 to 9)[. > 0])", " function($x, $p) { $x > 100 }") + ")",
+        true, type(func, "xs:integer*"));
+    // a 'to'-only call always starts at the first item, so it preserves one-or-more
+    check(func.args(" (1, (2 to 9)[. > 0])", " ()", " function($x, $p) { $x ge 3 }"),
+        "1\n2\n3", type(func, "xs:integer+"));
   }
 
   /** Test method. */
