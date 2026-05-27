@@ -42,7 +42,7 @@ public class MapForEach extends MapFn {
       @Override
       public Item get(final long i) throws QueryException {
         final Item key = keys.get((int) i);
-        return invoke(action, args.set(0, key).set(1, map.get(key)).inc(), qc).item(qc, info);
+        return invoke(action, args.set(0, key).set(1, map.get(key)).pos(i + 1), qc).item(qc, info);
       }
 
       @Override

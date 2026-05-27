@@ -307,6 +307,12 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" array { 1 to 5 }", 3), "[1,2,4,5]");
     query(func.args(" array { 1 to 5 }", 5), "[1,2,3,4]");
 
+    // structSize must reflect the number of removed positions, not assume exactly one
+    final String arr = "array:append(array { 1 to 4 }, <_>5</_>)";
+    query("array:size(array:remove(" + arr + ", (1, 2)))", 3);
+    query("array:size(array:remove(" + arr + ", ()))", 5);
+    query("array:size(array:remove(" + arr + ", 2))", 4);
+
     error(func.args(" [ ]", 0), ARRAYEMPTY);
     error(func.args(" [ 1 ]", 0), ARRAYBOUNDS_X_X);
     error(func.args(" [ 1 ]", 2), ARRAYBOUNDS_X_X);

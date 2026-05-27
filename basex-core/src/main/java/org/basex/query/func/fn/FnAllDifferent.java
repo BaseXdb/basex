@@ -51,9 +51,7 @@ public final class FnAllDifferent extends StandardFunc {
       if(values instanceof RangeSeq) return Bln.TRUE;
       // all-different(reverse($data)) → all-different($data)
       if(REVERSE.is(values) || SORT.is(values)) {
-        final Expr[] args = exprs.clone();
-        args[0] = args[0].arg(0);
-        return cc.function(ALL_DIFFERENT, info, args);
+        return cc.function(ALL_DIFFERENT, info, values.arg(0));
       }
     }
     return this;

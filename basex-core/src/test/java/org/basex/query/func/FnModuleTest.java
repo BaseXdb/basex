@@ -1372,6 +1372,11 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(5, 8, " fn($a, $b, $p) { ($b - $a) * $p }"), 3);
     query(func.args(" (0 to 5)", " (1 to 6)", " fn($a, $b, $p) { ($b - $a) * $p }"),
         "1\n2\n3\n4\n5\n6");
+
+    // random access
+    final String pos = func.args(" (10, 20, 30)", " (1, 2, 3)", " fn($a, $b, $p) { $p }");
+    query(pos + "[2]", 2);
+    query("reverse(" + pos + ')', "3\n2\n1");
   }
 
   /** Test method. */
@@ -1642,6 +1647,10 @@ public final class FnModuleTest extends SandboxTest {
         " function($a) { string($a/@*) }"), "<_ _=\"9\"/>");
     check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 6, empty(REVERSE));
+    // reverse/sort over the input must not be dropped: tied items keep their (reordered) order
+    query(func.args(" sort((1, 1.0)[. ge 0], (), function($x) "
+        + "{ if($x instance of xs:integer) then 2 else 1 })")
+        + " ! (if(. instance of xs:integer) then 'i' else 'd')", "d\ni");
 
     query(func.args(" (98 to 102)", " key := string#1"), 99);
     query(func.args(" (98 to 102)", " ()", " string#1"), 99);
@@ -2207,6 +2216,10 @@ return
         " function($a) { string($a/@*) }"), "<_ _=\"10\"/>");
     check(func.args(" replicate('a', 2)"), "a\na", root(SingletonSeq.class));
     check(func.args(" reverse( (1 to 6)[. > 3] )"), 4, empty(REVERSE));
+    // reverse/sort over the input must not be dropped: tied items keep their (reordered) order
+    query(func.args(" sort((1, 1.0)[. ge 0], (), function($x) "
+        + "{ if($x instance of xs:integer) then 2 else 1 })")
+        + " ! (if(. instance of xs:integer) then 'i' else 'd')", "d\ni");
 
     query(func.args(" (98 to 102)", " key := string#1"), 100);
     query(func.args(" (98 to 102)", " ()", " string#1"), 100);

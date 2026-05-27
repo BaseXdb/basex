@@ -108,7 +108,7 @@ public final class FnRemove extends StandardFunc {
       // skip last item
       if(p == size) return cc.function(Function.TRUNK, info, input);
       // decrement result size
-      sz--;
+      sz = size - 1;
     }
 
     exprType.assign(st.union(Occ.ZERO), sz).data(input);

@@ -273,8 +273,8 @@ public class FnSubsequence extends StandardFunc {
         final long length = itr.itr();
         // subsequence(EXPR, START, 1) → items-at(EXPR, START)
         if(length == 1) return cc.function(ITEMS_AT, info, input, first);
-        // subsequence(EXPR, START, 0) → void(EXPR)
-        if(length <= 0) return cc.voidAndReturn(input, Empty.VALUE, info);
+        // subsequence(EXPR, START, 0) → ()
+        if(length <= 0) return Empty.VALUE;
       }
     }
 

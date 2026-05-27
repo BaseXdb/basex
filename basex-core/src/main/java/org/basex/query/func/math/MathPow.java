@@ -26,20 +26,24 @@ public final class MathPow extends MathFn {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    final Expr base = arg(0);
+    final Expr base = arg(0), exp = arg(1);
+    final SeqType st = base.seqType();
+
+    // math:pow(1, y) → 1
     if(base instanceof final ANum num && num.dbl() == 1) return Dbl.ONE;
 
-    final Expr exp = arg(1);
     if(exp instanceof final ANum num) {
       final double e = num.dbl();
-      if(e == 0) return Dbl.ONE;
-      if(e == 1) return new Cast(info, base, Types.DOUBLE_O).optimize(cc);
+      if(e == 0 && st.one()) return Dbl.ONE;
+      if(e == 1) return new Cast(info, base, Types.DOUBLE_ZO).optimize(cc);
       if(e == -1) return new Arith(info, Dbl.ONE, base, Calc.DIVIDE).optimize(cc);
-    }
-    // merge nested function calls
-    if(_MATH_POW.is(base)) {
-      final Expr factor = new Arith(info, base.arg(1), exp, Calc.MULTIPLY).optimize(cc);
-      return cc.function(_MATH_POW, info, base.arg(0), factor);
+
+      // merge nested function calls
+      if(_MATH_POW.is(base) && e == (int) e && base.arg(1) instanceof final ANum b &&
+          b.dbl() == b.itr()) {
+        final Expr factor = new Arith(info, base.arg(1), exp, Calc.MULTIPLY).optimize(cc);
+        return cc.function(_MATH_POW, info, base.arg(0), factor);
+      }
     }
     return super.opt(cc);
   }

@@ -41,7 +41,7 @@ public class FnForEachPair extends StandardFunc {
       @Override
       public Item get(final long i) throws QueryException {
         final Item item1 = input1.get(i), item2 = input2.get(i);
-        return invoke(action, args.set(0, item1).set(1, item2), qc).item(qc, info);
+        return invoke(action, args.set(0, item1).set(1, item2).pos(i + 1), qc).item(qc, info);
       }
 
       @Override

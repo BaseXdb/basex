@@ -55,9 +55,7 @@ public final class FnAllEqual extends StandardFunc {
       // all-equal(reverse($data)) → all-equal($data)
       if(REVERSE.is(values) || SORT.is(values) ||
           REPLICATE.is(values) && values.arg(1) instanceof Itr) {
-        final Expr[] args = exprs.clone();
-        args[0] = args[0].arg(0);
-        return cc.function(ALL_EQUAL, info, args);
+        return cc.function(ALL_EQUAL, info, values.arg(0));
       }
     }
     return this;

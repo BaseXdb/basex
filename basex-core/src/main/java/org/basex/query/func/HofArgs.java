@@ -93,4 +93,15 @@ public final class HofArgs {
     pos = p;
     return this;
   }
+
+  /**
+   * Assigns an absolute position.
+   * @param p position
+   * @return self reference
+   */
+  public HofArgs pos(final long p) {
+    if(posParam != -1) set(posParam, Itr.get(p));
+    pos = (int) p;
+    return this;
+  }
 }

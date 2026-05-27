@@ -12,7 +12,6 @@ import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
-import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -100,11 +99,10 @@ public final class FnDistinctValues extends FnDuplicateValues {
     // X => sort() => distinct-values() → X => distinct-values() => sort()
     if(SORT.is(values) && (values.args().length == 1 ||
         values.arg(0).seqType().type.instanceOf(BasicType.ANY_ATOMIC_TYPE))) {
-      final ExprList sortArgs = new ExprList().add(values.args());
-      final ExprList dvArgs = new ExprList().add(values.arg(0));
-      if(defined(1)) dvArgs.add(arg(1));
-      sortArgs.set(0, cc.function(DISTINCT_VALUES, info, dvArgs.finish()));
-      return cc.function(SORT, info, sortArgs.finish());
+      final Expr[] sortArgs = values.args().clone();
+      sortArgs[0] = cc.function(DISTINCT_VALUES, info, defined(1) ?
+        new Expr[] { values.arg(0), arg(1) } : new Expr[] { values.arg(0) });
+      return cc.function(SORT, info, sortArgs);
     }
     // distinct-values(distinct-values($data)) → distinct-values($data)
     if(DISTINCT_VALUES.is(values) && arg(1).equals(values.arg(1))) return values;

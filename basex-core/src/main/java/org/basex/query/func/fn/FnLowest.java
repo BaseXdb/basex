@@ -91,15 +91,10 @@ public class FnLowest extends StandardFunc {
       if(noCheck.test(st.type) && (st.one() || input instanceof final SingletonSeq ss &&
           ss.singleItem())) return input;
 
+      // lowest(replicate(5, 2)) → replicate(5, 2)
       if(REPLICATE.is(input) && ((FnReplicate) input).singleEval(false)) {
-        // lowest(replicate(5, 2)) → replicate(5, 2)
         final SeqType ast = input.arg(0).seqType();
         if(ast.zeroOrOne() && noCheck.test(ast.type)) return input;
-      } else if(REVERSE.is(input) || SORT.is(input)) {
-        // lowest(reverse(E)) → lowest(E)
-        final Expr[] args = exprs.clone();
-        args[0] = args[0].arg(0);
-        return cc.function(min ? LOWEST : HIGHEST, info, args);
       }
     }
     return adoptType(input);

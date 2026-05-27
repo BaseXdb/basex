@@ -214,6 +214,11 @@ public final class MapModuleTest extends SandboxTest {
         type(func, "xs:boolean+"));
 
     query(func.args(" map:build(3 to 8)", " fn($k, $v, $p) { $p }"), "1\n2\n3\n4\n5\n6");
+
+    // random access into the result must report correct positions (Iter.get)
+    final String positions = func.args(" { 'a': 0, 'b': 0, 'c': 0 }", " fn($k, $v, $p) { $p }");
+    query(positions + "[2]", 2);
+    query("reverse(" + positions + ')', "3\n2\n1");
   }
 
   /** Test method. */
@@ -244,6 +249,14 @@ public final class MapModuleTest extends SandboxTest {
     check(record + func.args(" local:x(" + wrap(0) + ")", "x"), 0,
         type(RecordGet.class, "xs:integer"));
     check(record + func.args(" local:x(" + wrap(0) + ")", "y"), "", empty());
+
+    // preserve side effects of a nondeterministic map
+    final String ndt = " (" + MESSAGE.args("m") + ", { 'a': 1 })";
+    check(func.args(ndt, "b"), "", root(VOID), exists(MESSAGE));
+    check(func.args(ndt, "b", " 'D'"), "D", exists(VOID), exists(MESSAGE));
+    // ... also on the key-type mismatch path
+    check(func.args(" (" + MESSAGE.args("m") + ", { 1: 'a' })", "y"), "",
+        root(VOID), exists(MESSAGE));
   }
 
   /** Test method. */

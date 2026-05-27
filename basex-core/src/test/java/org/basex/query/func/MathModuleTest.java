@@ -46,7 +46,15 @@ public final class MathModuleTest extends SandboxTest {
 
     check(func.args(func.args(wrap(3), 2), 2), 81, count(func, 1));
     check(func.args(func.args(func.args(wrap(3), 2), 2), 2), 6561, count(func, 1));
-    check(func.args(func.args(wrap(3), 2), 0.5), 3, empty(func), root(Cast.class));
+    check(func.args(func.args(wrap(3), 2), 0.5), 3, count(func, 2));
+
+    check(func.args(" ()", 0), "", empty());
+    check(func.args(" ()", 1), "", empty());
+
+    // merge nested function calls
+    check(func.args(func.args(wrap(-2), 3), 2), 64, count(func, 1));
+    check(func.args(func.args(wrap(-1), 2), 0.5), 1, count(func, 2));
+    query(func.args(func.args(wrap(-1), 0.5), 2), "NaN");
   }
 
   /** Test method. */

@@ -53,6 +53,6 @@ public final class MapGet extends MapFn {
     }
 
     if(st != null) exprType.assign(dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO));
-    return notFound ? dflt ? arg(2) : Empty.VALUE : this;
+    return notFound ? cc.voidAndReturn(map, dflt ? arg(2) : Empty.VALUE, info) : this;
   }
 }
