@@ -73,8 +73,9 @@ public abstract class Preds extends Arr {
     final Value qv = qf.value;
     qf.value = item;
     try {
+      final long pos = qf.pos;
       for(final Expr expr : exprs) {
-        if(!expr.test(qc, info, qf.pos)) return false;
+        if(!expr.test(qc, info, pos)) return false;
       }
       return true;
     } finally {

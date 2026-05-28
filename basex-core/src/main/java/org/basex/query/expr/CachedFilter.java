@@ -57,12 +57,12 @@ public class CachedFilter extends Filter {
     final long vs = value.size();
     qf.size = vs;
     final ValueBuilder vb = new ValueBuilder(qc);
-    for(int v = 0; v < vs; ++v) {
+    for(int p = 1; p <= vs; ++p) {
       qc.checkStop();
-      final Item item = value.itemAt(v);
+      final Item item = value.itemAt(p - 1);
       qf.value = item;
-      qf.pos = v + 1;
-      if(pred.test(qc, info, v + 1)) vb.add(item);
+      qf.pos = p;
+      if(pred.test(qc, info, p)) vb.add(item);
     }
     return vb.value();
   }
