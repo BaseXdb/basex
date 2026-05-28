@@ -1,3 +1,24 @@
+VERSION 12.4 (May 28, 2025) --------------------------------------------
+
+  XQUERY FUNCTIONS
+  - XQuery Module, parallelization: for-each, fork-any, reduce
+  - String Module: new functions for ngrams & token set/sort ratio
+  - Binary Module: bin:rotate, functions for counting & settings bits
+  - Archive Module: improved support for different encodings
+  - Database Module, DB creation: support for binary & value resources
+
+  XQUERY PERFORMANCE
+  - index rewritings for numeric predicates: //city[@code = 12763]
+  - evaluate loop-invariant predicates only once
+  - faster sorting of primitive value sequences
+  - callback functions: improved type propagation
+
+  FIXES & TWEAKS
+  - parsing of CSV files with empty lines
+  - command-line: newline added after the result of a query
+  - error feedback: improved 'did you mean' suggestions
+  - GUI: higher trace output limits
+
 VERSION 12.3 (April 16, 2025) ------------------------------------------
 
  XQUERY 4.0
