@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.math.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.jobs.*;
@@ -67,6 +68,13 @@ public final class DecSeq extends NativeSeq {
     final int sz = (int) size;
     final BigDecimal[] tmp = new BigDecimal[sz];
     for(int i = 0; i < sz; i++) tmp[sz - i - 1] = values[i];
+    return get(tmp);
+  }
+
+  @Override
+  public Value sort() {
+    final BigDecimal[] tmp = values.clone();
+    Arrays.sort(tmp);
     return get(tmp);
   }
 

@@ -74,6 +74,18 @@ public final class BlnSeq extends NativeSeq {
   }
 
   @Override
+  public Value sort() {
+    final int sz = (int) size;
+    final boolean[] tmp = new boolean[sz];
+    int n = 0;
+    for(final boolean b : values) {
+      if(!b) n++;
+    }
+    Arrays.fill(tmp, n, sz, true);
+    return get(tmp);
+  }
+
+  @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     final Expr expr = this;
     if(mode.oneOf(Simplify.DISTINCT, Simplify.PREDICATE) && this != FT && this != TF) {

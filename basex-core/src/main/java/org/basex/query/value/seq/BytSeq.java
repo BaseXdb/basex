@@ -68,6 +68,13 @@ public final class BytSeq extends NativeSeq {
   }
 
   @Override
+  public Value sort() {
+    final byte[] tmp = values.clone();
+    Arrays.sort(tmp);
+    return get(tmp);
+  }
+
+  @Override
   public byte[] toJava() {
     return values;
   }

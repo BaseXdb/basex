@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class NativeSeq extends Seq {
+public abstract class NativeSeq extends Seq {
   /**
    * Constructor.
    * @param size number of items
@@ -21,6 +21,12 @@ abstract class NativeSeq extends Seq {
   NativeSeq(final int size, final Type type) {
     super(size, type);
   }
+
+  /**
+   * Returns a sorted sequence.
+   * @return sorted sequence
+   */
+  public abstract Value sort();
 
   @Override
   public final void cache(final boolean lazy, final InputInfo ii) { }

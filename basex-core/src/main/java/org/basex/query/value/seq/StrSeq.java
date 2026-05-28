@@ -71,6 +71,11 @@ public final class StrSeq extends NativeSeq {
   }
 
   @Override
+  public Value sort() {
+    return get(new TokenList(values.clone()).sort().finish(), type);
+  }
+
+  @Override
   public String[] toJava() {
     final StringList sl = new StringList((int) size);
     for(final byte[] value : values) sl.add(value);

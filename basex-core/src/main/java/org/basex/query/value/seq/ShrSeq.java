@@ -68,6 +68,13 @@ public final class ShrSeq extends NativeSeq {
   }
 
   @Override
+  public Value sort() {
+    final short[] tmp = values.clone();
+    Arrays.sort(tmp);
+    return get(tmp);
+  }
+
+  @Override
   public short[] toJava() {
     return values;
   }

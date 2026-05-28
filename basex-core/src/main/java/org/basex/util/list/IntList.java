@@ -265,8 +265,7 @@ public final class IntList extends ElementList {
    * @return self reference
    */
   public IntList sort() {
-    final int s = size;
-    if(s > 1) Arrays.sort(list, 0, s);
+    Arrays.sort(list, 0, size);
     return this;
   }
 

@@ -70,6 +70,13 @@ public final class DblSeq extends NativeSeq {
   }
 
   @Override
+  public Value sort() {
+    final double[] tmp = values.clone();
+    Arrays.sort(tmp);
+    return get(tmp);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     return this == obj || (obj instanceof final DblSeq seq ? Arrays.equals(values, seq.values) :
       super.equals(obj));

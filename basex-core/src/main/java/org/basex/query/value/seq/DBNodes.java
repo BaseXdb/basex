@@ -97,8 +97,7 @@ public final class DBNodes extends DBNodeSeq {
    * @return position, or {@code -1}
    */
   public int find(final int pre) {
-    sort();
-    return Arrays.binarySearch(sorted, pre);
+    return Arrays.binarySearch(sorted(), pre);
   }
 
   /**
@@ -165,21 +164,23 @@ public final class DBNodes extends DBNodeSeq {
   }
 
   /**
-   * Creates a sorted node array. If the original array is already sorted,
-   * the same reference is used.
+   * Returns a sorted node array.
+   * @return sorted nodes
    */
-  private void sort() {
-    if(sorted != null) return;
-    int min = Integer.MIN_VALUE;
-    for(final int pre : pres) {
-      if(pre < min) {
-        sorted = Arrays.copyOf(pres, pres.length);
-        Arrays.sort(sorted);
-        return;
+  private int[] sorted() {
+    if(sorted == null) {
+      int min = Integer.MIN_VALUE;
+      for(final int pre : pres) {
+        if(pre < min) {
+          sorted = Arrays.copyOf(pres, pres.length);
+          Arrays.sort(sorted);
+          return sorted;
+        }
+        min = pre;
       }
-      min = pre;
+      sorted = pres;
     }
-    sorted = pres;
+    return sorted;
   }
 
   /**

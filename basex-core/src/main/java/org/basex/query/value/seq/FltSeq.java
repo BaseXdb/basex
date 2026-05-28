@@ -70,6 +70,13 @@ public final class FltSeq extends NativeSeq {
   }
 
   @Override
+  public Value sort() {
+    final float[] tmp = values.clone();
+    Arrays.sort(tmp);
+    return get(tmp);
+  }
+
+  @Override
   public float[] toJava() {
     return values;
   }

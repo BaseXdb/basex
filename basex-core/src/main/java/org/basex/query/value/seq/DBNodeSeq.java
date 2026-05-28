@@ -102,6 +102,13 @@ public class DBNodeSeq extends NativeSeq {
   }
 
   @Override
+  public Value sort() {
+    final int[] tmp = pres.clone();
+    Arrays.sort(tmp);
+    return get(tmp, data, type, all);
+  }
+
+  @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
 

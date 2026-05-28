@@ -84,6 +84,13 @@ public final class IntSeq extends NativeSeq {
     return get(tmp, type);
   }
 
+  @Override
+  public Value sort() {
+    final int[] tmp = values.clone();
+    Arrays.sort(tmp);
+    return get(tmp, type);
+  }
+
   /**
    * Returns the internal values.
    * @return values
