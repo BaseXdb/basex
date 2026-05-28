@@ -37,7 +37,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
   /** Parameters. */
   private final Var[] params;
   /** Value type, {@code null} if not specified. */
-  private SeqType declType;
+  private final SeqType declType;
   /** Annotations. */
   private AnnList anns;
   /** Updating flag. */
@@ -155,7 +155,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
    * @throws QueryException query exception
    */
   private void captureContextIfNeeded(final CompileContext cc) throws QueryException {
-    if(!(expr instanceof StaticFuncCall sfc)) return;
+    if(!(expr instanceof final StaticFuncCall sfc)) return;
     final Var var = new Var(new QNm("ctx"), Types.ITEM_ZM, cc.qc, info);
     final VarRef ref = new VarRef(info, var);
     final InlineContext ic = new InlineContext(null, ref, cc);

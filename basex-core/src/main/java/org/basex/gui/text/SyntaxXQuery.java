@@ -53,7 +53,7 @@ final class SyntaxXQuery extends Syntax {
       for(final CmpOp op : CmpOp.values()) {
         Collections.addAll(KEYWORDS, op.toString());
         Collections.addAll(KEYWORDS, op.toValueString());
-        for(String o : op.nodes) Collections.addAll(KEYWORDS, o);
+        for(final String o : op.nodes) Collections.addAll(KEYWORDS, o);
       }
       final Atts ns = NSGlobal.NS;
       for(int n = 0; n < ns.size(); n++) KEYWORDS.add(string(ns.name(n)));

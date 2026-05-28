@@ -34,19 +34,19 @@ public final class CreateIndex extends ACreate {
     final CmdIndex ci = getOption(CmdIndex.class);
     final IndexType type;
     switch(ci) {
-      case TEXT:
+      case TEXT -> {
         type = IndexType.TEXT;
         data.meta.createtext = true;
-        break;
-      case ATTRIBUTE:
+      }
+      case ATTRIBUTE -> {
         type = IndexType.ATTRIBUTE;
         data.meta.createattr = true;
-        break;
-      case TOKEN:
+      }
+      case TOKEN -> {
         type = IndexType.TOKEN;
         data.meta.createtoken = true;
-        break;
-      case FULLTEXT:
+      }
+      case FULLTEXT -> {
         type = IndexType.FULLTEXT;
         data.meta.createft = true;
         data.meta.stemming = options.get(MainOptions.STEMMING);
@@ -54,9 +54,10 @@ public final class CreateIndex extends ACreate {
         data.meta.diacritics = options.get(MainOptions.DIACRITICS);
         data.meta.language = Language.get(options);
         data.meta.stopwords = options.get(MainOptions.STOPWORDS);
-        break;
-      default:
+      }
+      default -> {
         return error(UNKNOWN_CMD_X, this);
+      }
     }
     data.meta.names(type, options);
     data.meta.splitsize = options.get(MainOptions.SPLITSIZE);

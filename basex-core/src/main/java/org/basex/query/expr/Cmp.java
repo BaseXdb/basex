@@ -387,12 +387,12 @@ public abstract class Cmp extends Arr {
 
     // > (v<0), != (v<0), >= (v<=0), != integer(v)
     final long cnt = (long) count;
-    if((op.oneOf(CmpOp.GT, CmpOp.NE)) && count < 0 ||
+    if(op.oneOf(CmpOp.GT, CmpOp.NE) && count < 0 ||
         op == CmpOp.GE && count <= 0 ||
         op == CmpOp.NE && count != cnt) return COUNT_TRUE;
     // < (v<=0), <= (v<0), = (v<0), != integer(v)
     if(op == CmpOp.LT && count <= 0 ||
-      (op.oneOf(CmpOp.LE, CmpOp.EQ)) && count < 0 ||
+      op.oneOf(CmpOp.LE, CmpOp.EQ) && count < 0 ||
        op == CmpOp.EQ && count != cnt) return COUNT_FALSE;
     // < (v<=1), <= (v<1), = (v=0)
     if(op == CmpOp.LT && count <= 1 ||

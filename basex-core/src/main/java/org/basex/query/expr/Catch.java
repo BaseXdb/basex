@@ -162,7 +162,7 @@ public final class Catch extends Single {
   boolean matches(final QueryException ex) {
     final QNm name = ex.qname();
     for(final Test test : tests) {
-      if(test instanceof NameTest nt && nt.matches(name)) return true;
+      if(test instanceof final NameTest nt && nt.matches(name)) return true;
     }
     return false;
   }

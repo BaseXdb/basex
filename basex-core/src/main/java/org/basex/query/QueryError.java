@@ -725,8 +725,6 @@ public enum QueryError {
   /** Error code. */
   ARGTYPE_X_X_X(FORG, 6, "% expected, % found: %."),
   /** Error code. */
-  COMPARE_X_X(FORG, 6, "Items of type % cannot be compared: %."),
-  /** Error code. */
   NUMDUR_X_X(FORG, 6, "Number or duration expected, % found: %."),
   /** Error code. */
   FUNZONE_X_X(FORG, 8, "% and % have different timezones."),
@@ -1134,8 +1132,6 @@ public enum QueryError {
   /** Error code. */
   LOOKUP_X(XPTY, 4, "Input of lookup must be map or array: %."),
   /** Error code. */
-  STRUCT_FILTER_X(XPTY, 4, "Input of filter must be map or array: %."),
-  /** Error code. */
   EXP_FOUND_X_X(XPTY, 4, "% expected, % found."),
   /** Error code. */
   BINARY_X(XPTY, 4, "Binary expected, % found."),
@@ -1507,12 +1503,10 @@ public enum QueryError {
     /** Error type. */ DB(DB_PREFIX,             DB_URI),
     /** Error type. */ FETCH(FETCH_PREFIX,       FETCH_URI),
     /** Error type. */ FT(FT_PREFIX,             FT_URI),
-    /** Error type. */ HTML(HTML_PREFIX,         HTML_URI),
     /** Error type. */ INSPECT(INSPECT_PREFIX,   INSPECT_URI),
     /** Error type. */ JOB(JOB_PREFIX,           JOB_URI),
     /** Error type. */ JSON(JSON_PREFIX,         JSON_URI),
     /** Error type. */ PROC(PROC_PREFIX,         PROC_URI),
-    /** Error type. */ PROF(PROF_PREFIX,         PROF_URI),
     /** Error type. */ RANDOM(RANDOM_PREFIX,     RANDOM_URI),
     /** Error type. */ REPO(REPO_PREFIX,         REPO_URI),
     /** Error type. */ REQUEST(REQUEST_PREFIX,   REQUEST_URI),
@@ -1710,7 +1704,7 @@ public enum QueryError {
       // add cardinality string
       desc.add(Strings.capitalize(est.occ.desc)).add(" expected");
       // add expected type if item type differs from input
-      if(!(ist.type.instanceOf(est.type))) {
+      if(!ist.type.instanceOf(est.type)) {
         desc.add(" (").add(est).add(")");
       }
       // add number of results or type of input

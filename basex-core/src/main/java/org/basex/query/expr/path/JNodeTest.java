@@ -121,10 +121,11 @@ public final class JNodeTest extends Test {
   @Override
   public Test intersect(final Test test) {
     if(test == NodeTest.GNODE) return this;
-    if(test instanceof JNodeTest jt) {
+    if(test instanceof final JNodeTest jt) {
       final SeqType ct = valueType.intersect(jt.valueType);
       if(ct == null) return null;
-      Item k1 = key, k2 = jt.key;
+      Item k1 = key;
+      final Item k2 = jt.key;
       if(k2 != null) {
         if(k1 != null && !equals(k1, k2)) return null;
         k1 = k2;

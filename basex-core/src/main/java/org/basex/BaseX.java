@@ -230,15 +230,11 @@ public class BaseX extends CLI {
         } else if(!local()) {
           // client options: need to be set before other options
           switch(ch) {
-            // set server name
-            case 'n': context.soptions.set(StaticOptions.HOST, arg.string()); break;
-            // set server port
-            case 'p': context.soptions.set(StaticOptions.PORT, arg.number()); break;
-            // specify password
-            case 'P': context.soptions.set(StaticOptions.PASSWORD, arg.string()); break;
-            // specify username
-            case 'U': context.soptions.set(StaticOptions.USER, arg.string()); break;
-            default: throw arg.usage();
+            case 'n' -> context.soptions.set(StaticOptions.HOST, arg.string());
+            case 'p' -> context.soptions.set(StaticOptions.PORT, arg.number());
+            case 'P' -> context.soptions.set(StaticOptions.PASSWORD, arg.string());
+            case 'U' -> context.soptions.set(StaticOptions.USER, arg.string());
+            default -> throw arg.usage();
           }
         } else {
           throw arg.usage();

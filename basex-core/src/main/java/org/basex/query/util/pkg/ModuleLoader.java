@@ -30,7 +30,7 @@ public final class ModuleLoader {
   /** Java modules. */
   private final HashSet<Object> javaModules = new HashSet<>();
   /** Current class loaders. */
-  private ArrayList<Loader> loaders = new ArrayList<>();
+  private final ArrayList<Loader> loaders = new ArrayList<>();
   /** Resolved classes. */
   private final HashMap<String, Class<?>> resolved = new HashMap<>();
 

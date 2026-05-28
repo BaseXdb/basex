@@ -273,18 +273,12 @@ public final class JsonBasicSerializer extends JsonSerializer {
       if(cp >= 0 && cp < 32 || cp >= 127 && cp < 160) {
         tb.add('\\');
         switch(cp) {
-          case '\b':
-            tb.add('b'); break;
-          case '\f':
-            tb.add('f'); break;
-          case '\n':
-            tb.add('n'); break;
-          case '\r':
-            tb.add('r'); break;
-          case '\t':
-            tb.add('t'); break;
-          default:
-            tb.add('u').add(hex(cp, 4));
+          case '\b' -> tb.add('b');
+          case '\f' -> tb.add('f');
+          case '\n' -> tb.add('n');
+          case '\r' -> tb.add('r');
+          case '\t' -> tb.add('t');
+          default -> tb.add('u').add(hex(cp, 4));
         }
       } else {
         if((cp == '\\' || cp == '"' || cp == '/' && escapeSolidus) &&

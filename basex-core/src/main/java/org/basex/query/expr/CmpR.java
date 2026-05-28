@@ -105,12 +105,19 @@ public final class CmpR extends Single {
     if(int1 && (Math.abs(mn) >= MAX_INTEGER || Math.abs(mx) >= MAX_INTEGER)) return cmp;
 
     switch(cmp.op) {
-      case GE: mx = POSITIVE_INFINITY; break;
-      case GT: mn = Math.nextUp(mn); mx = POSITIVE_INFINITY; break;
-      case LE: mn = NEGATIVE_INFINITY; break;
-      case LT: mn = NEGATIVE_INFINITY; mx = Math.nextDown(mx); break;
-      // do not rewrite (non-)equality comparisons
-      default: return cmp;
+      case GE -> mx = POSITIVE_INFINITY;
+      case GT -> {
+        mn = Math.nextUp(mn);
+        mx = POSITIVE_INFINITY;
+      }
+      case LE -> mn = NEGATIVE_INFINITY;
+      case LT -> {
+        mn = NEGATIVE_INFINITY;
+        mx = Math.nextDown(mx);
+      }
+      default -> {
+        return cmp;
+      }
     }
     return get(cc, cmp.info, expr1, mn, mx);
   }

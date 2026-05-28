@@ -194,7 +194,7 @@ public abstract class StandardFunc extends Arr {
           // check whether function arguments may contain non-deterministic code
           final int hof = hofOffsets(), al = args().length;
           for(int a = 0; a < al; a++) {
-            if((hof & (1 << a)) != 0 && (!(arg(a) instanceof final Item item) ||
+            if((hof & 1 << a) != 0 && (!(arg(a) instanceof final Item item) ||
                 !(item instanceof final FuncItem fi) || fi.expr.has(Flag.NDT))) return true;
           }
           break;

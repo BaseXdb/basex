@@ -35,7 +35,7 @@ public abstract class XQMap extends XQStruct {
    * @param key key
    * @param value value
    */
-  public record Entry(Item key, Value value) { };
+  public record Entry(Item key, Value value) { }
 
   /**
    * Constructor.
@@ -118,7 +118,7 @@ public abstract class XQMap extends XQStruct {
   public final Value value(final Item key) {
     try {
       return getOrNull(key);
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       // the exception is only caused by atomizing the key
       throw Util.notExpected(ex);
     }

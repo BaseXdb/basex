@@ -2354,7 +2354,7 @@ public class QueryParser extends InputParser {
     }
 
     // all tests are node tests
-    if(((Checks<ExprInfo>) t -> t instanceof Test).all(list)) {
+    if(((Checks<ExprInfo>) Test.class::isInstance).all(list)) {
       final ArrayList<Test> tests = new ArrayList<>(list.size());
       for(final ExprInfo ei : list) tests.add((Test) ei);
       return new CachedStep(info(), axis, Test.get(tests), preds.finish());
@@ -2428,9 +2428,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private ExprInfo simpleNodeTest(final Kind kind, final boolean all) throws QueryException {
-    final java.util.function.BiFunction<QNm, NameTest.Scope, Test> nameTest = (qnm, scope) -> {
-      return Test.get(all && kind == Kind.ELEMENT ? null : kind, qnm, scope, sc.elemNS);
-    };
+    final java.util.function.BiFunction<QNm, NameTest.Scope, Test> nameTest = (qnm, scope) ->
+      Test.get(all && kind == Kind.ELEMENT ? null : kind, qnm, scope, sc.elemNS);
     int p = pos;
     if(consume('*')) {
       p = pos;

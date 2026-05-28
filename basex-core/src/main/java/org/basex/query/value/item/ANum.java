@@ -198,7 +198,7 @@ public abstract class ANum extends Item {
     if(d == i) return i;
     // general path: distribute bits to improve hashing
     final long bits = Double.doubleToLongBits(d);
-    int h = (int) (bits ^ (bits >>> 32));
+    int h = (int) (bits ^ bits >>> 32);
     h ^= h >>> 20 ^ h >>> 12;
     return h ^ h >>> 7 ^ h >>> 4;
   }

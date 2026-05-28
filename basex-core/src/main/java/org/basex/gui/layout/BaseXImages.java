@@ -72,7 +72,7 @@ public final class BaseXImages {
     for(int x = 0; x < image.getWidth(); x++) {
       for(int y = 0; y < image.getHeight(); y++) {
         final int rgb = image.getRGB(x, y);
-        final int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+        final int r = rgb >> 16 & 0xFF, g = rgb >> 8 & 0xFF, b = rgb & 0xFF;
         if(r != g || r != b) return image;
         tmp.setRGB(x, y, rgb ^ 0x00FFFFFF);
       }

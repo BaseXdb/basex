@@ -131,10 +131,9 @@ final class XMLScanner extends Job {
 
     // checks the scanner state
     switch(scan) {
-      case CNTNT: scanCONTENT(ch); break;
-      case ELMNT:
-      case ATTRBT: scanELEMENT(ch); break;
-      case QUT: scanATTVALUE(ch);
+      case CNTNT -> scanCONTENT(ch);
+      case ELMNT, ATTRBT -> scanELEMENT(ch);
+      case QUT -> scanATTVALUE(ch);
     }
     return true;
   }

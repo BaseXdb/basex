@@ -371,7 +371,7 @@ public final class Token {
     final byte[] tmp = new byte[nl];
 
     while(n >= 100) {
-      final int q = n / 100, r = (n % 100) * 2;
+      final int q = n / 100, r = n % 100 * 2;
       tmp[--nl] = PAIRS[r + 1];
       tmp[--nl] = PAIRS[r];
       n = q;

@@ -1521,7 +1521,8 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" ()", " fn { if(.) { . -1 } }"), "");
     query(func.args(3, " fn { if(.) { . -1 } }"), "3\n2\n1\n0");
 
-    String init = "x", step = " fn { . || 'x' }";
+    final String init = "x";
+    String step = " fn { . || 'x' }";
     query("head(" + func.args(init, step) + ")", init);
     query("count(" + func.args(init, step) + ") > 10", true);
     query(func.args(init, step) + "[1]", init);

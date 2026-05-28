@@ -50,7 +50,7 @@ public final class Jobs {
       options.set(MainOptions.INTPARSE, true);
       options.set(MainOptions.STRIPWS, true);
       final XNode doc = new DBNode(Parser.singleParser(file, options, ""));
-      if(children(doc, Q_JOBS).next() instanceof XNode root) {
+      if(children(doc, Q_JOBS).next() instanceof final XNode root) {
         for(final GNode child : children(root)) {
           final QNm qname = child.qname();
           if(qname.eq(Q_JOB)) {

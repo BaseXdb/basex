@@ -47,7 +47,7 @@ public final class JsonW3Converter extends JsonConverter {
   /** Stack for intermediate maps. */
   private final Stack<MapBuilder> maps = new Stack<>();
   /** Number format. */
-  private JsonNumberFormat fmt;
+  private final JsonNumberFormat fmt;
 
   /**
    * Constructor.

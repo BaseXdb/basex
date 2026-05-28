@@ -407,24 +407,18 @@ public class DBNode extends XNode {
   public void toString(final QueryString qs) {
     if(qs.error() || data.inMemory()) {
       switch(kind()) {
-        case ATTRIBUTE:
+        case ATTRIBUTE ->
           qs.concat(name(), "=", QueryString.toQuoted(string()));
-          break;
-        case PROCESSING_INSTRUCTION:
+        case PROCESSING_INSTRUCTION ->
           qs.concat(FPI.OPEN, name(), " ", QueryString.toValue(string()), FPI.CLOSE);
-          break;
-        case ELEMENT:
+        case ELEMENT ->
           qs.concat("<", name(), hasChildren() || hasAttributes() ? DOTS : "", "/>");
-          break;
-        case DOCUMENT:
+        case DOCUMENT ->
           qs.token(DOCUMENT).brace(QueryString.toQuoted(baseURI()));
-          break;
-        case COMMENT:
+        case COMMENT ->
           qs.concat("<!--", QueryString.toValue(string()), "-->");
-          break;
-        default:
+        default ->
           qs.quoted(string());
-          break;
       }
     } else {
       qs.function(Function._DB_GET_PRE, data.meta.name, pre);

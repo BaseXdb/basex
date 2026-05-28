@@ -269,7 +269,7 @@ public final class Strings {
    * @return string
    */
   public static String plural(final String noun, final long n) {
-    return (n == 1) ? noun : noun + 's';
+    return n == 1 ? noun : noun + 's';
   }
 
   /**
