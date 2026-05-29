@@ -14,7 +14,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ArchiveUpdate extends ArchiveCreate {
+public final class ArchiveUpdate extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Map<String, Entry<Item, Item>> files = toFiles(arg(1), arg(2), qc);

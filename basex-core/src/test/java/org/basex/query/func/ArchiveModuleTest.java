@@ -401,6 +401,15 @@ public final class ArchiveModuleTest extends SandboxTest {
     // updates an existing entry
     error(_ARCHIVE_CREATE.args("X", "X", " { 'format': 'gzip' }") + " => " +
         func.args("X", "Y"), ARCHIVE_MODIFY_X);
+
+    // updated archive, streamed to a file: must not be routed through the
+    // archive:create optimization (different argument layout)
+    final String tmp = Prop.TEMPDIR + NAME + "update";
+    query(_FILE_WRITE_BINARY.args(tmp, _ARCHIVE_CREATE.args(
+        " <archive:entry>X</archive:entry>", "X") + " => " +
+        func.args(" <archive:entry>Y</archive:entry>", "Y")));
+    query(_ARCHIVE_EXTRACT_TEXT.args(tmp), "X\nY");
+    query(_FILE_DELETE.args(tmp));
   }
 
   /** Test method. */

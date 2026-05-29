@@ -22,7 +22,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class ArchiveRefresh extends ArchiveCreate {
+public final class ArchiveRefresh extends ArchiveFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // entries to be updated

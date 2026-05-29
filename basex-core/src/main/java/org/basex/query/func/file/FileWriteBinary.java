@@ -46,7 +46,7 @@ public class FileWriteBinary extends FileWriteFn {
         raf.write(value);
       }
     } else if(arg(1) instanceof final ArchiveCreate ac) {
-      // optimization: stream archive to disk
+      // optimization: stream archive to disk (archive:create, archive:create-from)
       try(BufferOutput out = BufferOutput.get(new FileOutputStream(path.toFile(), append))) {
         ac.create(out, qc);
       }
