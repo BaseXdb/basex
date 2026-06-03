@@ -455,4 +455,11 @@ public final class FilterTest extends SandboxTest {
     check(pre + "!= 0          to last() + 1" + post, "", empty());
     check(pre + "!= last() + 1 to last() + 2" + post, "", empty(Pos.class));
   }
+
+  /** GH-2687: NPE from AndExpr filter over ContextValueRef step. */
+  @Test public void gh2687() {
+    query("()/.[true() and true()]", "");
+    query("declare function all-whitespace($arg) { normalize-space($arg) = '' };\n"
+        + "<a/>/.[true() and all-whitespace('')]", "<a/>");
+  }
 }
