@@ -16,7 +16,7 @@ public abstract class StaticDecl extends StaticScope {
   /** Annotations. */
   public AnnList anns;
 
-  /** Indicates if code is currently being compiled or evaluated. */
+  /** Indicates if code is currently being compiled. */
   protected boolean dontEnter;
 
   /**

@@ -2,9 +2,11 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+import static org.junit.jupiter.api.Timeout.ThreadMode.*;
 
 import org.basex.*;
 import org.basex.core.*;
+import org.basex.io.*;
 import org.junit.jupiter.api.*;
 
 /**
@@ -247,6 +249,53 @@ xquery:fork-join(
     query(func.args(" (fn() { 1 }, fn() { 2 })", " { 'timeout': 60 }") + " => count()", 2);
     // a non-positive timeout is treated as "no timeout"
     query(func.args(" (fn() { 1 }, fn() { 2 })", " { 'timeout': -1 }") + " => count()", 2);
+  }
+
+  /** Test method. */
+  @Test @Timeout(value = 60, threadMode = SEPARATE_THREAD) public void gh2678() {
+    final Function func = _XQUERY_FORK_JOIN;
+
+    // GH-2678: concurrent access to module-level static variable caused XQDY0054
+    // ("static variable depends on itself")
+    query("declare variable $V := (1 to 1000000) ! math:sqrt(.); "
+        + func.args(" (1 to 16) ! fn() { sum($V) }"));
+
+    final IOFile x = new IOFile(sandbox(), "x.xqm");
+    write(x, "module namespace x = 'x'; declare variable $x:V := (1 to 1000000) ! math:sqrt(.);");
+    query("import module namespace x = 'x' at \"" + x.path() + "\"; "
+        + func.args(" (1 to 16) ! fn() { sum($x:V) }"));
+
+    query("declare %basex:lazy variable $V := (prof:sleep(200), random:double());\n"
+        + "count(distinct-values(xquery:fork-join((1 to 16) ! fn() { $V })))", 1);
+
+    final IOFile f = new IOFile(sandbox(), "f.txt");
+    query("declare %basex:lazy variable $V :=\n"
+        + "  (prof:sleep(200), file:append-text('" + f.path() + "', 'x'), random:double());\n"
+        + "count(distinct-values(xquery:fork-join((1 to 16) ! fn() { $V }))),\n"
+        + "file:size('" + f.path() + "')", "1\n1");
+
+    error("declare %basex:lazy variable $a := (prof:sleep(200), $b);\n"
+        + "declare %basex:lazy variable $b := (prof:sleep(200), $a);\n"
+        + func.args(" (fn() { $a }, fn() { $b })"), CIRCVAR_X);
+    query("""
+declare %basex:lazy variable $A := (prof:sleep(200), $B);
+declare %basex:lazy variable $B := (prof:sleep(200), $C);
+declare %basex:lazy variable $C := (prof:sleep(200), $D);
+declare %basex:lazy variable $D := (prof:sleep(200), $E);
+declare %basex:lazy variable $E := (prof:sleep(200), $F);
+declare %basex:lazy variable $F := (prof:sleep(200), $A);
+let $errors := xquery:fork-join((
+  fn() { $A },
+  fn() { $B },
+  fn() { $C },
+  fn() { $D },
+  fn() { $E },
+  fn() { $F }
+), { 'report': true() })?error?code
+return count($errors[local-name-from-QName(.) = 'XQDY0054'])
+        """, 6);
+    error("declare %basex:lazy variable $V := xquery:fork-join((1 to 2) ! fn() { $V }, "
+        + "{ 'parallel': 2 }); $V", CIRCVAR_X);
   }
 
   /** Test method. */

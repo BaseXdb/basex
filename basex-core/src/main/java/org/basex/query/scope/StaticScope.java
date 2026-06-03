@@ -27,8 +27,11 @@ public abstract class StaticScope extends ExprInfo implements Scope {
 
   /** Expression of this declaration ({@code null} if this is an external function). */
   public Expr expr;
-  /** Resulting value (can be {@code null}). */
-  public Value value;
+  /**
+   * Resulting value (can be {@code null}, declared 'volatile' because of concurrent access
+   * while possibly being modified in {@link org.basex.query.var.StaticVar#value(QueryContext)}).
+   */
+  public volatile Value value;
 
   /** Input info (can be {@code null}). */
   public InputInfo info;
