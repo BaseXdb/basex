@@ -129,6 +129,19 @@ public final class InputInfo {
     internal = value;
   }
 
+  /**
+   * Creates a copy of this instance. All state is preserved, including lazy-initialization data,
+   * so that each copy can independently initialize its line and column.
+   * @return copy
+   */
+  public InputInfo copy() {
+    final InputInfo copy = new InputInfo(path, line, column);
+    copy.input = input;
+    copy.sc = sc;
+    copy.internal = internal;
+    return copy;
+  }
+
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final InputInfo ii &&

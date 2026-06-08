@@ -3,6 +3,10 @@ package org.basex.query.var;
 import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
@@ -24,6 +28,12 @@ public final class StaticVar extends StaticDecl {
   public final boolean external;
   /** Flag for lazy evaluation. */
   private final boolean lazy;
+  /** Context currently evaluating this variable. */
+  private QueryContext evalContext;
+  /** Error raised while evaluating this variable. */
+  private Throwable evalError;
+  /** Query exception data. */
+  private QueryException.Data exceptionData;
 
   /**
    * Constructor for a variable declared in a query.
@@ -75,23 +85,116 @@ public final class StaticVar extends StaticDecl {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    if(dontEnter) throw CIRCVAR_X.get(info, name());
     if(!lazy && expr == null) throw VAREMPTY_X.get(info, name());
 
-    if(value == null) {
-      dontEnter = true;
-      final QueryFocus focus = pushFocus(qc);
-      try {
-        super.value(qc);
-      } catch(final QueryException ex) {
+    Value cached = value;
+    if(cached != null) return cached;
+    cached = acquireEvaluation(qc);
+    if(cached != null) return cached;
+
+    final QueryFocus focus = pushFocus(qc);
+    Throwable error = null;
+    try {
+      return super.value(qc);
+    } catch(final Throwable th) {
+      if(th instanceof final QueryException ex) {
         if(lazy) ex.notCatchable();
+        exceptionData = new QueryException.Data(ex);
+        error = ex;
         throw ex;
-      } finally {
-        qc.focus = focus;
-        dontEnter = false;
       }
+      error = th;
+      if(th instanceof final RuntimeException ex) throw ex;
+      if(th instanceof final Error ex) throw ex;
+      throw Util.notExpected(th);
+    } finally {
+      qc.focus = focus;
+      releaseEvaluation(qc, error);
     }
-    return value;
+  }
+
+  /**
+   * Acquires the right to evaluate this variable, or returns a cached value.
+   * @param qc query context
+   * @return cached value, or {@code null} if the caller must evaluate it
+   * @throws QueryException query exception
+   */
+  private Value acquireEvaluation(final QueryContext qc) throws QueryException {
+    final IdentityHashMap<QueryContext, StaticVar> waiting = qc.staticVarWaiting;
+    synchronized(waiting) {
+      if(value != null) return value;
+      if(evalError != null) throwEvaluationError();
+      if(evalContext == null) {
+        // OK to evaluate this variable
+        evalContext = qc;
+        return null;
+      }
+
+      // someone else is evaluating this variable, check for circular dependencies,
+      // wait for them to finish
+      waiting.put(qc, this);
+      try {
+        if(circular(qc)) throw CIRCVAR_X.get(info, name());
+        while(evalContext != null && value == null && evalError == null) {
+          waiting.wait();
+        }
+      } catch(final InterruptedException ex) {
+        Util.debug(ex);
+        Thread.currentThread().interrupt();
+        throw new JobException(Text.INTERRUPTED);
+      } finally {
+        waiting.remove(qc);
+      }
+      if(value != null) return value;
+      if(evalError != null) throwEvaluationError();
+      throw Util.notExpected();
+    }
+  }
+
+  /**
+   * Releases evaluation ownership and wakes waiting threads.
+   * @param qc query context
+   * @param error error raised while evaluating this variable
+   */
+  private void releaseEvaluation(final QueryContext qc, final Throwable error) {
+    final IdentityHashMap<QueryContext, StaticVar> waiting = qc.staticVarWaiting;
+    synchronized(waiting) {
+      evalError = error;
+      evalContext = null;
+      waiting.notifyAll();
+    }
+  }
+
+  /**
+   * Checks if waiting for this variable would introduce a circular dependency. This is the case if
+   * the current query context {@code qc} is the same as or nested in the evaluating context, or if
+   * the chain of waiting contexts, that is linked by the variables they are waiting for, contains
+   * the current query context {@code qc}.
+   * @param qc current query context
+   * @return result of check
+   */
+  private boolean circular(final QueryContext qc) {
+    for(QueryContext q = qc; q != null; q = q.parent) {
+      if(q == evalContext) return true;
+    }
+    for(StaticVar sv = this; sv != null;) {
+      final QueryContext evaluator = sv.evalContext;
+      if(evaluator == qc) return true;
+      if(evaluator == null) return false;
+      sv = qc.staticVarWaiting.get(evaluator);
+    }
+    return false;
+  }
+
+  /**
+   * Throws an error that was raised while evaluating this variable.
+   * @throws QueryException query exception
+   */
+  private void throwEvaluationError() throws QueryException {
+    if(evalError instanceof QueryException) throw exceptionData.toException();
+    if(evalError instanceof final RuntimeException ex) throw ex;
+    if(evalError instanceof final Error ex) throw ex;
+    throw Util.notExpected(evalError);
   }
 
   /**
