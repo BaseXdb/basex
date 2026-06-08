@@ -19,6 +19,7 @@ public final class SerializerTest extends SandboxTest {
   /** Test: method=xml. */
   @Test public void xml() {
     query(METHOD.arg("xml") + "<html/>", "<html/>");
+    query(METHOD.arg("xml") + "<x a='1 > 0'>1 > 0</x>", "<x a=\"1 &gt; 0\">1 &gt; 0</x>");
     query(METHOD.arg("xml") + INDENT_ATTRIBUTES.arg("yes") + "<x a='1' b='2' c='3'/>",
         "<x a=\"1\"\n"
         + "   b=\"2\"\n"
@@ -382,6 +383,17 @@ public final class SerializerTest extends SandboxTest {
   /** Canonical serialization. */
   @Test public void canonical() {
     final String option = METHOD.arg("xml") + CANONICAL.arg("yes");
+
+    query(option + "parse-xml('<doc>Hello, world!<!--C2--></doc><!--C3-->')",
+        "<doc>Hello, world!<!--C2--></doc>\n<!--C3-->");
+    query(option + "parse-xml('<!--C1--><doc>Hello, world!<!--C2--></doc><!--C3-->')",
+        "<!--C1-->\n<doc>Hello, world!<!--C2--></doc>\n<!--C3-->");
+    query(option + "parse-xml('<!--C0--><!--C1--><doc>Hello, world!<!--C2--></doc><!--C3-->')",
+        "<!--C0-->\n<!--C1-->\n<doc>Hello, world!<!--C2--></doc>\n<!--C3-->");
+    query(option + "document { comment {'C1'}, <doc>Hello, world!<!--C2--></doc>, comment {'C3'} }",
+        "<!--C1-->\n<doc>Hello, world!<!--C2--></doc>\n<!--C3-->");
+    query(option + "<x a='1 > 0'>1 > 0</x>", "<x a=\"1 > 0\">1 &gt; 0</x>");
+
     // relative namespace URIs are not allowed
     error(option + "<x xmlns='relative'/>", SERCANONURI);
     // document must only have one element root node
