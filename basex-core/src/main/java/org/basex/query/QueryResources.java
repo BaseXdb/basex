@@ -33,8 +33,8 @@ import org.basex.util.list.*;
 public final class QueryResources {
   /** Default options. */
   public static final DocOptions DOC_OPTIONS = new DocOptions();
-  /** Default options for creating new documents. */
-  private static final MainOptions MAIN_OPTIONS = new MainOptions(DOC_OPTIONS);
+  /** Default options for creating new documents (trusted=false: fn-level default). */
+  private static final MainOptions MAIN_OPTIONS = new MainOptions(DOC_OPTIONS, null);
 
   /** Database context. */
   private final Context context;
@@ -501,11 +501,11 @@ public final class QueryResources {
     final MainOptions mopts = context.options, options;
     final boolean mainmem = !mopts.get(MainOptions.FORCECREATE);
     if(mainmem) {
-      if(docOpts == DOC_OPTIONS && mopts.resolver().standard()) {
+      if(docOpts == DOC_OPTIONS && mopts.resolver().standard()
+          && !mopts.get(MainOptions.FNXMLTRUSTED)) {
         options = MAIN_OPTIONS;
       } else {
-        options = new MainOptions(docOpts);
-        options.setResolver(mopts);
+        options = new MainOptions(docOpts, mopts);
       }
     } else {
       docOpts.checkDbAccess(info);
@@ -520,6 +520,8 @@ public final class QueryResources {
       return addData(data);
     } catch(final IOException ex) {
       final Throwable th = ex.getCause();
+      if(th instanceof TrustedViolationException)
+        throw EXTERNALRESOURCE_X.get(info, th.getMessage());
       throw !(th instanceof ValidationException) ? IOERR_X.get(info, ex) :
         options.get(MainOptions.DTDVALIDATION) ? DTDVALIDATIONERR_X.get(info, ex) :
           XSDVALIDATIONERR_X.get(info, ex);

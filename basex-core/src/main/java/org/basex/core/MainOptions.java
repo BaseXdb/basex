@@ -70,6 +70,8 @@ public final class MainOptions extends Options {
       CommonOptions.SKIP);
   /** Flag for handling xsi:schemaLocation and xsi:noNamespaceSchemaLocation attributes. */
   public static final BooleanOption XSILOCATION = new BooleanOption("XSILOCATION", true);
+  /** Default value for the fn-level XML parser 'trusted' option (fn:doc, fn:parse-xml, etc.). */
+  public static final BooleanOption FNXMLTRUSTED = new BooleanOption("FNXMLTRUSTED", true);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", false);
   /** Path to XML Catalog files. */
@@ -203,7 +205,7 @@ public final class MainOptions extends Options {
     XMLPARSINGMAP.put(CommonOptions.DTD, DTD);
     XMLPARSINGMAP.put(CommonOptions.DTD_VALIDATION, DTDVALIDATION);
     XMLPARSINGMAP.put(CommonOptions.XSD_VALIDATION, XSDVALIDATION);
-    XMLPARSINGMAP.put(CommonOptions.XSI_SCHEMA_LOCATION, XSILOCATION);
+    XMLPARSINGMAP.put(CommonOptions.USE_XSI_SCHEMA_LOCATION, XSILOCATION);
     XMLPARSINGMAP.put(CommonOptions.XINCLUDE, XINCLUDE);
     XMLPARSINGMAP.put(CommonOptions.CATALOG, CATALOG);
   }
@@ -250,6 +252,8 @@ public final class MainOptions extends Options {
 
   /** Resolver instance (lazy instantiation). */
   private XMLResolver resolver;
+  /** Whether external resources may be accessed. Derived from context, not user-configurable. */
+  private boolean trusted = true;
 
   /**
    * Default constructor.
@@ -273,6 +277,7 @@ public final class MainOptions extends Options {
   public MainOptions(final MainOptions options) {
     super(options);
     resolver = options.resolver;
+    trusted = options.trusted;
   }
 
   /**
@@ -284,18 +289,28 @@ public final class MainOptions extends Options {
     this(false);
     for(final Option<?> option : xml ? XMLPARSING : PARSING) put(option, options.get(option));
     resolver = options.resolver;
+    trusted = options.trusted;
   }
 
   /**
    * Constructor, adopting parsing options from the specified instance.
    * @param options options
+   * @param parent parent options
    */
-  public MainOptions(final Options options) {
+  public MainOptions(final Options options, final MainOptions parent) {
     this(false);
     XMLPARSINGMAP.forEach((source, target) -> {
       final Object value = options.get(source);
       if(value != null) put(target, value);
     });
+    final Boolean t = options.get(CommonOptions.TRUSTED);
+    if(parent == null) {
+      resolver = null;
+      trusted = t != null ? t : false;
+    } else {
+      setResolver(parent);
+      trusted = t != null ? t : parent.trusted && parent.get(FNXMLTRUSTED);
+    }
   }
 
   /**
@@ -326,5 +341,13 @@ public final class MainOptions extends Options {
     final String catalog = get(CATALOG);
     if(resolver == null || !catalog.equals(resolver.catalog())) resolver = new XMLResolver(catalog);
     return resolver;
+  }
+
+  /**
+   * Returns whether external resources may be accessed when parsing XML.
+   * @return trusted flag
+   */
+  public boolean isTrusted() {
+    return trusted;
   }
 }

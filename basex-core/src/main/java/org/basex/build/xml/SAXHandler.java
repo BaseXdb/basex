@@ -221,4 +221,15 @@ public class SAXHandler extends DefaultHandler implements LexicalHandler {
       super(cause);
     }
   }
+
+  /** Exception raised when an external resource is encountered and trusted=false. */
+  public static class TrustedViolationException extends SAXException {
+    /**
+     * Constructor.
+     * @param resource blocked resource identifier, e.g. an entity reference
+     */
+    public TrustedViolationException(final String resource) {
+      super(resource);
+    }
+  }
 }
