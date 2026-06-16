@@ -50,7 +50,10 @@ public final class FnReplace extends RegExFn {
       while(matcher.find()) {
         final ValueBuilder groups = new ValueBuilder(qc);
         final int gc = matcher.groupCount();
-        for(int g = 0; g < gc; g++) groups.add(Atm.get(matcher.group(g + 1)));
+        for(int g = 0; g < gc; g++) {
+          final String grp = matcher.group(g + 1);
+          groups.add(grp == null ? Atm.EMPTY : Atm.get(grp));
+        }
         args.set(0, Atm.get(matcher.group())).set(1, groups.value());
         final Item item = invoke(action, args, qc).atomItem(qc, info);
         matcher.appendReplacement(sb, item.isEmpty() ? "" :

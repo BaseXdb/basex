@@ -3233,6 +3233,9 @@ return
     query(func.args("c", "c", " fn($k, $g) { upper-case($k) }"), "C");
     query(func.args("de", ".", " fn($k, $g) { $k || $k }"), "ddee");
 
+    // GH-2692: unmatched groups supplied to replacement functions are zero-length strings
+    query(func.args("", "(X)?", " fn($_, $groups) { $groups[1] }"), "");
+
     query(func.args("Chapter 9", "[0-9]+", " fn($k, $g) { string(number($k) + 1) }"),
         "Chapter 10");
     query("let $map := { 'LAX': 'Los Angeles', 'LHR': 'London' } return"
