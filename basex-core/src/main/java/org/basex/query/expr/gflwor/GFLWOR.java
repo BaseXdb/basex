@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
+import org.basex.query.func.DynFuncCall;
 import org.basex.query.func.Function;
 import org.basex.query.func.fn.*;
 import org.basex.query.iter.*;
@@ -136,8 +137,9 @@ public final class GFLWOR extends ParseExpr {
 
   @Override
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
-    return cc.simplify(this, mode == Simplify.COUNT &&
-        clauses.removeIf(OrderBy.class::isInstance) ? optimize(cc) : this, mode);
+    // when counting, order is irrelevant: drop order-by clauses, but keep nondeterministic keys
+    return cc.simplify(this, mode == Simplify.COUNT && clauses.removeIf(
+        clause -> clause instanceof OrderBy && !clause.has(Flag.NDT)) ? optimize(cc) : this, mode);
   }
 
   /**
@@ -392,10 +394,14 @@ public final class GFLWOR extends ParseExpr {
         if(last) {
           // merge with return expression
           //   for $c in 1 to 3 return $c → 1 to 3
-          final Expr expr = inline(inline, rtrn, fl, cc);
-          if(expr != null) {
-            rtrn = expr;
-            changing = true;
+          // do not merge while the return references a preceding let bound to a nondeterministic
+          // function: the let-inlining above must run first, so cc.replicate sees the call's NDT
+          if(!referencesNdtFunction(rtrn, c)) {
+            final Expr expr = inline(inline, rtrn, fl, cc);
+            if(expr != null) {
+              rtrn = expr;
+              changing = true;
+            }
           }
         } else {
           // rewrite for/let combinations to a single for clause
@@ -431,6 +437,21 @@ public final class GFLWOR extends ParseExpr {
     }
 
     return changed;
+  }
+
+  /**
+   * Checks if an expression references the variable of a preceding let clause that is bound to a
+   * nondeterministic function item or closure.
+   * @param expr expression
+   * @param max index of the first clause that is not considered
+   * @return result of check
+   */
+  private boolean referencesNdtFunction(final Expr expr, final int max) {
+    for(int c = 0; c < max; c++) {
+      if(clauses.get(c) instanceof final Let lt && expr.count(lt.var) != VarUsage.NEVER &&
+          DynFuncCall.containsNdtFunction(lt.expr)) return true;
+    }
+    return false;
   }
 
   /**

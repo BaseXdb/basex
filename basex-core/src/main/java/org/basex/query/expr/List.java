@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -236,7 +237,12 @@ public final class List extends Arr {
     } else if(mode == Simplify.DISTINCT) {
       final int el = exprs.length;
       final ExprList list = new ExprList(el);
-      for(final Expr ex : exprs) list.addUnique(ex.simplifyFor(mode, cc));
+      for(final Expr ex : exprs) {
+        // do not drop duplicate nondeterministic operands, as this would discard side effects
+        final Expr sx = ex.simplifyFor(mode, cc);
+        if(sx.has(Flag.NDT)) list.add(sx);
+        else list.addUnique(sx);
+      }
       exprs = list.finish();
       if(exprs.length != el) {
         // remove duplicate list expressions

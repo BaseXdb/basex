@@ -5,6 +5,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.*;
 import org.basex.query.CompileContext.*;
 import org.basex.query.func.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -72,8 +73,9 @@ public class Arith extends Arr {
     if(expr == this && Function.COUNT.is(expr1) && calc == Calc.ADD && Function.COUNT.is(expr2)) {
       expr = cc.function(Function.COUNT, info, List.get(cc, info, expr1.arg(0), expr2.arg(0)));
     }
-    if(expr == this && numbers && noArrays && st1.one() && st2.one()) {
+    if(expr == this && numbers && noArrays && st1.one() && st2.one() && !has(Flag.NDT)) {
       // example: number($a) + 0 → number($a)
+      // nondeterministic operands must not be dropped, in order to preserve side effects
       final Expr ex = calc.optimize(expr1, expr2, info, cc);
       if(ex != null) {
         expr = ex;

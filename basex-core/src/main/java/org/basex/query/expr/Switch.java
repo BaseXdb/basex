@@ -97,7 +97,8 @@ public final class Switch extends ParseExpr {
       for(int e = 1; e < el; e++) {
         final Expr expr = group.exprs[e];
         // check if same case expression exists more than once
-        boolean remove = cases.contains(expr);
+        // (nondeterministic duplicates are kept, as they would otherwise lose their side effects)
+        boolean remove = cases.contains(expr) && !expr.has(Flag.NDT);
         if(!remove && cnd != null) {
           // pre-evaluate values; skip remaining checks if match is found
           if(expr instanceof Value) {

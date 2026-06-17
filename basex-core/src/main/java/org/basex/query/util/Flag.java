@@ -22,6 +22,9 @@ public enum Flag {
   CTX,
   /**
    * Nondeterministic code. Cannot be relocated, pre-evaluated or optimized away.
+   * Implied by {@link #UPD}: see the constructor of
+   * {@link org.basex.query.func.FuncDefinition} and
+   * {@code org.basex.query.up.expr.Update#has(Flag...)}.
    * Examples: random:double(), file:write()
    */
   NDT,

@@ -95,6 +95,14 @@ public final class FnReplicate extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0), count = arg(1);
+
+    // single evaluation suffices for deterministic input: drop a redundant repeated-evaluation
+    // flag (it may have been added conservatively for a call through a not-yet-resolved variable)
+    if(defined(2) && arg(2) == Bln.TRUE && !input.has(Flag.NDT, Flag.CNS) &&
+        !input.mayInvokeVariable()) {
+      return cc.function(REPLICATE, info, input, count);
+    }
+
     final boolean single = singleEval(true);
 
     // merge replicate functions
