@@ -376,7 +376,10 @@ public final class CompileContext {
   public Expr replicate(final Expr expr, final Expr count, final InputInfo info)
       throws QueryException {
     final ExprList args = new ExprList().add(expr).add(count);
-    if(expr.has(Flag.NDT, Flag.CNS)) args.add(Bln.TRUE);
+    // force repeated evaluation for side-effecting input and for calls through an unresolved
+    // variable that may be bound to a nondeterministic function. If the variable is later replaced
+    // with a deterministic function, FnReplicate drops the flag again, so nothing is pessimized.
+    if(expr.has(Flag.NDT, Flag.CNS) || expr.mayInvokeVariable()) args.add(Bln.TRUE);
     return function(Function.REPLICATE, info, args.finish());
   }
 

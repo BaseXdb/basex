@@ -239,6 +239,9 @@ public abstract class Cmp extends Arr {
 
     // distinct values checks
     final Expr arg = expr1.arg(0), count = exprs[1];
+    // keep nondeterministic input: the count comparisons below may skip its evaluation
+    if(arg.has(Flag.NDT)) return this;
+
     if(COUNT.is(count)) {
       final Expr carg = count.arg(0);
       // count(E) = count(distinct-values(E))

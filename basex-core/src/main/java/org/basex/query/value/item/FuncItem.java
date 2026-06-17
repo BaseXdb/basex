@@ -149,6 +149,14 @@ public final class FuncItem extends FItem implements Scope {
     return anns.contains(Annotation.UPDATING) || expr.has(Flag.UPD);
   }
 
+  /**
+   * Checks if the function body is non-deterministic.
+   * @return result of check
+   */
+  public boolean ndt() {
+    return expr.has(Flag.NDT);
+  }
+
   @Override
   public boolean accept(final ASTVisitor visitor) {
     return visitor.funcItem(this);

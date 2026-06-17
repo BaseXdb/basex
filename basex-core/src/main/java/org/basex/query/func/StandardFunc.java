@@ -195,7 +195,7 @@ public abstract class StandardFunc extends Arr {
           final int hof = hofOffsets(), al = args().length;
           for(int a = 0; a < al; a++) {
             if((hof & 1 << a) != 0 && (!(arg(a) instanceof final Item item) ||
-                !(item instanceof final FuncItem fi) || fi.expr.has(Flag.NDT))) return true;
+                !(item instanceof final FuncItem fi) || fi.ndt())) return true;
           }
           break;
         default:
@@ -336,9 +336,11 @@ public abstract class StandardFunc extends Arr {
     // head($nodes ! name()) → head($nodes) ! name()
     // foot((1 to 8) ! <_>{ . }</_>) → foot((1 to 8)) ! <_>{ . }</_>
     // do not rewrite positional access:  foot($nodes ! position())
+    // do not rewrite non-deterministic expressions: foot($nodes ! file:append($name, .))
     if(arg(0) instanceof SimpleMap) {
       final Expr[] ops = arg(0).args();
-      if(((Checks<Expr>) op -> op == ops[0] || op.seqType().one() && !op.has(Flag.POS)).all(ops)) {
+      if(((Checks<Expr>) op ->
+          op == ops[0] || op.seqType().one() && !op.has(Flag.POS, Flag.NDT)).all(ops)) {
         final Expr[] args = new ExprList().add(args()).set(0, ops[0]).finish();
         final Expr fn = definition.get(info, args).optimize(cc);
         return skip ? fn : SimpleMap.get(cc, info, new ExprList(ops.clone()).set(0, fn).finish());

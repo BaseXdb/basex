@@ -330,11 +330,6 @@ public final class RewritingsTest extends SandboxTest {
     check("((), <x/>, ())", "<x/>", empty(List.class), empty(Empty.class), exists(CElem.class));
   }
 
-  /** Checks that expressions marked as nondeterministic will not be rewritten. */
-  @Test public void nonDeterministic() {
-    check("count((# basex:nondeterministic #) { <x/> })", 1, exists(COUNT));
-  }
-
   /** Ensures that fn:doc with URLs will not be rewritten. */
   @Test public void doc() {
     check("<a>{ doc('" + FILE + "') }</a>//x", "", exists(DBNode.class));

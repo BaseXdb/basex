@@ -35,7 +35,8 @@ public class FnEmpty extends StandardFunc {
 
   @Override
   protected final void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.COUNT, cc));
+    // do not simplify nondeterministic input: the count rewrites could drop its side effects
+    arg(0, arg -> arg.has(Flag.NDT) ? arg : arg.simplifyFor(Simplify.COUNT, cc));
   }
 
   @Override

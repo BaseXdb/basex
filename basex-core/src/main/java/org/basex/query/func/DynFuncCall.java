@@ -12,10 +12,13 @@ import org.basex.query.ann.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.List;
 import org.basex.query.iter.*;
+import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.map.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
 import org.basex.util.*;
@@ -68,6 +71,11 @@ public final class DynFuncCall extends FuncCall {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     final Expr func = body();
+    // the call is nondeterministic if the invoked function is (a function item is a value and so
+    // carries no flag of its own, hence the explicit check)
+    if(func.has(Flag.NDT) || func instanceof final Value value && containsNdtFunction(value)) {
+      ndt = true;
+    }
 
     // ()() → ()
     if(func.seqType().zero()) return func;
@@ -123,6 +131,47 @@ public final class DynFuncCall extends FuncCall {
       }
     }
     return this;
+  }
+
+  /**
+   * Checks if an expression contains a nondeterministic function item or closure.
+   * @param expr expression
+   * @return result of check
+   */
+  public static boolean containsNdtFunction(final Expr expr) {
+    return expr instanceof Value value ? containsNdtFunction(value) :
+      !expr.accept(new ASTVisitor() {
+        @Override
+        public boolean funcItem(final FuncItem func) {
+          return !func.ndt();
+        }
+
+        @Override
+        public boolean inlineFunc(final Scope scope) {
+          return !(scope instanceof final Closure cl && cl.has(Flag.NDT));
+        }
+      });
+  }
+
+  /**
+   * Checks if a value contains a nondeterministic function item or closure.
+   * @param value value
+   * @return result of check
+   */
+  private static boolean containsNdtFunction(final Value value) {
+    for(final Item item : value) {
+      if(item instanceof final FuncItem fi && fi.ndt()) return true;
+      if(item instanceof final XQArray array) {
+        for(final Value member : array.members()) {
+          if(containsNdtFunction(member)) return true;
+        }
+      } else if(item instanceof final XQMap map) {
+        for(final XQMap.Entry entry : map.entries()) {
+          if(containsNdtFunction(entry.value())) return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override
@@ -204,6 +253,11 @@ public final class DynFuncCall extends FuncCall {
     return Flag.UPD.oneOf(flags) && (updating || sc().mixUpdates) ||
            Flag.NDT.oneOf(flags) && (ndt || updating || sc().mixUpdates) ||
            super.has(Flag.remove(flags, Flag.UPD));
+  }
+
+  @Override
+  public boolean accept(final ASTVisitor visitor) {
+    return visitor.dynFuncCall(body()) && super.accept(visitor);
   }
 
   @Override

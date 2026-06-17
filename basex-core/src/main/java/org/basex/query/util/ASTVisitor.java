@@ -78,6 +78,16 @@ public abstract class ASTVisitor {
   }
 
   /**
+   * Notifies the visitor of a dynamic function call.
+   * @param func expression that yields the invoked function
+   * @return if more expressions should be visited ({@code true} by default)
+   */
+  @SuppressWarnings("unused")
+  public boolean dynFuncCall(final Expr func) {
+    return true;
+  }
+
+  /**
    * Notifies the visitor of database locks. Overwritten by {@link MainModule}.
    * Returns {@code false} if the lock is not known statically.
    * @param list function supplying lock strings
