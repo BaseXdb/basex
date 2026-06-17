@@ -437,6 +437,7 @@ c_add1               = Veritabanına kaynak ekle.
 c_add2               = [%], [%] olarak veritabanına eklenir.
 c_alter1             = Veritabanı veya kullanıcı verilerini değiştir.
 c_alter2             = Bir veritabanının, kullanıcının veya kullanıcı parolasının adını değiştirir:
+c_alterbackup        = bir yedeğin adını değiştirir.
 c_alterdb            = veritabanının adını değiştirir.
 c_alterpw            = bir kullanıcının parolasını değiştirir.
 c_alteruser          = bir kullanıcının adını değiştirir.
