@@ -437,6 +437,7 @@ c_add1               = Ajouter ressource.
 c_add2               = Ajoute [%] comme [%] à la base de données.
 c_alter1             = Modifier des données de base de données ou utilisateur.
 c_alter2             = modifie le nom d’une base de données, d’un utilisateur ou d’un mot de passe :
+c_alterbackup        = modifie le nom d’une sauvegarde.
 c_alterdb            = modifie le nom d’une base de données.
 c_alterpw            = modifie le mot de passe d’un utilisateur.
 c_alteruser          = modifie le nom d’un utilisateur.

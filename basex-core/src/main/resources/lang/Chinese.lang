@@ -437,6 +437,7 @@ c_add1               = 将资源添加到数据库中
 c_add2               = 将[%]作为[%]添加到数据库中
 c_alter1             = 修改数据库或用户数据
 c_alter2             = 修改数据库名、用户或密码
+c_alterbackup        = 修改备份名称
 c_alterdb            = 修改数据库名称
 c_alterpw            = 修改密码
 c_alteruser          = 修改用户名

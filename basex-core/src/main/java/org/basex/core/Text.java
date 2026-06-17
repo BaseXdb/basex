@@ -7,6 +7,7 @@ import org.basex.core.parse.Commands.CmdBinary;
 import org.basex.core.parse.Commands.CmdCreate;
 import org.basex.core.parse.Commands.CmdDrop;
 import org.basex.core.parse.Commands.CmdIndex;
+import org.basex.core.parse.Commands.CmdIndexInfo;
 import org.basex.core.parse.Commands.CmdInfo;
 import org.basex.core.parse.Commands.CmdPerm;
 import org.basex.core.parse.Commands.CmdRepo;
@@ -369,7 +370,9 @@ public interface Text {
     lang("c_info21") + NL +
     LI + lang("c_info22") + NL +
     LI + CmdInfo.DATABASE + COLS + lang("c_info23") + NL +
-    LI + CmdInfo.INDEX + COLS + lang("c_info24") + NL +
+    LI + CmdInfo.INDEX + " [" + CmdIndexInfo.TEXT + '|' + CmdIndexInfo.ATTRIBUTE + '|' +
+      CmdIndexInfo.TOKEN + '|' + CmdIndexInfo.FULLTEXT + '|' + CmdIndexInfo.PATH + '|' +
+      CmdIndexInfo.ELEMNAME + '|' + CmdIndexInfo.ATTRNAME + "]" + COLS + lang("c_info24") + NL +
     LI + CmdInfo.STORAGE + " [start end] | [" + S_QUERY + "]: " + lang("c_info25")
   };
   /** Command help. */
@@ -452,13 +455,14 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPSHOW = {
-    "[" + CmdShow.BACKUPS + '|' + CmdShow.SESSIONS + '|' + CmdShow.USERS + ']',
+    "[" + CmdShow.BACKUPS + '|' + CmdShow.OPTIONS + '|' + CmdShow.SESSIONS + '|' + CmdShow.USERS +
+    ']',
     lang("c_show1"),
     lang("c_show21") + NL +
+    LI + CmdShow.BACKUPS + COLS + lang("c_show25") + NL +
     LI + CmdShow.OPTIONS + " ([name])" + COLS + lang("c_show22") + NL +
     LI + CmdShow.SESSIONS + COLS + lang("c_show23") + NL +
-    LI + CmdShow.USERS + " (" + ON + " [database])" + COLS + lang("c_show24") + NL +
-    LI + CmdShow.BACKUPS + COLS + lang("c_show25")
+    LI + CmdShow.USERS + " (" + ON + " [database])" + COLS + lang("c_show24")
   };
   /** Command help. */
   String[] HELPGRANT = {
@@ -470,15 +474,18 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + CmdAlter.DATABASE + '|' + CmdAlter.USER + '|' + CmdAlter.PASSWORD + "] [...]",
+    "[" + CmdAlter.BACKUP + '|' + CmdAlter.DATABASE + '|' + CmdAlter.PASSWORD + '|' +
+      CmdAlter.USER + "] [...]",
     lang("c_alter1"),
-    lang("c_alter2") + NL  +
+    lang("c_alter2") + NL +
+    LI + CmdAlter.BACKUP + " [" + S_NAME + "] [newname]" + NL +
+    "  " + lang("c_alterbackup") + NL +
     LI + CmdAlter.DATABASE + " [" + S_NAME + "] [newname]" + NL +
     "  " + lang("c_alterdb") + NL +
-    LI + CmdAlter.USER  + " [" + S_NAME + "] ([newname]):" + NL +
-    "  " + lang("c_alteruser") + NL +
     LI + CmdAlter.PASSWORD + " [" + S_NAME + "] [" + S_PW + ']' + NL +
-    "  " + lang("c_alterpw")
+    "  " + lang("c_alterpw") + NL +
+    LI + CmdAlter.USER  + " [" + S_NAME + "] ([newname]):" + NL +
+    "  " + lang("c_alteruser")
   };
   /** Command help. */
   String[] HELPINSPECT = {
