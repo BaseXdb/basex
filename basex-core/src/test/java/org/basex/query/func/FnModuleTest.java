@@ -3236,6 +3236,12 @@ return
     // GH-2692: unmatched groups supplied to replacement functions are zero-length strings
     query(func.args("", "(X)?", " fn($_, $groups) { $groups[1] }"), "");
 
+    // GH-2697: unmatched groups
+    query(func.args("a", "(a)|(b)", " fn($m){$m}"), "a");
+
+    // GH-2698: lookback for escaped dollar signs in replacement must look beyond first backslash
+    query(func.args("full stop.", "\\.", "\\\\$1"), "full stop\\");
+
     query(func.args("Chapter 9", "[0-9]+", " fn($k, $g) { string(number($k) + 1) }"),
         "Chapter 10");
     query("let $map := { 'LAX': 'Los Angeles', 'LHR': 'London' } return"
