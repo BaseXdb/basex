@@ -11,7 +11,6 @@ import org.basex.build.json.JsonParserOptions.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
-import org.basex.util.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
@@ -105,12 +104,7 @@ abstract class JsonXmlConverter extends JsonConverter {
 
   @Override
   protected void numberLit(final byte[] value) throws QueryException {
-    byte[] string = value;
-    if(numberParser != null) {
-      final Item item = numberParser.apply(value);
-      string = item.isEmpty() ? Token.EMPTY : item.string(null);
-    }
-    addValue(NUMBER, string);
+    addValue(NUMBER, value);
   }
 
   @Override
