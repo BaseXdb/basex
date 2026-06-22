@@ -5,6 +5,7 @@ import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 
+import org.basex.query.expr.path.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.hash.*;
 
@@ -211,6 +212,16 @@ public final class Types {
   public static final SeqType TEXT_ZO = TEXT.seqType(ZERO_OR_ONE);
   /** Zero or more text nodes. */
   public static final SeqType TEXT_ZM = TEXT.seqType(ZERO_OR_MORE);
+
+  /** Document with single element. */
+  public static final NodeType DOCUMENT_ELEMENT = NodeType.get(new DocTest(NodeTest.ELEMENT));
+  /** One document with single element. */
+  public static final SeqType DOCUMENT_ELEMENT_O = DOCUMENT_ELEMENT.seqType();
+  /** Zero or one document with single element. */
+  public static final SeqType DOCUMENT_ELEMENT_ZO = DOCUMENT_ELEMENT.seqType(ZERO_OR_ONE);
+  /** Zero or more documents or elements. */
+  public static final SeqType DOCUMENT_OR_ELEMENT_ZO =
+      ChoiceItemType.get(DOCUMENT_ELEMENT, NodeType.ELEMENT).seqType(Occ.ZERO_OR_ONE);
 
   /** Zero or one GNode. */
   public static final SeqType GNODE_ZO = GNODE.seqType(ZERO_OR_ONE);
