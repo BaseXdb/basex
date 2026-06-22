@@ -39,6 +39,9 @@ public final class DeepEqualOptions extends Options {
   /** Option: idrefs-property. */
   public static final BooleanOption IDREFS_PROPERTY =
       new BooleanOption("idrefs-property", false);
+  /** Option: ignore-empty-entries. */
+  public static final BooleanOption IGNORE_EMPTY_ENTRIES =
+      new BooleanOption("ignore-empty-entries", false);
   /** Option: in-scope-namespaces. */
   public static final BooleanOption IN_SCOPE_NAMESPACES =
       new BooleanOption("in-scope-namespaces", false);
