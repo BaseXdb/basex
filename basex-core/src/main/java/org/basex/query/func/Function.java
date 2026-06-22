@@ -685,14 +685,14 @@ public enum Function implements AFunction {
       params(STRING_ZO), INTEGER_ZM),
   /** XQuery function. */
   SUBSEQUENCE(FnSubsequence::new, "subsequence(input,start[,length])",
-      params(ITEM_ZM, DOUBLE_O, DOUBLE_ZO), ITEM_ZM),
+      params(ITEM_ZM, NUMERIC_O, NUMERIC_ZO), ITEM_ZM),
   /** XQuery function. */
   SUBSEQUENCE_WHERE(FnSubsequenceWhere::new, "subsequence-where(input[,from,to])",
       params(ITEM_ZM, PREDICATE_O.with(Occ.ZERO_OR_ONE), PREDICATE_O.with(Occ.ZERO_OR_ONE)),
       ITEM_ZM),
   /** XQuery function. */
   SUBSTRING(FnSubstring::new, "substring(value,start[,length])",
-      params(STRING_ZO, DOUBLE_O, DOUBLE_ZO), STRING_O),
+      params(STRING_ZO, NUMERIC_O, NUMERIC_ZO), STRING_O),
   /** XQuery function. */
   SUBSTRING_AFTER(FnSubstringAfter::new, "substring-after(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O),
@@ -2039,7 +2039,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_RANGE(UtilRange::new, "range(input,first,last)",
-      params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
+      params(ITEM_ZM, NUMERIC_O, NUMERIC_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
       params(GNODE_ZM), GNODE_ZM, UTIL_URI),
