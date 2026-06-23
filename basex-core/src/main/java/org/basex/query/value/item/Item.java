@@ -22,6 +22,7 @@ import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.query.value.type.Type.*;
 import org.basex.util.*;
@@ -243,7 +244,9 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Value insertValue(final long pos, final Value value, final Job job) {
+  public final Value insertValue(final long pos, final Value value, final Job job) {
+    if(equals(value)) return SingletonSeq.get(this, 2);
+
     final ValueBuilder vb = new ValueBuilder(job, value.size() + 1);
     vb.add(pos == 0 ? value : this);
     vb.add(pos == 0 ? this : value);
