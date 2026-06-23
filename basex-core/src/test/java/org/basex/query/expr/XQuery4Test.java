@@ -508,6 +508,13 @@ public final class XQuery4Test extends SandboxTest {
     error("try { 1 div 0 } catch * { 2 } finally { (1 to 1000)[. > 0] }", FINALLY_X);
     error("let $a := 1 return try { $a } finally { $a[. = 1] }", FINALLY_X);
     error("let $a := 1 return try { $a } catch * { $a } finally { $a[. = 1] }", FINALLY_X);
+
+    // non-catchable errors (e.g. from lazy variable evaluation) must not be caught
+    error("declare %basex:lazy variable $x := error(); try { $x } catch * { 1 }", FUNERR1);
+    error("declare %basex:lazy variable $x := error(); try { $x } catch err:FOER0000 { 1 }",
+        FUNERR1);
+    // finally block must still run even for non-catchable errors
+    error("declare %basex:lazy variable $x := error(); try { $x } finally { 1 }", FINALLY_X);
   }
 
   /** Window expression. */

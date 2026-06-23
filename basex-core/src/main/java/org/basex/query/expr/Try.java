@@ -79,7 +79,6 @@ public final class Try extends Single {
         expr.value(cc.qc);
       } catch(final QueryException ex) {
         Util.debug(ex);
-        if(!ex.isCatchable()) throw ex;
         final Catch ctch = matches(ex);
         if(ctch != null) e = ctch.inline(ex, cc);
         else if(fnlly == Empty.VALUE) throw ex;
@@ -120,8 +119,10 @@ public final class Try extends Single {
    * @return catch clause or {@code null}
    */
   private Catch matches(final QueryException ex) {
-    for(final Catch ctch : catches) {
-      if(ctch.matches(ex)) return ctch;
+    if(ex.isCatchable()) {
+      for(final Catch ctch : catches) {
+        if(ctch.matches(ex)) return ctch;
+      }
     }
     return null;
   }

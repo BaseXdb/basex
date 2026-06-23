@@ -63,8 +63,9 @@ public final class StaticVar extends StaticDecl {
       try {
         expr = expr.compile(cc);
       } catch(final QueryException ex) {
-        if(!lazy) throw ex.notCatchable();
+        ex.notCatchable();
         expr = FnError.get(ex, expr);
+        throw ex;
       } finally {
         cc.removeScope(this);
         cc.qc.focus = focus;
@@ -98,7 +99,7 @@ public final class StaticVar extends StaticDecl {
       return super.value(qc);
     } catch(final Throwable th) {
       if(th instanceof final QueryException ex) {
-        if(lazy) ex.notCatchable();
+        ex.notCatchable();
         exceptionData = new QueryException.Data(ex);
         error = ex;
         throw ex;
