@@ -1157,13 +1157,13 @@ public enum QueryError {
   INVALIDOPTION_X(XPTY, 4, "%"),
   /** Error code. */
   UNKNOWNOPTION_X(XPTY, 4, "Unknown option '%'."),
+  /** Error code. */
+  PATHNODE_X_X_X(XPTY, 4, "%: node expected, % found: %."),
 
   /** Error code. */
   JAVANULL(XPTY, 17, "Java array contains null values."),
   /** Error code. */
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),
-  /** Error code. */
-  PATHNODE_X_X_X(XPTY, 19, "%: node expected, % found: %."),
   /** Error code. */
   NSSENS_X_X(XPTY, 117, "Cannot convert % to %."),
 
