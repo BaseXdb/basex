@@ -392,10 +392,8 @@ public final class GFLWOR extends ParseExpr {
       if(!changing && (last || clauses.get(c + 1) instanceof ForLet &&
           count(fl.var, c + 2) == VarUsage.NEVER)) {
         if(last) {
-          // merge with return expression
+          // merge with return expression unless a nondeterministic function is referenced
           //   for $c in 1 to 3 return $c → 1 to 3
-          // do not merge while the return references a preceding let bound to a nondeterministic
-          // function: the let-inlining above must run first, so cc.replicate sees the call's NDT
           if(!referencesNdtFunction(rtrn, c)) {
             final Expr expr = inline(inline, rtrn, fl, cc);
             if(expr != null) {

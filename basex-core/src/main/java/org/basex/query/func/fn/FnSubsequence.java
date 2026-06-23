@@ -195,7 +195,7 @@ public class FnSubsequence extends StandardFunc {
     final SeqRange sr = range(cc);
     if(sr != null) {
       // no results
-      if(sr == EMPTY) return Empty.VALUE;
+      if(sr == EMPTY) return cc.voidAndReturn(input, Empty.VALUE, info);
       // all values?
       if(sr == ALL) return input;
       // ignore standard limitation for large values to speed up evaluation of result
@@ -214,7 +214,7 @@ public class FnSubsequence extends StandardFunc {
         sz = sr.length;
       } else if(st.zeroOrOne()) {
         // sr.length is always larger than 0 at this point
-        return sr.start == 0 ? input : Empty.VALUE;
+        return sr.start == 0 ? input : cc.voidAndReturn(input, Empty.VALUE, info);
       }
 
       if(sr.length == 1) {

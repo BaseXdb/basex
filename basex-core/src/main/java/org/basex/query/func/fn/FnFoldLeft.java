@@ -105,7 +105,7 @@ public class FnFoldLeft extends StandardFunc {
     final Expr input = arg(0), init = arg(1), action = arg(2);
     final SeqType ist = input.seqType();
     // fold-left((), INIT, $f) → INIT
-    if(array ? input == XQArray.empty() : ist.zero()) return init;
+    if(array ? input == XQArray.empty() : ist.zero()) return cc.voidAndReturn(input, init, info);
 
     final SeqType zst = init.seqType();
     if(action instanceof final FuncItem fiAction && exitOrAction == null) {

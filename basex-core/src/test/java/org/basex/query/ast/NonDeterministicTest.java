@@ -298,8 +298,8 @@ public final class NonDeterministicTest extends SandboxTest {
    * its nondeterministic property in a dynamic function call.
    */
   @Test public void sort() {
-    query("declare option db:inlinelimit '50'; count(sort((2, 1), (), function($int) { " +
-        fileAppend() + ", $int }))", 2, "xx");
+    inline(true);
+    query("count(sort((2, 1), (), function($int) { " + fileAppend() + ", $int }))", 2, "xx");
   }
 
   /**
@@ -311,8 +311,8 @@ public final class NonDeterministicTest extends SandboxTest {
    * comparator otherwise hides its nondeterministic property in a dynamic call.
    */
   @Test public void sortWith() {
-    query("declare option db:inlinelimit '50'; count(sort-with((2, 1), function($a, $b) { " +
-        fileAppend() + ", $a - $b }))", 2, "x");
+    inline(true);
+    query("count(sort-with((2, 1), function($a, $b) { " + fileAppend() + ", $a - $b }))", 2, "x");
   }
 
   /**
@@ -393,6 +393,128 @@ public final class NonDeterministicTest extends SandboxTest {
   @Test public void gh2673() {
     query("let $ten-strings := replicate('x', 10) return count($ten-strings ! (" + fileAppend() +
         ", .))", 10, "xxxxxxxxxx");
+  }
+
+  /**
+   * Checks that distinct-values does not reorder a sort with a nondeterministic key, which
+   * would reduce the number of key evaluations and drop side effects.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnDistinctValues#opt}.
+   */
+  @Test public void distinctValuesSort() {
+    inline(true);
+    query("count(distinct-values(sort(('b', 'a', 'b'), (), fn($x) { " + fileAppend() + ", $x })))",
+        2, "xxx");
+  }
+
+  /**
+   * Checks that fn:count does not drop the input of fn:reverse with nondeterministic content.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnReverse#simplifyFor}.
+   */
+  @Test public void countReverse() {
+    query("count(reverse((1 to 2) ! (" + fileAppend() + ", .)))", 2, "xx");
+  }
+
+  /**
+   * Checks that fn:fold-left does not drop a nondeterministic input when it has empty type.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnFoldLeft#optType}.
+   */
+  @Test public void foldLeftNdt() {
+    query("fold-left(" + fileAppend() + ", 0, fn($z, $x) { $z + 1 })", 0, "x");
+  }
+
+  /**
+   * Checks that fn:for-each-pair does not drop a nondeterministic second input when the first is
+   * empty, or a nondeterministic first input when the second is empty.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnForEachPair#opt}.
+   */
+  @Test public void forEachPairNdt() {
+    query("for-each-pair((), (1 to 2) ! (" + fileAppend() + ", .), fn($a, $b) { $a })", "", "xx");
+    query("for-each-pair((1 to 2) ! (" + fileAppend() + ", .), (), fn($a, $b) { $a })", "", "xxxx");
+  }
+
+  /**
+   * Checks that fn:contains-subsequence and fn:ends-with-subsequence do not drop a
+   * nondeterministic input when the subsequence is empty.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnContainsSubsequence#opt}.
+   */
+  @Test public void containsSubsequenceNdt() {
+    query("contains-subsequence((1 to 2) ! (" + fileAppend() + ", .), ())", true, "xx");
+    query("ends-with-subsequence((1 to 2) ! (" + fileAppend() + ", .), ())", true, "xxxx");
+  }
+
+  /**
+   * Checks that fn:compare does not drop a nondeterministic operand when the other is empty.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnCompare#opt}.
+   */
+  @Test public void compareNdt() {
+    query("compare((), (" + fileAppend() + ", 'a'))", "", "x");
+    query("compare((" + fileAppend() + ", 'a'), ())", "", "xx");
+  }
+
+  /**
+   * Checks that fn:codepoint-equal does not drop a nondeterministic operand when the other is
+   * empty.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnCodepointEqual#opt}.
+   */
+  @Test public void codepointEqualNdt() {
+    query("codepoint-equal((), (" + fileAppend() + ", 'a'))", "", "x");
+    query("codepoint-equal((" + fileAppend() + ", 'a'), ())", "", "xx");
+  }
+
+  /**
+   * Checks that fn:dateTime does not drop a nondeterministic operand when the other is empty.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnDateTime#opt}.
+   */
+  @Test public void dateTimeNdt() {
+    query("dateTime((), (" + fileAppend() + ", xs:time('10:00:00')))", "", "x");
+    query("dateTime((" + fileAppend() + ", xs:date('2020-01-01')), ())", "", "xx");
+  }
+
+  /**
+   * Checks that fn:items-at does not drop a nondeterministic input when the position list is empty.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnItemsAt#opt}.
+   */
+  @Test public void itemsAtNdt() {
+    query("items-at((1 to 2) ! (" + fileAppend() + ", .), ())", "", "xx");
+  }
+
+  /**
+   * Checks that fn:insert-separator does not drop a nondeterministic separator when the input has
+   * at most one item.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnInsertSeparator#opt}.
+   */
+  @Test public void insertSeparatorNdt() {
+    query("insert-separator(('a'), (" + fileAppend() + ", '-'))", "a", "x");
+  }
+
+  /**
+   * Checks that fn:subsequence does not drop a nondeterministic input when the position range is
+   * empty or starts beyond a single-item sequence.
+   * <p>
+   * Requires the use of {@link CompileContext#voidAndReturn} in {@link FnSubsequence#opt}.
+   */
+  @Test public void subsequenceNdt() {
+    query("subsequence((" + fileAppend() + ", 1), 2, 0)", "", "x");
+    query("subsequence((" + fileAppend() + ", 1)[. > 0], 2)", "", "xx");
+  }
+
+  /**
+   * Checks that fn:deep-equal does not drop nondeterministic inputs when sizes differ.
+   * <p>
+   * Requires the use of {@link CompileContext#voidAndReturn} in {@link FnDeepEqual#opt}.
+   */
+  @Test public void deepEqualNdt() {
+    query("deep-equal((" + fileAppend() + ", 1), (" + fileAppend() + ", 1, 2))", false, "xx");
   }
 
   /**

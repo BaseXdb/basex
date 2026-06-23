@@ -57,7 +57,6 @@ public class FnSortBy extends StandardFunc {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
     // count(sort(A)) → count(A)
-    // keep a nondeterministic sort key, whose evaluation it would drop
     return cc.simplify(this, mode == Simplify.COUNT && !has(Flag.NDT) ? arg(0) : this, mode);
   }
 

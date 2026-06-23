@@ -10,6 +10,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.path.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.value.*;
@@ -97,7 +98,7 @@ public final class FnDistinctValues extends FnDuplicateValues {
     if(st.zero()) return values;
 
     // X => sort() => distinct-values() → X => distinct-values() => sort()
-    if(SORT.is(values) && (values.args().length == 1 ||
+    if(SORT.is(values) && !values.has(Flag.NDT) && (values.args().length == 1 ||
         values.arg(0).seqType().type.instanceOf(BasicType.ANY_ATOMIC_TYPE))) {
       final Expr[] sortArgs = values.args().clone();
       sortArgs[0] = cc.function(DISTINCT_VALUES, info, defined(1) ?

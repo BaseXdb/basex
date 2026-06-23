@@ -31,8 +31,7 @@ public final class UtilCountWithin extends StandardFunc {
     final long[] minMax = minMax(qc);
     final long min = minMax[0], max = minMax[1];
 
-    // iterative access: if the iterator size is unknown or the input is nondeterministic (which
-    // must be fully evaluated for its side effects), iterate through the results
+    // iterative through the results if an iterator is nondeterministic or its size is unknown
     final Expr expr = arg(0);
     final Iter input = expr.iter(qc);
     final boolean enforce = expr.has(Flag.NDT);
@@ -53,7 +52,6 @@ public final class UtilCountWithin extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    // do not simplify nondeterministic input: the count rewrites could drop its side effects
     arg(0, arg -> arg.has(Flag.NDT) ? arg : arg.simplifyFor(Simplify.COUNT, cc));
   }
 

@@ -32,11 +32,11 @@ public final class FnCompare extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr value1 = arg(0), value2 = arg(1);
     final SeqType st1 = value1.seqType(), st2 = value2.seqType();
-    if(st1.zero()) return value1;
-    if(st2.zero()) return value2;
+    if(st1.zero()) return cc.voidAndReturn(value2, value1, info);
+    if(st2.zero()) return cc.voidAndReturn(value1, value2, info);
     if(st1.oneOrMore() && !st1.mayBeWrapped() && st2.oneOrMore() && !st2.mayBeWrapped())
       exprType.assign(Occ.EXACTLY_ONE);
     return this;

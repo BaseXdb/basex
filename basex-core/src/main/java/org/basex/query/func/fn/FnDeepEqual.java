@@ -47,7 +47,7 @@ public final class FnDeepEqual extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input1 = arg(0), input2 = arg(1);
     if(!defined(2)) {
       // do not compare identical arguments
@@ -55,7 +55,8 @@ public final class FnDeepEqual extends StandardFunc {
           input1.equals(input2) && !input1.has(Flag.NDT)) return Bln.TRUE;
       // reject arguments of different size
       final long size1 = input1.size(), size2 = input2.size();
-      if(size1 != -1 && size2 != -1 && size1 != size2) return Bln.FALSE;
+      if(size1 != -1 && size2 != -1 && size1 != size2)
+        return cc.voidAndReturn(input1, cc.voidAndReturn(input2, Bln.FALSE, info), info);
     }
     return this;
   }

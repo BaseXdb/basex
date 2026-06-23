@@ -31,10 +31,10 @@ public class FnInsertSeparator extends StandardFunc {
   }
 
   @Override
-  protected final Expr opt(final CompileContext cc) {
+  protected final Expr opt(final CompileContext cc) throws QueryException {
     final Expr values = arg(0), separator = arg(1);
     final SeqType st = values.seqType(), stSep = separator.seqType();
-    if(st.zeroOrOne() || separator == Empty.VALUE) return values;
+    if(st.zeroOrOne() || separator == Empty.VALUE) return cc.voidAndReturn(separator, values, info);
 
     final long size = values.size(), sizeSep = separator.size();
     final long sz = size != -1 && sizeSep != -1 ? size + sizeSep * (size - 1) : -1;

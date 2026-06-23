@@ -21,8 +21,7 @@ import org.basex.util.*;
 public final class FnCount extends StandardFunc {
   @Override
   public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // iterative access: if the iterator size is unknown or nondeterministic, iterate through all
-    // results
+    // if the iterator size is unknown or nondeterministic, iterate through all results
     final Expr expr = arg(0);
     final Iter input = expr.iter(qc);
     long size = expr.has(Flag.NDT) ? -1 : input.size();
@@ -34,13 +33,12 @@ public final class FnCount extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    // do not simplify nondeterministic input: the count rewrites could drop its side effects
     arg(0, arg -> arg.has(Flag.NDT) ? arg : arg.simplifyFor(Simplify.COUNT, cc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // return static result size (nondeterministic input is still evaluated for its side effects)
+    // return static result size
     final Expr input = arg(0);
     final long size = input.size();
     if(size >= 0 && !input.has(Flag.NDT)) return Itr.get(size);
