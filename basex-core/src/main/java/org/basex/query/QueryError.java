@@ -964,6 +964,8 @@ public enum QueryError {
   /** Error code. */
   NOWHILE(XPST, 3, "Expecting valid expression after 'while'."),
   /** Error code. */
+  NOTRACE(XPST, 3, "Expecting valid expression after 'trace'."),
+  /** Error code. */
   ORDERBY(XPST, 3, "Expecting valid expression after 'order by'."),
   /** Error code. */
   FLWORRETURN(XPST, 3, "Incomplete FLWOR expression, expecting 'return'."),

@@ -524,6 +524,19 @@ public final class GFLWORTest extends SandboxTest {
     check("let $a := <a/>[text()] while $a return $a", "", root(IterFilter.class));
   }
 
+  /** Trace clause. */
+  @Test public void trace() {
+    // pass-through: result is unchanged
+    query("for $i in 1 to 3 trace $i return $i", "1\n2\n3");
+    query("for $i in 1 to 3 trace $i * $i return $i", "1\n2\n3");
+    // error in trace expression does not abort the FLWOR
+    query("for $i in 1 to 3 trace (if($i = 2) then error() else $i) return $i * 10",
+        "10\n20\n30");
+    // not optimized away (NDT)
+    check("for $i in 1 to 3 trace $i return $i", "1\n2\n3", exists(Trace.class));
+    check("for $i in 1 to 1 trace 'x' return $i", 1, exists(Trace.class));
+  }
+
   /** Do not flatten nested FLWOR expressions with while clauses. */
   @Test public void gh2634() {
     query("for $max in (1 to 10) return (for $a in 0 to $max while $a < 1 return $a)",

@@ -478,6 +478,28 @@ public final class QueryContext extends Job implements Closeable {
   }
 
   /**
+   * Sends a serialized value to the tracer.
+   * @param label label (can be {@code null})
+   * @param input value to be traced
+   */
+  public void trace(final String label, final Value input) {
+    if(input.isEmpty() || input instanceof RangeSeq || input instanceof SingletonSeq) {
+      trace(label, input::toErrorString);
+    } else {
+      for(final Item item : input) {
+        final Supplier<String> message = item instanceof FItem ? item::toErrorString : () -> {
+          try {
+            return item.serialize(SerializerMode.DEBUG.get()).toString();
+          } catch(final QueryIOException ex) {
+            return ex.getMessage(); // unexpected
+          }
+        };
+        trace(label, message);
+      }
+    }
+  }
+
+  /**
    * Sends the specified message to the tracer.
    * @param label label (can be {@code null})
    * @param message message function

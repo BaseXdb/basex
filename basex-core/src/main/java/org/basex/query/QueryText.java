@@ -166,6 +166,7 @@ public interface QueryText {
   /** Parser token. */ String THESAURUS = "thesaurus";
   /** Parser token. */ String TIMES = "times";
   /** Parser token. */ String TO = "to";
+  /** Parser token. */ String TRACE = "trace";
   /** Parser token. */ String TRANSFORM = "transform";
   /** Parser token. */ String TREAT = "treat";
   /** Parser token. */ String TRUE = "true";
