@@ -79,7 +79,6 @@ public interface QueryText {
   /** Parser token. */ String FTOR = "ftor";
   /** Parser token. */ String FUNCTION = "function";
   /** Parser token. */ String FUZZY = "fuzzy";
-  /** Parser token. */ String GET = "get";
   /** Parser token. */ String GNODE = "gnode";
   /** Parser token. */ String GREATEST = "greatest";
   /** Parser token. */ String GROUP = "group";

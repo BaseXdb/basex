@@ -111,16 +111,7 @@ public final class JNode extends GNode {
 
   @Override
   public boolean is(final GNode node) {
-    if(this == node) return true;
-    if(!(node instanceof final JNode jnode)) return false;
-
-    JNode n1 = this, n2 = jnode;
-    while(n1 != n2 && n1 != null && n2 != null) {
-      if(!n1.equals(n2)) return false;
-      n1 = n1.parent;
-      n2 = n2.parent;
-    }
-    return n1 == n2;
+    return this == node || node instanceof JNode && compare(node) == 0;
   }
 
   @Override
@@ -128,35 +119,27 @@ public final class JNode extends GNode {
     if(this == node) return 0;
     if(!(node instanceof final JNode jnode)) return 1;
 
+    // determine roots and depths
+    JNode r1 = this, r2 = jnode;
     int d1 = 0, d2 = 0;
-    JNode n1 = this, n2 = jnode, r1 = n1, r2 = n2;
-    while(r1.parent != null) {
-      r1 = r1.parent;
-      d1++;
+    while(r1.parent != null) { r1 = r1.parent; d1++; }
+    while(r2.parent != null) { r2 = r2.parent; d2++; }
+    // different trees: arbitrary but stable order based on root value identity
+    if(r1 != r2 && r1.value != r2.value) return Integer.compare(
+        System.identityHashCode(r1.value), System.identityHashCode(r2.value));
+
+    // same tree: compare the index paths leading from the root to both nodes
+    final long[] p1 = new long[d1], p2 = new long[d2];
+    JNode n = this;
+    for(int i = d1 - 1; i >= 0; i--) { p1[i] = n.index(); n = n.parent; }
+    n = jnode;
+    for(int i = d2 - 1; i >= 0; i--) { p2[i] = n.index(); n = n.parent; }
+    final int ml = Math.min(d1, d2);
+    for(int i = 0; i < ml; i++) {
+      if(p1[i] != p2[i]) return Long.compare(p1[i], p2[i]);
     }
-    while(r2.parent != null) {
-      r2 = r2.parent;
-      d2++;
-    }
-    while(d1 > d2) {
-      n1 = n1.parent;
-      if(node.equals(n1)) return 1;
-      d1--;
-    }
-    while(d2 > d1) {
-      n2 = n2.parent;
-      if(equals(n2)) return -1;
-      d2--;
-    }
-    while(n1.parent != null && !n1.parent.equals(n2.parent)) {
-      n1 = n1.parent;
-      n2 = n2.parent;
-    }
-    if(n1.parent != null && n1.parent.equals(n2.parent)) {
-      final int d = Long.compare(n1.position, n2.position);
-      return d != 0 ? d : Long.compare(n1.index(), n2.index());
-    }
-    return Integer.compare(System.identityHashCode(r1.value), System.identityHashCode(r2.value));
+    // one node is an ancestor of the other: the ancestor comes first
+    return Integer.compare(d1, d2);
   }
 
   /**
@@ -184,7 +167,7 @@ public final class JNode extends GNode {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    throw Util.notExpected();
+    return atomItem(null, ii).compare(item, coll, transitive, ii);
   }
 
   @Override

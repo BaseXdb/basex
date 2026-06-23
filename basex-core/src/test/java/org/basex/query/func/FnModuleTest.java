@@ -2028,7 +2028,7 @@ return
     query(func.args("src/test/resources/example.json") + "('address')('state')", "NY");
     query(func.args("src/test/resources/example.json") + "?address?state", "NY");
     query(func.args("src/test/resources/example.json", " { 'number-format': 'adaptive' }")
-        + "//postalCode/data() => type-of()", "xs:integer");
+        + "//postalCode ! data() => type-of()", "xs:integer");
 
     error(func.args("src/test/resources/example.json", " { 'number-parser': xs:decimal#1 }"),
         INVALIDOPTION_X);

@@ -1,5 +1,7 @@
 package org.basex.query.func.util;
 
+import static org.basex.util.Token.*;
+
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -22,9 +24,23 @@ public final class UtilGet extends ContextFn {
     final Iter keys = arg(0).iter(qc);
     final GNode node = toGNode(context(qc).item(qc, info));
 
-    for(Item item; (item = qc.next(keys)) != null;) {
-      final Item key = node instanceof final JNode jnode ? jnode.key : node.qname();
-      if(key != null && item.atomicEqual(key)) return Bln.TRUE;
+    if(node instanceof final JNode jnode) {
+      // JNode: compare jkey property with atomic values
+      final Item key = jnode.key;
+      if(key != null) {
+        for(Item item; (item = qc.next(keys)) != null;) {
+          if(item.atomicEqual(key)) return Bln.TRUE;
+        }
+      }
+    } else {
+      // XNode: compare node name with QName values, local name with string values
+      final QNm qname = node.qname();
+      if(qname != null) {
+        for(Item item; (item = qc.next(keys)) != null;) {
+          if(item instanceof final QNm qnm ? qnm.eq(qname) :
+            item.type.isStringOrUntyped() && eq(item.string(info), qname.local())) return Bln.TRUE;
+        }
+      }
     }
     return Bln.FALSE;
   }
