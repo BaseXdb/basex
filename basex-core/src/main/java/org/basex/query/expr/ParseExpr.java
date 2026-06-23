@@ -645,6 +645,18 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Converts a value to a context node.
+   * @param value value
+   * @return context node
+   * @throws QueryException query exception
+   */
+  protected GNode toContextNode(final Value value) throws QueryException {
+    if(value instanceof final GNode gnode) return gnode;
+    if(value instanceof XQStruct) return new JNode(value);
+    throw QueryError.PATHNODE_X_X_X.get(info, this, value.seqType(), value);
+  }
+
+  /**
    * Evaluates an expression to a binary item.
    * @param expr expression
    * @param qc query context

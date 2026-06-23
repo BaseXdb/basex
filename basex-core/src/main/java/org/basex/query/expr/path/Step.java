@@ -15,7 +15,6 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
-import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -131,17 +130,11 @@ public abstract class Step extends Preds {
    */
   final BasicNodeIter iterator(final QueryContext qc) throws QueryException {
     final Value value = qc.focus.value;
-    GNode gnode;
-    if(value instanceof final GNode node) {
-      gnode = node;
-    } else if(value instanceof final XQStruct struct) {
-      gnode = new JNode(struct);
-    } else {
-      throw value == null ? QueryError.NOCTX_X.get(info, this) :
-        QueryError.PATHNODE_X_X_X.get(info, this, value.type, value);
-    }
-    final BasicNodeIter iter = axis.iter(gnode, test);
+    if(value == null) throw QueryError.NOCTX_X.get(info, this);
+
     return new BasicNodeIter() {
+      final BasicNodeIter iter = axis.iter(toContextNode(value), test);
+
       @Override
       public GNode next() {
         for(GNode node; (node = iter.next()) != null;) {

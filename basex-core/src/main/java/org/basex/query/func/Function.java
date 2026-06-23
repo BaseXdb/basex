@@ -2042,7 +2042,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, NUMERIC_O, NUMERIC_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
-      params(GNODE_ZM), GNODE_ZM, UTIL_URI),
+      params(GNODE_OR_MAP_OR_ARRAY_ZM), GNODE_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),

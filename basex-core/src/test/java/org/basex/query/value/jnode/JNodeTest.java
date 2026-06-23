@@ -376,6 +376,25 @@ public final class JNodeTest extends SandboxTest {
     query(jtree + "//a/preceding::* => count()", 0);
  }
 
+  /** Absolute path expressions starting at a map or array. */
+  @Test public void absolutePath() {
+    // single slash: map or array is coerced to a root JNode
+    query("declare context item := { 'a': 1, 'b': 2 }; /a", 1);
+    query("declare context item := { 'a': 1, 'b': 2 }; /b", 2);
+    query("declare context item := { 'a': 1, 'b': 2 }; /* => count()", 2);
+    query("declare context item := [ 8, 9 ]; /jnode(2)", 9);
+    query("({ 'a': 1 }) / (/a)", 1);
+
+    // double slash: descendants of the coerced root JNode
+    query("declare context item := { 'a': { 'b': 2 } }; //b", 2);
+    query("declare context item := { 'a': { 'b': 2 } }; //jnode() => count()", 2);
+    query("declare context item := [ [ 1, 2 ] ]; //jnode(*, xs:integer) => count()", 2);
+
+    // type error if the context item is neither node, map, nor array
+    error("declare context item := 123; /a", NODOC_X);
+    error("declare context item := 123; //a", NODOC_X);
+  }
+
   /** EBV. */
   @Test public void ebv() {
     query("boolean([] => jtree())", true);

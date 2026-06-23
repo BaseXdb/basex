@@ -284,6 +284,9 @@ public final class Types {
   public static final SeqType MAP_OR_ARRAY_O = MAP_OR_ARRAY.seqType();
   /** Zero or more maps or arrays. */
   public static final SeqType MAP_OR_ARRAY_ZM = MAP_OR_ARRAY.seqType(Occ.ZERO_OR_MORE);
+  /** Zero or more GNodes, maps, or arrays. */
+  public static final SeqType GNODE_OR_MAP_OR_ARRAY_ZM =
+      ChoiceItemType.get(GNODE, MAP, ARRAY).seqType(Occ.ZERO_OR_MORE);
 
   /** Single JNode. */
   public static final SeqType JNODE_O = JNODE.seqType();

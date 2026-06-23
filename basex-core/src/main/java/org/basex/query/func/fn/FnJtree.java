@@ -19,9 +19,8 @@ public final class FnJtree extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item item = arg(0).unwrappedItem(qc, info);
-    if(!(item instanceof final XQStruct struct))
-      throw typeError(item, Types.MAP_OR_ARRAY, info);
+    if(!(item instanceof XQStruct)) throw typeError(item, Types.MAP_OR_ARRAY, info);
 
-    return new JNode(struct);
+    return new JNode(item);
   }
 }
