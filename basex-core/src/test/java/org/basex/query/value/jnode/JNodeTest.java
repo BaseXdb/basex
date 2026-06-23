@@ -228,9 +228,7 @@ public final class JNodeTest extends SandboxTest {
     query(jtree + "//element() => count()", 0);
     query(jtree + "//jnode() => count()", 7);
     query(jtree + "//jnode(*) => count()", 7);
-    query(jtree + "//jnode(*, *) => count()", 7);
     query(jtree + "//jnode(x) => count()", 2);
-    query(jtree + "//jnode(x, *) => count()", 2);
     query(jtree + "//jnode(*, xs:integer) => count()", 3);
     query(jtree + "//jnode(x, xs:integer) => count()", 1);
     query(jtree + "//jnode('x', xs:integer) => count()", 1);

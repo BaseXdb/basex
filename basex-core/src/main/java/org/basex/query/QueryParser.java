@@ -3622,9 +3622,7 @@ public class QueryParser extends InputParser {
         final byte[] ncname = ncName(null, false);
         if(ncname.length != 0) key = Str.get(ncname);
       }
-      if((key != null || wsConsume("*")) && wsConsume(",")) {
-        if(!wsConsume("*")) st = sequenceType();
-      }
+      if((key != null || wsConsume("*")) && wsConsume(",")) st = sequenceType();
       wsCheck(")");
     }
     return JNodeTest.get(key, st);
