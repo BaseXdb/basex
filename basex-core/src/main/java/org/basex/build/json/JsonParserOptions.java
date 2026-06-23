@@ -19,8 +19,6 @@ public final class JsonParserOptions extends JsonOptions {
   public static final BooleanOption LIBERAL = new BooleanOption("liberal", false);
   /** Option: fallback function (parse-json, json-to-xml). */
   public static final ValueOption FALLBACK = new ValueOption("fallback", FUNCTION_ZO);
-  /** Option: number-parser function (json-to-xml). */
-  public static final ValueOption NUMBER_PARSER = new ValueOption("number-parser", FUNCTION_ZO);
   /** Option: number format (parse-json). */
   public static final EnumOption<JsonNumberFormat> NUMBER_FORMAT =
       new EnumOption<>("number-format", JsonNumberFormat.DOUBLE);
@@ -28,7 +26,7 @@ public final class JsonParserOptions extends JsonOptions {
   public static final EnumOption<JsonDuplicates> DUPLICATES =
       new EnumOption<>("duplicates", JsonDuplicates.class);
   /** Option: null item (parse-json). */
-  public static final ValueOption NULL = new ValueOption("null", ITEM_ZM);
+  public static final ValueOption NULL = new ValueOption("null", ITEM_ZO);
   /** Option: validation (json-to-xml). */
   public static final BooleanOption VALIDATE = new BooleanOption("validate");
   /** Option: encoding (custom). */

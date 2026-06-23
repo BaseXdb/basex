@@ -437,6 +437,7 @@ c_add1               = Adaugă resurse la baza de date.
 c_add2               = Adaugă [%] ca [%] la baza de date.
 c_alter1             = Modifica baza de date sau datele utilizatorului.
 c_alter2             = Modifica numele bazei de date, utilizatorul, sau parola utilizatorului.
+c_alterbackup        = Modifică numele unei copii de siguranță.
 c_alterdb            = Modifică numele unei baze de date.
 c_alterpw            = Modifica parola unui utilizator.
 c_alteruser          = modifica numele unui utilizator.

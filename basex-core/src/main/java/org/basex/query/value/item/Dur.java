@@ -65,6 +65,22 @@ public class Dur extends ADateDur {
   }
 
   /**
+   * Constructor for multiplying or dividing a duration by a number.
+   * @param dur duration item
+   * @param factor factor
+   * @param mult multiplication/division flag
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  public Dur(final Dur dur, final double factor, final boolean mult, final InputInfo info)
+      throws QueryException {
+    this(BasicType.DURATION);
+    checkFactor(factor, mult, type, info);
+    months = scaleMonths(dur.months, factor, mult, info);
+    seconds = scaleSeconds(dur.seconds == null ? BigDecimal.ZERO : dur.seconds, factor, mult);
+  }
+
+  /**
    * Constructor.
    * @param dur duration
    * @param type item type
@@ -247,13 +263,64 @@ public class Dur extends ADateDur {
 
   @Override
   public final int hashCode() {
-    return (int) (31 * months + (seconds == null ? 0 : seconds.doubleValue()));
+    return (int) (31 * months + seconds.doubleValue());
   }
 
   @Override
   public final boolean equals(final Object obj) {
     return this == obj || obj instanceof final Dur dur && type.eq(dur.type) &&
         months == dur.months && seconds.equals(dur.seconds);
+  }
+
+  /**
+   * Validates a duration arithmetic factor; raises an error for NaN or infinite/zero divisors.
+   * @param factor factor
+   * @param mult multiplication/division flag
+   * @param type duration type
+   * @param info input info (can be {@code null})
+   * @throws QueryException query exception
+   */
+  static void checkFactor(final double factor, final boolean mult, final Type type,
+      final InputInfo info) throws QueryException {
+    if(Double.isNaN(factor)) throw DATECALC_X_X.get(info, type, factor);
+    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(info, type, factor);
+  }
+
+  /**
+   * Scales a months component by a factor.
+   * @param months months
+   * @param factor factor
+   * @param mult multiplication/division flag
+   * @param info input info (can be {@code null})
+   * @return scaled months
+   * @throws QueryException query exception
+   */
+  static long scaleMonths(final long months, final double factor, final boolean mult,
+      final InputInfo info) throws QueryException {
+    final double d = mult ? months * factor : months / factor;
+    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(info, d);
+    return StrictMath.round(d);
+  }
+
+  /**
+   * Scales a seconds component by a factor.
+   * @param seconds seconds
+   * @param factor factor
+   * @param mult multiplication/division flag
+   * @return scaled seconds
+   */
+  static BigDecimal scaleSeconds(final BigDecimal seconds, final double factor,
+      final boolean mult) {
+    if(mult ? factor == 0 : Double.isInfinite(factor)) return BigDecimal.ZERO;
+    BigDecimal d = BigDecimal.valueOf(factor), result;
+    try {
+      result = mult ? seconds.multiply(d) : seconds.divide(d, MathContext.DECIMAL64);
+    } catch(final ArithmeticException ex) {
+      Util.debug(ex);
+      d = BigDecimal.valueOf(1 / factor);
+      result = mult ? seconds.divide(d, MathContext.DECIMAL64) : seconds.multiply(d);
+    }
+    return Math.abs(result.doubleValue()) < 1.0E-13 ? BigDecimal.ZERO : result;
   }
 
   @Override

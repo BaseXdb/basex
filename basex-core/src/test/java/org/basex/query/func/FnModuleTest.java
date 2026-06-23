@@ -1077,6 +1077,13 @@ public final class FnModuleTest extends SandboxTest {
         "?a instance of xs:untypedAtomic", true);
     query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'numeric' } } }") +
         "?a instance of xs:untypedAtomic", true);
+
+    // content-key option
+    query(func.args(" <price currency='USD'>12.16</price>",
+        " { 'attribute-marker': '', 'content-key': 'value' }") + "?price?value", "12.16");
+    // content key clashes with attribute name: prepend '#'
+    query(func.args(" <a b='1'>x</a>", " { 'attribute-marker': '', 'content-key': 'b' }") +
+        "?a => map:keys() => sort()", "#b\nb");
   }
 
   /** Test method. */
@@ -3232,6 +3239,15 @@ return
     query(func.args("b", "b", " fn($k, $g) {}"), "");
     query(func.args("c", "c", " fn($k, $g) { upper-case($k) }"), "C");
     query(func.args("de", ".", " fn($k, $g) { $k || $k }"), "ddee");
+
+    // GH-2692: unmatched groups supplied to replacement functions are zero-length strings
+    query(func.args("", "(X)?", " fn($_, $groups) { $groups[1] }"), "");
+
+    // GH-2697: unmatched groups
+    query(func.args("a", "(a)|(b)", " fn($m){$m}"), "a");
+
+    // GH-2698: lookback for escaped dollar signs in replacement must look beyond first backslash
+    query(func.args("full stop.", "\\.", "\\\\$1"), "full stop\\");
 
     query(func.args("Chapter 9", "[0-9]+", " fn($k, $g) { string(number($k) + 1) }"),
         "Chapter 10");

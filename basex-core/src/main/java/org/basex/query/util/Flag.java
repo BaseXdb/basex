@@ -1,6 +1,7 @@
 package org.basex.query.util;
 
 import org.basex.core.*;
+import org.basex.query.func.*;
 import org.basex.util.*;
 
 /**
@@ -22,6 +23,8 @@ public enum Flag {
   CTX,
   /**
    * Nondeterministic code. Cannot be relocated, pre-evaluated or optimized away.
+   * Implied by {@link #UPD}: see the constructor of {@link FuncDefinition} and
+   * {@code org.basex.query.up.expr.Update#has(Flag...)}.
    * Examples: random:double(), file:write()
    */
   NDT,

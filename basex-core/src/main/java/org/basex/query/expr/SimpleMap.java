@@ -322,7 +322,10 @@ public abstract class SimpleMap extends Mapping {
     }
 
     exprType.assign(exprs[ls - 1], new long[] { min, max });
-    return size() == 0 && !has(Flag.NDT, Flag.HOF) ? cc.emptySeq(this) : null;
+    // do not drop a map with an empty result that may still have side effects (nondeterministic,
+    // higher-order, or a function invoked through a variable)
+    return size() == 0 && !has(Flag.NDT, Flag.HOF) && !mayInvokeVariable()
+        ? cc.emptySeq(this) : null;
   }
 
   /**
@@ -363,6 +366,9 @@ public abstract class SimpleMap extends Mapping {
   @Override
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
+
+    // do not simplify nondeterministic map, in order to preserve side effects
+    if(((Checks<Expr>) ex -> ex.has(Flag.NDT)).any(exprs)) return this;
 
     Expr expr = this;
     final int el = exprs.length;

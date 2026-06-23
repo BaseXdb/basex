@@ -50,7 +50,10 @@ public final class FnReplace extends RegExFn {
       while(matcher.find()) {
         final ValueBuilder groups = new ValueBuilder(qc);
         final int gc = matcher.groupCount();
-        for(int g = 0; g < gc; g++) groups.add(Atm.get(matcher.group(g + 1)));
+        for(int g = 0; g < gc; g++) {
+          final String grp = matcher.group(g + 1);
+          groups.add(grp == null ? Atm.EMPTY : Atm.get(grp));
+        }
         args.set(0, Atm.get(matcher.group())).set(1, groups.value());
         final Item item = invoke(action, args, qc).atomItem(qc, info);
         matcher.appendReplacement(sb, item.isEmpty() ? "" :
@@ -85,7 +88,7 @@ public final class FnReplace extends RegExFn {
           if(i == -1) {
             sb.append(string, s, sl);
             s = sl;
-          } else if(i == 0 || string.charAt(i - 1) != '\\') {
+          } else if(!isEscaped(string, i)) {
             sb.append(string, s, i);
             s = ++i;
             if(i < sl && Character.isDigit(string.charAt(i))) i++;
@@ -101,6 +104,19 @@ public final class FnReplace extends RegExFn {
       }
     }
     return Str.get(matcher.replaceAll(string));
+  }
+
+  /**
+   * Checks if the character at the specified position is escaped, i.e., if it is preceded by
+   * an odd number of backslashes.
+   * @param string string
+   * @param pos position of the character
+   * @return result of check
+   */
+  private static boolean isEscaped(final String string, final int pos) {
+    int bs = 0;
+    for(int p = pos - 1; p >= 0 && string.charAt(p) == '\\'; p--) bs++;
+    return (bs & 1) != 0;
   }
 
   @Override

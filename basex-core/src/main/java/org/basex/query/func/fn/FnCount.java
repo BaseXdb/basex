@@ -21,9 +21,10 @@ import org.basex.util.*;
 public final class FnCount extends StandardFunc {
   @Override
   public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    // iterative access: if the iterator size is unknown, iterate through all results
-    final Iter input = arg(0).iter(qc);
-    long size = input.size();
+    // if the iterator size is unknown or nondeterministic, iterate through all results
+    final Expr expr = arg(0);
+    final Iter input = expr.iter(qc);
+    long size = expr.has(Flag.NDT) ? -1 : input.size();
     if(size == -1) {
       do ++size; while(qc.next(input) != null);
     }
@@ -32,7 +33,7 @@ public final class FnCount extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.COUNT, cc));
+    arg(0, arg -> arg.has(Flag.NDT) ? arg : arg.simplifyFor(Simplify.COUNT, cc));
   }
 
   @Override
@@ -60,7 +61,8 @@ public final class FnCount extends StandardFunc {
   public Expr simplifyFor(final Simplify mode, final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     Expr expr = this;
-    if(mode == Simplify.EBV) {
+    // rewrite to an existence check (skipped for nondeterministic input, which must be evaluated)
+    if(mode == Simplify.EBV && !input.has(Flag.NDT)) {
       // if(count($nodes)) → if($nodes)
       // if(count($items)) → if(exists($items))
       expr = input.seqType().type instanceof NodeType ? input : cc.function(EXISTS, info, exprs);

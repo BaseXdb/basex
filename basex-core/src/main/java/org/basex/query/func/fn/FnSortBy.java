@@ -9,6 +9,7 @@ import org.basex.query.CompileContext.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -56,7 +57,7 @@ public class FnSortBy extends StandardFunc {
   public final Expr simplifyFor(final Simplify mode, final CompileContext cc)
       throws QueryException {
     // count(sort(A)) → count(A)
-    return cc.simplify(this, mode == Simplify.COUNT ? arg(0) : this, mode);
+    return cc.simplify(this, mode == Simplify.COUNT && !has(Flag.NDT) ? arg(0) : this, mode);
   }
 
   /**

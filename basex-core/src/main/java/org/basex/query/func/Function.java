@@ -170,8 +170,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), STRING_O.arrayType().seqType(Occ.ZERO_OR_MORE)),
   /** XQuery function. */
   CSV_TO_XML(FnCsvToXml::new, "csv-to-xml(value[,options])",
-      params(STRING_ZO, MAP_ZO),
-      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(Occ.ZERO_OR_ONE), flag(CNS)),
+      params(STRING_ZO, MAP_ZO), DOCUMENT_ELEMENT_ZO, flag(CNS)),
   /** XQuery function. */
   CURRENT_DATE(FnCurrentDate::new, "current-date()",
       params(), DATE_O, flag(NDT)),
@@ -235,7 +234,8 @@ public enum Function implements AFunction {
       params(ANY_ATOMIC_TYPE_ZM, STRING_ZO), ANY_ATOMIC_TYPE_ZM),
   /** XQuery function. */
   ELEMENT_TO_MAP(FnElementToMap::new, "element-to-map(element[,options])",
-      params(ELEMENT_ZO, MAP_ZO), ITEM_ZO.mapType(BasicType.STRING).seqType(Occ.ZERO_OR_ONE)),
+      params(DOCUMENT_OR_ELEMENT_ZO, MAP_ZO),
+      ITEM_ZO.mapType(BasicType.STRING).seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
   ELEMENT_TO_MAP_PLAN(FnElementToMapPlan::new, "element-to-map-plan(input)",
       params(ChoiceItemType.get(NodeType.DOCUMENT, NodeType.ELEMENT).seqType(Occ.ZERO_OR_MORE)),
@@ -369,9 +369,7 @@ public enum Function implements AFunction {
       params(TIME_ZO), INTEGER_ZO),
   /** XQuery function. */
   HTML_DOC(FnHtmlDoc::new, "html-doc(source[,options])",
-      params(STRING_ZO, MAP_ZO),
-      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(Occ.ZERO_OR_ONE),
-      flag(NDT), FN_URI, Perm.CREATE),
+      params(STRING_ZO, MAP_ZO), DOCUMENT_ELEMENT_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   ID(FnId::new, "id(values[,node])",
       params(STRING_ZM, NODE_ZO), ELEMENT_ZM),
@@ -431,8 +429,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), ITEM_ZO, flag(NDT), FN_URI, Perm.CREATE),
   /** XQuery function. */
   JSON_TO_XML(FnJsonToXml::new, "json-to-xml(value[,options])",
-      params(STRING_ZO, MAP_ZO),
-      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(Occ.ZERO_OR_ONE), flag(CNS)),
+      params(STRING_ZO, MAP_ZO), DOCUMENT_ELEMENT_ZO, flag(CNS)),
   /** XQuery function. */
   JTREE(FnJtree::new, "jtree(input)",
       params(MAP_OR_ARRAY_O), JNODE_ROOT.seqType()),
@@ -548,8 +545,7 @@ public enum Function implements AFunction {
       params(STRING_ZO), DATE_TIME_ZO),
   /** XQuery function. */
   PARSE_HTML(FnParseHtml::new, "parse-html(value[,options])",
-      params(STRING_OR_BINARY_ZO, MAP_ZO),
-      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(Occ.ZERO_OR_ONE)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_ELEMENT_ZO),
   /** XQuery function. */
   PARSE_INTEGER(FnParseInteger::new, "parse-integer(value[,radix])",
       params(STRING_ZO, INTEGER_ZO), INTEGER_ZO),
@@ -564,8 +560,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), Records.URI_STRUCTURE.get().seqType(Occ.ZERO_OR_ONE)),
   /** XQuery function. */
   PARSE_XML(FnParseXml::new, "parse-xml(value[,options])",
-      params(STRING_OR_BINARY_ZO, MAP_ZO),
-      NodeType.get(new DocTest(NodeTest.ELEMENT)).seqType(), flag(CNS)),
+      params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_ELEMENT_O, flag(CNS)),
   /** XQuery function. */
   PARSE_XML_FRAGMENT(FnParseXmlFragment::new, "parse-xml-fragment(value[,options])",
       params(STRING_OR_BINARY_ZO, MAP_ZO), DOCUMENT_ZO, flag(CNS)),
@@ -690,14 +685,14 @@ public enum Function implements AFunction {
       params(STRING_ZO), INTEGER_ZM),
   /** XQuery function. */
   SUBSEQUENCE(FnSubsequence::new, "subsequence(input,start[,length])",
-      params(ITEM_ZM, DOUBLE_O, DOUBLE_ZO), ITEM_ZM),
+      params(ITEM_ZM, NUMERIC_O, NUMERIC_ZO), ITEM_ZM),
   /** XQuery function. */
   SUBSEQUENCE_WHERE(FnSubsequenceWhere::new, "subsequence-where(input[,from,to])",
       params(ITEM_ZM, PREDICATE_O.with(Occ.ZERO_OR_ONE), PREDICATE_O.with(Occ.ZERO_OR_ONE)),
       ITEM_ZM),
   /** XQuery function. */
   SUBSTRING(FnSubstring::new, "substring(value,start[,length])",
-      params(STRING_ZO, DOUBLE_O, DOUBLE_ZO), STRING_O),
+      params(STRING_ZO, NUMERIC_O, NUMERIC_ZO), STRING_O),
   /** XQuery function. */
   SUBSTRING_AFTER(FnSubstringAfter::new, "substring-after(value,substring[,collation])",
       params(STRING_ZO, STRING_ZO, STRING_ZO), STRING_O),
@@ -2044,10 +2039,10 @@ public enum Function implements AFunction {
       params(ITEM_ZM, ITEM_ZM, ITEM_ZM), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_RANGE(UtilRange::new, "range(input,first,last)",
-      params(ITEM_ZM, DOUBLE_O, DOUBLE_O), ITEM_ZM, UTIL_URI),
+      params(ITEM_ZM, NUMERIC_O, NUMERIC_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
-      params(GNODE_ZM), GNODE_ZM, UTIL_URI),
+      params(GNODE_OR_MAP_OR_ARRAY_ZM), GNODE_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),

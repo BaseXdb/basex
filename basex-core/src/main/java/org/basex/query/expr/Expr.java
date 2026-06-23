@@ -251,6 +251,24 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Checks if this expression may invoke a function through an unresolved variable. Such a call is
+   * treated as deterministic until the variable reference is replaced (inlined) with the function
+   * it is bound to, whose nondeterminism can then be determined. Side-effect-dropping rewrites must
+   * be deferred until then.
+   * @return {@code true} if a function may be invoked through a variable
+   */
+  public final boolean mayInvokeVariable() {
+    // return true iff the search was aborted, i.e. such a call was found
+    return !accept(new ASTVisitor() {
+      @Override
+      public boolean dynFuncCall(final Expr func) {
+        // abort when the invoked function is an unresolved variable
+        return !(func instanceof VarRef);
+      }
+    });
+  }
+
+  /**
    * Checks if inlining is possible.
    * This function is called by {@link InlineContext#inlineable}.
    *

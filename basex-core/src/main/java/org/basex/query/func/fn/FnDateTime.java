@@ -29,11 +29,11 @@ public final class FnDateTime extends StandardFunc {
   }
 
   @Override
-  protected Expr opt(final CompileContext cc) {
+  protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr date = arg(0), time = defined(1) ? arg(1) : Str.EMPTY;
     final SeqType stDate = date.seqType(), stTime = time.seqType();
-    if(stDate.zero()) return date;
-    if(stTime.zero()) return time;
+    if(stDate.zero()) return cc.voidAndReturn(time, date, info);
+    if(stTime.zero()) return cc.voidAndReturn(date, time, info);
     if(stDate.oneOrMore() && !stDate.mayBeWrapped() && stTime.oneOrMore() &&
         !stTime.mayBeWrapped()) exprType.assign(Occ.EXACTLY_ONE);
     return this;

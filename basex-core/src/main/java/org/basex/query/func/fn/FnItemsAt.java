@@ -105,7 +105,7 @@ public final class FnItemsAt extends StandardFunc {
     final Expr input = arg(0), at = arg(1);
     final SeqType ist = input.seqType(), ast = at.seqType();
     if(ist.zero()) return input;
-    if(ast.zero()) return Empty.VALUE;
+    if(ast.zero()) return cc.voidAndReturn(input, Empty.VALUE, info);
 
     Occ occ = Occ.ZERO_OR_MORE;
     if(!ast.mayBeWrapped()) {

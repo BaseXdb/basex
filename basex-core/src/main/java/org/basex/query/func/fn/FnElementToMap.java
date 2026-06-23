@@ -27,6 +27,9 @@ public final class FnElementToMap extends PlanFn {
     public static final StringOption ATTRIBUTE_MARKER =
         new StringOption("attribute-marker", "@");
     /** Option. */
+    public static final StringOption CONTENT_KEY =
+        new StringOption("content-key", "#content");
+    /** Option. */
     public static final EnumOption<NameFormat> NAME_FORMAT =
         new EnumOption<>("name-format", NameFormat.DEFAULT);
     /** Option. */
@@ -36,15 +39,17 @@ public final class FnElementToMap extends PlanFn {
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
-    final Item element = arg(0).item(qc, info);
-    if(element.isEmpty()) return Empty.VALUE;
-
-    final XNode elem = toElem(element, qc);
+    final Item node = (Item) Types.DOCUMENT_OR_ELEMENT_ZO.coerce(arg(0).value(qc), qc, info);
     final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), qc);
+    if(node.isEmpty()) return Empty.VALUE;
+
+    final XNode elem = (XNode) (node.type.instanceOf(NodeType.DOCUMENT) ?
+      ((XNode) node).childIter().next() : node);
 
     final Plan plan = new Plan();
     plan.name = options.get(ElementsOptions.NAME_FORMAT);
     plan.marker = options.get(ElementsOptions.ATTRIBUTE_MARKER);
+    plan.content = Str.get(options.get(ElementsOptions.CONTENT_KEY));
 
     final Value pln = options.get(ElementsOptions.PLAN);
     if(!pln.isEmpty()) {

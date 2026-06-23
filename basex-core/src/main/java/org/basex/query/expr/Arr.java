@@ -167,7 +167,11 @@ public abstract class Arr extends ParseExpr {
   final Expr emptyExpr() {
     // pre-evaluate if one value is empty (e.g.: () = local:expensive() )
     for(final Expr expr : exprs) {
-      if(expr.seqType().zero()) return expr;
+      if(expr.seqType().zero()) {
+        // keep expression if returning the empty operand would drop a nondeterministic sibling
+        if(((Checks<Expr>) ex -> ex != expr && ex.has(Flag.NDT)).any(exprs)) break;
+        return expr;
+      }
     }
     return this;
   }

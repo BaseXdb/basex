@@ -437,6 +437,7 @@ c_add1               = Tambahkan sumber ke dalam basisdata.
 c_add2               = Tambahkan [%] sebagai [%] ke dalam basisdata.
 c_alter1             = Ubah basis data atau data pengguna.
 c_alter2             = Ubah nama basis data, pengguna, atau kata kunci pengguna:
+c_alterbackup        = ubah nama cadangan.
 c_alterdb            = ubah nama basisdata.
 c_alterpw            = ubah kata kunci satu pengguna.
 c_alteruser          = ubah name satu pengguna.

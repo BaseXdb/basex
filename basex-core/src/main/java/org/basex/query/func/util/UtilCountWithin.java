@@ -31,11 +31,15 @@ public final class UtilCountWithin extends StandardFunc {
     final long[] minMax = minMax(qc);
     final long min = minMax[0], max = minMax[1];
 
-    // iterative access: if the iterator size is unknown, iterate through results
-    final Iter input = arg(0).iter(qc);
-    long size = input.size();
+    // iterative through the results if an iterator is nondeterministic or its size is unknown
+    final Expr expr = arg(0);
+    final Iter input = expr.iter(qc);
+    final boolean enforce = expr.has(Flag.NDT);
+    long size = enforce ? -1 : input.size();
     if(size == -1) {
-      if(max == Long.MAX_VALUE) {
+      if(enforce) {
+        do ++size; while(qc.next(input) != null);
+      } else if(max == Long.MAX_VALUE) {
         // >= min: skip if minimum is reached
         do ++size; while(size < min && qc.next(input) != null);
       } else {
@@ -48,23 +52,23 @@ public final class UtilCountWithin extends StandardFunc {
 
   @Override
   protected void simplifyArgs(final CompileContext cc) throws QueryException {
-    arg(0, arg -> arg.simplifyFor(Simplify.COUNT, cc));
+    arg(0, arg -> arg.has(Flag.NDT) ? arg : arg.simplifyFor(Simplify.COUNT, cc));
   }
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
 
-    // return statically known size (ignore nondeterministic expressions, e.g. count(error()))
+    // skip rewrites for nondeterministic input, which must be fully evaluated for its side effects
     final long[] minMax = minMaxValues(cc.qc);
-    if(minMax != null) {
+    if(minMax != null && !input.has(Flag.NDT)) {
       final long min = minMax[0], max = minMax[1];
       if(min > max) return Bln.FALSE;
       if(min <= 0 && max == Long.MAX_VALUE) return Bln.TRUE;
 
       // evaluate static result size
       final long size = input.size();
-      if(size >= 0 && !input.has(Flag.NDT)) return Bln.get(size >= min && size <= max);
+      if(size >= 0) return Bln.get(size >= min && size <= max);
 
       if(max == 0) return cc.function(EMPTY, info, input);
       if(min == 1 && max == Long.MAX_VALUE) return cc.function(EXISTS, info, input);

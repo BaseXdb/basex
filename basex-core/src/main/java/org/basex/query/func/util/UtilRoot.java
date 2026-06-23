@@ -45,7 +45,7 @@ public final class UtilRoot extends StandardFunc {
     Type tp = null;
     if(type.instanceOf(NodeType.NODE)) {
       tp = NodeType.DOCUMENT;
-    } else if(type.instanceOf(NodeType.JNODE)) {
+    } else if(type.instanceOf(NodeType.JNODE) || type.instanceOf(Types.MAP_OR_ARRAY)) {
       tp = Types.JNODE_ROOT;
     }
     if(tp != null) {
@@ -57,12 +57,14 @@ public final class UtilRoot extends StandardFunc {
   /**
    * Returns the root of the specified node.
    * @param item node item
-   * @return root
+   * @return root or {@code null}
    */
   private GNode root(final Item item) {
     if(item instanceof final GNode gnode) {
       final GNode root = gnode.root();
       if(root.kind().oneOf(Kind.DOCUMENT, Kind.JNODE)) return root;
+    } else if(item instanceof XQStruct) {
+      return new JNode(item);
     }
     return null;
   }

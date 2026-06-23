@@ -29,9 +29,11 @@ public final class FnChar extends StandardFunc {
       if(nl == 2 && token[0] == '\\') {
         // backslash-escape sequence
         final int cp = token[1];
-        if(cp == 't') return Str.get('\t');
+        if(cp == 'b') return Str.get('\b');
+        if(cp == 'f') return Str.get('\f');
         if(cp == 'n') return Str.get('\n');
         if(cp == 'r') return Str.get('\r');
+        if(cp == 't') return Str.get('\t');
       } else if(nl > 0) {
         // HTML character reference name
         final byte[] result = XMLToken.getEntity(token);

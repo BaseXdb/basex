@@ -46,6 +46,8 @@ public abstract class PlanFn extends StandardFunc {
     NameFormat name;
     /** Attribute marker. */
     String marker;
+    /** Content key. */
+    Str content = CONTENT;
   }
 
   /** Name format. */
@@ -232,8 +234,10 @@ public abstract class PlanFn extends StandardFunc {
           attributes(node, plan, qc).map();
         case SIMPLE ->
           cast(Str.get(node.string()));
-        case SIMPLE_PLUS ->
-          attributes(node, plan, qc).put(CONTENT, cast(Str.get(node.string()))).map();
+        case SIMPLE_PLUS -> {
+          final MapBuilder mb = attributes(node, plan, qc);
+          yield mb.put(contentKey(mb, plan), cast(Str.get(node.string()))).map();
+        }
         case LIST ->
           list(node, plan, qc);
         case LIST_PLUS ->
@@ -376,6 +380,19 @@ public abstract class PlanFn extends StandardFunc {
       mb.put(nodeName(attr, node, plan, qc), entry != null ? entry.cast(value) : value);
     }
     return mb;
+  }
+
+  /**
+   * Returns the content key, prepending {@code #} characters to avoid clashes with existing keys.
+   * @param mb map builder with the keys generated so far
+   * @param plan plan
+   * @return content key
+   * @throws QueryException query exception
+   */
+  private static Str contentKey(final MapBuilder mb, final Plan plan) throws QueryException {
+    Str key = plan.content;
+    while(mb.contains(key)) key = Str.get(Token.concat(Token.cpToken('#'), key.string()));
+    return key;
   }
 
   /**

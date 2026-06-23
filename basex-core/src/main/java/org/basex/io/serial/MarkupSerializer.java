@@ -148,6 +148,8 @@ abstract class MarkupSerializer extends StandardSerializer {
         out.print(E_QUOT);
       } else if(cp == 0x9 || cp == 0xA) {
         printHex(cp);
+      } else if(canonical && cp == '>') {
+        out.print(cp);
       } else {
         printChar(cp);
       }
@@ -244,6 +246,7 @@ abstract class MarkupSerializer extends StandardSerializer {
   protected void startOpen(final QNm name) throws IOException {
     if(opened.isEmpty()) checkRoot(name);
     if(sep) indent();
+    if(canonical && root) indent = false;
     out.print(ELEM_O);
     out.print(name.string());
     indAttrLength = out.lineLength();

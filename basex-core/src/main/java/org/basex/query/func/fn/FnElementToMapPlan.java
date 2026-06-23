@@ -26,7 +26,9 @@ public final class FnElementToMapPlan extends PlanFn {
     final QNmMap<GNodeList> elemNames = new QNmMap<>();
     final QNmMap<GNodeList> attrNames = new QNmMap<>();
     for(Item item; (item = iter.next()) != null;) {
-      for(final GNode desc : toNode(item).descendantIter(true)) {
+      final XNode node = (XNode) (item.type.instanceOf(NodeType.DOCUMENT) ? item :
+        toElem(item, qc));
+      for(final GNode desc : node.descendantIter(true)) {
         qc.checkStop();
         if(desc.kind() == Kind.ELEMENT) {
           elemNames.computeIfAbsent(desc.qname(), GNodeList::new).add(desc);

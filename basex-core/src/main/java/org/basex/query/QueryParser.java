@@ -1144,6 +1144,7 @@ public class QueryParser extends InputParser {
    * Parses the "FLWORExpr" rule.
    * Parses the "WhereClause" rule.
    * Parses the "WhileClause" rule.
+   * Parses the "TraceClause" rule.
    * Parses the "OrderByClause" rule.
    * Parses the "OrderSpecList" rule.
    * Parses the "GroupByClause" rule.
@@ -1177,6 +1178,11 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(WHILE)) {
         alterPos = pos;
         clauses.add(new While(check(single(), NOWHILE), info()));
+      }
+
+      if(wsConsumeWs(TRACE)) {
+        alterPos = pos;
+        clauses.add(new Trace(check(single(), NOTRACE), info()));
       }
 
       if(wsConsumeWs(GROUP)) {
@@ -3622,9 +3628,7 @@ public class QueryParser extends InputParser {
         final byte[] ncname = ncName(null, false);
         if(ncname.length != 0) key = Str.get(ncname);
       }
-      if((key != null || wsConsume("*")) && wsConsume(",")) {
-        if(!wsConsume("*")) st = sequenceType();
-      }
+      if((key != null || wsConsume("*")) && wsConsume(",")) st = sequenceType();
       wsCheck(")");
     }
     return JNodeTest.get(key, st);

@@ -55,8 +55,8 @@ public class FnForEachPair extends StandardFunc {
   protected final Expr opt(final CompileContext cc) throws QueryException {
     final Expr input1 = arg(0), input2 = arg(1);
     final SeqType st1 = input1.seqType(), st2 = input2.seqType();
-    if(st1.zero()) return input1;
-    if(st2.zero()) return input2;
+    if(st1.zero()) return cc.voidAndReturn(input2, input1, info);
+    if(st2.zero()) return cc.voidAndReturn(input1, input2, info);
 
     arg(2, arg -> refineFunc(arg, cc, st1.with(Occ.EXACTLY_ONE), st2.with(Occ.EXACTLY_ONE),
         Types.INTEGER_O));

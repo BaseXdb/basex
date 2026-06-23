@@ -437,6 +437,7 @@ c_add1               = Hinzufügen von XML-Dokumenten.
 c_add2               = Fügt der Datenbank ein XML-Dokument [%] unter [%] hinzu.
 c_alter1             = Änderung von Datenbank- und Benutzerdaten.
 c_alter2             = Ändert der Namen einer Datenbank, einer Benutzers oder dessen Passwort:
+c_alterbackup        = benennt ein Backup um
 c_alterdb            = benennt eine Datenbank um
 c_alterpw            = ändert das Passwort eines Benutzers
 c_alteruser          = benennt einen Benutzer um

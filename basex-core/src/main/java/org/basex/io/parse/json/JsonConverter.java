@@ -27,8 +27,6 @@ public abstract class JsonConverter extends Job {
 
   /** Fallback function. */
   protected QueryFunction<byte[], byte[]> fallback;
-  /** Number parser function. */
-  protected QueryFunction<byte[], Item> numberParser;
   /** Null value. */
   protected Value nullValue = Empty.VALUE;
   /** Input info. */
@@ -67,14 +65,6 @@ public abstract class JsonConverter extends Job {
    */
   public final void fallback(final QueryFunction<byte[], byte[]> func) {
     fallback = func;
-  }
-
-  /**
-   * Assigns a number parser function.
-   * @param func number parser function
-   */
-  public final void numberParser(final QueryFunction<byte[], Item> func) {
-    numberParser = func;
   }
 
   /**

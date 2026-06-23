@@ -53,7 +53,7 @@ public final class MixedPath extends Path {
         final ValueBuilder items = new ValueBuilder(qc);
         final Expr step = steps[s];
         for(Item item; (item = iter.next()) != null;) {
-          qf.value = checkNode(item);
+          qf.value = toContextNode(item);
           qf.pos++;
           // loop through all resulting items
           final Iter ir = step.iter(qc);
@@ -81,18 +81,6 @@ public final class MixedPath extends Path {
       qc.focus = focus;
     }
     return iter;
-  }
-
-  /**
-   * Throws an exception if the input is not a node.
-   * @param item item
-   * @return input
-   * @throws QueryException query exception
-   */
-  private Item checkNode(final Item item) throws QueryException {
-    if(item instanceof GNode) return item;
-    if(item instanceof XQStruct) return new JNode(item);
-    throw QueryError.PATHNODE_X_X_X.get(info, this, item.type, item);
   }
 
   @Override
