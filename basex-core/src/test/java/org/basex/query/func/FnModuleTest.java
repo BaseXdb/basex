@@ -1077,6 +1077,13 @@ public final class FnModuleTest extends SandboxTest {
         "?a instance of xs:untypedAtomic", true);
     query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'numeric' } } }") +
         "?a instance of xs:untypedAtomic", true);
+
+    // content-key option
+    query(func.args(" <price currency='USD'>12.16</price>",
+        " { 'attribute-marker': '', 'content-key': 'value' }") + "?price?value", "12.16");
+    // content key clashes with attribute name: prepend '#'
+    query(func.args(" <a b='1'>x</a>", " { 'attribute-marker': '', 'content-key': 'b' }") +
+        "?a => map:keys() => sort()", "#b\nb");
   }
 
   /** Test method. */
