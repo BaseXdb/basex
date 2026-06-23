@@ -183,6 +183,10 @@ public enum Calc {
         if(num2) return new DTDur((Dur) item1, item2.dbl(info), true, info);
       } else if(type2 == DAY_TIME_DURATION) {
         if(num1) return new DTDur((Dur) item2, item1.dbl(info), true, info);
+      } else if(type1 == DURATION) {
+        if(num2) return new Dur((Dur) item1, item2.dbl(info), true, info);
+      } else if(type2 == DURATION) {
+        if(num1) return new Dur((Dur) item2, item1.dbl(info), true, info);
       } else if(num1 && num2) {
         return switch(numType(type1, type2)) {
           case INTEGER -> multiplyInt(item1, item2, info);
@@ -230,6 +234,7 @@ public enum Calc {
     public Type type(final Type type1, final Type type2) {
       if(type1 == YEAR_MONTH_DURATION || type2 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
       if(type1 == DAY_TIME_DURATION || type2 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
+      if(type1 == DURATION || type2 == DURATION) return DURATION;
       return numType(type1, type2);
     }
 
@@ -263,6 +268,8 @@ public enum Calc {
         if(num2) return new YMDur((Dur) item1, item2.dbl(info), false, info);
       } else if(type1 == DAY_TIME_DURATION) {
         if(num2) return new DTDur((Dur) item1, item2.dbl(info), false, info);
+      } else if(type1 == DURATION) {
+        if(num2) return new Dur((Dur) item1, item2.dbl(info), false, info);
       } else if(num1 && num2) {
         return switch(numType(type1, type2)) {
           case DOUBLE -> divideDbl(item1, item2, info);
@@ -300,6 +307,7 @@ public enum Calc {
       if(type1 == type2 && type1.oneOf(YEAR_MONTH_DURATION, DAY_TIME_DURATION)) return DECIMAL;
       if(type1 == YEAR_MONTH_DURATION) return YEAR_MONTH_DURATION;
       if(type1 == DAY_TIME_DURATION) return DAY_TIME_DURATION;
+      if(type1 == DURATION) return DURATION;
       final Type type = numType(type1, type2);
       return type == INTEGER ? DECIMAL : type;
     }

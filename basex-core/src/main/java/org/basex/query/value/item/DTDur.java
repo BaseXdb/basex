@@ -76,7 +76,6 @@ public final class DTDur extends Dur {
    */
   public DTDur(final DTDur dur, final DTDur add, final boolean plus, final InputInfo info)
       throws QueryException {
-
     this(dur);
     seconds = plus ? seconds.add(add.seconds) : seconds.subtract(add.seconds);
     final double d = seconds.doubleValue();
@@ -84,34 +83,18 @@ public final class DTDur extends Dur {
   }
 
   /**
-   * Constructor for multiplying a duration with a number.
-   * @param dur  duration item
+   * Constructor for multiplying or dividing a duration by a number.
+   * @param dur duration item
    * @param factor factor
-   * @param mult multiplication flag
+   * @param mult multiplication/division flag
    * @param info input info (can be {@code null})
    * @throws QueryException query exception
    */
   public DTDur(final Dur dur, final double factor, final boolean mult, final InputInfo info)
       throws QueryException {
-
     this(dur);
-    if(Double.isNaN(factor)) throw DATECALC_X_X.get(info, description(), factor);
-    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(info, type, factor);
-    if(mult ? factor == 0 : Double.isInfinite(factor)) {
-      seconds = BigDecimal.ZERO;
-    } else {
-      BigDecimal d = BigDecimal.valueOf(factor);
-      try {
-        seconds = mult ? seconds.multiply(d) : seconds.divide(d, MathContext.DECIMAL64);
-      } catch(final ArithmeticException ex) {
-        Util.debug(ex);
-        // catch cases in which a computation yields no exact result; eg:
-        // xs:dayTimeDuration("P1D") div xs:double("-1.7976931348623157E308")
-        d = BigDecimal.valueOf(1 / factor);
-        seconds = mult ? seconds.divide(d, MathContext.DECIMAL64) : seconds.multiply(d);
-      }
-    }
-    if(Math.abs(seconds.doubleValue()) < 1.0E-13) seconds = BigDecimal.ZERO;
+    checkFactor(factor, mult, type, info);
+    seconds = scaleSeconds(seconds, factor, mult);
   }
 
   /**
@@ -147,7 +130,8 @@ public final class DTDur extends Dur {
     final int ss = seconds.signum();
     if(ss < 0) tb.add('-');
     tb.add('P');
-    if(day() != 0) { tb.addLong(Math.abs(day())); tb.add('D'); }
+    final long d = day();
+    if(d != 0) { tb.addLong(Math.abs(d)); tb.add('D'); }
     time(tb);
     if(ss == 0) tb.add("T0S");
     return tb.finish();

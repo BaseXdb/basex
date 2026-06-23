@@ -57,13 +57,9 @@ public final class YMDur extends Dur {
    */
   public YMDur(final Dur value, final double factor, final boolean mult, final InputInfo info)
       throws QueryException {
-
     this(value);
-    if(Double.isNaN(factor)) throw DATECALC_X_X.get(info, description(), factor);
-    if(mult ? Double.isInfinite(factor) : factor == 0) throw DATEZERO_X_X.get(info, type, factor);
-    final double d = mult ? months * factor : months / factor;
-    if(d <= Long.MIN_VALUE || d >= Long.MAX_VALUE) throw MONTHRANGE_X.get(info, d);
-    months = StrictMath.round(d);
+    checkFactor(factor, mult, type, info);
+    months = scaleMonths(months, factor, mult, info);
   }
 
   /**
@@ -106,7 +102,7 @@ public final class YMDur extends Dur {
   @Override
   public int compare(final Item item, final Collation coll, final boolean transitive,
       final InputInfo ii) throws QueryException {
-    return item.type == type ? Long.signum(months - ((Dur) item).months) :
+    return item.type == type ? Long.compare(months, ((Dur) item).months) :
       super.compare(item, coll, transitive, ii);
   }
 }
