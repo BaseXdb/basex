@@ -18,10 +18,11 @@ public final class StringNgramSimilarity extends StandardFunc {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final AStr value1 = toStr(arg(0), qc), value2 = toStr(arg(1), qc);
-    final long n = defined(2) ? Math.min(Integer.MAX_VALUE, toLong(arg(2), qc)) : 2;
+    final Long nn = toLongOrNull(arg(2), qc);
+    final int n = nn != null ? (int) Math.min(Integer.MAX_VALUE, nn) : 2;
     if(n < 1) throw STRING_NGRAM_X.get(info, n);
 
     final int[] cps1 = value1.codepoints(info), cps2 = value2.codepoints(info);
-    return Dbl.get(NGram.similarity(cps1, cps2, (int) n));
+    return Dbl.get(NGram.similarity(cps1, cps2, n));
   }
 }

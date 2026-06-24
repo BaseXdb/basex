@@ -20,11 +20,12 @@ public final class StringNgrams extends StandardFunc {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     final AStr value = toStr(arg(0), qc);
-    final long n = defined(1) ? Math.min(Integer.MAX_VALUE, toLong(arg(1), qc)) : 2;
+    final Long nn = toLongOrNull(arg(1), qc);
+    final int n = nn != null ? (int) Math.min(Integer.MAX_VALUE, nn) : 2;
     if(n < 1) throw STRING_NGRAM_X.get(info, n);
 
     final TokenList tokens = new TokenList();
-    for(final String gram : NGram.grams(value.codepoints(info), (int) n)) tokens.add(gram);
+    for(final String gram : NGram.grams(value.codepoints(info), n)) tokens.add(gram);
     return StrSeq.get(tokens);
   }
 }
