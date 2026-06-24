@@ -250,14 +250,17 @@ public abstract class Sandbox {
    */
   protected static String eval(final String query) throws QueryException, IOException {
     final ArrayOutput ao = new ArrayOutput();
-    try(QueryProcessor qp = new QueryProcessor(query, BASEURI, context, null)) {
+    // capture the context once: a query must release locks on the same context it registered with,
+    // even if the static field is reassigned (e.g. by another test class) while the query runs
+    final Context ctx = context;
+    try(QueryProcessor qp = new QueryProcessor(query, BASEURI, ctx, null)) {
       qp.compile();
-      qp.register(context);
+      qp.register(ctx);
       try(Serializer ser = qp.serializer(ao)) {
         qp.value().serialize(ser);
       } finally {
         qp.close();
-        qp.unregister(context);
+        qp.unregister(ctx);
       }
     }
     return ao.toString();
