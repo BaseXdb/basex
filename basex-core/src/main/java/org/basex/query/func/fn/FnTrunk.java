@@ -79,7 +79,7 @@ public final class FnTrunk extends StandardFunc {
     if(input instanceof Value) return value(cc.qc);
 
     final SeqType st = input.seqType();
-    if(st.zeroOrOne()) return Empty.VALUE;
+    if(st.zeroOrOne()) return cc.voidAndReturn(input, Empty.VALUE, info);
 
     final long size = input.size();
     // trunk(TWO-RESULTS) → head(TWO-RESULTS)

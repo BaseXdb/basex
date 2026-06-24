@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
@@ -40,7 +41,7 @@ public final class FnExactlyOne extends StandardFunc {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.one()) return input;
-    if(st.zero() || input.size() > 1) throw EXACTLYONE.get(info);
+    if((st.zero() || input.size() > 1) && !input.has(Flag.NDT)) throw EXACTLYONE.get(info);
 
     exprType.assign(st.with(Occ.EXACTLY_ONE)).data(input);
     return this;
