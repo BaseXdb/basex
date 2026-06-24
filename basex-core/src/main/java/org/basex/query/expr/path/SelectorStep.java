@@ -25,11 +25,23 @@ public final class SelectorStep extends Step {
    * Constructor.
    * @param info input info (can be {@code null})
    * @param axis axis
+   * @param selector selector
+   * @param preds predicates
+   */
+  public SelectorStep(final InputInfo info, final Axis axis, final Expr selector,
+      final Expr... preds) {
+    this(info, axis, Test.get(axis == Axis.ATTRIBUTE ? Kind.ATTRIBUTE : null, null,
+      NameTest.Scope.ALL, null), selector, preds);
+  }
+  /**
+   * Constructor.
+   * @param info input info (can be {@code null})
+   * @param axis axis
    * @param test kind test (wildcard)
    * @param selector selector
    * @param preds predicates
    */
-  public SelectorStep(final InputInfo info, final Axis axis, final Test test, final Expr selector,
+  SelectorStep(final InputInfo info, final Axis axis, final Test test, final Expr selector,
       final Expr... preds) {
     super(info, axis, test, preds);
     this.selector = selector;
@@ -86,29 +98,34 @@ public final class SelectorStep extends Step {
     // no keys: no results
     if(selector.seqType().zero()) return cc.emptySeq(this);
 
-    // constant QName keys: rewrite to a static name test
+    // constant keys: rewrite to a static test
+    // JNodes select by key (JNodeTest, enabling direct lookup), XML nodes by name (NameTest)
     if(selector instanceof final Value value) {
+      final Expr in = root != null ? root : cc.qc.focus.value;
+      final Type it = in != null ? in.seqType().type : null;
+      final boolean jnode = it != null &&
+          (it.instanceOf(NodeType.JNODE) || it.instanceOf(Types.MAP_OR_ARRAY));
+
       final ArrayList<Test> list = new ArrayList<>();
-      boolean qnames = true;
+      boolean fold = true;
       for(final Item item : value) {
-        if(item instanceof final QNm qnm) {
+        if(jnode && item.type.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+          list.add(JNodeTest.get(item, null));
+        } else if(item instanceof final QNm qnm) {
           list.add(Test.get(axis == Axis.ATTRIBUTE ? Kind.ATTRIBUTE : null, qnm, null, null));
         } else {
-          qnames = false;
+          fold = false;
           break;
         }
       }
-      final Test t = qnames ? Test.get(list) : null;
+      final Test t = fold ? Test.get(list) : null;
       if(t != null) {
         final Expr step = Step.get(cc, root, info, axis, t, exprs);
         cc.info(QueryText.OPTREWRITE_X_X, this, step);
         return step;
       }
     }
-
-    // dynamic name test: assign type, optimize predicates
-    assignType(root != null ? root : cc.qc.focus.value);
-    return optimize(cc, this) ? cc.emptySeq(this) : this;
+    return super.optimize(root, cc);
   }
 
   @Override

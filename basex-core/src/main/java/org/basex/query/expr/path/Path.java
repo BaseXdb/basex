@@ -307,27 +307,32 @@ public abstract class Path extends ParseExpr {
     boolean removed = false;
     final ExprList list = new ExprList(sl);
     for(int s = 0; s < sl; s++) {
-      final Expr step = steps[s];
+      Expr step = steps[s];
       final Expr prev = list.isEmpty() ? root != null ? root : cc.qc.focus.value : list.peek();
       if(prev != null) {
         final SeqType seqType = prev.seqType();
-        if(seqType.type instanceof NodeType && (step instanceof ContextValue ||
+        final Type pt = seqType.type;
+        if(pt instanceof NodeType && (step instanceof ContextValue ||
             step instanceof final Step stp && stp.remove(seqType))) {
           removed = true;
           continue;
         }
+        // $map/'X' → $map/child::{ 'X' }
+        if(step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) &&
+            (pt.instanceOf(NodeType.JNODE) || pt.instanceOf(Types.MAP_OR_ARRAY))) {
+          step = new SelectorStep(step.info(info), CHILD, step).optimize(prev, cc);
+        }
       }
 
       // step is empty sequence. example: $doc/NON-EXISTING-STEP → $doc/() → ()
-      final Expr expr = steps[s];
-      if(expr == Empty.VALUE) return cc.emptySeq(this);
+      if(step == Empty.VALUE) return cc.emptySeq(this);
 
       // add step to list
-      list.add(expr);
+      list.add(step);
 
       // ignore remaining steps if step yields no results
       // example: A/void(.)/B → A/void(.)
-      if(expr.seqType().zero() && s + 1 < sl) {
+      if(step.seqType().zero() && s + 1 < sl) {
         cc.info(QueryText.OPTSIMPLE_X_X, (Supplier<?>) this::description, this);
         break;
       }

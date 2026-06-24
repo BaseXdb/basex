@@ -726,19 +726,20 @@ public final class XQuery4Test extends SandboxTest {
     check("<x a='1' b='2'/>/@{#a}", "a=\"1\"", type(IterStep.class, "attribute(a)?"));
     check("string(<x a='1' b='2'/>/@{#a})", "1", root(STRING));
 
-    // dynamic name test must survive step merging (descendant-or-self::node()/self::{E})
+    // selector must survive step merging (descendant-or-self::node()/self::{E});
+    // a constant atomic selector on JNodes folds to a JNodeTest step (no SelectorStep remains)
     check("let $m := { 'x': 1, 'y': 2, 'z': 3 } return $m//self::{ 'z' } =!> jvalue()", 3,
-        exists(SelectorStep.class));
+        empty(SelectorStep.class));
     check("let $m := { 'a': { 'z': 9 } } return $m//self::{ 'z' } ! jvalue()", 9,
-        exists(SelectorStep.class));
-    // dynamic name test is never a redundant self step, and is never exactly-one
+        empty(SelectorStep.class));
+    // selector is never a redundant self step, and is never exactly-one (XML keeps SelectorStep)
     check("count(<a/>/self::{ 'x' })", 0, exists(SelectorStep.class));
     check("count(<a/>/self::{ 'a' })", 1, exists(SelectorStep.class));
     // name filter must survive predicate flattening and predicate merging
     check("let $m := { 'x': 3, 'z': 1 } return exists($m/child::{ 'z' }[jvalue() = 3])", false,
-        exists(SelectorStep.class));
+        empty(SelectorStep.class));
     check("let $m := { 'x': 1, 'y': 2, 'z': 3 } return "
-        + "($m/child::{ ('y', 'z') })[jvalue() > 2] ! jvalue()", 3, exists(SelectorStep.class));
+        + "($m/child::{ ('y', 'z') })[jvalue() > 2] ! jvalue()", 3, empty(SelectorStep.class));
   }
 
   /** Path operator: JNode navigation with atomic step results (jkey matching). */
@@ -749,12 +750,26 @@ public final class XQuery4Test extends SandboxTest {
     query("{ 'a': 1, 'b': 2 }/('a', 'b') ! jvalue()", "1\n2");
     query("[ 10, 20, 30 ]/2 ! jvalue()", "20");
     query("{ 'a': 1 }/'x'", "");
-    // numeric key matching follows atomic-equal (xs:double 2.0 matches array index 2)
+    // numeric key matching follows atomic-equal (any integral, in-range numeric key)
     query("[ 10, 20, 30 ]/2.0e0 ! jvalue()", "20");
+    query("[ 10, 20, 30 ]/xs:decimal(2) ! jvalue()", "20");
+    // non-integral or out-of-range numeric array keys select nothing
+    query("([ 10, 20, 30 ]/2.5, [ 10, 20, 30 ]/0, [ 10, 20, 30 ]/9, [ 10, 20, 30 ]/'2')", "");
     // result is in document order, duplicates removed
     query("{ 'a': 1, 'b': 2, 'c': 3 }/('c', 'a', 'c') ! jvalue()", "1\n3");
     // equivalent to the child::{ E } selector
     query("let $m := { 'a': 1, 'b': 2 } return deep-equal($m/'b', $m/child::{ 'b' })", "true");
+    // a constant atomic selector on a JNode folds to a JNodeTest step (direct key lookup) ...
+    check("let $m := { 'a': 1, 'b': 2 } return $m/'b' ! jvalue()", 2,
+        exists(IterStep.class), empty(SelectorStep.class));
+    check("let $a := [ 10, 20, 30 ] return $a/2 ! jvalue()", 20,
+        exists(IterStep.class), empty(SelectorStep.class));
+    check("{ 'x': 1 }/'x' ! jvalue()", 1, exists(IterStep.class), empty(SelectorStep.class));
+    // ... a non-constant selector stays a SelectorStep ...
+    check("declare function local:f($k) { { 'a': 1 }/child::{ $k } }; local:f('a') ! jvalue()", 1,
+        exists(SelectorStep.class));
+    // ... and the mixed-path form is preserved for XML nodes (result is the atomic value)
+    check("<a/>/'X'", "X", root(Str.class), empty(SelectorStep.class));
     // node-returning steps are unaffected
     query("{ 'name': 'Alice' }/name ! jvalue()", "Alice");
     query("[ { 'c': 'London' }, { 'c': 'Berlin' } ]//c ! jvalue()", "London\nBerlin");

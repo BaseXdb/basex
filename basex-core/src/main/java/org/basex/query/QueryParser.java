@@ -2359,11 +2359,8 @@ public class QueryParser extends InputParser {
     // step with node test
     final InputInfo ii = info();
     if(test instanceof final Test t) return new CachedStep(ii, axis, t, preds.finish());
-
     // step with selector
-    final Test t = Test.get(axis == Axis.ATTRIBUTE ? Kind.ATTRIBUTE : null, null,
-      NameTest.Scope.ALL, null);
-    return new SelectorStep(ii, axis, t, (Expr) test, preds.finish());
+    return new SelectorStep(ii, axis, (Expr) test, preds.finish());
   }
 
   /**

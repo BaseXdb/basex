@@ -206,21 +206,23 @@ public final class JNode extends GNode {
       // leaves have no children
       if(!(value instanceof final XQStruct struct)) return BasicNodeIter.EMPTY;
 
-      // map or array: check if direct lookup is possible
+      // direct lookup is always possible for the child axis; for the descendant axis it is
+      // only safe over atomic-leaf values, as nested structures would hide deeper matches
       final boolean direct = !descendant || (
           value instanceof XQMap ? ((MapType) value.type).valueType() :
         ((ArrayType) value.type).valueType()).type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
+      // map: any atomic key, array: in-range integer key (1-based)
       if(direct && test instanceof final JNodeTest nt) {
         final Item s = nt.key;
-        if(s != null && s != Empty.VALUE) {
+        if(s != null && s != Empty.VALUE && (struct instanceof XQMap || s instanceof ANum)) {
           Value c = null;
           long i = -1;
           if(struct instanceof final XQMap map) {
             c = map.value(s);
           } else {
-            final long as = struct.structSize();
-            i = s instanceof final Itr itr ? itr.itr() - 1 : -1;
-            if(i >= 0 && i < as) c = struct.valueAt(i);
+            final double d = ((ANum) s).dbl();
+            i = (long) d - 1;
+            if(d == i + 1 && i >= 0 && i < struct.structSize()) c = struct.valueAt(i);
           }
           return c != null ? singleIter(new JNode(s, c, JNode.this, i, 1)) : BasicNodeIter.EMPTY;
         }
