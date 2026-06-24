@@ -98,7 +98,7 @@ public final class InputInfo {
   /**
    * Calculates the column and line number in a string.
    */
-  private void init() {
+  public void init() {
     // positions have already been calculated
     if(line != 0) return;
 

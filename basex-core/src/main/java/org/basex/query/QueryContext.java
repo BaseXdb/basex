@@ -79,6 +79,8 @@ public final class QueryContext extends Job implements Closeable {
   public final QueryThreads threads = new QueryThreads();
   /** Shared data references. */
   public final SharedData shared;
+  /** Static variables that query contexts are waiting for. */
+  public final IdentityHashMap<QueryContext, StaticVar> staticVarWaiting;
   /** User-defined locks. */
   public final LockList locks = new LockList();
   /** Current query focus. */
@@ -188,6 +190,7 @@ public final class QueryContext extends Job implements Closeable {
     resources = parent != null ? parent.resources : new QueryResources(this);
     ftPosData = parent != null ? parent.ftPosData : null;
     shared = parent != null ? parent.shared : new SharedData();
+    staticVarWaiting = parent != null ? parent.staticVarWaiting : new IdentityHashMap<>();
     regex = parent != null ? parent.regex : new TokenObjectMap<>();
     user = context.user();
   }
