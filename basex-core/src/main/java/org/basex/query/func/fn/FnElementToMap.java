@@ -1,18 +1,11 @@
 package org.basex.query.func.fn;
 
-import static org.basex.query.QueryError.*;
-
-import java.util.function.*;
-
 import org.basex.query.*;
-import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
-import org.basex.util.*;
-import org.basex.util.options.*;
 
 /**
  * Function implementation.
@@ -21,83 +14,24 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public final class FnElementToMap extends PlanFn {
-  /** Options. */
-  public static class ElementsOptions extends Options {
-    /** Option. */
-    public static final StringOption ATTRIBUTE_MARKER = new StringOption("attribute-marker", "@");
-    /** Option. */
-    public static final StringOption CONTENT_KEY = new StringOption("content-key", "#content");
-    /** Option. */
-    public static final EnumOption<NameFormat> NAME_FORMAT =
-        new EnumOption<>("name-format", NameFormat.DEFAULT);
-    /** Option. */
-    public static final ValueOption PLAN = new ValueOption("plan", Types.MAP_ZO);
-  }
-
   @Override
   protected Item item(final QueryContext qc) throws QueryException {
     final Item node = (Item) Types.DOCUMENT_OR_ELEMENT_ZO.coerce(arg(0).value(qc), qc, info);
     final ElementsOptions options = toOptions(arg(1), new ElementsOptions(), qc);
     if(node.isEmpty()) return Empty.VALUE;
 
-    final XNode elem = (XNode) (node.type.instanceOf(NodeType.DOCUMENT) ?
-      ((XNode) node).childIter().next() : node);
-
-    final Plan plan = new Plan();
-    plan.name = options.get(ElementsOptions.NAME_FORMAT);
-    plan.marker = options.get(ElementsOptions.ATTRIBUTE_MARKER);
-    plan.content = Str.get(options.get(ElementsOptions.CONTENT_KEY));
-
-    final Value pln = options.get(ElementsOptions.PLAN);
-    if(!pln.isEmpty()) {
-      toMap(pln, qc).forEach((key, value) -> {
-        final byte[] token = key.string(info);
-        final boolean attr = Token.startsWith(token, '@');
-        final QNm name;
-        if(Token.eq(token, Token.cpToken('*'))) {
-          name = QNm.EMPTY;
-        } else {
-          name = qc.shared.parseQName(attr ? Token.substring(token, 1) : token, true, qc, sc());
+    // a document node is represented by its single element child (may be preceded by comments, PIs)
+    XNode elem = (XNode) node;
+    if(elem.type.instanceOf(NodeType.DOCUMENT)) {
+      for(final GNode child : elem.childIter()) {
+        if(child.kind() == Kind.ELEMENT) {
+          elem = (XNode) child;
+          break;
         }
-        if(name != null) {
-          final PlanEntry pe = new PlanEntry();
-          pe.attribute = attr;
-          final XQMap map = toMap(value, qc);
-          final Value layout = map.get(LAYOUT);
-          if(!layout.isEmpty()) pe.layout = Enums.get(PlanLayout.class, toString(layout, qc));
-          final Value type = map.get(TYPE);
-          if(!type.isEmpty()) pe.type = Enums.get(PlanType.class, toString(type, qc));
-          final Value child = map.get(CHILD);
-          if(!child.isEmpty()) {
-            final QNm qnm = qc.shared.parseQName(toToken(child, qc), true, qc, sc());
-            if(qnm != null) pe.child = qnm;
-          }
-          plan.entries.put(name, pe);
-
-          // error handling
-          final Function<String, QueryException> where = s ->
-            INVALIDOPTION_X.get(info, Util.info("Missing key '%' (node: %).", s, name));
-          final BiFunction<String, Object, QueryException> why = (s, t) ->
-            INVALIDOPTION_X.get(info, Util.info("Unexpected key '%':'%' (node: %).", s, t, name));
-          if(pe.layout == null) {
-            if(!pe.attribute) throw where.apply("layout");
-          } else {
-            if(pe.attribute) throw why.apply("layout", pe.layout);
-          }
-          if(pe.layout == PlanLayout.LIST || pe.layout == PlanLayout.LIST_PLUS) {
-            if(pe.child == null) throw where.apply("child");
-          } else {
-            if(pe.child != null) throw why.apply("child", pe.child);
-          }
-          if(pe.layout == PlanLayout.SIMPLE || pe.layout == PlanLayout.SIMPLE_PLUS ||
-              pe.attribute) {
-            if(!pe.attribute && pe.type == PlanType.SKIP) throw why.apply("type", pe.type);
-          } else {
-            if(pe.type != null) throw why.apply("type", pe.type);
-          }
-        }
-      });
+      }
     }
+
+    final Plan plan = buildPlan(options, qc);
 
     // create result
     final Item value = entry(elem, plan).apply(elem, null, plan, qc);

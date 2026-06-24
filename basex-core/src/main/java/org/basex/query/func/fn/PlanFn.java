@@ -7,6 +7,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
+import org.basex.query.value.*;
 import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
@@ -15,6 +16,7 @@ import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
+import org.basex.util.options.*;
 
 /**
  * Plan functions.
@@ -23,6 +25,19 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public abstract class PlanFn extends StandardFunc {
+  /** Options for converting between elements and maps. */
+  public static class ElementsOptions extends Options {
+    /** Option. */
+    public static final StringOption ATTRIBUTE_MARKER = new StringOption("attribute-marker", "@");
+    /** Option. */
+    public static final StringOption CONTENT_KEY = new StringOption("content-key", "#content");
+    /** Option. */
+    public static final EnumOption<NameFormat> NAME_FORMAT =
+        new EnumOption<>("name-format", NameFormat.DEFAULT);
+    /** Option. */
+    public static final ValueOption PLAN = new ValueOption("plan", Types.MAP_ZO);
+  }
+
   /** Content string. */
   static final Str CONTENT = Str.get("#content");
   /** Comment string. */
@@ -225,7 +240,12 @@ public abstract class PlanFn extends StandardFunc {
     Item apply(final GNode node, final GNode parent, final Plan plan, final QueryContext qc)
         throws QueryException {
 
-      final PlanEntry pe = valid(node) ? this : plan.entries.get(QNm.EMPTY);
+      PlanEntry pe = this;
+      if(!valid(node)) {
+        // fall back to the wildcard layout, which must be applicable as well
+        pe = plan.entries.get(QNm.EMPTY);
+        if(pe != null && !pe.valid(node)) pe = null;
+      }
       if(pe != null) {
         try {
           return pe.create(node, parent, plan, qc);
@@ -304,6 +324,105 @@ public abstract class PlanFn extends StandardFunc {
   }
 
   /**
+   * Builds a conversion plan from the function options.
+   * @param options options
+   * @param qc query context
+   * @return conversion plan
+   * @throws QueryException query exception
+   */
+  final Plan buildPlan(final ElementsOptions options, final QueryContext qc)
+      throws QueryException {
+    final Plan plan = new Plan();
+    plan.name = options.get(ElementsOptions.NAME_FORMAT);
+    plan.marker = options.get(ElementsOptions.ATTRIBUTE_MARKER);
+    plan.content = Str.get(options.get(ElementsOptions.CONTENT_KEY));
+
+    final Value pln = options.get(ElementsOptions.PLAN);
+    if(!pln.isEmpty()) {
+      toMap(pln, qc).forEach((key, value) -> {
+        final byte[] token = key.string(info);
+        final boolean attr = Token.startsWith(token, '@');
+        final QNm name;
+        if(Token.eq(token, Token.cpToken('*'))) {
+          name = QNm.EMPTY;
+        } else {
+          name = qc.shared.parseQName(attr ? Token.substring(token, 1) : token, true, qc, sc());
+        }
+        // entries with keys that are no valid names are ignored
+        if(name == null) return;
+
+        final PlanEntry pe = new PlanEntry();
+        pe.attribute = attr;
+        final XQMap map = toMap(value, qc);
+        final Value layout = map.get(LAYOUT);
+        if(!layout.isEmpty()) {
+          final String string = toString(layout, qc);
+          pe.layout = Enums.get(PlanLayout.class, string);
+          if(pe.layout == null) throw unexpected("layout", string, name);
+        }
+        final Value type = map.get(TYPE);
+        if(!type.isEmpty()) {
+          final String string = toString(type, qc);
+          pe.type = Enums.get(PlanType.class, string);
+          if(pe.type == null) throw unexpected("type", string, name);
+        }
+        final Value child = map.get(CHILD);
+        if(!child.isEmpty()) {
+          final byte[] childName = toToken(child, qc);
+          pe.child = qc.shared.parseQName(childName, true, qc, sc());
+          if(pe.child == null) throw unexpected("child", Token.string(childName), name);
+        }
+        plan.entries.put(name, pe);
+
+        // error handling
+        if(pe.layout == null) {
+          if(!pe.attribute) throw missing("layout", name);
+        } else if(pe.attribute) {
+          throw unexpected("layout", pe.layout, name);
+        }
+        if(pe.layout == PlanLayout.LIST || pe.layout == PlanLayout.LIST_PLUS) {
+          if(pe.child == null) throw missing("child", name);
+        } else if(pe.child != null) {
+          throw unexpected("child", pe.child, name);
+        }
+        if(pe.layout == PlanLayout.SIMPLE || pe.layout == PlanLayout.SIMPLE_PLUS ||
+            pe.attribute) {
+          if(pe.attribute) {
+            if(pe.type == null) throw missing("type", name);
+          } else if(pe.type == PlanType.SKIP) {
+            throw unexpected("type", pe.type, name);
+          }
+        } else if(pe.type != null) {
+          throw unexpected("type", pe.type, name);
+        }
+      });
+    }
+    return plan;
+  }
+
+  /**
+   * Returns an exception for a missing plan key.
+   * @param key key
+   * @param name node name
+   * @return exception
+   */
+  private QueryException missing(final String key, final QNm name) {
+    return INVALIDOPTION_X.get(info, Util.info("Missing key '%' (node: %).", key, name));
+  }
+
+  /**
+   * Returns an exception for an unexpected plan key.
+   * @param key key
+   * @param value value
+   * @param name node name
+   * @return exception
+   */
+  private QueryException unexpected(final String key, final Object value, final QNm name) {
+    return INVALIDOPTION_X.get(info, Util.info("Unexpected key '%':'%' (node: %).", key, value,
+        name));
+  }
+
+  /**
    * Returns a matching layout for the specified element.
    * @param node node
    * @param plan plan
@@ -311,8 +430,20 @@ public abstract class PlanFn extends StandardFunc {
    */
   final PlanEntry entry(final GNode node, final Plan plan) {
     PlanEntry pe = plan.entries.get(node.qname());
-    if(pe == null) pe = plan.entries.get(QNm.EMPTY);
+    // entries for attributes of the same name must be ignored
+    if(pe == null || pe.attribute) pe = plan.entries.get(QNm.EMPTY);
     return pe != null ? pe : entry(node);
+  }
+
+  /**
+   * Returns the plan entry for an attribute.
+   * @param name attribute name
+   * @param plan plan
+   * @return entry, or {@code null} if the plan has no entry for this attribute
+   */
+  private static PlanEntry attributeEntry(final QNm name, final Plan plan) {
+    final PlanEntry pe = plan.entries.get(name);
+    return pe != null && pe.attribute ? pe : null;
   }
 
   /**
@@ -418,12 +549,40 @@ public abstract class PlanFn extends StandardFunc {
       throws QueryException {
     final GNodeList attributes = children(Kind.ATTRIBUTE, node);
     final MapBuilder mb = new MapBuilder(attributes.size());
+    // a marker that does not distinguish attributes from child elements is replaced by '@'
+    final String marker = conflict(node, attributes, plan, qc) ? "@" : plan.marker;
     for(final GNode attr : attributes) {
-      final PlanEntry entry = plan.entries.get(attr.qname());
+      final PlanEntry entry = attributeEntry(attr.qname(), plan);
+      // attributes with the type 'skip' are omitted
+      if(entry != null && entry.type == PlanType.SKIP) continue;
       final Str value = Str.get(attr.string());
-      mb.put(nodeName(attr, node, plan, qc), entry != null ? entry.cast(value) : value);
+      mb.put(nodeName(attr.qname(), false, node, plan, qc, marker),
+          entry != null ? entry.cast(value) : value);
     }
     return mb;
+  }
+
+  /**
+   * Checks if the names of attributes and child elements of a node conflict.
+   * @param node node
+   * @param attributes attributes of the node
+   * @param plan plan
+   * @param qc query context
+   * @return result of check
+   */
+  private static boolean conflict(final GNode node, final GNodeList attributes, final Plan plan,
+      final QueryContext qc) {
+    if(attributes.isEmpty() || "@".equals(plan.marker)) return false;
+    final TokenSet names = new TokenSet();
+    for(final GNode child : children(Kind.ELEMENT, node)) {
+      names.add(nodeName(child, node, plan, qc));
+    }
+    for(final GNode attr : attributes) {
+      final PlanEntry entry = attributeEntry(attr.qname(), plan);
+      if((entry == null || entry.type != PlanType.SKIP) &&
+          names.contains(nodeName(attr, node, plan, qc))) return true;
+    }
+    return false;
   }
 
   /**
@@ -463,6 +622,21 @@ public abstract class PlanFn extends StandardFunc {
    */
   static byte[] nodeName(final QNm qnm, final boolean element, final GNode parent,
       final Plan plan, final QueryContext qc) {
+    return nodeName(qnm, element, parent, plan, qc, plan.marker);
+  }
+
+  /**
+   * Returns a string representation of the name of the node.
+   * @param qnm QName
+   * @param element element flag
+   * @param parent parent (can be {@code null})
+   * @param plan plan
+   * @param qc query context
+   * @param marker attribute marker (can be {@code null})
+   * @return name
+   */
+  static byte[] nodeName(final QNm qnm, final boolean element, final GNode parent,
+      final Plan plan, final QueryContext qc, final String marker) {
     final byte[] name = switch(plan.name) {
       case EQNAME ->
         qnm.uri().length != 0 ? qnm.eqName() : qnm.local();
@@ -475,8 +649,7 @@ public abstract class PlanFn extends StandardFunc {
           Token.eq(parent.qname().uri(), qnm.uri()) : qnm.uri().length == 0) ? qnm.local() :
         Token.eq(qnm.uri(), QueryText.XML_URI) ? qnm.string() : qnm.eqName();
     };
-    return qc.shared.token(!element && plan.marker != null ?
-      Token.concat(plan.marker, name) : name);
+    return qc.shared.token(!element && marker != null ? Token.concat(marker, name) : name);
   }
 
   /**

@@ -457,6 +457,9 @@ public enum Function implements AFunction {
       params(ITEM_ZM, STRING_ZO, FuncType.get(ANY_ATOMIC_TYPE_ZM, ITEM_O).seqType(Occ.ZERO_OR_ONE)),
       ITEM_ZM),
   /** XQuery function. */
+  MAP_TO_ELEMENT(FnMapToElement::new, "map-to-element(input, options?)",
+      params(MAP_ZO, MAP_ZO), ELEMENT_ZO, flag(CNS)),
+  /** XQuery function. */
   MATCHES(FnMatches::new, "matches(value, pattern, flags?)",
       params(STRING_ZO, STRING_O, STRING_ZO), BOOLEAN_O),
   /** XQuery function. */

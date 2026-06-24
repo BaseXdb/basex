@@ -199,7 +199,7 @@ public final class Constr {
    * @param nm element name
    * @throws QueryException query exception
    */
-  void namespaces(final Atts staticNs, final QNm nm) throws QueryException {
+  public void namespaces(final Atts staticNs, final QNm nm) throws QueryException {
     // dynamically added namespaces
     final Atts dynamicNs = builder.namespaces;
     final int sNs = staticNs.size(), dNs = dynamicNs == null ? 0 : dynamicNs.size();

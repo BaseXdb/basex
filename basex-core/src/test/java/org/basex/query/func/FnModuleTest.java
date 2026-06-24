@@ -1223,6 +1223,92 @@ public final class FnModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void mapToElement() {
+    final Function func = Function.MAP_TO_ELEMENT;
+    // empty input
+    query(func.args(" ()"), "");
+    // simple content
+    query(func.args(" { 'foo': 'bar' }"), "<foo>bar</foo>");
+    // attributes only (empty-plus)
+    query(func.args(" { 'box': { '@width': '5', '@height': '10' } }"),
+        "<box width=\"5\" height=\"10\"/>");
+    // simple content with attribute (simple-plus)
+    query(func.args(" { 'price': { '@currency': 'USD', '#content': 12.16 } }"),
+        "<price currency=\"USD\">12.16</price>");
+    // record
+    query(func.args(" { 'name': { 'first': 'Jane', 'last': 'Smith' } }"),
+        "<name><first>Jane</first><last>Smith</last></name>");
+    // repeated child (array value)
+    query(func.args(" { 'n': { 'a': [ '1', '2' ] } }"), "<n><a>1</a><a>2</a></n>");
+    // mixed content
+    query(func.args(" { 'para': [ { '@id': 'x' }, 'This is a ', { 'i': 'fine' }, ' mess!' ] }"),
+        "<para id=\"x\">This is a <i>fine</i> mess!</para>");
+    // list layout: child name supplied by the plan
+    query(func.args(" { 'dates': [ '2023-03-20', '2023-04-12' ] }",
+        " { 'plan': { 'dates': { 'layout': 'list', 'child': 'date' } } }"),
+        "<dates><date>2023-03-20</date><date>2023-04-12</date></dates>");
+
+    // error: not a single-entry map
+    error(func.args(" { 'a': 1, 'b': 2 }"), MAP_TO_ELEMENT_X);
+    // error: content value with more than one item
+    error(func.args(" { 'a': ('x', 'y') }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': { '@id': (1, 2) } }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': { 'b': (1, 2) } }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': [ ('x', 'y') ] }"), MAP_TO_ELEMENT_X);
+
+    // single atomic array member and interspersed text remain valid (mixed content)
+    query(func.args(" { 'a': ['x'] }") + " => serialize()", "<a>x</a>");
+    query(func.args(" { 'a': ['x', { 'b': 'y' }, 'z'] }") + " => serialize()", "<a>x<b>y</b>z</a>");
+    // error: adjacent atomic members (list child name not recoverable without a plan)
+    error(func.args(" { 'a': ['x', 'y'] }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': ['x', 'y', 'z'] }"), MAP_TO_ELEMENT_X);
+
+    // error: empty element name
+    error(func.args(" { '': () }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { '': 'x' }"), MAP_TO_ELEMENT_X);
+
+    // bound and predefined prefixes are accepted; unbound prefixes are rejected
+    query(func.args(" { 'xml:id': 'v' }") + " => serialize()", "<xml:id>v</xml:id>");
+    error(func.args(" { 'y:a': () }"), MAP_TO_ELEMENT_X);
+
+    // error: non-atomic attribute, content or text values
+    error(func.args(" { 'a': { '@x': { 'y': 1 } } }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': { '#content': [1, 2] } }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': <x/> }"), MAP_TO_ELEMENT_X);
+    // error: simple content combined with child elements (no layout produces this)
+    error(func.args(" { 'a': { '#content': 'x', 'b': 'y' } }"), MAP_TO_ELEMENT_X);
+    // error: invalid processing-instruction target or content
+    error(func.args(" { 'a': [ { '#processing-instruction': 'a b', '#data': 'd' } ] }"),
+        MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': [ { '#processing-instruction': 'xml', '#data': 'd' } ] }"),
+        MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': [ { '#processing-instruction': 'p', '#data': 'a?>b' } ] }"),
+        MAP_TO_ELEMENT_X);
+    // error: invalid comment content
+    error(func.args(" { 'a': [ { '#comment': 'a--b' } ] }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': [ { '#comment': 'ab-' } ] }"), MAP_TO_ELEMENT_X);
+
+    // error: array members must be single-entry maps (empty/multi-entry crash & silent loss)
+    error(func.args(" { 'a': [ {} ] }"), MAP_TO_ELEMENT_X);
+    error(func.args(" { 'a': [ { 'b': 1, 'c': 2 } ] }"), MAP_TO_ELEMENT_X);
+    // error: fn:null is only a nilled-element marker, not an attribute value
+    error(func.args(" { 'a': { '@x': xs:QName('fn:null') } }"), MAP_TO_ELEMENT_X);
+    // astral-plane (supplementary) characters are valid name characters
+    query("string-to-codepoints(name(" + func.args(" { codepoints-to-string(119070): 'x' }")
+        + "))", 119070);
+
+    // strict: an empty attribute-marker cannot distinguish attributes from elements
+    error("map-to-element({ 'a': 'x' }, { 'attribute-marker': '' })", MAP_TO_ELEMENT_X);
+    // xml layout must contain exactly one element (no extra/leading content silently dropped)
+    error("map-to-element({ 'a': '<b/><c/>' }, { 'plan': { 'a': { 'layout': 'xml' } } })",
+        MAP_TO_ELEMENT_X);
+    error("map-to-element({ 'a': 'hi<b/>' }, { 'plan': { 'a': { 'layout': 'xml' } } })",
+        MAP_TO_ELEMENT_X);
+    // xmlns must not be reconstructed as an attribute (would become a namespace declaration)
+    error(func.args(" { 'a': { '@xmlns': 'u' } }"), MAP_TO_ELEMENT_X);
+  }
+
+  /** Test method. */
   @Test public void error() {
     final Function func = ERROR;
 

@@ -702,6 +702,8 @@ public enum QueryError {
   ESCAPE_JSON_X(FOJS, 7, "Invalid escape sequence: %."),
   /** Error code. */
   PLAN_X_X(FOJS, 8, "Layout '%' cannot be applied: %."),
+  /** Error code. */
+  MAP_TO_ELEMENT_X(FOJS, 9, "%"),
 
   /** Error code. */
   NSDECL_X(FONS, 4, "Namespace prefix not declared: %."),
