@@ -71,7 +71,7 @@ public final class MainOptions extends Options {
   /** Flag for handling xsi:schemaLocation and xsi:noNamespaceSchemaLocation attributes. */
   public static final BooleanOption XSILOCATION = new BooleanOption("XSILOCATION", true);
   /** Default value for the fn-level XML parser 'trusted' option (fn:doc, fn:parse-xml, etc.). */
-  public static final BooleanOption FNXMLTRUSTED = new BooleanOption("FNXMLTRUSTED", true);
+  public static final BooleanOption FNXMLTRUSTED = new BooleanOption("FNXMLTRUSTED", false);
   /** Flag for using XInclude. */
   public static final BooleanOption XINCLUDE = new BooleanOption("XINCLUDE", false);
   /** Path to XML Catalog files. */
@@ -128,7 +128,7 @@ public final class MainOptions extends Options {
   /** Path to full-text stopword list. */
   public static final StringOption STOPWORDS = new StringOption("STOPWORDS", "");
 
-  // Query Options
+  // Querying
 
   /** Detailed query information. */
   public static final BooleanOption QUERYINFO = new BooleanOption("QUERYINFO", false);
@@ -164,7 +164,7 @@ public final class MainOptions extends Options {
   public static final EnumOption<WrapOptions> WRAPJAVA =
       new EnumOption<>("WRAPJAVA", WrapOptions.SOME);
 
-  // Serialize
+  // Serialization
 
   /** Flag for serializing query results. */
   public static final BooleanOption SERIALIZE = new BooleanOption("SERIALIZE", true);
@@ -189,7 +189,7 @@ public final class MainOptions extends Options {
   /** Maximum number of index occurrences to print. */
   public static final NumberOption MAXSTAT = new NumberOption("MAXSTAT", 30);
 
-  // Other
+  // Other options
 
   /** Indexing options. */
   public static final Option<?>[] INDEXING = { MAXCATS, MAXLEN, SPLITSIZE, LANGUAGE, STOPWORDS,
@@ -295,7 +295,7 @@ public final class MainOptions extends Options {
   /**
    * Constructor, adopting parsing options from the specified instance.
    * @param options options
-   * @param parent parent options
+   * @param parent parent options (can be {@code null})
    */
   public MainOptions(final Options options, final MainOptions parent) {
     this(false);
@@ -306,7 +306,7 @@ public final class MainOptions extends Options {
     final Boolean t = options.get(CommonOptions.TRUSTED);
     if(parent == null) {
       resolver = null;
-      trusted = t != null ? t : false;
+      trusted = t == Boolean.TRUE;
     } else {
       setResolver(parent);
       trusted = t != null ? t : parent.trusted && parent.get(FNXMLTRUSTED);

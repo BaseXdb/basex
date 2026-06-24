@@ -60,7 +60,7 @@ public final class SAXWrapper extends SingleParser {
       if(!trusted && options.get(MainOptions.XINCLUDE))
         throw new TrustedViolationException("xinclude");
       if(!trusted && (dtd || dtdValidation)) {
-        // Block all external resource access: raises FODC0016 via TrustedViolationException
+        // block external resource access
         reader.setEntityResolver((pubId, sysId) -> {
           throw new TrustedViolationException(sysId != null ? sysId : pubId != null ? pubId : "");
         });

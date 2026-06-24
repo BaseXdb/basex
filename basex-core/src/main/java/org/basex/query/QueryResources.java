@@ -501,7 +501,7 @@ public final class QueryResources {
     final boolean mainmem = !mopts.get(MainOptions.FORCECREATE);
     if(mainmem) {
       if(docOpts == DOC_OPTIONS && mopts.resolver().standard()
-          && !mopts.get(MainOptions.FNXMLTRUSTED)) {
+        && !mopts.get(MainOptions.FNXMLTRUSTED)) {
         options = MAIN_OPTIONS;
       } else {
         options = new MainOptions(docOpts, mopts);
