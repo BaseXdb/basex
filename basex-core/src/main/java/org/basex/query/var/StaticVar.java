@@ -10,7 +10,6 @@ import org.basex.core.jobs.*;
 import org.basex.query.*;
 import org.basex.query.ann.*;
 import org.basex.query.expr.*;
-import org.basex.query.func.fn.*;
 import org.basex.query.scope.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
@@ -32,8 +31,6 @@ public final class StaticVar extends StaticDecl {
   private QueryContext evalContext;
   /** Error raised while evaluating this variable. */
   private Throwable evalError;
-  /** Query exception data. */
-  private QueryException.Data exceptionData;
 
   /**
    * Constructor for a variable declared in a query.
@@ -62,10 +59,6 @@ public final class StaticVar extends StaticDecl {
       cc.pushScope(vs);
       try {
         expr = expr.compile(cc);
-      } catch(final QueryException ex) {
-        ex.notCatchable();
-        expr = FnError.get(ex, expr);
-        throw ex;
       } finally {
         cc.removeScope(this);
         cc.qc.focus = focus;
@@ -100,7 +93,8 @@ public final class StaticVar extends StaticDecl {
     } catch(final Throwable th) {
       if(th instanceof final QueryException ex) {
         ex.notCatchable();
-        exceptionData = new QueryException.Data(ex);
+        // eagerly initialize line/column so waiting threads see correct values
+        if(ex.info() != null) ex.info().init();
         error = ex;
         throw ex;
       }
@@ -192,7 +186,9 @@ public final class StaticVar extends StaticDecl {
    * @throws QueryException query exception
    */
   private void throwEvaluationError() throws QueryException {
-    if(evalError instanceof QueryException) throw exceptionData.toException();
+    if(evalError instanceof final QueryException qe)
+      throw new QueryException(qe.info(), qe.qname(), qe.getLocalizedMessage()).value(qe.value()).
+          notCatchable();
     if(evalError instanceof final RuntimeException ex) throw ex;
     if(evalError instanceof final Error ex) throw ex;
     throw Util.notExpected(evalError);

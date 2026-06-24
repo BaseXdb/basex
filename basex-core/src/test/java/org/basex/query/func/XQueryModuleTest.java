@@ -274,6 +274,17 @@ xquery:fork-join(
         + "count(distinct-values(xquery:fork-join((1 to 16) ! fn() { $V }))),\n"
         + "file:size('" + f.path() + "')", "1\n1");
 
+    // all waiting threads must see the same error value and location as the evaluating thread
+    query("declare %basex:lazy variable $v := (prof:sleep(200), error(xs:QName('err:FOER0000'), 'd'"
+        + ", 7));\nxquery:fork-join((1 to 8) ! fn() { $v }, { 'report': true() })?error?value[. = 7"
+        + "] => count()", 8);
+    query("declare %basex:lazy variable $V := (prof:sleep(200), error());\n"
+        + "let $errors := xquery:fork-join((1 to 4) ! fn() { $V }, { 'report': true() })?error\n"
+        + "return (count(distinct-values($errors?line-number)) eq 1, "
+        + "$errors[1]?line-number gt 0)",
+        "true\ntrue");
+
+    // circular detection works across threads without deadlocks
     error("declare %basex:lazy variable $a := (prof:sleep(200), $b);\n"
         + "declare %basex:lazy variable $b := (prof:sleep(200), $a);\n"
         + func.args(" (fn() { $a }, fn() { $b })"), CIRCVAR_X);

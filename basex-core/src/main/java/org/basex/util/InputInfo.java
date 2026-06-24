@@ -98,7 +98,7 @@ public final class InputInfo {
   /**
    * Calculates the column and line number in a string.
    */
-  private void init() {
+  public void init() {
     // positions have already been calculated
     if(line != 0) return;
 
@@ -127,19 +127,6 @@ public final class InputInfo {
    */
   public void internal(final boolean value) {
     internal = value;
-  }
-
-  /**
-   * Creates a copy of this instance. All state is preserved, including lazy-initialization data,
-   * so that each copy can independently initialize its line and column.
-   * @return copy
-   */
-  public InputInfo copy() {
-    final InputInfo copy = new InputInfo(path, line, column);
-    copy.input = input;
-    copy.sc = sc;
-    copy.internal = internal;
-    return copy;
   }
 
   @Override
