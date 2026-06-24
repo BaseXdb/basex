@@ -697,8 +697,8 @@ public final class XQuery4Test extends SandboxTest {
     check("<a><b/></a>/child::{#c}", "", type(IterStep.class, "element(c)*"));
     check("<a><b/></a>/child::{()}", "", empty());
 
-    check("<a><b/></a>/child::{#b, 1}", "<b/>", exists(_UTIL_GET));
-    check("<a><b/></a>/child::{#c, 1}", "", exists(_UTIL_GET));
+    check("<a><b/></a>/child::{#b, 1}", "<b/>", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{#c, 1}", "", exists(SelectorStep.class));
 
     check("<a><b/><c/></a>/child::{#c, #b}", "<b/>\n<c/>",
         type(IterStep.class, "(element(c)|element(b))*"));
@@ -710,21 +710,35 @@ public final class XQuery4Test extends SandboxTest {
     check("<a><b/><c/></a>/child::{xs:QName('c')}", "<c/>",
         type(IterStep.class, "element(c)*"));
     check("<a><b/><c/></a>/child::{xs:QName(<?_ c?>)}", "<c/>",
-        exists(CmpSimpleG.class), exists(NODE_NAME));
+        exists(SelectorStep.class));
     check("let $name := #b return <a><b/><c/></a>/child::{$name}", "<b/>",
         type(IterStep.class, "element(b)*"));
 
     // match local name against string values
-    check("<a><b/></a>/child::{'b'}", "<b/>", exists(_UTIL_GET));
-    check("<a><b/></a>/child::{'c'}", "", exists(_UTIL_GET));
-    check("<a><b/></a>/child::{'b', 'c'}", "<b/>", exists(_UTIL_GET));
+    check("<a><b/></a>/child::{'b'}", "<b/>", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{'c'}", "", exists(SelectorStep.class));
+    check("<a><b/></a>/child::{'b', 'c'}", "<b/>", exists(SelectorStep.class));
     check("declare namespace x = 'u'; <x:a><x:b/></x:a>/child::{'b'}",
-        "<x:b xmlns:x=\"u\"/>", exists(_UTIL_GET));
+        "<x:b xmlns:x=\"u\"/>", exists(SelectorStep.class));
 
     // attribute axis
-    check("<x a='1' b='2'/>/attribute::{'b'}", "b=\"2\"", exists(_UTIL_GET));
+    check("<x a='1' b='2'/>/attribute::{'b'}", "b=\"2\"", exists(SelectorStep.class));
     check("<x a='1' b='2'/>/@{#a}", "a=\"1\"", type(IterStep.class, "attribute(a)?"));
     check("string(<x a='1' b='2'/>/@{#a})", "1", root(STRING));
+
+    // dynamic name test must survive step merging (descendant-or-self::node()/self::{E})
+    check("let $m := { 'x': 1, 'y': 2, 'z': 3 } return $m//self::{ 'z' } =!> jvalue()", 3,
+        exists(SelectorStep.class));
+    check("let $m := { 'a': { 'z': 9 } } return $m//self::{ 'z' } ! jvalue()", 9,
+        exists(SelectorStep.class));
+    // dynamic name test is never a redundant self step, and is never exactly-one
+    check("count(<a/>/self::{ 'x' })", 0, exists(SelectorStep.class));
+    check("count(<a/>/self::{ 'a' })", 1, exists(SelectorStep.class));
+    // name filter must survive predicate flattening and predicate merging
+    check("let $m := { 'x': 3, 'z': 1 } return exists($m/child::{ 'z' }[jvalue() = 3])", false,
+        exists(SelectorStep.class));
+    check("let $m := { 'x': 1, 'y': 2, 'z': 3 } return "
+        + "($m/child::{ ('y', 'z') })[jvalue() > 2] ! jvalue()", 3, exists(SelectorStep.class));
   }
 
   /** Path operator: JNode navigation with atomic step results (jkey matching). */

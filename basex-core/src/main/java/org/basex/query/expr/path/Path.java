@@ -959,7 +959,8 @@ public abstract class Path extends ParseExpr {
         Expr curr = steps[s];
         if(curr instanceof final Step crr) {
           Expr next = s < sl - 1 ? steps[s + 1] : null;
-          if(crr.test == NodeTest.NODE && next instanceof final Step stp && stp.axis == ATTRIBUTE) {
+          if(crr.selector == null && crr.test == NodeTest.NODE && next instanceof final Step stp &&
+              stp.axis == ATTRIBUTE) {
             // rewrite node test before attribute step: node()/@* → */@*
             next = Step.get(cc, null, crr.info(), crr.axis, NodeTest.ELEMENT, crr.exprs);
             curr = cc.replaceWith(curr, next);
@@ -1029,7 +1030,7 @@ public abstract class Path extends ParseExpr {
 
     // compose new path, adopt analyzed step without predicates
     final Expr[] exprs = steps.clone();
-    exprs[s] = step.copyType(Step.get(step.info(), step.axis, step.test));
+    exprs[s] = step.copyType(step.rebuild());
     return get(info, root, exprs);
   }
 
@@ -1052,12 +1053,16 @@ public abstract class Path extends ParseExpr {
     final Step nxt = next instanceof final Step stp ? stp : null;
     if(nxt != null && nxt.axis == SELF && !nxt.mayBePositional()) {
       final Test test = curr.test.intersect(nxt.test);
-      return test == null ? null :
-        Step.get(cc, prev, curr.info(), curr.axis, test, ExprList.concat(curr.exprs, nxt.exprs));
+      if(test == null) return null;
+      final Expr cs = curr.selector, ns = nxt.selector;
+      // two selectors cannot be merged into a single step
+      if(cs != null && ns != null) return null;
+      return Step.get(cc, prev, curr.info(), curr.axis, test, cs != null ? cs : ns,
+          ExprList.concat(curr.exprs, nxt.exprs));
     }
 
     // merge descendant-or-self step
-    if(curr.axis != DESCENDANT_OR_SELF || curr.exprs.length > 0 ||
+    if(curr.axis != DESCENDANT_OR_SELF || curr.exprs.length > 0 || curr.selector != null ||
         !curr.test.kind.oneOf(Kind.NODE, Kind.JNODE, Kind.GNODE)) return null;
 
     // examples:
@@ -1065,7 +1070,8 @@ public abstract class Path extends ParseExpr {
     // - descendant-or-self::node()/descendant::* → descendant::*
     // - descendant-or-self::node()/descendant-or-self::* → descendant-or-self::*
     final Axis merged = mergedAxis(nxt);
-    if(merged != null) return Step.get(cc, prev, nxt.info(), merged, nxt.test, nxt.exprs);
+    if(merged != null)
+      return Step.get(cc, prev, nxt.info(), merged, nxt.test, nxt.selector, nxt.exprs);
 
     // function for merging steps inside union expressions
     final QueryFunction<Expr, Expr> rewrite = expr -> {
@@ -1075,7 +1081,7 @@ public abstract class Path extends ParseExpr {
           for(final Expr path : expr.args()) {
             final Path p = (Path) path;
             final Step s = (Step) p.steps[0];
-            p.steps[0] = Step.get(cc, prev, s.info(), axis, s.test, s.exprs);
+            p.steps[0] = Step.get(cc, prev, s.info(), axis, s.test, s.selector, s.exprs);
           }
           return expr.optimize(cc);
         }

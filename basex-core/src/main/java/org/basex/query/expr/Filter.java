@@ -306,8 +306,7 @@ public abstract class Filter extends Preds {
   }
 
   @Override
-  public final void toString(final QueryString qs) {
+  protected final void rootToString(final QueryString qs) {
     qs.token(root);
-    super.toString(qs);
   }
 }

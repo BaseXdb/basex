@@ -320,8 +320,15 @@ public abstract class Preds extends Arr {
     return true;
   }
 
+  /**
+   * Adds a string representation of the root part of the expression.
+   * @param qs query string builder
+   */
+  protected abstract void rootToString(QueryString qs);
+
   @Override
-  public void toString(final QueryString qs) {
+  public final void toString(final QueryString qs) {
+    rootToString(qs);
     for(final Expr expr : exprs) qs.braced("[", expr, "]");
   }
 }

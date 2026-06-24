@@ -32,27 +32,8 @@ public final class CachedStep extends Step {
     // evaluate step
     final GNodeList list = new GNodeList();
     for(final GNode node : iterator(qc)) list.add(node);
-
     // evaluate predicates
-    final QueryFocus focus = qc.focus, qf = new QueryFocus();
-    qc.focus = qf;
-    try {
-      for(final Expr expr : exprs) {
-        final long ns = list.size();
-        qf.size = ns;
-        int c = 0;
-        for(int p = 1; p <= ns; p++) {
-          final GNode node = list.get(p - 1);
-          qf.value = node;
-          qf.pos = p;
-          if(expr.test(qc, info, p)) list.set(c++, node);
-        }
-        list.size(c);
-      }
-    } finally {
-      qc.focus = focus;
-    }
-    return list.clean().iter();
+    return preds(list, qc);
   }
 
   @Override

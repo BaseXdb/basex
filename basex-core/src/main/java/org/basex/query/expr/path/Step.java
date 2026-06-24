@@ -32,6 +32,8 @@ public abstract class Step extends Preds {
   public Test test;
   /** Axis. */
   public Axis axis;
+  /** Selector ({@code null} for a static step). */
+  public Expr selector;
 
   /**
    * Returns a new optimized self::node() step.
@@ -79,6 +81,24 @@ public abstract class Step extends Preds {
   }
 
   /**
+   * Returns a new optimized step.
+   * @param cc compilation context
+   * @param root root context expression; if {@code null}, the current context will be used
+   * @param info input info (can be {@code null})
+   * @param axis axis
+   * @param test test
+   * @param selector selector (can be {@code null})
+   * @param preds predicates
+   * @return step or empty sequence
+   * @throws QueryException query exception
+   */
+  static Expr get(final CompileContext cc, final Expr root, final InputInfo info, final Axis axis,
+      final Test test, final Expr selector, final Expr[] preds) throws QueryException {
+    return (selector != null ? new SelectorStep(info, axis, test, selector, preds) :
+      new CachedStep(info, axis, test, preds)).optimize(root, cc);
+  }
+
+  /**
    * Returns a new step.
    * @param info input info (can be {@code null})
    * @param axis axis
@@ -117,7 +137,7 @@ public abstract class Step extends Preds {
    * @param preds predicates
    */
   Step(final InputInfo info, final Axis axis, final Test test, final Expr... preds) {
-    super(info, seqType(axis, test, preds), preds);
+    super(info, seqType(axis, test, null, preds), preds);
     this.axis = axis;
     this.test = test;
   }
@@ -146,6 +166,41 @@ public abstract class Step extends Preds {
     };
   }
 
+  /**
+   * Filters the cached result nodes with the predicates.
+   * @param list result nodes (will be modified)
+   * @param qc query context
+   * @return iterator over the resulting nodes
+   * @throws QueryException query exception
+   */
+  final BasicNodeIter preds(final GNodeList list, final QueryContext qc) throws QueryException {
+    final QueryFocus focus = qc.focus, qf = new QueryFocus();
+    qc.focus = qf;
+    try {
+      for(final Expr expr : exprs) {
+        final long ns = list.size();
+        qf.size = ns;
+        int c = 0;
+        for(int p = 1; p <= ns; p++) {
+          final GNode node = list.get(p - 1);
+          qf.value = node;
+          qf.pos = p;
+          if(expr.test(qc, info, p)) list.set(c++, node);
+        }
+        list.size(c);
+      }
+    } finally {
+      qc.focus = focus;
+    }
+    return list.clean().iter();
+  }
+
+  @Override
+  public final Expr compile(final CompileContext cc) throws QueryException {
+    if(selector != null) selector = selector.compile(cc);
+    return super.compile(cc);
+  }
+
   @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     return optimize(null, cc);
@@ -158,7 +213,7 @@ public abstract class Step extends Preds {
    * @return optimized step or empty sequence
    * @throws QueryException query exception
    */
-  final Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
+  Expr optimize(final Expr root, final CompileContext cc) throws QueryException {
     // updates the static type
     final Expr rt = assignType(root != null ? root : cc.qc.focus.value);
     Type rtype = rt != null ? rt.seqType().type : NodeType.GNODE;
@@ -204,7 +259,7 @@ public abstract class Step extends Preds {
       }
     }
     // choose best implementation
-    return copyType(get(info, axis, test, exprs));
+    return copyType(rebuild(exprs));
   }
 
   @Override
@@ -212,12 +267,13 @@ public abstract class Step extends Preds {
     final Type type = expr != null ? expr.seqType().type : NodeType.GNODE;
     test = test.optimize(type.kind(), null);
 
-    SeqType st = seqType(axis, test, exprs);
+    SeqType st = seqType(axis, test, selector, exprs);
     if(expr != null && axis == SELF) {
       // node test: adopt type of context expression: <a/>/self::gnode()
       if(test.kind == Kind.GNODE) st = type.seqType(st.occ);
       // no predicates: step will yield single result: $elements/self::element()
-      if(exprs.length == 0 && test.subsumes(type) == Boolean.TRUE) st = st.with(Occ.EXACTLY_ONE);
+      if(exprs.length == 0 && selector == null && test.subsumes(type) == Boolean.TRUE)
+        st = st.with(Occ.EXACTLY_ONE);
     }
     exprType.assign(st).data(expr);
     return expr;
@@ -227,14 +283,16 @@ public abstract class Step extends Preds {
    * Determines the sequence type of the step.
    * @param axis axis
    * @param test test
+   * @param selector selector
    * @param preds predicates
    * @return sequence type
    */
-  private static SeqType seqType(final Axis axis, final Test test, final Expr... preds) {
+  private static SeqType seqType(final Axis axis, final Test test, final Expr selector,
+      final Expr... preds) {
     final Occ occ = axis == ATTRIBUTE && test.subsumes(NodeType.ATTRIBUTE) == Boolean.FALSE
       // no results: attribute::element()
       ? Occ.ZERO :
-        axis == SELF && test == NodeTest.NODE && preds.length == 0
+        axis == SELF && test == NodeTest.NODE && selector == null && preds.length == 0
       // one result: self::node()
       ? Occ.EXACTLY_ONE :
         axis.oneOf(SELF, PARENT) ||
@@ -249,7 +307,12 @@ public abstract class Step extends Preds {
   @Override
   public final Expr inline(final InlineContext ic) throws QueryException {
     // do not inline context value
-    return ic.var != null && ic.cc.ok(this, true, () -> ic.inline(exprs)) ? optimize(ic.cc) : null;
+    if(ic.var == null) return null;
+
+    final Expr s = selector != null ? ic.inlineOrNull(selector) : null;
+    if(s != null) selector = s;
+    final boolean preds = ic.cc.ok(this, true, () -> ic.inline(exprs));
+    return s != null || preds ? optimize(ic.cc) : null;
   }
 
   @Override
@@ -399,17 +462,27 @@ public abstract class Step extends Preds {
    * @param seqType type of incoming nodes
    * @return {@code true} if the step can be removed
    */
-  final boolean remove(final SeqType seqType) {
+  boolean remove(final SeqType seqType) {
     // <xml/>/. → <xml/>
     // <xml/>/self::node() → <xml/>
     // $text/descendant-or-self::text() → $text
     // $doc/ancestor-or-self::text() → $doc
     final Type type = seqType.type;
-    return exprs.length == 0 && (
+    return exprs.length == 0 && selector == null && (
       axis == SELF ||
       axis == DESCENDANT_OR_SELF && isLeaf(type.kind()) ||
       axis == ANCESTOR_OR_SELF && type.instanceOf(NodeType.DOCUMENT)
     ) && test.subsumes(type) == Boolean.TRUE;
+  }
+
+  /**
+   * Creates a new step of the same kind with the given predicates.
+   * @param preds predicates
+   * @return step
+   */
+  final Step rebuild(final Expr... preds) {
+    return selector != null ? new SelectorStep(info, axis, test, selector, preds) :
+      get(info, axis, test, preds);
   }
 
   /**
@@ -420,7 +493,7 @@ public abstract class Step extends Preds {
    */
   final Step addPredicates(final Expr... preds) {
     exprType.assign(seqType().union(Occ.ZERO));
-    return copyType(get(info, axis, test, ExprList.concat(exprs, preds)));
+    return copyType(rebuild(ExprList.concat(exprs, preds)));
   }
 
   /**
@@ -429,7 +502,7 @@ public abstract class Step extends Preds {
    * @return resulting step instance
    */
   final Step removePredicate() {
-    return copyType(get(info, axis, test, Arrays.copyOfRange(exprs, 0, exprs.length - 1)));
+    return copyType(rebuild(Arrays.copyOfRange(exprs, 0, exprs.length - 1)));
   }
 
   /**
@@ -443,7 +516,29 @@ public abstract class Step extends Preds {
   }
 
   @Override
+  public boolean has(final Flag... flags) {
+    return selector != null && selector.has(flags) || super.has(flags);
+  }
+
+  @Override
+  public boolean inlineable(final InlineContext ic) {
+    return (selector == null || selector.inlineable(ic)) && super.inlineable(ic);
+  }
+
+  @Override
+  public VarUsage count(final Var var) {
+    final VarUsage vu = super.count(var);
+    return selector != null ? selector.count(var).plus(vu) : vu;
+  }
+
+  @Override
+  public int exprSize() {
+    return (selector != null ? selector.exprSize() : 0) + super.exprSize();
+  }
+
+  @Override
   public boolean accept(final ASTVisitor visitor) {
+    if(selector != null && !selector.accept(visitor)) return false;
     for(final Expr pred : exprs) {
       visitor.enterFocus();
       if(!pred.accept(visitor)) return false;
@@ -455,17 +550,21 @@ public abstract class Step extends Preds {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final Step st && axis == st.axis && test.equals(st.test) &&
-        super.equals(obj);
+        Objects.equals(selector, st.selector) && super.equals(obj);
   }
 
   @Override
   public final void toXml(final QueryPlan plan) {
     plan.add(plan.create(this, QueryText.AXIS, axis.name, QueryText.TEST,
-        test.toString(false)), exprs);
+        test.toString(false)), selector, exprs);
   }
 
   @Override
-  public void toString(final QueryString qs) {
+  protected void rootToString(final QueryString qs) {
+    if(selector != null) {
+      qs.token(axis.name + "::").token("{").token(selector).token("}");
+      return;
+    }
     final TokenBuilder tb = new TokenBuilder();
     if(test == NodeTest.NODE) {
       if(axis == PARENT) tb.add("..");
@@ -489,6 +588,5 @@ public abstract class Step extends Preds {
       }
     }
     qs.token(tb.finish());
-    super.toString(qs);
   }
 }

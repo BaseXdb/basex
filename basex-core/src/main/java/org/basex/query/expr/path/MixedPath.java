@@ -56,7 +56,7 @@ public final class MixedPath extends Path {
           final GNode node = toContextNode(item);
           qf.value = node;
           qf.pos++;
-          // loop through all resulting items (see also UtilGet)
+          // loop through all resulting items
           final Iter ir = step.iter(qc);
           for(Item it; (it = qc.next(ir)) != null;) {
             if(it instanceof final GNode result) {
