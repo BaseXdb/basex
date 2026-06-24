@@ -4,6 +4,7 @@ import static org.basex.query.QueryError.*;
 
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -18,7 +19,8 @@ import org.basex.util.*;
 public class FnDocAvailable extends Docs {
   /** Possible failures. */
   private static final EnumSet<QueryError> ERRORS = EnumSet.of(BASEX_DBPATH1_X, BASEX_DBPATH2_X,
-      IOERR_X, WHICHRES_X, RESDIR_X, INVDOC_X, DTDVALIDATIONERR_X, XSDVALIDATIONERR_X);
+      IOERR_X, WHICHRES_X, RESDIR_X, INVDOC_X, DTDVALIDATIONERR_X, XSDVALIDATIONERR_X,
+      EXTERNALRESOURCE_X);
 
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
@@ -39,6 +41,15 @@ public class FnDocAvailable extends Docs {
   final Item doc(final QueryContext qc) throws QueryException {
     final DocOptions options = toOptions(arg(1), new DocOptions(), qc);
     check(options, false, qc);
+    final Boolean trustedOpt = options.get(DocOptions.TRUSTED);
+    final boolean trusted = trustedOpt != null ? trustedOpt :
+        qc.context.options.get(MainOptions.FNXMLTRUSTED);
+    if(!trusted) {
+      if(options.get(DocOptions.XINCLUDE)) throw EXTERNALRESOURCE_X.get(info, "'xinclude'");
+      if(options.get(DocOptions.USE_XSI_SCHEMA_LOCATION) &&
+          !CommonOptions.SKIP.equals(options.get(DocOptions.XSD_VALIDATION)))
+          throw EXTERNALRESOURCE_X.get(info, "'use-xsi-schema-location'");
+    }
 
     QueryInput qi = queryInput;
     if(qi == null) {

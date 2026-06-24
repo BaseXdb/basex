@@ -25,7 +25,9 @@ public interface CommonOptions {
   /** Internal option: {@link MainOptions#XSDVALIDATION}. */
   StringOption XSD_VALIDATION = new StringOption("xsd-validation", SKIP);
   /** Internal option: {@link MainOptions#XSILOCATION}. */
-  BooleanOption XSI_SCHEMA_LOCATION = new BooleanOption("xsi-schema-location", false);
+  BooleanOption USE_XSI_SCHEMA_LOCATION = new BooleanOption("use-xsi-schema-location", false);
+  /** Trusted option value. No default: absence means "use FNXMLTRUSTED". */
+  BooleanOption TRUSTED = new BooleanOption("trusted");
 
   /** Internal option: {@link MainOptions#STRIPNS}. */
   BooleanOption STRIPNS = new BooleanOption("stripns", false);

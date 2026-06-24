@@ -22,8 +22,10 @@ public final class DocOptions extends Options {
   public static final BooleanOption XINCLUDE = CommonOptions.XINCLUDE;
   /** XSD validation. */
   public static final StringOption XSD_VALIDATION = CommonOptions.XSD_VALIDATION;
-  /** Flag for using XInclude. */
-  public static final BooleanOption XSI_SCHEMA_LOCATION = CommonOptions.XSI_SCHEMA_LOCATION;
+  /** Flag for using xsi:schemaLocation. */
+  public static final BooleanOption USE_XSI_SCHEMA_LOCATION = CommonOptions.USE_XSI_SCHEMA_LOCATION;
+  /** Whether external resources may be fetched. */
+  public static final BooleanOption TRUSTED = CommonOptions.TRUSTED;
   /** Whether two calls with same URI and options return the same node. */
   public static final BooleanOption STABLE = new BooleanOption("stable", true);
 
