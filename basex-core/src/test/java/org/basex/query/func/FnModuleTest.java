@@ -1072,11 +1072,25 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" <a>10</a>") + "?a instance of xs:integer", true);
     query(func.args(" <a>10.0</a>") + "?a instance of xs:decimal", true);
     query(func.args(" <a>10e0</a>") + "?a instance of xs:double", true);
-    query(func.args(" <a>x</a>") + "?a instance of xs:string", true);
+    // untyped string content is represented as xs:untypedAtomic
+    query(func.args(" <a>x</a>") + "?a instance of xs:untypedAtomic", true);
+    // booleans: 'true'/'false' are inferred as boolean, '0'/'1' as integer
+    query(func.args(" <a>true</a>") + "?a instance of xs:boolean", true);
+    query(func.args(" <a>false</a>") + "?a instance of xs:boolean", true);
+    query(func.args(" <a>1</a>") + "?a instance of xs:integer", true);
+    query(func.args(" <a>0</a>") + "?a instance of xs:integer", true);
+    // leading zeros are preserved as strings
+    query(func.args(" <a>007</a>") + "?a instance of xs:untypedAtomic", true);
+    query(func.args(" <a>-05</a>") + "?a instance of xs:untypedAtomic", true);
+    // infinity and not-a-number are not inferred as numeric
+    query(func.args(" <a>INF</a>") + "?a instance of xs:untypedAtomic", true);
+    query(func.args(" <a>NaN</a>") + "?a instance of xs:untypedAtomic", true);
     query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'boolean' } } }") +
         "?a instance of xs:untypedAtomic", true);
-    query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'numeric' } } }") +
+    query(func.args(" <a>x</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'double' } } }") +
         "?a instance of xs:untypedAtomic", true);
+    query(func.args(" <a>1</a>", " { 'plan': { 'a': {'layout': 'simple', 'type': 'decimal' } } }") +
+        "?a instance of xs:decimal", true);
 
     // content-key option
     query(func.args(" <price currency='USD'>12.16</price>",
@@ -2028,7 +2042,7 @@ return
     query(func.args("src/test/resources/example.json") + "('address')('state')", "NY");
     query(func.args("src/test/resources/example.json") + "?address?state", "NY");
     query(func.args("src/test/resources/example.json", " { 'number-format': 'adaptive' }")
-        + "//postalCode/data() => type-of()", "xs:integer");
+        + "//postalCode ! data() => type-of()", "xs:integer");
 
     error(func.args("src/test/resources/example.json", " { 'number-parser': xs:decimal#1 }"),
         INVALIDOPTION_X);

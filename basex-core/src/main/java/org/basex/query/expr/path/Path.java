@@ -106,8 +106,10 @@ public abstract class Path extends ParseExpr {
       return new CachedPath(info, root, stps);
     }
 
+    // an atomic step result may only replace the path if the context is an XML node
     // examples: 'text', (a union b)
-    if(step != null && (step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) || step.ddo())) {
+    if(step != null && (step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) ?
+        input != null && input.seqType().type.instanceOf(NodeType.NODE) : step.ddo())) {
       return step;
     }
     // example: (1 to 10)/<xml/>
@@ -498,7 +500,13 @@ public abstract class Path extends ParseExpr {
   private void seqType(final Expr rt) {
     final Expr last = steps[steps.length - 1];
     final Data data = last.data();
-    final SeqType st = last.seqType();
+    SeqType st = last.seqType();
+    // consider JNodes
+    final Expr prev = steps.length > 1 ? steps[steps.length - 2] : root != null ? root : rt;
+    if(this instanceof MixedPath && st.type.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
+        (prev == null || !prev.seqType().type.instanceOf(NodeType.NODE))) {
+      st = NodeType.JNODE.seqType();
+    }
     Occ occ = Occ.ZERO_OR_MORE;
     long size = size(rt, data);
 
@@ -687,9 +695,9 @@ public abstract class Path extends ParseExpr {
     final Type type1 = s1.seqType().type, type2 = s2.seqType().type;
 
     /* rewrite if:
-     * - previous expression yields nodes (otherwise, an error must be raised at runtime)
+     * - previous expression yields XML nodes (otherwise, an error must be raised at runtime)
      * - last expression is no step, and yields a single result or no node */
-    if(!(type1 instanceof NodeType) || s2 instanceof Step || size() != 1 &&
+    if(!type1.instanceOf(NodeType.NODE) || s2 instanceof Step || size() != 1 &&
        !type2.instanceOf(BasicType.ANY_ATOMIC_TYPE) && !type2.instanceOf(Types.FUNCTION))
       return this;
 

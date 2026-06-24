@@ -696,33 +696,89 @@ public final class XQuery4Test extends SandboxTest {
     error("{ 1: <a/>, (1 to 6) ! { .: . } }", MAPDUPLKEY_X);
   }
 
-  /** Path extensions: get(). */
-  @Test public void pathGet() {
-    check("<a><b/></a>/self::get(#a)", "<a><b/></a>", root(CElem.class));
-    check("<a><b/></a>/get(#b)", "<b/>", type(IterStep.class, "element(b)*"));
-    check("<a><b/></a>/child::get(#b)", "<b/>", type(IterStep.class, "element(b)*"));
-    check("<a><b/></a>/descendant-or-self::get(#b)", "<b/>", type(IterStep.class, "element(b)*"));
-    check("<a><b/></a>/get(#c)", "", type(IterStep.class, "element(c)*"));
-    check("<a><b/></a>/get(())", "", empty());
+  /** Path extensions: dynamic node test {expr}. */
+  @Test public void pathSelector() {
+    check("<a><b/></a>/self::{#a}", "<a><b/></a>", root(CElem.class));
+    check("<a><b/></a>/child::{#b}", "<b/>", type(IterStep.class, "element(b)*"));
+    check("<a><b/></a>/descendant-or-self::{#b}", "<b/>", type(IterStep.class, "element(b)*"));
+    check("<a><b/></a>/child::{#c}", "", type(IterStep.class, "element(c)*"));
+    check("<a><b/></a>/child::{()}", "", empty());
 
-    check("<a><b/></a>/get((#b, 1))", "<b/>", exists(_UTIL_GET));
-    check("<a><b/></a>/get((#c, 1))", "", exists(_UTIL_GET));
+    check("<a><b/></a>/child::{#b, 1}", "<b/>", exists(_UTIL_GET));
+    check("<a><b/></a>/child::{#c, 1}", "", exists(_UTIL_GET));
 
-    check("<a><b/><c/></a>/get((#c, #b))", "<b/>\n<c/>",
+    check("<a><b/><c/></a>/child::{#c, #b}", "<b/>\n<c/>",
         type(IterStep.class, "(element(c)|element(b))*"));
-    check("let $names := (#c, #b) return <a><b/><c/></a>/get($names)", "<b/>\n<c/>",
+    check("let $names := (#c, #b) return <a><b/><c/></a>/child::{$names}", "<b/>\n<c/>",
         type(IterStep.class, "(element(c)|element(b))*"));
 
-    check("<a><b/><c/></a>/(c | get(#b))", "<b/>\n<c/>",
+    check("<a><b/><c/></a>/(c | child::{#b})", "<b/>\n<c/>",
         type(IterStep.class, "(element(c)|element(b))*"));
-    check("<a><b/><c/></a>/(get(#c) | b)", "<b/>\n<c/>",
-        type(IterStep.class, "(element(c)|element(b))*"));
-    check("<a><b/><c/></a>/(get(xs:QName('c')))", "<c/>",
+    check("<a><b/><c/></a>/child::{xs:QName('c')}", "<c/>",
         type(IterStep.class, "element(c)*"));
-    check("<a><b/><c/></a>/(get(xs:QName(<?_ c?>)))", "<c/>",
+    check("<a><b/><c/></a>/child::{xs:QName(<?_ c?>)}", "<c/>",
         exists(CmpSimpleG.class), exists(NODE_NAME));
-    check("let $name := #b return <a><b/><c/></a>/(c | get($name))", "<b/>\n<c/>",
-        type(IterStep.class, "(element(c)|element(b))*"));
+    check("let $name := #b return <a><b/><c/></a>/child::{$name}", "<b/>",
+        type(IterStep.class, "element(b)*"));
+
+    // match local name against string values
+    check("<a><b/></a>/child::{'b'}", "<b/>", exists(_UTIL_GET));
+    check("<a><b/></a>/child::{'c'}", "", exists(_UTIL_GET));
+    check("<a><b/></a>/child::{'b', 'c'}", "<b/>", exists(_UTIL_GET));
+    check("declare namespace x = 'u'; <x:a><x:b/></x:a>/child::{'b'}",
+        "<x:b xmlns:x=\"u\"/>", exists(_UTIL_GET));
+
+    // attribute axis
+    check("<x a='1' b='2'/>/attribute::{'b'}", "b=\"2\"", exists(_UTIL_GET));
+    check("<x a='1' b='2'/>/@{#a}", "a=\"1\"", type(IterStep.class, "attribute(a)?"));
+    check("string(<x a='1' b='2'/>/@{#a})", "1", root(STRING));
+  }
+
+  /** Path operator: JNode navigation with atomic step results (jkey matching). */
+  @Test public void pathJNode() {
+    // an atomic step result selects children whose jkey matches
+    query("{ 'a': 1, 'b': 2 }/'b' ! jvalue()", "2");
+    query("let $k := 'b' return { 'a': 1, 'b': 2 }/$k ! jvalue()", "2");
+    query("{ 'a': 1, 'b': 2 }/('a', 'b') ! jvalue()", "1\n2");
+    query("[ 10, 20, 30 ]/2 ! jvalue()", "20");
+    query("{ 'a': 1 }/'x'", "");
+    // numeric key matching follows atomic-equal (xs:double 2.0 matches array index 2)
+    query("[ 10, 20, 30 ]/2.0e0 ! jvalue()", "20");
+    // result is in document order, duplicates removed
+    query("{ 'a': 1, 'b': 2, 'c': 3 }/('c', 'a', 'c') ! jvalue()", "1\n3");
+    // equivalent to the child::{ E } selector
+    query("let $m := { 'a': 1, 'b': 2 } return deep-equal($m/'b', $m/child::{ 'b' })", "true");
+    // node-returning steps are unaffected
+    query("{ 'name': 'Alice' }/name ! jvalue()", "Alice");
+    query("[ { 'c': 'London' }, { 'c': 'Berlin' } ]//c ! jvalue()", "London\nBerlin");
+    // XNode paths with atomic results are unaffected
+    query("<a><b/></a>/name()", "a");
+
+    // a single-use let must not drop the JNode context when folding 'context/atomic' to 'atomic'
+    query("let $x := if (current-date() lt xs:date('2000-01-01')) then parse-xml('<x/>') " +
+        "else [ 4, 5 ] return $x/2", "5");
+    query("let $x := [ 4, 5 ][current-date() ge xs:date('2000-01-01')] return $x/2", "5");
+    // XML-node context: 'context/atomic' still folds to the atomic
+    query("let $n := <a/> return $n/2", "2");
+
+    // a selected JNode is a node and atomizes to its value (must not be statically typed atomic)
+    query("[ 1 ] / 1 instance of xs:integer", "false");
+    query("data([ 1 ] / 1)", "1");
+    query("[ 1 ] / 1 + 0", "1");
+    query("{ 'a': 2 } / 'a' + 3", "5");
+    // predicates: an atomic-keyed selection must differ for matching vs. non-matching keys
+    query("[ 1 ][./0]", "");
+    query("[ 1 ][./1]", "[1]");
+    query("[ 1 ][./1 = 1]", "[1]");
+
+    // JNode identity: distinct positions are kept even when key and value coincide
+    query("count([ ['a'], ['a'] ]//1)", "3");
+    query("count(distinct-ordered-nodes([ [['a'],['b']], [['c'],['d']] ]//1 ! .//1))", "4");
+    // descendant-or-self over a JNode selection must keep the self node
+    query("count([ [['a'],['b']] ]/1/descendant-or-self::jnode())", "5");
+    query("count([ [['a'],['b']], [['c'],['d']] ]//1//1)", "4");
+    query("[ [['a'],['b']], [['c'],['d']] ]//1//1 ! jvalue()[. instance of xs:string]",
+        "a\nb\nc");
   }
 
   /** Destructuring let. */

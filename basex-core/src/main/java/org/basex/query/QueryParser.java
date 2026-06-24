@@ -62,7 +62,7 @@ public class QueryParser extends InputParser {
   private static final TokenSet KEYWORDS = new TokenSet(
       ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, GNODE, JNODE, NAMESPACE_NODE, NODE,
       SCHEMA_ATTRIBUTE, SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN,
-      FUNCTION, GET, IF, ITEM, MAP, RECORD, SWITCH, TYPESWITCH);
+      FUNCTION, IF, ITEM, MAP, RECORD, SWITCH, TYPESWITCH);
 
   /** Query context. */
   public final QueryContext qc;
@@ -2308,15 +2308,14 @@ public class QueryParser extends InputParser {
    */
   private Expr axisStep(final boolean error) throws QueryException {
     Axis axis = null;
-    ArrayList<ExprInfo> list = new ArrayList<>();
+    final ArrayList<ExprInfo> tests = new ArrayList<>();
     if(wsConsume("..")) {
       axis = Axis.PARENT;
-      list.add(NodeTest.GNODE);
-      checkTest(list.get(0), true);
+      tests.add(NodeTest.GNODE);
+      checkTest(tests.get(0), true);
     } else if(consume('@')) {
       axis = Axis.ATTRIBUTE;
-      list = nodeTest(axis);
-      if(list == null) {
+      if(!nodeTest(axis, tests)) {
         --pos;
         throw error(NOATTNAME);
       }
@@ -2327,8 +2326,7 @@ public class QueryParser extends InputParser {
           if(wsConsumeWs("::")) {
             alterPos = pos;
             axis = ax;
-            list = nodeTest(axis);
-            if(list == null) throw error(AXISMISS_X, axis);
+            if(!nodeTest(axis, tests)) throw error(AXISMISS_X, axis);
             break;
           }
           pos = p;
@@ -2337,16 +2335,16 @@ public class QueryParser extends InputParser {
 
       if(axis == null) {
         axis = Axis.CHILD;
-        final ExprInfo ei = simpleNodeTest(Kind.ELEMENT, true);
-        if(ei == NodeTest.NAMESPACE) throw error(NSAXIS);
-        if(ei instanceof final Test tst) {
-          if(tst.kind == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
-          checkTest(tst, axis != Axis.ATTRIBUTE);
+        final Test test = simpleNodeTest(Kind.ELEMENT, true);
+        if(test != null) {
+          if(test == NodeTest.NAMESPACE) throw error(NSAXIS);
+          if(test.kind == Kind.ATTRIBUTE) axis = Axis.ATTRIBUTE;
+          checkTest(test, axis != Axis.ATTRIBUTE);
+          tests.add(test);
         }
-        if(ei != null) list.add(ei);
       }
     }
-    if(list.isEmpty()) {
+    if(tests.isEmpty()) {
       if(error) throw error(STEPMISS_X, found());
       return null;
     }
@@ -2360,26 +2358,27 @@ public class QueryParser extends InputParser {
     }
 
     // all tests are node tests
-    if(((Checks<ExprInfo>) Test.class::isInstance).all(list)) {
-      final ArrayList<Test> tests = new ArrayList<>(list.size());
-      for(final ExprInfo ei : list) tests.add((Test) ei);
-      return new CachedStep(info(), axis, Test.get(tests), preds.finish());
+    if(((Checks<ExprInfo>) Test.class::isInstance).all(tests)) {
+      final ArrayList<Test> tmp = new ArrayList<>(tests.size());
+      for(final ExprInfo ei : tests) tmp.add((Test) ei);
+      return new CachedStep(info(), axis, Test.get(tmp), preds.finish());
     }
 
-    // tests include get() pseudo-function
+    // tests include a dynamic node test ({ expr })
     final InputInfo ii = info();
-    final ExprList exprs = new ExprList(list.size());
-    for(final ExprInfo ei : list) {
+    final ExprList exprs = new ExprList(tests.size());
+    for(final ExprInfo ei : tests) {
       if(ei instanceof final Test test) {
-        // axis:test
+        // axis::test
         exprs.add(Path.get(ii, null, new CachedStep(info(), axis, test)));
       } else {
-        // let $names := (expr) return axis:test[util:get-nodes($names)]
+        // axis::{ expr } → let $names := expr return axis::*[util:get($names)]
         final int s = localVars.openScope();
         final Let lt = new Let(localVars.add(new Var(new QNm("get"), null, qc, ii)), (Expr) ei);
-        final Test test = Test.get(null, null, NameTest.Scope.ALL, null);
+        final Test test = Test.get(axis == Axis.ATTRIBUTE ? Kind.ATTRIBUTE : null, null,
+          NameTest.Scope.ALL, null);
         final Step step = new CachedStep(info(), axis, test,
-            Function._UTIL_GET.get(ii, new VarRef(ii, lt.var)));
+          Function._UTIL_GET.get(ii, new VarRef(ii, lt.var)));
         final Expr rtrn = Path.get(ii, null, step);
         exprs.add(new GFLWOR(ii, lt, rtrn));
         localVars.closeScope(s);
@@ -2392,35 +2391,36 @@ public class QueryParser extends InputParser {
   /**
    * Parses the NodeTest rule.
    * @param axis axis
-   * @return tests and gets, or {@code null}
+   * @param tests node tests
+   * @return result flag
    * @throws QueryException query exception
    */
-  private ArrayList<ExprInfo> nodeTest(final Axis axis) throws QueryException {
-    final ArrayList<ExprInfo> exprs = new ArrayList<>(1);
-    final ArrayList<Test> tests = new ArrayList<>(1);
+  private boolean nodeTest(final Axis axis, final ArrayList<ExprInfo> tests) throws QueryException {
+    // dynamic node test: enclosed expression
+    if(current('{')) {
+      tests.add(enclosedExpr());
+      return true;
+    }
+    final ArrayList<Test> list = new ArrayList<>(1);
     final QueryPredicate<Expr> add = e -> {
       final boolean element = axis != Axis.ATTRIBUTE;
-      final ExprInfo ei = simpleNodeTest(element ? Kind.ELEMENT : Kind.ATTRIBUTE, true);
-      if(ei == null) return false;
-      if(ei instanceof final Test test) {
-        checkTest(test, element);
-        if(!tests.contains(test)) tests.add(test);
-      } else {
-        exprs.add(ei);
-      }
+      final Test test = simpleNodeTest(element ? Kind.ELEMENT : Kind.ATTRIBUTE, true);
+      if(test == null) return false;
+      checkTest(test, element);
+      if(!list.contains(test)) list.add(test);
       return true;
     };
     if(consume("(")) {
       do {
         skipWs();
-        if(!add.test(null)) return null;
+        if(!add.test(null)) return false;
       } while(wsConsume("|"));
       if(!consume(')')) throw error(WRONGCHAR_X_X, ')', found());
     } else {
-      if(!add.test(null)) return null;
+      if(!add.test(null)) return false;
     }
-    if(!tests.isEmpty()) exprs.add(0, Test.get(tests));
-    return exprs;
+    if(!list.isEmpty()) tests.add(0, Test.get(list));
+    return true;
   }
 
   /**
@@ -2430,10 +2430,10 @@ public class QueryParser extends InputParser {
    * @param kind node kind ({@link Kind#ELEMENT}, {@link Kind#ATTRIBUTE}, or
    *   {@code null} for catch clause))
    * @param all check all tests, or only names
-   * @return node test, get() expression (if {@code all} is true), or {@code null}
+   * @return node test or {@code null}
    * @throws QueryException query exception
    */
-  private ExprInfo simpleNodeTest(final Kind kind, final boolean all) throws QueryException {
+  private Test simpleNodeTest(final Kind kind, final boolean all) throws QueryException {
     final java.util.function.BiFunction<QNm, NameTest.Scope, Test> nameTest = (qnm, scope) ->
       Test.get(all && kind == Kind.ELEMENT ? null : kind, qnm, scope, sc.elemNS);
     int p = pos;
@@ -2468,11 +2468,6 @@ public class QueryParser extends InputParser {
           return jnodeTest();
         } else if(kn != null) {
           return kindTest(kn);
-        } else if(!name.hasURI() && eq(name.local(), token(GET))) {
-          // dynamic name test
-          final Expr expr = single();
-          wsCheck(")");
-          return expr;
         }
       } else {
         NameTest.Scope scope = NameTest.Scope.FULL;
@@ -3867,7 +3862,7 @@ public class QueryParser extends InputParser {
     final int p = pos;
     do {
       skipWs();
-      test = (Test) simpleNodeTest(kind, false);
+      test = simpleNodeTest(kind, false);
       if(test == null) break;
       tests.add(test);
     } while(wsConsume("|"));

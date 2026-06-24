@@ -172,7 +172,7 @@ public abstract class Step extends Preds {
       // descendant-or-self::document-node() → self::document-node()
       // ancestor-or-self::text() → self::text()
       axis = SELF;
-    } else if(rtype.seqType().type.intersect(type) == null) {
+    } else if(rtype instanceof NodeType && rtype.seqType().type.intersect(type) == null) {
       // root()/descendant-or-self::x → root()/descendant::x
       if(old == DESCENDANT_OR_SELF) axis = DESCENDANT;
       // $text/ancestor-or-self::x → $text/ancestor::x
