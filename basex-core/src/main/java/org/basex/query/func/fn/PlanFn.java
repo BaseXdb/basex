@@ -65,45 +65,83 @@ public abstract class PlanFn extends StandardFunc {
 
   /** Types. */
   enum PlanType {
-    /** Type 'boolean'. */ BOOLEAN(BasicType.BOOLEAN),
-    /** Type 'numeric'. */ NUMERIC(BasicType.NUMERIC),
-    /** Type 'string'.  */ STRING(BasicType.STRING),
-    /** Type 'skip'.    */ SKIP(null);
-
-    /** Target type. */
-    final BasicType type;
+    /** Type 'integer'. */ INTEGER,
+    /** Type 'decimal'. */ DECIMAL,
+    /** Type 'double'.  */ DOUBLE,
+    /** Type 'boolean'. */ BOOLEAN,
+    /** Type 'string'.  */ STRING,
+    /** Type 'skip'.    */ SKIP;
 
     /**
-     * Constructor.
-     * @param type type
+     * Infers a data type for the string values of the specified nodes.
+     * @param nodes nodes
+     * @return type
      */
-    PlanType(final BasicType type) {
-      this.type = type;
+    static PlanType get(final GNode... nodes) {
+      boolean dbl = true, integer = true, decimal = true, leadingZero = false, bool = true;
+      for(final GNode node : nodes) {
+        final byte[] value = node.string(), trimmed = Token.trim(value);
+        if(dbl) {
+          try {
+            final double d = Dbl.parse(value, null);
+            if(Double.isNaN(d) || Double.isInfinite(d)) dbl = false;
+          } catch(final QueryException ex) {
+            Util.debug(ex);
+            dbl = false;
+          }
+        }
+        if(integer) {
+          if(integerLexical(trimmed)) leadingZero |= leadingZero(trimmed);
+          else integer = false;
+        }
+        if(decimal && !decimalLexical(trimmed)) decimal = false;
+        if(bool && Bln.parse(trimmed) == null) bool = false;
+      }
+      if(dbl) return integer ? leadingZero ? STRING : INTEGER : decimal ? DECIMAL : DOUBLE;
+      return bool ? BOOLEAN : STRING;
     }
 
     /**
-     * Returns a matching type for the specified node.
-     * @param nodes nodes
-     * @return layout
+     * Checks if a trimmed token is in the lexical space of xs:integer.
+     * @param token token
+     * @return result of check
      */
-    static PlanType get(final GNode... nodes) {
-      PlanType type = BOOLEAN;
-      for(final GNode node : nodes) {
-        final byte[] value = node.string();
-        if(type == BOOLEAN) {
-          if(Bln.parse(value) == null) type = NUMERIC;
-        }
-        if(type == NUMERIC) {
-          try {
-            Dbl.parse(value, null);
-          } catch(final QueryException ex) {
-            Util.debug(ex);
-            type = STRING;
-            break;
-          }
-        }
+    private static boolean integerLexical(final byte[] token) {
+      final int tl = token.length;
+      int t = tl > 0 && (token[0] == '+' || token[0] == '-') ? 1 : 0;
+      if(t == tl) return false;
+      for(; t < tl; t++) {
+        if(!Token.digit(token[t])) return false;
       }
-      return type;
+      return true;
+    }
+
+    /**
+     * Checks if a trimmed integer token starts with a leading zero followed by another digit.
+     * @param token token (in the lexical space of xs:integer)
+     * @return result of check
+     */
+    private static boolean leadingZero(final byte[] token) {
+      final int tl = token.length, t = tl > 0 && (token[0] == '+' || token[0] == '-') ? 1 : 0;
+      return t + 1 < tl && token[t] == '0';
+    }
+
+    /**
+     * Checks if a trimmed token is in the lexical space of xs:decimal.
+     * @param token token
+     * @return result of check
+     */
+    private static boolean decimalLexical(final byte[] token) {
+      final int tl = token.length;
+      int t = tl > 0 && (token[0] == '+' || token[0] == '-') ? 1 : 0;
+      boolean digit = false, dot = false;
+      for(; t < tl; t++) {
+        final byte b = token[t];
+        if(Token.digit(b)) digit = true;
+        else if(b == '.' && !dot) dot = true;
+        else return false;
+      }
+      return digit;
     }
 
     @Override
@@ -152,15 +190,19 @@ public abstract class PlanFn extends StandardFunc {
     Item cast(final Str item) {
       if(type != null) {
         try {
-          if(type.type == BasicType.BOOLEAN) {
-            final Boolean b = Bln.parse(item.string());
-            if(b != null) return Bln.get(b);
-          } else if(type.type == BasicType.NUMERIC) {
-            if(Token.contains(item.string(), 'e')) return Dbl.get(item.dbl(info));
-            if(Token.contains(item.string(), '.')) return Dec.get(item.dec(info));
-            return Itr.get(item.itr(null));
-          } else {
-            return item;
+          switch(type) {
+            case BOOLEAN:
+              final Boolean b = Bln.parse(item.string());
+              if(b != null) return Bln.get(b);
+              break;
+            case INTEGER:
+              return Itr.get(item.itr(info));
+            case DECIMAL:
+              return Dec.get(item.dec(info));
+            case DOUBLE:
+              return Dbl.get(item.dbl(info));
+            default:
+              break;
           }
         } catch(final QueryException ex) {
           Util.debug(ex);
