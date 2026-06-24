@@ -14,7 +14,6 @@ import org.basex.query.func.Function;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.list.*;
-import org.basex.query.value.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
 import org.basex.query.var.*;
@@ -149,11 +148,8 @@ public abstract class Step extends Preds {
    * @throws QueryException query exception
    */
   final BasicNodeIter iterator(final QueryContext qc) throws QueryException {
-    final Value value = qc.focus.value;
-    if(value == null) throw QueryError.NOCTX_X.get(info, this);
-
     return new BasicNodeIter() {
-      final BasicNodeIter iter = axis.iter(toContextNode(value), test);
+      final BasicNodeIter iter = axis.iter(toContextNode(qc.focus.value), test);
 
       @Override
       public GNode next() {

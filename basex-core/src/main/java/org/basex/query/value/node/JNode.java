@@ -9,6 +9,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.query.util.collation.*;
 import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.seq.*;
@@ -211,21 +212,9 @@ public final class JNode extends GNode {
       final boolean direct = !descendant || (
           value instanceof XQMap ? ((MapType) value.type).valueType() :
         ((ArrayType) value.type).valueType()).type.instanceOf(BasicType.ANY_ATOMIC_TYPE);
-      // map: any atomic key, array: in-range integer key (1-based)
-      if(direct && test instanceof final JNodeTest nt) {
-        final Item s = nt.key;
-        if(s != null && s != Empty.VALUE && (struct instanceof XQMap || s instanceof ANum)) {
-          Value c = null;
-          long i = -1;
-          if(struct instanceof final XQMap map) {
-            c = map.value(s);
-          } else {
-            final double d = ((ANum) s).dbl();
-            i = (long) d - 1;
-            if(d == i + 1 && i >= 0 && i < struct.structSize()) c = struct.valueAt(i);
-          }
-          return c != null ? singleIter(new JNode(s, c, JNode.this, i, 1)) : BasicNodeIter.EMPTY;
-        }
+      if(direct && test instanceof final JNodeTest nt && nt.key != null && nt.key != Empty.VALUE) {
+        final JNode child = child(nt.key);
+        return child != null ? singleIter(child) : BasicNodeIter.EMPTY;
       }
 
       // map or array: sequential scan
@@ -268,6 +257,26 @@ public final class JNode extends GNode {
         }
       }
     };
+  }
+
+  /**
+   * Returns the child node selected by a key via direct lookup.
+   * @param item key (map: any atomic key; array: in-range integral numeric key, 1-based)
+   * @return child node or {@code null} if no child is selected
+   */
+  public JNode child(final Item item) {
+    if(value instanceof final XQMap map) {
+      final Value v = map.value(item);
+      return v != null ? new JNode(item, v, this, -1, 1) : null;
+    }
+    if(value instanceof final XQArray array && item instanceof final ANum num) {
+      final double d = num.dbl();
+      final long i = (long) d - 1;
+      if(d == i + 1 && i >= 0 && i < array.structSize()) {
+        return new JNode(item, array.valueAt(i), this, i, 1);
+      }
+    }
+    return null;
   }
 
   @Override

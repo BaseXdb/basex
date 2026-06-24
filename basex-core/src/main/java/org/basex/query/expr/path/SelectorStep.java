@@ -52,10 +52,18 @@ public final class SelectorStep extends Step {
     // evaluate name keys once, with the context node as focus
     final Value keys = selector.atomValue(qc, info);
 
-    // collect axis nodes that match one of the keys
     final GNodeList list = new GNodeList();
-    for(final GNode node : iterator(qc)) {
-      if(matches(keys, node)) list.add(node);
+    final Value value = qc.focus.value;
+    if(axis == Axis.CHILD && keys instanceof final Item key &&
+        toContextNode(value) instanceof final JNode jnode && jnode.value instanceof XQStruct) {
+      // child axis, single key, single struct: direct key lookup
+      final JNode child = jnode.child(key);
+      if(child != null) list.add(child);
+    } else {
+      // collect axis nodes that match one of the keys
+      for(final GNode node : iterator(qc)) {
+        if(matches(keys, node)) list.add(node);
+      }
     }
     // evaluate predicates
     return preds(list, qc);
