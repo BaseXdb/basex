@@ -19,10 +19,14 @@ public final class SqlPrepare extends SqlFn {
   public Uri item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Connection conn = connection(qc);
     final String prepStmt = toString(arg(1), qc);
+    final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
+    final boolean keys = options.get(StatementOptions.GENERATED_KEYS);
     try {
       // keep prepared statement
-      final PreparedStatement prep = conn.prepareStatement(prepStmt);
-      return jdbc(qc).add(prep);
+      final PreparedStatement prep = keys ?
+        conn.prepareStatement(prepStmt, Statement.RETURN_GENERATED_KEYS) :
+        conn.prepareStatement(prepStmt);
+      return jdbc(qc).add(prep, keys);
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }

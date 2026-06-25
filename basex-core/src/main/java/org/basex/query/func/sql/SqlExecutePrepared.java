@@ -35,11 +35,12 @@ public final class SqlExecutePrepared extends SqlExecute {
       throw UNKNOWNOPTION_X.get(info, prms.qname().local());
     }
 
+    final boolean keys = jdbc(qc).generatedKeys(ps);
     try {
       ps.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
       if(prms != null) setParameters(prms.childIter(), ps);
-      // If execute returns false, statement was updating: return number of updated rows
-      return iter(ps, false, ps.execute());
+      // If execute returns false, statement was updating: return keys or number of updated rows
+      return iter(ps, false, ps.execute(), keys);
     } catch(final QueryException ex) {
       // already handled
       throw ex;

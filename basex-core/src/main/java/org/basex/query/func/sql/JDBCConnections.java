@@ -3,6 +3,7 @@ package org.basex.query.func.sql;
 import static org.basex.util.Token.*;
 
 import java.sql.*;
+import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.value.item.*;
@@ -20,6 +21,9 @@ public final class JDBCConnections implements QueryResource {
   private int lastId = -1;
   /** Map with all open connections and prepared statements with unique IDs. */
   private final TokenObjectMap<AutoCloseable> conns = new TokenObjectMap<>();
+  /** Prepared statements that return auto-generated keys. */
+  private final Set<PreparedStatement> genKeys =
+      Collections.newSetFromMap(new IdentityHashMap<>());
 
   /**
    * Adds a connection.
@@ -36,14 +40,25 @@ public final class JDBCConnections implements QueryResource {
   /**
    * Adds a prepared statement.
    * @param stmt prepared statement
+   * @param keys statement returns auto-generated keys
    * @return generated ID
    * @throws SQLException SQL connection
    */
-  synchronized Uri add(final PreparedStatement stmt) throws SQLException {
+  synchronized Uri add(final PreparedStatement stmt, final boolean keys) throws SQLException {
     final String url = string(get(stmt.getConnection())).replaceAll("^(.+)/.+$", "$1");
     final byte[] uri = token(url + "/statement-" + ++lastId);
     conns.put(uri, stmt);
+    if(keys) genKeys.add(stmt);
     return Uri.get(uri);
+  }
+
+  /**
+   * Indicates if a prepared statement returns auto-generated keys.
+   * @param stmt prepared statement
+   * @return result of check
+   */
+  synchronized boolean generatedKeys(final PreparedStatement stmt) {
+    return genKeys.contains(stmt);
   }
 
   /**
@@ -84,5 +99,6 @@ public final class JDBCConnections implements QueryResource {
         Util.debug(ex);
       }
     }
+    genKeys.clear();
   }
 }

@@ -1872,8 +1872,8 @@ public enum Function implements AFunction {
   _SQL_INIT(SqlInit::new, "init(class)",
       params(STRING_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.CREATE),
   /** XQuery function. */
-  _SQL_PREPARE(SqlPrepare::new, "prepare(id,statement)",
-      params(INTEGER_O, STRING_O), INTEGER_O, flag(NDT), SQL_URI, Perm.CREATE),
+  _SQL_PREPARE(SqlPrepare::new, "prepare(id,statement[,options])",
+      params(INTEGER_O, STRING_O, MAP_ZO), INTEGER_O, flag(NDT), SQL_URI, Perm.CREATE),
   /** XQuery function. */
   _SQL_ROLLBACK(SqlRollback::new, "rollback(id)",
       params(INTEGER_O), EMPTY_SEQUENCE_Z, flag(NDT), SQL_URI, Perm.CREATE),
