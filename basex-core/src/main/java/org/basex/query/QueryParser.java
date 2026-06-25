@@ -1184,7 +1184,7 @@ public class QueryParser extends InputParser {
       publicTypes.put(qn, rt.seqType());
       qc.namedTypes.put(qn, rt.seqType());
     }
-    if(qn.uri().length != 0) declareRecordConstructor(rt, ii);
+    declareRecordConstructor(rt, ii);
   }
 
   /**

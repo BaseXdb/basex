@@ -233,6 +233,19 @@ public final class RecordTest extends SandboxTest {
 
   /** Record constructor function. */
   @Test public void recConstr() {
+    // constructor of a record in no namespace, called by an unprefixed name (#2257)
+    query("declare record coord(x, y); coord(1, 3)", "{\"x\":1,\"y\":3}");
+    query("declare record coord(x, y); coord(1, 3) instance of coord", true);
+    query("declare record coord(x as xs:integer, y := 0); coord(1)", "{\"x\":1,\"y\":0}");
+    // no-namespace constructor coexists with the built-in function namespace
+    query("declare record string(x); string(1)", "{\"x\":1}");
+    // a default element namespace puts the record in that namespace; prefixed call required
+    query("declare default element namespace 'G';\n"
+        + "declare namespace g = 'G';\n"
+        + "declare record coord(x, y);\n"
+        + "g:coord(1, 3) instance of coord",
+        true);
+
     query("declare namespace cx = 'CX';\n"
         + "declare record cx:complex(r as xs:double, i as xs:double := 0);\n"
         + "cx:complex(3, 2), cx:complex(3)",
