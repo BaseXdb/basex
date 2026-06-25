@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.nio.charset.*;
+import java.util.*;
 
 import org.basex.io.out.*;
 import org.basex.util.*;
@@ -26,10 +27,8 @@ public abstract class OutputSerializer extends Serializer {
   /** Item separator. */
   protected byte[] itemsep;
 
-  /** Number of spaces to indent. */
-  private final int indents;
-  /** Tabular character. */
-  private final char tab;
+  /** Indentation unit (whitespace string emitted per nesting level). */
+  private final byte[] indentUnit;
 
   /**
    * Constructor.
@@ -44,9 +43,15 @@ public abstract class OutputSerializer extends Serializer {
     indent = sopts.yes(INDENT);
     canonical = sopts.yes(CANONICAL);
 
-    // project-specific options
-    indents = sopts.get(INDENTS);
-    tab = sopts.yes(TABULATOR) ? '\t' : ' ';
+    // indentation unit: standard 'indent-unit' takes precedence over 'tabulator'/'indents'
+    final String unit = sopts.get(INDENT_UNIT);
+    if(unit != null) {
+      indentUnit = token(unescape(unit));
+    } else {
+      final byte ch = (byte) (sopts.yes(TABULATOR) ? '\t' : ' ');
+      indentUnit = new byte[sopts.get(INDENTS)];
+      Arrays.fill(indentUnit, ch);
+    }
 
     encoding = Strings.normEncoding(sopts.get(ENCODING), true);
     PrintOutput po;
@@ -60,8 +65,10 @@ public abstract class OutputSerializer extends Serializer {
     final int limit = sopts.get(LIMIT);
     if(limit != -1) po.setLimit(limit);
 
-    final Newline nl = sopts.get(NEWLINE);
-    if(nl != Newline.NL) po = new NewlineOutput(po, token(nl.newline()));
+    // line ending: standard 'line-ending' takes precedence over 'newline'
+    final String le = sopts.get(LINE_ENDING);
+    final String newline = le != null ? unescape(le) : sopts.get(NEWLINE).newline();
+    if(!newline.equals("\n")) po = new NewlineOutput(po, token(newline));
     out = po;
 
     final String is = sopts.get(ITEM_SEPARATOR);
@@ -74,6 +81,15 @@ public abstract class OutputSerializer extends Serializer {
         case Strings.UTF16BE: out.write(0xFE); out.write(0xFF); break;
       }
     }
+  }
+
+  /**
+   * Replaces the escapes {@code \t}, {@code \r} and {@code \n} with the corresponding characters.
+   * @param value parameter value
+   * @return resulting string
+   */
+  private static String unescape(final String value) {
+    return value.replace("\\t", "\t").replace("\\r", "\r").replace("\\n", "\n");
   }
 
   @Override
@@ -98,8 +114,7 @@ public abstract class OutputSerializer extends Serializer {
   protected void indent() throws IOException {
     if(indent) {
       out.print('\n');
-      final int ls = level * indents;
-      for(int l = 0; l < ls; l++) out.print(tab);
+      for(int l = 0; l < level; l++) out.print(indentUnit);
     }
   }
 

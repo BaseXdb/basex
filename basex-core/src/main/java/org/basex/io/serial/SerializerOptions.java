@@ -112,10 +112,16 @@ public final class SerializerOptions extends Options {
   /** Specific serialization parameter. */
   public static final OptionsOption<JsonSerialOptions> JSON =
       new OptionsOption<>("json", new JsonSerialOptions());
+  /** Serialization parameter: line ending (takes precedence over 'newline' if assigned). */
+  public static final StringOption LINE_ENDING =
+      new StringOption("line-ending");
   /** Specific serialization parameter: newline. */
   public static final EnumOption<Newline> NEWLINE =
       new EnumOption<>("newline",
         "\r".equals(Prop.NL) ? Newline.CR : "\n".equals(Prop.NL) ? Newline.NL : Newline.CRNL);
+  /** Serialization parameter: indentation unit (takes precedence over 'tabulator'/'indents'). */
+  public static final StringOption INDENT_UNIT =
+      new StringOption("indent-unit");
   /** Specific serialization parameter: indent with spaces or tabs. */
   public static final EnumOption<YesNo> TABULATOR =
       new EnumOption<>("tabulator", YesNo.NO);

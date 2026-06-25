@@ -26,6 +26,44 @@ public final class SerializerTest extends SandboxTest {
         + "   c=\"3\"/>");
   }
 
+  /** Test: indent-unit. */
+  @Test public void indentUnit() {
+    final String input = "<a><b/></a>";
+    // default: two spaces
+    query(METHOD.arg("xml") + INDENT.arg("yes") + input, "<a>\n  <b/>\n</a>");
+    // single tab
+    query(METHOD.arg("xml") + INDENT.arg("yes") + INDENT_UNIT.arg("\t") + input,
+        "<a>\n\t<b/>\n</a>");
+    // tab, supplied as the escape sequence \t
+    query(METHOD.arg("xml") + INDENT.arg("yes") + INDENT_UNIT.arg("\\t") + input,
+        "<a>\n\t<b/>\n</a>");
+    // four spaces
+    query(METHOD.arg("xml") + INDENT.arg("yes") + INDENT_UNIT.arg("    ") + input,
+        "<a>\n    <b/>\n</a>");
+    // empty unit: line breaks but no indentation
+    query(METHOD.arg("xml") + INDENT.arg("yes") + INDENT_UNIT.arg("") + input,
+        "<a>\n<b/>\n</a>");
+    // takes precedence over tabulator/indents
+    query(METHOD.arg("xml") + INDENT.arg("yes") + TABULATOR.arg("yes") + INDENTS.arg("8")
+        + INDENT_UNIT.arg(" ") + input, "<a>\n <b/>\n</a>");
+  }
+
+  /** Test: line-ending. */
+  @Test public void lineEnding() {
+    // Line endings are a byte-stream concern: write to a file and inspect the raw bytes.
+    // (fn:serialize normalizes line endings in its string result, so it cannot be used here.)
+    final String write = "let $f := file:create-temp-file('x', '.xml') return (file:write($f, "
+        + "<a><b/></a>, map { 'method': 'xml', 'indent': true(), ";
+    final String check = " }), contains(string(xs:hexBinary(file:read-binary($f))), '0D0A'), "
+        + "file:delete($f))";
+    // CR LF is emitted as the line ending
+    query(write + "'line-ending': '&#13;&#10;'" + check, true);
+    // CR LF, supplied as the escape sequence \r\n
+    query(write + "'line-ending': '\\r\\n'" + check, true);
+    // 'line-ending' takes precedence over the 'newline' option
+    query(write + "'newline': '\\n', 'line-ending': '&#13;&#10;'" + check, true);
+  }
+
   /** Test: method=xhtml. */
   @Test public void xhtml() {
     final String option = METHOD.arg("xhtml");
