@@ -44,9 +44,8 @@ public class SqlExecute extends SqlFn {
     try {
       final Statement stmt = conn.createStatement();
       stmt.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
-      final boolean result = keys ? stmt.execute(statement, Statement.RETURN_GENERATED_KEYS) :
-        stmt.execute(statement);
-      return iter(stmt, true, result, keys, nulls);
+      final int ks = keys ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS;
+      return iter(stmt, true, stmt.execute(statement, ks), keys, nulls);
     } catch(final SQLTimeoutException ex) {
       throw SQL_TIMEOUT_X.get(info, ex);
     } catch(final SQLException ex) {
