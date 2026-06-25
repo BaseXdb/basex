@@ -64,7 +64,7 @@ public final class FnTail extends StandardFunc {
     final long size = input.size();
     final SeqType st = input.seqType();
     // zero or one result: return empty sequence
-    if(size == 0 || size == 1 || st.zeroOrOne()) return Empty.VALUE;
+    if(size == 0 || size == 1 || st.zeroOrOne()) return cc.voidAndReturn(input, Empty.VALUE, info);
     // two results: return last item
     if(size == 2) return cc.function(FOOT, info, input);
 

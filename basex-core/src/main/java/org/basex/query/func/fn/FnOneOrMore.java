@@ -6,6 +6,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
@@ -52,7 +53,7 @@ public final class FnOneOrMore extends StandardFunc {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
     if(st.oneOrMore()) return input;
-    if(st.zero()) throw ONEORMORE.get(info);
+    if(st.zero() && !input.has(Flag.NDT)) throw ONEORMORE.get(info);
 
     exprType.assign(st.with(Occ.ONE_OR_MORE)).data(input);
     return this;

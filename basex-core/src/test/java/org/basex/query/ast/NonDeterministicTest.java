@@ -1,6 +1,9 @@
 package org.basex.query.ast;
 
+import static org.basex.query.QueryError.*;
 import static org.basex.query.func.Function.*;
+
+import java.io.*;
 
 import org.basex.*;
 import org.basex.io.*;
@@ -250,6 +253,44 @@ public final class NonDeterministicTest extends SandboxTest {
   @Test public void countKnownSize() {
     query("count(if (" + fileExists() + ") then (1 to 10) ! (" + fileAppend() + ", .) else ())", 10,
         "xxxxxxxxxx");
+  }
+
+  /**
+   * Checks that {@code fn:exactly-one} evaluates nondeterministic input before raising a
+   * cardinality error for statically oversized input.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnExactlyOne#opt}.
+   * @throws IOException I/O exception
+   */
+  @Test public void exactlyOneNdt() throws IOException {
+    error("exactly-one((" + fileAppend() + ", 1, 2))", EXACTLYONE);
+    query(_FILE_READ_TEXT.args(log.path()), "x");
+
+    log.write("");
+    error("exactly-one(" + fileAppend() + ")", EXACTLYONE);
+    query(_FILE_READ_TEXT.args(log.path()), "x");
+  }
+
+  /**
+   * Checks that {@code fn:zero-or-one} evaluates nondeterministic input before raising a
+   * cardinality error for statically oversized input.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnZeroOrOne#opt}.
+   */
+  @Test public void zeroOrOneNdt() {
+    error("zero-or-one((" + fileAppend() + ", 1, 2))", ZEROORONE);
+    query(_FILE_READ_TEXT.args(log.path()), "x");
+  }
+
+  /**
+   * Checks that {@code fn:one-or-more} evaluates nondeterministic input before raising a
+   * cardinality error for statically empty input.
+   * <p>
+   * Requires the {@link Flag#NDT} check in {@link FnOneOrMore#opt}.
+   */
+  @Test public void oneOrMoreNdt() {
+    error("one-or-more(" + fileAppend() + ")", ONEORMORE);
+    query(_FILE_READ_TEXT.args(log.path()), "x");
   }
 
   /**
@@ -515,6 +556,24 @@ public final class NonDeterministicTest extends SandboxTest {
    */
   @Test public void deepEqualNdt() {
     query("deep-equal((" + fileAppend() + ", 1), (" + fileAppend() + ", 1, 2))", false, "xx");
+  }
+
+  /**
+   * Checks that fn:tail does not drop a nondeterministic input with zero-or-one cardinality.
+   * <p>
+   * Requires the use of {@link CompileContext#voidAndReturn} in {@link FnTail#opt}.
+   */
+  @Test public void tailNdt() {
+    query("tail(" + fileAppend() + ")", "", "x");
+  }
+
+  /**
+   * Checks that fn:trunk does not drop a nondeterministic input with zero-or-one cardinality.
+   * <p>
+   * Requires the use of {@link CompileContext#voidAndReturn} in {@link FnTrunk#opt}.
+   */
+  @Test public void trunkNdt() {
+    query("trunk(" + fileAppend() + ")", "", "x");
   }
 
   /**
