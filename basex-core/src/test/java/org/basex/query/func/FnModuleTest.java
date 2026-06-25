@@ -2482,9 +2482,38 @@ return
     query(ex5 + "[3]?position", 10);
     query(ex5 + "[3]?groups?1?group", "go");
 
+    // named capturing groups: keyed by name instead of group number
+    final String ex6 = func.args("2026-06-25",
+        "(?<year>\\d{4})-(?<month>\\d{2})-(?<day>\\d{2})");
+    query(ex6 + "?substring", "2026-06-25");
+    query(ex6 + "?groups => map:size()", 3);
+    query(ex6 + "?groups => map:contains(1)", false);
+    query(ex6 + "?groups?year?group", 2026);
+    query(ex6 + "?groups?year?position", 1);
+    query(ex6 + "?groups?month?group", "06");
+    query(ex6 + "?groups?day?group", 25);
+    query(ex6 + "?groups?day?position", 9);
+
+    // named group mixed with numbered group
+    final String ex7 = func.args("A1", "(?<letter>[A-Z])([0-9]+)");
+    query(ex7 + "?groups?letter?group", "A");
+    query(ex7 + "?groups?2?group", 1);
+    query(ex7 + "?groups => map:size()", 2);
+    query(ex7 + "?groups => map:contains('letter')", true);
+    query(ex7 + "?groups => map:contains(1)", false);
+    query(ex7 + "?groups => map:contains(2)", true);
+
+    // named group that does not participate in the match: no entry
+    query(func.args("a", "(?<x>a)|(?<y>b)") + "?groups => map:contains('y')", false);
+
+    // named group in a lookahead
+    query(func.args("Chapter 5", "Chapter(?=\\s+(?<num>[0-9]+))") + "?groups?num?group", 5);
+
     // errors
     error(func.args("a", "+"), REGINVALID_X);
     error(func.args("a", "x", "X"), REGFLAG_X);
+    // duplicate group name
+    error(func.args("a", "(?<x>a)(?<x>b)"), REGINVALID_X);
   }
 
   /** Test method. */

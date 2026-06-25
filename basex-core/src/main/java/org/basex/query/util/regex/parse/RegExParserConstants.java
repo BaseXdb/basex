@@ -33,41 +33,43 @@ public interface RegExParserConstants {
   /** RegularExpression Id. */
   int PAR_OPEN = 11;
   /** RegularExpression Id. */
-  int CHAR = 12;
+  int NAMED_PAR_OPEN = 12;
   /** RegularExpression Id. */
-  int DIGIT = 13;
+  int CHAR = 13;
   /** RegularExpression Id. */
-  int BACK_REF = 14;
+  int DIGIT = 14;
   /** RegularExpression Id. */
-  int WILDCARD = 15;
+  int BACK_REF = 15;
   /** RegularExpression Id. */
-  int SINGLE_ESC = 16;
+  int WILDCARD = 16;
   /** RegularExpression Id. */
-  int MULTI_ESC = 17;
+  int SINGLE_ESC = 17;
   /** RegularExpression Id. */
-  int CAT_ESC = 18;
+  int MULTI_ESC = 18;
   /** RegularExpression Id. */
-  int BR_OPEN = 19;
+  int CAT_ESC = 19;
   /** RegularExpression Id. */
-  int NEG = 20;
+  int BR_OPEN = 20;
   /** RegularExpression Id. */
-  int TO = 21;
+  int NEG = 21;
   /** RegularExpression Id. */
-  int BR_CLOSE = 22;
+  int TO = 22;
   /** RegularExpression Id. */
-  int LINE_START = 23;
+  int BR_CLOSE = 23;
   /** RegularExpression Id. */
-  int LINE_END = 24;
+  int LINE_START = 24;
   /** RegularExpression Id. */
-  int WORD_BOUNDARY = 25;
+  int LINE_END = 25;
   /** RegularExpression Id. */
-  int POS_LOOKAHEAD = 26;
+  int WORD_BOUNDARY = 26;
   /** RegularExpression Id. */
-  int NEG_LOOKAHEAD = 27;
+  int POS_LOOKAHEAD = 27;
   /** RegularExpression Id. */
-  int POS_LOOKBEHIND = 28;
+  int NEG_LOOKAHEAD = 28;
   /** RegularExpression Id. */
-  int NEG_LOOKBEHIND = 29;
+  int POS_LOOKBEHIND = 29;
+  /** RegularExpression Id. */
+  int NEG_LOOKBEHIND = 30;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -83,6 +85,7 @@ public interface RegExParserConstants {
     "<NPAR_OPEN>",
     "<PAR_CLOSE>",
     "<PAR_OPEN>",
+    "<NAMED_PAR_OPEN>",
     "<CHAR>",
     "<DIGIT>",
     "<BACK_REF>",

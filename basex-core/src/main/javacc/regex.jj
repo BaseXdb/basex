@@ -211,6 +211,14 @@ PARSER_END(RegExParser)
         closed.put(grp, g);
         nd = g;
       }
+    | (<NAMED_PAR_OPEN> { final int ngrp = ++groups; final String name = (String) token.getValue(); }
+        nd = regExp(false)
+      <PAR_CLOSE>) {
+        if(lookbehind) throw new ParseException("Lookbehind assertions must not contain parenthesized expressions.");
+        final Group g = new Group(nd, true, name, atomPath.toArray(new Integer[atomPath.size()]));
+        closed.put(ngrp, g);
+        nd = g;
+      }
     | nd = backReference() {
         if(lookbehind) throw new ParseException("Lookbehind assertions must not contain backward references.");
       }

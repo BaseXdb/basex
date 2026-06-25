@@ -43,6 +43,15 @@ public class RegExpr {
   }
 
   /**
+   * Returns the names of capturing groups.
+   * @return names: element i contains the name of capturing group i+1, or {@code null}.
+   */
+  public String[] getGroupNames() {
+    if(groupInfo == null) groupInfo = GroupScanner.groupInfo(pattern.pattern());
+    return groupInfo.groupNames;
+  }
+
+  /**
    * Information about capturing groups.
    */
   public static class GroupInfo {
@@ -50,15 +59,19 @@ public class RegExpr {
     public final int[] parentGroups;
     /** Assertion status: element i tells whether capturing group i+1 occurs in an assertion. */
     public final boolean[] assertionFlags;
+    /** Group names: element i contains the name of capturing group i+1, or {@code null}. */
+    public final String[] groupNames;
 
     /**
      * Constructor.
      * @param parentGroup parent group IDs
      * @param assertionFlags inside of assertion indicators
+     * @param groupNames group names
      */
-    GroupInfo(final int[] parentGroup, final boolean[] assertionFlags) {
+    GroupInfo(final int[] parentGroup, final boolean[] assertionFlags, final String[] groupNames) {
       parentGroups = parentGroup;
       this.assertionFlags = assertionFlags;
+      this.groupNames = groupNames;
     }
   }
 
@@ -74,6 +87,8 @@ public class RegExpr {
     private int pos;
     /** Length of most recent code point. */
     private int chrCount;
+    /** Name of the most recently scanned named capturing group ({@code null} otherwise). */
+    private String name;
 
     /**
      * Constructor.
@@ -97,13 +112,14 @@ public class RegExpr {
       open.push(0);
       int[] parentGroups = { };
       boolean[] inAssertion = { };
+      String[] groupNames = { };
       boolean quoted = false;
       int classLevel = 0;
       int assrtMark = 0;
       for(;;) {
         switch(gnd.nxtToken()) {
           case EOP -> {
-            return new GroupInfo(parentGroups, inAssertion);
+            return new GroupInfo(parentGroups, inAssertion, groupNames);
           }
           case LBRACKET -> {
             if(!quoted) ++classLevel;
@@ -123,6 +139,8 @@ public class RegExpr {
               parentGroups[parentGroups.length - 1] = open.peek();
               inAssertion = Arrays.copyOf(inAssertion, inAssertion.length + 1);
               inAssertion[inAssertion.length - 1] = assrtMark != 0;
+              groupNames = Arrays.copyOf(groupNames, groupNames.length + 1);
+              groupNames[groupNames.length - 1] = gnd.name;
               open.push(parentGroups.length);
             }
           }
@@ -151,6 +169,7 @@ public class RegExpr {
      * @return next token
      */
     private Token nxtToken() {
+      name = null;
       return switch(nxtCp()) {
         case -1 -> Token.EOP;
         case ']' -> Token.RBRACKET;
@@ -165,13 +184,15 @@ public class RegExpr {
         case '(' -> switch(nxtCp()) {
           case '?' -> switch(nxtCp()) {
             case '=', '!' -> Token.ASSRT_LPAREN;
-            case '<' -> switch(nxtCp()) {
-              case '=', '!' -> Token.ASSRT_LPAREN;
-              default -> {
-                reset();
-                yield Token.CAPT_LPAREN;
-              }
-            };
+            case '<' -> {
+              final int c = nxtCp();
+              if(c == '=' || c == '!') yield Token.ASSRT_LPAREN;
+              // named capturing group (?<name>...): record the name
+              final StringBuilder nm = new StringBuilder();
+              for(int n = c; n != '>' && n != -1; n = nxtCp()) nm.append((char) n);
+              name = nm.toString();
+              yield Token.CAPT_LPAREN;
+            }
             default -> {
               reset();
               yield Token.LPAREN;

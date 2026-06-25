@@ -117,9 +117,23 @@ public final class RegExLexer implements TokenManager, RegExParserConstants {
               case '=': return POS_LOOKAHEAD;
               case '!': return NEG_LOOKAHEAD;
               case '<':
-                switch(next(skipCmt)) {
+                final int la = next(skipCmt);
+                switch(la) {
                   case '=': return POS_LOOKBEHIND;
                   case '!': return NEG_LOOKBEHIND;
+                  default:
+                    // named capturing group: (?<name>...)
+                    if(la >= 'a' && la <= 'z' || la >= 'A' && la <= 'Z') {
+                      final TokenBuilder name = new TokenBuilder().add(la);
+                      for(int nc = next(skipCmt);; nc = next(skipCmt)) {
+                        if(nc == '>') break;
+                        if(nc >= 'a' && nc <= 'z' || nc >= 'A' && nc <= 'Z' ||
+                           nc >= '0' && nc <= '9') name.add(nc);
+                        else throw error("(?<" + name + ">", nc);
+                      }
+                      payload = name.toString();
+                      return NAMED_PAR_OPEN;
+                    }
                 }
             }
             break;

@@ -64,7 +64,8 @@ public enum Records {
   MATCHING_SEGMENT(FN_URI, "matching-segment",
     field("substring", Types.STRING_O),
     field("position", Types.INTEGER_O),
-    field("groups", MapType.get(BasicType.INTEGER, MATCHING_GROUP.get().seqType()).seqType())),
+    field("groups", MapType.get(ChoiceItemType.get(BasicType.INTEGER, BasicType.STRING),
+        MATCHING_GROUP.get().seqType()).seqType())),
   /** Record definition. */
   MEMBER(ARRAY_URI, "member",
     field("value", Types.ITEM_ZM)),
