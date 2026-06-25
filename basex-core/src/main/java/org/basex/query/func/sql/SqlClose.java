@@ -8,7 +8,7 @@ import org.basex.query.value.seq.*;
 import org.basex.util.*;
 
 /**
- * Functions on relational databases.
+ * Function implementation.
  *
  * @author BaseX Team, BSD License
  * @author Rositsa Shadura

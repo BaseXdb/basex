@@ -256,6 +256,7 @@ public final class MockDriver implements Driver {
       switch(n) {
         case "getConnection": return conn;
         case "setQueryTimeout": queryTimeout = (Integer) a[0]; return null;
+        case "getParameterMetaData": return proxy(ParameterMetaData.class, new ParamMetaHandler());
         case "getResultSet": return proxy(ResultSet.class, new RowsHandler(columns, rows));
         case "getUpdateCount": return updateCount;
         case "getGeneratedKeys":
@@ -338,6 +339,14 @@ public final class MockDriver implements Driver {
         case "getColumnLabel": case "getColumnName": return cols[(Integer) a[0] - 1];
         default: return UNHANDLED;
       }
+    }
+  }
+
+  /** Parameter metadata handler. */
+  private static final class ParamMetaHandler extends Handler {
+    @Override
+    Object call(final Method m, final Object[] a) {
+      return m.getName().equals("getParameterType") ? Types.VARCHAR : UNHANDLED;
     }
   }
 }

@@ -11,7 +11,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.options.*;
 
 /**
- * Functions on relational databases.
+ * Function implementation.
  *
  * @author BaseX Team, BSD License
  * @author Rositsa Shadura

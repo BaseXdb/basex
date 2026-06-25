@@ -16,7 +16,7 @@ import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
- * Functions on relational databases.
+ * Function implementation.
  *
  * @author BaseX Team, BSD License
  * @author Rositsa Shadura
@@ -127,7 +127,7 @@ public class SqlExecutePrepared extends SqlExecute {
       final Item item = member.atomItem(qc, info);
       final Type type = item.type;
       if(item.isEmpty()) {
-        ps.setNull(i, java.sql.Types.NULL);
+        bindNull(i, ps);
       } else if(type == BasicType.DATE) {
         ps.setDate(i, new java.sql.Date(ms(item)));
       } else if(type == BasicType.TIME) {
@@ -139,6 +139,24 @@ public class SqlExecutePrepared extends SqlExecute {
       }
       i++;
     }
+  }
+
+  /**
+   * Binds a {@code NULL} value, using the declared parameter type if the driver exposes it.
+   * Some drivers (e.g. Oracle) reject {@link java.sql.Types#NULL} as a target type.
+   * @param i parameter index (starting with {@code 1})
+   * @param ps prepared statement
+   * @throws SQLException SQL exception
+   */
+  private static void bindNull(final int i, final PreparedStatement ps) throws SQLException {
+    int type = java.sql.Types.NULL;
+    try {
+      type = ps.getParameterMetaData().getParameterType(i);
+    } catch(final SQLException ex) {
+      // driver does not expose parameter metadata: fall back to a generic NULL type
+      Util.debug(ex);
+    }
+    ps.setNull(i, type);
   }
 
   /**
