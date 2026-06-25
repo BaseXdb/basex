@@ -8,8 +8,11 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.iter.*;
+import org.basex.query.value.*;
+import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 import org.basex.util.*;
 
 /**
@@ -30,17 +33,21 @@ public final class SqlExecutePrepared extends SqlExecute {
     final Item params = arg(1).item(qc, info);
     final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
 
-    final XNode prms = params.isEmpty() ? null : toElem(params, qc);
-    if(prms != null && !prms.qname().eq(Q_PARAMETERS)) {
-      throw UNKNOWNOPTION_X.get(info, prms.qname().local());
-    }
-
     final boolean keys = jdbc(qc).generatedKeys(ps);
+    final boolean nulls = options.get(StatementOptions.NULL);
     try {
       ps.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
-      if(prms != null) setParameters(prms.childIter(), ps);
+      if(params instanceof final XQArray array) {
+        // parameters supplied as array: one positional value per member
+        setParameters(array, ps, qc);
+      } else if(!params.isEmpty()) {
+        // parameters supplied as <sql:parameters/> element
+        final XNode prms = toElem(params, qc);
+        if(!prms.qname().eq(Q_PARAMETERS)) throw UNKNOWNOPTION_X.get(info, prms.qname().local());
+        setParameters(prms.childIter(), ps);
+      }
       // If execute returns false, statement was updating: return keys or number of updated rows
-      return iter(ps, false, ps.execute(), keys);
+      return iter(ps, false, ps.execute(), keys, nulls);
     } catch(final QueryException ex) {
       // already handled
       throw ex;
@@ -89,5 +96,45 @@ public final class SqlExecutePrepared extends SqlExecute {
         throw SQL_TYPE_X_X.get(info, type, value);
       }
     }
+  }
+
+  /**
+   * Sets the parameters of a prepared statement from an array. Each array member supplies one
+   * positional parameter; an empty sequence is bound to {@code NULL}, and the SQL type is derived
+   * from the XDM type of the value.
+   * @param array array with one value per positional parameter
+   * @param ps prepared statement
+   * @param qc query context
+   * @throws QueryException query exception
+   * @throws SQLException SQL exception
+   */
+  private void setParameters(final XQArray array, final PreparedStatement ps, final QueryContext qc)
+      throws QueryException, SQLException {
+    int i = 1;
+    for(final Value member : array.members()) {
+      final Item item = member.atomItem(qc, info);
+      final Type type = item.type;
+      if(item.isEmpty()) {
+        ps.setNull(i, java.sql.Types.NULL);
+      } else if(type == BasicType.DATE) {
+        ps.setDate(i, new java.sql.Date(ms(item)));
+      } else if(type == BasicType.TIME) {
+        ps.setTime(i, new Time(ms(item)));
+      } else if(type == BasicType.DATE_TIME) {
+        ps.setTimestamp(i, new Timestamp(ms(item)));
+      } else {
+        ps.setObject(i, item.toJava());
+      }
+      i++;
+    }
+  }
+
+  /**
+   * Returns the milliseconds since the epoch of a date/time item.
+   * @param item date, time or dateTime item
+   * @return milliseconds
+   */
+  private static long ms(final Item item) {
+    return ((ADate) item).toJava().toGregorianCalendar().getTimeInMillis();
   }
 }

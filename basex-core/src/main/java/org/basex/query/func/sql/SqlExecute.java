@@ -30,6 +30,8 @@ public class SqlExecute extends SqlFn {
   static final QNm Q_PARAMETER = new QNm(SQL_PREFIX, "parameter", SQL_URI);
   /** QName. */
   static final QNm Q_NAME = new QNm("name");
+  /** QName. */
+  static final QNm Q_NULL = new QNm("null");
 
   @Override
   public Iter iter(final QueryContext qc) throws QueryException {
@@ -37,13 +39,14 @@ public class SqlExecute extends SqlFn {
     final String statement = toString(arg(1), qc);
     final StatementOptions options = toOptions(arg(2), new StatementOptions(), qc);
     final boolean keys = options.get(StatementOptions.GENERATED_KEYS);
+    final boolean nulls = options.get(StatementOptions.NULL);
 
     try {
       final Statement stmt = conn.createStatement();
       stmt.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
       final boolean result = keys ? stmt.execute(statement, Statement.RETURN_GENERATED_KEYS) :
         stmt.execute(statement);
-      return iter(stmt, true, result, keys);
+      return iter(stmt, true, result, keys, nulls);
     } catch(final SQLTimeoutException ex) {
       throw SQL_TIMEOUT_X.get(info, ex);
     } catch(final SQLException ex) {
@@ -57,20 +60,21 @@ public class SqlExecute extends SqlFn {
    * @param close close statement after last result
    * @param result result set flag ({@code false}: statement was updating)
    * @param keys return auto-generated keys instead of the update count
+   * @param nulls represent null values as empty columns instead of omitting them
    * @return iterator
    * @throws QueryException query exception
    */
   final Iter iter(final Statement stmt, final boolean close, final boolean result,
-      final boolean keys) throws QueryException {
+      final boolean keys, final boolean nulls) throws QueryException {
 
     try {
       // updating statement: return auto-generated keys or number of updated rows
       if(!result) {
-        if(keys) return rows(stmt.getGeneratedKeys(), stmt, close);
+        if(keys) return rows(stmt.getGeneratedKeys(), stmt, close, nulls);
         return Itr.get(stmt.getUpdateCount()).iter();
       }
       // query statement: return result set
-      return rows(stmt.getResultSet(), stmt, close);
+      return rows(stmt.getResultSet(), stmt, close, nulls);
     } catch(final SQLException ex) {
       throw SQL_ERROR_X.get(info, ex);
     }
@@ -81,11 +85,12 @@ public class SqlExecute extends SqlFn {
    * @param rs result set
    * @param stmt SQL statement
    * @param close close statement after last result
+   * @param nulls represent null values as empty columns instead of omitting them
    * @return iterator
    * @throws SQLException SQL exception
    */
-  private Iter rows(final ResultSet rs, final Statement stmt, final boolean close)
-      throws SQLException {
+  private Iter rows(final ResultSet rs, final Statement stmt, final boolean close,
+      final boolean nulls) throws SQLException {
 
     final ResultSetMetaData md = rs.getMetaData();
     final int cols = md.getColumnCount();
@@ -104,12 +109,14 @@ public class SqlExecute extends SqlFn {
             // for each row add column values as children
             final String name = md.getColumnLabel(c);
             final Object value = rs.getObject(c);
-            // null values are ignored
-            if(value == null) continue;
 
             // element <sql:column name='...'>...</sql:column>
             final FBuilder column = FElem.build(Q_COLUMN).attr(Q_NAME, name);
-            if(value instanceof final SQLXML sxml) {
+            if(value == null) {
+              // null values are omitted unless requested as <sql:column name='...' null='true'/>
+              if(!nulls) continue;
+              column.attr(Q_NULL, "true");
+            } else if(value instanceof final SQLXML sxml) {
               // add XML value as child element
               final String xml = sxml.getString();
               try {
