@@ -21,7 +21,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Rositsa Shadura
  */
-public final class SqlExecutePrepared extends SqlExecute {
+public class SqlExecutePrepared extends SqlExecute {
   /** Attribute "type" of <sql:parameter/>. */
   private static final byte[] TYPE = token("type");
   /** Attribute "null" of <sql:parameter/>. */
@@ -37,15 +37,7 @@ public final class SqlExecutePrepared extends SqlExecute {
     final boolean nulls = options.get(StatementOptions.NULL);
     try {
       ps.setQueryTimeout(options.get(StatementOptions.TIMEOUT));
-      if(params instanceof final XQArray array) {
-        // parameters supplied as array: one positional value per member
-        setParameters(array, ps, qc);
-      } else if(!params.isEmpty()) {
-        // parameters supplied as <sql:parameters/> element
-        final XNode prms = toElem(params, qc);
-        if(!prms.qname().eq(Q_PARAMETERS)) throw UNKNOWNOPTION_X.get(info, prms.qname().local());
-        setParameters(prms.childIter(), ps);
-      }
+      bind(params, ps, qc);
       // If execute returns false, statement was updating: return keys or number of updated rows
       return iter(ps, false, ps.execute(), keys, nulls);
     } catch(final QueryException ex) {
@@ -55,6 +47,26 @@ public final class SqlExecutePrepared extends SqlExecute {
       // catch all kinds of exceptions
       // e.g., java.lang.ArrayIndexOutOfBoundsException in case of SQLite
       throw SQL_ERROR_X.get(info, ex);
+    }
+  }
+
+  /**
+   * Binds a single set of parameters to a prepared statement, supplied either as an array
+   * (one positional value per member) or as a {@code <sql:parameters/>} element.
+   * @param params parameters (array, element, or empty sequence)
+   * @param ps prepared statement
+   * @param qc query context
+   * @throws QueryException query exception
+   * @throws SQLException SQL exception
+   */
+  final void bind(final Item params, final PreparedStatement ps, final QueryContext qc)
+      throws QueryException, SQLException {
+    if(params instanceof final XQArray array) {
+      setParameters(array, ps, qc);
+    } else if(!params.isEmpty()) {
+      final XNode prms = toElem(params, qc);
+      if(!prms.qname().eq(Q_PARAMETERS)) throw UNKNOWNOPTION_X.get(info, prms.qname().local());
+      setParameters(prms.childIter(), ps);
     }
   }
 

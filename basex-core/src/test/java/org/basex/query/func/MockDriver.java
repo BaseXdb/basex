@@ -52,6 +52,8 @@ public final class MockDriver implements Driver {
   public static int queryTimeout;
   /** Exception thrown by the next {@code execute} call ({@code null} for none). */
   public static SQLException failure;
+  /** Bindings captured on each {@code addBatch} call. */
+  public static List<List<Object>> batches = new ArrayList<>();
 
   /** Resets configuration and recordings; call before each test. */
   public static void reset() {
@@ -68,6 +70,7 @@ public final class MockDriver implements Driver {
     keysRequested = false;
     queryTimeout = 0;
     failure = null;
+    batches = new ArrayList<>();
   }
 
   /**
@@ -266,6 +269,14 @@ public final class MockDriver implements Driver {
               i == Statement.RETURN_GENERATED_KEYS) keysRequested = true;
           executed.add(s);
           return isQuery(s);
+        case "addBatch":
+          batches.add(new ArrayList<>(bindings));
+          return null;
+        case "executeBatch":
+          if(failure != null) throw failure;
+          final int[] counts = new int[batches.size()];
+          Arrays.fill(counts, 1);
+          return counts;
         default:
           // record parameter binding: setX(int index, value), setNull(int index, int type)
           if(n.startsWith("set") && a != null && a[0] instanceof final Integer index) {

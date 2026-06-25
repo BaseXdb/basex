@@ -1866,6 +1866,9 @@ public enum Function implements AFunction {
   _SQL_EXECUTE(SqlExecute::new, "execute(id,statement[,options])",
       params(INTEGER_O, STRING_O, MAP_ZO), ITEM_ZM, flag(NDT), SQL_URI, Perm.CREATE),
   /** XQuery function. */
+  _SQL_EXECUTE_BATCH(SqlExecuteBatch::new, "execute-batch(id[,params,options])",
+      params(INTEGER_O, ITEM_ZM, MAP_ZO), INTEGER_ZM, flag(NDT), SQL_URI, Perm.CREATE),
+  /** XQuery function. */
   _SQL_EXECUTE_PREPARED(SqlExecutePrepared::new, "execute-prepared(id[,params,options])",
       params(INTEGER_O, ITEM_ZO, MAP_ZO), ITEM_ZM, flag(NDT), SQL_URI, Perm.CREATE),
   /** XQuery function. */

@@ -133,6 +133,22 @@ public final class SqlModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void executeBatch() {
+    final Function func = _SQL_EXECUTE_BATCH;
+    // two parameter sets via the array form: one update count per set
+    final String batch = "let $c := " + _SQL_CONNECT.args(URL) +
+        " let $p := " + _SQL_PREPARE.args(" $c", "insert into t values (?, ?)") +
+        " return " + func.args(" $p", " ([ 1, 'a' ], [ 2, 'b' ])");
+    query("count(" + batch + ")", 2);
+    // each set was bound positionally and added to the batch, in order
+    assertEquals(2, MockDriver.batches.size());
+    assertEquals(1L, MockDriver.batches.get(0).get(0));
+    assertEquals("a", MockDriver.batches.get(0).get(1));
+    assertEquals(2L, MockDriver.batches.get(1).get(0));
+    assertEquals("b", MockDriver.batches.get(1).get(1));
+  }
+
+  /** Test method. */
   @Test public void commit() {
     final Function func = _SQL_COMMIT;
     query(conn(func.args(" $c")), "");
