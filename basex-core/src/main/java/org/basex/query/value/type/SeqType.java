@@ -310,6 +310,9 @@ public final class SeqType {
       throws QueryException {
     final Type at = item.type;
     if(at.instanceOf(type)) return item;
+    // xs:error has an empty value space: function conversion never casts to it, so coercion
+    // always fails and the caller reports a type error (XPTY0004)
+    if(type == ERROR) return null;
 
     Item relabel = null;
     if(at == UNTYPED_ATOMIC) {
@@ -390,6 +393,11 @@ public final class SeqType {
    */
   public SeqType intersect(final SeqType st) {
     if(this == st) return this;
+    // a void type (xs:error, xs:error+) is the bottom of the sequence-type lattice, so it is the
+    // intersection (greatest lower bound) with any type, irrespective of the occurrence indicator.
+    // if both are void, the occurrences are intersected, so the result is order-independent
+    if(voidType()) return st.voidType() ? get(type, occ.intersect(st.occ)) : this;
+    if(st.voidType()) return st;
     final Type tp = type.intersect(st.type);
     if(tp == null) return null;
     final Occ oc = occ.intersect(st.occ);
@@ -430,6 +438,25 @@ public final class SeqType {
   }
 
   /**
+   * Tests if this is a sequence type of the <i>void</i> category ({@code xs:error} or
+   * {@code xs:error+}): it has no instances, so an expression of this type never returns a value
+   * (see the subtype rules in the specification, "Subtypes of Sequence Types").
+   * @return result of check
+   */
+  public boolean voidType() {
+    return type == BasicType.ERROR && oneOrMore();
+  }
+
+  /**
+   * Tests if this is a sequence type of the <i>empty</i> category ({@code empty-sequence()},
+   * {@code xs:error?} or {@code xs:error*}): the empty sequence is its only instance.
+   * @return result of check
+   */
+  public boolean emptyType() {
+    return zero() || type == BasicType.ERROR && !oneOrMore();
+  }
+
+  /**
    * Tests if expressions of this type may yield numbers.
    * @return result of check
    */
@@ -457,8 +484,11 @@ public final class SeqType {
    */
   public boolean instanceOf(final SeqType st) {
     if(this == st) return true;
-    // empty sequence: only check cardinality
-    if(zero()) return !st.oneOrMore();
+    // void category (xs:error, xs:error+): no instances, a subtype of every sequence type
+    if(voidType()) return true;
+    // empty category (empty-sequence(), xs:error?, xs:error*): the empty sequence is the only
+    // instance, a subtype of every sequence type that permits the empty sequence
+    if(emptyType()) return !st.oneOrMore();
     if(!occ.instanceOf(st.occ)) return false;
     return st.type instanceof final ChoiceItemType cit ? cit.hasInstance(type)
                                                        : type.instanceOf(st.type);

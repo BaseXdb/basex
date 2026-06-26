@@ -66,7 +66,8 @@ abstract class Convert extends Single {
 
       final Type et = est.type;
       if(et.instanceOf(castType.type) && est.occ.instanceOf(castType.occ) &&
-          (et.eq(castType.type) || castType.type == BasicType.NUMERIC)) return true;
+          (et.eq(castType.type) || castType.type == BasicType.NUMERIC) &&
+          castType.type != BasicType.ERROR) return true;
     }
     return null;
   }

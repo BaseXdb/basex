@@ -106,6 +106,7 @@ public final class EnumType implements Type {
   public Type union(final Type type) {
     if(type == this) return this;
     if(type instanceof ChoiceItemType) return type.union(this);
+    if(type.instanceOf(this)) return this;
     if(type instanceof final EnumType et) {
       final TokenSet tv = et.values;
       final TokenSet ts = new TokenSet();
@@ -122,6 +123,7 @@ public final class EnumType implements Type {
   public Type intersect(final Type type) {
     if(type instanceof ChoiceItemType) return type.intersect(this);
     if(instanceOf(type)) return this;
+    if(type.instanceOf(this)) return type;
     if(type instanceof final EnumType et) {
       final TokenSet ts = new TokenSet();
       final TokenSet tv = et.values;

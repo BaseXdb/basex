@@ -878,4 +878,54 @@ public final class XQuery4Test extends SandboxTest {
     check("(substring-before(?, 'b'), substring-before(?, 'c'))('abc')", "a\nab",
         root(StrSeq.class));
   }
+
+  /** Tests involving type xs:error. */
+  @Test public void xsError() {
+    error("23 ! xs:error()", FUNCCAST_X_X);
+    error("xs:error(23)", FUNCCAST_X_X);
+    error("23 cast as xs:error", FUNCCAST_X_X);
+    error("23 cast as xs:error?", FUNCCAST_X_X);
+    error("() cast as xs:error", INVTYPE_X);
+    error("(1, 2) cast as xs:error", INVTYPE_X);
+    error("(1, 2) cast as xs:error?", INVTYPE_X);
+    query("xs:error(())", "");
+    query("() cast as xs:error?", "");
+    query("23 instance of xs:error", false);
+    query("23 castable as xs:error", false);
+
+    // xs:error? (empty category) and xs:error (void category) as function return types
+    query("xs:error#1 instance of function(xs:anyAtomicType?) as empty-sequence()", true);
+    query("xs:error#1 instance of function(xs:anyAtomicType?) as xs:error?", true);
+    query("xs:error#1 instance of function(xs:anyAtomicType?) as xs:string", false);
+    query("fn() as xs:error { error() } instance of function() as empty-sequence()", true);
+
+    // coercion to xs:error (function conversion, type declarations) is a type error, not a cast
+    error("declare function local:f($a as xs:error) { $a }; local:f(1)", INVTYPE_X);
+    error("fn($a as xs:error) { $a }(1)", INVTYPE_X);
+    error("fn($a as xs:error) { $a }(xs:untypedAtomic('x'))", INVTYPE_X);
+    error("let $x as xs:error := 1 return $x", INVTYPE_X);
+
+    query("fn:error(code := ?, description := ?, value := ?) instance of function(xs:QName?, xs:str"
+        + "ing?, item()*) as xs:error", true);
+
+    // error() is void: optimizations must not discard it without evaluating it
+    error("exactly-one((true(), error()))", FUNERR1);
+    error("zero-or-one((true(), error()))", FUNERR1);
+    error("remove(error(), 1)", FUNERR1);
+    error("tail(error())", FUNERR1);
+    error("trunk(error())", FUNERR1);
+    error("error() castable as xs:error", FUNERR1);
+    error("declare function local:f() as empty-sequence() { error() }; local:f()", FUNERR1);
+
+    // functions whose result depends on the value or cardinality of error() must evaluate it
+    error("empty(error())", FUNERR1);
+    error("exists(error())", FUNERR1);
+    error("count(error())", FUNERR1);
+    error("boolean(error())", FUNERR1);
+    error("sum(error())", FUNERR1);
+    error("head(error())", FUNERR1);
+    error("reverse(error())", FUNERR1);
+    error("string(error())", FUNERR1);
+    error("duplicate-values(error())", FUNERR1);
+  }
 }

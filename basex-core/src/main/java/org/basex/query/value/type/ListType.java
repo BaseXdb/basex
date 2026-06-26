@@ -136,7 +136,8 @@ public enum ListType implements Type {
 
   @Override
   public final Type union(final Type tp) {
-    return this == tp ? tp : tp instanceof ChoiceItemType ? tp.union(this) : BasicType.ITEM;
+    return this == tp ? tp : tp instanceof ChoiceItemType ? tp.union(this) :
+      tp.instanceOf(this) ? this : BasicType.ITEM;
   }
 
   @Override

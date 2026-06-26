@@ -135,7 +135,7 @@ public final class ChoiceItemType implements Type {
 
   @Override
   public Type union(final Type type) {
-    return union.union(type);
+    return type == BasicType.ERROR ? this : union.union(type);
   }
 
   @Override
