@@ -58,7 +58,16 @@ public final class TypeCheck extends Single {
       final Occ nocc = et.occ.intersect(st.occ);
       // raise static error if no intersection is possible:
       //   () coerce to item()
-      if(nocc == null) throw typeError(expr, st, info);
+      if(nocc == null) {
+        // the void type xs:error is a subtype of every type, so its occurrence indicator must
+        // not trigger a cardinality error
+        //   fn:error() coerce to empty-sequence()
+        if(et.instanceOf(st)) {
+          cc.info(OPTTYPE_X_X, st, expr);
+          return expr;
+        }
+        throw typeError(expr, st, info);
+      }
       // refine result type:
       //   INTEGERS coerce to item() → INTEGERS coerce to xs:integer
       if(cardinality) st = nst;

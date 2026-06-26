@@ -101,10 +101,10 @@ public final class ArrayType extends FType {
   }
 
   @Override
-  public ArrayType intersect(final Type type) {
-    if(type instanceof ChoiceItemType) return (ArrayType) type.intersect(this);
+  public Type intersect(final Type type) {
+    if(type instanceof ChoiceItemType) return type.intersect(this);
     if(instanceOf(type)) return this;
-    if(type.instanceOf(this)) return (ArrayType) type;
+    if(type.instanceOf(this)) return type;
 
     if(type instanceof final ArrayType at) {
       final SeqType mt = valueType.intersect(at.valueType);

@@ -262,7 +262,7 @@ public enum Function implements AFunction {
       params(STRING_O), STRING_ZO, flag(), FN_URI, Perm.ADMIN),
   /** XQuery function. */
   ERROR(FnError::new, "error([code,description,value])",
-      params(QNAME_ZO, STRING_ZO, ITEM_ZM), ITEM_ZM, flag(NDT)),
+      params(QNAME_ZO, STRING_ZO, ITEM_ZM), ERROR_O, flag(NDT)),
   /** XQuery function. */
   ESCAPE_HTML_URI(FnEscapeHtmlUri::new, "escape-html-uri(value)",
       params(STRING_ZO), STRING_O),

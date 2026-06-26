@@ -26,8 +26,14 @@ import org.junit.jupiter.api.Test;
 public final class SeqTypeTest {
   /** Occurrences. */
   private static final Occ[] OCCS = { ZERO, ZERO_OR_ONE, EXACTLY_ONE, ZERO_OR_MORE, ONE_OR_MORE };
-  /** Error type. */
+  /** Error type (void category). */
   private static final SeqType ERROR_O = ERROR.seqType();
+  /** Error type {@code xs:error?} (empty category). */
+  private static final SeqType ERROR_ZO = ERROR.seqType(ZERO_OR_ONE);
+  /** Error type {@code xs:error*} (empty category). */
+  private static final SeqType ERROR_ZM = ERROR.seqType(ZERO_OR_MORE);
+  /** Error type {@code xs:error+} (void category). */
+  private static final SeqType ERROR_OM = ERROR.seqType(ONE_OR_MORE);
 
   /** Type gnode(). */
   private static final SeqType GNODE_O = GNODE.seqType();
@@ -167,6 +173,19 @@ public final class SeqTypeTest {
   }
 
   /**
+   * Tests that a void type ({@code xs:error}) reports an unknown result size: it has no instances
+   * and never returns a value, so size-based optimizations must not treat it as a single item (e.g.
+   * {@code count(local:f())} for a recursive {@code local:f() as xs:error} must not fold to 1).
+   */
+  @Test public void voidSize() {
+    assertEquals(-1, new ExprType(ERROR_O).size());
+    assertEquals(-1, new ExprType(ERROR.seqType(ONE_OR_MORE)).size());
+    // ordinary occurrences still derive the size from the occurrence indicator
+    assertEquals(1, new ExprType(STRING_O).size());
+    assertEquals(0, new ExprType(EMPTY_SEQUENCE_Z).size());
+  }
+
+  /**
    * Tests for {@link SeqType#instanceOf(SeqType)}.
    * @throws QueryException query exception
    */
@@ -178,7 +197,36 @@ public final class SeqTypeTest {
     assertFalse(DOUBLE_ZM.instanceOf(DOUBLE_O));
     assertFalse(DATE_TIME_O.instanceOf(DATE_TIME_STAMP_O));
     assertTrue(DATE_TIME_STAMP_O.instanceOf(DATE_TIME_O));
+
     assertTrue(ERROR_O.instanceOf(ANY_ATOMIC_TYPE_O));
+    assertTrue(ERROR.instanceOf(STRING));
+    assertTrue(ERROR.instanceOf(NUMERIC));
+    assertTrue(ERROR.instanceOf(NODE));
+    assertTrue(ERROR.instanceOf(FUNCTION));
+    assertTrue(ERROR.instanceOf(MAP));
+    assertTrue(ERROR.instanceOf(ARRAY));
+    assertTrue(ERROR.instanceOf(RECORD));
+    assertTrue(ERROR.instanceOf(ChoiceItemType.get(STRING, ELEMENT)));
+
+    assertFalse(STRING.instanceOf(ERROR));
+    assertFalse(NODE.instanceOf(ERROR));
+
+    assertTrue(ERROR_ZO.instanceOf(EMPTY_SEQUENCE_Z));
+    assertTrue(ERROR_ZO.instanceOf(STRING_ZO));
+    assertTrue(ERROR_ZO.instanceOf(STRING_ZM));
+    assertFalse(ERROR_ZO.instanceOf(STRING_O));
+    assertFalse(ERROR_ZO.instanceOf(STRING_OM));
+    assertFalse(ERROR_ZO.instanceOf(ERROR_O));
+    assertTrue(ERROR_ZM.instanceOf(EMPTY_SEQUENCE_Z));
+    assertTrue(ERROR_ZM.instanceOf(STRING_ZM));
+    assertFalse(ERROR_ZM.instanceOf(STRING_O));
+    assertTrue(ERROR_O.instanceOf(ERROR_ZO));
+    assertTrue(ERROR_O.instanceOf(ERROR_OM));
+    assertTrue(ERROR_OM.instanceOf(ERROR_O));
+    assertFalse(ERROR_ZO.instanceOf(ERROR_O));
+    assertTrue(EMPTY_SEQUENCE_Z.instanceOf(ERROR_ZO));
+    assertFalse(STRING_ZO.instanceOf(ERROR_ZO));
+    assertFalse(STRING_O.instanceOf(ERROR_ZO));
 
     // functions
     final SeqType f = FuncType.get(DECIMAL_ZO, BOOLEAN_O).seqType();
@@ -415,7 +463,6 @@ public final class SeqTypeTest {
     combine(NODE_O, op);
     combine(DATE_TIME_O, op);
     combine(DATE_TIME_STAMP_O, op);
-    combine(ERROR_O, op);
 
     combine(STRING_O, INTEGER_O, ANY_ATOMIC_TYPE_O, op);
     combine(STRING_O, STRING_O, STRING_O, op);
@@ -424,7 +471,32 @@ public final class SeqTypeTest {
     combine(STRING_O, NORMALIZED_STRING.seqType(), STRING_O, op);
     combine(DATE_TIME_STAMP_O, DATE_TIME_O, DATE_TIME_O, op);
     combine(DATE_TIME_O, DATE_TIME_STAMP_O, DATE_TIME_O, op);
+
+    combine(ERROR_O, op);
+    combine(ERROR_O, STRING_O, STRING_O, op);
+    combine(ERROR_O, STRING_ZO, STRING_ZO, op);
+    combine(ERROR_O, STRING_OM, STRING_OM, op);
+    combine(ERROR_O, STRING_ZM, STRING_ZM, op);
+    combine(ERROR_O, EMPTY_SEQUENCE_Z, ERROR_ZO, op);
+    combine(ERROR_OM, STRING_O, STRING_OM, op);
+    combine(ERROR_OM, STRING_ZO, STRING_ZM, op);
+    combine(ERROR_OM, STRING_OM, STRING_OM, op);
+    combine(ERROR_OM, STRING_ZM, STRING_ZM, op);
+    combine(ERROR_OM, EMPTY_SEQUENCE_Z, ERROR_ZM, op);
+    combine(ERROR_ZO, STRING_O, STRING_ZO, op);
+    combine(ERROR_ZO, STRING_ZO, STRING_ZO, op);
+    combine(ERROR_ZO, STRING_OM, STRING_ZM, op);
+    combine(ERROR_ZO, STRING_ZM, STRING_ZM, op);
+    combine(ERROR_ZO, EMPTY_SEQUENCE_Z, ERROR_ZO, op);
+    combine(ERROR_ZM, STRING_O, STRING_ZM, op);
+    combine(ERROR_ZM, STRING_ZO, STRING_ZM, op);
+    combine(ERROR_ZM, STRING_OM, STRING_ZM, op);
+    combine(ERROR_ZM, STRING_ZM, STRING_ZM, op);
+    combine(ERROR_ZM, EMPTY_SEQUENCE_Z, ERROR_ZM, op);
+    combine(ERROR_ZO, ERROR_O, ERROR_ZO, op);
     combine(ERROR_O, POSITIVE_INTEGER_O, POSITIVE_INTEGER_O, op);
+    combine(ERROR_O, NMTOKENS.seqType(), NMTOKENS.seqType(), op);
+    combine(ERROR_O, ERROR_OM, ERROR_OM, op);
 
     combine(ELEMENT_O, STRING_O, ITEM_O, op);
     combine(JNODE_O, GNODE_O, GNODE_O, op);
@@ -447,6 +519,7 @@ public final class SeqTypeTest {
     combine(ATTRIBUTE_O, ELEMENT_O, NODE_O, op);
     combine(ELEMENT_O, JNODE_O, GNODE_O, op);
     combine(ELEMENT_X_O, ATTRIBUTE_O, NODE_O, op);
+    combine(GNODE_O, ERROR_O, GNODE_O, op);
 
     combine(JNODE_XX_O, JNODE_XX_O, JNODE_XX_O, op);
     combine(JNODE_XX_O, JNODE_XI_O, JNODE_XX_O, op);
@@ -462,6 +535,7 @@ public final class SeqTypeTest {
     combine(MAP_O, ITEM_O, ITEM_O, op);
     combine(MAP_O, FUNCTION_O, FUNCTION_O, op);
     combine(MAP_O, ARRAY_O, FUNCTION_O, op);
+    combine(MAP_O, ERROR_O, MAP_O, op);
 
     // functions
     final SeqType
@@ -486,6 +560,7 @@ public final class SeqTypeTest {
 
     combine(f1, INTEGER_O, ITEM_O, op);
     combine(f1, FUNCTION_O, FUNCTION_O, op);
+    combine(f1, ERROR_O, f1, op);
     combine(f1, f2, f1, op);
     combine(f1, f3, FUNCTION_O, op);
     combine(f1, f4, FUNCTION_O, op);
@@ -513,7 +588,9 @@ public final class SeqTypeTest {
     combine(m4, op);
 
     combine(MAP_O, m1, MAP_O, op);
+    combine(MAP_O, ERROR_O, MAP_O, op);
     combine(m1, INTEGER_O, ITEM_O, op);
+    combine(m1, ERROR_O, m1, op);
     combine(m1, f1, f1, op);
     combine(m1, f2, f6, op);
     combine(m1, m2, m1, op);
@@ -536,7 +613,9 @@ public final class SeqTypeTest {
     combine(a4, op);
 
     combine(ARRAY_O, a1, ARRAY_O, op);
+    combine(ARRAY_O, ERROR_O, ARRAY_O, op);
     combine(a1, INTEGER_O, ITEM_O, op);
+    combine(a1, ERROR_O, a1, op);
     combine(a1, a2, a2, op);
     combine(a1, a3, a1, op);
     combine(a1, f1, FUNCTION_O, op);
@@ -558,6 +637,7 @@ public final class SeqTypeTest {
     combine(e1, STRING_O, STRING_O, op);
     combine(e1, LANGUAGE_O, STRING_O, op);
     combine(e1, INTEGER_O, ANY_ATOMIC_TYPE_O, op);
+    combine(e1, ERROR_O, e1, op);
 
     final SeqType
       // (xs:date | xs:string)
@@ -576,6 +656,7 @@ public final class SeqTypeTest {
     combine(c1, op);
     combine(c1, DATE_O, ANY_ATOMIC_TYPE_O, op);
     combine(c1, STRING_O, ANY_ATOMIC_TYPE_O, op);
+    combine(c1, ERROR_O, c1, op);
     combine(c2, op);
     combine(c2, ELEMENT_O, ITEM_O, op);
     combine(c2, STRING_O, ITEM_O, op);
@@ -659,11 +740,15 @@ public final class SeqTypeTest {
     combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
     combine(RECORD_O, MAP_O, MAP_O, op);
     combine(RECORD_O, r1, r5, op);
+    combine(RECORD_O, ERROR_O, RECORD_O, op);
     combine(FUNCTION_O, r1, FUNCTION_O, op);
+    combine(FUNCTION_O, ERROR_O, FUNCTION_O, op);
     combine(MAP_O, r1, MAP_O, op);
+    combine(MAP_O, ERROR_O, MAP_O, op);
     combine(r1, r2, r3, op);
     combine(r1, r3, r3, op);
     combine(r1, r1, r1, op);
+    combine(r1, ERROR_O, r1, op);
     combine(r5, r1, r5, op);
     combine(r1, r6, r7, op);
     combine(r2, r6, r11, op);
@@ -689,7 +774,33 @@ public final class SeqTypeTest {
     combine(NODE_O, op);
     combine(DATE_TIME_O, op);
     combine(DATE_TIME_STAMP_O, op);
-    combine(ERROR_O, ITEM_O, ITEM_O, op);
+
+    combine(ERROR_O, ITEM_O, ERROR_O, op);
+    combine(ERROR_O, POSITIVE_INTEGER_O, ERROR_O, op);
+    combine(ERROR_O, STRING_O, ERROR_O, op);
+    combine(ERROR_O, STRING_ZO, ERROR_O, op);
+    combine(ERROR_O, STRING_OM, ERROR_O, op);
+    combine(ERROR_O, STRING_ZM, ERROR_O, op);
+    combine(ERROR_O, EMPTY_SEQUENCE_Z, ERROR_O, op);
+    combine(ERROR_OM, STRING_O, ERROR_OM, op);
+    combine(ERROR_OM, STRING_ZO, ERROR_OM, op);
+    combine(ERROR_OM, STRING_OM, ERROR_OM, op);
+    combine(ERROR_OM, STRING_ZM, ERROR_OM, op);
+    combine(ERROR_OM, EMPTY_SEQUENCE_Z, ERROR_OM, op);
+    combine(ERROR_ZO, STRING_O, ERROR_O, op);
+    combine(ERROR_ZO, STRING_ZO, ERROR_ZO, op);
+    combine(ERROR_ZO, STRING_OM, ERROR_O, op);
+    combine(ERROR_ZO, STRING_ZM, ERROR_ZO, op);
+    combine(ERROR_ZO, EMPTY_SEQUENCE_Z, EMPTY_SEQUENCE_Z, op);
+    combine(ERROR_ZM, STRING_O, ERROR_O, op);
+    combine(ERROR_ZM, STRING_ZO, ERROR_ZO, op);
+    combine(ERROR_ZM, STRING_OM, ERROR_OM, op);
+    combine(ERROR_ZM, STRING_ZM, ERROR_ZM, op);
+    combine(ERROR_ZM, EMPTY_SEQUENCE_Z, EMPTY_SEQUENCE_Z, op);
+    combine(ERROR_ZO, ERROR_O, ERROR_O, op);
+    combine(ERROR_O, ARRAY_O, ERROR_O, op);
+    combine(ERROR_O, NMTOKENS.seqType(), ERROR_O, op);
+    combine(ERROR_O, ERROR_OM, ERROR_O, op);
 
     combine(DATE_TIME_O, DATE_TIME_STAMP_O, DATE_TIME_STAMP_O, op);
     combine(DATE_TIME_STAMP_O, DATE_TIME_O, DATE_TIME_STAMP_O, op);
@@ -717,6 +828,7 @@ public final class SeqTypeTest {
     combine(ATTRIBUTE_O, ELEMENT_O, null, op);
     combine(ELEMENT_O, JNODE_O, null, op);
     combine(ELEMENT_X_O, ATTRIBUTE_O, null, op);
+    combine(GNODE_O, ERROR_O, ERROR_O, op);
 
     combine(JNODE_XX_O, JNODE_XX_O, JNODE_XX_O, op);
     combine(JNODE_XX_O, JNODE_XI_O, JNODE_XI_O, op);
@@ -760,6 +872,7 @@ public final class SeqTypeTest {
 
     combine(NODE_O, INTEGER_O, null, op);
     combine(f1, INTEGER_O, null, op);
+    combine(f1, ERROR_O, ERROR_O, op);
     combine(f1, f1, f1, op);
     combine(f1, f2, f2, op);
     combine(f1, f5, f5, op);
@@ -785,6 +898,7 @@ public final class SeqTypeTest {
     combine(m1, f1, m1, op);
     combine(m1, ITEM_O, m1, op);
     combine(m1, INTEGER_O, null, op);
+    combine(m1, ERROR_O, ERROR_O, op);
     combine(m1, m2, m2, op);
     combine(m2, MapType.get(BOOLEAN, BOOLEAN_O).seqType(), null, op);
     combine(m1, FUNCTION_O, m1, op);
@@ -839,6 +953,7 @@ public final class SeqTypeTest {
     combine(e1, STRING_O, e1, op);
     combine(e1, LANGUAGE_O, null, op);
     combine(e1, INTEGER_O, null, op);
+    combine(e1, ERROR_O, ERROR_O, op);
 
     final SeqType
       // (xs:date | xs:string)
@@ -859,6 +974,7 @@ public final class SeqTypeTest {
     combine(c1, STRING_O, STRING_O, op);
     combine(c1, INTEGER_O, null, op);
     combine(c1, ITEM_O, c1, op);
+    combine(c1, ERROR_O, ERROR_O, op);
     combine(c2, op);
     combine(c2, ELEMENT_O, ELEMENT_O, op);
     combine(c2, STRING_O, STRING_O, op);
@@ -941,11 +1057,15 @@ public final class SeqTypeTest {
     combine(RECORD_O, FUNCTION_O, RECORD_O, op);
     combine(RECORD_O, MAP_O, RECORD_O, op);
     combine(RECORD_O, r1, null, op);
+    combine(RECORD_O, ERROR_O, ERROR_O, op);
     combine(FUNCTION_O, r1, r1, op);
+    combine(FUNCTION_O, ERROR_O, ERROR_O, op);
     combine(MAP_O, r1, r1, op);
+    combine(MAP_O, ERROR_O, ERROR_O, op);
     combine(r1, r2, null, op);
     combine(r1, r3, r1, op);
     combine(r1, r1, r1, op);
+    combine(r1, ERROR_O, ERROR_O, op);
     combine(r5, r1, r1, op);
     combine(r1, r6, null, op);
     combine(r2, r6, null, op);

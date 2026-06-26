@@ -43,7 +43,13 @@ public enum BasicType implements Type {
   ANY_ATOMIC_TYPE("anyAtomicType", ITEM, Type.ID.AAT, false, false),
 
   /** Error type. */
-  ERROR("error", ANY_ATOMIC_TYPE, Type.ID.ERR, false, false),
+  ERROR("error", ANY_ATOMIC_TYPE, Type.ID.ERR, false, false) {
+    @Override
+    public Item cast(final Item item, final QueryContext qc, final InputInfo info)
+        throws QueryException {
+      return cast((Object) item, qc, info);
+    }
+  },
 
   /** Untyped Atomic type. */
   UNTYPED_ATOMIC("untypedAtomic", ANY_ATOMIC_TYPE, Type.ID.ATM, false, false) {
@@ -1045,7 +1051,8 @@ public enum BasicType implements Type {
 
   @Override
   public final boolean instanceOf(final Type type) {
-    if(type == this || type == ITEM) return true;
+    // xs:error is a union type with no members, a subtype of every item type
+    if(this == ERROR || type == this || type == ITEM) return true;
     if(type instanceof final BasicType bt) {
       return (prePost & 0xFF) >= (bt.prePost & 0xFF) && (prePost & 0xFF00) <= (bt.prePost & 0xFF00);
     }
@@ -1071,8 +1078,8 @@ public enum BasicType implements Type {
 
   @Override
   public final Type intersect(final Type type) {
-    if(this == ERROR) return type;
-    if(type == ERROR) return this;
+    // xs:error is the bottom type, so it is the intersection (greatest lower bound) with any type
+    if(ERROR.oneOf(this, type)) return ERROR;
     if(type instanceof ChoiceItemType) return type.intersect(this);
     if(instanceOf(type)) return this;
     if(type.instanceOf(this)) return type;
