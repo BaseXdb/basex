@@ -841,6 +841,19 @@ public final class XQuery4Test extends SandboxTest {
       ["1",("2","3","4","5","6"),3]""");
   }
 
+  /** EQNames: optional prefix syntax (qtspecs#2227) must not swallow a following ":=". */
+  @Test public void eqName() {
+    query("let $Q{}foo := 1 return $Q{}foo", 1);
+    query("let $Q{u}foo := 1 return $Q{u}foo", 1);
+
+    // optional prefix in EQName syntax (Q{uri}prefix:local) must still be parsed
+    query("Q{http://www.w3.org/2005/xpath-functions}fn:abs(-1)", 1);
+    query("1 instance of Q{http://www.w3.org/2001/XMLSchema}xs:integer", true);
+
+    // gh-2701: URIQualifiedName variable directly followed by ":=" (no intervening whitespace)
+    query("let $Q{}foo:=1 return $Q{}foo", 1);
+  }
+
   /** Calls of dynamic function sequences. */
   @Test public void dynamicFunctionSequences() {
     // empty sequences
