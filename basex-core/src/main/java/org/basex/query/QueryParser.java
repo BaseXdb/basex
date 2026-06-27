@@ -4395,16 +4395,20 @@ public class QueryParser extends InputParser {
    */
   private QNm eQName(final byte[] ns, final QueryError error) throws QueryException {
     // parse URIQualifiedName
-    final int p = pos;
+    int p = pos;
     if(consume("Q{")) {
       final byte[] uri = bracedURILiteral(), name1 = ncName(null, true);
       if(name1.length != 0) {
-        if(!consume(':')) return new QNm(name1, uri);
-        final byte[] name2 = ncName(null, true);
-        if(name2.length != 0) {
-          if(uri.length == 0) throw error(PREFIXNOURI_X, name2);
-          return new QNm(name1, name2, uri);
+        p = pos;
+        if(consume(':')) {
+          final byte[] name2 = ncName(null, true);
+          if(name2.length != 0) {
+            if(uri.length == 0) throw error(PREFIXNOURI_X, name2);
+            return new QNm(name1, name2, uri);
+          }
+          pos = p;
         }
+        return new QNm(name1, uri);
       }
       pos = p;
     }
