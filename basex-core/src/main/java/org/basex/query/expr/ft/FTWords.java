@@ -359,7 +359,10 @@ public final class FTWords extends FTExpr {
         break;
       case ALL_WORDS:
       case ANY_WORD:
-        final FTLexer lexer = new FTLexer(ftOpt);
+        // split into words only; stemming is applied once downstream (cache / index lexer)
+        final FTOpt opt = ftOpt.copy();
+        opt.set(ST, false);
+        final FTLexer lexer = new FTLexer(opt);
         for(final byte[] token : tokens) {
           lexer.init(token);
           while(lexer.hasNext()) ts.add(lexer.nextToken());

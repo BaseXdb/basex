@@ -331,6 +331,12 @@ abstract class FTTest extends QueryTest {
         "'symposia' contains text 'symposium' using stemming" },
       { "FTStemming 14", booleans(true),
         "'men' contains text 'man' using stemming" },
+      { "FTStemming 15", booleans(true),
+        "'adverse' contains text 'adverse' all words using stemming" },
+      { "FTStemming 16", booleans(true),
+        "'adverse' contains text 'adverse' any word using stemming" },
+      { "FTStemming 17", booleans(true),
+        "'fox' contains text 'fox' any word using stemming" },
 
       { "FTLanguage 1", nodes(14),
         "//*[text() contains text 'hello' using language 'en']" },
@@ -380,6 +386,8 @@ abstract class FTTest extends QueryTest {
         "//order contains text 'A B' all words ordered" },
       { "FTOrdered 15", booleans(true),
         "//order contains text 'B A' all words ordered" },
+      { "FTOrdered 16", booleans(true),
+        "'a b c b' contains text 'a b c' all words ordered" },
 
       { "FTDistance 1", nodes(3),
         "//w[text() contains text 'the' ftand 'fourth' " +
@@ -427,6 +435,19 @@ abstract class FTTest extends QueryTest {
       { "FTWindow 5", nodes(37),
         "//w[. contains text 'fifth' ftand 'third' " +
         "ftand 'second' window 7 words ordered]" },
+      { "FTWindow 6", booleans(true),
+        "'a b b' contains text 'a b' all words window 2 words" },
+      { "FTWindow 7", booleans(true),
+        "'b a b' contains text 'a b' all words window 2 words" },
+      { "FTWindow 8", booleans(true),
+        "'a b a b' contains text 'a b' all words window 2 words" },
+      { "FTWindow 9", booleans(true),
+        "'a a b' contains text 'a b' all words window 2 words" },
+      { "FTWindow 10", booleans(false),
+        "'a b b' contains text 'a b' all words window 1 words" },
+      { "FTWindow 11", booleans(true),
+        "'a single event during the custodial history of a manuscript or other object.'" +
+        " contains text 'custodial history of a manuscript' all words window 5 words" },
 
       { "FTScope 1", nodes(27, 29, 33),
         "//fti[. contains text 'wordt ook' same sentence]" },

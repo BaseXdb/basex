@@ -62,6 +62,21 @@ public final class FTIndexQueryTest extends FTTest {
   }
 
   /**
+   * Tests window, ordered, and stemming fixes from issue #2141.
+   */
+  @Test public void testIssue2141() {
+    init("<x>a b b</x>");
+    assertQuery("Issue2141 Window 1",
+        "//*[text() contains text 'a b' all words window 2 words]");
+    init("<x>a b c b</x>");
+    assertQuery("Issue2141 Ordered 1",
+        "//*[text() contains text 'a b c' all words ordered]");
+    init("<x>adverse</x>");
+    assertQuery("Issue2141 Stemming 1",
+        "//*[text() contains text 'adverse' all words using stemming]");
+  }
+
+  /**
    * Tests mixed content.
    */
   @Test public void mixedContent() {

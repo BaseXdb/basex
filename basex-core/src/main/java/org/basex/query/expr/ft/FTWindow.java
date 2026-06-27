@@ -57,11 +57,45 @@ public final class FTWindow extends FTFilter {
       throws QueryException {
 
     final int n = (int) toLong(win, qc) - 1;
-    match.sort();
 
-    FTStringMatch first = null;
+    // excluded matches participate in the window offset check (combinations cover includes)
+    final FTMatch excludes = new FTMatch();
     for(final FTStringMatch sm : match) {
-      if(sm.exclude) continue;
+      if(sm.exclude) excludes.add(sm);
+    }
+
+    // try each one-occurrence-per-query-position combination; snapshot/restore first.end and
+    // first.gaps, which phase 1 mutates in place, across iterations
+    for(final FTMatch combo : combine(match)) {
+      combo.sort();
+      final FTStringMatch first = combo.get(0);
+      final int savedEnd = first.end;
+      final boolean savedGaps = first.gaps;
+      if(window(combo, excludes, n, lexer)) {
+        match.reset();
+        match.add(first);
+        return true;
+      }
+      first.end = savedEnd;
+      first.gaps = savedGaps;
+    }
+    return false;
+  }
+
+  /**
+   * Checks whether a combination of include string matches fits within the given window.
+   * @param combo include string matches for this combination, sorted by start position
+   * @param excludes excluded string matches
+   * @param n window size minus one
+   * @param lexer tokenizer
+   * @return result of check
+   */
+  private boolean window(final FTMatch combo, final FTMatch excludes, final int n,
+      final FTLexer lexer) {
+
+    // phase 1: accumulate span and gaps, checking window size
+    FTStringMatch first = null;
+    for(final FTStringMatch sm : combo) {
       if(first == null) first = sm;
       final int fend = first.end, send = sm.end;
       first.gaps |= send - fend > 1;
@@ -70,18 +104,15 @@ public final class FTWindow extends FTFilter {
     }
     if(first == null) return false;
 
+    // phase 2: find a window offset with no excluded match inside
     final int w = n - pos(first.end, lexer) + pos(first.start, lexer);
     for(int s = pos(first.start, lexer) - w; s <= pos(first.start, lexer); ++s) {
       boolean h = false;
-      for(final FTStringMatch sm : match) {
-        h = sm.exclude && pos(sm.start, lexer) >= s && pos(sm.end, lexer) <= s + w;
+      for(final FTStringMatch sm : excludes) {
+        h = pos(sm.start, lexer) >= s && pos(sm.end, lexer) <= s + w;
         if(h) break;
       }
-      if(!h) {
-        match.reset();
-        match.add(first);
-        return true;
-      }
+      if(!h) return true;
     }
     return false;
   }

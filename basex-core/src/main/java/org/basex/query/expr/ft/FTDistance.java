@@ -68,6 +68,9 @@ public final class FTDistance extends FTFilter {
     final long mn = toLong(min, qc), mx = toLong(max, qc);
 
     // create all possible combinations
+    // (candidate: the include combinations mirror the shared FTFilter#combine helper now
+    // used by FTWindow/FTOrder; could be unified once distance-specific exclude handling is
+    // factored in)
     final FTMatch includes = new FTMatch(), excludes = new FTMatch();
     for(final FTStringMatch sm : match) (sm.exclude ? excludes : includes).add(sm);
     int pos = -1;
