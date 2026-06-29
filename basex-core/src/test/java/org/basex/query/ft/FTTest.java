@@ -331,6 +331,12 @@ abstract class FTTest extends QueryTest {
         "'symposia' contains text 'symposium' using stemming" },
       { "FTStemming 14", booleans(true),
         "'men' contains text 'man' using stemming" },
+      { "FTStemming 15", booleans(true),
+        "'adverse' contains text 'adverse' all words using stemming" },
+      { "FTStemming 16", booleans(true),
+        "'adverse' contains text 'adverse' any word using stemming" },
+      { "FTStemming 17", booleans(true),
+        "'fox' contains text 'fox' any word using stemming" },
 
       { "FTLanguage 1", nodes(14),
         "//*[text() contains text 'hello' using language 'en']" },
