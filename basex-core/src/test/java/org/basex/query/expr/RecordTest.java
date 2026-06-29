@@ -342,15 +342,38 @@ public final class RecordTest extends SandboxTest {
     // no fusion when the coercion target is not the record's own (strict) type
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } return map:put($r, 'a', 0)",
         "{\"a\":0,\"b\":2}", empty(RecordPut.class));
-    // a chain of updates unrolls into a chain of +:= operations, with no RecordSet left behind
+    // a chain of updates unrolls into +:= operations and the constant updates merge into one
     check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
         + "let $s as record(a, b) := $r => map:put('a', 0) => map:put('b', 9) return $s",
         "{\"a\":0,\"b\":9}",
-        root(RecordPut.class), empty(RecordSet.class), count(RecordPut.class, 2));
+        root(RecordPut.class), empty(RecordSet.class), count(RecordPut.class, 1));
     error("declare record local:coord(x, y);\n"
         + "declare function local:reset($c as local:coord) as local:coord "
         + "{ $c => map:put('x', 0) => map:put('y', 0) };\n"
         + "local:reset(local:coord(<x>1</x>, 2))?z", RECORDFIELD_X_X);
+  }
+
+  /** Consecutive constant {@code +:=} updates with disjoint keys are merged. */
+  @Test public void recordPutMerge() {
+    // disjoint keys merge into one update
+    check("declare record local:c(x, y); "
+        + "local:c(<x>1</x>, <x>2</x>) +:= { 'x': 0 } +:= { 'y': 0 }",
+        "{\"x\":0,\"y\":0}", root(RecordPut.class), count(RecordPut.class, 1));
+    // overlapping keys are not merged (the earlier value is still coerced), but use-last holds
+    check("declare record local:c(x, y); "
+        + "local:c(<x>1</x>, <x>2</x>) +:= { 'x': 0 } +:= { 'x': 1 }",
+        "{\"x\":1,\"y\":<x>2</x>}", count(RecordPut.class, 2));
+    // only the disjoint pair collapses; the overlapping update stays separate
+    check("declare record local:c(x, y); "
+        + "local:c(<x>1</x>, <x>2</x>) +:= { 'x': 0 } +:= { 'y': 0 } +:= { 'x': 9 }",
+        "{\"x\":9,\"y\":0}", count(RecordPut.class, 2));
+    // a non-constant update is not merged (the field value is evaluated at runtime)
+    check("declare record local:c(x, y); "
+        + "local:c(<x>1</x>, <x>2</x>) +:= { 'x': <n/> } +:= { 'y': 0 }",
+        "{\"x\":<n/>,\"y\":0}", count(RecordPut.class, 2));
+    // merging must not drop the shadowed value and mask its coercion error
+    error("declare record local:c(x as xs:integer); "
+        + "local:c(1) +:= { 'x': 'y' } +:= { 'x': 3 }", INVTYPE_X);
   }
 
   /** Tests for the compact record map implementation. */
