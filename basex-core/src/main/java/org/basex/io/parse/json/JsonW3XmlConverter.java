@@ -29,33 +29,32 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
 
   @Override
   protected void openObject() {
-    openOuter(MAP);
+    if(!skipOpen()) openOuter(MAP);
   }
 
   @Override
   protected void closeObject() {
-    closeOuter();
+    if(!skipClose()) closeOuter();
   }
 
   @Override
   protected void openPair(final byte[] key, final boolean add) {
-    addValues.add(add);
-    if(add) name = shared.token(key);
+    if(!skipPair(add)) name = shared.token(key);
   }
 
   @Override
   protected void closePair(final boolean add) {
-    addValues.pop();
+    skipClose();
   }
 
   @Override
   protected void openArray() {
-    openOuter(ARRAY);
+    if(!skipOpen()) openOuter(ARRAY);
   }
 
   @Override
   protected void closeArray() {
-    closeOuter();
+    if(!skipClose()) closeOuter();
   }
 
   @Override
@@ -66,7 +65,7 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
 
   @Override
   void addValue(final byte[] type, final byte[] value) {
-    if(addValues.peek()) {
+    if(!skip()) {
       final byte[] val = value != null ? shared.token(value) : null;
       final FBuilder elem = element(type).text(val);
       if(escape && value != null && contains(val, '\\')) elem.attr(Q_ESCAPED, TRUE);

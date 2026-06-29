@@ -83,6 +83,80 @@ public final class JsonModuleTest extends SandboxTest {
     parseError("{ \"a\" : 0, }", "'liberal': false()");
   }
 
+  /** Duplicate keys, 'use-first' policy: the suppressed value and its nested content is dropped. */
+  @Test public void parseDuplicates() {
+    final String first = "<json type=\"object\"><x type=\"number\">1</x></json>";
+    final String opt = "'duplicates': 'use-first'";
+    // scalar duplicate
+    parse("{ \"x\": 1, \"x\": 2 }", opt, first);
+    // object duplicate (and its nested pairs) must not leak through
+    parse("{ \"x\": 1, \"x\": { \"y\": 2 } }", opt, first);
+    // array duplicate (and its items) must not leak through
+    parse("{ \"x\": 1, \"x\": [ 1, 2 ] }", opt, first);
+    // deeply nested duplicate value
+    parse("{ \"x\": 1, \"x\": { \"y\": { \"z\": 2 } } }", opt, first);
+    // duplicate within the suppressed value
+    parse("{ \"x\": 1, \"x\": { \"y\": 1, \"y\": 2 } }", opt, first);
+    // a valid container sibling after a suppressed duplicate is still emitted
+    parse("{ \"x\": 1, \"x\": { \"y\": 2 }, \"z\": { \"w\": 3 } }", opt,
+        "<json type=\"object\"><x type=\"number\">1</x><z type=\"object\">" +
+        "<w type=\"number\">3</w></z></json>");
+
+    // same suppression for the 'attributes' format
+    final String attsOpt = opt + ", 'format': 'attributes'";
+    final String attsFirst =
+        "<json type=\"object\"><pair name=\"x\" type=\"number\">1</pair></json>";
+    parse("{ \"x\": 1, \"x\": { \"y\": 2 } }", attsOpt, attsFirst);
+    parse("{ \"x\": 1, \"x\": [ 1, 2 ] }", attsOpt, attsFirst);
+
+    // same suppression for the 'basic' (W3 XML) format, as used by fn:json-to-xml
+    final String basicOpt = opt + ", 'format': 'basic'";
+    final String basicFirst = "<map xmlns=\"http://www.w3.org/2005/xpath-functions\">" +
+        "<number key=\"x\">1</number></map>";
+    parse("{ \"x\": 1, \"x\": { \"y\": 2 } }", basicOpt, basicFirst);
+    parse("{ \"x\": 1, \"x\": [ 1, 2 ] }", basicOpt, basicFirst);
+  }
+
+  /** Coverage for every value of the 'duplicates' option and its per-format defaults. */
+  @Test public void parseDuplicatesPolicies() {
+    final Function func = _JSON_PARSE;
+    final String in = "{ \"x\": 1, \"x\": 2 }";
+
+    // tree formats (direct): reject errors, use-first keeps the first, use-last is unsupported,
+    // retain keeps both; the default for non-W3 formats is 'use-first'
+    final String one = "<json type=\"object\"><x type=\"number\">1</x></json>";
+    final String two =
+        "<json type=\"object\"><x type=\"number\">1</x><x type=\"number\">2</x></json>";
+    error(func.args(in, " { 'duplicates': 'reject' }"), JSON_PARSE_X);
+    query(func.args(in, " { 'duplicates': 'use-first' }"), one);
+    error(func.args(in, " { 'duplicates': 'use-last' }"), JSON_OPTIONS_X);
+    query(func.args(in, " { 'duplicates': 'retain' }"), two);
+    query(func.args(in), one);
+
+    // xquery format (maps): reject errors, use-first/use-last select a value, retain is unsupported
+    error(func.args(in, " { 'format': 'xquery', 'duplicates': 'reject' }"), JSON_PARSE_X);
+    query(func.args(in, " { 'format': 'xquery', 'duplicates': 'use-first' }"), "{\"x\":1}");
+    query(func.args(in, " { 'format': 'xquery', 'duplicates': 'use-last' }"), "{\"x\":2}");
+    error(func.args(in, " { 'format': 'xquery', 'duplicates': 'retain' }"), JSON_OPTIONS_X);
+
+    // W3 XML format (basic): the default is 'retain' (both kept), use-last is unsupported
+    query(func.args(in, " { 'format': 'basic' }"), "<map xmlns=\"http://www.w3.org/2005/" +
+        "xpath-functions\"><number key=\"x\">1</number><number key=\"x\">2</number></map>");
+    error(func.args(in, " { 'format': 'basic', 'duplicates': 'use-last' }"), JSON_OPTIONS_X);
+
+    // jsonml rejects duplicate object keys regardless of the chosen policy
+    error(func.args("[ \"a\", { \"b\": \"1\", \"b\": \"2\" } ]",
+        " { 'format': 'jsonml', 'duplicates': 'retain' }"), JSON_PARSE_X);
+
+    // the wrapped json:* error messages must stay intact (no truncation to '1' or 'duplicates')
+    final String dup = "{\"x\":1,\"x\":2}";
+    query("try { " + func.args(dup, " { 'duplicates': 'reject' }") +
+        " } catch * { $err:description }", "(1:11): Key \"x\" occurs more than once.");
+    query("try { " + func.args(dup, " { 'duplicates': 'use-last' }") +
+        " } catch * { $err:description }",
+        "'duplicates':'use-last' is not supported by the target format.");
+  }
+
   /** Test method. */
   @Test public void parseJsonML() {
     parse("[ \"a\" ]", "'format': 'jsonml'", "<a/>");
@@ -153,6 +227,13 @@ public final class JsonModuleTest extends SandboxTest {
         "9\n10");
 
     error(func.args("42", " { 'spec': 'garbage' }"), INVALIDOPTION_X);
+
+    // escape cannot be combined with a fallback function; the json:options message must pass
+    // through the wrapping intact (regression for the JSON_OPTIONS_X template)
+    final String escFb = " { 'escape': true(), 'fallback': fn($s) { $s } }";
+    error(func.args("\"x\"", escFb), JSON_OPTIONS_X);
+    query("try { " + func.args("\"x\"", escFb) + " } catch * { $err:description }",
+        "Escape cannot be combined with fallback function.");
   }
 
   /** Test method. */

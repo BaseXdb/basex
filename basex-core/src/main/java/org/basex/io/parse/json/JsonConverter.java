@@ -60,6 +60,17 @@ public abstract class JsonConverter extends Job {
   }
 
   /**
+   * Raises an error for an option value that is not supported by the target format.
+   * @param name option name
+   * @param value option value
+   * @return query exception
+   */
+  protected static QueryException optionError(final String name, final Object value) {
+    return QueryError.OPTION_JSON_X.get(null,
+        Util.info("'%':'%' is not supported by the target format.", name, value));
+  }
+
+  /**
    * Assigns a fallback function for invalid characters.
    * @param func fallback function
    */

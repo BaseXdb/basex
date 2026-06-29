@@ -1,7 +1,6 @@
 package org.basex.io.parse.json;
 
 import static org.basex.io.parse.json.JsonConstants.*;
-import static org.basex.query.QueryError.*;
 import static org.basex.util.Token.*;
 
 import java.util.*;
@@ -38,8 +37,8 @@ abstract class JsonXmlConverter extends JsonConverter {
 
   /** Stack for intermediate nodes. */
   final Stack<FBuilder> stack = new Stack<>();
-  /** Add value pairs. */
-  final BoolList addValues = new BoolList();
+  /** Nesting depth of a suppressed duplicate value (0: nothing suppressed). */
+  private int skipDepth;
 
   /** Map from element name to a pair of all its nodes and the collective node type. */
   private final TokenObjectMap<TypeCache> names = new TokenObjectMap<>();
@@ -64,11 +63,10 @@ abstract class JsonXmlConverter extends JsonConverter {
     super(opts);
     merge = jopts.get(JsonOptions.MERGE);
     strings = jopts.get(JsonOptions.STRINGS);
-    addValues.add(true);
 
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
     if(dupl == JsonDuplicates.USE_LAST) {
-      throw OPTION_JSON_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl);
+      throw optionError(JsonParserOptions.DUPLICATES.name(), dupl);
     }
   }
 
@@ -129,6 +127,50 @@ abstract class JsonXmlConverter extends JsonConverter {
    * @throws QueryException query exception
    */
   abstract void addValue(byte[] type, byte[] value) throws QueryException;
+
+  /**
+   * Registers an opening object or array.
+   * @return {@code true} if the event belongs to a suppressed duplicate and must be ignored
+   */
+  final boolean skipOpen() {
+    if(skipDepth == 0) return false;
+    skipDepth++;
+    return true;
+  }
+
+  /**
+   * Registers a closing object, array or pair.
+   * @return {@code true} if the event belongs to a suppressed duplicate and must be ignored
+   */
+  final boolean skipClose() {
+    if(skipDepth == 0) return false;
+    skipDepth--;
+    return true;
+  }
+
+  /**
+   * Registers an opening pair. A pair that is not added (suppressed duplicate, 'use-first')
+   * starts skipping its entire value, including nested objects and arrays.
+   * @param add add pair
+   * @return {@code true} if the pair and its value are suppressed and must be ignored
+   */
+  final boolean skipPair(final boolean add) {
+    if(skipDepth > 0) {
+      skipDepth++;
+      return true;
+    }
+    if(add) return false;
+    skipDepth = 1;
+    return true;
+  }
+
+  /**
+   * Indicates if the current value is part of a suppressed duplicate.
+   * @return result of check
+   */
+  final boolean skip() {
+    return skipDepth > 0;
+  }
 
   /**
    * Adds type information to an element or the type cache.
