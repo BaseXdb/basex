@@ -305,7 +305,7 @@ public final class RecordType extends MapType {
     if(instanceOf(type)) return type;
 
     if(type instanceof final RecordType rt) {
-      if(sealed == rt.sealed && fields.size() == rt.fields.size() && sameFields(rt)) {
+      if(fields.size() == rt.fields.size() && sameFields(rt)) {
         final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
         for(final byte[] key : fields) {
           final SeqType fst = fields.get(key).seqType(), rtfst = rt.fields.get(key).seqType();
@@ -321,7 +321,7 @@ public final class RecordType extends MapType {
           }
           map.put(key, new RecordField(union));
         }
-        return new RecordType(sealed, map);
+        return new RecordType(sealed && rt.sealed, map);
       }
       // fallback (map supertype)
       return MapType.get(keyType().union(rt.keyType()), valueType().union(rt.valueType()));
@@ -363,7 +363,7 @@ public final class RecordType extends MapType {
     if(type.instanceOf(this)) return type;
 
     if(type instanceof final RecordType rt) {
-      if(sealed == rt.sealed && fields.size() == rt.fields.size() && sameFields(rt)) {
+      if(fields.size() == rt.fields.size() && sameFields(rt)) {
         final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
         for(final byte[] key : fields) {
           final SeqType is = intersect(fields.get(key).seqType(), rt.fields.get(key).seqType(),
@@ -371,7 +371,7 @@ public final class RecordType extends MapType {
           if(is == null) return null;
           map.put(key, new RecordField(is));
         }
-        return new RecordType(sealed, map);
+        return new RecordType(sealed || rt.sealed, map);
       }
       return null;
     }

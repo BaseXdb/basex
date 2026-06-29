@@ -43,6 +43,18 @@ public final class RecordTest extends SandboxTest {
 
     query("map:entries({ 'a': 1 }) instance of record(a)", true);
     query("map:entries({ 'x': 1 }) instance of record(a)", false);
+
+    // a non-constant map (node/function value keeps it an expression) must not be statically
+    // folded to false: the type intersection of an inferred and a declared record was wrong
+    query("{ 'a': 1, 'b': <x/> } instance of record(a, b)", true);
+    query("{ 'a': 1, 'b': fn($x) { $x } } instance of record(a, b)", true);
+    query("{ 'a': 1, 'b': <x/> } instance of record(a as xs:integer, b as element(x))", true);
+    query("{ 'a': 1, 'b': <x/>, 'c': 2 } instance of record(a, b)", false);
+    query("{ 'a': <x/>, 'b': 2 } instance of record(a as xs:integer, b)", false);
+    // the parsed-csv-structure built-in record (function-valued 'get' field)
+    query("{ 'columns': ('a', 'b'), 'column-index': { 'a': 1 }, 'rows': [ 'p' ],\n"
+        + "  'get': fn($r as xs:positiveInteger, $c as (xs:positiveInteger | xs:string))"
+        + " as xs:string { 'x' } } instance of fn:parsed-csv-structure-record", true);
     query("let $map := (\n"
         + "  {'x':5, 'y':6}\n"
         + "  => map:put(xs:NCName('x'), true())\n"
