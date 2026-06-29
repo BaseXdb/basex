@@ -395,6 +395,17 @@ public final class JNodeTest extends SandboxTest {
     error("declare context item := 123; //a", NODOC_X);
   }
 
+  /** Nested path expressions: flattening must preserve map/array coercion to JNodes. */
+  @Test public void nestedPath() {
+    // the inner '$j' is a nested-path root and must still be coerced to a JNode;
+    // it must not be flattened into a step, where the coercion no longer applies
+    query("let $j := { 'a': 1 } return $j/($j/a)", 1);
+    query("let $j := { 'a': 1 } return $j/(($j/a)[true()])", 1);
+    query("let $j := { 'a': { 'b': 2 } } return $j/($j/a/b)", 2);
+    // equivalent form with the inner JNode precomputed
+    query("let $j := { 'a': 1 } let $x := $j/a return $j/$x", 1);
+  }
+
   /** EBV. */
   @Test public void ebv() {
     query("boolean([] => jtree())", true);

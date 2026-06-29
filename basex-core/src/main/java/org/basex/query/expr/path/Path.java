@@ -279,13 +279,17 @@ public abstract class Path extends ParseExpr {
     for(final Expr step : steps) {
       Expr expr = step;
       if(expr instanceof final Path path) {
-        // rewrite nested path to axis steps
-        if(path.root != null && !(path.root instanceof ContextValue)) tmp.add(path.root);
-        final int pl = path.steps.length - 1;
-        for(int i = 0; i < pl; i++) tmp.add(path.steps[i]);
-        expr = path.steps[pl];
-        cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) path::description, path);
-        changed = true;
+        // flatten nested path; keep non-node roots nested to preserve map/array coercion
+        final Expr proot = path.root;
+        final boolean rootStep = proot != null && !(proot instanceof ContextValue);
+        if(!rootStep || proot.seqType().type instanceof NodeType) {
+          if(rootStep) tmp.add(proot);
+          final int pl = path.steps.length - 1;
+          for(int i = 0; i < pl; i++) tmp.add(path.steps[i]);
+          expr = path.steps[pl];
+          cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) path::description, path);
+          changed = true;
+        }
       }
       tmp.add(expr);
     }
