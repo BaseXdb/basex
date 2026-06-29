@@ -16,7 +16,8 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Type for record tests.
+ * Record type: a map type with a fixed set of named, individually typed fields. A record type may
+ * be sealed (named or declared) or inferred from a map constructor; see {@link #sealed()}.
  *
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
@@ -158,15 +159,14 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Return the minimum number of fields that must be supplied to the constructor function.
+   * Return the minimum number of fields that must be supplied to the constructor function. Only
+   * fields with an initializer are optional, and they are always trailing (enforced by the parser).
    * @return minimum number of fields
    */
   public int minFields() {
     int min = 0;
     for(final RecordField rf : fields.values()) {
-      // a field is an optional constructor parameter if it has an initializer, or if its type
-      // permits the empty sequence (in which case an omitted argument defaults to ())
-      if(rf.init() != null || !rf.seqType().oneOrMore()) return min;
+      if(rf.init() != null) return min;
       ++min;
     }
     return min;
@@ -305,7 +305,7 @@ public final class RecordType extends MapType {
     if(instanceOf(type)) return type;
 
     if(type instanceof final RecordType rt) {
-      if(fields.size() == rt.fields.size() && sameFields(rt)) {
+      if(sameFields(rt)) {
         final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
         for(final byte[] key : fields) {
           final SeqType fst = fields.get(key).seqType(), rtfst = rt.fields.get(key).seqType();
@@ -337,6 +337,7 @@ public final class RecordType extends MapType {
    * @return result of check
    */
   private boolean sameFields(final RecordType rt) {
+    if(fields.size() != rt.fields.size()) return false;
     for(final byte[] key : fields) {
       if(!rt.fields.contains(key)) return false;
     }
@@ -363,7 +364,7 @@ public final class RecordType extends MapType {
     if(type.instanceOf(this)) return type;
 
     if(type instanceof final RecordType rt) {
-      if(fields.size() == rt.fields.size() && sameFields(rt)) {
+      if(sameFields(rt)) {
         final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
         for(final byte[] key : fields) {
           final SeqType is = intersect(fields.get(key).seqType(), rt.fields.get(key).seqType(),
