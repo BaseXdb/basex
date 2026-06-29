@@ -36,7 +36,8 @@ public abstract class ConsoleReader implements AutoCloseable, PasswordReader {
    * @return instance of console reader
    */
   public static ConsoleReader get() {
-    if(Reflect.available("jline.console.ConsoleReader")) {
+    // only use JLine if the input is interactive
+    if(System.console() != null && Reflect.available("jline.console.ConsoleReader")) {
       try {
         return new JLineConsoleReader();
       } catch(final IOException ex) {
