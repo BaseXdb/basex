@@ -93,21 +93,18 @@ public class FnSchemaType extends StandardFunc {
       } else {
         return Empty.VALUE;
       }
-      final MapBuilder mb = new MapBuilder().type(Records.SCHEMA_TYPE.get());
-      mb.put("name", name);
-      mb.put("is-simple", Bln.get(!type.oneOf(ANY_TYPE, UNTYPED)));
-      mb.put("base-type", baseType == null ? TypeAnnotation.funcItem(info)
-                                           : TypeAnnotation.funcItem(info, baseType));
-      if(primType != null) mb.put("primitive-type", TypeAnnotation.funcItem(info, primType));
-      if(variety != null) mb.put("variety",
-          Types.SCHEMA_TYPE_RECORD_VARIETY.cast(Str.get(variety.name()), qc, info));
-      if(members != null) mb.put("members", members);
-      if(matches != null) mb.put("matches", matches);
-      if(constructor) {
-        mb.put("constructor", FuncType.get(Types.ANY_ATOMIC_TYPE_ZM, Types.ANY_ATOMIC_TYPE_ZO).cast(
-            (FuncItem) Functions.item(name, 1, true, info, qc), qc, info));
-      }
-      vb.add(mb.map());
+      vb.add(new XQRecordMap(Records.SCHEMA_TYPE.get(),
+        name,
+        Bln.get(!type.oneOf(ANY_TYPE, UNTYPED)),
+        baseType == null ? TypeAnnotation.funcItem(info) : TypeAnnotation.funcItem(info, baseType),
+        primType != null ? TypeAnnotation.funcItem(info, primType) : Empty.VALUE,
+        variety != null ? Types.SCHEMA_TYPE_RECORD_VARIETY.cast(Str.get(variety.name()), qc, info) :
+          Empty.VALUE,
+        members != null ? members : Empty.VALUE,
+        Empty.VALUE,
+        matches != null ? matches : Empty.VALUE,
+        constructor ? FuncType.get(Types.ANY_ATOMIC_TYPE_ZM, Types.ANY_ATOMIC_TYPE_ZO).cast(
+            (FuncItem) Functions.item(name, 1, true, info, qc), qc, info) : Empty.VALUE));
     }
     return vb.value();
   }

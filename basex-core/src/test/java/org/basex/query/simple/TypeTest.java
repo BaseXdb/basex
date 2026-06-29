@@ -49,8 +49,8 @@ public final class TypeTest extends QueryTest {
             + "instance of fn(enum('a', 'b')) as item()*"
         },
         { "Type 12", booleans(true), "fn() as record(a as xs:integer) { { 'a': 42 } } instance of "
-            + "fn() as record(a? as xs:integer)"},
-        { "Type 13", booleans(false), "fn() as record(a? as xs:integer) { {} } instance of "
+            + "fn() as record(a as xs:integer?)"},
+        { "Type 13", booleans(false), "fn() as record(a as xs:integer?) { {} } instance of "
             + "fn() as record(a as xs:integer)"},
         { "Type 14", strings("xs:dateTimeStamp"), "type-of(current-dateTime())" },
         { "Type 15", strings("xs:dateTime"), "type-of(current-dateTime() cast as xs:dateTime)" },

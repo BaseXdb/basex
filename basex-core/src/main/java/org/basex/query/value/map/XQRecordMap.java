@@ -50,11 +50,12 @@ public final class XQRecordMap extends XQHashMap {
 
   @Override
   public XQMap putAt(final int index, final Value value) throws QueryException {
-    if(value == values[index]) return this;
     if(value.seqType().instanceOf(fields().value(index + 1).seqType())) {
+      final Type tp = type instanceof final RecordType rt ? rt.open() : type;
+      if(value == values[index] && tp == type) return this;
       final Value[] copy = values.clone();
       copy[index] = value;
-      return new XQRecordMap(type, copy);
+      return new XQRecordMap(tp, copy);
     }
     return super.putAt(index, value);
   }

@@ -24,13 +24,6 @@ public final class FnRandomNumberGenerator extends StandardFunc {
   private static final FuncType NEXT_TYPE =
       FuncType.get(MapType.get(BasicType.STRING, Types.ITEM_O).seqType());
 
-  /** Number key. */
-  private static final Str NUMBER = Str.get("number");
-  /** Next key. */
-  private static final Str NEXT = Str.get("next");
-  /** Permute key. */
-  private static final Str PERMUTE = Str.get("permute");
-
   @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Item seed = arg(0).atomItem(qc, info);
@@ -38,12 +31,11 @@ public final class FnRandomNumberGenerator extends StandardFunc {
     final LongUnaryOperator number = l -> l * 0x5DEECE66DL + 0xBL & (1L << 48) - 1;
     final long i1 = number.applyAsLong(seed.isEmpty() ? qc.dateTime().nano : seed.hashCode());
     final long i2 = number.applyAsLong(i1);
-    return new MapBuilder().type(Records.RANDOM_NUMBER_GENERATOR.get()).
-      // derived from Java's random class
-      put(NUMBER, Dbl.get(((i1 >>> 22 << 27) + (i2 >>> 21)) / (double) (1L << 53))).
-      put(NEXT, FuncType.get(Records.RANDOM_NUMBER_GENERATOR.get().seqType()).
-          cast(nextFunc(i2), qc, info)).
-      put(PERMUTE, permuteFunc(i1, qc)).map();
+    // derived from Java's random class
+    return new XQRecordMap(Records.RANDOM_NUMBER_GENERATOR.get(),
+      Dbl.get(((i1 >>> 22 << 27) + (i2 >>> 21)) / (double) (1L << 53)),
+      FuncType.get(Records.RANDOM_NUMBER_GENERATOR.get().seqType()).cast(nextFunc(i2), qc, info),
+      permuteFunc(i1, qc));
   }
 
   /**

@@ -22,7 +22,6 @@ abstract class MapFn extends StandardFunc {
 
   @Override
   public long structSize() {
-    return seqType().type instanceof final RecordType rt &&
-        !rt.hasOptional() ? rt.fields().size() : -1;
+    return seqType().type instanceof final RecordType rt ? rt.fields().size() : -1;
   }
 }

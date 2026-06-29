@@ -1118,6 +1118,8 @@ public enum QueryError {
   /** Error code. */
   INVTYPE_X(XPTY, 4, "%."),
   /** Error code. */
+  RECORDFIELD_X_X(XPTY, 4, "% has no field named %."),
+  /** Error code. */
   CALCTYPE_X_X_X_X_X(XPTY, 4, "Arithmetics not defined for % and %: % % %."),
   /** Error code. */
   INVFUNCITEM_X_X(XPTY, 4, "Function expected, % found: %."),
@@ -1701,7 +1703,7 @@ public enum QueryError {
       if(est.type instanceof final RecordType rt && expr instanceof final XQMap map) {
         final TokenObjectMap<RecordField> fields = rt.fields();
         for(final byte[] key : fields) {
-          if(map.value(Str.get(key)) != null || fields.get(key).isOptional()) continue;
+          if(map.value(Str.get(key)) != null) continue;
           desc.add(QueryString.toQuoted(key)).add(" missing");
           missing = true;
           break;

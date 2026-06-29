@@ -80,6 +80,10 @@ public final class Lookup extends Arr {
     if(ks == 0) return keys;
 
     final Type it = input.seqType().type;
+    if(it instanceof final RecordType rt && rt.strict() && keys != WILDCARD &&
+        !(keys instanceof final AStr str && ks == 1 && rt.fields().contains(str.string(info)))) {
+      return this;
+    }
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
     if(map || array) {
       /* REWRITE LOOKUP:

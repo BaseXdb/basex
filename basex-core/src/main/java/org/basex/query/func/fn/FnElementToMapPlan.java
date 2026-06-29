@@ -8,6 +8,7 @@ import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 
@@ -39,19 +40,17 @@ public final class FnElementToMapPlan extends PlanFn {
       }
     }
 
-    // check structure and types
-    final MapBuilder ecm = new MapBuilder().type(Records.ELEMENT_CONVERSION_PLAN.get());
+    // check structure and types (the result is a map keyed by element/attribute names)
+    final MapBuilder ecm = new MapBuilder();
     for(final QNm name : elemNames) {
       final PlanEntry pe = entry(elemNames.get(name).finish());
-      final MapBuilder mb = new MapBuilder();
-      mb.put(LAYOUT, Str.get(pe.layout.toString()));
-      if(pe.type != null && pe.type != PlanType.STRING) {
-        mb.put(TYPE, Str.get(pe.type.toString()));
-      }
-      if(pe.child != null) {
-        mb.put(CHILD, pe.child.uri().length != 0 ? pe.child.eqName() : pe.child.local());
-      }
-      ecm.put(name.unique(), mb.map());
+      final XQMap plan = new XQRecordMap(Records.ELEMENT_CONVERSION_PLAN.get(),
+        Str.get(pe.layout.toString()),
+        pe.child != null ? Str.get(pe.child.uri().length != 0 ? pe.child.eqName() :
+          pe.child.local()) : Empty.VALUE,
+        pe.type != null && pe.type != PlanType.STRING ? Str.get(pe.type.toString()) :
+          Empty.VALUE);
+      ecm.put(name.unique(), plan);
     }
     for(final QNm attr : attrNames) {
       final PlanType pt = PlanType.get(attrNames.get(attr).finish());

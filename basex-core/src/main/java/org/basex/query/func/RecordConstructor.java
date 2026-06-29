@@ -10,6 +10,7 @@ import org.basex.query.util.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
+import org.basex.query.value.seq.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -22,8 +23,6 @@ public class RecordConstructor extends StandardFunc {
   private final RecordType recordType;
   /** Field names. */
   private final QNm[] names;
-  /** Created compact record map. */
-  private final boolean compact;
 
   /**
    * Constructor.
@@ -34,12 +33,9 @@ public class RecordConstructor extends StandardFunc {
     final TokenObjectMap<RecordField> fields = recordType.fields();
     final int fs = fields.size();
     names = new QNm[fs];
-    boolean c = true;
     for(int f = 1; f <= fs; ++f) {
       names[f - 1] = new QNm(fields.key(f));
-      c = c && fields.value(f).alwaysAdded();
     }
-    compact = c;
   }
 
   /**
@@ -62,25 +58,16 @@ public class RecordConstructor extends StandardFunc {
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; ++f) {
       final RecordField rf = fields.value(f + 1);
-      final Value value = f < el ? exprs[f].value(qc) : rf.init().value(qc);
-      if(!value.isEmpty() || rf.alwaysAdded()) {
-        values[f] = rf.seqType().coerce(value, qc, ii, names[f], null);
-      }
+      final Value value = f < el ? exprs[f].value(qc) :
+          rf.init() != null ? rf.init().value(qc) : Empty.VALUE;
+      values[f] = rf.seqType().coerce(value, qc, ii, names[f], null);
     }
-    // create compact record map if all fields of the type are present
-    if(compact) return new XQRecordMap(recordType, values);
-
-    // create regular map otherwise
-    final MapBuilder mb = new MapBuilder(fs).type(recordType);
-    for(int f = 0; f < fs; ++f) {
-      if(values[f] != null) mb.put(fields.key(f + 1), values[f]);
-    }
-    return mb.map();
+    return new XQRecordMap(recordType, values);
   }
 
   @Override
   public long structSize() {
-    return compact ? recordType.fields().size() : -1;
+    return recordType.fields().size();
   }
 
   @Override
@@ -127,8 +114,7 @@ public class RecordConstructor extends StandardFunc {
     final SeqType[] params = new SeqType[max];
     for(int i = 0; i < max; ++i) {
       final RecordField f = fields.value(i + 1);
-      final SeqType st = f.seqType();
-      params[i] = f.isOptional() ? st.union(Occ.ZERO) : st;
+      params[i] = f.seqType();
     }
 
     final Supplier<RecordConstructor> supplier = () -> new RecordConstructor(rt);

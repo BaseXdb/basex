@@ -25,6 +25,10 @@ public final class RecordType extends MapType {
   /** Maximum number of entries in generated records. */
   public static final int MAX_GENERATED_SIZE = 32;
 
+  /** Sealed flag: a sealed record type carries a runtime type annotation and constrains
+   * field access (lookup of an undeclared field raises a type error). Inferred record types
+   * (e.g. from map constructors) are not sealed and behave like ordinary maps. */
+  private final boolean sealed;
   /** Record fields. */
   private TokenObjectMap<RecordField> fields;
   /** Record type name (can be {@code null}). */
@@ -35,21 +39,43 @@ public final class RecordType extends MapType {
   private InputInfo info;
 
   /**
-   * Constructor.
+   * Constructor for an inferred (non-sealed) record type.
    * @param fields field declarations
    */
   public RecordType(final TokenObjectMap<RecordField> fields) {
-    this(fields, null, AnnList.EMPTY);
+    this(false, fields, null, AnnList.EMPTY);
   }
 
   /**
-   * Constructor.
+   * Constructor for an anonymous record type.
+   * @param sealed sealed flag
+   * @param fields field declarations
+   */
+  public RecordType(final boolean sealed, final TokenObjectMap<RecordField> fields) {
+    this(sealed, fields, null, AnnList.EMPTY);
+  }
+
+  /**
+   * Constructor for a named (sealed) record type.
    * @param fields field declarations
    * @param name record type name (can be {@code null})
    * @param anns annotations
    */
   public RecordType(final TokenObjectMap<RecordField> fields, final QNm name, final AnnList anns) {
+    this(true, fields, name, anns);
+  }
+
+  /**
+   * Constructor.
+   * @param sealed sealed flag
+   * @param fields field declarations
+   * @param name record type name (can be {@code null})
+   * @param anns annotations
+   */
+  public RecordType(final boolean sealed, final TokenObjectMap<RecordField> fields, final QNm name,
+      final AnnList anns) {
     super(BasicType.STRING, unionType(fields));
+    this.sealed = sealed;
     this.fields = fields;
     this.name = name;
     this.anns = anns;
@@ -63,6 +89,7 @@ public final class RecordType extends MapType {
    */
   public RecordType(final QNm name, final InputInfo info) {
     super(BasicType.ANY_ATOMIC_TYPE, Types.ITEM_ZM, false);
+    this.sealed = true;
     this.name = name;
     this.info = info;
     fields = new TokenObjectMap<>(0);
@@ -72,12 +99,11 @@ public final class RecordType extends MapType {
   /**
    * Adds a field to this record type.
    * @param fieldName field name
-   * @param optional optional flag
    * @param seqType sequence type of the field
    * @return this record type
    */
-  public RecordType add(final String fieldName, final boolean optional, final SeqType seqType) {
-    fields.put(Token.token(fieldName), new RecordField(seqType, optional));
+  public RecordType add(final String fieldName, final SeqType seqType) {
+    fields.put(Token.token(fieldName), new RecordField(seqType));
     return this;
   }
 
@@ -106,15 +132,21 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Indicates if this record has optional fields.
+   * Indicates if this record type is sealed (i.e. carries a runtime type annotation and
+   * constrains field access).
    * @return result of check
    */
-  public boolean hasOptional() {
-    final int fs = fields.size();
-    for(int f = 1; f <= fs; f++) {
-      if(fields.value(f).isOptional()) return true;
-    }
-    return false;
+  public boolean sealed() {
+    return sealed;
+  }
+
+  /**
+   * Indicates if this record type enforces strict field access, i.e. it is sealed and not the
+   * abstract {@code record(*)} type. Lookups of undeclared fields on such records raise an error.
+   * @return result of check
+   */
+  public boolean strict() {
+    return sealed && this != Types.RECORD;
   }
 
   /**
@@ -126,13 +158,15 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Return the minimum number of fields that must be present in a record of this type.
+   * Return the minimum number of fields that must be supplied to the constructor function.
    * @return minimum number of fields
    */
   public int minFields() {
     int min = 0;
     for(final RecordField rf : fields.values()) {
-      if(rf.init() != null) return min;
+      // a field is an optional constructor parameter if it has an initializer, or if its type
+      // permits the empty sequence (in which case an omitted argument defaults to ())
+      if(rf.init() != null || !rf.seqType().oneOrMore()) return min;
       ++min;
     }
     return min;
@@ -160,11 +194,13 @@ public final class RecordType extends MapType {
   private boolean eq(final Type type, final Set<Pair> pairs, final boolean strict) {
     if(this == type) return true;
     if(!(type instanceof final RecordType rt)) return false;
-    if(fields.size() != rt.fields.size()) return false;
+    // record() (empty record) and record(*) (any record) must remain distinct
+    if((this == Types.RECORD) != (rt == Types.RECORD) ||
+        sealed != rt.sealed || fields.size() != rt.fields.size()) return false;
 
     final Predicate<byte[]> compareFields = key -> {
       final RecordField rf1 = fields.get(key), rf2 = rt.fields.get(key);
-      if(rf1 == null || rf2 == null || rf1.isOptional() != rf2.isOptional()) return false;
+      if(rf1 == null || rf2 == null) return false;
       final SeqType st1 = rf1.seqType(), st2 = rf2.seqType();
       if(st1.occ != st2.occ) return false;
       final Type tp1 = st1.type, tp2 = st2.type;
@@ -211,33 +247,23 @@ public final class RecordType extends MapType {
       }
       return false;
     }
+    if(type == Types.RECORD) {
+      return true;
+    }
     if(type instanceof final RecordType rt) {
-      for(final byte[] key : fields) {
-        if(!rt.fields.contains(key)) return false;
-      }
+      if(fields.size() != rt.fields.size()) return false;
       for(final byte[] key : rt.fields) {
-        final RecordField rtf = rt.fields.get(key);
-        if(fields.contains(key)) {
-          final RecordField f = fields.get(key);
-          if(!rtf.isOptional() && f.isOptional()) return false;
-          final SeqType fst = f.seqType(), rtfst = rtf.seqType();
-          if(fst != rtfst) {
-            if(fst.zero()) {
-              if(rtfst.oneOrMore()) return false;
-            } else {
-              if(!fst.occ.instanceOf(rtfst.occ)) return false;
-              final Type ft = fst.type, rtft = rtfst.type;
-              if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2) {
-                final Pair pair = new Pair(rt1, rt2);
-                if(!pairs.contains(pair) && !rt1.instanceOf(rt2, pair.addTo(pairs)))
-                  return false;
-              } else if(!ft.instanceOf(rtft)) {
-                return false;
-              }
-            }
+        if(!fields.contains(key)) return false;
+        final SeqType fst = fields.get(key).seqType(), rtfst = rt.fields.get(key).seqType();
+        if(fst != rtfst) {
+          if(!fst.occ.instanceOf(rtfst.occ)) return false;
+          final Type ft = fst.type, rtft = rtfst.type;
+          if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2) {
+            final Pair pair = new Pair(rt1, rt2);
+            if(!pairs.contains(pair) && !rt1.instanceOf(rt2, pair.addTo(pairs))) return false;
+          } else if(!ft.instanceOf(rtft)) {
+            return false;
           }
-        } else if(!rtf.isOptional()) {
-          return false;
         }
       }
       return true;
@@ -277,13 +303,10 @@ public final class RecordType extends MapType {
     if(instanceOf(type)) return type;
 
     if(type instanceof final RecordType rt) {
-      final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
-      for(final byte[] key : fields) {
-        final RecordField f = fields.get(key);
-        if(rt.fields.contains(key)) {
-          // common field
-          final RecordField rtf = rt.fields.get(key);
-          final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
+      if(sealed == rt.sealed && fields.size() == rt.fields.size() && sameFields(rt)) {
+        final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
+        for(final byte[] key : fields) {
+          final SeqType fst = fields.get(key).seqType(), rtfst = rt.fields.get(key).seqType();
           final Type ft = fst.type, rtft = rtfst.type;
           final SeqType union;
           if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2 &&
@@ -294,23 +317,28 @@ public final class RecordType extends MapType {
           } else {
             union = fst.union(rtfst);
           }
-          map.put(key, new RecordField(union, f.isOptional() || rtf.isOptional()));
-        } else {
-          // field missing in type
-          map.put(key, new RecordField(f.seqType(), true));
+          map.put(key, new RecordField(union));
         }
+        return new RecordType(sealed, map);
       }
-      for(final byte[] key : rt.fields) {
-        if(!fields.contains(key)) {
-          // field missing in this RecordType
-          map.put(key, new RecordField(rt.fields.get(key).seqType(), true));
-        }
-      }
-      return new RecordType(map);
+      // fallback (map supertype)
+      return MapType.get(keyType().union(rt.keyType()), valueType().union(rt.valueType()));
     }
     return type instanceof final MapType mt ? mt.union(keyType(), valueType()) :
            type instanceof ArrayType ? Types.FUNCTION :
            type instanceof FuncType ? type.union(this) : BasicType.ITEM;
+  }
+
+  /**
+   * Checks whether this record type and the given one declare exactly the same set of field names.
+   * @param rt other record type
+   * @return result of check
+   */
+  private boolean sameFields(final RecordType rt) {
+    for(final byte[] key : fields) {
+      if(!rt.fields.contains(key)) return false;
+    }
+    return true;
   }
 
   @Override
@@ -333,39 +361,27 @@ public final class RecordType extends MapType {
     if(type.instanceOf(this)) return type;
 
     if(type instanceof final RecordType rt) {
-      final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
-      for(final byte[] key : fields) {
-        final RecordField f = fields.get(key);
-        if(rt.fields.contains(key)) {
-          // common field
-          final RecordField rtf = rt.fields.get(key);
-          final SeqType fst = f.seqType(), rtfst  = rtf.seqType();
-          final SeqType is = intersect(fst, rtfst, pairs);
+      if(sealed == rt.sealed && fields.size() == rt.fields.size() && sameFields(rt)) {
+        final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
+        for(final byte[] key : fields) {
+          final SeqType is = intersect(fields.get(key).seqType(), rt.fields.get(key).seqType(),
+              pairs);
           if(is == null) return null;
-          map.put(key, new RecordField(is, f.isOptional() && rtf.isOptional()));
-        } else {
-          // field missing in type
-          return null;
+          map.put(key, new RecordField(is));
         }
+        return new RecordType(sealed, map);
       }
-      for(final byte[] key : rt.fields) {
-        if(!fields.contains(key)) {
-          // field missing in this RecordType
-          return null;
-        }
-      }
-      return new RecordType(map);
+      return null;
     }
     if(type instanceof final MapType mt) {
       if(mt.keyType().intersect(BasicType.STRING) == null) return null;
       final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
       for(final byte[] key : fields) {
-        final RecordField f = fields.get(key);
-        final SeqType is = intersect(f.seqType(), mt.valueType(), pairs);
+        final SeqType is = intersect(fields.get(key).seqType(), mt.valueType(), pairs);
         if(is == null) return null;
-        map.put(key, new RecordField(is, f.isOptional()));
+        map.put(key, new RecordField(is));
       }
-      return new RecordType(map);
+      return new RecordType(sealed, map);
     }
     return null;
   }
@@ -391,7 +407,17 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Creates a new compile-time instance of the record type.
+   * Returns a non-sealed (open) version of this record type, as produced by map operations such as
+   * {@code map:put}/{@code map:remove} that do not preserve the record annotation.
+   * @return open record type
+   */
+  public RecordType open() {
+    return strict() ? new RecordType(false, fields) : this;
+  }
+
+  /**
+   * Creates a new compile-time instance of the record type. The result is not sealed, as it is
+   * produced by map operations such as {@code map:put}.
    * @param remove key to remove (can be {@code null})
    * @param put key to add or replace (can be {@code null})
    * @param seqType sequence type of the field to add or replace (ignored if put is {@code null})
@@ -427,8 +453,9 @@ public final class RecordType extends MapType {
         if(!tb.isEmpty()) tb.add(", ");
         if(!tb.moreInfo()) break;
         tb.add(XMLToken.isNCName(key) ? key : QueryString.toQuoted(key));
-        if(fields.get(key).isOptional()) tb.add('?');
       }
+    } else {
+      tb.add('*');
     }
     return qs.token(tb.finish()).token(')').toString();
   }

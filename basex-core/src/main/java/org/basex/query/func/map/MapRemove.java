@@ -34,11 +34,8 @@ public final class MapRemove extends MapFn {
     Type tp = null;
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
     if(mti.field != null) {
-      if(mti.field.isOptional()) {
-        // structure does not change: propagate record type
-        tp = mti.record;
-      } else if(mti.record.fields().size() <= RecordType.MAX_GENERATED_SIZE) {
-        // otherwise, derive new record type
+      if(mti.record.fields().size() <= RecordType.MAX_GENERATED_SIZE) {
+        // derive new record type with the field removed
         final RecordType rt = mti.record.copy(mti.key, null, null, cc);
         // return empty map if it will contain no entries
         if(rt != null && rt.fields().isEmpty()) return XQMap.empty();

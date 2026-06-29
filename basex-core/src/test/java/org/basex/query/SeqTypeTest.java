@@ -152,10 +152,10 @@ public final class SeqTypeTest {
       // r2 record(next? as r2, x)
       r2 = new RecordType(r2Name, ii).seqType();
 
-    fld1.put(Token.token("next"), new RecordField(r1, true));
+    fld1.put(Token.token("next"), new RecordField(r1.union(ZERO)));
     fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
 
-    fld2.put(Token.token("next"), new RecordField(r2, true));
+    fld2.put(Token.token("next"), new RecordField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new RecordField(ITEM_ZM));
 
     final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
@@ -424,10 +424,10 @@ public final class SeqTypeTest {
       // r2 record(next? as r2, x)
       r2 = new RecordType(r2Name, ii).seqType();
 
-    fld1.put(Token.token("next"), new RecordField(r1, true));
+    fld1.put(Token.token("next"), new RecordField(r1.union(ZERO)));
     fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
 
-    fld2.put(Token.token("next"), new RecordField(r2, true));
+    fld2.put(Token.token("next"), new RecordField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new RecordField(ITEM_ZM));
 
     final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
@@ -678,54 +678,37 @@ public final class SeqTypeTest {
         fld3 = new TokenObjectMap<>(),
         fld5 = new TokenObjectMap<>(),
         fld6 = new TokenObjectMap<>(),
-        fld7 = new TokenObjectMap<>(),
         fld8 = new TokenObjectMap<>(),
-        fld9 = new TokenObjectMap<>(),
-        fld10 = new TokenObjectMap<>(),
-        fld11 = new TokenObjectMap<>();
+        fld9 = new TokenObjectMap<>();
     fld1.put(Token.token("a"), new RecordField(INTEGER_O));
     fld2.put(Token.token("a"), new RecordField(STRING_O));
     fld3.put(Token.token("a"), new RecordField(ANY_ATOMIC_TYPE_O));
-    fld5.put(Token.token("a"), new RecordField(INTEGER_O, true));
-    fld6.put(Token.token("b"), new RecordField(INTEGER_O, true));
-    fld7.put(Token.token("a"), new RecordField(INTEGER_O, true));
-    fld7.put(Token.token("b"), new RecordField(INTEGER_O, true));
-    fld10.put(Token.token("next"), new RecordField(MAP_O, true));
-    fld10.put(Token.token("x"), new RecordField(ITEM_ZM));
-    fld10.put(Token.token("y"), new RecordField(ITEM_ZM, true));
-    fld10.put(Token.token("z"), new RecordField(ITEM_ZM, true));
-    fld11.put(Token.token("a"), new RecordField(STRING_O, true));
-    fld11.put(Token.token("b"), new RecordField(INTEGER_O, true));
+    fld5.put(Token.token("a"), new RecordField(INTEGER_O.union(ZERO)));
+    fld6.put(Token.token("b"), new RecordField(INTEGER_O.union(ZERO)));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = new RecordType(fld1).seqType(),
+      r1 = new RecordType(true, fld1).seqType(),
       // record(a as xs:string)
-      r2 = new RecordType(fld2).seqType(),
+      r2 = new RecordType(true, fld2).seqType(),
       // record(a as xs:anyAtomicType)
-      r3 = new RecordType(fld3).seqType(),
+      r3 = new RecordType(true, fld3).seqType(),
       // record(a as xs:integer?)
-      r5 = new RecordType(fld5).seqType(),
+      r5 = new RecordType(true, fld5).seqType(),
       // record(b as xs:integer?)
-      r6 = new RecordType(fld6).seqType(),
-      // record(a as xs:integer?, b as xs:integer?)
-      r7 = new RecordType(fld7).seqType(),
-      // r8 record(next? as r8, x, y)
+      r6 = new RecordType(true, fld6).seqType(),
+      // r8 record(next as r8?, x, y)
       r8 = new RecordType(r8Name, ii).seqType(),
-      // r9 record(next? as r9, x, z)
-      r9 = new RecordType(r9Name, ii).seqType(),
-      // record(next? as map(*), x, y?, z?)
-      r10 = new RecordType(fld10).seqType(),
-      // record(a? as xs:string, b? as xs:integer)
-      r11 = new RecordType(fld11).seqType();
+      // r9 record(next as r9?, x, z)
+      r9 = new RecordType(r9Name, ii).seqType();
 
-    fld8.put(Token.token("next"), new RecordField(r8, true));
+    fld8.put(Token.token("next"), new RecordField(r8.union(ZERO)));
     fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
     fld8.put(Token.token("y"), new RecordField(ITEM_ZM));
 
-    fld9.put(Token.token("next"), new RecordField(r9, true));
+    fld9.put(Token.token("next"), new RecordField(r9.union(ZERO)));
     fld9.put(Token.token("x"), new RecordField(ITEM_ZM));
     fld9.put(Token.token("z"), new RecordField(ITEM_ZM));
 
@@ -739,21 +722,24 @@ public final class SeqTypeTest {
 
     combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
     combine(RECORD_O, MAP_O, MAP_O, op);
-    combine(RECORD_O, r1, r5, op);
+    // a specific record type is a subtype of record(*)
+    combine(RECORD_O, r1, RECORD_O, op);
     combine(RECORD_O, ERROR_O, RECORD_O, op);
     combine(FUNCTION_O, r1, FUNCTION_O, op);
     combine(FUNCTION_O, ERROR_O, FUNCTION_O, op);
     combine(MAP_O, r1, MAP_O, op);
     combine(MAP_O, ERROR_O, MAP_O, op);
+    // records with the same field names: field types are unioned
     combine(r1, r2, r3, op);
     combine(r1, r3, r3, op);
     combine(r1, r1, r1, op);
     combine(r1, ERROR_O, r1, op);
     combine(r5, r1, r5, op);
-    combine(r1, r6, r7, op);
-    combine(r2, r6, r11, op);
-    combine(r5, r6, r7, op);
-    combine(r8, r9, r10, op);
+    // records with different field names: fall back to the map supertype
+    combine(r1, r6, MapType.get(STRING, INTEGER_ZO).seqType(), op);
+    combine(r2, r6, MapType.get(STRING, ANY_ATOMIC_TYPE_O.union(ZERO)).seqType(), op);
+    combine(r5, r6, MapType.get(STRING, INTEGER_ZO).seqType(), op);
+    combine(r8, r9, MapType.get(STRING, ITEM_ZM).seqType(), op);
   }
 
   /**
@@ -1013,36 +999,36 @@ public final class SeqTypeTest {
     fld1.put(Token.token("a"), new RecordField(INTEGER_O));
     fld2.put(Token.token("a"), new RecordField(STRING_O));
     fld3.put(Token.token("a"), new RecordField(ANY_ATOMIC_TYPE_O));
-    fld5.put(Token.token("a"), new RecordField(INTEGER_O, true));
-    fld6.put(Token.token("b"), new RecordField(INTEGER_O, true));
+    fld5.put(Token.token("a"), new RecordField(INTEGER_O.union(ZERO)));
+    fld6.put(Token.token("b"), new RecordField(INTEGER_O.union(ZERO)));
     fld7.put(Token.token("a"), new RecordField(INTEGER_O));
-    fld7.put(Token.token("b"), new RecordField(INTEGER_O, true));
-    fld10.put(Token.token("a"), new RecordField(INTEGER_O, true));
-    fld10.put(Token.token("b"), new RecordField(INTEGER_O, true));
+    fld7.put(Token.token("b"), new RecordField(INTEGER_O.union(ZERO)));
+    fld10.put(Token.token("a"), new RecordField(INTEGER_O.union(ZERO)));
+    fld10.put(Token.token("b"), new RecordField(INTEGER_O.union(ZERO)));
     final QNm r8Name = new QNm(Token.token("r8")),
       r9Name = new QNm(Token.token("r9"));
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // record(a as xs:integer)
-      r1 = new RecordType(fld1).seqType(),
+      r1 = new RecordType(true, fld1).seqType(),
       // record(a as xs:string)
-      r2 = new RecordType(fld2).seqType(),
+      r2 = new RecordType(true, fld2).seqType(),
       // record(a as xs:anyAtomicType)
-      r3 = new RecordType(fld3).seqType(),
+      r3 = new RecordType(true, fld3).seqType(),
       // record(a? as xs:integer)
-      r5 = new RecordType(fld5).seqType(),
+      r5 = new RecordType(true, fld5).seqType(),
       // record(b? as xs:integer)
-      r6 = new RecordType(fld6).seqType(),
+      r6 = new RecordType(true, fld6).seqType(),
       // r8 record(next? as r8, x, y)
       r8 = new RecordType(r8Name, ii).seqType(),
       // r9 record(next? as r9, x, z)
       r9 = new RecordType(r9Name, ii).seqType();
 
-    fld8.put(Token.token("next"), new RecordField(r8, true));
+    fld8.put(Token.token("next"), new RecordField(r8.union(ZERO)));
     fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
     fld8.put(Token.token("y"), new RecordField(ITEM_ZM));
 
-    fld9.put(Token.token("next"), new RecordField(r9, true));
+    fld9.put(Token.token("next"), new RecordField(r9.union(ZERO)));
     fld9.put(Token.token("x"), new RecordField(ITEM_ZM));
     fld9.put(Token.token("z"), new RecordField(ITEM_ZM));
 
@@ -1056,7 +1042,8 @@ public final class SeqTypeTest {
 
     combine(RECORD_O, FUNCTION_O, RECORD_O, op);
     combine(RECORD_O, MAP_O, RECORD_O, op);
-    combine(RECORD_O, r1, null, op);
+    // a specific record type is a subtype of record(*)
+    combine(RECORD_O, r1, r1, op);
     combine(RECORD_O, ERROR_O, ERROR_O, op);
     combine(FUNCTION_O, r1, r1, op);
     combine(FUNCTION_O, ERROR_O, ERROR_O, op);

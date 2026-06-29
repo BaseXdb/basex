@@ -37,9 +37,7 @@ public final class MapGet extends MapFn {
     boolean notFound = false;
     if(mti.field != null) {
       // use optimized getter for records
-      if(!mti.record.hasOptional()) return new RecordGet(info, map, mti.index).optimize(cc);
-      // type of result (if it exists)
-      st = mti.field.seqType();
+      return new RecordGet(info, map, mti.index).optimize(cc);
     } else if(mti.validKey) {
       // map:get({ 'a': 1 }, 'b') → ()
       notFound = true;
@@ -48,8 +46,8 @@ public final class MapGet extends MapFn {
     if(mti.mapType != null) {
       // map:get({ 1: 1 }, 'string') → ()
       if(mti.keyMismatch) notFound = true;
-      // type of result (if it exists)
-      else if(st == null) st = mti.mapType.valueType();
+      // type of result
+      else st = mti.mapType.valueType();
     }
 
     if(st != null) exprType.assign(dflt ? st.union(arg(2).seqType()) : st.union(Occ.ZERO));

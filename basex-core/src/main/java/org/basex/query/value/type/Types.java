@@ -303,7 +303,7 @@ public final class Types {
       EnumType.get("atomic", "list", "union", "empty", "simple", "element-only", "mixed");
 
   /** The empty record type. */
-  public static final RecordType RECORD = new RecordType(new TokenObjectMap<>(0));
+  public static final RecordType RECORD = new RecordType(true, new TokenObjectMap<>(0));
   /** Single empty record. */
   public static final SeqType RECORD_O = RECORD.seqType();
 

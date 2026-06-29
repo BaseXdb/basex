@@ -90,7 +90,12 @@ public abstract class XQMap extends XQStruct {
   @Override
   public final Value invokeInternal(final QueryContext qc, final InputInfo ii, final Value[] args)
       throws QueryException {
-    return get(key(args[0], qc, ii));
+    final Item k = key(args[0], qc, ii);
+    if(type instanceof final RecordType rt && rt.strict() &&
+        (!k.type.isStringOrUntyped() || !rt.fields().contains(k.string(null)))) {
+      throw RECORDFIELD_X_X.get(ii, this, k);
+    }
+    return get(k);
   }
 
   /**
@@ -236,25 +241,23 @@ public abstract class XQMap extends XQStruct {
 
     try {
       if(tp instanceof final RecordType rt) {
+        // record(*)
+        if(rt == Types.RECORD) {
+          for(final Item key : keys()) {
+            if(!key.type.instanceOf(BasicType.STRING)) return false;
+          }
+          return true;
+        }
+        // coercion: skip only if this is already a sealed record of the required type
+        if(coerce) {
+          return type.instanceOf(rt) && type instanceof final RecordType st && st.sealed();
+        }
+        // structural check: every declared field is present with a matching value, no extra keys
         final TokenObjectMap<RecordField> fields = rt.fields();
         final int fs = fields.size();
-        if(coerce) {
-          final BasicIter<Item> keys = keys().iter();
-          for(int f = 1; f <= fs; f++) {
-            final RecordField rf = fields.value(f);
-            final Item key = keys.next();
-            final SeqType st = rf.seqType();
-            if(rf.isOptional() || key == null || key.type != BasicType.STRING ||
-              !Token.eq(fields.key(f), key.string(null)) ||
-              st != Types.ITEM_ZM && !st.instance(getOrNull(key))) return false;
-          }
-          return keys.next() == null;
-        }
-
         for(int f = 1; f <= fs; f++) {
-          final RecordField rf = fields.value(f);
           final Value value = getOrNull(Str.get(fields.key(f)));
-          if(value != null ? !rf.seqType().instance(value) : !rf.isOptional()) return false;
+          if(value == null || !fields.value(f).seqType().instance(value)) return false;
         }
         for(final Item key : keys()) {
           if(!key.type.instanceOf(BasicType.STRING) || !fields.contains(key.string(null)))
@@ -357,26 +360,24 @@ public abstract class XQMap extends XQStruct {
   public final XQMap coerceTo(final RecordType rt, final QueryContext qc, final InputInfo ii,
       final CompileContext cc) throws QueryException {
 
-    final long ms = structSize();
-    final MapBuilder mb = new MapBuilder(ms);
-    // add defined values
     final TokenObjectMap<RecordField> fields = rt.fields();
-    final int fs = fields.size();
-    for(int f = 1; f <= fs; f++) {
-      final byte[] key = fields.key(f);
-      final RecordField rf = fields.value(f);
-      final Value value = getOrNull(Str.get(key));
-      if(value != null) {
-        mb.put(key, rf.seqType().coerce(value, qc, ii, null, cc));
-      } else if(!rf.isOptional()) {
+    // reject undeclared keys
+    for(final Item key : keys()) {
+      if(!key.type.isStringOrUntyped() || !fields.contains(key.string(null))) {
         throw typeError(this, rt, ii);
       }
     }
 
-    // assign record type to speed up future type checks
-    final XQMap map = mb.map();
-    if(map != empty()) map.type = rt;
-    return map;
+    // build record
+    final int fs = fields.size();
+    if(fs == 0) return empty();
+    final Value[] values = new Value[fs];
+    for(int f = 0; f < fs; f++) {
+      final Value value = getOrNull(Str.get(fields.key(f + 1)));
+      values[f] = fields.value(f + 1).seqType().coerce(value != null ? value : Empty.VALUE,
+          qc, ii, null, cc);
+    }
+    return new XQRecordMap(rt, values);
   }
 
   @Override

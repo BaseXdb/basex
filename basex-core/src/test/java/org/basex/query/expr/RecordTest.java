@@ -31,9 +31,9 @@ public final class RecordTest extends SandboxTest {
     query("{ 'x': () } instance of record(x)", true);
     query("{} instance of record(x)", false);
 
-    query("{ 'x': (), 'y': () } instance of record(x, y?)", true);
+    query("{ 'x': (), 'y': () } instance of record(x, y)", true);
     query("{ 'x': (), 'y': () } instance of record(x)", false);
-    query("{ 'x': (), 0: () } instance of record(x, y?)", false);
+    query("{ 'x': (), 0: () } instance of record(x, y)", false);
     query("{ 'x': (), 0: () } instance of record(x)", false);
 
     query("declare record local:coord(x, y); "
@@ -54,66 +54,139 @@ public final class RecordTest extends SandboxTest {
         + ")", true);
   }
 
+  /** Strict field access on sealed records. */
+  @Test public void lookup() {
+    // sealed record: lookup or call of an undeclared field is a type error
+    error("let $r as record(a) := { 'a': 1 } return $r?b", RECORDFIELD_X_X);
+    error("let $r as record(a) := { 'a': 1 } return $r('b')", RECORDFIELD_X_X);
+    error("let $r as record(a) := { 'a': 1 } return $r(('b')[. != ''])", RECORDFIELD_X_X);
+    error("declare record local:c(x, y); local:c(1, 2)?z", RECORDFIELD_X_X);
+    // declared fields are accessible
+    query("let $r as record(a) := { 'a': 1 } return $r?a", 1);
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?b", 2);
+    query("let $r as record(a) := { 'a': 1 } return $r('a')", 1);
+    // a plain map literal is not sealed: lookup or call of an absent key returns ()
+    query("{ 'a': 1 }?b", "");
+    query("{ 'a': 1 }('b')", "");
+    // map:get stays lenient even on a sealed record
+    query("let $r as record(a) := { 'a': 1 } return map:get($r, 'b')", "");
+    query("let $r as record(a) := { 'a': 1 } return $r => map:get('b')", "");
+    // map:put and map:remove de-seal: the teeth no longer apply to the result
+    query("let $r as record(a) := { 'a': 1 } return map:put($r, 'a', 2)?b", "");
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return map:remove($r, 'a')?z", "");
+    // multiple keys: every key must be a declared field
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?('a', 'b')", "1\n2");
+    error("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?('a', 'c')", RECORDFIELD_X_X);
+    // wildcard returns all field values and never errors
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?*", "1\n2");
+    // nested record lookup
+    query("let $o as record(in as record(x)) := { 'in': { 'x': 5 } } return $o?in?x", 5);
+    // map:get with a default stays lenient on a sealed record
+    query("let $r as record(a) := { 'a': 1 } return map:get($r, 'b', 99)", 99);
+  }
+
+  /** The {@code +:=} (record put) operator. */
+  @Test public void recordPut() {
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'b': 9 }",
+        "{\"a\":1,\"b\":9}");
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'a': 7, 'b': 8 }",
+        "{\"a\":7,\"b\":8}");
+    // left-associative chaining
+    query("let $r as record(a) := { 'a': 1 } return ($r +:= { 'a': 2 }) +:= { 'a': 3 }",
+        "{\"a\":3}");
+    // coercion applies: an integer is promoted to the required type
+    query("let $r as record(a as xs:double) := { 'a': 1 } return ($r +:= { 'a': 2 })?a", 2);
+    // the result is a sealed record: looking up an undeclared field still errors
+    error("let $r as record(a) := { 'a': 1 } return ($r +:= { 'a': 2 })?b", RECORDFIELD_X_X);
+    // an undeclared field in the right operand is a type error
+    error("let $r as record(a) := { 'a': 1 } return $r +:= { 'c': 9 }", INVTYPE_X);
+    // a value that does not conform to the field type is a type error
+    error("let $r as record(a as xs:integer) := { 'a': 1 } return $r +:= { 'a': 'x' }", INVTYPE_X);
+    // the left operand must be a record (a map with non-string keys is not)
+    error("{ 1: 'a' } +:= { 1: 'b' }", INVTYPE_X);
+    // updates a record built by a named constructor; unmentioned fields are preserved
+    query("declare record local:p(x, y); local:p(1, 2) +:= { 'y': 9 }", "{\"x\":1,\"y\":9}");
+    query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return ($r +:= { 'a': 9 })?b", 2);
+    // an empty right operand leaves the record unchanged (and still sealed)
+    query("let $r as record(a) := { 'a': 1 } return $r +:= {}", "{\"a\":1}");
+    error("let $r as record(a) := { 'a': 1 } return ($r +:= {})?b", RECORDFIELD_X_X);
+  }
+
+  /** Width-invariant subtyping and {@code record(*)}. */
+  @Test public void subtyping() {
+    // record(*) matches any record (a map with string keys), but not a non-string-keyed map
+    query("{} instance of record(*)", true);
+    query("{ 'x': 1 } instance of record(*)", true);
+    query("{ 1: 2 } instance of record(*)", false);
+    query("fn($r as record(*)) { count(map:keys($r)) }({ 'a': 1, 'b': 2 })", 2);
+
+    // record subtyping is width-invariant: the field-name sets must match
+    query("let $r as record(x, y) := { 'x': 1, 'y': 2 } return $r instance of record(x)", false);
+    query("let $r as record(x) := { 'x': 1 } return $r instance of record(x, y)", false);
+    // field types are covariant
+    query("let $r as record(x as xs:integer) := { 'x': 1 } "
+        + "return $r instance of record(x as xs:decimal)", true);
+
+    // function-argument coercion widens a narrower record (a missing field becomes ())
+    query("fn($r as record(x, y as item()*)) { $r }({ 'x': 1 })", "{\"x\":1,\"y\":()}");
+    // but a wider record is not narrowed: an extra field is rejected
+    error("fn($r as record(x)) { $r }({ 'x': 1, 'y': 2 })", INVTYPE_X);
+  }
+
   /** Recursive records. */
   @Test public void recRec() {
     query("declare variable $v as list := "
         + "{ 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44 } } };\n"
-        + "declare record list(value as item()*, next? as list);\n"
+        + "declare record list(value as item()*, next as list?);\n"
         + "$v",
-        "{\"value\":42,\"next\":{\"value\":43,\"next\":{\"value\":44}}}");
+        "{\"value\":42,\"next\":{\"value\":43,\"next\":{\"value\":44,\"next\":()}}}");
     query("declare variable $v := "
         + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44 } } } instance of list;\n"
-        + "declare record list(value as item()*, next? as list);\n"
+        + "declare record list(value as item()*, next as list?);\n"
         + "$v",
-        true);
+        false);
     query("declare variable $v := "
         + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44, 'next': () } } } "
         + "instance of list;\n"
-        + "declare record list(value as item()*, next? as list);"
+        + "declare record list(value as item()*, next as list?);"
         + "$v",
-        false);
+        true);
     // recursive RecordType.instanceOf
-    query("declare record list1(value, next? as list1);\n"
-        + "declare record list2(value, next? as list2);\n"
+    query("declare record list1(value, next as list1?);\n"
+        + "declare record list2(value, next as list2?);\n"
         + "fn($l as list2) as list1 { $l }({ 'value': () })",
-        "{\"value\":()}");
+        "{\"value\":(),\"next\":()}");
     // recursive RecordType.eq and RecordType.instanceOf
-    query("declare record list1(value, next? as list1);\n"
-        + "declare record list2(value, next? as list2);\n"
+    query("declare record list1(value, next as list1?);\n"
+        + "declare record list2(value, next as list2?);\n"
         + "declare function local:f1($l as list1) as list2 { $l };\n"
         + "declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
         + "local:f2(local:f1#1, { 'value': () })",
-        "{\"value\":()}");
+        "{\"value\":(),\"next\":()}");
     // recursive RecordType.eq and RecordType.instanceOf
     query("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
-        + "declare record list1(value, next? as list1);\n"
-        + "declare record list2(value, next? as record(value, next? as list2));\n"
+        + "declare record list1(value, next as list1?);\n"
+        + "declare record list2(value, next as record(value, next as list2?)?);\n"
         + "local:f2(fn($l as list1) as list2 { $l }, { 'value': 42, 'next': { 'value': 43 } })",
-        "{\"value\":42,\"next\":{\"value\":43}}");
+        "{\"value\":42,\"next\":{\"value\":43,\"next\":()}}");
     // recursive RecordType.union
-    query("declare record list1(value, next? as list1);declare record list2(item, next? as list2);"
+    query("declare record list1(value, next as list1?);declare record list2(item, next as list2?);"
         + "fn($l1 as list1, $l2 as list2) { "
         + "map:merge(($l1, $l2))}("
         + "{ 'value': 42, 'next': { 'value': 43 } }, { 'item': 44,'next': { 'item': 45 } })",
-        "{\"value\":42,\"next\":{\"value\":43},\"item\":44}");
+        "{\"value\":42,\"next\":{\"value\":43,\"next\":()},\"item\":44}");
     // recursive RecordType.intersect
-    query("declare record list1(next? as list1, x, y?);\n"
-        + "declare record list2(next? as list2, x, z?);\n"
-        + "let $f := fn($r as record(next? as list2, x as xs:boolean)) as xs:boolean { $r?x }\n"
-        + "let $r as record(next? as list1, x as xs:untypedAtomic) := { 'x': <a>0</a> }\n"
+    query("declare record list1(next as list1?, x, y);\n"
+        + "declare record list2(next as list2?, x, z);\n"
+        + "let $f := fn($r as record(next as list2?, x as xs:boolean)) as xs:boolean { $r?x }\n"
+        + "let $r as record(next as list1?, x as xs:untypedAtomic) := { 'x': <a>0</a> }\n"
         + "return $f($r)",
         "false");
 
-    //  cannot convert empty-sequence() to optional list
-    error("declare variable $v as list :=\n"
-        + "  { 'value':42, 'next': { 'value':43, 'next': { 'value': 44, 'next':() } } };\n"
-        + "declare record list(value as item()*, next? as list);\n"
-        + "$v",
-        INVTYPE_X);
     // recursive RecordType.eq and RecordType.instanceOf
     error("declare function local:f2($f as fn(list2) as list1, $l as list1) as list2 { $f($l) };\n"
-        + "declare record list1(value, next? as list1);\n"
-        + "declare record list2(value, next? as record(value as xs:string, next? as list2));\n"
+        + "declare record list1(value, next as list1?);\n"
+        + "declare record list2(value, next as record(value as xs:string, next as list2?)?);\n"
         + "local:f2(fn($l as list1) as list2 { $l }, { 'value': 42, 'next': { 'value': 43 } })",
         INVTYPE_X);
   }
@@ -125,11 +198,7 @@ public final class RecordTest extends SandboxTest {
         + "cx:complex(3, 2), cx:complex(3)",
         "{\"r\":3,\"i\":2}\n{\"r\":3,\"i\":0}");
     query("declare namespace cx = 'CX';\n"
-        + "declare record cx:complex(r as xs:double, i? as xs:double);\n"
-        + "cx:complex(3, 2), cx:complex(3)",
-        "{\"r\":3,\"i\":2}\n{\"r\":3}");
-    query("declare namespace cx = 'CX';\n"
-        + "declare record cx:complex(r as xs:double, i? as xs:double? := ());\n"
+        + "declare record cx:complex(r as xs:double, i as xs:double? := ());\n"
         + "cx:complex(3, 2), cx:complex(3)",
         "{\"r\":3,\"i\":2}\n{\"r\":3,\"i\":()}");
     query("declare namespace p = 'P'\n;"
@@ -138,9 +207,9 @@ public final class RecordTest extends SandboxTest {
         "{\"first\":\"John\",\"last\":\"Smith\"}");
     // recursive record type constructor function
     query("declare function local:f($x, $y) {local:list($x, $y)};\n"
-        + "declare record local:list (value as item()*, next? as local:list);\n"
+        + "declare record local:list (value as item()*, next as local:list?);\n"
         + "local:f(42, local:f(43, local:f(44, ())))",
-        "{\"value\":42,\"next\":{\"value\":43,\"next\":{\"value\":44}}}");
+        "{\"value\":42,\"next\":{\"value\":43,\"next\":{\"value\":44,\"next\":()}}}");
     // function as entry in record
     query("declare namespace geom = 'GEOM';\n"
         + "declare record geom:rectangle(\n"
@@ -179,7 +248,7 @@ public final class RecordTest extends SandboxTest {
     // invalid initializer
     error("""
       declare namespace cx = 'CX';
-      declare record cx:complex(r as xs:double, i? as xs:double := ());
+      declare record cx:complex(r as xs:double, i as xs:double := ());
       cx:complex(3, 2), cx:complex(3)
       """,
       INVTYPE_X);
@@ -207,47 +276,47 @@ public final class RecordTest extends SandboxTest {
     check("declare record local:x(x); local:x(1) => map:remove(1)", "{\"x\":1}",
         empty(func));
 
-    check("declare record local:x(x, y?); local:x(1) => map:remove('x')", "{}",
-        type(func, "record(y?)"));
-    check("declare record local:x(x, y?); local:x(1) => map:remove(<_>x</_>)", "{}",
-        type(func, "record(y?)"));
-    check("declare record local:x(x, y?); local:x(1) => map:remove('y')", "{\"x\":1}",
-        type(func, "local:x"));
-    check("declare record local:x(x, y?); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
-        type(func, "local:x"));
-    check("declare record local:x(x, y?); local:x(1) => map:remove('z')", "{\"x\":1}",
+    check("declare record local:x(x, y := ()); local:x(1) => map:remove('x')", "{\"y\":()}",
+        type(func, "record(y)"));
+    check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>x</_>)", "{\"y\":()}",
+        type(func, "record(y)"));
+    check("declare record local:x(x, y := ()); local:x(1) => map:remove('y')", "{\"x\":1}",
+        type(func, "record(x)"));
+    check("declare record local:x(x, y := ()); local:x(1) => map:remove(<_>y</_>)", "{\"x\":1}",
+        type(func, "record(x)"));
+    check("declare record local:x(x, y := ()); local:x(1) => map:remove('z')", "{\"x\":1,\"y\":()}",
         empty(func), type(StaticFuncCall.class, "local:x"));
-    check("declare record local:x(x, y?); local:x(1) => map:remove(1)", "{\"x\":1}",
+    check("declare record local:x(x, y := ()); local:x(1) => map:remove(1)", "{\"x\":1,\"y\":()}",
         empty(func));
   }
 
   /** Type propagation when inserting entries. */
   @Test public void typePut() {
     final Function func = _MAP_PUT;
-    check("declare record local:x(x); local:x(1) => map:put('x', 2)", "{\"x\":2}",
-        type(RecordSet.class, "local:x"));
-    check("declare record local:x(x); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
-        type(RecordSet.class, "local:x"));
-    check("declare record local:x(x); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
-        type(func, "record(x, y)"));
-    check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
-        type(func, "record(x, y)"));
-    check("declare record local:x(x); local:x(1) => map:put(0, 0)", "{\"x\":1,0:0}",
-        type(func, "map(*)"));
+    check("declare record local:x(x); local:x(1) => map:put('x', 2)",
+        "{\"x\":2}", type(RecordSet.class, "record(x)"));
+    check("declare record local:x(x); local:x(1) => map:put(<_>x</_>, 2)",
+        "{\"x\":2}", type(RecordSet.class, "record(x)"));
+    check("declare record local:x(x); local:x(1) => map:put('y', 2)",
+        "{\"x\":1,\"y\":2}", type(func, "record(x, y)"));
+    check("declare record local:x(x); local:x(1) => map:put(<_>y</_>, 2)",
+        "{\"x\":1,\"y\":2}", type(func, "record(x, y)"));
+    check("declare record local:x(x); local:x(1) => map:put(0, 0)",
+        "{\"x\":1,0:0}", type(func, "map(*)"));
 
-    check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)", "{\"x\":<x/>}",
-        type(RecordSet.class, "record(x)"));
+    check("declare record local:x(x as xs:int); local:x(1) => map:put('x', <x/>)",
+        "{\"x\":<x/>}", type(RecordSet.class, "record(x)"));
 
-    check("declare record local:x(x, y?); local:x(1) => map:put('x', 2)", "{\"x\":2}",
-        type(func, "local:x"));
-    check("declare record local:x(x, y?); local:x(1) => map:put(<_>x</_>, 2)", "{\"x\":2}",
-        type(func, "local:x"));
-    check("declare record local:x(x, y?); local:x(1) => map:put('y', 2)", "{\"x\":1,\"y\":2}",
-        type(func, "local:x"));
-    check("declare record local:x(x, y?); local:x(1) => map:put(<_>y</_>, 2)", "{\"x\":1,\"y\":2}",
-        type(func, "local:x"));
-    check("declare record local:x(x, y?); local:x(1) => map:put(0, 0)", "{\"x\":1,0:0}",
-        type(func, "map(*)"));
+    check("declare record local:x(x, y := ()); local:x(1) => map:put('x', 2)",
+        "{\"x\":2,\"y\":()}", type(RecordSet.class, "record(x, y)"));
+    check("declare record local:x(x, y := ()); local:x(1) => map:put(<_>x</_>, 2)",
+        "{\"x\":2,\"y\":()}", type(RecordSet.class, "record(x, y)"));
+    check("declare record local:x(x, y := ()); local:x(1) => map:put('y', 2)",
+        "{\"x\":1,\"y\":2}", type(RecordSet.class, "record(x, y)"));
+    check("declare record local:x(x, y := ()); local:x(1) => map:put(<_>y</_>, 2)",
+        "{\"x\":1,\"y\":2}", type(RecordSet.class, "record(x, y)"));
+    check("declare record local:x(x, y := ()); local:x(1) => map:put(0, 0)",
+        "{\"x\":1,\"y\":(),0:0}", type(func, "map(*)"));
   }
 
   /** Tests for the compact record map implementation. */
@@ -282,47 +351,38 @@ public final class RecordTest extends SandboxTest {
 
   /** Coercion of records. */
   @Test public void coercion() {
+    // empty record: only the empty map; any field is rejected
     query("let $m as record() := {} return $m", "{}");
-    query("let $m as record() := { 'a': 1 } return $m", "{}");
-    query("let $m as record() := { 0: 2 } return $m", "{}");
+    error("let $m as record() := { 'a': 1 } return $m", INVTYPE_X);
+    error("let $m as record() := { 0: 2 } return $m", INVTYPE_X);
 
+    // single field: extra fields are rejected
     query("let $m as record(a) := { 'a': 1 } return $m", "{\"a\":1}");
-    query("let $m as record(a) := { 'a': 1, 'b': 2 } return $m", "{\"a\":1}");
-    query("let $m as record(a) := { 'a': 1, 0: 2 } return $m", "{\"a\":1}");
-    query("let $m as record(b) := { 'a': 1, 'b': 2 } return $m", "{\"b\":2}");
+    error("let $m as record(a) := { 'a': 1, 'b': 2 } return $m", INVTYPE_X);
+    error("let $m as record(a) := { 'a': 1, 0: 2 } return $m", INVTYPE_X);
+    error("let $m as record(b) := { 'a': 1, 'b': 2 } return $m", INVTYPE_X);
     query("let $m as record(a) := map { xs:untypedAtomic('a'): 1 } return $m", "{\"a\":1}");
 
-    query("let $m as record(a?) := {} return $m", "{}");
-    query("let $m as record(b?) := { 'a': 1 } return $m", "{}");
-    query("let $m as record(a?) := map { xs:untypedAtomic('c'): 3 } return $m", "{}");
+    // missing field (untyped, so item()*) becomes the empty sequence
+    query("let $m as record(a) := {} return $m", "{\"a\":()}");
+    query("let $m as record(a, b) := { 'a': 1 } return $m", "{\"a\":1,\"b\":()}");
+    query("let $m as record(b, a) := { 'a': 1 } return $m", "{\"b\":(),\"a\":1}");
 
-    query("let $m as record(a, b?) := { 'a': 1 } return $m", "{\"a\":1}");
-    query("let $m as record(a, b?) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1}");
-    query("let $m as record(a?, b) := { 'b': 2 } return $m", "{\"b\":2}");
-    query("let $m as record(b?, a) := { 'c': 3, 'a': 1 } return $m", "{\"a\":1}");
-
+    // entry order follows the record type definition
     query("let $m as record(a, b) := { 'a': 1, 'b': 2 } return $m", "{\"a\":1,\"b\":2}");
     query("let $m as record(a, b) := { 'b': 2, 'a': 1 } return $m", "{\"a\":1,\"b\":2}");
-    query("let $m as record(b, a) := { 'a': 1, 'x': 9, 'b': 2 } return $m", "{\"b\":2,\"a\":1}");
     query("let $m as record(b, a) := { xs:untypedAtomic('a'): 1, 'b': 2 } return $m",
         "{\"b\":2,\"a\":1}");
 
-    query("let $m as record(a?, b?) := { 'c': 3 } return $m", "{}");
-    query("let $m as record(a?, b?) := { 'b': 2, 'c': 3 } return $m", "{\"b\":2}");
-    query("let $m as record(a?, b?) := { 'a': 1, 'c': 3 } return $m", "{\"a\":1}");
-    query("let $m as record(b?, a?) := { 'a': 1, 'b': 2, 'x': 9 } return $m", "{\"b\":2,\"a\":1}");
-    query("let $m as record(a?, b?) := map { xs:untypedAtomic('c'): 3 } return $m", "{}");
+    // extra field is rejected even when reordering occurs
+    error("let $m as record(b, a) := { 'a': 1, 'x': 9, 'b': 2 } return $m", INVTYPE_X);
 
-    query("fn($r as record(a)) { $r } ({ 'a': 1, 'b': 2 })", "{\"a\":1}");
+    // function-argument coercion rejects extra fields
+    error("fn($r as record(a)) { $r } ({ 'a': 1, 'b': 2 })", INVTYPE_X);
 
-    error("let $m as record(a) := {} return $m", INVTYPE_X);
-    error("let $m as record(b) := { 'a': 1 } return $m", INVTYPE_X);
-
-    error("let $m as record(a?, b) := {} return $m", INVTYPE_X);
-    error("let $m as record(a?, b) := { 'c': 3 } return $m", INVTYPE_X);
-    error("let $m as record(a?, b) := { 'a': 1 } return $m", INVTYPE_X);
-    error("let $m as record(a, b?) := {} return $m", INVTYPE_X);
-    error("let $m as record(a, b?) := { 'c': 3 } return $m", INVTYPE_X);
+    // missing field whose type does not admit the empty sequence is an error
+    error("let $m as record(a as xs:integer) := {} return $m", INVTYPE_X);
+    error("let $m as record(a, b as xs:integer) := { 'a': 1 } return $m", INVTYPE_X);
   }
 
   /** Equality of map/record constructors. */

@@ -26,13 +26,13 @@ public enum Records {
   COMPILED_REGEX(FN_URI, "compiled-regex"),
   /** Record definition. */
   DATETIME(FN_URI, "dateTime",
-    field("year", Types.INTEGER_ZO, true),
-    field("month", Types.INTEGER_ZO, true),
-    field("day", Types.INTEGER_ZO, true),
-    field("hours", Types.INTEGER_ZO, true),
-    field("minutes", Types.INTEGER_ZO, true),
-    field("seconds", Types.DECIMAL_ZO, true),
-    field("timezone", Types.DAY_TIME_DURATION_ZO, true)
+    field("year", Types.INTEGER_ZO),
+    field("month", Types.INTEGER_ZO),
+    field("day", Types.INTEGER_ZO),
+    field("hours", Types.INTEGER_ZO),
+    field("minutes", Types.INTEGER_ZO),
+    field("seconds", Types.DECIMAL_ZO),
+    field("timezone", Types.DAY_TIME_DURATION_ZO)
   ),
   /** Record definition. */
   DIVIDED_DECIMALS(FN_URI, "divided-decimals",
@@ -43,9 +43,9 @@ public enum Records {
   ELEMENT_CONVERSION_PLAN(FN_URI, "element-conversion-plan",
     field("layout", EnumType.get("empty", "empty-plus", "simple", "simple-plus", "list",
         "list-plus", "record", "sequence", "mixed", "xml", "error", "deep-skip").seqType()),
-    field("child", Types.STRING_ZO, true),
-    field("type", EnumType.get("integer", "decimal", "double", "boolean", "string").seqType(),
-        true)),
+    field("child", Types.STRING_ZO),
+    field("type", EnumType.get("integer", "decimal", "double", "boolean", "string").
+        seqType(Occ.ZERO_OR_ONE))),
   /** Record definition. */
   INFER_ENCODING(BIN_URI, "infer-encoding",
     field("encoding", Types.STRING_O),
@@ -81,21 +81,21 @@ public enum Records {
   SCHEMA_TYPE(FN_URI, "schema-type"),
   /** Record definition. */
   URI_STRUCTURE(FN_URI, "uri-structure",
-    field("uri", Types.STRING_ZO, true),
-    field("scheme", Types.STRING_ZO, true),
-    field("absolute", Types.BOOLEAN_ZO, true),
-    field("hierarchical", Types.BOOLEAN_ZO, true),
-    field("authority", Types.STRING_ZO, true),
-    field("userinfo", Types.STRING_ZO, true),
-    field("host", Types.STRING_ZO, true),
-    field("port", Types.INTEGER_ZO, true),
-    field("path", Types.STRING_ZO, true),
-    field("query", Types.STRING_ZO, true),
-    field("fragment", Types.STRING_ZO, true),
-    field("path-segments", Types.STRING_ZM, true),
+    field("uri", Types.STRING_ZO),
+    field("scheme", Types.STRING_ZO),
+    field("absolute", Types.BOOLEAN_ZO),
+    field("hierarchical", Types.BOOLEAN_ZO),
+    field("authority", Types.STRING_ZO),
+    field("userinfo", Types.STRING_ZO),
+    field("host", Types.STRING_ZO),
+    field("port", Types.INTEGER_ZO),
+    field("path", Types.STRING_ZO),
+    field("query", Types.STRING_ZO),
+    field("fragment", Types.STRING_ZO),
+    field("path-segments", Types.STRING_ZM),
     field("query-parameters", MapType.get(BasicType.STRING, Types.STRING_ZM).
-        seqType(Occ.ZERO_OR_ONE), true),
-    field("filepath", Types.STRING_ZO, true)
+        seqType(Occ.ZERO_OR_ONE)),
+    field("filepath", Types.STRING_ZO)
   );
 
   /** Built-in record types. */
@@ -108,34 +108,35 @@ public enum Records {
 
     // definitions requiring (possibly recursive) forward references
     final RecordType rng = RANDOM_NUMBER_GENERATOR.get();
-    rng.add("number", false, Types.DOUBLE_O).
-        add("next", false, FuncType.get(rng.seqType()).seqType()).
-        add("permute", false, FuncType.get(Types.ITEM_ZM, Types.ITEM_ZM).seqType());
+    rng.add("number", Types.DOUBLE_O).
+        add("next", FuncType.get(rng.seqType()).seqType()).
+        add("permute", FuncType.get(Types.ITEM_ZM, Types.ITEM_ZM).seqType());
 
     final RecordType stp = SCHEMA_TYPE.get();
-    stp.add("name", false, Types.QNAME_ZO).
-        add("is-simple", false, Types.BOOLEAN_O).
-        add("base-type", false, FuncType.get(stp.seqType(Occ.ZERO_OR_ONE)).seqType()).
-        add("primitive-type", true, FuncType.get(stp.seqType()).seqType()).
-        add("variety", true, Types.SCHEMA_TYPE_RECORD_VARIETY.seqType()).
-        add("members", true, FuncType.get(stp.seqType(Occ.ZERO_OR_MORE)).seqType()).
-        add("simple-content-type", true, FuncType.get(stp.seqType()).seqType()).
-        add("matches", true, FuncType.get(Types.BOOLEAN_O, Types.ANY_ATOMIC_TYPE_O).seqType()).
-        add("constructor", true, FuncType.get(Types.ANY_ATOMIC_TYPE_ZM,
-            Types.ANY_ATOMIC_TYPE_ZO).seqType());
+    stp.add("name", Types.QNAME_ZO).
+        add("is-simple", Types.BOOLEAN_O).
+        add("base-type", FuncType.get(stp.seqType(Occ.ZERO_OR_ONE)).seqType()).
+        add("primitive-type", FuncType.get(stp.seqType()).seqType(Occ.ZERO_OR_ONE)).
+        add("variety", Types.SCHEMA_TYPE_RECORD_VARIETY.seqType(Occ.ZERO_OR_ONE)).
+        add("members", FuncType.get(stp.seqType(Occ.ZERO_OR_MORE)).seqType(Occ.ZERO_OR_ONE)).
+        add("simple-content-type", FuncType.get(stp.seqType()).seqType(Occ.ZERO_OR_ONE)).
+        add("matches",
+            FuncType.get(Types.BOOLEAN_O, Types.ANY_ATOMIC_TYPE_O).seqType(Occ.ZERO_OR_ONE)).
+        add("constructor", FuncType.get(Types.ANY_ATOMIC_TYPE_ZM,
+            Types.ANY_ATOMIC_TYPE_ZO).seqType(Occ.ZERO_OR_ONE));
 
     final RecordType crx = COMPILED_REGEX.get();
-    crx.add("pattern", false, Types.STRING_O).
-        add("flags", false, Types.STRING_O).
-        add("matches", false, FuncType.get(Types.BOOLEAN_O, Types.STRING_O).seqType()).
-        add("tokenize", false, FuncType.get(Types.STRING_ZM, Types.STRING_O).seqType()).
-        add("replace", false, FuncType.get(Types.STRING_O, Types.STRING_O, ChoiceItemType.get(
+    crx.add("pattern", Types.STRING_O).
+        add("flags", Types.STRING_O).
+        add("matches", FuncType.get(Types.BOOLEAN_O, Types.STRING_O).seqType()).
+        add("tokenize", FuncType.get(Types.STRING_ZM, Types.STRING_O).seqType()).
+        add("replace", FuncType.get(Types.STRING_O, Types.STRING_O, ChoiceItemType.get(
             BasicType.STRING, FuncType.get(Types.ITEM_ZO, Types.UNTYPED_ATOMIC_O,
                 Types.UNTYPED_ATOMIC_ZM)).seqType(Occ.ZERO_OR_ONE)).seqType()).
-        add("analyze-string", false, FuncType.get(
+        add("analyze-string", FuncType.get(
             NodeType.get(NameTest.get(FnAnalyzeString.Q_ANALYZE_STRING_RESULT)).seqType(),
             Types.STRING_O).seqType()).
-        add("matching-segments", false, FuncType.get(
+        add("matching-segments", FuncType.get(
             MATCHING_SEGMENT.get().seqType(Occ.ZERO_OR_MORE), Types.STRING_O).seqType());
   }
 
@@ -189,18 +190,6 @@ public enum Records {
    * @return name/field pair
    */
   private static NamedRecordField field(final String name, final SeqType type) {
-    return field(name, type, false);
-  }
-
-  /**
-   * Returns a named record field.
-   * @param name name
-   * @param type type of record field
-   * @param optional optional flag
-   * @return name/field pair
-   */
-  private static NamedRecordField field(final String name, final SeqType type,
-      final boolean optional) {
-    return field(name, new RecordField(type, optional));
+    return field(name, new RecordField(type));
   }
 }

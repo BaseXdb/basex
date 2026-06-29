@@ -45,10 +45,6 @@ public class FnParseUri extends StandardFunc {
   static final String PATH_SEGMENTS = "path-segments";
   /** URI part. */
   static final String QUERY_PARAMETERS = "query-parameters";
-  /** URI part. */
-  static final String FILEPATH = "filepath";
-  /** Absolute. */
-  static final String ABSOLUTE = "absolute";
 
   /** File scheme. */
   static final String FILE = "file";
@@ -173,35 +169,22 @@ public class FnParseUri extends StandardFunc {
     }
     filepath = XMLToken.decodeUri(filepath);
 
-    final MapBuilder mb = new MapBuilder().type(Records.URI_STRUCTURE.get());
-    add(mb, URI, value);
-    add(mb, SCHEME, scheme);
-    if(absolute) add(mb, ABSOLUTE, Bln.TRUE);
-    add(mb, HIERARCHICAL, hierarchical);
-    add(mb, AUTHORITY, authority);
-    add(mb, USERINFO, userinfo);
-    add(mb, HOST, host);
-    add(mb, PORT, prt);
-    add(mb, PATH, path);
-    add(mb, QUERY, query);
-    add(mb, FRAGMENT, fragment);
-    add(mb, PATH_SEGMENTS, StrSeq.get(segments));
-    add(mb, QUERY_PARAMETERS, queries);
-    add(mb, FILEPATH, filepath);
-    return mb.map();
+    return new XQRecordMap(Records.URI_STRUCTURE.get(),
+      toValue(value), toValue(scheme), absolute ? Bln.TRUE : Empty.VALUE, toValue(hierarchical),
+      toValue(authority), toValue(userinfo), toValue(host), toValue(prt),
+      toValue(path), toValue(query), toValue(fragment), toValue(StrSeq.get(segments)),
+      toValue(queries), toValue(filepath));
   }
 
   /**
-   * Adds a non-empty map entry.
-   * @param mb map
-   * @param key key string
-   * @param value value object
-   * @throws QueryException query exception
+   * Returns the value for a record field.
+   * @param value value object (a string or a value)
+   * @return field value
    */
-  static void add(final MapBuilder mb, final String key, final Object value) throws QueryException {
+  static Value toValue(final Object value) {
     final Value v = value instanceof final Value vl ? vl : value.toString().isEmpty() ?
         Empty.VALUE : Str.get(value.toString());
-    if(!(v.isEmpty() || v == XQMap.empty())) mb.put(key, v);
+    return v.isEmpty() || v == XQMap.empty() ? Empty.VALUE : v;
   }
 
   /**

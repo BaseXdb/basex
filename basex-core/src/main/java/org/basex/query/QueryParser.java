@@ -993,19 +993,18 @@ public class QueryParser extends InputParser {
       do {
         skipWs();
         final byte[] name = ncName(NONCNAME_X, false);
-        final boolean optional = wsConsume("?");
         final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
         if(fields.contains(name)) throw error(DUPFIELD_X, name);
         skipWs();
         Expr expr = null;
-        if(exprRequired && !optional || current() == ':') {
+        if(exprRequired || current() == ':') {
           consume(":=");
           localVars.pushContext(false);
           expr = check(single(), NOEXPR);
           localVars.popContext();
           exprRequired = true;
         }
-        fields.put(name, new RecordField(seqType, optional, expr));
+        fields.put(name, new RecordField(seqType, expr));
       } while(wsConsume(","));
       wsCheck(")");
     }
@@ -1041,7 +1040,7 @@ public class QueryParser extends InputParser {
         throw error(PARAMOPTIONAL_X, key);
       }
       final SeqType st = rf.seqType();
-      params.add(new QNm(key), rf.isOptional() ? st.union(Occ.ZERO) : st, init, null);
+      params.add(new QNm(key), st, init, null);
     }
     params.seqType(rt.seqType()).finish(qc, localVars);
 
@@ -1828,7 +1827,8 @@ public class QueryParser extends InputParser {
   private Expr additive() throws QueryException {
     Expr expr = multiplicative();
     while(expr != null) {
-      final Calc c = consume('+') ? Calc.ADD : next() != '>' && consume('-') ? Calc.SUBTRACT : null;
+      final Calc c = next() != ':' && consume('+') ? Calc.ADD :
+        next() != '>' && consume('-') ? Calc.SUBTRACT : null;
       if(c == null) break;
       expr = new Arith(info(), expr, check(multiplicative(), CALCEXPR), c);
     }
@@ -1885,7 +1885,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr intersect() throws QueryException {
-    Expr expr = instanceOf();
+    Expr expr = recordPut();
     boolean lastIs = false;
     ExprList el = null;
     while(true) {
@@ -1897,9 +1897,22 @@ public class QueryParser extends InputParser {
       }
       lastIs = is;
       if(el == null) el = new ExprList().add(expr);
-      add(el, instanceOf());
+      add(el, recordPut());
     }
     return el != null ? intersectExcept(lastIs, el) : expr;
+  }
+
+  /**
+   * Parses the "RecordPutExpr" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr recordPut() throws QueryException {
+    Expr expr = instanceOf();
+    while(wsConsume("+:=")) {
+      expr = new RecordPut(info(), expr, instanceOf());
+    }
+    return expr;
   }
 
   /**
@@ -3609,8 +3622,13 @@ public class QueryParser extends InputParser {
    */
   private Type functionTest(final AnnList anns, final Type type) throws QueryException {
     if(type == Types.RECORD) {
-      // empty record
-      if(wsConsume(")")) return type;
+      // record(*): any record
+      if(wsConsume("*")) {
+        wsCheck(")");
+        return type;
+      }
+      // record(): empty record (distinct from the abstract record(*))
+      if(wsConsume(")")) return qc.shared.record(new RecordType(true, new TokenObjectMap<>(0)));
     } else if(wsConsume("*")) {
       // wildcard
       wsCheck(")");
@@ -3624,14 +3642,13 @@ public class QueryParser extends InputParser {
         do {
           skipWs();
           final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X, false);
-          final boolean optional = wsConsume("?");
           final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
           if(fields.contains(name)) throw error(DUPFIELD_X, name);
-          fields.put(name, new RecordField(seqType, optional));
+          fields.put(name, new RecordField(seqType));
         } while(wsConsume(","));
         check(')');
       }
-      return qc.shared.record(new RecordType(fields));
+      return qc.shared.record(new RecordType(true, fields));
     }
     // map
     if(type instanceof MapType) {

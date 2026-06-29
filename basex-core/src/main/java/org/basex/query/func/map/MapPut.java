@@ -34,17 +34,8 @@ public final class MapPut extends MapFn {
     Type tp = null;
     final MapTypeInfo mti = MapTypeInfo.get(map).key(key);
     if(mti.field != null) {
-      // use optimized getter for records
-      if(!mti.record.hasOptional()) return new RecordSet(info, map, mti.index, value).optimize(cc);
-
-      final SeqType vt = value.seqType(), ft = mti.field.seqType();
-      if(vt.instanceOf(ft)) {
-        // structure does not change (new value has same type): propagate record type
-        tp = mti.record;
-      } else if(mti.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
-        // otherwise, derive new record type
-        tp = mti.record.copy(null, mti.key, vt.union(ft), cc);
-      }
+      // use optimized setter for records
+      return new RecordSet(info, map, mti.index, value).optimize(cc);
     } else if(mti.validKey) {
       if(mti.key != null && mti.record.fields().size() < RecordType.MAX_GENERATED_SIZE) {
         // otherwise, derive new record type

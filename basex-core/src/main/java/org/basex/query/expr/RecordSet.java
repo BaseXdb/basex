@@ -42,8 +42,8 @@ public final class RecordSet extends Arr {
     Type tp = null;
     final SeqType vt = value.seqType(), ft = type.fields().value(index).seqType();
     if(vt.instanceOf(ft)) {
-      // structure does not change (new value has same type): propagate record type
-      tp = type;
+      // structure does not change (new value has same type): propagate the de-sealed record type
+      tp = type.open();
     } else {
       // otherwise, derive new record type
       tp = type.copy(null, type.fields().key(index), vt.union(ft), cc);

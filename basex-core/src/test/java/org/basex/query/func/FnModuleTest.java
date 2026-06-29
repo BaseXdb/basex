@@ -241,6 +241,8 @@ public final class FnModuleTest extends SandboxTest {
         + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"variety\":\"atomic\","
+        + "\"members\":(),"
+        + "\"simple-content-type\":(),"
         + "\"matches\":fn($value) as xs:boolean { matches($value) },"
         + "\"constructor\":xs:untypedAtomic#1}");
     query(q1 + "?name eq #xs:untypedAtomic", true);
@@ -251,14 +253,14 @@ public final class FnModuleTest extends SandboxTest {
     query(q1 + "?base-type()?variety", "atomic");
     query(q1 + "?base-type()?base-type()?name eq #xs:anySimpleType", true);
     query(q1 + "?base-type()?base-type()?is-simple", true);
-    query(q1 + "?base-type()?base-type()=> map:contains('variety')", false);
+    query(q1 + "?base-type()?base-type()=> map:contains('variety')", true);
     query(q1 + "?base-type()?base-type()?base-type()?name eq #xs:anyType", true);
     query(q1 + "?base-type()?base-type()?base-type()?is-simple", false);
     query(q1 + "?base-type()?base-type()?base-type()?variety", "mixed");
     query(q1 + "?base-type()?base-type()?base-type()?base-type() => exists()", false);
     query(q1 + "?primitive-type()?name eq #xs:untypedAtomic", true);
-    query(q1 + "=> map:contains('members')", false);
-    query(q1 + "=> map:contains('simple-content-type')", false);
+    query(q1 + "=> map:contains('members')", true);
+    query(q1 + "=> map:contains('simple-content-type')", true);
     query(q1 + "?matches(<a>abc</a>)", true);
     query(q1 + "?constructor(<a>abc</a>)", "abc");
 
@@ -268,6 +270,8 @@ public final class FnModuleTest extends SandboxTest {
         + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"variety\":\"atomic\","
+        + "\"members\":(),"
+        + "\"simple-content-type\":(),"
         + "\"matches\":fn($value) as xs:boolean { matches($value) },"
         + "\"constructor\":xs:unsignedByte#1}");
     query(q2 + "?name eq #xs:unsignedByte", true);
@@ -279,8 +283,8 @@ public final class FnModuleTest extends SandboxTest {
     query(q2 + "?primitive-type()?base-type()?name eq #xs:anyAtomicType", true);
     query(q2 + "?primitive-type() => deep-equal($q2?base-type()?primitive-type())", true);
     query(q2 + "?variety", "atomic");
-    query(q2 + "=> map:contains('members')", false);
-    query(q2 + "=> map:contains('simple-content-type')", false);
+    query(q2 + "=> map:contains('members')", true);
+    query(q2 + "=> map:contains('simple-content-type')", true);
     query(q2 + "?matches($q2?constructor(255))", true);
     query(q2 + "?matches($q2?base-type()?constructor(255))", false);
     query(q2 + "?constructor(255) => ($q2?matches)()", true);
@@ -2483,16 +2487,21 @@ return
     query(q1, "{\"name\":#untyped,"
         + "\"is-simple\":false(),"
         + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
-        + "\"variety\":\"mixed\"}");
+        + "\"primitive-type\":(),"
+        + "\"variety\":\"mixed\","
+        + "\"members\":(),"
+        + "\"simple-content-type\":(),"
+        + "\"matches\":(),"
+        + "\"constructor\":()}");
     query(q1 + "?name eq #xs:untyped", true);
     query(q1 + "?is-simple", false);
     query(q1 + "?variety", "mixed");
     query(q1 + "?base-type()?name eq #xs:anyType", true);
     query(q1 + "?base-type()?is-simple", false);
     query(q1 + "?base-type()?variety", "mixed");
-    query(q1 + "=> map:contains('primitive-type')", false);
-    query(q1 + "=> map:contains('members')", false);
-    query(q1 + "=> map:contains('simple-content-type')", false);
+    query(q1 + "=> map:contains('primitive-type')", true);
+    query(q1 + "=> map:contains('members')", true);
+    query(q1 + "=> map:contains('simple-content-type')", true);
 
     final String q2 = func.args(" attribute a {42}");
     query(q2, "{\"name\":#untypedAtomic,"
@@ -2500,6 +2509,8 @@ return
         + "\"base-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"primitive-type\":fn() as fn:schema-type-record { type-annotation() },"
         + "\"variety\":\"atomic\","
+        + "\"members\":(),"
+        + "\"simple-content-type\":(),"
         + "\"matches\":fn($value) as xs:boolean { matches($value) },"
         + "\"constructor\":xs:untypedAtomic#1}");
     query(q2 + "?name eq #xs:untypedAtomic", true);
@@ -2510,14 +2521,14 @@ return
     query(q2 + "?base-type()?variety", "atomic");
     query(q2 + "?base-type()?base-type()?name eq #xs:anySimpleType", true);
     query(q2 + "?base-type()?base-type()?is-simple", true);
-    query(q2 + "?base-type()?base-type()=> map:contains('variety')", false);
+    query(q2 + "?base-type()?base-type()=> map:contains('variety')", true);
     query(q2 + "?base-type()?base-type()?base-type()?name eq #xs:anyType", true);
     query(q2 + "?base-type()?base-type()?base-type()?is-simple", false);
     query(q2 + "?base-type()?base-type()?base-type()?variety", "mixed");
     query(q2 + "?base-type()?base-type()?base-type()?base-type() => exists()", false);
     query(q2 + "?primitive-type()?name eq #xs:untypedAtomic", true);
-    query(q2 + "=> map:contains('members')", false);
-    query(q2 + "=> map:contains('simple-content-type')", false);
+    query(q2 + "=> map:contains('members')", true);
+    query(q2 + "=> map:contains('simple-content-type')", true);
     query(q2 + "?matches(<a>abc</a>)", true);
     query(q2 + "?constructor(attribute a {42})", "42");
 
