@@ -53,6 +53,19 @@ public final class RecordSet extends Arr {
   }
 
   @Override
+  public Expr typeCheck(final TypeCheck tc, final CompileContext cc) throws QueryException {
+    // map:put(RECORD, FIELD, VALUE) coerce to T → (RECORD coerce to T) +:= map:entry(FIELD, VALUE)
+    if(tc.seqType().type instanceof final RecordType rt && rt.strict() &&
+        rt.fields().contains(type.fields().key(index)) &&
+        (exprs[0] instanceof RecordSet || type.instanceOf(rt))) {
+      final Expr rec = tc.check(exprs[0], cc);
+      final Expr entry = cc.function(_MAP_ENTRY, info, Str.get(type.fields().key(index)), exprs[1]);
+      return new RecordPut(info, rec != null ? rec : exprs[0], entry).optimize(cc);
+    }
+    return null;
+  }
+
+  @Override
   public XQMap item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return toMap(exprs[0], qc).putAt(index - 1, exprs[1].value(qc));
   }

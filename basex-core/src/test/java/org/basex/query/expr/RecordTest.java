@@ -329,6 +329,30 @@ public final class RecordTest extends SandboxTest {
         "{\"x\":1,\"y\":(),0:0}", type(func, "map(*)"));
   }
 
+  /** A field update coerced back to its record type is fused into the {@code +:=} operator. */
+  @Test public void typePutCoerce() {
+    // map:put(R, FIELD, VALUE) coerce to RECORD  ->  R +:= map:entry(FIELD, VALUE)
+    check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
+        + "let $s as record(a, b) := map:put($r, 'a', 0) return $s",
+        "{\"a\":0,\"b\":2}", root(RecordPut.class), empty(RecordSet.class));
+    // the fused result is sealed again: strict field access applies
+    error("declare record local:coord(x, y);\n"
+        + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
+        + "local:reset(local:coord(<x>1</x>, <y>2</y>))?z", RECORDFIELD_X_X);
+    // no fusion when the coercion target is not the record's own (strict) type
+    check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } return map:put($r, 'a', 0)",
+        "{\"a\":0,\"b\":2}", empty(RecordPut.class));
+    // a chain of updates unrolls into a chain of +:= operations, with no RecordSet left behind
+    check("let $r as record(a, b) := { 'a': <a/>, 'b': 2 } "
+        + "let $s as record(a, b) := $r => map:put('a', 0) => map:put('b', 9) return $s",
+        "{\"a\":0,\"b\":9}",
+        root(RecordPut.class), empty(RecordSet.class), count(RecordPut.class, 2));
+    error("declare record local:coord(x, y);\n"
+        + "declare function local:reset($c as local:coord) as local:coord "
+        + "{ $c => map:put('x', 0) => map:put('y', 0) };\n"
+        + "local:reset(local:coord(<x>1</x>, 2))?z", RECORDFIELD_X_X);
+  }
+
   /** Tests for the compact record map implementation. */
   @Test public void recordMap() {
     String map = "{ 'a': 1, 'b': 2 }";
