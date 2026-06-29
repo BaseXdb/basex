@@ -1171,6 +1171,8 @@ public enum QueryError {
   /** Error code. */
   MIXEDRESULTS(XPTY, 18, "Path returns both nodes and non-nodes."),
   /** Error code. */
+  PATHJNODE_X_X_X(XPTY, 18, "%: JNode or atomic value expected, % found: %."),
+  /** Error code. */
   NSSENS_X_X(XPTY, 117, "Cannot convert % to %."),
 
   /** Error code. */

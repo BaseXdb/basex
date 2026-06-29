@@ -406,6 +406,17 @@ public final class JNodeTest extends SandboxTest {
     query("let $j := { 'a': 1 } let $x := $j/a return $j/$x", 1);
   }
 
+  /** A path result over JNodes must be JNodes or atomic values (XPTY0018, not XPTY0004). */
+  @Test public void pathResultType() {
+    error("let $j := { 'a': 1 } return $j/$j", PATHJNODE_X_X_X);
+    error("{ 'a': 1 }/({ 'b': 2 })", PATHJNODE_X_X_X);
+    error("{ 'a': 1 }/(true#0)", PATHJNODE_X_X_X);
+    // XML nodes are not valid results either (must not be treated as a child step)
+    error("{ 'a': { 'b': 'c' } }/<a>a</a>", PATHJNODE_X_X_X);
+    error("{ 'a': 1 }/<x>y</x>", PATHJNODE_X_X_X);
+    error("{ 'a': 1 }/(<x>y</x>, 'a')", PATHJNODE_X_X_X);
+  }
+
   /** EBV. */
   @Test public void ebv() {
     query("boolean([] => jtree())", true);
