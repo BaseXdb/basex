@@ -43,15 +43,18 @@ public final class FTContent extends FTFilter {
       }
     } else {
       final int s = lexer.count();
-      final boolean[] bl = new boolean[s];
-      for(final FTStringMatch sm : match) {
-        if(sm.gaps) continue;
-        for(int p = sm.start; p <= sm.end; ++p) bl[p] = true;
+      for(final FTMatch combo : combine(match)) {
+        final boolean[] bl = new boolean[s];
+        for(final FTStringMatch sm : combo) {
+          if(sm.gaps) continue;
+          for(int p = sm.start; p <= sm.end; ++p) bl[p] = true;
+        }
+        boolean entire = true;
+        for(final boolean b : bl) {
+          if(!b) { entire = false; break; }
+        }
+        if(entire) return true;
       }
-      for(final boolean b : bl) {
-        if(!b) return false;
-      }
-      return true;
     }
     return false;
   }

@@ -386,6 +386,8 @@ abstract class FTTest extends QueryTest {
         "//order contains text 'A B' all words ordered" },
       { "FTOrdered 15", booleans(true),
         "//order contains text 'B A' all words ordered" },
+      { "FTOrdered 16", booleans(true),
+        "'a b c b' contains text 'a b c' all words ordered" },
 
       { "FTDistance 1", nodes(3),
         "//w[text() contains text 'the' ftand 'fourth' " +
@@ -433,6 +435,19 @@ abstract class FTTest extends QueryTest {
       { "FTWindow 5", nodes(37),
         "//w[. contains text 'fifth' ftand 'third' " +
         "ftand 'second' window 7 words ordered]" },
+      { "FTWindow 6", booleans(true),
+        "'a b b' contains text 'a b' all words window 2 words" },
+      { "FTWindow 7", booleans(true),
+        "'b a b' contains text 'a b' all words window 2 words" },
+      { "FTWindow 8", booleans(true),
+        "'a b a b' contains text 'a b' all words window 2 words" },
+      { "FTWindow 9", booleans(true),
+        "'a a b' contains text 'a b' all words window 2 words" },
+      { "FTWindow 10", booleans(false),
+        "'a b b' contains text 'a b' all words window 1 words" },
+      { "FTWindow 11", booleans(true),
+        "'a single event during the custodial history of a manuscript or other object.'" +
+        " contains text 'custodial history of a manuscript' all words window 5 words" },
 
       { "FTScope 1", nodes(27, 29, 33),
         "//fti[. contains text 'wordt ook' same sentence]" },
@@ -446,6 +461,12 @@ abstract class FTTest extends QueryTest {
         "//fti[. contains text 'ook' ftand 'wel' different paragraph]" },
       { "FTScope 6", booleans(true),
         "'a. a b' contains text ('a' ftand 'b') different sentence" },
+      { "FTScope 7", booleans(true),
+        "'a b. a b' contains text 'a b' all words same sentence" },
+      { "FTScope 8", booleans(true),
+        "'a b. a b' contains text 'a b' all words different sentence" },
+      { "FTScope 9", booleans(false),
+        "'a x. y b' contains text 'a b' all words same sentence" },
 
       { "FTContent 1", nodes(3, 5, 9, 11),
         "//w[text() contains text 'xml' at start]" },
@@ -505,6 +526,10 @@ abstract class FTTest extends QueryTest {
         "'a b' contains text 'a' entire content" },
       { "FTContent 27", booleans(false),
         "'a b' contains text 'b' entire content" },
+      { "FTContent 28", booleans(false),
+        "'a b b' contains text 'a b' all words entire content" },
+      { "FTContent 29", booleans(true),
+        "'a b' contains text 'a b' all words entire content" },
 
       { "FTMildNot 1", nodes(3, 5),
         "//w[text() contains text 'xml' not in 'xml databases']" },

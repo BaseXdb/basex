@@ -68,26 +68,8 @@ public final class FTDistance extends FTFilter {
     final long mn = toLong(min, qc), mx = toLong(max, qc);
 
     // create all possible combinations
-    final FTMatch includes = new FTMatch(), excludes = new FTMatch();
-    for(final FTStringMatch sm : match) (sm.exclude ? excludes : includes).add(sm);
-    int pos = -1;
-    final ArrayList<FTMatch> matches = new ArrayList<>();
-    for(final FTStringMatch include : includes) {
-      if(pos < include.pos) {
-        pos = include.pos;
-        if(matches.isEmpty()) {
-          matches.add(new FTMatch().add(include));
-        } else {
-          for(final FTMatch ftm : matches) ftm.add(include);
-        }
-      } else {
-        final int ms = matches.size();
-        for(int m = 0; m < ms; m++) {
-          final FTMatch ftm = matches.get(m);
-          matches.add(new FTMatch().add(ftm).set(ftm.size() - 1, include));
-        }
-      }
-    }
+    final FTMatch excludes = excludes(match);
+    final ArrayList<FTMatch> matches = combine(match);
 
     // collect matches
     match.reset();

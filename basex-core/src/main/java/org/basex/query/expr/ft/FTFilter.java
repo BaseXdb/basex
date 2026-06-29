@@ -1,5 +1,7 @@
 package org.basex.query.expr.ft;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.ft.*;
@@ -90,6 +92,47 @@ public abstract class FTFilter extends FTExpr {
    */
   protected abstract boolean filter(QueryContext qc, FTMatch match, FTLexer lexer)
       throws QueryException;
+
+  /**
+   * Returns the excluded string matches of a full-text match.
+   * @param match full-text match
+   * @return excludes
+   */
+  protected static FTMatch excludes(final FTMatch match) {
+    final FTMatch excludes = new FTMatch();
+    for(final FTStringMatch sm : match) {
+      if(sm.exclude) excludes.add(sm);
+    }
+    return excludes;
+  }
+
+  /**
+   * Builds all combinations of include string matches, one occurrence per query position.
+   * @param match full-text match (ordered by query position; excludes are dropped)
+   * @return combinations, each holding one include per query position
+   */
+  protected static ArrayList<FTMatch> combine(final FTMatch match) {
+    int pos = -1;
+    final ArrayList<FTMatch> combos = new ArrayList<>();
+    for(final FTStringMatch sm : match) {
+      if(sm.exclude) continue;
+      if(pos < sm.pos) {
+        pos = sm.pos;
+        if(combos.isEmpty()) {
+          combos.add(new FTMatch().add(sm));
+        } else {
+          for(final FTMatch combo : combos) combo.add(sm);
+        }
+      } else {
+        final int cs = combos.size();
+        for(int c = 0; c < cs; c++) {
+          final FTMatch combo = combos.get(c);
+          combos.add(new FTMatch().add(combo).set(combo.size() - 1, sm));
+        }
+      }
+    }
+    return combos;
+  }
 
   /**
    * Checks if the filter requires the whole text node to be parsed.

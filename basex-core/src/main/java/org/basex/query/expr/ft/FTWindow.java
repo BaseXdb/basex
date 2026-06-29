@@ -57,29 +57,54 @@ public final class FTWindow extends FTFilter {
       throws QueryException {
 
     final int n = (int) toLong(win, qc) - 1;
-    match.sort();
+    // excluded matches participate in the window offset check; combinations cover includes
+    final FTMatch excludes = excludes(match);
 
-    FTStringMatch first = null;
-    for(final FTStringMatch sm : match) {
-      if(sm.exclude) continue;
-      if(first == null) first = sm;
-      final int fend = first.end, send = sm.end;
-      first.gaps |= send - fend > 1;
-      first.end = send;
-      if(pos(send, lexer) - pos(first.start, lexer) > n) return false;
+    // succeed if any one-occurrence-per-query-position combination fits the window
+    for(final FTMatch combo : combine(match)) {
+      combo.sort();
+      if(window(combo, excludes, n, lexer)) {
+        match.reset();
+        match.add(combo.get(0));
+        return true;
+      }
     }
-    if(first == null) return false;
+    return false;
+  }
 
-    final int w = n - pos(first.end, lexer) + pos(first.start, lexer);
+  /**
+   * Checks whether a combination fits the window (records span/gaps in the first match on
+   * success, leaves the shared matches untouched on failure).
+   * @param combo include string matches for this combination, sorted by start position
+   * @param excludes excluded string matches
+   * @param n window size minus one
+   * @param lexer tokenizer
+   * @return result of check
+   */
+  private boolean window(final FTMatch combo, final FTMatch excludes, final int n,
+      final FTLexer lexer) {
+
+    // accumulate span and gaps without mutating, checking the window size
+    final FTStringMatch first = combo.get(0);
+    int end = first.end;
+    boolean gaps = first.gaps;
+    for(final FTStringMatch sm : combo) {
+      gaps |= sm.end - end > 1;
+      end = sm.end;
+      if(pos(end, lexer) - pos(first.start, lexer) > n) return false;
+    }
+
+    // find a window offset with no excluded match inside
+    final int w = n - pos(end, lexer) + pos(first.start, lexer);
     for(int s = pos(first.start, lexer) - w; s <= pos(first.start, lexer); ++s) {
       boolean h = false;
-      for(final FTStringMatch sm : match) {
-        h = sm.exclude && pos(sm.start, lexer) >= s && pos(sm.end, lexer) <= s + w;
+      for(final FTStringMatch sm : excludes) {
+        h = pos(sm.start, lexer) >= s && pos(sm.end, lexer) <= s + w;
         if(h) break;
       }
       if(!h) {
-        match.reset();
-        match.add(first);
+        first.end = end;
+        first.gaps = gaps;
         return true;
       }
     }

@@ -34,23 +34,39 @@ public final class FTScope extends FTFilter {
 
   @Override
   protected boolean filter(final QueryContext qc, final FTMatch match, final FTLexer lexer) {
-    // same unit
-    if(same) {
-      int s = -1;
-      for(final FTStringMatch sm : match) {
-        if(sm.exclude) continue;
-        final int p = pos(sm.start, lexer);
-        if(s == -1) s = p;
-        else if(s != p) return false;
-        if(sm.start != sm.end && s != pos(sm.end, lexer)) return false;
-      }
-      return true;
+    for(final FTMatch combo : combine(match)) {
+      if(same ? same(combo, lexer) : different(combo, lexer)) return true;
     }
-    // different unit
+    return false;
+  }
+
+  /**
+   * Checks if all string matches of the combination occur in the same unit.
+   * @param combo include string matches
+   * @param lexer tokenizer
+   * @return result of check
+   */
+  private boolean same(final FTMatch combo, final FTLexer lexer) {
+    int s = -1;
+    for(final FTStringMatch sm : combo) {
+      final int p = pos(sm.start, lexer);
+      if(s == -1) s = p;
+      else if(s != p) return false;
+      if(sm.start != sm.end && s != pos(sm.end, lexer)) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the string matches of the combination occur in different units.
+   * @param combo include string matches
+   * @param lexer tokenizer
+   * @return result of check
+   */
+  private boolean different(final FTMatch combo, final FTLexer lexer) {
     int c = 0;
     final BoolList bl = new BoolList();
-    for(final FTStringMatch sm : match) {
-      if(sm.exclude) continue;
+    for(final FTStringMatch sm : combo) {
       c++;
       final int pos = pos(sm.start, lexer), size = bl.size();
       if(pos < size && bl.get(pos) && pos == pos(sm.end, lexer)) return false;
