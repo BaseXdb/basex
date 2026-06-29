@@ -159,14 +159,15 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Return the minimum number of fields that must be supplied to the constructor function. Only
-   * fields with an initializer are optional, and they are always trailing (enforced by the parser).
+   * Return the minimum number of fields that must be supplied to the constructor function.
    * @return minimum number of fields
    */
   public int minFields() {
     int min = 0;
     for(final RecordField rf : fields.values()) {
-      if(rf.init() != null) return min;
+      // a field is an optional constructor parameter if it has an initializer, or if its type
+      // permits the empty sequence (in which case an omitted argument defaults to ())
+      if(rf.init() != null || !rf.seqType().oneOrMore()) return min;
       ++min;
     }
     return min;
