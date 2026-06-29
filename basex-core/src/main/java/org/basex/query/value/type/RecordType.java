@@ -251,6 +251,8 @@ public final class RecordType extends MapType {
       return true;
     }
     if(type instanceof final RecordType rt) {
+      // an open record is not an instance of a sealed record (the seal is an extra guarantee)
+      if(rt.sealed && !sealed) return false;
       if(fields.size() != rt.fields.size()) return false;
       for(final byte[] key : rt.fields) {
         if(!fields.contains(key)) return false;

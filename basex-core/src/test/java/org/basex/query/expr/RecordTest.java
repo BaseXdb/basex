@@ -74,6 +74,13 @@ public final class RecordTest extends SandboxTest {
     // map:put and map:remove de-seal: the teeth no longer apply to the result
     query("let $r as record(a) := { 'a': 1 } return map:put($r, 'a', 2)?b", "");
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return map:remove($r, 'a')?z", "");
+    // a declared return type re-seals a result de-sealed by map:put: the teeth apply again
+    query("declare record local:coord(x, y);\n"
+        + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
+        + "local:reset(local:coord(1, 2)) instance of local:coord", true);
+    error("declare record local:coord(x, y);\n"
+        + "declare function local:reset($c as local:coord) as local:coord { map:put($c, 'x', 0) }; "
+        + "local:reset(local:coord(1, 2))?z", RECORDFIELD_X_X);
     // multiple keys: every key must be a declared field
     query("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?('a', 'b')", "1\n2");
     error("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r?('a', 'c')", RECORDFIELD_X_X);
@@ -126,6 +133,9 @@ public final class RecordTest extends SandboxTest {
     // field types are covariant
     query("let $r as record(x as xs:integer) := { 'x': 1 } "
         + "return $r instance of record(x as xs:decimal)", true);
+
+    // a sealed record is an instance of a structurally equal open record
+    query("declare record local:coord(x, y); local:coord(1, 2) instance of record(x, y)", true);
 
     // function-argument coercion widens a narrower record (a missing field becomes ())
     query("fn($r as record(x, y as item()*)) { $r }({ 'x': 1 })", "{\"x\":1,\"y\":()}");
