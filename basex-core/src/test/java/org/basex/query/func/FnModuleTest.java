@@ -2088,6 +2088,23 @@ return
     final Function func = JSON_TO_XML;
     contains(func.args("null"), "xmlns");
     contains(func.args("null") + " update {}", "xmlns");
+
+    // duplicates: reject errors, use-first keeps the first, use-last is unsupported,
+    // retain (the default for this format) keeps both
+    final String dup = "{\"x\":1,\"x\":2}", ns = "http://www.w3.org/2005/xpath-functions";
+    error(func.args(dup, " { 'duplicates': 'reject' }"), DUPLICATE_JSON_X);
+    query("try { " + func.args(dup, " { 'duplicates': 'reject' }") +
+        " } catch * { $err:description }", "(1:11): Key \"x\" occurs more than once.");
+    query(func.args(dup, " { 'duplicates': 'use-first' }"),
+        "<map xmlns=\"" + ns + "\"><number key=\"x\">1</number></map>");
+    error(func.args(dup, " { 'duplicates': 'use-last' }"), OPTION_JSON_X);
+    query("try { " + func.args(dup, " { 'duplicates': 'use-last' }") +
+        " } catch * { $err:description }",
+        "'duplicates':'use-last' is not supported by the target format.");
+    final String both = "<map xmlns=\"" + ns + "\"><number key=\"x\">1</number>" +
+        "<number key=\"x\">2</number></map>";
+    query(func.args(dup, " { 'duplicates': 'retain' }"), both);
+    query(func.args(dup), both);
   }
 
   /**
@@ -2935,6 +2952,20 @@ return
 
     error(func.args("1", " { 'number-parser': xs:decimal#1 }"), INVALIDOPTION_X);
     error(func.args("1e9999", " { 'number-format': 'decimal' }"), FUNCCAST_X_X);
+
+    // duplicates (maps): reject errors, use-first/use-last select a value, retain is unsupported,
+    // the default is use-first
+    final String dup = "{\"x\":1,\"x\":2}";
+    error(func.args(dup, " { 'duplicates': 'reject' }"), DUPLICATE_JSON_X);
+    query("try { " + func.args(dup, " { 'duplicates': 'reject' }") +
+        " } catch * { $err:description }", "(1:11): Key \"x\" occurs more than once.");
+    query(func.args(dup, " { 'duplicates': 'use-first' }"), "{\"x\":1}");
+    query(func.args(dup, " { 'duplicates': 'use-last' }"), "{\"x\":2}");
+    error(func.args(dup, " { 'duplicates': 'retain' }"), OPTION_JSON_X);
+    query("try { " + func.args(dup, " { 'duplicates': 'retain' }") +
+        " } catch * { $err:description }",
+        "'duplicates':'retain' is not supported by the target format.");
+    query(func.args(dup), "{\"x\":1}");
   }
 
   /** Test method. */

@@ -59,7 +59,7 @@ public final class JsonW3Converter extends JsonConverter {
     fmt = jopts.get(JsonParserOptions.NUMBER_FORMAT);
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
     if(dupl == JsonDuplicates.RETAIN) {
-      throw OPTION_JSON_X.get(null, JsonParserOptions.DUPLICATES.name(), dupl);
+      throw optionError(JsonParserOptions.DUPLICATES.name(), dupl);
     }
   }
 

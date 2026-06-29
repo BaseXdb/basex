@@ -26,18 +26,17 @@ public final class JsonAttsConverter extends JsonXmlConverter {
 
   @Override
   protected void openObject() {
-    openOuter(OBJECT);
+    if(!skipOpen()) openOuter(OBJECT);
   }
 
   @Override
   protected void closeObject() {
-    closeOuter();
+    if(!skipClose()) closeOuter();
   }
 
   @Override
   protected void openPair(final byte[] key, final boolean add) {
-    addValues.add(add);
-    if(add) {
+    if(!skipPair(add)) {
       openInner(Q_PAIR);
       name = shared.token(key);
       curr.attr(Q_NAME, name);
@@ -46,36 +45,35 @@ public final class JsonAttsConverter extends JsonXmlConverter {
 
   @Override
   protected void closePair(final boolean add) {
-    if(add) {
+    if(!skipClose() && add) {
       closeInner();
       name = null;
     }
-    addValues.pop();
   }
 
   @Override
   protected void openArray() {
-    openOuter(ARRAY);
+    if(!skipOpen()) openOuter(ARRAY);
   }
 
   @Override
   protected void closeArray() {
-    closeOuter();
+    if(!skipClose()) closeOuter();
   }
 
   @Override
   protected void openItem() {
-    openInner(Q_ITEM);
+    if(!skip()) openInner(Q_ITEM);
   }
 
   @Override
   protected void closeItem() {
-    closeInner();
+    if(!skip()) closeInner();
   }
 
   @Override
   void addValue(final byte[] type, final byte[] value) {
-    if(addValues.peek()) element(type).text(value != null ? shared.token(value) : null);
+    if(!skip()) element(type).text(value != null ? shared.token(value) : null);
   }
 
   /**

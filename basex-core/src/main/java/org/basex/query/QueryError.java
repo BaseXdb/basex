@@ -346,7 +346,7 @@ public enum QueryError {
   /** Error code. */
   JSON_SERIALIZE_X(JSON, "serialize", "%."),
   /** Error code. */
-  JSON_OPTIONS_X(JSON, "options", "'%':'%' is not supported by the target format."),
+  JSON_OPTIONS_X(JSON, "options", "%"),
 
   // Process Module
 
@@ -669,7 +669,7 @@ public enum QueryError {
   /** Error code. */
   PARSE_JSON_X_X_X(FOJS, 1, "(%:%): %."),
   /** Error code. */
-  DUPLICATE_JSON_X(FOJS, 3, "%"),
+  DUPLICATE_JSON_X(FOJS, 3, "(%:%): %."),
   /** Error code. */
   MERGE_DUPLICATE_X(FOJS, 3, "Key % occurs more than once."),
   /** Error code. */
