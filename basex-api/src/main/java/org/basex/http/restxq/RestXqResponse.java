@@ -94,7 +94,10 @@ final class RestXqResponse extends WebResponse {
           // server-side forwarding
           final GNode ch = node.childIter().next();
           if(ch == null || ch.type != NodeType.TEXT) throw func.error(NO_VALUE_X, node.name());
-          forward = string(ch.string()).trim();
+          final String location = string(ch.string()).trim();
+          if(!conn.forwardable(location)) throw func.error(INVALID_FORWARD_X, location);
+          // assign the field only once valid: finish() forwards any non-null value, even on error
+          forward = location;
           item = iter.next();
         } else if(T_REST_RESPONSE.matches(node)) {
           // custom response

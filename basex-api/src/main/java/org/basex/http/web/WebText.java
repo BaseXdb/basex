@@ -89,6 +89,8 @@ public interface WebText {
   String ERROR_QS_X = "Invalid quality factor: qs=%";
   /** Error message. */
   String NO_VALUE_X = "'%' element has no string value.";
+  /** Error message. */
+  String INVALID_FORWARD_X = "Invalid forwarding location: '%'.";
 
   /** QName. */
   QNm Q_STATUS = new QNm("status");
