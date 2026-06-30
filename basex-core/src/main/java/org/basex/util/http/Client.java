@@ -18,6 +18,7 @@ import org.basex.build.html.*;
 import org.basex.build.json.*;
 import org.basex.core.*;
 import org.basex.core.StaticOptions.*;
+import org.basex.core.jobs.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
@@ -169,10 +170,10 @@ public final class Client {
       if(sa && request.authMethod == AuthMethod.BASIC) {
         ui.basic(rb);
       } else {
-        final HttpResponse<InputStream> response = client.send(rb.build(), handler);
+        final HttpResponse<InputStream> response = Job.run(() -> client.send(rb.build(), handler));
         if(!ui.assign(rb, response)) return response;
       }
-      return client.send(rb.build(), handler);
+      return Job.run(() -> client.send(rb.build(), handler));
     } catch(final InterruptedException | IllegalArgumentException ex) {
       // illegal argument exception may be caused by wrongly encoded redirect URL
       Util.debug(ex);

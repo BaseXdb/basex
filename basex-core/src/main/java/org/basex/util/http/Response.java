@@ -9,6 +9,7 @@ import java.util.Map.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.*;
@@ -68,7 +69,7 @@ public final class Response {
 
     // add payload elements and contents
     final ItemList items = new ItemList().add((Item) null);
-    try(InputStream is = response.body()) {
+    try(InputStream is = new StoppableInputStream(response.body())) {
       final HttpHeaders headers = response.headers();
       final MediaType type = mtype != null ? new MediaType(mtype) :
         headers.firstValue(CONTENT_TYPE).map(MediaType::new).orElse(MediaType.TEXT_PLAIN);
