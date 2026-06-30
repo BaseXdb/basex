@@ -24,6 +24,8 @@ public abstract class JsonConverter extends Job {
   protected final SharedData shared = new SharedData();
   /** JSON options. */
   protected final JsonParserOptions jopts;
+  /** Nesting depth of a suppressed duplicate value (0: nothing suppressed). */
+  private int skipDepth;
 
   /** Fallback function. */
   protected QueryFunction<byte[], byte[]> fallback;
@@ -68,6 +70,50 @@ public abstract class JsonConverter extends Job {
   protected static QueryException optionError(final String name, final Object value) {
     return QueryError.OPTION_JSON_X.get(null,
         Util.info("'%':'%' is not supported by the target format.", name, value));
+  }
+
+  /**
+   * Registers an opening object or array.
+   * @return {@code true} if the event belongs to a suppressed duplicate and must be ignored
+   */
+  protected final boolean skipOpen() {
+    if(skipDepth == 0) return false;
+    skipDepth++;
+    return true;
+  }
+
+  /**
+   * Registers a closing object, array or pair.
+   * @return {@code true} if the event belongs to a suppressed duplicate and must be ignored
+   */
+  protected final boolean skipClose() {
+    if(skipDepth == 0) return false;
+    skipDepth--;
+    return true;
+  }
+
+  /**
+   * Registers an opening pair. A pair that is not added (suppressed duplicate, 'use-first')
+   * starts skipping its entire value, including nested objects and arrays.
+   * @param add add pair
+   * @return {@code true} if the pair and its value are suppressed and must be ignored
+   */
+  protected final boolean skipPair(final boolean add) {
+    if(skipDepth > 0) {
+      skipDepth++;
+      return true;
+    }
+    if(add) return false;
+    skipDepth = 1;
+    return true;
+  }
+
+  /**
+   * Indicates if the current value is part of a suppressed duplicate.
+   * @return result of check
+   */
+  protected final boolean skip() {
+    return skipDepth > 0;
   }
 
   /**

@@ -144,7 +144,7 @@ public class Parser extends Job {
     final MainParser mp = options.get(MainOptions.PARSER);
     final SingleParser p = switch(mp) {
       case HTML -> new HtmlParser(source, options, options.get(MainOptions.HTMLPARSER));
-      case JSON -> new JsonParser(source, options, options.get(MainOptions.JSONPARSER));
+      case JSON -> JsonStreamingParser.get(source, options);
       case CSV -> new CsvParser(source, options, options.get(MainOptions.CSVPARSER));
       default -> options.get(MainOptions.INTPARSE) ? new XMLParser(source, options) :
         new SAXWrapper(source, options);
