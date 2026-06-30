@@ -191,6 +191,7 @@ public final class HTTPConnection implements ClientInfo {
    * @throws IOException I/O exception
    */
   public void error(final int code, final String info) throws IOException {
+    discardBody();
     log(code, info);
     status(code, info);
   }
@@ -317,6 +318,7 @@ public final class HTTPConnection implements ClientInfo {
   void stop(final JobException ex) throws IOException {
     final int code = 460;
     final String info = ex.getMessage();
+    discardBody();
     log(code, info);
     try {
       response.resetBuffer();
@@ -491,6 +493,18 @@ public final class HTTPConnection implements ClientInfo {
   }
 
   // PRIVATE METHODS ==============================================================================
+
+  /**
+   * Discards an unconsumed request body before an error response is returned.
+   */
+  private void discardBody() {
+    try {
+      request.getInputStream().transferTo(OutputStream.nullOutputStream());
+    } catch(final IOException | IllegalStateException ex) {
+      // body may already be consumed, or a reader may have been requested instead
+      Util.debug(ex);
+    }
+  }
 
   /**
    * Normalizes the specified path.
