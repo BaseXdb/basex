@@ -276,4 +276,36 @@ public final class ModuleTest extends SandboxTest {
         + "import module namespace b = 'B' at '" + b.path() + "';\n"
         + "exists(a:lookup())", true);
   }
+
+  /** Tests circular type dependencies across modules. */
+  @Test public void gh2635() {
+    final IOFile sandbox = sandbox();
+    final IOFile a = new IOFile(sandbox, "a.xqm");
+    final IOFile b = new IOFile(sandbox, "b.xqm");
+    // module a imports b and declares a record type;
+    // module b imports a and refers to a's record type (circular dependency)
+    write(a, "module namespace a = 'A';\n"
+        + "import module namespace b = 'B' at 'b.xqm';\n"
+        + "declare record a:rec(x as xs:integer);");
+    write(b, "module namespace b = 'B';\n"
+        + "import module namespace a = 'A' at 'a.xqm';\n"
+        + "declare type b:alias as a:rec;\n"
+        + "declare record b:wrap(inner as a:rec, label as xs:string);\n"
+        + "declare function b:make($n as xs:integer) as b:alias { a:rec($n) };\n"
+        + "declare function b:value($r as b:alias) as xs:integer { $r?x };");
+
+    // type alias referring to a record in a circularly imported module
+    // (raised [XPST0051] Unknown type: Q{A}rec before the fix)
+    query("import module namespace b = 'B' at '" + b.path() + "';\n"
+        + "b:value(b:make(42))", 42);
+
+    // record field whose type lives in a circularly imported module
+    query("import module namespace b = 'B' at '" + b.path() + "';\n"
+        + "b:wrap(b:make(7), 'l')?inner?x", 7);
+
+    // the circular type resolves consistently regardless of import order
+    query("import module namespace a = 'A' at '" + a.path() + "';\n"
+        + "import module namespace b = 'B' at '" + b.path() + "';\n"
+        + "b:make(1) instance of a:rec", true);
+  }
 }

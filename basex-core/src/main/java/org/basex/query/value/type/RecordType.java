@@ -465,21 +465,50 @@ public final class RecordType extends MapType {
   }
 
   /**
-   * Resolve named record references with named record declarations. Throw "unknown type" when a
-   * reference cannot be resolved.
-   * @param recordTypeRefs record type references
-   * @param declaredRecordTypes record type declarations
+   * Resolves named record references with named record declarations. References that cannot be
+   * resolved are added to the list of deferred references.
+   * @param types record types
+   * @param referenced record type references
+   * @param deferred deferred references
+   */
+  public static void resolve(final QNmMap<RecordType> types,
+      final QNmMap<RecordType> referenced, final ArrayList<RecordType> deferred) {
+    for(final QNm name : referenced) {
+      final RecordType ref = referenced.get(name);
+      RecordType dec = types.get(name);
+      if(dec == null) dec = Records.BUILT_IN.get(name);
+      if(dec != null) ref.resolve(dec);
+      else deferred.add(ref);
+    }
+  }
+
+  /**
+   * Resolves the references that were deferred during parsing, against the public record types of
+   * all parsed modules.
+   * @param types record types
+   * @param deferred deferred references
    * @throws QueryException query exception
    */
-  public static void resolveRefs(final QNmMap<RecordType> recordTypeRefs,
-      final QNmMap<RecordType> declaredRecordTypes) throws QueryException {
-    for(final QNm name : recordTypeRefs) {
-      final RecordType ref = recordTypeRefs.get(name);
-      final RecordType dec = ref.getDeclaration(declaredRecordTypes);
-      ref.fields = dec.fields;
-      ref.info = null;
-      ref.finalizeTypes(dec.keyType(), dec.valueType());
+  public static void resolveDeferred(final QNmMap<RecordType> types,
+      final ArrayList<RecordType> deferred) throws QueryException {
+    for(final RecordType ref : deferred) {
+      if(ref.info == null) continue;
+      RecordType dec = types.get(ref.name);
+      if(dec == null) dec = Records.BUILT_IN.get(ref.name);
+      if(dec == null) throw TYPEUNKNOWN_X.get(ref.info, BasicType.similar(ref.name));
+      ref.resolve(dec);
     }
+    deferred.clear();
+  }
+
+  /**
+   * Resolves this unresolved reference to the specified record type declaration (in-place).
+   * @param dec record type declaration
+   */
+  private void resolve(final RecordType dec) {
+    fields = dec.fields;
+    info = null;
+    finalizeTypes(dec.keyType(), dec.valueType());
   }
 
   /**
