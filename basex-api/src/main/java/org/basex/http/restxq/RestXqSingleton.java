@@ -13,8 +13,10 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class RestXqSingleton {
-  /** Mutex. */
+  /** Lock that guards the session registry and serves as condition for {@link #queue()}. */
   private static final Object MUTEX = new Object();
+  /** Maximum wait time between liveness checks (ms); safeguard against lost notifications. */
+  private static final long WAIT = 1000;
 
   /** ID of singleton function. */
   private final String id;
@@ -38,13 +40,24 @@ final class RestXqSingleton {
   }
 
   /**
-   * Waits until a running query has been stopped.
+   * Stops a running query (if present) and waits until it has been unregistered.
    */
   private void queue() {
     final QueryContext oldQc = qc();
-    if(oldQc != null) {
-      oldQc.stop();
-      do Performance.sleep(10); while(qc() == oldQc);
+    if(oldQc == null) return;
+
+    // request the running query to stop, wait until it deregisters itself
+    oldQc.stop();
+    synchronized(MUTEX) {
+      while(qc() == oldQc) {
+        try {
+          MUTEX.wait(WAIT);
+        } catch(final InterruptedException ex) {
+          Util.debug(ex);
+          Thread.currentThread().interrupt();
+          break;
+        }
+      }
     }
   }
 
@@ -62,7 +75,10 @@ final class RestXqSingleton {
    */
   void unregister() {
     synchronized(MUTEX) {
-      if(qc == qc()) session.removeAttribute(id);
+      if(qc == qc()) {
+        session.removeAttribute(id);
+        MUTEX.notifyAll();
+      }
     }
   }
 
