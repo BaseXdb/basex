@@ -6,8 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 
-import jakarta.servlet.*;
-
 import org.basex.core.*;
 import org.basex.http.*;
 import org.basex.http.web.*;
@@ -19,7 +17,10 @@ import org.basex.query.iter.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.node.*;
 import org.basex.query.value.type.*;
+import org.basex.util.*;
 import org.basex.util.http.*;
+
+import jakarta.servlet.*;
 
 /**
  * This class creates a new HTTP response.
@@ -130,6 +131,11 @@ final class RestXqResponse extends WebResponse {
         final OutputStream out = cache != null ? cache : conn.response.getOutputStream();
         try(Serializer ser = Serializer.get(out, so)) {
           for(; item != null; item = qc.next(iter)) ser.serialize(item);
+        } catch(final IOException ex) {
+          // client has disconnected: stop the query
+          Util.debug(ex);
+          if(cache == null) qc.stop();
+          throw ex;
         }
       }
     } finally {
