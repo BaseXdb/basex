@@ -63,7 +63,7 @@ final class SearchContext {
       if(regex) searchRegEx(start, end, txt);
       else searchSimple(start, end, txt);
     }
-    InterruptibleString.checkStop();
+    StoppableString.checkStop();
     nr = start.size();
     bar.refresh(this, jump);
     return new IntList[] { start, end };
@@ -81,7 +81,7 @@ final class SearchContext {
     final Pattern pattern = Pattern.compile(string, flags);
     if(multi) {
       int c = 0, p = 0;
-      final Matcher m = pattern.matcher(new InterruptibleString(string(text)));
+      final Matcher m = pattern.matcher(new StoppableString(string(text)));
       while(m.find()) {
         final int s = m.start(), e = m.end();
         while(c < s) {
@@ -100,10 +100,10 @@ final class SearchContext {
       final int os = text.length;
       final TokenBuilder tb = new TokenBuilder(os);
       for(int t = 0, o = 0; o <= os; o++) {
-        InterruptibleString.checkStop();
+        StoppableString.checkStop();
         if(o < os ? text[o] == '\n' : o != t) {
           int c = 0, p = t;
-          final Matcher m = pattern.matcher(new InterruptibleString(string(text, t, o - t)));
+          final Matcher m = pattern.matcher(new StoppableString(string(text, t, o - t)));
           while(m.find()) {
             final int s = m.start(), e = m.end();
             while(c < s) {
@@ -136,7 +136,7 @@ final class SearchContext {
     final int sl = srch.length, tl = text.length;
     boolean s = true;
     for(int t = 0; t < tl;) {
-      InterruptibleString.checkStop();
+      StoppableString.checkStop();
       int sp = 0;
       if(t + sl <= tl && s) {
         if(mcase) {
