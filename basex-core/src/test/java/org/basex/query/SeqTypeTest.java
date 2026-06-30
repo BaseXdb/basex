@@ -7,6 +7,7 @@ import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.Types.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.expr.path.*;
@@ -138,9 +139,8 @@ public final class SeqTypeTest {
 
   /**
    * Tests for {@link SeqType#eq(SeqType)}.
-   * @throws QueryException query exception
    */
-  @Test public void eq() throws QueryException {
+  @Test public void eq() {
     final TokenObjectMap<RecordField> fld1 = new TokenObjectMap<>(),
         fld2 = new TokenObjectMap<>();
     final QNm r1Name = new QNm(Token.token("r1")),
@@ -164,7 +164,7 @@ public final class SeqTypeTest {
     recordTypeRefs.put(r2Name, (RecordType) r2.type);
     declaredRecordTypes.put(r1Name, new RecordType(fld1));
     declaredRecordTypes.put(r2Name, new RecordType(fld2));
-    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
+    RecordType.resolve(declaredRecordTypes, recordTypeRefs, new ArrayList<>());
 
     assertTrue(r1.eq(r2));
     assertTrue(r2.eq(r1));
@@ -187,9 +187,8 @@ public final class SeqTypeTest {
 
   /**
    * Tests for {@link SeqType#instanceOf(SeqType)}.
-   * @throws QueryException query exception
    */
-  @Test public void instanceOf() throws QueryException {
+  @Test public void instanceOf() {
     // atomic items
     assertTrue(BOOLEAN_O.instanceOf(ANY_ATOMIC_TYPE_ZM));
     assertFalse(ANY_ATOMIC_TYPE_ZM.instanceOf(BOOLEAN_O));
@@ -436,7 +435,7 @@ public final class SeqTypeTest {
     recordTypeRefs.put(r2Name, (RecordType) r2.type);
     declaredRecordTypes.put(r1Name, new RecordType(fld1));
     declaredRecordTypes.put(r2Name, new RecordType(fld2));
-    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
+    RecordType.resolve(declaredRecordTypes, recordTypeRefs, new ArrayList<>());
 
     assertTrue(RECORD_O.instanceOf(FUNCTION_O));
     assertFalse(MAP_O.instanceOf(RECORD_O));
@@ -447,9 +446,8 @@ public final class SeqTypeTest {
 
   /**
    * Tests for {@link SeqType#union(SeqType)}.
-   * @throws QueryException query exception
    */
-  @Test public void union() throws QueryException {
+  @Test public void union() {
     final BiFunction<SeqType, SeqType, SeqType> op = SeqType::union;
 
     combine(EMPTY_SEQUENCE_Z, op);
@@ -718,7 +716,7 @@ public final class SeqTypeTest {
     recordTypeRefs.put(r9Name, (RecordType) r9.type);
     declaredRecordTypes.put(r8Name, new RecordType(fld8));
     declaredRecordTypes.put(r9Name, new RecordType(fld9));
-    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
+    RecordType.resolve(declaredRecordTypes, recordTypeRefs, new ArrayList<>());
 
     combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
     combine(RECORD_O, MAP_O, MAP_O, op);
@@ -744,9 +742,8 @@ public final class SeqTypeTest {
 
   /**
    * Tests for {@link SeqType#intersect(SeqType)}.
-   * @throws QueryException query exception
    */
-  @Test public void intersect() throws QueryException {
+  @Test public void intersect() {
     final BiFunction<SeqType, SeqType, SeqType> op = SeqType::intersect;
 
     combine(EMPTY_SEQUENCE_Z, op);
@@ -1038,7 +1035,7 @@ public final class SeqTypeTest {
     recordTypeRefs.put(r9Name, (RecordType) r9.type);
     declaredRecordTypes.put(r8Name, new RecordType(fld8));
     declaredRecordTypes.put(r9Name, new RecordType(fld9));
-    RecordType.resolveRefs(recordTypeRefs, declaredRecordTypes);
+    RecordType.resolve(declaredRecordTypes, recordTypeRefs, new ArrayList<>());
 
     combine(RECORD_O, FUNCTION_O, RECORD_O, op);
     combine(RECORD_O, MAP_O, RECORD_O, op);

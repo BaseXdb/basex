@@ -262,7 +262,7 @@ public class QueryParser extends InputParser {
     // completes the parsing step
     qnames.resolve(this, 0, sc.elemNS);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
-    RecordType.resolveRefs(recordTypeRefs, namedRecordTypes);
+    RecordType.resolve(namedRecordTypes, recordTypeRefs, qc.deferredTypeRefs);
   }
 
   /**
@@ -271,6 +271,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void check(final MainModule main) throws QueryException {
+    // resolve record references
+    RecordType.resolveDeferred(qc.namedRecordTypes, qc.deferredTypeRefs);
     // resolve function calls
     qc.functions.resolve();
     // resolve variable references
@@ -1014,6 +1016,7 @@ public class QueryParser extends InputParser {
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
       publicTypes.put(qn, rt.seqType());
+      qc.namedRecordTypes.put(qn, rt);
     }
     if(qn.uri().length != 0) declareRecordConstructor(rt, ii);
   }
