@@ -50,13 +50,13 @@ final class JsonMLConverter extends JsonXmlConverter {
   }
 
   @Override
-  protected void openPair(final byte[] key, final boolean add) throws QueryException {
+  protected void openPair(final byte[] key) throws QueryException {
     name = shared.token(check(key));
     if(!atts.add(name)) throw error("Duplicate attribute found");
   }
 
   @Override
-  protected void closePair(final boolean add) { }
+  protected void closePair() { }
 
   @Override
   protected void openArray() throws QueryException {

@@ -70,7 +70,9 @@ public final class JsonParser {
     escape = opts.get(JsonParserOptions.ESCAPE);
     final JsonDuplicates dupl = opts.get(JsonParserOptions.DUPLICATES);
     final JsonFormat jf = opts.get(JsonOptions.FORMAT);
-    duplicates = dupl != null ? dupl : jf == JsonFormat.W3_XML || jf == JsonFormat.BASIC ?
+    // JsonML always rejects duplicate attributes, regardless of the duplicates policy
+    duplicates = jf == JsonFormat.JSONML ? JsonDuplicates.REJECT :
+      dupl != null ? dupl : jf == JsonFormat.W3_XML || jf == JsonFormat.BASIC ?
       JsonDuplicates.RETAIN : JsonDuplicates.USE_FIRST;
   }
 
@@ -139,17 +141,70 @@ public final class JsonParser {
         final boolean dupl = set.contains(key);
         if(dupl && duplicates == JsonDuplicates.REJECT)
           throw error(DUPLICATE_JSON_X, "Key \"%\" occurs more than once", key);
-
-        final boolean add = !(dupl && duplicates == JsonDuplicates.USE_FIRST);
-        conv.openPair(key, add);
         consumeWs(':', true);
-        value();
-        conv.closePair(add);
+        if(dupl && duplicates == JsonDuplicates.USE_FIRST) {
+          skipValue();
+        } else {
+          conv.openPair(key);
+          value();
+          conv.closePair();
+        }
         set.put(key);
       } while(consumeWs(',', false) && !(liberal && current == '}'));
       consumeWs('}', true);
     }
     conv.closeObject();
+  }
+
+  /**
+   * Skips a JSON value without generating parse events.
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private void skipValue() throws QueryException, IOException {
+    if(!more()) throw eof(", expected JSON value");
+    switch(current) {
+      case '[' -> skipArray();
+      case '{' -> skipObject();
+      case '"' -> string();
+      case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> number();
+      case 't' -> consume("true");
+      case 'f' -> consume("false");
+      case 'n' -> consume("null");
+      default -> throw error("Unexpected JSON value: '%'", remaining());
+    }
+  }
+
+  /**
+   * Skips a JSON object without generating parse events.
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private void skipObject() throws QueryException, IOException {
+    consumeWs('{', true);
+    if(!consumeWs('}', false)) {
+      do {
+        if(!liberal || current == '"') string(); else unquoted();
+        consumeWs(':', true);
+        skipValue();
+      } while(consumeWs(',', false) && !(liberal && current == '}'));
+      consumeWs('}', true);
+    }
+  }
+
+  /**
+   * Skips a JSON array without generating parse events.
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
+   */
+  private void skipArray() throws QueryException, IOException {
+    consumeWs('[', true);
+    if(!consumeWs(']', false)) {
+      do {
+        skipValue();
+      } while(consumeWs(',', false) && !(liberal && current == ']'));
+      consumeWs(']', true);
+    }
   }
 
   /**

@@ -43,32 +43,17 @@ final class JsonW3XmlBuilderConverter extends JsonBuilderConverter {
 
   @Override
   protected void openObject() {
-    if(!skipOpen()) openContainer(MAP);
+    openContainer(MAP);
   }
 
   @Override
-  protected void closeObject() {
-    if(!skipClose()) closeElem();
-  }
-
-  @Override
-  protected void openPair(final byte[] key, final boolean add) {
-    if(!skipPair(add)) pendingKey = key;
-  }
-
-  @Override
-  protected void closePair(final boolean add) {
-    skipClose();
+  protected void openPair(final byte[] key) {
+    pendingKey = key;
   }
 
   @Override
   protected void openArray() {
-    if(!skipOpen()) openContainer(ARRAY);
-  }
-
-  @Override
-  protected void closeArray() {
-    if(!skipClose()) closeElem();
+    openContainer(ARRAY);
   }
 
   @Override
@@ -97,7 +82,6 @@ final class JsonW3XmlBuilderConverter extends JsonBuilderConverter {
    * @param value text content, or {@code null} for the null literal
    */
   private void addValue(final byte[] elemName, final byte[] value) {
-    if(skip()) return;
     try {
       atts.reset();
       addKeyAtts();

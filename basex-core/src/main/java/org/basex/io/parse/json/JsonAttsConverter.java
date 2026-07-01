@@ -26,54 +26,50 @@ public final class JsonAttsConverter extends JsonXmlConverter {
 
   @Override
   protected void openObject() {
-    if(!skipOpen()) openOuter(OBJECT);
+    openOuter(OBJECT);
   }
 
   @Override
   protected void closeObject() {
-    if(!skipClose()) closeOuter();
+    closeOuter();
   }
 
   @Override
-  protected void openPair(final byte[] key, final boolean add) {
-    if(!skipPair(add)) {
-      openInner(Q_PAIR);
-      name = shared.token(key);
-      curr.attr(Q_NAME, name);
-    }
+  protected void openPair(final byte[] key) {
+    openInner(Q_PAIR);
+    name = shared.token(key);
+    curr.attr(Q_NAME, name);
   }
 
   @Override
-  protected void closePair(final boolean add) {
-    if(!skipClose() && add) {
-      closeInner();
-      name = null;
-    }
+  protected void closePair() {
+    closeInner();
+    name = null;
   }
 
   @Override
   protected void openArray() {
-    if(!skipOpen()) openOuter(ARRAY);
+    openOuter(ARRAY);
   }
 
   @Override
   protected void closeArray() {
-    if(!skipClose()) closeOuter();
+    closeOuter();
   }
 
   @Override
   protected void openItem() {
-    if(!skip()) openInner(Q_ITEM);
+    openInner(Q_ITEM);
   }
 
   @Override
   protected void closeItem() {
-    if(!skip()) closeInner();
+    closeInner();
   }
 
   @Override
   void addValue(final byte[] type, final byte[] value) {
-    if(!skip()) element(type).text(value != null ? shared.token(value) : null);
+    element(type).text(value != null ? shared.token(value) : null);
   }
 
   /**

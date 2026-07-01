@@ -79,15 +79,15 @@ public final class JsonW3Converter extends JsonConverter {
   }
 
   @Override
-  protected void openPair(final byte[] key, final boolean add) {
+  protected void openPair(final byte[] key) {
     stack.push(Str.get(shared.token(key)));
   }
 
   @Override
-  protected void closePair(final boolean add) throws QueryException {
+  protected void closePair() throws QueryException {
     final Value value = stack.pop();
     final Item key = (Item) stack.pop();
-    if(add) maps.peek().put(key, value);
+    maps.peek().put(key, value);
   }
 
   @Override

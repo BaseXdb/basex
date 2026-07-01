@@ -57,14 +57,14 @@ final class JsonStringConverter extends JsonConverter {
   }
 
   @Override
-  public void openPair(final byte[] key, final boolean add) {
+  public void openPair(final byte[] key) {
     if(!first) tb.add(", ");
     stringLit(key);
     tb.add(": ");
   }
 
   @Override
-  public void closePair(final boolean add) {
+  public void closePair() {
     first = false;
   }
 
