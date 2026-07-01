@@ -636,9 +636,13 @@ public final class FnModuleTest extends SandboxTest {
       + "  `\"Bob \"\"The Exemplar\"\" Mustermann\",\"Berlin\"{ char('\\n') }`"),
         "[\"name\",\"city\"]\n"
       + "[\"Bob \"\"The Exemplar\"\" Mustermann\",\"Berlin\"]");
-    // Non-default record- and field-delimiters:
-    query(func.args("name;city\u00A7Bob;Berlin\u00A7Alice;Aachen",
-      " { \"row-delimiter\": \"\u00A7\", \"field-delimiter\": \";\" }"),
+    // Non-default field separator:
+    query(func.args(
+        " string-join(\n"
+      + "    (\"name;city\", \"Bob;Berlin\", \"Alice;Aachen\"),\n"
+      + "    char('\\n')\n"
+      + "  )",
+      " { \"separator\": \";\" }"),
         "[\"name\",\"city\"]\n"
       + "[\"Bob\",\"Berlin\"]\n"
       + "[\"Alice\",\"Aachen\"]");
@@ -2829,14 +2833,16 @@ return
       + "[\"Bob\",\"Berlin\"],[\"Alice\",\"Aachen\"]),\"get\":\"(: function :)\"}\n"
       + "Bob\n"
       + "Aachen");
-    // Custom delimiters, no column headers:
+    // Custom separator and quote character, no column headers:
     query(display
       + "let $options := {\n"
-      + "  \"row-delimiter\": \"\u00A7\", \n"
-      + "  \"field-delimiter\": \";\", \n"
+      + "  \"separator\": \";\", \n"
       + "  \"quote-character\": \"|\"\n"
       + "}\n"
-      + "let $input := \"|name|;|city|\u00A7|Bob|;|Berlin|\u00A7|Alice|;|Aachen|\"\n"
+      + "let $input := string-join(\n"
+      + "  (\"|name|;|city|\", \"|Bob|;|Berlin|\", \"|Alice|;|Aachen|\"),\n"
+      + "  char('\\n')\n"
+      + ")\n"
       + "let $result := " + func.args(" $input", " $options") + "\n"
       + "return (\n"
       + "  $result => $display(),\n"
@@ -2848,8 +2854,8 @@ return
     // Supplied column names:
     query(display
       + "let $headers := (\"Person\", \"Location\")\n"
-      + "let $options := { \"header\": $headers, \"row-delimiter\": \";\" }\n"
-      + "let $input := \"Alice,Aachen;Bob,Berlin;\"\n"
+      + "let $options := { \"header\": $headers }\n"
+      + "let $input := \"Alice,Aachen\" || char('\\n') || \"Bob,Berlin\" || char('\\n')\n"
       + "let $parsed-csv := " + func.args(" $input", " $options") + "\n"
       + "return (\n"
       + "  $parsed-csv => $display(),\n"

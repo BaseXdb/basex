@@ -17,10 +17,8 @@ import org.basex.util.options.*;
  * @author Christian Gruen
  */
 public class CsvOptions extends Options {
-  /** Option: separator. Ignored if {@code FIELD_DELIMITER} is assigned. */
+  /** Option: separator. */
   public static final StringOption SEPARATOR = new StringOption("separator", ",");
-  /** Option: field delimiter. */
-  public static final StringOption FIELD_DELIMITER = new StringOption("field-delimiter");
   /** Option: format. */
   public static final EnumOption<CsvFormat> FORMAT = new EnumOption<>("format", CsvFormat.DIRECT);
   /** Option: header. */
@@ -31,8 +29,6 @@ public class CsvOptions extends Options {
   public static final BooleanOption LAX = new BooleanOption("lax", true);
   /** Option: parse quotes. */
   public static final BooleanOption QUOTES = new BooleanOption("quotes", true);
-  /** Option: row delimiter. */
-  public static final StringOption ROW_DELIMITER = new StringOption("row-delimiter", "\n");
   /** Option: quote character. */
   public static final StringOption QUOTE_CHARACTER = new StringOption("quote-character", "\"");
   /** Option: trim whitespace. */
@@ -107,35 +103,20 @@ public class CsvOptions extends Options {
    * @throws QueryException query exception
    */
   private void validate(final InputInfo info) throws QueryException {
-    final StringOption separator = get(FIELD_DELIMITER) != null ? FIELD_DELIMITER : SEPARATOR;
-    final int f = fieldDelimiter(), r = rowDelimiter(), q = quoteCharacter();
-    final StringOption option = f == -1 ? separator : r == -1 ? ROW_DELIMITER : q == -1 ?
-      QUOTE_CHARACTER : null;
+    final int s = separator(), q = quoteCharacter();
+    final StringOption option = s == -1 ? SEPARATOR : q == -1 ? QUOTE_CHARACTER : null;
     if(option != null) throw CSV_SINGLECHAR_X_X.get(info, option.name(), get(option));
-    if(f == q || r == f || q == r) throw CSV_DELIMITER_X.get(info,
-        get(f == q || r == f ? separator : QUOTE_CHARACTER));
+    if(s == q) throw CSV_DELIMITER_X.get(info, get(SEPARATOR));
   }
 
   /**
-   * Returns the separator character or {@code -1} if character is invalid.
-   * @return field delimiter
+   * Returns the separator character or {@code -1} if the character is invalid.
+   * @return separator
    */
-  public int fieldDelimiter() {
-    String sep = get(FIELD_DELIMITER);
-    if(sep == null) {
-      sep = get(SEPARATOR);
-      final CsvSep s = Enums.get(CsvSep.class, sep);
-      if(s != null) return s.sep;
-    }
-    return checkCodepoint(sep);
-  }
-
-  /**
-   * Returns the row delimiter character or {@code -1} if character is invalid.
-   * @return row delimiter
-   */
-  public int rowDelimiter() {
-    return checkCodepoint(get(ROW_DELIMITER));
+  public int separator() {
+    final String sep = get(SEPARATOR);
+    final CsvSep s = Enums.get(CsvSep.class, sep);
+    return s != null ? s.sep : checkCodepoint(sep);
   }
 
   /**

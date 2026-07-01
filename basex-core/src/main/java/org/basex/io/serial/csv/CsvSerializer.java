@@ -23,13 +23,11 @@ public abstract class CsvSerializer extends StandardSerializer {
   /** CSV options. */
   final CsvOptions copts;
   /** Separator. */
-  final int fieldDelimiter;
+  final int separator;
   /** Generate quotes. */
   final boolean quotes;
   /** Generate backslashes. */
   final boolean backslashes;
-  /** Row delimiter (see {@link CsvOptions#ROW_DELIMITER}). */
-  private final int rowDelimiter;
   /** Quote character (see {@link CsvOptions#QUOTE_CHARACTER}). */
   private final int quoteCharacter;
   /** Select columns (see {@link CsvOptions#SELECT_COLUMNS}). */
@@ -68,8 +66,7 @@ public abstract class CsvSerializer extends StandardSerializer {
     copts = sopts.get(SerializerOptions.CSV);
     quotes = copts.get(CsvOptions.QUOTES);
     backslashes = copts.get(CsvOptions.BACKSLASHES);
-    fieldDelimiter = copts.fieldDelimiter();
-    rowDelimiter = copts.rowDelimiter();
+    separator = copts.separator();
     quoteCharacter = copts.quoteCharacter();
     selectColumns = copts.get(CsvOptions.SELECT_COLUMNS);
     maxCol = -1;
@@ -116,7 +113,7 @@ public abstract class CsvSerializer extends StandardSerializer {
         field(f++, val == null ? Token.EMPTY : val);
       }
     }
-    out.print(rowDelimiter);
+    out.print('\n');
     if(reset) entries.reset();
   }
 
@@ -128,11 +125,11 @@ public abstract class CsvSerializer extends StandardSerializer {
    */
   final void field(final int seqNo, final byte[] value) throws IOException {
     // print fields, skip trailing empty contents
-    if(seqNo != 0) out.print(fieldDelimiter);
+    if(seqNo != 0) out.print(separator);
 
     byte[] txt = value != null ? value : Token.EMPTY;
     if(form != null) txt = normalize(txt, form);
-    final boolean delim = contains(txt, fieldDelimiter) || contains(txt, rowDelimiter);
+    final boolean delim = contains(txt, separator) || contains(txt, '\n');
     final boolean special = contains(txt, '\r') || contains(txt, '\t')
         || contains(txt, quoteCharacter);
     if(delim || special || backslashes && contains(txt, '\\')) {
@@ -145,12 +142,12 @@ public abstract class CsvSerializer extends StandardSerializer {
       while(tp.more()) {
         final int cp = tp.next();
         if(backslashes) {
-          if(cp == '\n') tb.add("\\").add(fieldDelimiter == '\n' ? "n" : cp);
+          if(cp == '\n') tb.add("\\").add(separator == '\n' ? "n" : cp);
           else if(cp == '\r') tb.add("\\r");
           else if(cp == '\t') tb.add("\\t");
           else if(cp == quoteCharacter) tb.add("\\").add(cp);
           else if(cp == '\\') tb.add("\\\\");
-          else if(cp == fieldDelimiter && !quotes) tb.add('\\').add(cp);
+          else if(cp == separator && !quotes) tb.add('\\').add(cp);
           else tb.add(cp);
         } else {
           if(cp == quoteCharacter) tb.add(quoteCharacter);

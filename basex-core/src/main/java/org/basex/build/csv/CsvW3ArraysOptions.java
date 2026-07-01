@@ -17,13 +17,11 @@ import org.basex.util.options.*;
  * @author Gunther Rademacher
  */
 public class CsvW3ArraysOptions extends Options {
-  /** parse-csv option field-delimiter. */
-  public static final StringOption FIELD_DELIMITER = new StringOption("field-delimiter", ",");
-  /** parse-csv option row-delimiter. */
-  public static final StringOption ROW_DELIMITER = new StringOption("row-delimiter", "\n");
-  /** parse-csv option quote-character. */
+  /** csv-to-arrays option separator. */
+  public static final StringOption SEPARATOR = new StringOption("separator", ",");
+  /** csv-to-arrays option quote-character. */
   public static final StringOption QUOTE_CHARACTER = new StringOption("quote-character", "\"");
-  /** parse-csv option trim-whitespace. */
+  /** csv-to-arrays option trim-whitespace. */
   public static final BooleanOption TRIM_WHITESPACE = new BooleanOption("trim-whitespace", false);
 
   /**
@@ -35,7 +33,7 @@ public class CsvW3ArraysOptions extends Options {
    */
   public CsvParserOptions finish(final InputInfo ii, final CsvFormat format) throws QueryException {
     final IntSet delim = new IntSet();
-    for(final StringOption opt : Arrays.asList(FIELD_DELIMITER, ROW_DELIMITER, QUOTE_CHARACTER)) {
+    for(final StringOption opt : Arrays.asList(SEPARATOR, QUOTE_CHARACTER)) {
       final String val = get(opt);
       if(val.codePointCount(0, val.length()) != 1)
         throw CSV_SINGLECHAR_X_X.get(ii, opt.name(), val);
@@ -45,8 +43,7 @@ public class CsvW3ArraysOptions extends Options {
 
     final CsvParserOptions copts = new CsvParserOptions();
     copts.set(CsvOptions.FORMAT, format);
-    copts.set(CsvOptions.FIELD_DELIMITER, get(FIELD_DELIMITER));
-    copts.set(CsvOptions.ROW_DELIMITER, get(ROW_DELIMITER));
+    copts.set(CsvOptions.SEPARATOR, get(SEPARATOR));
     copts.set(CsvOptions.QUOTE_CHARACTER, get(QUOTE_CHARACTER));
     copts.set(CsvOptions.TRIM_WHITESPACE, get(TRIM_WHITESPACE));
     copts.set(CsvOptions.STRICT_QUOTING, true);

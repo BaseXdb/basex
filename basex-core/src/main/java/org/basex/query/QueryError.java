@@ -566,7 +566,7 @@ public enum QueryError {
   /** Error code. */
   CSV_SINGLECHAR_X_X(FOCV, 2, "The value of '%' is not a single character: '%'."),
   /** Error code. */
-  CSV_DELIMITER_X(FOCV, 3, "Duplicate CSV delimiter error: %."),
+  CSV_DELIMITER_X(FOCV, 2, "The same character is used for more than one CSV option: %."),
   /** Error code. */
   CSV_COLUMNNAME_X(FOCV, 4, "Argument supplied is not a known column name: %."),
 
