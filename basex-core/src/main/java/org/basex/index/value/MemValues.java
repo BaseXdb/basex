@@ -48,33 +48,61 @@ public final class MemValues extends ValueIndex {
 
   @Override
   public IndexIterator iter(final IndexSearch search) {
-    final int id = values.index(search.token());
-    if(id == 0) return IndexIterator.EMPTY;
-
-    final int len = lenList.get(id);
-    final int[] ids = idsList.get(id), pres;
-    if(data.meta.updindex) {
-      final IntList tmp = new IntList();
-      for(int i = 0; i < len; ++i) tmp.add(data.pre(ids[i]));
-      pres = tmp.sort().finish();
+    final int[] pres;
+    final int size;
+    if(search instanceof final StringRange range) {
+      pres = idRange(range).finish();
+      size = pres.length;
     } else {
-      pres = ids;
+      final int id = values.index(search.token());
+      if(id == 0) return IndexIterator.EMPTY;
+      size = lenList.get(id);
+      final int[] ids = idsList.get(id);
+      if(data.meta.updindex) {
+        final IntList tmp = new IntList();
+        for(int i = 0; i < size; ++i) tmp.add(data.pre(ids[i]));
+        pres = tmp.sort().finish();
+      } else {
+        pres = ids;
+      }
     }
 
     return new IndexIterator() {
       int p;
       @Override
-      public boolean more() { return p < len; }
+      public boolean more() { return p < size; }
       @Override
       public int pre() { return pres[p++]; }
       @Override
-      public int size() { return len; }
+      public int size() { return size; }
     };
+  }
+
+  /**
+   * Performs a string-based range query.
+   * @param range index range
+   * @return sorted PRE values
+   */
+  private IntList idRange(final StringRange range) {
+    final boolean upd = data.meta.updindex;
+    final IntList pres = new IntList();
+    final int s = values.size();
+    for(int p = 1; p <= s; p++) {
+      final int len = lenList.get(p);
+      if(len == 0) continue;
+      final byte[] key = values.key(p);
+      if(compare(key, range.min()) < (range.mni() ? 0 : 1) ||
+         compare(key, range.max()) > (range.mxi() ? 0 : -1)) continue;
+      final int[] ids = idsList.get(p);
+      for(int i = 0; i < len; ++i) pres.add(upd ? data.pre(ids[i]) : ids[i]);
+    }
+    return pres.sort();
   }
 
   @Override
   public IndexCosts costs(final IndexSearch search) {
-    return IndexCosts.get(lenList.get(values.index(search.token())));
+    return IndexCosts.get(search instanceof StringRange ? Math.max(1, data.meta.size / 10) :
+      lenList.get(values.index(search.token())));
   }
 
   @Override

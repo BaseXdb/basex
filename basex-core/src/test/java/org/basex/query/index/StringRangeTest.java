@@ -3,6 +3,7 @@ package org.basex.query.index;
 import java.util.*;
 
 import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.core.parse.Commands.*;
 import org.basex.query.expr.*;
@@ -85,6 +86,29 @@ public final class StringRangeTest extends SandboxTest {
     test("count(//*[text() > ' '   and text() < 'a'  ])", 1800, clz);
     test("count(//*[text() > '@'   and text() < 'a'  ])", 900, clz);
     test("count(//*[text() > '@'])", 900);
+  }
+
+  /**
+   * Tests string range queries against a main-memory database. The explicit range
+   * functions route through {@link StringRangeAccess} to the in-memory value index
+   * ({@code MemValues}); the results must match a sequential scan.
+   */
+  @Test public void mainmem() {
+    set(MainOptions.MAINMEM, true);
+    try {
+      execute(new CreateDB(NAME + "mm", "<xml><a t='m'>m</a><b t='z'>z</b><c t='A'>A</c></xml>"));
+      final String db = '\'' + NAME + "mm'";
+      // text index
+      query("db:text-range(" + db + ", 'a', 'z') ! string()", "m\nz");
+      query("count(db:text-range(" + db + ", 'a', 'z'))", 2);
+      // attribute index
+      query("db:attribute-range(" + db + ", 'a', 'z') ! string()", "m\nz");
+      query("count(db:attribute-range(" + db + ", 'a', 'z'))", 2);
+    } finally {
+      execute(new DropDB(NAME + "mm"));
+      set(MainOptions.MAINMEM, false);
+      execute(new Open(NAME));
+    }
   }
 
   /**
