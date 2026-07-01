@@ -1,11 +1,13 @@
 package org.basex.query.value.type;
 
+import static org.basex.query.QueryText.FN_URI;
 import static org.basex.query.value.type.BasicType.*;
 import static org.basex.query.value.type.ListType.*;
 import static org.basex.query.value.type.NodeType.*;
 import static org.basex.query.value.type.Occ.*;
 
 import org.basex.query.expr.path.*;
+import org.basex.query.value.item.*;
 import org.basex.query.value.seq.*;
 import org.basex.util.hash.*;
 
@@ -222,6 +224,16 @@ public final class Types {
   /** Zero or more documents or elements. */
   public static final SeqType DOCUMENT_OR_ELEMENT_ZO =
       ChoiceItemType.get(DOCUMENT_ELEMENT, NodeType.ELEMENT).seqType(Occ.ZERO_OR_ONE);
+
+  /** Zero or one html document (any namespace; {@code document-node(*:html)}). */
+  public static final SeqType DOCUMENT_HTML_ZO = NodeType.get(new DocTest(
+      Test.get(Kind.ELEMENT, new QNm("html"), NameTest.Scope.LOCAL, null))).seqType(ZERO_OR_ONE);
+  /** Zero or one document with an fn-namespace root element ({@code document-node(fn:*)}). */
+  public static final SeqType DOCUMENT_FN_ZO = NodeType.get(new DocTest(
+      Test.get(Kind.ELEMENT, new QNm("", FN_URI), NameTest.Scope.URI, null))).seqType(ZERO_OR_ONE);
+  /** Zero or one document with an {@code fn:csv} root element ({@code document-node(fn:csv)}). */
+  public static final SeqType DOCUMENT_FN_CSV_ZO = NodeType.get(new DocTest(
+      NameTest.get(new QNm("csv", FN_URI)))).seqType(ZERO_OR_ONE);
 
   /** Zero or one GNode. */
   public static final SeqType GNODE_ZO = GNODE.seqType(ZERO_OR_ONE);

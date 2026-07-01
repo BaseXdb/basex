@@ -343,4 +343,20 @@ public final class PathTest extends SandboxTest {
     query("document { <b/> } instance of document-node(a)", false);
     query("document { 'text' } instance of document-node(a)", false);
   }
+
+  /** Static subtyping of named document tests (child tests, not only the node kind). */
+  @Test public void docTest() {
+    // instance-of check via a typed argument (not a value): static instanceOf/intersect apply
+    final String f = "declare function local:f($n as %type) as xs:boolean { $n instance of %of };"
+        + " local:f(document { <a/> })";
+    // differing child names: neither is an instance of the other
+    query(f.replace("%type", "document-node(a)").replace("%of", "document-node(b)"), false);
+    query(f.replace("%type", "document-node(a)").replace("%of", "document-node(a)"), true);
+    // named child is an instance of the generic and the wildcard document test
+    query(f.replace("%type", "document-node(a)").replace("%of", "document-node()"), true);
+    query(f.replace("%type", "document-node(a)").replace("%of", "document-node(*)"), true);
+    // element wildcard is not statically an instance of a named test, but they may intersect
+    query(f.replace("%type", "document-node(*)").replace("%of", "document-node(a)"), true);
+    query(f.replace("%type", "document-node(*)").replace("%of", "document-node(b)"), false);
+  }
 }

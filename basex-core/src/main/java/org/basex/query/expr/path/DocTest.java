@@ -43,16 +43,34 @@ public final class DocTest extends Test {
   @Override
   public Test intersect(final Test test) {
     if(test instanceof final DocTest dt) {
-      if(equals(dt)) return this;
-    } else if(test instanceof NodeTest || test instanceof UnionTest) {
+      final Test isect = child.intersect(dt.child);
+      return isect != null ? new DocTest(isect) : null;
+    }
+    if(test instanceof NodeTest || test instanceof UnionTest) {
       return test.intersect(this);
     }
     return null;
   }
 
   @Override
+  public boolean instanceOf(final Test test) {
+    if(this == test) return true;
+    // distribute a union child: document-node(a|b) is document-node(a)|document-node(b)
+    if(child instanceof final UnionTest ut) {
+      for(final Test t : ut.tests) {
+        if(!new DocTest(t).instanceOf(test)) return false;
+      }
+      return true;
+    }
+    // compare the child tests of two document tests
+    if(test instanceof final DocTest dt) return child.instanceOf(dt.child);
+    // union on the right-hand side, generic node tests
+    return super.instanceOf(test);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
-    return obj instanceof final DocTest dt && obj.equals(dt.child);
+    return this == obj || obj instanceof final DocTest dt && child.equals(dt.child);
   }
 
   @Override
