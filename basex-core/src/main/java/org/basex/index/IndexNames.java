@@ -136,7 +136,7 @@ public final class IndexNames {
     // no entries: all attributes are indexed
     if(isEmpty()) return true;
     // currently no support for documents with namespaces (cannot be resolved from name index)
-    if(data.nspaces.isEmpty()) return false;
+    if(!data.nspaces.isEmpty()) return false;
     // find ID candidates
     final TokenSet names = new TokenSet();
     final int ns = qnames.size();

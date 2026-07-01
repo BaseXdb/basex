@@ -125,6 +125,25 @@ public final class SelectiveIndexTest extends SandboxTest {
     }
   }
 
+  /** Tests the ID functions on a database with namespaces (index check unsupported: scan). */
+  @Test public void idNamespaces() {
+    set(MainOptions.TOKENINDEX, true);
+    try {
+      // include filter targets a namespaced attribute, so the no-namespace idref
+      // attributes are not indexed; namespaces must force a sequential scan
+      final String file = "<root xmlns:p='URI1'><p:dummy/>" +
+          "<a idref='AAA'/><b idref='BBB'/></root>";
+      set(MainOptions.ATTRINCLUDE, "Q{URI1}idref");
+      set(MainOptions.TOKENINCLUDE, "Q{URI1}idref");
+      execute(new CreateDB(NAME, file));
+      query("count(idref(('AAA', 'BBB'), .))", 2);
+    } finally {
+      set(MainOptions.ATTRINCLUDE, "");
+      set(MainOptions.TOKENINCLUDE, "");
+      set(MainOptions.TOKENINDEX, false);
+    }
+  }
+
   /**
    * Returns a map with name tests.
    * @return map
