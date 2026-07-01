@@ -88,9 +88,9 @@ abstract class Ids extends ContextFn {
     // check if index exists
     final Data data = root.data();
     if(data == null || (idref ? !data.meta.tokenindex : !data.meta.attrindex)) return false;
-    // check if index names contain ID attributes
-    return indexed.computeIfAbsent(data, d -> new IndexNames(IndexType.ATTRIBUTE, d).
-        containsIds(idref));
+    // check if index names contain ID attributes (token index for IDREF, attribute index for ID)
+    final IndexType type = idref ? IndexType.TOKEN : IndexType.ATTRIBUTE;
+    return indexed.computeIfAbsent(data, d -> new IndexNames(type, d).containsIds(idref));
   }
 
   /**

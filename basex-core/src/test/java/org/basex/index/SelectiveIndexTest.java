@@ -104,6 +104,20 @@ public final class SelectiveIndexTest extends SandboxTest {
           throw new AssertionError(ae.getMessage() + "\nInclude: '" + include + '\'');
         }
       }
+
+      // diverging include filters: token-index completeness must be judged from TOKENINCLUDE,
+      // attribute-index completeness from ATTRINCLUDE (not both from ATTRINCLUDE)
+      set(MainOptions.ATTRINCLUDE, "");
+      set(MainOptions.TOKENINCLUDE, "excludeme");
+      execute(new CreateDB(NAME, file));
+      query("id('A', .)", file);
+      query("idref('B', .)", idref);
+
+      set(MainOptions.ATTRINCLUDE, "excludeme");
+      set(MainOptions.TOKENINCLUDE, "");
+      execute(new CreateDB(NAME, file));
+      query("id('A', .)", file);
+      query("idref('B', .)", idref);
     } finally {
       set(MainOptions.ATTRINCLUDE, "");
       set(MainOptions.TOKENINCLUDE, "");
