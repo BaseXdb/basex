@@ -122,7 +122,7 @@ abstract class TextDecoder {
       for(int c = 1; c < cl; ++c) {
         cp = ti.readByte();
         bytes[c] = (byte) cp;
-        if(cp < 0x80) return invalid(cp < 0, Arrays.copyOf(bytes, cp < 0 ? c : c + 1));
+        if(cp < 0x80 || cp > 0xBF) return invalid(cp < 0, Arrays.copyOf(bytes, cp < 0 ? c : c + 1));
       }
       return Token.cp(bytes, 0);
     }

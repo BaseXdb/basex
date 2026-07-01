@@ -116,12 +116,49 @@ public final class TextInputTest {
   }
 
   /**
+   * Test malformed UTF-8 input.
+   * @throws IOException I/O exception
+   */
+  @Test public void malformedUtf8() throws IOException {
+    // second byte is not a valid continuation byte (0x80-0xBF)
+    malformed(0xC2, 0xC2);
+    // truncated two-byte sequence at end of input
+    malformed(0xC2);
+    // truncated three-byte sequence at end of input
+    malformed(0xE2, 0x82);
+  }
+
+  /**
    * Returns the string representation of a codepoint.
    * @param codepoint codepoint
    * @return string
    */
   private static String cp(final int codepoint) {
     return new String(Character.toChars(codepoint));
+  }
+
+  /**
+   * Checks that malformed UTF-8 bytes yield a replacement character (with fallback)
+   * and raise an exception (without fallback).
+   * @param bytes malformed input bytes
+   * @throws IOException I/O exception
+   */
+  private static void malformed(final int... bytes) throws IOException {
+    final byte[] data = new byte[bytes.length];
+    for(int b = 0; b < bytes.length; b++) data[b] = (byte) bytes[b];
+
+    // with fallback: replacement character is returned
+    try(TextInput ti = new TextInput(new IOContent(data), "UTF-8")) {
+      boolean replaced = false;
+      for(int ch; (ch = ti.read()) != -1;) replaced |= ch == Token.REPLACEMENT;
+      assertTrue(replaced, "Expected replacement character");
+    }
+    // without fallback: exception is raised
+    assertThrows(IOException.class, () -> {
+      try(TextInput ti = new TextInput(new IOContent(data), "UTF-8").fallback(false)) {
+        while(ti.read() != -1);
+      }
+    });
   }
 
   /**
