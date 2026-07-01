@@ -2076,6 +2076,25 @@ public final class RewritingsTest extends SandboxTest {
     check("<a/>, 1, 1", "<a/>\n1\n1", exists(SingletonSeq.class));
   }
 
+  /** Node-constructing functions must not be pre-evaluated (fresh identity per call). */
+  @Test public void preEvalConstructors() {
+    // constant argument: parse-xml is not pre-evaluated to a document value
+    check("parse-xml('<a/>')", "<a/>", exists(PARSE_XML));
+
+    // identical constructions in a list: rewritten to replicate, but nodes stay distinct
+    check("let $d := (parse-xml('<a/>'), parse-xml('<a/>')) return $d[1] is $d[2]", false,
+        exists(REPLICATE), exists(PARSE_XML));
+
+    // separate calls yield distinct node identities
+    check("let $a := parse-xml('<a/>'), $b := parse-xml('<a/>') return $a is $b", false);
+    check("count(distinct-ordered-nodes((parse-xml('<a/>'), parse-xml('<a/>'))))", 2,
+        exists(PARSE_XML));
+    check("count(distinct-ordered-nodes((json-to-xml('{}'), json-to-xml('{}'))))", 2,
+        exists(JSON_TO_XML));
+    check("count(distinct-ordered-nodes((csv-to-xml('a'), csv-to-xml('a'))))", 2,
+        exists(CSV_TO_XML));
+  }
+
   /** Switch expression: static and dynamic cases. */
   @Test public void gh1919() {
     query("switch('x') case" + wrap("x") + "return 1 case 'x' return 2 default return 3", 1);
