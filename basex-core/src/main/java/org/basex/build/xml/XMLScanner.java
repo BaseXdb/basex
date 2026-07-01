@@ -267,7 +267,7 @@ final class XMLScanner extends Job {
       if(c == 0) throw error(ATTCLOSE, (char) 0);
       wrong |= c == '\'' || c == '"';
       if(c == '<') throw error(wrong ? ATTCLOSE : ATTCHAR, '<');
-      if(c == 0x0A) c = ' ';
+      if(c == 0x09 || c == 0x0A) c = ' ';
       if(c == '&') {
         // verify...
         final byte[] r = ref(true);

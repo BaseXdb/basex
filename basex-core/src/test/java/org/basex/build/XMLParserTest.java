@@ -113,6 +113,18 @@ public final class XMLParserTest extends SandboxTest {
     query(".", input);
   }
 
+  /** Attribute-value normalization of whitespace characters. */
+  @Test public void attributeWhitespace() {
+    // literal tab is normalized to a space, character reference is preserved
+    final String input = "<x a=\"\t\" b=\"&#x9;\"/>";
+    for(final boolean b : new boolean[] { false, true }) {
+      set(MainOptions.INTPARSE, b);
+      execute(new CreateDB(NAME, input));
+      query("string-to-codepoints(x/@a)", 32);
+      query("string-to-codepoints(x/@b)", 9);
+    }
+  }
+
   /** STRIPNS option with identical attribute names. */
   @Test public void gh2027() {
     set(MainOptions.STRIPNS, true);
