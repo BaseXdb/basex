@@ -50,6 +50,19 @@ abstract class JsonBuilderConverter extends JsonConverter {
   }
 
   @Override
+  protected void closePair() { }
+
+  @Override
+  protected void closeObject() {
+    closeElem();
+  }
+
+  @Override
+  protected void closeArray() {
+    closeElem();
+  }
+
+  @Override
   protected void openItem() { }
 
   @Override

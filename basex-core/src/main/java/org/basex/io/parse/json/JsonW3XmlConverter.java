@@ -29,32 +29,30 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
 
   @Override
   protected void openObject() {
-    if(!skipOpen()) openOuter(MAP);
+    openOuter(MAP);
   }
 
   @Override
   protected void closeObject() {
-    if(!skipClose()) closeOuter();
+    closeOuter();
   }
 
   @Override
-  protected void openPair(final byte[] key, final boolean add) {
-    if(!skipPair(add)) name = shared.token(key);
+  protected void openPair(final byte[] key) {
+    name = shared.token(key);
   }
 
   @Override
-  protected void closePair(final boolean add) {
-    skipClose();
-  }
+  protected void closePair() { }
 
   @Override
   protected void openArray() {
-    if(!skipOpen()) openOuter(ARRAY);
+    openOuter(ARRAY);
   }
 
   @Override
   protected void closeArray() {
-    if(!skipClose()) closeOuter();
+    closeOuter();
   }
 
   @Override
@@ -65,13 +63,11 @@ public final class JsonW3XmlConverter extends JsonXmlConverter {
 
   @Override
   void addValue(final byte[] type, final byte[] value) {
-    if(!skip()) {
-      final byte[] val = value != null ? shared.token(value) : null;
-      final FBuilder elem = element(type).text(val);
-      if(escape && value != null && contains(val, '\\')) elem.attr(Q_ESCAPED, TRUE);
-      if(curr != null) curr.node(elem);
-      else curr = elem;
-    }
+    final byte[] val = value != null ? shared.token(value) : null;
+    final FBuilder elem = element(type).text(val);
+    if(escape && value != null && contains(val, '\\')) elem.attr(Q_ESCAPED, TRUE);
+    if(curr != null) curr.node(elem);
+    else curr = elem;
   }
 
   /**

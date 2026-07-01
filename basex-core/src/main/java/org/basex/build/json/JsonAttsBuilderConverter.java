@@ -38,32 +38,17 @@ final class JsonAttsBuilderConverter extends JsonBuilderConverter {
 
   @Override
   protected void openObject() {
-    if(!skipOpen()) openElem(OBJECT);
+    openElem(OBJECT);
   }
 
   @Override
-  protected void closeObject() {
-    if(!skipClose()) closeElem();
-  }
-
-  @Override
-  protected void openPair(final byte[] key, final boolean add) {
-    if(!skipPair(add)) pendingKey = key;
-  }
-
-  @Override
-  protected void closePair(final boolean add) {
-    skipClose();
+  protected void openPair(final byte[] key) {
+    pendingKey = key;
   }
 
   @Override
   protected void openArray() {
-    if(!skipOpen()) openElem(ARRAY);
-  }
-
-  @Override
-  protected void closeArray() {
-    if(!skipClose()) closeElem();
+    openElem(ARRAY);
   }
 
   @Override
@@ -92,7 +77,6 @@ final class JsonAttsBuilderConverter extends JsonBuilderConverter {
    * @param value text content, or {@code null} for the null literal
    */
   private void addValue(final byte[] type, final byte[] value) {
-    if(skip()) return;
     try {
       atts.reset();
       final byte[] en = prepareElem();

@@ -65,32 +65,30 @@ public final class JsonDirectConverter extends JsonXmlConverter {
 
   @Override
   protected void openObject() {
-    if(!skipOpen()) openOuter(OBJECT);
+    openOuter(OBJECT);
   }
 
   @Override
   protected void closeObject() {
-    if(!skipClose()) closeOuter();
+    closeOuter();
   }
 
   @Override
-  protected void openPair(final byte[] key, final boolean add) {
-    if(!skipPair(add)) name = shared.token(XMLToken.encode(key, lax));
+  protected void openPair(final byte[] key) {
+    name = shared.token(XMLToken.encode(key, lax));
   }
 
   @Override
-  protected void closePair(final boolean add) {
-    skipClose();
-  }
+  protected void closePair() { }
 
   @Override
   protected void openArray() {
-    if(!skipOpen()) openOuter(ARRAY);
+    openOuter(ARRAY);
   }
 
   @Override
   protected void closeArray() {
-    if(!skipClose()) closeOuter();
+    closeOuter();
   }
 
   @Override
@@ -103,12 +101,10 @@ public final class JsonDirectConverter extends JsonXmlConverter {
 
   @Override
   void addValue(final byte[] type, final byte[] value) {
-    if(!skip()) {
-      final byte[] val = value != null ? shared.token(value) : null;
-      final FBuilder elem = element(type).text(val);
-      if(curr != null) curr.node(elem);
-      else curr = elem;
-    }
+    final byte[] val = value != null ? shared.token(value) : null;
+    final FBuilder elem = element(type).text(val);
+    if(curr != null) curr.node(elem);
+    else curr = elem;
   }
 
   /**
