@@ -84,14 +84,25 @@ public final class IndexInfo {
       text = true;
     } else if(kind == Kind.ELEMENT) {
       // ensure that addressed elements only have text nodes as children
-      // stop if database is unknown/out-dated, if namespaces occur, or if name test is not simple
-      if(data == null || !data.meta.uptodate || !data.nspaces.isEmpty() ||
-          !(last.test instanceof NameTest)) return null;
-
+      // stop if database is unknown/out-dated or if name test is not simple
+      if(data == null || !data.meta.uptodate || !(last.test instanceof NameTest)) return null;
       test = (NameTest) last.test;
-      if(test.name == null) return null;
 
-      final Stats stats = data.elemNames.stats(data.elemNames.index(test.name));
+      // resolve local name for statistics lookup; sound only if its lexical name is unambiguous
+      final byte[] local;
+      if(data.nspaces.isEmpty()) {
+        // no namespaces: one lexical name per local name
+        if(test.name == null) return null;
+        local = test.name;
+      } else if(test.scope == NameTest.Scope.FULL && !test.qname.hasURI() &&
+          !data.usesDefaultNs()) {
+        // no default namespace: full no-namespace test maps to its no-prefix lexical name
+        local = test.qname.local();
+      } else {
+        return null;
+      }
+
+      final Stats stats = data.elemNames.stats(data.elemNames.index(local));
       if(stats == null || !stats.isLeaf()) return null;
       text = true;
     } else if(kind == Kind.ATTRIBUTE) {

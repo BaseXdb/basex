@@ -270,6 +270,14 @@ public abstract class Data {
     return nspaces.defaultNs(meta.ndocs);
   }
 
+  /**
+   * Checks if a default namespace is declared anywhere in the database.
+   * @return result of check
+   */
+  public boolean usesDefaultNs() {
+    return nspaces.usesDefaultNs();
+  }
+
   // RETRIEVING VALUES ============================================================================
 
   /**

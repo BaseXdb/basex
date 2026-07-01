@@ -146,6 +146,31 @@ public final class Namespaces {
     return uri(id);
   }
 
+  /**
+   * Checks if a default namespace is declared anywhere in the database.
+   * @return result of check
+   */
+  public boolean usesDefaultNs() {
+    return !isEmpty() && usesDefaultNs(root);
+  }
+
+  /**
+   * Recursively checks a namespace node and its descendants for a default namespace.
+   * @param node namespace node
+   * @return result of check
+   */
+  private boolean usesDefaultNs(final NSNode node) {
+    final int[] values = node.values();
+    for(int v = 0; v < values.length; v += 2) {
+      if(prefix(values[v]).length == 0 && uri(values[v + 1]).length != 0) return true;
+    }
+    final int ch = node.children();
+    for(int c = 0; c < ch; c++) {
+      if(usesDefaultNs(node.child(c))) return true;
+    }
+    return false;
+  }
+
   // Requesting Namespaces Based on Context =======================================================
 
   /**

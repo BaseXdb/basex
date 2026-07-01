@@ -91,9 +91,21 @@ public final class NameTest extends Test {
     // skip optimizations if data reference is not known at compile time
     if(data == null) return this;
 
-    // skip optimizations if more than one namespace is defined in the database
+    // common default namespace (empty: none declared; null: ambiguous)
     final byte[] dataNs = data.defaultNs();
-    if(dataNs == null) return this;
+    if(dataNs == null) {
+      // no default namespace anywhere: discard no-namespace name test if its local name is unknown
+      // (the test is not reduced to local, as a prefixed name may share the same local name)
+      if(scope.oneOf(Scope.FLEXIBLE, Scope.FULL) && !qname.hasURI() &&
+          !kind.oneOf(Kind.GNODE, Kind.PROCESSING_INSTRUCTION) &&
+          (kind == Kind.ATTRIBUTE || ns.length == 0) && !data.usesDefaultNs()) {
+        final byte[] local = qname.local();
+        final Names names = kind == Kind.ELEMENT ? data.elemNames : data.attrNames;
+        if(!names.contains(local) && !names.contains(Token.concat(Token.XML, ':', local)))
+          return null;
+      }
+      return this;
+    }
 
     // check if test may yield results
     if(scope.oneOf(Scope.FLEXIBLE, Scope.FULL) && !qname.hasURI()) {

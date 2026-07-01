@@ -330,18 +330,26 @@ public final class IndexOptimizeTest extends SandboxTest {
   }
 
   /**
-   * Index access with namespaces.
+   * Index access with namespaces (#1763).
    */
   @Test public void gh1763() {
     final String doc = "<a xmlns:x=\"X\"><b>B</b></a>";
     execute(new CreateDB(NAME, doc));
+
+    // explicit text steps: rewritten for index access
     check("/a[.//text() = 'B']", doc, exists(ValueAccess.class));
     check("//a[.//text() = 'B']", doc, exists(ValueAccess.class));
     check("/a/b[text() = 'B']/..", doc, exists(ValueAccess.class));
     check("//b[text() = 'B']/..", doc, exists(ValueAccess.class));
     check("//*[text() = 'B']/..", doc, exists(ValueAccess.class));
 
-    // the following queries could be rewritten for index access
+    // no default namespace is declared anywhere: no-namespace element tests are rewritten
+    check("/a[b = 'B']", doc, exists(ValueAccess.class));
+    check("//a[b = 'B']", doc, exists(ValueAccess.class));
+    check("/*[b = 'B']", doc, exists(ValueAccess.class));
+    check("//*[b = 'B']", doc, exists(ValueAccess.class));
+
+    // local-name wildcard tests are not rewritten (may match names in other namespaces)
     check("/a[*:b = 'B']", doc, empty(ValueAccess.class));
     check("//a[*:b = 'B']", doc, empty(ValueAccess.class));
     check("/*:a[*:b = 'B']", doc, empty(ValueAccess.class));
@@ -349,10 +357,42 @@ public final class IndexOptimizeTest extends SandboxTest {
     check("/*[*:b = 'B']", doc, empty(ValueAccess.class));
     check("//*[*:b = 'B']", doc, empty(ValueAccess.class));
 
-    check("/a[b = 'B']", doc, empty(ValueAccess.class));
-    check("//a[b = 'B']", doc, empty(ValueAccess.class));
-    check("/*[b = 'B']", doc, empty(ValueAccess.class));
-    check("//*[b = 'B']", doc, empty(ValueAccess.class));
+    // nonexistent no-namespace names: statically discarded
+    check("/a/nonexistent", "", empty());
+    check("//nonexistent[. = 'B']", "", empty());
+
+    // attribute values are rewritten for index access
+    execute(new CreateDB(NAME, "<a xmlns:x=\"X\"><b id=\"7\">B</b></a>"));
+    check("//b[@id = '7']", "<b xmlns:x=\"X\" id=\"7\">B</b>", exists(ValueAccess.class));
+  }
+
+  /**
+   * Index access with namespaces: soundness with prefixed same-local names (#1763).
+   */
+  @Test public void gh1763Mixed() {
+    // no-namespace <b> (leaf) and prefixed <x:b> (non-leaf) share the local name 'b'
+    execute(new CreateDB(NAME, "<a xmlns:x=\"X\"><b>B</b><x:b><c>B</c></x:b></a>"));
+
+    // full no-namespace test is rewritten and matches only the no-namespace element
+    check("count(/a[b = 'B'])", "1", exists(ValueAccess.class));
+    check("count(//b[. = 'B'])", "1", exists(ValueAccess.class));
+    // local-name wildcard is evaluated sequentially and matches both elements
+    check("count(//*:b[. = 'B'])", "2", empty(ValueAccess.class));
+
+    // 'B' only occurs below the prefixed element: no-namespace test must not match
+    execute(new CreateDB(NAME, "<a xmlns:x=\"X\"><b>b</b><x:b><c>B</c></x:b></a>"));
+    check("count(/a[b = 'B'])", "0", exists(ValueAccess.class));
+  }
+
+  /**
+   * Index access on databases with a default namespace (#1763).
+   */
+  @Test public void gh1763DefaultNs() {
+    // single default namespace: a no-namespace element test never matches and is discarded
+    execute(new CreateDB(NAME, "<a xmlns=\"Y\"><b>B</b></a>"));
+    check("/a[b = 'B']", "", empty());
+    // query default namespace matches the database default namespace: correct result
+    check("declare default element namespace 'Y'; count(/a[b = 'B'])", "1");
   }
 
   /** Index access for integer comparisons (issue #2069). */

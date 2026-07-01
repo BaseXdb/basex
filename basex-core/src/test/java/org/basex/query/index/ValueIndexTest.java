@@ -56,7 +56,8 @@ public final class ValueIndexTest extends SandboxTest {
       execute(new CreateDB(NAME, FILE));
       check("count(//" + key + "[text() = " + value + "])",
           value.split(",").length, exists(ValueAccess.class));
-      if(!key.equals("*")) check("//X[text() = 'unknown']", "", exists(DBNode.class));
+      // existing but non-indexed element: sequential fallback (name 'b' is never a lookup key)
+      if(!key.equals("*")) check("//b[text() = 'unknown']", "", exists(DBNode.class));
     });
   }
 
@@ -73,7 +74,8 @@ public final class ValueIndexTest extends SandboxTest {
       execute(new CreateDB(NAME, FILE));
       check("count(//*[@" + key + " = " + value + "])",
           value.split(",").length, exists(ValueAccess.class));
-      if(!key.equals("*")) check("//*[@x = 'unknown']", "", exists(DBNode.class));
+      // existing but non-indexed attribute: sequential fallback (name 'b' is never a lookup key)
+      if(!key.equals("*")) check("//*[@b = 'unknown']", "", exists(DBNode.class));
     });
   }
 
@@ -88,7 +90,8 @@ public final class ValueIndexTest extends SandboxTest {
       check("count(//" + key + "[text() contains text { " + value + " }])",
           value.split(",").length,
           exists(FTIndexAccess.class));
-      if(!key.equals("*")) check("//X[text() contains text 'unknown']", "", exists(DBNode.class));
+      // existing but non-indexed element: sequential fallback (name 'b' is never a lookup key)
+      if(!key.equals("*")) check("//b[text() contains text 'unknown']", "", exists(DBNode.class));
     });
   }
 
