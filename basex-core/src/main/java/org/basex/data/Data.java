@@ -897,7 +897,7 @@ public abstract class Data {
    * @param value value
    */
   public final void dist(final int pre, final int kind, final int value) {
-    if(kind == ATTR) table.write1(pre, 0, value << 3 | ATTR);
+    if(kind == ATTR) table.write1(pre, 0, Math.min(value, IO.MAXATTS) << 3 | ATTR);
     else if(kind != DOC) table.write4(pre, kind == ELEM ? 4 : 8, value);
   }
 

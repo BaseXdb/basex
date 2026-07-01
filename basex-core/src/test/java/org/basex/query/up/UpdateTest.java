@@ -1031,6 +1031,21 @@ public final class UpdateTest extends SandboxTest {
     );
   }
 
+  /**
+   * Tests that attribute distances stay valid when the {@link IO#MAXATTS} line is crossed
+   * by inserting an attribute as first (following attributes are shifted).
+   */
+  @Test public void attributeDistance() {
+    // navigating from the 32nd attribute back to its parent must yield the element
+    query("let $e := <e>{ for $i in 1 to 31 return attribute { 'a' || $i } { $i } }</e>" +
+        " update { insert node attribute a0 { 0 } as first into . }" +
+        " return name($e/@a31/..)", "e");
+    // all 32 attributes must resolve to the element as their parent
+    query("let $e := <e>{ for $i in 1 to 31 return attribute { 'a' || $i } { $i } }</e>" +
+        " update { insert node attribute a0 { 0 } as first into . }" +
+        " return count($e/@*[.. instance of element(e)])", 32);
+  }
+
   /** Tests the "update" and "transform with" operators. */
   @Test public void update() {
     query("<x/> update {}", "<x/>");
