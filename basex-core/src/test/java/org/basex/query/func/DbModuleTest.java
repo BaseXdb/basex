@@ -1023,6 +1023,22 @@ public final class DbModuleTest extends SandboxTest {
     query(_DB_GET.args(NAME, "10.xml"), "");
   }
 
+  /** Replacing a document must not inflate the reported document count (meta.ndocs). */
+  @Test public void putReplaceCount() {
+    final Function func = _DB_PUT;
+    // database initially holds one document; add a second one with a known path
+    query(func.args(NAME, " <a/>", "doc.xml"));
+    query("count(" + _DB_GET.args(NAME) + ")", 2);
+    query("xs:integer(" + _DB_INFO.args(NAME) + "//documents)", 2);
+
+    // repeated replacement of the same document must keep the count stable
+    for(int i = 0; i < 3; i++) {
+      query(func.args(NAME, " <a><b/></a>", "doc.xml"));
+      query("count(" + _DB_GET.args(NAME) + ")", 2);
+      query("xs:integer(" + _DB_INFO.args(NAME) + "//documents)", 2);
+    }
+  }
+
   /** Test method. */
   @Test public void putBinary() {
     final Function func = _DB_PUT_BINARY;

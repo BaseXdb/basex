@@ -587,6 +587,8 @@ public abstract class Data {
     // update index structures
     final int tKind = kind(pre), tSize = size(pre, tKind), tPar = parent(pre, tKind);
     indexDelete(pre, id(pre), tSize);
+    // the replaced target document is removed; source documents are counted below
+    if(tKind == DOC) --meta.ndocs;
 
     final Data sData = source.data;
     int sTopPre = source.start;
