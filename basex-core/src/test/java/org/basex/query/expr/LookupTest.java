@@ -72,6 +72,18 @@ public final class LookupTest extends SandboxTest {
     query("array:for-each([], function($i) { string($i) })!?([])", "");
   }
 
+  /** Lookup directly following an axis step (#2591). */
+  @Test public void step() {
+    query("{ 'a': 1, 'b': 2 } ! self::jnode()?b", 2);
+    query("{ 'a': 1, 'b': 2 } ! self::jnode()?*", "1\n2");
+    query("{ 'a': { 'b': 5 } } ! self::jnode()?a?b", 5);
+    // predicate before and after the lookup
+    query("{ 'a': 1 } ! self::jnode()[1]?a", 1);
+    query("{ 'a': (1, 2, 3) } ! self::jnode()?a[. > 1]", "2\n3");
+    // one lookup per context item
+    query("({ 'k': 7 }, { 'k': 8 }) ! self::jnode()?k", "7\n8");
+  }
+
   /** Test. */
   @Test public void error() {
     error("1?a", LOOKUP_X);
