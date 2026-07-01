@@ -93,6 +93,38 @@ public final class TextInputTest {
   }
 
   /**
+   * Test supplementary characters (encoded as surrogate pairs).
+   * @throws IOException I/O exception
+   */
+  @Test public void supplementary() throws IOException {
+    // U+2000B and U+2A6B2 (CJK Extension B/C), surrounded by ASCII
+    final String in = "A" + cp(0x2000B) + cp(0x2A6B2) + "B";
+    encoding("GB18030", in);
+    encoding("UTF-8", in);
+    encoding("UTF-16LE", in);
+    encoding("UTF-16BE", in);
+    encoding("UTF-32", in);
+  }
+
+  /**
+   * Test a stateful encoding (escape sequences) with a mid-string mode switch.
+   * @throws IOException I/O exception
+   */
+  @Test public void stateful() throws IOException {
+    // U+4E2D and U+3042 force switches between ASCII and JIS X 0208
+    encoding("ISO-2022-JP", "A" + cp(0x4E2D) + "B" + cp(0x3042) + "C");
+  }
+
+  /**
+   * Returns the string representation of a codepoint.
+   * @param codepoint codepoint
+   * @return string
+   */
+  private static String cp(final int codepoint) {
+    return new String(Character.toChars(codepoint));
+  }
+
+  /**
    * Test alternate encoding.
    * @param enc encoding to be tested
    * @param input input string

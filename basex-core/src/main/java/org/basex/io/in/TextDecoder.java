@@ -11,9 +11,10 @@ import java.util.function.*;
 import org.basex.util.*;
 
 /**
- * This abstract class specifies a single method for decoding input to UTF-8.
- * The inheriting classes are optimized for performance and faster than Java's
- * default decoders.
+ * This abstract class specifies a single method for decoding input to codepoints.
+ * The hand-written UTF-8/16/32 decoders avoid the detour via UTF-16 char arrays and
+ * are faster than Java's default decoders; all other encodings are delegated to Java's
+ * charset decoders.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -174,14 +175,12 @@ abstract class TextDecoder {
     }
   }
 
-  /** Generic Decoder. */
+  /** Generic decoder, delegating to Java's charset decoders. */
   private static final class Generic extends TextDecoder {
-    /** Input cache. */
-    private final byte[] cache = new byte[4];
-    /** Input buffer. */
-    private final ByteBuffer inc = ByteBuffer.wrap(cache);
-    /** Output buffer. */
-    private final CharBuffer outc = CharBuffer.wrap(new char[4]);
+    /** Input buffer (undecoded bytes). */
+    private final ByteBuffer in = ByteBuffer.allocate(16);
+    /** Output buffer (decoded but not yet emitted characters). */
+    private final CharBuffer out = CharBuffer.allocate(8);
     /** Charset decoder. */
     private final CharsetDecoder csd;
 
@@ -197,30 +196,59 @@ abstract class TextDecoder {
       } catch(final Exception ex) {
         throw new DecodingException(ex);
       }
+      out.limit(0);
     }
 
     @Override
     int read(final TextInput ti) throws IOException {
-      int c = -1;
-      while(++c < 4) {
-        final int a = ti.readByte();
-        if(a < 0) break;
+      if(out.hasRemaining()) return codePoint();
 
-        cache[c] = (byte) a;
-        outc.position(0);
-        inc.position(0);
-        inc.limit(c + 1);
-        csd.reset();
-        final CoderResult cr = csd.decode(inc, outc, true);
-        if(cr.isMalformed()) continue;
-
-        // return codepoint
-        int i = 0;
-        final int os = outc.position();
-        for(int o = 0; o < os; ++o) i |= outc.get(o) << (o << 3);
-        return i;
+      while(true) {
+        final int b = ti.readByte();
+        final boolean eof = b < 0;
+        if(!eof) in.put((byte) b);
+        in.flip();
+        out.clear();
+        final CoderResult cr = csd.decode(in, out, eof);
+        out.flip();
+        if(out.hasRemaining()) {
+          in.compact();
+          return codePoint();
+        }
+        if(cr.isError()) {
+          final byte[] bytes = new byte[cr.length()];
+          in.get(bytes);
+          in.compact();
+          return invalid(false, bytes);
+        }
+        if(eof) {
+          out.clear();
+          csd.flush(out);
+          out.flip();
+          // reset the decoder so it stays usable if read() is called again after EOF
+          csd.reset();
+          if(out.hasRemaining()) {
+            in.compact();
+            return codePoint();
+          }
+          final int rem = in.remaining();
+          final byte[] bytes = new byte[rem];
+          in.get(bytes);
+          in.compact();
+          return rem == 0 ? -1 : invalid(true, bytes);
+        }
+        in.compact();
       }
-      return c == 0 ? -1 : invalid(false, cache[0]);
+    }
+
+    /**
+     * Returns the next codepoint from the output buffer.
+     * @return codepoint
+     */
+    private int codePoint() {
+      final char ch = out.get();
+      return Character.isHighSurrogate(ch) && out.hasRemaining() ?
+        Character.toCodePoint(ch, out.get()) : ch;
     }
   }
 }
