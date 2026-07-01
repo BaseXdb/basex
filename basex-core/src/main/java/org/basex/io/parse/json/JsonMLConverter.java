@@ -7,7 +7,6 @@ import org.basex.build.json.*;
 import org.basex.query.*;
 import org.basex.query.value.node.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * This class converts a <a href="http://jsonml.org">JsonML</a> document to XML.
@@ -19,9 +18,6 @@ import org.basex.util.hash.*;
  * @author Leo Woerteler
  */
 final class JsonMLConverter extends JsonXmlConverter {
-  /** Current attributes. */
-  private final TokenSet atts = new TokenSet();
-
   /**
    * Constructor.
    * @param opts JSON options
@@ -52,7 +48,6 @@ final class JsonMLConverter extends JsonXmlConverter {
   @Override
   protected void openPair(final byte[] key) throws QueryException {
     name = shared.token(check(key));
-    if(!atts.add(name)) throw error("Duplicate attribute found");
   }
 
   @Override
@@ -137,7 +132,6 @@ final class JsonMLConverter extends JsonXmlConverter {
    */
   private void reset() {
     curr = null;
-    atts.clear();
   }
 
   /**
