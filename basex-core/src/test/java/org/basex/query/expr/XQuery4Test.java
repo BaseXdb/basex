@@ -799,6 +799,28 @@ public final class XQuery4Test extends SandboxTest {
     query("[ 1 ][./1]", "[1]");
     query("[ 1 ][./1 = 1]", "[1]");
 
+    // GH-2709: each map or array used as a path root yields a JNode with distinct identity
+    // (data model, 4.0: "every operation that constructs a root JNode returns a JNode with
+    // distinct identity"), even when the wrapped values are equal or the same object
+    query("({ 'x': 1 }, { 'x': 1 })/x", "1\n1");
+    query("count(({ 'x': 1 }, { 'x': 1 }, { 'x': 1 })/x)", "3");
+    query("count(([ 1 ], [ 1 ])/?*)", "2");
+    query("count(replicate({ 'x': 1 }, 2)/x)", "2");
+    query("let $m := { 'x': 1 } return count(($m, $m)/x)", "2");
+    query("(1 to 6) ! { 'a': 1 } -> (.[1]/a is .[2]/a)", "false");
+    // each explicit or implicit JNode construction has a fresh identity: node-creating
+    // expressions carry Flag.CNS, so equal ones are not merged into a single construction
+    query("let $m := { 'a': 1 } return count(distinct-ordered-nodes((jtree($m), jtree($m))))", "2");
+    query("let $m := { 'a': 1 } return count(distinct-ordered-nodes(($m/a, $m/a)))", "2");
+    // a single construction bound to a variable keeps one identity, even if referenced twice
+    query("let $m := { 'a': 1 } return count(distinct-ordered-nodes("
+        + "let $y := $m/a return ($y, $y)))", "1");
+    // fresh identity is kept even when the path result is not statically a JNode, but only
+    // may be one: a heterogeneous XML/map root yields the union type (jnode(a)|element(a)),
+    // which is not an instance of jnode() yet can still produce JNodes
+    query("let $c := (<x><a/></x>, { 'a': 1 }) return "
+        + "count(distinct-ordered-nodes(($c/a, $c/a))[. instance of jnode()])", "2");
+
     // JNode identity: distinct positions are kept even when key and value coincide
     query("count([ ['a'], ['a'] ]//1)", "3");
     query("count(distinct-ordered-nodes([ [['a'],['b']], [['c'],['d']] ]//1 ! .//1))", "4");

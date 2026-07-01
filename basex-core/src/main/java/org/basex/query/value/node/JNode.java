@@ -125,9 +125,8 @@ public final class JNode extends GNode {
     int d1 = 0, d2 = 0;
     while(r1.parent != null) { r1 = r1.parent; d1++; }
     while(r2.parent != null) { r2 = r2.parent; d2++; }
-    // different trees: arbitrary but stable order based on root value identity
-    if(r1 != r2 && r1.value != r2.value) return Integer.compare(
-        System.identityHashCode(r1.value), System.identityHashCode(r2.value));
+    // different trees: arbitrary but stable order based on the root node ID
+    if(r1 != r2) return Integer.signum(r1.id - r2.id);
 
     // same tree: compare the index paths leading from the root to both nodes
     final long[] p1 = new long[d1], p2 = new long[d2];
@@ -175,7 +174,7 @@ public final class JNode extends GNode {
   public byte[] id() {
     final TokenBuilder tb = new TokenBuilder(Token.ID);
     for(JNode n = this; n != null; n = n.parent) {
-      tb.addLong(n.parent != null ? n.index() + 1 : n.hashCode()).add('j');
+      tb.addLong(n.parent != null ? n.index() + 1 : n.id).add('j');
     }
     return tb.removeLast().finish();
   }
@@ -312,9 +311,7 @@ public final class JNode extends GNode {
 
   @Override
   public boolean equals(final Object obj) {
-    // the parent reference is ignored
-    return this == obj || obj instanceof final JNode jnode &&
-        JNodeTest.equals(key, jnode.key) && JNodeTest.equals(value, jnode.value);
+    return this == obj || obj instanceof final JNode jnode && is(jnode);
   }
 
   @Override

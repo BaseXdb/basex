@@ -1,6 +1,7 @@
 package org.basex.query.value.node;
 
 import java.util.*;
+import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
 import org.basex.data.*;
@@ -21,6 +22,11 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public abstract class GNode extends Item {
+  /** Static node counter. */
+  private static final AtomicInteger ID = new AtomicInteger();
+  /** Unique node ID. ID can get negative, as subtraction of IDs is used for all comparisons. */
+  public final int id = ID.incrementAndGet();
+
   /**
    * Constructor.
    * @param type item type

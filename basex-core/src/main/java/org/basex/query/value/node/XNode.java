@@ -5,7 +5,6 @@ import static org.basex.query.util.DeepEqualOptions.*;
 import static org.basex.query.value.type.Kind.*;
 
 import java.io.*;
-import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
 import org.basex.api.dom.*;
@@ -40,10 +39,6 @@ public abstract class XNode extends GNode {
     NodeType.DOCUMENT, NodeType.ELEMENT, NodeType.TEXT, NodeType.ATTRIBUTE,
     NodeType.COMMENT, NodeType.PROCESSING_INSTRUCTION
   };
-  /** Static node counter. */
-  private static final AtomicInteger ID = new AtomicInteger();
-  /** Unique node ID. ID can get negative, as subtraction of IDs is used for all comparisons. */
-  public final int id = ID.incrementAndGet();
 
   /**
    * Constructor.

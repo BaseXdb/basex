@@ -227,6 +227,7 @@ public abstract class Path extends ParseExpr {
     if(Flag.FCS.oneOf(flags) ||
        Flag.CTX.oneOf(flags) && (root == null || root.has(Flag.CTX)) ||
        Flag.POS.oneOf(flags) && root != null && root.has(Flag.POS)) return true;
+    if(Flag.CNS.oneOf(flags) && seqType().type.intersect(NodeType.JNODE) != null) return true;
     // check remaining flags
     final Flag[] flgs = Flag.remove(flags, Flag.POS, Flag.CTX);
     if(flgs.length == 0) return false;

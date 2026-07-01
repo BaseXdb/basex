@@ -432,7 +432,7 @@ public enum Function implements AFunction {
       params(STRING_ZO, MAP_ZO), DOCUMENT_FN_ZO, flag(CNS)),
   /** XQuery function. */
   JTREE(FnJtree::new, "jtree(input)",
-      params(MAP_OR_ARRAY_O), JNODE_ROOT.seqType()),
+      params(MAP_OR_ARRAY_O), JNODE_ROOT.seqType(), flag(CNS)),
   /** XQuery function. */
   JVALUE(FnJvalue::new, "jvalue([input])",
       params(JNODE_ZO), ITEM_ZM),
@@ -2043,7 +2043,7 @@ public enum Function implements AFunction {
       params(ITEM_ZM, NUMERIC_O, NUMERIC_O), ITEM_ZM, UTIL_URI),
   /** XQuery function. */
   _UTIL_ROOT(UtilRoot::new, "root(nodes)",
-      params(GNODE_OR_MAP_OR_ARRAY_ZM), GNODE_ZM, UTIL_URI),
+      params(GNODE_OR_MAP_OR_ARRAY_ZM), GNODE_ZM, flag(CNS), UTIL_URI),
   /** XQuery function. */
   _UTIL_STRIP_NAMESPACES(UtilStripNamespaces::new, "strip-namespaces(node[,prefixes])",
       params(NODE_O, STRING_ZM), NODE_O, UTIL_URI),
