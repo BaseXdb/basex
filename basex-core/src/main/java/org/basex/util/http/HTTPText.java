@@ -60,6 +60,8 @@ public interface HTTPText {
   String ACCEPT = "Accept";
   /** HTTP header string. */
   String ALLOW = "Allow";
+  /** HTTP header string. */
+  String SET_COOKIE = "Set-Cookie";
 
   /** Content-Disposition (lower case). */
   byte[] CONTENT_DISPOSITION = token("content-disposition");

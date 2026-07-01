@@ -5,6 +5,7 @@ import static org.basex.http.web.WebText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.http.*;
@@ -193,6 +194,8 @@ final class RestXqResponse extends WebResponse {
         }
         if(sta != null) status = toInt(sta);
 
+        // remember header names to distinguish first occurrence from repetitions
+        final Set<String> seen = new HashSet<>();
         for(final GNode gchild : node.childIter()) {
           final XNode child = (XNode) gchild;
           // process http:header elements
@@ -203,8 +206,14 @@ final class RestXqResponse extends WebResponse {
               if(n.equalsIgnoreCase(HTTPText.CONTENT_TYPE)) {
                 cType = v;
               } else {
-                conn.response.setHeader(n, n.equalsIgnoreCase(HTTPText.LOCATION) ?
-                  conn.resolve(v) : v);
+                final String hv = n.equalsIgnoreCase(HTTPText.LOCATION) ? conn.resolve(v) : v;
+                // multiple Set-Cookie headers must be added one by one
+                if(n.equalsIgnoreCase(HTTPText.SET_COOKIE) ||
+                    !seen.add(n.toLowerCase(Locale.ENGLISH))) {
+                  conn.response.addHeader(n, hv);
+                } else {
+                  conn.response.setHeader(n, hv);
+                }
               }
             }
           } else {
