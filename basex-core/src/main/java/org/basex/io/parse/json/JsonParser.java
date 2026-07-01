@@ -31,8 +31,8 @@ public final class JsonParser {
     "CAN", "EM",  "SUB", "ESC", "FS",  "GS",  "RS",  "US",
   };
 
-  /** Converter. */
-  private final JsonConverter conv;
+  /** Event handler. */
+  private final JsonHandler conv;
   /** Liberal flag. */
   private final boolean liberal;
   /** Escape flag. */
@@ -63,7 +63,7 @@ public final class JsonParser {
    * @param opts options
    * @param conv converter
    */
-  public JsonParser(final TextInput input, final JsonParserOptions opts, final JsonConverter conv) {
+  public JsonParser(final TextInput input, final JsonParserOptions opts, final JsonHandler conv) {
     this.input = input;
     this.conv = conv;
     liberal = opts.get(JsonParserOptions.LIBERAL);

@@ -6,7 +6,6 @@ import org.basex.build.*;
 import org.basex.build.json.JsonParserOptions.*;
 import org.basex.io.parse.json.*;
 import org.basex.query.*;
-import org.basex.query.value.item.*;
 import org.basex.util.*;
 
 /**
@@ -16,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Gunther Rademacher
  */
-abstract class JsonBuilderConverter extends JsonConverter {
+abstract class JsonBuilderConverter extends JsonHandler {
   /** Empty namespace declarations. */
   static final Atts EMPTY_NSP = new Atts();
 
@@ -33,20 +32,11 @@ abstract class JsonBuilderConverter extends JsonConverter {
    */
   JsonBuilderConverter(final JsonParserOptions jopts, final Builder builder)
       throws QueryException {
-    super(jopts);
     this.builder = builder;
     final JsonDuplicates dupl = jopts.get(JsonParserOptions.DUPLICATES);
     if(dupl == JsonDuplicates.USE_LAST) {
       throw optionError(JsonParserOptions.DUPLICATES.name(), dupl);
     }
-  }
-
-  @Override
-  protected final void init(final String uri) { }
-
-  @Override
-  protected final Item finish() {
-    return null;
   }
 
   @Override

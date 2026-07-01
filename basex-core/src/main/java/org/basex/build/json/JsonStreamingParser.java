@@ -8,7 +8,6 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.parse.json.*;
 import org.basex.query.*;
 
 /**
@@ -65,7 +64,7 @@ public final class JsonStreamingParser extends SingleParser {
   @Override
   protected void parse() throws IOException {
     try {
-      final JsonConverter conv = converterFactory.apply(builder);
+      final JsonBuilderConverter conv = converterFactory.apply(builder);
       final String encoding = jopts.get(JsonParserOptions.ENCODING);
       try(NewlineInput ni = new NewlineInput(source, encoding)) {
         new org.basex.io.parse.json.JsonParser(ni, jopts, conv).parse(null);
