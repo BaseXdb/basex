@@ -2,10 +2,14 @@ package org.basex.core.jobs;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests stop-state propagation in the {@link Job} parent/child hierarchy.
+ * Tests stop-state propagation and the interruption of blocking operations in the {@link Job}
+ * parent/child hierarchy.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -38,6 +42,63 @@ public final class JobTest {
     parent.popJob(first);
     parent.stop();
     assertTrue(second.stopped(), "remaining child should still be reachable for stop");
+  }
+
+  /**
+   * A stoppable operation returns its result if the job is not stopped.
+   * @throws Exception exception
+   */
+  @Test public void stoppableReturnsResult() throws Exception {
+    assertEquals("ok", job().runStoppable(() -> "ok"));
+  }
+
+  /**
+   * Without a registered job, a static stoppable operation runs unwrapped.
+   * @throws Exception exception
+   */
+  @Test public void runStoppableWithoutJob() throws Exception {
+    assertEquals("ok", Job.run(() -> "ok"));
+  }
+
+  /** A job that is already stopped must not run the operation. */
+  @Test public void stoppableSkipsIfStopped() {
+    final Job job = job();
+    job.stop();
+    final AtomicBoolean ran = new AtomicBoolean();
+    assertThrows(JobException.class, () -> job.runStoppable(() -> {
+      ran.set(true);
+      return null;
+    }));
+    assertFalse(ran.get(), "operation must not run when the job is already stopped");
+  }
+
+  /**
+   * Stopping a job interrupts a blocking operation and surfaces a {@link JobException}.
+   * @throws Exception exception
+   */
+  @Test public void stopInterruptsBlockingOperation() throws Exception {
+    final Job job = job();
+    final CountDownLatch started = new CountDownLatch(1);
+    final AtomicReference<Throwable> caught = new AtomicReference<>();
+    final Thread worker = new Thread(() -> {
+      try {
+        job.runStoppable(() -> {
+          started.countDown();
+          // block until interrupted by the stop
+          Thread.sleep(60_000);
+          return null;
+        });
+      } catch(final Throwable th) {
+        caught.set(th);
+      }
+    });
+    worker.start();
+    assertTrue(started.await(5, TimeUnit.SECONDS), "operation should have started");
+    job.stop();
+    worker.join(5_000);
+    assertFalse(worker.isAlive(), "blocking operation should have been interrupted");
+    assertInstanceOf(JobException.class, caught.get(),
+        "interrupt should surface as a JobException");
   }
 
   /**

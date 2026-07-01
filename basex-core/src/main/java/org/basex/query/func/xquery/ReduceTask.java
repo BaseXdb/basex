@@ -2,6 +2,7 @@ package org.basex.query.func.xquery;
 
 import java.util.concurrent.*;
 
+import org.basex.core.jobs.Job.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -88,7 +89,7 @@ final class ReduceTask extends RecursiveTask<Value> {
     final long size = end - start;
     if(size <= grain) {
       // fold the chunk sequentially, starting from the seed value
-      try(QueryContext qc = tc.context()) {
+      try(QueryContext qc = tc.context(); Binding bound = qc.bind()) {
         Value value = init;
         for(long i = start; i < end; i++) {
           value = action.invoke(qc, tc.info, value, input.itemAt(i));
@@ -102,7 +103,7 @@ final class ReduceTask extends RecursiveTask<Value> {
     task2.fork();
     final ReduceTask task1 = new ReduceTask(tc, input, init, action, combine, start, middle, grain);
     final Value value1 = task1.invoke(), value2 = task2.join();
-    try(QueryContext qc = tc.context()) {
+    try(QueryContext qc = tc.context(); Binding bound = qc.bind()) {
       return combine.invoke(qc, tc.info, value1, value2);
     }
   }

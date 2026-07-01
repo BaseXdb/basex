@@ -12,6 +12,7 @@ import java.util.*;
 import javax.net.ssl.*;
 import javax.xml.transform.stream.*;
 
+import org.basex.core.jobs.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
 import org.basex.util.http.*;
@@ -123,7 +124,7 @@ public final class IOUrl extends IO {
 
   @Override
   public InputStream inputStream() throws IOException {
-    return isJarURL(pth) ? new URL(pth).openStream() : response().body();
+    return isJarURL(pth) ? new URL(pth).openStream() : new StoppableInputStream(response().body());
   }
 
   /**
@@ -142,8 +143,8 @@ public final class IOUrl extends IO {
       rb.header(HTTPText.USER_AGENT, Prop.NAME + '/' + Prop.VERSION.replace(' ', '-') +
           " (Java " + Prop.JAVA_VERSION + "; " + Prop.OS + " " + Prop.OS_ARCH + ')');
       new UserInfo(uri).basic(rb);
-      response = client.send(rb.build(), HttpResponse.BodyHandlers.ofInputStream());
-    } catch(final IOException ex) {
+      response = Job.run(() -> client.send(rb.build(), HttpResponse.BodyHandlers.ofInputStream()));
+    } catch(final JobException | IOException ex) {
       throw ex;
     } catch(final Exception ex) {
       /* possible exceptions, among others:

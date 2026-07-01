@@ -4,14 +4,14 @@ import org.basex.core.*;
 import org.basex.core.jobs.*;
 
 /**
- * Interruptible string implementation.
+ * Stoppable string implementation.
  * Inspired by https://stackoverflow.com/questions/910740/cancelling-a-long-running-regex-match
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  * @author gojomo
  */
-public final class InterruptibleString implements CharSequence {
+public final class StoppableString implements CharSequence {
   /** String. */
   private final String string;
 
@@ -19,7 +19,7 @@ public final class InterruptibleString implements CharSequence {
    * Constructor.
    * @param string string
    */
-  public InterruptibleString(final String string) {
+  public StoppableString(final String string) {
     this.string = string;
   }
 
@@ -35,8 +35,8 @@ public final class InterruptibleString implements CharSequence {
   }
 
   @Override
-  public InterruptibleString subSequence(final int start, final int end) {
-    return new InterruptibleString(string.substring(start, end));
+  public StoppableString subSequence(final int start, final int end) {
+    return new StoppableString(string.substring(start, end));
   }
 
   @Override
