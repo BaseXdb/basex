@@ -33,8 +33,6 @@ public final class CsvXQuerySerializer extends CsvSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
-    if(sep && level == 0) out.print(' ');
-
     if(!(item instanceof final XQMap map))
       throw CSV_SERIALIZE_X_X.getIO("Top level must be a map, found " + item.type, item);
 
@@ -53,7 +51,6 @@ public final class CsvXQuerySerializer extends CsvSerializer {
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
-    sep = true;
   }
 
   /**

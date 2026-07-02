@@ -131,6 +131,7 @@ public abstract class CsvSerializer extends StandardSerializer {
     if(seqNo != 0) out.print(fieldDelimiter);
 
     byte[] txt = value != null ? value : Token.EMPTY;
+    if(form != null) txt = normalize(txt, form);
     final boolean delim = contains(txt, fieldDelimiter) || contains(txt, rowDelimiter);
     final boolean special = contains(txt, '\r') || contains(txt, '\t')
         || contains(txt, quoteCharacter);
@@ -159,7 +160,7 @@ public abstract class CsvSerializer extends StandardSerializer {
       if(quotes && (delim || special)) tb.add(quoteCharacter);
       txt = tb.finish();
     }
-    out.print(txt);
+    printChars(txt);
   }
 
   @Override

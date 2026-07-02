@@ -34,8 +34,6 @@ public final class CsvW3Serializer extends CsvSerializer {
 
   @Override
   public void serialize(final Item item) throws IOException {
-    if(sep && level == 0) out.print(' ');
-
     if(!(item instanceof final XQMap map)) throw typeError("Top-level map", item);
     final TokenList tl = new TokenList();
     try {
@@ -55,7 +53,6 @@ public final class CsvW3Serializer extends CsvSerializer {
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
-    sep = true;
   }
 
   /**
