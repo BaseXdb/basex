@@ -69,6 +69,8 @@ final class TextRenderer extends BaseXBack {
   /** Indicates if the cursor is located in the current line. */
   private boolean lineC;
 
+  /** Line-offset cache (maps document-space y or text position to a line). */
+  private final TextLineCache cache = new TextLineCache();
   /** Cursor position. */
   private final int[] cursor = new int[2];
 
@@ -120,8 +122,9 @@ final class TextRenderer extends BaseXBack {
     BaseXLayout.antiAlias(g, antiAlias);
 
     parentheses.reset();
-    int oldL = 0;
     final TextIterator iter = init(g, false);
+    skip(iter);
+    int oldL = line - 1;
     while(more(iter, g) && y < height) {
       if(line != oldL && y >= 0) {
         drawLineNumber(g);
@@ -209,7 +212,10 @@ final class TextRenderer extends BaseXBack {
     if(pos == -1) return -1;
 
     final Graphics g = getGraphics();
-    for(final TextIterator iter = init(g, true); more(iter, g) && iter.pos() < pos; next(iter));
+    final TextIterator iter = init(g, true);
+    final int idx = lineIndex(pos);
+    if(idx >= 0) position(iter, idx, 0);
+    for(; more(iter, g) && iter.pos() < pos; next(iter));
     return y;
   }
 
@@ -218,22 +224,14 @@ final class TextRenderer extends BaseXBack {
    * @return line and column
    */
   int[] caretPos() {
-    final Graphics g = getGraphics();
+    final TextIterator iter = new TextIterator(text);
+    final int c = iter.caret(), idx = lineIndex(c);
+    if(idx < 0) return new int[] { 1, 1 };
+
+    // jump to the caret's line and count columns within it
     int col = 1;
-    boolean more = true;
-    for(final TextIterator iter = init(g, true); more(iter, g);) {
-      final int p = iter.pos();
-      while(iter.more()) {
-        more = iter.pos() < iter.caret();
-        if(!more) break;
-        iter.next();
-        col++;
-      }
-      if(!more) break;
-      iter.pos(p);
-      if(next(iter)) col = 1;
-    }
-    return new int[] { line, col };
+    for(iter.pos(cache.pos(idx)); iter.pos() < c; iter.next()) col++;
+    return new int[] { idx + 1, col };
   }
 
   /**
@@ -292,10 +290,56 @@ final class TextRenderer extends BaseXBack {
   void computeHeight() {
     width = getWidth() - (offset >> 1);
 
+    // rebuild the line-offset cache while measuring the whole document
     final Graphics g = getGraphics();
-    for(final TextIterator iter = init(g, true); more(iter, g); next(iter));
+    cache.reset();
+    final TextIterator iter = init(g, true);
+    cache.add(y, 0);
+    while(more(iter, g)) {
+      if(next(iter)) cache.add(y, iter.posEnd());
+    }
+    cache.finish(text.size(), width);
     height = getHeight() + fontHeight;
     scroll.height(y + OFFSET);
+  }
+
+  /**
+   * Positions the iterator at the first text line at or above the viewport, using the
+   * line-offset cache, so only the visible region is rendered. Falls back to rendering from
+   * the top of the document if the cache is missing or stale.
+   * @param iter text iterator
+   */
+  private void skip(final TextIterator iter) {
+    if(!cache.valid(text.size(), width)) return;
+    final int top = scroll.pos();
+    position(iter, cache.indexByY(top), -top);
+  }
+
+  /**
+   * Returns the index of the cached line containing the specified text position, or {@code -1}
+   * if the cache is missing or stale.
+   * @param pos text position
+   * @return line index, or {@code -1}
+   */
+  private int lineIndex(final int pos) {
+    return cache.valid(text.size(), width) ? cache.indexByPos(pos) : -1;
+  }
+
+  /**
+   * Positions the iterator and renderer at the start of the specified cached line.
+   * @param iter text iterator
+   * @param idx cached line index
+   * @param dy vertical offset added to the line's document-space y (e.g. {@code -scroll})
+   */
+  private void position(final TextIterator iter, final int idx, final int dy) {
+    line = idx + 1;
+    y = cache.y(idx) + dy;
+    lineY = y - (fontHeight << 2) / 5;
+    x = offset;
+    final int p = cache.pos(idx);
+    iter.pos(p);
+    iter.posEnd(p);
+    lineC = edit && iter.caretLine(true);
   }
 
   /**
@@ -304,7 +348,10 @@ final class TextRenderer extends BaseXBack {
    */
   int cursorY() {
     final Graphics g = getGraphics();
-    for(final TextIterator iter = init(g, true); more(iter, g) && !iter.edited(); next(iter));
+    final TextIterator iter = init(g, true);
+    final int idx = lineIndex(iter.caret());
+    if(idx >= 0) position(iter, idx, 0);
+    for(; more(iter, g) && !iter.edited(); next(iter));
     return y - fontHeight;
   }
 
