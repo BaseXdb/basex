@@ -121,7 +121,7 @@ public abstract class ParseFn extends StandardFunc {
         normalize ? new NewlineInput(io, encoding) : new TextInput(io, encoding)) {
       return parse(ti.fallback(fallback), options, qc);
     } catch(final DecodingException ex) {
-      throw RECDECODING_X.get(info, ex);
+      throw (enc != null ? RESINPUT_X : RECDECODING_X).get(info, ex);
     } catch(final InputException ex) {
       throw exception(ex);
     } catch(final IOException ex) {
