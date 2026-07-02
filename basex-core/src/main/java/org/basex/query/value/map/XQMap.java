@@ -281,7 +281,7 @@ public abstract class XQMap extends XQStruct {
         return false;
       }
       return kt == null && vt == null || test((key, value) ->
-        (kt == null || key.type.instanceOf(kt)) && (vt == null || vt.instance(value)));
+        (kt == null || kt.seqType().instance(key, coerce)) && (vt == null || vt.instance(value)));
     } catch(final QueryException ex) {
       throw Util.notExpected(ex);
     }
