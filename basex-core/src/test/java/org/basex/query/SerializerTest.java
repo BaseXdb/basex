@@ -259,44 +259,45 @@ public final class SerializerTest extends SandboxTest {
     query(option + "()", "");
     query(option + "1", 1);
     query(option + "1.0", 1);
-    query(option + "1e0", "1.0e0");
-    query(option + "1234567890e0", "1.23456789e9");
+    query(option + "1e0", 1);
+    query(option + "1234567890e0", "1.23456789E9");
     query(option + "xs:double('NaN')", "NaN");
     query(option + "xs:double('INF')", "INF");
-    query(option + "xs:double('-0')", "-0.0e0");
+    query(option + "xs:double('-0')", "-0");
     query(option + "xs:byte(1)", 1);
     query(option + "false()", "false()");
-    query(option + "'A'", "\"A\"");
-    query(option + "xs:anyURI('A')", "\"A\"");
-    query(option + "xs:untypedAtomic('A')", "\"A\"");
-    query(option + "xs:QName('xml:a')", "#Q{http://www.w3.org/XML/1998/namespace}a");
+    query(option + "'A'", "A");
+    query(option + "xs:anyURI('A')", "A");
+    query(option + "xs:untypedAtomic('A')", "A");
+    query(option + "xs:QName('xml:a')", "#xml:a");
+    query(option + "xs:QName('fn:a')", "#fn:a");
     query(option + "xs:dayTimeDuration('P1D')", "xs:duration(\"P1D\")");
     query(option + "<xml><a>B</a></xml>", "<xml><a>B</a></xml>");
     query(option + "true#0", "fn:true#0");
     query(option + "fn() {}", "fn() as item()* { () }");
-    query(option + "xs:float(1)", "xs:float(\"1\")");
-    query(option + "xs:float('-0')", "xs:float(\"-0\")");
+    query(option + "xs:float(1)", 1);
+    query(option + "xs:float('-0')", "-0");
 
     query(option + "[]", "[]");
     query(option + "[ 1 ]", "[1]");
     query(option + "[ 1.0 ]", "[1]");
-    query(option + "[ 1e0 ]", "[1.0e0]");
-    query(option + "[ 1234567890e0 ]", "[1.23456789e9]");
+    query(option + "[ 1e0 ]", "[1]");
+    query(option + "[ 1234567890e0 ]", "[1.23456789E9]");
     query(option + "[ xs:double('NaN') ]", "[NaN]");
     query(option + "[ xs:double('INF') ]", "[INF]");
-    query(option + "[ xs:double('-0') ]", "[-0.0e0]");
+    query(option + "[ xs:double('-0') ]", "[-0]");
     query(option + "[ xs:byte(1) ]", "[1]");
     query(option + "[ false() ]", "[false()]");
     query(option + "[ 'A' ]", "[\"A\"]");
     query(option + "[ xs:anyURI('A') ]", "[\"A\"]");
     query(option + "[ xs:untypedAtomic('A') ]", "[\"A\"]");
-    query(option + "[ xs:QName('xml:a') ]", "[#Q{http://www.w3.org/XML/1998/namespace}a]");
+    query(option + "[ xs:QName('xml:a') ]", "[#xml:a]");
     query(option + "[ xs:dayTimeDuration('P1D') ]", "[xs:duration(\"P1D\")]");
     query(option + "[ <xml><a>B</a></xml> ]", "[<xml><a>B</a></xml>]");
     query(option + "[ true#0 ]", "[fn:true#0]");
     query(option + "[ fn() {} ]", "[fn() as item()* { () }]");
-    query(option + "[ xs:float(1) ]", "[xs:float(\"1\")]");
-    query(option + "[ xs:float('-0')]", "[xs:float(\"-0\")]");
+    query(option + "[ xs:float(1) ]", "[1]");
+    query(option + "[ xs:float('-0')]", "[-0]");
 
     query(option + "{ 1: (), 2: 3, 4: (5, 6) }", "{1:(),2:3,4:(5,6)}");
   }
@@ -307,7 +308,7 @@ public final class SerializerTest extends SandboxTest {
     query("1", 1);
     query("1.0", 1);
     query("1e0", 1);
-    query("1234567890e0", 1234567890);
+    query("1234567890e0", "1.23456789E9");
     query("xs:double('NaN')", "NaN");
     query("xs:double('INF')", "INF");
     query("xs:double('-0')", "-0");
@@ -328,7 +329,7 @@ public final class SerializerTest extends SandboxTest {
     query("[ 1 ]", "[1]");
     query("[ 1.0 ]", "[1]");
     query("[ 1e0 ]", "[1]");
-    query("[ 1234567890e0 ]", "[1234567890]");
+    query("[ 1234567890e0 ]", "[1.23456789E9]");
     query("[ xs:double('NaN') ]", "[NaN]");
     query("[ xs:double('INF') ]", "[INF]");
     query("[ xs:byte(1) ]", "[1]");
@@ -341,7 +342,7 @@ public final class SerializerTest extends SandboxTest {
     query("[ <xml><a>B</a></xml> ]", "[<xml><a>B</a></xml>]");
     query("[ true#0 ]", "[fn:true#0]");
     query("[ fn() {} ]", "[fn() as item()* { () }]");
-    query("[ xs:float(1) ]", "[\"1\"]"); // should be revised for 'adaptive' method
+    query("[ xs:float(1) ]", "[1]");
 
     query("{ 1: (), 2: 3, 4: (5, 6) }", "{1:(),2:3,4:(5,6)}");
   }

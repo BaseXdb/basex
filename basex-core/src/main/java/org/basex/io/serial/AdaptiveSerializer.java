@@ -26,6 +26,8 @@ public class AdaptiveSerializer extends OutputSerializer {
   private final OutputStream os;
   /** XML serializer (lazy instantiation). */
   private XMLSerializer xml;
+  /** Nesting depth (0 = top level). */
+  protected int depth;
 
   /**
    * Constructor, specifying serialization options.
@@ -70,6 +72,7 @@ public class AdaptiveSerializer extends OutputSerializer {
 
   @Override
   protected void jnode(final JNode jnode) throws IOException {
+    ++depth;
     if(jnode.isRoot()) {
       printChars(QueryText.JTREE);
       printChar('(');
@@ -91,6 +94,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     }
     if(jnode.value.size() > 1) printChar(')');
     printChar(')');
+    --depth;
   }
 
   @Override
@@ -107,29 +111,44 @@ public class AdaptiveSerializer extends OutputSerializer {
   @Override
   protected void atomic(final Item item) throws IOException {
     final Type type = item.type;
-    final boolean basex = this instanceof BaseXSerializer;
     try {
       if(type == QNAME) {
-        final QNm qnm = (QNm) item;
         printChar('#');
-        printChars(basex ? qnm.prefixId() : qnm.unique());
-      } else if(type.instanceOf(NUMERIC) || type == BOOLEAN) {
+        printChars(((QNm) item).prefixId());
+      } else if(type == BOOLEAN) {
         printChars(Token.token(item));
+      } else if(type.instanceOf(NUMERIC) || type == FLOAT) {
+        printChars(item.string(null));
       } else {
-        final Type tp = basex || type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI) ?
-          null : type.instanceOf(DURATION) ? DURATION : type;
-        if(tp != null) {
-          printChars(Token.token(tp));
-          printChar('(');
-        }
-        printChars(value(item.string(null), true, false, false));
-        if(tp != null) {
-          printChar(')');
+        final Type tp = constructor(type);
+        if(tp == null && depth == 0) {
+          // top-level string: omit the enclosing quotes (Text output method)
+          printChars(item.string(null));
+        } else {
+          if(tp != null) {
+            printChars(Token.token(tp));
+            printChar('(');
+          }
+          printChars(value(item.string(null), true, false, false));
+          if(tp != null) {
+            printChar(')');
+          }
         }
       }
     } catch(final QueryException ex) {
       throw new QueryIOException(ex);
     }
+  }
+
+  /**
+   * Returns the type whose name wraps an atomic value in a constructor function
+   * (for example {@code xs:date} in {@code xs:date("…")}).
+   * @param type atomic type
+   * @return constructor type, or {@code null} if the value is serialized without a wrapper
+   */
+  protected Type constructor(final Type type) {
+    return type.instanceOf(STRING) || type.oneOf(UNTYPED_ATOMIC, ANY_URI) ? null :
+      type.instanceOf(DURATION) ? DURATION : type;
   }
 
   @Override
@@ -158,6 +177,7 @@ public class AdaptiveSerializer extends OutputSerializer {
    */
   protected void array(final XQArray array) throws IOException {
     printChar('[');
+    ++depth;
     int c = 0;
     for(final Value value : array.members()) {
       if(c++ > 0) printChar(',');
@@ -174,6 +194,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       if(vs != 1) printChar(')');
     }
     if(c > 0 && indent) printChar(' ');
+    --depth;
     printChar(']');
   }
 
@@ -186,6 +207,7 @@ public class AdaptiveSerializer extends OutputSerializer {
     printChar('{');
     int c = 0;
     ++level;
+    ++depth;
     for(final XQMap.Entry entry : map.entries()) {
       if(c++ > 0) printChar(',');
       indent();
@@ -206,6 +228,7 @@ public class AdaptiveSerializer extends OutputSerializer {
       if(par) printChar(')');
     }
     --level;
+    --depth;
     if(c > 0) indent();
     printChar('}');
   }

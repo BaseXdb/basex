@@ -6,10 +6,9 @@ import java.io.*;
 
 import org.basex.io.in.*;
 import org.basex.query.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
-import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
+import org.basex.query.value.type.*;
 
 /**
  * This class serializes items in a project-specific mode.
@@ -20,8 +19,6 @@ import org.basex.query.value.node.*;
 public final class BaseXSerializer extends AdaptiveSerializer {
   /** Binary. */
   private final boolean binary;
-  /** Level counter. */
-  private int nested;
 
   /**
    * Constructor, specifying serialization options.
@@ -36,7 +33,7 @@ public final class BaseXSerializer extends AdaptiveSerializer {
 
   @Override
   protected void atomic(final Item item) throws IOException {
-    if(nested == 0) {
+    if(depth == 0) {
       try {
         if(binary && item instanceof Bin) {
           try(BufferInput bi = item.input(null)) {
@@ -57,17 +54,9 @@ public final class BaseXSerializer extends AdaptiveSerializer {
   }
 
   @Override
-  protected void array(final XQArray item) throws IOException {
-    ++nested;
-    super.array(item);
-    --nested;
-  }
-
-  @Override
-  protected void map(final XQMap item) throws IOException {
-    ++nested;
-    super.map(item);
-    --nested;
+  protected Type constructor(final Type type) {
+    // project mode never wraps atomic values in a type constructor
+    return null;
   }
 
   @Override
