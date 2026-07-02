@@ -531,6 +531,8 @@ public final class QT3TS extends Main {
       "@type = 'feature' and not(@value = " + NOSUPPORT + ") and string(@satisfied) = 'false' or " +
       // skip fully-normalized Unicode tests
       "@type = 'unicode-normalization-form' and @value = 'FULLY-NORMALIZED' or " +
+      // skip tests locked to a historical Unicode version (JDK uses a much newer one)
+      "@type = 'unicode-version' and @value = ('5.2', '6.0', '6.2') or " +
       // skip xml/xsd 1.1 tests
       "@type = ('xml-version', 'xsd-version') and @value = ('1.1', '1.0:4-') or " +
       // skip default-language
