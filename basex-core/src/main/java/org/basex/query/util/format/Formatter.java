@@ -163,13 +163,22 @@ public abstract class Formatter extends FormatUtil {
       }
     }
     ADate date = dt;
+    byte[] zone = null;
     if(contains(place, '/')) { // IANA time zone name
       try {
-        final ZoneRules rules = ZoneId.of(string(place)).getRules();
-        final ZoneOffset offset = dt.type == BasicType.TIME
-            ? rules.getStandardOffset(Instant.now())
-            : rules.getOffset(dt.toJava().toGregorianCalendar().toInstant());
+        final ZoneId id = ZoneId.of(string(place));
+        final ZoneRules rules = id.getRules();
+        final boolean time = dt.type == BasicType.TIME;
+        final Instant instant = time ? Instant.now() :
+          dt.toJava().toGregorianCalendar().toInstant();
+        final ZoneOffset offset = time ? rules.getStandardOffset(instant) :
+          rules.getOffset(instant);
         date = dt.timeZone(DTDur.get(offset.getTotalSeconds() * 1000L), false, info);
+        // timezone name (standard time for xs:time, otherwise DST-aware; e.g. EST, CEST)
+        final Locale locale = languageTag.length == 0 ? Locale.ENGLISH :
+          Locale.forLanguageTag(string(languageTag));
+        final boolean dst = !time && rules.isDaylightSavings(instant);
+        zone = token(TimeZone.getTimeZone(id).getDisplayName(dst, TimeZone.SHORT, locale));
       } catch(final ZoneRulesException ex) {
         // not a supported IANA time zone
         Util.debug(ex);
@@ -282,17 +291,29 @@ public abstract class Formatter extends FormatUtil {
 
         // parse presentation modifier(s) and width modifier
         final DateFormat fp = new DateFormat(substring(marker, 1), pres, frac != null, info);
-        if(max && fp.max == Integer.MAX_VALUE) {
-          // limit maximum length of numeric output
-          int mx = 0;
-          final int fl = fp.primary.length;
-          for(int f = 0; f < fl; f += cl(fp.primary, f)) mx++;
-          if(mx > 1) fp.max = mx;
+        if(max) {
+          // year: reduce value modulo ten to the power N (see: Formatting the Year Component)
+          int n = fp.max;
+          if(n == Integer.MAX_VALUE && zeroes(fp.first) != -1) {
+            // decimal-digit-pattern: number of mandatory and optional digit signs, if 2 or more
+            int w = 0;
+            final int fl = fp.primary.length;
+            for(int f = 0; f < fl; f += cl(fp.primary, f)) {
+              final int cp = ch(fp.primary, f);
+              if(cp == '#' || zeroes(cp) != -1) w++;
+            }
+            if(w > 1) n = w;
+          }
+          if(n > 0 && n < 19) {
+            long p = 1;
+            while(n-- > 0) p *= 10;
+            num %= p;
+          }
         }
 
         if(compSpec == 'z' || compSpec == 'Z') {
-          // output timezone
-          tb.add(formatZone((int) num, fp, marker));
+          // output timezone (as name if requested via 'N' and a place is known)
+          tb.add(fp.first == 'n' && zone != null ? zone : formatZone((int) num, fp, marker));
         } else if(fp.first == 'n') {
           // output name representation
           byte[] in = switch(compSpec) {
