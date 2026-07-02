@@ -532,8 +532,7 @@ final class TextRenderer extends BaseXBack {
    * @param g graphics reference
    */
   private void drawString(final String string, final int xx, final int yy, final Graphics g) {
-    g.setFont(font.font(string));
-    g.drawString(string, xx, yy);
+    font.draw(g, string, xx, yy);
   }
 
   /**

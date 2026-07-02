@@ -279,18 +279,11 @@ public final class GUIConstants {
    */
   public static String[] fonts() {
     if(fonts == null) {
+      final String probe = new String(MONOSPACE);
       final StringList list = new StringList();
       for(final String name : GraphicsEnvironment.getLocalGraphicsEnvironment().
           getAvailableFontFamilyNames()) {
-        boolean add = true;
-        final Font f = new Font(name, Font.PLAIN, 100);
-        for(final char ch : MONOSPACE) {
-          if(!f.canDisplay(ch)) {
-            add = false;
-            break;
-          }
-        }
-        if(add) list.add(name);
+        if(new Font(name, Font.PLAIN, 100).canDisplayUpTo(probe) == -1) list.add(name);
       }
       fonts = list.finish();
     }
@@ -305,24 +298,26 @@ public final class GUIConstants {
     final JTextField text = new JTextField();
     final StringList monos = new StringList();
     for(final String name : fonts()) {
-      if(isMono(text.getFontMetrics(new Font(name, Font.PLAIN, 100)))) monos.add(name);
+      if(monoWidth(text.getFontMetrics(new Font(name, Font.PLAIN, 100))) != 0) monos.add(name);
     }
     return monos.finish();
   }
 
   /**
-   * Checks if the font metrics refer to a monospaced font.
-   * Slight deviations are tolerated.
+   * Returns the character cell width of a monospaced font, or {@code 0} if the font is not
+   * monospaced. Slight deviations from a fixed width are tolerated.
    * @param fm font metrics
-   * @return result of check
+   * @return cell width, or {@code 0}
    */
-  public static boolean isMono(final FontMetrics fm) {
+  public static int monoWidth(final FontMetrics fm) {
     final IntSet set = new IntSet(4);
+    int cell = 0;
     for(final char ch : MONOSPACE) {
       final int w = fm.charWidth(ch);
-      if(w == 0 || set.add(w) && set.size() > 2) return false;
+      if(w == 0 || set.add(w) && set.size() > 2) return 0;
+      cell = Math.max(cell, w);
     }
-    return true;
+    return cell;
   }
 
   // KEYS =========================================================================================

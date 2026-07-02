@@ -40,6 +40,10 @@ final class TextFont {
   private final int indent;
   /** Font size. */
   private final int size;
+  /** Width of a character cell (base for monospaced grid alignment). */
+  private final int cell;
+  /** Monospaced flag: snap glyphs to the character grid. */
+  private final boolean mono;
 
   /** Current style. */
   private int style;
@@ -67,6 +71,10 @@ final class TextFont {
     this.indent = indent;
     family = new FontFamily(font, comp);
     size = font.getSize();
+    // character cell width for grid alignment (0 for proportional fonts)
+    final FontMetrics fm = family.metrics(PLAIN);
+    cell = GUIConstants.monoWidth(fm);
+    mono = cell > 0;
   }
 
   /**
@@ -91,7 +99,10 @@ final class TextFont {
    * @return width
    */
   int stringWidth(final String string) {
-    return string.length() == 1 ? charWidth(string.codePointAt(0)) :
+    // single character (e.g. tab): use its cell width
+    if(string.length() == 1) return charWidth(string.codePointAt(0));
+    // monospaced: sum per-glyph cells (matches grid drawing); proportional: native width
+    return mono ? string.codePoints().map(this::charWidth).sum() :
       family(string).metrics(style).stringWidth(string);
   }
 
@@ -121,10 +132,77 @@ final class TextFont {
    */
   int charWidth(final int cp) {
     if(cp >= TokenBuilder.PRIVATE_START && cp <= TokenBuilder.PRIVATE_END) return 0;
+    if(cp == '\t') return charWidth(' ') * indent;
+    // combining marks attach to the preceding glyph and take no space of their own
+    if(nonspacing(cp)) return 0;
 
-    final FontFamily ff = family.font(style).canDisplay(cp) ? family : fallback(cp);
-    final FontMetrics fm = ff.metrics(style);
-    return cp == '\t' ? fm.charWidth(' ') * indent : fm.charWidth(cp);
+    // snap glyphs to the character grid to keep columns aligned in monospaced fonts
+    final int width = rawWidth(cp);
+    return mono && width != 0 ? Math.max(1, (width + cell / 2) / cell) * cell : width;
+  }
+
+  /**
+   * Checks if a codepoint is a non-spacing or enclosing combining mark.
+   * @param cp codepoint
+   * @return result of check
+   */
+  private static boolean nonspacing(final int cp) {
+    final int type = Character.getType(cp);
+    return type == Character.NON_SPACING_MARK || type == Character.ENCLOSING_MARK;
+  }
+
+  /**
+   * Returns the unsnapped pixel width of the specified codepoint.
+   * @param cp codepoint
+   * @return width
+   */
+  private int rawWidth(final int cp) {
+    return family(cp).metrics(style).charWidth(cp);
+  }
+
+  /**
+   * Draws a string, aligning each character to the grid for monospaced fonts.
+   * @param g graphics reference
+   * @param string string to draw
+   * @param x x position
+   * @param y y position
+   */
+  void draw(final Graphics g, final String string, final int x, final int y) {
+    if(mono) {
+      final char[] chars = string.toCharArray();
+      final int len = chars.length;
+      int cx = x;
+      Font last = null;
+      for(int i = 0; i < len;) {
+        final int cp = string.codePointAt(i), w = charWidth(cp);
+        // group the base glyph with trailing combining marks, so the font can compose them
+        int end = i + Character.charCount(cp);
+        while(end < len) {
+          final int mcp = string.codePointAt(end);
+          if(!nonspacing(mcp)) break;
+          end += Character.charCount(mcp);
+        }
+        if(w > 0) {
+          final Font fnt = family(cp).font(style);
+          if(fnt != last) { g.setFont(fnt); last = fnt; }
+          g.drawChars(chars, i, end - i, cx, y);
+        }
+        cx += w;
+        i = end;
+      }
+    } else {
+      g.setFont(font(string));
+      g.drawString(string, x, y);
+    }
+  }
+
+  /**
+   * Returns a font family for the specified codepoint.
+   * @param cp codepoint
+   * @return font family
+   */
+  private FontFamily family(final int cp) {
+    return family.font(style).canDisplay(cp) ? family : fallback(cp);
   }
 
   /**
@@ -134,7 +212,7 @@ final class TextFont {
    */
   private FontFamily fallback(final int cp) {
     if(fallbacks.isEmpty()) {
-      final StringList fonts = GUIConstants.isMono(family.metrics(PLAIN)) ? MONO : VARS;
+      final StringList fonts = mono ? MONO : VARS;
       for(final String name : fonts) fallback(name);
     }
 
