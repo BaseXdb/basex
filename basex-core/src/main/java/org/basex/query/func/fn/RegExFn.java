@@ -99,7 +99,7 @@ public abstract class RegExFn extends StandardFunc {
         pattern = Pattern.compile(string(regex), flags);
       } else {
         final RegExParser parser = new RegExParser(regex, strip, comments,
-            (flags & DOTALL) != 0, (flags & MULTILINE) != 0);
+            (flags & DOTALL) != 0, (flags & MULTILINE) != 0, (flags & CASE_INSENSITIVE) != 0);
         pattern = Pattern.compile(parser.parse().toString(), flags);
       }
       return new RegExpr(pattern);

@@ -24,7 +24,11 @@ public final class CharClass extends RegExp {
 
   @Override
   void toRegEx(final StringBuilder sb) {
-    group.toRegEx(sb.append('['));
+    sb.append('[');
+    final boolean wrap = subtract != null && group.negative;
+    if(wrap) sb.append('[');
+    group.toRegEx(sb);
+    if(wrap) sb.append(']');
     if(subtract != null) {
       subtract.group.negative ^= true;
       subtract.toRegEx(sb.append("&&"));

@@ -42,7 +42,7 @@ public final class LineBorder extends RegExp {
    * @return end-of-line pattern
    */
   public static String eos(final boolean multi) {
-    return multi ? "$" : "(?:$(?!\\s))";
+    return multi ? "$" : "\\z";
   }
 
   @Override

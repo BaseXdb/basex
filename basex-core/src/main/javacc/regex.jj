@@ -39,6 +39,8 @@ public class RegExParser {
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
   private boolean multiLine;
+  /** Case-insensitive matching mode. */
+  private boolean insensitive;
 
   /**
    * Constructor.
@@ -47,12 +49,14 @@ public class RegExParser {
    * @param comments allow comments while lexing
    * @param all dot matches all
    * @param multi multi line search
+   * @param insens case-insensitive matching
    */
   public RegExParser(final byte[] regex, final boolean strip, final boolean comments,
-      final boolean all, final boolean multi) {
+      final boolean all, final boolean multi, final boolean insens) {
     this(new RegExLexer(regex, strip, comments));
     dotAll = all;
     multiLine = multi;
+    insensitive = insens;
   }
 }
 
@@ -289,7 +293,7 @@ PARSER_END(RegExParser)
     ) {
       final RegExp esc = Escape.get(token.image);
       if(esc == null) throw new ParseException("Unknown escape: " + token);
-      return esc;
+      return insensitive && token.kind == CAT_ESC ? new CaseSensitive(esc) : esc;
     }
   }
 
@@ -352,7 +356,7 @@ PARSER_END(RegExParser)
           "The - character is a valid character range only at the beginning or end of a positive character group.");
       }
     ) {
-      return b == -1 ? new Literal(a) : new CharRange(a, b);
+      return b == -1 ? new Literal(a) : new CharRange(a, b, insensitive);
     }
   }
 

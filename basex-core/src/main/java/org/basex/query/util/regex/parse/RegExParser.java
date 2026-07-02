@@ -31,6 +31,8 @@ public class RegExParser implements RegExParserConstants {
   private boolean dotAll;
   /** Multi-line matching mode, {@code ^} and {@code $} match on line bounds. */
   private boolean multiLine;
+  /** Case-insensitive matching mode. */
+  private boolean insensitive;
 
   /**
    * Constructor.
@@ -39,12 +41,14 @@ public class RegExParser implements RegExParserConstants {
    * @param comments allow comments while lexing
    * @param all dot matches all
    * @param multi multi line search
+   * @param insens case-insensitive matching
    */
   public RegExParser(final byte[] regex, final boolean strip, final boolean comments,
-      final boolean all, final boolean multi) {
+      final boolean all, final boolean multi, final boolean insens) {
     this(new RegExLexer(regex, strip, comments));
     dotAll = all;
     multiLine = multi;
+    insensitive = insens;
   }
 
 /**
@@ -446,7 +450,7 @@ nd = Wildcard.get(dotAll);
     }
 final RegExp esc = Escape.get(token.image);
       if(esc == null) {if (true) throw new ParseException("Unknown escape: " + token);}
-      {if ("" != null) return esc;}
+      {if ("" != null) return insensitive && token.kind == CAT_ESC ? new CaseSensitive(esc) : esc;}
     throw new Error("Missing return statement in function");
 }
 
@@ -572,7 +576,7 @@ if(a == '-' && !isBegin && getToken(1).kind != BR_CLOSE && getToken(1).kind != E
         throw new ParseException();
       }
     }
-{if ("" != null) return b == -1 ? new Literal(a) : new CharRange(a, b);}
+{if ("" != null) return b == -1 ? new Literal(a) : new CharRange(a, b, insensitive);}
     throw new Error("Missing return statement in function");
 }
 
@@ -724,19 +728,7 @@ re = LookAround.get(behind, positive, re);
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3_2()
- {
-    if (jj_3R_posCharGroup_327_5_5()) return true;
-    return false;
-  }
-
-  private boolean jj_3_1()
- {
-    if (jj_scan_token(DIGIT)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_XmlChar_380_5_11()
+  private boolean jj_3R_XmlChar_384_5_11()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -747,7 +739,7 @@ re = LookAround.get(behind, positive, re);
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_328_7_7()
+  private boolean jj_3R_posCharGroup_332_7_7()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -761,15 +753,15 @@ re = LookAround.get(behind, positive, re);
     return false;
   }
 
-  private boolean jj_3R_charRange_350_7_9()
+  private boolean jj_3R_charRange_354_7_9()
  {
-    if (jj_3R_XmlChar_380_5_11()) return true;
+    if (jj_3R_XmlChar_384_5_11()) return true;
     return false;
   }
 
   private boolean jj_3_3()
  {
-    if (jj_3R_charRange_344_5_6()) return true;
+    if (jj_3R_charRange_348_5_6()) return true;
     return false;
   }
 
@@ -779,12 +771,12 @@ re = LookAround.get(behind, positive, re);
     xsp = jj_scanpos;
     if (jj_3_3()) {
     jj_scanpos = xsp;
-    if (jj_3R_posCharGroup_328_7_7()) return true;
+    if (jj_3R_posCharGroup_332_7_7()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_posCharGroup_327_5_5()
+  private boolean jj_3R_posCharGroup_331_5_5()
  {
     Token xsp;
     if (jj_3_4()) return true;
@@ -795,38 +787,38 @@ re = LookAround.get(behind, positive, re);
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_368_7_13()
+  private boolean jj_3R_charOrEsc_372_7_13()
  {
     if (jj_scan_token(SINGLE_ESC)) return true;
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_367_7_12()
+  private boolean jj_3R_charOrEsc_371_7_12()
  {
-    if (jj_3R_XmlChar_380_5_11()) return true;
+    if (jj_3R_XmlChar_384_5_11()) return true;
     return false;
   }
 
-  private boolean jj_3R_charRange_344_7_8()
+  private boolean jj_3R_charRange_348_7_8()
  {
-    if (jj_3R_charOrEsc_367_5_10()) return true;
+    if (jj_3R_charOrEsc_371_5_10()) return true;
     if (jj_scan_token(CHAR)) return true;
-    if (jj_3R_charOrEsc_367_5_10()) return true;
+    if (jj_3R_charOrEsc_371_5_10()) return true;
     return false;
   }
 
-  private boolean jj_3R_charOrEsc_367_5_10()
+  private boolean jj_3R_charOrEsc_371_5_10()
  {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_charOrEsc_367_7_12()) {
+    if (jj_3R_charOrEsc_371_7_12()) {
     jj_scanpos = xsp;
-    if (jj_3R_charOrEsc_368_7_13()) return true;
+    if (jj_3R_charOrEsc_372_7_13()) return true;
     }
     return false;
   }
 
-  private boolean jj_3R_charRange_344_5_6()
+  private boolean jj_3R_charRange_348_5_6()
  {
     Token xsp;
     xsp = jj_scanpos;
@@ -834,10 +826,22 @@ re = LookAround.get(behind, positive, re);
     jj_semLA = getToken(2).kind == CHAR && "-".equals(getToken(2).image)
         && getToken(3).kind != BR_CLOSE && getToken(3).kind != EOF;
     jj_lookingAhead = false;
-    if (!jj_semLA || jj_3R_charRange_344_7_8()) {
+    if (!jj_semLA || jj_3R_charRange_348_7_8()) {
     jj_scanpos = xsp;
-    if (jj_3R_charRange_350_7_9()) return true;
+    if (jj_3R_charRange_354_7_9()) return true;
     }
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    if (jj_scan_token(DIGIT)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_posCharGroup_331_5_5()) return true;
     return false;
   }
 
