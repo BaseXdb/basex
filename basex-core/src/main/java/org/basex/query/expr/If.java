@@ -48,6 +48,11 @@ public final class If extends Arr {
   }
 
   @Override
+  public boolean navigational() {
+    return exprs[0].navigational() && exprs[1].navigational();
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
     checkAllUp(exprs);

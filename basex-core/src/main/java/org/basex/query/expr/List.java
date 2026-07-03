@@ -46,6 +46,14 @@ public final class List extends Arr {
   }
 
   @Override
+  public boolean navigational() {
+    for(final Expr expr : exprs) {
+      if(!expr.navigational()) return false;
+    }
+    return true;
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkAllUp(exprs);
   }

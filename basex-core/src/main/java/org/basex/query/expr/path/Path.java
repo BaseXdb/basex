@@ -117,6 +117,15 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
+  public final boolean navigational() {
+    if(root != null && !root.navigational()) return false;
+    for(final Expr step : steps) {
+      if(!step.navigational()) return false;
+    }
+    return true;
+  }
+
+  @Override
   public final void checkUp() throws QueryException {
     checkNoUp(root);
     final int ss = steps.length;

@@ -96,8 +96,9 @@ public final class FnPath extends ContextFn {
             // boolean
             tb.add(string).add("()");
           } else {
-            // any other type
-            tb.add(key.type.toString()).add('(').add(QueryString.toQuoted(string)).add(')');
+            // any other type: constructor function, wrapped in a selector step
+            tb.add("child::{").add(key.type.toString()).add('(').add(QueryString.toQuoted(string)).
+              add(")}");
           }
         }
         // optional index

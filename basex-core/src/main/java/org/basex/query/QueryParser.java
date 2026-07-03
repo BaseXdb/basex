@@ -2428,7 +2428,26 @@ public class QueryParser extends InputParser {
       else root = expr;
     }
     relativePath(el);
-    return Path.get(info(), root, el.finish());
+    return Path.get(info(), root, dynamicSteps(root, el.finish()));
+  }
+
+  /**
+   * Rewrites non-navigational path steps for JNode navigation (XQuery 4.0, qtspecs #2734):
+   * every step but the leading one, if it is not {@link Expr#navigational() navigational}, is
+   * wrapped in a {@link DynamicStep} (which expands to
+   * {@code if(. instance of node()) then E else child::{ E }}).
+   * @param root root expression (can be {@code null})
+   * @param steps path steps
+   * @return rewritten steps
+   */
+  private Expr[] dynamicSteps(final Expr root, final Expr[] steps) {
+    for(int s = 0; s < steps.length; s++) {
+      final Expr step = steps[s];
+      if((root != null || s > 0) && !step.navigational()) {
+        steps[s] = new DynamicStep(step.info(info()), step);
+      }
+    }
+    return steps;
   }
 
   /**

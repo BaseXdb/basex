@@ -40,6 +40,14 @@ public final class Typeswitch extends ParseExpr {
   }
 
   @Override
+  public boolean navigational() {
+    for(final TypeswitchGroup group : groups) {
+      if(!group.expr.navigational()) return false;
+    }
+    return true;
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
     final int gl = groups.length;

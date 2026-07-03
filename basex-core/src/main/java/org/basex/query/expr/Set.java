@@ -37,6 +37,14 @@ abstract class Set extends Arr {
   }
 
   @Override
+  public final boolean navigational() {
+    for(final Expr expr : exprs) {
+      if(!expr.navigational()) return false;
+    }
+    return true;
+  }
+
+  @Override
   public final Expr optimize(final CompileContext cc) throws QueryException {
     Expr expr = opt(cc);
     if(expr == null) {

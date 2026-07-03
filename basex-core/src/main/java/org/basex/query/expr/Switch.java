@@ -42,6 +42,14 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
+  public boolean navigational() {
+    for(final SwitchGroup group : groups) {
+      if(!group.rtrn().navigational()) return false;
+    }
+    return true;
+  }
+
+  @Override
   public void checkUp() throws QueryException {
     checkNoUp(cond);
     for(final SwitchGroup group : groups) group.checkUp();

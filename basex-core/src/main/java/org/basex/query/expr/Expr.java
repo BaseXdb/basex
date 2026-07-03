@@ -399,6 +399,16 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Indicates if this expression is <i>navigational</i>: a context reference, an axis step, or a
+   * (syntactic) combination thereof. Used by the path operator to decide whether a step navigates
+   * to nodes or is rewritten to a dynamic selector for JNode navigation.
+   * @return result of check
+   */
+  public boolean navigational() {
+    return false;
+  }
+
+  /**
    * Returns the arguments/operands of an expression (function, list, etc.).
    * @return arguments or {@code null}
    */

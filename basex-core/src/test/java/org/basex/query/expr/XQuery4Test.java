@@ -862,7 +862,8 @@ public final class XQuery4Test extends SandboxTest {
     // distinct identity"), even when the wrapped values are equal or the same object
     query("({ 'x': 1 }, { 'x': 1 })/x", "{\"x\":1}\n{\"x\":1}");
     query("count(({ 'x': 1 }, { 'x': 1 }, { 'x': 1 })/x)", "3");
-    query("count(([ 1 ], [ 1 ])/?*)", "2");
+    // navigational step: '?*' is non-navigational and would raise a type error (qtspecs #2734)
+    query("count(([ 1 ], [ 1 ])/*)", "2");
     query("count(replicate({ 'x': 1 }, 2)/x)", "2");
     query("let $m := { 'x': 1 } return count(($m, $m)/x)", "2");
     query("(1 to 6) ! { 'a': 1 } -> (.[1]/a is .[2]/a)", "false");

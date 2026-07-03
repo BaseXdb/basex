@@ -53,6 +53,11 @@ public abstract class Filter extends Preds {
   }
 
   @Override
+  public final boolean navigational() {
+    return root.navigational();
+  }
+
+  @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
     root = root.compile(cc);
     return super.compile(cc);

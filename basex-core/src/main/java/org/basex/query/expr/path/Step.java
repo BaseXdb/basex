@@ -192,6 +192,11 @@ public abstract class Step extends Preds {
   }
 
   @Override
+  public final boolean navigational() {
+    return true;
+  }
+
+  @Override
   public final Expr compile(final CompileContext cc) throws QueryException {
     if(selector != null) selector = cc.get(null, false, () -> selector.compile(cc));
     return super.compile(cc);
