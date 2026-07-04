@@ -79,6 +79,21 @@ public final class TypeRef implements Type {
     return tp;
   }
 
+  /**
+   * Checks if this reference is part of a cycle of type references
+   * (which would make {@link #deref()} loop indefinitely).
+   * @return result of check
+   */
+  public boolean cyclic() {
+    final Set<TypeRef> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+    Type tp = this;
+    while(tp instanceof final TypeRef ref) {
+      if(!visited.add(ref)) return true;
+      tp = ref.type;
+    }
+    return false;
+  }
+
   @Override
   public Value cast(final Item item, final QueryContext qc, final InputInfo ii)
       throws QueryException {

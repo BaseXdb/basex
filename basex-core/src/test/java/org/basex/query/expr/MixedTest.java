@@ -77,6 +77,47 @@ public final class MixedTest extends SandboxTest {
       WHICHCAST_X);
   }
 
+  /** Constructor functions for declared item types. */
+  @Test public void typeConstructors() {
+    // constructor functions for atomic and enumeration types
+    query("declare type local:int as xs:integer; local:int('42')", 42);
+    query("declare type local:int as xs:integer; local:int('42') instance of local:int", true);
+    query("declare type local:e as enum('a', 'b'); local:e('a')", "a");
+    query("declare type local:int as xs:integer; ['1'] ! local:int()", 1);
+    query("declare type local:int as xs:integer; local:int(value := '7')", 7);
+    query("declare type local:int as xs:integer; local:int(())", "");
+    query("declare type local:int as xs:integer; function-lookup(xs:QName('local:int'), 1)('9')",
+        9);
+    // forward references, aliases of aliases
+    query("declare function local:f() { local:b('42') };"
+        + "declare type local:b as local:a; declare type local:a as xs:integer; local:f()", 42);
+    // types of imported modules
+    query("import module namespace a='world' at '" + XQMFILE + "'; a:int('42')", 42);
+    query("import module namespace a='world' at '" + XQMFILE + "';"
+        + "declare type local:t as a:int; local:t('42')", 42);
+    error("import module namespace a='world' at '" + XQMFILE + "'; a:private-int('42')",
+        FUNCPRIVATE_X);
+
+    // constructor functions for union types
+    query("declare type local:u as (xs:date | xs:time); local:u('12:00:00') instance of xs:time",
+        true);
+    query("declare type local:n as xs:numeric; local:n('1') instance of xs:double", true);
+    // constructor functions for record types
+    query("declare type local:r as record(x as xs:integer, y as xs:string); local:r(1, 'a')?y",
+        "a");
+    query("declare type local:r as record(x as xs:integer); local:r(2) instance of local:r",
+        true);
+    // no constructor functions for other item types
+    error("declare type local:m as map(*); local:m({})", WHICHFUNC_X);
+    error("declare type local:e as element(); local:e(<x/>)", WHICHFUNC_X);
+    // failing constructions
+    error("declare type local:int as xs:integer; local:int('x')", FUNCCAST_X_X);
+    error("declare type local:e as enum('a', 'b'); local:e('c')", INVTYPE_X);
+    // arity overlap with user-defined function
+    error("declare type local:int as xs:integer;"
+        + "declare function local:int($value) { $value }; 1", DUPLFUNC_X);
+  }
+
   /**
    * Overwrites an empty attribute value.
    */

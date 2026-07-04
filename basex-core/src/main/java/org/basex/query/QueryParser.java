@@ -88,6 +88,8 @@ public class QueryParser extends InputParser {
   private final ArrayList<TypeRef> deferredMapKeys = new ArrayList<>();
   /** Cast target types referencing a named type; resolved and validated after parsing. */
   private final ArrayList<TypeRef> deferredCastTargets = new ArrayList<>();
+  /** Type names referenced by each declared item type (for detecting cyclic declarations). */
+  private final QNmMap<QNmSet> typeDeps = new QNmMap<>();
   /** Type names referenced by the item type that is currently parsed; {@code null} otherwise. */
   private QNmSet currentTypeDeps;
   /** Options. */
@@ -113,6 +115,19 @@ public class QueryParser extends InputParser {
   private QueryError alter;
   /** Alternative position. */
   private int alterPos;
+
+  /**
+   * Type constructor data.
+   * @param sc static context
+   * @param name type name
+   * @param seqType declared sequence type
+   * @param anns annotations
+   * @param doc xqdoc string
+   * @param info input info
+   * @param funcs functions of the declaring module
+   */
+  record TypeCnstr(StaticContext sc, QNm name, SeqType seqType, AnnList anns, String doc,
+      InputInfo info, ArrayList<StaticFunc> funcs) { }
 
   /**
    * Constructor.
@@ -266,20 +281,23 @@ public class QueryParser extends InputParser {
     // completes the parsing step
     qnames.resolve(this, 0, sc.elemNS);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
+    // reject cyclic or self-referential item type declarations
+    for(final QNm name : typeDeps) {
+      if(cyclic(name, name, new QNmSet())) throw error(TYPECYCLE_X, name.string());
+    }
     resolveTypeRefs();
   }
 
   /**
    * Checks if a declared item type can be reached again from its own references, following only
-   * references that are themselves declared item types (record types may be recursive). The
-   * dependency graph is global, so cyclic declarations across module boundaries are detected too.
+   * references that are themselves declared item types (record types may be recursive).
    * @param name item type whose references are inspected
    * @param target item type to be reached
    * @param visited already visited item types
    * @return result of check
    */
   private boolean cyclic(final QNm name, final QNm target, final QNmSet visited) {
-    final QNmSet refs = qc.typeDeps.get(name);
+    final QNmSet refs = typeDeps.get(name);
     if(refs != null) {
       for(final QNm ref : refs) {
         if(ref.eq(target) || visited.add(ref) && cyclic(ref, target, visited)) return true;
@@ -328,10 +346,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void resolveDeferredTypeRefs() throws QueryException {
-    // reject cyclic or self-referential item type declarations (single- and cross-module)
-    for(final QNm name : qc.typeDeps) {
-      if(cyclic(name, name, new QNmSet())) throw error(TYPECYCLE_X, name.string());
-    }
     for(final TypeRef ref : qc.deferredTypeRefs) {
       if(ref.resolved()) continue;
       final SeqType st = qc.namedTypes.get(ref.name());
@@ -342,6 +356,10 @@ public class QueryParser extends InputParser {
         if(rt == null) throw TYPEUNKNOWN_X.get(ref.info(), BasicType.similar(ref.name()));
         ref.resolve(rt);
       }
+    }
+    // reject cyclic cross-module type-alias references
+    for(final TypeRef ref : qc.deferredTypeRefs) {
+      if(ref.cyclic()) throw error(TYPECYCLE_X, ref.name().string());
     }
     qc.deferredTypeRefs.clear();
   }
@@ -354,6 +372,11 @@ public class QueryParser extends InputParser {
   private void check(final MainModule main) throws QueryException {
     // resolve deferred (cross-module) type references
     resolveDeferredTypeRefs();
+    // declare constructor functions for named item types
+    for(final TypeCnstr tc : qc.typeCnstrs) {
+      if(cnstrType(tc.seqType().type)) declareTypeCnstr(tc);
+    }
+    qc.typeCnstrs.clear();
     // resolve function calls
     qc.functions.resolve();
     // resolve variable references
@@ -374,6 +397,55 @@ public class QueryParser extends InputParser {
       // check if main expression is updating
       qc.updating = main != null && main.expr.has(Flag.UPD);
     }
+  }
+
+  /**
+   * Checks if a named item type has a constructor function.
+   * @param type declared type
+   * @return result of check
+   */
+  private static boolean cnstrType(final Type type) {
+    final Type tp = TypeRef.deref(type);
+    if(tp instanceof RecordType) return tp != Types.RECORD;
+    return tp.instanceOf(BasicType.ANY_ATOMIC_TYPE) &&
+        !tp.oneOf(BasicType.ANY_ATOMIC_TYPE, BasicType.NOTATION);
+  }
+
+  /**
+   * Declares a constructor function for a named item type.
+   * @param tc constructor function information
+   * @throws QueryException query exception
+   */
+  private void declareTypeCnstr(final TypeCnstr tc) throws QueryException {
+    final InputInfo ii = tc.info();
+    localVars.pushContext(false);
+    final Params params = new Params();
+    final Expr expr;
+    final Type tp = TypeRef.deref(tc.seqType().type);
+    if(tp instanceof final RecordType rt) {
+      // record type: derive parameters from record fields (initializing expressions are ignored)
+      final TokenObjectMap<RecordField> fields = rt.fields();
+      for(final byte[] key : fields) {
+        params.add(new QNm(key), fields.get(key).seqType(), null, null);
+      }
+      params.seqType(rt.seqType()).finish(qc, localVars);
+      final Var[] pv = params.vars();
+      final Expr[] args = new Expr[pv.length];
+      for(int i = 0; i < pv.length; ++i) {
+        args[i] = new VarRef(null, pv[i]);
+      }
+      expr = RecordConstructor.get(ii, rt, args);
+    } else {
+      // generalized atomic type: cast the supplied argument to the declared type
+      final SeqType st = tc.seqType().type.seqType(Occ.ZERO_OR_ONE);
+      params.add(new QNm(VALUEE), Types.ANY_ATOMIC_TYPE_ZO, new ContextValue(ii), ii);
+      params.seqType(st).finish(qc, localVars);
+      expr = new Cast(ii, new VarRef(null, params.vars()[0]), st);
+    }
+    final VarScope vs = localVars.popContext();
+    final StaticFunc func = qc.functions.declare(tc.sc(), tc.name(), params, expr, tc.anns(),
+        tc.doc(), vs, ii);
+    tc.funcs().add(func);
   }
 
   /**
@@ -1047,6 +1119,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void typeDecl(final AnnList anns) throws QueryException {
+    final InputInfo ii = info();
     final QNm qn = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPENAME);
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
@@ -1056,13 +1129,16 @@ public class QueryParser extends InputParser {
     currentTypeDeps = refs;
     final SeqType st = itemType();
     currentTypeDeps = null;
-    qc.typeDeps.put(qn, refs);
+    typeDeps.put(qn, refs);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
       publicTypes.put(qn, st);
       qc.namedTypes.put(qn, st);
     }
     declaredTypes.put(qn, st);
+    if(qn.uri().length != 0) {
+      qc.typeCnstrs.add(new TypeCnstr(sc, qn, st, anns, docBuilder.toString(), ii, funcs));
+    }
   }
 
   /**
