@@ -403,9 +403,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   INSERT_SEPARATOR(FnInsertSeparator::new, "insert-separator(input,separator)",
       params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
-  /** XQuery function (obsolete). */
-  INTERSPERSE(FnIntersperse::new, "intersperse(input,separator)",
-      params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   INVISIBLE_XML(FnInvisibleXml::new, "invisible-xml(grammar[,options])",
       params(FnInvisibleXml.ARG_TYPE, MAP_ZO),
@@ -636,9 +633,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   SECONDS_FROM_TIME(FnSecondsFromTime::new, "seconds-from-time(value)",
       params(TIME_ZO), DECIMAL_ZO),
-  /** XQuery function (obsolete). */
-  SEQUENCE_JOIN(FnSequenceJoin::new, "sequence-join(input,separator)",
-      params(ITEM_ZM, ITEM_ZM), ITEM_ZM),
   /** XQuery function. */
   SERIALIZE(FnSerialize::new, "serialize(input[,options])",
       params(ITEM_ZM, ITEM_ZO), STRING_O),
