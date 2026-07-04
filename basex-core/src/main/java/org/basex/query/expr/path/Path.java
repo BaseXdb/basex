@@ -593,7 +593,7 @@ public abstract class Path extends ParseExpr {
       for(final PathNode node : PathIndex.desc(nodes, desc)) {
         if(node.kind == Data.ELEM && name == node.name) {
           // skip test if an element name occurs on different levels
-          if(!tmp.isEmpty() && tmp.get(0).level() != node.level()) return null;
+          if(!tmp.isEmpty() && tmp.getFirst().level() != node.level()) return null;
           tmp.add(node);
         }
       }
@@ -650,12 +650,12 @@ public abstract class Path extends ParseExpr {
 
       // cache child steps
       final ArrayList<QNm> qNames = new ArrayList<>();
-      while(nodes.get(0).parent != null) {
-        QNm qName = new QNm(data.elemNames.key(nodes.get(0).name));
+      while(nodes.getFirst().parent != null) {
+        QNm qName = new QNm(data.elemNames.key(nodes.getFirst().name));
         // skip children with prefixes
         if(qName.hasPrefix()) return this;
         for(final PathNode node : nodes) {
-          if(nodes.get(0).name != node.name) {
+          if(nodes.getFirst().name != node.name) {
             qName = null;
             break;
           }
@@ -886,7 +886,7 @@ public abstract class Path extends ParseExpr {
       if(test.name == null) return true;
       // only support unique paths with nodes on the correct level
       final ArrayList<PathNode> pn = data().paths.desc(test.name);
-      if(pn.size() != 1 || pn.get(0).level() != s + 1) return true;
+      if(pn.size() != 1 || pn.getFirst().level() != s + 1) return true;
     }
     return false;
   }

@@ -55,7 +55,7 @@ public final class FTLexer extends FTIterator implements IndexSearch {
     if(lang == null) lang = Language.def();
 
     // use default tokenizer if specific tokenizer is not available.
-    Tokenizer tkns = Tokenizer.IMPL.get(0);
+    Tokenizer tkns = Tokenizer.IMPL.getFirst();
     for(final Tokenizer tknzr : Tokenizer.IMPL) {
       if(tknzr.supports(lang)) {
         tkns = tknzr;
@@ -72,7 +72,7 @@ public final class FTLexer extends FTIterator implements IndexSearch {
       if(ftOpt.is(ST)) {
         if(ftOpt.sd == null) {
           // use default stemmer if specific stemmer is not available.
-          Stemmer st = Stemmer.IMPL.get(0);
+          Stemmer st = Stemmer.IMPL.getFirst();
           for(final Stemmer stem : Stemmer.IMPL) {
             if(stem.supports(lang)) {
               st = stem;

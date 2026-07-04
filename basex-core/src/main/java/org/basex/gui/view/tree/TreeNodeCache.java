@@ -31,7 +31,7 @@ final class TreeNodeCache {
     final int rs = roots.size();
     for(int i = 0; i < rs; ++i) {
       final int root = roots.get(i);
-      alil.get(0).add(root);
+      alil.getFirst().add(root);
       final int sh = i + 1 == rs ? ts : roots.get(i + 1);
       for(int p = root + 1; p < sh; ++p) {
         final int k = data.kind(p);

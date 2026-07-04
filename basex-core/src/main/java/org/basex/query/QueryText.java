@@ -397,6 +397,7 @@ public interface QueryText {
   /** Optimization info. */ String OPTNORESULTS_X = "no index results: %";
   /** Optimization info. */ String OPTCHILD_X = "convert to child steps: %";
   /** Optimization info. */ String OPTUNROLL_X = "unroll: %";
+  /** Optimization info. */ String OPTEXIT_X = "enable early exit: %";
   /** Optimization info. */ String OPTOPEN_X = "open database \"%\"";
 
   // MISCELLANEOUS ================================================================================

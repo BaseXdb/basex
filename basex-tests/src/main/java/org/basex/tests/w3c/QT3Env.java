@@ -65,9 +65,9 @@ final class QT3Env {
     params = list(ctx, env, PARAM);
     namespaces = list(ctx, env, NAMESPACE);
     ArrayList<HashMap<String, String>> al = list(ctx, env, SCHEMA);
-    schemas = al.isEmpty() ? null : al.get(0);
+    schemas = al.isEmpty() ? null : al.getFirst();
     al = list(ctx, env, COLLATION);
-    collations = al.isEmpty() ? null : al.get(0);
+    collations = al.isEmpty() ? null : al.getFirst();
     final String uri = string(STATIC_BASE_URI, ctx, env);
     baseURI = uri;
     sandpit = !list(ctx, env, SANDPIT).isEmpty();

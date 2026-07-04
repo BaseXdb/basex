@@ -86,7 +86,7 @@ public final class Table {
   public Table toTop(final byte[] top) {
     for(int i = 0; i < contents.size(); ++i) {
       if(eq(top, contents.get(i).get(0))) {
-        contents.add(0, contents.remove(i));
+        contents.addFirst(contents.remove(i));
         break;
       }
     }

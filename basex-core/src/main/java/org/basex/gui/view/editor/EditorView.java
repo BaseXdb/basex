@@ -845,7 +845,7 @@ public final class EditorView extends View {
     if(error) {
       final TreeMap<String, InputInfo> errors = project.errors();
       if(errors.isEmpty()) return;
-      path = errors.get(errors.keySet().iterator().next()).path();
+      path = errors.firstEntry().getValue().path();
     } else {
       path = ii.path();
     }

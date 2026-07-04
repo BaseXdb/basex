@@ -200,7 +200,7 @@ public abstract class JavaCall extends Arr {
         if(!candidates.get(c).exact) candidates.remove(c);
       }
     }
-    return candidates.size() == 1 ? candidates.get(0) : null;
+    return candidates.size() == 1 ? candidates.getFirst() : null;
   }
 
   /**
@@ -438,7 +438,7 @@ public abstract class JavaCall extends Arr {
         paramTypes(candidates.toArray(Executable[]::new), false));
 
     // single method found: add module locks to query context
-    final Method method = candidates.get(0);
+    final Method method = candidates.getFirst();
     final Lock lock = method.getAnnotation(Lock.class);
     if(lock != null) qc.locks.add(Locking.BASEX_PREFIX + lock.value());
     return method;

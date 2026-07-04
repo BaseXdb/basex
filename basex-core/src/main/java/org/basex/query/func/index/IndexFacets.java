@@ -27,7 +27,7 @@ public final class IndexFacets extends IndexFn {
     final String type = toZeroString(arg(1), qc);
 
     return FDoc.build().node(type.equals(FLAT) ? flat(data, qc) :
-      tree(data, data.paths.root().get(0), qc)).finish();
+      tree(data, data.paths.root().getFirst(), qc)).finish();
   }
 
   /**

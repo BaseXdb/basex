@@ -119,7 +119,7 @@ public final class QueryResources {
    * @return database or {@code null} if no database is globally opened
    */
   Data globalData() {
-    return globalData ? datas.get(0) : null;
+    return globalData ? datas.getFirst() : null;
   }
 
   /**
@@ -259,7 +259,7 @@ public final class QueryResources {
     // return default collection
     if(qi == null) {
       if(!withdb || colls.isEmpty()) throw NODEFCOLL.get(info);
-      return colls.get(0);
+      return colls.getFirst();
     }
 
     final MainOptions options = context.options;

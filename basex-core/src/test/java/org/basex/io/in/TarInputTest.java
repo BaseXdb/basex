@@ -21,9 +21,9 @@ public final class TarInputTest {
    */
   @Test public void scan() throws IOException {
     final ArrayList<TarEntry> entries = entries(false);
-    assertEquals("a.txt", entries.get(0).getName());
+    assertEquals("a.txt", entries.getFirst().getName());
     assertEquals("b.txt", entries.get(1).getName());
-    assertEquals(11, entries.get(0).getSize());
+    assertEquals(11, entries.getFirst().getSize());
     assertEquals(5, entries.get(1).getSize());
   }
 
@@ -33,9 +33,9 @@ public final class TarInputTest {
    */
   @Test public void read() throws IOException {
     final ArrayList<TarEntry> entries = entries(true);
-    assertEquals("a.txt", entries.get(0).getName());
+    assertEquals("a.txt", entries.getFirst().getName());
     assertEquals("b.txt", entries.get(1).getName());
-    assertEquals(11, entries.get(0).getSize());
+    assertEquals(11, entries.getFirst().getSize());
     assertEquals(5, entries.get(1).getSize());
   }
 

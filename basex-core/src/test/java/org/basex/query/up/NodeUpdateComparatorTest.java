@@ -483,7 +483,7 @@ public final class NodeUpdateComparatorTest extends SandboxTest {
     final List<NodeUpdate> l = new ArrayList<>();
     Collections.addAll(l, order);
     final List<NodeUpdate> l2 = new ArrayList<>();
-    for(final NodeUpdate p : order) l2.add(0, p);
+    for(final NodeUpdate p : order) l2.addFirst(p);
 
     // primitives are sorted ASCENDING
     final NodeUpdateComparator c = new NodeUpdateComparator();

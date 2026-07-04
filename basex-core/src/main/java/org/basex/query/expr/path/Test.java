@@ -61,7 +61,7 @@ public abstract class Test extends ExprInfo {
   public static Test get(final List<Test> tests) {
     final int ts = tests.size();
     if(ts == 0) return null;
-    if(ts == 1) return tests.get(0);
+    if(ts == 1) return tests.getFirst();
 
     final List<Test> list = new ArrayList<>(ts);
     for(final Test test : tests) {
@@ -73,7 +73,7 @@ public abstract class Test extends ExprInfo {
         return null;
       }
     }
-    return list.size() == 1 ? list.get(0) : new UnionTest(list.toArray(Test[]::new));
+    return list.size() == 1 ? list.getFirst() : new UnionTest(list.toArray(Test[]::new));
   }
 
   /**

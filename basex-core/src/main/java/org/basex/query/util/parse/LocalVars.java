@@ -34,7 +34,7 @@ public final class LocalVars {
    * @return variable
    */
   public Var add(final Var var) {
-    if(var != null) vars.get(vars.size() - 1).add(var);
+    if(var != null) vars.getLast().add(var);
     return var;
   }
 
@@ -130,7 +130,7 @@ public final class LocalVars {
    * @return the removed context's variable scope
    */
   public VarScope popContext() {
-    return vars.remove(vars.size() - 1).vs;
+    return vars.removeLast().vs;
   }
 
   /**
@@ -139,7 +139,7 @@ public final class LocalVars {
    * @return marker for the current bindings
    */
   public int openScope() {
-    return vars.get(vars.size() - 1).stack.size();
+    return vars.getLast().stack.size();
   }
 
   /**
@@ -147,6 +147,6 @@ public final class LocalVars {
    * @param marker marker for the start of the sub-scope
    */
   public void closeScope(final int marker) {
-    vars.get(vars.size() - 1).stack.size(marker);
+    vars.getLast().stack.size(marker);
   }
 }

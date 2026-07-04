@@ -466,7 +466,7 @@ public class TextPanel extends BaseXPanel {
         rend.repaint();
       } else if(editable && isEnabled()) {
         final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
-        if(!clips.isEmpty()) paste(clips.get(0).toString());
+        if(!clips.isEmpty()) paste(clips.getFirst().toString());
       }
       return;
     }
@@ -858,7 +858,7 @@ public class TextPanel extends BaseXPanel {
     @Override
     public void execute() {
       final ArrayList<Object> contents = BaseXLayout.fromClipboard(null);
-      if(!contents.isEmpty()) paste(contents.get(0).toString());
+      if(!contents.isEmpty()) paste(contents.getFirst().toString());
     }
     @Override
     public boolean enabled(final GUI main) {
@@ -1079,7 +1079,7 @@ public class TextPanel extends BaseXPanel {
 
     if(pairs.size() == 1) {
       // insert single candidate
-      complete(pairs.get(0).getValue(), start);
+      complete(pairs.getFirst().getValue(), start);
     } else if(!pairs.isEmpty()) {
       // show popup menu
       final JPopupMenu pm = new JPopupMenu();
@@ -1129,7 +1129,7 @@ public class TextPanel extends BaseXPanel {
     for(int l = 0; l < 5; l++) LISTS.add(new ArrayList<>());
     final TokenObjectMap<byte[]> map = Util.properties("completions.properties");
     for(final byte[] key : map) {
-      LISTS.get(0).add(new SimpleEntry<>(Token.string(key), Token.string(map.get(key))));
+      LISTS.getFirst().add(new SimpleEntry<>(Token.string(key), Token.string(map.get(key))));
     }
     // add functions (default functions first)
     for(final FuncDefinition fd : Functions.BUILT_IN.values()) {

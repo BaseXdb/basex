@@ -123,7 +123,7 @@ public final class WebModules {
     // multiple functions: check consume filter
     if(funcs.size() > 1) bestConsume(funcs, conn);
 
-    final RestXqFunction first = funcs.get(0);
+    final RestXqFunction first = funcs.getFirst();
     if(funcs.size() == 1) return first;
 
     // show error if we are left with multiple function candidates
@@ -202,7 +202,7 @@ public final class WebModules {
     final ArrayList<WsFunction> funcs = findWs(ws, ann);
     if(funcs.isEmpty()) return null;
 
-    final WsFunction first = funcs.get(0);
+    final WsFunction first = funcs.getFirst();
     if(funcs.size() == 1) return first;
 
     // show error if we are left with multiple function candidates
@@ -247,7 +247,7 @@ public final class WebModules {
    */
   private static void bestSpec(final List<RestXqFunction> funcs) {
     for(int l = funcs.size() - 1; l > 0; l--) {
-      if(funcs.get(0).compareTo(funcs.get(l)) != 0) funcs.remove(l);
+      if(funcs.getFirst().compareTo(funcs.get(l)) != 0) funcs.remove(l);
     }
   }
 

@@ -52,7 +52,7 @@ public final class ReplaceDoc extends NodeUpdate {
 
   @Override
   public void merge(final Update update) throws QueryException {
-    throw UPMULTDOC_X_X.get(info, data.meta.name, newDocs.inputs.get(0).path);
+    throw UPMULTDOC_X_X.get(info, data.meta.name, newDocs.inputs.getFirst().path);
   }
 
   @Override

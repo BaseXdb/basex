@@ -466,14 +466,14 @@ public final class AtomicUpdateCache {
         // check the nodes at the end of/after the insertion sequence
         if(beforeFollowingNode < smallestVisited) {
           final Delete del = mergeTextNodes(beforeFollowingNode);
-          if(del != null) deletes.add(0, del);
+          if(del != null) deletes.addFirst(del);
           smallestVisited = beforeFollowingNode;
         }
       }
       // check nodes for delete and for insert before the updated location
       if(beforeNewLocation < smallestVisited) {
         final Delete del = mergeTextNodes(beforeNewLocation);
-        if(del != null) deletes.add(0, del);
+        if(del != null) deletes.addFirst(del);
         smallestVisited = beforeNewLocation;
       }
     }

@@ -63,7 +63,7 @@ final class RestXqError implements Comparable<RestXqError> {
 
   @Override
   public int compareTo(final RestXqError error) {
-    return COMPARE.apply(error.tests.get(0)) - COMPARE.apply(tests.get(0));
+    return COMPARE.apply(error.tests.getFirst()) - COMPARE.apply(tests.getFirst());
   }
 
   @Override

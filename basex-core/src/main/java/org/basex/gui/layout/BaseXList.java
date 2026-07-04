@@ -161,7 +161,7 @@ public final class BaseXList extends BaseXBack {
       @Override
       public void mousePressed(final MouseEvent e) {
         final List<String> vals = list.getSelectedValuesList();
-        text.setText(vals.size() == 1 ? vals.get(0) : "");
+        text.setText(vals.size() == 1 ? vals.getFirst() : "");
         text.requestFocusInWindow();
         text.selectAll();
         dialog.action(BaseXList.this);
@@ -234,7 +234,7 @@ public final class BaseXList extends BaseXBack {
    */
   public String getValue() {
     final List<String> vals = list.getSelectedValuesList();
-    return vals.size() == 1 ? vals.get(0) : "";
+    return vals.size() == 1 ? vals.getFirst() : "";
   }
 
   /**

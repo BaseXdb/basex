@@ -92,6 +92,6 @@ public final class FnSubstring extends StandardFunc {
    * @return integer
    */
   private static int limit(final long l) {
-    return (int) Math.min(Math.max(Integer.MIN_VALUE + 1, l), Integer.MAX_VALUE - 1);
+    return Math.clamp(l, Integer.MIN_VALUE + 1, Integer.MAX_VALUE - 1);
   }
 }

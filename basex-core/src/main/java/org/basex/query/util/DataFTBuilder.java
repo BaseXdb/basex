@@ -82,9 +82,9 @@ final class DataFTBuilder {
     int ln = -len + string.length;
     if(ln > 0) {
       final int ms = marks.size();
-      final DataFTMarker first = marks.get(0);
+      final DataFTMarker first = marks.getFirst();
       final int firstl = first.mark ? 0 : first.token.length;
-      final DataFTMarker last = marks.get(ms - 1);
+      final DataFTMarker last = marks.getLast();
       final int lastl = last.mark ? 0 : last.token.length;
 
       // remove leading characters of first text

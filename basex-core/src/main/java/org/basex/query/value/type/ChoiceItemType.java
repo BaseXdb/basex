@@ -228,7 +228,7 @@ public final class ChoiceItemType implements Type {
       if(types.size() != 1) types.remove(BasicType.ERROR);
       return switch(types.size()) {
         case 0 -> throw Util.notExpected();
-        case 1 -> types.get(0);
+        case 1 -> types.getFirst();
         default -> new ChoiceItemType(types);
       };
     }

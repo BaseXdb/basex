@@ -79,7 +79,7 @@ public abstract class Job {
    * @return job
    */
   public final Job active() {
-    return children.isEmpty() ? this : children.get(0).active();
+    return children.isEmpty() ? this : children.getFirst().active();
   }
 
   /**
@@ -99,7 +99,7 @@ public abstract class Job {
    * Pops the last child job (LIFO).
    */
   public final synchronized void popJob() {
-    children.remove(children.size() - 1);
+    children.removeLast();
   }
 
   /**

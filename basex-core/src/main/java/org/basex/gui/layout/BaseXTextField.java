@@ -119,7 +119,7 @@ public class BaseXTextField extends JTextField {
         } else if(isEnabled() && isEditable()) {
           final ArrayList<Object> clips = BaseXLayout.fromClipboard(null);
           if(!clips.isEmpty()) {
-            final String string = clips.get(0).toString();
+            final String string = clips.getFirst().toString();
             setText(new StringBuilder(getText()).insert(getCaretPosition(), string).toString());
           }
         }

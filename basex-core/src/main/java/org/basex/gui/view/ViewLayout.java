@@ -69,7 +69,7 @@ final class ViewLayout implements ViewComponent {
       }
     }
     // return component if a single one is left over
-    return list.size() == 1 ? list.get(0) : null;
+    return list.size() == 1 ? list.getFirst() : null;
   }
 
   @Override

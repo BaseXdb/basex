@@ -151,7 +151,7 @@ public final class Catch extends Single {
    * @return result of check
    */
   boolean global() {
-    return tests.size() == 1 && tests.get(0) instanceof NodeTest;
+    return tests.size() == 1 && tests.getFirst() instanceof NodeTest;
   }
 
   /**

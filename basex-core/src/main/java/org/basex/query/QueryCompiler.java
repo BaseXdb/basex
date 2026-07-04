@@ -38,7 +38,7 @@ final class QueryCompiler {
    */
   static void compile(final CompileContext cc) throws QueryException {
     for(final ArrayList<Scope> scps : new QueryCompiler().scopes(cc.qc.main)) {
-      scps.get(0).compile(cc);
+      scps.getFirst().compile(cc);
     }
   }
 

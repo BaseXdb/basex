@@ -62,7 +62,7 @@ public class QueryParser extends InputParser {
   private static final TokenSet KEYWORDS = new TokenSet(
       ATTRIBUTE, COMMENT, DOCUMENT_NODE, ELEMENT, GNODE, JNODE, NAMESPACE_NODE, NODE,
       SCHEMA_ATTRIBUTE, SCHEMA_ELEMENT, PROCESSING_INSTRUCTION, TEXT, ARRAY, ENUM, FN,
-      FUNCTION, IF, ITEM, MAP, RECORD, SWITCH, TYPESWITCH);
+      FUNCTION, IF, ITEM, MAP, RECORD, SWITCH, TYPE, TYPESWITCH);
 
   /** Query context. */
   public final QueryContext qc;

@@ -244,7 +244,7 @@ public final class Namespaces {
     for(int p; (p = nd.find(pre)) > -1;) {
       // add candidate to stack
       nd = nd.child(p);
-      cand.add(0, nd);
+      cand.addFirst(nd);
     }
 
     nd = root;
@@ -252,7 +252,7 @@ public final class Namespaces {
       // compare candidates to ancestors of PRE value
       int ancPre = pre;
       // take first candidate from stack
-      NSNode curr = cand.remove(0);
+      NSNode curr = cand.removeFirst();
       while(ancPre > -1 && nd == root) {
         // if the current candidate's PRE value is lower than the current ancestor of par or par
         // itself, we have to look for a potential match for this candidate. therefore we iterate
@@ -263,7 +263,7 @@ public final class Namespaces {
         if(ancPre == curr.pre()) nd = curr;
         // no potential for infinite loop, because dummy root is always a match,
         // in this case ancPre ends iteration
-        if(!cand.isEmpty()) curr = cand.remove(0);
+        if(!cand.isEmpty()) curr = cand.removeFirst();
       }
     }
 

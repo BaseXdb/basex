@@ -94,7 +94,7 @@ public final class SqlModuleTest extends SandboxTest {
         " return " + func.args(" $p", " [ 7 ]"));
     assertTrue(row.contains("<sql:column name=\"id\">7</sql:column>"), row);
     assertEquals(1, MockDriver.bindings.size());
-    assertEquals(7L, ((Number) MockDriver.bindings.get(0)).longValue());
+    assertEquals(7L, ((Number) MockDriver.bindings.getFirst()).longValue());
 
     // parameters supplied as <sql:parameters/> element, including a null binding
     MockDriver.reset();
@@ -104,7 +104,7 @@ public final class SqlModuleTest extends SandboxTest {
     query("let $c := " + _SQL_CONNECT.args(URL) +
         " let $p := " + _SQL_PREPARE.args(" $c", "insert into t values (?, ?)") +
         " return " + func.args(" $p", " " + params));
-    assertEquals(7, MockDriver.bindings.get(0));
+    assertEquals(7, MockDriver.bindings.getFirst());
     assertSame(MockDriver.NULL, MockDriver.bindings.get(1));
 
     // errors
@@ -142,9 +142,9 @@ public final class SqlModuleTest extends SandboxTest {
     query("count(" + batch + ")", 2);
     // each set was bound positionally and added to the batch, in order
     assertEquals(2, MockDriver.batches.size());
-    assertEquals(1L, MockDriver.batches.get(0).get(0));
-    assertEquals("a", MockDriver.batches.get(0).get(1));
-    assertEquals(2L, MockDriver.batches.get(1).get(0));
+    assertEquals(1L, MockDriver.batches.getFirst().getFirst());
+    assertEquals("a", MockDriver.batches.getFirst().get(1));
+    assertEquals(2L, MockDriver.batches.get(1).getFirst());
     assertEquals("b", MockDriver.batches.get(1).get(1));
   }
 
@@ -189,7 +189,7 @@ public final class SqlModuleTest extends SandboxTest {
     query("let $c := " + _SQL_CONNECT.args(URL) +
         " let $p := " + _SQL_PREPARE.args(" $c", "insert into t values (?)") +
         " return " + _SQL_EXECUTE_PREPARED.args(" $p", " [ " + value + " ]"));
-    return MockDriver.bindings.get(0);
+    return MockDriver.bindings.getFirst();
   }
 
   /**

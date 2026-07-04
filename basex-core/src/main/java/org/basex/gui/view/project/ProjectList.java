@@ -122,7 +122,7 @@ final class ProjectList extends JList<String> implements ProjectCommands {
   @Override
   public IOFile selectedFile() {
     final List<IOFile> files = selectedFiles();
-    return files.size() == 1 ? files.get(0) : null;
+    return files.size() == 1 ? files.getFirst() : null;
   }
 
   @Override
