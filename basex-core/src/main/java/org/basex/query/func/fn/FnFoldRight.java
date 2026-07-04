@@ -26,21 +26,24 @@ public final class FnFoldRight extends FnFoldLeft {
     long p = input.size();
     if(p != -1) {
       for(; p > 0; p--) {
-        args.set(1, invoke(action, args.set(0, input.get(p - 1)).inc(), qc));
+        args.set(0, input.get(p - 1)).inc();
         if(exit(qc, args)) break;
+        args.set(1, invoke(action, args, qc));
       }
     } else {
       final Value value = input.value(qc, arg(0));
       p = value.size();
       if(value instanceof final TreeSeq seq) {
         for(final ListIterator<Item> iter = seq.iterator(p); iter.hasPrevious();) {
-          args.set(1, invoke(action, args.set(0, iter.previous()).inc(), qc));
+          args.set(0, iter.previous()).inc();
           if(exit(qc, args)) break;
+          args.set(1, invoke(action, args, qc));
         }
       } else {
         for(; p > 0; p--) {
-          args.set(1, invoke(action, args.set(0, value.itemAt(p - 1)).inc(), qc));
+          args.set(0, value.itemAt(p - 1)).inc();
           if(exit(qc, args)) break;
+          args.set(1, invoke(action, args, qc));
         }
       }
     }

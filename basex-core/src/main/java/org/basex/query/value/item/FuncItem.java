@@ -249,7 +249,8 @@ public final class FuncItem extends FItem implements Scope {
     final int arity = arity();
     if(!input.has(Flag.NDT)) {
       final IntFunction<Var> param = i -> i < arity ? params[i] : null;
-      final Var value = param.apply(left ? 1 : 0), result = param.apply(left ? 0 : 1);
+      final Var value = param.apply(left ? 1 : 0), result = param.apply(left ? 0 : 1),
+          pos = param.apply(2);
       final BiPredicate<Expr, Var> isRef = (ex, var) -> ex instanceof final VarRef vr &&
           vr.var.equals(var);
 
@@ -268,7 +269,7 @@ public final class FuncItem extends FItem implements Scope {
       final Expr expr1 = expr.arg(0), expr2 = expr.arg(1);
       final boolean ref1 = isRef.test(expr1, result), ref2 = isRef.test(expr2, result);
       if(expr instanceof final If iff) {
-        if(!(iff.cond.uses(value) || iff.cond.has(Flag.NDT))) {
+        if(!(iff.cond.uses(value) || iff.cond.uses(pos) || iff.cond.has(Flag.NDT))) {
           if(ref1) {
             // if(COND) then $result else ACTION → exit on COND
             exit = iff.cond;
@@ -280,8 +281,10 @@ public final class FuncItem extends FItem implements Scope {
           } else if(iff.cond instanceof final CmpG cmp) {
             final Expr op1 = cmp.arg(0), op2 = cmp.arg(1);
             final SeqType st1 = op1.seqType(), st2 = op2.seqType();
+            // strings: restrict to default collation (value equality must imply identity)
             if(isRef.test(op1, result) && op2 instanceof Item && st1.eq(st2) &&
-                (st1.instanceOf(Types.DECIMAL_O) || st1.instanceOf(Types.STRING_O))) {
+                (st1.instanceOf(Types.DECIMAL_O) ||
+                 st1.instanceOf(Types.STRING_O) && cmp.sc().collation == null)) {
               if(cmp.cmpOp() == CmpOp.EQ && op2.equals(expr1)) {
                 // if($result = ITEM) then ITEM else ACTION → exit on equality
                 exit = iff.cond;

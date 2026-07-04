@@ -129,6 +129,10 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" [ 1, 2 ]", " ()", " function($a, $b) { $b, $a }"), "2\n1");
     query(func.args(" array { 1 to 6 }", "ok", " fn($i, $r, $p) { $r[$i = 7 - $p] }"), "ok");
     query(func.args(" array { 2 to 7 }", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
+
+    // early exits: check the exit condition before the first call
+    query(func.args(" array { 1 to 5 }", 100,
+        " fn($v, $r) { if($r >= 10) then $r else $r + $v }"), 100);
   }
 
   /** Test method. */

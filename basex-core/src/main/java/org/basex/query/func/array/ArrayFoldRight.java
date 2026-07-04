@@ -24,8 +24,9 @@ public final class ArrayFoldRight extends ArrayFoldLeft {
     final HofArgs args = new HofArgs(3, action).set(1, arg(1).value(qc));
     final long p = array.structSize();
     for(final ListIterator<Value> iter = array.iterator(p); iter.hasPrevious();) {
-      args.set(1, invoke(action, args.set(0, iter.previous()).inc(), qc));
+      args.set(0, iter.previous()).inc();
       if(exit(qc, args)) break;
+      args.set(1, invoke(action, args, qc));
     }
     return args.get(1);
   }

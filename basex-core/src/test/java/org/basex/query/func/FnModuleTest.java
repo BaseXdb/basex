@@ -1238,6 +1238,12 @@ public final class FnModuleTest extends SandboxTest {
     query(func.args(" 1 to 6", "ok", " fn($r, $i, $p) { $r[$i = $p] }"), "ok");
     query(func.args(" 2 to 7", "-", " fn($r, $i, $p) { $r[$i = $p] }"), "");
 
+    // early exits: no exit if the condition depends on the position
+    query(func.args(" 1 to 5", 0, " fn($r, $v, $p) { if($p = 3) then $r else $r + $v }"), 12);
+    // early exits: no string equality exit for non-default collations
+    query("declare default collation 'http://basex.org/collation?lang=en;strength=primary'; " +
+        func.args(" 1 to 5", "a", " fn($r, $v) { if($r = 'A') then 'A' else 'z' }"), "A");
+
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
     check(func.args(" 1 to 10", " xs:byte(1)", " function($n, $_) {" +
@@ -1301,6 +1307,9 @@ public final class FnModuleTest extends SandboxTest {
     final Function func = FOLD_RIGHT;
     query(func.args(" 1 to 6", "ok", " fn($i, $r, $p) { $r[$i = 7 - $p] }"), "ok");
     query(func.args(" 1 to 6", "-", " fn($i, $r, $p) { $r[$i = $p] }"), "");
+
+    // early exits: check the exit condition before the first call
+    query(func.args(" 1 to 5", 100, " fn($v, $r) { if($r >= 10) then $r else $r + $v }"), 100);
 
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 
