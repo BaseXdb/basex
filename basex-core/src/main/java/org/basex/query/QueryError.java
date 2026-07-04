@@ -1086,6 +1086,8 @@ public enum QueryError {
   /** Error code. */
   NOURI_X(XPST, 81, "Namespace prefix not declared: %."),
   /** Error code. */
+  MAPKEYATOMIC_X(XPST, 152, "Map key type must be atomic: %."),
+  /** Error code. */
   PREFIXNOURI_X(XPST, 154, "QName includes prefix, but no URI: %."),
 
   /** Error code. */

@@ -7,11 +7,9 @@ import static org.basex.query.value.type.Occ.*;
 import static org.basex.query.value.type.Types.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.expr.path.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.type.*;
 import org.basex.util.*;
@@ -148,9 +146,9 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // r1 record(next? as r1, x)
-      r1 = new RecordType(r1Name, ii).seqType(),
+      r1 = new TypeRef(r1Name, ii).seqType(),
       // r2 record(next? as r2, x)
-      r2 = new RecordType(r2Name, ii).seqType();
+      r2 = new TypeRef(r2Name, ii).seqType();
 
     fld1.put(Token.token("next"), new RecordField(r1.union(ZERO)));
     fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
@@ -158,13 +156,8 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new RecordField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new RecordField(ITEM_ZM));
 
-    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
-    final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
-    recordTypeRefs.put(r1Name, (RecordType) r1.type);
-    recordTypeRefs.put(r2Name, (RecordType) r2.type);
-    declaredRecordTypes.put(r1Name, new RecordType(fld1));
-    declaredRecordTypes.put(r2Name, new RecordType(fld2));
-    RecordType.resolve(declaredRecordTypes, recordTypeRefs, new ArrayList<>());
+    ((TypeRef) r1.type).resolve(new RecordType(fld1));
+    ((TypeRef) r2.type).resolve(new RecordType(fld2));
 
     assertTrue(r1.eq(r2));
     assertTrue(r2.eq(r1));
@@ -419,9 +412,9 @@ public final class SeqTypeTest {
     final InputInfo ii = new InputInfo(getClass().getName(), 1, 1);
     final SeqType
       // r1 record(next? as r1, x)
-      r1 = new RecordType(r1Name, ii).seqType(),
+      r1 = new TypeRef(r1Name, ii).seqType(),
       // r2 record(next? as r2, x)
-      r2 = new RecordType(r2Name, ii).seqType();
+      r2 = new TypeRef(r2Name, ii).seqType();
 
     fld1.put(Token.token("next"), new RecordField(r1.union(ZERO)));
     fld1.put(Token.token("x"), new RecordField(ITEM_ZM));
@@ -429,13 +422,8 @@ public final class SeqTypeTest {
     fld2.put(Token.token("next"), new RecordField(r2.union(ZERO)));
     fld2.put(Token.token("x"), new RecordField(ITEM_ZM));
 
-    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
-    final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
-    recordTypeRefs.put(r1Name, (RecordType) r1.type);
-    recordTypeRefs.put(r2Name, (RecordType) r2.type);
-    declaredRecordTypes.put(r1Name, new RecordType(fld1));
-    declaredRecordTypes.put(r2Name, new RecordType(fld2));
-    RecordType.resolve(declaredRecordTypes, recordTypeRefs, new ArrayList<>());
+    ((TypeRef) r1.type).resolve(new RecordType(fld1));
+    ((TypeRef) r2.type).resolve(new RecordType(fld2));
 
     assertTrue(RECORD_O.instanceOf(FUNCTION_O));
     assertFalse(MAP_O.instanceOf(RECORD_O));
@@ -698,9 +686,9 @@ public final class SeqTypeTest {
       // record(b as xs:integer?)
       r6 = new RecordType(true, fld6).seqType(),
       // r8 record(next as r8?, x, y)
-      r8 = new RecordType(r8Name, ii).seqType(),
+      r8 = new TypeRef(r8Name, ii).seqType(),
       // r9 record(next as r9?, x, z)
-      r9 = new RecordType(r9Name, ii).seqType();
+      r9 = new TypeRef(r9Name, ii).seqType();
 
     fld8.put(Token.token("next"), new RecordField(r8.union(ZERO)));
     fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
@@ -710,13 +698,8 @@ public final class SeqTypeTest {
     fld9.put(Token.token("x"), new RecordField(ITEM_ZM));
     fld9.put(Token.token("z"), new RecordField(ITEM_ZM));
 
-    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
-    final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
-    recordTypeRefs.put(r8Name, (RecordType) r8.type);
-    recordTypeRefs.put(r9Name, (RecordType) r9.type);
-    declaredRecordTypes.put(r8Name, new RecordType(fld8));
-    declaredRecordTypes.put(r9Name, new RecordType(fld9));
-    RecordType.resolve(declaredRecordTypes, recordTypeRefs, new ArrayList<>());
+    ((TypeRef) r8.type).resolve(new RecordType(fld8));
+    ((TypeRef) r9.type).resolve(new RecordType(fld9));
 
     combine(RECORD_O, FUNCTION_O, FUNCTION_O, op);
     combine(RECORD_O, MAP_O, MAP_O, op);
@@ -1017,9 +1000,9 @@ public final class SeqTypeTest {
       // record(b? as xs:integer)
       r6 = new RecordType(true, fld6).seqType(),
       // r8 record(next? as r8, x, y)
-      r8 = new RecordType(r8Name, ii).seqType(),
+      r8 = new TypeRef(r8Name, ii).seqType(),
       // r9 record(next? as r9, x, z)
-      r9 = new RecordType(r9Name, ii).seqType();
+      r9 = new TypeRef(r9Name, ii).seqType();
 
     fld8.put(Token.token("next"), new RecordField(r8.union(ZERO)));
     fld8.put(Token.token("x"), new RecordField(ITEM_ZM));
@@ -1029,13 +1012,8 @@ public final class SeqTypeTest {
     fld9.put(Token.token("x"), new RecordField(ITEM_ZM));
     fld9.put(Token.token("z"), new RecordField(ITEM_ZM));
 
-    final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
-    final QNmMap<RecordType> declaredRecordTypes = new QNmMap<>();
-    recordTypeRefs.put(r8Name, (RecordType) r8.type);
-    recordTypeRefs.put(r9Name, (RecordType) r9.type);
-    declaredRecordTypes.put(r8Name, new RecordType(fld8));
-    declaredRecordTypes.put(r9Name, new RecordType(fld9));
-    RecordType.resolve(declaredRecordTypes, recordTypeRefs, new ArrayList<>());
+    ((TypeRef) r8.type).resolve(new RecordType(fld8));
+    ((TypeRef) r9.type).resolve(new RecordType(fld9));
 
     combine(RECORD_O, FUNCTION_O, RECORD_O, op);
     combine(RECORD_O, MAP_O, RECORD_O, op);

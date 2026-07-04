@@ -129,10 +129,10 @@ public final class QueryContext extends Job implements Closeable {
   /** Stack of module files that are currently parsed. */
   public final TokenList modStack = new TokenList();
 
-  /** Public record types of all parsed modules (for resolving cross-module references). */
-  public final QNmMap<RecordType> namedRecordTypes = new QNmMap<>();
-  /** Record references that could not be resolved within their module (resolved after parsing). */
-  public final ArrayList<RecordType> deferredTypeRefs = new ArrayList<>();
+  /** Public types of all parsed modules (for resolving cross-module references). */
+  public final QNmMap<SeqType> namedTypes = new QNmMap<>();
+  /** Type references that could not be resolved within their module (resolved after parsing). */
+  public final ArrayList<TypeRef> deferredTypeRefs = new ArrayList<>();
 
   /** Main module (root expression). */
   public MainModule main;

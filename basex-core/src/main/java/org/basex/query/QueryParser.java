@@ -82,10 +82,12 @@ public class QueryParser extends InputParser {
   private final QNmMap<SeqType> declaredTypes = new QNmMap<>();
   /** Public types. */
   private final QNmMap<SeqType> publicTypes = new QNmMap<>();
-  /** Named record types. */
-  private final QNmMap<RecordType> namedRecordTypes = new QNmMap<>();
-  /** Named record type references. */
-  private final QNmMap<RecordType> recordTypeRefs = new QNmMap<>();
+  /** References to named types (resolved after all type declarations have been parsed). */
+  private final QNmMap<TypeRef> typeRefs = new QNmMap<>();
+  /** Map key types referencing a named type; their atomicity is checked after resolution. */
+  private final ArrayList<TypeRef> deferredMapKeys = new ArrayList<>();
+  /** Cast target types referencing a named type; resolved and validated after parsing. */
+  private final ArrayList<TypeRef> deferredCastTargets = new ArrayList<>();
   /** Options. */
   private final QNmMap<String> options = new QNmMap<>();
 
@@ -262,7 +264,61 @@ public class QueryParser extends InputParser {
     // completes the parsing step
     qnames.resolve(this, 0, sc.elemNS);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
-    RecordType.resolve(namedRecordTypes, recordTypeRefs, qc.deferredTypeRefs);
+    resolveTypeRefs();
+  }
+
+  /**
+   * Resolves references to named types against the types declared in the current module. References
+   * that cannot be resolved locally are deferred until all modules have been parsed.
+   * @throws QueryException query exception
+   */
+  private void resolveTypeRefs() throws QueryException {
+    for(final QNm nm : typeRefs) {
+      final TypeRef ref = typeRefs.get(nm);
+      final SeqType st = declaredTypes.get(nm);
+      if(st != null) {
+        ref.resolve(st.type);
+      } else {
+        final RecordType rt = Records.BUILT_IN.get(nm);
+        if(rt != null) ref.resolve(rt);
+        else qc.deferredTypeRefs.add(ref);
+      }
+    }
+    // a resolved map key type must be atomic (an unresolved reference stays an unknown type)
+    for(final TypeRef ref : deferredMapKeys) {
+      if(ref.resolved() && !ref.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+        throw error(MAPKEYATOMIC_X, ref);
+      }
+    }
+    deferredMapKeys.clear();
+    // a referenced cast target type must be declared and castable
+    for(final TypeRef ref : deferredCastTargets) {
+      final SeqType st = declaredTypes.get(ref.name());
+      if(st == null) throw error(WHICHCAST_X, BasicType.similar(ref.name()));
+      ref.resolve(st.type);
+      if(ref.atomic() == null) throw error(INVALIDCAST_X, ref);
+    }
+    deferredCastTargets.clear();
+  }
+
+  /**
+   * Resolves references that could not be resolved within their module, against the public types
+   * of all parsed modules.
+   * @throws QueryException query exception
+   */
+  private void resolveDeferredTypeRefs() throws QueryException {
+    for(final TypeRef ref : qc.deferredTypeRefs) {
+      if(ref.resolved()) continue;
+      final SeqType st = qc.namedTypes.get(ref.name());
+      if(st != null) {
+        ref.resolve(st.type);
+      } else {
+        final RecordType rt = Records.BUILT_IN.get(ref.name());
+        if(rt == null) throw TYPEUNKNOWN_X.get(ref.info(), BasicType.similar(ref.name()));
+        ref.resolve(rt);
+      }
+    }
+    qc.deferredTypeRefs.clear();
   }
 
   /**
@@ -271,8 +327,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void check(final MainModule main) throws QueryException {
-    // resolve record references
-    RecordType.resolveDeferred(qc.namedRecordTypes, qc.deferredTypeRefs);
+    // resolve deferred (cross-module) type references
+    resolveDeferredTypeRefs();
     // resolve function calls
     qc.functions.resolve();
     // resolve variable references
@@ -974,6 +1030,7 @@ public class QueryParser extends InputParser {
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
       publicTypes.put(qn, st);
+      qc.namedTypes.put(qn, st);
     }
     declaredTypes.put(qn, st);
   }
@@ -1012,11 +1069,10 @@ public class QueryParser extends InputParser {
     }
     final RecordType rt = new RecordType(fields, qn, anns);
     declaredTypes.put(qn, rt.seqType());
-    namedRecordTypes.put(qn, rt);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
       publicTypes.put(qn, rt.seqType());
-      qc.namedRecordTypes.put(qn, rt);
+      qc.namedTypes.put(qn, rt.seqType());
     }
     if(qn.uri().length != 0) declareRecordConstructor(rt, ii);
   }
@@ -3482,13 +3538,18 @@ public class QueryParser extends InputParser {
             throw error(INVALIDCAST_X, name.prefixId(XML));
           if(type == null) {
             final SeqType st = declaredTypes.get(name);
-            if(st == null) throw error(WHICHCAST_X, BasicType.similar(name));
-            type = st.type;
+            if(st != null) {
+              type = st.type;
+            } else {
+              final TypeRef ref = new TypeRef(name, info());
+              deferredCastTargets.add(ref);
+              type = ref;
+            }
           }
         }
       }
     }
-    if(type.atomic() == null) throw error(INVALIDCAST_X, type);
+    if(!(type instanceof TypeRef) && type.atomic() == null) throw error(INVALIDCAST_X, type);
     skipWs();
     return type.seqType(consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);
   }
@@ -3565,10 +3626,10 @@ public class QueryParser extends InputParser {
       if(type == null) {
         st = declaredTypes.get(name);
         if(st == null) {
-          RecordType ref  = recordTypeRefs.get(name);
+          TypeRef ref = typeRefs.get(name);
           if(ref == null) {
-            ref = new RecordType(name, info());
-            recordTypeRefs.put(name, ref);
+            ref = new TypeRef(name, info());
+            typeRefs.put(name, ref);
           }
           type = ref;
         }
@@ -3655,9 +3716,12 @@ public class QueryParser extends InputParser {
     }
     // map
     if(type instanceof MapType) {
-      Type key = itemType().type;
-      if(key instanceof final RecordType rt) key = rt.getDeclaration(namedRecordTypes);
-      if(!key.instanceOf(BasicType.ANY_ATOMIC_TYPE)) throw error(MAPTAAT_X, key);
+      final Type key = itemType().type;
+      if(key instanceof final TypeRef ref && !ref.resolved()) {
+        deferredMapKeys.add(ref);
+      } else if(!key.instanceOf(BasicType.ANY_ATOMIC_TYPE)) {
+        throw error(MAPTAAT_X, key);
+      }
       wsCheck(",");
       final MapType tp = MapType.get(key, sequenceType());
       wsCheck(")");

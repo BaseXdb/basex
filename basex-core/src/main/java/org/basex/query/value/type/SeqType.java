@@ -106,6 +106,7 @@ public final class SeqType {
    * @return result of check
    */
   private boolean instance(final Value value, final boolean coerce) {
+    final Type dt = TypeRef.deref(this.type);
     if(eq(value.seqType())) return true;
 
     // check cardinality
@@ -114,8 +115,8 @@ public final class SeqType {
     if(size == 0) return true;
 
     // try shortcut (type of value may be specific enough)
-    if(!(coerce && type instanceof FType || type instanceof ChoiceItemType)) {
-      if(value.type.instanceOf(type)) return true;
+    if(!(coerce && dt instanceof FType || dt instanceof ChoiceItemType)) {
+      if(value.type.instanceOf(dt)) return true;
     }
     // check single item
     if(size == 1) return instance((Item) value, coerce);
@@ -133,16 +134,17 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final Item item, final boolean coerce) {
-    if(type instanceof final ChoiceItemType cit) {
+    final Type dt = TypeRef.deref(this.type);
+    if(dt instanceof final ChoiceItemType cit) {
       for(final Type tp : cit.types) {
         if(tp.seqType().instance(item, coerce)) return true;
       }
       return false;
     }
-    if(type instanceof final EnumType et) {
+    if(dt instanceof final EnumType et) {
       return et.instance(item);
     }
-    return item.instanceOf(type, coerce);
+    return item.instanceOf(dt, coerce);
   }
 
   /**
@@ -188,12 +190,13 @@ public final class SeqType {
   private Value cast(final Item item, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
-    if(item.type.eq(type)) return item;
+    final Type dt = TypeRef.deref(this.type);
+    if(item.type.eq(dt)) return item;
 
     // enable light-weight error handling
     if(!error && info != null) info.internal(true);
     try {
-      return type.cast(item, qc, info);
+      return dt.cast(item, qc, info);
     } catch(final QueryException ex) {
       if(error) throw ex;
       return null;
@@ -228,8 +231,9 @@ public final class SeqType {
   public Value coerce(final Value value, final QueryContext qc, final InputInfo info,
       final QNm name, final CompileContext cc) throws QueryException {
 
+    final Type dt = TypeRef.deref(this.type);
     // instance check
-    final SeqType[] at = type instanceof final FuncType ft ? ft.argTypes : null;
+    final SeqType[] at = dt instanceof final FuncType ft ? ft.argTypes : null;
     if((at == null || ((Checks<SeqType>) st -> st.eq(Types.ITEM_ZM)).all(at)) &&
         instance(value, true)) return value;
 
@@ -241,7 +245,7 @@ public final class SeqType {
       if(val == null) throw typeError(value, this, name, info);
       vb.add(val);
     }
-    final Value val = vb.value(type);
+    final Value val = vb.value(dt);
     if(!occ.check(val.size())) throw typeError(value, this, name, info);
     return val;
   }
@@ -259,7 +263,8 @@ public final class SeqType {
   private Value coerce(final Item item, final QNm name, final QueryContext qc,
       final CompileContext cc, final InputInfo info) throws QueryException {
 
-    if(type instanceof final ChoiceItemType cit) {
+    final Type dt = TypeRef.deref(this.type);
+    if(dt instanceof final ChoiceItemType cit) {
       for(final Type tp : cit.types) {
         try {
           final Value value = tp.seqType().coerce(item, name, qc, cc, info);
@@ -270,7 +275,7 @@ public final class SeqType {
       }
       return null;
     }
-    if(type instanceof BasicType || type instanceof EnumType) {
+    if(dt instanceof BasicType || dt instanceof EnumType) {
       final Value value = item.atomValue(qc, info);
       if(value.size() == 1) return coerceAtomic((Item) value, qc, info);
 
@@ -284,13 +289,13 @@ public final class SeqType {
     }
     if(item instanceof final FItem fitem) {
       if(fitem instanceof final XQArray array) {
-        if(type instanceof final ArrayType at) return array.coerceTo(at, qc, info, cc);
+        if(dt instanceof final ArrayType at) return array.coerceTo(at, qc, info, cc);
       } else if(fitem instanceof final XQMap map) {
-        if(type instanceof final RecordType rt) return map.coerceTo(rt, qc, info, cc);
-        if(type instanceof final MapType mt) return map.coerceTo(mt, qc, info, cc);
+        if(dt instanceof final RecordType rt) return map.coerceTo(rt, qc, info, cc);
+        if(dt instanceof final MapType mt) return map.coerceTo(mt, qc, info, cc);
       }
-      if(type instanceof final FuncType ft) {
-        return fitem.coerceTo(type == Types.FUNCTION ? fitem.funcType() : ft, qc, cc, info);
+      if(dt instanceof final FuncType ft) {
+        return fitem.coerceTo(dt == Types.FUNCTION ? fitem.funcType() : ft, qc, cc, info);
       }
     } else if(item instanceof final JNode jnode) {
       return coerce(jnode.value.unwrappedItem(qc, info), name, qc, cc, info);
@@ -365,7 +370,8 @@ public final class SeqType {
   public SeqType union(final SeqType st) {
     if(this == st) return this;
     // ignore general type of empty sequence
-    final Type tp = st.zero() ? type : zero() ? st.type : type.union(st.type);
+    final Type tp = st.zero() ? type : zero() ? st.type :
+      TypeRef.deref(type).union(TypeRef.deref(st.type));
     final Occ oc = occ.union(st.occ);
     return get(tp, oc);
   }
@@ -398,7 +404,7 @@ public final class SeqType {
     // if both are void, the occurrences are intersected, so the result is order-independent
     if(voidType()) return st.voidType() ? get(type, occ.intersect(st.occ)) : this;
     if(st.voidType()) return st;
-    final Type tp = type.intersect(st.type);
+    final Type tp = TypeRef.deref(type).intersect(TypeRef.deref(st.type));
     if(tp == null) return null;
     final Occ oc = occ.intersect(st.occ);
     if(oc == null) return null;
@@ -490,8 +496,8 @@ public final class SeqType {
     // instance, a subtype of every sequence type that permits the empty sequence
     if(emptyType()) return !st.oneOrMore();
     if(!occ.instanceOf(st.occ)) return false;
-    return st.type instanceof final ChoiceItemType cit ? cit.hasInstance(type)
-                                                       : type.instanceOf(st.type);
+    final Type t1 = TypeRef.deref(type), t2 = TypeRef.deref(st.type);
+    return t2 instanceof final ChoiceItemType cit ? cit.hasInstance(t1) : t1.instanceOf(t2);
   }
 
   /**
@@ -500,7 +506,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean eq(final SeqType st) {
-    return this == st || type.eq(st.type) && occ == st.occ;
+    return this == st || TypeRef.deref(type).eq(TypeRef.deref(st.type)) && occ == st.occ;
   }
 
   @Override

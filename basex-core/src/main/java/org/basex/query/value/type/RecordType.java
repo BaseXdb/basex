@@ -1,15 +1,12 @@
 package org.basex.query.value.type;
 
 import static java.util.Collections.*;
-import static org.basex.query.QueryError.*;
 import static org.basex.query.QueryText.*;
 
 import java.util.*;
 import java.util.function.*;
 
 import org.basex.query.*;
-import org.basex.query.func.*;
-import org.basex.query.util.hash.*;
 import org.basex.query.util.list.*;
 import org.basex.query.value.item.*;
 import org.basex.util.*;
@@ -31,13 +28,11 @@ public final class RecordType extends MapType {
    * (e.g. from map constructors) are not sealed and behave like ordinary maps. */
   private final boolean sealed;
   /** Record fields. */
-  private TokenObjectMap<RecordField> fields;
+  private final TokenObjectMap<RecordField> fields;
   /** Record type name (can be {@code null}). */
   private final QNm name;
   /** Annotations. */
   private final AnnList anns;
-  /** Input info ({@code null}, if this is not an unresolved reference). */
-  private InputInfo info;
 
   /**
    * Constructor for an inferred (non-sealed) record type.
@@ -80,21 +75,6 @@ public final class RecordType extends MapType {
     this.fields = fields;
     this.name = name;
     this.anns = anns;
-    info = null;
-  }
-
-  /**
-   * Constructor for RecordType references.
-   * @param name record type name
-   * @param info input info
-   */
-  public RecordType(final QNm name, final InputInfo info) {
-    super(BasicType.ANY_ATOMIC_TYPE, Types.ITEM_ZM, false);
-    this.sealed = true;
-    this.name = name;
-    this.info = info;
-    fields = new TokenObjectMap<>(0);
-    anns = AnnList.EMPTY;
   }
 
   /**
@@ -204,7 +184,7 @@ public final class RecordType extends MapType {
       if(rf1 == null || rf2 == null) return false;
       final SeqType st1 = rf1.seqType(), st2 = rf2.seqType();
       if(st1.occ != st2.occ) return false;
-      final Type tp1 = st1.type, tp2 = st2.type;
+      final Type tp1 = TypeRef.deref(st1.type), tp2 = TypeRef.deref(st2.type);
       if(tp1 instanceof final RecordType rt1 && tp2 instanceof final RecordType rt2) {
         final Pair pair = new Pair(rt1, rt2);
         return pairs.contains(pair) || rt1.eq(rt2, pair.addTo(pairs), strict);
@@ -260,7 +240,7 @@ public final class RecordType extends MapType {
         final SeqType fst = fields.get(key).seqType(), rtfst = rt.fields.get(key).seqType();
         if(fst != rtfst) {
           if(!fst.occ.instanceOf(rtfst.occ)) return false;
-          final Type ft = fst.type, rtft = rtfst.type;
+          final Type ft = TypeRef.deref(fst.type), rtft = TypeRef.deref(rtfst.type);
           if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2) {
             final Pair pair = new Pair(rt1, rt2);
             if(!pairs.contains(pair) && !rt1.instanceOf(rt2, pair.addTo(pairs))) return false;
@@ -310,7 +290,7 @@ public final class RecordType extends MapType {
         final TokenObjectMap<RecordField> map = new TokenObjectMap<>();
         for(final byte[] key : fields) {
           final SeqType fst = fields.get(key).seqType(), rtfst = rt.fields.get(key).seqType();
-          final Type ft = fst.type, rtft = rtfst.type;
+          final Type ft = TypeRef.deref(fst.type), rtft = TypeRef.deref(rtfst.type);
           final SeqType union;
           if(ft instanceof final RecordType rt1 && rtft instanceof final RecordType rt2 &&
               !fst.zero() && !rtfst.zero()) {
@@ -400,7 +380,7 @@ public final class RecordType extends MapType {
    * @return intersection type or {@code null}
    */
   private static SeqType intersect(final SeqType st1, final SeqType st2, final Set<Pair> pairs) {
-    final Type t1 = st1.type, t2 = st2.type;
+    final Type t1 = TypeRef.deref(st1.type), t2 = TypeRef.deref(st2.type);
     if(t1 instanceof final RecordType rt1 && t2 instanceof final RecordType rt2) {
       final Pair pair = new Pair(rt1, rt2);
       if(pairs.contains(pair)) return null;
@@ -462,70 +442,6 @@ public final class RecordType extends MapType {
       tb.add('*');
     }
     return qs.token(tb.finish()).token(')').toString();
-  }
-
-  /**
-   * Resolves named record references with named record declarations. References that cannot be
-   * resolved are added to the list of deferred references.
-   * @param types record types
-   * @param referenced record type references
-   * @param deferred deferred references
-   */
-  public static void resolve(final QNmMap<RecordType> types,
-      final QNmMap<RecordType> referenced, final ArrayList<RecordType> deferred) {
-    for(final QNm name : referenced) {
-      final RecordType ref = referenced.get(name);
-      RecordType dec = types.get(name);
-      if(dec == null) dec = Records.BUILT_IN.get(name);
-      if(dec != null) ref.resolve(dec);
-      else deferred.add(ref);
-    }
-  }
-
-  /**
-   * Resolves the references that were deferred during parsing, against the public record types of
-   * all parsed modules.
-   * @param types record types
-   * @param deferred deferred references
-   * @throws QueryException query exception
-   */
-  public static void resolveDeferred(final QNmMap<RecordType> types,
-      final ArrayList<RecordType> deferred) throws QueryException {
-    for(final RecordType ref : deferred) {
-      if(ref.info == null) continue;
-      RecordType dec = types.get(ref.name);
-      if(dec == null) dec = Records.BUILT_IN.get(ref.name);
-      if(dec == null) throw TYPEUNKNOWN_X.get(ref.info, BasicType.similar(ref.name));
-      ref.resolve(dec);
-    }
-    deferred.clear();
-  }
-
-  /**
-   * Resolves this unresolved reference to the specified record type declaration (in-place).
-   * @param dec record type declaration
-   */
-  private void resolve(final RecordType dec) {
-    fields = dec.fields;
-    info = null;
-    finalizeTypes(dec.keyType(), dec.valueType());
-  }
-
-  /**
-   * Returns the declaration of this record type. If this is an unresolved instance, the declaration
-   * is expected to be present in the (already) declared named record types. Otherwise, this
-   * instance is returned.
-   * @param declaredRecordTypes the (already) declared named record types
-   * @return the declared record type
-   * @throws QueryException an "unknown type" error, if this is a reference that cannot be resolved.
-   */
-  public RecordType getDeclaration(final QNmMap<RecordType> declaredRecordTypes)
-      throws QueryException {
-    if(info == null) return this;
-    RecordType rt = declaredRecordTypes.get(name);
-    if(rt == null) rt = Records.BUILT_IN.get(name);
-    if(rt == null) throw TYPEUNKNOWN_X.get(info, BasicType.similar(name));
-    return rt;
   }
 
   /**

@@ -122,6 +122,27 @@ public final class ModuleTest extends SandboxTest {
         + "let $v as b:p := 'b:p should not be visible' return $v", QueryError.TYPEUNKNOWN_X);
   }
 
+  /**
+   * Tests a circular reference to a non-record type across mutually importing modules (GH-2635).
+   * Module b references a:t before module a declares it, so the reference is resolved only after
+   * all modules have been parsed.
+   */
+  @Test public void circularTypes() {
+    final IOFile sandbox = sandbox();
+    final IOFile a = new IOFile(sandbox, "a.xqm");
+    write(a, "module namespace a = 'a';\n"
+        + "import module namespace b = 'b' at 'b.xqm';\n"
+        + "declare type a:t as xs:integer;\n"
+        + "declare function a:g() { b:f() };");
+    final IOFile b = new IOFile(sandbox, "b.xqm");
+    write(b, "module namespace b = 'b';\n"
+        + "import module namespace a = 'a' at 'a.xqm';\n"
+        + "declare function b:f() as a:t { 42 };");
+
+    query("import module namespace a = 'a' at '" + a.path() + "';\n"
+        + "a:g()", 42);
+  }
+
   /** Tests fn:load-xquery-module with nested module imports. */
   @Test public void dynamicNestedImport() {
     final IOFile sandbox = sandbox();

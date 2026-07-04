@@ -20,11 +20,9 @@ import org.basex.util.*;
  */
 public class MapType extends FType {
   /** Key type of the map. */
-  private Type keyType;
+  private final Type keyType;
   /** Value types (can be {@code null}, indicating that no type was specified). */
-  private SeqType valueType;
-  /** Flag indicating that keyType and valueType are final. */
-  private boolean isFinal;
+  private final SeqType valueType;
 
   /**
    * Constructor.
@@ -32,19 +30,8 @@ public class MapType extends FType {
    * @param valueType value type
    */
   MapType(final Type keyType, final SeqType valueType) {
-    this(keyType, valueType, true);
-  }
-
-  /**
-   * Constructor.
-   * @param keyType key type
-   * @param valueType value type
-   * @param isFinal whether keyType and valueType are final
-   */
-  MapType(final Type keyType, final SeqType valueType, final boolean isFinal) {
     this.keyType = keyType;
     this.valueType = valueType;
-    this.isFinal = isFinal;
   }
 
   /**
@@ -54,9 +41,7 @@ public class MapType extends FType {
    * @return map type
    */
   public static MapType get(final Type keyType, final SeqType valueType) {
-    final MapType mt = valueType.mapType(keyType);
-    if(!mt.isFinal) throw Util.notExpected();
-    return mt;
+    return valueType.mapType(keyType);
   }
 
   /**
@@ -66,18 +51,6 @@ public class MapType extends FType {
    */
   public static MapType get(final MapType mapType) {
     return get(mapType.keyType, mapType.valueType);
-  }
-
-  /**
-   * Supply final value of key type and value type.
-   * @param kt key type
-   * @param vt value type
-   */
-  public final void finalizeTypes(final Type kt, final SeqType vt) {
-    if(isFinal) throw Util.notExpected();
-    keyType = kt;
-    valueType = vt;
-    isFinal = true;
   }
 
   /**
