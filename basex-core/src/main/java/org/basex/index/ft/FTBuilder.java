@@ -43,7 +43,7 @@ public final class FTBuilder extends IndexBuilder {
     fto.set(FTFlag.ST, meta.stemming);
     fto.cs = meta.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
     fto.sw = new StopWords(data, meta.stopwords);
-    fto.ln = data.meta.language;
+    fto.ln = data.meta.language();
 
     if(!Tokenizer.supportFor(fto.ln))
       throw new BaseXException(NO_TOKENIZER_X, fto.ln);

@@ -408,7 +408,7 @@ public final class FTWords extends FTExpr {
       if(ftOpt.cs != null && md.casesens == (ftOpt.cs == FTCase.INSENSITIVE) ||
           ftOpt.isSet(DC) && md.diacritics != ftOpt.is(DC) ||
           ftOpt.isSet(ST) && md.stemming != ftOpt.is(ST) ||
-          ftOpt.ln != null && !ftOpt.ln.equals(md.language)) return false;
+          ftOpt.ln != null && !ftOpt.ln.equals(md.language())) return false;
       // assign database options
       ftOpt.assign(md);
     }

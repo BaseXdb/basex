@@ -60,7 +60,7 @@ public final class FTOpt extends ExprInfo {
     set(DC, md.diacritics);
     set(ST, md.stemming);
     cs = md.casesens ? FTCase.SENSITIVE : FTCase.INSENSITIVE;
-    ln = md.language;
+    ln = md.language();
     return this;
   }
 

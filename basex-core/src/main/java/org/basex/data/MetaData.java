@@ -84,8 +84,10 @@ public final class MetaData {
   /** Split size for creating indexes. */
   public int splitsize;
 
-  /** Language of full-text search index. */
-  public Language language;
+  /** Language of full-text search index (can be {@code null}). */
+  private Language language;
+  /** Language option, resolved by {@link #language()}. */
+  private String langOption;
 
   /** Indicates if index structures are out-dated. */
   public boolean uptodate = true;
@@ -145,7 +147,7 @@ public final class MetaData {
     maxlen = options.get(MainOptions.MAXLEN);
     maxcats = options.get(MainOptions.MAXCATS);
     stopwords = options.get(MainOptions.STOPWORDS);
-    language = Language.get(options);
+    langOption = options.get(MainOptions.LANGUAGE);
     textinclude = options.get(MainOptions.TEXTINCLUDE);
     attrinclude = options.get(MainOptions.ATTRINCLUDE);
     tokeninclude = options.get(MainOptions.TOKENINCLUDE);
@@ -380,6 +382,29 @@ public final class MetaData {
     }
   }
 
+  /**
+   * Returns the language of the full-text index. The language option is resolved on demand,
+   * as the lookup of all system locales is expensive.
+   * @return language (can be {@code null})
+   */
+  public Language language() {
+    if(langOption != null) {
+      final Language ln = Language.get(langOption);
+      language = ln != null ? ln : Language.get("en");
+      langOption = null;
+    }
+    return language;
+  }
+
+  /**
+   * Assigns the language of the full-text index.
+   * @param ln language (can be {@code null})
+   */
+  public void language(final Language ln) {
+    language = ln;
+    langOption = null;
+  }
+
   // CLASS METHODS ================================================================================
 
   /**
@@ -398,7 +423,7 @@ public final class MetaData {
         case IDBSTR -> istorage = v;
         case DBFNAME -> original = v;
         case DBFTSW -> stopwords = v;
-        case DBFTLN -> language = Language.get(v);
+        case DBFTLN -> language(Language.get(v));
         case DBSIZE -> size = toInt(v);
         case DBNDOCS -> ndocs = toInt(v);
         case DBMAXLEN -> maxlen = toInt(v);
@@ -473,7 +498,8 @@ public final class MetaData {
     writeInfo(out, DBMAXCATS,  maxcats);
     writeInfo(out, DBUPTODATE, uptodate);
     writeInfo(out, DBLASTID,   lastid);
-    if(language != null) writeInfo(out, DBFTLN, language.toString());
+    final Language ln = language();
+    if(ln != null) writeInfo(out, DBFTLN, ln.toString());
     out.write(0);
   }
 

@@ -52,7 +52,7 @@ public final class CreateIndex extends ACreate {
         data.meta.stemming = options.get(MainOptions.STEMMING);
         data.meta.casesens = options.get(MainOptions.CASESENS);
         data.meta.diacritics = options.get(MainOptions.DIACRITICS);
-        data.meta.language = Language.get(options);
+        data.meta.language(Language.get(options));
         data.meta.stopwords = options.get(MainOptions.STOPWORDS);
       }
       default -> {

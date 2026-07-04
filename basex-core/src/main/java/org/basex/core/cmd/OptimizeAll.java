@@ -101,7 +101,7 @@ public final class OptimizeAll extends ACreate {
     options.set(MainOptions.STEMMING, ometa.stemming);
     options.set(MainOptions.CASESENS, ometa.casesens);
     options.set(MainOptions.DIACRITICS, ometa.diacritics);
-    options.set(MainOptions.LANGUAGE, ometa.language.toString());
+    options.set(MainOptions.LANGUAGE, ometa.language().toString());
     options.set(MainOptions.STOPWORDS, ometa.stopwords);
     // adopt original index options
     options.set(MainOptions.MAXLEN, ometa.maxlen);

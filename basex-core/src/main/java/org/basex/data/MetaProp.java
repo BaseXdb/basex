@@ -118,7 +118,7 @@ public enum MetaProp {
   /** Property. */
   LANGUAGE(true) {
     @Override
-    public String value(final MetaData meta) { return meta.language.toString(); }
+    public String value(final MetaData meta) { return meta.language().toString(); }
   },
   /** Property. */
   STEMMING(true) {

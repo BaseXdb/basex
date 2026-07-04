@@ -91,7 +91,7 @@ public final class DBOptimize extends DBUpdate {
     final boolean rebuildToken = !meta.tokeninclude.equals(tokeninclude);
     final boolean rebuildFt = !meta.ftinclude.equals(ftinclude) || rebuild ||
         stemming != meta.stemming || casesens != meta.casesens || diacritics != meta.diacritics ||
-        !language.equals(meta.language) || !stopwords.equals(meta.stopwords);
+        !language.equals(meta.language()) || !stopwords.equals(meta.stopwords);
 
     // assign options to meta data
     meta.createtext = options.get(MainOptions.TEXTINDEX);
@@ -110,7 +110,7 @@ public final class DBOptimize extends DBUpdate {
     meta.stemming   = stemming;
     meta.casesens   = casesens;
     meta.diacritics = diacritics;
-    meta.language   = language;
+    meta.language(language);
     meta.stopwords  = stopwords;
 
     try {
