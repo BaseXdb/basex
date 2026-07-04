@@ -1351,6 +1351,8 @@ public enum QueryError {
   /** Error code. */
   NSAXIS(XQST, 134, "Namespace axis is not supported."),
   /** Error code. */
+  TYPECYCLE_X(XQST, 140, "Cyclic type declaration: %."),
+  /** Error code. */
   DUPLTYPE_X(XQST, 146, "Duplicate declaration of type %."),
   /** Error code. */
   PARAMOPTIONAL_X(XQST, 148, "Parameter must be declared as optional: $%."),

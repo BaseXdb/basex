@@ -131,6 +131,8 @@ public final class QueryContext extends Job implements Closeable {
 
   /** Public types of all parsed modules (for resolving cross-module references). */
   public final QNmMap<SeqType> namedTypes = new QNmMap<>();
+  /** Type names referenced by each declared item type (for detecting cyclic declarations). */
+  public final QNmMap<QNmSet> typeDeps = new QNmMap<>();
   /** Type references that could not be resolved within their module (resolved after parsing). */
   public final ArrayList<TypeRef> deferredTypeRefs = new ArrayList<>();
 

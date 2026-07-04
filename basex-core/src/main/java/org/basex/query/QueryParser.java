@@ -88,6 +88,8 @@ public class QueryParser extends InputParser {
   private final ArrayList<TypeRef> deferredMapKeys = new ArrayList<>();
   /** Cast target types referencing a named type; resolved and validated after parsing. */
   private final ArrayList<TypeRef> deferredCastTargets = new ArrayList<>();
+  /** Type names referenced by the item type that is currently parsed; {@code null} otherwise. */
+  private QNmSet currentTypeDeps;
   /** Options. */
   private final QNmMap<String> options = new QNmMap<>();
 
@@ -268,6 +270,25 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Checks if a declared item type can be reached again from its own references, following only
+   * references that are themselves declared item types (record types may be recursive). The
+   * dependency graph is global, so cyclic declarations across module boundaries are detected too.
+   * @param name item type whose references are inspected
+   * @param target item type to be reached
+   * @param visited already visited item types
+   * @return result of check
+   */
+  private boolean cyclic(final QNm name, final QNm target, final QNmSet visited) {
+    final QNmSet refs = qc.typeDeps.get(name);
+    if(refs != null) {
+      for(final QNm ref : refs) {
+        if(ref.eq(target) || visited.add(ref) && cyclic(ref, target, visited)) return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Resolves references to named types against the types declared in the current module. References
    * that cannot be resolved locally are deferred until all modules have been parsed.
    * @throws QueryException query exception
@@ -307,6 +328,10 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void resolveDeferredTypeRefs() throws QueryException {
+    // reject cyclic or self-referential item type declarations (single- and cross-module)
+    for(final QNm name : qc.typeDeps) {
+      if(cyclic(name, name, new QNmSet())) throw error(TYPECYCLE_X, name.string());
+    }
     for(final TypeRef ref : qc.deferredTypeRefs) {
       if(ref.resolved()) continue;
       final SeqType st = qc.namedTypes.get(ref.name());
@@ -1026,7 +1051,12 @@ public class QueryParser extends InputParser {
     if(declaredTypes.contains(qn)) throw error(DUPLTYPE_X, qn.string());
     if(NSGlobal.reserved(qn.uri())) throw error(TYPERESERVED_X, qn.string());
     wsCheck(AS);
+    // collect referenced type names to detect cyclic or self-referential declarations
+    final QNmSet refs = new QNmSet();
+    currentTypeDeps = refs;
     final SeqType st = itemType();
+    currentTypeDeps = null;
+    qc.typeDeps.put(qn, refs);
     if(!anns.contains(Annotation.PRIVATE)) {
       if(sc.module != null && !eq(qn.uri(), sc.module.uri())) throw error(MODULENS_X, qn);
       publicTypes.put(qn, st);
@@ -3624,6 +3654,8 @@ public class QueryParser extends InputParser {
       type = BasicType.get(name, false);
       // declared type
       if(type == null) {
+        // record dependency on a named type (for detecting cyclic type declarations)
+        if(currentTypeDeps != null) currentTypeDeps.add(name);
         st = declaredTypes.get(name);
         if(st == null) {
           TypeRef ref = typeRefs.get(name);
