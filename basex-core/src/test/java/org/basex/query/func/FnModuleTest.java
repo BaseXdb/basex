@@ -1244,6 +1244,26 @@ public final class FnModuleTest extends SandboxTest {
     query("declare default collation 'http://basex.org/collation?lang=en;strength=primary'; " +
         func.args(" 1 to 5", "a", " fn($r, $v) { if($r = 'A') then 'A' else 'z' }"), "A");
 
+    // early exits: recognized patterns terminate despite the huge input
+    query(func.args(" 1 to 1000000000", 0,
+        " fn($r, $v) { if($r >= 10) then $r else $r + $v }"), 10);
+    query(func.args(" 1 to 1000000000", 0,
+        " fn($r, $v) { if($r < 10) then $r + $v else $r }"), 10);
+    query(func.args(" 1 to 1000000000", " false()",
+        " fn($r, $v) { $r or $v = 5 }"), true);
+    query(func.args(" 1 to 1000000000", " true()",
+        " fn($r, $v) { $r and $v < 5 }"), false);
+    query(func.args(" 1 to 1000000000", " false()",
+        " fn($r, $v) { $r or $v mod 7 = 6 or $v = 3 }"), true);
+    query(func.args(" 1 to 1000000000", " false()",
+        " fn($r, $v) { $v = 300 or $r or $v mod 7 = 6 }"), true);
+    query(func.args(" 1 to 1000000000", " true()",
+        " fn($r, $v) { $v != 0 and $r and $v < 5 }"), false);
+    query(func.args(" 1 to 1000000000", " ()",
+        " fn($r, $v) { $r otherwise $v[. = 5] }"), 5);
+    query(func.args(" 1 to 1000000000", " ()",
+        " fn($r, $v) { $r otherwise $v[. = 5] otherwise $v[. = 3] }"), 3);
+
     check(func.args(" ()", " ()", " function($a, $b) { $b }"), "", empty());
 
     check(func.args(" 1 to 10", " xs:byte(1)", " function($n, $_) {" +
@@ -1310,6 +1330,12 @@ public final class FnModuleTest extends SandboxTest {
 
     // early exits: check the exit condition before the first call
     query(func.args(" 1 to 5", 100, " fn($v, $r) { if($r >= 10) then $r else $r + $v }"), 100);
+
+    // early exits: recognized patterns terminate despite the huge input
+    query(func.args(" 1 to 1000000000", 0,
+        " fn($v, $r) { if($r >= 10) then $r else $r + $v }"), 1000000000);
+    query(func.args(" 1 to 1000000000", " ()",
+        " fn($v, $r) { $r otherwise $v[. mod 2 = 1] }"), 999999999);
 
     check(func.args(" ()", " ()", " function($a, $b) { $a }"), "", empty());
 

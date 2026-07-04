@@ -298,11 +298,27 @@ public final class FuncItem extends FItem implements Scope {
           }
         }
       } else if(init.seqType().eq(Types.BOOLEAN_O) && expr instanceof final Logical logical &&
-          !expr.has(Flag.NDT) && (ref1 || ref2)) {
+          !expr.has(Flag.NDT)) {
         // $result or  ACTION → exit on boolean($result)
         // $result and ACTION → exit on not($result)
-        exit = cc.function(logical instanceof Or ? BOOLEAN : NOT, info, ref1 ? expr1 : expr2);
-        action = cc.function(BOOLEAN, info, ref1 ? expr2 : expr1);
+        final ExprList list = new ExprList(logical.exprs.length - 1);
+        Expr ref = null;
+        for(final Expr op : logical.exprs) {
+          if(ref == null && isRef.test(op, result)) ref = op;
+          else list.add(op);
+        }
+        if(ref != null && !list.isEmpty()) {
+          final boolean or = logical instanceof Or;
+          exit = cc.function(or ? BOOLEAN : NOT, info, ref);
+          action = list.size() == 1 ? cc.function(BOOLEAN, info, list.peek()) :
+            (or ? new Or(info, list.finish()) : new And(info, list.finish())).optimize(cc);
+        }
+      } else if(expr instanceof final Otherwise otherwise &&
+          isRef.test(otherwise.exprs[0], result)) {
+        // $result otherwise ACTION → exit on exists($result)
+        final Expr[] ops = otherwise.exprs;
+        exit = cc.function(EXISTS, info, ops[0]);
+        action = new Otherwise(info, Arrays.copyOfRange(ops, 1, ops.length)).optimize(cc);
       }
 
       if(exit != null) {

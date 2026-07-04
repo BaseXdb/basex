@@ -121,6 +121,12 @@ public final class ArrayModuleTest extends SandboxTest {
     query(func.args(" [ 1, 2 ]", 0, " function($a, $b) { $a + $b }"), 3);
     query(func.args(" array { 1 to 6 }", "ok", " fn($r, $i, $p) { $r[$i = $p] }"), "ok");
     query(func.args(" array { 2 to 7 }", "-", " fn($r, $i, $p) { $r[$i = $p] }"), "");
+
+    // early exits: recognized patterns
+    query(func.args(" array { 1 to 100 }", 0,
+        " fn($r, $v) { if($r >= 10) then $r else $r + $v }"), 10);
+    query(func.args(" array { 1 to 100 }", " ()",
+        " fn($r, $v) { $r otherwise $v[. = 42] }"), 42);
   }
 
   /** Test method. */
@@ -133,6 +139,10 @@ public final class ArrayModuleTest extends SandboxTest {
     // early exits: check the exit condition before the first call
     query(func.args(" array { 1 to 5 }", 100,
         " fn($v, $r) { if($r >= 10) then $r else $r + $v }"), 100);
+
+    // early exits: recognized patterns
+    query(func.args(" array { 1 to 100 }", " ()",
+        " fn($v, $r) { $r otherwise $v[. = 42] }"), 42);
   }
 
   /** Test method. */

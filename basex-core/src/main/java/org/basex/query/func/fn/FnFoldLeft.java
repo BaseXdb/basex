@@ -111,7 +111,10 @@ public class FnFoldLeft extends StandardFunc {
     if(action instanceof final FuncItem fiAction && exitOrAction == null) {
       final Object fold = fiAction.fold(input, init, left, array, cc);
       if(fold instanceof final Expr expr) return expr;
-      if(fold instanceof final FuncItem[] fi) exitOrAction = fi;
+      if(fold instanceof final FuncItem[] fi) {
+        exitOrAction = fi;
+        cc.info(QueryText.OPTEXIT_X, this);
+      }
     }
     if(action instanceof FuncItem || action instanceof Closure) {
       final SeqType i1t = array ? ist.type instanceof final ArrayType at ? at.valueType() :
