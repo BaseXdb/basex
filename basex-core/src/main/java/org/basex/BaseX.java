@@ -31,8 +31,6 @@ public class BaseX extends CLI {
   private IntList ops;
   /** Command arguments. */
   private StringList vals;
-  /** Console mode. May be set to {@code false} during execution. */
-  private volatile boolean console;
 
   /**
    * Main method, launching the standalone mode.
@@ -59,7 +57,7 @@ public class BaseX extends CLI {
     // create session to show optional login request
     session();
 
-    console = true;
+    boolean console = true;
     try {
       // loop through all commands
       final StringBuilder bind = new StringBuilder();
@@ -175,8 +173,7 @@ public class BaseX extends CLI {
 
     // create console reader
     try(ConsoleReader cr = ConsoleReader.get()) {
-      // loop until console is set to false (may happen in server mode)
-      while(console) {
+      while(true) {
         // get next line
         final String in = cr.readLine(PROMPT);
         // end of input: break loop
@@ -187,7 +184,7 @@ public class BaseX extends CLI {
         try {
           if(!execute(CommandParser.get(in, context).pwReader(cr))) {
             // show goodbye message if method returns false
-            Util.println(BYE[new Random().nextInt(4)]);
+            Util.println(BYE[new Random().nextInt(BYE.length)]);
             break;
           }
         } catch(final IOException ex) {
@@ -219,12 +216,15 @@ public class BaseX extends CLI {
       if(arg.dash()) {
         ch = arg.next();
         if(ch == 'd') {
-          // activate debug mode
-          Prop.debug = true;
-        } else if(Strings.contains("t", ch) && local() || Strings.contains("bcCiIoOqQrs", ch)) {
+          // toggle debug mode
+          Prop.debug ^= true;
+        } else if(ch == 't' && local() || Strings.contains("bcCiIoOqQs", ch)) {
           // options followed by a string
           v = arg.string();
-        } else if(Strings.contains("Du", ch) && local() || Strings.contains("RvVwWxXz", ch)) {
+        } else if(ch == 'r') {
+          // option followed by a number
+          v = String.valueOf(arg.number());
+        } else if(ch == 'u' && local() || Strings.contains("RvVwWxz", ch)) {
           // toggle options
           v = "";
         } else if(!local()) {
