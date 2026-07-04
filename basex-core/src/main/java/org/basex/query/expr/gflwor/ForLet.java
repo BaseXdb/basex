@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-abstract class ForLet extends Clause {
+abstract sealed class ForLet extends Clause permits For, Let {
   /** Item variable. */
   public Var var;
   /** Bound expression. */

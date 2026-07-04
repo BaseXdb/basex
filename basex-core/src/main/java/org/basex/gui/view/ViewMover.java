@@ -51,11 +51,11 @@ final class ViewMover extends BaseXPanel {
   public void mouseDragged(final MouseEvent e) {
     final ViewPanel view = (ViewPanel) getParent();
     Component comp = view;
-    while(!((comp = comp.getParent()) instanceof ViewContainer));
+    while(!(comp instanceof final ViewContainer container)) comp = comp.getParent();
 
-    final Point a = getLocationOnScreen(), b = comp.getLocationOnScreen();
+    final Point a = getLocationOnScreen(), b = container.getLocationOnScreen();
     final Point c = new Point(a.x - b.x + e.getX(), a.y - b.y + e.getY());
-    ((ViewContainer) comp).dragPanel(view, c);
+    container.dragPanel(view, c);
     move = true;
   }
 
@@ -69,8 +69,8 @@ final class ViewMover extends BaseXPanel {
   public void mouseReleased(final MouseEvent e) {
     if(!move) return;
     Component comp = this;
-    while(!((comp = comp.getParent()) instanceof ViewContainer));
-    ((ViewContainer) comp).dropPanel();
+    while(!(comp instanceof final ViewContainer container)) comp = comp.getParent();
+    container.dropPanel();
     move = false;
     repaint();
   }

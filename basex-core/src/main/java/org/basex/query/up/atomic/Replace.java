@@ -93,18 +93,18 @@ final class Replace extends StructuralUpdate {
         final byte[] trgName = data.name(t, tk);
         if(!eq(srcName, trgName)) valueUpdates.add(Rename.getInstance(data, t, srcName, EMPTY));
         switch(sk) {
-          case Data.ELEM:
+          case Data.ELEM -> {
             // check size of elements
             if(src.attSize(s, sk) != data.attSize(t, tk) || src.size(s, sk) != data.size(t, tk))
               return false;
-            break;
-          case Data.ATTR:
+          }
+          case Data.ATTR -> {
             // check attribute values
             final byte[] av = src.text(s, false);
             if(!eq(data.text(t, false), av))
               valueUpdates.add(UpdateValue.getInstance(data, t, av));
-            break;
-          case Data.PI:
+          }
+          case Data.PI -> {
             // check processing instruction value
             final byte[] srcText = src.text(s, true);
             final byte[] trgText = data.text(t, true);
@@ -114,7 +114,7 @@ final class Replace extends StructuralUpdate {
               substring(trgText, i + 1))) {
               valueUpdates.add(UpdateValue.getInstance(data, t, pv));
             }
-            break;
+          }
         }
       }
     }

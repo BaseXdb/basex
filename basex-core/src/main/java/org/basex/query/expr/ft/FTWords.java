@@ -353,12 +353,10 @@ public final class FTWords extends FTExpr {
     // cache all query tokens in a set (duplicates are removed)
     final TokenSet ts = new TokenSet();
     switch(mode) {
-      case ALL:
-      case ANY:
+      case ALL, ANY -> {
         for(final byte[] token : tokens) ts.add(token);
-        break;
-      case ALL_WORDS:
-      case ANY_WORD:
+      }
+      case ALL_WORDS, ANY_WORD -> {
         final FTOpt opt = ftOpt.copy();
         opt.set(ST, false);
         final FTLexer lexer = new FTLexer(opt);
@@ -366,11 +364,12 @@ public final class FTWords extends FTExpr {
           lexer.init(token);
           while(lexer.hasNext()) ts.add(lexer.nextToken());
         }
-        break;
-      case PHRASE:
+      }
+      case PHRASE -> {
         final TokenBuilder tb = new TokenBuilder();
         for(final byte[] token : tokens) tb.add(token).add(' ');
         ts.add(tb.trim().finish());
+      }
     }
     return ts;
   }
@@ -540,19 +539,11 @@ public final class FTWords extends FTExpr {
       qs.brace(query);
     }
     switch(mode) {
-      case ALL:
-        qs.token(ALL);
-        break;
-      case ALL_WORDS:
-        qs.token(ALL).token(WORDS);
-        break;
-      case ANY_WORD:
-        qs.token(ANY).token(WORD);
-        break;
-      case PHRASE:
-        qs.token(PHRASE);
-        break;
-      default:
+      case ALL -> qs.token(ALL);
+      case ALL_WORDS -> qs.token(ALL).token(WORDS);
+      case ANY_WORD -> qs.token(ANY).token(WORD);
+      case PHRASE -> qs.token(PHRASE);
+      default -> { }
     }
     if(occ != null) qs.token(OCCURS).token(occ[0]).token(TO).token(occ[1]).token(TIMES);
     if(ftOpt != null) qs.token(ftOpt);

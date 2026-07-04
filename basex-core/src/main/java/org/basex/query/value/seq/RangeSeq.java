@@ -171,33 +171,38 @@ public final class RangeSeq extends Seq {
   public Expr optimizePos(final CmpOp op, final CompileContext cc) {
     final long min = min(), max = max();
     switch(op) {
-      case LE:
+      case LE -> {
         // position() <= (-5 to 0) → false()
         // position() <= (3 to 5)  → position() <= 5
         return max <= 0 ? Bln.FALSE : Itr.get(max);
-      case LT:
+      }
+      case LT -> {
         // position() < (-5 to 1) → false()
         // position() < (3 to 5)  → position() < 5
         return max <= 1 ? Bln.FALSE : Itr.get(max);
-      case GE:
+      }
+      case GE -> {
         // position() >= (1 to 5) → true()
         // position() >= (3 to 5) → position() >= 3
         return min <= 1 ? Bln.TRUE : Itr.get(min);
-      case GT:
+      }
+      case GT -> {
         // position() > (0 to 5) → true()
         // position() > (3 to 5) → position() > 3
         return min <= 0 ? Bln.TRUE : Itr.get(min);
-      case EQ:
+      }
+      case EQ -> {
         // position() = (-5 to 0x7FFFFFFFFFFFFFFF) → true()
         // position() = (-5 to 0)                  → false()
         if(min <= 1 && max == Long.MAX_VALUE) return Bln.TRUE;
         if(max <= 0) return Bln.FALSE;
-        break;
-      case NE:
+      }
+      case NE -> {
         // position() != (-5 to 0x7FFFFFFFFFFFFFFF) → false()
         // position() != (-5 to 0)                  → true()
         if(min <= 1 && max == Long.MAX_VALUE) return Bln.FALSE;
         if(max <= 0) return Bln.TRUE;
+      }
     }
     // op: =/!=, max >= 1
     // position() = (-3 to 1) → position() = 1

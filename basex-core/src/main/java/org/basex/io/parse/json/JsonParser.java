@@ -267,25 +267,14 @@ public final class JsonParser {
     LOOP:
     while(true) {
       switch(current) {
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-          tb.add(consume());
-          break;
-        case '.':
-        case 'e':
-        case 'E':
+        case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' -> tb.add(consume());
+        case '.', 'e', 'E' -> {
           break LOOP;
-        default:
+        }
+        default -> {
           skipWs();
           return tb.toArray();
+        }
       }
     }
 
@@ -340,26 +329,13 @@ public final class JsonParser {
       if(cp == '\\') {
         cp = consume();
         switch(cp) {
-          case '\\':
-          case '/':
-          case '"':
-            break;
-          case 'b':
-            cp = '\b';
-            break;
-          case 'f':
-            cp = '\f';
-            break;
-          case 'n':
-            cp = '\n';
-            break;
-          case 'r':
-            cp = '\r';
-            break;
-          case 't':
-            cp = '\t';
-            break;
-          case 'u':
+          case '\\', '/', '"' -> { }
+          case 'b' -> cp = '\b';
+          case 'f' -> cp = '\f';
+          case 'n' -> cp = '\n';
+          case 'r' -> cp = '\r';
+          case 't' -> cp = '\t';
+          case 'u' -> {
             cp = 0;
             for(int i = 0; i < 4; i++) {
               if(!more()) throw eof(", expected four-digit hex value");
@@ -369,9 +345,8 @@ public final class JsonParser {
               else if(cp2 >= 'A' && cp2 <= 'F') cp = 16 * cp + cp2 + 10 - 'A';
               else throw error("Illegal hexadecimal digit: %", currentAsString());
             }
-            break;
-          default:
-            throw error("Unknown character escape: %", currentAsString());
+          }
+          default -> throw error("Unknown character escape: %", currentAsString());
         }
       } else if(!liberal && cp <= 0x1F) {
         throw error("Non-escaped control character: %", CTRL[cp]);
@@ -440,15 +415,11 @@ public final class JsonParser {
   private void skipWs() throws IOException {
     while(more()) {
       switch(current) {
-        case ' ':
-        case '\t':
-        case '\r':
-        case '\n':
-        case '\u00A0': // non-breaking space
-          consume();
-          break;
-        default:
+        // '\u00A0': non-breaking space
+        case ' ', '\t', '\r', '\n', '\u00A0' -> consume();
+        default -> {
           return;
+        }
       }
     }
   }

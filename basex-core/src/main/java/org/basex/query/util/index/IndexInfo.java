@@ -85,8 +85,9 @@ public final class IndexInfo {
     } else if(kind == Kind.ELEMENT) {
       // ensure that addressed elements only have text nodes as children
       // stop if database is unknown/out-dated or if name test is not simple
-      if(data == null || !data.meta.uptodate || !(last.test instanceof NameTest)) return null;
-      test = (NameTest) last.test;
+      if(data == null || !data.meta.uptodate ||
+          !(last.test instanceof final NameTest nt)) return null;
+      test = nt;
 
       // resolve local name for statistics lookup; sound only if its lexical name is unambiguous
       final byte[] local;

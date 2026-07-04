@@ -60,35 +60,36 @@ public class FnSchemaType extends StandardFunc {
         name = BasicType.qname();
         if(BasicType.atomic() != null) matches = Matches.funcItem(BasicType, qc, info);
         switch(BasicType) {
-          case ANY_TYPE:
+          case ANY_TYPE -> {
             baseType = null;
             variety = Variety.mixed;
-            break;
-          case UNTYPED:
+          }
+          case UNTYPED -> {
             baseType = ANY_TYPE;
             variety = Variety.mixed;
-            break;
-          case ANY_SIMPLE_TYPE:
+          }
+          case ANY_SIMPLE_TYPE -> {
             baseType = ANY_TYPE;
             variety = null;
-            break;
-          case ANY_ATOMIC_TYPE:
+          }
+          case ANY_ATOMIC_TYPE -> {
             baseType = ANY_SIMPLE_TYPE;
             variety = Variety.atomic;
-            break;
-          case NUMERIC:
+          }
+          case NUMERIC -> {
             baseType = ANY_SIMPLE_TYPE;
             variety = Variety.union;
             members = TypeAnnotation.funcItem(info, DOUBLE, FLOAT, DECIMAL);
             constructor = true;
-            break;
-          default:
+          }
+          default -> {
             final BasicType parent = BasicType.parent();
             baseType = parent == NUMERIC ? ANY_ATOMIC_TYPE : parent;
             variety = Variety.atomic;
             for(primType = BasicType; !primType.parent().oneOf(ANY_ATOMIC_TYPE, NUMERIC, null);)
               primType = primType.parent();
             constructor = !type.oneOf(QNAME, NOTATION);
+          }
         }
       } else {
         return Empty.VALUE;

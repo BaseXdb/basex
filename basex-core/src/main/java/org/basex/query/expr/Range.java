@@ -109,37 +109,37 @@ public final class Range extends Arr {
 
     final boolean results = mn <= mx;
     switch(op) {
-      case EQ:
+      case EQ -> {
         if(mn <= 1 && mx >= LAST) return Bln.TRUE;
         if(mn > LAST || mx < 1) return Bln.FALSE;
         if(mn < 1) minMax[0] = Itr.ONE;
         if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
         if(mn < LAST && mx >= LAST) minMax[1] = Itr.MAX;
-        break;
-      case NE:
+      }
+      case NE -> {
         if(mn <= 1 && mx >= LAST) return Bln.FALSE;
         if(results && (mn > LAST || mx < 1)) return Bln.TRUE;
         if(mn < 1) minMax[0] = Itr.ONE;
         if(mn == LAST && mx > mn) minMax[1] = cc.function(Function.LAST, info);
         if(mn < LAST && mx >= LAST) minMax[1] = Itr.MAX;
-        break;
-      case LE:
+      }
+      case LE -> {
         if(mx < 1) return Bln.FALSE;
         if(results && mx >= LAST) return Bln.TRUE;
         if(mn < 1) minMax[0] = Itr.ONE;
-        break;
-      case LT:
+      }
+      case LT -> {
         if(mx <= 1) return Bln.FALSE;
         if(results && mx > LAST) return Bln.TRUE;
-        break;
-      case GE:
+      }
+      case GE -> {
         if(mn > LAST) return Bln.FALSE;
         if(results && mx <= 1) return Bln.TRUE;
-        break;
-      case GT:
+      }
+      case GT -> {
         if(mn >= LAST) return Bln.FALSE;
         if(results && mx < 1) return Bln.TRUE;
-        break;
+      }
     }
     if(Arrays.equals(exprs, minMax)) return this;
     final Expr ex = new Range(info, minMax).optimize(cc);

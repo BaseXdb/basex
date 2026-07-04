@@ -158,8 +158,9 @@ public final class GFLWOR extends ParseExpr {
     //   where W return R             → if(W) then R else ()
     //   where W for $f in F return R → if(W) then (for $f in F return R) else ()
     final Expr first = clauses.getFirst();
-    if(first instanceof Where) {
-      return new If(info, ((Where) clauses.removeFirst()).expr, cs == 1 ? rtrn : this).optimize(cc);
+    if(first instanceof final Where where) {
+      clauses.removeFirst();
+      return new If(info, where.expr, cs == 1 ? rtrn : this).optimize(cc);
     }
 
     if(first instanceof final For fr) {
@@ -506,10 +507,8 @@ public final class GFLWOR extends ParseExpr {
       final ListIterator<Clause> iter = clauses.listIterator();
       while(iter.hasNext()) {
         final Clause clause = iter.next();
-        final boolean isFor = clause instanceof For, isLet = clause instanceof Let;
-        if(isFor) {
+        if(clause instanceof final For fr) {
           // for $x in (for $y in A (...) return B) → for $y in A (...) for $x in B
-          final For fr = (For) clause;
           if(!fr.empty && fr.pos == null && fr.expr instanceof final GFLWOR fl && fl.isFLW()) {
             cc.info(QueryText.OPTFLAT_X_X, (Supplier<?>) this::description, fr.var);
             iter.remove();
@@ -520,10 +519,9 @@ public final class GFLWOR extends ParseExpr {
           }
         }
 
-        if(!thisRound && (isFor || isLet)) {
+        if(!thisRound && clause instanceof final ForLet flt) {
           // let $x := (let $y := E return F) → let $y := E let $x := F
-          final Expr expr = isFor ? ((For) clause).expr : ((Let) clause).expr;
-          if(expr instanceof final GFLWOR fl) {
+          if(flt.expr instanceof final GFLWOR fl) {
             final LinkedList<Clause> cls = fl.clauses;
             if(cls.getFirst() instanceof Let) {
               // remove the binding from the outer clauses
@@ -535,8 +533,7 @@ public final class GFLWOR extends ParseExpr {
 
               // re-add the binding with new, reduced expression at the end
               final Expr rest = fl.clauses.isEmpty() ? fl.rtrn : fl.optimize(cc);
-              if(isFor) ((For) clause).expr = rest;
-              else ((Let) clause).expr = rest;
+              flt.expr = rest;
               iter.add(clause);
               thisRound = changed = true;
             }
@@ -621,8 +618,8 @@ public final class GFLWOR extends ParseExpr {
   private boolean optimizeCond(final CompileContext cc, final boolean where) throws QueryException {
     boolean changed = false;
     final java.util.function.Function<Clause, Expr> get = clause ->
-      (where ? clause instanceof Where : clause instanceof While) ?
-        where ? ((Where) clause).expr : ((While) clause).expr : null;
+      where ? clause instanceof final Where wh ? wh.expr : null :
+      clause instanceof final While wl ? wl.expr : null;
     final HashSet<ForLet> optimized = new HashSet<>();
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
@@ -924,8 +921,10 @@ public final class GFLWOR extends ParseExpr {
     for(int c = 0; c < clauses.size(); c++) {
       final Clause clause = clauses.get(c);
       final int ls = list.size();
-      if(where ? clause instanceof Where : clause instanceof While) {
-        list.add(where ? ((Where) clause).expr : ((While) clause).expr);
+      final Expr cond = where ? clause instanceof final Where wh ? wh.expr : null :
+        clause instanceof final While wl ? wl.expr : null;
+      if(cond != null) {
+        list.add(cond);
       } else if(ls > 1) {
         merge.accept(c);
         c -= ls + 1;

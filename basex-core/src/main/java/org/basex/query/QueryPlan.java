@@ -65,14 +65,14 @@ public final class QueryPlan {
     nodes.add(elem);
 
     for(final Object child : children) {
-      if(child instanceof ExprInfo) {
-        ((ExprInfo) child).toXml(this);
-      } else if(child instanceof ExprInfo[]) {
-        for(final ExprInfo ex : (ExprInfo[]) child) {
+      if(child instanceof final ExprInfo ei) {
+        ei.toXml(this);
+      } else if(child instanceof final ExprInfo[] eis) {
+        for(final ExprInfo ex : eis) {
           if(ex != null) ex.toXml(this);
         }
-      } else if(child instanceof byte[]) {
-        elem.text((byte[]) child);
+      } else if(child instanceof final byte[] bytes) {
+        elem.text(bytes);
       } else {
         elem.text(child);
       }
@@ -105,8 +105,8 @@ public final class QueryPlan {
     }
     if(expr instanceof final Expr ex) {
       attachType(elem, ex.seqType(), ex.size(), ex.structSize(), ex.data());
-    } else if(expr instanceof StaticDecl) {
-      attachType(elem, ((StaticDecl) expr).seqType(), -1, -1, null);
+    } else if(expr instanceof final StaticDecl sd) {
+      attachType(elem, sd.seqType(), -1, -1, null);
     }
     final InputInfo info = expr.info();
     if(info != null) attach(elem, info);

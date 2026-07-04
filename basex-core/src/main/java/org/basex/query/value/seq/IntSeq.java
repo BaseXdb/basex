@@ -128,28 +128,30 @@ public final class IntSeq extends NativeSeq {
 
   @Override
   public Object toJava() {
-    switch((BasicType) type) {
-      case BYTE:
+    return switch((BasicType) type) {
+      case BYTE -> {
         final ByteList bl = new ByteList((int) size);
         for(final int value : values) bl.add((byte) value);
-        return bl.finish();
-      case SHORT:
-      case UNSIGNED_BYTE:
+        yield bl.finish();
+      }
+      case SHORT, UNSIGNED_BYTE -> {
         final ShortList sl = new ShortList((int) size);
         for(final int value : values) sl.add((short) value);
-        return sl.finish();
-      case UNSIGNED_SHORT:
+        yield sl.finish();
+      }
+      case UNSIGNED_SHORT -> {
         final char[] chars = new char[(int) size];
         int c = 0;
         for(final int value : values) chars[c++] = (char) value;
-        return chars;
-      case INT:
-        return values;
-      default:
+        yield chars;
+      }
+      case INT -> values;
+      default -> {
         final LongList il = new LongList((int) size);
         for(final int value : values) il.add(value);
-        return il.finish();
-    }
+        yield il.finish();
+      }
+    };
   }
 
   @Override

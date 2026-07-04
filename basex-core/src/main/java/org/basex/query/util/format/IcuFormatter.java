@@ -263,18 +263,17 @@ public final class IcuFormatter extends Formatter {
    */
   private String ruleSet(final NumeralType numType) {
     switch(numType) {
-      case ORDINAL:
+      case ORDINAL -> {
         if(ruleSetNames.contains(ICU_SPELLOUT_ORDINAL)) return ICU_SPELLOUT_ORDINAL;
         if(ruleSetNames.contains(ICU_SPELLOUT_ORDINAL_NEUTER)) return ICU_SPELLOUT_ORDINAL_NEUTER;
         for(final String r : ruleSetNames) if(r.startsWith(ICU_SPELLOUT_ORDINAL)) return r;
-        break;
-      case CARDINAL:
+      }
+      case CARDINAL -> {
         if(ruleSetNames.contains(ICU_SPELLOUT_CARDINAL)) return ICU_SPELLOUT_CARDINAL;
         if(ruleSetNames.contains(ICU_SPELLOUT_CARDINAL_NEUTER)) return ICU_SPELLOUT_CARDINAL_NEUTER;
         for(final String r : ruleSetNames) if(r.startsWith(ICU_SPELLOUT_CARDINAL)) return r;
-        break;
-      default:
-        break;
+      }
+      default -> { }
     }
     return null;
   }

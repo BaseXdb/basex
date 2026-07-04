@@ -225,38 +225,27 @@ public final class BaseXServer extends CLI implements Runnable {
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
-          case 'c': // database command
-            commands.add(commands(arg.string()));
-            break;
-          case 'C': // command script
-            commands.add(script(arg.string()));
-            break;
-          case 'd': // activate debug mode
-            Prop.debug = true;
-            break;
-          case 'D': // hidden flag: daemon mode
-            daemon = true;
-            break;
-          case 'n': // parse host the server is bound to
-            context.soptions.set(StaticOptions.SERVERHOST, arg.string());
-            break;
-          case 'p': // parse server port
-            context.soptions.set(StaticOptions.SERVERPORT, arg.number());
-            break;
-          case 'q': // quiet flag (hidden)
-            quiet = true;
-            break;
-          case 'v': // verbose flag
-            verbose = true;
-            break;
-          case 'S': // set service flag
-            service = !daemon;
-            break;
-          case 'z': // suppress logging
-            context.soptions.set(StaticOptions.LOG, "");
-            break;
-          default:
-            throw arg.usage();
+          // database command
+          case 'c' -> commands.add(commands(arg.string()));
+          // command script
+          case 'C' -> commands.add(script(arg.string()));
+          // activate debug mode
+          case 'd' -> Prop.debug = true;
+          // hidden flag: daemon mode
+          case 'D' -> daemon = true;
+          // parse host the server is bound to
+          case 'n' -> context.soptions.set(StaticOptions.SERVERHOST, arg.string());
+          // parse server port
+          case 'p' -> context.soptions.set(StaticOptions.SERVERPORT, arg.number());
+          // quiet flag (hidden)
+          case 'q' -> quiet = true;
+          // verbose flag
+          case 'v' -> verbose = true;
+          // set service flag
+          case 'S' -> service = !daemon;
+          // suppress logging
+          case 'z' -> context.soptions.set(StaticOptions.LOG, "");
+          default -> throw arg.usage();
         }
       } else if(S_STOP.equalsIgnoreCase(arg.string())) {
         stop = true;

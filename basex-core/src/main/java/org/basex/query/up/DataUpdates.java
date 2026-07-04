@@ -69,8 +69,8 @@ final class DataUpdates {
    * @throws QueryException query exception
    */
   void add(final DataUpdate up, final MemData tmp) throws QueryException {
-    if(up instanceof NodeUpdate) {
-      for(final NodeUpdate nodeUp : ((NodeUpdate) up).substitute(tmp)) {
+    if(up instanceof final NodeUpdate nu) {
+      for(final NodeUpdate nodeUp : nu.substitute(tmp)) {
         nodeUpdates.computeIfAbsent(nodeUp.pre, NodeUpdates::new).add(nodeUp);
       }
     } else if(up instanceof final Put p) {

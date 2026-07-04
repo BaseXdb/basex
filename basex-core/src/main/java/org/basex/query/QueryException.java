@@ -112,8 +112,8 @@ public class QueryException extends Exception {
     this.name = name;
     if(info != null) info(info);
     for(final Object o : ext) {
-      if(o instanceof Throwable) {
-        initCause((Throwable) o);
+      if(o instanceof final Throwable th) {
+        initCause(th);
         break;
       }
     }

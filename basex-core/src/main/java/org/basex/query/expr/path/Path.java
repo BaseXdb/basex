@@ -461,42 +461,33 @@ public abstract class Path extends ParseExpr {
     for(final Expr expr : steps) {
       final Step step = (Step) expr;
       switch(step.axis) {
-        case ATTRIBUTE:
-        case SELF:
+        case ATTRIBUTE, SELF -> {
           // nothing changes
-          break;
-        case PARENT:
-        case FOLLOWING_SIBLING:
-        case FOLLOWING_SIBLING_OR_SELF:
+        }
+        case PARENT, FOLLOWING_SIBLING, FOLLOWING_SIBLING_OR_SELF -> {
           // can overlap, preserves level
           if(!atMostOne) return false;
-          break;
-        case CHILD:
+        }
+        case CHILD -> {
           // order is only ensured if all nodes are on the same level
           if(!sameDepth) return false;
-          break;
-        case DESCENDANT:
-        case DESCENDANT_OR_SELF:
+        }
+        case DESCENDANT, DESCENDANT_OR_SELF -> {
           // non-overlapping if all nodes are on the same level
           if(!sameDepth) return false;
           sameDepth = false;
-          break;
-        case ANCESTOR:
-        case ANCESTOR_OR_SELF:
-        case PRECEDING:
-        case PRECEDING_OR_SELF:
-        case PRECEDING_SIBLING:
-        case PRECEDING_SIBLING_OR_SELF:
+        }
+        case ANCESTOR, ANCESTOR_OR_SELF, PRECEDING, PRECEDING_OR_SELF, PRECEDING_SIBLING,
+             PRECEDING_SIBLING_OR_SELF -> {
           // backwards axes must be reordered
           return false;
-        case FOLLOWING:
-        case FOLLOWING_OR_SELF:
+        }
+        case FOLLOWING, FOLLOWING_OR_SELF -> {
           // can overlap
           if(!atMostOne) return false;
           sameDepth = false;
-          break;
-        default:
-          throw Util.notExpected();
+        }
+        default -> throw Util.notExpected();
       }
       atMostOne &= step.seqType().zeroOrOne();
     }

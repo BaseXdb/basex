@@ -619,29 +619,27 @@ public abstract class Data {
       }
 
       switch(sKind) {
-        case DOC:
+        case DOC -> {
           // add document
           doc(sSize, sData.text(sPre, true));
           ++meta.ndocs;
-          break;
-        case ELEM:
+        }
+        case ELEM -> {
           // add element
           final byte[] en = sData.name(sPre, sKind);
           elem(cDist, elemNames.put(en), sData.attSize(sPre, sKind), sSize,
               nspaces.uriIdForPrefix(prefix(en), true), false);
-          break;
-        case TEXT:
-        case COMM:
-        case PI:
+        }
+        case TEXT, COMM, PI ->
           // add text
           text(cDist, sData.text(sPre, true), sKind);
-          break;
-        case ATTR:
+        case ATTR -> {
           // add attribute
           final byte[] an = sData.name(sPre, sKind);
           attr(cDist, attrNames.put(an), sData.text(sPre, false),
               nspaces.uriIdForPrefix(prefix(an), false));
-          break;
+        }
+        default -> { }
       }
     }
 
@@ -787,27 +785,23 @@ public abstract class Data {
       nsScope.loop(nsPre, c);
 
       switch(sKind) {
-        case DOC:
+        case DOC -> {
           // add document
           nsScope.open(nPre);
           doc(sSize, sdata.text(sPre, true));
           ++meta.ndocs;
-          break;
-        case ELEM: {
+        }
+        case ELEM -> {
           // add element.
           final boolean nsFlag = nsScope.open(nPre, sdata.namespaces(sPre));
           final byte[] name = sdata.name(sPre, sKind);
           elem(nDist, elemNames.put(name), sdata.attSize(sPre, sKind), sSize,
               nspaces.uriIdForPrefix(prefix(name), true), nsFlag);
-          break;
         }
-        case TEXT:
-        case COMM:
-        case PI:
+        case TEXT, COMM, PI ->
           // add text, comment or processing instruction
           text(nDist, sdata.text(sPre, true), sKind);
-          break;
-        case ATTR:
+        case ATTR -> {
           // add attribute
           final byte[] name = sdata.name(sPre, sKind);
           int uriId = sdata.uriId(sPre, sKind);
@@ -821,6 +815,8 @@ public abstract class Data {
             }
           }
           attr(nDist, attrNames.put(name), sdata.text(sPre, false), uriId);
+        }
+        default -> { }
       }
       nsScope.shift(1);
     }

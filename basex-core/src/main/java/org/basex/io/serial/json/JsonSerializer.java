@@ -239,41 +239,39 @@ public abstract class JsonSerializer extends StandardSerializer {
   protected final void print(final int cp) throws IOException {
     if(escape) {
       switch(cp) {
-        case '\b':
+        case '\b' -> {
           out.print('\\');
           out.print('b');
-          break;
-        case '\f':
+        }
+        case '\f' -> {
           out.print('\\');
           out.print('f');
-          break;
-        case '\n':
+        }
+        case '\n' -> {
           out.print('\\');
           out.print('n');
-          break;
-        case '\r':
+        }
+        case '\r' -> {
           out.print('\\');
           out.print('r');
-          break;
-        case '\t':
+        }
+        case '\t' -> {
           out.print('\\');
           out.print('t');
-          break;
-        case '"' :
+        }
+        case '"' -> {
           out.print('\\');
           out.print('"');
-          break;
-        case '/' :
+        }
+        case '/' -> {
           if(escapeSolidus) out.print('\\');
           out.print('/');
-          break;
-        case '\\':
+        }
+        case '\\' -> {
           out.print('\\');
           out.print('\\');
-          break;
-        default:
-          out.print(cp, fallback);
-          break;
+        }
+        default -> out.print(cp, fallback);
       }
     } else {
       out.print(cp, fallback);

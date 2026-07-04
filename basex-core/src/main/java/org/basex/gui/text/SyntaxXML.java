@@ -92,16 +92,20 @@ public final class SyntaxXML extends Syntax {
   private Color comment(final int ch) {
     switch(comment) {
       // "<!", "<!-"
-      case 1:
-      case 2: comment = ch == '-' ? comment + 1 : 6; break;
+      case 1, 2 -> comment = ch == '-' ? comment + 1 : 6;
       // "<!--"
-      case 3: if(ch == '-') comment = 4; break;
+      case 3 -> {
+        if(ch == '-') comment = 4;
+      }
       // "<!-- ... -"
-      case 4: comment = ch == '-' ? comment + 1 : 3; break;
+      case 4 -> comment = ch == '-' ? comment + 1 : 3;
       // "<!-- ... --"
-      case 5: comment = ch == '>' ? 0 : 3; break;
+      case 5 -> comment = ch == '>' ? 0 : 3;
       // "<! ... >"
-      case 6: if(ch == '>') comment = 0; break;
+      case 6 -> {
+        if(ch == '>') comment = 0;
+      }
+      default -> { }
     }
     return comment > 0 ? cyan : blue;
   }
@@ -114,9 +118,12 @@ public final class SyntaxXML extends Syntax {
   private Color pi(final int ch) {
     switch(pi) {
       // "<?"
-      case 1: if(ch == '?') pi = 2; break;
+      case 1 -> {
+        if(ch == '?') pi = 2;
+      }
       // "<!? ... ?"
-      case 2: pi = ch == '>' ? 0 : 1; break;
+      case 2 -> pi = ch == '>' ? 0 : 1;
+      default -> { }
     }
     return pi > 0 ? cyan : blue;
   }

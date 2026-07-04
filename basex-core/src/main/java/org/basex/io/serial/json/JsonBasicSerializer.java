@@ -76,7 +76,8 @@ public final class JsonBasicSerializer extends JsonSerializer {
           final Boolean b = Bln.parse(av);
           if(b == null) throw error("Value of '%' attribute is invalid: '%'.", an, av);
           escaped = b;
-        } else {
+        } else if(level > 0 || !eq(an, ESCAPED) && !eq(an, ESCAPED_KEY)) {
+          // ignore escaped and escaped-key attributes on the top-level element
           throw error("Element '%' has invalid attribute: %.", local, an);
         }
       }
@@ -305,7 +306,7 @@ public final class JsonBasicSerializer extends JsonSerializer {
         if(!tp.more()) throw ESCAPE_JSON_X.getIO(value);
         cp = tp.next();
         switch(cp) {
-          case 'u':
+          case 'u' -> {
             cp = 0;
             for(int i = 0; i < 4; i++) {
               if(!tp.more()) throw ESCAPE_JSON_X.getIO(value);
@@ -315,21 +316,14 @@ public final class JsonBasicSerializer extends JsonSerializer {
               cp = (cp << 4) + c - (c >= 0x61 ? 0x57 : c >= 0x41 ? 0x37 : 0x30);
             }
             tb.add(cp);
-            break;
-          case '"': case '\\': case '/':
-            tb.add(cp); break;
-          case 'b':
-            tb.add('\b'); break;
-          case 'f':
-            tb.add('\f'); break;
-          case 'n':
-            tb.add('\n'); break;
-          case 'r':
-            tb.add('\r'); break;
-          case 't':
-            tb.add('\t'); break;
-          default:
-            throw ESCAPE_JSON_X.getIO(value);
+          }
+          case '"', '\\', '/' -> tb.add(cp);
+          case 'b' -> tb.add('\b');
+          case 'f' -> tb.add('\f');
+          case 'n' -> tb.add('\n');
+          case 'r' -> tb.add('\r');
+          case 't' -> tb.add('\t');
+          default -> throw ESCAPE_JSON_X.getIO(value);
         }
       } else {
         tb.add(cp);

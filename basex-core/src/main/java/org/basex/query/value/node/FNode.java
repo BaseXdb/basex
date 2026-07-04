@@ -106,20 +106,15 @@ public abstract class FNode extends XNode {
       final Node child = ch.item(c);
 
       switch(child.getNodeType()) {
-        case Node.TEXT_NODE:
+        case Node.TEXT_NODE ->
           builder.node(new FTxt((Text) child));
-          break;
-        case Node.COMMENT_NODE:
+        case Node.COMMENT_NODE ->
           builder.node(new FComm((Comment) child));
-          break;
-        case Node.PROCESSING_INSTRUCTION_NODE:
+        case Node.PROCESSING_INSTRUCTION_NODE ->
           builder.node(new FPI((ProcessingInstruction) child));
-          break;
-        case Node.ELEMENT_NODE:
+        case Node.ELEMENT_NODE ->
           builder.node(FElem.build((Element) child, nsMap).finish());
-          break;
-        default:
-          break;
+        default -> { }
       }
     }
   }

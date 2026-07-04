@@ -137,8 +137,8 @@ public final class AtomicUpdateCache {
       return;
     }
 
-    if(candidate instanceof StructuralUpdate && recentStruct != null) {
-      ((StructuralUpdate) candidate).accumulatedShifts += recentStruct.accumulatedShifts();
+    if(candidate instanceof final StructuralUpdate su && recentStruct != null) {
+      su.accumulatedShifts += recentStruct.accumulatedShifts();
     }
 
     // prepare & optimize incoming update

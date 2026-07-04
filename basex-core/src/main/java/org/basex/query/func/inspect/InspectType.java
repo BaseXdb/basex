@@ -45,15 +45,13 @@ public final class InspectType extends StandardFunc {
     final SeqType et = arg(0).seqType();
     SeqType st = input.seqType();
     switch(mode) {
-      case EXPRESSION:
-        st = et;
-        break;
-      case VALUE:
-        break;
-      default:
+      case EXPRESSION -> st = et;
+      case VALUE -> { }
+      default -> {
         // compare refined with original type, which may be more specific (e.g. for node types)
         input.refineType();
         if(et.instanceOf(st)) st = et;
+      }
     }
     return Str.get((item ? st.with(Occ.EXACTLY_ONE) : st).toString());
   }

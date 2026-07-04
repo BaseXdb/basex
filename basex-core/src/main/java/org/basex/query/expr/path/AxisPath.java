@@ -57,11 +57,10 @@ public abstract class AxisPath extends Path {
 
     final PathCache cache = qc.threads.get(this).get();
     switch(cache.state) {
-      case INIT:
+      case INIT ->
         // first invocation: find out if caching is possible
         cache.init(value, this);
-        break;
-      case ENABLED:
+      case ENABLED -> {
         // second invocation (ready for caching): cache result
         if(cache.valid(value)) {
           cache.cache(nodes(qc));
@@ -69,14 +68,14 @@ public abstract class AxisPath extends Path {
           // disable caching otherwise (expected to change frequently)
           cache.disable();
         }
-        break;
-      case CACHED:
+      }
+      case CACHED -> {
         // further invocations (result is cached): cache again if context has changed
         if(!cache.valid(value)) {
           cache.update(value, nodes(qc));
         }
-        break;
-      case DISABLED:
+      }
+      case DISABLED -> { }
     }
     return cache.result;
   }

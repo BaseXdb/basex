@@ -181,24 +181,25 @@ public abstract class StandardFunc extends Arr {
   public final boolean has(final Flag... flags) {
     for(final Flag flag : flags) {
       switch(flag) {
-        case HOF:
+        case HOF -> {
           if(hofOffsets() > 0) return true;
           continue;
-        case UPD:
+        }
+        case UPD -> {
           if(hasUPD()) return true;
-          break;
-        case CTX:
+        }
+        case CTX -> {
           if(hasCTX()) return true;
-          break;
-        case NDT:
+        }
+        case NDT -> {
           // check whether function arguments may contain non-deterministic code
           final int hof = hofOffsets(), al = args().length;
           for(int a = 0; a < al; a++) {
             if((hof & 1 << a) != 0 && (!(arg(a) instanceof final Item item) ||
                 !(item instanceof final FuncItem fi) || fi.ndt())) return true;
           }
-          break;
-        default:
+        }
+        default -> { }
       }
       if(definition.has(flag)) return true;
     }

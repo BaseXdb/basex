@@ -1173,12 +1173,11 @@ public enum BasicType implements Type {
     if(value instanceof final Value val) {
       if(val.size() != 1) throw typeError(val, this, info);
       item = (Item) val;
-    } else if(value instanceof Double || value instanceof Float) {
-      item = Dbl.get(((Number) value).doubleValue());
-    } else if(value instanceof Number) {
-      item = Itr.get(((Number) value).longValue());
-    } else if(value instanceof Character) {
-      item = Itr.get((char) value);
+    } else if(value instanceof final Number num) {
+      item = num instanceof Double || num instanceof Float ? Dbl.get(num.doubleValue()) :
+        Itr.get(num.longValue());
+    } else if(value instanceof final Character ch) {
+      item = Itr.get(ch);
     } else {
       item = Str.get(token(value));
     }

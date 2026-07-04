@@ -42,9 +42,9 @@ public final class FnSort extends FnSortBy {
     } else if(!defined(1)) {
       if(st.zeroOrOne() && st.type.isSortable()) {
         return input;
-      } else if(input instanceof Value) {
-        final Value value = quickValue((Value) input);
-        if(value != null) return value;
+      } else if(input instanceof final Value value) {
+        final Value quick = quickValue(value);
+        if(quick != null) return quick;
       } else if(SORT.is(input) && input.args().length == 1) {
         // sort(sort(EXPR)) → sort(EXPR)
         return cc.function(SORT, info, input.arg(0));

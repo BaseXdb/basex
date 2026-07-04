@@ -3278,7 +3278,7 @@ public class QueryParser extends InputParser {
         while(!consume(delim)) {
           cp = current();
           switch(cp) {
-            case '{':
+            case '{' -> {
               if(next() == '{') {
                 tb.add(consume());
                 consume();
@@ -3291,27 +3291,24 @@ public class QueryParser extends InputParser {
                   add(attv, Str.get(text));
                 }
               }
-              break;
-            case '}':
+            }
+            case '}' -> {
               consume();
               check('}');
               tb.add('}');
-              break;
-            case '<':
-            case 0:
+            }
+            case '<', 0 ->
               throw error(NOQUOTE_X, found());
-            case '\n':
-            case '\t':
+            case '\n', '\t' -> {
               tb.add(' ');
               consume();
-              break;
-            case '\r':
+            }
+            case '\r' -> {
               if(next() != '\n') tb.add(' ');
               consume();
-              break;
-            default:
+            }
+            default ->
               entity(tb);
-              break;
           }
         }
         if(!consume(delim)) break;

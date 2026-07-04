@@ -102,21 +102,22 @@ public class RegExpr {
       int assrtMark = 0;
       for(;;) {
         switch(gnd.nxtToken()) {
-          case EOP:
+          case EOP -> {
             return new GroupInfo(parentGroups, inAssertion);
-          case LBRACKET:
+          }
+          case LBRACKET -> {
             if(!quoted) ++classLevel;
-            break;
-          case RBRACKET:
+          }
+          case RBRACKET -> {
             if(!quoted) --classLevel;
-            break;
-          case LQUOTE:
+          }
+          case LQUOTE -> {
             if(classLevel == 0) quoted = true;
-            break;
-          case RQUOTE:
+          }
+          case RQUOTE -> {
             if(classLevel == 0) quoted = false;
-            break;
-          case CAPT_LPAREN:
+          }
+          case CAPT_LPAREN -> {
             if(!quoted && classLevel == 0) {
               parentGroups = Arrays.copyOf(parentGroups, parentGroups.length + 1);
               parentGroups[parentGroups.length - 1] = open.peek();
@@ -124,23 +125,23 @@ public class RegExpr {
               inAssertion[inAssertion.length - 1] = assrtMark != 0;
               open.push(parentGroups.length);
             }
-            break;
-          case ASSRT_LPAREN:
+          }
+          case ASSRT_LPAREN -> {
             if(!quoted && classLevel == 0) {
               open.push(open.peek());
               if(assrtMark == 0) assrtMark = open.size();
             }
-            break;
-          case LPAREN:
+          }
+          case LPAREN -> {
             if(!quoted && classLevel == 0) open.push(open.peek());
-            break;
-          case RPAREN:
+          }
+          case RPAREN -> {
             if(!quoted && classLevel == 0) {
               if(open.size() == assrtMark) assrtMark = 0;
               open.pop();
             }
-            break;
-          default:
+          }
+          default -> { }
         }
       }
     }
@@ -150,40 +151,39 @@ public class RegExpr {
      * @return next token
      */
     private Token nxtToken() {
-      switch(nxtCp()) {
-        case -1: return Token.EOP;
-        case ']': return Token.RBRACKET;
-        case '[': return Token.LBRACKET;
-        case ')': return Token.RPAREN;
-        case '\\': return switch(nxtCp()) {
+      return switch(nxtCp()) {
+        case -1 -> Token.EOP;
+        case ']' -> Token.RBRACKET;
+        case '[' -> Token.LBRACKET;
+        case ')' -> Token.RPAREN;
+        case '\\' -> switch(nxtCp()) {
           case -1 -> Token.EOP;
           case 'Q' -> Token.LQUOTE;
           case 'E' -> Token.RQUOTE;
           default -> Token.OTHER;
         };
-        case '(':
-          switch(nxtCp()) {
-            case '?':
-              return switch(nxtCp()) {
-                case '=', '!' -> Token.ASSRT_LPAREN;
-                case '<' -> switch(nxtCp()) {
-                                    case '=', '!' -> Token.ASSRT_LPAREN;
-                                    default -> {
-                                      reset();
-                                      yield Token.CAPT_LPAREN;
-                                    }
-                                  };
-                default -> {
-                  reset();
-                  yield Token.LPAREN;
-                }
-              };
-            default:
+        case '(' -> switch(nxtCp()) {
+          case '?' -> switch(nxtCp()) {
+            case '=', '!' -> Token.ASSRT_LPAREN;
+            case '<' -> switch(nxtCp()) {
+              case '=', '!' -> Token.ASSRT_LPAREN;
+              default -> {
+                reset();
+                yield Token.CAPT_LPAREN;
+              }
+            };
+            default -> {
               reset();
-              return Token.CAPT_LPAREN;
+              yield Token.LPAREN;
+            }
+          };
+          default -> {
+            reset();
+            yield Token.CAPT_LPAREN;
           }
-        default: return Token.OTHER;
-      }
+        };
+        default -> Token.OTHER;
+      };
     }
 
     /**

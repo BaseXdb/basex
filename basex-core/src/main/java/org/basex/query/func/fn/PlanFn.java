@@ -191,18 +191,20 @@ public abstract class PlanFn extends StandardFunc {
       if(type != null) {
         try {
           switch(type) {
-            case BOOLEAN:
+            case BOOLEAN -> {
               final Boolean b = Bln.parse(item.string());
               if(b != null) return Bln.get(b);
-              break;
-            case INTEGER:
+            }
+            case INTEGER -> {
               return Itr.get(item.itr(info));
-            case DECIMAL:
+            }
+            case DECIMAL -> {
               return Dec.get(item.dec(info));
-            case DOUBLE:
+            }
+            case DOUBLE -> {
               return Dbl.get(item.dbl(info));
-            default:
-              break;
+            }
+            default -> { }
           }
         } catch(final QueryException ex) {
           Util.debug(ex);

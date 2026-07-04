@@ -189,12 +189,15 @@ final class MapRenderer {
           rect.thumblh = (byte) Math.max(1, (bflh + bffh) * fontSize);
           rect.thumbsw = rect.thumbf;
           switch(rect.thumbal) {
-            case 0:
+            case 0 -> {
               drawToken(rect, data, true);
               return;
-            case 1: case 2:
+            }
+            case 1, 2 -> {
               drawSentence(rect, data, true, rect.h);
               return;
+            }
+            default -> { }
           }
         }
         if(le(ff, ffmin) || le(ffh, ffhmin) || le(flh, flhmin)) {

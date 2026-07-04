@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.Map.*;
 import java.util.concurrent.*;
 import java.util.jar.*;
-import java.util.stream.*;
 
 import org.basex.io.*;
 import org.basex.util.options.*;
@@ -199,7 +198,7 @@ public final class Prop {
     // override with system properties
     System.getProperties().forEach((key, value) -> entries.put(key.toString(), value.toString()));
     // return list sorted by key
-    return entries.entrySet().stream().sorted(Entry.comparingByKey()).collect(Collectors.toList());
+    return entries.entrySet().stream().sorted(Entry.comparingByKey()).toList();
   }
 
   /**

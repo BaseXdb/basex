@@ -29,30 +29,17 @@ public final class Literal extends RegExp {
    * @return string representation
    */
   public static String escape(final int cp) {
-    switch(cp) {
-      case '\t': return "\\t";
-      case '\r': return "\\r";
-      case '\n': return "\\n";
-      case '\\':
-      case '|':
-      case '.':
-      case '?':
-      case '*':
-      case '+':
-      case '(':
-      case ')':
-      case '{':
-      case '}':
-      case '$':
-      case '-':
-      case '[':
-      case ']':
-      case '^':
-        return "\\" + (char) cp;
-      default:
-        if(cp < 128 && !Character.isISOControl(cp)) return String.valueOf((char) cp);
-        if(cp < 0x10000) return String.format("\\u%04x", cp);
-        return String.valueOf(Character.toChars(cp));
-    }
+    return switch(cp) {
+      case '\t' -> "\\t";
+      case '\r' -> "\\r";
+      case '\n' -> "\\n";
+      case '\\', '|', '.', '?', '*', '+', '(', ')', '{', '}', '$', '-', '[', ']', '^' ->
+        "\\" + (char) cp;
+      default -> {
+        if(cp < 128 && !Character.isISOControl(cp)) yield String.valueOf((char) cp);
+        if(cp < 0x10000) yield String.format("\\u%04x", cp);
+        yield String.valueOf(Character.toChars(cp));
+      }
+    };
   }
 }

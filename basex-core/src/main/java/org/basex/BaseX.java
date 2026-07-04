@@ -69,92 +69,79 @@ public class BaseX extends CLI {
         String value = vals.get(o);
 
         switch(c) {
-          case 'b':
+          case 'b' -> {
             if(!bind.isEmpty()) bind.append(',');
             // commas are escaped by a second comma
             value = bind.append(value.replace(",", ",,")).toString();
             execute(new Set(MainOptions.BINDINGS, value), false);
-            break;
-          case 'c':
+          }
+          case 'c' -> {
             console = false;
             if(!execute(commands(value))) return;
-            break;
-          case 'C':
+          }
+          case 'C' -> {
             console = false;
             if(!execute(script(value))) return;
-            break;
-          case 'i':
+          }
+          case 'i' -> {
             execute(new Set(MainOptions.MAINMEM, true), false);
             execute(new Check(value), verbose);
             execute(new Set(MainOptions.MAINMEM, false), false);
-            break;
-          case 'I':
+          }
+          case 'I' -> {
             if(!bind.isEmpty()) bind.append(',');
             // commas are escaped by a second comma
             value = bind.append('=').append(value.replace(",", ",,")).toString();
             execute(new Set(MainOptions.BINDINGS, value), false);
-            break;
-          case 'o':
+          }
+          case 'o' -> {
             quit();
             out = new PrintOutput(new IOFile(value));
             fileOutput = true;
-            break;
-          case 'O': {
+          }
+          case 'O' -> {
             final String[] kv = value.split("=", 2);
             execute(new Set(kv[0], kv.length > 1 ? kv[1] : ""), false);
-            break;
           }
-          case 'q':
+          case 'q' -> {
             console = false;
             execute(new XQuery(value), verbose);
-            break;
-          case 'Q':
+          }
+          case 'Q' -> {
             console = false;
             final IO io = IO.get(value);
             execute(new XQuery(io.readString()).baseURI(io.path()), verbose);
-            break;
-          case 'r':
-            execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);
-            break;
-          case 'R':
-            execute(new Set(MainOptions.RUNQUERY, null), false);
-            break;
-          case 's': {
+          }
+          case 'r' -> execute(new Set(MainOptions.RUNS, Strings.toInt(value)), false);
+          case 'R' -> execute(new Set(MainOptions.RUNQUERY, null), false);
+          case 's' -> {
             if(sopts == null) sopts = new SerializerOptions();
             final String[] kv = value.split("=", 2);
             sopts.assign(kv[0], kv.length > 1 ? kv[1] : "");
             execute(new Set(MainOptions.SERIALIZER, sopts), false);
-            break;
           }
-          case 't':
+          case 't' -> {
             console = false;
             execute(new Test(value), verbose);
-            break;
-          case 'u':
-            execute(new Set(MainOptions.WRITEBACK, null), false);
-            break;
-          case 'v':
-            v ^= true;
-            break;
-          case 'V':
+          }
+          case 'u' -> execute(new Set(MainOptions.WRITEBACK, null), false);
+          case 'v' -> v ^= true;
+          case 'V' -> {
             qi ^= true;
             execute(new Set(MainOptions.QUERYINFO, null), false);
-            break;
-          case 'w':
-            execute(new Set(MainOptions.STRIPWS, null), false);
-            break;
-          case 'W':
+          }
+          case 'w' -> execute(new Set(MainOptions.STRIPWS, null), false);
+          case 'W' -> {
             if(sopts == null) sopts = new SerializerOptions();
             sopts.set(SerializerOptions.INDENT, YesNo.YES);
             execute(new Set(MainOptions.SERIALIZER, sopts), false);
-            break;
-          case 'x':
+          }
+          case 'x' -> {
             execute(new Set(MainOptions.XMLPLAN, null), false);
             qp ^= true;
-            break;
-          case 'z':
-            execute(new Set(MainOptions.SERIALIZE, null), false);
-            break;
+          }
+          case 'z' -> execute(new Set(MainOptions.SERIALIZE, null), false);
+          default -> { }
         }
         verbose = qi || qp || v;
       }

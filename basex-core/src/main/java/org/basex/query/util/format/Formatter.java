@@ -204,36 +204,36 @@ public abstract class Formatter extends FormatUtil {
         final boolean dat = type == BasicType.DATE, tim = type == BasicType.TIME;
         boolean err = false;
         switch(compSpec) {
-          case 'Y':
+          case 'Y' -> {
             num = Math.abs(date.yea());
             max = true;
             err = tim;
-            break;
-          case 'M':
+          }
+          case 'M' -> {
             num = date.mon();
             err = tim;
-            break;
-          case 'D':
+          }
+          case 'D' -> {
             num = date.day();
             err = tim;
-            break;
-          case 'd':
+          }
+          case 'd' -> {
             final long y = date.yea();
             for(int m = (int) date.mon() - 1; --m >= 0;) num += ADate.daysOfMonth(y, m);
             num += date.day();
             err = tim;
-            break;
-          case 'F':
+          }
+          case 'F' -> {
             num = date.toJava().toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
             if(num == 0) num = 7;
             pres = N;
             err = tim;
-            break;
-          case 'W':
+          }
+          case 'W' -> {
             num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_YEAR);
             err = tim;
-            break;
-          case 'w':
+          }
+          case 'w' -> {
             num = date.toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             // first week of month: fix value, according to ISO 8601
             if(num == 0) {
@@ -241,50 +241,46 @@ public abstract class Formatter extends FormatUtil {
                   false, info).toJava().toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
             }
             err = tim;
-            break;
-          case 'H':
+          }
+          case 'H' -> {
             num = date.hour();
             err = dat;
-            break;
-          case 'h':
+          }
+          case 'h' -> {
             num = date.hour() % 12;
             if(num == 0) num = 12;
             err = dat;
-            break;
-          case 'P':
+          }
+          case 'P' -> {
             num = date.hour() / 12;
             pres = N;
             err = dat;
-            break;
-          case 'm':
+          }
+          case 'm' -> {
             num = date.minute();
             pres = token("01");
             err = dat;
-            break;
-          case 's':
+          }
+          case 's' -> {
             num = date.seconds().intValue();
             pres = token("01");
             err = dat;
-            break;
-          case 'f':
+          }
+          case 'f' -> {
             frac = date.seconds().remainder(BigDecimal.ONE);
             err = dat;
-            break;
-          case 'Z':
-          case 'z':
+          }
+          case 'Z', 'z' -> {
             num = date.tz();
             pres = token("01:01");
-            break;
-          case 'C':
-            pres = N;
-            break;
-          case 'E':
+          }
+          case 'C' -> pres = N;
+          case 'E' -> {
             num = date.yea();
             pres = N;
             err = tim;
-            break;
-          default:
-            throw INVCOMPSPEC_X.get(info, marker);
+          }
+          default -> throw INVCOMPSPEC_X.get(info, marker);
         }
         if(err) throw PICINVCOMP_X_X_X.get(info, marker, type, date);
         if(pres == null) continue;

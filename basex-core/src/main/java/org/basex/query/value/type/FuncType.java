@@ -91,16 +91,14 @@ public final class FuncType extends FType {
    * @return type or {@code null}
    */
   public static Type get(final QNm name) {
-    if(name.uri().length == 0) {
-      switch(Token.string(name.local())) {
-        case QueryText.FUNCTION:
-        case QueryText.FN:       return FUNCTION;
-        case QueryText.MAP:      return MAP;
-        case QueryText.RECORD:   return RECORD;
-        case QueryText.ARRAY:    return ARRAY;
-      }
-    }
-    return null;
+    if(name.uri().length != 0) return null;
+    return switch(Token.string(name.local())) {
+      case QueryText.FUNCTION, QueryText.FN -> FUNCTION;
+      case QueryText.MAP    -> MAP;
+      case QueryText.RECORD -> RECORD;
+      case QueryText.ARRAY  -> ARRAY;
+      default -> null;
+    };
   }
 
   @Override

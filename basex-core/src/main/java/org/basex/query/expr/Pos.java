@@ -69,15 +69,14 @@ public final class Pos extends Single {
     if(pos instanceof final ANum num) {
       final long p = num.itr();
       final boolean exact = p == num.dbl();
-      switch(op) {
-        case EQ: return exact ? IntPos.get(p, p, info) : Bln.FALSE;
-        case GE: return IntPos.get(exact ? p : p + 1, MAX_VALUE, info);
-        case GT: return IntPos.get(p + 1, MAX_VALUE, info);
-        case LE: return IntPos.get(1, p, info);
-        case LT: return IntPos.get(1, exact ? p - 1 : p, info);
-        case NE: return exact ? p < 2 ? IntPos.get(p + 1, MAX_VALUE, info) : null : Bln.TRUE;
-        default:
-      }
+      return switch(op) {
+        case EQ -> exact ? IntPos.get(p, p, info) : Bln.FALSE;
+        case GE -> IntPos.get(exact ? p : p + 1, MAX_VALUE, info);
+        case GT -> IntPos.get(p + 1, MAX_VALUE, info);
+        case LE -> IntPos.get(1, p, info);
+        case LT -> IntPos.get(1, exact ? p - 1 : p, info);
+        case NE -> exact ? p < 2 ? IntPos.get(p + 1, MAX_VALUE, info) : null : Bln.TRUE;
+      };
     }
 
     // numeric tests
@@ -87,28 +86,26 @@ public final class Pos extends Single {
     if(st.zeroOrOne() && type.isNumberOrUntyped()) {
       Expr min = null, max = null;
       switch(op) {
-        case EQ:
-          min = pos;
-          break;
-        case GE:
+        case EQ -> min = pos;
+        case GE -> {
           min = pos;
           max = Itr.MAX;
-          break;
-        case GT:
+        }
+        case GT -> {
           min = new Arith(info, integer ? pos :
             cc.function(Function.FLOOR, info, pos), Itr.ONE, Calc.ADD).optimize(cc);
           max = Itr.MAX;
-          break;
-        case LE:
+        }
+        case LE -> {
           min = Itr.ONE;
           max = pos;
-          break;
-        case LT:
+        }
+        case LT -> {
           min = Itr.ONE;
           max = new Arith(info, integer ?
             pos : cc.function(Function.CEILING, info, pos), Itr.ONE, Calc.SUBTRACT).optimize(cc);
-          break;
-        default:
+        }
+        default -> { }
       }
       if(min != null) {
         // position() <= $pos → pos: 1, $pos

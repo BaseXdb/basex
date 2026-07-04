@@ -133,7 +133,7 @@ abstract class DbNew extends DbAccessFn {
     if(path.isEmpty() || Strings.endsWith(path, '/')) throw DB_PATH_X.get(info, path);
     ni.path = path;
     final Object source = toBinarySource(input);
-    if(source instanceof Bin) ni.value = (Bin) source;
+    if(source instanceof final Bin bin) ni.value = bin;
     else ni.io = (IO) source;
   }
 

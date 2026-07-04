@@ -26,60 +26,45 @@ interface CalcOpt {
    */
   static CalcOpt get(final SeqType st1, final SeqType st2, final Calc calc) {
     final BasicType type = Calc.numType(st1.type, st2.type);
-    if(type.isNumber()) {
-      switch(calc) {
-        case ADD:
-          switch(type) {
-            case DOUBLE:  return CalcOpt::addDbl;
-            case FLOAT:   return CalcOpt::addFlt;
-            case INTEGER: return CalcOpt::addInt;
-            default:
-          }
-          break;
-        case SUBTRACT:
-          switch(type) {
-            case DOUBLE:  return CalcOpt::subtractDbl;
-            case FLOAT:   return CalcOpt::subtractFlt;
-            case INTEGER: return CalcOpt::subtractInt;
-            default:
-          }
-          break;
-        case MULTIPLY:
-          switch(type) {
-            case DOUBLE:  return CalcOpt::multiplyDbl;
-            case FLOAT:   return CalcOpt::multiplyFlt;
-            case INTEGER: return CalcOpt::multiplyInt;
-            default:
-          }
-          break;
-        case DIVIDE:
-          switch(type) {
-            case DOUBLE:  return CalcOpt::divideDbl;
-            case FLOAT:   return CalcOpt::divideFlt;
-            case INTEGER: return CalcOpt::divideDec;
-            default:
-          }
-          break;
-        case DIVIDEINT:
-          switch(type) {
-            case DOUBLE:  return CalcOpt::divideIntDbl;
-            case FLOAT:   return CalcOpt::divideIntFlt;
-            case INTEGER: return CalcOpt::divideIntInt;
-            default:
-          }
-          break;
-        case MODULO:
-          switch(type) {
-            case DOUBLE:  return CalcOpt::moduloDbl;
-            case FLOAT:   return CalcOpt::moduloFlt;
-            case INTEGER: return CalcOpt::moduloInt;
-            default:
-          }
-          break;
-        default:
-      }
-    }
-    return null;
+    if(!type.isNumber()) return null;
+    return switch(calc) {
+      case ADD -> switch(type) {
+        case DOUBLE  -> CalcOpt::addDbl;
+        case FLOAT   -> CalcOpt::addFlt;
+        case INTEGER -> CalcOpt::addInt;
+        default      -> null;
+      };
+      case SUBTRACT -> switch(type) {
+        case DOUBLE  -> CalcOpt::subtractDbl;
+        case FLOAT   -> CalcOpt::subtractFlt;
+        case INTEGER -> CalcOpt::subtractInt;
+        default      -> null;
+      };
+      case MULTIPLY -> switch(type) {
+        case DOUBLE  -> CalcOpt::multiplyDbl;
+        case FLOAT   -> CalcOpt::multiplyFlt;
+        case INTEGER -> CalcOpt::multiplyInt;
+        default      -> null;
+      };
+      case DIVIDE -> switch(type) {
+        case DOUBLE  -> CalcOpt::divideDbl;
+        case FLOAT   -> CalcOpt::divideFlt;
+        case INTEGER -> CalcOpt::divideDec;
+        default      -> null;
+      };
+      case DIVIDEINT -> switch(type) {
+        case DOUBLE  -> CalcOpt::divideIntDbl;
+        case FLOAT   -> CalcOpt::divideIntFlt;
+        case INTEGER -> CalcOpt::divideIntInt;
+        default      -> null;
+      };
+      case MODULO -> switch(type) {
+        case DOUBLE  -> CalcOpt::moduloDbl;
+        case FLOAT   -> CalcOpt::moduloFlt;
+        case INTEGER -> CalcOpt::moduloInt;
+        default      -> null;
+      };
+    };
   }
 
   /**

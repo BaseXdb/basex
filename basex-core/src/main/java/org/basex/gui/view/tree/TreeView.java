@@ -354,26 +354,26 @@ public final class TreeView extends View {
     Color borderCol = null, textCol = textColor, fillColor;
     final boolean fill;
     switch(t) {
-      case RECTANGLE:
+      case RECTANGLE -> {
         borderCol = getColorPerLevel(lv, false);
         fillColor = getColorPerLevel(lv, true);
         border = true;
         fill = true;
-        break;
-      case HIGHLIGHT:
+      }
+      case HIGHLIGHT -> {
         borderCol = color4;
         final int alpha = 0xDD000000, rgb = lightGray.getRGB();
         fillColor = new Color(rgb + alpha, true);
         if(h > 4) border = true;
         fill = !big && !marked;
-        break;
-      case MARK:
+      }
+      case MARK -> {
         borderCol = h > 2 && r.w() > 4 ? colormark1A : colormark1;
         fillColor = colormark1;
         border = true;
         fill = true;
-        break;
-      case DESCENDANTS:
+      }
+      case DESCENDANTS -> {
         final int alphaD = 0xDD000000, rgbD = color(6).getRGB();
         fillColor = new Color(rgbD + alphaD, true);
         borderCol = color(8);
@@ -385,9 +385,8 @@ public final class TreeView extends View {
           borderCol = fillColor;
           label = false;
         }
-        break;
-      case PARENT:
-      default:
+      }
+      default -> {
         fillColor = color(6);
         textCol = backColor;
         fill = !big && !marked;
@@ -397,7 +396,7 @@ public final class TreeView extends View {
           borderCol = color(8);
           label = false;
         }
-        break;
+      }
     }
 
     if(border) {

@@ -59,122 +59,90 @@ final class StringParser extends CommandParser {
    * @throws QueryException query exception
    */
   private Command parse(final Cmd cmd) throws QueryException {
-    switch(cmd) {
-      case CREATE:
-        return switch(consume(CmdCreate.class, cmd)) {
-          case BACKUP -> new CreateBackup(glob(null), string(null));
-          case DATABASE, DB -> new CreateDB(name(cmd), remaining(null, true));
-          case INDEX -> new CreateIndex(consume(CmdIndex.class, cmd));
-          case USER -> new CreateUser(name(cmd), password());
-        };
-      case COPY:
-        return new Copy(name(cmd), name(cmd));
-      case ALTER:
-        return switch(consume(CmdAlter.class, cmd)) {
-          case BACKUP -> new AlterBackup(name(cmd), name(cmd));
-          case DATABASE, DB -> new AlterDB(name(cmd), name(cmd));
-          case PASSWORD -> new AlterPassword(name(cmd), password());
-          case USER -> new AlterUser(name(cmd), name(cmd));
-        };
-      case OPEN:
-        return new Open(name(cmd));
-      case CHECK:
-        return new Check(string(cmd));
-      case ADD:
+    return switch(cmd) {
+      case CREATE -> switch(consume(CmdCreate.class, cmd)) {
+        case BACKUP -> new CreateBackup(glob(null), string(null));
+        case DATABASE, DB -> new CreateDB(name(cmd), remaining(null, true));
+        case INDEX -> new CreateIndex(consume(CmdIndex.class, cmd));
+        case USER -> new CreateUser(name(cmd), password());
+      };
+      case COPY -> new Copy(name(cmd), name(cmd));
+      case ALTER -> switch(consume(CmdAlter.class, cmd)) {
+        case BACKUP -> new AlterBackup(name(cmd), name(cmd));
+        case DATABASE, DB -> new AlterDB(name(cmd), name(cmd));
+        case PASSWORD -> new AlterPassword(name(cmd), password());
+        case USER -> new AlterUser(name(cmd), name(cmd));
+      };
+      case OPEN -> new Open(name(cmd));
+      case CHECK -> new Check(string(cmd));
+      case ADD -> {
         final String aa = key(S_TO, null) ? string(cmd) : null;
-        return new Add(aa, remaining(cmd, true));
-      case GET:
-        return new Get(string(cmd));
-      case BINARY:
-        return switch(consume(CmdBinary.class, cmd)) {
-          case GET -> new BinaryGet(string(cmd));
-          case PUT -> new BinaryPut(key(S_TO, null) ? string(cmd) : null, remaining(cmd, true));
-        };
-      case DELETE:
-        return new Delete(string(cmd));
-      case RENAME:
-        return new Rename(string(cmd), string(cmd));
-      case PUT:
-        return new Put(string(cmd), remaining(cmd, true));
-      case INFO:
-        return switch(consume(CmdInfo.class, cmd)) {
-          case NULL -> new Info();
-          case DATABASE, DB -> new InfoDB();
-          case INDEX -> new InfoIndex(consume(CmdIndexInfo.class, null));
-          case STORAGE -> {
-            final String arg1 = number();
-            yield new InfoStorage(arg1, arg1 != null ? number() : null);
-          }
-        };
-      case INSPECT:
-        return new Inspect();
-      case CLOSE:
-        return new Close();
-      case LIST:
-        return new List(name(null), string(null));
-      case DIR:
-        return new Dir(string(null));
-      case DROP:
-        return switch(consume(CmdDrop.class, cmd)) {
-          case DATABASE, DB -> new DropDB(glob(cmd));
-          case INDEX -> new DropIndex(consume(CmdIndex.class, cmd));
-          case USER -> new DropUser(glob(cmd), key(ON, null) ? glob(cmd) : null);
-          case BACKUP -> new DropBackup(glob(null));
-        };
-      case OPTIMIZE:
-        return switch(consume(CmdOptimize.class, cmd)) {
-          case NULL -> new Optimize();
-          case ALL -> new OptimizeAll();
-        };
-      case EXPORT:
-        return new Export(string(cmd));
-      case XQUERY:
-        return new XQuery(remaining(cmd, false));
-      case RUN:
-        return new Run(string(cmd));
-      case TEST:
-        return new Test(string(cmd));
-      case EXECUTE:
-        return new Execute(remaining(cmd, true));
-      case FIND:
-        return new Find(remaining(cmd, true));
-      case SET:
-        return new Set(name(cmd), remaining(null, true));
-      case PASSWORD:
-        return new Password(password());
-      case HELP:
-        return new Help(name(null));
-      case EXIT:
-      case QUIT:
-        return new Exit();
-      case FLUSH:
-        return new Flush();
-      case KILL:
-        return new Kill(string(cmd));
-      case RESTORE:
-        return new Restore(name(null));
-      case SHOW:
-        return switch(consume(CmdShow.class, cmd)) {
-          case SESSIONS -> new ShowSessions();
-          case USERS -> new ShowUsers(key(ON, null) ? name(cmd) : null);
-          case BACKUPS -> new ShowBackups();
-          case OPTIONS -> new ShowOptions(name(null));
-        };
-      case GRANT:
+        yield new Add(aa, remaining(cmd, true));
+      }
+      case GET -> new Get(string(cmd));
+      case BINARY -> switch(consume(CmdBinary.class, cmd)) {
+        case GET -> new BinaryGet(string(cmd));
+        case PUT -> new BinaryPut(key(S_TO, null) ? string(cmd) : null, remaining(cmd, true));
+      };
+      case DELETE -> new Delete(string(cmd));
+      case RENAME -> new Rename(string(cmd), string(cmd));
+      case PUT -> new Put(string(cmd), remaining(cmd, true));
+      case INFO -> switch(consume(CmdInfo.class, cmd)) {
+        case NULL -> new Info();
+        case DATABASE, DB -> new InfoDB();
+        case INDEX -> new InfoIndex(consume(CmdIndexInfo.class, null));
+        case STORAGE -> {
+          final String arg1 = number();
+          yield new InfoStorage(arg1, arg1 != null ? number() : null);
+        }
+      };
+      case INSPECT -> new Inspect();
+      case CLOSE -> new Close();
+      case LIST -> new List(name(null), string(null));
+      case DIR -> new Dir(string(null));
+      case DROP -> switch(consume(CmdDrop.class, cmd)) {
+        case DATABASE, DB -> new DropDB(glob(cmd));
+        case INDEX -> new DropIndex(consume(CmdIndex.class, cmd));
+        case USER -> new DropUser(glob(cmd), key(ON, null) ? glob(cmd) : null);
+        case BACKUP -> new DropBackup(glob(null));
+      };
+      case OPTIMIZE -> switch(consume(CmdOptimize.class, cmd)) {
+        case NULL -> new Optimize();
+        case ALL -> new OptimizeAll();
+      };
+      case EXPORT -> new Export(string(cmd));
+      case XQUERY -> new XQuery(remaining(cmd, false));
+      case RUN -> new Run(string(cmd));
+      case TEST -> new Test(string(cmd));
+      case EXECUTE -> new Execute(remaining(cmd, true));
+      case FIND -> new Find(remaining(cmd, true));
+      case SET -> new Set(name(cmd), remaining(null, true));
+      case PASSWORD -> new Password(password());
+      case HELP -> new Help(name(null));
+      case EXIT, QUIT -> new Exit();
+      case FLUSH -> new Flush();
+      case KILL -> new Kill(string(cmd));
+      case RESTORE -> new Restore(name(null));
+      case SHOW -> switch(consume(CmdShow.class, cmd)) {
+        case SESSIONS -> new ShowSessions();
+        case USERS -> new ShowUsers(key(ON, null) ? name(cmd) : null);
+        case BACKUPS -> new ShowBackups();
+        case OPTIONS -> new ShowOptions(name(null));
+      };
+      case GRANT -> {
         final CmdPerm perm = consume(CmdPerm.class, cmd);
         if(perm == null) throw help(null, cmd);
         final String db = key(ON, null) ? glob(cmd) : null;
         key(S_TO, cmd);
-        return new Grant(perm, glob(cmd), db);
-      case REPO:
-        return switch(consume(CmdRepo.class, cmd)) {
-          case INSTALL -> new RepoInstall(string(cmd), parser.info());
-          case DELETE -> new RepoDelete(string(cmd), parser.info());
-          case LIST -> new RepoList();
-        };
-      default:
-        throw Util.notExpected("Command specified, but not implemented yet");
-    }
+        yield new Grant(perm, glob(cmd), db);
+      }
+      case REPO -> switch(consume(CmdRepo.class, cmd)) {
+        case INSTALL -> new RepoInstall(string(cmd), parser.info());
+        case DELETE -> new RepoDelete(string(cmd), parser.info());
+        case LIST -> new RepoList();
+      };
+      default -> throw Util.notExpected("Command specified, but not implemented yet");
+    };
   }
 
   /**

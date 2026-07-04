@@ -44,12 +44,11 @@ public final class CsvW3XmlSerializer extends CsvSerializer {
   protected void finishEmpty() throws IOException {
     finishOpen();
     switch(level) {
-      case 2:
+      case 2 -> {
         if(header && elem.eq(CsvW3XmlConverter.Q_FN_COLUMN)) headers.add(EMPTY);
-        break;
-      case 3:
-        data.add(EMPTY);
-        break;
+      }
+      case 3 -> data.add(EMPTY);
+      default -> { }
     }
     finishClose();
   }
@@ -57,12 +56,11 @@ public final class CsvW3XmlSerializer extends CsvSerializer {
   @Override
   protected void text(final byte[] value, final FTPos ftp) {
     switch(level) {
-      case 3:
+      case 3 -> {
         if(header && elem.eq(CsvW3XmlConverter.Q_FN_COLUMN)) headers.add(value);
-        break;
-      case 4:
-        data.add(value);
-        break;
+      }
+      case 4 -> data.add(value);
+      default -> { }
     }
   }
 

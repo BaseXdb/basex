@@ -244,17 +244,13 @@ public final class HtmlParser extends XMLParser {
         super.ensureAvailable(options, name, info);
         if(options.contains(HEURISTICS)) {
           switch(options.get(HEURISTICS)) {
-            case ALL:
+            case ALL -> {
               ensureAvailable(ICU_CLASS_NAME, name, info);
               ensureAvailable(CHARDET_CLASS_NAME, name, info);
-              break;
-            case ICU:
-              ensureAvailable(ICU_CLASS_NAME, name, info);
-              break;
-            case CHARDET:
-              ensureAvailable(CHARDET_CLASS_NAME, name, info);
-              break;
-            default:
+            }
+            case ICU -> ensureAvailable(ICU_CLASS_NAME, name, info);
+            case CHARDET -> ensureAvailable(CHARDET_CLASS_NAME, name, info);
+            default -> { }
           }
         }
       }
@@ -264,17 +260,17 @@ public final class HtmlParser extends XMLParser {
         if(!super.available(options)) return false;
         if(!options.contains(HEURISTICS)) return true;
         switch(options.get(HEURISTICS)) {
-          case ALL:
+          case ALL -> {
             if(!Reflect.available(ICU_CLASS_NAME)) return false;
             if(!Reflect.available(CHARDET_CLASS_NAME)) return false;
-            break;
-          case ICU:
+          }
+          case ICU -> {
             if(!Reflect.available(ICU_CLASS_NAME)) return false;
-            break;
-          case CHARDET:
+          }
+          case CHARDET -> {
             if(!Reflect.available(CHARDET_CLASS_NAME)) return false;
-            break;
-          default:
+          }
+          default -> { }
         }
         return true;
       }
