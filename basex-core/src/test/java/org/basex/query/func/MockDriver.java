@@ -310,12 +310,12 @@ public final class MockDriver implements Driver {
 
     @Override
     Object call(final Method m, final Object[] a) {
-      switch(m.getName()) {
-        case "next": return ++cursor < data.size();
-        case "getObject": return data.get(cursor)[(Integer) a[0] - 1];
-        case "getMetaData": return proxy(ResultSetMetaData.class, new MetaHandler(cols));
-        default: return UNHANDLED;
-      }
+      return switch(m.getName()) {
+        case "next" -> ++cursor < data.size();
+        case "getObject" -> data.get(cursor)[(Integer) a[0] - 1];
+        case "getMetaData" -> proxy(ResultSetMetaData.class, new MetaHandler(cols));
+        default -> UNHANDLED;
+      };
     }
   }
 
@@ -334,11 +334,11 @@ public final class MockDriver implements Driver {
 
     @Override
     Object call(final Method m, final Object[] a) {
-      switch(m.getName()) {
-        case "getColumnCount": return cols.length;
-        case "getColumnLabel": case "getColumnName": return cols[(Integer) a[0] - 1];
-        default: return UNHANDLED;
-      }
+      return switch(m.getName()) {
+        case "getColumnCount" -> cols.length;
+        case "getColumnLabel", "getColumnName" -> cols[(Integer) a[0] - 1];
+        default -> UNHANDLED;
+      };
     }
   }
 

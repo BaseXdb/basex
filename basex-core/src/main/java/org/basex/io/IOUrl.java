@@ -124,7 +124,7 @@ public final class IOUrl extends IO {
 
   @Override
   public InputStream inputStream() throws IOException {
-    return isJarURL(pth) ? new URL(pth).openStream() : new StoppableInputStream(response().body());
+    return isJarURL(pth) ? url(pth).openStream() : new StoppableInputStream(response().body());
   }
 
   /**
@@ -223,6 +223,22 @@ public final class IOUrl extends IO {
    */
   static boolean isJarURL(final String url) {
     return url.startsWith(JARPREF);
+  }
+
+  /**
+   * Converts a URL string to a URL.
+   * @param url URL string
+   * @return URL
+   * @throws MalformedURLException malformed URL exception
+   */
+  public static URL url(final String url) throws MalformedURLException {
+    try {
+      return new URI(url).toURL();
+    } catch(final URISyntaxException | IllegalArgumentException ex) {
+      final MalformedURLException mue = new MalformedURLException(ex.getMessage());
+      mue.initCause(ex);
+      throw mue;
+    }
   }
 
   /**

@@ -139,7 +139,7 @@ public final class DynFuncCall extends FuncCall {
    * @return result of check
    */
   public static boolean containsNdtFunction(final Expr expr) {
-    return expr instanceof Value value ? containsNdtFunction(value) :
+    return expr instanceof final Value value ? containsNdtFunction(value) :
       !expr.accept(new ASTVisitor() {
         @Override
         public boolean funcItem(final FuncItem func) {

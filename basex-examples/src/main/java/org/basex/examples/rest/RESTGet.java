@@ -22,7 +22,7 @@ public final class RESTGet {
     // The java URL connection to the resource
     String base = "http://localhost:8080/rest/";
 
-    URL url = new URL(base + "factbook?query=(//city/name)[position()=1+to+5]");
+    URL url = URI.create(base + "factbook?query=(//city/name)%5Bposition()=1+to+5%5D").toURL();
     System.out.println("\n* URL: " + url);
 
     // Establish the connection to the URL

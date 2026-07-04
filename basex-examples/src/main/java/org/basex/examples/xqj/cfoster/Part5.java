@@ -38,7 +38,7 @@ public final class Part5 extends Main {
     XQExpression xqe = conn.createExpression(properties);
 
     String surl = "http://www.w3.org/TR/2007/REC-xquery-20070123/xquery.xml";
-    URL url = new URL(surl);
+    URL url = URI.create(surl).toURL();
     xqe.bindDocument(new QName("x"), url.openStream(), null, null);
 
     String xqueryString = "declare variable $x external; $x//p";

@@ -252,8 +252,8 @@ public abstract class IO {
     if(io.isAbsolute()) return io;
     if(IOUrl.isJarURL(pth)) {
       try {
-        return get(new URL(new URL(pth), path).toString());
-      } catch(final MalformedURLException ex) {
+        return get(JARPREF + new URI(pth.substring(JARPREF.length())).resolve(path));
+      } catch(final URISyntaxException | IllegalArgumentException ex) {
         Util.stack(ex);
       }
     }

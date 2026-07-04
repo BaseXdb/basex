@@ -39,10 +39,10 @@ final class ClassLoaderCache {
     try {
       int i = 0;
       for(final String key : keys) {
-        final URL url = new URL(key);
-        if(!"file".equals(url.getProtocol())) throw Util.notExpected();
-        lastModified[i] = Files.getLastModifiedTime(Paths.get(url.toURI())).toMillis();
-        urls[i++] = url;
+        final URI uri = new URI(key);
+        if(!"file".equals(uri.getScheme())) throw Util.notExpected();
+        lastModified[i] = Files.getLastModifiedTime(Paths.get(uri)).toMillis();
+        urls[i++] = uri.toURL();
       }
     } catch(final URISyntaxException | MalformedURLException ex) {
       throw Util.notExpected(ex);

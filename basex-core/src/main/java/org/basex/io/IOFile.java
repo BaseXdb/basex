@@ -97,7 +97,7 @@ public final class IOFile extends IO {
    */
   static String toPath(final String uri) {
     try {
-      return new URL(uri).toURI().getPath();
+      return new URI(uri).getPath();
     } catch(final Exception ex) {
       Util.debug(ex);
       // workaround for URIs with invalid characters

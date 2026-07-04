@@ -2,6 +2,7 @@ package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
@@ -51,7 +52,7 @@ final class WordnetStemmer extends Stemmer {
   private static Object newDict(final Class<?> dct) {
     try {
       final Constructor<?> ctr = Reflect.find(dct, URL.class);
-      final Object dict = Reflect.get(ctr, new URL("file", null, PATH));
+      final Object dict = Reflect.get(ctr, new File(PATH).toURI().toURL());
       return Reflect.invoke(Reflect.method(dct, "open"), dict);
     } catch(final Exception ex) {
       Util.debug(ex);

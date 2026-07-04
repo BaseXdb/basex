@@ -1,7 +1,6 @@
 package org.basex.query.func.validate;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.Map.*;
 
@@ -98,7 +97,7 @@ public class ValidateXsd extends ValidateFn {
             sf.setFeature(entry.getKey(), Strings.isTrue(entry.getValue()));
           }
           // schema declaration is included in document, or specified as string
-          s = url.isEmpty() ? sf.newSchema() : sf.newSchema(new URL(url));
+          s = url.isEmpty() ? sf.newSchema() : sf.newSchema(IOUrl.url(url));
           if(cache) MAP.put(url, s);
         }
 

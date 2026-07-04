@@ -166,7 +166,7 @@ public final class JsonSerializerTest extends SandboxTest {
     serialize("1234567890123456e0", "1234567890123456", format);
     serialize("12345678901234567e0", "12345678901234568", format);
     serialize("123456789012345678e0", "123456789012345680", format);
-    serialize("1234567890123456789e0", "1234567890123456770", format);
+    serialize("1234567890123456789e0", "1234567890123456800", format);
   }
 
   /**

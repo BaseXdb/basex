@@ -100,7 +100,7 @@ public final class Locking {
    */
   void acquire(final Locks locks) throws InterruptedException {
     // one thread can only hold a single lock
-    final Long id = Thread.currentThread().getId();
+    final Long id = Thread.currentThread().threadId();
     if(locked.containsKey(id)) throw new IllegalMonitorStateException("Thread holds locks: " + id);
     locked.put(id, locks);
 
@@ -146,7 +146,7 @@ public final class Locking {
    * Removes locks for the specified job, all in reverse order.
    */
   public void release() {
-    final Long id = Thread.currentThread().getId();
+    final Long id = Thread.currentThread().threadId();
     final Locks locks = locked.remove(id);
     final LockList reads = locks.reads, writes = locks.writes;
     final boolean lock = reads.locking() || writes.locking();

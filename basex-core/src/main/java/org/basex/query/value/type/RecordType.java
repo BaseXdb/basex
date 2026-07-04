@@ -176,7 +176,7 @@ public final class RecordType extends MapType {
     if(this == type) return true;
     if(!(type instanceof final RecordType rt)) return false;
     // record() (empty record) and record(*) (any record) must remain distinct
-    if((this == Types.RECORD) != (rt == Types.RECORD) ||
+    if(this == Types.RECORD != (rt == Types.RECORD) ||
         sealed != rt.sealed || fields.size() != rt.fields.size()) return false;
 
     final Predicate<byte[]> compareFields = key -> {

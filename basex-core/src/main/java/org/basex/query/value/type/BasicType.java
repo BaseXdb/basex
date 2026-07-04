@@ -882,9 +882,7 @@ public enum BasicType implements Type {
     public Uri cast(final Item item, final QueryContext qc, final InputInfo info)
         throws QueryException {
       if(!item.type.isStringOrUntyped()) throw typeError(item, this, info);
-      final Uri u = Uri.get(item.string(info));
-      if(!u.isValid()) throw castError(item, info);
-      return u;
+      return Uri.get(item.string(info));
     }
     @Override
     public Uri cast(final Object value, final QueryContext qc, final InputInfo info) {
