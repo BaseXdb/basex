@@ -50,26 +50,28 @@ public final class BaseXGUI extends Main {
     super(args);
     parseArgs();
 
+    // initialize fonts and colors
+    final GUIOptions gopts = new GUIOptions();
+    GUIConstants.init(gopts);
+
     // create splash screen
     final JFrame splash = splash();
-
-    // read options
-    final GUIOptions gopts = new GUIOptions();
     // initialize look and feel
     init(gopts);
 
-    // initialize fonts and colors
-    GUIConstants.init(gopts);
-
     SwingUtilities.invokeLater(() -> {
       // open main window and close splash screen
-      final GUI gui = new GUI(context, gopts);
-      splash.dispose();
+      final GUI gui;
+      try {
+        gui = new GUI(context, gopts);
+      } finally {
+        splash.dispose();
+      }
 
       // open specified file
       final ArrayList<IOFile> xqfiles = new ArrayList<>();
       for(final String file : files.finish()) {
-        if(file.contains(IO.BASEXSUFFIX)) continue;
+        if(file.endsWith(IO.BASEXSUFFIX)) continue;
 
         final IOFile io = new IOFile(file);
         final boolean xml = file.endsWith(IO.XMLSUFFIX);
