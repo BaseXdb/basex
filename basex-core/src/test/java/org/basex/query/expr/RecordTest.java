@@ -388,6 +388,37 @@ public final class RecordTest extends SandboxTest {
         + "local:c(1) +:= { 'x': 'y' } +:= { 'x': 3 }", INVTYPE_X);
   }
 
+  /** An update that supplies every field overwrites the record and drops the merge operator. */
+  @Test public void recordPutCovered() {
+    // a covering constant update makes the left operand dead: the operator folds away entirely
+    check("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'a': 7, 'b': 8 }",
+        "{\"a\":7,\"b\":8}", empty(RecordPut.class));
+    // record(...) +:= record(...): every field is overwritten by the right operand
+    query("declare record local:rec(a, b); local:rec(1, 2) +:= local:rec(4, 5)",
+        "{\"a\":4,\"b\":5}");
+    // a non-constant covering update also drops the operator; only the update construction remains
+    check("let $r as record(a, b) := { 'a': 1, 'b': 2 } return $r +:= { 'a': <c/>, 'b': <d/> }",
+        "{\"a\":<c/>,\"b\":<d/>}", empty(RecordPut.class), count(RecordConstructor.class, 1));
+    // a covering constructor update builds the record type directly: no intermediate + coercion,
+    // so the plan carries no TypeCheck (field types differ: integer arguments, double fields)
+    check("declare record local:pt(x as xs:double, y as xs:double);\n"
+        + "declare function f($p as local:pt, $i) as local:pt { $p +:= { 'x': $i, 'y': $i } };\n"
+        + "f(local:pt(0, 0), 3)",
+        "{\"x\":3,\"y\":3}", empty(RecordPut.class), empty(TypeCheck.class));
+    // coercion still applies on the collapsed path: the integer is promoted to the field type
+    query("let $r as record(a as xs:double) := { 'a': 1 } return ($r +:= { 'a': 2 })?a", 2);
+    // the collapsed result stays a sealed record: an undeclared field in the update still errors
+    error("let $r as record(a) := { 'a': 1 } return $r +:= { 'a': 2, 'c': 3 }", INVTYPE_X);
+    // a partial update does NOT trigger the rewrite: the merge is kept, unmentioned fields survive
+    check("declare record local:c(x, y); local:c(<x>1</x>, <y>2</y>) +:= { 'x': 0 }",
+        "{\"x\":0,\"y\":<y>2</y>}", root(RecordPut.class));
+
+    inline(true);
+    // local:rec(...) is inlined and the whole expression constant-folds to a single record
+    check("declare record local:rec(a, b); local:rec(1, 2) +:= local:rec(4, 5)",
+        "{\"a\":4,\"b\":5}", empty(RecordPut.class), root(XQRecordMap.class));
+  }
+
   /** Tests for the compact record map implementation. */
   @Test public void recordMap() {
     String map = "{ 'a': 1, 'b': 2 }";
@@ -416,6 +447,35 @@ public final class RecordTest extends SandboxTest {
 
     map = "for $b in 1 to 6 return { 'a': 1, 'b': $b }";
     check(map + " => map:get('b')", "1\n2\n3\n4\n5\n6", type(DualMap.class, "xs:integer+"));
+  }
+
+  /** {@code map:empty} must be structural: a non-singleton empty record is still empty. */
+  @Test public void mapEmpty() {
+    // constructed empty record: an XQRecordMap, not the shared empty map, but still empty
+    query("declare record local:e(); "
+        + "declare %basex:inline(0) function local:f() as map(*) { local:e() }; "
+        + "map:empty(local:f())", true);
+    // coerced empty record: same runtime type, reached via the coercion path
+    query("declare record local:e(); "
+        + "declare %basex:inline(0) function local:f($x as local:e) as map(*) { $x }; "
+        + "map:empty(local:f({}))", true);
+    // a populated record on the same runtime path must report non-empty
+    query("declare record local:e(x); "
+        + "declare %basex:inline(0) function local:f() as map(*) { local:e(1) }; "
+        + "map:empty(local:f())", false);
+  }
+
+  /** A record-typed value that is not a compact XQRecordMap must still support field access. */
+  @Test public void recordFieldAccess() {
+    // RecordGet/RecordSet index into an XQRecordMap by field position; a record-typed plain map
+    // (here an XQSingletonMap, kept non-constant so it survives to runtime) must not class-cast
+    query("declare function local:f($v) { { 'a': $v }?a }; local:f(1)", 1);   // RecordGet
+    query("map:get({ 'a': (1, 2)[. = 1] }, 'a')", 1);                         // MapGet -> RecordGet
+    query("map:put({ 'a': (1, 2)[. = 1] }, 'a', 5)?a", 5);                    // RecordSet
+    // a two-field record written out of order is materialized as a field-ordered XQRecordMap,
+    // so positional field access still resolves each field to its own value
+    query("declare function local:f($v) { { 'b': $v, 'a': 9 }?a }; local:f(1)", 9);
+    query("declare function local:f($v) { { 'b': $v, 'a': 9 }?b }; local:f(1)", 1);
   }
 
   /** Coercion of records. */
