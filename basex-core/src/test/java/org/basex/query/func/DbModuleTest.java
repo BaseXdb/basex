@@ -549,10 +549,12 @@ public final class DbModuleTest extends SandboxTest {
     query("count(" + _DB_BACKUPS.args() + ")", 2);
 
     final int size1 = Integer.parseInt(query(_DB_BACKUPS.args(NAME) + "/@size ! data()"));
+    query(_DB_DROP_BACKUP.args(NAME));
     query(func.args(NAME, " { 'compress': false() }"));
     final int size2 = Integer.parseInt(query(_DB_BACKUPS.args(NAME) + "/@size ! data()"));
     assertTrue(size1 < size2, "Compressed backup is not smaller than uncompressed one");
 
+    query(_DB_DROP_BACKUP.args(NAME));
     query(func.args(NAME, " { 'comment': 'BLA' }"));
     query(_DB_BACKUPS.args(NAME) + "/@comment ! data()", "BLA");
 
