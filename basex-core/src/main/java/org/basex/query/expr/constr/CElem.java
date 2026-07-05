@@ -133,7 +133,7 @@ public final class CElem extends CName {
       if(!nm.hasURI() && nm.hasPrefix()) throw NOQNNAMENS_X.get(info, nmPrefix);
 
       // create node
-      final FBuilder elem = FElem.build(nm);
+      final FBuilder elem = FElem.build(nm, sc().baseURI().string());
 
       // add child and attribute nodes
       final Constr constr = new Constr(elem, info, qc).add(exprs);

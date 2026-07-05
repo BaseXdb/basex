@@ -26,6 +26,8 @@ import org.w3c.dom.*;
 public final class FElem extends FNode {
   /** Element name. */
   private final QNm name;
+  /** Base URI. */
+  private final byte[] uri;
   /** Namespaces. */
   private Atts namespaces;
   /** Attributes. */
@@ -36,10 +38,12 @@ public final class FElem extends FNode {
   /**
    * Constructor.
    * @param name element name
+   * @param uri base URI
    */
-  private FElem(final QNm name) {
+  private FElem(final QNm name, final byte[] uri) {
     super(NodeType.ELEMENT);
     this.name = name;
+    this.uri = uri;
   }
 
   /**
@@ -48,7 +52,17 @@ public final class FElem extends FNode {
    * @return element builder
    */
   public static FBuilder build(final QNm name) {
-    return new FBuilder(new FElem(name));
+    return build(name, Token.EMPTY);
+  }
+
+  /**
+   * Convenience constructor for creating an element.
+   * @param name element name
+   * @param uri base URI
+   * @return element builder
+   */
+  public static FBuilder build(final QNm name, final byte[] uri) {
+    return new FBuilder(new FElem(name, uri));
   }
 
   /**
@@ -163,7 +177,7 @@ public final class FElem extends FNode {
   @Override
   public byte[] baseURI() {
     final byte[] base = attribute(XML_BASE);
-    return base != null ? base : Token.EMPTY;
+    return base != null ? base : uri;
   }
 
   @Override
