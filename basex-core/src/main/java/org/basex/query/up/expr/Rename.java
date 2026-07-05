@@ -53,7 +53,7 @@ public final class Rename extends Update {
       if(newName == null) {
         final CNode cname;
         if(element) {
-          cname = new CElem(info, false, name, new Atts());
+          cname = new CElem(info, false, name, new Atts(), new Atts());
         } else if(attribute) {
           cname = new CAttr(info, false, name, Empty.VALUE);
         } else {

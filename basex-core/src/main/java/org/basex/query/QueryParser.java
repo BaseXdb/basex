@@ -101,6 +101,8 @@ public class QueryParser extends InputParser {
   private final HashMap<String, Object> sparams = new HashMap<>();
   /** QName cache. */
   private final QNmResolver qnames = new QNmResolver();
+  /** Namespaces of parsed element constructors, to be enriched by enclosing constructors. */
+  private final ArrayList<ConstrNS> constrNS = new ArrayList<>();
   /** Local variable. */
   private final LocalVars localVars = new LocalVars(this);
 
@@ -115,6 +117,13 @@ public class QueryParser extends InputParser {
   private QueryError alter;
   /** Alternative position. */
   private int alterPos;
+
+  /**
+   * Namespaces of an element constructor.
+   * @param nspaces declared namespaces
+   * @param inherited inherited namespaces
+   */
+  private record ConstrNS(Atts nspaces, Atts inherited) { }
 
   /**
    * Type constructor data.
@@ -3247,6 +3256,7 @@ public class QueryParser extends InputParser {
     final byte[] nse = sc.elemNS;
     final byte[] nsd = sc.dirNS;
     final int npos = qnames.size();
+    final int cpos = constrNS.size();
 
     final QNm name = new QNm(qnm);
     qnames.add(name, true, ii);
@@ -3383,7 +3393,21 @@ public class QueryParser extends InputParser {
     qc.ns.size(size);
     sc.elemNS = nse;
     sc.dirNS = nsd;
-    return new CElem(info(), false, name, ns, cont.finish());
+
+    // propagate namespace declarations to enclosed constructors, register own namespaces
+    final int cs = constrNS.size(), nl = ns.size();
+    for(int c = cpos; c < cs; c++) {
+      final ConstrNS cns = constrNS.get(c);
+      for(int n = 0; n < nl; n++) {
+        final byte[] prefix = ns.name(n);
+        if(!cns.nspaces.contains(prefix) && !cns.inherited.contains(prefix)) {
+          cns.inherited.add(prefix, ns.value(n));
+        }
+      }
+    }
+    final Atts inherited = new Atts();
+    constrNS.add(new ConstrNS(ns, inherited));
+    return new CElem(info(), false, name, ns, inherited, cont.finish());
   }
 
   /**
@@ -3526,7 +3550,11 @@ public class QueryParser extends InputParser {
     if(name == null) return null;
     if(name instanceof final QNm qnm) qnames.add(qnm, sc, info());
     skipWs();
-    return current('{') ? new CElem(info(), true, name, new Atts(), enclosedExpr()) : null;
+    if(!current('{')) return null;
+    // register namespaces, to be enriched by enclosing direct constructors
+    final Atts ns = new Atts(), inherited = new Atts();
+    constrNS.add(new ConstrNS(ns, inherited));
+    return new CElem(info(), true, name, ns, inherited, enclosedExpr());
   }
 
   /**

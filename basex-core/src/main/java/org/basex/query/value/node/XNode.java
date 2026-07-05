@@ -279,6 +279,14 @@ public abstract class XNode extends GNode {
   }
 
   /**
+   * Returns namespaces inherited from enclosing constructors.
+   * @return namespaces or {@code null}
+   */
+  public Atts nsInherited() {
+    return null;
+  }
+
+  /**
    * Returns a copy of the namespace hierarchy.
    * @param qc query context (can be {@code null})
    * @return namespaces
@@ -292,6 +300,16 @@ public abstract class XNode extends GNode {
           final byte[] name = nsp.name(a);
           if(!ns.contains(name)) ns.add(name, nsp.value(a));
         }
+      }
+      // constructed elements do not inherit namespaces from their parents
+      final Atts inherited = node.nsInherited();
+      if(inherited != null) {
+        final int is = inherited.size();
+        for(int a = 0; a < is; a++) {
+          final byte[] name = inherited.name(a);
+          if(!ns.contains(name)) ns.add(name, inherited.value(a));
+        }
+        return ns;
       }
     }
     if(qc != null) qc.ns.inScope(ns);
@@ -308,8 +326,14 @@ public abstract class XNode extends GNode {
     if(ns != null) {
       final byte[] s = ns.value(prefix);
       if(s != null) return s;
-      final XNode n = parent();
-      if(n != null) return n.uri(prefix);
+      final Atts inherited = nsInherited();
+      if(inherited != null) {
+        final byte[] u = inherited.value(prefix);
+        if(u != null) return u;
+      } else {
+        final XNode n = parent();
+        if(n != null) return n.uri(prefix);
+      }
     }
     return prefix.length == 0 ? Token.EMPTY : null;
   }

@@ -30,6 +30,8 @@ public final class FElem extends FNode {
   private final byte[] uri;
   /** Namespaces. */
   private Atts namespaces;
+  /** Namespaces inherited from enclosing constructors (constructed elements only, or {@code null}). */
+  private Atts nsInherited;
   /** Attributes. */
   private GNode[] attributes;
   /** Children. */
@@ -121,12 +123,14 @@ public final class FElem extends FNode {
   /**
    * Finalizes the node.
    * @param ns namespaces
+   * @param inherited namespaces inherited from enclosing constructors (can be {@code null})
    * @param at attributes
    * @param ch children
    * @return self reference
    */
-  FElem finish(final Atts ns, final GNode[] at, final GNode[] ch) {
+  FElem finish(final Atts ns, final Atts inherited, final GNode[] at, final GNode[] ch) {
     namespaces = ns;
+    nsInherited = inherited;
     attributes = at;
     children = ch;
     return this;
@@ -170,6 +174,11 @@ public final class FElem extends FNode {
   }
 
   @Override
+  public Atts nsInherited() {
+    return nsInherited;
+  }
+
+  @Override
   public byte[] string() {
     return string(children);
   }
@@ -177,7 +186,8 @@ public final class FElem extends FNode {
   @Override
   public byte[] baseURI() {
     final byte[] base = attribute(XML_BASE);
-    return base != null ? base : uri;
+    // nested elements inherit the base URI from their parents
+    return base != null ? base : parent() == null ? uri : Token.EMPTY;
   }
 
   @Override

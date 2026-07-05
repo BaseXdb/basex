@@ -23,6 +23,8 @@ public final class FBuilder {
   public FNode root;
   /** Namespaces (can be {@code null}). */
   public Atts namespaces;
+  /** Namespaces inherited from enclosing constructors (can be {@code null}). */
+  public Atts nsInherited;
  /** Attributes (can be {@code null}). */
   public GNodeList attributes;
   /** Children (can be {@code null}). */
@@ -143,6 +145,7 @@ public final class FBuilder {
     final Atts ns = namespaces != null ? namespaces.optimize() : NO_NAMESPACES;
     final GNode[] at = attributes != null ? attributes.finish() : NO_NODES;
     final GNode[] ch = children != null ? children.finish() : NO_NODES;
-    return root instanceof final FElem felem ? felem.finish(ns, at, ch) : ((FDoc) root).finish(ch);
+    return root instanceof final FElem felem ? felem.finish(ns, nsInherited, at, ch) :
+      ((FDoc) root).finish(ch);
   }
 }

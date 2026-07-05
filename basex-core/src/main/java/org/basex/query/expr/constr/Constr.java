@@ -43,6 +43,8 @@ public final class Constr {
   private final TokenBuilder text = new TokenBuilder();
   /** Space separator flag. */
   private boolean more;
+  /** Current expression is a direct constructor. */
+  private boolean direct;
 
   /**
    * Creates the children of the constructor.
@@ -69,6 +71,7 @@ public final class Constr {
       final QNmSet qnames = new QNmSet();
       for(final Expr expr : exprs) {
         more = false;
+        direct = expr instanceof final CNode cnode && !cnode.computed;
         final Iter iter = expr.iter(qc);
         for(Item item; (item = qc.next(iter)) != null && add(item, qnames););
       }
@@ -151,7 +154,8 @@ public final class Constr {
 
         // add text node
         builder.text(qc.shared.token(text.next()));
-        final boolean keep = !qc.context.options.get(MainOptions.COPYNODE);
+        // results of nested direct constructors are fresh nodes: adopt them without copying
+        final boolean keep = direct || !qc.context.options.get(MainOptions.COPYNODE);
         builder.node(node.materialize(n -> keep, info, qc));
       }
       more = false;

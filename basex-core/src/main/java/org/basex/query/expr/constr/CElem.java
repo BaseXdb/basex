@@ -32,6 +32,8 @@ import org.basex.util.hash.*;
 public final class CElem extends CName {
   /** Namespaces. */
   private final Atts nspaces;
+  /** Namespaces inherited from enclosing direct constructors. */
+  private final Atts nsInherited;
 
   /**
    * Constructor.
@@ -39,12 +41,14 @@ public final class CElem extends CName {
    * @param computed computed constructor
    * @param name name
    * @param nspaces namespaces
+   * @param nsInherited namespaces inherited from enclosing direct constructors
    * @param exprs element contents
    */
   public CElem(final InputInfo info, final boolean computed, final Expr name, final Atts nspaces,
-      final Expr... exprs) {
+      final Atts nsInherited, final Expr... exprs) {
     super(info, Types.ELEMENT_O, computed, name, exprs);
     this.nspaces = nspaces;
+    this.nsInherited = nsInherited;
   }
 
   @Override
@@ -144,6 +148,7 @@ public final class CElem extends CName {
 
       // assign namespaces
       constr.namespaces(nspaces, nm);
+      elem.nsInherited = nsInherited;
 
       // return optimized node
       return elem.finish();
@@ -155,7 +160,7 @@ public final class CElem extends CName {
   @Override
   public Expr copy(final CompileContext cc, final IntObjectMap<Var> vm) {
     return copyType(new CElem(info, computed, name.copy(cc, vm), new Atts(nspaces),
-        copyAll(cc, vm, exprs)));
+        new Atts(nsInherited), copyAll(cc, vm, exprs)));
   }
 
   /**
@@ -173,7 +178,7 @@ public final class CElem extends CName {
   @Override
   public boolean equals(final Object obj) {
     return this == obj || obj instanceof final CElem celem && nspaces.equals(celem.nspaces) &&
-        super.equals(obj);
+        nsInherited.equals(celem.nsInherited) && super.equals(obj);
   }
 
   @Override
