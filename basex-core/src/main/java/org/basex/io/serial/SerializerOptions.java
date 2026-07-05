@@ -212,7 +212,7 @@ public final class SerializerOptions extends Options {
     if(!(item instanceof final XNode node) || !T_ROOT.matches(node))
       throw ELMMAP_X_X_X.get(info, Q_ROOT.prefixId(XML), item.type, item);
     try {
-      assign(toString((XNode) item, new QNmSet(), info));
+      assign(toString(node, new QNmSet(), info));
     } catch(final BaseXException ex) {
       throw SERDOC_X.get(info, ex);
     }
@@ -329,7 +329,7 @@ public final class SerializerOptions extends Options {
    * @return string
    * @throws QueryException query exception
    */
-  private String toString(final GNode node, final QNmSet cache, final InputInfo info)
+  private String toString(final XNode node, final QNmSet cache, final InputInfo info)
       throws QueryException {
 
     final GNode att = node.attributeIter().next();
@@ -337,7 +337,8 @@ public final class SerializerOptions extends Options {
 
     final StringBuilder sb = new StringBuilder();
     // interpret options
-    for(final GNode child : node.childIter()) {
+    for(final GNode gchild : node.childIter()) {
+      final XNode child = (XNode) gchild;
       if(child.kind() != Kind.ELEMENT) continue;
 
       // ignore elements in other namespace
@@ -360,7 +361,9 @@ public final class SerializerOptions extends Options {
         for(final GNode attr : child.attributeIter()) {
           if(attr.qname().eq(Q_VALUE)) {
             value = string(attr.string());
-            if(option == CDATA_SECTION_ELEMENTS) value = cdataSectionElements(child, value);
+            if(option == CDATA_SECTION_ELEMENTS || option == SUPPRESS_INDENTATION) {
+              value = resolveQNames(child, value);
+            }
           } else {
             throw SERDOC_X.get(info, Util.info("Invalid attribute: '%'", attr.name()));
           }
@@ -373,21 +376,22 @@ public final class SerializerOptions extends Options {
   }
 
   /**
-   * Converts QNames with prefixes to the EQName notation.
+   * Converts lexical QNames to the EQName notation.
    * @param elem root element
    * @param value value
    * @return name with resolved QNames
    */
-  private static String cdataSectionElements(final GNode elem, final String value) {
-    if(!Strings.contains(value, ':')) return value;
-
+  private static String resolveQNames(final XNode elem, final String value) {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] name : distinctTokens(token(value))) {
       byte[] qname = name;
-      final int i = indexOf(name, ':');
-      if(i != -1) {
-        final byte[] uri = ((XNode) elem).nsScope(null).value(substring(name, 0, i));
+      // skip names in EQName notation
+      if(indexOf(name, '{') == -1) {
+        final int i = indexOf(name, ':');
+        final byte[] uri = elem.nsScope(null).value(i == -1 ? EMPTY : substring(name, 0, i));
+        // unprefixed names: default namespace applies (empty if undeclared)
         if(uri != null) qname = QNm.eqName(uri, substring(name, i + 1));
+        else if(i == -1) qname = QNm.eqName(EMPTY, name);
       }
       tb.add(qname).add(' ');
     }
