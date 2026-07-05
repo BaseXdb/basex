@@ -17,6 +17,7 @@ import org.basex.query.value.item.*;
 import org.basex.util.*;
 import org.ccil.cowan.tagsoup.*;
 import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 import nu.validator.htmlparser.common.Heuristics;
 import nu.validator.htmlparser.common.XmlViolationPolicy;
@@ -101,6 +102,44 @@ public final class HtmlParser extends XMLParser {
     } catch(final SAXException ex) {
       Util.errln(ex);
       throw INVHTML_X.getIO(ex.getLocalizedMessage());
+    }
+  }
+
+  /** SAX filter that retains attributes in the XML namespace, dropped by the XML serializer. */
+  private static final class XmlAttributes extends XMLFilterImpl {
+    /** XML namespace URI. */
+    private static final String XML_NS = string(XML_URI);
+
+    /**
+     * Constructor.
+     * @param handler content handler
+     */
+    private XmlAttributes(final ContentHandler handler) {
+      setContentHandler(handler);
+    }
+
+    @Override
+    public void startElement(final String uri, final String local, final String name,
+        final Attributes attrs) throws SAXException {
+      Attributes atts = attrs;
+      final int al = attrs.getLength();
+      for(int a = 0; a < al && atts == attrs; a++) {
+        if(!XML_NS.equals(attrs.getURI(a))) continue;
+        // pass on attributes in the XML namespace via their prefixed name
+        final org.xml.sax.helpers.AttributesImpl list = new org.xml.sax.helpers.AttributesImpl();
+        for(int b = 0; b < al; b++) {
+          final String u = attrs.getURI(b);
+          if(XML_NS.equals(u)) {
+            final String qname = "xml:" + attrs.getLocalName(b);
+            list.addAttribute("", qname, qname, attrs.getType(b), attrs.getValue(b));
+          } else {
+            list.addAttribute(u, attrs.getLocalName(b), attrs.getQName(b), attrs.getType(b),
+                attrs.getValue(b));
+          }
+        }
+        atts = list;
+      }
+      super.startElement(uri, local, name, atts);
     }
   }
 
@@ -206,8 +245,8 @@ public final class HtmlParser extends XMLParser {
         } else {
           reader.setXmlPolicy(XmlViolationPolicy.ALTER_INFOSET);
         }
-        final ContentHandler writer = new XmlSerializer(sw);
-        reader.setContentHandler(writer);
+        final XmlSerializer writer = new XmlSerializer(sw);
+        reader.setContentHandler(new XmlAttributes(writer));
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
 
         if(hopts.get(UNICODE_NORMALIZATION_CHECKING))
