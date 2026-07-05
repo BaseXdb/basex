@@ -373,7 +373,7 @@ public final class SerializerTest extends SandboxTest {
     query(option + "<html><head/></html>",
         "<!DOCTYPE HTML>\n<html>\n  <head>\n    <meta charset=\"UTF-8\">\n  </head>\n</html>");
     query(option + "<html><script/></html>",
-        "<!DOCTYPE HTML>\n<html>\n  <script></script>\n</html>");
+        "<!DOCTYPE HTML>\n<html><script></script></html>");
     query(option + "<html><meta/></html>",
         "<!DOCTYPE HTML>\n<html>\n  <meta>\n</html>");
     query(option + "<html><meta/><meta/></html>",

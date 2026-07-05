@@ -29,16 +29,16 @@ final class HTMLSerializer extends XhtmlHtmlSerializer {
   static final TokenSet FORMATTEDS = new TokenSet("pre", "script", "style", "textarea", "title");
   /** (X)HTML: inline elements. */
   static final TokenSet INLINES = new TokenSet("a", "abbr", "acronym", "b", "bdo", "big", "br",
-      "button", "cite", "code", "dfn", "em", "i", "img", "input", "kbd", "label", "map", "object",
-      "q", "s", "samp", "script", "select", "small", "span", "strike", "strong", "sub", "sup",
-      "textarea", "tt", "u", "var");
+      "button", "cite", "code", "del", "dfn", "em", "i", "img", "input", "ins", "kbd", "label",
+      "map", "object", "q", "s", "samp", "script", "select", "small", "span", "strike", "strong",
+      "sub", "sup", "textarea", "tt", "u", "var");
   /** HTML5: inline elements. */
   static final TokenSet INLINES5 = new TokenSet("a", "abbr", "area", "audio", "b", "bdi", "bdo",
-      "br", "button", "canvas", "cite", "code", "data", "datalist", "dfn", "em", "embed", "i",
-      "img", "input", "kbd", "keygen", "label", "map", "mark", "math", "meter", "noscript",
-      "object", "output", "picture", "progress", "q", "rp", "rt", "ruby", "s", "samp", "select",
-      "small", "span", "strong", "sub", "sup", "svg", "textarea", "time", "u", "var", "video",
-      "wbr");
+      "br", "button", "canvas", "cite", "code", "data", "datalist", "del", "dfn", "em", "embed",
+      "i", "iframe", "img", "input", "ins", "kbd", "keygen", "label", "map", "mark", "math",
+      "meter", "noscript", "object", "output", "picture", "progress", "q", "rp", "rt", "ruby",
+      "s", "samp", "script", "select", "slot", "small", "span", "strong", "sub", "sup", "svg",
+      "template", "textarea", "time", "u", "var", "video", "wbr");
   /** (X)HTML: URI attributes. */
   static final TokenSet URIS = new TokenSet("a@href", "a@name", "applet@codebase", "area@href",
       "base@href", "blockquote@cite", "body@background", "button@datasrc", "del@cite",
