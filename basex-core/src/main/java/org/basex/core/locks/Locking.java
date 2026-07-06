@@ -57,8 +57,10 @@ public final class Locking {
   private final ReentrantReadWriteLock globalLocks;
   /** Stores one lock for each lock string. */
   private final Map<String, LocalReadWriteLock> localLocks = new HashMap<>();
-  /** Lock object for queuing local writes and global reads. */
-  private final Object globalLock = new Object();
+  /** Lock for queuing local writes and global reads. */
+  private final ReentrantLock globalLock = new ReentrantLock();
+  /** Condition for signaling completion of local writes and global reads. */
+  private final Condition globalCond = globalLock.newCondition();
 
   /** Number of running local writers. */
   private int localWriters;
@@ -112,22 +114,25 @@ public final class Locking {
     // apply exclusive lock (global write), or shared lock otherwise
     if(lock) (writes.global() ? globalLocks.writeLock() : globalLocks.readLock()).lock();
 
-    synchronized(globalLock) {
+    globalLock.lock();
+    try {
       final boolean localWrite = writes.local(), globalRead = reads.global();
       if(localWrite && globalRead) {
         // job is both local writer and global reader
-        while(localWriters > 0 || globalReaders > 0) globalLock.wait();
+        while(localWriters > 0 || globalReaders > 0) globalCond.await();
         localWriters++;
         globalReaders++;
       } else if(localWrite) {
         // local write lock: wait for completion of global readers
-        while(globalReaders > 0) globalLock.wait();
+        while(globalReaders > 0) globalCond.await();
         localWriters++;
       } else if(globalRead) {
         // global read lock: wait for completion of local writers
-        while(localWriters > 0) globalLock.wait();
+        while(localWriters > 0) globalCond.await();
         globalReaders++;
       }
+    } finally {
+      globalLock.unlock();
     }
 
     // assign locks in sorted order (to ensure that write locks will be assigned first)
@@ -156,19 +161,25 @@ public final class Locking {
     for(final String string : writes) unpin(string).writeLock().unlock();
 
     // allow next global reader to resume
-    synchronized(globalLock) {
+    globalLock.lock();
+    try {
       if(reads.global()) {
         globalReaders--;
-        globalLock.notifyAll();
+        globalCond.signalAll();
       }
+    } finally {
+      globalLock.unlock();
     }
 
     // allow next local writer to resume
-    synchronized(globalLock) {
+    globalLock.lock();
+    try {
       if(writes.local()) {
         localWriters--;
-        globalLock.notifyAll();
+        globalCond.signalAll();
       }
+    } finally {
+      globalLock.unlock();
     }
 
     // release exclusive lock (global write), or shared lock otherwise
