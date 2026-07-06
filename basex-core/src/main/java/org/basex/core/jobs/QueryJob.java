@@ -190,11 +190,13 @@ public final class QueryJob extends Job implements Runnable {
    * Starts the job if it is not currently running.
    */
   void startIfNotRunning() {
-    if(running.compareAndSet(false, true)) new Thread(this).start();
+    if(running.compareAndSet(false, true)) jc().context.jobs.execute(this);
   }
 
   @Override
   public void run() {
+    // clear a possibly stale interrupt status
+    Thread.interrupted();
     try {
       result.init();
 

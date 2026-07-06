@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 import org.basex.core.*;
 import org.basex.util.*;
@@ -32,6 +33,10 @@ public final class JobPool {
 
   /** Timer. */
   final Timer timer = new Timer(true);
+  /** Executor for running jobs. */
+  private final ExecutorService pool = Executors.newCachedThreadPool(factory("basex-job"));
+  /** Available slots for jobs running in parallel. */
+  private final Semaphore slots = new Semaphore(MAX_RUNNING);
   /** Timeout (ms). */
   private final long timeout;
 
@@ -44,20 +49,29 @@ public final class JobPool {
   }
 
   /**
-   * Registers a job (puts it on a queue).
+   * Runs a job in a separate thread.
+   * @param job job to run
+   */
+  void execute(final QueryJob job) {
+    pool.execute(job);
+  }
+
+  /**
+   * Registers a job, blocking until a run slot is available.
    * @param job job
    */
   public void register(final Job job) {
-    while(active.size() >= MAX_RUNNING) Performance.sleep(10);
+    slots.acquireUninterruptibly();
     active.put(job.jc().id(), job);
   }
 
   /**
-   * Unregisters a job.
+   * Unregisters a job and releases its run slot.
    * @param job job
    */
   public void unregister(final Job job) {
     active.remove(job.jc().id());
+    slots.release();
   }
 
   /**
@@ -68,6 +82,7 @@ public final class JobPool {
     timer.cancel();
     for(final Job job : active.values()) job.stop();
     while(!active.isEmpty()) Performance.sleep(10);
+    pool.shutdown();
   }
 
   /**
@@ -117,5 +132,15 @@ public final class JobPool {
     results.remove(id);
 
     return job != null || task != null;
+  }
+
+  /**
+   * Creates a thread factory that assigns readable, numbered names.
+   * @param name thread name prefix
+   * @return thread factory
+   */
+  private static ThreadFactory factory(final String name) {
+    final AtomicInteger id = new AtomicInteger();
+    return runnable -> new Thread(runnable, name + '-' + id.incrementAndGet());
   }
 }
