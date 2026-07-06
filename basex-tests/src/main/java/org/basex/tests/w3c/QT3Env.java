@@ -51,6 +51,8 @@ final class QT3Env {
   final boolean collContext;
   /** Collection sources. */
   final StringList collSources;
+  /** Collection query (empty string if none). */
+  final String collQuery;
 
   /**
    * Constructor.
@@ -81,6 +83,9 @@ final class QT3Env {
     collSources = new StringList();
     for(final XdmItem iatt : new XQuery("*:collection/*:source/@file", ctx).context(env))
       collSources.add(iatt.getString());
+
+    // collection defined by a query (produces arbitrary items, e.g. JSON maps)
+    collQuery = XQuery.string("*:collection/*:query", env, ctx);
 
     decFormats = new HashMap<>();
     for(final XdmItem item : new XQuery("*:decimal-format", ctx).context(env)) {

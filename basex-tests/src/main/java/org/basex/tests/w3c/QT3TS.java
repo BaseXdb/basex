@@ -356,8 +356,13 @@ public final class QT3TS extends Main {
           query.addResource(uri, path, encoding);
           if(encoding == null) locations.put(uri, new IOFile(path));
         }
-        // bind collections
-        query.addCollection(env.collURI, env.collSources.toArray());
+        // bind collections (from source files, or from a query producing arbitrary items)
+        if(!env.collQuery.isEmpty()) {
+          final XQuery cq = new XQuery(env.collQuery, ctx).baseURI(baseURI);
+          query.addCollection(env.collURI, cq.value());
+        } else {
+          query.addCollection(env.collURI, env.collSources.toArray());
+        }
         if(env.collContext) {
           query.context(query.collection(env.collURI));
         }

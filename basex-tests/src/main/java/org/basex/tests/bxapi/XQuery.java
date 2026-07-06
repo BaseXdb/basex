@@ -115,6 +115,15 @@ public final class XQuery implements Iterable<XdmItem>, Closeable {
   }
 
   /**
+   * Adds a collection built from a value (e.g. produced by a &lt;query&gt; environment).
+   * @param name name of the collection (can be empty string)
+   * @param value collection value
+   */
+  public void addCollection(final String name, final XdmValue value) {
+    qp.qc.resources.addCollection(name, value.internal());
+  }
+
+  /**
    * Returns a collection of document nodes.
    * @param name name of the collection (empty string for default collection)
    * @return reference

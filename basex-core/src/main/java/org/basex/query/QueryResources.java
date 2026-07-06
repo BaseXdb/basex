@@ -399,6 +399,15 @@ public final class QueryResources {
   }
 
   /**
+   * Adds a collection with the specified value. Only called from the test APIs.
+   * @param name name of collection (can be empty string)
+   * @param value collection value
+   */
+  public void addCollection(final String name, final Value value) {
+    addCollection(value, name);
+  }
+
+  /**
    * Attaches full-text maps. Only called from the test APIs.
    * @param sw stop words
    * @param th thesaurus
