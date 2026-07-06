@@ -5,6 +5,7 @@ import static org.basex.util.Strings.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLAccess.*;
 
+import java.security.*;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -22,6 +23,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class User {
+  /** Source of randomness for salt generation. */
+  private static final SecureRandom RANDOM = new SecureRandom();
+
   /** Stored password codes. */
   private final EnumMap<Algorithm, EnumMap<Code, String>> passwords;
   /** Database patterns for local permissions. */
@@ -184,7 +188,9 @@ public final class User {
       final EnumMap<Code, String> codes = passwords.computeIfAbsent(algorithm,
           k -> new EnumMap<>(Code.class));
       if(algorithm == Algorithm.SALTED_SHA256) {
-        final String salt = Long.toString(System.nanoTime());
+        final byte[] bytes = new byte[16];
+        RANDOM.nextBytes(bytes);
+        final String salt = string(hex(bytes, false));
         codes.put(Code.SALT, salt);
         codes.put(Code.HASH, sha256(salt + password));
       } else {
