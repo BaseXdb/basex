@@ -211,16 +211,12 @@ public enum Calc {
         // check for absorbing number
         if(dbl2 == 0) return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Itr.ZERO : null;
       }
-      // merge arithmetical expressions
-      if(type == DOUBLE) {
-        if(expr1.equals(expr2)) {
-          return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
-        }
-        if(_MATH_POW.is(expr1)) {
-          if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof final ANum num) {
-            return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(num.dbl() + 1));
-          }
-        }
+      // x * x → math:pow(x, 2). The chain is deliberately not grown further
+      // (math:pow(x, y) * x → math:pow(x, y + 1)): StrictMath.pow only special-cases the
+      // exponent 2, so higher powers would be slower than the equivalent multiplications,
+      // whereas math:pow(x, 2) stays fast and enables constant folding.
+      if(type == DOUBLE && expr1.equals(expr2)) {
+        return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
       }
       if(expr2 instanceof final Arith arth) {
         if(arth.calc == DIVIDE && arth.exprs[0] instanceof Itr && arth.exprs[1].equals(expr1)) {
