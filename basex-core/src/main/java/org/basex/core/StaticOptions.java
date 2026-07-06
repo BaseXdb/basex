@@ -2,6 +2,7 @@ package org.basex.core;
 
 import java.util.*;
 
+import org.basex.core.users.*;
 import org.basex.io.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -103,6 +104,9 @@ public final class StaticOptions extends Options {
   /** Default authentication method. */
   public static final EnumOption<AuthMethod> AUTHMETHOD =
       new EnumOption<>("AUTHMETHOD", AuthMethod.BASIC);
+  /** Password algorithms (comma-separated, in order of priority). */
+  public static final StringOption AUTHALGORITHMS =
+      new StringOption("AUTHALGORITHMS", "salted-sha256,digest");
 
   /** Authorization method. */
   public enum AuthMethod {
@@ -148,6 +152,33 @@ public final class StaticOptions extends Options {
       Prop.setSystem("http.nonProxyHosts", nph);
     }
     if(get(IGNORECERT)) IOUrl.ignoreCertificates();
+
+    // warn if digest authentication is enabled without a matching password algorithm
+    if(get(AUTHMETHOD) == AuthMethod.DIGEST && !Enums.oneOf(Algorithm.DIGEST, authAlgorithms())) {
+      Util.errln("Warning: %='%' requires '%' in %.",
+          AUTHMETHOD.name(), AuthMethod.DIGEST, Algorithm.DIGEST, AUTHALGORITHMS.name());
+    }
+  }
+
+  /**
+   * Returns the enabled password algorithms, in order of priority. Unknown entries are ignored;
+   * if none remain, salted SHA-256 is used.
+   * @return algorithms
+   */
+  public Algorithm[] authAlgorithms() {
+    final ArrayList<Algorithm> list = new ArrayList<>();
+    for(final String entry : Strings.split(get(AUTHALGORITHMS), ',')) {
+      final String name = entry.trim();
+      if(name.isEmpty()) continue;
+      final Algorithm algorithm = Enums.get(Algorithm.class, name);
+      if(algorithm == null) {
+        Util.errln("Ignoring unknown authentication algorithm: '%'.", name);
+      } else if(!list.contains(algorithm)) {
+        list.add(algorithm);
+      }
+    }
+    if(list.isEmpty()) list.add(Algorithm.SALTED_SHA256);
+    return list.toArray(Algorithm[]::new);
   }
 
   /**

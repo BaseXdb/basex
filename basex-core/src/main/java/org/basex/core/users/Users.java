@@ -115,7 +115,7 @@ public final class Users {
     if(file.exists()) return;
 
     final String pw = UUID.randomUUID().toString();
-    get(ADMIN).password(pw);
+    get(ADMIN).password(pw, ctx.soptions.authAlgorithms());
     write();
     ctx.log.writeServer(LogType.INFO,
         "Initial " + ADMIN + " password (change after first login): " + pw);
@@ -127,6 +127,20 @@ public final class Users {
    */
   public synchronized void add(final User user) {
     users.put(user.name(), user);
+  }
+
+  /**
+   * Recomputes and persists outdated passwords.
+   * @param user user
+   * @param password password (plain text)
+   * @param algorithms currently configured algorithms
+   */
+  public synchronized void rehash(final User user, final String password,
+      final Algorithm[] algorithms) {
+    if(user.outdated(algorithms)) {
+      user.password(password, algorithms);
+      write();
+    }
   }
 
   /**

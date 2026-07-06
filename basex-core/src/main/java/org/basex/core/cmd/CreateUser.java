@@ -31,7 +31,7 @@ public final class CreateUser extends AUser {
     if(name.equals(UserText.ADMIN)) return error(ADMIN_STATIC);
 
     final Users users = context.users;
-    users.add(new User(name, password));
+    users.add(new User(name, password, context.soptions.authAlgorithms()));
     users.write();
     return info(USER_CREATED_X, args[0]);
   }

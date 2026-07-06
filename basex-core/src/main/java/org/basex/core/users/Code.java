@@ -10,6 +10,7 @@ import org.basex.util.*;
  */
 public enum Code {
   /** Salt. */ SALT,
+  /** Iterations. */ ITERATIONS,
   /** Hash. */ HASH;
 
   @Override

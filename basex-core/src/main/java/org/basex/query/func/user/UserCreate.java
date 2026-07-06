@@ -27,7 +27,7 @@ public final class UserCreate extends UserFn {
     final ArrayList<Perm> perms = toPermissions(arg(2), qc);
     final StringList patterns = toPatterns(arg(3), qc);
 
-    final User user = new User(name, password);
+    final User user = new User(name, password, qc.context.soptions.authAlgorithms());
     if(name.equals(UserText.ADMIN)) throw USER_ADMIN.get(info);
 
     if(defined(4)) {

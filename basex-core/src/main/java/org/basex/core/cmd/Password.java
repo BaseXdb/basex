@@ -25,7 +25,7 @@ public final class Password extends AUser {
     final Users users = context.users;
     final User user = context.user();
     final String password = args[0];
-    user.password(password);
+    user.password(password, context.soptions.authAlgorithms());
     users.write();
     return info(PW_CHANGED_X, user.name());
   }

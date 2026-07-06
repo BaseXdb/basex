@@ -18,7 +18,7 @@ public final class UserCheck extends UserFn {
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final User user = toUser(arg(0), false, qc);
-    if(user.matches(toString(arg(1), qc))) return Empty.VALUE;
+    if(user.matches(toString(arg(1), qc), qc.context.soptions.authAlgorithms())) return Empty.VALUE;
     throw USER_PASSWORD_X.get(info, user.name());
   }
 }

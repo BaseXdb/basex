@@ -1,11 +1,9 @@
 package org.basex.core.users;
 
 import static org.basex.core.users.UserText.*;
-import static org.basex.util.Strings.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLAccess.*;
 
-import java.security.*;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -23,9 +21,6 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class User {
-  /** Source of randomness for salt generation. */
-  private static final SecureRandom RANDOM = new SecureRandom();
-
   /** Stored password codes. */
   private final EnumMap<Algorithm, EnumMap<Code, String>> passwords;
   /** Database patterns for local permissions. */
@@ -52,10 +47,11 @@ public final class User {
    * Constructor with password.
    * @param name username
    * @param password password
+   * @param algorithms algorithms for which passwords are computed
    */
-  public User(final String name, final String password) {
+  public User(final String name, final String password, final Algorithm[] algorithms) {
     this(name);
-    password(password);
+    password(password, algorithms);
   }
 
   /**
@@ -101,12 +97,12 @@ public final class User {
         passwords.put(algorithm, ec);
 
         for(final GNode code : children(child)) {
-          final Code cd = value(name, code.qname().unique(), algorithm.codes);
+          final Code cd = value(name, code.qname().unique(), algorithm.codeTypes);
           if(ec.containsKey(cd)) throw new BaseXException(
               "%, %: Code % supplied more than once.", name, algorithm, code);
           ec.put(cd, string(code.string()));
         }
-        for(final Code code : algorithm.codes) {
+        for(final Code code : algorithm.codeTypes) {
           if(ec.get(code) == null)
             throw new BaseXException("%, %: Code '%' missing.", name, algorithm, code);
         }
@@ -180,22 +176,14 @@ public final class User {
   }
 
   /**
-   * Computes new password hashes.
+   * Computes new passwords.
    * @param password password (plain text)
+   * @param algorithms algorithms for which password codes are computed
    */
-  public synchronized void password(final String password) {
-    for(final Algorithm algorithm : Algorithm.values()) {
-      final EnumMap<Code, String> codes = passwords.computeIfAbsent(algorithm,
-          k -> new EnumMap<>(Code.class));
-      if(algorithm == Algorithm.SALTED_SHA256) {
-        final byte[] bytes = new byte[16];
-        RANDOM.nextBytes(bytes);
-        final String salt = string(hex(bytes, false));
-        codes.put(Code.SALT, salt);
-        codes.put(Code.HASH, sha256(salt + password));
-      } else {
-        codes.put(Code.HASH, digest(name, password));
-      }
+  public synchronized void password(final String password, final Algorithm[] algorithms) {
+    passwords.clear();
+    for(final Algorithm algorithm : algorithms) {
+      passwords.put(algorithm, algorithm.create(name, password));
     }
   }
 
@@ -203,10 +191,11 @@ public final class User {
    * Returns the specified code.
    * @param algorithm used algorithm
    * @param code code to be returned
-   * @return code, or {@code null} if code does not exist
+   * @return code, or {@code null} if the algorithm or code does not exist
    */
   public synchronized String code(final Algorithm algorithm, final Code code) {
-    return passwords.get(algorithm).get(code);
+    final EnumMap<Code, String> codes = passwords.get(algorithm);
+    return codes != null ? codes.get(code) : null;
   }
 
   /**
@@ -279,14 +268,31 @@ public final class User {
   }
 
   /**
-   * Computes the hash from the specified password and checks if it is correct.
-   * @param password (plain text)
-   * @return name
+   * Checks if the specified password is correct.
+   * @param password password (plain text)
+   * @param algorithms algorithms to check
+   * @return result of check
    */
-  public synchronized boolean matches(final String password) {
-    if(!enabled()) return false;
-    final EnumMap<Code, String> algorithm = passwords.get(Algorithm.SALTED_SHA256);
-    return sha256(algorithm.get(Code.SALT) + password).equals(algorithm.get(Code.HASH));
+  public synchronized boolean matches(final String password, final Algorithm[] algorithms) {
+    for(final Algorithm algorithm : algorithms) {
+      final EnumMap<Code, String> codes = passwords.get(algorithm);
+      if(codes != null && algorithm.verify(name, password, codes)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Checks if stored password codes should be recomputed.
+   * @param algorithms configured algorithms
+   * @return result of check
+   */
+  synchronized boolean outdated(final Algorithm[] algorithms) {
+    if(passwords.size() != algorithms.length) return true;
+    for(final Algorithm algorithm : algorithms) {
+      final EnumMap<Code, String> codes = passwords.get(algorithm);
+      if(codes == null || !algorithm.current(codes)) return true;
+    }
+    return false;
   }
 
   /**
@@ -303,16 +309,6 @@ public final class User {
    */
   public synchronized void info(final XNode elem) {
     info = elem.hasChildren() || elem.hasAttributes() ? elem : null;
-  }
-
-  /**
-   * Returns the digest hash value.
-   * @param name username
-   * @param password password
-   * @return digest digest hash
-   */
-  private static String digest(final String name, final String password) {
-    return md5(name + ':' + Prop.NAME + ':' + password);
   }
 
   @Override

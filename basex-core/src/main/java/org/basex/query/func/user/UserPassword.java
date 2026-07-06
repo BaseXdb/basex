@@ -26,6 +26,8 @@ public final class UserPassword extends UserFn {
   private static final class Password extends UserUpdate {
     /** Password. */
     private final String password;
+    /** Password algorithms. */
+    private final Algorithm[] algorithms;
 
     /**
      * Constructor.
@@ -38,11 +40,12 @@ public final class UserPassword extends UserFn {
         final InputInfo info) {
       super(UpdateType.USERPASSWORD, user, qc, info);
       this.password = password;
+      algorithms = qc.context.soptions.authAlgorithms();
     }
 
     @Override
     public void apply() {
-      user.password(password);
+      user.password(password, algorithms);
     }
 
     @Override
