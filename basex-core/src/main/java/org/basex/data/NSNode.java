@@ -195,7 +195,7 @@ final class NSNode {
     } else if(num > 0) {
       // otherwise remove nodes from the child array
       Array.remove(nodes, i, num, sz);
-      for(int n = size; n < sz; n++) nodes[n] = null;
+      Arrays.fill(nodes, size, sz, null);
     }
   }
 

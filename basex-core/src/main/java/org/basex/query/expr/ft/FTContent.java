@@ -2,6 +2,8 @@ package org.basex.query.expr.ft;
 
 import static org.basex.query.QueryText.*;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.util.ft.*;
 import org.basex.query.var.*;
@@ -47,7 +49,7 @@ public final class FTContent extends FTFilter {
         final boolean[] bl = new boolean[s];
         for(final FTStringMatch sm : combo) {
           if(sm.gaps) continue;
-          for(int p = sm.start; p <= sm.end; ++p) bl[p] = true;
+          Arrays.fill(bl, sm.start, sm.end + 1, true);
         }
         boolean entire = true;
         for(final boolean b : bl) {

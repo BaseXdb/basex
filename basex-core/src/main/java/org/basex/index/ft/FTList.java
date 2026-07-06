@@ -4,6 +4,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
 
 import org.basex.data.*;
 import org.basex.io.*;
@@ -64,7 +65,7 @@ final class FTList {
     dat = new DataAccess(filed);
     tp = new int[data.meta.maxlen + 3];
     final int tl = tp.length;
-    for(int t = 0; t < tl; t++) tp[t] = -1;
+    Arrays.fill(tp, 0, tl, -1);
     sizes = data.meta.dbFile(DATAFTX + prefix + 'x');
     try(DataAccess li = new DataAccess(sizes)) {
       int is = li.readNum();

@@ -1,5 +1,7 @@
 package org.basex.query.var;
 
+import java.util.*;
+
 import org.basex.query.*;
 import org.basex.query.func.prof.*;
 import org.basex.query.value.*;
@@ -46,7 +48,7 @@ public final class QueryStack {
     final int s = start;
     ensureCapacity(s + size);
     final Value[] vls = values;
-    for(int e = end; --e >= s;) vls[e] = null;
+    Arrays.fill(vls, s, end, null);
     end = s + size;
   }
 
@@ -57,7 +59,7 @@ public final class QueryStack {
   public void exitFrame(final int fp) {
     final int s = start;
     final Value[] vls = values;
-    for(int en = end; --en >= s;) vls[en] = null;
+    Arrays.fill(vls, s, end, null);
     end = s;
     start = fp;
 

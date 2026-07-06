@@ -85,7 +85,7 @@ public final class FTIndex extends ValueIndex {
     dataZ = new DataAccess(data.meta.dbFile(DATAFTX + 'z'));
     positions = new int[data.meta.maxlen + 3];
     final int pl = positions.length;
-    for(int p = 0; p < pl; p++) positions[p] = -1;
+    Arrays.fill(positions, -1);
     for(int is = dataX.readNum(); --is >= 0;) {
       final int p = dataX.readNum();
       positions[p] = dataX.read4();

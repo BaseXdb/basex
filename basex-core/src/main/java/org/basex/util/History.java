@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.*;
+
 /**
  * This class stores strings in a history.
  *
@@ -136,7 +138,7 @@ public final class History {
     hist[pos] = str;
     caret[pos] = nc;
     // remove old entries to save memory
-    for(int p = pos + 1; p < MAX; p++) hist[p] = null;
+    Arrays.fill(hist, pos + 1, MAX, null);
   }
 
   /**

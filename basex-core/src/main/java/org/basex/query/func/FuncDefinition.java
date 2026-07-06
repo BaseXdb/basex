@@ -131,7 +131,7 @@ public final class FuncDefinition {
       final int tl = types.length;
       Array.copy(types, tl, st);
       final SeqType var = types[tl - 1];
-      for(int t = tl; t < arity; t++) st[t] = var;
+      Arrays.fill(st, tl, arity, var);
     } else {
       Array.copy(types, arity, st);
     }
@@ -146,9 +146,7 @@ public final class FuncDefinition {
   QNm[] paramNames(final int arity) {
     final QNm[] qnames = new QNm[arity];
     final int nl = params.length;
-    for(int n = Math.min(arity, nl); --n >= 0;) {
-      qnames[n] = params[n];
-    }
+    Array.copy(params, Math.min(arity, nl), qnames);
     if(arity > nl) {
       final String nm = Token.string(params[nl - 1].local());
       final int start = 1;

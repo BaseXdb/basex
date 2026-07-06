@@ -181,7 +181,7 @@ public abstract class ObjectList<E, L extends ObjectList<E, ?>> extends ElementL
     for(int i = 0; i < s; ++i) {
       if(!equals(lst[i], element)) lst[ns++] = lst[i];
     }
-    for(int i = ns; i < s; i++) lst[i] = null;
+    Arrays.fill(lst, ns, s, null);
     size = ns;
     return s != ns;
   }

@@ -49,7 +49,7 @@ public final class BitArray {
     this(new long[(Math.max(0, capacity - 1) >>> WORD_POWER) + 1], capacity);
     if(set) {
       final int p = Math.max(0, capacity - 1) >>> WORD_POWER;
-      for(int i = 0; i < p; i++) words[i] = 0XFFFFFFFFFFFFFFFFL;
+      Arrays.fill(words, 0, p, 0XFFFFFFFFFFFFFFFFL);
       for(int i = p << WORD_POWER; i < capacity; i++) set(i);
     }
   }
