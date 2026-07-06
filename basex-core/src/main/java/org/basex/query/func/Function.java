@@ -141,7 +141,7 @@ public enum Function implements AFunction {
       params(STRING_O, STRING_ZO), BASE64_BINARY_O),
   /** XQuery function. */
   COLLECTION(FnCollection::new, "collection([source])",
-      params(STRING_ZO), DOCUMENT_ZM, flag(NDT)),
+      params(STRING_ZO), ITEM_ZM, flag(NDT)),
   /** XQuery function. */
   COMPARE(FnCompare::new, "compare(value1,value2[,collation])",
       params(ANY_ATOMIC_TYPE_ZO, ANY_ATOMIC_TYPE_ZO, STRING_ZO), INTEGER_ZO),
@@ -2101,9 +2101,6 @@ public enum Function implements AFunction {
   /** XQuery function. */
   _WEB_ERROR(WebError::new, "error(status,message)",
       params(INTEGER_O, STRING_O), ITEM_ZM, flag(NDT), WEB_URI),
-  /** XQuery function. */
-  _WEB_FORWARD(WebForward::new, "forward(path[,parameters])",
-      params(STRING_O, MAP_ZO), ELEMENT_O, WEB_URI),
   /** XQuery function. */
   _WEB_REDIRECT(WebRedirect::new, "redirect(url[,parameters,anchor,status])",
       params(STRING_O, MAP_ZO, STRING_ZO, INTEGER_ZO), ELEMENT_O, WEB_URI),

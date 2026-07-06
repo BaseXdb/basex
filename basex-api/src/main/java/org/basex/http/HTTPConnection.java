@@ -5,11 +5,9 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.function.*;
 
-import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 
 import org.basex.core.*;
@@ -35,10 +33,6 @@ public final class HTTPConnection implements ClientInfo {
   /** Forwarding headers. */
   private static final String[] FORWARDING_HEADERS = { "X-Forwarded-For", "Proxy-Client-IP",
       "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR" };
-  /** Allowed characters in a forwarding path (pchar and '/', without percent-encoding). */
-  private static final String FORWARD_PATH = "[-A-Za-z0-9._~!$&'()*+,;=:@/]*";
-  /** Allowed characters in a forwarding query (pchar, '/', '?' and percent-encoding). */
-  private static final String FORWARD_QUERY = "[-A-Za-z0-9._~!$&'()*+,;=:@/?%]*";
 
   /** HTTP servlet request. */
   public final HttpServletRequest request;
@@ -253,37 +247,6 @@ public final class HTTPConnection implements ClientInfo {
    */
   public void redirect(final String location) throws IOException {
     response.sendRedirect(resolve(location));
-  }
-
-  /**
-   * Sends a forward.
-   * @param location location
-   * @throws IOException I/O exception
-   * @throws ServletException servlet exception
-   */
-  public void forward(final String location) throws IOException, ServletException {
-    request.setAttribute(HTTPText.FORWARD, requestCtx);
-    request.getRequestDispatcher(resolve(location)).forward(request, response);
-  }
-
-  /**
-   * Checks if a location is a valid target for server-side forwarding.
-   * @param location location
-   * @return result of check
-   */
-  public boolean forwardable(final String location) {
-    try {
-      final URI uri = new URI(location);
-      if(uri.getScheme() != null || uri.getRawAuthority() != null || uri.getRawFragment() != null)
-        return false;
-      final String raw = uri.getRawPath();
-      if(raw != null && (!raw.matches(FORWARD_PATH) || raw.contains("//"))) return false;
-      final String query = uri.getRawQuery();
-      return query == null || query.matches(FORWARD_QUERY);
-    } catch(final URISyntaxException ex) {
-      Util.debug(ex);
-      return false;
-    }
   }
 
   @Override

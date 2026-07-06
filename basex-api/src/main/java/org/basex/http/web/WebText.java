@@ -87,10 +87,6 @@ public interface WebText {
   String ERROR_CONFLICT_X_X = "Multiple functions exist for error path \"%\":%";
   /** Error message. */
   String ERROR_QS_X = "Invalid quality factor: qs=%";
-  /** Error message. */
-  String NO_VALUE_X = "'%' element has no string value.";
-  /** Error message. */
-  String INVALID_FORWARD_X = "Invalid forwarding location: '%'.";
 
   /** QName. */
   QNm Q_STATUS = new QNm("status");
@@ -119,8 +115,6 @@ public interface WebText {
   Test T_HTTP_RESPONSE = NameTest.get(new QNm("response", HTTP_URI));
   /** RESTXQ Response test. */
   Test T_REST_RESPONSE = NameTest.get(new QNm("response", REST_URI));
-  /** RESTXQ Forward test. */
-  Test T_REST_FORWARD = NameTest.get(new QNm("forward", REST_URI));
   /** HTTP Header test. */
   Test T_HTTP_HEADER = NameTest.get(new QNm("header", HTTP_URI));
 }

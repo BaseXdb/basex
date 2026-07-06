@@ -31,8 +31,6 @@ public interface HTTPText {
   String DBA_CLIENT_ID = "dba";
   /** Client ID. */
   String CLIENT_ID = "id";
-  /** Forwarded request context. */
-  String FORWARD = "forward";
 
   /** HTTP header string. */
   String WWW_AUTHENTICATE = "WWW-Authenticate";
@@ -92,8 +90,6 @@ public interface HTTPText {
 
   /** QName. */
   QNm Q_REST_RESPONSE = new QNm(REST_PREFIX, "response", REST_URI);
-  /** QName. */
-  QNm Q_REST_FORWARD = new QNm(REST_PREFIX, "forward", REST_URI);
 
   /** QName. */
   QNm Q_HTTP_BODY = new QNm(HTTP_PREFIX, "body", HTTP_URI);

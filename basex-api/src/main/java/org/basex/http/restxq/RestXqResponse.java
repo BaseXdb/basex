@@ -41,8 +41,6 @@ final class RestXqResponse extends WebResponse {
   private RestXqFunction func;
   /** Status code. */
   private Integer status;
-  /** Forwarding. */
-  String forward;
 
   /**
    * Constructor.
@@ -92,16 +90,7 @@ final class RestXqResponse extends WebResponse {
       // handle special cases
       if(item != null && item.type == NodeType.ELEMENT) {
         final GNode node = (XNode) item;
-        if(T_REST_FORWARD.matches(node)) {
-          // server-side forwarding
-          final GNode ch = node.childIter().next();
-          if(ch == null || ch.type != NodeType.TEXT) throw func.error(NO_VALUE_X, node.name());
-          final String location = string(ch.string()).trim();
-          if(!conn.forwardable(location)) throw func.error(INVALID_FORWARD_X, location);
-          // assign the field only once valid: finish() forwards any non-null value, even on error
-          forward = location;
-          item = iter.next();
-        } else if(T_REST_RESPONSE.matches(node)) {
+        if(T_REST_RESPONSE.matches(node)) {
           // custom response
           so = build(node);
           item = iter.next();
@@ -149,7 +138,7 @@ final class RestXqResponse extends WebResponse {
       if(size > 0) conn.response.getOutputStream().write(cache.buffer(), 0, size);
     }
 
-    return status != null || forward != null ? Response.CUSTOM :
+    return status != null ? Response.CUSTOM :
       response ? Response.STANDARD : Response.NONE;
   }
 
@@ -160,10 +149,6 @@ final class RestXqResponse extends WebResponse {
       if(registered) qc.unregister(ctx);
     }
     if(singleton != null) singleton.unregister();
-    if(forward != null) {
-      conn.log(SC_NO_CONTENT, "");
-      conn.forward(forward);
-    }
   }
 
   /**

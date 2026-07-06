@@ -35,8 +35,6 @@ public final class RequestContext {
   private XQMap headers;
   /** Content body. */
   private IOContent body;
-  /** Query string. */
-  private final String query;
 
   /**
    * Returns an immutable map with all query parameters.
@@ -44,7 +42,6 @@ public final class RequestContext {
    */
   public RequestContext(final HttpServletRequest request) {
     this.request = request;
-    query = request.getQueryString();
   }
 
   /**
@@ -87,11 +84,7 @@ public final class RequestContext {
    */
   public XQMap queryValues() throws QueryException {
     if(values == null) {
-      // combine query parameters of previous and current request
       final MapBuilder mb = new MapBuilder();
-      final RequestContext forward = (RequestContext)
-          HTTPConnection.getAttribute(request, HTTPText.FORWARD);
-      if(forward != null && forward.query != null) addParams(forward.query, mb);
       final String string = request.getQueryString();
       if(string != null) addParams(string, mb);
       values = mb.map();
@@ -133,13 +126,7 @@ public final class RequestContext {
    */
   public IOContent body() throws IOException {
     if(body == null) {
-      final RequestContext forward = (RequestContext)
-          HTTPConnection.getAttribute(request, HTTPText.FORWARD);
-      if(forward != null && forward.body != null) {
-        body = forward.body;
-      } else {
-        body = new IOContent(BufferInput.get(request.getInputStream()).content());
-      }
+      body = new IOContent(BufferInput.get(request.getInputStream()).content());
     }
     return body;
   }
