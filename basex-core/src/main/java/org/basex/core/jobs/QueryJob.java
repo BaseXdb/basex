@@ -207,6 +207,7 @@ public final class QueryJob extends Job implements Runnable {
 
       final Performance perf = new Performance();
       qp = new QueryProcessor(job.query, opts.get(JobOptions.BASE_URI), ctx, null);
+      boolean registered = false;
       try {
         // parse, push and register query. order is important!
         for(final Entry<String, Value> binding : job.bindings.entrySet()) {
@@ -229,6 +230,7 @@ public final class QueryJob extends Job implements Runnable {
 
         // register job
         pushJob(qp);
+        registered = true;
         register(ctx);
         // reset timer
         perf.nanoRuntime();
@@ -253,12 +255,14 @@ public final class QueryJob extends Job implements Runnable {
           state(JobState.SCHEDULED);
         }
 
-        if(ctx.jobs.active.containsKey(id)) {
+        if(qp != null) {
           qp.close();
-          unregister(ctx);
-          popJob();
+          if(registered) {
+            unregister(ctx);
+            popJob();
+            result.time += jc.performance.nanoRuntime();
+          }
           qp = null;
-          result.time += jc.performance.nanoRuntime();
         }
 
         // write concluding log entry, invalidate performance measurements
