@@ -111,11 +111,7 @@ public final class QueryJob extends Job implements Runnable {
       // create and schedule job task
       final QueryJobTask task = new QueryJobTask(this, delay, interval, duration);
       jobs.tasks.put(id, task);
-      if(interval > 0) {
-        jobs.timer.scheduleAtFixedRate(task, delay, interval);
-      } else {
-        jobs.timer.schedule(task, delay);
-      }
+      jobs.schedule(task, delay, interval);
     }
   }
 

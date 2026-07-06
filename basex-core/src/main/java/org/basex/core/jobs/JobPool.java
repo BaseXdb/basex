@@ -28,11 +28,12 @@ public final class JobPool {
   public final Map<String, Job> active = new ConcurrentHashMap<>();
   /** Cached results. */
   public final Map<String, QueryJobResult> results = new ConcurrentHashMap<>();
-  /** Timer tasks. */
+  /** Scheduled tasks. */
   public final Map<String, QueryJobTask> tasks = new ConcurrentHashMap<>();
 
-  /** Timer. */
-  final Timer timer = new Timer(true);
+  /** Scheduler for delayed and periodic job tasks. */
+  private final ScheduledExecutorService scheduler =
+      Executors.newSingleThreadScheduledExecutor(factory("basex-scheduler"));
   /** Executor for running jobs. */
   private final ExecutorService pool = Executors.newCachedThreadPool(factory("basex-job"));
   /** Available slots for jobs running in parallel. */
@@ -54,6 +55,21 @@ public final class JobPool {
    */
   void execute(final QueryJob job) {
     pool.execute(job);
+  }
+
+  /**
+   * Schedules a job task for delayed or periodic execution.
+   * @param task job task
+   * @param delay initial delay (ms)
+   * @param interval repeat interval (ms; run once: {@code 0})
+   */
+  void schedule(final QueryJobTask task, final long delay, final long interval) {
+    // assign the cancellation handle before the task can run its body (see QueryJobTask#run)
+    synchronized(task) {
+      task.future(interval > 0
+          ? scheduler.scheduleAtFixedRate(task, delay, interval, TimeUnit.MILLISECONDS)
+          : scheduler.schedule(task, delay, TimeUnit.MILLISECONDS));
+    }
   }
 
   /**
@@ -79,7 +95,7 @@ public final class JobPool {
    */
   public synchronized void close() {
     // stop running tasks and queries
-    timer.cancel();
+    scheduler.shutdownNow();
     for(final Job job : active.values()) job.stop();
     while(!active.isEmpty()) Performance.sleep(10);
     pool.shutdown();
@@ -90,12 +106,7 @@ public final class JobPool {
    * @param job job
    */
   public void scheduleResult(final Job job) {
-    timer.schedule(new TimerTask() {
-      @Override
-      public void run() {
-        results.remove(job.jc().id());
-      }
-    }, timeout);
+    scheduler.schedule(() -> results.remove(job.jc().id()), timeout, TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -123,7 +134,7 @@ public final class JobPool {
    */
   public boolean remove(final String id) {
     // stop scheduled task
-    final TimerTask task = tasks.remove(id);
+    final QueryJobTask task = tasks.remove(id);
     if(task != null) task.cancel();
     // send stop signal to job
     final Job job = active.get(id);
@@ -141,6 +152,10 @@ public final class JobPool {
    */
   private static ThreadFactory factory(final String name) {
     final AtomicInteger id = new AtomicInteger();
-    return runnable -> new Thread(runnable, name + '-' + id.incrementAndGet());
+    return runnable -> {
+      final Thread thread = new Thread(runnable, name + '-' + id.incrementAndGet());
+      thread.setDaemon(true);
+      return thread;
+    };
   }
 }

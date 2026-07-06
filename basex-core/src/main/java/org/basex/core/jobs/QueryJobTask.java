@@ -1,6 +1,6 @@
 package org.basex.core.jobs;
 
-import java.util.*;
+import java.util.concurrent.*;
 
 import org.basex.util.*;
 
@@ -10,7 +10,7 @@ import org.basex.util.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-public final class QueryJobTask extends TimerTask {
+public final class QueryJobTask implements Runnable {
   /** Job. */
   public final QueryJob job;
   /** Interval. */
@@ -20,6 +20,10 @@ public final class QueryJobTask extends TimerTask {
 
   /** Next start time. */
   public long start;
+  /** Handle for cancelling the scheduled task. */
+  private ScheduledFuture<?> future;
+  /** Indicates that cancellation was requested before the future was assigned. */
+  private boolean canceled;
 
   /**
    * Constructor.
@@ -38,7 +42,7 @@ public final class QueryJobTask extends TimerTask {
   }
 
   @Override
-  public void run() {
+  public synchronized void run() {
     // check if job needs to be evaluated repeatedly
     start += interval;
     if(interval == 0 || start >= end) {
@@ -46,6 +50,23 @@ public final class QueryJobTask extends TimerTask {
       cancel();
     }
     job.startIfNotRunning();
+  }
+
+  /**
+   * Assigns the handle for canceling the scheduled task.
+   * @param ftr scheduled future
+   */
+  synchronized void future(final ScheduledFuture<?> ftr) {
+    future = ftr;
+    if(canceled) ftr.cancel(false);
+  }
+
+  /**
+   * Cancels the scheduled task, stopping any further repetitions.
+   */
+  synchronized void cancel() {
+    canceled = true;
+    if(future != null) future.cancel(false);
   }
 
   @Override

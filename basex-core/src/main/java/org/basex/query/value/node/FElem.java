@@ -30,7 +30,7 @@ public final class FElem extends FNode {
   private final byte[] uri;
   /** Namespaces. */
   private Atts namespaces;
-  /** Namespaces inherited from enclosing constructors (constructed elements only, or {@code null}). */
+  /** Namespaces inherited from enclosing constructors (can be {@code null}). */
   private Atts nsInherited;
   /** Attributes. */
   private GNode[] attributes;
