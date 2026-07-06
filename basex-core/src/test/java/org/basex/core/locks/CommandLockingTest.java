@@ -290,6 +290,14 @@ public final class CommandLockingTest extends SandboxTest {
     ckDBs(new XQuery(_REPO_LIST.args()), false, REPO_LIST);
   }
 
+  /** Test store module: store functions never acquire query locks (in-memory monitor only). */
+  @Test public void store() {
+    ckDBs(new XQuery(_STORE_GET.args("key")), false, NONE);
+    ckDBs(new XQuery(_STORE_PUT.args("key", "value")), false, NONE);
+    ckDBs(new XQuery(_STORE_READ.args()), false, NONE);
+    ckDBs(new XQuery(_STORE_WRITE.args()), false, NONE);
+  }
+
   /** Test XQuery module. */
   @Test public void xqueryModule() {
     ckDBs(new XQuery(_XQUERY_EVAL.args("1")), false, null);
