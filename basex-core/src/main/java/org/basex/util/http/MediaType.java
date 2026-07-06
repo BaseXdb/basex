@@ -88,14 +88,14 @@ public final class MediaType implements Comparable<MediaType> {
     final int p = string.indexOf(';');
     final String type = p == -1 ? string : string.substring(0, p);
 
-    // set main and subtype
+    // set main and subtype (case-insensitive, RFC 2045)
     final int s = type.indexOf('/');
-    main = s == -1 ? type : type.substring(0, s);
-    sub  = s == -1 ? "" : type.substring(s + 1);
+    main = (s == -1 ? type : type.substring(0, s)).toLowerCase(Locale.ENGLISH);
+    sub  = (s == -1 ? "" : type.substring(s + 1)).toLowerCase(Locale.ENGLISH);
 
     // parse parameters (simplified version of RFC 2045; no support for comments, etc.)
     if(p != -1) {
-      for(final String param : Strings.split(string.substring(p + 1), ';')) {
+      for(final String param : splitParams(string.substring(p + 1))) {
         final String[] kv = Strings.split(param, '=', 2);
         // attribute: trim whitespace, convert to lower case
         final String k = kv[0].trim().toLowerCase(Locale.ENGLISH);
@@ -105,6 +105,35 @@ public final class MediaType implements Comparable<MediaType> {
         parameters.put(k, v);
       }
     }
+  }
+
+  /**
+   * Splits a parameter list on ';', ignoring separators inside quoted strings.
+   * @param string parameter list (without the leading type)
+   * @return parameters
+   */
+  private static ArrayList<String> splitParams(final String string) {
+    final ArrayList<String> params = new ArrayList<>();
+    final StringBuilder sb = new StringBuilder();
+    final int sl = string.length();
+    boolean quoted = false;
+    for(int i = 0; i < sl; i++) {
+      final char c = string.charAt(i);
+      // keep backslash-escaped character verbatim
+      if(c == '\\' && i + 1 < sl) {
+        sb.append(c).append(string.charAt(++i));
+      } else if(c == '"') {
+        quoted = !quoted;
+        sb.append(c);
+      } else if(c == ';' && !quoted) {
+        params.add(sb.toString());
+        sb.setLength(0);
+      } else {
+        sb.append(c);
+      }
+    }
+    params.add(sb.toString());
+    return params;
   }
 
   /**

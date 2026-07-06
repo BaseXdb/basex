@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.http.HTTPText.*;
 
 import java.io.*;
+import java.util.regex.*;
 import java.util.zip.*;
 
 import org.basex.build.csv.*;
@@ -40,7 +41,7 @@ public final class Payload {
   /** Payloads (can be {@code null}). */
   private final ItemList payloads;
   /** Input stream. */
-  private final InputStream input;
+  private InputStream input;
   /** Input info (can be {@code null}). */
   private final InputInfo info;
   /** Database options. */
@@ -71,6 +72,10 @@ public final class Payload {
    * @throws QueryException query exception
    */
   FNode parse(final MediaType type, final String encoding) throws IOException, QueryException {
+    // decompress before parsing (applies to multipart and single-part alike); coding is
+    // case-insensitive (RFC 9110)
+    if(GZIP.equalsIgnoreCase(encoding)) input = new GZIPInputStream(input);
+
     final FBuilder body;
     if(type.isMultipart()) {
       // multipart response
@@ -83,8 +88,7 @@ public final class Payload {
       // single part response
       body = FElem.build(Q_HTTP_BODY);
       if(payloads != null) {
-        final InputStream in = GZIP.equals(encoding) ? new GZIPInputStream(input) : input;
-        payloads.add(parse(BufferInput.get(in).content(), type));
+        payloads.add(parse(BufferInput.get(input).content(), type));
       }
     }
     return body.attr(Q_MEDIA_TYPE, type.type()).finish();
@@ -127,7 +131,7 @@ public final class Payload {
     while(true) {
       final byte[] l = readLine();
       if(l == null) throw HC_REQ_X.get(info, "No body specified for http:part");
-      if(eq(sep, l)) break;
+      if(matchBoundary(sep, l)) break;
     }
     // parse part
     while(extractPart(sep, concat(sep, DASHES), parts));
@@ -147,7 +151,7 @@ public final class Payload {
 
     // check if last line is reached
     byte[] line = readLine();
-    if(line == null || eq(line, end)) return false;
+    if(line == null || matchBoundary(end, line)) return false;
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
@@ -163,7 +167,7 @@ public final class Payload {
         if(key.equalsIgnoreCase(CONTENT_TYPE)) {
           type = new MediaType(value);
         } else if(key.equalsIgnoreCase(CONTENT_TRANSFER_ENCODING)) {
-          base64 = value.equals(BASE64);
+          base64 = value.equalsIgnoreCase(BASE64);
         }
         if(!value.isEmpty() && parts != null) {
           parts.add(FElem.build(Q_HTTP_HEADER).attr(Q_NAME, key).attr(Q_VALUE, value).finish());
@@ -179,10 +183,10 @@ public final class Payload {
     final ByteList bl = new ByteList();
     while(true) {
       line = readLine();
-      if(line == null || eq(line, sep)) break;
+      if(line == null || matchBoundary(sep, line)) break;
 
       // RFC 1341: Epilogue is to be ignored
-      if(eq(line, end)) {
+      if(matchBoundary(end, line)) {
         while(readLine() != null);
         break;
       }
@@ -216,6 +220,26 @@ public final class Payload {
       bl.add(b);
     }
     return bl.isEmpty() ? null : bl.finish();
+  }
+
+  /**
+   * Checks if a line is a boundary delimiter, tolerating trailing transport-padding
+   * (spaces and tabs, RFC 2046 §5.1.1).
+   * @param boundary expected boundary bytes
+   * @param line line to check
+   * @return result of check
+   */
+  private static boolean matchBoundary(final byte[] boundary, final byte[] line) {
+    final int bl = boundary.length, ll = line.length;
+    if(ll < bl) return false;
+    for(int i = 0; i < bl; i++) {
+      if(boundary[i] != line[i]) return false;
+    }
+    for(int i = bl; i < ll; i++) {
+      final byte c = line[i];
+      if(c != ' ' && c != '\t') return false;
+    }
+    return true;
   }
 
   /**
@@ -270,16 +294,28 @@ public final class Payload {
           cont.add(line);
         }
       } else if(startsWith(lc(line), CONTENT_DISPOSITION)) {
-        // get key and file name
+        // get key and file name; match each parameter on its own (the 'name' token also
+        // occurs inside 'filename', so a plain search would confuse the two)
         final String ln = string(line);
-        name = Str.get(ln.contains("name=") ? ln.replaceAll("^.*?name=\"|\".*", "").
-          replaceAll("\\[]", "") : "");
-        filename = Str.get(ln.contains("filename=") ? ln.replaceAll("^.*filename=\"|\"$", "") : "");
+        name = Str.get(disposition(ln, "name").replaceAll("\\[]", ""));
+        filename = Str.get(disposition(ln, "filename"));
       } else if(line.length == 0) {
         lines = 0;
       }
     }
     return data;
+  }
+
+  /**
+   * Extracts the quoted value of a Content-Disposition parameter. The parameter name must not be
+   * preceded by a word character (so {@code name} is not matched inside {@code filename}).
+   * @param string disposition line
+   * @param key parameter name
+   * @return value (empty string if the parameter is absent)
+   */
+  private static String disposition(final String string, final String key) {
+    final Matcher m = Pattern.compile("(?<![\\w-])" + key + "=\"([^\"]*)\"").matcher(string);
+    return m.find() ? m.group(1) : "";
   }
 
   // STATIC METHODS ===============================================================================
@@ -348,7 +384,10 @@ public final class Payload {
     if(xml || text) {
       // convert text to UTF8; skip redundant XML declaration
       data = new NewlineInput(new IOContent(body), type.parameter(CHARSET)).content();
-      if(xml && startsWith(data, DECLSTART)) {
+      // '<?xml' is only a declaration if followed by whitespace; otherwise it is a
+      // processing instruction such as '<?xml-stylesheet?>', which must be kept
+      if(xml && startsWith(data, DECLSTART) && data.length > DECLSTART.length &&
+          ws(data[DECLSTART.length])) {
         final int d = indexOf(data, DECLEND, DECLSTART.length);
         if(d != -1) data = substring(data, d + DECLEND.length);
       }

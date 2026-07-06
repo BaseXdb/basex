@@ -138,9 +138,10 @@ public final class Client {
 
       // set method, attach payload
       final String method = request.attribute(METHOD);
+      final boolean hasBody = !(request.payload.isEmpty() && request.parts.isEmpty());
       if(method != null) {
         final BodyPublisher publisher;
-        if(request.payload.isEmpty() && request.parts.isEmpty()) {
+        if(!hasBody) {
           publisher = HttpRequest.BodyPublishers.noBody();
         } else {
           setContentType(rb, request);
@@ -149,8 +150,11 @@ public final class Client {
         rb.method(method, publisher);
       }
 
-      // assign headers to request; ensure that Accept header is sent; catch illegal header names
-      request.headers.forEach(rb::header);
+      // assign headers to request; the Content-Type of a payload request is already set above,
+      // so skip it here to avoid sending it twice; ensure that Accept header is sent
+      request.headers.forEach((name, value) -> {
+        if(!(hasBody && name.equalsIgnoreCase(CONTENT_TYPE))) rb.header(name, value);
+      });
       if(((Checks<String>) name -> !name.equalsIgnoreCase(ACCEPT)).all(request.headers.keySet())) {
         rb.header(ACCEPT, MediaType.ALL_ALL.toString());
       }
@@ -187,15 +191,21 @@ public final class Client {
    * @param request request data
    */
   private static void setContentType(final HttpRequest.Builder rb, final Request request) {
-    String ct;
-    final String contType = request.headers.get(CONTENT_TYPE.toLowerCase(Locale.ENGLISH));
-    if(contType != null) {
-      // if content type is set in the header, its value is used
-      ct = contType;
-    } else {
-      // otherwise @media-type of <http:body/> is considered
+    // look up an explicit Content-Type header (case-insensitively)
+    String ct = null;
+    for(final Entry<String, String> header : request.headers.entrySet()) {
+      if(header.getKey().equalsIgnoreCase(CONTENT_TYPE)) {
+        ct = header.getValue();
+        break;
+      }
+    }
+    if(ct == null) {
+      // no header: @media-type of <http:body/> is considered
       ct = request.payloadAtts.get(SerializerOptions.MEDIA_TYPE.name());
       if(request.isMultipart) ct = Strings.concat(ct, "; ", BOUNDARY, "=", request.boundary());
+    } else if(request.isMultipart && new MediaType(ct).parameter(BOUNDARY) == null) {
+      // multipart header without boundary: append the generated boundary
+      ct = Strings.concat(ct, "; ", BOUNDARY, "=", request.boundary());
     }
     rb.header(CONTENT_TYPE, ct);
   }
@@ -295,9 +305,9 @@ public final class Client {
         return;
       }
 
-      // serialization parameters
+      // serialization parameters (binary is resolved below, so that nodes get atomized)
       if(key.equals(SerializerOptions.METHOD.name())) {
-        method = value.equals(BINARY) ? SerialMethod.BASEX.toString() : value;
+        method = value;
       } else {
         sopts.assign(key, value);
         if(key.equals(SerializerOptions.MEDIA_TYPE.name())) type = value;

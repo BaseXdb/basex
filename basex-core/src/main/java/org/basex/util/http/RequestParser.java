@@ -104,7 +104,8 @@ public final class RequestParser {
         if(qn.equals(Q_NAME)) name = string(attr.string());
         else if(qn.equals(Q_VALUE)) value = string(attr.string());
       }
-      if(!name.isEmpty() && !value.isEmpty()) headers.put(name, value);
+      // an empty value is legal HTTP; repeated names are comma-merged (RFC 7230)
+      if(!name.isEmpty()) headers.merge(name, value, (a, b) -> a + ", " + b);
     }
     return null;
   }
@@ -155,8 +156,16 @@ public final class RequestParser {
       final Part part = new Part();
       final GNode payload = parseHeaders(iter, part.headers);
       if(payload == null) break;
-      // content is set from <http:body/> children or from $bodies parameter
-      final Item body = bodies.next();
+      // a part payload must be an <http:body/> element
+      if(!payload.qname().eq(Q_HTTP_BODY))
+        throw HC_REQ_X.get(info, "Unknown payload element: " + payload.qname());
+      // a part loading its content from 'src' takes no item from the $bodies sequence;
+      // otherwise the content is set from <http:body/> children or from $bodies
+      boolean src = false;
+      for(final GNode attr : payload.attributeIter()) {
+        if(string(attr.name()).equals(SRC)) { src = true; break; }
+      }
+      final Item body = src ? null : bodies.next();
       parseBody(payload, body == null ? Empty.VALUE : body, part.attributes, part.contents);
       parts.add(part);
     }
@@ -190,7 +199,7 @@ public final class RequestParser {
 
     // check other parameters
     final String timeout = request.attribute(RequestAttribute.TIMEOUT);
-    if(timeout != null && Strings.toInt(timeout) < 0)
+    if(timeout != null && Strings.toInt(timeout) <= 0)
       throw HC_REQ_X.get(info, "Invalid timeout: " + timeout);
 
     for(final RequestAttribute r : new RequestAttribute[] {
@@ -198,7 +207,7 @@ public final class RequestParser {
       RequestAttribute.SEND_AUTHORIZATION
     }) {
       final String s = request.attribute(r);
-      if(s != null && !Strings.eq(s, Text.TRUE, Text.FALSE))
+      if(s != null && !Strings.isTrue(s) && !Strings.isFalse(s))
         throw HC_REQ_X.get(info, "Value of '" + r + "' attribute is no boolean: " + s);
     }
   }
