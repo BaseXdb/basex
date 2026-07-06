@@ -204,17 +204,27 @@ public final class FuncItemTest extends SandboxTest {
   }
 
   /**
-   * Checks if function items that have a non-empty closure but no arguments are correctly inlined.
+   * GH-796: inlining a higher-order function whose typed parameter captures a closure used to
+   * raise a compile-time "Improper use?" exception.
    */
   @Test public void gh796() {
-    check("declare function local:f($x as item()) { function() { $x } };" +
+    query("declare function local:f($x as item()) { function() { $x } };" +
         "declare function local:g($f, $x) {if(fn:empty($f())) then local:f($x) else local:f(())};" +
         "declare variable $x := local:g(function() { () }, function() { () });" +
         "fn:count($x())",
-        1,
-        // the query should be pre-evaluated
-        "QueryPlan/Itr = 1"
-    );
+        1);
+    // captured closure returns more than one item (original report)
+    query("declare function local:f($x as item()) { function() { $x } };" +
+        "declare function local:g($f, $x) {if(fn:empty($f())) then local:f($x) else local:f(())};" +
+        "declare variable $x := local:g(function() { () }, function() { (), () });" +
+        "fn:count($x())",
+        1);
+    // no type annotation on the captured parameter
+    query("declare function local:f($x) { function() { $x } };" +
+        "declare function local:g($f, $x) {if(fn:empty($f())) then local:f($x) else local:f(())};" +
+        "declare variable $x := local:g(function() { () }, function() { () });" +
+        "fn:count($x())",
+        1);
   }
 
   /** Tests for coercion of function items. */

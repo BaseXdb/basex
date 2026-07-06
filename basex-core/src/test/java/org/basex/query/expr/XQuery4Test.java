@@ -522,12 +522,21 @@ public final class XQuery4Test extends SandboxTest {
     // non-deterministic global variable, referenced but folded away: must not be evaluated
     query("declare variable $x := error(); if(<a/>/b) then $x else 1", 1);
     query("declare variable $x := prof:sleep(1); if(<a/>/b) then $x else 1", 1);
+    // referenced only through a function whose call is folded away: still not evaluated
+    query("declare variable $x := error();"
+        + "declare function local:f() { $x };"
+        + "if(<a/>/b) then local:f() else 1", 1);
 
     // referenced non-deterministic global variable: still evaluated (errors surface)
     error("declare variable $x := error(); $x", FUNERR1);
     error("declare variable $x := error(); if(<a/>/self::a) then $x else 1", FUNERR1);
+    error("declare variable $x := error();"
+        + "declare function local:f() { $x };"
+        + "if(<a/>/self::a) then local:f() else 1", FUNERR1);
     // a lazy non-deterministic variable is evaluated only once (value is cached)
     query("declare variable $x := random:integer(); $x = $x", true);
+    // a non-deterministic variable referenced twice keeps a single, shared value
+    query("declare variable $x := random:integer(); ($x, $x)[1] = ($x, $x)[2]", true);
 
     // deterministic global variables stay eager: still pre-evaluated even if folded away
     error("declare variable $x := 1 idiv 0; if(<a/>/b) then $x else 1", DIVZERO_X);
