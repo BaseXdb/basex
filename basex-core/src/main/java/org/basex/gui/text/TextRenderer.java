@@ -294,9 +294,11 @@ final class TextRenderer extends BaseXBack {
     final Graphics g = getGraphics();
     cache.reset();
     final TextIterator iter = init(g, true);
-    cache.add(y, 0);
+    cache.add(y, 0, syntax.state());
     while(more(iter, g)) {
-      if(next(iter)) cache.add(y, iter.posEnd());
+      // advance the highlighter state so it can be restored when rendering resumes mid-document
+      syntax.getColor(iter);
+      if(next(iter)) cache.add(y, iter.posEnd(), syntax.state());
     }
     cache.finish(text.size(), width);
     height = getHeight() + fontHeight;
@@ -312,7 +314,10 @@ final class TextRenderer extends BaseXBack {
   private void skip(final TextIterator iter) {
     if(!cache.valid(text.size(), width)) return;
     final int top = scroll.pos();
-    position(iter, cache.indexByY(top), -top);
+    final int idx = cache.indexByY(top);
+    position(iter, idx, -top);
+    // restore the highlighter state captured for this line so colors resume correctly
+    syntax.state(cache.state(idx));
   }
 
   /**

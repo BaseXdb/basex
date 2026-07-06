@@ -51,4 +51,15 @@ final class SyntaxJSON extends Syntax {
     if(quote) quoted ^= true;
     return quote || quoted ? brown : red;
   }
+
+  @Override
+  public int[] state() {
+    return new int[] { quoted ? 1 : 0, back ? 1 : 0 };
+  }
+
+  @Override
+  public void state(final int[] state) {
+    quoted = state[0] != 0;
+    back = state[1] != 0;
+  }
 }

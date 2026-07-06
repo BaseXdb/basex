@@ -129,6 +129,20 @@ public final class SyntaxXML extends Syntax {
   }
 
   @Override
+  public int[] state() {
+    return new int[] { quote, name ? 1 : 0, elem ? 1 : 0, comment, pi };
+  }
+
+  @Override
+  public void state(final int[] state) {
+    quote = state[0];
+    name = state[1] != 0;
+    elem = state[2] != 0;
+    comment = state[3];
+    pi = state[4];
+  }
+
+  @Override
   public byte[] commentOpen() {
     return XMLToken.COMM_O;
   }

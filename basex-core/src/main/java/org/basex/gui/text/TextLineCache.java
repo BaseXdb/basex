@@ -1,5 +1,7 @@
 package org.basex.gui.text;
 
+import java.util.*;
+
 import org.basex.util.list.*;
 
 /**
@@ -14,6 +16,8 @@ final class TextLineCache {
   private final IntList ys = new IntList();
   /** Text position at each line start. */
   private final IntList ps = new IntList();
+  /** Highlighter state at each line start. */
+  private final ArrayList<int[]> states = new ArrayList<>();
   /** Text length the cache was built for (staleness guard). */
   private int length = -1;
   /** Text width the cache was built for (staleness guard). */
@@ -25,16 +29,19 @@ final class TextLineCache {
   void reset() {
     ys.reset();
     ps.reset();
+    states.clear();
   }
 
   /**
    * Appends a line start.
    * @param y document-space y
    * @param p text position
+   * @param state highlighter state at the line start
    */
-  void add(final int y, final int p) {
+  void add(final int y, final int p, final int[] state) {
     ys.add(y);
     ps.add(p);
+    states.add(state);
   }
 
   /**
@@ -91,6 +98,15 @@ final class TextLineCache {
    */
   int pos(final int idx) {
     return ps.get(idx);
+  }
+
+  /**
+   * Returns the highlighter state at the specified line index.
+   * @param idx line index
+   * @return state
+   */
+  int[] state(final int idx) {
+    return states.get(idx);
   }
 
   /**

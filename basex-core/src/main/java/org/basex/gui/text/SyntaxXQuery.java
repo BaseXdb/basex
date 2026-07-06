@@ -130,6 +130,19 @@ final class SyntaxXQuery extends Syntax {
   }
 
   @Override
+  public int[] state() {
+    return new int[] { comment, quote, var ? 1 : 0, elem ? 1 : 0 };
+  }
+
+  @Override
+  public void state(final int[] state) {
+    comment = state[0];
+    quote = state[1];
+    var = state[2] != 0;
+    elem = state[3] != 0;
+  }
+
+  @Override
   public byte[] commentOpen() {
     return XMLToken.XQCOMM_O;
   }

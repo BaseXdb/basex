@@ -36,6 +36,26 @@ abstract class Syntax {
    */
   public abstract Color getColor(TextIterator iter);
 
+  /** Empty highlighter state. */
+  private static final int[] NO_STATE = {};
+
+  /**
+   * Returns a snapshot of the current highlighting state. Allows the highlighter to resume
+   * mid-document (see {@link TextLineCache}).
+   * @return state (empty if the highlighter is stateless)
+   */
+  public int[] state() {
+    return NO_STATE;
+  }
+
+  /**
+   * Restores a highlighting state previously returned by {@link #state()}.
+   * @param state state to restore
+   */
+  @SuppressWarnings("unused")
+  public void state(final int[] state) {
+  }
+
   /**
    * Returns the start of a comment.
    * @return comment start

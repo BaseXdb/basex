@@ -121,6 +121,20 @@ final class SyntaxJS extends Syntax {
   }
 
   @Override
+  public int[] state() {
+    return new int[] { comment1, comment2, quote, var ? 1 : 0, back ? 1 : 0 };
+  }
+
+  @Override
+  public void state(final int[] state) {
+    comment1 = state[0];
+    comment2 = state[1];
+    quote = state[2];
+    var = state[3] != 0;
+    back = state[4] != 0;
+  }
+
+  @Override
   public byte[] commentOpen() {
     return XMLToken.JSCOMM_O;
   }
