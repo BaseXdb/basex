@@ -23,6 +23,9 @@ import org.basex.util.log.*;
  * @author Andreas Weiler
  */
 public final class BaseXServer extends CLI implements Runnable {
+  /** Maximum number of queued incoming connections (absorbs connection bursts). */
+  private static final int BACKLOG = 1 << 10;
+
   /** New sessions. */
   private final HashSet<ClientListener> authorizing = new HashSet<>();
   /** Indicates if server is running. */
@@ -101,7 +104,7 @@ public final class BaseXServer extends CLI implements Runnable {
     try {
       socket = new ServerSocket();
       socket.setReuseAddress(true);
-      socket.bind(new InetSocketAddress(addr, port));
+      socket.bind(new InetSocketAddress(addr, port), BACKLOG);
       stopFile = stopFile(getClass(), port);
     } catch(final BindException ex) {
       context.log.writeServer(LogType.ERROR, Util.message(ex));
