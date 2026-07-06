@@ -211,6 +211,7 @@ public final class QueryJob extends Job implements Runnable {
         }
         qp.parse();
         updating = qp.updating;
+        qp.compile();
         result.time = perf.nanoRuntime();
 
         // register job
