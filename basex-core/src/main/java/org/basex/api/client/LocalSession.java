@@ -60,7 +60,9 @@ public final class LocalSession extends Session {
       final OutputStream output) throws LoginException {
 
     this(context, output, context.users.get(username));
-    if(!ctx.user().matches(password)) throw new LoginException(username);
+    final Algorithm[] algorithms = ctx.soptions.authAlgorithms();
+    if(!ctx.user().matches(password, algorithms)) throw new LoginException(username);
+    ctx.users.rehash(ctx.user(), password, algorithms);
   }
 
   /**

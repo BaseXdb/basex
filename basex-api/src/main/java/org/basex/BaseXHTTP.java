@@ -153,7 +153,7 @@ public final class BaseXHTTP extends CLI {
     // the call of this function may already have been triggered during the start of jetty
     hc.init(wac.getServletContext());
     context = hc.context();
-    if(password != null) context.user().password(password);
+    if(password != null) context.user().password(password, context.soptions.authAlgorithms());
 
     // start daemon for stopping the HTTP server
     final int stopPort = soptions.get(StaticOptions.STOPPORT);

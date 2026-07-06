@@ -99,8 +99,6 @@ public class QueryParser extends InputParser {
   private final HashSet<String> decl = new HashSet<>();
   /** Output declarations. */
   private final HashMap<String, Object> sparams = new HashMap<>();
-  /** QName cache. */
-  private final QNmResolver qnames = new QNmResolver();
   /** Namespaces of parsed element constructors, to be enriched by enclosing constructors. */
   private final ArrayList<ConstrNS> constrNS = new ArrayList<>();
   /** Local variable. */
@@ -288,7 +286,6 @@ public class QueryParser extends InputParser {
     }
 
     // completes the parsing step
-    qnames.resolve(this, 0, sc.elemNS);
     if(sc.elemNS != null) sc.ns.add(EMPTY, sc.elemNS, null);
     // reject cyclic or self-referential item type declarations
     for(final QNm name : typeDeps) {
@@ -2288,10 +2285,7 @@ public class QueryParser extends InputParser {
     final int p = pos;
     if(!wsConsumeWs(VALIDATE)) return;
 
-    if(consume(TYPE)) {
-      final InputInfo ii = info();
-      qnames.add(eQName(SKIPCHECK, QNAME_X), sc, ii);
-    }
+    if(consume(TYPE)) eQName(sc.elemNS, QNAME_X);
     consume(STRICT);
     consume(LAX);
     skipWs();
@@ -2639,7 +2633,7 @@ public class QueryParser extends InputParser {
           }
         }
         // name test: prefix:name, name, Q{uri}name
-        if(kind == Kind.ELEMENT) qnames.add(name,  sc, ii); else qnames.add(name, false, ii);
+        resolveQNm(name, kind == Kind.ELEMENT ? sc.elemNS : null, ii);
         return nameTest.apply(name, scope);
       }
     }
@@ -3244,121 +3238,79 @@ public class QueryParser extends InputParser {
     final InputInfo ii = info();
     final byte[] qnm = qName(root ? null : ELEMNAME_X);
     consumeWS();
-    int cp = current();
+    final int cp = current();
     if(qnm.length == 0 || root && cp != '/' && cp != '>' && !XMLToken.isNCStartChar(cp)) {
       return null;
     }
 
     // cache namespace information
-    final int size = qc.ns.size();
-    final byte[] nse = sc.elemNS;
-    final byte[] nsd = sc.dirNS;
-    final int npos = qnames.size();
-    final int cpos = constrNS.size();
-
-    final QNm name = new QNm(qnm);
-    qnames.add(name, true, ii);
-
+    final int size = qc.ns.size(), cpos = constrNS.size();
+    final byte[] nse = sc.elemNS, nsd = sc.dirNS;
     final Atts ns = new Atts();
     final ExprList cont = new ExprList();
 
     // parse attributes
-    boolean xmlDecl = false; // xml prefix explicitly declared?
+    boolean xmlDecl = false;
     ArrayList<QNm> atts = null;
-    while(true) {
-      final byte[] atn = qName(null);
-      if(atn.length == 0) break;
-
-      final ExprList attv = new ExprList();
-      consumeWS();
-      if(root) {
-        if(!consume('=')) return null;
-      } else {
-        check('=');
-      }
-      consumeWS();
-      final int delim = consume();
-      if(!quote(delim)) throw error(NOQUOTE_X, found());
-      final TokenBuilder tb = new TokenBuilder();
-
-      boolean simple = true;
+    final int attrsPos = pos;
+    for(int phase = 0; phase < 2; phase++) {
+      pos = attrsPos;
       while(true) {
-        while(!consume(delim)) {
-          cp = current();
-          switch(cp) {
-            case '{' -> {
-              if(next() == '{') {
-                tb.add(consume());
-                consume();
-              } else {
-                final byte[] text = tb.next();
-                if(text.length == 0) {
-                  add(attv, enclosedExpr());
-                  simple = false;
-                } else {
-                  add(attv, Str.get(text));
-                }
-              }
-            }
-            case '}' -> {
-              consume();
-              check('}');
-              tb.add('}');
-            }
-            case '<', 0 ->
-              throw error(NOQUOTE_X, found());
-            case '\n', '\t' -> {
-              tb.add(' ');
-              consume();
-            }
-            case '\r' -> {
-              if(next() != '\n') tb.add(' ');
-              consume();
-            }
-            default ->
-              entity(tb);
-          }
-        }
-        if(!consume(delim)) break;
-        tb.add(delim);
-      }
+        final byte[] atn = qName(null);
+        if(atn.length == 0) break;
 
-      if(!tb.isEmpty()) add(attv, Str.get(tb.finish()));
-
-      // parse namespace declarations
-      final boolean pr = startsWith(atn, XMLNS_COLON);
-      if(pr || eq(atn, XMLNS)) {
-        if(!simple) throw error(NSCONS);
-        final byte[] prefix = pr ? local(atn) : EMPTY;
-        final byte[] uri = attv.isEmpty() ? EMPTY : ((Str) attv.get(0)).string();
-        if(eq(prefix, XML) && eq(uri, XML_URI)) {
-          if(xmlDecl) throw error(DUPLNSDEF_X, XML);
-          xmlDecl = true;
+        consumeWS();
+        if(root) {
+          if(!consume('=')) return null;
         } else {
-          if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
-          if(pr) {
-            if(uri.length == 0) throw error(NSEMPTYURI);
-            if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
-            if(eq(uri, XML_URI)) throw error(BINDXMLURI_X_X, uri, XML);
-            if(eq(uri, XMLNS_URI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
-            qc.ns.add(prefix, uri);
-          } else {
-            if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
-            sc.dirNS = uri;
-            if(!sc.elemNsFixed) sc.elemNS = sc.dirNS;
-          }
-          if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
-          ns.add(prefix, uri);
+          check('=');
         }
-      } else {
-        final QNm attn = new QNm(atn);
-        if(atts == null) atts = new ArrayList<>(1);
-        atts.add(attn);
-        qnames.add(attn, false, info());
-        add(cont, new CAttr(info(), false, attn, attv.finish()));
+        consumeWS();
+        final int delim = consume();
+        if(!quote(delim)) throw error(NOQUOTE_X, found());
+
+        final boolean pr = startsWith(atn, XMLNS_COLON), nsAtt = pr || eq(atn, XMLNS);
+        if(nsAtt != (phase == 0)) {
+          skipAttrValue(delim);
+        } else {
+          final ExprList attv = attributeValue(delim, nsAtt);
+          if(nsAtt) {
+            final byte[] prefix = pr ? local(atn) : EMPTY;
+            final byte[] uri = attv.isEmpty() ? EMPTY : ((Str) attv.get(0)).string();
+            if(eq(prefix, XML) && eq(uri, XML_URI)) {
+              if(xmlDecl) throw error(DUPLNSDEF_X, XML);
+              xmlDecl = true;
+            } else {
+              if(!Uri.get(uri).isValid()) throw error(INVURI_X, uri);
+              if(pr) {
+                if(uri.length == 0) throw error(NSEMPTYURI);
+                if(eq(prefix, XML, XMLNS)) throw error(BINDXML_X, prefix);
+                if(eq(uri, XML_URI)) throw error(BINDXMLURI_X_X, uri, XML);
+                if(eq(uri, XMLNS_URI)) throw error(BINDXMLURI_X_X, uri, XMLNS);
+                qc.ns.add(prefix, uri);
+              } else {
+                if(eq(uri, XML_URI)) throw error(XMLNSDEF_X, uri);
+                sc.dirNS = uri;
+                if(!sc.elemNsFixed) sc.elemNS = sc.dirNS;
+              }
+              if(ns.contains(prefix)) throw error(DUPLNSDEF_X, prefix);
+              ns.add(prefix, uri);
+            }
+          } else {
+            final QNm attn = new QNm(atn);
+            if(atts == null) atts = new ArrayList<>(1);
+            atts.add(attn);
+            resolveQNm(attn, null, info());
+            add(cont, new CAttr(info(), false, attn, attv.finish()));
+          }
+        }
+        if(!consumeWS()) break;
       }
-      if(!consumeWS()) break;
     }
+
+    // resolve element name
+    final QNm name = new QNm(qnm);
+    resolveQNm(name, sc.dirNS, ii);
 
     if(consume('/')) {
       check('>');
@@ -3375,8 +3327,6 @@ public class QueryParser extends InputParser {
       check('>');
       if(!eq(name.string(), close)) throw error(TAGWRONG_X_X, name.string(), close);
     }
-
-    qnames.resolve(this, npos, sc.dirNS);
 
     // check for duplicate attribute names
     if(atts != null) {
@@ -3406,6 +3356,316 @@ public class QueryParser extends InputParser {
     final Atts inherited = new Atts();
     constrNS.add(new ConstrNS(ns, inherited));
     return new CElem(info(), false, name, ns, inherited, cont.finish());
+  }
+
+  /**
+   * Finalizes a QName by assigning its namespace URI.
+   * @param name QName to be resolved
+   * @param elemNS default element namespace or {@code null}
+   * @param info input info
+   * @throws QueryException query exception
+   */
+  private void resolveQNm(final QNm name, final byte[] elemNS, final InputInfo info)
+      throws QueryException {
+    if(name.hasPrefix()) {
+      name.uri(qc.ns.resolve(name.prefix(), sc));
+      if(!name.hasURI()) throw error(NOURI_X, info, name.prefix());
+    } else if(elemNS != null) {
+      name.uri(elemNS);
+    }
+  }
+
+  /**
+   * Parses a direct attribute value into its literal string and enclosed-expression parts.
+   * @param delim delimiter (quote character)
+   * @param literal reject enclosed expressions (namespace declaration value)
+   * @return value parts
+   * @throws QueryException query exception
+   */
+  private ExprList attributeValue(final int delim, final boolean literal) throws QueryException {
+    final ExprList attv = new ExprList();
+    final TokenBuilder tb = new TokenBuilder();
+    while(true) {
+      while(!consume(delim)) {
+        final int cp = current();
+        switch(cp) {
+          case '{' -> {
+            if(next() == '{') {
+              tb.add(consume());
+              consume();
+            } else {
+              if(literal) throw error(NSCONS);
+              final byte[] text = tb.next();
+              add(attv, text.length == 0 ? enclosedExpr() : Str.get(text));
+            }
+          }
+          case '}' -> {
+            consume();
+            check('}');
+            tb.add('}');
+          }
+          case '<', 0 ->
+            throw error(NOQUOTE_X, found());
+          case '\n', '\t' -> {
+            tb.add(' ');
+            consume();
+          }
+          case '\r' -> {
+            if(next() != '\n') tb.add(' ');
+            consume();
+          }
+          default ->
+            entity(tb);
+        }
+      }
+      if(!consume(delim)) break;
+      tb.add(delim);
+    }
+    if(!tb.isEmpty()) add(attv, Str.get(tb.finish()));
+    return attv;
+  }
+
+  /**
+   * Skips a direct attribute value without evaluating enclosed expressions.
+   * @param delim delimiter (quote character)
+   * @throws QueryException query exception
+   */
+  private void skipAttrValue(final int delim) throws QueryException {
+    while(true) {
+      while(!consume(delim)) {
+        final int cp = current();
+        if(cp == 0 || cp == '<') throw error(NOQUOTE_X, found());
+        if(cp == '{') {
+          if(next() == '{') {
+            consume();
+            consume();
+          } else {
+            skipEnclosedExpr();
+          }
+        } else if(cp == '}') {
+          consume();
+          check('}');
+        } else {
+          consume();
+        }
+      }
+      if(!consume(delim)) break;
+    }
+  }
+
+  /**
+   * Skips an enclosed expression, including the surrounding curly braces.
+   * @throws QueryException query exception
+   */
+  private void skipEnclosedExpr() throws QueryException {
+    consume(); // opening brace
+    skipExprContent();
+  }
+
+  /**
+   * Skips expression content up to and including the closing curly brace.
+   * @throws QueryException query exception
+   */
+  private void skipExprContent() throws QueryException {
+    int last = 0; // last significant (non-whitespace) character
+    while(true) {
+      final int cp = current();
+      if(cp == 0) throw error(WRONGCHAR_X_X, "}", found());
+      if(cp == '}') {
+        consume();
+        return;
+      }
+      if(cp == '{') {
+        skipEnclosedExpr();
+        last = '}';
+      } else if(cp == '"' || cp == '\'') {
+        skipStringLiteral(cp);
+        last = cp;
+      } else if(cp == '`') {
+        skipStringConstructor();
+        last = '`';
+      } else if(cp == '(' && next() == ':') {
+        skipComment();
+      } else if(cp == '(' && next() == '#') {
+        skipPragma();
+        last = ')';
+      } else if(cp == '<') {
+        final int nx = next();
+        if(nx == '<' || nx == '=') {
+          // node comparison '<<' or general comparison '<='
+          consume();
+          consume();
+          last = 0;
+        } else if(nx == '!' || nx == '?' || !valueChar(last) && XMLToken.isNCStartChar(nx)) {
+          skipConstructor();
+          last = '>';
+        } else {
+          // less-than comparison
+          consume();
+          last = 0;
+        }
+      } else {
+        consume();
+        if(cp > ' ') last = cp;
+      }
+    }
+  }
+
+  /**
+   * Skips a direct element, comment, CDATA, or processing-instruction constructor.
+   * @throws QueryException query exception
+   */
+  private void skipConstructor() throws QueryException {
+    if(consume("<!--")) skipUntil("-->");
+    else if(consume("<![CDATA[")) skipUntil("]]>");
+    else if(consume("<?")) skipUntil("?>");
+    else skipDirElement();
+  }
+
+  /**
+   * Skips a direct element constructor.
+   * @throws QueryException query exception
+   */
+  private void skipDirElement() throws QueryException {
+    consume(); // '<'
+    qName(ELEMNAME_X);
+    while(true) {
+      consumeWS();
+      if(consume('/')) {
+        check('>');
+        return;
+      }
+      if(consume('>')) break;
+      qName(ELEMNAME_X);
+      consumeWS();
+      check('=');
+      consumeWS();
+      final int delim = consume();
+      if(!quote(delim)) throw error(NOQUOTE_X, found());
+      skipAttrValue(delim);
+    }
+    // element content, terminated by a closing tag
+    while(true) {
+      final int cp = current();
+      if(cp == 0) throw error(NOCLOSING_X, "");
+      if(cp == '<') {
+        if(next() == '/') {
+          consume();
+          consume();
+          qName(ELEMNAME_X);
+          consumeWS();
+          check('>');
+          return;
+        }
+        skipConstructor();
+      } else if(cp == '{') {
+        if(next() == '{') {
+          consume();
+          consume();
+        } else {
+          skipEnclosedExpr();
+        }
+      } else if(cp == '}') {
+        consume();
+        check('}');
+      } else {
+        consume();
+      }
+    }
+  }
+
+  /**
+   * Skips a string literal, including its quotes.
+   * @param quote quote character
+   * @throws QueryException query exception
+   */
+  private void skipStringLiteral(final int quote) throws QueryException {
+    consume(); // opening quote
+    while(true) {
+      if(!more()) throw error(NOQUOTE_X, found());
+      if(consume(quote)) {
+        if(!consume(quote)) break;
+      } else {
+        consume();
+      }
+    }
+  }
+
+  /**
+   * Skips a string constructor or string template, including its interpolated expressions.
+   * @throws QueryException query exception
+   */
+  private void skipStringConstructor() throws QueryException {
+    consume(); // leading backtick
+    final boolean constr = consume("`[");
+    while(more()) {
+      final int p = pos;
+      // terminator: ']``' (constructor) or a single '`' (template)
+      if(constr ? consume("]``") : consume('`') && !consume('`')) return;
+      pos = p;
+      // interpolation: '`{' (constructor) or a single '{' (template)
+      if(constr ? consume("`{") : consume('{') && !consume('{')) {
+        skipExprContent();
+        if(constr) check('`');
+      } else {
+        // fixed part; braces and backticks must be doubled in templates
+        pos = p;
+        final int cp = consume();
+        if(!constr && (cp == '{' || cp == '}' || cp == '`')) check((char) cp);
+      }
+    }
+    throw error(INCOMPLETE);
+  }
+
+  /**
+   * Skips a comment, including nested comments.
+   * @throws QueryException query exception
+   */
+  private void skipComment() throws QueryException {
+    consume();
+    consume(); // '(:'
+    for(int depth = 1; depth > 0;) {
+      if(!more()) throw error(COMCLOSE);
+      if(consume("(:")) ++depth;
+      else if(consume(":)")) --depth;
+      else consume();
+    }
+  }
+
+  /**
+   * Skips a pragma.
+   * @throws QueryException query exception
+   */
+  private void skipPragma() throws QueryException {
+    consume();
+    consume(); // '(#'
+    while(!consume("#)")) {
+      if(!more()) throw error(PRAGMAINV);
+      consume();
+    }
+  }
+
+  /**
+   * Skips all characters up to and including the specified terminator.
+   * @param end terminator string
+   * @throws QueryException query exception
+   */
+  private void skipUntil(final String end) throws QueryException {
+    while(!consume(end)) {
+      if(!more()) throw error(WRONGCHAR_X_X, end, found());
+      consume();
+    }
+  }
+
+  /**
+   * Checks if the specified character ends a value, so that a following {@code <} is a comparison
+   * operator rather than the start of a direct constructor.
+   * @param cp character
+   * @return result of check
+   */
+  private static boolean valueChar(final int cp) {
+    return cp == ')' || cp == ']' || cp == '}' || cp == '*' || cp == '"' || cp == '\'' ||
+        cp == '`' || XMLToken.isNCChar(cp);
   }
 
   /**
@@ -3544,9 +3804,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compElement() throws QueryException {
-    final Expr name = compName(NOELEMNAME, true);
+    final Expr name = compName(NOELEMNAME, true, sc.elemNS);
     if(name == null) return null;
-    if(name instanceof final QNm qnm) qnames.add(qnm, sc, info());
     skipWs();
     if(!current('{')) return null;
     // register namespaces, to be enriched by enclosing direct constructors
@@ -3561,9 +3820,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compAttribute() throws QueryException {
-    final Expr name = compName(NOATTNAME, true);
+    final Expr name = compName(NOATTNAME, true, null);
     if(name == null) return null;
-    if(name instanceof final QNm qnm) qnames.add(qnm, false, info());
     skipWs();
     return current('{') ? new CAttr(info(), true, name, enclosedExpr()) : null;
   }
@@ -3574,7 +3832,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compNamespace() throws QueryException {
-    final Expr name = compName(NONSNAME, false);
+    final Expr name = compName(NONSNAME, false, null);
     if(name == null) return null;
     skipWs();
     return current('{') ? new CNSpace(info(), true, name, enclosedExpr()) : null;
@@ -3586,7 +3844,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr compPI() throws QueryException {
-    final Expr name = compName(NOPINAME, false);
+    final Expr name = compName(NOPINAME, false, null);
     if(name == null) return null;
     skipWs();
     return current('{') ? new CPI(info(), true, name, enclosedExpr()) : null;
@@ -3596,10 +3854,12 @@ public class QueryParser extends InputParser {
    * Parses a computed name.
    * @param error error message
    * @param qname QName or NCName
+   * @param ns default namespace (can be {@code null})
    * @return name or {@code null}
    * @throws QueryException query exception
    */
-  private Expr compName(final QueryError error, final boolean qname) throws QueryException {
+  private Expr compName(final QueryError error, final boolean qname, final byte[] ns)
+      throws QueryException {
     // parse name enclosed in curly braces
     if(consume("{")) {
       final Expr name = check(expr(), error);
@@ -3609,7 +3869,7 @@ public class QueryParser extends InputParser {
     // parse literal name
     consume("#");
     skipWs();
-    if(qname) return eQName(SKIPCHECK, null);
+    if(qname) return eQName(ns, null);
 
     // parse name enclosed in quotes
     final byte[] string = ncName(null, false);

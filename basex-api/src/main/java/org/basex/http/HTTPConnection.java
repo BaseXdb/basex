@@ -517,7 +517,10 @@ public final class HTTPConnection implements ClientInfo {
           final String details = am.length > 1 ? am[1] : "";
           final String[] creds = Strings.split(Base64.decode(details), ':', 2);
           user = user(creds[0]);
-          if(creds.length < 2 || !user.matches(creds[1])) throw new LoginException(user.name());
+          final Algorithm[] algorithms = context.soptions.authAlgorithms();
+          if(creds.length < 2 || !user.matches(creds[1], algorithms))
+            throw new LoginException(user.name());
+          context.users.rehash(user, creds[1], algorithms);
         } else {
           final EnumMap<RequestAttribute, String> auth = Client.authHeaders(header);
           user = user(auth.get(RequestAttribute.USERNAME));
@@ -525,6 +528,8 @@ public final class HTTPConnection implements ClientInfo {
           final String nonce = auth.get(RequestAttribute.NONCE);
           final String cnonce = auth.get(RequestAttribute.CNONCE);
           String ha1 = user.code(Algorithm.DIGEST, Code.HASH);
+          // reject if no digest hash is stored for the user (digest not enabled in AUTHALGORITHMS)
+          if(ha1 == null) throw new LoginException(user.name());
           if(Strings.eq(auth.get(RequestAttribute.ALGORITHM), MD5_SESS))
             ha1 = Strings.md5(ha1 + ':' + nonce + ':' + cnonce);
 

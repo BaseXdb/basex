@@ -88,6 +88,50 @@ public final class NamespaceTest extends SandboxTest {
 
     query("declare namespace p = 'A'; <p:l>{ namespace p { 'B' } }</p:l> => in-scope-prefixes()",
         "p_1\np\nxml");
+
+    query("<e xmlns='E'/> -> namespace-uri()", "E");
+    query("<a:e xmlns:a='A'/> -> namespace-uri()", "A");
+    query("<e a='{<e b:a='42' xmlns:b='N'/>/@a:a}' xmlns:a='N'/>/@a -> data()", 42);
+    query("<e a='{<x a:b='42' xmlns:a='A'/>/@Q{A}b}'/>/@a -> data()", 42);
+    query("<e a='{<f xmlns='N'/> -> namespace-uri()}'/>/@a -> data()", "N");
+    query("<e a:a='42' xmlns:a='A'/>/@*:a -> namespace-uri()", "A");
+    query("<e a='{f:identity(42)}' xmlns:f='http://www.w3.org/2005/xpath-functions'/>/@a -> data()",
+        42);
+    query("<e a='{let $x:v := 42 return $y:v}' xmlns:x='N' xmlns:y='N'/>/@a -> data()", 42);
+    query(
+        "<e a='{0 cast as type:byte}' xmlns:type='http://www.w3.org/2001/XMLSchema'/>/@a -> data()",
+        0);
+
+    error("<e a='{f:identity(42)}'/>", NOURI_X);
+    error("<e xmlns:a='A' xmlns:a='B'/>", DUPLNSDEF_X);
+    error("<e xmlns:xml='X'/>", BINDXML_X);
+  }
+
+  /** Two-pass parsing of attributes. */
+  @Test public void attributeValueSkip() {
+    for(final String query : new String[] {
+      "<e a='{1}' xmlns:p='u'/>",
+      "<e a='{1 < 2}'/>",
+      "<e a='{1 <= 2}'/>",
+      "<e a='{let $r := <r><a/><b/></r> return $r/a << $r/b}'/>",
+      "<e a='{(1, 2)[. > 1]}'/>",
+      "<e a='{<x y=\"1\"/>/@y}'/>",
+      "<e a='{<x b=\"{1}\">{2}</x>/@b}'/>",
+      "<e a='{<x>{{ }}</x>}'/>",
+      "<e a='{<x><![CDATA[ } { ]]></x>}'/>",
+      "<e a='{<x><!-- } --></x>}'/>",
+      "<e a='{<?t }{ ?>}'/>",
+      "<e a='{ (: } { :) 1 }'/>",
+      "declare namespace pr = 'u'; <e a='{ (# pr:x } { #) { 1 } }'/>",
+      "<e a='{ \"}{\" }'/>",
+      "<e a='{ \"a\"\"b\" }'/>",
+      "<e a='{ ``[ text } end ]`` }'/>",
+      "<e a='{ `x{1}y` }'/>",
+      "<e a='{ 1 instance of Q{http://www.w3.org/2001/XMLSchema}integer }'/>",
+      "<e a='{{lit}}'/>",
+      "<e a=\"say \"\"hi\"\"\"/>",
+      "<e a='{1}' xmlns:m='http://www.w3.org/2005/xpath-functions' b='{m:abs(-2)}'/>",
+    }) query(query);
   }
 
   /** Simple tests. */
