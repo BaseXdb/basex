@@ -201,6 +201,37 @@ public final class JobModuleTest extends SandboxTest {
     error(func.args("1 + ''"), CALCTYPE_X_X_X_X_X);
   }
 
+  /** Rejects jobs whose execution would deadlock the calling query. */
+  @Test public void deadlock() {
+    final Function func = _JOB_EXECUTE;
+    query(_DB_CREATE.args("db"));
+    query(_DB_CREATE.args("db2"));
+    try {
+      // caller read-locks a database, job would write-lock the same one: deadlock
+      error(_DB_GET.args("db") + ", " + func.args("db:optimize('db')"), JOBS_DEADLOCK_X);
+      // job resolves a constructed constant name to a specific lock: still conflicts, deadlock
+      error(_DB_GET.args("db") + ", " + func.args("db:optimize(string(<a>db</a>))"),
+          JOBS_DEADLOCK_X);
+      // job acquires a global write lock (dynamic name), conflicting with the caller: deadlock
+      error(_DB_GET.args("db") + ", " + func.args("db:optimize(db:list()[1])"),
+          JOBS_DEADLOCK_X);
+      // caller and job share a read lock: no conflict
+      query(_DB_GET.args("db") + ", " + func.args("db:get('db')"));
+      // caller and job touch different databases: no conflict
+      query(_DB_GET.args("db") + ", " + func.args("db:optimize('db2')"));
+      // caller holds no locks: job may lock freely
+      query(func.args("db:optimize('db')"), "");
+      // job:eval does not wait for the result and is therefore not guarded
+      query(_DB_GET.args("db") + ", " + VOID.args(_JOB_EVAL.args("db:optimize('db')")));
+      // a variable-bound database name resolves after compilation: different database, no deadlock
+      query(_DB_GET.args("db") + ", " + func.args(
+          "declare variable $d external; db:optimize($d)", " { 'd': 'db2' }"));
+    } finally {
+      query(_DB_DROP.args("db"));
+      query(_DB_DROP.args("db2"));
+    }
+  }
+
   /** Test method. */
   @Test public void finished() {
     final String id = verySlowQuery();

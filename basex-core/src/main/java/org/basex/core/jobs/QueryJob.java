@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
 import org.basex.core.*;
+import org.basex.core.locks.*;
 import org.basex.query.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
@@ -29,6 +30,10 @@ public final class QueryJob extends Job implements Runnable {
   private final QueryJobSpec job;
   /** Notify function. */
   private final Consumer<QueryJobResult> notify;
+  /** Locks held by a caller that waits for this job; {@code null} if not applicable. */
+  private final Locks callerLocks;
+  /** Input info of the calling expression (for error reporting). */
+  private final InputInfo info;
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -43,13 +48,16 @@ public final class QueryJob extends Job implements Runnable {
    * @param context database context
    * @param info input info (can be {@code null})
    * @param notify notify function (ignored if {@code null})
+   * @param callerLocks locks held by a caller that waits for this job (can be {@code null})
    * @throws QueryException query exception
    */
   public QueryJob(final QueryJobSpec job, final Context context, final InputInfo info,
-      final Consumer<QueryJobResult> notify) throws QueryException {
+      final Consumer<QueryJobResult> notify, final Locks callerLocks) throws QueryException {
 
     this.job = job;
     this.notify = notify;
+    this.callerLocks = callerLocks;
+    this.info = info;
     jc().context = context;
 
     // check when job is to be started
@@ -213,6 +221,13 @@ public final class QueryJob extends Job implements Runnable {
         updating = qp.updating;
         qp.compile();
         result.time = perf.nanoRuntime();
+
+        // fail instead of blocking if a caller waiting for this job holds conflicting locks
+        if(callerLocks != null && callerLocks.locking()) {
+          qp.addLocks();
+          final Locks required = qp.jc().locks.finish(ctx);
+          if(callerLocks.conflicts(required)) throw JOBS_DEADLOCK_X.get(info, required);
+        }
 
         // register job
         pushJob(qp);

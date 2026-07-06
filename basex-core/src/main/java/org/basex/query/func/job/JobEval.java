@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.Map.*;
 
 import org.basex.core.jobs.*;
+import org.basex.core.locks.*;
 import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -52,8 +53,9 @@ public class JobEval extends StandardFunc {
       bindings.put(it.getKey(), it.getValue().materialize(n -> false, info, qc));
     }
 
+    final Locks held = synchronous() ? qc.context.locking.held() : null;
     final QueryJobSpec spec = new QueryJobSpec(options, bindings, query);
-    final QueryJob job = new QueryJob(spec, qc.context, info, null);
+    final QueryJob job = new QueryJob(spec, qc.context, info, null, held);
 
     // add service
     if(service) {
@@ -67,5 +69,14 @@ public class JobEval extends StandardFunc {
       }
     }
     return Str.get(job.jc().id());
+  }
+
+  /**
+   * Indicates if the calling query waits for the job result and is blocked until the job finishes.
+   * Overridden by {@link JobExecute}.
+   * @return result of check
+   */
+  boolean synchronous() {
+    return false;
   }
 }

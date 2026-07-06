@@ -1,5 +1,7 @@
 package org.basex.core.locks;
 
+import java.util.*;
+
 import org.basex.core.*;
 import org.basex.data.*;
 
@@ -34,6 +36,43 @@ public final class Locks {
     // remove read locks that are also defined as write locks
     reads.remove(writes);
     return this;
+  }
+
+  /**
+   * Indicates if any read or write lock exists.
+   * @return result of check
+   */
+  public boolean locking() {
+    return reads.locking() || writes.locking();
+  }
+
+  /**
+   * Checks if these locks and the specified locks cannot be held by two jobs at the same time.
+   * Both lock sets must have been finished (see {@link #finish(Context)}).
+   * @param locks locks to compare with
+   * @return result of check
+   */
+  public boolean conflicts(final Locks locks) {
+    // a global write lock is exclusive and clashes with any lock held by the other job
+    if(writes.global() && locks.locking() || locks.writes.global() && locking()) return true;
+    // a global read lock clashes with the other job's local write locks
+    if(reads.global() && locks.writes.local() || locks.reads.global() && writes.local())
+      return true;
+    // a write lock clashes with any equally-named lock held by the other job
+    return writes.intersects(locks.writes) || writes.intersects(locks.reads) ||
+        locks.writes.intersects(reads);
+  }
+
+  /**
+   * Returns a readable, comma-separated list of all lock strings.
+   * @return lock strings, including {@code (global)} for a global lock
+   */
+  public String labels() {
+    final ArrayList<String> list = new ArrayList<>();
+    for(final String lock : writes) list.add(lock);
+    for(final String lock : reads) list.add(lock);
+    if(writes.global() || reads.global()) list.add("(global)");
+    return String.join(", ", list);
   }
 
   @Override

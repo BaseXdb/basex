@@ -44,4 +44,9 @@ public final class JobExecute extends JobEval {
     final QueryJobResult result = pool.results.remove(id);
     return result != null ? result.get() : Empty.VALUE;
   }
+
+  @Override
+  boolean synchronous() {
+    return true;
+  }
 }

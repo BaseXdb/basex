@@ -179,6 +179,14 @@ public final class Locking {
   }
 
   /**
+   * Returns the locks currently held by the calling thread.
+   * @return locks, or {@code null} if the thread holds no locks
+   */
+  public Locks held() {
+    return locked.get(Thread.currentThread().threadId());
+  }
+
+  /**
    * Pins a lock string. Creates a new lock if necessary.
    * @param string lock string
    * @return lock
