@@ -65,8 +65,8 @@ public final class StaticVar extends StaticDecl {
         dontEnter = false;
       }
 
-      // dynamic compilation, eager evaluation: pre-evaluate expressions
-      if(expr instanceof Value || cc.dynamic && !lazy) {
+      // dynamic compilation, eager evaluation: pre-evaluate deterministic expressions
+      if(expr instanceof Value || cc.dynamic && !lazy && !expr.has(Flag.NDT)) {
         try {
           cc.replaceWith(expr, value(cc.qc));
         } catch(final QueryException ex) {

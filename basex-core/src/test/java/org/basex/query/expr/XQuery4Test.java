@@ -517,6 +517,22 @@ public final class XQuery4Test extends SandboxTest {
     error("declare %basex:lazy variable $x := error(); try { $x } finally { 1 }", FINALLY_X);
   }
 
+  /** Eager vs. lazy evaluation of prolog variables. */
+  @Test public void staticVariables() {
+    // non-deterministic global variable, referenced but folded away: must not be evaluated
+    query("declare variable $x := error(); if(<a/>/b) then $x else 1", 1);
+    query("declare variable $x := prof:sleep(1); if(<a/>/b) then $x else 1", 1);
+
+    // referenced non-deterministic global variable: still evaluated (errors surface)
+    error("declare variable $x := error(); $x", FUNERR1);
+    error("declare variable $x := error(); if(<a/>/self::a) then $x else 1", FUNERR1);
+    // a lazy non-deterministic variable is evaluated only once (value is cached)
+    query("declare variable $x := random:integer(); $x = $x", true);
+
+    // deterministic global variables stay eager: still pre-evaluated even if folded away
+    error("declare variable $x := 1 idiv 0; if(<a/>/b) then $x else 1", DIVZERO_X);
+  }
+
   /** Window expression. */
   @Test public void window() {
     query("for tumbling window $w in 1 to 2 "
