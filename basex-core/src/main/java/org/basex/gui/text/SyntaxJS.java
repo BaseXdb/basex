@@ -16,19 +16,16 @@ import org.basex.util.*;
 final class SyntaxJS extends Syntax {
   /** Keywords. */
   private static final HashSet<String> KEYWORDS = new HashSet<>();
+  /** State index: comment. */
+  private static final int COMMENT = 0;
+  /** State index: quote. */
+  private static final int QUOTE = 1;
+  /** State index: variable flag. */
+  private static final int VAR = 2;
+  /** State index: backslash. */
+  private static final int BACK = 3;
 
-  /** Comment. */
-  private int comment1;
-  /** Comment. */
-  private int comment2;
-  /** Quote. */
-  private int quote;
-  /** Variable flag. */
-  private boolean var;
-  /** Backslash. */
-  private boolean back;
-
-  // initialize xquery keys
+  // initialize keywords
   static {
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#Keywords
     Collections.addAll(KEYWORDS,
@@ -43,11 +40,7 @@ final class SyntaxJS extends Syntax {
   @Override
   public void init(final Color color) {
     super.init(color);
-    quote = 0;
-    var = false;
-    back = false;
-    comment1 = 0;
-    comment2 = 0;
+    state = new int[4];
   }
 
   @Override
@@ -55,61 +48,47 @@ final class SyntaxJS extends Syntax {
     final int ch = iter.curr();
 
     // opened quote
-    if(quote != 0) {
-      if(back) {
-        back = false;
-      } else if(ch == quote) {
-        quote = 0;
-      } else {
-        back = ch == '\\';
-      }
+    if(state[QUOTE] != 0) {
+      if(state[BACK] != 0) state[BACK] = 0;
+      else if(ch == state[QUOTE]) state[QUOTE] = 0;
+      else state[BACK] = ch == '\\' ? 1 : 0;
       return brown;
     }
 
-    // comment
-    if(comment1 == 0 && ch == '/') {
-      comment1++;
-    } else if(comment1 == 1) {
-      comment1 = ch == '*' ? 2 : 0;
-    } else if(comment1 == 2 && ch == '*') {
-      comment1++;
-    } else if(comment1 == 3) {
-      comment1 = ch == '/' ? 0 : 2;
+    // comment: 1 = after '/', 2 = block, 3 = block after '*', 4 = line
+    switch(state[COMMENT]) {
+      case 1 -> state[COMMENT] = ch == '*' ? 2 : ch == '/' ? 4 : 0;
+      case 2 -> { if(ch == '*') state[COMMENT] = 3; }
+      case 3 -> state[COMMENT] = ch == '/' ? 0 : 2;
+      case 4 -> { if(ch == '\n') state[COMMENT] = 0; }
+      default -> { if(ch == '/') state[COMMENT] = 1; }
     }
-    // comment
-    if(comment2 == 0 && ch == '/') {
-      comment2++;
-    } else if(comment2 == 1) {
-      comment2 = ch == '/' ? 2 : 0;
-    } else if(comment2 == 2 && ch == '\n') {
-      comment2 = 0;
-    }
-    if(comment1 != 0 || comment2 != 0) {
-      var = false;
+    if(state[COMMENT] != 0) {
+      state[VAR] = 0;
       return cyan;
     }
 
     // quotes
-    if(back) {
-      back = false;
+    if(state[BACK] != 0) {
+      state[BACK] = 0;
     } else if(ch == '\\') {
-      back = true;
+      state[BACK] = 1;
     } else if(ch == '"' || ch == '\'') {
-      quote = ch;
+      state[QUOTE] = ch;
       return brown;
     }
 
     // variables
     if(ch == '$') {
-      var = true;
+      state[VAR] = 1;
       return green;
     }
-    if(var) {
-      var = XMLToken.isNCStartChar(ch);
+    if(state[VAR] != 0) {
+      state[VAR] = XMLToken.isNCStartChar(ch) ? 1 : 0;
       return green;
     }
 
-    // digits
+    // digits (JS literals such as 0xFF are not full doubles, so match on the first digit)
     if(Token.digit(ch)) return purple;
     // special characters
     if(!XMLToken.isNCStartChar(ch)) return cyan;
@@ -118,20 +97,6 @@ final class SyntaxJS extends Syntax {
 
     // standard text
     return plain;
-  }
-
-  @Override
-  public int[] state() {
-    return new int[] { comment1, comment2, quote, var ? 1 : 0, back ? 1 : 0 };
-  }
-
-  @Override
-  public void state(final int[] state) {
-    comment1 = state[0];
-    comment2 = state[1];
-    quote = state[2];
-    var = state[3] != 0;
-    back = state[4] != 0;
   }
 
   @Override

@@ -13,63 +13,59 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class SyntaxXML extends Syntax {
-  /** Last quote. */
-  private int quote;
-  /** Element name flag. */
-  private boolean name;
-  /** Flag for printing element name. */
-  private boolean elem;
-  /** Current state of comment. */
-  private int comment;
-  /** Current state of processing instruction. */
-  private int pi;
+  /** State index: last quote. */
+  private static final int QUOTE = 0;
+  /** State index: element name flag. */
+  private static final int NAME = 1;
+  /** State index: element printing flag. */
+  private static final int ELEM = 2;
+  /** State index: comment. */
+  private static final int COMMENT = 3;
+  /** State index: processing instruction. */
+  private static final int PI = 4;
 
   @Override
   public void init(final Color color) {
     super.init(color);
-    quote = 0;
-    name = false;
-    elem = false;
-    comment = 0;
-    pi = 0;
+    state = new int[5];
   }
 
   @Override
   public Color getColor(final TextIterator iter) {
     final int ch = iter.curr();
-    if(comment > 0) return comment(ch);
-    if(pi > 0) return pi(ch);
+    if(state[COMMENT] > 0) return comment(ch);
+    if(state[PI] > 0) return pi(ch);
 
     // last token was an opening angle bracket (<)
-    if(name) {
-      if(quote != 0) {
-        if(quote == ch) quote = 0;
+    if(state[NAME] != 0) {
+      if(state[QUOTE] != 0) {
+        if(state[QUOTE] == ch) state[QUOTE] = 0;
         return brown;
       }
       if(ch == '"' || ch == '\'') {
-        quote = ch;
+        state[QUOTE] = ch;
         return brown;
       }
       if(ch == '>') {
-        name = false;
+        state[NAME] = 0;
         return blue;
       }
       if(ch == '=' || ch == '/') {
         return blue;
       }
       if(ch == '!') {
-        comment = 1;
-        name = false;
+        state[COMMENT] = 1;
+        state[NAME] = 0;
         return cyan;
       }
       if(ch == '?') {
-        pi = 1;
-        name = false;
+        state[PI] = 1;
+        state[NAME] = 0;
         return cyan;
       }
 
-      if(elem) {
-        if(ch <= ' ') elem = false;
+      if(state[ELEM] != 0) {
+        if(ch <= ' ') state[ELEM] = 0;
         return blue;
       }
       return purple;
@@ -77,37 +73,47 @@ public final class SyntaxXML extends Syntax {
 
     // start of a new element, comment or processing instruction
     if(ch == '<') {
-      name = true;
-      elem = true;
+      state[NAME] = 1;
+      state[ELEM] = 1;
       return blue;
     }
     return plain;
   }
 
   /**
-   * Processes a comment or doctype declaration.
+   * Processes a comment, doctype declaration or CDATA section.
    * @param ch current character
    * @return color
    */
   private Color comment(final int ch) {
-    switch(comment) {
-      // "<!", "<!-"
-      case 1, 2 -> comment = ch == '-' ? comment + 1 : 6;
+    switch(state[COMMENT]) {
+      // "<!"
+      case 1 -> state[COMMENT] = ch == '-' ? 2 : ch == '[' ? 7 : 6;
+      // "<!-"
+      case 2 -> state[COMMENT] = ch == '-' ? 3 : 6;
       // "<!--"
       case 3 -> {
-        if(ch == '-') comment = 4;
+        if(ch == '-') state[COMMENT] = 4;
       }
       // "<!-- ... -"
-      case 4 -> comment = ch == '-' ? comment + 1 : 3;
+      case 4 -> state[COMMENT] = ch == '-' ? state[COMMENT] + 1 : 3;
       // "<!-- ... --"
-      case 5 -> comment = ch == '>' ? 0 : 3;
+      case 5 -> state[COMMENT] = ch == '>' ? 0 : 3;
       // "<! ... >"
       case 6 -> {
-        if(ch == '>') comment = 0;
+        if(ch == '>') state[COMMENT] = 0;
       }
+      // "<![ ... " (CDATA or marked section)
+      case 7 -> {
+        if(ch == ']') state[COMMENT] = 8;
+      }
+      // "<![ ... ]"
+      case 8 -> state[COMMENT] = ch == ']' ? 9 : 7;
+      // "<![ ... ]]"
+      case 9 -> state[COMMENT] = ch == '>' ? 0 : ch == ']' ? 9 : 7;
       default -> { }
     }
-    return comment > 0 ? cyan : blue;
+    return state[COMMENT] > 0 ? cyan : blue;
   }
 
   /**
@@ -116,30 +122,16 @@ public final class SyntaxXML extends Syntax {
    * @return color
    */
   private Color pi(final int ch) {
-    switch(pi) {
+    switch(state[PI]) {
       // "<?"
       case 1 -> {
-        if(ch == '?') pi = 2;
+        if(ch == '?') state[PI] = 2;
       }
       // "<!? ... ?"
-      case 2 -> pi = ch == '>' ? 0 : 1;
+      case 2 -> state[PI] = ch == '>' ? 0 : 1;
       default -> { }
     }
-    return pi > 0 ? cyan : blue;
-  }
-
-  @Override
-  public int[] state() {
-    return new int[] { quote, name ? 1 : 0, elem ? 1 : 0, comment, pi };
-  }
-
-  @Override
-  public void state(final int[] state) {
-    quote = state[0];
-    name = state[1] != 0;
-    elem = state[2] != 0;
-    comment = state[3];
-    pi = state[4];
+    return state[PI] > 0 ? cyan : blue;
   }
 
   @Override

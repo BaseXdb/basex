@@ -28,15 +28,14 @@ final class SyntaxXQuery extends Syntax {
   private static final String CLOSING = "})";
   /** Keywords. */
   private static final HashSet<String> KEYWORDS = new HashSet<>();
-
-  /** Comment. */
-  private int comment;
-  /** Last quote. */
-  private int quote;
-  /** Variable flag. */
-  private boolean var;
-  /** Element flag. */
-  private boolean elem;
+  /** State index: comment. */
+  private static final int COMMENT = 0;
+  /** State index: last quote. */
+  private static final int QUOTE = 1;
+  /** State index: variable flag. */
+  private static final int VAR = 2;
+  /** State index: element flag. */
+  private static final int ELEM = 3;
 
   // initialize keywords
   static {
@@ -65,10 +64,7 @@ final class SyntaxXQuery extends Syntax {
   @Override
   public void init(final Color color) {
     super.init(color);
-    quote = 0;
-    var = false;
-    elem = false;
-    comment = 0;
+    state = new int[4];
   }
 
   @Override
@@ -76,70 +72,57 @@ final class SyntaxXQuery extends Syntax {
     final int ch = iter.curr();
 
     // opened quote
-    if(quote != 0) {
-      if(ch == quote) quote = 0;
+    if(state[QUOTE] != 0) {
+      if(ch == state[QUOTE]) state[QUOTE] = 0;
       return brown;
     }
 
     // comment
-    if(comment == 0 && ch == '(') {
-      comment++;
-    } else if(comment == 1) {
-      comment = ch == ':' ? 2 : 0;
-    } else if(comment == 2 && ch == ':') {
-      comment++;
-    } else if(comment == 3 && ch != ':') {
-      comment = ch == ')' ? 0 : 2;
+    if(state[COMMENT] == 0 && ch == '(') {
+      state[COMMENT]++;
+    } else if(state[COMMENT] == 1) {
+      state[COMMENT] = ch == ':' ? 2 : 0;
+    } else if(state[COMMENT] == 2 && ch == ':') {
+      state[COMMENT]++;
+    } else if(state[COMMENT] == 3 && ch != ':') {
+      state[COMMENT] = ch == ')' ? 0 : 2;
     }
-    if(comment != 0) {
-      var = false;
+    if(state[COMMENT] != 0) {
+      state[VAR] = 0;
       return cyan;
     }
 
     // quotes
     if(ch == '"' || ch == '\'' || ch == '`') {
-      quote = ch;
+      state[QUOTE] = ch;
       return brown;
     }
 
     // variables
     if(ch == '$') {
-      var = true;
+      state[VAR] = 1;
       return green;
     }
-    if(var) {
-      var = XMLToken.isChar(ch);
+    if(state[VAR] != 0) {
+      state[VAR] = XMLToken.isChar(ch) ? 1 : 0;
       return green;
     }
 
     // integers
-    if(digit(ch) && !Double.isNaN(toDouble(token(iter.currString())))) return purple;
+    if(number(iter)) return purple;
 
     // special characters
     if(!XMLToken.isNCChar(ch)) {
-      elem = ch == '<' || ch == '%';
+      state[ELEM] = ch == '<' || ch == '%' ? 1 : 0;
       return cyan;
     }
 
     // check for keywords
-    if(!elem && KEYWORDS.contains(iter.currString())) return blue;
+    if(state[ELEM] == 0 && KEYWORDS.contains(iter.currString())) return blue;
 
     // standard text
-    elem = false;
+    state[ELEM] = 0;
     return plain;
-  }
-
-  @Override
-  public int[] state() {
-    return new int[] { comment, quote, var ? 1 : 0, elem ? 1 : 0 };
-  }
-
-  @Override
-  public void state(final int[] state) {
-    comment = state[0];
-    quote = state[1];
-    var = state[2] != 0;
-    elem = state[3] != 0;
   }
 
   @Override

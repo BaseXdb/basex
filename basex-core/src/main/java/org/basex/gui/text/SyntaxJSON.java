@@ -15,51 +15,33 @@ import org.basex.util.hash.*;
  */
 final class SyntaxJSON extends Syntax {
   /** Keywords. */
-  private static final TokenSet KEYWORDS;
-
-  // initialize keywords
-  static {
-    KEYWORDS = new TokenSet("false", "true", "null");
-  }
-
-  /** Quoted flag. */
-  private boolean quoted;
-  /** Backslash. */
-  private boolean back;
+  private static final TokenSet KEYWORDS = new TokenSet("false", "true", "null");
+  /** State index: quoted flag. */
+  private static final int QUOTED = 0;
+  /** State index: backslash. */
+  private static final int BACK = 1;
 
   @Override
   public void init(final Color color) {
     super.init(color);
-    quoted = false;
-    back = false;
+    state = new int[2];
   }
 
   @Override
   public Color getColor(final TextIterator iter) {
     final int ch = iter.curr();
+    final boolean back = state[BACK] != 0;
     final boolean quote = !back && ch == '"';
 
-    if(quoted) {
-      back = !back && ch == '\\';
+    if(state[QUOTED] != 0) {
+      state[BACK] = !back && ch == '\\' ? 1 : 0;
     } else {
       if("{}[]:,".indexOf(ch) != -1) return cyan;
-      final byte[] token = token(iter.currString());
-      if(KEYWORDS.contains(token)) return blue;
-      if(digit(ch) && !Double.isNaN(toDouble(token))) return purple;
+      if(KEYWORDS.contains(token(iter.currString()))) return blue;
+      if(number(iter)) return purple;
     }
 
-    if(quote) quoted ^= true;
-    return quote || quoted ? brown : red;
-  }
-
-  @Override
-  public int[] state() {
-    return new int[] { quoted ? 1 : 0, back ? 1 : 0 };
-  }
-
-  @Override
-  public void state(final int[] state) {
-    quoted = state[0] != 0;
-    back = state[1] != 0;
+    if(quote) state[QUOTED] ^= 1;
+    return quote || state[QUOTED] != 0 ? brown : red;
   }
 }
