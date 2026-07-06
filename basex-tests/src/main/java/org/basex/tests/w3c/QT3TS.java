@@ -519,7 +519,6 @@ public final class QT3TS extends Main {
     // too much effort to support in the test suite
     "'fn-available-environment-variables-011', " +
     "'environment-variable-005', 'environment-variable-006', 'environment-variable-007', " +
-    "'cbcl-collection-002', 'cbcl-collection-003', 'cbcl-collection-004', " +
     "'')";
 
   /**

@@ -132,8 +132,6 @@ public final class MainOptions extends Options {
 
   /** Detailed query information. */
   public static final BooleanOption QUERYINFO = new BooleanOption("QUERYINFO", false);
-  /** Flag for mixing updates and items. */
-  public static final BooleanOption MIXUPDATES = new BooleanOption("MIXUPDATES", false);
   /** External variables, separated by commas. */
   public static final StringOption BINDINGS = new StringOption("BINDINGS", "");
   /** Limit for inlining functions. */

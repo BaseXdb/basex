@@ -3,8 +3,10 @@ package org.basex.query.func.fn;
 import static org.basex.query.QueryError.*;
 
 import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.value.*;
 import org.basex.query.value.item.*;
+import org.basex.query.value.type.*;
 
 /**
  * Function implementation.
@@ -16,6 +18,18 @@ public class FnCollection extends Docs {
   @Override
   public Value value(final QueryContext qc) throws QueryException {
     return collection(qc);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    final Expr expr = super.opt(cc);
+    if(expr == this) {
+      // sharpen the type
+      final byte[] uri = staticUri();
+      final QueryInput qi = uri != null ? queryInput(uri) : null;
+      if(qi != null && qi.dbName != null) exprType.assign(Types.DOCUMENT_ZM);
+    }
+    return expr;
   }
 
   @Override

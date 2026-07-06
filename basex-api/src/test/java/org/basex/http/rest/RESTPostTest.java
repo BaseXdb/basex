@@ -104,15 +104,10 @@ public final class RESTPostTest extends RESTTest {
    * @throws IOException I/O exception
    */
   @Test public void postOption() throws IOException {
-    assertEquals("2", post("<query>"
-        + "<text>2, delete node &lt;a/&gt;</text>"
-        + "<option name='" + MainOptions.MIXUPDATES.name() + "' value='true'/></query>",
+    assertEquals("1", post("<query>"
+        + "<text>1</text>"
+        + "<option name='" + MainOptions.QUERYINFO.name() + "' value='true'/></query>",
         MediaType.APPLICATION_XML, ""));
-
-    post(500, "<query xmlns=\"" + URI + "\">"
-        + "<text>1, delete node &lt;a/&gt;</text>"
-        + "<option name='" + MainOptions.MIXUPDATES.name() + "' value='false'/></query>",
-      MediaType.APPLICATION_XML, "");
   }
 
   /**

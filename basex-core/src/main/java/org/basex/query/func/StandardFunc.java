@@ -212,8 +212,7 @@ public abstract class StandardFunc extends Arr {
    * @return result of check
    */
   public boolean hasUPD() {
-    // mix updates: higher-order function may be updating
-    return definition.has(Flag.UPD) || sc().mixUpdates && hofOffsets() > 0;
+    return definition.has(Flag.UPD);
   }
 
   /**

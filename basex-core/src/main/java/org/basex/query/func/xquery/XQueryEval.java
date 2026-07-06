@@ -117,7 +117,7 @@ public class XQueryEval extends StandardFunc {
         }
         qctx.parseMain(string(query.read()), null, sctx);
 
-        if(!sc().mixUpdates && updating != qctx.updating) {
+        if(updating != qctx.updating) {
           if(!updating) throw XQUERY_NOUPDATES.get(info);
           if(!qctx.main.expr.vacuous()) throw XQUERY_UPDATEEXPECTED.get(info);
         }
@@ -164,10 +164,5 @@ public class XQueryEval extends StandardFunc {
   public final boolean accept(final ASTVisitor visitor) {
     // locked resources cannot be detected statically
     return visitor.lock((String) null) && super.accept(visitor);
-  }
-
-  @Override
-  public final boolean hasUPD() {
-    return sc().mixUpdates || super.hasUPD();
   }
 }

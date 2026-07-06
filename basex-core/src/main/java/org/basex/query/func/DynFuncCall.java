@@ -104,7 +104,7 @@ public final class DynFuncCall extends FuncCall {
           exprs[a] = new TypeCheck(info, exprs[a], st).compile(cc);
         }
       }
-      if(!sc().mixUpdates && !updating && ft.anns.contains(Annotation.UPDATING)) {
+      if(!updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
       exprType.assign(ft.declType);
@@ -250,9 +250,8 @@ public final class DynFuncCall extends FuncCall {
 
   @Override
   public boolean has(final Flag... flags) {
-    return Flag.UPD.oneOf(flags) && (updating || sc().mixUpdates) ||
-           Flag.NDT.oneOf(flags) && (ndt || updating || sc().mixUpdates) ||
-           super.has(Flag.remove(flags, Flag.UPD));
+    return Flag.UPD.oneOf(flags) && updating || Flag.NDT.oneOf(flags) && (ndt || updating) ||
+        super.has(Flag.remove(flags, Flag.UPD));
   }
 
   @Override

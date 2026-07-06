@@ -199,7 +199,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final <T extends XQFunctionExpr> T checkUp(final T expr, final boolean updating)
       throws QueryException {
-    if(updating != expr.annotations().contains(Annotation.UPDATING) && !sc().mixUpdates) {
+    if(updating != expr.annotations().contains(Annotation.UPDATING)) {
       if(!updating) throw FUNCUP_X.get(info, expr);
       if(!expr.vacuousBody()) throw FUNCNOTUP_X.get(info, expr);
     }

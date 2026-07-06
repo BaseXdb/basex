@@ -393,16 +393,14 @@ public class QueryParser extends InputParser {
 
     if(qc.contextValue != null) {
       final Expr ctx = qc.contextValue.expr;
-      if(!sc.mixUpdates && ctx.has(Flag.UPD)) throw error(UPCTX, ctx);
+      if(ctx.has(Flag.UPD)) throw error(UPCTX, ctx);
     }
 
     if(qc.updating) {
       // check updating semantics if updating expressions exist
-      if(!sc.mixUpdates) {
-        qc.functions.checkUp();
-        qc.vars.checkUp();
-        if(main != null) main.expr.checkUp();
-      }
+      qc.functions.checkUp();
+      qc.vars.checkUp();
+      if(main != null) main.expr.checkUp();
       // check if main expression is updating
       qc.updating = main != null && main.expr.has(Flag.UPD);
     }

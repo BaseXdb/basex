@@ -29,8 +29,6 @@ public final class StaticContext {
   public final TokenObjectMap<DecFormatter> decFormats = new TokenObjectMap<>();
   /** Static and dynamic namespaces. */
   public final NSContext ns = new NSContext();
-  /** Mix updates flag. */
-  public final boolean mixUpdates;
   /** Look up documents in databases. */
   public final boolean withdb;
 
@@ -80,7 +78,6 @@ public final class StaticContext {
    */
   public StaticContext(final QueryContext qc) {
     final MainOptions mopts = qc.context.options;
-    mixUpdates = mopts.get(MainOptions.MIXUPDATES);
     withdb = mopts.get(MainOptions.WITHDB);
     uriResolver = mopts.resolver().uriResolver();
   }

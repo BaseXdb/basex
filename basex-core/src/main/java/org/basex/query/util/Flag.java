@@ -1,6 +1,5 @@
 package org.basex.query.util;
 
-import org.basex.core.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 
@@ -35,8 +34,7 @@ public enum Flag {
    */
   POS,
   /**
-   * Performs updates. Checked to detect if an expression is updating or not, or if code
-   * can be optimized away when using {@link MainOptions#MIXUPDATES}.
+   * Performs updates. Checked to detect if an expression is updating or not.
    * All updating expressions are nondeterministic.
    * Example: delete node
    */

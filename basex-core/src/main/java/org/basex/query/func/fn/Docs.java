@@ -37,6 +37,16 @@ public abstract class Docs extends DynamicFn {
       Uri.get(uri).isValid() ? new QueryInput(string(uri), sc()) : null;
   }
 
+  /**
+   * Returns the first argument as a constant URI string.
+   * @return URI, or {@code null} if the argument is not a constant string
+   */
+  final byte[] staticUri() {
+    final Expr source = arg(0);
+    return source instanceof final Str str ? str.string() :
+      source instanceof final Atm atm ? atm.string(null) : null;
+  }
+
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     // pre-evaluate during dynamic compilation
@@ -59,16 +69,14 @@ public abstract class Docs extends DynamicFn {
         // lock default collection (only collection functions can have 0 arguments)
         if(defined(0)) {
           // check if input argument is a static string
-          final Expr expr = arg(0);
-          final byte[] uri = expr instanceof final Str str ? str.string() :
-            expr instanceof final Atm atm ? atm.string(null) : null;
+          final byte[] uri = staticUri();
           if(uri != null) {
             // add local lock if argument may reference a database
             queryInput = queryInput(uri);
             if(queryInput != null && queryInput.dbName != null) list.add(queryInput.dbName);
           } else {
             // empty sequence: default collection; otherwise, enforce global lock
-            list.add(expr.seqType().zero() ? Locking.COLLECTION : null);
+            list.add(arg(0).seqType().zero() ? Locking.COLLECTION : null);
           }
         } else {
           list.add(Locking.COLLECTION);

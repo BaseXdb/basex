@@ -139,8 +139,7 @@ public final class RESTGetTest extends RESTTest {
    * @throws IOException I/O exception
    */
   @Test public void queryOption() throws IOException {
-    get(200, "", "query", "2, delete node <a/>", MainOptions.MIXUPDATES.name(), true);
-    get(500, "", "query", "2, delete node <a/>", MainOptions.MIXUPDATES.name(), false);
+    get("1", "", "query", "1", MainOptions.QUERYINFO.name(), true);
   }
 
   /**
