@@ -102,11 +102,21 @@ public final class JobPool {
   }
 
   /**
+   * Schedules a one-off task for delayed execution.
+   * @param task task
+   * @param delay delay (ms)
+   * @return cancellation handle
+   */
+  ScheduledFuture<?> schedule(final Runnable task, final long delay) {
+    return scheduler.schedule(task, delay, TimeUnit.MILLISECONDS);
+  }
+
+  /**
    * Discards a result after the timeout.
    * @param job job
    */
   public void scheduleResult(final Job job) {
-    scheduler.schedule(() -> results.remove(job.jc().id()), timeout, TimeUnit.MILLISECONDS);
+    schedule(() -> results.remove(job.jc().id()), timeout);
   }
 
   /**

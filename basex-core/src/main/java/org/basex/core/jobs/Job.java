@@ -20,8 +20,8 @@ public abstract class Job {
   /** Job context. */
   private JobContext jc = new JobContext(this);
   // state and control flags must be volatile so that all threads see the actual non-cached values
-  /** Timer. */
-  private volatile Timer timer;
+  /** Handle for canceling the timeout task (can be {@code null}). */
+  private volatile ScheduledFuture<?> timeoutFuture;
 
   /** This flag indicates that a job is updating. */
   public volatile boolean updating;
@@ -59,7 +59,7 @@ public abstract class Job {
     state(JobState.RUNNING);
     jc.performance = new Performance();
     // non-admin users: stop process after timeout
-    if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx.soptions.get(StaticOptions.TIMEOUT));
+    if(!ctx.user().has(Perm.ADMIN)) startTimeout(ctx, ctx.soptions.get(StaticOptions.TIMEOUT));
   }
 
   /**
@@ -283,25 +283,23 @@ public abstract class Job {
   // PRIVATE FUNCTIONS ============================================================================
 
   /**
-   * Starts a timeout thread.
+   * Schedules the timeout on the shared job scheduler.
+   * @param ctx context
    * @param sec seconds wait; deactivated if set to 0
    */
-  private void startTimeout(final long sec) {
+  private void startTimeout(final Context ctx, final long sec) {
     if(sec == 0) return;
-    timer = new Timer(true);
-    timer.schedule(new TimerTask() {
-      @Override
-      public void run() { timeout(); }
-    }, sec * 1000L);
+    timeoutFuture = ctx.jobs.schedule(this::timeout, sec * 1000L);
   }
 
   /**
-   * Stops the timeout thread.
+   * Cancels a scheduled timeout.
    */
   private void stopTimeout() {
-    if(timer != null) {
-      timer.cancel();
-      timer = null;
+    final ScheduledFuture<?> future = timeoutFuture;
+    if(future != null) {
+      future.cancel(false);
+      timeoutFuture = null;
     }
   }
 }
