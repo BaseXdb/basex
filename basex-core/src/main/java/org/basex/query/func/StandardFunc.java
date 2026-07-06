@@ -339,8 +339,8 @@ public abstract class StandardFunc extends Arr {
     // do not rewrite non-deterministic expressions: foot($nodes ! file:append($name, .))
     if(arg(0) instanceof SimpleMap) {
       final Expr[] ops = arg(0).args();
-      if(((Checks<Expr>) op ->
-          op == ops[0] || op.seqType().one() && !op.has(Flag.POS, Flag.NDT)).all(ops)) {
+      if(Checks.all(ops, op ->
+          op == ops[0] || op.seqType().one() && !op.has(Flag.POS, Flag.NDT))) {
         final Expr[] args = new ExprList().add(args()).set(0, ops[0]).finish();
         final Expr fn = definition.get(info, args).optimize(cc);
         return skip ? fn : SimpleMap.get(cc, info, new ExprList(ops.clone()).set(0, fn).finish());

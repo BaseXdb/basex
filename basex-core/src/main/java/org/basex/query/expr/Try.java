@@ -64,7 +64,7 @@ public final class Try extends Single {
     // remove duplicates and too specific catch clauses
     final ArrayList<Catch> newCatches = new ArrayList<>();
     final ArrayList<Test> tests = new ArrayList<>();
-    if(!((Checks<Catch>) Catch::global).all(catches)) {
+    if(!Checks.all(catches, Catch::global)) {
       for(final Catch ctch : catches) {
         if(ctch.simplify(tests, cc)) newCatches.add(ctch);
       }
@@ -159,18 +159,18 @@ public final class Try extends Single {
 
   @Override
   public boolean vacuous() {
-    return expr.vacuous() && ((Checks<Catch>) ctch -> ctch.expr.vacuous()).all(catches) &&
+    return expr.vacuous() && Checks.all(catches, ctch -> ctch.expr.vacuous()) &&
         fnlly.vacuous();
   }
 
   @Override
   public boolean ddo() {
-    return expr.ddo() && ((Checks<Catch>) ctch -> ctch.expr.ddo()).all(catches);
+    return expr.ddo() && Checks.all(catches, ctch -> ctch.expr.ddo());
   }
 
   @Override
   public boolean has(final Flag... flags) {
-    return ((Checks<Catch>) ctch -> ctch.has(flags)).any(catches) || super.has(flags) ||
+    return Checks.any(catches, ctch -> ctch.has(flags)) || super.has(flags) ||
         fnlly.has(flags);
   }
 

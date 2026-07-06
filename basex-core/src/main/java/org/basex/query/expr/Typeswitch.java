@@ -90,7 +90,7 @@ public final class Typeswitch extends ParseExpr {
         boolean branch = false;
         for(int h = 0; !branch && h < g; h++) {
           for(final SeqType st : groups[h].seqTypes) {
-            if(((Checks<SeqType>) st::instanceOf).any(matching)) {
+            if(Checks.any(matching, st::instanceOf)) {
               branch = true;
               break;
             }
@@ -165,12 +165,12 @@ public final class Typeswitch extends ParseExpr {
 
   @Override
   public boolean vacuous() {
-    return ((Checks<TypeswitchGroup>) group -> group.expr.vacuous()).all(groups);
+    return Checks.all(groups, group -> group.expr.vacuous());
   }
 
   @Override
   public boolean ddo() {
-    return ((Checks<TypeswitchGroup>) group -> group.expr.ddo()).all(groups);
+    return Checks.all(groups, group -> group.expr.ddo());
   }
 
   @Override

@@ -399,7 +399,7 @@ public final class CompileContext {
       // sequence: 'a', 'b', 'c'
       add = exprs -> { for(final Item item : seq) exprs.add(item); };
     } else if(expr instanceof List && (single ?
-        size <= limit && ((Checks<Expr>) ex -> ex.seqType().one()).all(expr.args()) :
+        size <= limit && Checks.all(expr.args(), ex -> ex.seqType().one()) :
         expr.args().length <= limit)) {
       // list: <a/>, <b/>
       add = exprs -> { for(final Expr ex : expr.args()) exprs.add(ex); };

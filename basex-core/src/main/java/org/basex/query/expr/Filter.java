@@ -117,7 +117,7 @@ public abstract class Filter extends Preds {
 
     // rewrite loop-invariant predicates
     // example: for $i in (1, 'a') return $seq[$i]
-    if(((Checks<Expr>) Expr::isSimple).all(exprs)) {
+    if(Checks.all(exprs, Expr::isSimple)) {
       return copyType(new HoistedFilter(info, root, exprs));
     }
 

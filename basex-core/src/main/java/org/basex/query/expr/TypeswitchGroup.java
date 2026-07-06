@@ -171,7 +171,7 @@ public final class TypeswitchGroup extends Single {
   ArrayList<SeqType> matchingTypes(final SeqType... types) {
     final ArrayList<SeqType> tmp = new ArrayList<>(seqTypes.length);
     for(final SeqType st : seqTypes) {
-      if(((Checks<SeqType>) type -> type.instanceOf(st)).any(types)) tmp.add(st);
+      if(Checks.any(types, type -> type.instanceOf(st))) tmp.add(st);
     }
     return tmp;
   }

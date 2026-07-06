@@ -231,10 +231,7 @@ public final class Payload {
    */
   private static boolean matchBoundary(final byte[] boundary, final byte[] line) {
     final int bl = boundary.length, ll = line.length;
-    if(ll < bl) return false;
-    for(int i = 0; i < bl; i++) {
-      if(boundary[i] != line[i]) return false;
-    }
+    if(!startsWith(line, boundary)) return false;
     for(int i = bl; i < ll; i++) {
       final byte c = line[i];
       if(c != ' ' && c != '\t') return false;

@@ -104,7 +104,7 @@ public final class List extends Arr {
    * @param cc compilation context
    */
   private void toRange(final CompileContext cc) {
-    if(!((Checks<Expr>) expr -> expr instanceof Itr || expr instanceof RangeSeq).any(exprs)) return;
+    if(!Checks.any(exprs, expr -> expr instanceof Itr || expr instanceof RangeSeq)) return;
 
     long min = Long.MIN_VALUE, max = 0;
     final int el = exprs.length;
@@ -305,7 +305,7 @@ public final class List extends Arr {
 
   @Override
   public boolean vacuous() {
-    return ((Checks<Expr>) Expr::vacuous).all(exprs);
+    return Checks.all(exprs, Expr::vacuous);
   }
 
   @Override

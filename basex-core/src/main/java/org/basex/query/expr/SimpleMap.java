@@ -368,7 +368,7 @@ public abstract class SimpleMap extends Mapping {
       throws QueryException {
 
     // do not simplify nondeterministic map, in order to preserve side effects
-    if(((Checks<Expr>) ex -> ex.has(Flag.NDT)).any(exprs)) return this;
+    if(Checks.any(exprs, ex -> ex.has(Flag.NDT))) return this;
 
     Expr expr = this;
     final int el = exprs.length;

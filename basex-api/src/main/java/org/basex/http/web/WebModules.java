@@ -297,9 +297,9 @@ public final class WebModules {
         final Checks<MediaType> checkProduce = produce ->
           produce.matches(accept) && qf(accept, "q") == clientQf &&
           (serverQf == -1 || qf(produce, "qs") == serverQf);
-        return checkProduce.any(func.produces);
+        return Checks.any(func.produces, checkProduce);
       };
-      if(!check.any(accepts)) funcs.remove(fl);
+      if(!Checks.any(accepts, check)) funcs.remove(fl);
     }
   }
 

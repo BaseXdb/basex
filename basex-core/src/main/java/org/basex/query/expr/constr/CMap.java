@@ -40,7 +40,7 @@ public final class CMap extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     // flatten nested maps: { 1: 2, { 3: 4, 5: 6 }, () } → { 1: 2, 3: 4, 5: 6 }
     int el = exprs.length;
-    if(((Checks<Expr>) expr -> expr == Empty.UNDEFINED).any(exprs)) {
+    if(Checks.any(exprs, expr -> expr == Empty.UNDEFINED)) {
       final ExprList list = new ExprList();
       for(int e = 0; e < el; e += 2) {
         final Expr expr = exprs[e];

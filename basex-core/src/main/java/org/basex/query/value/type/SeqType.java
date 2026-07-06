@@ -234,7 +234,7 @@ public final class SeqType {
     final Type dt = TypeRef.deref(this.type);
     // instance check
     final SeqType[] at = dt instanceof final FuncType ft ? ft.argTypes : null;
-    if((at == null || ((Checks<SeqType>) st -> st.eq(Types.ITEM_ZM)).all(at)) &&
+    if((at == null || Checks.all(at, st -> st.eq(Types.ITEM_ZM))) &&
         instance(value, true)) return value;
 
     // coerce items if required

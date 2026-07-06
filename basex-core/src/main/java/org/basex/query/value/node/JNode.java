@@ -1,5 +1,6 @@
 package org.basex.query.value.node;
 
+import java.util.*;
 import java.util.function.*;
 
 import org.basex.data.*;
@@ -134,12 +135,7 @@ public final class JNode extends GNode {
     for(int i = d1 - 1; i >= 0; i--) { p1[i] = n.index(); n = n.parent; }
     n = jnode;
     for(int i = d2 - 1; i >= 0; i--) { p2[i] = n.index(); n = n.parent; }
-    final int ml = Math.min(d1, d2);
-    for(int i = 0; i < ml; i++) {
-      if(p1[i] != p2[i]) return Long.compare(p1[i], p2[i]);
-    }
-    // one node is an ancestor of the other: the ancestor comes first
-    return Integer.compare(d1, d2);
+    return Integer.signum(Arrays.compare(p1, p2));
   }
 
   /**

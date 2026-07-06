@@ -91,7 +91,7 @@ abstract class ValidateFn extends StandardFunc {
     final Checks<ErrorInfo> warnings = ei -> ei.level == Level.WARNING;
 
     final FBuilder report = FElem.build(Q_REPORT);
-    report.node(FElem.build(Q_STATUS).text(warnings.all(errors) ? VALID : INVALID));
+    report.node(FElem.build(Q_STATUS).text(Checks.all(errors, warnings) ? VALID : INVALID));
     for(final ErrorInfo ei : errors) {
       final FBuilder error = FElem.build(Q_MESSAGE).attr(Q_LEVEL, ei.level);
       if(ei.line != Integer.MIN_VALUE) error.attr(Q_LINE, ei.line);

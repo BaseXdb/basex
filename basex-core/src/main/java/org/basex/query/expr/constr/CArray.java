@@ -37,7 +37,7 @@ public final class CArray extends Arr {
 
     // if possible, rewrite to curly array constructor
     // [ 1, 2, 3 ] → array { 1, 2, 3 }
-    if(((Checks<Expr>) expr -> expr.seqType().one()).all(exprs)) {
+    if(Checks.all(exprs, expr -> expr.seqType().one())) {
       return cc.replaceWith(this, new CItemArray(info, List.get(cc, info, exprs)).optimize(cc));
     }
 

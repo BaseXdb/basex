@@ -89,7 +89,7 @@ public class MapMerge extends MapFn {
     if(arg(0).seqType().type instanceof MapType) {
       // remove empty entries
       if(arg(0) instanceof List &&
-          ((Checks<Expr>) arg -> arg == XQMap.empty()).any(arg(0).args())) {
+          Checks.any(arg(0).args(), arg -> arg == XQMap.empty())) {
         final ExprList list = new ExprList();
         for(final Expr arg : arg(0).args()) {
           if(arg != XQMap.empty()) list.add(arg);

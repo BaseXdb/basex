@@ -52,7 +52,7 @@ public final class ArrayJoin extends ArrayFn {
     if(ast.type instanceof ArrayType) {
       // remove empty entries
       final Expr[] args = arrays.args();
-      if(arrays instanceof List && ((Checks<Expr>) arg -> arg == XQArray.empty()).any(args)) {
+      if(arrays instanceof List && Checks.any(args, arg -> arg == XQArray.empty())) {
         final ExprList list = new ExprList();
         for(final Expr arg : args) {
           if(arg != XQArray.empty()) list.add(arg);

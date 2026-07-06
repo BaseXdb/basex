@@ -61,7 +61,7 @@ interface ProjectCommands {
         for(final IOFile file : selectedFiles()) view().open(file, search());
       }
       @Override public boolean enabled(final GUI main) {
-        return ((Checks<IOFile>) file -> !file.isDir()).all(selectedFiles());
+        return Checks.all(selectedFiles(), file -> !file.isDir());
       }
     });
     commands.add(new GUIPopupCmd(OPEN_EXTERNALLY, BaseXKeys.SHIFT_ENTER) {

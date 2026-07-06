@@ -76,8 +76,8 @@ public final class CElem extends CName {
     final TokenBuilder tb = new TokenBuilder();
     final ExprList list = new ExprList(exprs.length);
     for(final Expr expr : exprs) {
-      if(expr instanceof List && ((Checks<Expr>) arg -> text.test(arg) ||
-          arg instanceof Value && atomic.test(arg)).all(expr.args())) {
+      if(expr instanceof List && Checks.all(expr.args(), arg -> text.test(arg) ||
+          arg instanceof Value && atomic.test(arg))) {
         boolean more = false;
         for(final Expr arg : expr.args()) {
           if(text.test(arg)) {

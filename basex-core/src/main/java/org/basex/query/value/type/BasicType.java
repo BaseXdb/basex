@@ -1222,7 +1222,7 @@ public enum BasicType implements Type {
 
   @Override
   public final boolean refinable() {
-    return !((Checks<BasicType>) at -> at.eq(this) || !at.instanceOf(this)).all(values());
+    return !Checks.all(values(), at -> at.eq(this) || !at.instanceOf(this));
   }
 
   /**

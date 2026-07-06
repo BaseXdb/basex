@@ -220,12 +220,12 @@ public final class Switch extends ParseExpr {
 
   @Override
   public boolean vacuous() {
-    return ((Checks<SwitchGroup>) group -> group.rtrn().vacuous()).all(groups);
+    return Checks.all(groups, group -> group.rtrn().vacuous());
   }
 
   @Override
   public boolean ddo() {
-    return ((Checks<SwitchGroup>) group -> group.rtrn().ddo()).all(groups);
+    return Checks.all(groups, group -> group.rtrn().ddo());
   }
 
   @Override

@@ -195,7 +195,7 @@ public abstract class JavaCall extends Arr {
    * @return best candidate, or {@code null} if multiple candidates are left
    */
   static JavaCandidate bestCandidate(final ArrayList<JavaCandidate> candidates) {
-    if(((Checks<JavaCandidate>) jc -> jc.exact).any(candidates)) {
+    if(Checks.any(candidates, jc -> jc.exact)) {
       for(int c = candidates.size() - 1; c >= 0; c--) {
         if(!candidates.get(c).exact) candidates.remove(c);
       }

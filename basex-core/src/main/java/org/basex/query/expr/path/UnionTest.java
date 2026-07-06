@@ -80,7 +80,7 @@ public final class UnionTest extends Test {
     final UnionTest ut = test instanceof final UnionTest t ? t : null;
     for(final Test t : tests) {
       if(ut != null) {
-        if(!((Checks<Test>) ts -> t.instanceOf(ts)).any(ut.tests)) return false;
+        if(!Checks.any(ut.tests, ts -> t.instanceOf(ts))) return false;
       } else {
         if(!t.instanceOf(test)) return false;
       }

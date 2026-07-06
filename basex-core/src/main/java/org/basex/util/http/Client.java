@@ -155,7 +155,7 @@ public final class Client {
       request.headers.forEach((name, value) -> {
         if(!(hasBody && name.equalsIgnoreCase(CONTENT_TYPE))) rb.header(name, value);
       });
-      if(((Checks<String>) name -> !name.equalsIgnoreCase(ACCEPT)).all(request.headers.keySet())) {
+      if(Checks.all(request.headers.keySet(), name -> !name.equalsIgnoreCase(ACCEPT))) {
         rb.header(ACCEPT, MediaType.ALL_ALL.toString());
       }
     } catch(final IllegalArgumentException ex) {

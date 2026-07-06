@@ -55,7 +55,7 @@ public final class Except extends Set {
         // ignore empty operands or incompatible node types
         cc.info(OPTREMOVE_X_X, expr, (Supplier<?>) this::description);
       } else if(!expr.has(Flag.CNS, Flag.NDT)) {
-        final int same = ((Checks<Expr>) ex -> ex.equals(expr)).index(list);
+        final int same = Checks.index(list, ex -> ex.equals(expr));
         // identical to first operand: return empty sequence
         // example: text() except text() → ()
         if(same == 0) return Empty.VALUE;

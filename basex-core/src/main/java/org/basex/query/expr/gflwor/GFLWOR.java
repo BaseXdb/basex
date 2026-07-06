@@ -213,7 +213,7 @@ public final class GFLWOR extends ParseExpr {
         // zero iterations, no side effects
         //   for $_ in () return <x/> → ()
         if(!has(Flag.NDT)) return Empty.VALUE;
-      } else if(!varrefs.any(clauses) && !ndt.any(clauses)) {
+      } else if(!Checks.any(clauses, varrefs) && !Checks.any(clauses, ndt)) {
         // no referenced variables in return clause
         //   let $_ := 1 return <x/> → <x/>
         //   for $_ in 1 to 2 return 3 → replicate(3, 2)
@@ -222,7 +222,7 @@ public final class GFLWOR extends ParseExpr {
     }
 
     // for $_ in 1 to 2 return () → ()
-    return rtrn == Empty.VALUE && !ndt.any(clauses) ? rtrn : null;
+    return rtrn == Empty.VALUE && !Checks.any(clauses, ndt) ? rtrn : null;
   }
 
   /**
@@ -1060,13 +1060,13 @@ public final class GFLWOR extends ParseExpr {
    * @return result of check
    */
   private boolean isFLW() {
-    return ((Checks<Clause>) clause -> clause instanceof For || clause instanceof Let ||
-        clause instanceof Where).all(clauses);
+    return Checks.all(clauses, clause -> clause instanceof For || clause instanceof Let ||
+        clause instanceof Where);
   }
 
   @Override
   public boolean accept(final ASTVisitor visitor) {
-    return ((Checks<Clause>) clause -> clause.accept(visitor)).all(clauses) && rtrn.accept(visitor);
+    return Checks.all(clauses, clause -> clause.accept(visitor)) && rtrn.accept(visitor);
   }
 
   @Override

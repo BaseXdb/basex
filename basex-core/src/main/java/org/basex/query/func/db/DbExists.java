@@ -34,7 +34,7 @@ public final class DbExists extends DbAccessFn {
         final IOFile bin = data.meta.file(path, type);
         return bin != null && bin.exists() && !bin.isDir();
       };
-      return data.resources.doc(path) != -1 || exists.any(Resources.BINARIES);
+      return data.resources.doc(path) != -1 || Checks.any(Resources.BINARIES, exists);
     } catch(final QueryException ex) {
       if(ex.error() == DB_GET2_X) return false;
       throw ex;

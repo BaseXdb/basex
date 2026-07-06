@@ -49,7 +49,7 @@ abstract class Set extends Arr {
     }
     if(expr != null) return cc.replaceWith(this, expr);
 
-    iterative = ((Checks<Expr>) Expr::ddo).all(exprs);
+    iterative = Checks.all(exprs, Expr::ddo);
     return this;
   }
 

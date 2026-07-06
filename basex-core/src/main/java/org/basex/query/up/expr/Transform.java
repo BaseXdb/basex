@@ -95,7 +95,7 @@ public final class Transform extends Copy {
 
   @Override
   public boolean has(final Flag... flags) {
-    return ((Checks<Let>) copy -> copy.has(flags)).any(copies) ||
+    return Checks.any(copies, copy -> copy.has(flags)) ||
            Flag.CNS.oneOf(flags) ||
            Flag.UPD.oneOf(flags) && arg(target()).has(Flag.UPD) ||
            super.has(Flag.remove(flags, Flag.UPD));

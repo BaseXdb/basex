@@ -149,7 +149,7 @@ public abstract class Arr extends ParseExpr {
    * @param cc compilation context
    */
   protected final void removeEmpty(final CompileContext cc) {
-    if(!((Checks<Expr>) expr -> expr == Empty.VALUE).any(exprs)) return;
+    if(!Checks.any(exprs, expr -> expr == Empty.VALUE)) return;
 
     final ExprList list = new ExprList(exprs.length - 1);
     for(final Expr expr : exprs) {
@@ -169,7 +169,7 @@ public abstract class Arr extends ParseExpr {
     for(final Expr expr : exprs) {
       if(expr.seqType().zero()) {
         // keep expression if returning the empty operand would drop a nondeterministic sibling
-        if(((Checks<Expr>) ex -> ex != expr && ex.has(Flag.NDT)).any(exprs)) break;
+        if(Checks.any(exprs, ex -> ex != expr && ex.has(Flag.NDT))) break;
         return expr;
       }
     }
@@ -244,7 +244,7 @@ public abstract class Arr extends ParseExpr {
     // not($a) and not($b) → not($a or $b)
     final Function not = NOT;
     final Checks<Expr> fnNot = ex -> not.is(ex) && !(predicate && ex.has(Flag.POS));
-    if(exprs.length > 1 && fnNot.all(exprs)) {
+    if(exprs.length > 1 && Checks.all(exprs, fnNot)) {
       final ExprList tmp = new ExprList(exprs.length);
       for(final Expr expr : exprs) tmp.add(expr.arg(0));
       final Expr expr = or ? new And(info, tmp.finish()) : new Or(info, tmp.finish());
@@ -287,7 +287,7 @@ public abstract class Arr extends ParseExpr {
       throws QueryException {
 
     // skip if only one operand is left, or if children have no operands that can be optimized
-    if(exprs.length < 2 || !((Checks<Expr>) inverse::isInstance).any(exprs))
+    if(exprs.length < 2 || !Checks.any(exprs, inverse::isInstance))
       return null;
 
     // check if expressions have common operands

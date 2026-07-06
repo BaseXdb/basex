@@ -331,11 +331,11 @@ public abstract class PlanFn extends StandardFunc {
       pe.layout = attributes.isEmpty() ? PlanLayout.SIMPLE : PlanLayout.SIMPLE_PLUS;
       pe.type = PlanType.get(nodes);
     } else if(empty(texts)) {
-      if(equalNames(elements) && ((Checks<GNode>) node ->
-          children(Kind.ELEMENT, node).size() > 1).any(nodes)) {
+      if(equalNames(elements) && Checks.any(nodes, node ->
+          children(Kind.ELEMENT, node).size() > 1)) {
         pe.layout = attributes.isEmpty() ? PlanLayout.LIST : PlanLayout.LIST_PLUS;
         pe.child = elements.get(0).qname();
-      } else if(((Checks<GNode>) PlanFn::differentNames).all(nodes)) {
+      } else if(Checks.all(nodes, PlanFn::differentNames)) {
         pe.layout = PlanLayout.RECORD;
       } else {
         pe.layout = PlanLayout.SEQUENCE;
@@ -352,7 +352,7 @@ public abstract class PlanFn extends StandardFunc {
    * @return result of check
    */
   static boolean empty(final GNodeList nodes) {
-    return ((Checks<GNode>) node -> Token.normalize(node.string()).length == 0).all(nodes);
+    return Checks.all(nodes, node -> Token.normalize(node.string()).length == 0);
   }
 
   /**

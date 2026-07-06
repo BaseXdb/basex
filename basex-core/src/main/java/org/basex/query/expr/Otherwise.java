@@ -104,7 +104,7 @@ public final class Otherwise extends Arr {
 
   @Override
   public boolean vacuous() {
-    return ((Checks<Expr>) Expr::vacuous).all(exprs);
+    return Checks.all(exprs, Expr::vacuous);
   }
 
   @Override

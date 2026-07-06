@@ -120,13 +120,13 @@ public final class Catch extends Single {
         nt.scope == NameTest.Scope.ALL;
 
     // check if all errors are already caught
-    if(wildcard.any(list)) {
+    if(Checks.any(list, wildcard)) {
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
       return false;
     }
 
     // drop remaining tests in favor or wildcard test
-    if(wildcard.any(tests) && tests.size() != 1) {
+    if(Checks.any(tests, wildcard) && tests.size() != 1) {
       tests.clear();
       tests.add(NodeTest.ELEMENT);
       cc.info(OPTSIMPLE_X_X, (Supplier<?>) this::description, "*");
