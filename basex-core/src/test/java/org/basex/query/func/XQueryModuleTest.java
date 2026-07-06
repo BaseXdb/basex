@@ -242,7 +242,7 @@ xquery:fork-join(
   /** Test method. */
   @Test @Timeout(60) public void forkJoinTimeout() {
     final Function func = _XQUERY_FORK_JOIN;
-    // long-running branches are cancelled once the timeout is exceeded
+    // long-running branches are canceled once the timeout is exceeded
     error(func.args(" (1 to 4) ! fn() { prof:sleep(30000) }", " { 'timeout': 0.1 }"),
         XQUERY_TIMEOUT);
     // a timeout that is not reached returns the results
@@ -357,10 +357,10 @@ return count($errors[local-name-from-QName(.) = 'XQDY0054'])
     query(func.args(" (error#0, fn() { () })"), "");
     // all branches fail: an error is raised
     error(func.args(" (error#0, error#0)"), FUNERR1);
-    // long-running branches are cancelled once the timeout is exceeded
+    // long-running branches are canceled once the timeout is exceeded
     error(func.args(" (1 to 4) ! fn() { prof:sleep(30000) }", " { 'timeout': 0.1 }"),
         XQUERY_TIMEOUT);
-    // a single function with a timeout is cancelled, too (no direct-invoke shortcut)
+    // a single function with a timeout is canceled, too (no direct-invoke shortcut)
     error(func.args(" fn() { prof:sleep(30000) }", " { 'timeout': 0.1 }"), XQUERY_TIMEOUT);
     // errors
     error(func.args(" error#0"), FUNERR1);

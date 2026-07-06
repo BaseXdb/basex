@@ -490,7 +490,7 @@ public final class DbModuleTest extends SandboxTest {
     query(func.args(NAME, XML, " { 'a.bin': 'binary' }"));
     query("string-length(" + _DB_GET_BINARY.args(NAME, "a.bin") + ") > 0", true);
 
-    // explicit override: type 'xml' on a string is identical to default behaviour
+    // explicit override: type 'xml' on a string is identical to default behavior
     query(func.args(NAME, XML, " { 'a.xml': 'xml' }"));
     query("count(" + _DB_GET.args(NAME, "a.xml") + "/html)", 1);
 

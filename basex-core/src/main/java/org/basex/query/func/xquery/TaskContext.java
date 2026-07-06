@@ -105,7 +105,7 @@ final class TaskContext {
 
   /**
    * Invokes a set of tasks in parallel and returns the result of the first one that finishes
-   * successfully. Remaining branches are cancelled.
+   * successfully. Remaining branches are canceled.
    * @param tasks tasks to invoke
    * @return result
    * @throws QueryException query exception
