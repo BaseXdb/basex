@@ -75,23 +75,22 @@ public final class ProjectView extends BaseXPanel {
     back.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, GUIConstants.gray),
         BaseXLayout.border(5, 3, 5, 4)));
 
-    rootPath = new BaseXCombo(gui, true).history(GUIOptions.PROJECTS, gui.gopts);
-    rootPath.setFocusable(false);
-
-    // update project tree if another root is chosen
-    rootPath.textField().getDocument().addDocumentListener(
-      new DocumentListener() {
-        @Override public void insertUpdate(final DocumentEvent e) { changeRoot(); }
-        @Override public void removeUpdate(final DocumentEvent e) { }
-        @Override public void changedUpdate(final DocumentEvent e) { }
+    rootPath = new BaseXCombo(gui, false).history(GUIOptions.PROJECTS, gui.gopts);
+    rootPath.addActionListener(e -> changeRoot());
+    rootPath.addPopupMenuListener(new PopupMenuListener() {
+      @Override public void popupMenuWillBecomeVisible(final PopupMenuEvent e) { }
+      @Override public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+        rootPath.updateHistory();
       }
-    );
+      @Override public void popupMenuCanceled(final PopupMenuEvent e) { }
+    });
 
     final BaseXToolBar buttons = new BaseXToolBar();
 
     final AbstractButton browse = BaseXButton.get("c_edit_open", OPEN, false, gui);
     browse.setToolTipText(CHOOSE_DIR + DOTS);
     browse.addActionListener(e -> chooseRoot());
+    browse.setFocusable(true);
     buttons.add(browse);
 
     back.add(rootPath, BorderLayout.CENTER);
@@ -127,7 +126,7 @@ public final class ProjectView extends BaseXPanel {
       }
     });
 
-    rootPath.setText(dir.path());
+    rootPath.select(dir.path());
   }
 
   /**
@@ -335,13 +334,13 @@ public final class ProjectView extends BaseXPanel {
     final BaseXFileChooser fc = new BaseXFileChooser(gui, CHOOSE_DIR, root.file.path());
     final IOFile io = fc.select(Mode.DOPEN);
     if(io != null) {
-      rootPath.setText(io.normalize().path());
-      rootPath.updateHistory();
+      rootPath.select(io.normalize().path());
+      changeRoot();
     }
   }
 
   /**
-   * Changes the root directory. Called by document listener of editable root path component.
+   * Changes the root directory. Called when another directory is chosen in the root path combo box.
    */
   private void changeRoot() {
     final IOFile path = new IOFile(rootPath.getText());
@@ -351,7 +350,8 @@ public final class ProjectView extends BaseXPanel {
     gui.saveOptions();
 
     root.file = path;
-    root.refresh();
+    root.expand();
+    tree.expandPath(root.path());
     refresh();
   }
 }

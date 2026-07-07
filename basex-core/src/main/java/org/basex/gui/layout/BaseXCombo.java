@@ -138,34 +138,34 @@ public class BaseXCombo extends JComboBox<Object> {
    * @return self reference
    */
   public final BaseXCombo history(final StringsOption key, final Options opts) {
-    if(!isEditable()) throw Util.notExpected("Combobox is not editable.");
-
     options = opts;
     optionKey = key;
     history = new BaseXHistory(key, opts);
     setItems(opts.get(key));
 
-    // store input if enter is pressed; scroll between history entries
+    // editable combo boxes: store input if enter is pressed or focus is lost
     final JTextComponent comp = textField();
-    comp.removeKeyListener(keys);
-    keys = (KeyPressedListener) e -> {
-      final boolean next = NEXTLINE.is(e), prev = PREVLINE.is(e);
-      if((next || prev) && e.isShiftDown()) {
-        final String value = history.get(next);
-        if(value != null) {
-          setText(value);
-          final BaseXDialog dialog = win.dialog();
-          if(dialog != null) dialog.action(this);
+    if(comp != null) {
+      // store input if enter is pressed; scroll between history entries
+      comp.removeKeyListener(keys);
+      keys = (KeyPressedListener) e -> {
+        final boolean next = NEXTLINE.is(e), prev = PREVLINE.is(e);
+        if((next || prev) && e.isShiftDown()) {
+          final String value = history.get(next);
+          if(value != null) {
+            setText(value);
+            final BaseXDialog dialog = win.dialog();
+            if(dialog != null) dialog.action(this);
+          }
         }
-      }
-    };
-    comp.addKeyListener(keys);
+      };
+      comp.addKeyListener(keys);
 
-    // store input if focus is lost
-    comp.removeFocusListener(focus);
-    focus = (FocusLostListener) e -> updateHistory();
-    comp.addFocusListener(focus);
-
+      // store input if focus is lost
+      comp.removeFocusListener(focus);
+      focus = (FocusLostListener) e -> updateHistory();
+      comp.addFocusListener(focus);
+    }
     return this;
   }
 
@@ -210,6 +210,20 @@ public class BaseXCombo extends JComboBox<Object> {
       history.add(getText());
       SwingUtilities.invokeLater(() -> setItems(history.values()));
     }
+  }
+
+  /**
+   * Adds a value to the history and selects it. In contrast to {@link #setText(String)}, this
+   * ensures that the value can be displayed by a non-editable, history-backed combo box, which
+   * can only show items that are part of its model.
+   * @param value value to add and select
+   */
+  public void select(final String value) {
+    if(history != null) {
+      history.add(value);
+      setItems(history.values());
+    }
+    setText(value);
   }
 
   /**
