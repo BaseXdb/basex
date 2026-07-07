@@ -20,7 +20,7 @@ import org.basex.util.hash.*;
  */
 public class RecordConstructor extends StandardFunc {
   /** Record type. */
-  private final RecordType recordType;
+  private RecordType recordType;
   /** Field names. */
   private final QNm[] names;
 
@@ -63,6 +63,30 @@ public class RecordConstructor extends StandardFunc {
       values[f] = rf.seqType().coerce(value, qc, ii, names[f], null);
     }
     return new XQRecordMap(recordType, values);
+  }
+
+  @Override
+  protected Expr opt(final CompileContext cc) throws QueryException {
+    // refine the field types of an inferred (anonymous) record from the argument types
+    if(recordType.name() == null) {
+      final TokenObjectMap<RecordField> fields = recordType.fields();
+      final int fs = fields.size();
+      if(fs == exprs.length) {
+        final TokenObjectMap<RecordField> refined = new TokenObjectMap<>(fs);
+        boolean narrowed = false;
+        for(int f = 0; f < fs; f++) {
+          final SeqType ost = fields.value(f + 1).seqType(), nst = exprs[f].seqType();
+          final SeqType st = nst.instanceOf(ost) ? nst : ost;
+          if(!st.eq(ost)) narrowed = true;
+          refined.put(fields.key(f + 1), new RecordField(st));
+        }
+        if(narrowed) {
+          recordType = cc.qc.shared.record(new RecordType(refined));
+          exprType.assign(recordType.seqType());
+        }
+      }
+    }
+    return this;
   }
 
   @Override

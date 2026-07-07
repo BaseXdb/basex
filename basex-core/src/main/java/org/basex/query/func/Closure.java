@@ -256,9 +256,18 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
     }
     if(!narrow) return this;
 
-    // clone the closure, narrow the cloned params, re-compile the body
+    // clone the closure and narrow the cloned parameters
     final Closure copy = (Closure) copy(cc, new IntObjectMap<>());
-    for(int a = 0; a < arity; a++) copy.params[a].refineType(argTypes[a], cc);
+    for(int a = 0; a < arity; a++) {
+      final Var param = copy.params[a];
+      final SeqType before = param.seqType();
+      param.refineType(argTypes[a], cc);
+      // propagate a narrowed parameter type into the body
+      if(!param.seqType().eq(before)) {
+        final InlineContext ic = new InlineContext(param, new VarRef(info, param).optimize(cc), cc);
+        if(ic.inlineable(copy.expr)) copy.expr = ic.inline(copy.expr);
+      }
+    }
     return copy.optimize(cc);
   }
 
