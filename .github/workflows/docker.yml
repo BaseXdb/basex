@@ -12,8 +12,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'BaseX release version (e.g. 12.4)'
-        required: true
+        description: 'BaseX release version (e.g. 12.4); leave empty to build all supported releases'
+        required: false
       publish:
         description: 'Push the image to the registry'
         type: boolean
@@ -45,13 +45,14 @@ jobs:
             | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | sort -uV)
           NEWEST_MAP=$(echo "$ALL" | jq -Rnc \
             '[inputs] | group_by(split(".")[0]) | map({(.[0] | split(".")[0]): last}) | add')
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ -n "${{ github.event.inputs.version }}" ]; then
             VERSIONS='["${{ github.event.inputs.version }}"]'
           elif [ "${{ github.event_name }}" = "push" ]; then
             VERSIONS='["${{ github.ref_name }}"]'
           else
-            # all releases of the supported major lines, so that older
-            # version tags also receive base-image security updates
+            # schedule, or a manual run without version: all releases of the
+            # supported major lines, so that older version tags also receive
+            # base-image security updates
             VERSIONS=$(for MAJOR in $SUPPORTED_MAJORS; do
               echo "$ALL" | grep "^$MAJOR\."
             done | jq -Rnc '[inputs]')
