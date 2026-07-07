@@ -897,26 +897,29 @@ public final class TextEditor {
    * @param sb string builder
    */
   private void closeElem(final StringBuilder sb) {
-    final int p = pos;
-    int n = -1;
-    while(pos() > 0) {
-      final int cp = prev();
-      if(cp == '<') {
-        if(n != -1) {
-          // add closing element
-          next();
-          sb.append("</").append(string(text, pos, n - pos)).append('>');
-        }
-        break;
-      } else if(XMLToken.isNCChar(cp) || cp == ':') {
-        if(n == -1 && cp != ':') n = pos + 1;
-      } else if(cp != '>' && !(cp == '/' && pos + 1 == p)) {
-        n = -1;
-      } else {
-        break;
+    int s = pos - 1;
+    while(s >= 0 && text[s] != '<') s--;
+    final int n = s + 1;
+    if(s < 0 || n >= pos || text[n] == '/' || text[n] == '?' || text[n] == '!') return;
+    int e = n;
+    while(e < pos && !ws(text[e]) && text[e] != '/' && text[e] != '>') e++;
+    if(e == n) return;
+
+    int quote = 0;
+    boolean slash = false;
+    for(int q = e; q < pos; q++) {
+      final int cp = text[q];
+      if(quote != 0) {
+        if(cp == quote) quote = 0;
+      } else if(cp == '"' || cp == '\'') {
+        quote = cp;
+      } else if(cp == '>') {
+        return;
+      } else if(!ws(cp)) {
+        slash = cp == '/';
       }
     }
-    pos = p;
+    if(quote == 0 && !slash) sb.append("</").append(string(text, n, e - n)).append('>');
   }
 
   /**
