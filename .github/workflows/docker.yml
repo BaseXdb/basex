@@ -3,7 +3,7 @@ name: Docker Image
 # Builds release containers from the official zips on files.basex.org.
 #
 # Triggers:
-# - schedule: weekly rebuild of the newest release per supported major line,
+# - schedule: weekly rebuild of all releases of the supported major lines,
 #   picking up new BaseX releases and security updates of the base image.
 # - push tag / workflow_dispatch: build one specific version.
 on:
@@ -33,26 +33,35 @@ jobs:
     timeout-minutes: 5
     outputs:
       matrix: ${{ steps.list.outputs.versions }}
+      newest_map: ${{ steps.list.outputs.newest_map }}
       newest: ${{ steps.list.outputs.newest }}
     steps:
       - name: Determine versions to build
         id: list
         run: |
+          # all published releases, and the newest one per major line
+          ALL=$(curl -fs https://files.basex.org/releases/ \
+            | grep -oE 'href="[0-9]+\.[0-9]+(\.[0-9]+)?/"' \
+            | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | sort -uV)
+          NEWEST_MAP=$(echo "$ALL" | jq -Rnc \
+            '[inputs] | group_by(split(".")[0]) | map({(.[0] | split(".")[0]): last}) | add')
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSIONS='["${{ github.event.inputs.version }}"]'
           elif [ "${{ github.event_name }}" = "push" ]; then
             VERSIONS='["${{ github.ref_name }}"]'
           else
-            # newest release per supported major line, from the release index
-            ALL=$(curl -fs https://files.basex.org/releases/ \
-              | grep -oE 'href="[0-9]+\.[0-9]+(\.[0-9]+)?/"' \
-              | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | sort -uV)
+            # all releases of the supported major lines, so that older
+            # version tags also receive base-image security updates
             VERSIONS=$(for MAJOR in $SUPPORTED_MAJORS; do
-              echo "$ALL" | grep "^$MAJOR\." | tail -1
+              echo "$ALL" | grep "^$MAJOR\."
             done | jq -Rnc '[inputs]')
           fi
           echo "versions=$VERSIONS" >> "$GITHUB_OUTPUT"
-          echo "newest=$(echo "$VERSIONS" | jq -r 'sort_by(split(".") | map(tonumber)) | last')" >> "$GITHUB_OUTPUT"
+          echo "newest_map=$NEWEST_MAP" >> "$GITHUB_OUTPUT"
+          # newest release across the supported major lines ("latest" tag)
+          echo "newest=$(for MAJOR in $SUPPORTED_MAJORS; do
+            echo "$NEWEST_MAP" | jq -r --arg m "$MAJOR" '.[$m] // empty'
+          done | sort -V | tail -1)" >> "$GITHUB_OUTPUT"
 
   docker:
     needs: versions
@@ -77,7 +86,15 @@ jobs:
           OWNER="${{ github.repository_owner }}"
           IMAGE="ghcr.io/${OWNER,,}/basex"
           VERSION="${{ matrix.version }}"
-          TAGS="$IMAGE:$VERSION,$IMAGE:${VERSION%%.*}"
+          MAJOR="${VERSION%%.*}"
+          TAGS="$IMAGE:$VERSION"
+          # moving tags only when this is actually the newest release, so that
+          # backfilling an old version does not drag them backwards
+          NEWEST_IN_MAJOR=$(echo '${{ needs.versions.outputs.newest_map }}' \
+            | jq -r --arg m "$MAJOR" '.[$m] // empty')
+          if [ "$VERSION" = "$NEWEST_IN_MAJOR" ]; then
+            TAGS="$TAGS,$IMAGE:$MAJOR"
+          fi
           if [ "$VERSION" = "${{ needs.versions.outputs.newest }}" ]; then
             TAGS="$TAGS,$IMAGE:latest"
           fi
