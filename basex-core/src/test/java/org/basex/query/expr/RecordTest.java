@@ -284,6 +284,28 @@ public final class RecordTest extends SandboxTest {
         type(StaticFuncCall.class, "local:x"));
   }
 
+  /** Inferred record types. */
+  @Test public void inferredFieldTypes() {
+    check("declare function local:f($cx as xs:double) {"
+        + "  fold-left(<x><a/><a/></x>//a, { 'x': 0e0, 'y': 0e0 }, "
+        + "    fn($acc, $node) { { 'x': $acc?x + $cx, 'y': $acc?y + 2e0 } })?x"
+        + "}; local:f(1e0)",
+        2, exists("RecordGet[@type = 'xs:double']"),
+        empty("RecordGet[contains(@type, 'anyAtomicType')]"));
+
+    inline(true);
+    // while-do: 'x' stays xs:double, 'i' stays xs:integer
+    check("while-do({ 'x': 0e0, 'i': 0 }, fn($s) { $s?i < 3 }, "
+        + "fn($s) { { 'x': $s?x + 1e0, 'i': $s?i + 1 } })?x",
+        3, exists("RecordGet[@type = 'xs:double']"),
+        empty("RecordGet[contains(@type, 'anyAtomicType')]"));
+    // fold-left over constructed nodes (not pre-evaluable): same specialization
+    check("fold-left(<x><a/><a/></x>//a, { 'x': 0e0, 'y': 0e0 }, "
+        + "fn($acc, $node) { { 'x': $acc?x + 1e0, 'y': $acc?y + 2e0 } })?x",
+        2, exists("RecordGet[@type = 'xs:double']"),
+        empty("RecordGet[contains(@type, 'anyAtomicType')]"));
+  }
+
   /** Type propagation when removing entries. */
   @Test public void typeRemove() {
     final Function func = _MAP_REMOVE;

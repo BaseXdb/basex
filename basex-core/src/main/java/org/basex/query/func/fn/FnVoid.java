@@ -17,13 +17,16 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnVoid extends StandardFunc {
+  /** Nondeterministic input. */
+  private boolean ndt;
+
   @Override
   public Item item(final QueryContext qc, final InputInfo ii) throws QueryException {
     final Expr input = arg(0);
     final boolean skip = toBooleanOrFalse(arg(1), qc);
 
     // ensure that nondeterministic input will be evaluated
-    if(!skip || input.has(Flag.NDT)) {
+    if(!skip || ndt) {
       for(final Iter iter = input.iter(qc); qc.next(iter) != null;);
     }
     return Empty.VALUE;
@@ -32,7 +35,8 @@ public final class FnVoid extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
-    if(input.has(Flag.NDT)) {
+    ndt = input.has(Flag.NDT);
+    if(ndt) {
       if(input.size() == 0) return input;
     } else if(defined(1) && arg(1) instanceof Value && toBoolean(arg(1), cc.qc)) {
       return Empty.VALUE;
