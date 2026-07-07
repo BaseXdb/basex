@@ -20,6 +20,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class UtilCountWithin extends StandardFunc {
+  /** Nondeterministic input. */
+  private boolean ndt;
+
   @Override
   public Bln item(final QueryContext qc, final InputInfo ii) throws QueryException {
     return Bln.get(test(qc, info, 0));
@@ -32,12 +35,10 @@ public final class UtilCountWithin extends StandardFunc {
     final long min = minMax[0], max = minMax[1];
 
     // iterative through the results if an iterator is nondeterministic or its size is unknown
-    final Expr expr = arg(0);
-    final Iter input = expr.iter(qc);
-    final boolean enforce = expr.has(Flag.NDT);
-    long size = enforce ? -1 : input.size();
+    final Iter input = arg(0).iter(qc);
+    long size = ndt ? -1 : input.size();
     if(size == -1) {
-      if(enforce) {
+      if(ndt) {
         do ++size; while(qc.next(input) != null);
       } else if(max == Long.MAX_VALUE) {
         // >= min: skip if minimum is reached
@@ -58,10 +59,11 @@ public final class UtilCountWithin extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
+    ndt = input.has(Flag.NDT);
 
     // skip rewrites for nondeterministic input, which must be fully evaluated for its side effects
     final long[] minMax = minMaxValues(cc.qc);
-    if(minMax != null && !input.has(Flag.NDT)) {
+    if(minMax != null && !ndt) {
       final long min = minMax[0], max = minMax[1];
       if(min > max) return Bln.FALSE;
       if(min <= 0 && max == Long.MAX_VALUE) return Bln.TRUE;

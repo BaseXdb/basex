@@ -19,12 +19,14 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class FnCount extends StandardFunc {
+  /** Nondeterministic input. */
+  private boolean ndt;
+
   @Override
   public Itr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     // if the iterator size is unknown or nondeterministic, iterate through all results
-    final Expr expr = arg(0);
-    final Iter input = expr.iter(qc);
-    long size = expr.has(Flag.NDT) ? -1 : input.size();
+    final Iter input = arg(0).iter(qc);
+    long size = ndt ? -1 : input.size();
     if(size == -1) {
       do ++size; while(qc.next(input) != null);
     }
@@ -38,10 +40,12 @@ public final class FnCount extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
-    // return static result size
     final Expr input = arg(0);
+    ndt = input.has(Flag.NDT);
+
+    // return static result size
     final long size = input.size();
-    if(size >= 0 && !input.has(Flag.NDT)) return Itr.get(size);
+    if(size >= 0 && !ndt) return Itr.get(size);
 
     // count(map:keys(E)) → map:size(E)
     if(_MAP_KEYS.is(input))

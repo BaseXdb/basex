@@ -54,6 +54,10 @@ public class FnEmpty extends StandardFunc {
     if(REPLICATE.is(input) && input.arg(1) instanceof Itr) {
       input = input.arg(0);
     }
+    // exists(head(E)) → exists(E), empty(head(E)) → empty(E)
+    if(HEAD.is(input)) {
+      input = input.arg(0);
+    }
     // rewrite list to union expression:  exists((nodes1, nodes2)) → exists(nodes1 | nodes2)
     if(input instanceof List && input.seqType().type instanceof NodeType) {
       input = new Union(info, input.args()).optimize(cc);
@@ -82,6 +86,13 @@ public class FnEmpty extends StandardFunc {
     if(map || array) {
       input = cc.function(map ? _MAP_SIZE : _ARRAY_SIZE, info, input.args());
       return new CmpG(info, input, Itr.ZERO, exists ? CmpOp.NE : CmpOp.EQ).optimize(cc);
+    }
+
+    // exists(tail(E)) → util:count-within(E, 2), empty(tail(E)) → util:count-within(E, 0, 1)
+    if(TAIL.is(input) && !input.has(Flag.NDT)) {
+      final Expr seq = input.arg(0);
+      return exists ? cc.function(_UTIL_COUNT_WITHIN, info, seq, Itr.get(2)) :
+        cc.function(_UTIL_COUNT_WITHIN, info, seq, Itr.ZERO, Itr.ONE);
     }
 
     return embed(cc, true);

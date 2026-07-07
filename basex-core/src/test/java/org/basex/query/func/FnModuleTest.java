@@ -1664,6 +1664,25 @@ public final class FnModuleTest extends SandboxTest {
     error(func.args("", ""), HASH_ALGORITHM_X);
   }
 
+  /** Tests the fn:empty and fn:exists rewritings of fn:head and fn:tail arguments. */
+  @Test public void emptyExistsHeadTail() {
+    final String seq = " tokenize(" + wrap("a b c") + ", ' ')";
+    check(EXISTS.args(HEAD.args(seq)), true, root(EXISTS), empty(HEAD));
+    check(EMPTY.args(HEAD.args(seq)), false, root(EMPTY), empty(HEAD));
+    check(EXISTS.args(TAIL.args(seq)), true, root(_UTIL_COUNT_WITHIN), empty(TAIL));
+    check(EMPTY.args(TAIL.args(seq)), false, root(_UTIL_COUNT_WITHIN), empty(TAIL));
+    check(EXISTS.args(SUBSEQUENCE.args(seq, 2)), true, root(_UTIL_COUNT_WITHIN), empty(TAIL));
+
+    final String one = " tokenize(" + wrap("a") + ", ' ')";
+    check(EXISTS.args(TAIL.args(one)), false, root(_UTIL_COUNT_WITHIN));
+    check(EMPTY.args(TAIL.args(one)), true, root(_UTIL_COUNT_WITHIN));
+
+    // head is rewritten even for nondeterministic input; tail is kept
+    final String ndt = " (1 to 3) ! (if(. = 3) then error() else .)";
+    check(EXISTS.args(HEAD.args(ndt)), true, empty(HEAD));
+    check(EXISTS.args(TAIL.args(ndt)), true, exists(TAIL));
+  }
+
   /** Test method. */
   @Test public void head() {
     final Function func = HEAD;
