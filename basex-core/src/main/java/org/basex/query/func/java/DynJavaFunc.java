@@ -69,7 +69,7 @@ final class DynJavaFunc extends DynJavaCall {
     }
 
     // method candidates
-    final HashMap<String, ArrayList<Method>> allMethods = methods(clazz);
+    final HashMap<String, ArrayList<Method>> allMethods = methods(clazz, info);
     methods = candidates(allMethods, name, types, arity, arities, false);
 
     if(field != null || !methods.isEmpty()) return true;

@@ -426,7 +426,7 @@ public abstract class JavaCall extends Arr {
 
     // find method with identical name and arity
     final IntList arities = new IntList();
-    final HashMap<String, ArrayList<Method>> allMethods = methods(module.getClass());
+    final HashMap<String, ArrayList<Method>> allMethods = methods(module.getClass(), info);
     final ArrayList<Method> candidates = candidates(allMethods, name, types, arity, arities, true);
     final int cs = candidates.size();
     if(cs == 0) {
@@ -475,23 +475,31 @@ public abstract class JavaCall extends Arr {
   /**
    * Returns a map with all relevant methods for a class.
    * @param clazz class
+   * @param info input info (can be {@code null})
    * @return methods
+   * @throws QueryException query exception
    */
-  static HashMap<String, ArrayList<Method>> methods(final Class<?> clazz) {
+  static HashMap<String, ArrayList<Method>> methods(final Class<?> clazz, final InputInfo info)
+      throws QueryException {
     final HashSet<String> names = new HashSet<>();
     final HashMap<String, ArrayList<Method>> list = new HashMap<>();
-    for(final boolean bridge : new boolean[] { false, true }) {
-      for(final Method method : clazz.getMethods()) {
-        if(bridge == method.isBridge()) {
-          final StringBuilder id = new StringBuilder().append(method.getName()).append('-');
-          for(final Class<?> type : method.getParameterTypes()) {
-            id.append(type.getName()).append('-');
-          }
-          if(names.add(id.toString())) {
-            list.computeIfAbsent(method.getName(), n -> new ArrayList<>(1)).add(method);
+    try {
+      for(final boolean bridge : new boolean[] { false, true }) {
+        for(final Method method : clazz.getMethods()) {
+          if(bridge == method.isBridge()) {
+            final StringBuilder id = new StringBuilder().append(method.getName()).append('-');
+            for(final Class<?> type : method.getParameterTypes()) {
+              id.append(type.getName()).append('-');
+            }
+            if(names.add(id.toString())) {
+              list.computeIfAbsent(method.getName(), n -> new ArrayList<>(1)).add(method);
+            }
           }
         }
       }
+    } catch(final LinkageError err) {
+      // referenced class could not be linked (e.g. temporarily unavailable during a rebuild)
+      throw JAVAINIT_X_X.get(info, Util.className(err), err);
     }
     return list;
   }
