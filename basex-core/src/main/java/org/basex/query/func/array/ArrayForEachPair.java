@@ -36,6 +36,7 @@ public final class ArrayForEachPair extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr array1 = arg(0), array2 = arg(1);
+    // array:for-each-pair([], $b, $f) → [], array:for-each-pair($a, [], $f) → []
     if(array1 == XQArray.empty()) return array1;
     if(array2 == XQArray.empty()) return array2;
 

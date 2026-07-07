@@ -96,11 +96,11 @@ public class MapMerge extends MapFn {
         }
         arg(0, arg -> List.get(cc, info, list.finish()));
       }
-      // return simple arguments
+      // return simple arguments: map:merge($map) → $map
       final SeqType st = arg(0).seqType();
       if(st.one()) return arg(0);
 
-      // rewrite map:merge(map:entry, map) to map:put(map, key, value)
+      // map:merge((map:entry($k, $v), $map)) → map:put($map, $k, $v)
       if(!defined(1) && arg(0) instanceof List && arg(0).args().length == 2) {
         final Expr[] args = arg(0).args();
         if(_MAP_ENTRY.is(args[0]) && args[1].seqType().instanceOf(Types.MAP_O)) {

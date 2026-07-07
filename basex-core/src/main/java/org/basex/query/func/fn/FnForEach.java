@@ -39,7 +39,7 @@ public class FnForEach extends StandardFunc {
     final int arity = arity(action);
     if(arity == -1) return this;
 
-    // for $item at $pos in INPUT return ACTION($item, $pos)
+    // for-each(INPUT, ACTION) → for $item at $pos in INPUT return ACTION($item, $pos)
     final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
     final Expr rtrn = flwor.function(this, 1, this instanceof UpdateForEach);
     return flwor.finish(input, null, rtrn);

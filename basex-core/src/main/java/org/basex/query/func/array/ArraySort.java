@@ -27,6 +27,7 @@ public final class ArraySort extends ArraySortBy {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr array = arg(0);
+    // array:sort([]) → []
     if(array == XQArray.empty()) return array;
 
     if(array.seqType().type instanceof final ArrayType at) {

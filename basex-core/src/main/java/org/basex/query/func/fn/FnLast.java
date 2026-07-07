@@ -29,6 +29,7 @@ public final class FnLast extends StandardFunc {
   @Override
   protected Expr opt(final CompileContext cc) {
     final long size = cc.qc.focus.size;
+    // last() → INTEGER  (statically known context size)
     return size > 1 ? Itr.get(size) : this;
   }
 }

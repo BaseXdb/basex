@@ -38,6 +38,7 @@ public final class FnFilter extends StandardFunc {
     final int arity = arity(predicate);
     if(arity == -1) return this;
 
+    // filter(INPUT, PREDICATE) →
     // for $item at $pos in INPUT where PREDICATE($item, $pos) return $item
     final FLWORBuilder flwor = new FLWORBuilder(arity, cc, info);
     final Expr where = flwor.function(this, 1, false);

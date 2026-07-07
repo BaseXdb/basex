@@ -31,6 +31,7 @@ public final class MapFilter extends MapFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = arg(0);
+    // map:filter({}, $predicate) → {}
     if(map == XQMap.empty()) return map;
 
     if(map.seqType().type instanceof final MapType mt) {

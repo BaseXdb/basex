@@ -103,9 +103,9 @@ public final class FnRemove extends StandardFunc {
       // return all items
       final long size = input.size();
       if(p < 1 || size > 0 && p > size) return input;
-      // skip first item
+      // skip first item: remove($seq, 1) → tail($seq)
       if(p == 1) return cc.function(Function.TAIL, info, input);
-      // skip last item
+      // skip last item: remove($seq, count($seq)) → trunk($seq)
       if(p == size) return cc.function(Function.TRUNK, info, input);
       // decrement result size
       sz = size - 1;

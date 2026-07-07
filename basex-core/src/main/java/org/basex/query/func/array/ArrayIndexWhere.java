@@ -33,6 +33,7 @@ public final class ArrayIndexWhere extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr array = arg(0);
+    // array:index-where([], $predicate) → ()
     if(array == XQArray.empty()) return Empty.VALUE;
 
     if(arraySize(array) == 1) exprType.assign(Occ.ZERO_OR_ONE);

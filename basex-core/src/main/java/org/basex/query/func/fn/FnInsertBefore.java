@@ -76,7 +76,9 @@ public final class FnInsertBefore extends StandardFunc {
 
     if(pos instanceof Value) {
       final long ps = pos(cc.qc);
+      // insert-before($seq, 1, $ins) → ($ins, $seq)
       if(ps == 0) return List.get(cc, info, insert, input);
+      // insert-before($seq, N, $ins) → ($seq, $ins)  (N > count($seq))
       if(size != -1 && ps >= size) return List.get(cc, info, input, insert);
     }
 

@@ -29,6 +29,7 @@ public final class MapPut extends MapFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = arg(0), key = arg(1), value = arg(2);
+    // map:put({}, $k, $v) → map:entry($k, $v)
     if(map == XQMap.empty()) return cc.function(_MAP_ENTRY, info, key, value);
 
     Type tp = null;

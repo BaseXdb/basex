@@ -40,6 +40,7 @@ public final class ProfVariables extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     if(defined(0)) return this;
 
+    // prof:variables() → prof:variables([map:entry('$x', $x), ...])
     // create single-entry maps with context value and variables
     final ExprList list = new ExprList();
     if(cc.qc.focus.value != null) {

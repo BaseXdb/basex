@@ -52,6 +52,7 @@ public final class FnOneOrMore extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
+    // one-or-more($nonempty) → $nonempty
     if(st.oneOrMore()) return input;
     if(st.zero() && !input.has(Flag.NDT)) throw ONEORMORE.get(info);
 

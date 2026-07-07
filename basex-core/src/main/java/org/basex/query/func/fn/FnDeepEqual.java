@@ -50,7 +50,7 @@ public final class FnDeepEqual extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input1 = arg(0), input2 = arg(1);
     if(!defined(2)) {
-      // do not compare identical arguments
+      // deep-equal($x, $x) → true()
       if(!input1.seqType().mayBeWrapped() && !input2.seqType().mayBeWrapped() &&
           input1.equals(input2) && !input1.has(Flag.NDT)) return Bln.TRUE;
       // reject arguments of different size

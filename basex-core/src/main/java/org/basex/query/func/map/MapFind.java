@@ -30,6 +30,7 @@ public final class MapFind extends MapFn {
     final Expr input = arg(0);
     if(input.seqType().zero()) return cc.voidAndReturn(input, XQArray.empty(), info);
 
+    // map:find({}, $key) → [], map:find([], $key) → []
     return input == XQMap.empty() || input == XQArray.empty() ? XQArray.empty() : this;
   }
 

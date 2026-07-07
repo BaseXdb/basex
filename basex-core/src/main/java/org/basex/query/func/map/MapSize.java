@@ -24,6 +24,7 @@ public final class MapSize extends MapFn {
   protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
     final long size = mapSize(map);
+    // map:size($map) → INTEGER  (statically known size)
     return size == -1 || map.has(Flag.NDT) ? this : Itr.get(size);
   }
 }

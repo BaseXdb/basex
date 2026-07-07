@@ -61,6 +61,7 @@ public final class FnStringJoin extends StandardFunc {
       return cc.function(STRING, info, values.args());
 
     final SeqType st = values.seqType(), stSep = separator.seqType();
+    // string-join($string) → string($string)
     return (st.zero() || st.one() && st.type.isStringOrUntyped()) &&
         stSep.type.isStringOrUntyped() ? cc.function(STRING, info, values) : this;
   }

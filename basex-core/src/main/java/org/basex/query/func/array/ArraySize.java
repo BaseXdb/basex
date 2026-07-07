@@ -24,6 +24,7 @@ public final class ArraySize extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     final long size = arraySize(array);
+    // array:size($array) → INTEGER  (statically known size)
     return size == -1 || array.has(Flag.NDT) ? this : Itr.get(size);
   }
 }

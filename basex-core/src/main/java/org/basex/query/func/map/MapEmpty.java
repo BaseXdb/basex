@@ -28,6 +28,7 @@ public final class MapEmpty extends MapFn {
   protected Expr opt(final CompileContext cc) {
     final Expr map = arg(0);
     final long size = mapSize(map);
+    // map:empty({}) → true(), map:empty($nonempty) → false()
     return size == -1 || map.has(Flag.NDT) ? this : Bln.get(size == 0);
   }
 }

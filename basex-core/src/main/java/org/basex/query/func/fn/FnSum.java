@@ -51,6 +51,7 @@ public class FnSum extends NumericFn {
         return cc.voidAndReturn(values, zero, info);
       }
     } else if(!st.mayBeWrapped() && !stZero.mayBeWrapped()) {
+      // sum($nonempty, $zero) → sum($nonempty)  (default value unused)
       if(st.oneOrMore()) return cc.function(Function.SUM, info, values);
       final SeqType ost = optType(values), zst = optType(zero);
       final Type type = ost != null && zst != null ? ost.type.union(zst.type) : ANY_ATOMIC_TYPE;

@@ -30,6 +30,7 @@ public final class MapContains extends MapFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = arg(0), key = arg(1);
+    // map:contains({}, $key) → false()
     if(map == XQMap.empty()) return Bln.FALSE;
 
     if(!map.has(Flag.NDT)) {

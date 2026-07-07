@@ -39,6 +39,7 @@ public final class FnSubstringBefore extends StandardFunc {
 
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) &&
        (stSub.zero() || stSub.one() && stSub.type.isStringOrUntyped()) && !defined(2)) {
+      // substring-before($a, '') → '', substring-before($a, $a) → ''
       if(value == Empty.VALUE || value == Str.EMPTY || substring == Empty.VALUE ||
           substring == Str.EMPTY || value.equals(substring)) return Str.EMPTY;
     }

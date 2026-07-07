@@ -70,7 +70,9 @@ public final class UtilCountWithin extends StandardFunc {
       final long size = input.size();
       if(size >= 0) return Bln.get(size >= min && size <= max);
 
+      // util:count-within($seq, 0, 0) → empty($seq)
       if(max == 0) return cc.function(EMPTY, info, input);
+      // util:count-within($seq, 1) → exists($seq)
       if(min == 1 && max == Long.MAX_VALUE) return cc.function(EXISTS, info, input);
 
       if(input.seqType().zeroOrOne()) {

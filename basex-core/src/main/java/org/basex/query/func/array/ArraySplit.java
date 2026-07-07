@@ -39,6 +39,7 @@ public final class ArraySplit extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
+    // array:split([]) → ()
     if(array == XQArray.empty()) return Empty.VALUE;
 
     if(array.seqType().type instanceof final ArrayType at) {

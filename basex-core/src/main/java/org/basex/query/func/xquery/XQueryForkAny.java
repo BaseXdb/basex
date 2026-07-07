@@ -48,7 +48,7 @@ public final class XQueryForkAny extends StandardFunc {
     final Expr functions = arg(0);
     final SeqType st = functions.seqType();
     if(st.zero()) return functions;
-    // single function, no options: invoke directly
+    // xquery:fork-any($function) → $function()
     if(st.one() && arg(1) == Empty.UNDEFINED) {
       return new DynFuncCall(info, coerceFunc(0, cc)).optimize(cc);
     }

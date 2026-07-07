@@ -43,7 +43,7 @@ public final class XQueryForkJoin extends StandardFunc {
     final Expr functions = arg(0), options = arg(1);
     final SeqType st = functions.seqType();
     if(st.zero()) return functions;
-    // single function, no options: invoke directly
+    // xquery:fork-join($function) → $function()
     if(st.one() && options == Empty.UNDEFINED) {
       return new DynFuncCall(info, coerceFunc(0, cc)).optimize(cc);
     }

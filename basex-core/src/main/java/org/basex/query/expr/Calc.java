@@ -58,12 +58,15 @@ public enum Calc {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // merge arithmetical expressions
+      // $x + $x → $x * 2
       if(expr1.equals(expr2)) {
         return new Arith(info, expr1, Itr.get(2), MULTIPLY).optimize(cc);
       }
+      // $x + -$y → $x - $y
       if(expr2 instanceof final Unary unry) {
         return new Arith(info, expr1, unry.expr, SUBTRACT).optimize(cc);
       }
+      // $x * $n + $x → $x * ($n + 1)
       if(expr1 instanceof final Arith arth) {
         if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
             arth.exprs[1] instanceof final Itr itr) {
@@ -133,13 +136,16 @@ public enum Calc {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // replace with neutral number; ignore floating numbers due to special cases (NaN, INF)
+      // $x - $x → 0
       if(expr1.equals(expr2)) {
         return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Itr.ZERO : null;
       }
       // merge arithmetical expressions; ignore floating numbers due to special cases (NaN, INF)
+      // $x - -$y → $x + $y
       if(expr2 instanceof final Unary unry) {
         return new Arith(info, expr1, unry.expr, ADD).optimize(cc);
       }
+      // $x * $n - $x → $x * ($n - 1)
       if(expr1 instanceof final Arith arth) {
         if(arth.calc == MULTIPLY && arth.exprs[0].equals(expr2) &&
             arth.exprs[1] instanceof final Itr itr) {
@@ -211,13 +217,11 @@ public enum Calc {
         // check for absorbing number
         if(dbl2 == 0) return type == DECIMAL ? Dec.ZERO : type == INTEGER ? Itr.ZERO : null;
       }
-      // x * x → math:pow(x, 2). The chain is deliberately not grown further
-      // (math:pow(x, y) * x → math:pow(x, y + 1)): StrictMath.pow only special-cases the
-      // exponent 2, so higher powers would be slower than the equivalent multiplications,
-      // whereas math:pow(x, 2) stays fast and enables constant folding.
+      // $x * $x → math:pow($x, 2)
       if(type == DOUBLE && expr1.equals(expr2)) {
         return cc.function(_MATH_POW, info, expr1, Dbl.get(2));
       }
+      // $x * ($n div $x) → $n
       if(expr2 instanceof final Arith arth) {
         if(arth.calc == DIVIDE && arth.exprs[0] instanceof Itr && arth.exprs[1].equals(expr1)) {
           return new Cast(info, arth.exprs[0], type.seqType()).optimize(cc);
@@ -287,9 +291,11 @@ public enum Calc {
         return new Cast(info, expr1, type.seqType()).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
+      // $x div $x → 1
       if(expr1.equals(expr2)) {
         return type == DECIMAL ? Dec.ONE : type == INTEGER ? Itr.ONE : null;
       }
+      // math:pow($x, $n) div $x → math:pow($x, $n - 1)
       if(_MATH_POW.is(expr1)) {
         if(expr1.arg(0).equals(expr2) && expr1.arg(1) instanceof final ANum num) {
           return cc.function(_MATH_POW, info, expr1.arg(0), Dbl.get(num.dbl() - 1));
@@ -342,6 +348,7 @@ public enum Calc {
         return new Cast(info, expr1, Types.INTEGER_O).optimize(cc);
       }
       // check for identical operands; ignore floating numbers due to special cases (NaN, INF)
+      // $x idiv $x → 1
       if(expr1.equals(expr2)) {
         return type.oneOf(DECIMAL, INTEGER) ? Itr.ONE : null;
       }

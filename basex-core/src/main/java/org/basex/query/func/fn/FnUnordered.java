@@ -20,6 +20,7 @@ public final class FnUnordered extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) {
+    // unordered(E) → E
     return arg(0);
   }
 }

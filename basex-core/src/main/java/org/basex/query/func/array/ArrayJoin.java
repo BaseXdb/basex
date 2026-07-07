@@ -59,7 +59,7 @@ public final class ArrayJoin extends ArrayFn {
         }
         arg(0, arg -> List.get(cc, info, list.finish()));
       }
-      // return simple arguments
+      // return simple arguments: array:join($array) → $array
       final SeqType st = arg(0).seqType();
       if(st.one()) return arg(0);
 

@@ -71,6 +71,7 @@ public final class ArrayFlatten extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
+    // array:flatten($seq) → $seq  (no nested arrays)
     if(!st.mayBeWrapped()) return input;
     exprType.assign(type(st.type));
     return this;

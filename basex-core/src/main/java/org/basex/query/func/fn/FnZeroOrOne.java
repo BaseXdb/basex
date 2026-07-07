@@ -32,6 +32,7 @@ public final class FnZeroOrOne extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
+    // zero-or-one($zero-or-one) → $zero-or-one
     if(st.zeroOrOne()) return input;
     if(input.size() > 1 && !input.has(Flag.NDT)) throw ZEROORONE.get(info);
 

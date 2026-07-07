@@ -42,8 +42,10 @@ public final class FnSubstringAfter extends StandardFunc {
 
     if((st.zero() || st.one() && st.type.isStringOrUntyped()) &&
        (stSub.zero() || stSub.one() && stSub.type.isStringOrUntyped()) && !defined(2)) {
+      // substring-after('', $b) → '', substring-after($a, $a) → ''
       if(value == Empty.VALUE || value == Str.EMPTY || value.equals(substring))
         return Str.EMPTY;
+      // substring-after($a, '') → string($a)
       if(substring == Empty.VALUE || substring == Str.EMPTY)
         return cc.function(STRING, info, value);
     }

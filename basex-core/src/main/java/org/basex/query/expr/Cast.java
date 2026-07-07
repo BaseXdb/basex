@@ -32,6 +32,7 @@ public final class Cast extends Convert {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     super.optimize(cc);
+    // zero-or-one(E) cast as xs:string? → E cast as xs:string?
     if((ZERO_OR_ONE.is(expr) || EXACTLY_ONE.is(expr) || ONE_OR_MORE.is(expr)) &&
         seqType.occ.instanceOf(expr.seqType().occ)) expr = expr.arg(0);
 

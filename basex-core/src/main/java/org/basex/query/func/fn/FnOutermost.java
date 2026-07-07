@@ -59,6 +59,7 @@ public class FnOutermost extends StandardFunc {
   @Override
   protected final Expr opt(final CompileContext cc) {
     final SeqType st = arg(0).seqType();
+    // outermost($node) → $node, innermost($node) → $node  (at most one node)
     return st.zeroOrOne() && st.type instanceof NodeType ? arg(0) : this;
   }
 

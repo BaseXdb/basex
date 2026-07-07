@@ -53,6 +53,7 @@ public final class Concat extends Arr {
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
     // merge adjacent values, ignore empty sequences
+    // 'a' || 'b' || $x → 'ab' || $x
     final int el = exprs.length;
     final ExprList list = new ExprList(el);
     final TokenBuilder tb = new TokenBuilder();
@@ -70,6 +71,7 @@ public final class Concat extends Arr {
     if(!tb.isEmpty()) list.add(Str.get(tb.finish()));
 
     // single expression left: replace with string call
+    // $x || '' → string($x)
     final int ls = list.size();
     if(ls == 1) {
       final Expr arg = list.peek();

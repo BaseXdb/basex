@@ -40,6 +40,7 @@ public final class UtilRoot extends StandardFunc {
     final Expr nodes = arg(0);
     final SeqType st = nodes.seqType();
     final Type type = st.type;
+    // util:root($document) → $document
     if(type.instanceOf(NodeType.DOCUMENT)) return nodes;
 
     Type tp = null;

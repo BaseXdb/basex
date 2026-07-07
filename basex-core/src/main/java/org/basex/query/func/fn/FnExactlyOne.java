@@ -40,6 +40,7 @@ public final class FnExactlyOne extends StandardFunc {
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr input = arg(0);
     final SeqType st = input.seqType();
+    // exactly-one($item) → $item
     if(st.one()) return input;
     if((st.zero() || input.size() > 1) && !input.has(Flag.NDT)) throw EXACTLYONE.get(info);
 

@@ -26,6 +26,7 @@ public final class ArrayAppend extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr array = arg(0), add = arg(1);
+    // array:append([], $member) → util:array-member($member)
     if(array == XQArray.empty()) return cc.function(_UTIL_ARRAY_MEMBER, info, add);
 
     if(array.seqType().type instanceof final ArrayType at) {

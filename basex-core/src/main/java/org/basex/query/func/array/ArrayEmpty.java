@@ -29,6 +29,7 @@ public final class ArrayEmpty extends ArrayFn {
   protected Expr opt(final CompileContext cc) {
     final Expr array = arg(0);
     final long size = arraySize(array);
+    // array:empty([]) → true(), array:empty($nonempty) → false()
     return size == -1 || array.has(Flag.NDT) ? this : Bln.get(size == 0);
   }
 }

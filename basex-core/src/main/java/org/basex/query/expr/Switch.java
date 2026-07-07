@@ -184,6 +184,7 @@ public final class Switch extends ParseExpr {
       )) return this;
     }
 
+    // switch($c) case 'a' return B default return C → if($c = 'a') then B else C
     final Expr list = List.get(cc, groups[0].info, Arrays.copyOfRange(exprs, 1, exprs.length));
     final CmpG cmp = new CmpG(groups[0].info, cond, list, CmpOp.EQ);
     return new If(info, cmp.optimize(cc), groups[0].rtrn(), groups[1].rtrn()).optimize(cc);

@@ -67,6 +67,7 @@ public final class UtilValuesExcept extends StandardFunc {
     if(st.zero()) return values;
 
     final BasicType type = st.type.atomic();
+    // util:values-except($values, ()) → data($values)
     if(except.seqType().zero()) {
       return type == st.type ? values : cc.function(Function.DATA, info, values);
     }

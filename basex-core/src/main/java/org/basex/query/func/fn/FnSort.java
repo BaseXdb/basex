@@ -41,6 +41,7 @@ public final class FnSort extends FnSortBy {
       arg(2, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE)));
     } else if(!defined(1)) {
       if(st.zeroOrOne() && st.type.isSortable()) {
+        // sort($sortable) → $sortable  (at most one sortable item)
         return input;
       } else if(input instanceof final Value value) {
         final Value quick = quickValue(value);

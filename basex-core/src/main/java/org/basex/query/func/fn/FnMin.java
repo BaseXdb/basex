@@ -110,6 +110,7 @@ public class FnMin extends StandardFunc {
       if(type.isUntyped()) {
         type = DOUBLE;
       } else if(st.one() && noColl) {
+        // min($item) → $item, max($item) → $item
         return values;
       }
       exprType.assign(type);

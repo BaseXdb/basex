@@ -32,6 +32,7 @@ public final class ArrayFilter extends ArrayFn {
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
     final Expr array = arg(0);
+    // array:filter([], $predicate) → []
     if(array == XQArray.empty()) return array;
 
     if(array.seqType().type instanceof final ArrayType at) {

@@ -21,6 +21,7 @@ public final class UtilIf extends StandardFunc {
 
   @Override
   protected Expr opt(final CompileContext cc) throws QueryException {
+    // util:if($cond, $then, $else) → if($cond) then $then else $else
     return create().optimize(cc);
   }
 

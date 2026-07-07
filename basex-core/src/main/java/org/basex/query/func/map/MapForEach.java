@@ -55,6 +55,7 @@ public class MapForEach extends MapFn {
   @Override
   protected final Expr opt(final CompileContext cc) throws QueryException {
     final Expr map = arg(0);
+    // map:for-each({}, $action) → ()
     if(map == XQMap.empty()) return Empty.VALUE;
 
     if(map.seqType().type instanceof final MapType mt) {

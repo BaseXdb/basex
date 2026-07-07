@@ -28,6 +28,7 @@ public final class FnRoot extends ContextFn {
     final Expr expr;
     if(defined(0)) {
       expr = arg(0);
+      // root($document) → $document
       if(expr.seqType().instanceOf(Types.DOCUMENT_ZO)) return expr;
     } else {
       expr = value;
