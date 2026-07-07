@@ -171,6 +171,8 @@ public final class EditorView extends View {
     split.add(project);
     split.add(main);
     split.init(new double[] { 0.3, 0.7 }, new double[] { 0, 1 });
+    split.anchor(0, gui.gopts.get(GUIOptions.PROJECTSIZE), 100);
+    split.resized(sizes -> gui.gopts.set(GUIOptions.PROJECTSIZE, split.anchorSize()));
     toggleProject();
     add(split, BorderLayout.CENTER);
 

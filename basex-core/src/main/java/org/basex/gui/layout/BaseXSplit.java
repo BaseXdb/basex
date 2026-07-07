@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
+import java.util.function.*;
 
 /**
  * Project specific Split panel implementation.
@@ -22,6 +23,18 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   private double[] hiddenSize;
   /** Cached sizes (when panel is hidden). */
   private double[] cachedSize;
+  /** Resize listener. */
+  private Consumer<double[]> resized;
+
+  /** Index of the panel with a fixed pixel size ({@code -1}: proportional). */
+  private int anchor = -1;
+  /** Target pixel size of the anchored panel. */
+  private int anchorSize;
+  /** Minimum pixel size for the anchored panel and its neighbors. */
+  private int anchorMin;
+
+  /** Panels have actually been resized during the current drag. */
+  private boolean dragged;
 
   /**
    * Constructor.
@@ -57,6 +70,42 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   }
 
   /**
+   * Sets the proportional panel sizes (sum must be 1.0).
+   * @param sizes proportional sizes
+   */
+  public void sizes(final double[] sizes) {
+    propSize = sizes;
+  }
+
+  /**
+   * Registers a listener.
+   * @param listener resize listener
+   */
+  public void resized(final Consumer<double[]> listener) {
+    resized = listener;
+  }
+
+  /**
+   * Anchors a panel to a fixed pixel size.
+   * @param index panel index to anchor
+   * @param size target pixel size
+   * @param min minimum pixel size
+   */
+  public void anchor(final int index, final int size, final int min) {
+    anchor = index;
+    anchorSize = size;
+    anchorMin = min;
+  }
+
+  /**
+   * Returns the current pixel size of the anchored panel.
+   * @return pixel size
+   */
+  public int anchorSize() {
+    return anchorSize;
+  }
+
+  /**
    * Sets proportional panel sizes (sum must be 1.0).
    * @param show show/hide flag
    */
@@ -84,6 +133,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
   void startDrag(final double p) {
     dragPos = p;
     dragSize = propSize.clone();
+    dragged = false;
   }
 
   /**
@@ -92,8 +142,6 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
    * @param p current position
    */
   void drag(final BaseXSplitSep sep, final double p) {
-    if(dragSize == null) startDrag(p);
-
     final Component[] m = getComponents();
     final int r = propSize.length;
     int q = 0;
@@ -101,15 +149,59 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
       if(m[(n << 1) + 1] == sep) q = n + 1;
     }
     final double v = (dragPos - p) / (horizontal ? getWidth() : getHeight());
+    final double min = anchor >= 0 ? (double) anchorMin / splitSize() : 0.0001;
     for(int i = 0; i < q; ++i) {
-      if(dragSize[i] - v / q < 0.0001) return;
+      if(dragSize[i] - v / q < min) return;
     }
     for(int i = q; i < r; ++i) {
-      if(dragSize[i] + v / (r - q) < 0.0001) return;
+      if(dragSize[i] + v / (r - q) < min) return;
     }
     for(int i = 0; i < q; ++i) propSize[i] = dragSize[i] - v / q;
     for(int i = q; i < r; ++i) propSize[i] = dragSize[i] + v / (r - q);
+    dragged = true;
     revalidate();
+  }
+
+  /**
+   * Finishes a splitter drag: snapshots the anchored pixel size and notifies the listener once.
+   */
+  void endDrag() {
+    if(dragged) {
+      // remember the dragged pixel size of the anchored panel
+      if(anchor >= 0) {
+        anchorSize = (int) Math.round(propSize[anchor] * splitSize());
+      }
+      if(resized != null) resized.accept(propSize);
+    }
+    dragged = false;
+  }
+
+  /**
+   * Computes the proportional size of the anchored panel for the given available space.
+   * The panel keeps its target pixel size, but shrinks down to {@code min} pixels (and no
+   * further) when space runs short, always reserving {@code min} pixels for its neighbors.
+   * @param target target pixel size
+   * @param min minimum pixel size
+   * @param size available space in pixels
+   * @return proportional size (between 0 and 1)
+   */
+  static double anchorFraction(final int target, final int min, final int size) {
+    if(size <= 0) return 0;
+    int a = Math.min(target, size - min);
+    a = Math.max(a, Math.min(min, size));
+    return (double) a / size;
+  }
+
+  /**
+   * Returns the available space for the panels (total size minus the visible separators).
+   * @return size in pixels
+   */
+  private int splitSize() {
+    int seps = propSize.length - 1;
+    for(final double d : propSize) {
+      if(d == 0) --seps;
+    }
+    return (horizontal ? getWidth() : getHeight()) - seps * SEPARATOR_SIZE;
   }
 
   @Override
@@ -150,6 +242,21 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
 
     // set bounds of all components
     final int sz = (horizontal ? w : h) - c * SEPARATOR_SIZE;
+
+    // enforce a fixed pixel size for the anchored panel (skip while hidden or dragging)
+    if(anchor >= 0 && !dragged && propSize[anchor] != 0 && sz > 0) {
+      final double frac = anchorFraction(anchorSize, anchorMin, sz);
+      // distribute the remaining space among the other panels, keeping their relative sizes
+      double rest = 0;
+      for(int i = 0; i < propSize.length; i++) {
+        if(i != anchor) rest += propSize[i];
+      }
+      for(int i = 0; i < propSize.length; i++) {
+        propSize[i] = i == anchor ? frac :
+          rest > 0 ? propSize[i] / rest * (1 - frac) : (1 - frac) / (propSize.length - 1);
+      }
+    }
+
     double posD = 0;
     boolean invisible = false;
     for(c = 0; c < cl; c++) {

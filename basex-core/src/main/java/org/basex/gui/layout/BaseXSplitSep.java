@@ -32,6 +32,10 @@ final class BaseXSplitSep extends BaseXBack {
       public void mouseDragged(final MouseEvent e) {
         ((BaseXSplit) getParent()).drag(BaseXSplitSep.this, pos(e));
       }
+      @Override
+      public void mouseReleased(final MouseEvent e) {
+        ((BaseXSplit) getParent()).endDrag();
+      }
 
       private double pos(final MouseEvent e) {
         final Point p = getLocationOnScreen();

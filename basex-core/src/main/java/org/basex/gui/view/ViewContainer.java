@@ -67,7 +67,7 @@ public final class ViewContainer extends BaseXBack {
     for(int v = 0; v < vl; ++v) views[v] = new ViewPanel(view[v]);
 
     // build layout or use default if something goes wrong
-    if(!buildLayout(gui.gopts.get(GUIOptions.VIEWS)) && !buildLayout(VIEWS)) {
+    if(!buildLayout(gui.gopts.get(GUIOptions.LAYOUT)) && !buildLayout(VIEWS)) {
       Util.errln(Util.className(this) + ": could not build layout.");
     }
   }
@@ -84,14 +84,24 @@ public final class ViewContainer extends BaseXBack {
     if(ls.equals(layoutString)) return;
 
     // remember new layout
-    gui.gopts.set(GUIOptions.VIEWS, layout.layoutString(true));
+    persistLayout();
     layoutString = ls;
 
     // rebuild views
     removeAll();
+    layout.persister = this::persistLayout;
     layout.addTo(this);
     validate();
     repaint();
+  }
+
+  /**
+   * Stores the current layout, including the proportional view sizes, in the GUI options.
+   * Invoked on structural changes and whenever the user drags a splitter (see
+   * {@link ViewLayout#persister}).
+   */
+  private void persistLayout() {
+    gui.gopts.set(GUIOptions.LAYOUT, layout.layoutString(true));
   }
 
   @Override
@@ -120,6 +130,8 @@ public final class ViewContainer extends BaseXBack {
     if(source == null) return;
 
     if(location != null) {
+      // the model already holds the current sizes (kept in sync on every splitter drag),
+      // so the moved components carry their weights through the restructuring
       final ViewComponent comp = layout.delete(source);
       if(comp instanceof final ViewLayout vl) layout = vl;
 
@@ -315,10 +327,19 @@ public final class ViewContainer extends BaseXBack {
       layout = null;
       int nv = 0;
       final Stack<ViewLayout> layouts = new Stack<>();
-      final StringTokenizer tokens = new StringTokenizer(string);
-      while(tokens.hasMoreTokens()) {
-        final String token = tokens.nextToken();
-        if(Strings.eq(token, "H", "V")) {
+      // collect all tokens (allows look-ahead for the optional weight tokens)
+      final ArrayList<String> tokens = new ArrayList<>();
+      final StringTokenizer st = new StringTokenizer(string);
+      while(st.hasMoreTokens()) tokens.add(st.nextToken());
+
+      final int ts = tokens.size();
+      for(int t = 0; t < ts; t++) {
+        final String token = tokens.get(t);
+        final ViewComponent comp;
+        if("-".equals(token)) {
+          layouts.pop();
+          continue;
+        } else if(Strings.eq(token, "H", "V")) {
           final ViewLayout view = new ViewLayout("H".equals(token));
           if(layouts.isEmpty()) {
             layout = view;
@@ -326,13 +347,22 @@ public final class ViewContainer extends BaseXBack {
             layouts.peek().add(view);
           }
           layouts.add(view);
-        } else if("-".equals(token)) {
-          layouts.pop();
+          comp = view;
         } else {
           final ViewPanel view = getView(token);
           if(view == null) return false;
           layouts.peek().add(view);
           ++nv;
+          comp = view;
+        }
+        // parse the optional proportional size that may follow a layout or view token
+        if(t + 1 < ts) {
+          final String next = tokens.get(t + 1);
+          final char ch = next.charAt(0);
+          if(ch >= '0' && ch <= '9' || ch == '.') {
+            comp.weight(Double.parseDouble(next));
+            ++t;
+          }
         }
       }
       return nv == views.length;

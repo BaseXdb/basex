@@ -15,6 +15,8 @@ import org.basex.util.options.*;
 final class ViewPanel extends BaseXBack implements ViewComponent {
   /** View reference. */
   private final View view;
+  /** Proportional size within the parent layout. */
+  private double weight = 1;
 
   /**
    * Constructor.
@@ -25,6 +27,16 @@ final class ViewPanel extends BaseXBack implements ViewComponent {
     layout(new BorderLayout());
     add(new ViewMover(view.gui), BorderLayout.NORTH);
     add(view, BorderLayout.CENTER);
+  }
+
+  @Override
+  public double weight() {
+    return weight;
+  }
+
+  @Override
+  public void weight(final double wght) {
+    weight = wght;
   }
 
   @Override
@@ -48,7 +60,8 @@ final class ViewPanel extends BaseXBack implements ViewComponent {
 
   @Override
   public String layoutString(final boolean all) {
-    return all || isVisible() ? view.getName() + ' ' : "";
+    if(!all) return isVisible() ? view.getName() + ' ' : "";
+    return view.getName() + ' ' + ViewComponent.format(weight) + ' ';
   }
 
   @Override

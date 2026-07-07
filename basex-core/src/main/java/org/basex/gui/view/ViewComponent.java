@@ -10,6 +10,27 @@ import org.basex.gui.layout.*;
  */
 interface ViewComponent {
   /**
+   * Returns the proportional size (weight) of this component within its parent layout.
+   * @return weight
+   */
+  double weight();
+
+  /**
+   * Assigns the proportional size (weight) of this component within its parent layout.
+   * @param weight weight
+   */
+  void weight(double weight);
+
+  /**
+   * Formats a weight for the layout string (rounded to four decimal digits).
+   * @param weight weight
+   * @return string representation
+   */
+  static String format(final double weight) {
+    return Double.toString(Math.round(weight * 10_000) / 10_000.0);
+  }
+
+  /**
    * Checks if the view layout is visible.
    * @return true if layout is visible
    */

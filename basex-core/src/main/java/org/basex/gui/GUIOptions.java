@@ -64,7 +64,9 @@ public final class GUIOptions extends Options {
   public static final Comment C_WINDOWS = new Comment("Windows");
 
   /** GUI layout. */
-  public static final StringOption VIEWS = new StringOption("VIEWS", GUIConstants.VIEWS);
+  public static final StringOption LAYOUT = new StringOption("LAYOUT", GUIConstants.VIEWS);
+  /** Width of the project view (pixels). */
+  public static final NumberOption PROJECTSIZE = new NumberOption("PROJECTSIZE", 250);
 
   /** GUI height. */
   public static final NumbersOption GUISIZE = new NumbersOption("GUISIZE", 1004, 748);
