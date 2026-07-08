@@ -46,7 +46,7 @@ final class ReplaceContext {
         if(!sc.mcase) flags |= Pattern.CASE_INSENSITIVE;
         final Pattern pattern = Pattern.compile(sc.string, flags);
         if(sc.multi) {
-          tb.add(pattern.matcher(string(txt, start, end)).replaceAll(replace));
+          tb.add(pattern.matcher(string(txt, start, end - start)).replaceAll(replace));
         } else {
           for(int e = start, s = start; e <= end; e++) {
             if(e < end ? txt[e] == '\n' : e != s) {
