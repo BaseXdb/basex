@@ -59,17 +59,13 @@ public final class MixedPath extends Path {
           // loop through all resulting items
           final Iter ir = step.iter(qc);
           for(Item it; (it = qc.next(ir)) != null;) {
-            if(node instanceof final JNode jnode) {
-              // JNode context: result must be JNodes (navigation) or atomic items (key selection)
+            if(node instanceof JNode) {
               if(it instanceof final JNode result) {
                 nodes.add(result);
               } else if(it instanceof GNode || it instanceof FItem) {
                 throw PATHJNODE_X_X_X.get(info, step, it.type, it);
               } else {
-                for(final GNode child : jnode.childIter()) {
-                  if(child instanceof final JNode jchild && jchild.key != null &&
-                      it.atomicEqual(jchild.key)) nodes.add(child);
-                }
+                items.add(it);
               }
             } else if(it instanceof final GNode result) {
               nodes.add(result);

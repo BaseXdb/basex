@@ -417,6 +417,26 @@ public final class JNodeTest extends SandboxTest {
     error("{ 'a': 1 }/(<x>y</x>, 'a')", PATHJNODE_X_X_X);
   }
 
+  /** Lookup and navigational steps that compute an atomic value return the value, not a key. */
+  @Test public void lookupStep() {
+    // a lookup step is navigational: the JNode is coerced to its jvalue, the value is returned
+    query(jtree + "/a?x", 1);
+    query(jtree + "/a?y?z", 2);
+    query(jtree + "/b?x?y", 2);
+    // navigation ('/') and lookup ('?') can be mixed within one path
+    query(jtree + "/b/x?y", 2);
+    // a lookup step yields the same result as a lookup on the navigated node
+    query("{ 'a': { 'b': 3 } }/a?b", 3);
+    query("({ 'a': { 'b': 3 } }/a)?b", 3);
+    // lookup on a JNode whose value is atomic raises a type error
+    error(jtree + "//x?y", LOOKUP_X);
+
+    // non-navigational parenthesized steps remain key selectors (unaffected by the above)
+    query("[ 10, 20, 30 ]/(2)", 20);
+    query("{ 'a': 1 }/('a')", 1);
+    query("{ 'a': 1 }/(42)", "");
+  }
+
   /** EBV. */
   @Test public void ebv() {
     query("boolean([] => jtree())", true);
