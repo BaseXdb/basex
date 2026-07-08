@@ -29,6 +29,8 @@ final class XMLScanner extends Job {
     "amp", "&", "apos", "'", "quot", "\"", "lt", "<", "gt", ">");
   /** PublicID characters. */
   private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
+  /** Replacement character (U+FFFD): tolerant fallback for undeclared entities. */
+  private static final byte[] REPLACEMENT = cpToken(0xFFFD);
 
   /** Scanning states. */
   private enum Scan {
@@ -502,7 +504,7 @@ final class XMLScanner extends Job {
 
     byte[] en = ents.get(name);
     if(en == null) en = getEntity(name);
-    return en == null ? cpToken('?') : en;
+    return en == null ? REPLACEMENT : en;
   }
 
   /**
