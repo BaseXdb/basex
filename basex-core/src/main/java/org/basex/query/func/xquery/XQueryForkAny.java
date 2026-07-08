@@ -53,7 +53,7 @@ public final class XQueryForkAny extends StandardFunc {
       return new DynFuncCall(info, coerceFunc(0, cc)).optimize(cc);
     }
     final FuncType ft = functions.funcType();
-    if(ft != null) exprType.assign(ft.declType);
+    if(ft != null) exprType.assign(ft.refinedType);
     return this;
   }
 }

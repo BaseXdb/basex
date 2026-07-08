@@ -38,7 +38,7 @@ public class FnWhileDo extends StandardFunc {
         final SeqType[] types = { st, Types.INTEGER_O };
         arg(a, arg -> refineFunc(action, cc, types));
         ost = st;
-        st = st.union(arg(a).funcType().declType);
+        st = st.union(arg(a).funcType().refinedType);
       } while(!st.eq(ost));
 
       final SeqType[] types = { st, Types.INTEGER_O };
@@ -48,7 +48,7 @@ public class FnWhileDo extends StandardFunc {
       exprType.assign(st);
     } else {
       final FuncType ft = action.funcType();
-      if(ft != null) exprType.assign(st.union(ft.declType));
+      if(ft != null) exprType.assign(st.union(ft.refinedType));
     }
     return this;
   }

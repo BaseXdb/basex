@@ -54,7 +54,7 @@ public final class XQueryForkJoin extends StandardFunc {
     if(results == Boolean.TRUE) {
       final FuncType ft = functions.funcType();
       if(ft != null) {
-        final SeqType dt = ft.declType;
+        final SeqType dt = ft.refinedType;
         exprType.assign(dt.with(dt.occ.multiply(st.occ)));
       }
     } else if(results == Boolean.FALSE) {

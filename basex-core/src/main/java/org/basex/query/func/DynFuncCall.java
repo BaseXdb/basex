@@ -107,7 +107,7 @@ public final class DynFuncCall extends FuncCall {
       if(!updating && ft.anns.contains(Annotation.UPDATING)) {
         throw FUNCUP_X.get(info, func);
       }
-      exprType.assign(ft.declType);
+      exprType.assign(ft.refinedType);
     }
 
     if(func instanceof XQStruct) {

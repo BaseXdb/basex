@@ -35,8 +35,8 @@ public final class XQueryReduce extends StandardFunc {
     // result type: union of the seed type and the declared action/combine types
     SeqType st = init.seqType();
     final FuncType at = arg(2).funcType(), ct = arg(3).funcType();
-    if(at != null) st = st.union(at.declType);
-    if(ct != null) st = st.union(ct.declType);
+    if(at != null) st = st.union(at.refinedType);
+    if(ct != null) st = st.union(ct.refinedType);
     exprType.assign(st);
     return this;
   }

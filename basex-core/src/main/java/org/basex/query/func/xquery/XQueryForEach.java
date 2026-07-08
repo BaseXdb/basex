@@ -46,7 +46,7 @@ public final class XQueryForEach extends StandardFunc {
     if(arg(2) == Empty.UNDEFINED) {
       final FuncType ft = action.funcType();
       if(ft != null) {
-        final SeqType dt = ft.declType;
+        final SeqType dt = ft.refinedType;
         exprType.assign(dt.with(dt.occ.multiply(input.seqType().occ)));
       }
     }

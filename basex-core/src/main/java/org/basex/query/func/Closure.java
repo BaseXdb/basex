@@ -206,9 +206,11 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       cc.removeScope(this);
     }
 
-    final SeqType st = expr.seqType();
-    final SeqType dt = declType == null || st.instanceOf(declType) ? st : declType;
-    exprType.assign(FuncType.get(anns, dt, params));
+    // the declared return type is observed by instance-of and function coercion; it is the type
+    // declared in the signature, or item()* if none was given (so 'fn() { "x" } instance of
+    // fn() as xs:string' yields false). The body's inferred type is kept as the refined return
+    // type, so that direct calls can still profit from the more specific result type.
+    exprType.assign(FuncType.get(anns, declType, params).withRefinedType(expr.seqType()));
 
     // only evaluate if:
     // - the closure is empty, so we don't lose variables

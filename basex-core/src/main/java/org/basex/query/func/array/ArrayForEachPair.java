@@ -47,7 +47,7 @@ public final class ArrayForEachPair extends ArrayFn {
 
     // assign type after coercion (expression might have changed)
     final FuncType ft = arg(2).funcType();
-    if(ft != null) exprType.assign(ArrayType.get(ft.declType));
+    if(ft != null) exprType.assign(ArrayType.get(ft.refinedType));
 
     return this;
   }

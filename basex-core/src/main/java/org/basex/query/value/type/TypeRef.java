@@ -62,6 +62,17 @@ public final class TypeRef implements Type {
   }
 
   /**
+   * Checks if the specified type is a still-unresolved forward reference. Such a reference is a
+   * distinct placeholder that dereferences to {@code item()}, so it must not be treated as equal to
+   * (or an instance of) the types it happens to dereference to before it has been resolved.
+   * @param type type
+   * @return result of check
+   */
+  public static boolean unresolved(final Type type) {
+    return type instanceof final TypeRef ref && !ref.resolved();
+  }
+
+  /**
    * Returns the input info of an unresolved reference.
    * @return input info, or {@code null} if resolved
    */

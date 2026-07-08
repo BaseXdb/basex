@@ -79,6 +79,36 @@ public final class TypeTest extends QueryTest {
             "fn($x as xs:int) as xs:int {'x'} instance of fn(xs:int) as (xs:error | xs:int)"},
         { "Subtyping 8", booleans(true),
             "fn($x as xs:int) as (xs:error | xs:int) {'x'} instance of fn(xs:int) as xs:int"},
+        { "Subtyping 9", booleans(false),
+            "fn() as xs:string? { 'x' } instance of fn() as xs:string"},
+        { "Subtyping 10", booleans(false),
+            "fn() as xs:string* { 'x' } instance of fn() as xs:string"},
+        { "Subtyping 11", booleans(false),
+            "fn() as xs:anyAtomicType? { 'x' } instance of fn() as xs:string"},
+        { "Subtyping 12", booleans(true),
+            "fn() as xs:string { 'x' } instance of fn() as xs:string"},
+        { "Subtyping 13", booleans(true),
+            "fn() as xs:string { 'x' } instance of fn() as xs:string?"},
+        { "Subtyping 14", booleans(true),
+            "fn() as xs:string { 'x' } instance of fn() as xs:anyAtomicType"},
+        { "Subtyping 15", booleans(false),
+            "let $g as function(xs:anyAtomicType) as xs:anyAtomicType := "
+            + "fn($x as xs:integer) as xs:string { 'x' } "
+            + "return ($g, $g)[1] instance of function(xs:integer) as xs:string"},
+        { "Subtyping 16", booleans(false),
+            "for $c in (1 to 1) "
+            + "let $g as function(xs:anyAtomicType) as xs:anyAtomicType := "
+            + "fn($x as xs:integer) as xs:string { concat('x', $c) } "
+            + "return $g instance of function(xs:integer) as xs:string"},
+        { "Subtyping 17", booleans(false),
+            "(fn($f as function(xs:anyAtomicType) as xs:anyAtomicType) { ($f, $f)[1] })"
+            + "(fn($x as xs:integer) as xs:string { 'x' }) "
+            + "instance of function(xs:integer) as xs:string"},
+        { "Subtyping 18", booleans(false),
+            "let $f := (fn() as item() { 'a' }, fn() as item() { 1 })[trace(2)] "
+            + "return $f() instance of xs:string"},
+        { "Subtyping 19", booleans(true), "fn() { 'x' } instance of function() as item()*"},
+        { "Subtyping 20", booleans(false), "fn() { 'x' } instance of function() as xs:string"},
     };
   }
 }

@@ -23,7 +23,7 @@ public class MapForEach extends MapFn {
     final FItem action = toFunction(arg(1), 3, this instanceof UpdateMapForEach, qc);
 
     return new Iter() {
-      final long size = action.funcType().declType.one() ? map.structSize() : -1;
+      final long size = action.funcType().refinedType.one() ? map.structSize() : -1;
       final BasicIter<Item> keys = map.keys().iter();
       final HofArgs args = new HofArgs(3, action);
       Iter iter = Empty.ITER;
@@ -65,7 +65,7 @@ public class MapForEach extends MapFn {
 
     final FuncType ft = arg(1).funcType();
     if(ft != null) {
-      final SeqType st = ft.declType;
+      final SeqType st = ft.refinedType;
       exprType.assign(st.type.seqType(Occ.ZERO_OR_MORE), st.one() ? map.structSize() : -1);
     }
     return this;

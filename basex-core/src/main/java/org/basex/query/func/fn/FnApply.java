@@ -57,7 +57,7 @@ public class FnApply extends StandardFunc {
     }
 
     ft = arg(0).funcType();
-    if(ft != null) exprType.assign(ft.declType);
+    if(ft != null) exprType.assign(ft.refinedType);
     return this;
   }
 

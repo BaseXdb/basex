@@ -81,8 +81,10 @@ public final class Var extends ExprInfo {
    */
   public SeqType seqType() {
     final SeqType st = exprType.seqType(), dt = declType;
-    final SeqType it = dt != null ? dt.intersect(st) : null;
-    return it != null ? it : dt != null ? dt : st;
+    if(dt == null) return st;
+    // refine only if the bound type is a subtype of the declared type; if the value was coerced,
+    // the declared type is authoritative
+    return st.instanceOf(dt) ? st : dt;
   }
 
   /**
