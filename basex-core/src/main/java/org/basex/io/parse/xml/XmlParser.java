@@ -17,6 +17,17 @@ import org.xml.sax.helpers.*;
  * @author Christian Gruen
  */
 public final class XmlParser {
+  /**
+   * Entity and structure limits that JDK 24 lowered to restrictive defaults (JDK-8343006).
+   * They are disabled to preserve the ability to parse large documents (as before JDK 24).
+   */
+  private static final String[] LIMITS = {
+    "jdk.xml.entityExpansionLimit", "jdk.xml.entityReplacementLimit",
+    "jdk.xml.totalEntitySizeLimit", "jdk.xml.maxGeneralEntitySizeLimit",
+    "jdk.xml.maxParameterEntitySizeLimit", "jdk.xml.elementAttributeLimit",
+    "jdk.xml.maxElementDepth"
+  };
+
   /** Reader. */
   private final XMLReader reader;
 
@@ -83,6 +94,7 @@ public final class XmlParser {
       f.setSchema(sf.newSchema());
     }
     final XMLReader xr = f.newSAXParser().getXMLReader();
+    for(final String limit : LIMITS) xr.setProperty(limit, "0");
     if(xsdValidation && !xsiLocation) {
       xr.setEntityResolver((pubId, sysId) -> {
         throw new SAXException("External access not allowed: " + sysId);
