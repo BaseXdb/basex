@@ -107,15 +107,13 @@ public abstract class FItem extends Item implements XQFunction {
 
       // add type check if return types differ
       final SeqType dt = ft.declType;
-      FuncType tp = funcType();
       if(!body.seqType().instanceOf(dt)) {
         body = new TypeCheck(info, body, dt);
         if(cc != null) body = body.optimize(cc);
       }
 
-      // adopt type of optimized body if it is more specific than passed on type
-      final SeqType bt = body.seqType();
-      tp = cc != null && !bt.eq(dt) && bt.instanceOf(dt) ? FuncType.get(bt, argTypes) : ft;
+      // advertise the target type; keep the body type as refined return type for result typing
+      final FuncType tp = cc != null ? ft.withRefinedType(body.seqType()) : ft;
       body.markTailCalls(null);
       return new FuncItem(info, body, vars, annotations(), tp, vs.stackSize(), funcName());
     } finally {

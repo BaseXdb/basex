@@ -22,7 +22,7 @@ public class FnForEachPair extends StandardFunc {
     final FItem action = toFunction(arg(2), 3, this instanceof UpdateForEachPair, qc);
 
     return new Iter() {
-      final long size = action.funcType().declType.one() ?
+      final long size = action.funcType().refinedType.one() ?
         Math.min(input1.size(), input2.size()) : -1;
       final HofArgs args = new HofArgs(3, action);
       Iter iter = Empty.ITER;
@@ -64,7 +64,7 @@ public class FnForEachPair extends StandardFunc {
     // assign type after refinement
     final FuncType ft = arg(2).funcType();
     if(ft != null) {
-      final SeqType declType = ft.declType;
+      final SeqType declType = ft.refinedType;
       final boolean oneOrMore = st1.oneOrMore() && st2.oneOrMore() && declType.oneOrMore();
       final long size = declType.zero() ? 0 : declType.one() ?
         Math.min(input1.size(), input2.size()) : -1;

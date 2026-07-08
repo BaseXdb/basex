@@ -245,7 +245,7 @@ public class MapMerge extends MapFn {
 
     @Override
     SeqType type(final SeqType st) {
-      return st.union(function.funcType().declType);
+      return st.union(function.funcType().refinedType);
     }
   }
 }

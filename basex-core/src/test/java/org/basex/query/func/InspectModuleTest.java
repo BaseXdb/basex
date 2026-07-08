@@ -80,7 +80,7 @@ public final class InspectModuleTest extends SandboxTest {
     query(query + "/argument/@type/data()", "xs:int");
     query(query + "/annotation/@name/data()", "private");
     query(query + "/annotation/@uri/data()", "http://www.w3.org/2012/xquery");
-    query(query + "/return/@type/data()", "xs:int");
+    query(query + "/return/@type/data()", "xs:integer");
     query(query + "/return/@occurrence/data()", "");
 
     // unknown annotation
@@ -208,8 +208,8 @@ public final class InspectModuleTest extends SandboxTest {
     query(func.args(" { 'a': 'b' }"), "record(a)");
     query(func.args(" array { 1, <a/> }"), "array(item())");
     query(func.args(" array { 1, 2 }"), "array(xs:integer)");
-    query(func.args(" function() { 1 }"), "fn() as xs:integer");
-    query(func.args(" fn() { 1 }"), "fn() as xs:integer");
+    query(func.args(" function() { 1 }"), "fn() as item()*");
+    query(func.args(" fn() { 1 }"), "fn() as item()*");
 
     query(func.args(" 1 to 2", " { 'item': true() }"), "xs:integer");
     query(func.args(" (<a/>, <b/>)[name() = 'a']", " { 'mode': 'expression' }"),

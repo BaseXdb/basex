@@ -45,7 +45,7 @@ public final class HofScanLeft extends StandardFunc {
 
     SeqType st = zero.seqType();
     final FuncType ft = action.funcType();
-    if(ft != null) st = st.union(ft.declType);
+    if(ft != null) st = st.union(ft.refinedType);
     exprType.assign(st.with(Occ.ZERO_OR_MORE));
     return this;
   }

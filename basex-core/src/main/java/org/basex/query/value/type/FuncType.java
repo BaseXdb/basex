@@ -22,8 +22,10 @@ import org.basex.util.*;
 public final class FuncType extends FType {
   /** Annotations. */
   public final AnnList anns;
-  /** Return type of the function. */
+  /** Declared return type (used by instance-of, coercion, subtyping). */
   public final SeqType declType;
+  /** Refined return type (a subtype of {@link #declType}); used for result typing. */
+  public final SeqType refinedType;
   /** Argument types (can be {@code null}, indicates that no types were specified). */
   public final SeqType[] argTypes;
 
@@ -33,19 +35,33 @@ public final class FuncType extends FType {
    * @param argTypes argument types (can be {@code null})
    */
   FuncType(final SeqType declType, final SeqType... argTypes) {
-    this(AnnList.EMPTY, declType, argTypes);
+    this(AnnList.EMPTY, declType, null, argTypes);
   }
 
   /**
    * Constructor.
    * @param anns annotations
    * @param declType declared return type (can be {@code null})
+   * @param refinedType refined return type ({@code null}: same as declared type)
    * @param argTypes argument types (can be {@code null})
    */
-  private FuncType(final AnnList anns, final SeqType declType, final SeqType... argTypes) {
+  private FuncType(final AnnList anns, final SeqType declType, final SeqType refinedType,
+      final SeqType[] argTypes) {
     this.anns = anns;
     this.declType = declType == null ? ITEM_ZM : declType;
+    // the refined type must be a subtype of the declared type; otherwise it adds no refinement
+    this.refinedType = refinedType == null || !refinedType.instanceOf(this.declType) ? this.declType
+                                                                                     : refinedType;
     this.argTypes = argTypes;
+  }
+
+  /**
+   * Returns a copy of this function type with a refined (more specific) return type.
+   * @param rt refined return type
+   * @return function type
+   */
+  public FuncType withRefinedType(final SeqType rt) {
+    return rt.eq(refinedType) ? this : new FuncType(anns, declType, rt, argTypes);
   }
 
   /**
@@ -56,7 +72,7 @@ public final class FuncType extends FType {
    * @return function type
    */
   public static FuncType get(final AnnList anns, final SeqType declType, final SeqType... args) {
-    return new FuncType(anns, declType, args);
+    return new FuncType(anns, declType, null, args);
   }
 
   /**
@@ -82,7 +98,7 @@ public final class FuncType extends FType {
     for(int p = 0; p < pl; p++) {
       argTypes[p] = params[p] == null ? ITEM_ZM : params[p].declaredType();
     }
-    return new FuncType(anns, declType, argTypes);
+    return new FuncType(anns, declType, null, argTypes);
   }
 
   /**
@@ -150,29 +166,47 @@ public final class FuncType extends FType {
 
   @Override
   public Type union(final Type type) {
+    if(this == type) return this;
     if(type instanceof ChoiceItemType) return type.union(this);
+    final FuncType ft = type.funcType();
+
+    // structural union, run before the instance-of short-circuits so the refined type is merged too
+    if(this != FUNCTION && ft != null && ft != FUNCTION && argTypes != null &&
+        ft.argTypes != null && argTypes.length == ft.argTypes.length) {
+      final int arity = argTypes.length;
+      final SeqType[] arg = new SeqType[arity];
+      for(int a = 0; a < arity; a++) {
+        arg[a] = argTypes[a].intersect(ft.argTypes[a]);
+        if(arg[a] == null) return FUNCTION;
+      }
+      return new FuncType(anns.union(ft.anns), declType.union(ft.declType),
+          refinedType.union(ft.refinedType), arg);
+    }
+
     if(type.instanceOf(this)) return this;
     if(instanceOf(type)) return type;
-
-    final FuncType ft = type.funcType();
-    if(ft == null) return BasicType.ITEM;
-
-    final int arity = argTypes.length, nargs = ft.argTypes.length;
-    if(arity != nargs) return FUNCTION;
-
-    final SeqType[] arg = new SeqType[arity];
-    for(int a = 0; a < arity; a++) {
-      arg[a] = argTypes[a].intersect(ft.argTypes[a]);
-      if(arg[a] == null) return FUNCTION;
-    }
-    return get(anns.union(ft.anns), declType.union(ft.declType), arg);
+    return ft == null ? BasicType.ITEM : FUNCTION;
   }
 
   @Override
   public Type intersect(final Type type) {
     if(type instanceof ChoiceItemType) return type.intersect(this);
-    if(instanceOf(type)) return this;
-    if(type.instanceOf(this)) return type;
+
+    // subtype: the intersection is that operand, but still meet its refined type with the other's
+    if(instanceOf(type)) {
+      if(type instanceof final FuncType ft) {
+        final SeqType rf = refinedType.intersect(ft.refinedType);
+        return rf == null ? this : withRefinedType(rf);
+      }
+      return this;
+    }
+    if(type.instanceOf(this)) {
+      if(type instanceof final FuncType ft) {
+        final SeqType rf = refinedType.intersect(ft.refinedType);
+        return rf == null ? type : ft.withRefinedType(rf);
+      }
+      return type;
+    }
 
     if(type instanceof MapType || type instanceof ArrayType) return type.intersect(this);
 
@@ -186,10 +220,11 @@ public final class FuncType extends FType {
     if(an == null) return null;
     final SeqType dt = declType.intersect(ft.declType);
     if(dt == null) return null;
+    final SeqType rf = refinedType.intersect(ft.refinedType);
 
     final SeqType[] arg = new SeqType[arity];
     for(int a = 0; a < arity; a++) arg[a] = argTypes[a].union(ft.argTypes[a]);
-    return get(an, dt, arg);
+    return new FuncType(an, dt, rf, arg);
   }
 
   /**
@@ -198,7 +233,7 @@ public final class FuncType extends FType {
    * @return function type
    */
   public FuncType with(final int arity) {
-    return get(anns, declType, Arrays.copyOf(argTypes, arity));
+    return new FuncType(anns, declType, refinedType, Arrays.copyOf(argTypes, arity));
   }
 
   @Override

@@ -55,6 +55,22 @@ public final class RecordTest extends SandboxTest {
     query("{ 'columns': ('a', 'b'), 'column-index': { 'a': 1 }, 'rows': [ 'p' ],\n"
         + "  'get': fn($r as xs:positiveInteger, $c as (xs:positiveInteger | xs:string))"
         + " as xs:string { 'x' } } instance of fn:parsed-csv-structure-record", true);
+    query("{ 'columns': ('a', 'b', 'c'), 'column-index': { 'a': 1, 'b': 2, 'c': 3 },\n"
+        + "  'rows': ([ 'p', 'q', 'r' ], [ 's', 't', 'u' ]),\n"
+        + "  'get': fn($row as xs:positiveInteger, $col as (xs:positiveInteger | xs:string))"
+        + " as xs:anyAtomicType? { 'banana' } } instance of fn:parsed-csv-structure-record", false);
+    query("{ 'number': 0.937e0, 'next': fn() { fn:random-number-generator() },\n"
+        + "  'permute': fn($in) { reverse($in) } }"
+        + " instance of fn:random-number-generator-record", false);
+    query("{ 'name': xs:QName('platonic'), 'is-simple': true(),\n"
+        + "  'base-type': fn() as fn:schema-type-record { atomic-type-annotation(3) },\n"
+        + "  'primitive-type': fn() as fn:schema-type-record { atomic-type-annotation(3) },\n"
+        + "  'variety': 'atomic',\n"
+        + "  'members': fn() as fn:schema-type-record* { () },\n"
+        + "  'simple-content-type': fn() as fn:schema-type-record { atomic-type-annotation(3) },\n"
+        + "  'matches': fn($x as xs:anyAtomicType) as xs:boolean { true() },\n"
+        + "  'constructor': xs:integer#1 } instance of fn:schema-type-record", true);
+    error("fn() as fn:schema-type-record* { 1 }()", INVTYPE_X);
     query("let $map := (\n"
         + "  {'x':5, 'y':6}\n"
         + "  => map:put(xs:NCName('x'), true())\n"

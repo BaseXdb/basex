@@ -37,7 +37,7 @@ public final class HofFoldLeft1 extends StandardFunc {
     if(input.seqType().zero()) return input;
 
     final FuncType ft = action.funcType();
-    if(ft != null) exprType.assign(ft.declType);
+    if(ft != null) exprType.assign(ft.refinedType);
     return this;
   }
 }

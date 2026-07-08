@@ -206,9 +206,8 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       cc.removeScope(this);
     }
 
-    final SeqType st = expr.seqType();
-    final SeqType dt = declType == null || st.instanceOf(declType) ? st : declType;
-    exprType.assign(FuncType.get(anns, dt, params));
+    // declared type for instance-of/coercion (item()* if none), body type as refined return type
+    exprType.assign(FuncType.get(anns, declType, params).withRefinedType(expr.seqType()));
 
     // only evaluate if:
     // - the closure is empty, so we don't lose variables

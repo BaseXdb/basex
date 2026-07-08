@@ -43,7 +43,7 @@ public final class ArrayBuild extends ArrayFn {
 
     arg(1, arg -> refineFunc(arg, cc, st.with(Occ.EXACTLY_ONE), Types.INTEGER_O));
     final FuncType ft = arg(1).funcType();
-    if(ft != null) exprType.assign(ArrayType.get(ft.declType));
+    if(ft != null) exprType.assign(ArrayType.get(ft.refinedType));
     return this;
   }
 

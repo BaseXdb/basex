@@ -67,7 +67,7 @@ public final class PartFunc extends Arr {
           args[placeholderPerm == null ? a : placeholderPerm[a]] = ft.argTypes[e];
           ++a;
         }
-        exprType.assign(FuncType.get(ft.declType, args).seqType());
+        exprType.assign(FuncType.get(ft.declType, args).withRefinedType(ft.refinedType).seqType());
       }
     }
     return this;
@@ -114,7 +114,7 @@ public final class PartFunc extends Arr {
     final boolean updating = anns.contains(Annotation.UPDATING);
     final DynFuncCall expr = new DynFuncCall(info, updating, false, func, args);
 
-    final FuncType type = FuncType.get(anns, ft.declType, params);
+    final FuncType type = FuncType.get(anns, ft.declType, params).withRefinedType(ft.refinedType);
     return new FuncItem(info, expr, params, anns, type, vs.stackSize(), null, qc.focus.copy());
   }
 

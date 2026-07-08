@@ -45,7 +45,7 @@ public final class FnGenerate extends StandardFunc {
         final SeqType[] types = { st, Types.INTEGER_O };
         arg(1, arg -> refineFunc(step, cc, types));
         ost = st;
-        st = st.union(arg(1).funcType().declType);
+        st = st.union(arg(1).funcType().refinedType);
       } while(!st.eq(ost));
       exprType.assign(st.with(Occ.ONE_OR_MORE));
     }

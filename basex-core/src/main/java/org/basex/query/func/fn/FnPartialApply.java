@@ -68,7 +68,7 @@ public class FnPartialApply extends StandardFunc {
       funcCall = new DynFuncCall(info,
           new PartFunc(info, ExprList.concat(funcArgs, function), placeholders, null), args);
     }
-    return new FuncItem(info, funcCall, params, AnnList.EMPTY, FuncType.get(ft.declType, argTypes),
-        params.length, null);
+    return new FuncItem(info, funcCall, params, AnnList.EMPTY,
+        FuncType.get(ft.declType, argTypes).withRefinedType(ft.refinedType), params.length, null);
   }
 }

@@ -124,12 +124,12 @@ public class FnFoldLeft extends StandardFunc {
         final SeqType[] types = { left ? st : i1t, left ? i1t : st, Types.INTEGER_O };
         arg(2, arg -> refineFunc(action, cc, types));
         ost = st;
-        st = st.union(arg(2).funcType().declType);
+        st = st.union(arg(2).funcType().refinedType);
       } while(!st.eq(ost));
       exprType.assign(st);
     } else {
       final FuncType ft = action.funcType();
-      if(ft != null) exprType.assign(ist.oneOrMore() ? ft.declType : zst.union(ft.declType));
+      if(ft != null) exprType.assign(ist.oneOrMore() ? ft.refinedType : zst.union(ft.refinedType));
     }
     return this;
   }
