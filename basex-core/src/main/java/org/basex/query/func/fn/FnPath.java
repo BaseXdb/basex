@@ -8,7 +8,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
 import org.basex.query.value.*;
-import org.basex.query.value.array.*;
 import org.basex.query.value.item.*;
 import org.basex.query.value.map.*;
 import org.basex.query.value.node.*;
@@ -82,29 +81,25 @@ public final class FnPath extends ContextFn {
           tb.add(kind.toString(Token.string(qname.local())));
         } else if(kind.oneOf(Kind.COMMENT, Kind.TEXT)) {
           tb.add(type.toString());
-        } else if(parent instanceof final JNode jparent) {
-          final JNode jnode = (JNode) node;
-          final Item key = jnode.key;
-          byte[] get = null;
+        } else if(parent instanceof JNode) {
+          final Item key = ((JNode) node).key;
           final byte[] string = key.string(info);
-          if(jparent.value instanceof XQArray) {
-            tb.add("*[").add(key).add("]");
-          } else if(key instanceof AStr || key instanceof Atm || key instanceof Uri) {
-            if(XMLToken.isNCName(string)) {
-              tb.add(string);
-            } else {
-              get = QueryString.toQuoted(string);
-            }
+          if(key instanceof AStr || key instanceof Atm || key instanceof Uri) {
+            // string, untypedAtomic, anyURI: NCName, or quoted string
+            tb.add(XMLToken.isNCName(string) ? string : QueryString.toQuoted(string));
           } else if(key instanceof ANum) {
-            get = string;
+            // numeric (includes array indexes)
+            tb.add(string);
           } else if(key instanceof final QNm qnm) {
-            tb.add(qnm.eqName());
+            // QName: EQName literal
+            tb.add('#').add(qnm.eqName());
           } else if(key instanceof Bln) {
-            get = Token.concat(string, "()");
+            // boolean
+            tb.add(string).add("()");
           } else {
-            get = Token.concat(key.type.toString(), '(', QueryString.toQuoted(string), ')');
+            // any other type
+            tb.add(key.type.toString()).add('(').add(QueryString.toQuoted(string)).add(')');
           }
-          if(get != null) tb.add("get(").add(get).add(')');
         }
         // optional index
         if(indexes && !kind.oneOf(Kind.ATTRIBUTE, Kind.JNODE)) {
