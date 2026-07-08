@@ -1573,7 +1573,7 @@ public class QueryParser extends InputParser {
     for(final Var var : vrs) {
       final Expr expr = switch(binding.endCp) {
         case ']' -> Function._ARRAY_GET.get(var.info, seqRef, Itr.get(++i));
-        case '}' -> Function._MAP_GET.get(var.info, seqRef, Str.get(var.name.local()));
+        case '}' -> new Lookup(var.info, seqRef, Str.get(var.name.local()));
         default -> (++i < vrs.size() ? Function.ITEMS_AT : Function.SUBSEQUENCE).
           get(var.info, seqRef, Itr.get(i));
       };

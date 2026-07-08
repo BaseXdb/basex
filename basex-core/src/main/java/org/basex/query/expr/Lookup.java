@@ -39,7 +39,7 @@ public final class Lookup extends Arr {
   public Expr optimize(final CompileContext cc) throws QueryException {
     exprs[1] = exprs[1].simplifyFor(Simplify.DATA, cc);
 
-    final Expr inputs = exprs[0];
+    final Expr inputs = exprs[0], keys = exprs[1];
     final long is = inputs.size();
     if(is == 0) return cc.replaceWith(this, inputs);
 
@@ -48,11 +48,13 @@ public final class Lookup extends Arr {
     final boolean map = tp instanceof MapType, array = tp instanceof ArrayType;
     if(!(map || array)) return this;
 
+    // pre-evaluate a single-key lookup
+    if(is == 1 && inputs instanceof Value && keys instanceof Item) return cc.preEval(this);
+
     final Expr expr = opt(cc);
     if(expr != this) return cc.replaceWith(this, expr);
 
     // derive type from input expression
-    final Expr keys = exprs[1];
     final SeqType kt = keys.seqType();
     final SeqType st = map ? ((MapType) tp).valueType() : ((ArrayType) tp).valueType();
     Occ occ = st.occ;
@@ -80,12 +82,14 @@ public final class Lookup extends Arr {
     if(ks == 0) return keys;
 
     final Type it = input.seqType().type;
-    if(it instanceof final RecordType rt && rt.strict() && keys != WILDCARD &&
-        !(keys instanceof final AStr str && ks == 1 && rt.fields().contains(str.string(info)))) {
-      return this;
-    }
     final boolean map = it instanceof MapType, array = it instanceof ArrayType;
     if(map || array) {
+      // keep the lookup if a runtime value could be a strict record that lacks a requested key
+      if(keys != WILDCARD && it instanceof final MapType mt && (mt instanceof final RecordType rt
+          ? rt.strict() && !(ks == 1 && keys instanceof final AStr str &&
+              rt.fields().contains(str.string(info)))
+          : mt.keyType().intersect(BasicType.STRING) != null)) return this;
+
       /* REWRITE LOOKUP:
        *  MAP?*     → map:items(MAP)
        *  ARRAY?*   → array:items(MAP)

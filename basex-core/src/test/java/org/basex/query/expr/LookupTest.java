@@ -16,6 +16,7 @@ public final class LookupTest extends SandboxTest {
   /** Test. */
   @Test public void map() {
     query("{ 'a': 'b' } ? a", "b");
+    query("{ 'a': 'b' } ? c", "");
     query("({ 'a': 'b' }, { 'c': 'd' }) ? a", "b");
     query("{ 'a': 'b', 'c': 'd' } ? ('a', 'c')", "b\nd");
     query("({ 'a': 'b' }, { 'c': 'd' }) ? ('a', 'c')", "b\nd");
@@ -84,8 +85,26 @@ public final class LookupTest extends SandboxTest {
     query("({ 'k': 7 }, { 'k': 8 }) ! self::jnode()?k", "7\n8");
   }
 
+  /** Rewrite lookups to map:get/array:get unless this could suppress a strict-record error. */
+  @Test public void rewrite() {
+    check("({ 'a': <x/> }, { 'b': <y/> })?a", "<x/>", exists(Lookup.class), empty(_MAP_GET));
+    check("declare record local:r(a, b); local:r(<x/>, <y/>)?('a', 'b')", "<x/>\n<y/>",
+        exists(Lookup.class));
+    check("[ <x/>, <y/> ]?(1, 2)", "<x/>\n<y/>", exists(Lookup.class));
+
+    check("({ 'a': <x/> })?a", "<x/>", exists(RecordGet.class), empty(Lookup.class));
+    check("({ 'a': <x/> })?b", "", empty(Lookup.class));
+    check("({ 1: <x/> })?1", "<x/>", exists(_MAP_GET), empty(Lookup.class));
+    check("({ 'a': <x/> })?*", "<x/>", exists(_MAP_ITEMS), empty(Lookup.class));
+    check("[ <x/> ]?1", "<x/>", exists(_ARRAY_GET), empty(Lookup.class));
+    check("[ <x/> ]?*", "<x/>", exists(_ARRAY_ITEMS), empty(Lookup.class));
+  }
+
   /** Test. */
   @Test public void error() {
     error("1?a", LOOKUP_X);
+    error("declare record local:r(a, b); local:r(1, 2)?c", RECORDFIELD_X_X);
+    error("declare record local:r(a, b); (local:r(1, 2), { 'c': 3 })?c", RECORDFIELD_X_X);
+    error("declare record local:r(a, b); local:r(<x/>, <y/>)?1", RECORDFIELD_X_X);
   }
 }

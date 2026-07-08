@@ -23,9 +23,7 @@ public final class RecordType extends MapType {
   /** Maximum number of entries in generated records. */
   public static final int MAX_GENERATED_SIZE = 32;
 
-  /** Sealed flag: a sealed record type carries a runtime type annotation and constrains
-   * field access (lookup of an undeclared field raises a type error). Inferred record types
-   * (e.g. from map constructors) are not sealed and behave like ordinary maps. */
+  /** Sealed flag (runtime type annotation, constrains field access). */
   private final boolean sealed;
   /** Record fields. */
   private final TokenObjectMap<RecordField> fields;

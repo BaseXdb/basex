@@ -876,6 +876,13 @@ public final class XQuery4Test extends SandboxTest {
     query("let ${$a, $b, $c} := " + value + " return [ $a, $b, $c ]", "[1,2,3]");
     query("let ${$a, $b, $c, $d} := " + value + " return [ $a, $b, $c, $d ]", "[1,2,3,()]");
 
+    query("declare record local:r(a as xs:integer, b as xs:integer); "
+        + "let ${ $a, $b } := local:r(1, 2) return $a + $b", 3);
+    error("declare record local:r(a as xs:integer, b as xs:integer); "
+        + "let ${ $c } := local:r(1, 2) return $c", RECORDFIELD_X_X);
+    query("let $m as map(xs:string, xs:integer) := map:merge(('a', 'b') ! map:entry(., 1)) "
+        + "let ${ $z } := $m return empty($z)", true);
+
     // GH-2452
     query("""
       let $($a, $b) := (1 to 6) ! string()
