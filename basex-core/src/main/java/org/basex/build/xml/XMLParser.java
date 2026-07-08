@@ -70,7 +70,11 @@ public class XMLParser extends SingleParser {
     while(true) {
       if(scanner.type == Type.TEXT) {
         final byte[] text = scanner.token.toArray();
-        if(!elms.isEmpty() || fragment || !ws(text)) {
+        // ignore whitespace outside the root element, and ignorable whitespace between the
+        // children of an element with element-only content (matching the default parser)
+        final boolean ignorable = ws(text) && (elms.isEmpty() ? !fragment :
+            scanner.elementContent(elms.peek()));
+        if(!ignorable) {
           if(strips.peek()) scanner.token.trim();
           builder.text(scanner.token.toArray());
         }
@@ -127,8 +131,8 @@ public class XMLParser extends SingleParser {
     nsp.reset();
 
     // get element name
-    byte[] en = consumeToken(Type.ELEMNAME);
-    if(stripNS) en = local(en);
+    final byte[] raw = consumeToken(Type.ELEMNAME);
+    byte[] en = stripNS ? local(raw) : raw;
     skipSpace();
 
     // parse optional attributes
@@ -160,6 +164,9 @@ public class XMLParser extends SingleParser {
         consume(Type.WS);
       }
     }
+
+    // apply DTD-declared attribute defaults and tokenized-type value normalization
+    scanner.attributes(raw, atts, stripNS);
 
     // send empty element to builder
     if(scanner.type == Type.CLOSE_R_BR) {

@@ -125,24 +125,53 @@ public final class XMLParserTest extends SandboxTest {
 
   /** Internal and default parser must agree on DTD content models. */
   @Test public void dtdContentModelParsers() {
-    set(MainOptions.DTD, true);
-
     // well-formed documents with an internal subset and a matching element tree
-    final String[] docs = {
+    sameOnBothParsers(
         "<!DOCTYPE a [ <!ELEMENT a (b, c)> ]><a><b/><c/></a>",
         "<!DOCTYPE a [ <!ELEMENT a ((b)?, (c)*)> ]><a><c/><c/></a>",
         "<!DOCTYPE a [ <!ELEMENT a (b | c)> ]><a><b/></a>",
         "<!DOCTYPE a [ <!ELEMENT a (#PCDATA | b)*> ]><a>x<b/>y</a>",
-        "<!DOCTYPE a [ <!ELEMENT a (b, (c, d)+, e)> ]><a><b/><c/><d/><e/></a>",
-    };
-    for(final String doc : docs) {
-      set(MainOptions.INTPARSE, false);
-      execute(new CreateDB(NAME, doc));
-      final String def = query(".");
-      set(MainOptions.INTPARSE, true);
-      execute(new CreateDB(NAME, doc));
-      assertEquals(def, query("."), "Parsers disagree on: " + doc);
-    }
+        "<!DOCTYPE a [ <!ELEMENT a (b, (c, d)+, e)> ]><a><b/><c/><d/><e/></a>");
+  }
+
+  /**
+   * Internal and default parser must agree on attribute defaults (incl. #FIXED and enumeration
+   * defaults) and on tokenized-type attribute-value normalization.
+   */
+  @Test public void dtdAttributes() {
+    sameOnBothParsers(
+        // default values, incl. empty and multiple defaults; specified values win
+        "<!DOCTYPE a [ <!ATTLIST a b CDATA \"x\"> ]><a/>",
+        "<!DOCTYPE a [ <!ATTLIST a b CDATA \"x\"> ]><a b=\"y\"/>",
+        "<!DOCTYPE a [ <!ATTLIST a b CDATA \"\"> ]><a/>",
+        "<!DOCTYPE a [ <!ATTLIST a b CDATA \"1\" c CDATA \"2\"> ]><a c=\"X\"/>",
+        // #FIXED and enumeration defaults
+        "<!DOCTYPE a [ <!ATTLIST a b CDATA #FIXED \"x\"> ]><a/>",
+        "<!DOCTYPE a [ <!ATTLIST a b (l | r) \"l\"> ]><a/>",
+        // entity reference in a default value
+        "<!DOCTYPE a [ <!ATTLIST a b CDATA \"&#65;\"> ]><a/>",
+        // tokenized-type normalization (collapse + trim); CDATA is left untouched
+        "<!DOCTYPE a [ <!ATTLIST a b NMTOKEN #IMPLIED> ]><a b=\"  x  \"/>",
+        "<!DOCTYPE a [ <!ATTLIST a b NMTOKENS #IMPLIED> ]><a b=\" x   y \"/>",
+        "<!DOCTYPE a [ <!ATTLIST a b (l | r) #IMPLIED> ]><a b=\" l \"/>",
+        "<!DOCTYPE a [ <!ATTLIST a b CDATA #IMPLIED> ]><a b=\" x   y \"/>",
+        // #IMPLIED / #REQUIRED add nothing
+        "<!DOCTYPE a [ <!ATTLIST a b CDATA #IMPLIED> ]><a/>",
+        "<!DOCTYPE a [ <!ATTLIST a b CDATA #REQUIRED> ]><a b=\"z\"/>");
+  }
+
+  /** Internal and default parser must agree on ignorable (element-content) whitespace. */
+  @Test public void dtdElementContentWhitespace() {
+    sameOnBothParsers(
+        // element-only content: whitespace between children is ignorable and dropped
+        "<!DOCTYPE a [ <!ELEMENT a (b, b)><!ELEMENT b EMPTY> ]><a>\n  <b/>\n  <b/>\n</a>",
+        "<!DOCTYPE a [ <!ELEMENT a (b)><!ELEMENT b (c)><!ELEMENT c EMPTY> ]>" +
+            "<a>\n <b>\n  <c/>\n </b>\n</a>",
+        // mixed content and ANY: whitespace is significant and kept
+        "<!DOCTYPE a [ <!ELEMENT a (#PCDATA | b)*><!ELEMENT b EMPTY> ]><a>\n  <b/>\n</a>",
+        "<!DOCTYPE a [ <!ELEMENT a ANY><!ELEMENT b EMPTY> ]><a>\n  <b/>\n</a>",
+        // non-whitespace text in element content is kept by both (non-validating)
+        "<!DOCTYPE a [ <!ELEMENT a (b)><!ELEMENT b EMPTY> ]><a> x <b/> y </a>");
   }
 
   /** A malformed DTD must report its real cause, not a masked "empty document" error. */
@@ -159,26 +188,6 @@ public final class XMLParserTest extends SandboxTest {
     final String empty = createError("<!-- comment, but no root element -->");
     assertNotNull(empty, "Document without root element was accepted");
     assertTrue(empty.contains("No input found"), "Unexpected error: " + empty);
-  }
-
-  /** Internal parser: ATTLIST declarations, including enumerations and empty default values. */
-  @Test public void dtdAttlist() {
-    set(MainOptions.INTPARSE, true);
-    set(MainOptions.DTD, true);
-
-    // attribute declarations that must be accepted; an empty default value ("") regressed the
-    // scanner before the fix, overrunning the whole declaration
-    final String[] attlists = {
-        "<!ATTLIST a b CDATA \"\">",
-        "<!ATTLIST a b CDATA '' c CDATA '50'>",
-        "<!ATTLIST a b (x | y | z) \"x\">",
-        "<!ATTLIST a b NMTOKEN #IMPLIED c CDATA #REQUIRED d CDATA #FIXED \"1\">",
-        "<!ATTLIST a align (left | right | center | justify | char) \"left\" char CDATA \"\">",
-    };
-    for(final String attlist : attlists) {
-      execute(new CreateDB(NAME, "<!DOCTYPE a [ " + attlist + " ]><a/>"));
-      query(".", "<a/>");
-    }
   }
 
   /**
@@ -218,6 +227,22 @@ public final class XMLParserTest extends SandboxTest {
     // the external DTD is scanned without error; the general entity is expanded
     query("//entry/string()", "a Copyright © 2026");
     query("name(*)", "tgroup");
+  }
+
+  /**
+   * Asserts that the internal and the default parser produce identical documents.
+   * @param docs document strings (each with an internal DTD subset)
+   */
+  private void sameOnBothParsers(final String... docs) {
+    set(MainOptions.DTD, true);
+    for(final String doc : docs) {
+      set(MainOptions.INTPARSE, false);
+      execute(new CreateDB(NAME, doc));
+      final String def = query(".");
+      set(MainOptions.INTPARSE, true);
+      execute(new CreateDB(NAME, doc));
+      assertEquals(def, query("."), "Parsers disagree on: " + doc);
+    }
   }
 
   /**

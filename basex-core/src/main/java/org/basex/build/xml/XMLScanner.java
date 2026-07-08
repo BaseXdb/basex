@@ -49,6 +49,17 @@ final class XMLScanner extends Job {
   private final TokenObjectMap<byte[]> ents = new TokenObjectMap<>();
   /** Index for all PEReferences. */
   private final TokenObjectMap<byte[]> pents = new TokenObjectMap<>();
+  /** Declared attributes per element name (for default values and value normalization). */
+  private final TokenObjectMap<TokenObjectMap<AttDecl>> attDecls = new TokenObjectMap<>();
+  /** Element names declared with element-only content. */
+  private final TokenSet elemContent = new TokenSet();
+
+  /**
+   * Declared attribute.
+   * @param tokenized tokenized (non-CDATA) type flag
+   * @param value default value (or {@code null})
+   */
+  private record AttDecl(boolean tokenized, byte[] value) { }
   /** DTD flag. */
   private final boolean dtd;
   /** Parse fragment. */
@@ -802,7 +813,7 @@ final class XMLScanner extends Job {
       pe = true;
     } else if(consume(ELEM)) { // [45]
       checkS();
-      name(true);
+      final byte[] elem = name(true);
       checkS();
       pe = true;
       if(!consume(EMP) && !consume(ANY)) { // [46]
@@ -814,7 +825,8 @@ final class XMLScanner extends Job {
             while(consume('|')) { s(); name(true); s(); alt = true; }
             check(')');
             if(!consume('*') && alt) throw error(INVEND);
-          } else { // [47] children
+          } else { // [47] children (element-only content)
+            elemContent.add(elem);
             cp();
             while(sep()) cp();
             s();
@@ -830,13 +842,14 @@ final class XMLScanner extends Job {
     } else if(consume(ATTL)) { // [52]
       pe = true;
       checkS();
-      name(true);
+      final byte[] elem = name(true);
       s();
-      while(name(false) != null) { // [53]
+      for(byte[] att; (att = name(false)) != null;) { // [53]
         checkS();
-        if(!consume(CD) && !consume(IDRS) && !consume(IDR) && !consume(ID) &&
-            !consume(ENTS) && !consume(ENT1) && !consume(NMTS) &&
-            !consume(NMT)) { // [56]
+        // [56] AttType: CDATA is the only non-tokenized (StringType) type
+        final boolean tokenized = !consume(CD);
+        if(tokenized && !consume(IDRS) && !consume(IDR) && !consume(ID) &&
+            !consume(ENTS) && !consume(ENT1) && !consume(NMTS) && !consume(NMT)) {
           if(consume(NOT)) { // [57,58]
             checkS(); check('(');
             do { s(); name(true); s(); } while(consume('|'));
@@ -847,14 +860,18 @@ final class XMLScanner extends Job {
           check(')');
         }
 
-        // [54]
+        // [54] DefaultDecl
         pe = true;
         checkS();
+        byte[] value = null;
         if(!consume(REQ) && !consume(IMP)) { // [60]
           if(consume(FIX)) checkS();
           quote = qu();
+          token.reset();
           attValue(consume());
+          value = tokenized ? normalize(token.toArray()) : token.toArray();
         }
+        if(tokenized || value != null) declareAtt(elem, att, tokenized, value);
         s();
       }
       check('>');
@@ -908,6 +925,71 @@ final class XMLScanner extends Job {
    */
   private void occ() throws IOException {
     if(!consume('+') && !consume('?')) consume('*');
+  }
+
+  /**
+   * Registers a declared attribute. The first declaration of an attribute is binding.
+   * @param elem element name
+   * @param att attribute name
+   * @param tokenized non-CDATA (tokenized) type flag
+   * @param value default value (or {@code null})
+   */
+  private void declareAtt(final byte[] elem, final byte[] att, final boolean tokenized,
+      final byte[] value) {
+    attDecls.computeIfAbsent(elem, () -> new TokenObjectMap<>()).
+      computeIfAbsent(att, () -> new AttDecl(tokenized, value));
+  }
+
+  /**
+   * Applies declared attribute defaults and normalization. [3.3.2, 3.3.3]
+   * @param elem element name
+   * @param atts attributes assembled from the start tag
+   * @param stripNS strip namespaces
+   */
+  void attributes(final byte[] elem, final Atts atts, final boolean stripNS) {
+    final TokenObjectMap<AttDecl> decls = attDecls.get(elem);
+    if(decls == null) return;
+    // normalize specified values of tokenized-type attributes
+    final int as = atts.size();
+    for(int a = 0; a < as; a++) {
+      final AttDecl decl = decls.get(atts.name(a));
+      if(decl != null && decl.tokenized) atts.value(a, normalize(atts.value(a)));
+    }
+    // add default values for declared attributes that are absent (in declaration order)
+    for(final byte[] att : decls) {
+      final AttDecl decl = decls.get(att);
+      if(decl.value != null && !atts.contains(att)) atts.add(att, decl.value, stripNS);
+    }
+  }
+
+  /**
+   * Indicates whether the named element was declared with element-only content, so that
+   * whitespace between its child elements is ignorable. [3.2.1]
+   * @param elem element name
+   * @return result of check
+   */
+  boolean elementContent(final byte[] elem) {
+    return elemContent.contains(elem);
+  }
+
+  /**
+   * Normalizes an attribute value of a tokenized type. [3.3.3]
+   * @param value value
+   * @return normalized value
+   */
+  private static byte[] normalize(final byte[] value) {
+    final TokenBuilder tb = new TokenBuilder();
+    boolean space = false;
+    for(final byte b : value) {
+      if(b == ' ') {
+        space = true;
+      } else {
+        if(space && !tb.isEmpty()) tb.add(' ');
+        space = false;
+        tb.add(b);
+      }
+    }
+    return tb.finish();
   }
 
   /**

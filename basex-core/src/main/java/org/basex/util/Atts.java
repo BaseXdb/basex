@@ -139,6 +139,17 @@ public final class Atts extends ElementList {
   }
 
   /**
+   * Sets the value at the specified index position.
+   * @param index index
+   * @param value value
+   * @return self reference
+   */
+  public Atts value(final int index, final byte[] value) {
+    list[(index << 1) + 1] = value;
+    return this;
+  }
+
+  /**
    * Returns the value for the specified name or {@code null}.
    * @param name name to be found
    * @return offset or -1
