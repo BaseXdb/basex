@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.junit.jupiter.api.*;
@@ -29,6 +30,7 @@ public final class XMLParserTest extends SandboxTest {
     set(MainOptions.STRIPNS, false);
     set(MainOptions.SERIALIZER, new SerializerOptions());
     set(MainOptions.INTPARSE, true);
+    set(MainOptions.DTD, false);
   }
 
   /** Tests the internal parser (Option {@link MainOptions#INTPARSE}). */
@@ -82,6 +84,153 @@ public final class XMLParserTest extends SandboxTest {
       execute(new CreateDB(NAME, doc.toString()));
       query("_[_]", "");
       query("count(_/@*)", a);
+    }
+  }
+
+  /** Internal parser: DTD element content models with nested parenthesized groups. */
+  @Test public void dtdContentModel() {
+    set(MainOptions.INTPARSE, true);
+    set(MainOptions.DTD, true);
+
+    // content models that must be accepted (several contain more than one group)
+    final String[] valid = {
+        // simple content specs
+        "EMPTY", "ANY", "(#PCDATA)", "(#PCDATA)*", "(#PCDATA | b | c)*",
+        // sequences and choices
+        "(a, b, c)", "(a | b | c)", "(a,b,c)", "( a , b , c )",
+        // single group (regression-safe: always worked)
+        "(a, (b)?, c)", "((b))", "(((a)))",
+        // multiple groups (the actual bug: these failed before the fix)
+        "(a, (b)?, (c)*, d, e)", "((b), (c))", "((a | b), (c | d))",
+        "((b)?, (c)?, (d)?)", "(a, ((b | c), d)*, e)", "(a | (b, c) | d)",
+        // occurrence indicators on groups and on the whole model
+        "(a, (b, c)+, d)", "(a | b)?", "((a, b))*", "(a, b)+",
+        // whitespace (incl. newlines and tabs) inside the model
+        "(a,\n  (b)?,\t(c)*,\n  d)",
+    };
+    for(final String model : valid) {
+      execute(new CreateDB(NAME, "<!DOCTYPE a [ <!ELEMENT a " + model + "> ]><a/>"));
+      query(".", "<a/>");
+    }
+
+    // malformed content models must be rejected (and not silently accepted or hung)
+    final String[] invalid = {
+        "(a, (b)", "(a b)", "((b) (c))", "(a, (b) c)", "()", "(a,)", "(a,, b)", "(a | b",
+    };
+    for(final String model : invalid) {
+      final String doc = "<!DOCTYPE a [ <!ELEMENT a " + model + "> ]><a/>";
+      assertThrows(BaseXException.class, () -> new CreateDB(NAME, doc).execute(context));
+    }
+  }
+
+  /** Internal and default parser must agree on DTD content models. */
+  @Test public void dtdContentModelParsers() {
+    set(MainOptions.DTD, true);
+
+    // well-formed documents with an internal subset and a matching element tree
+    final String[] docs = {
+        "<!DOCTYPE a [ <!ELEMENT a (b, c)> ]><a><b/><c/></a>",
+        "<!DOCTYPE a [ <!ELEMENT a ((b)?, (c)*)> ]><a><c/><c/></a>",
+        "<!DOCTYPE a [ <!ELEMENT a (b | c)> ]><a><b/></a>",
+        "<!DOCTYPE a [ <!ELEMENT a (#PCDATA | b)*> ]><a>x<b/>y</a>",
+        "<!DOCTYPE a [ <!ELEMENT a (b, (c, d)+, e)> ]><a><b/><c/><d/><e/></a>",
+    };
+    for(final String doc : docs) {
+      set(MainOptions.INTPARSE, false);
+      execute(new CreateDB(NAME, doc));
+      final String def = query(".");
+      set(MainOptions.INTPARSE, true);
+      execute(new CreateDB(NAME, doc));
+      assertEquals(def, query("."), "Parsers disagree on: " + doc);
+    }
+  }
+
+  /** A malformed DTD must report its real cause, not a masked "empty document" error. */
+  @Test public void dtdErrorNotMasked() {
+    set(MainOptions.INTPARSE, true);
+    set(MainOptions.DTD, true);
+
+    // the real error (a missing ')') must surface instead of being replaced by close()
+    final String bad = createError("<!DOCTYPE a [ <!ELEMENT a (b, (c)> ]><a/>");
+    assertNotNull(bad, "Malformed DTD was accepted");
+    assertFalse(bad.contains("No input found"), "Real error was masked: " + bad);
+
+    // a document without a root element must still report an empty document
+    final String empty = createError("<!-- comment, but no root element -->");
+    assertNotNull(empty, "Document without root element was accepted");
+    assertTrue(empty.contains("No input found"), "Unexpected error: " + empty);
+  }
+
+  /** Internal parser: ATTLIST declarations, including enumerations and empty default values. */
+  @Test public void dtdAttlist() {
+    set(MainOptions.INTPARSE, true);
+    set(MainOptions.DTD, true);
+
+    // attribute declarations that must be accepted; an empty default value ("") regressed the
+    // scanner before the fix, overrunning the whole declaration
+    final String[] attlists = {
+        "<!ATTLIST a b CDATA \"\">",
+        "<!ATTLIST a b CDATA '' c CDATA '50'>",
+        "<!ATTLIST a b (x | y | z) \"x\">",
+        "<!ATTLIST a b NMTOKEN #IMPLIED c CDATA #REQUIRED d CDATA #FIXED \"1\">",
+        "<!ATTLIST a align (left | right | center | justify | char) \"left\" char CDATA \"\">",
+    };
+    for(final String attlist : attlists) {
+      execute(new CreateDB(NAME, "<!DOCTYPE a [ " + attlist + " ]><a/>"));
+      query(".", "<a/>");
+    }
+  }
+
+  /**
+   * Internal parser: a complex external DTD subset (parameter entities inside declarations,
+   * a parameter-entity-driven conditional section, enumerations and empty default values).
+   * These constructs are only legal in the external subset.
+   */
+  @Test public void dtdExternalSubset() {
+    final String dtd =
+        "<!ENTITY % yesorno \"(0 | 1)\">\n" +
+        "<!ENTITY % common \"id ID #IMPLIED\">\n" +
+        "<!ENTITY % inclusion \"INCLUDE\">\n" +
+        "<!ENTITY copyright \"Copyright &#169; 2026\">\n" +
+        "<!NOTATION gif PUBLIC \"-//IETF//NOTATION GIF//EN\">\n" +
+        "<!ELEMENT tgroup (colspec*, (thead)?, tbody)>\n" +
+        "<!ELEMENT colspec EMPTY>\n" +
+        "<!ELEMENT thead (row+)>\n" +
+        "<!ELEMENT tbody (row+)>\n" +
+        "<!ELEMENT row ((entry)+)>\n" +
+        "<!ELEMENT entry (#PCDATA)*>\n" +
+        "<!ATTLIST tgroup cols CDATA #REQUIRED\n" +
+        "                 colsep %yesorno; #IMPLIED\n" +
+        "                 align (left | right | center | char) \"left\"\n" +
+        "                 char CDATA \"\"\n" +
+        "                 %common; >\n" +
+        "<![ %inclusion; [ <!ELEMENT extra (#PCDATA)> ]]>\n" +
+        "<![IGNORE[ <!ELEMENT bad ( ]]>\n";
+    final IOFile dtdFile = new IOFile(sandbox(), "table.dtd");
+    final IOFile xmlFile = new IOFile(sandbox(), "table.xml");
+    write(dtdFile, dtd);
+    write(xmlFile, "<!DOCTYPE tgroup SYSTEM \"table.dtd\">\n" +
+        "<tgroup cols=\"2\"><tbody><row><entry>a &copyright;</entry></row></tbody></tgroup>");
+
+    set(MainOptions.INTPARSE, true);
+    set(MainOptions.DTD, true);
+    execute(new CreateDB(NAME, xmlFile.path()));
+    // the external DTD is scanned without error; the general entity is expanded
+    query("//entry/string()", "a Copyright © 2026");
+    query("name(*)", "tgroup");
+  }
+
+  /**
+   * Creates a database and returns the resulting error message, or {@code null} on success.
+   * @param doc document string
+   * @return error message or {@code null}
+   */
+  private static String createError(final String doc) {
+    try {
+      new CreateDB(NAME, doc).execute(context);
+      return null;
+    } catch(final BaseXException ex) {
+      return ex.getMessage();
     }
   }
 

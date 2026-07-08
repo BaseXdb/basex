@@ -263,7 +263,7 @@ final class XMLScanner extends Job {
   private void attValue(final int ch) throws IOException {
     boolean wrong = false;
     int c = ch;
-    do {
+    while(c != quote) {
       if(c == 0) throw error(ATTCLOSE, (char) 0);
       wrong |= c == '\'' || c == '"';
       if(c == '<') throw error(wrong ? ATTCLOSE : ATTCHAR, '<');
@@ -276,7 +276,8 @@ final class XMLScanner extends Job {
       } else {
         token.add(c);
       }
-    } while((c = consume()) != quote);
+      c = consume();
+    }
   }
 
   /**
@@ -737,11 +738,14 @@ final class XMLScanner extends Job {
       if(markupDecl()) continue;
       if(!consume(COND)) return;
 
-      s(); // [61]
+      // [61] a parameter entity may stand in for the INCLUDE/IGNORE keyword
+      pe = true;
+      s();
       final boolean incl = consume(INCL);
       if(!incl) check(IGNO);
       s();
       check('[');
+      pe = false;
 
       if(incl) {
         extSubsetDecl();
@@ -808,12 +812,11 @@ final class XMLScanner extends Job {
             while(consume('|')) { s(); name(true); s(); alt = true; }
             check(')');
             if(!consume('*') && alt) throw error(INVEND);
-          } else {
+          } else { // [47] children
             cp();
+            while(sep()) cp();
             s();
-            //check(')'); // to be fixed...
-            while(!consume(')')) consume();
-            //input.prev(1);
+            check(')');
             occ();
           }
         } else {
@@ -871,23 +874,30 @@ final class XMLScanner extends Job {
   }
 
   /**
-   * Scans a mixed value and children. [47-50]
+   * Scans a content particle. [48]
    * @throws IOException I/O exception
    */
   private void cp() throws IOException {
     s();
-    final byte[] name = name(false);
-    if(name == null) { check('('); s(); cp(); } else { occ(); }
-
-    s();
-    if(consume('|') || consume(',')) {
+    if(name(false) == null) {
+      // choice or sequence: '(' cp (sep cp)* ')'
+      check('(');
       cp();
+      while(sep()) cp();
       s();
-    }
-    if(name == null) {
       check(')');
-      occ();
     }
+    occ();
+  }
+
+  /**
+   * Consumes a content-model separator (',' or '|'), skipping surrounding whitespace.
+   * @return true if a separator was found
+   * @throws IOException I/O exception
+   */
+  private boolean sep() throws IOException {
+    s();
+    return consume(',') || consume('|');
   }
 
   /**
