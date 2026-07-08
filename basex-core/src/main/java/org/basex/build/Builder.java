@@ -80,9 +80,16 @@ public abstract class Builder extends Job {
     try {
       // add document node and parse document
       parser.parse(this);
-    } finally {
-      parser.close();
+    } catch(final IOException ex) {
+      // release resources, but keep the original error (do not let close() mask it)
+      try {
+        parser.close();
+      } catch(final IOException suppressed) {
+        ex.addSuppressed(suppressed);
+      }
+      throw ex;
     }
+    parser.close();
     meta.lastid = meta.size - 1;
 
     if(Prop.debug) Util.errln(" " + perf + " (" + Performance.formatMemory() + ')');
