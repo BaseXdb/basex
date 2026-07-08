@@ -681,7 +681,7 @@ public class TextPanel extends BaseXPanel {
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e) || CUT2.is(e))
+    if(!hist.active() || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e) || CUT.is(e))
       return;
 
     final int caret = editor.pos();
@@ -826,7 +826,7 @@ public class TextPanel extends BaseXPanel {
   /** Cut command. */
   private class CutCmd extends GUIPopupCmd {
     /** Constructor. */
-    CutCmd() { super(Text.CUT, CUT1, CUT2); }
+    CutCmd() { super(Text.CUT, CUT); }
 
     @Override
     public void execute() {
@@ -842,7 +842,7 @@ public class TextPanel extends BaseXPanel {
   /** Copy command. */
   private class CopyCmd extends GUIPopupCmd {
     /** Constructor. */
-    CopyCmd() { super(Text.COPY, COPY1, COPY2); }
+    CopyCmd() { super(Text.COPY, COPY); }
 
     @Override
     public void execute() { copy(); }
@@ -853,7 +853,7 @@ public class TextPanel extends BaseXPanel {
   /** Paste command. */
   private class PasteCmd extends GUIPopupCmd {
     /** Constructor. */
-    PasteCmd() { super(Text.PASTE, PASTE1, PASTE2); }
+    PasteCmd() { super(Text.PASTE, PASTE); }
 
     @Override
     public void execute() {
@@ -904,7 +904,7 @@ public class TextPanel extends BaseXPanel {
   /** Find next hit. */
   private class FindNextCmd extends GUIPopupCmd {
     /** Constructor. */
-    FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT1, FINDNEXT2); }
+    FindNextCmd() { super(Text.FIND_NEXT, FINDNEXT); }
 
     @Override
     public void execute() { search(true); }
@@ -915,7 +915,7 @@ public class TextPanel extends BaseXPanel {
   /** Find previous hit. */
   private class FindPrevCmd extends GUIPopupCmd {
     /** Constructor. */
-    FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV1, FINDPREV2); }
+    FindPrevCmd() { super(Text.FIND_PREVIOUS, FINDPREV); }
 
     @Override
     public void execute() { search(false); }

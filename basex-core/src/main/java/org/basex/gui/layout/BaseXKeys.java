@@ -22,8 +22,10 @@ public enum BaseXKeys {
   /** Right.                 */ NEXTCHAR(NO_MOD, VK_RIGHT, SHIFT),
   /** Word left.             */ PREVWORD(MAC ? ALT : META, VK_LEFT, SHIFT),
   /** Word right.            */ NEXTWORD(MAC ? ALT : META, VK_RIGHT, SHIFT),
-  /** Beginning of line.     */ LINESTART(MAC ? META : NO_MOD, MAC ? VK_LEFT : VK_HOME, SHIFT),
-  /** End of line.           */ LINEEND(MAC ? META : NO_MOD, MAC ? VK_RIGHT : VK_END, SHIFT),
+  /** Beginning of line.     */ LINESTART(MAC ? META : NO_MOD, MAC ? VK_LEFT : VK_HOME, SHIFT,
+                                    NO_MOD, MAC ? VK_HOME : -1),
+  /** End of line.           */ LINEEND(MAC ? META : NO_MOD, MAC ? VK_RIGHT : VK_END, SHIFT,
+                                    NO_MOD, MAC ? VK_END : -1),
 
   /** Up.                    */ PREVLINE(NO_MOD, VK_UP, SHIFT),
   /** Down.                  */ NEXTLINE(NO_MOD, VK_DOWN, SHIFT),
@@ -47,12 +49,9 @@ public enum BaseXKeys {
   /** Undo.                  */ UNDOSTEP(META, VK_Z),
   /** Redo.                  */ REDOSTEP(MAC ? META | SHIFT : META, MAC ? VK_Z : VK_Y),
 
-  /** Cut.                   */ CUT1(META, VK_X),
-  /** Cut.                   */ CUT2(SHIFT, VK_DELETE),
-  /** Copy.                  */ COPY1(META, VK_C),
-  /** Copy.                  */ COPY2(META, VK_INSERT),
-  /** Paste.                 */ PASTE1(META, VK_V),
-  /** Paste.                 */ PASTE2(SHIFT, VK_INSERT),
+  /** Cut.                   */ CUT(META, VK_X, NO_MOD, SHIFT, VK_DELETE),
+  /** Copy.                  */ COPY(META, VK_C, NO_MOD, META, VK_INSERT),
+  /** Paste.                 */ PASTE(META, VK_V, NO_MOD, SHIFT, VK_INSERT),
   /** Select all.            */ SELECTALL(META, VK_A),
 
   /** Move line(s) down.     */ MOVEDOWN(MAC ? ALT | SHIFT : ALT, VK_DOWN),
@@ -88,10 +87,9 @@ public enum BaseXKeys {
   // Find
 
   /** Find search term.      */ FIND(META, VK_F),
-  /** Find next hit.         */ FINDNEXT1(MAC ? META : NO_MOD, VK_F3),
-  /** Find next hit.         */ FINDNEXT2(META, VK_G),
-  /** Find previous hit.     */ FINDPREV1(MAC ? META | SHIFT : SHIFT, VK_F3),
-  /** Find previous hit.     */ FINDPREV2(META | SHIFT, VK_G),
+  /** Find next hit.         */ FINDNEXT(MAC ? META : NO_MOD, VK_F3, NO_MOD, META, VK_G),
+  /** Find previous hit.     */ FINDPREV(MAC ? META | SHIFT : SHIFT, VK_F3, NO_MOD,
+                                             META | SHIFT, VK_G),
   /** Match case.            */ MATCHCASE(SHIFT, VK_F4),
   /** Whole word.            */ WHOLEWORD(SHIFT, VK_F5),
   /** Regular expression.    */ REGEX(SHIFT, VK_F6),
@@ -99,8 +97,7 @@ public enum BaseXKeys {
 
   // Font
 
-  /** Increment size.        */ INCFONT1(META, VK_PLUS),
-  /** Increment size.        */ INCFONT2(META, VK_EQUALS),
+  /** Increment size.        */ INCFONT(META, VK_PLUS, NO_MOD, META, VK_EQUALS),
   /** Decrease size.         */ DECFONT(META, VK_MINUS),
   /** Standard size.         */ NORMFONT(META, VK_0),
 
@@ -127,6 +124,27 @@ public enum BaseXKeys {
   private final int key;
   /** Exclusive modifiers flag. */
   private final int allowed;
+  /** Alternative modifiers. */
+  private final int altModifiers;
+  /** Alternative key ({@code -1}: none). */
+  private final int altKey;
+
+  /**
+   * Constructor with an alternative key combination.
+   * @param modifiers modifiers (shift, control, meta, alt key)
+   * @param key key code
+   * @param allowed additionally allowed modifiers
+   * @param altModifiers alternative modifiers
+   * @param altKey alternative key code ({@code -1}: none)
+   */
+  BaseXKeys(final int modifiers, final int key, final int allowed, final int altModifiers,
+      final int altKey) {
+    this.modifiers = modifiers;
+    this.key = key;
+    this.allowed = allowed;
+    this.altModifiers = altModifiers;
+    this.altKey = altKey;
+  }
 
   /**
    * Constructor.
@@ -135,9 +153,7 @@ public enum BaseXKeys {
    * @param allowed additionally allowed modifiers
    */
   BaseXKeys(final int modifiers, final int key, final int allowed) {
-    this.modifiers = modifiers;
-    this.key = key;
-    this.allowed = allowed;
+    this(modifiers, key, allowed, NO_MOD, -1);
   }
 
   /**
@@ -146,7 +162,7 @@ public enum BaseXKeys {
    * @param k key code
    */
   BaseXKeys(final int m, final int k) {
-    this(m, k, NO_MOD);
+    this(m, k, NO_MOD, NO_MOD, -1);
   }
 
   /**
@@ -156,9 +172,10 @@ public enum BaseXKeys {
    */
   public boolean is(final KeyEvent e) {
     final int c = e.getKeyCode();
+    final int cc = c == VK_UNDEFINED ? getExtendedKeyCodeForChar(e.getKeyChar()) : c;
     final int m = e.getModifiersEx() | allowed;
-    return m == (modifiers | allowed) &&
-        (c == VK_UNDEFINED ? getExtendedKeyCodeForChar(e.getKeyChar()) : c) == key;
+    return m == (modifiers | allowed) && cc == key ||
+        altKey != -1 && m == (altModifiers | allowed) && cc == altKey;
   }
 
   /**

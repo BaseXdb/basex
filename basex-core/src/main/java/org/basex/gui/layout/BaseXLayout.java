@@ -358,7 +358,7 @@ public final class BaseXLayout {
       // change font size
       final int fs = gui.gopts.get(GUIOptions.FONTSIZE);
       long nfs = fs;
-      if(INCFONT1.is(e) || INCFONT2.is(e)) {
+      if(INCFONT.is(e)) {
         nfs = Math.max(fs + 1, Math.round(fs * 1.05));
       } else if(DECFONT.is(e)) {
         nfs = Math.min(fs - 1, Math.round(fs / 1.05));

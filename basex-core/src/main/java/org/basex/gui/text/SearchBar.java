@@ -91,7 +91,7 @@ public final class SearchBar extends BaseXBack {
     find.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(FINDPREV1.is(e) || FINDPREV2.is(e) || FINDNEXT1.is(e) || FINDNEXT2.is(e)) {
+        if(FINDPREV.is(e) || FINDNEXT.is(e)) {
           editor.editor.noSelect();
           deactivate(false);
         } else if(ENTER.is(e)) {
