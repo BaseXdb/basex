@@ -2482,10 +2482,10 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "AxisStep" rule.
    * @param error show error if nothing is found
-   * @return step or {@code null}
+   * @return step, lookup expression, or {@code null}
    * @throws QueryException query exception
    */
-  private Step axisStep(final boolean error) throws QueryException {
+  private Expr axisStep(final boolean error) throws QueryException {
     Axis axis = null;
     ExprInfo test = null;
     if(wsConsume("..")) {
@@ -2535,11 +2535,16 @@ public class QueryParser extends InputParser {
       checkPred(false);
     }
 
-    // step with node test
+    // step with node test or selector
     final InputInfo ii = info();
-    if(test instanceof final Test t) return new CachedStep(ii, axis, t, preds.finish());
-    // step with selector
-    return new SelectorStep(ii, axis, (Expr) test, preds.finish());
+    final Step step = test instanceof final Test t
+        ? new CachedStep(ii, axis, t, preds.finish())
+        : new SelectorStep(ii, axis, (Expr) test, preds.finish());
+
+    // an axis step may be followed by lookups and further predicates (#2591)
+    if(!current('?')) return step;
+    final Expr lookup = lookup(Path.get(ii, null, step));
+    return lookup == null ? step : postfixOps(lookup, true);
   }
 
   /**
@@ -2647,29 +2652,40 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr postfix() throws QueryException {
-    Expr expr = primary();
-    if(expr != null) {
-      while(true) {
-        if(wsConsume("[")) {
-          final ExprList el = new ExprList();
-          do {
-            add(el, expr());
-            wsCheck("]");
-          } while(wsConsume("["));
-          expr = new CachedFilter(info(), expr, el.finish());
-        } else if(consume("=?>")) {
-          expr = methodCall(expr);
-        } else if(current('(')) {
-          expr = Functions.dynamic(expr, argumentList(false, null));
-        } else if(current('?')) {
-          expr = lookup(expr);
-          if(expr == null) break;
-        } else {
-          break;
-        }
+    final Expr expr = primary();
+    return expr != null ? postfixOps(expr, false) : null;
+  }
+
+  /**
+   * Parses the postfix operators that may follow a primary expression or an axis step.
+   * @param expr input expression
+   * @param axis parse the tail of an axis step (only predicates and lookups are allowed)
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  private Expr postfixOps(final Expr expr, final boolean axis) throws QueryException {
+    Expr result = expr;
+    while(true) {
+      if(wsConsume("[")) {
+        final ExprList el = new ExprList();
+        do {
+          add(el, expr());
+          wsCheck("]");
+        } while(wsConsume("["));
+        result = new CachedFilter(info(), result, el.finish());
+      } else if(!axis && consume("=?>")) {
+        result = methodCall(result);
+      } else if(!axis && current('(')) {
+        result = Functions.dynamic(result, argumentList(false, null));
+      } else if(current('?')) {
+        final Expr lookup = lookup(result);
+        if(lookup == null) break;
+        result = lookup;
+      } else {
+        break;
       }
     }
-    return expr;
+    return result;
   }
 
   /**
