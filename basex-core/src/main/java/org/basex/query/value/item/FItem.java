@@ -112,8 +112,7 @@ public abstract class FItem extends Item implements XQFunction {
         if(cc != null) body = body.optimize(cc);
       }
 
-      // the coerced item advertises the target type (observed by instance-of); the body's inferred
-      // type is kept as the refined return type so result typing still profits from it
+      // advertise the target type; keep the body type as refined return type for result typing
       final FuncType tp = cc != null ? ft.withRefinedType(body.seqType()) : ft;
       body.markTailCalls(null);
       return new FuncItem(info, body, vars, annotations(), tp, vs.stackSize(), funcName());

@@ -206,10 +206,7 @@ public final class Closure extends Single implements Scope, XQFunctionExpr {
       cc.removeScope(this);
     }
 
-    // the declared return type is observed by instance-of and function coercion; it is the type
-    // declared in the signature, or item()* if none was given (so 'fn() { "x" } instance of
-    // fn() as xs:string' yields false). The body's inferred type is kept as the refined return
-    // type, so that direct calls can still profit from the more specific result type.
+    // declared type for instance-of/coercion (item()* if none), body type as refined return type
     exprType.assign(FuncType.get(anns, declType, params).withRefinedType(expr.seqType()));
 
     // only evaluate if:

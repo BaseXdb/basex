@@ -22,13 +22,9 @@ import org.basex.util.*;
 public final class FuncType extends FType {
   /** Annotations. */
   public final AnnList anns;
-  /** Declared return type (observed by instance-of, coercion and subtyping). */
+  /** Declared return type (used by instance-of, coercion, subtyping). */
   public final SeqType declType;
-  /**
-   * Refined return type, a subtype of {@link #declType} inferred from the function body. Used for
-   * result typing (e.g. dynamic calls, folds); never observed by instance-of, so that a function
-   * whose body is more specific than its declared return type still matches only its declaration.
-   */
+  /** Refined return type (a subtype of {@link #declType}); used for result typing. */
   public final SeqType refinedType;
   /** Argument types (can be {@code null}, indicates that no types were specified). */
   public final SeqType[] argTypes;
@@ -53,8 +49,7 @@ public final class FuncType extends FType {
       final SeqType[] argTypes) {
     this.anns = anns;
     this.declType = declType == null ? ITEM_ZM : declType;
-    // the refined type must be a subtype of the declared type; a body type that is not (e.g. the
-    // integer body of 'fn() as xs:double { 1 }', whose result is coerced) contributes no refinement
+    // the refined type must be a subtype of the declared type; otherwise it adds no refinement
     this.refinedType = refinedType == null || !refinedType.instanceOf(this.declType) ? this.declType
                                                                                      : refinedType;
     this.argTypes = argTypes;
@@ -175,11 +170,7 @@ public final class FuncType extends FType {
     if(type instanceof ChoiceItemType) return type.union(this);
     final FuncType ft = type.funcType();
 
-    // two function types (a map or array is viewed through its function type) with matching arity:
-    // union argument, declared and refined return types structurally. This must happen before the
-    // instance-of short-circuits below, as those ignore the refined type: returning a single
-    // operand would drop the other's refined return type, unsoundly narrowing the result type of a
-    // call on the union.
+    // structural union, run before the instance-of short-circuits so the refined type is merged too
     if(this != FUNCTION && ft != null && ft != FUNCTION && argTypes != null &&
         ft.argTypes != null && argTypes.length == ft.argTypes.length) {
       final int arity = argTypes.length;
@@ -201,10 +192,7 @@ public final class FuncType extends FType {
   public Type intersect(final Type type) {
     if(type instanceof ChoiceItemType) return type.intersect(this);
 
-    // if one function type is a subtype of the other, the intersection is that operand. Its refined
-    // return type is still met with the other's (the instance-of check ignores the refined type),
-    // yielding the most specific result type for calls on the intersection; if the refined types
-    // are disjoint, the operand is kept unchanged (no less precise than before).
+    // subtype: the intersection is that operand, but still meet its refined type with the other's
     if(instanceOf(type)) {
       if(type instanceof final FuncType ft) {
         final SeqType rf = refinedType.intersect(ft.refinedType);

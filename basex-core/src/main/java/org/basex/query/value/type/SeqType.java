@@ -508,8 +508,7 @@ public final class SeqType {
   public boolean eq(final SeqType st) {
     if(this == st) return true;
     if(occ != st.occ) return false;
-    // an unresolved forward reference is a distinct placeholder: do not compare it via its
-    // temporary item() dereference (else e.g. a recursive record type would look like item())
+    // an unresolved forward reference is a distinct placeholder, not its temporary item() deref
     if(TypeRef.unresolved(type) || TypeRef.unresolved(st.type)) return type == st.type;
     return TypeRef.deref(type).eq(TypeRef.deref(st.type));
   }

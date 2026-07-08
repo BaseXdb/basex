@@ -150,8 +150,7 @@ public final class StaticFunc extends StaticDecl implements XQFunction {
 
   @Override
   public FuncType funcType() {
-    // align the refined return type with seqType() (the declared type, or the body type once the
-    // declared type has been checked and cleared), so this type stays consistent for result typing
+    // refined return type: the body type (via seqType), consistent with call-result typing
     return FuncType.get(anns, declType, params).withRefinedType(seqType());
   }
 
