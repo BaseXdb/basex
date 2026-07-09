@@ -5,6 +5,7 @@ import java.awt.event.*;
 
 import org.basex.gui.*;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is a scrollbar implementation, supporting arbitrary
@@ -57,6 +58,15 @@ public final class BaseXScrollBar extends BaseXPanel {
   /** Scrollbar slider offset. */
   private int barOffset;
 
+  /** Document-space y of the search hits ({@code null} if there are none). */
+  private IntList markPos;
+  /** Hits, rasterized to one flag per pixel row of the slider track. */
+  private boolean[] markRows;
+  /** Track height the hits were rasterized for. */
+  private int markHeight;
+  /** Panel height the hits were rasterized for. */
+  private int markTotal;
+
   /**
    * Default constructor. By default, the scrollbar is switched off
    * if the component is completely displayed.
@@ -100,6 +110,16 @@ public final class BaseXScrollBar extends BaseXPanel {
   }
 
   /**
+   * Assigns the positions of the search hits.
+   * @param ys ascending document-space y of the hits (can be {@code null})
+   */
+  public void marks(final IntList ys) {
+    markPos = ys;
+    markRows = null;
+    repaint();
+  }
+
+  /**
    * Sets the panel height.
    * @param h panel height
    */
@@ -130,6 +150,9 @@ public final class BaseXScrollBar extends BaseXPanel {
     g.setColor(GUIConstants.panelColor);
     g.fillRect(0, 0, SIZE, hh);
 
+    // draw the search hits below the slider
+    paintMarks(g, barH);
+
     // draw scroll slider
     int bh = SIZE - 2 + barPos;
     BaseXLayout.drawCell(g, 0, SIZE, bh, bh + barSize, false);
@@ -150,6 +173,48 @@ public final class BaseXScrollBar extends BaseXPanel {
     g.setColor(GUIConstants.gray);
     g.drawLine(0, 0, 0, hh);
     g.drawLine(SIZE - 1, 0, SIZE - 1, hh);
+  }
+
+  /**
+   * Draws a marker for each search hit, rasterized to the pixel rows of the slider track.
+   * @param g graphics reference
+   * @param barH height of the slider track
+   */
+  private void paintMarks(final Graphics g, final int barH) {
+    if(markPos == null || markPos.isEmpty() || barH < 1) return;
+
+    if(markRows == null || markHeight != barH || markTotal != height) {
+      markHeight = barH;
+      markTotal = height;
+      markRows = new boolean[barH];
+      final int ms = markPos.size();
+      for(int m = 0; m < ms; m++) markRows[row(markPos.get(m), barH)] = true;
+    }
+    g.setColor(GUIConstants.color2);
+    for(int r = 0; r < barH; r++) {
+      if(markRows[r]) g.fillRect(3, markY(r), SIZE - 7, 2);
+    }
+  }
+
+  /**
+   * Returns the screen y of a marker, clamped to stay clear of the scroll buttons.
+   * The slider track overlaps them by two pixels, and they are painted on top of the markers.
+   * @param r pixel row of the slider track
+   * @return screen y
+   */
+  private int markY(final int r) {
+    return Math.max(SIZE, Math.min(hh - SIZE - 2, SIZE - 2 + r));
+  }
+
+  /**
+   * Returns the pixel row of the slider track that represents the specified document-space y.
+   * The slider scaling factor must not be used: {@link #barOffset} shrinks it.
+   * @param y document-space y
+   * @param barH height of the slider track
+   * @return pixel row
+   */
+  private int row(final int y, final int barH) {
+    return Math.max(0, Math.min(barH - 1, (int) ((long) y * barH / height)));
   }
 
   /**

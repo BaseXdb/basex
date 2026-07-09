@@ -439,6 +439,8 @@ public final class SearchBar extends BaseXBack {
     find.setToolTipText(error ? sc.error : Text.FIND + "\u2026");
     replace.highlight(GUIConstants.backColor);
     replace.setToolTipText(Text.REPLACE_WITH + "\u2026");
+    // the markers depend on the results; the count also on the navigation position
+    editor.marks();
     // a requested jump is deferred until its results arrive; it refreshes the count itself
     final SearchDir dir = jumpDir;
     final boolean select = jumpSelect;

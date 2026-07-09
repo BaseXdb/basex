@@ -65,6 +65,14 @@ final class TextLineCache {
   }
 
   /**
+   * Returns the number of cached lines.
+   * @return number of lines
+   */
+  int size() {
+    return ps.size();
+  }
+
+  /**
    * Returns the index of the last line starting at or above the specified document-space y.
    * @param y document-space y
    * @return line index

@@ -417,6 +417,13 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
+   * Updates the search-hit markers of the scroll bar.
+   */
+  final void marks() {
+    rend.marks();
+  }
+
+  /**
    * Jumps to the current, next or previous search string.
    * @param dir search direction
    * @param select select hit

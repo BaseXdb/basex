@@ -285,6 +285,41 @@ final class TextRenderer extends BaseXBack {
     cache.finish(text.size(), width);
     height = getHeight() + fontHeight;
     scroll.height(y + OFFSET);
+    marks();
+  }
+
+  /**
+   * Assigns the positions of the search hits to the scroll bar.
+   * The hits are mapped to the document-space y of their line, the axis of the slider.
+   */
+  void marks() {
+    final IntList starts = text.searchResults[0], ys = new IntList();
+    // a stale line cache yields no positions; the next layout will assign them
+    if(cache.valid(text.size(), width)) {
+      final int ss = starts.size(), cs = cache.size();
+      // one marker per line: the number of hits in a line is unbounded
+      for(int s = 0; s < ss;) {
+        final int idx = cache.indexByPos(starts.get(s));
+        final boolean last = idx + 1 == cs;
+        // a wrapped line extends over several rows
+        final int top = lineTop(idx), end = last ? top + fontHeight : lineTop(idx + 1);
+        for(int y2 = top; y2 < end; y2 += fontHeight) ys.add(y2);
+        if(last) break;
+        // continue with the first hit of the next line
+        final int next = starts.sortedIndexOf(cache.pos(idx + 1));
+        s = next < 0 ? -next - 1 : next;
+      }
+    }
+    scroll.marks(ys);
+  }
+
+  /**
+   * Returns the document-space y of the first rendered row of the specified line.
+   * @param idx line index
+   * @return y
+   */
+  private int lineTop(final int idx) {
+    return Math.max(0, cache.y(idx) - fontHeight);
   }
 
   /**
