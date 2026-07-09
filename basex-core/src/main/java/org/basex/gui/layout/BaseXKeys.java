@@ -92,7 +92,8 @@ public enum BaseXKeys {
   /** Match case.            */ MATCHCASE(SHIFT, VK_F4),
   /** Whole word.            */ WHOLEWORD(SHIFT, VK_F5),
   /** Regular expression.    */ REGEX(SHIFT, VK_F6),
-  /** Multi-line.            */ MULTILINE(SHIFT, VK_F7),
+  /** Dot matches newline.   */ DOTALL(SHIFT, VK_F7),
+  /** Replace all.           */ REPLACEALL(META | SHIFT, VK_R),
 
   // Font
 

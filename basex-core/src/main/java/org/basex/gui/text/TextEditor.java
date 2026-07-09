@@ -5,8 +5,6 @@ import static org.basex.util.Token.*;
 import java.text.*;
 import java.util.*;
 
-import org.basex.core.*;
-import org.basex.core.jobs.*;
 import org.basex.gui.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.util.*;
@@ -35,6 +33,10 @@ public final class TextEditor {
 
   /** Start and end positions of search terms (initially empty). */
   IntList[] searchResults = { new IntList(), new IntList() };
+  /** Index of the current search hit ({@code -1} if none). */
+  private int searchHit = -1;
+  /** Indicates whether the current search hit was reached by a selecting jump. */
+  private boolean searchSelected;
   /** Start position of a text selection ({@code -1} if no text is selected). */
   int start = -1;
   /** End position of a text selection +1 ({@code -1} if no text is selected). */
@@ -94,15 +96,13 @@ public final class TextEditor {
     // start new search
     t = new Thread(() -> {
       try {
+        searchHit = -1;
         searchResults = sc.search(text, jump);
         searchContext = sc;
         searchThread = null;
-      } catch(final JobException ex) {
-        Util.debug(ex);
-        // search was interrupted
       } catch(final Exception ex) {
-        final String info = Util.message(ex).replaceAll(Text.NL + ".*", "");
-        gui.status.setText(Text.REGULAR_EXPR + Text.COLS + info, false);
+        // search was interrupted, or failed unexpectedly
+        Util.debug(ex);
       }
     });
     t.setDaemon(true);
@@ -130,6 +130,17 @@ public final class TextEditor {
       e = ts;
     }
     return rc.replace(searchContext, text, s, e);
+  }
+
+  /**
+   * Replaces the current search hit.
+   * @param rc replace context
+   * @return selection offsets, or {@code null} if there is no current hit
+   */
+  int[] replaceHit(final ReplaceContext rc) {
+    final int hit = searchHit;
+    if(hit < 0 || hit >= searchResults[0].size()) return null;
+    return rc.replace(searchContext, text, searchResults[0].get(hit), searchResults[1].get(hit));
   }
 
   /**
@@ -323,15 +334,15 @@ public final class TextEditor {
   void lineStart(final boolean select) {
     if(select && !isSelected()) startSelect();
 
-    final int p = pos;
-    boolean s = true;
     // find beginning of line
-    while(back(select) != '\n') s &= FTToken.ws(curr());
+    final int p = pos;
+    while(back(select) != '\n');
     if(pos != 0 || curr() == '\n') forward(select);
-    // move to first non-whitespace character
-    if(p == pos || !s) {
-      while(FTToken.ws(curr()) && curr() != '\n') forward(select);
-    }
+
+    // move to first non-whitespace character, or back to line start if cursor was already there
+    final int bol = pos;
+    while(FTToken.ws(curr()) && curr() != '\n') forward(select);
+    if(pos == p) pos = bol;
 
     if(select) endSelection();
   }
@@ -1312,20 +1323,27 @@ public final class TextEditor {
    * @return new cursor position, or {@code -1}
    */
   int jump(final SearchDir dir, final boolean select) {
-    if(searchResults[0].isEmpty()) {
+    final int sl = searchResults[0].size();
+    if(sl == 0) {
+      searchHit = -1;
       if(select) noSelect();
       return -1;
     }
 
-    int s = searchResults[0].sortedIndexOf(!select || isSelected() ? pos : pos - 1);
+    // a zero-width hit (e.g. empty line for '.*') has start == end, so isSelected() is false;
+    // treat a hit we already jumped to as the current one so navigation can move past it
+    final boolean current = isSelected() || searchSelected && searchHit >= 0 && searchHit < sl &&
+        searchResults[0].get(searchHit) == pos;
+    int s = searchResults[0].sortedIndexOf(!select || current ? pos : pos - 1);
     s = switch(dir) {
       case CURRENT -> s < 0 ? -s - 1 : s;
       case FORWARD -> s < 0 ? -s - 1 : s + 1;
       case BACKWARD -> s < 0 ? -s - 2 : s - 1;
     };
-    final int sl = searchResults[0].size();
     if(s < 0) s = sl - 1;
     else if(s == sl) s = 0;
+    searchHit = s;
+    searchSelected = select;
     final int p = searchResults[0].get(s);
     if(select) {
       start = searchResults[1].get(s);
@@ -1333,5 +1351,13 @@ public final class TextEditor {
     }
     pos = p;
     return p;
+  }
+
+  /**
+   * Returns the index of the current search hit.
+   * @return index, or {@code -1}
+   */
+  int searchIndex() {
+    return searchHit;
   }
 }

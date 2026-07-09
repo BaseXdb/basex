@@ -24,12 +24,16 @@ final class SearchContext {
   final boolean mcase;
   /** Mode: regular expression. */
   final boolean regex;
-  /** Mode: multi-line. */
-  final boolean multi;
+  /** Mode: dot matches newline. */
+  final boolean dotall;
   /** Mode: whole word. */
   final boolean word;
   /** Search string. */
   final String string;
+  /** Compiled pattern (regex mode only; {@code null} if absent or invalid). */
+  final Pattern pattern;
+  /** Error message of an invalid regular expression ({@code null} otherwise). */
+  final String error;
   /** Number of results. */
   int nr;
 
@@ -43,12 +47,45 @@ final class SearchContext {
     mcase = bar.mcase.isSelected();
     word = bar.word.isSelected();
     regex = bar.regex.isSelected();
-    multi = bar.multi.isSelected();
-    String srch = mcase ? text : text.toLowerCase(Locale.ENGLISH);
-    // speed up regular expressions starting with wildcards
-    if(regex && (srch.startsWith(".*") || srch.startsWith("(.*") ||
-        srch.startsWith(".+") || srch.startsWith("(.+"))) srch = '^' + srch;
-    string = srch;
+    dotall = bar.dotall.isSelected();
+    // do not case-fold regular expressions: the pattern may contain case-sensitive
+    // metacharacters (\D, \S, \Q…\E, …); case-insensitivity is applied via the flag below
+    string = mcase || regex ? text : text.toLowerCase(Locale.ENGLISH);
+
+    // compile pattern once; remember error message for invalid expressions
+    Pattern pt = null;
+    String err = null;
+    if(regex && !string.isEmpty()) {
+      try {
+        pt = pattern(string, mcase, dotall);
+      } catch(final PatternSyntaxException ex) {
+        err = ex.getDescription();
+      }
+    }
+    pattern = pt;
+    error = err;
+  }
+
+  /**
+   * Compiles a regular expression as used by the search.
+   * @param string search string
+   * @param mcase match case
+   * @param dotall dot matches newline
+   * @return compiled pattern
+   */
+  static Pattern pattern(final String string, final boolean mcase, final boolean dotall) {
+    // anchor greedy leading wildcards (.* / .+) to avoid quadratic backtracking on long lines;
+    // skip lazy quantifiers (.*? / .+?), which would drop matches after the first.
+    // only a wildcard at the very start may be anchored: inside a group, the anchor would also
+    // bind to constructs that have no leading wildcard, such as (.*a)?b or (.*a|b)
+    final String pat = (string.startsWith(".*") || string.startsWith(".+")) &&
+        !string.startsWith(".*?") && !string.startsWith(".+?") ? '^' + string : string;
+    // ^/$ anchor per line; . matches newlines only in dot-all mode
+    int flags = Pattern.MULTILINE;
+    if(dotall) flags |= Pattern.DOTALL;
+    // UNICODE_CASE: fold non-ASCII characters as well, as the simple search does
+    if(!mcase) flags |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
+    return Pattern.compile(pat, flags);
   }
 
   /**
@@ -59,7 +96,7 @@ final class SearchContext {
    */
   IntList[] search(final byte[] txt, final boolean jump) {
     final IntList start = new IntList(), end = new IntList();
-    if(!string.isEmpty()) {
+    if(!string.isEmpty() && error == null) {
       if(regex) searchRegEx(start, end, txt);
       else searchSimple(start, end, txt);
     }
@@ -76,52 +113,26 @@ final class SearchContext {
    * @param text text to be searched
    */
   private void searchRegEx(final IntList start, final IntList end, final byte[] text) {
-    int flags = Pattern.DOTALL;
-    if(!mcase) flags |= Pattern.CASE_INSENSITIVE;
-    final Pattern pattern = Pattern.compile(string, flags);
-    if(multi) {
-      int c = 0, p = 0;
-      final Matcher m = pattern.matcher(new StoppableString(string(text)));
-      while(m.find()) {
-        final int s = m.start(), e = m.end();
-        while(c < s) {
-          p += cl(text, p);
-          c++;
-        }
-        start.add(p);
-        while(c < e) {
-          p += cl(text, p);
-          c++;
-        }
-        end.add(p);
-        if(start.size() >= MAX) return;
+    // match against the whole text: ^/$ anchor per line, . spans lines only in dot-all mode.
+    // c: char (UTF-16) index into the matched string; p: byte offset into text.
+    // A 4-byte UTF-8 sequence is a supplementary code point, i.e. two UTF-16 chars.
+    int c = 0, p = 0;
+    final Matcher m = pattern.matcher(new StoppableString(string(text)));
+    while(m.find()) {
+      final int s = m.start(), e = m.end();
+      while(c < s) {
+        final int bl = cl(text, p);
+        p += bl;
+        c += bl == 4 ? 2 : 1;
       }
-    } else {
-      final int os = text.length;
-      final TokenBuilder tb = new TokenBuilder(os);
-      for(int t = 0, o = 0; o <= os; o++) {
-        StoppableString.checkStop();
-        if(o < os ? text[o] == '\n' : o != t) {
-          int c = 0, p = t;
-          final Matcher m = pattern.matcher(new StoppableString(string(text, t, o - t)));
-          while(m.find()) {
-            final int s = m.start(), e = m.end();
-            while(c < s) {
-              p += cl(text, p);
-              c++;
-            }
-            start.add(p);
-            while(c < e) {
-              p += cl(text, p);
-              c++;
-            }
-            end.add(p);
-            if(start.size() >= MAX) return;
-          }
-          if(o < os) tb.add('\n');
-          t = o + 1;
-        }
+      start.add(p);
+      while(c < e) {
+        final int bl = cl(text, p);
+        p += bl;
+        c += bl == 4 ? 2 : 1;
       }
+      end.add(p);
+      if(start.size() >= MAX) return;
     }
   }
 
@@ -169,32 +180,14 @@ final class SearchContext {
     // ignore empty strings and others that stretch over multiple lines
     if(str.isEmpty() || str.contains("\n")) return true;
 
-    if(regex) {
-      try {
-        int flags = Pattern.DOTALL;
-        if(!mcase) flags |= Pattern.CASE_INSENSITIVE;
-        final Pattern pattern = Pattern.compile(string, flags);
-        return pattern.matcher(str).matches();
-      } catch(final Exception ex) {
-        Util.debug(ex);
-        return false;
-      }
-    }
+    if(regex) return pattern != null && pattern.matcher(str).matches();
     return mcase ? string.equals(str) : string.equalsIgnoreCase(str);
-  }
-
-  /**
-   * Returns the number of results.
-   * @return number of results
-   */
-  int nr() {
-    return nr;
   }
 
   @Override
   public boolean equals(final Object obj) {
     if(this == obj) return true;
     return obj instanceof final SearchContext sc && mcase == sc.mcase && word == sc.word &&
-        regex == sc.regex && multi == sc.multi && Strings.eq(string, sc.string);
+        regex == sc.regex && dotall == sc.dotall && Strings.eq(string, sc.string);
   }
 }

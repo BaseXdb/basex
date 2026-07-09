@@ -843,21 +843,17 @@ public interface Text {
   /** Command info. */
   String REPLACE_ALL = lang("replace_all");
   /** Command info. */
+  String REPLACE_NEXT = lang("replace_next");
+  /** Command info. */
   String REPLACE_WITH = lang("replace_with");
   /** Match case. */
   String MATCH_CASE = lang("match_case");
   /** Whole word. */
   String WHOLE_WORD = lang("whole_word");
-  /** Multi-line mode. */
-  String MULTI_LINE = lang("multi_line");
+  /** Dot matches newline. */
+  String DOT_ALL = lang("dot_all");
   /** Regular expression. */
   String REGULAR_EXPR = lang("regular_expr");
-  /** % string(s) found.. */
-  String STRINGS_FOUND_X = lang("strings_found_%");
-  /** Strings were replaced.. */
-  String STRINGS_REPLACED = lang("strings_replaced");
-  /** Searching. */
-  String SEARCHING = lang("searching");
 
   /** Serialization parameters. */
   String SERIALIZATION = lang("serialization");

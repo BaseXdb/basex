@@ -126,13 +126,14 @@ public class TextPanel extends BaseXPanel {
     new BaseXPopup(this, editable ?
       new GUICommand[] {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
-        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new MultiLineCmd(), null,
+        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
+        new ReplaceNextCmd(), new ReplaceAllCmd(), null,
         new GotoCmd(), null,
         new UndoCmd(), new RedoCmd(), null,
         new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd() } :
       new GUICommand[] {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
-        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new MultiLineCmd(), null,
+        new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
         new GotoCmd(), null,
         new AllCmd(), new CopyCmd() }
     );
@@ -383,7 +384,7 @@ public class TextPanel extends BaseXPanel {
    * @param jump jump to next hit
    */
   final void search(final SearchContext sc, final boolean jump) {
-    rend.search(sc, jump);
+    editor.search(sc, jump);
   }
 
   /**
@@ -392,17 +393,34 @@ public class TextPanel extends BaseXPanel {
    */
   final void replace(final ReplaceContext rc) {
     try {
-      final int[] select = rend.replace(rc);
+      final int[] select = editor.replace(rc);
       if(rc.text != null) {
         final boolean sel = editor.isSelected();
         setText(rc.text);
         editor.select(select[0], select[sel ? 1 : 0]);
         release(Action.CHECK);
       }
-      gui.status.setText(Text.STRINGS_REPLACED, true);
     } catch(final Exception ex) {
-      final String msg = Util.message(ex).replaceAll(Prop.NL + ".*", "");
-      gui.status.setText(Text.REGULAR_EXPR + Text.COLS + msg, false);
+      Util.debug(ex);
+    }
+  }
+
+  /**
+   * Replaces the current search hit and moves the caret behind the replacement.
+   * @param rc replace context
+   * @return {@code true} if a hit was replaced
+   */
+  final boolean replaceNext(final ReplaceContext rc) {
+    try {
+      final int[] select = editor.replaceHit(rc);
+      if(select == null) return false;
+      setText(rc.text);
+      setCaret(select[1]);
+      release(Action.CHECK);
+      return true;
+    } catch(final Exception ex) {
+      Util.debug(ex);
+      return false;
     }
   }
 
@@ -412,7 +430,10 @@ public class TextPanel extends BaseXPanel {
    * @param select select hit
    */
   protected final void jump(final SearchDir dir, final boolean select) {
-    SwingUtilities.invokeLater(() -> scroll(rend.jump(dir, select), 1));
+    SwingUtilities.invokeLater(() -> {
+      scroll(rend.jump(dir, select), 1);
+      if(search != null) search.refreshCount();
+    });
   }
 
   // MOUSE INTERACTIONS ===========================================================================
@@ -969,19 +990,41 @@ public class TextPanel extends BaseXPanel {
     public boolean selected(final GUI main) { return search.regex.isSelected(); }
   }
 
-  /** Multi-line search. */
-  private class MultiLineCmd extends GUIPopupCmd {
+  /** Dot-matches-newline search. */
+  private class DotAllCmd extends GUIPopupCmd {
     /** Constructor. */
-    MultiLineCmd() { super(Text.MULTI_LINE, MULTILINE); }
+    DotAllCmd() { super(Text.DOT_ALL, DOTALL); }
 
     @Override
-    public void execute() { search.toggle(search.multi); }
+    public void execute() { search.toggle(search.dotall); }
     @Override
     public boolean toggle() { return true; }
     @Override
-    public boolean enabled(final GUI main) { return search != null && search.multi.isEnabled(); }
+    public boolean enabled(final GUI main) { return search != null && search.dotall.isEnabled(); }
     @Override
-    public boolean selected(final GUI main) { return search.multi.isSelected(); }
+    public boolean selected(final GUI main) { return search.dotall.isSelected(); }
+  }
+
+  /** Replace next hit. */
+  private class ReplaceNextCmd extends GUIPopupCmd {
+    /** Constructor. */
+    ReplaceNextCmd() { super(Text.REPLACE_NEXT); }
+
+    @Override
+    public void execute() { search.replaceNext(); }
+    @Override
+    public boolean enabled(final GUI main) { return search != null && search.replaceEnabled(); }
+  }
+
+  /** Replace all hits. */
+  private class ReplaceAllCmd extends GUIPopupCmd {
+    /** Constructor. */
+    ReplaceAllCmd() { super(Text.REPLACE_ALL, REPLACEALL); }
+
+    @Override
+    public void execute() { search.replaceAll(); }
+    @Override
+    public boolean enabled(final GUI main) { return search != null && search.replaceEnabled(); }
   }
 
   /**

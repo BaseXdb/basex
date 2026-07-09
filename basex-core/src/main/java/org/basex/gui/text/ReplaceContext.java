@@ -15,6 +15,8 @@ import org.basex.util.*;
 final class ReplaceContext {
   /** Replace string. */
   private final String replace;
+  /** Replace only the first hit in the range (regex mode). */
+  private final boolean single;
   /** Text. */
   byte[] text;
 
@@ -23,7 +25,17 @@ final class ReplaceContext {
    * @param replace replacement text
    */
   ReplaceContext(final String replace) {
+    this(replace, false);
+  }
+
+  /**
+   * Constructor.
+   * @param replace replacement text
+   * @param single replace only the first hit in the range (regex mode)
+   */
+  ReplaceContext(final String replace, final boolean single) {
     this.replace = replace;
+    this.single = single;
   }
 
   /**
@@ -41,21 +53,9 @@ final class ReplaceContext {
     } else {
       final TokenBuilder tb = new TokenBuilder(os).add(txt, 0, start);
       if(sc.regex) {
-        // regular expressions, ignoring position arrays
-        int flags = Pattern.DOTALL;
-        if(!sc.mcase) flags |= Pattern.CASE_INSENSITIVE;
-        final Pattern pattern = Pattern.compile(sc.string, flags);
-        if(sc.multi) {
-          tb.add(pattern.matcher(string(txt, start, end - start)).replaceAll(replace));
-        } else {
-          for(int e = start, s = start; e <= end; e++) {
-            if(e < end ? txt[e] == '\n' : e != s) {
-              tb.add(pattern.matcher(string(txt, s, e - s)).replaceAll(replace));
-              if(e < end) tb.add('\n');
-              s = e + 1;
-            }
-          }
-        }
+        // regular expressions, applied to the whole range (ignoring position arrays)
+        final Matcher matcher = sc.pattern.matcher(string(txt, start, end - start));
+        tb.add(single ? matcher.replaceFirst(replace) : matcher.replaceAll(replace));
       } else {
         final byte[] srch = token(sc.string);
         final byte[] rplc = token(replace);
