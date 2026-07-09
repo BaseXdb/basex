@@ -154,7 +154,8 @@ public final class DialogManage extends BaseXDialog {
       for(final String s : dbs) {
         if(ctx.soptions.dbExists(s)) cmds.add(new DropDB(s));
       }
-      if(!BaseXDialog.confirm(gui, Util.info(DROPPING_DB_X, cmds.size()))) return;
+      final String count = BaseXLayout.format(cmds.size());
+      if(!BaseXDialog.confirm(gui, Util.info(DROPPING_DB_X, count))) return;
       refresh = true;
     } else if(cmp == rename) {
       final DialogInput input = new DialogInput(db, this, Action.ALTER_DATABASE);
@@ -184,7 +185,8 @@ public final class DialogManage extends BaseXDialog {
       backups.requestFocusInWindow();
     } else if(cmp == deleteAll) {
       final String[] back = backups.getList();
-      if(!BaseXDialog.confirm(gui, Util.info(DROP_BACKUPS_X, back.length))) return;
+      final String count = BaseXLayout.format(back.length);
+      if(!BaseXDialog.confirm(gui, Util.info(DROP_BACKUPS_X, count))) return;
       for(final String b : back) cmds.add(new DropBackup(b));
       refresh = true;
     } else {

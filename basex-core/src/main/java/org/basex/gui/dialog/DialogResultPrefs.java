@@ -2,8 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 
-import java.text.*;
-
 import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -88,7 +86,7 @@ final class DialogResultPrefs extends BaseXBack {
     gopts.set(GUIOptions.MAXTEXT, mt);
     gopts.set(GUIOptions.MAXRESULTS, mr);
 
-    resultsLabel.setText(mr == Integer.MAX_VALUE ? ALL : new DecimalFormat("#,###,###").format(mr));
+    resultsLabel.setText(mr == Integer.MAX_VALUE ? ALL : BaseXLayout.format(mr));
     textLabel.setText(mt == Integer.MAX_VALUE ? ALL : Performance.formatHuman(mt));
     return true;
   }

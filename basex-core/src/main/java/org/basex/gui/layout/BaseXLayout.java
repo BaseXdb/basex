@@ -567,6 +567,15 @@ public final class BaseXLayout {
   }
 
   /**
+   * Returns a grouped representation of the specified number.
+   * @param number number
+   * @return string representation
+   */
+  public static String format(final long number) {
+    return new DecimalFormat("#,###,###").format(number);
+  }
+
+  /**
    * Returns a string representation of the number of results.
    * @param count number of results (ignored if {@code -1})
    * @param bytes number of bytes (ignored if {@code -1})
@@ -578,8 +587,7 @@ public final class BaseXLayout {
     final BiFunction<Long, Integer, String> more = (num, max) -> num >= max ? "\u2265" : "";
     final StringBuilder sb = new StringBuilder();
     if(count >= 0) {
-      final String num = new DecimalFormat("#,###,###").format(count);
-      final String text = more.apply(count, gopts.get(GUIOptions.MAXRESULTS)) + num;
+      final String text = more.apply(count, gopts.get(GUIOptions.MAXRESULTS)) + format(count);
       sb.append(Util.info(count == 1 ? Text.RESULT_X : Text.RESULTS_X, text));
       if(bytes >= 0) {
         final int maxtext = gopts.get(GUIOptions.MAXTEXT);

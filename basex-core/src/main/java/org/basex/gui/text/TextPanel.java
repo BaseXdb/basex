@@ -1138,7 +1138,8 @@ public class TextPanel extends BaseXPanel {
           mi.addActionListener(al);
         }
         if(pm.getComponentCount() >= 15) {
-          final JMenuItem mi = new JMenuItem("... " + Util.info(Text.RESULTS_X, pairs.size()));
+          final JMenuItem mi = new JMenuItem("… " + Util.info(Text.RESULTS_X,
+              BaseXLayout.format(pairs.size())));
           mi.setEnabled(false);
           pm.add(mi);
           break;

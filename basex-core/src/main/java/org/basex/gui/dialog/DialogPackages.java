@@ -128,7 +128,8 @@ public final class DialogPackages extends BaseXDialog {
       refresh = true;
       cmds.add(new RepoInstall(file.path(), null));
     } else if(cmp == delete) {
-      if(!BaseXDialog.confirm(gui, Util.info(DELETE_PACKAGES_X, pkgs.size()))) return;
+      final String count = BaseXLayout.format(pkgs.size());
+      if(!BaseXDialog.confirm(gui, Util.info(DELETE_PACKAGES_X, count))) return;
       refresh = true;
       for(final String pkg : pkgs) cmds.add(new RepoDelete(pkg, null));
     } else {
