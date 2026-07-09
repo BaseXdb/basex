@@ -634,6 +634,7 @@ final class TextRenderer extends BaseXBack {
    * @param s syntax highlighter
    */
   void setSyntax(final Syntax s) {
+    if(syntax != s) cache.reset();
     syntax = s;
   }
 

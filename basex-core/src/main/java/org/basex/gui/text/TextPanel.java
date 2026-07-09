@@ -226,6 +226,7 @@ public class TextPanel extends BaseXPanel {
    */
   public final void setSyntax(final Syntax syntax) {
     rend.setSyntax(syntax);
+    if(isShowing()) resizeCode.invokeLater();
   }
 
   /**
