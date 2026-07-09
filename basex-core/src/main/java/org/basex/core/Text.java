@@ -846,11 +846,13 @@ public interface Text {
   String REPLACE_NEXT = lang("replace_next");
   /** Command info. */
   String REPLACE_WITH = lang("replace_with");
+  /** Number of replaced strings. */
+  String STRINGS_REPLACED_X = lang("strings_replaced_%");
   /** Match case. */
   String MATCH_CASE = lang("match_case");
   /** Whole word. */
   String WHOLE_WORD = lang("whole_word");
-  /** Dot matches newline. */
+  /** Dot matches all. */
   String DOT_ALL = lang("dot_all");
   /** Regular expression. */
   String REGULAR_EXPR = lang("regular_expr");

@@ -5,6 +5,8 @@ import static org.basex.util.Token.*;
 import java.text.*;
 import java.util.*;
 
+import javax.swing.*;
+
 import org.basex.gui.*;
 import org.basex.gui.text.SearchBar.*;
 import org.basex.util.*;
@@ -44,12 +46,17 @@ public final class TextEditor {
   /** Start position of an error highlighting ({@code -1} for no error). */
   int error = -1;
 
+  /** Search context. */
+  SearchContext searchContext;
+
   /** GUI reference. */
   private final GUI gui;
-  /** Search context. */
-  private SearchContext searchContext;
   /** Search thread. */
   private Thread searchThread;
+  /** Id of the most recent search. */
+  private long searchId;
+  /** Result of the last decoding (accessed by the search thread and the event dispatch thread). */
+  private volatile Decoded decoded;
   /** Text array to be written. */
   private byte[] text = EMPTY;
   /** Number of lines. Required for displaying line numbers. */
@@ -82,7 +89,29 @@ public final class TextEditor {
   }
 
   /**
-   * Sets a new search context.
+   * A decoded text and the byte array it was decoded from (compared by identity).
+   * @param text text
+   * @param string decoded text
+   */
+  private record Decoded(byte[] text, String string) { }
+
+  /**
+   * Returns the specified text as string; the result of the last call is cached.
+   * Two threads may decode the same text at once, but none of them is ever blocked.
+   * @param txt text
+   * @return decoded text
+   */
+  private String decode(final byte[] txt) {
+    final Decoded dec = decoded;
+    if(dec != null && dec.text() == txt) return dec.string();
+    final String str = string(txt);
+    decoded = new Decoded(txt, str);
+    return str;
+  }
+
+  /**
+   * Sets a new search context. The search runs in a separate thread; its results are adopted,
+   * and accessed, in the event dispatch thread.
    * @param sc search context (can be {@code null})
    * @param jump jump to next search result
    */
@@ -90,16 +119,23 @@ public final class TextEditor {
     if(sc == null) return;
 
     // interrupt old search thread
-    Thread t = searchThread;
-    if(t != null) t.interrupt();
+    final Thread old = searchThread;
+    if(old != null) old.interrupt();
 
-    // start new search
-    t = new Thread(() -> {
+    // start new search on a snapshot of the current text
+    final byte[] txt = text;
+    final long id = ++searchId;
+    final Thread t = new Thread(() -> {
       try {
-        searchHit = -1;
-        searchResults = sc.search(text, jump);
-        searchContext = sc;
-        searchThread = null;
+        final IntList[] results = sc.search(txt, decode(txt));
+        SwingUtilities.invokeLater(() -> {
+          // discard the results of a search that has been superseded
+          if(id != searchId) return;
+          searchResults = results;
+          searchHit = -1;
+          searchContext = sc;
+          if(sc.bar != null) sc.bar.refresh(this, sc, jump);
+        });
       } catch(final Exception ex) {
         // search was interrupted, or failed unexpectedly
         Util.debug(ex);
@@ -111,36 +147,55 @@ public final class TextEditor {
   }
 
   /**
-   * Replaces the text.
+   * Replaces all hits; a selection restricts the replacement.
    * @param rc replace context
-   * @return selection offsets
+   * @return new range of the selection, or {@code null} if the whole text was replaced
    */
   int[] replace(final ReplaceContext rc) {
-    // only adopt selection if it extends over more than one line
-    final int ts = size();
-    int s = Math.min(start, end), e = Math.max(start, end);
-    boolean sel = isSelected();
-    if(sel) {
-      int p = s - 1;
-      while(++p < e && text[p] != '\n');
-      sel = p < e;
-    }
-    if(!sel) {
-      s = 0;
-      e = ts;
-    }
-    return rc.replace(searchContext, text, s, e);
+    final int[] range = selectionRange();
+    final int[] rng = rc.replace(searchContext, text, decode(text), range != null ? range[0] : 0,
+        range != null ? range[1] : size());
+    return range != null ? rng : null;
   }
 
   /**
-   * Replaces the current search hit.
+   * Returns the current text selection if it restricts a replacement.
+   * A selected search hit does not: Replace All must not be reduced to a single hit.
+   * @return offsets, or {@code null}
+   */
+  int[] selectionRange() {
+    if(!isSelected()) return null;
+    final int s = Math.min(start, end), e = Math.max(start, end);
+    final int hit = searchResults[0].sortedIndexOf(s);
+    return hit >= 0 && searchResults[1].get(hit) == e ? null : new int[] { s, e };
+  }
+
+  /**
+   * Replaces the search hit at the caret.
    * @param rc replace context
-   * @return selection offsets, or {@code null} if there is no current hit
+   * @return selection offsets, or {@code null} if there is no hit
    */
   int[] replaceHit(final ReplaceContext rc) {
-    final int hit = searchHit;
-    if(hit < 0 || hit >= searchResults[0].size()) return null;
-    return rc.replace(searchContext, text, searchResults[0].get(hit), searchResults[1].get(hit));
+    final int hit = caretHit();
+    if(hit < 0) return null;
+    searchHit = hit;
+    return rc.replace(searchContext, text, decode(text), searchResults[0].get(hit),
+        searchResults[1].get(hit));
+  }
+
+  /**
+   * Returns the index of the hit that encloses the caret, or of the first hit after it (wrapping).
+   * @return index, or {@code -1} if there are no hits
+   */
+  int caretHit() {
+    final IntList starts = searchResults[0];
+    final int sl = starts.size();
+    if(sl == 0) return -1;
+    final int s = starts.sortedIndexOf(pos);
+    if(s >= 0) return s;
+    final int i = -s - 1;
+    // caret inside the preceding hit; otherwise, next hit, or first one
+    return i > 0 && pos < searchResults[1].get(i - 1) ? i - 1 : i == sl ? 0 : i;
   }
 
   /**
@@ -1330,11 +1385,12 @@ public final class TextEditor {
       return -1;
     }
 
-    // a zero-width hit (e.g. empty line for '.*') has start == end, so isSelected() is false;
-    // treat a hit we already jumped to as the current one so navigation can move past it
+    // a zero-width hit is no selection: treat a hit we jumped to as the current one
     final boolean current = isSelected() || searchSelected && searchHit >= 0 && searchHit < sl &&
         searchResults[0].get(searchHit) == pos;
-    int s = searchResults[0].sortedIndexOf(!select || current ? pos : pos - 1);
+    // a directional jump off a hit lowers the key: a hit at the caret still lies ahead of it
+    final boolean back = select && !current && dir != SearchDir.CURRENT;
+    int s = searchResults[0].sortedIndexOf(back ? pos - 1 : pos);
     s = switch(dir) {
       case CURRENT -> s < 0 ? -s - 1 : s;
       case FORWARD -> s < 0 ? -s - 1 : s + 1;
@@ -1359,5 +1415,13 @@ public final class TextEditor {
    */
   int searchIndex() {
     return searchHit;
+  }
+
+  /**
+   * Returns the number of search hits.
+   * @return number of hits
+   */
+  int searchSize() {
+    return searchResults[0].size();
   }
 }

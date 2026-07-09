@@ -278,12 +278,12 @@ public class BaseXCombo extends JComboBox<Object> {
   }
 
   /**
-   * Highlights the text field.
-   * @param hits  hits
+   * Sets the background color of the text field.
+   * @param color background color
    */
-  public synchronized void highlight(final boolean hits) {
+  public synchronized void highlight(final Color color) {
     final BaseXTextField tf = textField();
-    (tf != null ? tf : this).setBackground(hits ? GUIConstants.backColor : GUIConstants.lightRed);
+    (tf != null ? tf : this).setBackground(color);
   }
 
   @Override

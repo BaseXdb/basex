@@ -92,8 +92,7 @@ public enum BaseXKeys {
   /** Match case.            */ MATCHCASE(SHIFT, VK_F4),
   /** Whole word.            */ WHOLEWORD(SHIFT, VK_F5),
   /** Regular expression.    */ REGEX(SHIFT, VK_F6),
-  /** Dot matches newline.   */ DOTALL(SHIFT, VK_F7),
-  /** Replace all.           */ REPLACEALL(META | SHIFT, VK_R),
+  /** Dot matches all.       */ DOTALL(SHIFT, VK_F7),
 
   // Font
 
@@ -116,7 +115,8 @@ public enum BaseXKeys {
 
   /** Space key.             */ SPACE(NO_MOD, VK_SPACE, SHIFT | META),
   /** Enter.                 */ ENTER(NO_MOD, VK_ENTER),
-  /** Shift Enter.           */ SHIFT_ENTER(SHIFT, VK_ENTER);
+  /** Shift Enter.           */ SHIFT_ENTER(SHIFT, VK_ENTER),
+  /** Meta Enter.            */ META_ENTER(META, VK_ENTER);
 
   /** Modifiers. */
   private final int modifiers;

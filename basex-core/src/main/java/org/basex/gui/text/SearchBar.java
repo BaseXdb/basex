@@ -4,6 +4,7 @@ import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.regex.*;
 
 import javax.swing.*;
 
@@ -11,6 +12,7 @@ import org.basex.core.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.listener.*;
+import org.basex.util.*;
 
 /**
  * This panel provides search and replace facilities.
@@ -35,10 +37,16 @@ public final class SearchBar extends BaseXBack {
   final AbstractButton mcase;
   /** Mode: whole word. */
   final AbstractButton word;
-  /** Mode: dot matches newline. */
+  /** Mode: dot matches all. */
   final AbstractButton dotall;
-  /** Action: replace. */
+  /** Action: find previous hit. */
+  private final AbstractButton prev;
+  /** Action: find next hit. */
+  private final AbstractButton next;
+  /** Action: replace all hits. */
   private final AbstractButton rplc;
+  /** Action: replace next hit. */
+  private final AbstractButton rplcNext;
   /** Action: close. */
   private final AbstractButton cls;
 
@@ -50,10 +58,10 @@ public final class SearchBar extends BaseXBack {
   private final BaseXCombo replace;
   /** Hit count label. */
   private final BaseXLabel count;
-  /** Total number of hits ({@code -1} if no search is active). */
-  private int total = -1;
-  /** Whether the next refresh-driven jump should select its hit (set by {@link #replaceNext}). */
-  private boolean selectNext;
+  /** Direction of the jump that follows the next search. */
+  private SearchDir jumpDir = SearchDir.CURRENT;
+  /** Whether that jump selects its hit. */
+  private boolean jumpSelect;
 
   /** Escape key listener. */
   private final KeyListener keys;
@@ -82,15 +90,30 @@ public final class SearchBar extends BaseXBack {
     replace.hint(Text.REPLACE_WITH + "\u2026");
     count = new BaseXLabel(" ");
 
-    final ActionListener al = e -> search();
+    final ActionListener al = e -> {
+      modes();
+      search();
+    };
     mcase = button("f_case", BaseXLayout.addShortcut(Text.MATCH_CASE, MATCHCASE.toString()), al);
     word = button("f_word", BaseXLayout.addShortcut(Text.WHOLE_WORD, WHOLEWORD.toString()), al);
     regex = button("f_regex", BaseXLayout.addShortcut(Text.REGULAR_EXPR, REGEX.toString()), al);
     dotall = button("f_dotall", BaseXLayout.addShortcut(Text.DOT_ALL, DOTALL.toString()), al);
 
-    rplc  = BaseXButton.get("f_replace", BaseXLayout.addShortcut(Text.REPLACE_ALL,
-        REPLACEALL.toString()), false, gui);
-    rplc.setFocusable(true);
+    // restore the search modes of the last session
+    mcase.setSelected(gui.gopts.get(GUIOptions.MATCHCASE));
+    word.setSelected(gui.gopts.get(GUIOptions.WHOLEWORD));
+    regex.setSelected(gui.gopts.get(GUIOptions.REGEX));
+    dotall.setSelected(gui.gopts.get(GUIOptions.DOTALL));
+    modes();
+
+    prev = BaseXButton.get("f_prev",
+        BaseXLayout.addShortcut(Text.FIND_PREVIOUS, FINDPREV.toString()), false, gui);
+    next = BaseXButton.get("f_next",
+        BaseXLayout.addShortcut(Text.FIND_NEXT, FINDNEXT.toString()), false, gui);
+    rplcNext = BaseXButton.get("f_replace",
+        BaseXLayout.addShortcut(Text.REPLACE_NEXT, ENTER.toString()), false, gui);
+    rplc = BaseXButton.get("f_replaceall",
+        BaseXLayout.addShortcut(Text.REPLACE_ALL, META_ENTER.toString()), false, gui);
     cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()),
         false, gui);
 
@@ -98,15 +121,16 @@ public final class SearchBar extends BaseXBack {
     find.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(FINDPREV.is(e) || FINDNEXT.is(e)) {
-          editor.editor.noSelect();
-          deactivate(false);
-        } else if(ENTER.is(e)) {
-          find.updateHistory();
+        if(ENTER.is(e) || FINDNEXT.is(e)) {
           editor.jump(SearchDir.FORWARD, true);
-        } else if(SHIFT_ENTER.is(e)) {
+        } else if(SHIFT_ENTER.is(e) || FINDPREV.is(e)) {
           editor.jump(SearchDir.BACKWARD, true);
+        } else if(META_ENTER.is(e)) {
+          replaceAll();
+        } else {
+          return;
         }
+        e.consume();
       }
 
       @Override
@@ -125,14 +149,17 @@ public final class SearchBar extends BaseXBack {
       search();
     });
 
-    // replace the current hit when Enter is pressed in the replace field
     replace.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
         if(ENTER.is(e)) {
-          replace.updateHistory();
           replaceNext();
+        } else if(META_ENTER.is(e)) {
+          replaceAll();
+        } else {
+          return;
         }
+        e.consume();
       }
     });
 
@@ -143,7 +170,6 @@ public final class SearchBar extends BaseXBack {
       else if(WHOLEWORD.is(e)) toggle(word);
       else if(REGEX.is(e)) toggle(regex);
       else if(DOTALL.is(e)) toggle(dotall);
-      else if(REPLACEALL.is(e)) replaceAll();
     };
     mcase.addKeyListener(keys);
     word.addKeyListener(keys);
@@ -151,10 +177,16 @@ public final class SearchBar extends BaseXBack {
     dotall.addKeyListener(keys);
     find.addKeyListener(keys);
     replace.addKeyListener(keys);
+    prev.addKeyListener(keys);
+    next.addKeyListener(keys);
     rplc.addKeyListener(keys);
+    rplcNext.addKeyListener(keys);
     cls.addKeyListener(keys);
 
+    prev.addActionListener(e -> editor.jump(SearchDir.BACKWARD, true));
+    next.addActionListener(e -> editor.jump(SearchDir.FORWARD, true));
     rplc.addActionListener(e -> replaceAll());
+    rplcNext.addActionListener(e -> replaceNext());
     cls.addActionListener(e -> deactivate(true));
 
     // set initial values
@@ -179,16 +211,26 @@ public final class SearchBar extends BaseXBack {
       west.add(regex);
       west.add(dotall);
 
+      final BaseXToolBar meta = new BaseXToolBar();
+      meta.add(count);
+      meta.add(Box.createHorizontalStrut(6));
+      meta.add(prev);
+      meta.add(next);
+      meta.add(Box.createHorizontalStrut(6));
+
       final BaseXBack found = new BaseXBack(false).layout(new BorderLayout(8, 0));
       found.add(find, BorderLayout.CENTER);
-      found.add(count, BorderLayout.EAST);
+      found.add(meta, BorderLayout.EAST);
 
       final BaseXBack center = new BaseXBack(false).layout(new GridLayout(1, 2, 2, 0));
       center.add(found);
       if(editable) center.add(replace);
 
       final BaseXToolBar east = new BaseXToolBar();
-      if(editable) east.add(rplc);
+      if(editable) {
+        east.add(rplcNext);
+        east.add(rplc);
+      }
       east.add(cls);
 
       add(west, BorderLayout.WEST);
@@ -196,6 +238,8 @@ public final class SearchBar extends BaseXBack {
       add(east, BorderLayout.EAST);
     }
 
+    // a requested jump belongs to the editor it was requested for
+    if(editor != text) resetJump();
     editor = text;
     refreshLayout();
     text.setSearch(this);
@@ -231,10 +275,11 @@ public final class SearchBar extends BaseXBack {
    * Activates the search bar. A new search is triggered if the new search term differs from
    * the last one.
    * @param string search string (ignored if empty)
-   * @param enforce enforce search
    * @param focus indicates if the search field should be focused
+   * @param enforce enforce search
+   * @return {@code true} if a search was triggered
    */
-  public void activate(final String string, final boolean focus, final boolean enforce) {
+  public boolean activate(final String string, final boolean focus, final boolean enforce) {
     boolean invisible = !isVisible();
     if(invisible) {
       setVisible(true);
@@ -249,7 +294,24 @@ public final class SearchBar extends BaseXBack {
       invisible = true;
     }
     // search if string has changed, or if panel was hidden
-    if(invisible || enforce) search();
+    final boolean srch = invisible || enforce;
+    if(srch) search();
+    return srch;
+  }
+
+  /**
+   * Activates the search bar and jumps to a hit.
+   * @param string search string (ignored if empty)
+   * @param dir search direction
+   */
+  public void find(final String string, final SearchDir dir) {
+    jumpDir = dir;
+    jumpSelect = true;
+    if(!activate(string, false, false)) {
+      // no new search: the current results are up to date
+      resetJump();
+      editor.jump(dir, true);
+    }
   }
 
   /**
@@ -274,6 +336,7 @@ public final class SearchBar extends BaseXBack {
    */
   public void toggle(final AbstractButton button) {
     button.setSelected(!button.isSelected());
+    modes();
     activate(find.getText(), false, true);
   }
 
@@ -281,58 +344,115 @@ public final class SearchBar extends BaseXBack {
    * Indicates whether the current hits can be replaced.
    * @return result of check
    */
-  public boolean replaceEnabled() {
+  private boolean replaceEnabled() {
     return editor != null && editor.isEditable() && isVisible() && rplc.isEnabled();
   }
 
   /**
    * Replaces all hits of the current search.
    */
-  public void replaceAll() {
+  private void replaceAll() {
     if(!replaceEnabled()) return;
-    deactivate(true);
-    final String in = replace.getText();
-    editor.replace(new ReplaceContext(regex.isSelected() ? normalize(in) : in));
+    try {
+      // a selection restricts the replacement, unless it is one of the search hits
+      final ReplaceContext rc = new ReplaceContext(replacement());
+      editor.replace(rc);
+      gui.status.setText(Util.info(Text.STRINGS_REPLACED_X, BaseXLayout.format(rc.count)), true);
+      deactivate(true);
+    } catch(final Exception ex) {
+      replaceFailed(ex);
+    }
   }
 
   /**
    * Replaces the current hit and advances to the next one.
    */
-  public void replaceNext() {
-    if(!replaceEnabled() || editor.editor.searchIndex() < 0) return;
-    final String in = replace.getText();
-    final boolean rgx = regex.isSelected();
-    if(editor.replaceNext(new ReplaceContext(rgx ? normalize(in) : in, true))) {
-      selectNext = true;
-      search();
+  private void replaceNext() {
+    if(!replaceEnabled()) return;
+    try {
+      if(editor.replaceNext(new ReplaceContext(replacement(), true))) {
+        // select the hit that follows the replacement
+        jumpSelect = true;
+        search();
+      }
+    } catch(final Exception ex) {
+      replaceFailed(ex);
     }
+  }
+
+  /**
+   * Returns the contents of the replace field as a Java replacement string.
+   * @return replacement
+   */
+  private String replacement() {
+    final String in = replace.getText();
+    return regex.isSelected() ? normalize(in) : Matcher.quoteReplacement(in);
+  }
+
+  /**
+   * Flags a failed replacement by reddening the replace field.
+   * @param ex exception
+   */
+  private void replaceFailed(final Exception ex) {
+    Util.debug(ex);
+    replace.highlight(GUIConstants.lightRed);
+    replace.setToolTipText(ex.getLocalizedMessage());
+  }
+
+  /**
+   * Adopts the current search modes and remembers them for the next session.
+   */
+  private void modes() {
+    final boolean rgx = regex.isSelected();
+    dotall.setEnabled(rgx);
+    gui.gopts.set(GUIOptions.MATCHCASE, mcase.isSelected());
+    gui.gopts.set(GUIOptions.WHOLEWORD, word.isSelected());
+    gui.gopts.set(GUIOptions.REGEX, rgx);
+    gui.gopts.set(GUIOptions.DOTALL, dotall.isSelected());
   }
 
   /**
    * Searches text in the current editor.
    */
   private void search() {
-    final boolean sel = regex.isSelected();
-    dotall.setEnabled(sel);
-    word.setEnabled(!sel);
     search(true);
   }
 
   /**
-   * Refreshes the panel after a successful search operation.
+   * Refreshes the panel after a search operation.
+   * @param te editor the search was started for
    * @param sc search context
    * @param jump jump to next search result
    */
-  void refresh(final SearchContext sc, final boolean jump) {
-    final boolean hits = sc.nr != 0, empty = sc.string.isEmpty();
-    rplc.setEnabled(hits && !empty);
-    find.highlight(hits || empty);
-    total = empty ? -1 : sc.nr;
-    count.setText(countText());
-    // a Replace Next selects the following hit; a plain search only repositions the view
-    final boolean select = selectNext;
-    selectNext = false;
-    if(jump) editor.jump(SearchDir.CURRENT, select);
+  void refresh(final TextEditor te, final SearchContext sc, final boolean jump) {
+    // discard the results of a search for an editor that was replaced by a tab switch
+    if(editor.editor != te) return;
+
+    // an empty search string yields no hits, but is no failed search either
+    final boolean hits = te.searchSize() != 0, error = sc.error != null;
+    prev.setEnabled(hits);
+    next.setEnabled(hits);
+    rplc.setEnabled(hits);
+    rplcNext.setEnabled(hits);
+    find.highlight(error ? GUIConstants.lightRed :
+      hits || sc.string.isEmpty() ? GUIConstants.backColor : GUIConstants.paleGray);
+    find.setToolTipText(error ? sc.error : Text.FIND + "\u2026");
+    replace.highlight(GUIConstants.backColor);
+    replace.setToolTipText(Text.REPLACE_WITH + "\u2026");
+    // a requested jump is deferred until its results arrive; it refreshes the count itself
+    final SearchDir dir = jumpDir;
+    final boolean select = jumpSelect;
+    resetJump();
+    if(jump) editor.jump(dir, select);
+    else refreshCount();
+  }
+
+  /**
+   * Discards a requested jump.
+   */
+  private void resetJump() {
+    jumpDir = SearchDir.CURRENT;
+    jumpSelect = false;
   }
 
   /**
@@ -343,25 +463,22 @@ public final class SearchBar extends BaseXBack {
   }
 
   /**
-   * Returns the hit count text ("N/M" with a trailing space, empty if no search is active).
+   * Returns the hit count text ("N/M"). Before a hit is navigated to, N is 0.
    * @return count text
    */
   private String countText() {
-    if(total < 0) return "";
-    int n = editor == null ? -1 : editor.editor.searchIndex();
-    if(n < 0 || n >= total) n = 0;
-    // count string: thin spaces (U+2009) around the slash, trailing space for padding
-    return (total == 0 ? 0 : n + 1) + "\u2009/\u2009" + total + " ";
+    final int n = editor.editor.searchIndex(), total = editor.editor.searchSize();
+    return BaseXLayout.format(n < 0 ? 0 : n + 1) + "\u2009/\u2009" + BaseXLayout.format(total);
   }
 
   // PRIVATE METHODS ==============================================================================
 
   /**
-   * Sets a new search text.
+   * Sets a new search text, and remembers it as the one that is searched for next.
    * @param text text
    */
   private void setSearch(final String text) {
-    oldSearch = find.getText();
+    oldSearch = text;
     find.setText(text);
   }
 
@@ -370,18 +487,8 @@ public final class SearchBar extends BaseXBack {
    * @param jump jump to next search result
    */
   private void search(final boolean jump) {
-    final String text = isVisible() ? find.getText() : "";
-    final SearchContext sc = new SearchContext(this, text);
-    if(sc.error != null) {
-      // invalid regular expression: highlight the field red, show the cause as its tooltip
-      find.highlight(false);
-      find.setToolTipText(sc.error);
-      total = -1;
-      count.setText("");
-    } else {
-      find.setToolTipText(Text.FIND + "\u2026");
-      editor.search(sc, jump);
-    }
+    // an invalid regular expression yields no hits; the panel is refreshed as after any search
+    editor.search(new SearchContext(this, isVisible() ? find.getText() : ""), jump);
   }
 
   /**

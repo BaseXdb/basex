@@ -985,7 +985,7 @@ public final class EditorView extends View {
     @Override
     public void execute(final Object arg) {
       final int[] cp = getEditor().caretPos();
-      pos.setText(cp[0] + " : " + cp[1]);
+      pos.setText(cp[0] + "\u2009:\u2009" + cp[1]);
     }
   };
 

@@ -127,7 +127,6 @@ public class TextPanel extends BaseXPanel {
       new GUICommand[] {
         new FindCmd(), new FindNextCmd(), new FindPrevCmd(),
         new MatchCaseCmd(), new WholeWordCmd(), new RegExCmd(), new DotAllCmd(), null,
-        new ReplaceNextCmd(), new ReplaceAllCmd(), null,
         new GotoCmd(), null,
         new UndoCmd(), new RedoCmd(), null,
         new AllCmd(), new CutCmd(), new CopyCmd(), new PasteCmd(), new DelCmd() } :
@@ -389,40 +388,32 @@ public class TextPanel extends BaseXPanel {
   }
 
   /**
-   * Replaces the text.
+   * Replaces the text. May throw if the replacement references a non-existent group.
    * @param rc replace context
    */
   final void replace(final ReplaceContext rc) {
-    try {
-      final int[] select = editor.replace(rc);
-      if(rc.text != null) {
-        final boolean sel = editor.isSelected();
-        setText(rc.text);
-        editor.select(select[0], select[sel ? 1 : 0]);
-        release(Action.CHECK);
-      }
-    } catch(final Exception ex) {
-      Util.debug(ex);
+    final int[] range = editor.replace(rc);
+    if(rc.text != null) {
+      // the caret keeps its position; a replacement in a selection re-selects its new range
+      setText(rc.text);
+      if(range != null) editor.select(range[0], range[1]);
+      release(Action.CHECK);
     }
   }
 
   /**
    * Replaces the current search hit and moves the caret behind the replacement.
+   * May throw if the replacement references a non-existent group.
    * @param rc replace context
    * @return {@code true} if a hit was replaced
    */
   final boolean replaceNext(final ReplaceContext rc) {
-    try {
-      final int[] select = editor.replaceHit(rc);
-      if(select == null) return false;
-      setText(rc.text);
-      setCaret(select[1]);
-      release(Action.CHECK);
-      return true;
-    } catch(final Exception ex) {
-      Util.debug(ex);
-      return false;
-    }
+    final int[] select = editor.replaceHit(rc);
+    if(select == null) return false;
+    setText(rc.text);
+    setCaret(select[1]);
+    release(Action.CHECK);
+    return true;
   }
 
   /**
@@ -912,11 +903,12 @@ public class TextPanel extends BaseXPanel {
     public void execute() { selectAll(); }
   }
 
-  /** Find next hit. */
+  /** Open search bar. */
   private class FindCmd extends GUIPopupCmd {
     /** Constructor. */
     FindCmd() { super(Text.FIND + "\u2026", FIND); }
 
+    // the adopted selection is a hit of the new search, and restricts no replacement
     @Override
     public void execute() { search.activate(searchString(), true, false); }
     @Override
@@ -991,7 +983,7 @@ public class TextPanel extends BaseXPanel {
     public boolean selected(final GUI main) { return search.regex.isSelected(); }
   }
 
-  /** Dot-matches-newline search. */
+  /** Dot-matches-all search. */
   private class DotAllCmd extends GUIPopupCmd {
     /** Constructor. */
     DotAllCmd() { super(Text.DOT_ALL, DOTALL); }
@@ -1006,36 +998,14 @@ public class TextPanel extends BaseXPanel {
     public boolean selected(final GUI main) { return search.dotall.isSelected(); }
   }
 
-  /** Replace next hit. */
-  private class ReplaceNextCmd extends GUIPopupCmd {
-    /** Constructor. */
-    ReplaceNextCmd() { super(Text.REPLACE_NEXT); }
-
-    @Override
-    public void execute() { search.replaceNext(); }
-    @Override
-    public boolean enabled(final GUI main) { return search != null && search.replaceEnabled(); }
-  }
-
-  /** Replace all hits. */
-  private class ReplaceAllCmd extends GUIPopupCmd {
-    /** Constructor. */
-    ReplaceAllCmd() { super(Text.REPLACE_ALL, REPLACEALL); }
-
-    @Override
-    public void execute() { search.replaceAll(); }
-    @Override
-    public boolean enabled(final GUI main) { return search != null && search.replaceEnabled(); }
-  }
-
   /**
    * Highlights the next/previous hit.
    * @param next next/previous hit
    */
   private void search(final boolean next) {
-    final boolean vis = search.isVisible();
-    search.activate(searchString(), false, false);
-    jump(vis ? next ? SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT, true);
+    // a hidden search bar adopts the selected string: its first hit is the current one
+    search.find(searchString(), search.isVisible() ?
+      next ? SearchDir.FORWARD : SearchDir.BACKWARD : SearchDir.CURRENT);
   }
 
   /** Go to line. */

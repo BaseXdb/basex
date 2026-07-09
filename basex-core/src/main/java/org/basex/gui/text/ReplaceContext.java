@@ -1,13 +1,11 @@
 package org.basex.gui.text;
 
-import static org.basex.util.Token.*;
-
 import java.util.regex.*;
 
 import org.basex.util.*;
 
 /**
- * This class summarizes the result of a replacement.
+ * This class summarizes the result of a single replacement.
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -15,10 +13,12 @@ import org.basex.util.*;
 final class ReplaceContext {
   /** Replace string. */
   private final String replace;
-  /** Replace only the first hit in the range (regex mode). */
+  /** Replace only the first hit in the range. */
   private final boolean single;
   /** Text. */
   byte[] text;
+  /** Number of replaced hits. */
+  int count;
 
   /**
    * Constructor.
@@ -31,7 +31,7 @@ final class ReplaceContext {
   /**
    * Constructor.
    * @param replace replacement text
-   * @param single replace only the first hit in the range (regex mode)
+   * @param single replace only the first hit in the range
    */
   ReplaceContext(final String replace, final boolean single) {
     this.replace = replace;
@@ -42,52 +42,40 @@ final class ReplaceContext {
    * Replaces text.
    * @param sc search context
    * @param txt text
+   * @param str decoded text (must be equivalent to {@code txt})
    * @param start start offset
    * @param end end offset
    * @return resulting end marker
    */
-  int[] replace(final SearchContext sc, final byte[] txt, final int start, final int end) {
+  int[] replace(final SearchContext sc, final byte[] txt, final String str, final int start,
+      final int end) {
     final int os = txt.length;
-    if(sc.string.isEmpty()) {
+    if(sc.pattern == null) {
       text = txt;
     } else {
-      final TokenBuilder tb = new TokenBuilder(os).add(txt, 0, start);
-      if(sc.regex) {
-        // regular expressions, applied to the whole range (ignoring position arrays)
-        final Matcher matcher = sc.pattern.matcher(string(txt, start, end - start));
-        tb.add(single ? matcher.replaceFirst(replace) : matcher.replaceAll(replace));
-      } else {
-        final byte[] srch = token(sc.string);
-        final byte[] rplc = token(replace);
-        final int ss = srch.length;
-        boolean s = true;
-        int s1 = start;
-        for(int o = start; o < end;) {
-          int sp = 0;
-          if(o + ss <= end && s) {
-            if(sc.mcase) {
-              while(sp < ss && txt[o + sp] == srch[sp]) sp++;
-            } else {
-              while(sp < ss && lc(cp(txt, o + sp)) == cp(srch, sp)) sp += cl(srch, sp);
-            }
-          }
-          if(sp == ss && (!sc.word || o + ss == os ||
-              !Character.isLetterOrDigit(cp(txt, o + ss)))) {
-            tb.add(txt, s1, o).add(rplc);
-            o += ss;
-            s1 = o;
-            s = !sc.word;
-          } else if(sc.word) {
-            s = !Character.isLetterOrDigit(cp(txt, o));
-            o += cl(txt, o);
-          } else {
-            o++;
-          }
-        }
-        tb.add(txt, s1, end);
+      // hits outside the range are skipped: anchors and lookaround must see the whole text
+      final Matcher matcher = sc.pattern.matcher(str);
+      final TokenBuilder tb = new TokenBuilder(os);
+      final StringBuilder sb = new StringBuilder();
+      final TextCursor cursor = new TextCursor(txt);
+      // pc/p: char/byte offset of the copied text
+      int pc = 0, p = 0;
+      while(matcher.find()) {
+        final int ms = matcher.start(), me = matcher.end();
+        final int bs = cursor.advance(ms);
+        if(bs > end) break;
+        final int be = cursor.advance(me);
+        if(bs < start || be > end) continue;
+        // appendReplacement prefixes the expanded replacement with the text since the last hit
+        sb.setLength(0);
+        matcher.appendReplacement(sb, replace);
+        tb.add(txt, p, bs).add(sb.substring(ms - pc));
+        pc = me;
+        p = be;
+        count++;
+        if(single) break;
       }
-      tb.add(txt, end, os);
-      text = tb.finish();
+      text = tb.add(txt, p, os).finish();
     }
     return new int[] { start, end - os + text.length };
   }

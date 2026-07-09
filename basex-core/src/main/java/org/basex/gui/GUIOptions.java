@@ -205,6 +205,14 @@ public final class GUIOptions extends Options {
   public static final StringsOption SEARCHED = new StringsOption("SEARCHED");
   /** Last replaced strings. */
   public static final StringsOption REPLACED = new StringsOption("REPLACED");
+  /** Search mode: match case. */
+  public static final BooleanOption MATCHCASE = new BooleanOption("MATCHCASE", false);
+  /** Search mode: whole word. */
+  public static final BooleanOption WHOLEWORD = new BooleanOption("WHOLEWORD", false);
+  /** Search mode: regular expression. */
+  public static final BooleanOption REGEX = new BooleanOption("REGEX", false);
+  /** Search mode: dot matches all. */
+  public static final BooleanOption DOTALL = new BooleanOption("DOTALL", false);
 
   /** Comment: written to the options file. */
   public static final Comment C_HISTORY = new Comment("History");
