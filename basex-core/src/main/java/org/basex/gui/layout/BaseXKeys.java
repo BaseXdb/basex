@@ -76,11 +76,10 @@ public enum BaseXKeys {
   /** Previous tab.          */ PREVTAB(CTRL | SHIFT, VK_TAB),
   /** Close tab.             */ CLOSETAB(META, VK_F4),
 
-  /** Go back.               */ GOBACK(MAC ? META : ALT, VK_LEFT),
-  /** Go forward.            */ GOFORWARD(MAC ? META : ALT, VK_RIGHT),
-  /** Go up.                 */ GOUP(MAC ? META : ALT, VK_PAGE_UP),
-  /** Go down.               */ FILTER(MAC ? META : ALT, VK_PAGE_DOWN),
-  /** Go home.               */ GOHOME(MAC ? META : ALT, VK_HOME),
+  // browse shortcuts: disabled with Mac, as ALT and META are reserved for cursor movements
+  /** Go back.               */ GOBACK(ALT, VK_LEFT),
+  /** Go forward.            */ GOFORWARD(ALT, VK_RIGHT),
+  /** Go home.               */ GOHOME(ALT, VK_HOME),
 
   /** Go to line.            */ GOTOLINE(META, VK_L),
 

@@ -334,17 +334,13 @@ public final class BaseXLayout {
   private static KeyListener globalShortcuts(final GUI gui) {
     if(keys == null) keys = (KeyPressedListener) e -> {
       // browse back/forward
-      if(gui.context.data() != null) {
+      if(!Prop.MAC && gui.context.data() != null) {
         if(GOBACK.is(e)) {
           GUIMenuCmd.C_GO_BACK.execute(gui);
         } else if(GOFORWARD.is(e)) {
           GUIMenuCmd.C_GO_FORWARD.execute(gui);
-        } else if(GOUP.is(e)) {
-          GUIMenuCmd.C_GO_UP.execute(gui);
         } else if(GOHOME.is(e)) {
           GUIMenuCmd.C_GO_HOME.execute(gui);
-        } else if(FILTER.is(e)) {
-          GUIMenuCmd.C_FILTER_NODES.execute(gui);
         }
       }
 

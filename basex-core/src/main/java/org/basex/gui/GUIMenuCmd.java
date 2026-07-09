@@ -101,7 +101,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Closes the database. */
-  C_CLOSE(CLOSE, "% Q", true, false) {
+  C_CLOSE(CLOSE, Prop.MAC ? null : "% Q", true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Close());
@@ -494,7 +494,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Filters the currently marked nodes. */
-  C_FILTER_NODES(FILTER_SELECTED, "alt DOWN", true, false) {
+  C_FILTER_NODES(FILTER_SELECTED, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
@@ -808,7 +808,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Shows a preference dialog. */
-  C_PREFERENCES(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% shift P", false, false) {
+  C_PREFERENCES(PREFERENCES + DOTS, Prop.MAC ? null : "% shift P", false, false) {
     @Override
     public void execute(final GUI gui) {
       DialogPrefs.show(gui);
@@ -852,7 +852,7 @@ public enum GUIMenuCmd implements GUICommand {
   /* BROWSE COMMANDS */
 
   /** Goes one step back. */
-  C_GO_BACK(GO_BACK, "alt LEFT", true, false) {
+  C_GO_BACK(GO_BACK, Prop.MAC ? null : "alt LEFT", true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(false);
@@ -865,7 +865,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes one step forward. */
-  C_GO_FORWARD(GO_FORWARD, "alt RIGHT", true, false) {
+  C_GO_FORWARD(GO_FORWARD, Prop.MAC ? null : "alt RIGHT", true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.notify.hist(true);
@@ -878,7 +878,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes one level up. */
-  C_GO_UP(GO_UP, "alt UP", true, false) {
+  C_GO_UP(GO_UP, null, true, false) {
     @Override
     public void execute(final GUI gui) {
       // skip operation for root context
@@ -913,7 +913,7 @@ public enum GUIMenuCmd implements GUICommand {
   },
 
   /** Goes to the root node. */
-  C_GO_HOME(GO_HOME, "alt HOME", true, false) {
+  C_GO_HOME(GO_HOME, Prop.MAC ? null : "alt HOME", true, false) {
     @Override
     public void execute(final GUI gui) {
       // skip operation for root context
