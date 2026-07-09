@@ -142,7 +142,6 @@ first_line_header    = 1行目をヘッダーとして解析します
 folder               = フォルダー
 fonts                = フォント
 format               = 形式
-fullscreen           = 全画面表示
 fulltext             = 全文
 fulltext_index       = 全文インデックス
 general              = 一般

@@ -142,7 +142,6 @@ first_line_header    = Procesar la primera línea como cabecera de tabla
 folder               = Carpeta
 fonts                = Fuentes
 format               = Formato
-fullscreen           = Pantalla completa
 fulltext             = Texto-Completo
 fulltext_index       = Índice del Texto-Completo
 general              = General

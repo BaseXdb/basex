@@ -142,7 +142,6 @@ first_line_header    = Analyser la première ligne comme entête de tableau
 folder               = Dossier
 fonts                = Polices
 format               = Format
-fullscreen           = Plein écran
 fulltext             = Plein-texte
 fulltext_index       = Index plein-texte
 general              = Général

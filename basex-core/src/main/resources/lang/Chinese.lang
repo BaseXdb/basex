@@ -142,7 +142,6 @@ first_line_header    = 将第一行作为表头
 folder               = 文件夹
 fonts                = 字体
 format               = 格式
-fullscreen           = 全屏
 fulltext             = 全文检索
 fulltext_index       = 全文索引
 general              = 常规

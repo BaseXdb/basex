@@ -745,19 +745,6 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-  /** Fullscreen mode. */
-  C_FULLSCREEN(FULLSCREEN, Prop.MAC ? "% shift F" : "F11", false, true) {
-    @Override
-    public void execute(final GUI gui) {
-      gui.fullscreen();
-    }
-
-    @Override
-    public boolean selected(final GUI gui) {
-      return gui.fullscreen;
-    }
-  },
-
   /* OPTION MENU */
 
   /** Real-time execution on/off. */

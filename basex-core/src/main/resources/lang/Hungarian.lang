@@ -142,7 +142,6 @@ first_line_header    = Első sor figyelembe vétele táblázatfejlécként
 folder               = Mappa
 fonts                = Betűtípusok
 format               = Formázás
-fullscreen           = Teljes képernyő
 fulltext             = Teljes-szöveg
 fulltext_index       = Teljes-szöveg index
 general              = Általános

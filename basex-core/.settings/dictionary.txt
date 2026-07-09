@@ -56,7 +56,6 @@ ft
 ftcontains
 ftdata
 ftnot
-fullscreen
 fulltext
 gath
 gruen

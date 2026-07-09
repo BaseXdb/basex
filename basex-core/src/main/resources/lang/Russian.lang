@@ -142,7 +142,6 @@ first_line_header    = Считать первую строку заголовк
 folder               = Дерево
 fonts                = Шрифты
 format               = Формат
-fullscreen           = Полноэкранный режим
 fulltext             = Полнотекстовый индекс
 fulltext_index       = Полнотекстовый индекс
 general              = Общее

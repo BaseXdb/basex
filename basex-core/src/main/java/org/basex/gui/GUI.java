@@ -69,8 +69,6 @@ public final class GUI extends JFrame implements BaseXWindow {
   /** Indicates if a running command or operation is updating. */
   public boolean updating;
 
-  /** Fullscreen flag. */
-  boolean fullscreen;
   /** Button panel. */
   final BaseXBack buttons;
   /** Navigation/input panel. */
@@ -100,11 +98,6 @@ public final class GUI extends JFrame implements BaseXWindow {
   private final AtomicInteger commandID = new AtomicInteger(0);
   /** Indicates if a command is running. */
   private boolean running;
-
-  /** Menu panel height. */
-  private int menuHeight;
-  /** Fullscreen Window. */
-  private JFrame fullscr;
 
   /** Password reader. */
   private static volatile PasswordReader pwReader;
@@ -581,19 +574,13 @@ public final class GUI extends JFrame implements BaseXWindow {
     if(comp == status) {
       if(show) top.add(comp, layout);
       else top.remove(comp);
-    } else if(comp == menu) {
-      if(!show) menuHeight = menu.getHeight();
-      final int s = show ? menuHeight : 0;
-      comp.setPreferredSize(new Dimension(comp.getPreferredSize().width, s));
-      menu.setSize(menu.getWidth(), s);
     } else if(show) {
       control.add(comp, layout);
     } else {
       control.remove(comp);
     }
     setContentBorder();
-    final Component frame = fullscr == null ? getRootPane() : fullscr;
-    frame.validate();
+    getRootPane().validate();
     refreshControls(false);
   }
 
@@ -629,57 +616,6 @@ public final class GUI extends JFrame implements BaseXWindow {
 
     toolbar.refresh();
     menu.refresh();
-  }
-
-  /**
-   * Toggles fullscreen mode.
-   */
-  void fullscreen() {
-    fullscreen ^= true;
-    fullscreen(fullscreen);
-  }
-
-  /**
-   * Turns fullscreen mode on/off.
-   * @param full fullscreen flag
-   */
-  public void fullscreen(final boolean full) {
-    if(full ^ fullscr == null) return;
-
-    if(full) {
-      control.remove(buttons);
-      control.remove(nav);
-      getRootPane().remove(menu);
-      top.remove(status);
-      remove(top);
-      fullscr = new JFrame();
-      fullscr.setIconImage(getIconImage());
-      fullscr.setTitle(getTitle());
-      fullscr.setUndecorated(true);
-      fullscr.setJMenuBar(menu);
-      fullscr.add(top);
-      fullscr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-    } else {
-      fullscr.removeAll();
-      fullscr.dispose();
-      fullscr = null;
-      if(!gopts.get(GUIOptions.SHOWBUTTONS)) control.add(buttons, BorderLayout.CENTER);
-      if(!gopts.get(GUIOptions.SHOWINPUT)) control.add(nav, BorderLayout.SOUTH);
-      if(!gopts.get(GUIOptions.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
-      setJMenuBar(menu);
-      add(top);
-    }
-
-    gopts.set(GUIOptions.SHOWBUTTONS, !full);
-    gopts.set(GUIOptions.SHOWINPUT, !full);
-    gopts.set(GUIOptions.SHOWSTATUS, !full);
-    fullscreen = full;
-
-    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(
-        fullscr);
-    setContentBorder();
-    updateControl(menu, !full, BorderLayout.NORTH);
-    setVisible(!full);
   }
 
   @Override

@@ -142,7 +142,6 @@ first_line_header    = Leggi la prima linea come intestazione di tabella
 folder               = Cartella
 fonts                = Carattere
 format               = Formato
-fullscreen           = Schermo intero
 fulltext             = Full-Text
 fulltext_index       = Indice "full-text"
 general              = Generale

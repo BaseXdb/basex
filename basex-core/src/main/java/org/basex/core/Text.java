@@ -948,8 +948,6 @@ public interface Text {
   /** Command info. */
   String FILTER_SELECTED = lang("filter_selected");
   /** Command info. */
-  String FULLSCREEN = lang("fullscreen");
-  /** Command info. */
   String GO_BACK = lang("go_back");
   /** Command info. */
   String GO_FORWARD = lang("go_forward");

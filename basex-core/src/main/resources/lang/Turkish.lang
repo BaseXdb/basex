@@ -142,7 +142,6 @@ first_line_header    = İlk satırı tablo başlığı olarak ayrıştır
 folder               = Klasör
 fonts                = Yazı tipleri
 format               = Format
-fullscreen           = Tam ekran
 fulltext             = Tam Metin
 fulltext_index       = Tam Metin İndeksi
 general              = Genel

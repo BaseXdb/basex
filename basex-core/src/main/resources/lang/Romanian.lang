@@ -142,7 +142,6 @@ first_line_header    = Parsare a primei linii ca antent al tabelului.
 folder               = Director
 fonts                = Fonturi
 format               = Formatul
-fullscreen           = Pe tot ecranul
 fulltext             = Full-text
 fulltext_index       = Full-text Index
 general              = General

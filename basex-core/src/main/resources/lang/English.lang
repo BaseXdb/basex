@@ -142,7 +142,6 @@ first_line_header    = Parse first line as table header
 folder               = Folder
 fonts                = Fonts
 format               = Format
-fullscreen           = Fullscreen
 fulltext             = Full-Text
 fulltext_index       = Full-Text Index
 general              = General
