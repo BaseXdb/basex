@@ -298,6 +298,10 @@ public final class QT3TS extends Main {
           string = "declare variable " + role + " external;" + string;
         }
       }
+      // declare default collation (prepended last so the setter precedes the variable declarations)
+      if(env.collations != null && "true".equals(env.collations.get("default"))) {
+        string = "declare default collation '" + env.collations.get(URI) + "';" + string;
+      }
     }
 
     final XQuery query = new XQuery(string, ctx);
