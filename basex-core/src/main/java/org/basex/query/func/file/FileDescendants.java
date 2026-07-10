@@ -26,7 +26,7 @@ public final class FileDescendants extends FileList {
     /** Option: recurse. */
     public static final ValueOption RECURSE = new ValueOption("recurse", Types.FUNCTION_O);
     /** Option: maximum recursion depth. */
-    public static final NumberOption DEPTH = new NumberOption("depth");
+    public static final ValueOption DEPTH = new ValueOption("depth", Types.INTEGER_ZO);
   }
 
   @Override
@@ -36,15 +36,17 @@ public final class FileDescendants extends FileList {
 
     final Value filterValue = options.get(DescendantsOptions.FILTER);
     final Value recurseValue = options.get(DescendantsOptions.RECURSE);
-    final Integer depth = options.get(DescendantsOptions.DEPTH);
+    final Value depthValue = options.get(DescendantsOptions.DEPTH);
     final FItem filter = filterValue.isEmpty() ? constantFn(true) :
         toFunction(filterValue, 1, qc);
     final FItem recurse = recurseValue.isEmpty() ? constantFn(true) :
         toFunction(recurseValue, 1, qc);
+    final int depth = depthValue.isEmpty() ? Integer.MAX_VALUE :
+        (int) Math.min(toLong(depthValue.itemAt(0)), Integer.MAX_VALUE);
 
     final TokenList list = new TokenList();
     list(dir, recurse, new HofArgs(1), null, -1, filter, new HofArgs(1), list,
-        depth != null ? depth : Integer.MAX_VALUE, true, qc);
+        depth, true, qc);
     return StrSeq.get(list);
   }
 
