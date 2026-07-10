@@ -1161,7 +1161,7 @@ public class QueryParser extends InputParser {
       boolean exprRequired = false;
       do {
         skipWs();
-        final byte[] name = ncName(NONCNAME_X, false);
+        final byte[] name = quote(current()) ? stringLiteral() : ncName(NOSTRNCN_X, false);
         final SeqType seqType = wsConsume(AS) ? sequenceType() : null;
         if(fields.contains(name)) throw error(DUPFIELD_X, name);
         skipWs();

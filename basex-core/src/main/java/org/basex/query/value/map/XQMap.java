@@ -252,12 +252,11 @@ public abstract class XQMap extends XQStruct {
         if(coerce) {
           return type.instanceOf(rt) && type instanceof final RecordType st && st.sealed();
         }
-        // structural check: every declared field is present with a matching value, no extra keys
+        // structural check: absent fields are treated as empty sequence, no extra keys
         final TokenObjectMap<RecordField> fields = rt.fields();
         final int fs = fields.size();
         for(int f = 1; f <= fs; f++) {
-          final Value value = getOrNull(Str.get(fields.key(f)));
-          if(value == null || !fields.value(f).seqType().instance(value)) return false;
+          if(!fields.value(f).seqType().instance(get(Str.get(fields.key(f))))) return false;
         }
         for(final Item key : keys()) {
           if(!key.type.instanceOf(BasicType.STRING) || !fields.contains(key.string(null)))
@@ -373,8 +372,7 @@ public abstract class XQMap extends XQStruct {
     if(fs == 0) return empty();
     final Value[] values = new Value[fs];
     for(int f = 0; f < fs; f++) {
-      final Value value = getOrNull(Str.get(fields.key(f + 1)));
-      values[f] = fields.value(f + 1).seqType().coerce(value != null ? value : Empty.VALUE,
+      values[f] = fields.value(f + 1).seqType().coerce(get(Str.get(fields.key(f + 1))),
           qc, ii, null, cc);
     }
     return new XQRecordMap(rt, values);
