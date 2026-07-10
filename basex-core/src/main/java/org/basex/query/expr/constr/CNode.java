@@ -81,7 +81,8 @@ public abstract class CNode extends Arr {
         if(mode == Simplify.STRING) {
           st = Types.STRING_ZO;
         } else if(mode.oneOf(Simplify.DATA, Simplify.NUMBER)) {
-          st = this instanceof CComm ? Types.STRING_ZO : Types.UNTYPED_ATOMIC_ZO;
+          st = this instanceof CComm || this instanceof CNSpace ? Types.STRING_ZO :
+            Types.UNTYPED_ATOMIC_ZO;
         }
       }
     }

@@ -121,6 +121,14 @@ public final class FBuilder {
   }
 
   /**
+   * Renames the root element (namespace conflict).
+   * @param name new name
+   */
+  public void rename(final QNm name) {
+    ((FElem) root).rename(name);
+  }
+
+  /**
    * Adds a namespace declaration for the QName of this element.
    * @return self reference
    */

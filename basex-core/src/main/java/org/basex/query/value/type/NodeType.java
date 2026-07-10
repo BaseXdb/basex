@@ -201,7 +201,7 @@ public final class NodeType implements Type {
   public BasicType atomic() {
     return kind.oneOf(Kind.GNODE, Kind.JNODE) ? null :
       kind == Kind.NODE ? BasicType.ANY_ATOMIC_TYPE :
-      kind == Kind.PROCESSING_INSTRUCTION || kind == Kind.COMMENT ? BasicType.STRING :
+      kind.oneOf(Kind.PROCESSING_INSTRUCTION, Kind.COMMENT, Kind.NAMESPACE) ? BasicType.STRING :
       BasicType.UNTYPED_ATOMIC;
   }
 

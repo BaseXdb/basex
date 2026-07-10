@@ -25,7 +25,7 @@ import org.w3c.dom.*;
  */
 public final class FElem extends FNode {
   /** Element name. */
-  private final QNm name;
+  private QNm name;
   /** Base URI. */
   private final byte[] uri;
   /** Namespaces. */
@@ -118,6 +118,14 @@ public final class FElem extends FNode {
     if(!nspaces.isEmpty()) builder.namespaces = nspaces;
     children(elem, builder, new TokenObjectMap<>());
     return builder;
+  }
+
+  /**
+   * Renames the element (namespace conflict).
+   * @param nm new name
+   */
+  void rename(final QNm nm) {
+    name = nm;
   }
 
   /**

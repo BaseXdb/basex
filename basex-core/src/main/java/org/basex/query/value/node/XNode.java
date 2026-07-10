@@ -224,7 +224,8 @@ public abstract class XNode extends GNode {
 
   @Override
   public final Item atomItem(final QueryContext qc, final InputInfo ii) {
-    return kind().oneOf(PROCESSING_INSTRUCTION, COMMENT) ? Str.get(string()) : Atm.get(string());
+    return kind().oneOf(PROCESSING_INSTRUCTION, COMMENT, NAMESPACE) ? Str.get(string()) :
+      Atm.get(string());
   }
 
   @Override

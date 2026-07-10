@@ -183,13 +183,12 @@ public final class Constr {
     // add static namespaces
     for(int n = 0; n < sNs; n++) add(inscopeNS, staticNs.name(n), staticNs.value(n));
 
-    // add dynamic namespaces
     final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
     if(!eq(nmPrefix, XML)) {
-      // check declaration of default namespace
+      // check declaration of default namespace (before dynamic namespaces are added)
       final int defaultNS = dNs != 0 ? dynamicNs.get(EMPTY) : -1;
       if(defaultNS != -1) {
-        if(nm.uri().length == 0) throw EMPTYNSCONS.get(info);
+        if(nmUri.length == 0) throw EMPTYNSCONS.get(info);
         final int scope = inscopeNS.get(EMPTY);
         final byte[] scopeUri = scope != -1 ? inscopeNS.value(scope)
                                             : qc.ns.resolve(EMPTY, info.sc());
@@ -199,10 +198,23 @@ public final class Constr {
         }
       }
 
-      // add new namespace to in-scope namespaces
-      if(nm.hasURI() && !inscopeNS.contains(nmPrefix)) add(inscopeNS, nmPrefix, nmUri);
+      // bind the default namespace of the element name (before dynamic namespaces)
+      if(nmPrefix.length == 0 && nm.hasURI() && !inscopeNS.contains(EMPTY)) {
+        add(inscopeNS, EMPTY, nmUri);
+      }
     }
+
+    // add namespaces contributed by namespace nodes in the content sequence
     for(int n = 0; n < dNs; n++) addNS(inscopeNS, dynamicNs.name(n), dynamicNs.value(n));
+
+    // bind the prefix of the element name; namespace nodes take precedence, so the element is
+    // renamed with a generated prefix if its prefix is already bound to another URI (nscons-011)
+    if(!eq(nmPrefix, XML) && nmPrefix.length != 0 && nm.hasURI()) {
+      final byte[] npref = addNS(inscopeNS, nmPrefix, nmUri);
+      if(npref != null) {
+        builder.rename(qc.shared.qName(concat(npref, cpToken(':'), nm.local()), nmUri));
+      }
+    }
 
     final GNodeList attributes = builder.attributes;
     if(attributes != null) {
