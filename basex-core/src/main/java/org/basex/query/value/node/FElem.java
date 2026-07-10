@@ -186,6 +186,30 @@ public final class FElem extends FNode {
     return nsInherited;
   }
 
+  /**
+   * Assigns namespaces inherited from enclosing constructors.
+   * @param inherited inherited namespaces (can be {@code null})
+   */
+  public void nsInherited(final Atts inherited) {
+    nsInherited = inherited;
+  }
+
+  /**
+   * Removes namespaces that are used neither by the element nor by its attributes
+   * (copy-namespaces {@code no-preserve} mode).
+   */
+  public void noPreserve() {
+    final byte[] prefix = name.prefix();
+    for(int n = namespaces.size() - 1; n >= 0; n--) {
+      final byte[] pref = namespaces.name(n);
+      boolean used = eq(pref, prefix);
+      for(int a = 0; !used && a < attributes.length; a++) {
+        used = eq(attributes[a].qname().prefix(), pref);
+      }
+      if(!used) namespaces.remove(n);
+    }
+  }
+
   @Override
   public byte[] string() {
     return string(children);

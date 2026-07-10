@@ -156,7 +156,10 @@ public final class Constr {
         builder.text(qc.shared.token(text.next()));
         // results of nested direct constructors are fresh nodes: adopt them without copying
         final boolean keep = direct || !qc.context.options.get(MainOptions.COPYNODE);
-        builder.node(node.materialize(n -> keep, info, qc));
+        final XNode copy = node.materialize(n -> keep, info, qc);
+        // apply copy-namespaces mode to copied element nodes
+        if(!keep && copy instanceof final FElem elem) copyNamespaces(node, elem);
+        builder.node(copy);
       }
       more = false;
     } else {
@@ -166,6 +169,40 @@ public final class Constr {
       more = true;
     }
     return true;
+  }
+
+  /**
+   * Applies the copy-namespaces mode to a copied element and its descendants.
+   * @param orig original element
+   * @param copy copied element
+   */
+  private void copyNamespaces(final XNode orig, final FElem copy) {
+    final StaticContext sc = info != null ? info.sc() : null;
+    final boolean preserve = sc == null || sc.preserveNS, inherit = sc == null || sc.inheritNS;
+    if(!preserve || !inherit) copyNamespaces(orig, copy, preserve, inherit);
+  }
+
+  /**
+   * Recursively adjusts inherited and preserved namespaces of a copied element.
+   * @param orig original element
+   * @param copy copied element
+   * @param preserve preserve namespaces
+   * @param inherit inherit namespaces
+   */
+  private static void copyNamespaces(final XNode orig, final FElem copy, final boolean preserve,
+      final boolean inherit) {
+    // no-inherit: freeze inherited namespaces to prevent inheritance from the new parent
+    if(!inherit) copy.nsInherited(orig.nsInherited());
+    // no-preserve: drop namespaces that are used neither by the element nor by its attributes
+    if(!preserve) copy.noPreserve();
+    // recurse into copied child elements (materialized copy mirrors the original structure)
+    final BasicNodeIter oi = orig.childIter(), ci = copy.childIter();
+    for(GNode o; (o = oi.next()) != null;) {
+      final GNode c = ci.next();
+      if(o.kind() == Kind.ELEMENT && c instanceof final FElem ce) {
+        copyNamespaces((XNode) o, ce, preserve, inherit);
+      }
+    }
   }
 
   /**
