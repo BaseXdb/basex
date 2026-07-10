@@ -517,9 +517,10 @@ public final class QT3TS extends Main {
     // reserved keywords in computed node constructors - still being discussed in
     // https://github.com/qt4cg/qtspecs/issues/1528
     "'K2-ComputeConAttr-65', 'K2-ComputeConAttr-66', 'K2-ComputeConAttr-72', " +
-    "'K2-ComputeConElem-20', 'K2-ComputeConElem-21', 'K2-ComputeConElem-25', 'nscons-047', " +
-    "'nscons-048', 'K2-ComputeConPI-16', 'K2-ComputeConPI-17', 'K2-ForExprWithout-42a', " +
-    "'K2-ForExprWithout-43a', 'K2-ForExprWithout-44a', " +
+    "'K2-ComputeConElem-20', 'K2-ComputeConElem-21', 'K2-ComputeConElem-25', " +
+    "'K2-ComputeConElem-26', 'K2-ComputeConPI-16', 'K2-ComputeConPI-17', " +
+    "'K2-ForExprWithout-42a', 'K2-ForExprWithout-43a', 'K2-ForExprWithout-44a', " +
+    "'nscons-047', 'nscons-048', " +
     // too much effort to support in the test suite
     "'fn-available-environment-variables-011', " +
     "'environment-variable-005', 'environment-variable-006', 'environment-variable-007', " +

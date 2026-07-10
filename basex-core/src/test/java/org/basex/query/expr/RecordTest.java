@@ -29,14 +29,15 @@ public final class RecordTest extends SandboxTest {
     query("declare record local:empty(); { 'x': () } instance of local:empty", false);
 
     query("{ 'x': () } instance of record(x)", true);
-    query("{} instance of record(x)", false);
+    query("{} instance of record(x)", true);
+    query("{} instance of record(x as xs:integer)", false);
 
     query("{ 'x': (), 'y': () } instance of record(x, y)", true);
     query("{ 'x': (), 'y': () } instance of record(x)", false);
     query("{ 'x': (), 0: () } instance of record(x, y)", false);
     query("{ 'x': (), 0: () } instance of record(x)", false);
 
-    query("declare record local:coord(x, y); "
+    query("declare record local:coord(x as xs:integer, y as xs:integer); "
         + "let $coord := local:coord(1, 2) "
         + "let $new := map:remove($coord, 'x') "
         + "return $new instance of local:coord", false);
@@ -178,11 +179,12 @@ public final class RecordTest extends SandboxTest {
         + "declare record list(value as item()*, next as list?);\n"
         + "$v",
         "{\"value\":42,\"next\":{\"value\":43,\"next\":{\"value\":44,\"next\":()}}}");
+    // omitted emptiable field is equivalent to an explicit empty sequence
     query("declare variable $v := "
         + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44 } } } instance of list;\n"
         + "declare record list(value as item()*, next as list?);\n"
         + "$v",
-        false);
+        true);
     query("declare variable $v := "
         + "  { 'value': 42, 'next': { 'value': 43, 'next': { 'value': 44, 'next': () } } } "
         + "instance of list;\n"

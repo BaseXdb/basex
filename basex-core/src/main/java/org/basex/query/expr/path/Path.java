@@ -322,8 +322,8 @@ public abstract class Path extends ParseExpr {
           removed = true;
           continue;
         }
-        // $map/'X' → $map/child::{ 'X' }
-        if(step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) &&
+        // $map/'X' → $map/child::{ 'X' }; skip context-dependent steps (e.g. $node/jkey())
+        if(step.seqType().instanceOf(Types.ANY_ATOMIC_TYPE_ZM) && !step.has(Flag.CTX) &&
             (pt.instanceOf(NodeType.JNODE) || pt.instanceOf(Types.MAP_OR_ARRAY))) {
           step = new SelectorStep(step.info(info), CHILD, step).optimize(prev, cc);
         }

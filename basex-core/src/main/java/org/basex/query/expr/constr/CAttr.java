@@ -25,6 +25,8 @@ import org.basex.util.hash.*;
 public final class CAttr extends CName {
   /** Generated namespace. */
   private static final byte[] NS0 = token("ns0:");
+  /** XML prefix. */
+  private static final byte[] XML0 = token("xml:");
 
   /**
    * Constructor.
@@ -52,8 +54,14 @@ public final class CAttr extends CName {
   @Override
   public FAttr item(final QueryContext qc, final InputInfo ii) throws QueryException {
     QNm nm = qname(false, qc);
-    final byte[] nmPrefix = nm.prefix(), nmUri = nm.uri();
+    byte[] nmPrefix = nm.prefix();
+    final byte[] nmUri = nm.uri();
     if(computed) {
+      // assign the xml prefix to prefix-less names in the XML namespace
+      if(nmPrefix.length == 0 && eq(nmUri, XML_URI)) {
+        nm = qc.shared.qName(concat(XML0, nm.string()), nmUri);
+        nmPrefix = nm.prefix();
+      }
       if(eq(nmPrefix, XML) ^ eq(nmUri, XML_URI)) throw CAXML.get(info);
       if(eq(nmUri, XMLNS_URI)) throw CAINV_.get(info, nmUri);
       if(eq(nmPrefix, XMLNS) || nmPrefix.length == 0 && eq(nm.string(), XMLNS))

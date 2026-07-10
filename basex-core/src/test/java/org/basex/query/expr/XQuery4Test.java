@@ -630,9 +630,11 @@ public final class XQuery4Test extends SandboxTest {
     query("{ 'x': 1, 'y': 2 } instance of record(x, y)", true);
     query("{ 'x': 1 } instance of record(x as xs:integer)", true);
 
-    query("{} instance of record(x)", false);
-    query("{ 'x': 1 } instance of record(x, y)", false);
+    query("{} instance of record(x)", true);
+    query("{ 'x': 1 } instance of record(x, y)", true);
+    query("{} instance of record(x as xs:integer)", false);
     query("{ 'x': 1 } instance of record(x as xs:string)", false);
+    query("{ 'x': 1, 'y': 2 } instance of record(x)", false);
 
     // record(*) matches any record (a map with string keys)
     query("{} instance of record(*)", true);
