@@ -150,7 +150,7 @@
       <dependency>
         <groupId>de.bottlecaps</groupId>
         <artifactId>markup-blitz</artifactId>
-        <version>1.10</version>
+        <version>1.11</version>
         <scope>runtime</scope>
         <optional>true</optional>
       </dependency>
