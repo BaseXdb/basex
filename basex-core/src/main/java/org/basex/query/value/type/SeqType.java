@@ -340,8 +340,10 @@ public final class SeqType {
     } else {
       return null;
     }
-    final Item cast = (Item) cast(item, true, qc, info);
-    return relabel == null || cast.compare(relabel, null, false, info) == 0 ? cast : null;
+    final boolean lenient = type instanceof EnumType;
+    final Item cast = (Item) cast(item, !lenient, qc, info);
+    return cast != null && (relabel == null || cast.compare(relabel, null, false, info) == 0) ?
+        cast : null;
   }
 
   /**

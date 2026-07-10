@@ -63,7 +63,7 @@ public final class EnumType implements Type {
   public Value cast(final Item item, final QueryContext qc, final InputInfo info)
       throws QueryException {
     final byte[] string = item.string(info);
-    if(!values.contains(string)) throw typeError(item, this, info);
+    if(!values.contains(string)) throw FUNCCAST_X_X.get(info, this, item);
     return item.type.eq(this) ? item : Str.get(string, new EnumType(new TokenSet(string)));
   }
 

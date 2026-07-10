@@ -247,7 +247,14 @@ public final class ChoiceItemType implements Type {
         return this;
       }
       // ignore duplicates
-      if(types.contains(type)) return this;
+      if(type instanceof final TypeRef ref && !ref.resolved()) {
+        final QNm name = ref.name();
+        for(final Type tp : types) {
+          if(tp instanceof final TypeRef t && !t.resolved() && t.name().eq(name)) return this;
+        }
+      } else if(types.contains(type)) {
+        return this;
+      }
       // non-mergeable types or first entry
       final Type.ID id = type.id();
       if(types.isEmpty()

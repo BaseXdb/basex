@@ -112,7 +112,7 @@ public final class MixedTest extends SandboxTest {
     error("declare type local:e as element(); local:e(<x/>)", WHICHFUNC_X);
     // failing constructions
     error("declare type local:int as xs:integer; local:int('x')", FUNCCAST_X_X);
-    error("declare type local:e as enum('a', 'b'); local:e('c')", INVTYPE_X);
+    error("declare type local:e as enum('a', 'b'); local:e('c')", FUNCCAST_X_X);
     // arity overlap with user-defined function
     error("declare type local:int as xs:integer;"
         + "declare function local:int($value) { $value }; 1", DUPLFUNC_X);
