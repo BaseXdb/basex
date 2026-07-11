@@ -159,23 +159,110 @@ public final class SeqType {
   public Value cast(final Value value, final boolean error, final QueryContext qc,
       final InputInfo info) throws QueryException {
 
-    // check cardinality
-    final long size = value.size();
-    if(!occ.check(size)) {
-      if(error) throw typeError(value, this, info);
+    final Type dt = TypeRef.deref(type);
+
+    // item(): identity, only check the cardinality of the input
+    if(dt == ITEM) return occ.check(value.size()) ? value : castError(value, error, info);
+
+    // arrays, maps, records: structural cast without atomization
+    if(dt instanceof ArrayType || dt instanceof MapType) {
+      if(!occ.check(value.size())) return castError(value, error, info);
+      final ValueBuilder vb = new ValueBuilder(qc, value.size());
+      for(final Item item : value) {
+        qc.checkStop();
+        Value cast = null;
+        if(dt instanceof final ArrayType at) {
+          if(item instanceof final XQArray array) cast = array.castTo(at, error, qc, info);
+        } else if(dt instanceof final RecordType rt) {
+          if(item instanceof final XQMap map) cast = map.castTo(rt, error, qc, info);
+        } else if(dt instanceof final MapType mt) {
+          if(item instanceof final XQMap map) cast = map.castTo(mt, error, qc, info);
+        }
+        if(cast == null) return castError(value, error, info);
+        vb.add(cast);
+      }
+      return vb.value(dt);
+    }
+
+    // generalized atomic type, list type, union type, enumeration type: atomize, then cast items
+    final Value atom;
+    try {
+      atom = value.atomValue(qc, info);
+    } catch(final QueryException ex) {
+      if(error) throw ex;
+      Util.debug(ex);
       return null;
     }
+    // the occurrence indicator does not constrain the result of casting to a list type
+    final long size = atom.size();
+    if(!(dt instanceof ListType) && !occ.check(size)) return castError(value, error, info);
     if(size == 0) return Empty.VALUE;
+    if(size == 1) return cast((Item) atom, error, qc, info);
 
-    // cast single items
-    if(size == 1) return cast((Item) value, error, qc, info);
-    // cast sequences
-    final ValueBuilder vb = new ValueBuilder(qc);
-    for(final Item item : value) {
+    final ValueBuilder vb = new ValueBuilder(qc, size);
+    for(final Item item : atom) {
       qc.checkStop();
-      vb.add(cast(item, error, qc, info));
+      final Value cast = cast(item, error, qc, info);
+      if(cast == null) return null;
+      vb.add(cast);
     }
-    return vb.value(type);
+    return vb.value(dt instanceof final ListType lt ? lt.atomic() : dt);
+  }
+
+  /**
+   * Converts a component value when casting to an array, map, or record type: returns the value
+   * unchanged if it already matches this type, casts it if this type is a valid cast target, and
+   * raises a type error otherwise.
+   * @param value value to convert
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return converted value, or {@code null} if conversion failed and no error was raised
+   * @throws QueryException query exception
+   */
+  public Value convert(final Value value, final boolean error, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    if(instance(value)) return value;
+    if(castTarget(type)) return cast(value, error, qc, info);
+    if(error) throw INVCONVERT_X_X.get(info, value, this);
+    return null;
+  }
+
+  /**
+   * Checks if the specified type is eligible as the target of a cast expression.
+   * @param type type to check
+   * @return result of check
+   */
+  public static boolean castTarget(final Type type) {
+    final Type tp = TypeRef.deref(type);
+    // item(); array, map, record types (their component types are checked while casting)
+    if(tp == ITEM || tp instanceof ArrayType || tp instanceof MapType) return true;
+    // choice item type: all alternatives must be eligible
+    if(tp instanceof final ChoiceItemType cit) {
+      for(final Type alt : cit.types) {
+        if(!castTarget(alt)) return false;
+      }
+      return true;
+    }
+    // enumeration type, schema list type
+    if(tp instanceof EnumType || tp instanceof ListType) return true;
+    // generalized atomic type
+    return tp instanceof final BasicType bt && bt.atomic() != null &&
+        !bt.oneOf(NOTATION, ANY_ATOMIC_TYPE, ANY_SIMPLE_TYPE);
+  }
+
+  /**
+   * Raises or reports a cast error.
+   * @param value value that could not be cast
+   * @param error raise error (return {@code null} otherwise)
+   * @param info input info (can be {@code null})
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Value castError(final Value value, final boolean error, final InputInfo info)
+      throws QueryException {
+    if(error) throw typeError(value, this, info);
+    return null;
   }
 
   /**

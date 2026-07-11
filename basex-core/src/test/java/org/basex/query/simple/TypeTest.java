@@ -24,8 +24,18 @@ public final class TypeTest extends SandboxTest {
     query("42 castable as xs:error?", false);
     query("() cast as xs:error?", "");
     query("xs:error(())", "");
+    query("1 castable as xs:integer+", true);
+    query("(1, 2) castable as xs:integer+", true);
+    query("[1, 2] castable as array(xs:integer)", true);
+    query("[1, 'x'] castable as array(xs:integer)", false);
+    query("{ 'a': 1 } castable as record(a as xs:integer)", true);
+    query("{ 'a': 1 } castable as record(a as xs:integer, b as xs:integer)", false);
+    query("{ 'a': 1, 'b': 2 } castable as record(a as xs:integer)", true);
+    query("string(([1] cast as array(xs:integer))?1)", "1");
+    query("string(({ 'a': '2' } cast as record(a as xs:integer))?a)", "2");
+    query("true#0 castable as xs:string", false);
+    query("name(<x/> cast as item())", "x");
 
-    error("1 castable as xs:integer+", CALCEXPR);
     error("1 castable as xs:integer()", SIMPLETYPE_X);
     error("1 castable as xml:integer", WHICHCAST_X);
     error("1 castable as integer", WHICHCAST_X);
@@ -34,6 +44,10 @@ public final class TypeTest extends SandboxTest {
     error("(42 cast as enum('42')) cast as enum('x')", FUNCCAST_X_X);
     error("42 cast as xs:error?", FUNCCAST_X_X);
     error("xs:error(42)", FUNCCAST_X_X);
+    error("1 cast as function(*)", INVALIDCAST_X);
+    // component types need not be eligible; the integer just fails to coerce to an array/map
+    error("1 cast as array(element())", INVTYPE_X);
+    error("1 cast as map(xs:anyAtomicType, xs:string)", INVTYPE_X);
   }
 
   /** instance of. */

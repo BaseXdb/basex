@@ -1205,6 +1205,8 @@ public enum QueryError {
   PATHJNODE_X_X_X(XPTY, 18, "%: JNode or atomic value expected, % found: %."),
   /** Error code. */
   NSSENS_X_X(XPTY, 117, "Cannot convert % to %."),
+  /** Error code. */
+  INVCONVERT_X_X(XPTY, 155, "% cannot be cast to %."),
 
   /** Error code. */
   CATTDUPL_X(XQDY, 25, "Duplicate attribute name: %."),

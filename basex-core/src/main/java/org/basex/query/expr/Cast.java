@@ -23,7 +23,7 @@ public final class Cast extends Convert {
    * Function constructor.
    * @param info input info (can be {@code null})
    * @param expr expression
-   * @param seqType sequence type to cast to (zero or one item)
+   * @param seqType target sequence type
    */
   public Cast(final InputInfo info, final Expr expr, final SeqType seqType) {
     super(info, expr, seqType, Types.ITEM_ZM);
@@ -51,7 +51,7 @@ public final class Cast extends Convert {
 
   @Override
   public Value value(final QueryContext qc) throws QueryException {
-    return seqType.cast(expr.atomValue(qc, info), true, qc, info);
+    return seqType.cast(expr.value(qc), true, qc, info);
   }
 
   @Override
@@ -72,10 +72,6 @@ public final class Cast extends Convert {
 
   @Override
   public void toString(final QueryString qs) {
-    if(seqType.one()) {
-      qs.token("(").token(expr).token(CAST).token(AS).token(seqType).token(')');
-    } else {
-      qs.token(seqType.type).paren(expr);
-    }
+    qs.token("(").token(expr).token(CAST).token(AS).token(seqType).token(')');
   }
 }

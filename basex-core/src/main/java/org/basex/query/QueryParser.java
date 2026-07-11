@@ -337,12 +337,12 @@ public class QueryParser extends InputParser {
       }
     }
     deferredMapKeys.clear();
-    // a referenced cast target type must be declared and castable
+    // a referenced cast target type must be declared and eligible as a cast target
     for(final TypeRef ref : deferredCastTargets) {
       final SeqType st = declaredTypes.get(ref.name());
       if(st == null) throw error(WHICHCAST_X, BasicType.similar(ref.name()));
       ref.resolve(st.type);
-      if(ref.atomic() == null) throw error(INVALIDCAST_X, ref);
+      checkCastTarget(ref);
     }
     deferredCastTargets.clear();
   }
@@ -3941,13 +3941,27 @@ public class QueryParser extends InputParser {
   private SeqType castTarget() throws QueryException {
     Type type;
     if(wsConsume("(")) {
+      // choice item type, e.g. (xs:date | xs:dateTime)
       type = choiceItemType().type;
     } else {
-      final QNm name = eQName(sc.elemNsAny ? XS_URI : sc.elemNS, TYPEINVALID);
-      if(!name.hasURI() && eq(name.local(), token(ENUM))) {
+      final QNm name = eQName(null, TYPEINVALID);
+      final byte[] local = name.hasURI() ? null : name.local();
+      final Type ft = FuncType.get(name);
+      if(eq(local, token(ENUM))) {
+        // enumeration type
         if(!wsConsume("(")) throw error(WHICHCAST_X, BasicType.similar(name));
         type = enumerationType();
+      } else if(ft != null && wsConsume("(")) {
+        // array(...), map(...), record(...); function(...) is rejected in checkCastTarget
+        type = functionTest(AnnList.EMPTY, ft);
+      } else if(eq(local, token(ITEM)) && wsConsume("(")) {
+        // item()
+        wsCheck(")");
+        type = BasicType.ITEM;
       } else {
+        // attach default element namespace, or schema namespace if default is ##any
+        if(!name.hasURI()) name.uri(sc.elemNsAny ? XS_URI : sc.elemNS);
+        // schema type, list type, or (forward) reference to a named item type
         type = ListType.get(name);
         if(type == null) {
           type = BasicType.get(name, false);
@@ -3968,9 +3982,40 @@ public class QueryParser extends InputParser {
         }
       }
     }
-    if(!(type instanceof TypeRef) && type.atomic() == null) throw error(INVALIDCAST_X, type);
+    // check cast eligibility (forward references are re-checked after resolution)
+    checkCastTarget(type);
+    // occurrence indicator
     skipWs();
-    return type.seqType(consume('?') ? Occ.ZERO_OR_ONE : Occ.EXACTLY_ONE);
+    final Occ occ = consume('?') ? Occ.ZERO_OR_ONE : consume('+') ? Occ.ONE_OR_MORE :
+      consume('*') ? Occ.ZERO_OR_MORE : Occ.EXACTLY_ONE;
+    return type.seqType(occ);
+  }
+
+  /**
+   * Checks if a type is eligible as the target of a cast expression. The component types of arrays,
+   * maps, and records are not validated here: they are checked while casting. Unresolved forward
+   * references are treated as eligible and re-checked after resolution.
+   * @param type type to check
+   * @return {@code true} if an unresolved forward reference was encountered
+   * @throws QueryException if the type cannot serve as a cast target
+   */
+  private boolean checkCastTarget(final Type type) throws QueryException {
+    if(TypeRef.unresolved(type)) return true;
+    final Type tp = TypeRef.deref(type);
+    // item(); array, map, record types (component types are checked while casting)
+    if(tp == BasicType.ITEM || tp instanceof ArrayType || tp instanceof MapType) return false;
+    // choice item type: all alternatives must be eligible
+    if(tp instanceof final ChoiceItemType cit) {
+      boolean deferred = false;
+      for(final Type alt : cit.types) deferred |= checkCastTarget(alt);
+      return deferred;
+    }
+    // generalized atomic type, schema list type, enumeration type
+    if(tp instanceof EnumType || tp instanceof ListType) return false;
+    if(tp instanceof final BasicType bt && bt.atomic() != null &&
+        !bt.oneOf(BasicType.NOTATION, BasicType.ANY_ATOMIC_TYPE, BasicType.ANY_SIMPLE_TYPE))
+      return false;
+    throw error(INVALIDCAST_X, type);
   }
 
   /**

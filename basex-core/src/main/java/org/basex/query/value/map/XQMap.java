@@ -377,6 +377,72 @@ public abstract class XQMap extends XQStruct {
     return new XQRecordMap(rt, values);
   }
 
+  /**
+   * Casts this map to the given map type (see {@link SeqType#cast}).
+   * @param mt map type
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return cast map, or {@code null} if casting failed and no error was raised
+   * @throws QueryException query exception
+   */
+  public final XQMap castTo(final MapType mt, final boolean error, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    if(mt == Types.MAP) return this;
+    final SeqType kt = mt.keyType().seqType(), vt = mt.valueType();
+    final MapBuilder mb = new MapBuilder(structSize());
+    for(final Item key : keys()) {
+      qc.checkStop();
+      final Value ck = kt.convert(key, error, qc, info);
+      if(ck == null) return null;
+      final Item k = (Item) ck;
+      if(mb.contains(k)) {
+        if(error) throw MAPDUPLKEY_X.get(info, k);
+        return null;
+      }
+      final Value cv = vt.convert(get(key), error, qc, info);
+      if(cv == null) return null;
+      mb.put(k, cv);
+    }
+    return mb.map();
+  }
+
+  /**
+   * Casts this map to the given record type (see {@link SeqType#cast}). Undeclared entries are
+   * discarded; a missing field yields the empty sequence if that is a valid field value.
+   * @param rt record type
+   * @param error raise error (return {@code null} otherwise)
+   * @param qc query context
+   * @param info input info (can be {@code null})
+   * @return cast record, or {@code null} if casting failed and no error was raised
+   * @throws QueryException query exception
+   */
+  public final XQMap castTo(final RecordType rt, final boolean error, final QueryContext qc,
+      final InputInfo info) throws QueryException {
+    if(rt == Types.RECORD) return this;
+    final TokenObjectMap<RecordField> fields = rt.fields();
+    final int fs = fields.size();
+    if(fs == 0) return empty();
+    final Value[] values = new Value[fs];
+    for(int f = 0; f < fs; f++) {
+      qc.checkStop();
+      final SeqType ft = fields.value(f + 1).seqType();
+      final Value value = getOrNull(Str.get(fields.key(f + 1)));
+      final Value cast;
+      if(value != null) {
+        cast = ft.convert(value, error, qc, info);
+      } else if(ft.instance(Empty.VALUE)) {
+        cast = Empty.VALUE;
+      } else {
+        if(error) throw INVCONVERT_X_X.get(info, Empty.VALUE, ft);
+        cast = null;
+      }
+      if(cast == null) return null;
+      values[f] = cast;
+    }
+    return new XQRecordMap(rt, values);
+  }
+
   @Override
   public boolean refineType() throws QueryException {
     Type refined = null;

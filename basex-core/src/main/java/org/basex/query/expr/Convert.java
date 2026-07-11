@@ -15,15 +15,15 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 abstract class Convert extends Single {
-  /** Sequence type to cast to (zero or one items). */
+  /** Target sequence type. */
   final SeqType seqType;
 
   /**
    * Function constructor.
    * @param info input info (can be {@code null})
    * @param expr expression
-   * @param seqType sequence type to cast to (zero or one item)
-   * @param targetType target type
+   * @param seqType target sequence type
+   * @param targetType static type of this expression
    */
   Convert(final InputInfo info, final Expr expr, final SeqType seqType, final SeqType targetType) {
     super(info, expr, targetType);
@@ -32,7 +32,11 @@ abstract class Convert extends Single {
 
   @Override
   public Expr optimize(final CompileContext cc) throws QueryException {
-    expr = expr.simplifyFor(Simplify.STRING, cc);
+    // only atomizing casts benefit from string simplification (not item(), arrays, maps, records)
+    final Type dt = TypeRef.deref(seqType.type);
+    if(dt != BasicType.ITEM && !(dt instanceof FType)) {
+      expr = expr.simplifyFor(Simplify.STRING, cc);
+    }
     return this;
   }
 
