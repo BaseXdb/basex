@@ -104,11 +104,17 @@ public final class ProjectView extends BaseXPanel {
     final JScrollPane tscroll = new JScrollPane(tree);
     tscroll.setBorder(BaseXLayout.border(0, 0, 0, 0));
 
+    final BaseXBack listPanel = new BaseXBack(false).layout(new BorderLayout(0, 2));
+    listPanel.add(lscroll, BorderLayout.CENTER);
+    listPanel.add(filter.replaceRow(), BorderLayout.SOUTH);
+
     split = new BaseXSplit(false);
     split.setOpaque(false);
-    split.add(lscroll);
+    split.add(listPanel);
     split.add(tscroll);
-    split.init(new double[] { 0.3, 0.7}, new double[] { 0, 1});
+    final double lh = gui.gopts.get(GUIOptions.PROJECTLIST) / 100d;
+    split.init(new double[] { lh, 1 - lh }, new double[] { 0, 1});
+    split.resized(sizes -> gui.gopts.set(GUIOptions.PROJECTLIST, (int) Math.round(sizes[0] * 100)));
     split.visible(false);
     showList(false);
 
@@ -349,6 +355,9 @@ public final class ProjectView extends BaseXPanel {
   private void changeRoot() {
     final IOFile path = new IOFile(rootPath.getText());
     if(root.file.eq(path)) return;
+
+    // the pending replacement backup mirrors the old root; invalidate it
+    filter.discardBackups();
 
     gui.gopts.setFile(GUIOptions.PROJECTPATH, path);
     gui.saveOptions();

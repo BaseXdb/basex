@@ -49,6 +49,9 @@ public final class Prop {
   /** Respect lower/upper case when doing file comparisons. */
   public static final boolean CASE = !(MAC || WIN);
 
+  /** Process ID. */
+  public static final long PID = ProcessHandle.current().pid();
+
   /** Prefix for project specific options. */
   public static final String DBPREFIX = "org.basex.";
   /** System property for specifying database home directory. */

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.*;
 
 /**
  * Tests for the GUI editor regular-expression search and replace engine
- * ({@link SearchContext#pattern} and {@link SearchBar#normalize}).
+ * ({@link SearchContext#pattern} and {@link SearchContext#normalize}).
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -479,6 +479,6 @@ public final class SearchTest {
    */
   private static String repl(final String search, final String replInput, final String input) {
     return SearchContext.pattern(search, true, false, true, false).matcher(input).
-        replaceAll(SearchBar.normalize(replInput));
+        replaceAll(SearchContext.normalize(replInput));
   }
 }

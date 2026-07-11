@@ -848,6 +848,10 @@ public interface Text {
   String REPLACE_WITH = lang("replace_with");
   /** Number of replaced strings. */
   String STRINGS_REPLACED_X = lang("strings_replaced_%");
+  /** Confirm content replacement in a number of files. */
+  String REPLACE_FILES_X = lang("replace_files_%");
+  /** Undo the last content replacement. */
+  String UNDO_REPLACE = lang("undo_replace");
   /** Match case. */
   String MATCH_CASE = lang("match_case");
   /** Whole word. */

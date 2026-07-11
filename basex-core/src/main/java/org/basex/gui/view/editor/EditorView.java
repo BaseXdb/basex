@@ -556,9 +556,7 @@ public final class EditorView extends View {
 
     // save modified files before executing queries
     if(gui.gopts.get(GUIOptions.SAVERUN) && (action == Action.EXECUTE || action == Action.TEST)) {
-      for(final EditorArea edit : editors()) {
-        if(edit.opened()) edit.save();
-      }
+      saveAll();
     }
 
     IOFile file = editor.file();
@@ -988,6 +986,24 @@ public final class EditorView extends View {
       pos.setText(cp[0] + "\u2009:\u2009" + cp[1]);
     }
   };
+
+  /**
+   * Returns the editor that has the specified file open.
+   * @param file file to be found
+   * @return editor or {@code null}
+   */
+  public EditorArea editor(final IOFile file) {
+    return find(file);
+  }
+
+  /**
+   * Saves all opened editors.
+   */
+  public void saveAll() {
+    for(final EditorArea edit : editors()) {
+      if(edit.opened()) edit.save();
+    }
+  }
 
   /**
    * Finds the editor that contains the specified file.

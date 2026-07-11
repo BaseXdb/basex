@@ -4,6 +4,8 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.util.List;
 import java.util.regex.*;
 
 import javax.swing.*;
@@ -23,6 +25,12 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class ProjectFilter extends BaseXBack {
+  /** Directory for replacement backups. */
+  private static final IOFile REPLACE_TEMP =
+      new IOFile(new IOFile(Prop.TEMPDIR, Prop.PROJECT), "replace");
+
+  /** Backup directory. */
+  private final IOFile backupDir = new IOFile(REPLACE_TEMP, String.valueOf(Prop.PID));
   /** Files. */
   private final BaseXCombo filesFilter;
   /** Contents. */
@@ -35,8 +43,36 @@ final class ProjectFilter extends BaseXBack {
   private final AbstractButton regex;
   /** Mode: dot matches all. */
   private final AbstractButton dotall;
+  /** Replacement. */
+  private final BaseXCombo replace;
+  /** Replace-all button. */
+  private final AbstractButton replaceButton;
+  /** Replacement row. */
+  private final BaseXBack replaceRow;
+  /** Undo last replacement. */
+  private final AbstractButton undo;
   /** Project view. */
   private final ProjectView view;
+  /** Common text field shortcuts. */
+  private final KeyListener modeKeys = new KeyAdapter() {
+    @Override
+    public void keyPressed(final KeyEvent e) {
+      if(BaseXKeys.META_ENTER.is(e)) {
+        replace();
+      } else if(BaseXKeys.MATCHCASE.is(e)) {
+        toggleMode(mcase);
+      } else if(BaseXKeys.WHOLEWORD.is(e)) {
+        toggleMode(word);
+      } else if(BaseXKeys.REGEX.is(e)) {
+        toggleMode(regex);
+      } else if(BaseXKeys.DOTALL.is(e)) {
+        if(dotall.isEnabled()) toggleMode(dotall);
+      } else {
+        return;
+      }
+      e.consume();
+    }
+  };
 
   /** Last files filter. */
   private String lastFiles = "";
@@ -49,6 +85,8 @@ final class ProjectFilter extends BaseXBack {
    */
   ProjectFilter(final ProjectView view) {
     this.view = view;
+
+    cleanupBackups();
 
     layout(new BorderLayout(0, 2));
     filesFilter = new BaseXCombo(view.gui, true).history(GUIOptions.PROJFILES, view.gui.gopts);
@@ -78,11 +116,31 @@ final class ProjectFilter extends BaseXBack {
     contentRow.add(contentsFilter, BorderLayout.CENTER);
     contentRow.add(modes, BorderLayout.EAST);
 
+    // content replacement
+    replace = new BaseXCombo(view.gui, true).history(GUIOptions.PROJREPLACE, view.gui.gopts);
+    replace.hint(Text.REPLACE_WITH + Text.DOTS);
+    replace.addFocusListener(view.lastfocus);
+    replaceButton = BaseXButton.get("f_replaceall", BaseXLayout.addShortcut(
+        Text.REPLACE_ALL, BaseXKeys.META_ENTER.toString()), false, view.gui);
+    replaceButton.addActionListener(e -> replace());
+    replaceButton.setEnabled(false);
+    undo = BaseXButton.get("c_go_back", Text.UNDO_REPLACE, false, view.gui);
+    undo.addActionListener(e -> undoReplace());
+    undo.setEnabled(false);
+    final BaseXToolBar actions = new BaseXToolBar();
+    actions.add(undo);
+    actions.add(replaceButton);
+    replaceRow = new BaseXBack(false).layout(new BorderLayout(2, 0));
+    replaceRow.add(replace, BorderLayout.CENTER);
+    replaceRow.add(actions, BorderLayout.EAST);
+    replaceRow.setVisible(false);
+
     add(filesFilter, BorderLayout.NORTH);
     add(contentRow, BorderLayout.CENTER);
 
     addKeyListener(filesFilter);
     addKeyListener(contentsFilter);
+    replace.addKeyListener(modeKeys);
     refreshLayout();
   }
 
@@ -104,8 +162,9 @@ final class ProjectFilter extends BaseXBack {
       // clear the feedback of a previous search
       contentsFilter.highlight(backColor);
       contentsFilter.setToolTipText(null);
+      showReplace(false);
     }
-    view.showList(filter);
+    view.showList(filter || replaceRow.isVisible());
   }
 
   /**
@@ -132,9 +191,9 @@ final class ProjectFilter extends BaseXBack {
   }
 
   /**
-   * Derives a files filter from a file name, matching files with the same extension.
+   * Derives a files filter from a file name.
    * @param name file name
-   * @return new files pattern, or {@code null} if the current filter should be kept
+   * @return new files pattern or {@code null}
    */
   private String filePattern(final String name) {
     // extension-less files have no meaningful extension pattern
@@ -155,6 +214,130 @@ final class ProjectFilter extends BaseXBack {
   SearchFlags flags() {
     return new SearchFlags(mcase.isSelected(), word.isSelected(),
         regex.isSelected(), dotall.isSelected());
+  }
+
+  /**
+   * Returns the replacement row.
+   * @return replacement row
+   */
+  BaseXBack replaceRow() {
+    return replaceRow;
+  }
+
+  /**
+   * Shows or hides the replacement row.
+   * @param contentSearch content search is active
+   */
+  private void showReplace(final boolean contentSearch) {
+    final boolean show = contentSearch || undo.isEnabled();
+    if(replaceRow.isVisible() != show) {
+      replaceRow.setVisible(show);
+      view.revalidate();
+    }
+  }
+
+  /**
+   * Replaces the content search string in all listed files.
+   */
+  private void replace() {
+    if(!replaceButton.isEnabled()) return;
+
+    final String contents = view.list.search();
+    final boolean rgx = regex.isSelected();
+    final Pattern pattern;
+    try {
+      pattern = SearchContext.pattern(contents, mcase.isSelected(), word.isSelected(), rgx,
+          dotall.isSelected());
+    } catch(final PatternSyntaxException ex) {
+      Util.debug(ex);
+      return;
+    }
+
+    final List<IOFile> targets = view.list.allFiles();
+    if(targets.isEmpty() || !BaseXDialog.confirm(view.gui,
+        Util.info(Text.REPLACE_FILES_X, targets.size()))) return;
+
+    final String in = replace.getText();
+    final String replacement = rgx ? SearchContext.normalize(in) : Matcher.quoteReplacement(in);
+    replace.updateHistory();
+
+    // save open editors so the on-disk replacement sees their current content
+    view.gui.editor.saveAll();
+    discardBackups();
+
+    final IOFile root = view.root.file;
+    boolean changed = false;
+    try {
+      for(final IOFile file : targets) {
+        final String rel = relative(root, file);
+        if(rel != null && ProjectFiles.replace(file, pattern, replacement,
+            new IOFile(backupDir, rel))) {
+          changed = true;
+          final EditorArea ea = view.gui.editor.editor(file);
+          if(ea != null) ea.reopen(true);
+        }
+      }
+    } catch(final RuntimeException ex) {
+      Util.debug(ex);
+      backupDir.delete();
+      replace.highlight(lightRed);
+      replace.setToolTipText(ex.getLocalizedMessage());
+      return;
+    }
+    replace.highlight(backColor);
+    replace.setToolTipText(null);
+    undo.setEnabled(changed);
+    view.refresh();
+  }
+
+  /**
+   * Undoes the last replacement.
+   */
+  private void undoReplace() {
+    final IOFile root = view.root.file;
+    for(final String rel : backupDir.descendants()) {
+      final IOFile file = new IOFile(root, rel);
+      try {
+        new IOFile(backupDir, rel).copyTo(file);
+      } catch(final IOException ex) {
+        // file may not be writable
+        Util.debug(ex);
+      }
+      final EditorArea ea = view.gui.editor.editor(file);
+      if(ea != null) ea.reopen(true);
+    }
+    discardBackups();
+    view.refresh();
+  }
+
+  /**
+   * Discards the pending replacement backup.
+   */
+  void discardBackups() {
+    backupDir.delete();
+    undo.setEnabled(false);
+  }
+
+  /**
+   * Returns the path of a file relative to the project root.
+   * @param root project root directory
+   * @param file file
+   * @return relative path, or {@code null} if the file is not inside the root
+   */
+  private static String relative(final IOFile root, final IOFile file) {
+    final String base = Strings.endsWith(root.path(), '/') ? root.path() : root.path() + '/';
+    final String path = file.path();
+    return path.startsWith(base) ? path.substring(base.length()) : null;
+  }
+
+  /**
+   * Removes this instance's backups and those of dead instances, never a live instance's.
+   */
+  private static void cleanupBackups() {
+    for(final IOFile child : REPLACE_TEMP.children()) {
+      final long owner = Strings.toLong(child.name());
+      if(owner == Prop.PID || owner > 0 && ProcessHandle.of(owner).isEmpty()) child.delete();
+    }
   }
 
   /**
@@ -216,7 +399,6 @@ final class ProjectFilter extends BaseXBack {
       @Override
       protected void done(final String[] list) {
         view.list.setElements(list, contents);
-        // highlight an invalid regular expression
         final String error = content.error();
         contentsFilter.highlight(error != null ? lightRed : backColor);
         contentsFilter.setToolTipText(error);
@@ -225,6 +407,9 @@ final class ProjectFilter extends BaseXBack {
         view.gui.status.setText(contents.isEmpty() ? Util.info(Text.FILES_FOUND_X, found) :
           Util.info(Text.FILES_FOUND_STATS_X, found, content.searched(), content.tooLarge(),
               content.binary()), true);
+        final boolean contentSearch = !contents.isEmpty();
+        replaceButton.setEnabled(contentSearch && list.length > 0);
+        showReplace(contentSearch);
         filesFilter.setCursor(CURSORTEXT);
         contentsFilter.setCursor(CURSORTEXT);
         view.list.setCursor(CURSORARROW);
@@ -237,6 +422,7 @@ final class ProjectFilter extends BaseXBack {
    * @param combo combo box
    */
   private void addKeyListener(final BaseXCombo combo) {
+    combo.addKeyListener(modeKeys);
     combo.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -244,18 +430,6 @@ final class ProjectFilter extends BaseXBack {
         if(BaseXKeys.NEXTLINE.is(e) || BaseXKeys.PREVLINE.is(e) ||
             BaseXKeys.NEXTPAGE.is(e) || BaseXKeys.PREVPAGE.is(e)) {
           view.list.dispatchEvent(e);
-        } else if(BaseXKeys.MATCHCASE.is(e)) {
-          toggleMode(mcase);
-          e.consume();
-        } else if(BaseXKeys.WHOLEWORD.is(e)) {
-          toggleMode(word);
-          e.consume();
-        } else if(BaseXKeys.REGEX.is(e)) {
-          toggleMode(regex);
-          e.consume();
-        } else if(BaseXKeys.DOTALL.is(e)) {
-          if(dotall.isEnabled()) toggleMode(dotall);
-          e.consume();
         } else {
           for(final GUIPopupCmd cmd : view.list.commands) {
             if(cmd == null) continue;

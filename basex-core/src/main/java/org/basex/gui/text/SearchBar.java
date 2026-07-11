@@ -397,7 +397,7 @@ public final class SearchBar extends BaseXBack {
    */
   private String replacement() {
     final String in = replace.getText();
-    return regex.isSelected() ? normalize(in) : Matcher.quoteReplacement(in);
+    return regex.isSelected() ? SearchContext.normalize(in) : Matcher.quoteReplacement(in);
   }
 
   /**
@@ -517,53 +517,5 @@ public final class SearchBar extends BaseXBack {
     b.addKeyListener(keys);
     b.addActionListener(action);
     return b;
-  }
-
-  /**
-   * Normalizes a regular-expression replacement string to a valid Java replacement.
-   * Supported: {@code \n}, {@code \t}, {@code \\}, {@code \$}, group references
-   * {@code $1}/{@code \1}/{@code ${name}}; a bare {@code $} is treated as literal.
-   * @param in input
-   * @return normalized string
-   */
-  static String normalize(final String in) {
-    final StringBuilder sb = new StringBuilder();
-    final int is = in.length();
-    for(int i = 0; i < is; i++) {
-      final char ch = in.charAt(i);
-      if(ch == '\\') {
-        final char n = i + 1 < is ? in.charAt(++i) : 0;
-        if(n == 'n') sb.append('\n');
-        else if(n == 't') sb.append('\t');
-        else if(n == '\\') sb.append("\\\\");
-        else if(n == '$') sb.append("\\$");
-        else if(n >= '0' && n <= '9') sb.append('$').append(n);
-        else {
-          sb.append("\\\\");
-          if(n != 0) sb.append(n);
-        }
-      } else if(ch == '$') {
-        final char n = i + 1 < is ? in.charAt(i + 1) : 0;
-        if(n >= '0' && n <= '9') {
-          sb.append('$');
-        } else if(n == '{') {
-          // ${digits} -> $digits (numbered); ${name} passes through as a named reference
-          int k = i + 2;
-          while(k < is && in.charAt(k) != '}') k++;
-          final String name = in.substring(i + 2, Math.min(k, is));
-          if(k < is && !name.isEmpty() && name.chars().allMatch(Character::isDigit)) {
-            sb.append('$').append(name);
-            i = k;
-          } else {
-            sb.append('$');
-          }
-        } else {
-          sb.append("\\$");
-        }
-      } else {
-        sb.append(ch);
-      }
-    }
-    return sb.toString();
   }
 }

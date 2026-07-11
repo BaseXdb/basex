@@ -24,15 +24,15 @@ import org.basex.util.list.*;
 final class ProjectFiles {
   /** Maximum number of filtered hits (speeds up search). */
   static final int MAXHITS = 1000;
-  /** Content match result: the file contains the search string. */
+  /** Content match result (success). */
   static final int FOUND = 1;
-  /** Content match result: the file does not contain the search string. */
+  /** Content match result (missing). */
   static final int MISSING = 0;
-  /** Content match result: the file is binary or unreadable. */
+  /** Content match result (binary). */
   static final int BINARY = -1;
-  /** Maximum file size for the buffered regular-expression search (larger files are skipped). */
+  /** Maximum file size for the buffered regex search. */
   private static final long MAXBYTES = 100L << 20;
-  /** Regular-expression metacharacters (a string without any of these is a plain literal). */
+  /** Regex characters. */
   private static final String REGEX_META = "\\.[]{}()*+?^$|";
   /** Parse ID. */
   private static long parseId;
@@ -243,10 +243,7 @@ final class ProjectFiles {
     return results.size() >= MAXHITS;
   }
 
-  /**
-   * Content matcher. Also records how many files were examined, skipped because they were too
-   * large, or skipped because they were binary, and the error of an invalid regular expression.
-   */
+  /** Content matcher. */
   static final class ContentFilter {
     /** Streaming search codepoints ({@code null} for the buffered or trivial matcher). */
     private final int[] cps;
@@ -345,9 +342,7 @@ final class ProjectFiles {
   }
 
   /**
-   * Creates a filter for the file contents. Plain (non-regex, non-word) searches use a
-   * memory-light streaming scan; regular-expression and whole-word searches buffer each candidate
-   * file, rejecting binary files and skipping files that exceed {@link #MAXBYTES}.
+   * Creates a filter for the file contents.
    * @param contents contents search string
    * @param mcase match case
    * @param word whole word
@@ -377,8 +372,7 @@ final class ProjectFiles {
   }
 
   /**
-   * Checks if a regular expression is a plain literal, i.e. contains no metacharacters and can
-   * hence be matched with the faster streaming scan.
+   * Checks if a regular expression is a plain literal.
    * @param string regular expression
    * @return result of check
    */
@@ -418,8 +412,7 @@ final class ProjectFiles {
   }
 
   /**
-   * Computes the KMP prefix function of a search string: {@code lps[i]} is the length of the
-   * longest proper prefix of {@code search[0..i]} that is also a suffix.
+   * Computes the KMP prefix function of a search string.
    * @param search codepoints of search string
    * @return prefix function
    */
@@ -439,10 +432,41 @@ final class ProjectFiles {
   }
 
   /**
-   * Reads a file as text for a regular-expression search. Aborts as soon as an invalid (binary)
-   * character is read, before the whole file has been loaded.
+   * Creates backups and replaces all matches of a pattern in a file.
    * @param file file
-   * @return file contents, or {@code null} if the file is binary or not accessible
+   * @param pattern search pattern
+   * @param replacement Java replacement string
+   * @param backup backup file for the original contents
+   * @return {@code true} if the file was changed
+   */
+  static boolean replace(final IOFile file, final Pattern pattern, final String replacement,
+      final IOFile backup) {
+    if(file.length() > MAXBYTES) return false;
+    final String text = read(file);
+    if(text == null) return false;
+
+    final Matcher matcher = pattern.matcher(text);
+    final StringBuilder sb = new StringBuilder();
+    int count = 0;
+    for(; matcher.find(); count++) matcher.appendReplacement(sb, replacement);
+    if(count == 0) return false;
+    matcher.appendTail(sb);
+
+    try {
+      backup.parent().md();
+      file.copyTo(backup);
+      file.write(sb.toString());
+      return true;
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return false;
+    }
+  }
+
+  /**
+   * Tries to read a file as text for a regular-expression search.
+   * @param file file
+   * @return file contents or {@code null}
    */
   private static String read(final IOFile file) {
     try(TextInput ti = new TextInput(file)) {

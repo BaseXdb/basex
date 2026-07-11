@@ -67,6 +67,8 @@ public final class GUIOptions extends Options {
   public static final StringOption LAYOUT = new StringOption("LAYOUT", GUIConstants.VIEWS);
   /** Width of the project view (pixels). */
   public static final NumberOption PROJECTSIZE = new NumberOption("PROJECTSIZE", 250);
+  /** Height of the project list (percentage). */
+  public static final NumberOption PROJECTLIST = new NumberOption("PROJECTLIST", 30);
 
   /** GUI height. */
   public static final NumbersOption GUISIZE = new NumbersOption("GUISIZE", 1004, 748);
@@ -237,6 +239,8 @@ public final class GUIOptions extends Options {
   public static final StringsOption PROJFILES = new StringsOption("PROJFILES");
   /** History of filtered project file contents. */
   public static final StringsOption PROJCONTS = new StringsOption("PROJCONTS");
+  /** History of project content replacements. */
+  public static final StringsOption PROJREPLACE = new StringsOption("PROJREPLACE");
 
   /**
    * Constructor.

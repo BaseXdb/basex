@@ -48,12 +48,12 @@ final class ProjectList extends JList<String> implements ProjectCommands {
   }
 
   /**
-   * Assigns the specified list entries and selects the first entry.
+   * Assigns the specified list entries and selects the first one.
    * @param list result elements
    * @param srch content search string
    */
   void setElements(final String[] list, final String srch) {
-    // only update list if values have changed (preserves selections)
+    // rebuild the list only if the entries changed (preserves the selection otherwise)
     final ListModel<String> model = getModel();
     final int ll = list.length, ms = model.getSize();
     boolean same = ll == ms;
@@ -132,6 +132,17 @@ final class ProjectList extends JList<String> implements ProjectCommands {
 
     final ArrayList<IOFile> files = new ArrayList<>();
     for(final String value : getSelectedValuesList()) files.add(new IOFile(value));
+    return files;
+  }
+
+  /**
+   * Returns all listed files (a content replacement applies to all of them).
+   * @return files
+   */
+  List<IOFile> allFiles() {
+    final ListModel<String> model = getModel();
+    final ArrayList<IOFile> files = new ArrayList<>();
+    for(int i = 0; i < model.getSize(); i++) files.add(new IOFile(model.getElementAt(i)));
     return files;
   }
 
