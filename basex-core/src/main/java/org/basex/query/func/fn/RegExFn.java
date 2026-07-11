@@ -59,13 +59,25 @@ public abstract class RegExFn extends StandardFunc {
   }
 
   /**
-   * Tries to convert the regex pattern to a single character.
+   * Returns the string of a pattern that can be matched literally, i.e. without evaluating a
+   * regular expression, or {@code null} otherwise.
    * @param pattern pattern
-   * @return character or {@code -1}
+   * @param flags flags
+   * @return literal string, or {@code null}
    */
-  static int patternChar(final byte[] pattern) {
-    final int sl = pattern.length, separator = sl > 0 && cl(pattern, 0) == sl ? cp(pattern, 0) : -1;
-    return separator == -1 || contains(REGEX_CHARS, separator) ? -1 : separator;
+  static byte[] literal(final byte[] pattern, final byte[] flags) {
+    // empty pattern matches the empty string: leave to the regular expression engine
+    if(pattern.length == 0) return null;
+    // "q" flag: the whole pattern is literal
+    if(flags.length == 1 && flags[0] == 'q') return pattern;
+    // no flags: literal if the pattern contains no regular expression meta character
+    if(flags.length == 0) {
+      for(final byte b : pattern) {
+        if(contains(REGEX_CHARS, b)) return null;
+      }
+      return pattern;
+    }
+    return null;
   }
 
   /**

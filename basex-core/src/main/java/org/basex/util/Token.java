@@ -1060,6 +1060,25 @@ public final class Token {
   }
 
   /**
+   * Splits a token around occurrences of the given separator token.
+   * @param token token to be split
+   * @param separator separator token (an empty separator returns the token unchanged)
+   * @param empty include empty tokens
+   * @return array
+   */
+  public static byte[][] split(final byte[] token, final byte[] separator, final boolean empty) {
+    final int sl = separator.length, tl = token.length;
+    if(sl == 0) return new byte[][] { token };
+    final TokenList split = new TokenList();
+    int s = 0;
+    for(int i; (i = indexOf(token, separator, s)) != -1; s = i + sl) {
+      if(empty || i > s) split.add(Arrays.copyOfRange(token, s, i));
+    }
+    if(empty || s < tl) split.add(Arrays.copyOfRange(token, s, tl));
+    return split.finish();
+  }
+
+  /**
    * Normalizes the specified input and returns its distinct tokens.
    * Optimized for small number of tokens.
    * @param token token
@@ -1104,6 +1123,28 @@ public final class Token {
     final TokenBuilder tb = new TokenBuilder(token.length);
     forEachCp(token, cp -> tb.add(cp == search ? replace : cp));
     return tb.finish();
+  }
+
+  /**
+   * Replaces all occurrences of the search token and returns the result token.
+   * @param token token to be checked
+   * @param search token to be replaced (an empty token is returned unchanged)
+   * @param replace replacement token
+   * @return resulting token
+   */
+  public static byte[] replace(final byte[] token, final byte[] search, final byte[] replace) {
+    if(search.length == 0) return token;
+    int i = indexOf(token, search);
+    if(i == -1) return token;
+
+    final int sl = search.length;
+    final TokenBuilder tb = new TokenBuilder(token.length);
+    int s = 0;
+    do {
+      tb.add(token, s, i).add(replace);
+      s = i + sl;
+    } while((i = indexOf(token, search, s)) != -1);
+    return tb.add(token, s, token.length).finish();
   }
 
   /**

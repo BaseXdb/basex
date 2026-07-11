@@ -36,10 +36,14 @@ public final class FnReplace extends RegExFn {
     final FItem action = func ? toFunction(replacement, 2, qc) : null;
     final byte[] replace = func ? null : replacement.isEmpty() ? EMPTY : toToken(replacement);
 
-    // shortcut for simple character replacements
-    if(flags.length == 0) {
-      final int sp = patternChar(pattern), rp = func ? -1 : patternChar(replace);
-      if(sp != -1 && rp != -1) return Str.get(replace(value, sp, rp));
+    // shortcut for literal replacements
+    if(!func) {
+      final byte[] search = literal(pattern, flags);
+      // with "q" flag, "$" and "\" in the replacement are literal; otherwise they must be absent
+      final boolean q = flags.length == 1 && flags[0] == 'q';
+      if(search != null && (q || !contains(replace, '\\') && !contains(replace, '$'))) {
+        return Str.get(replace(value, search, replace));
+      }
     }
     final RegExpr regExpr = regExpr(pattern, flags, qc);
     final Matcher matcher = regExpr.pattern.matcher(string(value));

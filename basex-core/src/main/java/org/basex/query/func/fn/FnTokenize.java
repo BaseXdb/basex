@@ -20,8 +20,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FnTokenize extends RegExFn {
-  /** Default pattern. */
-  private static final byte[] DEFAULT = Token.cpToken(' ');
+  /** Default pattern (unique instance: must not equal the token of an explicit " " pattern). */
+  private static final byte[] DEFAULT = { ' ' };
   /** Placeholder for default search. */
   private static final byte[] WHITESPACE = Token.token("\\s+");
 
@@ -30,30 +30,28 @@ public final class FnTokenize extends RegExFn {
     final byte[] pattern = pattern(qc);
     final byte[] value = input(pattern, qc);
     final byte[] flags = toZeroToken(arg(2), qc);
-    final boolean simple = pattern == DEFAULT || flags.length == 0;
     final int vl = value.length;
 
-    if(simple) {
-      final int ch = patternChar(pattern);
-      if(ch != -1) {
-        final int sl = pattern.length;
-        return vl == 0 ? Empty.ITER : new Iter() {
-          int start;
+    // default pattern: split on whitespace, ignore flags
+    final byte[] literal = pattern == DEFAULT ? DEFAULT : literal(pattern, flags);
+    if(literal != null) {
+      final int sl = literal.length;
+      return vl == 0 ? Empty.ITER : new Iter() {
+        int start;
 
-          @Override
-          public Item next() {
-            if(start == -1) return null;
-            final int e = Token.indexOf(value, ch, start);
-            return e != -1 ? next(e, e + sl) : next(vl, -1);
-          }
+        @Override
+        public Item next() {
+          if(start == -1) return null;
+          final int e = Token.indexOf(value, literal, start);
+          return e != -1 ? next(e, e + sl) : next(vl, -1);
+        }
 
-          private Str next(final int end, final int next) {
-            final int b = start;
-            start = next;
-            return Str.get(Token.substring(value, b, end));
-          }
-        };
-      }
+        private Str next(final int end, final int next) {
+          final int b = start;
+          start = next;
+          return Str.get(Token.substring(value, b, end));
+        }
+      };
     }
 
     final Pattern p = pattern(pattern, flags, qc);
@@ -81,13 +79,12 @@ public final class FnTokenize extends RegExFn {
     final byte[] pattern = pattern(qc);
     final byte[] value = input(pattern, qc);
     final byte[] flags = toZeroToken(arg(2), qc);
-    final boolean simple = pattern == DEFAULT || flags.length == 0;
     final int vl = value.length;
 
-    if(simple) {
-      final int ch = patternChar(pattern);
-      if(ch != -1) return vl == 0 ? Empty.VALUE : StrSeq.get(Token.split(value, ch, true));
-    }
+    // default pattern: split on whitespace, ignore flags
+    final byte[] literal = pattern == DEFAULT ? DEFAULT : literal(pattern, flags);
+    if(literal != null) return vl == 0 ? Empty.VALUE :
+      StrSeq.get(Token.split(value, literal, true));
 
     final Pattern p = pattern(pattern, flags, qc);
     if(vl == 0) return Empty.VALUE;
