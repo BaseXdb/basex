@@ -207,11 +207,12 @@ public final class EditorArea extends TextPanel {
   }
 
   /**
-   * Jumps to the specified string.
+   * Jumps to the specified string, adopting the specified search flags.
    * @param string search string
+   * @param flags search flags
    */
-  public void jump(final String string) {
-    search.find(string, SearchDir.CURRENT);
+  public void jump(final String string, final SearchFlags flags) {
+    search.find(string, flags, SearchDir.CURRENT);
   }
 
   /**

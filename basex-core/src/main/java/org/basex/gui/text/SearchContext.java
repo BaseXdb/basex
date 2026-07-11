@@ -11,7 +11,7 @@ import org.basex.util.list.*;
  * @author BaseX Team, BSD License
  * @author Christian Gruen
  */
-final class SearchContext {
+public final class SearchContext {
   /** Maximum number of hits. */
   private static final int MAX = 10000000;
   /** Word character: matches {@link Character#isLetterOrDigit(int)}. */
@@ -73,7 +73,7 @@ final class SearchContext {
    * @param dotall dot matches all
    * @return compiled pattern
    */
-  static Pattern pattern(final String string, final boolean mcase, final boolean word,
+  public static Pattern pattern(final String string, final boolean mcase, final boolean word,
       final boolean regex, final boolean dotall) {
     String pat;
     if(regex) {

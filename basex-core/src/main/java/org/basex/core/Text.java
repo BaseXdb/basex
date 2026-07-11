@@ -856,6 +856,10 @@ public interface Text {
   String DOT_ALL = lang("dot_all");
   /** Regular expression. */
   String REGULAR_EXPR = lang("regular_expr");
+  /** Number of files found. */
+  String FILES_FOUND_X = lang("files_found_%");
+  /** Content search result: found, searched, too large, binary. */
+  String FILES_FOUND_STATS_X = lang("files_found_%_%_%_%");
 
   /** Serialization parameters. */
   String SERIALIZATION = lang("serialization");

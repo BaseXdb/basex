@@ -110,8 +110,7 @@ public final class SearchBar extends BaseXBack {
         BaseXLayout.addShortcut(Text.FIND_PREVIOUS, FINDPREV.toString()), false, gui);
     next = BaseXButton.get("f_next",
         BaseXLayout.addShortcut(Text.FIND_NEXT, FINDNEXT.toString()), false, gui);
-    rplcNext = BaseXButton.get("f_replace",
-        BaseXLayout.addShortcut(Text.REPLACE_NEXT, ENTER.toString()), false, gui);
+    rplcNext = BaseXButton.get("f_replace", Text.REPLACE_NEXT, false, gui);
     rplc = BaseXButton.get("f_replaceall",
         BaseXLayout.addShortcut(Text.REPLACE_ALL, META_ENTER.toString()), false, gui);
     cls = BaseXButton.get("f_close", BaseXLayout.addShortcut(Text.CLOSE, ESCAPE.toString()),
@@ -205,35 +204,29 @@ public final class SearchBar extends BaseXBack {
     final boolean editable = text.isEditable();
     if(editor == null || editable != editor.isEditable()) {
       removeAll();
-      final BaseXToolBar west = new BaseXToolBar();
-      west.add(mcase);
-      west.add(word);
-      west.add(regex);
-      west.add(dotall);
-
-      final BaseXToolBar meta = new BaseXToolBar();
-      meta.add(count);
-      meta.add(Box.createHorizontalStrut(6));
-      meta.add(prev);
-      meta.add(next);
-      meta.add(Box.createHorizontalStrut(6));
-
-      final BaseXBack found = new BaseXBack(false).layout(new BorderLayout(8, 0));
-      found.add(find, BorderLayout.CENTER);
-      found.add(meta, BorderLayout.EAST);
-
-      final BaseXBack center = new BaseXBack(false).layout(new GridLayout(1, 2, 2, 0));
-      center.add(found);
+      final BaseXBack center = new BaseXBack(false);
+      center.layout(new GridLayout(1, editable ? 2 : 1, 2, 0));
+      center.add(find);
       if(editable) center.add(replace);
 
       final BaseXToolBar east = new BaseXToolBar();
+      east.add(Box.createHorizontalStrut(6));
+      east.add(count);
+      east.add(Box.createHorizontalStrut(6));
+      east.add(prev);
+      east.add(next);
+      east.addSeparator();
+      east.add(mcase);
+      east.add(word);
+      east.add(regex);
+      east.add(dotall);
       if(editable) {
+        east.addSeparator();
         east.add(rplcNext);
         east.add(rplc);
       }
       east.add(cls);
 
-      add(west, BorderLayout.WEST);
       add(center, BorderLayout.CENTER);
       add(east, BorderLayout.EAST);
     }
@@ -312,6 +305,24 @@ public final class SearchBar extends BaseXBack {
       resetJump();
       editor.jump(dir, true);
     }
+  }
+
+  /**
+   * Adopts the specified search flags, then activates the search bar and jumps to a hit.
+   * @param string search string (ignored if empty)
+   * @param flags search flags to adopt
+   * @param dir search direction
+   */
+  public void find(final String string, final SearchFlags flags, final SearchDir dir) {
+    mcase.setSelected(flags.mcase());
+    word.setSelected(flags.word());
+    regex.setSelected(flags.regex());
+    dotall.setSelected(flags.dotall());
+    modes();
+    jumpDir = dir;
+    jumpSelect = true;
+    // enforce a fresh search: the adopted flags may differ from the current ones
+    activate(string, false, true);
   }
 
   /**
