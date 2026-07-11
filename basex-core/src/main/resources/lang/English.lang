@@ -347,7 +347,6 @@ sort                 = Sort
 srv_running          = Server is running or permission was denied
 srv_started          = Server was started
 srv_stopped          = Server was stopped
-status_bar           = Status Bar
 stemming             = Stemming
 stop                 = Stop
 stopped_at           = Stopped at

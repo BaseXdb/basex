@@ -347,7 +347,6 @@ sort                 = Rendezés
 srv_running          = Szerver fut vagy hozzáférés megtagadva
 srv_started          = Szerver elindult
 srv_stopped          = Szerver leállt
-status_bar           = Állapotsor
 stemming             = Csupaszítás
 stop                 = Megállítás
 stopped_at           = Megállítás itt:

@@ -347,7 +347,6 @@ sort                 = 排序
 srv_running          = 服务器已启动或者没有权限
 srv_started          = 服务器已启动
 srv_stopped          = 服务器已停止
-status_bar           = 状态条
 stemming             = Stemming
 stop                 = 停止
 stopped_at           = 停止在

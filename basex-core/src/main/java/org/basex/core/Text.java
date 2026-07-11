@@ -990,8 +990,6 @@ public interface Text {
   /** Command info. */
   String PLOT = lang("plot");
   /** Command info. */
-  String STATUS_BAR = lang("status_bar");
-  /** Command info. */
   String TABLE = lang("table");
   /** Command info. */
   String TREE = lang("tree");

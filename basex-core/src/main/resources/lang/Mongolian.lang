@@ -347,7 +347,6 @@ sort                 = Sort
 srv_running          = Серверийн ажиллагаа эсвэл эрх олголт амжилтгүй
 srv_started          = Сервер ажиллаж байна
 srv_stopped          = Сервер зогссон
-status_bar           = Статус бар
 stemming             = Зогсоолт
 stop                 = Зогсоох
 stopped_at           = дээр зогссон

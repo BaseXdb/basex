@@ -347,7 +347,6 @@ sort                 = Sırala
 srv_running          = Sunucu çalışıyor veya izin reddedildi
 srv_started          = Sunucu başlatıldı
 srv_stopped          = Sunucu durduruldu
-status_bar           = Durum Çubuğu
 stemming             = Kök bulma (stemming)
 stop                 = Durdur
 stopped_at           = Şurada durduruldu

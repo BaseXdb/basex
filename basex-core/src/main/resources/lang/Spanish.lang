@@ -347,7 +347,6 @@ sort                 = Ordenar
 srv_running          = El servidor está ejecutándose o el permiso fue denegado
 srv_started          = El servidor ha arrancado
 srv_stopped          = El servidor ha parado
-status_bar           = Barra de estado
 stemming             = Reducción a la raíz
 stop                 = Parar
 stopped_at           = Parado en

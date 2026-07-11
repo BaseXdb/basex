@@ -205,11 +205,12 @@ public final class GUI extends JFrame implements BaseXWindow {
         new ExploreView(notify));
 
     top.add(views, BorderLayout.CENTER);
-    setContentBorder();
+    views.setBorder(new CompoundBorder(BaseXLayout.border(3, 1, 3, 1),
+        BorderFactory.createEtchedBorder(EtchedBorder.LOWERED)));
 
     // add status bar
     status = new GUIStatus(this);
-    if(this.gopts.get(GUIOptions.SHOWSTATUS)) top.add(status, BorderLayout.SOUTH);
+    top.add(status, BorderLayout.SOUTH);
 
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     add(top);
@@ -541,21 +542,6 @@ public final class GUI extends JFrame implements BaseXWindow {
   }
 
   /**
-   * Sets the border of the content area.
-   */
-  private void setContentBorder() {
-    final int n = control.getComponentCount();
-    final int n2 = top.getComponentCount();
-
-    if(n == 0 && n2 == 2) {
-      views.border(0);
-    } else {
-      views.setBorder(new CompoundBorder(BaseXLayout.border(3, 1, 3, 1),
-          BorderFactory.createEtchedBorder(EtchedBorder.LOWERED)));
-    }
-  }
-
-  /**
    * Refreshes the layout.
    */
   public void updateLayout() {
@@ -579,7 +565,6 @@ public final class GUI extends JFrame implements BaseXWindow {
     } else {
       control.remove(comp);
     }
-    setContentBorder();
     getRootPane().validate();
     refreshControls(false);
   }

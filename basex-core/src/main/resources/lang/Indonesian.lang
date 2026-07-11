@@ -347,7 +347,6 @@ sort                 = Sortir
 srv_running          = Servis sudah berjalan atau izin ditolak
 srv_started          = Server sudah dijalankan
 srv_stopped          = Server sudah dihentikan
-status_bar           = Batang status
 stemming             = Memotong
 stop                 = Henti
 stopped_at           = Berhenti pada

@@ -79,8 +79,6 @@ public final class GUIOptions extends Options {
   public static final BooleanOption SHOWBUTTONS = new BooleanOption("SHOWBUTTONS", true);
   /** Flag for displaying the text field in the GUI window. */
   public static final BooleanOption SHOWINPUT = new BooleanOption("SHOWINPUT", true);
-  /** Flag for displaying the status bar in the GUI window. */
-  public static final BooleanOption SHOWSTATUS = new BooleanOption("SHOWSTATUS", true);
 
   /** Flag for activated info view. */
   public static final BooleanOption SHOWINFO = new BooleanOption("SHOWINFO", true);

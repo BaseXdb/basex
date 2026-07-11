@@ -347,7 +347,6 @@ sort                 = ソート
 srv_running          = サーバーが既に起動しているか、権限が足りません
 srv_started          = サーバーを開始しました
 srv_stopped          = サーバーを停止しました
-status_bar           = ステータスバー
 stemming             = 語幹処理
 stop                 = 終了
 stopped_at           = 停止しました

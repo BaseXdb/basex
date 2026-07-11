@@ -347,7 +347,6 @@ sort                 = Trier
 srv_running          = Serveur déjà démarré ou permission refusée
 srv_started          = Serveur démarré
 srv_stopped          = Serveur arrêté
-status_bar           = Barre d’état
 stemming             = Stemming
 stop                 = Arrêter
 stopped_at           = Arrêté à

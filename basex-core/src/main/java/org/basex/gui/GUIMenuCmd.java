@@ -626,19 +626,6 @@ public enum GUIMenuCmd implements GUICommand {
     }
   },
 
-  /** Shows the status bar. */
-  C_SHOW_STATUS_BAR(STATUS_BAR, null, false, true) {
-    @Override
-    public void execute(final GUI gui) {
-      gui.updateControl(gui.status, gui.gopts.invert(GUIOptions.SHOWSTATUS), BorderLayout.SOUTH);
-    }
-
-    @Override
-    public boolean selected(final GUI gui) {
-      return gui.gopts.get(GUIOptions.SHOWSTATUS);
-    }
-  },
-
   /** Shows the text view. */
   C_SHOW_RESULT(RESULT, "% R", false, true) {
     @Override

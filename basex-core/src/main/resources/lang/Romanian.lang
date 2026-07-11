@@ -347,7 +347,6 @@ sort                 = Sorteaza
 srv_running          = Serverul este pornit sau permisiunea a fost refuzata
 srv_started          = Serverul este pornit
 srv_stopped          = Serverul a fost oprit
-status_bar           = Bara de stare
 stemming             = Stemming
 stop                 = Stop
 stopped_at           = Oprit la

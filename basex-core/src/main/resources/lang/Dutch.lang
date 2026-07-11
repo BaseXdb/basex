@@ -347,7 +347,6 @@ sort                 = Sorteer
 srv_running          = Server loopt al of toegang ontzegd
 srv_started          = Server is gestart
 srv_stopped          = Server is gestopt
-status_bar           = Statusbalk
 stemming             = Stam zoeken
 stop                 = Stop
 stopped_at           = Gestopt bij
