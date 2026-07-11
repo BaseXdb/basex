@@ -289,7 +289,7 @@ public abstract class XNode extends GNode {
   }
 
   /**
-   * Returns a copy of the namespace hierarchy.
+   * Returns a copy of the in-scope namespaces.
    * @param qc query context (can be {@code null})
    * @return namespaces
    */
@@ -303,7 +303,7 @@ public abstract class XNode extends GNode {
           if(!ns.contains(name)) ns.add(name, nsp.value(a));
         }
       }
-      // constructed elements do not inherit namespaces from their parents
+      // frozen inherited set: add it and stop ascending (constructed/no-inherit boundary)
       final Atts inherited = node.nsInherited();
       if(inherited != null) {
         final int is = inherited.size();
