@@ -7,9 +7,9 @@ import java.util.*;
 import java.util.function.*;
 
 /**
- * <p>Damerau-Levenshtein algorithm. Based on the publications from Levenshtein (1965):
- * "Binary codes capable of correcting spurious insertions and deletions of ones", and
- * Damerau (1964): "A technique for computer detection and correction of spelling errors.".</p>
+ * <p>Optimal string alignment. Based on the publications from Levenshtein (1965): "Binary codes
+ * capable of correcting spurious insertions and deletions of ones", and Damerau (1964):
+ * "A technique for computer detection and correction of spelling errors.".</p>
  *
  * @author BaseX Team, BSD License
  * @author Christian Gruen
@@ -163,19 +163,18 @@ public final class Levenshtein {
 
     // compute distance
     final byte[][] m = matrix;
-    for(int f = -1, g = -1, t = 0; t < tl; t++) {
+    for(int t = 0; t < tl; t++) {
       final int tn = tkn[t];
       int d = Integer.MAX_VALUE;
       for(int c = 0; c < cl; c++) {
         final int cn = cmp[c];
         int cost = min(m[t][c + 1] + 1, m[t + 1][c] + 1, m[t][c] + (tn == cn ? 0 : 1));
-        if(tn == g && cn == f) cost = m[t][c];
+        if(t > 0 && c > 0 && tn == cmp[c - 1] && tkn[t - 1] == cn)
+          cost = Math.min(cost, m[t - 1][c - 1] + 1);
         m[t + 1][c + 1] = (byte) cost;
         d = Math.min(d, cost);
-        g = cn;
       }
       if(d > k) return Integer.MAX_VALUE;
-      f = tn;
     }
     final int d = m[tl][cl];
     return d <= k ? d : Integer.MAX_VALUE;
@@ -228,10 +227,12 @@ public final class Levenshtein {
     final int band = max >= 0 ? Math.min(max, Math.max(tl, cl)) : Math.max(tl, cl);
     final int inf = Integer.MAX_VALUE / 2;
 
-    int[] prev = new int[cl + 2], curr = new int[cl + 2];
+    // a transposition refers to the second last row
+    int[] prev2 = new int[cl + 2], prev = new int[cl + 2], curr = new int[cl + 2];
+    Arrays.fill(prev2, inf);
     for(int c = 0; c <= cl + 1; c++) prev[c] = c <= band ? c : inf;
 
-    for(int f = -1, g = -1, t = 0; t < tl; t++) {
+    for(int t = 0; t < tl; t++) {
       final int tn = token[t];
       final int lo = Math.max(0, t - band), hi = Math.min(cl - 1, t + band);
       curr[lo] = lo == 0 ? t + 1 : inf;
@@ -240,18 +241,17 @@ public final class Levenshtein {
       for(int c = lo; c <= hi; c++) {
         final int cn = compare[c];
         int cost = min(prev[c + 1] + 1, curr[c] + 1, prev[c] + (tn == cn ? 0 : 1));
-        if(tn == g && cn == f) cost = prev[c];
+        if(t > 0 && c > 0 && tn == compare[c - 1] && token[t - 1] == cn)
+          cost = Math.min(cost, prev2[c - 1] + 1);
         curr[c + 1] = cost;
         rowMin = Math.min(rowMin, cost);
-        g = cn;
       }
-      // invalidate the cell after the band: it must not be read as a stale value in the next row
+      // invalidate the cell after the band; it must not be read as a stale value
       if(hi + 2 <= cl + 1) curr[hi + 2] = inf;
-      f = tn;
 
-      // all subsequent distances will be at least as large as the minimum of the current row
       if(max >= 0 && rowMin > max) return -1;
-      final int[] tmp = prev;
+      final int[] tmp = prev2;
+      prev2 = prev;
       prev = curr;
       curr = tmp;
     }

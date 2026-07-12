@@ -173,6 +173,10 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args("ab", "ba"), 0.5);
     query(func.args("ba", "ab"), 0.5);
 
+    // optimal string alignment: no substring is edited more than once
+    query(func.args("bcb", "cbc"), 1e0 / 3);
+    query(func.args("abcde", "acbed"), 0.6);
+
     query(func.args("ab", "axb"), 2e0 / 3);
     query(func.args("ab", "axx"), 1e0 / 3);
 
