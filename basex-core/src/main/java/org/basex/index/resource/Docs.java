@@ -109,6 +109,13 @@ final class Docs {
       } catch(final IOException ex) {
         Util.debug(ex);
       }
+      // discard paths of databases that were created with an older version (case-folded paths)
+      if(pathList != null) {
+        final IntList docs = docs();
+        final int ds = docs.size();
+        if(pathList.size() != ds || ds > 0 &&
+            !eq(pathList.get(0), normalize(data.text(docs.get(0), true)))) pathList = null;
+      }
     }
 
     // generate paths
@@ -132,7 +139,12 @@ final class Docs {
    * @return path order
    */
   private synchronized int[] order() {
-    if(pathOrder == null) pathOrder = Array.createOrder(paths().toArray(), false, true);
+    if(pathOrder == null) {
+      final byte[][] keys = paths().toArray();
+      final int ks = keys.length;
+      for(int k = 0; k < ks; k++) keys[k] = key(keys[k]);
+      pathOrder = Array.createOrder(keys, false, true);
+    }
     return pathOrder;
   }
 
@@ -230,7 +242,7 @@ final class Docs {
     if(!dir && pth.isEmpty()) return docs;
 
     // normalize paths, check for explicit directory indicator
-    byte[] exact = EMPTY, prefix = normalize(token(pth));
+    byte[] exact = EMPTY, prefix = key(normalize(token(pth)));
     if(!(pth.isEmpty() || Strings.endsWith(pth, '/'))) {
       exact = prefix;
       prefix = concat(exact, cpToken('/'));
@@ -242,7 +254,7 @@ final class Docs {
     final TokenList paths = paths();
     final int ps = paths.size();
     for(int p = 0; p < ps; p++) {
-      final byte[] pt = paths.get(p);
+      final byte[] pt = key(paths.get(p));
       boolean add = eq(pt, exact);
       if(!add) {
         add = startsWith(pt, prefix);
@@ -264,12 +276,12 @@ final class Docs {
   synchronized int doc(final String path) {
     final String pth = MetaData.normPath(path);
     if(pth != null && !pth.isEmpty()) {
-      final byte[] npth = normalize(token(pth));
+      final byte[] npth = key(normalize(token(pth)));
       final TokenList paths = paths();
       final int[] order = order();
       int l = 0, h = order.length - 1;
       while(l <= h) {
-        final int m = l + h >>> 1, o = order[m], c = compare(paths.get(o), npth);
+        final int m = l + h >>> 1, o = order[m], c = compare(key(paths.get(o)), npth);
         if(c == 0) return docs().get(o);
         if(c < 0) l = m + 1;
         else h = m - 1;
@@ -284,9 +296,9 @@ final class Docs {
    * @return path to a directory or not
    */
   synchronized boolean isDir(final String path) {
-    final byte[] prefix = concat(path, cpToken('/'));
+    final byte[] prefix = key(concat(path, cpToken('/')));
     for(final byte[] pth : paths()) {
-      if(startsWith(pth, prefix)) return true;
+      if(startsWith(key(pth), prefix)) return true;
     }
     return false;
   }
@@ -323,12 +335,22 @@ final class Docs {
 
   /**
    * Returns the normalized index path representation for the specified path.
-   * The returned path begins with a slash and uses lower case on non-Unix machines.
+   * The returned path begins with a slash.
    * @param path input path (without leading slash)
    * @return canonical path
    */
   private static byte[] normalize(final byte[] path) {
-    return concat(cpToken('/'), Prop.CASE ? path : lc(path));
+    return concat(cpToken('/'), path);
+  }
+
+  /**
+   * Returns the key of a path for comparisons. As the index must be platform-independent,
+   * the case is not folded before a path is stored, but before it is compared.
+   * @param path normalized path
+   * @return comparison key
+   */
+  private static byte[] key(final byte[] path) {
+    return Prop.CASE ? path : lc(path);
   }
 
   @Override
