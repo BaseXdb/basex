@@ -113,7 +113,7 @@ public final class StringModuleTest extends SandboxTest {
 
   /** Test method. */
   @Test public void options() {
-    final Function lev = _STRING_LEVENSHTEIN;
+    final Function lev = _STRING_LEVENSHTEIN, dist = _STRING_LEVENSHTEIN_DISTANCE;
     final Function set = _STRING_TOKEN_SET_RATIO, sort = _STRING_TOKEN_SORT_RATIO;
     final Function jw = _STRING_JARO_WINKLER, ngrams = _STRING_NGRAMS;
 
@@ -127,6 +127,7 @@ public final class StringModuleTest extends SandboxTest {
     query(lev.args("Munch", "Münch", " { 'diacritics': 'insensitive' }"), 1);
     query(lev.args("HOUSES", "house", " { 'stemming': true(), 'case': 'insensitive' }"), 1);
     query(jw.args("flower", "FLOWER", " { 'case': 'insensitive' }"), 1);
+    query(dist.args("flower", "FLOWER", " ()", " { 'case': 'insensitive' }"), 0);
     query(ngrams.args("Rüb", " ()", " { 'case': 'insensitive', 'diacritics': 'insensitive' }"),
         "ru\nub");
 
@@ -217,6 +218,40 @@ public final class StringModuleTest extends SandboxTest {
     query(func.args("x", " string-join(replicate('x', 10000))"), "0.0001");
 
     error(func.args(" string-join(replicate('x', 10001))", "x"), STRING_BOUNDS_X);
+  }
+
+  /** Test method. */
+  @Test public void levenshteinDistance() {
+    final Function func = _STRING_LEVENSHTEIN_DISTANCE;
+    query(func.args("", ""), 0);
+    query(func.args("a", "a"), 0);
+    query(func.args("", "abc"), 3);
+    query(func.args("flower", "flowers"), 1);
+    query(func.args("kitten", "sitting"), 3);
+    // transposition of adjacent characters is a single edit
+    query(func.args("ab", "ba"), 1);
+    // optimal string alignment: no substring is edited more than once
+    query(func.args("CA", "ABC"), 3);
+    query(func.args("bcb", "cbc"), 2);
+    query(func.args("abcde", "acbed"), 2);
+    // comparison is case- and diacritic-sensitive
+    query(func.args("flower", "FLOWER"), 6);
+    query(func.args("Munch", "Münch"), 1);
+    // characters outside the BMP are single codepoints
+    query(func.args(" 'a&#x1D11E;'", "a"), 1);
+
+    // bounded computation: empty sequence if the distance exceeds the maximum
+    query(func.args("kitten", "sitting", 3), 3);
+    query(func.args("kitten", "sitting", 2), "");
+    query(func.args("a", "a", 0), 0);
+    query(func.args("a", "b", 0), "");
+    query(func.args("a", "a", -1), "");
+
+    // the length is only limited if the distance is computed exhaustively
+    final String long1 = " string-join(replicate('x', 10001))";
+    error(func.args(long1, "x"), STRING_BOUNDS_X);
+    query(func.args(long1, long1 + " || 'yy'", 5), 2);
+    query(func.args(long1, long1 + " || 'yy'", 1), "");
   }
 
   /** Test method. */

@@ -1926,6 +1926,10 @@ public enum Function implements AFunction {
   _STRING_LEVENSHTEIN(StringLevenshtein::new, "levenshtein(value1,value2[,options])",
       params(STRING_O, STRING_O, MAP_ZO), DOUBLE_O, STRING_URI),
   /** XQuery function. */
+  _STRING_LEVENSHTEIN_DISTANCE(StringLevenshteinDistance::new,
+      "levenshtein-distance(value1,value2[,max,options])",
+      params(STRING_O, STRING_O, INTEGER_ZO, MAP_ZO), INTEGER_ZO, STRING_URI),
+  /** XQuery function. */
   _STRING_NGRAM_SIMILARITY(StringNgramSimilarity::new,
       "ngram-similarity(value1,value2[,n,options])",
       params(STRING_O, STRING_O, INTEGER_ZO, MAP_ZO), DOUBLE_O, STRING_URI),
