@@ -255,6 +255,72 @@ public final class StringModuleTest extends SandboxTest {
   }
 
   /** Test method. */
+  @Test public void closest() {
+    final Function func = _STRING_CLOSEST;
+    final String candidates = " ('Rembrandt', 'Rembrand', 'Rubens')";
+
+    // best candidate, returned by default
+    query(func.args("Rembrant", " ()"), "");
+    query(func.args("Rembrant", candidates) + "?value", "Rembrandt");
+    query("count(" + func.args("Rembrant", candidates) + ')', 1);
+    query(func.args("Rembrandt", candidates) + "?similarity", 1);
+
+    // limit and ranking: equal similarities preserve the input order
+    query(func.args("Rembrant", candidates, " { 'limit': 0 }") + "?value",
+        "Rembrandt\nRembrand\nRubens");
+    query(func.args("x", " ('a', 'b')", " { 'limit': 0 }") + "?value", "a\nb");
+
+    // threshold
+    query(func.args("Rembrant", candidates, " { 'limit': 0, 'threshold': 0.8 }") + "?value",
+        "Rembrandt\nRembrand");
+    query(func.args("Rembrant", candidates, " { 'threshold': 1 }"), "");
+
+    // candidates can be untyped (e.g. the index entries returned by ft:tokens)
+    query(func.args("Rembrant", " <entry>Rembrandt</entry>") + "?value", "Rembrandt");
+    query(func.args("Rembrant", " (<e>Rubens</e>, <e>Rembrandt</e>)") + "?value", "Rembrandt");
+
+    // measures: named function references are computed internally
+    query(func.args("Ishida Yutei", " ('Yutei Ishida')",
+        " { 'measure': string:token-sort-ratio#2 }") + "?similarity", 1);
+    query(func.args("Ishida Yutei", " ('Yutei Ishida')",
+        " { 'measure': string:levenshtein#2 }") + "?similarity", 0);
+    query(func.args("Rembrandt", " ('Rembrandt van Rijn')",
+        " { 'measure': string:partial-ratio#2 }") + "?similarity", 1);
+
+    // partially applied functions must not be confused with their named references
+    query(func.args("night", " ('nacht')",
+        " { 'measure': string:ngram-similarity#2 }") + "?similarity", 0.25);
+    query(func.args("night", " ('nacht')",
+        " { 'measure': string:ngram-similarity(?, ?, 3) }") + "?similarity", 0);
+
+    // user-defined measures
+    query(func.args("abc", " ('abd', 'xyz')",
+        " { 'measure': fn($a, $b) { if($a = $b) then 1 else 0.5 }, 'limit': 0 }") + "?similarity",
+        "0.5\n0.5");
+    error(func.args("a", " ('b')", " { 'measure': 'levenshtein' }"), INVALIDOPTION_X_X_X_X);
+    error(func.args("a", " ('b')", " { 'measure': string:soundex#1 }"), INVTYPE_X);
+
+    // strings that are too long
+    final String long1 = " string-join(replicate('x', 10001))";
+    error(func.args(long1, " ('a')"), STRING_BOUNDS_X);
+    error(func.args("a", long1), STRING_BOUNDS_X);
+    query("exists(" + func.args("a", long1, " { 'measure': string:jaro-winkler#2 }") + ')', true);
+
+    // edge cases
+    query(func.args("", " ('', 'a')", " { 'limit': 0 }") + "?similarity", "1\n0");
+    query("count(" + func.args("a", " ('a', 'a', 'b')", " { 'limit': 0 }") + ')', 3);
+    query("count(" + func.args("a", " ('a')", " { 'threshold': 1.5 }") + ')', 0);
+    query("count(" + func.args("a", " ('a', 'b')", " { 'limit': -1 }") + ')', 2);
+
+    query("count(" + func.args("a", " ('a', 'b')",
+        " { 'threshold': xs:double('NaN'), 'limit': 0 }") + ')', 0);
+
+    // the measure must return a number
+    error(func.args("a", " ('b')", " { 'measure': fn($x, $y) { () } }"), INVTYPE_X);
+    error(func.args("a", " ('b')", " { 'measure': fn($x, $y) { 'x' } }"), NONUMBER_X_X);
+  }
+
+  /** Test method. */
   @Test public void partialRatio() {
     final Function func = _STRING_PARTIAL_RATIO;
     // the shorter string is compared with the best matching substring of the longer one
